@@ -81,7 +81,7 @@ private:
 	void inkey_select_favorite(const event *menu_event);
 	void inkey_special(const event *menu_event);
 	void inkey_export();
-	void inkey_configure(const event *menu_event);
+	void inkey_navigation();
 };
 
 } // namespace ui

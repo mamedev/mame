@@ -44,7 +44,7 @@ private:
 	// internal methods
 	void build_driver_list();
 	void inkey_select(const event *menu_event);
-	void inkey_cancel(const event *menu_event);
+	void inkey_cancel();
 	void inkey_special(const event *menu_event);
 };
 

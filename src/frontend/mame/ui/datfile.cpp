@@ -83,7 +83,7 @@ datfile_manager::datfile_manager(running_machine &machine, ui_options &moptions)
 void datfile_manager::init_sysinfo()
 {
 	int swcount = 0;
-	auto count = index_datafile(m_sysidx, swcount);
+	auto count = index_datafile(m_sysidx, swcount, TAG_SYSINFO_R, m_sysinfo_rev, '.');
 	osd_printf_verbose("Sysinfo.dat games found = %i\n", count);
 	osd_printf_verbose("Rev = %s\n", m_sysinfo_rev.c_str());
 }
@@ -94,7 +94,7 @@ void datfile_manager::init_sysinfo()
 void datfile_manager::init_story()
 {
 	int swcount = 0;
-	auto count = index_datafile(m_storyidx, swcount);
+	auto count = index_datafile(m_storyidx, swcount, TAG_STORY_R, m_story_rev, 's');
 	osd_printf_verbose("Story.dat games found = %i\n", count);
 }
 
@@ -104,7 +104,7 @@ void datfile_manager::init_story()
 void datfile_manager::init_history()
 {
 	int swcount = 0;
-	auto count = index_datafile(m_histidx, swcount);
+	auto count = index_datafile(m_histidx, swcount, TAG_HISTORY_R, m_history_rev, ' ');
 	osd_printf_verbose("History.dat systems found = %i\n", count);
 	osd_printf_verbose("History.dat software packages found = %i\n", swcount);
 	osd_printf_verbose("Rev = %s\n", m_history_rev.c_str());
@@ -152,7 +152,8 @@ void datfile_manager::init_messinfo()
 void datfile_manager::init_command()
 {
 	int swcount = 0;
-	auto count = index_datafile(m_cmdidx, swcount);
+	std::string tmp, tmp2;
+	auto count = index_datafile(m_cmdidx, swcount, tmp, tmp2, 'c');
 	osd_printf_verbose("Command.dat games found = %i\n", count);
 }
 
@@ -398,12 +399,10 @@ int datfile_manager::index_mame_mess_info(dataindex &index, drvindex &index_drv,
 //  load a game name and offset into an
 //  indexed array
 //-------------------------------------------------
-int datfile_manager::index_datafile(dataindex &index, int &swcount)
+int datfile_manager::index_datafile(dataindex &index, int &swcount, std::string &tag, std::string &str, char sep)
 {
 	std::string readbuf;
-	auto t_hist = TAG_HISTORY_R.size();
-	auto t_story = TAG_STORY_R.size();
-	auto t_sysinfo = TAG_SYSINFO_R.size();
+	auto tag_size = tag.size();
 	auto t_info = TAG_INFO.size();
 	auto t_bio = TAG_BIO.size();
 	char rbuf[64 * 1024];
@@ -411,21 +410,19 @@ int datfile_manager::index_datafile(dataindex &index, int &swcount)
 	{
 		readbuf = chartrimcarriage(rbuf);
 
-		if (m_history_rev.empty() && readbuf.compare(0, t_hist, TAG_HISTORY_R) == 0)
-		{
-			auto found = readbuf.find(" ", t_hist + 1);
-			m_history_rev = readbuf.substr(t_hist + 1, found - t_hist);
-		}
-		else if (m_sysinfo_rev.empty() && readbuf.compare(0, t_sysinfo, TAG_SYSINFO_R) == 0)
-		{
-			auto found = readbuf.find(".", t_sysinfo + 1);
-			m_sysinfo_rev = readbuf.substr(t_sysinfo + 1, found - t_sysinfo);
-		}
-		else if (m_story_rev.empty() && readbuf.compare(0, t_story, TAG_STORY_R) == 0)
-		{
-			m_story_rev = readbuf.substr(t_story + 1);
-		}
-		else if (readbuf.compare(0, t_info, TAG_INFO) == 0)
+		if (!tag.empty())
+			if (str.empty() && readbuf.compare(0, tag_size, tag) == 0)
+			{
+				if (sep != 's')
+				{
+					auto found = readbuf.find(sep, tag_size + 1);
+					str = readbuf.substr(tag_size + 1, found - tag_size);
+				}
+				else
+					str = readbuf.substr(tag_size + 1);
+			}
+
+		if (readbuf.compare(0, t_info, TAG_INFO) == 0)
 		{
 			// search for game info
 			auto rd = readbuf.substr(t_info + 1);
@@ -452,6 +449,7 @@ int datfile_manager::index_datafile(dataindex &index, int &swcount)
 				for (auto & li : token_list)
 					for (auto & ro : token_roms)
 						m_swindex[li].emplace(ro, ftell(fp));
+				swcount++;
 			}
 		}
 	}

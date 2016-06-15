@@ -122,7 +122,7 @@ void simple_menu_select_game::handle()
 				inkey_select(menu_event);
 				break;
 			case IPT_UI_CANCEL:
-				inkey_cancel(menu_event);
+				inkey_cancel();
 				break;
 			case IPT_SPECIAL:
 				inkey_special(menu_event);
@@ -182,7 +182,7 @@ void simple_menu_select_game::inkey_select(const event *menu_event)
 //  inkey_cancel
 //-------------------------------------------------
 
-void simple_menu_select_game::inkey_cancel(const event *menu_event)
+void simple_menu_select_game::inkey_cancel()
 {
 	// escape pressed with non-empty text clears the text
 	if (m_search[0] != 0)

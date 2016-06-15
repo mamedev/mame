@@ -15,6 +15,7 @@
 #include "machine/ldp1000.h"
 
 #define DUMP_BCD 1
+#define FIFO_MAX 0x10
 
 ROM_START( ldp1000 )
 	ROM_REGION( 0x2000, "ldp1000", 0 )
@@ -70,6 +71,9 @@ void sony_ldp1000_device::device_start()
 void sony_ldp1000_device::device_reset()
 {
 	laserdisc_device::device_reset();
+	
+	for(int i=0;i<0x10;i++)
+		m_internal_bcd[i] = 0;
 
 }
 
@@ -119,11 +123,10 @@ READ8_MEMBER( sony_ldp1000_device::status_r )
 	return res;
 }
 
-void sony_ldp1000_device::set_new_player_state(ldp1000_player_state which, UINT8 fifo_size)
+void sony_ldp1000_device::set_new_player_state(ldp1000_player_state which)
 {
 	m_player_state = which;
 	m_index_state = 0;
-	m_index_size = fifo_size;
 	printf("set new player state\n");
 }
 
@@ -132,18 +135,36 @@ void sony_ldp1000_device::set_new_player_bcd(UINT8 data)
 {
 	m_internal_bcd[m_index_state] = data;
 	m_index_state ++;
-	if(m_index_state >= m_index_size)
+	if(m_index_state >= FIFO_MAX)
+		throw emu_fatalerror("FIFO MAX reached");
+
+	m_status = stat_ack;
+}
+
+UINT32 sony_ldp1000_device::bcd_to_raw()
+{
+	UINT32 res = 0;
+	for(int i=0;i<6;i++)
+		res |= (m_internal_bcd[i] & 0xf) << i*4;
+	return res;
+}
+
+void sony_ldp1000_device::exec_enter_cmd()
+{
+	//const UINT32 saved_frame = bcd_to_raw();
+	
+	switch(m_player_state)
 	{
-		#if DUMP_BCD
-			for(int i=0;i<m_index_size;i++)
-				printf("%02x ",m_internal_bcd[i]);
+		case player_standby:
+			throw emu_fatalerror("Unimplemented standby state detected");
 			
-			printf("[size = %02x]\n",m_index_size);
-		#endif
-		m_status = stat_ack;
+		case player_search:
+			// TODO: move to timer
+			//advance_slider(1);
+			//set_slider_speed(saved_frame);
+			break;
 	}
-	else
-		m_status = stat_ack;
+	m_player_state = player_standby;
 }
 
 
@@ -154,7 +175,7 @@ WRITE8_MEMBER( sony_ldp1000_device::command_w )
 	// 0x30 to 0x69 range causes an ACK, anything else is invalid
 	m_command = data;
 
-	if((m_command & 0xf0) == 0x30)
+	if((m_command & 0xf0) == 0x30 && (m_command & 0xf) < 0x0a)
 	{
 		set_new_player_bcd(data);
 		return;
@@ -162,11 +183,13 @@ WRITE8_MEMBER( sony_ldp1000_device::command_w )
 
 	switch(m_command)
 	{
-		case 0x40: // enter bcd command, todo
+		case 0x40: // enter, process BCD command
+			exec_enter_cmd();
+			m_status = stat_ack;
 			break;
 		
 		case 0x43: // search
-			set_new_player_state(player_search,5);
+			set_new_player_state(player_search);
 			m_status = stat_ack;
 			break;
 		

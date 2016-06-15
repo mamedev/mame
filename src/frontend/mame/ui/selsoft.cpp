@@ -184,11 +184,11 @@ void menu_select_software::handle()
 		else if (menu_event->iptkey == IPT_UI_SELECT)
 		{
 			// handle selections
-			if (is_focus(focused_menu::main))
+			if (get_focus() == focused_menu::main)
 			{
 				inkey_select(menu_event);
 			}
-			else if (is_focus(focused_menu::left))
+			else if (get_focus() == focused_menu::left)
 			{
 				l_sw_hover = highlight;
 				check_filter = true;
@@ -300,14 +300,14 @@ void menu_select_software::handle()
 		}
 
 		else if (menu_event->iptkey == IPT_UI_CONFIGURE)
-			inkey_configure(menu_event);
+			inkey_navigation();
 	}
 
 	if (menu_event && !menu_event->itemref)
 	{
 		if (menu_event->iptkey == IPT_UI_CONFIGURE)
 		{
-			inkey_configure(menu_event);
+			inkey_navigation();
 		}
 		else if (menu_event->iptkey == IPT_UI_LEFT)
 		{
@@ -363,7 +363,7 @@ void menu_select_software::handle()
 			// handle UI_DOWN_FILTER
 			highlight++;
 		}
-		else if (menu_event->iptkey == IPT_OTHER && is_focus(focused_menu::left))
+		else if (menu_event->iptkey == IPT_OTHER && get_focus() == focused_menu::left)
 		{
 			l_sw_hover = highlight;
 			check_filter = true;
@@ -987,40 +987,59 @@ void menu_select_software::inkey_special(const event *menu_event)
 }
 
 
-void menu_select_software::inkey_configure(const event *menu_event)
+void menu_select_software::inkey_navigation()
 {
-	if (is_focus(focused_menu::main))
+	switch (get_focus())
 	{
-		if (selected <= visible_items)
-		{
-			m_prev_selected = item[selected].ref;
-			selected = visible_items + 1;
-		}
-		else
-		{
-			if (ui_globals::panels_status != HIDE_LEFT_PANEL)
-				set_focus(focused_menu::left);
-
-			else if (ui_globals::panels_status == HIDE_BOTH)
+		case focused_menu::main:
+			if (selected <= visible_items)
 			{
+				m_prev_selected = item[selected].ref;
+				selected = visible_items + 1;
+			}
+			else
+			{
+				if (ui_globals::panels_status != HIDE_LEFT_PANEL)
+					set_focus(focused_menu::left);
+
+				else if (ui_globals::panels_status == HIDE_BOTH)
+				{
+					for (int x = 0; x < item.size(); ++x)
+						if (item[x].ref == m_prev_selected)
+							selected = x;
+				}
+				else
+				{
+					set_focus(focused_menu::righttop);
+				}
+			}
+			break;
+
+		case focused_menu::left:
+			if (ui_globals::panels_status != HIDE_RIGHT_PANEL)
+			{
+				set_focus(focused_menu::righttop);
+			}
+			else
+			{
+				set_focus(focused_menu::main);
+				if (m_prev_selected == nullptr)
+				{
+					selected = 0;
+					return;
+				}
+
 				for (int x = 0; x < item.size(); ++x)
 					if (item[x].ref == m_prev_selected)
 						selected = x;
 			}
-			else
-			{
-				set_focus(focused_menu::righttop);
-			}
-		}
-	}
-	else if (is_focus(focused_menu::left))
-	{
-		if (ui_globals::panels_status != HIDE_RIGHT_PANEL)
-		{
-			set_focus(focused_menu::righttop);
-		}
-		else
-		{
+			break;
+
+		case focused_menu::righttop:
+			set_focus(focused_menu::rightbottom);
+			break;
+
+		case focused_menu::rightbottom:
 			set_focus(focused_menu::main);
 			if (m_prev_selected == nullptr)
 			{
@@ -1031,24 +1050,7 @@ void menu_select_software::inkey_configure(const event *menu_event)
 			for (int x = 0; x < item.size(); ++x)
 				if (item[x].ref == m_prev_selected)
 					selected = x;
-		}
-	}
-	else if (is_focus(focused_menu::righttop))
-	{
-		set_focus(focused_menu::rightbottom);
-	}
-	else if (is_focus(focused_menu::rightbottom))
-	{
-		set_focus(focused_menu::main);
-		if (m_prev_selected == nullptr)
-		{
-			selected = 0;
-			return;
-		}
-
-		for (int x = 0; x < item.size(); ++x)
-			if (item[x].ref == m_prev_selected)
-				selected = x;
+			break;
 	}
 }
 
@@ -1446,7 +1448,7 @@ float menu_select_software::draw_left_panel(float x1, float y1, float x2, float 
 				hover = phover + filter;
 			}
 
-			if (highlight == filter && is_focus(focused_menu::left))
+			if (highlight == filter && get_focus() == focused_menu::left)
 			{
 				fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
 				bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
@@ -1571,7 +1573,7 @@ void menu_select_software::infos_render(void *selectedref, float origx1, float o
 
 		rgb_t fgcolor = UI_TEXT_COLOR;
 		rgb_t bgcolor = UI_TEXT_BG_COLOR;
-		if (is_focus(focused_menu::rightbottom))
+		if (get_focus() == focused_menu::rightbottom)
 		{
 			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
 			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
@@ -1605,7 +1607,7 @@ void menu_select_software::infos_render(void *selectedref, float origx1, float o
 
 		rgb_t fgcolor = UI_TEXT_COLOR;
 		rgb_t bgcolor = UI_TEXT_BG_COLOR;
-		if (is_focus(focused_menu::rightbottom))
+		if (get_focus() == focused_menu::rightbottom)
 		{
 			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
 			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
@@ -1767,7 +1769,7 @@ void menu_select_software::arts_render(void *selectedref, float origx1, float or
 
 			olddriver = driver;
 			ui_globals::switch_image = false;
-			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2, false);
+			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2);
 			auto_free(machine(), tmp_bitmap);
 		}
 
@@ -1856,7 +1858,7 @@ void menu_select_software::arts_render(void *selectedref, float origx1, float or
 
 			oldsoft = soft;
 			ui_globals::switch_image = false;
-			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2, true);
+			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2);
 			auto_free(machine(), tmp_bitmap);
 		}
 

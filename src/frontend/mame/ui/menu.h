@@ -268,7 +268,7 @@ protected:
 	const event *process(UINT32 flags, float x0 = 0.0f, float y0 = 0.0f);
 	void process_parent() { m_parent->process(PROCESS_NOINPUT); }
 
-	bool is_focus(focused_menu focus) const { return m_focus == focus; }
+	focused_menu get_focus() const { return m_focus; }
 	void set_focus(focused_menu focus) { m_focus = focus; }
 
 	// draw right box
@@ -280,7 +280,7 @@ protected:
 
 	// images render
 	std::string arts_render_common(float origx1, float origy1, float origx2, float origy2);
-	void arts_render_images(bitmap_argb32 *bitmap, float origx1, float origy1, float origx2, float origy2, bool software);
+	void arts_render_images(bitmap_argb32 *bitmap, float origx1, float origy1, float origx2, float origy2);
 
 	// draw header and footer text
 	void extra_text_render(float top, float bottom, float origx1, float origy1, float origx2, float origy2, const char *header, const char *footer);
@@ -345,7 +345,7 @@ private:
 	void handle_main_keys(UINT32 flags);
 
 	// handle mouse
-	void handle_main_events(UINT32 flags);
+	void handle_main_events();
 
 	void draw_icon(int linenum, void *selectedref, float x1, float y1);
 	void extra_text_draw_box(float origx1, float origx2, float origy, float yspan, const char *text, int direction);

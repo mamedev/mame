@@ -7367,6 +7367,30 @@ static const gfx_layout super9_tilelayout =  // Green is OK. Red needs normal go
 	128*8   /* every char takes 128 consecutive bytes */
 };
 
+static const gfx_layout flaming7_charlayout =
+{
+	8,8,    /* 8*8 characters */
+	4096,    /* 4096 characters */
+	3,      /* 3 bits per pixel */
+	{ 2, 4, 6 }, /* the bitplanes are packed in one byte */
+	{ 2*8+1, 2*8+0, 3*8+1, 3*8+0, 0*8+1, 0*8+0, 1*8+1, 1*8+0 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	32*8   /* every char takes 32 consecutive bytes */
+};
+
+static const gfx_layout flaming7_tilelayout =
+{
+	8,32,    /* 8*32 characters */
+	256,    /* 256 tiles */
+	4,      /* 4 bits per pixel */
+	{ 0, 2, 4, 6 },
+	{ 2*8+0, 2*8+1, 3*8+0, 3*8+1, 0, 1, 1*8+0, 1*8+1 },
+	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8,
+			32*8, 36*8, 40*8, 44*8, 48*8, 52*8, 56*8, 60*8,
+			64*8, 68*8, 72*8, 76*8, 80*8, 84*8, 88*8, 92*8,
+			96*8, 100*8, 104*8, 108*8, 112*8, 116*8, 120*8, 124*8 },
+	128*8   /* every char takes 128 consecutive bytes */
+};
 
 
 static GFXDECODE_START( goldstar )
@@ -7470,6 +7494,11 @@ GFXDECODE_END
 static GFXDECODE_START( super9 )
 	GFXDECODE_ENTRY( "gfx1", 0, super9_charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, super9_tilelayout, 128,  8 )
+GFXDECODE_END
+
+static GFXDECODE_START( flaming7 )
+	GFXDECODE_ENTRY( "gfx1", 0, flaming7_charlayout,   0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, flaming7_tilelayout, 128,  8 )
 GFXDECODE_END
 
 
@@ -7638,6 +7667,7 @@ WRITE8_MEMBER(goldstar_state::ay8910_outputb_w)
 	//popmessage("ay8910_outputb_w %02x",data);
 }
 
+
 static MACHINE_CONFIG_START( goldstar, goldstar_state )
 
 	/* basic machine hardware */
@@ -7796,7 +7826,7 @@ static MACHINE_CONFIG_START( super9, goldstar_state )
 MACHINE_CONFIG_END
 
 
-PALETTE_INIT_MEMBER(goldstar_state,cm)
+PALETTE_INIT_MEMBER(goldstar_state, cm)
 {
 	/* BBGGGRRR */
 
@@ -7813,7 +7843,7 @@ PALETTE_INIT_MEMBER(goldstar_state,cm)
 	}
 }
 
-PALETTE_INIT_MEMBER(goldstar_state,cmast91)
+PALETTE_INIT_MEMBER(goldstar_state, cmast91)
 {
 	int i;
 	for (i = 0; i < 0x100; i++)
@@ -8186,17 +8216,31 @@ static MACHINE_CONFIG_DERIVED( bingownga, bingowng )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( flaming7, lucky8 )
+static MACHINE_CONFIG_DERIVED( flam7_w4, lucky8 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(flaming7_map)
-//  MCFG_CPU_IO_MAP(flaming7_readport)
 
 	MCFG_DEVICE_MODIFY("ppi8255_0")
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, fl7w4_outc802_w))
 
 	MCFG_DS2401_ADD("fl7w4_id")
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( flaming7, lucky8 )
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(flaming7_map)
+
+	MCFG_GFXDECODE_MODIFY("gfxdecode", flaming7)
+
+    // to do serial protection.
+	MCFG_DEVICE_MODIFY("ppi8255_0")
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, fl7w4_outc802_w))
+
+	MCFG_DS2401_ADD("fl7w4_id")
+MACHINE_CONFIG_END
+
 
 
 PALETTE_INIT_MEMBER(wingco_state, magodds)
@@ -14149,6 +14193,8 @@ ROM_END
   Flaming 7
   Cyberdyne Systems, Inc.
 
+  W4 hardware.
+
   GFX sets:
   1) Red, White & Blue 7's
   2) Hollywood Nights.
@@ -14191,6 +14237,119 @@ ROM_START( fl7_3121 )  // Red, White & Blue 7's + Hollywood Nights. Serial 7D063
 
 	ROM_REGION(0x8, "fl7w4_id", 0)     /* Electronic Serial DS2401 */
 	ROM_LOAD( "ds2401.bin", 0x0000, 0x0008, CRC(b7078792) SHA1(f9eba1587b65ed9bc07ea6c4b2d393fb43f60659) ) // Hand built to match our ROM set
+
+ROM_END
+
+/*
+  Flaming 7's
+  Cyberdyne Systems.
+
+  Main - 50.
+  Custom Hardware.
+
+*/  
+ROM_START( fl7_50 )  // Serial 00000069A1C9.
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "50-main.u22",  0x0000, 0x8000, CRC(e097e317) SHA1(a903144cc2290b7e22045490784b592adbf9ba97) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "27c1001.u6",  0x00000, 0x20000, CRC(00eac3c1) SHA1(1a955f8bc044e17f0885b4b126a66d7ad191e410) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "27c256.u3",   0x00000, 0x8000, CRC(cfc8f3e2) SHA1(7dd72e3ffb0904776f3c07635b953e72f4c63068) )
+
+	/* Bipolar PROMs from the W4 hardware version */
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.g13", 0x0000, 0x0100, CRC(3ed8a612) SHA1(4189f1abb0033aeb64b56f63bdbc29d980c43909) )
+	ROM_LOAD( "82s129.g14", 0x0100, 0x0100, CRC(aa068a22) SHA1(42c6d77e5aa360c529f8aca6b925010c15eedcd7) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "82s123.d13", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "82s129.f3", 0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "82s123.d12", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+
+	ROM_REGION(0x8, "fl7w4_id", 0)     /* Electronic Serial DS2401 */
+	ROM_LOAD( "ds2401.bin", 0x0000, 0x0008, NO_DUMP ) // Hand built to match our ROM set
+
+ROM_END
+
+
+/*
+  Flaming 7's
+  Cyberdyne Systems.
+
+  Main - 500.
+  Custom Hardware.
+
+*/  
+ROM_START( fl7_500 )  // Serial 000000125873.
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "500-main.u22",  0x0000, 0x8000, CRC(e2c82c67) SHA1(951b0044de9b6104f51aa5a3176d0ea475415f7c) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "27c1001.u6",  0x00000, 0x20000, CRC(00eac3c1) SHA1(1a955f8bc044e17f0885b4b126a66d7ad191e410) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "27c256.u3",   0x00000, 0x8000, CRC(4e3bd980) SHA1(202d3135da7ab435f487943079d88b170dc10955) )
+
+	/* Bipolar PROMs from the W4 hardware version */
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.g13", 0x0000, 0x0100, CRC(3ed8a612) SHA1(4189f1abb0033aeb64b56f63bdbc29d980c43909) )
+	ROM_LOAD( "82s129.g14", 0x0100, 0x0100, CRC(aa068a22) SHA1(42c6d77e5aa360c529f8aca6b925010c15eedcd7) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "82s123.d13", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "82s129.f3", 0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "82s123.d12", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+
+	ROM_REGION(0x8, "fl7w4_id", 0)     /* Electronic Serial DS2401 */
+	ROM_LOAD( "ds2401.bin", 0x0000, 0x0008, NO_DUMP ) // Hand built to match our ROM set
+
+ROM_END
+
+
+/*
+  Flaming 7's
+  Cyberdyne Systems.
+
+  Main - 2000.
+  Custom Hardware.
+
+*/  
+ROM_START( fl7_2000 )  // Serial 00000063A47F.
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "2000_main_27c256.u22",  0x0000, 0x8000, CRC(9659b045) SHA1(801b6733b70b35de65cd8faba6814fa013c05ad0) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "m27c1001.u6",  0x00000, 0x20000, CRC(5a2157bb) SHA1(2b170102caf1224df7a6d33bb84d19114f453d89) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "27c256.u3",   0x00000, 0x8000, CRC(cfc8f3e2) SHA1(7dd72e3ffb0904776f3c07635b953e72f4c63068) )
+
+	/* Bipolar PROMs from the W4 hardware version */
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.g13", 0x0000, 0x0100, CRC(3ed8a612) SHA1(4189f1abb0033aeb64b56f63bdbc29d980c43909) )
+	ROM_LOAD( "82s129.g14", 0x0100, 0x0100, CRC(aa068a22) SHA1(42c6d77e5aa360c529f8aca6b925010c15eedcd7) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "82s123.d13", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "82s129.f3", 0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "82s123.d12", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+
+	ROM_REGION(0x8, "fl7w4_id", 0)     /* Electronic Serial DS2401 */
+	ROM_LOAD( "ds2401.bin", 0x0000, 0x0008, NO_DUMP ) // Hand built to match our ROM set
 
 ROM_END
 
@@ -14939,7 +15098,10 @@ GAMEL( 1993, bingownga, bingowng, bingownga,bingownga,driver_device,  0,        
 
 
 // --- Flaming 7's hardware (W-4 derivative) ---
-GAME(  199?, fl7_3121,  0,        flaming7, flaming7, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 (Red, White & Blue 7's + Hollywood Nights)",     0 )
+GAME(  199?, fl7_3121,  0,        flam7_w4, flaming7, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 (W4 Hardware, Red, White & Blue 7's + Hollywood Nights)",          0 )
+GAME(  199?, fl7_50,    fl7_3121, flaming7, flaming7, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 50)",                    MACHINE_NOT_WORKING )
+GAME(  199?, fl7_500,   fl7_3121, flaming7, flaming7, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 500)",                   MACHINE_NOT_WORKING )
+GAME(  199?, fl7_2000,  fl7_3121, flaming7, flaming7, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 2000)",                  MACHINE_NOT_WORKING )
 
 
 // --- Wing W-8 hardware ---
