@@ -14256,21 +14256,14 @@ ROM_START( fl7_50 )  // Serial 00000069A1C9.
 	ROM_LOAD( "27c1001.u6",  0x00000, 0x20000, CRC(00eac3c1) SHA1(1a955f8bc044e17f0885b4b126a66d7ad191e410) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "27c256.u3",   0x00000, 0x8000, CRC(cfc8f3e2) SHA1(7dd72e3ffb0904776f3c07635b953e72f4c63068) )
+	ROM_LOAD( "27c256.u3",   0x0000, 0x8000, CRC(cfc8f3e2) SHA1(7dd72e3ffb0904776f3c07635b953e72f4c63068) )
 
-	/* Bipolar PROMs from the W4 hardware version */
+	/* Proper bipolar PROM dump */
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "82s129.g13", 0x0000, 0x0100, CRC(3ed8a612) SHA1(4189f1abb0033aeb64b56f63bdbc29d980c43909) )
-	ROM_LOAD( "82s129.g14", 0x0100, 0x0100, CRC(aa068a22) SHA1(42c6d77e5aa360c529f8aca6b925010c15eedcd7) )
+	ROM_LOAD( "am27s29.u1",  0x0000, 0x0200, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
 
 	ROM_REGION( 0x20, "proms2", 0 )
-	ROM_LOAD( "82s123.d13", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
-
-	ROM_REGION( 0x100, "unkprom", 0 )
-	ROM_LOAD( "82s129.f3", 0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
-
-	ROM_REGION( 0x20, "unkprom2", 0 )
-	ROM_LOAD( "82s123.d12", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+	ROM_LOAD( "dummy", 0x0000, 0x0020, NO_DUMP )
 
 	ROM_REGION(0x8, "fl7w4_id", 0)     /* Electronic Serial DS2401 */
 	ROM_LOAD( "ds2401.bin", 0x0000, 0x0008, NO_DUMP ) // Hand built to match our ROM set
@@ -14294,24 +14287,17 @@ ROM_START( fl7_500 )  // Serial 000000125873.
 	ROM_LOAD( "27c1001.u6",  0x00000, 0x20000, CRC(00eac3c1) SHA1(1a955f8bc044e17f0885b4b126a66d7ad191e410) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "27c256.u3",   0x00000, 0x8000, CRC(4e3bd980) SHA1(202d3135da7ab435f487943079d88b170dc10955) )
+	ROM_LOAD( "27c256.u3",   0x0000, 0x8000, CRC(4e3bd980) SHA1(202d3135da7ab435f487943079d88b170dc10955) )
 
-	/* Bipolar PROMs from the W4 hardware version */
+	/* Proper bipolar PROM dump */
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "82s129.g13", 0x0000, 0x0100, CRC(3ed8a612) SHA1(4189f1abb0033aeb64b56f63bdbc29d980c43909) )
-	ROM_LOAD( "82s129.g14", 0x0100, 0x0100, CRC(aa068a22) SHA1(42c6d77e5aa360c529f8aca6b925010c15eedcd7) )
+	ROM_LOAD( "am27s29.u1",  0x0000, 0x0200, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
 
 	ROM_REGION( 0x20, "proms2", 0 )
-	ROM_LOAD( "82s123.d13", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
-
-	ROM_REGION( 0x100, "unkprom", 0 )
-	ROM_LOAD( "82s129.f3", 0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
-
-	ROM_REGION( 0x20, "unkprom2", 0 )
-	ROM_LOAD( "82s123.d12", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+	ROM_LOAD( "dummy", 0x0000, 0x0020, NO_DUMP )
 
 	ROM_REGION(0x8, "fl7w4_id", 0)     /* Electronic Serial DS2401 */
-	ROM_LOAD( "ds2401.bin", 0x0000, 0x0008, NO_DUMP ) // Hand built to match our ROM set
+	ROM_LOAD( "ds2401.bin",  0x0000, 0x0008, NO_DUMP ) // Hand built to match our ROM set
 
 ROM_END
 
@@ -14332,21 +14318,14 @@ ROM_START( fl7_2000 )  // Serial 00000063A47F.
 	ROM_LOAD( "m27c1001.u6",  0x00000, 0x20000, CRC(5a2157bb) SHA1(2b170102caf1224df7a6d33bb84d19114f453d89) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "27c256.u3",   0x00000, 0x8000, CRC(cfc8f3e2) SHA1(7dd72e3ffb0904776f3c07635b953e72f4c63068) )
+	ROM_LOAD( "27c256.u3",   0x0000, 0x8000, CRC(cfc8f3e2) SHA1(7dd72e3ffb0904776f3c07635b953e72f4c63068) )
 
-	/* Bipolar PROMs from the W4 hardware version */
+	/* Proper bipolar PROM dump */
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "82s129.g13", 0x0000, 0x0100, CRC(3ed8a612) SHA1(4189f1abb0033aeb64b56f63bdbc29d980c43909) )
-	ROM_LOAD( "82s129.g14", 0x0100, 0x0100, CRC(aa068a22) SHA1(42c6d77e5aa360c529f8aca6b925010c15eedcd7) )
+	ROM_LOAD( "am27s29.u1", 0x0000, 0x0200, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
 
 	ROM_REGION( 0x20, "proms2", 0 )
-	ROM_LOAD( "82s123.d13", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
-
-	ROM_REGION( 0x100, "unkprom", 0 )
-	ROM_LOAD( "82s129.f3", 0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
-
-	ROM_REGION( 0x20, "unkprom2", 0 )
-	ROM_LOAD( "82s123.d12", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+	ROM_LOAD( "dummy", 0x0000, 0x0020, NO_DUMP )
 
 	ROM_REGION(0x8, "fl7w4_id", 0)     /* Electronic Serial DS2401 */
 	ROM_LOAD( "ds2401.bin", 0x0000, 0x0008, NO_DUMP ) // Hand built to match our ROM set
@@ -15099,9 +15078,9 @@ GAMEL( 1993, bingownga, bingowng, bingownga,bingownga,driver_device,  0,        
 
 // --- Flaming 7's hardware (W-4 derivative) ---
 GAME(  199?, fl7_3121,  0,        flam7_w4, flaming7, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 (W4 Hardware, Red, White & Blue 7's + Hollywood Nights)",          0 )
-GAME(  199?, fl7_50,    fl7_3121, flaming7, flaming7, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 50)",                    MACHINE_NOT_WORKING )
-GAME(  199?, fl7_500,   fl7_3121, flaming7, flaming7, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 500)",                   MACHINE_NOT_WORKING )
-GAME(  199?, fl7_2000,  fl7_3121, flaming7, flaming7, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 2000)",                  MACHINE_NOT_WORKING )
+GAME(  199?, fl7_50,    0,        flaming7, flaming7, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 50)",                    MACHINE_NOT_WORKING )
+GAME(  199?, fl7_500,   fl7_50,   flaming7, flaming7, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 500)",                   MACHINE_NOT_WORKING )
+GAME(  199?, fl7_2000,  fl7_50,   flaming7, flaming7, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 2000)",                  MACHINE_NOT_WORKING )
 
 
 // --- Wing W-8 hardware ---
