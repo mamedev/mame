@@ -14248,7 +14248,7 @@ ROM_END
   Custom Hardware.
 
 */  
-ROM_START( fl7_50 )  // Serial 69 A1 C9.
+ROM_START( fl7_50 )  // Serial 00000069A1C9.
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "50-main.u22",  0x0000, 0x8000, CRC(e097e317) SHA1(a903144cc2290b7e22045490784b592adbf9ba97) )
 
@@ -14286,7 +14286,7 @@ ROM_END
   Custom Hardware.
 
 */  
-ROM_START( fl7_500 )  // Serial 69 A1 C9.
+ROM_START( fl7_500 )  // Serial 000000125873.
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "500-main.u22",  0x0000, 0x8000, CRC(e2c82c67) SHA1(951b0044de9b6104f51aa5a3176d0ea475415f7c) )
 
@@ -14324,7 +14324,7 @@ ROM_END
   Custom Hardware.
 
 */  
-ROM_START( fl7_2000 )  // Serial 69 A1 C9.
+ROM_START( fl7_2000 )  // Serial 00000063A47F.
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "2000_main_27c256.u22",  0x0000, 0x8000, CRC(9659b045) SHA1(801b6733b70b35de65cd8faba6814fa013c05ad0) )
 
