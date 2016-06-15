@@ -249,11 +249,14 @@ static int sol20_handle_cassette(INT16 *buffer, const UINT8 *bytes)
 						}
 
 						sol20_byte_num+=2; // bump to file name
-						sol20_header[0] = bytes[sol20_byte_num++];
-						sol20_header[1] = bytes[sol20_byte_num++];
-						sol20_header[2] = bytes[sol20_byte_num++];
-						sol20_header[3] = bytes[sol20_byte_num++];
-						sol20_header[4] = bytes[sol20_byte_num++];
+						for (i = 0; i < 5; i++)
+							sol20_header[i] = 0x20;
+						for (i = 0; i < 5; i++)
+						{
+							sol20_header[i] = bytes[sol20_byte_num++];
+							if (sol20_header[i] == 0x20)
+								break;
+						}
 						sol20_header[5] = 0;
 						sol20_scan_to_hex(bytes); // bump to file type
 						sol20_header[6] = sol20_read_hex(bytes, 2);
