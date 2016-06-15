@@ -45,9 +45,9 @@ public:
 
 // Typedef for dynamically loaded function
 #if DIRECTINPUT_VERSION >= 0x0800
-typedef HRESULT WINAPI (*dinput_create_fn)(HINSTANCE, DWORD, LPDIRECTINPUT8 *, LPUNKNOWN);
+typedef HRESULT (WINAPI *dinput_create_fn)(HINSTANCE, DWORD, LPDIRECTINPUT8 *, LPUNKNOWN);
 #else
-typedef HRESULT WINAPI (*dinput_create_fn)(HINSTANCE, DWORD, LPDIRECTINPUT *, LPUNKNOWN);
+typedef HRESULT (WINAPI *dinput_create_fn)(HINSTANCE, DWORD, LPDIRECTINPUT *, LPUNKNOWN);
 #endif
 
 class dinput_api_helper

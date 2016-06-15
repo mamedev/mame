@@ -79,7 +79,7 @@ struct osd_deleter
 typedef std::unique_ptr<char, osd_deleter> osd_utf8_ptr;
 
 // Typedefs for dynamically loaded functions
-typedef HRESULT WINAPI (*d2d_create_factory_fn)(D2D1_FACTORY_TYPE, REFIID, const D2D1_FACTORY_OPTIONS *, void **);
+typedef HRESULT (WINAPI *d2d_create_factory_fn)(D2D1_FACTORY_TYPE, REFIID, const D2D1_FACTORY_OPTIONS *, void **);
 typedef HRESULT (*dwrite_create_factory_fn)(DWRITE_FACTORY_TYPE, REFIID, IUnknown **);
 
 // Debugging functions

@@ -38,10 +38,10 @@
 //============================================================
 
 // Typedefs for dynamically loaded functions
-typedef UINT WINAPI (*get_rawinput_device_list_ptr)(PRAWINPUTDEVICELIST, PUINT, UINT);
-typedef UINT WINAPI (*get_rawinput_data_ptr)( HRAWINPUT, UINT, LPVOID, PUINT, UINT);
-typedef UINT WINAPI (*get_rawinput_device_info_ptr)(HANDLE, UINT, LPVOID, PUINT);
-typedef BOOL WINAPI (*register_rawinput_devices_ptr)(PCRAWINPUTDEVICE, UINT, UINT);
+typedef UINT (WINAPI *get_rawinput_device_list_ptr)(PRAWINPUTDEVICELIST, PUINT, UINT);
+typedef UINT (WINAPI *get_rawinput_data_ptr)( HRAWINPUT, UINT, LPVOID, PUINT, UINT);
+typedef UINT (WINAPI *get_rawinput_device_info_ptr)(HANDLE, UINT, LPVOID, PUINT);
+typedef BOOL (WINAPI *register_rawinput_devices_ptr)(PCRAWINPUTDEVICE, UINT, UINT);
 
 class safe_regkey
 {

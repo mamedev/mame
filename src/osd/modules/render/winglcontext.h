@@ -17,14 +17,14 @@
 #include "modules/lib/osdlib.h"
 
 // Typedefs for dynamically loaded functions
-typedef PROC WINAPI (*wglGetProcAddress_fn)(LPCSTR);
-typedef HGLRC WINAPI (*wglCreateContext_fn)(HDC);
-typedef BOOL WINAPI (*wglDeleteContext_fn)(HGLRC);
-typedef BOOL WINAPI (*wglMakeCurrent_fn)(HDC, HGLRC);
+typedef PROC (WINAPI *wglGetProcAddress_fn)(LPCSTR);
+typedef HGLRC (WINAPI *wglCreateContext_fn)(HDC);
+typedef BOOL (WINAPI *wglDeleteContext_fn)(HGLRC);
+typedef BOOL (WINAPI *wglMakeCurrent_fn)(HDC, HGLRC);
 
-typedef const char * WINAPI (*wglGetExtensionsStringEXT_fn)(void);
-typedef BOOL WINAPI (*wglSwapIntervalEXT_fn)(int);
-typedef int WINAPI (*wglGetSwapIntervalEXT_fn)(void);
+typedef const char * (WINAPI *wglGetExtensionsStringEXT_fn)(void);
+typedef BOOL (WINAPI *wglSwapIntervalEXT_fn)(int);
+typedef int (WINAPI *wglGetSwapIntervalEXT_fn)(void);
 
 class win_gl_context : public osd_gl_context
 {
