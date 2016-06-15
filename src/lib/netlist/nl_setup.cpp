@@ -181,7 +181,7 @@ void setup_t::register_dippins_arr(const pstring &terms)
 	}
 }
 
-pstring setup_t::objtype_as_str(object_t &in) const
+pstring setup_t::objtype_as_str(device_object_t &in) const
 {
 	switch (in.type())
 	{
@@ -191,14 +191,8 @@ pstring setup_t::objtype_as_str(object_t &in) const
 			return "INPUT";
 		case terminal_t::OUTPUT:
 			return "OUTPUT";
-		case terminal_t::NET:
-			return "NET";
 		case terminal_t::PARAM:
 			return "PARAM";
-		case terminal_t::DEVICE:
-			return "DEVICE";
-		case terminal_t::QUEUE:
-			return "QUEUE";
 	}
 	// FIXME: noreturn
 	log().fatal("Unknown object type {1}\n", (unsigned) in.type());
@@ -385,12 +379,12 @@ core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool require
 	return term;
 }
 
-core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, object_t::type_t atype, bool required)
+core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, device_object_t::type_t atype, bool required)
 {
 	const pstring &tname = resolve_alias(terminal_in);
 	auto ret = m_terminals.find(tname);
 	/* look for default */
-	if (ret == m_terminals.end() && atype == object_t::OUTPUT)
+	if (ret == m_terminals.end() && atype == device_object_t::OUTPUT)
 	{
 		/* look for ".Q" std output */
 		ret = m_terminals.find(tname + ".Q");

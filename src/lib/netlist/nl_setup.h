@@ -189,7 +189,7 @@ namespace netlist
 	private:
 
 		core_terminal_t *find_terminal(const pstring &outname_in, bool required = true);
-		core_terminal_t *find_terminal(const pstring &outname_in, object_t::type_t atype, bool required = true);
+		core_terminal_t *find_terminal(const pstring &outname_in, device_object_t::type_t atype, bool required = true);
 
 		void connect_terminals(core_terminal_t &in, core_terminal_t &out);
 		void connect_input_output(core_terminal_t &in, core_terminal_t &out);
@@ -198,7 +198,7 @@ namespace netlist
 		bool connect_input_input(core_terminal_t &t1, core_terminal_t &t2);
 
 		// helpers
-		pstring objtype_as_str(object_t &in) const;
+		pstring objtype_as_str(device_object_t &in) const;
 
 		const pstring resolve_alias(const pstring &name) const;
 		devices::nld_base_proxy *get_d_a_proxy(core_terminal_t &out);

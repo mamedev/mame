@@ -104,7 +104,8 @@ const logic_family_desc_t *family_CD4XXX()
 
 queue_t::queue_t(netlist_t &nl)
 	: timed_queue<net_t *, netlist_time>(512)
-	, object_t(nl, "QUEUE", QUEUE)
+	, object_t("QUEUE")
+	, netlist_ref(nl)
 	, plib::state_manager_t::callback_t()
 	, m_qsize(0)
 	, m_times(512)
@@ -114,7 +115,6 @@ queue_t::queue_t(netlist_t &nl)
 
 void queue_t::register_state(plib::state_manager_t &manager, const pstring &module)
 {
-	printf("%e\n", netlist_time::never().as_double());
 	netlist().log().debug("register_state\n");
 	manager.save_item(this, m_qsize, module + "." + "qsize");
 	manager.save_item(this, &m_times[0], module + "." + "times", m_times.size());
@@ -155,10 +155,8 @@ void queue_t::on_post_load()
 // object_t
 // ----------------------------------------------------------------------------------------
 
-object_t::object_t(netlist_t &nl, const pstring &aname, const type_t atype)
-	: m_netlist(nl)
-	, m_name(aname)
-	, m_objtype(atype)
+object_t::object_t(const pstring &aname)
+	: m_name(aname)
 {
 }
 
@@ -176,8 +174,9 @@ const pstring &object_t::name() const
 // ----------------------------------------------------------------------------------------
 
 device_object_t::device_object_t(core_device_t &dev, const pstring &aname, const type_t atype)
-: object_t(dev.netlist(), aname, atype)
+: object_t(aname)
 , m_device(dev)
+, m_type(atype)
 {
 }
 
@@ -417,7 +416,9 @@ template class param_template_t<pstring, param_t::MODEL>;
 // ----------------------------------------------------------------------------------------
 
 core_device_t::core_device_t(netlist_t &owner, const pstring &name)
-: object_t(owner, name, DEVICE), logic_family_t()
+	: object_t(name)
+	, logic_family_t()
+	, netlist_ref(owner)
 #if (NL_KEEP_STATISTICS)
 	, stat_total_time(0)
 	, stat_update_count(0)
@@ -429,8 +430,9 @@ core_device_t::core_device_t(netlist_t &owner, const pstring &name)
 }
 
 core_device_t::core_device_t(core_device_t &owner, const pstring &name)
-	: object_t(owner.netlist(), owner.name() + "." + name, DEVICE)
+	: object_t(owner.name() + "." + name)
 	, logic_family_t()
+	, netlist_ref(owner.netlist())
 #if (NL_KEEP_STATISTICS)
 	, stat_total_time(0)
 	, stat_update_count(0)
@@ -558,7 +560,8 @@ struct do_nothing_deleter{
 
 
 net_t::net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr)
-	: object_t(nl, aname, NET)
+	: object_t(aname)
+	, netlist_ref(nl)
 	, m_new_Q(*this, "m_new_Q", 0)
 	, m_cur_Q (*this, "m_cur_Q", 0)
 	, m_time(*this, "m_time", netlist_time::zero())

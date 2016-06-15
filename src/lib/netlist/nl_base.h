@@ -158,7 +158,7 @@
 #include <vector>
 #include <unordered_map>
 #include <memory>
-#include <cmath>
+//#include <cmath>
 #include <cstdint>
 
 #include "nl_lists.h"
@@ -263,7 +263,7 @@ namespace netlist
 		class NETLIB_NAME(mainclock);
 		class NETLIB_NAME(netlistparams);
 		class NETLIB_NAME(base_proxy);
-		class nld_base_d_to_a_proxy;
+		class NETLIB_NAME(base_d_to_a_proxy);
 	}
 
 	//============================================================
@@ -284,7 +284,6 @@ namespace netlist
 	class setup_t;
 	class netlist_t;
 	class core_device_t;
-	class param_model_t;
 	class device_t;
 
 	// -----------------------------------------------------------------------------
@@ -398,37 +397,36 @@ namespace netlist
 	{
 		P_PREVENT_COPYING(object_t)
 	public:
-		enum type_t {
-			TERMINAL = 0,
-			INPUT    = 1,
-			OUTPUT   = 2,
-			PARAM    = 3,
-			NET      = 4,
-			DEVICE   = 5,
-			QUEUE    = 6
-		};
 
-		object_t(netlist_t &nl, const pstring &aname, const type_t atype);
+		object_t(const pstring &aname);
 		~object_t();
 
 		const pstring &name() const;
 
-		type_t type() const { return m_objtype; }
-		bool is_type(const type_t atype) const { return (m_objtype == atype); }
-
-		netlist_t & netlist() { return m_netlist; }
-		const netlist_t & netlist() const { return m_netlist; }
+		//netlist_t & m_netlist;
+		//netlist_t & netlist() { return m_netlist; }
+		//const netlist_t & netlist() const { return m_netlist; }
 
 	private:
-		netlist_t & m_netlist;
 		pstring m_name;
-		const type_t m_objtype;
 
 	public:
 	    void * operator new (size_t size, void *ptr) { return ptr; }
 	    void operator delete (void *ptr, void *) {  }
 	    void * operator new (size_t size);
 	    void operator delete (void * mem);
+	};
+
+	struct netlist_ref
+	{
+		netlist_ref(netlist_t &nl) : m_netlist(nl) { }
+
+		netlist_t & netlist() { return m_netlist; }
+		const netlist_t & netlist() const { return m_netlist; }
+
+	private:
+		netlist_t & m_netlist;
+
 	};
 
 	// -----------------------------------------------------------------------------
@@ -439,10 +437,24 @@ namespace netlist
 	{
 		P_PREVENT_COPYING(device_object_t)
 	public:
+		enum type_t {
+			TERMINAL = 0,
+			INPUT    = 1,
+			OUTPUT   = 2,
+			PARAM    = 3,
+		};
+
 		device_object_t(core_device_t &dev, const pstring &aname, const type_t atype);
 		core_device_t &device() const { return m_device; }
+
+		type_t type() const { return m_type; }
+		bool is_type(const type_t atype) const { return (m_type == atype); }
+
+		netlist_t &netlist();
+
 	private:
 		core_device_t & m_device;
+		const type_t m_type;
 	};
 
 
@@ -634,7 +646,7 @@ namespace netlist
 	// net_t
 	// -----------------------------------------------------------------------------
 
-	class net_t : public object_t
+	class net_t : public object_t, public netlist_ref
 	{
 		P_PREVENT_COPYING(net_t)
 	public:
@@ -799,8 +811,6 @@ namespace netlist
 	// param_t
 	// -----------------------------------------------------------------------------
 
-	class device_t;
-
 	class param_t : public device_object_t
 	{
 		P_PREVENT_COPYING(param_t)
@@ -871,7 +881,7 @@ namespace netlist
 	// core_device_t
 	// -----------------------------------------------------------------------------
 
-	class core_device_t : public object_t, public logic_family_t
+	class core_device_t : public object_t, public logic_family_t, public netlist_ref
 	{
 		P_PREVENT_COPYING(core_device_t)
 	public:
@@ -1008,8 +1018,6 @@ namespace netlist
 		NETLIB_UPDATE_TERMINALSI() { }
 
 	private:
-		void register_p(const pstring &name, object_t &obj);
-		void register_sub_p(device_t &dev);
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1037,9 +1045,10 @@ namespace netlist
 	// queue_t
 	// -----------------------------------------------------------------------------
 
-	class queue_t : public timed_queue<net_t *, netlist_time>,
-							public object_t,
-							public plib::state_manager_t::callback_t
+	class queue_t :	public timed_queue<net_t *, netlist_time>,
+					public object_t,
+					public netlist_ref,
+					public plib::state_manager_t::callback_t
 	{
 	public:
 		queue_t(netlist_t &nl);
@@ -1373,6 +1382,10 @@ protected:
 			m_value[i] = value;
 	}
 
+	inline netlist_t &device_object_t::netlist()
+	{
+		return m_device.netlist();
+	}
 
 }
 
