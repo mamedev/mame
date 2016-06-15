@@ -120,7 +120,7 @@ typedef std::unique_ptr<IXAudio2MasteringVoice, xaudio2_custom_deleter> masterin
 typedef std::unique_ptr<IXAudio2SourceVoice, xaudio2_custom_deleter> src_voice_ptr;
 
 // Typedef for pointer to XAudio2Create
-typedef HRESULT (*xaudio2_create_ptr)(IXAudio2 **, UINT32, XAUDIO2_PROCESSOR);
+typedef HRESULT (WINAPI *xaudio2_create_ptr)(IXAudio2 **, UINT32, XAUDIO2_PROCESSOR);
 
 //============================================================
 //  Helper classes

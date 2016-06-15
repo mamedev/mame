@@ -25,7 +25,7 @@
 //  TYPE DEFINITIONS
 //============================================================
 
-typedef IDirect3D9* (*d3d9_create_fn)(UINT);
+typedef IDirect3D9* (WINAPI *d3d9_create_fn)(UINT);
 
 
 //============================================================

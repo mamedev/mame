@@ -185,30 +185,28 @@ void raiden2cop_device::device_start()
 	save_item(NAME(m_LEGACY_r1));
 
 	m_videoramout_cb.resolve_safe();
+	m_byte_endian_val = m_cpu_is_68k ? 3 : 0;
+	m_word_endian_val = m_cpu_is_68k ? 2 : 0;
 }
 
 UINT16 raiden2cop_device::cop_read_word(address_space &space, int address)
 {
-	if (m_cpu_is_68k) return space.read_word(address ^ 2);
-	else return space.read_word(address);
+	return space.read_word(address ^ m_word_endian_val);
 }
 
 UINT8 raiden2cop_device::cop_read_byte(address_space &space, int address)
 {
-	if (m_cpu_is_68k) return space.read_byte(address ^ 3);
-	else return space.read_byte(address);
+	return space.read_byte(address ^ m_byte_endian_val);
 }
 
 void raiden2cop_device::cop_write_word(address_space &space, int address, UINT16 data)
 {
-	if (m_cpu_is_68k) space.write_word(address ^ 2, data);
-	else space.write_word(address, data);
+	space.write_word(address ^ m_word_endian_val, data);
 }
 
 void raiden2cop_device::cop_write_byte(address_space &space, int address, UINT8 data)
 {
-	if (m_cpu_is_68k) space.write_byte(address ^ 3, data);
-	else space.write_byte(address, data);
+	space.write_byte(address ^ m_byte_endian_val, data);
 }
 
 
@@ -887,12 +885,9 @@ WRITE16_MEMBER(raiden2cop_device::cop_dma_trigger_w)
 }
 
 /* Number Conversion */
-
-WRITE16_MEMBER(raiden2cop_device::cop_itoa_low_w)
+void raiden2cop_device::bcd_update()
 {
-	cop_itoa = (cop_itoa & ~UINT32(mem_mask)) | (data & mem_mask);
-
-	//int digits = 1 << cop_itoa_mode*2;
+		//int digits = 1 << cop_itoa_mode*2;
 	UINT32 val = cop_itoa;
 
 	//if(digits > 9)
@@ -918,9 +913,19 @@ WRITE16_MEMBER(raiden2cop_device::cop_itoa_low_w)
 	cop_itoa_digits[9] = 0;
 }
 
+WRITE16_MEMBER(raiden2cop_device::cop_itoa_low_w)
+{
+	cop_itoa = (cop_itoa & ~UINT32(mem_mask)) | (data & mem_mask);
+
+	bcd_update();
+}
+
 WRITE16_MEMBER(raiden2cop_device::cop_itoa_high_w)
 {
 	cop_itoa = (cop_itoa & ~(mem_mask << 16)) | ((data & mem_mask) << 16);
+	
+	// Godzilla cares, otherwise you get 2p score overflow in 1p vs 2p, TODO: might actually be HW endianness dependant?
+	bcd_update();
 }
 
 WRITE16_MEMBER(raiden2cop_device::cop_itoa_mode_w)

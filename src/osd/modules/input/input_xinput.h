@@ -91,8 +91,8 @@ struct xinput_api_state
 };
 
 // Typedefs for dynamically loaded functions
-typedef DWORD (*xinput_get_state_fn)(DWORD, XINPUT_STATE *);
-typedef DWORD (*xinput_get_caps_fn)(DWORD, DWORD, XINPUT_CAPABILITIES *);
+typedef DWORD (WINAPI *xinput_get_state_fn)(DWORD, XINPUT_STATE *);
+typedef DWORD (WINAPI *xinput_get_caps_fn)(DWORD, DWORD, XINPUT_CAPABILITIES *);
 
 class xinput_api_helper : public std::enable_shared_from_this<xinput_api_helper>
 {

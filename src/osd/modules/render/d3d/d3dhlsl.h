@@ -20,7 +20,7 @@
 //============================================================
 
 // Typedefs for dynamically loaded functions
-typedef HRESULT (*d3dx_create_effect_from_file_fn)(LPDIRECT3DDEVICE9, LPCTSTR, const D3DXMACRO *, LPD3DXINCLUDE, DWORD, LPD3DXEFFECTPOOL, LPD3DXEFFECT *, LPD3DXBUFFER *);
+typedef HRESULT (WINAPI *d3dx_create_effect_from_file_fn)(LPDIRECT3DDEVICE9, LPCTSTR, const D3DXMACRO *, LPD3DXINCLUDE, DWORD, LPD3DXEFFECTPOOL, LPD3DXEFFECT *, LPD3DXBUFFER *);
 
 class effect;
 class shaders;
