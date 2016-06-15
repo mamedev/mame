@@ -15,6 +15,8 @@ Notes:
 
 Todo:
     - LD TROUBLE appears at POST. Sync/timing issue?
+	- Performance spike after some time of gameplay, CPU comms gets corrupt?
+	- How to init NVRAM? Current defaults definitely aren't.
 	- Wrong overlay colors;
     - Convert to tilemaps (see next ToDo for feasibility).
     - Rumor has it there's an analog beep hanging off 0xf5?  Implement it and finish off 0xf5 bits.
@@ -32,11 +34,6 @@ Todo:
 class esh_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_IRQ_STOP
-	};
-
 	esh_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_laserdisc(*this, "laserdisc"),
@@ -99,13 +96,27 @@ UINT32 esh_state::screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap,
 			int palIndex  = (m_tile_control_ram[current_screen_character] & 0x0f);
 			int tileOffs  = (m_tile_control_ram[current_screen_character] & 0x10) >> 4;
 			bool blinkLine = bool((m_tile_control_ram[current_screen_character] & 0x40) >> 6);
-			//int blinkChar = (m_tile_control_ram[current_screen_character] & 0x80) >> 7;
+			bool blinkChar = bool((m_tile_control_ram[current_screen_character] & 0x80) >> 7);
 
+			
 			// TODO: blink timing
+			if(blinkChar == true && m_screen->frame_number() & 8)
+			{
+				if(trans_mask == 0)
+					continue;
+				
+				for(int yi=0;yi<8;yi++)
+					for(int xi=0;xi<8;xi++)
+						bitmap.pix32(yi+chary*8, xi+charx*8) = m_palette->pen(palIndex * 8 + pal_bank * 0x100);
+
+				continue;
+			}
+			
 			if(blinkLine == true && m_screen->frame_number() & 8)
 				gfx = m_gfxdecode->gfx(1);
 			else
 				gfx = m_gfxdecode->gfx(0);
+			
 			
 			gfx->transpen(bitmap,cliprect,
 				m_tile_ram[current_screen_character] + (0x100 * tileOffs),
@@ -263,7 +274,7 @@ PALETTE_INIT_MEMBER(esh_state, esh)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	/* Oddly enough, the top 4 bits of each byte is 0 */
+	/* Oddly enough, the top 4 bits of each byte is 0 <- ??? */
 	for (i = 0; i < palette.entries(); i++)
 	{
 		int r,g,b;
