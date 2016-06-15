@@ -4,7 +4,7 @@
 
     Metal Freezer (c) 1989 Seibu
 
-    preliminary driver by Angelo Salese
+    driver by Angelo Salese
 
     HW seems the natural evolution of Dark Mist type.
 
