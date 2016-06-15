@@ -32,6 +32,11 @@ device_portfolio_expansion_slot_interface::device_portfolio_expansion_slot_inter
 	m_slot = dynamic_cast<portfolio_expansion_slot_t *>(device.owner());
 }
 
+WRITE_LINE_MEMBER( device_portfolio_expansion_slot_interface::iint_w ) { m_slot->iint_w(state); }
+WRITE_LINE_MEMBER( device_portfolio_expansion_slot_interface::eint_w ) { m_slot->eint_w(state); }
+WRITE_LINE_MEMBER( device_portfolio_expansion_slot_interface::nmio_w ) { m_slot->nmio_w(state); }
+WRITE_LINE_MEMBER( device_portfolio_expansion_slot_interface::wake_w ) { m_slot->wake_w(state); }
+
 
 
 //**************************************************************************

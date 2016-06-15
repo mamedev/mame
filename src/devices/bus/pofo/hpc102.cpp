@@ -37,7 +37,7 @@ static MACHINE_CONFIG_FRAGMENT( hpc102 )
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	//MCFG_INS8250_OUT_INT_CB(WRITELINE(portfolio_state, i8250_intrpt_w))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(device_portfolio_expansion_slot_interface, eint_w))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(M82C50A_TAG, ins8250_uart_device, rx_w))
@@ -90,4 +90,59 @@ void hpc102_t::device_start()
 
 void hpc102_t::device_reset()
 {
+	m_uart->reset();
+}
+
+
+//-------------------------------------------------
+//  eack_r - external interrupt acknowledge
+//-------------------------------------------------
+
+UINT8 hpc102_t::eack_r()
+{
+	return m_vector;
+}
+
+
+//-------------------------------------------------
+//  nrdi_r - read
+//-------------------------------------------------
+
+UINT8 hpc102_t::nrdi_r(address_space &space, offs_t offset, UINT8 data, bool iom, bool bcom, bool ncc1)
+{
+	if (!bcom)
+	{
+		if ((offset & 0x0f) == 0x0f)
+		{
+			data = 0x01;
+		}
+
+		if (!(offset & 0x08))
+		{
+			data = m_uart->ins8250_r(space, offset & 0x07);
+		}
+	}
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  nwri_w - write
+//-------------------------------------------------
+
+void hpc102_t::nwri_w(address_space &space, offs_t offset, UINT8 data, bool iom, bool bcom, bool ncc1)
+{
+	if (!bcom)
+	{
+		if ((offset & 0x0f) == 0x0f)
+		{
+			m_vector = data;
+		}
+
+		if (!(offset & 0x08))
+		{
+			m_uart->ins8250_w(space, offset & 0x07, data);
+		}
+	}
 }

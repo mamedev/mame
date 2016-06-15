@@ -93,15 +93,20 @@ public:
     device_portfolio_expansion_slot_interface(const machine_config &mconfig, device_t &device);
     virtual ~device_portfolio_expansion_slot_interface() { }
 
-    bool nmd1() { return 1; }
-    bool pdet() { return 0; }
-    bool cdet() { return 1; }
+    virtual bool nmd1() { return 1; }
+    virtual bool pdet() { return 0; }
+    virtual bool cdet() { return 1; }
 
-    UINT8 iack_r() { return 0xff; }
-    UINT8 eack_r() { return 0xff; }
+    virtual UINT8 iack_r() { return 0xff; }
+    virtual UINT8 eack_r() { return 0xff; }
 
-    UINT8 nrdi_r(address_space &space, offs_t offset, UINT8 data, bool iom, bool bcom, bool ncc1) { return data; };
-    void nwri_w(address_space &space, offs_t offset, UINT8 data, bool iom, bool bcom, bool ncc1) { };
+    virtual UINT8 nrdi_r(address_space &space, offs_t offset, UINT8 data, bool iom, bool bcom, bool ncc1) { return data; };
+    virtual void nwri_w(address_space &space, offs_t offset, UINT8 data, bool iom, bool bcom, bool ncc1) { };
+
+    DECLARE_WRITE_LINE_MEMBER( iint_w );
+    DECLARE_WRITE_LINE_MEMBER( eint_w );
+    DECLARE_WRITE_LINE_MEMBER( nmio_w );
+    DECLARE_WRITE_LINE_MEMBER( wake_w );
 
 protected:
     portfolio_expansion_slot_t *m_slot;

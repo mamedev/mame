@@ -98,4 +98,44 @@ void hpc101_t::device_start()
 
 void hpc101_t::device_reset()
 {
+	m_ppi->reset();
+}
+
+
+//-------------------------------------------------
+//  nrdi_r - read
+//-------------------------------------------------
+
+UINT8 hpc101_t::nrdi_r(address_space &space, offs_t offset, UINT8 data, bool iom, bool bcom, bool ncc1)
+{
+	if (!bcom)
+	{
+		if ((offset & 0x0f) == 0x0f)
+		{
+			data = 0x02;
+		}
+
+		if ((offset & 0x0c) == 0x08)
+		{
+			data = m_ppi->read(space, offset & 0x03);
+		}
+	}
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  nwri_w - write
+//-------------------------------------------------
+
+void hpc101_t::nwri_w(address_space &space, offs_t offset, UINT8 data, bool iom, bool bcom, bool ncc1)
+{
+	if (!bcom)
+	{
+		if ((offset & 0x0c) == 0x08)
+		{
+			m_ppi->write(space, offset & 0x03, data);
+		}
+	}
 }

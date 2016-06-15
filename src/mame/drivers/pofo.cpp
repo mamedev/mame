@@ -117,7 +117,6 @@ public:
 	/* interrupt state */
 	UINT8 m_ip;                         /* interrupt pending */
 	UINT8 m_ie;                         /* interrupt enable */
-	UINT8 m_sivr;                       /* serial interrupt vector register */
 
 	/* counter state */
 	UINT16 m_counter;
@@ -207,7 +206,7 @@ WRITE8_MEMBER( portfolio_state::irq_mask_w )
 
 IRQ_CALLBACK_MEMBER(portfolio_state::portfolio_int_ack)
 {
-	UINT8 vector = m_sivr;
+	UINT8 vector = 0;
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -217,7 +216,7 @@ IRQ_CALLBACK_MEMBER(portfolio_state::portfolio_int_ack)
 			m_ip &= ~(1 << i);
 
 			if (i == 3)
-				vector = m_sivr;
+				vector = m_exp->eack_r();
 			else
 				vector = INTERRUPT_VECTOR[i];
 
@@ -716,12 +715,10 @@ void portfolio_state::machine_start()
 
 	/* set initial values */
 	m_keylatch = 0xff;
-	m_sivr = 0x2a;
 
 	/* register for state saving */
 	save_item(NAME(m_ip));
 	save_item(NAME(m_ie));
-	save_item(NAME(m_sivr));
 	save_item(NAME(m_counter));
 	save_item(NAME(m_keylatch));
 	save_pointer(NAME(m_contrast.target()), m_contrast.bytes());
