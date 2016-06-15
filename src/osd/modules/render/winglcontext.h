@@ -14,6 +14,17 @@
 #define __WIN_GL_CONTEXT__
 
 #include "modules/opengl/osd_opengl.h"
+#include "modules/lib/osdlib.h"
+
+// Typedefs for dynamically loaded functions
+typedef PROC WINAPI (*wglGetProcAddress_fn)(LPCSTR);
+typedef HGLRC WINAPI (*wglCreateContext_fn)(HDC);
+typedef BOOL WINAPI (*wglDeleteContext_fn)(HGLRC);
+typedef BOOL WINAPI (*wglMakeCurrent_fn)(HDC, HGLRC);
+
+typedef const char * WINAPI (*wglGetExtensionsStringEXT_fn)(void);
+typedef BOOL WINAPI (*wglSwapIntervalEXT_fn)(int);
+typedef int WINAPI (*wglGetSwapIntervalEXT_fn)(void);
 
 class win_gl_context : public osd_gl_context
 {
@@ -22,17 +33,25 @@ public:
 	{
 		m_error[0] = 0;
 
-		this->pfn_wglGetProcAddress = (PROC (WINAPI *)(LPCSTR lpszProc)) GetProcAddress(m_module, "wglGetProcAddress");
-		this->pfn_wglCreateContext = (HGLRC (WINAPI *)(HDC hdc)) GetProcAddress(m_module, "wglCreateContext");
-		this->pfn_wglDeleteContext = (BOOL (WINAPI *)(HGLRC hglrc)) GetProcAddress(m_module, "wglDeleteContext");
-		this->pfn_wglMakeCurrent = (BOOL (WINAPI *)(HDC hdc, HGLRC hglrc)) GetProcAddress(m_module, "wglMakeCurrent");
+		opengl32_dll = osd::dynamic_module::open({ "opengl32.dll" });
 
-		this->pfn_wglGetExtensionsStringEXT = (const char *(WINAPI *) (void)) pfn_wglGetProcAddress("wglGetExtensionsStringEXT");
+		pfn_wglGetProcAddress = opengl32_dll->bind<wglGetProcAddress_fn>("wglGetProcAddress");
+		pfn_wglCreateContext = opengl32_dll->bind<wglCreateContext_fn>("wglCreateContext");
+		pfn_wglDeleteContext = opengl32_dll->bind<wglDeleteContext_fn>("wglDeleteContext");
+		pfn_wglMakeCurrent = opengl32_dll->bind<wglMakeCurrent_fn>("wglMakeCurrent");
+
+		if (pfn_wglGetProcAddress == nullptr || pfn_wglCreateContext == nullptr ||
+			pfn_wglDeleteContext == nullptr || pfn_wglMakeCurrent == nullptr)
+		{
+			return;
+		}
+
+		pfn_wglGetExtensionsStringEXT = (wglGetExtensionsStringEXT_fn)(*pfn_wglGetProcAddress)("wglGetExtensionsStringEXT");
 
 		if (WGLExtensionSupported("WGL_EXT_swap_control"))
 		{
-			this->pfn_wglSwapIntervalEXT = (BOOL (WINAPI *) (int)) getProcAddress("wglSwapIntervalEXT");
-			this->pfn_wglGetSwapIntervalEXT = (int (WINAPI *) (void)) getProcAddress("wglGetSwapIntervalEXT");
+			pfn_wglSwapIntervalEXT = (BOOL (WINAPI *) (int)) getProcAddress("wglSwapIntervalEXT");
+			pfn_wglGetSwapIntervalEXT = (int (WINAPI *) (void)) getProcAddress("wglGetSwapIntervalEXT");
 		}
 		else
 		{
@@ -43,25 +62,25 @@ public:
 		m_hdc = GetDC(window);
 		if (!setupPixelFormat(m_hdc))
 		{
-			m_context = this->pfn_wglCreateContext(m_hdc);
-			if  (!m_context)
+			m_context = (*pfn_wglCreateContext)(m_hdc);
+			if (!m_context)
 			{
 				FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, GetLastError(), 0, m_error, 255, nullptr);
 				return;
 			}
-			this->pfn_wglMakeCurrent(m_hdc, m_context);
+			(*pfn_wglMakeCurrent)(m_hdc, m_context);
 		}
 	}
 
 	virtual ~win_gl_context()
 	{
-		this->pfn_wglDeleteContext(m_context);
+		(*pfn_wglDeleteContext)(m_context);
 		ReleaseDC(m_window, m_hdc);
 	}
 
 	virtual void MakeCurrent() override
 	{
-		this->pfn_wglMakeCurrent(m_hdc, m_context);
+		(*pfn_wglMakeCurrent)(m_hdc, m_context);
 	}
 
 	virtual const char *LastErrorMsg() override
@@ -74,17 +93,14 @@ public:
 
 	virtual void *getProcAddress(const char *proc) override
 	{
-		void *ret = (void *) GetProcAddress(m_module, proc);
-		if (ret == nullptr)
-			ret = (void *) this->pfn_wglGetProcAddress(proc);
-		return ret;
+		return (void *)(*pfn_wglGetProcAddress)(proc);
 	}
 
 	virtual int SetSwapInterval(const int swap) override
 	{
-		if (this->pfn_wglSwapIntervalEXT != nullptr)
+		if (pfn_wglSwapIntervalEXT != nullptr)
 		{
-			this->pfn_wglSwapIntervalEXT(swap ? 1 : 0);
+			pfn_wglSwapIntervalEXT(swap ? 1 : 0);
 		}
 		return 0;
 	}
@@ -93,11 +109,6 @@ public:
 	{
 		SwapBuffers(m_hdc);
 		//wglSwapLayerBuffers(GetDC(window().m_hwnd), WGL_SWAP_MAIN_PLANE);
-	}
-
-	static void load_library()
-	{
-		m_module = LoadLibraryA("opengl32.dll");
 	}
 
 private:
@@ -124,15 +135,17 @@ private:
 			0,                              /* reserved */
 			0, 0, 0,                        /* no layer, visible, damage masks */
 		};
-		int pixelFormat;
 
-		pixelFormat = ChoosePixelFormat(hDC, &pfd);
-		if (pixelFormat == 0) {
-			strcpy(m_error, "ChoosePixelFormat failed");
+		int pixelFormat = ChoosePixelFormat(hDC, &pfd);
+
+		if (pixelFormat == 0)
+		{
+			strcpy(m_error, "ChoosePixelFormat failed.");
 			return 1;
 		}
 
-		if (SetPixelFormat(hDC, pixelFormat, &pfd) != TRUE) {
+		if (SetPixelFormat(hDC, pixelFormat, &pfd) != TRUE)
+		{
 			strcpy(m_error, "SetPixelFormat failed.");
 			return 1;
 		}
@@ -141,10 +154,12 @@ private:
 
 	bool WGLExtensionSupported(const char *extension_name)
 	{
-		//if (pfn_wglGetExtensionsStringEXT != nullptr)
-		//  printf("%s\n", this->pfn_wglGetExtensionsStringEXT());
+		if (pfn_wglGetExtensionsStringEXT == nullptr)
+			return false;
+		
+		//  printf("%s\n", pfn_wglGetExtensionsStringEXT());
 
-		if (pfn_wglGetExtensionsStringEXT != nullptr && strstr(pfn_wglGetExtensionsStringEXT(), extension_name) != nullptr)
+		if (strstr(pfn_wglGetExtensionsStringEXT(), extension_name) != nullptr)
 			return true;
 		else
 			return false;
@@ -155,16 +170,15 @@ private:
 	HDC m_hdc;
 	char m_error[256];
 
-	PROC (WINAPI *pfn_wglGetProcAddress)(LPCSTR lpszProc);
-	HGLRC (WINAPI *pfn_wglCreateContext)(HDC hdc);
-	BOOL (WINAPI *pfn_wglDeleteContext)(HGLRC hglrc);
-	BOOL (WINAPI *pfn_wglMakeCurrent)(HDC hdc, HGLRC hglrc);
+	osd::dynamic_module::ptr     opengl32_dll;
+	wglGetProcAddress_fn         pfn_wglGetProcAddress;
+	wglCreateContext_fn          pfn_wglCreateContext;
+	wglDeleteContext_fn          pfn_wglDeleteContext;
+	wglMakeCurrent_fn            pfn_wglMakeCurrent;
 
-	const char *(WINAPI *pfn_wglGetExtensionsStringEXT) (void);
-	BOOL (WINAPI *pfn_wglSwapIntervalEXT) (int interval);
-	int (WINAPI * pfn_wglGetSwapIntervalEXT) (void);
-
-	static HMODULE m_module;
+	wglGetExtensionsStringEXT_fn pfn_wglGetExtensionsStringEXT;
+	wglSwapIntervalEXT_fn        pfn_wglSwapIntervalEXT;
+	wglGetSwapIntervalEXT_fn     pfn_wglGetSwapIntervalEXT;
 };
 
 #endif // __WIN_GL_CONTEXT__

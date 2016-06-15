@@ -1,61 +1,47 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
+
 #if defined(OSD_NET_USE_PCAP)
-
-#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
-#ifdef UNICODE
-#define LIB_NAME        L"wpcap.dll"
-#define LoadDynamicLibrary LoadLibraryW
-#else
-#define LIB_NAME        "wpcap.dll"
-#define LoadDynamicLibrary LoadLibraryA
-#endif
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#endif
-
-#include <pcap.h>
 
 #include "emu.h"
 #include "osdnet.h"
 #include "netdev_module.h"
 #include "modules/osdmodule.h"
+#include "modules/lib/osdlib.h"
 
 #if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#undef interface
+#define LIB_NAME	"wpcap.dll"
 
-#define LIB_ERROR_STR   "Unable to load winpcap: %lx\n"
-typedef DWORD except_type;
-
-#else
-
-#include <dlfcn.h>
-#ifdef SDLMAME_MACOSX
+#elif defined(SDLMAME_MACOSX)
 #include <pthread.h>
 #include <libkern/OSAtomic.h>
-#endif
-
-#ifdef SDLMAME_MACOSX
 #define LIB_NAME    "libpcap.dylib"
+
 #else
 #define LIB_NAME    "libpcap.so"
 #endif
-#define LIB_ERROR_STR   "Unable to load pcap: %s\n"
 
-typedef void *HMODULE;
-typedef const char *except_type;
-#define FreeLibrary(x) dlclose(x)
-#define GetLastError() dlerror()
-#define GetProcAddress(x, y) dlsym(x, y)
-#define LoadDynamicLibrary(x) dlopen(x, RTLD_LAZY)
+#include <pcap.h>
 
-#endif
+// Typedefs for dynamically loaded functions
+typedef int (*pcap_findalldevs_fn)(pcap_if_t **, char *);
+typedef pcap_t *(*pcap_open_live_fn)(const char *, int, int, int, char *);
+typedef int (*pcap_next_ex_fn)(pcap_t *, struct pcap_pkthdr **, const u_char **);
+typedef int (*pcap_compile_fn)(pcap_t *, struct bpf_program *, const char *, int, bpf_u_int32);
+typedef void (*pcap_close_fn)(pcap_t *);
+typedef int (*pcap_setfilter_fn)(pcap_t *, struct bpf_program *);
+typedef int (*pcap_sendpacket_fn)(pcap_t *, const u_char *, int);
+typedef int (*pcap_set_datalink_fn)(pcap_t *, int);
+typedef int (*pcap_dispatch_fn)(pcap_t *, int, pcap_handler, u_char *);
 
 class pcap_module : public osd_module, public netdev_module
 {
 public:
-
 	pcap_module()
-	: osd_module(OSD_NETDEV_PROVIDER, "pcap"), netdev_module(), handle(nullptr)
+	: osd_module(OSD_NETDEV_PROVIDER, "pcap"), netdev_module()
 	{
 	}
 	virtual ~pcap_module() { }
@@ -63,32 +49,46 @@ public:
 	virtual int init(const osd_options &options) override;
 	virtual void exit() override;
 
-	virtual bool probe() override;
+	virtual bool probe() override
+	{
+		pcap_dll = osd::dynamic_module::open({ LIB_NAME });
 
-	HMODULE handle;
+		pcap_findalldevs_dl = pcap_dll->bind<pcap_findalldevs_fn>("pcap_findalldevs");
+		pcap_open_live_dl = pcap_dll->bind<pcap_open_live_fn>("pcap_open_live");
+		pcap_next_ex_dl = pcap_dll->bind<pcap_next_ex_fn>("pcap_next_ex");
+		pcap_compile_dl = pcap_dll->bind<pcap_compile_fn>("pcap_compile");
+		pcap_close_dl = pcap_dll->bind<pcap_close_fn>("pcap_close");
+		pcap_setfilter_dl = pcap_dll->bind<pcap_setfilter_fn>("pcap_setfilter");
+		pcap_sendpacket_dl = pcap_dll->bind<pcap_sendpacket_fn>("pcap_sendpacket");
+		pcap_set_datalink_dl = pcap_dll->bind<pcap_set_datalink_fn>("pcap_set_datalink");
+		pcap_dispatch_dl = pcap_dll->bind<pcap_dispatch_fn>("pcap_dispatch");
+
+		if (!pcap_findalldevs_dl || !pcap_open_live_dl    || !pcap_next_ex_dl   ||
+			!pcap_compile_dl     || !pcap_close_dl        || !pcap_setfilter_dl ||
+			!pcap_sendpacket_dl  || !pcap_set_datalink_dl || !pcap_dispatch_dl)
+		{
+			osd_printf_error("Unable to load the PCAP library\n");
+			return false;
+		}
+
+		return true;
+	}
+
+	osd::dynamic_module::ptr pcap_dll;
+
+	pcap_findalldevs_fn  pcap_findalldevs_dl;
+	pcap_open_live_fn    pcap_open_live_dl;
+	pcap_next_ex_fn      pcap_next_ex_dl;
+	pcap_compile_fn      pcap_compile_dl;
+	pcap_close_fn        pcap_close_dl;
+	pcap_setfilter_fn    pcap_setfilter_dl;
+	pcap_sendpacket_fn   pcap_sendpacket_dl;
+	pcap_set_datalink_fn pcap_set_datalink_dl;
+	pcap_dispatch_fn     pcap_dispatch_dl;
 };
 
-static int (*pcap_compile_dl)(pcap_t *, struct bpf_program *, char *, int, bpf_u_int32) = nullptr;
-static int (*pcap_findalldevs_dl)(pcap_if_t **, char *) = nullptr;
-static pcap_t *(*pcap_open_live_dl)(const char *name, int, int, int, char *) = nullptr;
-static int (*pcap_next_ex_dl)(pcap_t *, struct pcap_pkthdr **, const u_char **) = nullptr;
-static void (*pcap_close_dl)(pcap_t *) = nullptr;
-static int (*pcap_setfilter_dl)(pcap_t *, struct bpf_program *) = nullptr;
-static int (*pcap_sendpacket_dl)(pcap_t *, u_char *, int) = nullptr;
-static int (*pcap_set_datalink_dl)(pcap_t *, int) = nullptr;
-static int (*pcap_dispatch_dl)(pcap_t *, int, pcap_handler callback, u_char *) = nullptr;
-
-
-#if 0
-#define pcap_compile_dl pcap_compile
-#define pcap_findalldevs_dl pcap_findalldevs
-#define pcap_open_live_dl pcap_open_live
-#define pcap_next_ex_dl pcap_next_ex
-#define pcap_close_dl pcap_close
-#define pcap_setfilter_dl pcap_setfilter
-#define pcap_sendpacket_dl pcap_sendpacket
-#define pcap_set_datalink_dl pcap_set_datalink
-#endif
+// FIXME: bridge between pcap_module and netdev_pcap
+static pcap_module *module = nullptr;
 
 #ifdef SDLMAME_MACOSX
 struct netdev_pcap_context {
@@ -140,7 +140,7 @@ static void *netdev_pcap_blocker(void *arg) {
 	struct netdev_pcap_context *ctx = (struct netdev_pcap_context*)arg;
 
 	while(ctx && ctx->p) {
-		pcap_dispatch_dl(ctx->p, 1, netdev_pcap_handler, (u_char*)ctx);
+		(*module->pcap_dispatch_dl)(ctx->p, 1, netdev_pcap_handler, (u_char*)ctx);
 	}
 
 	return 0;
@@ -152,19 +152,19 @@ netdev_pcap::netdev_pcap(const char *name, class device_network_interface *ifdev
 {
 	char errbuf[PCAP_ERRBUF_SIZE];
 #if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
-	m_p = pcap_open_live_dl(name, 65535, 1, -1, errbuf);
+	m_p = (*module->pcap_open_live_dl)(name, 65535, 1, -1, errbuf);
 #else
-	m_p = pcap_open_live_dl(name, 65535, 1, 1, errbuf);
+	m_p = (*module->pcap_open_live_dl)(name, 65535, 1, 1, errbuf);
 #endif
 	if(!m_p)
 	{
 		osd_printf_error("Unable to open %s: %s\n", name, errbuf);
 		return;
 	}
-	if(pcap_set_datalink_dl(m_p, DLT_EN10MB) == -1)
+	if ((*module->pcap_set_datalink_dl)(m_p, DLT_EN10MB) == -1)
 	{
 		osd_printf_error("Unable to set %s to ethernet", name);
-		pcap_close_dl(m_p);
+		(*module->pcap_close_dl)(m_p);
 		m_p = nullptr;
 		return;
 	}
@@ -188,10 +188,10 @@ void netdev_pcap::set_mac(const char *mac)
 #else
 	sprintf(filter, "ether dst %.2X:%.2X:%.2X:%.2X:%.2X:%.2X or ether multicast or ether broadcast", (unsigned char)mac[0], (unsigned char)mac[1], (unsigned char)mac[2],(unsigned char)mac[3], (unsigned char)mac[4], (unsigned char)mac[5]);
 #endif
-	if(pcap_compile_dl(m_p, &fp, filter, 1, 0) == -1) {
+	if ((*module->pcap_compile_dl)(m_p, &fp, filter, 1, 0) == -1) {
 		osd_printf_error("Error with pcap_compile\n");
 	}
-	if(pcap_setfilter_dl(m_p, &fp) == -1) {
+	if ((*module->pcap_setfilter_dl)(m_p, &fp) == -1) {
 		osd_printf_error("Error with pcap_setfilter\n");
 	}
 }
@@ -203,7 +203,7 @@ int netdev_pcap::send(UINT8 *buf, int len)
 		printf("send invoked, but no pcap context\n");
 		return 0;
 	}
-	ret = pcap_sendpacket_dl(m_p, buf, len);
+	ret = (*module->pcap_sendpacket_dl)(m_p, buf, len);
 	printf("sent packet length %d, returned %d\n", len, ret);
 	return ret ? len : 0;
 	//return (!pcap_sendpacket_dl(m_p, buf, len))?len:0;
@@ -228,7 +228,7 @@ int netdev_pcap::recv_dev(UINT8 **buf)
 #else
 	struct pcap_pkthdr *header;
 	if(!m_p) return 0;
-	return (pcap_next_ex_dl(m_p, &header, (const u_char **)buf) == 1)?header->len:0;
+	return ((*module->pcap_next_ex_dl)(m_p, &header, (const u_char **)buf) == 1)?header->len:0;
 #endif
 }
 
@@ -239,7 +239,7 @@ netdev_pcap::~netdev_pcap()
 	pthread_cancel(m_thread);
 	pthread_join(m_thread, nullptr);
 #endif
-	if(m_p) pcap_close_dl(m_p);
+	if(m_p) (*module->pcap_close_dl)(m_p);
 	m_p = nullptr;
 }
 
@@ -249,52 +249,16 @@ static CREATE_NETDEV(create_pcap)
 	return dynamic_cast<osd_netdev *>(dev);
 }
 
-bool pcap_module::probe()
-{
-	if (handle == nullptr)
-	{
-		handle = LoadDynamicLibrary(LIB_NAME);
-		return (handle != nullptr);
-	}
-	return true;
-}
-
-
 int pcap_module::init(const osd_options &options)
 {
 	pcap_if_t *devs;
 	char errbuf[PCAP_ERRBUF_SIZE];
 
-	try
+	// FIXME: bridge between pcap_module and netdev_pcap
+	module = this;
+
+	if ((*pcap_findalldevs_dl)(&devs, errbuf) == -1)
 	{
-		if(!(pcap_findalldevs_dl = (int (*)(pcap_if_t **, char *))GetProcAddress(handle, "pcap_findalldevs")))
-			throw GetLastError();
-		if(!(pcap_open_live_dl = (pcap_t* (*)(const char *, int, int, int, char *))GetProcAddress(handle, "pcap_open_live")))
-			throw GetLastError();
-		if(!(pcap_next_ex_dl = (int (*)(pcap_t *, struct pcap_pkthdr **, const u_char **))GetProcAddress(handle, "pcap_next_ex")))
-			throw GetLastError();
-		if(!(pcap_compile_dl = (int (*)(pcap_t *, struct bpf_program *, char *, int, bpf_u_int32))GetProcAddress(handle, "pcap_compile")))
-			throw GetLastError();
-		if(!(pcap_close_dl = (void (*)(pcap_t *))GetProcAddress(handle, "pcap_close")))
-			throw GetLastError();
-		if(!(pcap_setfilter_dl = (int (*)(pcap_t *, struct bpf_program *))GetProcAddress(handle, "pcap_setfilter")))
-			throw GetLastError();
-		if(!(pcap_sendpacket_dl = (int (*)(pcap_t *, u_char *, int))GetProcAddress(handle, "pcap_sendpacket")))
-			throw GetLastError();
-		if(!(pcap_set_datalink_dl = (int (*)(pcap_t *, int))GetProcAddress(handle, "pcap_set_datalink")))
-			throw GetLastError();
-		if(!(pcap_dispatch_dl = (int (*)(pcap_t *, int, pcap_handler callback, u_char *))GetProcAddress(handle, "pcap_dispatch")))
-			throw GetLastError();
-	}
-	catch (except_type e)
-	{
-		FreeLibrary(handle);
-		osd_printf_error(LIB_ERROR_STR, e);
-		return 1;
-	}
-	if(pcap_findalldevs_dl(&devs, errbuf) == -1)
-	{
-		FreeLibrary(handle);
 		osd_printf_error("Unable to get network devices: %s\n", errbuf);
 		return 1;
 	}
@@ -314,9 +278,8 @@ int pcap_module::init(const osd_options &options)
 void pcap_module::exit()
 {
 	clear_netdev();
-	//FreeLibrary(handle);
-	//handle = nullptr;
 }
+
 #else
 	#include "modules/osdmodule.h"
 	#include "netdev_module.h"

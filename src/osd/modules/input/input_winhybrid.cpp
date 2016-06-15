@@ -218,7 +218,7 @@ protected:
 			{
 				XINPUT_STATE state = { 0 };
 
-				if (m_xinput_helper->XInputGetState(i, &state) == ERROR_SUCCESS)
+				if (m_xinput_helper->xinput_get_state(i, &state) == ERROR_SUCCESS)
 				{
 					// allocate and link in a new device
 					devinfo = m_xinput_helper->create_xinput_device(machine, i, *this);
