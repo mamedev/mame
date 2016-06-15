@@ -8220,7 +8220,6 @@ static MACHINE_CONFIG_DERIVED( flam7_w4, lucky8 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(flaming7_map)
-//  MCFG_CPU_IO_MAP(flaming7_readport)
 
 	MCFG_DEVICE_MODIFY("ppi8255_0")
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, fl7w4_outc802_w))
@@ -8234,9 +8233,8 @@ static MACHINE_CONFIG_DERIVED( flaming7, lucky8 )
 	MCFG_CPU_PROGRAM_MAP(flaming7_map)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", flaming7)
-//	MCFG_GFXDECODE_MODIFY("gfxdecode", goldstar)
 
-    // to do serial protection & gfxdecode
+    // to do serial protection.
 	MCFG_DEVICE_MODIFY("ppi8255_0")
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, fl7w4_outc802_w))
 
