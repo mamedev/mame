@@ -24,7 +24,8 @@ static UINT32 common_dasm(device_t *device, char *buffer, offs_t pc, const UINT8
 		case 0x02:  if (!upi41)
 						sprintf(buffer, "out  bus,a");
 					else
-						sprintf(buffer, "out  dbb,a");                                          break;
+						sprintf(buffer, "out  dbb,a");
+			break;
 		case 0x03:      sprintf(buffer, "add  a,#$%02X", *opram++);                             break;
 		case 0x04:      sprintf(buffer, "jmp  $0%02X", *opram++);                               break;
 		case 0x05:      sprintf(buffer, "en   i");                                              break;
@@ -32,7 +33,8 @@ static UINT32 common_dasm(device_t *device, char *buffer, offs_t pc, const UINT8
 		case 0x08:  if (!upi41)
 						sprintf(buffer, "in   a,bus");
 					else
-						sprintf(buffer, "illegal");                                             break;
+						sprintf(buffer, "illegal");
+			break;
 		case 0x09:      sprintf(buffer, "in   a,p1");                                           break;
 		case 0x0a:      sprintf(buffer, "in   a,p2");                                           break;
 		case 0x0c:      sprintf(buffer, "movd a,p4");                                           break;
@@ -60,7 +62,8 @@ static UINT32 common_dasm(device_t *device, char *buffer, offs_t pc, const UINT8
 		case 0x22:  if (!upi41)
 						sprintf(buffer, "illegal");
 					else
-						sprintf(buffer, "in   a,dbb");                                          break;
+						sprintf(buffer, "in   a,dbb");
+			break;
 		case 0x23:      sprintf(buffer, "mov  a,#$%02X", *opram++);                             break;
 		case 0x24:      sprintf(buffer, "jmp  $1%02X", *opram++);                               break;
 		case 0x25:      sprintf(buffer, "en   tcnti");                                          break;
@@ -140,7 +143,8 @@ static UINT32 common_dasm(device_t *device, char *buffer, offs_t pc, const UINT8
 		case 0x75:  if (!upi41)
 						sprintf(buffer, "ent0 clk");
 					else
-						sprintf(buffer, "illegal");                                             break;
+						sprintf(buffer, "illegal");
+			break;
 		case 0x76:      sprintf(buffer, "jf1  $%03X", (pc & 0xf00) | *opram++);                 break;
 		case 0x77:      sprintf(buffer, "rr   a");                                              break;
 		case 0x78:      sprintf(buffer, "addc a,r0");                                           break;
@@ -154,22 +158,26 @@ static UINT32 common_dasm(device_t *device, char *buffer, offs_t pc, const UINT8
 		case 0x80:  if (!upi41)
 						sprintf(buffer, "movx a,@r0");
 					else
-						sprintf(buffer, "illegal");                                             break;
+						sprintf(buffer, "illegal");
+			break;
 		case 0x81:  if (!upi41)
 						sprintf(buffer, "movx a,@r1");
 					else
-						sprintf(buffer, "illegal");                                             break;
+						sprintf(buffer, "illegal");
+			break;
 		case 0x83:      sprintf(buffer, "ret"); flags = DASMFLAG_STEP_OUT;                      break;
 		case 0x84:      sprintf(buffer, "jmp  $4%02X", *opram++);                               break;
 		case 0x85:      sprintf(buffer, "clr  f0");                                             break;
 		case 0x86:  if (!upi41)
 						sprintf(buffer, "jni  $%03X", (pc & 0xf00) | *opram++);
 					else
-						sprintf(buffer, "jobf $%03X", (pc & 0xf00) | *opram++);                 break;
+						sprintf(buffer, "jobf $%03X", (pc & 0xf00) | *opram++);
+			break;
 		case 0x88:  if (!upi41)
 						sprintf(buffer, "orl  bus,#$%02X", *opram++);
 					else
-						sprintf(buffer, "illegal");                                             break;
+						sprintf(buffer, "illegal");
+			break;
 		case 0x89:      sprintf(buffer, "orl  p1,#$%02X", *opram++);                            break;
 		case 0x8a:      sprintf(buffer, "orl  p2,#$%02X", *opram++);                            break;
 		case 0x8c:      sprintf(buffer, "orld p4,a");                                           break;
@@ -179,11 +187,13 @@ static UINT32 common_dasm(device_t *device, char *buffer, offs_t pc, const UINT8
 		case 0x90:  if (!upi41)
 						sprintf(buffer, "movx @r0,a");
 					else
-						sprintf(buffer, "mov  sts,a");                                          break;
+						sprintf(buffer, "mov  sts,a");
+			break;
 		case 0x91:  if (!upi41)
 						sprintf(buffer, "movx @r1,a");
 					else
-						sprintf(buffer, "illegal");                                             break;
+						sprintf(buffer, "illegal");
+			break;
 		case 0x92:      sprintf(buffer, "jb4  $%03X", (pc & 0xf00) | *opram++);                 break;
 		case 0x93:      sprintf(buffer, "retr"); flags = DASMFLAG_STEP_OUT;                     break;
 		case 0x94:      sprintf(buffer, "call $4%02X", *opram++); flags = DASMFLAG_STEP_OVER;   break;
@@ -193,7 +203,8 @@ static UINT32 common_dasm(device_t *device, char *buffer, offs_t pc, const UINT8
 		case 0x98:  if (!upi41)
 						sprintf(buffer, "anl  bus,#$%02X", *opram++);
 					else
-						sprintf(buffer, "illegal");                                             break;
+						sprintf(buffer, "illegal");
+			break;
 		case 0x99:      sprintf(buffer, "anl  p1,#$%02X", *opram++);                            break;
 		case 0x9a:      sprintf(buffer, "anl  p2,#$%02X", *opram++);                            break;
 		case 0x9c:      sprintf(buffer, "anld p4,a");                                           break;
@@ -250,7 +261,8 @@ static UINT32 common_dasm(device_t *device, char *buffer, offs_t pc, const UINT8
 		case 0xd6:  if (!upi41)
 						sprintf(buffer, "illegal");
 					else
-						sprintf(buffer, "jnibf $%03X", (pc & 0xf00) | *opram++);                break;
+						sprintf(buffer, "jnibf $%03X", (pc & 0xf00) | *opram++);
+			break;
 		case 0xd7:      sprintf(buffer, "mov  psw,a");                                          break;
 		case 0xd8:      sprintf(buffer, "xrl  a,r0");                                           break;
 		case 0xd9:      sprintf(buffer, "xrl  a,r1");                                           break;
@@ -265,7 +277,8 @@ static UINT32 common_dasm(device_t *device, char *buffer, offs_t pc, const UINT8
 		case 0xe5:  if (!upi41)
 						sprintf(buffer, "sel  mb0");
 					else
-						sprintf(buffer, "en   dma");                                            break;
+						sprintf(buffer, "en   dma");
+			break;
 		case 0xe6:      sprintf(buffer, "jnc  $%03X", (pc & 0xf00) | *opram++);                 break;
 		case 0xe7:      sprintf(buffer, "rl   a");                                              break;
 		case 0xe8:      sprintf(buffer, "djnz r0,$%03X", (pc & 0xf00) | *opram++); flags = DASMFLAG_STEP_OVER; break;
@@ -283,7 +296,8 @@ static UINT32 common_dasm(device_t *device, char *buffer, offs_t pc, const UINT8
 		case 0xf5:  if (!upi41)
 						sprintf(buffer, "sel  mb1");
 					else
-						sprintf(buffer, "en   flags");                                          break;
+						sprintf(buffer, "en   flags");
+			break;
 		case 0xf6:      sprintf(buffer, "jc   $%03X", (pc & 0xf00) | *opram++);                 break;
 		case 0xf7:      sprintf(buffer, "rlc  a");                                              break;
 		case 0xf8:      sprintf(buffer, "mov  a,r0");                                           break;

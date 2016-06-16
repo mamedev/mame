@@ -196,7 +196,7 @@ void wolfpack_state::draw_pt(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		rect.max_x = 255;
 
 
-		m_gfxdecode->gfx(2)->transpen(bitmap,rect,
+	m_gfxdecode->gfx(2)->transpen(bitmap,rect,
 		m_pt_pic,
 		0,
 		0, 0,
@@ -204,7 +204,7 @@ void wolfpack_state::draw_pt(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		m_pt_pos_select ? 0x70 : 0xA0, 0);
 
 
-		m_gfxdecode->gfx(2)->transpen(bitmap,rect,
+	m_gfxdecode->gfx(2)->transpen(bitmap,rect,
 		m_pt_pic,
 		0,
 		0, 0,

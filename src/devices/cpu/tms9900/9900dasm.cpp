@@ -444,7 +444,7 @@ unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const UINT8 *oprom, 
 		case 1:
 			/* opcode is dcs */
 			opc = _dcs;
-				break;
+			break;
 
 		case 2:
 		case 3: /* should be 2, but instruction decoding is incomplete */
@@ -458,11 +458,11 @@ unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const UINT8 *oprom, 
 				instead of the immediate.  Since I do not know, I handle this
 				as an illegal instruction. */
 				opc = _ill;
-				break;
+			break;
 
 		default:
 			/* this is still a software xop */
-				break;
+			break;
 		}
 	}
 

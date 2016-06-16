@@ -335,7 +335,7 @@ void cyclemb_state::skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		if(m_obj3_ram[i+1] & 1)
 			x |= 0x100;
 
-			x = 0x138 - x;
+		x = 0x138 - x;
 
 		spr_offs = (m_obj1_ram[i+0]);
 		spr_offs += ((m_obj3_ram[i+0] & 3) << 8);

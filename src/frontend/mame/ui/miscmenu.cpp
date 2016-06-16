@@ -894,7 +894,11 @@ menu_plugins_configure::~menu_plugins_configure()
 {
 	emu_file file_plugin(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	if (file_plugin.open("plugin.ini") != osd_file::error::NONE)
-		throw emu_fatalerror("Unable to create file plugin.ini\n");
+		// Can't throw in a destructor, so let's ignore silently for
+		// now.  We shouldn't write files in a destructor in any case.
+		//
+		// throw emu_fatalerror("Unable to create file plugin.ini\n");
+		return;
 	// generate the updated INI
 	file_plugin.puts(mame_machine_manager::instance()->plugins().output_ini().c_str());
 }

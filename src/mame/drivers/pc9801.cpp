@@ -1021,7 +1021,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_video_ff_w)
 			m_gfx_ff = 1;
 			if(data & 1)
 				logerror("Graphic f/f actually enabled!\n");
-				break;
+			break;
 		case 4:
 			if(m_gfx_ff)
 			{

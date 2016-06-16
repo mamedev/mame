@@ -578,7 +578,9 @@ bool cobra_jvs::coin_counters(UINT8 *&buf, UINT8 count)
 	*buf++ = m_coin_counter[0] >> 8; *buf++ = m_coin_counter[0];
 
 	if(count > 1)
+	{
 		*buf++ = m_coin_counter[1] >> 8; *buf++ = m_coin_counter[1];
+	}
 
 	return true;
 }

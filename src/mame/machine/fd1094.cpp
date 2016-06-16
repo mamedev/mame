@@ -816,7 +816,7 @@ UINT16 fd1094_device::decrypt_one(offs_t address, UINT16 val, const UINT8 *main_
 		val = BITSWAP16(val, 15, 9,10,13, 3,12, 0,14, 6, 5, 2,11, 8, 1, 4, 7);
 
 		if (!global_xor1)   if (~val & 0x0800)  val ^= 0x3002;                                      // 1,12,13
-							if (~val & 0x0020)  val ^= 0x0044;                                      // 2,6
+		if (true)			if (~val & 0x0020)  val ^= 0x0044;                                      // 2,6
 		if (!key_1b)        if (~val & 0x0400)  val ^= 0x0890;                                      // 4,7,11
 		if (!global_swap2)  if (!key_0c)        val ^= 0x0308;                                      // 3,8,9
 												val ^= 0x6561;

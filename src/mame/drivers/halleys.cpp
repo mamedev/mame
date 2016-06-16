@@ -937,13 +937,20 @@ COMMAND_MODE:
 				ax = (UINT16)src1_ptr[edx];
 				al = src1_ptr[edx+0x10000];
 				ax |= BG_RGB;
-				if (al & 0x01) dst_ptr[ecx] = ax;  ecx++; ecx &= WARPMASK;
-				if (al & 0x02) dst_ptr[ecx] = ax;  ecx++; ecx &= WARPMASK;
-				if (al & 0x04) dst_ptr[ecx] = ax;  ecx++; ecx &= WARPMASK;
-				if (al & 0x08) dst_ptr[ecx] = ax;  ecx++; ecx &= WARPMASK;
-				if (al & 0x10) dst_ptr[ecx] = ax;  ecx++; ecx &= WARPMASK;
-				if (al & 0x20) dst_ptr[ecx] = ax;  ecx++; ecx &= WARPMASK;
-				if (al & 0x40) dst_ptr[ecx] = ax;  ecx++; ecx &= WARPMASK;
+				if (al & 0x01) dst_ptr[ecx] = ax;
+				ecx++; ecx &= WARPMASK;
+				if (al & 0x02) dst_ptr[ecx] = ax;
+				ecx++; ecx &= WARPMASK;
+				if (al & 0x04) dst_ptr[ecx] = ax;
+				ecx++; ecx &= WARPMASK;
+				if (al & 0x08) dst_ptr[ecx] = ax;
+				ecx++; ecx &= WARPMASK;
+				if (al & 0x10) dst_ptr[ecx] = ax;
+				ecx++; ecx &= WARPMASK;
+				if (al & 0x20) dst_ptr[ecx] = ax;
+				ecx++; ecx &= WARPMASK;
+				if (al & 0x40) dst_ptr[ecx] = ax;
+				ecx++; ecx &= WARPMASK;
 				if (al & 0x80) dst_ptr[ecx] = ax;
 				dst_ptr += SCREEN_WIDTH;
 			} while (++edx);
@@ -1404,12 +1411,18 @@ void halleys_state::copy_fixed_xp(bitmap_ind16 &bitmap, UINT16 *source)
 		do {
 			ax = esi[ecx];
 			bx = esi[ecx+1];
-			if (ax) edi[ecx  ] = ax; ax = esi[ecx+2];
-			if (bx) edi[ecx+1] = bx; bx = esi[ecx+3];
-			if (ax) edi[ecx+2] = ax; ax = esi[ecx+4];
-			if (bx) edi[ecx+3] = bx; bx = esi[ecx+5];
-			if (ax) edi[ecx+4] = ax; ax = esi[ecx+6];
-			if (bx) edi[ecx+5] = bx; bx = esi[ecx+7];
+			if (ax) edi[ecx  ] = ax;
+			ax = esi[ecx+2];
+			if (bx) edi[ecx+1] = bx;
+			bx = esi[ecx+3];
+			if (ax) edi[ecx+2] = ax;
+			ax = esi[ecx+4];
+			if (bx) edi[ecx+3] = bx;
+			bx = esi[ecx+5];
+			if (ax) edi[ecx+4] = ax;
+			ax = esi[ecx+6];
+			if (bx) edi[ecx+5] = bx;
+			bx = esi[ecx+7];
 			if (ax) edi[ecx+6] = ax;
 			if (bx) edi[ecx+7] = bx;
 		}
@@ -1440,24 +1453,40 @@ void halleys_state::copy_fixed_2b(bitmap_ind16 &bitmap, UINT16 *source)
 			ax = esi[ecx];
 			bx = esi[ecx+1];
 
-			if (!(ax)) goto SKIP0; if (!(ax&SP_2BACK)) goto DRAW0; if (edi[ecx  ]) goto SKIP0;
+			if (!(ax)) goto SKIP0;
+			if (!(ax&SP_2BACK)) goto DRAW0;
+			if (edi[ecx  ]) goto SKIP0;
 			DRAW0: edi[ecx  ] = ax; SKIP0: ax = esi[ecx+2];
-			if (!(bx)) goto SKIP1; if (!(bx&SP_2BACK)) goto DRAW1; if (edi[ecx+1]) goto SKIP1;
+			if (!(bx)) goto SKIP1;
+			if (!(bx&SP_2BACK)) goto DRAW1;
+			if (edi[ecx+1]) goto SKIP1;
 			DRAW1: edi[ecx+1] = bx; SKIP1: bx = esi[ecx+3];
 
-			if (!(ax)) goto SKIP2; if (!(ax&SP_2BACK)) goto DRAW2; if (edi[ecx+2]) goto SKIP2;
+			if (!(ax)) goto SKIP2;
+			if (!(ax&SP_2BACK)) goto DRAW2;
+			if (edi[ecx+2]) goto SKIP2;
 			DRAW2: edi[ecx+2] = ax; SKIP2: ax = esi[ecx+4];
-			if (!(bx)) goto SKIP3; if (!(bx&SP_2BACK)) goto DRAW3; if (edi[ecx+3]) goto SKIP3;
+			if (!(bx)) goto SKIP3;
+			if (!(bx&SP_2BACK)) goto DRAW3;
+			if (edi[ecx+3]) goto SKIP3;
 			DRAW3: edi[ecx+3] = bx; SKIP3: bx = esi[ecx+5];
 
-			if (!(ax)) goto SKIP4; if (!(ax&SP_2BACK)) goto DRAW4; if (edi[ecx+4]) goto SKIP4;
+			if (!(ax)) goto SKIP4;
+			if (!(ax&SP_2BACK)) goto DRAW4;
+			if (edi[ecx+4]) goto SKIP4;
 			DRAW4: edi[ecx+4] = ax; SKIP4: ax = esi[ecx+6];
-			if (!(bx)) goto SKIP5; if (!(bx&SP_2BACK)) goto DRAW5; if (edi[ecx+5]) goto SKIP5;
+			if (!(bx)) goto SKIP5;
+			if (!(bx&SP_2BACK)) goto DRAW5;
+			if (edi[ecx+5]) goto SKIP5;
 			DRAW5: edi[ecx+5] = bx; SKIP5: bx = esi[ecx+7];
 
-			if (!(ax)) goto SKIP6; if (!(ax&SP_2BACK)) goto DRAW6; if (edi[ecx+6]) goto SKIP6;
+			if (!(ax)) goto SKIP6;
+			if (!(ax&SP_2BACK)) goto DRAW6;
+			if (edi[ecx+6]) goto SKIP6;
 			DRAW6: edi[ecx+6] = ax; SKIP6:
-			if (!(bx)) continue;   if (!(bx&SP_2BACK)) goto DRAW7; if (edi[ecx+7]) continue;
+			if (!(bx)) continue;
+			if (!(bx&SP_2BACK)) goto DRAW7;
+			if (edi[ecx+7]) continue;
 			DRAW7: edi[ecx+7] = bx;
 		}
 		while (ecx += 8);

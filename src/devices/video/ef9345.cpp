@@ -428,7 +428,7 @@ void ef9345_device::bichrome40(UINT8 type, UINT16 address, UINT8 dial, UINT16 ib
 		case 0x70:                  //11 = flash underlined
 			if (m_blink)
 				underline = 1;
-				break;
+			break;
 		}
 	}
 

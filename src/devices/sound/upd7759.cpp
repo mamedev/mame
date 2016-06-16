@@ -716,7 +716,7 @@ void upd7759_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		/* set a timer to go off when that is done */
 		if (m_state != STATE_IDLE)
 			m_timer->adjust(m_clock_period * m_clocks_left);
-			break;
+		break;
 
 		default:
 			assert_always(FALSE, "Unknown id in upd7759_device::device_timer");

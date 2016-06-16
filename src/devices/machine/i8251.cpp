@@ -205,21 +205,20 @@ void i8251_device::transmit_clock()
 	else
 		return;
 
-		if (is_transmit_register_empty()) {
-				if ((m_status & I8251_STATUS_TX_READY) == 0 && (is_tx_enabled() || (m_flags & I8251_DELAYED_TX_EN) != 0)) {
-						start_tx();
-				} else {
-						m_status |= I8251_STATUS_TX_EMPTY;
-				}
-				update_tx_ready();
-				update_tx_empty();
+	if (is_transmit_register_empty()) {
+		if ((m_status & I8251_STATUS_TX_READY) == 0 && (is_tx_enabled() || (m_flags & I8251_DELAYED_TX_EN) != 0)) {
+			start_tx();
+		} else {
+			m_status |= I8251_STATUS_TX_EMPTY;
 		}
-		/* if diserial has bits to send, make them so */
-		if (!is_transmit_register_empty())
-			{
-				UINT8 data = transmit_register_get_data_bit();
-				m_txd_handler(data);
-			}
+		update_tx_ready();
+		update_tx_empty();
+	}
+	/* if diserial has bits to send, make them so */
+	if (!is_transmit_register_empty()) {
+		UINT8 data = transmit_register_get_data_bit();
+		m_txd_handler(data);
+	}
 
 #if 0
 	/* hunt mode? */
