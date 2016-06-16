@@ -2006,7 +2006,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 			<feature name="pcb" value="" />
 			<feature name="ic1" value="PICO-9515I" />
 			<dataarea name="flop" size="2097152">
-				<rom name="pico-9515i.ic1" size="2097152" crc="63e37ab9" sha1="a7ff319deaffbb27d732d86ad42458f26e4fcb12" offset="0" loadflag="load16_word_swap" />
+				<rom name="pico-9515i.ic1" size="2097152" crc="c7eb7f24" sha1="5058640eb70268345e6e630ac78958c99121e294" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
