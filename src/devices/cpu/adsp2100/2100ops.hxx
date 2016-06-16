@@ -380,7 +380,7 @@ void adsp21xx_device::write_reg1(int regnum, INT32 val)
 			break;
 
 		case 3:
-			logerror("ADSP %04x: Writing to an invalid register!\n", m_ppc);
+			logerror("ADSP %04x: Writing to an invalid register! RGP=01 RegCode=%1X Val=%04X\n", m_ppc, regnum, val);
 			break;
 	}
 }
@@ -505,7 +505,7 @@ INT32 adsp21xx_device::read_reg3(int regnum)
 		case 0x08:  if (!m_sport_rx_cb.isnull()) return m_sport_rx_cb(0); else return 0;
 		case 0x0a:  if (!m_sport_rx_cb.isnull()) return m_sport_rx_cb(1); else return 0;
 		case 0x0f:  return pc_stack_pop_val();
-		default:    logerror("ADSP %04x: Reading from an invalid register!\n", m_ppc); return 0;
+		default:    logerror("ADSP %04x: Reading from an invalid register! RGP=b11 RegCode=%1X\n", m_ppc, regnum); return 0;
 	}
 }
 

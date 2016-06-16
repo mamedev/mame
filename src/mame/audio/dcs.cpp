@@ -1872,10 +1872,10 @@ WRITE16_MEMBER(dcs_audio_device:: adsp_control_w )
 	switch (offset)
 	{
 		case SYSCONTROL_REG:
-			/* bit 9 forces a reset */
-			if (data & 0x0200)
+			/* bit 9 forces a reset (not on 2181) */
+			if ((data & 0x0200) && !(m_rev == 3 || m_rev == 4))
 			{
-				logerror("%04X:Rebooting DCS due to SYSCONTROL write\n", space.device().safe_pc());
+				logerror("%04X:Rebooting DCS due to SYSCONTROL write = %04X\n", space.device().safe_pc(), data);
 				m_cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 				dcs_boot();
 				m_control_regs[SYSCONTROL_REG] = 0;
@@ -1950,9 +1950,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::dcs_irq )
 	{
 		int count = m_size / (2*(m_incs ? m_incs : 1));
 		// sf2049se was having overflow issues with fixed size of 0x400 buffer (m_size==0xb40, count=0x5a0).
-		//INT16 buffer[0x400];
-		std::unique_ptr<INT16[]> buffer;
-		buffer = std::make_unique<INT16[]>(count);
+		INT16 buffer[0x800];
 		int i;
 
 		for (i = 0; i < count; i++)
@@ -1962,7 +1960,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::dcs_irq )
 		}
 
 		if (m_channels)
-			dmadac_transfer(&m_dmadac[0], m_channels, 1, m_channels, count / m_channels, buffer.get());
+			dmadac_transfer(&m_dmadac[0], m_channels, 1, m_channels, count / m_channels, buffer);
 	}
 
 	/* check for wrapping */

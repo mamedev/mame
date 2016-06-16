@@ -43,6 +43,7 @@
 #include "machine/vrc4373.h"
 #include "machine/pci9050.h"
 #include "machine/pci-ide.h"
+#include "video/zeus2.h"
 #include "includes/midzeus.h"
 #include "includes/midzeus2.h"
 #include "machine/nvram.h"
@@ -62,19 +63,22 @@
 
 // These need more verification
 #define IOASIC_IRQ_SHIFT    0
+#define GALILEO_IRQ_SHIFT   1
+#define ZEUS_IRQ_SHIFT      2
 #define PARALLEL_IRQ_SHIFT  3
 #define UART0_SHIFT         4
 #define UART1_SHIFT         5
-#define ZEUS_IRQ_SHIFT      2
 #define VBLANK_IRQ_SHIFT    7
-#define GALILEO_IRQ_SHIFT   0
 
 /* static interrupts */
 #define GALILEO_IRQ_NUM         MIPS3_IRQ0
+#define VBLANK_IRQ_NUM          MIPS3_IRQ3
 #define IDE_IRQ_NUM             MIPS3_IRQ4
 
-#define LOG_RTC         (1)
-#define LOG_ZEUS        (0)
+#define LOG_RTC         (0)
+#define LOG_RED         (0)
+#define LOG_PORT        (0)
+#define LOG_IRQ			(0)
 
 class atlantis_state : public driver_device
 {
@@ -83,6 +87,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_zeus(*this, "zeus2"),
 		m_dcs(*this, "dcs"),
 		m_ioasic(*this, "ioasic"),
 		m_uart0(*this, "uart0"),
@@ -95,14 +101,14 @@ public:
 	UINT32 screen_update_mwskins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<mips3_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	//required_device<dcs2_audio_dsio_device> m_dcs;
-	//required_device<dcs2_audio_denver_device> m_dcs;
+	optional_device<palette_device> m_palette;
+	required_device<zeus2_device> m_zeus;
 	required_device<dcs_audio_device> m_dcs;
 	required_device<midway_ioasic_device> m_ioasic;
 	required_device<ns16550_device> m_uart0;
 	required_device<ns16550_device> m_uart1;
 	required_device<nvram_device> m_rtc;
-	UINT8 m_rtc_data[0x800];
+	UINT8 m_rtc_data[0x8000];
 
 	UINT32 m_last_offset;
 	READ8_MEMBER(cmos_r);
@@ -110,22 +116,13 @@ public:
 	DECLARE_WRITE32_MEMBER(cmos_protect_w);
 	DECLARE_READ32_MEMBER(cmos_protect_r);
 	UINT32 m_cmos_write_enabled;
+	UINT32 m_serial_count;
 
 	DECLARE_READ32_MEMBER(status_leds_r);
 	DECLARE_WRITE32_MEMBER(status_leds_w);
 	UINT8 m_status_leds;
 
 	DECLARE_WRITE32_MEMBER(asic_fifo_w);
-	DECLARE_WRITE32_MEMBER(dcs3_fifo_full_w);
-
-	DECLARE_WRITE32_MEMBER(zeus_w);
-	DECLARE_READ32_MEMBER(zeus_r);
-	UINT32 m_zeus_data[0x80];
-
-	READ8_MEMBER (red_r);
-	WRITE8_MEMBER(red_w);
-	UINT8 m_red_data[0x1000];
-	int m_red_count;
 
 	READ32_MEMBER (green_r);
 	WRITE32_MEMBER(green_w);
@@ -142,6 +139,8 @@ public:
 	UINT8 board_ctrl[CTRL_SIZE];
 	void update_asic_irq();
 
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(zeus_irq);
 	DECLARE_WRITE_LINE_MEMBER(ide_irq);
 	DECLARE_WRITE_LINE_MEMBER(ioasic_irq);
 
@@ -153,37 +152,6 @@ public:
 	DECLARE_WRITE32_MEMBER(port_ctrl_w);
 	UINT32 m_port_ctrl_reg[0x8];
 };
-
-READ8_MEMBER (atlantis_state::red_r)
-{
-	UINT8 data = m_red_data[offset];
-	logerror("%06X: red_r %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, data);
-	m_last_offset = offset | 0x10000;
-	return data;
-}
-
-WRITE8_MEMBER(atlantis_state::red_w)
-{
-	COMBINE_DATA(&m_red_data[offset]);
-
-	switch (offset) {
-	case 0:
-		// User I/O 0 = Allow write to red[0]. Serial Write Enable?
-		if (m_user_io_state & 0x1) {
-			// Data written is shifted by 1 bit each time.  Maybe a serial line output?
-			if (m_red_count == 0)
-				logerror("%06X: red_w start serial %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, data);
-			m_red_count++;
-			if (m_red_count == 8)
-				m_red_count = 0;
-			break;
-		}  // Fall through to default if not enabled
-	default:
-		logerror("%06X: red_w %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, data);
-		break;
-	}
-	m_last_offset = offset | 0x10000;
-}
 
 READ32_MEMBER(atlantis_state::green_r)
 {
@@ -222,10 +190,12 @@ READ32_MEMBER(atlantis_state::board_ctrl_r)
 		if (1 && m_screen->vblank())
 			data |= 0x80;
 		if (m_last_offset != (newOffset | 0x40000))
-			logerror("%s:board_ctrl_r read from CTRL_STATUS offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
+			if (LOG_IRQ)
+				logerror("%s:board_ctrl_r read from CTRL_STATUS offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
 		break;
 	default:
-		logerror("%s:board_ctrl_r read from offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
+		if (LOG_IRQ)
+			logerror("%s:board_ctrl_r read from offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
 		break;
 	}
 	m_last_offset = newOffset | 0x40000;
@@ -251,66 +221,70 @@ WRITE32_MEMBER(atlantis_state::board_ctrl_w)
 				m_dcs->reset_w(CLEAR_LINE);
 			}
 		}
-		logerror("%s:board_ctrl_w write to CTRL_POWER0 offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
+		if (LOG_IRQ)
+			logerror("%s:board_ctrl_w write to CTRL_POWER0 offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
 		break;
 	case CTRL_POWER1:
-		// 0x1 VBlank clear?
+			// 0x1 VBlank clear?
 		if (changeData & 0x1) {
 			if ((data & 0x0001) == 0) {
+				//UINT32 status_bit = (1 << VBLANK_IRQ_SHIFT);
+				UINT32 status_bit = (1 << 7);
+				board_ctrl[CTRL_CAUSE] &= ~status_bit;
+				board_ctrl[CTRL_STATUS] &= ~status_bit;
+				update_asic_irq();
 			}
 			else {
 			}
 		}
-		logerror("%s:board_ctrl_w write to CTRL_POWER1 offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
+		if (LOG_IRQ)
+			logerror("%s:board_ctrl_w write to CTRL_POWER1 offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
 		break;
 	case CTRL_GLOBAL_EN:
 		// Zero bit will clear cause
 		board_ctrl[CTRL_CAUSE] &= data;
 		update_asic_irq();
-		logerror("%s:board_ctrl_w write to CTRL_GLOBAL_EN offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
+		if (LOG_IRQ)
+			logerror("%s:board_ctrl_w write to CTRL_GLOBAL_EN offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
 		break;
 	default:
-		logerror("%s:board_ctrl_w write to offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
+		if (LOG_IRQ)
+			logerror("%s:board_ctrl_w write to offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
 		break;
 	}
 }
 
-
-WRITE32_MEMBER(atlantis_state::asic_fifo_w)
-{
-	m_ioasic->fifo_w(data);
-}
 
 READ8_MEMBER(atlantis_state::cmos_r)
 {
 	UINT8 result = m_rtc_data[offset];
 
 	switch (offset) {
-	case 0x7F9:
-	case 0x7FA:
-	case 0x7FB:
-	case 0x7FC:
-	case 0x7FD:
-	case 0x7FE:
-	case 0x7FF:
-		if ((m_rtc_data[0x7F8] & 0x40)==0) {
+	case 0x7FF9:
+	case 0x7FFA:
+	case 0x7FFB:
+	case 0x7FFC:
+	case 0x7FFD:
+	case 0x7FFE:
+	case 0x7FFF:
+		if ((m_rtc_data[0x7FF8] & 0x40)==0) {
 			system_time systime;
 			// get the current date/time from the core
 			machine().current_datetime(systime);
-			m_rtc_data[0x7F9] = dec_2_bcd(systime.local_time.second);
-			m_rtc_data[0x7FA] = dec_2_bcd(systime.local_time.minute);
-			m_rtc_data[0x7FB] = dec_2_bcd(systime.local_time.hour);
+			m_rtc_data[0x7FF9] = dec_2_bcd(systime.local_time.second);
+			m_rtc_data[0x7FFA] = dec_2_bcd(systime.local_time.minute);
+			m_rtc_data[0x7FFB] = dec_2_bcd(systime.local_time.hour);
 
-			m_rtc_data[0x7FC] = dec_2_bcd((systime.local_time.weekday != 0) ? systime.local_time.weekday : 7);
-			m_rtc_data[0x7FD] = dec_2_bcd(systime.local_time.mday);
-			m_rtc_data[0x7FE] = dec_2_bcd(systime.local_time.month + 1);
-			m_rtc_data[0x7FF] = dec_2_bcd(systime.local_time.year - 1900); // Epoch is 1900
+			m_rtc_data[0x7FFC] = dec_2_bcd((systime.local_time.weekday != 0) ? systime.local_time.weekday : 7);
+			m_rtc_data[0x7FFD] = dec_2_bcd(systime.local_time.mday);
+			m_rtc_data[0x7FFE] = dec_2_bcd(systime.local_time.month + 1);
+			m_rtc_data[0x7FFF] = dec_2_bcd(systime.local_time.year - 1900); // Epoch is 1900
 			result = m_rtc_data[offset];
 		}
 		break;
 	default:
 		if (LOG_RTC)
-			logerror("%s:RTC read from offset %04X = %08X m_rtc_data[0x7F8] %02X\n", machine().describe_context(), offset, result, m_rtc_data[0x7F8]);
+			logerror("%s:RTC read from offset %04X = %08X m_rtc_data[0x7FF8] %02X\n", machine().describe_context(), offset, result, m_rtc_data[0x7FF8]);
 		break;
 	}
 	return result;
@@ -319,23 +293,31 @@ READ8_MEMBER(atlantis_state::cmos_r)
 WRITE8_MEMBER(atlantis_state::cmos_w)
 {
 	system_time systime;
-
-	if (m_cmos_write_enabled) {
+	// User I/O 0 = Allow write to cmos[0]. Serial Write Enable?
+	if (offset == 0 && (m_user_io_state & 0x1)) {
+		// Data written is shifted by 1 bit each time.  Maybe a serial line output?
+		if (LOG_RTC && m_serial_count == 0)
+			logerror("%06X: cmos_w[0] start serial %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, data);
+		m_serial_count++;
+		if (m_serial_count == 8)
+			m_serial_count = 0;
+	}
+	else if (m_cmos_write_enabled) {
 		COMBINE_DATA(&m_rtc_data[offset]);
 		m_cmos_write_enabled = FALSE;
 		switch (offset) {
-		case 0x7F8: // M48T02 time
+		case 0x7FF8: // M48T02 time
 			if (data & 0x40) {
 				// get the current date/time from the core
 				machine().current_datetime(systime);
-				m_rtc_data[0x7F9] = dec_2_bcd(systime.local_time.second);
-				m_rtc_data[0x7FA] = dec_2_bcd(systime.local_time.minute);
-				m_rtc_data[0x7FB] = dec_2_bcd(systime.local_time.hour);
+				m_rtc_data[0x7FF9] = dec_2_bcd(systime.local_time.second);
+				m_rtc_data[0x7FFA] = dec_2_bcd(systime.local_time.minute);
+				m_rtc_data[0x7FFB] = dec_2_bcd(systime.local_time.hour);
 
-				m_rtc_data[0x7FC] = dec_2_bcd((systime.local_time.weekday != 0) ? systime.local_time.weekday : 7);
-				m_rtc_data[0x7FD] = dec_2_bcd(systime.local_time.mday);
-				m_rtc_data[0x7FE] = dec_2_bcd(systime.local_time.month + 1);
-				m_rtc_data[0x7FF] = dec_2_bcd(systime.local_time.year - 1900); // Epoch is 1900
+				m_rtc_data[0x7FFC] = dec_2_bcd((systime.local_time.weekday != 0) ? systime.local_time.weekday : 7);
+				m_rtc_data[0x7FFD] = dec_2_bcd(systime.local_time.mday);
+				m_rtc_data[0x7FFE] = dec_2_bcd(systime.local_time.month + 1);
+				m_rtc_data[0x7FFF] = dec_2_bcd(systime.local_time.year - 1900); // Epoch is 1900
 			}
 			if (LOG_RTC)
 				logerror("%s:RTC write to offset %04X = %08X & %08X\n", machine().describe_context(), offset, data, mem_mask);
@@ -396,45 +378,14 @@ WRITE32_MEMBER(atlantis_state::status_leds_w)
 	}
 }
 
-READ32_MEMBER(atlantis_state::zeus_r)
-{
-	UINT32 result = m_zeus_data[offset];
-	switch (offset) {
-	case 0x1:
-		/* bit  $000C0070 are tested in a loop until 0 */
-		/* bits $00080000 is tested in a loop until 0 */
-		/* bit  $00000004 is tested for toggling; probably VBLANK */
-		// zeus is reset if 0x80 is read
-		//if (m_screen->vblank())
-			m_zeus_data[offset] = (m_zeus_data[offset] + 1) & 0xf;
-		break;
-	case 0x41:
-		// CPU resets map2, writes 0xffffffff here, and then expects this read
-		result &= 0x1fff03ff;
-		break;
-	}
-	if (LOG_ZEUS)
-		logerror("%s:zeus_r read from offset %04X = %08X & %08X\n", machine().describe_context(), offset, result, mem_mask);
-	return result;
-}
-
-WRITE32_MEMBER(atlantis_state::zeus_w)
-{
-	COMBINE_DATA(&m_zeus_data[offset]);
-	if (LOG_ZEUS)
-		logerror("%s:zeus_w write to offset %04X = %08X & %08X\n", machine().describe_context(), offset, data, mem_mask);
-	m_last_offset = offset | 0x30000;
-}
-
-
 READ32_MEMBER(atlantis_state::cmos_protect_r)
 {
 	return m_cmos_write_enabled;
 }
 
-WRITE32_MEMBER(atlantis_state::dcs3_fifo_full_w)
+WRITE32_MEMBER(atlantis_state::asic_fifo_w)
 {
-	m_ioasic->fifo_full_w(data);
+	m_ioasic->fifo_w(data);
 }
 
 /*************************************
@@ -496,12 +447,48 @@ WRITE_LINE_MEMBER(atlantis_state::uart1_irq_callback)
 }
 
 /*************************************
+*  Video interrupts
+*************************************/
+WRITE_LINE_MEMBER(atlantis_state::vblank_irq)
+{
+	//logerror("%s: atlantis_state::vblank state = %i\n", machine().describe_context(), state);
+	if (1) {
+		if (state) {
+			board_ctrl[CTRL_STATUS] |= (1 << VBLANK_IRQ_SHIFT);
+			update_asic_irq();
+		}
+		else {
+			board_ctrl[CTRL_STATUS] &= ~(1 << VBLANK_IRQ_SHIFT);
+			board_ctrl[CTRL_CAUSE] &= ~(1 << VBLANK_IRQ_SHIFT);
+			update_asic_irq();
+		}
+	} else {
+		m_maincpu->set_input_line(VBLANK_IRQ_NUM, state);
+	}
+}
+
+WRITE_LINE_MEMBER(atlantis_state::zeus_irq)
+{
+	logerror("%s: atlantis_state::zeus_irq state = %i\n", machine().describe_context(), state);
+	if (state) {
+		board_ctrl[CTRL_STATUS] |= (1 << ZEUS_IRQ_SHIFT);
+		update_asic_irq();
+	}
+	else {
+		board_ctrl[CTRL_STATUS] &= ~(1 << ZEUS_IRQ_SHIFT);
+		board_ctrl[CTRL_CAUSE] &= ~(1 << ZEUS_IRQ_SHIFT);
+		update_asic_irq();
+	}
+}
+
+/*************************************
 *  IDE interrupts
 *************************************/
 WRITE_LINE_MEMBER(atlantis_state::ide_irq)
 {
 	m_maincpu->set_input_line(IDE_IRQ_NUM, state);
-	logerror("%s: atlantis_state::ide_irq state = %i\n", machine().describe_context(), state);
+	if (LOG_IRQ)
+		logerror("%s: atlantis_state::ide_irq state = %i\n", machine().describe_context(), state);
 }
 
 /*************************************
@@ -509,7 +496,8 @@ WRITE_LINE_MEMBER(atlantis_state::ide_irq)
 *************************************/
 WRITE_LINE_MEMBER(atlantis_state::ioasic_irq)
 {
-	logerror("%s: atlantis_state::ioasic_irq state = %i\n", machine().describe_context(), state);
+	if (LOG_IRQ)
+		logerror("%s: atlantis_state::ioasic_irq state = %i\n", machine().describe_context(), state);
 	if (state) {
 		board_ctrl[CTRL_STATUS] |= (1 << IOASIC_IRQ_SHIFT);
 		update_asic_irq();
@@ -535,13 +523,13 @@ void atlantis_state::update_asic_irq()
 		if (irqBits && !currState) {
 			m_maincpu->set_input_line(MIPS3_IRQ0 + irqIndex, ASSERT_LINE);
 			m_irq_state |= (1 << irqIndex);
-			if (1)
+			if (LOG_IRQ)
 				logerror("atlantis_state::update_asic_irq Asserting IRQ(%d) CAUSE = %02X\n", irqIndex, board_ctrl[CTRL_CAUSE]);
 		}
 		else if (!(causeBits) && currState) {
 			m_maincpu->set_input_line(MIPS3_IRQ0 + irqIndex, CLEAR_LINE);
 			m_irq_state &= ~(1 << irqIndex);
-			if (1)
+			if (LOG_IRQ)
 				logerror("atlantis_state::update_asic_irq Clearing IRQ(%d) CAUSE = %02X\n", irqIndex, board_ctrl[CTRL_CAUSE]);
 		}
 	}
@@ -553,7 +541,8 @@ READ32_MEMBER(atlantis_state::port_ctrl_r)
 {
 	UINT32 newOffset = offset >> 17;
 	UINT32 result = m_port_ctrl_reg[newOffset];
-	logerror("%s: port_ctrl_r newOffset = %02X data = %08X\n", machine().describe_context(), newOffset, result);
+	if (LOG_PORT)
+		logerror("%s: port_ctrl_r newOffset = %02X data = %08X\n", machine().describe_context(), newOffset, result);
 	return result;
 }
 
@@ -562,22 +551,24 @@ WRITE32_MEMBER(atlantis_state::port_ctrl_w)
 	UINT32 newOffset = offset >> 17;
 	COMBINE_DATA(&m_port_ctrl_reg[newOffset]);
 
-	switch (newOffset) {
-	//case 1:
-	//	m_port_ctrl_reg[newOffset] = 0;
-	//	if (!(data & 0x8))
-	//		m_port_ctrl_reg[newOffset] = 0*3; // Row 0
-	//	else if (!(data & 0x10))
-	//		m_port_ctrl_reg[newOffset] = 1*3; // Row 1
-	//	else if (!(data & 0x20))
-	//		m_port_ctrl_reg[newOffset] = 2*3; // Row 2
-	//	else if (!(data & 0x40))
-	//		m_port_ctrl_reg[newOffset] = 3*3; // Row 3
-	//	logerror("%s: port_ctrl_w Keypad Row Sel = %04X data = %08X\n", machine().describe_context(), m_port_ctrl_reg[newOffset], data);
-	//	break;
-	default:
-		logerror("%s: port_ctrl_w write to offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
-		break;
+	//switch (newOffset) {
+	if (newOffset == 1) {
+		UINT32 bits = ioport("KEYPAD")->read();
+		m_port_ctrl_reg[2] = 0;
+		if (!(data & 0x8))
+			m_port_ctrl_reg[2] = bits & 7; // Row 0
+		else if (!(data & 0x10))
+			m_port_ctrl_reg[2] = (bits >> 4) & 7; // Row 1
+		else if (!(data & 0x20))
+			m_port_ctrl_reg[2] = (bits >> 8) & 7; // Row 2
+		else if (!(data & 0x40))
+			m_port_ctrl_reg[2] = (bits >> 12) & 7; // Row 3
+		if (LOG_PORT)
+			logerror("%s: port_ctrl_w Keypad Row Sel = %04X bits = %08X\n", machine().describe_context(), data, bits);
+	}
+	else {
+		if (LOG_PORT)
+			logerror("%s: port_ctrl_w write to offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
 	}
 }
 
@@ -625,24 +616,17 @@ void atlantis_state::machine_reset()
 	m_dcs->reset_w(0);
 	m_user_io_state = 0;
 	m_cmos_write_enabled = FALSE;
-	memset(m_zeus_data, 0, sizeof(m_zeus_data));
-	m_red_count = 0;
+	m_serial_count = 0;
 	m_irq_state = 0;
 	memset(board_ctrl, 0, sizeof(board_ctrl));
 	memset(m_port_ctrl_reg, 0, sizeof(m_port_ctrl_reg));
 }
 
-
-
 /*************************************
- *
- *  Main CPU memory handlers
- *
+ *  Address Maps
  *************************************/
-
 static ADDRESS_MAP_START( map0, AS_PROGRAM, 32, atlantis_state )
-	AM_RANGE(0x00000000, 0x00000fff) AM_READWRITE8(red_r, red_w, 0xff)
-	AM_RANGE(0x0001e000, 0x0001ffff) AM_READWRITE8(cmos_r, cmos_w, 0xff)
+	AM_RANGE(0x00000000, 0x0001ffff) AM_READWRITE8(cmos_r, cmos_w, 0xff)
 	AM_RANGE(0x00100000, 0x0010001f) AM_DEVREADWRITE8("uart0", ns16550_device, ins8250_r, ins8250_w, 0xff) // Serial UART0 (TL16C552 CS0)
 	AM_RANGE(0x00180000, 0x0018001f) AM_DEVREADWRITE8("uart1", ns16550_device, ins8250_r, ins8250_w, 0xff) // Serial UART1 (TL16C552 CS1)
 	//AM_RANGE(0x00200000, 0x0020001f) // Parallel UART (TL16C552 CS2)
@@ -665,22 +649,20 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( map1, AS_PROGRAM, 32, atlantis_state )
 	AM_RANGE(0x00000000, 0x0000003f) AM_DEVREADWRITE("ioasic", midway_ioasic_device, read, write)
 	// asic_fifo_w
-	// dcs3_fifo_full_w
-	//AM_RANGE(0x00200000, 0x00200003)
+	AM_RANGE(0x00200000, 0x00200003) AM_WRITE(asic_fifo_w)
 	AM_RANGE(0x00400000, 0x00400003) AM_DEVWRITE("dcs", dcs_audio_device, dsio_idma_addr_w)
 	AM_RANGE(0x00600000, 0x00600003) AM_DEVREADWRITE("dcs", dcs_audio_device, dsio_idma_data_r, dsio_idma_data_w)
-	//AM_RANGE(0x00800000, 0x00800003) AM_WRITE(dcs3_fifo_full_w)
-	//AM_RANGE(0x00800000, 0x00800003) AM_WRITE(asic_fifo_w)
-	//AM_RANGE(0x00800000, 0x00a00003) AM_READWRITE(port_ctrl_r, port_ctrl_w)
+	AM_RANGE(0x00800000, 0x00900003) AM_READWRITE(port_ctrl_r, port_ctrl_w)
 	//AM_RANGE(0x00800000, 0x00800003) // Written once = 0000fff8
 	//AM_RANGE(0x00880000, 0x00880003) // Initial write 0000fff0, follow by sequence ffef, ffdf, ffbf, fff7. Row Select?
 	//AM_RANGE(0x00900000, 0x00900003) // Read once before each sequence write to 0x00880000. Code checks bits 0,1,2. Keypad?
 	//AM_RANGE(0x00980000, 0x00980003) // Read / Write.  Bytes written 0x8f, 0xcf. Code if read 0x1 then read 00a00000. POTs?
 	//AM_RANGE(0x00a00000, 0x00a00003)
-	ADDRESS_MAP_END
+	AM_RANGE(0x00980000, 0x00980003) AM_NOP // AM_WRITE(asic_fifo_w)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(map2, AS_PROGRAM, 32, atlantis_state)
-	AM_RANGE(0x00000000, 0x000001ff) AM_READWRITE(zeus_r, zeus_w)
+	AM_RANGE(0x00000000, 0x000001ff) AM_DEVREADWRITE("zeus2", zeus2_device, zeus2_r, zeus2_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( map3, AS_PROGRAM, 32, atlantis_state )
@@ -696,26 +678,26 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( mwskins )
 	PORT_START("DIPS")
 	PORT_DIPNAME(0x0003, 0x0003, "Boot Mode")
-	PORT_DIPSETTING(0x0003, "Normal Boot")
+	PORT_DIPSETTING(0x0003, "Run Game")
 	PORT_DIPSETTING(0x0002, "Boot EEPROM Based Self Test")
 	PORT_DIPSETTING(0x0001, "Boot Disk Based Self Test")
 	PORT_DIPSETTING(0x0000, "Run Factory Tests")
-	PORT_DIPNAME(0x0004, 0x0004, "Unknown0004")
-	PORT_DIPSETTING(0x0004, DEF_STR(Off))
-	PORT_DIPSETTING(0x0000, DEF_STR(On))
-	PORT_DIPNAME(0x0008, 0x0008, "Unknown0008")
+	PORT_DIPNAME(0x0004, 0x0004, "Boot Message")
+	PORT_DIPSETTING(0x0004, "Quiet")
+	PORT_DIPSETTING(0x0000, "Squawk During Boot")
+	PORT_DIPNAME(0x0008, 0x0008, "Reserved")
 	PORT_DIPSETTING(0x0008, DEF_STR(Off))
 	PORT_DIPSETTING(0x0000, DEF_STR(On))
-	PORT_DIPNAME(0x0010, 0x0010, "Unknown0010")
+	PORT_DIPNAME(0x0010, 0x0010, "Reserved")
 	PORT_DIPSETTING(0x0010, DEF_STR(Off))
 	PORT_DIPSETTING(0x0000, DEF_STR(On))
-	PORT_DIPNAME(0x0020, 0x0020, "Unknown0020")
+	PORT_DIPNAME(0x0020, 0x0020, "Reserved")
 	PORT_DIPSETTING(0x0020, DEF_STR(Off))
 	PORT_DIPSETTING(0x0000, DEF_STR(On))
-	PORT_DIPNAME(0x0040, 0x0040, "Unknown0040")
+	PORT_DIPNAME(0x0040, 0x0040, "Reserved")
 	PORT_DIPSETTING(0x0040, DEF_STR(Off))
 	PORT_DIPSETTING(0x0000, DEF_STR(On))
-	PORT_DIPNAME(0x0080, 0x0080, "Unknown0080")
+	PORT_DIPNAME(0x0080, 0x0080, "Reserved")
 	PORT_DIPSETTING(0x0080, DEF_STR(Off))
 	PORT_DIPSETTING(0x0000, DEF_STR(On))
 	PORT_DIPNAME(0x0100, 0x0100, "Unknown0100")
@@ -783,18 +765,18 @@ static INPUT_PORTS_START( mwskins )
 	PORT_BIT(0xffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KEYPAD")
-	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD)   /* keypad 3 */
-	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD)   /* keypad 1 */
-	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD)   /* keypad 2 */
-	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD)   /* keypad 6 */
-	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad 4") PORT_CODE(KEYCODE_4_PAD)   /* keypad 4 */
-	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD)   /* keypad 5 */
-	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD)   /* keypad 9 */
-	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad 7") PORT_CODE(KEYCODE_7_PAD)   /* keypad 7 */
-	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD)   /* keypad 8 */
-	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad #") PORT_CODE(KEYCODE_PLUS_PAD)    /* keypad # */
-	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad *") PORT_CODE(KEYCODE_MINUS_PAD)   /* keypad * */
-	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD)   /* keypad 0 */
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD)   /* keypad 1 */
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD)   /* keypad 2 */
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD)   /* keypad 3 */
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad 4") PORT_CODE(KEYCODE_4_PAD)   /* keypad 4 */
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD)   /* keypad 5 */
+	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD)   /* keypad 6 */
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad 7") PORT_CODE(KEYCODE_7_PAD)   /* keypad 7 */
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD)   /* keypad 8 */
+	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD)   /* keypad 9 */
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad *") PORT_CODE(KEYCODE_MINUS_PAD)    /* keypad - */
+	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD)   /* keypad 0 */
+	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad #") PORT_CODE(KEYCODE_PLUS_PAD)   /* keypad + */
 
 INPUT_PORTS_END
 
@@ -830,16 +812,13 @@ static MACHINE_CONFIG_START( mwskins, atlantis_state )
 	MCFG_IDE_PCI_IRQ_HANDLER(DEVWRITELINE(":", atlantis_state, ide_irq))
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(atlantis_state, screen_update_mwskins)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_DEVICE_ADD("zeus2", ZEUS2, MIDZEUS_VIDEO_CLOCK)
+	MCFG_ZEUS2_IRQ_CB(WRITELINE(atlantis_state, zeus_irq))
+	MCFG_ZEUS2_VBLANK_CB(WRITELINE(atlantis_state, vblank_irq))
 
-	MCFG_PALETTE_ADD_BBBBBGGGGGRRRRR("palette")
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(MIDZEUS_VIDEO_CLOCK / 4, 634, 0, 368, 560, 0, 512)
+	MCFG_SCREEN_UPDATE_DEVICE("zeus2", zeus2_device, screen_update)
 
 	/* sound hardware */
 	//MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DSIO, 0)
