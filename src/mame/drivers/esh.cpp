@@ -295,6 +295,7 @@ PALETTE_INIT_MEMBER(esh_state, esh)
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		/* blue component */
+		// TODO: actually opaque flag
 		if((color_prom[i+0x100] >> 7) & 1)
 			b = 0xff;
 		else
@@ -326,25 +327,10 @@ static GFXDECODE_START( esh )
 	GFXDECODE_ENTRY("gfx2", 0, esh_gfx_layout, 0x0, 0x20)
 GFXDECODE_END
 
-#if 0
-void esh_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_IRQ_STOP:
-		m_maincpu->set_input_line(0, CLEAR_LINE);
-		break;
-	default:
-		assert_always(FALSE, "Unknown id in esh_state::device_timer");
-	}
-}
-#endif
-
 INTERRUPT_GEN_MEMBER(esh_state::vblank_callback_esh)
 {
 	// IRQ
 	device.execute().set_input_line(0, HOLD_LINE);
-	//timer_set(attotime::from_usec(50), TIMER_IRQ_STOP);
 }
 
 // TODO: 0xfe NMI enabled after writing to LD command port, NMI reads LD port. 

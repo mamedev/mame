@@ -4,8 +4,9 @@
 
     Metal Freezer (c) 1989 Seibu
 
-    driver by Angelo Salese
-
+    driver by Angelo Salese, based off initial work by David Haywood
+	thanks to Peter Wilhelmsen for the decryption
+	
     HW seems the natural evolution of Dark Mist type.
 
     TODO:
