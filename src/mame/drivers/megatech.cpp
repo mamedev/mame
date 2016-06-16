@@ -1460,4 +1460,17 @@ ROM_END
 /* 61 */ GAME( 1992, mt_tout,  megatech, megatech_fixedslot, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Turbo Outrun (Mega-Tech)", MACHINE_NOT_WORKING )
 /* 62 */ GAME( 1992, mt_soni2, megatech, megatech_fixedslot, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Sonic The Hedgehog 2 (Mega-Tech)", MACHINE_NOT_WORKING )
 
-/* more? */
+/* Games seen in auction (#122011114579), but no confirmed number
+- Action Fighter
+- Enduro Racer
+
+Games seen in auction (#122011114579) known not to be original but manufactured/bootlegged on actual megatech carts.
+The labels are noticably different than expected.  Be careful if thinking of obtaining!
+- After Burner II (GEN)
+- Castle of Illusion Starring Mickey Mouse (GEN)
+- Double Dragon (SMS)
+- Kung Fu Kid (SMS)
+- Quackshot Starring Donald Duck (GEN)
+- Wonderboy (SMS)
+
+more? */
