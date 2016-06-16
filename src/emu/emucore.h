@@ -335,7 +335,7 @@ inline Dest downcast(Source *src)
 {
 #if defined(MAME_DEBUG) && !defined(MAME_DEBUG_FAST)
 	Dest const chk(dynamic_cast<Dest>(src));
-	if (!chk || (chk != src)) report_bad_cast<std::remove_pointer_t<Dest>, Source>(src);
+	if (chk != src) report_bad_cast<std::remove_pointer_t<Dest>, Source>(src);
 #endif
 	return static_cast<Dest>(src);
 }
@@ -345,7 +345,7 @@ inline Dest downcast(Source &src)
 {
 #if defined(MAME_DEBUG) && !defined(MAME_DEBUG_FAST)
 	std::remove_reference_t<Dest> *const chk(dynamic_cast<std::remove_reference_t<Dest> *>(&src));
-	if (!chk || (chk != &src)) report_bad_cast<std::remove_reference_t<Dest>, Source>(&src);
+	if (chk != &src) report_bad_cast<std::remove_reference_t<Dest>, Source>(&src);
 #endif
 	return static_cast<Dest>(src);
 }
