@@ -21,21 +21,6 @@
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-static ADDRESS_MAP_START( eeprom_map8, AS_PROGRAM, 8, eeprom_base_device )
-	AM_RANGE(0x00000, 0xfffff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( eeprom_map16, AS_PROGRAM, 16, eeprom_base_device )
-	AM_RANGE(0x00000, 0x7ffff) AM_RAM
-ADDRESS_MAP_END
-
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -46,7 +31,6 @@ ADDRESS_MAP_END
 
 eeprom_base_device::eeprom_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file)
 	: device_t(mconfig, devtype, name, tag, owner, 0, shortname, file),
-		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
 		m_region(*this, DEVICE_SELF),
 		m_cells(0),
@@ -85,12 +69,6 @@ void eeprom_base_device::static_set_size(device_t &device, int cells, int cellbi
 		cells >>= 1;
 		eeprom.m_address_bits++;
 	}
-
-	// describe our address space
-	if (eeprom.m_data_bits == 8)
-		eeprom.m_space_config = address_space_config("eeprom", ENDIANNESS_BIG, 8,  eeprom.m_address_bits, 0, *ADDRESS_MAP_NAME(eeprom_map8));
-	else
-		eeprom.m_space_config = address_space_config("eeprom", ENDIANNESS_BIG, 16, eeprom.m_address_bits * 2, 0, *ADDRESS_MAP_NAME(eeprom_map16));
 }
 
 
@@ -231,8 +209,12 @@ void eeprom_base_device::device_validity_check(validity_checker &valid) const
 
 void eeprom_base_device::device_start()
 {
+	UINT32 size = (m_data_bits == 8 ? 1 : 2) << m_address_bits;
+	m_data = std::make_unique<UINT8 []>(size);
+
 	// save states
 	save_item(NAME(m_completion_time));
+	save_pointer(m_data.get(), "m_data", size);
 }
 
 
@@ -244,17 +226,6 @@ void eeprom_base_device::device_reset()
 {
 	// reset any pending operations
 	m_completion_time = attotime::zero;
-}
-
-
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-const address_space_config *eeprom_base_device::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
 
@@ -271,10 +242,7 @@ void eeprom_base_device::nvram_default()
 	// initialize to the default value
 	UINT32 default_value = m_default_value_set ? m_default_value : ~0;
 	for (offs_t offs = 0; offs < eeprom_length; offs++)
-		if (m_data_bits == 8)
-			space(AS_PROGRAM).write_byte(offs, default_value);
-		else
-			space(AS_PROGRAM).write_word(offs * 2, default_value);
+		internal_write(offs, default_value);
 
 	// handle hard-coded data from the driver
 	if (m_default_data.u8 != nullptr)
@@ -283,9 +251,9 @@ void eeprom_base_device::nvram_default()
 		for (offs_t offs = 0; offs < m_default_data_size; offs++)
 		{
 			if (m_data_bits == 8)
-				space(AS_PROGRAM).write_byte(offs, m_default_data.u8[offs]);
+				internal_write(offs, m_default_data.u8[offs]);
 			else
-				space(AS_PROGRAM).write_word(offs * 2, m_default_data.u16[offs]);
+				internal_write(offs, m_default_data.u16[offs]);
 		}
 	}
 
@@ -300,18 +268,7 @@ void eeprom_base_device::nvram_default()
 			fatalerror("eeprom region '%s' needs to be a 16-bit big-endian region\n", tag());
 		osd_printf_verbose("Loading data from EEPROM region '%s'\n", tag());
 
-		if (m_data_bits == 8)
-		{
-			UINT8 *default_data = m_region->base();
-			for (offs_t offs = 0; offs < eeprom_length; offs++)
-				space(AS_PROGRAM).write_byte(offs, default_data[offs]);
-		}
-		else
-		{
-			UINT16 *default_data = (UINT16 *)(m_region->base());
-			for (offs_t offs = 0; offs < eeprom_length; offs++)
-				space(AS_PROGRAM).write_word(offs * 2, default_data[offs]);
-		}
+		memcpy(&m_data[0], m_region->base(), eeprom_bytes);
 	}
 }
 
@@ -326,10 +283,7 @@ void eeprom_base_device::nvram_read(emu_file &file)
 	UINT32 eeprom_length = 1 << m_address_bits;
 	UINT32 eeprom_bytes = eeprom_length * m_data_bits / 8;
 
-	dynamic_buffer buffer(eeprom_bytes);
-	file.read(&buffer[0], eeprom_bytes);
-	for (offs_t offs = 0; offs < eeprom_bytes; offs++)
-		space(AS_PROGRAM).write_byte(offs, buffer[offs]);
+	file.read(&m_data[0], eeprom_bytes);
 }
 
 
@@ -343,10 +297,7 @@ void eeprom_base_device::nvram_write(emu_file &file)
 	UINT32 eeprom_length = 1 << m_address_bits;
 	UINT32 eeprom_bytes = eeprom_length * m_data_bits / 8;
 
-	dynamic_buffer buffer(eeprom_bytes);
-	for (offs_t offs = 0; offs < eeprom_bytes; offs++)
-		buffer[offs] = space(AS_PROGRAM).read_byte(offs);
-	file.write(&buffer[0], eeprom_bytes);
+	file.write(&m_data[0], eeprom_bytes);
 }
 
 
@@ -357,9 +308,9 @@ void eeprom_base_device::nvram_write(emu_file &file)
 UINT32 eeprom_base_device::internal_read(offs_t address)
 {
 	if (m_data_bits == 16)
-		return space(AS_PROGRAM).read_word(address * 2);
+		return m_data[address * 2] | (m_data[address * 2 + 1] << 8);
 	else
-		return space(AS_PROGRAM).read_byte(address);
+		return m_data[address];
 }
 
 
@@ -371,7 +322,9 @@ UINT32 eeprom_base_device::internal_read(offs_t address)
 void eeprom_base_device::internal_write(offs_t address, UINT32 data)
 {
 	if (m_data_bits == 16)
-		space(AS_PROGRAM).write_word(address * 2, data);
-	else
-		space(AS_PROGRAM).write_byte(address, data);
+	{
+		m_data[address*2] = data;
+		m_data[address*2+1] = data >> 8;
+	} else
+		m_data[address] = data;
 }
