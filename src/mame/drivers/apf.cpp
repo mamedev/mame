@@ -308,7 +308,7 @@ WRITE8_MEMBER( apf_state::serial_w)
 
 static ADDRESS_MAP_START( apfm1000_map, AS_PROGRAM, 8, apf_state )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x4000, 0x4fff) AM_MIRROR(0x1000) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x6800, 0x7fff) AM_NOP // BASIC accesses ROM here too, but this is installed at machine_start
 	AM_RANGE(0x8000, 0x9fff) AM_DEVREAD("cartslot", apf_cart_slot_device, read_rom)
@@ -317,7 +317,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( apfimag_map, AS_PROGRAM, 8, apf_state )
 	AM_IMPORT_FROM(apfm1000_map)
-	AM_RANGE(0x6000, 0x63ff) AM_MIRROR(0x03fc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x03fc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	// These need to be confirmed, disk does not work
 	AM_RANGE(0x6400, 0x64ff) AM_READWRITE(serial_r, serial_w)
 	AM_RANGE(0x6500, 0x6503) AM_DEVREADWRITE("fdc", fd1771_t, read, write)
