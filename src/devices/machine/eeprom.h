@@ -101,7 +101,6 @@ protected:
 	UINT32                  m_cells;
 	UINT8                   m_address_bits;
 	UINT8                   m_data_bits;
-	address_space_config    m_space_config;
 	generic_ptr             m_default_data;
 	UINT32                  m_default_data_size;
 	UINT32                  m_default_value;
