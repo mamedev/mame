@@ -983,7 +983,8 @@ WRITE8_MEMBER(pc9801_state::rtc_w)
 
 WRITE8_MEMBER(pc9801_state::dmapg4_w)
 {
-	m_dma_offset[(offset+1) & 3] = data & 0x0f;
+	if(offset < 4)
+		m_dma_offset[(offset+1) & 3] = data & 0x0f;
 }
 
 WRITE8_MEMBER(pc9801_state::dmapg8_w)
