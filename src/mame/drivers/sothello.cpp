@@ -161,7 +161,7 @@ READ8_MEMBER(sothello_state::soundcpu_status_r)
 static ADDRESS_MAP_START( maincpu_mem_map, AS_PROGRAM, 8, sothello_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_MIRROR(0x1800) AM_SHARE("share1")
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_MIRROR(0x1800) AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

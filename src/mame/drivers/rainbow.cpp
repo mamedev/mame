@@ -531,7 +531,7 @@ AM_RANGE(0x10000, END_OF_RAM) AM_RAM
 //    'diagnostic_w' handler (similar to real hardware).
 
 //  - Address bits 8-12 are ignored (-> AM_MIRROR).
-AM_RANGE(0xed000, 0xed0ff) AM_RAM AM_SHARE("vol_ram") AM_MIRROR(0x1f00)
+AM_RANGE(0xec000, 0xec0ff) AM_RAM AM_SHARE("vol_ram") AM_MIRROR(0x1f00)
 AM_RANGE(0xed100, 0xed1ff) AM_RAM AM_SHARE("nvram")
 
 AM_RANGE(0xee000, 0xeffff) AM_RAM AM_SHARE("p_ram")

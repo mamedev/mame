@@ -574,7 +574,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, firefox_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x087f) AM_MIRROR(0x0700) AM_RAM /* RIOT ram */
-	AM_RANGE(0x0880, 0x089f) AM_MIRROR(0x07e0) AM_DEVREADWRITE("riot", riot6532_device, read, write)
+	AM_RANGE(0x0880, 0x089f) AM_MIRROR(0x0760) AM_DEVREADWRITE("riot", riot6532_device, read, write)
 	AM_RANGE(0x1000, 0x1000) AM_READ(main_to_sound_r)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_to_main_w)
 	AM_RANGE(0x2000, 0x200f) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
