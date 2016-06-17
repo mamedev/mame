@@ -1344,112 +1344,112 @@ wildone                         // (c) 1997
 wtigernz                        // (c) 1996
 
 @source:aristmk5.cpp
+aristmk5                        // (c) 1995, USA platform set chips
 adonis                          // (c) 1998
 adonisa                         // (c) 1998
-adonise                         // (c) 2001
-aristmk5                        // (c) 1995, USA platform set chips
-bootsctn                        // (c) 1999
-bumblbug                        // (c) 1997
-cashcham                        // (c) 1996
-chariotc                        // (c) 1998
-chickena                        // (c) 1998
-cuckoo                          // (c) 2000
-dmdtouch                        // (c) 1997
-dolphntr                        // (c) 1996
-dolphtra                        // (c) 1996
-dolphtre                        // (c) 1996
-enchfore                        // (c) 1997
-enchfrst                        // (c) 1995
-geishanz                        // (c) 2001
-goldprmd                        // (c) 1997
-goldpyra                        // (c) 1997
-indiandr                        // (c) 1998
-koalamnt                        // (c) 2001
-magicmsk                        // (c) 2000
-magicmska                       // (c) 2000
-margmgc                         // (c) 2000
-marmagic                        // (c) 2000
-mgarden                         // (c) 1997
-minemine                        // (c) 1996
-partygrs                        // (c) 2001
-pengpays                        // (c) 1997
-prtygras                        // (c) 2001
-qotn                            // (c) 1997
-qotna                           // (c) 1997
-reelrock                        // (c) 1998
-swheart2                        // (c) 1998
-swthrt2v                        // (c) 1995
-thgamblr                        // (c) 1998
-trpdlght                        // (c) 1997
-wldcougr                        // (c) 1997
-wtiger                          // (c) 1999
-badbog
+adonisu                         // (c) 2001
+adonisce
+baddog
 blackpnt
-bootscot
-bumbugs
-butdeli
-cashchm
-cashcroa
-chkrun
-coralr2v
-cuckooa
-dstblom
-dmddove
-drawpka
-dyjack
-eldora
-fortela
+bootsctn
+bootsctnu                       // (c) 1999
+bumblbug
+bumblbugu                       // (c) 1997
+buttdeli
+cashcat
+cashcham
+cashchamu                        // (c) 1996
+cashcra5
+chariotc                        // (c) 1998
+chariotca
+checkma5
+chickrun
+chickrunu                       // (c) 1998
+coralrc2
+cuckoo
+cuckoou                         // (c) 2000
+dstbloom
+diamdove
+dimtouch                        // (c) 1997
+dolphntr                        // (c) 1996
+dolphntra                       // (c) 1996
+dolphntrb
+dolphntru                       // (c) 1996
+dynajack
+eldorda5
+eforsta5                        // (c) 1995
+eforsta5u                        // (c) 1997
+fortellr
+gambler                        // (c) 1998
+geisha                          // (c) 2001
 genmagi
 gnomatw
-goldra
-hrttrhb
-incsun
-kookabk
+goldpyr                         // (c) 1997
+goldpyra                        // (c) 1997
+goldenra
+incasun
+incasunnz
+indrema5                       // (c) 1998
+kgalah
+koalamnt                        // (c) 2001
+kookabuk
 locoloot
-lonwolf
-mgctouc
-monmous
-moutmon
-mystgrd
+locolootnz
+lonewolf
+mgarden                         // (c) 1997
+magimask                        // (c) 2000
+magimaska                       // (c) 2000
+magtcha5
+marmagic                        // (c) 2000
+marmagicu                       // (c) 2000
+minemine                        // (c) 1996
+monmouse
+montree
+mountmon
+multidrw
+mystgard
 orchidms
-oscarar
+oscara5
 pantmag
+partygrs                        // (c) 2001
+partygrsa                        // (c) 2001
 peaflut
 pengpay
-przfigha
-qncsh
-sumospin
-sbucks3
-tretrva
-triptrea
-trjhrs
-wildbill
-wldcoug
-chariotca
-chkmatar
-kgalah
-qonilea
-qonileb
-rwarhl
+pengpaya
+pengpayb
+pengpayu                        // (c) 1997
+petshop
+przfight
+qcash
+qnile
+qnilea
+qnileb                            // (c) 1997
+qnileu                           // (c) 1997
+qnilemax
+rainwrce
+reelrock                        // (c) 1998
 retrsam
-unicornd
-dolptra
-penpay20
-penpaya
-adonishl
-goldphm
-petshopa
-retsam20
-retsam5
-supbuk2
+retrsama
+retrsamb
+sumospin
+sbuk2
+sbuk3
+swhr2
+swhr2u                        // (c) 1998
+swhr2v                        // (c) 1995
 topbana
-wldamz1
-wldamz3
-wldthg
-cshcat
-incanz
-loconz
-mtreenz
+trstrov
+tritreat
+trojhors
+trpdlght                        // (c) 1997
+unicornd
+wamazon
+wamazona
+wildbill
+wcougar
+wcougaru                        // (c) 1997
+wthing
+wtiger                          // (c) 1999
 
 @source:aristmk6.cpp
 aristmk6                        //
@@ -1619,7 +1619,7 @@ pompeia6
 pompeia6u
 prideaf
 prophecy
-qnile
+qnilea6
 qnilese
 qnilejc
 qnilejcsp
@@ -1649,7 +1649,7 @@ sunmoon
 sunmonbb
 sunqndol
 sbuk5
-swhr2
+swhr2a6
 swh2ld
 tahitim
 thaiprnc
