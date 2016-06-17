@@ -11,15 +11,18 @@
 
 #include "emu.h"
 #include "raiden2cop.h"
+#include "debugger.h"
 
 // use Z to dump out table info
 //#define TABLE_DUMPER
 
 
-#define LOG_CMDS 0
+#define LOG_Commands 	0
+#define LOG_Phytagoras 	0
+#define LOG_Division  	1
 
 #define seibu_cop_log \
-	if (LOG_CMDS) logerror
+	if (LOG_Commands) logerror
 
 
 const device_type RAIDEN2COP = &device_creator<raiden2cop_device>;
@@ -1120,6 +1123,10 @@ void raiden2cop_device::execute_338e(address_space &space, int offset, UINT16 da
 			cop_angle += 0x80;
 	}
 
+#if LOG_Phytagoras
+	printf("cmd %04x: dx = %d dy = %d angle = %02x\n",data,dx,dy,cop_angle);
+#endif
+
 	if (data & 0x0080) {
 		space.write_byte(cop_regs[0] + 0x34, cop_angle);
 	}
@@ -1145,6 +1152,10 @@ void raiden2cop_device::execute_3b30(address_space &space, int offset, UINT16 da
 	dy = dy >> 16;
 	cop_dist = sqrt((double)(dx*dx + dy*dy));
 
+#if LOG_Phytagoras
+	printf("cmd %04x: dx = %d dy = %d dist = %08x \n",data,dx >> 16,dy >> 16,cop_dist);
+#endif
+	
 	if (data & 0x0080)
 		space.write_word(cop_regs[0] + (data & 0x200 ? 0x3a : 0x38), cop_dist);
 }
@@ -1169,6 +1180,11 @@ void raiden2cop_device::LEGACY_execute_3b30(address_space &space, int offset, UI
 void raiden2cop_device::execute_42c2(address_space &space, int offset, UINT16 data)
 {
 	int div = space.read_word(cop_regs[0] + (0x36));
+
+#if LOG_Division
+	printf("cmd %04x: div = %04x scale = %04x\n",data,div,cop_scale);
+#endif
+
 	if (!div)
 	{
 		cop_status |= 0x8000;
@@ -1179,6 +1195,13 @@ void raiden2cop_device::execute_42c2(address_space &space, int offset, UINT16 da
 	/* TODO: bits 5-6-15 */
 	cop_status = 7;
 
+#if LOG_Division
+	printf("res = %04x dist %04x\n",(cop_dist << (5 - cop_scale)) / div,cop_dist);
+	
+//	if(div & 0x8000)
+//		machine().debugger().debug_break();
+#endif
+	
 	space.write_word(cop_regs[0] + (0x38), (cop_dist << (5 - cop_scale)) / div);
 }
 

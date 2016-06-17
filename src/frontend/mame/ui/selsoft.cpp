@@ -1245,12 +1245,12 @@ void menu_select_software::build_list(std::vector<ui_software_info *> &s_drivers
 		case UI_SW_AVAILABLE:
 			if (s_driver->available)
 				m_displaylist.push_back(s_driver);
-				break;
+			break;
 
 		case UI_SW_UNAVAILABLE:
 			if (!s_driver->available)
 				m_displaylist.push_back(s_driver);
-				break;
+			break;
 
 		case UI_SW_SUPPORTED:
 			if (s_driver->supported == SOFTWARE_SUPPORTED_YES)

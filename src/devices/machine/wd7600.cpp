@@ -170,17 +170,19 @@ void wd7600_device::device_start()
 
 	// install BIOS ROM at cpu inital pc
 	m_space->install_rom(0x000f0000, 0x000fffff, m_bios + 0x10000);
-	m_space->install_rom(0xffff0000, 0xffffffff, m_bios + 0x10000);
+	if(m_space->addrmask() == 0xffffffff)  // 32-bit address space only
+		m_space->install_rom(0xffff0000, 0xffffffff, m_bios + 0x10000);
+	else
+		m_space->install_rom(0x00ff0000, 0x00ffffff, m_bios + 0x10000);
 
 	// install i/o accesses
 	m_space_io->install_readwrite_handler(0x0000, 0x000f, read8_delegate(FUNC(am9517a_device::read), &(*m_dma1)), write8_delegate(FUNC(am9517a_device::write), &(*m_dma1)), 0xffffffff);
 	m_space_io->install_readwrite_handler(0x0020, 0x003f, read8_delegate(FUNC(pic8259_device::read), &(*m_pic1)), write8_delegate(FUNC(pic8259_device::write), &(*m_pic1)), 0x0000ffff);
 	m_space_io->install_readwrite_handler(0x0040, 0x0043, read8_delegate(FUNC(pit8254_device::read), &(*m_ctc)), write8_delegate(FUNC(pit8254_device::write), &(*m_ctc)), 0xffffffff);
-	m_space_io->install_readwrite_handler(0x0060, 0x0063, read8_delegate(FUNC(wd7600_device::keyb_data_r), this), write8_delegate(FUNC(wd7600_device::keyb_data_w), this), 0x000000ff);
-	m_space_io->install_readwrite_handler(0x0060, 0x0063, read8_delegate(FUNC(wd7600_device::portb_r), this), write8_delegate(FUNC(wd7600_device::portb_w), this), 0x0000ff00);
+	m_space_io->install_readwrite_handler(0x0060, 0x0063, read8_delegate(FUNC(wd7600_device::keyb_data_r), this), write8_delegate(FUNC(wd7600_device::keyb_data_w), this), 0x0000ffff);
 	m_space_io->install_readwrite_handler(0x0064, 0x0067, read8_delegate(FUNC(wd7600_device::keyb_status_r), this), write8_delegate(FUNC(wd7600_device::keyb_cmd_w), this), 0x000000ff);
 	m_space_io->install_readwrite_handler(0x0070, 0x007f, read8_delegate(FUNC(mc146818_device::read), &(*m_rtc)), write8_delegate(FUNC(wd7600_device::rtc_w), this), 0x0000ffff);
-	m_space_io->install_readwrite_handler(0x0080, 0x009f, read8_delegate(FUNC(wd7600_device::dma_page_r), this), write8_delegate(FUNC(wd7600_device::dma_page_w), this), 0xffffffff);
+	m_space_io->install_readwrite_handler(0x0080, 0x008f, read8_delegate(FUNC(wd7600_device::dma_page_r), this), write8_delegate(FUNC(wd7600_device::dma_page_w), this), 0xffffffff);
 	m_space_io->install_readwrite_handler(0x0090, 0x0093, read8_delegate(FUNC(wd7600_device::a20_reset_r), this), write8_delegate(FUNC(wd7600_device::a20_reset_w), this), 0x00ff0000);
 	m_space_io->install_readwrite_handler(0x00a0, 0x00a3, read8_delegate(FUNC(pic8259_device::read), &(*m_pic2)), write8_delegate(FUNC(pic8259_device::write), &(*m_pic2)), 0x0000ffff);
 	m_space_io->install_readwrite_handler(0x00c0, 0x00df, read8_delegate(FUNC(am9517a_device::read), &(*m_dma2)), write8_delegate(FUNC(am9517a_device::write), &(*m_dma2)), 0x00ff00ff);
@@ -287,14 +289,20 @@ WRITE_LINE_MEMBER( wd7600_device::ctc_out2_w )
 WRITE8_MEMBER( wd7600_device::keyb_data_w )
 {
 //  if(LOG) logerror("WD7600 '%s': keyboard data write %02x\n", tag(), data);
-	m_keybc->data_w(space,0,data);
+	if(ACCESSING_BITS_0_7)
+		m_keybc->data_w(space,0,data);
+	else
+		portb_w(space,0,data);
 }
 
 READ8_MEMBER( wd7600_device::keyb_data_r )
 {
 	UINT8 ret = m_keybc->data_r(space,0);
 //  if(LOG) logerror("WD7600 '%s': keyboard data read %02x\n", tag(), ret);
-	return ret;
+	if(ACCESSING_BITS_0_7)
+		return ret;
+	else
+		return portb_r(space,0);
 }
 
 WRITE8_MEMBER( wd7600_device::keyb_cmd_w )

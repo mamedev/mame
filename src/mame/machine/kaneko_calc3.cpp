@@ -1336,11 +1336,11 @@ int kaneko_calc3_device::decompress_table(int tabnum, UINT8* dstram, int dstoffs
 					//printf("save to eeprom\n");
 
 					{
-						address_space &eeprom_space = space.machine().device<eeprom_serial_93cxx_device>(":eeprom")->space();
+						eeprom_serial_93cxx_device *eeprom = space.machine().device<eeprom_serial_93cxx_device>(":eeprom");
 
 						for (i=0;i<0x80;i++)
 						{
-							eeprom_space.write_byte(i, space.read_byte(m_eeprom_addr+0x200000+i));
+							eeprom->internal_write(i, space.read_byte(m_eeprom_addr+0x200000+i));
 						}
 
 					}
@@ -1672,11 +1672,11 @@ void kaneko_calc3_device::mcu_run()
 			}
 #endif
 			{
-				address_space &eeprom_space = space.machine().device<eeprom_serial_93cxx_device>(":eeprom")->space();
+				eeprom_serial_93cxx_device *eeprom = space.machine().device<eeprom_serial_93cxx_device>(":eeprom");
 
 				for (i=0;i<0x80;i++)
 				{
-					space.write_byte(m_eeprom_addr+0x200000+i, eeprom_space.read_byte(i));
+					space.write_byte(m_eeprom_addr+0x200000+i, eeprom->internal_read(i));
 				}
 
 			}

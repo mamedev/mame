@@ -90,7 +90,8 @@ CPU_DISASSEMBLE( asap )
 					else if (rsrc2_iszero)
 					sprintf(buffer, "mov%s  %s,%s", setcond[cond], reg[rsrc1], reg[rdst]);
 					else
-					sprintf(buffer, "add%s  %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);   break;
+					sprintf(buffer, "add%s  %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);
+		  break;
 		case 0x09:  sprintf(buffer, "sub%s  %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);   break;
 		case 0x0a:  sprintf(buffer, "addc%s %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);   break;
 		case 0x0b:  sprintf(buffer, "subc%s %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);   break;
@@ -103,7 +104,8 @@ CPU_DISASSEMBLE( asap )
 					else if (rsrc2_iszero)
 					sprintf(buffer, "mov%s  %s,%s", setcond[cond], reg[rsrc1], reg[rdst]);
 					else
-					sprintf(buffer, "or%s   %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);   break;
+					sprintf(buffer, "or%s   %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);
+			break;
 		case 0x0f:  sprintf(buffer, "orn%s  %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);   break;
 		case 0x10:  sprintf(buffer, "ld%s   %s[%s],%s", setcond[cond], reg[rsrc1], src2(op,2), reg[rdst]);  break;
 		case 0x11:  sprintf(buffer, "ldh%s  %s[%s],%s", setcond[cond], reg[rsrc1], src2(op,1), reg[rdst]);  break;
@@ -137,7 +139,7 @@ CPU_DISASSEMBLE( asap )
 					}
 					else
 						sprintf(buffer, "jmp%s  %s[%s]", setcond[cond], reg[rsrc1], src2(op,2));
-					break;
+			break;
 		case 0x1f:  sprintf(buffer, "trap   $1f"); flags = DASMFLAG_STEP_OVER;                              break;
 	}
 	return 4 | flags | DASMFLAG_SUPPORTED;

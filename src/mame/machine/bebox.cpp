@@ -770,7 +770,8 @@ void bebox_state::machine_reset()
 	m_ppc1->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	m_ppc2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-	memcpy(m_flash->space().get_read_ptr(0),memregion("user1")->base(),0x200000);
+	// Endianness? Bah!
+	memcpy(m_flash->base(),memregion("user1")->base(),0x200000);
 }
 
 void bebox_state::machine_start()

@@ -322,7 +322,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="3x3 Eyes - Sanjiyan Henjou.iso" size="165578788" crc="1a2395ea" sha1="005f8a9444cccb45a5f3ac38c20edb9a503faab7"/>
 		<rom name="3x3 eyes - sanjiyan henjou.cue" size="87" crc="b30ce569" sha1="16a9005a30fac9a4684df886393e39f101f843e2"/>
 		-->
-		<description>3x3 Eyes: Sanjiyan Henjou</description>
+		<description>3x3 Eyes - Sanjiyan Henjou</description>
 		<year>1993</year>
 		<publisher>日本クリエイト (Nihon Create)</publisher>
 		<info name="release" value="199310xx" />
@@ -409,7 +409,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="The 4th Unit 1-2 - Linkage.img" size="292577040" crc="e52e5890" sha1="8f3d4eb225a4b5da34f40986d43f026f01f9e347"/>
 		<rom name="The 4th Unit 1-2 - Linkage.sub" size="11941920" crc="b5d29977" sha1="c594da0071fada271ad2caa708b30cc9724f9616"/>
 		-->
-		<description>The 4th Unit 1-2 Towns: Linkage</description>
+		<description>The 4th Unit 1-2 Towns - Linkage</description>
 		<year>1989</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="release" value="198907xx" />
@@ -428,7 +428,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="The 4th Unit 3 - Dual Targets.img" size="180539520" crc="be6650ef" sha1="a3f9b4359118123a8b783cad76b6930de13ece07"/>
 		<rom name="The 4th Unit 3 - Dual Targets.sub" size="7368960" crc="02a9e1a7" sha1="5258d1713b7088bd0fe0a01b06eb6e3001c07c45"/>
 		-->
-		<description>The 4th Unit 3: Dual Targets</description>
+		<description>The 4th Unit 3 - Dual Targets</description>
 		<year>1989</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="release" value="198911xx" />
@@ -447,7 +447,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="The 4th Unit 4 - Zero.img" size="334995360" crc="60aea3fe" sha1="7ba2c22fafc4c470005aee16f77dcba6fab48b7e"/>
 		<rom name="The 4th Unit 4 - Zero.sub" size="13673280" crc="df9b7f1f" sha1="adf49681f66af20c85985fbab09286ed401f5f22"/>
 		-->
-		<description>The 4th Unit 4: Zero</description>
+		<description>The 4th Unit 4 - Zero</description>
 		<year>1989</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="release" value="198912xx" />
@@ -466,7 +466,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="The 4th Unit 5 - D-Again.img" size="371886480" crc="70c2e2bd" sha1="be920e5e1f1bfcb8492ecf06342029999ee088e2"/>
 		<rom name="The 4th Unit 5 - D-Again.sub" size="15179040" crc="0e12788a" sha1="bacc25e3cda1f26b09a9fb4d17662975f5da05f8"/>
 		-->
-		<description>The 4th Unit 5: D-Again</description>
+		<description>The 4th Unit 5 - D-Again</description>
 		<year>1990</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="release" value="199004xx" />
@@ -485,7 +485,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="The 4th Unit 6 - Merry-Go-Round.img" size="306964224" crc="e02f30f9" sha1="860ce4bafc860974f711889c2ccb4eb81e0c45f8"/>
 		<rom name="The 4th Unit 6 - Merry-Go-Round.sub" size="12529152" crc="115531c6" sha1="7c90f76dc92aa503a5599d74226919f2c60b1c73"/>
 		-->
-		<description>The 4th Unit 6: Merry-Go-Round</description>
+		<description>The 4th Unit 6 - Merry-Go-Round</description>
 		<year>1990</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="release" value="199012xx" />
@@ -504,7 +504,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="The 4th Unit 7 - Wyatt.img" size="579899712" crc="f6ff2208" sha1="2ca5d141a3f17c03362699dc032310d15a5ba6f7"/>
 		<rom name="The 4th Unit 7 - Wyatt.sub" size="23669376" crc="a317d739" sha1="a7f01abfcea8b0a7b9bfee62e35136a2335fee27"/>
 		-->
-		<description>The 4th Unit 7: Wyatt</description>
+		<description>The 4th Unit 7 - Wyatt</description>
 		<year>1992</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="release" value="199204xx" />
@@ -629,7 +629,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Abel.img" size="311764656" crc="c90bd8da" sha1="80e7940930b7c6330098e548a1cadd40bff29be9"/>
 		<rom name="Abel.sub" size="12725088" crc="63e70daa" sha1="373a0ebfe67c903c61d04fcbb69f21a1bfcfa450"/>
 		-->
-		<description>Abel: Shin Mokushiroku Taisen</description>
+		<description>Abel - Shin Mokushiroku Taisen</description>
 		<year>1995</year>
 		<publisher>ファミリーソフト (Family Soft)</publisher>
 		<info name="release" value="199511xx" />
@@ -990,7 +990,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Aoki Ookami to Shiroki Mejika - Genchou Hishi.img" size="530387760" crc="18044a4e" sha1="c42c5bf43c64025e801046b847ae65f39ac592a6"/>
 		<rom name="Aoki Ookami to Shiroki Mejika - Genchou Hishi.sub" size="21648480" crc="fa1cd6bf" sha1="93857a5c366722623dedf0e29d9a31fc6426ee6a"/>
 		-->
-		<description>Aoki Ookami to Shiroki Mejika: Genchou Hishi</description>
+		<description>Aoki Ookami to Shiroki Mejika - Genchou Hishi</description>
 		<year>1993</year>
 		<publisher>光栄 (Koei)</publisher>
 		<info name="release" value="199302xx" />
@@ -1332,7 +1332,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Blue - Will to Power.img" size="29282400" crc="af71e078" sha1="f5b4103b20f847bde4e9218879101e08c9669975"/>
 		<rom name="Blue - Will to Power.sub" size="1195200" crc="a1b15f22" sha1="40ccdbd81c602ca69249b8dc960efff2a639a986"/>
 		-->
-		<description>Blue: Will to Power</description>
+		<description>Blue - Will to Power</description>
 		<year>1992</year>
 		<publisher>Sofcom</publisher>
 		<info name="release" value="199204xx" />
@@ -1349,7 +1349,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Bomberman - Panic Bomber.bin" size="189806400" crc="7ed8cc7a" sha1="65dd63bd618dfbdccd82bb7b5b7d6a024025a681"/>
 		<rom name="Bomberman - Panic Bomber.cue" size="614" crc="f6601687" sha1="a926cc21f244c8558787735559cd6a86161344c3"/>
 		-->
-		<description>Bomberman: Panic Bomber</description>
+		<description>Bomberman - Panic Bomber</description>
 		<year>1995</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="release" value="199504xx" />
@@ -1501,7 +1501,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Tiny Steps - Cal Gaiden.img" size="194929056" crc="6f8b3267" sha1="6140d4655dc29b0631dd9afc37e798971e2e0cb3"/>
 		<rom name="Tiny Steps - Cal Gaiden.sub" size="7956288" crc="b09a6744" sha1="f41121849b37ba69ee8dafc2996ae1142c9d7cf1"/>
 		-->
-		<description>Cal Gaiden: Tiny Steps Behind the Cal</description>
+		<description>Cal Gaiden - Tiny Steps Behind the Cal</description>
 		<year>1993</year>
 		<publisher>バーディーソフト (Birdy Soft)</publisher>
 		<info name="release" value="199307xx" />
@@ -1718,7 +1718,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="D.O. Kanshuu Premium Box - Touch My Heart.bin" size="610252272" crc="6a32d7dc" sha1="ecffb1505b683fefec7a3829c1ca5b9703b41db5"/>
 		<rom name="D.O. Kanshuu Premium Box - Touch My Heart.cue" size="592" crc="aaf9a496" sha1="d2ce8e5f0a4df14f41fed42466c44f9968513bc1"/>
 		-->
-		<description>D.O. Kanshuu Premium Box: Touch My Heart</description>
+		<description>D.O. Kanshuu Premium Box - Touch My Heart</description>
 		<year>1995</year>
 		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="release" value="199505xx" />
@@ -2040,7 +2040,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Desire.img" size="525627312" crc="eda711e8" sha1="2f6e316e60146a6a5b762d29b0cc4a210987c95c"/>
 		<rom name="Desire.sub" size="21454176" crc="fea510bb" sha1="e5d36eba6a606b50d4459102e33f94dd9cca2111"/>
 		-->
-		<description>Desire: Haitoku no Rasen</description>
+		<description>Desire - Haitoku no Rasen</description>
 		<year>1994</year>
 		<publisher>シーズウェア (C's Ware)</publisher>
 		<info name="release" value="199411xx" />
@@ -2345,7 +2345,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Dungeon Master II - Skullkeep.img" size="196688352" crc="7100cde1" sha1="07cdb37aadb3962fe760611830d4386f17e60e48"/>
 		<rom name="Dungeon Master II - Skullkeep.sub" size="8028096" crc="e050038e" sha1="d52107b7a6a8b4812dd7beff0314367f7abb6af8"/>
 		-->
-		<description>Dungeon Master II: Skullkeep</description>
+		<description>Dungeon Master II - Skullkeep</description>
 		<year>1994</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
 		<info name="release" value="199401xx" />
@@ -2577,7 +2577,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Eye of the Beholder II.img" size="313110000" crc="008b5913" sha1="4c3230e0d8105255ca1a41fa325932f238867508"/>
 		<rom name="Eye of the Beholder II.sub" size="12780000" crc="0ca139f6" sha1="5bd0d38213a11453e80d598f3f098773e06a1fe4"/>
 		-->
-		<description>Eye of the Beholder II: The Legend of Darkmoon</description>
+		<description>Eye of the Beholder II - The Legend of Darkmoon</description>
 		<year>1993</year>
 		<publisher>サイベル (Cybelle)</publisher>
 		<info name="release" value="199311xx" />
@@ -3125,7 +3125,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="track07.bin" size="67914000" crc="a7b4166a" sha1="7527949412eb9a5d13cc95532a1fba69890f5b21"/>
 		<rom name="track08.bin" size="41454000" crc="4cdb5716" sha1="ba0c418704891605dbfcd40f3cd40b855560154d"/>
 		-->
-		<description>Gekirin: Ushinawareshi Houken</description>
+		<description>Gekirin - Ushinawareshi Houken</description>
 		<year>1994</year>
 		<publisher>日本アプリケーション (Nihon Application)</publisher>
 		<info name="release" value="199412xx" />
@@ -3284,7 +3284,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Mobile Suit Gundam Hyper Classic Operation.img" size="266745024" crc="d99bd13a" sha1="139c1c8c34b443c9888a6ce3d8584599a4e39fec"/>
 		<rom name="Mobile Suit Gundam Hyper Classic Operation.sub" size="10887552" crc="46761a4e" sha1="c960498b2bd3161662f5f650a81c96f60d6fa5a6"/>
 		-->
-		<description>Mobile Suit Gundam: Hyper Classic Operation</description>
+		<description>Mobile Suit Gundam - Hyper Classic Operation</description>
 		<year>1992</year>
 		<publisher>ファミリーソフト (Family Soft)</publisher>
 		<info name="release" value="199208xx" />
@@ -3303,7 +3303,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Mobile Suit Gundam Hyper Desert Operation.img" size="251633424" crc="44eb68ec" sha1="5e8827afe57acf7de620c468c9cd6bd3903dea9c"/>
 		<rom name="Mobile Suit Gundam Hyper Desert Operation.sub" size="10270752" crc="e9e722da" sha1="6a695055bdc6f144e532271952bc785bb3d5c9b3"/>
 		-->
-		<description>Mobile Suit Gundam: Hyper Desert Operation</description>
+		<description>Mobile Suit Gundam - Hyper Desert Operation</description>
 		<year>1992</year>
 		<publisher>ファミリーソフト (Family Soft)</publisher>
 		<info name="release" value="199209xx" />
@@ -3320,7 +3320,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Gunship - The Helicopter Simulation.cue" size="370" crc="258b11b0" sha1="146fb88fc218b94c5b04c8eb08fd04d4523dde44"/>
 		<rom name="Gunship - The Helicopter Simulation.img" size="376437600" crc="989f159f" sha1="74d836bff0beabbcd76a4c9a6362136c38cb2641"/>
 		-->
-		<description>Gunship: The Helicopter Simulation</description>
+		<description>Gunship - The Helicopter Simulation</description>
 		<year>1990</year>
 		<publisher>マイクロプローズジャパン (MicroProse Japan)</publisher>
 		<info name="release" value="199010xx" />
@@ -3596,7 +3596,7 @@ User/save disks that can be created from the game itself are not included.
 		<!--
 		Origin: Neo Kobe Collection
 		-->
-		<description>Igo Doujou: Honkakuha Yose Tsumego Shinan</description>
+		<description>Igo Doujou - Honkakuha Yose Tsumego Shinan</description>
 		<year>1989</year>
 		<publisher>富士通 (Fujitsu)</publisher>
 		<info name="release" value="198903xx" />
@@ -3707,7 +3707,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Infestation.bin" size="381826032" crc="47a91fb4" sha1="f6217f804e32b399daabaafb3d05fe0f7d8690a3"/>
 		<rom name="Infestation.cue" size="133" crc="eadc045d" sha1="ba7fd71706c190b4e2dfd5751f56ff54d2b2158e"/>
 		-->
-		<description>Infestation: Chinmoku no Wakusei</description>
+		<description>Infestation - Chinmoku no Wakusei</description>
 		<year>1992</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
 		<info name="release" value="199203xx" />
@@ -3726,7 +3726,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Injuu Gakuen - La Blue Girl.img" size="434842464" crc="dabf93e2" sha1="98be7d7dff583dd1282300ce109ac1d834325579"/>
 		<rom name="Injuu Gakuen - La Blue Girl.sub" size="17748672" crc="71d12240" sha1="092006bffc923e803d204978f3b4921e34efb918"/>
 		-->
-		<description>Injuu Gakuen: La Blue Girl</description>
+		<description>Injuu Gakuen - La Blue Girl</description>
 		<year>1994</year>
 		<publisher>DEZ</publisher>
 		<info name="release" value="199407xx" />
@@ -3894,7 +3894,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Kigen.bin" size="133005600" crc="f7e06793" sha1="51462a9ae88c7ad0546622ca94f5fae9c0259bea"/>
 		<rom name="Kigen.cue" size="379" crc="90afe3a2" sha1="9bef33cecf72c9b888303fe8f1f9ce36c4959562"/>
 		-->
-		<description>Kigen: Kagayaki no Hasha</description>
+		<description>Kigen - Kagayaki no Hasha</description>
 		<year>1992</year>
 		<publisher>リバーヒルソフト (Riverhill Soft)</publisher>
 		<info name="release" value="199205xx" />
@@ -3953,7 +3953,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="king's quest v.bin" size="287461440" crc="0171b747" sha1="b1b7a2dfbe361cc2b5c71ddfaca2b1790d77532d"/>
 		<rom name="king's quest v.cue" size="75" crc="93f65862" sha1="8137c3086aa1c4a921e6cb91b8828885669160db"/>
 		-->
-		<description>King's Quest V: Absence Makes the Heart Go Yonder</description>
+		<description>King's Quest V - Absence Makes the Heart Go Yonder</description>
 		<year>1991</year>
 		<publisher>シエラオンラインジャパン (Sierra On-Line Japan)</publisher>
 		<info name="release" value="199108xx" />
@@ -4088,7 +4088,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="The Legend of Kyrandia 2.cue" size="3557" crc="026fe47d" sha1="47fc6d71fa56421115f59791322fe54a41f4f863"/>
 		<rom name="The Legend of Kyrandia 2.img" size="494331600" crc="77d255b4" sha1="21f426eb2e0900a5df98fe714bd6608c82fae2a6"/>
 		-->
-		<description>Kyrandia II: The Hand of Fate</description>
+		<description>Kyrandia II - The Hand of Fate</description>
 		<year>1995</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -4098,12 +4098,11 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Originally labeled as "mp3 source". It probably needs a redump. -->
 	<software name="ktiger">
 		<!--
-		Origin: Neo Kobe Collection
-		<rom name="Kyuukyoku Tiger.bin" size="757515696" crc="98453ddc" sha1="cf311208d424de01ef60a43c2f3422fc1f8ef288"/>
-		<rom name="Kyuukyoku Tiger.cue" size="1045" crc="6e3c9b99" sha1="4a70a94f2afb0c1b16e38099babdb3c53bd6ecda"/>
+		Origin: Tokugawa Corporate Forums (wushu)
+		<rom name="Tiger.bin" size="757692096" crc="131e7221" sha1="e300709315d53e06fdc64eed31159da25d68e357"/>
+		<rom name="Tiger.cue" size="1014" crc="4311440c" sha1="001497dfb09e3dcba86491efb4335974c3a0cd96"/>
 		-->
 		<description>Kyuukyoku Tiger</description>
 		<year>1994</year>
@@ -4111,7 +4110,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="199402xx" />
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kyuukyoku tiger" sha1="187e052a9e699571bcd904a1e5cf18e3f0fcd9aa" status="baddump" />
+				<disk name="kyuukyoku tiger" sha1="7c0f1c42dba49fe71114d21ad2f604dabe729196" />
 			</diskarea>
 		</part>
 	</software>
@@ -4126,7 +4125,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="lands of lore.bin" size="20815200" crc="84903d38" sha1="b90ab7dfbe70a07276569aee59c5d64e8b2d5546"/>
 		<rom name="lands of lore.cue" size="74" crc="95020903" sha1="994125d8e7d1be1ebe0728e1bdb4258f648ef50a"/>
 		-->
-		<description>Lands of Lore: The Throne of Chaos</description>
+		<description>Lands of Lore - The Throne of Chaos</description>
 		<year>1993</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<info name="release" value="199501xx" />
@@ -4249,7 +4248,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Lemmings 2 - The Tribes (En).mdf" size="324691248" crc="72bfb72d" sha1="17cbcd5e720a949fe87c433126ab0f90a37a8533"/>
 		<rom name="Lemmings 2 - The Tribes (En).mds" size="1806" crc="4c0dfb47" sha1="e74c9dd6fcce3b1d4a063549beb7eeffb5a3cc8d"/>
 		-->
-		<description>Lemmings 2: The Tribes (English)</description>
+		<description>Lemmings 2 - The Tribes (English)</description>
 		<year>1994</year>
 		<publisher>富士通 (Fujitsu)</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -4267,7 +4266,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Lemmings 2 - The Tribes.img" size="335865600" crc="b92ab9cc" sha1="1b45b55ccb0cd2df1cce6475221204deb2d17984"/>
 		<rom name="Lemmings 2 - The Tribes.sub" size="13708800" crc="fe714f95" sha1="1be99f829fdc8926a8a8a879706e66cc0c258b05"/>
 		-->
-		<description>Lemmings 2: The Tribes (Japanese)</description>
+		<description>Lemmings 2 - The Tribes (Japanese)</description>
 		<year>1994</year>
 		<publisher>富士通 (Fujitsu)</publisher>
 		<info name="release" value="199406xx" />
@@ -4367,7 +4366,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Life &amp; Death II.img" size="322282800" crc="41a68591" sha1="a0dc83c794fb66b8e5b4baebf46ad55dc43f102c"/>
 		<rom name="Life &amp; Death II.sub" size="13154400" crc="d94d1d54" sha1="080fc8e4a9867fa359dd72ef493b228b0eb98d0b"/>
 		-->
-		<description>Life &amp; Death II: The Brain</description>
+		<description>Life &amp; Death II - The Brain</description>
 		<year>1992</year>
 		<publisher>ビング (Ving)</publisher>
 		<info name="release" value="199211xx" />
@@ -4462,7 +4461,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Record of Lodoss War - Haiiro no Majo.img" size="119636832" crc="fd25dfb0" sha1="543bb5edea022390cda6fc90ef84db8fc63e1848"/>
 		<rom name="Record of Lodoss War - Haiiro no Majo.sub" size="4883136" crc="1405c0ea" sha1="c6fdd87b5ebce3e307b3d2216dba57867f2a2059"/>
 		-->
-		<description>Record of Lodoss War: Haiiro no Majo</description>
+		<description>Record of Lodoss War - Haiiro no Majo</description>
 		<year>1994</year>
 		<publisher>ハミングバード (HummingBird)</publisher>
 		<info name="release" value="199404xx" />
@@ -4561,7 +4560,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Lupin III - Hong Kong no Mashu.img" size="341315184" crc="7fbe9b86" sha1="810defb7503665f185c868dc24e4eca2647f108a"/>
 		<rom name="Lupin III - Hong Kong no Mashu.sub" size="13931232" crc="31cd1f8d" sha1="1a6cbbae19217e1150190c8e60b4d920256609b6"/>
 		-->
-		<description>Lupin Sansei: Hong Kong no Mashu: Fukushuu wa Meikyuu no Hate ni</description>
+		<description>Lupin Sansei - Hong Kong no Mashu - Fukushuu wa Meikyuu no Hate ni</description>
 		<year>1990</year>
 		<publisher>CRI</publisher>
 		<info name="release" value="199006xx" />
@@ -4836,7 +4835,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Muscle Bomber.mdf" size="579201696" crc="2383cfb2" sha1="1da7b2822c496bd727dfa1d4c67a266f5719d01e"/>
 		<rom name="Muscle Bomber.mds" size="3038" crc="403bad3d" sha1="7abc6f7ca827e6c87ee1b48e162fa1ba9b6f0524"/>
 		-->
-		<description>Muscle Bomber: The Body Explosion</description>
+		<description>Muscle Bomber - The Body Explosion</description>
 		<year>1993</year>
 		<publisher>カプコン (Capcom)</publisher>
 		<info name="release" value="199311xx" />
@@ -4934,7 +4933,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="My Fair Lady CAN II - Elementary.img" size="595378224" crc="6a1d3222" sha1="8c4a883fe787620a4673c9b53ed59de870c60e60"/>
 		<rom name="My Fair Lady CAN II - Elementary.sub" size="24301152" crc="e9d48db2" sha1="cbc2b3d81aad1dd0d498df91230f139daafb4a38"/>
 		-->
-		<description>My Fair Lady CAN II: Elementary</description>
+		<description>My Fair Lady CAN II - Elementary</description>
 		<year>1990</year>
 		<publisher>CRI</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -5019,13 +5018,33 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="mmagic3">
+		<!--
+		Origin: Tokugawa Corporate Forums (yukin)
+		<rom name="MM3.mdf" size="15523200" crc="926d169b" sha1="107090bdd34e831f27ea979e3fd6a24c86aa418a"/>
+		<rom name="MM3.mds" size="500" crc="99adcc2f" sha1="1d6b9f2257f821d06d0f85a021e5be5a2f448f03"/>
+		
+		CUE file used for CHD conversion:
+		<rom name="MM3.cue" size="64" crc="5c30fa2b" sha1="7b53d089cbc4fb4fa0d517adafd8f74f8c94a652"/>
+		-->
+		<description>Might and Magic III - Isles of Terra</description>
+		<year>1992</year>
+		<publisher>スタークラフト (Starcraft)</publisher>
+		<info name="release" value="199210xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="mm3" sha1="fcab3ac89b001b394071798511ccb8692926818f" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="mmagic4">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Might and Magic IV - Clouds of Xeen.mdf" size="249429600" crc="d80dd9ac" sha1="3aaf6421375508cc7ea75e754185df3302b411dc"/>
 		<rom name="Might and Magic IV - Clouds of Xeen.mds" size="1718" crc="f0d179a2" sha1="8950d463d656e3d9fc8898ce3f3eceec73c55ad9"/>
 		-->
-		<description>Might and Magic: Clouds of Xeen</description>
+		<description>Might and Magic - Clouds of Xeen</description>
 		<year>1993</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<info name="release" value="199309xx" />
@@ -5042,7 +5061,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Might and Magic V - Darkside of Xeen.mdf" size="36691200" crc="c1bf597c" sha1="f0c3c649a77242223076ccafc608a702ede112db"/>
 		<rom name="Might and Magic V - Darkside of Xeen.mds" size="486" crc="974ae3fc" sha1="5bda8dd2b65112d77a3c8cc341ecb2f5e39f05e8"/>
 		-->
-		<description>Might and Magic: Darkside of Xeen</description>
+		<description>Might and Magic - Darkside of Xeen</description>
 		<year>1994</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<info name="release" value="199405xx" />
@@ -5143,7 +5162,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="monkey island 2 - lechuck's revenge.bin" size="41983200" crc="4722bcbf" sha1="46af7a3b0217d6ebfec41938e7b28b0a6677956e"/>
 		<rom name="monkey island 2 - lechuck's revenge.cue" size="96" crc="c52ca81e" sha1="9f7d201c41ea984ecf68bf8bc67005de465dfe3e"/>
 		-->
-		<description>Monkey Island 2: LeChuck's Revenge</description>
+		<description>Monkey Island 2 - LeChuck's Revenge</description>
 		<year>1994</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
 		<info name="release" value="199402xx" />
@@ -5205,7 +5224,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Ms. Detective File #1 (Disc 2).img" size="518860608" crc="6579dddc" sha1="a9920e6d9c65f7ff412358d27e8565c60c0786a8"/>
 		<rom name="Ms. Detective File #1 (Disc 2).sub" size="21177984" crc="56eac6c0" sha1="ca2dea4d6d25e269edb950b9b6c033755baf10ae"/>
 		-->
-		<description>Ms. Detective File #1: Iwami Ginzan Satsujin Jiken</description>
+		<description>Ms. Detective File #1 - Iwami Ginzan Satsujin Jiken</description>
 		<year>1992</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="release" value="199209xx" />
@@ -5230,7 +5249,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Ms. Detective File #2.img" size="474174960" crc="a810c9f2" sha1="7bfe20007b1473bb55a849685bd1258939c540f9"/>
 		<rom name="Ms. Detective File #2.sub" size="19354080" crc="0dfa8820" sha1="20be48fb8f6ecee27d31fb10269e8a175991d003"/>
 		-->
-		<description>Ms. Detective File #2: Sugata-naki Irainin</description>
+		<description>Ms. Detective File #2 - Sugata-naki Irainin</description>
 		<year>1993</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="release" value="199310xx" />
@@ -5421,7 +5440,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Nihon no Rekishi - Kizoku-hen.img" size="534310896" crc="d32b3404" sha1="7c51507d212d94ad47ed84dea16c7d1573a3af71"/>
 		<rom name="Nihon no Rekishi - Kizoku-hen.sub" size="21808608" crc="0babca94" sha1="a0fbb8a32d1ab606a837601e1023ebd6b55d09d9"/>
 		-->
-		<description>Nihon no Rekishi: Kizoku-hen</description>
+		<description>Nihon no Rekishi - Kizoku-hen</description>
 		<year>1990</year>
 		<publisher>CRI</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -5439,7 +5458,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Nihon no Rekishi - Kodai-hen.img" size="632718576" crc="245c0277" sha1="ac4857a0985acda75b732a3590a2278d8628f0fb"/>
 		<rom name="Nihon no Rekishi - Kodai-hen.sub" size="25825248" crc="4d377848" sha1="1f4cb424de7625b41d865c395a7ec6882cf2f984"/>
 		-->
-		<description>Nihon no Rekishi: Kodai-hen</description>
+		<description>Nihon no Rekishi - Kodai-hen</description>
 		<year>1990</year>
 		<publisher>CRI</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -5496,7 +5515,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Nobunaga no Yabou - Haou-den.img" size="621283152" crc="43ae963f" sha1="a6b620bca6f5b282c6461e0bc7e66de20d6b61c0"/>
 		<rom name="Nobunaga no Yabou - Haou-den.sub" size="25358496" crc="f5b33009" sha1="f7951f9056c1c44f1e8d42fb646505298ccb75bf"/>
 		-->
-		<description>Nobunaga no Yabou: Haouden</description>
+		<description>Nobunaga no Yabou - Haouden</description>
 		<year>1993</year>
 		<publisher>光栄 (Koei)</publisher>
 		<info name="release" value="199304xx" />
@@ -5519,7 +5538,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Nobunaga no Yabou - Tenshouki.bin" size="478798992" crc="17ba5021" sha1="936b1f97562762df23cad7d0880bfce31e8e7c73"/>
 		<rom name="Nobunaga no Yabou - Tenshouki.cue" size="628" crc="8652e29d" sha1="3ed6d965bdc9cf9deed37ccbe829d87e525fad68"/>
 		-->
-		<description>Nobunaga no Yabou: Tenshouki</description>
+		<description>Nobunaga no Yabou - Tenshouki</description>
 		<year>1995</year>
 		<publisher>光栄 (Koei)</publisher>
 		<info name="release" value="199503xx" />
@@ -5891,7 +5910,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Prince of Persia 2.bin" size="537667200" crc="691de262" sha1="5813739a84322a52aa9a311ce67d173cba155e69"/>
 		<rom name="Prince of Persia 2.cue" size="125" crc="25a122a8" sha1="e7bfebff079701b0b6e886e320923dc7c511f00b"/>
 		-->
-		<description>Prince of Persia 2: The Shadow and the Flame</description>
+		<description>Prince of Persia 2 - The Shadow and the Flame</description>
 		<year>1994</year>
 		<publisher>インタープログ (Interprog)</publisher>
 		<info name="release" value="199407xx" />
@@ -5935,7 +5954,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Provvidenza.img" size="64562400" crc="ce38ece3" sha1="e10bd585a8e60c806e5cfba2129d79e3bdfb975b"/>
 		<rom name="Provvidenza.sub" size="2635200" crc="8da409c6" sha1="1db91a5e42f8df0ece1a3762a52a465d1422994b"/>
 		-->
-		<description>Provvidenza: Legenda la Spada di Alfa</description>
+		<description>Provvidenza - Legenda la Spada di Alfa</description>
 		<year>1991</year>
 		<publisher>Sofcom</publisher>
 		<info name="release" value="199109xx" />
@@ -5955,7 +5974,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Psychic Detective Series Vol. 1 - Invitation (Track 4).bin" size="4233600" crc="4580866a" sha1="aaefaba5020efb03452df764e2897d0f278e3151"/>
 		<rom name="Psychic Detective Series Vol. 1 - Invitation.cue" size="534" crc="3312b6bd" sha1="4a420300e0aebd9b7e971047c9ecddf0ce5ba43f"/>
 		-->
-		<description>Psychic Detective Series Vol. 1: Invitation</description>
+		<description>Psychic Detective Series Vol. 1 - Invitation</description>
 		<year>1989</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="release" value="198903xx" />
@@ -5989,7 +6008,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Psychic Detective Series Vol. 2 - Memories (Track 18).bin" size="4233600" crc="4580866a" sha1="aaefaba5020efb03452df764e2897d0f278e3151"/>
 		<rom name="Psychic Detective Series Vol. 2 - Memories.cue" size="2448" crc="f97a66f6" sha1="c6a3b4621c40dffdbcdcf699e223e003439f5cb4"/>
 		-->
-		<description>Psychic Detective Series Vol. 2: Memories</description>
+		<description>Psychic Detective Series Vol. 2 - Memories</description>
 		<year>1989</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -6012,7 +6031,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Psychic Detective Series Vol. 3 - Aya (Track 8).bin" size="4233600" crc="4580866a" sha1="aaefaba5020efb03452df764e2897d0f278e3151"/>
 		<rom name="Psychic Detective Series Vol. 3 - Aya.cue" size="1030" crc="7ee451c0" sha1="7a78f47a67a0ec1c21f95902d3a3d97206d8949b"/>
 		-->
-		<description>Psychic Detective Series Vol. 3: Aya</description>
+		<description>Psychic Detective Series Vol. 3 - Aya</description>
 		<year>1990</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="release" value="199006xx" />
@@ -6036,7 +6055,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Psychic Detective Series Vol. 4 - Orgel (Track 8).bin" size="36197280" crc="732a69ae" sha1="81551f723c0f79d1e8e7c4ad2dc71cd9d0dbede4"/>
 		<rom name="Psychic Detective Series Vol. 4 - Orgel.cue" size="1046" crc="043a8cbc" sha1="2a6d1f743f3cff9f2147f8c4c746737086432de9"/>
 		-->
-		<description>Psychic Detective Series Vol. 4: Orgel</description>
+		<description>Psychic Detective Series Vol. 4 - Orgel</description>
 		<year>1991</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="release" value="199104xx" />
@@ -6060,7 +6079,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Psychic Detective Series Vol. 5 - Nightmare.img" size="376790400" crc="45450153" sha1="f0b30fe77076028a3d8d68b41b8a03faf4ae363b"/>
 		<rom name="Psychic Detective Series Vol. 5 - Nightmare.sub" size="15379200" crc="dfd9f75a" sha1="719fda535ec124596e4280ef0d82b08f40435c70"/>
 		-->
-		<description>Psychic Detective Series Vol. 5: Nightmare</description>
+		<description>Psychic Detective Series Vol. 5 - Nightmare</description>
 		<year>1991</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="release" value="199111xx" />
@@ -6089,7 +6108,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Psychic Detective Series Final - Solitude Joukan (Track 7).bin" size="49074480" crc="26509472" sha1="2009d73fd1536f47056e84076bd43d95a338cde0"/>
 		<rom name="Psychic Detective Series Final - Solitude Joukan.cue" size="976" crc="c0b0ba63" sha1="c9827261a2c1a9e5e71152bf806e0fefba106173"/>
 		-->
-		<description>Psychic Detective Series Final: Solitude Joukan</description>
+		<description>Psychic Detective Series Final - Solitude Joukan</description>
 		<year>1992</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="release" value="199212xx" />
@@ -6115,7 +6134,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Psychic Detective Series Final - Solitude Gekan (Track 5).bin" size="51910992" crc="988d84a3" sha1="b97e6b1f060ef12ed47fc239265ca27124178bc1"/>
 		<rom name="Psychic Detective Series Final - Solitude Gekan.cue" size="687" crc="d6efb6e2" sha1="c5007c6443420cc91328aacea84a36d3b90ad4eb"/>
 		-->
-		<description>Psychic Detective Series Final: Solitude Gekan</description>
+		<description>Psychic Detective Series Final - Solitude Gekan</description>
 		<year>1993</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="release" value="199303xx" />
@@ -6323,7 +6342,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Rance III.img" size="602231952" crc="3f27e7f4" sha1="5d5f5ccf8e02eb4cfb75fef9c6c39e24e953dd1b"/>
 		<rom name="Rance III.sub" size="24580896" crc="5fd3a83c" sha1="ed46131da5956d324f4b68a1f3590c4ac6a4ad6f"/>
 		-->
-		<description>Rance III: Leazas Kanraku</description>
+		<description>Rance III - Leazas Kanraku</description>
 		<year>1992</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="release" value="199205xx" />
@@ -6342,7 +6361,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Rance IV.img" size="400921920" crc="5ea9daf3" sha1="9df5dd75f4eb2e1e34a39245b51ffd67a7c4ed34"/>
 		<rom name="Rance IV.sub" size="16364160" crc="b9f43d38" sha1="6f42e82164320a093d5c74776fb57813c045eb42"/>
 		-->
-		<description>Rance IV: Kyoudan no Isan</description>
+		<description>Rance IV - Kyoudan no Isan</description>
 		<year>1994</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="release" value="199403xx" />
@@ -6367,7 +6386,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Rance 4.1.img" size="628325040" crc="b53d7ecc" sha1="6dc3f45ea6d7efecd0ae7c2714cf84117a291935"/>
 		<rom name="Rance 4.1.sub" size="25645920" crc="ea974b09" sha1="142042fd520b06432f3deaa474ecd9a46b4058f1"/>
 		-->
-		<description>Rance 4.1: Okusuri Koujou wo Sukue!</description>
+		<description>Rance 4.1 - Okusuri Koujou wo Sukue!</description>
 		<year>1995</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="release" value="199512xx" />
@@ -6387,7 +6406,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Rance 4.2.img" size="732104688" crc="d0e4dc53" sha1="441f7f3846e005f23a539c623c735786e8b1335a"/>
 		<rom name="Rance 4.2.sub" size="29881824" crc="5c096184" sha1="425aa6d1d738cd73d69b811e468c7e9eb5ca5e8b"/>
 		-->
-		<description>Rance 4.2: Angel-gumi</description>
+		<description>Rance 4.2 - Angel-gumi</description>
 		<year>1995</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="release" value="199512xx" />
@@ -6491,7 +6510,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Rejection - Denno Senshi.img" size="270138960" crc="29b9fa04" sha1="bb1a04a652862a0ebc33367c92c6f25ab483ca4b"/>
 		<rom name="Rejection - Denno Senshi.sub" size="11026080" crc="f4fbbf12" sha1="02a7fc2bf9a3c1190d2b3d840a1cd408230565f4"/>
 		-->
-		<description>Rejection: Den-no Senshi</description>
+		<description>Rejection - Den-no Senshi</description>
 		<year>1992</year>
 		<publisher>シュールド・ウェーブ (Sur De Wave)</publisher>
 		<info name="release" value="199212xx" />
@@ -6743,7 +6762,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Sherlock Holmes no Tantei Kouza.img" size="719359200" crc="b99d4037" sha1="45bf55fd953f81e5dc241e40dc236e0a12403c3f"/>
 		<rom name="Sherlock Holmes no Tantei Kouza.sub" size="29361600" crc="eec3883e" sha1="f7155ecc42b6552b73124a262b29347f98d8ccd8"/>
 		-->
-		<description>Sherlock Holmes: Consulting Detective</description>
+		<description>Sherlock Holmes - Consulting Detective</description>
 		<year>1991</year>
 		<publisher>富士通 (Fujitsu)</publisher>
 		<info name="release" value="199106xx" />
@@ -6913,7 +6932,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Sotsugyou &apos;93 - Graduation.img" size="153044640" crc="15b362eb" sha1="3390ca78f2dbadfd353081f41977b35d84fb7647"/>
 		<rom name="Sotsugyou &apos;93 - Graduation.sub" size="6246720" crc="3370d136" sha1="e06d6c05ab7a830015e147c6f0d3200ae4434988"/>
 		-->
-		<description>Sotsugyou '93: Graduation</description>
+		<description>Sotsugyou '93 - Graduation</description>
 		<year>1993</year>
 		<publisher>JHV</publisher>
 		<info name="release" value="199310xx" />
@@ -6994,7 +7013,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Shadow of the Beast.bin" size="496152048" crc="c641b3e1" sha1="2d89c60f9890bad31de4fa7b99a9717ef50700d9"/>
 		<rom name="Shadow of the Beast.cue" size="372" crc="f5b6be57" sha1="9c0528ecc6b4693cf064084ade0cfaca7d1eeccf"/>
 		-->
-		<description>Shadow of the Beast: Mashou no Okite</description>
+		<description>Shadow of the Beast - Mashou no Okite</description>
 		<year>1991</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
 		<info name="release" value="199109xx" />
@@ -7005,7 +7024,6 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Original image from the redump.org database -->
 	<software name="sotb2">
 		<!--
 		Origin: redump.org
@@ -7025,7 +7043,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="shadow of the beast ii - juushin no jubaku (japan) (track 14).bin" size="9525600" crc="304265dd" sha1="aa67c9461d147add5444612c96a851e2402944ce"/>
 		<rom name="shadow of the beast ii - juushin no jubaku (japan).cue" size="2035" crc="ae3b3ca9" sha1="c91ca1a0b2255feecc05aea14e0b615dace51cac"/>
 		-->
-		<description>Shadow of the Beast II: Juushin no Jubaku</description>
+		<description>Shadow of the Beast II - Juushin no Jubaku</description>
 		<year>1993</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
 		<info name="release" value="199306xx" />
@@ -7120,7 +7138,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Super Street Fighter II.img" size="465733632" crc="ccc32114" sha1="cbe65c9f0839339a74867ac1758b9de441c96fdd"/>
 		<rom name="Super Street Fighter II.sub" size="19009536" crc="e0c73ae0" sha1="871fb0e535d2418ac8008d5b9817f09f7e9db37c"/>
 		-->
-		<description>Super Street Fighter II: The New Challengers</description>
+		<description>Super Street Fighter II - The New Challengers</description>
 		<year>1994</year>
 		<publisher>カプコン (Capcom)</publisher>
 		<info name="release" value="199410xx" />
@@ -7137,7 +7155,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Super Street Fighter II (Sample Disc).bin" size="33311376" crc="e51369b5" sha1="813e8435518d71468f05fe1b2977a71a304ee4a8"/>
 		<rom name="Super Street Fighter II (Sample Disc).cue" size="421" crc="df35d025" sha1="a3aaa59d86716feda3b29e594d456810c2b703db"/>
 		-->
-		<description>Super Street Fighter II: The New Challengers (Sample Disc)</description>
+		<description>Super Street Fighter II - The New Challengers (Sample Disc)</description>
 		<year>1994</year>
 		<publisher>カプコン (Capcom)</publisher>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -7155,7 +7173,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Super Shanghai - Dragon&apos;s Eye.img" size="499917600" crc="1d6e5c1e" sha1="8d5056af7328d2e00ba9e9cb57bd880060c2c64f"/>
 		<rom name="Super Shanghai - Dragon&apos;s Eye.sub" size="20404800" crc="cc998f20" sha1="a55336efbd1ce9261a1efa159cf7d13b00b22c0b"/>
 		-->
-		<description>Super Shanghai: Dragon's Eye</description>
+		<description>Super Shanghai - Dragon's Eye</description>
 		<year>1991</year>
 		<publisher>HOT・B</publisher>
 		<info name="release" value="199111xx" />
@@ -7220,7 +7238,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Star Cruiser 2.img" size="241849104" crc="de3aeac6" sha1="d452aa0f644f737a87137327a4b80931b8e0bddb"/>
 		<rom name="Star Cruiser 2.sub" size="9871392" crc="fcc2e4d4" sha1="62a5d3b88563dc365298ca59ee60b664f0726d66"/>
 		-->
-		<description>Star Cruiser II: The Odysseus Project</description>
+		<description>Star Cruiser II - The Odysseus Project</description>
 		<year>1994</year>
 		<publisher>JHV</publisher>
 		<info name="release" value="199404xx" />
@@ -7360,7 +7378,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Takamizawa Kyosuke - Nekketsu!! Kyouiku Kenshuu.img" size="445943904" crc="0f83a769" sha1="b417cc433d6946ea6939e4f80b722bccb038318f"/>
 		<rom name="Takamizawa Kyosuke - Nekketsu!! Kyouiku Kenshuu.sub" size="18201792" crc="1412cb19" sha1="28071814e73145f6e9ca4eb16a1704fb00ab6109"/>
 		-->
-		<description>Takamizawa Kyosuke: Nekketsu!! Kyouiku Kenshuu</description>
+		<description>Takamizawa Kyosuke - Nekketsu!! Kyouiku Kenshuu</description>
 		<year>1995</year>
 		<publisher>ジックス (ZyX)</publisher>
 		<info name="release" value="199501xx" />
@@ -7379,7 +7397,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Tanjou - Debut.img" size="55401360" crc="e7fa4c3b" sha1="1387e54fad5bd7636afee3d7a0b9ac1c8baecd3f"/>
 		<rom name="Tanjou - Debut.sub" size="2261280" crc="d37b24b0" sha1="9a288b4a6d53e9edf3b4f4b15e3a5c695bf0645b"/>
 		-->
-		<description>Tanjou: Debut</description>
+		<description>Tanjou - Debut</description>
 		<year>1994</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="release" value="199404xx" />
@@ -7423,7 +7441,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="TDF - Terrestrial Defense Force.img" size="160606320" crc="1adea170" sha1="79296eec6cbc866e81ff1b862deedc1d723331e4"/>
 		<rom name="TDF - Terrestrial Defense Force.sub" size="6555360" crc="589616ea" sha1="f63ee1d3114a90445a6765c8afd9fb691b231f57"/>
 		-->
-		<description>TDF: Terrestrial Defense Force</description>
+		<description>TDF - Terrestrial Defense Force</description>
 		<year>1990</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="release" value="199009xx" />
@@ -7577,7 +7595,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Toushin Toshi II - Soshite Sorekara....img" size="340814208" crc="b51f44d5" sha1="c5595ca4e7db9b15b4b802b1c8d94decf9f56b35"/>
 		<rom name="Toushin Toshi II - Soshite Sorekara....sub" size="13910784" crc="b64a2761" sha1="c1c3ad052d27c34c7f2a4fdd731e52d0a33fd27d"/>
 		-->
-		<description>Toushin Toshi II: Soshite, Sorekara...</description>
+		<description>Toushin Toshi II - Soshite, Sorekara...</description>
 		<year>1995</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="release" value="199512xx" />
@@ -7843,7 +7861,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Ultima IV - Quest of the Avatar.bin" size="83260800" crc="cacc08b9" sha1="9194eb85d514e71e07ea3b1e0615a01c9d09f416"/>
 		<rom name="Ultima IV - Quest of the Avatar.cue" size="200" crc="8f8e7041" sha1="e70d908fa5fe464e6d88c6d14a5110e9c7b243f3"/>
 		-->
-		<description>Ultima IV: Quest of the Avatar</description>
+		<description>Ultima IV - Quest of the Avatar</description>
 		<year>1992</year>
 		<publisher>富士通 (Fujitsu)</publisher>
 		<info name="release" value="199204xx" />
@@ -7862,7 +7880,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Ultima V - Warriors of Destiny.img" size="128595600" crc="dfc1dbe5" sha1="a0cfebf22f4b0563fb12f7c745305b45cd458f73"/>
 		<rom name="Ultima V - Warriors of Destiny.sub" size="5248800" crc="57c99837" sha1="086b83fe4b0303cd0cb11dd0fa68a71a2186c56b"/>
 		-->
-		<description>Ultima V: Warriors of Destiny</description>
+		<description>Ultima V - Warriors of Destiny</description>
 		<year>1992</year>
 		<publisher>富士通 (Fujitsu)</publisher>
 		<info name="release" value="199208xx" />
@@ -7881,7 +7899,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Ultima VI - The False Prophet.img" size="503090448" crc="045e6cf8" sha1="7b96e1c090e870edcc6661d93d9651afcf500683"/>
 		<rom name="Ultima VI - The False Prophet.sub" size="20534304" crc="c6918e77" sha1="cb33c7f8f54252b6609722601c5960c5be3576ef"/>
 		-->
-		<description>Ultima VI: The False Prophet</description>
+		<description>Ultima VI - The False Prophet</description>
 		<year>1991</year>
 		<publisher>富士通 (Fujitsu)</publisher>
 		<info name="release" value="199112xx" />
@@ -7919,7 +7937,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Ultima Underworld.img" size="87527328" crc="9c4e58f3" sha1="1602c3f7cf668319f2e2cbba2ef925ed2e79a1db"/>
 		<rom name="Ultima Underworld.sub" size="3572544" crc="4fc2ecd4" sha1="6ede888227097aa54c0fa333474f0d5dee70b687"/>
 		-->
-		<description>Ultima Underworld: The Stygian Abyss</description>
+		<description>Ultima Underworld - The Stygian Abyss</description>
 		<year>1993</year>
 		<publisher>エレクトロニック・アーツ・ビクター (Electronic Arts Victor)</publisher>
 		<info name="release" value="199312xx" />
@@ -7940,7 +7958,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="ultima underworld 2.bin" size="67140192" crc="2f005f36" sha1="fbdd8df467050403bc7047239418284ab4173847"/>
 		<rom name="ultima underworld 2.cue" size="80" crc="d6b87614" sha1="1f12d627578632ef2e9e7667e27cf1ebb7744263"/>
 		-->
-		<description>Ultima Underworld II: Labyrinth of Worlds</description>
+		<description>Ultima Underworld II - Labyrinth of Worlds</description>
 		<year>1995</year>
 		<publisher>エレクトロニック・アーツ・ビクター (Electronic Arts Victor)</publisher>
 		<info name="release" value="199502xx" />
@@ -8034,7 +8052,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Vastness.img" size="463666224" crc="ff249f28" sha1="21c024c9f4bc2fcfaadf84072e094998facad4a7"/>
 		<rom name="Vastness.sub" size="18925152" crc="1f3a4a5d" sha1="7d26e94d29997ae4c1f204a143194c9a08c74860"/>
 		-->
-		<description>Vastness: Kuukyo no Ikenie-tachi</description>
+		<description>Vastness - Kuukyo no Ikenie-tachi</description>
 		<year>1993</year>
 		<publisher>CD Bros.</publisher>
 		<info name="release" value="199309xx" />
@@ -8066,12 +8084,13 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Originally labeled as "mp3 source". It probably needs a redump. -->
 	<software name="viewpoin">
 		<!--
-		Origin: Neo Kobe Collection
-		<rom name="Viewpoint.bin" size="478711968" crc="76e247e4" sha1="5fdc1c4d99544b0b7ae9a78bfc9bd2c218f6bee9"/>
-		<rom name="Viewpoint.cue" size="629" crc="55900cea" sha1="fd17d8ca5820d319032136a162366265bd8929a4"/>
+		Origin: Tokugawa Corporate Forums (wushu)
+		<rom name="Viewpoint.ccd" size="3443" crc="7540457a" sha1="64a84097b761edeaf13ccdfb5ef7b146de7fa078"/>
+		<rom name="Viewpoint.cue" size="858" crc="ca18b334" sha1="850438e7d1332871cccf38fa91b159cbeaf702bc"/>
+		<rom name="Viewpoint.img" size="478961280" crc="fd8a4b22" sha1="c4771fc1db50dba1fc57f8aa10482e8ebf680cd8"/>
+		<rom name="Viewpoint.sub" size="19549440" crc="d15c8b5a" sha1="ff4cbd245aaee1acd1ef44db63a8d4a101c7a3a8"/>
 		-->
 		<description>Viewpoint</description>
 		<year>1993</year>
@@ -8079,7 +8098,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="199311xx" />
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="viewpoint" sha1="f5d017b08a34eaadfab6e4f4c272d574a09d1718" status="baddump" />
+				<disk name="viewpoint" sha1="c977abc3e3ab7d675b6be7aacac69a57bc6e52be" />
 			</diskarea>
 		</part>
 	</software>
@@ -8272,7 +8291,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Wing Commander - Secret Missions.mdf" size="10231200" crc="f75ba7a5" sha1="63b8d24b3f376edef3ca0363aa9cfec0d0908d6a"/>
 		<rom name="Wing Commander - Secret Missions.mds" size="486" crc="15e78ee3" sha1="c0b6da8915c861eb0f826689efb7b6b237f25f2b"/>
 		-->
-		<description>Wing Commander: Secret Missions</description>
+		<description>Wing Commander - Secret Missions</description>
 		<year>1994</year>
 		<publisher>富士通 (Fujitsu)</publisher>
 		<info name="release" value="199411xx" />
@@ -8307,7 +8326,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Wizardry V - Heart of the Maelstrom.mdf" size="242197200" crc="fe7c9dfa" sha1="45c01ea042b534a4b91fb0aeb5b4e5af4a510cb3"/>
 		<rom name="Wizardry V - Heart of the Maelstrom.mds" size="1982" crc="eff072ba" sha1="ebfb946672e85270336f864d9a67c83dfb4a2c2e"/>
 		-->
-		<description>Wizardry V: Heart of the Maelstrom</description>
+		<description>Wizardry V - Heart of the Maelstrom</description>
 		<year>1990</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="release" value="199012xx" />
@@ -8332,7 +8351,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Wizardry VI - Bane of the Cosmic Forge.img" size="153468000" crc="33b91709" sha1="09ac3f62a16dd7fcdcb9270a347505c98b98719b"/>
 		<rom name="Wizardry VI - Bane of the Cosmic Forge.sub" size="6264000" crc="d7b1b7b0" sha1="20845962384bc0043cf0b5c0b3ed1c449fd6e423"/>
 		-->
-		<description>Wizardry VI: Bane of the Cosmic Forge</description>
+		<description>Wizardry VI - Bane of the Cosmic Forge</description>
 		<year>1991</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="release" value="199112xx" />
@@ -8355,7 +8374,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Wizardry VII - Crusaders of the Dark Savant.mdf" size="45689952" crc="5146397e" sha1="cf1d06bbdf340de84ae3dd41af7f6ebf0919e4f4"/>
 		<rom name="Wizardry VII - Crusaders of the Dark Savant.mds" size="574" crc="b1adbcf4" sha1="e3391b016ffd3779032df192ad2595196091417d"/>
 		-->
-		<description>Wizardry VII: Crusaders of the Dark Savant</description>
+		<description>Wizardry VII - Crusaders of the Dark Savant</description>
 		<year>1994</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="release" value="199409xx" />
@@ -8467,7 +8486,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Xak II - Rising of the Redmoon.img" size="737681280" crc="97a091d7" sha1="8754a54544277acf76e34b160fcffc0f966438b5"/>
 		<rom name="Xak II - Rising of the Redmoon.sub" size="30109440" crc="138201f9" sha1="4cbc46c52275ee709da5960fff8cce2f913d5ace"/>
 		-->
-		<description>Xak II: Rising of the Redmoon</description>
+		<description>Xak II - Rising of the Redmoon</description>
 		<year>1991</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<info name="release" value="199107xx" />
@@ -8486,7 +8505,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Xak III - The Eternal Recurrence.img" size="160124160" crc="0540cc47" sha1="67922d84c5612465991e42b53be5534da7593fdc"/>
 		<rom name="Xak III - The Eternal Recurrence.sub" size="6535680" crc="05a826ad" sha1="2cd50216b025cfb095fc23be1d7b99d6f137db59"/>
 		-->
-		<description>Xak III: The Eternal Recurrence</description>
+		<description>Xak III - The Eternal Recurrence</description>
 		<year>1993</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<info name="release" value="199309xx" />
@@ -8549,7 +8568,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Youjuu Senki - A.D. 2048.img" size="73735200" crc="c564c47f" sha1="74cb81be807b323f0abf8de633ae4c00dfe9b486"/>
 		<rom name="Youjuu Senki - A.D. 2048.sub" size="3009600" crc="7f503cf3" sha1="4e802b74e492bd1321f932de6c0bfdc473a5ebfb"/>
 		-->
-		<description>Yojuu Senki: A.D. 2048</description>
+		<description>Yojuu Senki - A.D. 2048</description>
 		<year>1993</year>
 		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="release" value="199311xx" />
@@ -8634,7 +8653,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="track04.bin" size="73911600" crc="e6694e61" sha1="9c1611325495fdb80e957cc4eb5da819f4a4c10e"/>
 		<rom name="zan 2 towns special.cue" size="690" crc="a07806e3" sha1="02cf38214074c540b51eccb3642950957e12a2ef"/>
 		-->
-		<description>Zan II: Towns Special</description>
+		<description>Zan II - Towns Special</description>
 		<year>1992</year>
 		<publisher>ウルフチーム (WolfTeam)</publisher>
 		<info name="release" value="199204xx" />
@@ -8696,7 +8715,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Zoku Dungeon Master - Chaos no Gyakushuu.img" size="507062976" crc="c99fc7ea" sha1="c03933fbc0c6a761a2ea56909b08c5439f9016c5"/>
 		<rom name="Zoku Dungeon Master - Chaos no Gyakushuu.sub" size="20696448" crc="85a1d575" sha1="7c1a263a45d652c298d130dc44a3ba79baa8495c"/>
 		-->
-		<description>Zoku Dungeon Master: Chaos no Gyakushuu</description>
+		<description>Zoku Dungeon Master - Chaos no Gyakushuu</description>
 		<year>1990</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
 		<info name="release" value="199012xx" />

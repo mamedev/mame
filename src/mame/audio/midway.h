@@ -282,7 +282,7 @@ private:
 #define SSIO_INPUT_PORTS(ssio) \
 	AM_RANGE(0x00, 0x04) AM_MIRROR(0x18) AM_DEVREAD(ssio, midway_ssio_device, ioport_read) \
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_DEVREAD(ssio, midway_ssio_device, read) \
-	AM_RANGE(0x00, 0x07) AM_MIRROR(0x03) AM_DEVWRITE(ssio, midway_ssio_device, ioport_write) \
+	AM_RANGE(0x00, 0x07) AM_DEVWRITE(ssio, midway_ssio_device, ioport_write) \
 	AM_RANGE(0x1c, 0x1f) AM_DEVWRITE(ssio, midway_ssio_device, write)
 
 

@@ -355,12 +355,6 @@ debug_view *debug_view_manager::alloc_view(debug_view_type type, debug_view_osd_
 		case DVT_LOG:
 			return append(global_alloc(debug_view_log(machine(), osdupdate, osdprivate)));
 
-		case DVT_TIMERS:
-//          return append(global_alloc(debug_view_timers(machine(), osdupdate, osdprivate)));
-
-		case DVT_ALLOCS:
-//          return append(global_alloc(debug_view_allocs(machine(), osdupdate, osdprivate)));
-
 		case DVT_BREAK_POINTS:
 			return append(global_alloc(debug_view_breakpoints(machine(), osdupdate, osdprivate)));
 

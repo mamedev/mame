@@ -316,7 +316,6 @@ void ADDRESS_MAP_NAME(_name)(address_map &map, device_t &device) \
 	typedef write##_bits##_delegate write_delegate ATTR_UNUSED; \
 	address_map_entry##_bits *curentry = nullptr; \
 	(void)curentry; \
-	assert(&device != nullptr); \
 	map.configure(_space, _bits); \
 	typedef _class drivdata_class ATTR_UNUSED;
 #define DEVICE_ADDRESS_MAP_START(_name, _bits, _class) \
@@ -326,7 +325,6 @@ void _class :: _name(::address_map &map, device_t &device) \
 	typedef write##_bits##_delegate write_delegate ATTR_UNUSED; \
 	address_map_entry##_bits *curentry = nullptr; \
 	(void)curentry; \
-	assert(&device != nullptr); \
 	map.configure(AS_PROGRAM, _bits);  \
 	typedef _class drivdata_class ATTR_UNUSED;
 #define ADDRESS_MAP_END \

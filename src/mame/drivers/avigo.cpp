@@ -688,7 +688,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(avigo_state::avigo_1hz_timer)
 
 QUICKLOAD_LOAD_MEMBER( avigo_state,avigo)
 {
-	address_space& flash1 = m_flash1->space(0);
 	const char *systemname = machine().system().name;
 	UINT32 first_app_page = (0x50000>>14);
 	int app_page;
@@ -704,7 +703,7 @@ QUICKLOAD_LOAD_MEMBER( avigo_state,avigo)
 
 		for (int offset=0; offset<0x4000; offset++)
 		{
-			if (flash1.read_byte((app_page<<14) + offset) != 0xff)
+			if (m_flash1->read_raw((app_page<<14) + offset) != 0xff)
 			{
 				empty_page = false;
 				break;
@@ -721,10 +720,10 @@ QUICKLOAD_LOAD_MEMBER( avigo_state,avigo)
 		logerror("Application loaded at 0x%05x-0x%05x\n", app_page<<14, (app_page<<14) + (UINT32)image.length());
 
 		// copy app file into flash memory
-		image.fread((UINT8*)flash1.get_read_ptr(app_page<<14), image.length());
+		image.fread(m_flash1->base() + (app_page<<14), image.length());
 
 		// update the application ID
-		flash1.write_byte((app_page<<14) + 0x1a5, 0x80 + (app_page - (first_app_page>>14)));
+		m_flash1->write_raw((app_page<<14) + 0x1a5, 0x80 + (app_page - (first_app_page>>14)));
 
 		// reset the CPU for allow at the Avigo OS to recognize the installed app
 		m_warm_start = 1;

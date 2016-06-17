@@ -606,7 +606,6 @@ private:
 	UINT64 get_frame(symbol_table &table, void *ref);
 
 	/* internal helpers */
-	void exit();
 	void on_vblank(screen_device &device, bool vblank_state);
 
 	running_machine&	m_machine;
@@ -617,7 +616,7 @@ private:
 
 	FILE *		m_source_file;			// script source file
 
-	symbol_table *	m_symtable;			// global symbol table
+	std::unique_ptr<symbol_table> m_symtable;			// global symbol table
 
 	bool	m_within_instruction_hook;
 	bool	m_vblank_occurred;

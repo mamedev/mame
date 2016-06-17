@@ -346,7 +346,7 @@ WRITE_LINE_MEMBER( apricot_state::i8086_lock_w )
 static ADDRESS_MAP_START( apricot_mem, AS_PROGRAM, 16, apricot_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAMBANK("ram")
 	AM_RANGE(0xf0000, 0xf0fff) AM_MIRROR(0x7000) AM_RAM AM_SHARE("screen_buffer")
-	AM_RANGE(0xfc000, 0xfffff) AM_MIRROR(0x4000) AM_ROM AM_REGION("bootstrap", 0)
+	AM_RANGE(0xf8000, 0xfbfff) AM_MIRROR(0x4000) AM_ROM AM_REGION("bootstrap", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( apricot_io, AS_IO, 16, apricot_state )

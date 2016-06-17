@@ -127,7 +127,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( s6_audio_map, AS_PROGRAM, 8, s6_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x0400, 0x0403) AM_MIRROR(0x8000) AM_DEVREADWRITE("pias", pia6821_device, read, write)
+	AM_RANGE(0x0400, 0x0403) AM_DEVREADWRITE("pias", pia6821_device, read, write)
 	AM_RANGE(0x3000, 0x7fff) AM_ROM AM_REGION("audioroms", 0)
 ADDRESS_MAP_END
 

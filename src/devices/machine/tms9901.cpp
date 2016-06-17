@@ -411,37 +411,53 @@ WRITE8_MEMBER ( tms9901_device::write )
 		switch (offset)
 		{
 		case 0x10:
-			if (!m_write_p0.isnull()) m_write_p0(data); break;
+			if (!m_write_p0.isnull()) m_write_p0(data);
+			break;
 		case 0x11:
-			if (!m_write_p1.isnull()) m_write_p1(data); break;
+			if (!m_write_p1.isnull()) m_write_p1(data);
+			break;
 		case 0x12:
-			if (!m_write_p2.isnull()) m_write_p2(data); break;
+			if (!m_write_p2.isnull()) m_write_p2(data);
+			break;
 		case 0x13:
-			if (!m_write_p3.isnull()) m_write_p3(data); break;
+			if (!m_write_p3.isnull()) m_write_p3(data);
+			break;
 		case 0x14:
-			if (!m_write_p4.isnull()) m_write_p4(data); break;
+			if (!m_write_p4.isnull()) m_write_p4(data);
+			break;
 		case 0x15:
-			if (!m_write_p5.isnull()) m_write_p5(data); break;
+			if (!m_write_p5.isnull()) m_write_p5(data);
+			break;
 		case 0x16:
-			if (!m_write_p6.isnull()) m_write_p6(data); break;
+			if (!m_write_p6.isnull()) m_write_p6(data);
+			break;
 		case 0x17:
-			if (!m_write_p7.isnull()) m_write_p7(data); break;
+			if (!m_write_p7.isnull()) m_write_p7(data);
+			break;
 		case 0x18:
-			if (!m_write_p8.isnull()) m_write_p8(data); break;
+			if (!m_write_p8.isnull()) m_write_p8(data);
+			break;
 		case 0x19:
-			if (!m_write_p9.isnull()) m_write_p9(data); break;
+			if (!m_write_p9.isnull()) m_write_p9(data);
+			break;
 		case 0x1A:
-			if (!m_write_p10.isnull()) m_write_p10(data); break;
+			if (!m_write_p10.isnull()) m_write_p10(data);
+			break;
 		case 0x1B:
-			if (!m_write_p11.isnull()) m_write_p11(data); break;
+			if (!m_write_p11.isnull()) m_write_p11(data);
+			break;
 		case 0x1C:
-			if (!m_write_p12.isnull()) m_write_p12(data); break;
+			if (!m_write_p12.isnull()) m_write_p12(data);
+			break;
 		case 0x1D:
-			if (!m_write_p13.isnull()) m_write_p13(data); break;
+			if (!m_write_p13.isnull()) m_write_p13(data);
+			break;
 		case 0x1E:
-			if (!m_write_p14.isnull()) m_write_p14(data); break;
+			if (!m_write_p14.isnull()) m_write_p14(data);
+			break;
 		case 0x1F:
-			if (!m_write_p15.isnull()) m_write_p15(data); break;
+			if (!m_write_p15.isnull()) m_write_p15(data);
+			break;
 
 		}
 		return;

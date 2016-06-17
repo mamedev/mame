@@ -542,7 +542,8 @@ inline void vc4000_state::vc4000_draw_grid(UINT8 *collision)
 	}
 	switch (i&3) {
 	case 0:
-		if (k&1) w=8;break;
+		if (k&1) w=8;
+		break;
 	case 1:
 		if ((line%40)<=10) {
 			if (k&2) w=8;

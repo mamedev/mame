@@ -702,7 +702,6 @@ PALETTE_INIT_MEMBER(rex6000_state, rex6000)
 QUICKLOAD_LOAD_MEMBER( rex6000_state,rex6000)
 {
 	static const char magic[] = "ApplicationName:Addin";
-	address_space& flash = m_flash0b->space(0);
 	UINT32 img_start = 0;
 
 	dynamic_buffer data(image.length());
@@ -715,7 +714,7 @@ QUICKLOAD_LOAD_MEMBER( rex6000_state,rex6000)
 	img_start += 0xa0;  //skip the icon (40x32 pixel)
 
 	for (UINT32 i=0; i<image.length() - img_start ;i++)
-		flash.write_byte(i, data[img_start + i]);
+		m_flash0b->write_raw(i, data[img_start + i]);
 
 	return IMAGE_INIT_PASS;
 }

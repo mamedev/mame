@@ -616,7 +616,7 @@ const struct
 	{ INPUT_STRING_None, "None" },
 };
 
-} // anonymous namespace
+} // TODO: anonymous namespace
 
 
 std::uint8_t const inp_header::MAGIC[inp_header::OFFS_BASETIME - inp_header::OFFS_MAGIC] = { 'M', 'A', 'M', 'E', 'I', 'N', 'P', 0 };

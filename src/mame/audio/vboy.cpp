@@ -372,8 +372,10 @@ void vboysnd_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		// scale to 16 bits
 		note_left = (note_left << 5) | ((note_left >> 6) & 0x1f);
 		note_right = (note_right << 5) | ((note_right >> 6) & 0x1f);
-		if (note_left  < -32767) note_left  = -32767; if (note_left  > 32767) note_left  = 32767;
-		if (note_right < -32767) note_right = -32767; if (note_right > 32767) note_right = 32767;
+		if (note_left  < -32767) note_left  = -32767;
+		if (note_left  > 32767) note_left  = 32767;
+		if (note_right < -32767) note_right = -32767;
+		if (note_right > 32767) note_right = 32767;
 
 		*(outL++) = ((INT16)note_left);
 		*(outR++) = ((INT16)note_right);
