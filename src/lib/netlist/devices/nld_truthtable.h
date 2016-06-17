@@ -17,34 +17,40 @@
 #include "nl_factory.h"
 #include "plib/plists.h"
 
-#define NETLIB_TRUTHTABLE(cname, nIN, nOUT, state)                               \
-	class NETLIB_NAME(cname) : public nld_truthtable_t<nIN, nOUT, state>         \
+#define NETLIB_TRUTHTABLE(cname, nIN, nOUT, state)                              \
+	class NETLIB_NAME(cname) : public nld_truthtable_t<nIN, nOUT, state>        \
 	{                                                                           \
 	public:                                                                     \
 		template <class C>                                                      \
-		NETLIB_NAME(cname)(C &owner, const pstring &name)                        \
+		NETLIB_NAME(cname)(C &owner, const pstring &name)                       \
 		: nld_truthtable_t<nIN, nOUT, state>(owner, name, nullptr, &m_ttbl, m_desc) { }   \
 	private:                                                                    \
 		static truthtable_t m_ttbl;                                             \
 		static const char *m_desc[];                                            \
 	}
 
-#define TRUTHTABLE_START(cname, in, out, has_state, def_params) \
+#define TRUTHTABLE_START(cname, in, out, has_statep, def_params) \
 	{ \
-	auto ttd = netlist::devices::nl_tt_factory_create(in, out, has_state, \
-			# cname, # cname, "+" def_params);
+		netlist::devices::tt_desc desc; \
+		desc.name = #cname ; \
+		desc.classname = #cname ; \
+		desc.ni = in; \
+		desc.no = out; \
+		desc.has_state = has_statep; \
+		desc.def_param = pstring("+") + def_params; \
+		desc.family = "";
 
 #define TT_HEAD(x) \
-	ttd->m_desc.push_back(x);
+		desc.desc.push_back(x);
 
 #define TT_LINE(x) \
-	ttd->m_desc.push_back(x);
+		desc.desc.push_back(x);
 
 #define TT_FAMILY(x) \
-	ttd->m_family = setup.family_from_model(x);
+		desc.family = x;
 
 #define TRUTHTABLE_END() \
-	setup.factory().register_device(std::move(ttd)); \
+		netlist::devices::nl_tt_factory_create(setup, desc);		\
 	}
 
 namespace netlist
@@ -411,10 +417,19 @@ namespace netlist
 		const logic_family_desc_t *m_family;
 	};
 
-	plib::owned_ptr<netlist_base_factory_truthtable_t> nl_tt_factory_create(const unsigned ni, const unsigned no,
-			const unsigned has_state,
-			const pstring &name, const pstring &classname,
-			const pstring &def_param);
+	struct tt_desc
+	{
+		pstring name;
+		pstring classname;
+		unsigned ni;
+		unsigned no;
+		unsigned has_state;
+		pstring def_param;
+		plib::pstring_vector_t desc;
+		pstring family;
+	};
+
+	void nl_tt_factory_create(setup_t &setup, tt_desc &desc);
 
 	} //namespace devices
 } // namespace netlist

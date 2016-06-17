@@ -11,7 +11,13 @@
 #include <memory>
 #include <stack>
 #include <unordered_map>
+#include <vector>
 
+#include "plib/pstring.h"
+#include "plib/palloc.h"
+#include "plib/pfmtlog.h"
+#include "plib/putil.h"
+#include "nl_config.h"
 #include "nl_base.h"
 #include "nl_factory.h"
 
@@ -34,75 +40,89 @@
 #define NET_REGISTER_DEV(type, name)                                            \
 		setup.register_dev(# type, # name);
 
-#define NET_CONNECT(name, input, output)                                         \
+#define NET_CONNECT(name, input, output)                                        \
 		setup.register_link(# name "." # input, # output);
 
-#define NET_C(term1, ...)                                                          \
+#define NET_C(term1, ...)                                                       \
 		setup.register_link_arr( # term1 ", " # __VA_ARGS__);
 
-#define PARAM(name, val)                                                          \
+#define PARAM(name, val)                                                        \
 		setup.register_param(# name, val);
 
-#define NETDEV_PARAMI(name, param, val)                                          \
+#define NETDEV_PARAMI(name, param, val)                                         \
 		setup.register_param(# name "." # param, val);
 
 #define NETLIST_NAME(name) netlist ## _ ## name
 
-#define NETLIST_EXTERNAL(name)                                                \
+#define NETLIST_EXTERNAL(name)                                                 \
 		void NETLIST_NAME(name)(netlist::setup_t &setup);
 
-#define NETLIST_START(name)                                                   \
-void NETLIST_NAME(name)(netlist::setup_t &setup)                    \
+#define NETLIST_START(name)                                                    \
+void NETLIST_NAME(name)(netlist::setup_t &setup)                               \
 {
 #define NETLIST_END()  }
 
-#define LOCAL_SOURCE(name)                                                    \
+#define LOCAL_SOURCE(name)                                                     \
 		setup.register_source(std::make_shared<netlist::source_proc_t>(# name, &NETLIST_NAME(name)));
 
-#define LOCAL_LIB_ENTRY(name)                                                 \
-		LOCAL_SOURCE(name)                                                    \
+#define LOCAL_LIB_ENTRY(name)                                                  \
+		LOCAL_SOURCE(name)                                                     \
 		setup.register_lib_entry(# name);
 
-#define INCLUDE(name)                                                         \
+#define INCLUDE(name)                                                          \
 		setup.include(# name);
 
-#define SUBMODEL(model, name)                                                \
-		setup.namespace_push(# name);                                         \
-		NETLIST_NAME(model)(setup);                                           \
+#define SUBMODEL(model, name)                                                  \
+		setup.namespace_push(# name);                                          \
+		NETLIST_NAME(model)(setup);                                            \
 		setup.namespace_pop();
-
-// ----------------------------------------------------------------------------------------
-// netlist_setup_t
-// ----------------------------------------------------------------------------------------
 
 namespace netlist
 {
-	// Forward definition so we keep nl_factory.h out of the public
-	class factory_list_t;
+
+	// -----------------------------------------------------------------------------
+	// param_ref_t
+	// -----------------------------------------------------------------------------
+
+	struct param_ref_t
+	{
+		param_ref_t(const pstring name, core_device_t &device, param_t &param)
+		: m_name(name)
+		, m_device(device)
+		, m_param(param)
+		{ }
+		pstring m_name;
+		core_device_t &m_device;
+		param_t &m_param;
+	};
+
+	// ----------------------------------------------------------------------------------------
+	// A Generic netlist sources implementation
+	// ----------------------------------------------------------------------------------------
+
+	class source_t
+	{
+	public:
+		using list_t = std::vector<std::shared_ptr<source_t>>;
+
+		source_t()
+		{}
+
+		virtual ~source_t() { }
+
+		virtual bool parse(setup_t &setup, const pstring &name) = 0;
+	private:
+	};
+
+	// ----------------------------------------------------------------------------------------
+	// setup_t
+	// ----------------------------------------------------------------------------------------
 
 
 	class setup_t
 	{
 		P_PREVENT_COPYING(setup_t)
 	public:
-
-		// ----------------------------------------------------------------------------------------
-		// A Generic netlist sources implementation
-		// ----------------------------------------------------------------------------------------
-
-		class source_t
-		{
-		public:
-			using list_t = std::vector<std::shared_ptr<source_t>>;
-
-			source_t()
-			{}
-
-			virtual ~source_t() { }
-
-			virtual bool parse(setup_t &setup, const pstring &name) = 0;
-		private:
-		};
 
 		using link_t = std::pair<pstring, pstring>;
 
@@ -179,8 +199,8 @@ namespace netlist
 
 		void model_parse(const pstring &model, model_map_t &map);
 
-		plib::plog_base<NL_DEBUG> &log() { return netlist().log(); }
-		const plib::plog_base<NL_DEBUG> &log() const { return netlist().log(); }
+		plib::plog_base<NL_DEBUG> &log();
+		const plib::plog_base<NL_DEBUG> &log() const;
 
 		std::vector<std::pair<pstring, base_factory_t *>> m_device_factory;
 
@@ -232,12 +252,12 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 
-	class source_string_t : public setup_t::source_t
+	class source_string_t : public source_t
 	{
 	public:
 
 		source_string_t(const pstring &source)
-		: setup_t::source_t(), m_str(source)
+		: source_t(), m_str(source)
 		{
 		}
 
@@ -247,12 +267,12 @@ namespace netlist
 		pstring m_str;
 	};
 
-	class source_file_t : public setup_t::source_t
+	class source_file_t : public source_t
 	{
 	public:
 
 		source_file_t(const pstring &filename)
-		: setup_t::source_t(), m_filename(filename)
+		: source_t(), m_filename(filename)
 		{
 		}
 
@@ -262,11 +282,11 @@ namespace netlist
 		pstring m_filename;
 	};
 
-	class source_mem_t : public setup_t::source_t
+	class source_mem_t : public source_t
 	{
 	public:
 		source_mem_t(const char *mem)
-		: setup_t::source_t(), m_str(mem)
+		: source_t(), m_str(mem)
 		{
 		}
 
@@ -276,11 +296,11 @@ namespace netlist
 		pstring m_str;
 	};
 
-	class source_proc_t : public setup_t::source_t
+	class source_proc_t : public source_t
 	{
 	public:
 		source_proc_t(pstring name, void (*setup_func)(setup_t &))
-		: setup_t::source_t(),
+		: source_t(),
 			m_setup_func(setup_func),
 			m_setup_func_name(name)
 		{

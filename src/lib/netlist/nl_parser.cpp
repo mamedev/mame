@@ -158,8 +158,14 @@ void parser_t::net_truthtable_start()
 	pstring def_param = get_string();
 	require_token(m_tok_param_right);
 
-	plib::owned_ptr<netlist::devices::netlist_base_factory_truthtable_t> ttd = netlist::devices::nl_tt_factory_create(ni, no, hs,
-			name, name, "+" + def_param);
+	netlist::devices::tt_desc desc;
+	desc.classname = name;
+	desc.name = name;
+	desc.ni = ni;
+	desc.no = no;
+	desc.has_state = hs;
+	desc.def_param = "+" + def_param;
+	desc.family = "";
 
 	while (true)
 	{
@@ -168,19 +174,19 @@ void parser_t::net_truthtable_start()
 		if (token.is(m_tok_TT_HEAD))
 		{
 			require_token(m_tok_param_left);
-			ttd->m_desc.push_back(get_string());
+			desc.desc.push_back(get_string());
 			require_token(m_tok_param_right);
 		}
 		else if (token.is(m_tok_TT_LINE))
 		{
 			require_token(m_tok_param_left);
-			ttd->m_desc.push_back(get_string());
+			desc.desc.push_back(get_string());
 			require_token(m_tok_param_right);
 		}
 		else if (token.is(m_tok_TT_FAMILY))
 		{
 			require_token(m_tok_param_left);
-			ttd->m_family = m_setup.family_from_model(get_string());
+			desc.family = get_string();
 			require_token(m_tok_param_right);
 		}
 		else
@@ -188,7 +194,7 @@ void parser_t::net_truthtable_start()
 			require_token(token, m_tok_TRUTHTABLE_END);
 			require_token(m_tok_param_left);
 			require_token(m_tok_param_right);
-			m_setup.factory().register_device(std::move(ttd));
+			netlist::devices::nl_tt_factory_create(m_setup, desc);
 			return;
 		}
 	}
@@ -431,7 +437,7 @@ nl_double parser_t::eval_param(const token_t tok)
 		val = tok.str();
 		ret = val.as_double(&e);
 		if (e)
-			error("Error with parameter ...\n");
+			error(plib::pfmt("Error with parameter {1}...\n")(val));
 	}
 	return ret * facs[f];
 

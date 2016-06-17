@@ -966,22 +966,6 @@ namespace netlist
 	};
 
 	// -----------------------------------------------------------------------------
-	// param_ref_t
-	// -----------------------------------------------------------------------------
-
-	struct param_ref_t
-	{
-		param_ref_t(const pstring name, core_device_t &device, param_t &param)
-		: m_name(name)
-		, m_device(device)
-		, m_param(param)
-		{ }
-		pstring m_name;
-		core_device_t &m_device;
-		param_t &m_param;
-	};
-
-	// -----------------------------------------------------------------------------
 	// device_t
 	// -----------------------------------------------------------------------------
 

@@ -788,6 +788,16 @@ void setup_t::start_devices()
 	netlist().start();
 }
 
+plib::plog_base<NL_DEBUG> &setup_t::log()
+{
+	return netlist().log();
+}
+const plib::plog_base<NL_DEBUG> &setup_t::log() const
+{
+	return netlist().log();
+}
+
+
 // ----------------------------------------------------------------------------------------
 // Model / family
 // ----------------------------------------------------------------------------------------

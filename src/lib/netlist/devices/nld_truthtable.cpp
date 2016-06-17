@@ -7,6 +7,7 @@
 
 #include "nld_truthtable.h"
 #include "plib/plists.h"
+#include "nl_setup.h"
 
 namespace netlist
 {
@@ -261,18 +262,17 @@ void truthtable_desc_t::setup(const plib::pstring_vector_t &truthtable, uint_lea
 
 #define ENTRYX(n, m, h)    case (n * 1000 + m * 10 + h): \
 	{ using xtype = netlist_factory_truthtable_t<n, m, h>; \
-		return plib::owned_ptr<netlist_base_factory_truthtable_t>::Create<xtype>(name,classname,def_param); } break
+		ret = new xtype(desc.name, desc.classname, desc.def_param); } break
 
 #define ENTRYY(n, m)   ENTRYX(n, m, 0); ENTRYX(n, m, 1)
 
 #define ENTRY(n) ENTRYY(n, 1); ENTRYY(n, 2); ENTRYY(n, 3); ENTRYY(n, 4); ENTRYY(n, 5); ENTRYY(n, 6)
 
-plib::owned_ptr<netlist_base_factory_truthtable_t> nl_tt_factory_create(const unsigned ni, const unsigned no,
-		const unsigned has_state,
-		const pstring &name, const pstring &classname,
-		const pstring &def_param)
+void nl_tt_factory_create(setup_t &setup, tt_desc &desc)
 {
-	switch (ni * 1000 + no * 10 + has_state)
+	netlist_base_factory_truthtable_t *ret;
+
+	switch (desc.ni * 1000 + desc.no * 10 + desc.has_state)
 	{
 		ENTRY(1);
 		ENTRY(2);
@@ -285,10 +285,13 @@ plib::owned_ptr<netlist_base_factory_truthtable_t> nl_tt_factory_create(const un
 		ENTRY(9);
 		ENTRY(10);
 		default:
-			pstring msg = plib::pfmt("unable to create truthtable<{1},{2},{3}>")(ni)(no)(has_state);
+			pstring msg = plib::pfmt("unable to create truthtable<{1},{2},{3}>")(desc.ni)(desc.no)(desc.has_state);
 			nl_assert_always(false, msg);
 	}
-	//return nullptr;
+	ret->m_desc = desc.desc;
+	if (desc.family != "")
+		ret->m_family = setup.family_from_model(desc.family);
+	setup.factory().register_device(plib::owned_ptr<netlist_base_factory_truthtable_t>(ret, true));
 }
 
 	} //namespace devices
