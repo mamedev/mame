@@ -170,7 +170,7 @@ READ8_MEMBER( decwriter_state::la120_DC305_r )
    2 = ?
    3 = ?
    there are at least two bits in here to enable the 2.5ms tick interrupt(rst3) and the dot interrupt/linefeed(rtc expired) interrupt(rst5)
-   the dot fifo is 4 bytes long, dot int fires when it is empty
+   the dot fifo is 4 bytes long, dot int fires when it is half empty
    at least 3 bits control the speaker/buzzer which can be on or off, at least two volume levels, and at least two frequencies, 400hz or 2400hz
    two quadrature lines from the head servomotor connect here to allow the dc305 to determine motor position; one pulses when the motor turns clockwise and one when it turns counterclockwise. the head stop is found when the pulses stop, which firmware uses to find the zero position.
  */
