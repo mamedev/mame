@@ -47,6 +47,7 @@ debugger_cpu::debugger_cpu(running_machine &machine)
     , m_rpindex(1)
     , m_wpdata(0)
     , m_wpaddr(0)
+	, m_last_periodic_update_time(0)
     , m_comments_loaded(false)
 {
 	screen_device *first_screen = m_machine.first_screen();
