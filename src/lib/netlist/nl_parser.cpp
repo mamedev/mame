@@ -153,17 +153,14 @@ void parser_t::net_truthtable_start()
 	require_token(m_tok_comma);
 	unsigned no = get_number_long();
 	require_token(m_tok_comma);
-	unsigned hs = get_number_long();
-	require_token(m_tok_comma);
 	pstring def_param = get_string();
 	require_token(m_tok_param_right);
 
-	netlist::devices::tt_desc desc;
+	netlist::tt_desc desc;
 	desc.classname = name;
 	desc.name = name;
 	desc.ni = ni;
 	desc.no = no;
-	desc.has_state = hs;
 	desc.def_param = "+" + def_param;
 	desc.family = "";
 
@@ -194,7 +191,7 @@ void parser_t::net_truthtable_start()
 			require_token(token, m_tok_TRUTHTABLE_END);
 			require_token(m_tok_param_left);
 			require_token(m_tok_param_right);
-			netlist::devices::nl_tt_factory_create(m_setup, desc);
+			netlist::devices::tt_factory_create(m_setup, desc);
 			return;
 		}
 	}

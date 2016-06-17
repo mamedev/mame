@@ -13,45 +13,22 @@
 #include <new>
 #include <cstdint>
 
-#include "nl_base.h"
+#include "nl_setup.h"
 #include "nl_factory.h"
 #include "plib/plists.h"
 
-#define NETLIB_TRUTHTABLE(cname, nIN, nOUT, state)                              \
-	class NETLIB_NAME(cname) : public nld_truthtable_t<nIN, nOUT, state>        \
+#define NETLIB_TRUTHTABLE(cname, nIN, nOUT)                             		\
+	class NETLIB_NAME(cname) : public nld_truthtable_t<nIN, nOUT>		        \
 	{                                                                           \
 	public:                                                                     \
 		template <class C>                                                      \
 		NETLIB_NAME(cname)(C &owner, const pstring &name)                       \
-		: nld_truthtable_t<nIN, nOUT, state>(owner, name, nullptr, &m_ttbl, m_desc) { }   \
+		: nld_truthtable_t<nIN, nOUT>(owner, name, nullptr, &m_ttbl, m_desc) { }   \
 	private:                                                                    \
 		static truthtable_t m_ttbl;                                             \
 		static const char *m_desc[];                                            \
 	}
 
-#define TRUTHTABLE_START(cname, in, out, has_statep, def_params) \
-	{ \
-		netlist::devices::tt_desc desc; \
-		desc.name = #cname ; \
-		desc.classname = #cname ; \
-		desc.ni = in; \
-		desc.no = out; \
-		desc.has_state = has_statep; \
-		desc.def_param = pstring("+") + def_params; \
-		desc.family = "";
-
-#define TT_HEAD(x) \
-		desc.desc.push_back(x);
-
-#define TT_LINE(x) \
-		desc.desc.push_back(x);
-
-#define TT_FAMILY(x) \
-		desc.family = x;
-
-#define TRUTHTABLE_END() \
-		netlist::devices::nl_tt_factory_create(setup, desc);		\
-	}
 
 namespace netlist
 {
@@ -127,11 +104,11 @@ namespace netlist
 
 	struct truthtable_desc_t
 	{
-		truthtable_desc_t(int NO, int NI, int has_state, bool *initialized,
+		truthtable_desc_t(int NO, int NI, bool *initialized,
 				packed_int outs, uint_least8_t *timing, netlist_time *timing_nt)
-		: m_NO(NO), m_NI(NI), /*m_has_state(has_state),*/ m_initialized(initialized),
+		: m_NO(NO), m_NI(NI),  m_initialized(initialized),
 			m_outs(outs), m_timing(timing), m_timing_nt(timing_nt),
-			m_num_bits(m_NI + has_state * (m_NI + m_NO)),
+			m_num_bits(m_NI),
 			m_size(1 << (m_num_bits))
 		{
 		}
@@ -160,15 +137,15 @@ namespace netlist
 
 	};
 
-	template<unsigned m_NI, unsigned m_NO, int m_has_state>
+	template<unsigned m_NI, unsigned m_NO>
 	NETLIB_OBJECT(truthtable_t)
 	{
 	private:
 		family_setter_t m_fam;
 	public:
 
-		static const int m_num_bits = m_NI + m_has_state * (m_NI + m_NO);
-		static const int m_size = (1 << (m_num_bits));
+		static constexpr int m_num_bits = m_NI;
+		static constexpr int m_size = (1 << (m_num_bits));
 
 		struct truthtable_t
 		{
@@ -186,7 +163,6 @@ namespace netlist
 				truthtable_t *ttp, const char *desc[])
 		: device_t(owner, name)
 		, m_fam(*this, fam)
-		, m_last_state(*this, "m_last_state", 0)
 		, m_ign(*this, "m_ign", 0)
 		, m_active(*this, "m_active", 1)
 		, m_use_deactivate(*this, "USE_DEACTIVATE", true)
@@ -205,7 +181,6 @@ namespace netlist
 				truthtable_t *ttp, const plib::pstring_vector_t &desc)
 		: device_t(owner, name)
 		, m_fam(*this, fam)
-		, m_last_state(*this, "m_last_state", 0)
 		, m_ign(*this, "m_ign", 0)
 		, m_active(*this, "m_active", 1)
 		, m_use_deactivate(*this, "USE_DEACTIVATE", true)
@@ -255,8 +230,9 @@ namespace netlist
 
 			m_ign = 0;
 
-			truthtable_desc_t desc(m_NO, m_NI, m_has_state,
-					&m_ttp->m_initialized, packed_int(m_ttp->m_outs), m_ttp->m_timing, m_ttp->m_timing_nt);
+			truthtable_desc_t desc(m_NO, m_NI, &m_ttp->m_initialized,
+					packed_int(m_ttp->m_outs),
+					m_ttp->m_timing, m_ttp->m_timing_nt);
 
 			desc.setup(m_desc, disabled_ignore * 0);
 	#if 0
@@ -278,7 +254,6 @@ namespace netlist
 			for (std::size_t i=0; i<m_NO;i++)
 				if (this->m_Q[i].net().num_cons()>0)
 					m_active++;
-			m_last_state = 0;
 		}
 
 		NETLIB_UPDATEI()
@@ -289,7 +264,7 @@ namespace netlist
 	public:
 		void inc_active() override
 		{
-			if (m_NI > 1 && m_has_state == 0 && m_use_deactivate)
+			if (m_NI > 1 && m_use_deactivate)
 				if (++m_active == 1)
 				{
 					process<false>();
@@ -304,7 +279,7 @@ namespace netlist
 			 * can decide for each individual gate whether it is benefitial to
 			 * ignore deactivation.
 			 */
-			if (m_NI > 1 && m_has_state == 0 && m_use_deactivate)
+			if (m_NI > 1 && m_use_deactivate)
 				if (--m_active == 0)
 				{
 					for (std::size_t i = 0; i< m_NI; i++)
@@ -328,7 +303,7 @@ namespace netlist
 			netlist_time mt = netlist_time::zero();
 
 			uint_least64_t state = 0;
-			if (m_NI > 1 && !m_has_state)
+			if (m_NI > 1)
 			{
 				auto ign = m_ign;
 				if (!doOUT)
@@ -360,9 +335,6 @@ namespace netlist
 			}
 			auto nstate = state;
 
-			if (m_has_state)
-				nstate |= (m_last_state << m_NI);
-
 			const auto outstate = m_ttp->m_outs[nstate];
 			const auto out = outstate & ((1 << m_NO) - 1);
 
@@ -379,10 +351,7 @@ namespace netlist
 				for (std::size_t i = 0; i < m_NO; i++)
 					m_Q[i].net().set_Q_time((out >> i) & 1, mt + m_ttp->m_timing_nt[m_ttp->m_timing[timebase + i]]);
 
-			if (m_has_state)
-				m_last_state = (state << m_NO) | out;
-
-			if (m_NI > 1 && !m_has_state)
+			if (m_NI > 1)
 			{
 				auto ign(m_ign);
 				for (std::size_t i = 0; ign != 0; ign >>= 1, i++)
@@ -392,11 +361,10 @@ namespace netlist
 		}
 
 		/* FIXME: check width */
-		state_var_u32 m_last_state;
-		state_var_u32 m_ign;
-		state_var_s32  m_active;
-		param_logic_t     m_use_deactivate;
-		truthtable_t *m_ttp;
+		state_var_u32		m_ign;
+		state_var_s32		m_active;
+		param_logic_t		m_use_deactivate;
+		truthtable_t *		m_ttp;
 		plib::pstring_vector_t m_desc;
 	};
 
@@ -417,19 +385,7 @@ namespace netlist
 		const logic_family_desc_t *m_family;
 	};
 
-	struct tt_desc
-	{
-		pstring name;
-		pstring classname;
-		unsigned ni;
-		unsigned no;
-		unsigned has_state;
-		pstring def_param;
-		plib::pstring_vector_t desc;
-		pstring family;
-	};
-
-	void nl_tt_factory_create(setup_t &setup, tt_desc &desc);
+	void tt_factory_create(setup_t &setup, tt_desc &desc);
 
 	} //namespace devices
 } // namespace netlist

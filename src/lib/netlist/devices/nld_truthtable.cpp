@@ -14,7 +14,7 @@ namespace netlist
 	namespace devices
 	{
 
-	template<unsigned m_NI, unsigned m_NO, int has_state>
+	template<unsigned m_NI, unsigned m_NO>
 	class netlist_factory_truthtable_t : public netlist_base_factory_truthtable_t
 	{
 		P_PREVENT_COPYING(netlist_factory_truthtable_t)
@@ -26,11 +26,11 @@ namespace netlist
 
 		plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override
 		{
-			typedef nld_truthtable_t<m_NI, m_NO, has_state> tt_type;
+			typedef nld_truthtable_t<m_NI, m_NO> tt_type;
 			return plib::owned_ptr<device_t>::Create<tt_type>(anetlist, name, m_family, &m_ttbl, m_desc);
 		}
 	private:
-		typename nld_truthtable_t<m_NI, m_NO, has_state>::truthtable_t m_ttbl;
+		typename nld_truthtable_t<m_NI, m_NO>::truthtable_t m_ttbl;
 	};
 
 	static const uint_least64_t all_set = ~((uint_least64_t) 0);
@@ -260,19 +260,17 @@ void truthtable_desc_t::setup(const plib::pstring_vector_t &truthtable, uint_lea
 
 }
 
-#define ENTRYX(n, m, h)    case (n * 1000 + m * 10 + h): \
-	{ using xtype = netlist_factory_truthtable_t<n, m, h>; \
+#define ENTRYY(n, m)    case (n * 100 + m): \
+	{ using xtype = netlist_factory_truthtable_t<n, m>; \
 		ret = new xtype(desc.name, desc.classname, desc.def_param); } break
-
-#define ENTRYY(n, m)   ENTRYX(n, m, 0); ENTRYX(n, m, 1)
 
 #define ENTRY(n) ENTRYY(n, 1); ENTRYY(n, 2); ENTRYY(n, 3); ENTRYY(n, 4); ENTRYY(n, 5); ENTRYY(n, 6)
 
-void nl_tt_factory_create(setup_t &setup, tt_desc &desc)
+void tt_factory_create(setup_t &setup, tt_desc &desc)
 {
 	netlist_base_factory_truthtable_t *ret;
 
-	switch (desc.ni * 1000 + desc.no * 10 + desc.has_state)
+	switch (desc.ni * 100 + desc.no)
 	{
 		ENTRY(1);
 		ENTRY(2);
@@ -285,7 +283,7 @@ void nl_tt_factory_create(setup_t &setup, tt_desc &desc)
 		ENTRY(9);
 		ENTRY(10);
 		default:
-			pstring msg = plib::pfmt("unable to create truthtable<{1},{2},{3}>")(desc.ni)(desc.no)(desc.has_state);
+			pstring msg = plib::pfmt("unable to create truthtable<{1},{2}>")(desc.ni)(desc.no);
 			nl_assert_always(false, msg);
 	}
 	ret->m_desc = desc.desc;

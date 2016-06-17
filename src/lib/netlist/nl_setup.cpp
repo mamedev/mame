@@ -16,6 +16,7 @@
 #include "nl_parser.h"
 #include "nl_factory.h"
 #include "devices/net_lib.h"
+#include "devices/nld_truthtable.h"
 #include "devices/nlid_system.h"
 #include "analog/nld_twoterm.h"
 #include "solver/nld_solver.h"
@@ -935,6 +936,12 @@ nl_double setup_t::model_value(model_map_t &map, const pstring &entity)
 		tmp = tmp.left(tmp.len() - 1);
 	return tmp.as_double() * factor;
 }
+
+void setup_t::tt_factory_create(tt_desc &desc)
+{
+	devices::tt_factory_create(*this, desc);
+}
+
 
 // ----------------------------------------------------------------------------------------
 // Sources

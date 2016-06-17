@@ -60,6 +60,7 @@
 #define NETLIST_START(name)                                                    \
 void NETLIST_NAME(name)(netlist::setup_t &setup)                               \
 {
+
 #define NETLIST_END()  }
 
 #define LOCAL_SOURCE(name)                                                     \
@@ -77,8 +78,51 @@ void NETLIST_NAME(name)(netlist::setup_t &setup)                               \
 		NETLIST_NAME(model)(setup);                                            \
 		setup.namespace_pop();
 
+// -----------------------------------------------------------------------------
+// truthtable defines
+// -----------------------------------------------------------------------------
+
+#define TRUTHTABLE_START(cname, in, out, def_params) \
+	{ \
+		netlist::tt_desc desc; \
+		desc.name = #cname ; \
+		desc.classname = #cname ; \
+		desc.ni = in; \
+		desc.no = out; \
+		desc.def_param = pstring("+") + def_params; \
+		desc.family = "";
+
+#define TT_HEAD(x) \
+		desc.desc.push_back(x);
+
+#define TT_LINE(x) \
+		desc.desc.push_back(x);
+
+#define TT_FAMILY(x) \
+		desc.family = x;
+
+#define TRUTHTABLE_END() \
+		netlist::devices::tt_factory_create(setup, desc);		\
+	}
+
+
 namespace netlist
 {
+
+	// -----------------------------------------------------------------------------
+	// truthtable desc
+	// -----------------------------------------------------------------------------
+
+	struct tt_desc
+	{
+		pstring name;
+		pstring classname;
+		unsigned ni;
+		unsigned no;
+		pstring def_param;
+		plib::pstring_vector_t desc;
+		pstring family;
+	};
 
 	// -----------------------------------------------------------------------------
 	// param_ref_t
@@ -203,6 +247,10 @@ namespace netlist
 		const plib::plog_base<NL_DEBUG> &log() const;
 
 		std::vector<std::pair<pstring, base_factory_t *>> m_device_factory;
+
+		/* FIXME: truth table trampoline */
+
+		void tt_factory_create(tt_desc &desc);
 
 	protected:
 
