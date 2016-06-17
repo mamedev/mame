@@ -32,18 +32,19 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
 		m_inp_matrix(*this, "IN"),
-		m_video_ram(*this, "video_ram"),
-		m_color_ram(*this, "color_ram")
+		m_vram(*this, "vram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport_array<4> m_inp_matrix;
-	required_shared_ptr<UINT8> m_video_ram;
-	required_shared_ptr<UINT8> m_color_ram;
+	required_shared_ptr<UINT8> m_vram;
 
+	std::unique_ptr<UINT8[]> m_colorram;
 	UINT8 m_output;
 
+	DECLARE_READ8_MEMBER(colorram_r) { return m_colorram[(offset >> 2 & 0x1e0) | (offset & 0x1f)] | 0x0f; }
+	DECLARE_WRITE8_MEMBER(colorram_w) { m_colorram[(offset >> 2 & 0x1e0) | (offset & 0x1f)] = data & 0xf0; }
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(output_w);
 
@@ -54,6 +55,8 @@ public:
 
 void horse_state::machine_start()
 {
+	m_colorram = std::make_unique<UINT8 []>(0x200);
+	save_pointer(NAME(m_colorram.get()), 0x200);
 	save_item(NAME(m_output));
 }
 
@@ -71,8 +74,8 @@ UINT32 horse_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	{
 		for (int x = 0; x < 32; x++)
 		{
-			UINT8 data = m_video_ram[y << 5 | x];
-			UINT8 color = m_color_ram[(y << 3 & 0x780) | x] >> 4;
+			UINT8 data = m_vram[y << 5 | x];
+			UINT8 color = m_colorram[(y << 1 & 0x1e0) | x] >> 4;
 
 			for (int i = 0; i < 8; i++)
 				bitmap.pix16(y, x << 3 | i) = (data >> i & 1) ? color : 0;
@@ -93,8 +96,8 @@ UINT32 horse_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 static ADDRESS_MAP_START( horse_map, AS_PROGRAM, 8, horse_state )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x4000, 0x40ff) AM_DEVREADWRITE("i8155", i8155_device, memory_r, memory_w)
-	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x0800) AM_MASK(0x079f) AM_RAM AM_SHARE("color_ram")
+	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x0800) AM_READWRITE(colorram_r, colorram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( horse_io_map, AS_IO, 8, horse_state )
