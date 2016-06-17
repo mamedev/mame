@@ -40,7 +40,7 @@ TILE_GET_INFO_MEMBER(divebomb_state::get_fg_tile_info)
 K051316_CB_MEMBER(divebomb_state::zoom_callback_1)
 {
     *code |= (*color & 0x03) << 8;
-    *color = 0 + (roz_pal >> 4) & 3;
+    *color = 0 + ((roz_pal >> 4) & 3);
 }
 
 
