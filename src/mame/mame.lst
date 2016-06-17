@@ -10920,6 +10920,9 @@ dim68k                          //
 discoboy                        // (c) 1993 Soft Art Co.
 discoboyp                       // (c) 1993 Soft Art Co. (Promat license?)
 
+@source:divebomb.cpp
+divebomb                        // GX840 (c) 1989 (Japan)
+
 @source:diverboy.cpp
 diverboy                        // (c) 1992 Electronic Devices
 
