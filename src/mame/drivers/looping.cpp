@@ -573,11 +573,11 @@ static ADDRESS_MAP_START( looping_sound_map, AS_PROGRAM, 8, looping_state )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x3bff) AM_RAM
 	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x00f4) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, address_w)
+	AM_RANGE(0x3c01, 0x3c01) AM_MIRROR(0x00f6) AM_NOP
 	AM_RANGE(0x3c02, 0x3c02) AM_MIRROR(0x00f4) AM_READNOP AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x3c03, 0x3c03) AM_MIRROR(0x00f6) AM_NOP
 	AM_RANGE(0x3e00, 0x3e00) AM_MIRROR(0x00f4) AM_READNOP AM_DEVWRITE("tms", tms5220_device, data_w)
+	AM_RANGE(0x3e01, 0x3e01) AM_MIRROR(0x00f6) AM_NOP
 	AM_RANGE(0x3e02, 0x3e02) AM_MIRROR(0x00f4) AM_DEVREAD("tms", tms5220_device, status_r) AM_WRITENOP
-	AM_RANGE(0x3e03, 0x3e03) AM_MIRROR(0x00f6) AM_NOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( looping_sound_io_map, AS_IO, 8, looping_state )

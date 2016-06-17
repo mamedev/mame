@@ -326,7 +326,7 @@ static ADDRESS_MAP_START( 68030_1_map, AS_PROGRAM, 32, skimaxx_state )
 
 	AM_RANGE(0x20000050, 0x20000057) AM_READ(skimaxx_analog_r ) AM_WRITENOP // read (0-1f), write motor?
 
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_RAM AM_MIRROR(0x00020000)
+	AM_RANGE(0xfffc0000, 0xfffdffff) AM_RAM AM_MIRROR(0x00020000)
 ADDRESS_MAP_END
 
 

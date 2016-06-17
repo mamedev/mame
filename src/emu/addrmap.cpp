@@ -685,6 +685,28 @@ void address_map::map_validity_check(validity_checker &valid, const device_t &de
 		if ((bytestart & (alignunit - 1)) != 0 || (byteend & (alignunit - 1)) != (alignunit - 1))
 			osd_printf_error("Wrong %s memory read handler start = %08x, end = %08x ALIGN = %d\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, alignunit);
 
+		// verify mask/mirror/select
+		offs_t set_bits = entry.m_addrstart | entry.m_addrend;
+		offs_t changing_bits = entry.m_addrstart ^ entry.m_addrend;
+		changing_bits |= changing_bits >> 1;
+		changing_bits |= changing_bits >> 2;
+		changing_bits |= changing_bits >> 4;
+		changing_bits |= changing_bits >> 8;
+		changing_bits |= changing_bits >> 16;
+
+		if (entry.m_addrmask & ~changing_bits)
+			osd_printf_error("In %s memory range %x-%x, mask %x is trying to unmask an unchanging address bit (%x)\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmask & ~changing_bits);
+		if (entry.m_addrmirror & changing_bits)
+			osd_printf_error("In %s memory range %x-%x, mirror %x touches a changing address bit (%x)\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_addrmirror, entry.m_addrmirror & changing_bits);
+		if (entry.m_addrselect & changing_bits)
+			osd_printf_error("In %s memory range %x-%x, select %x touches a changing address bit (%x)\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_addrselect, entry.m_addrselect & changing_bits);
+		if (entry.m_addrmirror & set_bits)
+			osd_printf_error("In %s memory range %x-%x, mirror %x touches a set address bit (%x)\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_addrmirror, entry.m_addrmirror & set_bits);
+		if (entry.m_addrselect & set_bits)
+			osd_printf_error("In %s memory range %x-%x, select %x touches a set address bit (%x)\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_addrselect, entry.m_addrselect & set_bits);
+		if (entry.m_addrmirror & entry.m_addrselect)
+			osd_printf_error("In %s memory range %x-%x, mirror %x touches a select bit (%x)\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_addrmirror, entry.m_addrmirror & entry.m_addrselect);
+
 		// if this is a program space, auto-assign implicit ROM entries
 		if (entry.m_read.m_type == AMH_ROM && entry.m_region == nullptr)
 		{

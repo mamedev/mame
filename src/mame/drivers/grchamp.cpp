@@ -511,7 +511,7 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 8, grchamp_state )
 	AM_RANGE(0x19, 0x19) AM_MIRROR(0x60) AM_READ(pc3259_3_r)
 	AM_RANGE(0x00, 0x0f) AM_MIRROR(0x40) AM_WRITE(cpu0_outputs_w)
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0x40) AM_WRITE(main_to_sub_comm_w)
-	AM_RANGE(0x20, 0x2f) AM_MIRROR(0x53) AM_WRITE(led_board_w)
+	AM_RANGE(0x20, 0x20) AM_SELECT(0x0c) AM_MIRROR(0x53) AM_WRITE(led_board_w)
 ADDRESS_MAP_END
 
 
