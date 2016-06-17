@@ -10635,7 +10635,7 @@
 		<description>Riddle of the Maze (Prototype v2.01, 19940127)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
-		<part name="cdrom" interface="psx_cdrom">
+		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
 				<disk name="riddle of the maze (v2.01)(27-01-94)(testing - phase 2)"  sha1="77b129103e5053618de4773ad938e204ac5afb18"/>
 			</diskarea>
