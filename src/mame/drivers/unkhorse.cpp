@@ -44,8 +44,6 @@ public:
 
 	UINT8 m_output;
 
-	DECLARE_READ8_MEMBER(cram_trampoline_r) { return m_color_ram[offset & ~0x60]; }
-	DECLARE_WRITE8_MEMBER(cram_trampoline_w) { m_color_ram[offset & ~0x60] = data; }
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_WRITE_LINE_MEMBER(timer_out);
@@ -97,7 +95,7 @@ static ADDRESS_MAP_START( horse_map, AS_PROGRAM, 8, horse_state )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x4000, 0x40ff) AM_DEVREADWRITE("i8155", i8155_device, memory_r, memory_w)
 	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0x8000, 0x87ff) AM_READWRITE(cram_trampoline_r, cram_trampoline_w) AM_SHARE("color_ram") AM_MIRROR(0x0800)
+	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x0800) AM_MASK(0x079f) AM_RAM AM_SHARE("color_ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( horse_io_map, AS_IO, 8, horse_state )
