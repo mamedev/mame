@@ -55,7 +55,7 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	m_tempvar = make_unique_clear<UINT64[]>(NUM_TEMP_VARIABLES);
 
 	/* create a global symbol table */
-	m_symtable = global_alloc(symbol_table(&m_machine));
+	m_symtable = std::make_unique<symbol_table>(&m_machine);
 
 	// configure our base memory accessors
 	configure_memory(*m_symtable);
@@ -84,8 +84,6 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	/* add callback for breaking on VBLANK */
 	if (m_machine.first_screen() != nullptr)
 		m_machine.first_screen()->register_vblank_callback(vblank_state_delegate(FUNC(debugger_cpu::on_vblank), this));
-
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(debugger_cpu::exit), this));
 }
 
 void debugger_cpu::configure_memory(symbol_table &table)
@@ -163,7 +161,7 @@ bool debugger_cpu::is_stopped()
 
 symbol_table* debugger_cpu::get_global_symtable()
 {
-	return m_symtable;
+	return m_symtable.get();
 }
 
 
@@ -955,16 +953,6 @@ UINT64 debugger_cpu::read_opcode(address_space &space, offs_t address, int size)
 /***************************************************************************
     INTERNAL HELPERS
 ***************************************************************************/
-
-/*-------------------------------------------------
-    exit - free all memory
--------------------------------------------------*/
-
-void debugger_cpu::exit()
-{
-	global_free(m_symtable);
-}
-
 
 /*-------------------------------------------------
     on_vblank - called when a VBLANK hits
