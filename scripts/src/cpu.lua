@@ -2370,3 +2370,19 @@ if (CPUS["ALTO2"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/alto2/alto2dsm.cpp")
 end
 
+------------------------------------------
+-- Sun SPARC, Fujitus MB86901 implementation
+--@src/devices/cpu/sparc/sparc.h,CPUS["MB86901"] = true
+--------------------------------------------------
+
+if (CPUS["MB86901"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/sparc/mb86901.cpp",
+		MAME_DIR .. "src/devices/cpu/sparc/mb86901defs.h",
+		MAME_DIR .. "src/devices/cpu/sparc/sparc.h",
+	}
+end
+
+if (CPUS["MB86901"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sparc/sparcdasm.cpp")
+end

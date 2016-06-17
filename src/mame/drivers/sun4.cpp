@@ -386,7 +386,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/sparc/sparc.h"
 
 
 class sun4_state : public driver_device
@@ -401,7 +401,7 @@ public:
 };
 
 static ADDRESS_MAP_START(sun4_mem, AS_PROGRAM, 32, sun4_state)
-	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -416,7 +416,7 @@ void sun4_state::machine_reset()
 
 static MACHINE_CONFIG_START( sun4, sun4_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68020, 16670000) // SPARC32 on real system
+	MCFG_CPU_ADD("maincpu", MB86901, 16670000) // SPARC32 on real system
 	MCFG_CPU_PROGRAM_MAP(sun4_mem)
 MACHINE_CONFIG_END
 
@@ -515,7 +515,7 @@ U0501       Revision
 
 // Sun 4/300, Cypress Semiconductor CY7C601, Texas Instruments 8847 FPU
 ROM_START( sun4_300 )
-	ROM_REGION32_BE( 0x40000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "1035-09.rom", 0x0000, 0x10000, CRC(4ae2f2ad) SHA1(9c17a80b3ce3efdf18b5eca969f1565ddaad3116))
 	ROM_LOAD( "1036-09.rom", 0x0000, 0x10000, CRC(cb3d45a7) SHA1(9d5da09ff87ec52dc99ffabd1003d30811eafdb0))
 	ROM_LOAD( "1037-09.rom", 0x0000, 0x10000, CRC(4f005bea) SHA1(db3f6133ea7c497ba440bc797123dde41abea6fd))
@@ -534,31 +534,31 @@ ROM_END
 
 // SPARCstation IPC (Sun 4/40)
 ROM_START( sun4_40 )
-	ROM_REGION32_BE( 0x40000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "4.40_v2.9.rom", 0x0000, 0x40000, CRC(532fc20d) SHA1(d86d9e958017b3fecdf510d728a3e46a0ce3281d))
 ROM_END
 
 // SPARCstation IPX (Sun 4/50)
 ROM_START( sun4_50 )
-	ROM_REGION32_BE( 0x40000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipx-29.rom", 0x0000, 0x40000, CRC(1910aa65) SHA1(7d8832fea8e299b89e6ec7137fcde497673c14f8))
 ROM_END
 
 // SPARCstation SLC (Sun 4/20)
 ROM_START( sun4_20 )
-	ROM_REGION32_BE( 0x20000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "520-2748-04.rom", 0x0000, 0x20000, CRC(e85b3fd8) SHA1(4cbc088f589375e2d5983f481f7d4261a408702e))
 ROM_END
 
 // SPARCstation 1 (Sun 4/60)
 ROM_START( sun4_60 )
-	ROM_REGION32_BE( 0x20000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "ss1v29.rom", 0x0000, 0x20000, CRC(e3f103a9) SHA1(5e95835f1090ea94859bd005757f0e7b5e86181b))
 ROM_END
 
 // SPARCstation 2 (Sun 4/75)
 ROM_START( sun4_75 )
-	ROM_REGION32_BE( 0x40000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "ss2-29.rom", 0x0000, 0x40000, CRC(d04132b3) SHA1(ef26afafa2800b8e2e5e994b3a76ca17ce1314b1))
 ROM_END
 
