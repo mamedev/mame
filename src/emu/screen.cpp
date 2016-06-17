@@ -1572,6 +1572,7 @@ bool screen_device::update_quads()
 
 void screen_device::update_burnin()
 {
+// TODO: other than being unnecessary (we should use our rand function first off), this is a simplification of how analog signals really works!
 #undef rand
 	if (!m_burnin.valid())
 		return;
