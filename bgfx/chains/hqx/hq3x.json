@@ -30,7 +30,7 @@
 		{
 			"name": "scaled_out",
 			"mode": "guest",
-			"scale": 2,
+			"scale": 3,
 			"doublebuffer": true
 		},
 		{
