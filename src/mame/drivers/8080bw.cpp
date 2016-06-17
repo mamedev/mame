@@ -1237,12 +1237,32 @@ INPUT_PORTS_END
 /*                                                     */
 /*******************************************************/
 
+READ8_MEMBER(_8080bw_state::rollingc_scattered_colorram_r)
+{
+	return m_scattered_colorram[(offset & 0x1f) | ((offset & 0x1f00) >> 3)];
+}
+
+WRITE8_MEMBER(_8080bw_state::rollingc_scattered_colorram_w)
+{
+	m_scattered_colorram[(offset & 0x1f) | ((offset & 0x1f00) >> 3)] = data;
+}
+
+READ8_MEMBER(_8080bw_state::rollingc_scattered_colorram2_r)
+{
+	return m_scattered_colorram2[(offset & 0x1f) | ((offset & 0x1f00) >> 3)];
+}
+
+WRITE8_MEMBER(_8080bw_state::rollingc_scattered_colorram2_w)
+{
+	m_scattered_colorram2[(offset & 0x1f) | ((offset & 0x1f00) >> 3)] = data;
+}
+
 static ADDRESS_MAP_START( rollingc_map, AS_PROGRAM, 8, _8080bw_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0x4000, 0x5fff) AM_ROM
-	AM_RANGE(0xa000, 0xbfff) AM_MASK(0x1f1f) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0xe000, 0xffff) AM_MASK(0x1f1f) AM_RAM AM_SHARE("colorram2")
+	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(rollingc_scattered_colorram_r, rollingc_scattered_colorram_w)
+	AM_RANGE(0xe000, 0xffff) AM_READWRITE(rollingc_scattered_colorram2_r, rollingc_scattered_colorram2_w)
 ADDRESS_MAP_END
 
 
@@ -1271,6 +1291,16 @@ static INPUT_PORTS_START( rollingc )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:4" )
 INPUT_PORTS_END
 
+MACHINE_START_MEMBER(_8080bw_state,rollingc)
+{
+	m_scattered_colorram = std::make_unique<UINT8 []>(0x400);
+	m_scattered_colorram2 = std::make_unique<UINT8 []>(0x400);
+	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x400);
+	save_pointer(&m_scattered_colorram2[0], "m_scattered_colorram2", 0x400);
+
+	MACHINE_START_CALL_MEMBER(mw8080bw);
+}
+
 static MACHINE_CONFIG_DERIVED_CLASS( rollingc, mw8080bw_root, _8080bw_state )
 
 	/* basic machine hardware */
@@ -1290,6 +1320,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( rollingc, mw8080bw_root, _8080bw_state )
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
+
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,rollingc)
 MACHINE_CONFIG_END
 
 
@@ -1300,11 +1332,22 @@ MACHINE_CONFIG_END
 /*                                                     */
 /*******************************************************/
 
+
+READ8_MEMBER(_8080bw_state::schaser_scattered_colorram_r)
+{
+	return m_scattered_colorram[(offset & 0x1f) | ((offset & 0x1f80) >> 2)];
+}
+
+WRITE8_MEMBER(_8080bw_state::schaser_scattered_colorram_w)
+{
+	m_scattered_colorram[(offset & 0x1f) | ((offset & 0x1f80) >> 2)] = data;
+}
+
 static ADDRESS_MAP_START( schaser_map, AS_PROGRAM, 8, _8080bw_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0x4000, 0x5fff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_MASK(0x1f1f) AM_RAM AM_SHARE("colorram")
+	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(schaser_scattered_colorram_r, schaser_scattered_colorram_w)
 ADDRESS_MAP_END
 
 
@@ -1385,6 +1428,8 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(_8080bw_state,schaser)
 {
+	m_scattered_colorram = std::make_unique<UINT8 []>(0x800);
+	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
 	MACHINE_START_CALL_MEMBER(schaser_sh);
 	MACHINE_START_CALL_MEMBER(extra_8080bw_vh);
 	MACHINE_START_CALL_MEMBER(mw8080bw);
@@ -1558,7 +1603,7 @@ static ADDRESS_MAP_START( sflush_map, AS_PROGRAM, 8, _8080bw_state )
 	AM_RANGE(0x801a, 0x801a) AM_WRITENOP
 	AM_RANGE(0x801c, 0x801c) AM_WRITENOP
 	AM_RANGE(0x801d, 0x801d) AM_WRITENOP
-	AM_RANGE(0xa000, 0xbfff) AM_MASK(0x1f9f) AM_RAM AM_SHARE("colorram")
+	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(schaser_scattered_colorram_r, schaser_scattered_colorram_w)
 	AM_RANGE(0xd800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1592,13 +1637,21 @@ static INPUT_PORTS_START( sflush )
 INPUT_PORTS_END
 
 
+MACHINE_START_MEMBER(_8080bw_state,sflush)
+{
+	m_scattered_colorram = std::make_unique<UINT8 []>(0x800);
+	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
+
+	MACHINE_START_CALL_MEMBER(mw8080bw);
+}
+
 static MACHINE_CONFIG_DERIVED_CLASS( sflush, mw8080bw_root, _8080bw_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu",M6800,1500000) // ?
 	MCFG_CPU_PROGRAM_MAP(sflush_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", _8080bw_state, irq0_line_hold)
-	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,mw8080bw)
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,sflush)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -1772,6 +1825,8 @@ INTERRUPT_GEN_MEMBER(_8080bw_state::polaris_interrupt)
 
 MACHINE_START_MEMBER(_8080bw_state,polaris)
 {
+	m_scattered_colorram = std::make_unique<UINT8 []>(0x800);
+	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
 	save_item(NAME(m_polaris_cloud_speed));
 	save_item(NAME(m_polaris_cloud_pos));
 

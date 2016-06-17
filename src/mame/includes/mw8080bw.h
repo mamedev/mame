@@ -88,6 +88,9 @@ public:
 	UINT8       m_spcenctr_bright_control;
 	UINT8       m_spcenctr_brightness;
 
+	std::unique_ptr<UINT8[]> m_scattered_colorram;
+	std::unique_ptr<UINT8[]> m_scattered_colorram2;
+
 	/* timer */
 	emu_timer   *m_interrupt_timer;
 
