@@ -309,6 +309,12 @@ public:
 		m_bytemask = bytemask;
 	}
 
+	// Re-expand the bytemask after subunit fun
+	void expand_bytemask(offs_t previous_mask)
+	{
+		m_bytemask |= previous_mask;
+	}
+
 	// reconfigure the subunits on a base address change
 	void reconfigure_subunits(offs_t bytestart);
 
@@ -329,6 +335,7 @@ protected:
 	// Subunit description information
 	struct subunit_info
 	{
+		offs_t              m_bytemask;             // bytemask for this subunit
 		UINT32              m_mask;                 // mask (ff, ffff or ffffffff)
 		INT32               m_offset;               // offset to add to the address
 		UINT32              m_multiplier;           // multiplier to the pre-split address
@@ -3090,7 +3097,7 @@ void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t 
 		m_space.m_direct->force_update(entry);
 	}
 
-	// Ranges in range_partial must duplicated then partially changed
+	// Ranges in range_partial must be duplicated then partially changed
 	if (!range_partial.empty())
 	{
 		for (std::map<UINT16, std::list<subrange> >::const_iterator i = range_partial.begin(); i != range_partial.end(); ++i)
@@ -3106,10 +3113,7 @@ void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t 
 			// Get the original handler
 			handler_entry *base_entry = &handler(i->first);
 
-			// Verify it is compatible enough with ours given what we can
-			// support.
-			if (base_entry->bytemask() != bytemask)
-				throw emu_fatalerror("Handlers on different subunits of the same address with different address masks are not supported.");
+			offs_t previous_bytemask = base_entry->bytemask();
 
 			// Grab a new handler and copy it there
 			UINT16 entry = get_free_handler();
@@ -3125,6 +3129,8 @@ void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t 
 			// Populate it wherever needed
 			for (const auto & elem : i->second)
 				populate_range(elem.start, elem.end, entry);
+
+			curentry.expand_bytemask(previous_bytemask);
 
 			// Add it in the "to be setup" list
 			entries.push_back(entry);
@@ -4374,6 +4380,7 @@ void handler_entry::configure_subunits(UINT64 handlermask, int handlerbits, int 
 		UINT32 shift = (unitnum^shift_xor_mask) * handlerbits;
 		if (((handlermask >> shift) & unitmask) != 0)
 		{
+			m_subunit_infos[m_subunits].m_bytemask = m_bytemask;
 			m_subunit_infos[m_subunits].m_mask = unitmask;
 			m_subunit_infos[m_subunits].m_offset = cur_offset++;
 			m_subunit_infos[m_subunits].m_size = handlerbits;
@@ -4462,11 +4469,12 @@ void handler_entry::description(char *buffer) const
 		{
 			if (i)
 				*buffer++ = ' ';
-			buffer += sprintf (buffer, "%d:%d:%x:%d:%s",
+			buffer += sprintf (buffer, "%d:%d:%x:%d:%x:%s",
 								m_subunit_infos[i].m_size,
 								m_subunit_infos[i].m_shift,
 								m_subunit_infos[i].m_offset,
 								m_subunit_infos[i].m_multiplier,
+							    m_subunit_infos[i].m_bytemask,
 								subunit_name(i));
 		}
 	}
@@ -4713,7 +4721,7 @@ UINT16 handler_entry_read::read_stub_16(address_space &space, offs_t offset, UIN
 		{
 			offs_t aoffset = offset * si.m_multiplier + si.m_offset;
 			UINT8 val;
-			val = m_subread[index].r8(space, aoffset, submask);
+			val = m_subread[index].r8(space, aoffset & si.m_bytemask, submask);
 			result |= val << si.m_shift;
 		}
 	}
@@ -4740,10 +4748,10 @@ UINT32 handler_entry_read::read_stub_32(address_space &space, offs_t offset, UIN
 			switch (si.m_size)
 			{
 			case 8:
-				val = m_subread[index].r8(space, aoffset, submask);
+				val = m_subread[index].r8(space, aoffset & si.m_bytemask, submask);
 				break;
 			case 16:
-				val = m_subread[index].r16(space, aoffset, submask);
+				val = m_subread[index].r16(space, aoffset & si.m_bytemask, submask);
 				break;
 			}
 			result |= val << si.m_shift;
@@ -4772,13 +4780,13 @@ UINT64 handler_entry_read::read_stub_64(address_space &space, offs_t offset, UIN
 			switch (si.m_size)
 			{
 			case 8:
-				val = m_subread[index].r8(space, aoffset, submask);
+				val = m_subread[index].r8(space, aoffset & si.m_bytemask, submask);
 				break;
 			case 16:
-				val = m_subread[index].r16(space, aoffset, submask);
+				val = m_subread[index].r16(space, aoffset & si.m_bytemask, submask);
 				break;
 			case 32:
-				val = m_subread[index].r32(space, aoffset, submask);
+				val = m_subread[index].r32(space, aoffset & si.m_bytemask, submask);
 				break;
 			}
 			result |=  UINT64(val) << si.m_shift;
@@ -5006,7 +5014,7 @@ void handler_entry_write::write_stub_16(address_space &space, offs_t offset, UIN
 		{
 			offs_t aoffset = offset * si.m_multiplier + si.m_offset;
 			UINT8 adata = data >> si.m_shift;
-			m_subwrite[index].w8(space, aoffset, adata, submask);
+			m_subwrite[index].w8(space, aoffset & si.m_bytemask, adata, submask);
 		}
 	}
 }
@@ -5030,10 +5038,10 @@ void handler_entry_write::write_stub_32(address_space &space, offs_t offset, UIN
 			switch (si.m_size)
 			{
 			case 8:
-				m_subwrite[index].w8(space, aoffset, adata, submask);
+				m_subwrite[index].w8(space, aoffset & si.m_bytemask, adata, submask);
 				break;
 			case 16:
-				m_subwrite[index].w16(space, aoffset, adata, submask);
+				m_subwrite[index].w16(space, aoffset & si.m_bytemask, adata, submask);
 				break;
 			}
 		}
@@ -5059,13 +5067,13 @@ void handler_entry_write::write_stub_64(address_space &space, offs_t offset, UIN
 			switch (si.m_size)
 			{
 			case 8:
-				m_subwrite[index].w8(space, aoffset, adata, submask);
+				m_subwrite[index].w8(space, aoffset & si.m_bytemask, adata, submask);
 				break;
 			case 16:
-				m_subwrite[index].w16(space, aoffset, adata, submask);
+				m_subwrite[index].w16(space, aoffset & si.m_bytemask, adata, submask);
 				break;
 			case 32:
-				m_subwrite[index].w32(space, aoffset, adata, submask);
+				m_subwrite[index].w32(space, aoffset & si.m_bytemask, adata, submask);
 				break;
 			}
 		}
