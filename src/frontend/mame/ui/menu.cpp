@@ -185,6 +185,8 @@ void menu::exit(running_machine &machine)
 		mre.texture_free(sw_toolbar_texture[i]);
 		mre.texture_free(toolbar_texture[i]);
 	}
+
+	icons_bitmap.clear();
 }
 
 
