@@ -503,7 +503,7 @@ void menu::draw(UINT32 flags, float origx0, float origy0)
 	if (ui().show_fps_counter())
 	{
 		ui().draw_text_full(container, machine().video().speed_text().c_str(), 0.0f, 0.0f, 1.0f,
-				JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, rgb_t::white, rgb_t::black, nullptr, nullptr);
+				ui::text_layout::RIGHT, ui::text_layout::WORD, mame_ui_manager::OPAQUE, rgb_t::white, rgb_t::black, nullptr, nullptr);
 	}
 
 	bool const customonly = (flags & PROCESS_CUSTOM_ONLY);
@@ -695,7 +695,7 @@ void menu::draw(UINT32 flags, float origx0, float origy0)
 					container->add_line(visible_left + visible_width - ((visible_width - heading_width) / 2) + UI_BOX_LR_BORDER, line_y + 0.5f * line_height, visible_left + visible_width, line_y + 0.5f * line_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 				}
 				ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width,
-					JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+					ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 			}
 
 			// otherwise, draw the item on the left and the subitem text on the right
@@ -707,7 +707,7 @@ void menu::draw(UINT32 flags, float origx0, float origy0)
 
 				// draw the left-side text
 				ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width,
-					JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, &item_width, nullptr);
+					ui::text_layout::LEFT, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor, &item_width, nullptr);
 
 				// give 2 spaces worth of padding
 				item_width += 2.0f * gutter_width;
@@ -732,7 +732,7 @@ void menu::draw(UINT32 flags, float origx0, float origy0)
 
 				// draw the subitem right-justified
 				ui().draw_text_full(container, subitem_text, effective_left + item_width, line_y, effective_width - item_width,
-					JUSTIFY_RIGHT, WRAP_TRUNCATE, DRAW_NORMAL, subitem_invert ? fgcolor3 : fgcolor2, bgcolor, &subitem_width, nullptr);
+							ui::text_layout::RIGHT, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, subitem_invert ? fgcolor3 : fgcolor2, bgcolor, &subitem_width, nullptr);
 
 				// apply arrows
 				if (itemnum == selected && (pitem.flags & FLAG_LEFT_ARROW))
@@ -771,7 +771,7 @@ void menu::draw(UINT32 flags, float origx0, float origy0)
 
 		// compute the multi-line target width/height
 		ui().draw_text_full(container, pitem.subtext, 0, 0, visible_width * 0.75f,
-			JUSTIFY_RIGHT, WRAP_WORD, DRAW_NONE, rgb_t::white, rgb_t::black, &target_width, &target_height);
+			ui::text_layout::RIGHT, ui::text_layout::WORD, mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &target_width, &target_height);
 
 		// determine the target location
 		target_x = visible_left + visible_width - target_width - UI_BOX_LR_BORDER;
@@ -785,8 +785,9 @@ void menu::draw(UINT32 flags, float origx0, float origy0)
 				target_x + target_width + UI_BOX_LR_BORDER,
 				target_y + target_height + UI_BOX_TB_BORDER,
 				subitem_invert ? UI_SELECTED_BG_COLOR : UI_BACKGROUND_COLOR);
+
 		ui().draw_text_full(container, pitem.subtext, target_x, target_y, target_width,
-			JUSTIFY_RIGHT, WRAP_WORD, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, nullptr, nullptr);
+				ui::text_layout::RIGHT, ui::text_layout::WORD, mame_ui_manager::NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, nullptr, nullptr);
 	}
 
 	// if there is something special to add, do it by calling the virtual method
@@ -815,7 +816,7 @@ void menu::draw_text_box()
 
 	// compute the multi-line target width/height
 	ui().draw_text_full(container, text, 0, 0, 1.0f - 2.0f * UI_BOX_LR_BORDER - 2.0f * gutter_width,
-		JUSTIFY_LEFT, WRAP_WORD, DRAW_NONE, rgb_t::white, rgb_t::black, &target_width, &target_height);
+		ui::text_layout::LEFT, ui::text_layout::WORD, mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &target_width, &target_height);
 	target_height += 2.0f * line_height;
 	if (target_height > 1.0f - 2.0f * UI_BOX_TB_BORDER)
 		target_height = floorf((1.0f - 2.0f * UI_BOX_TB_BORDER) / line_height) * line_height;
@@ -845,7 +846,7 @@ void menu::draw_text_box()
 							target_y + target_height + UI_BOX_TB_BORDER,
 							(item[0].flags & FLAG_REDTEXT) ?  UI_RED_COLOR : UI_BACKGROUND_COLOR);
 	ui().draw_text_full(container, text, target_x, target_y, target_width,
-		JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+		ui::text_layout::LEFT, ui::text_layout::WORD, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 	// draw the "return to prior menu" text with a hilight behind it
 	highlight(container,
@@ -855,7 +856,7 @@ void menu::draw_text_box()
 				target_y + target_height,
 				UI_SELECTED_BG_COLOR);
 	ui().draw_text_full(container, backtext, target_x, target_y + target_height - line_height, target_width,
-		JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, nullptr, nullptr);
+		ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, nullptr, nullptr);
 
 	// artificially set the hover to the last item so a double-click exits
 	hover = item.size() - 1;
@@ -1592,8 +1593,8 @@ void menu::draw_select_game(UINT32 flags)
 
 				space = ud_arrow_width * 1.5f;
 			}
-			ui().draw_text_full(container, pitem.text, effective_left + space, line_y, effective_width - space, JUSTIFY_LEFT, WRAP_TRUNCATE,
-				DRAW_NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor, nullptr, nullptr);
+			ui().draw_text_full(container, pitem.text, effective_left + space, line_y, effective_width - space, ui::text_layout::LEFT, ui::text_layout::TRUNCATE,
+				mame_ui_manager::NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor, nullptr, nullptr);
 		}
 		else
 		{
@@ -1602,16 +1603,16 @@ void menu::draw_select_game(UINT32 flags)
 
 			// compute right space for subitem
 			ui().draw_text_full(container, pitem.subtext, effective_left, line_y, ui().get_string_width(pitem.subtext),
-				JUSTIFY_RIGHT, WRAP_NEVER, DRAW_NONE, item_invert ? fgcolor3 : fgcolor, bgcolor, &subitem_width, nullptr);
+				ui::text_layout::RIGHT, ui::text_layout::NEVER, mame_ui_manager::NONE, item_invert ? fgcolor3 : fgcolor, bgcolor, &subitem_width, nullptr);
 			subitem_width += gutter_width;
 
 			// draw the item left-justified
 			ui().draw_text_full(container, pitem.text, effective_left, line_y, effective_width - subitem_width,
-				JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor, &item_width, nullptr);
+				ui::text_layout::LEFT, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor, &item_width, nullptr);
 
 			// draw the subitem right-justified
 			ui().draw_text_full(container, pitem.subtext, effective_left + item_width, line_y, effective_width - item_width,
-				JUSTIFY_RIGHT, WRAP_NEVER, DRAW_NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor, nullptr, nullptr);
+				ui::text_layout::RIGHT, ui::text_layout::NEVER, mame_ui_manager::NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor, nullptr, nullptr);
 		}
 	}
 
@@ -1648,8 +1649,8 @@ void menu::draw_select_game(UINT32 flags)
 			container->add_line(visible_left, line + 0.5f * line_height, visible_left + visible_width, line + 0.5f * line_height,
 				UI_LINE_WIDTH, UI_TEXT_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		else
-			ui().draw_text_full(container, pitem.text, effective_left, line, effective_width, JUSTIFY_CENTER, WRAP_TRUNCATE,
-				DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+			ui().draw_text_full(container, pitem.text, effective_left, line, effective_width, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+				mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 		line += line_height;
 	}
 
@@ -2199,7 +2200,7 @@ float menu::draw_right_box_title(float x1, float y1, float x2, float y2)
 				bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
 		ui().draw_text_full(container, buffer[cells].c_str(), x1 + UI_LINE_WIDTH, y1, midl - UI_LINE_WIDTH,
-			JUSTIFY_CENTER, WRAP_NEVER, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr, text_size);
+			ui::text_layout::CENTER, ui::text_layout::NEVER, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, text_size);
 		x1 += midl;
 	}
 
@@ -2223,8 +2224,8 @@ std::string menu::arts_render_common(float origx1, float origy1, float origx2, f
 	// apply title to right panel
 	for (int x = FIRST_VIEW; x < LAST_VIEW; x++)
 	{
-		ui().draw_text_full(container, _(arts_info[x].first), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER,
-			WRAP_TRUNCATE, DRAW_NONE, rgb_t::white, rgb_t::black, &txt_lenght, nullptr);
+		ui().draw_text_full(container, _(arts_info[x].first), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER,
+			ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &txt_lenght, nullptr);
 		txt_lenght += 0.01f;
 		title_size = MAX(txt_lenght, title_size);
 	}
@@ -2242,8 +2243,8 @@ std::string menu::arts_render_common(float origx1, float origy1, float origx2, f
 		ui().draw_textured_box(container, origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
 			origy1 + line_height, bgcolor, rgb_t(43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
-	ui().draw_text_full(container, snaptext.c_str(), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-		DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr, tmp_size);
+	ui().draw_text_full(container, snaptext.c_str(), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+		mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, tmp_size);
 
 	draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::curimage_view, FIRST_VIEW, LAST_VIEW, title_size);
 
@@ -2297,7 +2298,7 @@ void menu::draw_toolbar(float x1, float y1, float x2, float y2, bool software)
 				hover = HOVER_B_FAV + z;
 				color = rgb_t::white;
 				float ypos = y2 + ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;
-				ui().draw_text_box(container, _(hover_msg[z]), JUSTIFY_CENTER, 0.5f, ypos, UI_BACKGROUND_COLOR);
+				ui().draw_text_box(container, _(hover_msg[z]), ui::text_layout::CENTER, 0.5f, ypos, UI_BACKGROUND_COLOR);
 			}
 
 			container->add_quad(x1, y1, x2, y2, color, t_texture[z], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
@@ -2732,7 +2733,7 @@ void menu::draw_palette_menu()
 		// if we don't have a subitem, just draw the string centered
 		else if (pitem.subtext == nullptr)
 			ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width,
-				JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+				ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 
 		// otherwise, draw the item on the left and the subitem text on the right
 		else
@@ -2742,7 +2743,7 @@ void menu::draw_palette_menu()
 
 			// draw the left-side text
 			ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width,
-				JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+				ui::text_layout::LEFT, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 
 			// give 2 spaces worth of padding
 			float subitem_width = ui().get_string_width("FF00FF00");
@@ -2867,8 +2868,8 @@ void menu::draw_dats_menu()
 		// draw dats text
 		else if (pitem.subtext == nullptr)
 		{
-			ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width, JUSTIFY_LEFT, WRAP_NEVER,
-				DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+			ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width, ui::text_layout::LEFT, ui::text_layout::NEVER,
+				mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 		}
 	}
 
@@ -2892,8 +2893,8 @@ void menu::draw_dats_menu()
 		else
 		{
 			highlight(container, line_x0, line_y0, line_x1, line_y1, bgcolor);
-			ui().draw_text_full(container, itemtext, effective_left, line, effective_width, JUSTIFY_CENTER, WRAP_TRUNCATE,
-				DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+			ui().draw_text_full(container, itemtext, effective_left, line, effective_width, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+				mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 		}
 		line += line_height;
 	}

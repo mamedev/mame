@@ -70,30 +70,6 @@ class menu_item;
 /* cancel return value for a UI handler */
 #define UI_HANDLER_CANCEL       ((UINT32)~0)
 
-/* justification options for ui_draw_text_full */
-enum
-{
-	JUSTIFY_LEFT = 0,
-	JUSTIFY_CENTER,
-	JUSTIFY_RIGHT
-};
-
-/* word wrapping options for ui_draw_text_full */
-enum
-{
-	WRAP_NEVER,
-	WRAP_TRUNCATE,
-	WRAP_WORD
-};
-
-/* drawing options for ui_draw_text_full */
-enum
-{
-	DRAW_NONE,
-	DRAW_NORMAL,
-	DRAW_OPAQUE
-};
-
 #define SLIDER_DEVICE_SPACING	0x0ff
 #define SLIDER_SCREEN_SPACING	0x0f
 #define SLIDER_INPUT_SPACING	0x0f
@@ -167,6 +143,13 @@ enum ui_callback_type
 class mame_ui_manager : public ui_manager, public slider_changed_notifier
 {
 public:
+	enum draw_mode
+	{
+		NONE,
+		NORMAL,
+		OPAQUE
+	};
+
 	// construction/destruction
 	mame_ui_manager(running_machine &machine);
 
@@ -222,8 +205,8 @@ public:
 	void draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor);
 	void draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t fgcolor, rgb_t bgcolor);
 	void draw_text(render_container *container, const char *buf, float x, float y);
-	void draw_text_full(render_container *container, const char *origs, float x, float y, float origwrapwidth, int justify, int wrap, int draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth = nullptr, float *totalheight = nullptr, float text_size = 1.0f);
-	void draw_text_box(render_container *container, const char *text, int justify, float xpos, float ypos, rgb_t backcolor);
+	void draw_text_full(render_container *container, const char *origs, float x, float y, float origwrapwidth, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap, draw_mode draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth = nullptr, float *totalheight = nullptr, float text_size = 1.0f);
+	void draw_text_box(render_container *container, const char *text, ui::text_layout::text_justify justify, float xpos, float ypos, rgb_t backcolor);
 	void draw_message_window(render_container *container, const char *text);
 
 	// load/save options to file

@@ -114,7 +114,7 @@ void menu_audit::handle()
 
 	if (m_first)
 	{
-		ui().draw_text_box(container, _("Audit in progress..."), JUSTIFY_CENTER, 0.5f, 0.5f, UI_GREEN_COLOR);
+		ui().draw_text_box(container, _("Audit in progress..."), ui::text_layout::CENTER, 0.5f, 0.5f, UI_GREEN_COLOR);
 		m_first = false;
 		return;
 	}

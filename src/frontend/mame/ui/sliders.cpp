@@ -226,7 +226,7 @@ void menu_sliders::custom_render(void *selectedref, float top, float bottom, flo
 
 		// determine the text height
 		ui().draw_text_full(container, tempstring.c_str(), 0, 0, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
-					JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NONE, rgb_t::white, rgb_t::black, nullptr, &text_height);
+					ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white, rgb_t::black, nullptr, &text_height);
 
 		// draw the thermometer
 		bar_left = x1 + UI_BOX_LR_BORDER;
@@ -253,7 +253,7 @@ void menu_sliders::custom_render(void *selectedref, float top, float bottom, flo
 
 		// draw the actual text
 		ui().draw_text_full(container, tempstring.c_str(), x1 + UI_BOX_LR_BORDER, y1 + line_height, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
-					JUSTIFY_CENTER, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, &text_height);
+					ui::text_layout::CENTER, ui::text_layout::WORD, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, &text_height);
 	}
 }
 

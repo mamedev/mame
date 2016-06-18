@@ -15,6 +15,7 @@
 
 #include "debug/express.h"
 #include "debug/debugcpu.h"
+#include "ui/text.h"
 
 
 //**************************************************************************
@@ -174,12 +175,12 @@ private:
 		void validate_format(const char *filename, int line);
 
 		// internal state
-		parsed_expression   m_condition;                    // condition under which this is executed
-		parsed_expression   m_expression;                   // expression to execute
-		std::string         m_format;                       // string format to print
-		std::vector<std::unique_ptr<output_argument>> m_arglist;             // list of arguments
-		INT8                m_line;                         // which line to print on
-		UINT8               m_justify;                      // justification when printing
+		parsed_expression   m_condition;							// condition under which this is executed
+		parsed_expression   m_expression;							// expression to execute
+		std::string         m_format;								// string format to print
+		std::vector<std::unique_ptr<output_argument>> m_arglist;	// list of arguments
+		INT8                m_line;									// which line to print on
+		ui::text_layout::text_justify m_justify;					// justification when printing
 
 		// constants
 		static const int MAX_ARGUMENTS = 32;
@@ -288,7 +289,7 @@ public:
 	void render_text(mame_ui_manager &mui, render_container &container);
 
 	// output helpers
-	std::string &get_output_astring(int row, int justify);
+	std::string &get_output_string(int row, ui::text_layout::text_justify justify);
 
 	// global helpers
 	static std::string quote_expression(const parsed_expression &expression);
@@ -305,7 +306,7 @@ private:
 	std::vector<std::unique_ptr<cheat_entry>> m_cheatlist;                   // cheat list
 	UINT64              m_framecount;                       // frame count
 	std::vector<std::string>  m_output;                     // array of output strings
-	std::vector<UINT8>        m_justify;                    // justification for each string
+	std::vector<ui::text_layout::text_justify> m_justify;	// justification for each string
 	UINT8               m_numlines;                         // number of lines available for output
 	INT8                m_lastline;                         // last line used for output
 	bool                m_disabled;                         // true if the cheat engine is disabled
