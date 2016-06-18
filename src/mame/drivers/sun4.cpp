@@ -423,7 +423,7 @@ protected:
 
 READ32_MEMBER( sun4_state::sun4_mmu_r )
 {
-	UINT8 asi = m_maincpu->fetch_asi();
+	UINT8 asi = m_maincpu->get_asi();
 
 	if (asi == 2 && !space.debugger_access())
 	{
@@ -439,11 +439,11 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 				return 0;
 
 			case 8: // (d-)cache tags
-				printf("sun4: read dcache tags @ %x, PC = %x\n", offset, m_maincpu->pc());
+				logerror("sun4: read dcache tags @ %x, PC = %x\n", offset, m_maincpu->pc());
 				return 0xffffffff;
 
 			case 9: // (d-)cache data
-				printf("sun4: read dcache data @ %x, PC = %x\n", offset, m_maincpu->pc());
+				logerror("sun4: read dcache data @ %x, PC = %x\n", offset, m_maincpu->pc());
 				return 0xffffffff;
 
 			case 0: // IDPROM - TODO: SPARCstation-1 does not have an ID prom and a timeout should occur.
@@ -456,13 +456,17 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 	{
 		return m_rom_ptr[offset & 0x1ffff];
 	}
+	else if (asi < 8 || asi > 11)
+	{
+		logerror("sun4: read asi %d byte offset %x, PC = %x\n", asi, offset << 2, m_maincpu->pc());
+	}
 
 	return 0;
 }
 
 WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 {
-	UINT8 asi = m_maincpu->fetch_asi();
+	UINT8 asi = m_maincpu->get_asi();
 
 	if (asi == 2)
 	{
@@ -476,12 +480,12 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 				m_system_enable = (UINT8)data;
 				return;
 
-			case 8: // cache tags3
-				printf("sun4: %08x to cache tags @ %x, PC = %x\n", data, offset, m_maincpu->pc());
+			case 8: // cache tags
+				logerror("sun4: %08x to cache tags @ %x, PC = %x\n", data, offset, m_maincpu->pc());
 				return;
 
 			case 9: // cache data
-				printf("sun4: %08x to cache data @ %x, PC = %x\n", data, offset, m_maincpu->pc());
+				logerror("sun4: %08x to cache data @ %x, PC = %x\n", data, offset, m_maincpu->pc());
 				return;
 
 			case 0: // IDPROM
@@ -489,24 +493,14 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 				return;
 		}
 	}
+	else if (asi < 8 || asi > 11)
+	{
+		logerror("sun4: %08x to asi %d byte offset %x, PC = %x\n", data, asi, offset << 2, m_maincpu->pc());
+	}
 }
 
-static ADDRESS_MAP_START(sun4_asi8, AS_USER_INSN, 32, sun4_state)
-	AM_RANGE(0x00000000, 0xefffffff) AM_READWRITE( sun4_mmu_r, sun4_mmu_w )
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(sun4_asi9, AS_SUPER_INSN, 32, sun4_state)
-	AM_RANGE(0x00000000, 0xefffffff) AM_READWRITE( sun4_mmu_r, sun4_mmu_w )
-	AM_RANGE(0xffe80000, 0xffefffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(sun4_asi10, AS_USER_DATA, 32, sun4_state)
-	AM_RANGE(0x00000000, 0xefffffff) AM_READWRITE( sun4_mmu_r, sun4_mmu_w )
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(sun4_asi11, AS_SUPER_DATA, 32, sun4_state)
-	AM_RANGE(0x00000000, 0xefffffff) AM_READWRITE( sun4_mmu_r, sun4_mmu_w )
-	AM_RANGE(0xffe80000, 0xffefffff) AM_ROM AM_REGION("user1", 0)
+static ADDRESS_MAP_START(sun4_mem, AS_PROGRAM, 32, sun4_state)
+	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE( sun4_mmu_r, sun4_mmu_w )
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -526,10 +520,7 @@ void sun4_state::machine_start()
 static MACHINE_CONFIG_START( sun4, sun4_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MB86901, 16670000)
-	MCFG_DEVICE_ADDRESS_MAP(AS_USER_INSN, sun4_asi8)
-	MCFG_DEVICE_ADDRESS_MAP(AS_SUPER_INSN, sun4_asi9)
-	MCFG_DEVICE_ADDRESS_MAP(AS_USER_DATA, sun4_asi10)
-	MCFG_DEVICE_ADDRESS_MAP(AS_SUPER_DATA, sun4_asi11)
+	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, sun4_mem)
 MACHINE_CONFIG_END
 
 /*
