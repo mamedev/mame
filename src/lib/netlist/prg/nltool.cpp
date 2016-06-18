@@ -135,12 +135,9 @@ private:
 
 void usage(tool_options_t &opts)
 {
-	pout("{}",
-		"Usage: nltool [options]\n"
-		"\n"
-		"Options:\n"
-	);
-	pout("{}\n", opts.help().cstr());
+	pout("{}\n", opts.help(
+			"nltool serves as the Swiss Army knife to run, test and convert netlists.",
+			"nltool [options]").cstr());
 }
 
 struct input_t

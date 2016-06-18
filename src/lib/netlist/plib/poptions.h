@@ -159,10 +159,15 @@ public:
 		{
 			pstring arg(argv[i]);
 			option *opt = nullptr;
+			pstring opt_arg;
+			bool has_equal_arg = false;
 
 			if (arg.startsWith("--"))
 			{
-				opt = getopt_long(arg.substr(2));
+				auto v = pstring_vector_t(arg.substr(2),"=");
+				opt = getopt_long(v[0]);
+				has_equal_arg = (v.size() > 1);
+				if (has_equal_arg) opt_arg = v[1];
 			}
 			else if (arg.startsWith("-"))
 			{
@@ -174,20 +179,58 @@ public:
 				return i;
 			if (opt->has_argument())
 			{
-				i++; // FIXME: are there more arguments?
-				if (opt->parse(argv[i]) != 0)
-					return i - 1;
+				if (has_equal_arg)
+				{
+					if (opt->parse(opt_arg) != 0)
+						return i;
+				}
+				else
+				{
+					i++; // FIXME: are there more arguments?
+					if (opt->parse(argv[i]) != 0)
+						return i - 1;
+				}
 			}
 			else
+			{
+				if (has_equal_arg)
+					return i;
 				opt->parse("");
+			}
 			i++;
 		}
 		return argc;
 	}
 
-	pstring help()
+	pstring split_paragraphs(pstring text, unsigned width, unsigned ident,
+			unsigned firstline_ident)
+	{
+		auto paragraphs = pstring_vector_t(text,"\n");
+		pstring ret("");
+
+		for (auto &p : paragraphs)
+		{
+			pstring line = pstring("").rpad(" ", firstline_ident);
+			for (auto &s : pstring_vector_t(p, " "))
+			{
+				if (line.len() + s.len() > width)
+				{
+					ret += line + "\n";
+					line = pstring("").rpad(" ", ident);
+				}
+				line += s + " ";
+			}
+			ret += line + "\n";
+		}
+		return ret;
+	}
+
+	pstring help(pstring description, pstring usage, unsigned width = 72, unsigned ident = 20)
 	{
 		pstring ret;
+
+		ret = split_paragraphs(description, width, 0, 0) + "\n";
+		ret += "Usage:\t" + usage + "\n\nOptions:\n";
 
 		for (auto & opt : m_opts )
 		{
@@ -221,18 +264,10 @@ public:
 			if (line.len() > 21)
 			{
 				ret += line + "\n";
-				line = pstring("").rpad(" ", 21);
+				ret += split_paragraphs(opt->help(), 72, 21, 21);
 			}
-			for (auto &s : pstring_vector_t(opt->help(), " "))
-			{
-				if (line.len() + s.len() > 72)
-				{
-					ret += line + "\n";
-					line = pstring("").rpad(" ", 21);
-				}
-				line += s + " ";
-			}
-			ret = ret + line + "\n";
+			else
+				ret += split_paragraphs(line + opt->help(), 72, 21, 0);
 		}
 		return ret;
 	}

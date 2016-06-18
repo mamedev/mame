@@ -18,15 +18,23 @@ public:
 		opt_amp(*this,	"a", "amp",    10000.0,      "amplification after mean correction"),
 		opt_verb(*this,	"v", "verbose",              "be verbose - this produces lots of output"),
 		opt_quiet(*this,"q", "quiet",                "be quiet - no warnings"),
-		opt_help(*this,	"h", "help",                 "display help")
+		opt_version(*this,	"",  "version",    		 "display version and exit"),
+		opt_help(*this,	"h", "help",                 "display help and exit")
 	{}
 	plib::option_str    opt_inp;
 	plib::option_str    opt_out;
 	plib::option_double opt_amp;
 	plib::option_bool   opt_verb;
 	plib::option_bool   opt_quiet;
+	plib::option_bool   opt_version;
 	plib::option_bool   opt_help;
 };
+
+plib::pstdout pout_strm;
+plib::pstderr perr_strm;
+
+plib::pstream_fmt_writer_t pout(pout_strm);
+plib::pstream_fmt_writer_t perr(perr_strm);
 
 /* http://de.wikipedia.org/wiki/RIFF_WAVE */
 class wav_t
@@ -196,26 +204,20 @@ void convert(nlwav_options_t &opts)
 		//printf("%f %f\n", t, v);
 #endif
 	}
-	printf("Mean (low freq filter): %f\n", mean);
-	printf("Mean (static):          %f\n", means / (double) n);
-	printf("Amp + %f\n", 32000.0 / (maxsam- mean));
-	printf("Amp - %f\n", -32000.0 / (minsam- mean));
+	pout("Mean (low freq filter): {}\n", mean);
+	pout("Mean (static):          {}\n", means / (double) n);
+	pout("Amp + {}\n", 32000.0 / (maxsam- mean));
+	pout("Amp - {}\n", -32000.0 / (minsam- mean));
 	wo.close();
 	fo.close();
 	fin.close();
 
 }
 
-void usage(nlwav_options_t &opts)
+void usage(plib::pstream_fmt_writer_t &fw, nlwav_options_t &opts)
 {
-	fprintf(stderr,
-		"Usage:\n"
-		"  nltool -help\n"
-		"  nltool [options]\n"
-		"\n"
-		"Where:\n"
-	);
-	fprintf(stderr, "%s\n", opts.help().cstr());
+	fw("{}\n", opts.help("Convert netlist log files into wav files.\n",
+			"nltool [options]").cstr());
 }
 
 
@@ -226,15 +228,27 @@ int main(int argc, char *argv[])
 
 	if ((ret = opts.parse(argc, argv)) != argc)
 	{
-		fprintf(stderr, "Error parsing %s\n", argv[ret]);
-		usage(opts);
+		perr("Error parsing {}\n", argv[ret]);
+		usage(perr, opts);
 		return 1;
 	}
 
 	if (opts.opt_help())
 	{
-		usage(opts);
-		return 1;
+		usage(pout, opts);
+		return 0;
+	}
+
+	if (opts.opt_version())
+	{
+		pout(
+			"nlwav (netlist) 0.1\n"
+			"Copyright (C) 2016 Couriersud\n"
+			"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
+			"This is free software: you are free to change and redistribute it.\n"
+			"There is NO WARRANTY, to the extent permitted by law.\n\n"
+			"Written by Couriersud.\n");
+		return 0;
 	}
 
 	convert(opts);
