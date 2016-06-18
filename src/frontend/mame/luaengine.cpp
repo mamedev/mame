@@ -568,8 +568,8 @@ luabridge::LuaRef lua_engine::l_memory_get_banks(const memory_manager *m)
 	lua_State *L = luaThis->m_lua_state;
 	luabridge::LuaRef table = luabridge::LuaRef::newTable(L);
 
-	for (memory_bank &bank : mm->banks()) {
-		table[bank.tag()] = &bank;
+	for (auto &bank : mm->banks()) {
+		table[bank.second->tag()] = bank.second.get();
 	}
 
 	return table;
@@ -586,8 +586,8 @@ luabridge::LuaRef lua_engine::l_memory_get_regions(const memory_manager *m)
 	lua_State *L = luaThis->m_lua_state;
 	luabridge::LuaRef table = luabridge::LuaRef::newTable(L);
 
-	for (memory_region &region: mm->regions()) {
-		table[region.name()] = &region;
+	for (auto &region: mm->regions()) {
+		table[region.second->name()] = &region;
 	}
 
 	return table;
@@ -644,8 +644,8 @@ luabridge::LuaRef lua_engine::l_ioport_get_ports(const ioport_manager *m)
 	lua_State *L = luaThis->m_lua_state;
 	luabridge::LuaRef port_table = luabridge::LuaRef::newTable(L);
 
-	for (ioport_port &port : im->ports()) {
-		port_table[port.tag()] = &port;
+	for (auto &port : im->ports()) {
+		port_table[port.second->tag()] = &port;
 	}
 
 	return port_table;
@@ -1977,9 +1977,9 @@ void lua_engine::update_machine()
 	if (m_machine!=nullptr)
 	{
 		// Create the ioport array
-		for (ioport_port &port : machine().ioport().ports())
+		for (auto &port : machine().ioport().ports())
 		{
-			for (ioport_field &field : port.fields())
+			for (ioport_field &field : port.second->fields())
 			{
 				if (field.type_class() != INPUT_CLASS_INTERNAL)
 				{

@@ -147,10 +147,10 @@ void debug_view_memory::enumerate_sources()
 				}
 
 	// then add all the memory regions
-	for (memory_region &region : machine().memory().regions())
+	for (auto &region : machine().memory().regions())
 	{
-		name = string_format("Region '%s'", region.name());
-		m_source_list.append(*global_alloc(debug_view_memory_source(name.c_str(), region)));
+		name = string_format("Region '%s'", region.second->name());
+		m_source_list.append(*global_alloc(debug_view_memory_source(name.c_str(), *region.second.get())));
 	}
 
 	// finally add all global array symbols

@@ -21433,7 +21433,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-<!-- confirmed as good by pete_j -->
+<!-- confirmed as good by peter_j -->
 	<software name="dismix1">
 		<description>Kikan Dismix Soukan-gou</description>
 		<year>1990</year>
@@ -21486,7 +21486,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-<!-- confirmed as good by pete_j -->
+<!-- confirmed as good by peter_j -->
 	<software name="dismix2">
 		<description>Kikan Dismix Dai-2-Gou</description>
 		<year>1990?</year>
@@ -27836,6 +27836,27 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 			</dataarea>
 		</part>
 	</software>
+	
+<!-- confirmed as good by peter_j -->
+	<software name="3dgolfb" cloneof="3dgolf">
+		<description>New 3D Golf Simulation - Harukanaru Augusta (Alt Format)</description>
+		<year>1989</year>
+		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
+		<info name="alt_title" value="３Ｄゴルフシュミレーション スーパーバージョン 遙かなるオーガスタ" />
+		<info name="release" value="19891020" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="new3dgolf.hdm" size="1261568" crc="8e447d00" sha1="c793efb25bdc6773e9a2ceec40d3412ecc338af8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Course Disk (Harukanaru Augusta)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="new3dgolf_augustamasters.hdm" size="1261568" crc="9bfb26f2" sha1="76ece544361e74010213cc65b08dc0d584a90f12" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="3dgolf8l" cloneof="3dgolf">
 		<description>New 3D Golf Simulation - Eight Lakes G.C.</description>
@@ -27848,6 +27869,22 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 			<feature name="part_id" value="Course Disk (Eight Lakes G.C.)"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="eight lakes g.c. - new 3d golf simulation - harukanaru augusta expansion 1.fdi" size="1265664" crc="e02c4e94" sha1="7f55ca3f729ce3e02d88579fbae05843465719ab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+<!-- confirmed as good by peter_j -->
+	<software name="3dgolf8la" cloneof="3dgolf">
+		<description>New 3D Golf Simulation - Eight Lakes G.C. (Alt Format)</description>
+		<year>1990</year>
+		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
+		<info name="alt_title" value="エイトレイクス ゴルフクラブ" />
+		<info name="release" value="19900323" />
+		<info name="usage" value="Requires &quot;NEW 3D Golf Simulation&quot; to work" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Course Disk (Eight Lakes G.C.)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="new3dgolf_eightlakes.hdm" size="1261568" crc="462a0e93" sha1="d66e541fb995ca2380f34cbec4923fb98d179482" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -27877,6 +27914,21 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 			<feature name="part_id" value="Course Disk (Waialae no Kiseki)"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="waialae no kiseki - harukanaru augusta expansion 4.fdi" size="1265664" crc="c40af1f5" sha1="f63067482ad01191d7dbcea8743c55ac0fcba117" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+<!-- confirmed as good by peter_j -->
+	<software name="3dgolfwka" cloneof="3dgolf">
+		<description>New 3D Golf Simulation - Waialae no Kiseki (Alt Format)</description>
+		<year>1991</year>
+		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
+		<info name="alt_title" value="ワイアラエの奇蹟" />
+		<info name="usage" value="Requires &quot;NEW 3D Golf Simulation&quot; to work" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Course Disk (Waialae no Kiseki)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="new3dgolf_waialae.hdm" size="1261568" crc="0731b826" sha1="4193d9a861e005deca3fc604dd2e0baff86a9d0c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -45742,7 +45794,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-<!-- confirmed as good by pete_j -->
+<!-- confirmed as good by peter_j -->
 	<software name="nankaisha" cloneof="nankaish" supported="no">
 		<description>Daikairei - Nankai no Shitou (Alt Format)</description>
 		<year>1989</year>
@@ -46268,7 +46320,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-<!-- confirmed as good by pete_j -->
+<!-- confirmed as good by peter_j -->
 	<software name="fundatna" cloneof="fundatn" supported="no">
 		<description>Fundation - Shinjuku Story (Alt Format)</description>
 		<year>1990</year>
@@ -49227,7 +49279,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-<!-- confirmed as good by pete_j -->
+<!-- confirmed as good by peter_j -->
 	<software name="puyopuyob" cloneof="puyopuyo" supported="no">
 		<description>Puyo Puyo (Alt Format 2)</description>
 		<year>1993</year>
@@ -49868,7 +49920,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-<!-- confirmed as good by pete_j -->
+<!-- confirmed as good by peter_j -->
 	<software name="slayersa" cloneof="slayers" supported="no">
 		<description>Slayers (Alt Format)</description>
 		<year>1994</year>
@@ -49971,7 +50023,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-<!-- confirmed as good by pete_j -->
+<!-- confirmed as good by peter_j -->
 	<software name="slipst93a" cloneof="slipst93" supported="no">
 		<description>Slip Stream '93 Rev-LIMIT (Alt Format)</description>
 		<year>1994</year>
@@ -50276,7 +50328,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-<!-- confirmed as good by pete_j -->
+<!-- confirmed as good by peter_j -->
 	<software name="tenchia" cloneof="tenchi" supported="no">
 		<description>Tenchi Muyo! - Ryououki (Alt Format)</description>
 		<year>1994</year>
@@ -50583,7 +50635,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-<!-- confirmed as good by pete_j -->
+<!-- confirmed as good by peter_j -->
 	<software name="trial4" supported="no">
 		<description>Trial of Fours</description>
 		<year>1992</year>
@@ -60617,7 +60669,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-<!-- confirmed as good by pete_j -->
+<!-- confirmed as good by peter_j -->
 	<software name="bio100a" cloneof="bio100" supported="no">
 		<description>Bio 100% Free Games Collection (Alt Format)</description>
 		<year>199?</year>

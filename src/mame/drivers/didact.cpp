@@ -468,10 +468,10 @@ ADDRESS_MAP_END
 
 // This address map is traced from schema
 static ADDRESS_MAP_START( md6802_map, AS_PROGRAM, 8, md6802_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_MIRROR(0x1800)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800)
 	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("pia1", pia6821_device, read, write) AM_MIRROR(0x1ffc)
 	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("pia2", pia6821_device, read, write) AM_MIRROR(0x1ffc)
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_MIRROR(0x1800) AM_REGION("maincpu", 0xe000)
+	AM_RANGE(0xe000, 0xe7ff) AM_ROM AM_MIRROR(0x1800) AM_REGION("maincpu", 0xe000)
 ADDRESS_MAP_END
 
 // This address map is traced from pcb

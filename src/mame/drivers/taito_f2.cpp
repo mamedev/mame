@@ -1183,7 +1183,7 @@ static ADDRESS_MAP_START( cameltrya_sound_map, AS_PROGRAM, 8, taitof2_state )
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
 //  AM_RANGE(0xb000, 0xb000) AM_WRITE(unknown_w)    // probably controlling sample player?
-	AM_RANGE(0xb000, 0xb001) AM_MIRROR(0x0001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
 

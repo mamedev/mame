@@ -67,7 +67,7 @@ public:
 			!pcap_compile_dl     || !pcap_close_dl        || !pcap_setfilter_dl ||
 			!pcap_sendpacket_dl  || !pcap_set_datalink_dl || !pcap_dispatch_dl)
 		{
-			osd_printf_error("Unable to load the PCAP library\n");
+			osd_printf_verbose("Unable to load the PCAP library\n");
 			return false;
 		}
 

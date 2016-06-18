@@ -434,7 +434,7 @@ static ADDRESS_MAP_START( ppj_io, AS_IO, 8, kurukuru_state )
 	AM_RANGE(0x60, 0x60) AM_MIRROR(0x0f) AM_READ_PORT("IN1")
 	AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) AM_READ_PORT("IN0")
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVWRITE("ym2149", ay8910_device, address_w)
-	AM_RANGE(0xc8, 0xc8) AM_MIRROR(0x0f) AM_DEVREAD("ym2149", ay8910_device, data_r)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREAD("ym2149", ay8910_device, data_r)
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_DEVWRITE("ym2149", ay8910_device, data_w)
 ADDRESS_MAP_END
 /*

@@ -982,7 +982,7 @@ static ADDRESS_MAP_START( drivedge_tms1_map, AS_PROGRAM, 32, itech32_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drivedge_tms2_map, AS_PROGRAM, 32, itech32_state )
-	AM_RANGE(0x008000, 0x0083ff) AM_MIRROR(0x8400) AM_RAM_WRITE(tms2_trigger_w) AM_SHARE("tms2_ram")
+	AM_RANGE(0x000000, 0x0003ff) AM_MIRROR(0x8400) AM_RAM_WRITE(tms2_trigger_w) AM_SHARE("tms2_ram")
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
 ADDRESS_MAP_END
 

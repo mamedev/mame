@@ -90,16 +90,6 @@ struct hash_parse_state
 
 
 /***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-
-static void *expat_malloc(size_t size);
-static void *expat_realloc(void *ptr, size_t size);
-static void expat_free(void *ptr);
-
-
-
-/***************************************************************************
     CORE IMPLEMENTATION
 ***************************************************************************/
 
@@ -358,8 +348,6 @@ static void hashfile_parse(hash_file *hashfile,
 	struct hash_parse_state state;
 	char buf[1024];
 	UINT32 len;
-	XML_Memory_Handling_Suite memcallbacks;
-
 	hashfile->file->seek(0, SEEK_SET);
 
 	memset(&state, 0, sizeof(state));
@@ -370,10 +358,7 @@ static void hashfile_parse(hash_file *hashfile,
 	state.param = param;
 
 	/* create the XML parser */
-	memcallbacks.malloc_fcn = expat_malloc;
-	memcallbacks.realloc_fcn = expat_realloc;
-	memcallbacks.free_fcn = expat_free;
-	state.parser = XML_ParserCreate_MM(nullptr, &memcallbacks, nullptr);
+	state.parser = XML_ParserCreate_MM(nullptr, nullptr, nullptr);
 	if (!state.parser)
 		goto done;
 
@@ -589,31 +574,4 @@ bool hashfile_extrainfo(device_image_interface &image, std::string &result)
 	// if no extrainfo has been found but we can try a compatible or a parent set, go back
 	while (!hashfound && open != -1);
 	return hashfound;
-}
-
-/***************************************************************************
-    EXPAT INTERFACES
-***************************************************************************/
-
-/*-------------------------------------------------
-    expat_malloc/expat_realloc/expat_free -
-    wrappers for memory allocation functions so
-    that they pass through out memory tracking
-    systems
--------------------------------------------------*/
-
-static void *expat_malloc(size_t size)
-{
-	return global_alloc_array_clear<UINT8>(size);
-}
-
-static void *expat_realloc(void *ptr, size_t size)
-{
-	if (ptr) global_free_array((UINT8 *)ptr);
-	return global_alloc_array_clear<UINT8>(size);
-}
-
-static void expat_free(void *ptr)
-{
-	global_free_array((UINT8 *)ptr);
 }

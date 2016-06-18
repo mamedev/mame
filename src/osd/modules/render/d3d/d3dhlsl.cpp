@@ -609,7 +609,7 @@ void shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 	d3dx_create_effect_from_file_ptr = d3dx9_dll->bind<d3dx_create_effect_from_file_fn>("D3DXCreateEffectFromFileW");
 	if (!d3dx_create_effect_from_file_ptr)
 	{
-		printf("Direct3D: Unable to find D3DXCreateEffectFromFileW\n");
+		osd_printf_verbose("Direct3D: Unable to find D3DXCreateEffectFromFileW\n");
 		d3dintf->post_fx_available = false;
 		return;
 	}
