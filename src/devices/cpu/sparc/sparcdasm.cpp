@@ -285,7 +285,15 @@ offs_t sparc_dasm(char *buffer, offs_t pc, UINT32 op)
 					print(buffer, "andn     %s,%d,%s", regnames[RS1], SIMM13, regnames[RD]);
 				break;
 			case 6:		print(buffer, "orn      %s,%d,%s", regnames[RS1], SIMM13, regnames[RD]); break;
-			case 7:		print(buffer, "xnor     %s,%d,%s", regnames[RS1], SIMM13, regnames[RD]); break;
+			case 7:
+				if (SIMM13 == 0)
+					if (RS1 == RD)
+						print(buffer, "not      %s", regnames[RD]);
+					else
+						print(buffer, "not      %s,%s", regnames[RS1], regnames[RD]);
+				else
+					print(buffer, "xnor     %s,%d,%s", regnames[RS1], SIMM13, regnames[RD]);
+				break;
 			case 8:		print(buffer, "addx     %s,%d,%s", regnames[RS1], SIMM13, regnames[RD]); break;
 			case 10:	print(buffer, "umul     %s,%d,%s", regnames[RS1], SIMM13, regnames[RD]); break; // SPARCv8
 			case 11:	print(buffer, "smul     %s,%d,%s", regnames[RS1], SIMM13, regnames[RD]); break; // SPARCv8
@@ -398,7 +406,13 @@ offs_t sparc_dasm(char *buffer, offs_t pc, UINT32 op)
 				else
 					print(buffer, "jmpl     %s,%d,%s", regnames[RS1], SIMM13, regnames[RD]);
 				break;
-			case 57:	print(buffer, "rett     %s,%d,%s", regnames[RS1], SIMM13, regnames[RD]); break;
+			case 57:
+			{
+				char address[256];
+				sparc_dasm_address(address, op);
+				print(buffer, "rett     %s", address);
+				break;
+			}
 			case 58:	print(buffer, "%s%s,%d,%s", trapnames[COND], regnames[RS1], IMM7, regnames[RD]); break;
 			case 59:
 				if (RD == 0)

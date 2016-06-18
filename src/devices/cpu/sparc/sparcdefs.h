@@ -95,6 +95,9 @@
 #define IS_SUPERVISOR		(m_psr & PSR_S_MASK)
 #define IS_USER				(!IS_SUPERVISOR)
 
+#define TRAPS_ENABLED		(m_psr & PSR_ET_MASK)
+#define TRAPS_DISABLED		(!TRAPS_ENABLED)
+
 #define OP		(op >> 30) // gangnam style
 #define OP2		((op >> 22) & 7)
 #define OP3		((op >> 19) & 63)
@@ -106,7 +109,7 @@
 #define CONST22 (op & 0x3fffff)
 #define SIMM13	(((INT32)(op << 19)) >> 19)
 #define IMM7	(op & 0x7f)
-
+#define SIMM7	(((INT32)(op << 25)) >> 25)
 #define OPIMM	(op & 0x00002000)
 #define USEIMM	((op >> 13) & 1)
 
@@ -127,5 +130,36 @@
 
 #define PC		m_pc
 #define nPC		m_npc
+
+enum sparc_trap_type
+{
+	sparc_reset = 0,
+	sparc_instruction_access_exception = 1,
+	sparc_illegal_instruction = 2,
+	sparc_privileged_instruction = 3,
+	sparc_floating_point_disabled = 4,
+	sparc_window_overflow = 5,
+	sparc_window_underflow = 6,
+	sparc_mem_address_not_aligned = 7,
+	sparc_floating_point_exception = 8,
+	sparc_data_access_exception = 9,
+	sparc_tag_overflow = 10,
+	sparc_int1 = 17,
+	sparc_int2 = 18,
+	sparc_int3 = 19,
+	sparc_int4 = 20,
+	sparc_int5 = 21,
+	sparc_int6 = 22,
+	sparc_int7 = 23,
+	sparc_int8 = 24,
+	sparc_int9 = 25,
+	sparc_int10 = 26,
+	sparc_int11 = 27,
+	sparc_int12 = 28,
+	sparc_int13 = 29,
+	sparc_int14 = 30,
+	sparc_int15 = 31,
+	sparc_trap_instruction = 128
+};
 
 #endif // __MB86901_DEFS_H__

@@ -46,11 +46,17 @@ public:
 	UINT32 pc() { return m_pc; }
 
 protected:
+	void queue_trap(UINT8 type, UINT8 tt_override = 0);
+	bool invoke_queued_traps();
+	bool check_main_traps(UINT32 op, bool privileged, UINT32 alignment, UINT8 registeralign, bool noimmediate);
+
 	void update_gpr_pointers();
 	void save_restore_update_cwp(UINT32 op, UINT8 new_cwp);
 	bool execute_group2(UINT32 op);
 	void execute_group3(UINT32 op);
 	bool execute_bicc(UINT32 op);
+	bool execute_ticc(UINT32 op);
+	bool evaluate_condition(UINT32 op);
 
 	// address spaces
 	const address_space_config m_as8_config;
@@ -102,6 +108,9 @@ protected:
 	UINT8 m_asi;
 
 	// other internal states
+	UINT8 m_trap_priorities[256];
+	UINT8 m_queued_tt;
+	UINT8 m_queued_priority;
 	UINT32 m_nextnpc;
 	int m_icount;
 
