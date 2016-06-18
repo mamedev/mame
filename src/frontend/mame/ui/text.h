@@ -145,6 +145,7 @@ private:
 	line *m_current_line;
 	size_t m_last_break;
 	size_t m_text_position;
+	bool m_truncating;
 
 	// methods
 	void add_text(const char *text, const char_style &style);
