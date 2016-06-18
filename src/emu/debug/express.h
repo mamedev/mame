@@ -117,9 +117,9 @@ protected:
 
 	// construction/destruction
 	symbol_entry(symbol_table &table, symbol_type type, const char *name, void *ref);
+public:
 	virtual ~symbol_entry();
 
-public:
 	// getters
 	symbol_entry *next() const { return m_next; }
 	const char *name() const { return m_name.c_str(); }
@@ -171,7 +171,7 @@ public:
 	symbol_table(void *globalref, symbol_table *parent = nullptr);
 
 	// getters
-	const tagged_list<symbol_entry> &entries() const { return m_symlist; }
+	const std::unordered_map<std::string, std::unique_ptr<symbol_entry>> &entries() const { return m_symlist; }
 	symbol_table *parent() const { return m_parent; }
 	void *globalref() const { return m_globalref; }
 
@@ -183,7 +183,7 @@ public:
 	void add(const char *name, UINT64 constvalue);
 	void add(const char *name, void *ref, getter_func getter, setter_func setter = nullptr);
 	void add(const char *name, void *ref, int minparams, int maxparams, execute_func execute);
-	symbol_entry *find(const char *name) const { return m_symlist.find(name); }
+	symbol_entry *find(const char *name) const { if (name) { auto search = m_symlist.find(name); if (search != m_symlist.end()) return search->second.get(); else return nullptr; } else return nullptr; }
 	symbol_entry *find_deep(const char *name);
 
 	// value getter/setter
@@ -199,7 +199,7 @@ private:
 	// internal state
 	symbol_table *          m_parent;           // pointer to the parent symbol table
 	void *                  m_globalref;        // global reference parameter
-	tagged_list<symbol_entry> m_symlist;        // list of symbols
+	std::unordered_map<std::string,std::unique_ptr<symbol_entry>> m_symlist;        // list of symbols
 	void *                  m_memory_param;     // callback parameter for memory
 	valid_func              m_memory_valid;     // validation callback
 	read_func               m_memory_read;      // read callback
