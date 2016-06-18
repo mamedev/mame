@@ -267,7 +267,7 @@ offs_t sparc_dasm(char *buffer, offs_t pc, UINT32 op)
 				if (RS1 == RD)
 					print(buffer, "btog     %d,%s", SIMM13, regnames[RD]);
 				else
-					print(buffer, "xor      %s,%d,%s", regnames[RS1], SIMM13, regnames[RD]); break;
+					print(buffer, "xor      %s,%d,%s", regnames[RS1], SIMM13, regnames[RD]);
 				break;
 			case 4:
 				if (RS1 == RD)
@@ -443,7 +443,7 @@ offs_t sparc_dasm(char *buffer, offs_t pc, UINT32 op)
 				if (RS1 == RD)
 					print(buffer, "btog     %s,%s", regnames[RS2], regnames[RD]);
 				else
-					print(buffer, "xor      %s,%s,%s", regnames[RS1], regnames[RS2], regnames[RD]); break;
+					print(buffer, "xor      %s,%s,%s", regnames[RS1], regnames[RS2], regnames[RD]);
 				break;
 			case 4:		print(buffer, "sub      %s,%s,%s", regnames[RS1], regnames[RS2], regnames[RD]); break;
 			case 5:
