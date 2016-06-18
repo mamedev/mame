@@ -201,7 +201,7 @@ M4300049A (relabeled J1100004A/K1100010A)
 1x m5m5517
 z80c
 
-a17_14 protection processor. 28 Pin Motorolla 15-00011-01 DA68235 (Labeled 8909)
+a17_14 protection processor. 28 Pin Motorola 15-00011-01 DA68235 (Labeled 8909)
 Next to MB14241
 
 Rom Daughterboard
@@ -245,7 +245,7 @@ void fortyl_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 WRITE8_MEMBER(fortyl_state::sound_command_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	synchronize(TIMER_NMI_CALLBACK, data);
 }
 
@@ -747,7 +747,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, fortyl_state )
 	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE("msm", msm5232_device, write)
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(sound_control_0_w)
 	AM_RANGE(0xce00, 0xce00) AM_WRITE(sound_control_1_w)
-	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_byte_r) AM_WRITE(to_main_w)
+	AM_RANGE(0xd800, 0xd800) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(to_main_w)
 	AM_RANGE(0xda00, 0xda00) AM_READNOP AM_WRITE(nmi_enable_w) /* unknown read */
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(nmi_disable_w)
 	AM_RANGE(0xde00, 0xde00) AM_READNOP AM_DEVWRITE("dac", dac_device, write_signed8)       /* signed 8-bit DAC - unknown read */
@@ -1069,6 +1069,8 @@ static MACHINE_CONFIG_START( 40love, fortyl_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(fortyl_state, sound_control_2_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(fortyl_state, sound_control_3_w))
@@ -1125,6 +1127,8 @@ static MACHINE_CONFIG_START( undoukai, fortyl_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(fortyl_state, sound_control_2_w))

@@ -8,6 +8,7 @@
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "machine/segaic16.h"
 #include "video/segaic16.h"
@@ -31,6 +32,7 @@ public:
 			m_bsprites(*this, "bsprites"),
 			m_ysprites(*this, "ysprites"),
 			m_segaic16vid(*this, "segaic16vid"),
+			m_soundlatch(*this, "soundlatch"),
 			m_digital_ports(*this, digital_ports),
 			m_adc_ports(*this, "ADC"),
 			m_pdrift_bank(0),
@@ -112,6 +114,7 @@ protected:
 	required_device<sega_sys16b_sprite_device> m_bsprites;
 	required_device<sega_yboard_sprite_device> m_ysprites;
 	required_device<segaic16_video_device> m_segaic16vid;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	// input ports
 	DECLARE_IOPORT_ARRAY(digital_ports);

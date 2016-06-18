@@ -2175,7 +2175,6 @@ static ADDRESS_MAP_START(marty_mem, AS_PROGRAM, 16, towns_state)
 	AM_RANGE(0x00f00000, 0x00f7ffff) AM_ROM AM_REGION("user",0x180000)  // FONT
 	AM_RANGE(0x00f80000, 0x00f8ffff) AM_DEVREADWRITE8("pcm", rf5c68_device, rf5c68_mem_r, rf5c68_mem_w, 0xffff)  // WAVE RAM
 	AM_RANGE(0x00fc0000, 0x00ffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ux_mem, AS_PROGRAM, 16, towns_state)
@@ -2200,7 +2199,6 @@ static ADDRESS_MAP_START(ux_mem, AS_PROGRAM, 16, towns_state)
 	AM_RANGE(0x00f00000, 0x00f7ffff) AM_ROM AM_REGION("user",0x180000)  // FONT
 	AM_RANGE(0x00f80000, 0x00f8ffff) AM_DEVREADWRITE8("pcm", rf5c68_device, rf5c68_mem_r, rf5c68_mem_w, 0xffff)  // WAVE RAM
 	AM_RANGE(0x00fc0000, 0x00ffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( towns_io , AS_IO, 32, towns_state)
@@ -2584,7 +2582,7 @@ void towns_state::driver_start()
 	// CD-ROM init
 	m_towns_cd.read_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::towns_cdrom_read_byte),this), (void*)machine().device("dma_1"));
 
-	m_maincpu->space(AS_PROGRAM).install_ram(0x100000,m_ram->size()-1,0xffffffff,0,nullptr);
+	m_maincpu->space(AS_PROGRAM).install_ram(0x100000,m_ram->size()-1,nullptr);
 }
 
 void marty_state::driver_start()
@@ -2731,6 +2729,7 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(towns_state,mb8877a_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", towns_floppies, "35hd", towns_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", towns_floppies, "35hd", towns_state::floppy_formats)
+	MCFG_SOFTWARE_LIST_ADD("fd_list","fmtowns_flop")
 
 	MCFG_CDROM_ADD("cdrom")
 	MCFG_CDROM_INTERFACE("fmt_cdrom")

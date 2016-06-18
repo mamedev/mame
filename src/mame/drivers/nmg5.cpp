@@ -209,7 +209,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
     ("do you want to draw a medal ?" question) :
       * BUTTON5 : Yes
       * BUTTON6 : No
-  - As hopper and other mecanisms aren't emulated, you can't
+  - As hopper and other mechanisms aren't emulated, you can't
     draw a medal (winnings are always converted to credits).
     I hope that someone will be able to fix that as I can't do it.
 
@@ -224,6 +224,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 #include "video/decospr.h"
@@ -238,11 +239,12 @@ public:
 		m_bg_videoram(*this, "bg_videoram"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bitmap(*this, "bitmap"),
-		m_sprgen(*this, "spritegen"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_oki(*this, "oki"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_sprgen(*this, "spritegen"),
+		m_soundlatch(*this, "soundlatch")
 	{ }
 
 	/* memory pointers */
@@ -251,7 +253,6 @@ public:
 	required_shared_ptr<UINT16> m_bg_videoram;
 	required_shared_ptr<UINT16> m_fg_videoram;
 	required_shared_ptr<UINT16> m_bitmap;
-	optional_device<decospr_device> m_sprgen;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -268,6 +269,8 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
+	optional_device<decospr_device> m_sprgen;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE16_MEMBER(fg_videoram_w);
 	DECLARE_WRITE16_MEMBER(bg_videoram_w);
@@ -308,7 +311,7 @@ WRITE16_MEMBER(nmg5_state::nmg5_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_byte_w(space, 0, data & 0xff);
+		m_soundlatch->write(space, 0, data & 0xff);
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -410,7 +413,7 @@ static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, nmg5_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(oki_banking_w)
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-	AM_RANGE(0x18, 0x18) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x18, 0x18) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
@@ -1003,6 +1006,8 @@ static MACHINE_CONFIG_START( nmg5, nmg5_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000) /* 4MHz */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))

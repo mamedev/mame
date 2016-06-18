@@ -18,10 +18,8 @@ namespace netlist
 		, m_CLK(*this, "CLK")
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
-		, m_nextD(0)
+		, m_nextD(*this, "m_nextD", 0)
 		{
-
-			save(NLNAME(m_nextD));
 		}
 
 		NETLIB_RESETI();
@@ -31,9 +29,9 @@ namespace netlist
 		logic_input_t m_CLK;
 		logic_output_t m_Q;
 		logic_output_t m_QQ;
-		INT8 m_nextD;
+		state_var<unsigned> m_nextD;
 
-		inline void newstate(const UINT8 stateQ, const UINT8 stateQQ);
+		inline void newstate(const netlist_sig_t stateQ, const netlist_sig_t stateQQ);
 
 	private:
 
@@ -95,7 +93,7 @@ namespace netlist
 		NETLIB_SUB(7474) m_2;
 	};
 
-	inline void NETLIB_NAME(7474sub)::newstate(const UINT8 stateQ, const UINT8 stateQQ)
+	inline void NETLIB_NAME(7474sub)::newstate(const netlist_sig_t stateQ, const netlist_sig_t stateQQ)
 	{
 		// 0: High-to-low 40 ns, 1: Low-to-high 25 ns
 		const netlist_time delay[2] = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };

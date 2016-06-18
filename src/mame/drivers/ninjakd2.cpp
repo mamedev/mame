@@ -153,6 +153,7 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
+#include "machine/gen_latch.h"
 #include "machine/mc8123.h"
 #include "includes/ninjakd2.h"
 
@@ -376,7 +377,7 @@ static ADDRESS_MAP_START( ninjakd2_main_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("PAD2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DIPSW1")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DIPSW2")
-	AM_RANGE(0xc200, 0xc200) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xc200, 0xc200) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xc201, 0xc201) AM_WRITE(ninjakd2_soundreset_w)
 	AM_RANGE(0xc202, 0xc202) AM_WRITE(ninjakd2_bankselect_w)
 	AM_RANGE(0xc203, 0xc203) AM_WRITE(ninjakd2_sprite_overdraw_w)
@@ -401,7 +402,7 @@ static ADDRESS_MAP_START( mnight_main_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("PAD2")
 	AM_RANGE(0xf803, 0xf803) AM_READ_PORT("DIPSW1")
 	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("DIPSW2")
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xfa00, 0xfa00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xfa01, 0xfa01) AM_WRITE(ninjakd2_soundreset_w)
 	AM_RANGE(0xfa02, 0xfa02) AM_WRITE(ninjakd2_bankselect_w)
 	AM_RANGE(0xfa03, 0xfa03) AM_WRITE(ninjakd2_sprite_overdraw_w)
@@ -417,7 +418,7 @@ static ADDRESS_MAP_START( robokid_main_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0xd000, 0xd3ff) AM_READWRITE(robokid_bg2_videoram_r, robokid_bg2_videoram_w)   // banked
 	AM_RANGE(0xd400, 0xd7ff) AM_READWRITE(robokid_bg1_videoram_r, robokid_bg1_videoram_w)   // banked
 	AM_RANGE(0xd800, 0xdbff) AM_READWRITE(robokid_bg0_videoram_r, robokid_bg0_videoram_w)   // banked
-	AM_RANGE(0xdc00, 0xdc00) AM_READ_PORT("KEYCOIN") AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xdc00, 0xdc00) AM_READ_PORT("KEYCOIN") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xdc01, 0xdc01) AM_READ_PORT("PAD1") AM_WRITE(ninjakd2_soundreset_w)
 	AM_RANGE(0xdc02, 0xdc02) AM_READ_PORT("PAD2") AM_WRITE(ninjakd2_bankselect_w)
 	AM_RANGE(0xdc03, 0xdc03) AM_READ_PORT("DIPSW1") AM_WRITE(ninjakd2_sprite_overdraw_w)
@@ -436,7 +437,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( omegaf_main_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("KEYCOIN") AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("KEYCOIN") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xc001, 0xc003) AM_READ(omegaf_io_protection_r)
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(ninjakd2_soundreset_w)
 	AM_RANGE(0xc002, 0xc002) AM_WRITE(ninjakd2_bankselect_w)
@@ -463,7 +464,7 @@ static ADDRESS_MAP_START( ninjakd2_sound_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(ninjakd2_pcm_play_w)
 ADDRESS_MAP_END
 
@@ -471,7 +472,7 @@ static ADDRESS_MAP_START( ninjakid_nopcm_sound_cpu, AS_PROGRAM, 8, ninjakd2_stat
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xf000, 0xf000) AM_NOP
 ADDRESS_MAP_END
 
@@ -882,18 +883,6 @@ static GFXDECODE_START( robokid )
 GFXDECODE_END
 
 
-
-/*************************************
- *
- *  Sound definitions
- *
- *************************************/
-
-WRITE_LINE_MEMBER(ninjakd2_state::irqhandler)
-{
-	m_soundcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 /*************************************
  *
  *  Machine drivers
@@ -963,8 +952,10 @@ static MACHINE_CONFIG_START( ninjakd2_core, ninjakd2_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("2203.1", YM2203, MAIN_CLOCK_12/8)       /* verified */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(ninjakd2_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)
 	MCFG_SOUND_ROUTE(2, "mono", 0.10)

@@ -66,10 +66,11 @@ Notes:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "cpu/mcs51/mcs51.h"
 #include "video/ramdac.h"
-#include "libjpeg/jpeglib.h"
+#include "jpeglib.h"
 
 
 #define FIFO_SIZE 1024
@@ -84,9 +85,10 @@ public:
 	sliver_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_colorram(*this, "colorram"),
 		m_audiocpu(*this, "audiocpu"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen"),
+		m_soundlatch(*this, "soundlatch"),
+		m_colorram(*this, "colorram") { }
 
 	UINT16 m_io_offset;
 	UINT16 m_io_reg[IO_SIZE];
@@ -101,6 +103,9 @@ public:
 	int m_clr_offset;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<screen_device> m_screen;
+	required_device<generic_latch_8_device> m_soundlatch;
 	required_shared_ptr<UINT8> m_colorram;
 	bitmap_rgb32 m_bitmap_fg;
 	bitmap_rgb32 m_bitmap_bg;
@@ -123,8 +128,6 @@ public:
 	void plot_pixel_pal(int x, int y, int addr);
 	void blit_gfx();
 	void render_jpeg();
-	required_device<cpu_device> m_audiocpu;
-	required_device<screen_device> m_screen;
 };
 
 void sliver_state::plot_pixel_rgb(int x, int y, UINT32 r, UINT32 g, UINT32 b)
@@ -316,7 +319,7 @@ WRITE16_MEMBER(sliver_state::io_data_w)
 
 WRITE16_MEMBER(sliver_state::sound_w)
 {
-	soundlatch_byte_w(space, 0, data & 0xff);
+	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(MCS51_INT0_LINE, HOLD_LINE);
 }
 
@@ -363,7 +366,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( soundmem_io, AS_IO, 8, sliver_state )
 	AM_RANGE(0x0100, 0x0100) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x0101, 0x0101) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x0101, 0x0101) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	/* ports */
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(oki_setbank )
 ADDRESS_MAP_END
@@ -485,6 +488,8 @@ static MACHINE_CONFIG_START( sliver, sliver_state )
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)

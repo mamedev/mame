@@ -69,12 +69,12 @@ namespace netlist
 		m_B.activate();
 		m_C.activate();
 		m_D.activate();
-		UINT8 t1 = INPLOGIC(m_A) & INPLOGIC(m_B);
-		UINT8 t2 = INPLOGIC(m_C) & INPLOGIC(m_D);
+		uint_fast8_t t1 = INPLOGIC(m_A) & INPLOGIC(m_B);
+		uint_fast8_t t2 = INPLOGIC(m_C) & INPLOGIC(m_D);
 
 		const netlist_time times[2] = { NLTIME_FROM_NS(22), NLTIME_FROM_NS(15) };
 
-		UINT8 res = 0;
+		uint_fast8_t res = 0;
 		if (t1 ^ 1)
 		{
 			if (t2 ^ 1)

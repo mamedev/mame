@@ -398,7 +398,7 @@ static ADDRESS_MAP_START( cupsocbl_sound_mem, AS_PROGRAM, 8, legionna_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(okim_rombank_w)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -1499,6 +1499,8 @@ static MACHINE_CONFIG_START( cupsocbl, legionna_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -2767,7 +2769,7 @@ GAME( 1992, heatbrlo, heatbrl,  heatbrl,  heatbrl, driver_device,  0,         RO
 GAME( 1992, heatbrlu, heatbrl,  heatbrl,  heatbrl, driver_device,  0,         ROT0, "TAD Corporation", "Heated Barrel (US)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1992, heatbrle, heatbrl,  heatbrl,  heatbrl, driver_device,  0,         ROT0, "TAD Corporation (Electronic Devices license)", "Heated Barrel (Electronic Devices license)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 
-GAME( 1993, godzilla, 0,        godzilla, godzilla, driver_device, 0,         ROT0, "Banpresto", "Godzilla (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1993, godzilla, 0,        godzilla, godzilla, driver_device, 0,         ROT0, "Banpresto", "Godzilla (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, grainbow, 0,        grainbow, grainbow, driver_device, 0,         ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1993, denjinmk, 0,        denjinmk, denjinmk, legionna_state,denjinmk,  ROT0, "Winkysoft (Banpresto license)", "Denjin Makai", MACHINE_IMPERFECT_GRAPHICS )
 

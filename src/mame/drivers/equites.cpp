@@ -663,9 +663,9 @@ static ADDRESS_MAP_START( equites_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x100000, 0x1001ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x140000, 0x1407ff) AM_READWRITE8(mcu_ram_r, mcu_ram_w, 0x00ff)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN1") AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x184000, 0x184001) AM_MIRROR(0x020000) AM_MASK(0x020000) AM_WRITE(equites_flipw_w)
-	AM_RANGE(0x188000, 0x188001) AM_MIRROR(0x020000) AM_MASK(0x020000) AM_WRITE(mcu_start_w)
-	AM_RANGE(0x18c000, 0x18c001) AM_MIRROR(0x020000) AM_MASK(0x020000) AM_WRITE(mcu_switch_w)
+	AM_RANGE(0x184000, 0x184001) AM_SELECT(0x020000) AM_WRITE(equites_flipw_w)
+	AM_RANGE(0x188000, 0x188001) AM_SELECT(0x020000) AM_WRITE(mcu_start_w)
+	AM_RANGE(0x18c000, 0x18c001) AM_SELECT(0x020000) AM_WRITE(mcu_switch_w)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("IN0") AM_WRITE(equites_scrollreg_w)
 	AM_RANGE(0x380000, 0x380001) AM_WRITE8(equites_bgcolor_w, 0xff00)
 	AM_RANGE(0x780000, 0x780001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
@@ -673,7 +673,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gekisou_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("nvram") // mainram is battery-backed
-	AM_RANGE(0x580000, 0x580001) AM_MIRROR(0x020000) AM_MASK(0x020000) AM_WRITE(gekisou_unknown_bit_w)
+	AM_RANGE(0x580000, 0x580001) AM_SELECT(0x020000) AM_WRITE(gekisou_unknown_bit_w)
 	AM_IMPORT_FROM( equites_map )
 ADDRESS_MAP_END
 
@@ -684,11 +684,11 @@ static ADDRESS_MAP_START( splndrbt_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x040000, 0x040fff) AM_RAM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN1")
-	AM_RANGE(0x0c0000, 0x0c0001) AM_MIRROR(0x020000) AM_MASK(0x020000) AM_WRITE8(equites_bgcolor_w, 0xff00) // note: addressmask does not apply here
-	AM_RANGE(0x0c0000, 0x0c0001) AM_MIRROR(0x020000) AM_MASK(0x020000) AM_WRITE8(equites_flipb_w, 0x00ff)
-	AM_RANGE(0x0c4000, 0x0c4001) AM_MIRROR(0x020000) AM_MASK(0x020000) AM_WRITE(mcu_start_w)
-	AM_RANGE(0x0c8000, 0x0c8001) AM_MIRROR(0x020000) AM_MASK(0x020000) AM_WRITE(mcu_switch_w)
-	AM_RANGE(0x0cc000, 0x0cc001) AM_MIRROR(0x020000) AM_MASK(0x020000) AM_WRITE(splndrbt_selchar_w)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_SELECT(0x020000) AM_WRITE8(equites_bgcolor_w, 0xff00) // note: addressmask does not apply here
+	AM_RANGE(0x0c0000, 0x0c0001) AM_SELECT(0x020000) AM_WRITE8(equites_flipb_w, 0x00ff)
+	AM_RANGE(0x0c4000, 0x0c4001) AM_SELECT(0x020000) AM_WRITE(mcu_start_w)
+	AM_RANGE(0x0c8000, 0x0c8001) AM_SELECT(0x020000) AM_WRITE(mcu_switch_w)
+	AM_RANGE(0x0cc000, 0x0cc001) AM_SELECT(0x020000) AM_WRITE(splndrbt_selchar_w)
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(splndrbt_bg_scrollx_w)
 	AM_RANGE(0x140000, 0x140001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(splndrbt_bg_scrolly_w)

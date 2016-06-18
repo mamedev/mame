@@ -45,11 +45,11 @@ public:
 
 	int window_init();
 
-	void update();
+	void update() override;
 	void toggle_full_screen();
 	void modify_prescale(int dir);
 	void resize(INT32 width, INT32 height);
-	void destroy();
+	void destroy() override;
 
 	void capture_pointer() override;
 	void release_pointer() override;
@@ -120,13 +120,6 @@ struct osd_draw_callbacks
 {
 	osd_renderer *(*create)(osd_window *window);
 };
-
-//============================================================
-//  GLOBAL VARIABLES
-//============================================================
-
-// window - list
-extern std::list<std::shared_ptr<sdl_window_info>> sdl_window_list;
 
 //============================================================
 //  PROTOTYPES

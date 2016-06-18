@@ -35,14 +35,14 @@ menu_custom_ui::menu_custom_ui(mame_ui_manager &mui, render_container *container
 {
 	// load languages
 	file_enumerator path(mui.machine().options().language_path());
-	const char *lang = mui.machine().options().language();
+	auto lang = mui.machine().options().language();
 	const osd_directory_entry *dirent;
 	int cnt = 0;
 	while ((dirent = path.next()) != nullptr)
 		if (dirent->type == ENTTYPE_DIR && strcmp(dirent->name, ".") != 0 && strcmp(dirent->name, "..") != 0)
 		{
 			auto name = std::string(dirent->name);
-			int i = strreplace(name, "_", " (");
+			auto i = strreplace(name, "_", " (");
 			if (i > 0) name = name.append(")");
 			m_lang.push_back(name);
 			if (strcmp(name.c_str(), lang) == 0)
@@ -1002,7 +1002,7 @@ void menu_rgb_ui::inkey_special(const event *menu_event)
 	}
 }
 
-menu_palette_sel::palcolor menu_palette_sel::m_palette[] = {
+std::vector<std::pair<const char *, const char *>> menu_palette_sel::m_palette = {
 	{ __("White"),  "FFFFFFFF" },
 	{ __("Silver"), "FFC0C0C0" },
 	{ __("Gray"),   "FF808080" },
@@ -1057,8 +1057,8 @@ void menu_palette_sel::handle()
 
 void menu_palette_sel::populate()
 {
-	for (int x = 0; x < ARRAY_LENGTH(m_palette); ++x)
-		item_append(_(m_palette[x].name), m_palette[x].argb, FLAG_UI_PALETTE, (void *)(FPTR)(x + 1));
+	for (int x = 0; x < m_palette.size(); ++x)
+		item_append(_(m_palette[x].first), m_palette[x].second, FLAG_UI_PALETTE, (void *)(FPTR)(x + 1));
 
 	item_append(menu_item_type::SEPARATOR);
 }

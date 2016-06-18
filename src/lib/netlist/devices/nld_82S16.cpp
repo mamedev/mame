@@ -22,8 +22,8 @@ namespace netlist
 		, m_WEQ(*this, "WEQ")
 		, m_DIN(*this, "DIN")
 		, m_DOUTQ(*this, "DOUTQ")
+		, m_ram(*this, "m_ram", 0)
 		{
-			save(NLNAME(m_ram));
 		}
 
 		NETLIB_RESETI();
@@ -38,8 +38,7 @@ namespace netlist
 		logic_input_t m_DIN;
 		logic_output_t m_DOUTQ;
 
-		//netlist_state_t<UINT8[256]> m_ram;
-		UINT64 m_ram[4]; // 256 bits
+		state_var<uint_fast64_t[4]> m_ram; // 256 bits
 	};
 
 	NETLIB_OBJECT_DERIVED(82S16_dip, 82S16)
@@ -88,7 +87,7 @@ namespace netlist
 
 			if (!INPLOGIC(m_WEQ))
 			{
-				m_ram[adr >> 6] = (m_ram[adr >> 6] & ~((UINT64) 1 << (adr & 0x3f))) | ((UINT64) INPLOGIC(m_DIN) << (adr & 0x3f));
+				m_ram[adr >> 6] = (m_ram[adr >> 6] & ~((uint_fast64_t) 1 << (adr & 0x3f))) | ((uint_fast64_t) INPLOGIC(m_DIN) << (adr & 0x3f));
 			}
 			OUTLOGIC(m_DOUTQ, ((m_ram[adr >> 6] >> (adr & 0x3f)) & 1) ^ 1, NLTIME_FROM_NS(20));
 		}

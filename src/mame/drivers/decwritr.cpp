@@ -8,6 +8,8 @@
 
 **************************************************************************/
 
+// tech manual: http://manx.classiccmp.org/mirror/vt100.net/docs/la120-tm/la120tm1.pdf
+
 #include "emu.h"
 #include "render.h"
 #include "cpu/i8085/i8085.h"
@@ -120,6 +122,18 @@ WRITE8_MEMBER( decwriter_state::la120_LED_w )
 	(m_led_array&0x1)?"PAPER OUT":"---------" );
 }
 
+/* todo: er1400 device */
+/* control lines:
+   3 2 1
+   0 0 0 Standby
+   0 0 1 Read
+   0 1 0 Erase
+   0 1 1 Write
+   1 0 0 <unused>
+   1 0 1 Shift data out
+   1 1 0 Accept address
+   1 1 1 Accept data
+   */
 READ8_MEMBER( decwriter_state::la120_NVR_r )
 {
 	return 0xFF;
@@ -128,22 +142,65 @@ READ8_MEMBER( decwriter_state::la120_NVR_r )
 WRITE8_MEMBER( decwriter_state::la120_NVR_w )
 {
 }
+
+/* todo: fully reverse engineer DC305 ASIC */
+/* read registers: all 4 registers read the same set of 8 bits, but what register is being read may be selectable by writing
+   Tech manual implies this register is an 8-bit position counter of where the carriage head currently is located.
+   0 = 1 = 2 = 3
+   data bits:
+   76543210
+   |||||||\- ?
+   ||||||\-- ?
+   |||||\--- ?
+   ||||\---- ?
+   |||\----- ?
+   ||\------ ?
+   |\------- ?
+   \-------- ?
+ */
 READ8_MEMBER( decwriter_state::la120_DC305_r )
 {
-	return 0xFF;
+	UINT8 data = 0x00;
+	logerror("DC305 Read from offset %01x, returning %02X\n", offset, data);
+	return data;
 }
+/* write registers:
+   0 = ? (a bunch of data written here on start, likely motor control and setup bits)
+   1 = ? (one byte written here, possibly voltage control, 0x00 or could be dot fifo write?)
+   2 = ?
+   3 = ?
+   there are at least two bits in here to enable the 2.5ms tick interrupt(rst3) and the dot interrupt/linefeed(rtc expired) interrupt(rst5)
+   the dot fifo is 4 bytes long, dot int fires when it is half empty
+   at least 3 bits control the speaker/buzzer which can be on or off, at least two volume levels, and at least two frequencies, 400hz or 2400hz
+   two quadrature lines from the head servomotor connect here to allow the dc305 to determine motor position; one pulses when the motor turns clockwise and one when it turns counterclockwise. the head stop is found when the pulses stop, which firmware uses to find the zero position.
+ */
 WRITE8_MEMBER( decwriter_state::la120_DC305_w )
 {
+	logerror("DC305 Write of %02X to offset %01X\n", data, offset);
 }
 
+/*
+ * 8080  address map (x = ignored; * = selects address within this range)
+   a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  a3  a2  a1  a0
+   0   0   0   0   *   *   *   *   *   *   *   *   *   *   *   *     R      ROMS0 (e6 first half OR e6,e8)
+   0   0   0   1   *   *   *   *   *   *   *   *   *   *   *   *     R      ROMS1 (e6 second half OR e12,e17)
+   0   0   1   0   0   *   *   *   *   *   *   *   *   *   *   *     R      ROMS2 (e4)
+   0   0   1   0   1   *   *   *   *   *   *   *   *   *   *   *     R      ROMS2 (open bus)
+   0   0   1   1   x   x   x   x   x   x   x   *   *   *   *   *     RW     KBD(R)/LED(W)
+   0   1   0   0   x   x   *   *   *   *   *   *   *   *   *   *     RW     RAM0 (e7,e13)
+   0   1   0   1   x   x   *   *   *   *   *   *   *   *   *   *     RW     RAM1 (e9,e18)
+   0   1   1   0   x   *   *   *   x   x   x   x   x   x   x   *     RW     NVM (ER1400,e39)
+   0   1   1   1   x   x   x   x   x   x   x   x   x   x   *   *     RW     PTR (DC305 ASIC,e25)
+   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *            Expansion space (open bus)
+ */
 static ADDRESS_MAP_START(la120_mem, AS_PROGRAM, 8, decwriter_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x2fff ) AM_ROM
-	AM_RANGE( 0x3000, 0x3fff ) AM_READWRITE(la120_KBD_r, la120_LED_w) // keyboard read, write to status and 7seg LEDS
+	AM_RANGE( 0x0000, 0x27ff ) AM_ROM
+	AM_RANGE( 0x3000, 0x301f ) AM_READWRITE(la120_KBD_r, la120_LED_w) AM_MIRROR(0xFE0) // keyboard read, write to status and 7seg LEDS
 	AM_RANGE( 0x4000, 0x43ff ) AM_MIRROR(0x0c00) AM_RAM // 1k 'low ram'
 	AM_RANGE( 0x5000, 0x53ff ) AM_MIRROR(0x0c00) AM_RAM // 1k 'high ram'
-	AM_RANGE( 0x6000, 0x6fff ) AM_MIRROR(0x08fe) AM_READWRITE(la120_NVR_r, la120_NVR_w) // ER1400 EAROM
-	AM_RANGE( 0x7000, 0x7003 ) AM_MIRROR(0x0ffc) AM_READWRITE(la120_DC305_r, la120_DC305_w) // DC305 printer controller ASIC stuff; since this can generate interrupts this needs to be split to its own device.
+	AM_RANGE( 0x6000, 0x67ff ) /*AM_MIRROR(0x08fe)*/AM_MIRROR(0x800) AM_READWRITE(la120_NVR_r, la120_NVR_w) // ER1400 EAROM; a10,9,8 are c3,2,1, a0 is clk, data i/o on d7, d0 always reads as 0 (there may have once been a second er1400 with data i/o on d0, sharing same address controls as the d7 one, not populated on shipping boards), d1-d6 read open bus
+	AM_RANGE( 0x7000, 0x7003 ) AM_MIRROR(0x0ffc) AM_READWRITE(la120_DC305_r, la120_DC305_w) // DC305 printer controller ASIC stuff; since this can generate interrupts (dot interrupt, lf interrupt, 2.5ms interrupt) this needs to be split to its own device.
 	// 8000-ffff is reserved for expansion (i.e. unused, open bus)
 ADDRESS_MAP_END
 
@@ -160,7 +217,7 @@ static ADDRESS_MAP_START(la120_io, AS_IO, 8, decwriter_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7C) AM_DEVREADWRITE("i8251", i8251_device, data_r, data_w) // 8251 Data
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x7C) AM_DEVREADWRITE("i8251", i8251_device, status_r, control_w) // 8251 Status/Control
-	//AM_RANGE(0x02, 0x02) AM_MIRROR(0x7D) // other io ports
+	//AM_RANGE(0x02, 0x02) AM_MIRROR(0x7D) // other io ports, serial loopback etc, see table 4-9 in TM
 	// 0x80-0xff are reserved for expansion (i.e. unused, open bus)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
@@ -206,7 +263,7 @@ static INPUT_PORTS_START( la120 )
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("[ {") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("- _") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')
 		PORT_BIT(0x60, IP_ACTIVE_HIGH, IPT_UNUSED)
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_TOGGLE PORT_NAME("Caps lock") PORT_CODE(KEYCODE_CAPSLOCK) // TODO: does the physical switch toggle?
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_TOGGLE PORT_NAME("Caps lock") PORT_CODE(KEYCODE_CAPSLOCK) // This key has a physical toggle
 	PORT_START("COL5")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Num 0") PORT_CODE(KEYCODE_0_PAD)
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/ ?") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')

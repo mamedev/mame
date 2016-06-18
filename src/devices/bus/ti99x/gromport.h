@@ -475,12 +475,12 @@ class rpk;
 
 class rpk_socket
 {
-	friend class simple_list<rpk_socket>;
 	friend class rpk;
 
 public:
 	rpk_socket(const char *id, int length, UINT8 *contents);
 	rpk_socket(const char *id, int length, UINT8 *contents, const char *pathname);
+	~rpk_socket() {}
 
 	const char*     id() { return m_id; }
 	int             get_content_length() { return m_length; }
@@ -492,7 +492,6 @@ public:
 private:
 	const char*     m_id;
 	UINT32          m_length;
-	rpk_socket*     m_next;
 	UINT8*          m_contents;
 	const char*     m_pathname;
 };
@@ -507,8 +506,8 @@ public:
 
 private:
 	int             find_file(util::archive_file &zip, const char *filename, UINT32 crc);
-	rpk_socket*     load_rom_resource(util::archive_file &zip, xml_data_node* rom_resource_node, const char* socketname);
-	rpk_socket*     load_ram_resource(emu_options &options, xml_data_node* ram_resource_node, const char* socketname, const char* system_name);
+	std::unique_ptr<rpk_socket> load_rom_resource(util::archive_file &zip, xml_data_node* rom_resource_node, const char* socketname);
+	std::unique_ptr<rpk_socket> load_ram_resource(emu_options &options, xml_data_node* ram_resource_node, const char* socketname, const char* system_name);
 	const pcb_type* m_types;
 };
 
@@ -528,9 +527,9 @@ private:
 	emu_options&            m_options;      // need this to find the path to the nvram files
 	int                     m_type;
 	//const char*             m_system_name;  // need this to find the path to the nvram files
-	tagged_list<rpk_socket> m_sockets;
+	std::unordered_map<std::string,std::unique_ptr<rpk_socket>> m_sockets;
 
-	void add_socket(const char* id, rpk_socket *newsock);
+	void add_socket(const char* id, std::unique_ptr<rpk_socket> newsock);
 };
 
 enum rpk_open_error

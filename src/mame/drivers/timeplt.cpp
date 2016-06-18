@@ -137,7 +137,7 @@ static ADDRESS_MAP_START( common_main_map, AS_PROGRAM, 8, timeplt_state )
 	AM_RANGE(0xc300, 0xc300) AM_MIRROR(0x0c9f) AM_READ_PORT("IN0")
 	AM_RANGE(0xc302, 0xc302) AM_MIRROR(0x0cf1) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xc304, 0xc304) AM_MIRROR(0x0cf1) AM_DEVWRITE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w)
-	AM_RANGE(0xc30a, 0xc30c) AM_MIRROR(0x0cf1) AM_WRITE(coincounter_w)
+	AM_RANGE(0xc30a, 0xc30d) AM_MIRROR(0x0cf0) AM_WRITE(coincounter_w) // handler ignores low bit of offset
 	AM_RANGE(0xc320, 0xc320) AM_MIRROR(0x0c9f) AM_READ_PORT("IN1")
 	AM_RANGE(0xc340, 0xc340) AM_MIRROR(0x0c9f) AM_READ_PORT("IN2")
 	AM_RANGE(0xc360, 0xc360) AM_MIRROR(0x0c9f) AM_READ_PORT("DSW0")

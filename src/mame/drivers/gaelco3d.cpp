@@ -486,7 +486,7 @@ WRITE16_MEMBER(gaelco3d_state::tms_reset_w)
 	/* it does not ever appear to be touched after that */
 	if (LOG)
 		logerror("%06X:tms_reset_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
-		m_tms->set_input_line(INPUT_LINE_RESET, (data == 0xffff) ? CLEAR_LINE : ASSERT_LINE);
+	m_tms->set_input_line(INPUT_LINE_RESET, (data == 0xffff) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

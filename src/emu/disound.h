@@ -70,9 +70,6 @@ public:
 	public:
 		sound_route(int output, int input, float gain, const char *target, UINT32 mixoutput);
 
-		sound_route *next() const { return m_next; }
-
-		sound_route *       m_next;             // pointer to next route
 		UINT32              m_output;           // output index, or ALL_OUTPUTS
 		UINT32              m_input;            // target input index
 		UINT32              m_mixoutput;        // target mixer output
@@ -85,10 +82,10 @@ public:
 	virtual ~device_sound_interface();
 
 	// configuration access
-	const simple_list<sound_route> &routes() const { return m_route_list; }
+	const std::vector<std::unique_ptr<sound_route>> &routes() const { return m_route_list; }
 
 	// static inline configuration helpers
-	static sound_route &static_add_route(device_t &device, UINT32 output, const char *target, double gain, UINT32 input = AUTO_ALLOC_INPUT, UINT32 mixoutput = 0);
+	static void static_add_route(device_t &device, UINT32 output, const char *target, double gain, UINT32 input = AUTO_ALLOC_INPUT, UINT32 mixoutput = 0);
 	static void static_reset_routes(device_t &device);
 
 	// sound stream update overrides
@@ -114,7 +111,7 @@ protected:
 	virtual void interface_pre_reset() override;
 
 	// internal state
-	simple_list<sound_route> m_route_list;      // list of sound routes
+	std::vector<std::unique_ptr<sound_route>> m_route_list;      // list of sound routes
 	int             m_outputs;                  // number of outputs from this instance
 	int             m_auto_allocated_inputs;    // number of auto-allocated inputs targeting us
 };

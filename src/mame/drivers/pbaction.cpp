@@ -38,7 +38,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 
   - There is an ingame bug that prevents you to get a bonus life at 1000000 points
     when you set the "Bonus Life" Dip Switch to "200k 1000k" :
-      * Bonus life table index starts at 0x63c6 (8 * 2 butes, LSB first) :
+      * Bonus life table index starts at 0x63c6 (8 * 2 bites, LSB first) :
 
           63C6: D6 63   "70k 200k"          -> 04 07 03 02 01 10
           63C8: DC 63   "70k 200k 1000k"    -> 04 07 03 02 02 01 01 10
@@ -74,7 +74,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 
 WRITE8_MEMBER(pbaction_state::pbaction_sh_command_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0x00);
 }
 
@@ -109,7 +109,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pbaction_sound_map, AS_PROGRAM, 8, pbaction_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xffff, 0xffff) AM_WRITENOP    /* watchdog? */
 ADDRESS_MAP_END
 
@@ -262,11 +262,13 @@ INTERRUPT_GEN_MEMBER(pbaction_state::pbaction_interrupt)
 
 void pbaction_state::machine_start()
 {
+	save_item(NAME(m_nmi_mask));
 	save_item(NAME(m_scroll));
 }
 
 void pbaction_state::machine_reset()
 {
+	m_nmi_mask = 0;
 	m_scroll = 0;
 }
 
@@ -305,6 +307,8 @@ static MACHINE_CONFIG_START( pbaction, pbaction_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

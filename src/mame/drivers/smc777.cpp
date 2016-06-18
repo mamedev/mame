@@ -608,9 +608,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( smc777_io, AS_IO, 8, smc777_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x07) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(vram_r, vram_w)
-	AM_RANGE(0x08, 0x0f) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(attr_r, attr_w)
-	AM_RANGE(0x10, 0x17) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(pcg_r, pcg_w)
+	AM_RANGE(0x00, 0x07) AM_SELECT(0xff00) AM_READWRITE(vram_r, vram_w)
+	AM_RANGE(0x08, 0x0f) AM_SELECT(0xff00) AM_READWRITE(attr_r, attr_w)
+	AM_RANGE(0x10, 0x17) AM_SELECT(0xff00) AM_READWRITE(pcg_r, pcg_w)
 	AM_RANGE(0x18, 0x19) AM_MIRROR(0xff00) AM_WRITE(mc6845_w)
 	AM_RANGE(0x1a, 0x1b) AM_MIRROR(0xff00) AM_READWRITE(key_r, key_w)
 	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0xff00) AM_READWRITE(system_input_r, system_output_w)
@@ -633,7 +633,7 @@ static ADDRESS_MAP_START( smc777_io, AS_IO, 8, smc777_state )
 //  AM_RANGE(0x40, 0x47) ieee-488
 //  AM_RANGE(0x48, 0x4f) hdd (winchester)
 	AM_RANGE(0x51, 0x51) AM_MIRROR(0xff00) AM_READ_PORT("JOY_1P") AM_WRITE(color_mode_w)
-	AM_RANGE(0x52, 0x52) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_WRITE(ramdac_w)
+	AM_RANGE(0x52, 0x52) AM_SELECT(0xff00) AM_WRITE(ramdac_w)
 	AM_RANGE(0x53, 0x53) AM_MIRROR(0xff00) AM_DEVWRITE("sn1", sn76489a_device, write)
 //  AM_RANGE(0x54, 0x59) vrt controller
 //  AM_RANGE(0x5a, 0x5b) ram banking
@@ -641,7 +641,7 @@ static ADDRESS_MAP_START( smc777_io, AS_IO, 8, smc777_state )
 //  AM_RANGE(0x74, 0x74) ieee-488 rom
 //  AM_RANGE(0x75, 0x75) vrt controller rom
 //  AM_RANGE(0x7e, 0x7f) kanji rom
-	AM_RANGE(0x80, 0xff) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(fbuf_r, fbuf_w)
+	AM_RANGE(0x80, 0xff) AM_SELECT(0xff00) AM_READWRITE(fbuf_r, fbuf_w)
 ADDRESS_MAP_END
 
 /* Input ports */

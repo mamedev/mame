@@ -164,6 +164,7 @@ private:
 };
 
 // ======================> osd_interface
+class osd_window;
 
 // description of the currently-running machine
 class osd_common_t : public osd_interface, osd_output
@@ -237,6 +238,8 @@ public:
 	void set_verbose(bool print_verbose) { m_print_verbose = print_verbose; }
 
 	void notify(const char *outname, INT32 value) const { m_output->notify(outname, value); }
+
+	static std::list<std::shared_ptr<osd_window>> s_window_list;
 protected:
 	virtual bool input_init();
 	virtual void input_pause();

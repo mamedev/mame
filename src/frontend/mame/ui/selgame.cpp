@@ -217,14 +217,14 @@ void menu_select_game::handle()
 		else if (menu_event->iptkey == IPT_UI_SELECT)
 		{
 			// handle selections
-			if (is_focus(focused_menu::main))
+			if (get_focus() == focused_menu::main)
 			{
 				if (isfavorite())
 					inkey_select_favorite(menu_event);
 				else
 					inkey_select(menu_event);
 			}
-			else if (is_focus(focused_menu::left))
+			else if (get_focus() == focused_menu::left)
 			{
 				l_hover = highlight;
 				check_filter = true;
@@ -236,6 +236,11 @@ void menu_select_game::handle()
 			// handle IPT_CUSTOM (mouse right click)
 			if (!isfavorite())
 				menu::stack_push<menu_machine_configure>(ui(), container, (const game_driver *)m_prev_selected, menu_event->mouse.x0, menu_event->mouse.y0);
+			else
+			{
+				ui_software_info *sw = (ui_software_info *)m_prev_selected;
+				menu::stack_push<menu_machine_configure>(ui(), container, (const game_driver *)sw->driver, menu_event->mouse.x0, menu_event->mouse.y0);
+			}
 		}
 		else if (menu_event->iptkey == IPT_UI_LEFT)
 		{
@@ -417,7 +422,7 @@ void menu_select_game::handle()
 			inkey_special(menu_event);
 		}
 		else if (menu_event->iptkey == IPT_UI_CONFIGURE)
-			inkey_configure(menu_event);
+			inkey_navigation();
 
 		else if (menu_event->iptkey == IPT_OTHER)
 		{
@@ -435,7 +440,7 @@ void menu_select_game::handle()
 		}
 		else if (menu_event->iptkey == IPT_UI_CONFIGURE)
 		{
-			inkey_configure(menu_event);
+			inkey_navigation();
 		}
 		else if (menu_event->iptkey == IPT_OTHER)
 		{
@@ -590,7 +595,7 @@ void menu_select_game::populate()
 		}
 	}
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, FLAG_UI, nullptr);
+	item_append(menu_item_type::SEPARATOR);
 
 	// add special items
 	if (menu::stack_has_special_main_menu())
@@ -664,11 +669,11 @@ void menu_select_game::build_available_list()
 	// now check and include NONE_NEEDED
 	for (int x = 0; x < m_total; ++x)
 	{
-		const game_driver *driver = &driver_list::driver(x);
+		auto driver = &driver_list::driver(x);
 		if (!m_included[x] && driver != &GAME_NAME(___empty))
 		{
 			const rom_entry *rom = driver->rom;
-			bool noroms = true;
+			auto noroms = true;
 
 			// check NO-DUMP
 			for (; !ROMENTRY_ISEND(rom) && noroms == true; ++rom)
@@ -685,8 +690,8 @@ void menu_select_game::build_available_list()
 				int cx = driver_list::clone(*driver);
 				if (cx != -1 && m_included[cx])
 				{
-					const game_driver *drv = &driver_list::driver(cx);
-					const rom_entry *parentrom = drv->rom;
+					auto drv = &driver_list::driver(cx);
+					auto parentrom = drv->rom;
 					if ((rom = driver->rom) == parentrom)
 						noroms = true;
 
@@ -703,7 +708,7 @@ void menu_select_game::build_available_list()
 									continue;
 
 								UINT64 lenght = ROM_GETLENGTH(rom);
-								bool found = false;
+								auto found = false;
 								for (parentrom = drv->rom; !ROMENTRY_ISEND(parentrom) && found == false; ++parentrom)
 								{
 									if (ROMENTRY_ISFILE(parentrom) && ROM_GETLENGTH(parentrom) == lenght)
@@ -1028,8 +1033,7 @@ void menu_select_game::inkey_select(const event *menu_event)
 	{
 		if (m_prev_selected != nullptr)
 			menu::stack_push<menu_machine_configure>(ui(), container, (const game_driver *)m_prev_selected);
-		else
-			return;
+		return;
 	}
 
 	// special case for configure plugins
@@ -1093,18 +1097,16 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 	// special case for configure options
 	if ((FPTR)ui_swinfo == CONF_OPTS)
 		menu::stack_push<menu_game_options>(ui(), container);
-	/* special case for configure machine TODO
+	// special case for configure machine
 	else if ((FPTR)ui_swinfo == CONF_MACHINE)
 	{
 	    if (m_prev_selected != nullptr)
 	    {
 	        ui_software_info *swinfo = (ui_software_info *)m_prev_selected;
-	        if (swinfo->startempty == 1)
-	            menu::stack_push(ui(), container, swinfo->driver);
+			menu::stack_push<menu_machine_configure>(ui(), container, (const game_driver *)swinfo->driver);
 	    }
-	    else
-	        return;
-	} */
+		return;
+	}
 	// special case for configure plugins
 	else if ((FPTR)ui_swinfo == CONF_PLUGINS)
 	{
@@ -1239,40 +1241,59 @@ void menu_select_game::inkey_special(const event *menu_event)
 }
 
 
-void menu_select_game::inkey_configure(const event *menu_event)
+void menu_select_game::inkey_navigation()
 {
-	if (is_focus(focused_menu::main))
+	switch (get_focus())
 	{
-		if (selected <= visible_items)
-		{
-			m_prev_selected = item[selected].ref;
-			selected = visible_items + 1;
-		}
-		else
-		{
-			if (ui_globals::panels_status != HIDE_LEFT_PANEL)
-				set_focus(focused_menu::left);
-
-			else if (ui_globals::panels_status == HIDE_BOTH)
+		case focused_menu::main:
+			if (selected <= visible_items)
 			{
+				m_prev_selected = item[selected].ref;
+				selected = visible_items + 1;
+			}
+			else
+			{
+				if (ui_globals::panels_status != HIDE_LEFT_PANEL)
+					set_focus(focused_menu::left);
+
+				else if (ui_globals::panels_status == HIDE_BOTH)
+				{
+					for (int x = 0; x < item.size(); ++x)
+						if (item[x].ref == m_prev_selected)
+							selected = x;
+				}
+				else
+				{
+					set_focus(focused_menu::righttop);
+				}
+			}
+			break;
+
+		case focused_menu::left:
+			if (ui_globals::panels_status != HIDE_RIGHT_PANEL)
+			{
+				set_focus(focused_menu::righttop);
+			}
+			else
+			{
+				set_focus(focused_menu::main);
+				if (m_prev_selected == nullptr)
+				{
+					selected = 0;
+					return;
+				}
+
 				for (int x = 0; x < item.size(); ++x)
 					if (item[x].ref == m_prev_selected)
 						selected = x;
 			}
-			else
-			{
-				set_focus(focused_menu::righttop);
-			}
-		}
-	}
-	else if (is_focus(focused_menu::left))
-	{
-		if (ui_globals::panels_status != HIDE_RIGHT_PANEL)
-		{
-			set_focus(focused_menu::righttop);
-		}
-		else
-		{
+			break;
+
+		case focused_menu::righttop:
+			set_focus(focused_menu::rightbottom);
+			break;
+
+		case focused_menu::rightbottom:
 			set_focus(focused_menu::main);
 			if (m_prev_selected == nullptr)
 			{
@@ -1283,24 +1304,7 @@ void menu_select_game::inkey_configure(const event *menu_event)
 			for (int x = 0; x < item.size(); ++x)
 				if (item[x].ref == m_prev_selected)
 					selected = x;
-		}
-	}
-	else if (is_focus(focused_menu::righttop))
-	{
-		set_focus(focused_menu::rightbottom);
-	}
-	else if (is_focus(focused_menu::rightbottom))
-	{
-		set_focus(focused_menu::main);
-		if (m_prev_selected == nullptr)
-		{
-			selected = 0;
-			return;
-		}
-
-		for (int x = 0; x < item.size(); ++x)
-			if (item[x].ref == m_prev_selected)
-				selected = x;
+			break;
 	}
 }
 
@@ -1677,6 +1681,9 @@ void menu_select_game::init_sorted_list()
 		c_year::set(driver->year);
 	}
 
+	for (auto & e : c_mnfct::uimap)
+		c_mnfct::ui.emplace_back(e.first);
+
 	// sort manufacturers - years and driver
 	std::stable_sort(c_mnfct::ui.begin(), c_mnfct::ui.end());
 	std::stable_sort(c_year::ui.begin(), c_year::ui.end());
@@ -1860,7 +1867,7 @@ float menu_select_game::draw_left_panel(float x1, float y1, float x2, float y2)
 				menu::highlight(container, x1, y1, x2, y1+ line_height_max, bgcolor);
 			}
 
-			if (highlight == filter && is_focus(focused_menu::left))
+			if (highlight == filter && get_focus() == focused_menu::left)
 			{
 				fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
 				bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
@@ -2015,7 +2022,7 @@ void menu_select_game::infos_render(void *selectedref, float origx1, float origy
 
 		rgb_t fgcolor = UI_TEXT_COLOR;
 		rgb_t bgcolor = UI_TEXT_BG_COLOR;
-		if (is_focus(focused_menu::rightbottom))
+		if (get_focus() == focused_menu::rightbottom)
 		{
 			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
 			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
@@ -2194,7 +2201,7 @@ void menu_select_game::infos_render(void *selectedref, float origx1, float origy
 
 			rgb_t fgcolor = UI_TEXT_COLOR;
 			rgb_t bgcolor = UI_TEXT_BG_COLOR;
-			if (is_focus(focused_menu::rightbottom))
+			if (get_focus() == focused_menu::rightbottom)
 			{
 				fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
 				bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
@@ -2402,7 +2409,7 @@ void menu_select_game::arts_render(void *selectedref, float origx1, float origy1
 
 			olddriver = driver;
 			ui_globals::switch_image = false;
-			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2, false);
+			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2);
 			auto_free(machine(), tmp_bitmap);
 		}
 
@@ -2491,7 +2498,7 @@ void menu_select_game::arts_render(void *selectedref, float origx1, float origy1
 
 			oldsoft = soft;
 			ui_globals::switch_image = false;
-			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2, true);
+			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2);
 			auto_free(machine(), tmp_bitmap);
 		}
 

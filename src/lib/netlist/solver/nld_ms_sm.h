@@ -90,19 +90,19 @@ protected:
 	template <typename T1, typename T2>
 	inline nl_ext_double &lAinv(const T1 &r, const T2 &c) { return m_lAinv[r][c]; }
 
-	ATTR_ALIGN nl_double m_last_RHS[storage_N]; // right hand side - contains currents
+	nl_double m_last_RHS[storage_N]; // right hand side - contains currents
 
 private:
 	static const std::size_t m_pitch  = (((  storage_N) + 7) / 8) * 8;
-	ATTR_ALIGN nl_ext_double m_A[storage_N][m_pitch];
-	ATTR_ALIGN nl_ext_double m_Ainv[storage_N][m_pitch];
-	ATTR_ALIGN nl_ext_double m_W[storage_N][m_pitch];
-	ATTR_ALIGN nl_ext_double m_RHS[storage_N]; // right hand side - contains currents
+	nl_ext_double m_A[storage_N][m_pitch];
+	nl_ext_double m_Ainv[storage_N][m_pitch];
+	nl_ext_double m_W[storage_N][m_pitch];
+	nl_ext_double m_RHS[storage_N]; // right hand side - contains currents
 
-	ATTR_ALIGN nl_ext_double m_lA[storage_N][m_pitch];
-	ATTR_ALIGN nl_ext_double m_lAinv[storage_N][m_pitch];
+	nl_ext_double m_lA[storage_N][m_pitch];
+	nl_ext_double m_lAinv[storage_N][m_pitch];
 
-	//ATTR_ALIGN nl_ext_double m_RHSx[storage_N];
+	//nl_ext_double m_RHSx[storage_N];
 
 	const unsigned m_dim;
 
@@ -128,15 +128,10 @@ void matrix_solver_sm_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 
 	matrix_solver_t::setup_base(nets);
 
-
-	save(NLNAME(m_last_RHS));
+	netlist().save(*this, m_last_RHS, "m_last_RHS");
 
 	for (unsigned k = 0; k < N(); k++)
-	{
-		pstring num = plib::pfmt("{1}")(k);
-
-		save(RHS(k), "RHS." + num);
-	}
+		netlist().save(*this, RHS(k), plib::pfmt("RHS.{1}")(k));
 }
 
 

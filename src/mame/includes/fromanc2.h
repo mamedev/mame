@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi, Uki
+
+#include "machine/gen_latch.h"
 #include "machine/eepromser.h"
 
 class fromanc2_state : public driver_device
@@ -13,7 +15,9 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_lpalette(*this, "lpalette"),
-		m_rpalette(*this, "rpalette") { }
+		m_rpalette(*this, "rpalette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2") { }
 
 	/* memory pointers */
 	std::unique_ptr<UINT16[]>   m_videoram[2][4];
@@ -42,6 +46,9 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_lpalette;
 	required_device<palette_device> m_rpalette;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
+
 	DECLARE_WRITE16_MEMBER(fromanc2_sndcmd_w);
 	DECLARE_WRITE16_MEMBER(fromanc2_portselect_w);
 	DECLARE_READ16_MEMBER(fromanc2_keymatrix_r);
@@ -110,5 +117,4 @@ public:
 	inline void fromancr_vram_w(offs_t offset, UINT16 data, UINT16 mem_mask, int layer );
 	void fromancr_gfxbank_w( int data );
 	inline void fromanc4_vram_w( offs_t offset, UINT16 data, UINT16 mem_mask, int layer );
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

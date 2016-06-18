@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/gen_latch.h"
 #include "sound/msm5232.h"
 
 class ladyfrog_state : public driver_device
@@ -15,11 +16,12 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_scrlram(*this, "scrlram"),
-		m_audiocpu(*this, "audiocpu"),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -41,7 +43,13 @@ public:
 	UINT8      m_snd_data;
 
 	/* devices */
+	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<msm5232_device> m_msm;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+
 	DECLARE_READ8_MEMBER(from_snd_r);
 	DECLARE_WRITE8_MEMBER(to_main_w);
 	DECLARE_WRITE8_MEMBER(sound_cpu_reset_w);
@@ -69,8 +77,4 @@ public:
 	UINT32 screen_update_ladyfrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	required_device<cpu_device> m_maincpu;
-	required_device<msm5232_device> m_msm;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };

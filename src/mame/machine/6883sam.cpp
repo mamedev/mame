@@ -103,8 +103,8 @@ void sam6883_device::device_start()
 	m_read_res.resolve_safe(0);
 
 	// install SAM handlers
-	m_cpu_space->install_read_handler(0xFFC0, 0xFFDF, 0, 0, read8_delegate(FUNC(sam6883_device::read), this));
-	m_cpu_space->install_write_handler(0xFFC0, 0xFFDF, 0, 0, write8_delegate(FUNC(sam6883_device::write), this));
+	m_cpu_space->install_read_handler(0xFFC0, 0xFFDF, read8_delegate(FUNC(sam6883_device::read), this));
+	m_cpu_space->install_write_handler(0xFFC0, 0xFFDF, write8_delegate(FUNC(sam6883_device::write), this));
 
 	// save state support
 	save_item(NAME(m_sam_state));
@@ -511,6 +511,8 @@ void sam6883_device::sam_space<_addrstart, _addrend>::point_specific_bank(const 
 		if (mask != 0)
 			offset &= mask;
 
+		UINT32 mirror = (addrend - addrstart) ^ mask;
+
 		// this bank is a memory bank - first ensure that we have a bank
 		if (!memory_bank || !memory_bank->matches_exactly(addrstart, addrend) || (mask != m_mask))
 		{
@@ -519,9 +521,9 @@ void sam6883_device::sam_space<_addrstart, _addrend>::point_specific_bank(const 
 
 			// install it
 			if (is_write)
-				cpu_space().install_write_bank(addrstart, addrend, mask, 0, buffer);
+				cpu_space().install_write_bank(addrstart, addrend, mirror, buffer);
 			else
-				cpu_space().install_read_bank(addrstart, addrend, mask, 0, buffer);
+				cpu_space().install_read_bank(addrstart, addrend, mirror, buffer);
 			m_mask = mask;
 
 			// and get it
@@ -545,12 +547,12 @@ void sam6883_device::sam_space<_addrstart, _addrend>::point_specific_bank(const 
 		if (is_write)
 		{
 			if (!bank->m_whandler.isnull())
-				cpu_space().install_write_handler(addrstart, addrend, 0, 0, bank->m_whandler);
+				cpu_space().install_write_handler(addrstart, addrend, bank->m_whandler);
 		}
 		else
 		{
 			if (!bank->m_rhandler.isnull())
-				cpu_space().install_read_handler(addrstart, addrend, 0, 0, bank->m_rhandler);
+				cpu_space().install_read_handler(addrstart, addrend, bank->m_rhandler);
 		}
 	}
 }

@@ -585,10 +585,10 @@ WRITE8_MEMBER(snk_state::ikari_unknown_video_w)
 	   Changing palette bank is necessary to fix colors in test mode. */
 
 
-if (data != 0x20 && // normal
-	data != 0x31 && // ikari test
-	data != 0xaa)   // victroad spurious during boot
-	popmessage("attrs %02x contact MAMEDEV", data);
+	if (data != 0x20 && // normal
+		data != 0x31 && // ikari test
+		data != 0xaa)   // victroad spurious during boot
+		popmessage("attrs %02x contact MAMEDEV", data);
 
 	m_tx_tilemap->set_palette_offset((data & 0x01) << 4);
 	if (m_tx_tile_offset != ((data & 0x10) << 4))

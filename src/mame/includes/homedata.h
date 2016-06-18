@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino, Nicola Salmoria
+
+#include "machine/gen_latch.h"
 #include "sound/dac.h"
 #include "sound/sn76496.h"
 #include "sound/2203intf.h"
@@ -16,7 +18,9 @@ public:
 		m_dac(*this, "dac"),
 		m_ymsnd(*this, "ymsnd"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_sn(*this, "snsnd")
 	{
 	}
 
@@ -53,7 +57,9 @@ public:
 	optional_device<ym2203_device> m_ymsnd;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	sn76489a_device *m_sn;
+	optional_device<generic_latch_8_device> m_soundlatch; // mrokumei
+	optional_device<sn76489a_device> m_sn; // mrokumei and pteacher
+
 	UINT8 m_prot_data;
 	DECLARE_READ8_MEMBER(mrokumei_keyboard_r);
 	DECLARE_WRITE8_MEMBER(mrokumei_keyboard_select_w);

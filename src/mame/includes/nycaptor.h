@@ -1,5 +1,7 @@
 // license:LGPL-2.1+
 // copyright-holders:Tomasz Slanina
+
+#include "machine/gen_latch.h"
 #include "sound/msm5232.h"
 
 class nycaptor_state : public driver_device
@@ -17,7 +19,8 @@ public:
 		m_mcu(*this, "mcu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -65,6 +68,7 @@ public:
 	required_device<msm5232_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE8_MEMBER(sub_cpu_halt_w);
 	DECLARE_READ8_MEMBER(from_snd_r);

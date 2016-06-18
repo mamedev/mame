@@ -14,7 +14,7 @@ TODO:
   gfx related but since everything seems fine I've no idea what it might do.
 - Unknown sound writes at C00F; also, there's an NMI handler that would
   read from C00F.
-- Sound samples were getting chopped; I fixed this by changing sound/adpcm.c to
+- Sound samples were getting chopped; I fixed this by changing sound/adpcm.cpp to
   disregard requests to play new samples until the previous one is finished*.
 
 Gotcha pcb: 97,7,29 PARA VER 3.0 but it is the same as ppchamp
@@ -62,6 +62,7 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/gen_latch.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "includes/gotcha.h"
@@ -97,7 +98,7 @@ WRITE16_MEMBER(gotcha_state::gotcha_oki_bank_w)
 
 static ADDRESS_MAP_START( gotcha_map, AS_PROGRAM, 16, gotcha_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(soundlatch_word_w)
+	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x100002, 0x100003) AM_WRITE(gotcha_lamps_w)
 	AM_RANGE(0x100004, 0x100005) AM_WRITE(gotcha_oki_bank_w)
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM
@@ -119,7 +120,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gotcha_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xc002, 0xc002) AM_DEVREADWRITE("oki", okim6295_device, read, write) AM_MIRROR(1)
-	AM_RANGE(0xc006, 0xc006) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xc006, 0xc006) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -290,6 +291,8 @@ static MACHINE_CONFIG_START( gotcha, gotcha_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 14318180/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

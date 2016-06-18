@@ -17,7 +17,6 @@ Might be some priority glitches
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
-#include "sound/msm5205.h"
 #include "rendlay.h"
 #include "includes/tbowl.h"
 
@@ -29,7 +28,7 @@ WRITE8_MEMBER(tbowl_state::coincounter_w)
 
 /*** Banking
 
-note: check this, its borrowed from tecmo.c / wc90.c at the moment and could well be wrong
+note: check this, its borrowed from tecmo.cpp / wc90.cpp at the moment and could well be wrong
 
 ***/
 
@@ -49,7 +48,7 @@ WRITE8_MEMBER(tbowl_state::boardc_bankswitch_w)
 
 WRITE8_MEMBER(tbowl_state::sound_command_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -180,7 +179,7 @@ static ADDRESS_MAP_START( 6206A_map, AS_PROGRAM, 8, tbowl_state )
 	AM_RANGE(0xe004, 0xe005) AM_WRITE(adpcm_vol_w)
 	AM_RANGE(0xe006, 0xe006) AM_WRITENOP
 	AM_RANGE(0xe007, 0xe007) AM_WRITENOP    /* NMI acknowledge */
-	AM_RANGE(0xe010, 0xe010) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe010, 0xe010) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 /*** Input Ports
@@ -480,6 +479,8 @@ static MACHINE_CONFIG_START( tbowl, tbowl_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM3812, 4000000)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

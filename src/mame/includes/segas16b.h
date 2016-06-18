@@ -9,6 +9,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
 #include "sound/2151intf.h"
@@ -39,6 +40,7 @@ public:
 			m_nvram(*this, "nvram"),
 			m_sprites(*this, "sprites"),
 			m_segaic16vid(*this, "segaic16vid"),
+			m_soundlatch(*this, "soundlatch"),
 			m_workram(*this, "workram"),
 			m_romboard(ROM_BOARD_INVALID),
 			m_tilemap_type(SEGAIC16_TILEMAP_16B),
@@ -196,6 +198,7 @@ protected:
 	required_device<nvram_device> m_nvram;
 	optional_device<sega_sys16b_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
+	optional_device<generic_latch_8_device> m_soundlatch; // not for atomicp
 
 	// memory pointers
 	required_shared_ptr<UINT16> m_workram;

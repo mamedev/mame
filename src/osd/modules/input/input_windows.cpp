@@ -23,20 +23,41 @@
 bool windows_osd_interface::should_hide_mouse() const
 {
 	bool hidemouse = false;
-	hidemouse |= downcast<wininput_module*>(m_keyboard_input)->should_hide_mouse();
-	hidemouse |= downcast<wininput_module*>(m_mouse_input)->should_hide_mouse();
-	hidemouse |= downcast<wininput_module*>(m_lightgun_input)->should_hide_mouse();
-	hidemouse |= downcast<wininput_module*>(m_joystick_input)->should_hide_mouse();
+	wininput_module* mod = nullptr;
+	
+	mod = dynamic_cast<wininput_module*>(m_keyboard_input);
+	if (mod) hidemouse |= mod->should_hide_mouse();
+	
+	mod = dynamic_cast<wininput_module*>(m_mouse_input);
+	if (mod) hidemouse |= mod->should_hide_mouse();
+
+	mod = dynamic_cast<wininput_module*>(m_lightgun_input);
+	if (mod) hidemouse |= mod->should_hide_mouse();
+
+	mod = dynamic_cast<wininput_module*>(m_joystick_input);
+	if (mod) hidemouse |= mod->should_hide_mouse();
+
 	return hidemouse;
 }
 
 bool windows_osd_interface::handle_input_event(input_event eventid, void* eventdata) const
 {
 	bool handled = false;
-	handled |= downcast<wininput_module*>(m_keyboard_input)->handle_input_event(eventid, eventdata);
-	handled |= downcast<wininput_module*>(m_mouse_input)->handle_input_event(eventid, eventdata);
-	handled |= downcast<wininput_module*>(m_lightgun_input)->handle_input_event(eventid, eventdata);
-	handled |= downcast<wininput_module*>(m_joystick_input)->handle_input_event(eventid, eventdata);
+
+	wininput_module* mod = nullptr;
+
+	mod = dynamic_cast<wininput_module*>(m_keyboard_input);
+	if (mod) handled |= mod->handle_input_event(eventid, eventdata);
+
+	mod = dynamic_cast<wininput_module*>(m_mouse_input);
+	if (mod) handled |= mod->handle_input_event(eventid, eventdata);
+
+	mod = dynamic_cast<wininput_module*>(m_lightgun_input);
+	if (mod) handled |= mod->handle_input_event(eventid, eventdata);
+
+	mod = dynamic_cast<wininput_module*>(m_joystick_input);
+	if (mod) handled |= mod->handle_input_event(eventid, eventdata);
+
 	return handled;
 }
 

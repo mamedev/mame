@@ -102,7 +102,7 @@ TIMER_CALLBACK_MEMBER(buggychl_state::nmi_callback)
 
 WRITE8_MEMBER(buggychl_state::sound_command_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(buggychl_state::nmi_callback),this), data);
 }
 
@@ -168,7 +168,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, buggychl_state )
 	AM_RANGE(0x4810, 0x481d) AM_DEVWRITE("msm", msm5232_device, write)
 	AM_RANGE(0x4820, 0x4820) AM_RAM /* VOL/BAL   for the 7630 on the MSM5232 output */
 	AM_RANGE(0x4830, 0x4830) AM_RAM /* TRBL/BASS for the 7630 on the MSM5232 output  */
-	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x5000, 0x5000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 //  AM_RANGE(0x5001, 0x5001) AM_READNOP /* is command pending? */
 	AM_RANGE(0x5001, 0x5001) AM_WRITE(nmi_enable_w)
 	AM_RANGE(0x5002, 0x5002) AM_WRITE(nmi_disable_w)
@@ -393,6 +393,8 @@ static MACHINE_CONFIG_START( buggychl, buggychl_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 8000000/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(buggychl_state, port_a_0_w))

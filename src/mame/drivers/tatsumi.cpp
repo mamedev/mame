@@ -142,10 +142,8 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/nec/nec.h"
-#include "cpu/m68000/m68000.h"
 #include "includes/tatsumi.h"
 #include "sound/2151intf.h"
-#include "sound/okim6295.h"
 #include "machine/nvram.h"
 
 #include "roundup5.lh"
@@ -184,7 +182,7 @@ WRITE16_MEMBER(tatsumi_state::bigfight_a60000_w)
 
 WRITE16_MEMBER(tatsumi_state::cyclwarr_sound_w)
 {
-	soundlatch_byte_w(space, 0, data >> 8);
+	m_soundlatch->write(space, 0, data >> 8);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -334,7 +332,7 @@ static ADDRESS_MAP_START( cyclwarr_z80_map, AS_PROGRAM, 8, tatsumi_state )
 	AM_RANGE(0xe000, 0xffef) AM_RAM
 	AM_RANGE(0xfff0, 0xfff1) AM_READ(tatsumi_hack_ym2151_r) AM_DEVWRITE("ymsnd", ym2151_device, write)
 	AM_RANGE(0xfff4, 0xfff4) AM_READ(tatsumi_hack_oki_r) AM_DEVWRITE("oki", okim6295_device, write)
-	AM_RANGE(0xfffc, 0xfffc) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xfffc, 0xfffc) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xfffe, 0xfffe) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -992,6 +990,8 @@ static MACHINE_CONFIG_START( cyclwarr, tatsumi_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_YM2151_ADD("ymsnd", CLOCK_1 / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
@@ -1034,6 +1034,8 @@ static MACHINE_CONFIG_START( bigfight, tatsumi_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", CLOCK_1 / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))

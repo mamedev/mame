@@ -67,12 +67,10 @@
 class device_slot_option
 {
 	friend class device_slot_interface;
-	friend class simple_list<device_slot_option>;
 
 public:
 	device_slot_option(const char *name, const device_type &devtype);
 
-	device_slot_option *next() const { return m_next; }
 	const char *name() const { return m_name; }
 	const device_type &devtype() const { return m_devtype; }
 	bool selectable() const { return m_selectable; }
@@ -83,7 +81,6 @@ public:
 
 private:
 	// internal state
-	device_slot_option *m_next;
 	const char *m_name;
 	const device_type &m_devtype;
 	bool m_selectable;
@@ -114,15 +111,15 @@ public:
 	static void static_set_option_clock(device_t &device, const char *option, UINT32 default_clock) { static_option(device, option)->m_clock = default_clock; }
 	bool fixed() const { return m_fixed; }
 	const char *default_option() const { return m_default_option; }
-	const tagged_list<device_slot_option> &option_list() const { return m_options; }
-	device_slot_option *option(const char *name) const { if (name) return m_options.find(name); return nullptr; }
+	const std::unordered_map<std::string, std::unique_ptr<device_slot_option>> &option_list() const { return m_options; }
+	device_slot_option *option(const char *name) const { if (name) { auto search = m_options.find(name); if (search != m_options.end()) return search->second.get(); else return nullptr; } else return nullptr; }
 	virtual std::string get_default_card_software() { return std::string(); }
 	device_t *get_card_device();
 
 private:
 	// internal state
 	static device_slot_option *static_option(device_t &device, const char *option);
-	tagged_list<device_slot_option> m_options;
+	std::unordered_map<std::string,std::unique_ptr<device_slot_option>> m_options;
 	const char *m_default_option;
 	bool m_fixed;
 };

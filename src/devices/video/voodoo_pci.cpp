@@ -136,7 +136,7 @@ void voodoo_pci_device::map_extra(UINT64 memory_window_start, UINT64 memory_wind
 	if (m_type>=TYPE_VOODOO_BANSHEE) {
 		UINT64 start = io_offset + 0x3b0;
 		UINT64 end = io_offset + 0x3df;
-		io_space->install_readwrite_handler(start, end, 0, 0, read32_delegate(FUNC(voodoo_pci_device::vga_r), this), write32_delegate(FUNC(voodoo_pci_device::vga_w), this));
+		io_space->install_readwrite_handler(start, end, read32_delegate(FUNC(voodoo_pci_device::vga_r), this), write32_delegate(FUNC(voodoo_pci_device::vga_w), this));
 		logerror("%s: map %s at %0*x-%0*x\n", this->tag(), "vga_r/w", 4, UINT32(start), 4, UINT32(end));
 	}
 }

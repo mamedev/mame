@@ -97,13 +97,12 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/3812intf.h"
-#include "sound/msm5205.h"
 #include "sound/3812intf.h"
 #include "includes/toki.h"
 
 WRITE16_MEMBER(toki_state::tokib_soundcommand_w)
 {
-	soundlatch_byte_w(space, 0, data & 0xff);
+	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -187,7 +186,7 @@ static ADDRESS_MAP_START( tokib_audio_map, AS_PROGRAM, 8, toki_state )
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(tokib_adpcm_data_w)
 	AM_RANGE(0xec00, 0xec01) AM_MIRROR(0x0008) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -497,6 +496,8 @@ static MACHINE_CONFIG_START( tokib, toki_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

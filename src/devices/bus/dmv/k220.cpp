@@ -149,8 +149,8 @@ dmv_k220_device::dmv_k220_device(const machine_config &mconfig, const char *tag,
 void dmv_k220_device::device_start()
 {
 	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_IO);
-	space.install_readwrite_handler(0x08, 0x0b, 0, 0, read8_delegate(FUNC(pit8253_device::read), &(*m_pit)), write8_delegate(FUNC(pit8253_device::write), &(*m_pit)), 0);
-	space.install_readwrite_handler(0x0c, 0x0f, 0, 0, read8_delegate(FUNC(i8255_device::read), &(*m_ppi)), write8_delegate(FUNC(i8255_device::write), &(*m_ppi)), 0);
+	space.install_readwrite_handler(0x08, 0x0b, read8_delegate(FUNC(pit8253_device::read), &(*m_pit)), write8_delegate(FUNC(pit8253_device::write), &(*m_pit)), 0);
+	space.install_readwrite_handler(0x0c, 0x0f, read8_delegate(FUNC(i8255_device::read), &(*m_ppi)), write8_delegate(FUNC(i8255_device::write), &(*m_ppi)), 0);
 }
 
 //-------------------------------------------------

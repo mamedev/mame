@@ -93,9 +93,9 @@ static floperr_t get_offset(floppy_image_legacy *floppy, int head, int track, in
 			|| (sector < 0) || (sector >= 16))
 		return FLOPPY_ERROR_SEEKERROR;
 
-		offs = tag->sector_pos[track][sector];
-		if (offs <= 0 )
-				return FLOPPY_ERROR_SEEKERROR;
+	offs = tag->sector_pos[track][sector];
+	if (offs <= 0 )
+		return FLOPPY_ERROR_SEEKERROR;
 
 	if (offset)
 		*offset = offs;

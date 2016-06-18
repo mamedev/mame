@@ -164,10 +164,10 @@ void menu_input_specific::populate()
 	suborder[SEQ_TYPE_INCREMENT] = 2;
 
 	/* iterate over the input ports and add menu items */
-	for (ioport_port &port : machine().ioport().ports())
+	for (auto &port : machine().ioport().ports())
 	{
 		port_count++;
-		for (ioport_field &field : port.fields())
+		for (ioport_field &field : port.second->fields())
 		{
 			ioport_type_class type_class = field.type_class();
 
@@ -548,8 +548,8 @@ void menu_settings::populate()
 	diplist_tailptr = &diplist;
 
 	/* loop over input ports and set up the current values */
-	for (ioport_port &port : machine().ioport().ports())
-		for (ioport_field &field : port.fields())
+	for (auto &port : machine().ioport().ports())
+		for (ioport_field &field : port.second->fields())
 			if (field.type() == type && field.enabled())
 			{
 				UINT32 flags = 0;
@@ -818,8 +818,8 @@ void menu_analog::populate()
 	bool first_entry = true;
 
 	/* loop over input ports and add the items */
-	for (ioport_port &port : machine().ioport().ports())
-		for (ioport_field &field : port.fields())
+	for (auto &port : machine().ioport().ports())
+		for (ioport_field &field : port.second->fields())
 			if (field.is_analog() && field.enabled())
 			{
 				ioport_field::user_settings settings;

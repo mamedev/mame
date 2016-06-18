@@ -7,6 +7,8 @@
 #ifndef NLTIME_H_
 #define NLTIME_H_
 
+#include <cstdint>
+
 #include "nl_config.h"
 #include "plib/pstate.h"
 
@@ -25,114 +27,113 @@
 
 namespace netlist
 {
-	struct netlist_time final
+	template <typename TYPE, TYPE RES>
+	struct ptime final
 	{
 	public:
 
-#if (PHAS_INT128)
-		using INTERNALTYPE = UINT128;
-		static const pstate_data_type_e STATETYPE = DT_INT128;
-#else
-		using INTERNALTYPE = UINT64;
-		static constexpr pstate_data_type_e STATETYPE = pstate_data_type_e::DT_INT64;
-#endif
-		static constexpr INTERNALTYPE RESOLUTION = NETLIST_INTERNAL_RES;
+		using internal_type = TYPE;
+		using mult_type = std::uint_fast64_t;
+		static constexpr internal_type resolution = RES;
 
-		constexpr netlist_time() NOEXCEPT : m_time(0) {}
-		netlist_time(const netlist_time &rhs) NOEXCEPT = default;
-		netlist_time(netlist_time &&rhs) NOEXCEPT = default;
+		constexpr ptime() NOEXCEPT : m_time(0) {}
+		constexpr ptime(const ptime &rhs) NOEXCEPT = default;
+		constexpr ptime(ptime &&rhs) NOEXCEPT = default;
 
-		constexpr explicit netlist_time(const double t)
-		: m_time((INTERNALTYPE) ( t * (double) RESOLUTION)) { }
-		constexpr explicit netlist_time(const INTERNALTYPE nom, const INTERNALTYPE den)
-		: m_time(nom * (RESOLUTION / den)) { }
+		constexpr explicit ptime(const double t) = delete;
+		//: m_time((internal_type) ( t * (double) resolution)) { }
+		constexpr explicit ptime(const internal_type nom, const internal_type den)
+		: m_time(nom * (resolution / den)) { }
 
+		ptime &operator=(const ptime rhs) { m_time = rhs.m_time; return *this; }
 
-		netlist_time &operator=(const netlist_time rhs) { m_time = rhs.m_time; return *this; }
+		ptime &operator+=(const ptime &rhs) { m_time += rhs.m_time; return *this; }
+		ptime &operator-=(const ptime &rhs) { m_time -= rhs.m_time; return *this; }
 
-		netlist_time &operator+=(const netlist_time &rhs) { m_time += rhs.m_time; return *this; }
-		netlist_time &operator-=(const netlist_time &rhs) { m_time -= rhs.m_time; return *this; }
-
-		friend netlist_time operator-(netlist_time lhs, const netlist_time &rhs)
+		friend ptime operator-(ptime lhs, const ptime &rhs)
 		{
 			lhs -= rhs;
 			return lhs;
 		}
 
-		friend netlist_time operator+(netlist_time lhs, const netlist_time &rhs)
+		friend ptime operator+(ptime lhs, const ptime &rhs)
 		{
 			lhs += rhs;
 			return lhs;
 		}
 
-		friend netlist_time operator*(netlist_time lhs, const UINT64 factor)
+		friend ptime operator*(ptime lhs, const mult_type factor)
 		{
-			lhs.m_time *= static_cast<INTERNALTYPE>(factor);
+			lhs.m_time *= static_cast<internal_type>(factor);
 			return lhs;
 		}
 
-		friend UINT64 operator/(const netlist_time &lhs, const netlist_time &rhs)
+		friend mult_type operator/(const ptime &lhs, const ptime &rhs)
 		{
-			return static_cast<UINT64>(lhs.m_time / rhs.m_time);
+			return static_cast<mult_type>(lhs.m_time / rhs.m_time);
 		}
 
-		friend bool operator<(const netlist_time &lhs, const netlist_time &rhs)
+		friend bool operator<(const ptime &lhs, const ptime &rhs)
 		{
 			return (lhs.m_time < rhs.m_time);
 		}
 
-		friend bool operator>(const netlist_time &lhs, const netlist_time &rhs)
+		friend bool operator>(const ptime &lhs, const ptime &rhs)
 		{
-			return rhs < lhs;
+			return (rhs < lhs);
 		}
 
-		friend bool operator<=(const netlist_time &lhs, const netlist_time &rhs)
+		friend bool operator<=(const ptime &lhs, const ptime &rhs)
 		{
 			return !(lhs > rhs);
 		}
 
-		friend bool operator>=(const netlist_time &lhs, const netlist_time &rhs)
+		friend bool operator>=(const ptime &lhs, const ptime &rhs)
 		{
 			return !(lhs < rhs);
 		}
 
-		friend bool operator==(const netlist_time &lhs, const netlist_time &rhs)
+		friend bool operator==(const ptime &lhs, const ptime &rhs)
 		{
 			return lhs.m_time == rhs.m_time;
 		}
 
-		friend bool operator!=(const netlist_time &lhs, const netlist_time &rhs)
+		friend bool operator!=(const ptime &lhs, const ptime &rhs)
 		{
 			return lhs.m_time != rhs.m_time;
 		}
 
-		INTERNALTYPE as_raw() const { return m_time; }
-		double as_double() const { return (double) m_time / (double) RESOLUTION; }
+		constexpr internal_type as_raw() const { return m_time; }
+		constexpr double as_double() const { return (double) m_time / (double) resolution; }
 
 		// for save states ....
-		INTERNALTYPE *get_internaltype_ptr() { return &m_time; }
+		internal_type *get_internaltype_ptr() { return &m_time; }
 
-		static inline netlist_time from_nsec(const INTERNALTYPE ns) { return netlist_time(ns, U64(1000000000)); }
-		static inline netlist_time from_usec(const INTERNALTYPE us) { return netlist_time(us, U64(1000000)); }
-		static inline netlist_time from_msec(const INTERNALTYPE ms) { return netlist_time(ms, U64(1000)); }
-		static inline netlist_time from_hz(const INTERNALTYPE hz) { return netlist_time(1 , hz); }
-		static inline netlist_time from_raw(const INTERNALTYPE raw) { return netlist_time(raw, RESOLUTION); }
+		static inline constexpr ptime from_nsec(const internal_type ns) { return ptime(ns, UINT64_C(1000000000)); }
+		static inline constexpr ptime from_usec(const internal_type us) { return ptime(us, UINT64_C(1000000)); }
+		static inline constexpr ptime from_msec(const internal_type ms) { return ptime(ms, UINT64_C(1000)); }
+		static inline constexpr ptime from_hz(const internal_type hz) { return ptime(1 , hz); }
+		static inline constexpr ptime from_raw(const internal_type raw) { return ptime(raw, resolution); }
+		static inline constexpr ptime from_double(const double t) { return ptime((internal_type) ( t * (double) resolution), resolution); }
 
-		static inline netlist_time zero() { return netlist_time(0, RESOLUTION); }
-		static inline netlist_time quantum() { return netlist_time(1, RESOLUTION); }
-		static inline netlist_time never() { return netlist_time(std::numeric_limits<netlist_time::INTERNALTYPE>::max(), RESOLUTION); }
+		static inline constexpr ptime zero() { return ptime(0, resolution); }
+		static inline constexpr ptime quantum() { return ptime(1, resolution); }
+		static inline constexpr ptime never() { return ptime(plib::numeric_limits<internal_type>::max(), resolution); }
 	private:
-		INTERNALTYPE m_time;
+		internal_type m_time;
 	};
 
-
-
+#if (PHAS_INT128)
+	using netlist_time = ptime<UINT128, NETLIST_INTERNAL_RES>;
+#else
+	using netlist_time = ptime<std::uint_fast64_t, NETLIST_INTERNAL_RES>;
+#endif
 }
 
 namespace plib {
-template<> inline void pstate_manager_t::save_item(const void *owner, netlist::netlist_time &nlt, const pstring &stname)
+template<> inline void state_manager_t::save_item(const void *owner, netlist::netlist_time &nlt, const pstring &stname)
 {
-	save_state_ptr(owner, stname, netlist::netlist_time::STATETYPE, sizeof(netlist::netlist_time::INTERNALTYPE), 1, nlt.get_internaltype_ptr(), false);
+	save_state_ptr(owner, stname, datatype_t(sizeof(netlist::netlist_time::internal_type), false, true, false), 1, nlt.get_internaltype_ptr());
 }
 }
 

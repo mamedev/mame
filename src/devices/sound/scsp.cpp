@@ -1390,13 +1390,10 @@ int IRQCB(void *param)
 
 void scsp_device::set_ram_base(void *base)
 {
-	if (this)
-	{
-		m_SCSPRAM = (unsigned char *)base;
-		m_DSP.SCSPRAM = (UINT16 *)base;
-		m_SCSPRAM_LENGTH = 0x80000;
-		m_DSP.SCSPRAM_LENGTH = 0x80000/2;
-	}
+	m_SCSPRAM = (unsigned char *)base;
+	m_DSP.SCSPRAM = (UINT16 *)base;
+	m_SCSPRAM_LENGTH = 0x80000;
+	m_DSP.SCSPRAM_LENGTH = 0x80000/2;
 }
 
 

@@ -653,7 +653,7 @@ WRITE16_MEMBER( qx10_state::vram_w )
 }
 
 static ADDRESS_MAP_START( upd7220_map, AS_0, 16, qx10_state )
-	AM_RANGE(0x00000, 0x5ffff) AM_READWRITE(vram_r,vram_w)
+	AM_RANGE(0x00000, 0x3ffff) AM_READWRITE(vram_r,vram_w)
 ADDRESS_MAP_END
 
 static SLOT_INTERFACE_START(keyboard)

@@ -450,12 +450,7 @@ void menu_crosshair::populate()
 				int length = strlen(dir->name);
 
 				/* look for files ending in .png with a name not larger then 9 chars*/
-				if ((length > 4) && (length <= CROSSHAIR_PIC_NAME_LENGTH + 4) &&
-					dir->name[length - 4] == '.' &&
-					tolower((UINT8)dir->name[length - 3]) == 'p' &&
-					tolower((UINT8)dir->name[length - 2]) == 'n' &&
-					tolower((UINT8)dir->name[length - 1]) == 'g')
-
+				if ((length > 4) && (length <= CROSSHAIR_PIC_NAME_LENGTH + 4) && core_filename_ends_with(dir->name, ".png"))
 				{
 					/* remove .png from length */
 					length -= 4;
@@ -826,7 +821,6 @@ void menu_machine_configure::custom_render(void *selectedref, float top, float b
 
 	// compute our bounds
 	float x1 = 0.5f - 0.5f * maxwidth;
-//  float x1 = origx1;
 	float x2 = x1 + maxwidth;
 	float y1 = origy1 - top;
 	float y2 = origy1 - UI_BOX_TB_BORDER;
@@ -900,7 +894,11 @@ menu_plugins_configure::~menu_plugins_configure()
 {
 	emu_file file_plugin(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	if (file_plugin.open("plugin.ini") != osd_file::error::NONE)
-		throw emu_fatalerror("Unable to create file plugin.ini\n");
+		// Can't throw in a destructor, so let's ignore silently for
+		// now.  We shouldn't write files in a destructor in any case.
+		//
+		// throw emu_fatalerror("Unable to create file plugin.ini\n");
+		return;
 	// generate the updated INI
 	file_plugin.puts(mame_machine_manager::instance()->plugins().output_ini().c_str());
 }

@@ -65,7 +65,7 @@ void xor100_state::bankswitch()
 			program.unmap_write(0x0000, 0xffff);
 		}
 
-		program.install_read_bank(0x0000, 0xf7ff, 0x07ff, 0, "bank2");
+		program.install_read_bank(0x0000, 0x07ff, 0xf000, "bank2");
 		program.install_read_bank(0xf800, 0xffff, "bank3");
 		membank("bank2")->set_entry(0);
 		membank("bank3")->set_entry(0);

@@ -243,7 +243,7 @@ void wd_fdc_t::command_end()
 
 void wd_fdc_t::seek_start(int state)
 {
-	if (TRACE_COMMAND) logerror("seek %d (track=%d)\n", data, track);
+	if (TRACE_COMMAND) logerror("seek %d %x (track=%d)\n", state, data, track);
 	main_state = state;
 	status &= ~(S_CRC|S_RNF|S_SPIN);
 	if(head_control) {
@@ -1273,12 +1273,6 @@ void wd_fdc_t::index_callback(floppy_image_device *floppy, int state)
 		return;
 	}
 
-	if(!intrq && (intrq_cond & I_IDX)) {
-		intrq = true;
-		if(!intrq_cb.isnull())
-			intrq_cb(intrq);
-	}
-
 	switch(sub_state) {
 	case IDLE:
 		if(motor_control || head_control) {
@@ -1299,6 +1293,12 @@ void wd_fdc_t::index_callback(floppy_image_device *floppy, int state)
 
 				status &= ~S_HLD; // todo: should get this value from the drive
 			}
+		}
+
+		if(!intrq && (intrq_cond & I_IDX)) {
+			intrq = true;
+			if(!intrq_cb.isnull())
+				intrq_cb(intrq);
 		}
 		break;
 

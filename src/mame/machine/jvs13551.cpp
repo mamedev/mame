@@ -123,8 +123,9 @@ bool sega_837_13551::coin_counters(UINT8 *&buf, UINT8 count)
 
 	*buf++ = coin_counter[0] >> 8; *buf++ = coin_counter[0];
 
-	if(count > 1)
+	if(count > 1) {
 		*buf++ = coin_counter[1] >> 8; *buf++ = coin_counter[1];
+	}
 
 	return true;
 }

@@ -83,7 +83,7 @@ public:
 	void add_macpds_card(device_macpds_card_interface *card);
 	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler, UINT32 mask=0xffffffff);
 	void install_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler, UINT32 mask=0xffffffff);
-	void install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data);
+  void install_bank(offs_t start, offs_t end, const char *tag, UINT8 *data);
 	void set_irq_line(int line, int state);
 
 protected:
@@ -118,7 +118,7 @@ public:
 	void set_macpds_device();
 
 	// helper functions for card devices
-	void install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data);
+	void install_bank(offs_t start, offs_t end, const char *tag, UINT8 *data);
 	void install_rom(device_t *dev, const char *romregion, UINT32 addr);
 
 	// inline configuration

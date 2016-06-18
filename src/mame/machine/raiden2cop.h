@@ -240,10 +240,13 @@ public:
 	DECLARE_WRITE16_MEMBER(LEGACY_cop_cmd_w);
 
 
-	void  cop_collision_update_hitbox(address_space &space, UINT16 data, int slot, UINT32 hitadr);
-
+	void cop_collision_update_hitbox(address_space &space, UINT16 data, int slot, UINT32 hitadr);
+	void bcd_update();
+	
 	// endian stuff?
 	int m_cpu_is_68k;
+	UINT8 m_byte_endian_val;
+	UINT8 m_word_endian_val;
 	static void set_cpu_is_68k(device_t &device, int value) { downcast<raiden2cop_device &>(device).m_cpu_is_68k = value; }
 	UINT16 cop_read_word(address_space &space, int address);
 	UINT8 cop_read_byte(address_space &space, int address);

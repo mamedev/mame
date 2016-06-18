@@ -13,6 +13,12 @@
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <signal.h>
+#include <dlfcn.h>
+
+#include <codecvt>
+#include <iomanip>
+#include <memory>
+
 
 #include <mach/mach.h>
 #include <mach/mach_time.h>
@@ -215,3 +221,71 @@ char *osd_get_clipboard_text(void)
 
 	return result;
 }
+
+//============================================================
+//  dynamic_module_posix_impl
+//============================================================
+
+namespace osd {
+
+class dynamic_module_posix_impl : public dynamic_module
+{
+public:
+	dynamic_module_posix_impl(std::vector<std::string> &libraries)
+		: m_module(nullptr)
+	{
+		m_libraries = libraries;
+	}
+
+	virtual ~dynamic_module_posix_impl() override
+	{
+		if (m_module != nullptr)
+			dlclose(m_module);
+	};
+
+protected:
+	virtual generic_fptr_t get_symbol_address(char const *symbol) override
+	{
+		/*
+		 * given a list of libraries, if a first symbol is successfully loaded from
+		 * one of them, all additional symbols will be loaded from the same library
+		 */
+		if (m_module)
+		{
+			return reinterpret_cast<generic_fptr_t>(dlsym(m_module, symbol));
+		}
+
+		for (auto const &library : m_libraries)
+		{
+			void *module = dlopen(library.c_str(), RTLD_LAZY);
+
+			if (module != nullptr)
+			{
+				generic_fptr_t function = reinterpret_cast<generic_fptr_t>(dlsym(module, symbol));
+
+				if (function != nullptr)
+				{
+					m_module = module;		
+					return function;
+				}
+				else
+				{
+					dlclose(module);
+				}
+			}
+		}
+		
+		return nullptr;
+	}
+
+private:
+	std::vector<std::string> m_libraries;
+	void *                   m_module;
+};
+
+dynamic_module::ptr dynamic_module::open(std::vector<std::string> &&names)
+{
+	return std::make_unique<dynamic_module_posix_impl>(names);
+}
+
+} // namespace osd

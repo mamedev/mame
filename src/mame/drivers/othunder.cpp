@@ -651,19 +651,6 @@ static GFXDECODE_START( othunder )
 GFXDECODE_END
 
 
-
-/**************************************************************
-                 YM2610 (SOUND)
-**************************************************************/
-
-/* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(othunder_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-
 /***********************************************************
                  MACHINE DRIVERS
 ***********************************************************/
@@ -730,7 +717,7 @@ static MACHINE_CONFIG_START( othunder, othunder_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(othunder_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "2610.0l", 0.25)
 	MCFG_SOUND_ROUTE(0, "2610.0r", 0.25)
 	MCFG_SOUND_ROUTE(1, "2610.1l", 1.0)

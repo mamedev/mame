@@ -11,15 +11,18 @@
 
 #include "emu.h"
 #include "raiden2cop.h"
+#include "debugger.h"
 
 // use Z to dump out table info
 //#define TABLE_DUMPER
 
 
-#define LOG_CMDS 0
+#define LOG_Commands 	0
+#define LOG_Phytagoras 	0
+#define LOG_Division  	1
 
 #define seibu_cop_log \
-	if (LOG_CMDS) logerror
+	if (LOG_Commands) logerror
 
 
 const device_type RAIDEN2COP = &device_creator<raiden2cop_device>;
@@ -185,30 +188,28 @@ void raiden2cop_device::device_start()
 	save_item(NAME(m_LEGACY_r1));
 
 	m_videoramout_cb.resolve_safe();
+	m_byte_endian_val = m_cpu_is_68k ? 3 : 0;
+	m_word_endian_val = m_cpu_is_68k ? 2 : 0;
 }
 
 UINT16 raiden2cop_device::cop_read_word(address_space &space, int address)
 {
-	if (m_cpu_is_68k) return space.read_word(address ^ 2);
-	else return space.read_word(address);
+	return space.read_word(address ^ m_word_endian_val);
 }
 
 UINT8 raiden2cop_device::cop_read_byte(address_space &space, int address)
 {
-	if (m_cpu_is_68k) return space.read_byte(address ^ 3);
-	else return space.read_byte(address);
+	return space.read_byte(address ^ m_byte_endian_val);
 }
 
 void raiden2cop_device::cop_write_word(address_space &space, int address, UINT16 data)
 {
-	if (m_cpu_is_68k) space.write_word(address ^ 2, data);
-	else space.write_word(address, data);
+	space.write_word(address ^ m_word_endian_val, data);
 }
 
 void raiden2cop_device::cop_write_byte(address_space &space, int address, UINT8 data)
 {
-	if (m_cpu_is_68k) space.write_byte(address ^ 3, data);
-	else space.write_byte(address, data);
+	space.write_byte(address ^ m_byte_endian_val, data);
 }
 
 
@@ -887,12 +888,9 @@ WRITE16_MEMBER(raiden2cop_device::cop_dma_trigger_w)
 }
 
 /* Number Conversion */
-
-WRITE16_MEMBER(raiden2cop_device::cop_itoa_low_w)
+void raiden2cop_device::bcd_update()
 {
-	cop_itoa = (cop_itoa & ~UINT32(mem_mask)) | (data & mem_mask);
-
-	//int digits = 1 << cop_itoa_mode*2;
+		//int digits = 1 << cop_itoa_mode*2;
 	UINT32 val = cop_itoa;
 
 	//if(digits > 9)
@@ -918,9 +916,19 @@ WRITE16_MEMBER(raiden2cop_device::cop_itoa_low_w)
 	cop_itoa_digits[9] = 0;
 }
 
+WRITE16_MEMBER(raiden2cop_device::cop_itoa_low_w)
+{
+	cop_itoa = (cop_itoa & ~UINT32(mem_mask)) | (data & mem_mask);
+
+	bcd_update();
+}
+
 WRITE16_MEMBER(raiden2cop_device::cop_itoa_high_w)
 {
 	cop_itoa = (cop_itoa & ~(mem_mask << 16)) | ((data & mem_mask) << 16);
+	
+	// Godzilla cares, otherwise you get 2p score overflow in 1p vs 2p, TODO: might actually be HW endianness dependant?
+	bcd_update();
 }
 
 WRITE16_MEMBER(raiden2cop_device::cop_itoa_mode_w)
@@ -1115,6 +1123,10 @@ void raiden2cop_device::execute_338e(address_space &space, int offset, UINT16 da
 			cop_angle += 0x80;
 	}
 
+#if LOG_Phytagoras
+	printf("cmd %04x: dx = %d dy = %d angle = %02x\n",data,dx,dy,cop_angle);
+#endif
+
 	if (data & 0x0080) {
 		space.write_byte(cop_regs[0] + 0x34, cop_angle);
 	}
@@ -1140,6 +1152,10 @@ void raiden2cop_device::execute_3b30(address_space &space, int offset, UINT16 da
 	dy = dy >> 16;
 	cop_dist = sqrt((double)(dx*dx + dy*dy));
 
+#if LOG_Phytagoras
+	printf("cmd %04x: dx = %d dy = %d dist = %08x \n",data,dx >> 16,dy >> 16,cop_dist);
+#endif
+	
 	if (data & 0x0080)
 		space.write_word(cop_regs[0] + (data & 0x200 ? 0x3a : 0x38), cop_dist);
 }
@@ -1164,6 +1180,11 @@ void raiden2cop_device::LEGACY_execute_3b30(address_space &space, int offset, UI
 void raiden2cop_device::execute_42c2(address_space &space, int offset, UINT16 data)
 {
 	int div = space.read_word(cop_regs[0] + (0x36));
+
+#if LOG_Division
+	printf("cmd %04x: div = %04x scale = %04x\n",data,div,cop_scale);
+#endif
+
 	if (!div)
 	{
 		cop_status |= 0x8000;
@@ -1174,6 +1195,13 @@ void raiden2cop_device::execute_42c2(address_space &space, int offset, UINT16 da
 	/* TODO: bits 5-6-15 */
 	cop_status = 7;
 
+#if LOG_Division
+	printf("res = %04x dist %04x\n",(cop_dist << (5 - cop_scale)) / div,cop_dist);
+	
+//	if(div & 0x8000)
+//		machine().debugger().debug_break();
+#endif
+	
 	space.write_word(cop_regs[0] + (0x38), (cop_dist << (5 - cop_scale)) / div);
 }
 

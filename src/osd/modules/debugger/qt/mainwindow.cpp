@@ -76,7 +76,7 @@ MainWindow::MainWindow(running_machine* machine, QWidget* parent) :
 	rightActComments->setActionGroup(rightBarGroup);
 	rightActRaw->setShortcut(QKeySequence("Ctrl+R"));
 	rightActEncrypted->setShortcut(QKeySequence("Ctrl+E"));
-	rightActComments->setShortcut(QKeySequence("Ctrl+C"));
+	rightActComments->setShortcut(QKeySequence("Ctrl+N"));
 	rightActRaw->setChecked(true);
 	connect(rightBarGroup, &QActionGroup::triggered, this, &MainWindow::rightBarChanged);
 

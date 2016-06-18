@@ -2823,12 +2823,12 @@ void debugger_commands::execute_symlist(int ref, int params, const char **param)
 	}
 
 	/* gather names for all symbols */
-	for (symbol_entry &entry : symtable->entries())
+	for (auto &entry : symtable->entries())
 	{
 		/* only display "register" type symbols */
-		if (!entry.is_function())
+		if (!entry.second->is_function())
 		{
-			namelist[count++] = entry.name();
+			namelist[count++] = entry.second->name();
 			if (count >= ARRAY_LENGTH(namelist))
 				break;
 		}

@@ -179,38 +179,6 @@ public:
 	INTERRUPT_GEN_MEMBER( irq7_line_pulse );
 	INTERRUPT_GEN_MEMBER( irq7_line_assert );
 
-	// generic audio
-	void soundlatch_setclearedvalue(UINT16 value) { m_latch_clear_value = value; }
-
-	// sound latch readers
-	UINT32 soundlatch_read(UINT8 index = 0);
-	DECLARE_READ8_MEMBER( soundlatch_byte_r );
-	DECLARE_READ8_MEMBER( soundlatch2_byte_r );
-	DECLARE_READ8_MEMBER( soundlatch3_byte_r );
-	DECLARE_READ8_MEMBER( soundlatch4_byte_r );
-	DECLARE_READ16_MEMBER( soundlatch_word_r );
-	DECLARE_READ16_MEMBER( soundlatch2_word_r );
-	DECLARE_READ16_MEMBER( soundlatch3_word_r );
-	DECLARE_READ16_MEMBER( soundlatch4_word_r );
-
-	// sound latch writers
-	void soundlatch_write(UINT8 index, UINT32 data);
-	void soundlatch_write(UINT32 data) { soundlatch_write(0, data); }
-	DECLARE_WRITE8_MEMBER( soundlatch_byte_w );
-	DECLARE_WRITE8_MEMBER( soundlatch2_byte_w );
-	DECLARE_WRITE8_MEMBER( soundlatch3_byte_w );
-	DECLARE_WRITE8_MEMBER( soundlatch4_byte_w );
-	DECLARE_WRITE16_MEMBER( soundlatch_word_w );
-	DECLARE_WRITE16_MEMBER( soundlatch2_word_w );
-	DECLARE_WRITE16_MEMBER( soundlatch3_word_w );
-	DECLARE_WRITE16_MEMBER( soundlatch4_word_w );
-
-	// sound latch clearers
-	void soundlatch_clear(UINT8 index = 0);
-	DECLARE_WRITE8_MEMBER( soundlatch_clear_byte_w );
-	DECLARE_WRITE8_MEMBER( soundlatch2_clear_byte_w );
-	DECLARE_WRITE8_MEMBER( soundlatch3_clear_byte_w );
-	DECLARE_WRITE8_MEMBER( soundlatch4_clear_byte_w );
 
 	// generic video
 	void flip_screen_set(UINT32 on);
@@ -252,7 +220,6 @@ protected:
 private:
 	// helpers
 	void irq_pulse_clear(void *ptr, INT32 param);
-	void soundlatch_sync_callback(void *ptr, INT32 param);
 	void updateflip();
 
 	// configuration state
@@ -261,11 +228,6 @@ private:
 	// internal state
 	const game_driver *     m_system;                   // pointer to the game driver
 	driver_callback_delegate m_callbacks[CB_COUNT];     // start/reset callbacks
-
-	// generic audio
-	UINT16                  m_latch_clear_value;
-	UINT16                  m_latched_value[4];
-	UINT8                   m_latch_read[4];
 
 	// generic video
 	UINT8                   m_flip_screen_x;

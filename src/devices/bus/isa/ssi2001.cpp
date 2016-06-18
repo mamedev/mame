@@ -29,8 +29,8 @@ ssi2001_device::ssi2001_device(const machine_config &mconfig, const char *tag, d
 void ssi2001_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0200, 0x0207, 0, 0, read8_delegate(FUNC(pc_joy_device::joy_port_r), subdevice<pc_joy_device>("pc_joy")), write8_delegate(FUNC(pc_joy_device::joy_port_w), subdevice<pc_joy_device>("pc_joy")));
-	m_isa->install_device(0x0280, 0x029F, 0, 0, read8_delegate(FUNC(mos6581_device::read), subdevice<mos6581_device>("sid6581")), write8_delegate(FUNC(mos6581_device::write), subdevice<mos6581_device>("sid6581")));
+	m_isa->install_device(0x0200, 0x0207, read8_delegate(FUNC(pc_joy_device::joy_port_r), subdevice<pc_joy_device>("pc_joy")), write8_delegate(FUNC(pc_joy_device::joy_port_w), subdevice<pc_joy_device>("pc_joy")));
+	m_isa->install_device(0x0280, 0x029F, read8_delegate(FUNC(mos6581_device::read), subdevice<mos6581_device>("sid6581")), write8_delegate(FUNC(mos6581_device::write), subdevice<mos6581_device>("sid6581")));
 }
 
 

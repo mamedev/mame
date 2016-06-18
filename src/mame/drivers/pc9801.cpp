@@ -102,7 +102,6 @@
     - Sorcerian, Twilight Zone 3: Fails initial booting, issue with 2dd irq?
     - The Incredible Machine: hangs at main menu (YM mis-fires irq?)
     - Uchiyama Aki no Chou Bangai: keyboard irq is fussy (sometimes it doesn't register a key press);
-    - Uno: has minor EGC gfx bugs;
     - Windows 2: EGC drawing issue (byte wide writes?)
 
     per-game TODO (PC-9821):
@@ -984,7 +983,8 @@ WRITE8_MEMBER(pc9801_state::rtc_w)
 
 WRITE8_MEMBER(pc9801_state::dmapg4_w)
 {
-	m_dma_offset[(offset+1) & 3] = data & 0x0f;
+	if(offset < 4)
+		m_dma_offset[(offset+1) & 3] = data & 0x0f;
 }
 
 WRITE8_MEMBER(pc9801_state::dmapg8_w)
@@ -1021,7 +1021,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_video_ff_w)
 			m_gfx_ff = 1;
 			if(data & 1)
 				logerror("Graphic f/f actually enabled!\n");
-				break;
+			break;
 		case 4:
 			if(m_gfx_ff)
 			{
@@ -1055,13 +1055,16 @@ READ8_MEMBER(pc9801_state::txt_scrl_r)
 {
 	//logerror("Read to display register [%02x]\n",offset+0x70);
 	/* TODO: ok? */
-	return m_txt_scroll_reg[offset >> 1];
+	if(offset <= 5)
+		return m_txt_scroll_reg[offset];
+	return 0xff;
 }
 
 WRITE8_MEMBER(pc9801_state::txt_scrl_w)
 {
 	//logerror("Write to display register [%02x] %02x\n",offset+0x70,data);
-	m_txt_scroll_reg[offset >> 1] = data;
+	if(offset <= 5)
+		m_txt_scroll_reg[offset] = data;
 
 	//popmessage("%02x %02x %02x %02x",m_txt_scroll_reg[0],m_txt_scroll_reg[1],m_txt_scroll_reg[2],m_txt_scroll_reg[3]);
 }
@@ -1687,7 +1690,6 @@ WRITE8_MEMBER( pc9801_state::sasi_ctrl_w )
 }
 
 static ADDRESS_MAP_START( pc9801_map, AS_PROGRAM, 16, pc9801_state )
-	AM_RANGE(0x00000, 0x9ffff) AM_RAM //work RAM
 	AM_RANGE(0xa0000, 0xa3fff) AM_READWRITE(tvram_r,tvram_w) //TVRAM
 	AM_RANGE(0xa8000, 0xbffff) AM_READWRITE8(gvram_r,gvram_w,0xffff) //bitmap VRAM
 	AM_RANGE(0xcc000, 0xcdfff) AM_ROM AM_REGION("sound_bios",0) //sound BIOS
@@ -1700,18 +1702,18 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pc9801_common_io, AS_IO, 16, pc9801_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("i8237", am9517a_device, read, write, 0xff00)
-	AM_RANGE(0x0000, 0x000f) AM_READWRITE8(pic_r, pic_w, 0x00ff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
-	AM_RANGE(0x0020, 0x0021) AM_WRITE8(rtc_w,0x00ff)
+	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pic_r, pic_w, 0x00ff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
+	AM_RANGE(0x0020, 0x002f) AM_WRITE8(rtc_w,0x00ff)
 	AM_RANGE(0x0030, 0x0037) AM_DEVREADWRITE8("ppi8255_sys", i8255_device, read, write, 0xff00) //i8251 RS232c / i8255 system port
 	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8("ppi8255_prn", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("keyb", pc9801_kbd_device, rx_r, tx_w, 0xff00) //i8255 printer port / i8251 keyboard
+	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8("keyb", pc9801_kbd_device, rx_r, tx_w, 0xff00) //i8255 printer port / i8251 keyboard
 	AM_RANGE(0x0050, 0x0057) AM_DEVREADWRITE8("ppi8255_fdd", i8255_device, read, write, 0xff00)
-	AM_RANGE(0x0050, 0x0053) AM_WRITE8(nmi_ctrl_w,0x00ff) // NMI FF / i8255 floppy port (2d?)
+	AM_RANGE(0x0050, 0x0057) AM_WRITE8(nmi_ctrl_w,0x00ff) // NMI FF / i8255 floppy port (2d?)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("upd7220_chr", upd7220_device, read, write, 0x00ff) //upd7220 character ports / <undefined>
 	AM_RANGE(0x0064, 0x0065) AM_WRITE8(vrtc_clear_w,0x00ff)
 //  AM_RANGE(0x006c, 0x006f) border color / <undefined>
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0xff00)
-	AM_RANGE(0x0070, 0x007b) AM_READWRITE8(txt_scrl_r,txt_scrl_w,0x00ff) //display registers / i8253 pit
+	AM_RANGE(0x0070, 0x007f) AM_READWRITE8(txt_scrl_r,txt_scrl_w,0x00ff) //display registers / i8253 pit
 	AM_RANGE(0x0080, 0x0081) AM_READWRITE8(sasi_data_r, sasi_data_w, 0x00ff)
 	AM_RANGE(0x0082, 0x0083) AM_READWRITE8(sasi_status_r, sasi_ctrl_w,0x00ff)
 	AM_RANGE(0x0090, 0x0091) AM_DEVREAD8("upd765_2hd", upd765a_device, msr_r, 0x00ff)
@@ -1723,7 +1725,7 @@ static ADDRESS_MAP_START( pc9801_common_io, AS_IO, 16, pc9801_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9801_io, AS_IO, 16, pc9801_state )
-	AM_RANGE(0x0020, 0x0027) AM_WRITE8(dmapg4_w,0xff00)
+	AM_RANGE(0x0020, 0x002f) AM_WRITE8(dmapg4_w,0xff00)
 	AM_RANGE(0x0068, 0x0069) AM_WRITE8(pc9801_video_ff_w,0x00ff) //mode FF / <undefined>
 	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,pc9801_a0_w,0xffff) //upd7220 bitmap ports / display registers
 	AM_RANGE(0x00c8, 0x00cb) AM_DEVICE8("upd765_2dd", upd765a_device, map, 0x00ff)
@@ -1824,7 +1826,7 @@ WRITE8_MEMBER(pc9801_state::a20_ctrl_w)
 		/* reset POR bit, TODO: is there any other way? */
 		por = machine().device<i8255_device>("ppi8255_sys")->read(space, 2) & ~0x20;
 		machine().device<i8255_device>("ppi8255_sys")->write(space, 2,por);
-		m_maincpu->set_input_line(INPUT_LINE_A20, 0);
+		m_maincpu->set_input_line(INPUT_LINE_A20, CLEAR_LINE);
 		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 		m_gate_a20 = 0;
 	}
@@ -2101,7 +2103,6 @@ static ADDRESS_MAP_START( ipl_bank, AS_0, 16, pc9801_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9801ux_map, AS_PROGRAM, 16, pc9801_state )
-	AM_RANGE(0x000000, 0x09ffff) AM_RAMBANK("wram")
 	AM_RANGE(0x0a0000, 0x0a3fff) AM_READWRITE(tvram_r, tvram_w)
 	AM_RANGE(0x0a4000, 0x0a4fff) AM_READWRITE8(pc9801rs_knjram_r, pc9801rs_knjram_w, 0xffff)
 	AM_RANGE(0x0a8000, 0x0bffff) AM_READWRITE(grcg_gvram_r, grcg_gvram_w)
@@ -2331,7 +2332,6 @@ WRITE8_MEMBER(pc9801_state::winram_w)
 }*/
 
 static ADDRESS_MAP_START( pc9821_map, AS_PROGRAM, 32, pc9801_state )
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("wram")
 	//AM_RANGE(0x00080000, 0x0009ffff) AM_READWRITE8(winram_r, winram_w, 0xffffffff)
 	AM_RANGE(0x000a0000, 0x000a3fff) AM_READWRITE16(tvram_r, tvram_w, 0xffffffff)
 	AM_RANGE(0x000a4000, 0x000a4fff) AM_READWRITE8(pc9801rs_knjram_r, pc9801rs_knjram_w, 0xffffffff)
@@ -2349,12 +2349,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 //  ADDRESS_MAP_UNMAP_HIGH // TODO: a read to somewhere makes this to fail at POST
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("i8237", am9517a_device, read, write, 0xff00ff00)
-	AM_RANGE(0x0000, 0x000f) AM_READWRITE8(pic_r, pic_w, 0x00ff00ff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
-	AM_RANGE(0x0020, 0x0023) AM_WRITE8(rtc_w,0x000000ff)
+	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pic_r, pic_w, 0x00ff00ff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
+	AM_RANGE(0x0020, 0x002f) AM_WRITE8(rtc_w,0x000000ff)
 	AM_RANGE(0x0020, 0x002f) AM_WRITE8(dmapg8_w,0xff00ff00)
 	AM_RANGE(0x0030, 0x0037) AM_DEVREADWRITE8("ppi8255_sys", i8255_device, read, write, 0xff00ff00) //i8251 RS232c / i8255 system port
 	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8("ppi8255_prn", i8255_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("keyb", pc9801_kbd_device, rx_r, tx_w, 0xff00ff00) //i8255 printer port / i8251 keyboard
+	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8("keyb", pc9801_kbd_device, rx_r, tx_w, 0xff00ff00) //i8255 printer port / i8251 keyboard
 	AM_RANGE(0x0050, 0x0053) AM_WRITE8(nmi_ctrl_w, 0x00ff00ff)
 	AM_RANGE(0x005c, 0x005f) AM_READ16(timestamp_r,0xffffffff) AM_WRITENOP // artic
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("upd7220_chr", upd7220_device, read, write, 0x00ff00ff) //upd7220 character ports / <undefined>
@@ -2964,9 +2964,17 @@ MACHINE_START_MEMBER(pc9801_state,pc9801_common)
 
 	m_vbirq = timer_alloc(TIMER_VBIRQ);
 
+	int ram_size = m_ram->size() - (640*1024);
+
+	address_space& space = m_maincpu->space(AS_PROGRAM);
+	space.install_ram(0, (ram_size < 0) ? m_ram->size() - 1 : (640*1024) - 1, m_ram->pointer());
+	if(ram_size > 0)
+		space.install_ram(1024*1024, (1024*1024) + ram_size - 1, &m_ram->pointer()[(640*1024)]);
+
 	save_item(NAME(m_sasi_data));
 	save_item(NAME(m_sasi_data_enable));
 	save_item(NAME(m_sasi_ctrl));
+	save_pointer(NAME(m_egc.regs), 8);
 }
 
 MACHINE_START_MEMBER(pc9801_state,pc9801f)
@@ -2981,17 +2989,6 @@ MACHINE_START_MEMBER(pc9801_state,pc9801f)
 MACHINE_START_MEMBER(pc9801_state,pc9801rs)
 {
 	MACHINE_START_CALL_MEMBER(pc9801_common);
-
-	int ram_size = m_ram->size() - 0xa0000;
-
-	address_space& space = m_maincpu->space(AS_PROGRAM);
-	membank("wram")->set_base(m_ram->pointer());
-	if(ram_size)
-	{
-		space.install_read_bank(0x100000,  0x100000 + ram_size - 1, "ext_wram");
-		space.install_write_bank(0x100000,  0x100000 + ram_size - 1, "ext_wram");
-		membank("ext_wram")->set_base(m_ram->pointer() + 0xa0000);
-	}
 
 	m_sys_type = 0x80 >> 6;
 }
@@ -3276,11 +3273,11 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801f)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801f)
-#if 0
+
+	// TODO: maybe force dips to avoid beep error
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("256K,384K,512K,640K")
-#endif
+	MCFG_RAM_DEFAULT_SIZE("640K")
+	MCFG_RAM_EXTRA_OPTIONS("128K,256K,384K,512K")
 
 	MCFG_UPD765A_ADD("upd765_2dd", false, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc9801_state, fdc_2dd_irq))
@@ -3555,9 +3552,9 @@ ROM_START( pc9801bx2 )
 	ROM_LOAD( "pc98bank2.bin",  0x00000, 0x08000, BAD_DUMP CRC(12818a14) SHA1(9c31e8ac85d78fa779d6bbc2095557065294ec09) )
 	ROM_LOAD( "pc98bank3.bin",  0x00000, 0x08000, BAD_DUMP CRC(d0bda44e) SHA1(c1022a3b2be4d2a1e43914df9e4605254e5f99d5) )
 	ROM_LOAD( "pc98bank4.bin",  0x10000, 0x08000, BAD_DUMP CRC(be8092f4) SHA1(12c8a166b8c6ebbef85568b67e1f098562883365) )
-	ROM_LOAD( "pc98bank5.bin",  0x00000, 0x08000, BAD_DUMP CRC(4e32081e) SHA1(e23571273b7cad01aa116cb7414c5115a1093f85) )
-	ROM_LOAD( "pc98bank6.bin",  0x00000, 0x08000, BAD_DUMP CRC(f878c160) SHA1(cad47f09075ffe4f7b51bb937c9f716c709d4596) )
-	ROM_LOAD( "pc98bank7.bin",  0x00000, 0x08000, BAD_DUMP CRC(1bd6537b) SHA1(ff9ee1c976a12b87851635ce8991ac4ad607675b) )
+	ROM_LOAD( "pc98bank5.bin",  0x18000, 0x08000, BAD_DUMP CRC(4e32081e) SHA1(e23571273b7cad01aa116cb7414c5115a1093f85) )
+	ROM_LOAD( "pc98bank6.bin",  0x20000, 0x08000, BAD_DUMP CRC(f878c160) SHA1(cad47f09075ffe4f7b51bb937c9f716c709d4596) )
+	ROM_LOAD( "pc98bank7.bin",  0x28000, 0x08000, BAD_DUMP CRC(1bd6537b) SHA1(ff9ee1c976a12b87851635ce8991ac4ad607675b) )
 
 	ROM_REGION( 0x10000, "sound_bios", 0 )
 	ROM_LOAD( "sound.rom", 0x0000, 0x4000, CRC(80eabfde) SHA1(e09c54152c8093e1724842c711aed6417169db23) )

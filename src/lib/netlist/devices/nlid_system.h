@@ -11,6 +11,8 @@
 #ifndef NLID_SYSTEM_H_
 #define NLID_SYSTEM_H_
 
+#include <vector>
+
 #include "nl_setup.h"
 #include "nl_base.h"
 #include "nl_factory.h"
@@ -119,6 +121,8 @@ namespace netlist
 		, m_offset(*this, "OFFSET", 0.0)
 		, m_feedback(*this, "FB")
 		, m_Q(*this, "Q")
+		, m_cnt(*this, "m_cnt", 0)
+		, m_off(*this, "m_off", netlist_time::zero())
 		{
 			m_inc[0] = netlist_time::from_hz(m_freq.Value()*2);
 
@@ -126,7 +130,7 @@ namespace netlist
 			{
 				netlist_time base = netlist_time::from_hz(m_freq.Value()*2);
 				plib::pstring_vector_t pat(m_pattern.Value(),",");
-				m_off = netlist_time(m_offset.Value());
+				m_off = netlist_time::from_double(m_offset.Value());
 
 				int pati[256];
 				m_size = pat.size();
@@ -144,8 +148,6 @@ namespace netlist
 				}
 				m_inc[m_size - 1] = base * total - ttotal;
 			}
-			save(NLNAME(m_cnt));
-			save(NLNAME(m_off));
 		}
 		NETLIB_UPDATEI();
 		NETLIB_RESETI();
@@ -158,10 +160,10 @@ namespace netlist
 
 		logic_input_t m_feedback;
 		logic_output_t m_Q;
-		unsigned m_cnt;
-		unsigned m_size;
 		netlist_time m_inc[32];
-		netlist_time m_off;
+		state_var<unsigned> m_cnt;
+		state_var<netlist_time> m_off;
+		unsigned m_size;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -258,7 +260,7 @@ namespace netlist
 	{
 	public:
 		NETLIB_CONSTRUCTOR_DERIVED(frontier, base_dummy)
-		, m_RIN(*this, "m_RIN")
+		, m_RIN(*this, "m_RIN", true)
 		, m_ROUT(*this, "m_ROUT", true)
 		, m_I(*this, "_I")
 		, m_Q(*this, "_Q")
@@ -311,8 +313,8 @@ namespace netlist
 		, m_Q(*this, "Q")
 		{
 
-			for (std::size_t i=0; i < m_N; i++)
-				m_I.emplace(i, *this, plib::pfmt("A{1}")(i));
+			for (int i=0; i < m_N; i++)
+				m_I.push_back(plib::make_unique<analog_input_t>(*this, plib::pfmt("A{1}")(i)));
 
 			plib::pstring_vector_t cmds(m_func.Value(), " ");
 			m_precompiled.clear();
@@ -375,9 +377,9 @@ namespace netlist
 		param_int_t m_N;
 		param_str_t m_func;
 		analog_output_t m_Q;
-		plib::uninitialised_array_t<analog_input_t, 10> m_I;
+		std::vector<std::unique_ptr<analog_input_t>> m_I;
 
-		plib::pvector_t<rpn_inst> m_precompiled;
+		std::vector<rpn_inst> m_precompiled;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -392,12 +394,10 @@ namespace netlist
 		, m_I(*this, "I")
 		, m_RON(*this, "RON", 1.0)
 		, m_ROFF(*this, "ROFF", 1.0E20)
-		, m_last_state(0)
+		, m_last_state(*this, "m_last_state", 0)
 		{
 			register_subalias("1", m_R.m_P);
 			register_subalias("2", m_R.m_N);
-
-			save(NLNAME(m_last_state));
 		}
 
 		NETLIB_SUB(R) m_R;
@@ -414,8 +414,7 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	private:
-
-		UINT8 m_last_state;
+		state_var_u8 m_last_state;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -518,7 +517,7 @@ namespace netlist
 		: nld_base_d_to_a_proxy(anetlist, name, out_proxied, m_RV.m_P)
 		, m_GNDHack(*this, "_Q")
 		, m_RV(*this, "RV")
-		, m_last_state(-1)
+		, m_last_state(*this, "m_last_var", -1)
 		, m_is_timestep(false)
 		{
 			//register_sub(m_RV);
@@ -528,8 +527,6 @@ namespace netlist
 			register_subalias("Q", m_RV.m_P);
 
 			connect_late(m_RV.m_N, m_GNDHack);
-
-			save(NLNAME(m_last_state));
 		}
 
 		virtual ~nld_d_to_a_proxy() {}
@@ -542,7 +539,7 @@ namespace netlist
 	private:
 		analog_output_t m_GNDHack;  // FIXME: Long term, we need to connect proxy gnd to device gnd
 		NETLIB_SUB(twoterm) m_RV;
-		int m_last_state;
+		state_var<int> m_last_state;
 		bool m_is_timestep;
 	};
 

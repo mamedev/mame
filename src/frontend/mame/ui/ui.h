@@ -21,6 +21,7 @@
 #include "ui/uimain.h"
 #include "ui/menuitem.h"
 #include "ui/slider.h"
+#include "ui/text.h"
 
 namespace ui {
 
@@ -256,6 +257,7 @@ public:
 
 	// other
 	void process_natural_keyboard();
+	ui::text_layout create_layout(render_container *container, float width = 1.0, ui::text_layout::text_justify justify = ui::text_layout::LEFT, ui::text_layout::word_wrapping wrap = ui::text_layout::WORD);
 
 	// word wrap
 	int wrap_text(render_container *container, const char *origs, float x, float y, float origwrapwidth, std::vector<int> &xstart, std::vector<int> &xend, float text_size = 1.0f);
@@ -263,8 +265,6 @@ public:
 	// draw an outlined box with given line color and filled with a texture
 	void draw_textured_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor, rgb_t linecolor, render_texture *texture = nullptr, UINT32 flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	virtual void popup_time_string(int seconds, std::string message) override;
-
-	virtual void image_display(const device_type &type, device_image_interface *image) override;
 
 	virtual void menu_reset() override;
 

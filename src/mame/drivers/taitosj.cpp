@@ -92,7 +92,7 @@ Address          Dir Data     Name       Description
     although bioatack and spaceskr do initialise the second bank.
 
 [2] Priority is controlled by a 256x4 PROM.
-    Bits 0-3 of PRY go to A4-A7 of the PROM, bit 4 selectes D0-D1 or D2-D3.
+    Bits 0-3 of PRY go to A4-A7 of the PROM, bit 4 selects D0-D1 or D2-D3.
     A0-A3 of the PROM is fed with a mask of the inactive planes in the order
     OBJ-SCN1-SCN2-SCN3. The 2-bit code which comes out from the PROM selects
     the plane to display.
@@ -170,7 +170,6 @@ TODO:
 #include "cpu/m6805/m6805.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "sound/dac.h"
 #include "includes/taitosj.h"
 
 
@@ -181,7 +180,7 @@ WRITE8_MEMBER(taitosj_state::taitosj_sndnmi_msk_w)
 
 WRITE8_MEMBER(taitosj_state::taitosj_soundcommand_w)
 {
-	soundlatch_byte_w(space,offset,data);
+	m_soundlatch->write(space,offset,data);
 	if (!m_sndnmi_disable) m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -347,7 +346,7 @@ static ADDRESS_MAP_START( taitosj_audio_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0x4803, 0x4803) AM_DEVREAD("ay3", ay8910_device, data_r)
 	AM_RANGE(0x4804, 0x4805) AM_DEVWRITE("ay4", ay8910_device, address_data_w)
 	AM_RANGE(0x4805, 0x4805) AM_DEVREAD("ay4", ay8910_device, data_r)
-	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x5000, 0x5000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe000, 0xefff) AM_ROM /* space for diagnostic ROM */
 ADDRESS_MAP_END
 
@@ -1775,6 +1774,8 @@ static MACHINE_CONFIG_START( nomcu, taitosj_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 6000000/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))

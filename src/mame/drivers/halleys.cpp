@@ -164,6 +164,7 @@ Video sync   6 F   Video sync                 Post   6 F   Post
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/taitoipt.h"
+#include "machine/gen_latch.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 
@@ -217,7 +218,8 @@ public:
 		m_io_ram(*this, "io_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	UINT16 *m_render_layer[MAX_LAYERS];
 	UINT8 m_sound_fifo[MAX_SOUNDS];
@@ -285,6 +287,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 };
 
 
@@ -887,7 +890,7 @@ COMMAND_MODE:
 		    second pass at the same location with zeroes. In addition the
 		    X and Y values passed to the blitter do not reflect the tiles true
 		    locations. For example, tiles near the top or bottom of the screen
-		    are positioned resonably close but those in the middle are oddly
+		    are positioned reasonably close but those in the middle are oddly
 		    shifted toward either side. The tiles also resemble predefined
 		    patterns but I don't know if there are supposed to be lookup tables
 		    in ROM or hard-wired to the blitter chips.
@@ -934,13 +937,20 @@ COMMAND_MODE:
 				ax = (UINT16)src1_ptr[edx];
 				al = src1_ptr[edx+0x10000];
 				ax |= BG_RGB;
-				if (al & 0x01) dst_ptr[ecx] = ax;  ecx++; ecx &= WARPMASK;
-				if (al & 0x02) dst_ptr[ecx] = ax;  ecx++; ecx &= WARPMASK;
-				if (al & 0x04) dst_ptr[ecx] = ax;  ecx++; ecx &= WARPMASK;
-				if (al & 0x08) dst_ptr[ecx] = ax;  ecx++; ecx &= WARPMASK;
-				if (al & 0x10) dst_ptr[ecx] = ax;  ecx++; ecx &= WARPMASK;
-				if (al & 0x20) dst_ptr[ecx] = ax;  ecx++; ecx &= WARPMASK;
-				if (al & 0x40) dst_ptr[ecx] = ax;  ecx++; ecx &= WARPMASK;
+				if (al & 0x01) dst_ptr[ecx] = ax;
+				ecx++; ecx &= WARPMASK;
+				if (al & 0x02) dst_ptr[ecx] = ax;
+				ecx++; ecx &= WARPMASK;
+				if (al & 0x04) dst_ptr[ecx] = ax;
+				ecx++; ecx &= WARPMASK;
+				if (al & 0x08) dst_ptr[ecx] = ax;
+				ecx++; ecx &= WARPMASK;
+				if (al & 0x10) dst_ptr[ecx] = ax;
+				ecx++; ecx &= WARPMASK;
+				if (al & 0x20) dst_ptr[ecx] = ax;
+				ecx++; ecx &= WARPMASK;
+				if (al & 0x40) dst_ptr[ecx] = ax;
+				ecx++; ecx &= WARPMASK;
 				if (al & 0x80) dst_ptr[ecx] = ax;
 				dst_ptr += SCREEN_WIDTH;
 			} while (++edx);
@@ -1401,12 +1411,18 @@ void halleys_state::copy_fixed_xp(bitmap_ind16 &bitmap, UINT16 *source)
 		do {
 			ax = esi[ecx];
 			bx = esi[ecx+1];
-			if (ax) edi[ecx  ] = ax; ax = esi[ecx+2];
-			if (bx) edi[ecx+1] = bx; bx = esi[ecx+3];
-			if (ax) edi[ecx+2] = ax; ax = esi[ecx+4];
-			if (bx) edi[ecx+3] = bx; bx = esi[ecx+5];
-			if (ax) edi[ecx+4] = ax; ax = esi[ecx+6];
-			if (bx) edi[ecx+5] = bx; bx = esi[ecx+7];
+			if (ax) edi[ecx  ] = ax;
+			ax = esi[ecx+2];
+			if (bx) edi[ecx+1] = bx;
+			bx = esi[ecx+3];
+			if (ax) edi[ecx+2] = ax;
+			ax = esi[ecx+4];
+			if (bx) edi[ecx+3] = bx;
+			bx = esi[ecx+5];
+			if (ax) edi[ecx+4] = ax;
+			ax = esi[ecx+6];
+			if (bx) edi[ecx+5] = bx;
+			bx = esi[ecx+7];
 			if (ax) edi[ecx+6] = ax;
 			if (bx) edi[ecx+7] = bx;
 		}
@@ -1437,24 +1453,40 @@ void halleys_state::copy_fixed_2b(bitmap_ind16 &bitmap, UINT16 *source)
 			ax = esi[ecx];
 			bx = esi[ecx+1];
 
-			if (!(ax)) goto SKIP0; if (!(ax&SP_2BACK)) goto DRAW0; if (edi[ecx  ]) goto SKIP0;
+			if (!(ax)) goto SKIP0;
+			if (!(ax&SP_2BACK)) goto DRAW0;
+			if (edi[ecx  ]) goto SKIP0;
 			DRAW0: edi[ecx  ] = ax; SKIP0: ax = esi[ecx+2];
-			if (!(bx)) goto SKIP1; if (!(bx&SP_2BACK)) goto DRAW1; if (edi[ecx+1]) goto SKIP1;
+			if (!(bx)) goto SKIP1;
+			if (!(bx&SP_2BACK)) goto DRAW1;
+			if (edi[ecx+1]) goto SKIP1;
 			DRAW1: edi[ecx+1] = bx; SKIP1: bx = esi[ecx+3];
 
-			if (!(ax)) goto SKIP2; if (!(ax&SP_2BACK)) goto DRAW2; if (edi[ecx+2]) goto SKIP2;
+			if (!(ax)) goto SKIP2;
+			if (!(ax&SP_2BACK)) goto DRAW2;
+			if (edi[ecx+2]) goto SKIP2;
 			DRAW2: edi[ecx+2] = ax; SKIP2: ax = esi[ecx+4];
-			if (!(bx)) goto SKIP3; if (!(bx&SP_2BACK)) goto DRAW3; if (edi[ecx+3]) goto SKIP3;
+			if (!(bx)) goto SKIP3;
+			if (!(bx&SP_2BACK)) goto DRAW3;
+			if (edi[ecx+3]) goto SKIP3;
 			DRAW3: edi[ecx+3] = bx; SKIP3: bx = esi[ecx+5];
 
-			if (!(ax)) goto SKIP4; if (!(ax&SP_2BACK)) goto DRAW4; if (edi[ecx+4]) goto SKIP4;
+			if (!(ax)) goto SKIP4;
+			if (!(ax&SP_2BACK)) goto DRAW4;
+			if (edi[ecx+4]) goto SKIP4;
 			DRAW4: edi[ecx+4] = ax; SKIP4: ax = esi[ecx+6];
-			if (!(bx)) goto SKIP5; if (!(bx&SP_2BACK)) goto DRAW5; if (edi[ecx+5]) goto SKIP5;
+			if (!(bx)) goto SKIP5;
+			if (!(bx&SP_2BACK)) goto DRAW5;
+			if (edi[ecx+5]) goto SKIP5;
 			DRAW5: edi[ecx+5] = bx; SKIP5: bx = esi[ecx+7];
 
-			if (!(ax)) goto SKIP6; if (!(ax&SP_2BACK)) goto DRAW6; if (edi[ecx+6]) goto SKIP6;
+			if (!(ax)) goto SKIP6;
+			if (!(ax&SP_2BACK)) goto DRAW6;
+			if (edi[ecx+6]) goto SKIP6;
 			DRAW6: edi[ecx+6] = ax; SKIP6:
-			if (!(bx)) continue;   if (!(bx&SP_2BACK)) goto DRAW7; if (edi[ecx+7]) continue;
+			if (!(bx)) continue;
+			if (!(bx&SP_2BACK)) goto DRAW7;
+			if (edi[ecx+7]) continue;
 			DRAW7: edi[ecx+7] = bx;
 		}
 		while (ecx += 8);
@@ -1643,7 +1675,7 @@ WRITE8_MEMBER(halleys_state::sndnmi_msk_w)
 WRITE8_MEMBER(halleys_state::soundcommand_w)
 {
 	m_io_ram[0x8a] = data;
-	soundlatch_byte_w(space,offset,data);
+	m_soundlatch->write(space,offset,data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -1711,7 +1743,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, halleys_state )
 	AM_RANGE(0x4803, 0x4803) AM_DEVREAD("ay3", ay8910_device, data_r)
 	AM_RANGE(0x4804, 0x4805) AM_DEVWRITE("ay4", ay8910_device, address_data_w)
 	AM_RANGE(0x4805, 0x4805) AM_DEVREAD("ay4", ay8910_device, data_r)
-	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x5000, 0x5000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe000, 0xefff) AM_ROM // space for diagnostic ROM
 ADDRESS_MAP_END
 
@@ -1992,6 +2024,8 @@ static MACHINE_CONFIG_START( halleys, halleys_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_6MHz/4) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)

@@ -71,7 +71,7 @@ private:
 	void init_messinfo();
 	void init_command();
 	void init_sysinfo();
-	void init_storyinfo();
+	void init_story();
 	void init_gameinit();
 
 	// file open/close/seek
@@ -79,9 +79,9 @@ private:
 	void parseclose() { if (fp != nullptr) fclose(fp); }
 
 	int index_mame_mess_info(dataindex &index, drvindex &index_drv, int &drvcount);
-	int index_datafile(dataindex &index, int &swcount);
+	int index_datafile(dataindex &index, int &swcount, std::string &tag, std::string &str, char sep);
 	void index_menuidx(const game_driver *drv, dataindex &idx, drvindex &index);
-	drvindex::iterator m_itemsiter;
+	drvindex::const_iterator m_itemsiter;
 
 	void load_data_text(const game_driver *drv, std::string &buffer, dataindex &idx, std::string &tag);
 	void load_driver_text(const game_driver *drv, std::string &buffer, drvindex &idx, std::string &tag);

@@ -154,8 +154,6 @@ project ("osd_" .. _OPTIONS["osd"])
 	}
 
 	files {
-		MAME_DIR .. "src/osd/modules/render/d3d/d3d9intf.cpp",
-		MAME_DIR .. "src/osd/modules/render/d3d/d3dintf.h",
 		MAME_DIR .. "src/osd/modules/render/d3d/d3dhlsl.cpp",
 		MAME_DIR .. "src/osd/modules/render/d3d/d3dcomm.h",
 		MAME_DIR .. "src/osd/modules/render/d3d/d3dhlsl.h",

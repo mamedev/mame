@@ -4,11 +4,11 @@
  Welltris (c)1991 Video System
 
 ********************************************************************************
- hardware is similar to aerofgt.c but with slightly different sprites, sound,
+ hardware is similar to aerofgt.cpp but with slightly different sprites, sound,
  and an additional 'pixel' layer used for the backdrops
 
  Driver by David Haywood, with help from Steph from The Ultimate Patchers
- Thanks to the authors of aerofgt.c and fromance.c on which most of this is
+ Thanks to the authors of aerofgt.cpp and fromance.cpp on which most of this is
  based
 ********************************************************************************
 OW-13 CPU
@@ -51,7 +51,7 @@ V-SYSTEM VS8803 6082 9040 EBBB
 ********************************************************************************
 
  its impossible to know what some of the video registers do due to lack of
- evidence (bg palette has a selector, but i'm not sure which ... test mode
+ evidence (bg palette has a selector, but I'm not sure which ... test mode
  colours use different palette on rgb test
 
 ********************************************************************************
@@ -167,8 +167,8 @@ To select a player, press one of his 2 buttons ...
 
   - When it's OFF, only player 1 can play, the number of credits is decremented when
     you press the player buttons ... If you wait until timer reaches 0 without selecting
-    a player, 1 credit will be substracted, and you'll start a game with player 1 ...
-  - When it's ON, 1 credit will be automatically substracted, then the 4 players can
+    a player, 1 credit will be subtracted, and you'll start a game with player 1 ...
+  - When it's ON, 1 credit will be automatically subtracted, then the 4 players can
     play by pressing one of their buttons ... If you wait until timer reaches 0 without
     selecting a player, you'll start a game with player 1 ...
 
@@ -333,7 +333,7 @@ WRITE16_MEMBER(welltris_state::sound_command_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_pending_command = 1;
-		soundlatch_byte_w(space, 0, data & 0xff);
+		m_soundlatch->write(space, 0, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -383,7 +383,7 @@ static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, welltris_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bankswitch_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0x10, 0x10) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x10, 0x10) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x18, 0x18) AM_WRITE(pending_command_clear_w)
 ADDRESS_MAP_END
 
@@ -670,14 +670,6 @@ static GFXDECODE_START( welltris )
 GFXDECODE_END
 
 
-
-WRITE_LINE_MEMBER(welltris_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-
 DRIVER_INIT_MEMBER(welltris_state,welltris)
 {
 #if WELLTRIS_4P_HACK
@@ -727,8 +719,10 @@ static MACHINE_CONFIG_START( welltris, welltris_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(welltris_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.75)
 	MCFG_SOUND_ROUTE(2, "mono", 0.75)

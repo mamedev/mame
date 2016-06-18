@@ -418,7 +418,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( ace_io, AS_IO, 8, ace_state )
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xfffe) AM_MASK(0xff00) AM_READWRITE(io_r, io_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x00fe) AM_SELECT(0xff00) AM_READWRITE(io_r, io_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff00) AM_READ_PORT("JOY")
 	AM_RANGE(0x41, 0x41) AM_MIRROR(0xff80) AM_READWRITE(ppi_pa_r, ppi_pa_w)
 	AM_RANGE(0x43, 0x43) AM_MIRROR(0xff80) AM_READWRITE(ppi_pb_r, ppi_pb_w)

@@ -185,6 +185,7 @@ struct c_mnfct
 	static void set(const char *str);
 	static std::string getname(const char *str);
 	static std::vector<std::string> ui;
+	static std::unordered_map<std::string, int> uimap;
 	static UINT16 actual;
 };
 
@@ -242,15 +243,10 @@ struct sw_custfltr
 };
 
 // GLOBAL FUNCTIONS
-
-// advanced search function
 int fuzzy_substring(std::string needle, std::string haystack);
-
-// trim carriage return
 char* chartrimcarriage(char str[]);
-
 const char* strensure(const char* s);
-
 int getprecisionchr(const char* s);
+std::vector<std::string> tokenize(const std::string &text, char sep);
 
 #endif /* __UI_UTILS_H__ */

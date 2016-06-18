@@ -20,7 +20,7 @@ T.Slanina 20040530 :
 
  20080528
  - Removed ROM patches and debug keypresses
- - Added protection simulation in machine/tecmosys.c
+ - Added protection simulation in machine/tecmosys.cpp
  - Fixed inputs
  - Added watchdog
 
@@ -184,7 +184,6 @@ ae500w07.ad1 - M6295 Samples (23c4001)
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/eepromser.h"
 #include "includes/tecmosys.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
@@ -198,7 +197,7 @@ READ16_MEMBER(tecmosys_state::sound_r)
 	if (ACCESSING_BITS_0_7)
 	{
 		machine().scheduler().synchronize();
-		return soundlatch2_byte_r(space,  0 );
+		return m_soundlatch2->read(space, 0);
 	}
 
 	return 0;
@@ -209,7 +208,7 @@ WRITE16_MEMBER(tecmosys_state::sound_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		machine().scheduler().synchronize();
-		soundlatch_byte_w(space, 0x00, data & 0xff);
+		m_soundlatch->write(space, 0x00, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -351,8 +350,8 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, tecmosys_state )
 	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x20, 0x20) AM_WRITE(oki_bank_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(z80_bank_w)
-	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x50, 0x50) AM_WRITE(soundlatch2_byte_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0x50, 0x50) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("ymz", ymz280b_device, read, write)
 ADDRESS_MAP_END
 
@@ -433,13 +432,6 @@ static GFXDECODE_START( tecmosys )
 GFXDECODE_END
 
 
-
-WRITE_LINE_MEMBER(tecmosys_state::sound_irq)
-{
-	/* IRQ */
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 void tecmosys_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 16, memregion("audiocpu")->base(), 0x4000);
@@ -482,8 +474,11 @@ static MACHINE_CONFIG_START( deroon, tecmosys_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+
 	MCFG_SOUND_ADD("ymf", YMF262, XTAL_14_31818MHz)
-	MCFG_YMF262_IRQ_HANDLER(WRITELINE(tecmosys_state, sound_irq))
+	MCFG_YMF262_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)

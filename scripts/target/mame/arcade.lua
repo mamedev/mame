@@ -429,6 +429,7 @@ MACHINES["LC89510"] = true
 MACHINES["LDPR8210"] = true
 MACHINES["LDSTUB"] = true
 MACHINES["LDV1000"] = true
+MACHINES["LDP1000"] = true
 MACHINES["LDVP931"] = true
 --MACHINES["LH5810"] = true
 MACHINES["LINFLASH"] = true
@@ -1168,6 +1169,8 @@ files {
 	MAME_DIR .. "src/mame/machine/mathbox.cpp",
 	MAME_DIR .. "src/mame/machine/mathbox.h",
 	MAME_DIR .. "src/mame/machine/slapstic.cpp",
+	MAME_DIR .. "src/mame/machine/atarixga.cpp",
+	MAME_DIR .. "src/mame/machine/atarixga.h",
 	MAME_DIR .. "src/mame/audio/atarijsa.cpp",
 	MAME_DIR .. "src/mame/audio/atarijsa.h",
 	MAME_DIR .. "src/mame/audio/cage.cpp",
@@ -2114,6 +2117,9 @@ files {
 	MAME_DIR .. "src/mame/drivers/ddribble.cpp",
 	MAME_DIR .. "src/mame/includes/ddribble.h",
 	MAME_DIR .. "src/mame/video/ddribble.cpp",
+    MAME_DIR .. "src/mame/drivers/divebomb.cpp",
+    MAME_DIR .. "src/mame/includes/divebomb.h",
+    MAME_DIR .. "src/mame/video/divebomb.cpp",
 	MAME_DIR .. "src/mame/drivers/djmain.cpp",
 	MAME_DIR .. "src/mame/includes/djmain.h",
 	MAME_DIR .. "src/mame/video/djmain.cpp",
@@ -4220,6 +4226,11 @@ files {
 --------------------------------------------------
 
 createMAMEProjects(_target, _subtarget, "misc")
+
+includedirs {
+	ext_includedir("jpeg"),
+}
+
 files {
 	MAME_DIR .. "src/mame/drivers/1945kiii.cpp",
 	MAME_DIR .. "src/mame/drivers/39in1.cpp",

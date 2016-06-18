@@ -57,11 +57,8 @@ MB89372 - Uses 3 serial data transfer protocols: ASYNC, COP & BOP. Has a built
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/segaybd.h"
-#include "cpu/m68000/m68000.h"
 #include "machine/mb8421.h"
-#include "machine/segaic16.h"
 #include "machine/nvram.h"
 #include "sound/2151intf.h"
 #include "sound/segapcm.h"
@@ -257,7 +254,7 @@ WRITE16_MEMBER( segaybd_state::sound_data_w )
 READ8_MEMBER( segaybd_state::sound_data_r )
 {
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	return soundlatch_read();
+	return m_soundlatch->read(space, 0);
 }
 
 
@@ -373,7 +370,7 @@ void segaybd_state::device_timer(emu_timer &timer, device_timer_id id, int param
 			break;
 
 		case TID_SOUND_WRITE:
-			soundlatch_write(param);
+			m_soundlatch->write(m_soundcpu->space(AS_PROGRAM), 0, param);
 			m_soundcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 			break;
 
@@ -1408,6 +1405,8 @@ static MACHINE_CONFIG_START( yboard, segaybd_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK/8)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))

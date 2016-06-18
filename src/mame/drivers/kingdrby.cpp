@@ -303,7 +303,7 @@ WRITE8_MEMBER(kingdrby_state::sound_cmd_w)
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	m_sound_cmd = data;
 	/* soundlatch is unneeded since we are already using perfect interleave. */
-	// soundlatch_byte_w(space,0, data);
+	// m_soundlatch->write(space,0, data);
 }
 
 

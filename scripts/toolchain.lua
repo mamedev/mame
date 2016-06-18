@@ -109,7 +109,7 @@ function toolchain(_buildDir, _subDir)
 		windowsPlatform = _OPTIONS["with-windows"]
 	end
 
-	if _ACTION == "gmake" then
+	if _ACTION == "gmake" or _ACTION == "ninja" then
 
 		if nil == _OPTIONS["gcc"] or nil == _OPTIONS["gcc_version"] then
 			print("GCC flavor and version must be specified!")

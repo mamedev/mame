@@ -1184,7 +1184,7 @@ WRITE32_MEMBER( vegas_state::nile_w )
 		case NREG_T2CTRL+1:     /* general purpose timer control (control bits) */
 		case NREG_T3CTRL+1:     /* watchdog timer control (control bits) */
 			which = (offset - NREG_T0CTRL) / 4;
-			if (1 || LOG_NILE) logerror("%08X:NILE WRITE: timer %d control(%03X) = %08X & %08X\n", safe_pc(), which, offset*4, data, mem_mask);
+			if (LOG_NILE) logerror("%08X:NILE WRITE: timer %d control(%03X) = %08X & %08X\n", safe_pc(), which, offset*4, data, mem_mask);
 			logit = 0;
 
 			/* timer just enabled? */
@@ -1195,7 +1195,7 @@ WRITE32_MEMBER( vegas_state::nile_w )
 				//	logerror("Unexpected value: timer %d is prescaled\n", which);
 				if (m_nile_regs[offset] & 2) {
 					UINT32 scaleSrc = (m_nile_regs[offset] >> 2) & 0x3;
-					scale *= m_nile_regs[NREG_T0CTRL + which * 4];
+					scale *= m_nile_regs[NREG_T0CTRL + scaleSrc * 4];
 					logerror("Timer scale: timer %d is scaled by %08X\n", which, m_nile_regs[NREG_T0CTRL + which * 4]);
 				}
 				if (scale != 0)
@@ -1211,7 +1211,7 @@ WRITE32_MEMBER( vegas_state::nile_w )
 				UINT32 scale = 1;
 				if (m_nile_regs[offset] & 2) {
 					UINT32 scaleSrc = (m_nile_regs[offset] >> 2) & 0x3;
-					scale = m_nile_regs[NREG_T0CTRL + which * 4];
+					scale = m_nile_regs[NREG_T0CTRL + scaleSrc * 4];
 					logerror("Timer scale: timer %d is scaled by %08X\n", which, scale);
 				}
 				m_nile_regs[offset + 1] = m_timer[which]->remaining().as_double() * SYSTEM_CLOCK / scale;
@@ -1234,7 +1234,7 @@ WRITE32_MEMBER( vegas_state::nile_w )
 				UINT32 scale = 1;
 				if (m_nile_regs[offset - 1] & 2) {
 					UINT32 scaleSrc = (m_nile_regs[offset - 1] >> 2) & 0x3;
-					scale = m_nile_regs[NREG_T0CTRL + which * 4];
+					scale = m_nile_regs[NREG_T0CTRL + scaleSrc * 4];
 					logerror("Timer scale: timer %d is scaled by %08X\n", which, scale);
 				}
 				m_timer[which]->adjust(TIMER_PERIOD * m_nile_regs[offset] * scale, which);
@@ -1722,9 +1722,9 @@ void vegas_state::remap_dynamic_addresses()
 		if (dynamic[addr].read == NOP_HANDLER)
 			space.nop_read(dynamic[addr].start, dynamic[addr].end);
 		else if (!dynamic[addr].read.isnull())
-			space.install_read_handler(dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].read);
+			space.install_read_handler(dynamic[addr].start, dynamic[addr].end, dynamic[addr].read);
 		if (!dynamic[addr].write.isnull())
-			space.install_write_handler(dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].write);
+			space.install_write_handler(dynamic[addr].start, dynamic[addr].end, dynamic[addr].write);
 	}
 
 	if (LOG_DYNAMIC)

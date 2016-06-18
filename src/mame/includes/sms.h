@@ -180,7 +180,6 @@ public:
 	DECLARE_READ8_MEMBER(sms_sscope_r);
 	DECLARE_WRITE8_MEMBER(sms_sscope_w);
 
-	DECLARE_WRITE_LINE_MEMBER(sms_int_callback);
 	DECLARE_WRITE_LINE_MEMBER(sms_pause_callback);
 	DECLARE_WRITE_LINE_MEMBER(sms_ctrl1_th_input);
 	DECLARE_WRITE_LINE_MEMBER(sms_ctrl2_th_input);

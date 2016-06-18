@@ -41,7 +41,7 @@ make SUBTARGET=mess
 
 for MESS build.
 
-For Linux users we have provided you with all the [prerequisites](http://forums.bannister.org/ubbthreads.php?ubb=showflat&Number=35138).
+See the [Compiling MAME](http://docs.mamedev.org/initialsetup/compilingmame.html) page on our documentation site for more information, including prerequisites for Mac OS X and popular Linux distributions.
 
 For recent versions of OSX you need to install [Xcode](https://developer.apple.com/xcode/) including command-line tools and [SDL 2.0](https://www.libsdl.org/download-2.0.php).
 

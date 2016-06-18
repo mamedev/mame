@@ -1,6 +1,8 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
+
 #include "machine/buggychl.h"
+#include "machine/gen_latch.h"
 #include "sound/msm5232.h"
 
 class fortyl_state : public driver_device
@@ -20,7 +22,8 @@ public:
 		m_bmcu(*this, "bmcu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -77,6 +80,7 @@ public:
 	required_device<msm5232_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(nmi_disable_w);

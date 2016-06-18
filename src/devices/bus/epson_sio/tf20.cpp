@@ -174,7 +174,7 @@ void epson_tf20_device::device_reset()
 	m_mpsc->rxb_w(1);
 
 	// enable rom
-	m_cpu->space(AS_PROGRAM).install_rom(0x0000, 0x07ff, 0, 0x7800, memregion("rom")->base());
+	m_cpu->space(AS_PROGRAM).install_rom(0x0000, 0x07ff, 0x7800, memregion("rom")->base());
 }
 
 //-------------------------------------------------

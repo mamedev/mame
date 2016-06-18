@@ -492,18 +492,18 @@ READ8_MEMBER( px4_state::str_r )
 void px4_state::install_rom_capsule(address_space &space, int size, memory_region *mem)
 {
 	// ram, part 1
-	space.install_ram(0x0000, 0xdfff - size, 0, 0, m_ram->pointer());
+	space.install_ram(0x0000, 0xdfff - size, m_ram->pointer());
 
 	// actual rom data, part 1
 	if (mem)
-		space.install_rom(0xe000 - size, 0xffff, 0, 0, mem->base() + (size - 0x2000));
+		space.install_rom(0xe000 - size, 0xffff, mem->base() + (size - 0x2000));
 
 	// rom data, part 2
 	if (mem && size != 0x2000)
-		space.install_rom(0x10000 - size, 0xdfff, 0, 0, mem->base());
+		space.install_rom(0x10000 - size, 0xdfff, mem->base());
 
 	// ram, continued
-	space.install_ram(0xe000, 0xffff, 0, 0, m_ram->pointer() + 0xe000);
+	space.install_ram(0xe000, 0xffff, m_ram->pointer() + 0xe000);
 }
 
 // bank register
@@ -521,13 +521,13 @@ WRITE8_MEMBER( px4_state::bankr_w )
 	{
 	case 0x00:
 		// system bank
-		space_program.install_rom(0x0000, 0x7fff, 0, 0, memregion("os")->base());
-		space_program.install_ram(0x8000, 0xffff, 0, 0, m_ram->pointer() + 0x8000);
+		space_program.install_rom(0x0000, 0x7fff, memregion("os")->base());
+		space_program.install_ram(0x8000, 0xffff, m_ram->pointer() + 0x8000);
 		break;
 
 	case 0x04:
 		// memory
-		space_program.install_ram(0x0000, 0xffff, 0, 0, m_ram->pointer());
+		space_program.install_ram(0x0000, 0xffff, m_ram->pointer());
 		break;
 
 	case 0x08: install_rom_capsule(space_program, 0x2000, m_caps1_rom); break;

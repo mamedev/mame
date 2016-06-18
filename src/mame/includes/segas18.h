@@ -9,6 +9,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
 #include "machine/315_5296.h"
@@ -36,6 +37,7 @@ public:
 			m_sprites(*this, "sprites"),
 			m_segaic16vid(*this, "segaic16vid"),
 			m_gfxdecode(*this, "gfxdecode"),
+			m_soundlatch(*this, "soundlatch"),
 			m_workram(*this, "workram"),
 			m_romboard(ROM_BOARD_INVALID),
 			m_grayscale_enable(false),
@@ -138,6 +140,7 @@ protected:
 	required_device<sega_sys16b_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	// memory pointers
 	required_shared_ptr<UINT16> m_workram;

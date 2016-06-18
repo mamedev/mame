@@ -61,7 +61,7 @@ private:
 	// handlers
 	void inkey_select(const event *menu_event);
 	void inkey_special(const event *menu_event);
-	void inkey_configure(const event *menu_event);
+	void inkey_navigation();
 };
 
 class software_parts : public menu

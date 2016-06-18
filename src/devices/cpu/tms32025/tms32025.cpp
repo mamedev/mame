@@ -212,7 +212,7 @@ tms32025_device::tms32025_device(const machine_config &mconfig, const char *tag,
 	: cpu_device(mconfig, TMS32025, "TMS32025", tag, owner, clock, "tms32025", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 16, -1)
-	, m_io_config("io", ENDIANNESS_BIG, 16, 17, -1)
+	, m_io_config("io", ENDIANNESS_BIG, 16, 16+1, -1)
 {
 }
 
@@ -221,7 +221,7 @@ tms32025_device::tms32025_device(const machine_config &mconfig, device_type type
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 16, -1)
-	, m_io_config("io", ENDIANNESS_BIG, 16, 16, -1)
+	, m_io_config("io", ENDIANNESS_BIG, 16, 16+1, -1)
 {
 }
 

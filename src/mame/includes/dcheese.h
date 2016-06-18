@@ -1,11 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
+
 /***************************************************************************
 
     HAR MadMax hardware
 
 **************************************************************************/
 
+#include "machine/gen_latch.h"
+#include "sound/bsmt2000.h"
 
 class dcheese_state : public driver_device
 {
@@ -20,7 +23,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen"),
+		m_bsmt(*this, "bsmt"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* video-related */
 	UINT16   m_blitter_color[2];
@@ -41,7 +46,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<screen_device> m_screen;
-	device_t *m_bsmt;
+	required_device<bsmt2000_device> m_bsmt;
+	required_device<generic_latch_8_device> m_soundlatch;
+
 	DECLARE_WRITE16_MEMBER(eeprom_control_w);
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_READ8_MEMBER(sound_command_r);

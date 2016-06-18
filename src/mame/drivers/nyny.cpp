@@ -28,7 +28,7 @@
         * The Crosshatch switch only works on the title screen
         * The Service Mode switch, which displays the total number of
           credits stored in the NVRAM, only works on the "Start Game"
-          screen after a coin has been insered.  Hold down the key to
+          screen after a coin has been inserted.  Hold down the key to
           display the coin count
         * The schematics mixed up port A and B on both AY-8910
 
@@ -72,6 +72,7 @@
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 
 
@@ -100,7 +101,10 @@ public:
 		m_mc6845(*this, "crtc"),
 		m_palette(*this, "palette"),
 		m_pia1(*this, "pia1"),
-		m_pia2(*this, "pia2") { }
+		m_pia2(*this, "pia2"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
+		m_soundlatch3(*this, "soundlatch3") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram1;
@@ -123,6 +127,9 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
+	required_device<generic_latch_8_device> m_soundlatch3;
 
 	DECLARE_WRITE8_MEMBER(audio_1_command_w);
 	DECLARE_WRITE8_MEMBER(audio_1_answer_w);
@@ -355,14 +362,14 @@ WRITE_LINE_MEMBER(nyny_state::display_enable_changed)
 
 WRITE8_MEMBER(nyny_state::audio_1_command_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(M6800_IRQ_LINE, HOLD_LINE);
 }
 
 
 WRITE8_MEMBER(nyny_state::audio_1_answer_w)
 {
-	soundlatch3_byte_w(space, 0, data);
+	m_soundlatch3->write(space, 0, data);
 	m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
@@ -382,7 +389,7 @@ WRITE8_MEMBER(nyny_state::nyny_ay8910_37_port_a_w)
 
 WRITE8_MEMBER(nyny_state::audio_2_command_w)
 {
-	soundlatch2_byte_w(space, 0, (data & 0x60) >> 5);
+	m_soundlatch2->write(space, 0, (data & 0x60) >> 5);
 	m_audiocpu2->set_input_line(M6800_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -424,7 +431,7 @@ static ADDRESS_MAP_START( nyny_main_map, AS_PROGRAM, 8, nyny_state )
 	AM_RANGE(0xa100, 0xa100) AM_MIRROR(0x00fe) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xa101, 0xa101) AM_MIRROR(0x00fe) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0xa200, 0xa20f) AM_MIRROR(0x00f0) AM_READWRITE(nyny_pia_1_2_r, nyny_pia_1_2_w)
-	AM_RANGE(0xa300, 0xa300) AM_MIRROR(0x00ff) AM_READ(soundlatch3_byte_r) AM_WRITE(audio_1_command_w)
+	AM_RANGE(0xa300, 0xa300) AM_MIRROR(0x00ff) AM_DEVREAD("soundlatch3", generic_latch_8_device, read) AM_WRITE(audio_1_command_w)
 	AM_RANGE(0xa400, 0xa7ff) AM_NOP
 	AM_RANGE(0xa800, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
@@ -436,7 +443,7 @@ static ADDRESS_MAP_START( nyny_audio_1_map, AS_PROGRAM, 8, nyny_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM     /* internal RAM */
 	AM_RANGE(0x0080, 0x0fff) AM_NOP
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_READ(soundlatch_byte_r) AM_WRITE(audio_1_answer_w)
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(audio_1_answer_w)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0fff) AM_READ_PORT("SW3")
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffc) AM_DEVREAD("ay1", ay8910_device, data_r)
 	AM_RANGE(0x3000, 0x3001) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
@@ -453,7 +460,7 @@ static ADDRESS_MAP_START( nyny_audio_2_map, AS_PROGRAM, 8, nyny_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM     /* internal RAM */
 	AM_RANGE(0x0080, 0x0fff) AM_NOP
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_READ(soundlatch2_byte_r)
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_DEVREAD("ay3", ay8910_device, data_r)
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x0ffe) AM_DEVWRITE("ay3", ay8910_device, data_address_w)
 	AM_RANGE(0x3000, 0x6fff) AM_NOP
@@ -631,6 +638,10 @@ static MACHINE_CONFIG_START( nyny, nyny_state )
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
 
 	MCFG_SOUND_ADD("ay1", AY8910, AUDIO_CPU_1_CLOCK)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(nyny_state, nyny_ay8910_37_port_a_w))

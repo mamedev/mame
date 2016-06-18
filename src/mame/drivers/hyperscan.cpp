@@ -588,8 +588,8 @@ static ADDRESS_MAP_START(spg290_mem, AS_PROGRAM, 32, hyperscan_state)
 	AM_RANGE(0x08000000, 0x09ffffff) AM_READWRITE(spg290_regs_r, spg290_regs_w)
 	AM_RANGE(0x0a000000, 0x0a003fff) AM_RAM                         // internal SRAM
 	AM_RANGE(0x0b000000, 0x0b007fff) AM_ROM AM_REGION("spg290", 0)  // internal ROM
-	AM_RANGE(0x1e000000, 0x1e0fffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x0e000000)
-	AM_RANGE(0x1f000000, 0x1f0fffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x0e000000)
+	AM_RANGE(0x10000000, 0x100fffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x0e000000)
+	AM_RANGE(0x11000000, 0x110fffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x0e000000)
 ADDRESS_MAP_END
 
 /* Input ports */

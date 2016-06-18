@@ -511,6 +511,42 @@
 			</dataarea>
 		</part>
 	</software>
+	<software name="adv4">
+		<description>Voodoo Castle</description>
+		<year>1979</year>
+		<publisher>unknown</publisher>
+		<info name="developer" value="Scott and Alexis Adams"/>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="13867098">
+				<rom name="adv4.wav" size="13867098" crc="9fec95d9" sha1="ec714db72efeb3e3a8e41bde2fbca069038cdd54" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="adv7">
+		<description>Mystery Fun House</description>
+		<year>1979</year>
+		<publisher>unknown</publisher>
+		<info name="developer" value="Scott Adams"/>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="13658750">
+				<rom name="adv7.wav" size="13658750" crc="36832c51" sha1="7fd1805a78a0d0db3d446d2d1609058d5000796a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="adv8">
+		<description>Pyramid of Doom</description>
+		<year>1979</year>
+		<publisher>unknown</publisher>
+		<info name="developer" value="Scott Adams"/>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="13658750">
+				<rom name="adv8.wav" size="13658750" crc="fac6fb02" sha1="de3437f174e88b6a84b652bc15aa2cae298c6f80" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 	<software name="arrow">
 		<description>Arrows and Alleys</description>
 		<year>1980</year>
@@ -714,6 +750,27 @@
 			</dataarea>
 		</part>
 	</software>
-
-
+	<software name="invaders">
+		<description>Sorcerer Invaders</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="developer" value="Brian Wyvill"/>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="4804332">
+				<rom name="invaders.wav" size="4804332" crc="f020fa5b" sha1="ccc44f29fe7fa2844130ec3078f1839654be8a91" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="spider">
+		<description>Spider</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="1707474">
+				<rom name="spider.wav" size="1707474" crc="9fa56c8b" sha1="829d884dcf7f733f3a073ccc9c874627d6b5ebe0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

@@ -27,6 +27,7 @@
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
 #include "machine/eepromser.h"
+#include "machine/gen_latch.h"
 #include "sound/qs1000.h"
 #include "sound/okim6295.h"
 
@@ -41,6 +42,7 @@ public:
 		m_qs1000(*this, "qs1000"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_mainram(*this, "mainram"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_md_videoram(*this, "md_videoram"),
@@ -54,6 +56,7 @@ public:
 	optional_device<qs1000_device> m_qs1000;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT32> m_mainram;
 	required_shared_ptr<UINT32> m_fg_videoram;
@@ -176,7 +179,7 @@ WRITE32_MEMBER(limenko_state::spriteram_buffer_w)
 
 WRITE32_MEMBER(limenko_state::limenko_soundlatch_w)
 {
-	soundlatch_byte_w(space, 0, data >> 16);
+	m_soundlatch->write(space, 0, data >> 16);
 	m_qs1000->set_irq(ASSERT_LINE);
 
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
@@ -184,12 +187,12 @@ WRITE32_MEMBER(limenko_state::limenko_soundlatch_w)
 
 WRITE32_MEMBER(limenko_state::spotty_soundlatch_w)
 {
-	soundlatch_byte_w(space, 0, data >> 16);
+	m_soundlatch->write(space, 0, data >> 16);
 }
 
 READ8_MEMBER(limenko_state::qs1000_p1_r)
 {
-	return soundlatch_byte_r(space, 0);
+	return m_soundlatch->read(space, 0);
 }
 
 WRITE8_MEMBER(limenko_state::qs1000_p1_w)
@@ -283,7 +286,7 @@ READ8_MEMBER(limenko_state::spotty_sound_r)
 	// check m_spotty_sound_cmd bits...
 
 	if(m_spotty_sound_cmd == 0xf7)
-		return soundlatch_byte_r(space,0);
+		return m_soundlatch->read(space,0);
 	else
 		return m_oki->read(space,0);
 }
@@ -749,6 +752,8 @@ static MACHINE_CONFIG_START( limenko, limenko_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("qs1000", QS1000, XTAL_24MHz)
 	MCFG_QS1000_EXTERNAL_ROM(true)
 	MCFG_QS1000_IN_P1_CB(READ8(limenko_state, qs1000_p1_r))
@@ -786,6 +791,8 @@ static MACHINE_CONFIG_START( spotty, limenko_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_OKIM6295_ADD("oki", 4000000 / 4 , OKIM6295_PIN7_HIGH) //?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

@@ -116,7 +116,6 @@ public:
 	virtual UINT8 joy_read() override;
 	virtual void machine_reset() override;
 	required_device<discrete_device> m_discrete;
-	DECLARE_WRITE_LINE_MEMBER(pce_irq_changed);
 };
 
 #define UAPCE_SOUND_EN  NODE_10
@@ -302,11 +301,6 @@ static ADDRESS_MAP_START( pce_io , AS_IO, 8, uapce_state )
 	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
 ADDRESS_MAP_END
 
-WRITE_LINE_MEMBER(uapce_state::pce_irq_changed)
-{
-	m_maincpu->set_input_line(0, state);
-}
-
 
 static MACHINE_CONFIG_START( uapce, uapce_state )
 	/* basic machine hardware */
@@ -332,7 +326,7 @@ static MACHINE_CONFIG_START( uapce, uapce_state )
 	MCFG_HUC6260_HSYNC_CHANGED_CB(DEVWRITELINE("huc6270", huc6270_device, hsync_changed))
 	MCFG_DEVICE_ADD( "huc6270", HUC6270, 0 )
 	MCFG_HUC6270_VRAM_SIZE(0x10000)
-	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(uapce_state, pce_irq_changed))
+	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 	MCFG_SOUND_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)

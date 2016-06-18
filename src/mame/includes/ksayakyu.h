@@ -1,10 +1,13 @@
 // license:LGPL-2.1+
 // copyright-holders:Tomasz Slanina
+
 /*************************************************************************
 
     Kusayakyuu
 
 *************************************************************************/
+
+#include "machine/gen_latch.h"
 
 class ksayakyu_state : public driver_device
 {
@@ -15,7 +18,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -49,4 +53,5 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 };

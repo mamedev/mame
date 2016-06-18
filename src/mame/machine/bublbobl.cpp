@@ -2,7 +2,7 @@
 // copyright-holders:Chris Moore, Nicola Salmoria
 /***************************************************************************
 
-  machine.c
+  bublbobl.cpp
 
   Functions to emulate general aspects of the machine (RAM, ROM, interrupts,
   I/O ports)
@@ -107,7 +107,7 @@ void bublbobl_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 WRITE8_MEMBER(bublbobl_state::bublbobl_sound_command_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	synchronize(TIMER_NMI, data);
 }
 

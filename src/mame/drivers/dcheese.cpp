@@ -36,7 +36,6 @@
 #include "machine/eepromser.h"
 #include "machine/ticket.h"
 #include "machine/watchdog.h"
-#include "sound/bsmt2000.h"
 #include "includes/dcheese.h"
 
 
@@ -92,8 +91,6 @@ INTERRUPT_GEN_MEMBER(dcheese_state::dcheese_vblank)
 
 void dcheese_state::machine_start()
 {
-	m_bsmt = machine().device("bsmt");
-
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_soundlatch_full));
 	save_item(NAME(m_sound_control));
@@ -133,7 +130,7 @@ WRITE16_MEMBER(dcheese_state::sound_command_w)
 		/* write the latch and set the IRQ */
 		m_soundlatch_full = 1;
 		m_audiocpu->set_input_line(0, ASSERT_LINE);
-		soundlatch_byte_w(space, 0, data & 0xff);
+		m_soundlatch->write(space, 0, data & 0xff);
 	}
 }
 
@@ -150,15 +147,14 @@ READ8_MEMBER(dcheese_state::sound_command_r)
 	/* read the latch and clear the IRQ */
 	m_soundlatch_full = 0;
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return soundlatch_byte_r(space, 0);
+	return m_soundlatch->read(space, 0);
 }
 
 
 READ8_MEMBER(dcheese_state::sound_status_r)
 {
 	/* seems to be ready signal on BSMT or latching hardware */
-	bsmt2000_device *bsmt = machine().device<bsmt2000_device>("bsmt");
-	return bsmt->read_status() << 7;
+	return m_bsmt->read_status() << 7;
 }
 
 
@@ -178,16 +174,14 @@ WRITE8_MEMBER(dcheese_state::sound_control_w)
 
 WRITE8_MEMBER(dcheese_state::bsmt_data_w)
 {
-	bsmt2000_device *bsmt = machine().device<bsmt2000_device>("bsmt");
-
 	/* writes come in pairs; even bytes latch, odd bytes write */
 	if (offset % 2 == 0)
 	{
-		bsmt->write_reg(offset / 2);
+		m_bsmt->write_reg(offset / 2);
 		m_sound_msb_latch = data;
 	}
 	else
-		bsmt->write_data((m_sound_msb_latch << 8) | data);
+		m_bsmt->write_data((m_sound_msb_latch << 8) | data);
 }
 
 
@@ -425,6 +419,8 @@ static MACHINE_CONFIG_START( dcheese, dcheese_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_BSMT2000_ADD("bsmt", SOUND_OSC)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.2)

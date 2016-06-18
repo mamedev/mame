@@ -18,7 +18,7 @@
 TO DO:
   - sprites are probably banked differently (no way to be sure until MCU dump is available)
   - TA7630 emulation needs filter support (characteristics depend on the frequency)
-  - TA7630 volume table is hand tuned to match the sample, but still slighty off.
+  - TA7630 volume table is hand tuned to match the sample, but still slightly off.
 */
 
 
@@ -32,7 +32,7 @@ TIMER_CALLBACK_MEMBER(msisaac_state::nmi_callback)
 
 WRITE8_MEMBER(msisaac_state::sound_command_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(msisaac_state::nmi_callback),this), data);
 }
 
@@ -262,7 +262,7 @@ static ADDRESS_MAP_START( msisaac_sound_map, AS_PROGRAM, 8, msisaac_state )
 	AM_RANGE(0x8010, 0x801d) AM_DEVWRITE("msm", msm5232_device, write)
 	AM_RANGE(0x8020, 0x8020) AM_WRITE(sound_control_0_w)
 	AM_RANGE(0x8030, 0x8030) AM_WRITE(sound_control_1_w)
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(nmi_enable_w)
 	AM_RANGE(0xc002, 0xc002) AM_WRITE(nmi_disable_w)
 	AM_RANGE(0xc003, 0xc003) AM_WRITENOP /*???*/ /* this is NOT mixer_enable */
@@ -493,6 +493,8 @@ static MACHINE_CONFIG_START( msisaac, msisaac_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)

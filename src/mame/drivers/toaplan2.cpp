@@ -850,7 +850,7 @@ WRITE16_MEMBER(toaplan2_state::bgaregga_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_byte_w(space, offset, data & 0xff);
+		m_soundlatch->write(space, offset, data & 0xff);
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
@@ -906,7 +906,7 @@ WRITE16_MEMBER(toaplan2_state::batrider_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_byte_w(space, offset, data & 0xff);
+		m_soundlatch->write(space, offset, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
@@ -916,7 +916,7 @@ WRITE16_MEMBER(toaplan2_state::batrider_soundlatch2_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch2_byte_w(space, offset, data & 0xff);
+		m_soundlatch2->write(space, offset, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
@@ -1343,8 +1343,8 @@ static ADDRESS_MAP_START( batrider_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("SYS-DSW")
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("DSW")
 	AM_RANGE(0x500006, 0x500007) AM_READ(video_count_r)
-	AM_RANGE(0x500008, 0x500009) AM_READ(soundlatch3_word_r)
-	AM_RANGE(0x50000a, 0x50000b) AM_READ(soundlatch4_word_r)
+	AM_RANGE(0x500008, 0x500009) AM_DEVREAD8("soundlatch3", generic_latch_8_device, read, 0x00ff)
+	AM_RANGE(0x50000a, 0x50000b) AM_DEVREAD8("soundlatch4", generic_latch_8_device, read, 0x00ff)
 	AM_RANGE(0x50000c, 0x50000d) AM_READ(batrider_z80_busack_r)
 	AM_RANGE(0x500010, 0x500011) AM_WRITE(toaplan2_coin_word_w)
 	AM_RANGE(0x500020, 0x500021) AM_WRITE(batrider_soundlatch_w)
@@ -1374,8 +1374,8 @@ static ADDRESS_MAP_START( bbakraid_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("DSW")
 	AM_RANGE(0x500006, 0x500007) AM_READ(video_count_r)
 	AM_RANGE(0x500008, 0x500009) AM_WRITE(toaplan2_coin_word_w)
-	AM_RANGE(0x500010, 0x500011) AM_READ(soundlatch3_word_r)
-	AM_RANGE(0x500012, 0x500013) AM_READ(soundlatch4_word_r)
+	AM_RANGE(0x500010, 0x500011) AM_DEVREAD8("soundlatch3", generic_latch_8_device, read, 0x00ff)
+	AM_RANGE(0x500012, 0x500013) AM_DEVREAD8("soundlatch4", generic_latch_8_device, read, 0x00ff)
 	AM_RANGE(0x500014, 0x500015) AM_WRITE(batrider_soundlatch_w)
 	AM_RANGE(0x500016, 0x500017) AM_WRITE(batrider_soundlatch2_w)
 	AM_RANGE(0x500018, 0x500019) AM_READ(bbakraid_eeprom_r)
@@ -1414,7 +1414,7 @@ static ADDRESS_MAP_START( bgaregga_sound_z80_mem, AS_PROGRAM, 8, toaplan2_state 
 	AM_RANGE(0xe006, 0xe008) AM_WRITE(raizing_oki_bankswitch_w)
 	AM_RANGE(0xe00a, 0xe00a) AM_WRITE(raizing_z80_bankswitch_w)
 	AM_RANGE(0xe00c, 0xe00c) AM_WRITE(bgaregga_E00C_w)
-	AM_RANGE(0xe01c, 0xe01c) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe01c, 0xe01c) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe01d, 0xe01d) AM_READ(bgaregga_E01D_r)
 ADDRESS_MAP_END
 
@@ -1428,12 +1428,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( batrider_sound_z80_port, AS_IO, 8, toaplan2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_WRITE(soundlatch3_byte_w)
-	AM_RANGE(0x42, 0x42) AM_WRITE(soundlatch4_byte_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE("soundlatch3", generic_latch_8_device, write)
+	AM_RANGE(0x42, 0x42) AM_DEVWRITE("soundlatch4", generic_latch_8_device, write)
 	AM_RANGE(0x44, 0x44) AM_WRITE(batrider_sndirq_w)
 	AM_RANGE(0x46, 0x46) AM_WRITE(batrider_clear_nmi_w)
-	AM_RANGE(0x48, 0x48) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x4a, 0x4a) AM_READ(soundlatch2_byte_r)
+	AM_RANGE(0x48, 0x48) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0x4a, 0x4a) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x82, 0x82) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0x84, 0x84) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
@@ -1450,12 +1450,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bbakraid_sound_z80_port, AS_IO, 8, toaplan2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_WRITE(soundlatch3_byte_w)
-	AM_RANGE(0x42, 0x42) AM_WRITE(soundlatch4_byte_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE("soundlatch3", generic_latch_8_device, write)
+	AM_RANGE(0x42, 0x42) AM_DEVWRITE("soundlatch4", generic_latch_8_device, write)
 	AM_RANGE(0x44, 0x44) AM_WRITE(batrider_sndirq_w)
 	AM_RANGE(0x46, 0x46) AM_WRITE(batrider_clear_nmi_w)
-	AM_RANGE(0x48, 0x48) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x4a, 0x4a) AM_READ(soundlatch2_byte_r)
+	AM_RANGE(0x48, 0x48) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0x4a, 0x4a) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ymz", ymz280b_device, read, write)
 ADDRESS_MAP_END
 
@@ -3908,6 +3908,8 @@ static MACHINE_CONFIG_START( bgaregga, toaplan2_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_YM2151_ADD("ymsnd", XTAL_32MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -3964,6 +3966,11 @@ static MACHINE_CONFIG_START( batrider, toaplan2_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch4")
+
 	MCFG_YM2151_ADD("ymsnd", XTAL_32MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -4019,6 +4026,11 @@ static MACHINE_CONFIG_START( bbakraid, toaplan2_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch4")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	// IRQ not used ???  Connected to a test pin (TP082)

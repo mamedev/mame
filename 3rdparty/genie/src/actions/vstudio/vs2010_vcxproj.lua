@@ -298,12 +298,14 @@
 	--
 		local debug_info = ''
 		if cfg.flags.Symbols then
-			if (action.vstudio.supports64bitEditContinue == false and cfg.platform == "x64")
+			if cfg.flags.C7DebugInfo then
+				debug_info = "OldStyle"
+			elseif (action.vstudio.supports64bitEditContinue == false and cfg.platform == "x64")
 				or cfg.flags.Managed
 				or premake.config.isoptimizedbuild(cfg.flags)
 				or cfg.flags.NoEditAndContinue
 			then
-					debug_info = "ProgramDatabase"
+				debug_info = "ProgramDatabase"
 			else
 				debug_info = "EditAndContinue"
 			end

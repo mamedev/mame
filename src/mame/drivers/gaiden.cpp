@@ -142,9 +142,9 @@ Notes:
 WRITE16_MEMBER(gaiden_state::gaiden_sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
-		soundlatch_byte_w(space, 0, data & 0xff);   /* Ninja Gaiden */
+		m_soundlatch->write(space, 0, data & 0xff);   /* Ninja Gaiden */
 	if (ACCESSING_BITS_8_15)
-		soundlatch_byte_w(space, 0, data >> 8); /* Tecmo Knight */
+		m_soundlatch->write(space, 0, data >> 8); /* Tecmo Knight */
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -152,7 +152,7 @@ WRITE16_MEMBER(gaiden_state::drgnbowl_sound_command_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		soundlatch_byte_w(space, 0, data >> 8);
+		m_soundlatch->write(space, 0, data >> 8);
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
@@ -434,7 +434,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gaiden_state )
 	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0xf820, 0xf821) AM_DEVWRITE("ym2", ym2203_device, write)
 	AM_RANGE(0xfc00, 0xfc00) AM_NOP /* ?? */
-	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xfc20, 0xfc20) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drgnbowl_sound_map, AS_PROGRAM, 8, gaiden_state )
@@ -446,7 +446,7 @@ static ADDRESS_MAP_START( drgnbowl_sound_port_map, AS_IO, 8, gaiden_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( common )
@@ -738,11 +738,6 @@ static GFXDECODE_START( drgnbowl )
 	GFXDECODE_ENTRY( "gfx3", 0,       drgnbowl_spritelayout, 0x100, 16 )    /* sprites 16x16 */
 GFXDECODE_END
 
-/* handler called by the 2203 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(gaiden_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
 
 static MACHINE_CONFIG_START( shadoww, gaiden_state )
 
@@ -788,8 +783,10 @@ static MACHINE_CONFIG_START( shadoww, gaiden_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym1", YM2203, 4000000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gaiden_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -847,6 +844,8 @@ static MACHINE_CONFIG_START( drgnbowl, gaiden_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
@@ -907,7 +906,7 @@ static ADDRESS_MAP_START( mastninj_sound_map, AS_PROGRAM, 8, gaiden_state )
 	AM_RANGE(0xc400, 0xc401) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("ym2", ym2203_device, write)
 //  AM_RANGE(0xfc00, 0xfc00) AM_NOP /* ?? */
-//  AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_byte_r)
+//  AM_RANGE(0xfc20, 0xfc20) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mastninj_map, AS_PROGRAM, 16, gaiden_state )
@@ -963,15 +962,17 @@ static MACHINE_CONFIG_START( mastninj, gaiden_state )
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	/* NOT using Tecmo Sprite device - signifcant changes, maybe a clone of something else */
+	/* NOT using Tecmo Sprite device - significant changes, maybe a clone of something else */
 
 	MCFG_VIDEO_START_OVERRIDE(gaiden_state,drgnbowl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym1", YM2203, 4000000) /* ?? MHz */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gaiden_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)

@@ -60,7 +60,6 @@ static ADDRESS_MAP_START( cortex_io, AS_IO, 8, cortex_state )
 	//AM_RANGE(0x0812, 0x0813) AM_READ(cent_stat_r)
 	//AM_RANGE(0x1ee0, 0x1eef) AM_READWRITE(cpu_int_r,cpu_int_w)
 	//AM_RANGE(0x1fda, 0x1fdb) AM_READWRITE(cpu_int1_r,cpu_int1_w)
-	AM_RANGE(0x10000, 0x10000) AM_NOP
 ADDRESS_MAP_END
 
 /* Input ports */

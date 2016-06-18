@@ -40,6 +40,7 @@ RAM = 4116 (x11)
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 
 
@@ -58,7 +59,9 @@ public:
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
@@ -86,6 +89,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_audiocpu;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
 };
 
 
@@ -126,7 +131,7 @@ WRITE_LINE_MEMBER(r2dtank_state::main_cpu_irq)
 
 READ8_MEMBER(r2dtank_state::audio_command_r)
 {
-	UINT8 ret = soundlatch_byte_r(space, 0);
+	UINT8 ret = m_soundlatch->read(space, 0);
 
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", space.device().safe_pc(), ret);
 
@@ -136,7 +141,7 @@ if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", space.devi
 
 WRITE8_MEMBER(r2dtank_state::audio_command_w)
 {
-	soundlatch_byte_w(space, 0, ~data);
+	m_soundlatch->write(space, 0, ~data);
 	m_audiocpu->set_input_line(M6800_IRQ_LINE, HOLD_LINE);
 
 if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", space.device().safe_pc(), data^0xff);
@@ -145,7 +150,7 @@ if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", space.de
 
 READ8_MEMBER(r2dtank_state::audio_answer_r)
 {
-	UINT8 ret = soundlatch2_byte_r(space, 0);
+	UINT8 ret = m_soundlatch2->read(space, 0);
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", space.device().safe_pc(), ret);
 
 	return ret;
@@ -158,7 +163,7 @@ WRITE8_MEMBER(r2dtank_state::audio_answer_w)
 	if (space.device().safe_pc() == 0xfb12)
 		data = 0x00;
 
-	soundlatch2_byte_w(space, 0, data);
+	m_soundlatch2->write(space, 0, data);
 	m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Answer Write: %x\n", space.device().safe_pc(), data);
@@ -483,6 +488,9 @@ static MACHINE_CONFIG_START( r2dtank, r2dtank_state )
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("ay1", AY8910, (4000000 / 4))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWB"))

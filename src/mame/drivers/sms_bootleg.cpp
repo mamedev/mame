@@ -192,7 +192,7 @@ static MACHINE_CONFIG_START( sms_supergame, smsbootleg_state )
 	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5246, 0)
 	MCFG_SEGA315_5246_SET_SCREEN("screen")
 	MCFG_SEGA315_5246_IS_PAL(false)
-	MCFG_SEGA315_5246_INT_CB(WRITELINE(sms_state, sms_int_callback))
+	MCFG_SEGA315_5246_INT_CB(INPUTLINE("maincpu", 0))
 	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
 
 MACHINE_CONFIG_END

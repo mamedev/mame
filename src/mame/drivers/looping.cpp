@@ -57,6 +57,7 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 #include "emu.h"
 #include "cpu/tms9900/tms9995.h"
 #include "cpu/tms9900/tms9980a.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -110,7 +111,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_dac(*this, "dac"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -162,6 +164,7 @@ public:
 	required_device<dac_device> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 };
 
 
@@ -392,7 +395,7 @@ WRITE_LINE_MEMBER(looping_state::looping_spcint)
 
 WRITE8_MEMBER(looping_state::looping_soundlatch_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INT_9980A_LEVEL2, ASSERT_LINE);
 }
 
@@ -570,11 +573,11 @@ static ADDRESS_MAP_START( looping_sound_map, AS_PROGRAM, 8, looping_state )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x3bff) AM_RAM
 	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x00f4) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, address_w)
+	AM_RANGE(0x3c01, 0x3c01) AM_MIRROR(0x00f6) AM_NOP
 	AM_RANGE(0x3c02, 0x3c02) AM_MIRROR(0x00f4) AM_READNOP AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x3c03, 0x3c03) AM_MIRROR(0x00f6) AM_NOP
 	AM_RANGE(0x3e00, 0x3e00) AM_MIRROR(0x00f4) AM_READNOP AM_DEVWRITE("tms", tms5220_device, data_w)
+	AM_RANGE(0x3e01, 0x3e01) AM_MIRROR(0x00f6) AM_NOP
 	AM_RANGE(0x3e02, 0x3e02) AM_MIRROR(0x00f4) AM_DEVREAD("tms", tms5220_device, status_r) AM_WRITENOP
-	AM_RANGE(0x3e03, 0x3e03) AM_MIRROR(0x00f6) AM_NOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( looping_sound_io_map, AS_IO, 8, looping_state )
@@ -650,8 +653,10 @@ static MACHINE_CONFIG_START( looping, looping_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("aysnd", AY8910, SOUND_CLOCK/4)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_SOUND_ADD("tms", TMS5220, TMS_CLOCK)

@@ -662,9 +662,9 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "Caught unhandled emulator exception\n");
 		result = 1;
 	}
-	catch (add_exception &aex)
+	catch (tag_add_exception &aex)
 	{
-		fprintf(stderr, "Tag '%s' already exists in tagged_list\n", aex.tag());
+		fprintf(stderr, "Tag '%s' already exists in tagged map\n", aex.tag());
 		result = 1;
 	}
 	catch (std::exception &ex)

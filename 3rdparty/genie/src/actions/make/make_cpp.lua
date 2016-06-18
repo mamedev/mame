@@ -480,10 +480,9 @@
 		table.sort(prj.files)
 		for _, file in ipairs(prj.files or {}) do
 			if path.isSourceFile(file) then
-				_p('$(OBJDIR)/%s.o: %s $(GCH) %s'
+				_p('$(OBJDIR)/%s.o: %s $(GCH)'
 					, _MAKE.esc(path.trimdots(path.removeext(file)))
 					, _MAKE.esc(file)
-					, _MAKE.getmakefilename(prj, true)
 					)
 				if (path.isobjcfile(file) and prj.msgcompile_objc) then
 					_p('\t@echo ' .. prj.msgcompile_objc)

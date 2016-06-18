@@ -74,20 +74,20 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xybots_state )
 	AM_RANGE(0x000000, 0x007fff) AM_MIRROR(0x7c0000) AM_ROM
 	AM_RANGE(0x008000, 0x00ffff) AM_MIRROR(0x7c0000) AM_ROM /* slapstic maps here */
 	AM_RANGE(0x010000, 0x03ffff) AM_MIRROR(0x7c0000) AM_ROM
-	AM_RANGE(0xff8000, 0xff8fff) AM_MIRROR(0x7f8000) AM_RAM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
-	AM_RANGE(0xff9000, 0xffadff) AM_MIRROR(0x7f8000) AM_RAM
-	AM_RANGE(0xffae00, 0xffafff) AM_MIRROR(0x7f8000) AM_RAM AM_SHARE("mob")
-	AM_RANGE(0xffb000, 0xffbfff) AM_MIRROR(0x7f8000) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
-	AM_RANGE(0xffc000, 0xffc7ff) AM_MIRROR(0x7f8800) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xffd000, 0xffdfff) AM_MIRROR(0x7f8000) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
-	AM_RANGE(0xffe000, 0xffe0ff) AM_MIRROR(0x7f8000) AM_DEVREAD8("jsa", atari_jsa_i_device, main_response_r, 0x00ff)
-	AM_RANGE(0xffe100, 0xffe1ff) AM_MIRROR(0x7f8000) AM_READ_PORT("FFE100")
-	AM_RANGE(0xffe200, 0xffe2ff) AM_MIRROR(0x7f8000) AM_READ(special_port1_r)
-	AM_RANGE(0xffe800, 0xffe8ff) AM_MIRROR(0x7f8000) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
-	AM_RANGE(0xffe900, 0xffe9ff) AM_MIRROR(0x7f8000) AM_DEVWRITE8("jsa", atari_jsa_i_device, main_command_w, 0x00ff)
-	AM_RANGE(0xffea00, 0xffeaff) AM_MIRROR(0x7f8000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0xffeb00, 0xffebff) AM_MIRROR(0x7f8000) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0xffee00, 0xffeeff) AM_MIRROR(0x7f8000) AM_DEVWRITE("jsa", atari_jsa_i_device, sound_reset_w)
+	AM_RANGE(0x800000, 0x800fff) AM_MIRROR(0x7f8000) AM_RAM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
+	AM_RANGE(0x801000, 0x802dff) AM_MIRROR(0x7f8000) AM_RAM
+	AM_RANGE(0x802e00, 0x802fff) AM_MIRROR(0x7f8000) AM_RAM AM_SHARE("mob")
+	AM_RANGE(0x803000, 0x803fff) AM_MIRROR(0x7f8000) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
+	AM_RANGE(0x804000, 0x8047ff) AM_MIRROR(0x7f8800) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x805000, 0x805fff) AM_MIRROR(0x7f8000) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
+	AM_RANGE(0x806000, 0x8060ff) AM_MIRROR(0x7f8000) AM_DEVREAD8("jsa", atari_jsa_i_device, main_response_r, 0x00ff)
+	AM_RANGE(0x806100, 0x8061ff) AM_MIRROR(0x7f8000) AM_READ_PORT("FFE100")
+	AM_RANGE(0x806200, 0x8062ff) AM_MIRROR(0x7f8000) AM_READ(special_port1_r)
+	AM_RANGE(0x806800, 0x8068ff) AM_MIRROR(0x7f8000) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
+	AM_RANGE(0x806900, 0x8069ff) AM_MIRROR(0x7f8000) AM_DEVWRITE8("jsa", atari_jsa_i_device, main_command_w, 0x00ff)
+	AM_RANGE(0x806a00, 0x806aff) AM_MIRROR(0x7f8000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
+	AM_RANGE(0x806b00, 0x806bff) AM_MIRROR(0x7f8000) AM_WRITE(video_int_ack_w)
+	AM_RANGE(0x806e00, 0x806eff) AM_MIRROR(0x7f8000) AM_DEVWRITE("jsa", atari_jsa_i_device, sound_reset_w)
 ADDRESS_MAP_END
 
 

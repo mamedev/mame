@@ -210,7 +210,7 @@ DIPs are also shared 100% with each other.
 
 flickys1, flickys2
 ------------------
-Very noticibly more difficult than the other two sets.  DIPs have changes (less lives
+Very noticeably more difficult than the other two sets.  DIPs have changes (less lives
 and bonus options).  There is no screen which shows the bonus lives values like the
 other two sets, either.  flickys1 allows for DEMO SOUND which none of the others sets
 seem to have access to.
@@ -218,10 +218,8 @@ seem to have access to.
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/z80pio.h"
-#include "machine/i8255.h"
 #include "machine/segacrpt_device.h"
 #include "machine/mc8123.h"
 #include "sound/sn76496.h"
@@ -529,7 +527,7 @@ READ8_MEMBER(system1_state::sound_data_r)
 	{
 		m_ppi8255->pc6_w(0);
 		m_ppi8255->pc6_w(1);
-		return soundlatch_byte_r(space, offset);
+		return m_soundlatch->read(space, offset);
 	}
 
 	/* if we have a Z80 PIO, get the data from the port and toggle the strobe */
@@ -548,7 +546,7 @@ READ8_MEMBER(system1_state::sound_data_r)
 WRITE8_MEMBER(system1_state::soundport_w)
 {
 	/* boost interleave when communicating with the sound CPU */
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
@@ -819,8 +817,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, system1_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1fff) AM_DEVWRITE("sn1", sn76489a_device, write)
-	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1fff) AM_DEVWRITE("sn2", sn76489a_device, write)
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_DEVWRITE("sn1", sn76489a_device, write)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_DEVWRITE("sn2", sn76489a_device, write)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_READ(sound_data_r)
 ADDRESS_MAP_END
 
@@ -2176,6 +2174,8 @@ static MACHINE_CONFIG_START( sys1ppi, system1_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("sn1", SN76489A, SOUND_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -5261,7 +5261,7 @@ DRIVER_INIT_MEMBER(system1_state,nob)
 	space.install_read_handler(0x0001, 0x0001, read8_delegate(FUNC(system1_state::nob_start_r),this));
 
 	/* install MCU communications */
-	iospace.install_readwrite_handler(0x18, 0x18, 0x00, 0x00, read8_delegate(FUNC(system1_state::nob_maincpu_latch_r),this), write8_delegate(FUNC(system1_state::nob_maincpu_latch_w),this));
+	iospace.install_readwrite_handler(0x18, 0x18, read8_delegate(FUNC(system1_state::nob_maincpu_latch_r),this), write8_delegate(FUNC(system1_state::nob_maincpu_latch_w),this));
 	iospace.install_read_handler(0x1c, 0x1c, read8_delegate(FUNC(system1_state::nob_mcu_status_r),this));
 }
 
@@ -5333,10 +5333,10 @@ DRIVER_INIT_MEMBER(system1_state,choplift)
 DRIVER_INIT_MEMBER(system1_state,shtngmst)
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
-	iospace.install_read_port(0x12, 0x12, 0x00, 0x00, "TRIGGER");
-	iospace.install_read_port(0x18, 0x18, 0x00, 0x03, "18");
-	iospace.install_read_handler(0x1c, 0x1c, 0x00, 0x02, read8_delegate(FUNC(system1_state::shtngmst_gunx_r),this));
-	iospace.install_read_port(0x1d, 0x1d, 0x00, 0x02, "GUNY");
+	iospace.install_read_port(0x12, 0x12, "TRIGGER");
+	iospace.install_read_port(0x18, 0x18, 0x03, "18");
+	iospace.install_read_handler(0x1c, 0x1c, 0, 0x02, 0, read8_delegate(FUNC(system1_state::shtngmst_gunx_r),this));
+	iospace.install_read_port(0x1d, 0x1d, 0x02, "GUNY");
 	DRIVER_INIT_CALL(bank0c);
 }
 

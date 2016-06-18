@@ -21,6 +21,7 @@ std::vector<std::string> c_year::ui;
 // Manufacturers index
 UINT16 c_mnfct::actual = 0;
 std::vector<std::string> c_mnfct::ui;
+std::unordered_map<std::string, int> c_mnfct::uimap;
 
 // Main filters
 UINT16 main_filters::actual = 0;
@@ -92,6 +93,22 @@ int getprecisionchr(const char* s)
 	return precision;
 }
 
+std::vector<std::string> tokenize(const std::string &text, char sep)
+{
+	std::vector<std::string> tokens;
+	tokens.reserve(64);
+	std::size_t start = 0, end = 0;
+	while ((end = text.find(sep, start)) != std::string::npos) 
+	{
+		std::string temp = text.substr(start, end - start);
+		if (!temp.empty()) tokens.push_back(temp);
+		start = end + 1;
+	}
+	std::string temp = text.substr(start);
+	if (!temp.empty()) tokens.push_back(temp);
+	return tokens;
+}
+
 //-------------------------------------------------
 //  search a substring with even partial matching
 //-------------------------------------------------
@@ -150,10 +167,7 @@ int fuzzy_substring(std::string s_needle, std::string s_haystack)
 void c_mnfct::set(const char *str)
 {
 	std::string name = getname(str);
-	if (std::find(ui.begin(), ui.end(), name) != ui.end())
-		return;
-
-	ui.push_back(name);
+	uimap[name] = 0;
 }
 
 std::string c_mnfct::getname(const char *str)

@@ -74,7 +74,7 @@ void cpc_brunword4_device::device_start()
 	address_space& space = cpu->memory().space(AS_IO);
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 
-	space.install_write_handler(0xdf00,0xdfff,0,0,write8_delegate(FUNC(cpc_brunword4_device::rombank_w),this));
+	space.install_write_handler(0xdf00,0xdfff,write8_delegate(FUNC(cpc_brunword4_device::rombank_w),this));
 }
 
 void cpc_brunword4_device::device_reset()

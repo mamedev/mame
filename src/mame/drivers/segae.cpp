@@ -319,7 +319,6 @@ public:
 		m_bank1d(*this, "bank1d") { }
 
 	DECLARE_WRITE8_MEMBER( bank_write );
-	DECLARE_WRITE_LINE_MEMBER( int_callback );
 
 	DECLARE_READ8_MEMBER( ridleofp_port_f8_read );
 	DECLARE_WRITE8_MEMBER( ridleofp_port_fa_write );
@@ -953,12 +952,6 @@ ROM_START( opaopa )
 ROM_END
 
 
-WRITE_LINE_MEMBER( systeme_state::int_callback )
-{
-	m_maincpu->set_input_line(0, state);
-}
-
-
 UINT32 systeme_state::screen_update_systeme(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap_rgb32 &vdp1_bitmap = m_vdp1->get_bitmap();
@@ -999,7 +992,7 @@ static MACHINE_CONFIG_START( systeme, systeme_state )
 
 	MCFG_DEVICE_ADD("vdp2", SEGA315_5124, 0)
 	MCFG_SEGA315_5124_IS_PAL(false)
-	MCFG_SEGA315_5124_INT_CB(WRITELINE(systeme_state, int_callback))
+	MCFG_SEGA315_5124_INT_CB(INPUTLINE("maincpu", 0))
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, vdp2_map)
 
 	/* sound hardware */

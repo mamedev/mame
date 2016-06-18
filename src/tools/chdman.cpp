@@ -17,7 +17,6 @@
 #include "md5.h"
 #include "sha1.h"
 #include "vbiparse.h"
-#include "tagmap.h"
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>

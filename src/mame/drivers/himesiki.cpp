@@ -113,7 +113,7 @@ WRITE8_MEMBER(himesiki_state::himesiki_rombank_w)
 
 WRITE8_MEMBER(himesiki_state::himesiki_sound_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -149,7 +149,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( himesiki_iom1, AS_IO, 8, himesiki_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym2203", ym2203_device, read, write)
-	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 /****************************************************************************/
@@ -456,6 +456,9 @@ static MACHINE_CONFIG_START( himesiki, himesiki_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym2203", YM2203, CLK2/4) // ??
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("sub", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
@@ -523,7 +526,7 @@ ROM_START( androidpo )
 	ROM_LOAD16_BYTE( "MITSUBISHI__AD-7__M5L27512K.botpcb.bc9", 0x00001, 0x10000, CRC(611ff400) SHA1(1a9aed33d0e3f063811f92b9fee3ecbff0e965bf) )
 
 	ROM_REGION( 0x2000, "plds", 0 )
-	ROM_LOAD( "RICOH_7A2_19__EPL10P8BP_JAPAN_I.f1.jed", 0x0000, 0x0473, CRC(58520dfc) SHA1(2b7c6eadfbe315bc3ebd91519d53fc873676c42c) )
+	ROM_LOAD( "RICOH_7A2_19__EPL10P8BP_JAPAN_I.f1.jed", 0x0000, 0x0473, CRC(c5e51ea2) SHA1(3e35a30935f562227f0afa32a6be6eb33f9a8372) )
 	ROM_LOAD( "RICOH_7A2_19__EPL10P8BP_JAPAN_M.j3.jed", 0x1000, 0x0473, CRC(807d1553) SHA1(257be9eacd57d2e2dbaab3be5725d8d06d6a9a0b) )
 
 	ROM_REGION( 0x20000, "spr_p103a", ROMREGION_ERASEFF )

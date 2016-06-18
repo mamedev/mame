@@ -531,7 +531,7 @@ AM_RANGE(0x10000, END_OF_RAM) AM_RAM
 //    'diagnostic_w' handler (similar to real hardware).
 
 //  - Address bits 8-12 are ignored (-> AM_MIRROR).
-AM_RANGE(0xed000, 0xed0ff) AM_RAM AM_SHARE("vol_ram") AM_MIRROR(0x1f00)
+AM_RANGE(0xec000, 0xec0ff) AM_RAM AM_SHARE("vol_ram") AM_MIRROR(0x1f00)
 AM_RANGE(0xed100, 0xed1ff) AM_RAM AM_SHARE("nvram")
 
 AM_RANGE(0xee000, 0xeffff) AM_RAM AM_SHARE("p_ram")
@@ -782,25 +782,25 @@ void rainbow_state::machine_reset()
 
 	// * Reset RTC to a defined state *
 	#define RTC_RESET 0xFC104 // read $FC104 or mirror $FE104
-	program.install_read_handler(RTC_RESET, RTC_RESET, 0, 0, read8_delegate(FUNC(rainbow_state::rtc_reset), this));
-	program.install_read_handler(RTC_RESET + 0x2000, RTC_RESET + 0x2000, 0, 0, read8_delegate(FUNC(rainbow_state::rtc_reset2), this));
+	program.install_read_handler(RTC_RESET, RTC_RESET, read8_delegate(FUNC(rainbow_state::rtc_reset), this));
+	program.install_read_handler(RTC_RESET + 0x2000, RTC_RESET + 0x2000, read8_delegate(FUNC(rainbow_state::rtc_reset2), this));
 
 	// A magic pattern enables reads or writes (-> RTC_WRITE_DATA_0 / RTC_WRITE_DATA_1)
 	// 64 bits read from two alternating addresses (see DS1315.C)
 	#define RTC_PATTERN_0 0xFC100 // MIRROR: FE100
 	#define RTC_PATTERN_1 0xFC101 // MIRROR: FE101
-	program.install_read_handler(RTC_PATTERN_0, RTC_PATTERN_1, 0, 0, read8_delegate(FUNC(rainbow_state::rtc_enable), this));
-	program.install_read_handler(RTC_PATTERN_0 + 0x2000, RTC_PATTERN_1 + 0x2000, 0, 0, read8_delegate(FUNC(rainbow_state::rtc_enable2), this));
+	program.install_read_handler(RTC_PATTERN_0, RTC_PATTERN_1, read8_delegate(FUNC(rainbow_state::rtc_enable), this));
+	program.install_read_handler(RTC_PATTERN_0 + 0x2000, RTC_PATTERN_1 + 0x2000, read8_delegate(FUNC(rainbow_state::rtc_enable2), this));
 
 	// * Read actual time/date from ClikClok *
 	#define RTC_READ_DATA 0xFC004 // Single byte - delivers one bit (if RTC enabled). MIRROR: FE004
-	program.install_read_handler(RTC_READ_DATA, RTC_READ_DATA, 0, 0, read8_delegate(FUNC(rainbow_state::rtc_r), this));
-	program.install_read_handler(RTC_READ_DATA + 0x2000, RTC_READ_DATA + 0x2000, 0, 0, read8_delegate(FUNC(rainbow_state::rtc_r2), this));
+	program.install_read_handler(RTC_READ_DATA, RTC_READ_DATA, read8_delegate(FUNC(rainbow_state::rtc_r), this));
+	program.install_read_handler(RTC_READ_DATA + 0x2000, RTC_READ_DATA + 0x2000, read8_delegate(FUNC(rainbow_state::rtc_r2), this));
 
 	// * Secretly transmit data to RTC (set time / date) *  Works only if magic pattern enabled RTC. Look ma, no writes!
 	#define RTC_WRITE_DATA_0 0xFE000
 	#define RTC_WRITE_DATA_1 0xFE001
-	program.install_read_handler(RTC_WRITE_DATA_0, RTC_WRITE_DATA_1, 0, 0, read8_delegate(FUNC(rainbow_state::rtc_w), this));
+	program.install_read_handler(RTC_WRITE_DATA_0, RTC_WRITE_DATA_1, read8_delegate(FUNC(rainbow_state::rtc_w), this));
 
 	m_rtc->chip_reset();
 	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-B' ***************************************

@@ -274,7 +274,6 @@ Notes:
 #include "emu.h"
 #include "includes/segaorun.h"
 #include "machine/fd1089.h"
-#include "machine/segaic16.h"
 #include "sound/2151intf.h"
 #include "sound/segapcm.h"
 #include "includes/segaipt.h"
@@ -550,7 +549,7 @@ WRITE16_MEMBER( segaorun_state::nop_w )
 READ8_MEMBER( segaorun_state::sound_data_r )
 {
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	return soundlatch_read();
+	return m_soundlatch->read(space, 0);
 }
 
 
@@ -587,7 +586,7 @@ void segaorun_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	switch (id)
 	{
 		case TID_SOUND_WRITE:
-			soundlatch_write(param);
+			m_soundlatch->write(m_soundcpu->space(AS_PROGRAM), 0, param);
 			m_soundcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 			break;
 
@@ -1196,6 +1195,8 @@ static MACHINE_CONFIG_START( outrun_base, segaorun_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.43)

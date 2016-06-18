@@ -28,8 +28,8 @@ namespace netlist
 		, m_THRES(*this, "THRESH")    // Pin 6
 		, m_TRIG(*this, "TRIG")       // Pin 2
 		, m_OUT(*this, "OUT")         // Pin 3
-		, m_last_out(false)
-		, m_ff(false)
+		, m_last_out(*this, "m_last_out", false)
+		, m_ff(*this, "m_ff", false)
 		{
 
 			register_subalias("GND",  m_R3.m_N);    // Pin 1
@@ -40,9 +40,6 @@ namespace netlist
 			connect_late(m_R1.m_N, m_R2.m_P);
 			connect_late(m_R2.m_N, m_R3.m_P);
 			connect_late(m_RDIS.m_N, m_R3.m_N);
-
-			save(NLNAME(m_last_out));
-			save(NLNAME(m_ff));
 		}
 
 		NETLIB_UPDATEI();
@@ -60,8 +57,8 @@ namespace netlist
 		analog_output_t m_OUT;
 
 	private:
-		bool m_last_out;
-		bool m_ff;
+		state_var<bool> m_last_out;
+		state_var<bool> m_ff;
 
 		inline nl_double clamp(const nl_double v, const nl_double a, const nl_double b);
 

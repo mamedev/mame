@@ -768,17 +768,6 @@ static GFXDECODE_START( asuka )
 GFXDECODE_END
 
 
-
-/**************************************************************
-                SOUND
-**************************************************************/
-
-WRITE_LINE_MEMBER(asuka_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
 /***********************************************************
                  MACHINE DRIVERS
 ***********************************************************/
@@ -870,7 +859,7 @@ static MACHINE_CONFIG_START( bonzeadv, asuka_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(asuka_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)

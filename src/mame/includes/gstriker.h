@@ -1,8 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Farfetch'd, David Haywood
+
 #ifndef __GSTRIKER_H
 #define __GSTRIKER_H
 
+#include "machine/gen_latch.h"
 #include "video/vsystem_spr.h"
 #include "video/mb60553.h"
 #include "video/vs920a.h"
@@ -22,6 +24,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_CG10103_m_vram(*this, "cg10103_m_vram"),
 		m_work_ram(*this, "work_ram"),
 		m_mixerregs1(*this, "mixerregs1"),
@@ -36,6 +39,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT16> m_CG10103_m_vram;
 	required_shared_ptr<UINT16> m_work_ram;

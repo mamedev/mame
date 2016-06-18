@@ -42,9 +42,8 @@ namespace netlist
 		, m_Q(*this, "2")
 		, m_L_to_H(*this, "L_TO_H", 10)
 		, m_H_to_L(*this, "H_TO_L", 10)
-		, m_last(0)
+		, m_last(*this, "m_last", 0)
 		{
-			save(NLNAME(m_last));
 		}
 
 		//NETLIB_UPDATE_PARAMI();
@@ -58,7 +57,7 @@ namespace netlist
 		param_int_t m_L_to_H;
 		param_int_t m_H_to_L;
 
-		UINT8 m_last;
+		state_var_u8 m_last;
 	};
 
 	NETLIB_RESET(nicRSFF)

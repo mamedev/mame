@@ -236,6 +236,7 @@ struct rom_entry
 #define ROM_CONTINUE(offset,length)                 { nullptr, nullptr, offset, length, ROMENTRYTYPE_CONTINUE | ROM_INHERITFLAGS },
 #define ROM_IGNORE(length)                          { nullptr, nullptr, 0,      length, ROMENTRYTYPE_IGNORE | ROM_INHERITFLAGS },
 #define ROM_FILL(offset,length,value)               { nullptr, (const char *)value, offset, length, ROMENTRYTYPE_FILL },
+#define ROMX_FILL(offset,length,value,flags)        { nullptr, (const char *)value, offset, length, ROMENTRYTYPE_FILL | flags },
 #define ROM_COPY(srctag,srcoffs,offset,length)      { srctag, (const char *)srcoffs, offset, length, ROMENTRYTYPE_COPY },
 
 

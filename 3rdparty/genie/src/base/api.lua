@@ -143,6 +143,7 @@
 
 				local allowed_flags = {
 					ATL = 1,
+					C7DebugInfo = 1,
 					DebugEnvsDontMerge = 1,
 					DebugEnvsInherit = 1,
 					DeploymentContent = 1,

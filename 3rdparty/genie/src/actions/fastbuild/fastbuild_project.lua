@@ -155,14 +155,18 @@ local function compile(indentlevel, prj, cfg, commonbasepath)
 	end
 
 	if cfg.flags.Symbols then
-		if (premake.config.isoptimizedbuild(cfg.flags)
-			or cfg.flags.NoEditAndContinue) then
-			table.insert(compileroptions, '/Zi')
+		if (cfg.flags.C7DebugInfo) then
+			table.insert(compileroptions, '/Z7')
 		else
-			table.insert(compileroptions, '/ZI')
+			if (premake.config.isoptimizedbuild(cfg.flags)
+				or cfg.flags.NoEditAndContinue) then
+				table.insert(compileroptions, '/Zi')
+			else
+				table.insert(compileroptions, '/ZI')
+			end
+			local targetdir = add_trailing_backslash(cfg.buildtarget.directory)
+			table.insert(compileroptions, string.format("/Fd\"%s%s.pdb\"", targetdir, cfg.buildtarget.basename))
 		end
-		local targetdir = add_trailing_backslash(cfg.buildtarget.directory)
-		table.insert(compileroptions, string.format("/Fd\"%s%s.pdb\"", targetdir, cfg.buildtarget.basename))
 	end
 
 	local isoptimised = true

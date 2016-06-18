@@ -568,12 +568,13 @@ x   x   x   x   1   1  ?1? ?0?  ?   1   0   0   x   x   *   *   *   *   x   x   
 
 static ADDRESS_MAP_START(swyft_mem, AS_PROGRAM, 8, swyft_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM AM_MIRROR(0xF00000) // 64 KB ROM
-	AM_RANGE(0x040000, 0x07ffff) AM_RAM AM_MIRROR(0xF00000) AM_SHARE("p_swyft_vram") // 256 KB RAM
-	AM_RANGE(0x0d0000, 0x0d000f) AM_READ(swyft_d0000) AM_MIRROR(0xF00000) // status of something? reads from d0000, d0004, d0008, d000a, d000e
-	AM_RANGE(0x0e1000, 0x0e1000) AM_DEVWRITE("acia6850", acia6850_device, control_w) AM_MIRROR(0xF00000) // 6850 ACIA lives here
-	AM_RANGE(0x0e2000, 0x0e2fff) AM_READWRITE(swyft_via0_r, swyft_via0_w) AM_MIRROR(0xF00000)// io area with selector on a9 a8 a7 a6?
-	AM_RANGE(0x0e4000, 0x0e4fff) AM_READWRITE(swyft_via1_r, swyft_via1_w) AM_MIRROR(0xF00000)
+	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
+	AM_RANGE(0x000000, 0x00ffff) AM_ROM // 64 KB ROM
+	AM_RANGE(0x040000, 0x07ffff) AM_RAM AM_SHARE("p_swyft_vram") // 256 KB RAM
+	AM_RANGE(0x0d0000, 0x0d000f) AM_READ(swyft_d0000) // status of something? reads from d0000, d0004, d0008, d000a, d000e
+	AM_RANGE(0x0e1000, 0x0e1000) AM_DEVWRITE("acia6850", acia6850_device, control_w) // 6850 ACIA lives here
+	AM_RANGE(0x0e2000, 0x0e2fff) AM_READWRITE(swyft_via0_r, swyft_via0_w) // io area with selector on a9 a8 a7 a6?
+	AM_RANGE(0x0e4000, 0x0e4fff) AM_READWRITE(swyft_via1_r, swyft_via1_w)
 ADDRESS_MAP_END
 
 MACHINE_START_MEMBER(swyft_state,swyft)

@@ -102,6 +102,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 
 
@@ -114,6 +115,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_colorram(*this, "colorram")  { }
@@ -122,6 +124,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -282,7 +285,7 @@ WRITE8_MEMBER(mirax_state::nmi_mask_w)
 
 WRITE8_MEMBER(mirax_state::sound_cmd_w)
 {
-	soundlatch_byte_w(space, 0, data & 0xff);
+	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -329,7 +332,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mirax_sound_map, AS_PROGRAM, 8, mirax_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 
 	AM_RANGE(0xe000, 0xe000) AM_WRITENOP
 	AM_RANGE(0xe001, 0xe001) AM_WRITENOP
@@ -492,6 +495,9 @@ static MACHINE_CONFIG_START( mirax, mirax_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mirax)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, 12000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 

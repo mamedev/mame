@@ -5,7 +5,10 @@
     Goal! '92
 
 *************************************************************************/
+
+#include "machine/gen_latch.h"
 #include "sound/msm5205.h"
+
 class goal92_state : public driver_device
 {
 public:
@@ -16,11 +19,12 @@ public:
 		m_tx_data(*this, "tx_data"),
 		m_spriteram(*this, "spriteram"),
 		m_scrollram(*this, "scrollram"),
-		m_audiocpu(*this, "audiocpu"),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg_data;
@@ -41,7 +45,13 @@ public:
 	int         m_adpcm_toggle;
 
 	/* devices */
+	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<msm5205_device> m_msm;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+
 	DECLARE_WRITE16_MEMBER(goal92_sound_command_w);
 	DECLARE_READ16_MEMBER(goal92_inputs_r);
 	DECLARE_WRITE8_MEMBER(adpcm_data_w);
@@ -62,8 +72,4 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(goal92_adpcm_int);
-	required_device<cpu_device> m_maincpu;
-	required_device<msm5205_device> m_msm;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };

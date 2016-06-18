@@ -460,12 +460,6 @@ static INPUT_PORTS_START( gg )
 INPUT_PORTS_END
 
 
-WRITE_LINE_MEMBER(sms_state::sms_int_callback)
-{
-	m_maincpu->set_input_line(0, state);
-}
-
-
 static MACHINE_CONFIG_START( sms_ntsc_base, sms_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/3)
@@ -525,7 +519,7 @@ static MACHINE_CONFIG_DERIVED( sms2_ntsc, sms_ntsc_base )
 	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5246, 0)
 	MCFG_SEGA315_5246_SET_SCREEN("screen")
 	MCFG_SEGA315_5246_IS_PAL(false)
-	MCFG_SEGA315_5246_INT_CB(WRITELINE(sms_state, sms_int_callback))
+	MCFG_SEGA315_5246_INT_CB(INPUTLINE("maincpu", 0))
 	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
 MACHINE_CONFIG_END
 
@@ -568,7 +562,7 @@ static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
 	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5124, 0)
 	MCFG_SEGA315_5124_SET_SCREEN("screen")
 	MCFG_SEGA315_5124_IS_PAL(false)
-	MCFG_SEGA315_5124_INT_CB(WRITELINE(sms_state, sms_int_callback))
+	MCFG_SEGA315_5124_INT_CB(INPUTLINE("maincpu", 0))
 	MCFG_SEGA315_5124_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
 
 	// card and expansion slots, not present in Master System II
@@ -666,7 +660,7 @@ static MACHINE_CONFIG_DERIVED( sms2_pal, sms_pal_base )
 	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5246, 0)
 	MCFG_SEGA315_5246_SET_SCREEN("screen")
 	MCFG_SEGA315_5246_IS_PAL(true)
-	MCFG_SEGA315_5246_INT_CB(WRITELINE(sms_state, sms_int_callback))
+	MCFG_SEGA315_5246_INT_CB(INPUTLINE("maincpu", 0))
 	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
 MACHINE_CONFIG_END
 
@@ -708,7 +702,7 @@ static MACHINE_CONFIG_DERIVED( sms1_pal, sms_pal_base )
 	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5124, 0)
 	MCFG_SEGA315_5124_SET_SCREEN("screen")
 	MCFG_SEGA315_5124_IS_PAL(true)
-	MCFG_SEGA315_5124_INT_CB(WRITELINE(sms_state, sms_int_callback))
+	MCFG_SEGA315_5124_INT_CB(INPUTLINE("maincpu", 0))
 	MCFG_SEGA315_5124_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
 
 	// card and expansion slots, not present in Master System II
@@ -773,7 +767,7 @@ static MACHINE_CONFIG_START( gamegear, sms_state )
 	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5378, 0)
 	MCFG_SEGA315_5378_SET_SCREEN("screen")
 	MCFG_SEGA315_5378_IS_PAL(false)
-	MCFG_SEGA315_5378_INT_CB(WRITELINE(sms_state, sms_int_callback))
+	MCFG_SEGA315_5378_INT_CB(INPUTLINE("maincpu", 0))
 	MCFG_SEGA315_5378_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
 
 	/* sound hardware */

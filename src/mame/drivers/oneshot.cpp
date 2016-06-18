@@ -14,7 +14,7 @@ Notes :
   - Gun X range is 0x0000-0x01ff and gun Y range is 0x0000-0x00ff, so you
     can shoot sometimes out of the "visible area" ... NOT A BUG !
   - Player 1 and 2 guns do NOT use the same routine to determine the
-    coordonates of an impact on the screen : position both guns in the
+    coordinates of an impact on the screen : position both guns in the
     "upper left" corner in the "gun test" to see what I mean.
   - I've assumed that the shot was right at the place the shot was made,
     but I don't have any more information about that
@@ -39,6 +39,7 @@ NOTE: An eBay auction of the PCB shows "1996.9.16 PROMAT" on the JAMMA+ adapter 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/oneshot.h"
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 
@@ -110,8 +111,8 @@ static ADDRESS_MAP_START( oneshot_map, AS_PROGRAM, 16, oneshot_state )
 	AM_RANGE(0x181000, 0x181fff) AM_RAM_WRITE(oneshot_fg_videoram_w) AM_SHARE("fg_videoram") // credits etc.
 	AM_RANGE(0x182000, 0x182fff) AM_RAM_WRITE(oneshot_bg_videoram_w) AM_SHARE("bg_videoram") // credits etc.
 	AM_RANGE(0x188000, 0x18800f) AM_WRITEONLY AM_SHARE("scroll")    // scroll registers
-	AM_RANGE(0x190002, 0x190003) AM_READ(soundlatch_word_r)
-	AM_RANGE(0x190010, 0x190011) AM_WRITE(soundlatch_word_w)
+	AM_RANGE(0x190002, 0x190003) AM_DEVREAD8("soundlatch", generic_latch_8_device, read, 0x00ff)
+	AM_RANGE(0x190010, 0x190011) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x190018, 0x190019) AM_WRITE(soundbank_w)
 	AM_RANGE(0x190026, 0x190027) AM_READ(oneshot_gun_x_p1_r)
 	AM_RANGE(0x19002e, 0x19002f) AM_READ(oneshot_gun_x_p2_r)
@@ -126,7 +127,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( oneshot_sound_map, AS_PROGRAM, 8, oneshot_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8000) AM_READWRITE(soundlatch_byte_r,soundlatch_byte_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, write)
 	AM_RANGE(0x8001, 0x87ff) AM_RAM
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 	AM_RANGE(0xe010, 0xe010) AM_DEVREADWRITE("oki", okim6295_device, read, write)
@@ -376,6 +377,8 @@ static MACHINE_CONFIG_START( oneshot, oneshot_state )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3500000)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
