@@ -18,7 +18,7 @@
 /*************************************
 *  Constants
 *************************************/
-#define MIDZEUS_VIDEO_CLOCK     XTAL_66_6667MHz
+#define ZEUS2_VIDEO_CLOCK     XTAL_66_6667MHz
 
 #define DUMP_WAVE_RAM       0
 #define TRACK_REG_USAGE     0
@@ -51,8 +51,8 @@ struct zeus2_poly_extra_data
 
 #define WAVERAM_BLOCK0(blocknum)                ((void *)((UINT8 *)waveram[0] + 8 * (blocknum)))
 #define WAVERAM_BLOCK1(blocknum)                ((void *)((UINT8 *)waveram[1] + 12 * (blocknum)))
-#define WAVERAM_BLOCK0_EXT(blocknum)                ((void *)((UINT8 *)m_state.waveram[0] + 8 * (blocknum)))
-#define WAVERAM_BLOCK1_EXT(blocknum)                ((void *)((UINT8 *)m_state.waveram[1] + 12 * (blocknum)))
+#define WAVERAM_BLOCK0_EXT(blocknum)                ((void *)((UINT8 *)m_state->waveram[0] + 8 * (blocknum)))
+#define WAVERAM_BLOCK1_EXT(blocknum)                ((void *)((UINT8 *)m_state->waveram[1] + 12 * (blocknum)))
 
 #define WAVERAM_PTR8(base, bytenum)             ((UINT8 *)(base) + BYTE4_XOR_LE(bytenum))
 #define WAVERAM_READ8(base, bytenum)            (*WAVERAM_PTR8(base, bytenum))
@@ -85,17 +85,17 @@ class zeus2_device;
 class zeus2_renderer : public poly_manager<float, zeus2_poly_extra_data, 4, 10000>
 {
 public:
-	zeus2_renderer(zeus2_device &state);
+	zeus2_renderer(zeus2_device *state);
 
 	void render_poly_8bit(INT32 scanline, const extent_t& extent, const zeus2_poly_extra_data& object, int threadid);
 
 	void zeus2_draw_quad(const UINT32 *databuffer, UINT32 texoffs, int logit);
 
 private:
-	zeus2_device& m_state;
+	zeus2_device* m_state;
 };
-typedef zeus2_renderer::vertex_t poly_vertex;
-typedef zeus2_renderer::extent_t poly_extent;
+typedef zeus2_renderer::vertex_t z2_poly_vertex;
+typedef zeus2_renderer::extent_t z2_poly_extent;
 
 /*************************************
 *  Zeus2 Video Device
@@ -124,7 +124,7 @@ public:
 	devcb_write_line   m_vblank;
 	devcb_write_line   m_irq;
 
-	UINT32 m_zeusbase[400];
+	UINT32 m_zeusbase[0x80];
 
 	zeus2_renderer* poly;
 
@@ -171,6 +171,11 @@ private:
 	UINT32 zeus_fifo[20];
 	UINT8 zeus_fifo_words;
 
+	UINT32 m_fill_dark_color;
+	UINT16 m_fill_dark_depth;
+	UINT32 m_fill_light_color;
+	UINT16 m_fill_light_depth;
+
 #if TRACK_REG_USAGE
 	struct reg_info
 	{
@@ -216,7 +221,7 @@ public:
 	*************************************/
 
 #ifdef UNUSED_FUNCTION
-	inline void waveram_plot(int y, int x, UINT32 color)
+	inline void WAVERAM_plot(int y, int x, UINT32 color)
 	{
 		if (zeus_cliprect.contains(x, y))
 			WAVERAM_WRITEPIX(zeus_renderbase, y, x, color);

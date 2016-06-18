@@ -44,8 +44,6 @@
 #include "machine/pci9050.h"
 #include "machine/pci-ide.h"
 #include "video/zeus2.h"
-#include "includes/midzeus.h"
-#include "includes/midzeus2.h"
 #include "machine/nvram.h"
 #include "coreutil.h"
 
@@ -475,7 +473,7 @@ WRITE_LINE_MEMBER(atlantis_state::vblank_irq)
 
 WRITE_LINE_MEMBER(atlantis_state::zeus_irq)
 {
-	logerror("%s: atlantis_state::zeus_irq state = %i\n", machine().describe_context(), state);
+	//logerror("%s: atlantis_state::zeus_irq state = %i\n", machine().describe_context(), state);
 	if (state) {
 		board_ctrl[CTRL_STATUS] |= (1 << ZEUS_IRQ_SHIFT);
 		update_asic_irq();
@@ -819,12 +817,12 @@ static MACHINE_CONFIG_START( mwskins, atlantis_state )
 	MCFG_IDE_PCI_IRQ_HANDLER(DEVWRITELINE(":", atlantis_state, ide_irq))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("zeus2", ZEUS2, MIDZEUS_VIDEO_CLOCK)
+	MCFG_DEVICE_ADD("zeus2", ZEUS2, ZEUS2_VIDEO_CLOCK)
 	MCFG_ZEUS2_IRQ_CB(WRITELINE(atlantis_state, zeus_irq))
 	MCFG_ZEUS2_VBLANK_CB(WRITELINE(atlantis_state, vblank_irq))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MIDZEUS_VIDEO_CLOCK / 4, 634, 0, 368, 560, 0, 512)
+	MCFG_SCREEN_RAW_PARAMS(ZEUS2_VIDEO_CLOCK / 8, 529, 0, 400, 278, 0, 256)
 	MCFG_SCREEN_UPDATE_DEVICE("zeus2", zeus2_device, screen_update)
 
 	/* sound hardware */

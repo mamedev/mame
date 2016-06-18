@@ -1400,7 +1400,7 @@ WRITE16_MEMBER( dcs_audio_device::denver_w )
 					m_dmadac[chan] = subdevice<dmadac_sound_device>(buffer);
 				}
 				dmadac_enable(&m_dmadac[0], m_channels, enable);
-				if (m_channels < 6)
+				if (m_channels <= 6)
 					dmadac_enable(&m_dmadac[m_channels], 6 - m_channels, FALSE);
 				recompute_sample_rate();
 			}
