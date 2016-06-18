@@ -293,7 +293,7 @@ UINT32 _8080bw_state::screen_update_lupin3(screen_device &screen, bitmap_rgb32 &
 		UINT8 x = offs << 3;
 
 		UINT8 data = m_main_ram[offs];
-		UINT8 fore_color = ~m_colorram[offs & 0x1f9f] & 0x07;
+		UINT8 fore_color = ~m_scattered_colorram[(offs & 0x1f) | ((offs & 0x1f80) >> 2)] & 0x07;
 
 		set_8_pixels(bitmap, y, x, data, fore_color, 0);
 	}

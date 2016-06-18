@@ -1797,6 +1797,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( lupin3a, lupin3 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(schaser_map)
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,sflush)
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_lupin3)
