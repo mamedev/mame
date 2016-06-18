@@ -313,9 +313,9 @@ int cli_frontend::execute(int argc, char **argv)
 		osd_printf_error("Caught unhandled emulator exception\n");
 		m_result = EMU_ERR_FATALERROR;
 	}
-	catch (add_exception &aex)
+	catch (tag_add_exception &aex)
 	{
-		osd_printf_error("Tag '%s' already exists in tagged_list\n", aex.tag());
+		osd_printf_error("Tag '%s' already exists in tagged map\n", aex.tag());
 		m_result = EMU_ERR_FATALERROR;
 	}
 	catch (std::exception &ex)

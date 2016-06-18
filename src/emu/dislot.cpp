@@ -46,7 +46,7 @@ void device_slot_interface::static_option_add(device_t &device, const char *name
 
 	if (option != nullptr)
 		throw emu_fatalerror("slot '%s' duplicate option '%s\n", device.tag(), name);
-	if (intf.m_options.count(name) != 0) throw add_exception(name);
+	if (intf.m_options.count(name) != 0) throw tag_add_exception(name);
 	intf.m_options.emplace(std::make_pair(name, std::make_unique<device_slot_option>(name, devtype)));
 }
 

@@ -12,7 +12,6 @@
 #define NETLIST_H
 
 #include "emu.h"
-#include "tagmap.h"
 
 #include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"

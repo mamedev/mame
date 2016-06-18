@@ -2446,7 +2446,7 @@ rpk::rpk(emu_options& options, const char* sysname)
 	:m_options(options), m_type(0)
 //,m_system_name(sysname)
 {
-	m_sockets.reset();
+	m_sockets.clear();
 }
 
 rpk::~rpk()
@@ -2459,9 +2459,9 @@ rpk::~rpk()
 */
 UINT8* rpk::get_contents_of_socket(const char *socket_name)
 {
-	rpk_socket *socket = m_sockets.find(socket_name);
-	if (socket==nullptr) return nullptr;
-	return socket->get_contents();
+	auto socket = m_sockets.find(socket_name);
+	if (socket == m_sockets.end()) return nullptr;
+	return socket->second->get_contents();
 }
 
 /*
@@ -2469,14 +2469,14 @@ UINT8* rpk::get_contents_of_socket(const char *socket_name)
 */
 int rpk::get_resource_length(const char *socket_name)
 {
-	rpk_socket *socket = m_sockets.find(socket_name);
-	if (socket==nullptr) return 0;
-	return socket->get_content_length();
+	auto socket = m_sockets.find(socket_name);
+	if (socket == m_sockets.end()) return 0;
+	return socket->second->get_content_length();
 }
 
-void rpk::add_socket(const char* id, rpk_socket *newsock)
+void rpk::add_socket(const char* id, std::unique_ptr<rpk_socket> newsock)
 {
-	m_sockets.append(id, *newsock);
+	m_sockets.emplace(id, std::move(newsock));
 }
 
 /*-------------------------------------------------
@@ -2487,22 +2487,20 @@ void rpk::add_socket(const char* id, rpk_socket *newsock)
 void rpk::close()
 {
 	// Save the NVRAM contents
-	rpk_socket *socket = m_sockets.first();
-	while (socket != nullptr)
+	for(auto &socket : m_sockets)
 	{
-		if (socket->persistent_ram())
+		if (socket.second->persistent_ram())
 		{
 			// try to open the battery file and write it if possible
-			assert_always(socket->get_contents() && (socket->get_content_length() > 0), "Buffer is null or length is 0");
+			assert_always(socket.second->get_contents() && (socket.second->get_content_length() > 0), "Buffer is null or length is 0");
 
 			emu_file file(m_options.nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			osd_file::error filerr = file.open(socket->get_pathname());
+			osd_file::error filerr = file.open(socket.second->get_pathname());
 			if (filerr == osd_file::error::NONE)
-				file.write(socket->get_contents(), socket->get_content_length());
+				file.write(socket.second->get_contents(), socket.second->get_content_length());
 
 		}
-		socket->cleanup();
-		socket = socket->m_next;
+		socket.second->cleanup();
 	}
 }
 
@@ -2512,12 +2510,12 @@ void rpk::close()
 ***************************************************************/
 
 rpk_socket::rpk_socket(const char* id, int length, UINT8* contents, const char *pathname)
-: m_id(id), m_length(length), m_next(nullptr), m_contents(contents), m_pathname(pathname)
+: m_id(id), m_length(length), m_contents(contents), m_pathname(pathname)
 {
 }
 
 rpk_socket::rpk_socket(const char* id, int length, UINT8* contents)
-: m_id(id), m_length(length), m_next(nullptr), m_contents(contents), m_pathname(nullptr)
+: m_id(id), m_length(length), m_contents(contents), m_pathname(nullptr)
 {
 }
 
@@ -2554,7 +2552,7 @@ int rpk_reader::find_file(util::archive_file &zip, const char *filename, UINT32 
 /*
     Load a rom resource and put it in a pcb socket instance.
 */
-rpk_socket* rpk_reader::load_rom_resource(util::archive_file &zip, xml_data_node* rom_resource_node, const char* socketname)
+std::unique_ptr<rpk_socket> rpk_reader::load_rom_resource(util::archive_file &zip, xml_data_node* rom_resource_node, const char* socketname)
 {
 	const char* file;
 	const char* crcstr;
@@ -2613,13 +2611,13 @@ rpk_socket* rpk_reader::load_rom_resource(util::archive_file &zip, xml_data_node
 	}
 
 	// Create a socket instance
-	return new rpk_socket(socketname, length, contents);
+	return std::make_unique<rpk_socket>(socketname, length, contents);
 }
 
 /*
     Load a ram resource and put it in a pcb socket instance.
 */
-rpk_socket* rpk_reader::load_ram_resource(emu_options &options, xml_data_node* ram_resource_node, const char* socketname, const char* system_name)
+std::unique_ptr<rpk_socket> rpk_reader::load_ram_resource(emu_options &options, xml_data_node* ram_resource_node, const char* socketname, const char* system_name)
 {
 	const char* length_string;
 	const char* ram_type;
@@ -2697,7 +2695,7 @@ rpk_socket* rpk_reader::load_ram_resource(emu_options &options, xml_data_node* r
 	}
 
 	// Create a socket instance
-	return new rpk_socket(socketname, length, contents, ram_pname);
+	return std::make_unique<rpk_socket>(socketname, length, contents, ram_pname);
 }
 
 /*-------------------------------------------------
@@ -2725,8 +2723,6 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 	xml_data_node *resource_node;
 	xml_data_node *socket_node;
 	xml_data_node *pcb_node;
-
-	rpk_socket *newsock;
 
 	int i;
 
@@ -2815,15 +2811,13 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 					// found it
 					if (strcmp(resource_node->name, "rom")==0)
 					{
-						newsock = load_rom_resource(*zipfile, resource_node, id);
-						newrpk->add_socket(id, newsock);
+						newrpk->add_socket(id, load_rom_resource(*zipfile, resource_node, id));
 					}
 					else
 					{
 						if (strcmp(resource_node->name, "ram")==0)
 						{
-							newsock = load_ram_resource(options, resource_node, id, system_name);
-							newrpk->add_socket(id, newsock);
+							newrpk->add_socket(id, load_ram_resource(options, resource_node, id, system_name));
 						}
 						else throw rpk_exception(RPK_INVALID_LAYOUT, "resource node must be <rom> or <ram>");
 					}

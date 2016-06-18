@@ -3802,7 +3802,7 @@ void ioport_configurer::port_alloc(const char *tag)
 	std::string fulltag = m_owner.subtag(tag);
 
 	// add it to the list, and reset current field/setting
-	if (m_portlist.count(fulltag) != 0) throw add_exception(fulltag.c_str());
+	if (m_portlist.count(fulltag) != 0) throw tag_add_exception(fulltag.c_str());
 	m_portlist.emplace(std::make_pair(fulltag, std::make_unique<ioport_port>(m_owner, fulltag.c_str())));
 	m_curport = m_portlist.find(fulltag)->second.get();
 	m_curfield = nullptr;

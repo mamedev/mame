@@ -36,8 +36,6 @@
 #include "emualloc.h"
 #include "corestr.h"
 #include "bitmap.h"
-#include "tagmap.h"
-
 
 
 //**************************************************************************
@@ -302,7 +300,14 @@ private:
 	int code;
 };
 
-
+class tag_add_exception
+{
+public:
+	tag_add_exception(const char *tag) : m_tag(tag) { }
+	const char *tag() const { return m_tag.c_str(); }
+private:
+	std::string m_tag;
+};
 
 //**************************************************************************
 //  CASTING TEMPLATES
