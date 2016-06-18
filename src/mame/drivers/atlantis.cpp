@@ -123,6 +123,7 @@ public:
 	UINT8 m_status_leds;
 
 	DECLARE_WRITE32_MEMBER(asic_fifo_w);
+	DECLARE_WRITE32_MEMBER(dcs3_fifo_full_w);
 
 	READ32_MEMBER (green_r);
 	WRITE32_MEMBER(green_w);
@@ -388,6 +389,11 @@ WRITE32_MEMBER(atlantis_state::asic_fifo_w)
 	m_ioasic->fifo_w(data);
 }
 
+WRITE32_MEMBER(atlantis_state::dcs3_fifo_full_w)
+{
+	m_ioasic->fifo_full_w(data);
+}
+
 /*************************************
 *  PCI9050 User I/O handlers
 *************************************/
@@ -649,7 +655,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( map1, AS_PROGRAM, 32, atlantis_state )
 	AM_RANGE(0x00000000, 0x0000003f) AM_DEVREADWRITE("ioasic", midway_ioasic_device, read, write)
 	// asic_fifo_w
-	AM_RANGE(0x00200000, 0x00200003) AM_WRITE(asic_fifo_w)
+	// dcs3_fifo_full_w
+	AM_RANGE(0x00200000, 0x00200003) AM_WRITE(dcs3_fifo_full_w)
 	AM_RANGE(0x00400000, 0x00400003) AM_DEVWRITE("dcs", dcs_audio_device, dsio_idma_addr_w)
 	AM_RANGE(0x00600000, 0x00600003) AM_DEVREADWRITE("dcs", dcs_audio_device, dsio_idma_data_r, dsio_idma_data_w)
 	AM_RANGE(0x00800000, 0x00900003) AM_READWRITE(port_ctrl_r, port_ctrl_w)
@@ -823,7 +830,7 @@ static MACHINE_CONFIG_START( mwskins, atlantis_state )
 	/* sound hardware */
 	//MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DSIO, 0)
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0) /* no place to hook :-( */
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)

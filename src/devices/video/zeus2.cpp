@@ -419,7 +419,7 @@ void zeus2_device::zeus2_register_update(offs_t offset, UINT32 oldval, int logit
 				m_zeusbase[0x38] = oldval;
 				m_screen->update_partial(m_screen->vpos());
 				log_fifo = machine().input().code_pressed(KEYCODE_L);
-				log_fifo = 1;
+				//log_fifo = 1;
 				m_zeusbase[0x38] = temp;
 			}
 			break;
@@ -495,11 +495,11 @@ void zeus2_device::zeus2_register_update(offs_t offset, UINT32 oldval, int logit
 
 		case 0x50:
 			if ((m_zeusbase[0x50] & 0xffff0000) == 0x00980000) {
-				// Fast fill?
+				// Fast fill
 				// Unknow what the exact bit fields are, this is a just a guess
 				UINT32 lastRow = (((m_zeusbase[0x50] >> 8) & 0xff) << 3) | 0x7;
 				UINT32 lastCol = (((m_zeusbase[0x50] >> 0) & 0xff) << 2) | 0x3;
-				UINT32 fillColor = 0x004a4a4a;
+				UINT32 fillColor = m_zeusbase[0x5f]; // 0x004a4a4a;
 				void *base = waveram1_ptr_from_expanded_addr(m_zeusbase[0x51]);
 				for (int y = 0; y <= lastRow; y++)
 					for (int x = 0; x <= lastCol; x++)
@@ -702,12 +702,18 @@ int zeus2_device::zeus2_fifo_process(const UINT32 *data, int numwords)
 	/* handle logging */
 	switch (data[0] >> 24)
 	{
+		// 0x00: write 32-bit value to low registers
+		case 0x00:
+			// Ignore the all zeros commmand
+			if (((data[0] >> 16) & 0x7f) == 0x0)
+				return TRUE;
+			// Drop through to 0x05 command
 		/* 0x05: write 32-bit value to low registers */
 		case 0x05:
 			if (numwords < 2)
 				return FALSE;
 			if (log_fifo)
-				log_fifo_command(data, numwords, " -- reg32");
+				log_fifo_command(data, numwords, " -- reg32\n");
 			if (((data[0] >> 16) & 0x7f) != 0x08)
 				zeus2_register32_w((data[0] >> 16) & 0x7f, data[1], log_fifo);
 			break;
@@ -741,7 +747,7 @@ int zeus2_device::zeus2_fifo_process(const UINT32 *data, int numwords)
 
 			if (log_fifo)
 			{
-				log_fifo_command(data, numwords, "");
+				log_fifo_command(data, numwords, "\n");
 				logerror("\n\t\tmatrix ( %8.2f %8.2f %8.2f ) ( %8.2f %8.2f %8.2f ) ( %8.2f %8.2f %8.2f )\n\t\tvector %8.2f %8.2f %8.5f\n",
 						(double) zeus_matrix[0][0], (double) zeus_matrix[0][1], (double) zeus_matrix[0][2],
 						(double) zeus_matrix[1][0], (double) zeus_matrix[1][1], (double) zeus_matrix[1][2],
@@ -766,7 +772,7 @@ int zeus2_device::zeus2_fifo_process(const UINT32 *data, int numwords)
 
 			if (log_fifo)
 			{
-				log_fifo_command(data, numwords, "");
+				log_fifo_command(data, numwords, "\n");
 				logerror("\n\t\tvector %8.2f %8.2f %8.5f\n",
 						(double) zeus_point[0],
 						(double) zeus_point[1],
@@ -802,17 +808,30 @@ int zeus2_device::zeus2_fifo_process(const UINT32 *data, int numwords)
 
 		/* 0x23: render model in waveram (thegrid) */
 		/* 0x24: render model in waveram (crusnexo) */
+		// 0x17: ??? (atlantis)
+		case 0x17:
 		case 0x23:
 		case 0x24:
 			if (numwords < 2)
 				return FALSE;
 			if (log_fifo)
-				log_fifo_command(data, numwords, "");
+				log_fifo_command(data, numwords, "\n");
 			zeus2_draw_model(data[1], data[0] & 0xffff, log_fifo);
+			break;
+
+		// 0x2d; ??? (atlantis)
+		case 0x2d:
+			if (numwords < 2)
+				return FALSE;
+			if (log_fifo)
+				log_fifo_command(data, numwords, "\n");
+			//zeus2_draw_model(data[1], data[0] & 0xff, log_fifo);
 			break;
 
 		/* 0x31: sync pipeline? (thegrid) */
 		/* 0x32: sync pipeline? (crusnexo) */
+		// 0x25 ?? (atlantis)
+		case 0x25:
 		case 0x31:
 		case 0x32:
 			if (log_fifo)
@@ -821,11 +840,13 @@ int zeus2_device::zeus2_fifo_process(const UINT32 *data, int numwords)
 			break;
 
 		/* 0x38: direct render quad (crusnexo) */
+		// 0x38: 3 words?? (atlantis)
 		case 0x38:
-			if (numwords < 12)
+			//if (numwords < 12)
+			if (numwords < 3)
 				return FALSE;
-			if (log_fifo)
-				log_fifo_command(data, numwords, "");
+			if (0 && log_fifo)
+				log_fifo_command(data, numwords, "\n");
 			break;
 
 		/* 0x40: ???? */
@@ -837,7 +858,7 @@ int zeus2_device::zeus2_fifo_process(const UINT32 *data, int numwords)
 		default:
 			if (data[0] != 0x2c0)
 			{
-				printf("Unknown command %08X\n", data[0]);
+				//printf("Unknown command %08X\n", data[0]);
 				if (log_fifo)
 					log_fifo_command(data, numwords, "\n");
 			}

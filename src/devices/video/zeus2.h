@@ -26,10 +26,8 @@
 #define WAVERAM0_WIDTH      1024
 #define WAVERAM0_HEIGHT     2048
 
-//#define WAVERAM1_WIDTH      512
 #define WAVERAM1_WIDTH      512
 #define WAVERAM1_HEIGHT     1024
-//#define WAVERAM1_HEIGHT     1024
 
 /*************************************
 *  Type definitions
@@ -148,6 +146,47 @@ public:
 	int texel_width;
 	float zbase;
 
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_stop() override;
+
+private:
+	TIMER_CALLBACK_MEMBER(int_timer_callback);
+	void zeus2_register32_w(offs_t offset, UINT32 data, int logit);
+	void zeus2_register_update(offs_t offset, UINT32 oldval, int logit);
+	int zeus2_fifo_process(const UINT32 *data, int numwords);
+	void zeus2_pointer_write(UINT8 which, UINT32 value);
+	void zeus2_draw_model(UINT32 baseaddr, UINT16 count, int logit);
+	void log_fifo_command(const UINT32 *data, int numwords, const char *suffix);
+
+	/*************************************
+	*  Member variables
+	*************************************/
+
+
+	UINT8 log_fifo;
+
+	UINT32 zeus_fifo[20];
+	UINT8 zeus_fifo_words;
+
+#if TRACK_REG_USAGE
+	struct reg_info
+	{
+		struct reg_info *next;
+		UINT32 value;
+	};
+
+	reg_info *regdata[0x80];
+	int regdata_count[0x80];
+	int regread_count[0x80];
+	int regwrite_count[0x80];
+	reg_info *subregdata[0x100];
+	int subregdata_count[0x80];
+	int subregwrite_count[0x100];
+#endif
+public:
 	/*************************************
 	*  Inlines for block addressing
 	*************************************/
@@ -235,48 +274,6 @@ public:
 		return (WAVERAM_READ8(base, byteoffs) >> (4 * (x & 1))) & 0x0f;
 	}
 #endif
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_stop() override;
-
-private:
-	TIMER_CALLBACK_MEMBER(int_timer_callback);
-	void zeus2_register32_w(offs_t offset, UINT32 data, int logit);
-	void zeus2_register_update(offs_t offset, UINT32 oldval, int logit);
-	int zeus2_fifo_process(const UINT32 *data, int numwords);
-	void zeus2_pointer_write(UINT8 which, UINT32 value);
-	void zeus2_draw_model(UINT32 baseaddr, UINT16 count, int logit);
-	void log_fifo_command(const UINT32 *data, int numwords, const char *suffix);
-	
-	/*************************************
-	*  Member variables
-	*************************************/
-
-
-	UINT8 log_fifo;
-
-	UINT32 zeus_fifo[20];
-	UINT8 zeus_fifo_words;
-
-#if TRACK_REG_USAGE
-	struct reg_info
-	{
-		struct reg_info *next;
-		UINT32 value;
-	};
-
-	reg_info *regdata[0x80];
-	int regdata_count[0x80];
-	int regread_count[0x80];
-	int regwrite_count[0x80];
-	reg_info *subregdata[0x100];
-	int subregdata_count[0x80];
-	int subregwrite_count[0x100];
-#endif
-
 
 };
 

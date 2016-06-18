@@ -380,7 +380,11 @@ void adsp21xx_device::write_reg1(int regnum, INT32 val)
 			break;
 
 		case 3:
-			logerror("ADSP %04x: Writing to an invalid register! RGP=01 RegCode=%1X Val=%04X\n", m_ppc, regnum, val);
+			// Check for DMOVLAY instruction callback
+			if (regnum == 0xf && !m_dmovlay_cb.isnull())
+				m_dmovlay_cb(val & 0x3fff);
+			else
+				logerror("ADSP %04x: Writing to an invalid register! RGP=01 RegCode=%1X Val=%04X\n", m_ppc, regnum, val);
 			break;
 	}
 }
