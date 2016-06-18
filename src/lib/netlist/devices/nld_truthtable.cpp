@@ -289,7 +289,7 @@ void tt_factory_create(setup_t &setup, tt_desc &desc)
 	ret->m_desc = desc.desc;
 	if (desc.family != "")
 		ret->m_family = setup.family_from_model(desc.family);
-	setup.factory().register_device(plib::owned_ptr<netlist_base_factory_truthtable_t>(ret, true));
+	setup.factory().register_device(std::unique_ptr<netlist_base_factory_truthtable_t>(ret));
 }
 
 	} //namespace devices
