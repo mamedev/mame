@@ -210,8 +210,8 @@ void menu_custom_filter::custom_render(void *selectedref, float top, float botto
 	float width;
 
 	// get the size of the text
-	ui().draw_text_full(container, _("Select custom filters:"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-		DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+	ui().draw_text_full(container, _("Select custom filters:"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
+		mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
 	float maxwidth = MAX(width, origx2 - origx1);
 
@@ -230,8 +230,8 @@ void menu_custom_filter::custom_render(void *selectedref, float top, float botto
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	ui().draw_text_full(container, _("Select custom filters:"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+	ui().draw_text_full(container, _("Select custom filters:"), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
+		mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
 //-------------------------------------------------
@@ -525,8 +525,8 @@ void menu_swcustom_filter::custom_render(void *selectedref, float top, float bot
 	float width;
 
 	// get the size of the text
-	ui().draw_text_full(container, _("Select custom filters:"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-		DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+	ui().draw_text_full(container, _("Select custom filters:"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
+		mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
 	float maxwidth = MAX(width, origx2 - origx1);
 
@@ -545,8 +545,8 @@ void menu_swcustom_filter::custom_render(void *selectedref, float top, float bot
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	ui().draw_text_full(container, _("Select custom filters:"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+	ui().draw_text_full(container, _("Select custom filters:"), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
+		mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
 //-------------------------------------------------

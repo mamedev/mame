@@ -78,7 +78,7 @@ CORE IMPLEMENTATION
 //-------------------------------------------------
 
 text_layout::text_layout(render_font &font, float xscale, float yscale, float width, text_layout::text_justify justify, text_layout::word_wrapping wrap)
-	: m_font(font), m_xscale(xscale), m_yscale(yscale), m_width(width), m_justify(justify), m_wrap(wrap), m_current_line(nullptr), m_last_break(0), m_text_position(0)
+	: m_font(font), m_xscale(xscale), m_yscale(yscale), m_width(width), m_justify(justify), m_wrap(wrap), m_current_line(nullptr), m_last_break(0), m_text_position(0), m_truncating(false)
 
 {
 }
@@ -90,7 +90,7 @@ text_layout::text_layout(render_font &font, float xscale, float yscale, float wi
 
 text_layout::text_layout(text_layout &&that)
 	: m_font(that.m_font), m_xscale(that.m_xscale), m_yscale(that.m_yscale), m_width(that.m_width), m_justify(that.m_justify), m_wrap(that.m_wrap), m_lines(std::move(that.m_lines)),
-	  m_current_line(that.m_current_line), m_last_break(that.m_last_break), m_text_position(that.m_text_position)
+	  m_current_line(that.m_current_line), m_last_break(that.m_last_break), m_text_position(that.m_text_position), m_truncating(false)
 {
 }
 
@@ -162,7 +162,7 @@ void text_layout::add_text(const char *text, const char_style &style)
 			update_maximum_line_width();
 			m_current_line = nullptr;
 		}
-		else
+		else if (!m_truncating)
 		{
 			// if we hit a space, remember the location and width *without* the space
 			if (is_space_character(ch))
@@ -212,13 +212,41 @@ void text_layout::update_maximum_line_width()
 
 
 //-------------------------------------------------
+//  actual_left
+//-------------------------------------------------
+
+float text_layout::actual_left() const
+{
+	float result;
+	if (empty())
+	{
+		// degenerate scenario
+		result = 0;
+	}
+	else
+	{
+		result = 1.0f;
+		for (const auto &line : m_lines)
+		{
+			result = std::min(result, line->xoffset());
+
+			// take an opportunity to break out easily
+			if (result <= 0)
+				break;
+		}
+	}
+	return result;
+}
+
+
+//-------------------------------------------------
 //  actual_width
 //-------------------------------------------------
 
 float text_layout::actual_width() const
 {
 	float current_line_width = m_current_line ? m_current_line->width() : 0;
-	return MAX(m_maximum_line_width, current_line_width);
+	return std::max(m_maximum_line_width, current_line_width);
 }
 
 
@@ -250,6 +278,7 @@ void text_layout::start_new_line(text_layout::text_justify justify, float height
 	update_maximum_line_width();
 	m_current_line = new_line.get();
 	m_last_break = 0;
+	m_truncating = false;
 
 	// append it
 	m_lines.push_back(std::move(new_line));
@@ -272,6 +301,8 @@ float text_layout::get_char_width(unicode_char ch, float size)
 
 void text_layout::truncate_wrap()
 {
+	const unicode_char elipsis = 0x2026;
+
 	// for now, lets assume that we're only truncating the last character
 	size_t truncate_position = m_current_line->character_count() - 1;
 	const auto& truncate_char = m_current_line->character(truncate_position);
@@ -285,7 +316,7 @@ void text_layout::truncate_wrap()
 	source.span = 0;
 
 	// figure out how wide an elipsis is
-	float elipsis_width = 3 * get_char_width('.', style.size);
+	float elipsis_width = get_char_width(elipsis, style.size);
 
 	// where should we really truncate from?
 	while (truncate_position > 0 && m_current_line->character(truncate_position).xoffset + elipsis_width < width())
@@ -295,10 +326,10 @@ void text_layout::truncate_wrap()
 	m_current_line->truncate(truncate_position);
 
 	// and append the elipsis
-	m_current_line->add_character('.', style, source);
+	m_current_line->add_character(elipsis, style, source);
 
-	// finally start a new line
-	start_new_line(m_current_line->justify(), style.size);
+	// take note that we are truncating; supress new characters
+	m_truncating = true;
 }
 
 
@@ -489,7 +520,7 @@ void text_layout::line::add_character(unicode_char ch, const char_style &style, 
 	m_width += chwidth;
 
 	// we might be bigger
-	m_height = MAX(m_height, style.size * m_layout.yscale());
+	m_height = std::max(m_height, style.size * m_layout.yscale());
 }
 
 
