@@ -1657,9 +1657,9 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 
 	// add analog adjusters
 	int slider_index = 0;
-	for (ioport_port &port : machine.ioport().ports())
+	for (auto &port : machine.ioport().ports())
 	{
-		for (ioport_field &field : port.fields())
+		for (ioport_field &field : port.second->fields())
 		{
 			if (field.type() == IPT_ADJUSTER)
 			{
@@ -1763,9 +1763,9 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 #ifdef MAME_DEBUG
 	slider_index = 0;
 	// add crosshair adjusters
-	for (ioport_port &port : machine.ioport().ports())
+	for (auto &port : machine.ioport().ports())
 	{
-		for (ioport_field &field : port.fields())
+		for (ioport_field &field : port.second->fields())
 		{
 			if (field.crosshair_axis() != CROSSHAIR_AXIS_NONE && field.player() == 0)
 			{

@@ -849,17 +849,17 @@ void validity_checker::validate_inputs()
 			osd_printf_error("I/O port error during construction:\n%s\n", errorbuf.c_str());
 
 		// do a first pass over ports to add their names and find duplicates
-		for (ioport_port &port : portlist)
-			if (!port_map.insert(port.tag()).second)
-				osd_printf_error("Multiple I/O ports with the same tag '%s' defined\n", port.tag());
+		for (auto &port : portlist)
+			if (!port_map.insert(port.second->tag()).second)
+				osd_printf_error("Multiple I/O ports with the same tag '%s' defined\n", port.second->tag());
 
 		// iterate over ports
-		for (ioport_port &port : portlist)
+		for (auto &port : portlist)
 		{
-			m_current_ioport = port.tag();
+			m_current_ioport = port.second->tag();
 
 			// iterate through the fields on this port
-			for (ioport_field &field : port.fields())
+			for (ioport_field &field : port.second->fields())
 			{
 				// verify analog inputs
 				if (field.is_analog())

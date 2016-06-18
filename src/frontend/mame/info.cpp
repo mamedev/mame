@@ -261,9 +261,9 @@ void info_xml_creator::output_one()
 	{
 		int nplayers = 0;
 		bool new_kbd = false;
-		for (ioport_port &port : portlist)
-			if (&port.device() == &device)
-				for (ioport_field &field : port.fields())
+		for (auto &port : portlist)
+			if (&port.second->device() == &device)
+				for (ioport_field &field : port.second->fields())
 					if (field.type() >= IPT_START && field.type() < IPT_ANALOG_LAST)
 					{
 						if (field.type() == IPT_KEYBOARD)
@@ -366,8 +366,8 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 	for (device_t &dev : device_iterator(device))
 		portlist.append(dev, errors);
 	// check if the device adds player inputs (other than dsw and configs) to the system
-	for (ioport_port &port : portlist)
-		for (ioport_field &field : port.fields())
+	for (auto &port : portlist)
+		for (ioport_field &field : port.second->fields())
 			if (field.type() >= IPT_START1 && field.type() < IPT_UI_FIRST)
 			{
 				has_input = TRUE;
@@ -891,11 +891,11 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 	bool tilt = false;
 
 	// iterate over the ports
-	for (ioport_port &port : portlist)
+	for (auto &port : portlist)
 	{
 		int ctrl_type = CTRL_DIGITAL_BUTTONS;
 		bool ctrl_analog = FALSE;
-		for (ioport_field &field : port.fields())
+		for (ioport_field &field : port.second->fields())
 		{
 			// track the highest player number
 			if (nplayer < field.player() + 1)
@@ -1317,13 +1317,13 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 void info_xml_creator::output_switches(const ioport_list &portlist, const char *root_tag, int type, const char *outertag, const char *innertag)
 {
 	// iterate looking for DIP switches
-	for (ioport_port &port : portlist)
-		for (ioport_field &field : port.fields())
+	for (auto &port : portlist)
+		for (ioport_field &field : port.second->fields())
 			if (field.type() == type)
 			{
 				std::ostringstream output;
 
-				std::string newtag(port.tag()), oldtag(":");
+				std::string newtag(port.second->tag()), oldtag(":");
 				newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
 				// output the switch name information
@@ -1351,10 +1351,10 @@ void info_xml_creator::output_switches(const ioport_list &portlist, const char *
 void info_xml_creator::output_ports(const ioport_list &portlist)
 {
 	// cycle through ports
-	for (ioport_port &port : portlist)
+	for (auto &port : portlist)
 	{
-		fprintf(m_output,"\t\t<port tag=\"%s\">\n", xml_normalize_string(port.tag()));
-		for (ioport_field &field : port.fields())
+		fprintf(m_output,"\t\t<port tag=\"%s\">\n", xml_normalize_string(port.second->tag()));
+		for (ioport_field &field : port.second->fields())
 		{
 			if(field.is_analog())
 				fprintf(m_output,"\t\t\t<analog mask=\"%u\"/>\n", field.mask());
@@ -1373,8 +1373,8 @@ void info_xml_creator::output_ports(const ioport_list &portlist)
 void info_xml_creator::output_adjusters(const ioport_list &portlist)
 {
 	// iterate looking for Adjusters
-	for (ioport_port &port : portlist)
-		for (ioport_field &field : port.fields())
+	for (auto &port : portlist)
+		for (ioport_field &field : port.second->fields())
 			if (field.type() == IPT_ADJUSTER)
 				fprintf(m_output, "\t\t<adjuster name=\"%s\" default=\"%d\"/>\n", xml_normalize_string(field.name()), field.defvalue());
 }
