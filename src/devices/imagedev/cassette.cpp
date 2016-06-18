@@ -357,59 +357,60 @@ void cassette_image_device::call_unload()
 }
 
 
+//-------------------------------------------------
+//  display a small tape animation, with the
+//	current position in the tape image
+//-------------------------------------------------
 
-#define ANIMATION_FPS       1
-#define ANIMATION_FRAMES    4
-
-/*
-    display a small tape icon, with the current position in the tape image
-*/
-int cassette_image_device::call_display(std::string& s)
+std::string cassette_image_device::call_display()
 {
-	/* abort if we should not be showing the image */
-	if (!exists())
-		return -1;
-	if (!is_motor_on())
-		return -1;
+	const int ANIMATION_FPS = 1;
 
-	char buf[65];
-	int n;
-	double position, length;
-	cassette_state uistate;
-	static const UINT8 shapes[8] = { 0x2d, 0x5c, 0x7c, 0x2f, 0x2d, 0x20, 0x20, 0x20 };
+	std::string result;
 
-	/* figure out where we are in the cassette */
-	position = get_position();
-	length = get_length();
-	uistate = (cassette_state)(get_state() & CASSETTE_MASK_UISTATE);
-
-	/* choose which frame of the animation we are at */
-	n = ((int)position / ANIMATION_FPS) % ANIMATION_FRAMES;
-	/* Since you can have anything in a BDF file, we will use crude ascii characters instead */
-	snprintf(buf, ARRAY_LENGTH(buf), "%c%c %c %02d:%02d (%04d) [%02d:%02d (%04d)]",
-			 shapes[n],                  /* cassette icon left */
-			 shapes[n | 4],                    /* cassette icon right */
-			 (uistate == CASSETTE_PLAY) ? 0x50 : 0x52,   /* play (P) or record (R) */
-			 ((int)position / 60),
-			 ((int)position % 60),
-			 (int)position,
-			 ((int)length / 60),
-			 ((int)length % 60),
-			 (int)length);
-
-	s = buf;
-
-	// make sure tape stops at end when playing
-	if ((m_state & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY)
+	// only show the image when a cassette is loaded and the motor is on
+	if (exists() && is_motor_on())
 	{
-		if ( m_cassette )
+		int n;
+		double position, length;
+		cassette_state uistate;
+		static const char *shapes[] = { u8"\u2500", u8"\u2572", u8"\u2502", u8"\u2571" };
+
+		// figure out where we are in the cassette
+		position = get_position();
+		length = get_length();
+		uistate = (cassette_state)(get_state() & CASSETTE_MASK_UISTATE);
+
+		// choose which frame of the animation we are at
+		n = ((int)position / ANIMATION_FPS) % ARRAY_LENGTH(shapes);
+
+		// play or record
+		const char *status_icon = (uistate == CASSETTE_PLAY)
+			? u8"\u25BA"
+			: u8"\u25CF";
+
+		// Since you can have anything in a BDF file, we will use crude ascii characters instead 
+		result = string_format("%s %s %02d:%02d (%04d) [%02d:%02d (%04d)]",
+			shapes[n],					// animation
+			status_icon,				// play or record
+			((int)position / 60),
+			((int)position % 60),
+			(int)position,
+			((int)length / 60),
+			((int)length % 60),
+			(int)length);
+
+		// make sure tape stops at end when playing
+		if ((m_state & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY)
 		{
-			if (get_position() > get_length())
+			if (m_cassette)
 			{
-				m_state = (cassette_state)(( m_state & ~CASSETTE_MASK_UISTATE ) | CASSETTE_STOPPED);
+				if (get_position() > get_length())
+				{
+					m_state = (cassette_state)((m_state & ~CASSETTE_MASK_UISTATE) | CASSETTE_STOPPED);
+				}
 			}
 		}
 	}
-
-	return cassette_device_iterator(machine().root_device()).indexof(*this);
+	return result;
 }
