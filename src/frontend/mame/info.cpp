@@ -438,11 +438,11 @@ void info_xml_creator::output_devices()
 		// then, run through slot devices
 		for (const device_slot_interface &slot : slot_interface_iterator(m_drivlist.config().root_device()))
 		{
-			for (const device_slot_option &option : slot.option_list())
+			for (auto &option : slot.option_list())
 			{
 				std::string temptag("_");
-				temptag.append(option.name());
-				device_t *dev = const_cast<machine_config &>(m_drivlist.config()).device_add(&m_drivlist.config().root_device(), temptag.c_str(), option.devtype(), 0);
+				temptag.append(option.second->name());
+				device_t *dev = const_cast<machine_config &>(m_drivlist.config()).device_add(&m_drivlist.config().root_device(), temptag.c_str(), option.second->devtype(), 0);
 
 				// notify this device and all its subdevices that they are now configured
 				for (device_t &device : device_iterator(*dev))
@@ -1528,18 +1528,18 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 			 fprintf(m_output, " interface=\"%s\"", xml_normalize_string(slot.slot_interface()));
 			 */
 
-			for (const device_slot_option &option : slot.option_list())
+			for (auto &option : slot.option_list())
 			{
-				if (option.selectable())
+				if (option.second->selectable())
 				{
-					device_t *dev = const_cast<machine_config &>(m_drivlist.config()).device_add(&m_drivlist.config().root_device(), "dummy", option.devtype(), 0);
+					device_t *dev = const_cast<machine_config &>(m_drivlist.config()).device_add(&m_drivlist.config().root_device(), "dummy", option.second->devtype(), 0);
 					if (!dev->configured())
 						dev->config_complete();
 
 					fprintf(m_output, "\t\t\t<slotoption");
-					fprintf(m_output, " name=\"%s\"", xml_normalize_string(option.name()));
+					fprintf(m_output, " name=\"%s\"", xml_normalize_string(option.second->name()));
 					fprintf(m_output, " devname=\"%s\"", xml_normalize_string(dev->shortname()));
-					if (slot.default_option() != nullptr && strcmp(slot.default_option(),option.name())==0)
+					if (slot.default_option() != nullptr && strcmp(slot.default_option(), option.second->name())==0)
 						fprintf(m_output, " default=\"yes\"");
 					fprintf(m_output, "/>\n");
 					const_cast<machine_config &>(m_drivlist.config()).device_remove(&m_drivlist.config().root_device(), "dummy");

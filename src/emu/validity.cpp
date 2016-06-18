@@ -971,11 +971,11 @@ void validity_checker::validate_devices()
 	std::unordered_set<std::string> slot_device_map;
 	for (const device_slot_interface &slot : slot_interface_iterator(m_current_config->root_device()))
 	{
-		for (const device_slot_option &option : slot.option_list())
+		for (auto &option : slot.option_list())
 		{
 			std::string temptag("_");
-			temptag.append(option.name());
-			device_t *dev = const_cast<machine_config &>(*m_current_config).device_add(&m_current_config->root_device(), temptag.c_str(), option.devtype(), 0);
+			temptag.append(option.second->name());
+			device_t *dev = const_cast<machine_config &>(*m_current_config).device_add(&m_current_config->root_device(), temptag.c_str(), option.second->devtype(), 0);
 
 			// notify this device and all its subdevices that they are now configured
 			for (device_t &device : device_iterator(*dev))

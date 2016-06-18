@@ -36,7 +36,7 @@ void device_slot_interface::static_option_reset(device_t &device)
 {
 	device_slot_interface &intf = dynamic_cast<device_slot_interface &>(device);
 
-	intf.m_options.reset();
+	intf.m_options.clear();
 }
 
 void device_slot_interface::static_option_add(device_t &device, const char *name, const device_type &devtype)
@@ -47,7 +47,7 @@ void device_slot_interface::static_option_add(device_t &device, const char *name
 	if (option != nullptr)
 		throw emu_fatalerror("slot '%s' duplicate option '%s\n", device.tag(), name);
 
-	intf.m_options.append(name, *global_alloc(device_slot_option(name, devtype)));
+	intf.m_options.insert(std::make_pair(name, std::make_unique<device_slot_option>(name, devtype)));
 }
 
 device_slot_option *device_slot_interface::static_option(device_t &device, const char *name)
