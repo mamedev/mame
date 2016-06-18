@@ -58,8 +58,10 @@ public:
 	word_wrapping wrap() const { return m_wrap; }
 
 	// methods
+	float actual_left() const;
 	float actual_width() const;
 	float actual_height() const;
+	bool empty() const { return m_lines.size() == 0; }
 	bool hit_test(float x, float y, size_t &start, size_t &span) const;
 	void restyle(size_t start, size_t span, rgb_t *fgcolor, rgb_t *bgcolor);
 	int get_wrap_info(std::vector<int> &xstart, std::vector<int> &xend) const;

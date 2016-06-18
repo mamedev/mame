@@ -212,13 +212,41 @@ void text_layout::update_maximum_line_width()
 
 
 //-------------------------------------------------
+//  actual_left
+//-------------------------------------------------
+
+float text_layout::actual_left() const
+{
+	float result;
+	if (empty())
+	{
+		// degenerate scenario
+		result = 0;
+	}
+	else
+	{
+		result = 1.0f;
+		for (const auto &line : m_lines)
+		{
+			result = std::min(result, line->xoffset());
+
+			// take an opportunity to break out easily
+			if (result <= 0)
+				break;
+		}
+	}
+	return result;
+}
+
+
+//-------------------------------------------------
 //  actual_width
 //-------------------------------------------------
 
 float text_layout::actual_width() const
 {
 	float current_line_width = m_current_line ? m_current_line->width() : 0;
-	return MAX(m_maximum_line_width, current_line_width);
+	return std::max(m_maximum_line_width, current_line_width);
 }
 
 
@@ -492,7 +520,7 @@ void text_layout::line::add_character(unicode_char ch, const char_style &style, 
 	m_width += chwidth;
 
 	// we might be bigger
-	m_height = MAX(m_height, style.size * m_layout.yscale());
+	m_height = std::max(m_height, style.size * m_layout.yscale());
 }
 
 

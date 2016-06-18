@@ -584,49 +584,40 @@ void mame_ui_manager::draw_text_full(render_container *container, const char *or
 
 void mame_ui_manager::draw_text_box(render_container *container, const char *text, ui::text_layout::text_justify justify, float xpos, float ypos, rgb_t backcolor)
 {
-	float line_height = get_line_height();
-	float max_width = 2.0f * ((xpos <= 0.5f) ? xpos : 1.0f - xpos) - 2.0f * UI_BOX_LR_BORDER;
-	float target_width = max_width;
-	float target_height = line_height;
-	float target_x = 0, target_y = 0;
-	float last_target_height = 0;
+	// create a layout
+	ui::text_layout layout = create_layout(container, 1.0f, justify);
 
-	// limit this iteration to a finite number of passes
-	for (int pass = 0; pass < 5; pass++)
-	{
-		// determine the target location
-		target_x = xpos - 0.5f * target_width;
-		target_y = ypos - 0.5f * target_height;
+	// add text to it
+	layout.add_text(text);
 
-		// make sure we stay on-screen
-		if (target_x < UI_BOX_LR_BORDER)
-			target_x = UI_BOX_LR_BORDER;
-		if (target_x + target_width + UI_BOX_LR_BORDER > 1.0f)
-			target_x = 1.0f - UI_BOX_LR_BORDER - target_width;
-		if (target_y < UI_BOX_TB_BORDER)
-			target_y = UI_BOX_TB_BORDER;
-		if (target_y + target_height + UI_BOX_TB_BORDER > 1.0f)
-			target_y = 1.0f - UI_BOX_TB_BORDER - target_height;
+	// and draw the result
+	draw_text_box(container, layout, xpos, ypos, backcolor);
+}
 
-		// compute the multi-line target width/height
-		draw_text_full(container, text, target_x, target_y, target_width + 0.00001f,
-					justify, ui::text_layout::word_wrapping::WORD, draw_mode::NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &target_width, &target_height);
-		if (target_height > 1.0f - 2.0f * UI_BOX_TB_BORDER)
-			target_height = floorf((1.0f - 2.0f * UI_BOX_TB_BORDER) / line_height) * line_height;
 
-		// if we match our last value, we're done
-		if (target_height == last_target_height)
-			break;
-		last_target_height = target_height;
-	}
+//-------------------------------------------------
+//  draw_text_box - draw a multiline text
+//  message with a box around it
+//-------------------------------------------------
+
+void mame_ui_manager::draw_text_box(render_container *container, ui::text_layout &layout, float xpos, float ypos, rgb_t backcolor)
+{
+	// xpos and ypos are where we want to "pin" the layout, but we need to adjust for the actual size of the payload
+	auto actual_left = layout.actual_left();
+	auto actual_width = layout.actual_width();
+	auto actual_height = layout.actual_height();
+	auto x = std::min(std::max(xpos - actual_width / 2, UI_BOX_LR_BORDER), 1.0f - actual_width - UI_BOX_LR_BORDER);
+	auto y = std::min(std::max(ypos - actual_height / 2, UI_BOX_TB_BORDER), 1.0f - actual_height - UI_BOX_TB_BORDER);
 
 	// add a box around that
-	draw_outlined_box(container, target_x - UI_BOX_LR_BORDER,
-						target_y - UI_BOX_TB_BORDER,
-						target_x + target_width + UI_BOX_LR_BORDER,
-						target_y + target_height + UI_BOX_TB_BORDER, backcolor);
-	draw_text_full(container, text, target_x, target_y, target_width + 0.00001f,
-				justify, ui::text_layout::word_wrapping::WORD, draw_mode::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+	draw_outlined_box(container,
+		x - UI_BOX_LR_BORDER,
+		y - UI_BOX_TB_BORDER,
+		x + actual_width + UI_BOX_LR_BORDER,
+		y + actual_height + UI_BOX_TB_BORDER, backcolor);
+
+	// emit the text
+	layout.emit(container, x - actual_left, y);
 }
 
 
