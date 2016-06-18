@@ -1560,7 +1560,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( schasercv, mw8080bw_root, _8080bw_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(schaser_map)
 	MCFG_CPU_IO_MAP(schasercv_io_map)
-	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, schaser)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
