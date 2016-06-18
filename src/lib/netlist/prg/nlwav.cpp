@@ -13,12 +13,12 @@ class nlwav_options_t : public plib::options
 public:
 	nlwav_options_t() :
 		plib::options(),
-		opt_inp( "i", "input",       "",      "input file", this),
-		opt_out( "o", "output",      "",      "output file", this),
-		opt_amp( "a", "amp",    10000.0,      "amplification after mean correction", this),
-		opt_verb("v", "verbose",              "be verbose - this produces lots of output", this),
-		opt_quiet("q", "quiet",               "be quiet - no warnings", this),
-		opt_help("h", "help",                 "display help", this)
+		opt_inp(*this,	"i", "input",       "",      "input file"),
+		opt_out(*this,	"o", "output",      "",      "output file"),
+		opt_amp(*this,	"a", "amp",    10000.0,      "amplification after mean correction"),
+		opt_verb(*this,	"v", "verbose",              "be verbose - this produces lots of output"),
+		opt_quiet(*this,"q", "quiet",                "be quiet - no warnings"),
+		opt_help(*this,	"h", "help",                 "display help")
 	{}
 	plib::option_str    opt_inp;
 	plib::option_str    opt_out;

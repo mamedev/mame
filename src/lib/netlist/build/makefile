@@ -23,7 +23,7 @@ CDEFS = -DPSTANDALONE=1 -DPTR64=1
 CFLAGS =  $(LTO) -g -O3 -std=c++11 -march=native -I.. -Wall -Wpedantic -Wsign-compare -Wextra -Wno-unused-parameter
 LDFLAGS = $(LTO) -g -O3 -std=c++11 -lpthread -ldl
 
-CC = @g++-5
+CC = g++-5
 LD = @g++-5
 MD = @mkdir
 RM = @rm
@@ -101,6 +101,13 @@ NLOBJS := \
 	$(NLOBJ)/solver/nld_solver.o \
 	$(NLOBJ)/tools/nl_convert.o \
 
+ALL_OBJS = $(OBJS) $(NLOBJ)/prg/nltool.o $(NLOBJ)/prg/nlwav.o
+SOURCES = $(patsubst $(OBJ)%, $(SRC)%, $(ALL_OBJS:.o=.cpp))
+
+#-------------------------------------------------
+# all
+#-------------------------------------------------
+
 all:	maketree $(TARGETS)
 
 #-------------------------------------------------
@@ -108,7 +115,7 @@ all:	maketree $(TARGETS)
 #-------------------------------------------------
 
 clean:
-	$(RM) -rf $(OBJS) $(TARGETS)
+	$(RM) -rf $(OBJS) $(TARGETS) .depend
 
 #-------------------------------------------------
 # nltool
@@ -131,6 +138,20 @@ $(sort $(OBJDIRS)):
 
 maketree: $(sort $(OBJDIRS))
 
+#-------------------------------------------------
+# depends
+#-------------------------------------------------
+
+depend: .depend
+
+.depend: $(SOURCES)
+	@echo creating .depend
+	@rm -f ./.depend
+	@for i in $(SOURCES); do \
+		$(CC) $(CFLAGS) -MM $$i -MT `echo $$i | sed -e 's/$(SRC)/$(OBJ)/' -e 's/.cpp/.o/' ` >>./.depend; \
+	done
+
+-include .depend
 
 #-------------------------------------------------
 # generic rules
@@ -138,15 +159,15 @@ maketree: $(sort $(OBJDIRS))
 
 $(OBJ)/%.o: $(SRC)/%.cpp
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
+	@$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
 
 $(OBJ)/%.pp: $(SRC)/%.cpp | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CFLAGS) -E $< -o $@
+	@$(CC) $(CDEFS) $(CFLAGS) -E $< -o $@
 
 $(OBJ)/%.s: $(SRC)/%.cpp | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CFLAGS) -S $< -o $@
+	@$(CC) $(CDEFS) $(CFLAGS) -S $< -o $@
 
 $(OBJ)/%.a:
 	@echo Archiving $@...

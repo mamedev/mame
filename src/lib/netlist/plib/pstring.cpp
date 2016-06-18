@@ -258,7 +258,7 @@ const pstring_t<F> pstring_t<F>::rpad(const pstring_t &ws, const unsigned cnt) c
 	pstring_t ret(*this);
 	while (ret.len() < cnt)
 		ret += ws;
-	return pstring_t(ret).substr(0, cnt);
+	return ret;
 }
 
 

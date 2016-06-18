@@ -31,7 +31,7 @@ public:
 	: m_short(""), m_long(""), m_help(""), m_has_argument(false)
 	{}
 
-	option(pstring ashort, pstring along, pstring help, bool has_argument, options *parent = nullptr);
+	option(options &parent, pstring ashort, pstring along, pstring help, bool has_argument);
 
 	virtual ~option()
 	{
@@ -41,18 +41,22 @@ public:
 
 	virtual int parse(ATTR_UNUSED pstring argument) { return 0; }
 
+	pstring short_opt() { return m_short; }
+	pstring long_opt() { return m_long; }
+	pstring help() { return m_help; }
+	bool has_argument() { return m_has_argument ; }
+private:
 	pstring m_short;
 	pstring m_long;
 	pstring m_help;
 	bool m_has_argument;
-private:
 };
 
 class option_str : public option
 {
 public:
-	option_str(pstring ashort, pstring along, pstring defval, pstring help, options *parent = nullptr)
-	: option(ashort, along, help, true, parent), m_val(defval)
+	option_str(options &parent, pstring ashort, pstring along, pstring defval, pstring help)
+	: option(parent, ashort, along, help, true), m_val(defval)
 	{}
 
 	virtual int parse(pstring argument) override { m_val = argument; return 0; }
@@ -65,8 +69,8 @@ private:
 class option_str_limit : public option
 {
 public:
-	option_str_limit(pstring ashort, pstring along, pstring defval, pstring limit, pstring help, options *parent = nullptr)
-	: option(ashort, along, help, true, parent), m_val(defval), m_limit(limit, ":")
+	option_str_limit(options &parent, pstring ashort, pstring along, pstring defval, pstring limit, pstring help)
+	: option(parent, ashort, along, help, true), m_val(defval), m_limit(limit, ":")
 	{}
 
 	virtual int parse(pstring argument) override
@@ -81,6 +85,8 @@ public:
 	}
 
 	pstring operator ()() { return m_val; }
+	const plib::pstring_vector_t &limit() { return m_limit; }
+
 private:
 	pstring m_val;
 	plib::pstring_vector_t m_limit;
@@ -89,8 +95,8 @@ private:
 class option_bool : public option
 {
 public:
-	option_bool(pstring ashort, pstring along, pstring help, options *parent = nullptr)
-	: option(ashort, along, help, false, parent), m_val(false)
+	option_bool(options &parent, pstring ashort, pstring along, pstring help)
+	: option(parent, ashort, along, help, false), m_val(false)
 	{}
 
 	virtual int parse(ATTR_UNUSED pstring argument) override { m_val = true; return 0; }
@@ -103,8 +109,8 @@ private:
 class option_double : public option
 {
 public:
-	option_double(pstring ashort, pstring along, double defval, pstring help, options *parent = nullptr)
-	: option(ashort, along, help, true, parent), m_val(defval)
+	option_double(options &parent, pstring ashort, pstring along, double defval, pstring help)
+	: option(parent, ashort, along, help, true), m_val(defval)
 	{}
 
 	virtual int parse(pstring argument) override
@@ -166,7 +172,7 @@ public:
 				return i;
 			if (opt == nullptr)
 				return i;
-			if (opt->m_has_argument)
+			if (opt->has_argument())
 			{
 				i++; // FIXME: are there more arguments?
 				if (opt->parse(argv[i]) != 0)
@@ -186,17 +192,46 @@ public:
 		for (auto & opt : m_opts )
 		{
 			pstring line = "";
-			if (opt->m_short != "")
-				line += "  -" + opt->m_short;
-			if (opt->m_long != "")
+			if (opt->short_opt() != "")
+				line += "  -" + opt->short_opt();
+			if (opt->long_opt() != "")
 			{
 				if (line != "")
 					line += ", ";
 				else
-					line = "     ";
-				line += "--" + opt->m_long;
+					line = "      ";
+				line += "--" + opt->long_opt();
+				if (opt->has_argument())
+				{
+					line += "=";
+					option_str_limit *ol = dynamic_cast<option_str_limit *>(opt);
+					if (ol)
+					{
+						for (auto &v : ol->limit())
+						{
+							line += v + "|";
+						}
+						line = line.left(line.len() - 1);
+					}
+					else
+						line += "Value";
+				}
 			}
-			line = line.rpad(" ", 20).cat(opt->m_help);
+			line = line.rpad(" ", 20) + " ";
+			if (line.len() > 21)
+			{
+				ret += line + "\n";
+				line = pstring("").rpad(" ", 21);
+			}
+			for (auto &s : pstring_vector_t(opt->help(), " "))
+			{
+				if (line.len() + s.len() > 72)
+				{
+					ret += line + "\n";
+					line = pstring("").rpad(" ", 21);
+				}
+				line += s + " ";
+			}
 			ret = ret + line + "\n";
 		}
 		return ret;
@@ -209,7 +244,7 @@ private:
 	{
 		for (auto & opt : m_opts)
 		{
-			if (opt->m_short == arg)
+			if (opt->short_opt() == arg)
 				return opt;
 		}
 		return nullptr;
@@ -218,7 +253,7 @@ private:
 	{
 		for (auto & opt : m_opts)
 		{
-			if (opt->m_long == arg)
+			if (opt->long_opt() == arg)
 				return opt;
 		}
 		return nullptr;
@@ -228,11 +263,10 @@ private:
 	pstring m_app;
 };
 
-option::option(pstring ashort, pstring along, pstring help, bool has_argument, options *parent)
+option::option(options &parent, pstring ashort, pstring along, pstring help, bool has_argument)
 : m_short(ashort), m_long(along), m_help(help), m_has_argument(has_argument)
 {
-	if (parent != nullptr)
-		parent->register_option(this);
+	parent.register_option(this);
 }
 
 }
