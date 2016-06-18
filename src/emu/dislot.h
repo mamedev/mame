@@ -67,12 +67,10 @@
 class device_slot_option
 {
 	friend class device_slot_interface;
-	friend class simple_list<device_slot_option>;
 
 public:
 	device_slot_option(const char *name, const device_type &devtype);
 
-	device_slot_option *next() const { return m_next; }
 	const char *name() const { return m_name; }
 	const device_type &devtype() const { return m_devtype; }
 	bool selectable() const { return m_selectable; }
@@ -83,7 +81,6 @@ public:
 
 private:
 	// internal state
-	device_slot_option *m_next;
 	const char *m_name;
 	const device_type &m_devtype;
 	bool m_selectable;

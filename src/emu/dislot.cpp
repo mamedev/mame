@@ -21,7 +21,6 @@ device_slot_interface::~device_slot_interface()
 }
 
 device_slot_option::device_slot_option(const char *name, const device_type &devtype):
-	m_next(nullptr),
 	m_name(name),
 	m_devtype(devtype),
 	m_selectable(true),
