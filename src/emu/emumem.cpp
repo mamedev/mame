@@ -2672,7 +2672,7 @@ void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs
 {
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_all("install_write_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
-	write().handler_map_range(nstart, nend, nmask, mmirror, unitmask).set_delegate(handler);
+	write().handler_map_range(nstart, nend, nmask, nmirror, unitmask).set_delegate(handler);
 	generate_memdump(machine());
 }
 
