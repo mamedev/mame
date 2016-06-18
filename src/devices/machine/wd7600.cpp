@@ -179,7 +179,8 @@ void wd7600_device::device_start()
 	m_space_io->install_readwrite_handler(0x0000, 0x000f, read8_delegate(FUNC(am9517a_device::read), &(*m_dma1)), write8_delegate(FUNC(am9517a_device::write), &(*m_dma1)), 0xffffffff);
 	m_space_io->install_readwrite_handler(0x0020, 0x003f, read8_delegate(FUNC(pic8259_device::read), &(*m_pic1)), write8_delegate(FUNC(pic8259_device::write), &(*m_pic1)), 0x0000ffff);
 	m_space_io->install_readwrite_handler(0x0040, 0x0043, read8_delegate(FUNC(pit8254_device::read), &(*m_ctc)), write8_delegate(FUNC(pit8254_device::write), &(*m_ctc)), 0xffffffff);
-	m_space_io->install_readwrite_handler(0x0060, 0x0063, read8_delegate(FUNC(wd7600_device::keyb_data_r), this), write8_delegate(FUNC(wd7600_device::keyb_data_w), this), 0x0000ffff);
+	m_space_io->install_readwrite_handler(0x0060, 0x0063, read8_delegate(FUNC(wd7600_device::keyb_data_r), this), write8_delegate(FUNC(wd7600_device::keyb_data_w), this), 0x000000ff);
+	m_space_io->install_readwrite_handler(0x0060, 0x0063, read8_delegate(FUNC(wd7600_device::portb_r), this), write8_delegate(FUNC(wd7600_device::portb_w), this), 0x0000ff00);
 	m_space_io->install_readwrite_handler(0x0064, 0x0067, read8_delegate(FUNC(wd7600_device::keyb_status_r), this), write8_delegate(FUNC(wd7600_device::keyb_cmd_w), this), 0x000000ff);
 	m_space_io->install_readwrite_handler(0x0070, 0x007f, read8_delegate(FUNC(mc146818_device::read), &(*m_rtc)), write8_delegate(FUNC(wd7600_device::rtc_w), this), 0x0000ffff);
 	m_space_io->install_readwrite_handler(0x0080, 0x008f, read8_delegate(FUNC(wd7600_device::dma_page_r), this), write8_delegate(FUNC(wd7600_device::dma_page_w), this), 0xffffffff);
@@ -289,20 +290,14 @@ WRITE_LINE_MEMBER( wd7600_device::ctc_out2_w )
 WRITE8_MEMBER( wd7600_device::keyb_data_w )
 {
 //  if(LOG) logerror("WD7600 '%s': keyboard data write %02x\n", tag(), data);
-	if(ACCESSING_BITS_0_7)
-		m_keybc->data_w(space,0,data);
-	else
-		portb_w(space,0,data);
+	m_keybc->data_w(space,0,data);
 }
 
 READ8_MEMBER( wd7600_device::keyb_data_r )
 {
 	UINT8 ret = m_keybc->data_r(space,0);
 //  if(LOG) logerror("WD7600 '%s': keyboard data read %02x\n", tag(), ret);
-	if(ACCESSING_BITS_0_7)
 		return ret;
-	else
-		return portb_r(space,0);
 }
 
 WRITE8_MEMBER( wd7600_device::keyb_cmd_w )
