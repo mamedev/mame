@@ -388,20 +388,125 @@
 #include "emu.h"
 #include "cpu/sparc/sparc.h"
 
+#define ENA_NOTBOOT		0x80
+#define ENA_SDVMA		0x20
+#define ENA_CACHE		0x10
+#define ENA_RESET		0x04
+#define ENA_DIAG		0x01
 
 class sun4_state : public driver_device
 {
 public:
 	sun4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "user1")
+		, m_rom_ptr(nullptr)
+		, m_system_enable(0)
+	{
+	}
 
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
+	virtual void machine_start() override;
+
+	DECLARE_READ32_MEMBER( sun4_mmu_r );
+	DECLARE_WRITE32_MEMBER( sun4_mmu_w );
+
+protected:
+
+	required_device<mb86901_device> m_maincpu;
+	required_memory_region m_rom;
+	UINT32 *m_rom_ptr;
+	UINT32 m_context;
+	UINT32 m_system_enable;
 };
 
-static ADDRESS_MAP_START(sun4_mem, AS_PROGRAM, 32, sun4_state)
-	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("user1", 0)
+READ32_MEMBER( sun4_state::sun4_mmu_r )
+{
+	UINT8 asi = m_maincpu->fetch_asi();
+
+	if (asi == 2 && !space.debugger_access())
+	{
+		switch (offset >> 26)
+		{
+			case 3: // context reg
+				return m_context;
+
+			case 4: // system enable reg
+				return m_system_enable;
+
+			case 6: // bus error register
+				return 0;
+
+			case 8: // (d-)cache tags
+				printf("sun4: read dcache tags @ %x, PC = %x\n", offset, m_maincpu->pc());
+				return 0xffffffff;
+
+			case 9: // (d-)cache data
+				printf("sun4: read dcache data @ %x, PC = %x\n", offset, m_maincpu->pc());
+				return 0xffffffff;
+
+			case 0: // IDPROM - TODO: SPARCstation-1 does not have an ID prom and a timeout should occur.
+			default:
+				return 0;
+		}
+	}
+
+	if (!(m_system_enable & ENA_NOTBOOT))
+	{
+		return m_rom_ptr[offset & 0x1ffff];
+	}
+
+	return 0;
+}
+
+WRITE32_MEMBER( sun4_state::sun4_mmu_w )
+{
+	UINT8 asi = m_maincpu->fetch_asi();
+
+	if (asi == 2)
+	{
+		switch (offset >> 26)
+		{
+			case 3: // context reg
+				m_context = (UINT8)data;
+				return;
+
+			case 4: // system enable reg
+				m_system_enable = (UINT8)data;
+				return;
+
+			case 8: // cache tags3
+				printf("sun4: %08x to cache tags @ %x, PC = %x\n", data, offset, m_maincpu->pc());
+				return;
+
+			case 9: // cache data
+				printf("sun4: %08x to cache data @ %x, PC = %x\n", data, offset, m_maincpu->pc());
+				return;
+
+			case 0: // IDPROM
+			default:
+				return;
+		}
+	}
+}
+
+static ADDRESS_MAP_START(sun4_asi8, AS_USER_INSN, 32, sun4_state)
+	AM_RANGE(0x00000000, 0xefffffff) AM_READWRITE( sun4_mmu_r, sun4_mmu_w )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(sun4_asi9, AS_SUPER_INSN, 32, sun4_state)
+	AM_RANGE(0x00000000, 0xefffffff) AM_READWRITE( sun4_mmu_r, sun4_mmu_w )
+	AM_RANGE(0xffe80000, 0xffefffff) AM_ROM AM_REGION("user1", 0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(sun4_asi10, AS_USER_DATA, 32, sun4_state)
+	AM_RANGE(0x00000000, 0xefffffff) AM_READWRITE( sun4_mmu_r, sun4_mmu_w )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(sun4_asi11, AS_SUPER_DATA, 32, sun4_state)
+	AM_RANGE(0x00000000, 0xefffffff) AM_READWRITE( sun4_mmu_r, sun4_mmu_w )
+	AM_RANGE(0xffe80000, 0xffefffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -413,11 +518,18 @@ void sun4_state::machine_reset()
 {
 }
 
+void sun4_state::machine_start()
+{
+	m_rom_ptr = (UINT32 *)m_rom->base();
+}
 
 static MACHINE_CONFIG_START( sun4, sun4_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MB86901, 16670000) // SPARC32 on real system
-	MCFG_CPU_PROGRAM_MAP(sun4_mem)
+	MCFG_CPU_ADD("maincpu", MB86901, 16670000)
+	MCFG_DEVICE_ADDRESS_MAP(AS_USER_INSN, sun4_asi8)
+	MCFG_DEVICE_ADDRESS_MAP(AS_SUPER_INSN, sun4_asi9)
+	MCFG_DEVICE_ADDRESS_MAP(AS_USER_DATA, sun4_asi10)
+	MCFG_DEVICE_ADDRESS_MAP(AS_SUPER_DATA, sun4_asi11)
 MACHINE_CONFIG_END
 
 /*

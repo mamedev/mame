@@ -5,7 +5,7 @@
 */
 
 #include "emu.h"
-#include "mb86901defs.h"
+#include "sparcdefs.h"
 
 static void print(char *output, const char *fmt, ...)
 {
@@ -354,9 +354,24 @@ offs_t sparc_dasm(char *buffer, offs_t pc, UINT32 op)
 				else
 					print(buffer, "wr		%s,%d,%%asr%d", regnames[RS1], SIMM13, RD);
 				break;
-			case 49:	print(buffer, "wr       %s,%d,%%psr", regnames[RS1], SIMM13); break;
-			case 50:	print(buffer, "wr       %s,%d,%%wim", regnames[RS1], SIMM13); break;
-			case 51:	print(buffer, "wr       %s,%d,%%tbr", regnames[RS1], SIMM13); break;
+			case 49:
+				if (RS1 == 0)
+					print(buffer, "wr       %d,%%psr", SIMM13);
+				else
+					print(buffer, "wr       %s,%d,%%psr", regnames[RS1], SIMM13);
+				break;
+			case 50:
+				if (RS1 == 0)
+					print(buffer, "wr       %d,%%wim", SIMM13);
+				else
+					print(buffer, "wr       %s,%d,%%wim", regnames[RS1], SIMM13);
+				break;
+			case 51:
+				if (RS1 == 0)
+					print(buffer, "wr       %d,%%tbr", SIMM13);
+				else
+					print(buffer, "wr       %s,%d,%%tbr", regnames[RS1], SIMM13);
+				break;
 			case 52: // FPop1
 				sparc_dasm_fpop1(buffer, op);
 				break;

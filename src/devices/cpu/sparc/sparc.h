@@ -9,6 +9,11 @@
 #ifndef __SPARC_H__
 #define __SPARC_H__
 
+#define AS_USER_INSN		AS_0
+#define AS_SUPER_INSN		AS_1
+#define AS_USER_DATA		AS_2
+#define AS_SUPER_DATA		AS_3
+
 class mb86901_device : public cpu_device
 {
 public:
@@ -37,17 +42,33 @@ public:
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
+	UINT8 fetch_asi() { return m_asi; }
+	UINT32 pc() { return m_pc; }
+
 protected:
+	void update_gpr_pointers();
+	void save_restore_update_cwp(UINT32 op, UINT8 new_cwp);
+	bool execute_group2(UINT32 op);
+	void execute_group3(UINT32 op);
+	bool execute_bicc(UINT32 op);
+
 	// address spaces
-	const address_space_config m_program_config;
+	const address_space_config m_as8_config;
+	const address_space_config m_as9_config;
+	const address_space_config m_as10_config;
+	const address_space_config m_as11_config;
 
 	// memory access
-	UINT8  read_byte(UINT32 address);
-	UINT16 read_half(UINT32 address);
-	UINT32 read_word(UINT32 address);
-	void write_byte(UINT32 address, UINT8 data);
-	void write_half(UINT32 address, UINT16 data);
-	void write_word(UINT32 address, UINT32 data);
+	UINT32 read_byte(UINT8 asi, UINT32 address);
+	INT32 read_signed_byte(UINT8 asi, UINT32 address);
+	UINT32 read_half(UINT8 asi, UINT32 address);
+	INT32 read_signed_half(UINT8 asi, UINT32 address);
+	UINT32 read_word(UINT8 asi, UINT32 address);
+	UINT64 read_doubleword(UINT8 asi, UINT32 address);
+	void write_byte(UINT8 asi, UINT32 address, UINT8 data);
+	void write_half(UINT8 asi, UINT32 address, UINT16 data);
+	void write_word(UINT8 asi, UINT32 address, UINT32 data);
+	void write_doubleword(UINT8 asi, UINT32 address, UINT64 data);
 
 	// general-purpose registers
 	UINT32 m_r[120];
@@ -72,11 +93,27 @@ protected:
 	bool m_et;		// enable traps
 	UINT8 m_cwp;	// current window pointer
 
+	// register windowing helpers
+	UINT32* m_regs[32];
+
+	// addressing helpers
+	UINT8 m_insn_asi;
+	UINT8 m_data_asi;
+	UINT8 m_asi;
+
 	// other internal states
+	UINT32 m_nextnpc;
 	int m_icount;
 
+	// debugger helpers
+	UINT32 m_dbgregs[24];
+
 	// address spaces
-	address_space *m_program;
+	address_space *m_user_insn;
+	address_space *m_super_insn;
+	address_space *m_user_data;
+	address_space *m_super_data;
+	address_space *m_spaces[256];
 
 	// processor configuration
 	static const int WINDOW_COUNT;
