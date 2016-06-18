@@ -131,7 +131,7 @@
 		</part>
 	</software>
 
-	<software name="brandnew">
+	<software name="brandvt">
 		<!--
 		Origin: redump.org
 		<rom name="Brandish VT (Japan).cue" size="85" crc="b7368f87" md5="b1aaa8709e126b021d15f933d2f0cb7e" sha1="4d5c5eba2fc88cf8c3cec9d3c8d9392f04058ef3"/>
@@ -348,7 +348,7 @@
 		<description>Might and Magic - Clouds of Xeen</description>
 		<year>1993</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
-		<part name="flop1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="might and magic - clouds of xeen (japan).hdm" size="1261568" crc="e7738b2e" sha1="1c58c1ee565f777e931bd301cc535eb27a4b70e6" offset="000000" />
 			</dataarea>
