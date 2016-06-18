@@ -12,29 +12,7 @@
 #ifndef __MB86901_DEFS_H__
 #define __MB86901_DEFS_H__
 
-#define GET_OPCODE				0; { m_asi = m_insn_asi; op = m_spaces[m_insn_asi]->read_dword(m_pc); }
-
-#define LOAD_SBA(asi,addr)		(((INT32)m_spaces[asi]->read_byte(addr) << 24) >> 24)
-#define LOAD_UBA(asi,addr)		m_spaces[asi]->read_byte(addr)
-#define LOAD_SHA(asi,addr)		(((INT32)m_spaces[asi]->read_word(addr) << 16) >> 16)
-#define LOAD_UHA(asi,addr)		m_spaces[asi]->read_word(addr)
-#define LOAD_WA(asi,addr)		m_spaces[asi]->read_dword(addr)
-#define LOAD_DA(asi,addr)		(((UINT64)m_spaces[asi]->read_dword(addr) << 32) | m_spaces[asi]->read_dword(addr+4))
-#define STORE_BA(asi,addr,data)	{ m_spaces[asi]->write_byte(addr,data); }
-#define STORE_HA(asi,addr,data)	{ m_spaces[asi]->write_word(addr,data); }
-#define STORE_WA(asi,addr,data)	{ m_spaces[asi]->write_dword(addr,data); }
-#define STORE_DA(asi,addr,data)	{ m_spaces[asi]->write_dword(addr,(UINT32)(data >> 32)); m_spaces[asi]->write_dword(addr+4,(UINT32)data); }
-
-#define LOAD_SB(addr)			{ m_asi = m_data_asi; LOAD_SBA(m_data_asi,addr); }
-#define LOAD_UB(addr)			{ m_asi = m_data_asi; LOAD_UBA(m_data_asi,addr); }
-#define LOAD_SH(addr)			{ m_asi = m_data_asi; LOAD_SHA(m_data_asi,addr); }
-#define LOAD_UH(addr)			{ m_asi = m_data_asi; LOAD_UHA(m_data_asi,addr); }
-#define LOAD_W(addr)			{ m_asi = m_data_asi; LOAD_WA(m_data_asi,addr); }
-#define LOAD_D(addr)			{ m_asi = m_data_asi; LOAD_DA(m_data_asi,addr); }
-#define STORE_B(addr,data)		{ m_asi = m_data_asi; STORE_BA(m_data_asi,addr); }
-#define STORE_H(addr,data)		{ m_asi = m_data_asi; STORE_HA(m_data_asi,addr); }
-#define STORE_W(addr,data)		{ m_asi = m_data_asi; STORE_WA(m_data_asi,addr); }
-#define STORE_D(addr,data)		{ m_asi = m_data_asi; STORE_DA(m_data_asi,addr); }
+#define GET_OPCODE				0; { m_asi = m_insn_asi; op = m_program->read_dword(m_pc); }
 
 #define PSR_CWP_MASK		0x0000001f
 #define PSR_ET_SHIFT		5
@@ -88,8 +66,8 @@
 
 #define TEST_ICC_NZ(x)		do { m_psr &= ~PSR_ICC_MASK; m_psr |= (x & 0x80000000) ? PSR_N_MASK : 0; m_psr |= (x == 0) ? PSR_Z_MASK : 0; } while (0);
 
-#define MAKE_PSR			do { m_psr = (m_impl << PSR_IMPL_SHIFT) | (m_ver << PSR_VER_SHIFT) | (m_icc << PSR_ICC_SHIFT) | (m_ec ? PSR_EC_MASK : 0) | (m_ef ? PSR_EF_MASK : 0) | (m_pil << PSR_PIL_SHIFT) | (m_s ? PSR_S_MASK : 0) | (m_ps ? PSR_PS_MASK : 0) | (m_et ? PSR_ET_MASK : 0) | m_cwp; } while(0);
-#define BREAK_PSR			do { m_icc = (m_psr & PSR_ICC_MASK) >> PSR_ICC_SHIFT; m_ec = m_psr & PSR_EC_MASK; m_ef = m_psr & PSR_EF_MASK; m_pil = (m_psr & PSR_PIL_MASK) >> PSR_PIL_SHIFT; m_s = m_psr & PSR_S_MASK; m_ps = m_psr & PSR_PS_MASK; m_et = m_psr & PSR_ET_MASK; m_cwp = m_psr & PSR_CWP_MASK; } while(0);
+#define MAKE_PSR			do { m_psr = (m_impl << PSR_IMPL_SHIFT) | (m_ver << PSR_VER_SHIFT) | (m_icc << PSR_ICC_SHIFT) | (m_ec ? PSR_EC_MASK : 0) | (m_ef ? PSR_EF_MASK : 0) | (m_pil << PSR_PIL_SHIFT) | (m_s ? PSR_S_MASK : 0) | (m_ps ? PSR_PS_MASK : 0) | (m_et ? PSR_ET_MASK : 0) | m_cwp; m_insn_asi = m_s ? 9 : 8; m_data_asi = m_s ? 11 : 10; } while(0);
+#define BREAK_PSR			do { m_icc = (m_psr & PSR_ICC_MASK) >> PSR_ICC_SHIFT; m_ec = m_psr & PSR_EC_MASK; m_ef = m_psr & PSR_EF_MASK; m_pil = (m_psr & PSR_PIL_MASK) >> PSR_PIL_SHIFT; m_s = m_psr & PSR_S_MASK; m_ps = m_psr & PSR_PS_MASK; m_et = m_psr & PSR_ET_MASK; m_cwp = m_psr & PSR_CWP_MASK; m_insn_asi = m_s ? 9 : 8; m_data_asi = m_s ? 11 : 10; } while(0);
 #define MAKE_ICC			do { m_icc = (m_psr & PSR_ICC_MASK) >> PSR_ICC_SHIFT; } while(0);
 
 #define IS_SUPERVISOR		(m_psr & PSR_S_MASK)
@@ -97,6 +75,9 @@
 
 #define TRAPS_ENABLED		(m_psr & PSR_ET_MASK)
 #define TRAPS_DISABLED		(!TRAPS_ENABLED)
+
+#define FPU_ENABLED			(m_psr & PSR_EF_MASK)
+#define FPU_DISABLED		(!FPU_ENABLED)
 
 #define OP		(op >> 30) // gangnam style
 #define OP2		((op >> 22) & 7)
@@ -130,6 +111,8 @@
 
 #define PC		m_pc
 #define nPC		m_npc
+
+#define Y		m_y
 
 enum sparc_trap_type
 {

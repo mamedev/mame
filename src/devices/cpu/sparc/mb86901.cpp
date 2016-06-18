@@ -9,7 +9,9 @@
 //                compatible instruction set.
 //
 //  To-Do:
-//      - Ops: FBFcc, LDF, STF, SPARCv8 ops
+//      - Ops: FBFcc, LDF, STF
+//		- Test: SPARCv8 ops are untested
+//		- Test: Traps are untested
 //      - FPU support
 //      - Coprocessor support
 //
@@ -19,6 +21,8 @@
 #include "debugger.h"
 #include "sparc.h"
 #include "sparcdefs.h"
+
+#define SPARCV8		(0)
 
 CPU_DISASSEMBLE( sparc );
 
@@ -32,10 +36,7 @@ const int mb86901_device::WINDOW_COUNT = 7;
 
 mb86901_device::mb86901_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, MB86901, "Fujitsu MB86901", tag, owner, clock, "mb86901", __FILE__)
-	, m_as8_config("user_insn", ENDIANNESS_BIG, 32, 32)
-	, m_as9_config("supr_insn", ENDIANNESS_BIG, 32, 32)
-	, m_as10_config("user_data", ENDIANNESS_BIG, 32, 32)
-	, m_as11_config("supr_data", ENDIANNESS_BIG, 32, 32)
+	, m_program_config("program", ENDIANNESS_BIG, 32, 32)
 {
 }
 
@@ -77,20 +78,7 @@ void mb86901_device::device_start()
 
 	memset(m_dbgregs, 0, 24 * sizeof(UINT32));
 
-	m_user_insn = &space(AS_USER_INSN);
-	m_super_insn = &space(AS_SUPER_INSN);
-	m_user_data = &space(AS_USER_DATA);
-	m_super_data = &space(AS_SUPER_DATA);
-
-	for (int i = 0; i < 256; i++)
-	{
-		m_spaces[i] = m_super_insn;
-	}
-	m_spaces[0] = m_super_insn;
-	m_spaces[8] = m_user_insn;
-	m_spaces[9] = m_super_insn;
-	m_spaces[10] = m_user_data;
-	m_spaces[11] = m_super_data;
+	m_program = &space(AS_PROGRAM);
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,		"GENPC",	m_pc).noshow();
@@ -190,10 +178,10 @@ void mb86901_device::device_reset()
 	m_icc = 0;
 	m_ec = false;
 	m_ef = false;
-	m_pil = 0; // double-check this
+	m_pil = 0;
 	m_s = true;
-	m_ps = true; // double-check this
-	m_et = true; // double-check this
+	m_ps = true;
+	m_et = false;
 	m_cwp = 0;
 
 	m_insn_asi = 9;
@@ -218,18 +206,8 @@ const address_space_config *mb86901_device::memory_space_config(address_spacenum
 {
 	switch (spacenum)
 	{
-		case AS_USER_INSN:
-			return &m_as8_config;
-			break;
-		case AS_SUPER_INSN:
-			return &m_as9_config;
-			break;
-		case AS_USER_DATA:
-			return &m_as10_config;
-			break;
-		case AS_SUPER_DATA:
-			return &m_as11_config;
-			break;
+		case AS_PROGRAM:
+			return &m_program_config;
 		default:
 			return nullptr;
 	}
@@ -243,72 +221,72 @@ const address_space_config *mb86901_device::memory_space_config(address_spacenum
 UINT32 mb86901_device::read_byte(UINT8 asi, UINT32 address)
 {
 	m_asi = asi;
-
-	// TODO: check for traps
-	return LOAD_UBA(asi, address);
+	// TODO: data_access_exception, data_access_error traps
+	return m_program->read_byte(address);
 }
 
 INT32 mb86901_device::read_signed_byte(UINT8 asi, UINT32 address)
 {
 	m_asi = asi;
-	// TODO: check for traps
-	return LOAD_SBA(asi, address);
+	// TODO: data_access_exception, data_access_error traps
+	return (((INT32)m_program->read_byte(address) << 24) >> 24);
 }
 
 UINT32 mb86901_device::read_half(UINT8 asi, UINT32 address)
 {
 	m_asi = asi;
 	// TODO: data_access_exception, data_access_error traps
-	return LOAD_UHA(asi, address);
+	return m_program->read_word(address);
 }
 
 INT32 mb86901_device::read_signed_half(UINT8 asi, UINT32 address)
 {
 	m_asi = asi;
 	// TODO: data_access_exception, data_access_error traps
-	return LOAD_SHA(asi, address);
+	return (((INT32)m_program->read_word(address) << 16) >> 16);
 }
 
 UINT32 mb86901_device::read_word(UINT8 asi, UINT32 address)
 {
 	m_asi = asi;
 	// TODO: data_access_exception, data_access_error traps
-	return LOAD_WA(asi, address);
+	return m_program->read_dword(address);
 }
 
 UINT64 mb86901_device::read_doubleword(UINT8 asi, UINT32 address)
 {
 	m_asi = asi;
 	// TODO: data_access_exception, data_access_error traps
-	return LOAD_DA(asi, address);
+	return (((UINT64)m_program->read_dword(address) << 32) | m_program->read_dword(address+4));
 }
 
 void mb86901_device::write_byte(UINT8 asi, UINT32 address, UINT8 data)
 {
 	m_asi = asi;
-	// TODO: check for traps
-	STORE_BA(asi, address, data);
+	// TODO: data_access_exception, data_access_error traps
+	m_program->write_byte(address, data);
 }
 
 void mb86901_device::write_half(UINT8 asi, UINT32 address, UINT16 data)
 {
 	m_asi = asi;
-	// TODO: check for traps
-	STORE_HA(asi, address, data);
+	// TODO: data_access_exception, data_access_error traps
+	m_program->write_word(address, data);
 }
 
 void mb86901_device::write_word(UINT8 asi, UINT32 address, UINT32 data)
 {
 	m_asi = asi;
-	// TODO: check for traps
-	STORE_WA(asi, address, data);
+	// TODO: data_access_exception, data_access_error traps
+	m_program->write_dword(address, data);
 }
 
 void mb86901_device::write_doubleword(UINT8 asi, UINT32 address, UINT64 data)
 {
 	m_asi = asi;
-	// TODO: check for traps
-	STORE_DA(asi, address, data);
+	// TODO: data_access_exception, data_access_error traps
+	m_program->write_dword(address, (UINT32)(data >> 32));
+	m_program->write_dword(address+4, (UINT32)data);
 }
 
 
@@ -475,17 +453,62 @@ bool mb86901_device::execute_group2(UINT32 op)
 		case 8:		// addx
 			SET_RDREG(arg1 + arg2 + (ICC_C_SET ? 1 : 0));
 			break;
+#if SPARCV8
 		case 10:	// umul, SPARCv8
+		{
+			UINT64 result = (UINT64)arg1 * (UINT64)arg2;
+			Y = (UINT32)(result >> 32);
+			SET_RDREG((UINT32)result);
 			break;
+		}
 		case 11:	// smul, SPARCv8
+		{
+			INT64 result = (INT64)(INT32)arg1 * (INT64)(INT32)arg2;
+			Y = (UINT32)((UINT64)result >> 32);
+			SET_RDREG((UINT32)result);
 			break;
+		}
+#endif
 		case 12:	// subx
 			SET_RDREG(arg1 - arg2 - (ICC_C_SET ? 1 : 0));
 			break;
+#if SPARCV8
 		case 14:	// udiv, SPARCv8
+		{
+			UINT64 dividend = ((UINT64)Y << 32) || arg1;
+			UINT32 divisor = arg2;
+			UINT64 quotient = dividend / divisor;
+			if (quotient > (0xffffffffL + (divisor - 1)))
+			{
+				quotient = 0xffffffff;
+			}
+			SET_RDREG((UINT32)quotient);
 			break;
+		}
 		case 15:	// sdiv, SPARCv8
+		{
+			INT64 dividend = ((INT64)(INT32)Y << 32) || arg1;
+			INT32 divisor = arg2;
+			INT64 quotient = dividend / divisor;
+			if (quotient > 0)
+			{
+				INT32 absdivisor = (divisor < 0) ? -divisor : divisor;
+				if (quotient > (0x7fffffffL + (absdivisor - 1)))
+				{
+					quotient = 0x7fffffff;
+				}
+			}
+			else if (quotient < 0)
+			{
+				if (quotient < (INT64)0xffffffff80000000L)
+				{
+					quotient = 0x80000000;
+				}
+			}
+			SET_RDREG((UINT32)quotient);
 			break;
+		}
+#endif
 		case 16:	// addcc
 		{
 			UINT32 result = arg1 + arg2;
@@ -563,10 +586,24 @@ bool mb86901_device::execute_group2(UINT32 op)
 			SET_RDREG(result);
 			break;
 		}
+#if SPARCV8
 		case 26:	// umulcc, SPARCv8
+		{
+			UINT64 result = (UINT64)arg1 * (UINT64)arg2;
+			Y = (UINT32)(result >> 32);
+			TEST_ICC_NZ(result);
+			SET_RDREG((UINT32)result);
 			break;
+		}
 		case 27:	// smulcc, SPARCv8
+		{
+			INT64 result = (INT64)(INT32)arg1 * (INT64)(INT32)arg2;
+			Y = (UINT32)((UINT64)result >> 32);
+			TEST_ICC_NZ(result);
+			SET_RDREG((UINT32)result);
 			break;
+		}
+#endif
 		case 28:	// subxcc
 		{
 			UINT32 c = (ICC_C_SET ? 1 : 0);
@@ -580,10 +617,60 @@ bool mb86901_device::execute_group2(UINT32 op)
 			SET_RDREG(result);
 			break;
 		}
+#if SPARCV8
 		case 30:	// udivcc, SPARCv8
+		{
+			UINT64 dividend = ((UINT64)Y << 32) || arg1;
+			UINT32 divisor = arg2;
+			UINT64 quotient = dividend / divisor;
+
+			bool v = false;
+			if (quotient > (0xffffffffL + (divisor - 1)))
+			{
+				quotient = 0xffffffff;
+				v = true;
+			}
+
+			TEST_ICC_NZ((UINT32)quotient);
+			if (v)
+				ICC_V_SET;
+
+			SET_RDREG((UINT32)quotient);
 			break;
-		case 31:	// sdivcc, SPARCv8
+		}
+		case 31:	// sdiv, SPARCv8
+		{
+			INT64 dividend = ((INT64)(INT32)Y << 32) || arg1;
+			INT32 divisor = arg2;
+			INT64 quotient = dividend / divisor;
+
+			bool v = false;
+			if (quotient > 0)
+			{
+				INT32 absdivisor = (divisor < 0) ? -divisor : divisor;
+				if (quotient > (0x7fffffffL + (absdivisor - 1)))
+				{
+					quotient = 0x7fffffff;
+					v = true;
+				}
+			}
+			else if (quotient < 0)
+			{
+				if (quotient < (INT64)0xffffffff80000000L)
+				{
+					quotient = 0x80000000;
+					v = true;
+				}
+			}
+
+			if (v)
+				ICC_V_SET;
+			TEST_ICC_NZ((UINT32)quotient);
+
+			SET_RDREG((UINT32)quotient);
 			break;
+		}
+#endif
 		case 32:	// taddcc
 		{
 			UINT32 result = arg1 + arg2;
@@ -636,7 +723,7 @@ bool mb86901_device::execute_group2(UINT32 op)
 				TEST_ICC_NZ(result);
 				if (result > arg1)
 					SET_ICC_C_FLAG;
-				SET_RDREG(result);
+ 				SET_RDREG(result);
 			}
 			break;
 		}
@@ -694,50 +781,109 @@ bool mb86901_device::execute_group2(UINT32 op)
 			{	// rd y
 				SET_RDREG(m_y);
 			}
+#if SPARCV8
 			else if (RS1 == 15 && RD == 0)
 			{	// stbar, SPARCv8
+				// no-op, as this implementation assumes Total Store Ordering
 			}
 			else
 			{	// rd asr, SPARCv8
+				logerror("Unimplemented instruction: rd asr");
 			}
+#endif
 			break;
 		case 41:	// rd psr
-			// TODO: check privilege
-			SET_RDREG(m_psr);
+			if (IS_USER)
+			{
+				queue_trap(sparc_privileged_instruction);
+			}
+			else
+			{
+				SET_RDREG(m_psr);
+			}
 			break;
 		case 42:	// rd wim
-			// TODO: check privilege
-			SET_RDREG(m_wim);
+			if (IS_USER)
+			{
+				queue_trap(sparc_privileged_instruction);
+			}
+			else
+			{
+				SET_RDREG(m_wim);
+			}
 			break;
 		case 43:	// rd tbr
-			// TODO: check privilege
-			SET_RDREG(m_tbr);
+			if (IS_USER)
+			{
+				queue_trap(sparc_privileged_instruction);
+			}
+			else
+			{
+				SET_RDREG(m_tbr);
+			}
 			break;
 		case 48:
 			if (RD == 0)
 			{	// wr y
 				m_y = arg1 ^ arg2;
 			}
+#if SPARCV8
 			else
 			{	// wr asr, SPARCv8
+				logerror("Unimplemented instruction: wr asr");
 			}
+#endif
 			break;
 		case 49:	// wr psr
-			// TODO: check privilege
-			m_psr = (arg1 ^ arg2) & ~PSR_ZERO_MASK;
-			BREAK_PSR;
+			if (IS_USER)
+			{
+				queue_trap(sparc_privileged_instruction);
+			}
+			else
+			{
+				UINT32 new_psr = (arg1 ^ arg2) & ~PSR_ZERO_MASK;
+				if ((new_psr & PSR_CWP_MASK) >= WINDOW_COUNT)
+				{
+					queue_trap(sparc_illegal_instruction);
+				}
+				else
+				{
+					m_psr = new_psr;
+					BREAK_PSR;
+				}
+			}
 			break;
 		case 50:	// wr wim
-			// TODO: check privilege
-			m_wim = (arg1 ^ arg2) & 0x7f;
+			if (IS_USER)
+			{
+				queue_trap(sparc_privileged_instruction);
+			}
+			else
+			{
+				m_wim = (arg1 ^ arg2) & 0x7f;
+			}
 			break;
 		case 51:	// wr tbr
-			// TODO: check privilege
-			m_tbr = (arg1 ^ arg2) & 0xfffff000;
+			if (IS_USER)
+			{
+				queue_trap(sparc_privileged_instruction);
+			}
+			else
+			{
+				m_tbr = (arg1 ^ arg2) & 0xfffff000;
+			}
 			break;
 		case 52: // FPop1
+			if (FPU_DISABLED)
+			{
+				queue_trap(sparc_floating_point_disabled);
+			}
 			break;
 		case 53: // FPop2
+			if (FPU_DISABLED)
+			{
+				queue_trap(sparc_floating_point_disabled);
+			}
 			break;
 		case 56:	// jmpl
 		{
@@ -793,6 +939,8 @@ bool mb86901_device::execute_group2(UINT32 op)
 			m_cwp = new_cwp;
 
 			m_s = m_ps;
+			m_insn_asi = m_s ? 9 : 8;
+			m_data_asi = m_s ? 11 : 10;
 			m_et = true;
 
 			UINT32 target = arg1 + arg2;
@@ -802,11 +950,14 @@ bool mb86901_device::execute_group2(UINT32 op)
 		}
 		case 58:	// ticc
 			return execute_ticc(op);
+#if SPARCV8
 		case 59:
+			// SPARCv8
 			if (RD == 0)
 			{	// flush, SPARCv8
 			}
 			break;
+#endif
 		case 60:	// save
 		{
 			UINT8 new_cwp = ((m_cwp + WINDOW_COUNT) - 1) % WINDOW_COUNT;
@@ -834,6 +985,7 @@ bool mb86901_device::execute_group2(UINT32 op)
 			break;
 		}
 		default:
+			queue_trap(sparc_illegal_instruction);
 			break;
 	}
 
@@ -900,46 +1052,46 @@ void mb86901_device::execute_group3(UINT32 op)
 	{
 		case 0:		// ld
 			check_main_traps(op, false, 3, 0, false);
-			SET_RDREG(read_word(m_s ? 10 : 11, ADDRESS));
+			SET_RDREG(read_word(m_data_asi, ADDRESS));
 			break;
 		case 1:		// ldub
-			SET_RDREG(read_byte(m_s ? 10 : 11, ADDRESS));
+			SET_RDREG(read_byte(m_data_asi, ADDRESS));
 			break;
 		case 2:		// lduh
 			check_main_traps(op, false, 1, 0, false);
-			SET_RDREG(read_half(m_s ? 10 : 11, ADDRESS));
+			SET_RDREG(read_half(m_data_asi, ADDRESS));
 			break;
 		case 3:		// ldd
 			check_main_traps(op, false, 7, 1, false);
-			SET_RDREG(read_word(m_s ? 10 : 11, ADDRESS));
-			REG(RD+1) = read_word(m_s ? 10 : 11, ADDRESS+4);
+			SET_RDREG(read_word(m_data_asi, ADDRESS));
+			REG(RD+1) = read_word(m_data_asi, ADDRESS+4);
 			break;
 		case 4:		// st
 			check_main_traps(op, false, 3, 0, false);
-			write_word(m_s ? 10 : 11, ADDRESS, RDREG);
+			write_word(m_data_asi, ADDRESS, RDREG);
 			break;
 		case 5:		// stb
-			write_byte(m_s ? 10 : 11, ADDRESS, UINT8(RDREG));
+			write_byte(m_data_asi, ADDRESS, UINT8(RDREG));
 			break;
 		case 6:		// sth
 			check_main_traps(op, false, 1, 0, false);
-			write_word(m_s ? 10 : 11, ADDRESS, UINT16(RDREG));
+			write_word(m_data_asi, ADDRESS, UINT16(RDREG));
 			break;
 		case 7:		// std
 			check_main_traps(op, false, 7, 1, false);
-			write_word(m_s ? 10 : 11, ADDRESS, RDREG);
-			write_word(m_s ? 10 : 11, ADDRESS, REG(RD+1));
+			write_word(m_data_asi, ADDRESS, RDREG);
+			write_word(m_data_asi, ADDRESS, REG(RD+1));
 			break;
 		case 9:		// ldsb
-			SET_RDREG(read_signed_byte(m_s ? 10 : 11, ADDRESS));
+			SET_RDREG(read_signed_byte(m_data_asi, ADDRESS));
 			break;
 		case 10:	// lsdh
 			check_main_traps(op, false, 1, 0, false);
-			SET_RDREG(read_signed_half(m_s ? 10 : 11, ADDRESS));
+			SET_RDREG(read_signed_half(m_data_asi, ADDRESS));
 			break;
 		case 13:	// ldstub
-			SET_RDREG(read_byte(m_s ? 10 : 11, ADDRESS));
-			write_byte(m_s ? 10 : 11, ADDRESS, 0xff);
+			SET_RDREG(read_byte(m_data_asi, ADDRESS));
+			write_byte(m_data_asi, ADDRESS, 0xff);
 			break;
 		case 15:	// swap, SPARCv8
 			break;
@@ -1102,6 +1254,7 @@ bool mb86901_device::execute_ticc(UINT32 op)
 		UINT32 arg2 = USEIMM ? SIMM7 : RS2REG;
 		UINT8 tt = 128 + ((RS1REG + arg2) & 0x7f);
 		queue_trap(sparc_trap_instruction, tt);
+		m_icount -= 3;
 		return false;
 	}
 
@@ -1154,10 +1307,13 @@ bool mb86901_device::invoke_queued_traps()
 		m_ps = m_s;
 		m_s = true;
 		m_cwp = ((m_cwp + WINDOW_COUNT) - 1) % WINDOW_COUNT;
+
 		MAKE_PSR;
 		update_gpr_pointers();
+
 		REG(17) = PC;
 		REG(18) = nPC;
+
 		m_tbr |= m_queued_tt << 4;
 
 		PC = m_tbr;
@@ -1201,8 +1357,10 @@ void mb86901_device::execute_run()
 				break;
 			case 6: // branch on floating-point condition codes
 				break;
+#if SPARCV8
 			case 7: // branch on coprocessor condition codes, SPARCv8
 				break;
+#endif
 			default:
 				break;
 			}
