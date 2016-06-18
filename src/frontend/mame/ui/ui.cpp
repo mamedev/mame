@@ -1170,6 +1170,52 @@ void mame_ui_manager::paste()
 
 
 //-------------------------------------------------
+//  draw_fps_counter
+//-------------------------------------------------
+
+void mame_ui_manager::draw_fps_counter(render_container *container)
+{
+	draw_text_full(container, machine().video().speed_text().c_str(), 0.0f, 0.0f, 1.0f,
+		JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, rgb_t::white, rgb_t::black, nullptr, nullptr);
+}
+
+
+//-------------------------------------------------
+//  draw_timecode_counter
+//-------------------------------------------------
+
+void mame_ui_manager::draw_timecode_counter(render_container *container)
+{
+	std::string tempstring;
+	draw_text_full(container, machine().video().timecode_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
+		JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, rgb_t(0xf0, 0xf0, 0x10, 0x10), rgb_t::black, nullptr, nullptr);
+}
+
+
+//-------------------------------------------------
+//  draw_timecode_total
+//-------------------------------------------------
+
+void mame_ui_manager::draw_timecode_total(render_container *container)
+{
+	std::string tempstring;
+	draw_text_full(container, machine().video().timecode_total_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
+		JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, rgb_t(0xf0, 0x10, 0xf0, 0x10), rgb_t::black, nullptr, nullptr);
+}
+
+
+//-------------------------------------------------
+//  draw_profiler
+//-------------------------------------------------
+
+void mame_ui_manager::draw_profiler(render_container *container)
+{
+	const char *text = g_profiler.text(machine());
+	draw_text_full(container, text, 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, rgb_t::white, rgb_t::black, nullptr, nullptr);
+}
+
+
+//-------------------------------------------------
 //  image_handler_ingame - execute display
 //  callback function for each image device
 //-------------------------------------------------
@@ -1204,31 +1250,19 @@ UINT32 mame_ui_manager::handler_ingame(render_container *container)
 
 	// first draw the FPS counter
 	if (show_fps_counter())
-	{
-		draw_text_full(container, machine().video().speed_text().c_str(), 0.0f, 0.0f, 1.0f,
-					JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, rgb_t::white, rgb_t::black, nullptr, nullptr);
-	}
+		draw_fps_counter(container);
 
 	// Show the duration of current part (intro or gameplay or extra)
-	if (show_timecode_counter()) {
-		std::string tempstring;
-		draw_text_full(container, machine().video().timecode_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
-			JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, rgb_t(0xf0,0xf0,0x10,0x10), rgb_t::black, nullptr, nullptr);
-	}
-	// Show the total time elapsed for the video preview (all parts intro, gameplay, extras)
-	if (show_timecode_total()) {
-		std::string tempstring;
-		draw_text_full(container, machine().video().timecode_total_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
-			JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, rgb_t(0xf0,0x10,0xf0,0x10), rgb_t::black, nullptr, nullptr);
-	}
+	if (show_timecode_counter())
+		draw_timecode_counter(container);
 
+	// Show the total time elapsed for the video preview (all parts intro, gameplay, extras)
+	if (show_timecode_total())
+		draw_timecode_total(container);
 
 	// draw the profiler if visible
 	if (show_profiler())
-	{
-		const char *text = g_profiler.text(machine());
-		draw_text_full(container, text, 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, rgb_t::white, rgb_t::black, nullptr, nullptr);
-	}
+		draw_profiler(container);
 
 	// if we're single-stepping, pause now
 	if (single_step())

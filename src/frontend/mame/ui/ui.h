@@ -248,6 +248,10 @@ public:
 	void increase_frameskip();
 	void decrease_frameskip();
 	void request_quit();
+	void draw_fps_counter(render_container *container);
+	void draw_timecode_counter(render_container *container);
+	void draw_timecode_total(render_container *container);
+	void draw_profiler(render_container *container);
 
 	// print the game info string into a buffer
 	std::string &game_info_astring(std::string &str);
