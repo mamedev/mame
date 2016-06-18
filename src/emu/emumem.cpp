@@ -1640,14 +1640,14 @@ void memory_manager::dump(FILE *file)
 
 memory_region *memory_manager::region_alloc(const char *name, UINT32 length, UINT8 width, endianness_t endian)
 {
-osd_printf_verbose("Region '%s' created\n", name);
+	osd_printf_verbose("Region '%s' created\n", name);
 	// make sure we don't have a region of the same name; also find the end of the list
-	memory_region *info = m_regionlist.find(name);
-	if (info != nullptr)
+	if (m_regionlist.find(name) != m_regionlist.end())
 		fatalerror("region_alloc called with duplicate region name \"%s\"\n", name);
 
 	// allocate the region
-	return &m_regionlist.append(name, *global_alloc(memory_region(machine(), name, length, width, endian)));
+	m_regionlist.emplace(name, std::make_unique<memory_region>(machine(), name, length, width, endian));
+	return m_regionlist.find(name)->second.get();
 }
 
 
@@ -1657,7 +1657,7 @@ osd_printf_verbose("Region '%s' created\n", name);
 
 void memory_manager::region_free(const char *name)
 {
-	m_regionlist.remove(name);
+	m_regionlist.erase(name);
 }
 
 
@@ -1671,9 +1671,9 @@ memory_region *memory_manager::region_containing(const void *memory, offs_t byte
 	const UINT8 *data = reinterpret_cast<const UINT8 *>(memory);
 
 	// look through the region list and return the first match
-	for (memory_region &region : m_regionlist)
-		if (data >= region.base() && (data + bytes) <= region.end())
-			return &region;
+	for (auto &region : m_regionlist)
+		if (data >= region.second->base() && (data + bytes) <= region.second->end())
+			return region.second.get();
 
 	// didn't find one
 	return nullptr;
@@ -1705,9 +1705,9 @@ static void generate_memdump(running_machine &machine)
 void memory_manager::bank_reattach()
 {
 	// for each non-anonymous bank, explicitly reset its entry
-	for (memory_bank &bank : m_banklist)
-		if (!bank.anonymous() && bank.entry() != BANK_ENTRY_UNSPECIFIED)
-			bank.set_entry(bank.entry());
+	for (auto &bank : m_banklist)
+		if (!bank.second->anonymous() && bank.second->entry() != BANK_ENTRY_UNSPECIFIED)
+			bank.second->set_entry(bank.second->entry());
 }
 
 
@@ -2022,11 +2022,10 @@ void address_space::prepare_map()
 		{
 			// if we can't find it, add it to our map
 			std::string fulltag = entry.m_devbase.subtag(entry.m_share);
-			if (manager().m_sharelist.find(fulltag.c_str()) == nullptr)
+			if (manager().m_sharelist.find(fulltag.c_str()) == manager().m_sharelist.end())
 			{
 				VPRINTF(("Creating share '%s' of length 0x%X\n", fulltag.c_str(), entry.m_byteend + 1 - entry.m_bytestart));
-				auto share = global_alloc(memory_share(m_map->m_databits, entry.m_byteend + 1 - entry.m_bytestart, endianness()));
-				manager().m_sharelist.append(fulltag.c_str(), *share);
+				manager().m_sharelist.emplace(fulltag.c_str(), std::make_unique<memory_share>(m_map->m_databits, entry.m_byteend + 1 - entry.m_bytestart, endianness()));
 			}
 		}
 
@@ -2264,21 +2263,21 @@ void address_space::allocate_memory()
 void address_space::locate_memory()
 {
 	// once this is done, find the starting bases for the banks
-	for (memory_bank &bank : manager().banks())
-		if (bank.base() == nullptr && bank.references_space(*this, ROW_READWRITE))
+	for (auto &bank : manager().banks())
+		if (bank.second->base() == nullptr && bank.second->references_space(*this, ROW_READWRITE))
 		{
 			// set the initial bank pointer
 			for (address_map_entry &entry : m_map->m_entrylist)
-				if (entry.m_bytestart == bank.bytestart() && entry.m_memory != nullptr)
+				if (entry.m_bytestart == bank.second->bytestart() && entry.m_memory != nullptr)
 				{
-					bank.set_base(entry.m_memory);
-					VPRINTF(("assigned bank '%s' pointer to memory from range %08X-%08X [%p]\n", bank.tag(), entry.m_addrstart, entry.m_addrend, entry.m_memory));
+					bank.second->set_base(entry.m_memory);
+					VPRINTF(("assigned bank '%s' pointer to memory from range %08X-%08X [%p]\n", bank.second->tag(), entry.m_addrstart, entry.m_addrend, entry.m_memory));
 					break;
 				}
 
 			// if the entry was set ahead of time, override the automatically found pointer
-			if (!bank.anonymous() && bank.entry() != BANK_ENTRY_UNSPECIFIED)
-				bank.set_entry(bank.entry());
+			if (!bank.second->anonymous() && bank.second->entry() != BANK_ENTRY_UNSPECIFIED)
+				bank.second->set_entry(bank.second->entry());
 		}
 }
 
@@ -2301,10 +2300,10 @@ address_map_entry *address_space::block_assign_intersecting(offs_t bytestart, of
 		if (entry.m_memory == nullptr && entry.m_share != nullptr)
 		{
 			std::string fulltag = entry.m_devbase.subtag(entry.m_share);
-			memory_share *share = manager().shares().find(fulltag.c_str());
-			if (share != nullptr && share->ptr() != nullptr)
+			auto share = manager().shares().find(fulltag.c_str());
+			if (share != manager().shares().end() && share->second->ptr() != nullptr)
 			{
-				entry.m_memory = share->ptr();
+				entry.m_memory = share->second->ptr();
 				VPRINTF(("memory range %08X-%08X -> shared_ptr '%s' [%p]\n", entry.m_addrstart, entry.m_addrend, entry.m_share, entry.m_memory));
 			}
 			else
@@ -2324,10 +2323,10 @@ address_map_entry *address_space::block_assign_intersecting(offs_t bytestart, of
 		if (entry.m_memory != nullptr && entry.m_share != nullptr)
 		{
 			std::string fulltag = entry.m_devbase.subtag(entry.m_share);
-			memory_share *share = manager().shares().find(fulltag.c_str());
-			if (share != nullptr && share->ptr() == nullptr)
+			auto share = manager().shares().find(fulltag.c_str());
+			if (share != manager().shares().end() && share->second->ptr() == nullptr)
 			{
-				share->set_ptr(entry.m_memory);
+				share->second->set_ptr(entry.m_memory);
 				VPRINTF(("setting shared_ptr '%s' = %p\n", entry.m_share, entry.m_memory));
 			}
 		}
@@ -2806,8 +2805,8 @@ bool address_space::needs_backing_store(const address_map_entry &entry)
 	if (entry.m_share != nullptr)
 	{
 		std::string fulltag = entry.m_devbase.subtag(entry.m_share);
-		memory_share *share = manager().shares().find(fulltag.c_str());
-		if (share != nullptr && share->ptr() == nullptr)
+		auto share = manager().shares().find(fulltag.c_str());
+		if (share != manager().shares().end() && share->second->ptr() == nullptr)
 			return true;
 	}
 
@@ -2847,7 +2846,15 @@ memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrst
 	adjust_addresses(bytestart, byteend, bytemask, bytemirror);
 
 	// look up the bank by name, or else by byte range
-	memory_bank *membank = (tag != nullptr) ? manager().banks().find(tag) : bank_find_anonymous(bytestart, byteend);
+	memory_bank *membank = nullptr;
+	if (tag != nullptr) {
+		auto bank = manager().banks().find(tag);
+		if (bank != manager().banks().end())
+			membank = bank->second.get();
+	}
+	else {
+		membank = bank_find_anonymous(bytestart, byteend);
+	}
 
 	// if we don't have a bank yet, find a free one
 	if (membank == nullptr)
@@ -2863,13 +2870,14 @@ memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrst
 		}
 
 		// if no tag, create a unique one
-		membank = global_alloc(memory_bank(*this, banknum, bytestart, byteend, tag));
+		auto bank = std::make_unique<memory_bank>(*this, banknum, bytestart, byteend, tag);
 		std::string temptag;
 		if (tag == nullptr) {
-			temptag = string_format("anon_%p", membank);
+			temptag = string_format("anon_%p", bank.get());
 			tag = temptag.c_str();
 		}
-		manager().m_banklist.append(tag, *membank);
+		manager().m_banklist.emplace(tag, std::move(bank));
+		membank = manager().m_banklist.find(tag)->second.get();
 	}
 
 	// add a reference for this space
@@ -2885,9 +2893,9 @@ memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrst
 memory_bank *address_space::bank_find_anonymous(offs_t bytestart, offs_t byteend) const
 {
 	// try to find an exact match
-	for (memory_bank &bank : manager().banks())
-		if (bank.anonymous() && bank.references_space(*this, ROW_READWRITE) && bank.matches_exactly(bytestart, byteend))
-			return &bank;
+	for (auto &bank : manager().banks())
+		if (bank.second->anonymous() && bank.second->references_space(*this, ROW_READWRITE) && bank.second->matches_exactly(bytestart, byteend))
+			return bank.second.get();
 
 	// not found
 	return nullptr;
@@ -3694,9 +3702,9 @@ const char *address_table::handler_name(UINT16 entry) const
 {
 	// banks have names
 	if (entry >= STATIC_BANK1 && entry <= STATIC_BANKMAX)
-		for (memory_bank &info : m_space.manager().banks())
-			if (info.index() == entry)
-				return info.name();
+		for (auto &info : m_space.manager().banks())
+			if (info.second->index() == entry)
+				return info.second->name();
 
 	// constant strings for static entries
 	if (entry == STATIC_INVALID) return "invalid";
@@ -4087,8 +4095,7 @@ memory_block::~memory_block()
 //-------------------------------------------------
 
 memory_bank::memory_bank(address_space &space, int index, offs_t bytestart, offs_t byteend, const char *tag)
-	: m_next(nullptr),
-		m_machine(space.machine()),
+	: m_machine(space.machine()),
 		m_baseptr(space.manager().bank_pointer_addr(index)),
 		m_index(index),
 		m_anonymous(tag == nullptr),
@@ -4261,8 +4268,7 @@ void memory_bank::configure_entries(int startentry, int numentries, void *base, 
 //-------------------------------------------------
 
 memory_region::memory_region(running_machine &machine, const char *name, UINT32 length, UINT8 width, endianness_t endian)
-	: m_machine(machine),
-		m_next(nullptr),
+	: m_machine(machine),		
 		m_name(name),
 		m_buffer(length),
 		m_endianness(endian),

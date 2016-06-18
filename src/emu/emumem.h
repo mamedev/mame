@@ -571,7 +571,6 @@ public:
 	~memory_bank();
 
 	// getters
-	memory_bank *next() const { return m_next; }
 	running_machine &machine() const { return m_machine; }
 	int index() const { return m_index; }
 	int entry() const { return m_curentry; }
@@ -605,7 +604,6 @@ private:
 	void expand_entries(int entrynum);
 
 	// internal state
-	memory_bank *           m_next;                 // next bank in sequence
 	running_machine &       m_machine;              // need the machine to free our memory
 	UINT8 **                m_baseptr;              // pointer to our base pointer in the global array
 	UINT16                  m_index;                // array index for this handler
@@ -630,8 +628,7 @@ class memory_share
 public:
 	// construction/destruction
 	memory_share(UINT8 width, size_t bytes, endianness_t endianness, void *ptr = nullptr)
-		: m_next(nullptr),
-			m_ptr(ptr),
+		: m_ptr(ptr),
 			m_bytes(bytes),
 			m_endianness(endianness),
 			m_bitwidth(width),
@@ -639,7 +636,6 @@ public:
 	{ }
 
 	// getters
-	memory_share *next() const { return m_next; }
 	void *ptr() const { return m_ptr; }
 	size_t bytes() const { return m_bytes; }
 	endianness_t endianness() const { return m_endianness; }
@@ -651,7 +647,6 @@ public:
 
 private:
 	// internal state
-	memory_share *          m_next;                 // next share in the list
 	void *                  m_ptr;                  // pointer to the memory backing the region
 	size_t                  m_bytes;                // size of the shared region in bytes
 	endianness_t            m_endianness;           // endianness of the memory
@@ -672,13 +667,12 @@ class memory_region
 	friend class simple_list<memory_region>;
 	friend resource_pool_object<memory_region>::~resource_pool_object();
 
+public:
 	// construction/destruction
 	memory_region(running_machine &machine, const char *name, UINT32 length, UINT8 width, endianness_t endian);
 
-public:
 	// getters
 	running_machine &machine() const { return m_machine; }
-	memory_region *next() const { return m_next; }
 	UINT8 *base() { return (m_buffer.size() > 0) ? &m_buffer[0] : nullptr; }
 	UINT8 *end() { return base() + m_buffer.size(); }
 	UINT32 bytes() const { return m_buffer.size(); }
@@ -698,7 +692,6 @@ public:
 private:
 	// internal data
 	running_machine &       m_machine;
-	memory_region *         m_next;
 	std::string             m_name;
 	dynamic_buffer          m_buffer;
 	endianness_t            m_endianness;
@@ -722,9 +715,9 @@ public:
 
 	// getters
 	running_machine &machine() const { return m_machine; }
-	const tagged_list<memory_bank> &banks() const { return m_banklist; }
-	const tagged_list<memory_region> &regions() const { return m_regionlist; }
-	const tagged_list<memory_share> &shares() const { return m_sharelist; }
+	const std::unordered_map<std::string, std::unique_ptr<memory_bank>> &banks() const { return m_banklist; }
+	const std::unordered_map<std::string, std::unique_ptr<memory_region>> &regions() const { return m_regionlist; }
+	const std::unordered_map<std::string, std::unique_ptr<memory_share>> &shares() const { return m_sharelist; }
 
 	// dump the internal memory tables to the given file
 	void dump(FILE *file);
@@ -750,12 +743,12 @@ private:
 	simple_list<address_space>  m_spacelist;            // list of address spaces
 	simple_list<memory_block>   m_blocklist;            // head of the list of memory blocks
 
-	tagged_list<memory_bank>    m_banklist;             // data gathered for each bank
+	std::unordered_map<std::string,std::unique_ptr<memory_bank>>    m_banklist;             // data gathered for each bank
 	UINT16                      m_banknext;             // next bank to allocate
 
-	tagged_list<memory_share>   m_sharelist;            // map for share lookups
+	std::unordered_map<std::string, std::unique_ptr<memory_share>>   m_sharelist;            // map for share lookups
 
-	tagged_list<memory_region>  m_regionlist;           // list of memory regions
+	std::unordered_map<std::string, std::unique_ptr<memory_region>>  m_regionlist;           // list of memory regions
 };
 
 

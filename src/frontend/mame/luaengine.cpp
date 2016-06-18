@@ -568,8 +568,8 @@ luabridge::LuaRef lua_engine::l_memory_get_banks(const memory_manager *m)
 	lua_State *L = luaThis->m_lua_state;
 	luabridge::LuaRef table = luabridge::LuaRef::newTable(L);
 
-	for (memory_bank &bank : mm->banks()) {
-		table[bank.tag()] = &bank;
+	for (auto &bank : mm->banks()) {
+		table[bank.second->tag()] = bank.second.get();
 	}
 
 	return table;
@@ -586,8 +586,8 @@ luabridge::LuaRef lua_engine::l_memory_get_regions(const memory_manager *m)
 	lua_State *L = luaThis->m_lua_state;
 	luabridge::LuaRef table = luabridge::LuaRef::newTable(L);
 
-	for (memory_region &region: mm->regions()) {
-		table[region.name()] = &region;
+	for (auto &region: mm->regions()) {
+		table[region.second->name()] = &region;
 	}
 
 	return table;
