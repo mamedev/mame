@@ -147,16 +147,14 @@ public:
 	{
 	public:
 		// construction
-		direct_range()
-			: m_next(nullptr),
-				m_bytestart(0),
-				m_byteend(~0) { }
-
-		// getters
-		direct_range *next() const { return m_next; }
+		direct_range(): m_bytestart(0),m_byteend(~0) { }
+		
+		inline bool operator==(direct_range val) noexcept
+		{	// return true if _Left and _Right identify the same thread
+			return (m_bytestart == val.m_bytestart) && (m_byteend == val.m_byteend);
+		}
 
 		// internal state
-		direct_range *          m_next;                 // pointer to the next range in the list
 		offs_t                  m_bytestart;            // starting byte offset of the range
 		offs_t                  m_byteend;              // ending byte offset of the range
 	};
@@ -200,8 +198,8 @@ private:
 	offs_t                      m_bytestart;            // minimum valid byte address
 	offs_t                      m_byteend;              // maximum valid byte address
 	UINT16                      m_entry;                // live entry
-	simple_list<direct_range>   m_rangelist[TOTAL_MEMORY_BANKS];  // list of ranges for each entry
-	simple_list<direct_range>   m_freerangelist;        // list of recycled range entries
+	std::list<direct_range>     m_rangelist[TOTAL_MEMORY_BANKS];  // list of ranges for each entry
+	std::list<direct_range>     m_freerangelist;        // list of recycled range entries
 	direct_update_delegate      m_directupdate;         // fast direct-access update callback
 };
 
@@ -258,20 +256,17 @@ class address_space
 	friend class address_table_write;
 	friend class address_table_setoffset;
 	friend class direct_read_data;
-	friend class simple_list<address_space>;
-	friend resource_pool_object<address_space>::~resource_pool_object();
 
 protected:
 	// construction/destruction
 	address_space(memory_manager &manager, device_memory_interface &memory, address_spacenum spacenum, bool large);
-	virtual ~address_space();
 
 public:
+	virtual ~address_space();
 	// public allocator
-	static address_space &allocate(memory_manager &manager, const address_space_config &config, device_memory_interface &memory, address_spacenum spacenum);
+	static void allocate(std::vector<std::unique_ptr<address_space>> &space_list, memory_manager &manager, const address_space_config &config, device_memory_interface &memory, address_spacenum spacenum);
 
 	// getters
-	address_space *next() const { return m_next; }
 	memory_manager &manager() const { return m_manager; }
 	device_t &device() const { return m_device; }
 	running_machine &machine() const { return m_machine; }
@@ -459,7 +454,6 @@ private:
 
 protected:
 	// private state
-	address_space *         m_next;             // next address space in the global list
 	const address_space_config &m_config;       // configuration of this space
 	device_t &              m_device;           // reference to the owning device
 	std::unique_ptr<address_map> m_map;            // original memory map
@@ -489,9 +483,6 @@ class memory_block
 {
 	DISABLE_COPYING(memory_block);
 
-	friend class simple_list<memory_block>;
-	friend resource_pool_object<memory_block>::~resource_pool_object();
-
 public:
 	// construction/destruction
 	memory_block(address_space &space, offs_t bytestart, offs_t byteend, void *memory = nullptr);
@@ -499,7 +490,6 @@ public:
 
 	// getters
 	running_machine &machine() const { return m_machine; }
-	memory_block *next() const { return m_next; }
 	offs_t bytestart() const { return m_bytestart; }
 	offs_t byteend() const { return m_byteend; }
 	UINT8 *data() const { return m_data; }
@@ -512,7 +502,6 @@ public:
 
 private:
 	// internal state
-	memory_block *          m_next;                 // next memory block in the list
 	running_machine &       m_machine;              // need the machine to free our memory
 	address_space &         m_space;                // which address space are we associated with?
 	offs_t                  m_bytestart, m_byteend; // byte-normalized start/end for verifying a match
@@ -526,24 +515,16 @@ private:
 // a memory bank is a global pointer to memory that can be shared across devices and changed dynamically
 class memory_bank
 {
-	friend class simple_list<memory_bank>;
-	friend resource_pool_object<memory_bank>::~resource_pool_object();
-
 	// a bank reference is an entry in a list of address spaces that reference a given bank
 	class bank_reference
 	{
-		friend class simple_list<bank_reference>;
-		friend resource_pool_object<bank_reference>::~resource_pool_object();
-
 	public:
 		// construction/destruction
 		bank_reference(address_space &space, read_or_write readorwrite)
-			: m_next(nullptr),
-				m_space(space),
-				m_readorwrite(readorwrite) { }
+			: m_space(space),
+			  m_readorwrite(readorwrite) { }
 
 		// getters
-		bank_reference *next() const { return m_next; }
 		address_space &space() const { return m_space; }
 
 		// does this reference match the space+read/write combination?
@@ -554,7 +535,6 @@ class memory_bank
 
 	private:
 		// internal state
-		bank_reference *        m_next;             // link to the next reference
 		address_space &         m_space;            // address space that references us
 		read_or_write           m_readorwrite;      // used for read or write?
 	};
@@ -614,7 +594,7 @@ private:
 	std::vector<bank_entry> m_entry;                // array of entries (dynamically allocated)
 	std::string             m_name;                 // friendly name for this bank
 	std::string             m_tag;                  // tag for this bank
-	simple_list<bank_reference> m_reflist;          // linked list of address spaces referencing this bank
+	std::vector<std::unique_ptr<bank_reference>> m_reflist;          // linked list of address spaces referencing this bank
 };
 
 
@@ -623,8 +603,6 @@ private:
 // a memory share contains information about shared memory region
 class memory_share
 {
-	friend class simple_list<memory_share>;
-
 public:
 	// construction/destruction
 	memory_share(UINT8 width, size_t bytes, endianness_t endianness, void *ptr = nullptr)
@@ -664,9 +642,6 @@ class memory_region
 	DISABLE_COPYING(memory_region);
 
 	friend class memory_manager;
-	friend class simple_list<memory_region>;
-	friend resource_pool_object<memory_region>::~resource_pool_object();
-
 public:
 	// construction/destruction
 	memory_region(running_machine &machine, const char *name, UINT32 length, UINT8 width, endianness_t endian);
@@ -707,7 +682,7 @@ private:
 class memory_manager
 {
 	friend class address_space;
-
+	friend memory_region::memory_region(running_machine &machine, const char *name, UINT32 length, UINT8 width, endianness_t endian);
 public:
 	// construction/destruction
 	memory_manager(running_machine &machine);
@@ -740,8 +715,8 @@ private:
 
 	UINT8 *                     m_bank_ptr[TOTAL_MEMORY_BANKS];  // array of bank pointers
 
-	simple_list<address_space>  m_spacelist;            // list of address spaces
-	simple_list<memory_block>   m_blocklist;            // head of the list of memory blocks
+	std::vector<std::unique_ptr<address_space>>  m_spacelist;            // list of address spaces
+	std::vector<std::unique_ptr<memory_block>>   m_blocklist;            // head of the list of memory blocks
 
 	std::unordered_map<std::string,std::unique_ptr<memory_bank>>    m_banklist;             // data gathered for each bank
 	UINT16                      m_banknext;             // next bank to allocate

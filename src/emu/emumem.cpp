@@ -1568,30 +1568,30 @@ void memory_manager::initialize()
 			// if there is a configuration for this space, we need an address space
 			const address_space_config *spaceconfig = memory.space_config(spacenum);
 			if (spaceconfig != nullptr)
-				m_spacelist.append(address_space::allocate(*this, *spaceconfig, memory, spacenum));
+				address_space::allocate(m_spacelist,*this, *spaceconfig, memory, spacenum);
 		}
 
 	// construct and preprocess the address_map for each space
-	for (address_space &space : m_spacelist)
-		space.prepare_map();
+	for (auto &space : m_spacelist)
+		space->prepare_map();
 
 	// create the handlers from the resulting address maps
-	for (address_space &space : m_spacelist)
-		space.populate_from_map();
+	for (auto &space : m_spacelist)
+		space->populate_from_map();
 
 	// allocate memory needed to back each address space
-	for (address_space &space : m_spacelist)
-		space.allocate_memory();
+	for (auto &space : m_spacelist)
+		space->allocate_memory();
 
 	// find all the allocated pointers
-	for (address_space &space : m_spacelist)
-		space.locate_memory();
+	for (auto &space : m_spacelist)
+		space->locate_memory();
 
 	// disable logging of unmapped access when no one receives it
-	for (address_space &space : m_spacelist)
+	for (auto &space : m_spacelist)
 	{
 		if (!machine().options().log() && !machine().options().oslog() && !(machine().debug_flags & DEBUG_FLAG_ENABLED))
-			space.set_log_unmap(false);
+			space->set_log_unmap(false);
 	}
 
 	// register a callback to reset banks when reloading state
@@ -1617,19 +1617,19 @@ void memory_manager::dump(FILE *file)
 		return;
 
 	// loop over address spaces
-	for (address_space &space : m_spacelist)
+	for (auto &space : m_spacelist)
 	{
 		fprintf(file, "\n\n"
 						"====================================================\n"
 						"Device '%s' %s address space read handler dump\n"
-						"====================================================\n", space.device().tag(), space.name());
-		space.dump_map(file, ROW_READ);
+						"====================================================\n", space->device().tag(), space->name());
+		space->dump_map(file, ROW_READ);
 
 		fprintf(file, "\n\n"
 						"====================================================\n"
 						"Device '%s' %s address space write handler dump\n"
-						"====================================================\n", space.device().tag(), space.name());
-		space.dump_map(file, ROW_WRITE);
+						"====================================================\n", space->device().tag(), space->name());
+		space->dump_map(file, ROW_WRITE);
 	}
 }
 
@@ -1721,8 +1721,7 @@ void memory_manager::bank_reattach()
 //-------------------------------------------------
 
 address_space::address_space(memory_manager &manager, device_memory_interface &memory, address_spacenum spacenum, bool large)
-	: m_next(nullptr),
-		m_config(*memory.space_config(spacenum)),
+	: m_config(*memory.space_config(spacenum)),
 		m_device(memory.device()),
 		m_addrmask(0xffffffffUL >> (32 - m_config.m_addrbus_width)),
 		m_bytemask(address_to_byte_end(m_addrmask)),
@@ -1757,7 +1756,7 @@ address_space::~address_space()
 //  allocate - static smart allocator of subtypes
 //-------------------------------------------------
 
-address_space &address_space::allocate(memory_manager &manager, const address_space_config &config, device_memory_interface &memory, address_spacenum spacenum)
+void address_space::allocate(std::vector<std::unique_ptr<address_space>> &space_list,memory_manager &manager, const address_space_config &config, device_memory_interface &memory, address_spacenum spacenum)
 {
 	// allocate one of the appropriate type
 	bool large = (config.addr2byte_end(0xffffffffUL >> (32 - config.m_addrbus_width)) >= (1 << 18));
@@ -1767,68 +1766,73 @@ address_space &address_space::allocate(memory_manager &manager, const address_sp
 		case 8:
 			if (config.endianness() == ENDIANNESS_LITTLE)
 			{
-				if (large)
-					return *global_alloc(address_space_8le_large(manager, memory, spacenum));
+				if (large) 
+					space_list.push_back(std::make_unique<address_space_8le_large>(manager, memory, spacenum));
 				else
-					return *global_alloc(address_space_8le_small(manager, memory, spacenum));
+					space_list.push_back(std::make_unique<address_space_8le_small>(manager, memory, spacenum));
 			}
 			else
 			{
-				if (large)
-					return *global_alloc(address_space_8be_large(manager, memory, spacenum));
+				if (large) 
+					space_list.push_back(std::make_unique<address_space_8be_large>(manager, memory, spacenum));
 				else
-					return *global_alloc(address_space_8be_small(manager, memory, spacenum));
+					space_list.push_back(std::make_unique<address_space_8be_small>(manager, memory, spacenum));
 			}
+			break;
 
 		case 16:
 			if (config.endianness() == ENDIANNESS_LITTLE)
 			{
-				if (large)
-					return *global_alloc(address_space_16le_large(manager, memory, spacenum));
+				if (large) 
+					space_list.push_back(std::make_unique<address_space_16le_large>(manager, memory, spacenum));
 				else
-					return *global_alloc(address_space_16le_small(manager, memory, spacenum));
+					space_list.push_back(std::make_unique<address_space_16le_small>(manager, memory, spacenum));
 			}
 			else
 			{
 				if (large)
-					return *global_alloc(address_space_16be_large(manager, memory, spacenum));
+					space_list.push_back(std::make_unique<address_space_16be_large>(manager, memory, spacenum));
 				else
-					return *global_alloc(address_space_16be_small(manager, memory, spacenum));
+					space_list.push_back(std::make_unique<address_space_16be_small>(manager, memory, spacenum));
 			}
+			break;
 
 		case 32:
 			if (config.endianness() == ENDIANNESS_LITTLE)
 			{
 				if (large)
-					return *global_alloc(address_space_32le_large(manager, memory, spacenum));
+					space_list.push_back(std::make_unique<address_space_32le_large>(manager, memory, spacenum));
 				else
-					return *global_alloc(address_space_32le_small(manager, memory, spacenum));
+					space_list.push_back(std::make_unique<address_space_32le_small>(manager, memory, spacenum));
 			}
 			else
 			{
 				if (large)
-					return *global_alloc(address_space_32be_large(manager, memory, spacenum));
+					space_list.push_back(std::make_unique<address_space_32be_large>(manager, memory, spacenum));
 				else
-					return *global_alloc(address_space_32be_small(manager, memory, spacenum));
+					space_list.push_back(std::make_unique<address_space_32be_small>(manager, memory, spacenum));
 			}
+			break;
 
 		case 64:
 			if (config.endianness() == ENDIANNESS_LITTLE)
 			{
 				if (large)
-					return *global_alloc(address_space_64le_large(manager, memory, spacenum));
+					space_list.push_back(std::make_unique<address_space_64le_large>(manager, memory, spacenum));
 				else
-					return *global_alloc(address_space_64le_small(manager, memory, spacenum));
+					space_list.push_back(std::make_unique<address_space_64le_small>(manager, memory, spacenum));
 			}
 			else
 			{
 				if (large)
-					return *global_alloc(address_space_64be_large(manager, memory, spacenum));
+					space_list.push_back(std::make_unique<address_space_64be_large>(manager, memory, spacenum));
 				else
-					return *global_alloc(address_space_64be_small(manager, memory, spacenum));
+					space_list.push_back(std::make_unique<address_space_64be_small>(manager, memory, spacenum));
 			}
-	}
-	throw emu_fatalerror("Invalid width %d specified for address_space::allocate", config.data_width());
+			break;
+		default:
+			throw emu_fatalerror("Invalid width %d specified for address_space::allocate", config.data_width());
+	}	
 }
 
 
@@ -2193,20 +2197,20 @@ void address_space::populate_map_entry_setoffset(const address_map_entry &entry)
 
 void address_space::allocate_memory()
 {
-	simple_list<memory_block> &blocklist = manager().m_blocklist;
+	auto &blocklist = manager().m_blocklist;
 
 	// make a first pass over the memory map and track blocks with hardcoded pointers
 	// we do this to make sure they are found by space_find_backing_memory first
-	memory_block *prev_memblock_tail = blocklist.last();
+	int tail = blocklist.size();
 	for (address_map_entry &entry : m_map->m_entrylist)
 		if (entry.m_memory != nullptr)
-			blocklist.append(*global_alloc(memory_block(*this, entry.m_bytestart, entry.m_byteend, entry.m_memory)));
+			blocklist.push_back(std::make_unique<memory_block>(*this, entry.m_bytestart, entry.m_byteend, entry.m_memory));
 
 	// loop over all blocks just allocated and assign pointers from them
 	address_map_entry *unassigned = nullptr;
-	memory_block *first_new_block = (prev_memblock_tail != nullptr) ? prev_memblock_tail->next() : blocklist.first();
-	for (memory_block *memblock = first_new_block; memblock != nullptr; memblock = memblock->next())
-		unassigned = block_assign_intersecting(memblock->bytestart(), memblock->byteend(), memblock->data());
+	
+	for (auto memblock = blocklist.begin() + tail; memblock != blocklist.end(); ++memblock)
+		unassigned = block_assign_intersecting(memblock->get()->bytestart(), memblock->get()->byteend(), memblock->get()->data());
 
 	// if we don't have an unassigned pointer yet, try to find one
 	if (unassigned == nullptr)
@@ -2247,10 +2251,11 @@ void address_space::allocate_memory()
 		// we now have a block to allocate; do it
 		offs_t curbytestart = curblockstart * MEMORY_BLOCK_CHUNK;
 		offs_t curbyteend = curblockend * MEMORY_BLOCK_CHUNK + (MEMORY_BLOCK_CHUNK - 1);
-		memory_block &block = blocklist.append(*global_alloc(memory_block(*this, curbytestart, curbyteend)));
-
+		auto block = std::make_unique<memory_block>(*this, curbytestart, curbyteend);
+		
 		// assign memory that intersected the new block
-		unassigned = block_assign_intersecting(curbytestart, curbyteend, block.data());
+		unassigned = block_assign_intersecting(curbytestart, curbyteend, block.get()->data());
+		blocklist.push_back(std::move(block));
 	}
 }
 
@@ -2572,8 +2577,9 @@ void address_space::install_ram_generic(offs_t addrstart, offs_t addrend, offs_t
 		{
 			if (machine().phase() >= MACHINE_PHASE_RESET)
 				fatalerror("Attempted to call install_ram_generic() after initialization time without a baseptr!\n");
-			memory_block &block = manager().m_blocklist.append(*global_alloc(memory_block(*this, address_to_byte(addrstart), address_to_byte_end(addrend))));
-			bank.set_base(block.data());
+			auto block = std::make_unique<memory_block>(*this, address_to_byte(addrstart), address_to_byte_end(addrend));			
+			bank.set_base(block.get()->data());
+			manager().m_blocklist.push_back(std::move(block));
 		}
 	}
 
@@ -2601,8 +2607,9 @@ void address_space::install_ram_generic(offs_t addrstart, offs_t addrend, offs_t
 		{
 			if (machine().phase() >= MACHINE_PHASE_RESET)
 				fatalerror("Attempted to call install_ram_generic() after initialization time without a baseptr!\n");
-			memory_block &block = manager().m_blocklist.append(*global_alloc(memory_block(*this, address_to_byte(addrstart), address_to_byte_end(addrend))));
-			bank.set_base(block.data());
+			auto block = std::make_unique<memory_block>(*this, address_to_byte(addrstart), address_to_byte_end(addrend));
+			bank.set_base(block.get()->data());
+			manager().m_blocklist.push_back(std::move(block));
 		}
 	}
 }
@@ -2781,11 +2788,11 @@ void *address_space::find_backing_memory(offs_t addrstart, offs_t addrend)
 	}
 
 	// if not found there, look in the allocated blocks
-	for (memory_block &block : manager().m_blocklist)
-		if (block.contains(*this, bytestart, byteend))
+	for (auto &block : manager().m_blocklist)
+		if (block->contains(*this, bytestart, byteend))
 		{
-			VPRINTF(("found in allocated memory block %08X-%08X [%p]\n", block.bytestart(), block.byteend(), block.data() + (bytestart - block.bytestart())));
-			return block.data() + bytestart - block.bytestart();
+			VPRINTF(("found in allocated memory block %08X-%08X [%p]\n", block->bytestart(), block->byteend(), block->data() + (bytestart - block->bytestart())));
+			return block->data() + bytestart - block->bytestart();
 		}
 
 	VPRINTF(("did not find\n"));
@@ -3953,22 +3960,23 @@ direct_read_data::direct_range *direct_read_data::find_range(offs_t byteaddress,
 	entry = m_space.read().lookup_live_nowp(byteaddress);
 
 	// scan our table
-	for (direct_range &range : m_rangelist[entry])
+	for (auto &range : m_rangelist[entry])
 		if (byteaddress >= range.m_bytestart && byteaddress <= range.m_byteend)
 			return &range;
 
 	// didn't find out; allocate a new one
-	direct_range *range = m_freerangelist.first();
-	if (range != nullptr)
-		m_freerangelist.detach(*range);
-	else
-		range = global_alloc(direct_range);
+	direct_range range;
+	if (m_freerangelist.size() > 0) 
+	{
+		range = m_freerangelist.front();
+		m_freerangelist.pop_front();
+	}
 
 	// fill in the range
-	m_space.read().derive_range(byteaddress, range->m_bytestart, range->m_byteend);
-	m_rangelist[entry].prepend(*range);
+	m_space.read().derive_range(byteaddress, range.m_bytestart, range.m_byteend);
+	m_rangelist[entry].push_front(range);
 
-	return range;
+	return &m_rangelist[entry].front();
 }
 
 
@@ -3983,16 +3991,13 @@ void direct_read_data::remove_intersecting_ranges(offs_t bytestart, offs_t bytee
 	for (auto & elem : m_rangelist)
 	{
 		// loop over all ranges in this entry's list
-		direct_range *nextrange;
-		for (direct_range *range = elem.first(); range != nullptr; range = nextrange)
+		for (std::list<direct_range>::iterator range = elem.begin(); range!=elem.end();++range)
 		{
-			nextrange = range->next();
-
 			// if we intersect, remove and add to the free range list
 			if (bytestart <= range->m_byteend && byteend >= range->m_bytestart)
 			{
-				elem.detach(*range);
-				m_freerangelist.prepend(*range);
+				m_freerangelist.push_front(*range);
+				elem.erase(range);
 			}
 		}
 	}
@@ -4037,8 +4042,7 @@ void direct_read_data::explicit_configure(offs_t bytestart, offs_t byteend, offs
 //-------------------------------------------------
 
 memory_block::memory_block(address_space &space, offs_t bytestart, offs_t byteend, void *memory)
-	: m_next(nullptr),
-		m_machine(space.machine()),
+	: m_machine(space.machine()),
 		m_space(space),
 		m_bytestart(bytestart),
 		m_byteend(byteend),
@@ -4137,8 +4141,8 @@ memory_bank::~memory_bank()
 
 bool memory_bank::references_space(const address_space &space, read_or_write readorwrite) const
 {
-	for (bank_reference &ref : m_reflist)
-		if (ref.matches(space, readorwrite))
+	for (auto &ref : m_reflist)
+		if (ref->matches(space, readorwrite))
 			return true;
 	return false;
 }
@@ -4154,7 +4158,7 @@ void memory_bank::add_reference(address_space &space, read_or_write readorwrite)
 	// if we already have a reference, skip it
 	if (references_space(space, readorwrite))
 		return;
-	m_reflist.append(*global_alloc(bank_reference(space, readorwrite)));
+	m_reflist.push_back(std::make_unique<bank_reference>(space, readorwrite));
 }
 
 
@@ -4166,8 +4170,8 @@ void memory_bank::add_reference(address_space &space, read_or_write readorwrite)
 void memory_bank::invalidate_references()
 {
 	// invalidate all the direct references to any referenced address spaces
-	for (bank_reference &ref : m_reflist)
-		ref.space().direct().force_update();
+	for (auto &ref : m_reflist)
+		ref->space().direct().force_update();
 }
 
 
