@@ -24,6 +24,7 @@
 #include <mutex>
 #include <thread>
 #include <queue>
+#include <chrono>
 
 #undef interface
 
@@ -278,6 +279,9 @@ int sound_xaudio2::init(osd_options const &options)
 {
 	HRESULT result;
 	WAVEFORMATEX format = {0};
+	auto init_start = std::chrono::system_clock::now();
+	std::chrono::milliseconds init_time;
+
 	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
 	// Make sure our XAudio2Create entrypoint is bound
@@ -315,7 +319,8 @@ int sound_xaudio2::init(osd_options const &options)
 	// Start the thread listening
 	m_audioThread = std::thread([](sound_xaudio2* self) { self->process_audio(); }, this);
 
-	osd_printf_verbose("Sound: XAudio2 initialized\n");
+	init_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - init_start);
+	osd_printf_verbose("Sound: XAudio2 initialized. %d ms.\n", static_cast<int>(init_time.count()));
 
 	m_initialized = TRUE;
 	return 0;
