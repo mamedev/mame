@@ -161,6 +161,11 @@ void mb86901_device::device_start()
 	save_item(NAME(m_ps));
 	save_item(NAME(m_et));
 	save_item(NAME(m_cwp));
+	save_item(NAME(m_insn_asi));
+	save_item(NAME(m_data_asi));
+	save_item(NAME(m_asi));
+	save_item(NAME(m_queued_tt));
+	save_item(NAME(m_queued_priority));
 
 	// set our instruction counter
 	m_icountptr = &m_icount;

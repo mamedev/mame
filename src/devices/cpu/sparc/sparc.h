@@ -111,7 +111,6 @@ protected:
 	UINT8 m_trap_priorities[256];
 	UINT8 m_queued_tt;
 	UINT8 m_queued_priority;
-	UINT32 m_nextnpc;
 	int m_icount;
 
 	// debugger helpers
