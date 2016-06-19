@@ -1686,7 +1686,7 @@ void hp_taco_device::call_unload()
 		set_tape_present(false);
 }
 
-int hp_taco_device::call_display(std::string& s)
+int hp_taco_device::call_display_taco(std::string& s)
 {
 	// Mostly lifted from cassette_image_device::call_display ;)
 
