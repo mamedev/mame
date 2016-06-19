@@ -476,6 +476,8 @@ READ8_MEMBER(scc8530_t::reg_r)
 
 UINT8 scc8530_t::read_reg(int offset)
 {
+	UINT8 result = 0;
+
 	switch(offset)
 	{
 		case 0:	/* Channel B (Printer Port) Control */
@@ -486,7 +488,7 @@ UINT8 scc8530_t::read_reg(int offset)
 			else
 				reg = 0;
 
-			result = (offset == 0) ? getbreg(); : getareg()
+			result = (offset == 0) ? getbreg() : getareg();
 			break;
 
 		case 2:	/* Channel B (Printer Port) Data */
@@ -518,11 +520,11 @@ WRITE8_MEMBER( scc8530_t::reg_w )
 
 void scc8530_t::write_reg(int offset, UINT8 data)
 {
-	offset & 3;
+	//offset & 3;
 
 //  printf(" mode %d data %x offset %d  \n", mode, data, offset);
 
-	Chan *pChan;
+	//Chan *pChan;
 	switch(offset)
 	{
 		case 0:	/* Channel B (Printer Port) Control */
