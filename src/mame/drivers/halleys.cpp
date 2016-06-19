@@ -1434,16 +1434,16 @@ void halleys_state::copy_fixed_2b(bitmap_ind16 &bitmap, UINT16 *source)
 			bx = esi[ecx+1];
 
 			if ((ax && !(ax & SP_2BACK)) || !edi[ecx + 0]) edi[ecx + 0] = ax; ax = esi[ecx + 2];
-			if ((ax && !(bx & SP_2BACK)) || !edi[ecx + 1]) edi[ecx + 1] = bx; bx = esi[ecx + 3];
+			if ((bx && !(bx & SP_2BACK)) || !edi[ecx + 1]) edi[ecx + 1] = bx; bx = esi[ecx + 3];
 
 			if ((ax && !(ax & SP_2BACK)) || !edi[ecx + 2]) edi[ecx + 2] = ax; ax = esi[ecx + 4];
-			if ((ax && !(bx & SP_2BACK)) || !edi[ecx + 3]) edi[ecx + 3] = bx; bx = esi[ecx + 5];
+			if ((bx && !(bx & SP_2BACK)) || !edi[ecx + 3]) edi[ecx + 3] = bx; bx = esi[ecx + 5];
 
 			if ((ax && !(ax & SP_2BACK)) || !edi[ecx + 4]) edi[ecx + 4] = ax; ax = esi[ecx + 6];
-			if ((ax && !(bx & SP_2BACK)) || !edi[ecx + 5]) edi[ecx + 5] = bx; bx = esi[ecx + 7];
+			if ((bx && !(bx & SP_2BACK)) || !edi[ecx + 5]) edi[ecx + 5] = bx; bx = esi[ecx + 7];
 
 			if ((ax && !(ax & SP_2BACK)) || !edi[ecx + 6]) edi[ecx + 6] = ax; 
-			if ((ax && !(bx & SP_2BACK)) || !edi[ecx + 7]) edi[ecx + 7] = bx; 
+			if ((bx && !(bx & SP_2BACK)) || !edi[ecx + 7]) edi[ecx + 7] = bx; 
 		}	while (ecx += 8);
 
 		ecx = -CLIP_W;
