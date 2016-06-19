@@ -834,7 +834,7 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 			(( address & 0xfff ) == 0xaaa && ( data & 0xff ) == 0x10 ) )
 		{
 			// chip erase
-			memset(&m_data[0], 0, m_size);
+			memset(&m_data[0], 0xff, m_size);
 
 			m_status = 1 << 3;
 			m_flash_mode = FM_ERASEAMD4;

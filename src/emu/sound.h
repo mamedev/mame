@@ -52,7 +52,6 @@ struct mixer_input
 
 class sound_stream
 {
-	friend class simple_list<sound_stream>;
 	friend class sound_manager;
 
 	typedef void (*stream_update_func)(device_t *device, sound_stream *stream, void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
@@ -94,10 +93,10 @@ class sound_stream
 	static const UINT32 FRAC_ONE                = 1 << FRAC_BITS;
 	static const UINT32 FRAC_MASK               = FRAC_ONE - 1;
 
+public:
 	// construction/destruction
 	sound_stream(device_t &device, int inputs, int outputs, int sample_rate, stream_update_delegate callback);
 
-public:
 	// getters
 	sound_stream *next() const { return m_next; }
 	device_t &device() const { return m_device; }
@@ -199,7 +198,7 @@ public:
 	// getters
 	running_machine &machine() const { return m_machine; }
 	int attenuation() const { return m_attenuation; }
-	const simple_list<sound_stream> &streams() const { return m_stream_list; }
+	const std::vector<std::unique_ptr<sound_stream>> &streams() const { return m_stream_list; }
 	attotime last_update() const { return m_last_update; }
 	attoseconds_t update_attoseconds() const { return m_update_attoseconds; }
 
@@ -245,7 +244,7 @@ private:
 	wav_file *          m_wavfile;
 
 	// streams data
-	simple_list<sound_stream> m_stream_list;    // list of streams
+	std::vector<std::unique_ptr<sound_stream>> m_stream_list;    // list of streams
 	attoseconds_t       m_update_attoseconds;   // attoseconds between global updates
 	attotime            m_last_update;          // last update time
 };

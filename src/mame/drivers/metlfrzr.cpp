@@ -458,4 +458,4 @@ DRIVER_INIT_MEMBER(metlfrzr_state, metlfrzr)
 
 
 
-GAME( 1989, metlfrzr,  0,    metlfrzr, metlfrzr, metlfrzr_state,  metlfrzr, ROT270, "Seibu", "Metal Freezer (Japan)", MACHINE_NO_COCKTAIL )
+GAME( 1989, metlfrzr,  0,    metlfrzr, metlfrzr, metlfrzr_state,  metlfrzr, ROT270, "Seibu Kaihatsu", "Metal Freezer (Japan)", MACHINE_NO_COCKTAIL )

@@ -557,6 +557,7 @@ MACHINE_CONFIG_FRAGMENT( dcs2_audio_denver )
 	MCFG_CPU_ADD("denver", ADSP2181, XTAL_33_333MHz)
 	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
 	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device,timer_enable_callback))   /* callback for timer fired */
+	MCFG_ADSP21XX_DMOVLAY_CB(WRITE32(dcs_audio_device, dmovlay_callback)) // callback for adsp 2181 dmovlay instruction
 	MCFG_CPU_PROGRAM_MAP(denver_program_map)
 	MCFG_CPU_DATA_MAP(denver_data_map)
 	MCFG_CPU_IO_MAP(denver_io_map)
@@ -688,6 +689,8 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::dcs_reset )
 
 		/* rev 4: reset the Denver ASIC */
 		case 4:
+			m_dmovlay_val = 0;
+			dmovlay_remap_memory();
 			denver_reset();
 			break;
 	}
@@ -752,6 +755,7 @@ void dcs_audio_device::dcs_register_state()
 	save_item(NAME(m_control_regs));
 
 	save_item(NAME(m_sounddata_bank));
+	save_item(NAME(m_dmovlay_val));
 
 	save_item(NAME(m_auto_ack));
 	save_item(NAME(m_latch_control));
@@ -786,6 +790,9 @@ void dcs_audio_device::dcs_register_state()
 
 	if (m_rev == 2)
 		machine().save().register_postload(save_prepost_delegate(FUNC(dcs_audio_device::sdrc_remap_memory), this));
+
+	if (m_rev == 4)
+		machine().save().register_postload(save_prepost_delegate(FUNC(dcs_audio_device::dmovlay_remap_memory), this));
 }
 
 
@@ -958,8 +965,12 @@ void dcs2_audio_device::device_start()
 	/* supports both RAM and ROM variants */
 	if (m_dram_in_mb != 0)
 	{
-		m_sounddata = auto_alloc_array(machine(), UINT16, m_dram_in_mb << (20-1));
-		save_pointer(NAME(m_sounddata), m_dram_in_mb << (20-1));
+		UINT32 ramSize = m_dram_in_mb << (20 - 1);
+		// Add one extra bank for internal ram in ADSP 2181
+		if (m_rev == 4)
+			ramSize += soundbank_words;
+		m_sounddata = auto_alloc_array(machine(), UINT16, ramSize);
+		save_pointer(NAME(m_sounddata), ramSize);
 		m_sounddata_words = (m_dram_in_mb << 20) / 2;
 	}
 	else
@@ -972,6 +983,7 @@ void dcs2_audio_device::device_start()
 	{
 		m_data_bank->configure_entries(0, m_sounddata_banks, m_sounddata, soundbank_words*2);
 	}
+
 
 	/* allocate memory for the SRAM */
 	m_sram = auto_alloc_array(machine(), UINT16, 0x8000*4/2);
@@ -1330,7 +1342,7 @@ WRITE16_MEMBER( dcs_audio_device::dsio_w )
 		/* offset 2 controls RAM pages */
 		case 2:
 			dsio.reg[2] = data;
-			m_data_bank->set_entry(DSIO_DM_PG % m_sounddata_banks);
+			dmovlay_remap_memory();
 			break;
 	}
 }
@@ -1388,7 +1400,7 @@ WRITE16_MEMBER( dcs_audio_device::denver_w )
 					m_dmadac[chan] = subdevice<dmadac_sound_device>(buffer);
 				}
 				dmadac_enable(&m_dmadac[0], m_channels, enable);
-				if (m_channels < 6)
+				if (m_channels <= 6)
 					dmadac_enable(&m_dmadac[m_channels], 6 - m_channels, FALSE);
 				recompute_sample_rate();
 			}
@@ -1399,7 +1411,6 @@ WRITE16_MEMBER( dcs_audio_device::denver_w )
 			dsio.reg[2] = data;
 			m_data_bank->set_entry(DENV_DM_PG % m_sounddata_banks);
 			break;
-
 		/* offset 3 controls FIFO reset */
 		case 3:
 			if (!m_fifo_reset_w.isnull())
@@ -1460,6 +1471,32 @@ READ32_MEMBER( dcs_audio_device::dsio_idma_data_r )
 	return result;
 }
 
+void dcs_audio_device::dmovlay_remap_memory()
+{
+	// Switch banks
+	// Internal ram is bank 0
+	int bankSel;
+	if (m_dmovlay_val == 0) {
+		bankSel = 0;
+		m_data_bank->set_entry(bankSel);
+	} else {
+		bankSel = 1 + (DSIO_DM_PG % m_sounddata_banks);
+		m_data_bank->set_entry(bankSel);
+	}
+	if (LOG_DCS_IO)
+		logerror("%s dmovlay_remap_memory: Switching data ram location bankSel = %i\n", machine().describe_context(), bankSel);
+}
+
+WRITE32_MEMBER(dcs_audio_device::dmovlay_callback)
+{
+	// Do some checking first
+	if (data < 0 || data > 1) {
+		logerror("dmovlay_callback: Error! dmovlay called with value = %X\n", data);
+	} else {
+		m_dmovlay_val = data;
+		dmovlay_remap_memory();
+	}
+}
 
 
 /***************************************************************************
@@ -1872,10 +1909,10 @@ WRITE16_MEMBER(dcs_audio_device:: adsp_control_w )
 	switch (offset)
 	{
 		case SYSCONTROL_REG:
-			/* bit 9 forces a reset */
-			if (data & 0x0200)
+			/* bit 9 forces a reset (not on 2181) */
+			if ((data & 0x0200) && !(m_rev == 3 || m_rev == 4))
 			{
-				logerror("%04X:Rebooting DCS due to SYSCONTROL write\n", space.device().safe_pc());
+				logerror("%04X:Rebooting DCS due to SYSCONTROL write = %04X\n", space.device().safe_pc(), data);
 				m_cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 				dcs_boot();
 				m_control_regs[SYSCONTROL_REG] = 0;
@@ -1950,9 +1987,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::dcs_irq )
 	{
 		int count = m_size / (2*(m_incs ? m_incs : 1));
 		// sf2049se was having overflow issues with fixed size of 0x400 buffer (m_size==0xb40, count=0x5a0).
-		//INT16 buffer[0x400];
-		std::unique_ptr<INT16[]> buffer;
-		buffer = std::make_unique<INT16[]>(count);
+		INT16 buffer[0x800];
 		int i;
 
 		for (i = 0; i < count; i++)
@@ -1962,7 +1997,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::dcs_irq )
 		}
 
 		if (m_channels)
-			dmadac_transfer(&m_dmadac[0], m_channels, 1, m_channels, count / m_channels, buffer.get());
+			dmadac_transfer(&m_dmadac[0], m_channels, 1, m_channels, count / m_channels, buffer);
 	}
 
 	/* check for wrapping */

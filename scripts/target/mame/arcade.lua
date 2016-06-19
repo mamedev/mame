@@ -332,6 +332,7 @@ VIDEOS["V9938"] = true
 --VIDEOS["VIC4567"] = true
 VIDEOS["VOODOO"] = true
 VIDEOS["VOODOO_PCI"] = true
+VIDEOS["ZEUS2"] = true
 
 --------------------------------------------------
 -- specify available machine cores

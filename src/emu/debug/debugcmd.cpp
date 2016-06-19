@@ -2332,7 +2332,9 @@ void debugger_commands::execute_dasm(int ref, int params, const char *param[])
 		return;
 	if (!validate_cpu_space_parameter((params > 4) ? param[4] : nullptr, AS_PROGRAM, space))
 		return;
-	if (!validate_cpu_space_parameter((params > 4) ? param[4] : nullptr, AS_DECRYPTED_OPCODES, decrypted_space))
+	if (space->device().memory().has_space(AS_DECRYPTED_OPCODES))
+		decrypted_space = &space->device().memory().space(AS_DECRYPTED_OPCODES);
+	else
 		decrypted_space = space;
 
 	/* determine the width of the bytes */
@@ -2520,7 +2522,9 @@ void debugger_commands::execute_history(int ref, int params, const char *param[]
 	address_space *space, *decrypted_space;
 	if (!validate_cpu_space_parameter((params > 0) ? param[0] : nullptr, AS_PROGRAM, space))
 		return;
-	if (!validate_cpu_space_parameter((params > 0) ? param[0] : nullptr, AS_DECRYPTED_OPCODES, decrypted_space))
+	if (space->device().memory().has_space(AS_DECRYPTED_OPCODES))
+		decrypted_space = &space->device().memory().space(AS_DECRYPTED_OPCODES);
+	else
 		decrypted_space = space;
 
 	UINT64 count = device_debug::HISTORY_SIZE;

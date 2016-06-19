@@ -1490,7 +1490,7 @@ int lua_engine::lua_screen::l_draw_text(lua_State *L)
 	// retrieve all parameters
 	int sc_width = sc->visible_area().width();
 	int sc_height = sc->visible_area().height();
-	int justify = JUSTIFY_LEFT;
+	auto justify = ui::text_layout::LEFT;
 	float y, x = 0;
 	if(lua_isnumber(L, 2))
 	{
@@ -1501,9 +1501,9 @@ int lua_engine::lua_screen::l_draw_text(lua_State *L)
 	{
 		std::string just_str = lua_tostring(L, 2);
 		if(just_str == "right")
-			justify = JUSTIFY_RIGHT;
+			justify = ui::text_layout::RIGHT;
 		else if(just_str == "center")
-			justify = JUSTIFY_CENTER;
+			justify = ui::text_layout::CENTER;
 		y = lua_tonumber(L, 3);
 	}
 	const char *msg = luaL_checkstring(L,4);
@@ -1516,7 +1516,7 @@ int lua_engine::lua_screen::l_draw_text(lua_State *L)
 	// draw the text
 	render_container &rc = sc->container();
 	mame_machine_manager::instance()->ui().draw_text_full(&rc, msg, x, y, (1.0f - x),
-						justify, WRAP_WORD, DRAW_NORMAL, textcolor,
+						justify, ui::text_layout::WORD, mame_ui_manager::NORMAL, textcolor,
 						bgcolor, nullptr, nullptr);
 	return 0;
 }

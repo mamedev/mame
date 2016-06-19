@@ -267,6 +267,11 @@ private:
 	UINT8 cop_read_byte(int address);
 	void cop_write_word(int address, UINT16 data);
 	void cop_write_byte(int address, UINT8 data);
+	
+	void dma_tilemap_buffer();
+	void dma_palette_buffer();
+	void dma_fill();
+	void dma_palette_brightness();
 };
 
 extern const device_type RAIDEN2COP;

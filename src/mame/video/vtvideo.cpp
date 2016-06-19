@@ -231,74 +231,36 @@ READ8_MEMBER(vt100_video_device::lba7_r)
 	return m_lba7;
 }
 
-
 // Also used by Rainbow-100 ************
 WRITE8_MEMBER(vt100_video_device::dc012_w)
 {
 	// Writes to [10C] and [0C] are treated differently
 	// - see 3.1.3.9.5 DC012 Programming Information (PC-100 spec)
-
-	// MHFU is disabled by writing 00 to port 010C.
-
-	// Code recognition is abysmal - sorry for that.
-	if (data == 0)
+	if ((offset & 0x100) && (data == 0) ) // MHFU is disabled by writing 00 to port 010C.
 	{
-		UINT8 *rom = machine().root_device().memregion("maincpu")->base();
-		if (rom != nullptr)
-		{
-			UINT32 PC = space.device().safe_pc();
-			if ((rom[ PC - 1] == 0xe6) &&
-				(rom[ PC    ] == 0x0c)
-				)
-			{
-				// OUT 0C,al  < DO NOTHING >
-			}
-			else
-			{
-				//UINT8 magic1= rom[PC - 1];
-				//printf("\n PC %05x - MHFU MAGIC -1 %02x\n", PC,  magic1);
-				//UINT8 magic2 = rom[PC - 2];
-				//printf("\n PC %05x - MHFU MAGIC -2 %02x\n", PC, magic2);
-				//if (VERBOSE)
-
-				//if(1  )
-				if ((rom[PC - 2] == 0x0C) &&
-					(rom[PC - 1] == 0x01)
-					)
-				{
-					if (MHFU_FLAG == true)
-						printf("MHFU  *** DISABLED *** %05x \n", PC);
-
-					MHFU_FLAG = false;
-					MHFU_counter = 0;
-				}
-			}
-
-		} // DATA == 0 ONLY ....
-
+		if (MHFU_FLAG == true)
+						printf("MHFU  *** DISABLED *** \n");
+		MHFU_FLAG = false;
+		MHFU_counter = 0; // ?
 	}
 	else
 	{
-		//if (VERBOSE)
 		if (MHFU_FLAG == false)
 			printf("MHFU  ___ENABLED___ %05x \n", space.device().safe_pc());
 
-		// RESET
 		MHFU_FLAG = true;
-		MHFU_counter = 0;
+		MHFU_counter = 0; 
 	}
 
 	if (!(data & 0x08))
 	{
 		if (!(data & 0x04))
 		{
-			m_scroll_latch_valid = false; // LSB is written first.
-			// set lower part scroll
-			m_scroll_latch = data & 0x03;
+			m_scroll_latch_valid = false; 
+			m_scroll_latch = data & 0x03; // LSB is written first. 
 		}
-		else
+		else // set MSB of scroll_latch
 		{
-			// set higher part scroll
 			m_scroll_latch = (m_scroll_latch & 0x03) | ((data & 0x03) << 2);
 			m_scroll_latch_valid = true;
 		}
@@ -883,16 +845,23 @@ int rainbow_video_device::MHFU(int ASK)
 		return MHFU_FLAG;
 
 	case -1:        // -1: increment IF ENABLED, return counter value (=> Rainbow.c)
-		if (MHFU_FLAG == true)
-			MHFU_counter++;
+		//if (MHFU_FLAG == true)
+			if (MHFU_counter < 255)
+				MHFU_counter++;
+
+	case -2:
 		return MHFU_counter;
+
+	case -250:          // -250 : RESET counter (NOTHING ELSE!)
+		MHFU_counter = 0;
+		return MHFU_FLAG;
 
 	case -100:          // -100 : RESET and ENABLE MHFU counter
 		MHFU_counter = 0;
-		if(1) //if (VERBOSE)
+		if(0) //if (VERBOSE)
 			printf("-100 MHFU  * reset and ENABLE * \n");
 
-		if(1) // if (VERBOSE)
+		if(0) // if (VERBOSE)
 		{
 			if (MHFU_FLAG == false)
 				printf("-100 MHFU  ___ENABLED___\n");
@@ -904,10 +873,10 @@ int rainbow_video_device::MHFU(int ASK)
 	case -200:          // -200 : RESET and DISABLE MHFU
 		MHFU_counter = 0;
 
-		if(1) //if (VERBOSE)
+		if(0) //if (VERBOSE)
 		{
 			if (MHFU_FLAG == true)
-				printf("MHFU  *** DISABLED *** \n");
+				printf("MHFU  *** DISABLED ***xxx \n");
 		}
 		MHFU_FLAG = false;
 

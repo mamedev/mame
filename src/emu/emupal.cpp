@@ -466,7 +466,7 @@ void palette_device::device_start()
 			for (int color = 0; color < m_indirect_entries; color++)
 			{
 				// alpha = 0 ensures change is detected the first time set_indirect_color() is called
-				m_indirect_colors[color] = rgb_t(0, 0, 0, 0);
+				m_indirect_colors[color] = rgb_t::transparent;
 			}
 
 			m_indirect_pens.resize(m_entries);

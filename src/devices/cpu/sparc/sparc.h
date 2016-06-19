@@ -9,11 +9,6 @@
 #ifndef __SPARC_H__
 #define __SPARC_H__
 
-#define AS_USER_INSN		AS_0
-#define AS_SUPER_INSN		AS_1
-#define AS_USER_DATA		AS_2
-#define AS_SUPER_DATA		AS_3
-
 class mb86901_device : public cpu_device
 {
 public:
@@ -42,7 +37,7 @@ public:
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	UINT8 fetch_asi() { return m_asi; }
+	UINT8 get_asi() { return m_asi; }
 	UINT32 pc() { return m_pc; }
 
 protected:
@@ -59,10 +54,7 @@ protected:
 	bool evaluate_condition(UINT32 op);
 
 	// address spaces
-	const address_space_config m_as8_config;
-	const address_space_config m_as9_config;
-	const address_space_config m_as10_config;
-	const address_space_config m_as11_config;
+	const address_space_config m_program_config;
 
 	// memory access
 	UINT32 read_byte(UINT8 asi, UINT32 address);
@@ -117,11 +109,7 @@ protected:
 	UINT32 m_dbgregs[24];
 
 	// address spaces
-	address_space *m_user_insn;
-	address_space *m_super_insn;
-	address_space *m_user_data;
-	address_space *m_super_data;
-	address_space *m_spaces[256];
+	address_space *m_program;
 
 	// processor configuration
 	static const int WINDOW_COUNT;

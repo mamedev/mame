@@ -91,9 +91,9 @@ int device_sound_interface::inputs() const
 {
 	// scan the list counting streams we own and summing their inputs
 	int inputs = 0;
-	for (sound_stream &stream : m_device.machine().sound().streams())
-		if (&stream.device() == &m_device)
-			inputs += stream.input_count();
+	for (auto &stream : m_device.machine().sound().streams())
+		if (&stream->device() == &m_device)
+			inputs += stream->input_count();
 	return inputs;
 }
 
@@ -107,9 +107,9 @@ int device_sound_interface::outputs() const
 {
 	// scan the list counting streams we own and summing their outputs
 	int outputs = 0;
-	for (sound_stream &stream : m_device.machine().sound().streams())
-		if (&stream.device() == &m_device)
-			outputs += stream.output_count();
+	for (auto &stream : m_device.machine().sound().streams())
+		if (&stream->device() == &m_device)
+			outputs += stream->output_count();
 	return outputs;
 }
 
@@ -125,15 +125,15 @@ sound_stream *device_sound_interface::input_to_stream_input(int inputnum, int &s
 	assert(inputnum >= 0);
 
 	// scan the list looking for streams owned by this device
-	for (sound_stream &stream : m_device.machine().sound().streams())
-		if (&stream.device() == &m_device)
+	for (auto &stream : m_device.machine().sound().streams())
+		if (&stream->device() == &m_device)
 		{
-			if (inputnum < stream.input_count())
+			if (inputnum < stream->input_count())
 			{
 				stream_inputnum = inputnum;
-				return &stream;
+				return stream.get();
 			}
-			inputnum -= stream.input_count();
+			inputnum -= stream->input_count();
 		}
 
 	// not found
@@ -152,15 +152,15 @@ sound_stream *device_sound_interface::output_to_stream_output(int outputnum, int
 	assert(outputnum >= 0);
 
 	// scan the list looking for streams owned by this device
-	for (sound_stream &stream : m_device.machine().sound().streams())
-		if (&stream.device() == &device())
+	for (auto &stream : m_device.machine().sound().streams())
+		if (&stream->device() == &device())
 		{
-			if (outputnum < stream.output_count())
+			if (outputnum < stream->output_count())
 			{
 				stream_outputnum = outputnum;
-				return &stream;
+				return stream.get();
 			}
-			outputnum -= stream.output_count();
+			outputnum -= stream->output_count();
 		}
 
 	// not found
@@ -192,10 +192,10 @@ void device_sound_interface::set_output_gain(int outputnum, float gain)
 	// handle ALL_OUTPUTS as a special case
 	if (outputnum == ALL_OUTPUTS)
 	{
-		for (sound_stream &stream : m_device.machine().sound().streams())
-			if (&stream.device() == &device())
-				for (int num = 0; num < stream.output_count(); num++)
-					stream.set_output_gain(num, gain);
+		for (auto &stream : m_device.machine().sound().streams())
+			if (&stream->device() == &device())
+				for (int num = 0; num < stream->output_count(); num++)
+					stream->set_output_gain(num, gain);
 	}
 
 	// look up the stream and stream output index
@@ -217,10 +217,10 @@ void device_sound_interface::set_output_gain(int outputnum, float gain)
 int device_sound_interface::inputnum_from_device(device_t &source_device, int outputnum) const
 {
 	int overall = 0;
-	for (sound_stream &stream : m_device.machine().sound().streams())
-		if (&stream.device() == &device())
-			for (int inputnum = 0; inputnum < stream.input_count(); inputnum++, overall++)
-				if (stream.input_source_device(inputnum) == &source_device && stream.input_source_outputnum(inputnum) == outputnum)
+	for (auto &stream : m_device.machine().sound().streams())
+		if (&stream->device() == &device())
+			for (int inputnum = 0; inputnum < stream->input_count(); inputnum++, overall++)
+				if (stream->input_source_device(inputnum) == &source_device && stream->input_source_outputnum(inputnum) == outputnum)
 					return overall;
 	return -1;
 }
@@ -342,9 +342,9 @@ void device_sound_interface::interface_post_start()
 void device_sound_interface::interface_pre_reset()
 {
 	// update all streams on this device prior to reset
-	for (sound_stream &stream : m_device.machine().sound().streams())
-		if (&stream.device() == &device())
-			stream.update();
+	for (auto &stream : m_device.machine().sound().streams())
+		if (&stream->device() == &device())
+			stream->update();
 }
 
 

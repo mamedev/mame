@@ -47,6 +47,8 @@ public:
 	DECLARE_WRITE32_MEMBER( dsio_idma_addr_w );
 	DECLARE_WRITE32_MEMBER( dsio_idma_data_w );
 	DECLARE_READ32_MEMBER( dsio_idma_data_r );
+	void dmovlay_remap_memory();
+	WRITE32_MEMBER(dmovlay_callback);
 
 	// non public
 	void dcs_boot();
@@ -201,6 +203,8 @@ protected:
 	UINT16 *m_polling_base;
 	UINT32 *m_internal_program_ram;
 	UINT32 *m_external_program_ram;
+
+	int m_dmovlay_val;
 
 	sdrc_state m_sdrc;
 	dsio_state m_dsio;
