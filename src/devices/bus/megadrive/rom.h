@@ -263,6 +263,18 @@ public:
 	virtual DECLARE_READ16_MEMBER(read) override;
 };
 
+// ======================> md_rom_cjmjclub_device
+
+class md_rom_cjmjclub_device : public md_std_rom_device
+{
+public:
+	// construction/destruction
+	md_rom_cjmjclub_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	// reading and writing
+	virtual DECLARE_READ16_MEMBER(read) override;
+};
+
 // ======================> md_rom_pokea_device
 
 class md_rom_pokea_device : public md_std_rom_device
@@ -585,6 +597,7 @@ extern const device_type MD_ROM_LION2;
 extern const device_type MD_ROM_LION3;
 extern const device_type MD_ROM_MCPIR;
 extern const device_type MD_ROM_MJLOV;
+extern const device_type MD_ROM_CJMJCLUB;
 extern const device_type MD_ROM_POKEA;
 extern const device_type MD_ROM_POKESTAD;
 extern const device_type MD_ROM_REALTEC;

@@ -41,6 +41,7 @@ const device_type MD_ROM_SMB2 = &device_creator<md_rom_smb2_device>;
 const device_type MD_ROM_SBUBL = &device_creator<md_rom_sbubl_device>;
 const device_type MD_ROM_RX3 = &device_creator<md_rom_rx3_device>;
 const device_type MD_ROM_MJLOV = &device_creator<md_rom_mjlov_device>;
+const device_type MD_ROM_CJMJCLUB = &device_creator<md_rom_cjmjclub_device>;
 const device_type MD_ROM_KOF98 = &device_creator<md_rom_kof98_device>;
 const device_type MD_ROM_KOF99 = &device_creator<md_rom_kof99_device>;
 const device_type MD_ROM_SOULB = &device_creator<md_rom_soulb_device>;
@@ -138,6 +139,11 @@ md_rom_rx3_device::md_rom_rx3_device(const machine_config &mconfig, const char *
 
 md_rom_mjlov_device::md_rom_mjlov_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_MJLOV, "MD Ma Jiang Qing Ren / Mahjong Lover", tag, owner, clock, "md_rom_mjlov", __FILE__)
+{
+}
+
+md_rom_cjmjclub_device::md_rom_cjmjclub_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: md_std_rom_device(mconfig, MD_ROM_CJMJCLUB, "MD Chaoji Majiang Club / Super Mahjong Club", tag, owner, clock, "md_rom_cjmjclub", __FILE__)
 {
 }
 
@@ -908,6 +914,23 @@ READ16_MEMBER(md_rom_mjlov_device::read)
 	if (offset == 0x400000/2)   return 0x9000;
 	if (offset == 0x401000/2)   return 0xd300;
 
+	// non-protection accesses
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
+		return 0xffff;
+}
+
+
+/*-------------------------------------------------
+ CHAOJI MAJIANG CLUB
+ -------------------------------------------------*/
+
+READ16_MEMBER(md_rom_cjmjclub_device::read)
+{
+	if (offset == 0x400000/2)   return 0x9000;
+	if (offset == 0x400002/2)   return 0xd300;
+	
 	// non-protection accesses
 	if (offset < 0x400000/2)
 		return m_rom[MD_ADDR(offset)];
