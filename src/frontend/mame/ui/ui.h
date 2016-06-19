@@ -236,6 +236,8 @@ public:
 	void draw_timecode_counter(render_container *container);
 	void draw_timecode_total(render_container *container);
 	void draw_profiler(render_container *container);
+	void start_save_state();
+	void start_load_state();
 
 	// print the game info string into a buffer
 	std::string &game_info_astring(std::string &str);
