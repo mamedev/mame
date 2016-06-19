@@ -4869,7 +4869,7 @@ GAME( 1991, rascot,   0,        sega_rascot,         rascot,   segaxbd_new_state
 
 // decrypted bootlegs
 
-GAME( 1987, thndrbldd, thndrbld,sega_xboard,  thndrbld, driver_device,     0,  ROT0,   "Sega", "Thunder Blade (upright) (bootleg of FD1094 317-0056 set)", 0 )
+GAME( 1987, thndrbldd, thndrbld,sega_xboard,  thndrbld, driver_device,     0,  ROT0,   "bootleg", "Thunder Blade (upright) (bootleg of FD1094 317-0056 set)", 0 )
 
 GAME( 1989, racherod, rachero,  sega_xboard,  rachero,  driver_device,     0,        ROT0,   "bootleg", "Racing Hero (bootleg of FD1094 317-0144 set)", 0 )
 

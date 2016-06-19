@@ -77,18 +77,28 @@ Game                                          Dongle Sticker    printed on PIC  
 2 Spicy                                       253-5508-0491     317-0491-COM   ^DVP-0027A
 After Burner Climax (EXPORT)                  253-5508-0440A   ^317-0440-COM    DVP-0009
 After Burner Climax CE                        ?                 ?               DVP-0031A
-Ami-Gyo                                       ?                 ?               ?
-Answer X Answer                               253-5508-0618J    317-0618-JPN    ?
+After Burner Climax SDX (rev A)               ?                 ?               DVP-0018A
+Ami-Gyo (rev C)                               ?                 ?               DVP-0007C
+Ami-Gyo                                       ?                 ?               DVP-0028
+Answer X Answer                               253-5508-0618J    317-0618-JPN    DVP-0025H ???
 Answer X Answer 1.1                           ?                 ?               ?
 Answer X Answer DX                            ?                 ?               ?
 Answer X Answer Premium                       ?                 ?               ?
+Answer X Answer 2                             ?                 ?               DVP-0067
+Atractive Deck Poker (rev C)                  ?                 ?               DVP-0033C
+Cloud Nine (rev E)                            ?                 ?               DVP-0034E
 Club Majesty Extend                           ?                 ?               ?
 Club Majesty Formal                           ?                 ?               ?
+Cosmic Challenge                              ?                 ?               DVP-0032
+Cosmic Challenge (rev C)                      ?                 ?               DVP-0032C
 Derby Owners Club 2008: Feel the Rush         ?                 ?               DVP-0047A
+Derby Owners Club 2008: Feel the Rush         ?                 ?               DVP-5006C
 Derby Owners Club 2008: Feel the Rush V2.0    ?                 ?               ?
+Derby Owners Club 2009: Ride For the Life     ?                 ?               DVP-5014
 Ghost Squad Evolution                         ?                 ?              ^DVP-0029A
 Harley Davidson: King of the Road             ?                 ?               ?
-Hummer Extreme                                253-5508-????    ^317-????-COM    ?
+Hummer                                        ?                 ?               DVP-0057B
+Hummer Extreme                                253-5508-????    ^317-????-COM    DVP-0079 ???
 Initial D Arcade Stage 4                      253-5508-0620     317-0620-COM    DVP-0019
 Initial D Arcade Stage 4 (rev A)              253-5508-0620     317-0620-COM    DVP-0019A
 Initial D Arcade Stage 4 (rev B)              253-5508-0620     317-0620-COM    DVP-0019B
@@ -99,34 +109,51 @@ Initial D4                                    253-5508-0486E    317-0486-COM    
 Initial D4 (rev B)                            253-5508-0486E    317-0486-COM    DVP-0030B
 Initial D4 (rev C)                            253-5508-0486E    317-0486-COM   ^DVP-0030C
 Initial D4 (rev D)                            253-5508-0486E    317-0486-COM   ^DVP-0030D
-Initial D Arcade Stage 5                      ?                 ?               ?
+Initial D Arcade Stage 5 (rev A)              ?                 ?               DVP-0070A
+Initial D Arcade Stage 5 EXP 2.0              ?                 ?               DVP-0075
+INFO STATION 2 (rev C)                        ?                 ?               DVP-0050C
 Let's Go Jungle (EXPORT)                      253-5508-0442     317-0442-COM    DVP-0011
-MJ4                                           ?                 ?               ?
+Let's Go Jungle Special (rev A)               ?                 ?               DVP-0036A
+MJ4 (rev F)                                   ?                 ?               DVP-0049F
+MJ4 Evolution                                 ?                 ?               DVP-0081
 OutRun 2 Special Tours (EXPORT)               253-5508-0452     317-0452-COM    ?
 OutRun 2 SP SDX                               ?                 ?               DVP-0015A
 Primeval Hunt                                 253-5508-0512     317-0512-COM   ^DVP-0048A
 R-Tuned: Ultimate Street Racing               ?                 ?               DVP-0060
 Rambo (EXPORT)                                253-5508-0540    ^317-0540-COM   ^DVP-0069
+SEGA Network Casino Club Ver. 2               ?                 ?               DVP-0053
+SEGA Network Casino Club Ver. 2 (rev B)       ?                 ?               DVP-0053B
 SEGA Network Taisen Mahjong MJ4 (rev A)       ?                 ?               DVP-0049A
 SEGA Network Taisen Mahjong MJ4 (rev F)       ?                 ?               DVP-0049F
 SEGA Network Taisen Mahjong MJ4 (rev G)       ?                 ?               DVP-0049G
 SEGA-Race TV (EXPORT)                         253-5508-0504    ^317-0504-COM   ^DVP-0044
+StarHorse 2: New Generation (rev J)           ?                 ?               DVP-0001J
+StarHorse 2: Second Fusion (rev E)            ?                 ?               DVP-0024E
+StarHorse 2: Third Evolution (rev G)          ?                 ?               DVP-0046G
+StarHorse 2: Third Evolution (rev D)          ?                 ?               DVP-0054D
 StarHorse 2: Fifth Expansion (rev D)          ?                 ?               DVP-0082D
 StarHorse 2: Fifth Expansion (rev E)          ?                 ?               DVP-0082E
 The House Of The Dead 4 (EXPORT) (rev A)      253-5508-0427    ^317-0427-COM   ^DVP-0003A
 The House Of The Dead 4 (EXPORT) (rev B)      ?                 ?               DVP-0003B
-The House Of The Dead EX (JAPAN)              253-5508-0550    ^317-0550-JPN    ?
-The House Of the Dead 4 Special               ?                 ?               ?
+The House Of The Dead EX (JAPAN)              253-5508-0550    ^317-0550-JPN    DVP-0063
+The House Of the Dead 4 Special (rev B)       ?                 ?               DVP-0010B
+Router Update [For VTF]                       ?                 ?               DVP-0026
 VBIOS Update                                  ?                 ?              ^DVP-0021B
 VBIOS Update [For VTF]                        ?                 ?               DVP-0023A
-Virtua Fighter 5 (EXPORT)                     253-5508-0438     317-0438-COM    DVP-0008E
+VBIOS Update [For VTF]                        ?                 ?               DVP-0023C
+Virtua Fighter 5                              ?                 ?               DVP-00043
+Virtua Fighter 5 R (rev D)                    ?                 ?               DVP-5004D
+Virtua Fighter 5 (EXPORT) (rev A)             253-5508-0438     317-0438-COM    DVP-0008A
+Virtua Fighter 5 (EXPORT) (rev B)             253-5508-0438     317-0438-COM    DVP-0008B
+Virtua Fighter 5 (EXPORT) (rev E)             253-5508-0438     317-0438-COM    DVP-0008E
 Virtua Tennis 3 (Power Smash 3)               ?                 ?               DVP-0005
 Virtua Tennis 3 (Power Smash 3) (EXPORT)      253-5508-0434    ^317-0434-COM    DVP-0005A
 Virtua Tennis 3 (JAPAN)                       253-5508-0506     317-0506-JPN   ^DVP-0005C
 WCC Football Intercontinental Clubs 2006-2007 ?                 ?               ?
 WCC Football Intercontinental Clubs 2007-2008 ?                 ?               ?
-WCC Football Intercontinental Clubs 2008-2009 ?                 ?               ?
+WCC Football Intercontinental Clubs 2008-2009 ?                 ?               DVP-5012
 WCC Football Intercontinental Clubs 2009-2010 ?                 ?               ?
+Wheel Maniacs (rev D)                         ?                 ?               DVP-0035D
 
 ^ denotes these parts are archived.
 This list is not necessarily correct or complete.

@@ -75,7 +75,7 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 		m_callback = stream_update_delegate(FUNC(device_sound_interface::sound_stream_update),(device_sound_interface *)sound);
 
 	// create a unique tag for saving
-	std::string state_tag = string_format("%d", m_device.machine().sound().m_stream_list.count());
+	std::string state_tag = string_format("%d", m_device.machine().sound().m_stream_list.size());
 	m_device.machine().save().save_item(&m_device, "stream", state_tag.c_str(), 0, NAME(m_sample_rate));
 	m_device.machine().save().register_postload(save_prepost_delegate(FUNC(sound_stream::postload), this));
 
@@ -894,7 +894,8 @@ void sound_manager::stop_recording()
 
 sound_stream *sound_manager::stream_alloc(device_t &device, int inputs, int outputs, int sample_rate, stream_update_delegate callback)
 {
-	return &m_stream_list.append(*global_alloc(sound_stream(device, inputs, outputs, sample_rate, callback)));
+	m_stream_list.push_back(std::make_unique<sound_stream>(device, inputs, outputs, sample_rate, callback));
+	return m_stream_list.back().get();
 }
 
 
@@ -1109,15 +1110,15 @@ void sound_manager::update(void *ptr, int param)
 	}
 
 	// iterate over all the streams and update them
-	for (sound_stream &stream : m_stream_list)
-		stream.update_with_accounting(second_tick);
+	for (auto &stream : m_stream_list)
+		stream->update_with_accounting(second_tick);
 
 	// remember the update time
 	m_last_update = curtime;
 
 	// update sample rates if they have changed
-	for (sound_stream &stream : m_stream_list)
-		stream.apply_sample_rate_changes();
+	for (auto &stream : m_stream_list)
+		stream->apply_sample_rate_changes();
 
 	g_profiler.stop();
 }

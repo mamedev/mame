@@ -58,13 +58,15 @@ public:
 	word_wrapping wrap() const { return m_wrap; }
 
 	// methods
+	float actual_left() const;
 	float actual_width() const;
 	float actual_height() const;
+	bool empty() const { return m_lines.size() == 0; }
 	bool hit_test(float x, float y, size_t &start, size_t &span) const;
 	void restyle(size_t start, size_t span, rgb_t *fgcolor, rgb_t *bgcolor);
 	int get_wrap_info(std::vector<int> &xstart, std::vector<int> &xend) const;
 	void emit(render_container *container, float x, float y);
-	void add_text(const char *text, rgb_t fgcolor = rgb_t::white, rgb_t bgcolor = rgb_t(0,0,0,0), float size = 1.0)
+	void add_text(const char *text, rgb_t fgcolor = rgb_t::white, rgb_t bgcolor = rgb_t::transparent, float size = 1.0)
 	{
 		// create the style
 		char_style style = { 0, };
@@ -138,13 +140,14 @@ private:
 	float m_xscale;
 	float m_yscale;
 	float m_width;
-	float m_maximum_line_width;
+	mutable float m_calculated_actual_width;
 	text_justify m_justify;
 	word_wrapping m_wrap;
 	std::vector<std::unique_ptr<line>> m_lines;
 	line *m_current_line;
 	size_t m_last_break;
 	size_t m_text_position;
+	bool m_truncating;
 
 	// methods
 	void add_text(const char *text, const char_style &style);
@@ -152,7 +155,7 @@ private:
 	float get_char_width(unicode_char ch, float size);
 	void truncate_wrap();
 	void word_wrap();
-	void update_maximum_line_width();
+	void invalidate_calculated_actual_width();
 };
 
 } // namespace ui

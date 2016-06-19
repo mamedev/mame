@@ -345,28 +345,21 @@ private:
 	{
 	public:
 		callback_item(vblank_state_delegate callback)
-			: m_next(nullptr),
-				m_callback(std::move(callback)) { }
-		callback_item *next() const { return m_next; }
+			: m_callback(std::move(callback)) { }
 
-		callback_item *             m_next;
 		vblank_state_delegate       m_callback;
 	};
-	simple_list<callback_item> m_callback_list;     // list of VBLANK callbacks
+	std::vector<std::unique_ptr<callback_item>> m_callback_list;     // list of VBLANK callbacks
 
 	// auto-sizing bitmaps
 	class auto_bitmap_item
 	{
 	public:
 		auto_bitmap_item(bitmap_t &bitmap)
-			: m_next(nullptr),
-				m_bitmap(bitmap) { }
-		auto_bitmap_item *next() const { return m_next; }
-
-		auto_bitmap_item *          m_next;
+			: m_bitmap(bitmap) { }
 		bitmap_t &                  m_bitmap;
 	};
-	simple_list<auto_bitmap_item> m_auto_bitmap_list; // list of registered bitmaps
+	std::vector<std::unique_ptr<auto_bitmap_item>> m_auto_bitmap_list; // list of registered bitmaps
 
 	// static data
 	static UINT32       m_id_counter; // incremented for each constructed screen_device,

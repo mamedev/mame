@@ -5,13 +5,16 @@
     Driver for Midway Zeus games
 
 **************************************************************************/
+#include "video/zeus2.h"
 
 class midzeus2_state : public midzeus_state
 {
 public:
 	midzeus2_state(const machine_config &mconfig, device_type type, const char *tag)
-				: midzeus_state(mconfig, type, tag) { }
+				: midzeus_state(mconfig, type, tag), m_zeus(*this, "zeus2") { }
+	required_device<zeus2_device> m_zeus;
 
+	DECLARE_WRITE_LINE_MEMBER(zeus_irq);
 	DECLARE_VIDEO_START(midzeus2);
 	UINT32 screen_update_midzeus2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_READ32_MEMBER( zeus2_r );

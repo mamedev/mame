@@ -6532,6 +6532,7 @@ ROM_START( numcrash )
 	ROM_LOAD( "nc-6.6m",      0x1800, 0x0800, CRC(7b8de692) SHA1(7d5fe625ee9acf3cced2d98df99f5dee6c8122b1) )
 	ROM_LOAD( "nc-3.6h",      0x2000, 0x0800, CRC(e47f7cf3) SHA1(47e513cf4fe80617547093210ca6582646a9b256) )
 	/* 0x2800 - 0x2fff unpopulated? would usually be 6n */
+	/* at offset 0x4ce bit 7 reads inconsistently, the EPROM itself might be bad :( */
 	ROM_LOAD( "nc-4.6j",      0x3000, 0x0800, CRC(c67450d2) SHA1(b940093c979795d0de4b203200c3f824d5d9ac7f) )
 	/* 0x3800 - 0x3fff unpopulated? would usually be 6p */
 
