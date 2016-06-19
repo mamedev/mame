@@ -88,6 +88,7 @@ std::vector<std::unique_ptr<bitmap_argb32>> menu::icons_bitmap;
 std::unique_ptr<bitmap_rgb32> menu::hilight_main_bitmap;
 std::vector<std::shared_ptr<bitmap_argb32>> menu::toolbar_bitmap;
 std::vector<std::shared_ptr<bitmap_argb32>> menu::sw_toolbar_bitmap;
+std::vector<const game_driver *> menu::m_old_icons;
 
 /***************************************************************************
     INLINE FUNCTIONS
@@ -187,6 +188,7 @@ void menu::exit(running_machine &machine)
 	}
 
 	icons_bitmap.clear();
+	m_old_icons.clear();
 }
 
 
@@ -1370,6 +1372,7 @@ void menu::init_ui(running_machine &machine, ui_options &mopt)
 	// allocate icons
 	for (auto & icons : icons_texture)
 	{
+		m_old_icons.emplace_back(nullptr);
 		icons_bitmap.emplace_back(std::make_unique<bitmap_argb32>());
 		icons = mrender.texture_alloc();
 	}
@@ -1440,7 +1443,6 @@ void menu::draw_select_game(UINT32 flags)
 	float primary_left = (1.0f - visible_width) * 0.5f;
 	float primary_width = visible_width;
 	bool is_swlist = (item[0].flags & FLAG_UI_SWLIST);
-	bool is_favorites = (item[0].flags & FLAG_UI_FAVORITE);
 
 	// draw background image if available
 	if (ui().options().use_background_image() && bgrnd_bitmap->valid())
@@ -1578,27 +1580,13 @@ void menu::draw_select_game(UINT32 flags)
 		else if (pitem.subtext == nullptr)
 		{
 			int item_invert = pitem.flags & FLAG_INVERT;
-			float space = 0.0f;
-
-			if (ui_globals::has_icons && !is_swlist)
-			{
-				if (is_favorites)
-				{
-					ui_software_info *soft = (ui_software_info *)item[itemnum].ref;
-					if (soft->startempty == 1)
-						draw_icon(linenum, (void *)soft->driver, effective_left, line_y);
-				}
-				else
-					draw_icon(linenum, item[itemnum].ref, effective_left, line_y);
-
-				space = ud_arrow_width * 1.5f;
-			}
-			ui().draw_text_full(container, pitem.text, effective_left + space, line_y, effective_width - space, ui::text_layout::LEFT, ui::text_layout::TRUNCATE,
+			auto icon = draw_icon(linenum, item[itemnum].ref, effective_left, line_y);
+			ui().draw_text_full(container, pitem.text, effective_left + icon, line_y, effective_width - icon, ui::text_layout::LEFT, ui::text_layout::TRUNCATE,
 				mame_ui_manager::NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor, nullptr, nullptr);
 		}
 		else
 		{
-			int item_invert = pitem.flags & FLAG_INVERT;
+			auto item_invert = pitem.flags & FLAG_INVERT;
 			float item_width, subitem_width;
 
 			// compute right space for subitem
@@ -2452,16 +2440,29 @@ void menu::draw_common_arrow(float origx1, float origy1, float origx2, float ori
 //  draw icons
 //-------------------------------------------------
 
-void menu::draw_icon(int linenum, void *selectedref, float x0, float y0)
+float menu::draw_icon(int linenum, void *selectedref, float x0, float y0)
 {
-	static const game_driver *olddriver[MAX_ICONS_RENDER] = { nullptr };
-	auto x1 = x0 + ui().get_line_height() * container->manager().ui_aspect(container);
-	auto y1 = y0 + ui().get_line_height();
-	auto driver = (const game_driver *)selectedref;
+	if (!ui_globals::has_icons || (item[0].flags & FLAG_UI_SWLIST)) 
+		return 0.0f;
 
-	if (olddriver[linenum] != driver || ui_globals::redraw_icon)
+	float ud_arrow_width = ui().get_line_height() * container->manager().ui_aspect(container);
+	const game_driver *driver = nullptr;
+
+	if (item[0].flags & FLAG_UI_FAVORITE)
 	{
-		olddriver[linenum] = driver;
+		ui_software_info *soft = (ui_software_info *)selectedref;
+		if (soft->startempty == 1)
+			driver = soft->driver;
+	}
+	else
+		driver = (const game_driver *)selectedref;
+
+	auto x1 = x0 + ud_arrow_width;
+	auto y1 = y0 + ui().get_line_height();
+
+	if (m_old_icons[linenum] != driver || ui_globals::redraw_icon)
+	{
+		m_old_icons[linenum] = driver;
 
 		// set clone status
 		bool cloneof = strcmp(driver->parent, "0");
@@ -2532,7 +2533,6 @@ void menu::draw_icon(int linenum, void *selectedref, float x0, float y0)
 			else
 				dest_bitmap = tmp;
 
-			icons_bitmap[linenum]->reset();
 			icons_bitmap[linenum]->allocate(panel_width_pixel, panel_height_pixel);
 
 			for (int x = 0; x < dest_xPixel; x++)
@@ -2551,6 +2551,8 @@ void menu::draw_icon(int linenum, void *selectedref, float x0, float y0)
 
 	if (icons_bitmap[linenum] != nullptr && icons_bitmap[linenum]->valid())
 		container->add_quad(x0, y0, x1, y1, rgb_t::white, icons_texture[linenum], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+
+	return ud_arrow_width * 1.5f;
 }
 
 //-------------------------------------------------

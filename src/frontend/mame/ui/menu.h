@@ -347,7 +347,7 @@ private:
 	// handle mouse
 	void handle_main_events();
 
-	void draw_icon(int linenum, void *selectedref, float x1, float y1);
+	float draw_icon(int linenum, void *selectedref, float x1, float y1);
 	void extra_text_draw_box(float origx1, float origx2, float origy, float yspan, const char *text, int direction);
 
 	bool                    m_special_main_menu;
@@ -358,6 +358,7 @@ private:
 	event                   m_event;   // the UI event that occurred
 	pool                    *m_pool;   // list of memory pools
 	focused_menu            m_focus;
+	static std::vector<const game_driver *> m_old_icons;
 
 	static std::unique_ptr<menu> menu_stack;
 	static std::unique_ptr<menu> menu_free;
