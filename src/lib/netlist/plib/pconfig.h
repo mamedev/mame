@@ -99,6 +99,62 @@ static inline ticks_t profile_ticks()
 static inline ticks_t profile_ticks() { return ticks(); }
 #endif
 
+template<bool enabled_>
+struct perfcount_t
+{
+	perfcount_t() : m_count(0) { }
+	typedef uint_least64_t type;
+	type operator()() const { return m_count; }
+	void inc() { ++m_count; }
+	void reset() { m_count = 0; }
+	constexpr static bool enabled = enabled_;
+private:
+	type m_count;
+};
+
+template<>
+struct perfcount_t<false>
+{
+	typedef uint_least64_t type;
+	constexpr type operator()() const { return 0; }
+	void inc() const { }
+	void reset() const { }
+	constexpr static bool enabled = false;
+};
+
+
+template<bool enabled_>
+struct perftime_t
+{
+	perftime_t() : m_time(0), m_count(0) { }
+	typedef ticks_t type;
+	type operator()() const { return m_time; }
+	void begin() { m_time -= profile_ticks(); }
+	void end() { m_time += profile_ticks(); ++m_count; }
+	void reset() { m_time = 0; m_count = 0; }
+	type average() const { return (m_count == 0) ? 0 : m_time / m_count; }
+	type total() const { return m_time; }
+	type count() const { return m_count; }
+	constexpr static bool enabled = enabled_;
+private:
+	type m_time;
+	int_least64_t m_count;
+};
+
+template<>
+struct perftime_t<false>
+{
+	typedef ticks_t type;
+	constexpr type operator()() const { return 0; }
+	void begin()  const { }
+	void end() const { }
+	void reset() const { }
+	constexpr type average() const { return 0; }
+	constexpr type total() const { return 0; }
+	constexpr type count() const { return 0; }
+	constexpr static bool enabled = false;
+};
+
 /*
  * The following class was derived from the MAME delegate.h code.
  * It derives a pointer to a member function.

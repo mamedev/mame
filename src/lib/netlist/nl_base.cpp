@@ -341,7 +341,7 @@ void netlist_t::process_queue(const netlist_time &delta)
 		while (e.m_object != nullptr)
 		{
 			e.m_object->update_devs();
-			add_to_stat(m_perf_out_processed, 1);
+			m_perf_out_processed.inc();
 			e = m_queue.pop();
 			m_time = e.m_exec_time;
 		}
@@ -367,7 +367,7 @@ void netlist_t::process_queue(const netlist_time &delta)
 			if (e.m_object == nullptr)
 				break;
 			e.m_object->update_devs();
-			add_to_stat(m_perf_out_processed, 1);
+			m_perf_out_processed.inc();
 		}
 		mc_net.set_time(mc_time);
 	}
@@ -375,19 +375,26 @@ void netlist_t::process_queue(const netlist_time &delta)
 
 void netlist_t::print_stats() const
 {
-#if (NL_KEEP_STATISTICS)
+	if (nperftime_t::enabled)
 	{
-		for (auto & entry : m_devices)
+		std::vector<size_t> index;
+		for (size_t i=0; i<m_devices.size(); i++)
+			index.push_back(i);
+
+		std::sort(index.begin(), index.end(),
+				[&](size_t i1, size_t i2) { return m_devices[i1]->m_stat_total_time.total() < m_devices[i2]->m_stat_total_time.total(); });
+
+		for (auto & j : index)
 		{
+			auto entry = m_devices[j].get();
 			log().verbose("Device {1:20} : {2:12} {3:12} {4:15}", entry->name(),
-					entry->stat_call_count, entry->stat_update_count,
-					(long int) entry->stat_total_time / (entry->stat_update_count + 1));
+					entry->m_stat_call_count(), entry->m_stat_total_time.count(),
+					entry->m_stat_total_time.total());
 		}
 
-		log().verbose("Queue Pushes {1:15}", queue().m_prof_call);
-		log().verbose("Queue Moves  {1:15}", queue().m_prof_sortmove);
+		log().verbose("Queue Pushes {1:15}", queue().m_prof_call());
+		log().verbose("Queue Moves  {1:15}", queue().m_prof_sortmove());
 	}
-#endif
 }
 
 // ----------------------------------------------------------------------------------------
@@ -419,11 +426,6 @@ core_device_t::core_device_t(netlist_t &owner, const pstring &name)
 	: object_t(name)
 	, logic_family_t()
 	, netlist_ref(owner)
-#if (NL_KEEP_STATISTICS)
-	, stat_total_time(0)
-	, stat_update_count(0)
-	, stat_call_count(0)
-#endif
 {
 	if (logic_family() == nullptr)
 		set_logic_family(family_TTL());
@@ -433,11 +435,6 @@ core_device_t::core_device_t(core_device_t &owner, const pstring &name)
 	: object_t(owner.name() + "." + name)
 	, logic_family_t()
 	, netlist_ref(owner.netlist())
-#if (NL_KEEP_STATISTICS)
-	, stat_total_time(0)
-	, stat_update_count(0)
-	, stat_call_count(0)
-#endif
 {
 	set_logic_family(owner.logic_family());
 	if (logic_family() == nullptr)
@@ -586,7 +583,7 @@ void net_t::inc_active(core_terminal_t &term)
 {
 	m_active++;
 	m_list_active.push_front(&term);
-	nl_assert(m_active <= num_cons());
+	nl_assert(m_active <= (int) num_cons());
 	if (m_active == 1)
 	{
 		if (netlist().use_deactivate())
@@ -656,7 +653,7 @@ void net_t::update_devs()
 
 	for (auto & p : m_list_active)
 	{
-		inc_stat(p.device().stat_call_count);
+		p.device().m_stat_call_count.inc();
 		if ((p.state() & mask) != 0)
 			p.device().update_dev();
 	}

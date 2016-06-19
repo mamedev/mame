@@ -111,18 +111,20 @@
 //  Performance tracking
 //============================================================
 
+namespace netlist
+{
 #if NL_KEEP_STATISTICS
-#define add_to_stat(v,x)        do { v += (x); } while (0)
-#define inc_stat(v)             add_to_stat(v, 1)
-#define begin_timing(v)         do { v -= plib::profile_ticks(); } while (0)
-#define end_timing(v)           do { v += plib::profile_ticks(); } while (0)
+//#define add_to_stat(v,x)        do { v += (x); } while (0)
+//#define inc_stat(v)             add_to_stat(v, 1)
+//#define begin_timing(v)         do { v -= plib::profile_ticks(); } while (0)
+//#define end_timing(v)           do { v += plib::profile_ticks(); } while (0)
+using nperftime_t = plib::perftime_t<true>;
+using nperfcount_t = plib::perfcount_t<true>;
 #else
-#define add_to_stat(v,x)        do { } while (0)
-#define inc_stat(v)             add_to_stat(v, 1)
-#define begin_timing(v)         do { } while (0)
-#define end_timing(v)           do { } while (0)
+using nperftime_t = plib::perftime_t<false>;
+using nperfcount_t = plib::perfcount_t<false>;
 #endif
-
+}
 //============================================================
 //  General
 //============================================================

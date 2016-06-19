@@ -44,15 +44,15 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(9316_sub)
 		, m_CLK(*this, "CLK")
+		, m_cnt(*this, "m_cnt", 0)
+		, m_loadq(*this, "m_loadq", 0)
+		, m_ent(*this, "m_ent", 0)
 		, m_QA(*this, "QA")
 		, m_QB(*this, "QB")
 		, m_QC(*this, "QC")
 		, m_QD(*this, "QD")
 		, m_RC(*this, "RC")
 		, m_ABCD(nullptr)
-		, m_cnt(*this, "m_cnt", 0)
-		, m_loadq(*this, "m_loadq", 0)
-		, m_ent(*this, "m_ent", 0)
 		{
 		}
 
@@ -70,6 +70,10 @@ namespace netlist
 
 		logic_input_t m_CLK;
 
+		state_var_u8 m_cnt;
+		state_var_u8 m_loadq;
+		state_var_u8 m_ent;
+
 		logic_output_t m_QA;
 		logic_output_t m_QB;
 		logic_output_t m_QC;
@@ -77,11 +81,6 @@ namespace netlist
 		logic_output_t m_RC;
 
 		NETLIB_NAME(9316_subABCD) *m_ABCD;
-
-		state_var_u8 m_cnt;
-		state_var_u8 m_loadq;
-		state_var_u8 m_ent;
-
 	};
 
 	NETLIB_OBJECT(9316)

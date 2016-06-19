@@ -892,10 +892,9 @@ namespace netlist
 
 		void update_dev()
 		{
-			begin_timing(stat_total_time);
-			inc_stat(stat_update_count);
+			m_stat_total_time.begin();
 			do_update();
-			end_timing(stat_total_time);
+			m_stat_total_time.end();
 		}
 
 		void do_update() NOEXCEPT
@@ -928,12 +927,9 @@ namespace netlist
 		nl_double TERMANALOG(const terminal_t &term) const { return term.net().Q_Analog(); }
 		void OUTANALOG(analog_output_t &out, const nl_double val) { out.set_Q(val); }
 
-	#if (NL_KEEP_STATISTICS)
 		/* stats */
-		plib::ticks_t stat_total_time;
-		int_fast32_t stat_update_count;
-		int_fast32_t stat_call_count;
-	#endif
+		nperftime_t  m_stat_total_time;
+		nperfcount_t m_stat_call_count;
 
 	protected:
 
@@ -1151,12 +1147,10 @@ namespace netlist
 
 protected:
 
-	#if (NL_KEEP_STATISTICS)
 		// performance
-		int m_perf_out_processed;
-		int m_perf_inp_processed;
-		int m_perf_inp_active;
-	#endif
+		nperfcount_t m_perf_out_processed;
+		nperfcount_t m_perf_inp_processed;
+		nperfcount_t m_perf_inp_active;
 
 	private:
 		plib::state_manager_t 		m_state;

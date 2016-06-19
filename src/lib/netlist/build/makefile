@@ -51,6 +51,7 @@ POBJS := \
 	$(POBJ)/palloc.o \
 	$(POBJ)/pdynlib.o \
 	$(POBJ)/pfmtlog.o \
+	$(POBJ)/poptions.o \
 	$(POBJ)/pparser.o \
 	$(POBJ)/pstate.o \
 	$(POBJ)/pstream.o \
