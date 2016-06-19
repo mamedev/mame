@@ -60,8 +60,13 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	public:
-		inline void update_outputs_all(const uint_fast8_t cnt, const netlist_time out_delay);
-		inline void update_outputs(const uint_fast8_t cnt);
+		void update_outputs_all(const uint_fast8_t cnt, const netlist_time out_delay)
+		{
+			OUTLOGIC(m_QA, (cnt >> 0) & 1, out_delay);
+			OUTLOGIC(m_QB, (cnt >> 1) & 1, out_delay);
+			OUTLOGIC(m_QC, (cnt >> 2) & 1, out_delay);
+			OUTLOGIC(m_QD, (cnt >> 3) & 1, out_delay);
+		}
 
 		logic_input_t m_CLK;
 
@@ -173,7 +178,7 @@ namespace netlist
 					break;
 				default:
 					m_cnt++;
-					update_outputs(m_cnt);
+					update_outputs_all(m_cnt, NLTIME_FROM_NS(20));
 					break;
 			}
 		}
@@ -209,58 +214,6 @@ namespace netlist
 		}
 	}
 
-	inline NETLIB_FUNC_VOID(9316_sub, update_outputs_all, (const uint_fast8_t cnt, const netlist_time out_delay))
-	{
-		OUTLOGIC(m_QA, (cnt >> 0) & 1, out_delay);
-		OUTLOGIC(m_QB, (cnt >> 1) & 1, out_delay);
-		OUTLOGIC(m_QC, (cnt >> 2) & 1, out_delay);
-		OUTLOGIC(m_QD, (cnt >> 3) & 1, out_delay);
-	}
-
-	inline NETLIB_FUNC_VOID(9316_sub, update_outputs, (const uint_fast8_t cnt))
-	{
-		/* static */ const netlist_time out_delay = NLTIME_FROM_NS(20);
-	#if 0
-	//    for (int i=0; i<4; i++)
-	//        OUTLOGIC(m_Q[i], (cnt >> i) & 1, delay[i]);
-		OUTLOGIC(m_QA, (cnt >> 0) & 1, out_delay);
-		OUTLOGIC(m_QB, (cnt >> 1) & 1, out_delay);
-		OUTLOGIC(m_QC, (cnt >> 2) & 1, out_delay);
-		OUTLOGIC(m_QD, (cnt >> 3) & 1, out_delay);
-	#else
-		if ((cnt & 1) == 1)
-			OUTLOGIC(m_QA, 1, out_delay);
-		else
-		{
-			OUTLOGIC(m_QA, 0, out_delay);
-			switch (cnt)
-			{
-			case 0x00:
-				OUTLOGIC(m_QB, 0, out_delay);
-				OUTLOGIC(m_QC, 0, out_delay);
-				OUTLOGIC(m_QD, 0, out_delay);
-				break;
-			case 0x02:
-			case 0x06:
-			case 0x0A:
-			case 0x0E:
-				OUTLOGIC(m_QB, 1, out_delay);
-				break;
-			case 0x04:
-			case 0x0C:
-				OUTLOGIC(m_QB, 0, out_delay);
-				OUTLOGIC(m_QC, 1, out_delay);
-				break;
-			case 0x08:
-				OUTLOGIC(m_QB, 0, out_delay);
-				OUTLOGIC(m_QC, 0, out_delay);
-				OUTLOGIC(m_QD, 1, out_delay);
-				break;
-			}
-
-		}
-	#endif
-	}
 
 	NETLIB_DEVICE_IMPL(9316)
 	NETLIB_DEVICE_IMPL(9316_dip)
