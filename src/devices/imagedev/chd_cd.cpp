@@ -61,7 +61,7 @@ void cdrom_image_device::device_config_complete()
 {
 	m_extension_list = "chd,cue,toc,nrg,gdi,iso,cdr";
 
-	m_formatlist.append(*global_alloc(image_device_format("chdcd", "CD-ROM drive", m_extension_list, cd_option_spec)));
+	m_formatlist.push_back(std::make_unique<image_device_format>("chdcd", "CD-ROM drive", m_extension_list, cd_option_spec));
 
 	// set brief and instance name
 	update_names();

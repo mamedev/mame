@@ -71,24 +71,19 @@ struct image_device_type_info
 
 class image_device_format
 {
-	friend class simple_list<image_device_format>;
-
 public:
 	image_device_format(const char *name, const char *description, const char *extensions, const char *optspec)
-		: m_next(nullptr),
-			m_name(name),
+		: m_name(name),
 			m_description(description),
 			m_extensions(extensions),
 			m_optspec(optspec)  { }
 
-	image_device_format *next() const { return m_next; }
 	const char *name() const { return m_name.c_str(); }
 	const char *description() const { return m_description.c_str(); }
 	const char *extensions() const { return m_extensions.c_str(); }
 	const char *optspec() const { return m_optspec.c_str(); }
 
 private:
-	image_device_format *m_next;
 	std::string m_name;
 	std::string m_description;
 	std::string m_extensions;
@@ -165,7 +160,7 @@ public:
 	virtual const char *file_extensions() const = 0;
 	virtual const option_guide *create_option_guide() const = 0;
 
-	const image_device_format *device_get_indexed_creatable_format(int index) const { return m_formatlist.find(index); }
+	const image_device_format *device_get_indexed_creatable_format(int index) const { if (index < m_formatlist.size()) return m_formatlist.at(index).get(); else return nullptr;  }
 	const image_device_format *device_get_named_creatable_format(const char *format_name);
 	const option_guide *device_get_creation_option_guide() const { return create_option_guide(); }
 
@@ -226,7 +221,7 @@ public:
 	const char *instance_name() const { return m_instance_name.c_str(); }
 	const char *brief_instance_name() const { return m_brief_instance_name.c_str(); }
 	bool uses_file_extension(const char *file_extension) const;
-	const simple_list<image_device_format> &formatlist() const { return m_formatlist; }
+	const std::vector<std::unique_ptr<image_device_format>> &formatlist() const { return m_formatlist; }
 
 	bool load(const char *path);
 	bool open_image_file(emu_options &options);
@@ -320,7 +315,7 @@ protected:
 	std::string m_instance_name;
 
 	/* creation info */
-	simple_list<image_device_format> m_formatlist;
+	std::vector<std::unique_ptr<image_device_format>> m_formatlist;
 
 	/* in the case of arcade cabinet with fixed carts inserted,
 	 we want to disable command line cart loading... */
