@@ -147,7 +147,7 @@ public:
 	{
 		NONE,
 		NORMAL,
-		OPAQUE
+		OPAQUE_
 	};
 
 	// construction/destruction
