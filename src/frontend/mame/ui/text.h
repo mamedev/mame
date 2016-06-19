@@ -140,7 +140,7 @@ private:
 	float m_xscale;
 	float m_yscale;
 	float m_width;
-	float m_maximum_line_width;
+	mutable float m_calculated_actual_width;
 	text_justify m_justify;
 	word_wrapping m_wrap;
 	std::vector<std::unique_ptr<line>> m_lines;
@@ -155,7 +155,7 @@ private:
 	float get_char_width(unicode_char ch, float size);
 	void truncate_wrap();
 	void word_wrap();
-	void update_maximum_line_width();
+	void invalidate_calculated_actual_width();
 };
 
 } // namespace ui

@@ -78,9 +78,10 @@ CORE IMPLEMENTATION
 //-------------------------------------------------
 
 text_layout::text_layout(render_font &font, float xscale, float yscale, float width, text_layout::text_justify justify, text_layout::word_wrapping wrap)
-	: m_font(font), m_xscale(xscale), m_yscale(yscale), m_width(width), m_maximum_line_width(0.0f), m_justify(justify), m_wrap(wrap), m_current_line(nullptr), m_last_break(0), m_text_position(0), m_truncating(false)
+	: m_font(font), m_xscale(xscale), m_yscale(yscale), m_width(width), m_justify(justify), m_wrap(wrap), m_current_line(nullptr), m_last_break(0), m_text_position(0), m_truncating(false)
 
 {
+	invalidate_calculated_actual_width();
 }
 
 
@@ -89,9 +90,10 @@ text_layout::text_layout(render_font &font, float xscale, float yscale, float wi
 //-------------------------------------------------
 
 text_layout::text_layout(text_layout &&that)
-	: m_font(that.m_font), m_xscale(that.m_xscale), m_yscale(that.m_yscale), m_width(that.m_width), m_maximum_line_width(that.m_maximum_line_width), m_justify(that.m_justify), m_wrap(that.m_wrap), m_lines(std::move(that.m_lines)),
+	: m_font(that.m_font), m_xscale(that.m_xscale), m_yscale(that.m_yscale), m_width(that.m_width), m_calculated_actual_width(that.m_calculated_actual_width), m_justify(that.m_justify), m_wrap(that.m_wrap), m_lines(std::move(that.m_lines)),
 	  m_current_line(that.m_current_line), m_last_break(that.m_last_break), m_text_position(that.m_text_position), m_truncating(false)
 {
+	that.invalidate_calculated_actual_width();
 }
 
 
@@ -115,6 +117,9 @@ void text_layout::add_text(const char *text, const char_style &style)
 
 	while(position < text_length)
 	{
+		// adding a character - we might change the width
+		invalidate_calculated_actual_width();
+
 		// do we need to create a new line?
 		if (m_current_line == nullptr)
 		{
@@ -159,7 +164,6 @@ void text_layout::add_text(const char *text, const char_style &style)
 				start_new_line(LEFT, style.size);
 
 			// and then close up the current line
-			update_maximum_line_width();
 			m_current_line = nullptr;
 		}
 		else if (!m_truncating)
@@ -202,12 +206,12 @@ void text_layout::add_text(const char *text, const char_style &style)
 
 
 //-------------------------------------------------
-//  update_maximum_line_width
+//  invalidate_calculated_actual_width
 //-------------------------------------------------
 
-void text_layout::update_maximum_line_width()
+void text_layout::invalidate_calculated_actual_width()
 {
-	m_maximum_line_width = actual_width();
+	m_calculated_actual_width = -1;
 }
 
 
@@ -245,8 +249,18 @@ float text_layout::actual_left() const
 
 float text_layout::actual_width() const
 {
-	float current_line_width = m_current_line ? m_current_line->width() : 0;
-	return std::max(m_maximum_line_width, current_line_width);
+	// do we need to calculate the width?
+	if (m_calculated_actual_width < 0)
+	{
+		// calculate the actual width
+		m_calculated_actual_width = 0;
+		for (const auto &line : m_lines)
+			m_calculated_actual_width = std::max(m_calculated_actual_width, line->width());
+
+	}
+
+	// return it
+	return m_calculated_actual_width;
 }
 
 
@@ -275,7 +289,6 @@ void text_layout::start_new_line(text_layout::text_justify justify, float height
 	std::unique_ptr<line> new_line(global_alloc_clear<line>(*this, justify, actual_height(), height * yscale()));
 
 	// update the current line
-	update_maximum_line_width();
 	m_current_line = new_line.get();
 	m_last_break = 0;
 	m_truncating = false;
