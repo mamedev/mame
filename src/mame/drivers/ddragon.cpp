@@ -2195,7 +2195,7 @@ GAME( 1987, ddragon6809a,ddragon,  ddragon6809, ddragon, ddragon_state,  ddragon
 GAME( 1988, ddragon2,    0,        ddragon2, ddragon2, ddragon_state, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ddragon2u,   ddragon2, ddragon2, ddragon2, ddragon_state, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ddragon2j,   ddragon2, ddragon2, ddragon2, ddragon_state, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (Japan)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump
-GAME( 1988, ddragon2b,   ddragon2, ddragon2, ddragon2, ddragon_state, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (US, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ddragon2b,   ddragon2, ddragon2, ddragon2, ddragon_state, ddragon2, ROT0, "bootleg", "Double Dragon II - The Revenge (US, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* these were conversions of double dragon */
 GAME( 1991, tstrike,  0,        darktowr, tstrike, ddragon_state,  darktowr, ROT0, "East Coast Coin Company", "Thunder Strike (set 1)", MACHINE_SUPPORTS_SAVE ) // same manufacturer as The Game Room?
