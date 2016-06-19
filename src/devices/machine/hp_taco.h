@@ -47,7 +47,7 @@ public:
 	virtual bool call_load() override;
 	virtual bool call_create(int format_type, option_resolution *format_options) override;
 	virtual void call_unload() override;
-	virtual int call_display_taco(std::string& s);
+	virtual std::string call_display() override;
 	virtual iodevice_t image_type() const override { return IO_MAGTAPE; }
 	virtual bool is_readable() const override { return true; }
 	virtual bool is_writeable() const override { return true; }

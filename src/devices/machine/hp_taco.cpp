@@ -1686,16 +1686,15 @@ void hp_taco_device::call_unload()
 		set_tape_present(false);
 }
 
-int hp_taco_device::call_display_taco(std::string& s)
+std::string hp_taco_device::call_display()
 {
+	std::string buffer;
 	// Mostly lifted from cassette_image_device::call_display ;)
 
 	// Do not show anything if image not loaded or tape not moving
 	if (!exists() || m_start_time.is_never()) {
-		return -1;
+		return buffer;
 	}
-
-	char buffer[ 64 ];
 
 	char track = BIT(m_status_reg , STATUS_TRACKB_BIT) ? 'B' : 'A';
 	char r_w = m_tape_wr ? 'W' : 'R';
@@ -1712,12 +1711,10 @@ int hp_taco_device::call_display_taco(std::string& s)
 
 	int pos_in = current_tape_pos() / ONE_INCH_POS;
 
-	snprintf(buffer , sizeof(buffer) , "%c %c %c%c [%04d/1824]" , track , r_w , m1 , m2 , pos_in);
-
-	s = buffer;
+	buffer = string_format("%c %c %c%c [%04d/1824]" , track , r_w , m1 , m2 , pos_in);
 
 	// Not correct when there are 2 or more instances of TACO
-	return 0;
+	return buffer;
 }
 
 const char *hp_taco_device::file_extensions() const
