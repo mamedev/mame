@@ -206,7 +206,6 @@ Video sync   6 F   Video sync                 Post   6 F   Post
 #define CLIP_SKIP           (VIS_MINY * SCREEN_WIDTH + VIS_MINX)
 #define CLIP_W              (VIS_MAXX - VIS_MINX + 1)
 #define CLIP_H              (VIS_MAXY - VIS_MINY + 1)
-#define CLIP_BYTEW          (CLIP_W << 1)
 
 
 class halleys_state : public driver_device
@@ -1284,177 +1283,140 @@ void halleys_state::video_start()
 
 void halleys_state::copy_scroll_op(bitmap_ind16 &bitmap, UINT16 *source, int sx, int sy)
 {
-//--------------------------------------------------------------------------
-
-#define OPCOPY_COMMON { \
-	memcpy(edi, esi+sx, rcw); \
-	memcpy((UINT8*)edi+rcw, esi, CLIP_BYTEW-rcw); \
-	esi += SCREEN_WIDTH; \
-	edi += edx; }
-
-//--------------------------------------------------------------------------
-
-	UINT16 *esi, *edi;
-	int rcw, bch, ecx, edx;
-
 	sx = -sx & 0xff;
 	sy = -sy & 0xff;
 
-	if ((rcw = CLIP_W - sx) < 0) rcw = 0; else rcw <<= 1;
-	if ((bch = CLIP_H - sy) < 0) bch = 0;
+	int rcw = CLIP_W - sx;
+	if (rcw < 0)
+		rcw = 0;
 
-	esi = source + CLIP_SKIP + (sy << SCREEN_WIDTH_L2);
-	edi = &bitmap.pix16(VIS_MINY, VIS_MINX);
-	edx = bitmap.rowpixels();
+	int bch = CLIP_H - sy;
+	if (bch < 0)
+		bch = 0;
+
+	const UINT16 *src = source + CLIP_SKIP + sy * SCREEN_WIDTH;
 
 	// draw top split
-	for (ecx=bch; ecx; ecx--) OPCOPY_COMMON
+	for (int y=0; y != bch; y++) {
+		UINT16 *dest = &bitmap.pix16(VIS_MINY + y, VIS_MINX);
+		memcpy(dest, src+sx, 2*rcw);
+		memcpy(dest + rcw, src, 2*(CLIP_W - rcw));
+		src += SCREEN_WIDTH;
+	}
 
-	esi = source + CLIP_SKIP;
+	src = source + CLIP_SKIP;
 
 	// draw bottom split
-	for (ecx=CLIP_H-bch; ecx; ecx--) OPCOPY_COMMON
-
-#undef OPCOPY_COMMON
+	for (int y = bch; y != CLIP_H; y++) {
+		UINT16 *dest = &bitmap.pix16(VIS_MINY + y, VIS_MINX);
+		memcpy(dest, src+sx, 2*rcw);
+		memcpy(dest + rcw, src, 2*(CLIP_W - rcw));
+		src += SCREEN_WIDTH;
+	}
 }
 
 
 void halleys_state::copy_scroll_xp(bitmap_ind16 &bitmap, UINT16 *source, int sx, int sy)
 {
-//--------------------------------------------------------------------------
-
-#define XCOPY_COMMON \
-	if (ecx) { \
-		if (ecx & 1) { ecx--; ax = *esi; esi++; if (ax) *edi = ax; edi++; } \
-		esi += ecx; edi += ecx; ecx = -ecx; \
-		while (ecx) { \
-			ax = esi[ecx]; \
-			bx = esi[ecx+1]; \
-			if (ax) edi[ecx] = ax; \
-			if (bx) edi[ecx+1] = bx; \
-			ecx += 2; \
-		} \
-	}
-
-//--------------------------------------------------------------------------
-
-#define YCOPY_COMMON { \
-	esi = src_base + sx; ecx = rcw; XCOPY_COMMON \
-	esi = src_base; ecx = CLIP_W - rcw; XCOPY_COMMON \
-	src_base += SCREEN_WIDTH; \
-	edi += dst_adv; \
-}
-
-//--------------------------------------------------------------------------
-
-	int rcw, bch, dst_adv;
-
-	UINT16 *src_base, *esi, *edi;
-	int ecx, edx;
-	UINT16 ax, bx;
-
 	sx = -sx & 0xff;
 	sy = -sy & 0xff;
 
-	if ((rcw = CLIP_W - sx) < 0) rcw = 0;
-	if ((bch = CLIP_H - sy) < 0) bch = 0;
+	int rcw = CLIP_W - sx;
+	if (rcw < 0)
+		rcw = 0;
 
-	src_base = source + CLIP_SKIP + (sy << SCREEN_WIDTH_L2);
-	edi = &bitmap.pix16(VIS_MINY, VIS_MINX);
-	dst_adv = bitmap.rowpixels() - CLIP_W;
+	int bch = CLIP_H - sy;
+	if (bch < 0)
+		bch = 0;
+
+	const UINT16 *src_base = source + CLIP_SKIP + sy * SCREEN_WIDTH;
 
 	// draw top split
-	for (edx=bch; edx; edx--) YCOPY_COMMON
+	for (int y=0; y != bch; y++)  {
+		UINT16 *dest = &bitmap.pix16(VIS_MINY + y, VIS_MINX);
+		const UINT16 *src = src_base + sx;
+		for(int x=0; x != rcw; x++) {
+			UINT16 pixel = *src++;
+			if(pixel)
+				*dest = pixel;
+			dest++;
+		}
+
+		src = src_base;
+
+		for(int x=rcw; x != CLIP_W; x++) {
+			UINT16 pixel = *src++;
+			if(pixel)
+				*dest = pixel;
+			dest++;
+		}
+
+		src_base += SCREEN_WIDTH;
+	}
 
 	src_base = source + CLIP_SKIP;
 
 	// draw bottom split
-	for (edx=CLIP_H-bch; edx; edx--) YCOPY_COMMON
+	for (int y = bch; y != CLIP_H; y++) {
+		UINT16 *dest = &bitmap.pix16(VIS_MINY + y, VIS_MINX);
+		const UINT16 *src = src_base + sx;
+		for(int x=0; x != rcw; x++) {
+			UINT16 pixel = *src++;
+			if(pixel)
+				*dest = pixel;
+			dest++;
+		}
 
-#undef XCOPY_COMMON
-#undef YCOPY_COMMON
+		src = src_base;
+
+		for(int x=rcw; x != CLIP_W; x++) {
+			UINT16 pixel = *src++;
+			if(pixel)
+				*dest = pixel;
+			dest++;
+		}
+
+		src_base += SCREEN_WIDTH;
+	}
 }
 
 
 
 void halleys_state::copy_fixed_xp(bitmap_ind16 &bitmap, UINT16 *source)
 {
-	UINT16 *esi, *edi;
-	int dst_pitch, ecx, edx;
-	UINT16 ax, bx;
+	UINT16 *src = source + CLIP_SKIP;
+	for(int y=0; y != CLIP_H; y++) {
+		UINT16 *dest = &bitmap.pix16(VIS_MINY + y, VIS_MINX);
+		for(int x=0; x != CLIP_W; x++) {
+			UINT16 pixel = src[x];
 
-	esi = source + CLIP_SKIP + CLIP_W;
-	edi = &bitmap.pix16(VIS_MINY, VIS_MINX + CLIP_W);
-	dst_pitch = bitmap.rowpixels();
-	ecx = -CLIP_W;
-	edx = CLIP_H;
-
-	do {
-		do {
-			ax = esi[ecx];
-			bx = esi[ecx+1];
-			if (ax) edi[ecx  ] = ax;
-			ax = esi[ecx+2];
-			if (bx) edi[ecx+1] = bx;
-			bx = esi[ecx+3];
-			if (ax) edi[ecx+2] = ax;
-			ax = esi[ecx+4];
-			if (bx) edi[ecx+3] = bx;
-			bx = esi[ecx+5];
-			if (ax) edi[ecx+4] = ax;
-			ax = esi[ecx+6];
-			if (bx) edi[ecx+5] = bx;
-			bx = esi[ecx+7];
-			if (ax) edi[ecx+6] = ax;
-			if (bx) edi[ecx+7] = bx;
+			if (pixel)
+				dest[x] = pixel;
 		}
-		while (ecx += 8);
 
-		ecx = -CLIP_W;
-		esi += SCREEN_WIDTH;
-		edi += dst_pitch;
+		src += SCREEN_WIDTH;
 	}
-	while (--edx);
 }
 
 void halleys_state::copy_fixed_2b(bitmap_ind16 &bitmap, UINT16 *source)
 {
-	UINT16 *esi, *edi;
-	int dst_pitch, ecx, edx;
-	UINT16 ax, bx;
+	UINT16 *src = source + CLIP_SKIP;
+	for(int y=0; y != CLIP_H; y++) {
+		UINT16 *dest = &bitmap.pix16(VIS_MINY + y, VIS_MINX);
+		for(int x=0; x != CLIP_W; x++) {
+			UINT16 pixel = src[x];
 
-	esi = source + CLIP_SKIP + CLIP_W;
-	edi = &bitmap.pix16(VIS_MINY, VIS_MINX + CLIP_W);
-	dst_pitch = bitmap.rowpixels();
-	ecx = -CLIP_W;
-	edx = CLIP_H;
-	do {
-		do {
-			ax = esi[ecx];
-			bx = esi[ecx+1];
+			if ((pixel && !(pixel & SP_2BACK)) || !dest[x])
+				dest[x] = pixel;
+		}
 
-			if ((ax && !(ax & SP_2BACK)) || !edi[ecx + 0]) edi[ecx + 0] = ax; ax = esi[ecx + 2];
-			if ((bx && !(bx & SP_2BACK)) || !edi[ecx + 1]) edi[ecx + 1] = bx; bx = esi[ecx + 3];
-
-			if ((ax && !(ax & SP_2BACK)) || !edi[ecx + 2]) edi[ecx + 2] = ax; ax = esi[ecx + 4];
-			if ((bx && !(bx & SP_2BACK)) || !edi[ecx + 3]) edi[ecx + 3] = bx; bx = esi[ecx + 5];
-
-			if ((ax && !(ax & SP_2BACK)) || !edi[ecx + 4]) edi[ecx + 4] = ax; ax = esi[ecx + 6];
-			if ((bx && !(bx & SP_2BACK)) || !edi[ecx + 5]) edi[ecx + 5] = bx; bx = esi[ecx + 7];
-
-			if ((ax && !(ax & SP_2BACK)) || !edi[ecx + 6]) edi[ecx + 6] = ax; 
-			if ((bx && !(bx & SP_2BACK)) || !edi[ecx + 7]) edi[ecx + 7] = bx; 
-		}	while (ecx += 8);
-
-		ecx = -CLIP_W;
-		esi += SCREEN_WIDTH;
-		edi += dst_pitch;
+		src += SCREEN_WIDTH;
 	}
-	while (--edx);
 }
 
 void halleys_state::filter_bitmap(bitmap_ind16 &bitmap, int mask)
 {
+	return;
 	int dst_pitch;
 
 	UINT32 *pal_ptr, *edi;
