@@ -171,10 +171,8 @@ private:
 	UINT32 zeus_fifo[20];
 	UINT8 zeus_fifo_words;
 
-	UINT32 m_fill_dark_color;
-	UINT16 m_fill_dark_depth;
-	UINT32 m_fill_light_color;
-	UINT16 m_fill_light_depth;
+	UINT32 m_fill_color;
+	UINT16 m_fill_depth;
 
 #if TRACK_REG_USAGE
 	struct reg_info

@@ -98,10 +98,8 @@ void zeus2_device::device_start()
 	save_item(NAME(zeus_matrix));
 	save_item(NAME(zeus_point));
 	save_item(NAME(zeus_texbase));
-	save_item(NAME(m_fill_dark_color));
-	save_item(NAME(m_fill_dark_depth));
-	save_item(NAME(m_fill_light_color));
-	save_item(NAME(m_fill_light_depth));
+	save_item(NAME(m_fill_color));
+	save_item(NAME(m_fill_depth));
 }
 
 void zeus2_device::device_reset()
@@ -113,10 +111,8 @@ void zeus2_device::device_reset()
 	texel_width = 256;
 	zeus_renderbase = waveram[1];
 	zeus_fifo_words = 0;
-	m_fill_dark_color = 0;
-	m_fill_dark_depth = 0;
-	m_fill_light_color = 0;
-	m_fill_light_depth = 0;
+	m_fill_color = 0;
+	m_fill_depth = 0;
 }
 
 void zeus2_device::device_stop()
@@ -503,14 +499,18 @@ void zeus2_device::zeus2_register_update(offs_t offset, UINT32 oldval, int logit
 
 		case 0x50:
 			if (m_zeusbase[0x50] == 0x00510000) {
-				// Set ram info???
-				if (m_zeusbase[0x51] == 0x00400000) {
-					m_fill_dark_color = m_zeusbase[0x58];
-					m_fill_dark_depth = m_zeusbase[0x5a] & 0xffff;
+				// SGRAM Special Mode Register Write
+				if (m_zeusbase[0x51] & 0x00400000) {
+					// SGRAM Mask Register
+					if ((m_zeusbase[0x58] & m_zeusbase[0x59] & m_zeusbase[0x5a]) != 0xffffffff)
+						logerror("zeus2_register_update: Warning! Mask Register not equal to 0xffffffff\n");
 				}
-				if (m_zeusbase[0x51] == 0x00200000) {
-					m_fill_light_color = m_zeusbase[0x58];
-					m_fill_light_depth = m_zeusbase[0x5a] & 0xffff;
+				if (m_zeusbase[0x51] & 0x00200000) {
+					// SGRAM Color Register
+					m_fill_color = m_zeusbase[0x58];
+					m_fill_depth = m_zeusbase[0x5a] & 0xffff;
+					if (m_zeusbase[0x58] != m_zeusbase[0x59])
+						logerror("zeus2_register_update: Warning! Different fill colors are set.\n");
 				}
 			}
 			else if (1 && (m_zeusbase[0x50] & 0x00080000) && (m_zeusbase[0x50] & 0xffff)) {
@@ -522,17 +522,15 @@ void zeus2_device::zeus2_register_update(offs_t offset, UINT32 oldval, int logit
 				//UINT32 lastRow = (((m_zeusbase[0x50] >> 8) & 0xff) << 3) | 0x7;
 				UINT32 lastRow = (((m_zeusbase[0x50] >> 8) & 0xff) << 3) | 0x3;
 				UINT32 lastCol = (((m_zeusbase[0x50] >> 0) & 0xff) << 2) | 0x3;
-				UINT32 fillColor = m_fill_dark_color; // Not sure how to select
-				UINT16 fillDepth = m_fill_dark_depth; // Not sure how to select
 				// Not sure how to select
 				//void *base = waveram1_ptr_from_expanded_addr(m_zeusbase[0x51]);
 				void *base = (m_zeusbase[0x50] & 0x800000) ? waveram1_ptr_from_expanded_addr(m_zeusbase[0x51]) : zeus_renderbase;
 				for (int y = 0; y <= lastRow; y++)
 					for (int x = 0; x <= lastCol; x++) {
-						WAVERAM_WRITEPIX(base, y, x, fillColor);
-						WAVERAM_WRITEDEPTH(base, y, x, fillDepth);
+						WAVERAM_WRITEPIX(base, y, x, m_fill_color);
+						WAVERAM_WRITEDEPTH(base, y, x, m_fill_depth);
 					}
-					//waveram_plot_depth(y, x, fillColor, fillDepth);
+					//waveram_plot_depth(y, x, m_fill_color, m_fill_depth);
 			} 
 			else if ((m_zeusbase[0x5e] >> 16) != 0xF208) {
 			/* If 0x5e==0xf20a0000 (atlantis) or 0xf20d0000 (the grid) then process the read/write now */
