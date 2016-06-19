@@ -66,7 +66,7 @@ public:
 	void restyle(size_t start, size_t span, rgb_t *fgcolor, rgb_t *bgcolor);
 	int get_wrap_info(std::vector<int> &xstart, std::vector<int> &xend) const;
 	void emit(render_container *container, float x, float y);
-	void add_text(const char *text, rgb_t fgcolor = rgb_t::white, rgb_t bgcolor = rgb_t(0,0,0,0), float size = 1.0)
+	void add_text(const char *text, rgb_t fgcolor = rgb_t::white, rgb_t bgcolor = rgb_t::transparent, float size = 1.0)
 	{
 		// create the style
 		char_style style = { 0, };
@@ -140,7 +140,7 @@ private:
 	float m_xscale;
 	float m_yscale;
 	float m_width;
-	float m_maximum_line_width;
+	mutable float m_calculated_actual_width;
 	text_justify m_justify;
 	word_wrapping m_wrap;
 	std::vector<std::unique_ptr<line>> m_lines;
@@ -155,7 +155,7 @@ private:
 	float get_char_width(unicode_char ch, float size);
 	void truncate_wrap();
 	void word_wrap();
-	void update_maximum_line_width();
+	void invalidate_calculated_actual_width();
 };
 
 } // namespace ui

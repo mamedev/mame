@@ -584,8 +584,11 @@ void mame_ui_manager::draw_text_full(render_container *container, const char *or
 
 void mame_ui_manager::draw_text_box(render_container *container, const char *text, ui::text_layout::text_justify justify, float xpos, float ypos, rgb_t backcolor)
 {
+	// cap the maximum width
+	float maximum_width = 1.0f - UI_BOX_LR_BORDER * 2;
+
 	// create a layout
-	ui::text_layout layout = create_layout(container, 1.0f, justify);
+	ui::text_layout layout = create_layout(container, maximum_width, justify);
 
 	// add text to it
 	layout.add_text(text);
