@@ -582,6 +582,8 @@ void menu::draw(UINT32 flags, float origx0, float origy0)
 		top_line = 0;
 	if (top_line > item.size() - visible_lines || selected == (item.size() - 1))
 		top_line = item.size() - visible_lines;
+	if (selected >= top_line + visible_lines)
+		top_line = selected - (visible_lines / 2);
 
 	bool show_top_arrow = false;
 	bool show_bottom_arrow = false;
