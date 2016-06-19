@@ -78,7 +78,7 @@ CORE IMPLEMENTATION
 //-------------------------------------------------
 
 text_layout::text_layout(render_font &font, float xscale, float yscale, float width, text_layout::text_justify justify, text_layout::word_wrapping wrap)
-	: m_font(font), m_xscale(xscale), m_yscale(yscale), m_width(width), m_justify(justify), m_wrap(wrap), m_current_line(nullptr), m_last_break(0), m_text_position(0), m_truncating(false)
+	: m_font(font), m_xscale(xscale), m_yscale(yscale), m_width(width), m_maximum_line_width(0.0f), m_justify(justify), m_wrap(wrap), m_current_line(nullptr), m_last_break(0), m_text_position(0), m_truncating(false)
 
 {
 }
@@ -89,7 +89,7 @@ text_layout::text_layout(render_font &font, float xscale, float yscale, float wi
 //-------------------------------------------------
 
 text_layout::text_layout(text_layout &&that)
-	: m_font(that.m_font), m_xscale(that.m_xscale), m_yscale(that.m_yscale), m_width(that.m_width), m_justify(that.m_justify), m_wrap(that.m_wrap), m_lines(std::move(that.m_lines)),
+	: m_font(that.m_font), m_xscale(that.m_xscale), m_yscale(that.m_yscale), m_width(that.m_width), m_maximum_line_width(that.m_maximum_line_width), m_justify(that.m_justify), m_wrap(that.m_wrap), m_lines(std::move(that.m_lines)),
 	  m_current_line(that.m_current_line), m_last_break(that.m_last_break), m_text_position(that.m_text_position), m_truncating(false)
 {
 }
