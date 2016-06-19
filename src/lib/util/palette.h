@@ -80,6 +80,7 @@ public:
 	static const rgb_t white;
 	static const rgb_t green;
 	static const rgb_t amber;
+	static const rgb_t transparent;
 
 private:
 	UINT32  m_data;

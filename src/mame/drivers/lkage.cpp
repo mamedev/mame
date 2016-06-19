@@ -107,7 +107,7 @@ TIMER_CALLBACK_MEMBER(lkage_state::nmi_callback)
 
 WRITE8_MEMBER(lkage_state::lkage_sound_command_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(lkage_state::nmi_callback),this), data);
 }
 
@@ -187,7 +187,7 @@ static ADDRESS_MAP_START( lkage_sound_map, AS_PROGRAM, 8, lkage_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_byte_r) AM_WRITENOP /* ??? */
+	AM_RANGE(0xb000, 0xb000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITENOP /* ??? */
 	AM_RANGE(0xb001, 0xb001) AM_READNOP /* ??? */ AM_WRITE(lkage_sh_nmi_enable_w)
 	AM_RANGE(0xb002, 0xb002) AM_WRITE(lkage_sh_nmi_disable_w)
 	AM_RANGE(0xb003, 0xb003) AM_WRITENOP
@@ -476,10 +476,6 @@ static GFXDECODE_START( lkage )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, sprite_layout,  0, 16 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(lkage_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
 
 void lkage_state::machine_start()
 {
@@ -566,8 +562,10 @@ static MACHINE_CONFIG_START( lkage, lkage_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym1", YM2203, AUDIO_CLOCK )
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(lkage_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -611,8 +609,10 @@ static MACHINE_CONFIG_START( lkageb, lkage_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym1", YM2203, AUDIO_CLOCK)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(lkage_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)

@@ -1414,7 +1414,7 @@ endif
 .PHONY: cmake
 cmake: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) cmake
-ifeq ($(OS),windows)
+ifneq (posix,$(SHELLTYPE))
 	$(SILENT)echo cmake_minimum_required(VERSION 2.8.4) > CMakeLists.txt
 	$(SILENT)echo add_subdirectory($(PROJECTDIR)/cmake) >> CMakeLists.txt
 else

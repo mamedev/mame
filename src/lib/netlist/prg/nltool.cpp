@@ -11,12 +11,6 @@
 #include <cstdio>
 #include <cstdlib>
 
-#ifdef PSTANDALONE
-#if (PSTANDALONE)
-#define PSTANDALONE_PROVIDED
-#endif
-#endif
-
 #include "plib/poptions.h"
 #include "plib/pstring.h"
 #include "plib/plists.h"
@@ -129,7 +123,7 @@ protected:
 	{
 		pout("{}: {}\n", l.name().cstr(), ls.cstr());
 		if (l == plib::plog_level::FATAL)
-			throw;
+			throw std::exception();
 	}
 
 private:
@@ -162,7 +156,7 @@ struct input_t
 		int e = sscanf(line.cstr(), "%lf,%[^,],%lf", &t, buf, &m_value);
 		if ( e!= 3)
 			throw netlist::fatalerror_e(plib::pfmt("error {1} scanning line {2}\n")(e)(line));
-		m_time = netlist::netlist_time(t);
+		m_time = netlist::netlist_time::from_double(t);
 		m_param = netlist->setup().find_param(buf, true);
 	}
 
@@ -191,9 +185,9 @@ struct input_t
 
 };
 
-plib::pvector_t<input_t> *read_input(netlist::netlist_t *netlist, pstring fname)
+std::vector<input_t> *read_input(netlist::netlist_t *netlist, pstring fname)
 {
-	plib::pvector_t<input_t> *ret = plib::palloc<plib::pvector_t<input_t>>();
+	std::vector<input_t> *ret = plib::palloc<std::vector<input_t>>();
 	if (fname != "")
 	{
 		plib::pifilestream f(fname);
@@ -225,7 +219,7 @@ static void run(tool_options_t &opts)
 
 	nt.read_netlist(opts.opt_file(), opts.opt_name());
 
-	plib::pvector_t<input_t> *inps = read_input(&nt, opts.opt_inp());
+	std::vector<input_t> *inps = read_input(&nt, opts.opt_inp());
 
 	double ttr = opts.opt_ttr();
 
@@ -236,16 +230,16 @@ static void run(tool_options_t &opts)
 	unsigned pos = 0;
 	netlist::netlist_time nlt = netlist::netlist_time::zero();
 
-	while (pos < inps->size() && (*inps)[pos].m_time < netlist::netlist_time(ttr))
+	while (pos < inps->size() && (*inps)[pos].m_time < netlist::netlist_time::from_double(ttr))
 	{
 		nt.process_queue((*inps)[pos].m_time - nlt);
 		(*inps)[pos].setparam();
 		nlt = (*inps)[pos].m_time;
 		pos++;
 	}
-	nt.process_queue(netlist::netlist_time(ttr) - nlt);
+	nt.process_queue(netlist::netlist_time::from_double(ttr) - nlt);
 	nt.stop();
-	pfree(inps);
+	plib::pfree(inps);
 
 	double emutime = (double) (plib::ticks() - t) / (double) plib::ticks_per_second();
 	pout("{1:f} seconds emulation took {2:f} real time ==> {3:5.2f}%\n", ttr, emutime, ttr/emutime*100.0);
@@ -285,19 +279,34 @@ static void listdevices()
 	nt.setup().start_devices();
 	nt.setup().resolve_inputs();
 
+	std::vector<plib::owned_ptr<netlist::core_device_t>> devs;
+
 	for (auto & f : list)
 	{
 		pstring out = plib::pfmt("{1} {2}(<id>")(f->classname(),"-20")(f->name());
 		pstring terms("");
 
-		auto d = f->Create(nt.setup().netlist(), "dummy");
-
+		auto d = f->Create(nt.setup().netlist(), f->name() + "_lc");
 		// get the list of terminals ...
-		for (auto & inp :  d->m_terminals)
+
+		for (auto & t : nt.setup().m_terminals)
 		{
-			if (inp.startsWith(d->name() + "."))
-				inp = inp.substr(d->name().len() + 1);
-			terms += "," + inp;
+			if (t.second->name().startsWith(d->name()))
+			{
+				pstring tn(t.second->name().substr(d->name().len()+1));
+				if (tn.find(".")<0)
+					terms += ", " + tn;
+			}
+		}
+
+		for (auto & t : nt.setup().m_alias)
+		{
+			if (t.first.startsWith(d->name()))
+			{
+				pstring tn(t.first.substr(d->name().len()+1));
+				if (tn.find(".")<0)
+					terms += ", " + tn;
+			}
 		}
 
 		if (f->param_desc().startsWith("+"))
@@ -317,6 +326,7 @@ static void listdevices()
 		printf("%s\n", out.cstr());
 		if (terms != "")
 			printf("Terminals: %s\n", terms.substr(1).cstr());
+		devs.push_back(std::move(d));
 	}
 }
 
@@ -325,10 +335,6 @@ static void listdevices()
 /*-------------------------------------------------
     main - primary entry point
 -------------------------------------------------*/
-
-#if (!PSTANDALONE)
-#include "corealloc.h"
-#endif
 
 #if 0
 static const char *pmf_verbose[] =

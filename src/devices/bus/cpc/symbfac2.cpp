@@ -94,11 +94,11 @@ void cpc_symbiface2_device::device_start()
 
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 
-	space.install_readwrite_handler(0xfd00,0xfd07,0,0,read8_delegate(FUNC(cpc_symbiface2_device::ide_cs1_r),this),write8_delegate(FUNC(cpc_symbiface2_device::ide_cs1_w),this));
-	space.install_readwrite_handler(0xfd08,0xfd0f,0,0,read8_delegate(FUNC(cpc_symbiface2_device::ide_cs0_r),this),write8_delegate(FUNC(cpc_symbiface2_device::ide_cs0_w),this));
-	space.install_read_handler(0xfd10,0xfd10,0,0,read8_delegate(FUNC(cpc_symbiface2_device::mouse_r),this));
-	space.install_readwrite_handler(0xfd14,0xfd15,0,0,read8_delegate(FUNC(cpc_symbiface2_device::rtc_r),this),write8_delegate(FUNC(cpc_symbiface2_device::rtc_w),this));
-	space.install_readwrite_handler(0xfd17,0xfd17,0,0,read8_delegate(FUNC(cpc_symbiface2_device::rom_rewrite_r),this),write8_delegate(FUNC(cpc_symbiface2_device::rom_rewrite_w),this));
+	space.install_readwrite_handler(0xfd00,0xfd07,read8_delegate(FUNC(cpc_symbiface2_device::ide_cs1_r),this),write8_delegate(FUNC(cpc_symbiface2_device::ide_cs1_w),this));
+	space.install_readwrite_handler(0xfd08,0xfd0f,read8_delegate(FUNC(cpc_symbiface2_device::ide_cs0_r),this),write8_delegate(FUNC(cpc_symbiface2_device::ide_cs0_w),this));
+	space.install_read_handler(0xfd10,0xfd10,read8_delegate(FUNC(cpc_symbiface2_device::mouse_r),this));
+	space.install_readwrite_handler(0xfd14,0xfd15,read8_delegate(FUNC(cpc_symbiface2_device::rtc_r),this),write8_delegate(FUNC(cpc_symbiface2_device::rtc_w),this));
+	space.install_readwrite_handler(0xfd17,0xfd17,read8_delegate(FUNC(cpc_symbiface2_device::rom_rewrite_r),this),write8_delegate(FUNC(cpc_symbiface2_device::rom_rewrite_w),this));
 
 	// set up ROM space (these can be writable, when mapped to &4000, or completely disabled, allowing the built-in ROMs to be visible)
 	// 32 banks of 16kB (512kB)

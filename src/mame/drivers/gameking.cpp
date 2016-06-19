@@ -315,7 +315,7 @@ ROM_END
 
 ROM_START(gamekin3)
 	ROM_REGION(0x10000+0x80000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD("gameking3", 0x10000, 0x80000,NO_DUMP )
+	ROM_LOAD("gm220.bin", 0x10000, 0x80000, CRC(1dc43bd5) SHA1(f9dcd3cb76bb7cb10565a1acb070ab375c082b4c) )
 ROM_END
 
 CONS(2003,  gameking,    0,  0,  gameking1,    gameking, gameking_state, gameking,    "TimeTop",   "GameKing GM-218", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

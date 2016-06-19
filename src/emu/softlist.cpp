@@ -59,9 +59,6 @@ private:
 	void add_rom_entry(const char *name, const char *hashdata, UINT32 offset, UINT32 length, UINT32 flags);
 
 	// expat callbacks
-	static void *expat_malloc(size_t size);
-	static void *expat_realloc(void *ptr, size_t size);
-	static void expat_free(void *ptr);
 	static void start_handler(void *data, const char *tagname, const char **attributes);
 	static void data_handler(void *data, const XML_Char *s, int len);
 	static void end_handler(void *data, const char *name);
@@ -708,14 +705,8 @@ softlist_parser::softlist_parser(software_list_device &list, std::ostringstream 
 {
 	osd_printf_verbose("Parsing %s\n", m_list.m_file.filename());
 
-	// set up memory callbacks
-	XML_Memory_Handling_Suite memcallbacks;
-	memcallbacks.malloc_fcn = expat_malloc;
-	memcallbacks.realloc_fcn = expat_realloc;
-	memcallbacks.free_fcn = expat_free;
-
 	// create the parser
-	m_parser = XML_ParserCreate_MM(nullptr, &memcallbacks, nullptr);
+	m_parser = XML_ParserCreate_MM(nullptr, nullptr, nullptr);
 	if (m_parser == nullptr)
 		throw std::bad_alloc();
 
@@ -742,31 +733,6 @@ softlist_parser::softlist_parser(software_list_device &list, std::ostringstream 
 	XML_ParserFree(m_parser);
 	osd_printf_verbose("Parsing complete\n");
 }
-
-
-//-------------------------------------------------
-//  expat_malloc/expat_realloc/expat_free -
-//  wrappers for memory allocation functions so
-//  that they pass through out memory tracking
-//  systems
-//-------------------------------------------------
-
-void *softlist_parser::expat_malloc(size_t size)
-{
-	return global_alloc_array_clear<UINT8>(size);
-}
-
-void *softlist_parser::expat_realloc(void *ptr, size_t size)
-{
-	if (ptr != nullptr) global_free_array((UINT8 *)ptr);
-	return global_alloc_array_clear<UINT8>(size);
-}
-
-void softlist_parser::expat_free(void *ptr)
-{
-	global_free_array((UINT8 *)ptr);
-}
-
 
 //-------------------------------------------------
 //  parse_error - append a parsing error with

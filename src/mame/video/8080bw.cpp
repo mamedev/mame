@@ -159,7 +159,7 @@ UINT32 _8080bw_state::screen_update_schaser(screen_device &screen, bitmap_rgb32 
 		UINT8 x = offs << 3;
 
 		UINT8 data = m_main_ram[offs];
-		UINT8 fore_color = m_colorram[offs & 0x1f9f] & 0x07;
+		UINT8 fore_color = m_scattered_colorram[(offs & 0x1f) | ((offs & 0x1f80) >> 2)] & 0x07;
 
 		if (!m_schaser_background_disable)
 		{
@@ -189,7 +189,7 @@ UINT32 _8080bw_state::screen_update_schasercv(screen_device &screen, bitmap_rgb3
 		UINT8 x = offs << 3;
 
 		UINT8 data = m_main_ram[offs];
-		UINT8 fore_color = m_colorram[offs & 0x1f9f] & 0x07;
+		UINT8 fore_color = m_scattered_colorram[(offs & 0x1f) | ((offs & 0x1f80) >> 2)] & 0x07;
 
 		/* blue background */
 		set_8_pixels(bitmap, y, x, data, fore_color, 2);
@@ -209,8 +209,8 @@ UINT32 _8080bw_state::screen_update_rollingc(screen_device &screen, bitmap_rgb32
 		UINT8 x = offs << 3;
 
 		UINT8 data = m_main_ram[offs];
-		UINT8 fore_color = m_colorram[offs & 0x1f1f] & 0x0f;
-		UINT8 back_color = m_colorram2[offs & 0x1f1f] & 0x0f;
+		UINT8 fore_color = m_scattered_colorram[(offs & 0x1f) | ((offs & 0x1f00) >> 3)] & 0x0f;
+		UINT8 back_color = m_scattered_colorram2[(offs & 0x1f) | ((offs & 0x1f00) >> 3)] & 0x0f;
 
 		set_8_pixels(bitmap, y, x, data, fore_color, back_color);
 	}
@@ -242,7 +242,7 @@ UINT32 _8080bw_state::screen_update_polaris(screen_device &screen, bitmap_rgb32 
 		   bits 1 and 2 are marked 'not use' (sic) */
 
 		UINT8 back_color = (color_map_base[color_address] & 0x01) ? 6 : 2;
-		UINT8 fore_color = ~m_colorram[offs & 0x1f9f] & 0x07;
+		UINT8 fore_color = ~m_scattered_colorram[(offs & 0x1f) | ((offs & 0x1f80) >> 2)] & 0x07;
 
 		UINT8 cloud_y = y - m_polaris_cloud_pos;
 
@@ -293,7 +293,7 @@ UINT32 _8080bw_state::screen_update_lupin3(screen_device &screen, bitmap_rgb32 &
 		UINT8 x = offs << 3;
 
 		UINT8 data = m_main_ram[offs];
-		UINT8 fore_color = ~m_colorram[offs & 0x1f9f] & 0x07;
+		UINT8 fore_color = ~m_scattered_colorram[(offs & 0x1f) | ((offs & 0x1f80) >> 2)] & 0x07;
 
 		set_8_pixels(bitmap, y, x, data, fore_color, 0);
 	}
@@ -357,7 +357,7 @@ UINT32 _8080bw_state::screen_update_sflush(screen_device &screen, bitmap_rgb32 &
 		UINT8 x = offs << 3;
 
 		UINT8 data = m_main_ram[offs];
-		UINT8 fore_color = m_colorram[offs & 0x1f9f] & 0x07;
+		UINT8 fore_color = m_scattered_colorram[(offs & 0x1f) | ((offs & 0x1f80) >> 2)] & 0x07;
 
 		set_8_pixels(bitmap, y, x, data, fore_color, 0);
 	}

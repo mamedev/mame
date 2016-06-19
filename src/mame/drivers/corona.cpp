@@ -312,6 +312,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "re800.lh"
 #include "luckyrlt.lh"
@@ -324,7 +325,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	UINT8 m_blitter_x_reg;
 	UINT8 m_blitter_y_reg;
@@ -354,6 +356,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<screen_device> m_screen;
+	required_device<generic_latch_8_device> m_soundlatch;
 };
 
 
@@ -494,14 +497,14 @@ UINT32 corona_state::screen_update_luckyrlt(screen_device &screen, bitmap_ind16 
 
 WRITE8_MEMBER(corona_state::sound_latch_w)
 {
-	soundlatch_byte_w(space, 0, data & 0xff);
+	m_soundlatch->write(space, 0, data & 0xff);
 	m_soundcpu->set_input_line(0, ASSERT_LINE);
 }
 
 READ8_MEMBER(corona_state::sound_latch_r)
 {
 	m_soundcpu->set_input_line(0, CLEAR_LINE);
-	return soundlatch_byte_r(space, 0);
+	return m_soundlatch->read(space, 0);
 }
 
 
@@ -1364,6 +1367,9 @@ static MACHINE_CONFIG_START( winner81, corona_state )
 	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK1)    /* measured */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1395,6 +1401,9 @@ static MACHINE_CONFIG_START( winner82, corona_state )
 	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLK2)    /* measured */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1427,6 +1436,9 @@ static MACHINE_CONFIG_START( re800, corona_state )
 	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1458,6 +1470,9 @@ static MACHINE_CONFIG_START( rcirulet, corona_state )
 	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1490,6 +1505,9 @@ static MACHINE_CONFIG_START( luckyrlt, corona_state )
 	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

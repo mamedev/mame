@@ -39,12 +39,12 @@ static inline std::shared_ptr<sdl_window_info> window_from_id(Uint32 windowID)
 {
 	SDL_Window *window = SDL_GetWindowFromID(windowID);
 
-	for (auto w : sdl_window_list)
+	for (auto w : osd_common_t::s_window_list)
 	{
 		//printf("w->window_id: %d\n", w->window_id);
 		if (w->platform_window<SDL_Window*>() == window)
 		{
-			return w;
+			return std::static_pointer_cast<sdl_window_info>(w);
 		}
 	}
 	return nullptr;

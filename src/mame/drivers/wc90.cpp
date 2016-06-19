@@ -72,7 +72,7 @@ WRITE8_MEMBER(wc90_state::bankswitch1_w)
 
 WRITE8_MEMBER(wc90_state::sound_command_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -127,7 +127,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf803) AM_DEVREADWRITE("ymsnd", ym2608_device, read, write)
 	AM_RANGE(0xfc00, 0xfc00) AM_READNOP /* ??? adpcm ??? */
-	AM_RANGE(0xfc10, 0xfc10) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xfc10, 0xfc10) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -381,6 +381,8 @@ static MACHINE_CONFIG_START( wc90, wc90_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2608, XTAL_8MHz)  /* verified on pcb */
 	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

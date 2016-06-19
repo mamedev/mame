@@ -63,8 +63,8 @@ const device_type PIONEER_LDV1000 = &device_creator<pioneer_ldv1000_device>;
 static ADDRESS_MAP_START( ldv1000_map, AS_PROGRAM, 8, pioneer_ldv1000_device )
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x6000) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM
-	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x9ff0) AM_DEVREADWRITE("ldvppi0", i8255_device, read, write)
-	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x9ff0) AM_DEVREADWRITE("ldvppi1", i8255_device, read, write)
+	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1ff0) AM_DEVREADWRITE("ldvppi0", i8255_device, read, write)
+	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x1ff0) AM_DEVREADWRITE("ldvppi1", i8255_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -126,6 +126,7 @@ pioneer_ldv1000_device::pioneer_ldv1000_device(const machine_config &mconfig, co
 		m_z80_cpu(*this, "ldv1000"),
 		m_z80_ctc(*this, "ldvctc"),
 		m_multitimer(nullptr),
+		m_command_strobe_cb(*this),
 		m_command(0),
 		m_status(0),
 		m_vsync(false),
@@ -175,6 +176,8 @@ void pioneer_ldv1000_device::device_start()
 
 	// allocate timers
 	m_multitimer = timer_alloc(TID_MULTIJUMP);
+	
+	m_command_strobe_cb.resolve_safe();
 }
 
 
@@ -648,6 +651,9 @@ WRITE8_MEMBER( pioneer_ldv1000_device::ppi1_portc_w )
 		printf("\n");
 	}
 
+	// bit 4 sends a command strobe signal to Host CPU
+	m_command_strobe_cb(bool(data & 0x10));
+	
 	// video squelch is controlled by bit 3
 	set_video_squelch((data & 0x08) == 0);
 

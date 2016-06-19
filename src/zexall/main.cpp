@@ -99,7 +99,7 @@ void emulator_info::layout_file_cb(xml_data_node &layout) { }
 
 const char * emulator_info::get_appname() { return nullptr; }
 
-const char * emulator_info::get_appname_lower() { return nullptr; }
+const char * emulator_info::get_appname_lower() { return "zexall"; }
 
 const char * emulator_info::get_configname() { return nullptr; }
 

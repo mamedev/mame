@@ -114,8 +114,8 @@ void cpc_rs232_device::device_start()
 	address_space& space = cpu->memory().space(AS_IO);
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 
-	space.install_readwrite_handler(0xfadc,0xfadf,0,0,read8_delegate(FUNC(cpc_rs232_device::dart_r),this),write8_delegate(FUNC(cpc_rs232_device::dart_w),this));
-	space.install_readwrite_handler(0xfbdc,0xfbdf,0,0,read8_delegate(FUNC(cpc_rs232_device::pit_r),this),write8_delegate(FUNC(cpc_rs232_device::pit_w),this));
+	space.install_readwrite_handler(0xfadc,0xfadf,read8_delegate(FUNC(cpc_rs232_device::dart_r),this),write8_delegate(FUNC(cpc_rs232_device::dart_w),this));
+	space.install_readwrite_handler(0xfbdc,0xfbdf,read8_delegate(FUNC(cpc_rs232_device::pit_r),this),write8_delegate(FUNC(cpc_rs232_device::pit_w),this));
 }
 
 //-------------------------------------------------

@@ -430,12 +430,12 @@ cheat_script::script_entry::script_entry(cheat_manager &manager, symbol_table &s
 
 			// extract other attributes
 			m_line = xml_get_attribute_int(&entrynode, "line", 0);
-			m_justify = JUSTIFY_LEFT;
+			m_justify = ui::text_layout::LEFT;
 			const char *align = xml_get_attribute_string(&entrynode, "align", "left");
 			if (strcmp(align, "center") == 0)
-				m_justify = JUSTIFY_CENTER;
+				m_justify = ui::text_layout::CENTER;
 			else if (strcmp(align, "right") == 0)
-				m_justify = JUSTIFY_RIGHT;
+				m_justify = ui::text_layout::RIGHT;
 			else if (strcmp(align, "left") != 0)
 				throw emu_fatalerror("%s.xml(%d): invalid alignment '%s' specified\n", filename, entrynode.line, align);
 
@@ -509,7 +509,7 @@ void cheat_script::script_entry::execute(cheat_manager &manager, UINT64 &arginde
 			curarg += arg->values(argindex, &params[curarg]);
 
 		// generate the astring
-		manager.get_output_astring(m_line, m_justify) = string_format(m_format,
+		manager.get_output_string(m_line, m_justify) = string_format(m_format,
 			(UINT32)params[0],  (UINT32)params[1],  (UINT32)params[2],  (UINT32)params[3],
 			(UINT32)params[4],  (UINT32)params[5],  (UINT32)params[6],  (UINT32)params[7],
 			(UINT32)params[8],  (UINT32)params[9],  (UINT32)params[10], (UINT32)params[11],
@@ -545,9 +545,9 @@ void cheat_script::script_entry::save(emu_file &cheatfile) const
 			cheatfile.printf(" condition=\"%s\"", cheat_manager::quote_expression(m_condition).c_str());
 		if (m_line != 0)
 			cheatfile.printf(" line=\"%d\"", m_line);
-		if (m_justify == JUSTIFY_CENTER)
+		if (m_justify == ui::text_layout::CENTER)
 			cheatfile.printf(" align=\"center\"");
-		else if (m_justify == JUSTIFY_RIGHT)
+		else if (m_justify == ui::text_layout::RIGHT)
 			cheatfile.printf(" align=\"right\"");
 		if (m_arglist.size() == 0)
 			cheatfile.printf(" />\n");
@@ -1078,10 +1078,12 @@ cheat_manager::cheat_manager(running_machine &machine)
 	// we rely on the debugger expression callbacks; if the debugger isn't
 	// enabled, we must jumpstart them manually
 	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) == 0)
+	{
 		m_cpu = std::make_unique<debugger_cpu>(machine);
 
-	// configure for memory access (shared with debugger)
-	m_cpu->configure_memory(m_symtable);
+		// configure for memory access (shared with debugger)
+		m_cpu->configure_memory(m_symtable);
+	}
 
 	// load the cheats
 	reload();
@@ -1234,19 +1236,19 @@ void cheat_manager::render_text(mame_ui_manager &mui, render_container &containe
 			// output the text
 			mui.draw_text_full(&container, m_output[linenum].c_str(),
 					0.0f, (float)linenum * mui.get_line_height(), 1.0f,
-					m_justify[linenum], WRAP_NEVER, DRAW_OPAQUE,
+					m_justify[linenum], ui::text_layout::NEVER, mame_ui_manager::OPAQUE_,
 					rgb_t::white, rgb_t::black, nullptr, nullptr);
 		}
 }
 
 
 //-------------------------------------------------
-//  get_output_astring - return a reference to
+//  get_output_string - return a reference to
 //  the given row's string, and set the
 //  justification
 //-------------------------------------------------
 
-std::string &cheat_manager::get_output_astring(int row, int justify)
+std::string &cheat_manager::get_output_string(int row, ui::text_layout::text_justify justify)
 {
 	// if the row is not specified, grab the next one
 	if (row == 0)

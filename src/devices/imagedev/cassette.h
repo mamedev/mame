@@ -58,7 +58,7 @@ public:
 	virtual bool call_load() override;
 	virtual bool call_create(int format_type, option_resolution *format_options) override;
 	virtual void call_unload() override;
-	virtual int call_display(std::string& s) override;
+	virtual std::string call_display() override;
 	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override { return load_software(swlist, swname, start_entry); }
 
 	virtual iodevice_t image_type() const override { return IO_CASSETTE; }

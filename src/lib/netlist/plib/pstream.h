@@ -108,7 +108,7 @@ public:
 
 	bool readline(pstring &line);
 
-	bool read(UINT8 &c)
+	bool read(char &c)
 	{
 		return (read(&c, 1) == 1);
 	}

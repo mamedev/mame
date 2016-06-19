@@ -683,17 +683,6 @@ GFXDECODE_END
 
 
 /************************************************************
-                YM2610 (SOUND)
-************************************************************/
-
-/* Handler called by the YM2610 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(taitoair_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-/************************************************************
                 MACHINE DRIVERS
 ************************************************************/
 
@@ -772,7 +761,7 @@ static MACHINE_CONFIG_START( airsys, taitoair_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz / 2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoair_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 	MCFG_SOUND_ROUTE(2, "mono", 0.60)

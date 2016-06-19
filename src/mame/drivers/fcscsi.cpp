@@ -349,9 +349,16 @@ MACHINE_CONFIG_END
 ROM_START (fcscsi1)
 	ROM_REGION (0x1000000, "maincpu", 0)
 
-	/* Besta ROM:s */
-	ROM_LOAD16_BYTE ("besta88_scsi_lower.ROM", 0xe00001, 0x4000, CRC (fb3ab364) SHA1 (d79112100f1c4beaf358e006efd4dde5e300b0ba))
-	ROM_LOAD16_BYTE ("besta88_scsi_upper.ROM", 0xe00000, 0x4000, CRC (41f9cdf4) SHA1 (66b998bbf9459f0a613718260e05e97749532073))
+	/* Besta ROM:s - apparantly patched Force ROM:s */
+	ROM_SYSTEM_BIOS(0, "Besta 88", "Besta 88")
+	ROMX_LOAD ("besta88_scsi_lower.ROM", 0xe00001, 0x4000, CRC (fb3ab364) SHA1 (d79112100f1c4beaf358e006efd4dde5e300b0ba), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD ("besta88_scsi_upper.ROM", 0xe00000, 0x4000, CRC (41f9cdf4) SHA1 (66b998bbf9459f0a613718260e05e97749532073), ROM_SKIP(1) | ROM_BIOS(1))
+
+	/* Force ROM:s  */
+	ROM_SYSTEM_BIOS(1, "ISCSI-1 v3.7", "Force Computer SYS68K/ISCSI-1 firmware v3.7")
+	ROMX_LOAD ("ISCSI-1_V3.7_L.BIN", 0xe00001, 0x4000, CRC (83d95ab7) SHA1 (bf249910bcb6cb0b04dda2a95a38a0f90b553352), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD ("ISCSI-1_V3.7_U.BIN", 0xe00000, 0x4000, CRC (58815831) SHA1 (074085ef96e1fe2a551938bdeee6a9cab40ff09c), ROM_SKIP(1) | ROM_BIOS(2))
+
 ROM_END
 
 /* Driver */

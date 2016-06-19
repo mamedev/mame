@@ -16,7 +16,7 @@ CPU Board:
  D8243          - I/O Expander for D7751C (8048 based)
 
 Video Board:
- almost empty - 3/4 sodlering pins not populated
+ almost empty - 3/4 soldering pins not populated
 
 
 
@@ -40,6 +40,7 @@ Limit for help/undo (matta):
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/gen_latch.h"
 #include "machine/i8243.h"
 #include "sound/dac.h"
 #include "sound/ay8910.h"
@@ -58,7 +59,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ay1(*this, "ay1"),
 		m_ay2(*this, "ay2"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch")
 	{
 	}
 
@@ -83,6 +85,7 @@ public:
 	mc6845_device *m_mc6845;
 	device_t *m_n7751;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_READ8_MEMBER(unk_87_r);
 	DECLARE_WRITE8_MEMBER(unk_8a_w);
@@ -212,14 +215,14 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 8, othello_state )
 	AM_RANGE(0x87, 0x87) AM_READ(unk_87_r)
 	AM_RANGE(0x8a, 0x8a) AM_WRITE(unk_8a_w)
 	AM_RANGE(0x8c, 0x8c) AM_READWRITE(unk_8c_r, unk_8c_w)
-	AM_RANGE(0x8d, 0x8d) AM_READWRITE(sound_ack_r, soundlatch_byte_w)
+	AM_RANGE(0x8d, 0x8d) AM_READ(sound_ack_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x8f, 0x8f) AM_WRITE(unk_8f_w)
 ADDRESS_MAP_END
 
 READ8_MEMBER(othello_state::latch_r)
 {
-	int retval = soundlatch_byte_r(space, 0);
-	soundlatch_clear_byte_w(space, 0, 0);
+	int retval = m_soundlatch->read(space, 0);
+	m_soundlatch->clear_w(space, 0, 0);
 	return retval;
 }
 
@@ -433,6 +436,8 @@ static MACHINE_CONFIG_START( othello, othello_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)

@@ -172,13 +172,13 @@ READ8_MEMBER(matmania_state::maniach_mcu_status_r)
 
 WRITE8_MEMBER(matmania_state::matmania_sh_command_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 }
 
 WRITE8_MEMBER(matmania_state::maniach_sh_command_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
@@ -231,7 +231,7 @@ static ADDRESS_MAP_START( matmania_sound_map, AS_PROGRAM, 8, matmania_state )
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
 	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
 	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE("dac", dac_device, write_signed8)
-	AM_RANGE(0x2007, 0x2007) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x2007, 0x2007) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -239,7 +239,7 @@ static ADDRESS_MAP_START( maniach_sound_map, AS_PROGRAM, 8, matmania_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ymsnd", ym3526_device, write)
 	AM_RANGE(0x2002, 0x2002) AM_DEVWRITE("dac", dac_device, write_signed8)
-	AM_RANGE(0x2004, 0x2004) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x2004, 0x2004) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -451,6 +451,8 @@ static MACHINE_CONFIG_START( matmania, matmania_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
@@ -529,6 +531,8 @@ static MACHINE_CONFIG_START( maniach, matmania_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3526, 3600000)
 	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6809_device, firq_line))

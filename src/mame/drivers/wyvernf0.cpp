@@ -31,6 +31,7 @@ Actual game video: http://www.nicozon.net/watch/sm10823430
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/msm5232.h"
 
@@ -47,7 +48,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	// memory pointers
 	required_shared_ptr<UINT8> m_bgram;
@@ -96,6 +98,7 @@ public:
 	optional_device<cpu_device> m_mcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 };
 
 
@@ -352,7 +355,7 @@ TIMER_CALLBACK_MEMBER(wyvernf0_state::nmi_callback)
 
 WRITE8_MEMBER(wyvernf0_state::sound_command_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(wyvernf0_state::nmi_callback),this), data);
 }
 
@@ -402,7 +405,7 @@ static ADDRESS_MAP_START( wyvernf0_map, AS_PROGRAM, 8, wyvernf0_state )
 	AM_RANGE(0xd606, 0xd606) AM_READ_PORT("JOY2")
 	AM_RANGE(0xd607, 0xd607) AM_READ_PORT("FIRE2")
 
-	AM_RANGE(0xd610, 0xd610) AM_READWRITE(soundlatch_byte_r, sound_command_w)
+	AM_RANGE(0xd610, 0xd610) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(sound_command_w)
 	// d613 write (FF -> 00 at boot)
 
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -419,7 +422,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wyvernf0_state )
 	// ca00 write
 	// cb00 write
 	// cc00 write
-	AM_RANGE(0xd000, 0xd000) AM_READWRITE(soundlatch_byte_r, soundlatch_byte_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, write)
 	AM_RANGE(0xd200, 0xd200) AM_WRITE(nmi_enable_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(nmi_disable_w)
 	AM_RANGE(0xd600, 0xd600) AM_RAM // VOL/BAL?
@@ -662,6 +665,8 @@ static MACHINE_CONFIG_START( wyvernf0, wyvernf0_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	// coin, fire, lift-off
 	MCFG_SOUND_ADD("ay1", YM2149, 3000000) // YM2149 clock ??, pin 26 ??

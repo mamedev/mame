@@ -46,7 +46,6 @@
 */
 
 #include "includes/abc1600.h"
-#include "machine/watchdog.h"
 #include "softlist.h"
 
 
@@ -845,9 +844,6 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_CPU_PROGRAM_MAP(abc1600_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(abc1600_state,abc1600_int_ack)
 
-	//MCFG_WATCHDOG_ADD("watchdog")
-	//MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1600)) // XTAL_64MHz/8/10/20000/8/8
-
 	// video hardware
 	MCFG_ABC1600_MOVER_ADD()
 
@@ -951,12 +947,11 @@ MACHINE_CONFIG_END
 
 ROM_START( abc1600 )
 	ROM_REGION( 0x71c, "plds", 0 )
-	ROM_LOAD( "1020 6490349-01.8b",  0x104, 0x104, CRC(1fa065eb) SHA1(20a95940e39fa98e97e59ea1e548ac2e0c9a3444) ) // expansion bus strobes
-	ROM_LOAD( "1021 6490350-01.5d",  0x208, 0x104, CRC(96f6f44b) SHA1(12d1cd153dcc99d1c4a6c834122f370d49723674) ) // interrupt encoder and ROM/RAM control
-	ROM_LOAD( "1023 6490352-01.11e", 0x410, 0x104, CRC(a2f350ac) SHA1(77e08654a197080fa2111bc3031cd2c7699bf82b) ) // interrupt acknowledge
-	ROM_LOAD( "1024 6490353-01.12e", 0x514, 0x104, CRC(67f1328a) SHA1(b585495fe14a7ae2fbb29f722dca106d59325002) ) // expansion bus timing and control
-	ROM_LOAD( "1025 6490354-01.6e",  0x618, 0x104, CRC(9bda0468) SHA1(ad373995dcc18532274efad76fa80bd13c23df25) ) // DMA transfer
-	//ROM_LOAD( "pal16r4.10c", 0x71c, 0x104, NO_DUMP ) // SCC read/write, mentioned in the preliminary service manual, but not present on the PCB
+	ROM_LOAD( "1020 6490349-01.8b",  0x104, 0x104, CRC(1fa065eb) SHA1(20a95940e39fa98e97e59ea1e548ac2e0c9a3444) ) // PAL16L8A expansion bus strobes
+	ROM_LOAD( "1021 6490350-01.5d",  0x208, 0x104, CRC(96f6f44b) SHA1(12d1cd153dcc99d1c4a6c834122f370d49723674) ) // PAL16L8 interrupt encoder and ROM/RAM control
+	ROM_LOAD( "1023 6490352-01.11e", 0x410, 0x104, CRC(a2f350ac) SHA1(77e08654a197080fa2111bc3031cd2c7699bf82b) ) // PAL16R6 interrupt acknowledge
+	ROM_LOAD( "1024 6490353-01.12e", 0x514, 0x104, CRC(67f1328a) SHA1(b585495fe14a7ae2fbb29f722dca106d59325002) ) // PAL16R4 expansion bus timing and control
+	ROM_LOAD( "1025 6490354-01.6e",  0x618, 0x104, CRC(9bda0468) SHA1(ad373995dcc18532274efad76fa80bd13c23df25) ) // PAL16R4 DMA transfer
 ROM_END
 
 

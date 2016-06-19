@@ -1,16 +1,22 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
-/*
-  Unknown game, dump was marked 'slot 72 - poker'
+// copyright-holders:David Haywood, Robbbert
+/************************************************************************************************
+  Poker Monarch
 
   GFX roms contain
   'Extrema Systems International Ltd'
   as well as a logo for the company.
 
-  There are also 'Lucky Boy' graphics in various places, which might be the title.
+  There are also 'Lucky Boy' graphics in various places.
 
+  * Turn on all the dips of SW1
+  * Restart game
+  * If it says ERROR OF RAM GAME STOP, press F2
+  * When you get a blank blue screen Press Alt+2
+  * This gives a setup screen. Press F2 to see cards and logo (and it beeps)
+  * Depending on settings of SW1, you can get other cards, or other test screens.
 
-*/
+*************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -89,17 +95,15 @@ WRITE8_MEMBER(poker72_state::poker72_paletteram_w)
 
 WRITE8_MEMBER(poker72_state::output_w)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
-
 	printf("%02x\n",data);
 
 /*  if((data & 0xc) == 0xc)
-        membank("bank1")->set_base(&ROM[0x10000]);
+        membank("bank1")->set_entry(2);
     else*/
 	if(data & 8)
-		membank("bank1")->set_base(&ROM[0x08000]);
+		membank("bank1")->set_entry(1);
 	else
-		membank("bank1")->set_base(&ROM[0x00000]);
+		membank("bank1")->set_entry(0);
 }
 
 WRITE8_MEMBER(poker72_state::tile_bank_w)
@@ -108,17 +112,17 @@ WRITE8_MEMBER(poker72_state::tile_bank_w)
 }
 
 static ADDRESS_MAP_START( poker72_map, AS_PROGRAM, 8, poker72_state )
-	AM_RANGE(0x0000, 0xbfff) AM_ROMBANK("bank1")
+	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM //work ram
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xf000, 0xfbff) AM_RAM_WRITE(poker72_paletteram_w) AM_SHARE("pal")
 	AM_RANGE(0xfc00, 0xfdff) AM_RAM //???
-	AM_RANGE(0xfe08, 0xfe08) AM_READ_PORT("IN0")
+	AM_RANGE(0xfe08, 0xfe08) AM_READ_PORT("SW1")
 	AM_RANGE(0xfe09, 0xfe09) AM_READ_PORT("IN1")
 	AM_RANGE(0xfe0a, 0xfe0a) AM_READ_PORT("IN2")
-	AM_RANGE(0xfe0c, 0xfe0c) AM_READ_PORT("IN3")
-	AM_RANGE(0xfe0d, 0xfe0d) AM_READ_PORT("IN4")
-	AM_RANGE(0xfe0e, 0xfe0e) AM_READ_PORT("IN5")
+	AM_RANGE(0xfe0c, 0xfe0c) AM_READ_PORT("SW4")
+	AM_RANGE(0xfe0d, 0xfe0d) AM_READ_PORT("SW5")
+	AM_RANGE(0xfe0e, 0xfe0e) AM_READ_PORT("SW6")
 
 	AM_RANGE(0xfe17, 0xfe17) AM_READNOP //irq ack
 	AM_RANGE(0xfe20, 0xfe20) AM_WRITE(output_w) //output, irq enable?
@@ -142,8 +146,8 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( poker72 )
-	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x00, "IN0" )
+	PORT_START("SW1")
+	PORT_DIPNAME( 0x01, 0x00, "SW1" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
@@ -169,28 +173,28 @@ static INPUT_PORTS_START( poker72 )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("M. Bet")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Black")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 ) // Z
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 ) // X
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 ) // C
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_POKER_HOLD4 ) // V
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 ) // B
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("M. Bet")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Black")
 
 
 	PORT_START("IN2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Red")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Red")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_GAMBLE_DEAL ) // '2'
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_GAMBLE_BET ) // M
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SERVICE1 ) // '9'
+	PORT_SERVICE( 0x0080, IP_ACTIVE_HIGH ) // F2
 
-	PORT_START("IN3")
-	PORT_DIPNAME( 0x01, 0x00, "IN3" )
+	PORT_START("SW4")
+	PORT_DIPNAME( 0x01, 0x00, "SW4" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
@@ -214,8 +218,8 @@ static INPUT_PORTS_START( poker72 )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-	PORT_START("IN4")
-	PORT_DIPNAME( 0x01, 0x00, "IN4" )
+	PORT_START("SW5")
+	PORT_DIPNAME( 0x01, 0x00, "SW5" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
@@ -239,35 +243,8 @@ static INPUT_PORTS_START( poker72 )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-	PORT_START("IN5")
-	PORT_DIPNAME( 0x01, 0x00, "IN5" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
-
-	PORT_START("DSW0")
-	PORT_DIPNAME( 0x01, 0x00, "DSW0" )
+	PORT_START("SW6")
+	PORT_DIPNAME( 0x01, 0x00, "SW6" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
@@ -292,8 +269,35 @@ static INPUT_PORTS_START( poker72 )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "DSW1" )
+
+	PORT_START("SW2")
+	PORT_DIPNAME( 0x01, 0x00, "SW2" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("SW3")
+	PORT_DIPNAME( 0x01, 0x00, "SW3" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
@@ -354,9 +358,7 @@ PALETTE_INIT_MEMBER(poker72_state, poker72)
 
 void poker72_state::machine_reset()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
-
-	membank("bank1")->set_base(&ROM[0]);
+	membank("bank1")->set_entry(0);
 }
 
 static MACHINE_CONFIG_START( poker72, poker72_state )
@@ -384,15 +386,15 @@ static MACHINE_CONFIG_START( poker72, poker72_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay", AY8910, 8000000/8) /* ? Mhz */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SW2"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("SW3"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
 
 ROM_START( poker72 )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "roms", 0 )
 	ROM_LOAD( "27010.bin", 0x00000, 0x20000, CRC(62447341) SHA1(e442c1f834a5dd2ab6ab3bdd316dfa86f2ca6647) )
 
 	ROM_REGION( 0x1000, "89c51", 0 )
@@ -407,9 +409,14 @@ ROM_END
 
 DRIVER_INIT_MEMBER(poker72_state,poker72)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	UINT8 *rom = memregion("roms")->base();
 
-	rom[0x4a9] = 0x28;
+	// configure and intialize bank 1
+	membank("bank1")->configure_entries(0, 4, memregion("roms")->base(), 0x8000);
+	membank("bank1")->set_entry(0);
+
+	//rom[0x4a9] = 0x28;
+	rom[0x4aa] = 0x00;
 }
 
-GAME( 1995, poker72,  0,    poker72, poker72, poker72_state,  poker72, ROT0, "Extrema Systems International Ltd.", "Poker Monarch (v2.50)", MACHINE_NOT_WORKING ) // actually unknown, was marked 'slot 72 poker'  Manufacturers logo and 'Lucky Boy' gfx in rom..
+GAME( 1995, poker72,  0,    poker72, poker72, poker72_state,  poker72, ROT0, "Extrema Systems International Ltd.", "Poker Monarch (v2.50)", MACHINE_NOT_WORKING )

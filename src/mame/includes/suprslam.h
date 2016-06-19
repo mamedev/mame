@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/gen_latch.h"
 #include "video/k053936.h"
 
 class suprslam_state : public driver_device
@@ -19,12 +20,13 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_spr_ctrl(*this, "spr_ctrl"),
 		m_screen_vregs(*this, "screen_vregs"),
-		m_spr(*this, "vsystem_spr"),
+		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k053936(*this, "k053936"),
-		m_maincpu(*this, "maincpu"),
+		m_spr(*this, "vsystem_spr"),
+		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_screen_videoram;
@@ -33,7 +35,6 @@ public:
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_spr_ctrl;
 	required_shared_ptr<UINT16> m_screen_vregs;
-	required_device<vsystem_spr_device> m_spr;
 
 	/* video-related */
 	tilemap_t     *m_screen_tilemap;
@@ -46,8 +47,14 @@ public:
 	int         m_pending_command;
 
 	/* devices */
+	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<k053936_device> m_k053936;
+	required_device<vsystem_spr_device> m_spr;
+	required_device<palette_device> m_palette;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<generic_latch_8_device> m_soundlatch;
+
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 	DECLARE_WRITE8_MEMBER(suprslam_sh_bankswitch_w);
@@ -60,8 +67,4 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	UINT32 screen_update_suprslam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };

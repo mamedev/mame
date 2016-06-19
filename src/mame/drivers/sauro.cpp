@@ -26,7 +26,7 @@ Ports:
 20      R   DSW #2
 40      R   Input Ports Player 1
 60      R   Input Ports Player 2
-80       W  Sound Commnand
+80       W  Sound Command
 c0       W  Flip Screen
 c1       W  ???
 c2-c4    W  ???
@@ -81,7 +81,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - Press START1 while in "test mode" to cycle through different screens
     (colors, Dip Switches, Inputs)
   - When "Freeze" Dip Switch is ON, press START1 to freeze and START2 to unfreeze.
-    This setting (as well as others) must be defined before reseting the games.
+    This setting (as well as others) must be defined before resetting the games.
   - "Test mode" crashes when trying to display "Difficult" ("Hard") because the full string
     is 15 bytes long while other string are 14, so the 15th "char" is NOT 0x00 :
       * 0xd49f : mask (0x30)
@@ -95,7 +95,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - Press START1 while in "test mode" to cycle through different screens
     (colors, Dip Switches, Inputs)
   - When "Freeze" Dip Switch is ON, press START1 to freeze and START2 to unfreeze.
-    This setting (as well as others) must be defined before reseting the games.
+    This setting (as well as others) must be defined before resetting the games.
 
 2a) 'trckydoc'
 
@@ -133,13 +133,13 @@ Stephh's notes (based on the games Z80 code and some tests) :
 WRITE8_MEMBER(sauro_state::sauro_sound_command_w)
 {
 	data |= 0x80;
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 }
 
 READ8_MEMBER(sauro_state::sauro_sound_command_r)
 {
-	int ret = soundlatch_byte_r(space, offset);
-	soundlatch_clear_byte_w(space, offset, 0);
+	int ret = m_soundlatch->read(space, offset);
+	m_soundlatch->clear_w(space, offset, 0);
 	return ret;
 }
 
@@ -419,6 +419,8 @@ static MACHINE_CONFIG_DERIVED( sauro, tecfri )
 	MCFG_VIDEO_START_OVERRIDE(sauro_state,sauro)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(sauro_state, screen_update_sauro)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("speech", SP0256, 3120000)
 	MCFG_SP0256_DATA_REQUEST_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))

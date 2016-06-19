@@ -106,7 +106,6 @@ class intelfsh_device;
 // ======================> intelfsh_device
 
 class intelfsh_device : public device_t,
-						public device_memory_interface,
 						public device_nvram_interface
 {
 public:
@@ -145,6 +144,8 @@ public:
 		FLASH_SST_39VF400A
 	};
 
+	UINT8 *base() { return &m_data[0]; }
+
 protected:
 	// construction/destruction
 	intelfsh_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
@@ -153,9 +154,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -166,29 +164,29 @@ protected:
 	UINT32 read_full(UINT32 offset);
 	void write_full(UINT32 offset, UINT32 data);
 
-	optional_memory_region  m_region;
+	optional_memory_region   m_region;
 
 	// configuration state
-	address_space_config    m_space_config;
-	UINT32                  m_type;
-	INT32                   m_size;
-	UINT8                   m_bits;
-	UINT32                  m_addrmask;
-	UINT16                  m_device_id;
-	UINT8                   m_maker_id;
-	bool                    m_sector_is_4k;
-	bool                    m_sector_is_16k;
-	bool                    m_top_boot_sector;
-	UINT8                   m_page_size;
+	UINT32                   m_type;
+	INT32                    m_size;
+	UINT8                    m_bits;
+	UINT32                   m_addrmask;
+	UINT16                   m_device_id;
+	UINT8                    m_maker_id;
+	bool                     m_sector_is_4k;
+	bool                     m_sector_is_16k;
+	bool                     m_top_boot_sector;
+	UINT8                    m_page_size;
 
 	// internal state
-	UINT8                   m_status;
-	INT32                   m_erase_sector;
-	INT32                   m_flash_mode;
-	bool                    m_flash_master_lock;
-	emu_timer *             m_timer;
-	INT32                   m_bank;
-	UINT8                   m_byte_count;
+	std::unique_ptr<UINT8[]> m_data;
+	UINT8                    m_status;
+	INT32                    m_erase_sector;
+	INT32                    m_flash_mode;
+	bool                     m_flash_master_lock;
+	emu_timer *              m_timer;
+	INT32                    m_bank;
+	UINT8                    m_byte_count;
 };
 
 
@@ -207,8 +205,8 @@ public:
 	DECLARE_READ8_MEMBER(read) { return read_full(offset); }
 	DECLARE_WRITE8_MEMBER(write) { write_full(offset, data); }
 
-	UINT8 read_raw(offs_t offset) { return space(AS_PROGRAM).read_byte(offset); }
-	void write_raw(offs_t offset, UINT8 data) { space(AS_PROGRAM).write_byte(offset, data); }
+	UINT8 read_raw(offs_t offset) { return m_data[offset]; }
+	void write_raw(offs_t offset, UINT8 data) { m_data[offset] = data; }
 };
 
 
@@ -227,8 +225,8 @@ public:
 	DECLARE_READ16_MEMBER(read) { return read_full(offset); }
 	DECLARE_WRITE16_MEMBER(write) { write_full(offset, data); }
 
-	UINT16 read_raw(offs_t offset) { return space(AS_PROGRAM).read_word(offset * 2); }
-	void write_raw(offs_t offset, UINT16 data) { space(AS_PROGRAM).write_word(offset * 2, data); }
+	UINT16 read_raw(offs_t offset) { return m_data[offset*2] | (m_data[offset*2+1] << 8); }
+	void write_raw(offs_t offset, UINT16 data) { m_data[offset*2] = data; m_data[offset*2+1] = data >> 8; }
 };
 
 

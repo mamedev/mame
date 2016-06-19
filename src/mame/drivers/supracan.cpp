@@ -1128,7 +1128,7 @@ static ADDRESS_MAP_START( supracan_mem, AS_PROGRAM, 16, supracan_state )
 	AM_RANGE( 0xf00000, 0xf001ff ) AM_READWRITE(video_r, video_w)
 	AM_RANGE( 0xf00200, 0xf003ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE( 0xf40000, 0xf5ffff ) AM_RAM_WRITE(vram_w) AM_SHARE("vram")
-	AM_RANGE( 0xfc0000, 0xfdffff ) AM_MIRROR(0x30000) AM_RAM /* System work ram */
+	AM_RANGE( 0xfc0000, 0xfcffff ) AM_MIRROR(0x30000) AM_RAM /* System work ram */
 ADDRESS_MAP_END
 
 READ8_MEMBER( supracan_state::_6502_soundmem_r )

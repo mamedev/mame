@@ -65,7 +65,7 @@ namespace netlist
 		}
 	};
 
-	class factory_list_t : public plib::pvector_t<plib::owned_ptr<base_factory_t>>
+	class factory_list_t : public std::vector<plib::owned_ptr<base_factory_t>>
 	{
 	public:
 		factory_list_t(setup_t &m_setup);

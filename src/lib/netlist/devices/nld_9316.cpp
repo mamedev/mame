@@ -33,7 +33,7 @@ namespace netlist
 		logic_input_t m_C;
 		logic_input_t m_D;
 
-		inline UINT8 read_ABCD() const
+		uint_fast8_t read_ABCD() const
 		{
 			//return (INPLOGIC_PASSIVE(m_D) << 3) | (INPLOGIC_PASSIVE(m_C) << 2) | (INPLOGIC_PASSIVE(m_B) << 1) | (INPLOGIC_PASSIVE(m_A) << 0);
 			return (INPLOGIC(m_D) << 3) | (INPLOGIC(m_C) << 2) | (INPLOGIC(m_B) << 1) | (INPLOGIC(m_A) << 0);
@@ -49,23 +49,19 @@ namespace netlist
 		, m_QC(*this, "QC")
 		, m_QD(*this, "QD")
 		, m_RC(*this, "RC")
-		, m_cnt(0)
 		, m_ABCD(nullptr)
-		, m_loadq(0)
-		, m_ent(0)
+		, m_cnt(*this, "m_cnt", 0)
+		, m_loadq(*this, "m_loadq", 0)
+		, m_ent(*this, "m_ent", 0)
 		{
-
-			save(NLNAME(m_cnt));
-			save(NLNAME(m_loadq));
-			save(NLNAME(m_ent));
 		}
 
 		NETLIB_RESETI();
 		NETLIB_UPDATEI();
 
 	public:
-		inline void update_outputs_all(const UINT8 cnt, const netlist_time out_delay);
-		inline void update_outputs(const UINT8 cnt);
+		inline void update_outputs_all(const uint_fast8_t cnt, const netlist_time out_delay);
+		inline void update_outputs(const uint_fast8_t cnt);
 
 		logic_input_t m_CLK;
 
@@ -75,10 +71,12 @@ namespace netlist
 		logic_output_t m_QD;
 		logic_output_t m_RC;
 
-		UINT8 m_cnt;
 		NETLIB_NAME(9316_subABCD) *m_ABCD;
-		netlist_sig_t m_loadq;
-		netlist_sig_t m_ent;
+
+		state_var_u8 m_cnt;
+		state_var_u8 m_loadq;
+		state_var_u8 m_ent;
+
 	};
 
 	NETLIB_OBJECT(9316)
@@ -211,7 +209,7 @@ namespace netlist
 		}
 	}
 
-	inline NETLIB_FUNC_VOID(9316_sub, update_outputs_all, (const UINT8 cnt, const netlist_time out_delay))
+	inline NETLIB_FUNC_VOID(9316_sub, update_outputs_all, (const uint_fast8_t cnt, const netlist_time out_delay))
 	{
 		OUTLOGIC(m_QA, (cnt >> 0) & 1, out_delay);
 		OUTLOGIC(m_QB, (cnt >> 1) & 1, out_delay);
@@ -219,7 +217,7 @@ namespace netlist
 		OUTLOGIC(m_QD, (cnt >> 3) & 1, out_delay);
 	}
 
-	inline NETLIB_FUNC_VOID(9316_sub, update_outputs, (const UINT8 cnt))
+	inline NETLIB_FUNC_VOID(9316_sub, update_outputs, (const uint_fast8_t cnt))
 	{
 		/* static */ const netlist_time out_delay = NLTIME_FROM_NS(20);
 	#if 0

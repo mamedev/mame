@@ -2275,7 +2275,8 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static ADDRESS_MAP_START( daiohp_map, AS_PROGRAM, 16, seta_state )
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM AM_MIRROR(0x080000)         // ROM
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_MIRROR(0x080000)         // ROM
+	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_MIRROR(0x080000)         // ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM                             // RAM
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")                 // P1
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("P2")                 // P2

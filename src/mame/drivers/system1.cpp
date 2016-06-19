@@ -817,8 +817,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, system1_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1fff) AM_DEVWRITE("sn1", sn76489a_device, write)
-	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1fff) AM_DEVWRITE("sn2", sn76489a_device, write)
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_DEVWRITE("sn1", sn76489a_device, write)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_DEVWRITE("sn2", sn76489a_device, write)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_READ(sound_data_r)
 ADDRESS_MAP_END
 
@@ -5261,7 +5261,7 @@ DRIVER_INIT_MEMBER(system1_state,nob)
 	space.install_read_handler(0x0001, 0x0001, read8_delegate(FUNC(system1_state::nob_start_r),this));
 
 	/* install MCU communications */
-	iospace.install_readwrite_handler(0x18, 0x18, 0x00, 0x00, read8_delegate(FUNC(system1_state::nob_maincpu_latch_r),this), write8_delegate(FUNC(system1_state::nob_maincpu_latch_w),this));
+	iospace.install_readwrite_handler(0x18, 0x18, read8_delegate(FUNC(system1_state::nob_maincpu_latch_r),this), write8_delegate(FUNC(system1_state::nob_maincpu_latch_w),this));
 	iospace.install_read_handler(0x1c, 0x1c, read8_delegate(FUNC(system1_state::nob_mcu_status_r),this));
 }
 
@@ -5333,10 +5333,10 @@ DRIVER_INIT_MEMBER(system1_state,choplift)
 DRIVER_INIT_MEMBER(system1_state,shtngmst)
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
-	iospace.install_read_port(0x12, 0x12, 0x00, 0x00, "TRIGGER");
-	iospace.install_read_port(0x18, 0x18, 0x00, 0x03, "18");
-	iospace.install_read_handler(0x1c, 0x1c, 0x00, 0x02, read8_delegate(FUNC(system1_state::shtngmst_gunx_r),this));
-	iospace.install_read_port(0x1d, 0x1d, 0x00, 0x02, "GUNY");
+	iospace.install_read_port(0x12, 0x12, "TRIGGER");
+	iospace.install_read_port(0x18, 0x18, 0x03, "18");
+	iospace.install_read_handler(0x1c, 0x1c, 0, 0x02, 0, read8_delegate(FUNC(system1_state::shtngmst_gunx_r),this));
+	iospace.install_read_port(0x1d, 0x1d, 0x02, "GUNY");
 	DRIVER_INIT_CALL(bank0c);
 }
 

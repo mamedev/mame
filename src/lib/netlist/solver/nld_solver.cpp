@@ -67,12 +67,12 @@ void terms_t::add(terminal_t *term, int net_other, bool sorted)
 		{
 			if (m_net_other[i] > net_other)
 			{
-				m_term.insert_at(i, term);
-				m_net_other.insert_at(i, net_other);
-				m_gt.insert_at(i, 0.0);
-				m_go.insert_at(i, 0.0);
-				m_Idr.insert_at(i, 0.0);
-				m_other_curanalog.insert_at(i, nullptr);
+				plib::container::insert_at(m_term, i, term);
+				plib::container::insert_at(m_net_other, i, net_other);
+				plib::container::insert_at(m_gt, i, 0.0);
+				plib::container::insert_at(m_go, i, 0.0);
+				plib::container::insert_at(m_Idr, i, 0.0);
+				plib::container::insert_at(m_other_curanalog, i, nullptr);
 				return;
 			}
 		}
@@ -89,7 +89,7 @@ void terms_t::set_pointers()
 	for (unsigned i = 0; i < count(); i++)
 	{
 		m_term[i]->set_ptrs(&m_gt[i], &m_go[i], &m_Idr[i]);
-		m_other_curanalog[i] = &m_term[i]->m_otherterm->net().m_cur_Analog;
+		m_other_curanalog[i] = m_term[i]->m_otherterm->net().m_cur_Analog.ptr();
 	}
 }
 
@@ -135,10 +135,10 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 			{
 				case terminal_t::TERMINAL:
 					if (p->device().is_timestep())
-						if (!m_step_devices.contains(&p->device()))
+						if (!plib::container::contains(m_step_devices, &p->device()))
 							m_step_devices.push_back(&p->device());
 					if (p->device().is_dynamic())
-						if (!m_dynamic_devices.contains(&p->device()))
+						if (!plib::container::contains(m_dynamic_devices, &p->device()))
 							m_dynamic_devices.push_back(&p->device());
 					{
 						terminal_t *pterm = dynamic_cast<terminal_t *>(p);
@@ -257,13 +257,13 @@ void matrix_solver_t::setup_matrix()
 		t->m_nz.clear();
 
 		for (unsigned i = 0; i < t->m_railstart; i++)
-			if (!t->m_nz.contains(other[i]))
+			if (!plib::container::contains(t->m_nz, other[i]))
 				t->m_nz.push_back(other[i]);
 
 		t->m_nz.push_back(k);     // add diagonal
 
 		/* and sort */
-		plib::sort_list(t->m_nz);
+		std::sort(t->m_nz.begin(), t->m_nz.end());
 	}
 
 	/* create a list of non zero elements right of the diagonal
@@ -281,22 +281,21 @@ void matrix_solver_t::setup_matrix()
 		else
 		{
 			t->m_nzrd = m_terms[k-1]->m_nzrd;
-			unsigned j=0;
-			while(j < t->m_nzrd.size())
+			for (auto j = t->m_nzrd.begin(); j != t->m_nzrd.end(); )
 			{
-				if (t->m_nzrd[j] < k + 1)
-					t->m_nzrd.remove_at(j);
+				if (*j < k + 1)
+					j = t->m_nzrd.erase(j);
 				else
-					j++;
+					++j;
 			}
 		}
 
 		for (unsigned i = 0; i < t->m_railstart; i++)
-			if (!t->m_nzrd.contains(other[i]) && other[i] >= (int) (k + 1))
+			if (!plib::container::contains(t->m_nzrd, other[i]) && other[i] >= (int) (k + 1))
 				t->m_nzrd.push_back(other[i]);
 
 		/* and sort */
-		plib::sort_list(t->m_nzrd);
+		std::sort(t->m_nzrd.begin(), t->m_nzrd.end());
 	}
 
 	/* create a list of non zero elements below diagonal k
@@ -324,7 +323,7 @@ void matrix_solver_t::setup_matrix()
 			if (touched[row][k])
 			{
 				ops++;
-				if (!m_terms[k]->m_nzbd.contains(row))
+				if (!plib::container::contains(m_terms[k]->m_nzbd, row))
 					m_terms[k]->m_nzbd.push_back(row);
 				for (unsigned col = k + 1; col < iN; col++)
 					if (touched[k][col])
@@ -353,13 +352,13 @@ void matrix_solver_t::setup_matrix()
 	{
 		pstring num = plib::pfmt("{1}")(k);
 
-		save(m_terms[k]->m_last_V, "lastV." + num);
-		save(m_terms[k]->m_DD_n_m_1, "m_DD_n_m_1." + num);
-		save(m_terms[k]->m_h_n_m_1, "m_h_n_m_1." + num);
+		netlist().save(*this, m_terms[k]->m_last_V, "lastV." + num);
+		netlist().save(*this, m_terms[k]->m_DD_n_m_1, "m_DD_n_m_1." + num);
+		netlist().save(*this, m_terms[k]->m_h_n_m_1, "m_h_n_m_1." + num);
 
-		save(m_terms[k]->go(),"GO" + num, m_terms[k]->count());
-		save(m_terms[k]->gt(),"GT" + num, m_terms[k]->count());
-		save(m_terms[k]->Idr(),"IDR" + num , m_terms[k]->count());
+		netlist().save(*this, m_terms[k]->go(),"GO" + num, m_terms[k]->count());
+		netlist().save(*this, m_terms[k]->gt(),"GT" + num, m_terms[k]->count());
+		netlist().save(*this, m_terms[k]->Idr(),"IDR" + num , m_terms[k]->count());
 	}
 
 	for (unsigned k=0; k<iN; k++)
@@ -404,7 +403,7 @@ void matrix_solver_t::update_forced()
 	if (m_params.m_dynamic && has_timestep_devices())
 	{
 		m_Q_sync.net().toggle_new_Q();
-		m_Q_sync.net().reschedule_in_queue(netlist_time(m_params.m_min_timestep));
+		m_Q_sync.net().reschedule_in_queue(netlist_time::from_double(m_params.m_min_timestep));
 	}
 }
 
@@ -536,7 +535,7 @@ netlist_time matrix_solver_t::compute_next_timestep()
 	}
 	//if (new_solver_timestep > 10.0 * hn)
 	//    new_solver_timestep = 10.0 * hn;
-	return netlist_time(new_solver_timestep);
+	return netlist_time::from_double(new_solver_timestep);
 }
 
 
@@ -552,11 +551,11 @@ void matrix_solver_t::log_stats()
 		log().verbose("       has {1} elements", this->has_timestep_devices() ? "timestep" : "no timestep");
 		log().verbose("       {1:6.3} average newton raphson loops", (double) this->m_stat_newton_raphson / (double) this->m_stat_vsolver_calls);
 		log().verbose("       {1:10} invocations ({2:6} Hz)  {3:10} gs fails ({4:6.2} %) {5:6.3} average",
-				this->m_stat_calculations,
-				this->m_stat_calculations * 10 / (int) (this->netlist().time().as_double() * 10.0),
-				this->m_iterative_fail,
-				100.0 * (double) this->m_iterative_fail / (double) this->m_stat_calculations,
-				(double) this->m_iterative_total / (double) this->m_stat_calculations);
+				this->m_stat_calculations(),
+				this->m_stat_calculations() * 10 / (int) (this->netlist().time().as_double() * 10.0),
+				this->m_iterative_fail(),
+				100.0 * (double) this->m_iterative_fail() / (double) this->m_stat_calculations(),
+				(double) this->m_iterative_total() / (double) this->m_stat_calculations());
 	}
 }
 
@@ -629,7 +628,7 @@ NETLIB_UPDATE(solver)
 	if (!m_Q_step.net().is_queued())
 	{
 		m_Q_step.net().toggle_new_Q();
-		m_Q_step.net().push_to_queue(netlist_time(m_params.m_max_timestep));
+		m_Q_step.net().push_to_queue(netlist_time::from_double(m_params.m_max_timestep));
 	}
 }
 
@@ -698,14 +697,14 @@ std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(int size, co
 
 void NETLIB_NAME(solver)::post_start()
 {
-	plib::pvector_t<analog_net_t::list_t> groups;
+	std::vector<analog_net_t::list_t> groups;
 	const bool use_specific = true;
 
 	m_params.m_pivot = m_pivot.Value();
 	m_params.m_accuracy = m_accuracy.Value();
 	m_params.m_gs_loops = m_gs_loops.Value();
 	m_params.m_nr_loops = m_nr_loops.Value();
-	m_params.m_nt_sync_delay = netlist_time(m_sync_delay.Value());
+	m_params.m_nt_sync_delay = netlist_time::from_double(m_sync_delay.Value());
 	m_params.m_lte = m_lte.Value();
 	m_params.m_sor = m_sor.Value();
 

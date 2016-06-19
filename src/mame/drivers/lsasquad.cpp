@@ -539,12 +539,6 @@ static GFXDECODE_START( lsasquad )
 GFXDECODE_END
 
 
-
-WRITE_LINE_MEMBER(lsasquad_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 WRITE8_MEMBER(lsasquad_state::unk)
 {
 }
@@ -633,7 +627,7 @@ static MACHINE_CONFIG_START( lsasquad, lsasquad_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(lsasquad_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(lsasquad_state, unk))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(lsasquad_state, unk))
 	MCFG_SOUND_ROUTE(0, "mono", 0.12)
@@ -690,7 +684,7 @@ static MACHINE_CONFIG_START( daikaiju, lsasquad_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(lsasquad_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(lsasquad_state, unk))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(lsasquad_state, unk))
 	MCFG_SOUND_ROUTE(0, "mono", 0.12)

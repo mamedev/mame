@@ -176,8 +176,8 @@ void menu_device_config::populate()
 		portlist.append(iptdev, errors);
 
 	// check if the device adds inputs to the system
-	for (ioport_port &port : portlist)
-		for (ioport_field &field : port.fields())
+	for (auto &port : portlist)
+		for (ioport_field &field : port.second->fields())
 		{
 			if (field.type() >= IPT_MAHJONG_FIRST && field.type() < IPT_MAHJONG_LAST)
 				input_mj++;

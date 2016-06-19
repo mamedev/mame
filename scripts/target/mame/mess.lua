@@ -132,6 +132,7 @@ CPUS["E0C6200"] = true
 CPUS["MELPS4"] = true
 CPUS["HPHYBRID"] = true
 CPUS["SM510"] = true
+CPUS["MB86901"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -655,6 +656,7 @@ BUSES["PC_JOY"] = true
 BUSES["PC_KBD"] = true
 BUSES["PET"] = true
 BUSES["PLUS4"] = true
+BUSES["POFO"] = true
 BUSES["PSX_CONTROLLER"] = true
 BUSES["QL"] = true
 BUSES["RS232"] = true
@@ -1306,8 +1308,7 @@ files {
 	MAME_DIR .. "src/mame/audio/lynx.cpp",
 	MAME_DIR .. "src/mame/audio/lynx.h",
 	MAME_DIR .. "src/mame/machine/lynx.cpp",
-	MAME_DIR .. "src/mame/drivers/portfoli.cpp",
-	MAME_DIR .. "src/mame/includes/portfoli.h",
+	MAME_DIR .. "src/mame/drivers/pofo.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "att")

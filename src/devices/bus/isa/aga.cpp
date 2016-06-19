@@ -110,9 +110,9 @@ void isa8_aga_device::device_start()
 	m_videoram = std::make_unique<UINT8[]>(0x10000);
 
 	set_isa_device();
-	m_isa->install_memory(0xb0000, 0xbffff, 0, 0, read8_delegate(FUNC(isa8_aga_device::pc_aga_videoram_r),this), write8_delegate(FUNC(isa8_aga_device::pc_aga_videoram_w),this));
-	m_isa->install_device(0x3b0, 0x3bf, 0, 0, read8_delegate( FUNC(isa8_aga_device::pc_aga_mda_r), this ), write8_delegate( FUNC(isa8_aga_device::pc_aga_mda_w), this ) );
-	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate( FUNC(isa8_aga_device::pc_aga_cga_r), this ), write8_delegate( FUNC(isa8_aga_device::pc_aga_cga_w), this ) );
+	m_isa->install_memory(0xb0000, 0xbffff, read8_delegate(FUNC(isa8_aga_device::pc_aga_videoram_r),this), write8_delegate(FUNC(isa8_aga_device::pc_aga_videoram_w),this));
+	m_isa->install_device(0x3b0, 0x3bf, read8_delegate( FUNC(isa8_aga_device::pc_aga_mda_r), this ), write8_delegate( FUNC(isa8_aga_device::pc_aga_mda_w), this ) );
+	m_isa->install_device(0x3d0, 0x3df, read8_delegate( FUNC(isa8_aga_device::pc_aga_cga_r), this ), write8_delegate( FUNC(isa8_aga_device::pc_aga_cga_w), this ) );
 
 	/* Initialise the cga palette */
 	int i;
@@ -197,9 +197,9 @@ void isa8_aga_pc200_device::device_start()
 	m_videoram = std::make_unique<UINT8[]>(0x10000);
 
 	set_isa_device();
-	m_isa->install_memory(0xb0000, 0xbffff, 0, 0, read8_delegate(FUNC(isa8_aga_pc200_device::pc200_videoram_r),this), write8_delegate(FUNC(isa8_aga_pc200_device::pc200_videoram_w),this));
-	m_isa->install_device(0x3b0, 0x3bf, 0, 0, read8_delegate( FUNC(isa8_aga_device::pc_aga_mda_r), this ), write8_delegate( FUNC(isa8_aga_device::pc_aga_mda_w), this ) );
-	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate( FUNC(isa8_aga_pc200_device::pc200_cga_r), this ), write8_delegate( FUNC(isa8_aga_pc200_device::pc200_cga_w), this ) );
+	m_isa->install_memory(0xb0000, 0xbffff, read8_delegate(FUNC(isa8_aga_pc200_device::pc200_videoram_r),this), write8_delegate(FUNC(isa8_aga_pc200_device::pc200_videoram_w),this));
+	m_isa->install_device(0x3b0, 0x3bf, read8_delegate( FUNC(isa8_aga_device::pc_aga_mda_r), this ), write8_delegate( FUNC(isa8_aga_device::pc_aga_mda_w), this ) );
+	m_isa->install_device(0x3d0, 0x3df, read8_delegate( FUNC(isa8_aga_pc200_device::pc200_cga_r), this ), write8_delegate( FUNC(isa8_aga_pc200_device::pc200_cga_w), this ) );
 
 	/* Initialise the cga palette */
 	int i;

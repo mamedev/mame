@@ -456,7 +456,7 @@ void arcadia_state::machine_start()
 		switch (m_cart->get_type())
 		{
 			case ARCADIA_STD:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0xffff, read8_delegate(FUNC(arcadia_cart_slot_device::extra_rom),(arcadia_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x7fff, read8_delegate(FUNC(arcadia_cart_slot_device::extra_rom),(arcadia_cart_slot_device*)m_cart));
 				break;
 			case ARCADIA_GOLF:
 				m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x4fff, read8_delegate(FUNC(arcadia_cart_slot_device::extra_rom),(arcadia_cart_slot_device*)m_cart));

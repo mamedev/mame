@@ -849,17 +849,17 @@ void validity_checker::validate_inputs()
 			osd_printf_error("I/O port error during construction:\n%s\n", errorbuf.c_str());
 
 		// do a first pass over ports to add their names and find duplicates
-		for (ioport_port &port : portlist)
-			if (!port_map.insert(port.tag()).second)
-				osd_printf_error("Multiple I/O ports with the same tag '%s' defined\n", port.tag());
+		for (auto &port : portlist)
+			if (!port_map.insert(port.second->tag()).second)
+				osd_printf_error("Multiple I/O ports with the same tag '%s' defined\n", port.second->tag());
 
 		// iterate over ports
-		for (ioport_port &port : portlist)
+		for (auto &port : portlist)
 		{
-			m_current_ioport = port.tag();
+			m_current_ioport = port.second->tag();
 
 			// iterate through the fields on this port
-			for (ioport_field &field : port.fields())
+			for (ioport_field &field : port.second->fields())
 			{
 				// verify analog inputs
 				if (field.is_analog())
@@ -971,11 +971,11 @@ void validity_checker::validate_devices()
 	std::unordered_set<std::string> slot_device_map;
 	for (const device_slot_interface &slot : slot_interface_iterator(m_current_config->root_device()))
 	{
-		for (const device_slot_option &option : slot.option_list())
+		for (auto &option : slot.option_list())
 		{
 			std::string temptag("_");
-			temptag.append(option.name());
-			device_t *dev = const_cast<machine_config &>(*m_current_config).device_add(&m_current_config->root_device(), temptag.c_str(), option.devtype(), 0);
+			temptag.append(option.second->name());
+			device_t *dev = const_cast<machine_config &>(*m_current_config).device_add(&m_current_config->root_device(), temptag.c_str(), option.second->devtype(), 0);
 
 			// notify this device and all its subdevices that they are now configured
 			for (device_t &device : device_iterator(*dev))

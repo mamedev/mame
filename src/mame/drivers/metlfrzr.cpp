@@ -4,8 +4,9 @@
 
     Metal Freezer (c) 1989 Seibu
 
-    preliminary driver by Angelo Salese
-
+    driver by Angelo Salese, based off initial work by David Haywood
+	thanks to Peter Wilhelmsen for the decryption
+	
     HW seems the natural evolution of Dark Mist type.
 
     TODO:
@@ -457,4 +458,4 @@ DRIVER_INIT_MEMBER(metlfrzr_state, metlfrzr)
 
 
 
-GAME( 1989, metlfrzr,  0,    metlfrzr, metlfrzr, metlfrzr_state,  metlfrzr, ROT270, "Seibu", "Metal Freezer (Japan)", MACHINE_NO_COCKTAIL )
+GAME( 1989, metlfrzr,  0,    metlfrzr, metlfrzr, metlfrzr_state,  metlfrzr, ROT270, "Seibu Kaihatsu", "Metal Freezer (Japan)", MACHINE_NO_COCKTAIL )

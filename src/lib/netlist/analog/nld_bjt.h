@@ -105,7 +105,7 @@ NETLIB_OBJECT_DERIVED(QBJT_switch, QBJT)
 		, m_gB(NETLIST_GMIN_DEFAULT)
 		, m_gC(NETLIST_GMIN_DEFAULT)
 		, m_V(0.0)
-		, m_state_on(0)
+		, m_state_on(*this, "m_state_on", 0)
 	{
 		register_subalias("B", m_RB.m_P);
 		register_subalias("E", m_RB.m_N);
@@ -119,8 +119,6 @@ NETLIB_OBJECT_DERIVED(QBJT_switch, QBJT)
 
 		connect_late(m_RB.m_P, m_BC_dummy.m_P);
 		connect_late(m_RC.m_P, m_BC_dummy.m_N);
-
-		save(NLNAME(m_state_on));
 	}
 
 	NETLIB_RESETI();
@@ -141,7 +139,7 @@ protected:
 	nl_double m_gB; // base conductance / switch on
 	nl_double m_gC; // collector conductance / switch on
 	nl_double m_V; // internal voltage source
-	UINT8 m_state_on;
+	state_var<unsigned> m_state_on;
 
 private:
 };
@@ -155,11 +153,13 @@ NETLIB_OBJECT_DERIVED(QBJT_EB, QBJT)
 {
 public:
 	NETLIB_CONSTRUCTOR_DERIVED(QBJT_EB, QBJT)
-		,   m_D_CB(*this, "m_D_CB", true)
-		,   m_D_EB(*this, "m_D_EB", true)
-		,   m_D_EC(*this, "m_D_EC", true)
-		,   m_alpha_f(0)
-		,   m_alpha_r(0)
+	, m_gD_BC(*this, "m_D_BC")
+	, m_gD_BE(*this, "m_D_BE")
+	, m_D_CB(*this, "m_D_CB", true)
+	, m_D_EB(*this, "m_D_EB", true)
+	, m_D_EC(*this, "m_D_EC", true)
+	, m_alpha_f(0)
+	, m_alpha_r(0)
 	{
 		register_subalias("E", m_D_EB.m_P);   // Cathode
 		register_subalias("B", m_D_EB.m_N);   // Anode
@@ -173,9 +173,6 @@ public:
 		connect_late(m_D_EB.m_P, m_D_EC.m_P);
 		connect_late(m_D_EB.m_N, m_D_CB.m_N);
 		connect_late(m_D_CB.m_P, m_D_EC.m_N);
-
-		m_gD_BE.save("m_D_BE", *this);
-		m_gD_BC.save("m_D_BC", *this);
 	}
 
 protected:

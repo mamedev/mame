@@ -729,27 +729,33 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 {
 	if (endpoint != 0)
 		return -1;
-	printf("Control request: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
+	printf("Control request to an2131qc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
+	// default valuse for data stage
 	for (int n = 0; n < setup->wLength; n++)
 		endpoints[endpoint].buffer[n] = 0x50 ^ n;
 	endpoints[endpoint].buffer[1] = 0x4b; // bits 4-1 special value, must be 10 xor 15
+	// bRequest is a command value
+	if (setup->bRequest == 0x16)
+	{
+		// this command is used to read data from the first i2c serial eeprom connected to the chip
+		// setup->wValue = start address to read from
+		// setup->wIndex = number of bytes to read
+		// data will be transferred to the host using endpoint 1 (IN)
+		endpoints[1].remain = setup->wIndex & 255;
+		endpoints[1].position = region + setup->wValue; // usually wValue is 0x1f00
+	}
 	if (setup->bRequest == 0x17)
 	{
-		maximum_send = setup->wIndex;
-		if (maximum_send > 0x40)
-			maximum_send = 0x40;
-		endpoints[2].remain = maximum_send;
+		// this command is used to read data from the second i2c serial eeprom connected to the chip
+		// setup->wValue = start address to read from
+		// setup->wIndex = number of bytes to read
+		// data will be transferred to the host using endpoint 2 (IN)
+		endpoints[2].remain = setup->wIndex & 255;
 		endpoints[2].position = region + 0x2000 + setup->wValue;
-	}
-	if ((setup->bRequest == 0x16) && (setup->wValue == 0x1f00))
-	{
-		// should be for an2131sc
-		endpoints[1].remain = setup->wIndex;
-		endpoints[1].position = region + 0x1f00;
 	}
 	if (setup->bRequest == 0x19) // 19 used to receive packet, 20 to send ?
 	{
-		// amount to transfer
+		// amount to transfer with endpoint 4
 		endpoints[endpoint].buffer[5] = 20 >> 8;
 		endpoints[endpoint].buffer[4] = (20 & 0xff);
 		endpoints[4].remain = 20;
@@ -833,6 +839,7 @@ int ohci_hlean2131sc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 {
 	if (endpoint != 0)
 		return -1;
+	printf("Control request to an2131sc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
 	for (int n = 0; n < setup->wLength; n++)
 		endpoints[endpoint].buffer[n] = 0xa0 ^ n;
 	endpoints[endpoint].position = endpoints[endpoint].buffer;
@@ -1084,6 +1091,7 @@ WRITE32_MEMBER(chihiro_state::mediaboard_w)
 
 static ADDRESS_MAP_START(chihiro_map, AS_PROGRAM, 32, chihiro_state)
 	AM_IMPORT_FROM(xbox_base_map)
+	AM_RANGE(0xff000000, 0xff07ffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x00f80000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(chihiro_map_io, AS_IO, 32, chihiro_state)
@@ -1156,7 +1164,7 @@ MACHINE_CONFIG_END
 		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
 
 #define CHIHIRO_BIOS \
-	ROM_REGION( 0x100000, "bios", 0) \
+	ROM_REGION( 0x80000, "bios", 0) \
 	ROM_SYSTEM_BIOS( 0, "bios0", "Chihiro Bios" ) \
 	ROM_LOAD_BIOS( 0,  "chihiro_xbox_bios.bin", 0x000000, 0x80000, CRC(66232714) SHA1(b700b0041af8f84835e45d1d1250247bf7077188) ) \
 	ROM_REGION( 0x200000, "mediaboard", 0) \

@@ -1722,9 +1722,9 @@ void vegas_state::remap_dynamic_addresses()
 		if (dynamic[addr].read == NOP_HANDLER)
 			space.nop_read(dynamic[addr].start, dynamic[addr].end);
 		else if (!dynamic[addr].read.isnull())
-			space.install_read_handler(dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].read);
+			space.install_read_handler(dynamic[addr].start, dynamic[addr].end, dynamic[addr].read);
 		if (!dynamic[addr].write.isnull())
-			space.install_write_handler(dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].write);
+			space.install_write_handler(dynamic[addr].start, dynamic[addr].end, dynamic[addr].write);
 	}
 
 	if (LOG_DYNAMIC)

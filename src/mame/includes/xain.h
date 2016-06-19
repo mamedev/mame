@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Carlos A. Lozano, Rob Rosenbrock, Phil Stroffolino
+
+#include "machine/gen_latch.h"
+
 class xain_state : public driver_device
 {
 public:
@@ -12,6 +15,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_charram(*this, "charram"),
 		m_bgram0(*this, "bgram0"),
 		m_bgram1(*this, "bgram1"),
@@ -24,6 +28,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT8> m_charram;
 	required_shared_ptr<UINT8> m_bgram0;

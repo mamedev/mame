@@ -87,7 +87,7 @@ WRITE8_MEMBER(nbmj9195_state::dipswbitsel_w)
 
 WRITE8_MEMBER(nbmj9195_state::mscoutm_inputportsel_w)
 {
-	m_mscoutm_inputport = (data ^ 0xff);
+	m_mscoutm_inputport = (data ^ 0x1f);
 }
 
 READ8_MEMBER(nbmj9195_state::mscoutm_dipsw_0_r)

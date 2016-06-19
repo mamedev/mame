@@ -2057,7 +2057,7 @@ ROM_START( prophecy )
 ROM_END
 
 
-ROM_START( qnile )
+ROM_START( qnilea6 )
 	ARISTMK6_BIOS
 	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("3j011111.u72", 0x0800002, 0x0400000, CRC(491f4ef2) SHA1(fbaa64d9603900de44642f95fb9f7ee15e138669) )
@@ -2359,7 +2359,7 @@ ROM_START( sbuk5 )
 ROM_END
 
 
-ROM_START( swhr2 )
+ROM_START( swhr2a6 )
 	ARISTMK6_BIOS
 	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("0151183.u73", 0x0000002, 0x0400000, CRC(17f0dbe2) SHA1(7f1f0936e1cf528ee794e8925c40b063d1a77729) )
@@ -2950,7 +2950,7 @@ GAME( 2001, pompeia6, aristmk6,   aristmk6,    aristmk6, driver_device,    0, RO
 GAME( 2002, pompeia6u,pompeia6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Pompeii (0251010, US)",                         MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // US008,    A - 04/03/02
 GAME( 2005, prideaf,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Pride of Africa (10208511, NSW/ACT)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 628/9,    J - 06/12/05
 GAME( 2004, prophecy, aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Prophecy (20173411, NSW/ACT)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 734,    B - 10/08/04
-GAME( 2005, qnile,    aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Queen of the Nile (3J011111, NSW/ACT)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // JB027,    C - 16/02/05
+GAME( 2005, qnilea6,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Queen of the Nile (3J011111, NSW/ACT)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // JB027,    C - 16/02/05
 GAME( 2001, qnilese,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Queen of the Nile Special Edition (10102811, NSW/ACT)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 683,    A - 06/12/01
 GAME( 2002, qnilejc,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Queen of the Nile Special Edition - Jackpot Carnival (20123911, NSW/ACT)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 683/1,    A - 21/10/02
 GAME( 2002, qnilejcsp, qnilejc,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Queen of the Nile Special Edition - Jackpot Carnival (20123911, NSW/ACT, Show Program)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 683/1,    A - 21/10/02
@@ -2980,7 +2980,7 @@ GAME( 2003, sunmoon,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, RO
 GAME( 200?, sunmonbb, aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Sun & Moon - Bank Buster (0153028, US)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // MV4173/2,    (no data)
 GAME( 2003, sunqndol, aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Sun Queen - Dollar Storm (0451327, US)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // MV2070/1,    B - 11/24/03
 GAME( 2005, sbuk5,    aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Super Bucks V (20203611, NSW/ACT)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 794,    A - 03/08/05
-GAME( 2005, swhr2,    aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Sweethearts II (0151183, US)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // US169,    A - 7/5/05
+GAME( 2005, swhr2a6,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Sweethearts II (0151183, US)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // US169,    A - 7/5/05
 GAME( 2002, swh2ld,   aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Sweethearts II - Lucky Devil (10119811, NSW/ACT)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 712,    C - 16/10/02
 GAME( 2006, tahitim,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Tahiti Magic (10238911, NSW/ACT)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 765/2,    C - 07/12/06
 GAME( 2002, thaiprnc, aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Thai Princess (10119321, NSW/ACT)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 707,    A - 17/09/02

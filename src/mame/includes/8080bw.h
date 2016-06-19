@@ -106,12 +106,21 @@ public:
 	DECLARE_WRITE8_MEMBER(invmulti_eeprom_w);
 	DECLARE_WRITE8_MEMBER(invmulti_bank_w);
 
+	DECLARE_READ8_MEMBER(rollingc_scattered_colorram_r);
+	DECLARE_WRITE8_MEMBER(rollingc_scattered_colorram_w);
+	DECLARE_READ8_MEMBER(rollingc_scattered_colorram2_r);
+	DECLARE_WRITE8_MEMBER(rollingc_scattered_colorram2_w);
+	DECLARE_READ8_MEMBER(schaser_scattered_colorram_r);
+	DECLARE_WRITE8_MEMBER(schaser_scattered_colorram_w);
+
 	DECLARE_DRIVER_INIT(invmulti);
 	DECLARE_DRIVER_INIT(spacecom);
 	DECLARE_DRIVER_INIT(vortex);
 	DECLARE_DRIVER_INIT(attackfc);
 
 	DECLARE_MACHINE_START(extra_8080bw);
+	DECLARE_MACHINE_START(rollingc);
+	DECLARE_MACHINE_START(sflush);
 	DECLARE_MACHINE_START(schaser);
 	DECLARE_MACHINE_RESET(schaser);
 	DECLARE_MACHINE_START(polaris);

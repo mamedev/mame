@@ -9,12 +9,13 @@ driver by Ernesto Corvi
 
 Notes:
 - Sprite colors are wrong (missing colortable?)
-- driver should probably be merged with suprridr.c and thepit.c
+- driver should probably be merged with suprridr.cpp and thepit.cpp
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "includes/timelimt.h"
@@ -56,7 +57,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, timelimt_state )
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(nmi_enable_w) /* nmi enable */
 	AM_RANGE(0xb003, 0xb003) AM_WRITE(sound_reset_w)/* sound reset ? */
-	AM_RANGE(0xb800, 0xb800) AM_WRITE(soundlatch_byte_w) /* sound write */
+	AM_RANGE(0xb800, 0xb800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write) /* sound write */
 	AM_RANGE(0xb800, 0xb800) AM_READNOP     /* NMI ack? */
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(scroll_x_lsb_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITE(scroll_x_msb_w)
@@ -77,7 +78,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, timelimt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_clear_byte_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
 	AM_RANGE(0x8c, 0x8d) AM_DEVREADWRITE("ay1", ay8910_device, data_r, address_data_w)
 	AM_RANGE(0x8e, 0x8f) AM_DEVREADWRITE("ay2", ay8910_device, data_r, address_data_w)
 ADDRESS_MAP_END
@@ -249,11 +250,13 @@ static MACHINE_CONFIG_START( timelimt, timelimt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, 18432000/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 18432000/12)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

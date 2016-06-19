@@ -64,7 +64,6 @@ public:
 	{ }
 
 	d3d_texture_manager(renderer_d3d9 *d3d);
-	~d3d_texture_manager();
 
 	void                    update_textures();
 
@@ -142,9 +141,9 @@ public:
 	int                     get_cur_frame() const { return m_cur_frame; }
 	int                     get_prev_frame() const { return m_prev_frame; }
 
-	texture *               get_tex() const { return m_d3dtex; }
-	surface *               get_surface() const { return m_d3dsurface; }
-	texture *               get_finaltex() const { return m_d3dfinaltex; }
+	IDirect3DTexture9 *     get_tex() const { return m_d3dtex; }
+	IDirect3DSurface9 *     get_surface() const { return m_d3dsurface; }
+	IDirect3DTexture9 *     get_finaltex() const { return m_d3dfinaltex; }
 
 	vec2f &                 get_uvstart() { return m_start; }
 	vec2f &                 get_uvstop() { return m_stop; }
@@ -173,9 +172,9 @@ private:
 	int                     m_xprescale, m_yprescale;   // X/Y prescale factor
 	int                     m_cur_frame;                // what is our current frame?
 	int                     m_prev_frame;               // what was our last frame? (used to determine pause state)
-	texture *               m_d3dtex;                   // Direct3D texture pointer
-	surface *               m_d3dsurface;               // Direct3D offscreen plain surface pointer
-	texture *               m_d3dfinaltex;              // Direct3D final (post-scaled) texture
+	IDirect3DTexture9 *     m_d3dtex;                   // Direct3D texture pointer
+	IDirect3DSurface9 *     m_d3dsurface;               // Direct3D offscreen plain surface pointer
+	IDirect3DTexture9 *     m_d3dfinaltex;              // Direct3D final (post-scaled) texture
 };
 
 /* poly_info holds information about a single polygon/d3d primitive */
@@ -254,8 +253,8 @@ public:
 
 	bool init(renderer_d3d9 *d3d, d3d_base *d3dintf, int source_width, int source_height, int target_width, int target_height);
 
-	surface *last_target;
-	texture *last_texture;
+	IDirect3DSurface9 *last_target;
+	IDirect3DTexture9 *last_texture;
 
 	int target_width;
 	int target_height;
@@ -293,16 +292,16 @@ public:
 	int screen_index;
 	int page_index;
 
-	surface *target_surface[2];
-	texture *target_texture[2];
-	surface *source_surface[2];
-	texture *source_texture[2];
+	IDirect3DSurface9 *target_surface[2];
+	IDirect3DTexture9 *target_texture[2];
+	IDirect3DSurface9 *source_surface[2];
+	IDirect3DTexture9 *source_texture[2];
 
 	d3d_render_target *next;
 	d3d_render_target *prev;
 
-	surface *bloom_surface[MAX_BLOOM_COUNT];
-	texture *bloom_texture[MAX_BLOOM_COUNT];
+	IDirect3DSurface9 *bloom_surface[MAX_BLOOM_COUNT];
+	IDirect3DTexture9 *bloom_texture[MAX_BLOOM_COUNT];
 
 	float bloom_dims[MAX_BLOOM_COUNT][2];
 

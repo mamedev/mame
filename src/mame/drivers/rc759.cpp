@@ -461,8 +461,8 @@ void rc759_state::machine_reset()
 
 static ADDRESS_MAP_START( rc759_map, AS_PROGRAM, 16, rc759_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
-	AM_RANGE(0xd8000, 0xdffff) AM_MIRROR(0x08000) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0xf8000, 0xfffff) AM_MIRROR(0x10000) AM_ROM AM_REGION("bios", 0)
+	AM_RANGE(0xd0000, 0xd7fff) AM_MIRROR(0x08000) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0xe8000, 0xeffff) AM_MIRROR(0x10000) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rc759_io, AS_IO, 16, rc759_state )

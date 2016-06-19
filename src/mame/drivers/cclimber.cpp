@@ -1933,13 +1933,41 @@ ROM_START( ckongdks )
 	ROM_LOAD( "ck07.bin",    0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
 
+/* Original ORCA PCB, with a suicide battery attached
+
+ */
+ROM_START( rpatrol )
+	ROM_REGION( 0x6000, "maincpu", 0 ) 	// encrypted
+    ROM_LOAD( "1.1h",    0x000000, 0x001000, CRC(065197f0) SHA1(6e482967949bdb126b7ac484abb84c24f4687a3a) )
+    ROM_LOAD( "2.1f",    0x001000, 0x001000, CRC(3614b820) SHA1(01966e6ae2ead93797d402bc8d789458b0bdcd75) )
+    ROM_LOAD( "3.1d",    0x002000, 0x001000, CRC(ba428bbf) SHA1(ac4cd6ac0adab79bc2cfec3ec2683291c5f0f376) )
+    ROM_LOAD( "4.1c",    0x003000, 0x001000, CRC(41497a94) SHA1(7550e74f93c1fd1d5e7fc70c4a2cd2d1b4c22ce5) )
+    ROM_LOAD( "5.1a",    0x004000, 0x001000, CRC(e20ee7e7) SHA1(53f7ec5c6805043d3e8f014ade2480cd6dbd94db) )
+	
+	ROM_REGION( 0x4000, "gfx1", 0 )
+    ROM_LOAD( "6.6l.2732",    0x000000, 0x000800, CRC(b38d8aca) SHA1(b93aa0010b0c0ab23284188a881d4a9bb0fd4582) )
+	ROM_CONTINUE(			  0x001000, 0x000800 )
+    ROM_LOAD( "7.6p.2732",    0x002000, 0x000800, CRC(bc2bddf9) SHA1(4057fc535b1a2db943f893290afe9bfd865ac84b) )
+	ROM_CONTINUE(			  0x003000, 0x000800 )
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+    ROM_LOAD( "9.2t",    0x000000, 0x000800, CRC(d373fc48) SHA1(f06017190955d7458ac652b37c47cee033bc5498) )
+    ROM_LOAD( "8.2s",    0x000800, 0x000800, CRC(59747c31) SHA1(92acf07489f3e17f0c1769a0df15b6ddb117830f) )
+		
+	ROM_REGION( 0x0060, "proms", 0 )
+	// probably matches with existing sets
+	ROM_LOAD( "bprom1.9n",    0x0000, 0x0020, BAD_DUMP CRC(f9a2383b) SHA1(4d88c177740efdb27708474c9ee0fcdca5a78c36) )
+	ROM_LOAD( "bprom2.9p",    0x0020, 0x0020, BAD_DUMP CRC(1743bd26) SHA1(9bb50f6e24a7ac3c9ddf3923e57c5532603009e5) )
+	ROM_LOAD( "bprom3.9c",    0x0040, 0x0020, BAD_DUMP CRC(ee03bc96) SHA1(45e33e750a536a904f30136d84dd7993d97e8e54) )
+ROM_END
+
 /* This set came from a 'Silver Land' board with Silver Land GFX roms, however, the program roms are nearly
    the same as River Patrol but appear to have an original ORCA copyright
 
    I think the board was a half-converted board as 'Water Gage' and 'Bon Voyage' don't really fit the theme
    of Silver Land so I'm loading the River Patrol GFX instead as they fit better
 */
-ROM_START( rpatrol )
+ROM_START( rpatrola )
 	ROM_REGION( 0x6000, "maincpu", 0 )
 	ROM_LOAD( "sci1.bin",       0x0000, 0x1000, CRC(33b01c90) SHA1(9c8da6dd963bfb0544ef99b8fdedcf86c32cdb6b) )
 	ROM_LOAD( "sci2.bin",       0x1000, 0x1000, CRC(03f53340) SHA1(35336945f4b634fc4c7791ac9c9e6643c8cd8006) )
@@ -2551,8 +2579,9 @@ GAME( 1981, ckongpt2b,   ckongpt2, cclimber, ckongb, cclimber_state,   ckongb,  
 // see bagman.c for parent
 GAME( 1981, bagmanf,     bagman,   cclimber, ckong, driver_device,    0,        ROT270, "bootleg", "Bagman (bootleg on Crazy Kong hardware)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, rpatrol,     0,        cclimber, rpatrol, driver_device,  0,        ROT0,   "Orca", "River Patrol (Orca)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, rpatrolb,    rpatrol,  cclimber, rpatrol, driver_device,  0,        ROT0,   "bootleg", "River Patrol (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, rpatrol,     0,        cclimber, rpatrol, driver_device,  0,        ROT0,   "Orca", "River Patrol (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // TODO: encrypted, suicide battery on PCB
+GAME( 1981, rpatrola,    rpatrol,  cclimber, rpatrol, driver_device,  0,        ROT0,   "bootleg", "River Patrol (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, rpatrolb,    rpatrol,  cclimber, rpatrol, driver_device,  0,        ROT0,   "bootleg", "River Patrol (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, silvland,    rpatrol,  cclimber, rpatrol, driver_device,  0,        ROT0,   "Falcon", "Silver Land", MACHINE_SUPPORTS_SAVE )
 
 // see pacman.c for parent

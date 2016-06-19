@@ -89,7 +89,7 @@ WRITE8_MEMBER(ksayakyu_state::bank_select_w)
 WRITE8_MEMBER(ksayakyu_state::latch_w)
 {
 	m_sound_status &= ~0x80;
-	soundlatch_byte_w(space, 0, data | 0x80);
+	m_soundlatch->write(space, 0, data | 0x80);
 }
 
 READ8_MEMBER(ksayakyu_state::sound_status_r)
@@ -100,7 +100,7 @@ READ8_MEMBER(ksayakyu_state::sound_status_r)
 WRITE8_MEMBER(ksayakyu_state::tomaincpu_w)
 {
 	m_sound_status |= 0x80;
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 }
 
 static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, ksayakyu_state )
@@ -276,8 +276,10 @@ static MACHINE_CONFIG_START( ksayakyu, ksayakyu_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, MAIN_CLOCK/16) //unknown clock
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(ksayakyu_state, dummy1_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

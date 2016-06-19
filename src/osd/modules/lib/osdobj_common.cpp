@@ -159,6 +159,8 @@ osd_options::osd_options()
 	add_entries(osd_options::s_option_entries);
 }
 
+// Window list
+std::list<std::shared_ptr<osd_window>> osd_common_t::s_window_list;
 
 //-------------------------------------------------
 //  osd_interface - constructor

@@ -81,7 +81,6 @@ public:
 	DECLARE_WRITE16_MEMBER( bonzeadv_cchip_ctrl_w );
 	DECLARE_WRITE16_MEMBER( bonzeadv_cchip_bank_w );
 	DECLARE_WRITE16_MEMBER( bonzeadv_cchip_ram_w );
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(asuka_msm5205_vck);
 
 protected:

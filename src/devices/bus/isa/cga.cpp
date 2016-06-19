@@ -348,8 +348,10 @@ void isa8_cga_device::device_start()
 
 	set_isa_device();
 	m_vram.resize(m_vram_size);
-	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate( FUNC(isa8_cga_device::io_read), this ), write8_delegate( FUNC(isa8_cga_device::io_write), this ) );
-	m_isa->install_bank(0xb8000, 0xb8000 + MIN(0x8000,m_vram_size) - 1, 0, m_vram_size & 0x4000, "bank_cga", &m_vram[0]);
+	m_isa->install_device(0x3d0, 0x3df, read8_delegate( FUNC(isa8_cga_device::io_read), this ), write8_delegate( FUNC(isa8_cga_device::io_write), this ) );
+	m_isa->install_bank(0xb8000, 0xb8000 + MIN(0x8000,m_vram_size) - 1, "bank_cga", &m_vram[0]);
+	if(m_vram_size == 0x4000)
+		m_isa->install_bank(0xbc000, 0xbffff, "bank_cga", &m_vram[0]);
 
 	/* Initialise the cga palette */
 	int i;
@@ -1578,12 +1580,13 @@ void isa8_cga_pc1512_device::device_start()
 {
 	isa8_cga_device::device_start();
 
-	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate( FUNC(isa8_cga_pc1512_device::io_read), this ), write8_delegate( FUNC(isa8_cga_pc1512_device::io_write), this ) );
-	m_isa->install_bank(0xb8000, 0xbbfff, 0, 0, "bank1", &m_vram[0]);
+	m_isa->install_device(0x3d0, 0x3df, read8_delegate( FUNC(isa8_cga_pc1512_device::io_read), this ), write8_delegate( FUNC(isa8_cga_pc1512_device::io_write), this ) );
+	m_isa->install_bank(0xb8000, 0xbbfff, "bank1", &m_vram[0]);
 
 	address_space &space = machine().firstcpu->space( AS_PROGRAM );
 
-	space.install_write_handler( 0xb8000, 0xbbfff, 0, 0x0C000, write8_delegate( FUNC(isa8_cga_pc1512_device::vram_w), this ) );
+	space.install_write_handler( 0xb8000, 0xbbfff, write8_delegate( FUNC(isa8_cga_pc1512_device::vram_w), this ) );
+	space.install_write_handler( 0xbc000, 0xbffff, write8_delegate( FUNC(isa8_cga_pc1512_device::vram_w), this ) );
 }
 
 void isa8_cga_pc1512_device::device_reset()
@@ -1716,9 +1719,9 @@ void isa8_wyse700_device::device_start()
 {
 	isa8_cga_device::device_start();
 
-	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate( FUNC(isa8_wyse700_device::io_read), this ), write8_delegate( FUNC(isa8_wyse700_device::io_write), this ) );
-	m_isa->install_bank(0xa0000, 0xaffff, 0, 0, "bank_wy1", &m_vram[0x00000]);
-	m_isa->install_bank(0xb0000, 0xbffff, 0, 0, "bank_cga", &m_vram[0x10000]);
+	m_isa->install_device(0x3d0, 0x3df, read8_delegate( FUNC(isa8_wyse700_device::io_read), this ), write8_delegate( FUNC(isa8_wyse700_device::io_write), this ) );
+	m_isa->install_bank(0xa0000, 0xaffff, "bank_wy1", &m_vram[0x00000]);
+	m_isa->install_bank(0xb0000, 0xbffff, "bank_cga", &m_vram[0x10000]);
 }
 
 void isa8_wyse700_device::device_reset()
@@ -1778,7 +1781,7 @@ void isa8_ec1841_0002_device::device_start()
 {
 	isa8_cga_device::device_start();
 
-	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate( FUNC(isa8_ec1841_0002_device::io_read), this ), write8_delegate( FUNC(isa8_ec1841_0002_device::io_write), this ) );
+	m_isa->install_device(0x3d0, 0x3df, read8_delegate( FUNC(isa8_ec1841_0002_device::io_read), this ), write8_delegate( FUNC(isa8_ec1841_0002_device::io_write), this ) );
 }
 
 void isa8_ec1841_0002_device::device_reset()
@@ -1810,11 +1813,17 @@ WRITE8_MEMBER( isa8_ec1841_0002_device::io_write )
 	case 0x0f:
 		m_p3df = data;
 		if (data & 1) {
-			m_isa->install_memory(0xb8000, 0xb9fff, 0, m_vram_size & 0x4000,
-				read8_delegate( FUNC(isa8_ec1841_0002_device::char_ram_read), this),
-				write8_delegate(FUNC(isa8_ec1841_0002_device::char_ram_write), this) );
+			m_isa->install_memory(0xb8000, 0xb9fff,
+								  read8_delegate( FUNC(isa8_ec1841_0002_device::char_ram_read), this),
+								  write8_delegate(FUNC(isa8_ec1841_0002_device::char_ram_write), this) );
+			if(m_vram_size == 0x4000)
+				m_isa->install_memory(0xbc000, 0xbdfff,
+									  read8_delegate( FUNC(isa8_ec1841_0002_device::char_ram_read), this),
+									  write8_delegate(FUNC(isa8_ec1841_0002_device::char_ram_write), this) );
 		} else {
-			m_isa->install_bank(0xb8000, 0xb8000 + MIN(0x8000,m_vram_size) - 1, 0, m_vram_size & 0x4000, "bank_cga", &m_vram[0]);
+			m_isa->install_bank(0xb8000, 0xb8000 + MIN(0x8000,m_vram_size) - 1, "bank_cga", &m_vram[0]);
+			if(m_vram_size == 0x4000)
+				m_isa->install_bank(0xbc000, 0xbffff, "bank_cga", &m_vram[0]);
 		}
 		break;
 	default:

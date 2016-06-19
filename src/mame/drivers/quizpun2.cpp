@@ -7,7 +7,7 @@ Quiz Punch 2 (C)1989 Space Computer
 Preliminary driver by Luca Elia
 
 - It uses an unknown DIP40 device for protection, that supplies
-  the address to jump to (same as mosaic.c) and handles the EEPROM
+  the address to jump to (same as mosaic.cpp) and handles the EEPROM
 
 PCB Layout
 ----------
@@ -78,6 +78,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/2203intf.h"
 
 
@@ -100,7 +101,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	struct prot_t m_prot;
 	required_shared_ptr<UINT8> m_fg_ram;
@@ -123,6 +125,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 };
 
 
@@ -364,7 +367,7 @@ WRITE8_MEMBER(quizpun2_state::quizpun2_irq_ack)
 
 WRITE8_MEMBER(quizpun2_state::quizpun2_soundlatch_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -405,7 +408,7 @@ static ADDRESS_MAP_START( quizpun2_sound_io_map, AS_IO, 8, quizpun2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_WRITENOP  // IRQ end
 	AM_RANGE( 0x20, 0x20 ) AM_WRITENOP  // NMI end
-	AM_RANGE( 0x40, 0x40 ) AM_READ(soundlatch_byte_r )
+	AM_RANGE( 0x40, 0x40 ) AM_DEVREAD("soundlatch", generic_latch_8_device, read )
 	AM_RANGE( 0x60, 0x61 ) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write )
 ADDRESS_MAP_END
 
@@ -523,6 +526,8 @@ static MACHINE_CONFIG_START( quizpun2, quizpun2_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_8MHz / 4 ) // 2 MHz?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

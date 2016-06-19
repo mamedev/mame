@@ -1251,17 +1251,6 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-WRITE_LINE_MEMBER(dec0_state::sound_irq)
-{
-	m_audiocpu->set_input_line(0, state); /* IRQ */
-}
-
-WRITE_LINE_MEMBER(dec0_state::sound_irq2)
-{
-	m_audiocpu->set_input_line(1, state); /* IRQ2 */
-}
-
-/******************************************************************************/
 
 
 /* This is guesswork, in order to get ~57,41 Hz.
@@ -1333,7 +1322,7 @@ static MACHINE_CONFIG_DERIVED( dec0, dec0_base )
 	MCFG_SOUND_ROUTE(3, "mono", 0.35)
 
 	MCFG_SOUND_ADD("ym2", YM3812, XTAL_12MHz / 4)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(dec0_state, sound_irq))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_20MHz / 2 / 10, OKIM6295_PIN7_HIGH)
@@ -1361,7 +1350,7 @@ static MACHINE_CONFIG_DERIVED( dec1, dec0_base )
 	MCFG_SOUND_ROUTE(3, "mono", 0.35)
 
 	MCFG_SOUND_ADD("ym2", YM3812, XTAL_12MHz/4) /* verified on pcb */
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(dec0_state, sound_irq2))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, OKIM6295_PIN7_HIGH) /* verified on pcb */
@@ -1633,7 +1622,7 @@ static MACHINE_CONFIG_DERIVED( midresb, midres )
 	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
 
 	MCFG_SOUND_MODIFY("ym2")
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(dec0_state, sound_irq))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	// bootleg doesn't seem to support row/col scroll (or enable is different)

@@ -27,8 +27,8 @@ inline int cs_stricmp(const char *s1, const char *s2)
 {
 	for (;;)
 	{
-		int c1 = tolower((UINT8)*s1++);
-		int c2 = tolower((UINT8)*s2++);
+		int c1 = tolower(*s1++);
+		int c2 = tolower(*s2++);
 		if (c1 == 0 || c1 != c2)
 			return c1 - c2;
 	}
@@ -36,8 +36,8 @@ inline int cs_stricmp(const char *s1, const char *s2)
 
 bool sorted_game_list(const game_driver *x, const game_driver *y)
 {
-	bool clonex = strcmp(x->parent, "0");
-	bool cloney = strcmp(y->parent, "0");
+	bool clonex = (x->parent[0] != '0');
+	bool cloney = (y->parent[0] != '0');
 
 	if (!clonex && !cloney)
 		return (cs_stricmp(x->description, y->description) < 0);
@@ -114,7 +114,7 @@ void menu_audit::handle()
 
 	if (m_first)
 	{
-		ui().draw_text_box(container, _("Audit in progress..."), JUSTIFY_CENTER, 0.5f, 0.5f, UI_GREEN_COLOR);
+		ui().draw_text_box(container, _("Audit in progress..."), ui::text_layout::CENTER, 0.5f, 0.5f, UI_GREEN_COLOR);
 		m_first = false;
 		return;
 	}

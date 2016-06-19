@@ -438,11 +438,6 @@ READ8_MEMBER(angelkds_state::angelkds_sub_sound_r)
 }
 
 
-WRITE_LINE_MEMBER(angelkds_state::irqhandler)
-{
-	m_subcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 /*** Graphics Decoding
 
 all the 8x8 tiles are in one format, the 16x16 sprites in another
@@ -555,7 +550,7 @@ static MACHINE_CONFIG_START( angelkds, angelkds_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_4MHz)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(angelkds_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("sub", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.65)
 	MCFG_SOUND_ROUTE(1, "mono", 0.65)
 	MCFG_SOUND_ROUTE(2, "mono", 0.65)

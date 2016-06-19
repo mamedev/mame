@@ -48,19 +48,35 @@ enum texture_format
 // screen_update callback flags
 const UINT32 UPDATE_HAS_NOT_CHANGED = 0x0001;   // the video has not changed
 
-// ----- flags for video_attributes -----
+/*!
+ @defgroup flags for video_attributes
+ @{
+ @def VIDEO_UPDATE_BEFORE_VBLANK
+ update_video called at the start of the VBLANK period
+ @todo hack, remove me
+ 
+ @def VIDEO_UPDATE_AFTER_VBLANK
+ update_video called at the end of the VBLANK period
+ @todo hack, remove me
 
-// should VIDEO_UPDATE by called at the start of VBLANK or at the end?
+ @def VIDEO_SELF_RENDER
+ indicates VIDEO_UPDATE will add container bits itself
+ 
+ @def VIDEO_ALWAYS_UPDATE
+ force VIDEO_UPDATE to be called even for skipped frames.
+ @todo in case you need this one for model updating, then you're doing it wrong (read: hack)
+ 
+ @def VIDEO_UPDATE_SCANLINE
+ calls VIDEO_UPDATE for every visible scanline, even for skipped frames
+ 
+ @}
+ */
+
 #define VIDEO_UPDATE_BEFORE_VBLANK      0x0000
 #define VIDEO_UPDATE_AFTER_VBLANK       0x0004
 
-// indicates VIDEO_UPDATE will add container bits its
 #define VIDEO_SELF_RENDER               0x0008
-
-// force VIDEO_UPDATE to be called even for skipped frames
 #define VIDEO_ALWAYS_UPDATE             0x0080
-
-// calls VIDEO_UPDATE for every visible scanline, even for skipped frames
 #define VIDEO_UPDATE_SCANLINE           0x0100
 
 
@@ -329,28 +345,21 @@ private:
 	{
 	public:
 		callback_item(vblank_state_delegate callback)
-			: m_next(nullptr),
-				m_callback(std::move(callback)) { }
-		callback_item *next() const { return m_next; }
+			: m_callback(std::move(callback)) { }
 
-		callback_item *             m_next;
 		vblank_state_delegate       m_callback;
 	};
-	simple_list<callback_item> m_callback_list;     // list of VBLANK callbacks
+	std::vector<std::unique_ptr<callback_item>> m_callback_list;     // list of VBLANK callbacks
 
 	// auto-sizing bitmaps
 	class auto_bitmap_item
 	{
 	public:
 		auto_bitmap_item(bitmap_t &bitmap)
-			: m_next(nullptr),
-				m_bitmap(bitmap) { }
-		auto_bitmap_item *next() const { return m_next; }
-
-		auto_bitmap_item *          m_next;
+			: m_bitmap(bitmap) { }
 		bitmap_t &                  m_bitmap;
 	};
-	simple_list<auto_bitmap_item> m_auto_bitmap_list; // list of registered bitmaps
+	std::vector<std::unique_ptr<auto_bitmap_item>> m_auto_bitmap_list; // list of registered bitmaps
 
 	// static data
 	static UINT32       m_id_counter; // incremented for each constructed screen_device,
@@ -363,11 +372,89 @@ extern const device_type SCREEN;
 // iterator helper
 typedef device_type_iterator<&device_creator<screen_device>, screen_device> screen_device_iterator;
 
+/*!
+ @defgroup Screen device configuration macros
+ @{
+ @def MCFG_SCREEN_ADD
+  Add a new legacy screen color device
+ 
+ @def MCFG_SCREEN_ADD_MONOCHROME
+  Add a new legacy monochrome screen device
+ 
+ @def MCFG_SCREEN_MODIFY
+  Modify a legacy screen device
+ 
+ @def MCFG_SCREEN_TYPE
+  Modify the screen device type
+  @see screen_type_enum
+ 
+ @def MCFG_SCREEN_RAW_PARAMS
+  Configures screen parameters for the given screen. 
+  @remark It's better than using @see MCFG_SCREEN_REFRESH_RATE and @see MCFG_SCREEN_VBLANK_TIME but still not enough.
+ 
+  @param _pixclock 
+  Pixel Clock frequency value
+ 
+  @param _htotal 
+  Total number of horizontal pixels, including hblank period.
+ 
+  @param _hbend 
+  Horizontal pixel position for HBlank end event, also first pixel where screen rectangle is visible.
+ 
+  @param _hbstart 
+  Horizontal pixel position for HBlank start event, also last pixel where screen rectangle is visible.
+ 
+  @param _vtotal 
+  Total number of vertical pixels, including vblank period.
+ 
+  @param _vbend 
+  Vertical pixel position for VBlank end event, also first pixel where screen rectangle is visible.
+ 
+  @param _vbstart 
+  Vertical pixel position for VBlank start event, also last pixel where screen rectangle is visible.
+ 
+ @def MCFG_SCREEN_REFRESH_RATE
+  Sets the number of Frames Per Second for this screen
+  @remarks Please use @see MCFG_SCREEN_RAW_PARAMS instead. Gives imprecise timings.
 
+  @param _rate 
+  FPS number
 
-//**************************************************************************
-//  SCREEN DEVICE CONFIGURATION MACROS
-//**************************************************************************
+ @def MCFG_SCREEN_VBLANK_TIME
+  Sets the vblank time of the given screen
+  @remarks Please use @see MCFG_SCREEN_RAW_PARAMS instead. Gives imprecise timings.
+ 
+  @param _time 
+  Time parameter, in attotime value
+
+ @def MCFG_SCREEN_SIZE
+  Sets total screen size, including H/V-Blanks
+  @remarks Please use @see MCFG_SCREEN_RAW_PARAMS instead. Gives imprecise timings.
+  
+  @param _width 
+  Screen horizontal size
+
+  @param _height
+  Screen vertical size
+  
+ @def MCFG_SCREEN_VISIBLE_AREA
+  Sets screen visible area
+  @remarks Please use MCFG_SCREEN_RAW_PARAMS instead. Gives imprecise timings.
+
+  @param _minx 
+  Screen left border
+  
+  @param _maxx 
+  Screen right border, must be in N-1 format
+ 
+  @param _miny 
+  Screen top border
+  
+  @param _maxx 
+  Screen bottom border, must be in N-1 format
+  
+ @}
+ */
 
 #define MCFG_SCREEN_ADD(_tag, _type) \
 	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \
@@ -389,57 +476,18 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 	MCFG_SCREEN_TYPE(SVG) \
 	screen_device::static_set_svg_region(*device, _region);
 
-/*!
- @brief Configures screen parameters for the given screen.
-
- @param _pixclock Pixel Clock frequency value
- @param _htotal Total number of horizontal pixels, including hblank period.
- @param _hbend Horizontal pixel position for HBlank end event, also first pixel where screen rectangle is visible.
- @param _hbstart Horizontal pixel position for HBlank start event, also last pixel where screen rectangle is visible.
- @param _vtotal Total number of vertical pixels, including vblank period.
- @param _vbend Vertical pixel position for VBlank end event, also first pixel where screen rectangle is visible.
- @param _vbstart Vertical pixel position for VBlank start event, also last pixel where screen rectangle is visible.
- */
 #define MCFG_SCREEN_RAW_PARAMS(_pixclock, _htotal, _hbend, _hbstart, _vtotal, _vbend, _vbstart) \
 	screen_device::static_set_raw(*device, _pixclock, _htotal, _hbend, _hbstart, _vtotal, _vbend, _vbstart);
 
-/*!
- @brief Sets the number of Frames Per Second for this screen
-
- @param _rate FPS number
- @deprecated Please use MCFG_SCREEN_RAW_PARAMS instead. Gives imprecise timings.
- */
 #define MCFG_SCREEN_REFRESH_RATE(_rate) \
 	screen_device::static_set_refresh(*device, HZ_TO_ATTOSECONDS(_rate));
 
-/*!
- @brief Sets the vblank time of the given screen
-
- @param _time Time parameter, in attotime value\
- @deprecated Please use MCFG_SCREEN_RAW_PARAMS instead. Gives imprecise timings.
- */
 #define MCFG_SCREEN_VBLANK_TIME(_time) \
 	screen_device::static_set_vblank_time(*device, _time);
 
-/*!
- @brief Sets total screen size, including H/V-Blanks
-
- @param _width Screen horizontal size
- @param _height Screen vertical size
- @deprecated Please use MCFG_SCREEN_RAW_PARAMS instead. Gives imprecise timings.
- */
 #define MCFG_SCREEN_SIZE(_width, _height) \
 	screen_device::static_set_size(*device, _width, _height);
 
-/*!
- @brief Sets screen visible area
-
- @param _minx Screen left border
- @param _maxx Screen right border, must be in N-1 format
- @param _miny Screen top border
- @param _maxx Screen bottom border, must be in N-1 format
- @deprecated Please use MCFG_SCREEN_RAW_PARAMS instead. Gives imprecise timings.
- */
 #define MCFG_SCREEN_VISIBLE_AREA(_minx, _maxx, _miny, _maxy) \
 	screen_device::static_set_visarea(*device, _minx, _maxx, _miny, _maxy);
 #define MCFG_SCREEN_DEFAULT_POSITION(_xscale, _xoffs, _yscale, _yoffs)  \

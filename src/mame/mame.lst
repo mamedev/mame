@@ -1344,112 +1344,115 @@ wildone                         // (c) 1997
 wtigernz                        // (c) 1996
 
 @source:aristmk5.cpp
+aristmk5                        // (c) 1995, USA platform set chips
 adonis                          // (c) 1998
 adonisa                         // (c) 1998
-adonise                         // (c) 2001
-aristmk5                        // (c) 1995, USA platform set chips
-bootsctn                        // (c) 1999
-bumblbug                        // (c) 1997
-cashcham                        // (c) 1996
-chariotc                        // (c) 1998
-chickena                        // (c) 1998
-cuckoo                          // (c) 2000
-dmdtouch                        // (c) 1997
-dolphntr                        // (c) 1996
-dolphtra                        // (c) 1996
-dolphtre                        // (c) 1996
-enchfore                        // (c) 1997
-enchfrst                        // (c) 1995
-geishanz                        // (c) 2001
-goldprmd                        // (c) 1997
-goldpyra                        // (c) 1997
-indiandr                        // (c) 1998
-koalamnt                        // (c) 2001
-magicmsk                        // (c) 2000
-magicmska                       // (c) 2000
-margmgc                         // (c) 2000
-marmagic                        // (c) 2000
-mgarden                         // (c) 1997
-minemine                        // (c) 1996
-partygrs                        // (c) 2001
-pengpays                        // (c) 1997
-prtygras                        // (c) 2001
-qotn                            // (c) 1997
-qotna                           // (c) 1997
-reelrock                        // (c) 1998
-swheart2                        // (c) 1998
-swthrt2v                        // (c) 1995
-thgamblr                        // (c) 1998
-trpdlght                        // (c) 1997
-wldcougr                        // (c) 1997
-wtiger                          // (c) 1999
-badbog
+adonisu                         // (c) 2001
+adonisce
+baddog
 blackpnt
-bootscot
-bumbugs
-butdeli
-cashchm
-cashcroa
-chkrun
-coralr2v
-cuckooa
-dstblom
-dmddove
-drawpka
-dyjack
-eldora
-fortela
+bootsctn
+bootsctnu                       // (c) 1999
+bumblbug
+bumblbugql
+bumblbugu                       // (c) 1997
+buttdeli
+cashcat
+cashcham
+cashchamu                        // (c) 1996
+cashcra5
+chariotc                        // (c) 1998
+chariotca
+checkma5
+chickna5
+chickna5u                      // (c) 1998
+coralrc2
+cuckoo
+cuckoou                         // (c) 2000
+dstbloom
+diamdove
+dimtouch                        // (c) 1997
+dolphntr                        // (c) 1996
+dolphntra                       // (c) 1996
+dolphntrb
+dolphntru                       // (c) 1996
+dynajack
+eldorda5
+eforsta5                        // (c) 1995
+eforsta5u                        // (c) 1997
+fortellr
+gambler                        // (c) 1998
+geisha                          // (c) 2001
 genmagi
-gnomatw
-goldra
-hrttrhb
-incsun
-kookabk
+gnomeatw
+goldpyr                         // (c) 1997
+goldpyra                        // (c) 1997
+goldenra
+incasun
+incasunsp
+incasunnz
+indrema5                       // (c) 1998
+kgalah
+koalamnt                        // (c) 2001
+kookabuk
 locoloot
-lonwolf
-mgctouc
-monmous
-moutmon
-mystgrd
+locolootnz
+lonewolf
+mgarden                         // (c) 1997
+magimask                        // (c) 2000
+magimaska                       // (c) 2000
+magtcha5
+marmagic                        // (c) 2000
+marmagicu                       // (c) 2000
+minemine                        // (c) 1996
+monmouse
+montree
+mountmon
+multidrw
+mystgard
 orchidms
-oscarar
+oscara5
 pantmag
+partygrs                        // (c) 2001
+partygrsa                        // (c) 2001
 peaflut
 pengpay
-przfigha
-qncsh
-sumospin
-sbucks3
-tretrva
-triptrea
-trjhrs
-wildbill
-wldcoug
-chariotca
-chkmatar
-kgalah
-qonilea
-qonileb
-rwarhl
+pengpaya
+pengpayb
+pengpayu                        // (c) 1997
+petshop
+przfight
+qcash
+qnile
+qnilea
+qnileb                            // (c) 1997
+qnilec
+qnileu                           // (c) 1997
+qnilemax
+rainwrce
+reelrock                        // (c) 1998
 retrsam
-unicornd
-dolptra
-penpay20
-penpaya
-adonishl
-goldphm
-petshopa
-retsam20
-retsam5
-supbuk2
+retrsama
+retrsamb
+sumospin
+sbuk2
+sbuk3
+swhr2
+swhr2u                        // (c) 1998
+swhr2v                        // (c) 1995
 topbana
-wldamz1
-wldamz3
-wldthg
-cshcat
-incanz
-loconz
-mtreenz
+trstrove
+tritreat
+trojhors
+trpdlght                        // (c) 1997
+unicornd
+wamazon
+wamazona
+wildbill
+wcougar
+wcougaru                        // (c) 1997
+wthing
+wtiger                          // (c) 1999
 
 @source:aristmk6.cpp
 aristmk6                        //
@@ -1619,7 +1622,7 @@ pompeia6
 pompeia6u
 prideaf
 prophecy
-qnile
+qnilea6
 qnilese
 qnilejc
 qnilejcsp
@@ -1649,7 +1652,7 @@ sunmoon
 sunmonbb
 sunqndol
 sbuk5
-swhr2
+swhr2a6
 swh2ld
 tahitim
 thaiprnc
@@ -9200,7 +9203,8 @@ dking                           // Crazy Kong Bootleg
 guzzler                         // (c) 1983 Tehkan
 guzzlers                        // (c) 1983 Tehkan (Swimmer Conversion)
 monkeyd                         // bootleg
-rpatrol                         // Orca, from a suspicious set
+rpatrol							// (c) 1981.01 Orca
+rpatrola                        // bootleg 
 rpatrolb                        // bootleg
 silvland                        // Falcon
 swimmer                         // (c) 1982 Tehkan
@@ -10920,6 +10924,9 @@ dim68k                          //
 discoboy                        // (c) 1993 Soft Art Co.
 discoboyp                       // (c) 1993 Soft Art Co. (Promat license?)
 
+@source:divebomb.cpp
+divebomb                        // GX840 (c) 1989 (Japan)
+
 @source:diverboy.cpp
 diverboy                        // (c) 1992 Electronic Devices
 
@@ -12113,6 +12120,8 @@ csc                             // CSC: Champion Sensory Chess Challenger (Engli
 cscfr                           // * French
 cscg                            // * German
 cscsp                           // * Spanish
+feasbu                          // EAS: Elite A/S Challenger (Budapest program, English)
+feasgla                         // EAS: Elite A/S Challenger (Glasgow program, English)
 fexcel                          //
 fexcelv                         //
 fscc9                           //
@@ -12128,6 +12137,7 @@ feagv10                         //
 feagv11                         //
 feagv2                          //
 feagv7                          //
+feagv9                          //
 
 @source:fidelz80.cpp
 bridgec3                        //
@@ -12398,6 +12408,7 @@ royalcrdd                       // (c) 1991 TAB-Austria
 royalcrde                       // (c) 1991 TAB-Austria
 royalcrdf                       // (c) 1991 Evona Electronic
 royalcrdg                       // (c) 1991 TAB-Austria
+royalcrdh                       // (c) 1991 TAB-Austria
 royalcrdp                       // (c) 1993 Digital Dreams
 royalcrdt                       // (c) 1991 TAB-Austria orig
 saloon                          // 199? unknown
@@ -12581,6 +12592,7 @@ galaxbsf2                       // bootleg
 galaxian                        // (c) Namco
 galaxiana                       // (c) Namco
 galaxianbl                      // bootleg
+galaxianbl2                     // bootleg
 galaxiani                       // (c) Irem
 galaxianm                       // (c) Midway
 galaxianmo                      // (c) Midway
@@ -13439,6 +13451,7 @@ cmasterh                        // (c) 1991 Dyna Electronics
 cmezspin                        // (c) 1991 Dyna Electronics
 cmfun                           // (c) 1995 Dyna Electronics
 cmpacman                        //
+cmpacmana                       //
 cmtetris                        //
 cmtetrsa                        //
 cmtetrsb                        //
@@ -13449,6 +13462,9 @@ cmwm                            // (c) 199? Dyna Electronics
 crazybon                        // (c) 199? Sang Ho
 fb2010                          // (c) 2009 Amcoe
 fl7_3121                        // (c) 199? Cyberdyne Systems, Inc.
+fl7_50                          // (c) 199? Cyberdyne Systems, Inc.
+fl7_500                         // (c) 199? Cyberdyne Systems, Inc.
+fl7_2000                        // (c) 199? Cyberdyne Systems, Inc.
 goldfrui                        // bootleg
 goldstar                        // (c) 198? IGS
 goldstbl                        // (c) 198? IGS
@@ -17366,6 +17382,10 @@ mainsnk                         // (c) 1984
 
 @source:majorpkr.cpp
 majorpkr                        // (c) 1994 PAL System.
+majorpkra                       // (c) 1994 PAL System.
+majorpkrb                       // (c) 1994 PAL System.
+majorpkrc                       // (c) 1994 PAL System.
+luckypkr                        // bootleg/hack.
 
 @source:malzak.cpp
 malzak                          // (c) 1980? Kitronix
@@ -28032,7 +28052,8 @@ mtkob2                          // 2003.02 MushiKing The King Of Beetle
 mushi2eo                        // 2005.?? Mushiking The King Of Beetles II ENG (Ver. 1.001)
 mushi2k5                        // 2005.?? MushiKing The King Of Beetle 2K5 1st
 mushik2e                        // 2005.?? Mushiking The King Of Beetles II ENG (Ver. 2.001)
-mvsc2                           // 2000.03 Marvel Vs. Capcom 2 New Age of Heroes (Export, Rev A)
+mvsc2                           // 2000.03 Marvel Vs. Capcom 2 New Age of Heroes (Export, Korea) (Rev A)
+mvsc2u                          // 2000.03 Marvel Vs. Capcom 2 New Age of Heroes (USA) (Rev A)
 naomi                           // 1998.?? Naomi BIOS
 naomi2                          // 2001.?? Naomi 2 BIOS
 naomigd                         // 2001.?? Naomi GD-ROM Bios

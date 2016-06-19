@@ -22,9 +22,8 @@ namespace netlist
 		, m_IP(*this, "IP")
 		, m_Q(*this, {{"Q1", "_Q2", "_Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9",
 				"Q10", "Q11", "Q12", "Q13", "Q14"}})
-		, m_cnt(0)
+		, m_cnt(*this, "m_cnt", 0)
 		{
-			save(NLNAME(m_cnt));
 		}
 
 		NETLIB_RESETI()
@@ -36,12 +35,12 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	public:
-		void update_outputs(const UINT16 cnt);
+		void update_outputs(const unsigned cnt);
 
 		logic_input_t m_IP;
 		object_array_t<logic_output_t, 14> m_Q;
 
-		UINT16 m_cnt;
+		state_var<unsigned> m_cnt;
 	};
 
 	NETLIB_OBJECT(CD4020)
@@ -80,10 +79,9 @@ namespace netlist
 
 	NETLIB_UPDATE(CD4020_sub)
 	{
-		UINT8 cnt = m_cnt;
-		cnt = ( cnt + 1) & 0x3fff;
-		update_outputs(cnt);
-		m_cnt = cnt;
+		++m_cnt;
+		m_cnt &= 0x3fff;
+		update_outputs(m_cnt);
 	}
 
 	NETLIB_UPDATE(CD4020)
@@ -101,7 +99,7 @@ namespace netlist
 			m_sub.m_IP.activate_hl();
 	}
 
-	inline NETLIB_FUNC_VOID(CD4020_sub, update_outputs, (const UINT16 cnt))
+	inline NETLIB_FUNC_VOID(CD4020_sub, update_outputs, (const unsigned cnt))
 	{
 		/* static */ const netlist_time out_delayQn[14] = {
 				NLTIME_FROM_NS(180), NLTIME_FROM_NS(280),

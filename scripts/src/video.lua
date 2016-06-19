@@ -806,6 +806,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/zeus2.h,VIDEOS["ZEUS2"] = true
+--------------------------------------------------
+
+if (VIDEOS["ZEUS2"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/zeus2.cpp",
+		MAME_DIR .. "src/devices/video/zeus2.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/voodoo.h,VIDEOS["VOODOO"] = true
 --------------------------------------------------
 

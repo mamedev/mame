@@ -21,6 +21,7 @@
 
 const rgb_t rgb_t::black(0,0,0);
 const rgb_t rgb_t::white(255,255,255);
+const rgb_t rgb_t::transparent(0, 0, 0, 0);
 
 // the colors below are commonly used screen colors
 const rgb_t rgb_t::green(0, 255, 0);

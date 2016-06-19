@@ -373,7 +373,8 @@ unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op)
 				case 0x00:  if (op == 0)
 							sprintf(buffer, "nop");
 							else
-							sprintf(buffer, "sll    %s,%s,%d", reg[rd], reg[rt], shift);            break;
+							sprintf(buffer, "sll    %s,%s,%d", reg[rd], reg[rt], shift);
+					break;
 				case 0x01:  sprintf(buffer, "mov%c   %s,%s,%d", ((op >> 16) & 1) ? 't' : 'f', reg[rd], reg[rs], (op >> 18) & 7); break;
 				case 0x02:  sprintf(buffer, "srl    %s,%s,%d", reg[rd], reg[rt], shift);            break;
 				case 0x03:  sprintf(buffer, "sra    %s,%s,%d", reg[rd], reg[rt], shift);            break;
@@ -384,7 +385,9 @@ unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op)
 				case 0x09:  if (rd == 31)
 							sprintf(buffer, "jalr   %s", reg[rs]);
 							else
-							sprintf(buffer, "jalr   %s,%s", reg[rs], reg[rd]); flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1); break;
+							sprintf(buffer, "jalr   %s,%s", reg[rs], reg[rd]);
+					flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
+					break;
 				case 0x0a:  sprintf(buffer, "movz   %s,%s,%s", reg[rd], reg[rs], reg[rt]);          break;
 				case 0x0b:  sprintf(buffer, "movn   %s,%s,%s", reg[rd], reg[rs], reg[rt]);          break;
 				case 0x0c:  sprintf(buffer, "syscall"); flags = DASMFLAG_STEP_OVER;                 break;
@@ -461,7 +464,8 @@ unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op)
 		case 0x04:  if (rs == 0 && rt == 0)
 					sprintf(buffer, "b      $%08x", pc + 4 + ((INT16)op << 2));
 					else
-					sprintf(buffer, "beq    %s,%s,$%08x", reg[rs], reg[rt], pc + 4 + ((INT16)op << 2));break;
+					sprintf(buffer, "beq    %s,%s,$%08x", reg[rs], reg[rt], pc + 4 + ((INT16)op << 2));
+			break;
 		case 0x05:  sprintf(buffer, "bne    %s,%s,$%08x", reg[rs], reg[rt], pc + 4 + ((INT16)op << 2));break;
 		case 0x06:  sprintf(buffer, "blez   %s,$%08x", reg[rs], pc + 4 + ((INT16)op << 2));         break;
 		case 0x07:  sprintf(buffer, "bgtz   %s,$%08x", reg[rs], pc + 4 + ((INT16)op << 2));         break;

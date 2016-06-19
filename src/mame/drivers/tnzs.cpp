@@ -801,7 +801,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(tnzs_state::tnzsb_sound_command_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
@@ -850,7 +850,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tnzsb_io_map, AS_IO, 8, tnzs_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x02, 0x02) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8742_io_map, AS_IO, 8, tnzs_state )
@@ -1825,6 +1825,8 @@ static MACHINE_CONFIG_START( tnzsb, tnzs_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(tnzs_state, irqhandler))

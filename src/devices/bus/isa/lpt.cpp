@@ -51,11 +51,11 @@ void isa8_lpt_device::device_reset()
 	m_is_primary = (ioport("DSW")->read() & 1) ? false : true;
 	if (m_is_primary)
 	{
-		m_isa->install_device(0x0378, 0x037b, 0, 0, read8_delegate(FUNC(pc_lpt_device::read), subdevice<pc_lpt_device>("lpt")), write8_delegate(FUNC(pc_lpt_device::write), subdevice<pc_lpt_device>("lpt")));
+		m_isa->install_device(0x0378, 0x037b, read8_delegate(FUNC(pc_lpt_device::read), subdevice<pc_lpt_device>("lpt")), write8_delegate(FUNC(pc_lpt_device::write), subdevice<pc_lpt_device>("lpt")));
 	}
 	else
 	{
-		m_isa->install_device(0x0278, 0x027b, 0, 0, read8_delegate(FUNC(pc_lpt_device::read), subdevice<pc_lpt_device>("lpt")), write8_delegate(FUNC(pc_lpt_device::write), subdevice<pc_lpt_device>("lpt")));
+		m_isa->install_device(0x0278, 0x027b, read8_delegate(FUNC(pc_lpt_device::read), subdevice<pc_lpt_device>("lpt")), write8_delegate(FUNC(pc_lpt_device::write), subdevice<pc_lpt_device>("lpt")));
 	}
 }
 

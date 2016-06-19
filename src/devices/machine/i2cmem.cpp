@@ -60,11 +60,6 @@ static inline void ATTR_PRINTF( 3, 4 ) verboselog( device_t *device, int n_level
 // device type definition
 const device_type I2CMEM = &device_creator<i2cmem_device>;
 
-static ADDRESS_MAP_START( i2cmem_map8, AS_PROGRAM, 8, i2cmem_device )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-ADDRESS_MAP_END
-
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -76,7 +71,6 @@ ADDRESS_MAP_END
 
 i2cmem_device::i2cmem_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
 	: device_t(mconfig, I2CMEM, "I2C Memory", tag, owner, clock, "i2cmem", __FILE__),
-		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
 	m_region(*this, DEVICE_SELF),
 	m_slave_address( I2CMEM_SLAVE_ADDRESS ),
@@ -96,25 +90,6 @@ i2cmem_device::i2cmem_device( const machine_config &mconfig, const char *tag, de
 }
 
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void i2cmem_device::device_config_complete()
-{
-	int address_bits = 0;
-
-	int i = m_data_size - 1;
-	while( i > 0 )
-	{
-		address_bits++;
-		i >>= 1;
-	}
-
-	m_space_config = address_space_config( "i2cmem", ENDIANNESS_BIG, 8,  address_bits, 0, *ADDRESS_MAP_NAME( i2cmem_map8 ) );
-}
 
 
 //-------------------------------------------------
@@ -123,6 +98,7 @@ void i2cmem_device::device_config_complete()
 
 void i2cmem_device::device_start()
 {
+	m_data = std::make_unique<UINT8 []>(m_data_size);
 	m_page.resize( m_page_size );
 
 	save_item( NAME(m_scl) );
@@ -137,6 +113,7 @@ void i2cmem_device::device_start()
 	save_item( NAME(m_shift) );
 	save_item( NAME(m_devsel) );
 	save_item( NAME(m_byteaddr) );
+	save_pointer( &m_data[0], "m_data", m_data_size );
 	if ( m_page_size > 0 )
 	{
 		save_item( NAME(m_page) );
@@ -154,37 +131,20 @@ void i2cmem_device::device_reset()
 
 
 //-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-const address_space_config *i2cmem_device::memory_space_config( address_spacenum spacenum ) const
-{
-	return ( spacenum == 0 ) ? &m_space_config : nullptr;
-}
-
-
-//-------------------------------------------------
 //  nvram_default - called to initialize NVRAM to
 //  its default state
 //-------------------------------------------------
 
 void i2cmem_device::nvram_default()
 {
-	int i2cmem_bytes = m_data_size;
-
-	UINT16 default_value = 0xff;
-	for( offs_t offs = 0; offs < i2cmem_bytes; offs++ )
-	{
-		space(AS_PROGRAM).write_byte( offs, default_value );
-	}
+	memset(&m_data[0], 0xff, m_data_size);
 
 	/* populate from a memory region if present */
 	if (m_region.found())
 	{
-		if( m_region->bytes() != i2cmem_bytes )
+		if( m_region->bytes() != m_data_size )
 		{
-			fatalerror( "i2cmem region '%s' wrong size (expected size = 0x%X)\n", tag(), i2cmem_bytes );
+			fatalerror( "i2cmem region '%s' wrong size (expected size = 0x%X)\n", tag(), m_data_size );
 		}
 
 		if( m_region->bytewidth() != 1 )
@@ -192,9 +152,7 @@ void i2cmem_device::nvram_default()
 			fatalerror( "i2cmem region '%s' needs to be an 8-bit region\n", tag() );
 		}
 
-		UINT8 *default_data = m_region->base();
-		for( offs_t offs = 0; offs < i2cmem_bytes; offs++ )
-			space(AS_PROGRAM).write_byte( offs, default_data[offs] );
+		memcpy(&m_data[0], m_region->base(), m_data_size);
 	}
 }
 
@@ -206,15 +164,7 @@ void i2cmem_device::nvram_default()
 
 void i2cmem_device::nvram_read( emu_file &file )
 {
-	int i2cmem_bytes = m_data_size;
-	dynamic_buffer buffer ( i2cmem_bytes );
-
-	file.read( &buffer[0], i2cmem_bytes );
-
-	for( offs_t offs = 0; offs < i2cmem_bytes; offs++ )
-	{
-		space(AS_PROGRAM).write_byte( offs, buffer[ offs ] );
-	}
+	file.read( &m_data[0], m_data_size );
 }
 
 //-------------------------------------------------
@@ -224,15 +174,7 @@ void i2cmem_device::nvram_read( emu_file &file )
 
 void i2cmem_device::nvram_write( emu_file &file )
 {
-	int i2cmem_bytes = m_data_size;
-	dynamic_buffer buffer ( i2cmem_bytes );
-
-	for( offs_t offs = 0; offs < i2cmem_bytes; offs++ )
-	{
-		buffer[ offs ] = space(AS_PROGRAM).read_byte( offs );
-	}
-
-	file.write( &buffer[0], i2cmem_bytes );
+	file.write( &m_data[0], m_data_size );
 }
 
 
@@ -376,7 +318,7 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 
 								for( int i = 0; i < m_page_size; i++ )
 								{
-									space(AS_PROGRAM).write_byte( offset + i, m_page[ i ] );
+									m_data[offset + i] = m_page[ i ];
 								}
 
 								m_page_offset = 0;
@@ -387,7 +329,7 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 							int offset = data_offset();
 
 							verboselog( this, 1, "data[ %04x ] <- %02x\n", offset, m_shift );
-							space(AS_PROGRAM).write_byte( offset, m_shift );
+							m_data[ offset ] = m_shift;
 
 							m_byteaddr++;
 						}
@@ -420,7 +362,7 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 					{
 						int offset = data_offset();
 
-						m_shift = space(AS_PROGRAM).read_byte( offset );
+						m_shift = m_data[offset];
 						verboselog( this, 1, "data[ %04x ] -> %02x\n", offset, m_shift );
 						m_byteaddr++;
 					}

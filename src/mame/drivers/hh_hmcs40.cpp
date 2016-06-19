@@ -87,6 +87,7 @@
 #include "rendlay.h"
 #include "cpu/hmcs40/hmcs40.h"
 #include "cpu/cop400/cop400.h"
+#include "machine/gen_latch.h"
 #include "sound/speaker.h"
 
 // internal artwork
@@ -102,6 +103,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
 		m_inp_matrix(*this, "IN"),
 		m_speaker(*this, "speaker"),
 		m_display_wait(33),
@@ -112,6 +115,8 @@ public:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	optional_device<generic_latch_8_device> m_soundlatch;
+	optional_device<generic_latch_8_device> m_soundlatch2;
 	optional_ioport_array<7> m_inp_matrix; // max 7
 	optional_device<speaker_sound_device> m_speaker;
 
@@ -1798,7 +1803,7 @@ READ8_MEMBER(pairmtch_state::input_r)
 WRITE8_MEMBER(pairmtch_state::sound_w)
 {
 	// R5x: soundlatch (to audiocpu R2x)
-	soundlatch_byte_w(space, 0, BITSWAP8(data,7,6,5,4,0,1,2,3));
+	m_soundlatch->write(space, 0, BITSWAP8(data,7,6,5,4,0,1,2,3));
 }
 
 
@@ -1807,7 +1812,7 @@ WRITE8_MEMBER(pairmtch_state::sound_w)
 WRITE8_MEMBER(pairmtch_state::sound2_w)
 {
 	// R2x: soundlatch (to maincpu R5x)
-	soundlatch2_byte_w(space, 0, BITSWAP8(data,7,6,5,4,0,1,2,3));
+	m_soundlatch2->write(space, 0, BITSWAP8(data,7,6,5,4,0,1,2,3));
 }
 
 WRITE16_MEMBER(pairmtch_state::speaker_w)
@@ -1859,14 +1864,14 @@ static MACHINE_CONFIG_START( pairmtch, pairmtch_state )
 	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(pairmtch_state, plate_w))
 	MCFG_HMCS40_READ_R_CB(4, READ8(pairmtch_state, input_r))
 	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(pairmtch_state, sound_w))
-	MCFG_HMCS40_READ_R_CB(5, READ8(driver_device, soundlatch2_byte_r))
+	MCFG_HMCS40_READ_R_CB(5, DEVREAD8("soundlatch2", generic_latch_8_device, read))
 	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(pairmtch_state, plate_w))
 	MCFG_HMCS40_WRITE_D_CB(WRITE16(pairmtch_state, grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.2"))
 
 	MCFG_CPU_ADD("audiocpu", HD38820, 400000) // approximation
 	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(pairmtch_state, sound2_w))
-	MCFG_HMCS40_READ_R_CB(2, READ8(driver_device, soundlatch_byte_r))
+	MCFG_HMCS40_READ_R_CB(2, DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_HMCS40_WRITE_D_CB(WRITE16(pairmtch_state, speaker_w))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -1876,6 +1881,10 @@ static MACHINE_CONFIG_START( pairmtch, pairmtch_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END

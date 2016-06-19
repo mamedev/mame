@@ -139,12 +139,12 @@ void a1bus_device::install_device(offs_t start, offs_t end, read8_delegate rhand
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler);
 }
 
-void a1bus_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data)
+void a1bus_device::install_bank(offs_t start, offs_t end, const char *tag, UINT8 *data)
 {
-//  printf("install_bank: %s @ %x->%x mask %x mirror %x\n", tag, start, end, mask, mirror);
+//  printf("install_bank: %s @ %x->%x\n", tag, start, end);
 	m_maincpu = machine().device<cpu_device>(m_cputag);
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_readwrite_bank(start, end, mask, mirror, tag );
+	space.install_readwrite_bank(start, end, tag );
 	machine().root_device().membank(siblingtag(tag).c_str())->set_base(data);
 }
 
@@ -199,7 +199,7 @@ void device_a1bus_card_interface::install_device(offs_t start, offs_t end, read8
 	m_a1bus->install_device(start, end, rhandler, whandler);
 }
 
-void device_a1bus_card_interface::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, char *tag, UINT8 *data)
+void device_a1bus_card_interface::install_bank(offs_t start, offs_t end, char *tag, UINT8 *data)
 {
-	m_a1bus->install_bank(start, end, mask, mirror, tag, data);
+	m_a1bus->install_bank(start, end, tag, data);
 }

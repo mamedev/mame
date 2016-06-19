@@ -1,83 +1,51 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
-	<element name="digit" defstate="10">
-		<led7seg>
-			<color red="1.0" green="0.3" blue="0.0" />
-		</led7seg>
+
+<!-- define elements -->
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
 	</element>
 
-	<view name="Simple LEDs">
+	<element name="text_p1"><text string="PLAYER 1 SCORE"><color red="0.9" green="0.8" blue="0.05" /></text></element>
+	<element name="text_p2"><text string="PLAYER 2 SCORE"><color red="0.9" green="0.8" blue="0.05" /></text></element>
+	<element name="text_lives"><text string="LIVES" align="1"><color red="0.9" green="0.8" blue="0.05" /></text></element>
+	<element name="text_credits"><text string="CREDITS" align="1"><color red="0.9" green="0.8" blue="0.05" /></text></element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds x="0" y="0" width="4950" height="3000" />
 		<screen index="0">
-			<bounds left="0" top="0" right="4" bottom="3" />
+			<bounds x="0" y="0" width="4000" height="3000" />
 		</screen>
 
+		<bezel element="text_p1"><bounds x="4086" y="280" width="788" height="85" /></bezel>
+		<bezel name="digit0" element="digit"><bounds x="4086" y="380" width="118" height="165" /></bezel>
+		<bezel name="digit1" element="digit"><bounds x="4220" y="380" width="118" height="165" /></bezel>
+		<bezel name="digit2" element="digit"><bounds x="4354" y="380" width="118" height="165" /></bezel>
+		<bezel name="digit3" element="digit"><bounds x="4488" y="380" width="118" height="165" /></bezel>
+		<bezel name="digit4" element="digit"><bounds x="4622" y="380" width="118" height="165" /></bezel>
+		<bezel name="digit5" element="digit"><bounds x="4756" y="380" width="118" height="165" /></bezel>
 
-		<bezel name="digit0" element="digit">
-			<bounds x="1.4" y="-1.5" width="0.2" height="0.3" />
-		</bezel>
+		<bezel element="text_lives"><bounds x="4580" y="639" width="400" height="85" /></bezel>
+		<bezel name="digit6" element="digit"><bounds x="4419" y="599" width="118" height="165" /></bezel>
 
-		<bezel name="digit1" element="digit">
-			<bounds x="1.6" y="-1.5" width="0.2" height="0.3" />
-		</bezel>
+		<bezel element="text_p2"><bounds x="4086" y="783" width="788" height="85" /></bezel>
+		<bezel name="digit8" element="digit"><bounds x="4086" y="883" width="118" height="165" /></bezel>
+		<bezel name="digit9" element="digit"><bounds x="4220" y="883" width="118" height="165" /></bezel>
+		<bezel name="digit10" element="digit"><bounds x="4354" y="883" width="118" height="165" /></bezel>
+		<bezel name="digit11" element="digit"><bounds x="4488" y="883" width="118" height="165" /></bezel>
+		<bezel name="digit12" element="digit"><bounds x="4622" y="883" width="118" height="165" /></bezel>
+		<bezel name="digit13" element="digit"><bounds x="4756" y="883" width="118" height="165" /></bezel>
 
-		<bezel name="digit2" element="digit">
-			<bounds x="1.8" y="-1.5" width="0.2" height="0.3" />
-		</bezel>
+		<bezel element="text_lives"><bounds x="4580" y="1144" width="400" height="85" /></bezel>
+		<bezel name="digit7" element="digit"><bounds x="4419" y="1104" width="118" height="165" /></bezel>
 
-		<bezel name="digit3" element="digit">
-			<bounds x="2.0" y="-1.5" width="0.2" height="0.3" />
-		</bezel>
+		<bezel element="text_credits"><bounds x="4580" y="1413" width="400" height="85" /></bezel>
+		<bezel name="digit14" element="digit"><bounds x="4285" y="1383" width="118" height="165" /></bezel>
+		<bezel name="digit15" element="digit"><bounds x="4419" y="1383" width="118" height="165" /></bezel>
 
-		<bezel name="digit4" element="digit">
-			<bounds x="2.2" y="-1.5" width="0.2" height="0.3" />
-		</bezel>
-
-		<bezel name="digit5" element="digit">
-			<bounds x="2.4" y="-1.5" width="0.2" height="0.3" />
-		</bezel>
-
-
-		<bezel name="digit6" element="digit">
-			<bounds x="1.9" y="-1.2" width="0.2" height="0.3" />
-		</bezel>
-
-
-		<bezel name="digit8" element="digit">
-			<bounds x="1.4" y="-0.9" width="0.2" height="0.3" />
-		</bezel>
-
-		<bezel name="digit9" element="digit">
-			<bounds x="1.6" y="-0.9" width="0.2" height="0.3" />
-		</bezel>
-
-		<bezel name="digit10" element="digit">
-			<bounds x="1.8" y="-0.9" width="0.2" height="0.3" />
-		</bezel>
-
-		<bezel name="digit11" element="digit">
-			<bounds x="2.0" y="-0.9" width="0.2" height="0.3" />
-		</bezel>
-
-		<bezel name="digit12" element="digit">
-			<bounds x="2.2" y="-0.9" width="0.2" height="0.3" />
-		</bezel>
-
-		<bezel name="digit13" element="digit">
-			<bounds x="2.4" y="-0.9" width="0.2" height="0.3" />
-		</bezel>
-
-
-		<bezel name="digit7" element="digit">
-			<bounds x="1.9" y="-0.6" width="0.2" height="0.3" />
-		</bezel>
-
-
-		<bezel name="digit14" element="digit">
-			<bounds x="1.7" y="-0.3" width="0.2" height="0.3" />
-		</bezel>
-
-		<bezel name="digit15" element="digit">
-			<bounds x="1.9" y="-0.3" width="0.2" height="0.3" />
-		</bezel>
 	</view>
 </mamelayout>

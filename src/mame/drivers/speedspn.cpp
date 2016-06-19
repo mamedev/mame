@@ -23,7 +23,6 @@ TODO:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/okim6295.h"
 #include "includes/speedspn.h"
 
 /*** README INFO **************************************************************
@@ -77,7 +76,7 @@ WRITE8_MEMBER(speedspn_state::rombank_w)
 
 WRITE8_MEMBER(speedspn_state::sound_w)
 {
-	soundlatch_byte_w(space, 1, data);
+	m_soundlatch->write(space, 1, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -120,7 +119,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, speedspn_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(okibank_w)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( oki_map, AS_0, 8, speedspn_state )
@@ -300,6 +299,8 @@ static MACHINE_CONFIG_START( speedspn, speedspn_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_OKIM6295_ADD("oki", 1122000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

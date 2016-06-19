@@ -6407,7 +6407,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="hhunt1">
+	<software name="hhunt01">
 		<description>Houma Hunter Lime Dai-1-wa</description>
 		<year>1993</year>
 		<publisher>ブラザー工業 (Brother Industries)</publisher>
@@ -6427,7 +6427,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="hhunt2">
+	<software name="hhunt02">
 		<description>Houma Hunter Lime Dai-2-wa</description>
 		<year>1993</year>
 		<publisher>ブラザー工業 (Brother Industries)</publisher>
@@ -6447,7 +6447,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="hhunt3">
+	<software name="hhunt03">
 		<description>Houma Hunter Lime Dai-3-wa</description>
 		<year>1993</year>
 		<publisher>ブラザー工業 (Brother Industries)</publisher>
@@ -6467,7 +6467,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="hhunt6">
+	<software name="hhunt06">
 		<description>Houma Hunter Lime Dai-6-wa</description>
 		<year>1994</year>
 		<publisher>ブラザー工業 (Brother Industries)</publisher>
@@ -14678,7 +14678,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="wrestan3">
+	<software name="wang3">
 		<description>Wrestle Angels 3</description>
 		<year>1994</year>
 		<publisher>エクシング (Xing)</publisher>
@@ -14722,7 +14722,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="wrestans">
+	<software name="wangsp">
 		<description>Wrestle Angels Special - Mouhitori no Top Eventer</description>
 		<year>1994</year>
 		<publisher>エクシング (Xing)</publisher>

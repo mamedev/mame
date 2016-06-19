@@ -76,7 +76,7 @@ void rs232_interface_device::device_start()
 void rs232_interface_device::device_reset()
 {
 	// program
-	m_slot->m_program->install_rom(0x4000, 0x47ff, 0, 0x800, memregion("software")->base());
+	m_slot->m_program->install_rom(0x4000, 0x47ff, 0x800, memregion("software")->base());
 
 	// data
 	m_slot->m_program->install_read_handler(0x5000, 0x57ff, read8_delegate(FUNC(rs232_interface_device::receive_data_r), this));

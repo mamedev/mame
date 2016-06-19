@@ -75,6 +75,7 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_FRAGMENT( abc1600_mac )
 	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1600)) // XTAL_64MHz/8/10/20000/8/8
 MACHINE_CONFIG_END
 
 machine_config_constructor abc1600_mac_device::device_mconfig_additions() const
@@ -92,7 +93,7 @@ ROM_START( abc1600_mac )
 	ROM_LOAD( "boot 6490356-04.1f", 0x0000, 0x4000, CRC(9372f6f2) SHA1(86f0681f7ef8dd190b49eda5e781881582e0c2a4) )
 
 	ROM_REGION( 0x104, "plds", 0 )
-	ROM_LOAD( "1022 6490351-01.17e", 0x000, 0x104, CRC(5dd00d43) SHA1(a3871f0d796bea9df8f25d41b3169dd4b8ef65ab) ) // MAC register address decoder
+	ROM_LOAD( "1022 6490351-01.17e", 0x000, 0x104, CRC(5dd00d43) SHA1(a3871f0d796bea9df8f25d41b3169dd4b8ef65ab) ) // PAL16L8 MAC register address decoder
 ROM_END
 
 

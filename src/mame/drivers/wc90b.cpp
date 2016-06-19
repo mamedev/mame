@@ -51,11 +51,11 @@ fd08: scroll bg #2 X coordinate
 fd0a: scroll bg #2 Y coordinate
 fd0e: ????
 
-What i used instead, was the local copy kept in RAM. These values
+What I used instead, was the local copy kept in RAM. These values
 are the ones the original machine uses. This will differ when trying
-to use some of this code to write a driver for a similar tecmo bootleg.
+to use some of this code to write a driver for a similar Tecmo bootleg.
 
-Sprites are also very different. Theres a code snippet in the ROM
+Sprites are also very different. There's a code snippet in the ROM
 that converts the original sprites to the new format, which only allows
 16x16 sprites. That snippet also does some ( nasty ) clipping.
 
@@ -87,7 +87,6 @@ Noted added by ClawGrip 28-Mar-2008:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
-#include "sound/msm5205.h"
 #include "includes/wc90b.h"
 
 #define TEST_DIPS false /* enable to test unmapped dip switches */
@@ -110,7 +109,7 @@ WRITE8_MEMBER(wc90b_state::bankswitch1_w)
 
 WRITE8_MEMBER(wc90b_state::sound_command_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -166,7 +165,7 @@ static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, wc90b_state )
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(adpcm_data_w)
 	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -364,6 +363,8 @@ static MACHINE_CONFIG_START( wc90b, wc90b_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, YM2203_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)

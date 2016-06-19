@@ -88,6 +88,7 @@ std::vector<std::unique_ptr<bitmap_argb32>> menu::icons_bitmap;
 std::unique_ptr<bitmap_rgb32> menu::hilight_main_bitmap;
 std::vector<std::shared_ptr<bitmap_argb32>> menu::toolbar_bitmap;
 std::vector<std::shared_ptr<bitmap_argb32>> menu::sw_toolbar_bitmap;
+std::vector<const game_driver *> menu::m_old_icons;
 
 /***************************************************************************
     INLINE FUNCTIONS
@@ -180,11 +181,14 @@ void menu::exit(running_machine &machine)
 	for (auto & elem : icons_texture)
 		mre.texture_free(elem);
 
-	for (int i = 0; i < UI_TOOLBAR_BUTTONS; i++)
+	for (int i = 0; i < UI_TOOLBAR_BUTTONS; ++i)
 	{
 		mre.texture_free(sw_toolbar_texture[i]);
 		mre.texture_free(toolbar_texture[i]);
 	}
+
+	icons_bitmap.clear();
+	m_old_icons.clear();
 }
 
 
@@ -390,7 +394,7 @@ const menu::event *menu::process(UINT32 flags, float x0, float y0)
 	{
 		// read events
 		if ((item[0].flags & FLAG_UI ) != 0 || (item[0].flags & FLAG_UI_SWLIST ) != 0)
-			handle_main_events(flags);
+			handle_main_events();
 		else
 			handle_events(flags);
 
@@ -501,7 +505,7 @@ void menu::draw(UINT32 flags, float origx0, float origy0)
 	if (ui().show_fps_counter())
 	{
 		ui().draw_text_full(container, machine().video().speed_text().c_str(), 0.0f, 0.0f, 1.0f,
-				JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, rgb_t::white, rgb_t::black, nullptr, nullptr);
+				ui::text_layout::RIGHT, ui::text_layout::WORD, mame_ui_manager::OPAQUE_, rgb_t::white, rgb_t::black, nullptr, nullptr);
 	}
 
 	bool const customonly = (flags & PROCESS_CUSTOM_ONLY);
@@ -514,8 +518,6 @@ void menu::draw(UINT32 flags, float origx0, float origy0)
 
 	bool selected_subitem_too_big = false;
 	int itemnum, linenum;
-	bool mouse_hit, mouse_button;
-	float mouse_x = -1, mouse_y = -1;
 
 	if (ui().options().use_background_image() && &machine().system() == &GAME_NAME(___empty) && bgrnd_bitmap->valid() && !noimage)
 		container->add_quad(0.0f, 0.0f, 1.0f, 1.0f, rgb_t::white, bgrnd_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
@@ -523,9 +525,8 @@ void menu::draw(UINT32 flags, float origx0, float origy0)
 	// compute the width and height of the full menu
 	float visible_width = 0;
 	float visible_main_menu_height = 0;
-	for (itemnum = 0; itemnum < item.size(); itemnum++)
+	for (auto & pitem : item)
 	{
-		const menu_item &pitem = item[itemnum];
 		float total_width;
 
 		// compute width of left hand side
@@ -566,38 +567,6 @@ void menu::draw(UINT32 flags, float origx0, float origy0)
 	float visible_left = (1.0f - visible_width) * 0.5f;
 	float visible_top = (1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f;
 
-/*  float visible_left;
-    float visible_top;
-    if (origx0 == 0.0f && origy0 == 0.0f)
-    {
-        visible_left = (1.0f - visible_width) * 0.5f;
-        visible_top = (1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f;
-    }
-    else
-    {
-        INT32 mouse_target_x, mouse_target_y;
-        float m_x, m_y;
-        render_target *mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
-        if (mouse_target != nullptr)
-        {
-            if (mouse_target->map_point_container(origx0, origy0, *container, m_x, m_y))
-            {
-                visible_left = m_x;
-                visible_top = m_y;
-            }
-            else
-            {
-                visible_left = (1.0f - visible_width) * 0.5f;
-                visible_top = (1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f;
-            }
-        }
-        else
-        {
-            visible_left = (1.0f - visible_width) * 0.5f;
-            visible_top = (1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f;
-        }
-    }
-*/
 	// if the menu is at the bottom of the extra, adjust
 	visible_top += customtop;
 
@@ -613,6 +582,8 @@ void menu::draw(UINT32 flags, float origx0, float origy0)
 		top_line = 0;
 	if (top_line > item.size() - visible_lines || selected == (item.size() - 1))
 		top_line = item.size() - visible_lines;
+	if (selected >= top_line + visible_lines)
+		top_line = selected - (visible_lines / 2);
 
 	bool show_top_arrow = false;
 	bool show_bottom_arrow = false;
@@ -671,19 +642,15 @@ void menu::draw(UINT32 flags, float origx0, float origy0)
 			// if we're selected, draw with a different background
 			if (itemnum == selected)
 			{
-				fgcolor = UI_SELECTED_COLOR;
+				fgcolor = fgcolor2 = fgcolor3 = UI_SELECTED_COLOR;
 				bgcolor = UI_SELECTED_BG_COLOR;
-				fgcolor2 = UI_SELECTED_COLOR;
-				fgcolor3 = UI_SELECTED_COLOR;
 			}
 
 			// else if the mouse is over this item, draw with a different background
 			else if (itemnum == hover)
 			{
-				fgcolor = UI_MOUSEOVER_COLOR;
+				fgcolor = fgcolor2 = fgcolor3 = UI_MOUSEOVER_COLOR;
 				bgcolor = UI_MOUSEOVER_BG_COLOR;
-				fgcolor2 = UI_MOUSEOVER_COLOR;
-				fgcolor3 = UI_MOUSEOVER_COLOR;
 			}
 
 			// if we have some background hilighting to do, add a quad behind everything else
@@ -694,12 +661,12 @@ void menu::draw(UINT32 flags, float origx0, float origy0)
 			if (linenum == 0 && show_top_arrow)
 			{
 				draw_arrow(container,
-									0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
-									line_y + 0.25f * line_height,
-									0.5f * (x1 + x2) + 0.5f * ud_arrow_width,
-									line_y + 0.75f * line_height,
-									fgcolor,
-									ROT0);
+							0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
+							line_y + 0.25f * line_height,
+							0.5f * (x1 + x2) + 0.5f * ud_arrow_width,
+							line_y + 0.75f * line_height,
+							fgcolor,
+							ROT0);
 				if (hover == itemnum)
 					hover = HOVER_ARROW_UP;
 			}
@@ -708,12 +675,12 @@ void menu::draw(UINT32 flags, float origx0, float origy0)
 			else if (linenum == visible_lines - 1 && show_bottom_arrow)
 			{
 				draw_arrow(container,
-									0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
-									line_y + 0.25f * line_height,
-									0.5f * (x1 + x2) + 0.5f * ud_arrow_width,
-									line_y + 0.75f * line_height,
-									fgcolor,
-									ROT0 ^ ORIENTATION_FLIP_Y);
+							0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
+							line_y + 0.25f * line_height,
+							0.5f * (x1 + x2) + 0.5f * ud_arrow_width,
+							line_y + 0.75f * line_height,
+							fgcolor,
+							ROT0 ^ ORIENTATION_FLIP_Y);
 				if (hover == itemnum)
 					hover = HOVER_ARROW_DOWN;
 			}
@@ -732,7 +699,7 @@ void menu::draw(UINT32 flags, float origx0, float origy0)
 					container->add_line(visible_left + visible_width - ((visible_width - heading_width) / 2) + UI_BOX_LR_BORDER, line_y + 0.5f * line_height, visible_left + visible_width, line_y + 0.5f * line_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 				}
 				ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width,
-					JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+					ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 			}
 
 			// otherwise, draw the item on the left and the subitem text on the right
@@ -744,7 +711,7 @@ void menu::draw(UINT32 flags, float origx0, float origy0)
 
 				// draw the left-side text
 				ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width,
-							JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, &item_width, nullptr);
+					ui::text_layout::LEFT, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor, &item_width, nullptr);
 
 				// give 2 spaces worth of padding
 				item_width += 2.0f * gutter_width;
@@ -759,38 +726,38 @@ void menu::draw(UINT32 flags, float origx0, float origy0)
 
 				// customize subitem text color
 				if (!core_stricmp(subitem_text, _("On")))
-					fgcolor2 = rgb_t(0xff,0x00,0xff,0x00);
+					fgcolor2 = rgb_t(0x00,0xff,0x00);
 
 				if (!core_stricmp(subitem_text, _("Off")))
-					fgcolor2 = rgb_t(0xff,0xff,0x00,0x00);
+					fgcolor2 = rgb_t(0xff,0x00,0x00);
 
 				if (!core_stricmp(subitem_text, _("Auto")))
-					fgcolor2 = rgb_t(0xff,0xff,0xff,0x00);
+					fgcolor2 = rgb_t(0xff,0xff,0x00);
 
 				// draw the subitem right-justified
 				ui().draw_text_full(container, subitem_text, effective_left + item_width, line_y, effective_width - item_width,
-							JUSTIFY_RIGHT, WRAP_TRUNCATE, DRAW_NORMAL, subitem_invert ? fgcolor3 : fgcolor2, bgcolor, &subitem_width, nullptr);
+							ui::text_layout::RIGHT, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, subitem_invert ? fgcolor3 : fgcolor2, bgcolor, &subitem_width, nullptr);
 
 				// apply arrows
 				if (itemnum == selected && (pitem.flags & FLAG_LEFT_ARROW))
 				{
 					draw_arrow(container,
-										effective_left + effective_width - subitem_width - gutter_width,
-										line_y + 0.1f * line_height,
-										effective_left + effective_width - subitem_width - gutter_width + lr_arrow_width,
-										line_y + 0.9f * line_height,
-										fgcolor,
-										ROT90 ^ ORIENTATION_FLIP_X);
+								effective_left + effective_width - subitem_width - gutter_width,
+								line_y + 0.1f * line_height,
+								effective_left + effective_width - subitem_width - gutter_width + lr_arrow_width,
+								line_y + 0.9f * line_height,
+								fgcolor,
+								ROT90 ^ ORIENTATION_FLIP_X);
 				}
 				if (itemnum == selected && (pitem.flags & FLAG_RIGHT_ARROW))
 				{
 					draw_arrow(container,
-										effective_left + effective_width + gutter_width - lr_arrow_width,
-										line_y + 0.1f * line_height,
-										effective_left + effective_width + gutter_width,
-										line_y + 0.9f * line_height,
-										fgcolor,
-										ROT90);
+								effective_left + effective_width + gutter_width - lr_arrow_width,
+								line_y + 0.1f * line_height,
+								effective_left + effective_width + gutter_width,
+								line_y + 0.9f * line_height,
+								fgcolor,
+								ROT90);
 				}
 			}
 		}
@@ -808,7 +775,7 @@ void menu::draw(UINT32 flags, float origx0, float origy0)
 
 		// compute the multi-line target width/height
 		ui().draw_text_full(container, pitem.subtext, 0, 0, visible_width * 0.75f,
-										JUSTIFY_RIGHT, WRAP_WORD, DRAW_NONE, rgb_t::white, rgb_t::black, &target_width, &target_height);
+			ui::text_layout::RIGHT, ui::text_layout::WORD, mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &target_width, &target_height);
 
 		// determine the target location
 		target_x = visible_left + visible_width - target_width - UI_BOX_LR_BORDER;
@@ -822,8 +789,9 @@ void menu::draw(UINT32 flags, float origx0, float origy0)
 				target_x + target_width + UI_BOX_LR_BORDER,
 				target_y + target_height + UI_BOX_TB_BORDER,
 				subitem_invert ? UI_SELECTED_BG_COLOR : UI_BACKGROUND_COLOR);
+
 		ui().draw_text_full(container, pitem.subtext, target_x, target_y, target_width,
-				JUSTIFY_RIGHT, WRAP_WORD, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, nullptr, nullptr);
+				ui::text_layout::RIGHT, ui::text_layout::WORD, mame_ui_manager::NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, nullptr, nullptr);
 	}
 
 	// if there is something special to add, do it by calling the virtual method
@@ -852,7 +820,7 @@ void menu::draw_text_box()
 
 	// compute the multi-line target width/height
 	ui().draw_text_full(container, text, 0, 0, 1.0f - 2.0f * UI_BOX_LR_BORDER - 2.0f * gutter_width,
-									JUSTIFY_LEFT, WRAP_WORD, DRAW_NONE, rgb_t::white, rgb_t::black, &target_width, &target_height);
+		ui::text_layout::LEFT, ui::text_layout::WORD, mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &target_width, &target_height);
 	target_height += 2.0f * line_height;
 	if (target_height > 1.0f - 2.0f * UI_BOX_TB_BORDER)
 		target_height = floorf((1.0f - 2.0f * UI_BOX_TB_BORDER) / line_height) * line_height;
@@ -877,12 +845,12 @@ void menu::draw_text_box()
 
 	// add a box around that
 	ui().draw_outlined_box(container, target_x - UI_BOX_LR_BORDER - gutter_width,
-										target_y - UI_BOX_TB_BORDER,
-										target_x + target_width + gutter_width + UI_BOX_LR_BORDER,
-										target_y + target_height + UI_BOX_TB_BORDER,
-										(item[0].flags & FLAG_REDTEXT) ?  UI_RED_COLOR : UI_BACKGROUND_COLOR);
+							target_y - UI_BOX_TB_BORDER,
+							target_x + target_width + gutter_width + UI_BOX_LR_BORDER,
+							target_y + target_height + UI_BOX_TB_BORDER,
+							(item[0].flags & FLAG_REDTEXT) ?  UI_RED_COLOR : UI_BACKGROUND_COLOR);
 	ui().draw_text_full(container, text, target_x, target_y, target_width,
-				JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+		ui::text_layout::LEFT, ui::text_layout::WORD, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 	// draw the "return to prior menu" text with a hilight behind it
 	highlight(container,
@@ -892,7 +860,7 @@ void menu::draw_text_box()
 				target_y + target_height,
 				UI_SELECTED_BG_COLOR);
 	ui().draw_text_full(container, backtext, target_x, target_y + target_height - line_height, target_width,
-				JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, nullptr, nullptr);
+		ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, nullptr, nullptr);
 
 	// artificially set the hover to the last item so a double-click exits
 	hover = item.size() - 1;
@@ -916,6 +884,9 @@ void menu::handle_events(UINT32 flags)
 		{
 			// if we are hovering over a valid item, select it with a single click
 			case UI_EVENT_MOUSE_DOWN:
+				if (custom_mouse_down())
+					return;
+
 				if ((flags & PROCESS_ONLYCHAR) == 0)
 				{
 					if (hover >= 0 && hover < item.size())
@@ -949,7 +920,7 @@ void menu::handle_events(UINT32 flags)
 
 			// if we are hovering over a valid item, fake a UI_SELECT with a double-click
 			case UI_EVENT_MOUSE_DOUBLE_CLICK:
-				if ((flags & PROCESS_ONLYCHAR) == 0 && hover >= 0 && hover < item.size())
+				if (!(flags & PROCESS_ONLYCHAR) && hover >= 0 && hover < item.size())
 				{
 					selected = hover;
 					m_event.iptkey = IPT_UI_SELECT;
@@ -964,7 +935,7 @@ void menu::handle_events(UINT32 flags)
 
 			// caught scroll event
 			case UI_EVENT_MOUSE_WHEEL:
-				if ((flags & PROCESS_ONLYCHAR) == 0)
+				if (!(flags & PROCESS_ONLYCHAR))
 				{
 					if (local_menu_event.zdelta > 0)
 					{
@@ -981,7 +952,7 @@ void menu::handle_events(UINT32 flags)
 					}
 					else
 					{
-						if ((flags & FLAG_UI_DATS) != 0)
+						if ((flags & FLAG_UI_DATS))
 						{
 							top_line += local_menu_event.num_lines;
 							return;
@@ -1036,7 +1007,7 @@ void menu::handle_keys(UINT32 flags)
 	}
 
 	// bail out
-	if ((flags & PROCESS_ONLYCHAR) != 0)
+	if ((flags & PROCESS_ONLYCHAR))
 		return;
 
 	// hitting cancel also pops the stack
@@ -1054,7 +1025,7 @@ void menu::handle_keys(UINT32 flags)
 	bool ignoreleft = ((item[selected].flags & FLAG_LEFT_ARROW) == 0);
 	bool ignoreright = ((item[selected].flags & FLAG_RIGHT_ARROW) == 0);
 
-	if ((item[0].flags & FLAG_UI_DATS) != 0)
+	if ((item[0].flags & FLAG_UI_DATS))
 		ignoreleft = ignoreright = false;
 
 	// accept left/right keys as-is with repeat
@@ -1066,7 +1037,7 @@ void menu::handle_keys(UINT32 flags)
 	// up backs up by one item
 	if (exclusive_input_pressed(IPT_UI_UP, 6))
 	{
-		if ((item[0].flags & FLAG_UI_DATS) != 0)
+		if ((item[0].flags & FLAG_UI_DATS))
 		{
 			top_line--;
 			return;
@@ -1081,7 +1052,7 @@ void menu::handle_keys(UINT32 flags)
 	// down advances by one item
 	if (exclusive_input_pressed(IPT_UI_DOWN, 6))
 	{
-		if ((item[0].flags & FLAG_UI_DATS) != 0)
+		if ((item[0].flags & FLAG_UI_DATS))
 		{
 			top_line++;
 			return;
@@ -1370,15 +1341,15 @@ void menu::init_ui(running_machine &machine, ui_options &mopt)
 {
 	render_manager &mrender = machine.render();
 	// create a texture for hilighting items in main menu
-	hilight_main_bitmap = std::make_unique<bitmap_rgb32>(1, 26);
+	hilight_main_bitmap = std::make_unique<bitmap_rgb32>(1, 128);
 	int r1 = 0, g1 = 169, b1 = 255; //Any start color
 	int r2 = 0, g2 = 39, b2 = 130; //Any stop color
-	for (int y = 0; y < 26; y++)
+	for (int y = 0; y < 128; y++)
 	{
-		int r = r1 + (y * (r2 - r1) / 26);
-		int g = g1 + (y * (g2 - g1) / 26);
-		int b = b1 + (y * (b2 - b1) / 26);
-		hilight_main_bitmap->pix32(y, 0) = rgb_t(0xff, r, g, b);
+		int r = r1 + (y * (r2 - r1) / 128);
+		int g = g1 + (y * (g2 - g1) / 128);
+		int b = b1 + (y * (b2 - b1) / 128);
+		hilight_main_bitmap->pix32(y, 0) = rgb_t(r, g, b);
 	}
 
 	hilight_main_texture = mrender.texture_alloc();
@@ -1401,10 +1372,11 @@ void menu::init_ui(running_machine &machine, ui_options &mopt)
 	star_texture->set_bitmap(*star_bitmap, star_bitmap->cliprect(), TEXFORMAT_ARGB32);
 
 	// allocate icons
-	for (int i = 0; i < MAX_ICONS_RENDER; i++)
+	for (auto & icons : icons_texture)
 	{
+		m_old_icons.emplace_back(nullptr);
 		icons_bitmap.emplace_back(std::make_unique<bitmap_argb32>());
-		icons_texture[i] = mrender.texture_alloc();
+		icons = mrender.texture_alloc();
 	}
 
 	// create a texture for main menu background
@@ -1472,8 +1444,7 @@ void menu::draw_select_game(UINT32 flags)
 	float visible_width = 1.0f - 4.0f * UI_BOX_LR_BORDER;
 	float primary_left = (1.0f - visible_width) * 0.5f;
 	float primary_width = visible_width;
-	bool is_swlist = ((item[0].flags & FLAG_UI_SWLIST) != 0);
-	bool is_favorites = ((item[0].flags & FLAG_UI_FAVORITE) != 0);
+	bool is_swlist = (item[0].flags & FLAG_UI_SWLIST);
 
 	// draw background image if available
 	if (ui().options().use_background_image() && bgrnd_bitmap->valid())
@@ -1490,7 +1461,7 @@ void menu::draw_select_game(UINT32 flags)
 	if (!noinput)
 	{
 		mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
-		if (mouse_target != nullptr)
+		if (mouse_target)
 			if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, *container, mouse_x, mouse_y))
 				mouse_hit = true;
 	}
@@ -1548,7 +1519,6 @@ void menu::draw_select_game(UINT32 flags)
 		float line_y = visible_top + (float)linenum * line_height;
 		int itemnum = top_line + linenum;
 		const menu_item &pitem = item[itemnum];
-		const char *itemtext = pitem.text;
 		rgb_t fgcolor = UI_TEXT_COLOR;
 		rgb_t bgcolor = UI_TEXT_BG_COLOR;
 		rgb_t fgcolor3 = UI_CLONE_COLOR;
@@ -1564,10 +1534,10 @@ void menu::draw_select_game(UINT32 flags)
 		// if we're selected, draw with a different background
 		if (itemnum == selected && m_focus == focused_menu::main)
 		{
-			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
-			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
-			fgcolor3 = rgb_t(0xff, 0xcc, 0xcc, 0x00);
-			ui().draw_textured_box(container, line_x0 + 0.01f, line_y0, line_x1 - 0.01f, line_y1, bgcolor, rgb_t(255, 43, 43, 43),
+			fgcolor = rgb_t(0xff, 0xff, 0x00);
+			bgcolor = rgb_t(0xff, 0xff, 0xff);
+			fgcolor3 = rgb_t(0xcc, 0xcc, 0x00);
+			ui().draw_textured_box(container, line_x0 + 0.01f, line_y0, line_x1 - 0.01f, line_y1, bgcolor, rgb_t(43, 43, 43),
 				hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 		}
 		// else if the mouse is over this item, draw with a different background
@@ -1581,7 +1551,7 @@ void menu::draw_select_game(UINT32 flags)
 		{
 			fgcolor = fgcolor3 = UI_MOUSEOVER_COLOR;
 			bgcolor = UI_MOUSEOVER_BG_COLOR;
-			ui().draw_textured_box(container, line_x0 + 0.01f, line_y0, line_x1 - 0.01f, line_y1, bgcolor, rgb_t(255, 43, 43, 43),
+			ui().draw_textured_box(container, line_x0 + 0.01f, line_y0, line_x1 - 0.01f, line_y1, bgcolor, rgb_t(43, 43, 43),
 				hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 		}
 
@@ -1612,49 +1582,33 @@ void menu::draw_select_game(UINT32 flags)
 		else if (pitem.subtext == nullptr)
 		{
 			int item_invert = pitem.flags & FLAG_INVERT;
-			float space = 0.0f;
-
-			if (ui_globals::has_icons && !is_swlist)
-			{
-				if (is_favorites)
-				{
-					ui_software_info *soft = (ui_software_info *)item[itemnum].ref;
-					if (soft->startempty == 1)
-						draw_icon(linenum, (void *)soft->driver, effective_left, line_y);
-				}
-				else
-					draw_icon(linenum, item[itemnum].ref, effective_left, line_y);
-
-				space = ud_arrow_width * 1.5f;
-			}
-			ui().draw_text_full(container, itemtext, effective_left + space, line_y, effective_width - space, JUSTIFY_LEFT, WRAP_TRUNCATE,
-				DRAW_NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor, nullptr, nullptr);
+			auto icon = draw_icon(linenum, item[itemnum].ref, effective_left, line_y);
+			ui().draw_text_full(container, pitem.text, effective_left + icon, line_y, effective_width - icon, ui::text_layout::LEFT, ui::text_layout::TRUNCATE,
+				mame_ui_manager::NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor, nullptr, nullptr);
 		}
 		else
 		{
-			int item_invert = pitem.flags & FLAG_INVERT;
-			const char *subitem_text = pitem.subtext;
+			auto item_invert = pitem.flags & FLAG_INVERT;
 			float item_width, subitem_width;
 
 			// compute right space for subitem
-			ui().draw_text_full(container, subitem_text, effective_left, line_y, ui().get_string_width(pitem.subtext),
-				JUSTIFY_RIGHT, WRAP_NEVER, DRAW_NONE, item_invert ? fgcolor3 : fgcolor, bgcolor, &subitem_width, nullptr);
+			ui().draw_text_full(container, pitem.subtext, effective_left, line_y, ui().get_string_width(pitem.subtext),
+				ui::text_layout::RIGHT, ui::text_layout::NEVER, mame_ui_manager::NONE, item_invert ? fgcolor3 : fgcolor, bgcolor, &subitem_width, nullptr);
 			subitem_width += gutter_width;
 
 			// draw the item left-justified
-			ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width - subitem_width,
-				JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor, &item_width, nullptr);
+			ui().draw_text_full(container, pitem.text, effective_left, line_y, effective_width - subitem_width,
+				ui::text_layout::LEFT, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor, &item_width, nullptr);
 
 			// draw the subitem right-justified
-			ui().draw_text_full(container, subitem_text, effective_left + item_width, line_y, effective_width - item_width,
-				JUSTIFY_RIGHT, WRAP_NEVER, DRAW_NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor, nullptr, nullptr);
+			ui().draw_text_full(container, pitem.subtext, effective_left + item_width, line_y, effective_width - item_width,
+				ui::text_layout::RIGHT, ui::text_layout::NEVER, mame_ui_manager::NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor, nullptr, nullptr);
 		}
 	}
 
 	for (size_t count = visible_items; count < item.size(); count++)
 	{
 		const menu_item &pitem = item[count];
-		const char *itemtext = pitem.text;
 		float line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
 		float line_y0 = line;
 		float line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
@@ -1668,9 +1622,9 @@ void menu::draw_select_game(UINT32 flags)
 		// if we're selected, draw with a different background
 		if (count == selected && m_focus == focused_menu::main)
 		{
-			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
-			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
-			ui().draw_textured_box(container, line_x0 + 0.01f, line_y0, line_x1 - 0.01f, line_y1, bgcolor, rgb_t(255, 43, 43, 43),
+			fgcolor = rgb_t(0xff, 0xff, 0x00);
+			bgcolor = rgb_t(0xff, 0xff, 0xff);
+			ui().draw_textured_box(container, line_x0 + 0.01f, line_y0, line_x1 - 0.01f, line_y1, bgcolor, rgb_t(43, 43, 43),
 				hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 		}
 		// else if the mouse is over this item, draw with a different background
@@ -1685,8 +1639,8 @@ void menu::draw_select_game(UINT32 flags)
 			container->add_line(visible_left, line + 0.5f * line_height, visible_left + visible_width, line + 0.5f * line_height,
 				UI_LINE_WIDTH, UI_TEXT_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		else
-			ui().draw_text_full(container, itemtext, effective_left, line, effective_width, JUSTIFY_CENTER, WRAP_TRUNCATE,
-				DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+			ui().draw_text_full(container, pitem.text, effective_left, line, effective_width, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+				mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 		line += line_height;
 	}
 
@@ -1705,8 +1659,7 @@ void menu::draw_select_game(UINT32 flags)
 	visitems = visible_lines - (top_line != 0) - (top_line + visible_lines != visible_items);
 
 	// reset redraw icon stage
-	if (!is_swlist)
-		ui_globals::redraw_icon = false;
+	if (!is_swlist) ui_globals::redraw_icon = false;
 
 	// noinput
 	if (noinput)
@@ -1763,7 +1716,7 @@ void menu::get_title_search(std::string &snaptext, std::string &searchstr)
 
 void menu::handle_main_keys(UINT32 flags)
 {
-	bool ignorepause = menu::stack_has_special_main_menu();
+	auto ignorepause = menu::stack_has_special_main_menu();
 
 	// bail if no items
 	if (item.size() == 0)
@@ -1974,9 +1927,9 @@ void menu::handle_main_keys(UINT32 flags)
 //  handle input events for main menu
 //-------------------------------------------------
 
-void menu::handle_main_events(UINT32 flags)
+void menu::handle_main_events()
 {
-	bool stop = false;
+	auto stop = false;
 	ui_event local_menu_event;
 
 	if (m_pressed)
@@ -1984,8 +1937,8 @@ void menu::handle_main_events(UINT32 flags)
 		bool pressed = mouse_pressed();
 		INT32 m_target_x, m_target_y;
 		bool m_button;
-		render_target *mouse_target = machine().ui_input().find_mouse(&m_target_x, &m_target_y, &m_button);
-		if (mouse_target != nullptr && m_button && (hover == HOVER_ARROW_DOWN || hover == HOVER_ARROW_UP))
+		auto mouse_target = machine().ui_input().find_mouse(&m_target_x, &m_target_y, &m_button);
+		if (mouse_target && m_button && (hover == HOVER_ARROW_DOWN || hover == HOVER_ARROW_UP))
 		{
 			if (pressed)
 				machine().ui_input().push_mouse_down_event(mouse_target, m_target_x, m_target_y);
@@ -2180,7 +2133,7 @@ void menu::handle_main_events(UINT32 flags)
 
 float menu::draw_right_box_title(float x1, float y1, float x2, float y2)
 {
-	float line_height = ui().get_line_height();
+	auto line_height = ui().get_line_height();
 	float midl = (x2 - x1) * 0.5f;
 
 	// add outlined box for options
@@ -2197,7 +2150,7 @@ float menu::draw_right_box_title(float x1, float y1, float x2, float y2)
 	float text_size = 1.0f;
 	for (auto & elem : buffer)
 	{
-		float textlen = ui().get_string_width(elem.c_str()) + 0.01f;
+		auto textlen = ui().get_string_width(elem.c_str()) + 0.01f;
 		float tmp_size = (textlen > midl) ? (midl / textlen) : 1.0f;
 		text_size = MIN(text_size, tmp_size);
 	}
@@ -2227,17 +2180,17 @@ float menu::draw_right_box_title(float x1, float y1, float x2, float y2)
 
 		if (m_focus == focused_menu::righttop && ui_globals::rpanel == cells)
 		{
-			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
-			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
+			fgcolor = rgb_t(0xff, 0xff, 0x00);
+			bgcolor = rgb_t(0xff, 0xff, 0xff);
 			ui().draw_textured_box(container, x1 + UI_LINE_WIDTH, y1 + UI_LINE_WIDTH, x1 + midl - UI_LINE_WIDTH, y1 + line_height,
-				bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+				bgcolor, rgb_t(43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 		}
 		else if (bgcolor == UI_MOUSEOVER_BG_COLOR)
 			container->add_rect(x1 + UI_LINE_WIDTH, y1 + UI_LINE_WIDTH, x1 + midl - UI_LINE_WIDTH, y1 + line_height,
 				bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
 		ui().draw_text_full(container, buffer[cells].c_str(), x1 + UI_LINE_WIDTH, y1, midl - UI_LINE_WIDTH,
-			JUSTIFY_CENTER, WRAP_NEVER, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr, text_size);
+			ui::text_layout::CENTER, ui::text_layout::NEVER, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, text_size);
 		x1 += midl;
 	}
 
@@ -2250,25 +2203,25 @@ float menu::draw_right_box_title(float x1, float y1, float x2, float y2)
 
 std::string menu::arts_render_common(float origx1, float origy1, float origx2, float origy2)
 {
-	float line_height = ui().get_line_height();
+	auto line_height = ui().get_line_height();
 	std::string snaptext, searchstr;
-	float title_size = 0.0f;
-	float txt_lenght = 0.0f;
-	float gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
+	auto title_size = 0.0f;
+	auto txt_lenght = 0.0f;
+	auto gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
 
 	get_title_search(snaptext, searchstr);
 
 	// apply title to right panel
 	for (int x = FIRST_VIEW; x < LAST_VIEW; x++)
 	{
-		ui().draw_text_full(container, _(arts_info[x].first), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER,
-			WRAP_TRUNCATE, DRAW_NONE, rgb_t::white, rgb_t::black, &txt_lenght, nullptr);
+		ui().draw_text_full(container, _(arts_info[x].first), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER,
+			ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &txt_lenght, nullptr);
 		txt_lenght += 0.01f;
 		title_size = MAX(txt_lenght, title_size);
 	}
 
-	rgb_t fgcolor = (m_focus == focused_menu::rightbottom) ? rgb_t(0xff, 0xff, 0xff, 0x00) : UI_TEXT_COLOR;
-	rgb_t bgcolor = (m_focus == focused_menu::rightbottom) ? rgb_t(0xff, 0xff, 0xff, 0xff) : UI_TEXT_BG_COLOR;
+	rgb_t fgcolor = (m_focus == focused_menu::rightbottom) ? rgb_t(0xff, 0xff, 0x00) : UI_TEXT_COLOR;
+	rgb_t bgcolor = (m_focus == focused_menu::rightbottom) ? rgb_t(0xff, 0xff, 0xff) : UI_TEXT_BG_COLOR;
 	float middle = origx2 - origx1;
 
 	// check size
@@ -2278,10 +2231,10 @@ std::string menu::arts_render_common(float origx1, float origy1, float origx2, f
 
 	if (bgcolor != UI_TEXT_BG_COLOR)
 		ui().draw_textured_box(container, origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
-			origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+			origy1 + line_height, bgcolor, rgb_t(43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
-	ui().draw_text_full(container, snaptext.c_str(), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-		DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr, tmp_size);
+	ui().draw_text_full(container, snaptext.c_str(), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+		mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, tmp_size);
 
 	draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::curimage_view, FIRST_VIEW, LAST_VIEW, title_size);
 
@@ -2321,9 +2274,9 @@ void menu::draw_toolbar(float x1, float y1, float x2, float y2, bool software)
 	for (auto & e : t_bitmap)
 		if (e->valid()) m_valid++;
 
-	float space_x = (y2 - y1) * container->manager().ui_aspect();
-	float total = (m_valid * space_x) + ((m_valid - 1) * 0.001f);
-	x1 = ((x2 - x1) * 0.5f) - (total / 2);
+	float space_x = (y2 - y1) * container->manager().ui_aspect(container);
+	auto total = (float)(m_valid * space_x) + ((float)(m_valid - 1) * 0.001f);
+	x1 += (x2 - x1) * 0.5f - total * 0.5f;
 	x2 = x1 + space_x;
 
 	for (int z = 0; z < UI_TOOLBAR_BUTTONS; ++z)
@@ -2335,7 +2288,7 @@ void menu::draw_toolbar(float x1, float y1, float x2, float y2, bool software)
 				hover = HOVER_B_FAV + z;
 				color = rgb_t::white;
 				float ypos = y2 + ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;
-				ui().draw_text_box(container, _(hover_msg[z]), JUSTIFY_CENTER, 0.5f, ypos, UI_BACKGROUND_COLOR);
+				ui().draw_text_box(container, _(hover_msg[z]), ui::text_layout::CENTER, 0.5f, ypos, UI_BACKGROUND_COLOR);
 			}
 
 			container->add_quad(x1, y1, x2, y2, color, t_texture[z], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
@@ -2349,7 +2302,7 @@ void menu::draw_toolbar(float x1, float y1, float x2, float y2, bool software)
 //  perform rendering of image
 //-------------------------------------------------
 
-void menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float origy1, float origx2, float origy2, bool software)
+void menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float origy1, float origx2, float origy2)
 {
 	bool no_available = false;
 	float line_height = ui().get_line_height();
@@ -2460,14 +2413,14 @@ void menu::draw_common_arrow(float origx1, float origy1, float origx2, float ori
 	// set hover
 	if (mouse_hit && ar_x0 <= mouse_x && ar_x1 > mouse_x && ar_y0 <= mouse_y && ar_y1 > mouse_y && current != dmax)
 	{
-		ui().draw_textured_box(container, ar_x0 + 0.01f, ar_y0, ar_x1 - 0.01f, ar_y1, UI_MOUSEOVER_BG_COLOR, rgb_t(255, 43, 43, 43),
+		ui().draw_textured_box(container, ar_x0 + 0.01f, ar_y0, ar_x1 - 0.01f, ar_y1, UI_MOUSEOVER_BG_COLOR, rgb_t(43, 43, 43),
 			hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 		hover = HOVER_UI_RIGHT;
 		fgcolor_right = UI_MOUSEOVER_COLOR;
 	}
 	else if (mouse_hit && al_x0 <= mouse_x && al_x1 > mouse_x && al_y0 <= mouse_y && al_y1 > mouse_y && current != dmin)
 	{
-		ui().draw_textured_box(container, al_x0 + 0.01f, al_y0, al_x1 - 0.01f, al_y1, UI_MOUSEOVER_BG_COLOR, rgb_t(255, 43, 43, 43),
+		ui().draw_textured_box(container, al_x0 + 0.01f, al_y0, al_x1 - 0.01f, al_y1, UI_MOUSEOVER_BG_COLOR, rgb_t(43, 43, 43),
 			hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 		hover = HOVER_UI_LEFT;
 		fgcolor_left = UI_MOUSEOVER_COLOR;
@@ -2489,16 +2442,29 @@ void menu::draw_common_arrow(float origx1, float origy1, float origx2, float ori
 //  draw icons
 //-------------------------------------------------
 
-void menu::draw_icon(int linenum, void *selectedref, float x0, float y0)
+float menu::draw_icon(int linenum, void *selectedref, float x0, float y0)
 {
-	static const game_driver *olddriver[MAX_ICONS_RENDER] = { nullptr };
-	auto x1 = x0 + ui().get_line_height() * container->manager().ui_aspect(container);
-	auto y1 = y0 + ui().get_line_height();
-	auto driver = (const game_driver *)selectedref;
+	if (!ui_globals::has_icons || (item[0].flags & FLAG_UI_SWLIST)) 
+		return 0.0f;
 
-	if (olddriver[linenum] != driver || ui_globals::redraw_icon)
+	float ud_arrow_width = ui().get_line_height() * container->manager().ui_aspect(container);
+	const game_driver *driver = nullptr;
+
+	if (item[0].flags & FLAG_UI_FAVORITE)
 	{
-		olddriver[linenum] = driver;
+		ui_software_info *soft = (ui_software_info *)selectedref;
+		if (soft->startempty == 1)
+			driver = soft->driver;
+	}
+	else
+		driver = (const game_driver *)selectedref;
+
+	auto x1 = x0 + ud_arrow_width;
+	auto y1 = y0 + ui().get_line_height();
+
+	if (m_old_icons[linenum] != driver || ui_globals::redraw_icon)
+	{
+		m_old_icons[linenum] = driver;
 
 		// set clone status
 		bool cloneof = strcmp(driver->parent, "0");
@@ -2569,7 +2535,6 @@ void menu::draw_icon(int linenum, void *selectedref, float x0, float y0)
 			else
 				dest_bitmap = tmp;
 
-			icons_bitmap[linenum]->reset();
 			icons_bitmap[linenum]->allocate(panel_width_pixel, panel_height_pixel);
 
 			for (int x = 0; x < dest_xPixel; x++)
@@ -2588,6 +2553,8 @@ void menu::draw_icon(int linenum, void *selectedref, float x0, float y0)
 
 	if (icons_bitmap[linenum] != nullptr && icons_bitmap[linenum]->valid())
 		container->add_quad(x0, y0, x1, y1, rgb_t::white, icons_texture[linenum], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+
+	return ud_arrow_width * 1.5f;
 }
 
 //-------------------------------------------------
@@ -2602,7 +2569,7 @@ void menu::info_arrow(int ub, float origx1, float origx2, float oy1, float line_
 	if (mouse_hit && origx1 <= mouse_x && origx2 > mouse_x && oy1 <= mouse_y && oy1 + (line_height * text_size) > mouse_y)
 	{
 		ui().draw_textured_box(container, origx1 + 0.01f, oy1, origx2 - 0.01f, oy1 + (line_height * text_size), UI_MOUSEOVER_BG_COLOR,
-			rgb_t(255, 43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+			rgb_t(43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 		hover = (!ub) ? HOVER_DAT_UP : HOVER_DAT_DOWN;
 		fgcolor = UI_MOUSEOVER_COLOR;
 	}
@@ -2770,7 +2737,7 @@ void menu::draw_palette_menu()
 		// if we don't have a subitem, just draw the string centered
 		else if (pitem.subtext == nullptr)
 			ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width,
-				JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+				ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 
 		// otherwise, draw the item on the left and the subitem text on the right
 		else
@@ -2780,7 +2747,7 @@ void menu::draw_palette_menu()
 
 			// draw the left-side text
 			ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width,
-				JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+				ui::text_layout::LEFT, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 
 			// give 2 spaces worth of padding
 			float subitem_width = ui().get_string_width("FF00FF00");
@@ -2905,8 +2872,8 @@ void menu::draw_dats_menu()
 		// draw dats text
 		else if (pitem.subtext == nullptr)
 		{
-			ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width, JUSTIFY_LEFT, WRAP_NEVER,
-				DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+			ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width, ui::text_layout::LEFT, ui::text_layout::NEVER,
+				mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 		}
 	}
 
@@ -2930,8 +2897,8 @@ void menu::draw_dats_menu()
 		else
 		{
 			highlight(container, line_x0, line_y0, line_x1, line_y1, bgcolor);
-			ui().draw_text_full(container, itemtext, effective_left, line, effective_width, JUSTIFY_CENTER, WRAP_TRUNCATE,
-				DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+			ui().draw_text_full(container, itemtext, effective_left, line, effective_width, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+				mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 		}
 		line += line_height;
 	}
@@ -2957,24 +2924,13 @@ void menu::set_pressed()
 
 void menu::extra_text_draw_box(float origx1, float origx2, float origy, float yspan, const char *text, int direction)
 {
-	float text_width, text_height;
-	float width, maxwidth;
-	float x1, y1, x2, y2;
-
 	// get the size of the text
-	ui().draw_text_full(container,text, 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD,
-		DRAW_NONE, rgb_t::white, rgb_t::black, &text_width, &text_height);
-	width = text_width + (2 * UI_BOX_LR_BORDER);
-	maxwidth = MAX(width, origx2 - origx1);
+	auto layout = ui().create_layout(container);
+	layout.add_text(text);
 
-	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = origy + (yspan * direction);
-	y2 = origy + (UI_BOX_TB_BORDER * direction);
-
-	if (y1 > y2)
-		std::swap(y1, y2);
+	// position this extra text
+	float x1, y1, x2, y2;
+	extra_text_position(origx1, origx2, origy, yspan, layout, direction, x1, y1, x2, y2);
 
 	// draw a box
 	ui().draw_outlined_box(container,x1, y1, x2, y2, UI_BACKGROUND_COLOR);
@@ -2984,8 +2940,29 @@ void menu::extra_text_draw_box(float origx1, float origx2, float origy, float ys
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	ui().draw_text_full(container,text, x1, y1, text_width, JUSTIFY_LEFT, WRAP_WORD,
-		DRAW_NORMAL, rgb_t::white, rgb_t::black, nullptr, nullptr);
+	layout.emit(container, x1, y1);
+}
+
+
+//-------------------------------------------------
+//  extra_text_position - given extra text that has
+//	been put into a layout, position it
+//-------------------------------------------------
+
+void menu::extra_text_position(float origx1, float origx2, float origy, float yspan, text_layout &layout,
+	int direction, float &x1, float &y1, float &x2, float &y2)
+{
+	float width = layout.actual_width() + (2 * UI_BOX_LR_BORDER);
+	float maxwidth = MAX(width, origx2 - origx1);
+
+	// compute our bounds
+	x1 = 0.5f - 0.5f * maxwidth;
+	x2 = x1 + maxwidth;
+	y1 = origy + (yspan * direction);
+	y2 = origy + (UI_BOX_TB_BORDER * direction);
+
+	if (y1 > y2)
+		std::swap(y1, y2);
 }
 
 

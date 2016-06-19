@@ -49,7 +49,7 @@ WRITE16_MEMBER(taotaido_state::tileregs_w)
 				m_video_bank_select[(offset-4)*2] = data >> 8;
 			if(ACCESSING_BITS_0_7)
 				m_video_bank_select[(offset-4)*2+1] = data &0xff;
-				m_bg_tilemap->mark_all_dirty();
+			m_bg_tilemap->mark_all_dirty();
 			break;
 	}
 }

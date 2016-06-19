@@ -21,14 +21,11 @@ namespace netlist
 		, m_R2(*this, "R2")
 		, m_R91(*this, "R91")
 		, m_R92(*this, "R92")
-		, m_cnt(0)
-		, m_last_A(0)
-		, m_last_B(0)
+		, m_cnt(*this, "m_cnt", 0)
+		, m_last_A(*this, "m_last_A", 0)
+		, m_last_B(*this, "m_last_B", 0)
 		, m_Q(*this, {{"QA", "QB", "QC", "QD"}})
 		{
-			save(NLNAME(m_cnt));
-			save(NLNAME(m_last_A));
-			save(NLNAME(m_last_B));
 		}
 
 		NETLIB_UPDATEI();
@@ -44,9 +41,9 @@ namespace netlist
 		logic_input_t m_R91;
 		logic_input_t m_R92;
 
-		UINT8 m_cnt;
-		UINT8 m_last_A;
-		UINT8 m_last_B;
+		state_var_u8 m_cnt;
+		state_var_u8 m_last_A;
+		state_var_u8 m_last_B;
 
 		object_array_t<logic_output_t, 4> m_Q;
 	};

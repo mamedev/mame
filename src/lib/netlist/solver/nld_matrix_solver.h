@@ -74,9 +74,9 @@ public:
 
 	unsigned m_railstart;
 
-	plib::pvector_t<unsigned> m_nz;   /* all non zero for multiplication */
-	plib::pvector_t<unsigned> m_nzrd; /* non zero right of the diagonal for elimination, may include RHS element */
-	plib::pvector_t<unsigned> m_nzbd; /* non zero below of the diagonal for elimination */
+	std::vector<unsigned> m_nz;   /* all non zero for multiplication */
+	std::vector<unsigned> m_nzrd; /* non zero right of the diagonal for elimination, may include RHS element */
+	std::vector<unsigned> m_nzbd; /* non zero below of the diagonal for elimination */
 
 	/* state */
 	nl_double m_last_V;
@@ -84,12 +84,12 @@ public:
 	nl_double m_h_n_m_1;
 
 private:
-	plib::pvector_t<int> m_net_other;
-	plib::pvector_t<nl_double> m_go;
-	plib::pvector_t<nl_double> m_gt;
-	plib::pvector_t<nl_double> m_Idr;
-	plib::pvector_t<nl_double *> m_other_curanalog;
-	plib::pvector_t<terminal_t *> m_term;
+	std::vector<int> m_net_other;
+	std::vector<nl_double> m_go;
+	std::vector<nl_double> m_gt;
+	std::vector<nl_double> m_Idr;
+	std::vector<nl_double *> m_other_curanalog;
+	std::vector<terminal_t *> m_term;
 
 };
 
@@ -109,8 +109,7 @@ public:
 class matrix_solver_t : public device_t
 {
 public:
-	using list_t = plib::pvector_t<matrix_solver_t *>;
-	using dev_list_t = core_device_t::list_t;
+	using list_t = std::vector<matrix_solver_t *>;
 
 	enum eSortType
 	{
@@ -121,28 +120,20 @@ public:
 
 	matrix_solver_t(netlist_t &anetlist, const pstring &name,
 			const eSortType sort, const solver_parameters_t *params)
-	: device_t(anetlist, name),
-    m_stat_calculations(0),
-	m_stat_newton_raphson(0),
-	m_stat_vsolver_calls(0),
-	m_iterative_fail(0),
-	m_iterative_total(0),
-	m_params(*params),
-	m_last_step(0, 1),
-	m_cur_ts(0),
-	m_fb_sync(*this, "FB_sync"),
-	m_Q_sync(*this, "Q_sync"),
-	m_sort(sort)
+	: device_t(anetlist, name)
+	, m_params(*params)
+	, m_stat_calculations(*this, "m_stat_calculations", 0)
+	, m_stat_newton_raphson(*this, "m_stat_newton_raphson", 0)
+	, m_stat_vsolver_calls(*this, "m_stat_vsolver_calls", 0)
+	, m_iterative_fail(*this, "m_iterative_fail", 0)
+	, m_iterative_total(*this, "m_iterative_total", 0)
+	, m_last_step(*this, "m_last_step", netlist_time::quantum())
+	, m_cur_ts(*this, "m_cur_ts", 0)
+	, m_fb_sync(*this, "FB_sync")
+	, m_Q_sync(*this, "Q_sync")
+	, m_sort(sort)
 	{
 		connect_post_start(m_fb_sync, m_Q_sync);
-
-		save(NLNAME(m_last_step));
-		save(NLNAME(m_cur_ts));
-		save(NLNAME(m_stat_calculations));
-		save(NLNAME(m_stat_newton_raphson));
-		save(NLNAME(m_stat_vsolver_calls));
-		save(NLNAME(m_iterative_fail));
-		save(NLNAME(m_iterative_total));
 	}
 
 	virtual ~matrix_solver_t();
@@ -200,27 +191,27 @@ protected:
 	template <typename T>
 	void build_LE_RHS();
 
-	plib::pvector_t<terms_t *> m_terms;
-	plib::pvector_t<analog_net_t *> m_nets;
+	std::vector<terms_t *> m_terms;
+	std::vector<analog_net_t *> m_nets;
 	std::vector<std::unique_ptr<proxied_analog_output_t>> m_inps;
 
-	plib::pvector_t<terms_t *> m_rails_temp;
-
-	int m_stat_calculations;
-	int m_stat_newton_raphson;
-	int m_stat_vsolver_calls;
-	int m_iterative_fail;
-	int m_iterative_total;
+	std::vector<terms_t *> m_rails_temp;
 
 	const solver_parameters_t &m_params;
+
+	state_var<int> m_stat_calculations;
+	state_var<int> m_stat_newton_raphson;
+	state_var<int> m_stat_vsolver_calls;
+	state_var<int> m_iterative_fail;
+	state_var<int> m_iterative_total;
 
 	inline nl_double current_timestep() { return m_cur_ts; }
 private:
 
-	netlist_time m_last_step;
-	nl_double m_cur_ts;
-	dev_list_t m_step_devices;
-	dev_list_t m_dynamic_devices;
+	state_var<netlist_time> m_last_step;
+	state_var<nl_double> m_cur_ts;
+	std::vector<core_device_t *> m_step_devices;
+	std::vector<core_device_t *> m_dynamic_devices;
 
 	logic_input_t m_fb_sync;
 	logic_output_t m_Q_sync;

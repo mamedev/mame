@@ -164,6 +164,7 @@ Video sync   6 F   Video sync                 Post   6 F   Post
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/taitoipt.h"
+#include "machine/gen_latch.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 
@@ -205,7 +206,6 @@ Video sync   6 F   Video sync                 Post   6 F   Post
 #define CLIP_SKIP           (VIS_MINY * SCREEN_WIDTH + VIS_MINX)
 #define CLIP_W              (VIS_MAXX - VIS_MINX + 1)
 #define CLIP_H              (VIS_MAXY - VIS_MINY + 1)
-#define CLIP_BYTEW          (CLIP_W << 1)
 
 
 class halleys_state : public driver_device
@@ -217,7 +217,8 @@ public:
 		m_io_ram(*this, "io_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	UINT16 *m_render_layer[MAX_LAYERS];
 	UINT8 m_sound_fifo[MAX_SOUNDS];
@@ -285,6 +286,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 };
 
 
@@ -432,76 +434,69 @@ if (0) {
 	bank = ((code & BANKBIT0) | (color & BANKBIT1)) << 8;
 	pal_ptr = m_internal_palette.get();
 
-
 	// the crossroad of fate
-	if (code & BGLAYER || command & 7) goto COMMAND_MODE;
-
-
-	// reject off-screen objects
-	if (flags & MIRROR_Y) { flags |= FLIP_Y; y -= (h - 1); }
-	if (flags & MIRROR_X) { flags |= FLIP_X; x -= (w - 1); }
-	if (y > VIS_MAXY || (y + h) <= VIS_MINY) return;
-	if (x > VIS_MAXX || (x + w) <= VIS_MINX) return;
-
-
-	// clip objects against the visible area
-	yclip = y; xclip = x; hclip = h; wclip = w;
-	src_yskip = src_xskip = 0;
-	if (yclip < VIS_MINY) { src_yskip = VIS_MINY - yclip; yclip = VIS_MINY; hclip -= src_yskip; }
-	if (yclip + hclip > VIS_MAXY+1) { hclip = VIS_MAXY+1 - yclip; }
-	if (xclip < VIS_MINX) { src_xskip = VIS_MINX - xclip; xclip = VIS_MINX; wclip -= src_xskip; }
-	if (xclip + wclip > VIS_MAXX+1) { wclip = VIS_MAXX+1 - xclip; }
-	dst_skip = (yclip << SCREEN_WIDTH_L2) + xclip;
-
-
-	// adjust orientations
-	eax = 0;
-	if (flags & (S1_REV | S2_REV)) { flags ^= FLIP_Y | FLIP_X; eax -= w * h - 8; }
-
-	if (flags & FLIP_Y)
+	if (!(code & BGLAYER || command & 7))
 	{
-		eax += w * (h - 1);
-		src_yskip = -src_yskip;
-		src_dy = (flags & FLIP_X) ? -w + wclip : -w - wclip;
+		// reject off-screen objects
+		if (flags & MIRROR_Y) { flags |= FLIP_Y; y -= (h - 1); }
+		if (flags & MIRROR_X) { flags |= FLIP_X; x -= (w - 1); }
+		if (y > VIS_MAXY || (y + h) <= VIS_MINY) return;
+		if (x > VIS_MAXX || (x + w) <= VIS_MINX) return;
 
-	}
-	else src_dy = (flags & FLIP_X) ? w + wclip : w - wclip;
+		// clip objects against the visible area
+		yclip = y; xclip = x; hclip = h; wclip = w;
+		src_yskip = src_xskip = 0;
+		if (yclip < VIS_MINY) { src_yskip = VIS_MINY - yclip; yclip = VIS_MINY; hclip -= src_yskip; }
+		if (yclip + hclip > VIS_MAXY+1) { hclip = VIS_MAXY+1 - yclip; }
+		if (xclip < VIS_MINX) { src_xskip = VIS_MINX - xclip; xclip = VIS_MINX; wclip -= src_xskip; }
+		if (xclip + wclip > VIS_MAXX+1) { wclip = VIS_MAXX+1 - xclip; }
+		dst_skip = (yclip << SCREEN_WIDTH_L2) + xclip;
 
-	if (flags & FLIP_X)
-	{
-		eax += w - 1;
-		src_xskip = -src_xskip;
-		src_dx = -1;
-	}
-	else src_dx = 1;
+		// adjust orientations
+		eax = 0;
+		if (flags & (S1_REV | S2_REV)) { flags ^= FLIP_Y | FLIP_X; eax -= w * h - 8; }
 
+		if (flags & FLIP_Y)
+		{
+			eax += w * (h - 1);
+			src_yskip = -src_yskip;
+			src_dy = (flags & FLIP_X) ? -w + wclip : -w - wclip;
+		}
+		else src_dy = (flags & FLIP_X) ? w + wclip : w - wclip;
 
-	// calculate entry points and loop constants
-	src1_ptr = m_gfx_plane02 + ((bank + src1)<<3) + eax;
-	src2_ptr = m_gfx_plane13 + ((bank + src2)<<3) + eax;
+		if (flags & FLIP_X)
+		{
+			eax += w - 1;
+			src_xskip = -src_xskip;
+			src_dx = -1;
+		}
+		else src_dx = 1;
 
-	if (!(flags & (S1_IDLE | S2_IDLE)))
-	{
-		eax = src_yskip * w + src_xskip;
-		src1_ptr += eax;
-		src2_ptr += eax;
-	}
-	else src_dy = src_dx = 0;
+		// calculate entry points and loop constants
+		src1_ptr = m_gfx_plane02 + ((bank + src1)<<3) + eax;
+		src2_ptr = m_gfx_plane13 + ((bank + src2)<<3) + eax;
 
-	dst_ptr = m_render_layer[layer] + dst_skip;
+		if (!(flags & (S1_IDLE | S2_IDLE)))
+		{
+			eax = src_yskip * w + src_xskip;
+			src1_ptr += eax;
+			src2_ptr += eax;
+		}
+		else src_dy = src_dx = 0;
 
+		dst_ptr = m_render_layer[layer] + dst_skip;
 
-	// look up pen values and set rendering flags
-	pen0 = code>>3 & 0x10;
-	pen1 = 0;
-	if (command == EFX1) { flags |= BACKMODE; pen0 |= SP_2BACK; }
-	if (src1 == src2)
-	{
-		flags |= SINGLE_PEN;
-		eax = (UINT32)penxlat[color & PENCOLOR];
-		if (eax) pen1 = pen0 + eax;
-	}
-	else if (color & PENCOLOR) flags |= RGB_MASK;
+		// look up pen values and set rendering flags
+		pen0 = code>>3 & 0x10;
+		pen1 = 0;
+		if (command == EFX1) { flags |= BACKMODE; pen0 |= SP_2BACK; }
+		if (src1 == src2)
+		{
+			flags |= SINGLE_PEN;
+			eax = (UINT32)penxlat[color & PENCOLOR];
+			if (eax) pen1 = pen0 + eax;
+		}
+		else if (color & PENCOLOR) flags |= RGB_MASK;
 
 
 //--------------------------------------------------------------------------
@@ -515,223 +510,212 @@ if (0) {
 
 //--------------------------------------------------------------------------
 
-	// multi-pen block or transparent blit
-	if ((flags & (SINGLE_PEN | RGB_MASK | COLOR_ON)) == COLOR_ON)
-	{
-		if (!(flags & IGNORE_0)) BLOCK_WIPE_COMMON
-
-		dst_ptr += wclip;
-		ecx = wclip = -wclip;
-		edx = src_dx;
-
-		if (flags & PPCD_ON) goto COLLISION_MODE;
-
-		al = ah = (UINT8)pen0;
-
-		if (!(flags & BACKMODE))
+		// multi-pen block or transparent blit
+		if ((flags & (SINGLE_PEN | RGB_MASK | COLOR_ON)) == COLOR_ON)
 		{
-			do {
-				do {
-					al |= *src1_ptr;
-					src1_ptr += edx;
-					al |= *src2_ptr;
-					src2_ptr += edx;
-					if (al & 0xf) { dst_ptr[ecx] = (UINT16)al;  al = ah;}
+			if (!(flags & IGNORE_0)) BLOCK_WIPE_COMMON
+
+		    dst_ptr += wclip;
+			ecx = wclip = -wclip;
+			edx = src_dx;
+
+			if (!(flags & PPCD_ON))
+			{
+				al = ah = (UINT8)pen0;
+
+				if (!(flags & BACKMODE))
+				{
+					do {
+						do {
+							al |= *src1_ptr;
+							src1_ptr += edx;
+							al |= *src2_ptr;
+							src2_ptr += edx;
+							if (al & 0xf) { dst_ptr[ecx] = (UINT16)al;  al = ah;}
+						}
+						while (++ecx);
+						ecx = wclip; src1_ptr += src_dy; src2_ptr += src_dy; dst_ptr += SCREEN_WIDTH;
+					}
+					while (--hclip);
 				}
-				while (++ecx);
-				ecx = wclip; src1_ptr += src_dy; src2_ptr += src_dy; dst_ptr += SCREEN_WIDTH;
-			}
-			while (--hclip);
-		}
-		else
-		{
-			do {
-				do {
-					al |= *src1_ptr;
-					src1_ptr += edx;
-					al |= *src2_ptr;
-					src2_ptr += edx;
-					if (al & 0xf) { dst_ptr[ecx] = (UINT16)al | SP_2BACK;  al = ah; }
+				else
+			    {
+					do {
+						do {
+							al |= *src1_ptr;
+							src1_ptr += edx;
+							al |= *src2_ptr;
+							src2_ptr += edx;
+							if (al & 0xf) { dst_ptr[ecx] = (UINT16)al | SP_2BACK;  al = ah; }
+						}
+						while (++ecx);
+						ecx = wclip; src1_ptr += src_dy; src2_ptr += src_dy; dst_ptr += SCREEN_WIDTH;
+					}
+					while (--hclip);
 				}
-				while (++ecx);
-				ecx = wclip; src1_ptr += src_dy; src2_ptr += src_dy; dst_ptr += SCREEN_WIDTH;
+				return;
 			}
-			while (--hclip);
-		}
-		return;
-
-
-		COLLISION_MODE:
-
-		ax = 0;
-		if (group)
-		{
-			do {
+			ax = 0;
+			if (group)
+			{
 				do {
-					al = *src1_ptr;
-					src1_ptr += edx;
-					al |= *src2_ptr;
-					src2_ptr += edx;
-					if (al & 0xf) { dst_ptr[ecx] = (UINT16)al | SP_COLLD; } // set collision flag on group one pixels
+					do {
+						al = *src1_ptr;
+						src1_ptr += edx;
+						al |= *src2_ptr;
+						src2_ptr += edx;
+						if (al & 0xf) { dst_ptr[ecx] = (UINT16)al | SP_COLLD; } // set collision flag on group one pixels
+					}
+					while (++ecx);
+					ecx = wclip; src1_ptr += src_dy; src2_ptr += src_dy; dst_ptr += SCREEN_WIDTH;
 				}
-				while (++ecx);
-				ecx = wclip; src1_ptr += src_dy; src2_ptr += src_dy; dst_ptr += SCREEN_WIDTH;
+				while (--hclip);
 			}
-			while (--hclip);
-		}
-		else
-		{
-			do {
+			else
+			{
 				do {
-					al = *src1_ptr;
-					src1_ptr += edx;
-					al |= *src2_ptr;
-					src2_ptr += edx;
-					if (al & 0xf) { ax |= dst_ptr[ecx]; dst_ptr[ecx] = (UINT16)al; } // combine collision flags in ax
+					do {
+						al = *src1_ptr;
+						src1_ptr += edx;
+						al |= *src2_ptr;
+						src2_ptr += edx;
+						if (al & 0xf) { ax |= dst_ptr[ecx]; dst_ptr[ecx] = (UINT16)al; } // combine collision flags in ax
+					}
+					while (++ecx);
+					ecx = wclip; src1_ptr += src_dy; src2_ptr += src_dy; dst_ptr += SCREEN_WIDTH;
 				}
-				while (++ecx);
-				ecx = wclip; src1_ptr += src_dy; src2_ptr += src_dy; dst_ptr += SCREEN_WIDTH;
+				while (--hclip);
 			}
-			while (--hclip);
-		}
 
-		// update collision list if object collided with the other group
-		if (status & ACTIVE && ax & SP_COLLD)
-		{
-			m_collision_list[m_collision_count & (MAX_SPRITES-1)] = offset;
-			m_collision_count++;
+			// update collision list if object collided with the other group
+			if (status & ACTIVE && ax & SP_COLLD)
+			{
+				m_collision_list[m_collision_count & (MAX_SPRITES-1)] = offset;
+				m_collision_count++;
 
-			#if HALLEYS_DEBUG
-				popmessage("ID:%02x CC:%3d", offset, m_collision_count);
-			#endif
-		}
-
-	} else
+				#if HALLEYS_DEBUG
+					popmessage("ID:%02x CC:%3d", offset, m_collision_count);
+				#endif
+			}
+		} else
 
 //--------------------------------------------------------------------------
 
-	// multi-pen, RGB masked block or transparent blit
-	if ((flags & (RGB_MASK | COLOR_ON)) == RGB_MASK + COLOR_ON)
-	{
-		if (!(flags & IGNORE_0)) BLOCK_WIPE_COMMON
+		// multi-pen, RGB masked block or transparent blit
+		if ((flags & (RGB_MASK | COLOR_ON)) == RGB_MASK + COLOR_ON)
+		{
+			if (!(flags & IGNORE_0)) BLOCK_WIPE_COMMON
+		    dst_ptr += wclip;
+			ecx = wclip = -wclip;
+			al = ah = (UINT8)pen0;
+			ebx = rgbmask[color & PENCOLOR] | 0xffffff00;
 
-		dst_ptr += wclip;
-		ecx = wclip = -wclip;
-		al = ah = (UINT8)pen0;
-		ebx = rgbmask[color & PENCOLOR] | 0xffffff00;
-
-		do {
 			do {
-				al |= *src1_ptr;
-				src1_ptr += src_dx;
-				al |= *src2_ptr;
-				src2_ptr += src_dx;
-				if (al & 0xf) { edx = (UINT32)al;  al = ah;  dst_ptr[ecx] = pal_ptr[edx] & ebx; }
+				do {
+					al |= *src1_ptr;
+					src1_ptr += src_dx;
+					al |= *src2_ptr;
+					src2_ptr += src_dx;
+					if (al & 0xf) { edx = (UINT32)al;  al = ah;  dst_ptr[ecx] = pal_ptr[edx] & ebx; }
+				}
+				while (++ecx);
+				ecx = wclip; src1_ptr += src_dy; src2_ptr += src_dy; dst_ptr += SCREEN_WIDTH;
 			}
-			while (++ecx);
-			ecx = wclip; src1_ptr += src_dy; src2_ptr += src_dy; dst_ptr += SCREEN_WIDTH;
-		}
-		while (--hclip);
-
-	} else
+			while (--hclip);
+		} else
 
 //--------------------------------------------------------------------------
 
 	// single-pen block or transparent blit
-	if ((flags & (SINGLE_PEN | COLOR_ON)) == SINGLE_PEN + COLOR_ON)
-	{
-		if (!(flags & IGNORE_0)) BLOCK_WIPE_COMMON
+		if ((flags & (SINGLE_PEN | COLOR_ON)) == SINGLE_PEN + COLOR_ON)
+		{
+			if (!(flags & IGNORE_0)) BLOCK_WIPE_COMMON
+			dst_ptr += wclip;
+			ebx = hclip;
+			ecx = wclip = -wclip;
+			edx = src_dx;
+			ax = (UINT16)pen1;
 
-		dst_ptr += wclip;
-		ebx = hclip;
-		ecx = wclip = -wclip;
-		edx = src_dx;
-		ax = (UINT16)pen1;
-
-		do {
 			do {
-				if (*src1_ptr) dst_ptr[ecx] = ax;
-				src1_ptr += edx;
-			}
-			while (++ecx);
+				do {
+					if (*src1_ptr) dst_ptr[ecx] = ax;
+					src1_ptr += edx;
+				}
+				while (++ecx);
 
+				ecx = wclip;
+				src1_ptr += src_dy;
+				dst_ptr  += SCREEN_WIDTH;
+			}
+			while (--ebx);
+		} else
+
+//--------------------------------------------------------------------------
+
+		// transparent wipe
+		if ((flags & (IGNORE_0 | COLOR_ON)) == IGNORE_0)
+		{
+			dst_ptr += wclip;
+			wclip = -wclip;
 			ecx = wclip;
-			src1_ptr += src_dy;
-			dst_ptr  += SCREEN_WIDTH;
-		}
-		while (--ebx);
+			edx = src_dx;
 
-	} else
-
-//--------------------------------------------------------------------------
-
-	// transparent wipe
-	if ((flags & (IGNORE_0 | COLOR_ON)) == IGNORE_0)
-	{
-		dst_ptr += wclip;
-		wclip = -wclip;
-		ecx = wclip;
-		edx = src_dx;
-
-		if (flags & PPCD_ON && !group)
-		{
-			// preserve collision flags when wiping group zero objects
-			do {
+			if (flags & PPCD_ON && !group)
+			{
+				// preserve collision flags when wiping group zero objects
 				do {
-					al = *src1_ptr;
-					ah = *src2_ptr;
-					src1_ptr += edx;
-					src2_ptr += edx;
-					if (al | ah) dst_ptr[ecx] &= SP_COLLD;
-				}
-				while (++ecx);
+					do {
+						al = *src1_ptr;
+						ah = *src2_ptr;
+						src1_ptr += edx;
+						src2_ptr += edx;
+						if (al | ah) dst_ptr[ecx] &= SP_COLLD;
+					}
+					while (++ecx);
 
-				ecx = wclip;
-				src1_ptr += src_dy;
-				src2_ptr += src_dy;
-				dst_ptr  += SCREEN_WIDTH;
+					ecx = wclip;
+					src1_ptr += src_dy;
+					src2_ptr += src_dy;
+					dst_ptr  += SCREEN_WIDTH;
+				}
+				while (--hclip);
 			}
-			while (--hclip);
-		}
-		else
-		{
-			do {
+			else
+			{
 				do {
-					al = *src1_ptr;
-					ah = *src2_ptr;
-					src1_ptr += edx;
-					src2_ptr += edx;
-					if (al | ah) dst_ptr[ecx] = 0;
+					do {
+						al = *src1_ptr;
+						ah = *src2_ptr;
+						src1_ptr += edx;
+						src2_ptr += edx;
+						if (al | ah) dst_ptr[ecx] = 0;
+					}
+					while (++ecx);
+
+					ecx = wclip;
+					src1_ptr += src_dy;
+					src2_ptr += src_dy;
+					dst_ptr  += SCREEN_WIDTH;
 				}
-				while (++ecx);
-
-				ecx = wclip;
-				src1_ptr += src_dy;
-				src2_ptr += src_dy;
-				dst_ptr  += SCREEN_WIDTH;
+				while (--hclip);
 			}
-			while (--hclip);
-		}
-
-	} else
+		} else
 
 //--------------------------------------------------------------------------
 
-	// block wipe
-	if ((flags & (IGNORE_0 | COLOR_ON)) == 0) BLOCK_WIPE_COMMON
+		// block wipe
+		if ((flags & (IGNORE_0 | COLOR_ON)) == 0) BLOCK_WIPE_COMMON
 
 //--------------------------------------------------------------------------
 
-	// End of Standard Mode
-	return;
+	    // End of Standard Mode
+		return;
 
 //--------------------------------------------------------------------------
 
-
-COMMAND_MODE:
+	}
 
 #define GFX_HI 0x10000
-
 
 	// reject illegal blits and adjust parameters
 	if (command)
@@ -887,7 +871,7 @@ COMMAND_MODE:
 		    second pass at the same location with zeroes. In addition the
 		    X and Y values passed to the blitter do not reflect the tiles true
 		    locations. For example, tiles near the top or bottom of the screen
-		    are positioned resonably close but those in the middle are oddly
+		    are positioned reasonably close but those in the middle are oddly
 		    shifted toward either side. The tiles also resemble predefined
 		    patterns but I don't know if there are supposed to be lookup tables
 		    in ROM or hard-wired to the blitter chips.
@@ -934,13 +918,20 @@ COMMAND_MODE:
 				ax = (UINT16)src1_ptr[edx];
 				al = src1_ptr[edx+0x10000];
 				ax |= BG_RGB;
-				if (al & 0x01) dst_ptr[ecx] = ax;  ecx++; ecx &= WARPMASK;
-				if (al & 0x02) dst_ptr[ecx] = ax;  ecx++; ecx &= WARPMASK;
-				if (al & 0x04) dst_ptr[ecx] = ax;  ecx++; ecx &= WARPMASK;
-				if (al & 0x08) dst_ptr[ecx] = ax;  ecx++; ecx &= WARPMASK;
-				if (al & 0x10) dst_ptr[ecx] = ax;  ecx++; ecx &= WARPMASK;
-				if (al & 0x20) dst_ptr[ecx] = ax;  ecx++; ecx &= WARPMASK;
-				if (al & 0x40) dst_ptr[ecx] = ax;  ecx++; ecx &= WARPMASK;
+				if (al & 0x01) dst_ptr[ecx] = ax;
+				ecx++; ecx &= WARPMASK;
+				if (al & 0x02) dst_ptr[ecx] = ax;
+				ecx++; ecx &= WARPMASK;
+				if (al & 0x04) dst_ptr[ecx] = ax;
+				ecx++; ecx &= WARPMASK;
+				if (al & 0x08) dst_ptr[ecx] = ax;
+				ecx++; ecx &= WARPMASK;
+				if (al & 0x10) dst_ptr[ecx] = ax;
+				ecx++; ecx &= WARPMASK;
+				if (al & 0x20) dst_ptr[ecx] = ax;
+				ecx++; ecx &= WARPMASK;
+				if (al & 0x40) dst_ptr[ecx] = ax;
+				ecx++; ecx &= WARPMASK;
 				if (al & 0x80) dst_ptr[ecx] = ax;
 				dst_ptr += SCREEN_WIDTH;
 			} while (++edx);
@@ -1292,183 +1283,140 @@ void halleys_state::video_start()
 
 void halleys_state::copy_scroll_op(bitmap_ind16 &bitmap, UINT16 *source, int sx, int sy)
 {
-//--------------------------------------------------------------------------
-
-#define OPCOPY_COMMON { \
-	memcpy(edi, esi+sx, rcw); \
-	memcpy((UINT8*)edi+rcw, esi, CLIP_BYTEW-rcw); \
-	esi += SCREEN_WIDTH; \
-	edi += edx; }
-
-//--------------------------------------------------------------------------
-
-	UINT16 *esi, *edi;
-	int rcw, bch, ecx, edx;
-
 	sx = -sx & 0xff;
 	sy = -sy & 0xff;
 
-	if ((rcw = CLIP_W - sx) < 0) rcw = 0; else rcw <<= 1;
-	if ((bch = CLIP_H - sy) < 0) bch = 0;
+	int rcw = CLIP_W - sx;
+	if (rcw < 0)
+		rcw = 0;
 
-	esi = source + CLIP_SKIP + (sy << SCREEN_WIDTH_L2);
-	edi = &bitmap.pix16(VIS_MINY, VIS_MINX);
-	edx = bitmap.rowpixels();
+	int bch = CLIP_H - sy;
+	if (bch < 0)
+		bch = 0;
+
+	const UINT16 *src = source + CLIP_SKIP + sy * SCREEN_WIDTH;
 
 	// draw top split
-	for (ecx=bch; ecx; ecx--) OPCOPY_COMMON
+	for (int y=0; y != bch; y++) {
+		UINT16 *dest = &bitmap.pix16(VIS_MINY + y, VIS_MINX);
+		memcpy(dest, src+sx, 2*rcw);
+		memcpy(dest + rcw, src, 2*(CLIP_W - rcw));
+		src += SCREEN_WIDTH;
+	}
 
-	esi = source + CLIP_SKIP;
+	src = source + CLIP_SKIP;
 
 	// draw bottom split
-	for (ecx=CLIP_H-bch; ecx; ecx--) OPCOPY_COMMON
-
-#undef OPCOPY_COMMON
+	for (int y = bch; y != CLIP_H; y++) {
+		UINT16 *dest = &bitmap.pix16(VIS_MINY + y, VIS_MINX);
+		memcpy(dest, src+sx, 2*rcw);
+		memcpy(dest + rcw, src, 2*(CLIP_W - rcw));
+		src += SCREEN_WIDTH;
+	}
 }
 
 
 void halleys_state::copy_scroll_xp(bitmap_ind16 &bitmap, UINT16 *source, int sx, int sy)
 {
-//--------------------------------------------------------------------------
-
-#define XCOPY_COMMON \
-	if (ecx) { \
-		if (ecx & 1) { ecx--; ax = *esi; esi++; if (ax) *edi = ax; edi++; } \
-		esi += ecx; edi += ecx; ecx = -ecx; \
-		while (ecx) { \
-			ax = esi[ecx]; \
-			bx = esi[ecx+1]; \
-			if (ax) edi[ecx] = ax; \
-			if (bx) edi[ecx+1] = bx; \
-			ecx += 2; \
-		} \
-	}
-
-//--------------------------------------------------------------------------
-
-#define YCOPY_COMMON { \
-	esi = src_base + sx; ecx = rcw; XCOPY_COMMON \
-	esi = src_base; ecx = CLIP_W - rcw; XCOPY_COMMON \
-	src_base += SCREEN_WIDTH; \
-	edi += dst_adv; \
-}
-
-//--------------------------------------------------------------------------
-
-	int rcw, bch, dst_adv;
-
-	UINT16 *src_base, *esi, *edi;
-	int ecx, edx;
-	UINT16 ax, bx;
-
 	sx = -sx & 0xff;
 	sy = -sy & 0xff;
 
-	if ((rcw = CLIP_W - sx) < 0) rcw = 0;
-	if ((bch = CLIP_H - sy) < 0) bch = 0;
+	int rcw = CLIP_W - sx;
+	if (rcw < 0)
+		rcw = 0;
 
-	src_base = source + CLIP_SKIP + (sy << SCREEN_WIDTH_L2);
-	edi = &bitmap.pix16(VIS_MINY, VIS_MINX);
-	dst_adv = bitmap.rowpixels() - CLIP_W;
+	int bch = CLIP_H - sy;
+	if (bch < 0)
+		bch = 0;
+
+	const UINT16 *src_base = source + CLIP_SKIP + sy * SCREEN_WIDTH;
 
 	// draw top split
-	for (edx=bch; edx; edx--) YCOPY_COMMON
+	for (int y=0; y != bch; y++)  {
+		UINT16 *dest = &bitmap.pix16(VIS_MINY + y, VIS_MINX);
+		const UINT16 *src = src_base + sx;
+		for(int x=0; x != rcw; x++) {
+			UINT16 pixel = *src++;
+			if(pixel)
+				*dest = pixel;
+			dest++;
+		}
+
+		src = src_base;
+
+		for(int x=rcw; x != CLIP_W; x++) {
+			UINT16 pixel = *src++;
+			if(pixel)
+				*dest = pixel;
+			dest++;
+		}
+
+		src_base += SCREEN_WIDTH;
+	}
 
 	src_base = source + CLIP_SKIP;
 
 	// draw bottom split
-	for (edx=CLIP_H-bch; edx; edx--) YCOPY_COMMON
+	for (int y = bch; y != CLIP_H; y++) {
+		UINT16 *dest = &bitmap.pix16(VIS_MINY + y, VIS_MINX);
+		const UINT16 *src = src_base + sx;
+		for(int x=0; x != rcw; x++) {
+			UINT16 pixel = *src++;
+			if(pixel)
+				*dest = pixel;
+			dest++;
+		}
 
-#undef XCOPY_COMMON
-#undef YCOPY_COMMON
+		src = src_base;
+
+		for(int x=rcw; x != CLIP_W; x++) {
+			UINT16 pixel = *src++;
+			if(pixel)
+				*dest = pixel;
+			dest++;
+		}
+
+		src_base += SCREEN_WIDTH;
+	}
 }
 
 
 
 void halleys_state::copy_fixed_xp(bitmap_ind16 &bitmap, UINT16 *source)
 {
-	UINT16 *esi, *edi;
-	int dst_pitch, ecx, edx;
-	UINT16 ax, bx;
+	UINT16 *src = source + CLIP_SKIP;
+	for(int y=0; y != CLIP_H; y++) {
+		UINT16 *dest = &bitmap.pix16(VIS_MINY + y, VIS_MINX);
+		for(int x=0; x != CLIP_W; x++) {
+			UINT16 pixel = src[x];
 
-	esi = source + CLIP_SKIP + CLIP_W;
-	edi = &bitmap.pix16(VIS_MINY, VIS_MINX + CLIP_W);
-	dst_pitch = bitmap.rowpixels();
-	ecx = -CLIP_W;
-	edx = CLIP_H;
-
-	do {
-		do {
-			ax = esi[ecx];
-			bx = esi[ecx+1];
-			if (ax) edi[ecx  ] = ax; ax = esi[ecx+2];
-			if (bx) edi[ecx+1] = bx; bx = esi[ecx+3];
-			if (ax) edi[ecx+2] = ax; ax = esi[ecx+4];
-			if (bx) edi[ecx+3] = bx; bx = esi[ecx+5];
-			if (ax) edi[ecx+4] = ax; ax = esi[ecx+6];
-			if (bx) edi[ecx+5] = bx; bx = esi[ecx+7];
-			if (ax) edi[ecx+6] = ax;
-			if (bx) edi[ecx+7] = bx;
+			if (pixel)
+				dest[x] = pixel;
 		}
-		while (ecx += 8);
 
-		ecx = -CLIP_W;
-		esi += SCREEN_WIDTH;
-		edi += dst_pitch;
+		src += SCREEN_WIDTH;
 	}
-	while (--edx);
 }
-
 
 void halleys_state::copy_fixed_2b(bitmap_ind16 &bitmap, UINT16 *source)
 {
-	UINT16 *esi, *edi;
-	int dst_pitch, ecx, edx;
-	UINT16 ax, bx;
+	UINT16 *src = source + CLIP_SKIP;
+	for(int y=0; y != CLIP_H; y++) {
+		UINT16 *dest = &bitmap.pix16(VIS_MINY + y, VIS_MINX);
+		for(int x=0; x != CLIP_W; x++) {
+			UINT16 pixel = src[x];
 
-	esi = source + CLIP_SKIP + CLIP_W;
-	edi = &bitmap.pix16(VIS_MINY, VIS_MINX + CLIP_W);
-	dst_pitch = bitmap.rowpixels();
-	ecx = -CLIP_W;
-	edx = CLIP_H;
-
-	do {
-		do {
-			ax = esi[ecx];
-			bx = esi[ecx+1];
-
-			if (!(ax)) goto SKIP0; if (!(ax&SP_2BACK)) goto DRAW0; if (edi[ecx  ]) goto SKIP0;
-			DRAW0: edi[ecx  ] = ax; SKIP0: ax = esi[ecx+2];
-			if (!(bx)) goto SKIP1; if (!(bx&SP_2BACK)) goto DRAW1; if (edi[ecx+1]) goto SKIP1;
-			DRAW1: edi[ecx+1] = bx; SKIP1: bx = esi[ecx+3];
-
-			if (!(ax)) goto SKIP2; if (!(ax&SP_2BACK)) goto DRAW2; if (edi[ecx+2]) goto SKIP2;
-			DRAW2: edi[ecx+2] = ax; SKIP2: ax = esi[ecx+4];
-			if (!(bx)) goto SKIP3; if (!(bx&SP_2BACK)) goto DRAW3; if (edi[ecx+3]) goto SKIP3;
-			DRAW3: edi[ecx+3] = bx; SKIP3: bx = esi[ecx+5];
-
-			if (!(ax)) goto SKIP4; if (!(ax&SP_2BACK)) goto DRAW4; if (edi[ecx+4]) goto SKIP4;
-			DRAW4: edi[ecx+4] = ax; SKIP4: ax = esi[ecx+6];
-			if (!(bx)) goto SKIP5; if (!(bx&SP_2BACK)) goto DRAW5; if (edi[ecx+5]) goto SKIP5;
-			DRAW5: edi[ecx+5] = bx; SKIP5: bx = esi[ecx+7];
-
-			if (!(ax)) goto SKIP6; if (!(ax&SP_2BACK)) goto DRAW6; if (edi[ecx+6]) goto SKIP6;
-			DRAW6: edi[ecx+6] = ax; SKIP6:
-			if (!(bx)) continue;   if (!(bx&SP_2BACK)) goto DRAW7; if (edi[ecx+7]) continue;
-			DRAW7: edi[ecx+7] = bx;
+			if ((pixel && !(pixel & SP_2BACK)) || !dest[x])
+				dest[x] = pixel;
 		}
-		while (ecx += 8);
 
-		ecx = -CLIP_W;
-		esi += SCREEN_WIDTH;
-		edi += dst_pitch;
+		src += SCREEN_WIDTH;
 	}
-	while (--edx);
 }
-
 
 void halleys_state::filter_bitmap(bitmap_ind16 &bitmap, int mask)
 {
+	return;
 	int dst_pitch;
 
 	UINT32 *pal_ptr, *edi;
@@ -1643,7 +1591,7 @@ WRITE8_MEMBER(halleys_state::sndnmi_msk_w)
 WRITE8_MEMBER(halleys_state::soundcommand_w)
 {
 	m_io_ram[0x8a] = data;
-	soundlatch_byte_w(space,offset,data);
+	m_soundlatch->write(space,offset,data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -1711,7 +1659,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, halleys_state )
 	AM_RANGE(0x4803, 0x4803) AM_DEVREAD("ay3", ay8910_device, data_r)
 	AM_RANGE(0x4804, 0x4805) AM_DEVWRITE("ay4", ay8910_device, address_data_w)
 	AM_RANGE(0x4805, 0x4805) AM_DEVREAD("ay4", ay8910_device, data_r)
-	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x5000, 0x5000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe000, 0xefff) AM_ROM // space for diagnostic ROM
 ADDRESS_MAP_END
 
@@ -1992,6 +1940,8 @@ static MACHINE_CONFIG_START( halleys, halleys_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_6MHz/4) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)

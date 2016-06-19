@@ -91,7 +91,7 @@ READ8_MEMBER(retofinv_state::cpu0_mf800_r)
 
 WRITE8_MEMBER(retofinv_state::soundcommand_w)
 {
-		soundlatch_byte_w(space, 0, data);
+		m_soundlatch->write(space, 0, data);
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -161,7 +161,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(cpu2_m6000_w)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("sn1", sn76496_device, write)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("sn2", sn76496_device, write)
@@ -405,6 +405,8 @@ static MACHINE_CONFIG_START( retofinv, retofinv_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("sn1", SN76496, 18432000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)

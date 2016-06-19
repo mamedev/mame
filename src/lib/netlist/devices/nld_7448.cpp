@@ -13,14 +13,6 @@ namespace netlist
 	namespace devices
 	{
 
-
-	/*
-	 * FIXME: Using truthtable is a lot slower than the explicit device
-	 * 		  in breakout. Performance drops by 20%.
-	 */
-
-	#define USE_TRUTHTABLE_7448	(0)
-
 	#if (USE_TRUTHTABLE_7448 && USE_TRUTHTABLE)
 
 	NETLIB_TRUTHTABLE(7448, 7, 7, 0);
@@ -37,18 +29,17 @@ namespace netlist
 		, m_LTQ(*this, "LTQ")
 		, m_BIQ(*this, "BIQ")
 		, m_RBIQ(*this, "RBIQ")
-		, m_state(0)
+		, m_state(*this, "m_state", 0)
 		, m_Q(*this, {{"a", "b", "c", "d", "e", "f", "g"}})
 		{
-			save(NLNAME(m_state));
 		}
 
 		NETLIB_RESETI();
 		NETLIB_UPDATEI();
 
 	public:
-		void update_outputs(UINT8 v);
-		static const UINT8 tab7448[16][7];
+		void update_outputs(uint_fast8_t v);
+		static const uint_fast8_t tab7448[16][7];
 
 		logic_input_t m_A;
 		logic_input_t m_B;
@@ -58,7 +49,7 @@ namespace netlist
 		logic_input_t m_BIQ;
 		logic_input_t m_RBIQ;
 
-		UINT8 m_state;
+		state_var<unsigned> m_state;
 
 		object_array_t<logic_output_t, 7> m_Q;  /* a .. g */
 
@@ -167,7 +158,7 @@ namespace netlist
 			m_C.activate();
 			m_B.activate();
 			m_A.activate();
-			UINT8 v;
+			uint_fast8_t v;
 
 			v = (INPLOGIC(m_A) << 0) | (INPLOGIC(m_B) << 1) | (INPLOGIC(m_C) << 2) | (INPLOGIC(m_D) << 3);
 			if ((!INPLOGIC(m_RBIQ) && (v==0)))
@@ -186,7 +177,7 @@ namespace netlist
 		m_RBIQ.inactivate();
 	}
 
-	NETLIB_FUNC_VOID(7448, update_outputs, (UINT8 v))
+	NETLIB_FUNC_VOID(7448, update_outputs, (uint_fast8_t v))
 	{
 		nl_assert(v<16);
 		if (v != m_state)
@@ -199,7 +190,7 @@ namespace netlist
 		}
 	}
 
-	const UINT8 NETLIB_NAME(7448)::tab7448[16][7] =
+	const uint_fast8_t NETLIB_NAME(7448)::tab7448[16][7] =
 	{
 			{   1, 1, 1, 1, 1, 1, 0 },  /* 00 - not blanked ! */
 			{   0, 1, 1, 0, 0, 0, 0 },  /* 01 */

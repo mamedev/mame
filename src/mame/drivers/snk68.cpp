@@ -630,16 +630,17 @@ static MACHINE_CONFIG_START( pow, snk68_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( streetsm, pow )
+	MCFG_DEVICE_MODIFY("sprites")
+	MCFG_SNK68_SPR_SET_TILE_INDIRECT( snk68_state, tile_callback_notpow )
+MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( searchar, pow )
+static MACHINE_CONFIG_DERIVED( searchar, streetsm )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(searchar_map)
 
 	MCFG_VIDEO_START_OVERRIDE(snk68_state,searchar)
-
-	MCFG_DEVICE_MODIFY("sprites")
-	MCFG_SNK68_SPR_SET_TILE_INDIRECT( snk68_state, tile_callback_notpow )
 MACHINE_CONFIG_END
 
 
@@ -1102,7 +1103,7 @@ ROM_END
 
 GAME( 1988, pow,       0,        pow,      pow,      driver_device, 0, ROT0,  "SNK", "P.O.W. - Prisoners of War (US version 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, powj,      pow,      pow,      powj,     driver_device, 0, ROT0,  "SNK", "Datsugoku - Prisoners of War (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, streetsm,  0,        pow,      streetsm, driver_device, 0, ROT0,  "SNK", "Street Smart (US version 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, streetsm,  0,        streetsm, streetsm, driver_device, 0, ROT0,  "SNK", "Street Smart (US version 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, streetsm1, streetsm, searchar, streetsm, driver_device, 0, ROT0,  "SNK", "Street Smart (US version 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, streetsmw, streetsm, searchar, streetsj, driver_device, 0, ROT0,  "SNK", "Street Smart (World version 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, streetsmj, streetsm, searchar, streetsj, driver_device, 0, ROT0,  "SNK", "Street Smart (Japan version 1)", MACHINE_SUPPORTS_SAVE )

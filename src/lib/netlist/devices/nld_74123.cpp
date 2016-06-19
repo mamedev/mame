@@ -32,6 +32,9 @@ namespace netlist
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
 		, m_CV(*this, "_CV") // internal
+		, m_last_trig(*this, "m_last_trig", 0)
+		, m_state(*this, "m_state", 0)
+		, m_KP(*this, "m_KP", 0)
 		, m_K(*this, "K", (m_dev_type == 4538) ? 0.4 : 0.4)
 		, m_RI(*this, "RI", 400.0) // around 250 for HC series, 400 on LS/TTL, estimated from datasheets
 		{
@@ -49,10 +52,6 @@ namespace netlist
 
 			connect_late(m_RN.m_R.m_P, m_RP.m_R.m_N);
 			connect_late(m_CV, m_RN.m_R.m_P);
-
-			save(NLNAME(m_last_trig));
-			save(NLNAME(m_state));
-			save(NLNAME(m_KP));
 		}
 
 		NETLIB_RESETI();
@@ -75,9 +74,9 @@ namespace netlist
 
 		analog_input_t m_CV;
 
-		netlist_sig_t m_last_trig;
-		UINT8         m_state;
-		double        m_KP;
+		state_var<netlist_sig_t> m_last_trig;
+		state_var<unsigned>      m_state;
+		state_var<double>        m_KP;
 
 		param_double_t m_K;
 		param_double_t m_RI;

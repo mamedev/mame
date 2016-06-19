@@ -68,13 +68,12 @@ namespace netlist
 	#if HAS_OPENMP && USE_OPENMP
 			m_lock = 0;
 	#endif
-			//nl_assert(m_end - m_list < Size);
 		}
 
-		 entry_t pop() NOEXCEPT       { return *(--m_end); }
-		 entry_t top() const NOEXCEPT { return *(m_end-1); }
+		entry_t pop() NOEXCEPT       { return *(--m_end); }
+		const entry_t &top() const NOEXCEPT { return *(m_end-1); }
 
-		 void remove(const Element &elem) NOEXCEPT
+		void remove(const Element &elem) NOEXCEPT
 		{
 			/* Lock */
 	#if HAS_OPENMP && USE_OPENMP
@@ -99,6 +98,12 @@ namespace netlist
 	#if HAS_OPENMP && USE_OPENMP
 			m_lock = 0;
 	#endif
+		}
+
+		void retime(const Time t, const Element &elem) NOEXCEPT
+		{
+			remove(elem);
+			push(t, elem);
 		}
 
 		void clear()

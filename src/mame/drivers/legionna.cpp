@@ -1233,7 +1233,7 @@ static MACHINE_CONFIG_START( legionna, legionna_state )
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
-	MCFG_LEGIONNACOP_ADD("raiden2cop")
+	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(legionna_state, videowrite_cb_w))
 
 	/* video hardware */
@@ -1270,7 +1270,7 @@ static MACHINE_CONFIG_START( heatbrl, legionna_state )
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
-	MCFG_LEGIONNACOP_ADD("raiden2cop")
+	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(legionna_state, videowrite_cb_w))
 
 	/* video hardware */
@@ -1308,7 +1308,7 @@ static MACHINE_CONFIG_START( godzilla, legionna_state )
 
 	SEIBU2_SOUND_SYSTEM_CPU(14318180/4)
 
-	MCFG_LEGIONNACOP_ADD("raiden2cop")
+	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(legionna_state, videowrite_cb_w))
 
 	/* video hardware */
@@ -1347,7 +1347,7 @@ static MACHINE_CONFIG_START( denjinmk, legionna_state )
 
 	SEIBU2_SOUND_SYSTEM_CPU(14318180/4)
 
-	MCFG_LEGIONNACOP_ADD("raiden2cop")
+	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(legionna_state, videowrite_cb_w))
 
 	/* video hardware */
@@ -1385,7 +1385,7 @@ static MACHINE_CONFIG_START( grainbow, legionna_state )
 
 	SEIBU2_SOUND_SYSTEM_CPU(14318180/4)
 
-	MCFG_LEGIONNACOP_ADD("raiden2cop")
+	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(legionna_state, videowrite_cb_w))
 
 	/* video hardware */
@@ -1424,7 +1424,7 @@ static MACHINE_CONFIG_START( cupsoc, legionna_state )
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
-	MCFG_LEGIONNACOP_ADD("raiden2cop")
+	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(legionna_state, videowrite_cb_w))
 
 	/* video hardware */
@@ -1465,8 +1465,8 @@ static MACHINE_CONFIG_START( cupsocbl, legionna_state )
 	MCFG_CPU_PROGRAM_MAP(cupsocbl_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold) /* VBL */
 
-	MCFG_SEIBU_COP_ADD("seibucop_boot")
-	MCFG_LEGIONNACOP_ADD("raiden2cop")
+	MCFG_DEVICE_SEIBUCOP_BOOTLEG_ADD("seibucop_boot")
+	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0) // TODO: what?
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(legionna_state, videowrite_cb_w))
 
 
@@ -2769,7 +2769,7 @@ GAME( 1992, heatbrlo, heatbrl,  heatbrl,  heatbrl, driver_device,  0,         RO
 GAME( 1992, heatbrlu, heatbrl,  heatbrl,  heatbrl, driver_device,  0,         ROT0, "TAD Corporation", "Heated Barrel (US)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1992, heatbrle, heatbrl,  heatbrl,  heatbrl, driver_device,  0,         ROT0, "TAD Corporation (Electronic Devices license)", "Heated Barrel (Electronic Devices license)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 
-GAME( 1993, godzilla, 0,        godzilla, godzilla, driver_device, 0,         ROT0, "Banpresto", "Godzilla (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1993, godzilla, 0,        godzilla, godzilla, driver_device, 0,         ROT0, "Banpresto", "Godzilla (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, grainbow, 0,        grainbow, grainbow, driver_device, 0,         ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1993, denjinmk, 0,        denjinmk, denjinmk, legionna_state,denjinmk,  ROT0, "Winkysoft (Banpresto license)", "Denjin Makai", MACHINE_IMPERFECT_GRAPHICS )
 

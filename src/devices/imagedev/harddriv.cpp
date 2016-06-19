@@ -79,7 +79,7 @@ harddisk_image_device::~harddisk_image_device()
 
 void harddisk_image_device::device_config_complete()
 {
-	m_formatlist.append(*global_alloc(image_device_format("chd", "CHD Hard drive", "chd,hd", hd_option_spec)));
+	m_formatlist.push_back(std::make_unique<image_device_format>("chd", "CHD Hard drive", "chd,hd", hd_option_spec));
 
 	// set brief and instance name
 	update_names();

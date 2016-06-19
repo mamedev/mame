@@ -75,7 +75,7 @@ isa8_adlib_device::isa8_adlib_device(const machine_config &mconfig, const char *
 void isa8_adlib_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0388, 0x0389, 0, 0, read8_delegate( FUNC(isa8_adlib_device::ym3812_16_r), this ), write8_delegate( FUNC(isa8_adlib_device::ym3812_16_w), this ) );
+	m_isa->install_device(0x0388, 0x0389, read8_delegate( FUNC(isa8_adlib_device::ym3812_16_r), this ), write8_delegate( FUNC(isa8_adlib_device::ym3812_16_w), this ) );
 }
 
 //-------------------------------------------------

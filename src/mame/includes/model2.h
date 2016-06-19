@@ -53,7 +53,7 @@ public:
 	required_shared_ptr<UINT32> m_lumaram;
 	optional_shared_ptr<UINT16> m_soundram;
 	optional_shared_ptr<UINT32> m_tgp_program;
-	optional_shared_ptr<UINT32> m_tgpx4_program;
+	optional_shared_ptr<UINT64> m_tgpx4_program;
 
 	required_device<i960_cpu_device> m_maincpu;
 	optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board

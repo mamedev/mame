@@ -166,7 +166,7 @@ void spc1000_fdd_exp_device::device_reset()
 	m_cpu->set_input_line_vector(0, 0);
 
 	// enable rom (is this really needed? it does not seem necessary for FDD to work)
-	m_cpu->space(AS_PROGRAM).install_rom(0x0000, 0x0fff, 0, 0x2000, device().machine().root_device().memregion("fdccpu")->base());
+	m_cpu->space(AS_PROGRAM).install_rom(0x0000, 0x0fff, 0x2000, device().machine().root_device().memregion("fdccpu")->base());
 }
 
 void spc1000_fdd_exp_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

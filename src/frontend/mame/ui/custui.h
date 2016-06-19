@@ -169,13 +169,8 @@ public:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
-	struct palcolor
-	{
-		const char *name;
-		const char *argb;
-	};
 
-	static palcolor m_palette[];
+	static std::vector<std::pair<const char *, const char *>> m_palette;
 	rgb_t &m_original;
 };
 

@@ -11,17 +11,6 @@
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
-#ifdef LEGACY_WATCHDOG
-#undef MCFG_WATCHDOG_VBLANK_INIT
-#undef MCFG_WATCHDOG_TIME_INIT
-#define watchdog_reset_r MUST_USE_WATCHDOG_DEVICE_INSTEAD
-#define watchdog_reset_w MUST_USE_WATCHDOG_DEVICE_INSTEAD
-#define watchdog_reset16_r MUST_USE_WATCHDOG_DEVICE_INSTEAD
-#define watchdog_reset16_w MUST_USE_WATCHDOG_DEVICE_INSTEAD
-#define watchdog_reset32_r MUST_USE_WATCHDOG_DEVICE_INSTEAD
-#define watchdog_reset32_w MUST_USE_WATCHDOG_DEVICE_INSTEAD
-#endif
-
 #define MCFG_WATCHDOG_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, WATCHDOG_TIMER, 0)
 #define MCFG_WATCHDOG_MODIFY(_tag) \

@@ -48,7 +48,7 @@ private:
 
 	int solve_ilu_gmres(nl_double * RESTRICT x, const nl_double * RESTRICT rhs, const unsigned restart_max, const unsigned mr, nl_double accuracy);
 
-	plib::pvector_t<int> m_term_cr[storage_N];
+	std::vector<int> m_term_cr[storage_N];
 
 	bool m_use_iLU_preconditioning;
 	bool m_use_more_precise_stop_condition;
@@ -125,8 +125,8 @@ int matrix_solver_GMRES_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_
 	 */
 
 	//nz_num = 0;
-	ATTR_ALIGN nl_double RHS[storage_N];
-	ATTR_ALIGN nl_double new_V[storage_N];
+	nl_double RHS[storage_N];
+	nl_double new_V[storage_N];
 
 	for (unsigned i=0, e=mat.nz_num; i<e; i++)
 		m_A[i] = 0.0;

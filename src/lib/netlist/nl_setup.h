@@ -10,6 +10,8 @@
 
 #include <memory>
 #include <stack>
+#include <unordered_map>
+
 #include "nl_base.h"
 #include "nl_factory.h"
 
@@ -91,7 +93,7 @@ namespace netlist
 		class source_t
 		{
 		public:
-			using list_t = plib::pvector_t<std::shared_ptr<source_t>>;
+			using list_t = std::vector<std::shared_ptr<source_t>>;
 
 			source_t()
 			{}
@@ -167,7 +169,7 @@ namespace netlist
 		factory_list_t &factory() { return m_factory; }
 		const factory_list_t &factory() const { return m_factory; }
 
-		bool is_library_item(const pstring &name) const { return m_lib.contains(name); }
+		bool is_library_item(const pstring &name) const { return plib::container::contains(m_lib, name); }
 
 		/* model / family related */
 
@@ -180,14 +182,14 @@ namespace netlist
 		plib::plog_base<NL_DEBUG> &log() { return netlist().log(); }
 		const plib::plog_base<NL_DEBUG> &log() const { return netlist().log(); }
 
-		plib::pvector_t<std::pair<pstring, base_factory_t *>> m_device_factory;
+		std::vector<std::pair<pstring, base_factory_t *>> m_device_factory;
 
 	protected:
 
 	private:
 
 		core_terminal_t *find_terminal(const pstring &outname_in, bool required = true);
-		core_terminal_t *find_terminal(const pstring &outname_in, object_t::type_t atype, bool required = true);
+		core_terminal_t *find_terminal(const pstring &outname_in, device_object_t::type_t atype, bool required = true);
 
 		void connect_terminals(core_terminal_t &in, core_terminal_t &out);
 		void connect_input_output(core_terminal_t &in, core_terminal_t &out);
@@ -196,30 +198,32 @@ namespace netlist
 		bool connect_input_input(core_terminal_t &t1, core_terminal_t &t2);
 
 		// helpers
-		pstring objtype_as_str(object_t &in) const;
+		pstring objtype_as_str(device_object_t &in) const;
 
 		const pstring resolve_alias(const pstring &name) const;
 		devices::nld_base_proxy *get_d_a_proxy(core_terminal_t &out);
 
 		netlist_t &m_netlist;
 
-		plib::hashmap_t<pstring, pstring> m_alias;
-		plib::hashmap_t<pstring, param_ref_t>  m_params;
-		plib::hashmap_t<pstring, pstring> m_param_values;
-		plib::hashmap_t<pstring, core_terminal_t *> m_terminals;
+	public:
+		std::unordered_map<pstring, pstring> m_alias;
+		std::unordered_map<pstring, param_ref_t>  m_params;
+		std::unordered_map<pstring, pstring> m_param_values;
+		std::unordered_map<pstring, core_terminal_t *> m_terminals;
+	private:
 
-		plib::pvector_t<link_t> m_links;
+		std::vector<link_t> m_links;
 
 		factory_list_t m_factory;
 
-		plib::hashmap_t<pstring, pstring> m_models;
+		std::unordered_map<pstring, pstring> m_models;
 
 		int m_proxy_cnt;
 		int m_frontier_cnt;
 
 		std::stack<pstring> m_namespace_stack;
 		source_t::list_t m_sources;
-		plib::pvector_t<pstring> m_lib;
+		std::vector<pstring> m_lib;
 
 	};
 

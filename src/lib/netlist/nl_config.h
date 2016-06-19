@@ -8,6 +8,8 @@
 #ifndef NLCONFIG_H_
 #define NLCONFIG_H_
 
+#include <cstdint>
+
 #include "plib/pconfig.h"
 
 //============================================================
@@ -126,7 +128,7 @@
 //============================================================
 
 // this macro passes an item followed by a string version of itself as two consecutive parameters
-#define NLNAME(x) x, #x
+//#define NLNAME(x) x, #x
 
 #define NOEXCEPT noexcept
 
@@ -137,16 +139,17 @@
 #endif // !defined(USE_OPENMP)
 
 // Use nano-second resolution - Sufficient for now
-#define NETLIST_INTERNAL_RES        (U64(1000000000))
-//#define NETLIST_INTERNAL_RES      (U64(1000000000000))
+#define NETLIST_INTERNAL_RES        (UINT64_C(1000000000))
+//#define NETLIST_INTERNAL_RES      (UINT64_C(1000000000000))
 
 #define NETLIST_CLOCK               (NETLIST_INTERNAL_RES)
 
 //#define nl_double float
 //#define NL_FCONST(x) (x ## f)
 
-#define nl_double double
+//#define nl_double double
 #define NL_FCONST(x) x
+using nl_double = double;
 
 
 //============================================================

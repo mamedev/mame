@@ -48,14 +48,13 @@ class win_window_info  : public osd_window
 {
 public:
 	win_window_info(running_machine &machine, int index, osd_monitor_info *monitor, const osd_window_config *config);
-	virtual ~win_window_info();
 
 	running_machine &machine() const override { return m_machine; }
 
 	virtual render_target *target() override { return m_target; }
 	int fullscreen() const override { return m_fullscreen; }
 
-	void update();
+	void update() override;
 
 	virtual osd_monitor_info *winwindow_video_window_monitor(const osd_rect *proposed) override;
 
@@ -86,7 +85,7 @@ public:
 
 	virtual osd_monitor_info *monitor() const override { return m_monitor; }
 
-	void destroy();
+	void destroy() override;
 
 	// static
 
@@ -126,9 +125,6 @@ public:
 	int                                    m_lastclickx;
 	int                                    m_lastclicky;
 
-	// drawing data
-	std::unique_ptr<osd_renderer>      m_renderer;
-
 private:
 	void draw_video_contents(HDC dc, int update);
 	int complete_create();
@@ -158,14 +154,6 @@ struct osd_draw_callbacks
 	osd_renderer *(*create)(osd_window *window);
 	void (*exit)(void);
 };
-
-//============================================================
-//  GLOBAL VARIABLES
-//============================================================
-
-// windows
-extern std::list<std::shared_ptr<win_window_info>> win_window_list;
-
 
 
 //============================================================

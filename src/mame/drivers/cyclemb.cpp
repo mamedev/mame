@@ -73,6 +73,7 @@ Dumped by Chack'n
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/2203intf.h"
 #include "machine/tait8741.h"
 
@@ -86,6 +87,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_vram(*this, "vram"),
 		m_cram(*this, "cram"),
 		m_obj1_ram(*this, "obj1_ram"),
@@ -97,6 +99,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT8> m_vram;
 	required_shared_ptr<UINT8> m_cram;
@@ -332,7 +335,7 @@ void cyclemb_state::skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		if(m_obj3_ram[i+1] & 1)
 			x |= 0x100;
 
-			x = 0x138 - x;
+		x = 0x138 - x;
 
 		spr_offs = (m_obj1_ram[i+0]);
 		spr_offs += ((m_obj3_ram[i+0] & 3) << 8);
@@ -382,7 +385,7 @@ WRITE8_MEMBER(cyclemb_state::cyclemb_bankswitch_w)
 #if 0
 WRITE8_MEMBER(cyclemb_state::sound_cmd_w)
 {
-	soundlatch_byte_w(space, 0, data & 0xff);
+	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 #endif
@@ -396,7 +399,7 @@ READ8_MEMBER(cyclemb_state::mcu_status_r)
 
 WRITE8_MEMBER(cyclemb_state::sound_cmd_w)//actually ciom
 {
-	soundlatch_byte_w(space, 0, data & 0xff);
+	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 #endif
@@ -589,7 +592,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cyclemb_sound_io, AS_IO, 8, cyclemb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_byte_r) AM_WRITE(soundlatch2_byte_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 
@@ -938,6 +941,10 @@ static MACHINE_CONFIG_START( cyclemb, cyclemb_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_18MHz/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

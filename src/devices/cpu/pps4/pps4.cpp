@@ -74,7 +74,7 @@ pps4_device::pps4_device(const machine_config &mconfig, const char *tag, device_
 	: cpu_device(mconfig, PPS4, "PPS4", tag, owner, clock, "pps4", __FILE__ )
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 12)  // 4bit RAM
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8)  // 4bit IO
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8+1)  // 4bit IO
 {
 }
 

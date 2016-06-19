@@ -81,7 +81,7 @@ void a1bus_cassette_device::device_start()
 	m_rom = device().machine().root_device().memregion(this->subtag(CASSETTE_ROM_REGION).c_str())->base();
 
 	install_device(0xc000, 0xc0ff, read8_delegate(FUNC(a1bus_cassette_device::cassette_r), this), write8_delegate(FUNC(a1bus_cassette_device::cassette_w), this));
-	install_bank(0xc100, 0xc1ff, 0, 0, (char *)"bank_a1cas", m_rom);
+	install_bank(0xc100, 0xc1ff, (char *)"bank_a1cas", m_rom);
 
 	save_item(NAME(m_cassette_output_flipflop));
 }

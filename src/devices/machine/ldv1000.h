@@ -26,6 +26,10 @@
 #define MCFG_LASERDISC_LDV1000_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, PIONEER_LDV1000, 0)
 
+#define MCFG_LASERDISC_LDV1000_COMMAND_STROBE_CB(_cb) \
+	downcast<pioneer_ldv1000_device *>(device)->set_command_strobe_callback(DEVCB_##_cb);
+
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -48,6 +52,8 @@ class pioneer_ldv1000_device : public laserdisc_device
 public:
 	// construction/destruction
 	pioneer_ldv1000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _cmd_strobe_cb> void set_command_strobe_callback(_cmd_strobe_cb latch) { m_command_strobe_cb.set_callback(latch); }
 
 	// input and output
 	void data_w(UINT8 data);
@@ -102,6 +108,7 @@ protected:
 	required_device<z80_device> m_z80_cpu;                  /* CPU index of the Z80 */
 	required_device<z80ctc_device> m_z80_ctc;                   /* CTC device */
 	emu_timer *         m_multitimer;           /* multi-jump timer device */
+	devcb_write_line    m_command_strobe_cb;
 
 	/* communication status */
 	UINT8               m_command;              /* command byte to the player */
@@ -122,6 +129,7 @@ protected:
 	UINT8               m_vbi[7*3];             /* VBI data */
 	bool                m_vbiready;             /* VBI ready flag */
 	UINT8               m_vbiindex;             /* index within the VBI data */
+	
 };
 
 

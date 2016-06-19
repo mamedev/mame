@@ -292,12 +292,6 @@ UINT32 pce_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 }
 
 
-WRITE_LINE_MEMBER(pce_state::pce_irq_changed)
-{
-	m_maincpu->set_input_line(0, state);
-}
-
-
 static SLOT_INTERFACE_START(pce_cart)
 	SLOT_INTERFACE_INTERNAL("rom", PCE_ROM_STD)
 	SLOT_INTERFACE_INTERNAL("cdsys3u", PCE_ROM_CDSYS3)
@@ -330,7 +324,7 @@ static MACHINE_CONFIG_START( pce_common, pce_state )
 
 	MCFG_DEVICE_ADD( "huc6270", HUC6270, 0 )
 	MCFG_HUC6270_VRAM_SIZE(0x10000)
-	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(pce_state, pce_irq_changed))
+	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD(C6280_TAG, C6280, MAIN_CLOCK/6)
@@ -379,10 +373,10 @@ static MACHINE_CONFIG_START( sgx, pce_state )
 	MCFG_HUC6260_HSYNC_CHANGED_CB(DEVWRITELINE("huc6202", huc6202_device, hsync_changed))
 	MCFG_DEVICE_ADD( "huc6270_0", HUC6270, 0 )
 	MCFG_HUC6270_VRAM_SIZE(0x10000)
-	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(pce_state, pce_irq_changed))
+	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
 	MCFG_DEVICE_ADD( "huc6270_1", HUC6270, 0 )
 	MCFG_HUC6270_VRAM_SIZE(0x10000)
-	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(pce_state, pce_irq_changed))
+	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
 	MCFG_DEVICE_ADD( "huc6202", HUC6202, 0 )
 	MCFG_HUC6202_NEXT_PIXEL_0_CB(DEVREAD16("huc6270_0", huc6270_device, next_pixel))
 	MCFG_HUC6202_TIME_TIL_NEXT_EVENT_0_CB(DEVREAD16("huc6270_0", huc6270_device, time_until_next_event))

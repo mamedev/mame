@@ -255,7 +255,7 @@ WRITE8_MEMBER(punchout_state::spunchout_rp5h01_clock_w)
 static ADDRESS_MAP_START( spnchout_io_map, AS_IO, 8, punchout_state )
 	AM_RANGE(0x05, 0x05) AM_MIRROR(0xf0) AM_WRITE(spunchout_rp5h01_reset_w)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0xf0) AM_WRITE(spunchout_rp5h01_clock_w)
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0xf0) AM_MASK(0xf0) AM_READWRITE(spunchout_exp_r, spunchout_exp_w) // protection ports
+	AM_RANGE(0x07, 0x07) AM_SELECT(0xf0) AM_READWRITE(spunchout_exp_r, spunchout_exp_w) // protection ports
 	AM_IMPORT_FROM( punchout_io_map )
 ADDRESS_MAP_END
 

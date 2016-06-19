@@ -131,7 +131,7 @@ WRITE8_MEMBER(midway_ssio_device::ioport_write)
 {
 	int which = offset >> 2;
 	if (!m_custom_output[which].isnull())
-		m_custom_output[which](space, offset, data & m_custom_output_mask[which], 0xff);
+		m_custom_output[which](space, offset & 4, data & m_custom_output_mask[which], 0xff);
 }
 
 

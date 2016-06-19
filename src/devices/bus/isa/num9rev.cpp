@@ -95,13 +95,13 @@ void isa8_number_9_rev_device::device_start()
 {
 	set_isa_device();
 
-	m_isa->install_memory(0xc0000, 0xc0001, 0, 0, read8_delegate(FUNC(upd7220_device::read), (upd7220_device *)m_upd7220), write8_delegate(FUNC(upd7220_device::write), (upd7220_device *)m_upd7220));
-	m_isa->install_memory(0xc0100, 0xc03ff, 0, 0, read8_delegate(FUNC(isa8_number_9_rev_device::pal8_r), this), write8_delegate(FUNC(isa8_number_9_rev_device::pal8_w), this));
-	m_isa->install_memory(0xc0400, 0xc0401, 0, 0, read8_delegate(FUNC(isa8_number_9_rev_device::bank_r), this), write8_delegate(FUNC(isa8_number_9_rev_device::bank_w), this));
-	m_isa->install_memory(0xc0500, 0xc06ff, 0, 0, read8_delegate(FUNC(isa8_number_9_rev_device::overlay_r), this), write8_delegate(FUNC(isa8_number_9_rev_device::overlay_w), this));
-	m_isa->install_memory(0xc0700, 0xc070f, 0, 0, read8_delegate(FUNC(isa8_number_9_rev_device::ctrl_r), this), write8_delegate(FUNC(isa8_number_9_rev_device::ctrl_w), this));
-	m_isa->install_memory(0xc1000, 0xc3fff, 0, 0, read8_delegate(FUNC(isa8_number_9_rev_device::pal12_r), this), write8_delegate(FUNC(isa8_number_9_rev_device::pal12_w), this));
-	m_isa->install_memory(0xa0000, 0xaffff, 0, 0, read8_delegate(FUNC(isa8_number_9_rev_device::read8), this), write8_delegate(FUNC(isa8_number_9_rev_device::write8), this));
+	m_isa->install_memory(0xc0000, 0xc0001, read8_delegate(FUNC(upd7220_device::read), (upd7220_device *)m_upd7220), write8_delegate(FUNC(upd7220_device::write), (upd7220_device *)m_upd7220));
+	m_isa->install_memory(0xc0100, 0xc03ff, read8_delegate(FUNC(isa8_number_9_rev_device::pal8_r), this), write8_delegate(FUNC(isa8_number_9_rev_device::pal8_w), this));
+	m_isa->install_memory(0xc0400, 0xc0401, read8_delegate(FUNC(isa8_number_9_rev_device::bank_r), this), write8_delegate(FUNC(isa8_number_9_rev_device::bank_w), this));
+	m_isa->install_memory(0xc0500, 0xc06ff, read8_delegate(FUNC(isa8_number_9_rev_device::overlay_r), this), write8_delegate(FUNC(isa8_number_9_rev_device::overlay_w), this));
+	m_isa->install_memory(0xc0700, 0xc070f, read8_delegate(FUNC(isa8_number_9_rev_device::ctrl_r), this), write8_delegate(FUNC(isa8_number_9_rev_device::ctrl_w), this));
+	m_isa->install_memory(0xc1000, 0xc3fff, read8_delegate(FUNC(isa8_number_9_rev_device::pal12_r), this), write8_delegate(FUNC(isa8_number_9_rev_device::pal12_w), this));
+	m_isa->install_memory(0xa0000, 0xaffff, read8_delegate(FUNC(isa8_number_9_rev_device::read8), this), write8_delegate(FUNC(isa8_number_9_rev_device::write8), this));
 }
 
 //-------------------------------------------------

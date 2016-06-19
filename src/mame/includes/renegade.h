@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino, Carlos A. Lozano, Rob Rosenbrock
+
+#include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 
 #define MCU_BUFFER_MAX 6
@@ -14,6 +16,7 @@ public:
 		m_mcu(*this, "mcu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_soundlatch(*this, "soundlatch"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_spriteram(*this, "spriteram"),
@@ -25,6 +28,7 @@ public:
 	optional_device<cpu_device> m_mcu;
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT8> m_fg_videoram;
 	required_shared_ptr<UINT8> m_bg_videoram;

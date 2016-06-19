@@ -21,6 +21,7 @@
 #include "ui/uimain.h"
 #include "ui/menuitem.h"
 #include "ui/slider.h"
+#include "ui/text.h"
 
 namespace ui {
 
@@ -68,30 +69,6 @@ class menu_item;
 
 /* cancel return value for a UI handler */
 #define UI_HANDLER_CANCEL       ((UINT32)~0)
-
-/* justification options for ui_draw_text_full */
-enum
-{
-	JUSTIFY_LEFT = 0,
-	JUSTIFY_CENTER,
-	JUSTIFY_RIGHT
-};
-
-/* word wrapping options for ui_draw_text_full */
-enum
-{
-	WRAP_NEVER,
-	WRAP_TRUNCATE,
-	WRAP_WORD
-};
-
-/* drawing options for ui_draw_text_full */
-enum
-{
-	DRAW_NONE,
-	DRAW_NORMAL,
-	DRAW_OPAQUE
-};
 
 #define SLIDER_DEVICE_SPACING	0x0ff
 #define SLIDER_SCREEN_SPACING	0x0f
@@ -166,6 +143,13 @@ enum ui_callback_type
 class mame_ui_manager : public ui_manager, public slider_changed_notifier
 {
 public:
+	enum draw_mode
+	{
+		NONE,
+		NORMAL,
+		OPAQUE_
+	};
+
 	// construction/destruction
 	mame_ui_manager(running_machine &machine);
 
@@ -221,8 +205,9 @@ public:
 	void draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor);
 	void draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t fgcolor, rgb_t bgcolor);
 	void draw_text(render_container *container, const char *buf, float x, float y);
-	void draw_text_full(render_container *container, const char *origs, float x, float y, float origwrapwidth, int justify, int wrap, int draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth = nullptr, float *totalheight = nullptr, float text_size = 1.0f);
-	void draw_text_box(render_container *container, const char *text, int justify, float xpos, float ypos, rgb_t backcolor);
+	void draw_text_full(render_container *container, const char *origs, float x, float y, float origwrapwidth, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap, draw_mode draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth = nullptr, float *totalheight = nullptr, float text_size = 1.0f);
+	void draw_text_box(render_container *container, const char *text, ui::text_layout::text_justify justify, float xpos, float ypos, rgb_t backcolor);
+	void draw_text_box(render_container *container, ui::text_layout &layout, float xpos, float ypos, rgb_t backcolor);
 	void draw_message_window(render_container *container, const char *text);
 
 	// load/save options to file
@@ -247,6 +232,10 @@ public:
 	void increase_frameskip();
 	void decrease_frameskip();
 	void request_quit();
+	void draw_fps_counter(render_container *container);
+	void draw_timecode_counter(render_container *container);
+	void draw_timecode_total(render_container *container);
+	void draw_profiler(render_container *container);
 
 	// print the game info string into a buffer
 	std::string &game_info_astring(std::string &str);
@@ -256,6 +245,7 @@ public:
 
 	// other
 	void process_natural_keyboard();
+	ui::text_layout create_layout(render_container *container, float width = 1.0, ui::text_layout::text_justify justify = ui::text_layout::LEFT, ui::text_layout::word_wrapping wrap = ui::text_layout::WORD);
 
 	// word wrap
 	int wrap_text(render_container *container, const char *origs, float x, float y, float origwrapwidth, std::vector<int> &xstart, std::vector<int> &xend, float text_size = 1.0f);

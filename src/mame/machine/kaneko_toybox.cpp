@@ -178,11 +178,11 @@ void kaneko_toybox_device::mcu_run()
 		{
 			UINT8* nvdat = (UINT8*)&m_mcuram[mcu_offset];
 
-			address_space &eeprom_space = machine().device<eeprom_serial_93cxx_device>(":eeprom")->space();
+			eeprom_serial_93cxx_device *eeprom = machine().device<eeprom_serial_93cxx_device>(":eeprom");
 
 			for (int i=0;i<0x80;i++)
 			{
-				nvdat[i] = eeprom_space.read_byte(i);
+				nvdat[i] = eeprom->internal_read(i);
 			}
 
 			logerror("%s : MCU executed command: %04X %04X (load NVRAM settings)\n", machine().describe_context(), mcu_command, mcu_offset*2);
@@ -192,11 +192,11 @@ void kaneko_toybox_device::mcu_run()
 
 		case 0x42:  // Write to NVRAM
 		{
-			address_space &eeprom_space = machine().device<eeprom_serial_93cxx_device>(":eeprom")->space();
+		    eeprom_serial_93cxx_device *eeprom = machine().device<eeprom_serial_93cxx_device>(":eeprom");
 			UINT8* nvdat = (UINT8*)&m_mcuram[mcu_offset];
 			for (int i=0;i<0x80;i++)
 			{
-				eeprom_space.write_byte(i, nvdat[i]);
+				eeprom->internal_write(i, nvdat[i]);
 			}
 
 			logerror("%s : MCU executed command: %04X %04X (save NVRAM settings)\n", machine().describe_context(), mcu_command, mcu_offset*2);
@@ -210,12 +210,11 @@ void kaneko_toybox_device::mcu_run()
 			{
 				//memcpy(m_nvram_save, bonkadv_mcu_43, sizeof(bonkadv_mcu_43));
 
-
-				address_space &eeprom_space = machine().device<eeprom_serial_93cxx_device>(":eeprom")->space();
+				eeprom_serial_93cxx_device *eeprom = machine().device<eeprom_serial_93cxx_device>(":eeprom");
 				UINT8* nvdat = (UINT8*)&bonkadv_mcu_43[0];
 				for (int i=0;i<0x80;i++)
 				{
-					eeprom_space.write_byte(i, nvdat[i]);
+					eeprom->internal_write(i, nvdat[i]);
 				}
 				logerror("%s : MCU executed command: %04X %04X (restore default NVRAM settings)\n", machine().describe_context(), mcu_command, mcu_offset*2);
 			}

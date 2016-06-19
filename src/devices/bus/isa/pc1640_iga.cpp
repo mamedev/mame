@@ -108,8 +108,8 @@ void isa8_pc1640_iga_device::device_start()
 
 	m_crtc_ega = subdevice<crtc_ega_device>(EGA_CRTC_NAME);
 
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, 0, 0, "ega", "iga");
-	m_isa->install_device(0x3b0, 0x3bf, 0, 0, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3b0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3b0_w), this));
-	m_isa->install_device(0x3c0, 0x3cf, 0, 0, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3c0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3c0_w), this));
-	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3d0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3d0_w), this));
+	m_isa->install_rom(this, 0xc0000, 0xc7fff, "ega", "iga");
+	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3b0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3b0_w), this));
+	m_isa->install_device(0x3c0, 0x3cf, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3c0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3c0_w), this));
+	m_isa->install_device(0x3d0, 0x3df, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3d0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3d0_w), this));
 }

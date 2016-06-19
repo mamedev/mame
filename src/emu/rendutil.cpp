@@ -12,7 +12,7 @@
 #include "rendutil.h"
 #include "png.h"
 
-#include "libjpeg/jpeglib.h"
+#include "jpeglib.h"
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -570,11 +570,11 @@ void render_load_jpeg(bitmap_argb32 &bitmap, emu_file &file, const char *dirname
 
 	// allocates a buffer for the image
 	UINT32 jpg_size = file.size();
-	unsigned char *jpg_buffer = global_alloc_array(unsigned char, jpg_size);
+	std::unique_ptr<unsigned char[]> jpg_buffer = std::make_unique<unsigned char[]>(jpg_size);
 
 	// read data from the file and set them in the buffer
-	file.read(jpg_buffer, jpg_size);
-	jpeg_mem_src(&cinfo, jpg_buffer, jpg_size);
+	file.read(jpg_buffer.get(), jpg_size);
+	jpeg_mem_src(&cinfo, jpg_buffer.get(), jpg_size);
 
 	// read JPEG header and start decompression
 	jpeg_read_header(&cinfo, TRUE);
@@ -617,7 +617,6 @@ void render_load_jpeg(bitmap_argb32 &bitmap, emu_file &file, const char *dirname
 	file.close();
 	free(buffer[0]);
 	free(buffer);
-	global_free_array(jpg_buffer);
 }
 
 

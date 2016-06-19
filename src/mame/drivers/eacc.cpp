@@ -97,7 +97,7 @@ static ADDRESS_MAP_START(eacc_mem, AS_PROGRAM, 8, eacc_state)
 	AM_RANGE(0x0000, 0x001f) AM_RAM AM_SHARE("nvram") // inside cpu, battery-backed
 	AM_RANGE(0x0020, 0x007f) AM_RAM // inside cpu
 	AM_RANGE(0x6000, 0x67ff) AM_ROM AM_MIRROR(0x8000)
-	AM_RANGE(0x8004, 0x8007) AM_MIRROR(0x7fc) AM_DEVREADWRITE("pia", pia6821_device, read, write)
+	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x7fc) AM_DEVREADWRITE("pia", pia6821_device, read, write)
 ADDRESS_MAP_END
 
 

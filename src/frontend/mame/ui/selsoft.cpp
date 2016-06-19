@@ -184,11 +184,11 @@ void menu_select_software::handle()
 		else if (menu_event->iptkey == IPT_UI_SELECT)
 		{
 			// handle selections
-			if (is_focus(focused_menu::main))
+			if (get_focus() == focused_menu::main)
 			{
 				inkey_select(menu_event);
 			}
-			else if (is_focus(focused_menu::left))
+			else if (get_focus() == focused_menu::left)
 			{
 				l_sw_hover = highlight;
 				check_filter = true;
@@ -300,14 +300,14 @@ void menu_select_software::handle()
 		}
 
 		else if (menu_event->iptkey == IPT_UI_CONFIGURE)
-			inkey_configure(menu_event);
+			inkey_navigation();
 	}
 
 	if (menu_event && !menu_event->itemref)
 	{
 		if (menu_event->iptkey == IPT_UI_CONFIGURE)
 		{
-			inkey_configure(menu_event);
+			inkey_navigation();
 		}
 		else if (menu_event->iptkey == IPT_UI_LEFT)
 		{
@@ -363,7 +363,7 @@ void menu_select_software::handle()
 			// handle UI_DOWN_FILTER
 			highlight++;
 		}
-		else if (menu_event->iptkey == IPT_OTHER && is_focus(focused_menu::left))
+		else if (menu_event->iptkey == IPT_OTHER && get_focus() == focused_menu::left)
 		{
 			l_sw_hover = highlight;
 			check_filter = true;
@@ -375,7 +375,7 @@ void menu_select_software::handle()
 	if (ui_error)
 		ui().draw_text_box(container, _("The selected software is missing one or more required files. "
 									"Please select a different software.\n\nPress any key to continue."),
-									JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
+									ui::text_layout::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 
 	// handle filters selection from key shortcuts
 	if (check_filter)
@@ -688,8 +688,8 @@ void menu_select_software::custom_render(void *selectedref, float top, float bot
 
 	for (int line = 0; line < 3; ++line)
 	{
-		ui().draw_text_full(container, tempbuf[line].c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-			DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+		ui().draw_text_full(container, tempbuf[line].c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
+			mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = MAX(width, maxwidth);
 	}
@@ -717,8 +717,8 @@ void menu_select_software::custom_render(void *selectedref, float top, float bot
 	// draw the text within it
 	for (int line = 0; line < 3; ++line)
 	{
-		ui().draw_text_full(container, tempbuf[line].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-			DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
+		ui().draw_text_full(container, tempbuf[line].c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
+			mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
 		y1 += ui().get_line_height();
 	}
 
@@ -837,8 +837,8 @@ void menu_select_software::custom_render(void *selectedref, float top, float bot
 
 	for (auto & elem : tempbuf)
 	{
-		ui().draw_text_full(container, elem.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-			DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+		ui().draw_text_full(container, elem.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
+			mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = MAX(maxwidth, width);
 	}
@@ -870,8 +870,8 @@ void menu_select_software::custom_render(void *selectedref, float top, float bot
 	// draw all lines
 	for (auto & elem : tempbuf)
 	{
-		ui().draw_text_full(container, elem.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-			DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
+		ui().draw_text_full(container, elem.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
+			mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
 		y1 += ui().get_line_height();
 	}
 }
@@ -987,40 +987,59 @@ void menu_select_software::inkey_special(const event *menu_event)
 }
 
 
-void menu_select_software::inkey_configure(const event *menu_event)
+void menu_select_software::inkey_navigation()
 {
-	if (is_focus(focused_menu::main))
+	switch (get_focus())
 	{
-		if (selected <= visible_items)
-		{
-			m_prev_selected = item[selected].ref;
-			selected = visible_items + 1;
-		}
-		else
-		{
-			if (ui_globals::panels_status != HIDE_LEFT_PANEL)
-				set_focus(focused_menu::left);
-
-			else if (ui_globals::panels_status == HIDE_BOTH)
+		case focused_menu::main:
+			if (selected <= visible_items)
 			{
+				m_prev_selected = item[selected].ref;
+				selected = visible_items + 1;
+			}
+			else
+			{
+				if (ui_globals::panels_status != HIDE_LEFT_PANEL)
+					set_focus(focused_menu::left);
+
+				else if (ui_globals::panels_status == HIDE_BOTH)
+				{
+					for (int x = 0; x < item.size(); ++x)
+						if (item[x].ref == m_prev_selected)
+							selected = x;
+				}
+				else
+				{
+					set_focus(focused_menu::righttop);
+				}
+			}
+			break;
+
+		case focused_menu::left:
+			if (ui_globals::panels_status != HIDE_RIGHT_PANEL)
+			{
+				set_focus(focused_menu::righttop);
+			}
+			else
+			{
+				set_focus(focused_menu::main);
+				if (m_prev_selected == nullptr)
+				{
+					selected = 0;
+					return;
+				}
+
 				for (int x = 0; x < item.size(); ++x)
 					if (item[x].ref == m_prev_selected)
 						selected = x;
 			}
-			else
-			{
-				set_focus(focused_menu::righttop);
-			}
-		}
-	}
-	else if (is_focus(focused_menu::left))
-	{
-		if (ui_globals::panels_status != HIDE_RIGHT_PANEL)
-		{
-			set_focus(focused_menu::righttop);
-		}
-		else
-		{
+			break;
+
+		case focused_menu::righttop:
+			set_focus(focused_menu::rightbottom);
+			break;
+
+		case focused_menu::rightbottom:
 			set_focus(focused_menu::main);
 			if (m_prev_selected == nullptr)
 			{
@@ -1031,24 +1050,7 @@ void menu_select_software::inkey_configure(const event *menu_event)
 			for (int x = 0; x < item.size(); ++x)
 				if (item[x].ref == m_prev_selected)
 					selected = x;
-		}
-	}
-	else if (is_focus(focused_menu::righttop))
-	{
-		set_focus(focused_menu::rightbottom);
-	}
-	else if (is_focus(focused_menu::rightbottom))
-	{
-		set_focus(focused_menu::main);
-		if (m_prev_selected == nullptr)
-		{
-			selected = 0;
-			return;
-		}
-
-		for (int x = 0; x < item.size(); ++x)
-			if (item[x].ref == m_prev_selected)
-				selected = x;
+			break;
 	}
 }
 
@@ -1243,12 +1245,12 @@ void menu_select_software::build_list(std::vector<ui_software_info *> &s_drivers
 		case UI_SW_AVAILABLE:
 			if (s_driver->available)
 				m_displaylist.push_back(s_driver);
-				break;
+			break;
 
 		case UI_SW_UNAVAILABLE:
 			if (!s_driver->available)
 				m_displaylist.push_back(s_driver);
-				break;
+			break;
 
 		case UI_SW_SUPPORTED:
 			if (s_driver->supported == SOFTWARE_SUPPORTED_YES)
@@ -1446,7 +1448,7 @@ float menu_select_software::draw_left_panel(float x1, float y1, float x2, float 
 				hover = phover + filter;
 			}
 
-			if (highlight == filter && is_focus(focused_menu::left))
+			if (highlight == filter && get_focus() == focused_menu::left)
 			{
 				fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
 				bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
@@ -1486,8 +1488,8 @@ float menu_select_software::draw_left_panel(float x1, float y1, float x2, float 
 				convert_command_glyph(str);
 			}
 
-			ui().draw_text_full(container, str.c_str(), x1t, y1, x2 - x1, JUSTIFY_LEFT, WRAP_NEVER,
-				DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr, text_size);
+			ui().draw_text_full(container, str.c_str(), x1t, y1, x2 - x1, ui::text_layout::LEFT, ui::text_layout::NEVER,
+				mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, text_size);
 			y1 += line_height;
 		}
 
@@ -1565,13 +1567,13 @@ void menu_select_software::infos_render(void *selectedref, float origx1, float o
 	{
 		float title_size = 0.0f;
 
-		ui().draw_text_full(container, _("History"), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-			DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &title_size, nullptr);
+		ui().draw_text_full(container, _("History"), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+			mame_ui_manager::NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &title_size, nullptr);
 		title_size += 0.01f;
 
 		rgb_t fgcolor = UI_TEXT_COLOR;
 		rgb_t bgcolor = UI_TEXT_BG_COLOR;
-		if (is_focus(focused_menu::rightbottom))
+		if (get_focus() == focused_menu::rightbottom)
 		{
 			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
 			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
@@ -1583,8 +1585,8 @@ void menu_select_software::infos_render(void *selectedref, float origx1, float o
 			ui().draw_textured_box(container, origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
 				origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
-		ui().draw_text_full(container, _("History"), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_NEVER,
-			DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+		ui().draw_text_full(container, _("History"), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER, ui::text_layout::NEVER,
+			mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 		ui_globals::cur_sw_dats_view = 0;
 	}
 	else
@@ -1597,15 +1599,15 @@ void menu_select_software::infos_render(void *selectedref, float origx1, float o
 
 		for (auto & elem : t_text)
 		{
-			ui().draw_text_full(container, elem.c_str(), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_NEVER,
-				DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, nullptr);
+			ui().draw_text_full(container, elem.c_str(), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER, ui::text_layout::NEVER,
+				mame_ui_manager::NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, nullptr);
 			txt_lenght += 0.01f;
 			title_size = MAX(txt_lenght, title_size);
 		}
 
 		rgb_t fgcolor = UI_TEXT_COLOR;
 		rgb_t bgcolor = UI_TEXT_BG_COLOR;
-		if (is_focus(focused_menu::rightbottom))
+		if (get_focus() == focused_menu::rightbottom)
 		{
 			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
 			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
@@ -1623,7 +1625,7 @@ void menu_select_software::infos_render(void *selectedref, float origx1, float o
 				origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
 		ui().draw_text_full(container, t_text[ui_globals::cur_sw_dats_view].c_str(), origx1, origy1, origx2 - origx1,
-			JUSTIFY_CENTER, WRAP_NEVER, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr, tmp_size);
+			ui::text_layout::CENTER, ui::text_layout::NEVER, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, tmp_size);
 
 		draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::cur_sw_dats_view, 0, 1, title_size);
 	}
@@ -1646,8 +1648,8 @@ void menu_select_software::infos_render(void *selectedref, float origx1, float o
 
 	if (buffer.empty())
 	{
-		ui().draw_text_full(container, _("No Infos Available"), origx1, (origy2 + origy1) * 0.5f, origx2 - origx1, JUSTIFY_CENTER,
-			WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+		ui().draw_text_full(container, _("No Infos Available"), origx1, (origy2 + origy1) * 0.5f, origx2 - origx1, ui::text_layout::CENTER,
+			ui::text_layout::WORD, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 		return;
 	}
 	else
@@ -1675,7 +1677,7 @@ void menu_select_software::infos_render(void *selectedref, float origx1, float o
 			info_arrow(1, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
 		else
 			ui().draw_text_full(container, tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1,
-				JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
+				ui::text_layout::LEFT, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
 				nullptr, nullptr, text_size);
 		oy1 += (line_height * text_size);
 	}
@@ -1767,7 +1769,7 @@ void menu_select_software::arts_render(void *selectedref, float origx1, float or
 
 			olddriver = driver;
 			ui_globals::switch_image = false;
-			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2, false);
+			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2);
 			auto_free(machine(), tmp_bitmap);
 		}
 
@@ -1856,7 +1858,7 @@ void menu_select_software::arts_render(void *selectedref, float origx1, float or
 
 			oldsoft = soft;
 			ui_globals::switch_image = false;
-			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2, true);
+			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2);
 			auto_free(machine(), tmp_bitmap);
 		}
 
@@ -1984,8 +1986,8 @@ void software_parts::handle()
 void software_parts::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width;
-	ui().draw_text_full(container, _("Software part selection:"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-									DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+	ui().draw_text_full(container, _("Software part selection:"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+									mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
 
@@ -2004,8 +2006,8 @@ void software_parts::custom_render(void *selectedref, float top, float bottom, f
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	ui().draw_text_full(container, _("Software part selection:"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+	ui().draw_text_full(container, _("Software part selection:"), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+									mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
 //-------------------------------------------------
@@ -2125,8 +2127,8 @@ void bios_selection::handle()
 void bios_selection::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width;
-	ui().draw_text_full(container, _("Bios selection:"), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-									DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+	ui().draw_text_full(container, _("Bios selection:"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+									mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
 
@@ -2145,8 +2147,8 @@ void bios_selection::custom_render(void *selectedref, float top, float bottom, f
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	ui().draw_text_full(container, _("Bios selection:"), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+	ui().draw_text_full(container, _("Bios selection:"), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+									mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
 } // namespace ui

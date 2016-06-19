@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Paul Priest, David Haywood
 
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 
 class mcatadv_state : public driver_device
@@ -18,7 +19,8 @@ public:
 		m_soundcpu(*this, "soundcpu"),
 		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_videoram1;
@@ -42,6 +44,7 @@ public:
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE16_MEMBER(mcat_soundlatch_w);
 	DECLARE_READ16_MEMBER(mcat_wd_r);
@@ -56,5 +59,4 @@ public:
 	void screen_eof_mcatadv(screen_device &screen, bool state);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void mcatadv_draw_tilemap_part( screen_device &screen, UINT16* current_scroll, UINT16* current_videoram1, int i, tilemap_t* current_tilemap, bitmap_ind16 &bitmap, const rectangle &cliprect );
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 };

@@ -21,14 +21,10 @@ protected:
 private:
 	UINT16 *m_cop_mcu_ram;
 
-
-
-
 	required_device<raiden2cop_device> m_raiden2cop;
-
 };
 
 extern const device_type SEIBU_COP_BOOTLEG;
 
-#define MCFG_SEIBU_COP_ADD(_tag) \
+#define MCFG_DEVICE_SEIBUCOP_BOOTLEG_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SEIBU_COP_BOOTLEG, 0)

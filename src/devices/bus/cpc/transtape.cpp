@@ -63,8 +63,8 @@ void cpc_transtape_device::device_start()
 
 	m_ram = make_unique_clear<UINT8[]>(0x2000);
 
-	m_space->install_write_handler(0xfbf0,0xfbf0,0,0,write8_delegate(FUNC(cpc_transtape_device::output_w),this));
-	m_space->install_read_handler(0xfbff,0xfbff,0,0,read8_delegate(FUNC(cpc_transtape_device::input_r),this));
+	m_space->install_write_handler(0xfbf0,0xfbf0,write8_delegate(FUNC(cpc_transtape_device::output_w),this));
+	m_space->install_read_handler(0xfbff,0xfbff,read8_delegate(FUNC(cpc_transtape_device::input_r),this));
 }
 
 //-------------------------------------------------
