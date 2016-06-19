@@ -214,6 +214,7 @@ UINT32 dlair_state::screen_update_dleuro(screen_device &screen, bitmap_ind16 &bi
 		for (x = 0; x < 32; x++)
 		{
 			UINT8 *base = &videoram[y * 64 + x * 2 + 1];
+			// TODO: opaque?
 			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, base[0], base[1], 0, 0, 10 * x, 16 * y);
 		}
 
@@ -472,13 +473,13 @@ Address in ROM:
  *
  *************************************/
 
+ // TODO: DIPs still needs work
 static INPUT_PORTS_START( dlair )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("A:2,1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("A:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
-//  PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Unused ) ) // TODO: kill me
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_HIGH, "A:2")
 	PORT_DIPNAME( 0x04, 0x00, "Difficulty Mode" ) PORT_DIPLOCATION("A:3")
 	PORT_DIPSETTING(    0x04, "Mode 1" )
 	PORT_DIPSETTING(    0x00, "Mode 2" )
@@ -499,7 +500,7 @@ static INPUT_PORTS_START( dlair )
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "Sound every 8 attracts" ) PORT_DIPLOCATION("B:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )	
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("B:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -549,9 +550,9 @@ static INPUT_PORTS_START( dlaire )
 	PORT_INCLUDE(dlair)
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x08, 0x08, "LD Player" )     /* In Rev F, F2 and so on... before it was Joystick Sound Feedback */
-	PORT_DIPSETTING(    0x00, "LD-PR7820" )
-	PORT_DIPSETTING(    0x08, "LDV-1000" )
+	PORT_DIPNAME( 0x08, 0x00, "LD Player" )  PORT_DIPLOCATION("B:3")    /* In Rev F, F2 and so on... before it was Joystick Sound Feedback */
+	PORT_DIPSETTING(    0x08, "LD-PR7820" )
+	PORT_DIPSETTING(    0x00, "LDV-1000" )
 INPUT_PORTS_END
 
 
@@ -576,11 +577,10 @@ static INPUT_PORTS_START( dleuro )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_command_r, nullptr)    /* command strobe */
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("A:2,1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("A:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
-//  PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Unused ) )
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_HIGH, "A:2")
 	PORT_DIPNAME( 0x04, 0x00, "Difficulty Mode" ) PORT_DIPLOCATION("A:3")
 	PORT_DIPSETTING(    0x04, "Mode 1" )
 	PORT_DIPSETTING(    0x00, "Mode 2" )
@@ -673,7 +673,7 @@ static INPUT_PORTS_START( spaceace )
 
 INPUT_PORTS_END
 
-// TODO: dips for Space Ace euro
+// TODO: dips for Space Ace euro, different than NTSC
 
 /*************************************
  *
@@ -802,7 +802,7 @@ ROM_START( dlair )      /* revision F2 */
 	ROM_LOAD( "dl_f2_u4.bin", 0x6000, 0x2000,  CRC(f5ec23d2) SHA1(71149e2d359cc5944fbbb53dd7d0c2b42fbc9bb4) )
 
 	DISK_REGION( "ld_ldv1000" )
-	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "dlair", 0, SHA1(da70bac4fe526e48d556ad3fea72cde022c26648) )
 ROM_END
 
 ROM_START( dlair_1 )     /* Serial #001, courtesy Jason Finn */
