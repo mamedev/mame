@@ -387,12 +387,30 @@
 
 #include "emu.h"
 #include "cpu/sparc/sparc.h"
+#include "machine/z80scc.h"
+#include "bus/rs232/rs232.h"
 
 #define ENA_NOTBOOT		0x80
 #define ENA_SDVMA		0x20
 #define ENA_CACHE		0x10
 #define ENA_RESET		0x04
 #define ENA_DIAG		0x01
+
+#define SCC1_TAG		"kbdmouse"
+#define SCC2_TAG		"uart"
+#define RS232A_TAG      "rs232a"
+#define RS232B_TAG      "rs232b"
+
+#define ASI_SYSTEM_SPACE	2
+#define ASI_SEGMENT_MAP		3
+#define ASI_PAGE_MAP		4
+#define ASI_USER_INSN		8
+#define ASI_SUPER_INSN		9
+#define ASI_USER_DATA		10
+#define ASI_SUPER_DATA		11
+#define ASI_FLUSH_SEGMENT	12
+#define ASI_FLUSH_PAGE		13
+#define ASI_FLUSH_CONTEXT	14
 
 class sun4_state : public driver_device
 {
@@ -401,7 +419,10 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "user1")
+		, m_kbdmouse(*this, SCC1_TAG)
+		, m_uart(*this, SCC2_TAG)
 		, m_rom_ptr(nullptr)
+		, m_context(0)
 		, m_system_enable(0)
 	{
 	}
@@ -416,49 +437,178 @@ protected:
 
 	required_device<mb86901_device> m_maincpu;
 	required_memory_region m_rom;
+	required_device<z80scc_device> m_kbdmouse;
+	required_device<z80scc_device> m_uart;
+
+	UINT32 read_supervisor_data(UINT32 vaddr, UINT32 mem_mask);
+	void write_supervisor_data(UINT32 vaddr, UINT32 data, UINT32 mem_mask);
+
 	UINT32 *m_rom_ptr;
 	UINT32 m_context;
+	UINT16 m_segmap[8][4096];
+	UINT32 m_pagemap[8192];
 	UINT32 m_system_enable;
 };
+
+#define SEGMENT(vaddr)	m_segmap[m_context & 7][((vaddr) >> 18) & 0xfff]
+#define PAGE(vaddr)		m_pagemap[((m_segmap[m_context & 7][((vaddr) >> 18) & 0xfff] & 0x7f) << 6) | (((vaddr) >> 12) & 0x3f)]
+#define PADDR(vaddr)	(((PAGE(vaddr) << 12) & 0x0ffff000) | ((vaddr) & 0xfff))
+
+UINT32 sun4_state::read_supervisor_data(UINT32 vaddr, UINT32 mem_mask)
+{
+	UINT32 page = PAGE(vaddr);
+	bool v = (page & 0x80000000) ? true : false;
+	bool w = (page & 0x40000000) ? true : false;
+	bool s = (page & 0x20000000) ? true : false;
+	bool x = (page & 0x10000000) ? true : false;
+	 int t = (page & 0x0c000000) >> 26;
+	bool a = (page & 0x02000000) ? true : false;
+	bool m = (page & 0x01000000) ? true : false;
+	char mode[4] = { 'M', 'S', '0', '1' };
+
+	logerror("supervisor data read: vaddr %08x, paddr %08x, context %d, segment entry %02x, page entry %08x, %c%c%c%c%c%c%c\n", vaddr, PADDR(vaddr), m_context, SEGMENT(vaddr), PAGE(vaddr)
+		, v ? 'V' : 'v', w ? 'W' : 'w', s ? 'S' : 's', x ? 'X' : 'x', mode[t], a ? 'A' : 'a', m ? 'M' : 'm');
+	return 0;
+}
+
+void sun4_state::write_supervisor_data(UINT32 vaddr, UINT32 data, UINT32 mem_mask)
+{
+	UINT32 page = PAGE(vaddr);
+	bool v = (page & 0x80000000) ? true : false;
+	bool w = (page & 0x40000000) ? true : false;
+	bool s = (page & 0x20000000) ? true : false;
+	bool x = (page & 0x10000000) ? true : false;
+	 int t = (page & 0x0c000000) >> 26;
+	bool a = (page & 0x02000000) ? true : false;
+	bool m = (page & 0x01000000) ? true : false;
+	char mode[4] = { 'M', 'S', '0', '1' };
+
+	logerror("supervisor data write: vaddr %08x, paddr %08x, data %08x, mem_mask %08x, context %d, segment entry %02x, page entry %08x, %c%c%c%c%c%c%c\n", vaddr, PADDR(vaddr), data, mem_mask,
+		m_context, SEGMENT(vaddr), PAGE(vaddr), v ? 'V' : 'v', w ? 'W' : 'w', s ? 'S' : 's', x ? 'X' : 'x', mode[t], a ? 'A' : 'a', m ? 'M' : 'm');
+}
 
 READ32_MEMBER( sun4_state::sun4_mmu_r )
 {
 	UINT8 asi = m_maincpu->get_asi();
 
-	if (asi == 2 && !space.debugger_access())
+	if (!space.debugger_access())
 	{
-		switch (offset >> 26)
+		switch(asi)
 		{
-			case 3: // context reg
-				return m_context;
+			case ASI_SYSTEM_SPACE:
+				switch (offset >> 26)
+				{
+					case 3: // context reg
+						logerror("sun4: read context register %08x (& %08x) asi 2, offset %x, PC = %x\n", m_context << 24, mem_mask, offset << 2, m_maincpu->pc());
+						return m_context << 24;
 
-			case 4: // system enable reg
-				return m_system_enable;
+					case 4: // system enable reg
+						logerror("sun4: read system enable register %08x (& %08x) asi 2, offset %x, PC = %x\n", m_system_enable << 24, mem_mask, offset << 2, m_maincpu->pc());
+						return m_system_enable << 24;
 
-			case 6: // bus error register
-				return 0;
+					case 8: // (d-)cache tags
+						logerror("sun4: read dcache tags %08x (& %08x) asi 2, offset %x, PC = %x\n", 0xffffffff, mem_mask, offset << 2, m_maincpu->pc());
+						return 0xffffffff;
 
-			case 8: // (d-)cache tags
-				logerror("sun4: read dcache tags @ %x, PC = %x\n", offset, m_maincpu->pc());
-				return 0xffffffff;
+					case 9: // (d-)cache data
+						logerror("sun4: read dcache data %08x (& %08x) asi 2, offset %x, PC = %x\n", 0xffffffff, mem_mask, offset << 2, m_maincpu->pc());
+						return 0xffffffff;
 
-			case 9: // (d-)cache data
-				logerror("sun4: read dcache data @ %x, PC = %x\n", offset, m_maincpu->pc());
-				return 0xffffffff;
+					case 15: // Type 1 space passthrough
+						switch ((offset >> 22) & 15)
+						{
+							case 0: // keyboard/mouse
+								switch (offset & 1)
+								{
+									case 0:
+									{
+										UINT32 ret = 0;
+										if (mem_mask & 0xffff0000)
+											ret |= m_kbdmouse->cb_r(space, 0) << 24;
+										if (mem_mask & 0x0000ffff)
+											ret |= m_kbdmouse->db_r(space, 0) << 8;
+										return ret;
+									}
+									case 1:
+									{
+										UINT32 ret = 0;
+										if (mem_mask & 0xffff0000)
+											ret |= m_kbdmouse->ca_r(space, 0) << 24;
+										if (mem_mask & 0x0000ffff)
+											ret |= m_kbdmouse->da_r(space, 0) << 8;
+										return ret;
+									}
+								}
+								break;
+							case 1: // serial ports
+								switch (offset & 1)
+								{
+									case 0:
+									{
+										UINT32 ret = 0;
+										if (mem_mask & 0xffff0000)
+											ret |= m_uart->cb_r(space, 0) << 24;
+										if (mem_mask & 0x0000ffff)
+											ret |= m_uart->db_r(space, 0) << 8;
+										return ret;
+									}
+									case 1:
+									{
+										UINT32 ret = 0;
+										if (mem_mask & 0xffff0000)
+											ret |= m_uart->ca_r(space, 0) << 24;
+										if (mem_mask & 0x0000ffff)
+											ret |= m_uart->da_r(space, 0) << 8;
+										return ret;
+									}
+								}
+								break;
 
-			case 0: // IDPROM - TODO: SPARCstation-1 does not have an ID prom and a timeout should occur.
+							default:
+								logerror("sun4: read unknown type 1 space at address %x (& %08x) asi 2, offset %x, PC = %x\n", offset << 2, mem_mask, offset << 2, m_maincpu->pc());
+						}
+						break;
+
+					case 0: // IDPROM - TODO: SPARCstation-1 does not have an ID prom and a timeout should occur.
+					default:
+						logerror("sun4: read unknown register (& %08x) asi 2, offset %x, PC = %x\n", mem_mask, offset << 2, m_maincpu->pc());
+						return 0;
+				}
+				break;
+
+			case ASI_SEGMENT_MAP:
+			{
+				logerror("sun4: read m_segmap[%d][(%08x >> 18) & 0xfff = %03x] = %08x << 24 & %08x\n", m_context & 7, offset << 2, (offset >> 16) & 0xfff, SEGMENT(offset << 2), mem_mask);
+				UINT32 result = SEGMENT(offset << 2);
+				while (!(mem_mask & 1))
+				{
+					mem_mask >>= 1;
+					result <<= 1;
+				}
+				return result;
+			}
+
+			case ASI_PAGE_MAP: // page map
+			{
+				logerror("sun4: read m_pagemap[(m_segmap[%d][(%08x >> 18) & 0xfff = %03x] = %08x << 6) | ((%08x >> 12) & 0x3f)]] = %08x & %08x\n", m_context & 7, offset << 2, (offset >> 16) & 0xfff, SEGMENT(offset << 2), offset << 2, PAGE(offset << 2), mem_mask);
+				return PAGE(offset << 2);
+			}
+
+			case ASI_SUPER_INSN: // supervisor instruction space
+				return m_rom_ptr[offset & 0x1ffff]; // wrong, but works for now
+
+			case ASI_SUPER_DATA:
+				return read_supervisor_data(offset << 2, mem_mask);
+
 			default:
-				return 0;
+				logerror("sun4: read (& %08x) asi %d byte offset %x, PC = %x\n", mem_mask, asi, offset << 2, m_maincpu->pc());
+				break;
 		}
 	}
 
 	if (!(m_system_enable & ENA_NOTBOOT))
 	{
 		return m_rom_ptr[offset & 0x1ffff];
-	}
-	else if (asi < 8 || asi > 11)
-	{
-		logerror("sun4: read asi %d byte offset %x, PC = %x\n", asi, offset << 2, m_maincpu->pc());
 	}
 
 	return 0;
@@ -468,34 +618,107 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 {
 	UINT8 asi = m_maincpu->get_asi();
 
-	if (asi == 2)
+	switch (asi)
 	{
-		switch (offset >> 26)
+		case 2:
+			switch (offset >> 26)
+			{
+				case 3: // context reg
+					logerror("sun4: %08x (& %08x) asi 2 to context register, offset %x, PC = %x\n", data, mem_mask, offset << 2, m_maincpu->pc());
+					m_context = (UINT8)(data >> 24) & 7;
+					return;
+
+				case 4: // system enable reg
+					logerror("sun4: write %08x (& %08x) asi 2 to system enable register, offset %x, PC = %x\n", data, mem_mask, offset << 2, m_maincpu->pc());
+					m_system_enable = (UINT8)data;
+					return;
+
+				case 8: // cache tags
+					logerror("sun4: write %08x (& %08x) asi 2 to cache tags @ %x, PC = %x\n", data, mem_mask, offset << 2, m_maincpu->pc());
+					return;
+
+				case 9: // cache data
+					logerror("sun4: write %08x (& %08x) asi 2 to cache data @ %x, PC = %x\n", data, mem_mask, offset << 2, m_maincpu->pc());
+					return;
+
+				case 15: // Type 1 space passthrough
+					switch ((offset >> 22) & 15)
+					{
+						case 0: // keyboard/mouse
+							switch (offset & 1)
+							{
+								case 0:
+									if (mem_mask & 0xffff0000)
+										m_kbdmouse->cb_w(space, 0, data >> 24);
+									if (mem_mask & 0x0000ffff)
+										m_kbdmouse->db_w(space, 0, data >> 24);
+									break;
+								case 1:
+									if (mem_mask & 0xffff0000)
+										m_kbdmouse->ca_w(space, 0, data >> 24);
+									if (mem_mask & 0x0000ffff)
+										m_kbdmouse->da_w(space, 0, data >> 24);
+									break;
+							}
+							break;
+						case 1: // serial ports
+							switch (offset & 1)
+							{
+								case 0:
+									if (mem_mask & 0xffff0000)
+										m_uart->cb_w(space, 0, data >> 24);
+									if (mem_mask & 0x0000ffff)
+										m_uart->db_w(space, 0, data >> 24);
+									break;
+								case 1:
+									if (mem_mask & 0xffff0000)
+										m_uart->ca_w(space, 0, data >> 24);
+									if (mem_mask & 0x0000ffff)
+										m_uart->da_w(space, 0, data >> 24);
+									break;
+							}
+							break;
+						default:
+							logerror("sun4: write unknown type 1 space %08x (& %08x) asi 2, offset %x, PC = %x\n", data, mem_mask, offset << 2, m_maincpu->pc());
+					}
+					break;
+
+				case 0: // IDPROM
+				default:
+					logerror("sun4: write %08x (& %08x) asi 2 to unknown register, offset %x, PC = %x\n", data, mem_mask, offset << 2, m_maincpu->pc());
+					return;
+			}
+			break;
+
+		case 3: // segment map
+			offset <<= 2;
+			while (!(mem_mask & 1))
+			{
+				mem_mask >>= 1;
+				data >>= 1;
+			}
+			SEGMENT(offset) = data;
+			//m_segmap[m_context & 7][(offset >> 18) & 0xfff] &= ~(mem_mask >> 16);
+			//m_segmap[m_context & 7][(offset >> 18) & 0xfff] |= (data >> 16) & (mem_mask >> 16);
+			logerror("sun4: write m_segmap[%d][(%08x >> 18) & 0xfff = %03x] = %08x & %08x\n", m_context & 7, offset << 2, (offset >> 16) & 0xfff, data, mem_mask);
+			break;
+
+		case ASI_PAGE_MAP: // page map
 		{
-			case 3: // context reg
-				m_context = (UINT8)data;
-				return;
-
-			case 4: // system enable reg
-				m_system_enable = (UINT8)data;
-				return;
-
-			case 8: // cache tags
-				logerror("sun4: %08x to cache tags @ %x, PC = %x\n", data, offset, m_maincpu->pc());
-				return;
-
-			case 9: // cache data
-				logerror("sun4: %08x to cache data @ %x, PC = %x\n", data, offset, m_maincpu->pc());
-				return;
-
-			case 0: // IDPROM
-			default:
-				return;
+			logerror("sun4: write m_pagemap[(m_segmap[%d][(%08x >> 18) & 0xfff = %03x] = %08x << 6) | ((%08x >> 12) & 0x3f)]] = %08x & %08x\n", m_context & 7, offset << 2,
+				(offset >> 16) & 0xfff, SEGMENT(offset << 2), offset << 2, data, mem_mask);
+			COMBINE_DATA(&PAGE(offset << 2));
+			PAGE(offset << 2) &= 0xff00ffff;
+			break;
 		}
-	}
-	else if (asi < 8 || asi > 11)
-	{
-		logerror("sun4: %08x to asi %d byte offset %x, PC = %x\n", data, asi, offset << 2, m_maincpu->pc());
+
+		case ASI_SUPER_DATA:
+			write_supervisor_data(offset << 2, data, mem_mask);
+			break;
+
+		default:
+			logerror("sun4: write %08x (& %08x) to asi %d byte offset %x, PC = %x\n", data, mem_mask, asi, offset << 2, m_maincpu->pc());
+			break;
 	}
 }
 
@@ -521,6 +744,21 @@ static MACHINE_CONFIG_START( sun4, sun4_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MB86901, 16670000)
 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, sun4_mem)
+
+	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
+
+	MCFG_RS232_PORT_ADD(RS232A_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
+
+	MCFG_RS232_PORT_ADD(RS232B_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
 MACHINE_CONFIG_END
 
 /*
