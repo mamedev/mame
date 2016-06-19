@@ -152,7 +152,7 @@ public:
 	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) { return FALSE; }
 	virtual bool call_create(int format_type, option_resolution *format_options) { return FALSE; }
 	virtual void call_unload() { }
-	virtual int call_display(std::string& s) { return -1; }
+	virtual std::string call_display() { return std::string(); }
 	virtual device_image_partialhash_func get_partial_hash() const { return nullptr; }
 	virtual bool core_opens_image_file() const { return TRUE; }
 	virtual iodevice_t image_type()  const = 0;

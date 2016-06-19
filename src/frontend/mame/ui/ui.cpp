@@ -1214,20 +1214,29 @@ void mame_ui_manager::draw_profiler(render_container *container)
 void mame_ui_manager::image_handler_ingame()
 {
 	// run display routine for devices
-    if (machine().phase() == MACHINE_PHASE_RUNNING)
-		for (device_image_interface &image : image_interface_iterator(machine().root_device())) {
-			std::string str;
-			int idx = image.call_display(str);
-			if (idx >= 0) {
-				float x, y;
-				/* choose a location on the screen */
-				x = 0.2f;
-				y = 0.5f + idx;
-				y *= get_line_height() + 2.0f * UI_BOX_TB_BORDER;
+	if (machine().phase() == MACHINE_PHASE_RUNNING)
+	{
+		auto layout = create_layout(&machine().render().ui_container());
 
-				draw_text_box(&machine().render().ui_container(), str.c_str(), ui::text_layout::LEFT, x, y, UI_BACKGROUND_COLOR);
+		// loop through all devices, build their text into the layout
+		for (device_image_interface &image : image_interface_iterator(machine().root_device()))
+		{
+			std::string str = image.call_display();
+			if (!str.empty())
+			{
+				layout.add_text(str.c_str());
+				layout.add_text("\n");
 			}
 		}
+
+		// did we actually create anything?
+		if (!layout.empty())
+		{
+			float x = 0.2f;
+			float y = 0.5f * get_line_height() + 2.0f * UI_BOX_TB_BORDER;
+			draw_text_box(&machine().render().ui_container(), layout, x, y, UI_BACKGROUND_COLOR);
+		}
+	}
 }
 
 //-------------------------------------------------
