@@ -581,7 +581,7 @@ void zeus2_device::zeus2_register_update(offs_t offset, UINT32 oldval, int logit
 
 			/* in this mode, crusnexo expects the reads to immediately latch */
 			//if ((m_zeusbase[0x50] == 0x00a20000) || (m_zeusbase[0x50] == 0x00720000))
-			if ((m_zeusbase[0x50] == 0x00a20000))
+			if (m_zeusbase[0x50] == 0x00a20000)
 				oldval = m_zeusbase[0x51];
 
 			/* this is the address, except in read mode, where it latches values */
