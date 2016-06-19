@@ -1862,10 +1862,10 @@ void address_space::check_optimize_all(const char *function, offs_t addrstart, o
 {
 	if (addrstart > addrend)
 		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, start address is after the end address.\n", function, addrstart, addrend, addrmask, addrmirror, addrselect);
-	if (addrstart & ~m_bytemask)
-		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, start address is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, m_bytemask, addrstart & m_bytemask);
-	if (addrend & ~m_bytemask)
-		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, end address is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, m_bytemask, addrend & m_bytemask);
+	if (addrstart & ~m_addrmask)
+		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, start address is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, m_bytemask, addrstart & m_addrmask);
+	if (addrend & ~m_addrmask)
+		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, end address is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, m_bytemask, addrend & m_addrmask);
 
 	offs_t lowbits_mask = (m_config.data_width() >> (3 - m_config.m_addrbus_shift)) - 1;
 	if (addrstart & lowbits_mask)
@@ -1882,12 +1882,12 @@ void address_space::check_optimize_all(const char *function, offs_t addrstart, o
 	changing_bits |= changing_bits >> 8;
 	changing_bits |= changing_bits >> 16;
 
-	if (addrmask & ~m_bytemask)
-		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, mask is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, m_bytemask, addrmask & m_bytemask);
-	if (addrmirror & ~m_bytemask)
-		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, mirror is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, m_bytemask, addrmirror & m_bytemask);
-	if (addrselect & ~m_bytemask)
-		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, select is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, m_bytemask, addrselect & m_bytemask);
+	if (addrmask & ~m_addrmask)
+		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, mask is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, m_bytemask, addrmask & m_addrmask);
+	if (addrmirror & ~m_addrmask)
+		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, mirror is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, m_bytemask, addrmirror & m_addrmask);
+	if (addrselect & ~m_addrmask)
+		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, select is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, m_bytemask, addrselect & m_addrmask);
 	if (addrmask & ~changing_bits)
 		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, mask is trying to unmask an unchanging address bit, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, addrmask & changing_bits);
 	if (addrmirror & changing_bits)
@@ -1923,10 +1923,10 @@ void address_space::check_optimize_mirror(const char *function, offs_t addrstart
 {
 	if (addrstart > addrend)
 		fatalerror("%s: In range %x-%x mirror %x, start address is after the end address.\n", function, addrstart, addrend, addrmirror);
-	if (addrstart & ~m_bytemask)
+	if (addrstart & ~m_addrmask)
 		fatalerror("%s: In range %x-%x mirror %x, start address is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, addrmirror, m_bytemask, addrstart & m_bytemask);
-	if (addrend & ~m_bytemask)
-		fatalerror("%s: In range %x-%x mirror %x, end address is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, addrmirror, m_bytemask, addrend & m_bytemask);
+	if (addrend & ~m_addrmask)
+		fatalerror("%s: In range %x-%x mirror %x, end address is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, addrmirror, m_bytemask, addrend & m_addrmask);
 
 	offs_t lowbits_mask = (m_config.data_width() >> (3 - m_config.m_addrbus_shift)) - 1;
 	if (addrstart & lowbits_mask)
@@ -1943,8 +1943,8 @@ void address_space::check_optimize_mirror(const char *function, offs_t addrstart
 	changing_bits |= changing_bits >> 8;
 	changing_bits |= changing_bits >> 16;
 
-	if (addrmirror & ~m_bytemask)
-		fatalerror("%s: In range %x-%x mirror %x, mirror is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, addrmirror, m_bytemask, addrmirror & m_bytemask);
+	if (addrmirror & ~m_addrmask)
+		fatalerror("%s: In range %x-%x mirror %x, mirror is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, addrmirror, m_bytemask, addrmirror & m_addrmask);
 	if (addrmirror & changing_bits)
 		fatalerror("%s: In range %x-%x mirror %x, mirror touches a changing address bit, did you mean %x ?\n", function, addrstart, addrend, addrmirror, addrmirror & ~changing_bits);
 	if (addrmirror & set_bits)
@@ -1973,9 +1973,9 @@ void address_space::check_address(const char *function, offs_t addrstart, offs_t
 {
 	if (addrstart > addrend)
 		fatalerror("%s: In range %x-%x, start address is after the end address.\n", function, addrstart, addrend);
-	if (addrstart & ~m_bytemask)
+	if (addrstart & ~m_addrmask)
 		fatalerror("%s: In range %x-%x, start address is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, m_bytemask, addrstart & m_bytemask);
-	if (addrend & ~m_bytemask)
+	if (addrend & ~m_addrmask)
 		fatalerror("%s: In range %x-%x, end address is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, m_bytemask, addrend & m_bytemask);
 
 	offs_t lowbits_mask = (m_config.data_width() >> (3 - m_config.m_addrbus_shift)) - 1;
