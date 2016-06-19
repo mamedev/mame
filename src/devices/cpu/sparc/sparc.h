@@ -9,6 +9,34 @@
 #ifndef __SPARC_H__
 #define __SPARC_H__
 
+#define SPARC_RESET							0
+#define SPARC_INSTRUCTION_ACCESS_EXCEPTION	1
+#define SPARC_ILLEGAL_INSTRUCTION			2
+#define SPARC_PRIVILEGED_INSTRUCTION		3
+#define SPARC_FLOATING_POINT_DISABLED		4
+#define SPARC_WINDOW_OVERFLOW				5
+#define SPARC_WINDOW_UNDERFLOW				6
+#define SPARC_MEM_ADDRESS_NOT_ALIGNED		7
+#define SPARC_FLOATING_POINT_EXCEPTION		8
+#define SPARC_DATA_ACCESS_EXCEPTION			9
+#define SPARC_TAG_OVERFLOW					10
+#define SPARC_INT1							17
+#define SPARC_INT2							18
+#define SPARC_INT3							19
+#define SPARC_INT4							20
+#define SPARC_INT5							21
+#define SPARC_INT6							22
+#define SPARC_INT7							23
+#define SPARC_INT8							24
+#define SPARC_INT9							25
+#define SPARC_INT10							26
+#define SPARC_INT11							27
+#define SPARC_INT12							28
+#define SPARC_INT13							29
+#define SPARC_INT14							30
+#define SPARC_INT15							31
+#define SPARC_TRAP_INSTRUCTION				128
+
 class mb86901_device : public cpu_device
 {
 public:
@@ -40,8 +68,12 @@ public:
 	UINT8 get_asi() { return m_asi; }
 	UINT32 pc() { return m_pc; }
 
+	void trap(UINT8 type, UINT8 tt_override = 0);
+	void set_mae() { m_mae = true; }
+	void hold_bus() { m_hold_bus = true; }
+	void release_bus() { m_hold_bus = false; }
+
 protected:
-	void queue_trap(UINT8 type, UINT8 tt_override = 0);
 	bool invoke_queued_traps();
 	bool check_main_traps(UINT32 op, bool privileged, UINT32 alignment, UINT8 registeralign, bool noimmediate);
 
@@ -103,6 +135,8 @@ protected:
 	UINT8 m_trap_priorities[256];
 	UINT8 m_queued_tt;
 	UINT8 m_queued_priority;
+	bool m_mae;
+	bool m_hold_bus;
 	int m_icount;
 
 	// debugger helpers

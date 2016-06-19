@@ -165,6 +165,12 @@ void mb86901_device::device_stop()
 
 void mb86901_device::device_reset()
 {
+	m_queued_tt = 0;
+	m_queued_priority = 0;
+	m_asi = 0;
+	MAE = false;
+	HOLD_BUS = false;
+
 	PC = 0;
 	nPC = 4;
 	memset(m_r, 0, sizeof(UINT32) * 120);
@@ -699,7 +705,7 @@ bool mb86901_device::execute_group2(UINT32 op)
 			bool v = ((arg1 & 0x80000000) == (arg2 & 0x80000000) && (arg2 & 0x80000000) != (result & 0x80000000)) || ((arg1 & 3) != 0) || ((arg2 & 3) != 0);
 			if (v)
 			{
-				queue_trap(sparc_tag_overflow);
+				trap(SPARC_TAG_OVERFLOW);
 			}
 			else
 			{
@@ -716,7 +722,7 @@ bool mb86901_device::execute_group2(UINT32 op)
 			bool v = ((arg1 & 0x80000000) == (arg2 & 0x80000000) && (arg2 & 0x80000000) != (result & 0x80000000)) || ((arg1 & 3) != 0) || ((arg2 & 3) != 0);
 			if (v)
 			{
-				queue_trap(sparc_tag_overflow);
+				trap(SPARC_TAG_OVERFLOW);
 			}
 			else
 			{
@@ -795,7 +801,7 @@ bool mb86901_device::execute_group2(UINT32 op)
 		case 41:	// rd psr
 			if (IS_USER)
 			{
-				queue_trap(sparc_privileged_instruction);
+				trap(SPARC_PRIVILEGED_INSTRUCTION);
 			}
 			else
 			{
@@ -805,7 +811,7 @@ bool mb86901_device::execute_group2(UINT32 op)
 		case 42:	// rd wim
 			if (IS_USER)
 			{
-				queue_trap(sparc_privileged_instruction);
+				trap(SPARC_PRIVILEGED_INSTRUCTION);
 			}
 			else
 			{
@@ -815,7 +821,7 @@ bool mb86901_device::execute_group2(UINT32 op)
 		case 43:	// rd tbr
 			if (IS_USER)
 			{
-				queue_trap(sparc_privileged_instruction);
+				trap(SPARC_PRIVILEGED_INSTRUCTION);
 			}
 			else
 			{
@@ -837,14 +843,14 @@ bool mb86901_device::execute_group2(UINT32 op)
 		case 49:	// wr psr
 			if (IS_USER)
 			{
-				queue_trap(sparc_privileged_instruction);
+				trap(SPARC_PRIVILEGED_INSTRUCTION);
 			}
 			else
 			{
 				UINT32 new_psr = (arg1 ^ arg2) & ~PSR_ZERO_MASK;
 				if ((new_psr & PSR_CWP_MASK) >= WINDOW_COUNT)
 				{
-					queue_trap(sparc_illegal_instruction);
+					trap(SPARC_ILLEGAL_INSTRUCTION);
 				}
 				else
 				{
@@ -856,7 +862,7 @@ bool mb86901_device::execute_group2(UINT32 op)
 		case 50:	// wr wim
 			if (IS_USER)
 			{
-				queue_trap(sparc_privileged_instruction);
+				trap(SPARC_PRIVILEGED_INSTRUCTION);
 			}
 			else
 			{
@@ -866,7 +872,7 @@ bool mb86901_device::execute_group2(UINT32 op)
 		case 51:	// wr tbr
 			if (IS_USER)
 			{
-				queue_trap(sparc_privileged_instruction);
+				trap(SPARC_PRIVILEGED_INSTRUCTION);
 			}
 			else
 			{
@@ -876,13 +882,13 @@ bool mb86901_device::execute_group2(UINT32 op)
 		case 52: // FPop1
 			if (FPU_DISABLED)
 			{
-				queue_trap(sparc_floating_point_disabled);
+				trap(SPARC_FLOATING_POINT_DISABLED);
 			}
 			break;
 		case 53: // FPop2
 			if (FPU_DISABLED)
 			{
-				queue_trap(sparc_floating_point_disabled);
+				trap(SPARC_FLOATING_POINT_DISABLED);
 			}
 			break;
 		case 56:	// jmpl
@@ -891,7 +897,7 @@ bool mb86901_device::execute_group2(UINT32 op)
 			m_icount--;
 			if (addr & 3)
 			{
-				queue_trap(sparc_mem_address_not_aligned);
+				trap(SPARC_MEM_ADDRESS_NOT_ALIGNED);
 			}
 			else
 			{
@@ -909,11 +915,11 @@ bool mb86901_device::execute_group2(UINT32 op)
 			{
 				if (IS_USER)
 				{
-					queue_trap(sparc_privileged_instruction);
+					trap(SPARC_PRIVILEGED_INSTRUCTION);
 				}
 				else
 				{
-					queue_trap(sparc_illegal_instruction);
+					trap(SPARC_ILLEGAL_INSTRUCTION);
 				}
 				break;
 			}
@@ -921,17 +927,17 @@ bool mb86901_device::execute_group2(UINT32 op)
 			{
 				if (IS_USER)
 				{
-					queue_trap(sparc_reset, sparc_privileged_instruction);
+					trap(SPARC_RESET, SPARC_PRIVILEGED_INSTRUCTION);
 					break;
 				}
 				else if (m_wim & (1 << new_cwp))
 				{
-					queue_trap(sparc_reset, sparc_window_underflow);
+					trap(SPARC_RESET, SPARC_WINDOW_UNDERFLOW);
 					break;
 				}
 				else if (ADDRESS & 3)
 				{
-					queue_trap(sparc_reset, sparc_mem_address_not_aligned);
+					trap(SPARC_RESET, SPARC_MEM_ADDRESS_NOT_ALIGNED);
 					break;
 				}
 			}
@@ -963,7 +969,7 @@ bool mb86901_device::execute_group2(UINT32 op)
 			UINT8 new_cwp = ((m_cwp + WINDOW_COUNT) - 1) % WINDOW_COUNT;
 			if (m_wim & (1 << new_cwp))
 			{
-				queue_trap(sparc_window_overflow);
+				trap(SPARC_WINDOW_OVERFLOW);
 			}
 			else
 			{
@@ -976,7 +982,7 @@ bool mb86901_device::execute_group2(UINT32 op)
 			UINT8 new_cwp = (m_cwp + 1) % WINDOW_COUNT;
 			if (m_wim & (1 << new_cwp))
 			{
-				queue_trap(sparc_window_overflow);
+				trap(SPARC_WINDOW_UNDERFLOW);
 			}
 			else
 			{
@@ -985,7 +991,7 @@ bool mb86901_device::execute_group2(UINT32 op)
 			break;
 		}
 		default:
-			queue_trap(sparc_illegal_instruction);
+			trap(SPARC_ILLEGAL_INSTRUCTION);
 			break;
 	}
 
@@ -1014,17 +1020,17 @@ bool mb86901_device::check_main_traps(UINT32 op, bool privileged, UINT32 alignme
 	bool trap_queued = false;
 	if (privileged && !m_s)
 	{
-		queue_trap(sparc_privileged_instruction);
+		trap(SPARC_PRIVILEGED_INSTRUCTION);
 		trap_queued = true;
 	}
 	if (alignment & ADDRESS)
 	{
-		queue_trap(sparc_mem_address_not_aligned);
+		trap(SPARC_MEM_ADDRESS_NOT_ALIGNED);
 		trap_queued = true;
 	}
 	if ((registeralign & RD) || (noimmediate && USEIMM))
 	{
-		queue_trap(sparc_illegal_instruction);
+		trap(SPARC_ILLEGAL_INSTRUCTION);
 		trap_queued = true;
 	}
 	return trap_queued;
@@ -1051,21 +1057,44 @@ void mb86901_device::execute_group3(UINT32 op)
 	switch (OP3)
 	{
 		case 0:		// ld
+		{
 			check_main_traps(op, false, 3, 0, false);
-			SET_RDREG(read_word(m_data_asi, ADDRESS));
+			UINT32 result = read_word(m_data_asi, ADDRESS);
+			if (MAE || HOLD_BUS)
+				break;
+			SET_RDREG(result);
 			break;
+		}
 		case 1:		// ldub
-			SET_RDREG(read_byte(m_data_asi, ADDRESS));
+		{
+			UINT32 result = read_byte(m_data_asi, ADDRESS);
+			if (MAE || HOLD_BUS)
+				break;
+			SET_RDREG(result);
 			break;
+		}
 		case 2:		// lduh
+		{
 			check_main_traps(op, false, 1, 0, false);
-			SET_RDREG(read_half(m_data_asi, ADDRESS));
+			UINT32 result = read_half(m_data_asi, ADDRESS);
+			if (MAE || HOLD_BUS)
+				break;
+			SET_RDREG(result);
 			break;
+		}
 		case 3:		// ldd
+		{
 			check_main_traps(op, false, 7, 1, false);
-			SET_RDREG(read_word(m_data_asi, ADDRESS));
-			REG(RD+1) = read_word(m_data_asi, ADDRESS+4);
+			UINT32 result = read_word(m_data_asi, ADDRESS);
+			if (MAE || HOLD_BUS)
+				break;
+			SET_RDREG(result);
+			result = read_word(m_data_asi, ADDRESS+4);
+			if (MAE || HOLD_BUS)
+				break;
+			REG(RD+1) = result;
 			break;
+		}
 		case 4:		// st
 			check_main_traps(op, false, 3, 0, false);
 			write_word(m_data_asi, ADDRESS, RDREG);
@@ -1080,38 +1109,78 @@ void mb86901_device::execute_group3(UINT32 op)
 		case 7:		// std
 			check_main_traps(op, false, 7, 1, false);
 			write_word(m_data_asi, ADDRESS, RDREG);
+			if (MAE || HOLD_BUS)
+				break;
 			write_word(m_data_asi, ADDRESS, REG(RD+1));
 			break;
 		case 9:		// ldsb
-			SET_RDREG(read_signed_byte(m_data_asi, ADDRESS));
+		{
+			UINT32 result = read_signed_byte(m_data_asi, ADDRESS);
+			if (MAE || HOLD_BUS)
+				break;
+			SET_RDREG(result);
 			break;
+		}
 		case 10:	// lsdh
+		{
 			check_main_traps(op, false, 1, 0, false);
-			SET_RDREG(read_signed_half(m_data_asi, ADDRESS));
+			UINT32 result = read_signed_half(m_data_asi, ADDRESS);
+			if (MAE || HOLD_BUS)
+				break;
+			SET_RDREG(result);
 			break;
+		}
 		case 13:	// ldstub
-			SET_RDREG(read_byte(m_data_asi, ADDRESS));
+		{
+			UINT32 result = read_byte(m_data_asi, ADDRESS);
+			if (MAE || HOLD_BUS)
+				break;
+			SET_RDREG(result);
 			write_byte(m_data_asi, ADDRESS, 0xff);
 			break;
+		}
 		case 15:	// swap, SPARCv8
 			break;
 		case 16:	// lda
+		{
 			check_main_traps(op, true, 3, 0, true);
-			SET_RDREG(read_word(ASI, ADDRESS));
+			UINT32 result = read_word(ASI, ADDRESS);
+			if (MAE || HOLD_BUS)
+				break;
+			SET_RDREG(result);
 			break;
+		}
 		case 17:	// lduba
+		{
 			check_main_traps(op, true, 0, 0, true);
-			SET_RDREG(read_byte(ASI, ADDRESS));
+			UINT32 result = read_byte(ASI, ADDRESS);
+			if (MAE || HOLD_BUS)
+				break;
+			SET_RDREG(result);
 			break;
+		}
 		case 18:	// lduha
+		{
 			check_main_traps(op, true, 1, 0, true);
-			SET_RDREG(read_half(ASI, ADDRESS));
+			UINT32 result = read_half(ASI, ADDRESS);
+			if (MAE || HOLD_BUS)
+				break;
+			SET_RDREG(result);
 			break;
+		}
 		case 19:	// ldda
+		{
 			check_main_traps(op, true, 7, 1, true);
-			SET_RDREG(read_word(ASI, ADDRESS));
-			REG(RD+1) = read_word(ASI, ADDRESS+4);
+			UINT32 result = read_word(ASI, ADDRESS);
+			if (MAE || HOLD_BUS)
+				break;
+			SET_RDREG(result);
+			result = read_word(ASI, ADDRESS+4);
+			if (MAE || HOLD_BUS)
+				break;
+			REG(RD+1) = result;
 			break;
+		}
 		case 20:	// sta
 			check_main_traps(op, true, 3, 0, true);
 			write_word(ASI, ADDRESS, RDREG);
@@ -1127,36 +1196,67 @@ void mb86901_device::execute_group3(UINT32 op)
 		case 23:	// stda
 			check_main_traps(op, true, 7, 1, true);
 			write_word(ASI, ADDRESS, RDREG);
+			if (MAE || HOLD_BUS)
+				break;
 			write_word(ASI, ADDRESS+4, REG(RD+1));
 			break;
 		case 25:	// ldsba
+		{
 			check_main_traps(op, true, 0, 0, true);
-			SET_RDREG(read_signed_byte(ASI, ADDRESS));
+			UINT32 result = read_signed_byte(ASI, ADDRESS);
+			if (MAE || HOLD_BUS)
+				break;
+			SET_RDREG(result);
 			break;
+		}
 		case 26:	// ldsha
+		{
 			check_main_traps(op, true, 1, 0, true);
-			SET_RDREG(read_signed_half(ASI, ADDRESS));
+			UINT32 result = read_signed_half(ASI, ADDRESS);
+			if (MAE || HOLD_BUS)
+				break;
+			SET_RDREG(result);
 			break;
+		}
 		case 29:	// ldstuba
+		{
 			check_main_traps(op, true, 0, 0, true);
-			SET_RDREG(read_byte(ASI, ADDRESS));
+			UINT32 result = read_byte(ASI, ADDRESS);
+			if (MAE || HOLD_BUS)
+				break;
+			SET_RDREG(result);
 			write_byte(ASI, ADDRESS, 0xff);
 			break;
+		}
 		case 31:	// swapa, SPARCv8
 			break;
 		case 32:	// ld fpr
+			if (FPU_DISABLED)
+				trap(SPARC_FLOATING_POINT_DISABLED);
 			break;
 		case 33:	// ld fsr
+			if (FPU_DISABLED)
+				trap(SPARC_FLOATING_POINT_DISABLED);
 			break;
 		case 35:	// ldd fpr
+			if (FPU_DISABLED)
+				trap(SPARC_FLOATING_POINT_DISABLED);
 			break;
 		case 36:	// st fpr
+			if (FPU_DISABLED)
+				trap(SPARC_FLOATING_POINT_DISABLED);
 			break;
 		case 37:	// st fsr
+			if (FPU_DISABLED)
+				trap(SPARC_FLOATING_POINT_DISABLED);
 			break;
 		case 38:	// std fq, SPARCv8
+			if (FPU_DISABLED)
+				trap(SPARC_FLOATING_POINT_DISABLED);
 			break;
 		case 39:	// std fpr
+			if (FPU_DISABLED)
+				trap(SPARC_FLOATING_POINT_DISABLED);
 			break;
 		case 40:	// ld cpr, SPARCv8
 			break;
@@ -1174,7 +1274,10 @@ void mb86901_device::execute_group3(UINT32 op)
 			break;
 	}
 
-	m_icount -= ldst_cycles[OP3];
+	if (MAE || HOLD_BUS)
+		m_icount--;
+	else
+		m_icount -= ldst_cycles[OP3];
 }
 
 
@@ -1253,7 +1356,7 @@ bool mb86901_device::execute_ticc(UINT32 op)
 	{
 		UINT32 arg2 = USEIMM ? SIMM7 : RS2REG;
 		UINT8 tt = 128 + ((RS1REG + arg2) & 0x7f);
-		queue_trap(sparc_trap_instruction, tt);
+		trap(SPARC_TRAP_INSTRUCTION, tt);
 		m_icount -= 3;
 		return false;
 	}
@@ -1263,24 +1366,32 @@ bool mb86901_device::execute_ticc(UINT32 op)
 
 
 //-------------------------------------------------
-//  queue_trap - flag an incoming trap of a given
+//  trap - flag an incoming trap of a given
 //  type
 //-------------------------------------------------
 
-void mb86901_device::queue_trap(UINT8 type, UINT8 tt_override)
+void mb86901_device::trap(UINT8 type, UINT8 tt_override)
 {
-	if (type == sparc_reset)
+	if (type == SPARC_RESET)
 	{
 		m_queued_priority = m_trap_priorities[0];
 		m_queued_tt = tt_override;
 	}
 	else
 	{
-		if (type == sparc_trap_instruction)
+		if (type == SPARC_TRAP_INSTRUCTION)
 		{
 			type = tt_override;
 		}
 
+		if (type >= SPARC_INT1 && type <= SPARC_INT14)
+		{
+			if (!ET)
+				return;
+			int irl = (type - SPARC_INT1) + 1;
+			if (irl <= PIL)
+				return;
+		}
 		if (m_trap_priorities[type] < m_queued_priority)
 		{
 			m_queued_priority = m_trap_priorities[type];
@@ -1302,6 +1413,7 @@ bool mb86901_device::invoke_queued_traps()
 	if (m_queued_priority > 0)
 	{
 		m_queued_priority = 0;
+		m_queued_tt = 0;
 
 		m_et = false;
 		m_ps = m_s;
@@ -1336,8 +1448,20 @@ void mb86901_device::execute_run()
 
 	while (m_icount > 0)
 	{
+		bool trap_was_queued = invoke_queued_traps();
+		if (trap_was_queued)
+		{
+			m_icount -= 4;
+			continue;
+		}
+
 		debugger_instruction_hook(this, m_pc);
 
+		if (HOLD_BUS)
+		{
+			m_icount--;
+			continue;
+		}
 		UINT32 op = GET_OPCODE;
 
 		bool update_npc = true;
@@ -1390,7 +1514,7 @@ void mb86901_device::execute_run()
 		REG(0) = 0;
 
 		bool trap_taken = invoke_queued_traps();
-		if (!trap_taken && update_npc)
+		if (!trap_taken && update_npc && !HOLD_BUS)
 		{
 			PC = nPC;
 			nPC = PC + 4;
