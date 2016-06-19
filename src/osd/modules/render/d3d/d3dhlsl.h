@@ -301,14 +301,13 @@ public:
 	shaders();
 	~shaders();
 
-	void init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *renderer);
+	bool init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *renderer);
 
-	bool enabled() { return master_enable; }
-	void toggle(std::vector<ui::menu_item>& sliders);
+	bool enabled() { return post_fx_enable && d3dintf->post_fx_available; }
+	void toggle() { post_fx_enable = initialized && !post_fx_enable; }
 
-	bool vector_enabled() { return master_enable && vector_enable; }
 	d3d_render_target* get_vector_target(render_primitive *prim);
-	void create_vector_target(render_primitive *prim);
+	bool create_vector_target(render_primitive *prim);
 
 	void begin_frame();
 	void end_frame();
@@ -339,13 +338,14 @@ public:
 	void                    remove_render_target(int source_width, int source_height, UINT32 screen_index, UINT32 page_index);
 	void                    remove_render_target(d3d_render_target *rt);
 
-	int create_resources(bool reset, std::vector<ui::menu_item>& sliders);
-	void delete_resources(bool reset);
+	int create_resources();
+	void delete_resources();
 
 	// slider-related functions
 	virtual INT32 slider_changed(running_machine &machine, void *arg, int /*id*/, std::string *str, INT32 newval) override;
 	slider_state* slider_alloc(running_machine &machine, int id, const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, void *arg);
-	std::vector<ui::menu_item> init_slider_list();
+	void init_slider_list();
+	std::vector<ui::menu_item> get_slider_list() { return m_sliders; }
 	void *get_slider_option(int id, int index = 0);
 
 private:
@@ -382,8 +382,7 @@ private:
 	running_machine *       machine;
 	renderer_d3d9 *         d3d;                        // D3D renderer
 
-	bool                    master_enable;              // overall enable flag
-	bool                    vector_enable;              // vector post-processing enable flag
+	bool                    post_fx_enable;             // overall enable flag
 	bool                    oversampling_enable;        // oversampling enable flag
 	bool                    paused;                     // whether or not rendering is currently paused
 	int                     num_screens;                // number of emulated physical screens
@@ -442,6 +441,7 @@ private:
 	cache_target *          cachehead;
 
 	std::vector<slider*>    internal_sliders;
+	std::vector<ui::menu_item> m_sliders;
 
 	static slider_desc      s_sliders[];
 	static hlsl_options     last_options;               // last used options

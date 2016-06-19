@@ -137,7 +137,7 @@ int renderer_d3d9::create()
 
 void renderer_d3d9::toggle_fsfx()
 {
-	set_restarting(true);
+	set_toggle(true);
 }
 
 void renderer_d3d9::record()
@@ -184,14 +184,14 @@ render_primitive_list *renderer_d3d9::get_primitives()
 bool renderer_d3d9::init(running_machine &machine)
 {
 	d3dintf = global_alloc(d3d_base);
-	
+
 	d3dintf->d3d9_dll = osd::dynamic_module::open({ "d3d9.dll" });
 
 	d3d9_create_fn d3d9_create_ptr = d3dintf->d3d9_dll->bind<d3d9_create_fn>("Direct3DCreate9");
 	if (d3d9_create_ptr == nullptr)
 	{
 		osd_printf_verbose("Direct3D: Unable to find Direct3D 9 runtime library\n");
-		return true;		
+		return true;
 	}
 
 	d3dintf->d3dobj = (*d3d9_create_ptr)(D3D_SDK_VERSION);
@@ -520,21 +520,23 @@ texture_info *d3d_texture_manager::find_texinfo(const render_texinfo *texinfo, U
 
 renderer_d3d9::renderer_d3d9(std::shared_ptr<osd_window> window)
 	: osd_renderer(window, FLAG_NONE), m_adapter(0), m_width(0), m_height(0), m_refresh(0), m_create_error_count(0), m_device(nullptr), m_gamma_supported(0), m_pixformat(),
-	m_vertexbuf(nullptr), m_lockedbuf(nullptr), m_numverts(0), m_vectorbatch(nullptr), m_batchindex(0), m_numpolys(0), m_restarting(false), m_mod2x_supported(0), m_mod4x_supported(0),
+	m_vertexbuf(nullptr), m_lockedbuf(nullptr), m_numverts(0), m_vectorbatch(nullptr), m_batchindex(0), m_numpolys(0), m_toggle(false),
 	m_screen_format(), m_last_texture(nullptr), m_last_texture_flags(0), m_last_blendenable(0), m_last_blendop(0), m_last_blendsrc(0), m_last_blenddst(0), m_last_filter(0),
-	m_last_wrap(), m_last_modmode(0), m_hlsl_buf(nullptr), m_shaders(nullptr), m_shaders_options(nullptr), m_texture_manager(nullptr)
+	m_last_wrap(), m_last_modmode(0), m_hlsl_buf(nullptr), m_shaders(nullptr), m_texture_manager(nullptr)
 {
 }
 
 int renderer_d3d9::initialize()
 {
+	osd_printf_verbose("Direct3D: Initialize\n");
+
 	// configure the adapter for the mode we want
 	if (config_adapter_mode())
 	{
 		return false;
 	}
 
-	// create the device immediately for the full screen case (defer for window mode)
+	// create the device immediately for the full screen case (defer for window mode in update_window_size())
 	auto win = assert_window();
 	if (win->fullscreen() && device_create(win->main_window()->platform_window<HWND>()))
 	{
@@ -552,13 +554,24 @@ int renderer_d3d9::pre_window_draw_check()
 	if (win->m_resize_state == RESIZE_STATE_RESIZING)
 		return 0;
 
-	// if we're restarting the renderer, leave things alone
-	if (m_restarting)
+	// check if shaders should be toggled
+	if (m_toggle)
 	{
-		m_sliders.clear();
-		m_shaders->toggle(m_sliders);
+		m_toggle = false;
 
-		m_restarting = false;
+		// free resources
+		device_delete_resources();
+
+		m_shaders->toggle();
+		m_sliders_dirty = true;
+
+		// re-create resources 
+		if (device_create_resources())
+		{
+			osd_printf_verbose("Direct3D: failed to recreate resources for device; failing permanently\n");
+			device_delete();
+			return 1;
+		}
 	}
 
 	// if we have a device, check the cooperative level
@@ -630,11 +643,14 @@ void d3d_texture_manager::update_textures()
 		}
 		else if(PRIMFLAG_GET_VECTORBUF(prim.flags))
 		{
-			if (m_renderer->get_shaders()->vector_enabled())
+			if (m_renderer->get_shaders()->enabled())
 			{
 				if (!m_renderer->get_shaders()->get_vector_target(&prim))
 				{
-					m_renderer->get_shaders()->create_vector_target(&prim);
+					if (!m_renderer->get_shaders()->create_vector_target(&prim))
+					{
+						d3dintf->post_fx_available = false;
+					}
 				}
 			}
 		}
@@ -736,6 +752,65 @@ void renderer_d3d9::end_frame()
 		osd_printf_verbose("Direct3D: Error %08lX during device present call\n", result);
 }
 
+void renderer_d3d9::update_presentation_parameters()
+{
+	auto win = assert_window();
+
+	memset(&m_presentation, 0, sizeof(m_presentation));
+	m_presentation.BackBufferWidth = m_width;
+	m_presentation.BackBufferHeight = m_height;
+	m_presentation.BackBufferFormat = m_pixformat;
+	m_presentation.BackBufferCount = video_config.triplebuf ? 2 : 1;
+	m_presentation.MultiSampleType = D3DMULTISAMPLE_NONE;
+	m_presentation.SwapEffect = D3DSWAPEFFECT_DISCARD;
+	m_presentation.hDeviceWindow = win->platform_window<HWND>();
+	m_presentation.Windowed = !win->fullscreen() || win->win_has_menu();
+	m_presentation.EnableAutoDepthStencil = FALSE;
+	m_presentation.AutoDepthStencilFormat = D3DFMT_D16;
+	m_presentation.Flags = 0;
+	m_presentation.FullScreen_RefreshRateInHz = m_refresh;
+	m_presentation.PresentationInterval = (
+		(video_config.triplebuf && win->fullscreen())
+		|| video_config.waitvsync
+		|| video_config.syncrefresh)
+			? D3DPRESENT_INTERVAL_ONE
+			: D3DPRESENT_INTERVAL_IMMEDIATE;
+}
+
+
+void renderer_d3d9::update_gamma_ramp()
+{
+	if (m_gamma_supported)
+	{
+		return;
+	}
+
+	auto win = assert_window();
+
+	// create a standard ramp
+	D3DGAMMARAMP ramp;
+
+	// set the gamma if we need to
+	if (win->fullscreen())
+	{
+		// only set the gamma if it's not 1.0
+		windows_options &options = downcast<windows_options &>(win->machine().options());
+		float brightness = options.full_screen_brightness();
+		float contrast = options.full_screen_contrast();
+		float gamma = options.full_screen_gamma();
+		if (brightness != 1.0f || contrast != 1.0f || gamma != 1.0f)
+		{
+			for (int i = 0; i < 256; i++)
+			{
+				ramp.red[i] = ramp.green[i] = ramp.blue[i] = apply_brightness_contrast_gamma(i, brightness, contrast, gamma) << 8;
+			}
+		}
+	}
+
+	m_device->SetGammaRamp(0, 0, &ramp);
+}
+
+
 //============================================================
 //  device_create
 //============================================================
@@ -749,22 +824,8 @@ int renderer_d3d9::device_create(HWND device_hwnd)
 	}
 
 	// verify the caps
-	int verify = device_verify_caps();
-	if (verify == 2)
+	if (device_verify_caps())
 	{
-		osd_printf_error("Error: Device does not meet minimum requirements for Direct3D rendering\n");
-		return 1;
-	}
-	if (verify == 1)
-	{
-		osd_printf_warning("Warning: Device may not perform well for Direct3D rendering\n");
-	}
-
-	// verify texture formats
-	HRESULT result = d3dintf->d3dobj->CheckDeviceFormat(m_adapter, D3DDEVTYPE_HAL, m_pixformat, 0, D3DRTYPE_TEXTURE, D3DFMT_A8R8G8B8);
-	if (FAILED(result))
-	{
-		osd_printf_error("Error: A8R8G8B8 format textures not supported\n");
 		return 1;
 	}
 
@@ -773,12 +834,20 @@ int renderer_d3d9::device_create(HWND device_hwnd)
 try_again:
 	// try for XRGB first
 	m_screen_format = D3DFMT_X8R8G8B8;
-	result = d3dintf->d3dobj->CheckDeviceFormat(m_adapter, D3DDEVTYPE_HAL, m_pixformat, m_texture_manager->is_dynamic_supported() ? D3DUSAGE_DYNAMIC : 0, D3DRTYPE_TEXTURE, m_screen_format);
+	HRESULT result = d3dintf->d3dobj->CheckDeviceFormat(m_adapter, D3DDEVTYPE_HAL, m_pixformat, 
+		m_texture_manager->is_dynamic_supported() 
+			? D3DUSAGE_DYNAMIC
+			: 0,
+		D3DRTYPE_TEXTURE, m_screen_format);
 	if (FAILED(result))
 	{
 		// if not, try for ARGB
 		m_screen_format = D3DFMT_A8R8G8B8;
-		result = d3dintf->d3dobj->CheckDeviceFormat(m_adapter, D3DDEVTYPE_HAL, m_pixformat, m_texture_manager->is_dynamic_supported() ? D3DUSAGE_DYNAMIC : 0, D3DRTYPE_TEXTURE, m_screen_format);
+		result = d3dintf->d3dobj->CheckDeviceFormat(m_adapter, D3DDEVTYPE_HAL, m_pixformat,
+			m_texture_manager->is_dynamic_supported()
+				? D3DUSAGE_DYNAMIC
+				: 0,
+			D3DRTYPE_TEXTURE, m_screen_format);
 		if (FAILED(result) && m_texture_manager->is_dynamic_supported())
 		{
 			m_texture_manager->set_dynamic_supported(FALSE);
@@ -791,29 +860,12 @@ try_again:
 		}
 	}
 
-	auto win = assert_window();
-
 	// initialize the D3D presentation parameters
-	memset(&m_presentation, 0, sizeof(m_presentation));
-	m_presentation.BackBufferWidth               = m_width;
-	m_presentation.BackBufferHeight              = m_height;
-	m_presentation.BackBufferFormat              = m_pixformat;
-	m_presentation.BackBufferCount               = video_config.triplebuf ? 2 : 1;
-	m_presentation.MultiSampleType               = D3DMULTISAMPLE_NONE;
-	m_presentation.SwapEffect                    = D3DSWAPEFFECT_DISCARD;
-	m_presentation.hDeviceWindow                 = win->platform_window<HWND>();
-	m_presentation.Windowed                      = !win->fullscreen() || win->win_has_menu();
-	m_presentation.EnableAutoDepthStencil        = FALSE;
-	m_presentation.AutoDepthStencilFormat        = D3DFMT_D16;
-	m_presentation.Flags                         = 0;
-	m_presentation.FullScreen_RefreshRateInHz    = m_refresh;
-	m_presentation.PresentationInterval          = ((video_config.triplebuf && win->fullscreen()) ||
-													video_config.waitvsync || video_config.syncrefresh) ?
-													D3DPRESENT_INTERVAL_ONE : D3DPRESENT_INTERVAL_IMMEDIATE;
+	update_presentation_parameters();
 
 	// create the D3D device
-	result = d3dintf->d3dobj->CreateDevice(m_adapter, D3DDEVTYPE_HAL, device_hwnd,
-					D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE, &m_presentation, &m_device);
+	result = d3dintf->d3dobj->CreateDevice(
+		m_adapter, D3DDEVTYPE_HAL, device_hwnd,	D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE, &m_presentation, &m_device);
 	if (FAILED(result))
 	{
 		// if we got a "DEVICELOST" error, it may be transitory; count it and only fail if
@@ -834,52 +886,7 @@ try_again:
 	m_create_error_count = 0;
 	osd_printf_verbose("Direct3D: Device created at %dx%d\n", m_width, m_height);
 
-	// set the gamma if we need to
-	if (win->fullscreen())
-	{
-		// only set the gamma if it's not 1.0f
-		windows_options &options = downcast<windows_options &>(win->machine().options());
-		float brightness = options.full_screen_brightness();
-		float contrast = options.full_screen_contrast();
-		float gamma = options.full_screen_gamma();
-		if (brightness != 1.0f || contrast != 1.0f || gamma != 1.0f)
-		{
-			// warn if we can't do it
-			if (!m_gamma_supported)
-			{
-				osd_printf_warning("Direct3D: Warning - device does not support full screen gamma correction.\n");
-			}
-			else
-			{
-				// create a standard ramp and set it
-				D3DGAMMARAMP ramp;
-				for (int i = 0; i < 256; i++)
-				{
-					ramp.red[i] = ramp.green[i] = ramp.blue[i] = apply_brightness_contrast_gamma(i, brightness, contrast, gamma) << 8;
-				}
-				m_device->SetGammaRamp(0, 0, &ramp);
-			}
-		}
-	}
-
-	// create shader options only once
-	if (m_shaders_options == nullptr)
-	{
-		m_shaders_options = (hlsl_options*)global_alloc_clear<hlsl_options>();
-		m_shaders_options->params_init = false;
-	}
-
-	m_shaders = (shaders*)global_alloc_clear<shaders>();
-	m_shaders->init(d3dintf, &win->machine(), this);
-
-	m_sliders.clear();
-	int failed = m_shaders->create_resources(false, m_sliders);
-	if (failed)
-	{
-		return failed;
-	}
-
-	m_sliders_dirty = true;
+	update_gamma_ramp();
 
 	return device_create_resources();
 }
@@ -891,11 +898,35 @@ try_again:
 
 int renderer_d3d9::device_create_resources()
 {
+	auto win = assert_window();
+
+	// create shaders only once
+	if (m_shaders == nullptr)
+	{
+		m_shaders = (shaders*)global_alloc_clear<shaders>();
+	}
+
+	if (m_shaders->init(d3dintf, &win->machine(), this))
+	{
+		m_shaders->init_slider_list();
+		m_sliders_dirty = true;
+	}
+
+	// create resources
+	if (m_shaders->create_resources())
+	{
+		osd_printf_verbose("Direct3D: failed to create HLSL resources for device\n");
+		return 1;
+	}
+
 	// allocate a vertex buffer to use
-	HRESULT result = m_device->CreateVertexBuffer(sizeof(vertex) * VERTEX_BUFFER_SIZE,
-				D3DUSAGE_DYNAMIC | D3DUSAGE_SOFTWAREPROCESSING | D3DUSAGE_WRITEONLY,
-				VERTEX_BASE_FORMAT | ((m_shaders->enabled() && d3dintf->post_fx_available) ? D3DFVF_XYZW : D3DFVF_XYZRHW),
-				D3DPOOL_DEFAULT, &m_vertexbuf, nullptr);
+	HRESULT result = m_device->CreateVertexBuffer(
+		sizeof(vertex) * VERTEX_BUFFER_SIZE,
+		D3DUSAGE_DYNAMIC | D3DUSAGE_SOFTWAREPROCESSING | D3DUSAGE_WRITEONLY,
+		VERTEX_BASE_FORMAT | ((m_shaders->enabled() && d3dintf->post_fx_available) 
+			? D3DFVF_XYZW
+			: D3DFVF_XYZRHW),
+		D3DPOOL_DEFAULT, &m_vertexbuf, nullptr);
 	if (FAILED(result))
 	{
 		osd_printf_error("Error creating vertex buffer (%08X)\n", (UINT32)result);
@@ -903,8 +934,10 @@ int renderer_d3d9::device_create_resources()
 	}
 
 	// set the vertex format
-	result = m_device->SetFVF((D3DFORMAT)(VERTEX_BASE_FORMAT | ((m_shaders->enabled() &&
-		d3dintf->post_fx_available) ? D3DFVF_XYZW : D3DFVF_XYZRHW)));
+	result = m_device->SetFVF(
+		(D3DFORMAT)(VERTEX_BASE_FORMAT | ((m_shaders->enabled() && d3dintf->post_fx_available) 
+			? D3DFVF_XYZW 
+			: D3DFVF_XYZRHW)));
 	if (FAILED(result))
 	{
 		osd_printf_error("Error setting vertex format (%08X)\n", (UINT32)result);
@@ -955,16 +988,15 @@ int renderer_d3d9::device_create_resources()
 
 renderer_d3d9::~renderer_d3d9()
 {
-	if (get_shaders() != nullptr && get_shaders()->recording())
-		get_shaders()->window_record();
-
 	device_delete();
 
-	if (m_shaders_options != nullptr)
-	{
-		global_free(m_shaders_options);
-		m_shaders_options = nullptr;
-	}
+	// todo: throws error when switching from full screen to window mode
+	//if (m_shaders != nullptr)
+	//{
+	//	// delete the HLSL interface
+	//	global_free(m_shaders);
+	//	m_shaders = nullptr;
+	//}
 }
 
 void renderer_d3d9::exit()
@@ -978,18 +1010,10 @@ void renderer_d3d9::exit()
 
 void renderer_d3d9::device_delete()
 {
-	if (m_shaders != nullptr)
-	{
-		// free our effects
-		m_sliders.clear();
-		m_shaders->delete_resources(false);
-
-		// delete the HLSL interface
-		global_free(m_shaders);
-	}
-
 	// free our base resources
 	device_delete_resources();
+
+	// we do not delete the HLSL interface here
 
 	if (m_texture_manager != nullptr)
 	{
@@ -1012,6 +1036,11 @@ void renderer_d3d9::device_delete()
 
 void renderer_d3d9::device_delete_resources()
 {
+	if (m_shaders != nullptr)
+	{
+		m_shaders->delete_resources();
+	}
+
 	if (m_texture_manager != nullptr)
 	{
 		m_texture_manager->delete_resources();
@@ -1032,12 +1061,14 @@ void renderer_d3d9::device_delete_resources()
 
 int renderer_d3d9::device_verify_caps()
 {
-	int retval = 0;
+	int verify = 0;
 
 	D3DCAPS9 caps;
 	HRESULT result = d3dintf->d3dobj->GetDeviceCaps(m_adapter, D3DDEVTYPE_HAL, &caps);
 	if (FAILED(result))
+	{
 		osd_printf_verbose("Direct3D: Error %08lX during GetDeviceCaps call\n", result);
+	}
 
 	if (caps.MaxPixelShader30InstructionSlots < 512)
 	{
@@ -1049,40 +1080,59 @@ int renderer_d3d9::device_verify_caps()
 	if (!(caps.PresentationIntervals & D3DPRESENT_INTERVAL_IMMEDIATE))
 	{
 		osd_printf_verbose("Direct3D: Error - Device does not support immediate presentations\n");
-		retval = 2;
+		verify = 2;
 	}
 	if (!(caps.PresentationIntervals & D3DPRESENT_INTERVAL_ONE))
 	{
 		osd_printf_verbose("Direct3D: Error - Device does not support per-refresh presentations\n");
-		retval = 2;
+		verify = 2;
 	}
 
 	// verify device capabilities
 	if (!(caps.DevCaps & D3DDEVCAPS_CANRENDERAFTERFLIP))
 	{
 		osd_printf_verbose("Direct3D: Warning - Device does not support queued rendering after a page flip\n");
-		retval = 1;
+		verify = 1;
 	}
 	if (!(caps.DevCaps & D3DDEVCAPS_HWRASTERIZATION))
 	{
 		osd_printf_verbose("Direct3D: Warning - Device does not support hardware rasterization\n");
-		retval = 1;
+		verify = 1;
 	}
 
 	// verify texture operation capabilities
 	if (!(caps.TextureOpCaps & D3DTEXOPCAPS_MODULATE))
 	{
 		osd_printf_verbose("Direct3D: Warning - Device does not support texture modulation\n");
-		retval = 1;
+		verify = 1;
 	}
 
-	// set a simpler flag to indicate mod2x and mod4x texture modes
-	m_mod2x_supported = ((caps.TextureOpCaps & D3DTEXOPCAPS_MODULATE2X) != 0);
-	m_mod4x_supported = ((caps.TextureOpCaps & D3DTEXOPCAPS_MODULATE4X) != 0);
-
 	m_gamma_supported = ((caps.Caps2 & D3DCAPS2_FULLSCREENGAMMA) != 0);
+	if (!m_gamma_supported)
+	{
+		osd_printf_warning("Direct3D: Warning - device does not support full screen gamma correction.\n");
+	}
 
-	return retval;
+	// verify texture formats
+	result = d3dintf->d3dobj->CheckDeviceFormat(m_adapter, D3DDEVTYPE_HAL, m_pixformat, 0, D3DRTYPE_TEXTURE, D3DFMT_A8R8G8B8);
+	if (FAILED(result))
+	{
+		osd_printf_error("Error: A8R8G8B8 format textures not supported\n");
+		verify = 2;
+	}
+
+	if (verify == 2)
+	{
+		osd_printf_error("Error: Device does not meet minimum requirements for Direct3D rendering\n");
+		return 1;
+	}
+	if (verify == 1)
+	{
+		osd_printf_warning("Warning: Device may not perform well for Direct3D rendering\n");
+		return 1;
+	}
+
+	return 0;
 }
 
 
@@ -1103,8 +1153,6 @@ int renderer_d3d9::device_test_cooperative()
 		osd_printf_verbose("Direct3D: resetting device\n");
 
 		// free all existing resources and call reset on the device
-		m_sliders.clear();
-		m_shaders->delete_resources(true);
 		device_delete_resources();
 		result = m_device->Reset(&m_presentation);
 
@@ -1122,15 +1170,8 @@ int renderer_d3d9::device_test_cooperative()
 			device_delete();
 			return 1;
 		}
-
-		m_sliders.clear();
-		if (m_shaders->create_resources(true, m_sliders))
-		{
-			osd_printf_verbose("Direct3D: failed to recreate HLSL resources for device; failing permanently\n");
-			device_delete();
-			return 1;
-		}
 	}
+
 	return 0;
 }
 
@@ -1867,6 +1908,28 @@ void renderer_d3d9::primitive_flush_pending()
 	// reset the vertex count
 	m_numverts = 0;
 	m_numpolys = 0;
+}
+
+
+std::vector<ui::menu_item> renderer_d3d9::get_slider_list()
+{
+	m_sliders_dirty = false;
+
+	std::vector<ui::menu_item> sliders;
+	sliders.insert(sliders.end(), m_sliders.begin(), m_sliders.end());
+
+	if (m_shaders != nullptr && m_shaders->enabled())
+	{
+		std::vector<ui::menu_item> s_slider = m_shaders->get_slider_list();
+		sliders.insert(sliders.end(), s_slider.begin(), s_slider.end());
+	}
+
+	return sliders;
+}
+
+void renderer_d3d9::set_sliders_dirty()
+{
+	m_sliders_dirty = true;
 }
 
 
