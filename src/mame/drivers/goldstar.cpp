@@ -7497,9 +7497,9 @@ static GFXDECODE_START( super9 )
 	GFXDECODE_ENTRY( "gfx2", 0, super9_tilelayout, 128,  8 )
 GFXDECODE_END
 
-static GFXDECODE_START( flaming7 )
+static GFXDECODE_START( flaming7 )  // still wrong... FIXME
 	GFXDECODE_ENTRY( "gfx1", 0, flaming7_charlayout,   0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, flaming7_tilelayout, 128,  8 )
+	GFXDECODE_ENTRY( "gfx2", 0, flaming7_tilelayout, 104,  8 )
 GFXDECODE_END
 
 
@@ -14261,7 +14261,8 @@ ROM_START( fl7_50 )  // Serial 00000069A1C9.
 
 	/* Proper bipolar PROM dump */
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "am27s29.u1",  0x0000, 0x0200, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
+	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
+	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
 
 	ROM_REGION( 0x20, "proms2", 0 )
 	ROM_LOAD( "dummy", 0x0000, 0x0020, NO_DUMP )
@@ -14292,7 +14293,8 @@ ROM_START( fl7_500 )  // Serial 000000125873.
 
 	/* Proper bipolar PROM dump */
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "am27s29.u1",  0x0000, 0x0200, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
+	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
+	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
 
 	ROM_REGION( 0x20, "proms2", 0 )
 	ROM_LOAD( "dummy", 0x0000, 0x0020, NO_DUMP )
@@ -14323,7 +14325,8 @@ ROM_START( fl7_2000 )  // Serial 00000063A47F.
 
 	/* Proper bipolar PROM dump */
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "am27s29.u1", 0x0000, 0x0200, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
+	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
+	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
 
 	ROM_REGION( 0x20, "proms2", 0 )
 	ROM_LOAD( "dummy", 0x0000, 0x0020, NO_DUMP )
