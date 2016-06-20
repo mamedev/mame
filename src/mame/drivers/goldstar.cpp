@@ -915,6 +915,9 @@ ADDRESS_MAP_END
   W 9A00-B7FF FF
  RW B000-B7FF 00
 
+ Flaming7 custom hardware writes the bonus
+ graphics at 9A80-9A89, and the "reel scroll"
+ at B0C0-B0FF...
 */
 
 WRITE8_MEMBER(wingco_state::magodds_outb850_w)
@@ -14188,6 +14191,27 @@ ROM_END
 
   3) Z80 /INT line (pin 16) is out of socket and wired to a 74161.
 
+
+  Custom Hardware Notes:
+
+  GFX Bank 1 (chars and BG graphics) is colors-accurate.
+  GFX Bank 2 needs some work...
+
+  Seems that there is an extra layer for the bonus graphics.
+  This graphic is taken from Bank 2, and is the "representative"
+  for the chosen gfx set.
+  
+  Code writes the bonus graphics at 9A80-9A89, and the "reel scroll"
+  at B0C0-B0FF... 
+
+  Tileset:
+  Reels GFX 1: 00-00-01-02-03-04-05-06-07-00
+  Reels GFX 2: 00-5A-5B-5C-5D-5E-5F-60-61-00
+  Reels GFX 3: 9F-A0-A1-A2-A3-A4-A5-A6-A7-A8
+  Reels GFX 4: E7-E8-E9-EA-EB-EC-ED-EE-EF-F0
+
+  ...and written 0x10 at B0C0-B0FF.
+
 */
 
 /*
@@ -14267,8 +14291,8 @@ ROM_START( fl7_50 )  // Serial 00000069A1C9.
 	ROM_REGION( 0x20, "proms2", 0 )
 	ROM_LOAD( "dummy", 0x0000, 0x0020, NO_DUMP )
 
-	ROM_REGION(0x8, "fl7w4_id", 0)     /* Electronic Serial DS2401 */
-	ROM_LOAD( "ds2401.bin", 0x0000, 0x0008, NO_DUMP ) // Hand built to match our ROM set
+	ROM_REGION(0x8, "fl7w4_id", 0)     /* Electronic Serial */
+	ROM_LOAD( "eserial.bin", 0x0000, 0x0008, NO_DUMP ) // Hand built to match our ROM set
 
 ROM_END
 
@@ -14299,8 +14323,8 @@ ROM_START( fl7_500 )  // Serial 000000125873.
 	ROM_REGION( 0x20, "proms2", 0 )
 	ROM_LOAD( "dummy", 0x0000, 0x0020, NO_DUMP )
 
-	ROM_REGION(0x8, "fl7w4_id", 0)     /* Electronic Serial DS2401 */
-	ROM_LOAD( "ds2401.bin",  0x0000, 0x0008, NO_DUMP ) // Hand built to match our ROM set
+	ROM_REGION(0x8, "fl7w4_id", 0)     /* Electronic Serial */
+	ROM_LOAD( "eserial.bin",  0x0000, 0x0008, NO_DUMP ) // Hand built to match our ROM set
 
 ROM_END
 
@@ -14331,8 +14355,8 @@ ROM_START( fl7_2000 )  // Serial 00000063A47F.
 	ROM_REGION( 0x20, "proms2", 0 )
 	ROM_LOAD( "dummy", 0x0000, 0x0020, NO_DUMP )
 
-	ROM_REGION(0x8, "fl7w4_id", 0)     /* Electronic Serial DS2401 */
-	ROM_LOAD( "ds2401.bin", 0x0000, 0x0008, NO_DUMP ) // Hand built to match our ROM set
+	ROM_REGION(0x8, "fl7w4_id", 0)     /* Electronic Serial */
+	ROM_LOAD( "eserial.bin", 0x0000, 0x0008, NO_DUMP ) // Hand built to match our ROM set
 
 ROM_END
 
