@@ -188,6 +188,8 @@ void menu::exit(running_machine &machine)
 	}
 
 	icons_bitmap.clear();
+	sw_toolbar_bitmap.clear();
+	toolbar_bitmap.clear();
 	m_old_icons.clear();
 }
 
