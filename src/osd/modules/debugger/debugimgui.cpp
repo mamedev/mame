@@ -490,9 +490,9 @@ int debug_imgui::history_set(ImGuiTextEditCallbackData* data)
 	}
 
 	if(history_pos == view_main_console->console_history.size())
-		data->BufTextLen = (int)snprintf(data->Buf, (size_t)data->BufSize, "%s", "");
+		data->CursorPos = data->BufTextLen = (int)snprintf(data->Buf, (size_t)data->BufSize, "%s", "");
 	else
-		data->BufTextLen = (int)snprintf(data->Buf, (size_t)data->BufSize, "%s", view_main_console->console_history[history_pos].c_str());
+		data->CursorPos = data->BufTextLen = (int)snprintf(data->Buf, (size_t)data->BufSize, "%s", view_main_console->console_history[history_pos].c_str());
 	
 	data->BufDirty = true;
 	return 0;

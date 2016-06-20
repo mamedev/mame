@@ -4,7 +4,7 @@
 
 <!-- redump.org US PS1 discs (1719 of 1719), based on 'Sony - PlayStation (20160515 00-54-32).dat'
 
-These CHDs have been converted from redump.org disc images. 
+These CHDs have been converted from redump.org disc images.
 
     (Madden NFL 96 (USA) (Beta))*
     (Twisted Metal 2 (USA) (Beta))*
@@ -22698,18 +22698,20 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 		<info name="serial" value="SLUS-00423, SLUS-00584"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom1" interface="psx_cdrom">
+			<feature name="part_id" value="Super Street Fighter II &amp; Super Street Fighter II Turbo"/>
 			<diskarea name="cdrom">
 				<disk name="street fighter collection (usa) (disc 1) (v1.1)"  sha1="9eaab12a032b7e9d6a05f342752f1de8fe4d27b3"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
+			<feature name="part_id" value="Super Street Fighter Alpha 2 Gold"/>
 			<diskarea name="cdrom">
 				<disk name="street fighter collection (usa) (disc 2) (v1.1)"  sha1="b42293238b6b2dd5ebc9dc990bdc08ab6e6ec8c4"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="sfcolla" cloneof="sfcoll">	 <!-- Tracks 01 & 72 differ from v1.1! -->
+	<software name="sfcolla" cloneof="sfcoll">   <!-- Tracks 01 & 72 differ from v1.1! -->
 		<!-- Original images (Redump)
 		<rom name="street fighter collection (usa) (disc 1) (v1.0).cue" size="10211" crc="2be12124" sha1="6b70efeade397d03ffe0482da1a109385887832f" />
 		<rom name="street fighter collection (usa) (disc 1) (v1.0) (track 01).bin" size="54705168" crc="b366deb0" sha1="da079bc675c21502e43ef5599df5a7984b499f47" />
@@ -22795,11 +22797,13 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 		<info name="serial" value="SLUS-00423, SLUS-00584"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom1" interface="psx_cdrom">
+			<feature name="part_id" value="Super Street Fighter II &amp; Super Street Fighter II Turbo"/>
 			<diskarea name="cdrom">
 				<disk name="street fighter collection (usa) (disc 1) (v1.0)"  sha1="52532f13a35f9077b7e02d53f3feeb843727bd1e"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
+			<feature name="part_id" value="Super Street Fighter Alpha 2 Gold"/>
 			<diskarea name="cdrom">
 				<disk name="street fighter collection (usa) (disc 2) (v1.0)" sha1="273e82b4b9615803ba62babc5825639f1614bea6"/>
 			</diskarea>
@@ -35747,100 +35751,140 @@ TODO: Check if these match the corresponding redump dumps.
 -->
 
 	<software name="intcdv1m">
-		<description>Interactive CD Sampler Disc - Volume 01 (M Rated)</description>
+		<!-- Unknown source
+		<rom name="interactive cd sampler volume 1.bin" size="690918816" crc="78449608" sha1="65b45f282b1762590440fbaabac75809a6cbef63"/>
+		<rom name="interactive cd sampler volume 1.cue" size="1759" crc="451bdd86" sha1="2b28ae23bb2c85d3edf4fa38ac17dbc6c13f8481"/>
+		-->
+		<description>Interactive CD Sampler Disc - Volume 01 (USA, M Rated)</description>
 		<year>1995</year>
-		<publisher>SCEA</publisher>
+		<publisher>Sony Computer Entertainment America</publisher>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Interactive CD Sampler Disc - Volume 1 (M Rated)" sha1="de4924cbd635e0a11b33c03e6560e28790b09257"/>
+				<disk name="interactive cd sampler disc - volume 1 (m rated)" sha1="de4924cbd635e0a11b33c03e6560e28790b09257"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="intcdv4">
-		<description>Interactive CD Sampler Disc - Volume 04</description>
+		<!-- Unknown source
+		<rom name="interactive cd sampler volume 4.bin" size="692118336" crc="a86f1ae5" sha1="3d66101541737d5167f6604b5709181317acbfb8"/>
+		<rom name="interactive cd sampler volume 4.cue" size="223" crc="d6b84c58" sha1="e2c383fc8b5c26ee92619d1adac760af0e48e634"/>
+		-->
+		<description>Interactive CD Sampler Disc - Volume 04 (USA)</description>
 		<year>1997</year>
-		<publisher>SCEA</publisher>
+		<publisher>Sony Computer Entertainment America</publisher>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Interactive CD Sampler Disc - Volume 4" sha1="c558a684a28ccf6afe0d3fc166814539c75863f7"/>
+				<disk name="interactive cd sampler disc - volume 4" sha1="c558a684a28ccf6afe0d3fc166814539c75863f7"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="intcdv5">
-		<description>Interactive CD Sampler Disc - Volume 05</description>
+		<!-- Unknown source
+		<rom name="interactive cd sampler volume 5 (pbpx-95003).bin" size="508638816" crc="b5c82748" sha1="1f194024c3d9c772ed5a1e9dbdf5ff409c806fbb"/>
+		<rom name="interactive cd sampler volume 5 (pbpx-95003).cue" size="428" crc="1cd96880" sha1="75e7d01603849b1cf1d57d37b5600a9bce1d03f4"/>
+		-->
+		<description>Interactive CD Sampler Disc - Volume 05 (USA)</description>
 		<year>1997</year>
-		<publisher>SCEA</publisher>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="PBPX-95003"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Interactive CD Sampler Disc - Volume 5" sha1="f1ce1f4a942af852ee67f98c7d2a3c148d835abb"/>
+				<disk name="interactive cd sampler disc - volume 5" sha1="f1ce1f4a942af852ee67f98c7d2a3c148d835abb"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="intcdv6">
-		<description>Interactive CD Sampler Disc - Volume 06</description>
+		<!-- Unknown source
+		<rom name="interactive cd sampler volume 6 (pbpx-95004).bin" size="640614240" crc="db7b1f0f" sha1="2d25bce6b5d7218aa6dceff58badf26ccf5aeb39"/>
+		<rom name="interactive cd sampler volume 6 (pbpx-95004).cue" size="300" crc="1184abe8" sha1="194b4412dfcb2a4088a62c516616a1609512d14a"/>
+		-->
+		<description>Interactive CD Sampler Disc - Volume 06 (USA)</description>
 		<year>1998</year>
-		<publisher>SCEA</publisher>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="PBPX-95004"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Interactive CD Sampler Disc - Volume 6" sha1="78f9e8b125f440e626d1ccc1f3a5a5f5a3a1cb11"/>
+				<disk name="interactive cd sampler disc - volume 6" sha1="78f9e8b125f440e626d1ccc1f3a5a5f5a3a1cb11"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="intcdv7">
-		<description>Interactive CD Sampler Disc - Volume 07</description>
+		<!-- Unknown source
+		<rom name="interactive cd sampler volume 7.bin" size="733160736" crc="ce24e9a1" sha1="7c549f0187da1c1f870973da8492d4d237070326"/>
+		<rom name="interactive cd sampler volume 7.cue" size="415" crc="69fba598" sha1="7eb50623c569f453e83b413a7988d95e55a8c58c"/>
+		-->
+		<description>Interactive CD Sampler Disc - Volume 07 (USA)</description>
 		<year>1998</year>
-		<publisher>SCEA</publisher>
+		<publisher>Sony Computer Entertainment America</publisher>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Interactive CD Sampler Disc - Volume 7" sha1="73e8215a98da98d9f2d1468c62354b46af77fa56"/>
+				<disk name="interactive cd sampler disc - volume 7" sha1="73e8215a98da98d9f2d1468c62354b46af77fa56"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="intcdv8">
-		<description>Interactive CD Sampler Disc - Volume 08</description>
+		<!-- Unknown source
+		<rom name="interactive cd sampler volume 8.bin" size="725135712" crc="ef9b3cee" sha1="d465f074dfb8344d55f4da2a4b5358981d5b6541"/>
+		<rom name="interactive cd sampler volume 8.cue" size="287" crc="e40136d8" sha1="8bea452b452528c2b429ec5cdc8de20da26e4611"/>
+		-->
+		<description>Interactive CD Sampler Disc - Volume 08 (USA)</description>
 		<year>1998</year>
-		<publisher>SCEA</publisher>
+		<publisher>Sony Computer Entertainment America</publisher>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Interactive CD Sampler Disc - Volume 8" sha1="8145f022b1f44d2ed7140386acf5b293834fc6c8"/>
+				<disk name="interactive cd sampler disc - volume 8" sha1="8145f022b1f44d2ed7140386acf5b293834fc6c8"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="intcdv9">
-		<description>Interactive CD Sampler Disc - Volume 09</description>
+		<!-- Unknown source
+		<rom name="interactive cd sampler volume 9.bin" size="732615072" crc="473314a1" sha1="ab797ae8e3d6fd0b477c70b609211944be477bb1"/>
+		<rom name="interactive cd sampler volume 9.cue" size="351" crc="dad567a7" sha1="995ec02b8abea297e6822b1ee1619b7e779800af"/>
+		-->
+		<description>Interactive CD Sampler Disc - Volume 09 (USA)</description>
 		<year>1998</year>
-		<publisher>SCEA</publisher>
+		<publisher>Sony Computer Entertainment America</publisher>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Interactive CD Sampler Disc - Volume 9" sha1="4b504a4ce093c255b40f4cc2cf3fb59b4216f501"/>
+				<disk name="interactive cd sampler disc - volume 9" sha1="4b504a4ce093c255b40f4cc2cf3fb59b4216f501"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="intcdv10">
-		<description>Interactive CD Sampler Disc - Volume 10</description>
+		<!-- Unknown source
+		<rom name="interactive cd sampler volume 10 [pbpx-95011].bin" size="736747536" crc="2af7ed86" sha1="6839c7bb06ab0765a2aef7e67be5a2fbba52d62d"/>
+		<rom name="interactive cd sampler volume 10 [pbpx-95011].cue" size="429" crc="65f15b6e" sha1="91e2d2d576c488d17e125bf554e7207453f4eb4b"/>
+		-->
+		<description>Interactive CD Sampler Disc - Volume 10 (USA)</description>
 		<year>1999</year>
-		<publisher>SCEA</publisher>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="PBPX-95011"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Interactive CD Sampler Disc - Volume 10" sha1="960319d09f9ca10663f06068a2ff134f343d22ad"/>
+				<disk name="interactive cd sampler disc - volume 10" sha1="960319d09f9ca10663f06068a2ff134f343d22ad"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="intcdv11">
-		<description>Interactive CD Sampler Disc - Volume 11</description>
+		<!-- Unknown source
+		<rom name="interactive cd sampler volume 11 [scus-94463].bin" size="504059472" crc="0be789aa" sha1="0a0b125094f344d5552a840485021a2beda58aad"/>
+		<rom name="interactive cd sampler volume 11 [scus-94463].cue" size="301" crc="9948530c" sha1="95c782d5dca37dfd43b8c754e3a6903f2e665860"/>
+		-->
+		<description>Interactive CD Sampler Disc - Volume 11 (USA)</description>
 		<year>1999</year>
-		<publisher>SCEA</publisher>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94463"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="Interactive CD Sampler Disc - Volume 11" sha1="0506aa051708f32f8470a19b7d6c8538ecedecc1"/>
+				<disk name="interactive cd sampler disc - volume 11" sha1="0506aa051708f32f8470a19b7d6c8538ecedecc1"/>
 			</diskarea>
 		</part>
 	</software>
@@ -55879,6 +55923,10 @@ TODO: Check if these match the corresponding redump dumps.
 
 	<!-- corrupt text -->
 	<software name="firebugs" supported="partial">
+		<!-- Unknown source
+		<rom name="Firebugs (E).bin" size="608048448" crc="82b8ccd3" sha1="52bec5d0fa3bc954f4168806838a6723bcce265d"/>
+		<rom name="Firebugs (E).cue" size="908" crc="f17332da" sha1="e0f9f781a3c5e19a33dc25fc9b9c7529eab87031"/>
+		-->
 		<description>Firebugs (Euro)</description>
 		<year>2002</year>
 		<publisher>Sony</publisher>
@@ -55893,6 +55941,10 @@ TODO: Check if these match the corresponding redump dumps.
 
 	<!-- boot ok -->
 	<software name="terracon" supported="yes">
+		<!-- Unknown source
+		<rom name="Terracon_PAL.bin" size="622536768" crc="4ceb0a37" sha1="40f1dfc3cc8c47f3288283907c231c43c2fbe940"/>
+		<rom name="Terracon_PAL.cue" size="1187" crc="3b2098b7" sha1="7f9780eeeedc8eac693b2c18c5a6e58202bc97b3"/>
+		-->
 		<description>Terracon (Euro)</description>
 		<year>2000</year>
 		<publisher>Sony</publisher>
@@ -55954,8 +56006,8 @@ A few comments on these:
 
 	<software name="bublbob2" >
 		<!-- Original images
-		<rom name="bb2.bin" size="62620864" crc="1c2c9f63" sha1=""/>
-		<rom name="bb2.cue" size="69" crc="096e5077" sha1=""/>
+		<rom name="bb2.bin" size="62620864" crc="1c2c9f63" sha1="2d9cf9e34057c93fe1d40940428c463a7224444e"/>
+		<rom name="bb2.cue" size="69" crc="096e5077" sha1="a56c5425f32b5ead296ecd4d3b1ac909d8144972"/>
 		-->
 		<description>Bubble Bobble II (Prototype)</description>
 		<year>1995</year>
@@ -56464,7 +56516,7 @@ A few comments on these:
 		-->
 		<description>Torc - Legend of the Ogre Crown (Prototype)</description>
 		<year>19??</year>
-		<publisher>Head Games</publisher>	<!-- Head Games were actually the developer, but I was unable to dig any info about actual publishing deals -->
+		<publisher>Head Games</publisher>   <!-- Head Games were actually the developer, but I was unable to dig any info about actual publishing deals -->
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="torc - legend of the ogre crown (prototype)" sha1="0c27726e8957a2054c9c4fe38b8859ef4c4929c9" />

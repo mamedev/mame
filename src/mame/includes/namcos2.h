@@ -135,7 +135,7 @@ public:
 	UINT16  m_68k_gpu_C148[0x20];
 
 	// C123 Tilemap Emulation
-	// TODO: merge with namcos1.c implementation and convert to device
+	// TODO: merge with namcos1.cpp implementation and convert to device
 public:
 	DECLARE_WRITE16_MEMBER( c123_tilemap_videoram_w );
 	DECLARE_READ16_MEMBER( c123_tilemap_videoram_r );

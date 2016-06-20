@@ -223,7 +223,7 @@ offs_t sparc_dasm(char *buffer, offs_t pc, UINT32 op)
 				print(sign, "-");
 				disp = -disp;
 			}
-			print(buffer, "%s%s0x%06x", (OP2 == 2) ? branchnames[index] : ((OP2 == 6) ? fpbranchnames[index] : copbranchnames[index]), sign, disp);
+			print(buffer, "%s%s0x%06x ; %08x", (OP2 == 2) ? branchnames[index] : ((OP2 == 6) ? fpbranchnames[index] : copbranchnames[index]), sign, disp, pc + DISP22);
 			break;
 		}
 		case 4:	// SETHI
@@ -238,7 +238,7 @@ offs_t sparc_dasm(char *buffer, offs_t pc, UINT32 op)
 		}
 		break;
 	case 1: // CALL
-		print(buffer, "call     0x%08x", DISP30);
+		print(buffer, "call     0x%08x ; %08x", DISP30, DISP30 << 2);
 		break;
 	case 2:
 		if (USEIMM)

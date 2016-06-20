@@ -81,7 +81,6 @@ public:
 	UINT8 m_term_data;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_WRITE_LINE_MEMBER(h19_ace_irq);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -357,10 +356,6 @@ MC6845_UPDATE_ROW( h19_state::crtc_update_row )
 	}
 }
 
-WRITE_LINE_MEMBER(h19_state::h19_ace_irq)
-{
-	m_maincpu->set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
-}
 
 /* F4 Character Displayer */
 static const gfx_layout h19_charlayout =
@@ -410,7 +405,7 @@ static MACHINE_CONFIG_START( h19, h19_state )
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI)) // frame pulse
 
 	MCFG_DEVICE_ADD("ins8250", INS8250, XTAL_12_288MHz / 4) // 3.072mhz clock which gets divided down for the various baud rates
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(h19_state, h19_ace_irq)) // interrupt
+	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", 0)) // interrupt
 
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(h19_state, h19_kbd_put))

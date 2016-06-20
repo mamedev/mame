@@ -82,9 +82,9 @@ float GetRoundCornerFactor(float2 coord, float2 bounds, float radiusAmount, floa
 	smoothAmount = min(smoothAmount, radiusAmount);
 
 	float range = min(bounds.x, bounds.y);
-	float amountMinimum = range > 0.0f ? 1.0f / range : 0.0f;
+	float amountMinimum = 1.0f / range;
 	float radius = range * max(radiusAmount, amountMinimum);
-	float smooth = 1.0f / (range * max(smoothAmount, amountMinimum * 3.0f));
+	float smooth = 1.0f / (range * max(smoothAmount, amountMinimum * 2.0f));
 
 	// compute box
 	float box = roundBox(bounds * (coord * 2.0f), bounds, radius);

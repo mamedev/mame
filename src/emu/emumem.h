@@ -199,7 +199,6 @@ private:
 	offs_t                      m_byteend;              // maximum valid byte address
 	UINT16                      m_entry;                // live entry
 	std::list<direct_range>     m_rangelist[TOTAL_MEMORY_BANKS];  // list of ranges for each entry
-	std::list<direct_range>     m_freerangelist;        // list of recycled range entries
 	direct_update_delegate      m_directupdate;         // fast direct-access update callback
 };
 

@@ -199,7 +199,7 @@ Games running on this hardware:
 - The Outfoxies
 - Mach Breakers
 
-Changes from Namcon System NB1 include:
+Changes from Namco System NB1 include:
 - different memory map
 - more complex sprite and tile banking
 - 2 additional ROZ layers
@@ -280,10 +280,21 @@ GFX:                Custom 145     ( 80 pin PQFP)
 
 #define MASTER_CLOCK    XTAL_48_384MHz
 
+#define ENABLE_LOGGING (0)
+
+
+void namconb1_state::machine_start()
+{
+	save_item(NAME(m_vbl_irq_level));
+	save_item(NAME(m_pos_irq_level));
+	save_item(NAME(m_unk_irq_level));
+	save_item(NAME(m_count));
+	save_item(NAME(m_port6));
+}
 
 /****************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::namconb_scantimer)
+TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::scantimer)
 {
 	int scanline = param;
 
@@ -399,7 +410,8 @@ WRITE8_MEMBER(namconb1_state::namconb1_cpureg_w)
 			break;
 
 		default:
-			logerror("Unhandled CPU reg write to [0x%.2x] with 0x%.2x (PC=0x%x)\n", offset, data, space.device().safe_pc());
+			if (ENABLE_LOGGING)
+				logerror("Unhandled CPU reg write to [0x%.2x] with 0x%.2x (PC=0x%x)\n", offset, data, space.device().safe_pc());
 	}
 }
 
@@ -486,7 +498,8 @@ WRITE8_MEMBER(namconb1_state::namconb2_cpureg_w)
 			break;
 
 		default:
-			logerror("Unhandled CPU reg write to [0x%.2x] with 0x%.2x (PC=0x%x)\n", offset, data, space.device().safe_pc());
+			if (ENABLE_LOGGING)
+				logerror("Unhandled CPU reg write to [0x%.2x] with 0x%.2x (PC=0x%x)\n", offset, data, space.device().safe_pc());
 	}
 }
 
@@ -494,8 +507,11 @@ WRITE8_MEMBER(namconb1_state::namconb2_cpureg_w)
 READ8_MEMBER(namconb1_state::namconb1_cpureg_r)
 {
 	// 16: Watchdog
-	if (offset != 0x16)
-		logerror("Unhandled CPU reg read from [0x%.2x] (PC=0x%x)\n", offset, space.device().safe_pc());
+	if (ENABLE_LOGGING)
+	{
+		if (offset != 0x16)
+			logerror("Unhandled CPU reg read from [0x%.2x] (PC=0x%x)\n", offset, space.device().safe_pc());
+	}
 
 	return 0xff;
 }
@@ -504,8 +520,11 @@ READ8_MEMBER(namconb1_state::namconb1_cpureg_r)
 READ8_MEMBER(namconb1_state::namconb2_cpureg_r)
 {
 	// 14: Watchdog
-	if (offset != 0x14)
-		logerror("Unhandled CPU reg read from [0x%.2x] (PC=0x%x)\n", offset, space.device().safe_pc());
+	if (ENABLE_LOGGING)
+	{
+		if (offset != 0x14)
+			logerror("Unhandled CPU reg read from [0x%.2x] (PC=0x%x)\n", offset, space.device().safe_pc());
+	}
 
 	return 0xff;
 }
@@ -606,8 +625,8 @@ READ32_MEMBER(namconb1_state::custom_key_r)
 	case NAMCONB2_MACH_BREAKERS:
 		break; /* no protection? */
 	}
-
-	logerror( "custom_key_r(%d); pc=%08x\n", offset, space.device().safe_pc() );
+	if (ENABLE_LOGGING)
+		logerror( "custom_key_r(%d); pc=%08x\n", offset, space.device().safe_pc() );
 	return 0;
 } /* custom_key_r */
 
@@ -641,12 +660,12 @@ WRITE32_MEMBER(namconb1_state::srand_w)
 	 */
 } /* srand_w */
 
-READ32_MEMBER(namconb1_state::namconb_share_r)
+READ32_MEMBER(namconb1_state::share_r)
 {
 	return (m_namconb_shareram[offset*2] << 16) | m_namconb_shareram[offset*2+1];
 }
 
-WRITE32_MEMBER(namconb1_state::namconb_share_w)
+WRITE32_MEMBER(namconb1_state::share_w)
 {
 	COMBINE_DATA(m_namconb_shareram+offset*2+1);
 	data >>= 16;
@@ -659,7 +678,7 @@ static ADDRESS_MAP_START( namconb1_am, AS_PROGRAM, 32, namconb1_state )
 	AM_RANGE(0x100000, 0x10001f) AM_READ(gunbulet_gun_r)
 	AM_RANGE(0x1c0000, 0x1cffff) AM_RAM
 	AM_RANGE(0x1e4000, 0x1e4003) AM_READWRITE(randgen_r,srand_w)
-	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(namconb_share_r, namconb_share_w)
+	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(share_r, share_w)
 	AM_RANGE(0x208000, 0x2fffff) AM_RAM
 	AM_RANGE(0x400000, 0x40001f) AM_READWRITE8(namconb1_cpureg_r, namconb1_cpureg_w, 0xffffffff)
 	AM_RANGE(0x580000, 0x5807ff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0xffffffff)
@@ -676,7 +695,7 @@ static ADDRESS_MAP_START( namconb2_am, AS_PROGRAM, 32, namconb1_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x1c0000, 0x1cffff) AM_RAM
 	AM_RANGE(0x1e4000, 0x1e4003) AM_READWRITE(randgen_r,srand_w)
-	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(namconb_share_r, namconb_share_w)
+	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(share_r, share_w)
 	AM_RANGE(0x208000, 0x2fffff) AM_RAM
 	AM_RANGE(0x400000, 0x4fffff) AM_ROM AM_REGION("data", 0)
 	AM_RANGE(0x600000, 0x61ffff) AM_READWRITE16(c355_obj_ram_r,c355_obj_ram_w,0xffffffff) AM_SHARE("objram")
@@ -695,7 +714,7 @@ static ADDRESS_MAP_START( namconb2_am, AS_PROGRAM, 32, namconb1_state )
 	AM_RANGE(0xf00000, 0xf0001f) AM_READWRITE8(namconb1_cpureg_r, namconb2_cpureg_w, 0xffffffff)
 ADDRESS_MAP_END
 
-WRITE16_MEMBER(namconb1_state::nbmcu_shared_w)
+WRITE16_MEMBER(namconb1_state::mcu_shared_w)
 {
 	// HACK!  Many games data ROM routines redirect the vector from the sound command read to an RTS.
 	// This needs more investigation.  nebulray and vshoot do NOT do this.
@@ -718,24 +737,24 @@ WRITE16_MEMBER(namconb1_state::nbmcu_shared_w)
 
 static ADDRESS_MAP_START( namcoc75_am, AS_PROGRAM, 16, namconb1_state )
 	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_device, read, write)
-	AM_RANGE(0x004000, 0x00bfff) AM_RAM_WRITE(nbmcu_shared_w) AM_SHARE("namconb_share")
+	AM_RANGE(0x004000, 0x00bfff) AM_RAM_WRITE(mcu_shared_w) AM_SHARE("namconb_share")
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("c75data", 0)
 ADDRESS_MAP_END
 
 
 READ8_MEMBER(namconb1_state::port6_r)
 {
-	return m_nbx_port6;
+	return m_port6;
 }
 
 WRITE8_MEMBER(namconb1_state::port6_w)
 {
-	m_nbx_port6 = data;
+	m_port6 = data;
 }
 
 READ8_MEMBER(namconb1_state::port7_r)
 {
-	switch (m_nbx_port6 & 0xf0)
+	switch (m_port6 & 0xf0)
 	{
 		case 0x00:
 			return read_safe(ioport("P4"), 0xff);
@@ -1107,7 +1126,7 @@ static MACHINE_CONFIG_START( namconb1, namconb1_state )
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_MACHINE_RESET_OVERRIDE(namconb1_state, namconb)
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namconb1_state, namconb_scantimer, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namconb1_state, scantimer, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.7)
@@ -1144,7 +1163,7 @@ static MACHINE_CONFIG_START( namconb2, namconb1_state )
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_MACHINE_RESET_OVERRIDE(namconb1_state, namconb)
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namconb1_state, namconb_scantimer, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namconb1_state, scantimer, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.7)
@@ -1961,21 +1980,21 @@ ROM_END
 
 /***************************************************************/
 
-GAME( 1994, nebulray, 0,        namconb1, namconb1, namconb1_state, nebulray, ROT90, "Namco", "Nebulas Ray (World, NR2)", MACHINE_IMPERFECT_SOUND )
-GAME( 1994, nebulrayj,nebulray, namconb1, namconb1, namconb1_state, nebulray, ROT90, "Namco", "Nebulas Ray (Japan, NR1)", MACHINE_IMPERFECT_SOUND )
-GAME( 1994, ptblank,  0,        namconb1, gunbulet, namconb1_state, gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 1)", MACHINE_IMPERFECT_SOUND )
-GAME( 1994, ptblanka, ptblank,  namconb1, gunbulet, namconb1_state, gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 2)", MACHINE_IMPERFECT_SOUND )
-GAME( 1994, gunbuletj,ptblank,  namconb1, gunbulet, namconb1_state, gunbulet, ROT0,  "Namco", "Gun Bullet (Japan, GN1)", MACHINE_IMPERFECT_SOUND )
-GAME( 1994, gunbuletw,ptblank,  namconb1, gunbulet, namconb1_state, gunbulet, ROT0,  "Namco", "Gun Bullet (World, GN3 Rev B)", MACHINE_IMPERFECT_SOUND )
-GAME( 1993, gslugrsj, 0,        namconb1, nbsports, namconb1_state, gslgr94u, ROT0,  "Namco", "Great Sluggers (Japan)", MACHINE_IMPERFECT_SOUND )
-GAME( 1994, gslgr94u, 0,        namconb1, nbsports, namconb1_state, gslgr94u, ROT0,  "Namco", "Great Sluggers '94", MACHINE_IMPERFECT_SOUND )
-GAME( 1994, gslgr94j, gslgr94u, namconb1, nbsports, namconb1_state, gslgr94j, ROT0,  "Namco", "Great Sluggers '94 (Japan)", MACHINE_IMPERFECT_SOUND )
-GAME( 1995, sws95,    0,        namconb1, nbsports, namconb1_state, sws95,    ROT0,  "Namco", "Super World Stadium '95 (Japan)", MACHINE_IMPERFECT_SOUND )
-GAME( 1996, sws96,    0,        namconb1, nbsports, namconb1_state, sws96,    ROT0,  "Namco", "Super World Stadium '96 (Japan)", MACHINE_IMPERFECT_SOUND )
-GAME( 1997, sws97,    0,        namconb1, nbsports, namconb1_state, sws97,    ROT0,  "Namco", "Super World Stadium '97 (Japan)", MACHINE_IMPERFECT_SOUND )
-GAME( 1994, vshoot,   0,        namconb1, namconb1, namconb1_state, vshoot,   ROT0,  "Namco", "J-League Soccer V-Shoot (Japan)", MACHINE_IMPERFECT_SOUND )
+GAME( 1994, nebulray, 0,        namconb1, namconb1, namconb1_state, nebulray, ROT90, "Namco", "Nebulas Ray (World, NR2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nebulrayj,nebulray, namconb1, namconb1, namconb1_state, nebulray, ROT90, "Namco", "Nebulas Ray (Japan, NR1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, ptblank,  0,        namconb1, gunbulet, namconb1_state, gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, ptblanka, ptblank,  namconb1, gunbulet, namconb1_state, gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gunbuletj,ptblank,  namconb1, gunbulet, namconb1_state, gunbulet, ROT0,  "Namco", "Gun Bullet (Japan, GN1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gunbuletw,ptblank,  namconb1, gunbulet, namconb1_state, gunbulet, ROT0,  "Namco", "Gun Bullet (World, GN3 Rev B)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gslugrsj, 0,        namconb1, nbsports, namconb1_state, gslgr94u, ROT0,  "Namco", "Great Sluggers (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gslgr94u, 0,        namconb1, nbsports, namconb1_state, gslgr94u, ROT0,  "Namco", "Great Sluggers '94", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gslgr94j, gslgr94u, namconb1, nbsports, namconb1_state, gslgr94j, ROT0,  "Namco", "Great Sluggers '94 (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sws95,    0,        namconb1, nbsports, namconb1_state, sws95,    ROT0,  "Namco", "Super World Stadium '95 (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, sws96,    0,        namconb1, nbsports, namconb1_state, sws96,    ROT0,  "Namco", "Super World Stadium '96 (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, sws97,    0,        namconb1, nbsports, namconb1_state, sws97,    ROT0,  "Namco", "Super World Stadium '97 (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, vshoot,   0,        namconb1, namconb1, namconb1_state, vshoot,   ROT0,  "Namco", "J-League Soccer V-Shoot (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /*     YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT,     MNTR,  COMPANY, FULLNAME,   FLAGS */
-GAME( 1994, outfxies, 0,        namconb2, outfxies, namconb1_state, outfxies, ROT0, "Namco", "The Outfoxies (World, OU2)", MACHINE_IMPERFECT_SOUND )
-GAME( 1994, outfxiesj,outfxies, namconb2, outfxies, namconb1_state, outfxies, ROT0, "Namco", "The Outfoxies (Japan, OU1)", MACHINE_IMPERFECT_SOUND )
-GAME( 1995, machbrkr, 0,        namconb2, namconb1, namconb1_state, machbrkr, ROT0, "Namco", "Mach Breakers - Numan Athletics 2 (Japan)", MACHINE_IMPERFECT_SOUND )
+GAME( 1994, outfxies, 0,        namconb2, outfxies, namconb1_state, outfxies, ROT0, "Namco", "The Outfoxies (World, OU2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, outfxiesj,outfxies, namconb2, outfxies, namconb1_state, outfxies, ROT0, "Namco", "The Outfoxies (Japan, OU1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, machbrkr, 0,        namconb2, namconb1, namconb1_state, machbrkr, ROT0, "Namco", "Mach Breakers - Numan Athletics 2 (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

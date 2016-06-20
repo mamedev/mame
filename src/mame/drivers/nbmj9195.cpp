@@ -270,407 +270,357 @@ static ADDRESS_MAP_START( mjegolf_map, AS_PROGRAM, 8, nbmj9195_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjuraden_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0xb0, 0xb0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xb2, 0xb2) AM_WRITENOP
-	AM_RANGE(0xb4, 0xb4) AM_WRITENOP
-	AM_RANGE(0xb6, 0xb6) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xb2, 0xb2) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xb4, 0xb4) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xb6, 0xb6) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( koinomp_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_0_w)
+	AM_RANGE(0xa0, 0xa1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0xa0, 0xaf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xb0, 0xbf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xa0, 0xa1) AM_READ(blitter_1_r)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xc2, 0xc2) AM_WRITENOP
-	AM_RANGE(0xc4, 0xc4) AM_WRITENOP
-	AM_RANGE(0xc6, 0xc6) AM_WRITE(inputportsel_w)
-	AM_RANGE(0xcf, 0xcf) AM_WRITENOP
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xc2, 0xc2) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xc4, 0xc4) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xc6, 0xc6) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xcf, 0xcf) AM_MIRROR(0xff00) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( patimono_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(blitter_1_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_1_w)
+	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xa4, 0xa4) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xb0, 0xb8) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 
-	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_0_w)
-	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
-	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb8) AM_WRITE(inputportsel_w)
-
-	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_0_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_1_w)
+	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mmehyou_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
-	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xa4, 0xa4) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gal10ren_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
+	AM_RANGE(0xa0, 0xa1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0xa0, 0xaf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xb0, 0xbf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xa0, 0xa1) AM_READ(blitter_1_r)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xc8, 0xc8) AM_WRITENOP
-	AM_RANGE(0xd0, 0xd0) AM_WRITENOP
-	AM_RANGE(0xd8, 0xd8) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xc8, 0xc8) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xd8, 0xd8) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( renaiclb_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0x24, 0x24) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0x28, 0x28) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0x2c, 0x2c) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x24, 0x24) AM_WRITENOP
-	AM_RANGE(0x28, 0x28) AM_WRITENOP
-	AM_RANGE(0x2c, 0x2c) AM_WRITE(inputportsel_w)
+	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_1_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xe0, 0xe1) AM_READ(blitter_1_r)
-	AM_RANGE(0xe0, 0xef) AM_WRITE(blitter_0_w)
-	AM_RANGE(0xf0, 0xff) AM_WRITE(clut_0_w)
+	AM_RANGE(0xe0, 0xe1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0xf0, 0xff) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjlaman_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0x22, 0x22) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0x24, 0x24) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0x26, 0x26) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x22, 0x22) AM_WRITENOP
-	AM_RANGE(0x24, 0x24) AM_WRITENOP
-	AM_RANGE(0x26, 0x26) AM_WRITE(inputportsel_w)
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0xe0, 0xe1) AM_READ(blitter_1_r)
-	AM_RANGE(0xe0, 0xef) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xf0, 0xff) AM_WRITE(clut_1_w)
+	AM_RANGE(0xe0, 0xe1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xf0, 0xff) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mkeibaou_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_0_w)
+	AM_RANGE(0xa0, 0xa1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0xa0, 0xaf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xb0, 0xbf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xa0, 0xa1) AM_READ(blitter_1_r)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xd8, 0xd8) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xda, 0xda) AM_WRITENOP
-	AM_RANGE(0xdc, 0xdc) AM_WRITENOP
-	AM_RANGE(0xde, 0xde) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xd8, 0xd8) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xda, 0xda) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xdc, 0xdc) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xde, 0xde) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pachiten_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
+	AM_RANGE(0xa0, 0xa1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0xa0, 0xaf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xb0, 0xbf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xa0, 0xa1) AM_READ(blitter_1_r)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xe0, 0xe0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xe2, 0xe2) AM_WRITENOP
-	AM_RANGE(0xe4, 0xe4) AM_WRITENOP
-	AM_RANGE(0xe6, 0xe6) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xe4, 0xe4) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xe6, 0xe6) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sailorws_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(blitter_1_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_1_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xf0, 0xf0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xf2, 0xf2) AM_WRITENOP
-	AM_RANGE(0xf4, 0xf4) AM_WRITENOP
-	AM_RANGE(0xf6, 0xf6) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xf2, 0xf2) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xf4, 0xf4) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sailorwr_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(blitter_1_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_1_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xf8, 0xf8) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xfa, 0xfa) AM_WRITENOP
-	AM_RANGE(0xfc, 0xfc) AM_WRITENOP
-	AM_RANGE(0xfe, 0xfe) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xfa, 0xfa) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xfc, 0xfc) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( psailor1_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
+	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_1_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xf0, 0xf0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xf2, 0xf2) AM_WRITENOP
-	AM_RANGE(0xf4, 0xf4) AM_WRITENOP
-	AM_RANGE(0xf6, 0xf6) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xf2, 0xf2) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xf4, 0xf4) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( psailor2_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
+	AM_RANGE(0xa0, 0xa1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0xa0, 0xaf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xb0, 0xbf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xa0, 0xa1) AM_READ(blitter_1_r)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xe0, 0xe0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xe2, 0xe2) AM_WRITENOP
-	AM_RANGE(0xe4, 0xe4) AM_WRITENOP
-	AM_RANGE(0xf6, 0xf6) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xe4, 0xe4) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( otatidai_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(blitter_1_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_1_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_WRITENOP
-	AM_RANGE(0xb8, 0xb8) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xb8, 0xb8) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( yosimoto_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
+	AM_RANGE(0x90, 0x90) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0x94, 0x94) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0x98, 0x98) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0x9c, 0x9c) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 
-	AM_RANGE(0x90, 0x90) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x94, 0x94) AM_WRITENOP
-	AM_RANGE(0x98, 0x98) AM_WRITENOP
-	AM_RANGE(0x9c, 0x9c) AM_WRITE(inputportsel_w)
-
-	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_1_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_1_w)
+	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( yosimotm_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(blitter_1_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_1_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(inputportsel_w)
-	AM_RANGE(0xfc, 0xfc) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xf4, 0xf4) AM_NOP
-	AM_RANGE(0xf8, 0xf8) AM_NOP
+	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xfc, 0xfc) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xf4, 0xf4) AM_MIRROR(0xff00) AM_NOP
+	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0xff00) AM_NOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jituroku_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
+	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_1_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xe0, 0xe0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xe8, 0xe8) AM_WRITENOP
-	AM_RANGE(0xf0, 0xf0) AM_WRITENOP
-	AM_RANGE(0xf8, 0xf8) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xe8, 0xe8) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ngpgal_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xa4, 0xa4) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 
-	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
-	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(inputportsel_w)
-
-	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_0_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_0_w)
+	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjgottsu_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
-	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xa4, 0xa4) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cmehyou_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xb4, 0xb4) AM_MIRROR(0xff00) AM_WRITENOP
 
-	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(inputportsel_w)
-	AM_RANGE(0xb4, 0xb4) AM_WRITENOP
-
-	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_0_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_0_w)
+	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjkoiura_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
-	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xa4, 0xa4) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mkoiuraa_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xa4, 0xa4) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 
-	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
-	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(inputportsel_w)
-
-	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_0_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_0_w)
+	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mscoutm_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff00) AM_READ(mscoutm_dipsw_1_r)
+	AM_RANGE(0x82, 0x82) AM_MIRROR(0xff00) AM_READ(mscoutm_dipsw_0_r)
+	AM_RANGE(0x84, 0x84) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 
-	AM_RANGE(0x80, 0x80) AM_READ(mscoutm_dipsw_1_r)
-	AM_RANGE(0x82, 0x82) AM_READ(mscoutm_dipsw_0_r)
-	AM_RANGE(0x84, 0x84) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xa0, 0xa6) AM_MIRROR(0xff00) AM_WRITENOP            // nb22090 param ?
 
-	AM_RANGE(0xa0, 0xa6) AM_WRITENOP            // nb22090 param ?
+	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
 
-	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_0_w)
+	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
+	AM_RANGE(0xe0, 0xe1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
 
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_0_w)
-	AM_RANGE(0xe0, 0xe1) AM_READ(blitter_1_r)
-	AM_RANGE(0xe0, 0xef) AM_WRITE(blitter_1_w)
-
-	AM_RANGE(0xf0, 0xff) AM_WRITE(clut_1_w)
+	AM_RANGE(0xf0, 0xff) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( imekura_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff00) AM_READ(mscoutm_dipsw_1_r)
+	AM_RANGE(0x82, 0x82) AM_MIRROR(0xff00) AM_READ(mscoutm_dipsw_0_r)
+	AM_RANGE(0x84, 0x84) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 
-	AM_RANGE(0x80, 0x80) AM_READ(mscoutm_dipsw_1_r)
-	AM_RANGE(0x82, 0x82) AM_READ(mscoutm_dipsw_0_r)
-	AM_RANGE(0x84, 0x84) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xb0, 0xb6) AM_MIRROR(0xff00) AM_WRITENOP            // nb22090 param ?
 
-	AM_RANGE(0xb0, 0xb6) AM_WRITENOP            // nb22090 param ?
-
-	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_0_w)
+	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
 
 	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0xe0, 0xe1) AM_READ(blitter_1_r)
-	AM_RANGE(0xe0, 0xef) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xf0, 0xff) AM_WRITE(clut_1_w)
+	AM_RANGE(0xe0, 0xe1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xf0, 0xff) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjegolf_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x86) AM_MIRROR(0xff00) AM_WRITENOP            // nb22090 param ?
 
-	AM_RANGE(0x80, 0x86) AM_WRITENOP            // nb22090 param ?
+	AM_RANGE(0xa0, 0xa1) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0xa0, 0xaf) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0xb0, 0xbf) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0xa0, 0xa1) AM_READ(blitter_0_r)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE(blitter_0_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE(clut_0_w)
+	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
 
-	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_1_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xe0, 0xe0) AM_READ(mscoutm_dipsw_1_r)
-	AM_RANGE(0xe2, 0xe2) AM_READ(mscoutm_dipsw_0_r)
-	AM_RANGE(0xe4, 0xe4) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0xff00) AM_READ(mscoutm_dipsw_1_r)
+	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0xff00) AM_READ(mscoutm_dipsw_0_r)
+	AM_RANGE(0xe4, 0xe4) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 
@@ -682,8 +632,7 @@ static ADDRESS_MAP_START( sailorws_sound_map, AS_PROGRAM, 8, nbmj9195_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sailorws_sound_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ymsnd", ym3812_device, write)
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_DEVWRITE("ymsnd", ym3812_device, write)
 ADDRESS_MAP_END
 
 
@@ -702,8 +651,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shabdama_io_map, AS_IO, 8, nbmj9195_state )
 //  ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-
 //  AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
 //  AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
 //  AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)

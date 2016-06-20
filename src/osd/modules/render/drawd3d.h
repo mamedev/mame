@@ -23,6 +23,7 @@
 #undef interface
 
 #include "d3d/d3dcomm.h"
+#include "sliderdirtynotifier.h"
 #include "modules/lib/osdlib.h"
 
 //============================================================
@@ -49,7 +50,7 @@ class shaders;
 struct hlsl_options;
 
 /* renderer is the information about Direct3D for the current screen */
-class renderer_d3d9 : public osd_renderer
+class renderer_d3d9 : public osd_renderer, public slider_dirty_notifier
 {
 public:
 	renderer_d3d9(std::shared_ptr<osd_window> window);
@@ -64,6 +65,8 @@ public:
 	virtual void save() override;
 	virtual void record() override;
 	virtual void toggle_fsfx() override;
+	virtual std::vector<ui::menu_item> get_slider_list() override;
+	virtual void set_sliders_dirty() override;
 
 	int                     initialize();
 
@@ -71,6 +74,8 @@ public:
 	int                     device_create_resources();
 	void                    device_delete();
 	void                    device_delete_resources();
+	void                    update_presentation_parameters();
+	void                    update_gamma_ramp();
 
 	int                     device_verify_caps();
 	int                     device_test_cooperative();
@@ -117,9 +122,7 @@ public:
 	VOID **                 get_locked_buffer_ptr()const { return (VOID **)&m_lockedbuf; }
 	void                    set_locked_buffer(vertex *lockedbuf) { m_lockedbuf = lockedbuf; }
 
-	void                    set_restarting(bool restarting) { m_restarting = restarting; }
-	bool                    is_mod2x_supported() const { return (bool)m_mod2x_supported; }
-	bool                    is_mod4x_supported() const { return (bool)m_mod4x_supported; }
+	void                    set_toggle(bool toggle) { m_toggle = toggle; }
 
 	D3DFORMAT               get_screen_format() const { return m_screen_format; }
 	D3DFORMAT               get_pixel_format() const { return m_pixformat; }
@@ -131,7 +134,6 @@ public:
 	texture_info *          get_default_texture();
 
 	shaders *               get_shaders() const { return m_shaders; }
-	hlsl_options *          get_shaders_options() const { return m_shaders_options; }
 
 private:
 	int                     m_adapter;                  // ordinal adapter number
@@ -156,10 +158,8 @@ private:
 	poly_info               m_poly[VERTEX_BUFFER_SIZE/3];// array to hold polygons as they are created
 	int                     m_numpolys;                 // number of accumulated polygons
 
-	bool                    m_restarting;               // if we're restarting
+	bool                    m_toggle;                   // if we're toggle fsfx
 
-	int                     m_mod2x_supported;          // is D3DTOP_MODULATE2X supported?
-	int                     m_mod4x_supported;          // is D3DTOP_MODULATE4X supported?
 	D3DFORMAT               m_screen_format;            // format to use for screen textures
 
 	texture_info *          m_last_texture;             // previous texture
@@ -174,9 +174,8 @@ private:
 
 	void *                  m_hlsl_buf;                 // HLSL vertex data
 	shaders *               m_shaders;                  // HLSL interface
-	hlsl_options *          m_shaders_options;          // HLSL options
 
-	d3d_texture_manager *  m_texture_manager;          // texture manager
+	d3d_texture_manager *   m_texture_manager;          // texture manager
 };
 
 #endif // OSD_WINDOWS

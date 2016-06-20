@@ -526,14 +526,10 @@ UINT32 intelfsh_device::read_full(UINT32 address)
 		switch( m_bits )
 		{
 		case 8:
-			{
-				data = m_data[address];
-			}
+			data = m_data[address];
 			break;
 		case 16:
-			{
-				data = m_data[address*2+1] | (m_data[address*2] << 8);
-			}
+			data = (m_data[address*2] << 8) | m_data[address*2+1];
 			break;
 		}
 		break;
@@ -605,14 +601,10 @@ UINT32 intelfsh_device::read_full(UINT32 address)
 			switch( m_bits )
 			{
 			case 8:
-				{
-					data = m_data[address];
-				}
+				data = m_data[address];
 				break;
 			case 16:
-				{
-					data = m_data[address*2+1] | (m_data[address*2] << 8);
-				}
+				data = (m_data[address*2] << 8) | m_data[address*2+1];
 				break;
 			}
 		}
@@ -927,7 +919,7 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 			break;
 		case 16:
 			m_data[address*2] = data >> 8;
-			m_data[address] = data;
+			m_data[address*2+1] = data;
 			break;
 		default:
 			logerror( "FM_WRITEPART1 not supported when m_bits == %d\n", m_bits );
@@ -947,7 +939,7 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 			break;
 		case 16:
 			m_data[address*2] = data >> 8;
-			m_data[address] = data;
+			m_data[address*2+1] = data;
 			break;
 		default:
 			logerror( "FM_WRITEPAGEATMEL not supported when m_bits == %d\n", m_bits );
@@ -1010,7 +1002,7 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 				}
 
 				// clear the block containing the current address to all 0xffffs
-				memset(&m_data[2*base], 0xff, size);
+				memset(&m_data[base], 0xff, size);
 
 				m_timer->adjust( attotime::from_msec( duration ) );
 			}

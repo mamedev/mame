@@ -66,8 +66,6 @@ public:
 
 	/* keyboard state */
 	UINT8 m_keylatch;
-
-	DECLARE_WRITE_LINE_MEMBER(sg1000_vdp_interrupt);
 };
 
 class sc3000_state : public sg1000_state

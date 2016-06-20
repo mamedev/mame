@@ -1,0 +1,883 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="pc98_cd" description="NEC PC-9801 CD-ROMs">
+
+	<!-- 
+
+	Partial list of PC-9801/PC-9821 CD-ROMs.
+	
+	Floppy disks are also included where needed. They are attached to the floppy_5_25 interface
+	for convenience, as the PC-98x1 driver always emulates 5.25" drives. This isn't realistic,
+	though, as CD-ROM software was generally released very late in the life of the plaform,
+	when 3.5" floppies were much more common.
+	
+	-->
+
+	<software name="aitd2">
+		<!--
+		Origin: redump.org
+		<rom name="Alone in the Dark 2 (Japan) (Track 01).bin" size="19051200" crc="4fe30d1a" sha1="589986149c46c783e3259e242e3ff48d8eef4d65"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 02).bin" size="11917584" crc="e7097db2" sha1="db3bfa5ad614371fce41daa8c3c35179ca35c27c"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 03).bin" size="20276592" crc="c9766b0f" sha1="494eba2b4cffeb1ca74d845ba9be4c890416aaf6"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 04).bin" size="18423216" crc="53c24ed1" sha1="e722b8d1f276fb9b46376310a28488dcfdb61119"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 05).bin" size="17611776" crc="9e5ae663" sha1="186599ed278d3d0c720b36a43e6f0ffa67f5a4b9"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 06).bin" size="13446384" crc="befdeed5" sha1="d4a3f4b3e58bbd69c9e9a6695103fc73cd4bbbad"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 07).bin" size="12432672" crc="017d7845" sha1="2403f33732a793f0a7859c0d42331899f74f8b07"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 08).bin" size="15469104" crc="5af4755a" sha1="0c741cde9b4fc307fe244325340102afe113ae41"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 09).bin" size="21153888" crc="6b82aa33" sha1="a097f62b34899916f1c582b7cde6da24bf9738eb"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 10).bin" size="5597760" crc="824cfb0d" sha1="0d42c77be1c5c6f007b0021e7ff761b64787fd6e"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 11).bin" size="3099936" crc="8fd76886" sha1="0db75ee4ff5321ca97d006052e38c03294bd33dd"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 12).bin" size="3986640" crc="16fbe588" sha1="3a8ae4244d44550b1693f0be22f23484b8871b20"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 13).bin" size="18627840" crc="e4afc9ae" sha1="038f5e12fb4e3ce213fb5da85edf1fa0f0b90948"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 14).bin" size="7013664" crc="81725b80" sha1="ef0852222edca7923a57b58d0d98649f645be092"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 15).bin" size="4043088" crc="f23fc01e" sha1="ffdb6a53ffceccfc0fec0c58bf2608bc6f89e247"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 16).bin" size="13719216" crc="cdc0bd82" sha1="93128d80b254ffa587e40d147e4c6fa055f7575c"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 17).bin" size="18830112" crc="2be9ea3b" sha1="cec550c9f29b5b72c1073149f1ab3f4c930be456"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 18).bin" size="18966528" crc="d7f4e04a" sha1="eb9ebd787537bb08dbb831b30607faa8476222fe"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 19).bin" size="14083776" crc="b00c8a3d" sha1="f7714ef41f102495d3a8b79120dfa86e2123ff96"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 20).bin" size="14151984" crc="50ffef97" sha1="446053407a31f3ed16679129097181d9c91fada1"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 21).bin" size="18601968" crc="9e6d3bff" sha1="76a33aa494c9271bb31ecaea7cb2d863870995e6"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 22).bin" size="31592064" crc="26209034" sha1="3076d6349f2939c56a513786b2b0aa5eb801224a"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 23).bin" size="4823952" crc="774f1553" sha1="2e7b4a0ec70c8e9e7c46c1d9da92c8c9fe10a814"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 24).bin" size="4217136" crc="da6604d2" sha1="037971b04e7fd8cfaa8e23e6a8e17be434e3ec1a"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 25).bin" size="5564832" crc="e1db16ca" sha1="191b82193d11433f0cf58ad3760f7cbfb66ce695"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 26).bin" size="3920784" crc="7ca387e0" sha1="72dca429d64f7ea9b896148457fc73d263e79a8b"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 27).bin" size="802032" crc="c0921a26" sha1="d3a85a31ab1427a2894911f4462ac0922af5d15e"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 28).bin" size="3798480" crc="a4bac07d" sha1="c80489c8408dfd94bb1269742e4f3d14b2ecb015"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 29).bin" size="3600912" crc="59a2bf73" sha1="ff5f9691c6850fd82d88facc1675614ca21a4fd7"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 30).bin" size="4033680" crc="9c968283" sha1="a740bce21c1111ca431538355baba76a92bd5171"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 31).bin" size="3553872" crc="6c76741e" sha1="02ab995cf119fd849ec07d2433bb1a16728fb929"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 32).bin" size="3149328" crc="c1fbadcc" sha1="42d37ae4a4a354ad8baca48931bc7230b90b3bc6"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 33).bin" size="3161088" crc="de41b290" sha1="1edec6a6eb372f8cb33cebee00dfd78daab5818e"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 34).bin" size="4125408" crc="909e6357" sha1="9eb94041c555862ec2874dabc7eb879bc4975969"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 35).bin" size="2681280" crc="faad0ff0" sha1="38e5f1228952f2b64977e472b9260a7c4c6ec7d3"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 36).bin" size="936096" crc="226d0666" sha1="0dbaee8d971ced2916ec60524ff38fc6114a2a37"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 37).bin" size="5588352" crc="0dd900d2" sha1="9bc29a686fc0d3e0929d10b4ba9007210a421ffc"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 38).bin" size="4718112" crc="61177ee7" sha1="ff430611656f722ccb333717d531750b246d373e"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 39).bin" size="4405296" crc="9ba82903" sha1="9bec630cdfb213c10e729de6d68074daa3dca57f"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 40).bin" size="3685584" crc="9eadb5de" sha1="11f33535ada08a52391c59cd1715714068c274d0"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 41).bin" size="1629936" crc="e0e1be53" sha1="5f14174595868a7bd6338f5c57cf784cd4cdb3fd"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 42).bin" size="4252416" crc="b1ed08a1" sha1="85191a0a16aad6aae7f82ef4b20347fcca3e77d1"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 43).bin" size="4097184" crc="11bcd694" sha1="7f40411a8e93473e61bbd36c637ce9938faa2477"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 44).bin" size="3845520" crc="ee808569" sha1="452bb58351ce78e3135fbc4c201e08b8b2a8e3af"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 45).bin" size="1867488" crc="459033ff" sha1="48fc1fbf3848555d7230ce7c59064a32fe00ad9c"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 46).bin" size="2326128" crc="b04530b3" sha1="81929deeca7a0cec06fb04ccf5526d59fe49c156"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 47).bin" size="5618928" crc="46a4d3f1" sha1="62e79f7f877b4d08b7c114390429dc19f900a15a"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 48).bin" size="4391184" crc="2a2f16f5" sha1="5acf2ae9e9fe1984b1d865ae5276afea71a717ad"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 49).bin" size="2222640" crc="115e7d3e" sha1="a342da289d70f7b650f07858ff292c7268019cb0"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 50).bin" size="5934096" crc="d3db95ba" sha1="7c41a51d7bd564d0e17d63870b823abdc2e6947f"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 51).bin" size="1836912" crc="957ae0e5" sha1="c55acebfc12d3503f991c00510cfde2b99032753"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 52).bin" size="4772208" crc="eb5b144b" sha1="4d867a153bd57bb09be29c9f131c6897b0cfc750"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 53).bin" size="3739680" crc="14fd2387" sha1="b6f685d4d43b1021d5389c7191b72ffa1f0ea362"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 54).bin" size="5760048" crc="4b8e77bf" sha1="0eea09b164872e82e05c08f8c8283d10900a4797"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 55).bin" size="5593056" crc="3e1db633" sha1="c4e687447cf9fa3115d4e6876ce19f7958bc7b98"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 56).bin" size="4358256" crc="0e2db174" sha1="60ec3bce87165baa038b7f50919d6285468f75f8"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 57).bin" size="2333184" crc="5d35556b" sha1="64b7b10553604a5fd1580dc0e0a52d2cb40e9d9a"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 58).bin" size="5056800" crc="db9e06de" sha1="975d7fd091c19eee91633f6f190c07bd00d60ca6"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 59).bin" size="5244960" crc="ed79c0f2" sha1="c26233b72cb18c791bb488dbb52e922b65b0fcf8"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 60).bin" size="5722416" crc="64e1e119" sha1="f4bef4098e009d077283ff29d7cb76c79d64502a"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 61).bin" size="5868240" crc="df35c435" sha1="f5de6ffcd760e76a303b24f76f84b3eb864eed09"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 62).bin" size="2944704" crc="503fc1c8" sha1="83e2b7b683939acfc577246599638c9ad4d845a7"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 63).bin" size="5837664" crc="e286ff32" sha1="c594de88434f2ffa9e903492802d1015f8a92d2b"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 64).bin" size="5327280" crc="8d40ba19" sha1="6166159f93885095d23f0ac76b8124f50ce9ecfd"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 65).bin" size="1018416" crc="ffbdd671" sha1="80eeefa5a9579747b0fdf74413bf3097e1bd96ab"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 66).bin" size="5087376" crc="4d0d3fa5" sha1="f42d179f666d3ae67b3e2b541be38baf108ba85c"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 67).bin" size="6305712" crc="5536d07d" sha1="523bfc5f9c7ce7288c2be4f08c717a05994219ef"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 68).bin" size="5101488" crc="b5df861f" sha1="3ba0ec8089e0af29bdd0ef9a6ae92e5aa810d91d"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 69).bin" size="5282592" crc="a80b91ba" sha1="f009d475fa3fbd2b6f2056986add49604bb99c8d"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 70).bin" size="2427264" crc="c718c330" sha1="8a6680f76c60207af2959dbdf7d906c0d6e88fdd"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 71).bin" size="4386480" crc="5c362c68" sha1="b18b42da2a9f17173d444e1f725d10ab045eb375"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 72).bin" size="6437424" crc="79f1f26f" sha1="19fb96a11f25c2d99c90c71c1429f892cbd764ca"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 73).bin" size="3351600" crc="a31d63a0" sha1="1ed79051a4067e877fc7e80b4b874d8a129fd32f"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 74).bin" size="2497824" crc="797d691b" sha1="38f4bc609383a1bf9329efa3e474ba9d3e354113"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 75).bin" size="4210080" crc="b4ce033d" sha1="bf0c3f31e34311bb92b346d1d774ab72356febb0"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 76).bin" size="5287296" crc="bc30c2b5" sha1="76ad034727eb596e5dec9c6db10152cb80389bc2"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 77).bin" size="2504880" crc="f9e0fb3e" sha1="9ef6c0999eb0c6ac9d18c35e56261263c06a0863"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 78).bin" size="1564080" crc="c8202f34" sha1="d07ce509b2302e604a71114ad4c5ae727151df3b"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 79).bin" size="5628336" crc="2e7773ed" sha1="8005605e1b8f22985e6e5f9673f9bca3ba8f03da"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 80).bin" size="5103840" crc="1e891b22" sha1="d09ac8885d8689611169111cb9228dc46b23f5c4"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 81).bin" size="5967024" crc="3d3da9ea" sha1="d3891c0a512bd600880363608417758526def089"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 82).bin" size="5456640" crc="be966cb7" sha1="d5f47bf10eb6e471aea7599bc0eea2a04e0f2492"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 83).bin" size="2972928" crc="ddce7d9b" sha1="3ff26df100f9542c3c6a45d4d5309099b00a1900"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 84).bin" size="3906672" crc="c3613ecd" sha1="d2df3a970f216d71c56546d941022f4ef7048061"/>
+		<rom name="Alone in the Dark 2 (Japan) (Track 85).bin" size="1851024" crc="04bbabd6" sha1="8735c94921c2fe15c5ba2f36dc06a39af9b03a06"/>
+		<rom name="Alone in the Dark 2 (Japan).cue" size="8443" crc="89ba036c" sha1="a7af63fd78be075bc03bc231882dd227bfb3ef13"/>
+		-->
+		<description>Alone in the Dark 2</description>
+		<year>1994</year>
+		<publisher>アローマイクロテックス (Arrow Micro-Techs)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="alone in the dark 2 (japan)" sha1="cbbb766102038d808172bfd5675838fa57fde6b2" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="branmar2">
+		<!--
+		Origin: Unknown
+		<rom name="GAME.BIN" size="479222352" crc="b96fad3a" sha1="76d673cd9fdcf7479f484e2e5b92fcde3d6c6e41"/>
+		<rom name="GAME.CUE" size="173" crc="75049f00" sha1="008c1c2053e71aa20f6818fbe4f9eeb6705ef7a6"/>
+		-->
+		<description>Branmarker 2</description>
+		<year>1995</year>
+		<publisher>ディー・オー (D.O.)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="branmarker 2" sha1="15f0320726f83a341a7f01e3268945b143c66873" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="brandnew">
+		<!--
+		Origin: redump.org
+		<rom name="Brandish (Japan) (Renewal) (Track 01).bin" size="11936400" crc="07953f04" sha1="e3aba6d10495617412095fb47ae40c59c63b2237"/>
+		<rom name="Brandish (Japan) (Renewal) (Track 02).bin" size="27048000" crc="eb5d87f7" sha1="9cd9110b02652e6f95b48e49fc20f000aeab5143"/>
+		<rom name="Brandish (Japan) (Renewal) (Track 03).bin" size="19227600" crc="48884cca" sha1="6415021ba125e5836716cb87f5d38d17b4ac3375"/>
+		<rom name="Brandish (Japan) (Renewal) (Track 04).bin" size="20109600" crc="02627708" sha1="1c5c62a297761eff3f5a873f75f7aed7011b9ce2"/>
+		<rom name="Brandish (Japan) (Renewal) (Track 05).bin" size="64033200" crc="d4ee67ed" sha1="e873447e7e831831c268f419cebf77350c46000e"/>
+		<rom name="Brandish (Japan) (Renewal) (Track 06).bin" size="23284800" crc="0ef5c8cd" sha1="dc55d1067bcbe1bfe44f7aec37832ba9bd036703"/>
+		<rom name="Brandish (Japan) (Renewal) (Track 07).bin" size="17463600" crc="0719383a" sha1="1c31f060b6216bf1c97b6f308899967522895a0b"/>
+		<rom name="Brandish (Japan) (Renewal) (Track 08).bin" size="19051200" crc="e9a7d73b" sha1="848780a529e56e8c9b2992425d183192b1e53824"/>
+		<rom name="Brandish (Japan) (Renewal) (Track 09).bin" size="41101200" crc="40d73bba" sha1="8756fbc4c60e2be35800a69cd3fa114ba389d5c5"/>
+		<rom name="Brandish (Japan) (Renewal) (Track 10).bin" size="22402800" crc="280e72de" sha1="487d4677276bdec0cbc7b1c3e3e27c8688ac6809"/>
+		<rom name="Brandish (Japan) (Renewal) (Track 11).bin" size="43394400" crc="d4ca4035" sha1="c51a0dd575e606b5d02d35556428f75ece212fd6"/>
+		<rom name="Brandish (Japan) (Renewal) (Track 12).bin" size="51332400" crc="988808a6" sha1="4b785f2e06ea612a7d9eaf809a4f0364aa341fca"/>
+		<rom name="Brandish (Japan) (Renewal) (Track 13).bin" size="21168000" crc="e22d6a3e" sha1="d557ff1505c892ef374daf119f5f83e0e311463d"/>
+		<rom name="Brandish (Japan) (Renewal) (Track 14).bin" size="28576800" crc="95195948" sha1="6f03e8f8372ae32a4c6339b4ee48dac172e3ed5a"/>
+		<rom name="Brandish (Japan) (Renewal).cue" size="1699" crc="d0d03a06" sha1="dc56f56978146574591ad5e7201ee047e8a33651"/>
+		-->
+		<description>Brandish Renewal</description>
+		<year>1995</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="brandish (japan) (renewal)" sha1="d804bc3ddb997443b0ba856bac3eb2d8d333a8a7" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="brandvt">
+		<!--
+		Origin: redump.org
+		<rom name="Brandish VT (Japan).cue" size="85" crc="b7368f87" sha1="4d5c5eba2fc88cf8c3cec9d3c8d9392f04058ef3"/>
+		<rom name="Brandish VT (Japan).bin" size="10673376" crc="f0ef8291" sha1="4bec0d6244ec0cfc318d24968640542f1f5b3828"/>
+		-->
+		<description>Brandish VT</description>
+		<year>1996</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="brandish vt (japan)" sha1="0aa4a61ad74f93d78fc331ddefb91e67c79e9bc8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="crysweep">
+		<!--
+		Origin: Unknown
+		<rom name="CS.cue" size="171" crc="1277a748" sha1="6bb3d04a127c225b3a69a49537f243d8eda3b48d"/>
+		<rom name="CS.bin" size="571625376" crc="31a296fc" sha1="059fa04b0d515092b9312364504551959f1729e7"/>
+		-->
+		<description>Cry Sweeper</description>
+		<year>1996</year>
+		<publisher>ディー・オー (D.O.)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cry sweeper" sha1="8b7000406f871d338b23fbc0275f6b71eabe1b8c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Hybrid disc, also included in fmtowns_cd.xml -->
+	<software name="dangel">
+		<!--
+		Origin: redump.org
+		<rom name="Dangel (Japan).cue" size="80" crc="afbb2b04" md5="09b954697d11ce8413adae4c80715f65" sha1="c18f1bd180c4b87a3f7167cab436a31d4dd36f55"/>
+		<rom name="Dangel (Japan).bin" size="298943904" crc="58c44148" md5="014e3adff972065a032b22771f9860ea" sha1="803cdfeaf8662b3a9d1e6cc3a378bf63a7fece5b"/>
+		-->
+		<description>Dangel</description>
+		<year>1996</year>
+		<publisher>ミンク (Mink)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dangel (japan)" sha1="5b748eb84966710bf125a84dac3e878f62872ba6" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dstat_09">
+		<!--
+		Origin: redump.org
+		<rom name="Disc Station Vol. 9 (Japan).cue" size="93" crc="5705eaf1" md5="a5d71c4f37e88b5c25900f6ed21ad463" sha1="662eda1ea95d7d582d7704acf3ba073a268178d6"/>
+		<rom name="Disc Station Vol. 9 (Japan).bin" size="46901232" crc="290ed47c" md5="cd281ceb615104feb4e8fdb8965fc267" sha1="97d1cb149b6d8bef08ebb050595d254a35cc1dd4"/>
+		-->
+		<description>Disc Station Vol. 09</description>
+		<year>1995</year>
+		<publisher>コンパイル (Compile)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="disc station vol. 9 (japan)" sha1="664455bba9d9830783a76b41f816ffe27c537835" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dstat_10">
+		<!--
+		Origin: redump.org
+		<rom name="Disc Station Vol. 10 (Japan).cue" size="94" crc="4f4df880" md5="03f3d701a75ccdb14851d2e600917877" sha1="31b417003eb2ef34243622a3449839d734b76310"/>
+		<rom name="Disc Station Vol. 10 (Japan).bin" size="150142272" crc="58db2b79" md5="315e6f62277f514f60be737af7ef9b05" sha1="03424e364744f09906e4f0aa456d6a1a5c887767"/>
+		-->
+		<description>Disc Station Vol. 10</description>
+		<year>1996</year>
+		<publisher>コンパイル (Compile)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="disc station vol. 10 (japan)" sha1="2b998518d8f2eddfd65b7871ae5a94e11d7b6b11" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dstat_11">
+		<!--
+		Origin: redump.org
+		<rom name="Disc Station Vol. 11 (Japan).cue" size="94" crc="9a4884fc" md5="01e1d313098b2be939b6b1603a869bd2" sha1="753f2b98d8a0495c96b5d40d4faa7b9c8bcbda32"/>
+		<rom name="Disc Station Vol. 11 (Japan).bin" size="158197872" crc="3ffba967" md5="e708233599fa3a48b85731b516bf725d" sha1="5434c2a3ac045e7de1d618ecb477404ac3b86a92"/>
+		-->
+		<description>Disc Station Vol. 11</description>
+		<year>1996</year>
+		<publisher>コンパイル (Compile)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="disc station vol. 11 (japan)" sha1="a8aff0cb5c0bf8244939a91b3fb3fe3cd07bdb36" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="doom">
+		<!--
+		Origin: redump.org
+		<rom name="Doom (Japan).cue" size="78" crc="1fc40160" md5="f2dca5634ac58c4e417742568dac52cf" sha1="417aa17487286fd2a30620b64b5f2f4a972bb738"/>
+		<rom name="Doom (Japan).bin" size="17578848" crc="0a683d88" md5="6be92ade4cb0a74fe0b04fb33085f1ba" sha1="c708e01f6256b07dbd5e8b1c72a0076fe153e30c"/>
+		-->
+		<description>Doom</description>
+		<year>1995</year>
+		<publisher>イマジニア (Imagineer)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="doom (japan)" sha1="d8df34ba9caaec7f07841e375b4dff85549065ff" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="doom2">
+		<!--
+		Origin: redump.org
+		<rom name="Doom II (Japan).cue" size="81" crc="bf7ae499" md5="0daf5db6cb9f2e9683cf4378560fd442" sha1="270f31750fa528000bcf4752c19aaa40f0717585"/>
+		<rom name="Doom II (Japan).bin" size="18860688" crc="e56f5c3d" md5="cf61309baee3a54c0a469cd06d571957" sha1="b76609d9e9da4f6c48c62e354620a76ba46129f5"/>
+		-->
+		<description>Doom II</description>
+		<year>1995</year>
+		<publisher>イマジニア (Imagineer)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="doom ii (japan)" sha1="d6e6ac62129f441e1e4ca0c551923e5f49cc2b68" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="fh2tag">
+		<!--
+		Origin: redump.org
+		<rom name="Finish Hold 2 - Tag (Japan).cue" size="93" crc="7cf64221" md5="a2dc55a24539aab103701e08562253fe" sha1="8a49ecb6010ea76deb1bcc3c84a0cfc437de46e3"/>
+		<rom name="Finish Hold 2 - Tag (Japan).bin" size="139555920" crc="1ebec24d" md5="7c2fa0f55e3a37eb3acef427051298d5" sha1="87c0051de042876f7fed2008bbd7b4316800532f"/>
+		-->
+		<description>Finish Hold 2 - Tag</description>
+		<year>1996</year>
+		<publisher>システムソフト (SystemSoft)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="finish hold 2 - tag (japan)" sha1="a553455dae0a6efa8b2b424d24c1e611bd03a10e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="galpani">
+		<!--
+		Origin: Unknown
+		<rom name="galpani (1995)(kaneko - creo i).ccd" size="3120" crc="788eda2a" sha1="12dd368e864857dc3d206dae6890621536d322da"/>
+		<rom name="galpani (1995)(kaneko - creo i).img" size="497229264" crc="8b3ce23e" sha1="9bd91b2e62d5847cc65bd363e7a59bd7bda15613"/>
+		<rom name="galpani (1995)(kaneko - creo i).sub" size="20295072" crc="c2670009" sha1="c0cf2725384ef328682d5c28f017f9dddbc6f28b"/>
+		
+		After conversion with IsoBuster + EAC:
+		<rom name="galpani.cue" size="1725" crc="17aa363e" sha1="4cb40d4ec35eff243114029f3ddc90d81eb646d3"/>
+		<rom name="track01.bin" size="103473888" crc="18ce00b3" sha1="3d6ed2ff296d77ad8df3e76c2765f1cc5ca69115"/>
+		<rom name="track02.bin" size="23684640" crc="0e541aa6" sha1="2f2ee36f184fd3a6cb211760cb7eed053c91afab"/>
+		<rom name="track03.bin" size="27304368" crc="1c9a120a" sha1="7f84c793d7bea440ab16a06f6ea032e5a12b9bc7"/>
+		<rom name="track04.bin" size="29202432" crc="d400d2af" sha1="6491cb6ea0a25daa41264cd52795b932cc1b8018"/>
+		<rom name="track05.bin" size="38822112" crc="6abc013c" sha1="e328c9c82ece454d4c5a381b66230386f5b1e294"/>
+		<rom name="track06.bin" size="34978944" crc="dd0ec099" sha1="5ff34042f7d2b06704a4a1fdcd4a603200a87737"/>
+		<rom name="track07.bin" size="35089488" crc="1f0809b7" sha1="c5e1089cc0dac148f015186c23b4c0ec20c3b4ad"/>
+		<rom name="track08.bin" size="41491632" crc="b65e9a96" sha1="929ad7fd64e842140a1d1ac2a168b713351de69e"/>
+		<rom name="track09.bin" size="22035888" crc="c33340fe" sha1="108c959676745deb315e8e61cc3d1d45046b85ea"/>
+		<rom name="track10.bin" size="41832672" crc="411f1aa9" sha1="e4a77beb71c34fa8a6a67b9ff50fb339404651a6"/>
+		<rom name="track11.bin" size="32422320" crc="08d46196" sha1="4cdab646ba794d99c33f5d73ac7844c4a103b66a"/>
+		<rom name="track12.bin" size="38403456" crc="80f16812" sha1="9efa2a2871895a4a2803867d01ca0cc333584c8d"/>
+		<rom name="track13.bin" size="28487424" crc="cdb49e40" sha1="2a5dbc79d3c869f249a37495d655857f6ccbc5c9"/>
+		-->
+		<description>Galpani</description>
+		<year>1995</year>
+		<publisher>Creo I</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="galpani" sha1="a6ef11bd97ac8917eee3ef7af50b516d7d538e17" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="gitenmt">
+		<!--
+		Origin: redump.org
+		<rom name="Giten Megami Tensei - Tokyo Mokushiroku (Japan).cue" size="113" crc="40db8275" md5="01a1d9aa8310a5bab608f63c770d8bff" sha1="3854f7e6148c4be07afc0693d5f28142e09ba4f8"/>
+		<rom name="Giten Megami Tensei - Tokyo Mokushiroku (Japan).bin" size="23630544" crc="25f30ab9" md5="51d9d52725daec92f72dbde0e932529f" sha1="3c0d28d697870a24e9f373bb4e0446e2f5d88c62"/>
+		-->
+		<description>Giten Megami Tensei - Tokyo Mokushiroku</description>
+		<year>1997</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="giten megami tensei - tokyo mokushiroku (japan)" sha1="5ec487543a5e2b6dbf0d8e2b78c7d36307d60599" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="guynarck">
+		<!--
+		Origin: Unknown
+		<rom name="guynarock r.cue" size="633" crc="5d46bde5" sha1="798fdf61ea95d66b4dc74fb5a8c8494a1084fb44"/>
+		<rom name="guynarock r.img" size="533257200" crc="08f4f81c" sha1="aebb53e1a8632f1e179a8bc0cfe0aab27cb27cef"/>
+		-->
+		<description>GuynaRock R</description>
+		<year>1997</year>
+		<publisher>ソニア (Sogna)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="guynarock r" sha1="6c2c417960ce6df8b88ae2f69b77f4ab1bf922a3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="letspir">
+		<!--
+		Origin: Unknown
+		<rom name="lptv.bin" size="629345808" crc="c255cd67" sha1="88870768ff5291369264043e4179d8add509cfe6"/>
+		<rom name="lptv.cue" size="173" crc="e9325e8e" sha1="df5078e1cc21a684e0e4f34b455e5bb9d11621aa"/>
+		-->
+		<description>Let's! Pirates</description>
+		<year>1997</year>
+		<publisher>ジックス (ZyX)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="lptv" sha1="a866ed50254551455d5a646e87c5d10eeeea0329" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="links386">
+		<!--
+		Origin: redump.org
+		<rom name="Golf Links 386 Pro (Japan).cue" size="92" crc="2f39ce25" md5="7b971ef29af37dc896f91b76398a26b0" sha1="81a07ca4334675f87ea175f0103dc2b14a3988a2"/>
+		<rom name="Golf Links 386 Pro (Japan).bin" size="20815200" crc="99a1878d" md5="164db67263c00939fc9ceb8f3d1a96cb" sha1="bc5a1e3c0773dcba00720728351661da6fd8a75c"/>
+		-->
+		<description>Golf Links 386 Pro</description>
+		<year>1995</year>
+		<publisher>サイベル (Cybelle)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="golf links 386 pro (japan)" sha1="c0eb847d7168e6209482b19a270bd81d40383137" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="loh4">
+		<!--
+		Origin: redump.org
+		<rom name="Akai Shizuku - The Legend of Heroes IV (Japan).cue" size="112" crc="51672b80" md5="31535feeaec7c80f11da3556e4366922" sha1="c0eaf4181b26932759cc78679c83c6bf52725862"/>
+		<rom name="Akai Shizuku - The Legend of Heroes IV (Japan).bin" size="8772960" crc="5427ac70" md5="6bd6a1dc1a79d58abd14266516218358" sha1="3c603b5cd6000a0f7d365da32ad6d7dfb5bc1965"/>
+		-->
+		<description>Akai Shizuku - The Legend of Heroes IV</description>
+		<year>1996</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="akai shizuku - the legend of heroes iv (japan)" sha1="3524c9b012c4b96bbae03220088bbadbfed28898" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="macrslcp">
+		<!--
+		Origin: redump.org
+		<rom name="Chou Jikuu Yousai Macross - SkullLeader Complete Pack (Japan).cue" size="447" crc="c16d423e" md5="be2a0ed6b66d7af5465defeaa5e6fc9f" sha1="1cc4e97dd3496cc91ce1fe9d6d899d7d874cc0c9"/>
+		<rom name="Chou Jikuu Yousai Macross - SkullLeader Complete Pack (Japan) (Track 1).bin" size="11832912" crc="12341454" md5="2931a48797a2d353f095639ec5391310" sha1="3fa7099b3dcc2d794659d0ca7fc89abfef790880"/>
+		<rom name="Chou Jikuu Yousai Macross - SkullLeader Complete Pack (Japan) (Track 2).bin" size="21518448" crc="d8642621" md5="9e36b834adb077051b96c02120b12e41" sha1="345be6b9afa27a2381f25236a347de7e31f16af4"/>
+		<rom name="Chou Jikuu Yousai Macross - SkullLeader Complete Pack (Japan) (Track 3).bin" size="35985600" crc="ba94c502" md5="654be3fc65aa773df951856003f3e3b2" sha1="bee8a5ab076d10c9d6d85803316ba32d9bc30b5a"/>
+		-->
+		<description>Chou Jikuu Yousai Macross - SkullLeader Complete Pack</description>
+		<year>1995</year>
+		<publisher>ファミリーソフト (Family Soft)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="chou jikuu yousai macross - skullleader complete pack" sha1="a3c9c3e798c84ca64fc5dfbc86c39eef427bc6ad" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="mmagic4">
+		<!--
+		Origin: redump.org
+		<rom name="Might and Magic - Clouds of Xeen (Japan).cue" size="2007" crc="77861ae9" md5="658d8729451fd58a51109ff96cdd39e0" sha1="f2b0f966a3d55950a3dc7d93176d165c68a8a6f3"/>
+		<rom name="Might and Magic - Clouds of Xeen (Japan) (Track 01).bin" size="14283696" crc="6c5f9e30" md5="c68a661ad754c242141aa9534e365f75" sha1="e8b5640ee98997402763d143405783d8e4b3f9cb"/>
+		<rom name="Might and Magic - Clouds of Xeen (Japan) (Track 02).bin" size="16750944" crc="1af9ae1a" md5="9e5804bcb534005f3dc0e614c717c3ef" sha1="c22cac53b725d011d4d2b8195d5ad0aed61072ff"/>
+		<rom name="Might and Magic - Clouds of Xeen (Japan) (Track 03).bin" size="9029328" crc="3dfe9bc4" md5="a0c719f427776690c3fa21abf2eb2b04" sha1="a9daf766298d82f7fea1358144c57824e0431028"/>
+		<rom name="Might and Magic - Clouds of Xeen (Japan) (Track 04).bin" size="27511344" crc="53e93127" md5="ab3e8ae7f1206ff26d296b600de1c8ec" sha1="40f5ed9ba071165eb1fa424d2f099261f750fbc2"/>
+		<rom name="Might and Magic - Clouds of Xeen (Japan) (Track 05).bin" size="7100688" crc="de731102" md5="04242bb7ca08092731a535590d80d42b" sha1="ac4510811513ee0c5059399ba94bbad7ca84c0b8"/>
+		<rom name="Might and Magic - Clouds of Xeen (Japan) (Track 06).bin" size="8274336" crc="198e6c9a" md5="0b97a17d0dbfce1f07382a5c45895271" sha1="9aa4d2722eab3ed7e73b33bc1977d2332befb952"/>
+		<rom name="Might and Magic - Clouds of Xeen (Japan) (Track 07).bin" size="11769408" crc="5a544cf0" md5="3f7b9f339d76bf34fad1759101acb5d9" sha1="b94da1650b7693397efbe7728913e7e02192d52a"/>
+		<rom name="Might and Magic - Clouds of Xeen (Japan) (Track 08).bin" size="5341392" crc="0ac523f4" md5="13845958c739d62d45cae57b98b706d1" sha1="d903a4a66e3be9ada62994402a0b19911c765003"/>
+		<rom name="Might and Magic - Clouds of Xeen (Japan) (Track 09).bin" size="5221440" crc="15a05f24" md5="fc3ddff0569c5d06b9579b98c83f4e76" sha1="aece1f0b861c014b10c066704f22a0d93440f563"/>
+		<rom name="Might and Magic - Clouds of Xeen (Japan) (Track 10).bin" size="8589504" crc="f0767dcf" md5="0a11c643587ccdd10bec2fe8029836c0" sha1="a859c02a65c8be6b889fecc13dccd4b2eb779485"/>
+		<rom name="Might and Magic - Clouds of Xeen (Japan) (Track 11).bin" size="27596016" crc="6e961c0d" md5="7f74cab30ce5b29c09ef7a9e75418c17" sha1="69b929dc1cdd6791df9edc192bd1586b26b56c09"/>
+		<rom name="Might and Magic - Clouds of Xeen (Japan) (Track 12).bin" size="37587312" crc="f6002ac7" md5="ffeaf5ba9f00ff791f92c0ba6058be86" sha1="0ccd291cf0f5792269c20dd2010b10dc82efcc75"/>
+		<rom name="Might and Magic - Clouds of Xeen (Japan) (Track 13).bin" size="32808048" crc="60c7b3fe" md5="730c4b98a2a09237bcebc6102627e14b" sha1="c7da83f76082720708d8ce0d8152e89adfd3ffe7"/>
+		<rom name="Might and Magic - Clouds of Xeen (Japan) (Track 14).bin" size="24423168" crc="3f42b4f7" md5="a992cbceac28c97fe0b5caf801fcde4d" sha1="d86e8584a43d23e56d328bf6d2d329297fb4bab9"/>
+		<rom name="Might and Magic - Clouds of Xeen (Japan) (Track 15).bin" size="29275344" crc="ebfaec74" md5="1dfe948aed3f20a500a806973a9c1f7c" sha1="c3b5621d5b617973ef33238634d735de48ef5041"/>
+		-->
+		<description>Might and Magic - Clouds of Xeen</description>
+		<year>1993</year>
+		<publisher>スタークラフト (Starcraft)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="might and magic - clouds of xeen (japan).hdm" size="1261568" crc="e7738b2e" sha1="1c58c1ee565f777e931bd301cc535eb27a4b70e6" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="might and magic - clouds of xeen (japan)" sha1="c8e213e391ecc1d0bd416450f48bf9fd8dfe4966" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="panzerg">
+		<!--
+		Origin: redump.org
+		<rom name="pg.bin" size="203549136" crc="6542ab9b" sha1="11f0723f6fd309124b43f94ed2f9de9fd5c28ca5"/>
+		<rom name="pg.cue" size="68" crc="a0dc8d13" sha1="68cc23cb28da99ba1d7c4e3af85acb57b959274d"/>
+		-->
+		<description>Panzer General</description>
+		<year>1995</year>
+		<publisher>AMT Savan</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="panzer general" sha1="51ba8a8c5e443271d745b98a80325e819e04a3d8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="photogen">
+		<!--
+		Origin: redump.org
+		<rom name="Photo Genic (Japan).cue" size="85" crc="97ca0b88" md5="4e1575abab8940c80b41e003928d0c9d" sha1="917369cda659f3bd55ab4c5ceb46c6bd74f3a0b0"/>
+		<rom name="Photo Genic (Japan).bin" size="24641904" crc="52dcb64b" md5="53f1a1dc0f0663a547a5515738040bf6" sha1="a9e813960d37ec48e0544b4d8383f027060a4ca4"/>
+		-->
+		<description>Photo Genic</description>
+		<year>1997</year>
+		<publisher>サンソフト (Sunsoft)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="photo genic (japan)" sha1="407a1029503fc66d6207e436000c47b1626e01a0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pnauts">
+		<!--
+		Origin: redump.org
+		<rom name="Policenauts (Japan).cue" size="591" crc="33715417" md5="ae17a348af34b2f7bddd0695d976f61c" sha1="2e41266a1a1e82eaa6a2b85858aec7af8ad93e33"/>
+		<rom name="Policenauts (Japan) (Track 1).bin" size="438123504" crc="2b3e3183" md5="c397bfaeb01f420d68bdc025035e9790" sha1="55f73b092e899fed724b0f77936fd27481c7796f"/>
+		<rom name="Policenauts (Japan) (Track 2).bin" size="1270080" crc="f67682bf" md5="9d65bf3162a18aac88c5d0428e3f529e" sha1="08a2573b9f1bc9fe41df1c9496cf51f8d586fbbc"/>
+		<rom name="Policenauts (Japan) (Track 3).bin" size="16659216" crc="359cad9c" md5="03c335a645b72c0f4ff84262a9f4e657" sha1="3dd20bc84242fe359c817a5a8c9343f7967c2833"/>
+		<rom name="Policenauts (Japan) (Track 4).bin" size="40581408" crc="9f11a2ed" md5="b828594ed9f3ebfacb62be844f0365be" sha1="f7843607689b0ef8b0dff29af863fbeb11061e50"/>
+		<rom name="Policenauts (Japan) (Track 5).bin" size="55366080" crc="7d2995bd" md5="afeb83ea9683fe45bd7468072e1002f0" sha1="0e44e6269eabdada9db6ac9348c80e102ec39a17"/>
+		<rom name="Policenauts (Japan) (Track 6).bin" size="77420784" crc="64a52f0a" md5="f785c2207b16c0db1c77dbf2816c463f" sha1="6e413cc80079a8207e60f3dbf72463424817f476"/>
+		-->
+		<description>Policenauts</description>
+		<year>1994</year>
+		<publisher>コナミ (Konami)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="policenauts (japan) (system disk).fdi" size="1265664" crc="ef3e4428" sha1="246b674a48903ff7e3fe90292b1236d75a8d6c23" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="policenauts (japan)" sha1="b753663d060934d3566f909e837419736f0efd0a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="puyopuy2">
+		<!--
+		Origin: redump.org
+		<rom name="Puyo Puyo Tsuu (Japan).cue" size="353" crc="9c2cb334" md5="85cefa326719e3a81894d3e0515edd26" sha1="0ed2b72c7eda806e17df8e22e6bd3686ee92df2b"/>
+		<rom name="Puyo Puyo Tsuu (Japan) (Track 1).bin" size="270574080" crc="eeb69995" md5="0a0cb1b7ebedb8ccf4ede5316f11c17a" sha1="edc42a08a2792807d6daae696b990ee3f6c3cb38"/>
+		<rom name="Puyo Puyo Tsuu (Japan) (Track 2).bin" size="48455904" crc="d8c36ca8" md5="3c753999f1135f281c1e3e119fcc363d" sha1="1a52ffa8b8272ad95eec2b475c977151e98f57c6"/>
+		<rom name="Puyo Puyo Tsuu (Japan) (Track 3).bin" size="48599376" crc="48830830" md5="5580f8cd4a79599aeafb7650860c5998" sha1="d99b57af923b60e5d55981a96abf8b0bf91171b9"/>
+		-->
+		<description>Puyo Puyo Tsuu</description>
+		<year>1995</year>
+		<publisher>コンパイル (Compile)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="puyo puyo tsuu (japan)" sha1="1c4ef6ec62de5b092363538fcb66e4c54e3988a5" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="rpgtd982">
+		<!--
+		Origin: redump.org
+		<rom name="RPG Tkool Dante98 II (Japan).cue" size="94" crc="c4bb7dbc" md5="21e91169b17ab3a3fa06c986b936b7b6" sha1="980a4a0a76a5e0e6519b96f3973b5e5ce43a380b"/>
+		<rom name="RPG Tkool Dante98 II (Japan).bin" size="32109504" crc="82d12cd8" md5="536c6452e26431a33cb4bf2fd5a04160" sha1="4f81df2baa23ea9b18e531182c1beb22a7eee608"/>
+		-->
+		<description>RPG Tkool Dante98 II</description>
+		<year>1996</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="rpg tkool dante98 ii (japan)" sha1="23d11194a580ff8cb12fb7a9cff9d550362665f1" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="samyzen">
+		<!--
+		Origin: redump.org
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan).cue" size="5830" crc="f767e079" md5="7bf31e023a4b1cab0f535040720248a5" sha1="23afeb3660d51cb920679c5bbbbf1508619fce09"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 01).bin" size="27311424" crc="cccf2ab3" md5="d7b1aa5296fd024f12d9f57118df4a51" sha1="d135665e050b4f22955d6e52e928128e35c8fe98"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 02).bin" size="23465904" crc="b5a157cc" md5="2f567010bd8e74259014d3314b6bbdf4" sha1="b5c25f45ff1b57fe1a8aa036eadc574b8f454a08"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 03).bin" size="22059408" crc="6bdace3d" md5="81391c4db4ea53cc8855e16d9141ee0f" sha1="a760228c628f6cde0ad7ff363d887ad9b56701b9"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 04).bin" size="39010272" crc="8282acf8" md5="8355de6af15017b25d4384f5fead5332" sha1="95f97b27a82b0b09bd13103c102eee481304efb2"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 05).bin" size="31328640" crc="72daa2de" md5="6fe463c52d69a400861931b2323b1540" sha1="9b1220435bf9ac2c047ff1c699653b807ce75e97"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 06).bin" size="13401696" crc="8f5b0b54" md5="7c91d8ff4ee7aaa7d05c9c8b3da09663" sha1="a2e8b103ef158251515d4cc17d70a2401b94d3e2"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 07).bin" size="15847776" crc="53547344" md5="4a3cff1965eabb2f1bf4553460c97959" sha1="e134ea0af484e5bf1ea74636ae613ed6bca41f66"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 08).bin" size="7808640" crc="d0e44193" md5="798b10e1c80220fc93642b10452e7d8e" sha1="17c3439518e62ae13c05d6f6c66a977c1e971aef"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 09).bin" size="22108800" crc="299ea911" md5="8e993bf45936482debbeaa4ba06ca98d" sha1="39ac2fa3599bf53bc7a5705992526f38b041f8e5"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 10).bin" size="22976688" crc="cd6d540a" md5="3f260f823d3a559580784ce7681f43f5" sha1="2bb12e18d3e0613943dd5ba55e238901aa0a1cb5"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 11).bin" size="20029632" crc="a64de910" md5="46a27f3a06fa02bfa068ebd40dfe25ff" sha1="8134e0dd861641584ef3c7becf345a94a056e6f4"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 12).bin" size="2958816" crc="6e3fd2f9" md5="218309dd66f7206c417bf24ed851fecc" sha1="57435e72299e861f2079ee6c2ca05873e4c6a4fa"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 13).bin" size="1980384" crc="31038995" md5="361449b9a3484bc8072a4b9577147fbe" sha1="1e341aa4c275b4a5656ccbe8056ac728e3373896"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 14).bin" size="2347296" crc="24b411c8" md5="81bb40a26eda1877bdee153dcf54ac00" sha1="5524b0c5ad1dfcbe7fc08ed96bd1c1d9e20a222c"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 15).bin" size="1467648" crc="d8d7fe4e" md5="026eae5b64ad09acf492318b7583a69e" sha1="436dd58ebc7863be7d8bfdff51615b766fb65376"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 16).bin" size="12223344" crc="1dc765da" md5="0d80654379c6d83ea7d34b19b4a4b18e" sha1="10664f4cac60cd425b9504b41e9f341db8de4907"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 17).bin" size="9777264" crc="883371f1" md5="05f2975e446d2947d7d1910b320fc2d3" sha1="5ef49e95c106f36254dc30650a909a023016168d"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 18).bin" size="10466400" crc="b37d45b4" md5="10d0a4c0ddaf7a71615bf00dc4ee338a" sha1="02ea9cabc226ce0d5bbcbb11e7195651fdf6abc7"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 19).bin" size="1470000" crc="eb90e050" md5="7c44649c6bd253adb4d222d80daf4e58" sha1="ccfd5c4646986b7e18758533f377f888005dee25"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 20).bin" size="1535856" crc="34659f3b" md5="f88dd37c131c63e1de806cd2053404c1" sha1="cd56591d7a7895432ad655b7c3b88c517f2d5ab3"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 21).bin" size="3563280" crc="88e96ff3" md5="d8218978cf93f17c6fcb70c0f616e27b" sha1="e684074d1a1e400ed7a209451d71682cbd390ec0"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 22).bin" size="3718512" crc="5095489a" md5="bab73b0b1101504bdf4b5dd1ee8811fb" sha1="57bc4f82e997f4a7b2ec3cbf7f7e58ee7b9523da"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 23).bin" size="72432192" crc="35d4248d" md5="46db0b9018e11c98c80c20087d55caf0" sha1="b773bc12992731367bc78c8d93d302d2b466d0d8"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 24).bin" size="13782720" crc="168bf73e" md5="ec10e035e9219d05b96a7273910f337d" sha1="72354fdbd5b6da36a13b198d68f4a8fd1cea0886"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 25).bin" size="6620880" crc="faa8e106" md5="d75ad82d1938ac7d4d2c5fb741d1d118" sha1="599172abb3851d5deb2ad219362c42a57f2ff313"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 26).bin" size="15666672" crc="8c8372e5" md5="12bda865f17ee4ff9622abe40af08c69" sha1="204f87cad149479c324e0ea9b8905136e305589f"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 27).bin" size="7331184" crc="0c220e97" md5="8d0463cd8207299e55217a9419398ab6" sha1="37f40c31aa6bc3016994ed0e1310e9d975d3e5c4"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 28).bin" size="2319072" crc="6f5ab84a" md5="27df1ee14813ec958a6d1146a94a5e4a" sha1="68abf293fd2a7898922f56b86b9d6c7addae506b"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 29).bin" size="18658416" crc="fee7a9dc" md5="bdb735644f74cc6b48eeb61aeabd4de4" sha1="de6f6e45d4b731f39cda52ddb57a7c41108c1352"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 30).bin" size="4231248" crc="e68652ce" md5="2b0cc918a52b7621fd7ea1c965bb47c7" sha1="18b02331a6826c6ec03782924db446c1e4249a7a"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 31).bin" size="4134816" crc="a1a5eb4f" md5="f6b30096b13032712afeeb56d6b3e104" sha1="870bbf61e1fabf3e87a55e53d7af9ac5cd74e7fa"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 32).bin" size="2300256" crc="d9e1d0fd" md5="d5c3c3402d06ce13fa2676741cd7dc99" sha1="e5ac296cb7cf866b93d411032a8b3e371a0580c6"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 33).bin" size="1058400" crc="59078781" md5="457bb5a53fba44c64ccc2dab8f618ee4" sha1="3037f0cf887d55fd1a9bc762af1393945b790ecd"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 34).bin" size="1646400" crc="99622a6b" md5="6fa71a8166882dedae4a346cbf8b7d5e" sha1="3551517ef0fefa2f9ccc82c66fc7cc2211f7ae70"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 35).bin" size="75637968" crc="e05c1d69" md5="27198d3a031e699d0cf11cce1d1fe8db" sha1="04525525f5024e662ee8e93a978b9d3c6427b651"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 36).bin" size="64188432" crc="083cfa06" md5="f307703067303504ff1845e23fdaec85" sha1="b0d3342e51069cc59764f6231c10db922e32fe26"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 37).bin" size="27200880" crc="73726e84" md5="8088ce3a3ed53c7fd160fc49af808284" sha1="dd23030caa2ee7fd339e9828c41cbafa02ecb2ab"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 38).bin" size="31458000" crc="11e2090b" md5="312464739b881316c4179a51b4c9d624" sha1="662972cbe9caaa876beae8df79ac11e0832837d5"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 39).bin" size="2173248" crc="e291030e" md5="83b7dd910b05ddaad465629936614bbd" sha1="004aeea4e18765fb447adc23e073000f5ce27824"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 40).bin" size="22339296" crc="275aec8c" md5="8978127fc90335344f0bf3499f3ae8a4" sha1="4053b7b7612768e76ce9655329a2d56b99226f02"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 41).bin" size="7594608" crc="78cfd895" md5="5a412e72f62ea915505deb260f990bf5" sha1="6980f4e89fb5485ac1eccb13d421ddc0c605ca3e"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 42).bin" size="1554672" crc="f2a553ab" md5="862ffc1d9b77cbfada125c0601591c82" sha1="4d61cdaa9dd877a5ce52f37125de5736fa0d33aa"/>
+		<rom name="Mahou Shoujo Pretty Samy - Zenpen (Japan) (Track 43).bin" size="1493520" crc="72c39f65" md5="f5928ca66bc5eeb294ea391e096a2bac" sha1="f93a37b56c07591fcf496df04755fea9340b037a"/>
+		-->
+		<description>Mahou Shoujo Pretty Samy - Zenpen</description>
+		<year>1995</year>
+		<publisher>AIC</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="mahou shoujo pretty samy - zenpen (japan)" sha1="046b59ec30eed04c9371b85a95310d66ca225062" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="strikpls">
+		<!--
+		Origin: Unknown
+		<rom name="strike commander plus.iso" size="86388960" crc="d8953dae" sha1="80f27e2682f41ee5d82a3c8cad59bb5aeb7e9817"/>
+		
+		CUE file used for conversion:
+		<rom name="strike commander plus.cue" size="82" crc="0f9a2f59" sha1="90970d4595d29c7efd90f39e07dea9e46b5e297f"/>
+		-->
+		<description>Strike Commander Plus</description>
+		<year>1995</year>
+		<publisher>エレクトロニック・アーツ・ビクター (Electronic Arts Victor)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="strike commander plus" sha1="a70044bd61fad32b8a13462f8f3fda100caff265" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tfx">
+		<!--
+		Origin: redump.org
+		<rom name="TFX - The Cutting Edge of Aerial Combat (Japan).cue" size="2703" crc="e1b7d0e9" md5="c2bee0d3b8937d67c37aec680d0b09ae" sha1="8c2c9d6aff002b2c42580364d6ab2b0638cd103f"/>
+		<rom name="TFX - The Cutting Edge of Aerial Combat (Japan) (Track 01).bin" size="15269184" crc="e4514058" md5="4a9dbb28eacc1ba6ee07173ccedf3127" sha1="0c4e45ad478579089a136bdb9d2e0cce40945d9c"/>
+		<rom name="TFX - The Cutting Edge of Aerial Combat (Japan) (Track 02).bin" size="49474320" crc="8347ce15" md5="c069755d23db2ac3ba8bea0edba130a4" sha1="f9eded08ceda10ef0d9397af209f17919bde49cf"/>
+		<rom name="TFX - The Cutting Edge of Aerial Combat (Japan) (Track 03).bin" size="49514304" crc="4b01ce38" md5="a12f0572e612590b9c97831a0ec4bb68" sha1="36c457ad40ca1e8b2cacf0b98f2e5f630b807ead"/>
+		<rom name="TFX - The Cutting Edge of Aerial Combat (Japan) (Track 04).bin" size="55410768" crc="e47ed054" md5="2820b38dfbc2cbd15f687bd1aac21547" sha1="2a7e1ccc6df5e40ec0183ef2d37a957f1bac8fad"/>
+		<rom name="TFX - The Cutting Edge of Aerial Combat (Japan) (Track 05).bin" size="47503344" crc="190bafcb" md5="2e69cf8dc3a7c9a8e4d39ce87fc79237" sha1="5d759f4fc162fa6604e266676a5843bacc96e320"/>
+		<rom name="TFX - The Cutting Edge of Aerial Combat (Japan) (Track 06).bin" size="50838480" crc="891f2dc6" md5="537f3b716b695080ce073fc71789e6f4" sha1="2a2723b526a22cc4aa4f691e55c263c3f4ee275d"/>
+		<rom name="TFX - The Cutting Edge of Aerial Combat (Japan) (Track 07).bin" size="51308880" crc="23b69fae" md5="64c0dec94127427a83e5736ad62688b8" sha1="19eece7fb379dfff84269a8088276f323b5334df"/>
+		<rom name="TFX - The Cutting Edge of Aerial Combat (Japan) (Track 08).bin" size="54380592" crc="b847dcdf" md5="4d27573cd2ae9b45c6fdac3f297186d3" sha1="21c28d8f9817c5d341c96b0348eaef5328ba78be"/>
+		<rom name="TFX - The Cutting Edge of Aerial Combat (Japan) (Track 09).bin" size="50198736" crc="883729cb" md5="9cafd8e36c2b267b83b201a90235b4b4" sha1="c4152634934efeb52c0d1a8b5e2cf62d5d431d25"/>
+		<rom name="TFX - The Cutting Edge of Aerial Combat (Japan) (Track 10).bin" size="20643504" crc="bf72d512" md5="34533c32d93b0e62b92a23fa2864b3ed" sha1="98c329d6194008220de1665a39bc29da98781706"/>
+		<rom name="TFX - The Cutting Edge of Aerial Combat (Japan) (Track 11).bin" size="19907328" crc="14c2cbbd" md5="06aab3f45984c26aeb6e53dc603d8f7f" sha1="67bcf0633655e283ffe31f90052bfde31b48219f"/>
+		<rom name="TFX - The Cutting Edge of Aerial Combat (Japan) (Track 12).bin" size="18260928" crc="175a1d6c" md5="4bcc53ff504a0f67466624e30c11d23d" sha1="f4ff86476caf1641b4bc15e1cc53010ec38985d8"/>
+		<rom name="TFX - The Cutting Edge of Aerial Combat (Japan) (Track 13).bin" size="18223296" crc="e96eee8f" md5="8c3cb1cb47e8a5eaa9ef8c7cb68f2abc" sha1="14c5e512fbdb900a7475e621d73d5b4de8a9ceb0"/>
+		<rom name="TFX - The Cutting Edge of Aerial Combat (Japan) (Track 14).bin" size="18585504" crc="bfe701eb" md5="a4b57467aa0bdc4416c2c2c435af42e9" sha1="50ce2f8e2eccb69e3f92d669ebe31c1009762c18"/>
+		<rom name="TFX - The Cutting Edge of Aerial Combat (Japan) (Track 15).bin" size="23639952" crc="3170c06e" md5="687a96db2a5e7589d90a821414d574d3" sha1="e5320a6c23dea3151a2106ee08509a98f90915cc"/>
+		<rom name="TFX - The Cutting Edge of Aerial Combat (Japan) (Track 16).bin" size="15739584" crc="713741f1" md5="dcc503b9e3b7c84d8e4256854057485c" sha1="246268bb04c0759321b2e8022ed4e852f4eb0690"/>
+		<rom name="TFX - The Cutting Edge of Aerial Combat (Japan) (Track 17).bin" size="19145280" crc="db471d56" md5="56981088778d34e3f9cddc5119ad45fc" sha1="493e08cdd9719011a570a659d56c56dbd3161180"/>
+		<rom name="TFX - The Cutting Edge of Aerial Combat (Japan) (Track 18).bin" size="32462304" crc="b6f4dd8a" md5="c0cd9374feb7336b7b4898c413566142" sha1="95a8e5ddf059f0ed7e18479e8db5c0263cf9d7ef"/>
+		<rom name="TFX - The Cutting Edge of Aerial Combat (Japan) (Track 19).bin" size="1467648" crc="6257e903" md5="2105c070b33a3ef9049878f5c7b1c884" sha1="bc7608fb11113cb2afc66272450ee4529b7b933e"/>
+		-->
+		<description>TFX - The Cutting Edge of Aerial Combat (Japan)</description>
+		<year>1996</year>
+		<publisher>イマジニア (Imagineer)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="tfx - the cutting edge of aerial combat" sha1="6eb1ea4cf8db8c1ebf3ef6824ac393f6a92dc27a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tokio2">
+		<!--
+		Origin: redump.org
+		<rom name="Tokyo 2 - Kaitaku Imin Boshuuchuu! (Japan).cue" size="108" crc="b3dba3b3" md5="48e1d8bc56e4bd72a3481132f8a6b116" sha1="4e8256c1b11b23da5796e2415d436a9fada6399b"/>
+		<rom name="Tokyo 2 - Kaitaku Imin Boshuuchuu! (Japan).bin" size="11553024" crc="4b90e99c" md5="be5a40bcc8e0b573a79c7c182de6d8aa" sha1="63af46c05b95ba9e6a66758ef5029b231cc4652b"/>
+		-->
+		<description>Tokio 2 - Kaitaku Imin Boshuuchuu!</description>
+		<year>1995</year>
+		<publisher>アートディンク (Artdink)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="tokyo 2 - kaitaku imin boshuuchuu! (japan)" sha1="009ad8945385a51fd2e0bd1960a872297052396b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="thehorde">
+		<!--
+		Origin: redump.org
+		<rom name="Horde, The (Japan).cue" size="1451" crc="89c39237" md5="43a9b4b3c10af301fe8c6e8e842b930c" sha1="afae4fee774ec36ec6bb01099e7346f0bcbdb0fb"/>
+		<rom name="Horde, The (Japan) (Track 01).bin" size="281717856" crc="73721dfb" md5="809430b8fae12da96ca62cb7df374783" sha1="0b753964b7283a092928f8d5700a32a9729cedca"/>
+		<rom name="Horde, The (Japan) (Track 02).bin" size="34574400" crc="e0f167a9" md5="aba053012cac233baca7aff29d7218ec" sha1="4c9066f9bb72da1552638526d4cf8f801b601670"/>
+		<rom name="Horde, The (Japan) (Track 03).bin" size="22226400" crc="a792a8f0" md5="3d37c4980e47758fddec5cc884d125d2" sha1="b145cbeb83e981b724ef5c2aa02d33f67b520552"/>
+		<rom name="Horde, The (Japan) (Track 04).bin" size="33163200" crc="daec7246" md5="e1197932468b157f1f89a15500e91dcd" sha1="216dc4558cfd1f09d08d02f8328407c0c1cb3166"/>
+		<rom name="Horde, The (Japan) (Track 05).bin" size="22402800" crc="ddb0edac" md5="20c9c490ac52f90659908b39e7af03f5" sha1="4f85104654bb55e42359e8270f105dbd97917bc2"/>
+		<rom name="Horde, The (Japan) (Track 06).bin" size="32457600" crc="a5441176" md5="32ec3214802d4ed2247792ae734523cd" sha1="c8488464d17fcef8ba3f6ce375a0aacfa03e1081"/>
+		<rom name="Horde, The (Japan) (Track 07).bin" size="13935600" crc="e5951b8b" md5="f0f0bc7c659ef37bd1aa7720d5c39c5a" sha1="29d52bca0c86bf6fab3beedb2e63f01710d1d31a"/>
+		<rom name="Horde, The (Japan) (Track 08).bin" size="21873600" crc="8ca59661" md5="b96bc333b60b6ca759a9bf466d82e09b" sha1="912b000348d8dc09cc95320313503dea254d10f6"/>
+		<rom name="Horde, The (Japan) (Track 09).bin" size="22755600" crc="02ba42bf" md5="f13a257a66a00680c72720287f40fff4" sha1="d719799a7335025e8545b06a5429be35706b8541"/>
+		<rom name="Horde, The (Japan) (Track 10).bin" size="34574400" crc="0480e090" md5="3eba782fc0fdcbdfc3704c38d2d924e4" sha1="57eec18e628d7831978f7c03fb628a6207316f41"/>
+		<rom name="Horde, The (Japan) (Track 11).bin" size="24696000" crc="f5099eb8" md5="bc9ee6327b560b849e724868d983f060" sha1="85be72692bcb87ae1cb894ff951a3df765a1e355"/>
+		<rom name="Horde, The (Japan) (Track 12).bin" size="25048800" crc="b933af1c" md5="cb7a1c5ebed9873f582db69b68cbb2cb" sha1="0bc9e73054f1182e23735ad35a60b618276b3786"/>
+		<rom name="Horde, The (Japan) (Track 13).bin" size="25048800" crc="73b1c9f4" md5="bb7022ce51ff47046daec24b89e43108" sha1="6b9a293824d3fa9fe62de6c681dc3850c0d9e6c5"/>
+		-->
+		<description>The Horde</description>
+		<year>1995</year>
+		<publisher>アローマイクロテックス (Arrow Micro-Techs)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="horde, the (japan)" sha1="92bee5ef1eb88ef43a47375771a6930db964d5c0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="themeprk">
+		<!--
+		Origin: redump.org
+		<rom name="Theme Park (Japan).cue" size="84" crc="4d74c64d" md5="15a908ecd413a3083ce2dce4cc61417a" sha1="1be7ed6e440077887a8a023a818c715bbaa2a064"/>
+		<rom name="Theme Park (Japan).bin" size="190041600" crc="04b932d0" md5="c3eba2da6227b98afde0a7bca805dc4f" sha1="28e0308f70459436bf09701f96a98d38be699944"/>
+		-->
+		<description>Theme Park</description>
+		<year>1995</year>
+		<publisher>エレクトロニック・アーツ・ビクター (Electronic Arts Victor)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="theme park (japan)" sha1="c5c1380be290b7e42c8d843dbe404626d4c5cacd" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="viperf40">
+		<!--
+		Origin: Unknown
+		<rom name="viper-f40.cue" size="1000" crc="da58d814" sha1="16890718aaf5584716528e01c88060e6112f385a"/>
+		<rom name="viper-f40.img" size="713062896" crc="199b891e" sha1="c5f881cd131fc0e52771802ea522d55d63d1d18a"/>
+		-->
+		<description>Viper F40</description>
+		<year>1997</year>
+		<publisher>ソニア (Sogna)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="viper-f40" sha1="674b7facd61b11a415d7474d53fd0014d8383ac6" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="win2kpc">
+		<!--
+		Origin: Unknown
+		<rom name="Windows 2000 Professional (PC-9821) - W2PCCP_JA.iso" size="410273792" crc="ffffffff" sha1="00c6238bced18a108ab062b50bd6ea2be34d0cb7"/>
+		
+		CUE file used for conversion:
+		<rom name="Windows 2000 Professional (PC-9821) - W2PCCP_JA.cue" size="108" crc="5e4281a4" sha1="60b45b2155b2bce7d550f7ed99d4b95247e2c786"/>		
+		-->
+		<description>Windows 2000 Professional (W2PCCP)</description>
+		<year>2000</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="windows 2000 professional (pc-9821) - w2pccp_ja" sha1="2d30b7ff6504d0faa9896573cdb2d34df2bd2789" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="win2kpf">
+		<!--
+		Origin: Unknown
+		<rom name="Windows 2000 Professional (PC-9821) - W2PFPP_JA.iso" size="409946112" crc="ffffffff" sha1="ef5035b8c6b566552eba9f16e085272632e259b4"/>
+		
+		CUE file used for conversion:
+		<rom name="Windows 2000 Professional (PC-9821) - W2PFPP_JA.cue" size="108" crc="90edbbcd" sha1="a2b214d641906d27172e10d35094e652647d4194"/>
+		-->
+		<description>Windows 2000 Professional (W2PFPP)</description>
+		<year>2000</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="windows 2000 professional (pc-9821) - w2pfpp_ja" sha1="4487e2ffec2f0e931262d90111f5f7ce7ab2c968" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="win2ksrv">
+		<!--
+		Origin: Unknown
+		<rom name="Windows 2000 Server (PC-9821) - W2SSEL_JA.iso" size="479168512" crc="ffffffff" sha1="325e1f718981603fc21b88f34643efb71e0ee7e1"/>
+		
+		CUE file used for conversion:
+		<rom name="Windows 2000 Server (PC-9821) - W2SSEL_JA.cue" size="102" crc="aec3800b" sha1="6a64d6297d6906ce672ce77967d3bde940202eac"/>
+		-->
+		<description>Windows 2000 Server (W2SSEL)</description>
+		<year>2000</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="windows 2000 server (pc-9821) - w2ssel_ja" sha1="2d8f13038acc25d1f16e88c486895b299ae47731" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Supports IBM PC-AT, PC-98, Alpha, MIPS and PowerPC -->
+	<software name="winnt40w">
+		<!--
+		Origin: Unknown
+		<rom name="disc2.ISO" size="434356224" crc="b30d864c" sha1="99310256b48d9b467a0af7101b1f5c84777853c1"/>
+		<rom name="image.ISO" size="531824640" crc="6a13d50c" sha1="3c6c54450583e12401daf1bcc0457fc41f60736d"/>
+		
+		CUE files used for conversion:
+		<rom name="disc2.cue" size="66" crc="2cabba7b" sha1="38cfe76167cf3065478036c386c69693fa0bf5f3"/>
+		<rom name="image.cue" size="66" crc="3f846e22" sha1="d3d798255e5d26cd8485a5c5f7aa086a51368ebe"/>
+		-->
+		<description>Windows NT 4.0 Workstation</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="windows nt 4.0 workstation (disc 1)" sha1="b1786c6ee6486f2f37191481e252cf67cc0f0dae" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="windows nt 4.0 workstation (disc 2)" sha1="994b952e9065abb2c831f601df76f11c1961392b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="win95">
+		<!--
+		Origin: Unknown
+		<rom name="Microsoft Windows 95 PC-98 (JPN).iso" size="81395712" crc="d402c155" sha1="14d10f62db11397ea46bdf02d1619f1b8e1ff345"/>
+		
+		CUE file used for conversion:
+		<rom name="Microsoft Windows 95 PC-98 (JPN).cue" size="93" crc="c4113669" sha1="3ee6d0113b8efe9cf0ee19fe6054165233fa9906"/>
+		-->
+		<description>Windows 95</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="microsoft windows 95 pc-98 (jpn)" sha1="bbec0977ae382c100bfd4d94bcabf4a8f45bb5a7" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Supports IBM PC-AT and PC-98 architectures -->
+	<software name="win98">
+		<!--
+		Origin: Unknown
+		<rom name="Microsoft Windows 98 x86 &amp; PC-98 (JPN).iso" size="508647424" crc="f82c51a9" sha1="3607d2cc8fea57ca915954e9ff2e2cbc82a02fff"/>
+		
+		CUE file used for conversion:
+		<rom name="Microsoft Windows 98 x86 &amp; PC-98 (JPN).cue" size="99" crc="1229745f" sha1="5181dc844bf7f7d5acd3e2fad4ad2e2c8af70297"/>
+		-->
+		<description>Windows 98</description>
+		<year>1998</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="microsoft windows 98 x86 &amp; pc-98 (jpn)" sha1="3be220cca006d5d012db9a29599bbad15c2627a4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="yuno">
+		<!--
+		Origin: Unknown
+		<rom name="yu_no.bin" size="315581440" crc="c6f2d29b" sha1="a245fec6fb7dd0d82eec14dd9625d88e2a30d103"/>
+		<rom name="yu_no.cue" size="645" crc="d375372b" sha1="0bbe382a4e1eebd5a513c84014c414b37354c4be"/>
+		-->
+		<description>Kono Yo no Hate de Koi wo Utau Shoujo YU-NO</description>
+		<year>1996</year>
+		<publisher>エルフ (Elf)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="yu_no" sha1="3c68242c9eb1ae0d1e79549391afbc988d0ae94f" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

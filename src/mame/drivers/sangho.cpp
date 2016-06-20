@@ -96,7 +96,6 @@ public:
 	DECLARE_MACHINE_RESET(sexyboom);
 	void pzlestar_map_banks();
 	void sexyboom_map_bank(int bank);
-	DECLARE_WRITE_LINE_MEMBER(msx_vdp_interrupt);
 	DECLARE_READ8_MEMBER(sec_slot_r);
 	DECLARE_WRITE8_MEMBER(sec_slot_w);
 };
@@ -450,11 +449,6 @@ MACHINE_RESET_MEMBER(sangho_state,sexyboom)
 	sexyboom_map_bank(3);
 }
 
-WRITE_LINE_MEMBER(sangho_state::msx_vdp_interrupt)
-{
-	m_maincpu->set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
-}
-
 
 static MACHINE_CONFIG_START( pzlestar, sangho_state )
 
@@ -463,7 +457,7 @@ static MACHINE_CONFIG_START( pzlestar, sangho_state )
 	MCFG_CPU_IO_MAP(pzlestar_io_map)
 
 	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL_21_4772MHz) // typical 9958 clock, not verified
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(sangho_state,msx_vdp_interrupt))
+	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL_21_4772MHz)
 
 	MCFG_MACHINE_RESET_OVERRIDE(sangho_state,pzlestar)
@@ -482,7 +476,7 @@ static MACHINE_CONFIG_START( sexyboom, sangho_state )
 	MCFG_CPU_IO_MAP(sexyboom_io_map)
 
 	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL_21_4772MHz) // typical 9958 clock, not verified
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(sangho_state,msx_vdp_interrupt))
+	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL_21_4772MHz)
 
 	MCFG_MACHINE_RESET_OVERRIDE(sangho_state,sexyboom)

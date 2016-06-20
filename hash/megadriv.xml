@@ -57,7 +57,7 @@ Known undumped protos
 Known undumped pirates
 
   * Tec Toy Mega Drive 3 (with 86 built in games)
-  * Chinese Checkers (by RealTec)
+  * Chinese Checkers (by RealTec) - 中國象棋 ?
   * Shizen Mahjong / Competition Mahjong (by Sachen, apparently dumped but hoarded)
   * Magic 7 Block - 百変七巧板
   * Chinese Battle Chess (?) - 戦 棊
@@ -9717,10 +9717,10 @@ but dumps still have to be confirmed.
 -->
 
 	<software name="13mahjan">
-		<description>13 Ma Jiang - 98 Mei Shao Nu Pian (Chi)</description>
+		<description>13 Ma Jiang - 98 Mei Shao Nu (Chi)</description>
 		<year>1998</year>
 		<publisher>BBD</publisher>
-		<info name="alt_title" value="十三張麻將 98'美少女篇"/>
+		<info name="alt_title" value="十三張麻將 98'美少女"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="655360">
 				<rom name="13 mahjong 98 (unl).bin" size="655360" crc="68b372f6" sha1="af19eb952bff78178ae3d31ed48b3fc5c7010dea" offset="0x000000"/>
@@ -9750,13 +9750,28 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="16zhan">
-		<description>16 Zhang Ma Jiang (Chi)</description>
+	<software name="16mj">
+		<description>Shi Liu Zhang Ma Jiang (Chi)</description>
 		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>City Man</publisher>
+		<info name="alt_title" value="十六張麻將"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="16 zhang ma jiang (chi) (unl).bin" size="1048576" crc="36407c82" sha1="7857c797245b52641a3d1d4512089bccb0ed5359" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="16mj2">
+		<description>Shi Liu Zhang Ma Jiang II</description>
+		<year>199?</year>
+		<publisher>City Man</publisher>
+		<info name="serial" value="GM-95003"/>
+		<info name="alt_title" value="十六張麻將II"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_16mj2"/>
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="16 tiles mahjong ii (unl).bin" size="1048576" crc="b4f4249f" sha1="c5278d513ac7b627319bdcb840af216d0fc60f4c" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10095,9 +10110,10 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="adveboy">
-		<description>Adventurous Boy - Mao Xian Xiao Zi (Chi)</description>
+		<description>Adventurous Boy - Mao Xian Xiao Zi (Tw)</description>
 		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>Gamtec</publisher>
+		<info name="alt_title" value="冒險小子"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="adventurous boy - mao xian xiao zi (chi) (unl).bin" size="524288" crc="d4403913" sha1="f6e5bba7254f7f73a007f234f1001ddcb0b62484" offset="0x000000"/>
@@ -10449,10 +10465,11 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="aqrenk">
-		<description>Aq Renkan Awa (Chi)</description>
+	<software name="aqlian">
+		<description>A Q Lian Huan Pao (Tw)</description>
 		<year>1995</year>
 		<publisher>C&amp;E</publisher>
+		<info name="alt_title" value="阿Q連環泡"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="aq renkan awa (chi) (unl).bin" size="1048576" crc="2c6cbd77" sha1="fcd1c7fcfb9027ae7baad9c67847ef5f1090991a" offset="0x000000"/>
@@ -11076,9 +11093,10 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="barver">
-		<description>Barver Battle Saga - Tai Kong Zhan Shi (Chi)</description>
+		<description>Barver Battle Saga - Tai Kong Zhan Shi - Mo Fa Zhan Shi (Chi)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="太空戰士 魔法戰士"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -11616,7 +11634,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="btomato">
-		<description>Bill's Tomato Adventure (Prototype)</description>
+		<description>Bill's Tomato Game (Prototype)</description>
 		<year>199?</year>
 		<publisher>Psygnosis</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -12284,6 +12302,7 @@ but dumps still have to be confirmed.
 		<description>Chao Ji Da Fu Weng (Chi)</description>
 		<year>199?</year>
 		<publisher>Gametec?</publisher>
+		<info name="alt_title" value="超級大富翁"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -12430,9 +12449,10 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="chinesec">
-		<description>Chinese Chess</description>
+		<description>Zhong Guo Xiang Qi - Chinese Chess (Tw)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="中國象棋"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="chinese chess (unl).bin" size="524288" crc="475215a0" sha1="3907bf058493e7b9db9720493030f0284797908c" offset="0x000000"/>
@@ -13947,10 +13967,11 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="dialqo">
-		<description>Dial Q o Mawase! (Jpn)</description>
+	<software name="dialq">
+		<description>Dial Q Mahjang Club (Jpn)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="ダイヤルQをまわせ ~ Dial Q o Mawase! / 究極麻雀 ~ Jiuji Maque (Box?)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="dial q o mawase! (jpn) (unl).bin" size="1048576" crc="c632e5af" sha1="08967e04d992264f193ecdfd0e0457baaf25f4f2" offset="0x000000"/>
@@ -15400,7 +15421,8 @@ but dumps still have to be confirmed.
 	<software name="fengkuan">
 		<description>Feng Kuang Tao Hua Yuan (Chi)</description>
 		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>Creaton</publisher>
+		<info name="alt_title" value="瘋狂桃花源"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_mjlov"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -15412,7 +15434,8 @@ but dumps still have to be confirmed.
 	<software name="fengkuan1" cloneof="fengkuan">
 		<description>Feng Kuang Tao Hua Yuan (Chi, Unprotected)</description>
 		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>Creaton</publisher>
+		<info name="alt_title" value="瘋狂桃花源"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="feng kuang tao hua yuan (chi) (unl).bin" size="1048576" crc="8d40d64f" sha1="0330611a5fcb1f3ca173fcb3387fd35b865f1131" offset="0x000000"/>
@@ -15424,6 +15447,7 @@ but dumps still have to be confirmed.
 		<description>Feng Shen Ying Jie Chuan (Chi)</description>
 		<year>1996</year>
 		<publisher>Chuanpu Technologies</publisher>
+		<info name="alt_title" value="封神英傑傳"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="feng shen ying jie chuan (chi) (unl).bin" size="2097152" crc="6a382b60" sha1="7a6e06846a94df2df2417d6509e398c29354dc68" offset="0x000000"/>
@@ -15435,6 +15459,7 @@ but dumps still have to be confirmed.
 		<description>Feng Shen Ying Jie Zhuan (Chi, Alt?)</description>
 		<year>1996</year>
 		<publisher>Chuanpu Technologies</publisher>
+		<info name="alt_title" value="封神英傑傳"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -16507,10 +16532,12 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="heitao">
-		<description>Hei Tao 2 - Super Big 2 (Chi)</description>
+	<software name="heitao2">
+		<description>Hei Tao 2 - Super Big 2 (Tw)</description>
 		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>King Tec</publisher>
+		<info name="serial" value="GM-95301"/>
+		<info name="alt_title" value="黑桃2 大老二 ~ Hei Tao 2 - Da Lao Er (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="hei tao 2 - super big 2 (chi) (unl).bin" size="1048576" crc="31449113" sha1="e1e4c439c5c22fa5cfcecaab421c55bf1746b5de" offset="0x000000"/>
@@ -18167,6 +18194,7 @@ but dumps still have to be confirmed.
 		<description>Ma Qiao E Mo Ta - Devilish Mahjong Tower (Chi)</description>
 		<year>1994</year>
 		<publisher>C&amp;E</publisher>
+		<info name="alt_title" value="麻雀惡魔塔"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="ma qiao e mo ta - devilish mahjong tower (chi) (unl).bin" size="1048576" crc="12e35994" sha1="84e8bf546283c73396e40c4cfa05986ebeb123bb" offset="0x000000"/>
@@ -18816,7 +18844,9 @@ but dumps still have to be confirmed.
 	<software name="menghu">
 		<description>Meng Huan Shui Guo Pan - 777 Casino (Chi)</description>
 		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>City Man</publisher>
+		<info name="serial" value="GM-95002"/>
+		<info name="alt_title" value="夢幻水果盤"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="meng huan shui guo pan - 777 casino (chi) (unl).bin" size="1048576" crc="42dc03e4" sha1="df20a28d03a2cd481af134ef7602062636c3cc79" offset="0x000000"/>
@@ -22595,6 +22625,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Queen of Poker Club (Tw)</description>
 		<year>199?</year>
 		<publisher>Sachen</publisher>
+		<info name="alt_title" value="撲克俱樂部 Poker 6 in 1 ~ Poker Club Poker 6 in 1 (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="poker club (sachen).bin" size="1048576" crc="ae28d9eb" sha1="600c9b234f2559b6d101a111f7033088bd701a5d" offset="0x000000"/>
@@ -23609,6 +23640,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>San Guo Zhi V (Chi)</description>
 		<year>199?</year>
 		<publisher>SKOB</publisher>
+		<info name="alt_title" value="三國志V"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="san guo zhi v (chi) (unl).bin" size="2097152" crc="cd7e53d0" sha1="1a3333983f40dd242ad86187e50d1abed68d5ae9" offset="0x000000"/>
@@ -23895,9 +23927,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="shijie">
-		<description>Shi Jie Zhi Bang Zheng Ba Zhan - World Pro Baseball 94 (Chi)</description>
+		<description>Jin Guan Jun Xiong Di Xiang - Shi Jie Zhi Bang Zheng Ba Zhan (Chi)</description>
 		<year>1994</year>
 		<publisher>C&amp;E</publisher>
+		<info name="alt_title" value="金冠軍兄弟象 世界职棒争霸战"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="shi jie zhi bang zheng ba zhan - world pro baseball 94 (chi) (unl).bin" size="2097152" crc="72dd884f" sha1="d05c770312feec38c45b910ad09204b87961c01a" offset="0x000000"/>
@@ -24190,6 +24223,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Shui Hu - Feng Yun Zhuan (Chi)</description>
 		<year>1999</year>
 		<publisher>Never Ending Soft Team</publisher>
+		<info name="alt_title" value="水滸 風雲傳"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="shui hu - feng yun zhuan (chi) (unl).bin" size="2097152" crc="3e9e010c" sha1="7ac1b7a9e36dde9a03b3d0861b473ac9e1324175" offset="0x000000"/>
@@ -24201,6 +24235,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Shui Hu Zhuan (Chi)</description>
 		<year>1996</year>
 		<publisher>Chuanpu Technologies</publisher>
+		<info name="alt_title" value="水滸傳"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="shui hu zhuan (chi) (unl).bin" size="2097152" crc="61e458c3" sha1="f58c522bd0629833d3943ef4091c3c349c134879" offset="0x000000"/>
@@ -26723,6 +26758,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Taiwan Daheng (Chi)</description>
 		<year>1994</year>
 		<publisher>C&amp;E</publisher>
+		<info name="alt_title" value="台灣大亨"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="taiwan daheng (chi) (unl).bin" size="1048576" crc="baf20f81" sha1="88726c11e5ed7927830bf5ae0b83d85dfff4a2a4" offset="0x000000"/>
@@ -27828,9 +27864,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="tunshi">
-		<description>Tun Shi Tian Di III (China, Simple Chinese)</description>
+		<description>Tun Shi Tian Di III (Chi, Simple Chinese)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="吞食天地III"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="tun shi tian di iii (chi) (simple chinese) (unl).bin" size="2097152" crc="ea57b668" sha1="7040e96c053f29c75cf0524ddb168a83d0fb526f" offset="0x000000"/>
@@ -27842,6 +27879,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Tun Shi Tian Di III (Chi)</description>
 		<year>199?</year>
 		<publisher>SKOB</publisher>
+		<info name="alt_title" value="吞食天地III"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="tun shi tian di iii (chi) (unl).bin" size="2097152" crc="b23c4166" sha1="534bf8f951ee30d47df18202246245b998c0eced" offset="0x000000"/>
@@ -29980,6 +30018,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Wu Kong Wai Zhuan (Chi)</description>
 		<year>1996</year>
 		<publisher>Ming</publisher>
+		<info name="serial" value="GM-95701"/>
+		<info name="alt_title" value="悟空外傳"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_yasech"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -29994,6 +30034,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Wu Kong Wai Zhuan (Chi, Unprotected)</description>
 		<year>1996</year>
 		<publisher>Ming</publisher>
+		<info name="serial" value="GM-95701"/>
+		<info name="alt_title" value="悟空外傳"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -30301,9 +30343,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="xiaomo">
-		<description>Xiao Monv - Magic Girl (Chi)</description>
+		<description>Xiao Monv - Magic Girl (Tw)</description>
 		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>Gamtec</publisher>
+		<info name="alt_title" value="小魔女"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="xiao monv - magic girl (chi) (unl).bin" size="524288" crc="8e49a92e" sha1="22a48404e77cab473ee65e5d5167d17c28884a7a" offset="0x000000"/>
@@ -30323,10 +30366,24 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="xinqig" cloneof="beggarp">
+		<description>Xin Qi Gai Wang Zi (Chi)</description>
+		<year>1996</year>
+		<publisher>C&amp;E</publisher>
+		<info name="alt_title" value="新乞丐王子"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_xinqig"/>
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="xin qi gai wang zi (chi) (unl).bin" size="4194304" crc="dd2f38b5" sha1="4a7494d8601149f43ba7e3595a0b2340cde2e9ba" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="xinqig1" cloneof="beggarp">
 		<description>Xin Qi Gai Wang Zi (Chi, Alt)</description>
 		<year>1996</year>
 		<publisher>C&amp;E</publisher>
+		<info name="alt_title" value="新乞丐王子"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_xinqig"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
@@ -30335,23 +30392,12 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="xinqig" cloneof="beggarp">
-		<description>Xin Qi Gai Wang Zi (Chi)</description>
-		<year>1996</year>
-		<publisher>C&amp;E</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_xinqig"/>
-			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="xin qi gai wang zi (chi) (unl).bin" size="4194304" crc="dd2f38b5" sha1="4a7494d8601149f43ba7e3595a0b2340cde2e9ba" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="yasech">
 		<description>Ya Se Chuan Shuo (Chi)</description>
 		<year>1995</year>
-		<publisher>Chuanpu Technologies</publisher>
-		<info name="alt_title" value="亚瑟传说"/>
+		<publisher>Ming</publisher>
+		<info name="serial" value="GM-95403"/>
+		<info name="alt_title" value="亚瑟传说 / 帝國王朝 (亞瑟傳說篇) ~ Di Guo Wang Chao (Ya Se Chuan Shuo Pian) [Box]"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_yasech"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -30361,9 +30407,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="yangji">
-		<description>Yang Jia Jiang - Yang Warrior Family (Chi)</description>
+		<description>Yi Men Ying Lie - Yang Jia Jiang (Chi)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="一門英烈 楊家將"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="yang jia jiang - yang warrior family (chi) (unl).bin" size="2097152" crc="6604a79e" sha1="6fcc3102fc22b42049e6eae9a1c30c8a7f022d14" offset="0x000000"/>
@@ -30523,7 +30570,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	<software name="zhuogu">
 		<description>Zhuo Gui Da Shi - Ghost Hunter (Chi)</description>
 		<year>1994</year>
-		<publisher>Shenchi Technology</publisher>
+		<publisher>Senchi Technology</publisher>
+		<info name="alt_title" value="抓鬼大師"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="zhuo gui da shi - ghost hunter (chi) (unl).bin" size="524288" crc="76c62a8b" sha1="3424892e913c20754d2e340c6e79476a9eb6761b" offset="0x000000"/>
@@ -30728,18 +30776,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="16mj2">
-		<description>16 Tiles Mahjong II</description>
-		<year>199?</year>
-		<publisher>Gamtec</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_16mj2"/>
-			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="16 tiles mahjong ii (unl).bin" size="1048576" crc="b4f4249f" sha1="c5278d513ac7b627319bdcb840af216d0fc60f4c" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bugslife">
 		<description>A Bug's Life</description>
 		<year>199?</year>
@@ -30764,9 +30800,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="chinf3">
-		<description>Chinese Fighter III (Chi)</description>
+		<description>Tenchi wo Kurau III - Sanguo Wai Chuan - Chinese Fighter (Chi)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="天地を喰らうⅢ三国外伝"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_chinf3"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -30827,7 +30864,9 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	<software name="huanle">
 		<description>Huan Le Tao Qi Shu - Smart Mouse (Chi)</description>
 		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>Ming</publisher>
+		<info name="serial" value="GM-95401"/>
+		<info name="alt_title" value="歡樂淘氣鼠"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_smouse"/>
 			<dataarea name="rom" width="16" endianness="big" size="524288">
@@ -30874,9 +30913,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="supmagic">
-		<description>Linghuan Daoshi Super Magician (Chi)</description>
+		<description>Ling Huan Dao Shi - Super Magician (Chi)</description>
 		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>Ming</publisher>
+		<info name="serial" value="GM-95402"/>
+		<info name="alt_title" value="靈幻道士"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_elfwor"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -30911,10 +30952,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="majian">
-		<description>Ma Jiang Qing Ren - Ji Ma Jiang Zhi (Chi)</description>
+	<software name="majianqr">
+		<description>Ji Ma Jiang Zhi - Ma Jiang Qing Ren (Chi)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="姬麻將之 麻將情人"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_mjlov"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -30923,10 +30965,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="majiana" cloneof="majian">
+	<software name="majianqra" cloneof="majianqr">
 		<description>Ma Jiang Qing Ren - Ji Ma Jiang Zhi (Chi, Alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="姬麻將之 麻將情人"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_mjlov"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -31056,10 +31099,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="mjclub">
-		<description>Super Mahjong Club</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+	<software name="mhpoker">
+		<description>Du Shen Zhi Meng Huan Puke</description>
+		<year>1995</year>
+		<publisher>Creaton</publisher>
+		<info name="alt_title" value="赌神之梦幻扑克"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_mjlov"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -31105,9 +31149,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="redcliff">
-		<description>The Battle of Red Cliffs - Romance of the Three Kingdoms</description>
+		<description>San Guo Yan Yi - Huo Shao Chi Bi (Tw)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="三國演義 火燒赤壁"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_redcl"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097158">
@@ -31117,9 +31162,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="redcliffa" cloneof="redcliff">
-		<description>The Battle of Red Cliffs - Romance of the Three Kingdoms (Hacked out Protection?)</description>
+		<description>San Guo Yan Yi - Huo Shao Chi Bi (Tw, Hacked out Protection?)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="三國演義 火燒赤壁"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="the battle of red cliffs (unl).bin" size="2097152" crc="63eca090" sha1="648c04365610084d76c9a2b1b0b07031ca84897d" offset="00000"/>
@@ -31143,10 +31189,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 <!-- Dump with CRC a2ef16de is hacked to bypass protection. If you found it on a real cart, please let us know. -->
 	<software name="tbolt2">
-		<description>Thunderbolt II (Unl)</description>
+		<description>Lei Dian II - Thunderbolt II (Unl)</description>
 		<year>199?</year>
 		<publisher>Sun Green</publisher>
-		<info name="alt_title" value="雷電伝説II"/>
+		<info name="serial" value="GM-95201"/>
+		<info name="alt_title" value="雷電伝説II ~ Lei Dian Chuan Shuo II (Box) / 雷電II"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_smouse"/>
 			<dataarea name="rom" width="16" endianness="big" size="524288">
@@ -31227,10 +31274,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="suppoker">
-		<description>Super Poker (Chi)</description>
+		<description>Chaoji Puke (Tw)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
-		<info name="alt_title" value="Cha Oji Pu Ke"/>
+		<info name="alt_title" value="超級撲克 ~ Super Poker"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_smouse"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
@@ -31242,9 +31289,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 <!-- Are these unprotected versions legit? or were they hacked to work with emus? -->
 
 	<software name="chinf3a" cloneof="chinf3">
-		<description>Chinese Fighter III (Chi, Unprotected?)</description>
+		<description>Tenchi wo Kurau III - Sanguo Wai Chuan - Chinese Fighter (Chi, Unprotected?)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="天地を喰らうⅢ三国外伝"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="chinese fighter iii (unl, alt).bin" size="2097152" crc="6f98247d" sha1="cc212b1564dc7c73ffdc55f9fde3269a83fee399" offset="0x000000"/>
@@ -31296,6 +31344,19 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="bomboy (unl).bin" size="524288" crc="065d2019" sha1="206fff31bccbb9a973de95c9ae780acb462548dd" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="jujimj2">
+		<description>Ju Ji Ma Jiang II</description>
+		<year>199?</year>
+		<publisher>Sun Green</publisher>
+		<info name="serial" value="GM-95001"/>
+		<info name="alt_title" value="究極麻將II"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="pretty girl mahjongg (Ch).bin" size="1048576" crc="69f24500" sha1="0b4f63b8de2dcc4359a26c3ff21f910f206b6110" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -31374,6 +31435,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Magic Bubble</description>
 		<year>1993</year>
 		<publisher>C&amp;E</publisher>
+		<info name="alt_title" value="魔法氣泡 ~ Mo Fa Qi Pao (Cart)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="magic_bubble.bin" size="524288" crc="3ec61dc1" sha1="134086c458e20eee1ab614e2df64083942311e8c" offset="0x000000"/>
@@ -31385,6 +31447,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Magic Bubble (Alt)</description>
 		<year>1993</year>
 		<publisher>C&amp;E</publisher>
+		<info name="alt_title" value="魔法氣泡 ~ Mo Fa Qi Pao (Cart)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="magic bubble [a1].bin" size="524288" crc="503e0718" sha1="de8037a8cea321ca3f0c03b7a4c36b9fa3b67be2" offset="0x000000"/>
