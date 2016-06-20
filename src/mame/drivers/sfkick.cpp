@@ -204,7 +204,6 @@ public:
 	void sfkick_remap_banks();
 	void sfkick_bank_set(int num, int data);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	DECLARE_WRITE_LINE_MEMBER(sfkick_vdp_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_memory_region m_region_bios;
@@ -558,10 +557,6 @@ static INPUT_PORTS_START( sfkick )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER(sfkick_state::sfkick_vdp_interrupt)
-{
-	m_maincpu->set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
-}
 
 void sfkick_state::machine_reset()
 {
@@ -595,7 +590,7 @@ static MACHINE_CONFIG_START( sfkick, sfkick_state )
 	MCFG_CPU_IO_MAP(sfkick_sound_io_map)
 
 	MCFG_V9938_ADD("v9938", "screen", 0x80000, MASTER_CLOCK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(sfkick_state,sfkick_vdp_interrupt))
+	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MASTER_CLOCK)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)

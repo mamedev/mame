@@ -229,11 +229,11 @@ INTERRUPT_GEN_MEMBER(cvs_state::cvs_main_cpu_interrupt)
 }
 
 
-static void cvs_slave_cpu_interrupt( cpu_device *cpu, int state )
+WRITE_LINE_MEMBER(cvs_state::cvs_slave_cpu_interrupt)
 {
-	cpu->set_input_line_vector(0, 0x03);
-	//cpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-	cpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line_vector(0, 0x03);
+	//m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 
@@ -435,7 +435,7 @@ WRITE8_MEMBER(cvs_state::audio_command_w)
 	LOG(("data %02x\n", data));
 	/* cause interrupt on audio CPU if bit 7 set */
 	m_soundlatch->write(space, 0, data);
-	cvs_slave_cpu_interrupt(m_audiocpu, data & 0x80 ? 1 : 0);
+	cvs_slave_cpu_interrupt(data & 0x80 ? 1 : 0);
 }
 
 
