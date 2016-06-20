@@ -461,7 +461,9 @@ core_device_t::core_device_t(netlist_t &owner, const pstring &name)
 	: object_t(name)
 	, logic_family_t()
 	, netlist_ref(owner)
+#if (NL_PMF_TYPE > NL_PMF_TYPE_VIRTUAL)
 	, m_static_update()
+#endif
 {
 	if (logic_family() == nullptr)
 		set_logic_family(family_TTL());
@@ -471,7 +473,9 @@ core_device_t::core_device_t(core_device_t &owner, const pstring &name)
 	: object_t(owner.name() + "." + name)
 	, logic_family_t()
 	, netlist_ref(owner.netlist())
+#if (NL_PMF_TYPE > NL_PMF_TYPE_VIRTUAL)
 	, m_static_update()
+#endif
 {
 	set_logic_family(owner.logic_family());
 	if (logic_family() == nullptr)
