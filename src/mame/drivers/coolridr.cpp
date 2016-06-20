@@ -3005,7 +3005,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_sound_dma_w)
 
 
 static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
-	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_SHARE("share2") // note: SH7032 only supports 64KB
+	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM // note: SH7032 only supports 64KB
 
 	AM_RANGE(0x01000000, 0x0100ffff) AM_RAM //communication RAM
 
@@ -3031,9 +3031,6 @@ static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x0610001c, 0x0610001f) AM_READWRITE8(analog_mux_r,analog_mux_w,0x000000ff) //AM_WRITENOP
 	AM_RANGE(0x06200000, 0x06200fff) AM_RAM //network related?
 	AM_RANGE(0x07ffe000, 0x07ffffff) AM_RAM // On-Chip RAM (actually mapped at 0x0fffe000-0x0fffffff)
-	AM_RANGE(0x20000000, 0x2001ffff) AM_ROM AM_SHARE("share2")
-
-	AM_RANGE(0x60000000, 0x600003ff) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aquastge_submap, AS_PROGRAM, 32, coolridr_state )
