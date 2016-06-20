@@ -7500,7 +7500,7 @@ static GFXDECODE_START( super9 )
 	GFXDECODE_ENTRY( "gfx2", 0, super9_tilelayout, 128,  8 )
 GFXDECODE_END
 
-static GFXDECODE_START( flaming7 )  // still wrong... FIXME
+static GFXDECODE_START( flaming7 )  // gfx 2 still wrong...
 	GFXDECODE_ENTRY( "gfx1", 0, flaming7_charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, flaming7_tilelayout, 104,  8 )
 GFXDECODE_END
