@@ -189,7 +189,6 @@ netlist_t::netlist_t(const pstring &aname)
 	: m_state()
 	, m_time(netlist_time::zero())
 	, m_queue(*this)
-	, m_use_deactivate(0)
 	, m_mainclock(nullptr)
 	, m_solver(nullptr)
 	, m_gnd(nullptr)
@@ -247,8 +246,6 @@ void netlist_t::start()
 	m_gnd = get_single_device<devices::NETLIB_NAME(gnd)>("gnd");
 	m_params = get_single_device<devices::NETLIB_NAME(netlistparams)>("parameter");
 
-	m_use_deactivate = (m_params->m_use_deactivate.Value() ? true : false);
-
 	/* create devices */
 
 	for (auto & e : setup().m_device_factory)
@@ -263,6 +260,24 @@ void netlist_t::start()
 		}
 	}
 
+	bool use_deactivate = (m_params->m_use_deactivate.Value() ? true : false);
+
+
+	for (auto &d : m_devices)
+	{
+		if (use_deactivate)
+		{
+			auto p = setup().m_param_values.find(d->name() + ".HINT_NO_DEACTIVATE");
+			if (p != setup().m_param_values.end())
+			{
+				//FIXME: Error checking
+				auto v = p->second.as_long();
+				d->set_hint_deactivate(!v);
+			}
+		}
+		else
+			d->set_hint_deactivate(false);
+	}
 }
 
 void netlist_t::stop()
@@ -461,6 +476,7 @@ core_device_t::core_device_t(netlist_t &owner, const pstring &name)
 	: object_t(name)
 	, logic_family_t()
 	, netlist_ref(owner)
+	, m_hint_deactivate(false)
 #if (NL_PMF_TYPE > NL_PMF_TYPE_VIRTUAL)
 	, m_static_update()
 #endif
@@ -473,6 +489,7 @@ core_device_t::core_device_t(core_device_t &owner, const pstring &name)
 	: object_t(owner.name() + "." + name)
 	, logic_family_t()
 	, netlist_ref(owner.netlist())
+	, m_hint_deactivate(false)
 #if (NL_PMF_TYPE > NL_PMF_TYPE_VIRTUAL)
 	, m_static_update()
 #endif
@@ -627,11 +644,7 @@ void net_t::inc_active(core_terminal_t &term)
 	nl_assert(m_active <= (int) num_cons());
 	if (m_active == 1)
 	{
-		if (netlist().use_deactivate())
-		{
-			railterminal().device().do_inc_active();
-			//m_cur_Q = m_new_Q;
-		}
+		railterminal().device().do_inc_active();
 		if (m_in_queue == 0)
 		{
 			if (m_time > netlist().time())
@@ -653,7 +666,7 @@ void net_t::dec_active(core_terminal_t &term)
 	--m_active;
 	nl_assert(m_active >= 0);
 	m_list_active.remove(&term);
-	if (m_active == 0 && netlist().use_deactivate())
+	if (m_active == 0)
 		railterminal().device().do_dec_active();
 }
 
@@ -981,10 +994,6 @@ nl_double param_model_t::model_value(const pstring &entity)
 }
 
 
-} // namespace
-
-namespace netlist
-{
 	namespace devices
 	{
 

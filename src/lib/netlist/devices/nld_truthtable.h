@@ -165,7 +165,6 @@ namespace netlist
 		, m_fam(*this, fam)
 		, m_ign(*this, "m_ign", 0)
 		, m_active(*this, "m_active", 1)
-		, m_use_deactivate(*this, "USE_DEACTIVATE", true)
 		, m_ttp(ttp)
 		{
 			while (*desc != nullptr && **desc != 0 )
@@ -183,7 +182,6 @@ namespace netlist
 		, m_fam(*this, fam)
 		, m_ign(*this, "m_ign", 0)
 		, m_active(*this, "m_active", 1)
-		, m_use_deactivate(*this, "USE_DEACTIVATE", true)
 		, m_ttp(ttp)
 		{
 			m_desc = desc;
@@ -192,6 +190,8 @@ namespace netlist
 
 		void startxx()
 		{
+			set_hint_deactivate(true);
+
 			pstring header = m_desc[0];
 
 			plib::pstring_vector_t io(header,"|");
@@ -264,7 +264,7 @@ namespace netlist
 	public:
 		void inc_active() override
 		{
-			if (m_NI > 1 && m_use_deactivate)
+			if (m_NI > 1)
 				if (++m_active == 1)
 				{
 					process<false>();
@@ -279,7 +279,7 @@ namespace netlist
 			 * can decide for each individual gate whether it is benefitial to
 			 * ignore deactivation.
 			 */
-			if (m_NI > 1 && m_use_deactivate)
+			if (m_NI > 1)
 				if (--m_active == 0)
 				{
 					for (std::size_t i = 0; i< m_NI; i++)
@@ -363,7 +363,6 @@ namespace netlist
 		/* FIXME: check width */
 		state_var_u32		m_ign;
 		state_var_s32		m_active;
-		param_logic_t		m_use_deactivate;
 		truthtable_t *		m_ttp;
 		plib::pstring_vector_t m_desc;
 	};

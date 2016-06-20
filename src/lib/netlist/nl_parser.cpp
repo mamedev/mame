@@ -45,6 +45,7 @@ bool parser_t::parse(const pstring nlname)
 	m_tok_NET_C = register_token("NET_C");
 	m_tok_FRONTIER = register_token("OPTIMIZE_FRONTIER");
 	m_tok_PARAM = register_token("PARAM");
+	m_tok_HINT = register_token("HINT");
 	m_tok_NET_MODEL = register_token("NET_MODEL");
 	m_tok_INCLUDE = register_token("INCLUDE");
 	m_tok_LOCAL_SOURCE = register_token("LOCAL_SOURCE");
@@ -120,6 +121,8 @@ void parser_t::parse_netlist(ATTR_UNUSED const pstring &nlname)
 			frontier();
 		else if (token.is(m_tok_PARAM))
 			netdev_param();
+		else if (token.is(m_tok_HINT))
+			netdev_hint();
 		else if (token.is(m_tok_NET_MODEL))
 			net_model();
 		else if (token.is(m_tok_SUBMODEL))
@@ -339,6 +342,15 @@ void parser_t::netdev_param()
 		m_setup.log().debug("Parser: Param: {1} {2}\n", param, val);
 		m_setup.register_param(param, val);
 	}
+	require_token(m_tok_param_right);
+}
+
+void parser_t::netdev_hint()
+{
+	pstring dev(get_identifier());
+	require_token(m_tok_comma);
+	pstring hint(get_identifier());
+	m_setup.register_param(dev + ".HINT_" + hint, 1);
 	require_token(m_tok_param_right);
 }
 

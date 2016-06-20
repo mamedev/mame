@@ -49,6 +49,9 @@
 #define PARAM(name, val)                                                        \
 		setup.register_param(# name, val);
 
+#define HINT(name, val)                                                        \
+		setup.register_param(# name ".HINT_" # val, 1);
+
 #define NETDEV_PARAMI(name, param, val)                                         \
 		setup.register_param(# name "." # param, val);
 
