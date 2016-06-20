@@ -4354,85 +4354,85 @@ ROM_END
 
 ROM_START( fixeightkt )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeightkt.nv", 0x00, 0x80, CRC(08fa73ba) SHA1(b7761d3dd3f4485e55c8ef2cf1a840ca771ee2fc) )
 ROM_END
 
 ROM_START( fixeightk )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeightk.nv", 0x00, 0x80, CRC(cac91c6f) SHA1(55b284f081753d60abff63493094322756b7f0c5) )
 ROM_END
 
 ROM_START( fixeightht )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeightht.nv", 0x00, 0x80, CRC(57edaa51) SHA1(b8d50e82590b8cbbbcafec5f9cfbc91e4c286db5) )
 ROM_END
 
 ROM_START( fixeighth )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeighth.nv", 0x00, 0x80, CRC(95dec584) SHA1(1c309074b51da5a5263dee00403296946e41067b) )
 ROM_END
 
 ROM_START( fixeighttwt )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeighttwt.nv", 0x00, 0x80, CRC(b6d5c06c) SHA1(7fda380ac6835a983c57d093ccad7bd76893c9ba))
 ROM_END
 
 ROM_START( fixeighttw )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeighttw.nv", 0x00, 0x80, CRC(74e6afb9) SHA1(87bdc95eb0d2d54375de2c622557d503e14154be))
 ROM_END
 
 ROM_START( fixeightat )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeightat.nv", 0x00, 0x80,CRC(e9c21987) SHA1(7f699e38deb84902ed62b857a3d2b4e3ea1475bb) )
 ROM_END
 
 ROM_START( fixeighta )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeighta.nv", 0x00, 0x80, CRC(2bf17652) SHA1(4ec6f188e63610d258cd6b2432d2200d61d80bed))
 ROM_END
 
 ROM_START( fixeightt )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeightt.nv", 0x00, 0x80, CRC(c0da4a05) SHA1(3686161244e3e8be0e2fdb5fc5c24e39a7aeba85) )
 ROM_END
 
 ROM_START( fixeight )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeight.nv", 0x00, 0x80, CRC(02e925d0) SHA1(5839d10aceff84916ea99e9c6afcdc90eef7468b) )
 ROM_END
 
 ROM_START( fixeightut )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeightut.nv", 0x00, 0x80, CRC(9fcd93ee) SHA1(4f2750f09d9b8ff358a2fd6c7a4a8ba6de67017a) )
 ROM_END
 
 ROM_START( fixeightu )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeightu.nv", 0x00, 0x80, CRC(5dfefc3b) SHA1(5203525c58e2ae10575af2e277a5696bd64c5b60) )
 ROM_END
 
 ROM_START( fixeightj )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeightj.nv", 0x00, 0x80, CRC(21e22038) SHA1(29fb10061e62799bb5e4171e144daac49f0cdf06) )
 ROM_END
 
 ROM_START( fixeightjt )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeightjt.nv", 0x00, 0x80, CRC(e3d14fed) SHA1(ee4982ef195240c5eaa5005ca1d591901fb01b47) )
 ROM_END
 
