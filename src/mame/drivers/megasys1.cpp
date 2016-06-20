@@ -32,6 +32,7 @@ Year + Game                       System    Protection
     R&T (Prototype?)                A             Encryption (key 2)
     Phantasm        (Japan) /       A             Encryption (key 1)
 91  Avenging Spirit (World)         B       Inputs
+    Earth Defense Force (Prototype) A             Encryption (key 1)
     Earth Defense Force             B       Inputs
     64th Street  (World) /          C       Inputs
     64th Street  (Japan)            C       Inputs
@@ -920,6 +921,59 @@ static INPUT_PORTS_START( edf )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( edfp )
+	PORT_INCLUDE( megasys1_generic )
+
+    PORT_START("DSW")
+    PORT_DIPNAME( 0x0007, 0x0007, "DSW bits 2-0" )
+    PORT_DIPSETTING(      0x0000, "0" )
+    PORT_DIPSETTING(      0x0001, "1" )
+    PORT_DIPSETTING(      0x0002, "2" )
+    PORT_DIPSETTING(      0x0003, "3" )
+    PORT_DIPSETTING(      0x0004, "4" )
+    PORT_DIPSETTING(      0x0005, "5" )
+    PORT_DIPSETTING(      0x0006, "6" )
+    PORT_DIPSETTING(      0x0007, "7" )
+    PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Lives ) )
+    PORT_DIPSETTING(      0x0008, "3" )
+    PORT_DIPSETTING(      0x0000, "4" )
+    PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Difficulty ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( Easy ) )
+    PORT_DIPSETTING(      0x0030, DEF_STR( Normal ) )
+    PORT_DIPSETTING(      0x0010, DEF_STR( Hard ) )
+    PORT_DIPSETTING(      0x0020, DEF_STR( Very_Hard ) )
+    PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) )
+    PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+    PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coin_A ) )
+    PORT_DIPSETTING(      0x0400, DEF_STR( 3C_1C ) )
+    PORT_DIPSETTING(      0x0200, DEF_STR( 2C_1C ) )
+    PORT_DIPSETTING(      0x0700, DEF_STR( 1C_1C ) )
+    PORT_DIPSETTING(      0x0300, DEF_STR( 1C_2C ) )
+    PORT_DIPSETTING(      0x0500, DEF_STR( 1C_3C ) )
+    PORT_DIPSETTING(      0x0100, DEF_STR( 1C_4C ) )
+    PORT_DIPSETTING(      0x0600, DEF_STR( 1C_5C ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+    PORT_DIPNAME( 0x3800, 0x3800, DEF_STR( Coin_B ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
+    PORT_DIPSETTING(      0x2000, DEF_STR( 3C_1C ) )
+    PORT_DIPSETTING(      0x1000, DEF_STR( 2C_1C ) )
+    PORT_DIPSETTING(      0x3800, DEF_STR( 1C_1C ) )
+    PORT_DIPSETTING(      0x1800, DEF_STR( 1C_2C ) )
+    PORT_DIPSETTING(      0x2800, DEF_STR( 1C_3C ) )
+    PORT_DIPSETTING(      0x0800, DEF_STR( 1C_4C ) )
+    PORT_DIPSETTING(      0x3000, DEF_STR( 1C_5C ) )
+    PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Demo_Sounds ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
+    PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( hachoo )
 	PORT_INCLUDE( megasys1_generic )
@@ -2508,6 +2562,59 @@ ROM_START( edfu )
 
 	ROM_REGION( 0x040000, "oki2", 0 )       /* Samples */
 	ROM_LOAD( "edf_m01.rom",  0x000000, 0x040000, CRC(9149286b) SHA1(f6c66c5cd50b72c4d401a263c65a8d4ef8cf9221) )
+
+	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM  (N82S131N compatible type PROM) */
+	ROM_LOAD( "rd.20n",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
+ROM_END
+
+
+/*
+    EDF (Prototype)
+ 
+    Main Board: MB-8842 (System-A)
+    ROM Board: MB8845 (with D6500SCW-362 custom)
+*/
+ROM_START( edfp )
+	ROM_REGION( 0xc0000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_LOAD16_BYTE( "2.ROM2.27C010",  0x000000, 0x020000, CRC(358a6ac3) SHA1(b7beaadd2e934071e6bc9cafdaa9cc5a1241488a) )
+	ROM_LOAD16_BYTE( "1.ROM1.27C010",  0x000001, 0x020000, CRC(f30cfb25) SHA1(38020aa62e61f15dbd4267293bd4b8df356ed16e) )
+    ROM_LOAD16_BYTE( "4.ROM4.27512",   0x040001, 0x010000, CRC(41e1a014) SHA1(8d40353228114c762fe58c525162f35aa71ef21b) )
+    ROM_LOAD16_BYTE( "3.ROM3.27512",   0x040000, 0x010000, CRC(f0357ba2) SHA1(e4ff21d5149ae7d0b259238c18edb193eb94be5e) )
+
+	ROM_REGION( 0x40000, "audiocpu", 0 )        /* Sound CPU Code */
+    ROM_LOAD16_BYTE( "5.ROM5.27512", 0x000000, 0x010000, CRC(505d09ff) SHA1(681579123257548f71ebb9d591c4db81fc52ff85) )
+    ROM_LOAD16_BYTE( "6.ROM6.27512", 0x000001, 0x010000, CRC(13c14471) SHA1(9661ff7ca829260d1b247dee8fc5eb22d92cb1fa) )
+
+    /* No MCU */
+
+	ROM_REGION( 0x080000, "gfx1", 0 ) /* Scroll 0 */
+	ROM_LOAD( "11.ROM11.27C010",  0x000000, 0x020000, CRC(cfba8249) SHA1(f5ca1114296c2e268b44923b363add25b60f9e98) )
+    ROM_LOAD( "12.ROM12.27C010",  0x020000, 0x020000, CRC(c2027f34) SHA1(c685666ae368259b27f62563131ffa4c5db2f985) )
+    ROM_LOAD( "13.ROM13.27C010",  0x040000, 0x020000, CRC(d4b87d60) SHA1(94e85c9392150d3395e400defb96f7cb3fbc639b) )
+    ROM_LOAD( "14.ROM14.27C010",  0x060000, 0x020000, CRC(9814fe96) SHA1(c1c53534bc2b0d97dda9f1caa0e4917d497c08ae) )
+
+	ROM_REGION( 0x080000, "gfx2", 0 ) /* Scroll 1 */
+    ROM_LOAD( "15.ROM15.27C010",  0x000000, 0x020000, CRC(a91c027d) SHA1(39b68e81e07c81ce9961e5d14e9c123c72b31051) )
+    ROM_LOAD( "16.ROM16.27C010",  0x020000, 0x020000, CRC(2caecbc7) SHA1(82c2afcc3763d79ebf281fcf93b429ddbc6c44ae) )
+    ROM_LOAD( "17.ROM17.27C010",  0x040000, 0x020000, CRC(3947efe8) SHA1(925dce253bf81c7d454872a707593b5085a0f3d0) )
+    ROM_LOAD( "18.ROM18.27C010",  0x060000, 0x020000, CRC(2de832cb) SHA1(2b0266223561e649c535041ab8c543e3c64885ad) )
+
+	ROM_REGION( 0x020000, "gfx3", 0 ) /* Scroll 2 */
+	ROM_LOAD( "19.ROM19.27C010",  0x000000, 0x020000, CRC(96e38983) SHA1(a4fb94f15d9a9f7df1645be66fe3e179d0ebf765) )
+
+	ROM_REGION( 0x080000, "gfx4", 0 ) /* Sprites */
+	ROM_LOAD( "20.ROM20.27C010",  0x000000, 0x020000, CRC(e6956a01) SHA1(3ded46d0372b0633383f2a5d7b0f53687091b220) )
+    ROM_LOAD( "21.ROM21.27C010",  0x020000, 0x020000, CRC(8e19ae9a) SHA1(b12cdce9d6dae96a1c9d134828cc1cd7f85f3dab) )
+    ROM_LOAD( "22.ROM22.27C010",  0x040000, 0x020000, CRC(b5be39f3) SHA1(a330f26d7355ebb4ba5c81189564c39c896e7544) )
+    ROM_LOAD( "23.ROM23.27C010",  0x060000, 0x020000, CRC(01304689) SHA1(ef1836cce5b6a55633965b3c94293c6b99c59eb5) )
+
+	ROM_REGION( 0x040000, "oki1", 0 )       /* Samples */
+    ROM_LOAD( "9.ROM9.27C010",    0x000000, 0x020000, CRC(7182f27c) SHA1(dc83f3552f6d01365f9f3af89ba97a9936f7899c) )
+    ROM_LOAD( "10.ROM10.27C010",  0x020000, 0x020000, CRC(f780d92f) SHA1(8bee845a0aaa0b5ca5532ea4962adeb40699e3be) )
+
+	ROM_REGION( 0x040000, "oki2", 0 )       /* Samples */
+    ROM_LOAD( "7.ROM7.27C010",  0x000000, 0x020000, CRC(b9d79c1e) SHA1(315dbed9b7cc289b383c95e6c94267682324154c) )
+    ROM_LOAD( "8.ROM8.27C010",  0x020000, 0x020000, CRC(fa0d1887) SHA1(d24c17806669f5b12527b36bc9c10fd16222e23c) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM  (N82S131N compatible type PROM) */
 	ROM_LOAD( "rd.20n",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
@@ -4138,6 +4245,11 @@ DRIVER_INIT_MEMBER(megasys1_state,edf)
 
 }
 
+DRIVER_INIT_MEMBER(megasys1_state,edfp)
+{
+    phantasm_rom_decode(machine(), "maincpu");
+}
+
 READ16_MEMBER(megasys1_state::edfbl_input_r)
 {
 	ioport_port *in_names[] = { m_io_system, m_io_p1, m_io_p2, m_io_dsw1, m_io_dsw2 };
@@ -4432,8 +4544,9 @@ GAME( 1989, stdragonb,stdragon, system_A,          stdragon, megasys1_state, std
 GAME( 1990, rodland,  0,        system_A,          rodland,  megasys1_state, rodland,  ROT0,   "Jaleco", "Rod-Land (World)", 0 )
 GAME( 1990, rodlandj, rodland,  system_A,          rodland,  megasys1_state, rodlandj, ROT0,   "Jaleco", "Rod-Land (Japan)", 0 )
 GAME( 1990, rittam,   rodland,  system_A,          rodland,  megasys1_state, rittam,   ROT0,   "Jaleco", "R&T (Rod-Land prototype?)", 0 )
-GAME( 1990, rodlandjb,rodland,  system_A,          rodland,  megasys1_state,  rodlandjb,        ROT0,   "bootleg","Rod-Land (Japan bootleg)", 0 )
+GAME( 1990, rodlandjb,rodland,  system_A,          rodland,  megasys1_state, rodlandjb,ROT0,   "bootleg","Rod-Land (Japan bootleg)", 0 )
 GAME( 1990, phantasm, avspirit, system_A,          phantasm, megasys1_state, phantasm, ROT0,   "Jaleco", "Phantasm (Japan)", 0 )
+GAME( 1991, edfp,     edf,      system_A,          edfp,     megasys1_state, edfp,     ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (Japan, prototype)", 0 )
 GAME( 1992, soldam,   0,        system_A,          soldam,   megasys1_state, soldam,   ROT0,   "Jaleco", "Soldam", 0 )
 GAME( 1992, soldamj,  soldam,   system_A,          soldam,   megasys1_state, soldamj,  ROT0,   "Jaleco", "Soldam (Japan)", 0 )
 
