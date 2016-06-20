@@ -10,8 +10,9 @@
 #ifndef RAIDEN2COP_H
 #define RAIDEN2COP_H
 
-
-
+#define LOG_Commands 	0
+#define LOG_Phytagoras 	0
+#define LOG_Division  	0
 
 #define MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(_devcb) \
 	devcb = &raiden2cop_device::set_m_videoramout_cb(*device, DEVCB_##_devcb);
