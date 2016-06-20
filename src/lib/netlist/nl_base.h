@@ -911,7 +911,7 @@ namespace netlist
 		void set_delegate_pointer();
 		void stop_dev();
 
-		void do_inc_active() { inc_active();  }
+		void do_inc_active() { m_stat_inc_active.inc(); inc_active();  }
 		void do_dec_active() { dec_active(); }
 		void do_reset() { reset(); }
 
@@ -930,6 +930,7 @@ namespace netlist
 		/* stats */
 		nperftime_t  m_stat_total_time;
 		nperfcount_t m_stat_call_count;
+		nperfcount_t m_stat_inc_active;
 
 	protected:
 
@@ -1051,7 +1052,7 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 
 
-	class netlist_t : public plib::plog_dispatch_intf //, public device_owner_t
+	class netlist_t : public plib::plog_dispatch_intf
 	{
 		P_PREVENT_COPYING(netlist_t)
 	public:
@@ -1157,7 +1158,9 @@ protected:
 		/* mostly rw */
 		netlist_time                m_time;
 		queue_t                     m_queue;
-		/* mostly rw */
+
+		nperftime_t					m_stat_mainloop;
+		/* mostly ro */
 		bool                        m_use_deactivate;
 
 		devices::NETLIB_NAME(mainclock) *    m_mainclock;

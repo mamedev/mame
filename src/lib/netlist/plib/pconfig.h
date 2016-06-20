@@ -12,9 +12,22 @@
 #include <thread>
 #include <chrono>
 
-#ifndef PSTANDALONE
-	#define PSTANDALONE (0)
-#endif
+/*
+ * Define this for more accurate measurements if you processor supports
+ * RDTSCP.
+ */
+#define PHAS_RDTSCP (1)
+
+/*
+ * Define this to use accurate timing measurements. Only works
+ * if PHAS_RDTSCP == 1
+ */
+#define PUSE_ACCURATE_STATS (1)
+
+/*
+ * Set this to one if you want to use 128 bit int for ptime.
+ * This is for tests only.
+ */
 
 #define PHAS_INT128 (0)
 
@@ -88,15 +101,92 @@ static inline ticks_t ticks_per_second()
 
 #if defined(__x86_64__) &&  !defined(_clang__) && !defined(_MSC_VER) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 6))
 
-static inline ticks_t profile_ticks()
+
+/* Based on "How to Benchmark Code Execution Times on Intel® IA-32 and IA-64
+ * Instruction Set Architectures", Intel, 2010
+ *
+ */
+#if PUSE_ACCURATE_STATS && PHAS_RDTSCP
+/*
+ * kills performance completely, but is accurate
+ * cpuid serializes, but clobbers ebx and ecx
+ *
+ */
+static inline ticks_t profile_ticks_begin()
 {
-    unsigned hi, lo;
-    __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
-    return ( (unsigned long long)lo)|( ((unsigned long long)hi)<<32 );
+    int64_t v;
+    __asm__ __volatile__ (
+    		"cpuid;"
+    		//"xor %%eax, %%eax\n\t"
+    		"rdtsc;"
+    		"shl $32, %%rdx;"
+    		"or %%edx, %%eax;"
+    		: "=a"(v) /* outputs */
+			: "a"(0x0)                /* inputs */
+			: "%ebx", "%ecx", "%rdx"  /* clobbers*/
+    );
+    return v;
 }
+static inline ticks_t profile_ticks_end()
+{
+	int64_t v;
+    __asm__ __volatile__ (
+    		"rdtscp;"
+    		"shl $32, %%rdx;"
+    		"or %%eax, %%edx;"
+    		"mov %%rdx, %%r10;"
+    		"xor %%eax, %%eax\n\t"
+    		"cpuid;"
+    		"mov %%r10, %0;"
+    		: "=r" (v)
+			:
+			:	"%rax", "%ebx", "%ecx", "%rdx", "%r10"
+    );
+    return v;
+}
+#elif PHAS_RDTSCP
+static inline ticks_t profile_ticks_begin()
+{
+    union {
+    	struct {
+    		unsigned lo, hi;
+    	} v32;
+    	int64_t v64;
+    } v;
+    __asm__ __volatile__ (
+    		"rdtscp" : "=a"(v.v32.lo), "=d"(v.v32.hi) /* outputs */
+			   : /*"a"(0)*/             /* inputs */
+			   : "%ecx"     /* clobbers*/
+    );
+    return v.v64;
+}
+static inline ticks_t profile_ticks_end()
+{
+	return profile_ticks_begin();
+}
+#else
+static inline ticks_t profile_ticks_begin()
+{
+    union {
+    	struct {
+    		unsigned lo, hi;
+    	} v32;
+    	int64_t v64;
+    } v;
+    __asm__ __volatile__ (
+    		"rdtsc" : "=a"(v.v32.lo), "=d"(v.v32.hi) /* outputs */
+    );
+    return v.v64;
+}
+static inline ticks_t profile_ticks_end()
+{
+	return profile_ticks_begin();
+}
+#endif
 
 #else
-static inline ticks_t profile_ticks() { return ticks(); }
+static inline ticks_t profile_ticks_begin() { return ticks(); }
+static inline ticks_t profile_ticks_end() { return ticks(); }
 #endif
 
 template<bool enabled_>
@@ -129,8 +219,8 @@ struct perftime_t
 	perftime_t() : m_time(0), m_count(0) { }
 	typedef ticks_t type;
 	type operator()() const { return m_time; }
-	void begin() { m_time -= profile_ticks(); }
-	void end() { m_time += profile_ticks(); ++m_count; }
+	void begin() { m_time -= profile_ticks_begin(); }
+	void end() { m_time += profile_ticks_end(); ++m_count; }
 	void reset() { m_time = 0; m_count = 0; }
 	type average() const { return (m_count == 0) ? 0 : m_time / m_count; }
 	type total() const { return m_time; }

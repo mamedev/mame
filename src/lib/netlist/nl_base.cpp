@@ -334,6 +334,8 @@ void netlist_t::process_queue(const netlist_time &delta)
 
 	m_queue.push(stop, nullptr);
 
+	m_stat_mainloop.begin();
+
 	if (m_mainclock == nullptr)
 	{
 		queue_t::entry_t e(m_queue.pop());
@@ -371,6 +373,7 @@ void netlist_t::process_queue(const netlist_time &delta)
 		}
 		mc_net.set_time(mc_time);
 	}
+	m_stat_mainloop.end();
 }
 
 void netlist_t::print_stats() const
@@ -384,16 +387,48 @@ void netlist_t::print_stats() const
 		std::sort(index.begin(), index.end(),
 				[&](size_t i1, size_t i2) { return m_devices[i1]->m_stat_total_time.total() < m_devices[i2]->m_stat_total_time.total(); });
 
+		nperftime_t::type total_time(0);
+		uint_least64_t total_count(0);
+
 		for (auto & j : index)
 		{
 			auto entry = m_devices[j].get();
-			log().verbose("Device {1:20} : {2:12} {3:12} {4:15}", entry->name(),
+			log().verbose("Device {1:20} : {2:12} {3:12} {4:15} {5:12}", entry->name(),
 					entry->m_stat_call_count(), entry->m_stat_total_time.count(),
-					entry->m_stat_total_time.total());
+					entry->m_stat_total_time.total(), entry->m_stat_inc_active());
+			total_time += entry->m_stat_total_time.total();
+			total_count += entry->m_stat_total_time.count();
 		}
 
-		log().verbose("Queue Pushes {1:15}", queue().m_prof_call());
-		log().verbose("Queue Moves  {1:15}", queue().m_prof_sortmove());
+		nperftime_t overhead;
+		nperftime_t test;
+		overhead.begin();
+		for (int j=0; j<100000;j++)
+		{
+			test.begin();
+			test.end();
+		}
+		overhead.end();
+
+		uint_least64_t total_overhead = (uint_least64_t) overhead()*(uint_least64_t)total_count/(uint_least64_t)200000;
+
+		log().verbose("Queue Pushes   {1:15}", queue().m_prof_call());
+		log().verbose("Queue Moves    {1:15}", queue().m_prof_sortmove());
+
+		log().verbose("Total loop     {1:15}", m_stat_mainloop());
+		/* Only one serialization should be counted in total time */
+		/* But two are contained in m_stat_mainloop */
+		log().verbose("Total devices  {1:15}", total_time);
+		log().verbose("");
+		log().verbose("Take the next lines with a grain of salt. They depend on the measurement implementation.");
+		log().verbose("Total overhead {1:15}", total_overhead);
+		log().verbose("Overhead per pop  {1:11}", (m_stat_mainloop()-2*total_overhead - (total_time - total_overhead ))/queue().m_prof_call());
+		log().verbose("");
+		for (auto &entry : m_devices)
+		{
+			if (entry->m_stat_inc_active() > 3 * entry->m_stat_total_time.count())
+				log().verbose("PARAM({}.USE_DEACTIVATE, 0)", entry->name());
+		}
 	}
 }
 
@@ -426,6 +461,7 @@ core_device_t::core_device_t(netlist_t &owner, const pstring &name)
 	: object_t(name)
 	, logic_family_t()
 	, netlist_ref(owner)
+	, m_static_update()
 {
 	if (logic_family() == nullptr)
 		set_logic_family(family_TTL());
@@ -435,6 +471,7 @@ core_device_t::core_device_t(core_device_t &owner, const pstring &name)
 	: object_t(owner.name() + "." + name)
 	, logic_family_t()
 	, netlist_ref(owner.netlist())
+	, m_static_update()
 {
 	set_logic_family(owner.logic_family());
 	if (logic_family() == nullptr)
@@ -604,8 +641,6 @@ void net_t::inc_active(core_terminal_t &term)
 				m_in_queue = 2;
 			}
 		}
-		//else if (netlist().use_deactivate())
-		//  m_cur_Q = m_new_Q;
 	}
 }
 
