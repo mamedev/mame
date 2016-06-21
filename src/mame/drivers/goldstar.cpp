@@ -14563,6 +14563,32 @@ ROM_END
 
   -------------------------------------------------------------------------
 
+  Cyberdyne Printer Harness (Flaming 7)
+  -------------------------------------
+
+                         +12V.----+----+
+                                  |    |
+                                  Z    Z
+                                  Z    Z  470 ohm 1/4 watt resistors
+                                  Z    Z
+                                  |    |
+  PCB Pin 69 Solder Side (TXD) ---+----|---- DB25 pin 3 (received data)
+                                       |
+                                       +---- DB25 pin 6
+
+  PCB Pin 22 Parts Side -------------------- DB25 pins 1 & 7 (Single & Safety)
+
+  PCB Pin 35 Parts Side -------------------- DB25 pin 20 (Printer Busy Signal)
+
+
+  DIP Switches settings for Citizen Printer:
+
+  Model # 3551
+  DIP SW #1 = 5, 7, 9, 10 OFF.
+  DIP SW #2 = 5, 7, 8, OFF.
+
+  -------------------------------------------------------------------------
+
   Tech Notes:
 
   W-4 PCB type has some hacks...
