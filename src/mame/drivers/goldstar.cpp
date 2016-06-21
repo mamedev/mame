@@ -15612,7 +15612,7 @@ GAME(  199?, fl7_50,    0,        flaming7, flaming7, wingco_state,   flaming7, 
 GAME(  199?, fl7_500,   fl7_50,   flaming7, flaming7, wingco_state,   flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 500 Bonus)",             MACHINE_NOT_WORKING )
 GAME(  199?, fl7_2000,  fl7_50,   flaming7, flaming7, wingco_state,   flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 2000 Bonus)",            MACHINE_NOT_WORKING )
 GAME(  199?, fl7_2k16,  fl7_50,   flaming7, flaming7, wingco_state,   flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Egyptian Gold, 2000 Bonus)",   MACHINE_NOT_WORKING )
-GAME(  199?, fl7_tw,    fl7_50,   flaming7, flaming7, wingco_state,   flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Taiwanese Hardware, unknown version)",          MACHINE_NOT_WORKING )  // needs proper gfx roms decryption.
+GAME(  199?, fl7_tw,    fl7_50,   flaming7, flaming7, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 (Taiwanese Hardware, unknown version)",          MACHINE_NOT_WORKING )  // needs proper gfx roms decryption.
 
 
 // --- Wing W-8 hardware ---
