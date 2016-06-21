@@ -351,11 +351,9 @@ void m2comm_device::comm_tick_16726()
 {
 	if (m_linkenable == 0x01)
 	{
-		m_zfg ^= 1;
-
-		int frameStart = 0x2000;
-		int frameOffset = 0x0000;
-		int frameSize = 0x01c0;
+		int frameTX = 0x2000;
+		int frameRX = 0x21c0;
+		int frameSize = 0x01c0 * 8;
 		int dataSize = frameSize + 1;
 		int togo = 0;
 		int recv = 0;
@@ -412,7 +410,6 @@ void m2comm_device::comm_tick_16726()
 							else if (isSlave)
 							{
 								m_buffer[1]++;
-								m_linkid = m_buffer[1];
 
 								// forward message
 								m_line_tx.write(m_buffer, dataSize);
@@ -425,6 +422,8 @@ void m2comm_device::comm_tick_16726()
 							if (isSlave)
 							{
 								m_linkcount = m_buffer[1];
+								m_linkid = m_buffer[2];
+								m_buffer[2]--;
 
 								// forward message
 								m_line_tx.write(m_buffer, dataSize);
@@ -433,6 +432,7 @@ void m2comm_device::comm_tick_16726()
 							// consider it done
 							printf("M2COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
 							m_linkalive = 0x01;
+							m_linktimer = 0x01;
 
 							// write to shared mem
 							m_shared[0] = 0x01;
@@ -466,6 +466,7 @@ void m2comm_device::comm_tick_16726()
 					{
 						m_buffer[0] = 0xff;
 						m_buffer[1] = 0x01;
+						m_buffer[2] = 0x00;
 						m_line_tx.write(m_buffer, dataSize);
 					}
 
@@ -474,11 +475,13 @@ void m2comm_device::comm_tick_16726()
 					{
 						m_buffer[0] = 0xfe;
 						m_buffer[1] = m_linkcount;
+						m_buffer[2] = m_linkcount;
 						m_line_tx.write(m_buffer, dataSize);
 
 						// consider it done
 						printf("M2COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
 						m_linkalive = 0x01;
+						m_linktimer = 0x00;
 
 						// write to shared mem
 						m_shared[0] = 0x01;
@@ -511,47 +514,12 @@ void m2comm_device::comm_tick_16726()
 					// check if valid id
 					int idx = m_buffer[0];
 					if (idx > 0 && idx <= m_linkcount) {
-						int slotFrom = m_linkid - idx;
-						int slotDest = slotFrom + m_linkcount;
-						while (slotDest < 9) {
-							slotDest += m_linkcount;
-						}
-						while (slotDest - m_linkcount > 0) {
-							slotFrom = slotDest - m_linkcount;
-							if (slotDest < 9) {
-								int frameOffset1 = frameStart + slotFrom * frameSize;
-								int frameOffset2 = frameStart + slotDest * frameSize;
-								for (int j = 0x00 ; j < frameSize ; j++)
-								{
-									m_shared[frameOffset2 + j] = m_shared[frameOffset1 + j];
-								}
-							}
-							slotDest -= m_linkcount;
-						}
-						if (slotDest > 0) {
-							// save message to "ring buffer"
-							frameOffset = frameStart + (slotDest * frameSize);
-							for (int j = 0x00 ; j < frameSize ; j++)
-							{
-								m_shared[frameOffset + j] = m_buffer[1 + j];
-							}
-						}
-						if (idx != m_linkid)
+						for (int j = 0x00 ; j < frameSize ; j++)
 						{
-							// forward message to other nodes
-							m_line_tx.write(m_buffer, dataSize);
+							m_shared[frameRX + j] = m_buffer[1 + j];
 						}
-					} else {
-						if (!isMaster && idx == 0xF0){
-							// 0xF0 - master addional bytes
-							for (int j = 0x05 ; j < 0x10 ; j++)
-							{
-								m_shared[j] = m_buffer[1 + j];
-							}
-
-							// forward message to other nodes
-							m_line_tx.write(m_buffer, dataSize);
-						}
+						m_zfg ^= 1;
+						m_linktimer = 0x00;
 					}
 				}
 				else
@@ -568,27 +536,16 @@ void m2comm_device::comm_tick_16726()
 				recv = m_line_rx.read(m_buffer, dataSize);
 			}
 
-			// push message to other nodes
-			m_buffer[0] = m_linkid;
-			for (int j = 0x00 ; j < frameSize ; j++)
+			if (m_linktimer == 0x00)
 			{
-				m_buffer[1 + j] = m_shared[frameStart + j];
-			}
-			m_line_tx.write(m_buffer, dataSize);
-
-			// master sends some additional status bytes
-			if (isMaster){
-				m_buffer[0] = 0xF0;
+				// push message to other nodes
+				m_buffer[0] = m_linkid;
 				for (int j = 0x00 ; j < frameSize ; j++)
 				{
-					m_buffer[1 + j] = 0x00;
+					m_buffer[1 + j] = m_shared[frameTX + j];
 				}
-				for (int j = 0x05 ; j < 0x10 ; j++)
-				{
-					m_buffer[1 + j] = m_shared[j];
-				}
-				// push message to other nodes
 				m_line_tx.write(m_buffer, dataSize);
+				m_linktimer = 0x01;
 			}
 		}
 
