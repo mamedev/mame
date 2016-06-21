@@ -49,6 +49,7 @@ OBJS = $(POBJS) $(NLOBJS)
 POBJS := \
 	$(POBJ)/pstring.o \
 	$(POBJ)/palloc.o \
+	$(POBJ)/pchrono.o \
 	$(POBJ)/pdynlib.o \
 	$(POBJ)/pfmtlog.o \
 	$(POBJ)/poptions.o \

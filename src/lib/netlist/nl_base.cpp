@@ -349,7 +349,7 @@ void netlist_t::process_queue(const netlist_time &delta)
 
 	m_queue.push(stop, nullptr);
 
-	m_stat_mainloop.begin();
+	m_stat_mainloop.start();
 
 	if (m_mainclock == nullptr)
 	{
@@ -388,7 +388,7 @@ void netlist_t::process_queue(const netlist_time &delta)
 		}
 		mc_net.set_time(mc_time);
 	}
-	m_stat_mainloop.end();
+	m_stat_mainloop.stop();
 }
 
 void netlist_t::print_stats() const
@@ -417,13 +417,13 @@ void netlist_t::print_stats() const
 
 		nperftime_t overhead;
 		nperftime_t test;
-		overhead.begin();
+		overhead.start();
 		for (int j=0; j<100000;j++)
 		{
-			test.begin();
-			test.end();
+			test.start();
+			test.stop();
 		}
-		overhead.end();
+		overhead.stop();
 
 		uint_least64_t total_overhead = (uint_least64_t) overhead()*(uint_least64_t)total_count/(uint_least64_t)200000;
 
@@ -442,7 +442,7 @@ void netlist_t::print_stats() const
 		for (auto &entry : m_devices)
 		{
 			if (entry->m_stat_inc_active() > 3 * entry->m_stat_total_time.count())
-				log().verbose("PARAM({}.USE_DEACTIVATE, 0)", entry->name());
+				log().verbose("HINT({}, NO_DEACTIVATE)", entry->name());
 		}
 	}
 }

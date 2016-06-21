@@ -892,9 +892,9 @@ namespace netlist
 
 		void update_dev()
 		{
-			m_stat_total_time.begin();
+			m_stat_total_time.start();
 			do_update();
-			m_stat_total_time.end();
+			m_stat_total_time.stop();
 		}
 
 		void do_update() NOEXCEPT

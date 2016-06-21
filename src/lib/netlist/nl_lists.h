@@ -10,10 +10,11 @@
 #ifndef NLLISTS_H_
 #define NLLISTS_H_
 
+#include <atomic>
+
 #include "nl_config.h"
 #include "plib/plists.h"
-
-#include <atomic>
+#include "plib/pchrono.h"
 
 
 // ----------------------------------------------------------------------------------------

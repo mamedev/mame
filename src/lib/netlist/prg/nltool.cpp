@@ -204,7 +204,10 @@ std::vector<input_t> *read_input(netlist::netlist_t *netlist, pstring fname)
 static void run(tool_options_t &opts)
 {
 	netlist_tool_t nt("netlist");
-	plib::ticks_t t = plib::ticks();
+	plib::chrono::timer<plib::chrono::system_ticks> t;
+	//plib::perftime_t<plib::exact_ticks> t;
+
+	t.start();
 
 	nt.m_opts = &opts;
 	nt.init();
@@ -219,10 +222,13 @@ static void run(tool_options_t &opts)
 	std::vector<input_t> *inps = read_input(&nt, opts.opt_inp());
 
 	double ttr = opts.opt_ttr();
+	t.stop();
 
-	pout("startup time ==> {1:5.3f}\n", (double) (plib::ticks() - t) / (double) plib::ticks_per_second() );
+	pout("startup time ==> {1:5.3f}\n", t.as_seconds() );
 	pout("runnning ...\n");
-	t = plib::ticks();
+
+	t.reset();
+	t.start();
 
 	unsigned pos = 0;
 	netlist::netlist_time nlt = netlist::netlist_time::zero();
@@ -238,7 +244,9 @@ static void run(tool_options_t &opts)
 	nt.stop();
 	plib::pfree(inps);
 
-	double emutime = (double) (plib::ticks() - t) / (double) plib::ticks_per_second();
+	t.stop();
+
+	double emutime = t.as_seconds();
 	pout("{1:f} seconds emulation took {2:f} real time ==> {3:5.2f}%\n", ttr, emutime, ttr/emutime*100.0);
 }
 

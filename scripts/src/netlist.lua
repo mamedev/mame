@@ -38,6 +38,8 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/plib/pconfig.h",
 		MAME_DIR .. "src/lib/netlist/plib/palloc.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/palloc.h",
+    MAME_DIR .. "src/lib/netlist/plib/pchrono.cpp",
+    MAME_DIR .. "src/lib/netlist/plib/pchrono.h",
 		MAME_DIR .. "src/lib/netlist/plib/pfmtlog.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/pfmtlog.h",
 		MAME_DIR .. "src/lib/netlist/plib/plists.h",

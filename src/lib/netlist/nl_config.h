@@ -11,6 +11,7 @@
 #include <cstdint>
 
 #include "plib/pconfig.h"
+#include "plib/pchrono.h"
 
 //============================================================
 //  SETUP
@@ -114,15 +115,11 @@
 namespace netlist
 {
 #if NL_KEEP_STATISTICS
-//#define add_to_stat(v,x)        do { v += (x); } while (0)
-//#define inc_stat(v)             add_to_stat(v, 1)
-//#define begin_timing(v)         do { v -= plib::profile_ticks(); } while (0)
-//#define end_timing(v)           do { v += plib::profile_ticks(); } while (0)
-using nperftime_t = plib::perftime_t<true>;
-using nperfcount_t = plib::perfcount_t<true>;
+using nperftime_t = plib::timer<plib::exact_ticks, true>;
+using nperfcount_t = plib::counter<true>;
 #else
-using nperftime_t = plib::perftime_t<false>;
-using nperfcount_t = plib::perfcount_t<false>;
+using nperftime_t = plib::chrono::timer<plib::chrono::exact_ticks, false>;
+using nperfcount_t = plib::chrono::counter<false>;
 #endif
 }
 //============================================================
