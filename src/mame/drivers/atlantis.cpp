@@ -370,7 +370,7 @@ WRITE32_MEMBER(atlantis_state::status_leds_w)
 			case 0xfe: digit = '-'; break;
 			case 0xff: digit = 'Z'; break;
 			}
-			popmessage("LED: %c", digit);
+			//popmessage("LED: %c", digit);
 			osd_printf_debug("%06X: status_leds_w digit: %c %08x = %02x\n", machine().device("maincpu")->safe_pc(), digit, offset, data);
 			logerror("%06X: status_leds_w digit: %c %08x = %02x\n", machine().device("maincpu")->safe_pc(), digit, offset, data);
 		}
@@ -818,6 +818,7 @@ static MACHINE_CONFIG_START( mwskins, atlantis_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("zeus2", ZEUS2, ZEUS2_VIDEO_CLOCK)
+	MCFG_ZEUS2_FLOAT_MODE(1)
 	MCFG_ZEUS2_IRQ_CB(WRITELINE(atlantis_state, zeus_irq))
 	MCFG_ZEUS2_VBLANK_CB(WRITELINE(atlantis_state, vblank_irq))
 
