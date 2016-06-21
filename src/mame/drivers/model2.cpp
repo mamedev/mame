@@ -1507,7 +1507,9 @@ static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x01800000, 0x01803fff) AM_READWRITE16(model2_palette_r,model2_palette_w,0xffffffff)
 	AM_RANGE(0x01810000, 0x0181bfff) AM_RAM AM_SHARE("colorxlat")
 	AM_RANGE(0x0181c000, 0x0181c003) AM_WRITE(model2_3d_zclip_w)
-	AM_RANGE(0x01a10000, 0x01a1ffff) AM_READWRITE(network_r, network_w)
+	AM_RANGE(0x01a10000, 0x01a13fff) AM_DEVREADWRITE8("m2comm", m2comm_device, share_r, share_w, 0xffffffff)
+	AM_RANGE(0x01a14000, 0x01a14003) AM_DEVREADWRITE8("m2comm", m2comm_device, cn_r, cn_w, 0x000000ff)
+	AM_RANGE(0x01a14000, 0x01a14003) AM_DEVREADWRITE8("m2comm", m2comm_device, fg_r, fg_w, 0x00ff0000)
 	AM_RANGE(0x01d00000, 0x01d03fff) AM_RAM AM_SHARE("backup1") // Backup sram
 	AM_RANGE(0x02000000, 0x03ffffff) AM_ROM AM_REGION("user1", 0)
 
@@ -2229,6 +2231,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_interrupt)
 		if(m_intena & 1<<0)
 			m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
 		model2_check_irq_state();
+		if (m_m2comm != nullptr)
+			m_m2comm->check_vint_irq();
 	}
 	else if(scanline == 0)
 	{
@@ -2418,6 +2422,8 @@ static MACHINE_CONFIG_START( model2o, model2_state )
 	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
 
 	MCFG_SEGAM1AUDIO_ADD("m1audio")
+
+	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END
 
 /* 2A-CRX */
@@ -2469,6 +2475,8 @@ static MACHINE_CONFIG_START( model2a, model2_state )
 	MCFG_SCSP_IRQ_CB(WRITE8(model2_state,scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+
+	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( manxttdx, model2a ) /* Includes a Model 1 Sound board for additional sounds - Deluxe version only */
@@ -2584,6 +2592,8 @@ static MACHINE_CONFIG_START( model2b, model2_state )
 	MCFG_SCSP_IRQ_CB(WRITE8(model2_state,scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+
+	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END
 
 
@@ -2647,6 +2657,8 @@ static MACHINE_CONFIG_START( model2c, model2_state )
 	MCFG_SCSP_IRQ_CB(WRITE8(model2_state, scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+
+	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( stcc, model2c )

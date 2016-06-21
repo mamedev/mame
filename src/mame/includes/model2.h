@@ -8,6 +8,7 @@
 #include "sound/scsp.h"
 #include "machine/315-5881_crypt.h"
 #include "machine/315-5838_317-0229_comp.h"
+#include "machine/m2comm.h"
 
 class model2_renderer;
 struct raster_state;
@@ -30,6 +31,7 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_dsbz80(*this, DSBZ80_TAG),
 		m_m1audio(*this, "m1audio"),
+		m_m2comm(*this, "m2comm"),
 		m_audiocpu(*this, "audiocpu"),
 		m_tgp(*this, "tgp"),
 		m_dsp(*this, "dsp"),
@@ -58,6 +60,7 @@ public:
 	required_device<i960_cpu_device> m_maincpu;
 	optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
 	optional_device<segam1audio_device> m_m1audio;  // Model 1 standard sound board
+	optional_device<m2comm_device> m_m2comm;        // Model 2 communication board
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_tgp;
 	optional_device<cpu_device> m_dsp;

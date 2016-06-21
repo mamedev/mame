@@ -163,6 +163,8 @@ Sega PC BD MODEL2 C-CRX COMMUNICATION 837-12839
         18643A.7   Sega Touring Car Championship
 */
 
+#include "emu.h"
+#include "emuopts.h"
 #include "machine/m2comm.h"
 
 //#define __M2COMM_VERBOSE__

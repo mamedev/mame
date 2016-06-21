@@ -3043,6 +3043,8 @@ files {
 	MAME_DIR .. "src/mame/machine/s32comm.h",
 	MAME_DIR .. "src/mame/machine/m1comm.cpp",
 	MAME_DIR .. "src/mame/machine/m1comm.h",
+	MAME_DIR .. "src/mame/machine/m2comm.cpp",
+	MAME_DIR .. "src/mame/machine/m2comm.h",
 	MAME_DIR .. "src/mame/audio/dsbz80.cpp",
 	MAME_DIR .. "src/mame/audio/dsbz80.h",
 	MAME_DIR .. "src/mame/drivers/model2.cpp",
