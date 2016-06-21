@@ -27,7 +27,7 @@ public:
 
 
 static ADDRESS_MAP_START( bingo_map, AS_PROGRAM, 8, bingo_state )
-	AM_RANGE(0x0000, 0xffff) AM_NOP
+	AM_RANGE(0x0000, 0x7fff) AM_NOP
 	AM_RANGE(0x0000, 0x1eff) AM_ROM
 	AM_RANGE(0x1f00, 0x1fff) AM_RAM
 ADDRESS_MAP_END

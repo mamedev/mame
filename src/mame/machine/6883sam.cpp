@@ -510,8 +510,10 @@ void sam6883_device::sam_space<_addrstart, _addrend>::point_specific_bank(const 
 		// normalize offset
 		if (mask != 0)
 			offset &= mask;
+		else
+			mask = 0xffff;
 
-		UINT32 mirror = (addrend - addrstart) ^ mask;
+		UINT32 mirror = (addrend - addrstart) & ~mask;
 
 		// this bank is a memory bank - first ensure that we have a bank
 		if (!memory_bank || !memory_bank->matches_exactly(addrstart, addrend) || (mask != m_mask))
