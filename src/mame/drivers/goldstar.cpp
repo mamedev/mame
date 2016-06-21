@@ -14502,6 +14502,67 @@ ROM_END
 
   -------------------------------------------------------------------------
 
+        CYBERDYNE 72 PIN GAME LOGIC CONNECTOR
+
+            Parts Side |  |  | Solder Side
+        ---------------+--+--+---------------
+             Red Video |01|37| Green Video
+            Blue Video |02|38| Video Sync
+            Speaker (+)|03|39| Speaker Ground
+                       |04|40|
+                       |05|41|
+                       |06|42|
+          Drop Door SW |07|43| Change SW
+         Logic Door SW |08|44| Main Door SW
+          Start Switch |09|45|
+            Low Switch |10|46|
+    Play Credit Switch |11|47|
+     Take Score Switch |12|48|
+      Double Up Switch |13|49|
+           High Switch |14|50|
+           Button Lock |15|51|
+                       |16|52|
+                       |17|53|
+         (DBA) Inuput0 |18|54| Coin Switch “A”
+       Coin Switch “B” |19|55|
+   Book Keeping Switch |20|56| Stats / Setup SW
+            Collect SW |21|57|
+    Hopper Full Switch |22|58|
+       Counter Out “A” |23|59|
+                  Bell |24|60| Lockout mars (DBA)
+            Tower Lamp |25|61|
+       Counter Out “D” |26|62|
+          Played Meter |27|63| Lack of Hopper Counter
+  Count down Meter Out |28|64|
+            Start Lamp |29|65|
+              Low Lamp |30|66| Collect Lamp
+      Play Credit Lamp |31|67| Progressive Link
+       Take Score Lamp |32|68|
+        Double Up Lamp |33|69| TXD
+             High Lamp |34|70|
+                       |35|71|
+        Switch Grounds |36|72| Switch Grounds
+                       +--+--+
+
+
+           20 Pin Game PCB Power Connector
+
+            Parts Side |  |  | Solder Side
+        ---------------+--+--+---------------
+          Logic Ground |01|11| Logic Ground
+          Logic Ground |02|12| Logic Ground
+                +5 VDC |03|13|
+                +5 VDC |04|14| +5 VDC
+               +12 VDC |05|15| +12 VDC
+                       |06|16|
+                       |07|17|
+                       |08|18|
+          Logic Ground |09|19| Logic Ground
+          Logic Ground |10|20| Logic Ground
+                       +--+--+
+
+  -------------------------------------------------------------------------
+
   Tech Notes:
 
   W-4 PCB type has some hacks...
