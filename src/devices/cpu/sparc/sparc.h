@@ -9,6 +9,7 @@
 #ifndef __SPARC_H__
 #define __SPARC_H__
 
+#define SPARC_NO_TRAP						256
 #define SPARC_RESET							0
 #define SPARC_INSTRUCTION_ACCESS_EXCEPTION	1
 #define SPARC_ILLEGAL_INSTRUCTION			2
@@ -132,9 +133,9 @@ protected:
 	UINT8 m_asi;
 
 	// other internal states
-	UINT8 m_trap_priorities[256];
-	UINT8 m_queued_tt;
-	UINT8 m_queued_priority;
+	UINT32 m_trap_priorities[256];
+	UINT32 m_queued_tt;
+	UINT32 m_queued_priority;
 	bool m_mae;
 	bool m_hold_bus;
 	int m_icount;
