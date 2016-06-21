@@ -360,6 +360,10 @@ bool device_t::findit(bool isvalidation) const
 
 void device_t::start()
 {
+	// prepare the logerror buffer
+	if (m_machine->allow_logging())
+		m_string_buffer.reserve(1024);
+
 	// find all the registered devices
 	if (!findit(false))
 		throw emu_fatalerror("Missing some required objects, unable to proceed");
@@ -380,7 +384,7 @@ void device_t::start()
 	device_sound_interface *sound;
 	if (state_registrations == 0 && (interface(exec) || interface(sound)) && type() != SPEAKER)
 	{
-		logerror("Device '%s' did not register any state to save!\n", tag());
+		logerror("Device did not register any state to save!\n");
 		if ((machine().system().flags & MACHINE_SUPPORTS_SAVE) != 0)
 			fatalerror("Device '%s' did not register any state to save!\n", tag());
 	}

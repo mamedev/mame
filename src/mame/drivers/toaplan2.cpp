@@ -776,25 +776,6 @@ WRITE16_MEMBER(toaplan2_state::fixeightbl_oki_bankswitch_w)
 	}
 }
 
-
-READ8_MEMBER(toaplan2_state::v25_dswa_r)
-{
-	return ioport("DSWA")->read() ^ 0xff;
-}
-
-
-READ8_MEMBER(toaplan2_state::v25_dswb_r)
-{
-	return ioport("DSWB")->read() ^ 0xff;
-}
-
-
-READ8_MEMBER(toaplan2_state::v25_jmpr_r)
-{
-	return ioport("JMPR")->read() ^ 0xff;
-}
-
-
 READ8_MEMBER(toaplan2_state::fixeight_region_r)
 {
 	// this must match the eeprom region!
@@ -1494,27 +1475,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( vfive_v25_mem, AS_PROGRAM, 8, toaplan2_state )
 	AM_RANGE(0x00000, 0x00001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x80000, 0x87fff) AM_MIRROR(0x78000) AM_RAM AM_SHARE("shared_ram")
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( v25_port, AS_IO, 8, toaplan2_state )
-	AM_RANGE(V25_PORT_PT, V25_PORT_PT) AM_READ(v25_dswa_r)
-	AM_RANGE(V25_PORT_P0, V25_PORT_P0) AM_READ(v25_dswb_r)
-	AM_RANGE(V25_PORT_P1, V25_PORT_P1) AM_READ(v25_jmpr_r)
-	AM_RANGE(V25_PORT_P2, V25_PORT_P2) AM_WRITENOP  // bit 0 is FAULT according to kbash schematic
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( dogyuun_v25_port, AS_IO, 8, toaplan2_state )
-	AM_RANGE(V25_PORT_PT, V25_PORT_PT) AM_READ(v25_dswb_r)
-	AM_RANGE(V25_PORT_P0, V25_PORT_P0) AM_READ(v25_dswa_r)
-	AM_RANGE(V25_PORT_P1, V25_PORT_P1) AM_READ(v25_jmpr_r)
-	AM_RANGE(V25_PORT_P2, V25_PORT_P2) AM_WRITENOP  // bit 0 is FAULT according to kbash schematic
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( fixeight_v25_port, AS_IO, 8, toaplan2_state )
-	AM_RANGE(V25_PORT_P0, V25_PORT_P0) AM_READWRITE_PORT("EEPROM")
 ADDRESS_MAP_END
 
 
@@ -3219,8 +3179,11 @@ static MACHINE_CONFIG_START( dogyuun, toaplan2_state )
 
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_25MHz/2)         /* NEC V25 type Toaplan marked CPU ??? */
 	MCFG_CPU_PROGRAM_MAP(v25_mem)
-	MCFG_CPU_IO_MAP(dogyuun_v25_port)
 	MCFG_V25_CONFIG(nitro_decryption_table)
+	MCFG_V25_PORT_PT_READ_CB(IOPORT("DSWB")) MCFG_DEVCB_XOR(0xff) 
+	MCFG_V25_PORT_P0_READ_CB(IOPORT("DSWA")) MCFG_DEVCB_XOR(0xff) 
+	MCFG_V25_PORT_P1_READ_CB(IOPORT("JMPR")) MCFG_DEVCB_XOR(0xff) 
+	MCFG_V25_PORT_P2_WRITE_CB(NOOP)  // bit 0 is FAULT according to kbash schematic
 
 	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3264,8 +3227,11 @@ static MACHINE_CONFIG_START( kbash, toaplan2_state )
 	/* ROM based v25 */
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_16MHz)           /* NEC V25 type Toaplan marked CPU ??? */
 	MCFG_CPU_PROGRAM_MAP(kbash_v25_mem)
-	MCFG_CPU_IO_MAP(v25_port)
 	MCFG_V25_CONFIG(nitro_decryption_table)
+	MCFG_V25_PORT_PT_READ_CB(IOPORT("DSWA")) MCFG_DEVCB_XOR(0xff) 
+	MCFG_V25_PORT_P0_READ_CB(IOPORT("DSWB")) MCFG_DEVCB_XOR(0xff) 
+	MCFG_V25_PORT_P1_READ_CB(IOPORT("JMPR")) MCFG_DEVCB_XOR(0xff) 
+	MCFG_V25_PORT_P2_WRITE_CB(NOOP)  // bit 0 is FAULT according to kbash schematic
 
 	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3519,8 +3485,9 @@ static MACHINE_CONFIG_START( fixeight, toaplan2_state )
 
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_16MHz)           /* NEC V25 type Toaplan marked CPU ??? */
 	MCFG_CPU_PROGRAM_MAP(fixeight_v25_mem)
-	MCFG_CPU_IO_MAP(fixeight_v25_port)
 	MCFG_V25_CONFIG(ts001turbo_decryption_table)
+	MCFG_V25_PORT_P0_READ_CB(IOPORT("EEPROM"))
+	MCFG_V25_PORT_P0_WRITE_CB(IOPORT("EEPROM"))
 
 	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3601,8 +3568,11 @@ static MACHINE_CONFIG_START( vfive, toaplan2_state )
 
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_20MHz/2) /* Verified on pcb, NEC V25 type Toaplan mark scratched out */
 	MCFG_CPU_PROGRAM_MAP(vfive_v25_mem)
-	MCFG_CPU_IO_MAP(v25_port)
 	MCFG_V25_CONFIG(nitro_decryption_table)
+	MCFG_V25_PORT_PT_READ_CB(IOPORT("DSWA")) MCFG_DEVCB_XOR(0xff) 
+	MCFG_V25_PORT_P0_READ_CB(IOPORT("DSWB")) MCFG_DEVCB_XOR(0xff) 
+	MCFG_V25_PORT_P1_READ_CB(IOPORT("JMPR")) MCFG_DEVCB_XOR(0xff) 
+	MCFG_V25_PORT_P2_WRITE_CB(NOOP)  // bit 0 is FAULT according to kbash schematic
 
 	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3639,7 +3609,10 @@ static MACHINE_CONFIG_START( batsugun, toaplan2_state )
 
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_32MHz/2)         /* NEC V25 type Toaplan marked CPU ??? */
 	MCFG_CPU_PROGRAM_MAP(v25_mem)
-	MCFG_CPU_IO_MAP(v25_port)
+	MCFG_V25_PORT_PT_READ_CB(IOPORT("DSWA")) MCFG_DEVCB_XOR(0xff) 
+	MCFG_V25_PORT_P0_READ_CB(IOPORT("DSWB")) MCFG_DEVCB_XOR(0xff) 
+	MCFG_V25_PORT_P1_READ_CB(IOPORT("JMPR")) MCFG_DEVCB_XOR(0xff) 
+	MCFG_V25_PORT_P2_WRITE_CB(NOOP)  // bit 0 is FAULT according to kbash schematic
 
 	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 

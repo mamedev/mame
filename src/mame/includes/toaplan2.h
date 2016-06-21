@@ -100,9 +100,6 @@ public:
 	DECLARE_WRITE16_MEMBER(ghox_shared_ram_w);
 	DECLARE_WRITE16_MEMBER(fixeight_subcpu_ctrl_w);
 	DECLARE_WRITE16_MEMBER(fixeightbl_oki_bankswitch_w);
-	DECLARE_READ8_MEMBER(v25_dswa_r);
-	DECLARE_READ8_MEMBER(v25_dswb_r);
-	DECLARE_READ8_MEMBER(v25_jmpr_r);
 	DECLARE_READ8_MEMBER(fixeight_region_r);
 	DECLARE_WRITE8_MEMBER(raizing_z80_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(raizing_oki_bankswitch_w);

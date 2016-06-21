@@ -587,7 +587,25 @@ luabridge::LuaRef lua_engine::l_memory_get_regions(const memory_manager *m)
 	luabridge::LuaRef table = luabridge::LuaRef::newTable(L);
 
 	for (auto &region: mm->regions()) {
-		table[region.second->name()] = &region;
+		table[region.second->name()] = region.second.get();
+	}
+
+	return table;
+}
+
+//-------------------------------------------------
+//  memory_shares - return memory_shares
+//  -> manager:machine():memory().share[":maincpu"]
+//-------------------------------------------------
+
+luabridge::LuaRef lua_engine::l_memory_get_shares(const memory_manager *m)
+{
+	memory_manager *mm = const_cast<memory_manager *>(m);
+	lua_State *L = luaThis->m_lua_state;
+	luabridge::LuaRef table = luabridge::LuaRef::newTable(L);
+
+	for (auto &share: mm->shares()) {
+		table[share.first] = share.second.get();
 	}
 
 	return table;
@@ -1063,7 +1081,7 @@ int lua_engine::lua_addr_space::l_direct_mem_write(lua_State *L)
 
 //-------------------------------------------------
 //  region_read - templated region readers for <sign>,<size>
-//  -> manager:machine():memory().region[":maincpu"]:read_i8(0xC000)
+//  -> manager:machine():memory().regions[":maincpu"]:read_i8(0xC000)
 //-------------------------------------------------
 
 template <typename T>
@@ -1097,7 +1115,7 @@ int lua_engine::lua_memory_region::l_region_read(lua_State *L)
 
 //-------------------------------------------------
 //  region_write - templated region writer for <sign>,<size>
-//  -> manager:machine():memory().region[":maincpu"]:write_u16(0xC000, 0xF00D)
+//  -> manager:machine():memory().regions[":maincpu"]:write_u16(0xC000, 0xF00D)
 //-------------------------------------------------
 
 template <typename T>
@@ -1118,6 +1136,71 @@ int lua_engine::lua_memory_region::l_region_write(lua_State *L)
 			region.base()[(BYTE8_XOR_BE(addr) & lowmask) | (addr & ~lowmask)] = val & 0xff;
 		else
 			region.base()[(BYTE8_XOR_BE(addr) & lowmask) | (addr & ~lowmask)] = val & 0xff;
+		val >>= 8;
+	}
+
+	return 0;
+}
+
+//-------------------------------------------------
+//  share_read - templated share readers for <sign>,<size>
+//  -> manager:machine():memory().shares[":maincpu"]:read_i8(0xC000)
+//-------------------------------------------------
+
+template <typename T>
+int lua_engine::lua_memory_share::l_share_read(lua_State *L)
+{
+	memory_share &share = luabridge::Stack<memory_share &>::get(L, 1);
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
+	offs_t address = lua_tounsigned(L, 2);
+	T mem_content = 0;
+	offs_t lowmask = share.bytewidth() - 1;
+	UINT8* ptr = (UINT8*)share.ptr();
+	for(int i = 0; i < sizeof(T); i++)
+	{
+		int addr = share.endianness() == ENDIANNESS_LITTLE ? address + sizeof(T) - 1 - i : address + i;
+		if(addr >= share.bytes())
+			continue;
+		mem_content <<= 8;
+		if(share.endianness() == ENDIANNESS_BIG)
+			mem_content |= ptr[(BYTE8_XOR_BE(addr) & lowmask) | (addr & ~lowmask)];
+		else
+			mem_content |= ptr[(BYTE8_XOR_LE(addr) & lowmask) | (addr & ~lowmask)];
+	}
+
+	if (std::numeric_limits<T>::is_signed) {
+		lua_pushinteger(L, mem_content);
+	} else {
+		lua_pushunsigned(L, mem_content);
+	}
+
+	return 1;
+}
+
+//-------------------------------------------------
+//  share_write - templated share writer for <sign>,<size>
+//  -> manager:machine():memory().shares[":maincpu"]:write_u16(0xC000, 0xF00D)
+//-------------------------------------------------
+
+template <typename T>
+int lua_engine::lua_memory_share::l_share_write(lua_State *L)
+{
+	memory_share &share = luabridge::Stack<memory_share &>::get(L, 1);
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 3), 3, "value (integer) expected");
+	offs_t address = lua_tounsigned(L, 2);
+	T val = lua_tounsigned(L, 3);
+	offs_t lowmask = share.bytewidth() - 1;
+	UINT8* ptr = (UINT8*)share.ptr();
+	for(int i = 0; i < sizeof(T); i++)
+	{
+		int addr = share.endianness() == ENDIANNESS_BIG ? address + sizeof(T) - 1 - i : address + i;
+		if(addr >= share.bytes())
+			continue;
+		if(share.endianness() == ENDIANNESS_BIG)
+			ptr[(BYTE8_XOR_BE(addr) & lowmask) | (addr & ~lowmask)] = val & 0xff;
+		else
+			ptr[(BYTE8_XOR_BE(addr) & lowmask) | (addr & ~lowmask)] = val & 0xff;
 		val >>= 8;
 	}
 
@@ -2375,6 +2458,7 @@ void lua_engine::initialize()
 			.beginClass <memory_manager> ("memory")
 				.addProperty <luabridge::LuaRef, void> ("banks", &lua_engine::l_memory_get_banks)
 				.addProperty <luabridge::LuaRef, void> ("regions", &lua_engine::l_memory_get_regions)
+				.addProperty <luabridge::LuaRef, void> ("shares", &lua_engine::l_memory_get_shares)
 			.endClass()
 			.beginClass <lua_memory_region> ("lua_region")
 				.addCFunction ("read_i8", &lua_memory_region::l_region_read<INT8>)
@@ -2394,6 +2478,30 @@ void lua_engine::initialize()
 				.addCFunction ("write_i64", &lua_memory_region::l_region_write<INT64>)
 				.addCFunction ("write_u64", &lua_memory_region::l_region_write<UINT64>)
 			.endClass()
+			.deriveClass <memory_region, lua_memory_region> ("region")
+				.addProperty <UINT32> ("size", &memory_region::bytes)
+			.endClass()
+			.beginClass <lua_memory_share> ("lua_share")
+				.addCFunction ("read_i8", &lua_memory_share::l_share_read<INT8>)
+				.addCFunction ("read_u8", &lua_memory_share::l_share_read<UINT8>)
+				.addCFunction ("read_i16", &lua_memory_share::l_share_read<INT16>)
+				.addCFunction ("read_u16", &lua_memory_share::l_share_read<UINT16>)
+				.addCFunction ("read_i32", &lua_memory_share::l_share_read<INT32>)
+				.addCFunction ("read_u32", &lua_memory_share::l_share_read<UINT32>)
+				.addCFunction ("read_i64", &lua_memory_share::l_share_read<INT64>)
+				.addCFunction ("read_u64", &lua_memory_share::l_share_read<UINT64>)
+				.addCFunction ("write_i8", &lua_memory_share::l_share_write<INT8>)
+				.addCFunction ("write_u8", &lua_memory_share::l_share_write<UINT8>)
+				.addCFunction ("write_i16", &lua_memory_share::l_share_write<INT16>)
+				.addCFunction ("write_u16", &lua_memory_share::l_share_write<UINT16>)
+				.addCFunction ("write_i32", &lua_memory_share::l_share_write<INT32>)
+				.addCFunction ("write_u32", &lua_memory_share::l_share_write<UINT32>)
+				.addCFunction ("write_i64", &lua_memory_share::l_share_write<INT64>)
+				.addCFunction ("write_u64", &lua_memory_share::l_share_write<UINT64>)
+			.endClass()
+			.deriveClass <memory_share, lua_memory_share> ("region")
+				.addProperty <size_t> ("size", &memory_share::bytes)
+			.endClass()
 			.beginClass <output_manager> ("output")
 				.addFunction ("set_value", &output_manager::set_value)
 				.addFunction ("set_indexed_value", &output_manager::set_indexed_value)
@@ -2401,9 +2509,6 @@ void lua_engine::initialize()
 				.addFunction ("get_indexed_value", &output_manager::get_indexed_value)
 				.addFunction ("name_to_id", &output_manager::name_to_id)
 				.addFunction ("id_to_name", &output_manager::id_to_name)
-			.endClass()
-			.deriveClass <memory_region, lua_memory_region> ("region")
-				.addProperty <UINT32> ("size", &memory_region::bytes)
 			.endClass()
 			.beginClass <device_image_interface> ("image")
 				.addFunction ("exists", &device_image_interface::exists)
