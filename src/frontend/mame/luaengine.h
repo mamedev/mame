@@ -198,6 +198,11 @@ private:
 	};
 
 	static luabridge::LuaRef l_memory_get_banks(const memory_manager *m);
+	static luabridge::LuaRef l_memory_get_shares(const memory_manager *m);
+	struct lua_memory_share {
+		template<typename T> int l_share_read(lua_State *L);
+		template<typename T> int l_share_write(lua_State *L);
+	};
 	static luabridge::LuaRef l_memory_get_regions(const memory_manager *m);
 	struct lua_memory_region {
 		template<typename T> int l_region_read(lua_State *L);
