@@ -166,7 +166,7 @@ void mb86901_device::device_stop()
 void mb86901_device::device_reset()
 {
 	m_queued_tt = 0;
-	m_queued_priority = 0;
+	m_queued_priority = SPARC_NO_TRAP;
 	m_asi = 0;
 	MAE = false;
 	HOLD_BUS = false;
@@ -877,6 +877,7 @@ bool mb86901_device::execute_group2(UINT32 op)
 			else
 			{
 				m_tbr = (arg1 ^ arg2) & 0xfffff000;
+				printf("wr (%08x ^ %08x) & 0xfffff000 (%08x),tbr", arg1, arg2, m_tbr);
 			}
 			break;
 		case 52: // FPop1
@@ -1352,6 +1353,7 @@ bool mb86901_device::execute_ticc(UINT32 op)
 {
 	bool trap_taken = evaluate_condition(op);
 
+	printf("ticc @ %x\n", PC);
 	if (trap_taken)
 	{
 		UINT32 arg2 = USEIMM ? SIMM7 : RS2REG;
@@ -1410,11 +1412,8 @@ void mb86901_device::trap(UINT8 type, UINT8 tt_override)
 
 bool mb86901_device::invoke_queued_traps()
 {
-	if (m_queued_priority > 0)
+	if (m_queued_priority != SPARC_NO_TRAP)
 	{
-		m_queued_priority = 0;
-		m_queued_tt = 0;
-
 		m_et = false;
 		m_ps = m_s;
 		m_s = true;
@@ -1430,6 +1429,9 @@ bool mb86901_device::invoke_queued_traps()
 
 		PC = m_tbr;
 		nPC = m_tbr + 4;
+
+		m_queued_priority = SPARC_NO_TRAP;
+		m_queued_tt = 0;
 		return true;
 	}
 
@@ -1472,6 +1474,7 @@ void mb86901_device::execute_run()
 			switch (OP2)
 			{
 			case 0: // unimp
+				printf("unimp @ %x\n", PC);
 				break;
 			case 2: // branch on integer condition codes
 				update_npc = execute_bicc(op);
@@ -1480,12 +1483,14 @@ void mb86901_device::execute_run()
 				SET_RDREG(IMM22);
 				break;
 			case 6: // branch on floating-point condition codes
+				printf("fbfcc @ %x\n", PC);
 				break;
 #if SPARCV8
 			case 7: // branch on coprocessor condition codes, SPARCv8
 				break;
 #endif
 			default:
+				printf("unknown %08x @ %x\n", op, PC);
 				break;
 			}
 			break;
