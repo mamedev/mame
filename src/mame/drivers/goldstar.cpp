@@ -7141,7 +7141,7 @@ static INPUT_PORTS_START( flaming7 )
 	PORT_DIPSETTING(    0x00, "9321" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x07, 0x07, "Bonus Pay" )   PORT_DIPLOCATION("DSW2:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, "Bonus Pay" )   PORT_DIPLOCATION("DSW2:1,2,3")  // percentage of how quickly the internal progressive advances.
 	PORT_DIPSETTING(    0x07, "1.00%" )
 	PORT_DIPSETTING(    0x06, "2.00%" )
 	PORT_DIPSETTING(    0x05, "3.30%" )
