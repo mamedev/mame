@@ -30,6 +30,7 @@ path_iterator::path_iterator(const char *rawsearchpath)
 		m_current(m_base),
 		m_index(0)
 {
+	assert(rawsearchpath != nullptr);
 }
 
 

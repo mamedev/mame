@@ -549,6 +549,39 @@ std::string running_machine::get_statename(const char *option) const
 	return statename_str;
 }
 
+
+//-------------------------------------------------
+//  compose_saveload_filename - composes a filename
+//  for state loading/saving
+//-------------------------------------------------
+
+std::string running_machine::compose_saveload_filename(const char *filename, const char **searchpath)
+{
+	std::string result;
+
+	// is this an absolute path?
+	if (osd_is_absolute_path(filename))
+	{
+		// if so, this is easy
+		if (searchpath != nullptr)
+			*searchpath = nullptr;
+		result = filename;
+	}
+	else
+	{
+		// this is a relative path; first specify the search path
+		if (searchpath != nullptr)
+			*searchpath = options().state_directory();
+
+		// take into account the statename option
+		const char *stateopt = options().state_name();
+		std::string statename = get_statename(stateopt);
+		result.assign(statename.c_str()).append(PATH_SEPARATOR).append(filename).append(".sta");
+	}
+	return result;
+}
+
+
 //-------------------------------------------------
 //  set_saveload_filename - specifies the filename
 //  for state loading/saving
@@ -556,20 +589,8 @@ std::string running_machine::get_statename(const char *option) const
 
 void running_machine::set_saveload_filename(const char *filename)
 {
-	// free any existing request and allocate a copy of the requested name
-	if (osd_is_absolute_path(filename))
-	{
-		m_saveload_searchpath = nullptr;
-		m_saveload_pending_file.assign(filename);
-	}
-	else
-	{
-		m_saveload_searchpath = options().state_directory();
-		// take into account the statename option
-		const char *stateopt = options().state_name();
-		std::string statename = get_statename(stateopt);
-		m_saveload_pending_file.assign(statename.c_str()).append(PATH_SEPARATOR).append(filename).append(".sta");
-	}
+	// compose the save/load filename and persist it
+	m_saveload_pending_file = compose_saveload_filename(filename, &m_saveload_searchpath);
 }
 
 
@@ -797,6 +818,25 @@ void running_machine::call_notifiers(machine_notification which)
 {
 	for (auto& cb : m_notifier_list[which])
 		cb->m_func();
+}
+
+
+//-------------------------------------------------
+//  get_save_state_modified_time - get the last
+//	modified time of a save state file
+//-------------------------------------------------
+
+std::time_t running_machine::get_save_state_modified_time(const char *filename)
+{
+	const char *searchpath = osd_is_absolute_path(filename)
+		? nullptr
+		: options().state_directory();
+
+	emu_file file(searchpath, OPEN_FLAG_READ);
+	auto const filerr = file.open(filename);
+	return (filerr == osd_file::error::NONE)
+		? ((util::core_file &) file).get_last_modified_time()
+		: (std::time_t) - 1;
 }
 
 

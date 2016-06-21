@@ -13,6 +13,17 @@ static osd_output *m_stack[MAXSTACK];
 static int m_ptr = -1;
 
 /*-------------------------------------------------
+osd_file::get_last_modified_time
+-------------------------------------------------*/
+
+osd_file::error osd_file::get_last_modified_time(std::time_t &last_modified_time)
+{
+	last_modified_time = (std::time_t) -1;
+	return error::FAILURE;
+}
+
+
+/*-------------------------------------------------
     osd_output
 -------------------------------------------------*/
 
