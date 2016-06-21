@@ -14277,12 +14277,12 @@ ROM_END
   | 02 | Buffalo Bills.               | NO      | NO       |
   | 03 | Cash Cabaret.                | NO      | NO       |
   | 04 | Cash Cow.                    | NO      | NO       |
-  | 05 | Cherry 50 Bonus.             | NO      | NO       |
-  | 06 | Cherry 500 Bonus.            | NO      | NO       |
-  | 07 | Cherry 1000 Bonus.           | NO      | NO       |
+  | 05 | Cherry 50 Bonus.             | YES     | YES      |  Custom main 50, 500 & 2000.
+  | 06 | Cherry 500 Bonus.            | YES     | YES      |  Custom main 50, 500 & 2000.
+  | 07 | Cherry 1000 Bonus.           | YES     | YES      |  Custom main 50, 500 & 2000.
   | 08 | Christmas.                   | NO      | NO       |
   | 09 | Deuces Wild.                 | NO      | NO       |
-  | 10 | Diamond Delight.             | NO      | NO       |
+  | 10 | Diamond Delight.             | YES     | YES      |  Different set. Custom main 50, 500 & 2000.
   | 11 | Diamond Doubles.             | NO      | NO       |
   | 12 | Diamond Treasure.            | NO      | NO       |
   | 13 | Dream Catcher.               | NO      | NO       |
@@ -14293,7 +14293,7 @@ ROM_END
   | 18 | Golden Treasure.             | NO      | NO       |
   | 19 | Greenbacks.                  | NO      | NO       |
   | 20 | Harley Davidson.             | NO      | NO       |
-  | 21 | Hollywood Nights.            | YES     | YES      |
+  | 21 | Hollywood Nights.            | YES (W4)| YES (W4) |  Flaming 7's W4 version.
   | 22 | Independence Day.            | NO      | NO       |
   | 23 | Jokers Wild.                 | NO      | NO       |
   | 24 | Midnight Sevens.             | NO      | NO       |
@@ -14303,7 +14303,7 @@ ROM_END
   | 28 | New Year's.                  | NO      | NO       |
   | 29 | Prospector's Gold.           | NO      | NO       |
   | 30 | Red Hot Ice.                 | NO      | NO       |
-  | 31 | Red, White & Blue 7's.       | YES     | YES      |
+  | 31 | Red, White & Blue 7's.       | YES (W4)| YES (W4) |  Flaming 7's W4 version.
   | 32 | Rising Star.                 | NO      | NO       |
   | 33 | Rockin' Reels.               | NO      | NO       |
   | 34 | Rolling Thunder.             | NO      | NO       |
