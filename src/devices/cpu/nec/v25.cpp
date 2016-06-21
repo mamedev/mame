@@ -52,9 +52,16 @@ const device_type V35 = &device_creator<v35_device>;
 v25_common_device::v25_common_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, bool is_16bit, offs_t fetch_xor, UINT8 prefetch_size, UINT8 prefetch_cycles, UINT32 chip_type)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 20, 0)
-	, m_io_config("io", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 16+1, 0)
+	, m_io_config("io", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 16, 0)
 	, m_fetch_xor(fetch_xor)
 	, m_PCK(8)
+	, m_pt_in(*this)
+	, m_p0_in(*this)
+	, m_p1_in(*this)
+	, m_p2_in(*this)
+	, m_p0_out(*this)
+	, m_p1_out(*this)
+	, m_p2_out(*this)
 	, m_prefetch_size(prefetch_size)
 	, m_prefetch_cycles(prefetch_cycles)
 	, m_chip_type(chip_type)
@@ -500,6 +507,15 @@ void v25_common_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 	m_io = &space(AS_IO);
+
+	m_pt_in.resolve_safe(0xff);
+	m_p0_in.resolve_safe(0xff);
+	m_p1_in.resolve_safe(0xff);
+	m_p2_in.resolve_safe(0xff);
+
+	m_p0_out.resolve_safe();
+	m_p1_out.resolve_safe();
+	m_p2_out.resolve_safe();
 
 	state_add( V25_PC,    "PC", m_debugger_temp).callimport().callexport().formatstr("%05X");
 	state_add( V25_IP,    "IP", m_ip).formatstr("%04X");
