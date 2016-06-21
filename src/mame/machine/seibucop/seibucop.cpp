@@ -3,6 +3,14 @@
 /***************************************************************************
 
  Seibu Cop (Co-Processor) device emulation
+  a.k.a. known as Toshiba gate array TC25SC rebadged as:
+  SEI300 - Legionnaire PCB
+  There's also a ROM labeled COP-Dx, which is probably used for some in-game maths: 
+  COP-D1 - Seibu Cup Soccer PCBs
+  COP-D2 - legionna.cpp and raiden2.cpp, latter might use another component too
+  COP-D3 - New Zero Team / Raiden 2 V33 HWs
+  Raiden 2 first boss arms is known to behave strangely without this ROM on a real PCB
+  
   (new implementation, based on Raiden 2 code)
   
  TODO:
