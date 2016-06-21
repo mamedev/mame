@@ -7547,6 +7547,31 @@ static const gfx_layout flaming7_tilelayout =
 	128*8   /* every char takes 128 consecutive bytes */
 };
 
+static const gfx_layout flam7_tw_charlayout =
+{
+	8,8,    /* 8*8 characters */
+	4096,    /* 4096 characters */
+	3,      /* 3 bits per pixel */
+	{ 2, 4, 6 }, /* the bitplanes are packed in one byte */
+	{ 2*8+0, 2*8+1, 3*8+0, 3*8+1, 0*8+0, 0*8+1, 1*8+0, 1*8+1 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	32*8   /* every char takes 32 consecutive bytes */
+};
+
+static const gfx_layout flam7_tw_tilelayout =
+{
+	8,32,    /* 8*32 characters */
+	256,    /* 256 tiles */
+	4,      /* 4 bits per pixel */
+	{ 0, 2, 4, 6 },
+	{ 3*8+0, 3*8+1, 2*8+0, 1*8+0, 1*8+1, 2*8+1, 0, 1 },
+	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8,
+	  32*8, 36*8, 40*8, 44*8, 48*8, 52*8, 56*8, 60*8,
+	  64*8, 68*8, 72*8, 76*8, 80*8, 84*8, 88*8, 92*8,
+	  96*8, 100*8, 104*8, 108*8, 112*8, 116*8, 120*8, 124*8 },
+	128*8   /* every char takes 128 consecutive bytes */
+};
+
 
 static GFXDECODE_START( goldstar )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
@@ -7654,6 +7679,11 @@ GFXDECODE_END
 static GFXDECODE_START( flaming7 )  // gfx 2 still wrong...
 	GFXDECODE_ENTRY( "gfx1", 0, flaming7_charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, flaming7_tilelayout, 104,  8 )
+GFXDECODE_END
+
+static GFXDECODE_START( flam7_tw )
+	GFXDECODE_ENTRY( "gfx1", 0, flam7_tw_charlayout,   0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, flam7_tw_tilelayout, 104,  8 )
 GFXDECODE_END
 
 
@@ -8388,6 +8418,20 @@ static MACHINE_CONFIG_DERIVED( flaming7, lucky8 )
 	MCFG_CPU_PROGRAM_MAP(flaming7_map)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", flaming7)
+
+    // to do serial protection.
+	MCFG_DEVICE_MODIFY("ppi8255_0")
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, fl7w4_outc802_w))
+
+	MCFG_DS2401_ADD("fl7w4_id")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( flam7_tw, lucky8 )
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(flaming7_map)
+
+	MCFG_GFXDECODE_MODIFY("gfxdecode", flam7_tw)
 
     // to do serial protection.
 	MCFG_DEVICE_MODIFY("ppi8255_0")
@@ -15612,7 +15656,7 @@ GAME(  199?, fl7_50,    0,        flaming7, flaming7, wingco_state,   flaming7, 
 GAME(  199?, fl7_500,   fl7_50,   flaming7, flaming7, wingco_state,   flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 500 Bonus)",             MACHINE_NOT_WORKING )
 GAME(  199?, fl7_2000,  fl7_50,   flaming7, flaming7, wingco_state,   flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 2000 Bonus)",            MACHINE_NOT_WORKING )
 GAME(  199?, fl7_2k16,  fl7_50,   flaming7, flaming7, wingco_state,   flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Egyptian Gold, 2000 Bonus)",   MACHINE_NOT_WORKING )
-GAME(  199?, fl7_tw,    fl7_50,   flaming7, flaming7, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 (Taiwanese Hardware, unknown version)",          MACHINE_NOT_WORKING )  // needs proper gfx roms decryption.
+GAME(  199?, fl7_tw,    fl7_50,   flam7_tw, flaming7, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 (Taiwanese Hardware, unknown version)",          MACHINE_NOT_WORKING )  // needs proper gfx roms decryption.
 
 
 // --- Wing W-8 hardware ---
