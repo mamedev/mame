@@ -7187,7 +7187,7 @@ static INPUT_PORTS_START( flaming7 )
 	PORT_DIPNAME( 0xc0, 0xc0, "Progressive Sign" )     PORT_DIPLOCATION("DSW3:7,8")
 	PORT_DIPSETTING(    0xc0, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, "Single Level" )
-	PORT_DIPSETTING(    0x40, "Multi Level" )
+	PORT_DIPSETTING(    0x40, "Multi Level" )   // use this setting *only* if using external sign.
 	PORT_DIPSETTING(    0x00, "Test Mode" )
 
 	PORT_START("DSW4")
