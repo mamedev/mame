@@ -7553,12 +7553,12 @@ static const gfx_layout flam7_tw_charlayout =
 	4096,    /* 4096 characters */
 	3,      /* 3 bits per pixel */
 	{ 2, 4, 6 }, /* the bitplanes are packed in one byte */
-	{ 2*8+0, 2*8+1, 3*8+0, 3*8+1, 0*8+0, 0*8+1, 1*8+0, 1*8+1 },
+	{ 3*8+0, 3*8+1, 2*8+0, 2*8+1, 1*8+0, 1*8+1, 0*8+0, 0*8+1 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	32*8   /* every char takes 32 consecutive bytes */
 };
 
-static const gfx_layout flam7_tw_tilelayout =
+static const gfx_layout flam7_tw_tilelayout =  // FIXME
 {
 	8,32,    /* 8*32 characters */
 	256,    /* 256 tiles */
@@ -7681,7 +7681,7 @@ static GFXDECODE_START( flaming7 )  // gfx 2 still wrong...
 	GFXDECODE_ENTRY( "gfx2", 0, flaming7_tilelayout, 104,  8 )
 GFXDECODE_END
 
-static GFXDECODE_START( flam7_tw )
+static GFXDECODE_START( flam7_tw )  // gfx 2 still wrong...
 	GFXDECODE_ENTRY( "gfx1", 0, flam7_tw_charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, flam7_tw_tilelayout, 104,  8 )
 GFXDECODE_END
