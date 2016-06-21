@@ -25,7 +25,20 @@
    - printing facilities;
    - debugger break on pre-setted commands;
    - ...
-  
+ per-game TODO:
+ legionnaire
+ - (fixed) player walks on spot on stage clear;
+ - several enemies seems to not like a missing min/max range limit for a specific operation? 
+   (when i.e. first boss goes to bottom of the screen and become unreachable)
+ heated barrel
+ - gives random value to hi-score if you continue (only the first time, not a bug?);
+ - (fixed?) throws random address exceptions at level 3 and above, a RAM address arrives corrupt in the snippet at 0x136a;
+ - (fixed?) some corrupt sprites, probably a non-fatal version of the one above;
+ - stage 2 boss attacks only in vertical (regressed with the 130e / 3b30 / 42c2 command merge);
+ - (fixed) level 3+ boss movements looks wrong;
+ - missiles doesn't seem to like our 6200 hookup here;
+ 
+ 
   Tech notes:
   -----------
   [0x6fc] DMA mode bit scheme:
@@ -1422,7 +1435,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0x984, 0xaa4, 0xd82, 0xaa2, 0x39b, 0xb9a, 0xb9a, 0xb9a, 5, 0xbf7f))
 	{
 		executed = 1;
-		LEGACY_execute_130e(offset, data);
+		execute_130e(offset, data);
 		return;
 	}
 
@@ -1437,7 +1450,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0xf9c, 0xb9c, 0xb9c, 0xb9c, 0xb9c, 0xb9c, 0xb9c, 0x99c, 4, 0x007f))
 	{
 		executed = 1;
-		LEGACY_execute_3b30(offset, data);
+		execute_3b30(offset, data);
 		return;
 	}
 
@@ -1455,7 +1468,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0xf9a, 0xb9a, 0xb9c, 0xb9c, 0xb9c, 0x29c, 0x000, 0x000, 5, 0xfcdd))
 	{
 		executed = 1;
-		LEGACY_execute_42c2(offset, data);
+		execute_42c2(offset, data);
 		return;
 	}
 

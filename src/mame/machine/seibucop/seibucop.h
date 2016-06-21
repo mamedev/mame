@@ -250,10 +250,10 @@ private:
 	void execute_b900(int offset, UINT16 data);
 
 	// TODO: remove these
-	void LEGACY_execute_130e(int offset, UINT16 data);
+	//void LEGACY_execute_130e(int offset, UINT16 data);
 	void LEGACY_execute_130e_cupsoc(int offset, UINT16 data);
-	void LEGACY_execute_3b30(int offset, UINT16 data);
-	void LEGACY_execute_42c2(int offset, UINT16 data);
+	//void LEGACY_execute_3b30(int offset, UINT16 data);
+	//void LEGACY_execute_42c2(int offset, UINT16 data);
 	void LEGACY_execute_e30e(int offset, UINT16 data);
 	void LEGACY_execute_6200(int offset, UINT16 data);
 	void LEGACY_execute_dde5(int offset, UINT16 data);

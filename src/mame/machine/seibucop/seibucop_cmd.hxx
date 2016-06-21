@@ -1,5 +1,3 @@
-
-
 /* Main COP functionality */
 
 // notes about tables:
@@ -23,7 +21,7 @@
 */
 void raiden2cop_device::execute_0205(int offset, UINT16 data)
 {
-	int ppos = 		  m_host_space->read_dword(cop_regs[0] + 4 + offset * 4);
+	int ppos =        m_host_space->read_dword(cop_regs[0] + 0x04 + offset * 4);
 	int npos = ppos + m_host_space->read_dword(cop_regs[0] + 0x10 + offset * 4);
 	int delta = (npos >> 16) - (ppos >> 16);
 	m_host_space->write_dword(cop_regs[0] + 4 + offset * 4, npos);
@@ -61,29 +59,6 @@ void raiden2cop_device::execute_130e(int offset, UINT16 data)
 {
 	// this can't be right
 	execute_338e(offset, data);
-}
-
-void raiden2cop_device::LEGACY_execute_130e(int offset, UINT16 data)
-{
-	int dy = m_host_space->read_dword(cop_regs[1] + 4) - m_host_space->read_dword(cop_regs[0] + 4);
-	int dx = m_host_space->read_dword(cop_regs[1] + 8) - m_host_space->read_dword(cop_regs[0] + 8);
-
-	cop_status = 7;
-	if (!dx) {
-		cop_status |= 0x8000;
-		cop_angle = 0;
-	}
-	else {
-		cop_angle = (int)(atan(double(dy) / double(dx)) * 128.0 / M_PI);
-		if (dx < 0)
-			cop_angle += 0x80;
-	}
-
-	m_LEGACY_r0 = dy;
-	m_LEGACY_r1 = dx;
-
-	if (data & 0x80)
-		m_host_space->write_word(cop_regs[0] + (0x34 ^ 2), cop_angle);
 }
 
 void raiden2cop_device::LEGACY_execute_130e_cupsoc(int offset, UINT16 data)
@@ -175,6 +150,8 @@ void raiden2cop_device::execute_338e(int offset, UINT16 data)
 		cop_angle = (int)(atan(double(dx) / double(dy)) * 128 / M_PI);
 		if (dy < 0)
 			cop_angle += 0x80;
+		
+		cop_angle &= 0xff;
 	}
 
 #if LOG_Phytagoras
@@ -182,7 +159,8 @@ void raiden2cop_device::execute_338e(int offset, UINT16 data)
 #endif
 
 	if (data & 0x0080) {
-		m_host_space->write_byte(cop_regs[0] + 0x34, cop_angle);
+		// TODO: byte or word?
+		cop_write_byte(cop_regs[0] + 0x34, cop_angle);
 	}
 }
 
@@ -211,20 +189,7 @@ void raiden2cop_device::execute_3b30(int offset, UINT16 data)
 #endif
 	
 	if (data & 0x0080)
-		m_host_space->write_word(cop_regs[0] + (data & 0x200 ? 0x3a : 0x38), cop_dist);
-}
-
-void raiden2cop_device::LEGACY_execute_3b30(int offset, UINT16 data)
-{
-	int dy = m_LEGACY_r0;
-	int dx = m_LEGACY_r1;
-
-	dx >>= 16;
-	dy >>= 16;
-	cop_dist = sqrt((double)(dx*dx + dy*dy));
-
-	if (data & 0x80)
-		m_host_space->write_word(cop_regs[0] + (0x38), cop_dist);
+		cop_write_word(cop_regs[0] + (data & 0x200 ? 0x3a : 0x38), cop_dist);
 }
 
 /*
@@ -233,7 +198,7 @@ void raiden2cop_device::LEGACY_execute_3b30(int offset, UINT16 data)
 */
 void raiden2cop_device::execute_42c2(int offset, UINT16 data)
 {
-	int div = m_host_space->read_word(cop_regs[0] + (0x36));
+	int div = cop_read_word(cop_regs[0] + (0x36));
 
 #if LOG_Division
 	printf("cmd %04x: div = %04x scale = %04x\n",data,div,cop_scale);
@@ -242,7 +207,7 @@ void raiden2cop_device::execute_42c2(int offset, UINT16 data)
 	if (!div)
 	{
 		cop_status |= 0x8000;
-		m_host_space->write_word(cop_regs[0] + (0x38), 0);
+		cop_write_word(cop_regs[0] + (0x38), 0);
 		return;
 	}
 
@@ -256,42 +221,7 @@ void raiden2cop_device::execute_42c2(int offset, UINT16 data)
 //		machine().debugger().debug_break();
 #endif
 	
-	m_host_space->write_word(cop_regs[0] + (0x38), (cop_dist << (5 - cop_scale)) / div);
-}
-
-void raiden2cop_device::LEGACY_execute_42c2(int offset, UINT16 data)
-{
-	int dy = m_LEGACY_r0;
-	int dx = m_LEGACY_r1;
-	int div = m_host_space->read_word(cop_regs[0] + (0x36 ^ 2));
-	int res;
-	int cop_dist_raw;
-
-	// divide by zero?
-	if (!div)
-	{
-		// No emulation error here: heatbrl specifically tests this
-		cop_status |= 0x8000;
-		res = 0;
-	}
-	else
-	{
-		/* TODO: calculation of this one should occur at 0x3b30/0x3bb0 I *think* */
-		/* TODO: recheck if cop_scale still masks at 3 with this command */
-		dx >>= 11 + cop_scale;
-		dy >>= 11 + cop_scale;
-		cop_dist_raw = sqrt((double)(dx*dx + dy*dy));
-
-		res = cop_dist_raw;
-		res /= div;
-
-		cop_dist = (1 << (5 - cop_scale)) / div;
-
-		/* TODO: bits 5-6-15 */
-		cop_status = 7;
-	}
-
-	m_host_space->write_word(cop_regs[0] + (0x38 ^ 2), res);
+	cop_write_word(cop_regs[0] + (0x38), (cop_dist << (5 - cop_scale)) / div);
 }
 
 /*
@@ -696,5 +626,80 @@ void raiden2cop_device::execute_f205(int offset, UINT16 data)
 1f - fc84 ( 1f) (  484) :  (182, 280, 000, 000, 000, 000, 000, 000)  6     00ff   (zeroteam, xsedae)
 */
 
+#ifdef UNUSED_COMMANDS
+
+// For reference only, will be nuked at some point
+
+void raiden2cop_device::LEGACY_execute_130e(int offset, UINT16 data)
+{
+	int dy =  m_host_space->read_dword(cop_regs[1] + 4) - m_host_space->read_dword(cop_regs[0] + 4);
+	int dx = m_host_space->read_dword(cop_regs[1] + 8) - m_host_space->read_dword(cop_regs[0] + 8);
+
+	cop_status = 7;
+	if (!dx) {
+		cop_status |= 0x8000;
+		cop_angle = 0;
+	}
+	else {
+		cop_angle = (int)(atan(double(dy) / double(dx)) * 128.0 / M_PI);
+		if (dx < 0)
+			cop_angle += 0x80;
+	}
+
+	m_LEGACY_r0 = dy;
+	m_LEGACY_r1 = dx;
+
+	if (data & 0x80)
+		m_host_space->write_word(cop_regs[0] + (0x34 ^ 2), cop_angle);
+}
+
+void raiden2cop_device::LEGACY_execute_3b30(int offset, UINT16 data)
+{
+	int dy = m_LEGACY_r0;
+	int dx = m_LEGACY_r1;
+
+	dx >>= 16;
+	dy >>= 16;
+	cop_dist = sqrt((double)(dx*dx + dy*dy));
+
+	if (data & 0x80)
+		m_host_space->write_word(cop_regs[0] + (0x38), cop_dist);
+}
+
+void raiden2cop_device::LEGACY_execute_42c2(int offset, UINT16 data)
+{
+	int dy = m_LEGACY_r0;
+	int dx = m_LEGACY_r1;
+	int div = m_host_space->read_word(cop_regs[0] + (0x36 ^ 2));
+	int res;
+	int cop_dist_raw;
+
+	// divide by zero?
+	if (!div)
+	{
+		// No emulation error here: heatbrl specifically tests this
+		cop_status |= 0x8000;
+		res = 0;
+	}
+	else
+	{
+		/* TODO: calculation of this one should occur at 0x3b30/0x3bb0 I *think* */
+		/* TODO: recheck if cop_scale still masks at 3 with this command */
+		dx >>= 11 + cop_scale;
+		dy >>= 11 + cop_scale;
+		cop_dist_raw = sqrt((double)(dx*dx + dy*dy));
+
+		res = cop_dist_raw;
+		res /= div;
+
+		cop_dist = (1 << (5 - cop_scale)) / div;
+
+		/* TODO: bits 5-6-15 */
+		cop_status = 7;
+	}
+
+	m_host_space->write_word(cop_regs[0] + (0x38 ^ 2), res);
+}
 
 
+#endif
