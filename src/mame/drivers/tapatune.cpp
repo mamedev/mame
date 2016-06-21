@@ -82,6 +82,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
+
 	DECLARE_WRITE16_MEMBER(palette_w);
 	DECLARE_READ16_MEMBER(read_from_z80);
 	DECLARE_WRITE16_MEMBER(write_to_z80);
@@ -192,6 +194,12 @@ WRITE16_MEMBER(tapatune_state::palette_w)
 		case 2: // unknown?
 			break;
 	}
+}
+
+
+WRITE_LINE_MEMBER(tapatune_state::crtc_vsync)
+{
+	m_videocpu->set_input_line(2, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 
@@ -529,7 +537,7 @@ static MACHINE_CONFIG_DERIVED( tapatune, tapatune_base )
 	MCFG_MC6845_CHAR_WIDTH(5)
 	MCFG_MC6845_BEGIN_UPDATE_CB(tapatune_state, crtc_begin_update)
 	MCFG_MC6845_UPDATE_ROW_CB(tapatune_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("videocpu", 2))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(tapatune_state, crtc_vsync))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
