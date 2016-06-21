@@ -37,6 +37,7 @@ const int mb86901_device::WINDOW_COUNT = 7;
 mb86901_device::mb86901_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, MB86901, "Fujitsu MB86901", tag, owner, clock, "mb86901", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32)
+	, m_dasm(7)
 {
 }
 
@@ -351,8 +352,8 @@ UINT32 mb86901_device::disasm_max_opcode_bytes() const
 
 offs_t mb86901_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	extern CPU_DISASSEMBLE( sparc );
-	return CPU_DISASSEMBLE_NAME(sparc)(this, buffer, pc, oprom, opram, options);
+	UINT32 op = *reinterpret_cast<const UINT32 *>(oprom);
+	return m_dasm.dasm(buffer, pc, BIG_ENDIANIZE_INT32(op));
 }
 
 

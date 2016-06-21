@@ -83,20 +83,39 @@
 #define OP2		((op >> 22) & 7)
 #define OP3		((op >> 19) & 63)
 #define OPF		((op >> 5) & 0x1ff)
+#define OPC		((op >> 5) & 0x1ff)
+#define OPFLOW	((op >> 5) & 0x3f)
 
-#define DISP30	(op << 2)
-#define DISP22	(((INT32)(op << 10)) >> 8)
+#define DISP30	(INT32(op << 2))
+#define DISP22	(INT32(op << 10) >> 8)
+#define DISP19	(INT32(op << 13) >> 11)
+#define DISP16	(INT32(((op << 10) & 0xc0000000) | ((op << 16) & 0x3fff0000)) >> 14)
 #define IMM22	(op << 10)
 #define CONST22 (op & 0x3fffff)
-#define SIMM13	(((INT32)(op << 19)) >> 19)
+#define SIMM13	(INT32(op << 19) >> 19)
+#define SIMM11	(INT32(op << 21) >> 21)
+#define SIMM10	(INT32(op << 22) >> 22)
 #define IMM7	(op & 0x7f)
-#define SIMM7	(((INT32)(op << 25)) >> 25)
-#define OPIMM	(op & 0x00002000)
+#define SIMM7	(INT32(op << 25) >> 25)
+#define SIMM8	(INT32(op << 24) >> 24)
+#define SHCNT32	(op & 31)
+#define SHCNT64 (op & 63)
 #define USEIMM	((op >> 13) & 1)
+#define USEEXT	((op >> 12) & 1)
+
 
 #define COND	((op >> 25) & 15)
+#define RCOND	((op >> 10) & 7)
+#define MOVCOND	((op >> 14) & 15)
+#define PRED	((op >> 19) & 1)
 #define ANNUL	((op >> 29) & 1)
-#define ASI		((op >> 5) & 0xff)
+#define BRCC	((op >> 20) & 3)
+#define MOVCC	(((op >> 11) & 3) | ((op >> 16) & 4))
+#define OPFCC	((op >> 11) & 7)
+#define TCCCC	((op >> 11) & 3)
+#define ASI		((op >> 5) & 255)
+#define MMASK	(op & 15)
+#define CMASK	((op >> 4) & 7)
 
 #define RD		((op >> 25) & 31)
 #define RS1		((op >> 14) & 31)
@@ -107,7 +126,7 @@
 #define RS1REG	*m_regs[RS1]
 #define RS2REG	*m_regs[RS2]
 #define SET_RDREG(x)	if(RD) { RDREG = x; }
-#define ADDRESS	(OPIMM ? (RS1REG + SIMM13) : (RS1REG + RS2REG))
+#define ADDRESS	(USEIMM ? (RS1REG + SIMM13) : (RS1REG + RS2REG))
 
 #define PC		m_pc
 #define nPC		m_npc

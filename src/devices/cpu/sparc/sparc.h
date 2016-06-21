@@ -4,10 +4,12 @@
     SPARC v7 emulator
 */
 
-#pragma once
-
 #ifndef __SPARC_H__
 #define __SPARC_H__
+
+#pragma once
+
+#include "sparcdasm.h"
 
 #define SPARC_NO_TRAP						256
 #define SPARC_RESET							0
@@ -142,6 +144,7 @@ protected:
 
 	// debugger helpers
 	UINT32 m_dbgregs[24];
+	sparc_disassembler m_dasm;
 
 	// address spaces
 	address_space *m_program;
@@ -189,7 +192,5 @@ enum
 	SPARC_R80,	SPARC_R81,	SPARC_R82,	SPARC_R83,	SPARC_R84,	SPARC_R85,	SPARC_R86,	SPARC_R87,	SPARC_R88,	SPARC_R89,	SPARC_R90,	SPARC_R91,	SPARC_R92,	SPARC_R93,	SPARC_R94,	SPARC_R95,
 	SPARC_R96,	SPARC_R97,	SPARC_R98,	SPARC_R99,	SPARC_R100,	SPARC_R101,	SPARC_R102,	SPARC_R103,	SPARC_R104,	SPARC_R105,	SPARC_R106,	SPARC_R107,	SPARC_R108,	SPARC_R109,	SPARC_R110,	SPARC_R111
 };
-
-CPU_DISASSEMBLE( sparc );
 
 #endif /* __SPARC_H__ */
