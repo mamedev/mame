@@ -14807,6 +14807,37 @@ ROM_START( fl7_2k16 )  // Serial 000000743111.
 ROM_END
 
 
+/*
+  Flaming 7's (unknown version)
+  Taiwanese Hardware.
+
+  Needs proper graphics ROM decryption and gfxdecode...
+
+*/  
+ROM_START( fl7_tw )  // Serial 00000050E9B7.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c512_tw.u20",  0x0000, 0x10000, CRC(50927a1b) SHA1(2557069f497b23f13978294f3ac108229d9db544) )  // identical halves.
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "m27c1001_tw.u1", 0x00000, 0x20000, CRC(e6099723) SHA1(31e73a81166dd0d50d51ead38d348e36018d0698) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "27c256_tw.u3",   0x0000, 0x8000, CRC(7f163639) SHA1(607aa1e7d15423409bb2cd49895502dc2e4b3e46) )
+
+	/* Bipolar PROM dump borrowed from main sets */
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
+	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "dummy", 0x0000, 0x0020, NO_DUMP )
+
+	ROM_REGION(0x8, "fl7w4_id", 0)     /* Electronic Serial */
+	ROM_LOAD( "eserial.bin", 0x0000, 0x0008, NO_DUMP ) // Hand built to match our ROM set
+
+ROM_END
+
+
 /*********************************************************************************************************************/
 
 DRIVER_INIT_MEMBER(goldstar_state,goldstar)
@@ -15581,6 +15612,7 @@ GAME(  199?, fl7_50,    0,        flaming7, flaming7, wingco_state,   flaming7, 
 GAME(  199?, fl7_500,   fl7_50,   flaming7, flaming7, wingco_state,   flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 500 Bonus)",             MACHINE_NOT_WORKING )
 GAME(  199?, fl7_2000,  fl7_50,   flaming7, flaming7, wingco_state,   flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 2000 Bonus)",            MACHINE_NOT_WORKING )
 GAME(  199?, fl7_2k16,  fl7_50,   flaming7, flaming7, wingco_state,   flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Egyptian Gold, 2000 Bonus)",   MACHINE_NOT_WORKING )
+GAME(  199?, fl7_tw,    fl7_50,   flaming7, flaming7, wingco_state,   flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Taiwanese Hardware, unknown version)",          MACHINE_NOT_WORKING )  // needs proper gfx roms decryption.
 
 
 // --- Wing W-8 hardware ---
