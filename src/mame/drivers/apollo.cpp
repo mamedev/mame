@@ -950,8 +950,8 @@ void apollo_state::machine_start(){
 	MACHINE_START_CALL_MEMBER(apollo);
 
 	// install nop handlers for unmapped ISA bus addresses
-	m_isa->install16_device(0, ATBUS_IO_END, read16_delegate(FUNC(apollo_state::apollo_atbus_unmap_io_r), this), write16_delegate(FUNC(apollo_state::apollo_atbus_unmap_io_w), this));
-	m_isa->install_memory(0, ATBUS_MEMORY_END, read8_delegate(FUNC(apollo_state::apollo_atbus_unmap_r), this), write8_delegate(FUNC(apollo_state::apollo_atbus_unmap_w), this));
+	m_isa->install16_device((ATBUS_IO_BASE - 0x40000) >> 7, (ATBUS_IO_END - 0x40000) >> 7, read16_delegate(FUNC(apollo_state::apollo_atbus_unmap_io_r), this), write16_delegate(FUNC(apollo_state::apollo_atbus_unmap_io_w), this));
+	m_isa->install_memory(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END, read8_delegate(FUNC(apollo_state::apollo_atbus_unmap_r), this), write8_delegate(FUNC(apollo_state::apollo_atbus_unmap_w), this));
 }
 
 /***************************************************************************
