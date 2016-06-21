@@ -14417,6 +14417,89 @@ ROM_END
         demonation with the DIP switch on the board, the software will know how many
         credits to give per dollar.
 
+
+  Pay Table Diagram: (Set With DIP Switches Bank #1, numbers 7 & 8)
+
+
+  --- 9323 ---
+
+  3 Flaming Sevens    75 for 1
+  3 Sevens            40 for 1
+  9 Bars              15 for 1
+  6 Bars              12 for 1
+  3 Bars              10 for 1
+  3 Cherries          08 for 1
+  2 Cherries          05 for 1
+  1 Cherries          02 for 1
+
+  With 8 or more Bet:
+
+  9 of any one = 1000 for 1
+  8 of any one =  500 for 1
+  7 of any one =  100 for 1
+
+  If Cherry Bonus is on 5 or more Cherries, Pays Bonus.
+
+
+  --- 9324 ---
+
+  3 Flaming Sevens    75 for 1
+  3 Sevens            40 for 1
+  9 Bars              15 for 1
+  6 Bars              12 for 1
+  3 Bars              10 for 1
+  3 Cherries          08 for 1
+  2 Cherries          04 for 1
+  1 Cherries          01 for 1
+
+  With 8 or more Bet:
+
+  9 of any one = 5000 for 1
+  8 of any one = 2500 for 1
+  7 of any one =  500 for 1
+
+  If Cherry Bonus is on 5 or more Cherries, Pays Bonus.
+
+
+  --- 9321 ---
+
+  3 Flaming Sevens    75 for 1
+  3 Sevens            40 for 1
+  9 Bars              15 for 1
+  6 Bars              12 for 1
+  3 Bars              10 for 1
+  3 Cherries          08 for 1
+  2 Cherries          05 for 1
+  1 Cherries          02 for 1
+
+  With 8 or more Bet:
+
+  9 of any one = 3000 for 1
+  8 of any one = 1500 for 1
+  7 of any one =  300 for 1
+
+  If Cherry Bonus is on 5 or more Cherries, Pays Bonus.
+
+
+  --- 9322 ---
+
+  3 Flaming Sevens   100 for 1
+  3 Sevens            50 for 1
+  9 Bars              18 for 1
+  6 Bars              14 for 1
+  3 Bars              10 for 1
+  3 Cherries          10 for 1
+  2 Cherries          05 for 1
+  1 Cherries          02 for 1
+
+  With 8 or more Bet:
+
+  9 of any one = 1000 for 1
+  8 of any one =  500 for 1
+  7 of any one =  100 for 1
+
+  If Cherry Bonus is on 5 or more Cherries, Pays Bonus.
+
   -------------------------------------------------------------------------
 
   Tech Notes:
