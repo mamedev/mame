@@ -67,7 +67,6 @@ UINT32 sealy_state::screen_update_sealy(screen_device &screen, bitmap_rgb32 &bit
 
 
 static ADDRESS_MAP_START( sealy_map, AS_PROGRAM, 16, sealy_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x3ffff)
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 ADDRESS_MAP_END
 

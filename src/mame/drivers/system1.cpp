@@ -5290,9 +5290,9 @@ DRIVER_INIT_MEMBER(system1_state,nobb)
 	DRIVER_INIT_CALL(bank44);
 
 	iospace.install_read_handler(0x1c, 0x1c, read8_delegate(FUNC(system1_state::nobb_inport1c_r),this));
-	iospace.install_read_handler(0x22, 0x22, read8_delegate(FUNC(system1_state::nobb_inport22_r),this));
-	iospace.install_read_handler(0x23, 0x23, read8_delegate(FUNC(system1_state::nobb_inport23_r),this));
-	iospace.install_write_handler(0x24, 0x24, write8_delegate(FUNC(system1_state::nobb_outport24_w),this));
+	iospace.install_read_handler(0x02, 0x02, read8_delegate(FUNC(system1_state::nobb_inport22_r),this));
+	iospace.install_read_handler(0x03, 0x03, read8_delegate(FUNC(system1_state::nobb_inport23_r),this));
+	iospace.install_write_handler(0x04, 0x04, write8_delegate(FUNC(system1_state::nobb_outport24_w),this));
 }
 
 

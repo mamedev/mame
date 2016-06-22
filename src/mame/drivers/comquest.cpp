@@ -61,7 +61,7 @@ WRITE8_MEMBER(comquest_state::comquest_write)
 
 static ADDRESS_MAP_START( comquest_mem , AS_PROGRAM, 8, comquest_state )
 //  { 0x0000, 0x7fff, SMH_BANK(1) },
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x0000, 0xfff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( comquest )

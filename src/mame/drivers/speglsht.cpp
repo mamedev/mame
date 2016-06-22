@@ -262,10 +262,9 @@ static ADDRESS_MAP_START( speglsht_mem, AS_PROGRAM, 32, speglsht_state )
 	AM_RANGE(0x01b00000, 0x01b07fff) AM_RAM //cleared ...  video related ?
 	AM_RANGE(0x01c00000, 0x01dfffff) AM_ROM AM_REGION("user2", 0)
 	AM_RANGE(0x0a000000, 0x0a003fff) AM_READWRITE(shared_r, shared_w)
+	AM_RANGE(0x0fc00000, 0x0fdfffff) AM_ROM AM_MIRROR(0x10000000) AM_REGION("user1", 0)
 	AM_RANGE(0x1eff0000, 0x1eff001f) AM_RAM
 	AM_RANGE(0x1eff003c, 0x1eff003f) AM_READ(irq_ack_clear)
-	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0x2fc00000, 0x2fdfffff) AM_ROM AM_REGION("user1", 0) // mirror for interrupts
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( speglsht )

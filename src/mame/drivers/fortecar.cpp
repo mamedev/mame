@@ -702,7 +702,7 @@ ROM_START( fortecar )
 	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, BAD_DUMP CRC(7d3e7eb5) SHA1(788fe7adc381bcc6eaefed33f5aa1081340608a0) )
 
-	ROM_REGION( 0x0100, "eeprom", 0 )   /* default serial EEPROM */
+	ROM_REGION16_BE( 0x0100, "eeprom", 0 )   /* default serial EEPROM */
 	ROM_LOAD16_WORD_SWAP( "forte_card_93cs56_serial_12345678.u13", 0x0000, 0x0100, BAD_DUMP CRC(2fc5961d) SHA1(f958c8b2b4e48cc6e5a607a6751acde5592bd27f) )
 
 	ROM_REGION( 0x200, "proms", 0 )
@@ -721,7 +721,7 @@ ROM_START( fortecrd )
 	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, CRC(7d3e7eb5) SHA1(788fe7adc381bcc6eaefed33f5aa1081340608a0) )
 
-	ROM_REGION( 0x0100, "eeprom", 0 )   /* default serial EEPROM */
+	ROM_REGION16_BE( 0x0100, "eeprom", 0 )   /* default serial EEPROM */
 	ROM_LOAD16_WORD_SWAP( "forte_card_93cs56_serial_12345678.u13", 0x0000, 0x0100, CRC(2fc5961d) SHA1(f958c8b2b4e48cc6e5a607a6751acde5592bd27f) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
