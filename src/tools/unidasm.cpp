@@ -163,6 +163,9 @@ CPU_DISASSEMBLE( sm500 );
 CPU_DISASSEMBLE( sm510 );
 CPU_DISASSEMBLE( sm511 );
 CPU_DISASSEMBLE( sm8500 );
+CPU_DISASSEMBLE( sparcv7 );
+CPU_DISASSEMBLE( sparcv8 );
+CPU_DISASSEMBLE( sparcv9 );
 CPU_DISASSEMBLE( spc700 );
 CPU_DISASSEMBLE( ssem );
 CPU_DISASSEMBLE( ssp1601 );
@@ -319,6 +322,9 @@ static const dasm_table_entry dasm_table[] =
 	{ "sm510",      _8bit,  0, CPU_DISASSEMBLE_NAME(sm510) },
 	{ "sm511",      _8bit,  0, CPU_DISASSEMBLE_NAME(sm511) },
 	{ "sm8500",     _8bit,  0, CPU_DISASSEMBLE_NAME(sm8500) },
+	{ "sparcv7",    _32be,  0, CPU_DISASSEMBLE_NAME(sparcv7) },
+	{ "sparcv8",    _32be,  0, CPU_DISASSEMBLE_NAME(sparcv8) },
+	{ "sparcv9",    _32be,  0, CPU_DISASSEMBLE_NAME(sparcv9) },
 	{ "spc700",     _8bit,  0, CPU_DISASSEMBLE_NAME(spc700) },
 	{ "ssem",       _32le,  0, CPU_DISASSEMBLE_NAME(ssem) },
 	{ "ssp1601",    _16be, -1, CPU_DISASSEMBLE_NAME(ssp1601) },

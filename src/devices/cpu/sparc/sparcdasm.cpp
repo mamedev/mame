@@ -14,6 +14,10 @@ namespace {
 	const sparc_disassembler DASM_V7(7);
 	const sparc_disassembler DASM_V8(8);
 	const sparc_disassembler DASM_V9(9);
+
+	INT32 get_disp16(UINT32 op) { return DISP19; }
+	INT32 get_disp19(UINT32 op) { return DISP19; }
+	INT32 get_disp22(UINT32 op) { return DISP19; }
 }
 
 const char * const sparc_disassembler::REG_NAMES[32] = {
@@ -33,7 +37,7 @@ const sparc_disassembler::branch_desc sparc_disassembler::EMPTY_BRANCH_DESC = {
 };
 
 const sparc_disassembler::branch_desc sparc_disassembler::BPCC_DESC = {
-	[](UINT32 op) { return DISP19; }, 6, true, true,
+	&get_disp19, 6, true, true,
 	{ "%icc", nullptr, "%xcc", nullptr },
 	{
 		"bn",    "be",    "ble",   "bl",    "bleu",  "bcs",   "bneg",  "bvs",
@@ -42,7 +46,7 @@ const sparc_disassembler::branch_desc sparc_disassembler::BPCC_DESC = {
 };
 
 const sparc_disassembler::branch_desc sparc_disassembler::BICC_DESC = {
-	[](UINT32 op) { return DISP22; }, 6, false, false,
+	&get_disp22, 6, false, false,
 	{ nullptr, nullptr, nullptr, nullptr },
 	{
 		"bn",    "be",    "ble",   "bl",    "bleu",  "bcs",   "bneg",  "bvs",
@@ -51,7 +55,7 @@ const sparc_disassembler::branch_desc sparc_disassembler::BICC_DESC = {
 };
 
 const sparc_disassembler::branch_desc sparc_disassembler::BPR_DESC = {
-	[](UINT32 op) { return DISP16; }, 5, true, false,
+	&get_disp16, 5, true, false,
 	{ nullptr, nullptr, nullptr, nullptr },
 	{
 		nullptr, "brz",   "brlez", "brlz",  nullptr, "brnz",  "brgz",  "brgez",
@@ -60,7 +64,7 @@ const sparc_disassembler::branch_desc sparc_disassembler::BPR_DESC = {
 };
 
 const sparc_disassembler::branch_desc sparc_disassembler::FBPFCC_DESC = {
-	[](UINT32 op) { return DISP19; }, 6, true, true,
+	&get_disp19, 6, true, true,
 	{ "%fcc0", "%fcc1", "%fcc2", "%fcc3" },
 	{
 		"fbn",   "fbne",  "fblg",  "fbul",  "fbl",   "fbug",  "fbg",   "fbu",
@@ -69,7 +73,7 @@ const sparc_disassembler::branch_desc sparc_disassembler::FBPFCC_DESC = {
 };
 
 const sparc_disassembler::branch_desc sparc_disassembler::FBFCC_DESC = {
-	[](UINT32 op) { return DISP22; }, 6, false, false,
+	&get_disp22, 6, false, false,
 	{ nullptr, nullptr, nullptr, nullptr },
 	{
 		"fbn",   "fbne",  "fblg",  "fbul",  "fbl",   "fbug",  "fbg",   "fbu",
@@ -78,7 +82,7 @@ const sparc_disassembler::branch_desc sparc_disassembler::FBFCC_DESC = {
 };
 
 const sparc_disassembler::branch_desc sparc_disassembler::CBCCC_DESC = {
-	[](UINT32 op) { return DISP22; }, 6, false, false,
+	&get_disp22, 6, false, false,
 	{ nullptr, nullptr, nullptr, nullptr },
 	{
 		"cbn",   "cb123", "cb12",  "cb13",  "cb1",   "cb23",  "cb2",   "cb3",
@@ -412,7 +416,7 @@ offs_t sparc_disassembler::dasm(char *buf, offs_t pc, UINT32 op) const
 		}
 		return 4 | DASMFLAG_SUPPORTED;
 	case 1:
-		print(buf, "%-*s%%pc%c0x%08x ! %08x", m_op_field_width, "call", (DISP30 < 0) ? '-' : '+', std::abs(DISP30), pc + DISP30);
+		print(buf, "%-*s%%pc%c0x%08x ! 0x%08x", m_op_field_width, "call", (DISP30 < 0) ? '-' : '+', std::abs(DISP30), pc + DISP30);
 		return 4 | DASMFLAG_SUPPORTED;
 	case 2:
 		switch (OP3)
