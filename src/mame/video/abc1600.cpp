@@ -80,7 +80,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mover_map, AS_0, 16, abc1600_mover_device )
-	AM_RANGE(0x00000, 0x7ffff) AM_RAM
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 ADDRESS_MAP_END
 
 

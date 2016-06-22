@@ -3749,6 +3749,72 @@ static INPUT_PORTS_START( geniea )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( bsuertev )
+	/* Multiplexed - 4x5bits */
+	PORT_INCLUDE( bsuerte )
+
+	PORT_MODIFY("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )       PORT_IMPULSE(3) PORT_NAME("Coin In")      // Key '5'
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_NAME("Attendant Key") PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )                               // Key '3'
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Settings")  // Key '2'
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )                              // Key 'N'
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("Unknown IN0-1 0x01") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )     PORT_NAME("Payout") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )                                       // Key '4'
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big / Black")              // Key 'A'
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Small / Red")              // Key 'S'
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  // Key 'Z'
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )  // Key 'X'
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )  // Key 'C'
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )  // Key 'V'
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )  // Key 'B'
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_NAME("Supervisor Key") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )      PORT_NAME("Unknown IN0-3 0x02") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )      PORT_IMPULSE(3) PORT_NAME("Note In")     // Key '6'
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BET )                                          // Key 'M'
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )      PORT_NAME("Unknown IN0-3 0x10") PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("SW1")
+	/* only bits 4-7 are connected here and were routed to SW1 1-4 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x10, 0x10, "Par Simple" )        PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+
 /*********************************************
 *              Graphics Layouts              *
 *********************************************/
@@ -5118,6 +5184,51 @@ ROM_START( bsuerteu )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+/*
+  Buena Suerte.
+
+  Brazilian copy of Protel HW, but with inferior quality.
+
+  Golden Poker derivative, with blue killer circuitry.
+  Suitable for "Good Luck" and "Buena Suerte" games.
+  Addressing, ROM banks, and edge connector close to Magic Fly.
+
+  Discrete sound need to be traced...
+
+  30x2-pins Edge connector + 10-pin connector.
+  (see Protel set for pinouts)
+
+  Software is a hack that mix spanish and portuguese words.
+  Suitable for southern Brazil, or north of Argentina.
+
+  DIP switches are just replaced with fixed bridges.
+  Minimal hand is set in Double Pair.
+
+  GFX ROMs are identical to the Protel set.
+
+*/
+ROM_START( bsuertev )
+	ROM_REGION( 0x10000, "maincpu", 0 )  // Brazilian copy of Protel PCB.
+	ROM_LOAD( "main.16a", 0x4000, 0x4000, CRC(d56849ce) SHA1(2bba9821e53679b024d74ac1e023bf6bc6750c29) )
+
+	ROM_REGION( 0x6000, "gfx", 0 )
+	ROM_LOAD( "1.4a", 0x0000, 0x2000, CRC(943d200b) SHA1(e0c9d626be8e075e2087efc020c710aed3ca7511) )  // 4th quarter has the cards bitplane.
+	ROM_LOAD( "2.6a", 0x2000, 0x2000, CRC(e0c7fb67) SHA1(26b6dc9615121b86160352bb969e9fb0f5ed3618) )  // 4th quarter has the cards bitplane.
+	ROM_LOAD( "3.7a", 0x4000, 0x2000, CRC(2b888258) SHA1(e16587119f548298a5d23d0cb9250badc0321b93) )  // 3rd quarter has the cards bitplane, 4th quarter has the charset.
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(         0x0000, 0x1000, 0x0000 )  // filling the R-G bitplanes.
+	ROM_COPY( "gfx",  0x5800, 0x1000, 0x0800 )  // chars.
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_COPY( "gfx",  0x1800, 0x0000, 0x0800 )  // cards deck gfx, bitplane 1.
+	ROM_COPY( "gfx",  0x3800, 0x0800, 0x0800 )  // cards deck gfx, bitplane 2.
+	ROM_COPY( "gfx",  0x5000, 0x1000, 0x0800 )  // cards deck gfx, bitplane 3.
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "n82s129an.9c", 0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )  // PROM dump verified.
 ROM_END
 
 
@@ -10766,6 +10877,7 @@ GAMEL( 1991, bsuerter,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        
 GAMEL( 1991, bsuertes,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 20)",             0,                layout_goldnpkr )
 GAMEL( 1991, bsuertet,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 21)",             0,                layout_goldnpkr )
 GAMEL( 1991, bsuerteu,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 22)",             0,                layout_goldnpkr )
+GAMEL( 1991, bsuertev,  bsuerte,  witchcrd, bsuertev, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish/Portuguese, set 23)",  0,                layout_goldnpkr )
 GAMEL( 1991, goodluck,  bsuerte,  witchcrd, goodluck, driver_device,  0,        ROT0,   "<unknown>",                "Good Luck",                                  0,                layout_goldnpkr )
 
 GAMEL( 1991, falcnwld,  0,        wildcard, wildcard, driver_device,  0,        ROT0,   "TVG",                      "Falcons Wild - Wild Card 1991 (TVG)",        0,                layout_goldnpkr )
