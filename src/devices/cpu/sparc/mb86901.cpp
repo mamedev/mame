@@ -550,7 +550,7 @@ bool mb86901_device::execute_group2(UINT32 op)
 		{
 			UINT32 result = arg1 - arg2;
 			TEST_ICC_NZ(result);
-			if ((arg1 & 0x80000000) == (arg2 & 0x80000000) && (arg2 & 0x80000000) != (result & 0x80000000))
+			if ((arg1 & 0x80000000) != (arg2 & 0x80000000) && (arg2 & 0x80000000) != (result & 0x80000000))
 				SET_ICC_V_FLAG;
 			if (result > arg1)
 				SET_ICC_C_FLAG;
@@ -612,10 +612,10 @@ bool mb86901_device::execute_group2(UINT32 op)
 		case 28:	// subxcc
 		{
 			UINT32 c = (ICC_C_SET ? 1 : 0);
-			UINT32 argt = arg2 - c;
+			UINT32 argt = arg2 + c;
 			UINT32 result = arg1 - argt;
 			TEST_ICC_NZ(result);
-			if (((arg1 & 0x80000000) == (argt & 0x80000000) && (arg1 & 0x80000000) != (result & 0x80000000)) || (c != 0 && arg2 == 0x80000000))
+			if (((arg1 & 0x80000000) != (argt & 0x80000000) && (arg1 & 0x80000000) != (result & 0x80000000)) || (c != 0 && arg2 == 0x80000000))
 				SET_ICC_V_FLAG;
 			if (result > arg1 || (result == arg1 && arg2 != 0))
 				SET_ICC_C_FLAG;
