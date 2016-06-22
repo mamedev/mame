@@ -382,20 +382,13 @@
         21/11/2011 Skeleton driver.
         20/06/2016 Much less skeletony.
         
-        4/60 memory test notes:
+        4/60 ROM notes:
         
         ffe809fc: call to print "Sizing Memory" to the UART
-        ffe80a04: set o0 to 0xf0000000, a valid PTE that points to absolute zero in main RAM
-        ffe80a08: call to set that PTE in the page table (routine also reads back the written value and verifies that the unused bits are all 0)
-        ffe80a0c: stash g0, the current memory base testing, to o2, which the CALL above uses as the virtual address to set the PTE for
-        ffe80a10: set o0 to 0xf0000400, a valid PTE that points to the 4 MB mark (0x400000) in main RAM
-        ffe80a14: call to set that PTE in the page table
-        ffe80a18: set o2 to 0x00001000, so virtual address 0x1000 now points to physical 0x400000
-        ffe80a1c: set i7 to 0x01000000, which indicates the memory size is 64MB if everything passes
-        ffe80a20: store i7 at g0, which is currently 0
-        ffe80a24: SRL i7 by 2, now 0x00400000, so if the next store fails on a bus error memory size is 4 MB
-        ffe80a28: store the new i7 at o2, which is 0x400000
-        ffe80a2c: store succeeded! load [g0] to i7, ta-da, 64 MB RAM sized
+ 		ffe80a70: call to "Setting up RAM for monitor" that goes wrong
+ 		ffe80210: testing memory 		
+ 		ffe80274: loop that goes wobbly and fails
+ 		ffe80dc4: switch off boot mode, MMU maps ROM to copy in RAM from here on
 
 ****************************************************************************/
 
@@ -428,6 +421,42 @@
 #define PM_TYPEMASK (0x0c000000)	// type mask
 #define PM_ACCESSED (0x02000000)	// accessed flag
 #define PM_MODIFIED (0x01000000)	// modified flag
+
+namespace
+{
+const sparc_disassembler::asi_desc_map::value_type sun4_asi_desc[] = {
+													 { 0x10, { nullptr, "Flush I-Cache (Segment)" } },
+													 { 0x11, { nullptr, "Flush I-Cache (Page)"    } },
+	{ 0x02, { nullptr, "System Space"           } }, { 0x12, { nullptr, "Flush I-Cache (Context)" } },
+	{ 0x03, { nullptr, "Segment Map"            } }, { 0x13, { nullptr, "Flush I-Cache (User)"    } },
+	{ 0x04, { nullptr, "Page Map"               } }, { 0x14, { nullptr, "Flush D-Cache (Segment)" } },
+	{ 0x05, { nullptr, "Block Copy"             } }, { 0x15, { nullptr, "Flush D-Cache (Page)"    } },
+	{ 0x06, { nullptr, "Region Map"             } }, { 0x16, { nullptr, "Flush D-Cache (Context)" } },
+	{ 0x07, { nullptr, "Flush Cache (Region)"   } }, { 0x17, { nullptr, "Flush D-Cache (User)"    } },
+	{ 0x08, { nullptr, "User Instruction"       } },
+	{ 0x09, { nullptr, "Supervisor Instruction" } },
+	{ 0x0a, { nullptr, "User Data"              } },
+	{ 0x0b, { nullptr, "Supervisor Data"        } }, { 0x1b, { nullptr, "Flush I-Cache (Region)"  } },
+	{ 0x0c, { nullptr, "Flush Cache (Segment)"  } },
+	{ 0x0d, { nullptr, "Flush Cache (Page)"     } },
+	{ 0x0e, { nullptr, "Flush Cache (Context)"  } },
+	{ 0x0f, { nullptr, "Flush Cache (User)"     } }, { 0x1f, { nullptr, "Flush D-Cache (Region)"  } }
+};
+/* TODO: make SPARCstation-1 a different machine type so it can load its own ASI descriptions - it's a subset of Sun4
+const sparc_disassembler::asi_desc_map::value_type sun4c_asi_desc[] = {
+	{ 0x02, { nullptr, "System Space"           } },
+	{ 0x03, { nullptr, "Segment Map"            } },
+	{ 0x04, { nullptr, "Page Map"               } },
+	{ 0x08, { nullptr, "User Instruction"       } },
+	{ 0x09, { nullptr, "Supervisor Instruction" } },
+	{ 0x0a, { nullptr, "User Data"              } },
+	{ 0x0b, { nullptr, "Supervisor Data"        } },
+	{ 0x0c, { nullptr, "Flush Cache (Segment)"  } },
+	{ 0x0d, { nullptr, "Flush Cache (Page)"     } },
+	{ 0x0e, { nullptr, "Flush Cache (Context)"  } }
+};
+*/
+}
 
 class sun4_state : public driver_device
 {
@@ -465,7 +494,8 @@ protected:
 	required_memory_region m_rom;
 	UINT32 *m_rom_ptr;
 	UINT32 m_context;
-	UINT32 m_system_enable;
+	UINT8 m_system_enable;
+	UINT32 m_buserror[4];
 
 private:
 	UINT32 *m_ram_ptr;
@@ -496,9 +526,10 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 				return m_context<<24;
 
 			case 4: // system enable reg
-				return m_system_enable;
+				return m_system_enable<<24;
 
 			case 6: // bus error register
+				printf("sun4: read buserror, PC=%x (mask %08x)\n", m_maincpu->pc(), mem_mask);
 				return 0;
 
 			case 8: // (d-)cache tags
@@ -551,7 +582,7 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 			UINT32 tmp = (m_pagemap[entry] & 0xffff) << 10;
 			tmp |= (offset & 0x3ff);
 			
-			//printf("sun4: translated vaddr %08x to phys %08x type %d, PTE %08x, PC=%x\n", offset<<2, tmp<<2, (m_pagemap[entry]>>26) & 3, m_pagemap[entry], m_maincpu->pc());
+			//printf("sun4: read translated vaddr %08x to phys %08x type %d, PTE %08x, PC=%x\n", offset<<2, tmp<<2, (m_pagemap[entry]>>26) & 3, m_pagemap[entry], m_maincpu->pc());
 			
 			switch ((m_pagemap[entry] >> 26) & 3)
 			{
@@ -574,7 +605,11 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 		}
 		else
 		{
-			printf("sun4: INVALID PTE accessed!  PC=%x\n", m_maincpu->pc());
+			printf("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
+			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
+			//m_buserror[0] = 0x88;	// read, invalid PTE
+			//m_buserror[1] = offset<<2;
+			return 0;
 		}	
 		}
 		break;
@@ -603,11 +638,11 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 		{
 			case 3: // context reg
 				printf("%08x to context, mask %08x\n", data, mem_mask);
-				m_context = (UINT8)data<<24;
+				m_context = data>>24;
 				return;
 
 			case 4: // system enable reg
-				m_system_enable = (UINT8)data;
+				m_system_enable = data>>24;
 				return;
 
 			case 8: // cache tags
@@ -667,7 +702,7 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 			UINT32 tmp = (m_pagemap[entry] & 0xffff) << 10;
 			tmp |= (offset & 0x3ff);
 			
-			//printf("sun4: translated vaddr %08x to phys %08x type %d, PTE %08x, PC=%x\n", offset<<2, tmp<<2, (m_pagemap[entry]>>26) & 3, m_pagemap[entry], m_maincpu->pc());
+			//printf("sun4: write translated vaddr %08x to phys %08x type %d, PTE %08x, PC=%x\n", offset<<2, tmp<<2, (m_pagemap[entry]>>26) & 3, m_pagemap[entry], m_maincpu->pc());
 
 			switch ((m_pagemap[entry] >> 26) & 3)
 			{
@@ -686,7 +721,11 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 		}
 		else
 		{
-			printf("sun4: INVALID PTE accessed!  PC=%x\n", m_maincpu->pc());
+			printf("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
+			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
+			//m_buserror[0] = 0x8;	// invalid PTE
+			//m_buserror[1] = offset<<2;
+			return;
 		}
 		break;
 		
@@ -720,10 +759,9 @@ void sun4_state::machine_start()
 
 READ32_MEMBER( sun4_state::ram_r )
 {
-	if (offset < m_ram_size_words) return m_ram_ptr[offset];
+	//printf("ram_r: @ %08x (mask %08x)\n", offset<<2, mem_mask);
 
-	//printf("ram_r: DAEing on access to %08x\n", offset<<2);
-	m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
+	if (offset < m_ram_size_words) return m_ram_ptr[offset];
 
 	return 0xffffffff;
 }
@@ -783,14 +821,13 @@ WRITE32_MEMBER( sun4_state::ram_w )
 	}
 #endif
 
+	//printf("ram_w: %08x to %08x (mask %08x)\n", data, offset<<2, mem_mask);
+
 	if (offset < m_ram_size_words) 
 	{
 		COMBINE_DATA(&m_ram_ptr[offset]);
 		return;
 	}
-	
-	printf("ram_w: DAEing on access to %08x\n", offset<<2);
-	m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
 }
 
 static ADDRESS_MAP_START(type0space_map, AS_PROGRAM, 32, sun4_state)
@@ -822,9 +859,10 @@ static MACHINE_CONFIG_START( sun4, sun4_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MB86901, 16670000)
 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, sun4_mem)
+	MCFG_SPARC_ADD_ASI_DESC(sun4_asi_desc)
 
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
+	MCFG_RAM_DEFAULT_SIZE("16M")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 
 	MCFG_M48T02_ADD(TIMEKEEPER_TAG)

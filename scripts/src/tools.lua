@@ -165,6 +165,7 @@ links {
 
 includedirs {
 	MAME_DIR .. "src/osd",
+	MAME_DIR .. "src/devices",
 	MAME_DIR .. "src/emu",
 	MAME_DIR .. "src/lib/util",
 	MAME_DIR .. "3rdparty",
@@ -779,7 +780,7 @@ if _OPTIONS["targetos"] == "macosx" then
 			MAME_DIR .. "src/tools/aueffectutil.mm",
 		}
 
-        configuration { }
+		configuration { }
 
 		strip()
 end

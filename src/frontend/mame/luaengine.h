@@ -213,6 +213,10 @@ private:
 		int l_ui_input_find_mouse(lua_State *L);
 	};
 
+	struct lua_render_target {
+		int l_render_view_bounds(lua_State *L);
+	};
+
 	struct lua_emu_file {
 		lua_emu_file(const char *searchpath, UINT32 openflags) :
 			path(searchpath),

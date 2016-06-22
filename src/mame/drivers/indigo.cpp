@@ -468,31 +468,17 @@ static ADDRESS_MAP_START( indigo_map, AS_PROGRAM, 32, indigo_state )
 	AM_RANGE( 0x18000000, 0x187fffff ) AM_RAM AM_SHARE("share1")
 	AM_RANGE( 0x1fb80000, 0x1fb8ffff ) AM_READWRITE(hpc_r, hpc_w )
 	AM_RANGE( 0x1fbd9000, 0x1fbd903f ) AM_READWRITE(int_r, int_w )
-	AM_RANGE( 0x80000000, 0x801fffff ) AM_RAM AM_SHARE("share10")
-	AM_RANGE( 0x88000000, 0x88ffffff ) AM_RAM AM_SHARE("share5")
-	AM_RANGE( 0xa0000000, 0xa01fffff ) AM_RAM AM_SHARE("share10")
-	AM_RANGE( 0xa8000000, 0xa8ffffff ) AM_RAM AM_SHARE("share5")
-	AM_RANGE( 0xa9000000, 0xa97fffff ) AM_RAM AM_SHARE("share6")
-	AM_RANGE( 0xaa000000, 0xaa7fffff ) AM_RAM AM_SHARE("share7")
-	AM_RANGE( 0xac000000, 0xac7fffff ) AM_RAM AM_SHARE("share8")
-	AM_RANGE( 0xb0000000, 0xb07fffff ) AM_RAM AM_SHARE("share9")
-	AM_RANGE( 0xb8000000, 0xb87fffff ) AM_RAM AM_SHARE("share1")
-	AM_RANGE( 0xbfb80000, 0xbfb8ffff ) AM_READWRITE(hpc_r, hpc_w )
-	AM_RANGE( 0xbfbd9000, 0xbfbd903f ) AM_READWRITE(int_r, int_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( indigo3k_map, AS_PROGRAM, 32, indigo_state )
 	AM_IMPORT_FROM( indigo_map )
 	AM_RANGE( 0x1fc00000, 0x1fc3ffff ) AM_ROM AM_SHARE("share2") AM_REGION( "user1", 0 )
-	AM_RANGE( 0xbfc00000, 0xbfc3ffff ) AM_ROM AM_SHARE("share2") /* BIOS Mirror */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( indigo4k_map, AS_PROGRAM, 32, indigo_state )
 	AM_IMPORT_FROM( indigo_map )
 	AM_RANGE( 0x1fa00000, 0x1fa1ffff ) AM_DEVREADWRITE("sgi_mc", sgi_mc_device, read, write )
 	AM_RANGE( 0x1fc00000, 0x1fc7ffff ) AM_ROM AM_SHARE("share2") AM_REGION( "user1", 0 )
-	AM_RANGE( 0xbfa00000, 0xbfa1ffff ) AM_DEVREADWRITE("sgi_mc", sgi_mc_device, read, write )
-	AM_RANGE( 0xbfc00000, 0xbfc7ffff ) AM_ROM AM_SHARE("share2") /* BIOS Mirror */
 ADDRESS_MAP_END
 
 WRITE_LINE_MEMBER(indigo_state::scsi_irq)

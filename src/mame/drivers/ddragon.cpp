@@ -569,7 +569,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( ddragonba_sub_portmap, AS_IO, 8, ddragon_state )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(ddragonba_port_w)
+	AM_RANGE(0x0000, 0x01ff) AM_WRITE(ddragonba_port_w)
 ADDRESS_MAP_END
 
 

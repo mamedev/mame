@@ -131,8 +131,6 @@ Table 3-2.  TMS32025/26 Memory Blocks
 
 #define P_IN(A)         (m_io->read_word((A)<<1))
 #define P_OUT(A,V)      (m_io->write_word(((A)<<1),(V)))
-#define S_IN(A)         (m_io->read_word((A)<<1))
-#define S_OUT(A,V)      (m_io->write_word(((A)<<1),(V)))
 
 #define M_RDOP(A)       ((m_pgmmap[(A) >> 7]) ? (m_pgmmap[(A) >> 7][(A) & 0x7f]) : m_direct->read_word((A)<<1))
 #define M_RDOP_ARG(A)   ((m_pgmmap[(A) >> 7]) ? (m_pgmmap[(A) >> 7][(A) & 0x7f]) : m_direct->read_word((A)<<1))
@@ -212,7 +210,13 @@ tms32025_device::tms32025_device(const machine_config &mconfig, const char *tag,
 	: cpu_device(mconfig, TMS32025, "TMS32025", tag, owner, clock, "tms32025", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 16, -1)
-	, m_io_config("io", ENDIANNESS_BIG, 16, 16+1, -1)
+	, m_io_config("io", ENDIANNESS_BIG, 16, 16, -1)
+	, m_bio_in(*this)
+	, m_hold_in(*this)
+	, m_hold_ack_out(*this)
+	, m_xf_out(*this)
+	, m_dr_in(*this)
+	, m_dx_out(*this)
 {
 }
 
@@ -221,7 +225,13 @@ tms32025_device::tms32025_device(const machine_config &mconfig, device_type type
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 16, -1)
-	, m_io_config("io", ENDIANNESS_BIG, 16, 16+1, -1)
+	, m_io_config("io", ENDIANNESS_BIG, 16, 16, -1)
+	, m_bio_in(*this)
+	, m_hold_in(*this)
+	, m_hold_ack_out(*this)
+	, m_xf_out(*this)
+	, m_dr_in(*this)
+	, m_dx_out(*this)
 {
 }
 
@@ -674,7 +684,7 @@ void tms32025_device::bgz()
 }
 void tms32025_device::bioz()
 {
-	if (S_IN(TMS32025_BIO) != CLEAR_LINE) SET_PC(M_RDOP_ARG(m_PC));
+	if (m_bio_in() != CLEAR_LINE) SET_PC(M_RDOP_ARG(m_PC));
 	else m_PC++ ;
 	MODIFY_AR_ARP();
 }
@@ -1276,7 +1286,7 @@ void tms32025_device::rtxm()  /** Serial port stuff */
 void tms32025_device::rxf()
 {
 	CLR1(XF_FLAG);
-	S_OUT(TMS32025_XF,CLEAR_LINE);
+	m_xf_out(CLEAR_LINE);
 }
 void tms32025_device::sach()
 {
@@ -1485,7 +1495,7 @@ void tms32025_device::subt()
 void tms32025_device::sxf()
 {
 	SET1(XF_FLAG);
-	S_OUT(TMS32025_XF,ASSERT_LINE);
+	m_xf_out(ASSERT_LINE);
 }
 void tms32025_device::tblr()
 {
@@ -1638,6 +1648,13 @@ void tms32025_device::device_start()
 	m_direct = &m_program->direct();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
+
+	m_bio_in.resolve_safe(0xffff);
+	m_hold_in.resolve_safe(0xffff);
+	m_hold_ack_out.resolve_safe();
+	m_xf_out.resolve_safe();
+	m_dr_in.resolve_safe(0xffff);
+	m_dx_out.resolve_safe();
 
 	m_PREVPC = 0;
 	m_PFC = 0;
@@ -1846,7 +1863,7 @@ void tms32025_device::device_reset()
 	m_RPTC = 0;         /* Reset repeat counter to 0 */
 	m_IFR = 0;          /* IRQ pending flags */
 
-	S_OUT(TMS32025_XF,ASSERT_LINE); /* XF flag is high. Must set the pin */
+	m_xf_out(ASSERT_LINE); /* XF flag is high. Must set the pin */
 
 	/* Set the internal memory mapped registers */
 	GREG = 0;
@@ -1941,7 +1958,7 @@ int tms32025_device::process_IRQs()
 		}
 		if ((m_IFR & 0x10) && (IMR & 0x10)) {       /* Serial port receive IRQ (internal) */
 //          logerror("TMS32025:  Active RINT (Serial receive)\n");
-			DRR = S_IN(TMS32025_DR);
+			DRR = m_dr_in();
 			SET_PC(0x001A);
 			m_idle = 0;
 			m_IFR &= (~0x10);
@@ -1950,7 +1967,7 @@ int tms32025_device::process_IRQs()
 		}
 		if ((m_IFR & 0x20) && (IMR & 0x20)) {       /* Serial port transmit IRQ (internal) */
 //          logerror("TMS32025:  Active XINT (Serial transmit)\n");
-			S_OUT(TMS32025_DX,DXR);
+			m_dx_out(DXR);
 			SET_PC(0x001C);
 			m_idle = 0;
 			m_IFR &= (~0x20);
@@ -2005,9 +2022,9 @@ again:
 void tms32025_device::execute_run()
 {
 	/**** Respond to external hold signal */
-	if (S_IN(TMS32025_HOLD) == ASSERT_LINE) {
+	if (m_hold_in() == ASSERT_LINE) {
 		if (m_hold == 0) {
-			S_OUT(TMS32025_HOLDA,ASSERT_LINE);  /* Hold-Ack (active low) */
+			m_hold_ack_out(ASSERT_LINE);  /* Hold-Ack (active low) */
 		}
 		m_hold = 1;
 		if (HM) {
@@ -2021,7 +2038,7 @@ void tms32025_device::execute_run()
 	}
 	else {
 		if (m_hold == 1) {
-			S_OUT(TMS32025_HOLDA,CLEAR_LINE);   /* Hold-Ack (active low) */
+			m_hold_ack_out(CLEAR_LINE);   /* Hold-Ack (active low) */
 			process_timer(3);
 		}
 		m_hold = 0;

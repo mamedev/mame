@@ -89,7 +89,7 @@ public:
 
 	void render_poly_8bit(INT32 scanline, const extent_t& extent, const zeus2_poly_extra_data& object, int threadid);
 
-	void zeus2_draw_quad(const UINT32 *databuffer, UINT32 texoffs, int logit);
+	void zeus2_draw_quad(const UINT32 *databuffer, UINT32 texdata, int logit);
 
 private:
 	zeus2_device* m_state;
