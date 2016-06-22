@@ -155,16 +155,16 @@ void mac_state::mac_install_memory(offs_t memory_begin, offs_t memory_end,
 	offs_t memory_mirror;
 
 	memory_size = MIN(memory_size, (memory_end + 1 - memory_begin));
-	memory_mirror = (memory_end - memory_begin) ^ (memory_size - 1);
+	memory_mirror = (memory_end - memory_begin) & ~(memory_size - 1);
 
 	if (!is_rom)
 	{
-		space.install_readwrite_bank(memory_begin, memory_end, memory_mirror, bank);
+		space.install_readwrite_bank(memory_begin, memory_end & ~memory_mirror, memory_mirror, bank);
 	}
 	else
 	{
 		space.unmap_write(memory_begin, memory_end);
-		space.install_read_bank(memory_begin, memory_end, memory_mirror, bank);
+		space.install_read_bank(memory_begin, memory_end & ~memory_mirror, memory_mirror, bank);
 	}
 
 	membank(bank)->set_base(memory_data);
@@ -471,7 +471,7 @@ void mac_state::set_memory_overlay(int overlay)
 			else
 			{
 				size_t rom_mirror = 0xfffffff ^ (memregion("bootrom")->bytes() - 1);
-				m_maincpu->space(AS_PROGRAM).install_read_bank(0x40000000, 0x4fffffff, rom_mirror, "bankR");
+				m_maincpu->space(AS_PROGRAM).install_read_bank(0x40000000, 0x4fffffff & ~rom_mirror, rom_mirror, "bankR");
 				membank("bankR")->set_base((void *)memregion("bootrom")->base());
 			}
 		}
