@@ -188,6 +188,8 @@ void menu::exit(running_machine &machine)
 	}
 
 	icons_bitmap.clear();
+	sw_toolbar_bitmap.clear();
+	toolbar_bitmap.clear();
 	m_old_icons.clear();
 }
 
@@ -2274,9 +2276,9 @@ void menu::draw_toolbar(float x1, float y1, float x2, float y2, bool software)
 	for (auto & e : t_bitmap)
 		if (e->valid()) m_valid++;
 
-	float space_x = (y2 - y1) * container->manager().ui_aspect();
-	float total = (m_valid * space_x) + ((m_valid - 1) * 0.001f);
-	x1 = ((x2 - x1) * 0.5f) - (total / 2);
+	float space_x = (y2 - y1) * container->manager().ui_aspect(container);
+	auto total = (float)(m_valid * space_x) + ((float)(m_valid - 1) * 0.001f);
+	x1 += (x2 - x1) * 0.5f - total * 0.5f;
 	x2 = x1 + space_x;
 
 	for (int z = 0; z < UI_TOOLBAR_BUTTONS; ++z)

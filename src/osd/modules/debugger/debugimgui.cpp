@@ -39,6 +39,7 @@ public:
 		this->m_machine = &machine;
 		this->width = 300;
 		this->height = 300;
+		this->console_prev.clear();
 
 		/* specials */
 		switch (type)
@@ -78,6 +79,7 @@ public:
 	int                 src_sel;
 	char                console_input[512];
 	std::vector<std::string> console_history;
+	std::string         console_prev;
 };
 
 class debug_imgui : public osd_module, public debug_module
@@ -465,7 +467,12 @@ void debug_imgui::handle_console(running_machine* machine)
 			m_running = true;
 		if(strcmp(view_main_console->console_input,"next") == 0)
 			m_running = true;
-		view_main_console->console_history.push_back(std::string(view_main_console->console_input));
+		// don't bother adding to history if the current command matches the previous one
+		if(view_main_console->console_prev != view_main_console->console_input)
+		{
+			view_main_console->console_history.push_back(std::string(view_main_console->console_input));
+			view_main_console->console_prev = view_main_console->console_input;
+		}
 		history_pos = view_main_console->console_history.size();
 		strcpy(view_main_console->console_input,"");
 		view_main_console->exec_cmd = false;
@@ -490,9 +497,9 @@ int debug_imgui::history_set(ImGuiTextEditCallbackData* data)
 	}
 
 	if(history_pos == view_main_console->console_history.size())
-		data->BufTextLen = (int)snprintf(data->Buf, (size_t)data->BufSize, "%s", "");
+		data->CursorPos = data->BufTextLen = (int)snprintf(data->Buf, (size_t)data->BufSize, "%s", "");
 	else
-		data->BufTextLen = (int)snprintf(data->Buf, (size_t)data->BufSize, "%s", view_main_console->console_history[history_pos].c_str());
+		data->CursorPos = data->BufTextLen = (int)snprintf(data->Buf, (size_t)data->BufSize, "%s", view_main_console->console_history[history_pos].c_str());
 	
 	data->BufDirty = true;
 	return 0;

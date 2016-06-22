@@ -24,8 +24,6 @@
 
 #define SPARCV8		(0)
 
-CPU_DISASSEMBLE( sparc );
-
 const device_type MB86901 = &device_creator<mb86901_device>;
 
 const int mb86901_device::WINDOW_COUNT = 7;
@@ -37,6 +35,7 @@ const int mb86901_device::WINDOW_COUNT = 7;
 mb86901_device::mb86901_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, MB86901, "Fujitsu MB86901", tag, owner, clock, "mb86901", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32)
+	, m_dasm(7)
 {
 }
 
@@ -166,7 +165,7 @@ void mb86901_device::device_stop()
 void mb86901_device::device_reset()
 {
 	m_queued_tt = 0;
-	m_queued_priority = 0;
+	m_queued_priority = SPARC_NO_TRAP;
 	m_asi = 0;
 	MAE = false;
 	HOLD_BUS = false;
@@ -351,8 +350,8 @@ UINT32 mb86901_device::disasm_max_opcode_bytes() const
 
 offs_t mb86901_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	extern CPU_DISASSEMBLE( sparc );
-	return CPU_DISASSEMBLE_NAME(sparc)(this, buffer, pc, oprom, opram, options);
+	UINT32 op = *reinterpret_cast<const UINT32 *>(oprom);
+	return m_dasm.dasm(buffer, pc, BIG_ENDIANIZE_INT32(op));
 }
 
 
@@ -551,7 +550,7 @@ bool mb86901_device::execute_group2(UINT32 op)
 		{
 			UINT32 result = arg1 - arg2;
 			TEST_ICC_NZ(result);
-			if ((arg1 & 0x80000000) == (arg2 & 0x80000000) && (arg2 & 0x80000000) != (result & 0x80000000))
+			if ((arg1 & 0x80000000) != (arg2 & 0x80000000) && (arg2 & 0x80000000) != (result & 0x80000000))
 				SET_ICC_V_FLAG;
 			if (result > arg1)
 				SET_ICC_C_FLAG;
@@ -613,10 +612,10 @@ bool mb86901_device::execute_group2(UINT32 op)
 		case 28:	// subxcc
 		{
 			UINT32 c = (ICC_C_SET ? 1 : 0);
-			UINT32 argt = arg2 - c;
+			UINT32 argt = arg2 + c;
 			UINT32 result = arg1 - argt;
 			TEST_ICC_NZ(result);
-			if (((arg1 & 0x80000000) == (argt & 0x80000000) && (arg1 & 0x80000000) != (result & 0x80000000)) || (c != 0 && arg2 == 0x80000000))
+			if (((arg1 & 0x80000000) != (argt & 0x80000000) && (arg1 & 0x80000000) != (result & 0x80000000)) || (c != 0 && arg2 == 0x80000000))
 				SET_ICC_V_FLAG;
 			if (result > arg1 || (result == arg1 && arg2 != 0))
 				SET_ICC_C_FLAG;
@@ -877,6 +876,7 @@ bool mb86901_device::execute_group2(UINT32 op)
 			else
 			{
 				m_tbr = (arg1 ^ arg2) & 0xfffff000;
+				printf("wr (%08x ^ %08x) & 0xfffff000 (%08x),tbr", arg1, arg2, m_tbr);
 			}
 			break;
 		case 52: // FPop1
@@ -1111,7 +1111,7 @@ void mb86901_device::execute_group3(UINT32 op)
 			write_word(m_data_asi, ADDRESS, RDREG);
 			if (MAE || HOLD_BUS)
 				break;
-			write_word(m_data_asi, ADDRESS, REG(RD+1));
+			write_word(m_data_asi, ADDRESS+4, REG(RD+1));
 			break;
 		case 9:		// ldsb
 		{
@@ -1352,6 +1352,7 @@ bool mb86901_device::execute_ticc(UINT32 op)
 {
 	bool trap_taken = evaluate_condition(op);
 
+	printf("ticc @ %x\n", PC);
 	if (trap_taken)
 	{
 		UINT32 arg2 = USEIMM ? SIMM7 : RS2REG;
@@ -1410,11 +1411,8 @@ void mb86901_device::trap(UINT8 type, UINT8 tt_override)
 
 bool mb86901_device::invoke_queued_traps()
 {
-	if (m_queued_priority > 0)
+	if (m_queued_priority != SPARC_NO_TRAP)
 	{
-		m_queued_priority = 0;
-		m_queued_tt = 0;
-
 		m_et = false;
 		m_ps = m_s;
 		m_s = true;
@@ -1430,6 +1428,9 @@ bool mb86901_device::invoke_queued_traps()
 
 		PC = m_tbr;
 		nPC = m_tbr + 4;
+
+		m_queued_priority = SPARC_NO_TRAP;
+		m_queued_tt = 0;
 		return true;
 	}
 
@@ -1472,6 +1473,7 @@ void mb86901_device::execute_run()
 			switch (OP2)
 			{
 			case 0: // unimp
+				printf("unimp @ %x\n", PC);
 				break;
 			case 2: // branch on integer condition codes
 				update_npc = execute_bicc(op);
@@ -1480,12 +1482,14 @@ void mb86901_device::execute_run()
 				SET_RDREG(IMM22);
 				break;
 			case 6: // branch on floating-point condition codes
+				printf("fbfcc @ %x\n", PC);
 				break;
 #if SPARCV8
 			case 7: // branch on coprocessor condition codes, SPARCv8
 				break;
 #endif
 			default:
+				printf("unknown %08x @ %x\n", op, PC);
 				break;
 			}
 			break;

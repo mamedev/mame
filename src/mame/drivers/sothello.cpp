@@ -82,7 +82,6 @@ public:
 	TIMER_CALLBACK_MEMBER(subcpu_suspend);
 	TIMER_CALLBACK_MEMBER(subcpu_resume);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
-	DECLARE_WRITE_LINE_MEMBER(sothello_vdp_interrupt);
 	void unlock_shared_ram();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -329,11 +328,6 @@ static INPUT_PORTS_START( sothello )
 INPUT_PORTS_END
 
 
-WRITE_LINE_MEMBER(sothello_state::sothello_vdp_interrupt)
-{
-	m_maincpu->set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
-}
-
 WRITE_LINE_MEMBER(sothello_state::adpcm_int)
 {
 	/* only 4 bits are used */
@@ -363,7 +357,7 @@ static MACHINE_CONFIG_START( sothello, sothello_state )
 
 	/* video hardware */
 	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MAIN_CLOCK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(sothello_state,sothello_vdp_interrupt))
+	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MAIN_CLOCK)
 
 	/* sound hardware */

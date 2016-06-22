@@ -155,7 +155,7 @@ void main()
 
 			ScanCoord *= u_source_dims.y * u_scanline_scale.x * 3.1415927; // PI
 
-			float ScanCoordJitter = u_scanline_jitter.x * u_jitter_amount.x * 1.618034; // PHI
+			float ScanCoordJitter = u_scanline_jitter.x * u_jitter_amount.x * 1.5707963; // half PI
 			float ScanSine = sin(ScanCoord + ScanCoordJitter);
 			float ScanlineWide = u_scanline_height.x + u_scanline_variation.x * max(1.0, u_scanline_height.x) * (1.0 - ColorBrightness);
 			float ScanSineScaled = pow(ScanSine * ScanSine, ScanlineWide);

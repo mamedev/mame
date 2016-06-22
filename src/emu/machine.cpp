@@ -728,6 +728,19 @@ void running_machine::add_logerror_callback(logerror_callback callback)
 
 
 //-------------------------------------------------
+//  strlog - send an error logging string to the
+//  debugger and any OSD-defined output streams
+//-------------------------------------------------
+
+void running_machine::strlog(const char *str) const
+{
+	// log to all callbacks
+	for (auto &cb : m_logerror_list)
+		cb->m_func(str);
+}
+
+
+//-------------------------------------------------
 //  debug_break - breaks into the debugger, if
 //  enabled
 //-------------------------------------------------

@@ -421,7 +421,7 @@ DRIVER_INIT_MEMBER(drw80pkr_state,drw80pkr)
 *************************/
 
 static ADDRESS_MAP_START( drw80pkr_map, AS_PROGRAM, 8, drw80pkr_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x0000, 0x0fff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drw80pkr_io_map, AS_IO, 8, drw80pkr_state )

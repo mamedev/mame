@@ -3497,6 +3497,34 @@ ROM_START( tmht22pe )
 	ROM_LOAD( "tmnt2_eba.nv", 0x0000, 0x080, CRC(c0a3ed50) SHA1(6deec720c7f1c607740076cb8b5b5becd175aed0) )
 ROM_END
 
+ROM_START( tmht24pe )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 4*128k for 68000 code */
+	ROM_LOAD16_BYTE( "063eaa02.8e",  0x000000, 0x20000, CRC(665a68de) SHA1(3cefc2cb0f0a42f1044ef04862669fc7893005da) )
+	ROM_LOAD16_BYTE( "063eaa03.8g",  0x000001, 0x20000, CRC(7b7fb3af) SHA1(1c96283af8fc81c30136dfe2efbd113cb7dd3d66) )
+	ROM_LOAD16_BYTE( "063eaa04.10e", 0x040000, 0x20000, CRC(69f38e1d) SHA1(a63aa86a11f803fa3f07c5eb2fdbdb75bb850d55) )
+	ROM_LOAD16_BYTE( "063eaa05.10g", 0x040001, 0x20000, CRC(818032af) SHA1(60d416a58696add58493c0f2297b3a4af5f46d6d) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "063b01.2f", 0x0000, 0x10000, CRC(364f548a) SHA1(e0636e27d4fc48b2ccb1417b63d2b68d9e272c06) )
+
+	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "063b12.16k", 0x000000, 0x080000, CRC(d3283d19) SHA1(49e4daa9cbe4d99bf71fcee6237cb434a0d55312) )
+	ROM_LOAD32_WORD( "063b11.12k", 0x000002, 0x080000, CRC(6ebc0c15) SHA1(e6848405076937fbf8ec6d318293a0ff922725f4) )
+
+	ROM_REGION( 0x400000, "k053245", 0 )    /* sprites */
+	ROM_LOAD32_WORD( "063b09.7l", 0x000000, 0x100000, CRC(2d7a9d2a) SHA1(a26f9c1a07152bc8c7bcd797d4485bf848f5e2a0) )
+	ROM_LOAD32_WORD( "063b07.3l", 0x000002, 0x100000, CRC(d9bee7bf) SHA1(7bbb65138fbd216b80412783e6f0072742101440) )
+	ROM_LOAD32_WORD( "063b10.7k", 0x200000, 0x080000, CRC(f2dd296e) SHA1(a2aad10bfb0904dd73c2ee11049648c94de7f4d5) )
+	ROM_LOAD32_WORD( "063b08.3k", 0x200002, 0x080000, CRC(3b1ae36f) SHA1(9e69cae8b517497ac77c4d148f56f2bb6a23de89) )
+	/* second half empty */
+
+	ROM_REGION( 0x200000, "k053260", 0 )    /* samples for the 053260 */
+	ROM_LOAD( "063b06.1d",  0x0000, 0x200000, CRC(1e510aa5) SHA1(02b9bd6bb6b098026a620e4d671c40a31ad9e318) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with invisible error message
+	ROM_LOAD( "tmnt2_eaa.nv", 0x0000, 0x080, CRC(124af18f) SHA1(bbd0629663135fc6c08b000b886ea76a96592a9e) )
+ROM_END
+
 ROM_START( tmnt2a )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 4*128k for 68000 code */
 	ROM_LOAD16_BYTE( "063ada02.8e",  0x000000, 0x20000, CRC(4f11b587) SHA1(111051da23ce7035405b4d12c0f18dcc1d6c8ddc) )
@@ -4207,6 +4235,7 @@ GAME( 1991, glfgreatj,   glfgreat, glfgreat, glfgreatj, driver_device, 0,       
 GAME( 1991, tmnt2,       0,        tmnt2,    ssridr4p,  driver_device, 0,        ROT0,   "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UAA)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tmnt2a,      tmnt2,    tmnt2,    ssrid4ps,  driver_device, 0,        ROT0,   "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver ADA)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tmht22pe,    tmnt2,    tmnt2,    ssriders,  driver_device, 0,        ROT0,   "Konami", "Teenage Mutant Hero Turtles - Turtles in Time (2 Players ver EBA)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tmht24pe,    tmnt2,    tmnt2,    ssriders,  driver_device, 0,        ROT0,   "Konami", "Teenage Mutant Hero Turtles - Turtles in Time (4 Players ver EAA)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tmnt22pu,    tmnt2,    tmnt2,    ssriders,  driver_device, 0,        ROT0,   "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (2 Players ver UDA)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1993, qgakumon,    0,        tmnt2,    qgakumon,  driver_device, 0,        ROT0,   "Konami", "Quiz Gakumon no Susume (Japan ver. JA2 Type L)", MACHINE_SUPPORTS_SAVE )

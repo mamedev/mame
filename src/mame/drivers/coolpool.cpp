@@ -681,9 +681,6 @@ static ADDRESS_MAP_START( coolpool_dsp_io_map, AS_IO, 16, coolpool_state )
 	AM_RANGE(0x04, 0x04) AM_READ(dsp_rom_r)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN0")
 	AM_RANGE(0x07, 0x07) AM_READ_PORT("IN1")
-	AM_RANGE(TMS32025_BIO, TMS32025_BIO) AM_READ(dsp_bio_line_r)
-	AM_RANGE(TMS32025_HOLD, TMS32025_HOLD) AM_READ(dsp_hold_line_r)
-//  AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE(dsp_HOLDA_signal_w)
 ADDRESS_MAP_END
 
 
@@ -837,6 +834,9 @@ static MACHINE_CONFIG_START( coolpool, coolpool_state )
 	MCFG_CPU_ADD("dsp", TMS32026,XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(coolpool_dsp_pgm_map)
 	MCFG_CPU_IO_MAP(coolpool_dsp_io_map)
+	MCFG_TMS32025_BIO_IN_CB(READ16(coolpool_state, dsp_bio_line_r))
+	MCFG_TMS32025_HOLD_IN_CB(READ16(coolpool_state, dsp_hold_line_r))
+//  MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(coolpool_state, dsp_HOLDA_signal_w))
 
 	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,coolpool)
 	MCFG_NVRAM_ADD_0FILL("nvram")

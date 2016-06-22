@@ -89,7 +89,7 @@ public:
 
 	void render_poly_8bit(INT32 scanline, const extent_t& extent, const zeus2_poly_extra_data& object, int threadid);
 
-	void zeus2_draw_quad(const UINT32 *databuffer, UINT32 texoffs, int logit);
+	void zeus2_draw_quad(const UINT32 *databuffer, UINT32 texdata, int logit);
 
 private:
 	zeus2_device* m_state;
@@ -105,6 +105,9 @@ typedef zeus2_renderer::extent_t z2_poly_extent;
 
 #define MCFG_ZEUS2_IRQ_CB(_devcb) \
 	devcb = &zeus2_device::set_irq_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_ZEUS2_FLOAT_MODE(_mode) \
+	downcast<zeus2_device *>(device)->set_float_mode(_mode);
 
 class zeus2_device : public device_t
 {
@@ -124,11 +127,14 @@ public:
 	devcb_write_line   m_vblank;
 	devcb_write_line   m_irq;
 
+	void set_float_mode(int mode) { m_ieee754_float = mode; }
+	int m_ieee754_float; // Used to switch to using IEEE754 floating point format
+
 	UINT32 m_zeusbase[0x80];
+	UINT32 m_renderRegs[0x100];
 
 	zeus2_renderer* poly;
 
-	void *zeus_renderbase;
 	rectangle zeus_cliprect;
 
 	float zeus_matrix[3][3];
@@ -139,6 +145,9 @@ public:
 	int zeus_quad_size;
 
 	UINT32 *waveram[2];
+	std::unique_ptr<UINT32[]> m_frameColor;
+	std::unique_ptr<UINT16[]> m_frameDepth;
+
 	emu_timer *int_timer;
 	emu_timer *vblank_timer;
 	int m_yScale;
@@ -164,15 +173,13 @@ private:
 	/*************************************
 	*  Member variables
 	*************************************/
-
-
 	UINT8 log_fifo;
 
 	UINT32 zeus_fifo[20];
 	UINT8 zeus_fifo_words;
 
 	UINT32 m_fill_color;
-	UINT16 m_fill_depth;
+	UINT32 m_fill_depth;
 
 #if TRACK_REG_USAGE
 	struct reg_info
@@ -193,6 +200,75 @@ public:
 	/*************************************
 	*  Inlines for block addressing
 	*************************************/
+	inline float convert_float(UINT32 val)
+	{
+		if (m_ieee754_float)
+			return reinterpret_cast<float&>(val);
+		else
+			return tms3203x_device::fp_to_float(val);
+	}
+
+	inline UINT32 frame_addr_from_xy(UINT32 x, UINT32 y, bool render)
+	{
+		UINT32 addr = render ? frame_addr_from_expanded_addr(m_renderRegs[0x4] << 16)
+			: frame_addr_from_expanded_addr(m_zeusbase[0x38]);
+		addr += ((y * WAVERAM1_WIDTH) << (1 - m_yScale)) + x;
+		return addr;
+	}
+
+	// Convert 0xRRRRCCCC to frame buffer addresss
+	inline UINT32 frame_addr_from_expanded_addr(UINT32 addr)
+	{
+		return (((addr & 0x3ff0000) >> (16 - 9 + m_yScale)) | (addr & 0x1ff)) << 1;
+	}
+
+	// Convert Physical 0xRRRRCCCC to frame buffer addresss
+	// Based on address reg 51 (no scaling)
+	inline UINT32 frame_addr_from_reg51()
+	{
+		UINT32 addr = (((m_zeusbase[0x51] & 0x3ff0000) >> (16 - 9)) | (m_zeusbase[0x51] & 0x1ff)) << 1;
+		return addr;
+	}
+
+	// Read from frame buffer
+	inline void frame_read()
+	{
+		UINT32 addr = frame_addr_from_reg51();
+		m_zeusbase[0x58] = m_frameColor[addr];
+		m_zeusbase[0x59] = m_frameColor[addr + 1];
+		m_zeusbase[0x5a] = *(UINT32*)&m_frameDepth[addr];
+		if (m_zeusbase[0x5e] & 0x40)
+		{
+			m_zeusbase[0x51]++;
+			m_zeusbase[0x51] += (m_zeusbase[0x51] & 0x200) << 7;
+			m_zeusbase[0x51] &= ~0xfe00;
+		}
+	}
+
+	// Write to frame buffer
+	inline void frame_write()
+	{
+		UINT32 addr = frame_addr_from_reg51();
+		if (m_zeusbase[0x57] & 0x1)
+			m_frameColor[addr] = m_zeusbase[0x58];
+		if (m_zeusbase[0x5e] & 0x20) {
+			if (m_zeusbase[0x57] & 0x4)
+				m_frameColor[addr + 1] = m_zeusbase[0x5a];
+		} else
+		{
+			if (m_zeusbase[0x57] & 0x4)
+					m_frameColor[addr + 1] = m_zeusbase[0x59];
+			if (m_zeusbase[0x57] & 0x10)
+				*(UINT32*)&m_frameDepth[addr] = m_zeusbase[0x5a];
+		}
+
+		if (m_zeusbase[0x5e] & 0x40)
+		{
+			m_zeusbase[0x51]++;
+			m_zeusbase[0x51] += (m_zeusbase[0x51] & 0x200) << 7;
+			m_zeusbase[0x51] &= ~0xfe00;
+		}
+	}
 
 	inline void *waveram0_ptr_from_expanded_addr(UINT32 addr)
 	{
@@ -226,6 +302,7 @@ public:
 	}
 #endif
 
+#ifdef UNUSED_FUNCTION
 	inline void waveram_plot_depth(int y, int x, UINT32 color, UINT16 depth)
 	{
 		if (zeus_cliprect.contains(x, y))
@@ -234,6 +311,7 @@ public:
 			WAVERAM_WRITEDEPTH(zeus_renderbase, y, x, depth);
 		}
 	}
+#endif
 
 #ifdef UNUSED_FUNCTION
 	inline void waveram_plot_check_depth(int y, int x, UINT32 color, UINT16 depth)

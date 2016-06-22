@@ -162,7 +162,7 @@
  *the video board as these are known to run hot and commonly fail, especially now the system is many years old.
  *
  *CPU PCB   - There are four known revisions of this PCB. Three of them have an extra connector for an
- *            auxillary PCB. One of the others doesn't have that connector but is are otherwise identical.
+ *            auxiliary PCB. One of the others doesn't have that connector but is are otherwise identical.
  *            All PCBs can be swapped to any game and it will work. However, ALL required IC's must be swapped.
  *            This includes Program ROM PCB, socketed Keycus IC, socketed DATA ROM and socketed WAVE ROM(s).
  *            On most games the EEPROM will re-init itself on bootup. On the others, the EEPROM can re-init itself
@@ -242,7 +242,7 @@
  *Notes:
  *      J6           : Custom Namco connector for plug-in program ROM PCB
  *      J11          : Custom Namco connector for optional plug-in WAVE ROM PCB (holds some SOP44 MASKROMs)
- *      JC410        : Custom Namco connector for Optional plug-in Auxillary PCB (e.g. Gun Control PCB used in Time Crisis
+ *      JC410        : Custom Namco connector for Optional plug-in Auxiliary PCB (e.g. Gun Control PCB used in Time Crisis
  *                     etc)
  *                     The connector is populated only on the 2nd revision CPU (B) PCB 8646962600 (8646972600)
  *                     and 3rd Revision CPU (B) PCB 8646962600 (8646972601)
@@ -963,7 +963,7 @@
  *      C407         : Namco custom C407 (QFP64) NOTE! On Revision A & B, this position is populated by an
  *                                                     Altera EPM7064 PLCC84 FPGA labelled 'SS22V1B'
  *                                                     The Altera chip runs very hot and fails quite often.
- *                                                     Even if a heaksink is added to the chip it still fails.
+ *                                                     Even if a heatsink is added to the chip it still fails.
  *                                                     The failure of this chip is the primary cause of
  *                                                     video faults on Namco Super System 22 PCBs.
  *                                                     (Second reason for video faults is generally attributed
@@ -2562,11 +2562,6 @@ static ADDRESS_MAP_START( master_dsp_io, AS_IO, 16, namcos22_state )
 	AM_RANGE(0xd, 0xd) AM_WRITE(namcos22_dspram16_bank_w)
 	AM_RANGE(0xe, 0xe) AM_WRITE(dsp_led_w)
 	AM_RANGE(0xf, 0xf) AM_READ(dsp_upload_status_r) AM_WRITENOP
-	AM_RANGE(TMS32025_HOLD,  TMS32025_HOLD)  AM_READ(dsp_hold_signal_r)
-	AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE(dsp_hold_ack_w)
-	AM_RANGE(TMS32025_XF,    TMS32025_XF)    AM_WRITE(dsp_xf_output_w)
-	AM_RANGE(TMS32025_BIO,   TMS32025_BIO)   AM_READ(pdp_status_r)
-	AM_RANGE(TMS32025_DR,    TMS32025_DR)    AM_READ(master_serial_io_r)
 ADDRESS_MAP_END
 
 
@@ -2651,12 +2646,6 @@ static ADDRESS_MAP_START( slave_dsp_io, AS_IO, 16, namcos22_state )
 	AM_RANGE(0xb, 0xb) AM_READWRITE(dsp_slave_portb_r, dsp_slave_portb_w)
 
 	AM_RANGE(0xc, 0xc) AM_WRITE(dsp_slave_portc_w)
-
-	AM_RANGE(TMS32025_HOLD,  TMS32025_HOLD)  AM_READ(dsp_hold_signal_r)
-	AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE(dsp_hold_ack_w)
-	AM_RANGE(TMS32025_XF,    TMS32025_XF)    AM_WRITE(dsp_xf_output_w)
-	AM_RANGE(TMS32025_BIO,   TMS32025_BIO)   AM_READ(dsp_bioz_r)
-	AM_RANGE(TMS32025_DX,    TMS32025_DX)    AM_WRITE(slave_serial_io_w)
 ADDRESS_MAP_END
 
 
@@ -3751,12 +3740,22 @@ static MACHINE_CONFIG_START( namcos22, namcos22_state )
 	MCFG_CPU_PROGRAM_MAP(master_dsp_program)
 	MCFG_CPU_DATA_MAP(master_dsp_data)
 	MCFG_CPU_IO_MAP(master_dsp_io)
+	MCFG_TMS32025_BIO_IN_CB(READ16(namcos22_state, pdp_status_r))
+	MCFG_TMS32025_HOLD_IN_CB(READ16(namcos22_state, dsp_hold_signal_r))
+	MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(namcos22_state, dsp_hold_ack_w))
+	MCFG_TMS32025_XF_OUT_CB(WRITE16(namcos22_state, dsp_xf_output_w))
+	MCFG_TMS32025_DR_IN_CB(READ16(namcos22_state, master_serial_io_r))
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("master_st", namcos22_state, dsp_master_serial_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("slave", TMS32025,SS22_MASTER_CLOCK) /* ? */
 	MCFG_CPU_PROGRAM_MAP(slave_dsp_program)
 	MCFG_CPU_DATA_MAP(slave_dsp_data)
 	MCFG_CPU_IO_MAP(slave_dsp_io)
+	MCFG_TMS32025_BIO_IN_CB(READ16(namcos22_state, dsp_bioz_r))
+	MCFG_TMS32025_HOLD_IN_CB(READ16(namcos22_state, dsp_hold_signal_r))
+	MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(namcos22_state, dsp_hold_ack_w))
+	MCFG_TMS32025_XF_OUT_CB(WRITE16(namcos22_state, dsp_xf_output_w))
+	MCFG_TMS32025_DX_OUT_CB(WRITE16(namcos22_state, slave_serial_io_w))
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("slave_st", namcos22_state, dsp_slave_serial_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("mcu", NAMCO_C74, SS22_MASTER_CLOCK/3) // C74 on the CPU board has no periodic interrupts, it runs entirely off Timer A0
@@ -3801,12 +3800,22 @@ static MACHINE_CONFIG_START( namcos22s, namcos22_state )
 	MCFG_CPU_PROGRAM_MAP(master_dsp_program)
 	MCFG_CPU_DATA_MAP(master_dsp_data)
 	MCFG_CPU_IO_MAP(master_dsp_io)
+	MCFG_TMS32025_BIO_IN_CB(READ16(namcos22_state, pdp_status_r))
+	MCFG_TMS32025_HOLD_IN_CB(READ16(namcos22_state, dsp_hold_signal_r))
+	MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(namcos22_state, dsp_hold_ack_w))
+	MCFG_TMS32025_XF_OUT_CB(WRITE16(namcos22_state, dsp_xf_output_w))
+	MCFG_TMS32025_DR_IN_CB(READ16(namcos22_state, master_serial_io_r))
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("master_st", namcos22_state, dsp_master_serial_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("slave", TMS32025,SS22_MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(slave_dsp_program)
 	MCFG_CPU_DATA_MAP(slave_dsp_data)
 	MCFG_CPU_IO_MAP(slave_dsp_io)
+	MCFG_TMS32025_BIO_IN_CB(READ16(namcos22_state, dsp_bioz_r))
+	MCFG_TMS32025_HOLD_IN_CB(READ16(namcos22_state, dsp_hold_signal_r))
+	MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(namcos22_state, dsp_hold_ack_w))
+	MCFG_TMS32025_XF_OUT_CB(WRITE16(namcos22_state, dsp_xf_output_w))
+	MCFG_TMS32025_DX_OUT_CB(WRITE16(namcos22_state, slave_serial_io_w))
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("slave_st", namcos22_state, dsp_slave_serial_irq, "screen", 0, 1)
 
 	MCFG_CPU_ADD("mcu", M37710S4, SS22_MASTER_CLOCK/3)

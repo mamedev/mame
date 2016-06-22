@@ -3922,9 +3922,6 @@ bool direct_read_data::set_direct_region(offs_t &byteaddress)
 		byteaddress = overrideaddress;
 	}
 
-	// remove the masked bits (we'll put them back later)
-	offs_t maskedbits = overrideaddress & ~m_bytemask;
-
 	// find or allocate a matching range
 	direct_range *range = find_range(overrideaddress, m_entry);
 
@@ -3940,6 +3937,7 @@ bool direct_read_data::set_direct_region(offs_t &byteaddress)
 	UINT8 *base = *m_space.manager().bank_pointer_addr(m_entry);
 
 	// compute the adjusted base
+	offs_t maskedbits = overrideaddress & ~m_space.bytemask();
 	const handler_entry_read &handler = m_space.read().handler_read(m_entry);
 	m_bytemask = handler.bytemask();
 	m_ptr = base - (handler.bytestart() & m_bytemask);
@@ -3964,15 +3962,8 @@ direct_read_data::direct_range *direct_read_data::find_range(offs_t byteaddress,
 		if (byteaddress >= range.m_bytestart && byteaddress <= range.m_byteend)
 			return &range;
 
-	// didn't find out; allocate a new one
+	// didn't find out; create a new one
 	direct_range range;
-	if (m_freerangelist.size() > 0) 
-	{
-		range = m_freerangelist.front();
-		m_freerangelist.pop_front();
-	}
-
-	// fill in the range
 	m_space.read().derive_range(byteaddress, range.m_bytestart, range.m_byteend);
 	m_rangelist[entry].push_front(range);
 
@@ -3991,14 +3982,13 @@ void direct_read_data::remove_intersecting_ranges(offs_t bytestart, offs_t bytee
 	for (auto & elem : m_rangelist)
 	{
 		// loop over all ranges in this entry's list
-		for (std::list<direct_range>::iterator range = elem.begin(); range!=elem.end();++range)
+		for (auto range = elem.begin(); range!=elem.end();)
 		{
-			// if we intersect, remove and add to the free range list
+			// if we intersect, remove
 			if (bytestart <= range->m_byteend && byteend >= range->m_bytestart)
-			{
-				m_freerangelist.push_front(*range);
-				elem.erase(range);
-			}
+				range = elem.erase(range);
+			else
+				range ++;
 		}
 	}
 }

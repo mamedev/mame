@@ -482,11 +482,6 @@ WRITE32_MEMBER(metalmx_state::host_vram_w)
 	COMBINE_DATA(m_gsp_vram + offset * 2);
 }
 
-WRITE_LINE_MEMBER(metalmx_state::tms_interrupt)
-{
-	m_maincpu->set_input_line(4, state ? HOLD_LINE : CLEAR_LINE);
-}
-
 
 WRITE32_MEMBER(metalmx_state::timer_w)
 {
@@ -703,7 +698,7 @@ static MACHINE_CONFIG_START( metalmx, metalmx_state )
 	MCFG_TMS340X0_HALT_ON_RESET(TRUE) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(4000000) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(metalmx_state, tms_interrupt))
+	MCFG_TMS340X0_OUTPUT_INT_CB(INPUTLINE("maincpu", 4))
 
 	MCFG_CPU_ADD("dsp32c_1", DSP32C, 40000000)      /* Unverified */
 	MCFG_CPU_PROGRAM_MAP(dsp32c_1_map)

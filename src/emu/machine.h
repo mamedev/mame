@@ -19,9 +19,6 @@
 
 #include <functional>
 
-#include "strformat.h"
-#include "vecstream.h"
-
 #include <time.h>
 
 // forward declaration instead of osdepend.h
@@ -198,6 +195,7 @@ public:
 	emu_options &options() const { return m_config.options(); }
 	attotime time() const { return m_scheduler.time(); }
 	bool scheduled_event_pending() const { return m_exit_pending || m_hard_reset_pending; }
+	bool allow_logging() const { return !m_logerror_list.empty(); }
 
 	// fetch items by name
 	inline device_t *device(const char *tag) const { return root_device().subdevice(tag); }
@@ -233,6 +231,7 @@ public:
 	void popmessage() const { popmessage(static_cast<char const *>(nullptr)); }
 	template <typename Format, typename... Params> void popmessage(Format &&fmt, Params &&... args) const;
 	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
+	void strlog(const char *str) const;
 	UINT32 rand();
 	const char *describe_context();
 
@@ -387,7 +386,7 @@ template <typename Format, typename... Params>
 inline void running_machine::logerror(Format &&fmt, Params &&... args) const
 {
 	// process only if there is a target
-	if (!m_logerror_list.empty())
+	if (allow_logging())
 	{
 		g_profiler.start(PROFILER_LOGERROR);
 
@@ -397,10 +396,7 @@ inline void running_machine::logerror(Format &&fmt, Params &&... args) const
 		util::stream_format(m_string_buffer, std::forward<Format>(fmt), std::forward<Params>(args)...);
 		m_string_buffer.put('\0');
 
-		// log to all callbacks
-		char const *const str(&m_string_buffer.vec()[0]);
-		for (auto &cb : m_logerror_list)
-			cb->m_func(str);
+		strlog(&m_string_buffer.vec()[0]);
 
 		g_profiler.stop();
 	}

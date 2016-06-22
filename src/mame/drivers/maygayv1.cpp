@@ -643,7 +643,7 @@ static ADDRESS_MAP_START( sound_prg, AS_PROGRAM, 8, maygayv1_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_data, AS_DATA, 8, maygayv1_state )
-	AM_RANGE(0x0000, 0xffff) AM_RAM // nothing?
+	AM_RANGE(0x0000, 0x1ff) AM_RAM // nothing?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io, AS_IO, 8, maygayv1_state )

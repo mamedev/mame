@@ -780,13 +780,6 @@ static ADDRESS_MAP_START( dsp_map_data, AS_DATA, 16, mlanding_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("dot_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dsp_map_io, AS_IO, 16, mlanding_state )
-	AM_RANGE(TMS32025_HOLD, TMS32025_HOLD) AM_READ(dsp_hold_signal_r)
-	AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITENOP
-ADDRESS_MAP_END
-
-
-
 /*************************************
  *
  *  Audio CPU memory handlers
@@ -945,7 +938,8 @@ static MACHINE_CONFIG_START( mlanding, mlanding_state )
 	MCFG_CPU_ADD("dsp", TMS32025, 32000000) // ?
 	MCFG_CPU_PROGRAM_MAP(dsp_map_prog)
 	MCFG_CPU_DATA_MAP(dsp_map_data)
-	MCFG_CPU_IO_MAP(dsp_map_io)
+	MCFG_TMS32025_HOLD_IN_CB(READ16(mlanding_state, dsp_hold_signal_r))
+	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, 4000000)
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(mlanding_state, z80ctc_to0))

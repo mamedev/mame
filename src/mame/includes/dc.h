@@ -165,8 +165,9 @@ class dc_state : public driver_device
 #define SB_G1CRDYC  ((0x005f74b4-0x005f7400)/4)
 #define SB_GDAPRO   ((0x005f74b8-0x005f7400)/4)
 
-/*-------- Unknown/Special Registers ---------*/
-#define GD_UNLOCK   ((0x005f74e4-0x005f7400)/4)
+/*-------- BIOS security Registers ---------*/
+#define SB_SECUR_EADR  ((0x005f74e4-0x005f7400)/4)
+#define SB_SECUR_STATE ((0x005f74ec-0x005f7400)/4)
 /*---------- GD-DMA Debug Registers ------------*/
 #define SB_GDSTARD  ((0x005f74f4-0x005f7400)/4)
 #define SB_GDLEND   ((0x005f74f8-0x005f7400)/4)

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
+// thanks-to: David Haywood, Peter Wilhelmsen
 /*************************************************************************************************************************
 
     Metal Freezer (c) 1989 Seibu

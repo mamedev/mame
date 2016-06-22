@@ -290,7 +290,7 @@ void t11_device::mark(UINT16 op)
 {
 	m_icount -= 36;
 
-	SP = SP + 2 * (op & 0x3f);
+	SP = PC + 2 * (op & 0x3f);
 	PC = REGW(5);
 	REGW(5) = POP();
 }

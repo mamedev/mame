@@ -126,6 +126,13 @@ READ32_MEMBER(dc_cons_state::dc_mess_g1_ctrl_r )
 		case SB_GDLEND:
 			//machine().debug_break();
 			return atapi_xferlen; // TODO: check me
+		case SB_SECUR_EADR:		// always read 0xFF on hardware
+			return 0x000000ff;
+		case SB_SECUR_STATE:	// state of BIOS checksum security system (R/O):
+								// 3 - check passed OK, G1 ATA (5F70xx) registers area accessible
+								// 2 - check failed, G1 ATA area blocked (read FFFFFFFFh) 
+								// 0 - check in progress, BIOS data summed, G1 ATA area blocked (read FFFFFFFFh) 
+			return 3;
 		default:
 			printf("G1CTRL:  Unmapped read %08x\n", 0x5f7400+offset*4);
 			machine().debug_break();
@@ -166,27 +173,27 @@ WRITE32_MEMBER(dc_cons_state::dc_mess_g1_ctrl_w )
     The following register is involved in BIOS checksum protection system.
     current understanding of its functioning based on several hardware tests:
 
-    after power on system is in "protected state":
-    - access to G1 ATA register area (5F70XX) is locked, ie GD-ROM in Dreamcast or cartridge/DIMM in arcade systems is not accessible;
-    - *any* data readed via G1 data bus (ie BIOS) is summed internally by chipset;
-    - write to GD_UNLOCK (5F74E4) register set "last address" of checksummed area;
+    after power on security system is in state 0 (check in progress):
+    - access to G1 ATA register area (5F70XX) is blocked, ie GD-ROM in Dreamcast or cartridge/DIMM in arcade systems is not accessible;
+    - *any* data readed via G1 data bus (i.e. BIOS) is summed internally by chipset;
+    - write to SB_SECUR_EADR register set last address of checksummed area;
 
-    then readed address matches with "last address" - calculated summ compared with some hardcoded value
-    if values match - system becomes in "unlocked state":
-    - G1 ATA registers unlocked;
-    - by write to GD_UNLOCK register system can be switched back to "protected state"
+    then read address will match SB_SECUR_EADR - calculated summ compared with some hardcoded value
+    if values match - security system becomes in state 3 (check OK):
+    - G1 ATA registers area unlocked;
+    - can be switched back to state 0 by write to SB_SECUR_EADR register, Dreamcast BIOS write 42FEh before jump into Mil-CD executables
 
-    if values doesn't match - system switch to "locked state":
-    - similar to protected, but data summing seems not performed anymore,
-    at least write to GD_UNLOCK and "pumping" through G1 bus data chunk with valid checksumm have no effect;
+    if values doesn't match - security system switch to state 2 (check fail):
+    - similar to state 0, but data summing seems not performed anymore,
     - the only exit from this state - power off/on or reset;
 
+	current state can be read from SB_SECUR_STATE register
     actual checksum algorithm is unknown, but its supposed to be simple and weak,
     known few modded BIOSes which succesfully passes this CRC check, because of good luck
 
     all described above works the same way in all HOLLY/CLX2-based systems - Dreamcast, Naomi 1/2, Atomiswave, SystemSP
 */
-	case GD_UNLOCK:
+	case SB_SECUR_EADR:
 		if (data==0 || data==0x001fffff || data==0x42fe)
 		{
 //          atapi_regs[ATAPI_REG_SAMTAG] = GDROM_PAUSE_STATE | 0x80;

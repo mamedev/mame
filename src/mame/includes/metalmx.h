@@ -51,7 +51,6 @@ public:
 	DECLARE_WRITE32_MEMBER(timer_w);
 	DECLARE_DRIVER_INIT(metalmx);
 	DECLARE_WRITE8_MEMBER(cage_irq_callback);
-	DECLARE_WRITE_LINE_MEMBER(tms_interrupt);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	UINT32 screen_update_metalmx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

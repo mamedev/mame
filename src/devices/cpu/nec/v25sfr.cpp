@@ -25,21 +25,21 @@ UINT8 v25_common_device::read_sfr(unsigned o)
 	switch(o)
 	{
 		case 0x00: /* P0 */
-			ret = m_io->read_byte(V25_PORT_P0);
+			ret = m_p0_in();
 			break;
 		case 0x08: /* P1 */
 			/* P1 is combined with the interrupt lines */
-			ret = ((m_io->read_byte(V25_PORT_P1) & 0xF0)
+			ret = ((m_p1_in() & 0xF0)
 					| (m_nmi_state     ? 0x00 : 0x01)
 					| (m_intp_state[0] ? 0x00 : 0x02)
 					| (m_intp_state[1] ? 0x00 : 0x04)
 					| (m_intp_state[2] ? 0x00 : 0x08));
 			break;
 		case 0x10: /* P2 */
-			ret = m_io->read_byte(V25_PORT_P2);
+			ret = m_p2_in();
 			break;
 		case 0x38: /* PT */
-			ret = m_io->read_byte(V25_PORT_PT);
+			ret = m_pt_in();
 			break;
 		case 0x4C: /* EXIC0 */
 			ret = read_irqcontrol(INTP0, m_priority_intp);
@@ -169,14 +169,14 @@ void v25_common_device::write_sfr(unsigned o, UINT8 d)
 	switch(o)
 	{
 		case 0x00: /* P0 */
-			m_io->write_byte(V25_PORT_P0, d);
+			m_p0_out(d);
 			break;
 		case 0x08: /* P1 */
 			/* only the upper four bits of P1 can be used as output */
-			m_io->write_byte(V25_PORT_P1, d & 0xF0);
+			m_p1_out(d & 0xF0);
 			break;
 		case 0x10: /* P2 */
-			m_io->write_byte(V25_PORT_P2, d);
+			m_p2_out(d);
 			break;
 		case 0x4C: /* EXIC0 */
 			write_irqcontrol(INTP0, d);

@@ -459,8 +459,7 @@ static ADDRESS_MAP_START( kenseim_map, AS_PROGRAM, 8, kenseim_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kenseim_io_map, AS_IO, 8, kenseim_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x27) AM_DEVREADWRITE("mb89363b", mb89363b_device, read, write)
+	AM_RANGE(0x20, 0x27) AM_MIRROR(0xff00) AM_DEVREADWRITE("mb89363b", mb89363b_device, read, write)
 ADDRESS_MAP_END
 
 

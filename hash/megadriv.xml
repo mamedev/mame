@@ -30407,10 +30407,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="yangji">
-		<description>Yang Jia Jiang - Yang Warrior Family (Chi)</description>
+		<description>Yi Men Ying Lie - Yang Jia Jiang (Chi)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
-		<info name="alt_title" value="楊家將"/>
+		<info name="alt_title" value="一門英烈 楊家將"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="yang jia jiang - yang warrior family (chi) (unl).bin" size="2097152" crc="6604a79e" sha1="6fcc3102fc22b42049e6eae9a1c30c8a7f022d14" offset="0x000000"/>
@@ -30571,7 +30571,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Zhuo Gui Da Shi - Ghost Hunter (Chi)</description>
 		<year>1994</year>
 		<publisher>Senchi Technology</publisher>
-		<info name="alt_title" value="Zool - Ninja of the &quot;Nth&quot; Dimension (Box)"/>
+		<info name="alt_title" value="抓鬼大師"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="zhuo gui da shi - ghost hunter (chi) (unl).bin" size="524288" crc="76c62a8b" sha1="3424892e913c20754d2e340c6e79476a9eb6761b" offset="0x000000"/>
@@ -30800,9 +30800,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="chinf3">
-		<description>Chinese Fighter III (Chi)</description>
+		<description>Tenchi wo Kurau III - Sanguo Wai Chuan - Chinese Fighter (Chi)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="天地を喰らうⅢ三国外伝"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_chinf3"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -31288,9 +31289,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 <!-- Are these unprotected versions legit? or were they hacked to work with emus? -->
 
 	<software name="chinf3a" cloneof="chinf3">
-		<description>Chinese Fighter III (Chi, Unprotected?)</description>
+		<description>Tenchi wo Kurau III - Sanguo Wai Chuan - Chinese Fighter (Chi, Unprotected?)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="天地を喰らうⅢ三国外伝"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="chinese fighter iii (unl, alt).bin" size="2097152" crc="6f98247d" sha1="cc212b1564dc7c73ffdc55f9fde3269a83fee399" offset="0x000000"/>
