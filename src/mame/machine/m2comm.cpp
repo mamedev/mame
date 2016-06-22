@@ -79,6 +79,7 @@ Sega PC BD MODEL2 A-CRX COMMUNICATION 837-11525
 
     EEPROM:
         16726.7    Sega Rally Championship
+        18643.7    ManxTT
         18643A.7   ManxTT
 
 
@@ -230,7 +231,6 @@ void m2comm_device::device_start()
 
 void m2comm_device::device_reset()
 {
-	set_linktype(16726);
 	m_zfg = 0;
 	m_cn = 0;
 	m_fg = 0;
@@ -297,8 +297,9 @@ WRITE8_MEMBER(m2comm_device::cn_w)
 		m_linkid = 0x00;
 		m_linkalive = 0x00;
 		m_linkcount = 0x00;
-		m_linktimer = 0x04; //0x00E8; // 58 fps * 4s
+		m_linktimer = 0x00E8; // 58 fps * 4s
 
+		comm_init();
 		comm_tick();
 	}
 #endif
@@ -323,44 +324,38 @@ void m2comm_device::check_vint_irq()
 }
 
 #ifdef __M2COMM_SIMULATION__
-void m2comm_device::set_linktype(UINT16 linktype)
+void m2comm_device::comm_init()
 {
-	m_linktype = linktype;
+	// TODO - check EPR-16726 on Daytona USA and Sega Rally Championship
+	// EPR-18643(A) - these are accessed by VirtuaON and Sega Touring Car Championship
+	
+	// frameSize - 0xe00
+	m_shared[0x12] = 0x00;
+	m_shared[0x13] = 0x0e;
 
-	switch (m_linktype)
-	{
-		case 16726:
-			// Daytona USA / Sega Rally Championship
-			printf("M2COMM: set mode 'EPR-16726 - Daytona USA'\n");
-			break;
-	}
+	// frameOffset - 0x1c0
+	m_shared[0x14] = 0xc0;
+	m_shared[0x15] = 0x01;
 }
 
 void m2comm_device::comm_tick()
 {
-	switch (m_linktype)
-	{
-		case 16726:
-			// Daytona USA / Sega Rally Championship
-			comm_tick_16726();
-			break;
-	}
-}
-
-void m2comm_device::comm_tick_16726()
-{
 	if (m_linkenable == 0x01)
 	{
-		int frameTX = 0x2000;
-		int frameRX = 0x21c0;
-		int frameSize = 0x01c0 * 8;
+		m_zfg ^= 1;
+		
+		int frameSize = m_shared[0x13] << 8 | m_shared[0x12];
+		int frameOffset = m_shared[0x15] << 8 | m_shared[0x14];
+		
 		int dataSize = frameSize + 1;
 		int togo = 0;
 		int recv = 0;
 		int idx = 0;
 
-		bool isMaster = (m_fg == 0x01);
-		bool isSlave = (m_fg == 0x00);
+		// EPR-16726 uses m_fg for Master/Slave
+		// EPR-18643(A) seems to check m_shared[1], with a fallback to m_fg
+		bool isMaster = (m_fg == 0x01 || m_shared[1] == 0x01);
+		bool isSlave = !isMaster && (m_fg == 0x00);
 
 		// if link not yet established...
 		if (m_linkalive == 0x00)
@@ -409,6 +404,7 @@ void m2comm_device::comm_tick_16726()
 							}
 							else if (isSlave)
 							{
+								// increase linkcount
 								m_buffer[1]++;
 
 								// forward message
@@ -421,6 +417,7 @@ void m2comm_device::comm_tick_16726()
 						{
 							if (isSlave)
 							{
+								// fetch linkcount and linkid, then decrease linkid
 								m_linkcount = m_buffer[1];
 								m_linkid = m_buffer[2];
 								m_buffer[2]--;
@@ -508,18 +505,17 @@ void m2comm_device::comm_tick_16726()
 			int recv = m_line_rx.read(m_buffer, dataSize);
 			while (recv != 0)
 			{
+				m_linktimer = 0x00;
 				// check if complete message
 				if (recv == dataSize)
 				{
 					// check if valid id
 					int idx = m_buffer[0];
-					if (idx > 0 && idx <= m_linkcount) {
+					if (idx >= 0 && idx <= m_linkcount) {
 						for (int j = 0x00 ; j < frameSize ; j++)
 						{
-							m_shared[frameRX + j] = m_buffer[1 + j];
+							m_shared[0x2000 + frameOffset + j] = m_buffer[1 + j];
 						}
-						m_zfg ^= 1;
-						m_linktimer = 0x00;
 					}
 				}
 				else
@@ -542,15 +538,12 @@ void m2comm_device::comm_tick_16726()
 				m_buffer[0] = m_linkid;
 				for (int j = 0x00 ; j < frameSize ; j++)
 				{
-					m_buffer[1 + j] = m_shared[frameTX + j];
+					m_buffer[1 + j] = m_shared[0x2000 + j];
 				}
 				m_line_tx.write(m_buffer, dataSize);
 				m_linktimer = 0x01;
 			}
 		}
-
-		// clear 03
-		//TODO:m_shared[3] = 0x00;
 	}
 }
 #endif
