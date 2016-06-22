@@ -51,7 +51,7 @@ namespace plib
 	{
 	    indexed_compare(const C& target): m_target(target) {}
 
-	    bool operator()(int a, int b) const { return m_target[a] < m_target[b]; }
+	    bool operator()(int a, int b) const { return *m_target[a] < *m_target[b]; }
 
 	    const C& m_target;
 	};
