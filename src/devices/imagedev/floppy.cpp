@@ -242,7 +242,7 @@ void floppy_image_device::set_formats(const floppy_format_type *formats)
 		else
 			fif_list->append(fif);
 
-		m_formatlist.append(*global_alloc(image_device_format(fif->name(), fif->description(), fif->extensions(), "")));
+		m_formatlist.push_back(std::make_unique<image_device_format>(fif->name(), fif->description(), fif->extensions(), ""));
 
 		image_specify_extension( extension_list, 256, fif->extensions() );
 	}
@@ -438,10 +438,10 @@ bool floppy_image_device::call_load()
 	if (!cur_load_cb.isnull())
 		return cur_load_cb(this);
 
-		if (motor_always_on) {
-				// When disk is inserted, start motor
-				mon_w(0);
-		} else if(!mon)
+	if (motor_always_on) {
+		// When disk is inserted, start motor
+		mon_w(0);
+	} else if(!mon)
 		ready_counter = 2;
 
 	return IMAGE_INIT_PASS;
@@ -469,10 +469,10 @@ void floppy_image_device::call_unload()
 	if (!cur_unload_cb.isnull())
 		cur_unload_cb(this);
 
-		if (motor_always_on) {
-				// When disk is removed, stop motor
-				mon_w(1);
-		} else if(!ready) {
+	if (motor_always_on) {
+		// When disk is removed, stop motor
+		mon_w(1);
+	} else if(!ready) {
 		ready = true;
 		if(!cur_ready_cb.isnull())
 			cur_ready_cb(this, ready);

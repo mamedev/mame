@@ -161,7 +161,7 @@ void isa8_cga_tetriskr_device::device_start()
 {
 	m_bg_bank = 0;
 	isa8_cga_superimpose_device::device_start();
-	m_isa->install_device(0x3c0, 0x3c0, 0, 0,  read8_delegate( FUNC(isa8_cga_tetriskr_device::bg_bank_r), this ), write8_delegate( FUNC(isa8_cga_tetriskr_device::bg_bank_w), this ) );
+	m_isa->install_device(0x3c0, 0x3c0, read8_delegate( FUNC(isa8_cga_tetriskr_device::bg_bank_r), this ), write8_delegate( FUNC(isa8_cga_tetriskr_device::bg_bank_w), this ) );
 }
 
 WRITE8_MEMBER(isa8_cga_tetriskr_device::bg_bank_w)

@@ -6,7 +6,7 @@ Cyber Tank HW (c) 1987/1988 Coreland Technology
 
 preliminary driver by Angelo Salese & David Haywood
 
-Maybe it has some correlation with WEC Le Mans HW? (supposely that was originally done by Coreland too)
+Maybe it has some correlation with WEC Le Mans HW? (supposedly that was originally done by Coreland too)
 
 TODO:
 - improve sprite zooming
@@ -172,6 +172,7 @@ lev 7 : 0x7c : 0000 07e0 - input device clear?
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/gen_latch.h"
 #include "sound/8950intf.h"
 #include "rendlay.h"
 
@@ -185,6 +186,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_spr_ram(*this, "spr_ram"),
 		m_tilemap0_vram(*this, "tilemap0_vram"),
 		m_tilemap1_vram(*this, "tilemap1_vram"),
@@ -198,6 +200,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT16> m_spr_ram;
 	required_shared_ptr<UINT16> m_tilemap0_vram;
@@ -536,7 +539,7 @@ WRITE8_MEMBER( cybertnk_state::cybertnk_sound_cmd_w )
 	}
 	else if (offset == 1)
 	{
-		soundlatch_byte_w(space, offset, data & 0xff);
+		m_soundlatch->write(space, offset, data & 0xff);
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
@@ -637,7 +640,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 8, cybertnk_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa001, 0xa001) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xa005, 0xa006) AM_NOP
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym1", y8950_device, read, write)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym2", y8950_device, read, write)
@@ -865,6 +868,8 @@ static MACHINE_CONFIG_START( cybertnk, cybertnk_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", Y8950, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)

@@ -64,12 +64,6 @@
 #define WMSZ_RIGHT          (7)
 #endif
 
-//============================================================
-//  GLOBAL VARIABLES
-//============================================================
-
-std::list<std::shared_ptr<sdl_window_info>> sdl_window_list;
-
 class SDL_DM_Wrapper
 {
 public:
@@ -154,7 +148,7 @@ bool sdl_osd_interface::window_init()
 
 void sdl_osd_interface::update_slider_list()
 {
-	for (auto window : sdl_window_list)
+	for (auto window : osd_common_t::s_window_list)
 	{
 		// check if any window has dirty sliders
 		if (window->renderer().sliders_dirty())
@@ -169,7 +163,7 @@ void sdl_osd_interface::build_slider_list()
 {
 	m_sliders.clear();
 
-	for (auto window : sdl_window_list)
+	for (auto window : osd_common_t::s_window_list)
 	{
 		std::vector<ui::menu_item> window_sliders = window->renderer().get_slider_list();
 		m_sliders.insert(m_sliders.end(), window_sliders.begin(), window_sliders.end());
@@ -186,9 +180,9 @@ void sdl_osd_interface::window_exit()
 	osd_printf_verbose("Enter sdlwindow_exit\n");
 
 	// free all the windows
-	while (!sdl_window_list.empty())
+	while (!osd_common_t::s_window_list.empty())
 	{
-		auto window = sdl_window_list.front();
+		auto window = osd_common_t::s_window_list.front();
 
 		// Part of destroy removes the window from the list
 		window->destroy();
@@ -399,7 +393,7 @@ int sdl_window_info::window_init()
 	m_startmaximized = options.maximize();
 
 	// add us to the list
-	sdl_window_list.push_back(std::static_pointer_cast<sdl_window_info>(shared_from_this()));
+	osd_common_t::s_window_list.push_back(std::static_pointer_cast<sdl_window_info>(shared_from_this()));
 
 	set_renderer(osd_renderer::make_for_type(video_config.mode, static_cast<osd_window*>(this)->shared_from_this()));
 
@@ -451,7 +445,7 @@ void sdl_window_info::destroy()
 	//osd_event_wait(window->rendered_event, osd_ticks_per_second()*10);
 
 	// remove us from the list
-	sdl_window_list.remove(std::static_pointer_cast<sdl_window_info>(shared_from_this()));
+	osd_common_t::s_window_list.remove(std::static_pointer_cast<sdl_window_info>(shared_from_this()));
 
 	// free the textures etc
 	complete_destroy();
@@ -773,7 +767,7 @@ int sdl_window_info::complete_create()
 	// set main window
 	if (m_index > 0)
 	{
-		for (auto w : sdl_window_list)
+		for (auto w : osd_common_t::s_window_list)
 		{
 			if (w->m_index == 0)
 			{

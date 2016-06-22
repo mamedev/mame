@@ -856,7 +856,7 @@ WRITE16_MEMBER(raiden2_state::sprite_prot_src_w)
 		dst1 += 8;
 	}
 	//printf("[%08x] %08x %08x %04x %04x\n",src,dx,dy,dst1,dst2);
-	//  debugger_break(machine());
+	//machine().debug_break();
 }
 
 READ16_MEMBER(raiden2_state::sprite_prot_dst1_r)
@@ -1395,7 +1395,7 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(raiden2_state, tilemap_enable_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(raiden2_state, tile_scroll_w))
 
-	MCFG_RAIDEN2COP_ADD("raiden2cop")
+	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(raiden2_state, m_videoram_private_w))
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
@@ -1455,7 +1455,7 @@ static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(raiden2_state, tilemap_enable_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(raiden2_state, tile_scroll_w))
 
-	MCFG_RAIDEN2COP_ADD("raiden2cop")
+	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(raiden2_state, m_videoram_private_w))
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)

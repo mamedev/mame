@@ -10,6 +10,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
+#include "machine/gen_latch.h"
 #include "machine/upd1990a.h"
 #include "machine/ng_memcard.h"
 #include "video/neogeo_spr.h"
@@ -38,6 +39,8 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_memcard(*this, "memcard"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_sprites(*this, "sprites"),
 		m_region_fixed(*this, "fixed"),
@@ -125,6 +128,8 @@ protected:
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	optional_device<ng_memcard_device> m_memcard;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
 
 	// memory
 	optional_memory_region m_region_maincpu;

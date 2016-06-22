@@ -186,7 +186,6 @@ ROMs (All ROMs are 27C010 EPROM. - means not populated)
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2151intf.h"
-#include "sound/okim6295.h"
 #include "includes/ddragon3.h"
 
 
@@ -203,7 +202,7 @@ WRITE8_MEMBER(ddragon3_state::oki_bankswitch_w)
 
 WRITE16_MEMBER(wwfwfest_state::wwfwfest_soundwrite)
 {
-	soundlatch_byte_w(space,1,data & 0xff);
+	m_soundlatch->write(space,1,data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
@@ -218,8 +217,8 @@ WRITE16_MEMBER(ddragon3_state::ddragon3_io_w)
 			m_vreg = m_io_reg[0];
 			break;
 
-		case 1: /* soundlatch_byte_w */
-			soundlatch_byte_w(space, 1, m_io_reg[1] & 0xff);
+		case 1: /* soundlatch write */
+			m_soundlatch->write(space, 1, m_io_reg[1] & 0xff);
 			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 		break;
 
@@ -379,7 +378,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ddragon3_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
 	AM_RANGE(0xd800, 0xd800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(oki_bankswitch_w)
 ADDRESS_MAP_END
 
@@ -389,7 +388,7 @@ static ADDRESS_MAP_START( ctribe_sound_map, AS_PROGRAM, 8, ddragon3_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ym2151", ym2151_device, status_r, write)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 /*************************************
@@ -852,6 +851,8 @@ static MACHINE_CONFIG_START( ddragon3, ddragon3_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_YM2151_ADD("ym2151", XTAL_3_579545MHz)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
@@ -919,6 +920,8 @@ static MACHINE_CONFIG_START( wwfwfest, wwfwfest_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ym2151", XTAL_3_579545MHz)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

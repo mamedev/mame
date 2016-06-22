@@ -23,7 +23,10 @@
 
 #define NL_USE_SSE 0
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 template <unsigned m_N, unsigned storage_N>
 class matrix_solver_GCR_t: public matrix_solver_t
@@ -59,13 +62,13 @@ private:
 	{
 		plib::postringstream t;
 		csc_private(t);
-		plib::hash_functor<pstring> h(t.str());
+		std::hash<pstring> h;
 
-		return plib::pfmt("nl_gcr_{1:x}_{2}")(h())(mat.nz_num);
+		return plib::pfmt("nl_gcr_{1:x}_{2}")(h( t.str() ))(mat.nz_num);
 	}
 
 	unsigned m_dim;
-	plib::pvector_t<int> m_term_cr[storage_N];
+	std::vector<int> m_term_cr[storage_N];
 	mat_cr_t<storage_N> mat;
 	nl_double m_A[storage_N * storage_N];
 
@@ -240,8 +243,8 @@ int matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_ra
 {
 	const unsigned iN = this->N();
 
-	ATTR_ALIGN nl_double RHS[storage_N];
-	ATTR_ALIGN nl_double new_V[storage_N];
+	nl_double RHS[storage_N];
+	nl_double new_V[storage_N];
 
 	for (unsigned i=0, e=mat.nz_num; i<e; i++)
 		m_A[i] = 0.0;
@@ -395,6 +398,7 @@ int matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_ra
 	}
 }
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_MS_GCR_H_ */

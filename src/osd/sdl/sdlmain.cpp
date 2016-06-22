@@ -8,6 +8,8 @@
 //
 //============================================================
 
+// only for oslog callback
+#include <functional>
 
 #ifdef SDLMAME_UNIX
 #if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_EMSCRIPTEN)) && (!defined(SDLMAME_ANDROID))
@@ -224,19 +226,6 @@ int main(int argc, char *argv[])
 	exit(res);
 }
 
-
-
-//============================================================
-//  output_oslog
-//============================================================
-
-static void output_oslog(const running_machine &machine, const char *buffer)
-{
-	fputs(buffer, stderr);
-}
-
-
-
 //============================================================
 //  constructor
 //============================================================
@@ -383,15 +372,27 @@ static void osd_sdl_info(void)
 void sdl_osd_interface::video_register()
 {
 	video_options_add("soft", nullptr);
+#if USE_OPENGL
 	video_options_add("opengl", nullptr);
+#endif
 	video_options_add("bgfx", nullptr);
 	//video_options_add("auto", nullptr); // making d3d video default one
 }
 
+
+//============================================================
+//  output_oslog
+//============================================================
+
+void sdl_osd_interface::output_oslog(const char *buffer)
+{
+	fputs(buffer, stderr);
+}
+
+
 //============================================================
 //  init
 //============================================================
-
 
 void sdl_osd_interface::init(running_machine &machine)
 {
@@ -489,7 +490,10 @@ void sdl_osd_interface::init(running_machine &machine)
 	osd_common_t::init_subsystems();
 
 	if (options().oslog())
-		machine.add_logerror_callback(output_oslog);
+	{
+		using namespace std::placeholders;
+		machine.add_logerror_callback(std::bind(&sdl_osd_interface::output_oslog, this, _1));
+	}
 
 
 

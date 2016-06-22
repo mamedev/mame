@@ -9,62 +9,12 @@
     http://www.best-electronics-ca.com/portfoli.htm
     http://www.atari-portfolio.co.uk/pfnews/pf9.txt
 
-
-    Undumped Atari cartridges:
-
-    Utility-Card                HPC-701
-    Finance-Card                HPC-702
-    Science-Card                HPC-703
-    File Manager / Tutorial     HPC-704
-    PowerBASIC                  HPC-705
-    Instant Spell               HPC-709
-    Hyperlist                   HPC-713
-    Bridge Baron                HPC-724
-    Wine Companion              HPC-725
-    Diet / Cholesterol Counter  HPC-726
-    Astrologer                  HPC-728
-    Stock Tracker               HPC-729
-    Chess                       HPC-750
-
-
-    Undumped 3rd party cartridges:
-
-    Adcalc                      AAC-1000
-    Alpha Paging Interface      SAMpage
-    Business Contacts and Information Manager       BCIM
-    Checkwriter
-    Colossal Cave Adventure
-    Drug Interactions
-    Dynapulse                                       200M-A
-    Form Letters
-    FORTH programming system                        UTIL
-    FX-3 DUAT Flight Software
-    FX-4 Flight Planner
-    Graphics Screens
-    Marine Device Interface                         CM380 UMPIRE
-    Message Mover (Mac)                             MSG-PKG6
-    Message Mover (PC)                              MSG-PKG5
-    Micro Hedge
-    Micro-Roentgen Radiation Monitor                RM-60
-    Patient Management
-    PBase
-    PDD2 Utilities
-    Pharmaceuticals
-    Physician's Reference I
-    PIPELINE Fuel Management
-    REACT
-    Stocks Games
-    Terminal+
-    Timekeeper
-    TIMEPAC-5
-
 */
 
 /*
 
     TODO:
 
-    - expansion port slot interface
     - clock is running too fast
     - create chargen ROM from tech manual
     - memory error interrupt vector
@@ -73,37 +23,126 @@
     - system tick frequency selection (1 or 128 Hz)
     - speaker
     - credit card memory (A:/B:)
-    - software list
 
 */
 
-#include "includes/portfoli.h"
-#include "bus/rs232/rs232.h"
+#include "emu.h"
 #include "rendlay.h"
 #include "softlist.h"
+#include "cpu/i86/i86.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+#include "bus/pofo/exp.h"
+#include "machine/nvram.h"
+#include "machine/ram.h"
+#include "sound/speaker.h"
+#include "video/hd61830.h"
+
+#define M80C88A_TAG     "u1"
+#define HD61830_TAG     "hd61830"
+#define TIMER_TICK_TAG  "tick"
+#define SCREEN_TAG      "screen"
+
+class portfolio_state : public driver_device
+{
+public:
+	portfolio_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, M80C88A_TAG),
+		m_lcdc(*this, HD61830_TAG),
+		m_speaker(*this, "speaker"),
+		m_exp(*this, PORTFOLIO_EXPANSION_SLOT_TAG),
+		m_timer_tick(*this, TIMER_TICK_TAG),
+		m_rom(*this, M80C88A_TAG),
+		m_char_rom(*this, HD61830_TAG),
+		m_y0(*this, "Y0"),
+		m_y1(*this, "Y1"),
+		m_y2(*this, "Y2"),
+		m_y3(*this, "Y3"),
+		m_y4(*this, "Y4"),
+		m_y5(*this, "Y5"),
+		m_y6(*this, "Y6"),
+		m_y7(*this, "Y7"),
+		m_battery(*this, "BATTERY"),
+		m_contrast(*this, "contrast"),
+		m_ram(*this, RAM_TAG)
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<hd61830_device> m_lcdc;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<portfolio_expansion_slot_t> m_exp;
+	required_device<timer_device> m_timer_tick;
+	required_region_ptr<UINT8> m_rom;
+	required_region_ptr<UINT8> m_char_rom;
+	required_ioport m_y0;
+	required_ioport m_y1;
+	required_ioport m_y2;
+	required_ioport m_y3;
+	required_ioport m_y4;
+	required_ioport m_y5;
+	required_ioport m_y6;
+	required_ioport m_y7;
+	required_ioport m_battery;
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void check_interrupt();
+	void trigger_interrupt(int level);
+	void scan_keyboard();
+
+	enum
+	{
+		INT_TICK = 0,
+		INT_KEYBOARD,
+		INT_ERROR,
+		INT_EXTERNAL
+	};
+
+	DECLARE_READ8_MEMBER( irq_status_r );
+	DECLARE_READ8_MEMBER( keyboard_r );
+	DECLARE_READ8_MEMBER( battery_r );
+	DECLARE_READ8_MEMBER( counter_r );
+
+	DECLARE_WRITE8_MEMBER( irq_mask_w );
+	DECLARE_WRITE8_MEMBER( speaker_w );
+	DECLARE_WRITE8_MEMBER( power_w );
+	DECLARE_WRITE8_MEMBER( unknown_w );
+	DECLARE_WRITE8_MEMBER( counter_w );
+
+	DECLARE_WRITE_LINE_MEMBER( iint_w );
+	DECLARE_WRITE_LINE_MEMBER( eint_w );
+
+	/* interrupt state */
+	UINT8 m_ip;                         /* interrupt pending */
+	UINT8 m_ie;                         /* interrupt enable */
+
+	/* counter state */
+	UINT16 m_counter;
+
+	/* keyboard state */
+	UINT8 m_keylatch;
+
+	/* video state */
+	required_shared_ptr<UINT8> m_contrast;
+
+	/* peripheral state */
+	DECLARE_PALETTE_INIT(portfolio);
+	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
+	TIMER_DEVICE_CALLBACK_MEMBER(system_tick);
+	TIMER_DEVICE_CALLBACK_MEMBER(counter_tick);
+	DECLARE_READ8_MEMBER(hd61830_rd_r);
+	IRQ_CALLBACK_MEMBER(portfolio_int_ack);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( portfolio_cart );
+	required_device<ram_device> m_ram;
+};
+
 
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-
-enum
-{
-	INT_TICK = 0,
-	INT_KEYBOARD,
-	INT_ERROR,
-	INT_EXTERNAL
-};
-
-enum
-{
-	PID_COMMCARD = 0x00,
-	PID_SERIAL,
-	PID_PARALLEL,
-	PID_PRINTER,
-	PID_MODEM,
-	PID_NONE = 0xff
-};
 
 static const UINT8 INTERRUPT_VECTOR[] = { 0x08, 0x09, 0x00 };
 
@@ -162,23 +201,12 @@ WRITE8_MEMBER( portfolio_state::irq_mask_w )
 
 
 //-------------------------------------------------
-//  sivr_w - serial interrupt vector register
-//-------------------------------------------------
-
-WRITE8_MEMBER( portfolio_state::sivr_w )
-{
-	m_sivr = data;
-	//logerror("SIVR %02x\n", data);
-}
-
-
-//-------------------------------------------------
 //  IRQ_CALLBACK_MEMBER( portfolio_int_ack )
 //-------------------------------------------------
 
 IRQ_CALLBACK_MEMBER(portfolio_state::portfolio_int_ack)
 {
-	UINT8 vector = m_sivr;
+	UINT8 vector = 0;
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -188,7 +216,7 @@ IRQ_CALLBACK_MEMBER(portfolio_state::portfolio_int_ack)
 			m_ip &= ~(1 << i);
 
 			if (i == 3)
-				vector = m_sivr;
+				vector = m_exp->eack_r();
 			else
 				vector = INTERRUPT_VECTOR[i];
 
@@ -363,7 +391,7 @@ READ8_MEMBER( portfolio_state::battery_r )
 	UINT8 data = 0;
 
 	/* peripheral detect */
-	data |= (m_pid != PID_NONE) << 5;
+	data |= m_exp->pdet_r() << 5;
 
 	/* battery status */
 	data |= BIT(m_battery->read(), 0) << 6;
@@ -451,60 +479,6 @@ WRITE8_MEMBER( portfolio_state::counter_w )
 
 
 //**************************************************************************
-//  EXPANSION
-//**************************************************************************
-
-//-------------------------------------------------
-//  ncc1_w - credit card memory select
-//-------------------------------------------------
-
-WRITE8_MEMBER( portfolio_state::ncc1_w )
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	if (BIT(data, 0))
-	{
-		// system ROM
-		program.install_rom(0xc0000, 0xdffff, m_rom);
-	}
-	else
-	{
-		// credit card memory
-		program.unmap_readwrite(0xc0000, 0xdffff);
-	}
-
-	//logerror("NCC %02x\n", data);
-}
-
-
-//-------------------------------------------------
-//  pid_r - peripheral identification
-//-------------------------------------------------
-
-READ8_MEMBER( portfolio_state::pid_r )
-{
-	/*
-
-	    PID     peripheral
-
-	    00      communication card
-	    01      serial port
-	    02      parallel port
-	    03      printer peripheral
-	    04      modem
-	    05-3f   reserved
-	    40-7f   user peripherals
-	    80      file-transfer interface
-	    81-ff   reserved
-
-	*/
-
-	return m_pid;
-}
-
-
-
-//**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
 
@@ -535,10 +509,6 @@ static ADDRESS_MAP_START( portfolio_io, AS_IO, 8, portfolio_state )
 	AM_RANGE(0x8050, 0x8050) AM_READWRITE(irq_status_r, irq_mask_w)
 	AM_RANGE(0x8051, 0x8051) AM_READWRITE(battery_r, unknown_w)
 	AM_RANGE(0x8060, 0x8060) AM_RAM AM_SHARE("contrast")
-//  AM_RANGE(0x8070, 0x8077) AM_DEVREADWRITE(M82C50A_TAG, ins8250_device, ins8250_r, ins8250_w) // Serial Interface
-//  AM_RANGE(0x8078, 0x807b) AM_DEVREADWRITE(M82C55A_TAG, i8255_device, read, write) // Parallel Interface
-	AM_RANGE(0x807c, 0x807c) AM_WRITE(ncc1_w)
-	AM_RANGE(0x807f, 0x807f) AM_READWRITE(pid_r, sivr_w)
 ADDRESS_MAP_END
 
 
@@ -636,12 +606,6 @@ static INPUT_PORTS_START( portfolio )
 	PORT_CONFNAME( 0x01, 0x01, "Battery Status" )
 	PORT_CONFSETTING( 0x01, DEF_STR( Normal ) )
 	PORT_CONFSETTING( 0x00, "Low Battery" )
-
-	PORT_START("PERIPHERAL")
-	PORT_CONFNAME( 0xff, PID_NONE, "Peripheral" )
-	PORT_CONFSETTING( PID_NONE, DEF_STR( None ) )
-	PORT_CONFSETTING( PID_PARALLEL, "Intelligent Parallel Interface (HPC-101)" )
-	PORT_CONFSETTING( PID_SERIAL, "Serial Interface (HPC-102)" )
 INPUT_PORTS_END
 
 
@@ -700,11 +664,11 @@ GFXDECODE_END
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-//-------------------------------------------------
-//  ins8250_interface i8250_intf
-//-------------------------------------------------
+WRITE_LINE_MEMBER( portfolio_state::iint_w )
+{
+}
 
-WRITE_LINE_MEMBER( portfolio_state::i8250_intrpt_w )
+WRITE_LINE_MEMBER( portfolio_state::eint_w )
 {
 	if (state)
 		trigger_interrupt(INT_EXTERNAL);
@@ -751,17 +715,13 @@ void portfolio_state::machine_start()
 
 	/* set initial values */
 	m_keylatch = 0xff;
-	m_sivr = 0x2a;
-	m_pid = 0xff;
 
 	/* register for state saving */
 	save_item(NAME(m_ip));
 	save_item(NAME(m_ie));
-	save_item(NAME(m_sivr));
 	save_item(NAME(m_counter));
 	save_item(NAME(m_keylatch));
 	save_pointer(NAME(m_contrast.target()), m_contrast.bytes());
-	save_item(NAME(m_pid));
 }
 
 
@@ -771,24 +731,6 @@ void portfolio_state::machine_start()
 
 void portfolio_state::machine_reset()
 {
-	address_space &io = m_maincpu->space(AS_IO);
-
-	// peripherals
-	m_pid = ioport("PERIPHERAL")->read();
-
-	io.unmap_readwrite(0x8070, 0x807b);
-	io.unmap_readwrite(0x807d, 0x807e);
-
-	switch (m_pid)
-	{
-	case PID_SERIAL:
-		io.install_readwrite_handler(0x8070, 0x8077, READ8_DEVICE_DELEGATE(m_uart, ins8250_device, ins8250_r), WRITE8_DEVICE_DELEGATE(m_uart, ins8250_device, ins8250_w));
-		break;
-
-	case PID_PARALLEL:
-		io.install_readwrite_handler(0x8078, 0x807b, READ8_DEVICE_DELEGATE(m_ppi, i8255_device, read), WRITE8_DEVICE_DELEGATE(m_ppi, i8255_device, write));
-		break;
-	}
 }
 
 
@@ -832,42 +774,15 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	/* devices */
-	MCFG_DEVICE_ADD(M82C55A_TAG, I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_I8255_OUT_PORTB_CB(DEVWRITE8("cent_ctrl_out", output_latch_device, write))
-	MCFG_I8255_IN_PORTC_CB(DEVREAD8("cent_status_in", input_buffer_device, read))
+	// devices
+	MCFG_PORTFOLIO_EXPANSION_SLOT_ADD(PORTFOLIO_EXPANSION_SLOT_TAG, XTAL_4_9152MHz, portfolio_expansion_cards, nullptr)
+	MCFG_PORTFOLIO_EXPANSION_SLOT_IINT_CALLBACK(WRITELINE(portfolio_state, iint_w))
+	MCFG_PORTFOLIO_EXPANSION_SLOT_EINT_CALLBACK(WRITELINE(portfolio_state, eint_w))
+	MCFG_PORTFOLIO_EXPANSION_SLOT_NMIO_CALLBACK(INPUTLINE(M80C88A_TAG, INPUT_LINE_NMI))
+	//MCFG_PORTFOLIO_EXPANSION_SLOT_WAKE_CALLBACK()
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit5))
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit4))
-	MCFG_CENTRONICS_FAULT_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit3))
-	MCFG_CENTRONICS_SELECT_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit1))
-	MCFG_CENTRONICS_PERROR_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit0))
-
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
-	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
-
-	MCFG_DEVICE_ADD("cent_ctrl_out", OUTPUT_LATCH, 0)
-	MCFG_OUTPUT_LATCH_BIT0_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_autofd))
-	MCFG_OUTPUT_LATCH_BIT2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_init))
-	MCFG_OUTPUT_LATCH_BIT3_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_select_in))
-
-	MCFG_DEVICE_ADD(M82C50A_TAG, INS8250, XTAL_1_8432MHz) // should be INS8250A
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(portfolio_state, i8250_intrpt_w))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("counter", portfolio_state, counter_tick, attotime::from_hz(XTAL_32_768kHz/16384))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_TICK_TAG, portfolio_state, system_tick, attotime::from_hz(XTAL_32_768kHz/32768))
-
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(M82C50A_TAG, ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(M82C50A_TAG, ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(M82C50A_TAG, ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(DEVWRITELINE(M82C50A_TAG, ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(M82C50A_TAG, ins8250_uart_device, cts_w))
 
 	/* fake keyboard */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", portfolio_state, keyboard_tick, attotime::from_usec(2500))
@@ -876,19 +791,8 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "portfolio_cart")
 	MCFG_GENERIC_LOAD(portfolio_state, portfolio_cart)
 
-	/* memory card */
-/*  MCFG_MEMCARD_ADD("memcard_a")
-    MCFG_MEMCARD_EXTENSION_LIST("bin")
-    MCFG_MEMCARD_LOAD(portfolio_memcard)
-    MCFG_MEMCARD_SIZE_OPTIONS("32K,64K,128K")
-
-    MCFG_MEMCARD_ADD("memcard_b")
-    MCFG_MEMCARD_EXTENSION_LIST("bin")
-    MCFG_MEMCARD_LOAD(portfolio_memcard)
-    MCFG_MEMCARD_SIZE_OPTIONS("32K,64K,128K")*/
-
 	/* software lists */
-//  MCFG_SOFTWARE_LIST_ADD("cart_list", "pofo")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "pofo")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

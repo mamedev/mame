@@ -17,7 +17,6 @@ public:
 	DECLARE_DRIVER_INIT(kyustrkr);
 	DECLARE_MACHINE_START(taitox);
 	DECLARE_MACHINE_START(superman);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
 	// superman c-chip
 	UINT16 m_current_bank;

@@ -65,7 +65,7 @@ out of the sprite list at that point.. (verify on real hw)
 
 Ma Cheon Ru
 
-The electrified maze + ball minigame appears unreponsive to controls, this
+The electrified maze + ball minigame appears unresponsive to controls, this
 is because it actually requires you to move the joysticks in a circular
 motion through all 8 directions at a very even speed, a task which is
 practically impossible to perform on keyboard, and not even that easy with
@@ -80,7 +80,6 @@ a joystick.  This is not an emulation bug.
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
 #include "sound/3812intf.h"
-#include "sound/okim6295.h"
 #include "cpu/mcs51/mcs51.h" // for semicom mcu
 #include "machine/watchdog.h"
 
@@ -179,7 +178,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(snowbros_state::snowbros3_irq)
 
 READ16_MEMBER(snowbros_state::snowbros_68000_sound_r)
 {
-	return soundlatch_byte_r(space,offset);
+	return m_soundlatch->read(space,offset);
 }
 
 
@@ -187,14 +186,14 @@ WRITE16_MEMBER(snowbros_state::snowbros_68000_sound_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_byte_w(space, offset, data & 0xff);
+		m_soundlatch->write(space, offset, data & 0xff);
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 WRITE16_MEMBER(snowbros_state::semicom_soundcmd_w)
 {
-	if (ACCESSING_BITS_0_7) soundlatch_byte_w(space,0,data & 0xff);
+	if (ACCESSING_BITS_0_7) m_soundlatch->write(space,0,data & 0xff);
 }
 
 READ16_MEMBER(snowbros_state::toto_read)
@@ -230,7 +229,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, snowbros_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(soundlatch_byte_r, soundlatch_byte_w) /* goes back to the main CPU, checked during boot */
+	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, write) /* goes back to the main CPU, checked during boot */
 ADDRESS_MAP_END
 
 
@@ -331,7 +330,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( honeydol_sound_io_map, AS_IO, 8, snowbros_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)                                // not connected?
-	AM_RANGE(0x04, 0x04) AM_READWRITE(soundlatch_byte_r, soundlatch_byte_w) /* goes back to the main CPU, checked during boot */
+	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, write) /* goes back to the main CPU, checked during boot */
 ADDRESS_MAP_END
 
 /* Twin Adventure */
@@ -340,7 +339,7 @@ WRITE16_MEMBER(snowbros_state::twinadv_68000_sound_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_byte_w(space, offset, data & 0xff);
+		m_soundlatch->write(space, offset, data & 0xff);
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -373,7 +372,7 @@ WRITE8_MEMBER(snowbros_state::twinadv_oki_bank_w)
 
 static ADDRESS_MAP_START( twinadv_sound_io_map, AS_IO, 8, snowbros_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(soundlatch_byte_r, soundlatch_byte_w) // back to 68k?
+	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, write) // back to 68k?
 	AM_RANGE(0x04, 0x04) AM_WRITE(twinadv_oki_bank_w) // oki bank?
 	AM_RANGE(0x06, 0x06) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
@@ -407,7 +406,7 @@ static ADDRESS_MAP_START( hyperpac_sound_map, AS_PROGRAM, 8, snowbros_state )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
 	AM_RANGE(0xf002, 0xf002) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xf008, 0xf008) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hyperpac_sound_io_map, AS_IO, 8, snowbros_state )
@@ -1684,6 +1683,8 @@ static MACHINE_CONFIG_START( snowbros, snowbros_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_12MHz/4) /* 3 MHz - confirmed */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1774,7 +1775,7 @@ static MACHINE_CONFIG_START( honeydol, snowbros_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	/* sound hardware */
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_12MHz/4) /* 3Mhz */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
@@ -1813,6 +1814,8 @@ static MACHINE_CONFIG_START( twinadv, snowbros_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* sound hardware */
 	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) /* freq? */

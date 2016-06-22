@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
+
+#include "machine/gen_latch.h"
+
 class tsamurai_state : public driver_device
 {
 public:
@@ -11,6 +14,7 @@ public:
 		m_audio3(*this, "audio3"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_bg_videoram(*this, "bg_videoram"),
@@ -22,6 +26,7 @@ public:
 	optional_device<cpu_device> m_audio3;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch; // vsgongf only 
 
 	required_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_colorram;

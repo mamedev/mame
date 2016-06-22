@@ -339,7 +339,7 @@ WRITE32_MEMBER(ms32_state::pip_w)
 
 static ADDRESS_MAP_START( ms32_map, AS_PROGRAM, 32, ms32_state )
 	/* RAM areas verified by testing on real hw - usually accessed at the 0xfc000000 + mirror */
-	AM_RANGE(0xc0000000, 0xc0007fff) AM_READWRITE8(ms32_nvram_r8,   ms32_nvram_w8,   0x000000ff) AM_MIRROR(0x3c1fe000)  // nvram is 8-bit wide, 0x2000 in size */
+	AM_RANGE(0xc0000000, 0xc0007fff) AM_READWRITE8(ms32_nvram_r8,   ms32_nvram_w8,   0x000000ff) AM_MIRROR(0x3c1f8000)  // nvram is 8-bit wide, 0x2000 in size */
 /*  AM_RANGE(0xc0008000, 0xc01fffff) // mirrors of nvramram, handled above */
 	AM_RANGE(0xc1180000, 0xc1187fff) AM_READWRITE8(ms32_priram_r8,  ms32_priram_w8,  0x000000ff) AM_MIRROR(0x3c038000) AM_SHARE("priram") /* priram is 8-bit wide, 0x2000 in size */
 /*  AM_RANGE(0xc1188000, 0xc11bffff) // mirrors of priram, handled above */

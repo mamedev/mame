@@ -5,7 +5,9 @@
     tecmosys protection simulation
 
 ***************************************************************************/
+
 #include "machine/eepromser.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 
 class tecmosys_state : public driver_device
@@ -20,6 +22,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
 		m_spriteram(*this, "spriteram"),
 		m_tilemap_paletteram16(*this, "tmap_palette"),
 		m_bg2tilemap_ram(*this, "bg2tilemap_ram"),
@@ -42,6 +46,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_tilemap_paletteram16;
@@ -91,7 +97,6 @@ public:
 	DECLARE_WRITE16_MEMBER(bg2_tilemap_lineram_w);
 	DECLARE_READ16_MEMBER(eeprom_r);
 	DECLARE_WRITE16_MEMBER(eeprom_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 
 	DECLARE_DRIVER_INIT(tkdensha);
 	DECLARE_DRIVER_INIT(deroon);

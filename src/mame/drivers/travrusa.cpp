@@ -610,7 +610,7 @@ READ8_MEMBER(travrusa_state::shtridrb_port11_r)
 
 DRIVER_INIT_MEMBER(travrusa_state, shtridrb)
 {
-	m_maincpu->space(AS_IO).install_read_handler(0x11, 0x11, 0x0000, 0xff00, read8_delegate(FUNC(travrusa_state::shtridrb_port11_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x11, 0x11, 0, 0xff00, 0, read8_delegate(FUNC(travrusa_state::shtridrb_port11_r),this));
 }
 
 

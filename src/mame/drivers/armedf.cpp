@@ -361,12 +361,12 @@ WRITE16_MEMBER(armedf_state::bootleg_io_w)
 WRITE16_MEMBER(armedf_state::sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
-		soundlatch_byte_w(space, 0, ((data & 0x7f) << 1) | 1);
+		m_soundlatch->write(space, 0, ((data & 0x7f) << 1) | 1);
 }
 
 READ8_MEMBER(armedf_state::soundlatch_clear_r)
 {
-	soundlatch_clear_byte_w(space, 0, 0);
+	m_soundlatch->clear_w(space, 0, 0);
 	return 0;
 }
 
@@ -750,7 +750,7 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, armedf_state )
 	AM_RANGE(0x2, 0x2) AM_DEVWRITE("dac1", dac_device, write_signed8)
 	AM_RANGE(0x3, 0x3) AM_DEVWRITE("dac2", dac_device, write_signed8)
 	AM_RANGE(0x4, 0x4) AM_READ(soundlatch_clear_r)
-	AM_RANGE(0x6, 0x6) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x6, 0x6) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -1205,6 +1205,8 @@ static MACHINE_CONFIG_START( terraf, armedf_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -1254,6 +1256,8 @@ static MACHINE_CONFIG_START( terrafjb, armedf_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -1307,6 +1311,8 @@ static MACHINE_CONFIG_START( kozure, armedf_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -1352,6 +1358,8 @@ static MACHINE_CONFIG_START( armedf, armedf_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -1401,6 +1409,8 @@ static MACHINE_CONFIG_START( cclimbr2, armedf_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -1449,6 +1459,8 @@ static MACHINE_CONFIG_START( legion, armedf_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -1495,6 +1507,8 @@ static MACHINE_CONFIG_START( legionjb, armedf_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -1552,6 +1566,8 @@ static MACHINE_CONFIG_START( bigfghtr, bigfghtr_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

@@ -1502,13 +1502,13 @@ WRITE32_MEMBER( powervr2_device::ta_yuv_tex_ctrl_w )
 /* TODO */
 READ32_MEMBER( powervr2_device::ta_yuv_tex_cnt_r )
 {
-	debugger_break(machine());
+	machine().debug_break();
 	return ta_yuv_tex_cnt;
 }
 
 WRITE32_MEMBER( powervr2_device::ta_yuv_tex_cnt_w )
 {
-	debugger_break(machine());
+	machine().debug_break();
 	COMBINE_DATA(&ta_yuv_tex_cnt);
 }
 

@@ -177,8 +177,15 @@ void isa8_mda_device::device_start()
 
 	set_isa_device();
 	m_videoram.resize(0x1000);
-	m_isa->install_device(0x3b0, 0x3bf, 0, 0, read8_delegate( FUNC(isa8_mda_device::io_read), this ), write8_delegate( FUNC(isa8_mda_device::io_write), this ) );
-	m_isa->install_bank(0xb0000, 0xb0fff, 0, 0x07000, "bank_mda", &m_videoram[0]);
+	m_isa->install_device(0x3b0, 0x3bf, read8_delegate( FUNC(isa8_mda_device::io_read), this ), write8_delegate( FUNC(isa8_mda_device::io_write), this ) );
+	m_isa->install_bank(0xb0000, 0xb0fff, "bank_mda", &m_videoram[0]);
+	m_isa->install_bank(0xb1000, 0xb1fff, "bank_mda", &m_videoram[0]);
+	m_isa->install_bank(0xb2000, 0xb2fff, "bank_mda", &m_videoram[0]);
+	m_isa->install_bank(0xb3000, 0xb3fff, "bank_mda", &m_videoram[0]);
+	m_isa->install_bank(0xb4000, 0xb4fff, "bank_mda", &m_videoram[0]);
+	m_isa->install_bank(0xb5000, 0xb5fff, "bank_mda", &m_videoram[0]);
+	m_isa->install_bank(0xb6000, 0xb6fff, "bank_mda", &m_videoram[0]);
+	m_isa->install_bank(0xb7000, 0xb7fff, "bank_mda", &m_videoram[0]);
 
 	/* Initialise the mda palette */
 	for(int i = 0; i < 4; i++)
@@ -596,8 +603,8 @@ void isa8_hercules_device::device_start()
 
 	m_videoram.resize(0x10000);
 	set_isa_device();
-	m_isa->install_device(0x3b0, 0x3bf, 0, 0, read8_delegate( FUNC(isa8_hercules_device::io_read), this ), write8_delegate( FUNC(isa8_hercules_device::io_write), this ) );
-	m_isa->install_bank(0xb0000, 0xbffff, 0, 0, "bank_hercules", &m_videoram[0]);
+	m_isa->install_device(0x3b0, 0x3bf, read8_delegate( FUNC(isa8_hercules_device::io_read), this ), write8_delegate( FUNC(isa8_hercules_device::io_write), this ) );
+	m_isa->install_bank(0xb0000, 0xbffff, "bank_hercules", &m_videoram[0]);
 
 	/* Initialise the mda palette */
 	for(int i = 0; i < (sizeof(mda_palette) / 3); i++)
@@ -800,7 +807,8 @@ void isa8_ec1840_0002_device::device_start()
 	isa8_mda_device::device_start();
 
 	m_soft_chr_gen = std::make_unique<UINT8[]>(0x2000);
-	m_isa->install_bank(0xdc000, 0xddfff, 0, 0x2000, "bank_chargen", m_soft_chr_gen.get());
+	m_isa->install_bank(0xdc000, 0xddfff, "bank_chargen", m_soft_chr_gen.get());
+	m_isa->install_bank(0xde000, 0xdffff, "bank_chargen", m_soft_chr_gen.get());
 }
 
 void isa8_ec1840_0002_device::device_reset()

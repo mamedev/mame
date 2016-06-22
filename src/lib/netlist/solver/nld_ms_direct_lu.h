@@ -15,7 +15,10 @@
 
 //#define A(r, c) m_A[_r][_c]
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 //#define nl_ext_double _float128 // slow, very slow
 //#define nl_ext_double long double // slightly slower
@@ -139,15 +142,15 @@ protected:
 	template <typename T1, typename T2>
 	inline nl_ext_double &A(const T1 r, const T2 c) { return m_A[r][c]; }
 
-	//ATTR_ALIGN nl_double m_A[storage_N][((storage_N + 7) / 8) * 8];
-	ATTR_ALIGN nl_double m_RHS[storage_N];
-	ATTR_ALIGN nl_double m_last_RHS[storage_N]; // right hand side - contains currents
-	ATTR_ALIGN nl_double m_last_V[storage_N];
+	//nl_double m_A[storage_N][((storage_N + 7) / 8) * 8];
+	nl_double m_RHS[storage_N];
+	nl_double m_last_RHS[storage_N]; // right hand side - contains currents
+	nl_double m_last_V[storage_N];
 
 	terms_t *m_rails_temp;
 
 private:
-	ATTR_ALIGN nl_ext_double m_A[storage_N][((storage_N + 7) / 8) * 8];
+	nl_ext_double m_A[storage_N][((storage_N + 7) / 8) * 8];
 
 	const unsigned m_dim;
 	nl_double m_lp_fact;
@@ -186,8 +189,8 @@ nl_double matrix_solver_direct_t<m_N, storage_N>::compute_next_timestep()
 
 			n->m_h_n_m_1 = hn;
 			n->m_DD_n_m_1 = DD_n;
-			if (nl_math::abs(DD2) > NL_FCONST(1e-30)) // avoid div-by-zero
-				new_net_timestep = nl_math::sqrt(m_params.m_lte / nl_math::abs(NL_FCONST(0.5)*DD2));
+			if (std::abs(DD2) > NL_FCONST(1e-30)) // avoid div-by-zero
+				new_net_timestep = std::sqrt(m_params.m_lte / std::abs(NL_FCONST(0.5)*DD2));
 			else
 				new_net_timestep = m_params.m_max_timestep;
 
@@ -203,7 +206,7 @@ nl_double matrix_solver_direct_t<m_N, storage_N>::compute_next_timestep()
 }
 
 template <unsigned m_N, unsigned storage_N>
-ATTR_COLD void matrix_solver_direct_t<m_N, storage_N>::add_term(int k, terminal_t *term)
+void matrix_solver_direct_t<m_N, storage_N>::add_term(int k, terminal_t *term)
 {
 	if (term->m_otherterm->net().isRailNet())
 	{
@@ -227,7 +230,7 @@ ATTR_COLD void matrix_solver_direct_t<m_N, storage_N>::add_term(int k, terminal_
 
 
 template <unsigned m_N, unsigned storage_N>
-ATTR_COLD void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
+void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 {
 	if (m_dim < nets.size())
 		netlist().error("Dimension {1} less than {2}", m_dim,nets.size());
@@ -331,10 +334,11 @@ ATTR_COLD void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list
 					t->m_nz.add(other[i]);
 			}
 		}
-		psort_list(t->m_nzrd);
+		std::sort(t->m_nzrd.begin(), t->m_nzrd.end());
 
 		t->m_nz.add(k);     // add diagonal
-		psort_list(t->m_nz);
+
+		std::sort(t->m_nz.begin(), t->m_nz.end());
 	}
 
 	if(0)
@@ -547,7 +551,7 @@ nl_double matrix_solver_direct_t<m_N, storage_N>::delta(
 	const unsigned iN = this->N();
 	nl_double cerr = 0;
 	for (unsigned i = 0; i < iN; i++)
-		cerr = std::fmax(cerr, nl_math::abs(V[i] - this->m_nets[i]->m_cur_Analog));
+		cerr = std::fmax(cerr, std::abs(V[i] - this->m_nets[i]->m_cur_Analog));
 	return cerr;
 }
 
@@ -625,6 +629,7 @@ matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(const eSolverType
 	}
 }
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist
 
 #endif /* NLD_MS_DIRECT_H_ */

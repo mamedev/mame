@@ -212,12 +212,12 @@ void nubus_device::install_writeonly_device(offs_t start, offs_t end, write32_de
 	}
 }
 
-void nubus_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data)
+void nubus_device::install_bank(offs_t start, offs_t end, const char *tag, UINT8 *data)
 {
-//  printf("install_bank: %s @ %x->%x mask %x mirror %x\n", tag, start, end, mask, mirror);
+//  printf("install_bank: %s @ %x->%x\n", tag, start, end);
 	m_maincpu = machine().device<cpu_device>(m_cputag);
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_readwrite_bank(start, end, mask, mirror, tag );
+	space.install_readwrite_bank(start, end, 0, tag );
 	machine().root_device().membank(siblingtag(tag).c_str())->set_base(data);
 }
 
@@ -312,7 +312,7 @@ void device_nubus_card_interface::set_nubus_device()
 	m_nubus->add_nubus_card(this);
 }
 
-void device_nubus_card_interface::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data)
+void device_nubus_card_interface::install_bank(offs_t start, offs_t end, const char *tag, UINT8 *data)
 {
 	char bank[256];
 
@@ -321,7 +321,7 @@ void device_nubus_card_interface::install_bank(offs_t start, offs_t end, offs_t 
 	strcat(bank, "_");
 	strcat(bank, m_nubus_slottag);
 
-	m_nubus->install_bank(start, end, mask, mirror, bank, data);
+	m_nubus->install_bank(start, end, bank, data);
 }
 
 void device_nubus_card_interface::install_declaration_rom(device_t *dev, const char *romregion, bool mirror_all_mb, bool reverse_rom)
@@ -467,10 +467,14 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 //  printf("Installing ROM at %x, length %x\n", addr, romlen);
 	if (mirror_all_mb)  // mirror the declaration ROM across all 16 megs of the slot space
 	{
-		m_nubus->install_bank(addr, addr+romlen-1, 0, 0x00f00000, bankname, &m_declaration_rom[0]);
+		UINT32 off = 0;
+		while(off < 0x1000000) {
+			m_nubus->install_bank(addr + off, addr+off+romlen-1, bankname, &m_declaration_rom[0]);
+			off += romlen;
+		}
 	}
 	else
 	{
-		m_nubus->install_bank(addr, addr+romlen-1, 0, 0, bankname, &m_declaration_rom[0]);
+		m_nubus->install_bank(addr, addr+romlen-1, bankname, &m_declaration_rom[0]);
 	}
 }

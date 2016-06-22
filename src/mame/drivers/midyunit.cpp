@@ -116,8 +116,6 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/tms34010/tms34010.h"
-#include "sound/okim6295.h"
 #include "includes/midyunit.h"
 
 
@@ -182,7 +180,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, midyunit_state )
 	AM_RANGE(0x01000000, 0x010fffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x01400000, 0x0140ffff) AM_READWRITE(midyunit_cmos_r, midyunit_cmos_w)
 	AM_RANGE(0x01800000, 0x0181ffff) AM_RAM_WRITE(midyunit_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x01a80000, 0x01a8009f) AM_MIRROR(0x00080000) AM_READWRITE(midyunit_dma_r, midyunit_dma_w)
+	AM_RANGE(0x01a00000, 0x01a0009f) AM_MIRROR(0x00080000) AM_READWRITE(midyunit_dma_r, midyunit_dma_w)
 	AM_RANGE(0x01c00000, 0x01c0005f) AM_READ(midyunit_input_r)
 	AM_RANGE(0x01c00060, 0x01c0007f) AM_READWRITE(midyunit_protection_r, midyunit_cmos_enable_w)
 	AM_RANGE(0x01e00000, 0x01e0001f) AM_WRITE(midyunit_sound_w)
@@ -198,7 +196,7 @@ static ADDRESS_MAP_START( yawdim_sound_map, AS_PROGRAM, 8, midyunit_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x97ff) AM_WRITE(yawdim_oki_bank_w)
 	AM_RANGE(0x9800, 0x9fff) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa7ff) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa7ff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -1229,6 +1227,9 @@ static MACHINE_CONFIG_DERIVED( mkyawdim, yunit_core )
 	MCFG_VIDEO_START_OVERRIDE(midyunit_state,mkyawdim)
 
 	/* sound hardware */
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

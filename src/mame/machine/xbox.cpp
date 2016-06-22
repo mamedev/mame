@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Samuele Zannoli
 
+#include <functional>
+
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "machine/lpci.h"
@@ -9,6 +11,7 @@
 #include "machine/idectrl.h"
 #include "video/poly.h"
 #include "bitmap.h"
+#include "debugger.h"
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
 #include "debug/debugcpu.h"
@@ -20,109 +23,113 @@
 //#define LOG_OHCI
 #define USB_HACK_ENABLED
 
-static void dump_string_command(running_machine &machine, int ref, int params, const char **param)
+void xbox_base_state::dump_string_command(int ref, int params, const char **param)
 {
-	xbox_base_state *state = machine.driver_data<xbox_base_state>();
-	address_space &space = state->m_maincpu->space();
-	UINT64  addr;
-	offs_t address;
-	UINT32 length, maximumlength;
-	offs_t buffer;
+	address_space &space = m_maincpu->space();
 
 	if (params < 1)
 		return;
-	if (!debug_command_parameter_number(machine, param[0], &addr))
+
+	UINT64 addr;
+	if (!machine().debugger().commands().validate_number_parameter(param[0], &addr))
 		return;
-	address = (offs_t)addr;
-	if (!debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &address))
+
+	offs_t address = (offs_t)addr;
+	if (!machine().debugger().cpu().translate(space, TRANSLATE_READ_DEBUG, &address))
 	{
-		debug_console_printf(machine, "Address is unmapped.\n");
+		machine().debugger().console().printf("Address is unmapped.\n");
 		return;
 	}
-	length = space.read_word_unaligned(address);
-	maximumlength = space.read_word_unaligned(address + 2);
-	buffer = space.read_dword_unaligned(address + 4);
-	debug_console_printf(machine, "Length %d word\n", length);
-	debug_console_printf(machine, "MaximumLength %d word\n", maximumlength);
-	debug_console_printf(machine, "Buffer %08X byte* ", buffer);
-	if (!debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &buffer))
+
+	UINT32 length = space.read_word_unaligned(address);
+	UINT32 maximumlength = space.read_word_unaligned(address + 2);
+	offs_t buffer = space.read_dword_unaligned(address + 4);
+	machine().debugger().console().printf("Length %d word\n", length);
+	machine().debugger().console().printf("MaximumLength %d word\n", maximumlength);
+	machine().debugger().console().printf("Buffer %08X byte* ", buffer);
+	if (!machine().debugger().cpu().translate(space, TRANSLATE_READ_DEBUG, &buffer))
 	{
-		debug_console_printf(machine, "\nBuffer is unmapped.\n");
+		machine().debugger().console().printf("\nBuffer is unmapped.\n");
 		return;
 	}
+
 	if (length > 256)
 		length = 256;
+
 	for (int a = 0; a < length; a++)
 	{
 		UINT8 c = space.read_byte(buffer + a);
-		debug_console_printf(machine, "%c", c);
+		machine().debugger().console().printf("%c", c);
 	}
-	debug_console_printf(machine, "\n");
+	machine().debugger().console().printf("\n");
 }
 
-static void dump_process_command(running_machine &machine, int ref, int params, const char **param)
+void xbox_base_state::dump_process_command(int ref, int params, const char **param)
 {
-	xbox_base_state *state = machine.driver_data<xbox_base_state>();
-	address_space &space = state->m_maincpu->space();
+	address_space &space = m_maincpu->space();
+
+	if (params < 1)
+		return;
+
 	UINT64 addr;
-	offs_t address;
+	if (!machine().debugger().commands().validate_number_parameter(param[0], &addr))
+		return;
 
-	if (params < 1)
-		return;
-	if (!debug_command_parameter_number(machine, param[0], &addr))
-		return;
-	address = (offs_t)addr;
-	if (!debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &address))
+	offs_t address = (offs_t)addr;
+	if (!machine().debugger().cpu().translate(space, TRANSLATE_READ_DEBUG, &address))
 	{
-		debug_console_printf(machine, "Address is unmapped.\n");
+		machine().debugger().console().printf("Address is unmapped.\n");
 		return;
 	}
-	debug_console_printf(machine, "ReadyListHead {%08X,%08X} _LIST_ENTRY\n", space.read_dword_unaligned(address), space.read_dword_unaligned(address + 4));
-	debug_console_printf(machine, "ThreadListHead {%08X,%08X} _LIST_ENTRY\n", space.read_dword_unaligned(address + 8), space.read_dword_unaligned(address + 12));
-	debug_console_printf(machine, "StackCount %d dword\n", space.read_dword_unaligned(address + 16));
-	debug_console_printf(machine, "ThreadQuantum %d dword\n", space.read_dword_unaligned(address + 20));
-	debug_console_printf(machine, "BasePriority %d byte\n", space.read_byte(address + 24));
-	debug_console_printf(machine, "DisableBoost %d byte\n", space.read_byte(address + 25));
-	debug_console_printf(machine, "DisableQuantum %d byte\n", space.read_byte(address + 26));
-	debug_console_printf(machine, "_padding %d byte\n", space.read_byte(address + 27));
+	machine().debugger().console().printf("ReadyListHead {%08X,%08X} _LIST_ENTRY\n", space.read_dword_unaligned(address), space.read_dword_unaligned(address + 4));
+	machine().debugger().console().printf("ThreadListHead {%08X,%08X} _LIST_ENTRY\n", space.read_dword_unaligned(address + 8), space.read_dword_unaligned(address + 12));
+	machine().debugger().console().printf("StackCount %d dword\n", space.read_dword_unaligned(address + 16));
+	machine().debugger().console().printf("ThreadQuantum %d dword\n", space.read_dword_unaligned(address + 20));
+	machine().debugger().console().printf("BasePriority %d byte\n", space.read_byte(address + 24));
+	machine().debugger().console().printf("DisableBoost %d byte\n", space.read_byte(address + 25));
+	machine().debugger().console().printf("DisableQuantum %d byte\n", space.read_byte(address + 26));
+	machine().debugger().console().printf("_padding %d byte\n", space.read_byte(address + 27));
 }
 
-static void dump_list_command(running_machine &machine, int ref, int params, const char **param)
+void xbox_base_state::dump_list_command(int ref, int params, const char **param)
 {
-	xbox_base_state *state = machine.driver_data<xbox_base_state>();
-	address_space &space = state->m_maincpu->space();
-	UINT64 addr, offs, start, old;
-	offs_t address, offset;
+	address_space &space = m_maincpu->space();
 
 	if (params < 1)
 		return;
-	if (!debug_command_parameter_number(machine, param[0], &addr))
+
+	UINT64 addr;
+	if (!machine().debugger().commands().validate_number_parameter(param[0], &addr))
 		return;
-	offs = 0;
-	offset = 0;
+
+	UINT64 offs = 0;
+	offs_t offset = 0;
 	if (params >= 2)
 	{
-		if (!debug_command_parameter_number(machine, param[1], &offs))
+		if (!machine().debugger().commands().validate_number_parameter(param[1], &offs))
 			return;
 		offset = (offs_t)offs;
 	}
-	start = addr;
-	address = (offs_t)addr;
-	if (!debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &address))
+
+	UINT64 start = addr;
+	offs_t address = (offs_t)addr;
+	if (!machine().debugger().cpu().translate(space, TRANSLATE_READ_DEBUG, &address))
 	{
-		debug_console_printf(machine, "Address is unmapped.\n");
+		machine().debugger().console().printf("Address is unmapped.\n");
 		return;
 	}
 	if (params >= 2)
-		debug_console_printf(machine, "Entry    Object\n");
+		machine().debugger().console().printf("Entry    Object\n");
 	else
-		debug_console_printf(machine, "Entry\n");
+		machine().debugger().console().printf("Entry\n");
+
+	UINT64 old;
 	for (int num = 0; num < 32; num++)
 	{
 		if (params >= 2)
-			debug_console_printf(machine, "%08X %08X\n", (UINT32)addr, (offs_t)addr - offset);
+			machine().debugger().console().printf("%08X %08X\n", (UINT32)addr, (offs_t)addr - offset);
 		else
-			debug_console_printf(machine, "%08X\n", (UINT32)addr);
+			machine().debugger().console().printf("%08X\n", (UINT32)addr);
 		old = addr;
 		addr = space.read_dword_unaligned(address);
 		if (addr == start)
@@ -130,159 +137,151 @@ static void dump_list_command(running_machine &machine, int ref, int params, con
 		if (addr == old)
 			break;
 		address = (offs_t)addr;
-		if (!debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &address))
+		if (!machine().debugger().cpu().translate(space, TRANSLATE_READ_DEBUG, &address))
 			break;
 	}
 }
 
-static void dump_dpc_command(running_machine &machine, int ref, int params, const char **param)
+void xbox_base_state::dump_dpc_command(int ref, int params, const char **param)
 {
-	xbox_base_state *state = machine.driver_data<xbox_base_state>();
-	address_space &space = state->m_maincpu->space();
-	UINT64 addr;
-	offs_t address;
+	address_space &space = m_maincpu->space();
 
 	if (params < 1)
 		return;
-	if (!debug_command_parameter_number(machine, param[0], &addr))
+
+	UINT64 addr;
+	if (!machine().debugger().commands().validate_number_parameter(param[0], &addr))
 		return;
-	address = (offs_t)addr;
-	if (!debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &address))
+
+	offs_t address = (offs_t)addr;
+	if (!machine().debugger().cpu().translate(space, TRANSLATE_READ_DEBUG, &address))
 	{
-		debug_console_printf(machine, "Address is unmapped.\n");
+		machine().debugger().console().printf("Address is unmapped.\n");
 		return;
 	}
-	debug_console_printf(machine, "Type %d word\n", space.read_word_unaligned(address));
-	debug_console_printf(machine, "Inserted %d byte\n", space.read_byte(address + 2));
-	debug_console_printf(machine, "Padding %d byte\n", space.read_byte(address + 3));
-	debug_console_printf(machine, "DpcListEntry {%08X,%08X} _LIST_ENTRY\n", space.read_dword_unaligned(address + 4), space.read_dword_unaligned(address + 8));
-	debug_console_printf(machine, "DeferredRoutine %08X dword\n", space.read_dword_unaligned(address + 12));
-	debug_console_printf(machine, "DeferredContext %08X dword\n", space.read_dword_unaligned(address + 16));
-	debug_console_printf(machine, "SystemArgument1 %08X dword\n", space.read_dword_unaligned(address + 20));
-	debug_console_printf(machine, "SystemArgument2 %08X dword\n", space.read_dword_unaligned(address + 24));
+	machine().debugger().console().printf("Type %d word\n", space.read_word_unaligned(address));
+	machine().debugger().console().printf("Inserted %d byte\n", space.read_byte(address + 2));
+	machine().debugger().console().printf("Padding %d byte\n", space.read_byte(address + 3));
+	machine().debugger().console().printf("DpcListEntry {%08X,%08X} _LIST_ENTRY\n", space.read_dword_unaligned(address + 4), space.read_dword_unaligned(address + 8));
+	machine().debugger().console().printf("DeferredRoutine %08X dword\n", space.read_dword_unaligned(address + 12));
+	machine().debugger().console().printf("DeferredContext %08X dword\n", space.read_dword_unaligned(address + 16));
+	machine().debugger().console().printf("SystemArgument1 %08X dword\n", space.read_dword_unaligned(address + 20));
+	machine().debugger().console().printf("SystemArgument2 %08X dword\n", space.read_dword_unaligned(address + 24));
 }
 
-static void dump_timer_command(running_machine &machine, int ref, int params, const char **param)
+void xbox_base_state::dump_timer_command(int ref, int params, const char **param)
 {
-	xbox_base_state *state = machine.driver_data<xbox_base_state>();
-	address_space &space = state->m_maincpu->space();
-	UINT64 addr;
-	offs_t address;
+	address_space &space = m_maincpu->space();
 
 	if (params < 1)
 		return;
-	if (!debug_command_parameter_number(machine, param[0], &addr))
+
+	UINT64 addr;
+	if (!machine().debugger().commands().validate_number_parameter(param[0], &addr))
 		return;
-	address = (offs_t)addr;
-	if (!debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &address))
+
+	offs_t address = (offs_t)addr;
+	if (!machine().debugger().cpu().translate(space, TRANSLATE_READ_DEBUG, &address))
 	{
-		debug_console_printf(machine, "Address is unmapped.\n");
+		machine().debugger().console().printf("Address is unmapped.\n");
 		return;
 	}
-	debug_console_printf(machine, "Header.Type %d byte\n", space.read_byte(address));
-	debug_console_printf(machine, "Header.Absolute %d byte\n", space.read_byte(address + 1));
-	debug_console_printf(machine, "Header.Size %d byte\n", space.read_byte(address + 2));
-	debug_console_printf(machine, "Header.Inserted %d byte\n", space.read_byte(address + 3));
-	debug_console_printf(machine, "Header.SignalState %08X dword\n", space.read_dword_unaligned(address + 4));
-	debug_console_printf(machine, "Header.WaitListEntry {%08X,%08X} _LIST_ENTRY\n", space.read_dword_unaligned(address + 8), space.read_dword_unaligned(address + 12));
-	debug_console_printf(machine, "%s", string_format("DueTime %I64x qword\n", (INT64)space.read_qword_unaligned(address + 16)).c_str());
-	debug_console_printf(machine, "TimerListEntry {%08X,%08X} _LIST_ENTRY\n", space.read_dword_unaligned(address + 24), space.read_dword_unaligned(address + 28));
-	debug_console_printf(machine, "Dpc %08X dword\n", space.read_dword_unaligned(address + 32));
-	debug_console_printf(machine, "Period %d dword\n", space.read_dword_unaligned(address + 36));
+	machine().debugger().console().printf("Header.Type %d byte\n", space.read_byte(address));
+	machine().debugger().console().printf("Header.Absolute %d byte\n", space.read_byte(address + 1));
+	machine().debugger().console().printf("Header.Size %d byte\n", space.read_byte(address + 2));
+	machine().debugger().console().printf("Header.Inserted %d byte\n", space.read_byte(address + 3));
+	machine().debugger().console().printf("Header.SignalState %08X dword\n", space.read_dword_unaligned(address + 4));
+	machine().debugger().console().printf("Header.WaitListEntry {%08X,%08X} _LIST_ENTRY\n", space.read_dword_unaligned(address + 8), space.read_dword_unaligned(address + 12));
+	machine().debugger().console().printf("%s", string_format("DueTime %I64x qword\n", (INT64)space.read_qword_unaligned(address + 16)).c_str());
+	machine().debugger().console().printf("TimerListEntry {%08X,%08X} _LIST_ENTRY\n", space.read_dword_unaligned(address + 24), space.read_dword_unaligned(address + 28));
+	machine().debugger().console().printf("Dpc %08X dword\n", space.read_dword_unaligned(address + 32));
+	machine().debugger().console().printf("Period %d dword\n", space.read_dword_unaligned(address + 36));
 }
 
-static void curthread_command(running_machine &machine, int ref, int params, const char **param)
+void xbox_base_state::curthread_command(int ref, int params, const char **param)
 {
-	xbox_base_state *state = machine.driver_data<xbox_base_state>();
-	address_space &space = state->m_maincpu->space();
-	UINT64 fsbase;
-	UINT32 kthrd, topstack, tlsdata;
-	offs_t address;
+	address_space &space = m_maincpu->space();
 
-	fsbase = state->m_maincpu->state_int(44);
-	address = (offs_t)fsbase + 0x28;
-	if (!debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &address))
+	UINT64 fsbase = m_maincpu->state_int(44);
+	offs_t address = (offs_t)fsbase + 0x28;
+	if (!machine().debugger().cpu().translate(space, TRANSLATE_READ_DEBUG, &address))
 	{
-		debug_console_printf(machine, "Address is unmapped.\n");
+		machine().debugger().console().printf("Address is unmapped.\n");
 		return;
 	}
-	kthrd = space.read_dword_unaligned(address);
-	debug_console_printf(machine, "Current thread is %08X\n", kthrd);
+
+	UINT32 kthrd = space.read_dword_unaligned(address);
+	machine().debugger().console().printf("Current thread is %08X\n", kthrd);
+
 	address = (offs_t)kthrd + 0x1c;
-	if (!debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &address))
+	if (!machine().debugger().cpu().translate(space, TRANSLATE_READ_DEBUG, &address))
 		return;
-	topstack = space.read_dword_unaligned(address);
-	debug_console_printf(machine, "Current thread stack top is %08X\n", topstack);
+
+	UINT32 topstack = space.read_dword_unaligned(address);
+	machine().debugger().console().printf("Current thread stack top is %08X\n", topstack);
+
 	address = (offs_t)kthrd + 0x28;
-	if (!debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &address))
+	if (!machine().debugger().cpu().translate(space, TRANSLATE_READ_DEBUG, &address))
 		return;
-	tlsdata = space.read_dword_unaligned(address);
+
+	UINT32 tlsdata = space.read_dword_unaligned(address);
 	if (tlsdata == 0)
 		address = (offs_t)topstack - 0x210 - 8;
 	else
 		address = (offs_t)tlsdata - 8;
-	if (!debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &address))
+	if (!machine().debugger().cpu().translate(space, TRANSLATE_READ_DEBUG, &address))
 		return;
-	debug_console_printf(machine, "Current thread function is %08X\n", space.read_dword_unaligned(address));
+	machine().debugger().console().printf("Current thread function is %08X\n", space.read_dword_unaligned(address));
 }
 
-static void generate_irq_command(running_machine &machine, int ref, int params, const char **param)
+void xbox_base_state::generate_irq_command(int ref, int params, const char **param)
 {
 	UINT64 irq;
-	xbox_base_state *chst = machine.driver_data<xbox_base_state>();
 
 	if (params < 1)
 		return;
-	if (!debug_command_parameter_number(machine, param[0], &irq))
+	if (!machine().debugger().commands().validate_number_parameter(param[0], &irq))
 		return;
 	if (irq > 15)
 		return;
 	if (irq == 2)
 		return;
-	chst->debug_generate_irq((int)irq, true);
+	debug_generate_irq((int)irq, true);
 }
 
-static void nv2a_combiners_command(running_machine &machine, int ref, int params, const char **param)
+void xbox_base_state::nv2a_combiners_command(int ref, int params, const char **param)
 {
-	int en;
-
-	xbox_base_state *chst = machine.driver_data<xbox_base_state>();
-	en = chst->nvidia_nv2a->toggle_register_combiners_usage();
+	int en = nvidia_nv2a->toggle_register_combiners_usage();
 	if (en != 0)
-		debug_console_printf(machine, "Register combiners enabled\n");
+		machine().debugger().console().printf("Register combiners enabled\n");
 	else
-		debug_console_printf(machine, "Register combiners disabled\n");
+		machine().debugger().console().printf("Register combiners disabled\n");
 }
 
-static void waitvblank_command(running_machine &machine, int ref, int params, const char **param)
+void xbox_base_state::waitvblank_command(int ref, int params, const char **param)
 {
-	int en;
-
-	xbox_base_state *chst = machine.driver_data<xbox_base_state>();
-	en = chst->nvidia_nv2a->toggle_wait_vblank_support();
+	int en = nvidia_nv2a->toggle_wait_vblank_support();
 	if (en != 0)
-		debug_console_printf(machine, "Vblank method enabled\n");
+		machine().debugger().console().printf("Vblank method enabled\n");
 	else
-		debug_console_printf(machine, "Vblank method disabled\n");
+		machine().debugger().console().printf("Vblank method disabled\n");
 }
 
-static void grab_texture_command(running_machine &machine, int ref, int params, const char **param)
+void xbox_base_state::grab_texture_command(int ref, int params, const char **param)
 {
 	UINT64 type;
-	xbox_base_state *chst = machine.driver_data<xbox_base_state>();
 
 	if (params < 2)
 		return;
-	if (!debug_command_parameter_number(machine, param[0], &type))
+	if (!machine().debugger().commands().validate_number_parameter(param[0], &type))
 		return;
 	if ((param[1][0] == 0) || (strlen(param[1]) > 127))
 		return;
-	chst->nvidia_nv2a->debug_grab_texture((int)type, param[1]);
+	nvidia_nv2a->debug_grab_texture((int)type, param[1]);
 }
 
-static void grab_vprog_command(running_machine &machine, int ref, int params, const char **param)
+void xbox_base_state::grab_vprog_command(int ref, int params, const char **param)
 {
-	xbox_base_state *chst = machine.driver_data<xbox_base_state>();
 	UINT32 instruction[4];
 	FILE *fil;
 
@@ -293,36 +292,40 @@ static void grab_vprog_command(running_machine &machine, int ref, int params, co
 	if ((fil = fopen(param[0], "wb")) == nullptr)
 		return;
 	for (int n = 0; n < 136; n++) {
-		chst->nvidia_nv2a->debug_grab_vertex_program_slot(n, instruction);
+		nvidia_nv2a->debug_grab_vertex_program_slot(n, instruction);
 		fwrite(instruction, sizeof(UINT32), 4, fil);
 	}
 	fclose(fil);
 }
 
-static void vprogdis_command(running_machine &machine, int ref, int params, const char **param)
+void xbox_base_state::vprogdis_command(int ref, int params, const char **param)
 {
-	UINT64 address, length, type;
-	UINT32 instruction[4];
-	offs_t addr;
-	vertex_program_disassembler vd;
-	char line[64];
-	xbox_base_state *chst = machine.driver_data<xbox_base_state>();
-	address_space &space = chst->m_maincpu->space();
+	address_space &space = m_maincpu->space();
 
 	if (params < 2)
 		return;
-	if (!debug_command_parameter_number(machine, param[0], &address))
+
+	UINT64 address;
+	if (!machine().debugger().commands().validate_number_parameter(param[0], &address))
 		return;
-	if (!debug_command_parameter_number(machine, param[1], &length))
+
+	UINT64 length;
+	if (!machine().debugger().commands().validate_number_parameter(param[1], &length))
 		return;
-	type = 0;
+
+	UINT64 type = 0;
 	if (params > 2)
-		if (!debug_command_parameter_number(machine, param[2], &type))
+		if (!machine().debugger().commands().validate_number_parameter(param[2], &type))
 			return;
-	while (length > 0) {
-		if (type == 1) {
-			addr = (offs_t)address;
-			if (!debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &addr))
+
+	vertex_program_disassembler vd;
+	while (length > 0)
+	{
+		UINT32 instruction[4];
+		if (type == 1)
+		{
+			offs_t addr = (offs_t)address;
+			if (!machine().debugger().cpu().translate(space, TRANSLATE_READ_DEBUG, &addr))
 				return;
 			instruction[0] = space.read_dword_unaligned(address);
 			instruction[1] = space.read_dword_unaligned(address + 4);
@@ -330,65 +333,71 @@ static void vprogdis_command(running_machine &machine, int ref, int params, cons
 			instruction[3] = space.read_dword_unaligned(address + 12);
 		}
 		else
-			chst->nvidia_nv2a->debug_grab_vertex_program_slot((int)address, instruction);
+		{
+			nvidia_nv2a->debug_grab_vertex_program_slot((int)address, instruction);
+		}
+
+		char line[64];
 		while (vd.disassemble(instruction, line) != 0)
-			debug_console_printf(machine, "%s\n", line);
+			machine().debugger().console().printf("%s\n", line);
+
 		if (type == 1)
 			address = address + 4 * 4;
 		else
 			address++;
+
 		length--;
 	}
 }
 
-static void help_command(running_machine &machine, int ref, int params, const char **param)
+void xbox_base_state::help_command(int ref, int params, const char **param)
 {
-	debug_console_printf(machine, "Available Xbox commands:\n");
-	debug_console_printf(machine, "  xbox dump_string,<address> -- Dump _STRING object at <address>\n");
-	debug_console_printf(machine, "  xbox dump_process,<address> -- Dump _PROCESS object at <address>\n");
-	debug_console_printf(machine, "  xbox dump_list,<address>[,<offset>] -- Dump _LIST_ENTRY chain starting at <address>\n");
-	debug_console_printf(machine, "  xbox dump_dpc,<address> -- Dump _KDPC object at <address>\n");
-	debug_console_printf(machine, "  xbox dump_timer,<address> -- Dump _KTIMER object at <address>\n");
-	debug_console_printf(machine, "  xbox curthread -- Print information about current thread\n");
-	debug_console_printf(machine, "  xbox irq,<number> -- Generate interrupt with irq number 0-15\n");
-	debug_console_printf(machine, "  xbox nv2a_combiners -- Toggle use of register combiners\n");
-	debug_console_printf(machine, "  xbox waitvblank -- Toggle support for wait vblank method\n");
-	debug_console_printf(machine, "  xbox grab_texture,<type>,<filename> -- Save to <filename> the next used texture of type <type>\n");
-	debug_console_printf(machine, "  xbox grab_vprog,<filename> -- save current vertex program instruction slots to <filename>\n");
-	debug_console_printf(machine, "  xbox vprogdis,<address>,<length>[,<type>] -- disassemble <lenght> vertex program instructions at <address> of <type>\n");
-	debug_console_printf(machine, "  xbox help -- this list\n");
+	machine().debugger().console().printf("Available Xbox commands:\n");
+	machine().debugger().console().printf("  xbox dump_string,<address> -- Dump _STRING object at <address>\n");
+	machine().debugger().console().printf("  xbox dump_process,<address> -- Dump _PROCESS object at <address>\n");
+	machine().debugger().console().printf("  xbox dump_list,<address>[,<offset>] -- Dump _LIST_ENTRY chain starting at <address>\n");
+	machine().debugger().console().printf("  xbox dump_dpc,<address> -- Dump _KDPC object at <address>\n");
+	machine().debugger().console().printf("  xbox dump_timer,<address> -- Dump _KTIMER object at <address>\n");
+	machine().debugger().console().printf("  xbox curthread -- Print information about current thread\n");
+	machine().debugger().console().printf("  xbox irq,<number> -- Generate interrupt with irq number 0-15\n");
+	machine().debugger().console().printf("  xbox nv2a_combiners -- Toggle use of register combiners\n");
+	machine().debugger().console().printf("  xbox waitvblank -- Toggle support for wait vblank method\n");
+	machine().debugger().console().printf("  xbox grab_texture,<type>,<filename> -- Save to <filename> the next used texture of type <type>\n");
+	machine().debugger().console().printf("  xbox grab_vprog,<filename> -- save current vertex program instruction slots to <filename>\n");
+	machine().debugger().console().printf("  xbox vprogdis,<address>,<length>[,<type>] -- disassemble <lenght> vertex program instructions at <address> of <type>\n");
+	machine().debugger().console().printf("  xbox help -- this list\n");
 }
 
-static void xbox_debug_commands(running_machine &machine, int ref, int params, const char **param)
+void xbox_base_state::xbox_debug_commands(int ref, int params, const char **param)
 {
 	if (params < 1)
 		return;
 	if (strcmp("dump_string", param[0]) == 0)
-		dump_string_command(machine, ref, params - 1, param + 1);
+		dump_string_command(ref, params - 1, param + 1);
 	else if (strcmp("dump_process", param[0]) == 0)
-		dump_process_command(machine, ref, params - 1, param + 1);
+		dump_process_command(ref, params - 1, param + 1);
 	else if (strcmp("dump_list", param[0]) == 0)
-		dump_list_command(machine, ref, params - 1, param + 1);
+		dump_list_command(ref, params - 1, param + 1);
 	else if (strcmp("dump_dpc", param[0]) == 0)
-		dump_dpc_command(machine, ref, params - 1, param + 1);
+		dump_dpc_command(ref, params - 1, param + 1);
 	else if (strcmp("dump_timer", param[0]) == 0)
-		dump_timer_command(machine, ref, params - 1, param + 1);
+		dump_timer_command(ref, params - 1, param + 1);
 	else if (strcmp("curthread", param[0]) == 0)
-		curthread_command(machine, ref, params - 1, param + 1);
+		curthread_command(ref, params - 1, param + 1);
 	else if (strcmp("irq", param[0]) == 0)
-		generate_irq_command(machine, ref, params - 1, param + 1);
+		generate_irq_command(ref, params - 1, param + 1);
 	else if (strcmp("nv2a_combiners", param[0]) == 0)
-		nv2a_combiners_command(machine, ref, params - 1, param + 1);
+		nv2a_combiners_command(ref, params - 1, param + 1);
 	else if (strcmp("waitvblank", param[0]) == 0)
-		waitvblank_command(machine, ref, params - 1, param + 1);
+		waitvblank_command(ref, params - 1, param + 1);
 	else if (strcmp("grab_texture", param[0]) == 0)
-		grab_texture_command(machine, ref, params - 1, param + 1);
+		grab_texture_command(ref, params - 1, param + 1);
 	else if (strcmp("grab_vprog", param[0]) == 0)
-		grab_vprog_command(machine, ref, params - 1, param + 1);
+		grab_vprog_command(ref, params - 1, param + 1);
 	else if (strcmp("vprogdis", param[0]) == 0)
-		vprogdis_command(machine, ref, params - 1, param + 1);
+		vprogdis_command(ref, params - 1, param + 1);
 	else
-		help_command(machine, ref, params - 1, param + 1);
+		help_command(ref, params - 1, param + 1);
 }
 
 void xbox_base_state::debug_generate_irq(int irq, bool active)
@@ -2596,7 +2605,6 @@ ADDRESS_MAP_START(xbox_base_map, AS_PROGRAM, 32, xbox_base_state)
 	AM_RANGE(0xfe800000, 0xfe87ffff) AM_READWRITE(audio_apu_r, audio_apu_w)
 	AM_RANGE(0xfec00000, 0xfec00fff) AM_READWRITE(audio_ac93_r, audio_ac93_w)
 	AM_RANGE(0xfef00000, 0xfef003ff) AM_READWRITE(network_r, network_w)
-	AM_RANGE(0xff000000, 0xff0fffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x00f80000)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START(xbox_base_map_io, AS_IO, 32, xbox_base_state)
@@ -2639,7 +2647,10 @@ void xbox_base_state::machine_start()
 	apust.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xbox_base_state::audio_apu_timer), this), (void *)"APU Timer");
 	apust.timer->enable(false);
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
-		debug_console_register_command(machine(), "xbox", CMDFLAG_NONE, 0, 1, 4, xbox_debug_commands);
+	{
+		using namespace std::placeholders;
+		machine().debugger().console().register_command("xbox", CMDFLAG_NONE, 0, 1, 4, std::bind(&xbox_base_state::xbox_debug_commands, this, _1, _2, _3));
+	}
 	// PIC challenge handshake data
 	pic16lc_buffer[0x1c] = 0x0c;
 	pic16lc_buffer[0x1d] = 0x0d;

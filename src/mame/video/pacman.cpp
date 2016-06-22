@@ -291,7 +291,7 @@ UINT32 pacman_state::screen_update_pacman(screen_device &screen, bitmap_ind16 &b
 			m_gfxdecode->gfx(1)->transmask(bitmap,spriteclip,
 					( spriteram[offs] >> 2 ) | (m_spritebank << 6),
 					color,
-					fy,fx,          //FIXME: flipping bits are really supposed to be inverted here?
+					fx,fy,
 					sx - 256,sy + m_xoffsethack,
 					m_palette->transpen_mask(*m_gfxdecode->gfx(1), color & 0x3f, 0));
 		}

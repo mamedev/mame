@@ -11,7 +11,6 @@
 #include "sharcfe.h"
 
 
-#define ENABLE_DRC					0
 #define DISABLE_FAST_REGISTERS		1
 
 
@@ -76,6 +75,7 @@ adsp21062_device::adsp21062_device(const machine_config &mconfig, const char *ta
 	, m_cache(CACHE_SIZE + sizeof(sharc_internal_state))
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
+	, m_enable_drc(false)
 {
 }
 
@@ -84,6 +84,11 @@ offs_t adsp21062_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 {
 	extern CPU_DISASSEMBLE( sharc );
 	return CPU_DISASSEMBLE_NAME(sharc)(this, buffer, pc, oprom, opram, options);
+}
+
+void adsp21062_device::enable_recompiler()
+{
+	m_enable_drc = true;
 }
 
 
@@ -892,45 +897,48 @@ void adsp21062_device::check_interrupts()
 
 void adsp21062_device::execute_run()
 {
-#if ENABLE_DRC
-	if (m_core->irq_pending != 0)
+	if (m_enable_drc)
 	{
-		m_core->idle = 0;
-	}
-	execute_run_drc();
-	return;
-#else
-	if (m_core->idle && m_core->irq_pending == 0)
-	{
-		m_core->icount = 0;
-		debugger_instruction_hook(this, m_core->daddr);
-	}
-	if (m_core->irq_pending != 0)
-	{
-		check_interrupts();
-		m_core->idle = 0;
-	}
-
-	while (m_core->icount > 0 && !m_core->idle)
-	{
-		m_core->pc = m_core->daddr;
-		m_core->daddr = m_core->faddr;
-		m_core->faddr = m_core->nfaddr;
-		m_core->nfaddr++;
-
-		m_core->astat_old_old_old = m_core->astat_old_old;
-		m_core->astat_old_old = m_core->astat_old;
-		m_core->astat_old = m_core->astat;
-
-		debugger_instruction_hook(this, m_core->pc);
-
-		m_core->opcode = ROPCODE(m_core->pc);		
-
-		// handle looping
-		if (m_core->pc == m_core->laddr.addr)
+		if (m_core->irq_pending != 0)
 		{
-			switch (m_core->laddr.loop_type)
+			m_core->idle = 0;
+		}
+		execute_run_drc();
+		return;
+	}
+	else
+	{
+		if (m_core->idle && m_core->irq_pending == 0)
+		{
+			m_core->icount = 0;
+			debugger_instruction_hook(this, m_core->daddr);
+		}
+		if (m_core->irq_pending != 0)
+		{
+			check_interrupts();
+			m_core->idle = 0;
+		}
+
+		while (m_core->icount > 0 && !m_core->idle)
+		{
+			m_core->pc = m_core->daddr;
+			m_core->daddr = m_core->faddr;
+			m_core->faddr = m_core->nfaddr;
+			m_core->nfaddr++;
+
+			m_core->astat_old_old_old = m_core->astat_old_old;
+			m_core->astat_old_old = m_core->astat_old;
+			m_core->astat_old = m_core->astat;
+
+			debugger_instruction_hook(this, m_core->pc);
+
+			m_core->opcode = ROPCODE(m_core->pc);
+
+			// handle looping
+			if (m_core->pc == m_core->laddr.addr)
 			{
+				switch (m_core->laddr.loop_type)
+				{
 				case 0:     // arithmetic condition-based
 				{
 					int condition = m_core->laddr.code;
@@ -980,27 +988,27 @@ void adsp21062_device::execute_run()
 						CHANGE_PC(TOP_PC());
 					}
 				}
+				}
 			}
-		}
 
-		(this->*m_sharc_op[(m_core->opcode >> 39) & 0x1ff])();
-
+			(this->*m_sharc_op[(m_core->opcode >> 39) & 0x1ff])();
 
 
 
-		// System register latency effect
-		if (m_core->systemreg_latency_cycles > 0)
-		{
-			--m_core->systemreg_latency_cycles;
-			if (m_core->systemreg_latency_cycles <= 0)
+
+			// System register latency effect
+			if (m_core->systemreg_latency_cycles > 0)
 			{
-				systemreg_write_latency_effect();
+				--m_core->systemreg_latency_cycles;
+				if (m_core->systemreg_latency_cycles <= 0)
+				{
+					systemreg_write_latency_effect();
+				}
 			}
-		}
 
-		--m_core->icount;
-	};
-#endif
+			--m_core->icount;
+		};
+	}
 }
 
 bool adsp21062_device::memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value)

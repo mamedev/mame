@@ -1092,6 +1092,23 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/pofo/exp.h,BUSES["POFO"] = true
+---------------------------------------------------
+
+if (BUSES["POFO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/pofo/exp.cpp",
+		MAME_DIR .. "src/devices/bus/pofo/exp.h",
+		MAME_DIR .. "src/devices/bus/pofo/hpc101.cpp",
+		MAME_DIR .. "src/devices/bus/pofo/hpc101.h",
+		MAME_DIR .. "src/devices/bus/pofo/hpc102.cpp",
+		MAME_DIR .. "src/devices/bus/pofo/hpc102.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/s100/s100.h,BUSES["S100"] = true
 ---------------------------------------------------
 

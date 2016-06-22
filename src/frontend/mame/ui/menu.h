@@ -268,7 +268,7 @@ protected:
 	const event *process(UINT32 flags, float x0 = 0.0f, float y0 = 0.0f);
 	void process_parent() { m_parent->process(PROCESS_NOINPUT); }
 
-	bool is_focus(focused_menu focus) const { return m_focus == focus; }
+	focused_menu get_focus() const { return m_focus; }
 	void set_focus(focused_menu focus) { m_focus = focus; }
 
 	// draw right box
@@ -280,10 +280,15 @@ protected:
 
 	// images render
 	std::string arts_render_common(float origx1, float origy1, float origx2, float origy2);
-	void arts_render_images(bitmap_argb32 *bitmap, float origx1, float origy1, float origx2, float origy2, bool software);
+	void arts_render_images(bitmap_argb32 *bitmap, float origx1, float origy1, float origx2, float origy2);
 
 	// draw header and footer text
 	void extra_text_render(float top, float bottom, float origx1, float origy1, float origx2, float origy2, const char *header, const char *footer);
+	void extra_text_position(float origx1, float origx2, float origy, float yspan, text_layout &layout,
+		int direction, float &x1, float &y1, float &x2, float &y2);
+
+	// custom events
+	virtual bool custom_mouse_down() { return false; }
 
 	template <typename T>
 	static T *topmost_menu() { return dynamic_cast<T *>(menu_stack.get()); }
@@ -312,7 +317,7 @@ private:
 
 	static std::unique_ptr<bitmap_argb32> no_avail_bitmap, bgrnd_bitmap, star_bitmap;
 	static render_texture *bgrnd_texture, *star_texture;
-	static bitmap_argb32 *icons_bitmap[];
+	static std::vector<std::unique_ptr<bitmap_argb32>> icons_bitmap;
 	static render_texture *icons_texture[];
 
 	// request the specific handling of the game selection main menu
@@ -322,7 +327,7 @@ private:
 	static void stack_push(std::unique_ptr<menu> &&menu);
 
 	// toolbar
-	static bitmap_argb32 *toolbar_bitmap[], *sw_toolbar_bitmap[];
+	static std::vector<std::shared_ptr<bitmap_argb32>> toolbar_bitmap, sw_toolbar_bitmap;
 	static render_texture *toolbar_texture[], *sw_toolbar_texture[];
 
 	// draw game list
@@ -340,9 +345,9 @@ private:
 	void handle_main_keys(UINT32 flags);
 
 	// handle mouse
-	void handle_main_events(UINT32 flags);
+	void handle_main_events();
 
-	void draw_icon(int linenum, void *selectedref, float x1, float y1);
+	float draw_icon(int linenum, void *selectedref, float x1, float y1);
 	void extra_text_draw_box(float origx1, float origx2, float origy, float yspan, const char *text, int direction);
 
 	bool                    m_special_main_menu;
@@ -353,6 +358,7 @@ private:
 	event                   m_event;   // the UI event that occurred
 	pool                    *m_pool;   // list of memory pools
 	focused_menu            m_focus;
+	static std::vector<const game_driver *> m_old_icons;
 
 	static std::unique_ptr<menu> menu_stack;
 	static std::unique_ptr<menu> menu_free;

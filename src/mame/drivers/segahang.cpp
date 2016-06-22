@@ -17,7 +17,6 @@
 
 #include "emu.h"
 #include "includes/segahang.h"
-#include "machine/segaic16.h"
 #include "machine/fd1089.h"
 #include "machine/fd1094.h"
 #include "sound/2203intf.h"
@@ -306,19 +305,8 @@ READ8_MEMBER( segahang_state::sound_data_r )
 {
 	// assert ACK
 	m_i8255_1->pc6_w(CLEAR_LINE);
-	return soundlatch_read();
+	return m_soundlatch->read(space, 0);
 }
-
-
-//-------------------------------------------------
-//  sound_irq - signal an IRQ to the sound CPU
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( segahang_state::sound_irq )
-{
-	m_soundcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 
 
 //**************************************************************************
@@ -775,7 +763,7 @@ static MACHINE_CONFIG_START( shared_base, segahang_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_DEVICE_ADD("i8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(driver_device, soundlatch_byte_w))
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(segahang_state, video_lamps_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(segahang_state, tilemap_sound_w))
 
@@ -795,6 +783,8 @@ static MACHINE_CONFIG_START( shared_base, segahang_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(segahang_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 MACHINE_CONFIG_END
 
 
@@ -846,7 +836,7 @@ static MACHINE_CONFIG_FRAGMENT( sound_board_2203 )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK_8MHz/2)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(segahang_state, sound_irq))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.13)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.13)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  0.13)
@@ -874,7 +864,7 @@ static MACHINE_CONFIG_FRAGMENT( sound_board_2203x2 )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ym1", YM2203, MASTER_CLOCK_8MHz/2)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(segahang_state, sound_irq))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.13)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.13)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  0.13)

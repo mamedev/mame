@@ -11,6 +11,7 @@
 #include "sound/es8712.h"
 #include "video/k053936.h"
 #include "machine/eepromser.h"
+#include "machine/gen_latch.h"
 
 class metro_state : public driver_device
 {
@@ -30,6 +31,11 @@ public:
 		m_ymsnd(*this, "ymsnd"),
 		m_essnd(*this, "essnd"),
 		m_k053936(*this, "k053936") ,
+		m_eeprom(*this, "eeprom"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_vram_0(*this, "vram_0"),
 		m_vram_1(*this, "vram_1"),
 		m_vram_2(*this, "vram_2"),
@@ -45,11 +51,7 @@ public:
 		m_videoregs(*this, "videoregs"),
 		m_screenctrl(*this, "screenctrl"),
 		m_input_sel(*this, "input_sel"),
-		m_k053936_ram(*this, "k053936_ram"),
-		m_eeprom(*this, "eeprom"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_k053936_ram(*this, "k053936_ram")
 	{ }
 
 	/* devices */
@@ -59,6 +61,12 @@ public:
 	optional_device<device_t> m_ymsnd; // TODO set correct type
 	optional_device<es8712_device> m_essnd;
 	optional_device<k053936_device> m_k053936;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch;
+
 	/* memory pointers */
 	optional_shared_ptr<UINT16> m_vram_0;
 	optional_shared_ptr<UINT16> m_vram_1;
@@ -76,11 +84,6 @@ public:
 	optional_shared_ptr<UINT16> m_screenctrl;
 	optional_shared_ptr<UINT16> m_input_sel;
 	optional_shared_ptr<UINT16> m_k053936_ram;
-
-	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 
 	int         m_flip_screen;
 

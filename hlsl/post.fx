@@ -98,7 +98,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 	Output.TexCoord = Input.TexCoord;
 	Output.TexCoord += PrepareBloom
-		? 0.0f / TargetDims  // use half texel offset (DX9) to do the blur for first bloom layer
+		? 0.0f               // use half texel offset (DX9) to do the blur for first bloom layer
 		: 0.5f / TargetDims; // fix half texel offset (DX9)
 
 	Output.ScreenCoord = Input.Position.xy / ScreenDims;
@@ -252,7 +252,13 @@ float4 ps_main(PS_INPUT Input) : COLOR
 
 			float ColorBrightness = 0.299f * BaseColor.r + 0.587f * BaseColor.g + 0.114 * BaseColor.b;
 
-			float ScanlineCoord = SourceCoord.y * SourceDims.y * ScanlineScale * PI;
+			float ScanlineCoord = SourceCoord.y;
+			ScanlineCoord += QuadDims.y <= SourceDims.y * 2.0f
+				? 0.5f / QuadDims.y // uncenter scanlines if the quad is less than twice the size of the source
+				: 0.0f;
+
+			ScanlineCoord *= SourceDims.y * ScanlineScale * PI;
+
 			float ScanlineCoordJitter = ScanlineOffset * PHI;
 			float ScanlineSine = sin(ScanlineCoord + ScanlineCoordJitter);
 			float ScanlineWide = ScanlineHeight + ScanlineVariation * max(1.0f, ScanlineHeight) * (1.0f - ColorBrightness);

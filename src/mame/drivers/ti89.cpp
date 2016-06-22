@@ -455,11 +455,11 @@ void ti68k_state::machine_start()
 
 		if (m_initial_pc > 0x400000)
 		{
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x400000, 0x5fffff, 0, 0, read16_delegate(FUNC(ti68k_state::flash_r), this),write16_delegate(FUNC(ti68k_state::flash_w), this));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x400000, 0x5fffff, read16_delegate(FUNC(ti68k_state::flash_r), this),write16_delegate(FUNC(ti68k_state::flash_w), this));
 		}
 		else
 		{
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x200000, 0x3fffff, 0, 0, read16_delegate(FUNC(ti68k_state::flash_r), this), write16_delegate(FUNC(ti68k_state::flash_w), this));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x200000, 0x3fffff, read16_delegate(FUNC(ti68k_state::flash_r), this), write16_delegate(FUNC(ti68k_state::flash_w), this));
 		}
 	}
 

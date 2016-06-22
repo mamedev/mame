@@ -11,26 +11,6 @@
 #include "nl_convert.h"
 
 
-template<typename Class>
-static plib::pvector_t<int> bubble(const plib::pvector_t<Class> &sl)
-{
-	plib::pvector_t<int> ret;
-	for (unsigned i=0; i<sl.size(); i++)
-		ret.push_back(i);
-
-	for(unsigned i=0; i < sl.size(); i++)
-	{
-		for(unsigned j=i+1; j < sl.size(); j++)
-		{
-			if(sl[ret[i]]->name() > sl[ret[j]]->name())
-			{
-				std::swap(ret[i], ret[j]);
-			}
-		}
-	}
-	return ret;
-}
-
 /*-------------------------------------------------
     convert - convert a spice netlist
 -------------------------------------------------*/
@@ -38,7 +18,7 @@ static plib::pvector_t<int> bubble(const plib::pvector_t<Class> &sl)
 void nl_convert_base_t::add_pin_alias(const pstring &devname, const pstring &name, const pstring &alias)
 {
 	pstring pname = devname + "." + name;
-	m_pins.add(pname, plib::pmake_unique<pin_alias_t>(pname, devname + "." + alias));
+	m_pins.insert({pname, plib::make_unique<pin_alias_t>(pname, devname + "." + alias)});
 }
 
 void nl_convert_base_t::add_ext_alias(const pstring &alias)
@@ -73,13 +53,14 @@ void nl_convert_base_t::add_device(const pstring &atype, const pstring &aname)
 void nl_convert_base_t::add_term(pstring netname, pstring termname)
 {
 	net_t * net = nullptr;
-	if (m_nets.contains(netname))
+	auto idx = m_nets.find(netname);
+	if (idx != m_nets.end())
 		net = m_nets[netname].get();
 	else
 	{
 		auto nets = std::make_shared<net_t>(netname);
 		net = nets.get();
-		m_nets.add(netname, nets);
+		m_nets.insert({netname, nets});
 	}
 
 	/* if there is a pin alias, translate ... */
@@ -102,7 +83,12 @@ void nl_convert_base_t::dump_nl()
 		if (net->terminals().size() == 1)
 			net->set_no_export();
 	}
-	plib::pvector_t<int> sorted = bubble(m_devs);
+
+	std::vector<int> sorted;
+	for (unsigned i=0; i < m_devs.size(); i++)
+		sorted.push_back(i);
+	std::sort(sorted.begin(), sorted.end(), plib::indexed_compare<std::vector<std::shared_ptr<dev_t>>>(m_devs));
+
 	for (std::size_t i=0; i<m_devs.size(); i++)
 	{
 		std::size_t j = sorted[i];
@@ -118,9 +104,9 @@ void nl_convert_base_t::dump_nl()
 					m_devs[j]->name().cstr());
 	}
 	// print nets
-	for (std::size_t i=0; i<m_nets.size(); i++)
+	for (auto & i : m_nets)
 	{
-		net_t * net = m_nets.value_at(i).get();
+		net_t * net = i.second.get();
 		if (!net->is_no_export())
 		{
 			//printf("Net {}\n", net->name().cstr());

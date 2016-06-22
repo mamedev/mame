@@ -95,8 +95,7 @@ public:
 	UINT32 screen_update_othunder(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int y_offs );
-	void update_irq(  );
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	void update_irq();
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

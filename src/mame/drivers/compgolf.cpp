@@ -193,16 +193,6 @@ static GFXDECODE_START( compgolf )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout8,  0, 0x10 )
 GFXDECODE_END
 
-/*************************************
- *
- *  Sound interface
- *
- *************************************/
-
-WRITE_LINE_MEMBER(compgolf_state::sound_irq)
-{
-	m_maincpu->set_input_line(0, state);
-}
 
 /*************************************
  *
@@ -253,7 +243,7 @@ static MACHINE_CONFIG_START( compgolf, compgolf_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(compgolf_state, sound_irq))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", 0))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(compgolf_state, compgolf_scrollx_lo_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(compgolf_state, compgolf_scrolly_lo_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

@@ -2892,28 +2892,6 @@ static GFXDECODE_START( dblaxle )
 GFXDECODE_END
 
 
-
-/**************************************************************
-                         YM2610 (SOUND)
-
-The first interface is for game boards with twin 68000 and Z80.
-Interface B is for games which lack a Z80 (Spacegun, Bshark).
-**************************************************************/
-
-/* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(taitoz_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-/* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(taitoz_state::irqhandlerb)
-{
-	// DG: this is probably specific to Z80 and wrong?
-//  m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
 /***********************************************************
                       MACHINE DRIVERS
 
@@ -3033,7 +3011,7 @@ static MACHINE_CONFIG_START( contcirc, taitoz_state )
 	MCFG_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "subwoofer", 0.20)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 2.0)
 	MCFG_SOUND_ROUTE(1, "2610.1.r", 2.0)
@@ -3111,7 +3089,7 @@ static MACHINE_CONFIG_START( chasehq, taitoz_state )
 	MCFG_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "subwoofer", 0.20)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 1.0)
 	MCFG_SOUND_ROUTE(1, "2610.1.r", 1.0)
@@ -3189,7 +3167,7 @@ static MACHINE_CONFIG_START( enforce, taitoz_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 20.0)
@@ -3262,7 +3240,7 @@ static MACHINE_CONFIG_START( bshark, taitoz_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandlerb))
+	//MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) // DG: this is probably specific to Z80 and wrong?
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 28.0)
@@ -3343,7 +3321,7 @@ static MACHINE_CONFIG_START( sci, taitoz_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 2.0)
@@ -3424,7 +3402,7 @@ static MACHINE_CONFIG_START( nightstr, taitoz_state )
 	MCFG_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "subwoofer", 0.20)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 2.0)
 	MCFG_SOUND_ROUTE(1, "2610.1.r", 2.0)
@@ -3502,7 +3480,7 @@ static MACHINE_CONFIG_START( aquajack, taitoz_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 2.0)
@@ -3576,7 +3554,7 @@ static MACHINE_CONFIG_START( spacegun, taitoz_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandlerb))
+	//MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) // DG: this is probably specific to Z80 and wrong?
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 8.0)
@@ -3648,7 +3626,7 @@ static MACHINE_CONFIG_START( dblaxle, taitoz_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_32MHz/4)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 8.0)
@@ -3723,7 +3701,7 @@ static MACHINE_CONFIG_START( racingb, taitoz_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_32MHz/4)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 8.0)

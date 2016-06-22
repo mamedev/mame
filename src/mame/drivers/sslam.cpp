@@ -364,7 +364,7 @@ WRITE8_MEMBER(sslam_state::sslam_snd_w)
 
 WRITE16_MEMBER(sslam_state::powerbls_sound_w)
 {
-	soundlatch_byte_w(space, 0, data & 0xff);
+	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(MCS51_INT1_LINE, HOLD_LINE);
 }
 
@@ -423,7 +423,7 @@ READ8_MEMBER(sslam_state::playmark_snd_command_r)
 	UINT8 data = 0;
 
 	if ((m_oki_control & 0x38) == 0x30) {
-		data = soundlatch_byte_r(space,0);
+		data = m_soundlatch->read(space,0);
 	}
 	else if ((m_oki_control & 0x38) == 0x28) {
 		data = (m_oki->read(space,0) & 0x0f);
@@ -750,6 +750,8 @@ static MACHINE_CONFIG_START( powerbls, sslam_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)   /* verified on original PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)

@@ -2731,7 +2731,7 @@ void n64_state::machine_start()
 	m_vr4300->mips3drc_set_options(MIPS3DRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions */
-	m_vr4300->add_fastram(0x00000000, 0x007fffff, FALSE, m_rdram);
+	//m_vr4300->add_fastram(0x00000000, 0x007fffff, FALSE, m_rdram);
 
 	rsp_device *rsp = machine().device<rsp_device>("rsp");
 	rsp->rspdrc_set_options(RSPDRC_STRICT_VERIFY);

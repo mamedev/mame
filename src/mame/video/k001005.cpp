@@ -969,8 +969,10 @@ void k001005_renderer::draw_scanline(INT32 scanline, const extent_t &extent, con
 		int ibri = (int)(bri);
 		int ifog = (int)(fog);
 
-		if (ibri < 0) ibri = 0; if (ibri > 255) ibri = 255;
-		if (ifog < 0) ifog = 0; if (ifog > 65536) ifog = 65536;
+		if (ibri < 0) ibri = 0;
+		if (ibri > 255) ibri = 255;
+		if (ifog < 0) ifog = 0;
+		if (ifog > 65536) ifog = 65536;
 
 		if (z <= zb[x])
 		{
@@ -984,9 +986,12 @@ void k001005_renderer::draw_scanline(INT32 scanline, const extent_t &extent, con
 				g = ((((g * poly_light_g * ibri) >> 16) * ifog) + (poly_fog_g * (65536 - ifog))) >> 16;
 				b = ((((b * poly_light_b * ibri) >> 16) * ifog) + (poly_fog_b * (65536 - ifog))) >> 16;
 
-				if (r < 0) r = 0; if (r > 255) r = 255;
-				if (g < 0) g = 0; if (g > 255) g = 255;
-				if (b < 0) b = 0; if (b > 255) b = 255;
+				if (r < 0) r = 0;
+				if (r > 255) r = 255;
+				if (g < 0) g = 0;
+				if (g > 255) g = 255;
+				if (b < 0) b = 0;
+				if (b > 255) b = 255;
 
 				fb[x] = (color & 0xff000000) | (r << 16) | (g << 8) | b;
 				zb[x] = z;
@@ -1046,8 +1051,10 @@ void k001005_renderer::draw_scanline_tex(INT32 scanline, const extent_t &extent,
 		int ibri = (int)(bri);
 		int ifog = (int)(fog);
 
-		if (ibri < 0) ibri = 0; if (ibri > 255) ibri = 255;
-		if (ifog < 0) ifog = 0; if (ifog > 65536) ifog = 65536;
+		if (ibri < 0) ibri = 0;
+		if (ibri > 255) ibri = 255;
+		if (ifog < 0) ifog = 0;
+		if (ifog > 65536) ifog = 65536;
 
 		if (z <= zb[x])
 		{
@@ -1074,9 +1081,12 @@ void k001005_renderer::draw_scanline_tex(INT32 scanline, const extent_t &extent,
 				g = ((((g * poly_light_g * ibri) >> 16) * ifog) + (poly_fog_g * (65536 - ifog))) >> 16;
 				b = ((((b * poly_light_b * ibri) >> 16) * ifog) + (poly_fog_b * (65536 - ifog))) >> 16;
 
-				if (r < 0) r = 0; if (r > 255) r = 255;
-				if (g < 0) g = 0; if (g > 255) g = 255;
-				if (b < 0) b = 0; if (b > 255) b = 255;
+				if (r < 0) r = 0;
+				if (r > 255) r = 255;
+				if (g < 0) g = 0;
+				if (g > 255) g = 255;
+				if (b < 0) b = 0;
+				if (b > 255) b = 255;
 
 				fb[x] = 0xff000000 | (r << 16) | (g << 8) | b;
 				zb[x] = z;
@@ -1129,9 +1139,12 @@ void k001005_renderer::draw_scanline_gouraud_blend(INT32 scanline, const extent_
 					ib = ((ib * ia) >> 8) + ((sb * (0xff-ia)) >> 8);
 				}
 
-				if (ir < 0) ir = 0; if (ir > 255) ir = 255;
-				if (ig < 0) ig = 0; if (ig > 255) ig = 255;
-				if (ib < 0) ib = 0; if (ib > 255) ib = 255;
+				if (ir < 0) ir = 0;
+				if (ir > 255) ir = 255;
+				if (ig < 0) ig = 0;
+				if (ig > 255) ig = 255;
+				if (ib < 0) ib = 0;
+				if (ib > 255) ib = 255;
 
 				fb[x] = 0xff000000 | (ir << 16) | (ig << 8) | ib;
 				zb[x] = z;

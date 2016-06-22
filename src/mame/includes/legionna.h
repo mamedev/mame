@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Graves, Angelo Salese, David Haywood, Tomasz Slanina
+
 #include "sound/okim6295.h"
 #include "audio/seibu.h"
+#include "machine/gen_latch.h"
 #include "machine/raiden2cop.h"
 #include "video/seibu_crtc.h"
 
@@ -21,6 +23,7 @@ public:
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_wordswapram(*this, "wordswapram"),
 		m_raiden2cop(*this, "raiden2cop")
 	{
@@ -93,6 +96,7 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_shared_ptr<UINT16> m_wordswapram;
 	optional_device<raiden2cop_device> m_raiden2cop;
 

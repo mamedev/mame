@@ -7,6 +7,17 @@
 
 #include "netlist/devices/net_lib.h"
 
+NETLIST_START(perf)
+
+    SOLVER(Solver, 48000)
+    PARAM(Solver.ACCURACY, 1e-20)
+    MAINCLOCK(clk, 50000000)
+
+    TTL_7400_NAND(n1,clk,clk)
+
+NETLIST_END()
+
+
 NETLIST_START(7400_astable)
 
     /*

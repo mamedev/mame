@@ -13,30 +13,32 @@ function toolchain(_buildDir, _libDir)
 		value = "GCC",
 		description = "Choose GCC flavor",
 		allowed = {
-			{ "android-arm",    "Android - ARM"              },
-			{ "android-mips",   "Android - MIPS"             },
-			{ "android-x86",    "Android - x86"              },
-			{ "asmjs",          "Emscripten/asm.js"          },
-			{ "freebsd",        "FreeBSD"                    },
-			{ "linux-gcc",      "Linux (GCC compiler)"       },
-			{ "linux-gcc-5",    "Linux (GCC-5 compiler)"     },
-			{ "linux-clang",    "Linux (Clang compiler)"     },
-			{ "linux-mips-gcc", "Linux (MIPS, GCC compiler)" },
-			{ "linux-arm-gcc",  "Linux (ARM, GCC compiler)"  },
-			{ "ios-arm",        "iOS - ARM"                  },
-			{ "ios-simulator",  "iOS - Simulator"            },
-			{ "tvos-arm64",     "tvOS - ARM64"               },
-			{ "tvos-simulator", "tvOS - Simulator"           },
-			{ "mingw-gcc",      "MinGW"                      },
-			{ "mingw-clang",    "MinGW (clang compiler)"     },
-			{ "nacl",           "Native Client"              },
-			{ "nacl-arm",       "Native Client - ARM"        },
-			{ "netbsd",         "NetBSD"                     },
-			{ "osx",            "OSX"                        },
-			{ "pnacl",          "Native Client - PNaCl"      },
-			{ "ps4",            "PS4"                        },
-			{ "qnx-arm",        "QNX/Blackberry - ARM"       },
-			{ "rpi",            "RaspberryPi"                },
+			{ "android-arm",     "Android - ARM"              },
+			{ "android-mips",    "Android - MIPS"             },
+			{ "android-x86",     "Android - x86"              },
+			{ "asmjs",           "Emscripten/asm.js"          },
+			{ "freebsd",         "FreeBSD"                    },
+			{ "linux-gcc",       "Linux (GCC compiler)"       },
+			{ "linux-gcc-afl",   "Linux (GCC + AFL fuzzer)"   },
+			{ "linux-gcc-5",     "Linux (GCC-5 compiler)"     },
+			{ "linux-clang",     "Linux (Clang compiler)"     },
+			{ "linux-clang-afl", "Linux (Clang + AFL fuzzer)" },
+			{ "linux-mips-gcc",  "Linux (MIPS, GCC compiler)" },
+			{ "linux-arm-gcc",   "Linux (ARM, GCC compiler)"  },
+			{ "ios-arm",         "iOS - ARM"                  },
+			{ "ios-simulator",   "iOS - Simulator"            },
+			{ "tvos-arm64",      "tvOS - ARM64"               },
+			{ "tvos-simulator",  "tvOS - Simulator"           },
+			{ "mingw-gcc",       "MinGW"                      },
+			{ "mingw-clang",     "MinGW (clang compiler)"     },
+			{ "nacl",            "Native Client"              },
+			{ "nacl-arm",        "Native Client - ARM"        },
+			{ "netbsd",          "NetBSD"                     },
+			{ "osx",             "OSX"                        },
+			{ "pnacl",           "Native Client - PNaCl"      },
+			{ "ps4",             "PS4"                        },
+			{ "qnx-arm",         "QNX/Blackberry - ARM"       },
+			{ "rpi",             "RaspberryPi"                },
 		},
 	}
 
@@ -120,7 +122,7 @@ function toolchain(_buildDir, _libDir)
 		tvosPlatform = _OPTIONS["with-tvos"]
 	end
 
-	if _ACTION == "gmake" then
+	if _ACTION == "gmake" or _ACTION == "ninja" then
 
 		if nil == _OPTIONS["gcc"] then
 			print("GCC flavor must be specified!")
@@ -206,6 +208,12 @@ function toolchain(_buildDir, _libDir)
 		elseif "linux-gcc" == _OPTIONS["gcc"] then
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux"))
 
+		elseif "linux-gcc-afl" == _OPTIONS["gcc"] then
+			premake.gcc.cc  = "afl-gcc"
+			premake.gcc.cxx = "afl-g++"
+			premake.gcc.ar  = "ar"
+			location (path.join(_buildDir, "projects", _ACTION .. "-linux"))
+
 		elseif "linux-gcc-5" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "gcc-5"
 			premake.gcc.cxx = "g++-5"
@@ -215,6 +223,12 @@ function toolchain(_buildDir, _libDir)
 		elseif "linux-clang" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "clang"
 			premake.gcc.cxx = "clang++"
+			premake.gcc.ar  = "ar"
+			location (path.join(_buildDir, "projects", _ACTION .. "-linux-clang"))
+
+		elseif "linux-clang-afl" == _OPTIONS["gcc"] then
+			premake.gcc.cc  = "afl-clang"
+			premake.gcc.cxx = "afl-clang++"
 			premake.gcc.ar  = "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux-clang"))
 
@@ -610,7 +624,7 @@ function toolchain(_buildDir, _libDir)
 			"-mfpmath=sse",
 		}
 
-	configuration { "linux-gcc or linux-clang" }
+	configuration { "linux-gcc* or linux-clang*" }
 		buildoptions {
 			"-msse2",
 			"-Wunused-value",
@@ -643,7 +657,7 @@ function toolchain(_buildDir, _libDir)
 			"-m64",
 		}
 
-	configuration { "linux-clang", "x32" }
+	configuration { "linux-clang*", "x32" }
 		targetdir (path.join(_buildDir, "linux32_clang/bin"))
 		objdir (path.join(_buildDir, "linux32_clang/obj"))
 		libdirs { path.join(_libDir, "lib/linux32_clang") }
@@ -651,7 +665,7 @@ function toolchain(_buildDir, _libDir)
 			"-m32",
 		}
 
-	configuration { "linux-clang", "x64" }
+	configuration { "linux-clang*", "x64" }
 		targetdir (path.join(_buildDir, "linux64_clang/bin"))
 		objdir (path.join(_buildDir, "linux64_clang/obj"))
 		libdirs { path.join(_libDir, "lib/linux64_clang") }

@@ -201,8 +201,8 @@ Language:
 80-084465(FR)   | Oui-Oui - Detective d'un jour
 80-084467(SP)   | Noddy - Detective por un Dia
 -
-80-084480(US)   | The Princess and the Frog
-80-084481(US)   | The Princess and the Frog  ('pocket' version)
+80-084480(US)   | The Princess and the Frog  (motion version)
+80-084481(US)   | The Princess and the Frog  (pocket version)
 80-084482(NL)   | Prinses en de Kikker (label in english)
 80-084483(UK)   | The Princess and the Frog
 80-084484(GE)   | Kuess den Frosch
@@ -223,7 +223,7 @@ Language:
 -
 80-084560(US)   | <Unknown>
 -
-80-084580(US)   | Cars 2
+80-084580(US)   | Cars 2  (motion version)
 80-084581(US)   | Cars 2  (pocket version)
 80-084583(UK)   | Cars 2
 80-084584(GE)   | Cars 2
@@ -901,7 +901,18 @@ V.Baby (NOT V.Smile Baby)
 			</dataarea>
 		</part>
 	</software>
-
+	
+	<software name="cinderlaa" cloneof="cinderla" supported="no">
+		<description>Cinderella - Cinderella's Magic Wishes (USA, Alt)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="disney princess cinderella - cinderella's magic wishes [52-92240(us)].bin" size="8388608" crc="0a89723c" sha1="15082b565f6f71a0f993c2734cb807f37611eb17" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="cinderlaf" cloneof="cinderla" supported="no">
 		<description>Cendrillon - Le Rêve Enchanté de Cendrillon (Fra)</description>
 		<year>200?</year>
@@ -1111,8 +1122,19 @@ V.Baby (NOT V.Smile Baby)
 			</dataarea>
 		</part>
 	</software>
-
+	
 	<software name="mickymag" supported="no">
+		<description>Disney's Mickey Mouse - Mickey's Magical Adventure (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="disney's mickey mouse - mickey's magical adventure [no id].bin" size="8388608" crc="997a8a07" sha1="cd70c7249e25a37aeb3a3b85f56bd2b39dbf3d73" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickymagg" cloneof="mickymag" supported="no">
 		<description>Micky - Mickys magisches Abenteuer (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1452,8 +1474,19 @@ V.Baby (NOT V.Smile Baby)
 			</dataarea>
 		</part>
 	</software>
-
+	
 	<software name="toystor2" supported="no">
+		<description>Toy Story 2 - Operation: Rescue Woody! (USA)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="toy story 2 - operation- rescue woody! [52-92220(us)] (2005).bin" size="8388608" crc="6335b0e1" sha1="ddb4bcc5f9b155041bf4ffce236f57cfae3fdec2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toystor2g" cloneof="toystor2" supported="no">
 		<description>Toy Story 2 - Woodys Spannende Rettung (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1584,8 +1617,19 @@ V.Baby (NOT V.Smile Baby)
 			</dataarea>
 		</part>
 	</software>
-
+	
 	<software name="zayzoo" supported="no">
+		<description>Zayzoo - My Alien Classmate (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="zayzoo - my alien classmate [52-92360(us)].bin" size="8388608" crc="76ff9718" sha1="be783c1abe96f785564f5b5b6b4ea089b799c1d4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zayzoog" cloneof="zayzoo" supported="no">
 		<description>Zayzoo's Lernall (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1621,8 +1665,19 @@ V.Baby (NOT V.Smile Baby)
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="poohhawa" supported="no">
+		<description>Pooh's Hundred Acre Wood Adventure (USA) (V.Smile Baby)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="pooh's hundred acre wood adventure [099020] (2007) (baby).bin" size="8388608" crc="a3ac4cd4" sha1="3562c632e0a1e70cb9e382ebb823449757afed67" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
-	<software name="poohvb" supported="no">
+	<software name="poohvb" cloneof="poohhawa" supported="no">
 		<description>Nalle Puhs Aeventyr i Sjumilaskogen (Swe) (V.Smile Baby)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>

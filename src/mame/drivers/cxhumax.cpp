@@ -971,7 +971,7 @@ static ADDRESS_MAP_START(cxhumax_map, AS_PROGRAM, 32, cxhumax_state)
 	AM_RANGE(0xe0600000, 0xe063ffff) AM_READWRITE(cx_gxa_r, cx_gxa_w)                       // GXA
 	AM_RANGE(0xe4017000, 0xe40173ff) AM_RAM                                                 // HSX - BSP - 1K Video Shared Dual Port RAM (shared with MVP)
 	AM_RANGE(0xe4080000, 0xe4083fff) AM_RAM                                                 // HSX - TSP 0 - 16K Private Instructions/Data and Host-Shared Data
-	AM_RANGE(0xf0000000, 0xf03fffff) AM_READWRITE(flash_r, flash_w) AM_MIRROR(0xf8000000)   // 4MB FLASH (INTEL 28F320J3D)
+	AM_RANGE(0xf0000000, 0xf03fffff) AM_READWRITE(flash_r, flash_w) AM_MIRROR(0x08000000)   // 4MB FLASH (INTEL 28F320J3D)
 	AM_RANGE(0xf4000000, 0xf43fffff) AM_READ(dummy_flash_r)                                 // do we need it?
 ADDRESS_MAP_END
 

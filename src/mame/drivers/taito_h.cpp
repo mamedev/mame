@@ -150,18 +150,6 @@ some kind of zoom table?
 #include "sound/2610intf.h"
 #include "includes/taito_h.h"
 
-/***************************************************************************
-
-  Interrupt(s)
-
-***************************************************************************/
-
-/* Handler called by the YM2610 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(taitoh_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 
 /***************************************************************************
 
@@ -681,7 +669,7 @@ static MACHINE_CONFIG_START( syvalion, taitoh_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoh_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
@@ -736,7 +724,7 @@ static MACHINE_CONFIG_START( recordbr, taitoh_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoh_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
@@ -799,7 +787,7 @@ static MACHINE_CONFIG_START( dleague, taitoh_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoh_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)

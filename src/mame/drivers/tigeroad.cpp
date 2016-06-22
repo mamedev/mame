@@ -589,12 +589,6 @@ MACHINE_RESET_MEMBER(tigeroad_state,pushman)
 	memset(m_shared_ram, 0, ARRAY_LENGTH(m_shared_ram));
 }
 
-/* handler called by the 2203 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(tigeroad_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 static MACHINE_CONFIG_START( tigeroad, tigeroad_state )
 
 	/* basic machine hardware */
@@ -634,7 +628,7 @@ static MACHINE_CONFIG_START( tigeroad, tigeroad_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_3_579545MHz) /* verified on pcb */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(tigeroad_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ym2", YM2203, XTAL_3_579545MHz) /* verified on pcb */
@@ -698,7 +692,7 @@ static MACHINE_CONFIG_START( f1dream_comad, tigeroad_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 2000000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(tigeroad_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("ym2", YM2203, 2000000)

@@ -127,6 +127,7 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/3812intf.h"
 #include "video/hd63484.h"
@@ -334,7 +335,7 @@ static ADDRESS_MAP_START( jwildb52_map, AS_PROGRAM, 8, sigmab52_state )
 //  AM_RANGE(0xf770, 0xf77f)  Bill validator
 
 	AM_RANGE(0xf780, 0xf780) AM_WRITE(audiocpu_cmd_irq_w)
-	AM_RANGE(0xf790, 0xf790) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xf790, 0xf790) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 
 	AM_RANGE(0xf7b0, 0xf7b0) AM_WRITE(coin_enable_w)
 	AM_RANGE(0xf7d5, 0xf7d5) AM_WRITE(hopper_w)
@@ -360,7 +361,7 @@ static ADDRESS_MAP_START( sound_prog_map, AS_PROGRAM, 8, sigmab52_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x6020, 0x6027) AM_DEVREADWRITE("6840ptm_2", ptm6840_device, read, write)
 	AM_RANGE(0x6030, 0x6030) AM_WRITE(audiocpu_irq_ack_w)
-	AM_RANGE(0x6050, 0x6050) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x6050, 0x6050) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x6060, 0x6061) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("audiocpu", 0)
 ADDRESS_MAP_END
@@ -605,6 +606,9 @@ static MACHINE_CONFIG_START( jwildb52, sigmab52_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM3812, AUX_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

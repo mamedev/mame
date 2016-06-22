@@ -13,6 +13,8 @@
 #ifndef __EXPRESS_H__
 #define __EXPRESS_H__
 
+#include <functional>
+
 #include "emu.h"
 
 
@@ -115,9 +117,9 @@ protected:
 
 	// construction/destruction
 	symbol_entry(symbol_table &table, symbol_type type, const char *name, void *ref);
+public:
 	virtual ~symbol_entry();
 
-public:
 	// getters
 	symbol_entry *next() const { return m_next; }
 	const char *name() const { return m_name.c_str(); }
@@ -148,16 +150,16 @@ class symbol_table
 {
 public:
 	// callback functions for getting/setting a symbol value
-	typedef UINT64 (*getter_func)(symbol_table &table, void *symref);
-	typedef void (*setter_func)(symbol_table &table, void *symref, UINT64 value);
+	typedef std::function<UINT64(symbol_table &table, void *symref)> getter_func;
+	typedef std::function<void(symbol_table &table, void *symref, UINT64 value)> setter_func;
 
 	// callback functions for function execution
-	typedef UINT64 (*execute_func)(symbol_table &table, void *symref, int numparams, const UINT64 *paramlist);
+	typedef std::function<UINT64(symbol_table &table, void *symref, int numparams, const UINT64 *paramlist)> execute_func;
 
 	// callback functions for memory reads/writes
-	typedef expression_error::error_code (*valid_func)(void *cbparam, const char *name, expression_space space);
-	typedef UINT64 (*read_func)(void *cbparam, const char *name, expression_space space, UINT32 offset, int size);
-	typedef void (*write_func)(void *cbparam, const char *name, expression_space space, UINT32 offset, int size, UINT64 value);
+	typedef std::function<expression_error::error_code(void *cbparam, const char *name, expression_space space)> valid_func;
+	typedef std::function<UINT64(void *cbparam, const char *name, expression_space space, UINT32 offset, int size)> read_func;
+	typedef std::function<void(void *cbparam, const char *name, expression_space space, UINT32 offset, int size, UINT64 value)> write_func;
 
 	enum read_write
 	{
@@ -169,7 +171,7 @@ public:
 	symbol_table(void *globalref, symbol_table *parent = nullptr);
 
 	// getters
-	const tagged_list<symbol_entry> &entries() const { return m_symlist; }
+	const std::unordered_map<std::string, std::unique_ptr<symbol_entry>> &entries() const { return m_symlist; }
 	symbol_table *parent() const { return m_parent; }
 	void *globalref() const { return m_globalref; }
 
@@ -181,7 +183,7 @@ public:
 	void add(const char *name, UINT64 constvalue);
 	void add(const char *name, void *ref, getter_func getter, setter_func setter = nullptr);
 	void add(const char *name, void *ref, int minparams, int maxparams, execute_func execute);
-	symbol_entry *find(const char *name) const { return m_symlist.find(name); }
+	symbol_entry *find(const char *name) const { if (name) { auto search = m_symlist.find(name); if (search != m_symlist.end()) return search->second.get(); else return nullptr; } else return nullptr; }
 	symbol_entry *find_deep(const char *name);
 
 	// value getter/setter
@@ -197,7 +199,7 @@ private:
 	// internal state
 	symbol_table *          m_parent;           // pointer to the parent symbol table
 	void *                  m_globalref;        // global reference parameter
-	tagged_list<symbol_entry> m_symlist;        // list of symbols
+	std::unordered_map<std::string,std::unique_ptr<symbol_entry>> m_symlist;        // list of symbols
 	void *                  m_memory_param;     // callback parameter for memory
 	valid_func              m_memory_valid;     // validation callback
 	read_func               m_memory_read;      // read callback

@@ -16,7 +16,7 @@
 #include "palloc.h"
 #include "pfmtlog.h"
 
-PLIB_NAMESPACE_START()
+namespace plib {
 
 // -----------------------------------------------------------------------------
 // pstream: things common to all streams
@@ -108,7 +108,7 @@ public:
 
 	bool readline(pstring &line);
 
-	bool read(UINT8 &c)
+	bool read(char &c)
 	{
 		return (read(&c, 1) == 1);
 	}
@@ -377,6 +377,6 @@ private:
 	postream &m_strm;
 };
 
-PLIB_NAMESPACE_END()
+}
 
 #endif /* PSTREAM_H_ */

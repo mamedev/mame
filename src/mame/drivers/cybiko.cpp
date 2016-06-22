@@ -519,7 +519,7 @@ ROM_START( cybikoxt )
 
 	ROM_SYSTEM_BIOS( 0, "v1508", "v1.5.08" )
 
-	ROM_REGION( 0x80000, "flashxt", 0 )
+	ROM_REGION16_BE( 0x80000, "flashxt", 0 )
 	ROMX_LOAD( "cyos_v1508.bin", 0, 0x80000, CRC(f79400ba) SHA1(537a88e238746b3944b0cdfd4b0a9396460b2977), ROM_BIOS(1) )
 ROM_END
 

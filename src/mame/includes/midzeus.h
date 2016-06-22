@@ -29,7 +29,7 @@ public:
 	required_shared_ptr<UINT32> m_ram_base;
 	optional_shared_ptr<UINT32> m_linkram;
 	required_shared_ptr<UINT32> m_tms32031_control;
-	required_shared_ptr<UINT32> m_zeusbase;
+	optional_shared_ptr<UINT32> m_zeusbase;
 	optional_device<timekeeper_device> m_m48t35;
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;

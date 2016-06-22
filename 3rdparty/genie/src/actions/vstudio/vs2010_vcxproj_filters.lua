@@ -6,7 +6,7 @@
 
 	local vc2010 = premake.vstudio.vc2010
 	local project = premake.project
-	
+
 
 --
 -- The first portion of the filters file assigns unique IDs to each
@@ -28,7 +28,7 @@
 					filterfound = true
 					_p(1,'<ItemGroup>')
 				end
-				
+
 				path = path .. folders[i]
 
 				-- have I seen this path before?
@@ -43,7 +43,7 @@
 				path = path .. "\\"
 			end
 		end
-		
+
 		for _, custombuildtask in ipairs(prj.custombuildtask or {}) do
 			for _, buildtask in ipairs(custombuildtask or {}) do
 				local folders = string.explode(path.trimdots(path.getrelative(prj.location,buildtask[1])), "/", true)
@@ -54,7 +54,7 @@
 						filterfound = true
 						_p(1,'<ItemGroup>')
 					end
-					
+
 					path = path .. folders[i]
 
 					-- have I seen this path before?
@@ -67,7 +67,7 @@
 
 					-- prepare for the next subfolder
 					path = path .. "\\"
-				end	
+				end
 			end
 		end
 		if filterfound then
@@ -78,17 +78,17 @@
 
 --
 -- The second portion of the filters file assigns filters to each source
--- code file, as needed. Section is one of "ClCompile", "ClInclude", 
+-- code file, as needed. Section is one of "ClCompile", "ClInclude",
 -- "ResourceCompile", or "None".
 --
 
 	function vc2010.filefiltergroup(prj, section, kind)
 		local files = vc2010.getfilegroup(prj, section) or {}
-		
+
 		if kind == nill then
 			kind = section
 		end
-		
+
 		if (section == "CustomBuild") then
 			for _, custombuildtask in ipairs(prj.custombuildtask or {}) do
 				for _, buildtask in ipairs(custombuildtask or {}) do
@@ -107,8 +107,8 @@
 					filter = path.getdirectory(file.vpath)
 				else
 					filter = path.getdirectory(file.name)
-				end				
-				
+				end
+
 				if filter ~= "." then
 					_p(2,'<%s Include=\"%s\">', kind, path.translate(file.name, "\\"))
 						_p(3,'<Filter>%s</Filter>', path.translate(filter, "\\"))
@@ -125,7 +125,7 @@
 --
 -- Output the VC2010 filters file
 --
-	
+
 	function vc2010.generate_filters(prj)
 		io.indent = "  "
 		vc2010.header()
@@ -138,5 +138,6 @@
 			vc2010.filefiltergroup(prj, "AppxManifest")
 			vc2010.filefiltergroup(prj, "Image")
 			vc2010.filefiltergroup(prj, "DeploymentContent", "None")
+			vc2010.filefiltergroup(prj, "MASM")
 		_p('</Project>')
 	end

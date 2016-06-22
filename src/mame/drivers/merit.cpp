@@ -114,7 +114,6 @@ public:
 	DECLARE_WRITE8_MEMBER(casino5_bank_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(rndbit_r);
 	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
 	DECLARE_WRITE8_MEMBER(led1_w);
 	DECLARE_WRITE8_MEMBER(led2_w);
 	DECLARE_WRITE8_MEMBER(misc_w);
@@ -308,11 +307,6 @@ WRITE_LINE_MEMBER(merit_state::hsync_changed)
 	/* update any video up to the current scanline */
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
-}
-
-WRITE_LINE_MEMBER(merit_state::vsync_changed)
-{
-	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(merit_state::led1_w)
@@ -1334,7 +1328,7 @@ static MACHINE_CONFIG_START( pitboss, merit_state )
 	MCFG_MC6845_BEGIN_UPDATE_CB(merit_state, crtc_begin_update)
 	MCFG_MC6845_UPDATE_ROW_CB(merit_state, crtc_update_row)
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(merit_state, hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(merit_state, vsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", 0))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

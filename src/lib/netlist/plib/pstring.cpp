@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <algorithm>
+#include <stack>
 
 #include "pstring.h"
 #include "palloc.h"
@@ -131,8 +132,6 @@ const pstring_t<F> pstring_t<F>::substr(int start, int count) const
 		ret.pcopy(p, 0);
 	else
 	{
-		//FIXME: Trait to tell which one
-		//ret.pcopy(cstr() + start, count);
 		// find start
 		for (int i=0; i<start; i++)
 			p += F::codelen(p);
@@ -149,7 +148,7 @@ const pstring_t<F> pstring_t<F>::ucase() const
 {
 	pstring_t ret = *this;
 	ret.pcopy(cstr(), blen());
-	for (unsigned i=0; i<ret.len(); i++)
+	for (std::size_t  i=0; i<ret.len(); i++)
 		ret.m_ptr->str()[i] = toupper((unsigned) ret.m_ptr->str()[i]);
 	return ret;
 }
@@ -160,11 +159,11 @@ int pstring_t<F>::find_first_not_of(const pstring_t &no) const
 	char *t = m_ptr->str();
 	unsigned nolen = no.len();
 	unsigned tlen = len();
-	for (unsigned i=0; i < tlen; i++)
+	for (std::size_t  i=0; i < tlen; i++)
 	{
 		char *n = no.m_ptr->str();
 		bool f = true;
-		for (unsigned j=0; j < nolen; j++)
+		for (std::size_t  j=0; j < nolen; j++)
 		{
 			if (F::code(t) == F::code(n))
 				f = false;
@@ -184,11 +183,11 @@ int pstring_t<F>::find_last_not_of(const pstring_t &no) const
 	unsigned nolen = no.len();
 	unsigned tlen = len();
 	int last_found = -1;
-	for (unsigned i=0; i < tlen; i++)
+	for (std::size_t  i=0; i < tlen; i++)
 	{
 		char *n = no.m_ptr->str();
 		bool f = true;
-		for (unsigned j=0; j < nolen; j++)
+		for (std::size_t  j=0; j < nolen; j++)
 		{
 			if (F::code(t) == F::code(n))
 				f = false;
@@ -375,8 +374,8 @@ pstr_t *pstring_t<F>::salloc(int n)
 	if (stk == nullptr)
 		stk = plib::palloc_array<std::stack<pstr_t *>>(17);
 	pstr_t *p;
-	unsigned sn= ((32 - countleadbits(n)) + 1) / 2;
-	unsigned size = sizeof(pstr_t) + ((UINT64) 1<<(sn * 2)) + 1;
+	std::size_t sn= ((32 - countleadbits(n)) + 1) / 2;
+	std::size_t size = sizeof(pstr_t) + ((std::size_t) 1<<(sn * 2)) + 1;
 	if (stk[sn].empty())
 		p = (pstr_t *) plib::palloc_array<char>(size);
 	else
@@ -394,7 +393,7 @@ void pstring_t<F>::resetmem()
 {
 	if (stk != nullptr)
 	{
-		for (unsigned i=0; i<=16; i++)
+		for (std::size_t  i=0; i<=16; i++)
 		{
 			for (; stk[i].size() > 0; )
 			{
@@ -450,7 +449,7 @@ int pstring_t<F>::find(const pstring_t &search, unsigned start) const
 	const char *s = search.cstr();
 	const unsigned startt = std::min(start, tlen);
 	const char *t = cstr();
-	for (unsigned i=0; i<startt; i++)
+	for (std::size_t  i=0; i<startt; i++)
 		t += F::codelen(t);
 	for (int i=0; i <= (int) tlen - (int) startt - (int) slen; i++)
 	{
@@ -479,7 +478,7 @@ int pstring_t<F>::find(const mem_t *search, unsigned start) const
 	const char *s = search;
 	const unsigned startt = std::min(start, tlen);
 	const char *t = cstr();
-	for (unsigned i=0; i<startt; i++)
+	for (std::size_t  i=0; i<startt; i++)
 		t += F::codelen(t);
 	for (int i=0; i <= (int) tlen - (int) startt - (int) slen; i++)
 	{

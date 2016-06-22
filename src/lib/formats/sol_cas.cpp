@@ -198,7 +198,7 @@ static int sol20_handle_cassette(INT16 *buffer, const UINT8 *bytes)
 {
 	UINT32 sample_count = 0;
 	UINT32 i = 0,t = 0;
-	UINT8  c = 0;
+	UINT16 cc = 0;
 	sol20_byte_num = 1;
 	bool process_d = 0;
 	UINT16 length = 0;
@@ -227,10 +227,10 @@ static int sol20_handle_cassette(INT16 *buffer, const UINT8 *bytes)
 					break;
 				case 'C': // carrier
 					{
-						if (c) // if this is the next file, clean up after the previous one
+						if (cc) // if this is the next file, clean up after the previous one
 						{
 							sample_count += sol20_output_byte(buffer, sample_count, sol20_cksm_byte); // final checksum if needed
-							c = 0;
+							cc = 0;
 						}
 
 						sol20_byte_num+=2; // bump to parameter
@@ -242,18 +242,21 @@ static int sol20_handle_cassette(INT16 *buffer, const UINT8 *bytes)
 					}
 				case 'H': // header
 					{
-						if (c) // if this is the next file, clean up after the previous one
+						if (cc) // if this is the next file, clean up after the previous one
 						{
 							sample_count += sol20_output_byte(buffer, sample_count, sol20_cksm_byte); // final checksum if needed
-							c = 0;
+							cc = 0;
 						}
 
 						sol20_byte_num+=2; // bump to file name
-						sol20_header[0] = bytes[sol20_byte_num++];
-						sol20_header[1] = bytes[sol20_byte_num++];
-						sol20_header[2] = bytes[sol20_byte_num++];
-						sol20_header[3] = bytes[sol20_byte_num++];
-						sol20_header[4] = bytes[sol20_byte_num++];
+						for (i = 0; i < 5; i++)
+							sol20_header[i] = 0x20;
+						for (i = 0; i < 5; i++)
+						{
+							sol20_header[i] = bytes[sol20_byte_num++];
+							if (sol20_header[i] == 0x20)
+								break;
+						}
 						sol20_header[5] = 0;
 						sol20_scan_to_hex(bytes); // bump to file type
 						sol20_header[6] = sol20_read_hex(bytes, 2);
@@ -298,16 +301,24 @@ static int sol20_handle_cassette(INT16 *buffer, const UINT8 *bytes)
 						{
 							t = sol20_read_hex(bytes, 2);
 							sample_count += sol20_output_byte(buffer, sample_count, t);
-							sol20_cksm_byte = sol20_calc_cksm(sol20_cksm_byte, t);
-							c++;
-							length--;
-							if (!length)
-								process_d = 0;
-							if (!c)
+							cc++;
+							// if it's a data byte reduce remaining length and calculate checksum;
+							// tape supplies checksums except last one
+							if (cc < 257)
 							{
-								sample_count += sol20_output_byte(buffer, sample_count, sol20_cksm_byte);
+								length--;
+								sol20_cksm_byte = sol20_calc_cksm(sol20_cksm_byte, t);
+							}
+							else
+							// didnt need it, throw away
+							{
+								cc = 0;
 								sol20_cksm_byte = 0;
 							}
+							// see if finished tape
+							if (!length)
+								process_d = 0;
+							// bump to next byte
 							sol20_scan_to_hex(bytes);
 						}
 					}
@@ -318,7 +329,7 @@ static int sol20_handle_cassette(INT16 *buffer, const UINT8 *bytes)
 		}
 	}
 
-	if (c)  // reached the end of the svt file
+	if (cc)  // reached the end of the svt file
 		sample_count += sol20_output_byte(buffer, sample_count, sol20_cksm_byte); // final checksum if needed
 
 	return sample_count;

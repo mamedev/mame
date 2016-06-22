@@ -793,7 +793,7 @@ WRITE16_MEMBER(neogeo_state::memcard_w)
 
 WRITE8_MEMBER(neogeo_state::audio_command_w)
 {
-	soundlatch_write(data);
+	m_soundlatch->write(space, 0, data);
 
 	m_audio_cpu_nmi_pending = true;
 	audio_cpu_check_nmi();
@@ -805,7 +805,7 @@ WRITE8_MEMBER(neogeo_state::audio_command_w)
 
 READ8_MEMBER(neogeo_state::audio_command_r)
 {
-	UINT8 ret = soundlatch_read();
+	UINT8 ret = m_soundlatch->read(space, 0);
 
 	m_audio_cpu_nmi_pending = false;
 	audio_cpu_check_nmi();
@@ -816,7 +816,7 @@ READ8_MEMBER(neogeo_state::audio_command_r)
 
 CUSTOM_INPUT_MEMBER(neogeo_state::get_audio_result)
 {
-	UINT8 ret = soundlatch_read(1); // soundlatch2_byte_r
+	UINT8 ret = m_soundlatch2->read(m_audiocpu->space(AS_PROGRAM), 0);
 
 	return ret;
 }
@@ -1172,12 +1172,12 @@ void neogeo_state::set_slot_idx(int slot)
 		space.unmap_readwrite(0x000080, 0x0fffff);
 		space.unmap_readwrite(0x200000, 0x2fffff);
 		if (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0)
-			space.install_rom(0x000080, 0x0fffff, 0, 0, (UINT16 *)m_region_maincpu->base() + 0x80/2);
+			space.install_rom(0x000080, 0x0fffff, (UINT16 *)m_region_maincpu->base() + 0x80/2);
 		else
-			space.install_rom(0x000080, 0x0fffff, 0, 0, (UINT16 *)m_slots[m_curr_slot]->get_rom_base() + 0x80/2);
+			space.install_rom(0x000080, 0x0fffff, (UINT16 *)m_slots[m_curr_slot]->get_rom_base() + 0x80/2);
 
 
-		space.install_read_bank(0x200000, 0x2fffff, 0, 0, "cartridge");
+		space.install_read_bank(0x200000, 0x2fffff, "cartridge");
 		space.install_write_handler(0x2ffff0, 0x2fffff, write16_delegate(FUNC(neogeo_state::write_banksel),this));
 		m_bank_cartridge = membank("cartridge");
 
@@ -1289,7 +1289,7 @@ void neogeo_state::set_slot_idx(int slot)
 			case NEOGEO_VLINER:
 				space.install_readwrite_handler(0x200000, 0x201fff, read16_delegate(FUNC(neogeo_cart_slot_device::ram_r),(neogeo_cart_slot_device*)m_slots[m_curr_slot]), write16_delegate(FUNC(neogeo_cart_slot_device::ram_w),(neogeo_cart_slot_device*)m_slots[m_curr_slot]));
 				// custom input handling... install it here for the moment.
-				space.install_read_port(0x300000, 0x300001, 0, 0x01ff7e, "DSW");
+				space.install_read_port(0x300000, 0x300001, 0x01ff7e, "DSW");
 				space.install_read_port(0x280000, 0x280001, "IN5");
 				space.install_read_port(0x2c0000, 0x2c0001, "IN6");
 				break;
@@ -1522,11 +1522,11 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( audio_io_map, AS_IO, 8, neogeo_state )
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(audio_command_r, soundlatch_clear_byte_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READ(audio_command_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
 	AM_RANGE(0x04, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff10) AM_MASK(0x0010) AM_WRITE(audio_cpu_enable_nmi_w)
-	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xfff0) AM_MASK(0xff03) AM_READ(audio_cpu_bank_select_r)
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff00) AM_WRITE(soundlatch2_byte_w)
+	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_SELECT(0x0010) AM_WRITE(audio_cpu_enable_nmi_w)
+	AM_RANGE(0x08, 0x0b) AM_MIRROR(0x00f0) AM_SELECT(0xff00) AM_READ(audio_cpu_bank_select_r)
+	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 
@@ -1660,6 +1660,9 @@ MACHINE_CONFIG_START( neogeo_base, neogeo_state )
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, NEOGEO_YM2610_CLOCK)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -2023,9 +2026,9 @@ DRIVER_INIT_MEMBER(neogeo_state, neogeo)
 {
 	// install controllers
 	if (m_ctrl1)
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, 0, 0x01ff7e, read16_delegate(FUNC(neogeo_state::in0_r), this));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, 0, 0x01ff7e, 0, read16_delegate(FUNC(neogeo_state::in0_r), this));
 	if (m_ctrl2)
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x340000, 0x340001, 0, 0x01fffe, read16_delegate(FUNC(neogeo_state::in1_r), this));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x340000, 0x340001, 0, 0x01fffe, 0, read16_delegate(FUNC(neogeo_state::in1_r), this));
 }
 
 

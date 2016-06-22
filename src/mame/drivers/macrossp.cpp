@@ -307,7 +307,7 @@ WRITE32_MEMBER(macrossp_state::macrossp_soundcmd_w)
 	if (ACCESSING_BITS_16_31)
 	{
 		//logerror("%08x write soundcmd %08x (%08x)\n",space.device().safe_pc(),data,mem_mask);
-		soundlatch_word_w(space, 0, data >> 16, 0xffff);
+		m_soundlatch->write(space, 0, data >> 16, 0xffff);
 		m_sndpending = 1;
 		m_audiocpu->set_input_line(2, HOLD_LINE);
 		/* spin for a while to let the sound CPU read the command */
@@ -319,7 +319,7 @@ READ16_MEMBER(macrossp_state::macrossp_soundcmd_r)
 {
 	//  logerror("%06x read soundcmd\n",space.device().safe_pc());
 	m_sndpending = 0;
-	return soundlatch_word_r(space, offset, mem_mask);
+	return m_soundlatch->read(space, offset, mem_mask);
 }
 
 WRITE16_MEMBER(macrossp_state::palette_fade_w)
@@ -563,6 +563,8 @@ static MACHINE_CONFIG_START( macrossp, macrossp_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ensoniq", ES5506, 16000000)
 	MCFG_ES5506_REGION0("ensoniq.0")

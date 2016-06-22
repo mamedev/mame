@@ -357,27 +357,60 @@ void cassette_image_device::call_unload()
 }
 
 
+//-------------------------------------------------
+//  display a small tape animation, with the
+//	current position in the tape image
+//-------------------------------------------------
 
-/*
-    display a small tape icon, with the current position in the tape image
-*/
-void cassette_image_device::call_display()
+std::string cassette_image_device::call_display()
 {
-	/* abort if we should not be showing the image */
-	if (!exists())
-		return;
-	if (!is_motor_on())
-		return;
-	machine().ui().image_display(CASSETTE, this);
-	// make sure tape stops at end when playing
-	if ((m_state & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY)
+	const int ANIMATION_FPS = 1;
+
+	std::string result;
+
+	// only show the image when a cassette is loaded and the motor is on
+	if (exists() && is_motor_on())
 	{
-		if ( m_cassette )
+		int n;
+		double position, length;
+		cassette_state uistate;
+		static const char *shapes[] = { u8"\u2500", u8"\u2572", u8"\u2502", u8"\u2571" };
+
+		// figure out where we are in the cassette
+		position = get_position();
+		length = get_length();
+		uistate = (cassette_state)(get_state() & CASSETTE_MASK_UISTATE);
+
+		// choose which frame of the animation we are at
+		n = ((int)position / ANIMATION_FPS) % ARRAY_LENGTH(shapes);
+
+		// play or record
+		const char *status_icon = (uistate == CASSETTE_PLAY)
+			? u8"\u25BA"
+			: u8"\u25CF";
+
+		// Since you can have anything in a BDF file, we will use crude ascii characters instead 
+		result = string_format("%s %s %02d:%02d (%04d) [%02d:%02d (%04d)]",
+			shapes[n],					// animation
+			status_icon,				// play or record
+			((int)position / 60),
+			((int)position % 60),
+			(int)position,
+			((int)length / 60),
+			((int)length % 60),
+			(int)length);
+
+		// make sure tape stops at end when playing
+		if ((m_state & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY)
 		{
-			if (get_position() > get_length())
+			if (m_cassette)
 			{
-				m_state = (cassette_state)(( m_state & ~CASSETTE_MASK_UISTATE ) | CASSETTE_STOPPED);
+				if (get_position() > get_length())
+				{
+					m_state = (cassette_state)((m_state & ~CASSETTE_MASK_UISTATE) | CASSETTE_STOPPED);
+				}
 			}
 		}
 	}
+	return result;
 }

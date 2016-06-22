@@ -12,7 +12,7 @@
 
 What's new :
  - added bootlegs - Bronx and Colt
- - Cycle Shooting added (bigger VRAM than nycpator, dfferent (unknwn yet) banking and
+ - Cycle Shooting added (bigger VRAM than nycpator, different (unknown yet) banking and
    gfx control , ROMs probably are wrong mapped, gfx too)
  - Sub CPU halt (cpu #0 ,$d001)
  - Improved communication between main cpu and sound cpu ($d400 cpu#0 , $d000 sound cpu)
@@ -159,14 +159,14 @@ Stephh's additional notes (based on the game Z80 code and some tests) :
         Furthermore, shooting birds kills you instead of recovering 3 "steps" of damage !
   - I can't tell if it's an ingame bug of this bootleg, but the game hangs after bonus stage
     (level 4) instead of looping back to level 1 with higher difficulty.
-    The game also frezees sometimes for some unknown reasons.
+    The game also freezes sometimes for some unknown reasons.
 
 2) 'cyclshtg' and clones
 
 2a) 'cyclshtg'
 
   - Lives (BCD coded) settings are not read from MCU, but from table at 0x0fee.
-  - Even if it isn't mentionned in the manual, DSWB bit 7 allows you to reset damage to 0
+  - Even if it isn't mentioned in the manual, DSWB bit 7 allows you to reset damage to 0
     at the end of a level (check code at 0x328d).
   - When "Infinite Bullets" is set to ON, there is no timer to reload the bullets.
     However, it's hard to notice as you don't see an indicator as in 'nycaptor'.
@@ -271,7 +271,7 @@ TIMER_CALLBACK_MEMBER(nycaptor_state::nmi_callback)
 
 WRITE8_MEMBER(nycaptor_state::sound_command_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(nycaptor_state::nmi_callback),this), data);
 }
 
@@ -360,7 +360,7 @@ static ADDRESS_MAP_START( nycaptor_sound_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0xca00, 0xca00) AM_WRITENOP
 	AM_RANGE(0xcb00, 0xcb00) AM_WRITENOP
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITENOP
-	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_byte_r) AM_WRITE(to_main_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(to_main_w)
 	AM_RANGE(0xd200, 0xd200) AM_READNOP AM_WRITE(nmi_enable_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(nmi_disable_w)
 	AM_RANGE(0xd600, 0xd600) AM_WRITENOP
@@ -837,6 +837,8 @@ static MACHINE_CONFIG_START( nycaptor, nycaptor_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, 8000000/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(nycaptor_state, unk_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(nycaptor_state, unk_w))
@@ -898,6 +900,8 @@ static MACHINE_CONFIG_START( cyclshtg, nycaptor_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, 8000000/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(nycaptor_state, unk_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(nycaptor_state, unk_w))
@@ -958,6 +962,8 @@ static MACHINE_CONFIG_START( bronx, nycaptor_state )
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 8000000/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(nycaptor_state, unk_w))

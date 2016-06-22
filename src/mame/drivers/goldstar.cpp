@@ -938,9 +938,9 @@ WRITE8_MEMBER(wingco_state::magodds_outb860_w)
 //  popmessage("magodds_outb860_w %02x\n", data);
 }
 
-WRITE8_MEMBER(wingco_state::fl7w4_outb802_w)
+WRITE8_MEMBER(wingco_state::fl7w4_outc802_w)
 {
-	m_fl7w4_id->write((data & 0x40) ? 1 : 0);
+	m_fl7w4_id->write((data >> 6) & 0x01);
 }
 
 static ADDRESS_MAP_START( magodds_map, AS_PROGRAM, 8, wingco_state )
@@ -7368,6 +7368,31 @@ static const gfx_layout super9_tilelayout =  // Green is OK. Red needs normal go
 };
 
 
+static const gfx_layout flaming7_charlayout =
+{
+	8,8,    /* 8*8 characters */
+	4096,    /* 4096 characters */
+	3,      /* 3 bits per pixel */
+	{ 2, 4, 6 }, /* the bitplanes are packed in one byte */
+	{ 2*8+0, 2*8+1, 3*8+0, 3*8+1, 0*8+0, 0*8+1, 1*8+0, 1*8+1 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	32*8   /* every char takes 32 consecutive bytes */
+};
+
+static const gfx_layout flaming7_tilelayout =
+{
+	8,32,    /* 8*32 characters */
+	256,    /* 256 tiles */
+	4,      /* 4 bits per pixel */
+	{ 0, 2, 4, 6 },
+	{ 2*8+0, 2*8+1, 3*8+0, 3*8+1, 0, 1, 1*8+0, 1*8+1 },
+	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8,
+	  32*8, 36*8, 40*8, 44*8, 48*8, 52*8, 56*8, 60*8,
+	  64*8, 68*8, 72*8, 76*8, 80*8, 84*8, 88*8, 92*8,
+	  96*8, 100*8, 104*8, 108*8, 112*8, 116*8, 120*8, 124*8 },
+	128*8   /* every char takes 128 consecutive bytes */
+};
+
 
 static GFXDECODE_START( goldstar )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
@@ -7470,6 +7495,11 @@ GFXDECODE_END
 static GFXDECODE_START( super9 )
 	GFXDECODE_ENTRY( "gfx1", 0, super9_charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, super9_tilelayout, 128,  8 )
+GFXDECODE_END
+
+static GFXDECODE_START( flaming7 )  // still wrong... FIXME
+	GFXDECODE_ENTRY( "gfx1", 0, flaming7_charlayout,   0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, flaming7_tilelayout, 104,  8 )
 GFXDECODE_END
 
 
@@ -7638,6 +7668,7 @@ WRITE8_MEMBER(goldstar_state::ay8910_outputb_w)
 	//popmessage("ay8910_outputb_w %02x",data);
 }
 
+
 static MACHINE_CONFIG_START( goldstar, goldstar_state )
 
 	/* basic machine hardware */
@@ -7796,7 +7827,7 @@ static MACHINE_CONFIG_START( super9, goldstar_state )
 MACHINE_CONFIG_END
 
 
-PALETTE_INIT_MEMBER(goldstar_state,cm)
+PALETTE_INIT_MEMBER(goldstar_state, cm)
 {
 	/* BBGGGRRR */
 
@@ -7813,7 +7844,7 @@ PALETTE_INIT_MEMBER(goldstar_state,cm)
 	}
 }
 
-PALETTE_INIT_MEMBER(goldstar_state,cmast91)
+PALETTE_INIT_MEMBER(goldstar_state, cmast91)
 {
 	int i;
 	for (i = 0; i < 0x100; i++)
@@ -8186,17 +8217,31 @@ static MACHINE_CONFIG_DERIVED( bingownga, bingowng )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_DERIVED( flam7_w4, lucky8 )
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(flaming7_map)
+
+	MCFG_DEVICE_MODIFY("ppi8255_0")
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, fl7w4_outc802_w))
+
+	MCFG_DS2401_ADD("fl7w4_id")
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( flaming7, lucky8 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(flaming7_map)
-//  MCFG_CPU_IO_MAP(flaming7_readport)
 
+	MCFG_GFXDECODE_MODIFY("gfxdecode", flaming7)
+
+    // to do serial protection.
 	MCFG_DEVICE_MODIFY("ppi8255_0")
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(wingco_state, fl7w4_outb802_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, fl7w4_outc802_w))
 
 	MCFG_DS2401_ADD("fl7w4_id")
 MACHINE_CONFIG_END
+
 
 
 PALETTE_INIT_MEMBER(wingco_state, magodds)
@@ -13770,7 +13815,34 @@ ROM_END
 
 */
 ROM_START( cmpacman )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )  // Seems to have the pulse/bookkeeping bug fixed.
+	ROM_LOAD( "corsica_v8.31_pacman_old_board_new.bin",  0x0000,  0x10000, CRC(4f1ea727) SHA1(e127f3da9e7cc81b93dc3eec66ca56452e78375e) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "c_m_pacman_rom7.u16", 0x00000,  0x8000, CRC(c53273a4) SHA1(d359e65c31ef5253f1e9a3b67db8851a8d1262d1) )
+	ROM_LOAD( "c_m_pacman_rom6.u11", 0x08000,  0x8000, CRC(013bff64) SHA1(65f2808480970a756b642ddd1a64c10b89ea3b3e) )
+	ROM_LOAD( "c_m_pacman_rom5.u4",  0x10000,  0x8000, CRC(03298f22) SHA1(32c99da82afff6d38333a9998802c497d6f49fab) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.u15",  0x0000,  0x2000, CRC(8607ffd9) SHA1(9bc94715554aa2473ae2ed249a47f29c7886b3dc) )
+	ROM_LOAD( "3.u10",  0x2000,  0x2000, CRC(c32367be) SHA1(ff217021b9c58e23b2226f8b0a7f5da966225715) )
+	ROM_LOAD( "2.u14",  0x4000,  0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
+	ROM_LOAD( "1.u9",   0x6000,  0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "8.u53",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+
+	/* proms taken from cmv4, probably wrong  */
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+ROM_START( cmpacmana )
+	ROM_REGION( 0x10000, "maincpu", 0 )  // Seems to have a pulse/bookkeeping bug.
 	ROM_LOAD( "corsica_v8.31_pacman_old_board.bin",  0x0000,  0x10000, CRC(f69cbe75) SHA1(08446eb005b6c7ed24489fd664df14b20a41e3eb) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
@@ -14122,6 +14194,8 @@ ROM_END
   Flaming 7
   Cyberdyne Systems, Inc.
 
+  W4 hardware.
+
   GFX sets:
   1) Red, White & Blue 7's
   2) Hollywood Nights.
@@ -14163,7 +14237,102 @@ ROM_START( fl7_3121 )  // Red, White & Blue 7's + Hollywood Nights. Serial 7D063
 	ROM_LOAD( "82s123.d12", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 
 	ROM_REGION(0x8, "fl7w4_id", 0)     /* Electronic Serial DS2401 */
-	ROM_LOAD( "ds2401.bin", 0x0000, 0x0008, BAD_DUMP CRC(747b40b1) SHA1(3336d8de5333057beb5f55873b9410cc7bf73fbb) ) // Hand built... Last byte is CRC-8. Need to be checked.
+	ROM_LOAD( "ds2401.bin", 0x0000, 0x0008, CRC(b7078792) SHA1(f9eba1587b65ed9bc07ea6c4b2d393fb43f60659) ) // Hand built to match our ROM set
+
+ROM_END
+
+/*
+  Flaming 7's
+  Cyberdyne Systems.
+
+  Main - 50.
+  Custom Hardware.
+
+*/  
+ROM_START( fl7_50 )  // Serial 00000069A1C9.
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "50-main.u22",  0x0000, 0x8000, CRC(e097e317) SHA1(a903144cc2290b7e22045490784b592adbf9ba97) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "27c1001.u6",  0x00000, 0x20000, CRC(00eac3c1) SHA1(1a955f8bc044e17f0885b4b126a66d7ad191e410) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "27c256.u3",   0x0000, 0x8000, CRC(cfc8f3e2) SHA1(7dd72e3ffb0904776f3c07635b953e72f4c63068) )
+
+	/* Proper bipolar PROM dump */
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
+	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "dummy", 0x0000, 0x0020, NO_DUMP )
+
+	ROM_REGION(0x8, "fl7w4_id", 0)     /* Electronic Serial DS2401 */
+	ROM_LOAD( "ds2401.bin", 0x0000, 0x0008, NO_DUMP ) // Hand built to match our ROM set
+
+ROM_END
+
+
+/*
+  Flaming 7's
+  Cyberdyne Systems.
+
+  Main - 500.
+  Custom Hardware.
+
+*/  
+ROM_START( fl7_500 )  // Serial 000000125873.
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "500-main.u22",  0x0000, 0x8000, CRC(e2c82c67) SHA1(951b0044de9b6104f51aa5a3176d0ea475415f7c) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "27c1001.u6",  0x00000, 0x20000, CRC(00eac3c1) SHA1(1a955f8bc044e17f0885b4b126a66d7ad191e410) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "27c256.u3",   0x0000, 0x8000, CRC(4e3bd980) SHA1(202d3135da7ab435f487943079d88b170dc10955) )
+
+	/* Proper bipolar PROM dump */
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
+	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "dummy", 0x0000, 0x0020, NO_DUMP )
+
+	ROM_REGION(0x8, "fl7w4_id", 0)     /* Electronic Serial DS2401 */
+	ROM_LOAD( "ds2401.bin",  0x0000, 0x0008, NO_DUMP ) // Hand built to match our ROM set
+
+ROM_END
+
+
+/*
+  Flaming 7's
+  Cyberdyne Systems.
+
+  Main - 2000.
+  Custom Hardware.
+
+*/  
+ROM_START( fl7_2000 )  // Serial 00000063A47F.
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "2000_main_27c256.u22",  0x0000, 0x8000, CRC(9659b045) SHA1(801b6733b70b35de65cd8faba6814fa013c05ad0) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "m27c1001.u6",  0x00000, 0x20000, CRC(5a2157bb) SHA1(2b170102caf1224df7a6d33bb84d19114f453d89) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "27c256.u3",   0x0000, 0x8000, CRC(cfc8f3e2) SHA1(7dd72e3ffb0904776f3c07635b953e72f4c63068) )
+
+	/* Proper bipolar PROM dump */
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
+	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "dummy", 0x0000, 0x0020, NO_DUMP )
+
+	ROM_REGION(0x8, "fl7w4_id", 0)     /* Electronic Serial DS2401 */
+	ROM_LOAD( "ds2401.bin", 0x0000, 0x0008, NO_DUMP ) // Hand built to match our ROM set
 
 ROM_END
 
@@ -14312,7 +14481,7 @@ DRIVER_INIT_MEMBER(cb3_state, chrygld)
 	dump_to_file(ROM);
 }
 
-DRIVER_INIT_MEMBER(cmaster_state,cm)
+DRIVER_INIT_MEMBER(cmaster_state, cm)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
 
@@ -14334,7 +14503,7 @@ DRIVER_INIT_MEMBER(cmaster_state, cmv4)
 	ROM[0x020d] = 0x9b;
 }
 
-DRIVER_INIT_MEMBER(goldstar_state,cmast91)
+DRIVER_INIT_MEMBER(goldstar_state, cmast91)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
 
@@ -14815,6 +14984,31 @@ DRIVER_INIT_MEMBER(goldstar_state, wcherry)
 	}
 }
 
+/*
+  Flaming 7's
+  Cyberdyne Systems.
+  
+  Original custom hardware graphics decryption.
+
+*/
+DRIVER_INIT_MEMBER(wingco_state, flaming7)
+{
+/*  bank 1 graphics */
+	int i;
+	UINT8 *src = memregion("gfx1")->base();
+	for (i = 0; i < 0x20000; i++)
+	{
+		src[i] = BITSWAP8(src[i], 4, 3, 2, 5, 1, 6, 0, 7);      // OK
+	}
+
+/*  bank 2 graphics */
+	UINT8 *src2 = memregion("gfx2")->base();
+	for (i = 0; i < 0x8000; i++)
+	{
+		src2[i] = BITSWAP8(src2[i], 3, 4, 2, 5, 1, 6, 0, 7);    // OK
+	}
+}
+
 
 /*********************************************
 *                Game Drivers                *
@@ -14912,7 +15106,10 @@ GAMEL( 1993, bingownga, bingowng, bingownga,bingownga,driver_device,  0,        
 
 
 // --- Flaming 7's hardware (W-4 derivative) ---
-GAME(  199?, fl7_3121,  0,        flaming7, flaming7, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 (Red, White & Blue 7's + Hollywood Nights)",     MACHINE_NOT_WORKING )
+GAME(  199?, fl7_3121,  0,        flam7_w4, flaming7, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 (W4 Hardware, Red, White & Blue 7's + Hollywood Nights)",          0 )
+GAME(  199?, fl7_50,    0,        flaming7, flaming7, wingco_state,   flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 50)",                    MACHINE_NOT_WORKING )
+GAME(  199?, fl7_500,   fl7_50,   flaming7, flaming7, wingco_state,   flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 500)",                   MACHINE_NOT_WORKING )
+GAME(  199?, fl7_2000,  fl7_50,   flaming7, flaming7, wingco_state,   flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 2000)",                  MACHINE_NOT_WORKING )
 
 
 // --- Wing W-8 hardware ---
@@ -14989,12 +15186,13 @@ GAME( 1996, cherry96, scmaster,  unkch,    unkch4,    unkch_state,    unkch4,   
 /* Stealth sets.
    These have hidden games inside that can be switched to avoid inspections, police or whatever purposes)... */
 
-/*    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT     ROT    COMPANY                FULLNAME                                                 FLAGS                  LAYOUT    */
-GAMEL( 198?, cmpacman, 0,        cm,       cmpacman, cmaster_state,  cm,      ROT0, "<unknown>",           "Super Pacman (v1.2) + Cherry Master (Corsica, v8.31)",   0,                     layout_cmpacman ) // need to press K to switch between games...
-GAMEL( 198?, cmtetris, 0,        cm,       cmtetris, cmaster_state,  cm,      ROT0, "<unknown>",           "Tetris + Cherry Master (Corsica, v8.01, set 1)",         0,                     layout_cmpacman ) // need to press K/L to switch between games...
-GAMEL( 198?, cmtetrsa, 0,        cm,       cmtetris, cmaster_state,  cm,      ROT0, "<unknown>",           "Tetris + Cherry Master (Corsica, v8.01, set 2)",         MACHINE_NOT_WORKING,      layout_cmpacman ) // seems banked...
-GAMEL( 198?, cmtetrsb, 0,        cm,       cmtetris, cmaster_state,  cm,      ROT0, "<unknown>",           "Tetris + Cherry Master (+K, Canada Version, encrypted)", MACHINE_NOT_WORKING,      layout_cmpacman ) // different Tetris game. press insert to throttle and see the attract running.
-GAMEL( 1997, crazybon, 0,        pkrmast,  crazybon, driver_device,  0,       ROT0, "bootleg (Crazy Co.)", "Crazy Bonus 2002",                                       MACHINE_IMPERFECT_COLORS, layout_crazybon ) // Windows ME desktop... but not found the way to switch it.
+/*    YEAR  NAME        PARENT    MACHINE   INPUT     STATE           INIT     ROT    COMPANY                FULLNAME                                                      FLAGS                     LAYOUT    */
+GAMEL( 198?, cmpacman,  0,        cm,       cmpacman, cmaster_state,  cm,      ROT0, "<unknown>",           "Super Pacman (v1.2) + Cherry Master (Corsica, v8.31, set 1)", 0,                        layout_cmpacman ) // need to press K to switch between games...
+GAMEL( 198?, cmpacmana, cmpacman, cm,       cmpacman, cmaster_state,  cm,      ROT0, "<unknown>",           "Super Pacman (v1.2) + Cherry Master (Corsica, v8.31, set 2)", 0,                        layout_cmpacman ) // need to press K to switch between games...
+GAMEL( 198?, cmtetris,  0,        cm,       cmtetris, cmaster_state,  cm,      ROT0, "<unknown>",           "Tetris + Cherry Master (Corsica, v8.01, set 1)",              0,                        layout_cmpacman ) // need to press K/L to switch between games...
+GAMEL( 198?, cmtetrsa,  0,        cm,       cmtetris, cmaster_state,  cm,      ROT0, "<unknown>",           "Tetris + Cherry Master (Corsica, v8.01, set 2)",              MACHINE_NOT_WORKING,      layout_cmpacman ) // seems banked...
+GAMEL( 198?, cmtetrsb,  0,        cm,       cmtetris, cmaster_state,  cm,      ROT0, "<unknown>",           "Tetris + Cherry Master (+K, Canada Version, encrypted)",      MACHINE_NOT_WORKING,      layout_cmpacman ) // different Tetris game. press insert to throttle and see the attract running.
+GAMEL( 1997, crazybon,  0,        pkrmast,  crazybon, driver_device,  0,       ROT0, "bootleg (Crazy Co.)", "Crazy Bonus 2002",                                            MACHINE_IMPERFECT_COLORS, layout_crazybon ) // Windows ME desktop... but not found the way to switch it.
 
 /* other possible stealth sets:
  - cmv4a    ---> see the 1fxx zone. put a bp in 1f9f to see the loop.

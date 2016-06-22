@@ -171,8 +171,8 @@ WRITE8_MEMBER(icatel_state::ci8_w)
 READ8_MEMBER(icatel_state::ci15_r)
 {
 	/* TODO: Implement-me! */
-//  debugger_break(machine());
-//  logerror("read: ci15\n");
+	//machine().debug_break();
+	//logerror("read: ci15\n");
 	return (1 << 3) | (1 << 0);
 }
 

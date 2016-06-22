@@ -108,7 +108,7 @@ menu_confirm_save_as::~menu_confirm_save_as()
 void menu_confirm_save_as::populate()
 {
 	item_append(_("File Already Exists - Override?"), nullptr, FLAG_DISABLE, nullptr);
-	item_append(MENU_SEPARATOR_ITEM, nullptr, FLAG_DISABLE, nullptr);
+	item_append(menu_item_type::SEPARATOR);
 	item_append(_("No"), nullptr, 0, ITEMREF_NO);
 	item_append(_("Yes"), nullptr, 0, ITEMREF_YES);
 }
@@ -224,7 +224,7 @@ void menu_file_create::populate()
 	item_append(_("New Image Name:"), new_image_name, 0, ITEMREF_NEW_IMAGE_NAME);
 
 	// do we support multiple formats?
-	if (ENABLE_FORMATS) format = m_image->formatlist().first();
+	if (ENABLE_FORMATS) format = m_image->formatlist().front().get();
 	if (ENABLE_FORMATS && (format != nullptr))
 	{
 		item_append(_("Image Format:"), m_current_format->description(), 0, ITEMREF_FORMAT);
@@ -319,12 +319,62 @@ menu_file_selector::~menu_file_selector()
 
 void menu_file_selector::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	extra_text_render(top, bottom,
-		origx1, origy1, origx2, origy2,
-		m_current_directory.c_str(),
-		nullptr);
+	// lay out extra text
+	auto layout = ui().create_layout(container);
+	layout.add_text(m_current_directory.c_str());
+
+	// position this extra text
+	float x1, y1, x2, y2;
+	extra_text_position(origx1, origx2, origy1, top, layout, -1, x1, y1, x2, y2);
+
+	// draw a box
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+
+	// take off the borders
+	x1 += UI_BOX_LR_BORDER;
+	y1 += UI_BOX_TB_BORDER;
+
+	size_t hit_start = 0, hit_span = 0;
+	if (mouse_hit
+		&& layout.hit_test(mouse_x - x1, mouse_y - y1, hit_start, hit_span)
+		&& m_current_directory.substr(hit_start, hit_span) != PATH_SEPARATOR)
+	{
+		// we're hovering over a directory!  highlight it
+		auto target_dir_start = m_current_directory.rfind(PATH_SEPARATOR, hit_start) + 1;
+		auto target_dir_end = m_current_directory.find(PATH_SEPARATOR, hit_start + hit_span);
+		m_hover_directory = m_current_directory.substr(0, target_dir_end);
+
+		// highlight the text in question
+		rgb_t fgcolor = UI_MOUSEOVER_COLOR;
+		rgb_t bgcolor = UI_MOUSEOVER_BG_COLOR;
+		layout.restyle(target_dir_start, target_dir_end - target_dir_start, &fgcolor, &bgcolor);
+	}
+	else
+	{
+		// we are not hovering over anything
+		m_hover_directory.clear();
+	}
+
+	// draw the text within it
+	layout.emit(container, x1, y1);
 }
 
+
+//-------------------------------------------------
+//  custom_mouse_down - perform our special mouse down
+//-------------------------------------------------
+
+bool menu_file_selector::custom_mouse_down()
+{
+	if (m_hover_directory.length() > 0)
+	{
+		m_current_directory = m_hover_directory;
+		reset(reset_options::SELECT_FIRST);
+		return true;
+	}
+
+	return false;
+}
 
 
 //-------------------------------------------------

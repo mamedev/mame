@@ -10,38 +10,40 @@
 
 #include "nld_twoterm.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
+namespace netlist
+{
+	namespace devices
+	{
 
 // ----------------------------------------------------------------------------------------
 // generic_diode
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD generic_diode::generic_diode()
+generic_diode::generic_diode(device_t &dev, pstring name)
+	: m_Vd(dev, name + ".m_Vd", 0.7)
+	, m_Id(dev, name + ".m_Id", 0.0)
+	, m_G(dev,  name + ".m_G", 1e-15)
+	, m_Vt(0.0)
+	, m_Is(0.0)
+	, m_n(0.0)
+	, m_gmin(1e-15)
+	, m_VtInv(0.0)
+	, m_Vcrit(0.0)
 {
-	m_Vd = 0.7;
 	set_param(1e-15, 1, 1e-15);
-	m_G = m_gmin;
-	m_Id = 0.0;
 }
 
-ATTR_COLD void generic_diode::set_param(const nl_double Is, const nl_double n, nl_double gmin)
+void generic_diode::set_param(const nl_double Is, const nl_double n, nl_double gmin)
 {
-	static const double csqrt2 = nl_math::sqrt(2.0);
+	static const double csqrt2 = std::sqrt(2.0);
 	m_Is = Is;
 	m_n = n;
 	m_gmin = gmin;
 
 	m_Vt = 0.0258 * m_n;
 
-	m_Vcrit = m_Vt * nl_math::log(m_Vt / m_Is / csqrt2);
+	m_Vcrit = m_Vt * std::log(m_Vt / m_Is / csqrt2);
 	m_VtInv = 1.0 / m_Vt;
-}
-
-ATTR_COLD void generic_diode::save(pstring name, object_t &parent)
-{
-	parent.save(m_Vd, name + ".m_Vd");
-	parent.save(m_Id, name + ".m_Id");
-	parent.save(m_G, name + ".m_G");
 }
 
 // ----------------------------------------------------------------------------------------
@@ -50,10 +52,6 @@ ATTR_COLD void generic_diode::save(pstring name, object_t &parent)
 
 NETLIB_UPDATE(twoterm)
 {
-	/* FIXME: some proxies created seem to be disconnected again
-	 * or not even properly connected.
-	 * Example: pong proxy_da_c9c.Q_1.RV
-	 */
 	/* only called if connected to a rail net ==> notify the solver to recalculate */
 	/* we only need to call the non-rail terminal */
 	if (m_P.has_net() && !m_P.net().isRailNet())
@@ -70,7 +68,7 @@ NETLIB_UPDATE_PARAM(POT)
 {
 	nl_double v = m_Dial.Value();
 	if (m_DialIsLog.Value())
-		v = (nl_math::exp(v) - 1.0) / (nl_math::exp(1.0) - 1.0);
+		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
 
 	m_R1.update_dev();
 	m_R2.update_dev();
@@ -89,7 +87,7 @@ NETLIB_UPDATE_PARAM(POT2)
 	nl_double v = m_Dial.Value();
 
 	if (m_DialIsLog.Value())
-		v = (nl_math::exp(v) - 1.0) / (nl_math::exp(1.0) - 1.0);
+		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
 	if (m_Reverse.Value())
 		v = 1.0 - v;
 
@@ -172,4 +170,5 @@ NETLIB_UPDATE(CS)
 	NETLIB_NAME(twoterm)::update();
 }
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

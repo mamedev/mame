@@ -23,7 +23,10 @@
     code on the real machine.
 */
 
+#include <functional>
+
 #include "emu.h"
+#include "debugger.h"
 #include "debug/debugcpu.h"
 #include "debug/debugcon.h"
 #include "includes/rmnimbus.h"
@@ -44,8 +47,6 @@
 #define DEBUG_PIXEL 0x04
 
 #define DEBUG_SET(flags)    ((m_debug_video & (flags))==(flags))
-
-static void video_debug(running_machine &machine, int ref, int params, const char *param[]);
 
 READ16_MEMBER(rmnimbus_state::nimbus_video_io_r)
 {
@@ -470,30 +471,31 @@ void rmnimbus_state::change_palette(UINT8 bank, UINT16 colours)
 	}
 }
 
-static void video_debug(running_machine &machine, int ref, int params, const char *param[])
+void rmnimbus_state::video_debug(int ref, int params, const char *param[])
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-	if(params>0)
+	if (params > 0)
 	{
 		int temp;
-		sscanf(param[0],"%d",&temp); state->m_debug_video = temp;
+		sscanf(param[0],"%d",&temp);
+		m_debug_video = temp;
 	}
 	else
 	{
-		debug_console_printf(machine,"Error usage : nimbus_vid_debug <debuglevel>\n");
-		debug_console_printf(machine,"Current debuglevel=%02X\n",state->m_debug_video);
+		machine().debugger().console().printf("Error usage : nimbus_vid_debug <debuglevel>\n");
+		machine().debugger().console().printf("Current debuglevel=%02X\n", m_debug_video);
 	}
 }
 
 void rmnimbus_state::video_start()
 {
-	m_debug_video=0;
+	m_debug_video = 0;
 
 	m_screen->register_screen_bitmap(m_video_mem);
 
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		debug_console_register_command(machine(), "nimbus_vid_debug", CMDFLAG_NONE, 0, 0, 1, video_debug);
+		using namespace std::placeholders;
+		machine().debugger().console().register_command("nimbus_vid_debug", CMDFLAG_NONE, 0, 0, 1, std::bind(&rmnimbus_state::video_debug, this, _1, _2, _3));
 	}
 }
 

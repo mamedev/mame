@@ -222,8 +222,7 @@ Custom: GX61A01
 #include "cpu/m6809/m6809.h"
 #include "cpu/upd7810/upd7810.h"
 #include "includes/homedata.h"
-#include "sound/dac.h"
-#include "sound/2203intf.h"
+
 
 INTERRUPT_GEN_MEMBER(homedata_state::homedata_irq)
 {
@@ -289,7 +288,7 @@ WRITE8_MEMBER(homedata_state::mrokumei_keyboard_select_w)
 READ8_MEMBER(homedata_state::mrokumei_sound_io_r)
 {
 	if (m_sndbank & 4)
-		return(soundlatch_byte_r(space, 0));
+		return(m_soundlatch->read(space, 0));
 	else
 		return memregion("audiocpu")->base()[0x10000 + offset + (m_sndbank & 1) * 0x10000];
 }
@@ -317,7 +316,7 @@ WRITE8_MEMBER(homedata_state::mrokumei_sound_io_w)
 
 WRITE8_MEMBER(homedata_state::mrokumei_sound_cmd_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -1159,8 +1158,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(homedata_state,homedata)
 {
-	m_sn = machine().device<sn76489a_device>("snsnd");
-
 	save_item(NAME(m_visible_page));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_blitter_bank));
@@ -1285,6 +1282,8 @@ static MACHINE_CONFIG_START( mrokumei, homedata_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("snsnd", SN76489A, 16000000/4)     // SN76489AN actually
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

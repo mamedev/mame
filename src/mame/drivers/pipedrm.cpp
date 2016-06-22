@@ -188,7 +188,6 @@ public:
 	DECLARE_WRITE8_MEMBER( pending_command_clear_w );
 	DECLARE_READ8_MEMBER( pending_command_r );
 	DECLARE_READ8_MEMBER( sound_command_r );
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };
 
 
@@ -570,18 +569,6 @@ static GFXDECODE_START( hatris )
 GFXDECODE_END
 
 
-
-/*************************************
- *
- *  Sound definitions
- *
- *************************************/
-
-WRITE_LINE_MEMBER(pipedrm_state::irqhandler)
-{
-	m_subcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 /*************************************
  *
  *  Machine driver
@@ -669,7 +656,7 @@ static MACHINE_CONFIG_START( pipedrm, pipedrm_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(pipedrm_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("sub", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
@@ -710,7 +697,7 @@ static MACHINE_CONFIG_START( hatris, pipedrm_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2608, 8000000)
-	MCFG_YM2608_IRQ_HANDLER(WRITELINE(pipedrm_state, irqhandler))
+	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("sub", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)

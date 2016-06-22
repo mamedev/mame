@@ -4,7 +4,7 @@
 
 Go 2000 - Korean Card game
 
-Newer PCB, very sparce with newer surface mounted CPUs
+Newer PCB, very sparse with newer surface mounted CPUs
 
 MC68EC000FU10
 Z84C0006FEC
@@ -34,6 +34,7 @@ Notes:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/dac.h"
 
 class go2000_state : public driver_device
@@ -43,33 +44,36 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_videoram2(*this, "videoram2"),
-		m_soundcpu(*this, "soundcpu"),
 		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT16> m_videoram2;
 
 	/* devices */
+	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+	
 	DECLARE_WRITE16_MEMBER(sound_cmd_w);
 	DECLARE_WRITE8_MEMBER(go2000_pcm_1_bankswitch_w);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	UINT32 screen_update_go2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 };
 
 
 WRITE16_MEMBER(go2000_state::sound_cmd_w)
 {
-	soundlatch_byte_w(space, offset, data & 0xff);
+	m_soundlatch->write(space, offset, data & 0xff);
 	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -99,7 +103,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( go2000_sound_io, AS_IO, 8, go2000_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac1", dac_device, write_unsigned8)
 	AM_RANGE(0x03, 0x03) AM_WRITE(go2000_pcm_1_bankswitch_w)
 ADDRESS_MAP_END
@@ -351,6 +355,8 @@ static MACHINE_CONFIG_START( go2000, go2000_state )
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_DAC_ADD("dac1")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)

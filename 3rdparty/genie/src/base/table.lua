@@ -25,6 +25,34 @@
 
 
 --
+-- Make a complete copy of a table, including any child tables it contains.
+--
+
+	function table.deepcopy(object)
+		-- keep track of already seen objects to avoid loops
+		local seen = {}
+
+		local function copy(object)
+			if type(object) ~= "table" then
+				return object
+			elseif seen[object] then
+				return seen[object]
+			end
+
+			local clone = {}
+			seen[object] = clone
+			for key, value in pairs(object) do
+				clone[key] = copy(value)
+			end
+
+			setmetatable(clone, getmetatable(object))
+			return clone
+		end
+
+		return copy(object)
+	end
+
+--
 -- Enumerates an array of objects and returns a new table containing
 -- only the value of one particular field.
 --

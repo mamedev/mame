@@ -9,6 +9,7 @@
 #include "machine/segag80.h"
 #include "sound/sn76496.h"
 #include "audio/segasnd.h"
+#include "machine/gen_latch.h"
 
 
 class sega005_sound_device;
@@ -36,6 +37,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	required_shared_ptr<UINT8> m_mainram;
@@ -52,6 +54,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 
 	std::vector<UINT8> m_paletteram;

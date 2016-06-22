@@ -99,7 +99,7 @@ DasmWindow::DasmWindow(running_machine* machine, QWidget* parent) :
 	rightActComments->setActionGroup(rightBarGroup);
 	rightActRaw->setShortcut(QKeySequence("Ctrl+R"));
 	rightActEncrypted->setShortcut(QKeySequence("Ctrl+E"));
-	rightActComments->setShortcut(QKeySequence("Ctrl+C"));
+	rightActComments->setShortcut(QKeySequence("Ctrl+N"));
 	rightActRaw->setChecked(true);
 	connect(rightBarGroup, &QActionGroup::triggered, this, &DasmWindow::rightBarChanged);
 
@@ -158,12 +158,12 @@ void DasmWindow::toggleBreakpointAtCursor(bool changedTo)
 		if (bpindex == -1)
 		{
 			bpindex = cpuinfo->breakpoint_set(address, nullptr, nullptr);
-			debug_console_printf(*m_machine, "Breakpoint %X set\n", bpindex);
+			m_machine->debugger().console().printf("Breakpoint %X set\n", bpindex);
 		}
 		else
 		{
 			cpuinfo->breakpoint_clear(bpindex);
-			debug_console_printf(*m_machine, "Breakpoint %X cleared\n", bpindex);
+			m_machine->debugger().console().printf("Breakpoint %X cleared\n", bpindex);
 		}
 		m_machine->debug_view().update_all();
 		m_machine->debugger().refresh_display();
@@ -189,7 +189,7 @@ void DasmWindow::enableBreakpointAtCursor(bool changedTo)
 		if (bp != nullptr)
 		{
 			cpuinfo->breakpoint_enable(bp->index(), !bp->enabled());
-			debug_console_printf(*m_machine, "Breakpoint %X %s\n", (UINT32)bp->index(), bp->enabled() ? "enabled" : "disabled");
+			m_machine->debugger().console().printf("Breakpoint %X %s\n", (UINT32)bp->index(), bp->enabled() ? "enabled" : "disabled");
 			m_machine->debug_view().update_all();
 			m_machine->debugger().refresh_display();
 		}

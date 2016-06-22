@@ -51,7 +51,6 @@ public:
 	DECLARE_READ8_MEMBER(palette_r);
 	DECLARE_WRITE8_MEMBER(palette_w);
 	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	virtual void machine_start() override;
@@ -162,10 +161,6 @@ WRITE_LINE_MEMBER(slotcarn_state::hsync_changed)
 	m_screen->update_partial(m_screen->vpos());
 }
 
-WRITE_LINE_MEMBER(slotcarn_state::vsync_changed)
-{
-	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
 
 /*******************************
 *          Memory Map          *
@@ -567,7 +562,7 @@ static MACHINE_CONFIG_START( slotcarn, slotcarn_state )
 	MCFG_MC6845_BEGIN_UPDATE_CB(slotcarn_state, crtc_begin_update)
 	MCFG_MC6845_UPDATE_ROW_CB(slotcarn_state, crtc_update_row)
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(slotcarn_state, hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(slotcarn_state, vsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slotcarn)
 	MCFG_PALETTE_ADD("palette", 0x400)

@@ -402,9 +402,9 @@ void sega_315_5195_mapper_device::map_as_rom(UINT32 offset, UINT32 length, offs_
 			romend = romsize - 1 - rgnoffset + info.start;
 
 		// map now
-		m_space->install_read_bank(info.start, romend, 0, info.mirror, bank_name);
+		m_space->install_read_bank(info.start, romend, info.mirror, bank_name);
 		if (m_decrypted_space)
-			m_decrypted_space->install_read_bank(info.start, romend, 0, info.mirror, decrypted_bank_name);
+			m_decrypted_space->install_read_bank(info.start, romend, info.mirror, decrypted_bank_name);
 
 		// configure the bank
 		memory_bank *bank = owner()->membank(bank_name);
@@ -422,9 +422,9 @@ void sega_315_5195_mapper_device::map_as_rom(UINT32 offset, UINT32 length, offs_
 	// falling through to the memory-mapping registers and crashing the
 	// game during stage 2-4 (see PC:$18a98). Protection maybe?
 	if (!whandler.isnull())
-		m_space->install_write_handler(info.start, info.end, 0, info.mirror, whandler);
+		m_space->install_write_handler(info.start, info.end, 0, info.mirror, 0, whandler);
 	else
-		m_space->unmap_write(info.start, info.end, 0, info.mirror);
+		m_space->unmap_write(info.start, info.end | info.mirror);
 }
 
 
@@ -446,13 +446,13 @@ void sega_315_5195_mapper_device::map_as_ram(UINT32 offset, UINT32 length, offs_
 	}
 
 	// map now
-	m_space->install_read_bank(info.start, info.end, 0, info.mirror, bank_share_name);
+	m_space->install_read_bank(info.start, info.end, info.mirror, bank_share_name);
 
 	// either install a write handler or a write bank, as appropriate
 	if (!whandler.isnull())
-		m_space->install_write_handler(info.start, info.end, 0, info.mirror, whandler);
+		m_space->install_write_handler(info.start, info.end, 0, info.mirror, 0, whandler);
 	else
-		m_space->install_write_bank(info.start, info.end, 0, info.mirror, bank_share_name);
+		m_space->install_write_bank(info.start, info.end, info.mirror, bank_share_name);
 
 	// configure the bank
 	memory_bank *bank = owner()->membank(bank_share_name);
@@ -483,9 +483,9 @@ void sega_315_5195_mapper_device::map_as_handler(UINT32 offset, UINT32 length, o
 
 	// install read/write handlers
 	if (!rhandler.isnull())
-		m_space->install_read_handler(info.start, info.end, 0, info.mirror, rhandler);
+		m_space->install_read_handler(info.start, info.end, 0, info.mirror, 0, rhandler);
 	if (!whandler.isnull())
-		m_space->install_write_handler(info.start, info.end, 0, info.mirror, whandler);
+		m_space->install_write_handler(info.start, info.end, 0, info.mirror, 0, whandler);
 
 	// clear this rom bank reference
 	m_banks[m_curregion].clear();

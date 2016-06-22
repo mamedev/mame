@@ -167,7 +167,7 @@ void wmg_state::wmg_def_install_io_space(address_space &space)
 	pia6821_device *pia_1 = space.machine().device<pia6821_device>("pia_1");
 
 	/* this routine dynamically installs the memory mapped above from c000-cfff */
-	space.install_write_bank       (0xc000, 0xc00f, 0, 0, "bank4");
+	space.install_write_bank       (0xc000, 0xc00f, "bank4");
 	space.install_write_handler    (0xc010, 0xc01f, write8_delegate(FUNC(williams_state::defender_video_control_w),this));
 	space.install_write_handler    (0xc400, 0xc400, write8_delegate(FUNC(wmg_state::wmg_rombank_w),this));
 	space.install_write_handler    (0xc401, 0xc401, write8_delegate(FUNC(wmg_state::wmg_sound_reset_w),this));
@@ -197,13 +197,13 @@ WRITE8_MEMBER( wmg_state::wmg_def_rombank_w )
 			case 1:
 			case 2:
 			case 3:
-				space1.install_read_bank(0xc000, 0xcfff, 0, 0, "bank7");
+				space1.install_read_bank(0xc000, 0xcfff, "bank7");
 				space1.unmap_write(0xc000, 0xcfff);
 				membank("bank7")->set_entry(data);
 				break;
 
 			case 7:
-				space1.install_read_bank(0xc000, 0xcfff, 0, 0, "bank7");
+				space1.install_read_bank(0xc000, 0xcfff, "bank7");
 				space1.unmap_write(0xc000, 0xcfff);
 				membank("bank7")->set_entry(4);
 				break;

@@ -11,6 +11,7 @@ Issues:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "includes/rollrace.h"
 
@@ -59,7 +60,7 @@ static ADDRESS_MAP_START( rollrace_map, AS_PROGRAM, 8, rollrace_state )
 	AM_RANGE(0xd900, 0xd900) AM_READWRITE(fake_d800_r,fake_d800_w) /* protection ??*/
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xe400, 0xe47f) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xec00, 0xec0f) AM_NOP /* Analog sound effects ?? ec00 sound enable ?*/
 	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf400, 0xf400) AM_WRITE(backgroundcolor_w)
@@ -80,7 +81,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rollrace_sound_map, AS_PROGRAM, 8, rollrace_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r) AM_WRITE(sound_nmi_mask_w)
+	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(sound_nmi_mask_w)
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay3", ay8910_device, address_data_w)
@@ -262,6 +263,8 @@ static MACHINE_CONFIG_START( rollrace, rollrace_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910,XTAL_24MHz/16) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)

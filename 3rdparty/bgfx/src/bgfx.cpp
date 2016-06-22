@@ -1471,7 +1471,7 @@ namespace bgfx
 		}
 	}
 
-	uint32_t Context::frame()
+	uint32_t Context::frame(bool _capture)
 	{
 		BX_CHECK(0 == m_instBufferCount, "Instance buffer allocated, but not used. This is incorrect, and causes memory leak.");
 
@@ -1479,6 +1479,8 @@ namespace bgfx
 		{
 			m_occlusionQuerySet.clear();
 		}
+
+		m_submit->m_capture = _capture;
 
 		BGFX_PROFILER_SCOPE(bgfx, main_thread_frame, 0xff2040ff);
 		// wait for render thread to finish
@@ -2510,10 +2512,10 @@ namespace bgfx
 		s_ctx->reset(_width, _height, _flags);
 	}
 
-	uint32_t frame()
+	uint32_t frame(bool _capture)
 	{
 		BGFX_CHECK_MAIN_THREAD();
-		return s_ctx->frame();
+		return s_ctx->frame(_capture);
 	}
 
 	const Caps* getCaps()
@@ -3114,20 +3116,20 @@ namespace bgfx
 		}
 	}
 
-	void readTexture(TextureHandle _handle, void* _data)
+	uint32_t readTexture(TextureHandle _handle, void* _data)
 	{
 		BGFX_CHECK_MAIN_THREAD();
 		BX_CHECK(NULL != _data, "_data can't be NULL");
 		BGFX_CHECK_CAPS(BGFX_CAPS_TEXTURE_READ_BACK, "Texture read-back is not supported!");
-		s_ctx->readTexture(_handle, _data);
+		return s_ctx->readTexture(_handle, _data);
 	}
 
-	void readTexture(FrameBufferHandle _handle, uint8_t _attachment, void* _data)
+	uint32_t readTexture(FrameBufferHandle _handle, uint8_t _attachment, void* _data)
 	{
 		BGFX_CHECK_MAIN_THREAD();
 		BX_CHECK(NULL != _data, "_data can't be NULL");
 		BGFX_CHECK_CAPS(BGFX_CAPS_TEXTURE_READ_BACK, "Texture read-back is not supported!");
-		s_ctx->readTexture(_handle, _attachment, _data);
+		return s_ctx->readTexture(_handle, _attachment, _data);
 	}
 
 	FrameBufferHandle createFrameBuffer(uint16_t _width, uint16_t _height, TextureFormat::Enum _format, uint32_t _textureFlags)
@@ -3859,9 +3861,9 @@ BGFX_C_API void bgfx_reset(uint32_t _width, uint32_t _height, uint32_t _flags)
 	bgfx::reset(_width, _height, _flags);
 }
 
-BGFX_C_API uint32_t bgfx_frame()
+BGFX_C_API uint32_t bgfx_frame(bool _capture)
 {
-	return bgfx::frame();
+	return bgfx::frame(_capture);
 }
 
 BGFX_C_API bgfx_renderer_type_t bgfx_get_renderer_type()
@@ -4167,16 +4169,16 @@ BGFX_C_API void bgfx_update_texture_cube(bgfx_texture_handle_t _handle, uint8_t 
 	bgfx::updateTextureCube(handle.cpp, _side, _mip, _x, _y, _width, _height, (const bgfx::Memory*)_mem, _pitch);
 }
 
-BGFX_C_API void bgfx_read_texture(bgfx_texture_handle_t _handle, void* _data)
+BGFX_C_API uint32_t bgfx_read_texture(bgfx_texture_handle_t _handle, void* _data)
 {
 	union { bgfx_texture_handle_t c; bgfx::TextureHandle cpp; } handle = { _handle };
-	bgfx::readTexture(handle.cpp, _data);
+	return bgfx::readTexture(handle.cpp, _data);
 }
 
-BGFX_C_API void bgfx_read_frame_buffer(bgfx_frame_buffer_handle_t _handle, uint8_t _attachment, void* _data)
+BGFX_C_API uint32_t bgfx_read_frame_buffer(bgfx_frame_buffer_handle_t _handle, uint8_t _attachment, void* _data)
 {
 	union { bgfx_frame_buffer_handle_t c; bgfx::FrameBufferHandle cpp; } handle = { _handle };
-	bgfx::readTexture(handle.cpp, _attachment, _data);
+	return bgfx::readTexture(handle.cpp, _attachment, _data);
 }
 
 BGFX_C_API void bgfx_destroy_texture(bgfx_texture_handle_t _handle)

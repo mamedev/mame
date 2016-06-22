@@ -74,7 +74,7 @@ void tms3203x_device::illegal(UINT32 op)
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		logerror("Illegal op @ %06X: %08X (tbl=%03X)\n", m_pc - 1, op, op >> 21);
-		debugger_break(machine());
+		machine().debug_break();
 	}
 }
 

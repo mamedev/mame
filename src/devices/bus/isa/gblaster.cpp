@@ -112,9 +112,9 @@ isa8_gblaster_device::isa8_gblaster_device(const machine_config &mconfig, const 
 void isa8_gblaster_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0220, 0x0221, 0, 0, read8_delegate( FUNC(isa8_gblaster_device::saa1099_16_r), this ), write8_delegate( FUNC(isa8_gblaster_device::saa1099_1_16_w), this ) );
-	m_isa->install_device(0x0222, 0x0223, 0, 0, read8_delegate( FUNC(isa8_gblaster_device::saa1099_16_r), this ), write8_delegate( FUNC(isa8_gblaster_device::saa1099_2_16_w), this ) );
-	m_isa->install_device(0x0224, 0x022F, 0, 0, read8_delegate( FUNC(isa8_gblaster_device::detect_r), this ), write8_delegate( FUNC(isa8_gblaster_device::detect_w), this ) );
+	m_isa->install_device(0x0220, 0x0221, read8_delegate( FUNC(isa8_gblaster_device::saa1099_16_r), this ), write8_delegate( FUNC(isa8_gblaster_device::saa1099_1_16_w), this ) );
+	m_isa->install_device(0x0222, 0x0223, read8_delegate( FUNC(isa8_gblaster_device::saa1099_16_r), this ), write8_delegate( FUNC(isa8_gblaster_device::saa1099_2_16_w), this ) );
+	m_isa->install_device(0x0224, 0x022F, read8_delegate( FUNC(isa8_gblaster_device::detect_r), this ), write8_delegate( FUNC(isa8_gblaster_device::detect_w), this ) );
 }
 
 //-------------------------------------------------

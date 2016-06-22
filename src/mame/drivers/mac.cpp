@@ -799,7 +799,6 @@ static ADDRESS_MAP_START(quadra700_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x50014000, 0x50015fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff) AM_MIRROR(0x00fc0000)
 	AM_RANGE(0x5001e000, 0x5001ffff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff) AM_MIRROR(0x00fc0000)
 
-	AM_RANGE(0x50040000, 0x50041fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00fc0000)
 	// f9800000 = VDAC / DAFB
 	AM_RANGE(0xf9000000, 0xf91fffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xf9800000, 0xf98001ff) AM_READWRITE(dafb_r, dafb_w)

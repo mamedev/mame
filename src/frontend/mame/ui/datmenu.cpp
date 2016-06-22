@@ -111,7 +111,7 @@ void menu_dats_view::populate()
 
 	(m_issoft == true) ? get_data_sw() : get_data();
 
-	item_append(MENU_SEPARATOR_ITEM, nullptr, (FLAG_UI_DATS | FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW), nullptr);
+	item_append(menu_item_type::SEPARATOR);
 	customtop = 2.0f * ui().get_line_height() + 4.0f * UI_BOX_TB_BORDER;
 	custombottom = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 
@@ -129,8 +129,8 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	float width;
 	std::string driver = (m_issoft == true) ? m_swinfo->longname : m_driver->description;
 
-	ui().draw_text_full(container, driver.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-		DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+	ui().draw_text_full(container, driver.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+		mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(maxwidth, width);
 
@@ -148,14 +148,14 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	x2 -= UI_BOX_LR_BORDER;
 	y1 += UI_BOX_TB_BORDER;
 
-	ui().draw_text_full(container, driver.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+	ui().draw_text_full(container, driver.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
+		mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 	maxwidth = 0;
 	for (auto & elem : m_items_list)
 	{
-		ui().draw_text_full(container, elem.label.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-			DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+		ui().draw_text_full(container, elem.label.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
+			mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 		maxwidth += width;
 	}
 
@@ -171,7 +171,6 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	// take off the borders
-	x2 -= UI_BOX_LR_BORDER;
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
@@ -181,13 +180,13 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 		x1 += space;
 		rgb_t fcolor = (m_actual == x) ? rgb_t(0xff, 0xff, 0xff, 0x00) : UI_TEXT_COLOR;
 		rgb_t bcolor = (m_actual == x) ? rgb_t(0xff, 0xff, 0xff, 0xff) : UI_TEXT_BG_COLOR;
-		ui().draw_text_full(container, elem.label.c_str(), x1, y1, 1.0f, JUSTIFY_LEFT, WRAP_NEVER, DRAW_NONE, fcolor, bcolor, &width, nullptr);
+		ui().draw_text_full(container, elem.label.c_str(), x1, y1, 1.0f, ui::text_layout::LEFT, ui::text_layout::NEVER, mame_ui_manager::NONE, fcolor, bcolor, &width, nullptr);
 
 		if (bcolor != UI_TEXT_BG_COLOR)
 			ui().draw_textured_box(container, x1 - (space / 2), y1, x1 + width + (space / 2), y2, bcolor, rgb_t(255, 43, 43, 43),
 				hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
-		ui().draw_text_full(container, elem.label.c_str(), x1, y1, 1.0f, JUSTIFY_LEFT, WRAP_NEVER, DRAW_NORMAL, fcolor, bcolor, &width, nullptr);
+		ui().draw_text_full(container, elem.label.c_str(), x1, y1, 1.0f, ui::text_layout::LEFT, ui::text_layout::NEVER, mame_ui_manager::NORMAL, fcolor, bcolor, &width, nullptr);
 		x1 += width + space;
 		++x;
 	}
@@ -195,7 +194,7 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	// bottom
 	std::string revision;
 	revision.assign(_("Revision: ")).append(m_items_list[m_actual].revision);
-	ui().draw_text_full(container, revision.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+	ui().draw_text_full(container, revision.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(origx2 - origx1, width);
 
@@ -214,8 +213,8 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	ui().draw_text_full(container, revision.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+	ui().draw_text_full(container, revision.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+		mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
 //-------------------------------------------------
@@ -224,22 +223,20 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 
 void menu_dats_view::get_data()
 {
-	std::vector<int> xstart;
-	std::vector<int> xend;
+	std::vector<int> xstart, xend;
 	std::string buffer;
-	std::vector<std::string> m_item;
 	if (m_items_list[m_actual].option == UI_COMMAND_LOAD)
 	{
+		std::vector<std::string> m_item;
 		mame_machine_manager::instance()->datfile().command_sub_menu(m_driver, m_item);
 		if (!m_item.empty())
 		{
-			for (size_t x = 0; x < m_item.size(); ++x)
+			for (auto & e : m_item)
 			{
 				std::string t_buffer;
-				buffer.append(m_item[x]).append("\n");
-				mame_machine_manager::instance()->datfile().load_command_info(t_buffer, m_item[x]);
-				if (!t_buffer.empty())
-					buffer.append(t_buffer).append("\n");
+				buffer.append(e).append("\n");
+				mame_machine_manager::instance()->datfile().load_command_info(t_buffer, e);
+				if (!t_buffer.empty()) buffer.append(t_buffer).append("\n");
 			}
 			convert_command_glyph(buffer);
 		}
@@ -247,7 +244,7 @@ void menu_dats_view::get_data()
 	else
 		mame_machine_manager::instance()->datfile().load_data_info(m_driver, buffer, m_items_list[m_actual].option);
 
-	int lines = ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
+	auto lines = ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
 	for (int x = 0; x < lines; ++x)
 	{
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));
@@ -270,7 +267,7 @@ void menu_dats_view::get_data_sw()
 			mame_machine_manager::instance()->datfile().load_software_info(m_swinfo->listname, buffer, m_swinfo->shortname, m_swinfo->parentname);
 	}
 
-	int lines = ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
+	auto lines = ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
 	for (int x = 0; x < lines; ++x)
 	{
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));

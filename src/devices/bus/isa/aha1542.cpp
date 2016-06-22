@@ -192,8 +192,8 @@ aha1542_device::aha1542_device(const machine_config &mconfig, const char *tag, d
 void aha1542_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_rom(this, 0xdc000, 0xdffff, 0, 0, "aha1542", "aha1542");
-	m_isa->install_device(0x330, 0x333, 0, 0, read8_delegate(FUNC( aha1542_device::aha1542_r ), this),
+	m_isa->install_rom(this, 0xdc000, 0xdffff, "aha1542", "aha1542");
+	m_isa->install_device(0x330, 0x333, read8_delegate(FUNC( aha1542_device::aha1542_r ), this),
 	write8_delegate(FUNC( aha1542_device::aha1542_w ), this) );
 }
 

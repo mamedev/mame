@@ -942,43 +942,46 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-ROM_START( gameboy )
-	ROM_REGION( 0x0100, "maincpu", 0 )
-	ROM_LOAD( "dmg_boot.bin", 0x0000, 0x0100, CRC(59c8598e) SHA1(4ed31ec6b0b175bb109c0eb5fd3d193da823339f) )
+ROM_START(gameboy)
+	ROM_REGION(0x0100, "maincpu", 0)
+	ROM_SYSTEM_BIOS(0, "dmg", "DMG vX")
+	ROMX_LOAD("dmg_boot.bin", 0x0000, 0x0100, CRC(59c8598e) SHA1(4ed31ec6b0b175bb109c0eb5fd3d193da823339f), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "dmg_v0", "DMG v0")
+	ROMX_LOAD("dmg_v0.rom", 0x0000, 0x0100, CRC(c2f5cc97) SHA1(8bd501e31921e9601788316dbd3ce9833a97bcbc), ROM_BIOS(2))
 ROM_END
 
-ROM_START( supergb )
-	ROM_REGION( 0x0100, "maincpu", 0 )
-	ROM_LOAD( "sgb_boot.bin", 0x0000, 0x0100, CRC(ec8a83b9) SHA1(aa2f50a77dfb4823da96ba99309085a3c6278515) )
+ROM_START(supergb)
+	ROM_REGION(0x0100, "maincpu", 0)
+	ROM_LOAD("sgb_boot.bin", 0x0000, 0x0100, CRC(ec8a83b9) SHA1(aa2f50a77dfb4823da96ba99309085a3c6278515))
 ROM_END
 
-ROM_START( supergb2 )
-	ROM_REGION( 0x0100, "maincpu", 0 )
-	ROM_LOAD( "sgb2_boot.bin", 0x0000, 0x0100, CRC(53d0dd63) SHA1(93407ea10d2f30ab96a314d8eca44fe160aea734) )
+ROM_START(supergb2 )
+	ROM_REGION(0x0100, "maincpu", 0)
+	ROM_LOAD("sgb2_boot.bin", 0x0000, 0x0100, CRC(53d0dd63) SHA1(93407ea10d2f30ab96a314d8eca44fe160aea734))
 ROM_END
 
-ROM_START( gbpocket )
-	ROM_REGION( 0x0100, "maincpu", 0 )
-	ROM_LOAD( "mgb_boot.bin", 0x0000, 0x0100, CRC(e6920754) SHA1(4e68f9da03c310e84c523654b9026e51f26ce7f0) )
+ROM_START(gbpocket )
+	ROM_REGION(0x0100, "maincpu", 0)
+	ROM_LOAD("mgb_boot.bin", 0x0000, 0x0100, CRC(e6920754) SHA1(4e68f9da03c310e84c523654b9026e51f26ce7f0))
 ROM_END
 
-ROM_START( gbcolor )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "gbc_boot.1", 0x0000, 0x0100, CRC(779ea374) SHA1(e4b40c9fd593a97a1618cfb2696f290cf9596a62) ) /* Bootstrap code part 1 */
-	ROM_LOAD( "gbc_boot.2", 0x0100, 0x0700, CRC(f741807d) SHA1(f943b1e0b640cf1d371e1d8f0ada69af03ebb396) ) /* Bootstrap code part 2 */
+ROM_START(gbcolor)
+	ROM_REGION(0x800, "maincpu", 0)
+	ROM_LOAD("gbc_boot.1", 0x0000, 0x0100, CRC(779ea374) SHA1(e4b40c9fd593a97a1618cfb2696f290cf9596a62)) /* Bootstrap code part 1 */
+	ROM_LOAD("gbc_boot.2", 0x0100, 0x0700, CRC(f741807d) SHA1(f943b1e0b640cf1d371e1d8f0ada69af03ebb396)) /* Bootstrap code part 2 */
 ROM_END
 
 
-ROM_START( megaduck )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+ROM_START(megaduck)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 ROM_END
 
-/*    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT    INIT  COMPANY     FULLNAME */
-CONS( 1990, gameboy,  0,       0,       gameboy,  gameboy, driver_device, 0,    "Nintendo", "Game Boy", MACHINE_SUPPORTS_SAVE )
-CONS( 1994, supergb,  gameboy, 0,       supergb,  gameboy, driver_device, 0,    "Nintendo", "Super Game Boy", MACHINE_SUPPORTS_SAVE )
-CONS( 1998, supergb2, gameboy, 0,       supergb2, gameboy, driver_device, 0,    "Nintendo", "Super Game Boy 2", MACHINE_SUPPORTS_SAVE )
-CONS( 1996, gbpocket, gameboy, 0,       gbpocket, gameboy, driver_device, 0,    "Nintendo", "Game Boy Pocket", MACHINE_SUPPORTS_SAVE )
-CONS( 1998, gbcolor,  0,       0,       gbcolor,  gameboy, driver_device, 0,    "Nintendo", "Game Boy Color", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+/*   YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT    INIT  COMPANY     FULLNAME */
+CONS(1990, gameboy,  0,       0,       gameboy,  gameboy, driver_device, 0,    "Nintendo", "Game Boy", MACHINE_SUPPORTS_SAVE)
+CONS(1994, supergb,  gameboy, 0,       supergb,  gameboy, driver_device, 0,    "Nintendo", "Super Game Boy", MACHINE_SUPPORTS_SAVE)
+CONS(1998, supergb2, gameboy, 0,       supergb2, gameboy, driver_device, 0,    "Nintendo", "Super Game Boy 2", MACHINE_SUPPORTS_SAVE)
+CONS(1996, gbpocket, gameboy, 0,       gbpocket, gameboy, driver_device, 0,    "Nintendo", "Game Boy Pocket", MACHINE_SUPPORTS_SAVE)
+CONS(1998, gbcolor,  0,       0,       gbcolor,  gameboy, driver_device, 0,    "Nintendo", "Game Boy Color", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 
 // Sound is not 100% yet, it generates some sounds which could be ok. Since we're lacking a real system there's no way to verify.
 CONS( 1993, megaduck, 0,       0,       megaduck, gameboy, driver_device, 0,    "Welback Holdings (Timlex International) / Creatronic / Videojet / Cougar USA", "Mega Duck / Cougar Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

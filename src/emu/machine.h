@@ -17,6 +17,8 @@
 #ifndef __MACHINE_H__
 #define __MACHINE_H__
 
+#include <functional>
+
 #include "strformat.h"
 #include "vecstream.h"
 
@@ -99,7 +101,6 @@ class rom_load_manager;
 class debugger_manager;
 class osd_interface;
 enum class config_type;
-struct debugcpu_private;
 
 
 // ======================> system_time
@@ -144,7 +145,7 @@ class running_machine
 
 	friend class sound_manager;
 
-	typedef void (*logerror_callback)(const running_machine &machine, const char *string);
+	typedef std::function<void(const char*)> logerror_callback;
 
 	// must be at top of member variables
 	resource_pool           m_respool;              // pool of resources for this machine
@@ -211,6 +212,7 @@ public:
 	void call_notifiers(machine_notification which);
 	void add_logerror_callback(logerror_callback callback);
 	void set_ui_active(bool active) { m_ui_active = active; }
+	void debug_break();
 
 	// TODO: Do saves and loads still require scheduling?
 	void immediate_save(const char *filename);
@@ -245,9 +247,6 @@ public:
 	// debugger-related information
 	UINT32                  debug_flags;        // the current debug flags
 
-	// internal core information
-	debugcpu_private *      debugcpu_data;      // internal data from debugcpu.c
-
 private:
 	// internal helpers
 	template <typename T> struct is_null { template <typename U> static bool value(U &&x) { return false; } };
@@ -264,7 +263,7 @@ private:
 	void popup_message(util::format_argument_pack<std::ostream> const &args) const;
 
 	// internal callbacks
-	static void logfile_callback(const running_machine &machine, const char *buffer);
+	void logfile_callback(const char *buffer);
 
 	// internal device helpers
 	void start_all_devices();
@@ -401,7 +400,7 @@ inline void running_machine::logerror(Format &&fmt, Params &&... args) const
 		// log to all callbacks
 		char const *const str(&m_string_buffer.vec()[0]);
 		for (auto &cb : m_logerror_list)
-			(cb->m_func)(*this, str);
+			cb->m_func(str);
 
 		g_profiler.stop();
 	}

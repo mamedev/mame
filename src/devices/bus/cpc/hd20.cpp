@@ -65,8 +65,8 @@ void cpc_hd20_device::device_start()
 	address_space& space = cpu->memory().space(AS_IO);
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 
-	space.install_write_handler(0xfbe0,0xfbe4,0,0,write8_delegate(FUNC(cpc_hd20_device::hdc_w),this));
-	space.install_read_handler(0xfbe0,0xfbe4,0,0,read8_delegate(FUNC(cpc_hd20_device::hdc_r),this));
+	space.install_write_handler(0xfbe0,0xfbe4,write8_delegate(FUNC(cpc_hd20_device::hdc_w),this));
+	space.install_read_handler(0xfbe0,0xfbe4,read8_delegate(FUNC(cpc_hd20_device::hdc_r),this));
 }
 
 //-------------------------------------------------

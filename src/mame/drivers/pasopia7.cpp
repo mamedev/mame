@@ -815,14 +815,14 @@ WRITE8_MEMBER( pasopia7_state::video_misc_w )
 	    ---- x--- pal disable
 	    ---- xx-- palette selector (both bits enables this, odd hook-up)
 	*/
-//  if(data & 2)
-//  {
-//    printf("VIDEO MISC %02x\n",data);
-//    debugger_break(device->machine());
-//  }
+	//if(data & 2)
+	//{
+	//	printf("VIDEO MISC %02x\n",data);
+	//	machine().debug_break();
+	//}
 	m_cursor_blink = data & 0x20;
 	m_attr_wrap = data & 0x10;
-//  m_pal_sel = data & 0x02;
+	//m_pal_sel = data & 0x02;
 }
 
 WRITE8_MEMBER( pasopia7_state::nmi_mask_w )

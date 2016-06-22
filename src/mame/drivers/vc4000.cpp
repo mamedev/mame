@@ -198,9 +198,9 @@ static ADDRESS_MAP_START(elektor_mem, AS_PROGRAM, 8, vc4000_state)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x15ff) AM_RAM
-	AM_RANGE(0x1d80, 0x1dff) AM_MIRROR(0x400) AM_READWRITE(elektor_cass_r,elektor_cass_w)
-	AM_RANGE(0x1e80, 0x1e8f) AM_MIRROR(0x800) AM_READWRITE(vc4000_key_r,vc4000_sound_ctl)
-	AM_RANGE(0x1f00, 0x1fff) AM_MIRROR(0x800) AM_READWRITE(vc4000_video_r, vc4000_video_w)
+	AM_RANGE(0x1980, 0x19ff) AM_MIRROR(0x400) AM_READWRITE(elektor_cass_r,elektor_cass_w)
+	AM_RANGE(0x1680, 0x168f) AM_MIRROR(0x800) AM_READWRITE(vc4000_key_r,vc4000_sound_ctl)
+	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x800) AM_READWRITE(vc4000_video_r, vc4000_video_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( vc4000 )

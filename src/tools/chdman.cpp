@@ -17,7 +17,6 @@
 #include "md5.h"
 #include "sha1.h"
 #include "vbiparse.h"
-#include "tagmap.h"
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -962,9 +961,6 @@ static void guess_chs(std::string *filename, UINT64 filesize, int sectorsize, UI
 						return;
 					}
 			}
-
-	// ack, it didn't work!
-	report_error(1, "Can't guess CHS values because no logical combination works!");
 }
 
 

@@ -8,7 +8,6 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms34010/tms34010.h"
 #include "cpu/m6809/m6809.h"
 #include "includes/midyunit.h"
 
@@ -603,7 +602,7 @@ WRITE16_MEMBER(midyunit_state::midyunit_sound_w)
 				break;
 
 			case SOUND_YAWDIM:
-				soundlatch_byte_w(space, 0, data);
+				m_soundlatch->write(space, 0, data);
 				m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 				break;
 		}

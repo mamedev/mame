@@ -1,10 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+
 /***************************************************************************
 
     Blockout
 
 ***************************************************************************/
+
+#include "machine/gen_latch.h"
 
 class blockout_state : public driver_device
 {
@@ -17,7 +20,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_videoram;
@@ -33,6 +37,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE_LINE_MEMBER(irq_handler);
 	DECLARE_WRITE16_MEMBER(blockout_sound_command_w);

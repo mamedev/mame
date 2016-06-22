@@ -60,9 +60,8 @@ public:
 	UINT32 screen_update_volfied(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(volfied_timer_callback);
 	void refresh_pixel_layer( bitmap_ind16 &bitmap );
-	void volfied_cchip_init(  );
-	void volfied_cchip_reset(  );
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	void volfied_cchip_init();
+	void volfied_cchip_reset();
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

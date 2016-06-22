@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( atari_s1_map, AS_PROGRAM, 8, atari_s1_state )
 	AM_RANGE(0x2000, 0x204f) AM_MIRROR(0x0F80) AM_READ(switch_r) AM_WRITENOP // aavenger ROL 200B causes a spurious write
 	AM_RANGE(0x3000, 0x3fff) AM_WRITE(audioen_w) // audio enable
 	AM_RANGE(0x4000, 0x4fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x5080, 0x508c) AM_MIRROR(3) AM_WRITE(meter_w) // time2000 only
+	AM_RANGE(0x5080, 0x508f) AM_WRITE(meter_w) // time2000 only
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(audiores_w) // audio reset
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
 ADDRESS_MAP_END

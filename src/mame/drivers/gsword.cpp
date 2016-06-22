@@ -146,7 +146,6 @@ reg: 0->1 (main->2nd) /     : (1->0) 2nd->main :
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/tait8741.h"
-#include "sound/msm5205.h"
 #include "includes/gsword.h"
 
 
@@ -308,7 +307,7 @@ WRITE8_MEMBER(gsword_state::gsword_adpcm_data_w)
 
 WRITE8_MEMBER(gsword_state::adpcm_soundcommand_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -364,7 +363,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cpu3_map, AS_PROGRAM, 8, gsword_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(gsword_adpcm_data_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -668,6 +667,8 @@ static MACHINE_CONFIG_START( gsword, gsword_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18MHz/12) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)

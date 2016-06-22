@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Jarek Parchanski, Nicola Salmoria, Mirko Buffoni
+
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "machine/segacrp2_device.h"
 
@@ -22,6 +24,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_maincpu_region(*this, "maincpu"),
 		m_color_prom(*this, "palette"),
@@ -130,6 +133,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 	required_memory_region m_maincpu_region;
 	optional_region_ptr<UINT8> m_color_prom;

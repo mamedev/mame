@@ -48,7 +48,7 @@
 #include "fs_imgui_image_swizz.bin.h"
 
 // embedded font
-#include "droidsans.ttf.h"
+#include "roboto_regular.ttf.h"
 
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4244); // warning C4244: '=' : conversion from '' to '', possible loss of data
 
@@ -451,7 +451,7 @@ struct Imgui
 		return bgfx::createTexture2D(uint16_t(_width), uint16_t(_height), 0, bgfx::TextureFormat::BGRA8, 0, mem);
 	}
 
-	ImguiFontHandle create(const void* _data, uint32_t _size, float _fontSize, bx::AllocatorI* _allocator)
+	ImguiFontHandle create(float _fontSize, bx::AllocatorI* _allocator)
 	{
 		m_allocator = _allocator;
 
@@ -463,16 +463,10 @@ struct Imgui
 		}
 #endif // BX_CONFIG_ALLOCATOR_CRT
 
-		if (NULL == _data)
-		{
-			_data = s_droidSansTtf;
-			_size = sizeof(s_droidSansTtf);
-		}
-
-		IMGUI_create(_data, _size, _fontSize, m_allocator);
+		IMGUI_create(_fontSize, m_allocator);
 
 		m_nvg = nvgCreate(1, m_view, m_allocator);
- 		nvgCreateFontMem(m_nvg, "default", (unsigned char*)_data, INT32_MAX, 0);
+ 		nvgCreateFontMem(m_nvg, "default", (unsigned char*)s_robotoRegularTtf, INT32_MAX, 0);
  		nvgFontSize(m_nvg, _fontSize);
  		nvgFontFace(m_nvg, "default");
 
@@ -606,7 +600,7 @@ struct Imgui
 		m_missingTexture = genMissingTexture(256, 256, 0.04f);
 
 #if !USE_NANOVG_FONT
-		const ImguiFontHandle handle = createFont(_data, _fontSize);
+		const ImguiFontHandle handle = createFont(s_robotoRegularTtf, _fontSize);
 		m_currentFontIdx = handle.idx;
 #else
 		const ImguiFontHandle handle = { bgfx::invalidHandle };
@@ -879,7 +873,10 @@ struct Imgui
 			bgfx::setViewRect(_view, 0, 0, _width, _height);
 		}
 
-		updateInput(mx, my, _button, _scroll, _inputChar);
+		if (!ImGui::IsMouseHoveringAnyWindow() )
+		{
+			updateInput(mx, my, _button, _scroll, _inputChar);
+		}
 
 		m_hot = m_hotToBe;
 		m_hotToBe = 0;
@@ -3262,9 +3259,9 @@ void imguiFree(void* _ptr, void*)
 	BX_FREE(s_imgui.m_allocator, _ptr);
 }
 
-ImguiFontHandle imguiCreate(const void* _data, uint32_t _size, float _fontSize, bx::AllocatorI* _allocator)
+ImguiFontHandle imguiCreate(const void*, uint32_t, float _fontSize, bx::AllocatorI* _allocator)
 {
-	return s_imgui.create(_data, _size, _fontSize, _allocator);
+	return s_imgui.create(_fontSize, _allocator);
 }
 
 void imguiDestroy()
@@ -3573,7 +3570,10 @@ float imguiGetTextLength(const char* _text, ImguiFontHandle _handle)
 
 bool imguiMouseOverArea()
 {
-	return s_imgui.m_insideArea;
+	return s_imgui.m_insideArea
+		|| ImGui::IsAnyItemHovered()
+		|| ImGui::IsMouseHoveringAnyWindow()
+		;
 }
 
 bgfx::ProgramHandle imguiGetImageProgram(uint8_t _mip)

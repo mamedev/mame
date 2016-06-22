@@ -1366,6 +1366,57 @@ void adsp21062_device::generate_sequence_instruction(drcuml_block *block, compil
 		UML_EXIT(block, EXECUTE_UNMAPPED_CODE);												// exit    EXECUTE_UNMAPPED_CODE
 	}
 
+	// handle a special case where call is used as the last operation in a loop
+	if (desc->userflags & OP_USERFLAG_CALL && desc->userflags & (OP_USERFLAG_COND_LOOP | OP_USERFLAG_COUNTER_LOOP))
+	{
+		if (desc->userflags & OP_USERFLAG_COUNTER_LOOP)
+		{
+			code_label end = compiler->labelnum++;
+			UML_LOAD(block, I0, m_core->lastack, LSTKP, SIZE_DWORD, SCALE_x4);
+			UML_CMP(block, I0, desc->pc);
+			UML_JMPc(block, COND_NE, end);
+
+			code_label label_expire = compiler->labelnum++;
+			UML_MOV(block, I1, mem(&m_core->lstkp));							// mov     i1,[m_core->lstkp]
+			UML_LOAD(block, I0, m_core->lcstack, I1, SIZE_DWORD, SCALE_x4);		// load    i0,m_core->lcstack,i1,dword,scale_x4
+			UML_SUB(block, I0, I0, 1);											// sub     i0,1
+			UML_STORE(block, m_core->lcstack, I1, I0, SIZE_DWORD, SCALE_x4);	// store   m_core->lcstack,i1,i0,dword,scale_x4
+			UML_SUB(block, CURLCNTR, CURLCNTR, 1);								// sub     CURLCNTR,1
+			UML_JMPc(block, COND_E, label_expire);								// jne     label_expire
+
+			UML_MOV(block, mem(&m_core->temp_return), desc->userdata0);
+			UML_JMP(block, end);
+
+			UML_LABEL(block, label_expire);										// label_expire:
+			UML_CALLH(block, *m_pop_pc);										// callh   m_pop_pc
+			UML_CALLH(block, *m_pop_loop);										// callh   m_pop_loop
+			UML_MOV(block, mem(&m_core->temp_return), desc->pc + 1);
+
+			UML_LABEL(block, end);
+		}
+		if (desc->userflags & OP_USERFLAG_COND_LOOP)
+		{
+			code_label end = compiler->labelnum++;
+			UML_LOAD(block, I0, m_core->lastack, LSTKP, SIZE_DWORD, SCALE_x4);
+			UML_CMP(block, I0, desc->pc);
+			UML_JMPc(block, COND_NE, end);
+
+			code_label label_expire = compiler->labelnum++;
+
+			int condition = (desc->userflags & OP_USERFLAG_COND_FIELD) >> OP_USERFLAG_COND_FIELD_SHIFT;
+			generate_do_condition(block, compiler, desc, condition, label_expire, m_core->astat_delay_copy);
+			UML_MOV(block, mem(&m_core->temp_return), desc->userdata0);
+			UML_JMP(block, end);
+
+			UML_LABEL(block, label_expire);
+			UML_CALLH(block, *m_pop_pc);
+			UML_CALLH(block, *m_pop_loop);
+			UML_MOV(block, mem(&m_core->temp_return), desc->pc + 1);
+
+			UML_LABEL(block, end);
+		}
+	}
+
 	/* if this is an invalid opcode, generate the exception now */
 //	if (desc->flags & OPFLAG_INVALID_OPCODE)
 //		UML_EXH(block, *m_exception[EXCEPTION_PROGRAM], 0x80000);							// exh    exception_program,0x80000
@@ -1432,7 +1483,7 @@ void adsp21062_device::generate_sequence_instruction(drcuml_block *block, compil
 		UML_SUB(block, CURLCNTR, CURLCNTR, 1);								// sub     CURLCNTR,1
 		UML_JMPc(block, COND_E, label_expire);								// jne     label_expire
 
-		generate_jump(block, compiler, desc, false, false, false);
+		generate_loop_jump(block, compiler, desc);
 
 		UML_LABEL(block, label_expire);										// label_expire:
 		UML_CALLH(block, *m_pop_pc);										// callh   m_pop_pc
@@ -1452,7 +1503,7 @@ void adsp21062_device::generate_sequence_instruction(drcuml_block *block, compil
 		int condition = (desc->userflags & OP_USERFLAG_COND_FIELD) >> OP_USERFLAG_COND_FIELD_SHIFT;
 		generate_do_condition(block, compiler, desc, condition, label_expire, m_core->astat_delay_copy);
 
-		generate_jump(block, compiler, desc, false, false, false);
+		generate_loop_jump(block, compiler, desc);
 
 		UML_LABEL(block, label_expire);
 		UML_CALLH(block, *m_pop_pc);
@@ -1786,10 +1837,18 @@ void adsp21062_device::generate_call(drcuml_block *block, compiler_state *compil
 		generate_sequence_instruction(block, &compiler_temp, desc->delay.last(), true);
 	}
 
-	if (delayslot)
-		UML_MOV(block, I0, desc->pc + 3);
+	// if this is the last instruction of a loop, we need to use the return PC from the resolved loop
+	if (desc->userflags & OP_USERFLAG_CALL && desc->userflags & (OP_USERFLAG_COND_LOOP | OP_USERFLAG_COUNTER_LOOP))
+	{
+		UML_MOV(block, I0, mem(&m_core->temp_return));
+	}
 	else
-		UML_MOV(block, I0, desc->pc + 1);
+	{
+		if (delayslot)
+			UML_MOV(block, I0, desc->pc + 3);
+		else
+			UML_MOV(block, I0, desc->pc + 1);		
+	}
 	UML_CALLH(block, *m_push_pc);
 
 	// update cycles and hash jump
@@ -1872,6 +1931,23 @@ void adsp21062_device::generate_jump(drcuml_block *block, compiler_state *compil
 
 	// update compiler label
 	compiler->labelnum = compiler_temp.labelnum;
+
+	/* reset the mapvar to the current cycles and account for skipped slots */
+	compiler->cycles += desc->skipslots;
+	UML_MAPVAR(block, MAPVAR_CYCLES, compiler->cycles);									// mapvar  CYCLES,compiler->cycles
+}
+
+void adsp21062_device::generate_loop_jump(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+{
+	// update cycles and hash jump
+	generate_update_cycles(block, compiler, desc->userdata0, TRUE);
+	/*
+	if (desc->flags & OPFLAG_INTRABLOCK_BRANCH)
+		UML_JMP(block, desc->targetpc | 0x80000000);								// jmp      targetpc | 0x80000000
+	else
+		UML_HASHJMP(block, 0, desc->targetpc, *m_nocode);							// hashjmp  0,targetpc,nocode
+		*/
+	UML_HASHJMP(block, 0, desc->userdata0, *m_nocode);
 
 	/* reset the mapvar to the current cycles and account for skipped slots */
 	compiler->cycles += desc->skipslots;
@@ -2116,6 +2192,12 @@ void adsp21062_device::generate_write_ureg(drcuml_block *block, compiler_state *
 			break;
 		case 0x65:		// PCSTKP
 			UML_MOV(block, PCSTKP, imm ? data : I0);
+			break;
+		case 0x67:		// CURLCNTR
+			UML_MOV(block, CURLCNTR, imm ? data : I0);
+			break;
+		case 0x68:		// LCNTR
+			UML_MOV(block, LCNTR, imm ? data : I0);
 			break;
 		case 0x70:		// USTAT1
 			UML_MOV(block, mem(&m_core->ustat1), imm ? data : I0);
@@ -2734,8 +2816,51 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 									compiler->mode1_delay.data = data;
 									compiler->mode1_delay.mode = MODE1_SET;
 									break;
-								case 0xc: // ASTAT
-									return FALSE;
+								case 0xc: // ASTAT										
+									// TODO: does this need delay?
+									if (data & ASTAT_FLAGS::AZ)
+										UML_MOV(block, ASTAT_AZ, 1);
+									if (data & ASTAT_FLAGS::AV)
+										UML_MOV(block, ASTAT_AV, 1);
+									if (data & ASTAT_FLAGS::AN)
+										UML_MOV(block, ASTAT_AN, 1);
+									if (data & ASTAT_FLAGS::AC)
+										UML_MOV(block, ASTAT_AC, 1);
+									if (data & ASTAT_FLAGS::AS)
+										UML_MOV(block, ASTAT_AS, 1);
+									if (data & ASTAT_FLAGS::AI)
+										UML_MOV(block, ASTAT_AI, 1);
+									if (data & ASTAT_FLAGS::MN)
+										UML_MOV(block, ASTAT_MN, 1);
+									if (data & ASTAT_FLAGS::MV)
+										UML_MOV(block, ASTAT_MV, 1);
+									if (data & ASTAT_FLAGS::MU)
+										UML_MOV(block, ASTAT_MU, 1);
+									if (data & ASTAT_FLAGS::MI)
+										UML_MOV(block, ASTAT_MI, 1);
+									if (data & ASTAT_FLAGS::AF)
+										UML_MOV(block, ASTAT_AF, 1);
+									if (data & ASTAT_FLAGS::SV)
+										UML_MOV(block, ASTAT_SV, 1);
+									if (data & ASTAT_FLAGS::SZ)
+										UML_MOV(block, ASTAT_SZ, 1);
+									if (data & ASTAT_FLAGS::SS)
+										UML_MOV(block, ASTAT_SS, 1);
+									if (data & ASTAT_FLAGS::BTF)
+										UML_MOV(block, ASTAT_BTF, 1);
+									if (data & ASTAT_FLAGS::FLG0)
+										UML_MOV(block, FLAG0, 1);
+									if (data & ASTAT_FLAGS::FLG1)
+										UML_MOV(block, FLAG1, 1);
+									if (data & ASTAT_FLAGS::FLG2)
+										UML_MOV(block, FLAG2, 1);
+									if (data & ASTAT_FLAGS::FLG3)
+										UML_MOV(block, FLAG3, 1);
+									if (data & 0xff000000)
+									{
+										UML_OR(block, mem(&m_core->astat_drc.cacc), mem(&m_core->astat_drc.cacc), (data >> 24));
+									}
+									break;
 								case 0xd: // IMASK
 									UML_OR(block, IMASK, IMASK, data);
 									break;
@@ -2773,7 +2898,50 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 									compiler->mode1_delay.mode = MODE1_CLEAR;
 									break;
 								case 0xc: // ASTAT
-									return FALSE;
+									// TODO: does this need delay?
+									if (data & ASTAT_FLAGS::AZ)
+										UML_MOV(block, ASTAT_AZ, 0);
+									if (data & ASTAT_FLAGS::AV)
+										UML_MOV(block, ASTAT_AV, 0);
+									if (data & ASTAT_FLAGS::AN)
+										UML_MOV(block, ASTAT_AN, 0);
+									if (data & ASTAT_FLAGS::AC)
+										UML_MOV(block, ASTAT_AC, 0);
+									if (data & ASTAT_FLAGS::AS)
+										UML_MOV(block, ASTAT_AS, 0);
+									if (data & ASTAT_FLAGS::AI)
+										UML_MOV(block, ASTAT_AI, 0);
+									if (data & ASTAT_FLAGS::MN)
+										UML_MOV(block, ASTAT_MN, 0);
+									if (data & ASTAT_FLAGS::MV)
+										UML_MOV(block, ASTAT_MV, 0);
+									if (data & ASTAT_FLAGS::MU)
+										UML_MOV(block, ASTAT_MU, 0);
+									if (data & ASTAT_FLAGS::MI)
+										UML_MOV(block, ASTAT_MI, 0);
+									if (data & ASTAT_FLAGS::AF)
+										UML_MOV(block, ASTAT_AF, 0);
+									if (data & ASTAT_FLAGS::SV)
+										UML_MOV(block, ASTAT_SV, 0);
+									if (data & ASTAT_FLAGS::SZ)
+										UML_MOV(block, ASTAT_SZ, 0);
+									if (data & ASTAT_FLAGS::SS)
+										UML_MOV(block, ASTAT_SS, 0);
+									if (data & ASTAT_FLAGS::BTF)
+										UML_MOV(block, ASTAT_BTF, 0);
+									if (data & ASTAT_FLAGS::FLG0)
+										UML_MOV(block, FLAG0, 0);
+									if (data & ASTAT_FLAGS::FLG1)
+										UML_MOV(block, FLAG1, 0);
+									if (data & ASTAT_FLAGS::FLG2)
+										UML_MOV(block, FLAG2, 0);
+									if (data & ASTAT_FLAGS::FLG3)
+										UML_MOV(block, FLAG3, 0);
+									if (data & 0xff000000)
+									{
+										UML_AND(block, mem(&m_core->astat_drc.cacc), mem(&m_core->astat_drc.cacc), ~(data >> 24));
+									}
+									break;
 								case 0xd: // IMASK
 									UML_AND(block, IMASK, IMASK, ~data);
 									break;
@@ -2961,7 +3129,77 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 
 		case 1:				// compute / dreg <-> DM / dreg <-> PM									|001|
 		{
-			return FALSE;
+			int pm_dreg = (opcode >> 23) & 0xf;
+			int pmm = (opcode >> 27) & 0x7;
+			int pmi = (opcode >> 30) & 0x7;
+			int dm_dreg = (opcode >> 33) & 0xf;
+			int dmm = (opcode >> 38) & 0x7;
+			int dmi = (opcode >> 41) & 0x7;
+			int pmd = (opcode >> 37) & 0x1;
+			int dmd = (opcode >> 44) & 0x1;
+			int compute = opcode & 0x7fffff;
+
+			bool temp_pm_dreg = false;
+			if (compute != 0 && pmd && desc->regout[0] & (1 << pm_dreg))
+			{
+				UML_MOV(block, mem(&m_core->dreg_temp), REG(pm_dreg));
+				temp_pm_dreg = true;
+			}
+			bool temp_dm_dreg = false;
+			if (compute != 0 && dmd && desc->regout[0] & (1 << dm_dreg))
+			{
+				UML_MOV(block, mem(&m_core->dreg_temp2), REG(dm_dreg));
+				temp_dm_dreg = true;
+			}
+
+			generate_compute(block, compiler, desc);
+
+			// PM transfer
+			if (pmd)
+			{
+				// dreg -> PM
+				if (temp_pm_dreg)
+					UML_MOV(block, I0, mem(&m_core->dreg_temp));
+				else
+					UML_MOV(block, I0, REG(pm_dreg));
+				UML_MOV(block, I1, PM_I(pmi));
+				UML_CALLH(block, *m_pm_write32);
+				UML_ADD(block, PM_I(pmi), PM_I(pmi), PM_M(pmm));
+				generate_update_circular_buffer(block, compiler, desc, 1, pmi);
+			}
+			else
+			{
+				// PM -> dreg
+				UML_MOV(block, I1, PM_I(pmi));
+				UML_CALLH(block, *m_pm_read32);
+				UML_MOV(block, REG(pm_dreg), I0);
+				UML_ADD(block, PM_I(pmi), PM_I(pmi), PM_M(pmm));
+				generate_update_circular_buffer(block, compiler, desc, 1, pmi);
+			}
+
+			// DM transfer
+			if (dmd)
+			{
+				// dreg -> DM
+				if (temp_dm_dreg)
+					UML_MOV(block, I0, mem(&m_core->dreg_temp2));
+				else
+					UML_MOV(block, I0, REG(dm_dreg));
+				UML_MOV(block, I1, DM_I(dmi));
+				UML_CALLH(block, *m_dm_write32);
+				UML_ADD(block, DM_I(dmi), DM_I(dmi), DM_M(dmm));
+				generate_update_circular_buffer(block, compiler, desc, 0, dmi);
+			}
+			else
+			{
+				// DM -> dreg
+				UML_MOV(block, I1, DM_I(dmi));
+				UML_CALLH(block, *m_dm_read32);
+				UML_MOV(block, REG(dm_dreg), I0);
+				UML_ADD(block, DM_I(dmi), DM_I(dmi), DM_M(dmm));
+				generate_update_circular_buffer(block, compiler, desc, 0, dmi);
+			}
+			return TRUE;
 		}
 
 		case 2:				// compute / ureg <-> DM|PM, register modify							|010|
@@ -3184,7 +3422,31 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 		{
 			if (opcode & U64(0x100000000000))	// immediate data -> DM|PM							|100|1|
 			{
-				return FALSE;
+				int i = (opcode >> 41) & 0x7;
+				int m = (opcode >> 38) & 0x7;
+				int g = (opcode >> 37) & 0x1;
+				UINT32 data = (UINT32)opcode;
+
+				if (g)
+				{
+					// PM
+					UML_MOV(block, I0, data);
+					UML_MOV(block, I1, PM_I(i));
+					UML_CALLH(block, *m_pm_write32);
+					UML_ADD(block, PM_I(i), PM_I(i), PM_M(m));
+				}
+				else
+				{
+					// DM
+					UML_MOV(block, I0, data);
+					UML_MOV(block, I1, DM_I(i));
+					UML_CALLH(block, *m_dm_write32);
+					UML_ADD(block, DM_I(i), DM_I(i), DM_M(m));					
+				}
+
+				generate_update_circular_buffer(block, compiler, desc, g, i);
+
+				return TRUE;
 			}
 			else								// immediate shift / dreg <-> DM|PM					|100|0|
 			{
@@ -3865,7 +4127,6 @@ void adsp21062_device::generate_compute(drcuml_block *block, compiler_state *com
 					case 0x92:		// Fn = ABS(Fx - Fy)
 					case 0x89:		// Fn = (Fx + Fy) / 2
 					case 0xdd:		// Rn = TRUNC Fx BY Ry
-					case 0xe3:		// Fn = CLIP Fx BY Fy
 					case 0xe0:		// Fn = Fx COPYSIGN Fy
 					case 0x05:		// Rn = Rx + Ry + CI
 					case 0x06:		// Rn = Rx - Ry + CI - 1
@@ -3873,7 +4134,6 @@ void adsp21062_device::generate_compute(drcuml_block *block, compiler_state *com
 					case 0x26:		// Rn = Rx + CI - 1
 					case 0x30:		// Rn = ABS Rx
 					case 0x43:		// Rn = NOT Rx
-					case 0xb0:		// Fn = ABS(Fx)
 					case 0xa5:		// Fn = RND Fx
 					case 0xad:		// Rn = MANT Fx
 					case 0xcd:		// Rn = TRUNC Fx
@@ -4147,6 +4407,19 @@ void adsp21062_device::generate_compute(drcuml_block *block, compiler_state *com
 						if (AI_CALC_REQUIRED) UML_MOV(block, ASTAT_AI, 0);	// TODO
 						return;
 
+					case 0xb0:		// Fn = ABS(Fx)
+						UML_FSCOPYI(block, F0, REG(rx));
+						UML_FSABS(block, F0, F0);
+						UML_ICOPYFS(block, REG(rn), F0);
+
+						if (AZ_CALC_REQUIRED) UML_MOV(block, ASTAT_AZ, 0);	// TODO
+						if (AN_CALC_REQUIRED) UML_MOV(block, ASTAT_AN, 0);
+						if (AV_CALC_REQUIRED) UML_MOV(block, ASTAT_AV, 0);
+						if (AC_CALC_REQUIRED) UML_MOV(block, ASTAT_AC, 0);
+						if (AS_CALC_REQUIRED) UML_MOV(block, ASTAT_AS, 0);	// TODO
+						if (AI_CALC_REQUIRED) UML_MOV(block, ASTAT_AI, 0);	// TODO
+						return;
+
 					case 0xbd:		// Fn = SCALB Fx BY Ry
 						// TODO: source = nan, result = denormal
 						UML_MOV(block, I1, REG(rx));
@@ -4376,6 +4649,36 @@ void adsp21062_device::generate_compute(drcuml_block *block, compiler_state *com
 						if (AI_CALC_REQUIRED) UML_MOV(block, ASTAT_AI, 0);	// TODO
 						UML_ICOPYFS(block, REG(rn), F4);
 						return;
+
+					case 0xe3:		// Fn = CLIP Fx BY Fy
+					{
+						code_label label_1 = compiler->labelnum++;
+						code_label label_2 = compiler->labelnum++;
+						UML_FSCOPYI(block, F0, REG(rx));
+						UML_FSCOPYI(block, F1, REG(ry));
+						UML_FSABS(block, F1, F1);
+						UML_FSCMP(block, F0, F1);
+						UML_JMPc(block, COND_C, label_1);
+
+						UML_FSCMP(block, F0, mem(&m_core->fp0));
+						UML_JMPc(block, COND_C, label_2);
+						UML_FSMOV(block, F0, F1);
+						UML_JMP(block, label_1);
+						UML_LABEL(block, label_2);
+						UML_FSNEG(block, F0, F1);
+
+						UML_LABEL(block, label_1);
+						if (AZ_CALC_REQUIRED || AN_CALC_REQUIRED)
+							UML_FSCMP(block, F0, mem(&m_core->fp0));
+						if (AZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_AZ);
+						if (AN_CALC_REQUIRED) UML_SETc(block, COND_C, ASTAT_AN);
+						if (AV_CALC_REQUIRED) UML_MOV(block, ASTAT_AV, 0);
+						if (AC_CALC_REQUIRED) UML_MOV(block, ASTAT_AC, 0);
+						if (AS_CALC_REQUIRED) UML_MOV(block, ASTAT_AS, 0);
+						if (AI_CALC_REQUIRED) UML_MOV(block, ASTAT_AI, 0);	// TODO
+						UML_ICOPYFS(block, REG(rn), F0);
+						return;
+					}
 
 					case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7:
 					case 0xf8: case 0xf9: case 0xfa: case 0xfb: case 0xfc: case 0xfd: case 0xfe: case 0xff:
@@ -5162,8 +5465,7 @@ void adsp21062_device::generate_shift_imm(drcuml_block *block, compiler_state *c
 	int len = (data >> 6) & 0x3f;
 
 	switch (shiftop)
-	{
-		case 0x01:		// ASHIFT Rx BY <data8>		
+	{		
 		case 0x11:		// FDEP Rx BY <bit6>:<len6>
 		case 0x13:		// FDEP Rx BY <bit6>:<len6> (SE)
 		case 0x1b:		// Rn = Rn OR FDEP Rx BY <bit6>:<len6> (SE)
@@ -5184,6 +5486,29 @@ void adsp21062_device::generate_shift_imm(drcuml_block *block, compiler_state *c
 			{
 				if (shift < 0)
 					UML_SHR(block, REG(rn), REG(rx), -shift);
+				else
+					UML_SHL(block, REG(rn), REG(rx), shift);
+				if (SZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_SZ);
+				if (SV_CALC_REQUIRED && shift != 0) UML_MOV(block, ASTAT_SV, 1);
+				if (SV_CALC_REQUIRED && shift == 0) UML_MOV(block, ASTAT_SV, 0);
+				if (SS_CALC_REQUIRED) UML_MOV(block, ASTAT_SS, 0);
+			}
+			return;
+
+		case 0x01:		// ASHIFT Rx BY <data8>
+			if (abs(shift) >= 32)
+			{
+				UML_MOV(block, REG(rn), 0);
+				UML_TEST(block, REG(rn), 0x80000000);
+				UML_MOVc(block, COND_NZ, REG(rn), 0xffffffff);
+				if (SZ_CALC_REQUIRED) UML_MOV(block, ASTAT_SZ, 1);
+				if (SV_CALC_REQUIRED) UML_MOV(block, ASTAT_SV, 1);
+				if (SS_CALC_REQUIRED) UML_MOV(block, ASTAT_SS, 0);
+			}
+			else
+			{
+				if (shift < 0)
+					UML_SAR(block, REG(rn), REG(rx), -shift);
 				else
 					UML_SHL(block, REG(rn), REG(rx), shift);
 				if (SZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_SZ);

@@ -218,4 +218,8 @@ public:
 
 		emu_timer   *m_mouse_timer;
 	} m_nimbus_mouse;
+
+private:
+	void debug_command(int ref, int params, const char *param[]);
+	void video_debug(int ref, int params, const char *param[]);
 };

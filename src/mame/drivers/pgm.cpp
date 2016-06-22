@@ -289,10 +289,6 @@ WRITE8_MEMBER(pgm_state::z80_l3_w)
 	m_soundlatch3->write(space, 0, data);
 }
 
-WRITE_LINE_MEMBER(pgm_state::pgm_sound_irq)
-{
-	m_soundcpu->set_input_line(0, state);
-}
 
 /*** Memory Maps *************************************************************/
 
@@ -544,7 +540,7 @@ MACHINE_CONFIG_FRAGMENT( pgmbase )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
 
 	MCFG_ICS2115_ADD("ics", 0)
-	MCFG_ICS2115_IRQ_CB(WRITELINE(pgm_state, pgm_sound_irq))
+	MCFG_ICS2115_IRQ_CB(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 MACHINE_CONFIG_END
 

@@ -27,6 +27,7 @@ const device_type NETLIST_SOUND = &device_creator<netlist_mame_sound_device_t>;
 /* subdevices */
 
 const device_type NETLIST_ANALOG_INPUT = &device_creator<netlist_mame_analog_input_t>;
+const device_type NETLIST_INT_INPUT = &device_creator<netlist_mame_int_input_t>;
 const device_type NETLIST_LOGIC_INPUT = &device_creator<netlist_mame_logic_input_t>;
 const device_type NETLIST_STREAM_INPUT = &device_creator<netlist_mame_stream_input_t>;
 
@@ -100,7 +101,7 @@ void netlist_mame_analog_output_t::custom_netlist_additions(netlist::setup_t &se
 	pstring dname = "OUT_" + m_in;
 	m_delegate.bind_relative_to(owner()->machine().root_device());
 
-	plib::powned_ptr<netlist::device_t> dev = plib::powned_ptr<netlist::device_t>::Create<NETLIB_NAME(analog_callback)>(setup.netlist(), setup.build_fqn(dname));
+	plib::owned_ptr<netlist::device_t> dev = plib::owned_ptr<netlist::device_t>::Create<NETLIB_NAME(analog_callback)>(setup.netlist(), setup.build_fqn(dname));
 	static_cast<NETLIB_NAME(analog_callback) *>(dev.get())->register_callback(m_delegate);
 	setup.register_dev(std::move(dev));
 	setup.register_link(dname + ".IN", m_in);
@@ -113,11 +114,11 @@ void netlist_mame_analog_output_t::device_start()
 
 
 // ----------------------------------------------------------------------------------------
-// netlist_mame_logic_input_t
+// netlist_mame_int_input_t
 // ----------------------------------------------------------------------------------------
 
-netlist_mame_logic_input_t::netlist_mame_logic_input_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, NETLIST_ANALOG_INPUT, "Netlist Logic Input", tag, owner, clock, "netlist_logic_input", __FILE__),
+netlist_mame_int_input_t::netlist_mame_int_input_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+		: device_t(mconfig, NETLIST_INT_INPUT, "Netlist Logic Input", tag, owner, clock, "netlist_logic_input", __FILE__),
 			netlist_mame_sub_interface(*owner),
 			m_param(nullptr),
 			m_mask(0xffffffff),
@@ -126,20 +127,52 @@ netlist_mame_logic_input_t::netlist_mame_logic_input_t(const machine_config &mco
 {
 }
 
-void netlist_mame_logic_input_t::static_set_params(device_t &device, const char *param_name, const UINT32 mask, const UINT32 shift)
+void netlist_mame_int_input_t::static_set_params(device_t &device, const char *param_name, const UINT32 mask, const UINT32 shift)
 {
-	netlist_mame_logic_input_t &netlist = downcast<netlist_mame_logic_input_t &>(device);
+	netlist_mame_int_input_t &netlist = downcast<netlist_mame_int_input_t &>(device);
 	LOG_DEV_CALLS(("static_set_params %s\n", device.tag()));
 	netlist.m_param_name = param_name;
 	netlist.m_shift = shift;
 	netlist.m_mask = mask;
 }
 
-void netlist_mame_logic_input_t::device_start()
+void netlist_mame_int_input_t::device_start()
 {
 	LOG_DEV_CALLS(("start %s\n", tag()));
 	netlist::param_t *p = downcast<netlist_mame_device_t *>(this->owner())->setup().find_param(m_param_name);
 	m_param = dynamic_cast<netlist::param_int_t *>(p);
+	if (m_param == nullptr)
+	{
+		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.cstr());
+	}
+}
+
+// ----------------------------------------------------------------------------------------
+// netlist_mame_logic_input_t
+// ----------------------------------------------------------------------------------------
+
+netlist_mame_logic_input_t::netlist_mame_logic_input_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+		: device_t(mconfig, NETLIST_LOGIC_INPUT, "Netlist Logic Input", tag, owner, clock, "netlist_logic_input", __FILE__),
+			netlist_mame_sub_interface(*owner),
+			m_param(nullptr),
+			m_shift(0),
+			m_param_name("")
+{
+}
+
+void netlist_mame_logic_input_t::static_set_params(device_t &device, const char *param_name, const UINT32 shift)
+{
+	netlist_mame_logic_input_t &netlist = downcast<netlist_mame_logic_input_t &>(device);
+	LOG_DEV_CALLS(("static_set_params %s\n", device.tag()));
+	netlist.m_param_name = param_name;
+	netlist.m_shift = shift;
+}
+
+void netlist_mame_logic_input_t::device_start()
+{
+	LOG_DEV_CALLS(("start %s\n", tag()));
+	netlist::param_t *p = downcast<netlist_mame_device_t *>(this->owner())->setup().find_param(m_param_name);
+	m_param = dynamic_cast<netlist::param_logic_t *>(p);
 	if (m_param == nullptr)
 	{
 		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.cstr());
@@ -264,7 +297,7 @@ ADDRESS_MAP_END
 netlist_mame_device_t::netlist_mame_device_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NETLIST_CORE, "Netlist core device", tag, owner, clock, "netlist_core", __FILE__),
 		m_icount(0),
-		m_old(netlist::netlist_time::zero),
+		m_old(netlist::netlist_time::zero()),
 		m_netlist(nullptr),
 		m_setup(nullptr),
 		m_setup_func(nullptr)
@@ -274,7 +307,7 @@ netlist_mame_device_t::netlist_mame_device_t(const machine_config &mconfig, cons
 netlist_mame_device_t::netlist_mame_device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *file)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, file),
 		m_icount(0),
-		m_old(netlist::netlist_time::zero),
+		m_old(netlist::netlist_time::zero()),
 		m_netlist(nullptr),
 		m_setup(nullptr),
 		m_setup_func(nullptr)
@@ -322,14 +355,14 @@ void netlist_mame_device_t::device_start()
 	m_setup->start_devices();
 	m_setup->resolve_inputs();
 
-	netlist().save_item(m_rem, this, "m_rem");
-	netlist().save_item(m_div, this, "m_div");
-	netlist().save_item(m_old, this, "m_old");
+	netlist().save(*this, m_rem, "m_rem");
+	netlist().save(*this, m_div, "m_div");
+	netlist().save(*this, m_old, "m_old");
 
 	save_state();
 
-	m_old = netlist::netlist_time::zero;
-	m_rem = netlist::netlist_time::zero;
+	m_old = netlist::netlist_time::zero();
+	m_rem = netlist::netlist_time::zero();
 
 	LOG_DEV_CALLS(("device_start exit %s\n", tag()));
 }
@@ -344,8 +377,8 @@ void netlist_mame_device_t::device_clock_changed()
 void netlist_mame_device_t::device_reset()
 {
 	LOG_DEV_CALLS(("device_reset\n"));
-	m_old = netlist::netlist_time::zero;
-	m_rem = netlist::netlist_time::zero;
+	m_old = netlist::netlist_time::zero();
+	m_rem = netlist::netlist_time::zero();
 	netlist().reset();
 }
 
@@ -366,7 +399,7 @@ ATTR_COLD void netlist_mame_device_t::device_post_load()
 {
 	LOG_DEV_CALLS(("device_post_load\n"));
 
-	netlist().post_load();
+	netlist().state().post_load();
 	netlist().rebuild_lists();
 }
 
@@ -374,14 +407,14 @@ ATTR_COLD void netlist_mame_device_t::device_pre_save()
 {
 	LOG_DEV_CALLS(("device_pre_save\n"));
 
-	netlist().pre_save();
+	netlist().state().pre_save();
 }
 
 void netlist_mame_device_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 }
 
-ATTR_HOT ATTR_ALIGN void netlist_mame_device_t::update_time_x()
+void netlist_mame_device_t::update_time_x()
 {
 	const netlist::netlist_time newt(netlist().time());
 	const netlist::netlist_time delta(newt - m_old + m_rem);
@@ -391,7 +424,7 @@ ATTR_HOT ATTR_ALIGN void netlist_mame_device_t::update_time_x()
 	m_icount -= d;
 }
 
-ATTR_HOT ATTR_ALIGN void netlist_mame_device_t::check_mame_abort_slice()
+void netlist_mame_device_t::check_mame_abort_slice()
 {
 	if (m_icount <= 0)
 		netlist().abort_current_queue_slice();
@@ -399,53 +432,48 @@ ATTR_HOT ATTR_ALIGN void netlist_mame_device_t::check_mame_abort_slice()
 
 ATTR_COLD void netlist_mame_device_t::save_state()
 {
-	for (auto const & s : netlist().save_list())
+	for (auto const & s : netlist().state().save_list())
 	{
 		netlist().log().debug("saving state for {1}\n", s->m_name.cstr());
-		switch (s->m_dt)
+		if (s->m_dt.is_float)
 		{
-			case pstate_data_type_e::DT_DOUBLE:
-				{
-					double *td = s->resolved<double>();
-					if (td != nullptr) save_pointer(td, s->m_name.cstr(), s->m_count);
-				}
-				break;
-			case pstate_data_type_e::DT_FLOAT:
-				{
-					float *td = s->resolved<float>();
-					if (td != nullptr) save_pointer(td, s->m_name.cstr(), s->m_count);
-				}
-				break;
-#if (PHAS_INT128)
-			case pstate_data_type_e::DT_INT128:
-				// FIXME: we are cheating here
-				save_pointer((char *) s->m_ptr, s->m_name.cstr(), s->m_count * sizeof(INT128));
-				break;
-#endif
-			case pstate_data_type_e::DT_INT64:
-				save_pointer((INT64 *) s->m_ptr, s->m_name.cstr(), s->m_count);
-				break;
-			case pstate_data_type_e::DT_INT16:
-				save_pointer((INT16 *) s->m_ptr, s->m_name.cstr(), s->m_count);
-				break;
-			case pstate_data_type_e::DT_INT8:
-				save_pointer((INT8 *) s->m_ptr, s->m_name.cstr(), s->m_count);
-				break;
-			case pstate_data_type_e::DT_INT:
-				save_pointer((int *) s->m_ptr, s->m_name.cstr(), s->m_count);
-				break;
-			case pstate_data_type_e::DT_BOOLEAN:
-				save_pointer((bool *) s->m_ptr, s->m_name.cstr(), s->m_count);
-				break;
-			case pstate_data_type_e::DT_CUSTOM:
-				break;
-			case pstate_data_type_e::NOT_SUPPORTED:
-			default:
-				netlist().log().fatal("found unsupported save element %s\n", s->m_name);
-				break;
+			if (s->m_dt.size == sizeof(double))
+			{
+				double *td = s->resolved<double>();
+				if (td != nullptr) save_pointer(td, s->m_name.cstr(), s->m_count);
+			}
+			else if (s->m_dt.size == sizeof(float))
+			{
+				float *td = s->resolved<float>();
+				if (td != nullptr) save_pointer(td, s->m_name.cstr(), s->m_count);
+			}
+			else
+				netlist().log().fatal("Unknown floating type for {1}\n", s->m_name.cstr());
 		}
+		else if (s->m_dt.is_integral)
+		{
+			if (s->m_dt.size == sizeof(INT64))
+				save_pointer((INT64 *) s->m_ptr, s->m_name.cstr(), s->m_count);
+			else if (s->m_dt.size == sizeof(INT32))
+				save_pointer((INT32 *) s->m_ptr, s->m_name.cstr(), s->m_count);
+			else if (s->m_dt.size == sizeof(INT16))
+				save_pointer((INT16 *) s->m_ptr, s->m_name.cstr(), s->m_count);
+			else if (s->m_dt.size == sizeof(INT8))
+				save_pointer((INT8 *) s->m_ptr, s->m_name.cstr(), s->m_count);
+#if (PHAS_INT128)
+			else if (s->m_dt.size == sizeof(INT128))
+				save_pointer((INT64 *) s->m_ptr, s->m_name.cstr(), s->m_count * 2);
+#endif
+			else
+				netlist().log().fatal("Unknown integral type size {1} for {2}\n", s->m_dt.size, s->m_name.cstr());
+		}
+		else if (s->m_dt.is_custom)
+		{
+			/* do nothing */
+		}
+		else
+			netlist().log().fatal("found unsupported save element {1}\n", s->m_name);
 	}
-
 }
 
 // ----------------------------------------------------------------------------------------
@@ -511,12 +539,12 @@ ATTR_COLD offs_t netlist_mame_cpu_device_t::disasm_disassemble(char *buffer, off
 	//char tmp[16];
 	unsigned startpc = pc;
 	int relpc = pc - m_genPC;
-	if (relpc >= 0 && relpc < netlist().queue().count())
+	if (relpc >= 0 && relpc < netlist().queue().size())
 	{
-		int dpc = netlist().queue().count() - relpc - 1;
+		int dpc = netlist().queue().size() - relpc - 1;
 		// FIXME: 50 below fixes crash in mame-debugger. It's based on try on error.
-		snprintf(buffer, 50, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', netlist().queue()[dpc].object()->name().cstr(),
-				netlist().queue()[dpc].exec_time().as_double());
+		snprintf(buffer, 50, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', netlist().queue()[dpc].m_object->name().cstr(),
+				netlist().queue()[dpc].m_exec_time.as_double());
 	}
 	else
 		sprintf(buffer, "%s", "");
@@ -566,7 +594,7 @@ void netlist_mame_sound_device_t::device_start()
 
 	// Configure outputs
 
-	plib::pvector_t<nld_sound_out *> outdevs = netlist().get_device_list<nld_sound_out>();
+	std::vector<nld_sound_out *> outdevs = netlist().get_device_list<nld_sound_out>();
 	if (outdevs.size() == 0)
 		fatalerror("No output devices");
 
@@ -592,7 +620,7 @@ void netlist_mame_sound_device_t::device_start()
 	m_num_inputs = 0;
 	m_in = nullptr;
 
-	plib::pvector_t<nld_sound_in *> indevs = netlist().get_device_list<nld_sound_in>();
+	std::vector<nld_sound_in *> indevs = netlist().get_device_list<nld_sound_in>();
 	if (indevs.size() > 1)
 		fatalerror("A maximum of one input device is allowed!");
 	if (indevs.size() == 1)

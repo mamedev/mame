@@ -102,7 +102,7 @@ tms32010_device::tms32010_device(const machine_config &mconfig, const char *tag,
 	: cpu_device(mconfig, TMS32010, "TMS32010", tag, owner, clock, "tms32010", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 12, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 8, -1, ADDRESS_MAP_NAME(tms32010_ram))
-	, m_io_config("io", ENDIANNESS_BIG, 16, 5, -1)
+	, m_io_config("io", ENDIANNESS_BIG, 16, 4+1, -1)
 	, m_addr_mask(0x0fff)
 {
 }
@@ -112,7 +112,7 @@ tms32010_device::tms32010_device(const machine_config &mconfig, device_type type
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 12, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 8, -1, ADDRESS_MAP_NAME(tms32015_ram))
-	, m_io_config("io", ENDIANNESS_BIG, 16, 5, -1)
+	, m_io_config("io", ENDIANNESS_BIG, 16, 4+1, -1)
 	, m_addr_mask(addr_mask)
 {
 }

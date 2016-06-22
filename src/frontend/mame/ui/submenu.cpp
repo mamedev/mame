@@ -414,8 +414,8 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 {
 	float width;
 
-	ui().draw_text_full(container, _(m_options[0].description), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-		DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+	ui().draw_text_full(container, _(m_options[0].description), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+		mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
 
@@ -434,16 +434,16 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	ui().draw_text_full(container, _(m_options[0].description), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-		DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+	ui().draw_text_full(container, _(m_options[0].description), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+		mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 	if (selectedref != nullptr)
 	{
 		option &selected_sm_option = *reinterpret_cast<option *>(selectedref);
 		if (selected_sm_option.entry != nullptr)
 		{
-			ui().draw_text_full(container, selected_sm_option.entry->description(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-					DRAW_NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+			ui().draw_text_full(container, selected_sm_option.entry->description(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+					mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 
 			width += 2 * UI_BOX_LR_BORDER;
 			maxwidth = MAX(origx2 - origx1, width);
@@ -463,8 +463,8 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 			y1 += UI_BOX_TB_BORDER;
 
 			// draw the text within it
-			ui().draw_text_full(container, selected_sm_option.entry->description(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-					DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+			ui().draw_text_full(container, selected_sm_option.entry->description(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
+					mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 		}
 	}
 }

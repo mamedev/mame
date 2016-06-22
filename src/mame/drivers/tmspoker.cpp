@@ -342,7 +342,7 @@ READ8_MEMBER(tmspoker_state::unk_r)
 }
 
 static ADDRESS_MAP_START( tmspoker_cru_map, AS_IO, 8, tmspoker_state )
-	AM_RANGE(0x0000, 0xffff) AM_READ(unk_r)
+	AM_RANGE(0x0000, 0x07ff) AM_READ(unk_r)
 ADDRESS_MAP_END
 
 /* I/O byte R/W

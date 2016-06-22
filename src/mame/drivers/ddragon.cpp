@@ -60,7 +60,6 @@ Dip locations verified with manual for ddragon & ddragon2
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-#include "sound/msm5205.h"
 #include "includes/ddragon.h"
 
 
@@ -281,7 +280,7 @@ void ddragon_state::ddragon_interrupt_ack(address_space &space, offs_t offset, U
 			break;
 
 		case 3: /* 380e - SND IRQ and latch */
-			soundlatch_byte_w(space, 0, data);
+			m_soundlatch->write(space, 0, data);
 			m_soundcpu->set_input_line(m_sound_irq, ASSERT_LINE);
 			break;
 
@@ -327,7 +326,7 @@ WRITE_LINE_MEMBER(ddragon_state::irq_handler)
 READ8_MEMBER(ddragon_state::soundlatch_ack_r)
 {
 	m_soundcpu->set_input_line(m_sound_irq, CLEAR_LINE);
-	return soundlatch_byte_r(space, 0);
+	return m_soundlatch->read(space, 0);
 }
 
 
@@ -977,6 +976,8 @@ static MACHINE_CONFIG_START( ddragon, ddragon_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_YM2151_ADD("fmsnd", SOUND_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(ddragon_state, irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
@@ -1044,6 +1045,8 @@ static MACHINE_CONFIG_START( ddragon6809, ddragon_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_YM2151_ADD("fmsnd", SOUND_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(ddragon_state,irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
@@ -1093,6 +1096,8 @@ static MACHINE_CONFIG_START( ddragon2, ddragon_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("fmsnd", SOUND_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(ddragon_state,irq_handler))
@@ -2190,7 +2195,7 @@ GAME( 1987, ddragon6809a,ddragon,  ddragon6809, ddragon, ddragon_state,  ddragon
 GAME( 1988, ddragon2,    0,        ddragon2, ddragon2, ddragon_state, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ddragon2u,   ddragon2, ddragon2, ddragon2, ddragon_state, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ddragon2j,   ddragon2, ddragon2, ddragon2, ddragon_state, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (Japan)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump
-GAME( 1988, ddragon2b,   ddragon2, ddragon2, ddragon2, ddragon_state, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (US, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ddragon2b,   ddragon2, ddragon2, ddragon2, ddragon_state, ddragon2, ROT0, "bootleg", "Double Dragon II - The Revenge (US, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* these were conversions of double dragon */
 GAME( 1991, tstrike,  0,        darktowr, tstrike, ddragon_state,  darktowr, ROT0, "East Coast Coin Company", "Thunder Strike (set 1)", MACHINE_SUPPORTS_SAVE ) // same manufacturer as The Game Room?

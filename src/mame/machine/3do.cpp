@@ -771,8 +771,8 @@ READ32_MEMBER(_3do_state::_3do_clio_r)
 		return m_clio.uncle_rom;
 
 	default:
-	if (!space.debugger_access())
-		logerror( "%08X: unhandled CLIO read offset = %08X\n", m_maincpu->pc(), offset * 4 );
+		if (!space.debugger_access())
+			logerror( "%08X: unhandled CLIO read offset = %08X\n", m_maincpu->pc(), offset * 4 );
 		break;
 	}
 	return 0;
@@ -1004,7 +1004,7 @@ WRITE32_MEMBER(_3do_state::_3do_clio_w)
 	case 0x17fc/4:
 		/* TODO: DSPP enabled just before enabling DSPP irq! */
 		if(data & 1)
-			debugger_break(machine());
+			machine().debug_break();
 
 		//printf("%08x\n",data);
 		break;

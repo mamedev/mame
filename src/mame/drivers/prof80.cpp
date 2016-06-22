@@ -348,7 +348,7 @@ static ADDRESS_MAP_START( prof80_io, AS_IO, 8, prof80_state )
 	AM_RANGE(0xda, 0xda) AM_MIRROR(0xff00) AM_READ(status_r)
 	AM_RANGE(0xdb, 0xdb) AM_MIRROR(0xff00) AM_READ(status2_r)
 	AM_RANGE(0xdc, 0xdd) AM_MIRROR(0xff00) AM_DEVICE(UPD765_TAG, upd765a_device, map)
-	AM_RANGE(0xde, 0xde) AM_MIRROR(0xff01) AM_MASK(0xff00) AM_DEVWRITE(MMU_TAG, prof80_mmu_device, par_w)
+	AM_RANGE(0xde, 0xde) AM_MIRROR(0x0001) AM_SELECT(0xff00) AM_DEVWRITE(MMU_TAG, prof80_mmu_device, par_w)
 ADDRESS_MAP_END
 
 

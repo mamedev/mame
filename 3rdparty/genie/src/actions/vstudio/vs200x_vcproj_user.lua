@@ -60,10 +60,6 @@
 		if cfg.debugdir then
 			_p(4,'WorkingDirectory="%s"', path.translate(cfg.debugdir, '\\'))
 		end
-
-		if cfg.debugabsolutedir then
-			_p(4,'WorkingDirectory="%s"', path.translate(cfg.debugabsolutedir, '\\'))
-		end
 		
 		if #cfg.debugargs > 0 then
 			_p(4,'CommandArguments="%s"', table.concat(cfg.debugargs, " "))

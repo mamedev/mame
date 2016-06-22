@@ -212,55 +212,61 @@ WRITE8_MEMBER(cosmic_state::cosmica_sound_output_w)
 					if (m_samples->playing(2))
 					{
 						m_samples->stop(2);
-						m_samples->start(2, 3); break;
+						m_samples->start(2, 3);
 					}
 					else
-						m_samples->start(2, 3); break;
+						m_samples->start(2, 3);
+					break;
 
 				case 3:
 					if (m_samples->playing(3))
 					{
 						m_samples->stop(3);
-						m_samples->start(3, 4); break;
+						m_samples->start(3, 4);
 					}
 					else
-						m_samples->start(3, 4); break;
+						m_samples->start(3, 4);
+					break;
 
 				case 4:
 					if (m_samples->playing(4))
 					{
 						m_samples->stop(4);
-						m_samples->start(4, 5); break;
+						m_samples->start(4, 5);
 					}
 					else
-						m_samples->start(4, 5); break;
+						m_samples->start(4, 5);
+					break;
 
 				case 5:
 					if (m_samples->playing(5))
 					{
 						m_samples->stop(5);
-						m_samples->start(5, 6); break;
+						m_samples->start(5, 6);
 					}
 					else
-						m_samples->start(5, 6); break;
+						m_samples->start(5, 6);
+					break;
 
 				case 6:
 					if (m_samples->playing(6))
 					{
 						m_samples->stop(6);
-						m_samples->start(6, 7); break;
+						m_samples->start(6, 7);
 					}
 					else
-						m_samples->start(6, 7); break;
+						m_samples->start(6, 7);
+					break;
 
 				case 7:
 					if (m_samples->playing(7))
 					{
 						m_samples->stop(7);
-						m_samples->start(7, 8); break;
+						m_samples->start(7, 8);
 					}
 					else
-						m_samples->start(7, 8); break;
+						m_samples->start(7, 8);
+					break;
 				}
 			}
 

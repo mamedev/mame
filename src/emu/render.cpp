@@ -772,6 +772,11 @@ render_container::item &render_container::add_generic(UINT8 type, float x0, floa
 {
 	item *newitem = m_item_allocator.alloc();
 
+	assert(x0 == x0);
+	assert(x1 == x1);
+	assert(y0 == y0);
+	assert(y1 == y1);
+
 	// copy the data into the new item
 	newitem->m_type = type;
 	newitem->m_bounds.x0 = x0;

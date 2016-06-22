@@ -123,5 +123,4 @@ public:
 	void update_sprites();
 	void lineswap_gfx_roms(const char *region, const int bit);
 	void gfx_unscramble();
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

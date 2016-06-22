@@ -220,7 +220,7 @@ READ8_MEMBER( micropolis_device::status_r )
 READ8_MEMBER( micropolis_device::data_r )
 {
 	if (m_data_offset >= m_sector_length)
-		m_data_offset = 0;
+		return 0;
 
 	return m_buffer[m_data_offset++];
 }
@@ -254,7 +254,7 @@ Command (bits 5,6,7)      Options (bits 0,1,2,3,4)
 	case 3:
 		if (BIT(data, 0))
 		{
-			if (m_track < 77)
+			if (m_track < 76)
 			{
 				m_track++;
 				direction = 1;
@@ -276,17 +276,11 @@ Command (bits 5,6,7)      Options (bits 0,1,2,3,4)
 	}
 
 
-	m_status = STAT_RFC;
-
-	if (BIT(data, 5))
-		m_status |= STAT_READY;
-
-	m_drive->floppy_drive_set_ready_state(1,0);
-
-
-	if (!m_track)
+	m_status = STAT_RFC | STAT_READY;
+	if (m_track == 0)
 		m_status |= STAT_TRACK0;
 
+	m_drive->floppy_drive_set_ready_state(1,0);
 	m_drive->floppy_drive_seek(direction);
 }
 

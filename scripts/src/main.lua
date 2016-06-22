@@ -147,17 +147,7 @@ end
 		end
 
 	configuration { }
-	
-if _OPTIONS["IGNORE_GIT"]~="1" then	
-	GIT_VERSION = backtick( "git describe --dirty" )
-	local p = string.find(GIT_VERSION, '-', 1)
-	if (p~=nil) then
-		defines {
-			"GIT_VERSION=" .. string.sub(GIT_VERSION,p+1)
-		}
-	end
-end
-	
+
 	if _OPTIONS["targetos"]=="android" then
 		includedirs {
 			MAME_DIR .. "3rdparty/SDL2/include",
@@ -277,7 +267,7 @@ if (STANDALONE~=true) then
 			"-sectcreate __TEXT __info_plist " .. _MAKE.esc(GEN_DIR) .. "resource/" .. _subtarget .. "-Info.plist"
 		}
 		custombuildtask {
-			{ MAME_DIR .. "src/version.cpp" ,  GEN_DIR .. "resource/" .. _subtarget .. "-Info.plist",    {  MAME_DIR .. "scripts/build/verinfo.py" }, {"@echo Emitting " .. _subtarget .. "-Info.plist" .. "...",    PYTHON .. " $(1)  -p -b " .. _subtarget .. " $(<) > $(@)" }},
+			{ GEN_DIR .. "version.cpp" ,  GEN_DIR .. "resource/" .. _subtarget .. "-Info.plist",    {  MAME_DIR .. "scripts/build/verinfo.py" }, {"@echo Emitting " .. _subtarget .. "-Info.plist" .. "...",    PYTHON .. " $(1)  -p -b " .. _subtarget .. " $(<) > $(@)" }},
 		}
 		dependency {
 			{ "$(TARGET)" ,  GEN_DIR  .. "resource/" .. _subtarget .. "-Info.plist", true  },
@@ -312,7 +302,7 @@ if (STANDALONE~=true) then
 	end
 	files {
 		mainfile,
-		MAME_DIR .. "src/version.cpp",
+		GEN_DIR .. "version.cpp",
 		GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",
 	}
 
@@ -355,21 +345,21 @@ if (STANDALONE~=true) then
 
 	configuration { "mingw*" }
 		custombuildtask {
-			{ MAME_DIR .. "src/version.cpp" ,  GEN_DIR  .. "resource/" .. rctarget .. "vers.rc",    {  MAME_DIR .. "scripts/build/verinfo.py" }, {"@echo Emitting " .. rctarget .. "vers.rc" .. "...",    PYTHON .. " $(1)  -r -b " .. rctarget .. " $(<) > $(@)" }},
+			{ GEN_DIR .. "version.cpp" ,  GEN_DIR  .. "resource/" .. rctarget .. "vers.rc",    {  MAME_DIR .. "scripts/build/verinfo.py" }, {"@echo Emitting " .. rctarget .. "vers.rc" .. "...",    PYTHON .. " $(1)  -r -b " .. rctarget .. " $(<) > $(@)" }},
 		}
 
 	configuration { "vs*" }
 		prebuildcommands {
 			"mkdir " .. path.translate(GEN_DIR  .. "resource/","\\") .. " 2>NUL",
 			"@echo Emitting ".. rctarget .. "vers.rc...",
-			PYTHON .. " " .. path.translate(MAME_DIR .. "scripts/build/verinfo.py","\\") .. " -r -b " .. rctarget .. " " .. path.translate(MAME_DIR .. "src/version.cpp","\\") .. " > " .. path.translate(GEN_DIR  .. "resource/" .. rctarget .. "vers.rc", "\\") ,
+			PYTHON .. " " .. path.translate(MAME_DIR .. "scripts/build/verinfo.py","\\") .. " -r -b " .. rctarget .. " " .. path.translate(GEN_DIR .. "version.cpp","\\") .. " > " .. path.translate(GEN_DIR  .. "resource/" .. rctarget .. "vers.rc", "\\") ,
 		}
 end
 
 	configuration { }
 
 	if _OPTIONS["DEBUG_DIR"]~=nil then
-		debugabsolutedir(_OPTIONS["DEBUG_DIR"])
+		debugdir(_OPTIONS["DEBUG_DIR"])
 	else
 		debugdir (MAME_DIR)
 	end

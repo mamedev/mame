@@ -154,43 +154,6 @@ public:
 	INT16 cop_hit_val[3];
 	UINT16 cop_hit_val_stat;
 
-	void cop_collision_read_pos(address_space &space, int slot, UINT32 spradr, bool allow_swap);
-
-	void execute_8100(address_space &space, int offset, UINT16 data);
-	void execute_8900(address_space &space, int offset, UINT16 data);
-
-	void execute_42c2(address_space &space, int offset, UINT16 data);
-	void execute_4aa0(address_space &space, int offset, UINT16 data);
-	void execute_6200(address_space &space, int offset, UINT16 data);
-
-	void execute_338e(address_space &space, int offset, UINT16 data);
-	void execute_2288(address_space &space, int offset, UINT16 data);
-	void execute_0205(address_space &space, int offset, UINT16 data);
-	void execute_3b30(address_space &space, int offset, UINT16 data);
-	void execute_130e(address_space &space, int offset, UINT16 data);
-	void execute_0904(address_space &space, int offset, UINT16 data);
-	void execute_2a05(address_space &space, int offset, UINT16 data);
-	void execute_7e05(address_space &space, int offset, UINT16 data);
-	void execute_5205(address_space &space, int offset, UINT16 data);
-	void execute_5a05(address_space &space, int offset, UINT16 data);
-
-	void execute_f205(address_space &space, int offset, UINT16 data);
-	void execute_a100(address_space &space, int offset, UINT16 data);
-	void execute_a900(address_space &space, int offset, UINT16 data);
-	void execute_b100(address_space &space, int offset, UINT16 data);
-	void execute_b900(address_space &space, int offset, UINT16 data);
-
-	void LEGACY_execute_130e(address_space &space, int offset, UINT16 data);
-	void LEGACY_execute_130e_cupsoc(address_space &space, int offset, UINT16 data);
-	void LEGACY_execute_3b30(address_space &space, int offset, UINT16 data);
-	void LEGACY_execute_42c2(address_space &space, int offset, UINT16 data);
-	void LEGACY_execute_e30e(address_space &space, int offset, UINT16 data);
-	void LEGACY_execute_6200(address_space &space, int offset, UINT16 data);
-	void LEGACY_execute_dde5(address_space &space, int offset, UINT16 data);
-	void LEGACY_execute_d104(address_space &space, int offset, UINT16 data);
-	void LEGACY_execute_6980(address_space &space, int offset, UINT16 data);
-	void LEGACY_execute_c480(address_space &space, int offset, UINT16 data);
-
 	// Sort DMA (zeroteam, cupsoc)
 
 	UINT32 cop_sort_ram_addr, cop_sort_lookup;
@@ -239,17 +202,6 @@ public:
 	int m_LEGACY_r0, m_LEGACY_r1;
 	DECLARE_WRITE16_MEMBER(LEGACY_cop_cmd_w);
 
-
-	void  cop_collision_update_hitbox(address_space &space, UINT16 data, int slot, UINT32 hitadr);
-
-	// endian stuff?
-	int m_cpu_is_68k;
-	static void set_cpu_is_68k(device_t &device, int value) { downcast<raiden2cop_device &>(device).m_cpu_is_68k = value; }
-	UINT16 cop_read_word(address_space &space, int address);
-	UINT8 cop_read_byte(address_space &space, int address);
-	void cop_write_word(address_space &space, int address, UINT16 data);
-	void cop_write_byte(address_space &space, int address, UINT8 data);
-
 	// DEBUG
 	void dump_table();
 
@@ -261,6 +213,65 @@ private:
 	// internal state
 	devcb_write16       m_videoramout_cb;
 	required_device<palette_device> m_palette;
+	
+	cpu_device *m_host_cpu; 	 /**< reference to the host cpu */
+	address_space *m_host_space; /**< reference to the host cpu space */
+	bool m_host_endian;			 /**< reference to the host cpu endianness, some commands cares! */
+	UINT8 m_byte_endian_val;	 /**< 2 if m_host_endian is big (68k) else 0 */
+	UINT8 m_word_endian_val;	 /**< 3 if m_host_endian is big (68k) else 0 */
+
+	
+	void cop_collision_read_pos(int slot, UINT32 spradr, bool allow_swap);
+
+	// commands, TODO: needs commenting!
+	void execute_8100(int offset, UINT16 data);
+	void execute_8900(int offset, UINT16 data);
+
+	void execute_42c2(int offset, UINT16 data);
+	void execute_4aa0(int offset, UINT16 data);
+	void execute_6200(int offset, UINT16 data);
+
+	void execute_338e(int offset, UINT16 data);
+	void execute_2288(int offset, UINT16 data);
+	void execute_0205(int offset, UINT16 data);
+	void execute_3b30(int offset, UINT16 data);
+	void execute_130e(int offset, UINT16 data);
+	void execute_0904(int offset, UINT16 data);
+	void execute_2a05(int offset, UINT16 data);
+	void execute_7e05(int offset, UINT16 data);
+	void execute_5205(int offset, UINT16 data);
+	void execute_5a05(int offset, UINT16 data);
+
+	void execute_f205(int offset, UINT16 data);
+	void execute_a100(int offset, UINT16 data);
+	void execute_a900(int offset, UINT16 data);
+	void execute_b100(int offset, UINT16 data);
+	void execute_b900(int offset, UINT16 data);
+
+	// TODO: remove these
+	void LEGACY_execute_130e(int offset, UINT16 data);
+	void LEGACY_execute_130e_cupsoc(int offset, UINT16 data);
+	void LEGACY_execute_3b30(int offset, UINT16 data);
+	void LEGACY_execute_42c2(int offset, UINT16 data);
+	void LEGACY_execute_e30e(int offset, UINT16 data);
+	void LEGACY_execute_6200(int offset, UINT16 data);
+	void LEGACY_execute_dde5(int offset, UINT16 data);
+	void LEGACY_execute_d104(int offset, UINT16 data);
+	void LEGACY_execute_6980(int offset, UINT16 data);
+	void LEGACY_execute_c480(int offset, UINT16 data);
+	
+	void cop_collision_update_hitbox(UINT16 data, int slot, UINT32 hitadr);
+	void bcd_update();
+	
+	UINT16 cop_read_word(int address);
+	UINT8 cop_read_byte(int address);
+	void cop_write_word(int address, UINT16 data);
+	void cop_write_byte(int address, UINT8 data);
+	
+	void dma_tilemap_buffer();
+	void dma_palette_buffer();
+	void dma_fill();
+	void dma_palette_brightness();
 };
 
 extern const device_type RAIDEN2COP;

@@ -337,7 +337,7 @@ void special_state::erik_set_bank()
 			m_bank4->set_base(mem + 0x1c000);
 			space.unmap_write(0xf000, 0xf7ff);
 			space.nop_read(0xf000, 0xf7ff);
-			space.install_readwrite_handler(0xf800, 0xf803, 0, 0x7fc, read8_delegate(FUNC(i8255_device::read), (i8255_device*)m_ppi), write8_delegate(FUNC(i8255_device::write), (i8255_device*)m_ppi));
+			space.install_readwrite_handler(0xf800, 0xf803, 0, 0x7fc, 0, read8_delegate(FUNC(i8255_device::read), (i8255_device*)m_ppi), write8_delegate(FUNC(i8255_device::write), (i8255_device*)m_ppi));
 			break;
 	}
 }

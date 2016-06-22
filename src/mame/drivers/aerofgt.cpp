@@ -65,7 +65,6 @@ Verification still needed for the other PCBs.
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
 #include "sound/3812intf.h"
-#include "sound/okim6295.h"
 #include "includes/aerofgt.h"
 
 WRITE16_MEMBER(aerofgt_state::sound_command_w)
@@ -73,7 +72,7 @@ WRITE16_MEMBER(aerofgt_state::sound_command_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_pending_command = 1;
-		soundlatch_byte_w(space, offset, data & 0xff);
+		m_soundlatch->write(space, offset, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -83,7 +82,7 @@ WRITE16_MEMBER(aerofgt_state::turbofrc_sound_command_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		m_pending_command = 1;
-		soundlatch_byte_w(space, offset, (data >> 8) & 0xff);
+		m_soundlatch->write(space, offset, (data >> 8) & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -92,7 +91,7 @@ WRITE16_MEMBER(aerofgt_state::aerfboot_soundlatch_w)
 {
 	if(ACCESSING_BITS_8_15)
 	{
-		soundlatch_byte_w(space, 0, (data >> 8) & 0xff);
+		m_soundlatch->write(space, 0, (data >> 8) & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -132,6 +131,18 @@ WRITE8_MEMBER(aerofgt_state::aerfboot_okim6295_banking_w)
 	/*bit 2 (0x4) setted too?*/
 	if (data & 0x4)
 		membank("okibank")->set_entry(data & 0x3);
+}
+
+WRITE8_MEMBER(aerofgt_state::karatblzbl_d7759_write_port_0_w)
+{
+	m_upd7759->port_w(space, 0, data);
+	m_upd7759->start_w(0);
+	m_upd7759->start_w(1);
+}
+
+WRITE8_MEMBER(aerofgt_state::karatblzbl_d7759_reset_w)
+{
+	m_upd7759->reset_w(data & 0x80);
 }
 
 static ADDRESS_MAP_START( pspikes_map, AS_PROGRAM, 16, aerofgt_state )
@@ -385,7 +396,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( turbofrc_sound_portmap, AS_IO, 8, aerofgt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(aerofgt_sh_bankswitch_w)
-	AM_RANGE(0x14, 0x14) AM_READ(soundlatch_byte_r) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x14, 0x14) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(pending_command_clear_w)
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 ADDRESS_MAP_END
 
@@ -394,7 +405,7 @@ static ADDRESS_MAP_START( aerofgt_sound_portmap, AS_IO, 8, aerofgt_state )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0x04, 0x04) AM_WRITE(aerofgt_sh_bankswitch_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(pending_command_clear_w)
-	AM_RANGE(0x0c, 0x0c) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x0c, 0x0c) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aerfboot_sound_map, AS_PROGRAM, 8, aerofgt_state )
@@ -402,7 +413,7 @@ static ADDRESS_MAP_START( aerfboot_sound_map, AS_PROGRAM, 8, aerofgt_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(aerfboot_okim6295_banking_w)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wbbc97_sound_map, AS_PROGRAM, 8, aerofgt_state )
@@ -411,12 +422,21 @@ static ADDRESS_MAP_START( wbbc97_sound_map, AS_PROGRAM, 8, aerofgt_state )
 	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0xfc00, 0xfc00) AM_NOP
-	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xfc20, 0xfc20) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( karatblzbl_sound_map, AS_PROGRAM, 8, aerofgt_state )
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
+	AM_RANGE(0x0000, 0xefff) AM_ROM
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM
+	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read) //AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( karatblzbl_sound_portmap, AS_IO, 8, aerofgt_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ymsnd", ym3812_device, status_port_r, control_port_w)
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE("ymsnd", ym3812_device, write_port_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(karatblzbl_d7759_write_port_0_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(karatblzbl_d7759_reset_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( oki_map, AS_0, 8, aerofgt_state ) //only for aerfboot for now
@@ -1349,6 +1369,8 @@ static MACHINE_CONFIG_START( pspikes, aerofgt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
@@ -1505,6 +1527,8 @@ static MACHINE_CONFIG_START( karatblz, aerofgt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz ) /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
@@ -1522,6 +1546,7 @@ static MACHINE_CONFIG_START( karatblzbl, aerofgt_state )
 
 	MCFG_CPU_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(karatblzbl_sound_map)
+	MCFG_CPU_IO_MAP(karatblzbl_sound_portmap)
 
 	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
@@ -1550,11 +1575,20 @@ static MACHINE_CONFIG_START( karatblzbl, aerofgt_state )
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,karatblz)
+	
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	/* sound hardware */
-	//MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") // breaks savestate
+	
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	// NEC D7759c + YM????
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2) 
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( spinlbrk, aerofgt_state )
@@ -1600,6 +1634,8 @@ static MACHINE_CONFIG_START( spinlbrk, aerofgt_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)  /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1651,6 +1687,8 @@ static MACHINE_CONFIG_START( turbofrc, aerofgt_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)  /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1704,6 +1742,8 @@ static MACHINE_CONFIG_START( aerofgtb, aerofgt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
@@ -1751,6 +1791,8 @@ static MACHINE_CONFIG_START( aerofgt, aerofgt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)  /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
@@ -1790,6 +1832,8 @@ static MACHINE_CONFIG_START( aerfboot, aerofgt_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
@@ -1863,6 +1907,8 @@ static MACHINE_CONFIG_START( wbbc97, aerofgt_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -2466,7 +2512,7 @@ ROM_END
 Karate Blazers (bootleg)
 
 CPU : MC68000
-SND : Z80 + NEC D7759c + YM???? (no number on chip)
+SND : Z80 + NEC D7759c + YM3812 (no number on chip, but ROM is the same as streetsm, which uses a YM3812)
 
 */
 
@@ -2478,7 +2524,7 @@ ROM_START( karatblzbl )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "2.u80",        0x00000, 0x10000, CRC(ca4b171e) SHA1(a05fd81f68759a09be3ec09f38d7c9364dfb6c14) )
 
-	ROM_REGION( 0x20000, "samples", 0 ) // D7759c data
+	ROM_REGION( 0x20000, "upd", 0 ) // D7759c data
 	ROM_LOAD( "1.u88",        0x00000, 0x20000, CRC(47db1605) SHA1(ae00e633eb98567f04ff97e3d63e04e049d955ec) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -2774,7 +2820,7 @@ GAME( 1991, karatblz, 0,        karatblz, karatblz, driver_device, 0, ROT0,   "V
 GAME( 1991, karatblza,karatblz, karatblz, karatblz, driver_device, 0, ROT0,   "Video System Co.", "Karate Blazers (World, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1991, karatblzu,karatblz, karatblz, karatblz, driver_device, 0, ROT0,   "Video System Co.", "Karate Blazers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1991, karatblzj,karatblz, karatblz, karatblz, driver_device, 0, ROT0,   "Video System Co.", "Toushin Blazers (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, karatblzbl,karatblz,karatblzbl,karatblz,driver_device, 0, ROT0,   "bootleg",          "Karate Blazers (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_NO_SOUND )
+GAME( 1991, karatblzbl,karatblz,karatblzbl,karatblz,driver_device, 0, ROT0,   "bootleg",          "Karate Blazers (bootleg with Street Smart sound hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
 
 GAME( 1991, turbofrc, 0,        turbofrc, turbofrc, driver_device, 0, ROT270, "Video System Co.", "Turbo Force (old revision)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 // there's also an undumped Turbo Force (new revision). Most notable thing in there is the points value of the rocks in level 6 (5.000 versus 500).

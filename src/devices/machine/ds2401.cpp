@@ -127,6 +127,7 @@ void ds2401_device::device_timer(emu_timer &timer, device_timer_id id, int param
 				switch(m_shift)
 				{
 				case COMMAND_READROM:
+				case COMMAND_READROM_COMPAT:
 					verboselog(1, "timer_main readrom\n");
 					m_bit = 0;
 					m_byte = 0;

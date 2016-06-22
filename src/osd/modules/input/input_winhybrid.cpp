@@ -167,7 +167,7 @@ public:
 			goto exit;
 		}
 
-		if (!win_window_list.empty() && win_window_list.front()->win_has_menu())
+		if (!osd_common_t::s_window_list.empty() && osd_common_t::s_window_list.front()->win_has_menu())
 			cooperative_level = DISCL_BACKGROUND | DISCL_NONEXCLUSIVE;
 
 		// allocate and link in a new device
@@ -218,7 +218,7 @@ protected:
 			{
 				XINPUT_STATE state = { 0 };
 
-				if (m_xinput_helper->XInputGetState(i, &state) == ERROR_SUCCESS)
+				if (m_xinput_helper->xinput_get_state(i, &state) == ERROR_SUCCESS)
 				{
 					// allocate and link in a new device
 					devinfo = m_xinput_helper->create_xinput_device(machine, i, *this);

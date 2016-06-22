@@ -110,48 +110,6 @@ const device_type INTEL_28F320J5 = &device_creator<intel_28f320j5_device>;
 
 const device_type SST_39VF400A = &device_creator<sst_39vf400a_device>;
 
-static ADDRESS_MAP_START( memory_map8_512Kb, AS_PROGRAM, 8, intelfsh_device )
-	AM_RANGE(0x00000, 0x00ffff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( memory_map8_1Mb, AS_PROGRAM, 8, intelfsh_device )
-	AM_RANGE(0x00000, 0x01ffff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( memory_map8_2Mb, AS_PROGRAM, 8, intelfsh_device )
-	AM_RANGE(0x00000, 0x03ffff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( memory_map8_4Mb, AS_PROGRAM, 8, intelfsh_device )
-	AM_RANGE(0x00000, 0x07ffff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( memory_map8_8Mb, AS_PROGRAM, 8, intelfsh_device )
-	AM_RANGE(0x00000, 0x0fffff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( memory_map8_16Mb, AS_PROGRAM, 8, intelfsh_device )
-	AM_RANGE(0x00000, 0x1fffff) AM_RAM
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( memory_map16_4Mb, AS_PROGRAM, 16, intelfsh_device )
-	AM_RANGE(0x00000, 0x03ffff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( memory_map16_16Mb, AS_PROGRAM, 16, intelfsh_device )
-	AM_RANGE(0x00000, 0x0fffff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( memory_map16_32Mb, AS_PROGRAM, 16, intelfsh_device )
-	AM_RANGE(0x00000, 0x1fffff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( memory_map16_64Mb, AS_PROGRAM, 16, intelfsh_device )
-	AM_RANGE(0x00000, 0x3fffff) AM_RAM
-ADDRESS_MAP_END
-
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -163,7 +121,6 @@ ADDRESS_MAP_END
 
 intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
 		m_region(*this, DEVICE_SELF),
 		m_type(variant),
@@ -182,8 +139,6 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_timer(nullptr),
 		m_bank(0)
 {
-	address_map_constructor map = nullptr;
-
 	switch( variant )
 	{
 	case FLASH_INTEL_28F016S5:
@@ -192,7 +147,6 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_size = 0x200000;
 		m_maker_id = MFG_INTEL;
 		m_device_id = 0xaa;
-		map = ADDRESS_MAP_NAME( memory_map8_16Mb );
 		break;
 	case FLASH_ATMEL_29C010:
 		m_bits = 8;
@@ -200,21 +154,18 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_page_size = 0x80;
 		m_maker_id = MFG_ATMEL;
 		m_device_id = 0xd5;
-		map = ADDRESS_MAP_NAME( memory_map8_1Mb );
 		break;
 	case FLASH_AMD_29F010:
 		m_bits = 8;
 		m_size = 0x20000;
 		m_maker_id = MFG_AMD;
 		m_device_id = 0x20;
-		map = ADDRESS_MAP_NAME( memory_map8_1Mb );
 		break;
 	case FLASH_AMD_29F040:
 		m_bits = 8;
 		m_size = 0x80000;
 		m_maker_id = MFG_AMD;
 		m_device_id = 0xa4;
-		map = ADDRESS_MAP_NAME( memory_map8_4Mb );
 		break;
 	case FLASH_AMD_29F080:
 		m_bits = 8;
@@ -222,7 +173,6 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_addrmask = 0x7ff;
 		m_maker_id = MFG_AMD;
 		m_device_id = 0xd5;
-		map = ADDRESS_MAP_NAME( memory_map8_8Mb );
 		break;
 	case FLASH_AMD_29F400T:
 		m_bits = 8;
@@ -230,7 +180,6 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_maker_id = MFG_AMD;
 		m_device_id = 0x23;
 		m_top_boot_sector = true;
-		map = ADDRESS_MAP_NAME( memory_map8_4Mb );
 		break;
 	case FLASH_AMD_29F800T:
 		m_bits = 8;
@@ -238,14 +187,12 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_maker_id = MFG_AMD;
 		m_device_id = 0xda;
 		m_top_boot_sector = true;
-		map = ADDRESS_MAP_NAME( memory_map8_8Mb );
 		break;
 	case FLASH_AMD_29LV200T:
 		m_bits = 8;
 		m_size = 0x40000;
 		m_maker_id = MFG_AMD;
 		m_device_id = 0x3b;
-		map = ADDRESS_MAP_NAME( memory_map8_2Mb );
 		break;
 	case FLASH_INTEL_28F320J3D:
 		m_bits = 16;
@@ -253,7 +200,6 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_maker_id = MFG_INTEL;
 		m_device_id = 0x16;
 		m_sector_is_4k = true;
-		map = ADDRESS_MAP_NAME( memory_map16_32Mb );
 		break;
 	case FLASH_INTEL_28F320J5: // funkball
 		m_bits = 16;
@@ -261,7 +207,6 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_maker_id = MFG_INTEL;
 		m_device_id = 0x14;
 //      m_sector_is_4k = true; 128kb?
-		map = ADDRESS_MAP_NAME( memory_map16_32Mb );
 		break;
 	case FLASH_SST_39VF020:
 		m_bits = 8;
@@ -269,7 +214,6 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_maker_id = MFG_SST;
 		m_device_id = 0xd6;
 		m_sector_is_4k = true;
-		map = ADDRESS_MAP_NAME( memory_map8_2Mb );
 		break;
 	case FLASH_SST_39VF400A:
 		m_bits = 16;
@@ -277,21 +221,18 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_maker_id = MFG_SST;
 		m_device_id = 0xd6;
 		m_sector_is_4k = true;
-		map = ADDRESS_MAP_NAME( memory_map16_4Mb );
 		break;
 	case FLASH_SHARP_LH28F400:
 		m_bits = 16;
 		m_size = 0x80000;
 		m_maker_id = MFG_SHARP;
 		m_device_id = 0xed;
-		map = ADDRESS_MAP_NAME( memory_map16_4Mb );
 		break;
 	case FLASH_INTEL_E28F400B:
 		m_bits = 16;
 		m_size = 0x80000;
 		m_maker_id = MFG_INTEL;
 		m_device_id = 0x4471;
-		map = ADDRESS_MAP_NAME( memory_map16_4Mb );
 		break;
 	case FLASH_FUJITSU_29F160T:
 		m_bits = 8;
@@ -299,56 +240,48 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_maker_id = MFG_FUJITSU;
 		m_device_id = 0xad;
 		m_top_boot_sector = true;
-		map = ADDRESS_MAP_NAME( memory_map8_16Mb );
 		break;
 	case FLASH_FUJITSU_29F016A:
 		m_bits = 8;
 		m_size = 0x200000;
 		m_maker_id = MFG_FUJITSU;
 		m_device_id = 0xad;
-		map = ADDRESS_MAP_NAME( memory_map8_16Mb );
 		break;
 	case FLASH_FUJITSU_29DL16X:
 		m_bits = 8;
 		m_size = 0x200000;
 		m_maker_id = MFG_FUJITSU;
 		m_device_id = 0x35;
-		map = ADDRESS_MAP_NAME( memory_map8_16Mb );
 		break;
 	case FLASH_INTEL_E28F008SA:
 		m_bits = 8;
 		m_size = 0x100000;
 		m_maker_id = MFG_INTEL;
 		m_device_id = 0xa2;
-		map = ADDRESS_MAP_NAME( memory_map8_8Mb );
 		break;
 	case FLASH_INTEL_TE28F160:
 		m_bits = 16;
 		m_size = 0x200000;
 		m_maker_id = MFG_SHARP;
 		m_device_id = 0xd0;
-		map = ADDRESS_MAP_NAME( memory_map16_16Mb );
 		break;
 	case FLASH_INTEL_TE28F320:
 		m_bits = 16;
 		m_size = 0x400000;
 		m_maker_id = MFG_INTEL;
 		m_device_id = 0x8896;
-		map = ADDRESS_MAP_NAME( memory_map16_32Mb );
 		break;
 	case FLASH_SHARP_UNK128MBIT:
 		m_bits = 16;
 		m_size = 0x800000;
 		m_maker_id = MFG_SHARP;
 		m_device_id = 0xb0;
-		map = ADDRESS_MAP_NAME( memory_map16_64Mb );
 		break;
 	case FLASH_MACRONIX_29L001MC:
 		m_bits = 8;
 		m_size = 0x20000;
 		m_maker_id = MFG_MACRONIX;
 		m_device_id = 0x51;
-		map = ADDRESS_MAP_NAME( memory_map8_1Mb );
 		break;
 	case FLASH_MACRONIX_29LV160TMC:
 		m_bits = 8;
@@ -356,7 +289,6 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_maker_id = MFG_MACRONIX;
 		m_device_id = 0x49;
 		m_sector_is_16k = true;
-		map = ADDRESS_MAP_NAME( memory_map8_1Mb );
 		break;
 	case FLASH_PANASONIC_MN63F805MNP:
 		m_bits = 8;
@@ -364,7 +296,6 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_maker_id = MFG_PANASONIC;
 		m_device_id = 0x1b;
 		m_sector_is_4k = true;
-		map = ADDRESS_MAP_NAME( memory_map8_512Kb );
 		break;
 	case FLASH_SANYO_LE26FV10N1TS:
 		m_bits = 8;
@@ -372,14 +303,12 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_maker_id = MFG_SANYO;
 		m_device_id = 0x13;
 		m_sector_is_4k = true;
-		map = ADDRESS_MAP_NAME( memory_map8_1Mb );
 		break;
 	case FLASH_SST_28SF040:
 		m_bits = 8;
 		m_size = 0x80000;
 		m_maker_id = MFG_SST;
 		m_device_id = 0x04;
-		map = ADDRESS_MAP_NAME( memory_map8_4Mb );
 		break;
 	case FLASH_TMS_29F040:
 		m_bits = 8;
@@ -387,7 +316,6 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_size = 0x80000;
 		m_maker_id = MFG_AMD;
 		m_device_id = 0xa4;
-		map = ADDRESS_MAP_NAME( memory_map8_4Mb );
 		break;
 	}
 
@@ -395,8 +323,6 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 	for (addrbits = 24; addrbits > 0; addrbits--)
 		if ((m_size & (1 << addrbits)) != 0)
 			break;
-
-	m_space_config = address_space_config("flash", ENDIANNESS_BIG, m_bits, addrbits, (m_bits == 8) ? 0 : -1, map);
 }
 
 intelfsh8_device::intelfsh8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
@@ -498,11 +424,13 @@ tms_29f040_device::tms_29f040_device(const machine_config &mconfig, const char *
 
 void intelfsh_device::device_start()
 {
+	m_data = std::make_unique<UINT8 []>(m_size);
 	m_timer = timer_alloc();
 
 	save_item( NAME(m_status) );
 	save_item( NAME(m_flash_mode) );
 	save_item( NAME(m_flash_master_lock) );
+	save_pointer( &m_data[0], "m_data", m_size);
 }
 
 
@@ -526,17 +454,6 @@ void intelfsh_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 
 //-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-const address_space_config *intelfsh_device::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == 0) ? &m_space_config : nullptr;
-}
-
-
-//-------------------------------------------------
 //  nvram_default - called to initialize NVRAM to
 //  its default state
 //-------------------------------------------------
@@ -553,19 +470,21 @@ void intelfsh_device::nvram_default()
 		if (m_bits == 8)
 		{
 			for (offs_t offs = 0; offs < bytes; offs++)
-				space(AS_PROGRAM).write_byte(offs, m_region->u8(offs));
+				m_data[offs] = m_region->u8(offs);
 		}
 		else
 		{
-			for (offs_t offs = 0; offs < bytes; offs += 2)
-				space(AS_PROGRAM).write_word(offs, m_region->u16(offs / 2));
+			for (offs_t offs = 0; offs < bytes; offs += 2) {
+				UINT16 v = m_region->u16(offs / 2);
+				m_data[offs] = v >> 8;
+				m_data[offs+1] = v;
+			}
 		}
 		return;
 	}
 
 	// otherwise, default to 0xff
-	for (offs_t offs = 0; offs < m_size; offs++)
-		space(AS_PROGRAM).write_byte(offs, 0xff);
+	memset(&m_data[0], 0xff, m_size);
 }
 
 
@@ -576,10 +495,7 @@ void intelfsh_device::nvram_default()
 
 void intelfsh_device::nvram_read(emu_file &file)
 {
-	dynamic_buffer buffer(m_size);
-	file.read(&buffer[0], m_size);
-	for (int byte = 0; byte < m_size; byte++)
-		space(AS_PROGRAM).write_byte(byte, buffer[byte]);
+	file.read(&m_data[0], m_size);
 }
 
 
@@ -590,10 +506,7 @@ void intelfsh_device::nvram_read(emu_file &file)
 
 void intelfsh_device::nvram_write(emu_file &file)
 {
-	dynamic_buffer buffer(m_size);
-	for (int byte = 0; byte < m_size; byte++)
-		buffer[byte] = space(AS_PROGRAM).read_byte(byte);
-	file.write(&buffer[0], m_size);
+	file.write(&m_data[0], m_size);
 }
 
 
@@ -614,12 +527,12 @@ UINT32 intelfsh_device::read_full(UINT32 address)
 		{
 		case 8:
 			{
-				data = space(AS_PROGRAM).read_byte(address);
+				data = m_data[address];
 			}
 			break;
 		case 16:
 			{
-				data = space(AS_PROGRAM).read_word(address * 2);
+				data = m_data[address*2+1] | (m_data[address*2] << 8);
 			}
 			break;
 		}
@@ -693,12 +606,12 @@ UINT32 intelfsh_device::read_full(UINT32 address)
 			{
 			case 8:
 				{
-					data = space(AS_PROGRAM).read_byte(address);
+					data = m_data[address];
 				}
 				break;
 			case 16:
 				{
-					data = space(AS_PROGRAM).read_word(address * 2);
+					data = m_data[address*2+1] | (m_data[address*2] << 8);
 				}
 				break;
 			}
@@ -921,8 +834,7 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 			(( address & 0xfff ) == 0xaaa && ( data & 0xff ) == 0x10 ) )
 		{
 			// chip erase
-			for (offs_t offs = 0; offs < m_size; offs++)
-				space(AS_PROGRAM).write_byte(offs, 0xff);
+			memset(&m_data[0], 0xff, m_size);
 
 			m_status = 1 << 3;
 			m_flash_mode = FM_ERASEAMD4;
@@ -947,15 +859,13 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 			UINT32 base = address * ((m_bits == 16) ? 2 : 1);
 			if (m_sector_is_4k)
 			{
-				for (offs_t offs = 0; offs < 4 * 1024; offs++)
-					space(AS_PROGRAM).write_byte((base & ~0xfff) + offs, 0xff);
+				memset(&m_data[base & ~0xfff], 0xff, 4 * 1024);
 				m_erase_sector = address & ((m_bits == 16) ? ~0x7ff : ~0xfff);
 				m_timer->adjust( attotime::from_msec( 125 ) );
 			}
 			else if(m_sector_is_16k)
 			{
-				for (offs_t offs = 0; offs < 16 * 1024; offs++)
-					space(AS_PROGRAM).write_byte((base & ~0x3fff) + offs, 0xff);
+				memset(&m_data[base & ~0x3fff], 0xff, 16 * 1024);
 				m_erase_sector = address & ((m_bits == 16) ? ~0x1fff : ~0x3fff);
 				m_timer->adjust( attotime::from_msec( 500 ) );
 			}
@@ -963,30 +873,26 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 			{
 				if (address >= (m_size - (16*1024)))
 				{
-					for (offs_t offs = 0; offs < 16 * 1024; offs++)
-						space(AS_PROGRAM).write_byte((base & ~0x3fff) + offs, 0xff);
+					memset(&m_data[base & ~0x3fff], 0xff, 16 * 1024);
 					m_erase_sector = address & ((m_bits == 16) ? ~0x1fff : ~0x3fff);
 					m_timer->adjust( attotime::from_msec( 500 ) );
 				}
 				else if (address >= (m_size - (32*1024)))
 				{
-					for (offs_t offs = 0; offs < 8 * 1024; offs++)
-						space(AS_PROGRAM).write_byte((base & ~0x1fff) + offs, 0xff);
+					memset(&m_data[base & ~0x1fff], 0xff, 8 * 1024);
 					m_erase_sector = address & ((m_bits == 16) ? ~0xfff : ~0x1fff);
 					m_timer->adjust( attotime::from_msec( 250 ) );
 				}
 				else
 				{
-					for (offs_t offs = 0; offs < 32 * 1024; offs++)
-						space(AS_PROGRAM).write_byte((base & ~0x7fff) + offs, 0xff);
+					memset(&m_data[base & ~0x7fff], 0xff, 32 * 1024);
 					m_erase_sector = address & ((m_bits == 16) ? ~0x3fff : ~0x7fff);
 					m_timer->adjust( attotime::from_msec( 500 ) );
 				}
 			}
 			else
 			{
-				for (offs_t offs = 0; offs < 64 * 1024; offs++)
-					space(AS_PROGRAM).write_byte((base & ~0xffff) + offs, 0xff);
+				memset(&m_data[base & ~0xffff], 0xff, 64 * 1024);
 				m_erase_sector = address & ((m_bits == 16) ? ~0x7fff : ~0xffff);
 				m_timer->adjust( attotime::from_seconds( 1 ) );
 			}
@@ -1004,7 +910,7 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		{
 		case 8:
 			{
-				space(AS_PROGRAM).write_byte(address, data);
+				m_data[address] = data;
 			}
 			break;
 		default:
@@ -1017,10 +923,11 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		switch( m_bits )
 		{
 		case 8:
-			space(AS_PROGRAM).write_byte(address, data);
+			m_data[address] = data;
 			break;
 		case 16:
-			space(AS_PROGRAM).write_word(address * 2, data);
+			m_data[address*2] = data >> 8;
+			m_data[address] = data;
 			break;
 		default:
 			logerror( "FM_WRITEPART1 not supported when m_bits == %d\n", m_bits );
@@ -1036,10 +943,11 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		switch( m_bits )
 		{
 		case 8:
-			space(AS_PROGRAM).write_byte(address, data);
+			m_data[address] = data;
 			break;
 		case 16:
-			space(AS_PROGRAM).write_word(address * 2, data);
+			m_data[address*2] = data >> 8;
+			m_data[address] = data;
 			break;
 		default:
 			logerror( "FM_WRITEPAGEATMEL not supported when m_bits == %d\n", m_bits );
@@ -1060,8 +968,7 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 			{
 				// clear the 256 bytes block containing the current address to all 0xffs
 				UINT32 base = address * ((m_bits == 16) ? 2 : 1);
-				for (offs_t offs = 0; offs < 256; offs++)
-					space(AS_PROGRAM).write_byte((base & ~0xff) + offs, 0xff);
+				memset(&m_data[base & ~0xff], 0xff, 256);
 
 				m_timer->adjust( attotime::from_msec( 4 ) );
 			}
@@ -1103,8 +1010,7 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 				}
 
 				// clear the block containing the current address to all 0xffffs
-				for (offs_t offs = 0; offs < size / 2; offs += 2)
-					space(AS_PROGRAM).write_word(base | offs, 0xffff);
+				memset(&m_data[2*base], 0xff, size);
 
 				m_timer->adjust( attotime::from_msec( duration ) );
 			}
@@ -1112,8 +1018,7 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 			{
 				// clear the 64k block containing the current address to all 0xffs
 				UINT32 base = address * ((m_bits == 16) ? 2 : 1);
-				for (offs_t offs = 0; offs < 64 * 1024; offs++)
-					space(AS_PROGRAM).write_byte((base & ~0xffff) + offs, 0xff);
+				memset(&m_data[base & ~0xffff], 0xff, 64 * 1024);
 
 				m_timer->adjust( attotime::from_seconds( 1 ) );
 			}

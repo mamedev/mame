@@ -2664,7 +2664,7 @@ UINT8 s3_vga_device::s3_crtc_reg_read(UINT8 index)
 				break;
 			default:
 				res = vga.crtc.data[index];
-				//debugger_break(machine);
+				//machine().debug_break();
 				//printf("%02x\n",index);
 				break;
 		}

@@ -41,8 +41,6 @@ public:
 
 	virtual void popup_time_string(int seconds, std::string message) { }
 
-	virtual void image_display(const device_type &type, device_image_interface *image) { }
-
 	virtual void menu_reset() { }
 
 	template <typename Format, typename... Params> void popup_time(int seconds, Format &&fmt, Params &&... args);

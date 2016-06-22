@@ -945,7 +945,7 @@ isa8_hdc_ec1841_device::isa8_hdc_ec1841_device(const machine_config &mconfig, co
 void isa8_hdc_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0320, 0x0323, 0, 0, read8_delegate( FUNC(isa8_hdc_device::pc_hdc_r), this ), write8_delegate( FUNC(isa8_hdc_device::pc_hdc_w), this ) );
+	m_isa->install_device(0x0320, 0x0323, read8_delegate( FUNC(isa8_hdc_device::pc_hdc_r), this ), write8_delegate( FUNC(isa8_hdc_device::pc_hdc_w), this ) );
 	m_isa->set_dma_channel(3, this, FALSE);
 }
 
@@ -958,7 +958,7 @@ void isa8_hdc_device::device_reset()
 	dip = ioport("HDD")->read();
 
 	if (ioport("ROM")->read() == 1)
-		m_isa->install_rom(this, 0xc8000, 0xc9fff, 0, 0, "hdc", "hdc");
+		m_isa->install_rom(this, 0xc8000, 0xc9fff, "hdc", "hdc");
 }
 
 /*************************************************************************

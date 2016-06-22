@@ -106,7 +106,7 @@ public:
 	void install_device(offs_t start, offs_t end, read32_delegate rhandler, write32_delegate whandler, UINT32 mask=0xffffffff);
 	void install_readonly_device(offs_t start, offs_t end, read32_delegate rhandler, UINT32 mask=0xffffffff);
 	void install_writeonly_device(offs_t start, offs_t end, write32_delegate whandler, UINT32 mask=0xffffffff);
-	void install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data);
+	void install_bank(offs_t start, offs_t end, const char *tag, UINT8 *data);
 	void set_irq_line(int slot, int state);
 
 	DECLARE_WRITE_LINE_MEMBER( irq9_w );
@@ -156,7 +156,7 @@ public:
 
 	// helper functions for card devices
 	void install_declaration_rom(device_t *dev, const char *romregion, bool mirror_all_mb = false, bool reverse_rom = false);
-	void install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data);
+	void install_bank(offs_t start, offs_t end, const char *tag, UINT8 *data);
 
 	UINT32 get_slotspace() { return 0xf0000000 | (m_slot<<24); }
 	UINT32 get_super_slotspace() { return m_slot<<28; }

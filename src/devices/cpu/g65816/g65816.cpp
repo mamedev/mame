@@ -1116,18 +1116,18 @@ READ8_MEMBER( _5a22_device::rdmpyh_r )
 
 void _5a22_device::set_5a22_map()
 {
-	space(AS_PROGRAM).install_write_handler(0x4202, 0x4202, 0, 0xbf0000, write8_delegate(FUNC(_5a22_device::wrmpya_w),this));
-	space(AS_PROGRAM).install_write_handler(0x4203, 0x4203, 0, 0xbf0000, write8_delegate(FUNC(_5a22_device::wrmpyb_w),this));
-	space(AS_PROGRAM).install_write_handler(0x4204, 0x4204, 0, 0xbf0000, write8_delegate(FUNC(_5a22_device::wrdivl_w),this));
-	space(AS_PROGRAM).install_write_handler(0x4205, 0x4205, 0, 0xbf0000, write8_delegate(FUNC(_5a22_device::wrdivh_w),this));
-	space(AS_PROGRAM).install_write_handler(0x4206, 0x4206, 0, 0xbf0000, write8_delegate(FUNC(_5a22_device::wrdvdd_w),this));
+	space(AS_PROGRAM).install_write_handler(0x4202, 0x4202, 0, 0xbf0000, 0, write8_delegate(FUNC(_5a22_device::wrmpya_w),this));
+	space(AS_PROGRAM).install_write_handler(0x4203, 0x4203, 0, 0xbf0000, 0, write8_delegate(FUNC(_5a22_device::wrmpyb_w),this));
+	space(AS_PROGRAM).install_write_handler(0x4204, 0x4204, 0, 0xbf0000, 0, write8_delegate(FUNC(_5a22_device::wrdivl_w),this));
+	space(AS_PROGRAM).install_write_handler(0x4205, 0x4205, 0, 0xbf0000, 0, write8_delegate(FUNC(_5a22_device::wrdivh_w),this));
+	space(AS_PROGRAM).install_write_handler(0x4206, 0x4206, 0, 0xbf0000, 0, write8_delegate(FUNC(_5a22_device::wrdvdd_w),this));
 
-	space(AS_PROGRAM).install_write_handler(0x420d, 0x420d, 0, 0xbf0000, write8_delegate(FUNC(_5a22_device::memsel_w),this));
+	space(AS_PROGRAM).install_write_handler(0x420d, 0x420d, 0, 0xbf0000, 0, write8_delegate(FUNC(_5a22_device::memsel_w),this));
 
-	space(AS_PROGRAM).install_read_handler(0x4214, 0x4214, 0, 0xbf0000, read8_delegate(FUNC(_5a22_device::rddivl_r),this));
-	space(AS_PROGRAM).install_read_handler(0x4215, 0x4215, 0, 0xbf0000, read8_delegate(FUNC(_5a22_device::rddivh_r),this));
-	space(AS_PROGRAM).install_read_handler(0x4216, 0x4216, 0, 0xbf0000, read8_delegate(FUNC(_5a22_device::rdmpyl_r),this));
-	space(AS_PROGRAM).install_read_handler(0x4217, 0x4217, 0, 0xbf0000, read8_delegate(FUNC(_5a22_device::rdmpyh_r),this));
+	space(AS_PROGRAM).install_read_handler(0x4214, 0x4214, 0, 0xbf0000, 0, read8_delegate(FUNC(_5a22_device::rddivl_r),this));
+	space(AS_PROGRAM).install_read_handler(0x4215, 0x4215, 0, 0xbf0000, 0, read8_delegate(FUNC(_5a22_device::rddivh_r),this));
+	space(AS_PROGRAM).install_read_handler(0x4216, 0x4216, 0, 0xbf0000, 0, read8_delegate(FUNC(_5a22_device::rdmpyl_r),this));
+	space(AS_PROGRAM).install_read_handler(0x4217, 0x4217, 0, 0xbf0000, 0, read8_delegate(FUNC(_5a22_device::rdmpyh_r),this));
 }
 
 

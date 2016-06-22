@@ -173,6 +173,7 @@ opcode_desc *drc_frontend::describe_one(offs_t curpc, const opcode_desc *prevdes
 	// set the delay slot flag
 	desc->flags = in_delay_slot ? OPFLAG_IN_DELAY_SLOT : 0;
 	desc->userflags = 0;
+	desc->userdata0 = 0;
 	desc->cycles = 0;
 	memset(desc->regin, 0x00, sizeof(desc->regin));
 	memset(desc->regout, 0x00, sizeof(desc->regout));

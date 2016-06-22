@@ -88,7 +88,7 @@ project "zlib"
 
 	local version = str_to_version(_OPTIONS["gcc_version"])
 	if _OPTIONS["gcc"]~=nil and ((string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android"))) then
-		configuration { "gmake" }
+		configuration { "gmake or ninja" }
 		if (version >= 30700) then
 			buildoptions {
 				"-Wno-shift-negative-value",
@@ -113,7 +113,7 @@ end
 			"verbose=-1",
 		}
 
-	configuration { "gmake" }
+	configuration { "gmake or ninja" }
 		buildoptions_c {
 			"-Wno-strict-prototypes",
 		}
@@ -299,7 +299,7 @@ end
 			"HAVE_CONFIG_H=1",
 		}
 
-	configuration { "gmake" }
+	configuration { "gmake or ninja" }
 		buildoptions_c {
 			"-Wno-unused-function",
 			"-O0",
@@ -352,7 +352,7 @@ project "7z"
 	uuid "ad573d62-e76a-4b11-ae34-5110a6789a42"
 	kind "StaticLib"
 
-	configuration { "gmake" }
+	configuration { "gmake or ninja" }
 		buildoptions_c {
 			"-Wno-undef",
       "-Wno-strict-prototypes",
@@ -446,7 +446,7 @@ project "lua"
 	--  "ForceCPP",
 	--}
 
-	configuration { "gmake" }
+	configuration { "gmake or ninja" }
 		buildoptions_c {
 			"-Wno-bad-function-cast"
 		}
@@ -717,7 +717,7 @@ end
 			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
 		}
 
-	configuration { "gmake" }
+	configuration { "gmake or ninja" }
 		buildoptions {
 			"-Wno-uninitialized",
 			"-Wno-unused-function",
@@ -795,15 +795,12 @@ end
 		MAME_DIR .. "3rdparty/bgfx/examples/common/font/utf8.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/imgui.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/ocornut_imgui.cpp",
-		MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/scintilla.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg_bgfx.cpp",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/ib-compress/indexbuffercompression.cpp",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/ib-compress/indexbufferdecompression.cpp",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/ocornut-imgui/imgui.cpp",
-		MAME_DIR .. "3rdparty/bgfx/3rdparty/ocornut-imgui/imgui_demo.cpp",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/ocornut-imgui/imgui_draw.cpp",
-		MAME_DIR .. "3rdparty/bgfx/3rdparty/ocornut-imgui/imgui_node_graph_test.cpp",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/ocornut-imgui/imgui_wm.cpp",
 	}
 	if _OPTIONS["targetos"]=="macosx" then
@@ -845,7 +842,7 @@ end
 --			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 --		}
 --
---	configuration { "gmake" }
+--	configuration { "gmake or ninja" }
 --		buildoptions_c {
 --			"-Wno-strict-prototypes",
 --			"-Wno-bad-function-cast",
@@ -982,7 +979,7 @@ project "uv"
 		MAME_DIR .. "3rdparty/libuv/src/win",
 	}
 
-	configuration { "gmake" }
+	configuration { "gmake or ninja" }
 		buildoptions_c {
 			"-Wno-strict-prototypes",
 			"-Wno-bad-function-cast",

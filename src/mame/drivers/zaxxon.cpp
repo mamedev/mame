@@ -257,6 +257,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "sound/samples.h"
+#include "machine/gen_latch.h"
 #include "machine/segacrpt_device.h"
 #include "machine/i8255.h"
 #include "audio/segasnd.h"
@@ -487,7 +488,7 @@ static ADDRESS_MAP_START( congo_map, AS_PROGRAM, 8, zaxxon_state )
 	AM_RANGE(0xc027, 0xc027) AM_MIRROR(0x1fc0) AM_WRITE(congo_color_bank_w)
 	AM_RANGE(0xc028, 0xc029) AM_MIRROR(0x1fc4) AM_WRITE(zaxxon_bg_position_w)
 	AM_RANGE(0xc030, 0xc033) AM_MIRROR(0x1fc4) AM_WRITE(congo_sprite_custom_w)
-	AM_RANGE(0xc038, 0xc03f) AM_MIRROR(0x1fc0) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xc038, 0xc03f) AM_MIRROR(0x1fc0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 
@@ -1019,7 +1020,7 @@ static MACHINE_CONFIG_DERIVED( congo, root )
 
 	MCFG_DEVICE_REMOVE("ppi8255")
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_I8255_IN_PORTA_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(zaxxon_state, congo_sound_b_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(zaxxon_state, congo_sound_c_w))
 
@@ -1038,6 +1039,8 @@ static MACHINE_CONFIG_DERIVED( congo, root )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("sn1", SN76489A, SOUND_CLOCK) // schematic shows sn76489A
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1555,9 +1558,9 @@ DRIVER_INIT_MEMBER(zaxxon_state,razmataz)
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 
 	/* additional input ports are wired */
-	pgmspace.install_read_port(0xc004, 0xc004, 0, 0x18f3, "SW04");
-	pgmspace.install_read_port(0xc008, 0xc008, 0, 0x18f3, "SW08");
-	pgmspace.install_read_port(0xc00c, 0xc00c, 0, 0x18f3, "SW0C");
+	pgmspace.install_read_port(0xc004, 0xc004, 0x18f3, "SW04");
+	pgmspace.install_read_port(0xc008, 0xc008, 0x18f3, "SW08");
+	pgmspace.install_read_port(0xc00c, 0xc00c, 0x18f3, "SW0C");
 
 	/* unknown behavior expected here */
 	pgmspace.install_read_handler(0xc80a, 0xc80a, read8_delegate(FUNC(zaxxon_state::razmataz_counter_r),this));

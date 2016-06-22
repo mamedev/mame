@@ -44,5 +44,4 @@ public:
 	void recordbr_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	void dleague_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	void taitoh_log_vram();
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

@@ -369,11 +369,6 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-WRITE_LINE_MEMBER(sshangha_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state);
-}
-
 DECO16IC_BANK_CB_MEMBER(sshangha_state::bank_callback)
 {
 	return (bank >> 4) * 0x1000;
@@ -431,7 +426,7 @@ static MACHINE_CONFIG_START( sshangha, sshangha_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") /* sure it's stereo? */
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 16000000/4)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(sshangha_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 

@@ -126,51 +126,6 @@ slider_state *mame_ui_manager::slider_current;
 
 
 /***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-//-------------------------------------------------
-//  is_breakable_char - is a given unicode
-//  character a possible line break?
-//-------------------------------------------------
-
-static inline int is_breakable_char(unicode_char ch)
-{
-	// regular spaces and hyphens are breakable
-	if (ch == ' ' || ch == '-')
-		return TRUE;
-
-	// In the following character sets, any character is breakable:
-	//  Hiragana (3040-309F)
-	//  Katakana (30A0-30FF)
-	//  Bopomofo (3100-312F)
-	//  Hangul Compatibility Jamo (3130-318F)
-	//  Kanbun (3190-319F)
-	//  Bopomofo Extended (31A0-31BF)
-	//  CJK Strokes (31C0-31EF)
-	//  Katakana Phonetic Extensions (31F0-31FF)
-	//  Enclosed CJK Letters and Months (3200-32FF)
-	//  CJK Compatibility (3300-33FF)
-	//  CJK Unified Ideographs Extension A (3400-4DBF)
-	//  Yijing Hexagram Symbols (4DC0-4DFF)
-	//  CJK Unified Ideographs (4E00-9FFF)
-	if (ch >= 0x3040 && ch <= 0x9fff)
-		return TRUE;
-
-	// Hangul Syllables (AC00-D7AF) are breakable
-	if (ch >= 0xac00 && ch <= 0xd7af)
-		return TRUE;
-
-	// CJK Compatibility Ideographs (F900-FAFF) are breakable
-	if (ch >= 0xf900 && ch <= 0xfaff)
-		return TRUE;
-
-	return FALSE;
-}
-
-
-
-/***************************************************************************
     CORE IMPLEMENTATION
 ***************************************************************************/
 
@@ -446,7 +401,7 @@ void mame_ui_manager::update_and_render(render_container *container)
 
 	// display any popup messages
 	if (osd_ticks() < m_popup_text_end)
-		draw_text_box(container, messagebox_poptext.c_str(), JUSTIFY_CENTER, 0.5f, 0.9f, messagebox_backcolor);
+		draw_text_box(container, messagebox_poptext.c_str(), ui::text_layout::CENTER, 0.5f, 0.9f, messagebox_backcolor);
 	else
 		m_popup_text_end = 0;
 
@@ -588,7 +543,7 @@ void mame_ui_manager::draw_outlined_box(render_container *container, float x0, f
 
 void mame_ui_manager::draw_text(render_container *container, const char *buf, float x, float y)
 {
-	draw_text_full(container, buf, x, y, 1.0f - x, JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+	draw_text_full(container, buf, x, y, 1.0f - x, ui::text_layout::LEFT, ui::text_layout::WORD, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
 
@@ -598,206 +553,27 @@ void mame_ui_manager::draw_text(render_container *container, const char *buf, fl
 //  and full size computation
 //-------------------------------------------------
 
-void mame_ui_manager::draw_text_full(render_container *container, const char *origs, float x, float y, float origwrapwidth, int justify, int wrap, int draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight, float text_size)
+void mame_ui_manager::draw_text_full(render_container *container, const char *origs, float x, float y, float origwrapwidth, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap, draw_mode draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight, float text_size)
 {
-	float lineheight = get_line_height() * text_size;
-	const char *ends = origs + strlen(origs);
-	float wrapwidth = origwrapwidth;
-	const char *s = origs;
-	const char *linestart;
-	float cury = y;
-	float maxwidth = 0;
-	float aspect = machine().render().ui_aspect(container);
+	// create the layout
+	auto layout = create_layout(container, origwrapwidth, justify, wrap);
 
-	// if we don't want wrapping, guarantee a huge wrapwidth
-	if (wrap == WRAP_NEVER)
-		wrapwidth = 1000000.0f;
-	if (wrapwidth <= 0)
-		return;
+	// append text to it
+	layout.add_text(
+		origs,
+		fgcolor,
+		draw == OPAQUE_ ? bgcolor : rgb_t::transparent,
+		text_size);
 
-	// loop over lines
-	while (*s != 0)
-	{
-		const char *lastbreak = nullptr;
-		int line_justify = justify;
-		unicode_char schar;
-		int scharcount;
-		float lastbreak_width = 0;
-		float curwidth = 0;
-		float curx = x;
+	// and emit it (if we are asked to do so)
+	if (draw != NONE)
+		layout.emit(container, x, y);
 
-		// get the current character
-		scharcount = uchar_from_utf8(&schar, s, ends - s);
-		if (scharcount == -1)
-			break;
-
-		// if the line starts with a tab character, center it regardless
-		if (schar == '\t')
-		{
-			s += scharcount;
-			line_justify = JUSTIFY_CENTER;
-		}
-
-		// remember the starting position of the line
-		linestart = s;
-
-		// loop while we have characters and are less than the wrapwidth
-		while (*s != 0 && curwidth <= wrapwidth)
-		{
-			float chwidth;
-
-			// get the current chcaracter
-			scharcount = uchar_from_utf8(&schar, s, ends - s);
-			if (scharcount == -1)
-				break;
-
-			// if we hit a newline, stop immediately
-			if (schar == '\n')
-				break;
-
-			// get the width of this character
-			chwidth = get_font()->char_width(lineheight, aspect, schar);
-
-			// if we hit a space, remember the location and width *without* the space
-			if (schar == ' ')
-			{
-				lastbreak = s;
-				lastbreak_width = curwidth;
-			}
-
-			// add the width of this character and advance
-			curwidth += chwidth;
-			s += scharcount;
-
-			// if we hit any non-space breakable character, remember the location and width
-			// *with* the breakable character
-			if (schar != ' ' && is_breakable_char(schar) && curwidth <= wrapwidth)
-			{
-				lastbreak = s;
-				lastbreak_width = curwidth;
-			}
-		}
-
-		// if we accumulated too much for the current width, we need to back off
-		if (curwidth > wrapwidth)
-		{
-			// if we're word wrapping, back up to the last break if we can
-			if (wrap == WRAP_WORD)
-			{
-				// if we hit a break, back up to there with the appropriate width
-				if (lastbreak != nullptr)
-				{
-					s = lastbreak;
-					curwidth = lastbreak_width;
-				}
-
-				// if we didn't hit a break, back up one character
-				else if (s > linestart)
-				{
-					// get the previous character
-					s = (const char *)utf8_previous_char(s);
-					scharcount = uchar_from_utf8(&schar, s, ends - s);
-					if (scharcount == -1)
-						break;
-
-					curwidth -= get_font()->char_width(lineheight, aspect, schar);
-					// if back to 0, there is no space to draw even a single char
-					if (curwidth <= 0)
-						break;
-				}
-			}
-
-			// if we're truncating, make sure we have enough space for the ...
-			else if (wrap == WRAP_TRUNCATE)
-			{
-				// add in the width of the ...
-				curwidth += 3.0f * get_font()->char_width(lineheight, aspect, '.');
-
-				// while we are above the wrap width, back up one character
-				while (curwidth > wrapwidth && s > linestart)
-				{
-					// get the previous character
-					s = (const char *)utf8_previous_char(s);
-					scharcount = uchar_from_utf8(&schar, s, ends - s);
-					if (scharcount == -1)
-						break;
-
-					curwidth -= get_font()->char_width(lineheight, aspect, schar);
-				}
-			}
-		}
-
-		// align according to the justfication
-		if (line_justify == JUSTIFY_CENTER)
-			curx += (origwrapwidth - curwidth) * 0.5f;
-		else if (line_justify == JUSTIFY_RIGHT)
-			curx += origwrapwidth - curwidth;
-
-		// track the maximum width of any given line
-		if (curwidth > maxwidth)
-			maxwidth = curwidth;
-
-		// if opaque, add a black box
-		if (draw == DRAW_OPAQUE)
-			container->add_rect(curx, cury, curx + curwidth, cury + lineheight, bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-
-		// loop from the line start and add the characters
-		while (linestart < s)
-		{
-			// get the current character
-			unicode_char linechar;
-			int linecharcount = uchar_from_utf8(&linechar, linestart, ends - linestart);
-			if (linecharcount == -1)
-				break;
-
-			if (draw != DRAW_NONE)
-			{
-				container->add_char(curx, cury, lineheight, aspect, fgcolor, *get_font(), linechar);
-				curx += get_font()->char_width(lineheight, aspect, linechar);
-			}
-			linestart += linecharcount;
-		}
-
-		// append ellipses if needed
-		if (wrap == WRAP_TRUNCATE && *s != 0 && draw != DRAW_NONE)
-		{
-			container->add_char(curx, cury, lineheight, aspect, fgcolor, *get_font(), '.');
-			curx += get_font()->char_width(lineheight, aspect, '.');
-			container->add_char(curx, cury, lineheight, aspect, fgcolor, *get_font(), '.');
-			curx += get_font()->char_width(lineheight, aspect, '.');
-			container->add_char(curx, cury, lineheight, aspect, fgcolor, *get_font(), '.');
-			curx += get_font()->char_width(lineheight, aspect, '.');
-		}
-
-		// if we're not word-wrapping, we're done
-		if (wrap != WRAP_WORD)
-			break;
-
-		// advance by a row
-		cury += lineheight;
-
-		// skip past any spaces at the beginning of the next line
-		scharcount = uchar_from_utf8(&schar, s, ends - s);
-		if (scharcount == -1)
-			break;
-
-		if (schar == '\n')
-			s += scharcount;
-		else
-			while (*s && isspace(schar))
-			{
-				s += scharcount;
-				scharcount = uchar_from_utf8(&schar, s, ends - s);
-				if (scharcount == -1)
-					break;
-			}
-	}
-
-	// report the width and height of the resulting space
+	// return width/height
 	if (totalwidth)
-		*totalwidth = maxwidth;
+		*totalwidth = layout.actual_width();
 	if (totalheight)
-		*totalheight = cury - y;
+		*totalheight = layout.actual_height();
 }
 
 
@@ -806,51 +582,45 @@ void mame_ui_manager::draw_text_full(render_container *container, const char *or
 //  message with a box around it
 //-------------------------------------------------
 
-void mame_ui_manager::draw_text_box(render_container *container, const char *text, int justify, float xpos, float ypos, rgb_t backcolor)
+void mame_ui_manager::draw_text_box(render_container *container, const char *text, ui::text_layout::text_justify justify, float xpos, float ypos, rgb_t backcolor)
 {
-	float line_height = get_line_height();
-	float max_width = 2.0f * ((xpos <= 0.5f) ? xpos : 1.0f - xpos) - 2.0f * UI_BOX_LR_BORDER;
-	float target_width = max_width;
-	float target_height = line_height;
-	float target_x = 0, target_y = 0;
-	float last_target_height = 0;
+	// cap the maximum width
+	float maximum_width = 1.0f - UI_BOX_LR_BORDER * 2;
 
-	// limit this iteration to a finite number of passes
-	for (int pass = 0; pass < 5; pass++)
-	{
-		// determine the target location
-		target_x = xpos - 0.5f * target_width;
-		target_y = ypos - 0.5f * target_height;
+	// create a layout
+	ui::text_layout layout = create_layout(container, maximum_width, justify);
 
-		// make sure we stay on-screen
-		if (target_x < UI_BOX_LR_BORDER)
-			target_x = UI_BOX_LR_BORDER;
-		if (target_x + target_width + UI_BOX_LR_BORDER > 1.0f)
-			target_x = 1.0f - UI_BOX_LR_BORDER - target_width;
-		if (target_y < UI_BOX_TB_BORDER)
-			target_y = UI_BOX_TB_BORDER;
-		if (target_y + target_height + UI_BOX_TB_BORDER > 1.0f)
-			target_y = 1.0f - UI_BOX_TB_BORDER - target_height;
+	// add text to it
+	layout.add_text(text);
 
-		// compute the multi-line target width/height
-		draw_text_full(container, text, target_x, target_y, target_width + 0.00001f,
-					justify, WRAP_WORD, DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &target_width, &target_height);
-		if (target_height > 1.0f - 2.0f * UI_BOX_TB_BORDER)
-			target_height = floorf((1.0f - 2.0f * UI_BOX_TB_BORDER) / line_height) * line_height;
+	// and draw the result
+	draw_text_box(container, layout, xpos, ypos, backcolor);
+}
 
-		// if we match our last value, we're done
-		if (target_height == last_target_height)
-			break;
-		last_target_height = target_height;
-	}
+
+//-------------------------------------------------
+//  draw_text_box - draw a multiline text
+//  message with a box around it
+//-------------------------------------------------
+
+void mame_ui_manager::draw_text_box(render_container *container, ui::text_layout &layout, float xpos, float ypos, rgb_t backcolor)
+{
+	// xpos and ypos are where we want to "pin" the layout, but we need to adjust for the actual size of the payload
+	auto actual_left = layout.actual_left();
+	auto actual_width = layout.actual_width();
+	auto actual_height = layout.actual_height();
+	auto x = std::min(std::max(xpos - actual_width / 2, UI_BOX_LR_BORDER), 1.0f - actual_width - UI_BOX_LR_BORDER);
+	auto y = std::min(std::max(ypos - actual_height / 2, UI_BOX_TB_BORDER), 1.0f - actual_height - UI_BOX_TB_BORDER);
 
 	// add a box around that
-	draw_outlined_box(container, target_x - UI_BOX_LR_BORDER,
-						target_y - UI_BOX_TB_BORDER,
-						target_x + target_width + UI_BOX_LR_BORDER,
-						target_y + target_height + UI_BOX_TB_BORDER, backcolor);
-	draw_text_full(container, text, target_x, target_y, target_width + 0.00001f,
-				justify, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+	draw_outlined_box(container,
+		x - UI_BOX_LR_BORDER,
+		y - UI_BOX_TB_BORDER,
+		x + actual_width + UI_BOX_LR_BORDER,
+		y + actual_height + UI_BOX_TB_BORDER, backcolor);
+
+	// emit the text
+	layout.emit(container, x - actual_left, y);
 }
 
 
@@ -861,7 +631,7 @@ void mame_ui_manager::draw_text_box(render_container *container, const char *tex
 
 void mame_ui_manager::draw_message_window(render_container *container, const char *text)
 {
-	draw_text_box(container, text, JUSTIFY_LEFT, 0.5f, 0.5f, UI_BACKGROUND_COLOR);
+	draw_text_box(container, text, ui::text_layout::text_justify::LEFT, 0.5f, 0.5f, UI_BACKGROUND_COLOR);
 }
 
 
@@ -1234,7 +1004,7 @@ std::string &mame_ui_manager::game_info_astring(std::string &str)
 
 UINT32 mame_ui_manager::handler_messagebox(render_container *container)
 {
-	draw_text_box(container, messagebox_text.c_str(), JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
+	draw_text_box(container, messagebox_text.c_str(), ui::text_layout::LEFT, 0.5f, 0.5f, messagebox_backcolor);
 	return 0;
 }
 
@@ -1250,7 +1020,7 @@ UINT32 mame_ui_manager::handler_messagebox_anykey(render_container *container)
 	UINT32 state = 0;
 
 	// draw a standard message window
-	draw_text_box(container, messagebox_text.c_str(), JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
+	draw_text_box(container, messagebox_text.c_str(), ui::text_layout::LEFT, 0.5f, 0.5f, messagebox_backcolor);
 
 	// if the user cancels, exit out completely
 	if (machine().ui_input().pressed(IPT_UI_CANCEL))
@@ -1394,6 +1164,52 @@ void mame_ui_manager::paste()
 
 
 //-------------------------------------------------
+//  draw_fps_counter
+//-------------------------------------------------
+
+void mame_ui_manager::draw_fps_counter(render_container *container)
+{
+	draw_text_full(container, machine().video().speed_text().c_str(), 0.0f, 0.0f, 1.0f,
+		ui::text_layout::RIGHT, ui::text_layout::WORD, OPAQUE_, rgb_t::white, rgb_t::black, nullptr, nullptr);
+}
+
+
+//-------------------------------------------------
+//  draw_timecode_counter
+//-------------------------------------------------
+
+void mame_ui_manager::draw_timecode_counter(render_container *container)
+{
+	std::string tempstring;
+	draw_text_full(container, machine().video().timecode_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
+		ui::text_layout::RIGHT, ui::text_layout::WORD, OPAQUE_, rgb_t(0xf0, 0xf0, 0x10, 0x10), rgb_t::black, nullptr, nullptr);
+}
+
+
+//-------------------------------------------------
+//  draw_timecode_total
+//-------------------------------------------------
+
+void mame_ui_manager::draw_timecode_total(render_container *container)
+{
+	std::string tempstring;
+	draw_text_full(container, machine().video().timecode_total_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
+		ui::text_layout::LEFT, ui::text_layout::WORD, OPAQUE_, rgb_t(0xf0, 0x10, 0xf0, 0x10), rgb_t::black, nullptr, nullptr);
+}
+
+
+//-------------------------------------------------
+//  draw_profiler
+//-------------------------------------------------
+
+void mame_ui_manager::draw_profiler(render_container *container)
+{
+	const char *text = g_profiler.text(machine());
+	draw_text_full(container, text, 0.0f, 0.0f, 1.0f, ui::text_layout::LEFT, ui::text_layout::WORD, OPAQUE_, rgb_t::white, rgb_t::black, nullptr, nullptr);
+}
+
+
+//-------------------------------------------------
 //  image_handler_ingame - execute display
 //  callback function for each image device
 //-------------------------------------------------
@@ -1402,56 +1218,26 @@ void mame_ui_manager::image_handler_ingame()
 {
 	// run display routine for devices
 	if (machine().phase() == MACHINE_PHASE_RUNNING)
-		for (device_image_interface &image : image_interface_iterator(machine().root_device()))
-			image.call_display();
-}
-
-
-#define ANIMATION_FPS       1
-#define ANIMATION_FRAMES    4
-
-void mame_ui_manager::image_display(const device_type &type, device_image_interface *image)
-{
-	if (type == CASSETTE)
 	{
-		cassette_image_device *cass = dynamic_cast<cassette_image_device *>(image);
-		if (cass != nullptr)
+		auto layout = create_layout(&machine().render().ui_container());
+
+		// loop through all devices, build their text into the layout
+		for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 		{
-			char buf[65];
-			float x, y;
-			int n;
-			double position, length;
-			cassette_state uistate;
-			static const UINT8 shapes[8] = { 0x2d, 0x5c, 0x7c, 0x2f, 0x2d, 0x20, 0x20, 0x20 };
+			std::string str = image.call_display();
+			if (!str.empty())
+			{
+				layout.add_text(str.c_str());
+				layout.add_text("\n");
+			}
+		}
 
-			/* figure out where we are in the cassette */
-			position = cass->get_position();
-			length = cass->get_length();
-			uistate = (cassette_state)(cass->get_state() & CASSETTE_MASK_UISTATE);
-
-			/* choose a location on the screen */
-			x = 0.2f;
-			y = 0.5f;
-
-			y += cassette_device_iterator(machine().root_device()).indexof(*cass);
-
-			y *= get_line_height() + 2.0f * UI_BOX_TB_BORDER;
-			/* choose which frame of the animation we are at */
-			n = ((int)position / ANIMATION_FPS) % ANIMATION_FRAMES;
-			/* Since you can have anything in a BDF file, we will use crude ascii characters instead */
-			snprintf(buf, ARRAY_LENGTH(buf), "%c%c %c %02d:%02d (%04d) [%02d:%02d (%04d)]",
-				shapes[n],                  /* cassette icon left */
-				shapes[n | 4],                    /* cassette icon right */
-				(uistate == CASSETTE_PLAY) ? 0x50 : 0x52,   /* play (P) or record (R) */
-				((int)position / 60),
-				((int)position % 60),
-				(int)position,
-				((int)length / 60),
-				((int)length % 60),
-				(int)length);
-
-			// draw the cassette
-			draw_text_box(&machine().render().ui_container(), buf, JUSTIFY_LEFT, x, y, UI_BACKGROUND_COLOR);
+		// did we actually create anything?
+		if (!layout.empty())
+		{
+			float x = 0.2f;
+			float y = 0.5f * get_line_height() + 2.0f * UI_BOX_TB_BORDER;
+			draw_text_box(&machine().render().ui_container(), layout, x, y, UI_BACKGROUND_COLOR);
 		}
 	}
 }
@@ -1467,31 +1253,19 @@ UINT32 mame_ui_manager::handler_ingame(render_container *container)
 
 	// first draw the FPS counter
 	if (show_fps_counter())
-	{
-		draw_text_full(container, machine().video().speed_text().c_str(), 0.0f, 0.0f, 1.0f,
-					JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, rgb_t::white, rgb_t::black, nullptr, nullptr);
-	}
+		draw_fps_counter(container);
 
 	// Show the duration of current part (intro or gameplay or extra)
-	if (show_timecode_counter()) {
-		std::string tempstring;
-		draw_text_full(container, machine().video().timecode_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
-			JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, rgb_t(0xf0,0xf0,0x10,0x10), rgb_t::black, nullptr, nullptr);
-	}
-	// Show the total time elapsed for the video preview (all parts intro, gameplay, extras)
-	if (show_timecode_total()) {
-		std::string tempstring;
-		draw_text_full(container, machine().video().timecode_total_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
-			JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, rgb_t(0xf0,0x10,0xf0,0x10), rgb_t::black, nullptr, nullptr);
-	}
+	if (show_timecode_counter())
+		draw_timecode_counter(container);
 
+	// Show the total time elapsed for the video preview (all parts intro, gameplay, extras)
+	if (show_timecode_total())
+		draw_timecode_total(container);
 
 	// draw the profiler if visible
 	if (show_profiler())
-	{
-		const char *text = g_profiler.text(machine());
-		draw_text_full(container, text, 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, rgb_t::white, rgb_t::black, nullptr, nullptr);
-	}
+		draw_profiler(container);
 
 	// if we're single-stepping, pause now
 	if (single_step())
@@ -1572,7 +1346,7 @@ UINT32 mame_ui_manager::handler_ingame(render_container *container)
 	// if the on-screen display isn't up and the user has toggled it, turn it on
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0 && machine().ui_input().pressed(IPT_UI_ON_SCREEN_DISPLAY))
 	{
-		set_handler<mame_ui_manager&, bool>(UI_CALLBACK_TYPE_GENERAL, ui::menu_sliders::ui_handler, *this, true);
+		set_handler<mame_ui_manager&>(UI_CALLBACK_TYPE_MENU, ui::menu_sliders::ui_handler, *this);
 		return 1;
 	}
 
@@ -1838,7 +1612,7 @@ UINT32 mame_ui_manager::handler_confirm_quit(render_container *container)
 			ui_select_text,
 			ui_cancel_text);
 
-	draw_text_box(container, quit_message.c_str(), JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
+	draw_text_box(container, quit_message.c_str(), ui::text_layout::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 	machine().pause();
 
 	// if the user press ENTER, quit the game
@@ -1920,9 +1694,9 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 
 	// add analog adjusters
 	int slider_index = 0;
-	for (ioport_port &port : machine.ioport().ports())
+	for (auto &port : machine.ioport().ports())
 	{
-		for (ioport_field &field : port.fields())
+		for (ioport_field &field : port.second->fields())
 		{
 			if (field.type() == IPT_ADJUSTER)
 			{
@@ -2026,9 +1800,9 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 #ifdef MAME_DEBUG
 	slider_index = 0;
 	// add crosshair adjusters
-	for (ioport_port &port : machine.ioport().ports())
+	for (auto &port : machine.ioport().ports())
 	{
-		for (ioport_field &field : port.fields())
+		for (ioport_field &field : port.second->fields())
 		{
 			if (field.crosshair_axis() != CROSSHAIR_AXIS_NONE && field.player() == 0)
 			{
@@ -2575,136 +2349,40 @@ void mame_ui_manager::set_use_natural_keyboard(bool use_natural_keyboard)
 	assert(error.empty());
 }
 
+
+//-------------------------------------------------
+//  wrap_text
+//-------------------------------------------------
+
+ui::text_layout mame_ui_manager::create_layout(render_container *container, float width, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap)
+{
+	// determine scale factors
+	float yscale = get_line_height();
+	float xscale = yscale * machine().render().ui_aspect(container);
+
+	// create the layout
+	return ui::text_layout(*get_font(), xscale, yscale, width, justify, wrap);
+}
+
+
 //-------------------------------------------------
 //  wrap_text
 //-------------------------------------------------
 
 int mame_ui_manager::wrap_text(render_container *container, const char *origs, float x, float y, float origwrapwidth, std::vector<int> &xstart, std::vector<int> &xend, float text_size)
 {
-	float lineheight = get_line_height() * text_size;
-	const char *ends = origs + strlen(origs);
-	float wrapwidth = origwrapwidth;
-	const char *s = origs;
-	const char *linestart;
-	float maxwidth = 0;
-	float aspect = machine().render().ui_aspect(container);
-	int count = 0;
+	// create the layout
+	auto layout = create_layout(container, origwrapwidth, ui::text_layout::LEFT, ui::text_layout::WORD);
 
-	// loop over lines
-	while (*s != 0)
-	{
-		const char *lastbreak = nullptr;
-		unicode_char schar;
-		int scharcount;
-		float lastbreak_width = 0;
-		float curwidth = 0;
+	// add the text
+	layout.add_text(
+		origs,
+		rgb_t::black,
+		rgb_t::black,
+		text_size);
 
-		// get the current character
-		scharcount = uchar_from_utf8(&schar, s, ends - s);
-		if (scharcount == -1)
-			break;
-
-		// remember the starting position of the line
-		linestart = s;
-
-		// loop while we have characters and are less than the wrapwidth
-		while (*s != 0 && curwidth <= wrapwidth)
-		{
-			float chwidth;
-
-			// get the current chcaracter
-			scharcount = uchar_from_utf8(&schar, s, ends - s);
-			if (scharcount == -1)
-				break;
-
-			// if we hit a newline, stop immediately
-			if (schar == '\n')
-				break;
-
-			// get the width of this character
-			chwidth = get_font()->char_width(lineheight, aspect, schar);
-
-			// if we hit a space, remember the location and width *without* the space
-			if (schar == ' ')
-			{
-				lastbreak = s;
-				lastbreak_width = curwidth;
-			}
-
-			// add the width of this character and advance
-			curwidth += chwidth;
-			s += scharcount;
-
-			// if we hit any non-space breakable character, remember the location and width
-			// *with* the breakable character
-			if (schar != ' ' && is_breakable_char(schar) && curwidth <= wrapwidth)
-			{
-				lastbreak = s;
-				lastbreak_width = curwidth;
-			}
-		}
-
-		// if we accumulated too much for the current width, we need to back off
-		if (curwidth > wrapwidth)
-		{
-			// if we hit a break, back up to there with the appropriate width
-			if (lastbreak != nullptr)
-			{
-				s = lastbreak;
-				curwidth = lastbreak_width;
-			}
-
-			// if we didn't hit a break, back up one character
-			else if (s > linestart)
-			{
-				// get the previous character
-				s = (const char *)utf8_previous_char(s);
-				scharcount = uchar_from_utf8(&schar, s, ends - s);
-				if (scharcount == -1)
-					break;
-
-				curwidth -= get_font()->char_width(lineheight, aspect, schar);
-			}
-		}
-
-		// track the maximum width of any given line
-		if (curwidth > maxwidth)
-			maxwidth = curwidth;
-
-		xstart.push_back(linestart - origs);
-		xend.push_back(s - origs);
-
-		// loop from the line start and add the characters
-		while (linestart < s)
-		{
-			// get the current character
-			unicode_char linechar;
-			int linecharcount = uchar_from_utf8(&linechar, linestart, ends - linestart);
-			if (linecharcount == -1)
-				break;
-			linestart += linecharcount;
-		}
-
-		// advance by a row
-		count++;
-
-		// skip past any spaces at the beginning of the next line
-		scharcount = uchar_from_utf8(&schar, s, ends - s);
-		if (scharcount == -1)
-			break;
-
-		if (schar == '\n')
-			s += scharcount;
-		else
-			while (*s && isspace(schar))
-			{
-				s += scharcount;
-				scharcount = uchar_from_utf8(&schar, s, ends - s);
-				if (scharcount == -1)
-					break;
-			}
-	}
-	return count;
+	// and get the wrapping info
+	return layout.get_wrap_info(xstart, xend);
 }
 
 //-------------------------------------------------

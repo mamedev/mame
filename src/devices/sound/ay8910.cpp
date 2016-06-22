@@ -603,10 +603,8 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 			/* No action required */
 			break;
 		case AY_ECOARSE:
-			#ifdef MAME_DEBUG
 			if ( (v & 0x0f) > 0)
-				popmessage("ECoarse");
-			#endif
+				osd_printf_verbose("ECoarse\n");
 			/* No action required */
 			break;
 		case AY_ENABLE:
@@ -628,10 +626,8 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 			m_last_enable = m_regs[AY_ENABLE];
 			break;
 		case AY_ESHAPE:
-			#ifdef MAME_DEBUG
 			if ( (v & 0x0f) > 0)
-				popmessage("EShape");
-			#endif
+				osd_printf_verbose("EShape\n");
 			m_attack = (m_regs[AY_ESHAPE] & 0x04) ? m_env_step_mask : 0x00;
 			if ((m_regs[AY_ESHAPE] & 0x08) == 0)
 			{

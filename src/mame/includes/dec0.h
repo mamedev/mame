@@ -80,8 +80,6 @@ public:
 	DECLARE_WRITE16_MEMBER(dec0_update_sprites_w);
 	DECLARE_WRITE16_MEMBER(dec0_priority_w);
 	DECLARE_READ16_MEMBER(ffantasybl_242024_r);
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
-	DECLARE_WRITE_LINE_MEMBER(sound_irq2);
 
 	DECLARE_DRIVER_INIT(robocop);
 	DECLARE_DRIVER_INIT(hippodrm);

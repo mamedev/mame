@@ -400,14 +400,14 @@ void threecom3c505_device::device_reset()
 		m_irq = m_irqdrq->read() & 0xf;
 		m_drq = (m_irqdrq->read() >> 4) & 0x7;
 
-		m_isa->install16_device(base, base + ELP_IO_EXTENT - 1, 0, 0, read16_delegate(FUNC(threecom3c505_device::read), this), write16_delegate(FUNC(threecom3c505_device::write), this));
+		m_isa->install16_device(base, base + ELP_IO_EXTENT - 1, read16_delegate(FUNC(threecom3c505_device::read), this), write16_delegate(FUNC(threecom3c505_device::write), this));
 
 		if (m_romopts->read() & 1)
 		{
 			// host ROM is enabled, get base address
 			static const int rom_bases[4] = { 0x0000, 0x2000, 0x4000, 0x6000 };
 			int rom_base = rom_bases[(m_romopts->read() >> 1) & 3];
-			m_isa->install_rom(this, rom_base, rom_base + 0x01fff, 0, 0, "threecom3c505", "threecom3c505");
+			m_isa->install_rom(this, rom_base, rom_base + 0x01fff, "threecom3c505", "threecom3c505");
 		}
 
 		m_installed = true;

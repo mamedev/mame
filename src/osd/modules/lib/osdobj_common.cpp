@@ -159,6 +159,8 @@ osd_options::osd_options()
 	add_entries(osd_options::s_option_entries);
 }
 
+// Window list
+std::list<std::shared_ptr<osd_window>> osd_common_t::s_window_list;
 
 //-------------------------------------------------
 //  osd_interface - constructor
@@ -322,9 +324,6 @@ void osd_common_t::register_options()
 
 	// Register video options and update options
 	video_options_add("none", nullptr);
-#if USE_OPENGL
-	video_options_add("opengl", nullptr);
-#endif
 	video_register();
 	update_option(OSDOPTION_VIDEO, m_video_names);
 }

@@ -110,6 +110,7 @@ PCB2  (Top board, CPU board)
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 
 #define MASTER_CLOCK            XTAL_18_432MHz
@@ -123,6 +124,7 @@ public:
 		m_soundcpu(*this, "soundcpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_attr(*this, "attr"),
 		m_vid(*this, "vid"),
 		m_spriteram(*this, "spriteram"),
@@ -133,6 +135,7 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<UINT8> m_attr;
 	required_shared_ptr<UINT8> m_vid;
@@ -263,7 +266,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(sub_state::to_sound_w)
 {
-	soundlatch_byte_w(space, 0, data & 0xff);
+	m_soundlatch->write(space, 0, data & 0xff);
 	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -274,7 +277,7 @@ WRITE8_MEMBER(sub_state::nmi_mask_w)
 
 static ADDRESS_MAP_START( subm_io, AS_IO, 8, sub_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_byte_r) AM_WRITE(to_sound_w) // to/from sound CPU
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_WRITE(to_sound_w) // to/from sound CPU
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( subm_sound_map, AS_PROGRAM, 8, sub_state )
@@ -285,7 +288,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( subm_sound_io, AS_IO, 8, sub_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_byte_r, soundlatch2_byte_w) // to/from main CPU
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write) // to/from main CPU
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ay1", ay8910_device, data_r, address_data_w)
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ay2", ay8910_device, data_r, address_data_w)
 ADDRESS_MAP_END
@@ -467,6 +470,9 @@ static MACHINE_CONFIG_START( sub, sub_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("ay1", AY8910, MASTER_CLOCK/6/2) /* ? Mhz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)

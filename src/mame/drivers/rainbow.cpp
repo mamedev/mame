@@ -4,31 +4,38 @@
 DEC Rainbow 100
 
 Driver-in-progress by R. Belmont and Miodrag Milanovic.
-Portions (2013 - 2015) by Karl-Ludwig Deisenhofer (Floppy, ClikClok RTC, NVRAM, DIPs, hard disk).
+Keyboard fix by Cracyc (June 2016)
+Portions (2013 - 2016) by Karl-Ludwig Deisenhofer (Floppy, ClikClok RTC, NVRAM, DIPs, hard disk).
 
-STATE AS OF APRIL 2015
+To unlock floppy drives A-D compile with WORKAROUND_RAINBOW_B (prevents a side effect of ERROR 13).
+Only single sided disk images with 80 tracks, 10 sectors appear to work (IMG or *.TD0 / TeleDisk).
+If problems arise, delete the NVRAM file in folder Rainbow.
+You may also want to reassign SETUP (away from F3, where it sits on a LK201).
+
+STATE AS OF JUNE 2016
 ----------------------
 Driver is based entirely on the DEC-100 'B' variant (DEC-190 and DEC-100 A models are treated as clones).
 While this is OK for the compatible -190, it doesn't do justice to ancient '100 A' hardware.
-RBCONVERT.ZIP has details on how model 'A' differs from version B.
+RBCONVERT.ZIP documents how model 'A' differs from version B.
 
-Issues with this driver:
+BUGS / ISSUES
 
-(1) Keyboard emulation incomplete (fatal; inhibits the system from booting with ERROR 50).
+(1) LOOPBACK circuit not emulated, NMI from RAM card also unemulated (ERROR 27).
+The former is used in startup tests, the latter seems less relevant (must use menu self test "S").
 
-Serial ports do not work, so serial communication failure (ERROR 60) and ERROR 40 (serial
-printer interface) result. Unfortunately the BIOS tests all three serial interfaces in line.
+(2) serial ports do not work, so serial communication failure (ERROR 60) and ERROR 40 (serial
+printer interface) result. 
 
-(2) while DOS 3 and UCSD systems (fort_sys, pas_sys) + diag disks boot, CPM 2.x and DOS 2.x die
+(3) while DOS 3 and UCSD systems (fort_sys, pas_sys) + diag disks boot, CPM 2.x and DOS 2.x die
 in secondary boot loader with a RESTORE (seek track 0) when track 2 sector 1 should be loaded.
 
 Writing files to floppy is next to impossible on both CPM 1.x and DOS 3 (these two OS boot
-with keyboard workarounds enabled). File deletion works, so few bytes pass.
+with new workaround enabled). File deletion works, so few bytes pass.
 
-(3) heavy system interaction stalls the driver. Start the RX50 diag.disk and
- see what happens (key 3 for individual tests, then select system interaction).
-    
-(4) arbitration chip (E11; in 100-A schematics or E13 in -B) should be dumped.
+(4) system interaction tests HALT Z80 CPU at location $0211 (forever). Boot the RX50 diag.disk
+to see what happens (key 3 for individual tests, then select system interaction).
+
+(5) arbitration chip (E11; in 100-A schematics or E13 in -B) should be dumped.
  It is a 6308 OTP ROM (2048 bit, 256 x 8) used as a lookup table (LUT) with the address pins (A)
  used as inputs and the data pins (D) as output.
 
@@ -58,7 +65,7 @@ Graphics output is independent from monochrome output.
 Two ports, a high-speed RS-422 half-duplex interface (port A) + lower-speed RS-423 full/half-duplex interface
 with modem control (port B). A 5 Mhz. 8237 DMA controller transfers data into and out of shared memory (not: optional RAM).
 
-Uses SHRAM, SHMA, BDL SH WR L, NONSHARED CYCLE. Implementation requires DMA and arbitration logic (dump of E11/E13 ?).
+Uses SHRAM, SHMA, BDL SH WR L, NONSHARED CYCLE. Implementation requires DMA and arbitration logic (using dump of E11/E13?).
 Can't be added if RD51 hard disk controller present (J4 + J5). For programming info see NEWCOM1.DOC (-> RBETECDOC.ZIP).
 
 
@@ -207,14 +214,11 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 
 // ---------------------------------------------------------------------------
 // WORKAROUNDS:
-// (1) FORCE LOGO: - not valid for 100-A ROM -
-//#define FORCE_RAINBOW_B_LOGO
-
-// (2) KEYBOARD_WORKAROUND : also requires FORCE...LOGO (and preliminary headers)
-//#define KEYBOARD_WORKAROUND
-//#define KBD_DELAY 8    // (debounce delay)
+// - tested only in conjunction with 100-B ROM -
+// Part of the self test feeds an mfm bitstream directly into the data separator
+// this isn't currently possible to emulate and may never be so enable this rom patch by default
+#define WORKAROUND_RAINBOW_B
 // ---------------------------------------------------------------------------
-
 
 // Define standard and maximum RAM sizes (A, then B model):
 //#define BOARD_RAM 0x0ffff  // 64 K base RAM  (100-A)
@@ -260,11 +264,6 @@ class rainbow_state : public driver_device
 public:
 	rainbow_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-
-#ifdef KEYBOARD_WORKAROUND
-#include "./m_kbd1.c"
-#endif
-
 
 		m_inp1(*this, "W13"),
 		m_inp2(*this, "W14"),
@@ -365,10 +364,6 @@ public:
 
 	DECLARE_READ8_MEMBER(rtc_w);
 
-
-#ifdef KEYBOARD_WORKAROUND
-#include "./port9x_Ax.c"
-#endif
 	UINT32 screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
@@ -394,11 +389,6 @@ private:
 		IRQ_8088_VBL,         // 20/A0  80/280  - [built-in DC012] - VERT INTR L (= schematics)
 		IRQ_8088_NMI          // 02/02  08/08   - [external MEMORY EXTENSION] - PARITY ERROR L
 	};  // HIGHEST PRIORITY
-
-
-#ifdef KEYBOARD_WORKAROUND
-#include "./m_kbd2.c"
-#endif
 
 	required_ioport m_inp1;
 	required_ioport m_inp2;
@@ -516,40 +506,13 @@ void rainbow_state::machine_start()
 	save_item(NAME(m_irq_high));
 	save_item(NAME(m_irq_mask));
 
-#ifdef FORCE_RAINBOW_B_LOGO
+#ifdef WORKAROUND_RAINBOW_B
 	UINT8 *rom = memregion("maincpu")->base();
-
-	rom[0xf4000 + 0x364a] = 2 + 8;  // 2 :set ; 4 : reset, 8 : set for 0xf4363 ( 0363 WAIT_FOR_BIT3__loc_35E )
-
-	rom[0xf4000 + 0x0363] = 0x90;
-	rom[0xf4000 + 0x0364] = 0x90;
-
-	// If bit 2 = 1 (Efff9), then a keyboard powerup is necessary (=> will lock up in current state)
-	rom[0xf4000 + 0x3638] = 0x80;  // OR instead of TEST
-	rom[0xf4000 + 0x3639] = 0x0f;  // OR instead of TEST
-	rom[0xf4000 + 0x363a] = 0x08;  // 04 => 08
-
-	rom[0xf4000 + 0x363b] = 0xeb;  // COND => JMPS
-
-	if (rom[0xf4174] == 0x75)
+	if (rom[0xf4000 + 0x3ffc] == 0x31) // 100-B (5.01)    0x35 would test for V5.05
 	{
-		rom[0xf4174] = 0xeb; // jmps  RAINBOW100_LOGO__loc_33D
-		rom[0xf4175] = 0x08;
+		rom[0xf4000 + 0x0303] = 0x00; // disable CRC check
+		rom[0xf4000 + 0x135e] = 0x00; // FLOPPY / RX-50 WORKAROUND: in case of Z80 RESPONSE FAILURE ($80 bit set in AL), do not block floppy access.
 	}
-
-	if (rom[0xf4000 + 0x3ffc] == 0x31) // 100-B
-		rom[0xf4384] = 0xeb; // JMPS  =>  BOOT80
-
-	if (rom[0xf4000 + 0x3ffc] == 0x35) // v5.05
-		rom[0xf437b] = 0xeb;
-
-	//TEST-DEBUG: always reset NVM to defaults (!)
-	//rom[0x3d6c] = 0x90;
-	//rom[0x3d6d] = 0x90;
-#endif
-
-#ifdef KEYBOARD_WORKAROUND
-#include "./rainbow_keyboard0.c"
 #endif
 }
 
@@ -568,7 +531,7 @@ AM_RANGE(0x10000, END_OF_RAM) AM_RAM
 //    'diagnostic_w' handler (similar to real hardware).
 
 //  - Address bits 8-12 are ignored (-> AM_MIRROR).
-AM_RANGE(0xed000, 0xed0ff) AM_RAM AM_SHARE("vol_ram") AM_MIRROR(0x1f00)
+AM_RANGE(0xec000, 0xec0ff) AM_RAM AM_SHARE("vol_ram") AM_MIRROR(0x1f00)
 AM_RANGE(0xed100, 0xed1ff) AM_RAM AM_SHARE("nvram")
 
 AM_RANGE(0xee000, 0xeffff) AM_RAM AM_SHARE("p_ram")
@@ -681,12 +644,6 @@ AM_RANGE(0x69, 0x69) AM_READ(hd_status_69_r)
 // ===========================================================
 // 0x10c
 AM_RANGE(0x10c, 0x10c) AM_DEVWRITE("vt100_video", rainbow_video_device, dc012_w)
-
-
-#ifdef KEYBOARD_WORKAROUND
-#include "./am_range_9x_Ax.c"
-#endif
-
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(rainbowz80_mem, AS_PROGRAM, 8, rainbow_state)
@@ -716,9 +673,6 @@ ADDRESS_MAP_END
 /* DIP switches */
 static INPUT_PORTS_START(rainbow100b_in)
 
-#ifdef KEYBOARD_WORKAROUND
-#include "./rainbow_ipt.c"
-#endif
 PORT_START("MONITOR TYPE")
 PORT_DIPNAME(0x03, 0x03, "MONOCHROME MONITOR")
 PORT_DIPSETTING(0x01, "WHITE")
@@ -828,25 +782,25 @@ void rainbow_state::machine_reset()
 
 	// * Reset RTC to a defined state *
 	#define RTC_RESET 0xFC104 // read $FC104 or mirror $FE104
-	program.install_read_handler(RTC_RESET, RTC_RESET, 0, 0, read8_delegate(FUNC(rainbow_state::rtc_reset), this));
-	program.install_read_handler(RTC_RESET + 0x2000, RTC_RESET + 0x2000, 0, 0, read8_delegate(FUNC(rainbow_state::rtc_reset2), this));
+	program.install_read_handler(RTC_RESET, RTC_RESET, read8_delegate(FUNC(rainbow_state::rtc_reset), this));
+	program.install_read_handler(RTC_RESET + 0x2000, RTC_RESET + 0x2000, read8_delegate(FUNC(rainbow_state::rtc_reset2), this));
 
 	// A magic pattern enables reads or writes (-> RTC_WRITE_DATA_0 / RTC_WRITE_DATA_1)
 	// 64 bits read from two alternating addresses (see DS1315.C)
 	#define RTC_PATTERN_0 0xFC100 // MIRROR: FE100
 	#define RTC_PATTERN_1 0xFC101 // MIRROR: FE101
-	program.install_read_handler(RTC_PATTERN_0, RTC_PATTERN_1, 0, 0, read8_delegate(FUNC(rainbow_state::rtc_enable), this));
-	program.install_read_handler(RTC_PATTERN_0 + 0x2000, RTC_PATTERN_1 + 0x2000, 0, 0, read8_delegate(FUNC(rainbow_state::rtc_enable2), this));
+	program.install_read_handler(RTC_PATTERN_0, RTC_PATTERN_1, read8_delegate(FUNC(rainbow_state::rtc_enable), this));
+	program.install_read_handler(RTC_PATTERN_0 + 0x2000, RTC_PATTERN_1 + 0x2000, read8_delegate(FUNC(rainbow_state::rtc_enable2), this));
 
 	// * Read actual time/date from ClikClok *
 	#define RTC_READ_DATA 0xFC004 // Single byte - delivers one bit (if RTC enabled). MIRROR: FE004
-	program.install_read_handler(RTC_READ_DATA, RTC_READ_DATA, 0, 0, read8_delegate(FUNC(rainbow_state::rtc_r), this));
-	program.install_read_handler(RTC_READ_DATA + 0x2000, RTC_READ_DATA + 0x2000, 0, 0, read8_delegate(FUNC(rainbow_state::rtc_r2), this));
+	program.install_read_handler(RTC_READ_DATA, RTC_READ_DATA, read8_delegate(FUNC(rainbow_state::rtc_r), this));
+	program.install_read_handler(RTC_READ_DATA + 0x2000, RTC_READ_DATA + 0x2000, read8_delegate(FUNC(rainbow_state::rtc_r2), this));
 
 	// * Secretly transmit data to RTC (set time / date) *  Works only if magic pattern enabled RTC. Look ma, no writes!
 	#define RTC_WRITE_DATA_0 0xFE000
 	#define RTC_WRITE_DATA_1 0xFE001
-	program.install_read_handler(RTC_WRITE_DATA_0, RTC_WRITE_DATA_1, 0, 0, read8_delegate(FUNC(rainbow_state::rtc_w), this));
+	program.install_read_handler(RTC_WRITE_DATA_0, RTC_WRITE_DATA_1, read8_delegate(FUNC(rainbow_state::rtc_w), this));
 
 	m_rtc->chip_reset();
 	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-B' ***************************************
@@ -926,10 +880,6 @@ void rainbow_state::machine_reset()
 	m_irq_mask = 0;
 }
 
-#ifdef KEYBOARD_WORKAROUND
-#include "./rainbow_keyboard2.c"
-#endif
-
 UINT32 rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 /*
@@ -956,7 +906,7 @@ void rainbow_state::update_8088_irqs()
 
 	if (m_irq_mask != 0)
 	{
-		for (int i = 0; i < IRQ_8088_NMI; i++)
+		for (int i = IRQ_8088_NMI; i >= 0; i--)
 		{
 			if (m_irq_mask & (1 << i))
 			{
@@ -1664,21 +1614,6 @@ WRITE_LINE_MEMBER(rainbow_state::bundle_irq)
 
 READ8_MEMBER(rainbow_state::system_parameter_r)
 {
-#ifdef FORCE_RAINBOW_B_LOGO
-
-	// WORKAROUND: Initialize NVRAM + VOLATILE RAM with DEFAULTS + correct RAM SIZE !
-	int test = (m_inp8->read() >> 16) - 2; // 0 = 128 K (!)
-	if (test >= 0)
-	{
-		m_p_vol_ram[0xdb] = test;
-		m_p_nvram[0xdb] = test;
-	}
-
-	// NVRAM @ 0x89 : AUTO RPT(0 = OFF 1 = ON)
-	m_p_nvram[0x89] = 0;  //  AUTO REPEAT ON (1 would be DETRIMENTAL TO "SET-UP" (80/132 + 50/60 Hz) with KEYBOARD_WORKAROUND (!)
-#endif
-
-
 	/*  Info about option boards is in bits 0 - 3:
 	SYSTEM PARAMETER INFORMATION: see AA-P308A-TV page 92 section 14.0
 	Bundle card (1) | Floppy (2) | Graphics (4) | Memory option (8)
@@ -2179,16 +2114,10 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 // KEYBOARD
 void rainbow_state::update_kbd_irq()
 {
-#ifndef KEYBOARD_WORKAROUND
 	if ((m_kbd_rx_ready) || (m_kbd_tx_ready))
-	{
 		raise_8088_irq(IRQ_8088_KBD);
-	}
 	else
-	{
 		lower_8088_irq(IRQ_8088_KBD);
-	}
-#endif
 }
 
 WRITE_LINE_MEMBER(rainbow_state::kbd_tx)
@@ -2403,6 +2332,10 @@ ROM_LOAD("23-092e4-00.bin", 0xFE000, 0x2000, NO_DUMP)  // ROM (FE000-FFFFF) (E91
 
 ROM_REGION(0x1000, "chargen", 0) // [E98] 2732 (4 K) EPROM
 ROM_LOAD("23-020e3-00.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f))
+
+// Z80 ARBITRATION PROM
+ROM_REGION(0x100, "prom", 0)
+ROM_LOAD("23-090b1.mmi6308-ij.e11", 0x0000, 0x0100, CRC(cac3a7e3) SHA1(2d0468cda36fa287f705364c56dbf62f548d2e4c) ) // MMI 6308-IJ; Silkscreen stamp: "LM8413 // 090B1"; 256x8 Open Collector prom @E11, same prom is @E13 on 100-B
 ROM_END
 
 //----------------------------------------------------------------------------------------
@@ -2433,6 +2366,10 @@ ROM_RELOAD(0xfc000, 0x4000)
 // CHARACTER GENERATOR (E3-03)
 ROM_REGION(0x1000, "chargen", 0)
 ROM_LOAD("23-037e3.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f))
+
+// Z80 ARBITRATION PROM
+ROM_REGION(0x100, "prom", 0)
+ROM_LOAD("23-090b1.mmi6308-ij.e13", 0x0000, 0x0100, CRC(cac3a7e3) SHA1(2d0468cda36fa287f705364c56dbf62f548d2e4c) ) // MMI 6308-IJ; Silkscreen stamp: "LM8413 // 090B1"; 256x8 Open Collector prom @E13, same prom is @E11 on 100-A
 ROM_END
 
 //----------------------------------------------------------------------------------------

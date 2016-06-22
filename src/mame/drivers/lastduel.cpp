@@ -445,12 +445,6 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-/* handler called by the 2203 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(lastduel_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 TIMER_DEVICE_CALLBACK_MEMBER(lastduel_state::lastduel_timer_cb)
 {
 	m_maincpu->set_input_line(4, HOLD_LINE); /* Controls */
@@ -523,7 +517,7 @@ static MACHINE_CONFIG_START( lastduel, lastduel_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_3_579545MHz)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(lastduel_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("ym2", YM2203, XTAL_3_579545MHz)
@@ -568,7 +562,7 @@ static MACHINE_CONFIG_START( madgear, lastduel_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_3_579545MHz)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(lastduel_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("ym2", YM2203, XTAL_3_579545MHz)

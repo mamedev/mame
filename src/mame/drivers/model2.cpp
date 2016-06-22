@@ -690,7 +690,16 @@ WRITE32_MEMBER(model2_state::copro_prg_w)
 	if (m_coproctl & 0x80000000)
 	{
 		logerror("copro_prg_w: %08X:   %08X\n", m_coprocnt, data);
-		m_tgpx4_program[m_coprocnt] = data;
+		if (m_coprocnt & 1)
+		{
+			m_tgpx4_program[m_coprocnt / 2] &= U64(0xffffffff);
+			m_tgpx4_program[m_coprocnt / 2] |= (UINT64)(data) << 32;
+		}
+		else
+		{
+			m_tgpx4_program[m_coprocnt / 2] &= U64(0xffffffff00000000);
+			m_tgpx4_program[m_coprocnt / 2] |= data;
+		}
 		m_coprocnt++;
 	}
 	else
@@ -2610,7 +2619,7 @@ static MACHINE_CONFIG_DERIVED( model2b_0229, model2b )
 MACHINE_CONFIG_END
 
 
-static ADDRESS_MAP_START( copro_tgpx4_map, AS_PROGRAM, 32, model2_state )
+static ADDRESS_MAP_START( copro_tgpx4_map, AS_PROGRAM, 64, model2_state )
 	AM_RANGE(0x00000000, 0x00007fff) AM_RAM AM_SHARE("tgpx4_program")
 ADDRESS_MAP_END
 

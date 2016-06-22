@@ -405,7 +405,7 @@ House of the Dead 2 (USA)                       834-13636-01 21585   20 (64Mb)  
 Idol Janshi Suchie-Pai 3                        841-0002C    21979   14 (64Mb)   ?           315-6213  317-5047-JPN   requires mahjong panel
 Jambo! Safari (Rev A)                           840-0013C    22826A   8 (64Mb)   ?           315-6213  317-0264-COM
 Mars TV                                         840-0025C    22993   15 (64Mb)   present     315-6213  317-0274-JPN
-Marvel Vs. Capcom 2 (USA, Rev A)                841-0007C-01 23062A  14 (64Mb)   ?           315-6213  ?
+Marvel Vs. Capcom 2 (USA) (Rev A)               841-0007C-01 23062A  14 (64Mb)   present     315-6213  317-5053-COM
 OutTrigger                                      840-0017C    22163   19 (64Mb)   ?           315-6213  317-0266-COM   requires regular 837-13551 and 837-13938 rotary JVS boards, and special panel
 Power Stone                                     841-0001C    21597    8 (64Mb)   present     315-6213  317-5046-COM   joystick + 3 buttons
 Power Stone 2                                   841-0008C    23127    9 (64Mb)   present     315-6213  317-5054-COM   joystick + 3 buttons
@@ -531,7 +531,8 @@ Club Kart Prize (Rev A)                                      840-0129C    24082A
 Club Kart Prize Ver. B                                       840-0137C    24149   16 (64Mb)   present  317-0368-COM  requires 837-14438 "SH I/O BD" hopper controller (not dumped)
 Giant Gram 2000                                              840-0039C    23377   20 (64Mb)   present  317-0296-COM
 Kick '4' Cash                                                840-0140C    24212   16 (64Mb)   present  317-0397-COM  requires 837-14438 "SH I/O BD" hopper controller (not dumped)
-Marvel Vs. Capcom 2 New Age of Heroes (Export, Rev A)        841-0007C-02 23085A  14 (64Mb)*  present  317-5058-COM  *(+2x 32Mb)
+Marvel Vs. Capcom 2 New Age of Heroes (Export) (Rev A)       841-0007C-02 23085A  14 (64Mb)*  present  317-5058-COM  *(+2x 32Mb) have factory wire-mod connecting IC13S serial EEPROM CLK pin to IC11 ROM /OE pin
+Marvel Vs. Capcom 2 New Age of Heroes (Korea) (Rev A)        841-0007C-03 23085A  14 (64Mb)*  present  317-5058-COM  *(+2x 32Mb) have factory wire-mod connecting IC13S serial EEPROM CLK pin to IC11 ROM /OE pin
 MushiKing The King of Beetles 2K3 2ND                        840-0150C    24217    6 (64Mb)   present  317-0394-COM  requires 610-0669 barcode reader, 838-14245-92 "MAPLE/232C CONVERT BD" (MIE-based), 838-14243 "RFID CHIP R/W BD" and RFID chip
 Quiz Ah Megamisama                                           840-0030C    23227   16 (64Mb)   present  317-0280-JPN
 Shootout Pool                                                840-0098C    23844    4 (64Mb)   present  317-0336-COM  requires regular 837-13551 and 837-13938 rotary JVS boards
@@ -1817,7 +1818,7 @@ inline int naomi_state::decode_reg32_64(UINT32 offset, UINT64 mem_mask, UINT64 *
 	if ((mem_mask != U64(0xffffffff00000000)) && (mem_mask != U64(0x00000000ffffffff)))
 	{
 		osd_printf_verbose("%s:Wrong mask!\n", machine().describe_context());
-//      debugger_break(machine);
+		//machine().debug_break();
 	}
 
 	if (mem_mask == U64(0xffffffff00000000))
@@ -4576,16 +4577,40 @@ ROM_START( shangril )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // Unknown
 ROM_END
 
-/*
-SYSTEMID: NAOMI
-JAP: MARVEL VS. CAPCOM 2
-USA: MARVEL VS. CAPCOM 2
-EXP: MARVEL VS. CAPCOM 2
+// 841-0007C-01, uses 171-7919A type ROM board
+ROM_START( mvsc2u )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
 
-Note: the following game is one of the few known regular Naomi game to have a rom test item in its specific test mode menu.
-So the Naomi regular board test item is unreliable in this circumstance.
+	ROM_REGION( 0x7800000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD("epr-23062a.ic22", 0x0000000, 0x0400000, CRC(96038276) SHA1(877ba02c92082567280afcb1ae40b3bbfc8a63e8) )
+	ROM_LOAD("mpr-23048.ic1",   0x0800000, 0x0800000, CRC(93d7a63a) SHA1(c50d10b4a3f9db51eae5749f5b665d7c8ab6c898) )
+	ROM_LOAD("mpr-23049.ic2",   0x1000000, 0x0800000, CRC(003dcce0) SHA1(fb71c8ca9271d2155878c72d8fe2df3031e6c014) )
+	ROM_LOAD("mpr-23050.ic3",   0x1800000, 0x0800000, CRC(1d6b88a7) SHA1(ba42e9d1d912d88a7ad839b878975ba590634320) )
+	ROM_LOAD("mpr-23051.ic4",   0x2000000, 0x0800000, CRC(01226aaa) SHA1(a4c6a0eda05e53d0e51b92a4317a86a708a7efdb) )
+	ROM_LOAD("mpr-23052.ic5",   0x2800000, 0x0800000, CRC(74bee120) SHA1(5a0fb48fa758a2be2e08e3b1298103c5aa748835) )
+	ROM_LOAD("mpr-23053.ic6",   0x3000000, 0x0800000, CRC(d92d4401) SHA1(a868780f8d2e176ff10781e1c08bf932f34ac504) )
+	ROM_LOAD("mpr-23054.ic7",   0x3800000, 0x0800000, CRC(78ba02e8) SHA1(0f696a33e1e6671001efc309ed62f084a246ad24) )
+	ROM_LOAD("mpr-23055.ic8",   0x4000000, 0x0800000, CRC(84319604) SHA1(c3dde162e043a54e1325202b46191b32e8784a1c) )
+	ROM_LOAD("mpr-23056.ic9",   0x4800000, 0x0800000, CRC(d7386034) SHA1(be1f3ca5f283e428dc59dc072de3e7d36e122d53) )
+	ROM_LOAD("mpr-23057.ic10",  0x5000000, 0x0800000, CRC(a3f087db) SHA1(b52d7c072cb5c2fdd10d0ac0b62cebe48b229ae3) )
+	ROM_LOAD("mpr-23058.ic11",  0x5800000, 0x0800000, CRC(61a6cc5d) SHA1(34e52cb076888313a80f2b87876b8d37b91d85a0) )
+	ROM_LOAD("mpr-23059.ic12s", 0x6000000, 0x0800000, CRC(64808024) SHA1(1a6c60c330642b273978d3dd02d95d17d36ee3f2) )
+	ROM_LOAD("mpr-23060.ic13s", 0x6800000, 0x0800000, CRC(67519942) SHA1(fc758d9075625f8140d5d828c8f6b7a91bcc9119) )
+	ROM_LOAD("mpr-23061.ic14s", 0x7000000, 0x0800000, CRC(fb1844c4) SHA1(1d1571516a6dbed0c4ded3b80efde9cc9281f66f) )
 
-*/
+	ROM_REGION(0x84, "some_eeprom", 0)
+	ROM_LOAD("sflash.ic37", 0x000000, 0x000084, CRC(37a66f3c) SHA1(df6cd2cdc2813caa5da4dc9f171998485bcbdc44))
+
+	// 841-0007-01 2000     317-5053-COM   Naomi
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "0002c840" )
+ROM_END
+
+// 841-0007C-02 / 841-0007C-03, uses 171-7978B type ROM board
+// reuses MPR 23048-23061 MaskROMs from 841-0007C-01 set, which contain regular non-interleaved data, not native/normal for such ROM board type
+// have added IC31-32 32Mbit MaskROMs with interleaved M1-encrypted data
+// mentioned above ROMs mapping is unsupported by NAOMI BIOS, so it's ROM BOARD TEST and shown sums is unreliable,
+// because of it this game version have it's own ROM BOARD TEST in GAME TEST MODE, which perform test and show sums correctly
 
 ROM_START( mvsc2 )
 	NAOMI_BIOS
@@ -4613,6 +4638,9 @@ ROM_START( mvsc2 )
 	ROM_LOAD32_WORD("mpr-23084.ic32s", 0x8000002, 0x0400000, CRC(4ebbbdd9) SHA1(9ad8c1a644850de6e35705318cd1991e1d6e60a8) )
 
 	ROM_COPY( "rom_board", 0x1200000, 0x400000, 0x400000 )
+
+	ROM_REGION(0x74, "some_eeprom", 0)
+	ROM_LOAD("sflash.ic13s", 0x000000, 0x000074, CRC(5fbc2d5e) SHA1(fd762b81d1bbb65d28ad223874db198918fb0853))
 
 	// 841-0007-02 2000     317-5058-COM   Naomi
 	ROM_PARAMETER( ":rom_board:key", "c18b6e7c" )
@@ -9620,8 +9648,8 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 /* 0004 */ GAME( 1999, shangril, naomi, naomim2, naomi_mp,naomi_state,naomi_mp,ROT0,  "Marvelous Ent.",  "Dengen Tenshi Taisen Janshi Shangri-la", GAME_FLAGS )
 /* 0005 */ GAME( 1999, spawn,    naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Todd Mc Farlane / Capcom","Spawn In the Demon's Hand (Rev B)", GAME_FLAGS )
 /* 0006 */ GAME( 1999, puyoda,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Compile",         "Puyo Puyo Da!", GAME_FLAGS )
-// 0007-01    GAME(2000, mvsc2u, mvsc2, naomim2, naomi,   naomi_state, mvsc2,  ROT0,  "Capcom / Marvel", "Marvel Vs. Capcom 2 New Age of Heroes (USA, Rev A)", GAME_FLAGS)
-/* 0007-02 */ GAME(2000, mvsc2,  naomi, naomim1, naomi,   naomi_state, mvsc2,  ROT0,  "Capcom / Marvel", "Marvel Vs. Capcom 2 New Age of Heroes (Export, Rev A)", GAME_FLAGS)
+/* 0007-01 */     GAME(2000, mvsc2u, mvsc2, naomim2, naomi,   naomi_state, mvsc2,  ROT0,  "Capcom / Marvel", "Marvel Vs. Capcom 2 New Age of Heroes (USA) (Rev A)", GAME_FLAGS)
+/* 0007-02 -03 */ GAME(2000, mvsc2,  naomi, naomim1, naomi,   naomi_state, mvsc2,  ROT0,  "Capcom / Marvel", "Marvel Vs. Capcom 2 New Age of Heroes (Export, Korea) (Rev A)", GAME_FLAGS)
 /* 0008 */ GAME( 2000, pstone2,  naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom",          "Power Stone 2", GAME_FLAGS )
 /* 0011 */ GAME( 2000, capsnk,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000 (Rev C)", GAME_FLAGS )
 /* 0011 */ GAME( 2000, capsnka,  capsnk,naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000 (Rev A)", GAME_FLAGS )

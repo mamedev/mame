@@ -30,6 +30,7 @@ Also seem to be running on the same/similar hardware:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/2612intf.h"
 #include "video/hd63484.h"
@@ -43,7 +44,8 @@ public:
 	segajw_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu")
+			m_audiocpu(*this, "audiocpu"),
+			m_soundlatch(*this, "soundlatch")
 	{ }
 
 	DECLARE_READ16_MEMBER(coin_counter_r);
@@ -64,6 +66,7 @@ protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -131,7 +134,7 @@ WRITE16_MEMBER(segajw_state::coinlockout_w)
 
 WRITE8_MEMBER(segajw_state::audiocpu_cmd_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -190,7 +193,7 @@ static ADDRESS_MAP_START( segajw_map, AS_PROGRAM, 16, segajw_state )
 	AM_RANGE(0x080002, 0x080003) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
 
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("DSW0")
-	AM_RANGE(0x180004, 0x180005) AM_READWRITE8(soundlatch2_byte_r, audiocpu_cmd_w, 0x00ff)
+	AM_RANGE(0x180004, 0x180005) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff) AM_WRITE8(audiocpu_cmd_w, 0x00ff)
 	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("DSW1")
 	AM_RANGE(0x18000a, 0x18000b) AM_READ_PORT("DSW3")
 	AM_RANGE(0x18000c, 0x18000d) AM_READ_PORT("DSW2")
@@ -223,7 +226,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( segajw_audiocpu_io_map, AS_IO, 8, segajw_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ymsnd", ym3438_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_READWRITE(soundlatch_byte_r, soundlatch2_byte_w)
+	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( segajw_hd63484_map, AS_0, 16, segajw_state )
@@ -416,6 +419,10 @@ static MACHINE_CONFIG_START( segajw, segajw_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+
 	MCFG_SOUND_ADD("ymsnd", YM3438, 8000000)   // unknown clock
 	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("maincpu", 5))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

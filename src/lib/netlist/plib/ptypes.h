@@ -8,75 +8,49 @@
 #ifndef PTYPES_H_
 #define PTYPES_H_
 
+#include <type_traits>
+
 #include "pconfig.h"
 #include "pstring.h"
 
-PLIB_NAMESPACE_START()
-
-//============================================================
-//  penum - strongly typed enumeration
-//============================================================
-
-struct enum_base
+namespace plib
 {
-protected:
-	static int from_string_int(const char *str, const char *x)
-	{
-		int cnt = 0;
-		const char *cur = str;
-		int lx = strlen(x);
-		while (*str)
-		{
-			if (*str == ',')
-			{
-				int l = str-cur;
-				if (l == lx)
-					if (strncmp(cur, x, lx) == 0)
-						return cnt;
-			}
-			else if (*str == ' ')
-			{
-				cur = str + 1;
-				cnt++;
-			}
-			str++;
-		}
-		int l = str-cur;
-		if (l == lx)
-			if (strncmp(cur, x, lx) == 0)
-				return cnt;
-		return -1;
-	}
-	static pstring nthstr(int n, const char *str)
-	{
-		char buf[64];
-		char *bufp = buf;
-		int cur = 0;
-		while (*str)
-		{
-			if (cur == n)
-			{
-				if (*str == ',')
-				{
-					*bufp = 0;
-					return pstring(buf);
-				}
-				else if (*str != ' ')
-					*bufp++ = *str;
-			}
-			else
-			{
-				if (*str == ',')
-					cur++;
-			}
-			str++;
-		}
-		*bufp = 0;
-		return pstring(buf);
-	}
-};
 
-PLIB_NAMESPACE_END()
+	template<typename T> struct is_integral : public std::is_integral<T> { };
+	template<typename T> struct numeric_limits : public std::numeric_limits<T> { };
+
+	/* 128 bit support at least on GCC is not fully supported */
+#if PHAS_INT128
+	template<> struct is_integral<UINT128> { static constexpr bool value = true; };
+	template<> struct is_integral<INT128> { static constexpr bool value = true; };
+	template<> struct numeric_limits<UINT128>
+	{
+		static inline constexpr UINT128 max()
+		{
+			return ~((UINT128)0);
+		}
+	};
+	template<> struct numeric_limits<INT128>
+	{
+		static inline constexpr INT128 max()
+		{
+			return (~((UINT128)0)) >> 1;
+		}
+	};
+#endif
+
+	//============================================================
+	//  penum - strongly typed enumeration
+	//============================================================
+
+	struct enum_base
+	{
+	protected:
+		static int from_string_int(const char *str, const char *x);
+		static pstring nthstr(int n, const char *str);
+	};
+
+}
 
 #define P_ENUM(ename, ...) \
 	struct ename : public plib::enum_base { \

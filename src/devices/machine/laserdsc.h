@@ -79,6 +79,8 @@ enum laserdisc_field_code
 	laserdisc_device::static_set_overlay_palette(*device, "^" _palette_tag);
 
 // use these to add laserdisc screens with proper video update parameters
+// TODO: actually move these SCREEN_RAW_PARAMS to a common screen info header
+// TODO: someday we'll kill the pixel clock hack ...
 #define MCFG_LASERDISC_SCREEN_ADD_NTSC(_tag, _ldtag) \
 	MCFG_DEVICE_MODIFY(_ldtag) \
 	laserdisc_device::static_set_screen(*device, _tag); \
@@ -86,13 +88,13 @@ enum laserdisc_field_code
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER) \
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz*2, 910, 0, 704, 525, 44, 524) \
 	MCFG_SCREEN_UPDATE_DEVICE(_ldtag, laserdisc_device, screen_update)
-// not correct yet; fix me...
+
 #define MCFG_LASERDISC_SCREEN_ADD_PAL(_tag, _ldtag) \
 	MCFG_DEVICE_MODIFY(_ldtag) \
 	laserdisc_device::static_set_screen(*device, _tag); \
 	MCFG_SCREEN_ADD(_tag, RASTER) \
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER) \
-	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz, 910, 0, 704, 525.0/2, 0, 480/2) \
+	MCFG_SCREEN_RAW_PARAMS(XTAL_17_73447MHz*2, 1135, 0, 768, 625, 48, 624) \
 	MCFG_SCREEN_UPDATE_DEVICE(_ldtag, laserdisc_device, screen_update)
 
 

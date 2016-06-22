@@ -22,6 +22,7 @@
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
 #include "debug/debugcpu.h"
+#include "debugger.h"
 #include "includes/chihiro.h"
 #include "includes/xbox.h"
 
@@ -58,6 +59,7 @@ void xbox_state::video_start()
 
 static ADDRESS_MAP_START(xbox_map, AS_PROGRAM, 32, xbox_state)
 	AM_IMPORT_FROM(xbox_base_map)
+	AM_RANGE(0xff000000, 0xff0fffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x00f00000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(xbox_map_io, AS_IO, 32, xbox_state)

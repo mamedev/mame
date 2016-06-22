@@ -72,7 +72,7 @@ machine_config_constructor z88_1024k_flash_device::device_mconfig_additions() co
 
 UINT8* z88_1024k_flash_device::get_cart_base()
 {
-	return (UINT8*)m_flash->space().get_read_ptr(0);
+	return m_flash->base();
 }
 
 /*-------------------------------------------------

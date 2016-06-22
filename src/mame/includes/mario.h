@@ -3,6 +3,7 @@
 #ifndef MARIO_H_
 #define MARIO_H_
 
+#include "machine/gen_latch.h"
 #include "machine/z80dma.h"
 
 #define OLD_SOUND   (1)
@@ -52,6 +53,10 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_z80dma(*this, "z80dma"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
+		m_soundlatch3(*this, "soundlatch3"),
+		m_soundlatch4(*this, "soundlatch4"),
 #if OLD_SOUND
 		m_discrete(*this, "discrete"),
 #else
@@ -69,6 +74,10 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<z80dma_device> m_z80dma;
+	optional_device<generic_latch_8_device> m_soundlatch;
+	optional_device<generic_latch_8_device> m_soundlatch2;
+	optional_device<generic_latch_8_device> m_soundlatch3;
+	optional_device<generic_latch_8_device> m_soundlatch4;
 #if OLD_SOUND
 	optional_device<discrete_device> m_discrete;
 #else

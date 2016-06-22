@@ -78,24 +78,24 @@ void isa16_svga_tgui9680_device::device_start()
 
 	m_vga = subdevice<trident_vga_device>("vga");
 
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, 0, 0, "tgui9680", "tgui9680");
+	m_isa->install_rom(this, 0xc0000, 0xc7fff, "tgui9680", "tgui9680");
 
-	m_isa->install_device(0x3b0, 0x3bf, 0, 0, read8_delegate(FUNC(trident_vga_device::port_03b0_r),m_vga), write8_delegate(FUNC(trident_vga_device::port_03b0_w),m_vga));
-	m_isa->install_device(0x3c0, 0x3cf, 0, 0, read8_delegate(FUNC(trident_vga_device::port_03c0_r),m_vga), write8_delegate(FUNC(trident_vga_device::port_03c0_w),m_vga));
-	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate(FUNC(trident_vga_device::port_03d0_r),m_vga), write8_delegate(FUNC(trident_vga_device::port_03d0_w),m_vga));
-	m_isa->install_device(0x43c4, 0x43cb, 0, 0, read8_delegate(FUNC(trident_vga_device::port_43c6_r),m_vga), write8_delegate(FUNC(trident_vga_device::port_43c6_w),m_vga));
-	m_isa->install_device(0x83c4, 0x83cb, 0, 0, read8_delegate(FUNC(trident_vga_device::port_83c6_r),m_vga), write8_delegate(FUNC(trident_vga_device::port_83c6_w),m_vga));
+	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(FUNC(trident_vga_device::port_03b0_r),m_vga), write8_delegate(FUNC(trident_vga_device::port_03b0_w),m_vga));
+	m_isa->install_device(0x3c0, 0x3cf, read8_delegate(FUNC(trident_vga_device::port_03c0_r),m_vga), write8_delegate(FUNC(trident_vga_device::port_03c0_w),m_vga));
+	m_isa->install_device(0x3d0, 0x3df, read8_delegate(FUNC(trident_vga_device::port_03d0_r),m_vga), write8_delegate(FUNC(trident_vga_device::port_03d0_w),m_vga));
+	m_isa->install_device(0x43c4, 0x43cb, read8_delegate(FUNC(trident_vga_device::port_43c6_r),m_vga), write8_delegate(FUNC(trident_vga_device::port_43c6_w),m_vga));
+	m_isa->install_device(0x83c4, 0x83cb, read8_delegate(FUNC(trident_vga_device::port_83c6_r),m_vga), write8_delegate(FUNC(trident_vga_device::port_83c6_w),m_vga));
 
-	m_isa->install_memory(0xa0000, 0xbffff, 0, 0, read8_delegate(FUNC(trident_vga_device::mem_r),m_vga), write8_delegate(FUNC(trident_vga_device::mem_w),m_vga));
+	m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(FUNC(trident_vga_device::mem_r),m_vga), write8_delegate(FUNC(trident_vga_device::mem_w),m_vga));
 
 	// uncomment to test Windows 3.1 TGUI9440AGi driver
-//  m_isa->install_memory(0x4400000, 0x45fffff, 0, 0, read8_delegate(FUNC(trident_vga_device::vram_r),m_vga), write8_delegate(FUNC(trident_vga_device::vram_w),m_vga));
+//  m_isa->install_memory(0x4400000, 0x45fffff, read8_delegate(FUNC(trident_vga_device::vram_r),m_vga), write8_delegate(FUNC(trident_vga_device::vram_w),m_vga));
 
 	// win95 drivers
-//  m_isa->install_memory(0x4000000, 0x41fffff, 0, 0, read8_delegate(FUNC(trident_vga_device::vram_r),m_vga), write8_delegate(FUNC(trident_vga_device::vram_w),m_vga));
+//  m_isa->install_memory(0x4000000, 0x41fffff, read8_delegate(FUNC(trident_vga_device::vram_r),m_vga), write8_delegate(FUNC(trident_vga_device::vram_w),m_vga));
 
 	// acceleration ports
-	m_isa->install_device(0x2120, 0x21ff, 0, 0, read8_delegate(FUNC(trident_vga_device::accel_r),m_vga), write8_delegate(FUNC(trident_vga_device::accel_w),m_vga));
+	m_isa->install_device(0x2120, 0x21ff, read8_delegate(FUNC(trident_vga_device::accel_r),m_vga), write8_delegate(FUNC(trident_vga_device::accel_w),m_vga));
 }
 
 //-------------------------------------------------

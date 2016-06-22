@@ -2,7 +2,7 @@
 #define INPUT_DINPUT_H_
 
 #include "input_common.h"
-#include "winutil.h"
+#include "modules/lib/osdlib.h"
 
 //============================================================
 //  dinput_device - base directinput device
@@ -43,10 +43,11 @@ public:
 	virtual BOOL device_enum_callback(LPCDIDEVICEINSTANCE instance, LPVOID ref) = 0;
 };
 
+// Typedef for dynamically loaded function
 #if DIRECTINPUT_VERSION >= 0x0800
-typedef lazy_loaded_function_p4<HRESULT, HMODULE, int, IDirectInput8 **, LPUNKNOWN> pfn_dinput_create;
+typedef HRESULT (WINAPI *dinput_create_fn)(HINSTANCE, DWORD, LPDIRECTINPUT8 *, LPUNKNOWN);
 #else
-typedef lazy_loaded_function_p4<HRESULT, HMODULE, int, IDirectInput **, LPUNKNOWN> pfn_dinput_create;
+typedef HRESULT (WINAPI *dinput_create_fn)(HINSTANCE, DWORD, LPDIRECTINPUT *, LPUNKNOWN);
 #endif
 
 class dinput_api_helper
@@ -58,7 +59,8 @@ private:
 	Microsoft::WRL::ComPtr<IDirectInput>  m_dinput;
 #endif
 	int                                   m_dinput_version;
-	pfn_dinput_create                     m_pfn_DirectInputCreate;
+	osd::dynamic_module::ptr              m_dinput_dll;
+	dinput_create_fn                      m_dinput_create_prt;
 
 public:
 	dinput_api_helper(int version);
@@ -117,7 +119,7 @@ public:
 		}
 
 		// set the cooperative level
-		result = devinfo->dinput.device->SetCooperativeLevel(win_window_list.front()->platform_window<HWND>(), cooperative_level);
+		result = devinfo->dinput.device->SetCooperativeLevel(osd_common_t::s_window_list.front()->platform_window<HWND>(), cooperative_level);
 		if (result != DI_OK)
 			goto error;
 

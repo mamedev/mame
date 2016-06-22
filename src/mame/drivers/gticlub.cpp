@@ -272,7 +272,7 @@ public:
 	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<adsp21062_device> m_dsp;
-	optional_device<cpu_device> m_dsp2;
+	optional_device<adsp21062_device> m_dsp2;
 	required_device<k056800_device> m_k056800;
 	required_device<adc1038_device> m_adc1038;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -1402,6 +1402,8 @@ ROM_END
 DRIVER_INIT_MEMBER(gticlub_state,gticlub)
 {
 	m_sharc_dataram_0 = std::make_unique<UINT32[]>(0x100000/4);
+
+	m_dsp->enable_recompiler();
 }
 
 void gticlub_state::init_hangplt_common()

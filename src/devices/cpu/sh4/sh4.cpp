@@ -3028,7 +3028,7 @@ inline void sh34_base_device::op1111_0xf13(const UINT16 opcode)
 						FRCHG();
 						break;
 					default:
-						debugger_break(machine());
+						machine().debug_break();
 						break;
 				}
 			} else {
@@ -3041,7 +3041,7 @@ inline void sh34_base_device::op1111_0xf13(const UINT16 opcode)
 
 void sh34_base_device::dbreak(const UINT16 opcode)
 {
-	debugger_break(machine());
+	machine().debug_break();
 }
 
 

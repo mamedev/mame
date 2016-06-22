@@ -133,12 +133,12 @@ static const UINT16 mHoreKidProtData[] =
 
 WRITE16_MEMBER(terracre_state::amazon_sound_w)
 {
-	soundlatch_byte_w(space,0,((data & 0x7f) << 1) | 1);
+	m_soundlatch->write(space,0,((data & 0x7f) << 1) | 1);
 }
 
 READ8_MEMBER(terracre_state::soundlatch_clear_r)
 {
-	soundlatch_clear_byte_w(space,0,0);
+	m_soundlatch->clear_w(space,0,0);
 	return 0;
 }
 
@@ -225,7 +225,7 @@ static ADDRESS_MAP_START( sound_3526_io_map, AS_IO, 8, terracre_state )
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_device, write_signed8)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac2", dac_device, write_signed8)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_clear_r)
-	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x06, 0x06) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_2203_io_map, AS_IO, 8, terracre_state )
@@ -234,7 +234,7 @@ static ADDRESS_MAP_START( sound_2203_io_map, AS_IO, 8, terracre_state )
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_device, write_signed8)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac2", dac_device, write_signed8)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_clear_r)
-	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x06, 0x06) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( terracre )
@@ -540,6 +540,8 @@ static MACHINE_CONFIG_START( ym3526, terracre_state )
 	MCFG_PALETTE_INIT_OWNER(terracre_state, terracre)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_16MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

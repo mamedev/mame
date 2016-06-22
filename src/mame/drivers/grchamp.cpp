@@ -200,7 +200,7 @@ WRITE8_MEMBER(grchamp_state::cpu0_outputs_w)
 
 		case 0x0e:  /* OUT14 */
 			/* O-21 connector */
-			soundlatch_byte_w(space, 0, data);
+			m_soundlatch->write(space, 0, data);
 			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 			break;
 	}
@@ -511,7 +511,7 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 8, grchamp_state )
 	AM_RANGE(0x19, 0x19) AM_MIRROR(0x60) AM_READ(pc3259_3_r)
 	AM_RANGE(0x00, 0x0f) AM_MIRROR(0x40) AM_WRITE(cpu0_outputs_w)
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0x40) AM_WRITE(main_to_sub_comm_w)
-	AM_RANGE(0x20, 0x2f) AM_MIRROR(0x53) AM_WRITE(led_board_w)
+	AM_RANGE(0x20, 0x20) AM_SELECT(0x0c) AM_MIRROR(0x53) AM_WRITE(led_board_w)
 ADDRESS_MAP_END
 
 
@@ -543,7 +543,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, grchamp_state )
 	AM_RANGE(0x4803, 0x4803) AM_MIRROR(0x07f8) AM_DEVREAD("ay2", ay8910_device, data_r)
 	AM_RANGE(0x4804, 0x4805) AM_MIRROR(0x07fa) AM_DEVWRITE("ay3", ay8910_device, address_data_w)
 	AM_RANGE(0x4805, 0x4805) AM_MIRROR(0x07fa) AM_DEVREAD("ay3", ay8910_device, data_r)
-	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x5000, 0x5000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -679,6 +679,8 @@ static MACHINE_CONFIG_START( grchamp, grchamp_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, SOUND_CLOCK/4)    /* 3B */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(grchamp_state, portA_0_w))

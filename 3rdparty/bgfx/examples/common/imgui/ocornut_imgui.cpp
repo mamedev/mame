@@ -11,7 +11,6 @@
 #include <ocornut-imgui/imgui_wm.h>
 #include "imgui.h"
 #include "ocornut_imgui.h"
-#include <stb/stb_image.c>
 
 #ifndef USE_ENTRY
 #	if defined(SCI_NAMESPACE)
@@ -32,6 +31,24 @@
 
 #include "vs_ocornut_imgui.bin.h"
 #include "fs_ocornut_imgui.bin.h"
+
+#include "roboto_regular.ttf.h"
+#include "robotomono_regular.ttf.h"
+#include "icons_kenney.ttf.h"
+#include "icons_font_awesome.ttf.h"
+
+struct FontRangeMerge
+{
+	const void* data;
+	size_t      size;
+	ImWchar     ranges[3];
+};
+
+static FontRangeMerge s_fontRangeMerge[] =
+{
+	{ s_iconsKenneyTtf,      sizeof(s_iconsKenneyTtf),      { ICON_MIN_KI, ICON_MAX_KI, 0 } },
+	{ s_iconsFontAwesomeTtf, sizeof(s_iconsFontAwesomeTtf), { ICON_MIN_FA, ICON_MAX_FA, 0 } },
+};
 
 class PlatformWindow : public ImGuiWM::PlatformWindow
 {
@@ -345,7 +362,7 @@ struct OcornutImguiContext
 		}
 	}
 
-	void create(const void* _data, uint32_t _size, float _fontSize, bx::AllocatorI* _allocator)
+	void create(float _fontSize, bx::AllocatorI* _allocator)
 	{
 		m_viewId = 255;
 		m_allocator = _allocator;
@@ -430,9 +447,28 @@ struct OcornutImguiContext
 		int32_t width;
 		int32_t height;
 		{
-			void* font = ImGui::MemAlloc(_size);
-			memcpy(font, _data, _size);
-			io.Fonts->AddFontFromMemoryTTF(font, _size, _fontSize);
+			ImFontConfig config;
+			config.FontDataOwnedByAtlas = false;
+			config.MergeMode = false;
+//			config.MergeGlyphCenterV = true;
+
+			m_font[ImGui::Font::Regular] = io.Fonts->AddFontFromMemoryTTF( (void*)s_robotoRegularTtf,     sizeof(s_robotoRegularTtf),     _fontSize,      &config);
+			m_font[ImGui::Font::Mono   ] = io.Fonts->AddFontFromMemoryTTF( (void*)s_robotoMonoRegularTtf, sizeof(s_robotoMonoRegularTtf), _fontSize-3.0f, &config);
+
+			config.MergeMode = true;
+			config.DstFont   = m_font[ImGui::Font::Regular];
+
+			for (uint32_t ii = 0; ii < BX_COUNTOF(s_fontRangeMerge); ++ii)
+			{
+				const FontRangeMerge& frm = s_fontRangeMerge[ii];
+
+				io.Fonts->AddFontFromMemoryTTF( (void*)frm.data
+						, (int)frm.size
+						, _fontSize-3.0f
+						, &config
+						, frm.ranges
+						);
+			}
 		}
 
 		io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
@@ -444,9 +480,6 @@ struct OcornutImguiContext
 			, 0
 			, bgfx::copy(data, width*height*4)
 			);
-
-		ImGuiStyle& style = ImGui::GetStyle();
-		style.FrameRounding = 4.0f;
 
 		m_wm = BX_NEW(m_allocator, WindowManager);
 		m_wm->Init();
@@ -516,6 +549,8 @@ struct OcornutImguiContext
 		// Doug Binks' darl color scheme
 		// https://gist.github.com/dougbinks/8089b4bbaccaaf6fa204236978d165a9
 		ImGuiStyle& style = ImGui::GetStyle();
+
+		style.FrameRounding = 4.0f;
 
 		// light style from Pacome Danhiez (user itamago)
 		// https://github.com/ocornut/imgui/pull/511#issuecomment-175719267
@@ -624,9 +659,24 @@ struct OcornutImguiContext
 #endif // 0
 
 #if 0
-		extern void ShowExampleAppCustomNodeGraph(bool* opened);
-		bool opened = true;
-		ShowExampleAppCustomNodeGraph(&opened);
+		{
+			static ImGui::MemoryEditor me;
+			bool open = true;
+			if (ImGui::Begin("HexII", &open))
+			{
+				me.Draw(s_iconsKenneyTtf, sizeof(s_iconsKenneyTtf) );
+
+				ImGui::End();
+			}
+		}
+#endif // 0
+
+#if 0
+		{
+			extern void ShowExampleAppCustomNodeGraph(bool* opened);
+			bool opened = true;
+			ShowExampleAppCustomNodeGraph(&opened);
+		}
 #endif // 0
 	}
 
@@ -642,6 +692,7 @@ struct OcornutImguiContext
 	bgfx::ProgramHandle m_program;
 	bgfx::TextureHandle m_texture;
 	bgfx::UniformHandle s_tex;
+	ImFont* m_font[ImGui::Font::Count];
 	WindowManager* m_wm;
 	int64_t m_last;
 	int32_t m_lastScroll;
@@ -765,9 +816,9 @@ void OcornutImguiContext::renderDrawLists(ImDrawData* _drawData)
 	s_ctx.render(_drawData);
 }
 
-void IMGUI_create(const void* _data, uint32_t _size, float _fontSize, bx::AllocatorI* _allocator)
+void IMGUI_create(float _fontSize, bx::AllocatorI* _allocator)
 {
-	s_ctx.create(_data, _size, _fontSize, _allocator);
+	s_ctx.create(_fontSize, _allocator);
 }
 
 void IMGUI_destroy()
@@ -784,3 +835,11 @@ void IMGUI_endFrame()
 {
 	s_ctx.endFrame();
 }
+
+namespace ImGui
+{
+	void PushFont(Font::Enum _font)
+	{
+		PushFont(s_ctx.m_font[_font]);
+	}
+} // namespace ImGui

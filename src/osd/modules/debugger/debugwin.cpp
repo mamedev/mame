@@ -23,6 +23,7 @@
 
 #include "emu.h"
 #include "debugger.h"
+#include "debug/debugcpu.h"
 
 #include "window.h"
 #include "../input/input_common.h"
@@ -153,14 +154,14 @@ void debugger_windows::wait_for_debugger(device_t &device, bool firststop)
 void debugger_windows::debugger_update()
 {
 	// if we're running live, do some checks
-	if (!winwindow_has_focus() && m_machine && !debug_cpu_is_stopped(*m_machine) && (m_machine->phase() == MACHINE_PHASE_RUNNING))
+	if (!winwindow_has_focus() && m_machine && !m_machine->debugger().cpu().is_stopped() && (m_machine->phase() == MACHINE_PHASE_RUNNING))
 	{
 		// see if the interrupt key is pressed and break if it is
 		if (seq_pressed())
 		{
 			HWND const focuswnd = GetFocus();
 
-			debug_cpu_get_visible_cpu(*m_machine)->debug()->halt_on_next_instruction("User-initiated break\n");
+			m_machine->debugger().cpu().get_visible_cpu()->debug()->halt_on_next_instruction("User-initiated break\n");
 
 			// if we were focused on some window's edit box, reset it to default
 			for (debugwin_info &info : m_window_list)
@@ -236,7 +237,7 @@ void debugger_windows::show_all()
 
 void debugger_windows::hide_all()
 {
-	SetForegroundWindow(win_window_list.front()->platform_window<HWND>());
+	SetForegroundWindow(osd_common_t::s_window_list.front()->platform_window<HWND>());
 	for (debugwin_info &info : m_window_list)
 		info.hide();
 }

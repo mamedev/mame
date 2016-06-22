@@ -130,7 +130,7 @@ INTERRUPT_GEN_MEMBER(zodiack_state::zodiack_sound_nmi_gen)
 
 WRITE8_MEMBER( zodiack_state::master_soundlatch_w )
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -150,7 +150,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zodiack_state )
 	AM_RANGE(0x6082, 0x6082) AM_READ_PORT("DSW1")
 	AM_RANGE(0x6083, 0x6083) AM_READ_PORT("IN0")
 	AM_RANGE(0x6084, 0x6084) AM_READ_PORT("IN1")
-	AM_RANGE(0x6090, 0x6090) AM_READWRITE(soundlatch_byte_r, master_soundlatch_w)
+	AM_RANGE(0x6090, 0x6090) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(master_soundlatch_w)
 	AM_RANGE(0x7000, 0x7000) AM_READNOP AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)  /* NOP??? */
 	AM_RANGE(0x7100, 0x7100) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0x7200, 0x7200) AM_WRITE(flipscreen_w)
@@ -167,7 +167,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, zodiack_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(sound_nmi_enable_w)
-	AM_RANGE(0x6000, 0x6000) AM_READWRITE(soundlatch_byte_r, soundlatch_byte_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, zodiack_state  )
@@ -587,6 +587,8 @@ static MACHINE_CONFIG_START( zodiack, zodiack_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

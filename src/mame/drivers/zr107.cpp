@@ -216,7 +216,7 @@ public:
 
 	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_dsp;
+	required_device<adsp21062_device> m_dsp;
 	required_device<watchdog_timer_device> m_watchdog;
 	optional_device<k001604_device> m_k001604;
 	required_device<k056800_device> m_k056800;
@@ -496,23 +496,23 @@ WRITE32_MEMBER(zr107_state::jetwave_palette_w)
 }
 
 static ADDRESS_MAP_START( jetwave_map, AS_PROGRAM, 32, zr107_state )
-	AM_RANGE(0x00000000, 0x000fffff) AM_MIRROR(0x80000000) AM_RAM       /* Work RAM */
-	AM_RANGE(0x74000000, 0x740000ff) AM_MIRROR(0x80000000) AM_DEVREADWRITE("k001604", k001604_device, reg_r, reg_w)
-	AM_RANGE(0x74010000, 0x7401ffff) AM_MIRROR(0x80000000) AM_RAM_WRITE(jetwave_palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0x74020000, 0x7403ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE("k001604", k001604_device, tile_r, tile_w)
-	AM_RANGE(0x74040000, 0x7407ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE("k001604", k001604_device, char_r, char_w)
-	AM_RANGE(0x78000000, 0x7800ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE("konppc", konppc_device, cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)      /* 21N 21K 23N 23K */
-	AM_RANGE(0x78010000, 0x7801ffff) AM_MIRROR(0x80000000) AM_DEVWRITE("konppc", konppc_device, cgboard_dsp_shared_w_ppc)
-	AM_RANGE(0x78040000, 0x7804000f) AM_MIRROR(0x80000000) AM_DEVREADWRITE("k001006_1", k001006_device, read, write)
-	AM_RANGE(0x78080000, 0x7808000f) AM_MIRROR(0x80000000) AM_DEVREADWRITE("k001006_2", k001006_device, read, write)
-	AM_RANGE(0x780c0000, 0x780c0007) AM_MIRROR(0x80000000) AM_DEVREADWRITE("konppc", konppc_device, cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
-	AM_RANGE(0x7e000000, 0x7e003fff) AM_MIRROR(0x80000000) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
-	AM_RANGE(0x7e008000, 0x7e009fff) AM_MIRROR(0x80000000) AM_DEVREADWRITE8("k056230", k056230_device, read, write, 0xffffffff)             /* LANC registers */
-	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_MIRROR(0x80000000) AM_DEVREADWRITE("k056230", k056230_device, lanc_ram_r, lanc_ram_w)    /* LANC Buffer RAM (27E) */
-	AM_RANGE(0x7e00c000, 0x7e00c00f) AM_MIRROR(0x80000000) AM_DEVREADWRITE8("k056800", k056800_device, host_r, host_w, 0xffffffff)
-	AM_RANGE(0x7f000000, 0x7f3fffff) AM_MIRROR(0x80000000) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0x7f800000, 0x7f9fffff) AM_MIRROR(0x80000000) AM_ROM AM_SHARE("share2")
-	AM_RANGE(0x7fe00000, 0x7fffffff) AM_MIRROR(0x80000000) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")  /* Program ROM */
+	AM_RANGE(0x00000000, 0x000fffff) AM_RAM       /* Work RAM */
+	AM_RANGE(0x74000000, 0x740000ff) AM_DEVREADWRITE("k001604", k001604_device, reg_r, reg_w)
+	AM_RANGE(0x74010000, 0x7401ffff) AM_RAM_WRITE(jetwave_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x74020000, 0x7403ffff) AM_DEVREADWRITE("k001604", k001604_device, tile_r, tile_w)
+	AM_RANGE(0x74040000, 0x7407ffff) AM_DEVREADWRITE("k001604", k001604_device, char_r, char_w)
+	AM_RANGE(0x78000000, 0x7800ffff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)      /* 21N 21K 23N 23K */
+	AM_RANGE(0x78010000, 0x7801ffff) AM_DEVWRITE("konppc", konppc_device, cgboard_dsp_shared_w_ppc)
+	AM_RANGE(0x78040000, 0x7804000f) AM_DEVREADWRITE("k001006_1", k001006_device, read, write)
+	AM_RANGE(0x78080000, 0x7808000f) AM_DEVREADWRITE("k001006_2", k001006_device, read, write)
+	AM_RANGE(0x780c0000, 0x780c0007) AM_DEVREADWRITE("konppc", konppc_device, cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
+	AM_RANGE(0x7e000000, 0x7e003fff) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
+	AM_RANGE(0x7e008000, 0x7e009fff) AM_DEVREADWRITE8("k056230", k056230_device, read, write, 0xffffffff)             /* LANC registers */
+	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_DEVREADWRITE("k056230", k056230_device, lanc_ram_r, lanc_ram_w)    /* LANC Buffer RAM (27E) */
+	AM_RANGE(0x7e00c000, 0x7e00c00f) AM_DEVREADWRITE8("k056800", k056800_device, host_r, host_w, 0xffffffff)
+	AM_RANGE(0x7f000000, 0x7f3fffff) AM_ROM AM_REGION("user2", 0)
+	AM_RANGE(0x7f800000, 0x7f9fffff) AM_ROM AM_SHARE("share2")
+	AM_RANGE(0x7fe00000, 0x7fffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")  /* Program ROM */
 ADDRESS_MAP_END
 
 
@@ -911,6 +911,8 @@ DRIVER_INIT_MEMBER(zr107_state,common)
 	m_sharc_dataram = std::make_unique<UINT32[]>(0x100000/4);
 	m_led_reg0 = m_led_reg1 = 0x7f;
 	m_ccu_vcth = m_ccu_vctl = 0;
+
+	m_dsp->enable_recompiler();
 }
 
 DRIVER_INIT_MEMBER(zr107_state,zr107)

@@ -14,8 +14,9 @@
 
 #include "pstring.h"
 #include "plists.h"
+#include "putil.h"
 
-PLIB_NAMESPACE_START()
+namespace plib {
 
 /***************************************************************************
     Options
@@ -70,7 +71,7 @@ public:
 
 	virtual int parse(pstring argument) override
 	{
-		if (m_limit.contains(argument))
+		if (plib::container::contains(m_limit, argument))
 		{
 			m_val = argument;
 			return 0;
@@ -82,7 +83,7 @@ public:
 	pstring operator ()() { return m_val; }
 private:
 	pstring m_val;
-	pstring_vector_t m_limit;
+	plib::pstring_vector_t m_limit;
 };
 
 class option_bool : public option
@@ -182,9 +183,8 @@ public:
 	{
 		pstring ret;
 
-		for (std::size_t i=0; i<m_opts.size(); i++ )
+		for (auto & opt : m_opts )
 		{
-			option *opt = m_opts[i];
 			pstring line = "";
 			if (opt->m_short != "")
 				line += "  -" + opt->m_short;
@@ -207,24 +207,24 @@ private:
 
 	option *getopt_short(pstring arg)
 	{
-		for (std::size_t i=0; i < m_opts.size(); i++)
+		for (auto & opt : m_opts)
 		{
-			if (m_opts[i]->m_short == arg)
-				return m_opts[i];
+			if (opt->m_short == arg)
+				return opt;
 		}
 		return nullptr;
 	}
 	option *getopt_long(pstring arg)
 	{
-		for (std::size_t i=0; i < m_opts.size(); i++)
+		for (auto & opt : m_opts)
 		{
-			if (m_opts[i]->m_long == arg)
-				return m_opts[i];
+			if (opt->m_long == arg)
+				return opt;
 		}
 		return nullptr;
 	}
 
-	pvector_t<option *> m_opts;
+	std::vector<option *> m_opts;
 	pstring m_app;
 };
 
@@ -235,6 +235,6 @@ option::option(pstring ashort, pstring along, pstring help, bool has_argument, o
 		parent->register_option(this);
 }
 
-PLIB_NAMESPACE_END()
+}
 
 #endif /* POPTIONS_H_ */

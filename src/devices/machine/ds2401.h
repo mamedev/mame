@@ -30,7 +30,8 @@ protected:
 	enum {
 		SIZE_DATA = 8,
 
-		COMMAND_READROM = 0x33
+		COMMAND_READROM = 0x33,
+		COMMAND_READROM_COMPAT = 0x0f
 	};
 
 	enum {

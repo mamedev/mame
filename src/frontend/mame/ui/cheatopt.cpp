@@ -145,7 +145,10 @@ void menu_cheat::populate()
 		{
 			UINT32 flags;
 			curcheat->menu_text(text, subtext, flags);
-			item_append(text.c_str(), subtext.c_str(), flags, curcheat.get());
+			if (text == MENU_SEPARATOR_ITEM)
+				item_append(menu_item_type::SEPARATOR);
+			else
+				item_append(text.c_str(), subtext.c_str(), flags, curcheat.get());
 		}
 
 		/* add a separator */
@@ -273,10 +276,10 @@ void menu_autofire::populate()
 
 	/* iterate over the input ports and add autofire toggle items */
 	int menu_items = 0;
-	for (ioport_port &port : machine().ioport().ports())
+	for (auto &port : machine().ioport().ports())
 	{
 		bool is_first_button = true;
-		for (ioport_field &field : port.fields())
+		for (ioport_field &field : port.second->fields())
 		{
 			if (field.type() >= IPT_BUTTON1 && field.type() <= IPT_BUTTON16)
 			{

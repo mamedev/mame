@@ -69,6 +69,9 @@ public:
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
+protected:
+	virtual bool custom_mouse_down() override;
+
 private:
 	enum file_selector_entry_type
 	{
@@ -98,6 +101,7 @@ private:
 	bool                        m_has_create;
 	int *                       m_result;
 	file_selector_entry *       m_entrylist;
+	std::string				    m_hover_directory;
 	char                        m_filename_buffer[1024];
 
 	// methods

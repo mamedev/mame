@@ -136,8 +136,7 @@ void dinput_keyboard_device::reset()
 
 dinput_api_helper::dinput_api_helper(int version)
 	: m_dinput(nullptr),
-		m_dinput_version(version),
-		m_pfn_DirectInputCreate("DirectInputCreateW", L"dinput.dll")
+		m_dinput_version(version)
 {
 }
 
@@ -163,18 +162,23 @@ int dinput_api_helper::initialize()
 	else
 #endif
 	{
-		result = m_pfn_DirectInputCreate.initialize();
-		if (result != DI_OK)
-			return result;
+		m_dinput_dll = osd::dynamic_module::open({ "dinput.dll" });
+
+		m_dinput_create_prt = m_dinput_dll->bind<dinput_create_fn>("DirectInputCreateW");
+		if (m_dinput_create_prt == nullptr)
+		{
+			osd_printf_verbose("Legacy DirectInput library dinput.dll is not available\n");
+			return ERROR_DLL_NOT_FOUND;
+		}
 
 		// first attempt to initialize DirectInput at v7
 		m_dinput_version = 0x0700;
-		result = m_pfn_DirectInputCreate(GetModuleHandleUni(), m_dinput_version, m_dinput.GetAddressOf(), nullptr);
+		result = (*m_dinput_create_prt)(GetModuleHandleUni(), m_dinput_version, m_dinput.GetAddressOf(), nullptr);
 		if (result != DI_OK)
 		{
 			// if that fails, try version 5
 			m_dinput_version = 0x0500;
-			result = m_pfn_DirectInputCreate(GetModuleHandleUni(), m_dinput_version, m_dinput.GetAddressOf(), nullptr);
+			result = (*m_dinput_create_prt)(GetModuleHandleUni(), m_dinput_version, m_dinput.GetAddressOf(), nullptr);
 			if (result != DI_OK)
 			{
 				m_dinput_version = 0;
@@ -574,7 +578,7 @@ public:
 		dinput_joystick_device *devinfo;
 		int result = 0;
 
-		if (!win_window_list.empty() && win_window_list.front()->win_has_menu())
+		if (!osd_common_t::s_window_list.empty() && osd_common_t::s_window_list.front()->win_has_menu())
 			cooperative_level = DISCL_BACKGROUND | DISCL_NONEXCLUSIVE;
 
 		// allocate and link in a new device

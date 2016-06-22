@@ -102,7 +102,6 @@ public:
 	DECLARE_PALETTE_INIT(chanbara);
 	UINT32 screen_update_chanbara(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 };
 
 
@@ -372,11 +371,6 @@ WRITE8_MEMBER(chanbara_state::chanbara_ay_out_1_w)
 	//if (data & 0xf8)    printf("chanbara_ay_out_1_w unused bits set %02x\n", data & 0xf8);
 }
 
-WRITE_LINE_MEMBER(chanbara_state::sound_irq)
-{
-	m_maincpu->set_input_line(0, state);
-}
-
 void chanbara_state::machine_start()
 {
 	save_item(NAME(m_scroll));
@@ -412,7 +406,7 @@ static MACHINE_CONFIG_START( chanbara, chanbara_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 12000000/8)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(chanbara_state, sound_irq))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", 0))
 
 
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(chanbara_state, chanbara_ay_out_0_w))

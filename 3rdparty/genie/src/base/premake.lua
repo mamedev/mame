@@ -34,8 +34,7 @@
 		f:close()
 	end
 
-
--- 
+--
 -- Finds a valid premake build file in the specified directory
 -- Used by both the main genie process, and include commands
 --

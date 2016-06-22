@@ -12,8 +12,7 @@
 #include "debugvw.h"
 #include "dvtext.h"
 #include "debugcon.h"
-
-
+#include "debugger.h"
 
 //**************************************************************************
 //  DEBUG VIEW TEXTBUF
@@ -135,7 +134,7 @@ void debug_view_textbuf::view_notify(debug_view_notification type)
 //-------------------------------------------------
 
 debug_view_console::debug_view_console(running_machine &machine, debug_view_osd_update_func osdupdate, void *osdprivate)
-	: debug_view_textbuf(machine, DVT_CONSOLE, osdupdate, osdprivate, *debug_console_get_textbuf())
+	: debug_view_textbuf(machine, DVT_CONSOLE, osdupdate, osdprivate, *machine.debugger().console().get_console_textbuf())
 {
 }
 
@@ -150,6 +149,6 @@ debug_view_console::debug_view_console(running_machine &machine, debug_view_osd_
 //-------------------------------------------------
 
 debug_view_log::debug_view_log(running_machine &machine, debug_view_osd_update_func osdupdate, void *osdprivate)
-	: debug_view_textbuf(machine, DVT_LOG, osdupdate, osdprivate, *debug_errorlog_get_textbuf())
+	: debug_view_textbuf(machine, DVT_LOG, osdupdate, osdprivate, *machine.debugger().console().get_errorlog_textbuf())
 {
 }

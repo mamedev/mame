@@ -4705,6 +4705,28 @@ ROM_END
 
 
 /*
+  Royal Card (Austrian, set 8)
+  Year: 1991.
+  Manufacturer: TAB Austria.
+
+*/
+ROM_START( royalcrdh )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "145-3.bin", 0x8000, 0x8000, CRC(c4da3e95) SHA1(fb7c3652f783a3040e6e08616df102efcb0b4134) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "145-2.bin", 0x0000, 0x8000, CRC(85e77661) SHA1(7d7a765c1bfcfeb9eb91d2519b22d734f20eab24) )
+	ROM_LOAD( "145-1.bin", 0x8000, 0x8000, CRC(41f7a0b3) SHA1(9aff2b8832d2a4f868daa9849a0bfe5e44f88fc0) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
+	ROM_LOAD( "royalcrdh_nvram.bin", 0x0000, 0x0800, CRC(7757d73a) SHA1(997bfbd847d1d21777694331be92a1a5e79e4faf) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "prom.bin", 0x0000, 0x0200, CRC(7e5839e6) SHA1(5e8401d2b236f73cc017a73a369b3b3b821a1deb) )  // borrowed from parent set.
+ROM_END
+
+
+/*
   Royal Card (French)
   Year:         1991
   Manufacturer: TAB Austria
@@ -6545,7 +6567,8 @@ GAMEL( 1991, royalcrde, royalcrd, royalcd1, royalcrd,  driver_device,  0,       
 GAMEL( 1991, royalcrdt, royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (TAB original)",                       0,                       layout_jollycrd )
 GAME(  1991, royalcrdf, royalcrd, royalcd1, royalcrd,  funworld_state, royalcdc, ROT0, "Evona Electronic","Royal Card (Slovak, encrypted)",                  MACHINE_NOT_WORKING )
 GAMEL( 1990, royalcrdg, royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "bootleg",         "Royal Card (Austrian, set 7, CMC C1030 HW)",      0,                       layout_jollycrd ) // big CPLD
-GAMEL( 1991, royalcdfr, royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (French)",                             0,                       layout_jollycrd ) // big CPLD
+GAMEL( 1991, royalcrdh, royalcrd, royalcd2, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 8)",                    0 ,                      layout_jollycrd )
+GAMEL( 1991, royalcdfr, royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (French)",                             0,                       layout_jollycrd )
 GAME(  1993, royalcrdp, royalcrd, cuoreuno, royalcrd,  driver_device,  0,        ROT0, "Digital Dreams",  "Royal Card v2.0 Professional",                    0 )
 GAMEL( 199?, witchryl,  0,        witchryl, witchryl,  driver_device,  0,        ROT0, "Video Klein",     "Witch Royal (Export version 2.1)",                0,                       layout_jollycrd )
 

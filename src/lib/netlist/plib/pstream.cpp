@@ -13,7 +13,7 @@
 #include "pstream.h"
 #include "palloc.h"
 
-PLIB_NAMESPACE_START()
+namespace plib {
 
 // -----------------------------------------------------------------------------
 // pistream: input stream
@@ -21,7 +21,7 @@ PLIB_NAMESPACE_START()
 
 bool pistream::readline(pstring &line)
 {
-	UINT8 c = 0;
+	char c = 0;
 	pstringbuffer buf;
 	if (!this->read(c))
 	{
@@ -363,4 +363,4 @@ pstream::pos_type pomemstream::vtell()
 	return m_pos;
 }
 
-PLIB_NAMESPACE_END()
+}

@@ -69,7 +69,7 @@ Dips:
 
    Easy (A) -> Difficult (D)
 
-Game is controled with 4-direction lever and two buttons
+Game is controlled with 4-direction lever and two buttons
 Coin B is not used
 
 *************************************************************************/
@@ -78,7 +78,6 @@ Coin B is not used
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2203intf.h"
-#include "sound/msm5205.h"
 #include "includes/ashnojoe.h"
 
 READ16_MEMBER(ashnojoe_state::fake_4a00a_r)
@@ -93,7 +92,7 @@ WRITE16_MEMBER(ashnojoe_state::ashnojoe_soundlatch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_soundlatch_status = 1;
-		soundlatch_byte_w(space, 0, data & 0xff);
+		m_soundlatch->write(space, 0, data & 0xff);
 	}
 }
 
@@ -128,7 +127,7 @@ WRITE8_MEMBER(ashnojoe_state::adpcm_w)
 READ8_MEMBER(ashnojoe_state::sound_latch_r)
 {
 	m_soundlatch_status = 0;
-	return soundlatch_byte_r(space, 0);
+	return m_soundlatch->read(space, 0);
 }
 
 READ8_MEMBER(ashnojoe_state::sound_latch_status_r)
@@ -271,12 +270,6 @@ static GFXDECODE_START( ashnojoe )
 	GFXDECODE_ENTRY( "gfx5", 0, tiles16x16_layout, 0, 0x100 )
 GFXDECODE_END
 
-
-WRITE_LINE_MEMBER(ashnojoe_state::ym2203_irq_handler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 WRITE8_MEMBER(ashnojoe_state::ym2203_write_a)
 {
 	/* This gets called at 8910 startup with 0xff before the 5205 exists, causing a crash */
@@ -349,8 +342,10 @@ static MACHINE_CONFIG_START( ashnojoe, ashnojoe_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM2203, 4000000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(ashnojoe_state, ym2203_irq_handler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(ashnojoe_state, ym2203_write_a))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(ashnojoe_state, ym2203_write_b))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)

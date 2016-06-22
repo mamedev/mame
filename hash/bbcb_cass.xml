@@ -34,8 +34,8 @@
 		<year>1984</year>
 		<publisher>Incentive</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="16456">
-				<rom name="1984(incentive).uef" size="16456" crc="10b49713" sha1="1c5dd3dfee444bd4887e79e39b51f60df0a1442e" offset="0" />
+			<dataarea name="cass" size="17087">
+				<rom name="1984(incentive).hq.uef" size="17087" crc="d47c678a" sha1="63403b623d9fb19fa3964ec98db5ce5913c3bd42" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -75,7 +75,7 @@
 
 	<software name="3ddotty">
 		<description>3D Dotty</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Blue Ribbon</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8566">
@@ -101,7 +101,7 @@
 		<publisher>Software Invasion</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="26884">
-				<rom name="3dgrandprix.hq(softwareinvasion).uef" size="26884" crc="9152071f" sha1="4783394728e8238ebbf2f9472cd6770f20a100ae" offset="0" />
+				<rom name="3dgrandprix(softwareinvasion).hq.uef" size="26884" crc="9152071f" sha1="4783394728e8238ebbf2f9472cd6770f20a100ae" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -118,7 +118,7 @@
 	</software>
 
 	<software name="3dmunchybr" cloneof="3dmunchy">
-		<description>3D Munchy (Blue Ribbon Games 1)</description>
+		<description>3D Munchy (Blue Ribbon)</description>
 		<year>1985</year>
 		<publisher>Blue Ribbon</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -235,15 +235,15 @@
 		<year>1983</year>
 		<publisher>Doctor Soft</publisher>
 		<part name="cass1" interface="bbc_cass">
-			<feature name="part_id" value="Joystick"/>
-			<dataarea name="cass" size="7319">
-				<rom name="747-joystick(doctorsoft).uef" size="7319" crc="904248e2" sha1="b948886e3547403763f5a15d946c0930d7c306b8" offset="0" />
+			<feature name="part_id" value="Keyboard"/>
+			<dataarea name="cass" size="10062">
+				<rom name="747-keyboard(doctorsoft).hq.uef" size="10062" crc="b82805da" sha1="0cac98cada87f40fa6bb7a1c2c1f01efdadb70ef" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="bbc_cass">
-			<feature name="part_id" value="Keyboard"/>
-			<dataarea name="cass" size="8981">
-				<rom name="747-keyboard(doctorsoft).uef" size="8981" crc="11c96e96" sha1="337569c285e62ff91043f33b55a580693d483d89" offset="0" />
+			<feature name="part_id" value="Joystick"/>
+			<dataarea name="cass" size="8221">
+				<rom name="747-joystick(doctorsoft).hq.uef" size="8221" crc="a01091b7" sha1="71be30faa1d60bdf0be3f1f65a6056008f7d3ed8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -261,7 +261,7 @@
 
 	<software name="9cardbd2">
 		<description>9 Classic Card and Board Games Vol.2</description>
-		<year>198?</year>
+		<year>1986</year>
 		<publisher>Database</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="38434">
@@ -304,7 +304,7 @@
 	</software>
 
 	<software name="adv1">
-		<description>Adventure 1 - AdventureLand</description>
+		<description>Adventure 1: AdventureLand</description>
 		<year>198?</year>
 		<publisher>Adventure Soft</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -315,8 +315,8 @@
 	</software>
 
 	<software name="adv10">
-		<description>Adventure 10 - Savage Island pt.1</description>
-		<year>198?</year>
+		<description>Adventure 10: Savage Island Part I</description>
+		<year>1984</year>
 		<publisher>Adventure Soft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11827">
@@ -326,8 +326,8 @@
 	</software>
 
 	<software name="adv11">
-		<description>Adventure 11 - Savage Island pt.2</description>
-		<year>198?</year>
+		<description>Adventure 11: Savage Island Part II</description>
+		<year>1984</year>
 		<publisher>Adventure Soft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11726">
@@ -337,7 +337,7 @@
 	</software>
 
 	<software name="adv13">
-		<description>Adventure 13 - Sorceror Claymorgue Castle</description>
+		<description>Adventure 13: Sorceror of Claymorgue Castle</description>
 		<year>198?</year>
 		<publisher>Adventure Soft</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -348,7 +348,7 @@
 	</software>
 
 	<software name="adv2">
-		<description>Adventure 2 - Pirate Adventure</description>
+		<description>Adventure 2: Pirate Adventure</description>
 		<year>198?</year>
 		<publisher>Adventure Soft</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -359,7 +359,7 @@
 	</software>
 
 	<software name="adv3">
-		<description>Adventure 3 - Secret Mission</description>
+		<description>Adventure 3: Secret Mission</description>
 		<year>198?</year>
 		<publisher>Adventure Soft</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -370,7 +370,7 @@
 	</software>
 
 	<software name="adv4">
-		<description>Adventure 4 - Voodoo Castle</description>
+		<description>Adventure 4: Voodoo Castle</description>
 		<year>198?</year>
 		<publisher>Adventure Soft</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -381,7 +381,7 @@
 	</software>
 
 	<software name="adv5">
-		<description>Adventure 5 - The Count</description>
+		<description>Adventure 5: The Count</description>
 		<year>198?</year>
 		<publisher>Adventure Soft</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -392,7 +392,7 @@
 	</software>
 
 	<software name="adv6">
-		<description>Adventure 6 - Strange Odyssey</description>
+		<description>Adventure 6: Strange Odyssey</description>
 		<year>198?</year>
 		<publisher>Adventure Soft</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -403,7 +403,7 @@
 	</software>
 
 	<software name="adv7">
-		<description>Adventure 7 - Mystery Funhouse</description>
+		<description>Adventure 7: Mystery Funhouse</description>
 		<year>198?</year>
 		<publisher>Adventure Soft</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -414,7 +414,7 @@
 	</software>
 
 	<software name="adv8">
-		<description>Adventure 8 - Pyramid of Doom</description>
+		<description>Adventure 8: Pyramid of Doom</description>
 		<year>198?</year>
 		<publisher>Adventure Soft</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -425,7 +425,7 @@
 	</software>
 
 	<software name="adv9">
-		<description>Adventure 9 - Ghost Town</description>
+		<description>Adventure 9: Ghost Town</description>
 		<year>198?</year>
 		<publisher>Adventure Soft</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -435,25 +435,14 @@
 		</part>
 	</software>
 
-	<software name="adventur">
-		<description>Adventure</description>
-		<year>1983</year>
-		<publisher>Micro Power</publisher>
-		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="8639">
-				<rom name="adventure(1983)(micropower).uef" size="8639" crc="53770f29" sha1="5949dc94c31137c0beb996e37b34724e4e71af8c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="advquest">
 		<description>Adventure Quest</description>
-		<year>1983</year>
+		<year>1982</year>
 		<publisher>Level 9 Computing</publisher>
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="20894">
-				<rom name="adventurequest_run(1983)(level9).uef" size="20894" crc="bc15c06a" sha1="2229b5c0f6839858dcd3d404f9f19ba4c1ce7374" offset="0" />
+				<rom name="adventurequest_run(1982)(level9).uef" size="20894" crc="bc15c06a" sha1="2229b5c0f6839858dcd3d404f9f19ba4c1ce7374" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -538,12 +527,12 @@
 
 	<software name="alien8">
 		<description>Alien 8</description>
-		<year>1985</year>
+		<year>1984</year>
 		<publisher>Ultimate</publisher>
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="25390">
-				<rom name="alien8_run.hq(1985)(ultimate).uef" size="25390" crc="6d6066cf" sha1="7b4647e20be8f6f725dbca832732c68b6747d578" offset="0" />
+				<rom name="alien8_run(1984)(ultimate).hq.uef" size="25390" crc="6d6066cf" sha1="7b4647e20be8f6f725dbca832732c68b6747d578" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -584,7 +573,7 @@
 
 	<software name="alienout">
 		<description>Alien From Outta Space</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Incentive</publisher>
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
@@ -607,7 +596,7 @@
 
 	<software name="alphatro">
 		<description>Alphatron</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Tynesoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8027">
@@ -659,11 +648,11 @@
 
 	<software name="androida">
 		<description>Android Attack</description>
-		<year>1983</year>
+		<year>1982</year>
 		<publisher>Computer Concepts</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11738">
-				<rom name="androidattack.hq(1983)(computerconcepts).uef" size="11738" crc="16fd0e82" sha1="6e27511a91bd24c3655477cfae2597b7f32426f7" offset="0" />
+				<rom name="androidattack(1982)(computerconcepts).hq.uef" size="11738" crc="16fd0e82" sha1="6e27511a91bd24c3655477cfae2597b7f32426f7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -733,7 +722,7 @@
 
 	<software name="antix">
 		<description>Antix</description>
-		<year>19??</year>
+		<year>1984</year>
 		<publisher>Voyager</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="2888">
@@ -769,15 +758,26 @@
 		<year>1983</year>
 		<publisher>Software Invasion</publisher>
 		<part name="cass1" interface="bbc_cass">
+			<feature name="part_id" value="Keyboard"/>
+			<dataarea name="cass" size="7259">
+				<rom name="apollo(softwareinvasion).uef" size="7259" crc="787688ed" sha1="185de7feec4555f2d2093e9c18b860239fa71a68" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="bbc_cass">
 			<feature name="part_id" value="Joystick"/>
 			<dataarea name="cass" size="7523">
 				<rom name="apollo-joysticks(softwareinvasion).uef" size="7523" crc="07ebf289" sha1="5543073467915012ee0059e8ef639f9d084378e8" offset="0" />
 			</dataarea>
 		</part>
-		<part name="cass2" interface="bbc_cass">
-			<feature name="part_id" value="Keyboard"/>
-			<dataarea name="cass" size="7259">
-				<rom name="apollo(softwareinvasion).uef" size="7259" crc="787688ed" sha1="185de7feec4555f2d2093e9c18b860239fa71a68" offset="0" />
+	</software>
+
+	<software name="applepie">
+		<description>Apple Pie</description>
+		<year>1984</year>
+		<publisher>Visions</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="7583">
+				<rom name="applepie(1984)(visions).hq.uef" size="7583" crc="837ca83d" sha1="05467e5758e9866f04d83b9364602f0c10bc71c7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -810,15 +810,15 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG14" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="13255">
-				<rom name="arcadians-v1.2(1982)(acornsoft)(g14).uef" size="13255" crc="e8418496" sha1="78c73583c25d54f89d21dbb6564ac4f26c7949b5" offset="0" />
+			<dataarea name="cass" size="13855">
+				<rom name="arcadians-v1.2(1982)(acornsoft)(g14).hq.uef" size="13855" crc="b6d40bfc" sha1="e2c1dbb3093b0abc5459ce11414264e909446ce3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="arearadr">
 		<description>Area Radar Controller</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Software For All</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="3572">
@@ -918,12 +918,12 @@
 
 	<software name="aticatac">
 		<description>Atic Atac</description>
-		<year>1983</year>
+		<year>1984</year>
 		<publisher>Ultimate</publisher>
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="21430">
-				<rom name="aticatac_run.hq(1983)(ultimate).uef" size="21430" crc="a1623ec3" sha1="47f764d0312b3a02027ff398e982d9b11d8464e4" offset="0" />
+				<rom name="aticatac_run(1984)(ultimate).hq.uef" size="21430" crc="a1623ec3" sha1="47f764d0312b3a02027ff398e982d9b11d8464e4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1008,7 +1008,7 @@
 
 	<software name="awari">
 		<description>Awari</description>
-		<year>1983</year>
+		<year>1982</year>
 		<publisher>CSL Microdata</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="2579">
@@ -1061,7 +1061,7 @@
 	<software name="ballistx">
 		<description>Ballistix</description>
 		<year>1989</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="19618">
 				<rom name="ballistix(1989)(superior).uef" size="19618" crc="fcf494c3" sha1="569811addaf66a6285a12370b4a323a45e484282" offset="0" />
@@ -1092,7 +1092,7 @@
 	</software>
 
 	<software name="bananamnbr" cloneof="bananamn">
-		<description>Banana Man (Blue Ribbon Games 1)</description>
+		<description>Banana Man (Blue Ribbon)</description>
 		<year>1985</year>
 		<publisher>Blue Ribbon</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -1103,7 +1103,7 @@
 	</software>
 
 	<software name="bananamn">
-		<description>Banana Man (MRM Software)</description>
+		<description>Banana Man</description>
 		<year>1983</year>
 		<publisher>MRM Software</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -1138,7 +1138,7 @@
 	<software name="barbar2">
 		<description>Barbarian 2</description>
 		<year>1989</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="41212">
 				<rom name="barbarian2(1989)(superior).uef" size="41212" crc="a3a316f8" sha1="3c5b56332584aa80c57df4b23abb5174e6bea7d5" offset="0" />
@@ -1148,8 +1148,8 @@
 
 	<software name="barbar">
 		<description>Barbarian</description>
-		<year>1987</year>
-		<publisher>Superior Software</publisher>
+		<year>1988</year>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Combat Practice"/>
 			<dataarea name="cass" size="24764">
@@ -1178,7 +1178,7 @@
 	<software name="baron">
 		<description>Baron</description>
 		<year>1989</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="23101">
 				<rom name="baron(1989)(superior).uef" size="23101" crc="d0c6807a" sha1="0ea8c2c56236408e1f2a0d8c7bc08af473cbd083" offset="0" />
@@ -1210,7 +1210,7 @@
 
 	<software name="battlefi">
 		<description>Battlefields</description>
-		<year>198?</year>
+		<year>1985</year>
 		<publisher>BBC Soft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="17693">
@@ -1268,8 +1268,8 @@
 		<year>1983</year>
 		<publisher>Lothlorien</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="5499">
-				<rom name="battlezone2000_be(1983)(lothlorien).uef" size="5499" crc="da72a0f3" sha1="aed27242a6fc841b22d36274aa8c4e402c41fb33" offset="0" />
+			<dataarea name="cass" size="5801">
+				<rom name="battlezone2000_be(1983)(lothlorien).hq.uef" size="5801" crc="8986a425" sha1="8c8ec2166248c06a94c62f03d1eda9b0a527cea1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1290,8 +1290,8 @@
 		<year>1984</year>
 		<publisher>Mirrorsoft-Ivan Berg</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="5436">
-				<rom name="mastermindquizmaster_be(1984)(mirrorsoft).uef" size="5436" crc="1cd42c57" sha1="f2c1171a603128cf7f9abc5e32dc9afe41c8e97e" offset="0" />
+			<dataarea name="cass" size="5795">
+				<rom name="mastermindquizmaster_be(1984)(mirrorsoft).hq.uef" size="5795" crc="e3a94ea3" sha1="591f1e6ffd207789fc0c78ee669bf1ec39a7c8a8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1312,8 +1312,8 @@
 		<year>1984</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="26869">
-				<rom name="beachhead(1984)(usgold).uef" size="26869" crc="bd1a32f3" sha1="53b52dbac9c46b8dce8988a77893c140926ef1fb" offset="0" />
+			<dataarea name="cass" size="28012">
+				<rom name="beachhead(1984)(usgold).hq.uef" size="28012" crc="df792695" sha1="dfdaf88f9b2c2a59f369028a27f25c94b1352f2e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1364,11 +1364,11 @@
 
 	<software name="beebtrek">
 		<description>Beebtrek</description>
-		<year>1982</year>
-		<publisher>Epsilon</publisher>
+		<year>1983</year>
+		<publisher>Software For All</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="7168">
-				<rom name="beebtrek(epsilon).uef" size="7168" crc="729eef94" sha1="c6062440f4624d5d217a9a4deb073d45eb5144fe" offset="0" />
+			<dataarea name="cass" size="7235">
+				<rom name="beebtrek_be(softwareforall).uef" size="7235" crc="0d25509e" sha1="512adbb3cb8d1846f06fe9b4474e35ef711bd752" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1458,13 +1458,13 @@
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Original"/>
 			<dataarea name="cass" size="17412">
-				<rom name="blitzkrieg-mono.hq(1984)(softwareinvasion).uef" size="17412" crc="46ae1ea4" sha1="883a581e6f86fb171de30ab8d2fa297030e55de5" offset="0" />
+				<rom name="blitzkrieg-mono(1984)(softwareinvasion).hq.uef" size="17412" crc="46ae1ea4" sha1="883a581e6f86fb171de30ab8d2fa297030e55de5" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="bbc_cass">
 			<feature name="part_id" value="Colour"/>
 			<dataarea name="cass" size="17888">
-				<rom name="blitzkrieg-colour.hq(1984)(softwareinvasion).uef" size="17888" crc="ad7f1f6d" sha1="db85b52b1a775c3f3455e6c7df4640be3a7e62ba" offset="0" />
+				<rom name="blitzkrieg-colour(1984)(softwareinvasion).hq.uef" size="17888" crc="ad7f1f6d" sha1="db85b52b1a775c3f3455e6c7df4640be3a7e62ba" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1581,6 +1581,30 @@
 		</part>
 	</software>
 
+	<software name="boffin">
+		<description>Boffin</description>
+		<year>1985</year>
+		<publisher>Addictive</publisher>
+		<info name="usage" value="Load with *RUN" />
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="20407">
+				<rom name="boffin(addictive).hq.uef" size="20407" crc="b1e0edc3" sha1="4331970dc63c5b81f16dc1cb2f7b60de6f7c7102" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boffin2">
+		<description>Boffin 2</description>
+		<year>1985</year>
+		<publisher>Addictive</publisher>
+		<info name="usage" value="Load with *RUN" />
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="18818">
+				<rom name="boffin2(addictive).hq.uef" size="18818" crc="805b3d92" sha1="0e6918e16f61ebd7159a07fbf3cc9bc952fcb541" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bombbaro">
 		<description>Bomber Baron</description>
 		<year>198?</year>
@@ -1606,7 +1630,7 @@
 	<software name="bonecrunpias" cloneof="bonecrun">
 		<description>Bone Cruncher (Play It Again Sam 7)</description>
 		<year>1989</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="39351">
 				<rom name="bonecruncher-piasrr(1989)(superior).uef" size="39351" crc="0583cf9f" sha1="d7c787af3751a73e733fb492b0df29ef4f47fbab" offset="0" />
@@ -1620,7 +1644,7 @@
 		<publisher>Superior Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="39942">
-				<rom name="bonecruncher.hq(1987)(superior).uef" size="39942" crc="8a58ee25" sha1="636b48be4778819889edf6ad5e6270f69c68cf22" offset="0" />
+				<rom name="bonecruncher(1987)(superior).hq.uef" size="39942" crc="8a58ee25" sha1="636b48be4778819889edf6ad5e6270f69c68cf22" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1670,6 +1694,17 @@
 		</part>
 	</software>
 
+	<software name="bouncera">
+		<description>Bouncer (A&amp;F)</description>
+		<year>1983</year>
+		<publisher>A&amp;F Software</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="6555">
+				<rom name="bouncer(1983)(anf).uef" size="6555" crc="b9c30b2d" sha1="135397e43a7c30dd2b1b798fe5b50f216807f92e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bbsb">
 		<description>Bounty Bob Strikes Back</description>
 		<year>1986</year>
@@ -1687,15 +1722,15 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG31" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="9143">
-				<rom name="boxer-v1(1984)(acornsoft)(g31).uef" size="9143" crc="9b78d174" sha1="47b0b4e13eafcf5fd48064c787cd046a29620093" offset="0" />
+			<dataarea name="cass" size="9597">
+				<rom name="boxer-v1(1984)(acornsoft)(g31).hq.uef" size="9597" crc="c07d0c6a" sha1="403eccc2ece08f217bc2cb0e049497b3a6e16c45" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="bozobrav">
 		<description>Bozo the Brave</description>
-		<year>198?</year>
+		<year>1985</year>
 		<publisher>Tynesoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="4944">
@@ -1717,7 +1752,7 @@
 
 	<software name="brainsto">
 		<description>Brainstorm</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Virgin Games</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6492">
@@ -1743,8 +1778,8 @@
 		<year>1987</year>
 		<publisher>CDS</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="15364">
-				<rom name="briancloughsfootballfortunes_be(1987)(cds).uef" size="15364" crc="dcb909b0" sha1="6a7c00520ec5dd83e0021a5d171782690c4227e2" offset="0" />
+			<dataarea name="cass" size="16127">
+				<rom name="briancloughsfootballfortunes_be(1987)(cds).hq.uef" size="16127" crc="62138dd3" sha1="2defebeb2d0d579402b50c3f1226982f6c2b6a0b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1803,8 +1838,8 @@
 	</software>
 
 	<software name="boogiecl">
-		<description>Broadway Boogie and Classics</description>
-		<year>19??</year>
+		<description>The Broadway Boogie and Classics</description>
+		<year>1983</year>
 		<publisher>Broadway Electronics</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6979">
@@ -1830,7 +1865,7 @@
 		<publisher>Tynesoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="107175">
-				<rom name="buffalobillsrodeogames.hq(1989)(tynesoft).uef" size="107175" crc="25995673" sha1="8e1e22036760115efb02a03074212f49cc82107c" offset="0" />
+				<rom name="buffalobillsrodeogames(1989)(tynesoft).hq.uef" size="107175" crc="25995673" sha1="8e1e22036760115efb02a03074212f49cc82107c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1849,7 +1884,7 @@
 	<software name="bugblastpias" cloneof="bugblast">
 		<description>Bug Blaster (Play It Again Sam 5)</description>
 		<year>1987</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="13216">
 				<rom name="bugblaster-piasrr.uef" size="13216" crc="7ff89d95" sha1="e13bd6ca7eca09db5648fb6d472a6decb8c04332" offset="0" />
@@ -1858,7 +1893,7 @@
 	</software>
 
 	<software name="bugblast">
-		<description>Bug Blaster (Alligata)</description>
+		<description>Bug Blaster</description>
 		<year>1983</year>
 		<publisher>Alligata</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -1875,6 +1910,17 @@
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7217">
 				<rom name="bugbomb(1983)(virgin).uef" size="7217" crc="ad5601cd" sha1="87ff6d035c42508475d688468976585ccea2e0da" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bugeyes">
+		<description>Bug Eyes</description>
+		<year>1985</year>
+		<publisher>Icon</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="14950">
+				<rom name="bugeyes(1985)(icon).hq.uef" size="14950" crc="9bb1493d" sha1="7f70adb2a0db3fa59c59a4e35433675e39cb29d0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1926,7 +1972,7 @@
 	<software name="camelot">
 		<description>Camelot</description>
 		<year>1989</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="17376">
 				<rom name="camelot(1989)(superior).uef" size="17376" crc="1e6f100f" sha1="b6109427e4d07d7b8ec9544a0d7a90324ac5991c" offset="0" />
@@ -1951,8 +1997,8 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG24" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="9733">
-				<rom name="carousel-v1.1(1983)(acornsoft)(g24).uef" size="9733" crc="c8937c86" sha1="064c5a26c72af93f1905d473d94154b739faa74e" offset="0" />
+			<dataarea name="cass" size="10211">
+				<rom name="carousel-v1.1(1983)(acornsoft)(g24).hq.uef" size="10211" crc="8913b693" sha1="34e19ba7410b9c4844846708bec4df0e7a51f9f9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1970,19 +2016,8 @@
 		</part>
 	</software>
 
-	<software name="cascad50">
-		<description>Cascade 50</description>
-		<year>198?</year>
-		<publisher>Cascade</publisher>
-		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="37743">
-				<rom name="cascade50(cascade).uef" size="37743" crc="340ab359" sha1="d59f04c761df80c319d5f9bb6bf41aa6879e0422" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="castlassbr" cloneof="castlass">
-		<description>Castle Assault (Blue Ribbon Games 1)</description>
+		<description>Castle Assault (Blue Ribbon)</description>
 		<year>1985</year>
 		<publisher>Blue Ribbon</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -2060,8 +2095,8 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG17" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="15634">
-				<rom name="castleofriddles-v1.0(1982)(acornsoft)(g17).uef" size="15634" crc="f61d67f7" sha1="404dfc37c0876d79c7d57c7137943e4916119e25" offset="0" />
+			<dataarea name="cass" size="16355">
+				<rom name="castleofriddles-v1.0(1982)(acornsoft)(g17).hq.uef" size="16355" crc="6edb4268" sha1="bd5dac8ec39900ec16310159630a15d03fb03143" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2084,7 +2119,7 @@
 		<publisher>Micro Power</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="14000">
-				<rom name="castlequest.hq(1985)(micropower).uef" size="14000" crc="25703678" sha1="2c5e42df9c3cde45ac7bae77df78fb80ded5e00a" offset="0" />
+				<rom name="castlequest(1985)(micropower).hq.uef" size="14000" crc="25703678" sha1="2c5e42df9c3cde45ac7bae77df78fb80ded5e00a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2117,7 +2152,7 @@
 		<publisher>Icon</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11629">
-				<rom name="cavemancapers.hq(1985)(icon).uef" size="11629" crc="396023ce" sha1="eb6191291bb1a731d539829510a36df182d6261c" offset="0" />
+				<rom name="cavemancapers(1985)(icon).hq.uef" size="11629" crc="396023ce" sha1="eb6191291bb1a731d539829510a36df182d6261c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2337,12 +2372,12 @@
 
 	<software name="chessmp">
 		<description>Chess (Micro Power)</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Micro Power</publisher>
 		<info name="usage" value="Load with *LOAD" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="5703">
-				<rom name="chess_starload_run(micropower).uef" size="5703" crc="636822b3" sha1="4074c9fdbd80d2322ee0f7e88d8e8b314d854900" offset="0" />
+			<dataarea name="cass" size="6502">
+				<rom name="chess_starload_run(micropower).hq.uef" size="6502" crc="a4907b9d" sha1="56a2e8a18f45e172fffe1e53ba5764a2b4a9bf65" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2383,18 +2418,18 @@
 
 	<software name="chipbust">
 		<description>Chip Buster</description>
-		<year>198?</year>
+		<year>1985</year>
 		<publisher>Software Invasion</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="12858">
-				<rom name="chipbuster.hq(softwareinvasion).uef" size="12858" crc="c59d5176" sha1="07dbb0c12831ddc952144474ee52ecf6aa029027" offset="0" />
+				<rom name="chipbuster(softwareinvasion).hq.uef" size="12858" crc="c59d5176" sha1="07dbb0c12831ddc952144474ee52ecf6aa029027" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="ccracker">
 		<description>Christmas Crackers</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Database</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="22589">
@@ -2450,7 +2485,7 @@
 	<software name="citadelpias" cloneof="citadel">
 		<description>Citadel (Play It Again Sam 1)</description>
 		<year>1987</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="23868">
 				<rom name="citadel-piasrr(198x)(superior).uef" size="23868" crc="17f562ba" sha1="311a29c73c832bc9e0f52c85acdd43de873531e9" offset="0" />
@@ -2464,7 +2499,7 @@
 		<publisher>Superior Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="27731">
-				<rom name="citadel.hq(1985)(superior).uef" size="27731" crc="8d08e441" sha1="8ce009ea3cdb8cd1fcab43f48570112fc33f9450" offset="0" />
+				<rom name="citadel(1985)(superior).hq.uef" size="27731" crc="8d08e441" sha1="8ce009ea3cdb8cd1fcab43f48570112fc33f9450" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2522,6 +2557,17 @@
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="15315">
 				<rom name="classicadventure_run_be(1984)(melbourne).uef" size="15315" crc="490129e0" sha1="5ba069331d5816d2785a0ccf5fcea38d2d0f2b1b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ccompend">
+		<description>Classic Compendium</description>
+		<year>1984</year>
+		<publisher>Database</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="33225">
+				<rom name="classiccompendium(database).uef" size="33225" crc="abdb4372" sha1="75a838ef5fed82c85e8ea0a6d640162944ac905d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2584,18 +2630,18 @@
 
 	<software name="colossal">
 		<description>Colossal Adventure</description>
-		<year>1983</year>
+		<year>1982</year>
 		<publisher>Level 9 Computing</publisher>
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="21065">
-				<rom name="colossaladventure_run(1983)(level9).uef" size="21065" crc="e37d6b8b" sha1="9fafa146c6a4a83f57a4f617e8970227a6240466" offset="0" />
+				<rom name="colossaladventure_run(1982)(level9).uef" size="21065" crc="e37d6b8b" sha1="9fafa146c6a4a83f57a4f617e8970227a6240466" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="colos4br">
-		<description>Colossus 4 Bridge</description>
+		<description>Colossus Bridge 4</description>
 		<year>1988</year>
 		<publisher>CDS</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -2606,8 +2652,8 @@
 	</software>
 
 	<software name="colos4ch">
-		<description>Colossus 4 Chess</description>
-		<year>1988</year>
+		<description>Colossus Chess 4</description>
+		<year>1986</year>
 		<publisher>CDS</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="37519">
@@ -2622,8 +2668,8 @@
 		<publisher>Durell</publisher>
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="19331">
-				<rom name="combatlynx_run(1984)(durell).uef" size="19331" crc="55d37424" sha1="368b8bd73533a11ebb3e4f9ef29f3b9ae0c7f997" offset="0" />
+			<dataarea name="cass" size="20586">
+				<rom name="combatlynx_run(1984)(durell).hq.uef" size="20586" crc="359edcbd" sha1="2725b4c010a9f1f51162eb7fdf9b1607c89be5a9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2646,6 +2692,102 @@
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="54792">
 				<rom name="commonwealthgames(1986)(tynesoft).uef" size="54792" crc="f1de4566" sha1="cc609be559d4429cd72c02d566b93f48c4ee6f4d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="complbbc">
+		<description>The Complete BBC</description>
+		<year>1986</year>
+		<publisher>Audiogenic</publisher>
+		<part name="cass1" interface="bbc_cass">
+			<feature name="part_id" value="The Genesis Project"/>
+			<dataarea name="cass" size="18025">
+				<rom name="genesisproject-cbbcrr(audiogenic).hq.uef" size="18025" crc="cac6f8fd" sha1="fbf10b9c12bd666c2391a0a9efb81b3eea33700e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="bbc_cass">
+			<feature name="part_id" value="Flip!"/>
+			<dataarea name="cass" size="14503">
+				<rom name="flip-cbbcrr(audiogenic).hq.uef" size="14503" crc="949edfad" sha1="0b1dc01f965976ccca8524638b3c9433abe2d942" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="bbc_cass">
+			<feature name="part_id" value="Chrysalis"/>
+			<dataarea name="cass" size="10396">
+				<rom name="chrysalis-cbbcrr(audiogenic).hq.uef" size="10396" crc="18c518f4" sha1="73a1bae9dc27ed13d5b939ccc5b3ce5c14484397" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass4" interface="bbc_cass">
+			<feature name="part_id" value="Drain Mania"/>
+			<dataarea name="cass" size="18294">
+				<rom name="drainmania-cbbcrr(audiogenic).hq.uef" size="18294" crc="b4125d46" sha1="a660ef1ee06903878b05dfd0ed6debdd1f5050a4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass5" interface="bbc_cass">
+			<feature name="part_id" value="Space Agent Zelda"/>
+			<dataarea name="cass" size="16470">
+				<rom name="spaceagentzelda-cbbcrr(audiogenic).hq.uef" size="16470" crc="0684845c" sha1="db97c4c7678cc189b526d0ddaf61b4f2be9fc530" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass6" interface="bbc_cass">
+			<feature name="part_id" value="Bug Eyes II"/>
+			<dataarea name="cass" size="20741">
+				<rom name="bugeyes2-cbbcrr(audiogenic).hq.uef" size="20741" crc="1cc48d48" sha1="45ca12cc80b3cc5437cb7989c1ecba2c25cef108" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass7" interface="bbc_cass">
+			<feature name="part_id" value="International Megasports"/>
+			<dataarea name="cass" size="43796">
+				<rom name="internationalmegasports-cbbcrr(audiogenic).hq.uef" size="43796" crc="88e82286" sha1="dd939390e73440f52c1c2d155a6e5747969052e9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="complbbca" cloneof="complbbc">
+		<description>The Complete BBC (alt)</description>
+		<year>1986</year>
+		<publisher>Audiogenic</publisher>
+		<part name="cass1" interface="bbc_cass">
+			<feature name="part_id" value="The Genesis Project, Flip!"/>
+			<dataarea name="cass" size="25966">
+				<rom name="thecompletebbc_1a(audiogenic).hq.uef" size="25966" crc="3443fd24" sha1="089704e8d15ba7479badeca2d41fc0475c6067aa" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="bbc_cass">
+			<feature name="part_id" value="Chrysalis, Drain Mania"/>
+			<dataarea name="cass" size="22551">
+				<rom name="thecompletebbc_1b(audiogenic).hq.uef" size="22551" crc="be2d6a0d" sha1="f8e3d576ee2cd1ed12254fff35c68dba0b58be33" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="bbc_cass">
+			<feature name="part_id" value="Space Agent Zelda, Bug Eyes II"/>
+			<dataarea name="cass" size="29110">
+				<rom name="thecompletebbc_2a(audiogenic).hq.uef" size="29110" crc="4e45ae7c" sha1="5b968ab90e118af77300d873acc73f9b137083b1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass4" interface="bbc_cass">
+			<feature name="part_id" value="International Megasports"/>
+			<dataarea name="cass" size="43984">
+				<rom name="thecompletebbc_2b(audiogenic).hq.uef" size="43984" crc="d1b15f1b" sha1="9cb346f5b0906dfda299e4e03c532fa780948bb6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="comphits">
+		<description>10 Computer Hits</description>
+		<year>1985</year>
+		<publisher>Beau Jolly</publisher>
+		<part name="cass1" interface="bbc_cass">
+			<feature name="part_id" value="Tape A"/>
+			<dataarea name="cass" size="65055">
+				<rom name="computerhits_a(beaujolly).uef" size="65055" crc="0fb75eed" sha1="ead34cf5809d75f6e638a0a8174ac9c2e1824763" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="bbc_cass">
+			<feature name="part_id" value="Tape B"/>
+			<dataarea name="cass" size="54682">
+				<rom name="computerhits_b(beaujolly).uef" size="54682" crc="c1c5bced" sha1="ef507f7d6ca3278ae5d418b430cb8ebfb9696586" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2711,8 +2853,9 @@
 
 	<software name="concentr">
 		<description>Concentration</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>ASP Software</publisher>
+		<info name="compatibility" value="Stack Lightpen" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="2746">
 				<rom name="concentration(asp).uef" size="2746" crc="d78751e2" sha1="fb4e8ca797467ad3d2a85deb1d1171880ccf8e77" offset="0" />
@@ -2766,7 +2909,7 @@
 
 	<software name="conquere">
 		<description>Conquering Everest</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>ASP Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6475">
@@ -2799,11 +2942,11 @@
 
 	<software name="contrapt">
 		<description>Contraption</description>
-		<year>198?</year>
+		<year>1985</year>
 		<publisher>Icon</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="12484">
-				<rom name="contraption.hq(icon).uef" size="12484" crc="7cacff1b" sha1="45757596348c71bfda8f7fd9ba04f7fb35e1a0a6" offset="0" />
+				<rom name="contraption(icon).hq.uef" size="12484" crc="7cacff1b" sha1="45757596348c71bfda8f7fd9ba04f7fb35e1a0a6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2863,10 +3006,28 @@
 		</part>
 	</software>
 
+	<software name="cosmicbz">
+		<description>Cosmic Battlezones</description>
+		<year>1986</year>
+		<publisher>Ultimate</publisher>
+		<part name="cass1" interface="bbc_cass">
+			<feature name="part_id" value="Alien 8, Lunar Jetman"/>
+			<dataarea name="cass" size="51803">
+				<rom name="cosmicbattlezones-a(ultimate).hq.uef" size="51803" crc="32232645" sha1="50a1b19853db7d86a3dd53b9c97e82e30f3cf46e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="bbc_cass">
+			<feature name="part_id" value="Jet-Pac"/>
+			<dataarea name="cass" size="11189">
+				<rom name="cosmicbattlezones-b(ultimate).hq.uef" size="11189" crc="133dcbc5" sha1="94efdb6454e7dbdbb2c670b1ac903b61b5f5a71b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cosmicca">
 		<description>Cosmic Camouflage</description>
 		<year>1988</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="12581">
 				<rom name="cosmiccamouflage(1988)(superior).uef" size="12581" crc="4f53d6c3" sha1="4f200b9dc8bf3cd39011683658ef0668f5142d36" offset="0" />
@@ -2960,7 +3121,7 @@
 	</software>
 
 	<software name="cowboysh">
-		<description>Cowboy Shootout</description>
+		<description>Cowboy Shoot-Out</description>
 		<year>1983</year>
 		<publisher>Micro Power</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -3032,8 +3193,8 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG26" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="8535">
-				<rom name="crazytracer-v1.1(1983)(acornsoft)(g26).uef" size="8535" crc="e21bdd04" sha1="bdcc817714497541709582029c3e30be4a61488d" offset="0" />
+			<dataarea name="cass" size="8992">
+				<rom name="crazytracer-v1.1(1983)(acornsoft)(g26).hq.uef" size="8992" crc="4d8c7702" sha1="3ab3695d6c339263b493c1d209911969290ec6cc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3051,12 +3212,23 @@
 
 	<software name="cribbage">
 		<description>Cribbage</description>
-		<year>198?</year>
+		<year>1982</year>
 		<publisher>Superior Software</publisher>
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8336">
-				<rom name="cribbage-superior_run(198x)(superior).uef" size="8336" crc="3fb92e36" sha1="7bb0139b4983f29e78bc3cb23f3eaf95936ef61a" offset="0" />
+				<rom name="cribbage-superior_run(1982)(superior).uef" size="8336" crc="3fb92e36" sha1="7bb0139b4983f29e78bc3cb23f3eaf95936ef61a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cricket">
+		<description>Cricket</description>
+		<year>1986</year>
+		<publisher>Bug Byte</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="11598">
+				<rom name="cricket_be.uef" size="11598" crc="1fb0a611" sha1="6d9bd3a2c9b4bfbc0b16a482afaff08b03472947" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3064,7 +3236,8 @@
 	<software name="crimedet">
 		<description>Crime &amp; Detection Quiz</description>
 		<year>1983</year>
-		<publisher>Ivan Berg</publisher>
+		<publisher>Acornsoft/Ivan Berg</publisher>
+		<info name="release" value="XBX02" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="56292">
 				<rom name="crimedetectionquiz_be(1983)(ivanberg).uef" size="56292" crc="1af0f115" sha1="805e3c0cef96a294851909a25c5b9feb35dbcc06" offset="0" />
@@ -3086,7 +3259,7 @@
 
 	<software name="croakit">
 		<description>CroakIt</description>
-		<year>19??</year>
+		<year>1983</year>
 		<publisher>Kerian</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6765">
@@ -3120,11 +3293,11 @@
 
 	<software name="ccastles">
 		<description>Crystal Castles</description>
-		<year>1983</year>
-		<publisher>Atarisoft</publisher>
+		<year>1986</year>
+		<publisher>U.S. Gold</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="12517">
-				<rom name="crystalcastles(1983)(atarisoft).uef" size="12517" crc="e1c85f00" sha1="c754494c043e4f520ab23449b55d2ec1d669cbb7" offset="0" />
+			<dataarea name="cass" size="13243">
+				<rom name="crystalcastles(1986)(usgold).hq.uef" size="13243" crc="7af24d1e" sha1="365a868c76b02e588d284f6e255b4e996e68726c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3135,8 +3308,8 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG08" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="5883">
-				<rom name="cubemaster-v1.0(1982)(acornsoft)(g08).uef" size="5883" crc="0f4a40f6" sha1="bcf0b137a5dcc2e56d10c847d4c372abbe171c44" offset="0" />
+			<dataarea name="cass" size="6221">
+				<rom name="cubemaster-v1.0(1982)(acornsoft)(g08).hq.uef" size="6221" crc="e60e7b95" sha1="f509a70b0a20179a0ed41de987d536251cc94443" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3161,7 +3334,7 @@
 
 	<software name="cutter">
 		<description>Cutter</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>Voyager</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="2456">
@@ -3184,7 +3357,7 @@
 	<software name="cyborgwa">
 		<description>Cyborg Warriors</description>
 		<year>1991</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="15828">
 				<rom name="cyborgwarriors(1991)(superior).uef" size="15828" crc="8b045a6d" sha1="2bca1ba957f397c4ca0a2d59d84076e6379e7d05" offset="0" />
@@ -3205,18 +3378,18 @@
 
 	<software name="cylonatt">
 		<description>Cylon Attack (A&amp;F Software)</description>
-		<year>1985</year>
+		<year>1983</year>
 		<publisher>A&amp;F Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="18919">
-				<rom name="cylonattack(1985)(anf).uef" size="18919" crc="3d7ae8af" sha1="c16c085962919b53a3ea1562723cdcc6e6e228ca" offset="0" />
+				<rom name="cylonattack(1983)(anf).uef" size="18919" crc="3d7ae8af" sha1="c16c085962919b53a3ea1562723cdcc6e6e228ca" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="cyloninv">
 		<description>Cylon Invasion</description>
-		<year>19??</year>
+		<year>1985</year>
 		<publisher>Tynesoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6307">
@@ -3278,17 +3451,17 @@
 
 	<software name="dddenis">
 		<description>Daredevil Denis</description>
-		<year>1984</year>
+		<year>1983</year>
 		<publisher>Visions</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7221">
-				<rom name="daredevildenis(1984)(visions).uef" size="7221" crc="ad6b8ce9" sha1="2bc29ffec282b0109a3dd0a9566863381677fb68" offset="0" />
+				<rom name="daredevildenis(1983)(visions).uef" size="7221" crc="ad6b8ce9" sha1="2bc29ffec282b0109a3dd0a9566863381677fb68" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="dartsbr" cloneof="dartsmrm">
-		<description>Darts (Blue Ribbon Games 2)</description>
+		<description>Darts (Blue Ribbon)</description>
 		<year>1985</year>
 		<publisher>Blue Ribbon</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -3300,7 +3473,7 @@
 
 	<software name="dartsmrm">
 		<description>Darts (MRM Software)</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>MRM Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6917">
@@ -3323,7 +3496,8 @@
 	<software name="datingga">
 		<description>The Dating Game</description>
 		<year>1983</year>
-		<publisher>Ivan Berg</publisher>
+		<publisher>Acornsoft/Ivan Berg</publisher>
+		<info name="release" value="XBX08" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="18349">
 				<rom name="datinggame_be(1983)(ivanberg).uef" size="18349" crc="d85ba7f9" sha1="f876136f0025e31dc41cda98e63c188b5ee6f868" offset="0" />
@@ -3376,12 +3550,12 @@
 	</software>
 
 	<software name="deathsta">
-		<description>Death Star (Superior Software)</description>
+		<description>Death Star</description>
 		<year>1985</year>
 		<publisher>Superior Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="9015">
-				<rom name="deathstar.hq(1985)(superior).uef" size="9015" crc="548baef5" sha1="ab0c00d48608b01ea7623958443be1e13323f829" offset="0" />
+				<rom name="deathstar(1985)(superior).hq.uef" size="9015" crc="548baef5" sha1="ab0c00d48608b01ea7623958443be1e13323f829" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3392,8 +3566,8 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG02 (deleted)" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="8358">
-				<rom name="defender-v1.0(1982)(acornsoft)(g02).uef" size="8358" crc="d981bff4" sha1="4a38d349f4b23cc7983e1537c85ec89bb8df22d6" offset="0" />
+			<dataarea name="cass" size="8769">
+				<rom name="defender-v1.0(1982)(acornsoft)(g02).hq.uef" size="8769" crc="304d2ac1" sha1="baa22e1daa9b47ad87d73675770e6d7432bc0b5e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3471,7 +3645,7 @@
 
 	<software name="denisdri">
 		<description>Denis Through the Drinking Glass</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>ASS</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="18952">
@@ -3482,7 +3656,7 @@
 
 	<software name="dmfinsbu">
 		<description>Depot Master Finsbury Park</description>
-		<year>198?</year>
+		<year>1989</year>
 		<publisher>Ashley Greenup</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7563">
@@ -3493,7 +3667,7 @@
 
 	<software name="dmoldoak">
 		<description>Depot Master Old Oak Common</description>
-		<year>198?</year>
+		<year>1989</year>
 		<publisher>Ashley Greenup</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7612">
@@ -3536,7 +3710,7 @@
 	</software>
 
 	<software name="diaminebr" cloneof="diamine">
-		<description>Diamond Mine (Blue Ribbon Games 2)</description>
+		<description>Diamond Mine (Blue Ribbon)</description>
 		<year>1985</year>
 		<publisher>Blue Ribbon</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -3571,8 +3745,8 @@
 
 	<software name="dictator">
 		<description>Dictator</description>
-		<year>198?</year>
-		<publisher>DK Tronics</publisher>
+		<year>1983</year>
+		<publisher>DK'Tronics</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10527">
 				<rom name="dictator(dktronics).uef" size="10527" crc="f4cbe5f0" sha1="6e9d5e8a3528653f5288f29d4cc28dcc06acf8aa" offset="0" />
@@ -3642,7 +3816,7 @@
 
 	<software name="drwhoadv">
 		<description>Doctor Who The First Adventure</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>BBC Soft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="23359">
@@ -3730,7 +3904,7 @@
 
 	<software name="dragonri">
 		<description>Dragon Rider</description>
-		<year>198?</year>
+		<year>1982</year>
 		<publisher>Salamander</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="4602">
@@ -3741,7 +3915,7 @@
 
 	<software name="dragonst">
 		<description>Dragons Tooth</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Incentive</publisher>
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
@@ -3764,7 +3938,7 @@
 
 	<software name="draughtc">
 		<description>Draughts (Computer Concepts)</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Computer Concepts</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="9292">
@@ -3775,7 +3949,7 @@
 
 	<software name="draughtl">
 		<description>Draughts (Logic Systems)</description>
-		<year>198?</year>
+		<year>1982</year>
 		<publisher>Logic Systems</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6229">
@@ -3834,8 +4008,8 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG27" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="7979">
-				<rom name="drogna-v1(1983)(acornsoft)(g27).uef" size="7979" crc="24ef9bab" sha1="cd41f48683b11593598f59b611df6380f2aab9fc" offset="0" />
+			<dataarea name="cass" size="8522">
+				<rom name="drogna-v1(1983)(acornsoft)(g27).hq.uef" size="8522" crc="4765c978" sha1="d3879bd200acbce1b3e14b3faa7c4f633ac0c657" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3862,13 +4036,24 @@
 		</part>
 	</software>
 
+	<software name="duneridr">
+		<description>Dune Rider</description>
+		<year>1984</year>
+		<publisher>Micro Power</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="10598">
+				<rom name="dunerider(micropower).hq.uef" size="10598" crc="f1f80934" sha1="09cfce8e35d4da7d51ee31e8254978a6fda0e4bb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dungadv">
 		<description>Dungeon Adventure</description>
-		<year>1983</year>
+		<year>1982</year>
 		<publisher>Level 9 Computing</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="22300">
-				<rom name="dungeonadventure(1983)(level9).uef" size="22300" crc="593b40ed" sha1="d4373b44daf53b009693ba8ce0abd601ee2e03ba" offset="0" />
+				<rom name="dungeonadventure(1982)(level9).uef" size="22300" crc="593b40ed" sha1="d4373b44daf53b009693ba8ce0abd601ee2e03ba" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3913,6 +4098,17 @@
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11553">
 				<rom name="eagleswing-smash7(softwareinvasion).uef" size="11553" crc="5048b199" sha1="360c70238e234327f8cc70779c1d2a401415a09e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="earlylrn">
+		<description>Early Learning</description>
+		<year>1982</year>
+		<publisher>BBC Soft</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="22920">
+				<rom name="earlylearning(bbc).uef" size="22920" crc="2b12f60e" sha1="fbb34b25ef306e9fbd0d43d00d3563a74dfa1f11" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4009,7 +4205,7 @@
 	<software name="elixirpias" cloneof="elixir">
 		<description>Elixir (Play It Again Sam 5)</description>
 		<year>1987</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="21763">
 				<rom name="elixir-piasrr(198x)(superior).uef" size="21763" crc="0b6e2dd5" sha1="f5f06716249f4661c4577fa22042a45b8c2c4afa" offset="0" />
@@ -4020,7 +4216,7 @@
 	<software name="elixir">
 		<description>Elixir</description>
 		<year>1987</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="20820">
 				<rom name="elixir(1987)(superior).uef" size="20820" crc="cb6193fa" sha1="932099e8c93d2d377f1b9d587ab0ba7ea78f85b5" offset="0" />
@@ -4067,7 +4263,7 @@
 		<publisher>Domark</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="18043">
-				<rom name="empirestrikesback.hq(1988)(domark).uef" size="18043" crc="19ef4de5" sha1="7c28923b70575d435981054144222173c719cf3b" offset="0" />
+				<rom name="empirestrikesback(1988)(domark).hq.uef" size="18043" crc="19ef4de5" sha1="7c28923b70575d435981054144222173c719cf3b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4120,9 +4316,16 @@
 		<description>Estra</description>
 		<year>198?</year>
 		<publisher>Firebird</publisher>
-		<part name="cass" interface="bbc_cass">
+		<part name="cass1" interface="bbc_cass">
+			<feature name="part_id" value="Game and Instructions"/>
 			<dataarea name="cass" size="18898">
-				<rom name="estra.hq(firebird).uef" size="18898" crc="29c86513" sha1="2f2307ef8cf926dc6188e6df2e25160c5472fde4" offset="0" />
+				<rom name="estra_1(firebird).hq.uef" size="18898" crc="29c86513" sha1="2f2307ef8cf926dc6188e6df2e25160c5472fde4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="bbc_cass">
+			<feature name="part_id" value="Game Only"/>
+			<dataarea name="cass" size="18898">
+				<rom name="estra_2(firebird).hq.uef" size="17831" crc="e2bd3fdb" sha1="83f34a06244e9fbc96bd1dcfb400a5eb56385f45" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4185,7 +4388,7 @@
 	<software name="exile">
 		<description>Exile</description>
 		<year>1988</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="48452">
 				<rom name="exile(1988)(superior).uef" size="48452" crc="d72d2068" sha1="5f39b737b2e29f6c53de7452e323a5383711f3e2" offset="0" />
@@ -4205,12 +4408,30 @@
 	</software>
 
 	<software name="eyezolto">
-		<description>Eye of Zolton</description>
-		<year>198?</year>
+		<description>The Eye of Zolton</description>
+		<year>1983</year>
 		<publisher>Softek</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="14263">
 				<rom name="eyeofzolton_be(softek).uef" size="14263" crc="164729a6" sha1="0a8e7b9a15abec0295222fef1db87317cb798fd4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fabfour1">
+		<description>Fab Four Vol.1</description>
+		<year>1989</year>
+		<publisher>Audiogenic</publisher>
+		<part name="cass1" interface="bbc_cass">
+			<feature name="part_id" value="Sphere of Destiny 2 / Omega Orb"/>
+			<dataarea name="cass" size="42751">
+				<rom name="fabfour_vol1a(1989)(asl).uef" size="42751" crc="45edc334" sha1="a63b2aba9b2e5f9b44d99539e15c24b06dc34587" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="bbc_cass">
+			<feature name="part_id" value="Psycastria / Thunderstruck 2"/>
+			<dataarea name="cass" size="40955">
+				<rom name="fabfour_vol1b(1989)(asl).uef" size="40955" crc="dfa9e94c" sha1="af190e0214b96b6396c3e708920c0d52dbcc49c9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4262,7 +4483,7 @@
 
 	<software name="fallofro">
 		<description>Fall of Rome</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>ASP Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11119">
@@ -4288,7 +4509,7 @@
 		<publisher>Firebird</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="25563">
-				<rom name="fatmansam.hq(1985)(firebird).uef" size="25563" crc="d7a8aa6b" sha1="44b63db51f4e13818f71be12fab1c0bbbfdbbc6e" offset="0" />
+				<rom name="fatmansam(1985)(firebird).hq.uef" size="25563" crc="d7a8aa6b" sha1="44b63db51f4e13818f71be12fab1c0bbbfdbbc6e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4309,8 +4530,8 @@
 		<year>1983</year>
 		<publisher>Micro Power</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="8088">
-				<rom name="felixinthefactory(1983)(micropower).uef" size="8088" crc="4f632fb3" sha1="7c47b276dce5f0bee3814e8fe1f30b95b794d9b3" offset="0" />
+			<dataarea name="cass" size="9156">
+				<rom name="felixinthefactory(1983)(micropower).hq.uef" size="9156" crc="9bc5b138" sha1="25d16002be3034f8a3d49fe53e47f396d0636aff" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4416,9 +4637,9 @@
 	</software>
 
 	<software name="firetrak">
-		<description>Fire Track</description>
+		<description>FireTrack</description>
 		<year>1987</year>
-		<publisher>Aardvark</publisher>
+		<publisher>Electric Dreams</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="26566">
 				<rom name="firetrack(1987)(aardvark).uef" size="26566" crc="1a151f07" sha1="bfcaa10cb52b75a63f523b686085293d2244d018" offset="0" />
@@ -4451,7 +4672,7 @@
 
 	<software name="fistfulf">
 		<description>Fistful of Fun</description>
-		<year>198?</year>
+		<year>1985</year>
 		<publisher>Alligata</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="48390">
@@ -4489,6 +4710,24 @@
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="17639">
 				<rom name="fivespheresofgoliath(kansas).uef" size="17639" crc="15070ed5" sha1="53b45c766c27fc0f419ae9dbe893f2c151006d41" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fivestr3">
+		<description>Five Star Games III</description>
+		<year>198?</year>
+		<publisher>Beau Jolly</publisher>
+		<part name="cass1" interface="bbc_cass">
+			<feature name="part_id" value="Tape A"/>
+			<dataarea name="cass" size="53195">
+				<rom name="fivestargames3_a(beaujolly).hq.uef" size="53195" crc="55ca9730" sha1="b5eac0ed9e07c84ddee364918e6a6f26df591006" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="bbc_cass">
+			<feature name="part_id" value="Tape B"/>
+			<dataarea name="cass" size="65156">
+				<rom name="fivestargames3_b(beaujolly).hq.uef" size="65156" crc="e150009d" sha1="4b4366f57c84ef9197a53a5ac0ee536d4e5e6cb8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4597,7 +4836,7 @@
 	<software name="fortresspias" cloneof="fortress">
 		<description>Fortress (Play It Again Sam 5)</description>
 		<year>1987</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="19048">
 				<rom name="fortress-piasrr(superior).uef" size="19048" crc="545034f6" sha1="1767937dc7799dc5d8800a0495e416c832b4ba2c" offset="0" />
@@ -4610,8 +4849,8 @@
 		<year>1984</year>
 		<publisher>Pace</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="14071">
-				<rom name="fortress(pace).uef" size="14071" crc="e4b30d0d" sha1="24cd9638184bf9d6a77f66f9819b05112db32c3e" offset="0" />
+			<dataarea name="cass" size="14731">
+				<rom name="fortress(pace).hq.uef" size="14731" crc="43ed64d6" sha1="4e2507aaaec595f4f99c7af0807fc9202c96c284" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4629,7 +4868,7 @@
 
 	<software name="frnk2000atrr" cloneof="frnk2000">
 		<description>Frankenstein 2000 (Atlantis)</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Atlantis</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="12200">
@@ -4639,7 +4878,7 @@
 	</software>
 
 	<software name="frnk2000">
-		<description>Frankenstein 2000 (Icon)</description>
+		<description>Frankenstein 2000</description>
 		<year>1985</year>
 		<publisher>Icon</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -4892,7 +5131,7 @@
 		<publisher>Tynesoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="22703">
-				<rom name="futureshock.hq(1986)(tynesoft).uef" size="22703" crc="5762beb3" sha1="2d2cda36503e35f76beb95d0f92ad3811381c123" offset="0" />
+				<rom name="futureshock(1986)(tynesoft).hq.uef" size="22703" crc="5762beb3" sha1="2d2cda36503e35f76beb95d0f92ad3811381c123" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4980,7 +5219,7 @@
 	<software name="galafor2">
 		<description>Galaforce 2</description>
 		<year>1988</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="27885">
 				<rom name="galaforce2(1988)(superior).uef" size="27885" crc="6a20cb1e" sha1="79c08e5c96d2dc153ec8ca428cfe908061a29bf5" offset="0" />
@@ -5171,8 +5410,8 @@
 		<year>1984</year>
 		<publisher>Micro Power</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="12393">
-				<rom name="ghouls(1984)(micropower).uef" size="12393" crc="90da74fd" sha1="c5305b06a03640a698bc100e6d8fcf47546034cb" offset="0" />
+			<dataarea name="cass" size="14217">
+				<rom name="ghouls(1984)(micropower).hq.uef" size="14217" crc="47eff702" sha1="d70aceccbc36c2feae23acc34de4394555c9a867" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5217,8 +5456,8 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG42" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="12814">
-				<rom name="go-v1(1984)(acornsoft)(g42).uef" size="12814" crc="e7bbcff3" sha1="0189d4ec49f327ee570d007e489e41acf0247003" offset="0" />
+			<dataarea name="cass" size="13333">
+				<rom name="go-v1(1984)(acornsoft)(g42).hq.uef" size="13333" crc="db5ff6d9" sha1="2aebb8eb755fe7a853b412edddcc6d842160f38f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5258,7 +5497,7 @@
 		<publisher>Firebird</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10102">
-				<rom name="golddigger.hq(1984)(firebird).uef" size="10102" crc="28a1b04d" sha1="91db4b539d674ef857f4e4063cd846a4429fc219" offset="0" />
+				<rom name="golddigger(1984)(firebird).hq.uef" size="10102" crc="28a1b04d" sha1="91db4b539d674ef857f4e4063cd846a4429fc219" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5330,8 +5569,8 @@
 	</software>
 
 	<software name="grabit">
-		<description>Grab It</description>
-		<year>198?</year>
+		<description>Grabit</description>
+		<year>1984</year>
 		<publisher>Voyager</publisher>
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
@@ -5363,8 +5602,8 @@
 		</part>
 	</software>
 
-	<software name="gradvcre">
-		<description>The Graphic Adventure Creator</description>
+	<software name="advcreat">
+		<description>The Adventure Creator</description>
 		<year>1986</year>
 		<publisher>Incentive</publisher>
 		<part name="cass1" interface="bbc_cass">
@@ -5381,8 +5620,8 @@
 		</part>
 	</software>
 
-	<software name="gradvcrea" cloneof="gradvcre">
-		<description>Graphic Adventure Creator (Alt)</description>
+	<software name="gradvcre">
+		<description>The Graphic Adventure Creator</description>
 		<year>1986</year>
 		<publisher>Incentive</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -5393,9 +5632,9 @@
 	</software>
 
 	<software name="gbltd">
-		<description>Great Britain Ltd</description>
+		<description>Great Britain Limited</description>
 		<year>1983</year>
-		<publisher>Hessel</publisher>
+		<publisher>Simon W. Hessel</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10380">
 				<rom name="greatbritainltd(hessel).uef" size="10380" crc="9844c361" sha1="6d5d2a972d83dc2318a4144a9dd09c69b95da27d" offset="0" />
@@ -5430,8 +5669,8 @@
 		<year>1985</year>
 		<publisher>Imagine</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="9438">
-				<rom name="greenberet(1985)(imagine).uef" size="9438" crc="c5aa879c" sha1="eed91455b1d829ef1017bb80d8fa43fb7ce52484" offset="0" />
+			<dataarea name="cass" size="9858">
+				<rom name="greenberet(1985)(imagine).hq.uef" size="9858" crc="2be65b24" sha1="c71e0776da8eef2073de1afc5a2bbcdfa48b9ba4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5547,7 +5786,7 @@
 	</software>
 
 	<software name="guyinhatbr" cloneof="guyinhat">
-		<description>Guy in the Hat (Blue Ribbon Games 2)</description>
+		<description>Guy in the Hat (Blue Ribbon)</description>
 		<year>1985</year>
 		<publisher>Blue Ribbon</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -5580,8 +5819,8 @@
 	</software>
 
 	<software name="hack2000">
-		<description>Hacker2000</description>
-		<year>198?</year>
+		<description>Hacker 2000</description>
+		<year>1984</year>
 		<publisher>Micrograf</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="20825">
@@ -5593,7 +5832,7 @@
 	<software name="halleysc">
 		<description>Halleys Comet</description>
 		<year>19??</year>
-		<publisher>Basil Blackwell</publisher>
+		<publisher>Basil Blackwell Ltd</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11173">
 				<rom name="halleyscomet(basilblackwell).uef" size="11173" crc="17be7ecc" sha1="b6048d066b888b77a5e67b96dab8d87c9e665c91" offset="0" />
@@ -5614,7 +5853,7 @@
 
 	<software name="hangman">
 		<description>Hangman</description>
-		<year>198?</year>
+		<year>1985</year>
 		<publisher>Blue Ribbon</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8193">
@@ -5623,20 +5862,9 @@
 		</part>
 	</software>
 
-	<software name="happynum">
-		<description>Happy Numbers</description>
-		<year>198?</year>
-		<publisher>Bourne Educational Software</publisher>
-		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="4676">
-				<rom name="happynumbers(bourne).uef" size="4676" crc="3cd9531a" sha1="04d71c30dc0804c6c416b6f8e743535ad68ccaa3" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="hareraif">
-		<description>Hareraiser Finale</description>
-		<year>198?</year>
+		<description>Hareraiser (Finale)</description>
+		<year>1984</year>
 		<publisher>Haresoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8238">
@@ -5646,8 +5874,8 @@
 	</software>
 
 	<software name="harerais">
-		<description>Hareraiser</description>
-		<year>198?</year>
+		<description>Hareraiser (Prelude)</description>
+		<year>1984</year>
 		<publisher>Haresoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6784">
@@ -5659,10 +5887,21 @@
 	<software name="harleq">
 		<description>Harlequin</description>
 		<year>1984</year>
-		<publisher>Haresoft</publisher>
+		<publisher>Kansas</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10106">
 				<rom name="harlequin(1984)(kansas).uef" size="10106" crc="86515ca0" sha1="8818e12fcd96ab25dd3173183c0f4f9f75212718" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="habbey">
+		<description>Haunted Abbey</description>
+		<year>1984</year>
+		<publisher>A&amp;F Software</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="17544">
+				<rom name="hauntedabbey(1984)(anf).hq.uef" size="17544" crc="0d73f796" sha1="d04c74981ecb83f41f5739d505ab30105adad9f6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5772,7 +6011,8 @@
 	<software name="histquiz">
 		<description>History Quiz</description>
 		<year>1983</year>
-		<publisher>Ivan Berg</publisher>
+		<publisher>Acornsoft/Ivan Berg</publisher>
+		<info name="release" value="XBX04" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="49953">
 				<rom name="historyquiz_be(1983)(ivanberg).uef" size="49953" crc="749b31c3" sha1="b50d2993ea9394c3225c93297d6e794f92a2ba63" offset="0" />
@@ -5793,7 +6033,7 @@
 
 	<software name="hobgobl2">
 		<description>Hobgoblin 2</description>
-		<year>19??</year>
+		<year>1990</year>
 		<publisher>Atlantis</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="15039">
@@ -5804,7 +6044,7 @@
 
 	<software name="hobgobl">
 		<description>Hobgoblin</description>
-		<year>19??</year>
+		<year>1989</year>
 		<publisher>Atlantis</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11555">
@@ -5826,7 +6066,7 @@
 
 	<software name="holedoc1">
 		<description>Holed Out Extra Courses Vol.1</description>
-		<year>1990</year>
+		<year>1989</year>
 		<publisher>4th Dimension</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="35742">
@@ -5837,7 +6077,7 @@
 
 	<software name="holedoc2">
 		<description>Holed Out Extra Courses Vol.2</description>
-		<year>1990</year>
+		<year>1989</year>
 		<publisher>4th Dimension</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="35752">
@@ -5885,8 +6125,8 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG23" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="7958">
-				<rom name="hopper-v2.1(1983)(acornsoft)(g23).uef" size="7958" crc="6799d1a5" sha1="0b5bef8cd1fbf0a6032ed705150c6729d30f65f3" offset="0" />
+			<dataarea name="cass" size="8395">
+				<rom name="hopper-v2.1(1983)(acornsoft)(g23).hq.uef" size="8395" crc="1e098853" sha1="65d73eb8569997130325324fa967918aa667dc29" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5897,15 +6137,15 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG23" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="7957">
-				<rom name="hopper-v2.2(1983)(acornsoft)(g23).uef" size="7957" crc="934807a1" sha1="39eb04e7844d06743e510ad835148bf982e94350" offset="0" />
+			<dataarea name="cass" size="8397">
+				<rom name="hopper-v2.2(1983)(acornsoft)(g23).hq.uef" size="8397" crc="94136ff2" sha1="17376ca665b6dc009c6183f7e56d5e3d98ad5892" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="horrorca">
 		<description>Horror Castle</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>A&amp;F Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="12293">
@@ -5915,12 +6155,12 @@
 	</software>
 
 	<software name="horselor">
-		<description>Horse Lord</description>
-		<year>198?</year>
+		<description>The Horse Lord</description>
+		<year>1984</year>
 		<publisher>Century</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8573">
-				<rom name="horselord.hq(century).uef" size="8573" crc="79026194" sha1="0119d1fbcf9c38704a240ef5b1d0c9a1fbbd13ba" offset="0" />
+				<rom name="horselord(century).hq.uef" size="8573" crc="79026194" sha1="0119d1fbcf9c38704a240ef5b1d0c9a1fbbd13ba" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5949,7 +6189,7 @@
 
 	<software name="howzat">
 		<description>Howzat</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>A&amp;F Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7831">
@@ -5993,12 +6233,12 @@
 	</software>
 
 	<software name="hnchbak2">
-		<description>Hunchback Mk.2</description>
+		<description>Hunchback (Re-issue)</description>
 		<year>1984</year>
 		<publisher>Superior Software</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="5666">
-				<rom name="hunchbackmk2(superior).uef" size="5666" crc="2c29b4cf" sha1="ce100ae2b1f2864c425c56cf4c12ff9129870974" offset="0" />
+			<dataarea name="cass" size="6006">
+				<rom name="hunchbackmk2(superior).hq.uef" size="6006" crc="54fc4e6c" sha1="05b8c23f5ddcc47600be39b9058b8d49a45c54e8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6088,6 +6328,18 @@
 		</part>
 	</software>
 
+	<software name="ido">
+		<description>..I Do</description>
+		<year>1983</year>
+		<publisher>Acornsoft/Ivan Berg</publisher>
+		<info name="release" value="XBX07" />
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="17171">
+				<rom name="ido(1983)(ivanberg).uef" size="17171" crc="d24c67cb" sha1="37e86c24519b01061f0bf4ebfac273f20bd17853" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ideurope">
 		<description>Identify Europe</description>
 		<year>198?</year>
@@ -6125,7 +6377,7 @@
 	<software name="imogenpias" cloneof="imogen">
 		<description>Imogen (Play It Again Sam 5)</description>
 		<year>1987</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="60481">
 				<rom name="imogen-piasrr(198x)(superior).uef" size="60481" crc="df787546" sha1="5e8f1a1b806395fbc21cd92cab1ff678eef769a0" offset="0" />
@@ -6157,7 +6409,7 @@
 
 	<software name="impmiss">
 		<description>Impossible Mission</description>
-		<year>1985</year>
+		<year>1986</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="24956">
@@ -6224,7 +6476,7 @@
 	<software name="inherita">
 		<description>Inheritance</description>
 		<year>1983</year>
-		<publisher>Hessel</publisher>
+		<publisher>Simon W. Hessel</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="13910">
 				<rom name="inheritance(hessel).uef" size="13910" crc="e871d0f4" sha1="66443534a2357533e00e8538c3cf5c51c5688f4c" offset="0" />
@@ -6285,7 +6537,7 @@
 
 	<software name="intruder">
 		<description>Intruders</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Interceptor</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="3393">
@@ -6422,8 +6674,8 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG09" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="10051">
-				<rom name="jcbdigger-v1.1(1983)(acornsoft)(g09).uef" size="10051" crc="2a6abe99" sha1="81ee3924e027bf16429d0a013711ebf008c752bc" offset="0" />
+			<dataarea name="cass" size="10568">
+				<rom name="jcbdigger-v1.1(1983)(acornsoft)(g09).hq.uef" size="10568" crc="565d3466" sha1="a7fe7c317c3e6819726513031c12038fd9282968" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6451,19 +6703,19 @@
 	</software>
 
 	<software name="jetpac">
-		<description>Jetpac</description>
+		<description>Jet-Pac</description>
 		<year>1984</year>
 		<publisher>Ultimate</publisher>
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="10705">
-				<rom name="jetpac_run(1984)(ultimate).uef" size="10705" crc="f3137968" sha1="951d83f59daf976c8c857ebd00c38e54a29dc047" offset="0" />
+			<dataarea name="cass" size="11291">
+				<rom name="jetpac_run(1984)(ultimate).hq.uef" size="11291" crc="8c478e04" sha1="36408fbdead27e1031e8d719b98a51f5d6b7ad2b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="jetpjack">
-		<description>Jet Power Jack</description>
+		<description>Jet-Power Jack</description>
 		<year>1984</year>
 		<publisher>Micro Power</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -6490,7 +6742,7 @@
 		<publisher>Tynesoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="18819">
-				<rom name="jetsetwilly.hq(1984)(tynesoft).uef" size="18819" crc="9906d5ba" sha1="590e40f706fa511057d300d995766d546be75bd5" offset="0" />
+				<rom name="jetsetwilly(1984)(tynesoft).hq.uef" size="18819" crc="9906d5ba" sha1="590e40f706fa511057d300d995766d546be75bd5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6531,23 +6783,23 @@
 
 	<software name="johnyreb">
 		<description>Johnny Reb</description>
-		<year>1984</year>
+		<year>1983</year>
 		<publisher>Lothlorien</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8604">
-				<rom name="johnnyreb_be(1984)(lothlorien).uef" size="8604" crc="203794a7" sha1="d58e4253d08b19cf080b642edd03cc5c1a4f9033" offset="0" />
+				<rom name="johnnyreb_be(1983)(lothlorien).uef" size="8604" crc="203794a7" sha1="d58e4253d08b19cf080b642edd03cc5c1a4f9033" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="joust">
 		<description>Joust</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Aardvark</publisher>
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="21936">
-				<rom name="joust_run.hq(aardvark).uef" size="21936" crc="10a4a790" sha1="b0bdda1f3c5624d29acf1376b8c286ee016131c6" offset="0" />
+				<rom name="joust_run(aardvark).hq.uef" size="21936" crc="10a4a790" sha1="b0bdda1f3c5624d29acf1376b8c286ee016131c6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6733,8 +6985,8 @@
 		<year>1984</year>
 		<publisher>Micro Power</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="8760">
-				<rom name="killergorilla(1984)(micropower).uef" size="8760" crc="6b7dc09d" sha1="16f663c13a622544ff2b83bb0d1a93d8a529083b" offset="0" />
+			<dataarea name="cass" size="9859">
+				<rom name="killergorilla(1984)(micropower).hq.uef" size="9859" crc="9a64545f" sha1="3072162811ea0a3c726d45da77f73bc00c179bbf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6745,8 +6997,8 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG25" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="18905">
-				<rom name="kingdomofhamil-v1.1(1983)(acornsoft)(g25).uef" size="18905" crc="851a33cb" sha1="f19156edaf9ed1097739eda2227e0068d72629a6" offset="0" />
+			<dataarea name="cass" size="19622">
+				<rom name="kingdomofhamil-v1.1(1983)(acornsoft)(g25).hq.uef" size="19622" crc="7f6929cc" sha1="8dfb00cf4bbbaca8779e04b0b180da031719299f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6813,7 +7065,19 @@
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="19864">
-				<rom name="knightlore_run.hq(1984)(ultimate).uef" size="19864" crc="fd128ae3" sha1="24a761f71f168226088a7824e07bfdc841fdc415" offset="0" />
+				<rom name="knightlore_run(1984)(ultimate).hq.uef" size="19864" crc="fd128ae3" sha1="24a761f71f168226088a7824e07bfdc841fdc415" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="knightlr" cloneof="knightl">
+		<description>Knight Lore (Ricochet)</description>
+		<year>198?</year>
+		<publisher>Ricochet</publisher>
+		<info name="usage" value="Load with *RUN" />
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="19891">
+				<rom name="knightlore_run(ricochet).hq.uef" size="19891" crc="cecde52e" sha1="43ba233c4fb3de4b9bda5d41638bade34e33c3de" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6879,8 +7143,8 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG41" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="15623">
-				<rom name="labyrinth-v1.0(1984)(acornsoft)(g41).uef" size="15623" crc="4052af69" sha1="32955760cde941a02e97371bc30542e235542244" offset="0" />
+			<dataarea name="cass" size="16263">
+				<rom name="labyrinth-v1.0(1984)(acornsoft)(g41).hq.uef" size="16263" crc="c828166d" sha1="62c82f7c86828f93f6483c440777b566d0bff9cf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6897,8 +7161,8 @@
 	</software>
 
 	<software name="lander">
-		<description>Lander</description>
-		<year>198?</year>
+		<description>Asteroid Lander</description>
+		<year>1982</year>
 		<publisher>ASP Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="1674">
@@ -6920,7 +7184,7 @@
 
 	<software name="landtezr">
 		<description>Land of Tezrel</description>
-		<year>19??</year>
+		<year>1984</year>
 		<publisher>Omen</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11507">
@@ -6943,7 +7207,7 @@
 
 	<software name="lsreflex">
 		<description>Laser Reflex</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Talent</publisher>
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
@@ -6956,7 +7220,7 @@
 	<software name="lastnin2">
 		<description>The Last Ninja 2</description>
 		<year>1988</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="40506">
 				<rom name="lastninja2(1988)(superior).uef" size="40506" crc="1f867205" sha1="9f376c49d5c9167d46103853fcd5ce0b2d98c7ef" offset="0" />
@@ -6967,7 +7231,7 @@
 	<software name="lastninj">
 		<description>The Last Ninja</description>
 		<year>1988</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="40937">
 				<rom name="lastninja(1988)(superior).uef" size="40937" crc="87a6dbdf" sha1="5790e682f1f5dabc50daa45547a8103c1e56ace2" offset="0" />
@@ -6976,7 +7240,7 @@
 	</software>
 
 	<software name="lastfree">
-		<description>Last of the Free</description>
+		<description>The Last of the Free</description>
 		<year>1986</year>
 		<publisher>Audiogenic</publisher>
 		<info name="usage" value="Load with *RUN" />
@@ -7143,7 +7407,7 @@
 
 	<software name="lockluck">
 		<description>Locks of Luck</description>
-		<year>19??</year>
+		<year>1986</year>
 		<publisher>Magus</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="19824">
@@ -7176,7 +7440,7 @@
 
 	<software name="logic1">
 		<description>Logic1</description>
-		<year>19??</year>
+		<year>1983</year>
 		<publisher>Shiva</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="9361">
@@ -7248,7 +7512,7 @@
 	</software>
 
 	<software name="lotr">
-		<description>The Lord of the Rings</description>
+		<description>Lord of the Rings</description>
 		<year>1986</year>
 		<publisher>Melbourne House</publisher>
 		<part name="cass1" interface="bbc_cass">
@@ -7313,7 +7577,7 @@
 
 	<software name="llander">
 		<description>Lunar Lander</description>
-		<year>1983</year>
+		<year>1982</year>
 		<publisher>A&amp;F Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="4951">
@@ -7383,8 +7647,8 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG46" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="9083">
-				<rom name="magicmushrooms-v1(1985)(acornsoft)(g46).uef" size="9083" crc="54d740e1" sha1="a5a4e50e8ef8beef4f0d1ae304aa5c36853382f4" offset="0" />
+			<dataarea name="cass" size="9505">
+				<rom name="magicmushrooms-v1(1985)(acornsoft)(g46).hq.uef" size="9505" crc="41eb3447" sha1="ee54381136ebf467b6732c3ec48432604e739a34" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -7415,7 +7679,7 @@
 
 	<software name="mtmotm">
 		<description>Making the Most of the Micro</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>BBC Soft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="81268">
@@ -7426,7 +7690,7 @@
 
 	<software name="manage">
 		<description>Manage</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>CCS</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8118">
@@ -7452,18 +7716,7 @@
 		<publisher>Software Projects</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="16801">
-				<rom name="manicminer.hq(1984)(softwareprojects).uef" size="16801" crc="7a1754d3" sha1="1c4d0fa60053fe09213a6d9d7e629ca2cdebb12e" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="maprally">
-		<description>Map Rally</description>
-		<year>198?</year>
-		<publisher>Bourne Educational Software</publisher>
-		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="6957">
-				<rom name="maprally(bourne).uef" size="6957" crc="ece25693" sha1="7f4a1dc179ded6606cca053392c79eafb9772b26" offset="0" />
+				<rom name="manicminer(1984)(softwareprojects).hq.uef" size="16801" crc="7a1754d3" sha1="1c4d0fa60053fe09213a6d9d7e629ca2cdebb12e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -7514,12 +7767,12 @@
 
 	<software name="matchday">
 		<description>Match Day</description>
-		<year>1984</year>
+		<year>1985</year>
 		<publisher>Ocean</publisher>
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="19224">
-				<rom name="matchday_run(1984)(ocean).uef" size="19224" crc="f083cc74" sha1="b1b8ebb20674e2b9c10b0238acf4ca287102eb0a" offset="0" />
+				<rom name="matchday_run(1985)(ocean).uef" size="19224" crc="f083cc74" sha1="b1b8ebb20674e2b9c10b0238acf4ca287102eb0a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -7630,8 +7883,8 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG29" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="7512">
-				<rom name="meteormission-v1(1984)(acornsoft)(g29).uef" size="7512" crc="921df4c6" sha1="1c0445f26f3607b9c7a69a5d308e587c1b8386b6" offset="0" />
+			<dataarea name="cass" size="8032">
+				<rom name="meteormission-v1(1984)(acornsoft)(g29).hq.uef" size="8032" crc="4f6469ab" sha1="a5054fb2458d5c6f70d6f158d05b700cb1379948" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -7653,8 +7906,8 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG13" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="6875">
-				<rom name="meteors-v1(1982)(acornsoft)(g13).uef" size="6875" crc="c737a94a" sha1="f06045f46f052a614bb3e2625007cb6ed5fb719a" offset="0" />
+			<dataarea name="cass" size="7258">
+				<rom name="meteors-v1(1982)(acornsoft)(g13).hq.uef" size="7258" crc="e0640ea9" sha1="c4b5916b9d4f026cf912c0dc903f3c33e307ad7b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -7664,15 +7917,15 @@
 		<year>1986</year>
 		<publisher>Qualsoft</publisher>
 		<part name="cass1" interface="bbc_cass">
-			<feature name="part_id" value="Finals"/>
-			<dataarea name="cass" size="8625">
-				<rom name="mexico86-finals(qualsoft).uef" size="8625" crc="633204a9" sha1="f75d4fcad28baf3ea9b03cb67cc9d28fa174c174" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="bbc_cass">
 			<feature name="part_id" value="Qualifiers"/>
 			<dataarea name="cass" size="8727">
 				<rom name="mexico86-qualifiers(qualsoft).uef" size="8727" crc="c7e20a5e" sha1="7f2988fe361ecc184a238e09092ede3ceec12447" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="bbc_cass">
+			<feature name="part_id" value="Finals"/>
+			<dataarea name="cass" size="8625">
+				<rom name="mexico86-finals(qualsoft).uef" size="8625" crc="633204a9" sha1="f75d4fcad28baf3ea9b03cb67cc9d28fa174c174" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -7700,24 +7953,13 @@
 		</part>
 	</software>
 
-	<software name="micrbudg">
-		<description>Micro Budget</description>
-		<year>1983</year>
-		<publisher>Micro Power</publisher>
-		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="3142">
-				<rom name="microbudget(micropower).uef" size="3142" crc="767e9fdd" sha1="2a869c681572194dc7796a45c8eea3b047a509c3" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="micrcosm">
 		<description>Microcosm</description>
-		<year>1984</year>
+		<year>1985</year>
 		<publisher>Firebird</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="18456">
-				<rom name="microcosm.hq(1984)(firebird).uef" size="18456" crc="302e42d3" sha1="120b62ac19d46c6f793540bc6b584c720fdfb23e" offset="0" />
+				<rom name="microcosm(1985)(firebird).hq.uef" size="18456" crc="302e42d3" sha1="120b62ac19d46c6f793540bc6b584c720fdfb23e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -7801,8 +8043,8 @@
 	</software>
 
 	<software name="minedout">
-		<description>Mined Out</description>
-		<year>198?</year>
+		<description>Mined-Out</description>
+		<year>1983</year>
 		<publisher>Quicksilva</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="9396">
@@ -7817,13 +8059,13 @@
 		<publisher>Alternative</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11986">
-				<rom name="mineshaft-arr.hq(1990)(alternative).uef" size="11986" crc="1f3bb40d" sha1="e165655785ab05715f2a5b403fd586710e5f9c48" offset="0" />
+				<rom name="mineshaft-arr(1990)(alternative).hq.uef" size="11986" crc="1f3bb40d" sha1="e165655785ab05715f2a5b403fd586710e5f9c48" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="mineshaf">
-		<description>Mineshaft (Durell)</description>
+		<description>Mineshaft</description>
 		<year>1984</year>
 		<publisher>Durell</publisher>
 		<info name="usage" value="Load with *RUN" />
@@ -7846,13 +8088,13 @@
 	</software>
 
 	<software name="missbase">
-		<description>Missile Base v2.0</description>
+		<description>Missile Base</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG18" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="8534">
-				<rom name="missilebase-v2.0(1982)(acornsoft)(g18).uef" size="8534" crc="574b5833" sha1="d9cf1b4cbafb2921f1c24af1513d33c769354eab" offset="0" />
+			<dataarea name="cass" size="9014">
+				<rom name="missilebase-v2.0(1982)(acornsoft)(g18).hq.uef" size="9014" crc="ccd2c021" sha1="e8729d0d06681804844f494c754453f2ec127e53" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -7948,7 +8190,7 @@
 	<software name="monsterspias" cloneof="monsters">
 		<description>Monsters (Play It Again Sam 11)</description>
 		<year>1989</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7492">
 				<rom name="monsters-piasrr(198x)(superior)(g03).uef" size="7492" crc="b84179f9" sha1="d766c891b55bcfca927d392d0f1fc71d01062f98" offset="0" />
@@ -8041,8 +8283,8 @@
 		<year>1983</year>
 		<publisher>Micro Power</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="10301">
-				<rom name="moonraider(1983)(micropower).uef" size="10301" crc="5d4b6160" sha1="b56d5f7d35a6144107f6045c4d0fe5c7b8fad015" offset="0" />
+			<dataarea name="cass" size="9411">
+				<rom name="moonraider(1983)(micropower).hq.uef" size="9411" crc="cc5c6e74" sha1="dc06db0e3d9cad743cee04cf7f9f40ac7b00ba12" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -8093,7 +8335,7 @@
 		<publisher>Firebird</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="13835">
-				<rom name="mrfreeze.hq(1984)(firebird).uef" size="13835" crc="cd9e8f34" sha1="52bd7e1a7af8770375eb224368c6a81e3914b58d" offset="0" />
+				<rom name="mrfreeze(1984)(firebird).hq.uef" size="13835" crc="cd9e8f34" sha1="52bd7e1a7af8770375eb224368c6a81e3914b58d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -8123,7 +8365,7 @@
 	<software name="mrwizpias" cloneof="mrwiz">
 		<description>Mr Wiz (Play It Again Sam 8)</description>
 		<year>1988</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="13990">
 				<rom name="mrwiz-piasrr(198x)(superior).uef" size="13990" crc="3d738f52" sha1="f1dadc80b0437d56acd112a43315b1cbd44a2236" offset="0" />
@@ -8223,7 +8465,7 @@
 
 	<software name="mustools">
 		<description>Music Tools</description>
-		<year>19??</year>
+		<year>1986</year>
 		<publisher>Duckworth</publisher>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -8328,8 +8570,8 @@
 	</software>
 
 	<software name="lostshep">
-		<description>Mystery of the Lost Sheep</description>
-		<year>19??</year>
+		<description>The Mystery of the Lost Sheep</description>
+		<year>198?</year>
 		<publisher>Central Computing</publisher>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Side One"/>
@@ -8350,8 +8592,8 @@
 		<year>1984</year>
 		<publisher>Alligata</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="7559">
-				<rom name="neanderthalman(1984)(alligata).uef" size="7559" crc="1be9bd75" sha1="241b0ea1724ab98679a989321db15ad8a85fa200" offset="0" />
+			<dataarea name="cass" size="7949">
+				<rom name="neanderthalman(1984)(alligata).hq.uef" size="7949" crc="21ba73bc" sha1="923b912d061613f802f4cbfeddead67a6cd2d5ef" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -8370,7 +8612,7 @@
 	<software name="networkpias" cloneof="network">
 		<description>Network (Play It Again Sam 15)</description>
 		<year>1991</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="22580">
 				<rom name="network-piasrr(1991)(superior).uef" size="22580" crc="965de4b5" sha1="835e61348df4437ef436a3f4d03f73ba450d9760" offset="0" />
@@ -8424,7 +8666,7 @@
 	</software>
 
 	<software name="nmaremazbr" cloneof="nmaremaz">
-		<description>Nightmare Maze (Blue Ribbon Games 1)</description>
+		<description>Nightmare Maze (Blue Ribbon)</description>
 		<year>1985</year>
 		<publisher>Blue Ribbon</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -8440,7 +8682,7 @@
 		<publisher>MRM Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8523">
-				<rom name="nightmaremaze.hq(1984)(mrm).uef" size="8523" crc="11cf35bd" sha1="8c05df02e6e75e3216894ee992119db194a38cfb" offset="0" />
+				<rom name="nightmaremaze(1984)(mrm).hq.uef" size="8523" crc="11cf35bd" sha1="8c05df02e6e75e3216894ee992119db194a38cfb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -8514,8 +8756,8 @@
 
 	<software name="ogles">
 		<description>Ogles</description>
-		<year>19??</year>
-		<publisher>The Games Master</publisher>
+		<year>1983</year>
+		<publisher>Games Machine</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="5688">
 				<rom name="ogles(gamemaster).uef" size="5688" crc="059fd01c" sha1="c6edc336c50caa49d594240404da8c6cc3c14b32" offset="0" />
@@ -8536,7 +8778,7 @@
 
 	<software name="omegaorb">
 		<description>Omega Orb</description>
-		<year>1986</year>
+		<year>1987</year>
 		<publisher>Audiogenic</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="22840">
@@ -8558,7 +8800,7 @@
 
 	<software name="orpheus">
 		<description>Orpheus</description>
-		<year>198?</year>
+		<year>1985</year>
 		<publisher>A&amp;F Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6076">
@@ -8670,7 +8912,7 @@
 	<software name="palmagic">
 		<description>Palace of Magic</description>
 		<year>1987</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="26918">
 				<rom name="palaceofmagic(1987)(superior).uef" size="26918" crc="d5162960" sha1="3c7ea3bae999e9bc29b3aee9a3f75eb8dfe9ad8b" offset="0" />
@@ -8681,7 +8923,7 @@
 	<software name="pandemonpias" cloneof="pandemon">
 		<description>Pandemonium (Play It Again Sam 13)</description>
 		<year>1990</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="21085">
 				<rom name="pandemonium-piasrr(1990)(superior).uef" size="21085" crc="e3f7b8a2" sha1="70c02ff33a4ff183698949376d6e7685abc4ae65" offset="0" />
@@ -8736,11 +8978,11 @@
 
 	<software name="paras">
 		<description>Paras</description>
-		<year>1984</year>
+		<year>1983</year>
 		<publisher>Lothlorien</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6556">
-				<rom name="paras_be(1984)(lothlorien).uef" size="6556" crc="237d2802" sha1="7980839b0e89ec348b081f85fc7a876922706be3" offset="0" />
+				<rom name="paras_be(1983)(lothlorien).uef" size="6556" crc="237d2802" sha1="7980839b0e89ec348b081f85fc7a876922706be3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -8813,11 +9055,11 @@
 
 	<software name="pengwyn">
 		<description>Pengwyn</description>
-		<year>1984</year>
+		<year>1983</year>
 		<publisher>Postern</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="7046">
-				<rom name="pengwyn(postern).uef" size="7046" crc="02775cbd" sha1="6459bb9087970b238b108079a14caeb37bc77e44" offset="0" />
+			<dataarea name="cass" size="7394">
+				<rom name="pengwyn(postern).hq.uef" size="7394" crc="4d59e7f3" sha1="2b57b5914e22e39b68a79d2de51c4e06b576130d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -8836,7 +9078,7 @@
 	<software name="ppenguinpias" cloneof="ppenguin">
 		<description>Percy Penguin (Play It Again Sam 13)</description>
 		<year>1990</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7053">
 				<rom name="percypenguin-piasrr(198x)(superior).uef" size="7053" crc="b07f7317" sha1="92cf2dc72250137f163c0dd989f93596bb9f1a4a" offset="0" />
@@ -8858,7 +9100,7 @@
 	<software name="perplex">
 		<description>Perplexity</description>
 		<year>1989</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="19403">
 				<rom name="perplexity(1989)(superior).uef" size="19403" crc="19ba7482" sha1="5b3a04d7fc119d44bc9bee79ed14c036aca68602" offset="0" />
@@ -8905,8 +9147,8 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG01" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="16930">
-				<rom name="philosophersquest-v2.0(1982)(acornsoft)(g01).uef" size="16930" crc="0310eeb8" sha1="dfe227e334b3174029f5445b1b396eadc2fe2826" offset="0" />
+			<dataarea name="cass" size="17729">
+				<rom name="philosophersquest-v2.0(1982)(acornsoft)(g01).hq.uef" size="17729" crc="564b1c0a" sha1="dbbca252829df43cf9cce9134c456b5da292c3be" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -8980,7 +9222,7 @@
 	<software name="pipeline">
 		<description>Pipeline</description>
 		<year>1989</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Game"/>
 			<dataarea name="cass" size="25675">
@@ -9019,7 +9261,7 @@
 	</software>
 
 	<software name="planb2">
-		<description>Plan B 2</description>
+		<description>Plan B2</description>
 		<year>1987</year>
 		<publisher>Bug Byte</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -9075,7 +9317,7 @@
 
 	<software name="planetfa">
 		<description>Planetfall</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>ASP Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="12414">
@@ -9101,8 +9343,8 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG15" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="8382">
-				<rom name="planetoid-v2.0(1982)(acornsoft)(g15).uef" size="8382" crc="c5a6ebed" sha1="27551cee8e8768b33d5fe2092c2fbeb5ecf3d787" offset="0" />
+			<dataarea name="cass" size="8804">
+				<rom name="planetoid-v2.0(1982)(acornsoft)(g15).hq.uef" size="8804" crc="f503f852" sha1="b5654346e1504af9ee9e2506597d19bd31b803ea" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -9144,7 +9386,7 @@
 
 	<software name="plegaron">
 		<description>Plegaron People Eaters</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>RH Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="3976">
@@ -9272,8 +9514,8 @@
 	</software>
 
 	<software name="poolwin2">
-		<description>Pools Winner 2</description>
-		<year>198?</year>
+		<description>Pools Winner II</description>
+		<year>1987</year>
 		<publisher>Selec</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="19880">
@@ -9284,7 +9526,7 @@
 
 	<software name="poolwin">
 		<description>Pools Winner</description>
-		<year>198?</year>
+		<year>1985</year>
 		<publisher>Selec</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="17361">
@@ -9305,8 +9547,8 @@
 	</software>
 
 	<software name="postman">
-		<description>Postman</description>
-		<year>198?</year>
+		<description>Pete the Plastered Postman</description>
+		<year>1982</year>
 		<publisher>ASP Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="2124">
@@ -9329,7 +9571,7 @@
 	<software name="predator">
 		<description>Predator</description>
 		<year>1988</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="20982">
 				<rom name="predator(1988)(superior).uef" size="20982" crc="53011f5c" sha1="a205fd38dd028750b5075a33cbbd42adadb32f51" offset="0" />
@@ -9354,7 +9596,7 @@
 		<publisher>Codemasters</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="23721">
-				<rom name="proboxingsimulator.hq(codemasters).uef" size="23721" crc="6914d978" sha1="f162c61577457ce9f05de2c5ef6402a0a375dc0d" offset="0" />
+				<rom name="proboxingsimulator(codemasters).hq.uef" size="23721" crc="6914d978" sha1="f162c61577457ce9f05de2c5ef6402a0a375dc0d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -9405,8 +9647,8 @@
 
 	<software name="proteans">
 		<description>Proteanse</description>
-		<year>198?</year>
-		<publisher>DK Tronics</publisher>
+		<year>1983</year>
+		<publisher>DK'Tronics</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="5697">
 				<rom name="proteanse(dktronics).uef" size="5697" crc="2a150e14" sha1="1f9edfb64c1c20efccd423531548a90729de9a8d" offset="0" />
@@ -9438,7 +9680,7 @@
 	</software>
 
 	<software name="psycast2">
-		<description>Psycastria 2 (Audiogenic)</description>
+		<description>Psycastria 2</description>
 		<year>1989</year>
 		<publisher>Audiogenic</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -9454,7 +9696,7 @@
 		<publisher>Audiogenic</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="30321">
-				<rom name="psycastria.hq(1986)(audiogenic).uef" size="30321" crc="fe007059" sha1="69106c9bcaa10a8e7f89bf6dce918070d408f021" offset="0" />
+				<rom name="psycastria(1986)(audiogenic).hq.uef" size="30321" crc="fe007059" sha1="69106c9bcaa10a8e7f89bf6dce918070d408f021" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -9473,7 +9715,7 @@
 
 	<software name="pydpaint">
 		<description>Pyramid Painter</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Thor</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="5108">
@@ -9495,7 +9737,7 @@
 	</software>
 
 	<software name="qmanbr" cloneof="qman">
-		<description>Q Man (Blue Ribbon Games 1)</description>
+		<description>Q Man (Blue Ribbon)</description>
 		<year>1985</year>
 		<publisher>Blue Ribbon</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -9517,7 +9759,7 @@
 	</software>
 
 	<software name="qmansbrobr" cloneof="qmansbro">
-		<description>Q Man's Brother (Blue Ribbon Games 2)</description>
+		<description>Q Man's Brother (Blue Ribbon)</description>
 		<year>1985</year>
 		<publisher>Blue Ribbon</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -9541,7 +9783,7 @@
 	<software name="quest">
 		<description>Quest (Superior Software)</description>
 		<year>1988</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="17912">
 				<rom name="quest(1988)(superior).uef" size="17912" crc="97fa735e" sha1="8bc65539510aff54edc6927437210594942d61b2" offset="0" />
@@ -9550,7 +9792,7 @@
 	</software>
 
 	<software name="holygrai">
-		<description>Quest for the Holy Grail</description>
+		<description>The Quest for the Holy Grail</description>
 		<year>198?</year>
 		<publisher>Epic</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -9597,7 +9839,7 @@
 	<software name="qwak">
 		<description>Qwak</description>
 		<year>1989</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="15629">
 				<rom name="qwak(1989)(superior).uef" size="15629" crc="4ec7a8ff" sha1="d044a4a15902e34a6c023cb54081a9f05a347de6" offset="0" />
@@ -9640,7 +9882,7 @@
 
 	<software name="ravskull">
 		<description>Ravenskull</description>
-		<year>1987</year>
+		<year>1986</year>
 		<publisher>Superior Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="26904">
@@ -9660,13 +9902,24 @@
 		</part>
 	</software>
 
+	<software name="redarrow">
+		<description>Red Arrows</description>
+		<year>1985</year>
+		<publisher>Database</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="29445">
+				<rom name="redarrows(database).hq.uef" size="29445" crc="a8dcc0de" sha1="0e41fb8614bea556720b926eb9ca3aa80d7382f5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="redcoats">
 		<description>Red Coats</description>
-		<year>1985</year>
+		<year>1984</year>
 		<publisher>Lothlorien</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="10181">
-				<rom name="redcoats_be(1985)(lothlorien).uef" size="10181" crc="77f3fa73" sha1="df466166aff5cdefc2f1958688455d4ad6baa38c" offset="0" />
+			<dataarea name="cass" size="11322">
+				<rom name="redcoats_be(1985)(lothlorien).hq.uef" size="11322" crc="f846b0ca" sha1="5dc32cf743171bdb0287ffd2182de236d747e010" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -9707,6 +9960,17 @@
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8903">
 				<rom name="renegaderobots(senator).uef" size="8903" crc="1d81169e" sha1="65642661f54a79650e8185760bebe37dd92cc712" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="repton">
+		<description>Repton</description>
+		<year>1985</year>
+		<publisher>Superior Software</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="29998">
+				<rom name="repton(1985)(superior).hq.uef" size="29998" crc="8d8a61ef" sha1="a785fa09df3540eba44f2243cb4ea546dc416d13" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -9766,17 +10030,6 @@
 		</part>
 	</software>
 
-	<software name="repton">
-		<description>Repton</description>
-		<year>1985</year>
-		<publisher>Superior Software</publisher>
-		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="29402">
-				<rom name="repton(1985)(superior).uef" size="29402" crc="a2e0c671" sha1="7b148950d24a8220a351b090aa050bab82b0a0db" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="reptonwo">
 		<description>Repton Around the World in 40 Screens</description>
 		<year>1987</year>
@@ -9791,7 +10044,7 @@
 	<software name="reptonin">
 		<description>Repton Infinity</description>
 		<year>1988</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="109952">
 				<rom name="reptoninfinity(1988)(superior).uef" size="109952" crc="825f7f89" sha1="686619d7b9e8a0c569ddc12c08b80c94cb529bec" offset="0" />
@@ -9802,7 +10055,7 @@
 	<software name="reptonti">
 		<description>Repton Thru Time</description>
 		<year>1988</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="66401">
 				<rom name="reptonthrutime(1988)(superior).uef" size="66401" crc="eddb42c4" sha1="334c0747174bf3f75a8e19206387663b3a50ba73" offset="0" />
@@ -9854,6 +10107,17 @@
 		</part>
 	</software>
 
+	<software name="revsgomo">
+		<description>Reversi/Gomoku</description>
+		<year>1982</year>
+		<publisher>Pro Software</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="7407">
+				<rom name="reversigomoko(1982)(pro).uef" size="7407" crc="e7f1c239" sha1="9bee9707a4e156bca269ae47d1c273c57fb4aa60" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="reversis">
 		<description>Reversi (Superior Software)</description>
 		<year>1983</year>
@@ -9884,7 +10148,7 @@
 		<info name="release" value="SBG43" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="31111">
-				<rom name="revs.hq(1984)(acornsoft)(g43).uef" size="31111" crc="42b8a114" sha1="9d4ff3aa3370c49b4ace00162d2117f0fe2bc442" offset="0" />
+				<rom name="revs(1984)(acornsoft)(g43).hq.uef" size="31111" crc="42b8a114" sha1="9d4ff3aa3370c49b4ace00162d2117f0fe2bc442" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -9916,7 +10180,7 @@
 	<software name="ricochet">
 		<description>Ricochet</description>
 		<year>1989</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="49645">
 				<rom name="ricochet(1989)(superior).uef" size="49645" crc="c8452a55" sha1="1ff307dc3daa354528551e0fe2a2f48b4ea7d303" offset="0" />
@@ -10137,8 +10401,8 @@
 		<year>1983</year>
 		<publisher>Lothlorien</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="6608">
-				<rom name="romanempire_be(1983)(lothlorien).uef" size="6608" crc="bbb58ac0" sha1="b2f7bd5628444f721b5dc71f156b5ef77aba4992" offset="0" />
+			<dataarea name="cass" size="7015">
+				<rom name="romanempire_be(1983)(lothlorien).hq.uef" size="7015" crc="0f8e3334" sha1="3e0d20b18204674c83b0f70168b3d1debbd231cb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -10189,7 +10453,7 @@
 
 	<software name="rtcbirmi">
 		<description>RTC Birmingham</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Dee-Kay</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8222">
@@ -10243,8 +10507,8 @@
 	</software>
 
 	<software name="rtclimes">
-		<description>RTC Limestreet</description>
-		<year>198?</year>
+		<description>RTC Lime Street</description>
+		<year>1985</year>
 		<publisher>Dee-Kay</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10948">
@@ -10333,8 +10597,8 @@
 		<publisher>Ultimate</publisher>
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="23956">
-				<rom name="sabrewulf_run(1984)(ultimate).uef" size="23956" crc="048caf66" sha1="ede8e7f8fd72d188fb8b540e0f50c612a54e7c13" offset="0" />
+			<dataarea name="cass" size="24668">
+				<rom name="sabrewulf_run(1984)(ultimate).hq.uef" size="24668" crc="229301c3" sha1="81b88b27bb75060522381bd91d997af491c53d2d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -10374,11 +10638,11 @@
 
 	<software name="saloonsa">
 		<description>Saloon Sally</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Psion</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="5373">
-				<rom name="saloonsally(psion).uef" size="5373" crc="19f68309" sha1="7af0d7af5676656536e7503bc65cd760fd2b75e5" offset="0" />
+			<dataarea name="cass" size="5756">
+				<rom name="saloonsally(psion).hq.uef" size="5756" crc="0f89d1db" sha1="37cf8555cf9cec79bb5ffbcbb530bfa7869b7439" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -10396,7 +10660,7 @@
 
 	<software name="savagei1">
 		<description>Savage Island Part One</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>Tynesoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11418">
@@ -10407,7 +10671,7 @@
 
 	<software name="savagei2">
 		<description>Savage Island Part Two</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>Tynesoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11324">
@@ -10416,32 +10680,11 @@
 		</part>
 	</software>
 
-	<software name="savpondb">
-		<description>Savage Pond (Bug Byte)</description>
-		<year>1983</year>
-		<publisher>Bug Byte</publisher>
-		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="11605">
-				<rom name="savagepond(1983)(bugbyte).uef" size="11605" crc="4b1629cd" sha1="833a3c6bfd1432a754124f8adf5a07b6c63e67b3" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="savponda">
-		<description>Savage Pond (ASP Software)</description>
-		<year>198?</year>
-		<publisher>ASP Software</publisher>
-		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="11586">
-				<rom name="savagepond(asp).uef" size="11586" crc="4efb0a68" sha1="06b20cfa0a17b7b7f1e9451f5bd2e842af8d8928" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="scfiquiz">
 		<description>Science Fiction Quiz</description>
 		<year>1983</year>
-		<publisher>Ivan Berg</publisher>
+		<publisher>Acornsoft/Ivan Berg</publisher>
+		<info name="release" value="XBX05" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="55315">
 				<rom name="sciencefictionquiz_be(1983)(ivanberg).uef" size="55315" crc="67f74c65" sha1="351eedce83d731fad6ac908d3fe7687fba4dbed5" offset="0" />
@@ -10473,7 +10716,7 @@
 	</software>
 
 	<software name="screwbalbr" cloneof="screwbal">
-		<description>Screwball (Blue Ribbon Games 2)</description>
+		<description>Screwball (Blue Ribbon)</description>
 		<year>1985</year>
 		<publisher>Blue Ribbon</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -10518,7 +10761,7 @@
 
 	<software name="seaqueen">
 		<description>Sea Queen</description>
-		<year>19??</year>
+		<year>1988</year>
 		<publisher>Unreleased</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="13589">
@@ -10551,7 +10794,7 @@
 
 	<software name="ssam1br" cloneof="ssam1">
 		<description>Secret Sam 1 (Blue Ribbon)</description>
-		<year>198?</year>
+		<year>1985</year>
 		<publisher>Blue Ribbon</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10820">
@@ -10561,7 +10804,7 @@
 	</software>
 
 	<software name="ssam1">
-		<description>Secret Sam 1 (MRM Software)</description>
+		<description>Secret Sam 1</description>
 		<year>1983</year>
 		<publisher>MRM Software</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -10572,8 +10815,8 @@
 	</software>
 
 	<software name="ssam2br">
-		<description>Secret Sam 2</description>
-		<year>198?</year>
+		<description>Secret Sam 2 (Blue Ribbon)</description>
+		<year>1985</year>
 		<publisher>Blue Ribbon</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10034">
@@ -10610,8 +10853,8 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG36" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="22732">
-				<rom name="seventhstar-v1.0(1984)(acornsoft)(g36).uef" size="22732" crc="a3202842" sha1="a83ddaf4e4d39e61aa44fd7eaa07dea510dbdd36" offset="0" />
+			<dataarea name="cass" size="23713">
+				<rom name="seventhstar-v1.0(1984)(acornsoft)(g36).hq.uef" size="23713" crc="c70b5c11" sha1="2db383358413f842b3d354be175cbfbb1f3d5ef3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -10661,7 +10904,7 @@
 	</software>
 
 	<software name="shbounds">
-		<description>Shedmaster Bounds Greene</description>
+		<description>Shedmaster Bounds Green</description>
 		<year>1987</year>
 		<publisher>Dee-Kay</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -10716,20 +10959,9 @@
 		</part>
 	</software>
 
-	<software name="sigmagic">
-		<description>Signals and Magic</description>
-		<year>198?</year>
-		<publisher>H&amp;H Software</publisher>
-		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="9649">
-				<rom name="signalsandmagic(hnh).uef" size="9649" crc="19edfd4a" sha1="0353fbea7269b821a8174bdb51ced70e2eb36b7c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sim">
 		<description>Sim</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Viper</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10656">
@@ -10741,7 +10973,7 @@
 	<software name="simcity">
 		<description>Sim City</description>
 		<year>1990</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="39075">
 				<rom name="simcity(1990)(superior).uef" size="39075" crc="66a2882b" sha1="dcbd191ad0fb586dda2143f942e723101fb27098" offset="0" />
@@ -10766,7 +10998,7 @@
 		<publisher>Godax</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="22110">
-				<rom name="skirmish.hq(godax).uef" size="22110" crc="298d6d06" sha1="d1deeb5f652cc0be4b867e64f831e22ea2ed49d1" offset="0" />
+				<rom name="skirmish(godax).hq.uef" size="22110" crc="298d6d06" sha1="d1deeb5f652cc0be4b867e64f831e22ea2ed49d1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -10807,7 +11039,7 @@
 	<software name="slickerp">
 		<description>Slicker Puzzle</description>
 		<year>198?</year>
-		<publisher>DK Tronics</publisher>
+		<publisher>DK'Tronics</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="4574">
 				<rom name="slickerpuzzle(dktronics).uef" size="4574" crc="51fed1f8" sha1="07c49b68cf3b3f4b12d2973b0bd5cac3bffb9b10" offset="0" />
@@ -10816,7 +11048,7 @@
 	</software>
 
 	<software name="slblpuzz1" cloneof="slblpuzz">
-		<description>Sliding Block Puzzles v1.0</description>
+		<description>Sliding-Block Puzzles v1.0</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG12" />
@@ -10828,7 +11060,7 @@
 	</software>
 
 	<software name="slblpuzz">
-		<description>Sliding Block Puzzles v2.3</description>
+		<description>Sliding-Block Puzzles v2.3</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG12" />
@@ -10953,7 +11185,7 @@
 	<software name="snapperpias" cloneof="snapper">
 		<description>Snapper (Play It Again Sam 7)</description>
 		<year>1989</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11761">
 				<rom name="snapper-piasrr(1989)(superior)(g04).uef" size="11761" crc="94813097" sha1="47cf3fbfc77a5780bdfded18af1890f4f205e884" offset="0" />
@@ -10967,8 +11199,8 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG04" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="6568">
-				<rom name="snapper-v1(1982)(acornsoft)(g04).uef" size="6568" crc="dd094359" sha1="7baac890a5d40f332f491d3eaebfcc7eaee18044" offset="0" />
+			<dataarea name="cass" size="6944">
+				<rom name="snapper-v1(1982)(acornsoft)(g04).hq.uef" size="6944" crc="d493fd2e" sha1="a46e76d2b397dec7daf746e5cd613910aef9181f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -10979,8 +11211,8 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG04" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="7330">
-				<rom name="snapper-v2.1(1982)(acornsoft)(g04).uef" size="7330" crc="d0ee1a50" sha1="aa34d0e1a6d3fb862194705b77a016822b54ceaf" offset="0" />
+			<dataarea name="cass" size="7789">
+				<rom name="snapper-v2.1(1982)(acornsoft)(g04).hq.uef" size="7789" crc="1e587d8d" sha1="7475c52aa98d1392661b7ddc4d9f8a88100d3581" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -11003,8 +11235,8 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG21" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="7270">
-				<rom name="snooker-acornsoft-v2.0(1983)(acornsoft)(g21).uef" size="7270" crc="d60da42b" sha1="79281c87db0191cc559f542dfcbc43a1ce15880a" offset="0" />
+			<dataarea name="cass" size="7744">
+				<rom name="snooker-acornsoft-v2.0(1983)(acornsoft)(g21).hq.uef" size="7744" crc="9bdc8d01" sha1="06def39ff27f021546bc1bbcd0a2afdb3658b6b2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -11024,7 +11256,7 @@
 	<software name="snorter">
 		<description>Snorter</description>
 		<year>198?</year>
-		<publisher>Beebug)</publisher>
+		<publisher>Beebug</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="5578">
 				<rom name="snorter(beebug).uef" size="5578" crc="8db87273" sha1="0fb4092342bf7fd3fa1265a90c2251a0a14754bc" offset="0" />
@@ -11056,7 +11288,7 @@
 
 	<software name="soccersu">
 		<description>Soccer Supremo</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Qualsoft</publisher>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Data"/>
@@ -11113,7 +11345,7 @@
 
 	<software name="spadvpro">
 		<description>Space Adventure (Pro)</description>
-		<year>1982</year>
+		<year>1983</year>
 		<publisher>Pro Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="9964">
@@ -11123,9 +11355,9 @@
 	</software>
 
 	<software name="spcadv">
-		<description>Space Adventure</description>
-		<year>198?</year>
-		<publisher>Virgin</publisher>
+		<description>Space Adventure (Virgin)</description>
+		<year>1983</year>
+		<publisher>Virgin Games</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="9998">
 				<rom name="spaceadventure(virgin).uef" size="9998" crc="61b07081" sha1="b5f1dcc9baa8c3e10290a32abcfbaa3cbcb4f2fd" offset="0" />
@@ -11135,7 +11367,7 @@
 
 	<software name="spadv1">
 		<description>Space Adventure 1</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>First Byte</publisher>
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
@@ -11175,8 +11407,8 @@
 		<publisher>MP Software</publisher>
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="4280">
-				<rom name="spaceguard_run(1983)(mpsoft).uef" size="4280" crc="eeaf252a" sha1="9f56303dda43d941b20191b0433873595af0badf" offset="0" />
+			<dataarea name="cass" size="4522">
+				<rom name="spaceguard_run(1983)(mpsoft).hq.uef" size="4522" crc="c863bbf1" sha1="91ea5c9456849639e717c6f466298d7fb333ba55" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -11199,7 +11431,7 @@
 		<publisher>Amcom</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="9212">
-				<rom name="spacehi-way.hq(amcom).uef" size="9212" crc="209b2d62" sha1="d055d493cae85e36e1516ce339aad7bf3ed34ce3" offset="0" />
+				<rom name="spacehi-way(amcom).hq.uef" size="9212" crc="209b2d62" sha1="d055d493cae85e36e1516ce339aad7bf3ed34ce3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -11364,7 +11596,7 @@
 	<software name="spellbin">
 		<description>Spellbinder</description>
 		<year>1987</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="29750">
 				<rom name="spellbinder(1987)(superior).uef" size="29750" crc="b99ed804" sha1="58cc85a4baf5a6412d84495d7679c7bfd554f2d2" offset="0" />
@@ -11374,8 +11606,8 @@
 
 	<software name="spellbes">
 		<description>Spellbound Beseiged</description>
-		<year>198?</year>
-		<publisher>Sullis</publisher>
+		<year>1983</year>
+		<publisher>Sulis Software</publisher>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="14151">
@@ -11403,11 +11635,11 @@
 
 	<software name="sphdest">
 		<description>Sphere of Destiny</description>
-		<year>1986</year>
+		<year>1987</year>
 		<publisher>Audiogenic</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="30623">
-				<rom name="sphereofdestiny.hq(1986)(audiogenic).uef" size="30623" crc="f7bcf29c" sha1="e16ec52d56409a3570170e2d68c4918e1b3231b2" offset="0" />
+				<rom name="sphereofdestiny(1987)(audiogenic).hq.uef" size="30623" crc="f7bcf29c" sha1="e16ec52d56409a3570170e2d68c4918e1b3231b2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -11418,8 +11650,8 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG07" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="13999">
-				<rom name="sphinxadventure-v1.0(1982)(acornsoft)(g07).uef" size="13999" crc="d71fcbc5" sha1="177135bfa47a0bc46cdcf29342aacb10339303e6" offset="0" />
+			<dataarea name="cass" size="14688">
+				<rom name="sphinxadventure-v1.0(1982)(acornsoft)(g07).hq.uef" size="14688" crc="d96874e4" sha1="7ef1bd964338fb7ba0f9fae421831737e105873a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -11459,7 +11691,7 @@
 
 	<software name="spitsim">
 		<description>Spitfire Flight Simulator</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Alligata</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7755">
@@ -11529,7 +11761,7 @@
 	<software name="spycat">
 		<description>Spycat</description>
 		<year>1988</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="29945">
 				<rom name="spycat(1988)(superior).uef" size="29945" crc="1e307dd3" sha1="109773d56ab6579ec04b95ef0e2c4269f1fda5b1" offset="0" />
@@ -11554,7 +11786,7 @@
 		<publisher>Tynesoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="21901">
-				<rom name="spyvsspy.hq(1984)(tynesoft).uef" size="21901" crc="e50496d1" sha1="b799d5a6044547a7354e1418a997151144956425" offset="0" />
+				<rom name="spyvsspy(1984)(tynesoft).hq.uef" size="21901" crc="e50496d1" sha1="b799d5a6044547a7354e1418a997151144956425" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -11587,7 +11819,7 @@
 		<publisher>Software Invasion</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="21855">
-				<rom name="stairwaytohell.hq(1985)(softwareinvasion).uef" size="21855" crc="32dded20" sha1="375e1fa7400cf7dc9bd7642f51e44772d7845150" offset="0" />
+				<rom name="stairwaytohell(1985)(softwareinvasion).hq.uef" size="21855" crc="32dded20" sha1="375e1fa7400cf7dc9bd7642f51e44772d7845150" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -11620,7 +11852,7 @@
 		<publisher>Firebird</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="27620">
-				<rom name="stardrifter.hq(1985)(firebird).uef" size="27620" crc="22f13441" sha1="17e3b099a592b7edae4fa729090a7da12ac397c5" offset="0" />
+				<rom name="stardrifter(1985)(firebird).hq.uef" size="27620" crc="22f13441" sha1="17e3b099a592b7edae4fa729090a7da12ac397c5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -11660,7 +11892,7 @@
 
 	<software name="starflan">
 		<description>Starforce Lander</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>First Byte</publisher>
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
@@ -11717,7 +11949,7 @@
 	<software name="starport">
 		<description>Star Port</description>
 		<year>1990</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="15693">
 				<rom name="starport(1990)(superior).uef" size="15693" crc="33e8cd31" sha1="8282d6f88e89ba2ae9a671016a5d4294e7ccd463" offset="0" />
@@ -11731,7 +11963,7 @@
 		<publisher>Bubble Bus</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="40808">
-				<rom name="starquake.hq(bubblebus).uef" size="40808" crc="9d3a074f" sha1="0be54d8c11bb98f0d4f249e3a13cbfddc13a21c7" offset="0" />
+				<rom name="starquake(bubblebus).hq.uef" size="40808" crc="9d3a074f" sha1="0be54d8c11bb98f0d4f249e3a13cbfddc13a21c7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -11753,8 +11985,8 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG22" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="12949">
-				<rom name="starshipcommand-v1.1(1983)(acornsoft)(g22).uef" size="12949" crc="92204551" sha1="7606748c501013fde28357214e74134ce84b5d50" offset="0" />
+			<dataarea name="cass" size="13486">
+				<rom name="starshipcommand-v1.1(1983)(acornsoft)(g22).hq.uef" size="13486" crc="2307f19a" sha1="5584b6f6fc41812e121e079dade07df3f5d4451c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -11810,15 +12042,15 @@
 		<year>1984</year>
 		<publisher>Superior Software</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="8405">
-				<rom name="starstriker(1984)(superior).uef" size="8405" crc="3375b385" sha1="cdd7c4ffe4ba169d915ba5c6f2cf8f4498b78527" offset="0" />
+			<dataarea name="cass" size="8835">
+				<rom name="starstriker(1984)(superior).hq.uef" size="8835" crc="430ed053" sha1="a81f5291f8ce374b6e226af29c44a117f638ea07" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="startrad">
 		<description>Star Trader</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>First Byte</publisher>
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
@@ -11830,7 +12062,7 @@
 
 	<software name="startrkl">
 		<description>Startrek</description>
-		<year>198?</year>
+		<year>1982</year>
 		<publisher>Logic Systems</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8479">
@@ -11885,7 +12117,7 @@
 	</software>
 
 	<software name="stdsnook">
-		<description>Steve Davis Snooker (CDS)</description>
+		<description>Steve Davis Snooker</description>
 		<year>1986</year>
 		<publisher>CDS</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -11897,8 +12129,9 @@
 
 	<software name="stix">
 		<description>Stix</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Supersoft</publisher>
+		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="4243">
 				<rom name="stix(supersoft).uef" size="4243" crc="86bacb6c" sha1="2f607058d90d56ac65a96776b08835311c5f882b" offset="0" />
@@ -12069,7 +12302,7 @@
 	<software name="subkillr">
 		<description>Sub Killer</description>
 		<year>198?</year>
-		<publisher>DK Tronics</publisher>
+		<publisher>DK'Tronics</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="5405">
 				<rom name="subkiller(dktronics).uef" size="5405" crc="fb43b0ae" sha1="ac27283a48944d2af724c3250551b4ec3a8ebe2d" offset="0" />
@@ -12129,6 +12362,17 @@
 		</part>
 	</software>
 
+	<software name="solympid">
+		<description>Summer Olympiad</description>
+		<year>1988</year>
+		<publisher>Tynesoft</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="82501">
+				<rom name="summerolympiad(1988)(tynesoft).hq.uef" size="82501" crc="4b26af7a" sha1="7a10ed1d849376f15001462e7f53951b2251f338" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="super7">
 		<description>Super-7</description>
 		<year>1983</year>
@@ -12143,7 +12387,7 @@
 	<software name="superfru">
 		<description>Super Fruits</description>
 		<year>198?</year>
-		<publisher>DK Tronics</publisher>
+		<publisher>DK'Tronics</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="4265">
 				<rom name="superfruits(dktronics).uef" size="4265" crc="1201619b" sha1="dbe3718a1be1ae5bf7e9ac2a7726d8139880a21f" offset="0" />
@@ -12152,8 +12396,8 @@
 	</software>
 
 	<software name="supgolf">
-		<description>Supergolf</description>
-		<year>198?</year>
+		<description>Super Golf</description>
+		<year>1984</year>
 		<publisher>Squirrel Soft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6736">
@@ -12175,7 +12419,7 @@
 
 	<software name="suprhang">
 		<description>Super Hangman</description>
-		<year>198?</year>
+		<year>1982</year>
 		<publisher>I.J.K.</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8105">
@@ -12199,7 +12443,7 @@
 	<software name="supsocc">
 		<description>Superior Soccer</description>
 		<year>1989</year>
-		<publisher>Superior Software</publisher>
+		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="21195">
 				<rom name="superiorsoccer(1989)(superior).uef" size="21195" crc="4df93358" sha1="f0bcc40d70f65031c6768129942ce9bb425a03d0" offset="0" />
@@ -12207,7 +12451,18 @@
 		</part>
 	</software>
 
-	<software name="superman">
+	<software name="suprlife">
+		<description>Superlife</description>
+		<year>1982</year>
+		<publisher>Golem</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="3798">
+				<rom name="superlife(golem).uef" size="3798" crc="13178564" sha1="457778e76fbd18f35a68e7c76a98699895250285" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprmang">
 		<description>Superman: The Game</description>
 		<year>1988</year>
 		<publisher>First Star</publisher>
@@ -12218,13 +12473,24 @@
 		</part>
 	</software>
 
+	<software name="superman">
+		<description>Superman: The Man of Steel</description>
+		<year>1989</year>
+		<publisher>Tynesoft</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="65587">
+				<rom name="superman_manofsteel(1989)(tynesoft).hq.uef" size="65587" crc="b97c2058" sha1="98c6449ff0bba23cebf717b588ac10543782e08d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="suprpool">
 		<description>Super Pool</description>
 		<year>1984</year>
 		<publisher>Software Invasion</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11330">
-				<rom name="superpool.hq(1984)(softwareinvasion).uef" size="11330" crc="d18454e0" sha1="949b09def2c00a340aa1596e43652f9f781b6bfd" offset="0" />
+				<rom name="superpool(1984)(softwareinvasion).hq.uef" size="11330" crc="d18454e0" sha1="949b09def2c00a340aa1596e43652f9f781b6bfd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -12282,6 +12548,17 @@
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6425">
 				<rom name="swampmonsters(1982)(mpsoft).uef" size="6425" crc="60630ec8" sha1="4ce79d48b93e83e4c4971ccf8e857fecaa197cac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swarm">
+		<description>Swarm</description>
+		<year>1982</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="6848">
+				<rom name="swarm(1982)(computerconcepts).hq.uef" size="6848" crc="510ebad5" sha1="c7b3c1200de37b275d6837544df457f24906cb83" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -12345,7 +12622,7 @@
 
 	<software name="arabiann">
 		<description>Tales of the Arabian Nights</description>
-		<year>1983</year>
+		<year>1985</year>
 		<publisher>Interceptor</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="9777">
@@ -12356,7 +12633,7 @@
 
 	<software name="tankattg">
 		<description>Tank Attack (Gem)</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Gem</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10197">
@@ -12378,7 +12655,7 @@
 
 	<software name="tanks">
 		<description>Tanks!</description>
-		<year>1983</year>
+		<year>1982</year>
 		<publisher>Salamander</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="4772">
@@ -12510,7 +12787,7 @@
 
 	<software name="tmatchv2">
 		<description>Test Match v2</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>CRL</publisher>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -12528,7 +12805,7 @@
 
 	<software name="tmatch">
 		<description>Test Match</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>CRL</publisher>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -12596,24 +12873,6 @@
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="94604">
 				<rom name="thearchers(mosaic).uef" size="94604" crc="c771c650" sha1="017f3f8f4331ed2d42993558146572ed23d84f0f" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="artstudi">
-		<description>The Art Studio</description>
-		<year>1989</year>
-		<publisher>Impact</publisher>
-		<part name="cass1" interface="bbc_cass">
-			<feature name="part_id" value="Side 1 MODE4"/>
-			<dataarea name="cass" size="12647">
-				<rom name="theartstudio-side1mode4_be(1989)(impact).uef" size="12647" crc="df5049f8" sha1="cb37bd80c626f88e2de6d3b05838606ecff7ca5f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="bbc_cass">
-			<feature name="part_id" value="Side 2 MODE5"/>
-			<dataarea name="cass" size="13064">
-				<rom name="theartstudio-side2mode5_be(1989(impact).uef" size="13064" crc="22ab434f" sha1="a2e8a9373ca60f576d16e795e82e3e8eacd62595" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -12726,13 +12985,43 @@
 		</part>
 	</software>
 
+	<software name="goldcoll">
+		<description>The Gold Collection</description>
+		<year>1987</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="cass1" interface="bbc_cass">
+			<feature name="part_id" value="Jetpac, Knightlore, Nightshade"/>
+			<dataarea name="cass" size="63556">
+				<rom name="thegoldcollection-1a(usgold).hq.uef" size="63556" crc="e8b38e2e" sha1="308e771149f3c56fe958e9a3a0bb9911c9a51383" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="bbc_cass">
+			<feature name="part_id" value="Sabre Wulf, Pirate Adventure"/>
+			<dataarea name="cass" size="35167">
+				<rom name="thegoldcollection-1b(usgold).hq.uef" size="35167" crc="ea9604bd" sha1="b98731c77b77f5ff8935c6ca29e811663d24a779" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="bbc_cass">
+			<feature name="part_id" value="Voodoo Castle, Strange Odyssey"/>
+			<dataarea name="cass" size="18887">
+				<rom name="thegoldcollection-2a(usgold).hq.uef" size="18887" crc="247a3af9" sha1="c7742e5e96d2a6238784d9064a58b05543a54a35" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass4" interface="bbc_cass">
+			<feature name="part_id" value="Buckaroo Banzai, Temple of Terror"/>
+			<dataarea name="cass" size="30188">
+				<rom name="thegoldcollection-2b(usgold).hq.uef" size="30188" crc="f7e99b66" sha1="946d604c3df7e7625a5963b88fd567845e2f2e66" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hacker">
 		<description>The Hacker</description>
 		<year>198?</year>
 		<publisher>Firebird</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="16051">
-				<rom name="thehacker.hq(firebird).uef" size="16051" crc="78013c40" sha1="8d4ca6963ef8b8b08c673d7802fc9414bb731715" offset="0" />
+				<rom name="thehacker(firebird).hq.uef" size="16051" crc="78013c40" sha1="8d4ca6963ef8b8b08c673d7802fc9414bb731715" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -12786,7 +13075,7 @@
 	<software name="magsword">
 		<description>The Magic Sword</description>
 		<year>1984</year>
-		<publisher>Database</publisher>
+		<publisher>Database Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="19213">
 				<rom name="themagicsword(database).uef" size="19213" crc="87f47f6c" sha1="6ad9291d52c331ae3000b2e82ac3c767f288211f" offset="0" />
@@ -12807,11 +13096,11 @@
 
 	<software name="themine">
 		<description>The Mine</description>
-		<year>1984</year>
+		<year>1983</year>
 		<publisher>Micro Power</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="8754">
-				<rom name="themine(micropower).uef" size="8754" crc="cc0cca5a" sha1="b9b4cb4bfab776589b18a7b894d90b9581718184" offset="0" />
+			<dataarea name="cass" size="9868">
+				<rom name="themine(micropower).hq.uef" size="9868" crc="6ac9d8dc" sha1="19848b86dc4aaa644e9555a26eee55cac42c60e2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -12878,7 +13167,7 @@
 		<publisher>Firebird</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="21473">
-				<rom name="thesentinel.hq(1986)(firebird).uef" size="21473" crc="0e91ace3" sha1="05b98f9d22289d05f7f37fc7c83204eb7b2a9be0" offset="0" />
+				<rom name="thesentinel(1986)(firebird).hq.uef" size="21473" crc="0e91ace3" sha1="05b98f9d22289d05f7f37fc7c83204eb7b2a9be0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -12943,8 +13232,8 @@
 		<year>1986</year>
 		<publisher>Superior Software</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="18562">
-				<rom name="thrust(1986)(superior).uef" size="18562" crc="965f867b" sha1="2b68f45eb783546ba7bc4acbad2858c2f9df0dda" offset="0" />
+			<dataarea name="cass" size="19313">
+				<rom name="thrust(1986)(superior).hq.uef" size="19313" crc="6d597193" sha1="6a40ac7221efe8338f3cedaed39850cdfd60c877" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -12960,18 +13249,6 @@
 		</part>
 	</software>
 
-	<software name="tstruck2">
-		<description>Thunderstruck 2: Mind Master</description>
-		<year>1986</year>
-		<publisher>Audiogenic</publisher>
-		<info name="usage" value="Load with *RUN" />
-		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="19705">
-				<rom name="thunderstruck2_run(1986)(audiogenic).uef" size="19705" crc="234746dc" sha1="b8d96d6d00e5aa5805b6a60dcec1cf5aea9e3e9d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="tstruck">
 		<description>Thunderstruck</description>
 		<year>1985</year>
@@ -12980,6 +13257,17 @@
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="19576">
 				<rom name="thunderstruck_run(1985)(audiogenic).uef" size="19576" crc="0e91a57a" sha1="c55609231fecf20f0658f68745d5e2427c9c4de7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tstruck2">
+		<description>Thunderstruck 2: Mind Master</description>
+		<year>1986</year>
+		<publisher>Audiogenic</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="21966">
+				<rom name="thunderstruck2(1986)(audiogenic).hq.uef" size="21966" crc="a7722c7f" sha1="b208ca332b87372c373929ea06b80d0b3171ec1e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -13177,7 +13465,7 @@
 			</dataarea>
 		</part>
 		<part name="cass3" interface="bbc_cass">
-			<feature name="part_id" value="Rockfall"/>
+			<feature name="part_id" value="Rock Fall"/>
 			<dataarea name="cass" size="5148">
 				<rom name="td10-rockfall_be(1988)(alternative).uef" size="5148" crc="50d5a42c" sha1="e56ccb7cead9a85a9b789df1f63b7e698dfce298" offset="0" />
 			</dataarea>
@@ -13404,8 +13692,8 @@
 		<year>1983</year>
 		<publisher>Bug Byte</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="21502">
-				<rom name="twinkingdomvalley(1983)(bugbyte).uef" size="21502" crc="89f6cfab" sha1="931316f71edbe8a8642da81dd8389301df8808c6" offset="0" />
+			<dataarea name="cass" size="22182">
+				<rom name="twinkingdomvalley(1983)(bugbyte).hq.uef" size="22182" crc="76babec6" sha1="5539a1002fa24a2e3f2a3954e01e46db40d8e2f0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -13450,8 +13738,8 @@
 		<year>1984</year>
 		<publisher>Icon</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="12102">
-				<rom name="ultron(icon).uef" size="12102" crc="0dbfc591" sha1="af3a31cdcb1f80a79a6468d2ec251b57639e993f" offset="0" />
+			<dataarea name="cass" size="12561">
+				<rom name="ultron(1984)(icon).hq.uef" size="12561" crc="d38871a4" sha1="979a87df31e24e2ee17e3989d28b7f4977d747df" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -13556,7 +13844,7 @@
 
 	<software name="valphara">
 		<description>Valley of the Pharaohs</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>First Byte</publisher>
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
@@ -13605,7 +13893,7 @@
 		<publisher>Firebird</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="12979">
-				<rom name="videoclassics.hq(firebird).uef" size="12979" crc="004141e0" sha1="fdb1b712aaf371d6d4b203ab94edb253993051d1" offset="0" />
+				<rom name="videoclassics(firebird).hq.uef" size="12979" crc="004141e0" sha1="fdb1b712aaf371d6d4b203ab94edb253993051d1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -13621,9 +13909,20 @@
 		</part>
 	</software>
 
+	<software name="videorev">
+		<description>Video's Revenge</description>
+		<year>1985</year>
+		<publisher>Budgie</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="19458">
+				<rom name="videosrevenge(1985)(budgie).hq.uef" size="19458" crc="bb4d1cca" sha1="13ab287fd9561b8be926df7c667e61ae237f553b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="villsoulo" cloneof="villsoul">
 		<description>Village of Lost Souls (Original)</description>
-		<year>1987</year>
+		<year>1985</year>
 		<publisher>Magus</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="23481">
@@ -13660,8 +13959,8 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBG33" />
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="9951">
-				<rom name="volcano-v1(1984)(acornsoft)(g33).uef" size="9951" crc="6750ea2f" sha1="5079d10c287cdab70bb1c73078fc05c488aff045" offset="0" />
+			<dataarea name="cass" size="10387">
+				<rom name="volcano-v1(1984)(acornsoft)(g33).hq.uef" size="10387" crc="1f2f0ee0" sha1="aa4d08dc6f08c1c6b63329604f23bb7e64b1c32c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -13671,15 +13970,15 @@
 		<year>1983</year>
 		<publisher>Software Invasion</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="11625">
-				<rom name="vortex(1983)(softwareinvasion).uef" size="11625" crc="394d3be4" sha1="e883f2918dc5d6b4c3bf7a1004730400c8db8ae4" offset="0" />
+			<dataarea name="cass" size="12094">
+				<rom name="vortex(1983)(softwareinvasion).hq.uef" size="12094" crc="094a2a35" sha1="22c75a5839bd48726756a96d9ab4c13fc0a896f1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="wall">
 		<description>Wall</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Micro Power</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="3457">
@@ -13777,25 +14076,25 @@
 		<publisher>Melbourne House</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="18449">
-				<rom name="wayoftheexplodingfist.hq(1985)(melbourne).uef" size="18449" crc="8cdaebf6" sha1="c7c0fa29063a337e1511dd79639f999ed5fb7453" offset="0" />
+				<rom name="wayoftheexplodingfist(1985)(melbourne).hq.uef" size="18449" crc="8cdaebf6" sha1="c7c0fa29063a337e1511dd79639f999ed5fb7453" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="wayotef2" cloneof="wayotef">
-		<description>The Way of the Exploding Fist v2</description>
+		<description>The Way of the Exploding Fist (Richochet)</description>
 		<year>1985</year>
-		<publisher>Melbourne House</publisher>
+		<publisher>Richochet</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="17353">
-				<rom name="wayoftheexplodingfistv2.hq(1985)(melbourne).uef" size="17353" crc="d5ef89de" sha1="3186dad75a0099836be20a97956fca2597ceaeb1" offset="0" />
+				<rom name="wayoftheexplodingfistv2(1985)(ricochet).hq.uef" size="17353" crc="d5ef89de" sha1="3186dad75a0099836be20a97956fca2597ceaeb1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="webrunne">
 		<description>Web Runner</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Alligata</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="5725">
@@ -13816,7 +14115,7 @@
 	</software>
 
 	<software name="weetabix">
-		<description>Weetabix Versus The Titchies</description>
+		<description>Weetabix versus The Titchies</description>
 		<year>1984</year>
 		<publisher>Romik</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -13839,8 +14138,9 @@
 
 	<software name="west">
 		<description>West</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>Talent</publisher>
+		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="19553">
 				<rom name="west(talent).uef" size="19553" crc="05d16378" sha1="7b67e0cd34d00dd98800ae59b26cb7808d407475" offset="0" />
@@ -13850,8 +14150,8 @@
 
 	<software name="wetzone">
 		<description>Wet Zone</description>
-		<year>19??</year>
-		<publisher>Everise</publisher>
+		<year>1985</year>
+		<publisher>Everiss</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8021">
 				<rom name="wetzone(everise).uef" size="8021" crc="ea67cf97" sha1="4035ab903e861f4d1333e0770d37670c52bed130" offset="0" />
@@ -13861,7 +14161,7 @@
 
 	<software name="eeyores">
 		<description>What's Eeyore's</description>
-		<year>19??</year>
+		<year>1986</year>
 		<publisher>Magus</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="19673">
@@ -13872,7 +14172,7 @@
 
 	<software name="wheeldea">
 		<description>Wheeler Dealer</description>
-		<year>19??</year>
+		<year>1983</year>
 		<publisher>OIC</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="16602">
@@ -13932,6 +14232,17 @@
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="32298">
 				<rom name="whitemagic(1989)(4thdimension).uef" size="32298" crc="695d5458" sha1="92de80dbc67e699d5c0d1d63e01f4bf1da040e35" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizzym">
+		<description>Wizzy's Mansion</description>
+		<year>1986</year>
+		<publisher>Audiogenic</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="12709">
+				<rom name="wizzysmansion(1986)(audiogenic).hq.uef" size="12709" crc="3cd992d6" sha1="001024d602429a4ffb842f96a9852fb603fc0048" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -14010,7 +14321,7 @@
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="15196">
-				<rom name="wizadore_run.hq(1985)(imagine).uef" size="15196" crc="3a50cef3" sha1="ab3b100f043dcfa063825fb1f99267bdcb7a3b84" offset="0" />
+				<rom name="wizadore_run(1985)(imagine).hq.uef" size="15196" crc="3a50cef3" sha1="ab3b100f043dcfa063825fb1f99267bdcb7a3b84" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -14131,7 +14442,7 @@
 	<software name="worldtra">
 		<description>World Travel Game</description>
 		<year>1983</year>
-		<publisher>Hessel</publisher>
+		<publisher>Simon W. Hessel</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="9350">
 				<rom name="worldtravelgame(hessel).uef" size="9350" crc="54986641" sha1="392cfef4dbb228386617849f97ba753b72d20260" offset="0" />
@@ -14165,7 +14476,7 @@
 	<software name="xadomy">
 		<description>Xadomy</description>
 		<year>1984</year>
-		<publisher>Brassington</publisher>
+		<publisher>Brassington Enterprises</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6340">
 				<rom name="xadomy_be(1984)(brassington).uef" size="6340" crc="9b36857d" sha1="f2ddb08b1728c46bd8211ee6eacb5b99493b2171" offset="0" />
@@ -14217,8 +14528,26 @@
 		</part>
 	</software>
 
+	<software name="yespm">
+		<description>Yes, Prime Minister</description>
+		<year>1987</year>
+		<publisher>Mosaic</publisher>
+		<part name="cass1" interface="bbc_cass">
+			<feature name="part_id" value="Days 1 &amp; 2"/>
+			<dataarea name="cass" size="67936">
+				<rom name="yesprimeminister-a(mosaic).uef" size="67936" crc="dfb6fc43" sha1="6d674bd518245cf0876ef5c1df8277a6244d2474" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="bbc_cass">
+			<feature name="part_id" value="Days 3, 4 &amp; 5"/>
+			<dataarea name="cass" size="90266">
+				<rom name="yesprimeminister-b(mosaic).uef" size="90266" crc="d38788f3" sha1="20194c96fbda8f9833d00c83c4539228e315d2ba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="yiear2">
-		<description>Yie Ar Kung Fu 2</description>
+		<description>Yie Ar Kung-Fu 2</description>
 		<year>198?</year>
 		<publisher>Imagine</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -14229,12 +14558,12 @@
 	</software>
 
 	<software name="yiear">
-		<description>Yie Ar Kung Fu</description>
-		<year>1984</year>
+		<description>Yie Ar Kung-Fu</description>
+		<year>1985</year>
 		<publisher>Imagine</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="27723">
-				<rom name="yiearkungfu(1984)(imagine).uef" size="27723" crc="84ba92ac" sha1="632738f9161f0d9ddc705afbdf97b1944931dc13" offset="0" />
+				<rom name="yiearkungfu(1985)(imagine).uef" size="27723" crc="84ba92ac" sha1="632738f9161f0d9ddc705afbdf97b1944931dc13" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -14462,8 +14791,8 @@
 	</software>
 
 	<software name="stockmrk">
-		<description>Stock Market</description>
-		<year>198?</year>
+		<description>Stockmarket</description>
+		<year>1983</year>
 		<publisher>ASP Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6079">
@@ -14474,7 +14803,7 @@
 
 	<software name="taxcalc">
 		<description>Tax Calc</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>BBC Soft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="19808">
@@ -14531,6 +14860,17 @@
 		</part>
 	</software>
 
+	<software name="amazolli">
+		<description>Amazing Ollie</description>
+		<year>1983</year>
+		<publisher>Storm Software</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="4377">
+				<rom name="amazingollie(storm).uef" size="4377" crc="09a20d5d" sha1="2c8aec0193fec3b5d4cbfcf306fa08f1d353dbc0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="animalve">
 		<description>Animal, Vegetable, Mineral</description>
 		<year>1983</year>
@@ -14545,7 +14885,7 @@
 	<software name="alienpla">
 		<description>Basic Adventures in Space: The Alien Planet</description>
 		<year>198?</year>
-		<publisher>Glentop</publisher>
+		<publisher>Glentop Publishers</publisher>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="4357">
@@ -14581,7 +14921,7 @@
 	<software name="bertboot">
 		<description>Bert Boot</description>
 		<year>1984</year>
-		<publisher>H.S.Software</publisher>
+		<publisher>Highlight Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7174">
 				<rom name="bertboot(hs).uef" size="7174" crc="65f1605d" sha1="9eb8674dfebcd249576757641827dea5a4ee9495" offset="0" />
@@ -14620,9 +14960,10 @@
 	</software>
 
 	<software name="biology">
-		<description>Biology</description>
+		<description>Revise GCE/CSE Biology</description>
 		<year>1983</year>
-		<publisher>Ivan Berg</publisher>
+		<publisher>Acornsoft/Ivan Berg</publisher>
+		<info name="release" value="XBX11" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="51155">
 				<rom name="biology_be(1983)(ivanberg).uef" size="51155" crc="57e129ee" sha1="ee7371e89a264a0f9af5042b65b4db59fc5d2145" offset="0" />
@@ -14630,13 +14971,35 @@
 		</part>
 	</software>
 
+	<software name="biologyc">
+		<description>Biology 'O' Level</description>
+		<year>1983</year>
+		<publisher>Calisto</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="9137">
+				<rom name="biology(1983)(calisto).uef" size="9137" crc="5a05c72a" sha1="b0dac93995a597d57a57e53d445b41248a78b3d5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="birdwatc">
-		<description>Bird Watch</description>
-		<year>198?</year>
+		<description>Birdwatch</description>
+		<year>1984</year>
 		<publisher>Macdonald</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11287">
 				<rom name="birdwatch(macdonald).uef" size="11287" crc="3130c2be" sha1="33fd7786e853741016d93ce2df91bd2537559ace" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bigeogqz">
+		<description>British Isles Geography Quiz</description>
+		<year>1984</year>
+		<publisher>Computer Market</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="9683">
+				<rom name="britishislesgeographyquiz(computermarket).uef" size="9683" crc="9a4e319a" sha1="fc025a6af745c70a4bcedc022ab7f6534b756a9b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -14887,6 +15250,17 @@
 		</part>
 	</software>
 
+	<software name="frencht">
+		<description>French Tutor</description>
+		<year>1983</year>
+		<publisher>Salamander</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="47920">
+				<rom name="frenchtutor(salamander).uef" size="47920" crc="97349b5a" sha1="6e518a3802679082c01ac921f75c2b18a021ae9c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fs2-68">
 		<description>Fun School 2 (For 6-8 year olds)</description>
 		<year>1989</year>
@@ -14931,6 +15305,17 @@
 		</part>
 	</software>
 
+	<software name="happynum">
+		<description>Happy Numbers</description>
+		<year>198?</year>
+		<publisher>Bourne Educational Software</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="4676">
+				<rom name="happynumbers(bourne).uef" size="4676" crc="3cd9531a" sha1="04d71c30dc0804c6c416b6f8e743535ad68ccaa3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hibounce">
 		<description>Hi Bouncer</description>
 		<year>198?</year>
@@ -14944,8 +15329,8 @@
 
 	<software name="honeylog">
 		<description>Honey Logo</description>
-		<year>198?</year>
-		<publisher>Glentop</publisher>
+		<year>1985</year>
+		<publisher>Glentop Publishers</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="9301">
 				<rom name="honeylogo_be(glentop).uef" size="9301" crc="89897c5e" sha1="90b4cdb626712f58dda0846637535b5e28aff182" offset="0" />
@@ -14966,8 +15351,8 @@
 	</software>
 
 	<software name="jnrmath1">
-		<description>Junior Maths Part1</description>
-		<year>198?</year>
+		<description>Junior Maths - Part 1</description>
+		<year>1986</year>
 		<publisher>Tynesoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="9220">
@@ -14977,8 +15362,8 @@
 	</software>
 
 	<software name="jnrmath2">
-		<description>Junior Maths Part2</description>
-		<year>198?</year>
+		<description>Junior Maths - Part 2</description>
+		<year>1986</year>
 		<publisher>Tynesoft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="9639">
@@ -15021,9 +15406,42 @@
 		</part>
 	</software>
 
+	<software name="letterbg">
+		<description>Letterbugs</description>
+		<year>1983</year>
+		<publisher>Highlight Software</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="5409">
+				<rom name="letterbugs(highlight).uef" size="5409" crc="841b1a4d" sha1="1ca865357e6a6f90666f69206fe075dda92e45d3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macbeth">
+		<description>Shakespeare Macbeth</description>
+		<year>198?</year>
+		<publisher>Penguin Study Software</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="19460">
+				<rom name="shakespearemacbeth(penguin).uef" size="19460" crc="fd4cd042" sha1="6fdc6fa191c229820e54343d1495103e9a3e373d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maprally">
+		<description>Map Rally</description>
+		<year>198?</year>
+		<publisher>Bourne Educational Software</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="6957">
+				<rom name="maprally(bourne).uef" size="6957" crc="ece25693" sha1="7f4a1dc179ded6606cca053392c79eafb9772b26" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mathsinv">
 		<description>Maths Invaders</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Stell</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="4226">
@@ -15039,6 +15457,24 @@
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="14594">
 				<rom name="mathstutor_be(1985)(century).uef" size="14594" crc="f1da555d" sha1="ad2bbcb4f857a41150519e7182e859f02bdb537f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrmenfir">
+		<description>First Steps with the Mr.Men</description>
+		<year>1983</year>
+		<publisher>Mirrorsoft</publisher>
+		<part name="cass1" interface="bbc_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="7697">
+				<rom name="mrmen-firststepsa(1983)(mirrorsoft).uef" size="7697" crc="46c87ae8" sha1="93d520ead1282f5f8615d6cc8b0b7569dea669a5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="bbc_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="6610">
+				<rom name="mrmen-firststepsb(1983)(mirrorsoft).uef" size="6610" crc="c907db3d" sha1="65e58e33527c8768e3fc5a2af41bda2aa59555ec" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -15079,7 +15515,7 @@
 
 	<software name="numercy2">
 		<description>Numeracy 2</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Shiva</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="14793">
@@ -15113,7 +15549,7 @@
 
 	<software name="questauc">
 		<description>Quest</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>AUCBE</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="15229">
@@ -15136,7 +15572,7 @@
 	<software name="roadcft1">
 		<description>Roadcraft 1</description>
 		<year>1984</year>
-		<publisher>H.S.Software</publisher>
+		<publisher>Highlight Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6854">
 				<rom name="roadcraft1(hs).uef" size="6854" crc="5cb6062d" sha1="6387fb7705651f3bf35ebbad8b5c1bd57393c3be" offset="0" />
@@ -15163,6 +15599,17 @@
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8628">
 				<rom name="sentencesequencing(1983)(acornsoft)(e07).uef" size="8628" crc="a7cbdc3b" sha1="ee718b17f7810fffdc309b693873bafca8018933" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sortout">
+		<description>Sortout</description>
+		<year>1983</year>
+		<publisher>Highlight Software</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="5847">
+				<rom name="sortout(highlight).uef" size="5847" crc="3792ebce" sha1="90f432e13bc758dae906a7bda2f99038951ecb95" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -15246,7 +15693,7 @@
 
 	<software name="topstail">
 		<description>Tops and Tails</description>
-		<year>198?</year>
+		<year>1985</year>
 		<publisher>Macmillian</publisher>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Snakes and Ladders"/>
@@ -15258,6 +15705,17 @@
 			<feature name="part_id" value="Tail End"/>
 			<dataarea name="cass" size="9392">
 				<rom name="tat-tailend_be(macmillian).uef" size="9392" crc="498e708d" sha1="ca70869eb30b1622d2933fa45aad9ef240f5da31" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="towntest">
+		<description>TownTest</description>
+		<year>1983</year>
+		<publisher>Silverlind</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="6366">
+				<rom name="towntest(1983)(silverlind).uef" size="6366" crc="79434da4" sha1="796200a4afabcbacbeafef49c35f278a8654baea" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -15277,10 +15735,23 @@
 	<software name="twelfnig">
 		<description>Twelfth Night</description>
 		<year>198?</year>
-		<publisher>Penguin</publisher>
+		<publisher>Penguin Study Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="18141">
 				<rom name="twelfthnight(penguin).uef" size="18141" crc="e94eb0b7" sha1="33f00a1856f52fe9ebd53051278aaf5b4a3357d5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="viking">
+		<description>Viking England</description>
+		<year>1984</year>
+		<publisher>Fernleaf</publisher>
+		<info name="usage" value="Load with *RUN" />
+		<part name="cass1" interface="bbc_cass">
+			<feature name="part_id" value="4: The Jarl"/>
+			<dataarea name="cass" size="29097">
+				<rom name="jarl(1984)(fernleaf).uef" size="29097" crc="d57893c1" sha1="4544c32389a2b175f675fa0bcfb7236ab982c249" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -15320,8 +15791,8 @@
 
 	<software name="wordpowr">
 		<description>Word Power</description>
-		<year>198?</year>
-		<publisher>Sullis</publisher>
+		<year>1983</year>
+		<publisher>Sulis Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="15176">
 				<rom name="wordpower(sullis).uef" size="15176" crc="f9c9e35a" sha1="96c790f1609165bbcb91e5db18dac94bc8f65518" offset="0" />
@@ -15420,7 +15891,7 @@
 
 	<software name="aslangpe">
 		<description>Assembly Language Programming Made Easy</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Century</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="13101">
@@ -15510,7 +15981,7 @@
 	</software>
 
 	<software name="artistbr" cloneof="artist">
-		<description>Artist (Blue Ribbon Games 3)</description>
+		<description>Artist (Blue Ribbon)</description>
 		<year>1985</year>
 		<publisher>Blue Ribbon</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -15531,6 +16002,24 @@
 		</part>
 	</software>
 
+	<software name="artstudi">
+		<description>The Art Studio</description>
+		<year>1989</year>
+		<publisher>Impact</publisher>
+		<part name="cass1" interface="bbc_cass">
+			<feature name="part_id" value="Side 1 MODE4"/>
+			<dataarea name="cass" size="12647">
+				<rom name="theartstudio-side1mode4_be(1989)(impact).uef" size="12647" crc="df5049f8" sha1="cb37bd80c626f88e2de6d3b05838606ecff7ca5f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="bbc_cass">
+			<feature name="part_id" value="Side 2 MODE5"/>
+			<dataarea name="cass" size="13064">
+				<rom name="theartstudio-side2mode5_be(1989(impact).uef" size="13064" crc="22ab434f" sha1="a2e8a9373ca60f576d16e795e82e3e8eacd62595" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bbcmusyn">
 		<description>BBC Music Synthesizer</description>
 		<year>1983</year>
@@ -15538,6 +16027,17 @@
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7696">
 				<rom name="bbcmusicsynthesizer(bugbyte).uef" size="7696" crc="26dd228c" sha1="578281ce7f7f91d63009e4f854bc354bc4b96b9d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebart">
+		<description>Beeb-Art</description>
+		<year>1982</year>
+		<publisher>Quicksilva</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="18701">
+				<rom name="beebart(quicksilva).uef" size="18701" crc="cd84b064" sha1="283bd85792e0c68e125df090ae7a18a784118a80" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -15604,6 +16104,17 @@
 		</part>
 	</software>
 
+	<software name="inter3d">
+		<description>Interactive 3D</description>
+		<year>198?</year>
+		<publisher>Design Dynamics</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="7297">
+				<rom name="interactive3d(1983)(designdynamics).uef" size="7297" crc="59cb76f8" sha1="836fd8484d9576e2bc69e19fe9a73c1539f44a82" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pictmake">
 		<description>Picture Maker</description>
 		<year>1983</year>
@@ -15641,13 +16152,32 @@
 	</software>
 
 	<software name="pauldani">
-		<description>Paul Daniel's Magic Show</description>
+		<description>Paul Daniels' Magic Show</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SBX11" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="25634">
 				<rom name="pauldanielsmagicshow(1984)(acornsoft)(x11).uef" size="25634" crc="794f3de0" sha1="efa0139ad02dac3867fb4a446216b384ffb58efa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lwordita">
+		<description>LINKWORD Italian</description>
+		<year>1983</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SBX14" />
+		<part name="cass1" interface="bbc_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="27324">
+				<rom name="linkworditalian-side1(1983)(acornsoft)(x14).uef" size="27324" crc="0286f0fa" sha1="6dc0f204d8d54b2666824fded401e3657eba81b0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="bbc_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="22391">
+				<rom name="linkworditalian-side2(1983)(acornsoft)(x14).uef" size="22391" crc="f3ed2082" sha1="b69148570fae96763d7eda7e6e9686b276fbaac5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -16357,7 +16887,7 @@
 
 	<software name="modelb10">
 		<description>Model B Computing Issue 10</description>
-		<year>198?</year>
+		<year>1985</year>
 		<publisher>Argus Press Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="65472">

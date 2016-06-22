@@ -81,6 +81,7 @@ public:
 
 	// simple inline setters
 	void set_mirror(offs_t _mirror) { m_addrmirror = _mirror; }
+	void set_select(offs_t _select) { m_addrselect = _select; }
 	void set_read_type(map_handler_type _type) { m_read.m_type = _type; }
 	void set_write_type(map_handler_type _type) { m_write.m_type = _type; }
 	void set_region(const char *tag, offs_t offset) { m_region = tag; m_rgnoffs = offset; }
@@ -115,6 +116,7 @@ public:
 	offs_t                  m_addrend;              // end address
 	offs_t                  m_addrmirror;           // mirror bits
 	offs_t                  m_addrmask;             // mask bits
+	offs_t                  m_addrselect;           // select bits
 	map_handler_data        m_read;                 // data for read handler
 	map_handler_data        m_write;                // data for write handler
 	map_handler_data        m_setoffsethd;          // data for setoffset handler
@@ -314,7 +316,6 @@ void ADDRESS_MAP_NAME(_name)(address_map &map, device_t &device) \
 	typedef write##_bits##_delegate write_delegate ATTR_UNUSED; \
 	address_map_entry##_bits *curentry = nullptr; \
 	(void)curentry; \
-	assert(&device != nullptr); \
 	map.configure(_space, _bits); \
 	typedef _class drivdata_class ATTR_UNUSED;
 #define DEVICE_ADDRESS_MAP_START(_name, _bits, _class) \
@@ -324,7 +325,6 @@ void _class :: _name(::address_map &map, device_t &device) \
 	typedef write##_bits##_delegate write_delegate ATTR_UNUSED; \
 	address_map_entry##_bits *curentry = nullptr; \
 	(void)curentry; \
-	assert(&device != nullptr); \
 	map.configure(AS_PROGRAM, _bits);  \
 	typedef _class drivdata_class ATTR_UNUSED;
 #define ADDRESS_MAP_END \
@@ -362,6 +362,8 @@ void _class :: _name(::address_map &map, device_t &device) \
 	curentry->set_mask(_mask);
 #define AM_MIRROR(_mirror) \
 	curentry->set_mirror(_mirror);
+#define AM_SELECT(_select) \
+	curentry->set_select(_select);
 
 // driver data reads
 #define AM_READ(_handler) \

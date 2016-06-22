@@ -366,6 +366,8 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 
 */
 
+#include <functional>
+
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "machine/pic8259.h"
@@ -376,6 +378,7 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
 #include "debug/debugcpu.h"
+#include "debugger.h"
 #include "includes/chihiro.h"
 #include "includes/xbox.h"
 
@@ -475,6 +478,12 @@ public:
 	int usbhack_counter;
 	UINT8 *dimm_board_memory;
 	UINT32 dimm_board_memory_size;
+
+private:
+	void jamtable_disasm(address_space &space, UINT32 address, UINT32 size);
+	void jamtable_disasm_command(int ref, int params, const char **param);
+	void help_command(int ref, int params, const char **param);
+	void debug_commands(int ref, int params, const char **param);
 };
 
 /* jamtable instructions for Chihiro (different from Xbox console)
@@ -493,29 +502,28 @@ St.     Instr.       Comment
 */
 
 /* jamtable disassembler */
-static void jamtable_disasm(running_machine &machine, address_space &space, UINT32 address, UINT32 size) // 0xff000080 == fff00080
+void chihiro_state::jamtable_disasm(address_space &space, UINT32 address, UINT32 size) // 0xff000080 == fff00080
 {
-	offs_t base, addr;
-	UINT32 opcode, op1, op2;
-	char sop1[16];
-	char sop2[16];
-	char pcrel[16];
-
-	addr = (offs_t)address;
-	if (!debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &addr))
+	offs_t addr = (offs_t)address;
+	if (!machine().debugger().cpu().translate(space, TRANSLATE_READ_DEBUG, &addr))
 	{
-		debug_console_printf(machine, "Address is unmapped.\n");
+		machine().debugger().console().printf("Address is unmapped.\n");
 		return;
 	}
 	while (1)
 	{
-		base = addr;
-		opcode = space.read_byte(addr);
+		offs_t base = addr;
+
+		UINT32 opcode = space.read_byte(addr);
 		addr++;
-		op1 = space.read_dword_unaligned(addr);
+		UINT32 op1 = space.read_dword_unaligned(addr);
 		addr += 4;
-		op2 = space.read_dword_unaligned(addr);
+		UINT32 op2 = space.read_dword_unaligned(addr);
 		addr += 4;
+
+		char sop1[16];
+		char sop2[16];
+		char pcrel[16];
 		if (opcode == 0xe1)
 		{
 			opcode = op2 & 255;
@@ -531,7 +539,7 @@ static void jamtable_disasm(running_machine &machine, address_space &space, UINT
 			sprintf(sop1, "%08X", op1);
 			sprintf(pcrel, "%08X", base + 9 + op1);
 		}
-		debug_console_printf(machine, "%08X ", base);
+		machine().debugger().console().printf("%08X ", base);
 		// dl=instr ebx=par1 eax=par2
 		switch (opcode)
 		{
@@ -546,39 +554,39 @@ static void jamtable_disasm(running_machine &machine, address_space &space, UINT
 			// | | Reserved | Bus Number | Device Number | Function Number | Register Number |0|0|
 			// +-+----------+------------+---------------+-----------------+-----------------+-+-+
 			// 31 - Enable bit
-			debug_console_printf(machine, "POKEPCI PCICONF[%s]=%s\n", sop2, sop1);
+			machine().debugger().console().printf("POKEPCI PCICONF[%s]=%s\n", sop2, sop1);
 			break;
 		case 0x02:
-			debug_console_printf(machine, "OUTB    PORT[%s]=%s\n", sop2, sop1);
+			machine().debugger().console().printf("OUTB    PORT[%s]=%s\n", sop2, sop1);
 			break;
 		case 0x03:
-			debug_console_printf(machine, "POKE    MEM[%s]=%s\n", sop2, sop1);
+			machine().debugger().console().printf("POKE    MEM[%s]=%s\n", sop2, sop1);
 			break;
 		case 0x04:
-			debug_console_printf(machine, "BNE     IF ACC != %s THEN PC=%s\n", sop2, pcrel);
+			machine().debugger().console().printf("BNE     IF ACC != %s THEN PC=%s\n", sop2, pcrel);
 			break;
 		case 0x05:
 			// out cf8,op2
 			// in acc,cfc
-			debug_console_printf(machine, "PEEKPCI ACC=PCICONF[%s]\n", sop2);
+			machine().debugger().console().printf("PEEKPCI ACC=PCICONF[%s]\n", sop2);
 			break;
 		case 0x06:
-			debug_console_printf(machine, "AND/OR  ACC=(ACC & %s) | %s\n", sop2, sop1);
+			machine().debugger().console().printf("AND/OR  ACC=(ACC & %s) | %s\n", sop2, sop1);
 			break;
 		case 0x07:
-			debug_console_printf(machine, "BRA     PC=%s\n", pcrel);
+			machine().debugger().console().printf("BRA     PC=%s\n", pcrel);
 			break;
 		case 0x08:
-			debug_console_printf(machine, "INB     ACC=PORT[%s]\n", sop2);
+			machine().debugger().console().printf("INB     ACC=PORT[%s]\n", sop2);
 			break;
 		case 0x09:
-			debug_console_printf(machine, "PEEK    ACC=MEM[%s]\n", sop2);
+			machine().debugger().console().printf("PEEK    ACC=MEM[%s]\n", sop2);
 			break;
 		case 0xee:
-			debug_console_printf(machine, "END\n");
+			machine().debugger().console().printf("END\n");
 			break;
 		default:
-			debug_console_printf(machine, "NOP     ????\n");
+			machine().debugger().console().printf("NOP     ????\n");
 			break;
 		}
 		if (opcode == 0xee)
@@ -589,36 +597,35 @@ static void jamtable_disasm(running_machine &machine, address_space &space, UINT
 	}
 }
 
-static void jamtable_disasm_command(running_machine &machine, int ref, int params, const char **param)
+void chihiro_state::jamtable_disasm_command(int ref, int params, const char **param)
 {
-	chihiro_state *state = machine.driver_data<chihiro_state>();
-	address_space &space = state->m_maincpu->space();
+	address_space &space = m_maincpu->space();
 	UINT64  addr, size;
 
 	if (params < 2)
 		return;
-	if (!debug_command_parameter_number(machine, param[0], &addr))
+	if (!machine().debugger().commands().validate_number_parameter(param[0], &addr))
 		return;
-	if (!debug_command_parameter_number(machine, param[1], &size))
+	if (!machine().debugger().commands().validate_number_parameter(param[1], &size))
 		return;
-	jamtable_disasm(machine, space, (UINT32)addr, (UINT32)size);
+	jamtable_disasm(space, (UINT32)addr, (UINT32)size);
 }
 
-static void help_command(running_machine &machine, int ref, int params, const char **param)
+void chihiro_state::help_command(int ref, int params, const char **param)
 {
-	debug_console_printf(machine, "Available Chihiro commands:\n");
-	debug_console_printf(machine, "  chihiro jamdis,<start>,<size> -- Disassemble <size> bytes of JamTable instructions starting at <start>\n");
-	debug_console_printf(machine, "  chihiro help -- this list\n");
+	machine().debugger().console().printf("Available Chihiro commands:\n");
+	machine().debugger().console().printf("  chihiro jamdis,<start>,<size> -- Disassemble <size> bytes of JamTable instructions starting at <start>\n");
+	machine().debugger().console().printf("  chihiro help -- this list\n");
 }
 
-static void chihiro_debug_commands(running_machine &machine, int ref, int params, const char **param)
+void chihiro_state::debug_commands(int ref, int params, const char **param)
 {
 	if (params < 1)
 		return;
 	if (strcmp("jamdis", param[0]) == 0)
-		jamtable_disasm_command(machine, ref, params - 1, param + 1);
+		jamtable_disasm_command(ref, params - 1, param + 1);
 	else
-		help_command(machine, ref, params - 1, param + 1);
+		help_command(ref, params - 1, param + 1);
 }
 
 void chihiro_state::hack_eeprom()
@@ -722,27 +729,33 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 {
 	if (endpoint != 0)
 		return -1;
-	printf("Control request: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
+	printf("Control request to an2131qc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
+	// default valuse for data stage
 	for (int n = 0; n < setup->wLength; n++)
 		endpoints[endpoint].buffer[n] = 0x50 ^ n;
 	endpoints[endpoint].buffer[1] = 0x4b; // bits 4-1 special value, must be 10 xor 15
+	// bRequest is a command value
+	if (setup->bRequest == 0x16)
+	{
+		// this command is used to read data from the first i2c serial eeprom connected to the chip
+		// setup->wValue = start address to read from
+		// setup->wIndex = number of bytes to read
+		// data will be transferred to the host using endpoint 1 (IN)
+		endpoints[1].remain = setup->wIndex & 255;
+		endpoints[1].position = region + setup->wValue; // usually wValue is 0x1f00
+	}
 	if (setup->bRequest == 0x17)
 	{
-		maximum_send = setup->wIndex;
-		if (maximum_send > 0x40)
-			maximum_send = 0x40;
-		endpoints[2].remain = maximum_send;
+		// this command is used to read data from the second i2c serial eeprom connected to the chip
+		// setup->wValue = start address to read from
+		// setup->wIndex = number of bytes to read
+		// data will be transferred to the host using endpoint 2 (IN)
+		endpoints[2].remain = setup->wIndex & 255;
 		endpoints[2].position = region + 0x2000 + setup->wValue;
-	}
-	if ((setup->bRequest == 0x16) && (setup->wValue == 0x1f00))
-	{
-		// should be for an2131sc
-		endpoints[1].remain = setup->wIndex;
-		endpoints[1].position = region + 0x1f00;
 	}
 	if (setup->bRequest == 0x19) // 19 used to receive packet, 20 to send ?
 	{
-		// amount to transfer
+		// amount to transfer with endpoint 4
 		endpoints[endpoint].buffer[5] = 20 >> 8;
 		endpoints[endpoint].buffer[4] = (20 & 0xff);
 		endpoints[4].remain = 20;
@@ -826,6 +839,7 @@ int ohci_hlean2131sc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 {
 	if (endpoint != 0)
 		return -1;
+	printf("Control request to an2131sc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
 	for (int n = 0; n < setup->wLength; n++)
 		endpoints[endpoint].buffer[n] = 0xa0 ^ n;
 	endpoints[endpoint].position = endpoints[endpoint].buffer;
@@ -1077,6 +1091,7 @@ WRITE32_MEMBER(chihiro_state::mediaboard_w)
 
 static ADDRESS_MAP_START(chihiro_map, AS_PROGRAM, 32, chihiro_state)
 	AM_IMPORT_FROM(xbox_base_map)
+	AM_RANGE(0xff000000, 0xff07ffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x00f80000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(chihiro_map_io, AS_IO, 32, chihiro_state)
@@ -1099,7 +1114,10 @@ void chihiro_state::machine_start()
 		dimm_board_memory = chihiro_devs.dimmboard->memory(dimm_board_memory_size);
 	}
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
-		debug_console_register_command(machine(), "chihiro", CMDFLAG_NONE, 0, 1, 4, chihiro_debug_commands);
+	{
+		using namespace std::placeholders;
+		machine().debugger().console().register_command("chihiro", CMDFLAG_NONE, 0, 1, 4, std::bind(&chihiro_state::debug_commands, this, _1, _2, _3));
+	}
 	usbhack_index = -1;
 	for (int a = 1; a < 3; a++)
 		if (strcmp(machine().basename(), hacks[a].game_name) == 0) {
@@ -1146,7 +1164,7 @@ MACHINE_CONFIG_END
 		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
 
 #define CHIHIRO_BIOS \
-	ROM_REGION( 0x100000, "bios", 0) \
+	ROM_REGION( 0x80000, "bios", 0) \
 	ROM_SYSTEM_BIOS( 0, "bios0", "Chihiro Bios" ) \
 	ROM_LOAD_BIOS( 0,  "chihiro_xbox_bios.bin", 0x000000, 0x80000, CRC(66232714) SHA1(b700b0041af8f84835e45d1d1250247bf7077188) ) \
 	ROM_REGION( 0x200000, "mediaboard", 0) \

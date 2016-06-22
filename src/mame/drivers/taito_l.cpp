@@ -1704,12 +1704,6 @@ static GFXDECODE_START( taito_l )
 GFXDECODE_END
 
 
-
-WRITE_LINE_MEMBER(taitol_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 WRITE8_MEMBER(taitol_state::portA_w)
 {
 	if (m_cur_bank != (data & 0x03))
@@ -1765,7 +1759,7 @@ static MACHINE_CONFIG_START( fhawk, taitol_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)       /* verified on pcb */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(taitol_state,irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitol_state, portA_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
@@ -1794,7 +1788,7 @@ static MACHINE_CONFIG_DERIVED( champwr, fhawk )
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("ymsnd")
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(taitol_state,irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitol_state, portA_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(taitol_state, champwr_msm5205_volume_w))
 
@@ -1822,7 +1816,7 @@ static MACHINE_CONFIG_DERIVED( raimais, fhawk )
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("ymsnd", YM2610, XTAL_8MHz)      /* verified on pcb (8Mhz OSC is also for the 2nd z80) */
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitol_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)

@@ -262,7 +262,7 @@ void isa8_device::device_reset()
 }
 
 
-void isa8_device::install_space(address_spacenum spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler)
+void isa8_device::install_space(address_spacenum spacenum, offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
 {
 	int buswidth;
 	address_space *space;
@@ -285,21 +285,21 @@ void isa8_device::install_space(address_spacenum spacenum, offs_t start, offs_t 
 	switch(buswidth)
 	{
 		case 8:
-			space->install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0);
+			space->install_readwrite_handler(start, end, rhandler, whandler, 0);
 			break;
 		case 16:
-			space->install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0xffff);
+			space->install_readwrite_handler(start, end, rhandler, whandler, 0xffff);
 			break;
 		case 32:
 			if ((start % 4) == 0) {
 				if ((end-start)==1) {
-					space->install_readwrite_handler(start, end+2, mask, mirror, rhandler, whandler, 0x0000ffff);
+					space->install_readwrite_handler(start, end+2, rhandler, whandler, 0x0000ffff);
 				} else {
-					space->install_readwrite_handler(start, end,   mask, mirror, rhandler, whandler, 0xffffffff);
+					space->install_readwrite_handler(start, end,   rhandler, whandler, 0xffffffff);
 				}
 			} else {
-				// we handle just misalligned by 2
-				space->install_readwrite_handler(start-2, end, mask, mirror, rhandler, whandler, 0xffff0000);
+				// we handle just misaligned by 2
+				space->install_readwrite_handler(start-2, end, rhandler, whandler, 0xffff0000);
 			}
 			break;
 		default:
@@ -308,44 +308,44 @@ void isa8_device::install_space(address_spacenum spacenum, offs_t start, offs_t 
 }
 
 
-void isa8_device::install_memory(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler)
+void isa8_device::install_memory(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
 {
-	install_space(AS_PROGRAM, start, end, mask, mirror, rhandler, whandler);
+	install_space(AS_PROGRAM, start, end, rhandler, whandler);
 }
 
-void isa8_device::install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler)
+void isa8_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
 {
-	install_space(AS_IO, start, end, mask, mirror, rhandler, whandler);
+	install_space(AS_IO, start, end, rhandler, whandler);
 }
 
 
-void isa8_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data)
+void isa8_device::install_bank(offs_t start, offs_t end, const char *tag, UINT8 *data)
 {
-	m_prgspace->install_readwrite_bank(start, end, mask, mirror, tag );
+	m_prgspace->install_readwrite_bank(start, end, 0, tag );
 	machine().root_device().membank(m_prgspace->device().siblingtag(tag).c_str())->set_base(data);
 }
 
-void isa8_device::unmap_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror)
+void isa8_device::unmap_bank(offs_t start, offs_t end)
 {
-	m_prgspace->unmap_readwrite(start, end, mask, mirror);
+	m_prgspace->unmap_readwrite(start, end);
 }
 
-void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, const char *region)
+void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, const char *tag, const char *region)
 {
 	if (machine().root_device().memregion("isa")) {
 		UINT8 *src = dev->memregion(region)->base();
 		UINT8 *dest = machine().root_device().memregion("isa")->base() + start - 0xc0000;
 		memcpy(dest,src, end - start + 1);
 	} else {
-		m_prgspace->install_read_bank(start, end, mask, mirror, tag);
-		m_prgspace->unmap_write(start, end, mask, mirror);
+		m_prgspace->install_read_bank(start, end, 0, tag);
+		m_prgspace->unmap_write(start, end);
 		machine().root_device().membank(m_prgspace->device().siblingtag(tag).c_str())->set_base(machine().root_device().memregion(dev->subtag(region).c_str())->base());
 	}
 }
 
-void isa8_device::unmap_rom(offs_t start, offs_t end, offs_t mask, offs_t mirror)
+void isa8_device::unmap_rom(offs_t start, offs_t end)
 {
-	m_prgspace->unmap_read(start, end, mask, mirror);
+	m_prgspace->unmap_read(start, end);
 }
 
 bool isa8_device::is_option_rom_space_available(offs_t start, int size)
@@ -507,25 +507,25 @@ void isa16_device::device_start()
 	m_out_drq7_cb.resolve_safe();
 }
 
-void isa16_device::install16_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_delegate rhandler, write16_delegate whandler)
+void isa16_device::install16_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler)
 {
 	int buswidth = m_prgwidth;
 	switch(buswidth)
 	{
 		case 16:
-			m_iospace->install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0);
+			m_iospace->install_readwrite_handler(start, end, rhandler, whandler, 0);
 			break;
 		case 32:
-			m_iospace->install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0xffffffff);
+			m_iospace->install_readwrite_handler(start, end, rhandler, whandler, 0xffffffff);
 			if ((start % 4) == 0) {
 				if ((end-start)==1) {
-					m_iospace->install_readwrite_handler(start, end+2, mask, mirror, rhandler, whandler, 0x0000ffff);
+					m_iospace->install_readwrite_handler(start, end+2, rhandler, whandler, 0x0000ffff);
 				} else {
-					m_iospace->install_readwrite_handler(start, end,   mask, mirror, rhandler, whandler, 0xffffffff);
+					m_iospace->install_readwrite_handler(start, end,   rhandler, whandler, 0xffffffff);
 				}
 			} else {
 				// we handle just misalligned by 2
-				m_iospace->install_readwrite_handler(start-2, end, mask, mirror, rhandler, whandler, 0xffff0000);
+				m_iospace->install_readwrite_handler(start-2, end, rhandler, whandler, 0xffff0000);
 			}
 
 			break;

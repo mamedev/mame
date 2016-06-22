@@ -636,10 +636,10 @@ void isa8_ega_device::device_start()
 
 	m_crtc_ega = subdevice<crtc_ega_device>(EGA_CRTC_NAME);
 
-	m_isa->install_rom(this, 0xc0000, 0xc3fff, 0, 0, "ega", "user2");
-	m_isa->install_device(0x3b0, 0x3bf, 0, 0, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3b0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3b0_w), this));
-	m_isa->install_device(0x3c0, 0x3cf, 0, 0, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3c0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3c0_w), this));
-	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3d0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3d0_w), this));
+	m_isa->install_rom(this, 0xc0000, 0xc3fff, "ega", "user2");
+	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3b0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3b0_w), this));
+	m_isa->install_device(0x3c0, 0x3cf, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3c0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3c0_w), this));
+	m_isa->install_device(0x3d0, 0x3df, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3d0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3d0_w), this));
 }
 
 //-------------------------------------------------
@@ -693,53 +693,53 @@ void isa8_ega_device::install_banks()
 	case 0x00:      /* 0xA0000, 128KB */
 		if ( m_misc_output & 0x02 )
 		{
-			m_isa->install_memory(0xa0000, 0xbffff, 0, 0, read8_delegate(FUNC(isa8_ega_device::read), this), write8_delegate(FUNC(isa8_ega_device::write), this));
+			m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(FUNC(isa8_ega_device::read), this), write8_delegate(FUNC(isa8_ega_device::write), this));
 		}
 		else
 		{
-			m_isa->unmap_bank(0xa0000, 0xaffff,0,0);
-			m_isa->unmap_bank(0xb0000, 0xb7fff,0,0);
-			m_isa->unmap_bank(0xb8000, 0xbffff,0,0);
+			m_isa->unmap_bank(0xa0000, 0xaffff);
+			m_isa->unmap_bank(0xb0000, 0xb7fff);
+			m_isa->unmap_bank(0xb8000, 0xbffff);
 		}
 		break;
 	case 0x04:      /* 0xA0000, 64KB */
 		if ( m_misc_output & 0x02 )
 		{
-			m_isa->install_memory(0xa0000, 0xaffff, 0, 0, read8_delegate(FUNC(isa8_ega_device::read), this), write8_delegate(FUNC(isa8_ega_device::write), this));
+			m_isa->install_memory(0xa0000, 0xaffff, read8_delegate(FUNC(isa8_ega_device::read), this), write8_delegate(FUNC(isa8_ega_device::write), this));
 		}
 		else
 		{
-			m_isa->unmap_bank(0xa0000, 0xaffff,0,0);
+			m_isa->unmap_bank(0xa0000, 0xaffff);
 		}
 		/* These unmaps may break multi graphics card support */
-		m_isa->unmap_bank(0xb0000, 0xb7fff,0,0);
-		m_isa->unmap_bank(0xb8000, 0xbffff,0,0);
+		m_isa->unmap_bank(0xb0000, 0xb7fff);
+		m_isa->unmap_bank(0xb8000, 0xbffff);
 		break;
 	case 0x08:      /* 0xB0000, 32KB */
 		if ( m_misc_output & 0x02 )
 		{
-			m_isa->install_memory(0xb0000, 0xb7fff, 0, 0, read8_delegate(FUNC(isa8_ega_device::read), this), write8_delegate(FUNC(isa8_ega_device::write), this));
+			m_isa->install_memory(0xb0000, 0xb7fff, read8_delegate(FUNC(isa8_ega_device::read), this), write8_delegate(FUNC(isa8_ega_device::write), this));
 		}
 		else
 		{
-			m_isa->unmap_bank(0xb0000, 0xb7fff,0,0);
+			m_isa->unmap_bank(0xb0000, 0xb7fff);
 		}
 		/* These unmaps may break multi graphics card support */
-		m_isa->unmap_bank(0xa0000, 0xaffff,0,0);
-		m_isa->unmap_bank(0xb8000, 0xbffff,0,0);
+		m_isa->unmap_bank(0xa0000, 0xaffff);
+		m_isa->unmap_bank(0xb8000, 0xbffff);
 		break;
 	case 0x0c:      /* 0xB8000, 32KB */
 		if ( m_misc_output & 0x02 )
 		{
-			m_isa->install_memory(0xb8000, 0xbffff, 0, 0, read8_delegate(FUNC(isa8_ega_device::read), this), write8_delegate(FUNC(isa8_ega_device::write), this));
+			m_isa->install_memory(0xb8000, 0xbffff, read8_delegate(FUNC(isa8_ega_device::read), this), write8_delegate(FUNC(isa8_ega_device::write), this));
 		}
 		else
 		{
-			m_isa->unmap_bank(0xb8000, 0xbffff,0,0);
+			m_isa->unmap_bank(0xb8000, 0xbffff);
 		}
 		/* These unmaps may break multi graphics card support */
-		m_isa->unmap_bank(0xa0000, 0xaffff,0,0);
-		m_isa->unmap_bank(0xb0000, 0xb7fff,0,0);
+		m_isa->unmap_bank(0xa0000, 0xaffff);
+		m_isa->unmap_bank(0xb0000, 0xb7fff);
 		break;
 	}
 }

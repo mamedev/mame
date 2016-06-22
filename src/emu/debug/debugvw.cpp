@@ -18,6 +18,7 @@
 #include "dvbpoints.h"
 #include "dvwpoints.h"
 #include "debugcpu.h"
+#include "debugger.h"
 #include <ctype.h>
 
 
@@ -354,12 +355,6 @@ debug_view *debug_view_manager::alloc_view(debug_view_type type, debug_view_osd_
 		case DVT_LOG:
 			return append(global_alloc(debug_view_log(machine(), osdupdate, osdprivate)));
 
-		case DVT_TIMERS:
-//          return append(global_alloc(debug_view_timers(machine(), osdupdate, osdprivate)));
-
-		case DVT_ALLOCS:
-//          return append(global_alloc(debug_view_allocs(machine(), osdupdate, osdprivate)));
-
 		case DVT_BREAK_POINTS:
 			return append(global_alloc(debug_view_breakpoints(machine(), osdupdate, osdprivate)));
 
@@ -452,11 +447,11 @@ debug_view *debug_view_manager::append(debug_view *view)
 //-------------------------------------------------
 
 debug_view_expression::debug_view_expression(running_machine &machine)
-	: m_machine(machine),
-		m_dirty(true),
-		m_result(0),
-		m_parsed(debug_cpu_get_global_symtable(machine)),
-		m_string("0")
+	: m_machine(machine)
+	, m_dirty(true)
+	, m_result(0)
+	, m_parsed(machine.debugger().cpu().get_global_symtable())
+	, m_string("0")
 {
 }
 
@@ -477,7 +472,7 @@ debug_view_expression::~debug_view_expression()
 
 void debug_view_expression::set_context(symbol_table *context)
 {
-	m_parsed.set_symbols((context != nullptr) ? context : debug_cpu_get_global_symtable(machine()));
+	m_parsed.set_symbols((context != nullptr) ? context : m_machine.debugger().cpu().get_global_symtable());
 	m_dirty = true;
 }
 
