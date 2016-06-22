@@ -179,7 +179,7 @@ WRITE8_MEMBER(vt240_state::i8085_comm_w)
 			break;
 		case 2:
 			m_i8085->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
-			m_t11 = 0;
+			m_t11 = 1;
 			m_i8085->set_input_line(I8085_RST65_LINE, CLEAR_LINE);
 			break;
 	}
@@ -351,6 +351,8 @@ void vt240_state::machine_reset()
 	m_nvram->recall(ASSERT_LINE);
 	m_nvram->recall(CLEAR_LINE);
 	m_mem_map_sel = 0;
+	m_t11 = 1;
+	m_i8085_rdy = 1;
 }
 
 static const gfx_layout vt240_chars_8x10 =

@@ -285,7 +285,7 @@ void t11_device::device_start()
 	state_add( T11_R5,  "R5",  m_reg[5].w.l).formatstr("%04X");
 
 	state_add(STATE_GENPC, "curpc", m_reg[7].w.l).noshow();
-	state_add(STATE_GENFLAGS, "GENFLAGS", m_psw.b.l).noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_psw.b.l).formatstr("%8s").noshow();
 	state_add(STATE_GENPCBASE, "GENPCBASE", m_ppc.w.l).noshow();
 
 	m_icountptr = &m_icount;
