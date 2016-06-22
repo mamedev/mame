@@ -9,6 +9,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "cpu/sparc/sparcdasm.h"
 #include <ctype.h>
 
 enum display_type
@@ -163,9 +164,6 @@ CPU_DISASSEMBLE( sm500 );
 CPU_DISASSEMBLE( sm510 );
 CPU_DISASSEMBLE( sm511 );
 CPU_DISASSEMBLE( sm8500 );
-CPU_DISASSEMBLE( sparcv7 );
-CPU_DISASSEMBLE( sparcv8 );
-CPU_DISASSEMBLE( sparcv9 );
 CPU_DISASSEMBLE( spc700 );
 CPU_DISASSEMBLE( ssem );
 CPU_DISASSEMBLE( ssp1601 );
@@ -208,6 +206,25 @@ CPU_DISASSEMBLE( z180 );
 CPU_DISASSEMBLE( z8 );
 CPU_DISASSEMBLE( z80 );
 CPU_DISASSEMBLE( z8000 );
+
+static sparc_disassembler sparcv7_dasm(7);
+static sparc_disassembler sparcv8_dasm(8);
+static sparc_disassembler sparcv9_dasm(9);
+static sparc_disassembler sparcv9vis1_dasm(9);
+static sparc_disassembler sparcv9vis2_dasm(9);
+struct sparc_helper_c
+{
+	sparc_helper_c()
+	{
+		sparcv9vis1_dasm.enable_vis1();
+		sparcv9vis2_dasm.enable_vis2();
+	}
+} sparc_helper;
+CPU_DISASSEMBLE( sparcv7 ) { return sparcv7_dasm.dasm(buffer, pc, BIG_ENDIANIZE_INT32(*reinterpret_cast<const UINT32 *>(oprom))); }
+CPU_DISASSEMBLE( sparcv8 ) { return sparcv8_dasm.dasm(buffer, pc, BIG_ENDIANIZE_INT32(*reinterpret_cast<const UINT32 *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9 )  { return sparcv9_dasm.dasm(buffer, pc, BIG_ENDIANIZE_INT32(*reinterpret_cast<const UINT32 *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9vis1 ) { return sparcv9vis1_dasm.dasm(buffer, pc, BIG_ENDIANIZE_INT32(*reinterpret_cast<const UINT32 *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9vis2 ) { return sparcv9vis2_dasm.dasm(buffer, pc, BIG_ENDIANIZE_INT32(*reinterpret_cast<const UINT32 *>(oprom))); }
 
 
 static const dasm_table_entry dasm_table[] =
@@ -325,6 +342,8 @@ static const dasm_table_entry dasm_table[] =
 	{ "sparcv7",    _32be,  0, CPU_DISASSEMBLE_NAME(sparcv7) },
 	{ "sparcv8",    _32be,  0, CPU_DISASSEMBLE_NAME(sparcv8) },
 	{ "sparcv9",    _32be,  0, CPU_DISASSEMBLE_NAME(sparcv9) },
+	{ "sparcv9vis1",_32be,  0, CPU_DISASSEMBLE_NAME(sparcv9vis1) },
+	{ "sparcv9vis2",_32be,  0, CPU_DISASSEMBLE_NAME(sparcv9vis2) },
 	{ "spc700",     _8bit,  0, CPU_DISASSEMBLE_NAME(spc700) },
 	{ "ssem",       _32le,  0, CPU_DISASSEMBLE_NAME(ssem) },
 	{ "ssp1601",    _16be, -1, CPU_DISASSEMBLE_NAME(ssp1601) },
@@ -491,15 +510,15 @@ usage:
 	printf("   [-skip <n>] [-count <n>]\n");
 	printf("\n");
 	printf("Supported architectures:");
-	numrows = (ARRAY_LENGTH(dasm_table) + 6) / 7;
-	for (curarch = 0; curarch < numrows * 7; curarch++)
+	numrows = (ARRAY_LENGTH(dasm_table) + 5) / 6;
+	for (curarch = 0; curarch < numrows * 6; curarch++)
 	{
-		int row = curarch / 7;
-		int col = curarch % 7;
+		int row = curarch / 6;
+		int col = curarch % 6;
 		int index = col * numrows + row;
 		if (col == 0)
 			printf("\n  ");
-		printf("%-11s", (index < ARRAY_LENGTH(dasm_table)) ? dasm_table[index].name : "");
+		printf("%-12s", (index < ARRAY_LENGTH(dasm_table)) ? dasm_table[index].name : "");
 	}
 	printf("\n");
 	return 1;

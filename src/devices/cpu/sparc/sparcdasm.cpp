@@ -8,13 +8,11 @@
 #include "sparcdasm.h"
 #include "sparcdefs.h"
 
+#include <algorithm>
 #include <cstdio>
 
-namespace {
-	const sparc_disassembler DASM_V7(7);
-	const sparc_disassembler DASM_V8(8);
-	const sparc_disassembler DASM_V9(9);
 
+namespace {
 	INT32 get_disp16(UINT32 op) { return DISP19; }
 	INT32 get_disp19(UINT32 op) { return DISP19; }
 	INT32 get_disp22(UINT32 op) { return DISP19; }
@@ -127,12 +125,12 @@ const sparc_disassembler::int_op_desc_map::value_type sparc_disassembler::V9_INT
 };
 
 const sparc_disassembler::state_reg_desc_map::value_type sparc_disassembler::V9_STATE_REG_DESC[] = {
-	{ 1, { true,  nullptr, nullptr } },
-	{ 2, { false, "%ccr",  "%ccr"  } },
-	{ 3, { false, "%asi",  "%asi"  } },
-	{ 4, { false, "%tick", nullptr } },
-	{ 5, { false, "%pc",   nullptr } },
-	{ 6, { false, "%fprs", "%fprs" } }
+	{  1, { true,  nullptr, nullptr } },
+	{  2, { false, "%ccr",  "%ccr"  } },
+	{  3, { false, "%asi",  "%asi"  } },
+	{  4, { false, "%tick", nullptr } },
+	{  5, { false, "%pc",   nullptr } },
+	{  6, { false, "%fprs", "%fprs" } }
 };
 
 const char * const sparc_disassembler::MOVCC_CC_NAMES[8] = {
@@ -285,13 +283,148 @@ const sparc_disassembler::asi_desc_map::value_type sparc_disassembler::V9_ASI_DE
 	{ 0x8b, { "#ASI_SNF_L",  nullptr } }
 };
 
-const sparc_disassembler::prftch_desc_map::value_type sparc_disassembler::V9_PRFTCH_DESC[] =
-{
+const sparc_disassembler::prftch_desc_map::value_type sparc_disassembler::V9_PRFTCH_DESC[] = {
 	{ 0x00, { "#n_reads"   } },
 	{ 0x01, { "#one_read"  } },
 	{ 0x02, { "#n_writes"  } },
 	{ 0x03, { "#one_write" } },
 	{ 0x04, { "#page"      } }
+};
+
+const sparc_disassembler::vis_op_desc_map::value_type sparc_disassembler::VIS1_OP_DESC[] = {
+	{ 0x000, { vis_op_desc::I,  vis_op_desc::I,  vis_op_desc::I,  false, "edge8"       } },
+	{ 0x002, { vis_op_desc::I,  vis_op_desc::I,  vis_op_desc::I,  false, "edge8l"      } },
+	{ 0x004, { vis_op_desc::I,  vis_op_desc::I,  vis_op_desc::I,  false, "edge16"      } },
+	{ 0x006, { vis_op_desc::I,  vis_op_desc::I,  vis_op_desc::I,  false, "edge16l"     } },
+	{ 0x008, { vis_op_desc::I,  vis_op_desc::I,  vis_op_desc::I,  false, "edge32"      } },
+	{ 0x00a, { vis_op_desc::I,  vis_op_desc::I,  vis_op_desc::I,  false, "edge32l"     } },
+
+	{ 0x010, { vis_op_desc::I,  vis_op_desc::I,  vis_op_desc::I,  false, "array8"      } },
+	{ 0x012, { vis_op_desc::I,  vis_op_desc::I,  vis_op_desc::I,  false, "array16"     } },
+	{ 0x014, { vis_op_desc::I,  vis_op_desc::I,  vis_op_desc::I,  false, "array32"     } },
+	{ 0x018, { vis_op_desc::I,  vis_op_desc::I,  vis_op_desc::I,  true,  "alignaddr"   } },
+	{ 0x01a, { vis_op_desc::I,  vis_op_desc::I,  vis_op_desc::I,  true,  "alignaddrl"  } },
+
+	{ 0x020, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::I,  false, "fcmple16"    } },
+	{ 0x022, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::I,  false, "fcmpne16"    } },
+	{ 0x024, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::I,  false, "fcmple32"    } },
+	{ 0x026, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::I,  false, "fcmpne32"    } },
+	{ 0x028, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::I,  false, "fcmpgt16"    } },
+	{ 0x02a, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::I,  false, "fcmpeq16"    } },
+	{ 0x02c, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::I,  false, "fcmpgt32"    } },
+	{ 0x02e, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::I,  false, "fcmpeq32"    } },
+
+	{ 0x031, { vis_op_desc::Fs, vis_op_desc::Fd, vis_op_desc::Fd, false, "fmul8x16"    } },
+	{ 0x033, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fd, false, "fmul8x16au"  } },
+	{ 0x035, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fd, false, "fmul8x16al"  } },
+	{ 0x036, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fmul8sux16"  } },
+	{ 0x037, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fmul8ulx16"  } },
+	{ 0x038, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fd, false, "fmuld8sux16" } },
+	{ 0x039, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fd, false, "fmuld8ulx16" } },
+	{ 0x03a, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fpack32"     } },
+	{ 0x03b, { vis_op_desc::X,  vis_op_desc::Fd, vis_op_desc::Fs, false, "fpack16"     } },
+	{ 0x03d, { vis_op_desc::X,  vis_op_desc::Fd, vis_op_desc::Fs, false, "fpackfix"    } },
+	{ 0x03e, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "pdist"       } },
+
+	{ 0x048, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "faligndata"  } },
+	{ 0x04b, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fd, false, "fpmerge"     } },
+	{ 0x04d, { vis_op_desc::X,  vis_op_desc::Fs, vis_op_desc::Fd, false, "fexpand"     } },
+
+	{ 0x050, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fpadd16"     } },
+	{ 0x051, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fpadd16s"    } },
+	{ 0x052, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fpadd32"     } },
+	{ 0x053, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fpadd32s"    } },
+	{ 0x054, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fpsub16"     } },
+	{ 0x055, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fpsub16s"    } },
+	{ 0x056, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fpsub32"     } },
+	{ 0x057, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fpsub32s"    } },
+
+	{ 0x060, { vis_op_desc::X,  vis_op_desc::X,  vis_op_desc::Fd, false, "fzero"       } },
+	{ 0x061, { vis_op_desc::X,  vis_op_desc::X,  vis_op_desc::Fs, false, "fzeros"      } },
+	{ 0x062, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fnor"        } },
+	{ 0x063, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fnors"       } },
+	{ 0x064, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fandnot2"    } },
+	{ 0x065, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fandnot2s"   } },
+	{ 0x066, { vis_op_desc::X,  vis_op_desc::Fd, vis_op_desc::Fd, false, "fnot2"       } },
+	{ 0x067, { vis_op_desc::X,  vis_op_desc::Fs, vis_op_desc::Fs, false, "fnot2s"      } },
+	{ 0x068, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fandnot1"    } },
+	{ 0x069, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fandnot1s"   } },
+	{ 0x06a, { vis_op_desc::Fd, vis_op_desc::X,  vis_op_desc::Fd, false, "fnot1"       } },
+	{ 0x06b, { vis_op_desc::Fs, vis_op_desc::X,  vis_op_desc::Fs, false, "fnot1s"      } },
+	{ 0x06c, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fxor"        } },
+	{ 0x06d, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fxors"       } },
+	{ 0x06e, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fnand"       } },
+	{ 0x06f, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fnands"      } },
+
+	{ 0x070, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fand"        } },
+	{ 0x071, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fands"       } },
+	{ 0x072, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fxnor"       } },
+	{ 0x073, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fxnors"      } },
+	{ 0x074, { vis_op_desc::Fd, vis_op_desc::X,  vis_op_desc::Fd, false, "fsrc1"       } },
+	{ 0x075, { vis_op_desc::Fs, vis_op_desc::X,  vis_op_desc::Fs, false, "fsrc1s"      } },
+	{ 0x076, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fornot2"     } },
+	{ 0x077, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fornot2s"    } },
+	{ 0x078, { vis_op_desc::X,  vis_op_desc::Fd, vis_op_desc::Fd, false, "fsrc2"       } },
+	{ 0x079, { vis_op_desc::X,  vis_op_desc::Fs, vis_op_desc::Fs, false, "fsrc2s"      } },
+	{ 0x07a, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fornot1"     } },
+	{ 0x07b, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fornot1s"    } },
+	{ 0x07c, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "for"         } },
+	{ 0x07d, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fors"        } },
+	{ 0x07e, { vis_op_desc::X,  vis_op_desc::X,  vis_op_desc::Fd, false, "fone"        } },
+	{ 0x07f, { vis_op_desc::X,  vis_op_desc::X,  vis_op_desc::Fs, false, "fones"       } },
+
+	{ 0x080, { vis_op_desc::X,  vis_op_desc::X,  vis_op_desc::X,  false, "shutdown"    } }
+};
+
+const sparc_disassembler::state_reg_desc_map::value_type sparc_disassembler::VIS1_STATE_REG_DESC[] = {
+	{ 19, { false,  "%gsr",  "%gsr"  } }
+};
+
+const sparc_disassembler::asi_desc_map::value_type sparc_disassembler::VIS1_ASI_DESC[] = {
+	{ 0x2c, { "#ASI_NUCLEUS_QUAD_LDD_L", nullptr } },
+	{ 0x70, { "#ASI_BLK_AIUP",           nullptr } },
+	{ 0x71, { "#ASI_BLK_AIUS",           nullptr } },
+	{ 0x78, { "#ASI_BLK_AIUPL",          nullptr } },
+	{ 0x79, { "#ASI_BLK_AIUSL",          nullptr } },
+	{ 0xc0, { "#ASI_PST8_P",             nullptr } },
+	{ 0xc1, { "#ASI_PST8_S",             nullptr } },
+	{ 0xc2, { "#ASI_PST16_P",            nullptr } },
+	{ 0xc3, { "#ASI_PST16_S",            nullptr } },
+	{ 0xc4, { "#ASI_PST32_P",            nullptr } },
+	{ 0xc5, { "#ASI_PST32_S",            nullptr } },
+	{ 0xc8, { "#ASI_PST8_PL",            nullptr } },
+	{ 0xc9, { "#ASI_PST8_SL",            nullptr } },
+	{ 0xca, { "#ASI_PST16_PL",           nullptr } },
+	{ 0xcb, { "#ASI_PST16_SL",           nullptr } },
+	{ 0xcc, { "#ASI_PST32_PL",           nullptr } },
+	{ 0xcd, { "#ASI_PST32_SL",           nullptr } },
+	{ 0xd0, { "#ASI_FL8_P",              nullptr } },
+	{ 0xd1, { "#ASI_FL8_S",              nullptr } },
+	{ 0xd2, { "#ASI_FL16_P",             nullptr } },
+	{ 0xd3, { "#ASI_FL16_S",             nullptr } },
+	{ 0xd8, { "#ASI_FL8_PL",             nullptr } },
+	{ 0xd9, { "#ASI_FL8_SL",             nullptr } },
+	{ 0xda, { "#ASI_FL16_PL",            nullptr } },
+	{ 0xdb, { "#ASI_FL16_SL",            nullptr } },
+	{ 0xe0, { "#ASI_BLOCK_COMMIT_P",     nullptr } },
+	{ 0xe1, { "#ASI_BLOCK_COMMIT_S",     nullptr } },
+	{ 0xf0, { "#ASI_BLOCK_P",            nullptr } },
+	{ 0xf1, { "#ASI_BLOCK_S",            nullptr } },
+	{ 0xf8, { "#ASI_BLOCK_PL",           nullptr } },
+	{ 0xf9, { "#ASI_BLOCK_SL",           nullptr } }
+};
+
+const sparc_disassembler::vis_op_desc_map::value_type sparc_disassembler::VIS2_OP_DESC[] = {
+	{ 0x001, { vis_op_desc::I,  vis_op_desc::I,  vis_op_desc::I,  false, "edge8n"      } },
+	{ 0x003, { vis_op_desc::I,  vis_op_desc::I,  vis_op_desc::I,  false, "edge8ln"     } },
+	{ 0x005, { vis_op_desc::I,  vis_op_desc::I,  vis_op_desc::I,  false, "edge16n"     } },
+	{ 0x007, { vis_op_desc::I,  vis_op_desc::I,  vis_op_desc::I,  false, "edge16ln"    } },
+	{ 0x009, { vis_op_desc::I,  vis_op_desc::I,  vis_op_desc::I,  false, "edge32n"     } },
+	{ 0x00b, { vis_op_desc::I,  vis_op_desc::I,  vis_op_desc::I,  false, "edge32ln"    } },
+
+	{ 0x019, { vis_op_desc::I,  vis_op_desc::I,  vis_op_desc::I,  true,  "bmask"       } },
+
+	{ 0x04c, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "bshuffle"    } }
 };
 
 
@@ -322,6 +455,12 @@ template <typename T> inline void sparc_disassembler::add_ldst_desc(const T &des
 {
 	for (const auto &it : desc)
 		m_ldst_desc.insert(it);
+}
+
+template <typename T> inline void sparc_disassembler::add_vis_op_desc(const T &desc)
+{
+	for (const auto &it : desc)
+		m_vis_op_desc.insert(it);
 }
 
 inline void sparc_disassembler::pad_op_field(char *buf, char *&output) const
@@ -358,6 +497,7 @@ sparc_disassembler::sparc_disassembler(unsigned version)
 	, m_ldst_desc(std::begin(V7_LDST_DESC), std::end(V7_LDST_DESC))
 	, m_asi_desc()
 	, m_prftch_desc()
+	, m_vis_op_desc()
 {
 	if (m_version >= 8)
 	{
@@ -392,6 +532,22 @@ sparc_disassembler::sparc_disassembler(unsigned version)
 
 		add_prftch_desc(V9_PRFTCH_DESC);
 	}
+}
+
+
+void sparc_disassembler::enable_vis1()
+{
+	m_op_field_width = std::max(m_op_field_width, 12);
+	add_vis_op_desc(VIS1_OP_DESC);
+	add_state_reg_desc(VIS1_STATE_REG_DESC);
+	add_asi_desc(VIS1_ASI_DESC);
+}
+
+
+void sparc_disassembler::enable_vis2()
+{
+	enable_vis1();
+	add_vis_op_desc(VIS2_OP_DESC);
 }
 
 
@@ -620,8 +776,7 @@ offs_t sparc_disassembler::dasm(char *buf, offs_t pc, UINT32 op) const
 		case 0x35:
 			return dasm_fpop2(buf, pc, op);
 		case 0x36:
-			// TODO: hooks for IMPDEP1/CPop1
-			break;
+			return dasm_impdep1(buf, pc, op);
 		case 0x37:
 			// TODO: hooks for IMPDEP2/CPop2
 			break;
@@ -832,7 +987,7 @@ offs_t sparc_disassembler::dasm_write_state_reg(char *buf, offs_t pc, UINT32 op)
 				}
 				else
 				{
-					const char *const comment((RD < 16) ? "reserved" : "implementation-dependent");
+					const char * const comment((RD < 16) ? "reserved" : "implementation-dependent");
 					if (USEIMM) print(buf, "%-*s%s,%d,%%asr%d ! %s", m_op_field_width, "wr", REG_NAMES[RS1], SIMM13, RD, comment);
 					else        print(buf, "%-*s%s,%s,%%asr%d ! %s", m_op_field_width, "wr", REG_NAMES[RS1], REG_NAMES[RS2], RD, comment);
 				}
@@ -931,6 +1086,36 @@ offs_t sparc_disassembler::dasm_fpop2(char *buf, offs_t pc, UINT32 op) const
 			return 4 | DASMFLAG_SUPPORTED;
 		}
 	}
+
+	return dasm_invalid(buf, pc, op);
+}
+
+
+offs_t sparc_disassembler::dasm_impdep1(char *buf, offs_t pc, UINT32 op) const
+{
+	const auto it(m_vis_op_desc.find(OPF));
+	if (it != m_vis_op_desc.end())
+	{
+		print(buf, "%-*s", m_op_field_width, it->second.mnemonic);
+		bool args(false);
+		if (it->second.collapse && !RS1)
+		{
+			dasm_vis_arg(buf, args, it->second.rs2, RS2);
+		}
+		else if (it->second.collapse && !RS2)
+		{
+			dasm_vis_arg(buf, args, it->second.rs1, RS1);
+		}
+		else
+		{
+			dasm_vis_arg(buf, args, it->second.rs1, RS1);
+			dasm_vis_arg(buf, args, it->second.rs2, RS2);
+		}
+		dasm_vis_arg(buf, args, it->second.rd, RD);
+		return 4 | DASMFLAG_SUPPORTED;
+	}
+
+	// TODO: driver hook for other kinds of coprocessor?
 
 	return dasm_invalid(buf, pc, op);
 }
@@ -1167,20 +1352,20 @@ void sparc_disassembler::dasm_asi_comment(char *&output, UINT32 op) const
 }
 
 
-CPU_DISASSEMBLE( sparcv7 )
+void sparc_disassembler::dasm_vis_arg(char *&output, bool &args, vis_op_desc::arg fmt, UINT32 reg) const
 {
-	UINT32 op = *reinterpret_cast<const UINT32 *>(oprom);
-	return DASM_V7.dasm(buffer, pc, BIG_ENDIANIZE_INT32(op));
-}
-
-CPU_DISASSEMBLE( sparcv8 )
-{
-	UINT32 op = *reinterpret_cast<const UINT32 *>(oprom);
-	return DASM_V8.dasm(buffer, pc, BIG_ENDIANIZE_INT32(op));
-}
-
-CPU_DISASSEMBLE( sparcv9 )
-{
-	UINT32 op = *reinterpret_cast<const UINT32 *>(oprom);
-	return DASM_V9.dasm(buffer, pc, BIG_ENDIANIZE_INT32(op));
+	switch (fmt)
+	{
+	case vis_op_desc::X:
+		break;
+	case vis_op_desc::I:
+		print(output, args ? ",%s" : "%s", REG_NAMES[reg]);
+		args = true;
+		break;
+	case vis_op_desc::Fs:
+	case vis_op_desc::Fd:
+		print(output, args ? ",%%f%d" : "%%f%d", freg(reg, (fmt == vis_op_desc::Fd)));
+		args = true;
+		break;
+	};
 }
