@@ -1629,6 +1629,17 @@ int lua_engine::lua_ui_input::l_ui_input_find_mouse(lua_State *L)
 	return 4;
 }
 
+int lua_engine::lua_render_target::l_render_view_bounds(lua_State *L)
+{
+	render_target *target = luabridge::Stack<render_target *>::get(L, 1);
+	const render_bounds &bounds = target->current_view()->bounds();
+	lua_pushnumber(L, bounds.x0);
+	lua_pushnumber(L, bounds.x1);
+	lua_pushnumber(L, bounds.y0);
+	lua_pushnumber(L, bounds.y1);
+	return 4;
+}
+
 void *lua_engine::checkparam(lua_State *L, int idx, const char *tname)
 {
 	const char *name;
@@ -2391,7 +2402,10 @@ void lua_engine::initialize()
 			.deriveClass <ui_input_manager, lua_ui_input> ("input")
 				.addFunction ("pressed", &ui_input_manager::pressed)
 			.endClass()
-			.beginClass <render_target> ("target")
+			.beginClass <lua_render_target> ("lua_target")
+				.addCFunction ("view_bounds", &lua_render_target::l_render_view_bounds)
+			.endClass()
+			.deriveClass <render_target, lua_render_target> ("target")
 				.addFunction ("width", &render_target::width)
 				.addFunction ("height", &render_target::height)
 				.addFunction ("pixel_aspect", &render_target::pixel_aspect)

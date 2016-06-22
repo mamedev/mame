@@ -23,8 +23,25 @@
 			return nil
 		end
 		last_state = true
-		x = ((x / target:width()) * 95) - 15
-		y = ((y / target:height()) * 82.5) - 2.5
+		local h = target:height()
+		local w = target:width()
+		local x0, x1, y0, y1 = target:view_bounds()
+		local vw = (x1 - x0)
+		local vh = (y1 - y0)
+		if machine:options().entries.keepaspect:value() then
+			if (vh / h) &lt; (vw / w) then
+				local oh = h
+				h = w * (vh / vw)
+				y = y - ((oh - h) / 2)
+			else
+				local ow = w
+				w = h * (vw / vh)
+				x = x - ((ow - w) / 2)
+			end
+		end
+
+		x = ((x / w) * vw) + x0
+		y = ((y / h) * vh) + y0
 		return x, y
 	end
 
