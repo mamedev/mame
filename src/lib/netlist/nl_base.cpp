@@ -217,6 +217,14 @@ nl_double netlist_t::gmin() const
 	return solver()->gmin();
 }
 
+void netlist_t::register_dev(plib::owned_ptr<device_t> dev)
+{
+	for (auto & d : m_devices)
+		if (d->name() == dev->name())
+			log().fatal("Error adding {1} to device list. Duplicate name \n", d->name());
+	m_devices.push_back(std::move(dev));
+}
+
 void netlist_t::start()
 {
 	/* load the library ... */
@@ -225,59 +233,7 @@ void netlist_t::start()
 
 	m_lib = plib::palloc<plib::dynlib>(libpath);
 
-	/* make sure the solver and parameters are started first! */
 
-	for (auto & e : setup().m_device_factory)
-	{
-		if ( setup().factory().is_class<devices::NETLIB_NAME(mainclock)>(e.second)
-				|| setup().factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
-				|| setup().factory().is_class<devices::NETLIB_NAME(gnd)>(e.second)
-				|| setup().factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
-		{
-			auto dev = plib::owned_ptr<device_t>(e.second->Create(*this, e.first));
-			setup().register_dev(std::move(dev));
-		}
-	}
-
-	log().debug("Searching for mainclock and solver ...\n");
-
-	m_mainclock = get_single_device<devices::NETLIB_NAME(mainclock)>("mainclock");
-	m_solver = get_single_device<devices::NETLIB_NAME(solver)>("solver");
-	m_gnd = get_single_device<devices::NETLIB_NAME(gnd)>("gnd");
-	m_params = get_single_device<devices::NETLIB_NAME(netlistparams)>("parameter");
-
-	/* create devices */
-
-	for (auto & e : setup().m_device_factory)
-	{
-		if ( !setup().factory().is_class<devices::NETLIB_NAME(mainclock)>(e.second)
-				&& !setup().factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
-				&& !setup().factory().is_class<devices::NETLIB_NAME(gnd)>(e.second)
-				&& !setup().factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
-		{
-			auto dev = plib::owned_ptr<device_t>(e.second->Create(*this, e.first));
-			setup().register_dev(std::move(dev));
-		}
-	}
-
-	bool use_deactivate = (m_params->m_use_deactivate.Value() ? true : false);
-
-
-	for (auto &d : m_devices)
-	{
-		if (use_deactivate)
-		{
-			auto p = setup().m_param_values.find(d->name() + ".HINT_NO_DEACTIVATE");
-			if (p != setup().m_param_values.end())
-			{
-				//FIXME: Error checking
-				auto v = p->second.as_long();
-				d->set_hint_deactivate(!v);
-			}
-		}
-		else
-			d->set_hint_deactivate(false);
-	}
 }
 
 void netlist_t::stop()

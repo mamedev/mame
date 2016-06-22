@@ -1066,6 +1066,7 @@ namespace netlist
 
 	class netlist_t : public plib::plog_dispatch_intf
 	{
+		friend class setup_t;
 		P_PREVENT_COPYING(netlist_t)
 	public:
 
@@ -1094,6 +1095,9 @@ namespace netlist
 
 		void set_setup(setup_t *asetup) { m_setup = asetup;  }
 		setup_t &setup() { return *m_setup; }
+
+
+		void register_dev(plib::owned_ptr<device_t> dev);
 
 		net_t *find_net(const pstring &name);
 
@@ -1156,7 +1160,7 @@ namespace netlist
 		/* sole use is to manage lifetime of family objects */
 		std::vector<std::pair<pstring, std::unique_ptr<logic_family_desc_t>>> m_family_cache;
 
-protected:
+	protected:
 
 		// performance
 		nperfcount_t m_perf_out_processed;

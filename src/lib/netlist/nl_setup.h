@@ -185,7 +185,6 @@ namespace netlist
 
 		void register_term(core_terminal_t &obj);
 
-		void register_dev(plib::owned_ptr<device_t> dev);
 		void register_dev(const pstring &classname, const pstring &name);
 
 		void register_lib_entry(const pstring &name);
