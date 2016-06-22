@@ -1111,7 +1111,7 @@ void mb86901_device::execute_group3(UINT32 op)
 			write_word(m_data_asi, ADDRESS, RDREG);
 			if (MAE || HOLD_BUS)
 				break;
-			write_word(m_data_asi, ADDRESS, REG(RD+1));
+			write_word(m_data_asi, ADDRESS+4, REG(RD+1));
 			break;
 		case 9:		// ldsb
 		{
