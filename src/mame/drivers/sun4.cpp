@@ -429,6 +429,42 @@
 #define PM_ACCESSED (0x02000000)	// accessed flag
 #define PM_MODIFIED (0x01000000)	// modified flag
 
+namespace
+{
+const sparc_disassembler::asi_desc_map::value_type sun4_asi_desc[] = {
+													 { 0x10, { nullptr, "Flush I-Cache (Segment)" } },
+													 { 0x11, { nullptr, "Flush I-Cache (Page)"    } },
+	{ 0x02, { nullptr, "System Space"           } }, { 0x12, { nullptr, "Flush I-Cache (Context)" } },
+	{ 0x03, { nullptr, "Segment Map"            } }, { 0x13, { nullptr, "Flush I-Cache (User)"    } },
+	{ 0x04, { nullptr, "Page Map"               } }, { 0x14, { nullptr, "Flush D-Cache (Segment)" } },
+	{ 0x05, { nullptr, "Block Copy"             } }, { 0x15, { nullptr, "Flush D-Cache (Page)"    } },
+	{ 0x06, { nullptr, "Region Map"             } }, { 0x16, { nullptr, "Flush D-Cache (Context)" } },
+	{ 0x07, { nullptr, "Flush Cache (Region)"   } }, { 0x17, { nullptr, "Flush D-Cache (User)"    } },
+	{ 0x08, { nullptr, "User Instruction"       } },
+	{ 0x09, { nullptr, "Supervisor Instruction" } },
+	{ 0x0a, { nullptr, "User Data"              } },
+	{ 0x0b, { nullptr, "Supervisor Data"        } }, { 0x1b, { nullptr, "Flush I-Cache (Region)"  } },
+	{ 0x0c, { nullptr, "Flush Cache (Segment)"  } },
+	{ 0x0d, { nullptr, "Flush Cache (Page)"     } },
+	{ 0x0e, { nullptr, "Flush Cache (Context)"  } },
+	{ 0x0f, { nullptr, "Flush Cache (User)"     } }, { 0x1f, { nullptr, "Flush D-Cache (Region)"  } }
+};
+/* TODO: make SPARCstation-1 a different machine type so it can load its own ASI descriptions - it's a subset of Sun4
+const sparc_disassembler::asi_desc_map::value_type sun4c_asi_desc[] = {
+	{ 0x02, { nullptr, "System Space"           } },
+	{ 0x03, { nullptr, "Segment Map"            } },
+	{ 0x04, { nullptr, "Page Map"               } },
+	{ 0x08, { nullptr, "User Instruction"       } },
+	{ 0x09, { nullptr, "Supervisor Instruction" } },
+	{ 0x0a, { nullptr, "User Data"              } },
+	{ 0x0b, { nullptr, "Supervisor Data"        } },
+	{ 0x0c, { nullptr, "Flush Cache (Segment)"  } },
+	{ 0x0d, { nullptr, "Flush Cache (Page)"     } },
+	{ 0x0e, { nullptr, "Flush Cache (Context)"  } }
+};
+*/
+}
+
 class sun4_state : public driver_device
 {
 public:
@@ -822,6 +858,7 @@ static MACHINE_CONFIG_START( sun4, sun4_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MB86901, 16670000)
 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, sun4_mem)
+	MCFG_SPARC_ADD_ASI_DESC(sun4_asi_desc)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")

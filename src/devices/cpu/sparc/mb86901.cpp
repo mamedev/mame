@@ -24,8 +24,6 @@
 
 #define SPARCV8		(0)
 
-CPU_DISASSEMBLE( sparc );
-
 const device_type MB86901 = &device_creator<mb86901_device>;
 
 const int mb86901_device::WINDOW_COUNT = 7;

@@ -40,6 +40,10 @@
 #define SPARC_INT15							31
 #define SPARC_TRAP_INSTRUCTION				128
 
+// TODO: when there are more SPARC CPUs, move setter to a base class
+#define MCFG_SPARC_ADD_ASI_DESC(desc) \
+	mb86901_device::add_asi_desc(*device, desc);
+
 class mb86901_device : public cpu_device
 {
 public:
@@ -76,7 +80,11 @@ public:
 	void hold_bus() { m_hold_bus = true; }
 	void release_bus() { m_hold_bus = false; }
 
+	template<typename T> static void add_asi_desc(device_t &device, const T &desc) { return downcast<mb86901_device &>(device).add_asi_desc(desc); }
+
 protected:
+	template<typename T> void add_asi_desc(const T &desc) { m_dasm.add_asi_desc(desc); }
+
 	bool invoke_queued_traps();
 	bool check_main_traps(UINT32 op, bool privileged, UINT32 alignment, UINT8 registeralign, bool noimmediate);
 

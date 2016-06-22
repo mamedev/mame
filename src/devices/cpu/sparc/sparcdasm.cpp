@@ -86,45 +86,40 @@ const sparc_disassembler::branch_desc sparc_disassembler::CBCCC_DESC = {
 	}
 };
 
-const sparc_disassembler::int_op_desc_map::value_type sparc_disassembler::SIMPLE_INT_OP_DESC[] = {
-	{ 0x00, { 7, false, "add"      } },
-	{ 0x01, { 7, true,  "and"      } },
-	{ 0x02, { 7, true,  "or"       } },
-	{ 0x03, { 7, true,  "xor"      } },
-	{ 0x04, { 7, false, "sub"      } },
-	{ 0x05, { 7, true,  "andn"     } },
-	{ 0x06, { 7, true,  "orn"      } },
-	{ 0x07, { 7, true,  "xnor"     } },
-	{ 0x08, { 7, false, "addx"     } },
-	{ 0x09, { 9, false, "mulx"     } },
-	{ 0x0a, { 8, false, "umul"     } },
-	{ 0x0b, { 8, false, "smul"     } },
-	{ 0x0c, { 7, false, "subx"     } },
-	{ 0x0d, { 9, false, "udivx"    } },
-	{ 0x0e, { 8, false, "udiv"     } },
-	{ 0x0f, { 8, false, "sdiv"     } },
-	{ 0x10, { 8, false, "addcc"    } },
-	{ 0x11, { 8, true,  "andcc"    } },
-	{ 0x12, { 7, true,  "orcc"     } },
-	{ 0x13, { 7, true,  "xorcc"    } },
-	{ 0x14, { 7, false, "subcc"    } },
-	{ 0x15, { 7, true,  "andncc"   } },
-	{ 0x16, { 7, true,  "orncc"    } },
-	{ 0x17, { 7, true,  "xnorcc"   } },
-	{ 0x18, { 7, false, "addxcc"   } },
-	{ 0x1a, { 8, false, "umulcc"   } },
-	{ 0x1b, { 8, false, "smulcc"   } },
-	{ 0x1c, { 7, false, "subxcc"   } },
-	{ 0x1e, { 8, false, "udivcc"   } },
-	{ 0x1f, { 8, false, "sdivcc"   } },
-	{ 0x20, { 7, false, "taddcc"   } },
-	{ 0x21, { 7, false, "tsubcc"   } },
-	{ 0x22, { 7, false, "taddcctv" } },
-	{ 0x23, { 7, false, "tsubcctv" } },
-	{ 0x24, { 7, false, "mulscc"   } },
-	{ 0x2d, { 9, false, "sdivx"    } },
-	{ 0x3c, { 7, false, "save"     } },
-	{ 0x3d, { 7, false, "restore"  } }
+const sparc_disassembler::int_op_desc_map::value_type sparc_disassembler::V7_INT_OP_DESC[] = {
+	{ 0x00, { false, "add"      } }, { 0x10, { false, "addcc"    } },
+	{ 0x01, { true,  "and"      } }, { 0x11, { true,  "andcc"    } },
+	{ 0x02, { true,  "or"       } }, { 0x12, { true,  "orcc"     } },
+	{ 0x03, { true,  "xor"      } }, { 0x13, { true,  "xorcc"    } },
+	{ 0x04, { false, "sub"      } }, { 0x14, { false, "subcc"    } },
+	{ 0x05, { true,  "andn"     } }, { 0x15, { true,  "andncc"   } },
+	{ 0x06, { true,  "orn"      } }, { 0x16, { true,  "orncc"    } },
+	{ 0x07, { true,  "xnor"     } }, { 0x17, { true,  "xnorcc"   } },
+	{ 0x08, { false, "addx"     } }, { 0x18, { false, "addxcc"   } },
+	{ 0x0c, { false, "subx"     } }, { 0x1c, { false, "subxcc"   } },
+
+	{ 0x20, { false, "taddcc"   } },
+	{ 0x21, { false, "tsubcc"   } },
+	{ 0x22, { false, "taddcctv" } },
+	{ 0x23, { false, "tsubcctv" } },
+	{ 0x24, { false, "mulscc"   } },
+
+	{ 0x3c, { false, "save"     } },
+	{ 0x3d, { false, "restore"  } }
+};
+
+const sparc_disassembler::int_op_desc_map::value_type sparc_disassembler::V8_INT_OP_DESC[] = {
+	{ 0x0a, { false, "umul"     } }, { 0x1a, { false, "umulcc"   } },
+	{ 0x0b, { false, "smul"     } }, { 0x1b, { false, "smulcc"   } },
+	{ 0x0e, { false, "udiv"     } }, { 0x1e, { false, "udivcc"   } },
+	{ 0x0f, { false, "sdiv"     } }, { 0x1f, { false, "sdivcc"   } }
+};
+
+const sparc_disassembler::int_op_desc_map::value_type sparc_disassembler::V9_INT_OP_DESC[] = {
+	{ 0x09, { false, "mulx"     } },
+	{ 0x0d, { false, "udivx"    } },
+
+	{ 0x2d, { false, "sdivx"    } }
 };
 
 const sparc_disassembler::state_reg_desc_map::value_type sparc_disassembler::V9_STATE_REG_DESC[] = {
@@ -301,6 +296,12 @@ inline UINT32 sparc_disassembler::freg(UINT32 val, bool shift) const
 	return (shift && (m_version >= 9)) ? ((val & 0x1e) | ((val << 5) & 0x20)) : val;
 }
 
+template <typename T> inline void sparc_disassembler::add_int_op_desc(const T &desc)
+{
+	for (const auto &it : desc)
+		m_int_op_desc.insert(it);
+}
+
 template <typename T> inline void sparc_disassembler::add_fpop1_desc(const T &desc)
 {
 	for (const auto &it : desc)
@@ -346,7 +347,7 @@ sparc_disassembler::sparc_disassembler(unsigned version)
 		FBFCC_DESC,                                         // branch on floating-point condition codes
 		(version == 8) ? CBCCC_DESC : EMPTY_BRANCH_DESC     // branch on coprocessor condition codes, SPARCv8
 	}
-	, m_simple_int_op_desc(std::begin(SIMPLE_INT_OP_DESC), std::end(SIMPLE_INT_OP_DESC))
+	, m_int_op_desc(std::begin(V7_INT_OP_DESC), std::end(V7_INT_OP_DESC))
 	, m_state_reg_desc()
 	, m_fpop1_desc(std::begin(V7_FPOP1_DESC), std::end(V7_FPOP1_DESC))
 	, m_fpop2_desc(std::begin(V7_FPOP2_DESC), std::end(V7_FPOP2_DESC))
@@ -354,14 +355,20 @@ sparc_disassembler::sparc_disassembler(unsigned version)
 	, m_asi_desc()
 	, m_prftch_desc()
 {
+	if (m_version >= 8)
+	{
+		add_int_op_desc(V8_INT_OP_DESC);
+	}
+
 	if (m_version >= 9)
 	{
 		m_op_field_width = 11;
 
-		m_simple_int_op_desc.find(0x08)->second.mnemonic = "addc";
-		m_simple_int_op_desc.find(0x0c)->second.mnemonic = "subc";
-		m_simple_int_op_desc.find(0x18)->second.mnemonic = "addccc";
-		m_simple_int_op_desc.find(0x1c)->second.mnemonic = "subccc";
+		m_int_op_desc.find(0x08)->second.mnemonic = "addc";
+		m_int_op_desc.find(0x0c)->second.mnemonic = "subc";
+		m_int_op_desc.find(0x18)->second.mnemonic = "addccc";
+		m_int_op_desc.find(0x1c)->second.mnemonic = "subccc";
+		add_int_op_desc(V9_INT_OP_DESC);
 
 		add_state_reg_desc(V9_STATE_REG_DESC),
 		add_fpop1_desc(V9_FPOP1_DESC);
@@ -654,8 +661,8 @@ offs_t sparc_disassembler::dasm(char *buf, offs_t pc, UINT32 op) const
 			break;
 		}
 		{
-			const auto it(m_simple_int_op_desc.find(OP3));
-			if ((it != m_simple_int_op_desc.end()) && (m_version >= it->second.min_version))
+			const auto it(m_int_op_desc.find(OP3));
+			if (it != m_int_op_desc.end())
 			{
 				if (!USEIMM)
 					print(buf, "%-*s%s,%s,%s", m_op_field_width, it->second.mnemonic, REG_NAMES[RS1], REG_NAMES[RS2], REG_NAMES[RD]);

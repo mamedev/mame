@@ -97,7 +97,6 @@ private:
 
 	struct int_op_desc
 	{
-		unsigned        min_version;
 		bool            hex_imm;
 		const char      *mnemonic;
 	};
@@ -152,6 +151,7 @@ private:
 
 	UINT32 freg(UINT32 val, bool shift) const;
 
+	template <typename T> void add_int_op_desc(const T &desc);
 	template <typename T> void add_fpop1_desc(const T &desc);
 	template <typename T> void add_fpop2_desc(const T &desc);
 	template <typename T> void add_ldst_desc(const T &desc);
@@ -167,7 +167,9 @@ private:
 	static const branch_desc                    FBPFCC_DESC;
 	static const branch_desc                    FBFCC_DESC;
 	static const branch_desc                    CBCCC_DESC;
-	static const int_op_desc_map::value_type    SIMPLE_INT_OP_DESC[];
+	static const int_op_desc_map::value_type    V7_INT_OP_DESC[];
+	static const int_op_desc_map::value_type    V8_INT_OP_DESC[];
+	static const int_op_desc_map::value_type    V9_INT_OP_DESC[];
 	static const state_reg_desc_map::value_type V9_STATE_REG_DESC[];
 	static const char * const                   MOVCC_CC_NAMES[8];
 	static const char * const                   MOVCC_COND_NAMES[32];
@@ -185,7 +187,7 @@ private:
 	unsigned            m_version;
 	int                 m_op_field_width;
 	branch_desc         m_branch_desc[8];
-	int_op_desc_map     m_simple_int_op_desc;
+	int_op_desc_map     m_int_op_desc;
 	state_reg_desc_map  m_state_reg_desc;
 	fpop1_desc_map      m_fpop1_desc;
 	fpop2_desc_map      m_fpop2_desc;
