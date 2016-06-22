@@ -1632,7 +1632,6 @@ device_debug::device_debug(device_t &device)
 	, m_symtable(&device, device.machine().debugger().cpu().get_global_symtable())
 	, m_instrhook(nullptr)
 	, m_dasm_override(nullptr)
-	, m_opwidth(0)
 	, m_stepaddr(0)
 	, m_stepsleft(0)
 	, m_stopaddr(0)
@@ -1698,7 +1697,6 @@ device_debug::device_debug(device_t &device)
 	if (m_exec != nullptr)
 	{
 		m_flags = DEBUG_FLAG_OBSERVING | DEBUG_FLAG_HISTORY;
-		m_opwidth = min_opcode_bytes();
 
 		// if no curpc, add one
 		if (m_state != nullptr && m_symtable.find("curpc") == nullptr)
@@ -1920,7 +1918,7 @@ void device_debug::instruction_hook(offs_t curpc)
 
 	// handle step out/over on the instruction we are about to execute
 	if ((m_flags & (DEBUG_FLAG_STEPPING_OVER | DEBUG_FLAG_STEPPING_OUT)) != 0 && m_stepaddr == ~0)
-		prepare_for_step_overout(pc());
+		prepare_for_step_overout(m_device.safe_pc());
 
 	// no longer in debugger code
 	debugcpu.set_within_instruction(false);
@@ -1997,7 +1995,7 @@ offs_t device_debug::disassemble(char *buffer, offs_t pc, const UINT8 *oprom, co
 		result = m_disasm->disassemble(buffer, pc, oprom, opram, 0);
 
 	// make sure we get good results
-	assert((result & DASMFLAG_LENGTHMASK) != 0);
+	assert((result & DASMFLAG_LENGTHMASK) != 0 || m_disasm == nullptr);
 #ifdef MAME_DEBUG
 	if (m_memory != nullptr && m_disasm != nullptr)
 	{
@@ -2653,7 +2651,7 @@ UINT32 device_debug::compute_opcode_crc32(offs_t pc) const
 
 	// fetch the bytes up to the maximum
 	UINT8 opbuf[64], argbuf[64];
-	int maxbytes = max_opcode_bytes();
+	int maxbytes = (m_disasm != nullptr) ? m_disasm->max_opcode_bytes() : 1;
 	for (int numbytes = 0; numbytes < maxbytes; numbytes++)
 	{
 		opbuf[numbytes] = m_device.machine().debugger().cpu().read_opcode(decrypted_space, pcbyte + numbytes, 1);
@@ -2966,7 +2964,7 @@ void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t addre
 				{
 					"0bytes", "byte", "word", "3bytes", "dword", "5bytes", "6bytes", "7bytes", "qword"
 				};
-				offs_t pc = space.device().debug()->pc();
+				offs_t pc = space.device().safe_pc();
 				std::string buffer;
 
 				if (type & WATCHPOINT_WRITE)
@@ -2996,7 +2994,7 @@ void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t addre
 
 void device_debug::hotspot_check(address_space &space, offs_t address)
 {
-	offs_t curpc = pc();
+	offs_t curpc = m_device.safe_pc();
 
 	// see if we have a match in our list
 	unsigned int hotindex;
@@ -3051,7 +3049,7 @@ UINT32 device_debug::dasm_wrapped(std::string &buffer, offs_t pc)
 
 	// fetch the bytes up to the maximum
 	UINT8 opbuf[64], argbuf[64];
-	int maxbytes = max_opcode_bytes();
+	int maxbytes = m_disasm->max_opcode_bytes();
 	for (int numbytes = 0; numbytes < maxbytes; numbytes++)
 	{
 		opbuf[numbytes] = m_device.machine().debugger().cpu().read_opcode(decrypted_space, pcbyte + numbytes, 1);
@@ -3075,7 +3073,7 @@ UINT32 device_debug::dasm_wrapped(std::string &buffer, offs_t pc)
 UINT64 device_debug::get_current_pc(symbol_table &table, void *ref)
 {
 	device_t *device = reinterpret_cast<device_t *>(table.globalref());
-	return device->debug()->pc();
+	return device->safe_pc();
 }
 
 
