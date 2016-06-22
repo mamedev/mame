@@ -994,7 +994,7 @@ void setup_t::tt_factory_create(tt_desc &desc)
 
 void setup_t::include(const pstring &netlist_name)
 {
-	for (auto source : m_sources)
+	for (auto &source : m_sources)
 	{
 		if (source->parse(*this, netlist_name))
 			return;

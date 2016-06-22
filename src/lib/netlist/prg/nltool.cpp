@@ -94,7 +94,8 @@ public:
 	{
 		// read the netlist ...
 
-		m_setup->register_source(std::make_shared<netlist::source_file_t>(filename));
+		m_setup->register_source(plib::make_unique_base<netlist::source_t,
+				netlist::source_file_t>(filename));
 		m_setup->include(name);
 		log_setup();
 
@@ -278,7 +279,8 @@ static void listdevices()
 	nt.init();
 	netlist::factory_list_t &list = nt.setup().factory();
 
-	nt.setup().register_source(std::make_shared<netlist::source_proc_t>("dummy", &netlist_dummy));
+	nt.setup().register_source(plib::make_unique_base<netlist::source_t,
+			netlist::source_proc_t>("dummy", &netlist_dummy));
 	nt.setup().include("dummy");
 
 	nt.setup().start_devices();

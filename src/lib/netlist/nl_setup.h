@@ -67,7 +67,7 @@ void NETLIST_NAME(name)(netlist::setup_t &setup)                               \
 #define NETLIST_END()  }
 
 #define LOCAL_SOURCE(name)                                                     \
-		setup.register_source(std::make_shared<netlist::source_proc_t>(# name, &NETLIST_NAME(name)));
+		setup.register_source(plib::make_unique_base<netlist::source_t, netlist::source_proc_t>(# name, &NETLIST_NAME(name)));
 
 #define LOCAL_LIB_ENTRY(name)                                                  \
 		LOCAL_SOURCE(name)                                                     \
@@ -150,7 +150,7 @@ namespace netlist
 	class source_t
 	{
 	public:
-		using list_t = std::vector<std::shared_ptr<source_t>>;
+		using list_t = std::vector<std::unique_ptr<source_t>>;
 
 		source_t()
 		{}
@@ -226,10 +226,9 @@ namespace netlist
 
 		/* register a source */
 
-		template <class C>
-		void register_source(std::shared_ptr<C> src)
+		void register_source(std::unique_ptr<source_t> &&src)
 		{
-			m_sources.push_back(std::static_pointer_cast<source_t>(src));
+			m_sources.push_back(std::move(src));
 		}
 
 		factory_list_t &factory() { return m_factory; }
