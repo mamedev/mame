@@ -47,7 +47,6 @@ public:
 		: namcos2_shared_state(mconfig, type, tag),
 		m_winrun_dspbios(*this,"winrun_dspbios"),
 		m_winrun_polydata(*this,"winrun_polydata"),
-		m_winrun_gpucomram(*this,"winrun_comram"),
 		m_dspram16(*this,"dspram16"),
 		m_mpDualPortRAM(*this,"mpdualportram"),
 		m_master_dsp_code(*this,"master_dsp_code"),
@@ -57,7 +56,6 @@ public:
 
 	optional_shared_ptr<UINT16> m_winrun_dspbios;
 	optional_shared_ptr<UINT16> m_winrun_polydata;
-	optional_shared_ptr<UINT16> m_winrun_gpucomram;
 	optional_shared_ptr<UINT16> m_dspram16;
 	required_shared_ptr<UINT8> m_mpDualPortRAM;
 	optional_shared_ptr<UINT16> m_master_dsp_code;
@@ -146,8 +144,6 @@ public:
 	DECLARE_READ16_MEMBER(winrun_dsp_pointrom_data_r);
 	DECLARE_WRITE16_MEMBER(winrun_dsp_complete_w);
 	DECLARE_READ16_MEMBER(winrun_table_r);
-	DECLARE_READ16_MEMBER(winrun_gpucomram_r);
-	DECLARE_WRITE16_MEMBER(winrun_gpucomram_w);
 	DECLARE_WRITE16_MEMBER(winrun_dspbios_w);
 	DECLARE_READ16_MEMBER(winrun_68k_dspcomram_r);
 	DECLARE_WRITE16_MEMBER(winrun_68k_dspcomram_w);
