@@ -221,10 +221,10 @@ if (machine().input().code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popmessage("Z
 		if (machine().input().code_pressed(KEYCODE_RIGHT) && texel_width < 512) { texel_width <<= 1; while (machine().input().code_pressed(KEYCODE_RIGHT)) ; }
 
 		if (yoffs < 0) yoffs = 0;
-		if (0)
+		if (1)
 			base = waveram0_ptr_from_expanded_addr(yoffs << 16);
 		else
-			base = (void *)&m_frameColor[yoffs<<9];
+			base = (void *)&m_frameColor[yoffs << 6];
 
 		int xoffs = screen.visible_area().min_x;
 		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -232,7 +232,7 @@ if (machine().input().code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popmessage("Z
 			UINT32 *dest = &bitmap.pix32(y);
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
-				if (0) {
+				if (1) {
 					UINT8 tex = get_texel_8bit((UINT64 *)base, y, x, texel_width);
 					dest[x] = (tex << 16) | (tex << 8) | tex;
 				}
@@ -241,7 +241,7 @@ if (machine().input().code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popmessage("Z
 				}
 			}
 		}
-		popmessage("offs = %06X base = %08X", yoffs, yoffs<<9);
+		popmessage("offs = %06X base = %08X", yoffs, yoffs<<16);
 	}
 
 	return 0;
@@ -776,7 +776,7 @@ int zeus2_device::zeus2_fifo_process(const UINT32 *data, int numwords)
 				return FALSE;
 			if (log_fifo)
 			{
-				log_fifo_command(data, numwords, " -- unknown control + hack clear screen\n");
+				log_fifo_command(data, numwords, " -- unknown control + happens after clear screen\n");
 				logerror("\t\tvector %8.2f %8.2f %8.5f\n",
 						(double) convert_float(data[1]),
 						(double) convert_float(data[2]),
@@ -816,7 +816,7 @@ int zeus2_device::zeus2_fifo_process(const UINT32 *data, int numwords)
 		case 0x25:
 			if (log_fifo)
 				log_fifo_command(data, numwords, "\n");
-			//zeus_quad_size = 10;
+			zeus_quad_size = 14;
 			break;
 
 		/* 0x31: sync pipeline? (thegrid) */
@@ -864,7 +864,7 @@ void zeus2_device::zeus2_draw_model(UINT32 baseaddr, UINT16 count, int logit)
 	UINT32 databuffer[32];
 	int databufcount = 0;
 	int model_done = FALSE;
-	UINT32 texoffs = 0;
+	UINT32 texdata = 0;
 	int quadsize = zeus_quad_size;
 
 	if (logit)
@@ -914,9 +914,9 @@ void zeus2_device::zeus2_draw_model(UINT32 baseaddr, UINT16 count, int logit)
 					case 0x22:  /* crusnexo */
 						if (((databuffer[0] >> 16) & 0xff) == 0x9b)
 						{
-							texoffs = databuffer[1];
+							texdata = databuffer[1];
 							if (logit)
-								logerror("texture offset\n");
+								logerror("texdata\n");
 						}
 						else if (logit)
 							logerror("unknown offset\n");
@@ -936,12 +936,14 @@ void zeus2_device::zeus2_draw_model(UINT32 baseaddr, UINT16 count, int logit)
 						break;
 
 					case 0x2d:  // atlantis
-						texoffs = databuffer[1];
-						poly->zeus2_draw_quad(&databuffer[1], texoffs, logit);
+						texdata = databuffer[1];
+						databuffer[1] = m_renderRegs[0x6];
+						//poly->zeus2_draw_quad(&databuffer[1], texoffs, logit);
+						poly->zeus2_draw_quad(databuffer, texdata, logit);
 						break;
 
 					case 0x38:  /* crusnexo/thegrid */
-						poly->zeus2_draw_quad(databuffer, texoffs, logit);
+						poly->zeus2_draw_quad(databuffer, texdata, logit);
 						break;
 
 					default:
@@ -965,7 +967,7 @@ void zeus2_device::zeus2_draw_model(UINT32 baseaddr, UINT16 count, int logit)
 /*************************************
  *  Draw a quad
  *************************************/
-void zeus2_renderer::zeus2_draw_quad(const UINT32 *databuffer, UINT32 texoffs, int logit)
+void zeus2_renderer::zeus2_draw_quad(const UINT32 *databuffer, UINT32 texdata, int logit)
 {
 	z2_poly_vertex clipvert[8];
 	z2_poly_vertex vert[4];
@@ -976,20 +978,20 @@ void zeus2_renderer::zeus2_draw_quad(const UINT32 *databuffer, UINT32 texoffs, i
 	int i;
 	//  INT16 normal[3];
 	//  INT32 rotnormal[3];
-	int texmode = texoffs & 0xffff;
+	int texmode = texdata & 0xffff;
 
 	if (logit)
 		m_state->logerror("quad\n");
 
-	if (machine().input().code_pressed(KEYCODE_Q) && (texoffs & 0xffff) == 0x119) return;
-	if (machine().input().code_pressed(KEYCODE_E) && (texoffs & 0xffff) == 0x01d) return;
-	if (machine().input().code_pressed(KEYCODE_R) && (texoffs & 0xffff) == 0x11d) return;
-	if (machine().input().code_pressed(KEYCODE_T) && (texoffs & 0xffff) == 0x05d) return;
-	if (machine().input().code_pressed(KEYCODE_Y) && (texoffs & 0xffff) == 0x0dd) return;
-	//if (machine().input().code_pressed(KEYCODE_U) && (texoffs & 0xffff) == 0x119) return;
-	//if (machine().input().code_pressed(KEYCODE_I) && (texoffs & 0xffff) == 0x119) return;
-	//if (machine().input().code_pressed(KEYCODE_O) && (texoffs & 0xffff) == 0x119) return;
-	//if (machine().input().code_pressed(KEYCODE_L) && (texoffs & 0x100)) return;
+	if (machine().input().code_pressed(KEYCODE_Q) && (texdata & 0xffff) == 0x119) return;
+	if (machine().input().code_pressed(KEYCODE_E) && (texdata & 0xffff) == 0x01d) return;
+	if (machine().input().code_pressed(KEYCODE_R) && (texdata & 0xffff) == 0x11d) return;
+	if (machine().input().code_pressed(KEYCODE_T) && (texdata & 0xffff) == 0x05d) return;
+	if (machine().input().code_pressed(KEYCODE_Y) && (texdata & 0xffff) == 0x0dd) return;
+	//if (machine().input().code_pressed(KEYCODE_U) && (texdata & 0xffff) == 0x119) return;
+	//if (machine().input().code_pressed(KEYCODE_I) && (texdata & 0xffff) == 0x119) return;
+	//if (machine().input().code_pressed(KEYCODE_O) && (texdata & 0xffff) == 0x119) return;
+	//if (machine().input().code_pressed(KEYCODE_L) && (texdata & 0x100)) return;
 
 	/*
 	0   38800000
@@ -1092,7 +1094,7 @@ void zeus2_renderer::zeus2_draw_quad(const UINT32 *databuffer, UINT32 texoffs, i
 		vert[i].y = x * m_state->zeus_matrix[1][0] + y * m_state->zeus_matrix[1][1] + z * m_state->zeus_matrix[1][2] + m_state->zeus_point[1];
 		vert[i].p[0] = x * m_state->zeus_matrix[2][0] + y * m_state->zeus_matrix[2][1] + z * m_state->zeus_matrix[2][2] + m_state->zeus_point[2];
 		vert[i].p[0] += m_state->zbase;
-		vert[i].p[2] += texoffs >> 16;
+		vert[i].p[2] += texdata >> 16;
 		vert[i].p[1] *= 256.0f;
 		vert[i].p[2] *= 256.0f;
 
@@ -1138,17 +1140,21 @@ void zeus2_renderer::zeus2_draw_quad(const UINT32 *databuffer, UINT32 texoffs, i
 	zeus2_poly_extra_data& extra = this->object_data_alloc();
 	switch (texmode)
 	{
+	//case 0x18e:     // atlantis
+	//	extra.texwidth = 512;
+	//	break;
+
 	case 0x01d:     /* crusnexo: RHS of score bar */
 	case 0x05d:     /* crusnexo: background, road */
 	case 0x0dd:     /* crusnexo: license plate letters */
 	case 0x11d:     /* crusnexo: LHS of score bar */
 	case 0x14d:     // atlantis
+	case 0x18e:     // atlantis
 	case 0x15d:     /* crusnexo */
 	case 0x85d:     /* crusnexo */
 	case 0x95d:     /* crusnexo */
 	case 0xc1d:     /* crusnexo */
 	case 0xc5d:     /* crusnexo */
-	case 0x18e:     // atlantis
 		extra.texwidth = 256;
 		break;
 
@@ -1176,10 +1182,10 @@ void zeus2_renderer::zeus2_draw_quad(const UINT32 *databuffer, UINT32 texoffs, i
 	default:
 	{
 		static UINT8 hits[0x10000];
-		if (!hits[(texoffs & 0xffff)])
+		if (!hits[(texdata & 0xffff)])
 		{
-			hits[(texoffs & 0xffff)] = 1;
-			printf("format = %04X\n", (texoffs & 0xffff));
+			hits[(texdata & 0xffff)] = 1;
+			printf("texMode = %04X\n", (texdata & 0xffff));
 		}
 		break;
 	}
