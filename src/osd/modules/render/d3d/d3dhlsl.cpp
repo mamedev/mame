@@ -43,23 +43,13 @@ static void get_vector(const char *data, int count, float *out, bool report_erro
 //============================================================
 
 shaders::shaders() :
-	d3dintf(nullptr), machine(nullptr), d3d(nullptr), num_screens(0), curr_screen(0),
-	avi_output_file(nullptr), avi_frame(0), avi_copy_surface(nullptr), avi_copy_texture(nullptr), avi_final_target(nullptr), avi_final_texture(nullptr),
+	d3dintf(nullptr), machine(nullptr), d3d(nullptr), post_fx_enable(false), oversampling_enable(false), paused(true), num_screens(0), curr_screen(0), lastidx(-1),
+	shadow_texture(nullptr), options(nullptr), avi_output_file(nullptr), avi_frame(0), avi_copy_surface(nullptr), avi_copy_texture(nullptr), avi_final_target(nullptr), avi_final_texture(nullptr),
 	black_surface(nullptr), black_texture(nullptr), render_snap(false), snap_rendered(false), snap_copy_target(nullptr), snap_copy_texture(nullptr), snap_target(nullptr), snap_texture(nullptr),
-	snap_width(0), snap_height(0), lines_pending(false), backbuffer(nullptr), curr_effect(nullptr), default_effect(nullptr), prescale_effect(nullptr), post_effect(nullptr), distortion_effect(nullptr),
-	focus_effect(nullptr), phosphor_effect(nullptr), deconverge_effect(nullptr), color_effect(nullptr), ntsc_effect(nullptr), bloom_effect(nullptr),
-	downsample_effect(nullptr), vector_effect(nullptr), fsfx_vertices(nullptr), curr_texture(nullptr), curr_render_target(nullptr), curr_poly(nullptr)
+	snap_width(0), snap_height(0), lines_pending(false), initialized(false), backbuffer(nullptr), curr_effect(nullptr), default_effect(nullptr), prescale_effect(nullptr), post_effect(nullptr),
+	distortion_effect(nullptr),	focus_effect(nullptr), phosphor_effect(nullptr), deconverge_effect(nullptr), color_effect(nullptr), ntsc_effect(nullptr), bloom_effect(nullptr),
+	downsample_effect(nullptr), vector_effect(nullptr), fsfx_vertices(nullptr), curr_texture(nullptr), curr_render_target(nullptr), curr_poly(nullptr), targethead(nullptr), cachehead(nullptr)
 {
-	master_enable = false;
-	vector_enable = true;
-	oversampling_enable = false;
-	shadow_texture = nullptr;
-	options = nullptr;
-	paused = true;
-	lastidx = -1;
-	targethead = nullptr;
-	cachehead = nullptr;
-	initialized = false;
 }
 
 
@@ -72,6 +62,12 @@ shaders::~shaders()
 	for (slider* slider : internal_sliders)
 	{
 		delete slider;
+	}
+
+	if (options != nullptr)
+	{
+		global_free(options);
+		options = nullptr;
 	}
 
 	cache_target *currcache = cachehead;
@@ -98,7 +94,7 @@ shaders::~shaders()
 
 void shaders::window_save()
 {
-	if (!master_enable || !d3dintf->post_fx_available)
+	if (!enabled())
 	{
 		return;
 	}
@@ -130,7 +126,7 @@ void shaders::window_save()
 
 void shaders::window_record()
 {
-	if (!master_enable || !d3dintf->post_fx_available)
+	if (!enabled())
 	{
 		return;
 	}
@@ -155,7 +151,7 @@ void shaders::window_record()
 
 void shaders::avi_update_snap(IDirect3DSurface9 *surface)
 {
-	if (!master_enable || !d3dintf->post_fx_available)
+	if (!enabled())
 	{
 		return;
 	}
@@ -208,7 +204,7 @@ void shaders::avi_update_snap(IDirect3DSurface9 *surface)
 
 void shaders::render_snapshot(IDirect3DSurface9 *surface)
 {
-	if (!master_enable || !d3dintf->post_fx_available)
+	if (!enabled())
 	{
 		return;
 	}
@@ -310,7 +306,7 @@ void shaders::render_snapshot(IDirect3DSurface9 *surface)
 
 void shaders::record_texture()
 {
-	if (!master_enable || !d3dintf->post_fx_available)
+	if (!enabled())
 	{
 		return;
 	}
@@ -353,7 +349,7 @@ void shaders::record_texture()
 
 void shaders::end_avi_recording()
 {
-	if (!master_enable || !d3dintf->post_fx_available)
+	if (!enabled())
 	{
 		return;
 	}
@@ -369,52 +365,12 @@ void shaders::end_avi_recording()
 
 
 //============================================================
-//  shaders::toggle
-//============================================================
-
-void shaders::toggle(std::vector<ui::menu_item>& sliders)
-{
-	if (master_enable)
-	{
-		if (initialized)
-		{
-			// free shader resources before renderer resources
-			delete_resources(false);
-		}
-
-		master_enable = !master_enable;
-
-		// free shader resources and re-create
-		d3d->device_delete_resources();
-		d3d->device_create_resources();
-	}
-	else
-	{
-		master_enable = !master_enable;
-
-		// free shader resources and re-create
-		d3d->device_delete_resources();
-		d3d->device_create_resources();
-
-		if (!initialized)
-		{
-			// re-create shader resources after renderer resources
-			bool failed = create_resources(false, sliders);
-			if (failed)
-			{
-				master_enable = false;
-			}
-		}
-	}
-}
-
-//============================================================
 //  shaders::begin_avi_recording
 //============================================================
 
 void shaders::begin_avi_recording(const char *name)
 {
-	if (!master_enable || !d3dintf->post_fx_available)
+	if (!enabled())
 	{
 		return;
 	}
@@ -573,7 +529,7 @@ void shaders::remove_render_target(d3d_render_target *rt)
 
 void shaders::set_texture(texture_info *texture)
 {
-	if (!master_enable || !d3dintf->post_fx_available)
+	if (!enabled())
 	{
 		return;
 	}
@@ -602,53 +558,64 @@ void shaders::set_texture(texture_info *texture)
 //  shaders::init
 //============================================================
 
-void shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *renderer)
+bool shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *renderer)
 {
+	osd_printf_verbose("Direct3D: Initialize HLSL\n");
+
+	if (initialized)
+	{
+		return false;
+	}
+
+	// check if no driver loaded (not all settings might be loaded yet)
+	if (&machine->system() == &GAME_NAME(___empty))
+	{
+		return false;
+	}
+
+	// check if another driver is loaded and reset last options
+	if (std::strcmp(machine->system().name, last_system_name) != 0)
+	{
+		strncpy(last_system_name, machine->system().name, sizeof(last_system_name));
+
+		last_options.params_init = false;
+	}
+
 	d3dx9_dll = osd::dynamic_module::open({ "d3dx9_43.dll" });
 
 	d3dx_create_effect_from_file_ptr = d3dx9_dll->bind<d3dx_create_effect_from_file_fn>("D3DXCreateEffectFromFileW");
 	if (!d3dx_create_effect_from_file_ptr)
 	{
 		osd_printf_verbose("Direct3D: Unable to find D3DXCreateEffectFromFileW\n");
-		d3dintf->post_fx_available = false;
-		return;
+		return false;
 	}
 
 	d3dintf->post_fx_available = true;
+
 	this->d3dintf = d3dintf;
 	this->machine = machine;
 	this->d3d = renderer;
-	this->options = renderer->get_shaders_options();
-
-	// check if no driver loaded (not all settings might be loaded yet)
-	if (&machine->system() == &GAME_NAME(___empty))
-	{
-		return;
-	}
-
-	// check if another driver is loaded
-	if (std::strcmp(machine->system().name, last_system_name) != 0)
-	{
-		strncpy(last_system_name, machine->system().name, sizeof(last_system_name));
-
-		options->params_init = false;
-		last_options.params_init = false;
-	}
 
 	enumerate_screens();
 
 	windows_options &winoptions = downcast<windows_options &>(machine->options());
 
-	master_enable = winoptions.d3d_hlsl_enable();
+	post_fx_enable = winoptions.d3d_hlsl_enable();
 	oversampling_enable = winoptions.d3d_hlsl_oversampling();
 	snap_width = winoptions.d3d_snap_width();
 	snap_height = winoptions.d3d_snap_height();
 
+	this->options = (hlsl_options*)global_alloc_clear<hlsl_options>();
+	this->options->params_init = false;
+
+	// copy last options if initialized
 	if (last_options.params_init)
 	{
+		osd_printf_verbose("Direct3D: First restore options\n");
 		options = &last_options;
 	}
 
+	// read options if not initialized
 	if (!options->params_init)
 	{
 		strncpy(options->shadow_mask_texture, winoptions.screen_shadow_mask_texture(), sizeof(options->shadow_mask_texture));
@@ -719,9 +686,19 @@ void shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 		options->bloom_level8_weight = winoptions.screen_bloom_lvl8_weight();
 
 		options->params_init = true;
+
+		osd_printf_verbose("Direct3D: First store options\n");
+		last_options = *options;
+		options = &last_options;
 	}
 
 	options->params_dirty = true;
+
+	initialized = true;
+
+	osd_printf_verbose("Direct3D: HLSL initialized\n");
+
+	return true;
 }
 
 
@@ -734,7 +711,7 @@ void shaders::init_fsfx_quad(void *vertbuf)
 	// Called at the start of each frame by the D3D code in order to reserve two triangles
 	// that are guaranteed to be at a fixed position so as to simply use D3DPT_TRIANGLELIST, 0, 2
 	// instead of having to do bookkeeping about a specific screen quad
-	if (!master_enable || !d3dintf->post_fx_available)
+	if (!enabled())
 	{
 		return;
 	}
@@ -805,15 +782,16 @@ void shaders::init_fsfx_quad(void *vertbuf)
 //  shaders::create_resources
 //============================================================
 
-int shaders::create_resources(bool reset, std::vector<ui::menu_item>& sliders)
+int shaders::create_resources()
 {
-	if (!master_enable || !d3dintf->post_fx_available)
+	if (!initialized || !enabled())
 	{
 		return 0;
 	}
 
 	if (last_options.params_init)
 	{
+		osd_printf_verbose("Direct3D: Restore options\n");
 		options = &last_options;
 	}
 
@@ -982,11 +960,6 @@ int shaders::create_resources(bool reset, std::vector<ui::menu_item>& sliders)
 	distortion_effect->add_uniform("SmoothBorderAmount", uniform::UT_FLOAT, uniform::CU_POST_SMOOTH_BORDER);
 	distortion_effect->add_uniform("ReflectionAmount", uniform::UT_FLOAT, uniform::CU_POST_REFLECTION);
 
-	initialized = true;
-
-	std::vector<ui::menu_item> my_sliders = init_slider_list();
-	sliders.insert(sliders.end(), my_sliders.begin(), my_sliders.end());
-
 	return 0;
 }
 
@@ -997,7 +970,7 @@ int shaders::create_resources(bool reset, std::vector<ui::menu_item>& sliders)
 
 void shaders::begin_draw()
 {
-	if (!master_enable || !d3dintf->post_fx_available)
+	if (!enabled())
 	{
 		return;
 	}
@@ -1094,7 +1067,7 @@ void shaders::blit(
 
 void shaders::end_frame()
 {
-	if (!master_enable || !d3dintf->post_fx_available)
+	if (!enabled())
 	{
 		return;
 	}
@@ -1587,7 +1560,7 @@ void shaders::ui_pass(poly_info *poly, int vertnum)
 
 void shaders::render_quad(poly_info *poly, int vertnum)
 {
-	if (!master_enable || !d3dintf->post_fx_available)
+	if (!enabled())
 	{
 		return;
 	}
@@ -1644,7 +1617,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 		curr_screen++;
 	}
-	else if (PRIMFLAG_GET_VECTOR(poly->get_flags()) && vector_enable)
+	else if (PRIMFLAG_GET_VECTOR(poly->get_flags()))
 	{
 		lines_pending = true;
 
@@ -1673,7 +1646,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 			osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
 		}
 	}
-	else if (PRIMFLAG_GET_VECTORBUF(poly->get_flags()) && vector_enable)
+	else if (PRIMFLAG_GET_VECTORBUF(poly->get_flags()))
 	{
 		curr_screen = curr_screen < num_screens ? curr_screen : 0;
 
@@ -1748,7 +1721,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 void shaders::end_draw()
 {
-	if (!master_enable || !d3dintf->post_fx_available)
+	if (!enabled())
 	{
 		return;
 	}
@@ -1790,6 +1763,11 @@ bool shaders::add_cache_target(renderer_d3d9* d3d, texture_info* texture, int so
 
 d3d_render_target* shaders::get_texture_target(render_primitive *prim, texture_info *texture)
 {
+	if (!enabled())
+	{
+		return nullptr;
+	}
+
 	auto win = d3d->assert_window();
 
 	int target_width = int(prim->get_quad_width() + 0.5f);
@@ -1810,7 +1788,7 @@ d3d_render_target* shaders::get_texture_target(render_primitive *prim, texture_i
 			// check if the size of the screen quad has changed
 			if (target->target_width != target_width || target->target_height != target_height)
 			{
-				osd_printf_verbose("get_texture_target() - invalid size\n");
+				osd_printf_verbose("Direct3D: Get texture target - invalid size\n");
 				return nullptr;
 			}
 		}
@@ -1821,7 +1799,7 @@ d3d_render_target* shaders::get_texture_target(render_primitive *prim, texture_i
 
 d3d_render_target* shaders::get_vector_target(render_primitive *prim)
 {
-	if (!vector_enable)
+	if (!enabled())
 	{
 		return nullptr;
 	}
@@ -1850,7 +1828,7 @@ d3d_render_target* shaders::get_vector_target(render_primitive *prim)
 			// check if the size of the screen quad has changed
 			if (target->target_width != target_width || target->target_height != target_height)
 			{
-				osd_printf_verbose("get_vector_target() - invalid size\n");
+				osd_printf_verbose("Direct3D: Get vector target - invalid size\n");
 				return nullptr;
 			}
 		}
@@ -1859,8 +1837,13 @@ d3d_render_target* shaders::get_vector_target(render_primitive *prim)
 	return target;
 }
 
-void shaders::create_vector_target(render_primitive *prim)
+bool shaders::create_vector_target(render_primitive *prim)
 {
+	if (!enabled())
+	{
+		return false;
+	}
+
 	auto win = d3d->assert_window();
 
 	// source and target size are the same for vector targets
@@ -1876,11 +1859,13 @@ void shaders::create_vector_target(render_primitive *prim)
 		std::swap(target_width, target_height);
 	}
 
-	osd_printf_verbose("create_vector_target() - %d, %d\n", target_width, target_height);
+	osd_printf_verbose("Direct3D: Create vector target - %dx%d\n", target_width, target_height);
 	if (!add_render_target(d3d, prim, nullptr, source_width, source_height, target_width, target_height))
 	{
-		vector_enable = false;
+		return false;
 	}
+
+	return true;
 }
 
 
@@ -1966,7 +1951,7 @@ void shaders::enumerate_screens()
 
 bool shaders::register_texture(render_primitive *prim, texture_info *texture)
 {
-	if (!master_enable || !d3dintf->post_fx_available)
+	if (!enabled())
 	{
 		return false;
 	}
@@ -1985,7 +1970,7 @@ bool shaders::register_texture(render_primitive *prim, texture_info *texture)
 		std::swap(target_width, target_height);
 	}
 
-	osd_printf_verbose("register_texture() - %d, %d\n", target_width, target_height);
+	osd_printf_verbose("Direct3D: Register texture - %dx%d\n", target_width, target_height);
 	if (!add_render_target(d3d, prim, texture, source_width, source_height, target_width, target_height))
 	{
 		return false;
@@ -1999,20 +1984,20 @@ bool shaders::register_texture(render_primitive *prim, texture_info *texture)
 //  shaders::delete_resources
 //============================================================
 
-void shaders::delete_resources(bool reset)
+void shaders::delete_resources()
 {
-	if (!master_enable || !d3dintf->post_fx_available)
+	if (!initialized || !enabled())
 	{
 		return;
 	}
 
+	end_avi_recording();
+
 	if (options != nullptr)
 	{
+		osd_printf_verbose("Direct3D: Store options\n");
 		last_options = *options;
-		options = nullptr;
 	}
-
-	initialized = false;
 
 	cache_target *currcache = cachehead;
 	while(cachehead != nullptr)
@@ -2490,9 +2475,9 @@ void *shaders::get_slider_option(int id, int index)
 	return nullptr;
 }
 
-std::vector<ui::menu_item> shaders::init_slider_list()
+void shaders::init_slider_list()
 {
-	std::vector<ui::menu_item> sliders;
+	m_sliders.clear();
 
 	for (slider* slider : internal_sliders)
 	{
@@ -2503,7 +2488,7 @@ std::vector<ui::menu_item> shaders::init_slider_list()
 	auto first_screen = machine->first_screen();
 	if (first_screen == nullptr)
 	{
-		return sliders;
+		return;
 	}
 	int screen_type = first_screen->screen_type();
 
@@ -2559,12 +2544,10 @@ std::vector<ui::menu_item> shaders::init_slider_list()
 				item.flags = 0;
 				item.ref = core_slider;
 				item.type = ui::menu_item_type::SLIDER;
-				sliders.push_back(item);
+				m_sliders.push_back(item);
 			}
 		}
 	}
-
-	return sliders;
 }
 
 

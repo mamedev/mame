@@ -4,7 +4,7 @@
 #include "sound/okim6295.h"
 #include "audio/seibu.h"
 #include "machine/gen_latch.h"
-#include "machine/raiden2cop.h"
+#include "machine/seibucop/seibucop.h"
 #include "video/seibu_crtc.h"
 
 class legionna_state : public driver_device

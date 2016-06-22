@@ -802,7 +802,7 @@ ROM_START( dlair )      /* revision F2 */
 	ROM_LOAD( "dl_f2_u4.bin", 0x6000, 0x2000,  CRC(f5ec23d2) SHA1(71149e2d359cc5944fbbb53dd7d0c2b42fbc9bb4) )
 
 	DISK_REGION( "ld_ldv1000" )
-	DISK_IMAGE_READONLY( "dlair", 0, SHA1(da70bac4fe526e48d556ad3fea72cde022c26648) )
+	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
 ROM_END
 
 ROM_START( dlair_1 )     /* Serial #001, courtesy Jason Finn */
@@ -951,7 +951,7 @@ ROM_START( spaceace )       /* revision A3 */
 	ROM_LOAD( "sa_a3_u5.bin", 0x8000, 0x2000,  CRC(85cbcdc4) SHA1(97e01e96c885ab7af4c3a3b586eb40374d54f12f) )
 
 	DISK_REGION( "ld_ldv1000" )
-	DISK_IMAGE_READONLY( "space_ace_ver2", 0, SHA1(9ca7d4cba380b04a3277a9b706b35036622fe2fb) )
+	DISK_IMAGE_READONLY( "space_ace_ver2", 0, NO_DUMP )
 ROM_END
 
 ROM_START( spaceacea2 )     /* revision A2 */
@@ -963,7 +963,7 @@ ROM_START( spaceacea2 )     /* revision A2 */
 	ROM_LOAD( "sa_a2_u5.bin", 0x8000, 0x2000,  CRC(85cbcdc4) SHA1(97e01e96c885ab7af4c3a3b586eb40374d54f12f) )
 
 	DISK_REGION( "ld_ldv1000" )
-	DISK_IMAGE_READONLY( "space_ace_ver2", 0, SHA1(9ca7d4cba380b04a3277a9b706b35036622fe2fb) )
+	DISK_IMAGE_READONLY( "space_ace_ver2", 0, NO_DUMP )
 ROM_END
 
 ROM_START( spaceacea )      /* revision A */
@@ -975,7 +975,7 @@ ROM_START( spaceacea )      /* revision A */
 	ROM_LOAD( "sa_a_u5.bin", 0x8000, 0x2000,  CRC(85cbcdc4) SHA1(97e01e96c885ab7af4c3a3b586eb40374d54f12f) )
 
 	DISK_REGION( "ld_ldv1000" )
-	DISK_IMAGE_READONLY( "space_ace_ver2", 0, SHA1(9ca7d4cba380b04a3277a9b706b35036622fe2fb) )
+	DISK_IMAGE_READONLY( "space_ace_ver2", 0, NO_DUMP )
 ROM_END
 
 ROM_START( spaceaceeuro )       /* Italian Sidam version */

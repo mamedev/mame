@@ -4,11 +4,14 @@
     SPARC v7 emulator
 */
 
-#pragma once
-
 #ifndef __SPARC_H__
 #define __SPARC_H__
 
+#pragma once
+
+#include "sparcdasm.h"
+
+#define SPARC_NO_TRAP						256
 #define SPARC_RESET							0
 #define SPARC_INSTRUCTION_ACCESS_EXCEPTION	1
 #define SPARC_ILLEGAL_INSTRUCTION			2
@@ -36,6 +39,10 @@
 #define SPARC_INT14							30
 #define SPARC_INT15							31
 #define SPARC_TRAP_INSTRUCTION				128
+
+// TODO: when there are more SPARC CPUs, move setter to a base class
+#define MCFG_SPARC_ADD_ASI_DESC(desc) \
+	mb86901_device::add_asi_desc(*device, desc);
 
 class mb86901_device : public cpu_device
 {
@@ -73,7 +80,11 @@ public:
 	void hold_bus() { m_hold_bus = true; }
 	void release_bus() { m_hold_bus = false; }
 
+	template<typename T> static void add_asi_desc(device_t &device, const T &desc) { return downcast<mb86901_device &>(device).add_asi_desc(desc); }
+
 protected:
+	template<typename T> void add_asi_desc(const T &desc) { m_dasm.add_asi_desc(desc); }
+
 	bool invoke_queued_traps();
 	bool check_main_traps(UINT32 op, bool privileged, UINT32 alignment, UINT8 registeralign, bool noimmediate);
 
@@ -132,15 +143,16 @@ protected:
 	UINT8 m_asi;
 
 	// other internal states
-	UINT8 m_trap_priorities[256];
-	UINT8 m_queued_tt;
-	UINT8 m_queued_priority;
+	UINT32 m_trap_priorities[256];
+	UINT32 m_queued_tt;
+	UINT32 m_queued_priority;
 	bool m_mae;
 	bool m_hold_bus;
 	int m_icount;
 
 	// debugger helpers
 	UINT32 m_dbgregs[24];
+	sparc_disassembler m_dasm;
 
 	// address spaces
 	address_space *m_program;
@@ -188,7 +200,5 @@ enum
 	SPARC_R80,	SPARC_R81,	SPARC_R82,	SPARC_R83,	SPARC_R84,	SPARC_R85,	SPARC_R86,	SPARC_R87,	SPARC_R88,	SPARC_R89,	SPARC_R90,	SPARC_R91,	SPARC_R92,	SPARC_R93,	SPARC_R94,	SPARC_R95,
 	SPARC_R96,	SPARC_R97,	SPARC_R98,	SPARC_R99,	SPARC_R100,	SPARC_R101,	SPARC_R102,	SPARC_R103,	SPARC_R104,	SPARC_R105,	SPARC_R106,	SPARC_R107,	SPARC_R108,	SPARC_R109,	SPARC_R110,	SPARC_R111
 };
-
-CPU_DISASSEMBLE( sparc );
 
 #endif /* __SPARC_H__ */

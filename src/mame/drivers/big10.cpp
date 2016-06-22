@@ -82,7 +82,6 @@ public:
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	virtual void machine_reset() override;
-	DECLARE_WRITE_LINE_MEMBER(big10_vdp_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_ioport m_in1;
 	required_ioport m_in2;
@@ -91,17 +90,6 @@ public:
 
 
 #define VDP_MEM             0x40000
-
-
-/***************************************
-*      Interrupt handling & Video      *
-***************************************/
-
-WRITE_LINE_MEMBER(big10_state::big10_vdp_interrupt)
-{
-	m_maincpu->set_input_line(0, (state ? ASSERT_LINE : CLEAR_LINE));
-}
-
 
 
 /*************************************
@@ -245,7 +233,7 @@ static MACHINE_CONFIG_START( big10, big10_state )
 
 	/* video hardware */
 	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MASTER_CLOCK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(big10_state, big10_vdp_interrupt))
+	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MASTER_CLOCK)
 
 	/* sound hardware */

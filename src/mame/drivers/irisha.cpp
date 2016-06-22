@@ -46,7 +46,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
 	TIMER_CALLBACK_MEMBER(irisha_key);
-	DECLARE_WRITE_LINE_MEMBER(irisha_pic_set_int_line);
 	UINT32 screen_update_irisha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_shared_ptr<UINT8> m_p_videoram;
 
@@ -289,17 +288,6 @@ WRITE8_MEMBER(irisha_state::irisha_8255_portc_w)
 	update_speaker();
 }
 
-/*************************************************
-
-    i8259
-
-*************************************************/
-
-WRITE_LINE_MEMBER(irisha_state::irisha_pic_set_int_line)
-{
-	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
-}
-
 
 /*************************************************
 
@@ -425,7 +413,7 @@ static MACHINE_CONFIG_START( irisha, irisha_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(irisha_state, irisha_8255_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(irisha_state, irisha_8255_portc_w))
 
-	MCFG_PIC8259_ADD( "pic8259", WRITELINE(irisha_state,irisha_pic_set_int_line), VCC, NOOP)
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
 MACHINE_CONFIG_END
 
 /* ROM definition */

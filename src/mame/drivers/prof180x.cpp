@@ -186,7 +186,7 @@ READ8_MEMBER( prof180x_state::status_r )
 /* Address Maps */
 
 static ADDRESS_MAP_START( prof180x_mem, AS_PROGRAM, 8, prof180x_state )
-	AM_RANGE(0x00000, 0x7ffff) AM_READWRITE(read, write)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( prof180x_io , AS_IO, 8, prof180x_state )

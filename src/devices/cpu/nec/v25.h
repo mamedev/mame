@@ -10,11 +10,6 @@
 #define NEC_INPUT_LINE_INTP2 12
 #define NEC_INPUT_LINE_POLL 20
 
-#define V25_PORT_P0 0x10000
-#define V25_PORT_P1 0x10002
-#define V25_PORT_P2 0x10004
-#define V25_PORT_PT 0x10006
-
 enum
 {
 	V25_PC=0,
@@ -28,6 +23,28 @@ enum
 	v25_common_device::set_decryption_table(*device, _table);
 
 
+#define MCFG_V25_PORT_PT_READ_CB(_devcb) \
+	devcb = &v25_common_device::set_pt_in_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_V25_PORT_P0_READ_CB(_devcb) \
+	devcb = &v25_common_device::set_p0_in_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_V25_PORT_P1_READ_CB(_devcb) \
+	devcb = &v25_common_device::set_p1_in_cb(*device, DEVCB_##_devcb);
+	
+#define MCFG_V25_PORT_P2_READ_CB(_devcb) \
+	devcb = &v25_common_device::set_p2_in_cb(*device, DEVCB_##_devcb);
+
+
+#define MCFG_V25_PORT_P0_WRITE_CB(_devcb) \
+	devcb = &v25_common_device::set_p0_out_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_V25_PORT_P1_WRITE_CB(_devcb) \
+	devcb = &v25_common_device::set_p1_out_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_V25_PORT_P2_WRITE_CB(_devcb) \
+	devcb = &v25_common_device::set_p2_out_cb(*device, DEVCB_##_devcb);
+
 class v25_common_device : public cpu_device
 {
 public:
@@ -36,6 +53,15 @@ public:
 
 	// static configuration helpers
 	static void set_decryption_table(device_t &device, const UINT8 *decryption_table) { downcast<v25_common_device &>(device).m_v25v35_decryptiontable = decryption_table; }
+	
+	template<class _Object> static devcb_base & set_pt_in_cb(device_t &device, _Object object) { return downcast<v25_common_device &>(device).m_pt_in.set_callback(object); }
+	template<class _Object> static devcb_base & set_p0_in_cb(device_t &device, _Object object) { return downcast<v25_common_device &>(device).m_p0_in.set_callback(object); }
+	template<class _Object> static devcb_base & set_p1_in_cb(device_t &device, _Object object) { return downcast<v25_common_device &>(device).m_p1_in.set_callback(object); }
+	template<class _Object> static devcb_base & set_p2_in_cb(device_t &device, _Object object) { return downcast<v25_common_device &>(device).m_p2_in.set_callback(object); }
+
+	template<class _Object> static devcb_base & set_p0_out_cb(device_t &device, _Object object) { return downcast<v25_common_device &>(device).m_p0_out.set_callback(object); }
+	template<class _Object> static devcb_base & set_p1_out_cb(device_t &device, _Object object) { return downcast<v25_common_device &>(device).m_p1_out.set_callback(object); }
+	template<class _Object> static devcb_base & set_p2_out_cb(device_t &device, _Object object) { return downcast<v25_common_device &>(device).m_p2_out.set_callback(object); }
 
 	TIMER_CALLBACK_MEMBER(v25_timer_callback);
 
@@ -117,6 +143,16 @@ union internalram
 	direct_read_data *m_direct;
 	address_space *m_io;
 	int     m_icount;
+
+	/* callbacks */
+	devcb_read8 m_pt_in;
+	devcb_read8 m_p0_in;
+	devcb_read8 m_p1_in;
+	devcb_read8 m_p2_in;
+
+	devcb_write8 m_p0_out;
+	devcb_write8 m_p1_out;
+	devcb_write8 m_p2_out;
 
 	UINT8   m_prefetch_size;
 	UINT8   m_prefetch_cycles;

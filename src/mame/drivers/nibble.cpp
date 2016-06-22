@@ -65,9 +65,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT16> m_videoram;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(nibble_videoram_w);
+	DECLARE_WRITE16_MEMBER(nibble_videoram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 	virtual void machine_start() override;
@@ -85,10 +85,11 @@ public:
 *     Video Hardware     *
 *************************/
 
-WRITE8_MEMBER(nibble_state::nibble_videoram_w)
+WRITE16_MEMBER(nibble_state::nibble_videoram_w)
 {
-	m_videoram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(m_videoram+offset);
+	m_bg_tilemap->mark_tile_dirty(offset*2);
+	m_bg_tilemap->mark_tile_dirty(offset*2+1);
 }
 
 
@@ -100,7 +101,7 @@ TILE_GET_INFO_MEMBER(nibble_state::get_bg_tile_info)
     ---- ----   color code.
     ---- ----   seems unused.
 */
-	int code = m_videoram[tile_index];
+	UINT8 code = m_videoram[tile_index/2] >> (tile_index & 1 ? 0 : 8);
 
 	SET_TILE_INFO_MEMBER(0 /* bank */, code, 0 /* color */, 0);
 }
@@ -147,7 +148,7 @@ void nibble_state::machine_reset()
 * Memory Map Information *
 *************************/
 
-static ADDRESS_MAP_START( nibble_map, AS_PROGRAM, 8, nibble_state )
+static ADDRESS_MAP_START( nibble_map, AS_PROGRAM, 16, nibble_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_WRITE(nibble_videoram_w) AM_SHARE("videoram")   // placeholder
@@ -301,8 +302,7 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( nibble, nibble_state )
 
-	// CPU should be switched to TMS9900
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, MASTER_CLOCK/4, nibble_map, nibble_cru_map)
+	MCFG_TMS99xx_ADD("maincpu", TMS9900, MASTER_CLOCK/4, nibble_map, nibble_cru_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nibble_state,  nibble_interrupt)
 
 	/* video hardware */

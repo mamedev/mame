@@ -329,7 +329,7 @@ function cheat.startplugin()
 			index = index - #cheats
 			if index == 2 then
 				for num, cheat in pairs(cheats) do
-					if cheat.script and cheat.script.off then
+					if cheat.enabled and cheat.script.off then
 						cheat.script.off()
 					end
 					cheat.enabled = false
@@ -340,7 +340,7 @@ function cheat.startplugin()
 				end
 			elseif index == 3 then
 				for num, cheat in pairs(cheats) do 
-					if cheat.script and cheat.script.off then
+					if cheat.enabled and cheat.script.off then
 						cheat.script.off()
 					end
 				end

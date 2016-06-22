@@ -21,7 +21,8 @@ Raiden later rev (probably the first game to use it)
 
 TODO:
 - Most registers are still a mystery;
-- Get the proper Seibu chip ID number;
+- Get the proper Seibu chip ID number. 
+  Kold found that a Raiden alt set has irq request pin from a chip named SEI0160, which might be our man.
 
 preliminary memory map:
 (screen 0 -> Background)

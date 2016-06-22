@@ -562,8 +562,6 @@ static ADDRESS_MAP_START( looping_io_map, AS_IO, 8, looping_state )
 	/* 405 = C1 */
 	AM_RANGE(0x406, 0x406) AM_WRITE(main_irq_ack_w)
 	AM_RANGE(0x407, 0x407) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-
-	AM_RANGE(0x10000, 0x10000) AM_NOP       /* external IDLE signal -- we can ignore it */
 ADDRESS_MAP_END
 
 

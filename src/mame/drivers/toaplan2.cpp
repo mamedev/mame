@@ -776,25 +776,6 @@ WRITE16_MEMBER(toaplan2_state::fixeightbl_oki_bankswitch_w)
 	}
 }
 
-
-READ8_MEMBER(toaplan2_state::v25_dswa_r)
-{
-	return ioport("DSWA")->read() ^ 0xff;
-}
-
-
-READ8_MEMBER(toaplan2_state::v25_dswb_r)
-{
-	return ioport("DSWB")->read() ^ 0xff;
-}
-
-
-READ8_MEMBER(toaplan2_state::v25_jmpr_r)
-{
-	return ioport("JMPR")->read() ^ 0xff;
-}
-
-
 READ8_MEMBER(toaplan2_state::fixeight_region_r)
 {
 	// this must match the eeprom region!
@@ -1494,27 +1475,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( vfive_v25_mem, AS_PROGRAM, 8, toaplan2_state )
 	AM_RANGE(0x00000, 0x00001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x80000, 0x87fff) AM_MIRROR(0x78000) AM_RAM AM_SHARE("shared_ram")
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( v25_port, AS_IO, 8, toaplan2_state )
-	AM_RANGE(V25_PORT_PT, V25_PORT_PT) AM_READ(v25_dswa_r)
-	AM_RANGE(V25_PORT_P0, V25_PORT_P0) AM_READ(v25_dswb_r)
-	AM_RANGE(V25_PORT_P1, V25_PORT_P1) AM_READ(v25_jmpr_r)
-	AM_RANGE(V25_PORT_P2, V25_PORT_P2) AM_WRITENOP  // bit 0 is FAULT according to kbash schematic
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( dogyuun_v25_port, AS_IO, 8, toaplan2_state )
-	AM_RANGE(V25_PORT_PT, V25_PORT_PT) AM_READ(v25_dswb_r)
-	AM_RANGE(V25_PORT_P0, V25_PORT_P0) AM_READ(v25_dswa_r)
-	AM_RANGE(V25_PORT_P1, V25_PORT_P1) AM_READ(v25_jmpr_r)
-	AM_RANGE(V25_PORT_P2, V25_PORT_P2) AM_WRITENOP  // bit 0 is FAULT according to kbash schematic
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( fixeight_v25_port, AS_IO, 8, toaplan2_state )
-	AM_RANGE(V25_PORT_P0, V25_PORT_P0) AM_READWRITE_PORT("EEPROM")
 ADDRESS_MAP_END
 
 
@@ -3219,8 +3179,11 @@ static MACHINE_CONFIG_START( dogyuun, toaplan2_state )
 
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_25MHz/2)         /* NEC V25 type Toaplan marked CPU ??? */
 	MCFG_CPU_PROGRAM_MAP(v25_mem)
-	MCFG_CPU_IO_MAP(dogyuun_v25_port)
 	MCFG_V25_CONFIG(nitro_decryption_table)
+	MCFG_V25_PORT_PT_READ_CB(IOPORT("DSWB")) MCFG_DEVCB_XOR(0xff) 
+	MCFG_V25_PORT_P0_READ_CB(IOPORT("DSWA")) MCFG_DEVCB_XOR(0xff) 
+	MCFG_V25_PORT_P1_READ_CB(IOPORT("JMPR")) MCFG_DEVCB_XOR(0xff) 
+	MCFG_V25_PORT_P2_WRITE_CB(NOOP)  // bit 0 is FAULT according to kbash schematic
 
 	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3264,8 +3227,11 @@ static MACHINE_CONFIG_START( kbash, toaplan2_state )
 	/* ROM based v25 */
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_16MHz)           /* NEC V25 type Toaplan marked CPU ??? */
 	MCFG_CPU_PROGRAM_MAP(kbash_v25_mem)
-	MCFG_CPU_IO_MAP(v25_port)
 	MCFG_V25_CONFIG(nitro_decryption_table)
+	MCFG_V25_PORT_PT_READ_CB(IOPORT("DSWA")) MCFG_DEVCB_XOR(0xff) 
+	MCFG_V25_PORT_P0_READ_CB(IOPORT("DSWB")) MCFG_DEVCB_XOR(0xff) 
+	MCFG_V25_PORT_P1_READ_CB(IOPORT("JMPR")) MCFG_DEVCB_XOR(0xff) 
+	MCFG_V25_PORT_P2_WRITE_CB(NOOP)  // bit 0 is FAULT according to kbash schematic
 
 	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3519,8 +3485,9 @@ static MACHINE_CONFIG_START( fixeight, toaplan2_state )
 
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_16MHz)           /* NEC V25 type Toaplan marked CPU ??? */
 	MCFG_CPU_PROGRAM_MAP(fixeight_v25_mem)
-	MCFG_CPU_IO_MAP(fixeight_v25_port)
 	MCFG_V25_CONFIG(ts001turbo_decryption_table)
+	MCFG_V25_PORT_P0_READ_CB(IOPORT("EEPROM"))
+	MCFG_V25_PORT_P0_WRITE_CB(IOPORT("EEPROM"))
 
 	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3601,8 +3568,11 @@ static MACHINE_CONFIG_START( vfive, toaplan2_state )
 
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_20MHz/2) /* Verified on pcb, NEC V25 type Toaplan mark scratched out */
 	MCFG_CPU_PROGRAM_MAP(vfive_v25_mem)
-	MCFG_CPU_IO_MAP(v25_port)
 	MCFG_V25_CONFIG(nitro_decryption_table)
+	MCFG_V25_PORT_PT_READ_CB(IOPORT("DSWA")) MCFG_DEVCB_XOR(0xff) 
+	MCFG_V25_PORT_P0_READ_CB(IOPORT("DSWB")) MCFG_DEVCB_XOR(0xff) 
+	MCFG_V25_PORT_P1_READ_CB(IOPORT("JMPR")) MCFG_DEVCB_XOR(0xff) 
+	MCFG_V25_PORT_P2_WRITE_CB(NOOP)  // bit 0 is FAULT according to kbash schematic
 
 	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3639,7 +3609,10 @@ static MACHINE_CONFIG_START( batsugun, toaplan2_state )
 
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_32MHz/2)         /* NEC V25 type Toaplan marked CPU ??? */
 	MCFG_CPU_PROGRAM_MAP(v25_mem)
-	MCFG_CPU_IO_MAP(v25_port)
+	MCFG_V25_PORT_PT_READ_CB(IOPORT("DSWA")) MCFG_DEVCB_XOR(0xff) 
+	MCFG_V25_PORT_P0_READ_CB(IOPORT("DSWB")) MCFG_DEVCB_XOR(0xff) 
+	MCFG_V25_PORT_P1_READ_CB(IOPORT("JMPR")) MCFG_DEVCB_XOR(0xff) 
+	MCFG_V25_PORT_P2_WRITE_CB(NOOP)  // bit 0 is FAULT according to kbash schematic
 
 	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -4354,85 +4327,85 @@ ROM_END
 
 ROM_START( fixeightkt )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeightkt.nv", 0x00, 0x80, CRC(08fa73ba) SHA1(b7761d3dd3f4485e55c8ef2cf1a840ca771ee2fc) )
 ROM_END
 
 ROM_START( fixeightk )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeightk.nv", 0x00, 0x80, CRC(cac91c6f) SHA1(55b284f081753d60abff63493094322756b7f0c5) )
 ROM_END
 
 ROM_START( fixeightht )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeightht.nv", 0x00, 0x80, CRC(57edaa51) SHA1(b8d50e82590b8cbbbcafec5f9cfbc91e4c286db5) )
 ROM_END
 
 ROM_START( fixeighth )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeighth.nv", 0x00, 0x80, CRC(95dec584) SHA1(1c309074b51da5a5263dee00403296946e41067b) )
 ROM_END
 
 ROM_START( fixeighttwt )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeighttwt.nv", 0x00, 0x80, CRC(b6d5c06c) SHA1(7fda380ac6835a983c57d093ccad7bd76893c9ba))
 ROM_END
 
 ROM_START( fixeighttw )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeighttw.nv", 0x00, 0x80, CRC(74e6afb9) SHA1(87bdc95eb0d2d54375de2c622557d503e14154be))
 ROM_END
 
 ROM_START( fixeightat )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeightat.nv", 0x00, 0x80,CRC(e9c21987) SHA1(7f699e38deb84902ed62b857a3d2b4e3ea1475bb) )
 ROM_END
 
 ROM_START( fixeighta )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeighta.nv", 0x00, 0x80, CRC(2bf17652) SHA1(4ec6f188e63610d258cd6b2432d2200d61d80bed))
 ROM_END
 
 ROM_START( fixeightt )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeightt.nv", 0x00, 0x80, CRC(c0da4a05) SHA1(3686161244e3e8be0e2fdb5fc5c24e39a7aeba85) )
 ROM_END
 
 ROM_START( fixeight )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeight.nv", 0x00, 0x80, CRC(02e925d0) SHA1(5839d10aceff84916ea99e9c6afcdc90eef7468b) )
 ROM_END
 
 ROM_START( fixeightut )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeightut.nv", 0x00, 0x80, CRC(9fcd93ee) SHA1(4f2750f09d9b8ff358a2fd6c7a4a8ba6de67017a) )
 ROM_END
 
 ROM_START( fixeightu )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeightu.nv", 0x00, 0x80, CRC(5dfefc3b) SHA1(5203525c58e2ae10575af2e277a5696bd64c5b60) )
 ROM_END
 
 ROM_START( fixeightj )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeightj.nv", 0x00, 0x80, CRC(21e22038) SHA1(29fb10061e62799bb5e4171e144daac49f0cdf06) )
 ROM_END
 
 ROM_START( fixeightjt )
 	ROMS_FIXEIGHT
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeightjt.nv", 0x00, 0x80, CRC(e3d14fed) SHA1(ee4982ef195240c5eaa5005ca1d591901fb01b47) )
 ROM_END
 

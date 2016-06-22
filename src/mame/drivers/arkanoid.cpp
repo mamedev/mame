@@ -863,7 +863,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( brixian_map, AS_PROGRAM, 8, arkanoid_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("protram") AM_REGION("maincpu", 0xc000)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("protram")
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0xd001, 0xd001) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
 	AM_RANGE(0xd008, 0xd008) AM_WRITE(brixian_d008_w)  /* gfx bank, flip screen etc. */

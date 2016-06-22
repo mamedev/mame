@@ -67,7 +67,7 @@ struct PS_INPUT
 //-----------------------------------------------------------------------------
 
 static const float PI = 3.1415927f;
-static const float PHI = 1.618034f;
+static const float HalfPI = PI * 0.5f;
 
 //-----------------------------------------------------------------------------
 // Scanline & Shadowmask Vertex Shader
@@ -259,7 +259,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 
 			ScanlineCoord *= SourceDims.y * ScanlineScale * PI;
 
-			float ScanlineCoordJitter = ScanlineOffset * PHI;
+			float ScanlineCoordJitter = ScanlineOffset * HalfPI;
 			float ScanlineSine = sin(ScanlineCoord + ScanlineCoordJitter);
 			float ScanlineWide = ScanlineHeight + ScanlineVariation * max(1.0f, ScanlineHeight) * (1.0f - ColorBrightness);
 			float ScanlineAmount = pow(ScanlineSine * ScanlineSine, ScanlineWide);

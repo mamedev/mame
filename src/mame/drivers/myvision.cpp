@@ -44,7 +44,6 @@ public:
 		, m_io_row3(*this, "ROW3")
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER( vdp_interrupt );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart );
 	DECLARE_READ8_MEMBER( ay_port_a_r );
 	DECLARE_READ8_MEMBER( ay_port_b_r );
@@ -158,11 +157,6 @@ DEVICE_IMAGE_LOAD_MEMBER( myvision_state, cart )
 }
 
 
-WRITE_LINE_MEMBER(myvision_state::vdp_interrupt)
-{
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
-}
-
 READ8_MEMBER( myvision_state::ay_port_a_r )
 {
 	UINT8 data = 0xFF;
@@ -217,7 +211,7 @@ static MACHINE_CONFIG_START( myvision, myvision_state )
 	/* video hardware */
 	MCFG_DEVICE_ADD( "tms9918", TMS9918A, XTAL_10_738635MHz / 2 )  /* Exact model not verified */
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)  /* Not verified */
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(myvision_state, vdp_interrupt))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9918", tms9918a_device, screen_update )
 
