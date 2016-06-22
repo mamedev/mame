@@ -23,7 +23,7 @@
   * Jack Potten's Poker (set 6),                      198?, Bootleg.
   * Jack Potten's Poker (set 7, Royale GFX),          198?, Bootleg.
   * Jack Potten's Poker (set 8, Australian),          198?, Bootleg.
-  * Good Luck,                                        198?, Unknown.
+  * Jack Potten's Poker (set 9, 'just 4 fun'),        198?, Bootleg.
   * Jack Potten's Poker (NGold, set 1),               198?, Unknown.
   * Jack Potten's Poker (NGold, set 2),               198?, Unknown.
   * Jack Potten's Poker (NGold, set 3),               198?, Unknown.
@@ -49,6 +49,8 @@
   * Buena Suerte (Spanish, set 20),                   1991, Unknown.
   * Buena Suerte (Spanish, set 21),                   1991, Unknown.
   * Buena Suerte (Spanish, set 22),                   1991, Unknown.
+  * Buena Suerte (Spanish/Portuguese, set 23),        1991, Unknown.
+  * Good Luck,                                        198?, Unknown.
   * Falcons Wild - World Wide Poker,                  1983, Falcon.
   * Falcons Wild - World Wide Poker (VK set 1),       1990, Video Klein.
   * Falcons Wild - World Wide Poker (VK set 2),       1990, Video Klein.
@@ -96,7 +98,6 @@
   * Witch Up & Down (Export, 6T/12T ver 1.02),        1998, Video Klein.
   * Witch Strike (Export, 6T/12T ver 1.01A),          1992, Video Klein.
   * Witch Strike (Export, 6T/12T ver 1.01B),          1992, Video Klein.
-  * Witch Jackpot (Export, 6T/12T ver 0.25),          1992-1996, Video Klein.
   * Witch Jack (Export, 6T/12T ver 0.40),             1992-1996, Video Klein.
   * Witch Jack (Export, 6T/12T ver 0.40T),            1992-1996, Video Klein.
   * Witch Jack (Export, 6T/12T ver 0.62),             1992-1996, Video Klein.
@@ -107,11 +108,12 @@
   * Witch Jack (Export, 6T/12T ver 0.87),             1992-1996, Video Klein.
   * Witch Jack (Export, 6T/12T ver 0.87-88),          1992-1996, Video Klein.
   * Witch Jack (Export, 6T/12T ver 0.87-89),          1992-1996, Video Klein.
+  * Witch Jackpot (Export, 6T/12T ver 0.25),          1992-1996, Video Klein.
   * PlayMan Poker (German),                           1981, PM / Beck Elektronik.
-  * Super Loco 93 (Spanish, set 1),                   1993, Unknown.
-  * Super Loco 93 (Spanish, set 2),                   1993, Unknown.
   * Royale (set 1),                                   198?, Unknown.
   * Royale (set 2),                                   198?, Unknown.
+  * Super Loco 93 (Spanish, set 1),                   1993, Unknown.
+  * Super Loco 93 (Spanish, set 2),                   1993, Unknown.
   * Maverik,                                          198?, Unknown.
   * Brasil 86,                                        1986, Unknown.
   * Brasil 87,                                        1987, Unknown.
@@ -131,6 +133,8 @@
   * Bonne Chance! (Golden Poker prequel HW, set 2),   198?, Unknown.
   * Mundial/Mondial (Italian/French),                 1987, Unknown.
   * Super 98 (3-hands, ICP-1),                        199?, Unknown.
+  * unknown animal-themed game (bottom),              199?, Unknown.
+  * unknown animal-themed game (top),                 199?, Unknown.
 
 
 ************************************************************************************
