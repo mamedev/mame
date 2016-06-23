@@ -2338,9 +2338,14 @@ void debugger_commands::execute_dasm(int ref, int params, const char *param[])
 		decrypted_space = space;
 
 	/* determine the width of the bytes */
-	cpu_device *cpudevice = downcast<cpu_device *>(&space->device());
-	minbytes = cpudevice->min_opcode_bytes();
-	maxbytes = cpudevice->max_opcode_bytes();
+	device_disasm_interface *dasmintf;
+	if (!space->device().interface(dasmintf))
+	{
+		m_console.printf("No disassembler available for %s\n", space->device().name());
+		return;
+	}
+	minbytes = dasmintf->min_opcode_bytes();
+	maxbytes = dasmintf->max_opcode_bytes();
 	byteswidth = 0;
 	if (bytes)
 	{
@@ -2538,7 +2543,8 @@ void debugger_commands::execute_history(int ref, int params, const char *param[]
 	device_debug *debug = space->device().debug();
 
 	/* loop over lines */
-	int maxbytes = debug->max_opcode_bytes();
+	device_disasm_interface *dasmintf;
+	int maxbytes = space->device().interface(dasmintf) ? dasmintf->max_opcode_bytes() : 1;
 	for (int index = 0; index < (int) count; index++)
 	{
 		offs_t pc = debug->history_pc(-index);
@@ -2587,7 +2593,7 @@ void debugger_commands::execute_trackpc(int ref, int params, const char *param[]
 		// Insert current pc
 		if (m_cpu.get_visible_cpu() == cpu)
 		{
-			const offs_t pc = cpu->debug()->pc();
+			const offs_t pc = cpu->safe_pc();
 			cpu->debug()->set_track_pc_visited(pc);
 		}
 		m_console.printf("PC tracking enabled\n");
