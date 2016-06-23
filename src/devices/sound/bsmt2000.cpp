@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    bsmt2000.c
+    bsmt2000.cpp
 
     BSMT2000 device emulator.
 
@@ -39,7 +39,6 @@ static ADDRESS_MAP_START( tms_io_map, AS_IO, 16, bsmt2000_device)
 	AM_RANGE(2, 2) AM_READ(tms_rom_r)
 	AM_RANGE(3, 3) AM_WRITE(tms_left_w)
 	AM_RANGE(7, 7) AM_WRITE(tms_right_w)
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(tms_write_pending_r)
 ADDRESS_MAP_END
 
 
@@ -49,6 +48,7 @@ static MACHINE_CONFIG_FRAGMENT( bsmt2000 )
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
 	// data map is internal to the CPU
 	MCFG_CPU_IO_MAP(tms_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(bsmt2000_device, tms_write_pending_r))
 MACHINE_CONFIG_END
 
 
@@ -352,7 +352,7 @@ WRITE16_MEMBER( bsmt2000_device::tms_right_w )
 //  on the TMS32015
 //-------------------------------------------------
 
-READ16_MEMBER( bsmt2000_device::tms_write_pending_r )
+READ_LINE_MEMBER( bsmt2000_device::tms_write_pending_r )
 {
 	return m_write_pending ? 1 : 0;
 }

@@ -86,11 +86,11 @@ public:
 	DECLARE_WRITE16_MEMBER(m68k_shared_1_w);
 	DECLARE_READ16_MEMBER(dsp0_status_r);
 	DECLARE_WRITE16_MEMBER(dsp0_control_w);
-	DECLARE_READ16_MEMBER(dsp0_bio_r);
+	DECLARE_READ_LINE_MEMBER(dsp0_bio_r);
 	DECLARE_WRITE16_MEMBER(dsp0_bank_w);
 	DECLARE_READ16_MEMBER(dsp1_status_r);
 	DECLARE_WRITE16_MEMBER(dsp1_control_w);
-	DECLARE_READ16_MEMBER(dsp1_bio_r);
+	DECLARE_READ_LINE_MEMBER(dsp1_bio_r);
 	DECLARE_WRITE16_MEMBER(dsp1_bank_w);
 	DECLARE_READ16_MEMBER(analog_r);
 	DECLARE_DRIVER_INIT(airrace);
@@ -601,7 +601,7 @@ WRITE16_MEMBER(atarisy4_state::dsp0_control_w)
 	m_csr[0] = data;
 }
 
-READ16_MEMBER(atarisy4_state::dsp0_bio_r)
+READ_LINE_MEMBER(atarisy4_state::dsp0_bio_r)
 {
 	return BIT(m_csr[0], 2);
 }
@@ -635,7 +635,7 @@ WRITE16_MEMBER(atarisy4_state::dsp1_control_w)
 	m_csr[1] = data;
 }
 
-READ16_MEMBER(atarisy4_state::dsp1_bio_r)
+READ_LINE_MEMBER(atarisy4_state::dsp1_bio_r)
 {
 	return BIT(m_csr[1], 2);
 }
@@ -692,7 +692,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp0_io_map, AS_IO, 16, atarisy4_state )
 	AM_RANGE(0x00, 0x01) AM_WRITE(dsp0_bank_w)
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(dsp0_bio_r)
 ADDRESS_MAP_END
 
 
@@ -710,7 +709,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp1_io_map, AS_IO, 16, atarisy4_state )
 	AM_RANGE(0x00, 0x01) AM_WRITE(dsp1_bank_w)
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(dsp1_bio_r)
 ADDRESS_MAP_END
 
 
@@ -766,6 +764,7 @@ static MACHINE_CONFIG_START( atarisy4, atarisy4_state )
 	MCFG_CPU_ADD("dsp0", TMS32010, 16000000)
 	MCFG_CPU_PROGRAM_MAP(dsp0_map)
 	MCFG_CPU_IO_MAP(dsp0_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(atarisy4_state, dsp0_bio_r))
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -781,6 +780,7 @@ static MACHINE_CONFIG_DERIVED( airrace, atarisy4 )
 	MCFG_CPU_ADD("dsp1", TMS32010, 16000000)
 	MCFG_CPU_PROGRAM_MAP(dsp1_map)
 	MCFG_CPU_IO_MAP(dsp1_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(atarisy4_state, dsp1_bio_r))
 
 	MCFG_MACHINE_RESET_OVERRIDE(atarisy4_state,airrace)
 MACHINE_CONFIG_END

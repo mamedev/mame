@@ -76,7 +76,7 @@ public:
 	DECLARE_WRITE16_MEMBER( tms_rom_bank_w );
 	DECLARE_WRITE16_MEMBER( tms_left_w );
 	DECLARE_WRITE16_MEMBER( tms_right_w );
-	DECLARE_READ16_MEMBER( tms_write_pending_r );
+	DECLARE_READ_LINE_MEMBER( tms_write_pending_r );
 
 private:
 	// timers

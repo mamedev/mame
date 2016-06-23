@@ -93,7 +93,7 @@ WRITE16_MEMBER(dectalk_isa_device::dsp_dma_w)
 	m_dsp_dma = data;
 }
 
-READ16_MEMBER(dectalk_isa_device::bio_line_r)
+READ_LINE_MEMBER(dectalk_isa_device::bio_line_r)
 {
 	// TODO: reading the bio line doesn't cause any direct external effects so this is wrong
 	if(m_bio == ASSERT_LINE)
@@ -129,7 +129,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(dectalk_dsp_io, AS_IO, 16, dectalk_isa_device)
 	AM_RANGE(0x0, 0x0) AM_READ(dsp_dma_r)
 	AM_RANGE(0x1, 0x1) AM_READWRITE(dsp_dma_r, dac_w)
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(bio_line_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(dectalk_dsp_map, AS_PROGRAM, 16, dectalk_isa_device)
@@ -144,6 +143,7 @@ static MACHINE_CONFIG_FRAGMENT( dectalk_isa )
 
 	MCFG_CPU_ADD("dectalk_dsp", TMS32015, XTAL_20MHz)
 	MCFG_CPU_IO_MAP(dectalk_dsp_io)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(dectalk_isa_device, bio_line_r))
 	MCFG_CPU_PROGRAM_MAP(dectalk_dsp_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")

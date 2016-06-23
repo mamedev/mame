@@ -170,7 +170,7 @@ WRITE16_MEMBER(twincobr_state::fsharkbt_dsp_w)
 #endif
 }
 
-READ16_MEMBER(twincobr_state::twincobr_BIO_r)
+READ_LINE_MEMBER(twincobr_state::twincobr_BIO_r)
 {
 	return m_dsp_BIO;
 }

@@ -78,11 +78,9 @@ public:
 	DECLARE_WRITE16_MEMBER(tomcat_irqclr_w);
 	DECLARE_READ16_MEMBER(tomcat_inputs2_r);
 	DECLARE_READ16_MEMBER(tomcat_320bio_r);
-	DECLARE_READ16_MEMBER(dsp_BIO_r);
-	DECLARE_READ16_MEMBER(tomcat_shared_ram_r);
-	DECLARE_WRITE16_MEMBER(tomcat_shared_ram_w);
 	DECLARE_READ8_MEMBER(tomcat_nvram_r);
 	DECLARE_WRITE8_MEMBER(tomcat_nvram_w);
+	DECLARE_READ_LINE_MEMBER(dsp_BIO_r);
 	DECLARE_WRITE8_MEMBER(soundlatches_w);
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
@@ -232,9 +230,9 @@ READ16_MEMBER(tomcat_state::tomcat_320bio_r)
 	return 0;
 }
 
-READ16_MEMBER(tomcat_state::dsp_BIO_r)
+READ_LINE_MEMBER(tomcat_state::dsp_BIO_r)
 {
-	if ( space.device().safe_pc() == 0x0001 )
+	if ( m_dsp->pc() == 0x0001 )
 	{
 		if ( m_dsp_idle == 0 )
 		{
@@ -243,7 +241,7 @@ READ16_MEMBER(tomcat_state::dsp_BIO_r)
 		}
 		return !m_dsp_BIO;
 	}
-	else if ( space.device().safe_pc() == 0x0003 )
+	else if ( m_dsp->pc() == 0x0003 )
 	{
 		if ( m_dsp_BIO == 1 )
 		{
@@ -262,16 +260,6 @@ READ16_MEMBER(tomcat_state::dsp_BIO_r)
 	{
 		return !m_dsp_BIO;
 	}
-}
-
-READ16_MEMBER(tomcat_state::tomcat_shared_ram_r)
-{
-	return m_shared_ram[offset];
-}
-
-WRITE16_MEMBER(tomcat_state::tomcat_shared_ram_w)
-{
-	COMBINE_DATA(&m_shared_ram[offset]);
 }
 
 READ8_MEMBER(tomcat_state::tomcat_nvram_r)
@@ -308,7 +296,7 @@ static ADDRESS_MAP_START( tomcat_map, AS_PROGRAM, 16, tomcat_state )
 	AM_RANGE(0x40e01c, 0x40e01d) AM_WRITE(tomcat_ackh_w)
 	AM_RANGE(0x40e01e, 0x40e01f) AM_WRITE(tomcat_txbuffh_w)
 	AM_RANGE(0x800000, 0x803fff) AM_RAM AM_SHARE("vectorram")
-	AM_RANGE(0xffa000, 0xffbfff) AM_READWRITE(tomcat_shared_ram_r, tomcat_shared_ram_w)
+	AM_RANGE(0xffa000, 0xffbfff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0xffc000, 0xffcfff) AM_RAM
 	AM_RANGE(0xffd000, 0xffdfff) AM_DEVREADWRITE8("m48t02", timekeeper_device, read, write, 0xff00)
 	AM_RANGE(0xffd000, 0xffdfff) AM_READWRITE8(tomcat_nvram_r, tomcat_nvram_w, 0x00ff)
@@ -318,9 +306,6 @@ static ADDRESS_MAP_START( dsp_map, AS_PROGRAM, 16, tomcat_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("shared_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dsp_io_map, AS_IO, 16, tomcat_state )
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(dsp_BIO_r)
-ADDRESS_MAP_END
 
 WRITE8_MEMBER(tomcat_state::soundlatches_w)
 {
@@ -391,7 +376,7 @@ static MACHINE_CONFIG_START( tomcat, tomcat_state )
 
 	MCFG_CPU_ADD("dsp", TMS32010, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP( dsp_map)
-	MCFG_CPU_IO_MAP( dsp_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(tomcat_state, dsp_BIO_r))
 
 	MCFG_CPU_ADD("soundcpu", M6502, XTAL_14_31818MHz / 8 )
 	MCFG_DEVICE_DISABLE()

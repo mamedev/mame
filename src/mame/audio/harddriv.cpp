@@ -299,7 +299,7 @@ WRITE16_MEMBER(harddriv_sound_board_device::hdsnd68k_320com_w)
  *
  *************************************/
 
-READ16_MEMBER(harddriv_sound_board_device::hdsnddsp_get_bio)
+READ_LINE_MEMBER(harddriv_sound_board_device::hdsnddsp_get_bio)
 {
 	UINT64 cycles_since_last_bio = m_sounddsp->total_cycles() - m_last_bio_cycles;
 	INT32 cycles_until_bio = CYCLES_PER_BIO - cycles_since_last_bio;
@@ -307,7 +307,7 @@ READ16_MEMBER(harddriv_sound_board_device::hdsnddsp_get_bio)
 	/* if we're not at the next BIO yet, advance us there */
 	if (cycles_until_bio > 0)
 	{
-		space.device().execute().adjust_icount(-cycles_until_bio);
+		m_sounddsp->adjust_icount(-cycles_until_bio);
 		m_last_bio_cycles += CYCLES_PER_BIO;
 	}
 	else
@@ -421,7 +421,6 @@ static ADDRESS_MAP_START( driversnd_dsp_io_map, AS_IO, 16, harddriv_sound_board_
 	AM_RANGE(4, 4) AM_WRITE(hdsnddsp_mute_w)
 	AM_RANGE(5, 5) AM_WRITE(hdsnddsp_gen68kirq_w)
 	AM_RANGE(6, 7) AM_WRITE(hdsnddsp_soundaddr_w)
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(hdsnddsp_get_bio)
 ADDRESS_MAP_END
 
 
@@ -435,6 +434,7 @@ static MACHINE_CONFIG_FRAGMENT( harddriv_snd )
 	MCFG_CPU_PROGRAM_MAP(driversnd_dsp_program_map)
 	/* Data Map is internal to the CPU */
 	MCFG_CPU_IO_MAP(driversnd_dsp_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(harddriv_sound_board_device, hdsnddsp_get_bio))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

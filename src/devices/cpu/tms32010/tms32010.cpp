@@ -71,7 +71,6 @@
 #define M_RDOP_ARG(A)   TMS32010_RDOP_ARG(A)
 #define P_IN(A)         TMS32010_In(A)
 #define P_OUT(A,V)      TMS32010_Out(A,V)
-#define BIO_IN          TMS32010_BIO_In
 
 
 const device_type TMS32010 = &device_creator<tms32010_device>;
@@ -102,7 +101,8 @@ tms32010_device::tms32010_device(const machine_config &mconfig, const char *tag,
 	: cpu_device(mconfig, TMS32010, "TMS32010", tag, owner, clock, "tms32010", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 12, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 8, -1, ADDRESS_MAP_NAME(tms32010_ram))
-	, m_io_config("io", ENDIANNESS_BIG, 16, 4+1, -1)
+	, m_io_config("io", ENDIANNESS_BIG, 16, 4, -1)
+	, m_bio_in(*this)
 	, m_addr_mask(0x0fff)
 {
 }
@@ -112,7 +112,8 @@ tms32010_device::tms32010_device(const machine_config &mconfig, device_type type
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 12, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 8, -1, ADDRESS_MAP_NAME(tms32015_ram))
-	, m_io_config("io", ENDIANNESS_BIG, 16, 4+1, -1)
+	, m_io_config("io", ENDIANNESS_BIG, 16, 4, -1)
+	, m_bio_in(*this)
 	, m_addr_mask(addr_mask)
 {
 }
@@ -155,14 +156,6 @@ offs_t tms32010_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 
 #define DMA_DP  (DP | (m_opcode.b.l & 0x7f))    /* address used in direct memory access operations */
 #define DMA_DP1 (0x80 | m_opcode.b.l)           /* address used in direct memory access operations for sst instruction */
 #define IND     (m_AR[ARP] & 0xff)              /* address used in indirect memory access operations */
-
-
-
-/****************************************************************************
- *  Read the state of the BIO pin
- */
-
-#define TMS32010_BIO_In (m_io->read_word(TMS32010_BIO<<1))
 
 
 /****************************************************************************
@@ -448,7 +441,7 @@ void tms32010_device::bgz()
 }
 void tms32010_device::bioz()
 {
-	if (BIO_IN != CLEAR_LINE) {
+	if (m_bio_in() != CLEAR_LINE) {
 		m_PC = M_RDOP_ARG(m_PC);
 		m_icount -= add_branch_cycle();
 	}
@@ -841,6 +834,8 @@ void tms32010_device::device_start()
 	m_direct = &m_program->direct();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
+
+	m_bio_in.resolve_safe(0);
 
 	m_PREVPC = 0;
 	m_ALU.d = 0;

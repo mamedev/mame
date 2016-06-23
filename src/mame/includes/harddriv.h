@@ -479,7 +479,7 @@ public:
 	DECLARE_WRITE16_MEMBER(hdsnd68k_320ports_w);
 	DECLARE_READ16_MEMBER(hdsnd68k_320com_r);
 	DECLARE_WRITE16_MEMBER(hdsnd68k_320com_w);
-	DECLARE_READ16_MEMBER(hdsnddsp_get_bio);
+	DECLARE_READ_LINE_MEMBER(hdsnddsp_get_bio);
 
 	DECLARE_WRITE16_MEMBER(hdsnddsp_dac_w);
 	DECLARE_WRITE16_MEMBER(hdsnddsp_comport_w);
