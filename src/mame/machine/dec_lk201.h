@@ -17,14 +17,19 @@
 
 #define LK_CMD_DIS_KEYCLK       0x99    /* disable the keyclick */
 #define LK_CMD_ENB_KEYCLK       0x1b    /* enable the keyclick - 1st param: volume */
-//#define LK_CMD_DIS_CTLCLK       0xb9    /* disable the Ctrl keyclick */
-//#define LK_CMD_ENB_CTLCLK       0xbb    /* enable the Ctrl keyclick */
+#define LK_CMD_DIS_CTLCLK       0xb9    /* disable the Ctrl keyclick */
+#define LK_CMD_ENB_CTLCLK       0xbb    /* enable the Ctrl keyclick */
 #define LK_CMD_SOUND_CLK        0x9f    /* emit a keyclick  - 1st param: volume */
 #define LK_CMD_DIS_BELL         0xa1    /* disable the bell */
 #define LK_CMD_ENB_BELL         0x23    /* enable the bell - 1st param: volume */
 #define LK_CMD_BELL             0xa7    /* emit a bell - 1st param: volume */
 
-#define LK_CMD_POWER_UP         0xfd    /* init power-up sequence */
+// TCR - Timer Compare Register 
+#define TCR_OCIE 0x40 // Bit 6 (output compare IRQ enable)
+#define TCR_OLVL 0x01 // Bit 1 (output level)        
+
+// TSR - Timer Status Register 
+#define TSR_OCFL 0x40 // TSR (68HC05 output compare flag)  
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -45,16 +50,16 @@ public:
 	// construction/destruction
 	lk201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_READ8_MEMBER( ddr_r );
-	DECLARE_WRITE8_MEMBER( ddr_w );
-	DECLARE_READ8_MEMBER( ports_r );
-	DECLARE_WRITE8_MEMBER( ports_w );
-	DECLARE_READ8_MEMBER( sci_r );
-	DECLARE_WRITE8_MEMBER( sci_w );
-	DECLARE_READ8_MEMBER( spi_r );
-	DECLARE_WRITE8_MEMBER( spi_w );
-	DECLARE_READ8_MEMBER( timer_r );
-	DECLARE_WRITE8_MEMBER( timer_w );
+	DECLARE_READ8_MEMBER(ddr_r);
+	DECLARE_WRITE8_MEMBER(ddr_w);
+	DECLARE_READ8_MEMBER(ports_r);
+	DECLARE_WRITE8_MEMBER(ports_w);
+	DECLARE_READ8_MEMBER(sci_r);
+	DECLARE_WRITE8_MEMBER(sci_w);
+	DECLARE_READ8_MEMBER(spi_r);
+	DECLARE_WRITE8_MEMBER(spi_w);
+	DECLARE_READ8_MEMBER(timer_r);
+	DECLARE_WRITE8_MEMBER(timer_w);
 
 	template<class _Object> static devcb_base &set_tx_handler(device_t &device, _Object wr) { return downcast<lk201_device &>(device).m_tx_handler.set_callback(wr); }
 
@@ -95,6 +100,7 @@ private:
 	} m_timer;
 
 	emu_timer *m_count;
+	emu_timer *m_beeper;
 
 	UINT8 sci_ctl2;
 	UINT8 sci_status;
@@ -127,6 +133,8 @@ private:
 
 	void send_port(address_space &space, UINT8 offset, UINT8 data);
 	void update_interrupts();
+
+	int m_kbd_state;
 
 	devcb_write_line m_tx_handler;
 };
