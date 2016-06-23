@@ -315,7 +315,7 @@ static ADDRESS_MAP_START( tomcat_map, AS_PROGRAM, 16, tomcat_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp_map, AS_PROGRAM, 16, tomcat_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("shared_ram")
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("shared_ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp_io_map, AS_IO, 16, tomcat_state )
