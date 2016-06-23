@@ -450,6 +450,7 @@ plus4.cpp
 pm68k.cpp
 pmd85.cpp
 pmi80.cpp
+pockchal.cpp
 pocketc.cpp
 pockstat.cpp
 poisk1.cpp
