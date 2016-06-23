@@ -78,6 +78,7 @@ Notes:
 #include "machine/pcshare.h"
 #include "machine/bankdev.h"
 #include "machine/intelfsh.h"
+#include "machine/terminal.h"
 
 
 class funkball_state : public pcat_base_state
@@ -88,6 +89,7 @@ public:
 			m_voodoo(*this, "voodoo_0"),
 			m_unk_ram(*this, "unk_ram"),
 			m_flashbank(*this, "flashbank"),
+			m_terminal(*this, "terminal"),
 			m_inputs(*this, "IN")
 	{ }
 
@@ -105,6 +107,7 @@ public:
 
 	required_shared_ptr<UINT32> m_unk_ram;
 	required_device<address_map_bank_device> m_flashbank;
+	required_device<generic_terminal_device> m_terminal;
 	required_ioport_array<16> m_inputs;
 
 	DECLARE_WRITE32_MEMBER( flash_w );
@@ -225,10 +228,11 @@ WRITE8_MEMBER( funkball_state::serial_w )
 {
 	if(offset == 0)
 	{
+		// TODO: hack, main CPU sends a CR only here, actually expecting Windows-style newline. 
 		if(data == 0x0d)
-			printf("\n");
+			m_terminal->write(space,0,0x0a);
 		else
-			printf("%c",data);
+			m_terminal->write(space,0,data);
 	}
 }
 
@@ -834,6 +838,8 @@ static MACHINE_CONFIG_START( funkball, funkball_state )
 	MCFG_SCREEN_SIZE(1024, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 16, 447)
 
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	
 	MCFG_INTEL_28F320J5_ADD("u29")
 	MCFG_INTEL_28F320J5_ADD("u30")
 	MCFG_INTEL_28F320J5_ADD("u3")
