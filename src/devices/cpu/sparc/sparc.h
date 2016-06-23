@@ -16,7 +16,7 @@
 #define SPARC_INSTRUCTION_ACCESS_EXCEPTION	1
 #define SPARC_ILLEGAL_INSTRUCTION			2
 #define SPARC_PRIVILEGED_INSTRUCTION		3
-#define SPARC_FLOATING_POINT_DISABLED		4
+#define SPARC_FP_DISABLED					4
 #define SPARC_WINDOW_OVERFLOW				5
 #define SPARC_WINDOW_UNDERFLOW				6
 #define SPARC_MEM_ADDRESS_NOT_ALIGNED		7
@@ -40,6 +40,7 @@
 #define SPARC_INT15							31
 #define SPARC_TRAP_INSTRUCTION				128
 
+#define SPARC_FPU_SEQUENCE_ERROR
 // TODO: when there are more SPARC CPUs, move setter to a base class
 #define MCFG_SPARC_ADD_ASI_DESC(desc) \
 	mb86901_device::add_asi_desc(*device, desc);
@@ -85,34 +86,55 @@ public:
 protected:
 	template<typename T> void add_asi_desc(const T &desc) { m_dasm.add_asi_desc(desc); }
 
-	bool invoke_queued_traps();
-	bool check_main_traps(UINT32 op, bool privileged, UINT32 alignment, UINT8 registeralign, bool noimmediate);
-
 	void update_gpr_pointers();
-	void save_restore_update_cwp(UINT32 op, UINT8 new_cwp);
-	bool execute_group2(UINT32 op);
+
+	void execute_add(UINT32 op);
+	void execute_taddcc(UINT32 op);
+	void execute_sub(UINT32 op);
+	void execute_tsubcc(UINT32 op);
+	void execute_logical(UINT32 op);
+	void execute_shift(UINT32 op);
+	void execute_mulscc(UINT32 op);
+	void execute_rdsr(UINT32 op);
+	void execute_wrsr(UINT32 op);
+	void execute_rett(UINT32 op);
+	void execute_saverestore(UINT32 op);
+	void execute_jmpl(UINT32 op);
+	void execute_group2(UINT32 op);
+
+	void execute_load(UINT32 op);
+	void execute_store(UINT32 op);
+	void execute_ldstub(UINT32 op);
 	void execute_group3(UINT32 op);
-	bool execute_bicc(UINT32 op);
-	bool execute_ticc(UINT32 op);
+
 	bool evaluate_condition(UINT32 op);
+	void execute_bicc(UINT32 op);
+	void execute_ticc(UINT32 op);
+	void select_trap();
+	void execute_trap();
+
+	void complete_instruction_execution(UINT32 op);
+	void dispatch_instruction(UINT32 op);
+	void complete_fp_execution(UINT32 /*op*/);
+	void execute_step();
+
+	void reset_step();
+	void error_step();
 
 	// address spaces
 	const address_space_config m_program_config;
 
 	// memory access
-	UINT32 read_byte(UINT8 asi, UINT32 address);
-	INT32 read_signed_byte(UINT8 asi, UINT32 address);
-	UINT32 read_half(UINT8 asi, UINT32 address);
-	INT32 read_signed_half(UINT8 asi, UINT32 address);
-	UINT32 read_word(UINT8 asi, UINT32 address);
-	UINT64 read_doubleword(UINT8 asi, UINT32 address);
-	void write_byte(UINT8 asi, UINT32 address, UINT8 data);
-	void write_half(UINT8 asi, UINT32 address, UINT16 data);
-	void write_word(UINT8 asi, UINT32 address, UINT32 data);
-	void write_doubleword(UINT8 asi, UINT32 address, UINT64 data);
+	UINT32 read_sized_word(UINT8 asi, UINT32 address, int size);
+	void write_sized_word(UINT8 asi, UINT32 address, UINT32 data, int size);
 
 	// general-purpose registers
 	UINT32 m_r[120];
+
+	// FPU registers
+	UINT32 m_fpr[32];
+	UINT32 m_fsr;
+	UINT8 m_ftt;
 
 	// control/status registers
 	UINT32 m_pc;
@@ -121,6 +143,45 @@ protected:
 	UINT32 m_wim;
 	UINT32 m_tbr;
 	UINT32 m_y;
+
+	bool m_bp_reset_in;
+	UINT8 m_bp_irl;
+	bool m_bp_fpu_present;
+	bool m_bp_cp_present;
+	bool m_pb_error;
+	bool m_pb_block_ldst_byte;
+	bool m_pb_block_ldst_word;
+
+	// trap and error registers
+	bool m_trap;
+	UINT8 m_tt;
+	UINT8 m_ticc_trap_type;
+	UINT8 m_interrupt_level;
+	bool m_privileged_instruction;
+	bool m_illegal_instruction;
+	bool m_mem_address_not_aligned;
+	bool m_fp_disabled;
+	bool m_fp_exception;
+	bool m_cp_disabled; // SPARCv8
+	bool m_cp_exception; // SPARCv8
+	bool m_unimplemented_FLUSH; // SPARCv8
+	bool m_r_register_access_error; // SPARCv8
+	bool m_instruction_access_error; // SPARCv8
+	bool m_instruction_access_exception;
+	bool m_data_access_error; // SPARCv8
+	bool m_data_store_error; // SPARCv8
+	bool m_data_access_exception;
+	bool m_division_by_zero; // SPARCv8
+	bool m_trap_instruction;
+	bool m_window_underflow;
+	bool m_window_overflow;
+	bool m_tag_overflow;
+	bool m_reset_mode;
+	bool m_reset_trap;
+	bool m_execute_mode;
+	bool m_error_mode;
+	UINT8 m_fpu_sequence_err;
+	UINT8 m_cp_sequence_err;
 
 	// fields separated out from PSR (Processor State Register)
 	UINT8 m_impl;	// implementation (always 0 in MB86901)
@@ -134,19 +195,20 @@ protected:
 	bool m_et;		// enable traps
 	UINT8 m_cwp;	// current window pointer
 
+	bool m_alu_op3_assigned[64];
+	bool m_ldst_op3_assigned[64];
+
 	// register windowing helpers
 	UINT32* m_regs[32];
 
 	// addressing helpers
-	UINT8 m_insn_asi;
-	UINT8 m_data_asi;
 	UINT8 m_asi;
 
 	// other internal states
-	UINT32 m_trap_priorities[256];
-	UINT32 m_queued_tt;
-	UINT32 m_queued_priority;
+	bool m_privileged_asr[32];
+	bool m_illegal_instruction_asr[32];
 	bool m_mae;
+	bool m_annul;
 	bool m_hold_bus;
 	int m_icount;
 
@@ -158,7 +220,7 @@ protected:
 	address_space *m_program;
 
 	// processor configuration
-	static const int WINDOW_COUNT;
+	static const int NWINDOWS;
 };
 
 // device type definition
