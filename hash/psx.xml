@@ -22700,13 +22700,13 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 		<part name="cdrom1" interface="psx_cdrom">
 			<feature name="part_id" value="Super Street Fighter II &amp; Super Street Fighter II Turbo"/>
 			<diskarea name="cdrom">
-				<disk name="street fighter collection (usa) (disc 1) (v1.1)"  sha1="9eaab12a032b7e9d6a05f342752f1de8fe4d27b3"/>
+				<disk name="street fighter collection (usa) (disc 1) (v1.1)" sha1="9eaab12a032b7e9d6a05f342752f1de8fe4d27b3"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
 			<feature name="part_id" value="Super Street Fighter Alpha 2 Gold"/>
 			<diskarea name="cdrom">
-				<disk name="street fighter collection (usa) (disc 2) (v1.1)"  sha1="b42293238b6b2dd5ebc9dc990bdc08ab6e6ec8c4"/>
+				<disk name="street fighter collection (usa) (disc 2) (v1.1)" sha1="b42293238b6b2dd5ebc9dc990bdc08ab6e6ec8c4"/>
 			</diskarea>
 		</part>
 	</software>
@@ -22799,7 +22799,7 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 		<part name="cdrom1" interface="psx_cdrom">
 			<feature name="part_id" value="Super Street Fighter II &amp; Super Street Fighter II Turbo"/>
 			<diskarea name="cdrom">
-				<disk name="street fighter collection (usa) (disc 1) (v1.0)"  sha1="52532f13a35f9077b7e02d53f3feeb843727bd1e"/>
+				<disk name="street fighter collection (usa) (disc 1) (v1.0)" sha1="52532f13a35f9077b7e02d53f3feeb843727bd1e"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
@@ -55959,6 +55959,26 @@ TODO: Check if these match the corresponding redump dumps.
 
 
 
+	<software name="mgg">
+		<!-- Original images (unknown source)
+		<rom name="Manic Game Girl.ccd" size="773" crc="e40c7636" sha1="573632bc04b0b7ddb1241b50f6c13c38b30fd475"/>
+		<rom name="Manic Game Girl.cue" size="79" crc="3dbd6b4c" sha1="5989eea0be02a8793b7a464c97eb0fb0a5235a17"/>
+		<rom name="Manic Game Girl.img" size="473890368" crc="2f2fa489" sha1="050015a247c9908e2fbf43d7d043a7a3ad81a6b1"/>
+		<rom name="Manic Game Girl.sub" size="19342464" crc="9d98f664" sha1="9e78429091e72cadbc1f0a2e54e0b4ea39b364d5"/>
+		-->
+		<description>Manic Game Girl (Kor)</description>
+		<year>2002</year>
+		<publisher>Joycast Entertainment</publisher>
+		<info name="alt_title" value="MGG [Manic Game Girl] (Box) / 매닉 게임 걸"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="manic game girl" sha1="86a99497bde4abba913058f7e21728f389b9172e"/>
+			</diskarea>
+		</part>
+	</software>
+
+
+
 <!--
 ***********************
 NON-REDUMP Rips
@@ -56102,7 +56122,7 @@ A few comments on these:
 		<rom name="biohazard-2-beta.ccd" size="743" crc="7c549fd8" sha1="442760fd3c8e080b4860b17951f85f77a04c56e9"/>
 		<rom name="biohazard-2-beta.sub" size="28164096" crc="9af638a3" sha1="e89a6ea0dee1a217d2faedbb2d6769992b2b4aeb"/>
 		-->
-		<description>BioHazard 2 (Prototype)</description>
+		<description>BioHazard 2 (Jpn, Prototype)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -56117,12 +56137,26 @@ A few comments on these:
 		<rom name="biohazard 2 (beta 2).bin" size="780788736" crc="b7e5b1b9" sha1="354cd30e1c570e85accaf3af716d0843614dfc40"/>
 		<rom name="biohazard 2 (beta 2).cue" size="86" crc="1fd0def1" sha1="00bb06023a89a3ef11b9fcd58593eaef813f8e2a"/>
 		-->
-		<description>BioHazard 2 (Prototype, Alt)</description>
+		<description>BioHazard 2 (Jpn, Prototype, Alt)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="biohazard 2 (beta 2)" sha1="6297f31f083406884e03a1f52fd9db577e017fd8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="biohaz2po" cloneof="revil2">
+		<!-- Original images (unknown source)
+		<rom name="BH2P_PVB.ISO" size="124300848" crc="598a6bfd" sha1="ecac141d16ee0c8cfa946fb3860cf9dae75b6752"/>
+		-->
+		<description>BioHazard 2 (Jpn, Early Prototype)</description>
+		<year>1998</year>
+		<publisher>Capcom</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="bh2p_pvb" sha1="c47b1e470f54423f68cd3d68cb0fd9daf346b920"/>
 			</diskarea>
 		</part>
 	</software>
@@ -56143,18 +56177,107 @@ A few comments on these:
 		</part>
 	</software>
 
-	<software name="crashp" cloneof="crash">
+	<software name="cnccomnd">
+		<!-- Original images (unknown source)
+		<rom name="COMMANDO.BIN" size="3370416" crc="7b9442ef" sha1="aed79c2859e8949c7f3303f9de2e7a188e07d8c9"/>
+		<rom name="COMMANDO.CUE" size="74" crc="7f9d7a10" sha1="f91833587f7ca34b1d53868f47169db040dfa493"/>
+		-->
+		<description>Command &amp; Conquerer - Commando (Tech Demo, 19970714)</description>
+		<year>19??</year>
+		<publisher>POV</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="commando" sha1="203a72b27d35443cbd01a7efe5ca521b40b7dd4a"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="crashp1" cloneof="crash">
+		<!-- Original images (unknown source)
+		<rom name="CRASHBANDICOOT.ccd" size="788" crc="d320da8b" sha1="06a586cb319cab68318d9220c5efb6897eb5d761"/>
+		<rom name="CRASHBANDICOOT.img" size="183627696" crc="e0cb00ae" sha1="bdebf6ec7a7f4732daa2e0cb570d962b34de565d"/>
+		<rom name="CRASHBANDICOOT.sub" size="7495008" crc="2fb45167" sha1="0596388a74c6e5486f64f6806f9776ed8cce9a38"/>
+		-->
+		<description>Crash Bandicoot (USA, Prototype, 19960511)</description>
+		<year>1996</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="crashbandicoot" sha1="519c823b2c54f3c5bcfb3f0210db06d275514667"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="crashp2" cloneof="crash">
 		<!-- Original images (from drx)
 		<rom name="crash.ccd" size="772" crc="34265432" sha1="d318d178bd37afe4cbd52771414649a094694197"/>
 		<rom name="crash.img" size="167431824" crc="79827883" sha1="837c7a9c1af9262fbe1842e798cd341ed221bc83"/>
 		<rom name="crash.sub" size="6833952" crc="86466038" sha1="3b57d344c4c813f8436c4c7acf3369591293ecaa"/>
 		-->
-		<description>Crash Bandicoot (Prototype, 19960408)</description>
+		<description>Crash Bandicoot (USA, Prototype, 19960408)</description>
 		<year>1996</year>
-		<publisher>SCEA</publisher>
+		<publisher>Sony Computer Entertainment America</publisher>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="crash" sha1="8272aa46a2a959d2ffd54f281301a38bd1b2fbad" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="crashp2p" cloneof="crash2">
+		<!-- Original images (unknown source)
+		<rom name="Crash Bandicoot 2 - Cortex Strikes Back (BETA_08-09-1997).bin" size="249636576" crc="9bb04050" sha1="895fd4b675adbdcc8c395a8031cb6105767c90f5"/>
+		-->
+		<description>Crash Bandicoot 2 - Cortex Strikes Back (USA, Prototype 19970908)</description>
+		<year>1997</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="cb2_beta" sha1="45cd3589b76aa82bfb966fda05848d376c58e9ba"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="crocp" cloneof="croc">
+		<!-- Original images (unknown source)
+		<rom name="CROC_0_12.BIN" size="513862608" crc="f9c683f1" sha1="69c4e514243f5c326190d8a36539dca0cdf11ca2"/>
+		<rom name="CROC_0_12.cue" size="138" crc="b3487209" sha1="5e3a0bb57d33c9b8f5e60631c3b588e7051382e1"/>
+		-->
+		<description>Croc - Legend of the Gobbos (Prototype)</description>
+		<year>1997</year>
+		<publisher>Fox Interactive</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="croc_0_12" sha1="ac313144690a45fb2a56c4bdda89e403a9ca346b"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="crocpo" cloneof="croc">
+		<!-- Original images (unknown source)
+		<rom name="CROC_DEMO.BIN" size="323106000" crc="c7f47362" sha1="1feb55ba93b28ebadfbf429df1f7009b7eebe8ce"/>
+		<rom name="CROC_DEMO.cue" size="1194" crc="0af47fd2" sha1="46ca82b29d4425aa2d8ab933f545e946ffd46c06"/>
+		-->
+		<description>Croc (Earlier Prototype)</description>
+		<year>1997</year>
+		<publisher>Fox Interactive</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="croc_demo" sha1="2042fd50c946be76a4e3f373b0b3af63efd11f44"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ctrp" cloneof="ctr">
+		<!-- Original images (unknown source)
+		<rom name="CTR - Review.bin" size="514189536" crc="16a14528" sha1="b7ac1d239edff79ea8c3b1c1a8abeed79fe11c9e"/>
+		-->
+		<description>CTR - Crash Team Racing (USA, Prototype)</description>
+		<year>1999</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ctrbeta" sha1="77b7cdc4dbfda5672a6180aba75e1bb09c59b8bb"/>
 			</diskarea>
 		</part>
 	</software>
@@ -56198,7 +56321,7 @@ A few comments on these:
 		<publisher>GT Interactive</publisher>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="driver (beta demo 3)" sha1="527e4c1ca4c2ec0a27a005290b4a1eac596b3fa9" />
+				<disk name="driver (beta demo 3)" sha1="7c5b9479295b9016ed9700d9b21abdea0d22edd5"/>
 			</diskarea>
 		</part>
 	</software>
@@ -56229,6 +56352,38 @@ A few comments on these:
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="slus-01419" sha1="b8df7f15e32150e703780951fd7ccb6914c75c06" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="imsarcng">
+		<!-- Original images (unknown source)
+		<rom name="IMSA.bin" size="61283712" crc="7941f9b8" sha1="260d958310382073f756a447c6749c6de4dab64e"/>
+		<rom name="IMSA.cue" size="126" crc="f42a8822" sha1="479cfc179893836701069643ec56bdb76eb1911a"/>
+		-->
+		<description>IMSA Racing (Tech Demo, 19970715)</description>
+		<year>19??</year>
+		<publisher>POV</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="imsa" sha1="8bd31d36a673de8238f57516d6f631febc5235ca"/>
+			</diskarea>
+		</part>
+	</software>
+
+<!-- There also exists an hacked image floating around where the Atlantis track design has been modified to
+use an alternate design found on the demo disk... It might be possible to enable it with some cheat? -->
+	<software name="jetm2124" supported="no">
+		<!-- Original images (unknown source)
+		<rom name="Jetmoto 2124.bin" size="188084736" crc="1c041492" sha1="c9404c1af14b52dc37c70b23efdb3f9b6f7098b9"/>
+		<rom name="Jetmoto 2124.cue" size="78" crc="e71df0dd" sha1="94d5c9980391b630d9c62b6a28f85d8bde992d0f"/>
+		-->
+		<description>Jetmoto 2124 (USA, Prototype)</description>
+		<year>1999?</year>
+		<publisher>989 Studios</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="jetmoto 2124" sha1="d6a72ca70a7b793f1c52677f9525d43fdc81620b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -56278,6 +56433,24 @@ A few comments on these:
 		</part>
 	</software>
 
+
+<!-- INVESTIGATE! unsure whether this has been ripped from a Demo Disc with multiple games or it is a legit standalone demo disc... -->
+	<software name="medievilp" cloneof="medievil">
+		<!-- Original images (unknown source)
+		<rom name="medievil beta [sces_033.11] (pal).bin" size="525436800" crc="94d7c8f7" sha1="65c8474c8e18d599d090cacfc1d68d8428cea290"/>
+		<rom name="medievil beta [sces_033.11] (pal).cue" size="200" crc="eb01c924" sha1="f749eecc4d196b3bff03b773d4592396f0af5d05"/>
+		-->
+		<description>MediEvil (Euro, Prototype)</description>
+		<year>1998</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCES-03311?"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="medievil beta [sces_033.11] (pal)" sha1="74539672136aa86d0e6168e256f3ad2b9d74db8b"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="mgspilot" supported="no">
 		<!-- Original images (unknown source)
 		<rom name="slpm.mdf" size="79669296" crc="f32426af" sha1="61099819f6623cf46bab78b14df6333ad13c7f40"/>
@@ -56294,6 +56467,21 @@ A few comments on these:
 		</part>
 	</software>
 
+	<software name="missilep" cloneof="missile">
+		<!-- Original images (unknown source)
+		<rom name="MISSILECOMMAND.BIN" size="328602624" crc="7eeabdc7" sha1="cf2a4916c103eff856046a44f7b6e134a812180f"/>
+		<rom name="MISSILECOMMAND.CUE" size="121" crc="1af0a4f5" sha1="e173bf59f5a6f612ac7d45cac9b331a92bab5448"/>
+		-->
+		<description>Missile Command (USA, Prototype 19990812)</description>
+		<year>1999</year>
+		<publisher>Atari Interactive</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="missilecommand" sha1="c8c6e20ed0ce1644ad917937460cac0d0ebcb633"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="persona2p" cloneof="persona2" supported="no">
 		<!-- L1+R1+START+SELECT brings up the debug menu -->
 		<!-- Original images (unknown source)
@@ -56306,6 +56494,21 @@ A few comments on these:
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="persona2xus" sha1="63910ca0f84d97496c5f4498e7a8d70299b14d64" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="qbertp">
+		<!-- Original images (unknown source)
+		<rom name="SLUS_00904.BIN" size="289194864" crc="774c1174" sha1="3edb5222987ff95f30bf680e6b4b8771736520fe"/>
+		<rom name="SLUS_00904.CUE" size="101" crc="2d0364af" sha1="e9726433173434a1b9653550ef797dc10935b88e"/>
+		-->
+		<description>Q*bert (Euro?, Prototype 19990928)</description>
+		<year>1999</year>
+		<publisher>Atari Interactive</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="qbert beta pal" sha1="ccd7fff2a62b63c7118a10960004b8a7192d4341"/>
 			</diskarea>
 		</part>
 	</software>
@@ -56365,7 +56568,7 @@ A few comments on these:
 		<info name="serial" value="SLPM-80158" />
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="slpm-80158" sha1="0156cc68c320849821b780207ed58cb8bc5b4a73" />
+				<disk name="slpm-80158" sha1="e62186095e824961557607c78a35229217ae8ebf" />
 			</diskarea>
 		</part>
 	</software>
@@ -56433,12 +56636,29 @@ A few comments on these:
 
 	<software name="thkill" supported="no">
 		<!-- Original images (unknown source)
+		<rom name="thrill kill [sles-01337].bin" size="543892944" crc="ecee0c8e" sha1="b31ded0a99acc51a98c8fdbf7ef353d3d27b8aba"/>
+		<rom name="thrill kill [sles-01337].cue" size="603" crc="ab9afb6e" sha1="e8a40c6456dac23e120c2d1dd9f1b0e7c5010d6f"/>
+		-->
+		<description>Thrill Kill (Euro, Prototype)</description>
+		<year>1998</year>
+		<publisher>Virgin Interactive</publisher>
+		<info name="serial" value="SLES-01337?"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="thrill kill [sles-01337]" sha1="b2fe1518d310b15ec3a2673e57273ab31975e829"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="thkillu" cloneof="thkill" supported="no">
+		<!-- Original images (unknown source)
 		<rom name="thrill kill.bin" size="625629648" crc="ab7aa9a2" sha1="8a0a68c4fa1d5d6e68acd878ea4e22c1cbcf5d24"/>
 		<rom name="thrill kill.cue" size="601" crc="b10890b1"/>
 		-->
 		<description>Thrill Kill (USA, Prototype)</description>
 		<year>1998</year>
 		<publisher>Virgin Interactive</publisher>
+		<info name="serial" value="SLUS-00752?"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="thrill kill" sha1="09721bf343ee69f13b7ed86cc92beb0be94db04a" />
@@ -56446,19 +56666,17 @@ A few comments on these:
 		</part>
 	</software>
 
-	<software name="thkilla" cloneof="thkill" supported="no">
+	<software name="thkillua" cloneof="thkill" supported="no">
 		<!-- Original images (unknown source)
-		<rom name="thrill_kill_slus12345_frederico_psx_ud.img" size="164428320" crc="755a6f9a" sha1=""/>
-		<rom name="thrill_kill_slus12345_frederico_psx_ud.sub" size="6711360" crc="04f2d980" sha1=""/>
-		<rom name="thrill_kill_slus12345_frederico_psx_ud.ccd" size="1821" crc="e65f76a3" sha1=""/>
-		<rom name="thrill_kill_slus12345_frederico_psx_ud.cue" size="402" crc="1676ac31" sha1=""/>
+		<rom name="thrill kill (usa) beta [slus-12345].bin" size="164430672" crc="f72ccb2a" sha1="ec359a95b0bfe153b46f6ecf1e160030a13f62e9"/>
+		<rom name="thrill kill (usa) beta [slus-12345].cue" size="467" crc="86f88cef" sha1="979aeab2cf4e59e595b9f1ecbc8fb64ad947ab24"/>
 		-->
 		<description>Thrill Kill (USA, Prototype Earlier?)</description>
 		<year>1998</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="thrill_kill_slus12345_frederico_psx_ud" sha1="5ee0e947808176e37a946c69ee6234927a0b96cc" />
+				<disk name="thrill kill (usa) beta [slus-12345]" sha1="00ac3bec50244e246c21d526eb34ea02d2816349"/>
 			</diskarea>
 		</part>
 	</software>
@@ -56490,7 +56708,7 @@ A few comments on these:
 		<publisher>Core Design</publisher>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tomb raider ii (usa, prototype)" sha1="cc844146249ec76bdebf777efdbcf7d7bec07694" />
+				<disk name="tomb raider ii (usa, prototype)" sha1="62036de387e8715afdbe30c3ba6c12aa1121cfeb" />
 			</diskarea>
 		</part>
 	</software>
@@ -56519,24 +56737,39 @@ A few comments on these:
 		<publisher>Head Games</publisher>   <!-- Head Games were actually the developer, but I was unable to dig any info about actual publishing deals -->
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="torc - legend of the ogre crown (prototype)" sha1="0c27726e8957a2054c9c4fe38b8859ef4c4929c9" />
+				<disk name="torc - legend of the ogre crown (prototype)" sha1="fd93d28c7a64f047d6e9d40fb8333fc74a43b887" />
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="virtuoso">
 		<!-- Original images (unknown source)
-		<rom name="virtuoso (prototype 1996-05-14).ccd" size="1178" crc="4a4d26ac" sha1="fec39e4a5945c102fa8f9daf3aa339f33ab7cd8b"/>
-		<rom name="virtuoso (prototype 1996-05-14).cue" size="228" crc="20483bb0" sha1="ae7d040597b26d01d871c50bea2b46b0dd85b595"/>
-		<rom name="virtuoso (prototype 1996-05-14).img" size="75607392" crc="3ffa24c3" sha1="e73eaec7f72111ec923a880f2452293c35eae9fa"/>
-		<rom name="virtuoso (prototype 1996-05-14).sub" size="3086016" crc="d6099623" sha1="95e7699ea0008f46f549989b82da5a3fd4780708"/>
+		<rom name="virtuoso (japan) (prototype 1996-05-14) (track 1).bin" size="27269088" crc="47f5fd22" sha1="084be1e87349755fc1deedf5a1e06e3fcfaf6a11"/>
+		<rom name="virtuoso (japan) (prototype 1996-05-14) (track 2).bin" size="8293152" crc="5272b4e7" sha1="752d6e70d122000ac9bbc2b903ec2a4abf7c279b"/>
+		<rom name="virtuoso (japan) (prototype 1996-05-14) (track 3).bin" size="40045152" crc="209896a4" sha1="37d11c227eb6ffcd28ecb94414689d9ecb3e99bc"/>
+		<rom name="virtuoso (japan) (prototype 1996-05-14).cue" size="381" crc="76ce14e0" sha1="86be87af128d63f164147ccc1081cf76bb6f7985"/>
 		-->
 		<description>Virtuoso (Prototype, 19960514)</description>
 		<year>1996</year>
 		<publisher>Data East?</publisher>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="virtuoso" sha1="17b12ec274b92acb586f4660303bbb21309c0702" />
+				<disk name="virtuoso 960514" sha1="5eafe5417c6cd327d1b0026f3bb862dab111afd5"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="virtuosoa" cloneof="virtuoso">
+		<!-- Original images (unknown source)
+		<rom name="virtuoso (japan) (prototype 1995-12-19).bin" size="4287696" crc="8163083d" sha1="0c032fbe9d0bf2d719b87e1c35d28cdc7cffdead"/>
+		<rom name="virtuoso (japan) (prototype 1995-12-19).cue" size="105" crc="0de27535" sha1="3034741d5e5cccb81782038583d7f506b0090651"/>
+		-->
+		<description>Virtuoso (Prototype, 19951219)</description>
+		<year>1995</year>
+		<publisher>Data East?</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="virtuoso 951219" sha1="1723c0af6f6269cc2c433b1281619d4c1de6134f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -56561,8 +56794,8 @@ A few comments on these:
 
 	<software name="revil2d" cloneof="revil2" supported="no">
 		<!-- Original images (unknown source)
-		<rom name="revil2prevpaling by spectro.bin" size="170583504" crc="3f66f858" sha1=""/>
-		<rom name="revil2prevpaling by spectro.cue" size="93" crc="7f31a5a5" sha1=""/>
+		<rom name="(PSX) Resident Evil 2 (Preview) (SLED-00977).bin" size="170583504" crc="acbf1ead" sha1="2d5aa8554dfd7bbe54ff6c981788570117d7f16e"/>
+		<rom name="(PSX) Resident Evil 2 (Preview) (SLED-00977).cue" size="113" crc="4f074fd1" sha1="4cecd78cc2fa8bcbfe069b9ecb7e7c8821225c08"/>
 		-->
 		<description>Resident Evil 2 Preview (Euro, CD Consoles No.38)</description>
 		<year>1997</year>
@@ -56570,7 +56803,7 @@ A few comments on these:
 		<info name="serial" value="SLED-00977" />
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="sled-00977" sha1="2e05c694daa7dc069b93bbaca465ab047ef3eef8" />
+				<disk name="sled-00977" sha1="e4b02905f0032c4f834cddd45e8c4ba3f12150a3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -56618,6 +56851,68 @@ A few comments on these:
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="sotn e3 demo" sha1="c3f5a41ee4722660ce9a708c22990bf9656d5949" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="gen13td">
+		<!-- Original images (unknown source)
+		<rom name="gen13.bin" size="1251264" crc="006d49c5" sha1="abf73cebb7e65d928409b654855d3b057222f79d"/>
+		<rom name="gen13.cue" size="68" crc="21ae2764" sha1="b254dcb574a62724609d2c9b3cb17c7d1a3bab5f"/>
+		-->
+		<description>Gen13 (Tech Demo)</description>
+		<year>199?</year>
+		<publisher>Realtime Associates</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="gen13" sha1="deeeefc06e67bc7bca85eaf18a882a4b348c0440"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="robocopd">
+		<!-- Original images (unknown source)
+		<rom name="robocop.bin" size="1502928" crc="2de33042" sha1="88cb83a706eaa65b49eeeccbdac53d2fa17acf1c"/>
+		<rom name="robocop.cue" size="73" crc="a72d02f6" sha1="bee10d96b71bf372a0de2607240fa88513953193"/>
+		-->
+		<description>Robocop (Tech Demo)</description>
+		<year>199?</year>
+		<publisher>Realtime Associates</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="robocop" sha1="4b9f7d45ed8ee409482039bc741c1f051070edca"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="shpwreckd" cloneof="shpwreck">
+		<!-- Original images (unknown source)
+		<rom name="Shipwreckers! (USA) (Demo) [SLUS-90013].bin" size="44937312" crc="6af9ce38" sha1="22bb814f2b7b118b7e471dce46078125ead480b9"/>
+		<rom name="Shipwreckers! (USA) (Demo) [SLUS-90013].cue" size="105" crc="d2c44981" sha1="15954f6e9544bf9ae5beee5fd3d546db10a3e179"/>
+		-->
+		<description>Shipwreckers! (USA, Demo)</description>
+		<year>1997</year>
+		<publisher>Psygnosis</publisher>
+		<info name="serial" value="SLUS-90013"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="slus-90013" sha1="82f54b9e5a341c815dc7f713a01a465085609202"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="silenthtd" cloneof="silenth">
+		<!-- Original images (unknown source)
+		<rom name="Silent Hill (Trade Demo) [NTSC-U] [SLUS-80707].bin" size="615045648" crc="4f60c3ec" sha1="49695af2c2b8b19a31b01da4cd4dbc758445ccef"/>
+		<rom name="Silent Hill (Trade Demo) [NTSC-U] [SLUS-80707].cue" size="112" crc="1ca1d493" sha1="a4cf762ddbcf24809296d0d9e28c0a1c076db484"/>
+		-->
+		<description>Silent Hill (USA, Trade Demo)</description>
+		<year>1999</year>
+		<publisher>Konami of America</publisher>
+		<info name="serial" value="SLUS-80707" />
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="slus-80707" sha1="3dc02338a4a00a5a9fb1e89308a7ec75854efec5"/>
 			</diskarea>
 		</part>
 	</software>
