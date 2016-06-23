@@ -11,6 +11,8 @@
 
 #include "sparcdasm.h"
 
+#define SPARCV8		(0)
+
 #define SPARC_NO_TRAP						256
 #define SPARC_RESET							0
 #define SPARC_INSTRUCTION_ACCESS_EXCEPTION	1
@@ -100,11 +102,18 @@ protected:
 	void execute_rett(UINT32 op);
 	void execute_saverestore(UINT32 op);
 	void execute_jmpl(UINT32 op);
+#if SPARCV8
+	void execute_mul(UINT32 op);
+	void execute_div(UINT32 op);
+#endif
 	void execute_group2(UINT32 op);
 
 	void execute_load(UINT32 op);
 	void execute_store(UINT32 op);
 	void execute_ldstub(UINT32 op);
+#if SPARCV8
+	void execute_swap(UINT32 op);
+#endif
 	void execute_group3(UINT32 op);
 
 	bool evaluate_condition(UINT32 op);
