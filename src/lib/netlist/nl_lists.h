@@ -10,10 +10,11 @@
 #ifndef NLLISTS_H_
 #define NLLISTS_H_
 
+#include <atomic>
+
 #include "nl_config.h"
 #include "plib/plists.h"
-
-#include <atomic>
+#include "plib/pchrono.h"
 
 
 // ----------------------------------------------------------------------------------------
@@ -36,10 +37,6 @@ namespace netlist
 
 		timed_queue(unsigned list_size)
 		: m_list(list_size)
-#if (NL_KEEP_STATISTICS)
-		, m_prof_sortmove(0)
-		, m_prof_call(0)
-#endif
 		{
 	#if HAS_OPENMP && USE_OPENMP
 			m_lock = 0;
@@ -60,11 +57,11 @@ namespace netlist
 			for (; t > (i - 1)->m_exec_time; --i)
 			{
 				*(i) = *(i-1);
-				inc_stat(m_prof_sortmove);
+				m_prof_sortmove.inc();
 			}
 			*i = { t, o };
 			++m_end;
-			inc_stat(m_prof_call);
+			m_prof_call.inc();
 	#if HAS_OPENMP && USE_OPENMP
 			m_lock = 0;
 	#endif
@@ -132,12 +129,9 @@ namespace netlist
 		std::vector<entry_t> m_list;
 
 	public:
-	#if (NL_KEEP_STATISTICS)
 		// profiling
-		std::size_t   m_prof_sortmove;
-		std::size_t   m_prof_call;
-	#endif
-
+		nperfcount_t m_prof_sortmove;
+		nperfcount_t m_prof_call;
 };
 
 }

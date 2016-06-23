@@ -26,16 +26,17 @@ class tool_options_t : public plib::options
 public:
 	tool_options_t() :
 		plib::options(),
-		opt_ttr ("t", "time_to_run", 1.0,   "time to run the emulation (seconds)", this),
-		opt_name("n", "name",        "",      "netlist in file to run; default is first one", this),
-		opt_logs("l", "logs",        "",      "colon separated list of terminals to log", this),
-		opt_file("f", "file",        "-",     "file to process (default is stdin)", this),
-		opt_type("y", "type",        "spice", "spice:eagle", "type of file to be converted: spice,eagle", this),
-		opt_cmd ("c", "cmd",         "run",   "run|convert|listdevices|static", this),
-		opt_inp( "i", "input",       "",      "input file to process (default is none)", this),
-		opt_verb("v", "verbose",              "be verbose - this produces lots of output", this),
-		opt_quiet("q", "quiet",               "be quiet - no warnings", this),
-		opt_help("h", "help",                 "display help", this)
+		opt_ttr (*this,		"t", "time_to_run", 1.0,		"time to run the emulation (seconds)"),
+		opt_name(*this,		"n", "name",        "",      	"netlist in file to run; default is first one"),
+		opt_logs(*this,		"l", "logs",        "",      	"colon separated list of terminals to log"),
+		opt_file(*this,		"f", "file",        "-",     	"file to process (default is stdin)"),
+		opt_type(*this,		"y", "type",        "spice", 	"spice:eagle", "type of file to be converted: spice,eagle"),
+		opt_cmd (*this,		"c", "cmd",         "run",   	"run:convert:listdevices:static", "run|convert|listdevices|static"),
+		opt_inp(*this, 		"i", "input",       "",      	"input file to process (default is none)"),
+		opt_verb(*this,		"v", "verbose",              	"be verbose - this produces lots of output"),
+		opt_quiet(*this,	"q", "quiet",               	"be quiet - no warnings"),
+		opt_version(*this,	"",  "version",          		"display version and exit"),
+		opt_help(*this,		"h", "help",               		"display help and exit")
 	{}
 
 	plib::option_double opt_ttr;
@@ -43,10 +44,11 @@ public:
 	plib::option_str    opt_logs;
 	plib::option_str    opt_file;
 	plib::option_str_limit opt_type;
-	plib::option_str    opt_cmd;
+	plib::option_str_limit opt_cmd;
 	plib::option_str    opt_inp;
 	plib::option_bool   opt_verb;
 	plib::option_bool   opt_quiet;
+	plib::option_bool   opt_version;
 	plib::option_bool   opt_help;
 };
 
@@ -92,7 +94,8 @@ public:
 	{
 		// read the netlist ...
 
-		m_setup->register_source(std::make_shared<netlist::source_file_t>(filename));
+		m_setup->register_source(plib::make_unique_base<netlist::source_t,
+				netlist::source_file_t>(filename));
 		m_setup->include(name);
 		log_setup();
 
@@ -133,14 +136,9 @@ private:
 
 void usage(tool_options_t &opts)
 {
-	perr("{}",
-		"Usage:\n"
-		"  nltool --help\n"
-		"  nltool [options]\n"
-		"\n"
-		"Where:\n"
-	);
-	perr("{}\n", opts.help().cstr());
+	pout("{}\n", opts.help(
+			"nltool serves as the Swiss Army knife to run, test and convert netlists.",
+			"nltool [options]").cstr());
 }
 
 struct input_t
@@ -207,7 +205,10 @@ std::vector<input_t> *read_input(netlist::netlist_t *netlist, pstring fname)
 static void run(tool_options_t &opts)
 {
 	netlist_tool_t nt("netlist");
-	plib::ticks_t t = plib::ticks();
+	plib::chrono::timer<plib::chrono::system_ticks> t;
+	//plib::perftime_t<plib::exact_ticks> t;
+
+	t.start();
 
 	nt.m_opts = &opts;
 	nt.init();
@@ -222,10 +223,13 @@ static void run(tool_options_t &opts)
 	std::vector<input_t> *inps = read_input(&nt, opts.opt_inp());
 
 	double ttr = opts.opt_ttr();
+	t.stop();
 
-	pout("startup time ==> {1:5.3f}\n", (double) (plib::ticks() - t) / (double) plib::ticks_per_second() );
+	pout("startup time ==> {1:5.3f}\n", t.as_seconds() );
 	pout("runnning ...\n");
-	t = plib::ticks();
+
+	t.reset();
+	t.start();
 
 	unsigned pos = 0;
 	netlist::netlist_time nlt = netlist::netlist_time::zero();
@@ -241,7 +245,9 @@ static void run(tool_options_t &opts)
 	nt.stop();
 	plib::pfree(inps);
 
-	double emutime = (double) (plib::ticks() - t) / (double) plib::ticks_per_second();
+	t.stop();
+
+	double emutime = t.as_seconds();
 	pout("{1:f} seconds emulation took {2:f} real time ==> {3:5.2f}%\n", ttr, emutime, ttr/emutime*100.0);
 }
 
@@ -273,7 +279,8 @@ static void listdevices()
 	nt.init();
 	netlist::factory_list_t &list = nt.setup().factory();
 
-	nt.setup().register_source(std::make_shared<netlist::source_proc_t>("dummy", &netlist_dummy));
+	nt.setup().register_source(plib::make_unique_base<netlist::source_t,
+			netlist::source_proc_t>("dummy", &netlist_dummy));
 	nt.setup().include("dummy");
 
 	nt.setup().start_devices();
@@ -351,7 +358,7 @@ int main(int argc, char *argv[])
 	tool_options_t opts;
 	int ret;
 
-	perr("{}", "WARNING: This is Work In Progress! - It may fail anytime\n");
+	//perr("{}", "WARNING: This is Work In Progress! - It may fail anytime\n");
 	//perr("Update dispatching using method {}\n", pmf_verbose[NL_PMF_TYPE]);
 	if ((ret = opts.parse(argc, argv)) != argc)
 	{
@@ -363,7 +370,19 @@ int main(int argc, char *argv[])
 	if (opts.opt_help())
 	{
 		usage(opts);
-		return 1;
+		return 0;
+	}
+
+	if (opts.opt_version())
+	{
+		pout(
+			"nltool (netlist) 0.1\n"
+			"Copyright (C) 2016 Couriersud\n"
+			"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
+			"This is free software: you are free to change and redistribute it.\n"
+			"There is NO WARRANTY, to the extent permitted by law.\n\n"
+			"Written by Couriersud.\n");
+		return 0;
 	}
 
 	pstring cmd = opts.opt_cmd();

@@ -12,9 +12,22 @@
 #include <thread>
 #include <chrono>
 
-#ifndef PSTANDALONE
-	#define PSTANDALONE (0)
-#endif
+/*
+ * Define this for more accurate measurements if you processor supports
+ * RDTSCP.
+ */
+#define PHAS_RDTSCP (1)
+
+/*
+ * Define this to use accurate timing measurements. Only works
+ * if PHAS_RDTSCP == 1
+ */
+#define PUSE_ACCURATE_STATS (1)
+
+/*
+ * Set this to one if you want to use 128 bit int for ptime.
+ * This is for tests only.
+ */
 
 #define PHAS_INT128 (0)
 
@@ -74,30 +87,6 @@ typedef __int128_t INT128;
 #endif
 
 namespace plib {
-
-using ticks_t = int64_t;
-
-static inline ticks_t ticks()
-{
-	return std::chrono::high_resolution_clock::now().time_since_epoch().count();
-}
-static inline ticks_t ticks_per_second()
-{
-	return std::chrono::high_resolution_clock::period::den / std::chrono::high_resolution_clock::period::num;
-}
-
-#if defined(__x86_64__) &&  !defined(_clang__) && !defined(_MSC_VER) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 6))
-
-static inline ticks_t profile_ticks()
-{
-    unsigned hi, lo;
-    __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
-    return ( (unsigned long long)lo)|( ((unsigned long long)hi)<<32 );
-}
-
-#else
-static inline ticks_t profile_ticks() { return ticks(); }
-#endif
 
 /*
  * The following class was derived from the MAME delegate.h code.

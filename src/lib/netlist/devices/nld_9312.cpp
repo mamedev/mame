@@ -32,7 +32,7 @@ namespace netlist
 	/* The truthtable implementation is a lot faster than
 	 * the carefully crafted code :-(
 	 */
-	NETLIB_TRUTHTABLE(9312, 12, 2, 0);
+	NETLIB_TRUTHTABLE(9312, 12, 2);
 	#else
 
 	NETLIB_OBJECT(9312)

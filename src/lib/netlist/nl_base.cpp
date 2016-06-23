@@ -189,7 +189,6 @@ netlist_t::netlist_t(const pstring &aname)
 	: m_state()
 	, m_time(netlist_time::zero())
 	, m_queue(*this)
-	, m_use_deactivate(0)
 	, m_mainclock(nullptr)
 	, m_solver(nullptr)
 	, m_gnd(nullptr)
@@ -218,6 +217,14 @@ nl_double netlist_t::gmin() const
 	return solver()->gmin();
 }
 
+void netlist_t::register_dev(plib::owned_ptr<device_t> dev)
+{
+	for (auto & d : m_devices)
+		if (d->name() == dev->name())
+			log().fatal("Error adding {1} to device list. Duplicate name \n", d->name());
+	m_devices.push_back(std::move(dev));
+}
+
 void netlist_t::start()
 {
 	/* load the library ... */
@@ -226,42 +233,6 @@ void netlist_t::start()
 
 	m_lib = plib::palloc<plib::dynlib>(libpath);
 
-	/* make sure the solver and parameters are started first! */
-
-	for (auto & e : setup().m_device_factory)
-	{
-		if ( setup().factory().is_class<devices::NETLIB_NAME(mainclock)>(e.second)
-				|| setup().factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
-				|| setup().factory().is_class<devices::NETLIB_NAME(gnd)>(e.second)
-				|| setup().factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
-		{
-			auto dev = plib::owned_ptr<device_t>(e.second->Create(*this, e.first));
-			setup().register_dev(std::move(dev));
-		}
-	}
-
-	log().debug("Searching for mainclock and solver ...\n");
-
-	m_mainclock = get_single_device<devices::NETLIB_NAME(mainclock)>("mainclock");
-	m_solver = get_single_device<devices::NETLIB_NAME(solver)>("solver");
-	m_gnd = get_single_device<devices::NETLIB_NAME(gnd)>("gnd");
-	m_params = get_single_device<devices::NETLIB_NAME(netlistparams)>("parameter");
-
-	m_use_deactivate = (m_params->m_use_deactivate.Value() ? true : false);
-
-	/* create devices */
-
-	for (auto & e : setup().m_device_factory)
-	{
-		if ( !setup().factory().is_class<devices::NETLIB_NAME(mainclock)>(e.second)
-				&& !setup().factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
-				&& !setup().factory().is_class<devices::NETLIB_NAME(gnd)>(e.second)
-				&& !setup().factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
-		{
-			auto dev = plib::owned_ptr<device_t>(e.second->Create(*this, e.first));
-			setup().register_dev(std::move(dev));
-		}
-	}
 
 }
 
@@ -334,6 +305,8 @@ void netlist_t::process_queue(const netlist_time &delta)
 
 	m_queue.push(stop, nullptr);
 
+	m_stat_mainloop.start();
+
 	if (m_mainclock == nullptr)
 	{
 		queue_t::entry_t e(m_queue.pop());
@@ -341,7 +314,7 @@ void netlist_t::process_queue(const netlist_time &delta)
 		while (e.m_object != nullptr)
 		{
 			e.m_object->update_devs();
-			add_to_stat(m_perf_out_processed, 1);
+			m_perf_out_processed.inc();
 			e = m_queue.pop();
 			m_time = e.m_exec_time;
 		}
@@ -367,27 +340,67 @@ void netlist_t::process_queue(const netlist_time &delta)
 			if (e.m_object == nullptr)
 				break;
 			e.m_object->update_devs();
-			add_to_stat(m_perf_out_processed, 1);
+			m_perf_out_processed.inc();
 		}
 		mc_net.set_time(mc_time);
 	}
+	m_stat_mainloop.stop();
 }
 
 void netlist_t::print_stats() const
 {
-#if (NL_KEEP_STATISTICS)
+	if (nperftime_t::enabled)
 	{
-		for (auto & entry : m_devices)
+		std::vector<size_t> index;
+		for (size_t i=0; i<m_devices.size(); i++)
+			index.push_back(i);
+
+		std::sort(index.begin(), index.end(),
+				[&](size_t i1, size_t i2) { return m_devices[i1]->m_stat_total_time.total() < m_devices[i2]->m_stat_total_time.total(); });
+
+		nperftime_t::type total_time(0);
+		uint_least64_t total_count(0);
+
+		for (auto & j : index)
 		{
-			log().verbose("Device {1:20} : {2:12} {3:12} {4:15}", entry->name(),
-					entry->stat_call_count, entry->stat_update_count,
-					(long int) entry->stat_total_time / (entry->stat_update_count + 1));
+			auto entry = m_devices[j].get();
+			log().verbose("Device {1:20} : {2:12} {3:12} {4:15} {5:12}", entry->name(),
+					entry->m_stat_call_count(), entry->m_stat_total_time.count(),
+					entry->m_stat_total_time.total(), entry->m_stat_inc_active());
+			total_time += entry->m_stat_total_time.total();
+			total_count += entry->m_stat_total_time.count();
 		}
 
-		log().verbose("Queue Pushes {1:15}", queue().m_prof_call);
-		log().verbose("Queue Moves  {1:15}", queue().m_prof_sortmove);
+		nperftime_t overhead;
+		nperftime_t test;
+		overhead.start();
+		for (int j=0; j<100000;j++)
+		{
+			test.start();
+			test.stop();
+		}
+		overhead.stop();
+
+		uint_least64_t total_overhead = (uint_least64_t) overhead()*(uint_least64_t)total_count/(uint_least64_t)200000;
+
+		log().verbose("Queue Pushes   {1:15}", queue().m_prof_call());
+		log().verbose("Queue Moves    {1:15}", queue().m_prof_sortmove());
+
+		log().verbose("Total loop     {1:15}", m_stat_mainloop());
+		/* Only one serialization should be counted in total time */
+		/* But two are contained in m_stat_mainloop */
+		log().verbose("Total devices  {1:15}", total_time);
+		log().verbose("");
+		log().verbose("Take the next lines with a grain of salt. They depend on the measurement implementation.");
+		log().verbose("Total overhead {1:15}", total_overhead);
+		log().verbose("Overhead per pop  {1:11}", (m_stat_mainloop()-2*total_overhead - (total_time - total_overhead ))/queue().m_prof_call());
+		log().verbose("");
+		for (auto &entry : m_devices)
+		{
+			if (entry->m_stat_inc_active() > 3 * entry->m_stat_total_time.count())
+				log().verbose("HINT({}, NO_DEACTIVATE)", entry->name());
+		}
 	}
-#endif
 }
 
 // ----------------------------------------------------------------------------------------
@@ -419,10 +432,9 @@ core_device_t::core_device_t(netlist_t &owner, const pstring &name)
 	: object_t(name)
 	, logic_family_t()
 	, netlist_ref(owner)
-#if (NL_KEEP_STATISTICS)
-	, stat_total_time(0)
-	, stat_update_count(0)
-	, stat_call_count(0)
+	, m_hint_deactivate(false)
+#if (NL_PMF_TYPE > NL_PMF_TYPE_VIRTUAL)
+	, m_static_update()
 #endif
 {
 	if (logic_family() == nullptr)
@@ -433,10 +445,9 @@ core_device_t::core_device_t(core_device_t &owner, const pstring &name)
 	: object_t(owner.name() + "." + name)
 	, logic_family_t()
 	, netlist_ref(owner.netlist())
-#if (NL_KEEP_STATISTICS)
-	, stat_total_time(0)
-	, stat_update_count(0)
-	, stat_call_count(0)
+	, m_hint_deactivate(false)
+#if (NL_PMF_TYPE > NL_PMF_TYPE_VIRTUAL)
+	, m_static_update()
 #endif
 {
 	set_logic_family(owner.logic_family());
@@ -586,14 +597,10 @@ void net_t::inc_active(core_terminal_t &term)
 {
 	m_active++;
 	m_list_active.push_front(&term);
-	nl_assert(m_active <= num_cons());
+	nl_assert(m_active <= (int) num_cons());
 	if (m_active == 1)
 	{
-		if (netlist().use_deactivate())
-		{
-			railterminal().device().do_inc_active();
-			//m_cur_Q = m_new_Q;
-		}
+		railterminal().device().do_inc_active();
 		if (m_in_queue == 0)
 		{
 			if (m_time > netlist().time())
@@ -607,8 +614,6 @@ void net_t::inc_active(core_terminal_t &term)
 				m_in_queue = 2;
 			}
 		}
-		//else if (netlist().use_deactivate())
-		//  m_cur_Q = m_new_Q;
 	}
 }
 
@@ -617,7 +622,7 @@ void net_t::dec_active(core_terminal_t &term)
 	--m_active;
 	nl_assert(m_active >= 0);
 	m_list_active.remove(&term);
-	if (m_active == 0 && netlist().use_deactivate())
+	if (m_active == 0)
 		railterminal().device().do_dec_active();
 }
 
@@ -656,7 +661,7 @@ void net_t::update_devs()
 
 	for (auto & p : m_list_active)
 	{
-		inc_stat(p.device().stat_call_count);
+		p.device().m_stat_call_count.inc();
 		if ((p.state() & mask) != 0)
 			p.device().update_dev();
 	}
@@ -945,10 +950,6 @@ nl_double param_model_t::model_value(const pstring &entity)
 }
 
 
-} // namespace
-
-namespace netlist
-{
 	namespace devices
 	{
 

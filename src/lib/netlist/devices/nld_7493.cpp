@@ -101,8 +101,8 @@ namespace netlist
 
 	NETLIB_UPDATE(7493ff)
 	{
-		const netlist_time out_delay = NLTIME_FROM_NS(18);
-		if (m_reset != 0)
+		constexpr netlist_time out_delay = NLTIME_FROM_NS(18);
+		if (m_reset)
 		{
 			m_state ^= 1;
 			OUTLOGIC(m_Q, m_state, out_delay);

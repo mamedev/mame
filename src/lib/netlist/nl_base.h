@@ -892,10 +892,9 @@ namespace netlist
 
 		void update_dev()
 		{
-			begin_timing(stat_total_time);
-			inc_stat(stat_update_count);
+			m_stat_total_time.start();
 			do_update();
-			end_timing(stat_total_time);
+			m_stat_total_time.stop();
 		}
 
 		void do_update() NOEXCEPT
@@ -912,9 +911,21 @@ namespace netlist
 		void set_delegate_pointer();
 		void stop_dev();
 
-		void do_inc_active() { inc_active();  }
-		void do_dec_active() { dec_active(); }
+		void do_inc_active()
+		{
+			if (m_hint_deactivate)
+			{
+				m_stat_inc_active.inc();
+				inc_active();
+			}
+		}
+		void do_dec_active()
+		{
+			if (m_hint_deactivate)
+				dec_active();
+		}
 		void do_reset() { reset(); }
+		void set_hint_deactivate(bool v) { m_hint_deactivate = v; }
 
 		netlist_sig_t INPLOGIC_PASSIVE(logic_input_t &inp);
 		netlist_sig_t INPLOGIC(const logic_input_t &inp) const
@@ -928,12 +939,10 @@ namespace netlist
 		nl_double TERMANALOG(const terminal_t &term) const { return term.net().Q_Analog(); }
 		void OUTANALOG(analog_output_t &out, const nl_double val) { out.set_Q(val); }
 
-	#if (NL_KEEP_STATISTICS)
 		/* stats */
-		plib::ticks_t stat_total_time;
-		int_fast32_t stat_update_count;
-		int_fast32_t stat_call_count;
-	#endif
+		nperftime_t  m_stat_total_time;
+		nperfcount_t m_stat_call_count;
+		nperfcount_t m_stat_inc_active;
 
 	protected:
 
@@ -953,32 +962,16 @@ namespace netlist
 		virtual bool needs_update_after_param_change() const { return false; }
 
 	private:
-
-		#if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
+		bool m_hint_deactivate;
+	#if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
 		typedef void (core_device_t::*net_update_delegate)();
-		#elif ((NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF_CONV) || (NL_PMF_TYPE == NL_PMF_TYPE_INTERNAL))
+	#elif ((NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF_CONV) || (NL_PMF_TYPE == NL_PMF_TYPE_INTERNAL))
 		using net_update_delegate = MEMBER_ABI void (*)(core_device_t *);
-		#endif
+	#endif
 
 	#if (NL_PMF_TYPE > NL_PMF_TYPE_VIRTUAL)
 		net_update_delegate m_static_update;
 	#endif
-	};
-
-	// -----------------------------------------------------------------------------
-	// param_ref_t
-	// -----------------------------------------------------------------------------
-
-	struct param_ref_t
-	{
-		param_ref_t(const pstring name, core_device_t &device, param_t &param)
-		: m_name(name)
-		, m_device(device)
-		, m_param(param)
-		{ }
-		pstring m_name;
-		core_device_t &m_device;
-		param_t &m_param;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1071,8 +1064,9 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 
 
-	class netlist_t : public plib::plog_dispatch_intf //, public device_owner_t
+	class netlist_t : public plib::plog_dispatch_intf
 	{
+		friend class setup_t;
 		P_PREVENT_COPYING(netlist_t)
 	public:
 
@@ -1097,12 +1091,13 @@ namespace netlist
 		void process_queue(const netlist_time &delta);
 		void abort_current_queue_slice() { m_queue.retime(m_time, nullptr); }
 
-		bool use_deactivate() const { return m_use_deactivate; }
-
 		void rebuild_lists(); /* must be called after post_load ! */
 
 		void set_setup(setup_t *asetup) { m_setup = asetup;  }
 		setup_t &setup() { return *m_setup; }
+
+
+		void register_dev(plib::owned_ptr<device_t> dev);
 
 		net_t *find_net(const pstring &name);
 
@@ -1165,22 +1160,21 @@ namespace netlist
 		/* sole use is to manage lifetime of family objects */
 		std::vector<std::pair<pstring, std::unique_ptr<logic_family_desc_t>>> m_family_cache;
 
-protected:
+	protected:
 
-	#if (NL_KEEP_STATISTICS)
 		// performance
-		int m_perf_out_processed;
-		int m_perf_inp_processed;
-		int m_perf_inp_active;
-	#endif
+		nperfcount_t m_perf_out_processed;
+		nperfcount_t m_perf_inp_processed;
+		nperfcount_t m_perf_inp_active;
 
 	private:
 		plib::state_manager_t 		m_state;
 		/* mostly rw */
 		netlist_time                m_time;
 		queue_t                     m_queue;
-		/* mostly rw */
-		bool                        m_use_deactivate;
+
+		nperftime_t					m_stat_mainloop;
+		/* mostly ro */
 
 		devices::NETLIB_NAME(mainclock) *    m_mainclock;
 		devices::NETLIB_NAME(solver) *       m_solver;
