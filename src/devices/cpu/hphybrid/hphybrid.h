@@ -127,8 +127,7 @@ protected:
 				AEC_CASE_A,     // Instr. fetches, non-base page fetches of link pointers, BPC direct non-base page accesses
 				AEC_CASE_B,     // Base page fetches of link pointers, BPC direct base page accesses
 				AEC_CASE_C,     // IOC, EMC & BPC indirect final destination accesses
-				AEC_CASE_D,     // DMA accesses
-				AEC_CASE_I      // Interrupt vector fetches
+				AEC_CASE_D      // DMA accesses
 		} aec_cases_t;
 
 		// do memory address extension
