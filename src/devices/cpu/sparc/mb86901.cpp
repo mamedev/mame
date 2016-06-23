@@ -22,8 +22,6 @@
 #include "sparc.h"
 #include "sparcdefs.h"
 
-#define SPARCV8		(0)
-
 const device_type MB86901 = &device_creator<mb86901_device>;
 
 const int mb86901_device::NWINDOWS = 7;
@@ -510,6 +508,10 @@ void mb86901_device::execute_set_input(int inputnum, int state)
 }
 
 
+#if SPARCV8
+#include "sparcv8ops.ipp"
+#endif
+
 //-------------------------------------------------
 //  execute_add - execute an add-type opcode
 //-------------------------------------------------
@@ -541,16 +543,16 @@ void mb86901_device::execute_add(UINT32 op)
 	UINT32 operand2 = USEIMM ? SIMM13 : RS2REG;
 
 	UINT32 result = 0;
-	if (OP3 == 0 || OP3 == 16)
+	if (ADD || ADDCC)
 		result = RS1REG + operand2;
-	else if (OP3 == 8 || OP3 == 24)
+	else if (ADDX || ADDXCC)
 		result = RS1REG + operand2 + ICC_C;
 
 
 	if (RD != 0)
 		RDREG = result;
 
-	if (OP3 & 16)
+	if (ADDCC || ADDXCC)
 	{
 		CLEAR_ICC;
 		PSR |= (BIT31(result)) ? PSR_N_MASK : 0;
@@ -603,7 +605,7 @@ void mb86901_device::execute_taddcc(UINT32 op)
 	              (!BIT31(RS1REG) && !BIT31(operand2) && BIT31(result)) ||
 	              ((RS1REG & 3) != 0 || (RS1REG & 3) != 0) ? true : false;
 
-	if (OP3 == 34 && temp_v)
+	if (TADDCCTV && temp_v)
 	{
 		m_trap = 1;
 		m_tag_overflow = true;
@@ -655,15 +657,15 @@ void mb86901_device::execute_sub(UINT32 op)
 	UINT32 operand2 = USEIMM ? SIMM13 : RS2REG;
 
 	UINT32 result = 0;
-	if (OP3 == 4 || OP3 == 20)
+	if (SUB || SUBCC)
 		result = RS1REG - operand2;
-	else if (OP3 == 12 || OP3 == 28)
+	else if (SUBX || SUBXCC)
 		result = RS1REG - operand2 - ICC_C;
 
 	if (RD != 0)
 		RDREG = result;
 
-	if (OP3 & 16)
+	if (SUBCC || SUBXCC)
 	{
 		CLEAR_ICC;
 		PSR |= (BIT31(result)) ? PSR_N_MASK : 0;
@@ -717,7 +719,7 @@ void mb86901_device::execute_tsubcc(UINT32 op)
 	              (!BIT31(RS1REG) && BIT31(operand2) && BIT31(result)) ||
 	              ((RS1REG & 3) != 0 || (RS1REG & 3) != 0) ? true : false;
 
-	if (OP3 == 35 && temp_v)
+	if (TSUBCCTV && temp_v)
 	{
 		m_trap = 1;
 		m_tag_overflow = 1;
@@ -771,31 +773,36 @@ void mb86901_device::execute_logical(UINT32 op)
 	UINT32 result = 0;
 	switch (OP3)
 	{
-		case 1:
-		case 17:
+		case OP3_AND:
+		case OP3_ANDCC:
 			result = RS1REG & operand2;
 			break;
-		case 5:
-		case 21:
+		case OP3_ANDN:
+		case OP3_ANDNCC:
 			result = RS1REG & ~operand2;
 			break;
-		case 2:  case 18:
+		case OP3_OR:
+		case OP3_ORCC:
 			result = RS1REG | operand2;
 			break;
-		case 6:  case 22:
+		case OP3_ORN:
+		case OP3_ORNCC:
 			result = RS1REG | ~operand2;
 			break;
-		case 3:  case 19:
+		case OP3_XOR:
+		case OP3_XORCC:
 			result = RS1REG ^ operand2;
 			break;
-		case 7:  case 23:
+		case OP3_XNOR:
+		case OP3_XNORCC:
 			result = RS1REG ^ ~operand2;
 			break;
 	}
 
-	if (RD != 0) RDREG = result;
+	if (RD != 0)
+		RDREG = result;
 
-	if (OP3 & 16)
+	if (ANDCC || ANDNCC || ORCC || ORNCC || XORCC || XNORCC)
 	{
 		CLEAR_ICC;
 		PSR |= (BIT31(result)) ? PSR_N_MASK : 0;
@@ -824,11 +831,11 @@ void mb86901_device::execute_shift(UINT32 op)
 	*/
 	UINT32 shift_count = USEIMM ? (SIMM13 & 31) : (RS2REG & 31);
 
-	if (OP3 == 37 && RD != 0)
+	if (SLL && RD != 0)
 		RDREG = RS1REG << shift_count;
-	else if (OP3 == 38 && RD != 0)
+	else if (SRL && RD != 0)
 		RDREG = UINT32(RS1REG) >> shift_count;
-	else if (OP3 == 39 && RD != 0)
+	else if (SRA && RD != 0)
 		RDREG = INT32(RS1REG) >> shift_count;
 }
 
@@ -907,7 +914,7 @@ void mb86901_device::execute_rdsr(UINT32 op)
 	);
 	*/
 
-	if (((OP3 == 41 || OP3 == 42 || OP3 == 43) || (OP3 == 40 && m_privileged_asr[RS1])) && IS_USER)
+	if (((WRPSR || WRWIM || WRTBR) || (WRASR && m_privileged_asr[RS1])) && IS_USER)
 	{
 		m_trap = 1;
 		m_privileged_instruction = 1;
@@ -919,14 +926,19 @@ void mb86901_device::execute_rdsr(UINT32 op)
 	}
 	else if (RD != 0)
 	{
-		switch (OP3)
+		if (RDASR)
 		{
-			case OP3_RDASR:
-				if (RS1 == 0)	RDREG = Y;	break;
-			case OP3_RDPSR:	RDREG = PSR;	break;
-			case OP3_RDWIM:	RDREG = WIM;	break;
-			case OP3_RDTBR:	RDREG = TBR;	break;
+			if (RS1 == 0)
+			{
+				RDREG = Y;
+			}
 		}
+		else if (RDPSR)
+			RDREG = PSR;
+		else if (RDWIM)
+			RDREG = WIM;
+		else if (RDTBR)
+			RDREG = TBR;
 	}
 }
 
@@ -985,11 +997,11 @@ void mb86901_device::execute_wrsr(UINT32 op)
 
 	UINT32 result = RS1REG ^ operand2;
 
-	if (OP3 == 48 && RD == 0)
+	if (WRASR && RD == 0)
 	{
 		Y = result;
 	}
-	else if (OP3 == 48)
+	else if (WRASR)
 	{
 		if (m_privileged_asr[RD] && IS_USER)
 		{
@@ -1006,7 +1018,7 @@ void mb86901_device::execute_wrsr(UINT32 op)
 			// SPARCv8
 		}
 	}
-	else if (OP3 == 49)
+	else if (WRPSR)
 	{
 		if (IS_USER)
 		{
@@ -1023,7 +1035,7 @@ void mb86901_device::execute_wrsr(UINT32 op)
 			PSR = result &~ PSR_ZERO_MASK;
 		}
 	}
-	else if (OP3 == 50)
+	else if (WRWIM)
 	{
 		if (IS_USER)
 		{
@@ -1035,7 +1047,7 @@ void mb86901_device::execute_wrsr(UINT32 op)
 			WIM = result & 0x7f;
 		}
 	}
-	else if (OP3 == 51)
+	else if (WRTBR)
 	{
 		if (IS_USER)
 		{
@@ -1182,7 +1194,7 @@ void mb86901_device::execute_saverestore(UINT32 op)
 	UINT32 operand2 = USEIMM ? SIMM13 : RS2REG;
 
 	UINT32 result = 0;
-	if (OP3 == OP3_SAVE)
+	if (SAVE)
 	{
 		UINT8 new_cwp = ((CWP + NWINDOWS) - 1) % NWINDOWS;
 		if ((WIM & (1 << new_cwp)) != 0)
@@ -1196,7 +1208,7 @@ void mb86901_device::execute_saverestore(UINT32 op)
 			CWP = new_cwp;
 		}
 	}
-	else if (OP3 == OP3_RESTORE)
+	else if (RESTORE)
 	{
 		UINT8 new_cwp = (CWP + 1) % NWINDOWS;
 		if ((WIM & (1 << new_cwp)) != 0)
@@ -1351,142 +1363,22 @@ void mb86901_device::execute_group2(UINT32 op)
 			break;
 
 #if SPARCV8
-		case OP3_UMUL:	// SPARCv8
-		{
-			UINT32 arg1 = RS1REG;
-			UINT32 arg2 = USEIMM ? SIMM13 : RS2REG;
-			UINT64 result = (UINT64)arg1 * (UINT64)arg2;
-			Y = (UINT32)(result >> 32);
-			SET_RDREG((UINT32)result);
+		case OP3_UMUL:
+		case OP3_SMUL:
+		case OP3_UMULCC:
+		case OP3_SMULCC:
+			execute_mul(op);
 			break;
-		}
-		case OP3_SMUL:	// SPARCv8
-		{
-			UINT32 arg1 = RS1REG;
-			UINT32 arg2 = USEIMM ? SIMM13 : RS2REG;
-			INT64 result = (INT64)(INT32)arg1 * (INT64)(INT32)arg2;
-			Y = (UINT32)((UINT64)result >> 32);
-			SET_RDREG((UINT32)result);
-			break;
-		}
-		case OP3_UDIV:	// SPARCv8
-		{
-			UINT32 arg1 = RS1REG;
-			UINT32 arg2 = USEIMM ? SIMM13 : RS2REG;
-			UINT64 dividend = ((UINT64)Y << 32) || arg1;
-			UINT32 divisor = arg2;
-			UINT64 quotient = dividend / divisor;
-			if (quotient > (0xffffffffL + (divisor - 1)))
-			{
-				quotient = 0xffffffff;
-			}
-			SET_RDREG((UINT32)quotient);
-			break;
-		}
-		case OP3_SDIV:	// SPARCv8
-		{
-			UINT32 arg1 = RS1REG;
-			UINT32 arg2 = USEIMM ? SIMM13 : RS2REG;
-			INT64 dividend = ((INT64)(INT32)Y << 32) || arg1;
-			INT32 divisor = arg2;
-			INT64 quotient = dividend / divisor;
-			if (quotient > 0)
-			{
-				INT32 absdivisor = (divisor < 0) ? -divisor : divisor;
-				if (quotient > (0x7fffffffL + (absdivisor - 1)))
-				{
-					quotient = 0x7fffffff;
-				}
-			}
-			else if (quotient < 0)
-			{
-				if (quotient < (INT64)0xffffffff80000000L)
-				{
-					quotient = 0x80000000;
-				}
-			}
-			SET_RDREG((UINT32)quotient);
-			break;
-		}
-		case OP3_UMULCC:	// SPARCv8
-		{
-			UINT32 arg1 = RS1REG;
-			UINT32 arg2 = USEIMM ? SIMM13 : RS2REG;
-			UINT64 result = (UINT64)arg1 * (UINT64)arg2;
-			Y = (UINT32)(result >> 32);
-			TEST_ICC_NZ(result);
-			SET_RDREG((UINT32)result);
-			break;
-		}
-		case OP3_SMULCC:	// SPARCv8
-		{
-			UINT32 arg1 = RS1REG;
-			UINT32 arg2 = USEIMM ? SIMM13 : RS2REG;
-			INT64 result = (INT64)(INT32)arg1 * (INT64)(INT32)arg2;
-			Y = (UINT32)((UINT64)result >> 32);
-			TEST_ICC_NZ(result);
-			SET_RDREG((UINT32)result);
-			break;
-		}
-		case OP3_UDIVCC:	// SPARCv8
-		{
-			UINT32 arg1 = RS1REG;
-			UINT32 arg2 = USEIMM ? SIMM13 : RS2REG;
-			UINT64 dividend = ((UINT64)Y << 32) || arg1;
-			UINT32 divisor = arg2;
-			UINT64 quotient = dividend / divisor;
 
-			bool v = false;
-			if (quotient > (0xffffffffL + (divisor - 1)))
-			{
-				quotient = 0xffffffff;
-				v = true;
-			}
-
-			TEST_ICC_NZ((UINT32)quotient);
-			if (v)
-				ICC_V_SET;
-
-			SET_RDREG((UINT32)quotient);
+		case OP3_UDIV:
+		case OP3_SDIV:
+		case OP3_UDIVCC:
+		case OP3_SDIVCC:
+			execute_div(op);
 			break;
-		}
-		case OP3_SDIVCC:	// SPARCv8
-		{
-			UINT32 arg1 = RS1REG;
-			UINT32 arg2 = USEIMM ? SIMM13 : RS2REG;
-			INT64 dividend = ((INT64)(INT32)Y << 32) || arg1;
-			INT32 divisor = arg2;
-			INT64 quotient = dividend / divisor;
 
-			bool v = false;
-			if (quotient > 0)
-			{
-				INT32 absdivisor = (divisor < 0) ? -divisor : divisor;
-				if (quotient > (0x7fffffffL + (absdivisor - 1)))
-				{
-					quotient = 0x7fffffff;
-					v = true;
-				}
-			}
-			else if (quotient < 0)
-			{
-				if (quotient < (INT64)0xffffffff80000000L)
-				{
-					quotient = 0x80000000;
-					v = true;
-				}
-			}
-
-			if (v)
-				ICC_V_SET;
-			TEST_ICC_NZ((UINT32)quotient);
-
-			SET_RDREG((UINT32)quotient);
-			break;
-		}
-		case OP3_CPOP1:		// SPARCv8
-			break;
-		case OP3_CPOP2:		// SPARCv8
+		case OP3_CPOP1:
+		case OP3_CPOP2:
 			break;
 #endif
 
@@ -2333,10 +2225,12 @@ void mb86901_device::execute_group3(UINT32 op)
 			execute_ldstub(op);
 			break;
 
-		case OP3_SWAP: // SPARCv8
+#if SPARCV8
+		case OP3_SWAP:
+		case OP3_SWAPA:
+			execute_swap(op);
 			break;
-		case OP3_SWAPA: // SPARCv8
-			break;
+#endif
 	}
 
 	if (MAE || HOLD_BUS)
@@ -2805,12 +2699,12 @@ void mb86901_device::dispatch_instruction(UINT32 op)
 		m_illegal_instruction = 1;
 
 	}
-	if (((OP == OP_ALU && (OP3 == OP3_FPOP1 || OP3 == OP3_FPOP2)) || (OP == OP_TYPE0 && OP2 == OP2_FBFCC)) && (!EF || !m_bp_fpu_present))
+	if (((OP == OP_ALU && (FPOP1 || FPOP2)) || (OP == OP_TYPE0 && OP2 == OP2_FBFCC)) && (!EF || !m_bp_fpu_present))
 	{
 		m_trap = 1;
 		m_fp_disabled = 1;
 	}
-	if (((OP == OP_ALU && (OP3 == OP3_CPOP1 || OP3 == OP3_CPOP2)) || (OP == OP_TYPE0 && OP2 == OP2_CBCCC)) && (!EC || !m_bp_cp_present))
+	if (((OP == OP_ALU && (CPOP1 || CPOP2)) || (OP == OP_TYPE0 && OP2 == OP2_CBCCC)) && (!EC || !m_bp_cp_present))
 	{
 		m_trap = 1;
 		m_cp_disabled = 1;
@@ -2924,7 +2818,7 @@ void mb86901_device::execute_step()
 			{
 				dispatch_instruction(op);
 
-				if (OP3 == OP3_FPOP1 || OP3 == OP3_FPOP2)
+				if (FPOP1 || FPOP2)
 				{
 					complete_fp_execution(op);
 				}

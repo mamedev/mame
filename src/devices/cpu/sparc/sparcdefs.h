@@ -319,7 +319,68 @@
 #define TICC	(OP3 == OP3_TICC)
 #define RETT	(OP3 == OP3_RETT)
 
+#define SWAP	(OP3 == OP3_SWAP)
+#define SWAPA	(OP3 == OP3_SWAPA)
+
+#define FPOP1	(OP3 == OP3_FPOP1)
+#define FPOP2	(OP3 == OP3_FPOP2)
+#define CPOP1	(OP3 == OP3_CPOP1)
+#define CPOP2	(OP3 == OP3_CPOP2)
+
 #define LDSTUB	(OP3 == OP3_LDSTUB)
 #define LDSTUBA	(OP3 == OP3_LDSTUBA)
+
+#define ADD		(OP3 == OP3_ADD)
+#define ADDX	(OP3 == OP3_ADDX)
+#define ADDCC	(OP3 == OP3_ADDCC)
+#define ADDXCC	(OP3 == OP3_ADDXCC)
+
+#define SUB		(OP3 == OP3_SUB)
+#define SUBX	(OP3 == OP3_SUBX)
+#define SUBCC	(OP3 == OP3_SUBCC)
+#define SUBXCC	(OP3 == OP3_SUBXCC)
+
+#define TADDCCTV	(OP3 == OP3_TADDCCTV)
+#define TSUBCCTV	(OP3 == OP3_TSUBCCTV)
+
+#define AND		(OP3 == OP3_AND)
+#define OR		(OP3 == OP3_OR)
+#define XOR		(OP3 == OP3_XOR)
+#define ANDN	(OP3 == OP3_ANDN)
+#define ORN		(OP3 == OP3_ORN)
+#define XNOR	(OP3 == OP3_XNOR)
+#define ANDCC	(OP3 == OP3_ANDCC)
+#define ORCC	(OP3 == OP3_ORCC)
+#define XORCC	(OP3 == OP3_XORCC)
+#define ANDNCC	(OP3 == OP3_ANDNCC)
+#define ORNCC	(OP3 == OP3_ORNCC)
+#define XNORCC	(OP3 == OP3_XNORCC)
+
+#define SLL		(OP3 == OP3_SLL)
+#define SRL		(OP3 == OP3_SRL)
+#define SRA		(OP3 == OP3_SRA)
+
+#define RDASR	(OP3 == OP3_RDASR)
+#define RDPSR	(OP3 == OP3_RDPSR)
+#define RDWIM	(OP3 == OP3_RDWIM)
+#define RDTBR	(OP3 == OP3_RDTBR)
+
+#define WRASR	(OP3 == OP3_WRASR)
+#define WRPSR	(OP3 == OP3_WRPSR)
+#define WRWIM	(OP3 == OP3_WRWIM)
+#define WRTBR	(OP3 == OP3_WRTBR)
+
+#define SAVE	(OP3 == OP3_SAVE)
+#define RESTORE	(OP3 == OP3_RESTORE)
+
+#define UMUL	(OP3 == OP3_UMUL)
+#define UMULCC	(OP3 == OP3_UMULCC)
+#define SMUL	(OP3 == OP3_SMUL)
+#define SMULCC	(OP3 == OP3_SMULCC)
+
+#define UDIV	(OP3 == OP3_UDIV)
+#define UDIVCC	(OP3 == OP3_UDIVCC)
+#define SDIV	(OP3 == OP3_SDIV)
+#define SDIVCC	(OP3 == OP3_SDIVCC)
 
 #endif // __MB86901_DEFS_H__
