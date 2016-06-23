@@ -668,7 +668,7 @@ if (subregdata_count[which] < 256)
 	{
 		case 0x40:
 			m_renderMode = value;
-			zeus_quad_size = (m_renderMode == 0) ? 10 : 14;
+			zeus_quad_size = (m_renderMode & 0x4) ? 14 : 10;
 			if (logit)
 				logerror("\tRender Mode = %06X", m_renderMode);
 			//printf("\tRender Mode = %06X\n", m_renderMode);
@@ -843,7 +843,7 @@ int zeus2_device::zeus2_fifo_process(const UINT32 *data, int numwords)
 		case 0x25:
 			if (log_fifo)
 				log_fifo_command(data, numwords, "\n");
-			zeus_quad_size = 14;
+			//zeus_quad_size = 14;
 			break;
 
 		/* 0x31: sync pipeline? (thegrid) */
@@ -852,7 +852,7 @@ int zeus2_device::zeus2_fifo_process(const UINT32 *data, int numwords)
 		case 0x32:
 			if (log_fifo)
 				log_fifo_command(data, numwords, "\n");
-			zeus_quad_size = 10;
+			//zeus_quad_size = 10;
 			break;
 
 		/* 0x38: direct render quad (crusnexo) */
@@ -964,9 +964,9 @@ void zeus2_device::zeus2_draw_model(UINT32 baseaddr, UINT16 count, int logit)
 
 					case 0x2d:  // atlantis
 						//texdata = m_renderRegs[0x14];
-						texdata = databuffer[1];
+						//texdata = databuffer[1];
 						//databuffer[1] = m_renderRegs[0x14];
-						databuffer[1] = 0;
+						//databuffer[1] = 0;
 						//poly->zeus2_draw_quad(&databuffer[1], texoffs, logit);
 						poly->zeus2_draw_quad(databuffer, texdata, logit);
 						break;
@@ -1007,7 +1007,6 @@ void zeus2_renderer::zeus2_draw_quad(const UINT32 *databuffer, UINT32 texdata, i
 	int i;
 	//  INT16 normal[3];
 	//  INT32 rotnormal[3];
-	int texmode = texdata & 0xffff;
 
 	if (logit)
 		m_state->logerror("quad %d\n", m_state->zeus_quad_size);
@@ -1066,8 +1065,9 @@ void zeus2_renderer::zeus2_draw_quad(const UINT32 *databuffer, UINT32 texdata, i
 	UINT32 renderMode = m_state->m_renderMode;
 	// Altantis rendermode: 0x024004 startup, then 0x020202, then 0x021E0E
 	/* extract raw x,y,z */
-	if (1 && ((renderMode == 0x024004) || (renderMode == 0x021E0E))) {
-		// Atlantis quad 14
+	if (m_state->zeus_quad_size==14) {
+			// Atlantis quad 14
+		texdata = databuffer[1];
 		vert[0].x = (INT16)databuffer[2];
 		vert[0].y = (INT16)databuffer[3];
 		vert[0].p[0] = (INT16)databuffer[4];
@@ -1150,6 +1150,7 @@ void zeus2_renderer::zeus2_draw_quad(const UINT32 *databuffer, UINT32 texdata, i
 	vert[3].p[1] = (UINT16)databuffer[7];
 	vert[3].p[2] = (UINT16)(databuffer[7] >> 16);
 	*/
+
 	for (i = 0; i < 4; i++)
 	{
 		float x = vert[i].x;
@@ -1213,6 +1214,7 @@ void zeus2_renderer::zeus2_draw_quad(const UINT32 *databuffer, UINT32 texdata, i
 	}
 
 	zeus2_poly_extra_data& extra = this->object_data_alloc();
+	int texmode = texdata & 0xffff;
 	switch (texmode)
 	{
 	//case 0x18e:     // atlantis
