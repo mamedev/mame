@@ -219,6 +219,7 @@ void cheat_parameter::save(emu_file &cheatfile) const
 	// iterate over items
 	else
 	{
+		cheatfile.printf(">\n");
 		for (auto &curitem : m_itemlist)
 			cheatfile.printf("\t\t\t<item value=\"%s\">%s</item>\n", curitem->value().format().c_str(), curitem->text());
 		cheatfile.printf("\t\t</parameter>\n");
@@ -300,7 +301,7 @@ bool cheat_parameter::set_next_state()
 			if (it->get()->value() == m_value)
 				break;
 		if (it != m_itemlist.end() && (++it != m_itemlist.end()))
-			m_value = (++it)->get()->value();
+			m_value = it->get()->value();
 	}
 
 	return (m_value != origvalue);
