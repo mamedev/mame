@@ -15,6 +15,8 @@
 class sparc_disassembler
 {
 public:
+	enum vis_level { vis_none, vis_1, vis_2, vis_2p, vis_3, vis_3b };
+
 	struct asi_desc
 	{
 		asi_desc() { }
@@ -43,9 +45,7 @@ public:
 	typedef std::map<UINT8, prftch_desc> prftch_desc_map;
 
 	sparc_disassembler(unsigned version);
-
-	void enable_vis1();
-	void enable_vis2();
+	sparc_disassembler(unsigned version, vis_level vis);
 
 	template <typename T> void add_state_reg_desc(const T &desc)
 	{
@@ -148,7 +148,7 @@ private:
 
 	struct vis_op_desc
 	{
-		enum arg { X, I, Fs, Fd };
+		enum arg { X, R, Fs, Fd };
 		vis_op_desc() { }
 		vis_op_desc(arg rs1_, arg rs2_, arg rd_, bool collapse_, const char *mnemonic_) : rs1(rs1_), rs2(rs2_), rd(rd_), collapse(collapse_), mnemonic(mnemonic_) { }
 		arg         rs1 = X;
@@ -218,9 +218,13 @@ private:
 	static const state_reg_desc_map::value_type VIS1_STATE_REG_DESC[];
 	static const asi_desc_map::value_type       VIS1_ASI_DESC[];
 	static const vis_op_desc_map::value_type    VIS2_OP_DESC[];
+	static const asi_desc_map::value_type       VIS2P_ASI_DESC[];
+	static const fpop1_desc_map::value_type     VIS3_FPOP1_DESC[];
+	static const vis_op_desc_map::value_type    VIS3_OP_DESC[];
+	static const vis_op_desc_map::value_type    VIS3B_OP_DESC[];
 
 	unsigned            m_version;
-	unsigned            m_vis_level;
+	vis_level           m_vis_level;
 	int                 m_op_field_width;
 	branch_desc         m_branch_desc[8];
 	int_op_desc_map     m_int_op_desc;
