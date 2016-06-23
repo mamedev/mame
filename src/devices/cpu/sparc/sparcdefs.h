@@ -102,11 +102,12 @@
 #define SIMM13	(INT32(op << 19) >> 19)
 #define SIMM11	(INT32(op << 21) >> 21)
 #define SIMM10	(INT32(op << 22) >> 22)
+#define SIMM8	(INT32(op << 24) >> 24)
 #define IMM7	(op & 0x7f)
 #define SIMM7	(INT32(op << 25) >> 25)
-#define SIMM8	(INT32(op << 24) >> 24)
 #define SHCNT32	(op & 31)
 #define SHCNT64 (op & 63)
+#define IAMODE  (op & 0x7)
 #define USEIMM	((op >> 13) & 1)
 #define USEEXT	((op >> 12) & 1)
 

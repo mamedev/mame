@@ -17,6 +17,8 @@ class sparc_disassembler
 public:
 	struct asi_desc
 	{
+		asi_desc() { }
+		asi_desc(const char *name_, const char *desc_) : name(name_), desc(desc_) { }
 		const char *name = nullptr;
 		const char *desc = nullptr;
 	};
@@ -24,14 +26,18 @@ public:
 
 	struct state_reg_desc
 	{
-		bool reserved = false;
-		const char *read_name = nullptr;
-		const char *write_name = nullptr;
+		state_reg_desc() { }
+		state_reg_desc(bool reserved_, const char *read_name_, const char *write_name_) : reserved(reserved_), read_name(read_name_), write_name(write_name_) { }
+		bool        reserved = false;
+		const char  *read_name = nullptr;
+		const char  *write_name = nullptr;
 	};
 	typedef std::map<UINT8, state_reg_desc> state_reg_desc_map;
 
 	struct prftch_desc
 	{
+		prftch_desc() { }
+		prftch_desc(const char *name_) : name(name_) { }
 		const char *name = nullptr;
 	};
 	typedef std::map<UINT8, prftch_desc> prftch_desc_map;
@@ -107,6 +113,8 @@ private:
 
 	struct fpop1_desc
 	{
+		fpop1_desc() { }
+		fpop1_desc(bool three_op_, bool rs1_shift_, bool rs2_shift_, bool rd_shift_, const char *mnemonic_) : three_op(three_op_), rs1_shift(rs1_shift_), rs2_shift(rs2_shift_), rd_shift(rd_shift_), mnemonic(mnemonic_) { }
 		bool        three_op = true;
 		bool        rs1_shift = false;
 		bool        rs2_shift = false;
@@ -117,6 +125,8 @@ private:
 
 	struct fpop2_desc
 	{
+		fpop2_desc() { }
+		fpop2_desc(bool int_rs1_, bool shift_, const char *mnemonic_) : int_rs1(int_rs1_), shift(shift_), mnemonic(mnemonic_) { }
 		bool        int_rs1 = false;
 		bool        shift = false;
 		const char  *mnemonic = nullptr;
@@ -125,6 +135,8 @@ private:
 
 	struct ldst_desc
 	{
+		ldst_desc() { }
+		ldst_desc(bool rd_first_, bool alternate_, char rd_alt_reg_, bool rd_shift_, const char *mnemonic_, const char *g0_synth_) : rd_first(rd_first_), alternate(alternate_), rd_alt_reg(rd_alt_reg_), rd_shift(rd_shift_), mnemonic(mnemonic_), g0_synth(g0_synth_) { }
 		bool        rd_first = false;
 		bool        alternate = false;
 		char        rd_alt_reg = '\0';
@@ -137,6 +149,8 @@ private:
 	struct vis_op_desc
 	{
 		enum arg { X, I, Fs, Fd };
+		vis_op_desc() { }
+		vis_op_desc(arg rs1_, arg rs2_, arg rd_, bool collapse_, const char *mnemonic_) : rs1(rs1_), rs2(rs2_), rd(rd_), collapse(collapse_), mnemonic(mnemonic_) { }
 		arg         rs1 = X;
 		arg         rs2 = X;
 		arg         rd = X;
@@ -206,6 +220,7 @@ private:
 	static const vis_op_desc_map::value_type    VIS2_OP_DESC[];
 
 	unsigned            m_version;
+	unsigned            m_vis_level;
 	int                 m_op_field_width;
 	branch_desc         m_branch_desc[8];
 	int_op_desc_map     m_int_op_desc;
@@ -217,9 +232,5 @@ private:
 	prftch_desc_map     m_prftch_desc;
 	vis_op_desc_map     m_vis_op_desc;
 };
-
-CPU_DISASSEMBLE( sparcv7 );
-CPU_DISASSEMBLE( sparcv8 );
-CPU_DISASSEMBLE( sparcv9 );
 
 #endif // MAME_DEVICES_CPU_SPARC_SPARC_DASM_H

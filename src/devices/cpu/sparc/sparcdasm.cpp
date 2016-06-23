@@ -479,6 +479,7 @@ inline void sparc_disassembler::print(char *&output, const char *fmt, ...)
 
 sparc_disassembler::sparc_disassembler(unsigned version)
 	: m_version(version)
+	, m_vis_level(0)
 	, m_op_field_width(9)
 	, m_branch_desc{
 		EMPTY_BRANCH_DESC,
@@ -537,6 +538,7 @@ sparc_disassembler::sparc_disassembler(unsigned version)
 
 void sparc_disassembler::enable_vis1()
 {
+	m_vis_level = std::max(m_vis_level, 1U);
 	m_op_field_width = std::max(m_op_field_width, 12);
 	add_vis_op_desc(VIS1_OP_DESC);
 	add_state_reg_desc(VIS1_STATE_REG_DESC);
@@ -547,6 +549,7 @@ void sparc_disassembler::enable_vis1()
 void sparc_disassembler::enable_vis2()
 {
 	enable_vis1();
+	m_vis_level = std::max(m_vis_level, 2U);
 	add_vis_op_desc(VIS2_OP_DESC);
 }
 
@@ -1052,7 +1055,7 @@ offs_t sparc_disassembler::dasm_fpop2(char *buf, offs_t pc, UINT32 op) const
 		case 1:  mnemonic = "fmovs"; shift = false; break;
 		case 2:  mnemonic = "fmovd"; shift = true; break;
 		case 3:  mnemonic = "fmovq"; shift = true; break;
-		default: mnemonic = nullptr;
+		default: mnemonic = nullptr; shift = false; break;
 		}
 		if (mnemonic)
 		{
@@ -1112,6 +1115,11 @@ offs_t sparc_disassembler::dasm_impdep1(char *buf, offs_t pc, UINT32 op) const
 			dasm_vis_arg(buf, args, it->second.rs2, RS2);
 		}
 		dasm_vis_arg(buf, args, it->second.rd, RD);
+		return 4 | DASMFLAG_SUPPORTED;
+	}
+	else if ((m_vis_level >= 2) && (OPF == 0x081))
+	{
+		print(buf, "%-*s0x%x", m_op_field_width, "siam", IAMODE);
 		return 4 | DASMFLAG_SUPPORTED;
 	}
 

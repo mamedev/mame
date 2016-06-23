@@ -1778,7 +1778,7 @@ void mb86901_device::execute_store(UINT32 op)
 			//byte_mask = 15;
 			data0 = REG(RD);
 		}
-		else if (STH or STHA)
+		else if (STH || STHA)
 		{
 			if ((address & 3) == 0)
 			{
@@ -1791,7 +1791,7 @@ void mb86901_device::execute_store(UINT32 op)
 				data0 = REG(RD);
 			}
 		}
-		else if (STB or STBA)
+		else if (STB || STBA)
 		{
 			if ((address & 3) == 0)
 			{
@@ -2029,7 +2029,7 @@ void mb86901_device::execute_load(UINT32 op)
 		}
 	}
 
-	UINT32 word0;
+	UINT32 word0(0);
 	if (!m_trap)
 	{
 		UINT32 data = read_sized_word(addr_space, address, (LD || LDD || LDA || LDDA) ? 4 : ((LDUH || LDSH || LDUHA || LDSHA) ? 2 : 1));
@@ -2193,7 +2193,7 @@ void mb86901_device::execute_ldstub(UINT32 op)
 		}
 	}
 
-	UINT32 data;
+	UINT32 data(0);
 	if (!m_trap)
 	{
 		while (m_pb_block_ldst_byte || m_pb_block_ldst_word)
@@ -2257,7 +2257,7 @@ void mb86901_device::execute_ldstub(UINT32 op)
 			{
 				word = (data >> 8) & 0xff;
 			}
-			else if ((address & 3) == 3)
+			else // if ((address & 3) == 3)
 			{
 				word = data & 0xff;
 			}
