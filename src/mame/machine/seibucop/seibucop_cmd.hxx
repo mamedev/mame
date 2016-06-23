@@ -20,10 +20,13 @@
 00 - 0105 ( 00) (  105) :  (180, 2e0, 0a0, 000, 000, 000, 000, 000)  6     fffb   (zeroteamsr)
 */
 void raiden2cop_device::execute_0205(int offset, UINT16 data)
-{
+{	
 	int ppos =        m_host_space->read_dword(cop_regs[0] + 0x04 + offset * 4);
 	int npos = ppos + m_host_space->read_dword(cop_regs[0] + 0x10 + offset * 4);
 	int delta = (npos >> 16) - (ppos >> 16);
+#if LOG_Move0205
+	// ...
+#endif
 	m_host_space->write_dword(cop_regs[0] + 4 + offset * 4, npos);
 	cop_write_word(cop_regs[0] + 0x1e + offset * 4, cop_read_word(cop_regs[0] + 0x1e + offset * 4) + delta);
 }
@@ -38,6 +41,10 @@ void raiden2cop_device::execute_0205(int offset, UINT16 data)
 
 void raiden2cop_device::execute_0904(int offset, UINT16 data)
 {
+#if LOG_Move0905
+	printf("cmd %04x: %08x %08x [%08x]\n",data, m_host_space->read_dword(cop_regs[0] + 16 + offset * 4),m_host_space->read_dword(cop_regs[0] + 0x28 + offset * 4),cop_regs[0]);
+#endif
+	
 	if (data&0x0001)
 		m_host_space->write_dword(cop_regs[0] + 16 + offset * 4, m_host_space->read_dword(cop_regs[0] + 16 + offset * 4) + m_host_space->read_dword(cop_regs[0] + 0x28 + offset * 4));
 	else /* X Se Dae and Zero Team uses this variant */
@@ -57,7 +64,7 @@ void raiden2cop_device::execute_0904(int offset, UINT16 data)
 // triggered with 130e, 138e
 void raiden2cop_device::execute_130e(int offset, UINT16 data)
 {
-	// this can't be right
+	// this can't be right, or bits 15-12 from mask have different meaning ...
 	execute_338e(offset, data);
 }
 
@@ -155,7 +162,7 @@ void raiden2cop_device::execute_338e(int offset, UINT16 data)
 	}
 
 #if LOG_Phytagoras
-	printf("cmd %04x: dx = %d dy = %d angle = %02x\n",data,dx,dy,cop_angle);
+	printf("cmd %04x: dx = %d dy = %d angle = %02x %04x\n",data,dx,dy,cop_angle);
 #endif
 
 	if (data & 0x0080) {
@@ -299,7 +306,7 @@ void raiden2cop_device::execute_6200(int offset, UINT16 data)
 	}
 
 	cop_write_word(cop_regs[primary_reg], flags);
-
+	
 	if (!m_host_endian)
 		cop_write_byte(cop_regs[primary_reg] + primary_offset, angle);
 	else // angle is a byte, but grainbow (cave mid-boss) is only happy with write-word, could be more endian weirdness, or it always writes a word?

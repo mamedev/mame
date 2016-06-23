@@ -13,20 +13,17 @@
 #define LOG_Commands 	0
 #define LOG_Phytagoras 	0
 #define LOG_Division  	0
+#define LOG_Move0205    0
+#define LOG_Move0905    0
 
 #define MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(_devcb) \
 	devcb = &raiden2cop_device::set_m_videoramout_cb(*device, DEVCB_##_devcb);
 
-#define MCFG_CPU_IS_68K(value) \
-	raiden2cop_device::set_cpu_is_68k(*device, value);
-
 #define MCFG_RAIDEN2COP_ADD(_tag ) \
-	MCFG_DEVICE_ADD(_tag, RAIDEN2COP, 0) \
-	MCFG_CPU_IS_68K(0)
+	MCFG_DEVICE_ADD(_tag, RAIDEN2COP, 0)
 
 #define MCFG_LEGIONNACOP_ADD(_tag ) \
-	MCFG_DEVICE_ADD(_tag, RAIDEN2COP, 0) \
-	MCFG_CPU_IS_68K(1)
+	MCFG_DEVICE_ADD(_tag, RAIDEN2COP, 0)
 
 
 class raiden2cop_device : public device_t

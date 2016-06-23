@@ -30,13 +30,19 @@
  - (fixed) player walks on spot on stage clear;
  - several enemies seems to not like a missing min/max range limit for a specific operation? 
    (when i.e. first boss goes to bottom of the screen and become unreachable)
+ - (btanb) Throw is made by quickly double jumping (!)    
  heated barrel
  - gives random value to hi-score if you continue (only the first time, not a bug?);
  - (fixed?) throws random address exceptions at level 3 and above, a RAM address arrives corrupt in the snippet at 0x136a;
  - (fixed?) some corrupt sprites, probably a non-fatal version of the one above;
  - stage 2 boss attacks only in vertical (regressed with the 130e / 3b30 / 42c2 command merge);
  - (fixed) level 3+ boss movements looks wrong;
- - missiles doesn't seem to like our 6200 hookup here;
+ - stage 3 "homing" missiles doesn't seem to like our 6200 hookup here, except it's NOT 6200!?
+ sd gundam
+ - stage 3 mid-boss still has the sprite garbage bug;
+ - stage 4: has sprite stuck on bottom-left of screen;
+ - palette dims too much on attract / continue screen. 
+   It's known that the DMA data arrangement gives same results on a real Legionnaire board, so shrug
  
  
   Tech notes:
@@ -331,7 +337,7 @@ WRITE16_MEMBER(raiden2cop_device::cop_pgm_data_w)
 				logerror("addmem16 (r%x)\n", reg);
 			break;
 		default:
-			logerror("?\n");
+			logerror("? %x(r%x)\n",off,reg);
 			break;
 		}
 	}
