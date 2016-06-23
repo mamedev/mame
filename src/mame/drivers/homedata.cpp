@@ -9,7 +9,7 @@ driver by Phil Stroffolino and Nicola Salmoria
 
 *1987 X77 Mahjong Hourouki Part1 -Seisyun Hen-
 *1987 X72 Mahjong Hourouki Gaiden
- 1988     Mahjong Joshi Pro-wres -Give up 5 byou mae-
+*1988 X73 Mahjong Joshi Pro-wres -Give up 5 byou mae-
 *1988 A74 Mahjong Hourouki Okite
 *1988 X80 Mahjong Clinic
 *1988 M81 Mahjong Rokumeikan
@@ -145,6 +145,18 @@ Board:  X73-PWB-A(C)
 CPU:    6809 uPC324C
 Sound:  SN76489
 OSC:    16.000MHz 9.000MHz
+
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+Mahjong Joshi Pro-wres -Give up 5 byou mae-
+(c)1988 HOME DATA
+
+Board:  X73-PWB-A(C)
+
+CPU:    6809 uPC324C
+Sound:  SN76489
+OSC:    16.000MHz 9.000MHz
+ROM:	28 pin mask rom devices are 1mbit, 32 pin are 2mbit.
 
 ----------------------------------------------------------------------------
 Mahjong Vitamin C
@@ -955,6 +967,38 @@ static INPUT_PORTS_START( pteacher )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_INCLUDE( mj_keyboard )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mjjoship )
+	PORT_INCLUDE( pteacher )
+	
+	PORT_MODIFY("DSW")
+	// SW1
+	PORT_DIPNAME( 0x0001, 0x0000, "Attract Sound" )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(	0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x0000, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW1:4" )
+        PORT_DIPNAME( 0x0010, 0x0010, "Player Start Score" )	PORT_DIPLOCATION("SW1:5")
+        PORT_DIPSETTING(	0x0010, "1000" )
+        PORT_DIPSETTING(	0x0000, "2000" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW1:7" )
+        PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:8")
+        PORT_DIPSETTING(	0x0080, DEF_STR( Off ) )
+        PORT_DIPSETTING(	0x0000, DEF_STR( On ) )
+	
+	// SW2
+        PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SW2:1" )
+        PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW2:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW2:3" )
+        PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SW2:5" )
+        PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW2:7" )
+        PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "SW2:8" )
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lemnangl )
@@ -1779,6 +1823,39 @@ ROM_START( mjkojink )
 	ROM_LOAD( "x83b03.12e", 0x0000, 0x40000, CRC(4ba8b5ec) SHA1(cee77583f2f7b7fdba7e0f17e4d1244891488d36) )
 ROM_END
 
+ROM_START( mjjoship )
+        ROM_REGION( 0x01c000, "maincpu", 0 ) /* 6809 Code */
+        ROM_LOAD( "X73_L01.16E", 0x010000, 0xc000, CRC(df950025) SHA1(3dc22c0a8cf03cff7310fbff36f83804019a5337) )
+        ROM_CONTINUE(           0x00c000, 0x4000             )
+
+        ROM_REGION( 0x40000, "audiocpu", 0) /* uPD7807 code */
+        ROM_LOAD( "X73_B02.9G",  0x00000, 0x20000, CRC(6b01503b) SHA1(2e1575dac0b9b7c7233a3b8262a99a10e24ec813) )
+	ROM_RELOAD(             0x20000, 0x20000 )
+
+        ROM_REGION( 0x80000, "gfx1", 0 )
+        ROM_LOAD32_BYTE( "X73A14.1F",  0, 0x20000, CRC(42f429a5) SHA1(41f64258a65b56f818f8a6ecddab606d0bdc11ab) )
+        ROM_LOAD32_BYTE( "X73A15.3F",  1, 0x20000, CRC(2d827236) SHA1(d392dc64f136fd2ef19a2874758ad7804741882a) )
+	ROM_IGNORE( 0x20000 )
+        ROM_LOAD32_BYTE( "X73A16.4F",  2, 0x20000, CRC(c606cd02) SHA1(d316f11ad56359c8ae74858a84b373dd06934888) )
+	ROM_IGNORE( 0x20000 )
+        ROM_LOAD32_BYTE( "X73A17.6F",  3, 0x20000, CRC(2c0fdbc9) SHA1(3ae5b590db4705deeaeff93680a10ca980e6264f) )
+	ROM_IGNORE( 0x20000 )
+
+        ROM_REGION( 0x100000, "gfx2", 0 )
+        ROM_LOAD32_BYTE( "X73A10.1C",  0, 0x40000, CRC(e6663a99) SHA1(361503c16e32977c8f6b9c5ff981002ac0f97426) )
+        ROM_LOAD32_BYTE( "X73A11.3C",  1, 0x40000, CRC(d8a35ebe) SHA1(b6e12db38ddd6dcefa8335b92c0a6e269a6a1e9a) )
+        ROM_LOAD32_BYTE( "X73A12.4C",  2, 0x40000, CRC(f3b6ad98) SHA1(d91eeffd18684300809c99fa93d4ac0188530ff7) )
+        ROM_LOAD32_BYTE( "X73A13.6C",  3, 0x40000, CRC(30ff8c5f) SHA1(e51d89f6b5db0d8e2c22a046337993f962f6ba8c) )
+
+        ROM_REGION( 0x010000, "proms", 0 )  /* static palette */
+        ROM_LOAD16_BYTE( "X73_C19.4K", 0x00000, 0x8000, CRC(f4bdce8a) SHA1(e3168d6aa6f8cd24b497706a117c77353d1c6ef3) )
+        ROM_LOAD16_BYTE( "X73_C18.3K", 0x00001, 0x8000, CRC(1ab265cc) SHA1(24dced438a28ea9eb2f06c8859c5c07f4d975bfd) )
+
+        ROM_REGION( 0x20000, "user1", 0 ) /* blitter data */
+        ROM_LOAD( "X73A03.12E", 0x0000, 0x20000, CRC(fd32eb8c) SHA1(584afb1ed2da776a4ff9c0b9eb2906c914b28928) )
+ROM_END
+
+
 ROM_START( vitaminc )
 	ROM_REGION( 0x01c000, "maincpu", 0 ) /* 6809 Code */
 	ROM_LOAD( "x90e01.bin", 0x010000, 0xc000, CRC(bc982525) SHA1(30f5e9ab27f799b895a3d979109e331603d94249) )
@@ -2041,6 +2118,7 @@ GAME( 1988, mrokumei, 0, mrokumei, mjhokite, driver_device,  0,          ROT0, "
 GAME( 1988, reikaids, 0, reikaids, reikaids, homedata_state, reikaids,   ROT0, "Home Data", "Reikai Doushi (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, battlcry, 0, reikaids, battlcry, homedata_state, battlcry,   ROT0, "Home Data", "Battlecry", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjkojink, 0, pteacher, pteacher, driver_device,  0,          ROT0, "Home Data", "Mahjong Kojinkyouju (Private Teacher) (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mjjoship, 0, pteacher, mjjoship, driver_device,  0,          ROT0, "Home Data", "Mahjong Joshi Pro-wres -Give up 5 byou mae- (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, vitaminc, 0, pteacher, pteacher, driver_device,  0,          ROT0, "Home Data", "Mahjong Vitamin C (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjyougo,  0, pteacher, pteacher, driver_device,  0,          ROT0, "Home Data", "Mahjong-yougo no Kisotairyoku (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mjkinjas, 0, mjkinjas, pteacher, driver_device,  0,          ROT0, "Home Data", "Mahjong Kinjirareta Asobi (Japan)", MACHINE_SUPPORTS_SAVE )
