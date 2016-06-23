@@ -1094,10 +1094,10 @@ void zeus2_renderer::zeus2_draw_quad(const UINT32 *databuffer, UINT32 texdata, i
 
 		// buffer 10-13 ???? 00000000 1FF7FC00 00000000 1FF7FC00 -- quad 14
 		/* extract the translation point from the raw data */
-		//m_state->zeus_point[0] = m_state->convert_float(databuffer[11]);
-		//m_state->zeus_point[1] = m_state->convert_float(databuffer[12]);
-		//m_state->zeus_point[2] = m_state->convert_float(databuffer[13]);
-		// 10???
+		m_state->zeus_point[0] = m_state->convert_float(databuffer[10]);
+		m_state->zeus_point[1] = m_state->convert_float(databuffer[11]);
+		m_state->zeus_point[2] = m_state->convert_float(databuffer[12]);
+		// 13???
 	}
 	else {
 		//printf("renderMode: %06X\n", m_state->m_renderMode);
@@ -1215,58 +1215,72 @@ void zeus2_renderer::zeus2_draw_quad(const UINT32 *databuffer, UINT32 texdata, i
 
 	zeus2_poly_extra_data& extra = this->object_data_alloc();
 	int texmode = texdata & 0xffff;
-	switch (texmode)
+	// Just a guess but seems to work
+	switch ((texmode >> 2) & 3)
 	{
-	//case 0x18e:     // atlantis
-	//	extra.texwidth = 512;
-	//	break;
-
-	case 0x14d:     // atlantis
-	case 0x18e:     // atlantis
-	case 0x01d:     /* crusnexo: RHS of score bar */
-	case 0x05d:     /* crusnexo: background, road */
-	case 0x0dd:     /* crusnexo: license plate letters */
-	case 0x11d:     /* crusnexo: LHS of score bar */
-	case 0x15d:     /* crusnexo */
-	case 0x85d:     /* crusnexo */
-	case 0x95d:     /* crusnexo */
-	case 0xc1d:     /* crusnexo */
-	case 0xc5d:     /* crusnexo */
+	case 3:
 		extra.texwidth = 256;
 		break;
-
-	case 0x18a:     // atlantis
-	case 0x059:     /* crusnexo */
-	case 0x0d9:     /* crusnexo */
-	case 0x119:     /* crusnexo: license plates */
-	case 0x159:     /* crusnexo */
+	case 2:
 		extra.texwidth = 128;
 		break;
-
-	case 0x055:     /* crusnexo */
-	case 0x145:     // atlantis
-	case 0x155:     /* crusnexo */
+	case 1:
 		extra.texwidth = 64;
 		break;
-
-	case 0x000:     // thegrid guess
-	case 0x120:     // thegrid guess
-	case 0x140:     // atlantis
-	case 0x141:     // atlantis
+	case 0:
+	default:
 		extra.texwidth = 32;
 		break;
+	}
 
-	default:
-	{
-		static UINT8 hits[0x10000];
-		if (!hits[(texdata & 0xffff)])
-		{
-			hits[(texdata & 0xffff)] = 1;
-			printf("texMode = %04X\n", (texdata & 0xffff));
-		}
-		break;
-	}
-	}
+	//switch (texmode)
+	//{
+	//case 0x14d:     // atlantis
+	//case 0x18e:     // atlantis
+	//case 0x01d:     /* crusnexo: RHS of score bar */
+	//case 0x05d:     /* crusnexo: background, road */
+	//case 0x0dd:     /* crusnexo: license plate letters */
+	//case 0x11d:     /* crusnexo: LHS of score bar */
+	//case 0x15d:     /* crusnexo */
+	//case 0x85d:     /* crusnexo */
+	//case 0x95d:     /* crusnexo */
+	//case 0xc1d:     /* crusnexo */
+	//case 0xc5d:     /* crusnexo */
+	//	extra.texwidth = 256;
+	//	break;
+
+	//case 0x18a:     // atlantis
+	//case 0x059:     /* crusnexo */
+	//case 0x0d9:     /* crusnexo */
+	//case 0x119:     /* crusnexo: license plates */
+	//case 0x159:     /* crusnexo */
+	//	extra.texwidth = 128;
+	//	break;
+
+	//case 0x055:     /* crusnexo */
+	//case 0x145:     // atlantis
+	//case 0x155:     /* crusnexo */
+	//	extra.texwidth = 64;
+	//	break;
+
+	//case 0x000:     // thegrid guess
+	//case 0x120:     // thegrid guess
+	//case 0x140:     // atlantis
+	//case 0x141:     // atlantis
+	//	extra.texwidth = 32;
+	//	break;
+
+	//default:
+	//{
+	//	static UINT8 hits[0x10000];
+	//	if (!hits[(texdata & 0xffff)])
+	//	{
+	//		hits[(texdata & 0xffff)] = 1;
+	//		printf("texMode = %04X\n", (texdata & 0xffff));
+	//	}
+	//	break;
+	//}
+	//}
 
 	extra.solidcolor = 0;//m_zeusbase[0x00] & 0x7fff;
 	extra.zoffset = 0;//m_zeusbase[0x7e] >> 16;
