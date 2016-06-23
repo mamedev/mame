@@ -1200,6 +1200,7 @@ offs_t sparc_disassembler::dasm_ldst(char *buf, offs_t pc, UINT32 op) const
 				print(buf, "%-*s%%fsr,[", m_op_field_width, (RD == 1) ? "stx" : "st");
 				dasm_address(buf, op);
 				*buf++ = ']';
+				*buf = '\0';
 				return 4 | DASMFLAG_SUPPORTED;
 			}
 			break;
@@ -1236,7 +1237,7 @@ offs_t sparc_disassembler::dasm_ldst(char *buf, offs_t pc, UINT32 op) const
 				if (OP3 == 0x3d) dasm_asi(buf, op);
 				const auto it(m_prftch_desc.find(RD));
 				if (it != m_prftch_desc.end())  print(buf, ",%s", it->second.name);
-				else                                print(buf, ",0x%02x", RD);
+				else                            print(buf, ",0x%02x", RD);
 				if (OP3 == 0x3d) dasm_asi_comment(buf, op);
 			}
 			return 4 | DASMFLAG_SUPPORTED;
@@ -1257,12 +1258,14 @@ offs_t sparc_disassembler::dasm_ldst(char *buf, offs_t pc, UINT32 op) const
 			print(buf, "%-*s%%%csr,[", m_op_field_width, "st", (OP3 == 0x35) ? 'c' : 'f');
 			dasm_address(buf, op);
 			*buf++ = ']';
+			*buf = '\0';
 			return 4 | DASMFLAG_SUPPORTED;
 		case 0x26: // Store Floating-point deferred-trap Queue
 		case 0x36: // Store Coprocessor deferred-trap Queue
 			print(buf, "%-*s%%%cq,[", m_op_field_width, "std", (OP3 == 0x36) ? 'c' : 'f');
 			dasm_address(buf, op);
 			*buf++ = ']';
+			*buf = '\0';
 			return 4 | DASMFLAG_SUPPORTED;
 		}
 	}
@@ -1279,6 +1282,7 @@ offs_t sparc_disassembler::dasm_ldst(char *buf, offs_t pc, UINT32 op) const
 		print(buf, "%-*s[", m_op_field_width, it->second.g0_synth);
 		dasm_address(buf, op);
 		*buf++ = ']';
+		*buf = '\0';
 		if (it->second.alternate)
 		{
 			dasm_asi(buf, op);
@@ -1296,6 +1300,7 @@ offs_t sparc_disassembler::dasm_ldst(char *buf, offs_t pc, UINT32 op) const
 		*buf++ = '[';
 		dasm_address(buf, op);
 		*buf++ = ']';
+		*buf = '\0';
 		if (it->second.alternate) dasm_asi(buf, op);
 		if (!it->second.rd_first)
 		{
