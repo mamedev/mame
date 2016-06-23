@@ -5967,7 +5967,7 @@ DRIVER_INIT_MEMBER(model2_state,sgt24h)
 {
 //  DRIVER_INIT_CALL(genprot);
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x01a10000, 0x01a1ffff, read32_delegate(FUNC(model2_state::jaleco_network_r),this), write32_delegate(FUNC(model2_state::jaleco_network_w),this));
+	//m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x01a10000, 0x01a1ffff, read32_delegate(FUNC(model2_state::jaleco_network_r),this), write32_delegate(FUNC(model2_state::jaleco_network_w),this));
 
 	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
 	ROM[0x56578/4] = 0x08000004;
@@ -5976,7 +5976,7 @@ DRIVER_INIT_MEMBER(model2_state,sgt24h)
 
 DRIVER_INIT_MEMBER(model2_state,overrev)
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x01a10000, 0x01a1ffff, read32_delegate(FUNC(model2_state::jaleco_network_r),this), write32_delegate(FUNC(model2_state::jaleco_network_w),this));
+	//m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x01a10000, 0x01a1ffff, read32_delegate(FUNC(model2_state::jaleco_network_r),this), write32_delegate(FUNC(model2_state::jaleco_network_w),this));
 }
 
 
