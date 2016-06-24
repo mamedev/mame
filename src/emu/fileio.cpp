@@ -89,9 +89,6 @@ file_enumerator::file_enumerator(const char *searchpath)
 
 file_enumerator::~file_enumerator()
 {
-	// close anything open
-	if (m_curdir != nullptr)
-		delete m_curdir;
 }
 
 
@@ -106,7 +103,7 @@ const osd::directory::entry *file_enumerator::next()
 	while (1)
 	{
 		// if no open directory, get the next path
-		while (m_curdir == nullptr)
+		while (!m_curdir)
 		{
 			// if we fail to get anything more, we're done
 			if (!m_iterator.next(m_pathbuffer))
@@ -122,8 +119,7 @@ const osd::directory::entry *file_enumerator::next()
 			return result;
 
 		// we're done; close this directory
-		delete m_curdir;
-		m_curdir = nullptr;
+		m_curdir.reset();
 	}
 }
 

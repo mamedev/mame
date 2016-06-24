@@ -381,9 +381,11 @@ std::unique_ptr<osd::directory::entry> osd_stat(const std::string &path)
 
 	// create an osd::directory::entry; be sure to make sure that the caller can
 	// free all resources by just freeing the resulting osd::directory::entry
-	osd::directory::entry *result = (osd::directory::entry *) ::operator new(sizeof(*result) + path.length() + 1);
-	if (!result)
-		return nullptr;
+	osd::directory::entry *result;
+	try { result = reinterpret_cast<osd::directory::entry *>(::operator new(sizeof(*result) + path.length() + 1)); }
+	catch (...) { return nullptr; }
+	new (result) osd::directory::entry;
+
 	strcpy(((char *) result) + sizeof(*result), path.c_str());
 	result->name = ((char *) result) + sizeof(*result);
 	result->type = win_attributes_to_entry_type(find_data.dwFileAttributes);

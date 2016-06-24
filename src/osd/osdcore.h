@@ -21,11 +21,11 @@
 
 #include "osdcomm.h"
 
+#include <chrono>
 #include <cstdarg>
 #include <cstdint>
 #include <memory>
 #include <string>
-#include <chrono>
 
 
 /***************************************************************************
@@ -304,6 +304,8 @@ namespace osd
 	class directory
 	{
 	public:
+		typedef std::unique_ptr<directory> ptr;
+
 		// osd::directory::entry contains basic information about a file when iterating through
 		// a directory
 		class entry
@@ -319,7 +321,7 @@ namespace osd
 
 			const char *							name;           // name of the entry
 			entry_type								type;           // type of the entry
-			UINT64									size;           // size of the entry
+			std::uint64_t							size;           // size of the entry
 			std::chrono::system_clock::time_point	last_modified;	// last modified time
 		};
 
@@ -336,7 +338,7 @@ namespace osd
 		// which contains opaque data necessary to traverse the directory; on
 		// failure, this function should return nullptr
 		// -----------------------------------------------------------------------------
-		static directory *open(const char *dirname);
+		static ptr open(std::string const &dirname);
 
 		// -----------------------------------------------------------------------------
 		// osd::directory::~directory: close an open directory

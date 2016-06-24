@@ -115,8 +115,8 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 							directory_path += "/" + file_directory;
 						}
 
-						osd::directory *directory = osd::directory::open(directory_path.c_str());
-						if (directory != nullptr)
+						osd::directory::ptr directory = osd::directory::open(directory_path);
+						if (directory)
 						{
 							for (const osd::directory::entry *entry = directory->read(); entry != nullptr; entry = directory->read())
 							{
@@ -159,8 +159,6 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 									}
 								}
 							}
-
-							delete directory;
 						}
 					}
 				}

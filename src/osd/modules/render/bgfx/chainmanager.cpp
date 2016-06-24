@@ -91,7 +91,7 @@ void chain_manager::destroy_unloaded_chains()
 
 void chain_manager::find_available_chains(std::string root, std::string path)
 {
-	osd::directory *directory = osd::directory::open((root + path).c_str());
+	osd::directory::ptr directory = osd::directory::open(root + path);
 	if (directory != nullptr)
 	{
 		for (const osd::directory::entry *entry = directory->read(); entry != nullptr; entry = directory->read())
@@ -128,8 +128,6 @@ void chain_manager::find_available_chains(std::string root, std::string path)
 				}
 			}
 		}
-
-		delete directory;
 	}
 }
 

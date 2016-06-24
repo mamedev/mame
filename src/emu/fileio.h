@@ -67,9 +67,9 @@ public:
 
 private:
 	// internal state
-	path_iterator   m_iterator;
-	osd::directory *m_curdir;
-	std::string     m_pathbuffer;
+	path_iterator       m_iterator;
+	osd::directory::ptr m_curdir;
+	std::string         m_pathbuffer;
 	//int             m_buflen;
 };
 

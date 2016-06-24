@@ -39,8 +39,8 @@ plugin_options::plugin_options()
 void plugin_options::parse_json(std::string path)
 {
 	// first try to open as a directory
-	osd::directory *directory = osd::directory::open(path.c_str());
-	if (directory != nullptr)
+	osd::directory::ptr directory = osd::directory::open(path);
+	if (directory)
 	{
 		// iterate over all files in the directory
 		for (const osd::directory::entry *entry = directory->read(); entry != nullptr; entry = directory->read())
@@ -89,8 +89,5 @@ void plugin_options::parse_json(std::string path)
 				}
 			}
 		}
-
-		// close the directory and be done
-		delete directory;
 	}
 }

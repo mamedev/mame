@@ -37,9 +37,9 @@ class zippath_directory
 public:
 	zippath_directory()
 		: returned_parent(false)
-		, directory(nullptr)
+		, directory()
 		, called_zip_first(false)
-		, zipfile(nullptr)
+		, zipfile()
 		, returned_dirlist()
 	{
 	}
@@ -52,7 +52,7 @@ public:
 
 	/* specific to normal directories */
 	/** @brief  Pathname of the directory. */
-	osd::directory *directory;
+	osd::directory::ptr directory;
 
 	/* specific to ZIP directories */
 	/** @brief  true to called zip first. */
@@ -840,7 +840,7 @@ done:
 void zippath_closedir(zippath_directory *directory)
 {
 	if (directory->directory != nullptr)
-		delete directory->directory;
+		directory->directory.reset();
 
 	if (directory->zipfile != nullptr)
 		directory->zipfile.reset();

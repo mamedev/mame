@@ -300,9 +300,9 @@ bool device_image_interface::try_change_working_directory(const char *subdir)
 	bool done = false;
 
 	auto directory = osd::directory::open(m_working_directory.c_str());
-	if (directory != nullptr)
+	if (directory)
 	{
-		while(!done && (entry = directory->read()) != nullptr)
+		while (!done && (entry = directory->read()) != nullptr)
 		{
 			if (!core_stricmp(subdir, entry->name))
 			{
@@ -311,7 +311,7 @@ bool device_image_interface::try_change_working_directory(const char *subdir)
 			}
 		}
 
-		delete directory;
+		directory.reset();
 	}
 
 	/* did we successfully identify the directory? */

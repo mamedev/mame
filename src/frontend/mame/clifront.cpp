@@ -1810,8 +1810,8 @@ media_identifier::media_identifier(emu_options &options)
 void media_identifier::identify(const char *filename)
 {
 	// first try to open as a directory
-	osd::directory *directory = osd::directory::open(filename);
-	if (directory != nullptr)
+	osd::directory::ptr directory = osd::directory::open(filename);
+	if (directory)
 	{
 		// iterate over all files in the directory
 		for (const osd::directory::entry *entry = directory->read(); entry != nullptr; entry = directory->read())
@@ -1822,7 +1822,7 @@ void media_identifier::identify(const char *filename)
 			}
 
 		// close the directory and be done
-		delete directory;
+		directory.reset();
 	}
 
 	// if that failed, and the filename ends with .zip, identify as a ZIP file
