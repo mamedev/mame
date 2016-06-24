@@ -68,7 +68,7 @@ constexpr char PATHSEPCH = '\\';
 constexpr char INVPATHSEPCH = '/';
 #else
 constexpr char PATHSEPCH = '/';
-constexpr char INVPATHSEPCH = '\\';
+//constexpr char INVPATHSEPCH = '\\';
 #endif
 
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__) || defined(EMSCRIPTEN) || defined(__ANDROID__) || defined(WIN32) || defined(SDLMAME_NO64BITIO)
