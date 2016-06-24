@@ -652,6 +652,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( adsp_program_map, AS_PROGRAM, 32, harddriv_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("adsp_pgm_memory")
+	AM_RANGE(0x2000, 0x3fff) AM_READNOP // ROM?
 ADDRESS_MAP_END
 
 
