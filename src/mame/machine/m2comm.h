@@ -77,9 +77,8 @@ private:
 
 	UINT16 m_linktype;
 
+	void comm_init();
 	void comm_tick();
-
-	void comm_tick_16726();
 #endif
 };
 
