@@ -1044,7 +1044,7 @@ namespace netlist
 					public plib::state_manager_t::callback_t
 	{
 	public:
-		queue_t(netlist_t &nl);
+		explicit queue_t(netlist_t &nl);
 
 	protected:
 
@@ -1070,7 +1070,7 @@ namespace netlist
 		P_PREVENT_COPYING(netlist_t)
 	public:
 
-		netlist_t(const pstring &aname);
+		explicit netlist_t(const pstring &aname);
 		virtual ~netlist_t();
 
 		pstring name() const { return m_name; }
@@ -1155,7 +1155,7 @@ namespace netlist
 		std::vector<plib::owned_ptr<core_device_t>> m_devices;
 
 		/* sole use is to manage lifetime of net objects */
-		std::vector<std::shared_ptr<net_t>> m_nets;
+		std::vector<plib::owned_ptr<net_t>> m_nets;
 
 		/* sole use is to manage lifetime of family objects */
 		std::vector<std::pair<pstring, std::unique_ptr<logic_family_desc_t>>> m_family_cache;

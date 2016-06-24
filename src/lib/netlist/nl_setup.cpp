@@ -399,7 +399,7 @@ core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, device_objec
 	return term;
 }
 
-param_t *setup_t::find_param(const pstring &param_in, bool required)
+param_t *setup_t::find_param(const pstring &param_in, bool required) const
 {
 	const pstring param_in_fqn = build_fqn(param_in);
 

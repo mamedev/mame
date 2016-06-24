@@ -583,9 +583,9 @@ net_t::net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr)
 {
 	m_railterminal = mr;
 	if (mr != nullptr)
-		nl.m_nets.push_back(std::shared_ptr<net_t>(this, do_nothing_deleter()));
+		nl.m_nets.push_back(std::move(plib::owned_ptr<net_t>(this, false)));
 	else
-		nl.m_nets.push_back(std::shared_ptr<net_t>(this));
+		nl.m_nets.push_back(std::move(plib::owned_ptr<net_t>(this, true)));
 }
 
 net_t::~net_t()

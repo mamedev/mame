@@ -173,7 +173,7 @@ namespace netlist
 
 		using link_t = std::pair<pstring, pstring>;
 
-		setup_t(netlist_t &netlist);
+		explicit setup_t(netlist_t &netlist);
 		~setup_t();
 
 		netlist_t &netlist() { return m_netlist; }
@@ -210,7 +210,7 @@ namespace netlist
 
 		bool device_exists(const pstring name) const;
 
-		param_t *find_param(const pstring &param_in, bool required = true);
+		param_t *find_param(const pstring &param_in, bool required = true) const;
 
 		void start_devices();
 		void resolve_inputs();
