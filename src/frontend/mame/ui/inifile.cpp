@@ -39,7 +39,7 @@ inifile_manager::inifile_manager(running_machine &machine, ui_options &moptions)
 void inifile_manager::directory_scan()
 {
 	file_enumerator path(m_options.extraini_path());
-	const osd_directory_entry *dir;
+	const osd::directory::entry *dir;
 
 	while ((dir = path.next()) != nullptr)
 		if (core_filename_ends_with(dir->name, ".ini") && parseopen(dir->name))

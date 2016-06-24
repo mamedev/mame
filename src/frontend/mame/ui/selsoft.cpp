@@ -608,7 +608,7 @@ void menu_select_software::build_software_list()
 	}
 
 	std::string searchstr, curpath;
-	const osd_directory_entry *dir;
+	const osd::directory::entry *dir;
 	for (auto & elem : m_filter.swlist.name)
 	{
 		path_iterator path(machine().options().media_path());
@@ -621,9 +621,9 @@ void menu_select_software::build_software_list()
 			while ((dir = fpath.next()) != nullptr)
 			{
 				std::string name;
-				if (dir->type == ENTTYPE_FILE)
+				if (dir->type == osd::directory::entry::entry_type::FILE)
 					name = core_filename_extract_base(dir->name, true);
-				else if (dir->type == ENTTYPE_DIR && strcmp(dir->name, ".") != 0)
+				else if (dir->type == osd::directory::entry::entry_type::DIR && strcmp(dir->name, ".") != 0)
 					name = dir->name;
 				else
 					continue;

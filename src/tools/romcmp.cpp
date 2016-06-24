@@ -448,22 +448,20 @@ static void printname(const fileinfo *file1,const fileinfo *file2,float score,in
 
 static int load_files(int i, int *found, const char *path)
 {
-	osd_directory *dir;
-
 	/* attempt to open as a directory first */
-	dir = osd_opendir(path);
-	if (dir != nullptr)
+	auto dir = osd::directory::open(path);
+	if (dir)
 	{
-		const osd_directory_entry *d;
+		const osd::directory::entry *d;
 
 		/* load all files in directory */
-		while ((d = osd_readdir(dir)) != nullptr)
+		while ((d = dir->read()) != nullptr)
 		{
 			const char *d_name = d->name;
 			char buf[255+1];
 
 			sprintf(buf, "%s%c%s", path, PATH_DELIM, d_name);
-			if (d->type == ENTTYPE_FILE)
+			if (d->type == osd::directory::entry::entry_type::FILE)
 			{
 				UINT64 size = d->size;
 				while (size && (size & 1) == 0) size >>= 1;
@@ -484,7 +482,7 @@ static int load_files(int i, int *found, const char *path)
 				}
 			}
 		}
-		osd_closedir(dir);
+		dir.reset();
 	}
 
 	/* if not, try to open as a ZIP file */

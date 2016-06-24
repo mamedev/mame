@@ -21,6 +21,7 @@
 
 #include "osdcomm.h"
 
+#include <chrono>
 #include <cstdarg>
 #include <cstdint>
 #include <memory>
@@ -297,75 +298,65 @@ int osd_uchar_from_osdchar(UINT32 /* unicode_char */ *uchar, const char *osdchar
     DIRECTORY INTERFACES
 ***************************************************************************/
 
-/* types of directory entries that can be returned */
-enum osd_dir_entry_type
+namespace osd
 {
-	ENTTYPE_NONE,
-	ENTTYPE_FILE,
-	ENTTYPE_DIR,
-	ENTTYPE_OTHER
+	// directory is an opaque type which represents an open directory
+	class directory
+	{
+	public:
+		typedef std::unique_ptr<directory> ptr;
+
+		// osd::directory::entry contains basic information about a file when iterating through
+		// a directory
+		class entry
+		{
+		public:
+			enum class entry_type
+			{
+				NONE,
+				FILE,
+				DIR,
+				OTHER
+			};
+
+			const char *							name;           // name of the entry
+			entry_type								type;           // type of the entry
+			std::uint64_t							size;           // size of the entry
+			std::chrono::system_clock::time_point	last_modified;	// last modified time
+		};
+
+		// -----------------------------------------------------------------------------
+		// osd::directory::open: open a directory for iteration
+		// 
+		// Parameters:
+		// 
+		// dirname - path to the directory in question
+		// 
+		// Return value:
+		// 
+		// upon success, this function should return an directory pointer
+		// which contains opaque data necessary to traverse the directory; on
+		// failure, this function should return nullptr
+		// -----------------------------------------------------------------------------
+		static ptr open(std::string const &dirname);
+
+		// -----------------------------------------------------------------------------
+		// osd::directory::~directory: close an open directory
+		// -----------------------------------------------------------------------------
+		virtual ~directory() { }
+
+		// -----------------------------------------------------------------------------
+		// osd::directory::read: return information about the next entry in the directory
+		// 
+		// Return value:
+		// 
+		// a constant pointer to an entry representing the current item
+		// in the directory, or nullptr, indicating that no more entries are
+		// present
+		// -----------------------------------------------------------------------------
+		virtual const entry *read() = 0;
+	};
 };
-
-/* osd_directory is an opaque type which represents an open directory */
-struct osd_directory;
-
-/* osd_directory_entry contains basic information about a file when iterating through */
-/* a directory */
-struct osd_directory_entry
-{
-	const char *        name;           /* name of the entry */
-	osd_dir_entry_type  type;           /* type of the entry */
-	UINT64              size;           /* size of the entry */
-};
-
-
-/*-----------------------------------------------------------------------------
-    osd_opendir: open a directory for iteration
-
-    Parameters:
-
-        dirname - path to the directory in question
-
-    Return value:
-
-        upon success, this function should return an osd_directory pointer
-        which contains opaque data necessary to traverse the directory; on
-        failure, this function should return nullptr
------------------------------------------------------------------------------*/
-osd_directory *osd_opendir(const char *dirname);
-
-
-/*-----------------------------------------------------------------------------
-    osd_readdir: return information about the next entry in the directory
-
-    Parameters:
-
-        dir - pointer to an osd_directory that was returned from a prior
-            call to osd_opendir
-
-    Return value:
-
-        a constant pointer to an osd_directory_entry representing the current item
-        in the directory, or nullptr, indicating that no more entries are
-        present
------------------------------------------------------------------------------*/
-const osd_directory_entry *osd_readdir(osd_directory *dir);
-
-
-/*-----------------------------------------------------------------------------
-    osd_closedir: close an open directory for iteration
-
-    Parameters:
-
-        dir - pointer to an osd_directory that was returned from a prior
-            call to osd_opendir
-
-    Return value:
-
-        frees any allocated memory and resources associated with the open
-        directory
------------------------------------------------------------------------------*/
-void osd_closedir(osd_directory *dir);
 
 
 /*-----------------------------------------------------------------------------
@@ -798,12 +789,11 @@ char *osd_get_clipboard_text(void);
 
     Return value:
 
-        an allocated pointer to an osd_directory_entry representing
+        an allocated pointer to an osd::directory::entry representing
         info on the path; even if the file does not exist.
-        free with osd_free()
 
 -----------------------------------------------------------------------------*/
-osd_directory_entry *osd_stat(std::string const &path);
+std::unique_ptr<osd::directory::entry> osd_stat(std::string const &path);
 
 /***************************************************************************
     PATH INTERFACES

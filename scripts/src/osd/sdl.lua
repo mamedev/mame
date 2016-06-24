@@ -461,7 +461,6 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/strconv.h",
 		MAME_DIR .. "src/osd/osdsync.cpp",
 		MAME_DIR .. "src/osd/osdsync.h",
-		MAME_DIR .. "src/osd/sdl/sdldir.cpp",
 		MAME_DIR .. "src/osd/modules/osdmodule.cpp",
 		MAME_DIR .. "src/osd/modules/osdmodule.h",
 		MAME_DIR .. "src/osd/modules/lib/osdlib_" .. SDLOS_TARGETOS .. ".cpp",
@@ -470,6 +469,7 @@ project ("ocore_" .. _OPTIONS["osd"])
 
 	if BASE_TARGETOS=="unix" then
 		files {
+			MAME_DIR .. "src/osd/modules/file/posixdir.cpp",
 			MAME_DIR .. "src/osd/modules/file/posixfile.cpp",
 			MAME_DIR .. "src/osd/modules/file/posixfile.h",
 			MAME_DIR .. "src/osd/modules/file/posixptty.cpp",
@@ -480,6 +480,7 @@ project ("ocore_" .. _OPTIONS["osd"])
 			MAME_DIR .. "src/osd/windows",
 		}
 		files {
+			MAME_DIR .. "src/osd/modules/file/windir.cpp",
 			MAME_DIR .. "src/osd/modules/file/winfile.cpp",
 			MAME_DIR .. "src/osd/modules/file/winfile.h",
 			MAME_DIR .. "src/osd/modules/file/winptty.cpp",
