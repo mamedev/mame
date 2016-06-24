@@ -83,6 +83,7 @@
 #include "sound/upd7759.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
+#include "video/ramdac.h"
 
 
 /*
@@ -167,26 +168,6 @@ struct bf_blitter_t
 };
 
 #define LOOPTYPE ( ( blitter.command&0x60 ) >> 5 )
-
-/*
-    MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
-*/
-struct ramdac_t
-{
-	UINT8   addr_w;
-	UINT8   addr_r;
-	UINT8   mask;
-
-	/* 18-bit colors */
-	UINT8   color_r[3];
-	UINT8   color_w[3];
-	UINT32  table[256];
-
-	/* Access counts */
-	UINT8   count_r;
-	UINT8   count_w;
-};
-
 
 struct fdc_t
 {
@@ -275,10 +256,7 @@ public:
 	UINT8 m_col7bit[256];
 	UINT8 m_col6bit[256];
 	struct bf_blitter_t m_blitter;
-	struct ramdac_t m_ramdac;
 	struct fdc_t m_fdc;
-	DECLARE_READ8_MEMBER(ramdac_r);
-	DECLARE_WRITE8_MEMBER(ramdac_w);
 	DECLARE_READ8_MEMBER(chipset_r);
 	DECLARE_WRITE8_MEMBER(chipset_w);
 	DECLARE_WRITE8_MEMBER(rombank_w);
@@ -757,85 +735,6 @@ void bfcobra_state::RunBlit(address_space &space)
 
 	/* Burn Z80 cycles while blitter is in operation */
 	space.device().execute().spin_until_time(attotime::from_nsec( (1000000000 / Z80_XTAL)*cycles_used * 2 ) );
-}
-
-
-READ8_MEMBER(bfcobra_state::ramdac_r)
-{
-	struct ramdac_t &ramdac = m_ramdac;
-	UINT8 val = 0xff;
-
-	switch (offset & 3)
-	{
-		case 1:
-		{
-			UINT8 *count = &ramdac.count_r;
-
-			if (*count == 0)
-			{
-				rgb_t color;
-				color = m_palette->pen_color(ramdac.addr_r);
-
-				ramdac.color_r[0] = color.r();
-				ramdac.color_r[1] = color.g();
-				ramdac.color_r[2] = color.b();
-			}
-
-			val = ramdac.color_r[*count];
-
-			/* 8bpp -> 6bpp */
-			val = ((val & 0xc0) >> 2) | ((val >>2) & 0xf);
-
-			if (++*count == 3)
-			{
-				*count = 0;
-				ramdac.addr_r++;
-			}
-			break;
-		}
-		default:
-		{
-			osd_printf_debug("Unhandled RAMDAC read (PC:%.4x)\n", space.device().safe_pcbase());
-		}
-	}
-
-	return val;
-}
-
-WRITE8_MEMBER(bfcobra_state::ramdac_w)
-{
-	struct ramdac_t &ramdac = m_ramdac;
-
-	switch (offset & 3)
-	{
-		case 0:
-		{
-			ramdac.addr_w = data;
-			break;
-		}
-		case 1:
-		{
-			data &= 0x3f;
-			ramdac.color_w[ramdac.count_w] = pal6bit(data);
-			if (++ramdac.count_w == 3)
-			{
-				m_palette->set_pen_color(ramdac.addr_w, ramdac.color_w[0], ramdac.color_w[1], ramdac.color_w[2]);
-				ramdac.count_w = 0;
-				ramdac.addr_w++;
-			}
-			break;
-		}
-		case 2:
-		{
-			ramdac.mask = data;
-			break;
-		}
-		case 3:
-		{
-			ramdac.addr_r = data;
-			break;
-		}
-	}
 }
 
 /***************************************************************************
@@ -1340,7 +1239,6 @@ void bfcobra_state::machine_reset()
 	}
 
 	m_bank_data[0] = 1;
-	memset(&m_ramdac, 0, sizeof(m_ramdac));
 	reset_fdc();
 
 	m_irq_state = m_blitter_irq = m_vblank_irq = m_acia_irq = 0;
@@ -1369,7 +1267,15 @@ ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x30, 0x30) AM_READ(fdctrl_r)
 	AM_RANGE(0x31, 0x31) AM_READWRITE(fddata_r, fdctrl_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(rombank_w)
-	AM_RANGE(0x50, 0x53) AM_READWRITE(ramdac_r, ramdac_w)
+	AM_RANGE(0x50, 0x50) AM_DEVWRITE("ramdac", ramdac_device, index_w)
+	AM_RANGE(0x51, 0x51) AM_DEVREADWRITE("ramdac", ramdac_device, pal_r, pal_w)
+	AM_RANGE(0x52, 0x52) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
+	AM_RANGE(0x53, 0x53) AM_DEVWRITE("ramdac", ramdac_device, index_r_w)
+ADDRESS_MAP_END
+
+ 
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8, bfcobra_state )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
 ADDRESS_MAP_END
 
 
@@ -1745,6 +1651,9 @@ static MACHINE_CONFIG_START( bfcobra, bfcobra_state )
 	MCFG_SCREEN_UPDATE_DRIVER(bfcobra_state, screen_update_bfcobra)
 
 	MCFG_PALETTE_ADD("palette", 256)
+
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
+	MCFG_RAMDAC_SPLIT_READ(1)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

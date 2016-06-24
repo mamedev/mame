@@ -66,6 +66,8 @@
 #include "seibucop_dma.hxx"
 #include "seibucop_cmd.hxx"
 
+#include <algorithm>
+
 #define seibu_cop_log \
 	if (LOG_Commands) logerror
 
@@ -1169,49 +1171,28 @@ WRITE16_MEMBER( raiden2cop_device::cop_sort_param_w)
 
 WRITE16_MEMBER( raiden2cop_device::cop_sort_dma_trig_w)
 {
-	UINT16 sort_size;
+	struct sort_entry {
+		INT16 sorting_key;
+		UINT16 val;
+	};
 
-	sort_size = data;
-
-	//printf("%04x %04x %04x %04x\n",cop_sort_ram_addr,cop_sort_lookup,cop_sort_param,data);
-
-	{
-		int i,j;
-		UINT8 xchg_flag;
-		UINT32 addri,addrj;
-		UINT16 vali,valj;
-
-		// TODO: use a better algorithm than bubble sort!
-		for(i=2;i<sort_size;i+=2)
-		{
-			for(j=i-2;j<sort_size;j+=2)
-			{
-				addri = cop_sort_ram_addr + m_host_space->read_word(cop_sort_lookup+i);
-				addrj = cop_sort_ram_addr + m_host_space->read_word(cop_sort_lookup+j);
-
-				vali = m_host_space->read_word(addri);
-				valj = m_host_space->read_word(addrj);
-
-				//printf("%08x %08x %04x %04x\n",addri,addrj,vali,valj);
-
-				switch(cop_sort_param)
-				{
-					case 2: xchg_flag = (vali > valj); break;
-					case 1: xchg_flag = (vali < valj); break;
-					default: xchg_flag = 0; /* printf("Warning: sort-DMA used with param %02x\n",cop_sort_param); */ break;
-				}
-
-				if(xchg_flag)
-				{
-					UINT16 xch_val;
-
-					xch_val = m_host_space->read_word(cop_sort_lookup+i);
-					m_host_space->write_word(cop_sort_lookup+i,m_host_space->read_word(cop_sort_lookup+j));
-					m_host_space->write_word(cop_sort_lookup+j,xch_val);
-				}
-			}
-		}
+	std::vector<sort_entry> entries(data);
+	for(int i=0; i<data; i++) {
+		sort_entry &e = entries[i];
+		e.val = m_host_space->read_word(cop_sort_lookup + 2*i);
+		e.sorting_key = m_host_space->read_word(cop_sort_ram_addr + e.val);
 	}
+	switch(cop_sort_param) {
+	case 1:
+		std::sort(entries.begin(), entries.end(), [](const auto &a, const auto &b){ return a.sorting_key > b.sorting_key; });
+		break;
+	case 2:
+		std::sort(entries.begin(), entries.end(), [](const auto &a, const auto &b){ return a.sorting_key < b.sorting_key; });
+		break;
+	}
+
+	for(int i=0; i<data; i++)
+		m_host_space->write_word(cop_sort_lookup + 2*i, entries[i].val);
 }
 
 /* Random number generators (only verified on 68k games) */

@@ -295,24 +295,23 @@ void device_image_interface::message(const char *format, ...)
 -------------------------------------------------*/
 bool device_image_interface::try_change_working_directory(const char *subdir)
 {
-	osd_directory *directory;
-	const osd_directory_entry *entry;
-	bool success = FALSE;
-	bool done = FALSE;
+	const osd::directory::entry *entry;
+	bool success = false;
+	bool done = false;
 
-	directory = osd_opendir(m_working_directory.c_str());
-	if (directory != nullptr)
+	auto directory = osd::directory::open(m_working_directory.c_str());
+	if (directory)
 	{
-		while(!done && (entry = osd_readdir(directory)) != nullptr)
+		while (!done && (entry = directory->read()) != nullptr)
 		{
 			if (!core_stricmp(subdir, entry->name))
 			{
-				done = TRUE;
-				success = entry->type == ENTTYPE_DIR;
+				done = true;
+				success = entry->type == osd::directory::entry::entry_type::DIR;
 			}
 		}
 
-		osd_closedir(directory);
+		directory.reset();
 	}
 
 	/* did we successfully identify the directory? */

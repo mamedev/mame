@@ -14,7 +14,12 @@
 #endif
 
 #ifdef __linux__
+#ifndef __USE_LARGEFILE64
 #define __USE_LARGEFILE64
+#endif
+#ifndef __USE_BSD
+#define __USE_BSD
+#endif
 #endif
 
 #ifdef WIN32
@@ -337,7 +342,7 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 //  osd_stat
 //============================================================
 
-osd_directory_entry *osd_stat(const std::string &path)
+std::unique_ptr<osd::directory::entry> osd_stat(const std::string &path)
 {
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__) || defined(__HAIKU__) || defined(WIN32) || defined(SDLMAME_NO64BITIO) || defined(__ANDROID__)
 	struct stat st;
@@ -350,13 +355,18 @@ osd_directory_entry *osd_stat(const std::string &path)
 
 	// create an osd_directory_entry; be sure to make sure that the caller can
 	// free all resources by just freeing the resulting osd_directory_entry
-	osd_directory_entry *const result = reinterpret_cast<osd_directory_entry *>(osd_malloc_array(sizeof(osd_directory_entry) + path.length() + 1));
+	osd::directory::entry *result;
+	try { result = reinterpret_cast<osd::directory::entry *>(::operator new(sizeof(*result) + path.length() + 1)); }
+	catch (...) { return nullptr; }
+	new (result) osd::directory::entry;
+
 	std::strcpy(reinterpret_cast<char *>(result) + sizeof(*result), path.c_str());
 	result->name = reinterpret_cast<char *>(result) + sizeof(*result);
-	result->type = S_ISDIR(st.st_mode) ? ENTTYPE_DIR : ENTTYPE_FILE;
+	result->type = S_ISDIR(st.st_mode) ? osd::directory::entry::entry_type::DIR : osd::directory::entry::entry_type::FILE;
 	result->size = std::uint64_t(std::make_unsigned_t<decltype(st.st_size)>(st.st_size));
+	result->last_modified = std::chrono::system_clock::from_time_t(st.st_mtime);
 
-	return result;
+	return std::unique_ptr<osd::directory::entry>(result);
 }
 
 
