@@ -381,7 +381,7 @@ std::unique_ptr<osd::directory::entry> osd_stat(const std::string &path)
 
 	// create an osd::directory::entry; be sure to make sure that the caller can
 	// free all resources by just freeing the resulting osd::directory::entry
-	osd::directory::entry *result = (osd::directory::entry *) operator new(sizeof(*result) + path.length() + 1);
+	osd::directory::entry *result = (osd::directory::entry *) ::operator new(sizeof(*result) + path.length() + 1);
 	if (!result)
 		return nullptr;
 	strcpy(((char *) result) + sizeof(*result), path.c_str());
