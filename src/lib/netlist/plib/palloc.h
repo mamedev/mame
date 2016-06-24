@@ -17,7 +17,6 @@
 #include "pstring.h"
 
 namespace plib {
-
 //============================================================
 //  exception base
 //============================================================
@@ -41,7 +40,7 @@ private:
 template<typename T, typename... Args>
 T *palloc(Args&&... args)
 {
-    return new T(std::forward<Args>(args)...);
+	return new T(std::forward<Args>(args)...);
 }
 
 template<typename T>
@@ -58,7 +57,7 @@ void pfree_array(T *ptr) { delete [] ptr; }
 
 template<typename T, typename... Args>
 std::unique_ptr<T> make_unique(Args&&... args) {
-    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+	return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 
 template<typename BC, typename DC, typename... Args>
@@ -79,8 +78,15 @@ public:
 	: m_ptr(p), m_is_owned(owned)
 	{ }
 	owned_ptr(const owned_ptr &r) = delete;
-	owned_ptr & operator =(const owned_ptr &r) = delete;
-
+	owned_ptr & operator =(owned_ptr &r) = delete;
+	owned_ptr & operator =(owned_ptr &&r)
+	{
+		m_is_owned = r.m_is_owned;
+		m_ptr = r.m_ptr;
+		r.m_is_owned = false;
+		r.m_ptr = nullptr;
+		return *this;
+	}
 	owned_ptr(owned_ptr &&r)
 	{
 		m_is_owned = r.m_is_owned;
@@ -92,17 +98,17 @@ public:
 	template<typename DC>
 	owned_ptr(owned_ptr<DC> &&r)
 	{
-		SC *dest_ptr = &dynamic_cast<SC &>(*r.get());
-		bool o = r.is_owned();
+		m_ptr = static_cast<SC *>(r.get());
+		m_is_owned = r.is_owned();
 		r.release();
-		m_is_owned = o;
-		m_ptr = dest_ptr;
 	}
 
 	~owned_ptr()
 	{
-		if (m_is_owned)
+		if (m_is_owned && m_ptr != nullptr)
 			delete m_ptr;
+		m_is_owned = false;
+		m_ptr = nullptr;
 	}
 	template<typename DC, typename... Args>
 	static owned_ptr Create(Args&&... args)
@@ -110,7 +116,7 @@ public:
 		owned_ptr a;
 		DC *x = new DC(std::forward<Args>(args)...);
 		a.m_ptr = static_cast<SC *>(x);
-		return a;
+		return std::move(a);
 	}
 
 	template<typename... Args>
@@ -118,7 +124,7 @@ public:
 	{
 		owned_ptr a;
 		a.m_ptr = new SC(std::forward<Args>(args)...);
-		return a;
+		return std::move(a);
 	}
 	void release()
 	{
@@ -128,8 +134,9 @@ public:
 
 	bool is_owned() const { return m_is_owned; }
 
+#if 1
 	template<typename DC>
-	owned_ptr<DC> & operator =(owned_ptr<DC> &r)
+	owned_ptr & operator =(owned_ptr<DC> &&r)
 	{
 		m_is_owned = r.m_is_owned;
 		m_ptr = r.m_ptr;
@@ -137,6 +144,7 @@ public:
 		r.m_ptr = nullptr;
 		return *this;
 	}
+#endif
 	SC * operator ->() const { return m_ptr; }
 	SC & operator *() const { return *m_ptr; }
 	SC * get() const { return m_ptr; }

@@ -13,7 +13,6 @@
 #endif
 
 namespace plib {
-
 dynlib::dynlib(const pstring libname)
 : m_isLoaded(false), m_lib(nullptr)
 {
@@ -43,7 +42,7 @@ dynlib::dynlib(const pstring libname)
 dynlib::dynlib(const pstring path, const pstring libname)
 : m_isLoaded(false), m_lib(nullptr)
 {
-	//	printf("win: loading <%s>\n", libname.cstr());
+	//  printf("win: loading <%s>\n", libname.cstr());
 #ifdef WIN32
 	if (libname != "")
 		m_lib = LoadLibrary(libname.cstr());

@@ -17,7 +17,6 @@
 #include "putil.h"
 
 namespace plib {
-
 /***************************************************************************
     Options
 ***************************************************************************/
@@ -111,7 +110,7 @@ class options
 public:
 
 	options();
-	options(option *o[]);
+	explicit options(option *o[]);
 
 	~options();
 

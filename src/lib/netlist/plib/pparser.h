@@ -18,14 +18,13 @@
 #include "pstream.h"
 
 namespace plib {
-
 class ptokenizer
 {
 	P_PREVENT_COPYING(ptokenizer)
 public:
 	virtual ~ptokenizer() {}
 
-	ptokenizer(pistream &strm)
+	explicit ptokenizer(pistream &strm)
 	: m_strm(strm), m_lineno(1), m_px(0), m_string('"')
 	{}
 

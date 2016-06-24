@@ -11,7 +11,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 	NETLIB_OBJECT(74107Asub)
 	{
 		NETLIB_CONSTRUCTOR(74107Asub)
@@ -78,7 +77,6 @@ namespace netlist
 		, m_1(*this, "1")
 		, m_2(*this, "2")
 		{
-
 			register_subalias("1", m_1.m_J);
 			register_subalias("2", m_1.m_sub.m_QQ);
 			register_subalias("3", m_1.m_sub.m_Q);

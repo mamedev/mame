@@ -16,7 +16,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 	NETLIB_OBJECT(NE555)
 	{
 		NETLIB_CONSTRUCTOR(NE555)
@@ -31,7 +30,6 @@ namespace netlist
 		, m_last_out(*this, "m_last_out", false)
 		, m_ff(*this, "m_ff", false)
 		{
-
 			register_subalias("GND",  m_R3.m_N);    // Pin 1
 			register_subalias("CONT", m_R1.m_N);    // Pin 5
 			register_subalias("DISCH", m_RDIS.m_P); // Pin 7

@@ -12,7 +12,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 	#if (USE_TRUTHTABLE_7448 && USE_TRUTHTABLE)
 
 	NETLIB_TRUTHTABLE(7448, 7, 7, 0);

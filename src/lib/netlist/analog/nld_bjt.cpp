@@ -13,7 +13,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 class diode
 {
 public:

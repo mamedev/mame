@@ -42,8 +42,8 @@ namespace chrono {
 					"rdtscp;"
 					"shl $32, %%rdx;"
 					"or %%rdx, %%rax;"
-					: "=a"(v) 			/* outputs  */
-					: 			        /* inputs   */
+					: "=a"(v)           /* outputs  */
+					:                   /* inputs   */
 					: "%rcx", "%rdx"    /* clobbers */
 			);
 			return v;
@@ -66,8 +66,8 @@ namespace chrono {
 					"rdtsc;"
 					"shl $32, %%rdx;"
 					"or %%rdx, %%rax;"
-					: "=a"(v) 	/* outputs  */
-					: 			/* inputs   */
+					: "=a"(v)   /* outputs  */
+					:           /* inputs   */
 					: "%rdx"    /* clobbers */
 			);
 			return v;

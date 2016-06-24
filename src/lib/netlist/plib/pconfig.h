@@ -87,7 +87,6 @@ typedef __int128_t INT128;
 #endif
 
 namespace plib {
-
 /*
  * The following class was derived from the MAME delegate.h code.
  * It derives a pointer to a member function.

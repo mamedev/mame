@@ -173,9 +173,9 @@
 
 using netlist_sig_t = std::uint_least32_t;
 
- //============================================================
- //  MACROS / New Syntax
- //============================================================
+	//============================================================
+	//  MACROS / New Syntax
+	//============================================================
 
 #define NETLIB_NAME(chip) nld_ ## chip
 
@@ -202,14 +202,14 @@ class NETLIB_NAME(name) : public device_t
 	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring name, __VA_ARGS__) \
 		: device_t(owner, name)
 
-#define NETLIB_DYNAMIC() 														\
+#define NETLIB_DYNAMIC()                                                        \
 	public: virtual bool is_dynamic() const override { return true; }
 
-#define NETLIB_TIMESTEP() 														\
+#define NETLIB_TIMESTEP()                                                       \
 	public: virtual bool is_timestep() const override { return true; } \
 	public: virtual void step_time(const nl_double step) override
 
-#define NETLIB_UPDATE_AFTER_PARAM_CHANGE() 						     			\
+#define NETLIB_UPDATE_AFTER_PARAM_CHANGE()                                      \
 	public: virtual bool needs_update_after_param_change() const override { return true; }
 
 #define NETLIB_FAMILY(family) , m_famsetter(*this, family)
@@ -411,10 +411,10 @@ namespace netlist
 		pstring m_name;
 
 	public:
-	    void * operator new (size_t size, void *ptr) { return ptr; }
-	    void operator delete (void *ptr, void *) {  }
-	    void * operator new (size_t size);
-	    void operator delete (void * mem);
+		void * operator new (size_t size, void *ptr) { return ptr; }
+		void operator delete (void *ptr, void *) {  }
+		void * operator new (size_t size);
+		void operator delete (void * mem);
 	};
 
 	struct netlist_ref
@@ -662,7 +662,7 @@ namespace netlist
 		bool is_logic() const;
 		bool is_analog() const;
 
-		void toggle_new_Q()				{ m_new_Q ^= 1;   }
+		void toggle_new_Q()             { m_new_Q ^= 1;   }
 
 		void push_to_queue(const netlist_time delay) NOEXCEPT;
 		void reschedule_in_queue(const netlist_time delay) NOEXCEPT;
@@ -693,7 +693,7 @@ namespace netlist
 
 		state_var<netlist_time>  m_time;
 		state_var_s32            m_active;
-		state_var_u8		     m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
+		state_var_u8             m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
 
 	private:
 		plib::linkedlist_t<core_terminal_t> m_list_active;
@@ -714,7 +714,7 @@ namespace netlist
 		virtual ~logic_net_t() { };
 
 		netlist_sig_t Q() const { return m_cur_Q; }
-		netlist_sig_t new_Q() const 	{ return m_new_Q; }
+		netlist_sig_t new_Q() const     { return m_new_Q; }
 		void initial(const netlist_sig_t val) { m_cur_Q = m_new_Q = val; }
 
 		void set_Q(const netlist_sig_t newQ, const netlist_time delay) NOEXCEPT
@@ -739,7 +739,7 @@ namespace netlist
 		/* internal state support
 		 * FIXME: get rid of this and implement export/import in MAME
 		 */
-		 netlist_sig_t &Q_state_ptr() { return m_cur_Q; }
+			netlist_sig_t &Q_state_ptr() { return m_cur_Q; }
 
 	protected:
 	private:
@@ -1038,13 +1038,13 @@ namespace netlist
 	// queue_t
 	// -----------------------------------------------------------------------------
 
-	class queue_t :	public timed_queue<net_t *, netlist_time>,
+	class queue_t : public timed_queue<net_t *, netlist_time>,
 					public object_t,
 					public netlist_ref,
 					public plib::state_manager_t::callback_t
 	{
 	public:
-		queue_t(netlist_t &nl);
+		explicit queue_t(netlist_t &nl);
 
 	protected:
 
@@ -1070,7 +1070,7 @@ namespace netlist
 		P_PREVENT_COPYING(netlist_t)
 	public:
 
-		netlist_t(const pstring &aname);
+		explicit netlist_t(const pstring &aname);
 		virtual ~netlist_t();
 
 		pstring name() const { return m_name; }
@@ -1155,7 +1155,7 @@ namespace netlist
 		std::vector<plib::owned_ptr<core_device_t>> m_devices;
 
 		/* sole use is to manage lifetime of net objects */
-		std::vector<std::shared_ptr<net_t>> m_nets;
+		std::vector<plib::owned_ptr<net_t>> m_nets;
 
 		/* sole use is to manage lifetime of family objects */
 		std::vector<std::pair<pstring, std::unique_ptr<logic_family_desc_t>>> m_family_cache;
@@ -1168,12 +1168,12 @@ namespace netlist
 		nperfcount_t m_perf_inp_active;
 
 	private:
-		plib::state_manager_t 		m_state;
+		plib::state_manager_t       m_state;
 		/* mostly rw */
 		netlist_time                m_time;
 		queue_t                     m_queue;
 
-		nperftime_t					m_stat_mainloop;
+		nperftime_t                 m_stat_mainloop;
 		/* mostly ro */
 
 		devices::NETLIB_NAME(mainclock) *    m_mainclock;

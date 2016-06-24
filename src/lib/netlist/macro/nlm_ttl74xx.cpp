@@ -79,13 +79,13 @@ NETLIST_START(TTL_7402_DIP)
 		s2.A,  /*    A2 |5           10| Y3   */ s3.Q,
 		s2.B,  /*    B2 |6            9| B3   */ s3.B,
 		GND.I, /*   GND |7            8| A3   */ s3.A
-			   /*       +--------------+      */
+				/*       +--------------+      */
 	)
 NETLIST_END()
 
 /*
  *   DM7404: Hex Inverting Gates
- *                 
+ *
  *             Y = A
  *          +---++---+
  *          | A || Y |
@@ -117,7 +117,7 @@ NETLIST_START(TTL_7404_DIP)
 		s3.A,  /*    A3 |5           10| Y5   */ s5.Q,
 		s3.Q,  /*    Y3 |6            9| A4   */ s4.A,
 		GND.I, /*   GND |7            8| Y4   */ s4.Q
-			   /*       +--------------+      */
+				/*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -156,7 +156,7 @@ NETLIST_START(TTL_7408_DIP)
 		s2.B,  /*    B2 |5           10| B3   */ s3.B,
 		s2.Q,  /*    Y2 |6            9| A3   */ s3.A,
 		GND.I, /*   GND |7            8| Y3   */ s3.Q
-			   /*       +--------------+      */
+				/*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -193,7 +193,7 @@ NETLIST_START(TTL_7410_DIP)
 		s2.C,  /*    C2 |5           10| B3   */ s3.B,
 		s2.Q,  /*    Y2 |6            9| A3   */ s3.A,
 		GND.I, /*   GND |7            8| Y3   */ s3.Q
-			   /*       +--------------+      */
+				/*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -230,7 +230,7 @@ NETLIST_START(TTL_7411_DIP)
 		s2.C,  /*    C2 |5           10| B3   */ s3.B,
 		s2.Q,  /*    Y2 |6            9| A3   */ s3.A,
 		GND.I, /*   GND |7            8| Y3   */ s3.Q
-			   /*       +--------------+      */
+				/*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -297,7 +297,7 @@ NETLIST_START(TTL_7420_DIP)
 		s1.D,  /*    D1 |5           10| B2   */ s2.B,
 		s1.Q,  /*    Y1 |6            9| A2   */ s2.A,
 		GND.I, /*   GND |7            8| Y2   */ s2.Q
-			   /*       +--------------+      */
+				/*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -334,12 +334,12 @@ NETLIST_START(TTL_7425_DIP)
 	DIPPINS(   /*       +--------------+      */
 		s1.A,  /*    A1 |1     ++    14| VCC  */ VCC.I,
 		s1.B,  /*    B1 |2           13| D2   */ s2.D,
-		 X.I,  /*    X1 |3           12| C2   */ s2.C,
+			X.I,  /*    X1 |3           12| C2   */ s2.C,
 		s1.C,  /*    C1 |4    7425   11| X2   */  X.I,
 		s1.D,  /*    D1 |5           10| B2   */ s2.B,
 		s1.Q,  /*    Y1 |6            9| A2   */ s2.A,
 		GND.I, /*   GND |7            8| Y2   */ s2.Q
-			   /*       +--------------+      */
+				/*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -377,7 +377,7 @@ NETLIST_START(TTL_7427_DIP)
 		s2.C,  /*    C2 |5           10| B3   */ s3.B,
 		s2.Q,  /*    Y2 |6            9| A3   */ s3.A,
 		GND.I, /*   GND |7            8| Y3   */ s3.Q
-			   /*       +--------------+      */
+				/*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -417,7 +417,7 @@ NETLIST_START(TTL_7430_DIP)
 		s1.E,  /*     E |5           10| NC   */ NC.I,
 		s1.F,  /*     F |6            9| NC   */ NC.I,
 		GND.I, /*   GND |7            8| Y    */ s1.Q
-			   /*       +--------------+      */
+				/*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -456,7 +456,7 @@ NETLIST_START(TTL_7432_DIP)
 		s2.B,  /*    B2 |5           10| B3   */ s3.B,
 		s2.Q,  /*    Y2 |6            9| A3   */ s3.A,
 		GND.I, /*   GND |7            8| Y3   */ s3.Q
-		       /*       +--------------+      */
+				/*       +--------------+      */
 	)
 NETLIST_END()
 

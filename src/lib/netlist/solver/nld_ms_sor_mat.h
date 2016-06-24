@@ -22,7 +22,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 template <unsigned m_N, unsigned storage_N>
 class matrix_solver_SOR_mat_t: public matrix_solver_direct_t<m_N, storage_N>
 {

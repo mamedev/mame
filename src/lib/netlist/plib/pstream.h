@@ -17,7 +17,6 @@
 #include "pfmtlog.h"
 
 namespace plib {
-
 // -----------------------------------------------------------------------------
 // pstream: things common to all streams
 // -----------------------------------------------------------------------------
@@ -31,7 +30,7 @@ public:
 
 	static const pos_type SEEK_EOF = (pos_type) -1;
 
-	pstream(const unsigned flags) : m_flags(flags)
+	explicit pstream(const unsigned flags) : m_flags(flags)
 	{
 	}
 	virtual ~pstream()
@@ -99,7 +98,7 @@ class pistream : public pstream
 	P_PREVENT_COPYING(pistream)
 public:
 
-	pistream(const unsigned flags) : pstream(flags) {}
+	explicit pistream(const unsigned flags) : pstream(flags) {}
 	virtual ~pistream() {}
 
 	bool eof() const { return ((flags() & FLAG_EOF) != 0) || bad(); }
@@ -134,7 +133,7 @@ class postream : public pstream
 	P_PREVENT_COPYING(postream)
 public:
 
-	postream(unsigned flags) : pstream(flags) {}
+	explicit postream(unsigned flags) : pstream(flags) {}
 	virtual ~postream() {}
 
 	/* this digests linux & dos/windows text files */
@@ -230,7 +229,7 @@ class pofilestream : public postream
 	P_PREVENT_COPYING(pofilestream)
 public:
 
-	pofilestream(const pstring &fname);
+	explicit pofilestream(const pstring &fname);
 	virtual ~pofilestream();
 
 	void close();
@@ -281,7 +280,7 @@ class pifilestream : public pistream
 	P_PREVENT_COPYING(pifilestream)
 public:
 
-	pifilestream(const pstring &fname);
+	explicit pifilestream(const pstring &fname);
 	virtual ~pifilestream();
 
 	void close();
@@ -324,7 +323,7 @@ class pimemstream : public pistream
 public:
 
 	pimemstream(const void *mem, const pos_type len);
-	pimemstream(const pomemstream &ostrm);
+	explicit pimemstream(const pomemstream &ostrm);
 	virtual ~pimemstream();
 
 protected:
@@ -364,7 +363,7 @@ class pstream_fmt_writer_t : public plib::pfmt_writer_t<>
 	P_PREVENT_COPYING(pstream_fmt_writer_t)
 public:
 
-	pstream_fmt_writer_t(postream &strm) : m_strm(strm) {}
+	explicit pstream_fmt_writer_t(postream &strm) : m_strm(strm) {}
 	virtual ~pstream_fmt_writer_t() { }
 
 protected:

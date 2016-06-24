@@ -63,7 +63,6 @@
 #define NETLIST_START(name)                                                    \
 void NETLIST_NAME(name)(netlist::setup_t &setup)                               \
 {
-
 #define NETLIST_END()  }
 
 #define LOCAL_SOURCE(name)                                                     \
@@ -105,13 +104,12 @@ void NETLIST_NAME(name)(netlist::setup_t &setup)                               \
 		desc.family = x;
 
 #define TRUTHTABLE_END() \
-		netlist::devices::tt_factory_create(setup, desc);		\
+		netlist::devices::tt_factory_create(setup, desc);       \
 	}
 
 
 namespace netlist
 {
-
 	// -----------------------------------------------------------------------------
 	// truthtable desc
 	// -----------------------------------------------------------------------------
@@ -173,7 +171,7 @@ namespace netlist
 
 		using link_t = std::pair<pstring, pstring>;
 
-		setup_t(netlist_t &netlist);
+		explicit setup_t(netlist_t &netlist);
 		~setup_t();
 
 		netlist_t &netlist() { return m_netlist; }
@@ -210,7 +208,7 @@ namespace netlist
 
 		bool device_exists(const pstring name) const;
 
-		param_t *find_param(const pstring &param_in, bool required = true);
+		param_t *find_param(const pstring &param_in, bool required = true) const;
 
 		void start_devices();
 		void resolve_inputs();

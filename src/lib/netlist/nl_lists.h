@@ -44,8 +44,8 @@ namespace netlist
 			clear();
 		}
 
-		 std::size_t capacity() const { return m_list.size(); }
-		 bool empty() const { return (m_end == &m_list[1]); }
+			std::size_t capacity() const { return m_list.size(); }
+			bool empty() const { return (m_end == &m_list[1]); }
 
 		void push(const Time t, Element o) NOEXCEPT
 		{
@@ -116,9 +116,9 @@ namespace netlist
 
 		// save state support & mame disasm
 
-		 const entry_t *listptr() const { return &m_list[1]; }
-		 std::size_t size() const { return m_end - &m_list[1]; }
-		 const entry_t & operator[](const std::size_t index) const { return m_list[ 1 + index]; }
+			const entry_t *listptr() const { return &m_list[1]; }
+			std::size_t size() const { return m_end - &m_list[1]; }
+			const entry_t & operator[](const std::size_t index) const { return m_list[ 1 + index]; }
 
 	private:
 

@@ -18,7 +18,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 	/* FIXME: these should become proper devices */
 
 	struct solver_parameters_t

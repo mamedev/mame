@@ -36,7 +36,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 NETLIB_OBJECT(OPAMP)
 {
 	NETLIB_CONSTRUCTOR(OPAMP)
@@ -49,7 +48,6 @@ NETLIB_OBJECT(OPAMP)
 	, m_VL(*this, "VL")
 	, m_VREF(*this, "VREF")
 	{
-
 		m_type = m_model.model_value("TYPE");
 
 		if (m_type == 1)
