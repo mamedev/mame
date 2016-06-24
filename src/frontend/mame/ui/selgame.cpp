@@ -69,7 +69,7 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container *conta
 	// check if there are available icons
 	ui_globals::has_icons = false;
 	file_enumerator path(moptions.icons_directory());
-	const osd_directory_entry *dir;
+	const osd::directory::entry *dir;
 	while ((dir = path.next()) != nullptr)
 	{
 		std::string src(dir->name);
@@ -644,7 +644,7 @@ void menu_select_game::build_available_list()
 
 	// open a path to the ROMs and find them in the array
 	file_enumerator path(machine().options().media_path());
-	const osd_directory_entry *dir;
+	const osd::directory::entry *dir;
 
 	// iterate while we get new objects
 	while ((dir = path.next()) != nullptr)

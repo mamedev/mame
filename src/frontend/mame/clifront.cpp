@@ -1810,19 +1810,19 @@ media_identifier::media_identifier(emu_options &options)
 void media_identifier::identify(const char *filename)
 {
 	// first try to open as a directory
-	osd_directory *directory = osd_opendir(filename);
+	osd::directory *directory = osd::directory::open(filename);
 	if (directory != nullptr)
 	{
 		// iterate over all files in the directory
-		for (const osd_directory_entry *entry = osd_readdir(directory); entry != nullptr; entry = osd_readdir(directory))
-			if (entry->type == ENTTYPE_FILE)
+		for (const osd::directory::entry *entry = directory->read(); entry != nullptr; entry = directory->read())
+			if (entry->type == osd::directory::entry::entry_type::FILE)
 			{
 				std::string curfile = std::string(filename).append(PATH_SEPARATOR).append(entry->name);
 				identify(curfile.c_str());
 			}
 
 		// close the directory and be done
-		osd_closedir(directory);
+		delete directory;
 	}
 
 	// if that failed, and the filename ends with .zip, identify as a ZIP file

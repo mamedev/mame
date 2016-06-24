@@ -63,12 +63,12 @@ public:
 	~file_enumerator();
 
 	// iterator
-	const osd_directory_entry *next();
+	const osd::directory::entry *next();
 
 private:
 	// internal state
 	path_iterator   m_iterator;
-	osd_directory * m_curdir;
+	osd::directory *m_curdir;
 	std::string     m_pathbuffer;
 	//int             m_buflen;
 };

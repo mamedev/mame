@@ -91,12 +91,12 @@ void chain_manager::destroy_unloaded_chains()
 
 void chain_manager::find_available_chains(std::string root, std::string path)
 {
-	osd_directory *directory = osd_opendir((root + path).c_str());
+	osd::directory *directory = osd::directory::open((root + path).c_str());
 	if (directory != nullptr)
 	{
-		for (const osd_directory_entry *entry = osd_readdir(directory); entry != nullptr; entry = osd_readdir(directory))
+		for (const osd::directory::entry *entry = directory->read(); entry != nullptr; entry = directory->read())
 		{
-			if (entry->type == ENTTYPE_FILE)
+			if (entry->type == osd::directory::entry::entry_type::FILE)
 			{
 				std::string name(entry->name);
 				std::string extension(".json");
@@ -114,7 +114,7 @@ void chain_manager::find_available_chains(std::string root, std::string path)
 					}
 				}
 			}
-			else if (entry->type == ENTTYPE_DIR)
+			else if (entry->type == osd::directory::entry::entry_type::DIR)
 			{
 				std::string name = entry->name;
 				if (!(name == "." || name == ".."))
@@ -129,7 +129,7 @@ void chain_manager::find_available_chains(std::string root, std::string path)
 			}
 		}
 
-		osd_closedir(directory);
+		delete directory;
 	}
 }
 

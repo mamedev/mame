@@ -115,12 +115,12 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 							directory_path += "/" + file_directory;
 						}
 
-						osd_directory *directory = osd_opendir(directory_path.c_str());
+						osd::directory *directory = osd::directory::open(directory_path.c_str());
 						if (directory != nullptr)
 						{
-							for (const osd_directory_entry *entry = osd_readdir(directory); entry != nullptr; entry = osd_readdir(directory))
+							for (const osd::directory::entry *entry = directory->read(); entry != nullptr; entry = directory->read())
 							{
-								if (entry->type == ENTTYPE_FILE)
+								if (entry->type == osd::directory::entry::entry_type::FILE)
 								{
 									std::string file(entry->name);
 									std::string extension(".png");
@@ -160,7 +160,7 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 								}
 							}
 
-							osd_closedir(directory);
+							delete directory;
 						}
 					}
 				}

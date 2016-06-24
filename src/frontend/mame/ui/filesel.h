@@ -107,7 +107,7 @@ private:
 	// methods
 	int compare_entries(const file_selector_entry *e1, const file_selector_entry *e2);
 	file_selector_entry *append_entry(file_selector_entry_type entry_type, const char *entry_basename, const char *entry_fullpath);
-	file_selector_entry *append_dirent_entry(const osd_directory_entry *dirent);
+	file_selector_entry *append_dirent_entry(const osd::directory::entry *dirent);
 	void append_entry_menu_item(const file_selector_entry *entry);
 };
 
