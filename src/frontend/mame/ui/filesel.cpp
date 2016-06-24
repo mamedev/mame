@@ -451,7 +451,7 @@ menu_file_selector::file_selector_entry *menu_file_selector::append_entry(
 //  a menu item for a file selector entry
 //-------------------------------------------------
 
-menu_file_selector::file_selector_entry *menu_file_selector::append_dirent_entry(const osd_directory_entry *dirent)
+menu_file_selector::file_selector_entry *menu_file_selector::append_dirent_entry(const osd::directory::entry *dirent)
 {
 	std::string buffer;
 	file_selector_entry_type entry_type;
@@ -459,11 +459,11 @@ menu_file_selector::file_selector_entry *menu_file_selector::append_dirent_entry
 
 	switch(dirent->type)
 	{
-		case ENTTYPE_FILE:
+		case osd::directory::entry::entry_type::FILE:
 			entry_type = SELECTOR_ENTRY_TYPE_FILE;
 			break;
 
-		case ENTTYPE_DIR:
+		case osd::directory::entry::entry_type::DIR:
 			entry_type = SELECTOR_ENTRY_TYPE_DIRECTORY;
 			break;
 
@@ -536,7 +536,7 @@ void menu_file_selector::populate()
 {
 	util::zippath_directory *directory = nullptr;
 	osd_file::error err;
-	const osd_directory_entry *dirent;
+	const osd::directory::entry *dirent;
 	const file_selector_entry *entry;
 	const file_selector_entry *selected_entry = nullptr;
 	int i;

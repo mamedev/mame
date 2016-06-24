@@ -28,36 +28,39 @@
 //  TYPE DEFINITIONS
 //============================================================
 
-struct osd_directory
+namespace
 {
-	HANDLE              find;                   // handle to the finder
-	int                 is_first;               // TRUE if this is the first entry
-	osd_directory_entry entry;                  // current entry's data
-	WIN32_FIND_DATA     data;                   // current raw data
+	class win_directory : public osd::directory
+	{
+	public:
+		win_directory();
+		~win_directory();
+
+		virtual const entry *read() override;
+
+		HANDLE              m_find;                   // handle to the finder
+		bool                m_is_first;               // true if this is the first entry
+		entry				m_entry;                  // current entry's data
+		WIN32_FIND_DATA     m_data;                   // current raw data
+	};
 };
 
 
-
 //============================================================
-//  osd_opendir
+//  osd::directory::open
 //============================================================
 
-osd_directory *osd_opendir(const char *dirname)
+osd::directory *osd::directory::open(const char *dirname)
 {
-	osd_directory *dir = nullptr;
+	win_directory *dir = nullptr;
 	TCHAR *t_dirname = nullptr;
 	TCHAR *dirfilter = nullptr;
 	size_t dirfilter_size;
 
 	// allocate memory to hold the osd_tool_directory structure
-	dir = (osd_directory *)malloc(sizeof(*dir));
+	dir = new win_directory();
 	if (dir == nullptr)
 		goto error;
-	memset(dir, 0, sizeof(*dir));
-
-	// initialize the structure
-	dir->find = INVALID_HANDLE_VALUE;
-	dir->is_first = TRUE;
 
 	// convert the path to TCHARs
 	t_dirname = tstring_from_utf8(dirname);
@@ -72,7 +75,7 @@ osd_directory *osd_opendir(const char *dirname)
 	_sntprintf(dirfilter, dirfilter_size, TEXT("%s\\*.*"), t_dirname);
 
 	// attempt to find the first file
-	dir->find = FindFirstFileEx(dirfilter, FindExInfoStandard, &dir->data, FindExSearchNameMatch, nullptr, 0);
+	dir->m_find = FindFirstFileEx(dirfilter, FindExInfoStandard, &dir->m_data, FindExSearchNameMatch, nullptr, 0);
 
 error:
 	// cleanup
@@ -80,9 +83,9 @@ error:
 		osd_free(t_dirname);
 	if (dirfilter != nullptr)
 		free(dirfilter);
-	if (dir != nullptr && dir->find == INVALID_HANDLE_VALUE)
+	if (dir != nullptr && dir->m_find == INVALID_HANDLE_VALUE)
 	{
-		free(dir);
+		delete dir;
 		dir = nullptr;
 	}
 	return dir;
@@ -90,47 +93,56 @@ error:
 
 
 //============================================================
-//  osd_readdir
+//  win_directory::win_directory
 //============================================================
 
-const osd_directory_entry *osd_readdir(osd_directory *dir)
+win_directory::win_directory()
+	: m_find(INVALID_HANDLE_VALUE), m_is_first(true)
 {
-	// if we've previously allocated a name, free it now
-	if (dir->entry.name != nullptr)
-	{
-		osd_free((void *)dir->entry.name);
-		dir->entry.name = nullptr;
-	}
-
-	// if this isn't the first file, do a find next
-	if (!dir->is_first)
-	{
-		if (!FindNextFile(dir->find, &dir->data))
-			return nullptr;
-	}
-
-	// otherwise, just use the data we already had
-	else
-		dir->is_first = FALSE;
-
-	// extract the data
-	dir->entry.name = utf8_from_tstring(dir->data.cFileName);
-	dir->entry.type = win_attributes_to_entry_type(dir->data.dwFileAttributes);
-	dir->entry.size = dir->data.nFileSizeLow | ((UINT64) dir->data.nFileSizeHigh << 32);
-	return (dir->entry.name != nullptr) ? &dir->entry : nullptr;
+	memset(&m_entry, 0, sizeof(m_entry));
+	memset(&m_data, 0, sizeof(m_data));
 }
 
 
 //============================================================
-//  osd_closedir
+//  win_directory::~win_directory
 //============================================================
 
-void osd_closedir(osd_directory *dir)
+win_directory::~win_directory()
 {
 	// free any data associated
-	if (dir->entry.name != nullptr)
-		osd_free((void *)dir->entry.name);
-	if (dir->find != INVALID_HANDLE_VALUE)
-		FindClose(dir->find);
-	free(dir);
+	if (m_entry.name != nullptr)
+		osd_free((void *)m_entry.name);
+	if (m_find != INVALID_HANDLE_VALUE)
+		FindClose(m_find);
+}
+
+
+//============================================================
+//  win_directory::read
+//============================================================
+
+const osd::directory::entry *win_directory::read()
+{
+	// if we've previously allocated a name, free it now
+	if (m_entry.name != nullptr)
+	{
+		osd_free((void *)m_entry.name);
+		m_entry.name = nullptr;
+	}
+
+	// if this isn't the first file, do a find next
+	if (!m_is_first)
+	{
+		if (!FindNextFile(m_find, &m_data))
+			return nullptr;
+	}
+	m_is_first = false;
+
+	// extract the data
+	m_entry.name = utf8_from_tstring(m_data.cFileName);
+	m_entry.type = win_attributes_to_entry_type(m_data.dwFileAttributes);
+	m_entry.size = m_data.nFileSizeLow | ((UINT64) m_data.nFileSizeHigh << 32);
+	m_entry.last_modified = win_time_point_from_filetime(&m_data.ftLastWriteTime);
+	return (m_entry.name != nullptr) ? &m_entry : nullptr;
 }

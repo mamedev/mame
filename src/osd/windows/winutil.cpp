@@ -23,14 +23,26 @@
 //  win_attributes_to_entry_type
 //============================================================
 
-osd_dir_entry_type win_attributes_to_entry_type(DWORD attributes)
+osd::directory::entry::entry_type win_attributes_to_entry_type(DWORD attributes)
 {
 	if (attributes == 0xFFFFFFFF)
-		return ENTTYPE_NONE;
+		return osd::directory::entry::entry_type::NONE;
 	else if (attributes & FILE_ATTRIBUTE_DIRECTORY)
-		return ENTTYPE_DIR;
+		return osd::directory::entry::entry_type::DIR;
 	else
-		return ENTTYPE_FILE;
+		return osd::directory::entry::entry_type::FILE;
+}
+
+
+
+//============================================================
+//  win_time_point_from_filetime
+//============================================================
+
+std::chrono::system_clock::time_point win_time_point_from_filetime(LPFILETIME file_time)
+{
+	return std::chrono::system_clock::time_point(std::chrono::system_clock::duration(
+		(static_cast<__int64>(file_time->dwHighDateTime) << 32) | file_time->dwLowDateTime));
 }
 
 

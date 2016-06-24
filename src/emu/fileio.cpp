@@ -91,7 +91,7 @@ file_enumerator::~file_enumerator()
 {
 	// close anything open
 	if (m_curdir != nullptr)
-		osd_closedir(m_curdir);
+		delete m_curdir;
 }
 
 
@@ -100,7 +100,7 @@ file_enumerator::~file_enumerator()
 //  in the search path
 //-------------------------------------------------
 
-const osd_directory_entry *file_enumerator::next()
+const osd::directory::entry *file_enumerator::next()
 {
 	// loop over potentially empty directories
 	while (1)
@@ -113,16 +113,16 @@ const osd_directory_entry *file_enumerator::next()
 				return nullptr;
 
 			// open the path
-			m_curdir = osd_opendir(m_pathbuffer.c_str());
+			m_curdir = osd::directory::open(m_pathbuffer.c_str());
 		}
 
 		// get the next entry from the current directory
-		const osd_directory_entry *result = osd_readdir(m_curdir);
+		const osd::directory::entry *result = m_curdir->read();
 		if (result != nullptr)
 			return result;
 
 		// we're done; close this directory
-		osd_closedir(m_curdir);
+		delete m_curdir;
 		m_curdir = nullptr;
 	}
 }

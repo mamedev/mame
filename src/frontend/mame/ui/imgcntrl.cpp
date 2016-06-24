@@ -88,31 +88,31 @@ menu_control_device_image::~menu_control_device_image()
 void menu_control_device_image::test_create(bool &can_create, bool &need_confirm)
 {
 	std::string path;
-	osd_directory_entry *entry;
-	osd_dir_entry_type file_type;
+	osd::directory::entry *entry;
+	osd::directory::entry::entry_type file_type;
 
 	/* assemble the full path */
 	util::zippath_combine(path, current_directory.c_str(), current_file.c_str());
 
 	/* does a file or a directory exist at the path */
 	entry = osd_stat(path.c_str());
-	file_type = (entry != nullptr) ? entry->type : ENTTYPE_NONE;
+	file_type = (entry != nullptr) ? entry->type : osd::directory::entry::entry_type::NONE;
 
 	switch(file_type)
 	{
-		case ENTTYPE_NONE:
+		case osd::directory::entry::entry_type::NONE:
 			/* no file/dir here - always create */
 			can_create = true;
 			need_confirm = false;
 			break;
 
-		case ENTTYPE_FILE:
+		case osd::directory::entry::entry_type::FILE:
 			/* a file exists here - ask for permission from the user */
 			can_create = true;
 			need_confirm = true;
 			break;
 
-		case ENTTYPE_DIR:
+		case osd::directory::entry::entry_type::DIR:
 			/* a directory exists here - we can't save over it */
 			ui().popup_time(5, "%s", _("Cannot save over directory"));
 			can_create = false;
