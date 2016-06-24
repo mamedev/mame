@@ -125,6 +125,9 @@ public:
 	// flush file buffers
 	virtual osd_file::error flush() = 0;
 
+	// last modified
+	virtual std::time_t get_last_modified_time();
+
 
 protected:
 	core_file();

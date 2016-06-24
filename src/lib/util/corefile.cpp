@@ -313,6 +313,7 @@ public:
 	virtual std::uint32_t write(void const *buffer, std::uint32_t length) override;
 	virtual osd_file::error truncate(std::uint64_t offset) override;
 	virtual osd_file::error flush() override;
+	virtual std::time_t get_last_modified_time() override;
 
 protected:
 
@@ -963,6 +964,19 @@ osd_file::error core_osd_file::flush()
 
 
 /*-------------------------------------------------
+	get_last_modified_time
+-------------------------------------------------*/
+
+std::time_t core_osd_file::get_last_modified_time()
+{
+	std::time_t last_modified_time;
+	return m_file->get_last_modified_time(last_modified_time) == osd_file::error::NONE
+		? last_modified_time
+		: (std::time_t) - 1;
+}
+
+
+/*-------------------------------------------------
     osd_or_zlib_read - wrapper for osd_read that
     handles zlib-compressed data
 -------------------------------------------------*/
@@ -1245,6 +1259,16 @@ osd_file::error core_file::load(std::string const &filename, dynamic_buffer &dat
 
 	// close the file and return data
 	return osd_file::error::NONE;
+}
+
+
+/*-------------------------------------------------
+	get_last_modified_time
+-------------------------------------------------*/
+
+std::time_t core_file::get_last_modified_time()
+{
+	return (std::time_t) -1;
 }
 
 

@@ -25,6 +25,7 @@
 #include "ui/mainmenu.h"
 #include "ui/filemngr.h"
 #include "ui/sliders.h"
+#include "ui/state.h"
 #include "ui/viewgfx.h"
 #include "imagedev/cassette.h"
 #include "image.h"
@@ -181,8 +182,7 @@ mame_ui_manager::mame_ui_manager(running_machine &machine)
 		m_show_profiler(false),
 		m_popup_text_end(0),
 		m_mouse_arrow_texture(nullptr),
-		m_mouse_show(false),
-		m_load_save_hold(false)
+		m_mouse_show(false)
 {
 }
 
@@ -1210,6 +1210,28 @@ void mame_ui_manager::draw_profiler(render_container *container)
 
 
 //-------------------------------------------------
+//  start_save_state
+//-------------------------------------------------
+
+void mame_ui_manager::start_save_state()
+{
+	show_menu();
+	ui::menu::stack_push<ui::menu_save_state>(*this, &machine().render().ui_container());
+}
+
+
+//-------------------------------------------------
+//  start_load_state
+//-------------------------------------------------
+
+void mame_ui_manager::start_load_state()
+{
+	show_menu();
+	ui::menu::stack_push<ui::menu_load_state>(*this, &machine().render().ui_container());
+}
+
+
+//-------------------------------------------------
 //  image_handler_ingame - execute display
 //  callback function for each image device
 //-------------------------------------------------
@@ -1386,18 +1408,14 @@ UINT32 mame_ui_manager::handler_ingame(render_container *container)
 	// handle a save state request
 	if (machine().ui_input().pressed(IPT_UI_SAVE_STATE))
 	{
-		machine().pause();
-		m_load_save_hold = true;
-		set_handler(UI_CALLBACK_TYPE_GENERAL, &mame_ui_manager::handler_load_save, (UINT32)LOADSAVE_SAVE);
+		start_save_state();
 		return LOADSAVE_SAVE;
 	}
 
 	// handle a load state request
 	if (machine().ui_input().pressed(IPT_UI_LOAD_STATE))
 	{
-		machine().pause();
-		m_load_save_hold = true;
-		set_handler(UI_CALLBACK_TYPE_GENERAL, &mame_ui_manager::handler_load_save, (UINT32)LOADSAVE_LOAD);
+		start_load_state();
 		return LOADSAVE_LOAD;
 	}
 
@@ -1471,110 +1489,6 @@ UINT32 mame_ui_manager::handler_ingame(render_container *container)
 	return 0;
 }
 
-
-//-------------------------------------------------
-//  handler_load_save - leads the user through
-//  specifying a game to save or load
-//-------------------------------------------------
-
-UINT32 mame_ui_manager::handler_load_save(render_container *container, UINT32 state)
-{
-	char filename[20];
-	char file = 0;
-
-	// if we're not in the middle of anything, skip
-	if (state == LOADSAVE_NONE)
-		return 0;
-
-	// okay, we're waiting for a key to select a slot; display a message
-	if (state == LOADSAVE_SAVE)
-		draw_message_window(container, _("Select position to save to"));
-	else
-		draw_message_window(container, _("Select position to load from"));
-
-	// if load/save state sequence is still being pressed, do not read the filename yet
-	if (m_load_save_hold) {
-		bool seq_in_progress = false;
-		const input_seq &load_save_seq = state == LOADSAVE_SAVE ?
-			machine().ioport().type_seq(IPT_UI_SAVE_STATE) :
-			machine().ioport().type_seq(IPT_UI_LOAD_STATE);
-
-		for (int i = 0; i < load_save_seq.length(); i++)
-			if (machine().input().code_pressed_once(load_save_seq[i]))
-				seq_in_progress = true;
-
-		if (seq_in_progress)
-			return state;
-		else
-			m_load_save_hold = false;
-	}
-
-	// check for cancel key
-	if (machine().ui_input().pressed(IPT_UI_CANCEL))
-	{
-		// display a popup indicating things were cancelled
-		if (state == LOADSAVE_SAVE)
-			machine().popmessage(_("Save cancelled"));
-		else
-			machine().popmessage(_("Load cancelled"));
-
-		// reset the state
-		machine().resume();
-		return UI_HANDLER_CANCEL;
-	}
-
-	// check for A-Z or 0-9
-	for (input_item_id id = ITEM_ID_A; id <= ITEM_ID_Z; ++id)
-		if (machine().input().code_pressed_once(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
-			file = id - ITEM_ID_A + 'a';
-	if (file == 0)
-		for (input_item_id id = ITEM_ID_0; id <= ITEM_ID_9; ++id)
-			if (machine().input().code_pressed_once(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
-				file = id - ITEM_ID_0 + '0';
-	if (file == 0)
-		for (input_item_id id = ITEM_ID_0_PAD; id <= ITEM_ID_9_PAD; ++id)
-			if (machine().input().code_pressed_once(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
-				file = id - ITEM_ID_0_PAD + '0';
-	if (file == 0)
-	{
-		bool found = false;
-
-		for (int joy_index = 0; joy_index <= MAX_SAVED_STATE_JOYSTICK; joy_index++)
-			for (input_item_id id = ITEM_ID_BUTTON1; id <= ITEM_ID_BUTTON32; ++id)
-				if (machine().input().code_pressed_once(input_code(DEVICE_CLASS_JOYSTICK, joy_index, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
-				{
-					snprintf(filename, sizeof(filename), "joy%i-%i", joy_index, id - ITEM_ID_BUTTON1 + 1);
-					found = true;
-					break;
-				}
-
-		if (!found)
-			return state;
-	}
-	else
-	{
-		sprintf(filename, "%c", file);
-	}
-
-	// display a popup indicating that the save will proceed
-	if (state == LOADSAVE_SAVE)
-	{
-		machine().popmessage(_("Save to position %s"), filename);
-		machine().schedule_save(filename);
-	}
-	else
-	{
-		machine().popmessage(_("Load from position %s"), filename);
-		machine().schedule_load(filename);
-	}
-
-	// avoid handling the name of the save state slot as a seperate input
-	machine().ui_input().mark_all_as_pressed();
-
-	// remove the pause and reset the state
-	machine().resume();
-	return UI_HANDLER_CANCEL;
-}
 
 
 //-------------------------------------------------

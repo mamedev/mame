@@ -236,6 +236,8 @@ public:
 	void draw_timecode_counter(render_container *container);
 	void draw_timecode_total(render_container *container);
 	void draw_profiler(render_container *container);
+	void start_save_state();
+	void start_load_state();
 
 	// print the game info string into a buffer
 	std::string &game_info_astring(std::string &str);
@@ -270,7 +272,6 @@ private:
 	std::unique_ptr<UINT8[]> m_non_char_keys_down;
 	render_texture *        m_mouse_arrow_texture;
 	bool                    m_mouse_show;
-	bool                    m_load_save_hold;
 	ui_options              m_ui_options;
 
 	// static variables

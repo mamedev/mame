@@ -110,6 +110,28 @@ public:
 		return error::NONE;
 	}
 
+	virtual error get_last_modified_time(std::time_t &last_modified_time) override
+	{
+		FILETIME windows_last_modified_time;
+		if (!GetFileTime(m_handle, nullptr, nullptr, &windows_last_modified_time))
+			return win_error_to_file_error(GetLastError());
+
+		// takes the last modified date
+		LARGE_INTEGER date, adjust;
+		date.HighPart = windows_last_modified_time.dwHighDateTime;
+		date.LowPart = windows_last_modified_time.dwLowDateTime;
+
+		// 100-nanoseconds = milliseconds * 10000
+		adjust.QuadPart = 11644473600000 * 10000;
+
+		// removes the diff between 1970 and 1601
+		date.QuadPart -= adjust.QuadPart;
+
+		// converts back from 100-nanoseconds to seconds
+		last_modified_time = date.QuadPart / 10000000;
+		return error::NONE;
+	}
+
 private:
 	HANDLE m_handle;
 };

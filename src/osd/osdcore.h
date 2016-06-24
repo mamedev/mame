@@ -25,6 +25,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <ctime>
 
 
 /***************************************************************************
@@ -224,6 +225,20 @@ public:
 	        the file, or FILERR_NONE if no error occurred
 	-----------------------------------------------------------------------------*/
 	static error remove(std::string const &filename);
+
+	/*-----------------------------------------------------------------------------
+		osd_file::get_last_modified_time: gets the last modified time
+	
+	Parameters:
+
+		last_modified_time - last modified time
+
+	Return value:
+
+		a file_error describing any error that occurred while deleting
+		the file, or FILERR_NONE if no error occurred
+	-----------------------------------------------------------------------------*/
+	virtual error get_last_modified_time(std::time_t &last_modified_time);
 };
 
 
