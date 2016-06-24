@@ -88,14 +88,13 @@ menu_control_device_image::~menu_control_device_image()
 void menu_control_device_image::test_create(bool &can_create, bool &need_confirm)
 {
 	std::string path;
-	osd::directory::entry *entry;
 	osd::directory::entry::entry_type file_type;
 
 	/* assemble the full path */
 	util::zippath_combine(path, current_directory.c_str(), current_file.c_str());
 
 	/* does a file or a directory exist at the path */
-	entry = osd_stat(path.c_str());
+	auto entry = osd_stat(path.c_str());
 	file_type = (entry != nullptr) ? entry->type : osd::directory::entry::entry_type::NONE;
 
 	switch(file_type)
@@ -124,9 +123,6 @@ void menu_control_device_image::test_create(bool &can_create, bool &need_confirm
 			need_confirm = false;
 			fatalerror("Unexpected\n");
 	}
-
-	if (entry != nullptr)
-		osd_free(entry);
 }
 
 

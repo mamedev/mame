@@ -701,7 +701,7 @@ static osd_file::error zippath_resolve(const char *path, osd::directory::entry::
 		apath_trimmed = apath;
 
 		// stat the path
-		std::unique_ptr<osd::directory::entry, void (*)(void *)> current_entry(osd_stat(apath_trimmed), &osd_free);
+		auto current_entry = osd_stat(apath_trimmed);
 
 		// did we find anything?
 		if (current_entry)
