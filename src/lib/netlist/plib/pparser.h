@@ -25,7 +25,7 @@ class ptokenizer
 public:
 	virtual ~ptokenizer() {}
 
-	ptokenizer(pistream &strm)
+	explicit ptokenizer(pistream &strm)
 	: m_strm(strm), m_lineno(1), m_px(0), m_string('"')
 	{}
 

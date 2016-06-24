@@ -111,7 +111,7 @@ class options
 public:
 
 	options();
-	options(option *o[]);
+	explicit options(option *o[]);
 
 	~options();
 

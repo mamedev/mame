@@ -22,7 +22,7 @@ namespace plib {
 class dynlib
 {
 public:
-	dynlib(const pstring libname);
+	explicit dynlib(const pstring libname);
 	dynlib(const pstring path, const pstring libname);
 	~dynlib();
 

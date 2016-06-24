@@ -96,8 +96,8 @@ public:
 	{
 		LC* p;
 	public:
-		constexpr iter_t(LC* x) noexcept : p(x) {}
-		iter_t(const iter_t &rhs) noexcept = default;
+		explicit constexpr iter_t(LC* x) noexcept : p(x) {}
+		explicit iter_t(const iter_t &rhs) noexcept = default;
 		iter_t(iter_t &&rhs) noexcept = default;
 		iter_t& operator++() noexcept {p = p->next();return *this;}
 		iter_t operator++(int) noexcept {iter_t tmp(*this); operator++(); return tmp;}

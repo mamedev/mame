@@ -30,7 +30,7 @@ public:
 		datatype_t(std::size_t bsize, bool bptr, bool bintegral, bool bfloat)
 		: size(bsize), is_ptr(bptr), is_integral(bintegral), is_float(bfloat), is_custom(false)
 		{}
-		datatype_t(bool bcustom)
+		explicit datatype_t(bool bcustom)
 		: size(0), is_ptr(false), is_integral(false), is_float(false), is_custom(bcustom)
 		{}
 
