@@ -33276,12 +33276,18 @@ gamegear                        // Sega GameGear
 sg1000m3                        // Sega SG-1000 Mark III (Japan)
 sms                             // Sega Master System II (NTSC)
 sms1                            // Sega Master System I (NTSC)
+sms1br                          // Tec Toy Master System I (Brazil)
 sms1kr                          // Samsung Gam*Boy I (Korea)
 sms1krfm                        // Samsung Gam*Boy I (Korea) with FM Chip
 sms1pal                         // Sega Master System I (PAL)
+sms1paln                        // Tec Toy Master System I (PAL-N)
+sms2br                          // Tec Toy Master System II (Brazil)
+sms2paln                        // Tec Toy Master System II (PAL-N)
+smsbr                           // Tec Toy Master System III Compact (Brazil)
 smsj                            // Sega Master System (Japan) with FM Chip
 smskr                           // Samsung Gam*Boy II (Korea)
 smspal                          // Sega Master System II (PAL)
+smspaln                         // Tec Toy Master System III Compact (PAL-N)
 smssdisp                        // Sega Master System Store Display Unit
 
 @source:smsmcorp.cpp
