@@ -37,8 +37,6 @@
 #endif
 #endif
 
-#undef _POSIX_C_SOURCE  // to get DT_xxx on OS X
-
 
 #include "osdcore.h"
 #include "modules/lib/osdlib.h"
@@ -51,6 +49,7 @@
 #include <string>
 #include <utility>
 
+#undef _POSIX_C_SOURCE  // to get DT_xxx on OS X
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -65,7 +64,7 @@ namespace {
 
 #if defined(WIN32)
 constexpr char PATHSEPCH = '\\';
-constexpr char INVPATHSEPCH = '/';
+//constexpr char INVPATHSEPCH = '/';
 #else
 constexpr char PATHSEPCH = '/';
 //constexpr char INVPATHSEPCH = '\\';
