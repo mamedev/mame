@@ -8,7 +8,6 @@
 #include "pstate.h"
 
 namespace plib {
-
 state_manager_t::state_manager_t()
 {
 }

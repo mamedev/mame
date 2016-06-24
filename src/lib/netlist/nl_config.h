@@ -75,18 +75,18 @@
 //  GENERAL
 //============================================================
 
-#define NL_USE_MEMPOOL				(0)
-#define USE_TRUTHTABLE          	(1)
+#define NL_USE_MEMPOOL              (0)
+#define USE_TRUTHTABLE              (1)
 
 //============================================================
 //  Solver defines
 //============================================================
 
-#define USE_MATRIX_GS 				(0)
-#define USE_GABS 					(1)
+#define USE_MATRIX_GS               (0)
+#define USE_GABS                    (1)
 // savings are eaten up by effort
 // FIXME: Convert into solver parameter
-#define USE_LINEAR_PREDICTION 		(0)
+#define USE_LINEAR_PREDICTION       (0)
 #define NETLIST_GMIN_DEFAULT     (1e-9)
 
 

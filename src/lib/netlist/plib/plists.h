@@ -19,14 +19,13 @@
 #include "pstring.h"
 
 namespace plib {
-
 /* ----------------------------------------------------------------------------------------
  * uninitialised_array_t:
- * 		fixed size array allowing to override constructor and initialize
- * 		members by placement new.
+ *      fixed size array allowing to override constructor and initialize
+ *      members by placement new.
  *
- * 		Use with care. This template is provided to improve locality of storage
- * 		in high frequency applications. It should not be used for anything else.
+ *      Use with care. This template is provided to improve locality of storage
+ *      in high frequency applications. It should not be used for anything else.
  * ---------------------------------------------------------------------------------------- */
 
 template <class C, std::size_t N>

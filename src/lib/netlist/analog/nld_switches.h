@@ -31,7 +31,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 NETLIB_OBJECT(switch1)
 {
 	NETLIB_CONSTRUCTOR(switch1)

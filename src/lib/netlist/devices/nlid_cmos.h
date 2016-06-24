@@ -14,7 +14,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 	NETLIB_OBJECT(vdd_vss)
 	{
 		NETLIB_CONSTRUCTOR(vdd_vss)

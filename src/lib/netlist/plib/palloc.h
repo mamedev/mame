@@ -17,7 +17,6 @@
 #include "pstring.h"
 
 namespace plib {
-
 //============================================================
 //  exception base
 //============================================================
@@ -41,7 +40,7 @@ private:
 template<typename T, typename... Args>
 T *palloc(Args&&... args)
 {
-    return new T(std::forward<Args>(args)...);
+	return new T(std::forward<Args>(args)...);
 }
 
 template<typename T>
@@ -58,7 +57,7 @@ void pfree_array(T *ptr) { delete [] ptr; }
 
 template<typename T, typename... Args>
 std::unique_ptr<T> make_unique(Args&&... args) {
-    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+	return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 
 template<typename BC, typename DC, typename... Args>

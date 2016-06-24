@@ -27,7 +27,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 template <unsigned m_N, unsigned storage_N>
 class matrix_solver_GCR_t: public matrix_solver_t
 {

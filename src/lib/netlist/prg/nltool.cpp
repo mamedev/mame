@@ -26,17 +26,17 @@ class tool_options_t : public plib::options
 public:
 	tool_options_t() :
 		plib::options(),
-		opt_ttr (*this,		"t", "time_to_run", 1.0,		"time to run the emulation (seconds)"),
-		opt_name(*this,		"n", "name",        "",      	"netlist in file to run; default is first one"),
-		opt_logs(*this,		"l", "logs",        "",      	"colon separated list of terminals to log"),
-		opt_file(*this,		"f", "file",        "-",     	"file to process (default is stdin)"),
-		opt_type(*this,		"y", "type",        "spice", 	"spice:eagle", "type of file to be converted: spice,eagle"),
-		opt_cmd (*this,		"c", "cmd",         "run",   	"run:convert:listdevices:static", "run|convert|listdevices|static"),
-		opt_inp(*this, 		"i", "input",       "",      	"input file to process (default is none)"),
-		opt_verb(*this,		"v", "verbose",              	"be verbose - this produces lots of output"),
-		opt_quiet(*this,	"q", "quiet",               	"be quiet - no warnings"),
-		opt_version(*this,	"",  "version",          		"display version and exit"),
-		opt_help(*this,		"h", "help",               		"display help and exit")
+		opt_ttr (*this,     "t", "time_to_run", 1.0,        "time to run the emulation (seconds)"),
+		opt_name(*this,     "n", "name",        "",         "netlist in file to run; default is first one"),
+		opt_logs(*this,     "l", "logs",        "",         "colon separated list of terminals to log"),
+		opt_file(*this,     "f", "file",        "-",        "file to process (default is stdin)"),
+		opt_type(*this,     "y", "type",        "spice",    "spice:eagle", "type of file to be converted: spice,eagle"),
+		opt_cmd (*this,     "c", "cmd",         "run",      "run:convert:listdevices:static", "run|convert|listdevices|static"),
+		opt_inp(*this,      "i", "input",       "",         "input file to process (default is none)"),
+		opt_verb(*this,     "v", "verbose",                 "be verbose - this produces lots of output"),
+		opt_quiet(*this,    "q", "quiet",                   "be quiet - no warnings"),
+		opt_version(*this,  "",  "version",                 "display version and exit"),
+		opt_help(*this,     "h", "help",                    "display help and exit")
 	{}
 
 	plib::option_double opt_ttr;

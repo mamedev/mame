@@ -17,8 +17,8 @@
 #include "nl_factory.h"
 #include "plib/plists.h"
 
-#define NETLIB_TRUTHTABLE(cname, nIN, nOUT)                             		\
-	class NETLIB_NAME(cname) : public nld_truthtable_t<nIN, nOUT>		        \
+#define NETLIB_TRUTHTABLE(cname, nIN, nOUT)                                     \
+	class NETLIB_NAME(cname) : public nld_truthtable_t<nIN, nOUT>               \
 	{                                                                           \
 	public:                                                                     \
 		template <class C>                                                      \
@@ -34,16 +34,15 @@ namespace netlist
 {
 	namespace devices
 	{
-
 	template<unsigned bits>
 	struct need_bytes_for_bits
 	{
-	    enum { value =
-	        bits <= 8       ?  1 :
-	        bits <= 16      ?  2 :
-	        bits <= 32      ?  4 :
-	                           8
-	    };
+		enum { value =
+			bits <= 8       ?  1 :
+			bits <= 16      ?  2 :
+			bits <= 32      ?  4 :
+								8
+		};
 	};
 
 	template<unsigned bits> struct uint_for_size;
@@ -361,9 +360,9 @@ namespace netlist
 		}
 
 		/* FIXME: check width */
-		state_var_u32		m_ign;
-		state_var_s32		m_active;
-		truthtable_t *		m_ttp;
+		state_var_u32       m_ign;
+		state_var_s32       m_active;
+		truthtable_t *      m_ttp;
 		plib::pstring_vector_t m_desc;
 	};
 

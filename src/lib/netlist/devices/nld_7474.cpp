@@ -11,7 +11,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 	NETLIB_OBJECT(7474sub)
 	{
 		NETLIB_CONSTRUCTOR(7474sub)
@@ -68,7 +67,6 @@ namespace netlist
 		, m_1(*this, "1")
 		, m_2(*this, "2")
 		{
-
 			register_subalias("1", m_1.m_CLRQ);
 			register_subalias("2", m_1.m_D);
 			register_subalias("3", m_1.sub.m_CLK);
@@ -152,7 +150,7 @@ namespace netlist
 
 	NETLIB_RESET(7474_dip)
 	{
-	//	m_1.do_reset();
+	//  m_1.do_reset();
 		//m_2.do_reset();
 	}
 

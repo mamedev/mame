@@ -17,7 +17,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 	NETLIB_OBJECT(74123)
 	{
 		NETLIB_CONSTRUCTOR_EX(74123, int dev_type = 74123)

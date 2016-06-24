@@ -22,7 +22,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 	// -----------------------------------------------------------------------------
 	// netlistparams
 	// -----------------------------------------------------------------------------
@@ -50,7 +49,6 @@ namespace netlist
 		, m_Q(*this, "Q")
 		, m_freq(*this, "FREQ", 7159000.0 * 5)
 		{
-
 			m_inc = netlist_time::from_hz(m_freq.Value()*2);
 		}
 
@@ -92,7 +90,6 @@ namespace netlist
 		, m_Q(*this, "Q")
 		, m_freq(*this, "FREQ", 7159000.0 * 5.0)
 		{
-
 			m_inc = netlist_time::from_hz(m_freq.Value()*2);
 
 			connect_late(m_feedback, m_Q);
@@ -312,7 +309,6 @@ namespace netlist
 		, m_func(*this, "FUNC", "")
 		, m_Q(*this, "Q")
 		{
-
 			for (int i=0; i < m_N; i++)
 				m_I.push_back(plib::make_unique<analog_input_t>(*this, plib::pfmt("A{1}")(i)));
 
@@ -471,7 +467,7 @@ namespace netlist
 
 	protected:
 
-		NETLIB_RESETI()	{ }
+		NETLIB_RESETI() { }
 
 		NETLIB_UPDATEI()
 		{

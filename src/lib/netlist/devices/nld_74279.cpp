@@ -12,7 +12,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 		NETLIB_TRUTHTABLE(74279A, 3, 1);
 		NETLIB_TRUTHTABLE(74279B, 4, 1);
 

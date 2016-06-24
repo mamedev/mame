@@ -27,7 +27,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 	#if (USE_TRUTHTABLE)
 	/* The truthtable implementation is a lot faster than
 	 * the carefully crafted code :-(

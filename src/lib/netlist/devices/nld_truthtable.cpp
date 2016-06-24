@@ -13,7 +13,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 	template<unsigned m_NI, unsigned m_NO>
 	class netlist_factory_truthtable_t : public netlist_base_factory_truthtable_t
 	{

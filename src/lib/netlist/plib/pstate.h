@@ -20,7 +20,6 @@
 // ----------------------------------------------------------------------------------------
 
 namespace plib {
-
 class state_manager_t
 {
 public:
@@ -84,12 +83,12 @@ public:
 
 		~entry_t() { }
 
-		pstring 			m_name;
-		const datatype_t	m_dt;
-		const void *		m_owner;
-		callback_t *		m_callback;
-		const std::size_t	m_count;
-		void *				m_ptr;
+		pstring             m_name;
+		const datatype_t    m_dt;
+		const void *        m_owner;
+		callback_t *        m_callback;
+		const std::size_t   m_count;
+		void *              m_ptr;
 
 		template<typename T>
 		T *resolved()

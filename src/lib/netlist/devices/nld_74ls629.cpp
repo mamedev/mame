@@ -46,7 +46,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 	NETLIB_OBJECT(SN74LS629clk)
 	{
 		NETLIB_CONSTRUCTOR(SN74LS629clk)

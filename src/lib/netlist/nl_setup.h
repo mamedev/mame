@@ -63,7 +63,6 @@
 #define NETLIST_START(name)                                                    \
 void NETLIST_NAME(name)(netlist::setup_t &setup)                               \
 {
-
 #define NETLIST_END()  }
 
 #define LOCAL_SOURCE(name)                                                     \
@@ -105,13 +104,12 @@ void NETLIST_NAME(name)(netlist::setup_t &setup)                               \
 		desc.family = x;
 
 #define TRUTHTABLE_END() \
-		netlist::devices::tt_factory_create(setup, desc);		\
+		netlist::devices::tt_factory_create(setup, desc);       \
 	}
 
 
 namespace netlist
 {
-
 	// -----------------------------------------------------------------------------
 	// truthtable desc
 	// -----------------------------------------------------------------------------

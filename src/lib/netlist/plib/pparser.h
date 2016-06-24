@@ -18,7 +18,6 @@
 #include "pstream.h"
 
 namespace plib {
-
 class ptokenizer
 {
 	P_PREVENT_COPYING(ptokenizer)

@@ -13,7 +13,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 	NETLIB_OBJECT(CD4066_GATE)
 	{
 		NETLIB_CONSTRUCTOR(CD4066_GATE)

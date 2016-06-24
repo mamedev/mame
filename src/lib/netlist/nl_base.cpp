@@ -18,7 +18,6 @@
 
 namespace netlist
 {
-
 #if (NL_USE_MEMPOOL)
 static plib::mempool p(65536, 8);
 
@@ -29,8 +28,8 @@ void * object_t::operator new (size_t size)
 
 void object_t::operator delete (void * mem)
 {
-    if (mem)
-    	p.free(mem);
+	if (mem)
+		p.free(mem);
 }
 #else
 void * object_t::operator new (size_t size)
@@ -40,8 +39,8 @@ void * object_t::operator new (size_t size)
 
 void object_t::operator delete (void * mem)
 {
-    if (mem)
-    	::operator delete(mem);
+	if (mem)
+		::operator delete(mem);
 }
 #endif
 
@@ -204,7 +203,6 @@ netlist_t::netlist_t(const pstring &aname)
 
 netlist_t::~netlist_t()
 {
-
 	m_nets.clear();
 	m_devices.clear();
 
@@ -268,7 +266,7 @@ void netlist_t::reset()
 	if (m_mainclock != nullptr)
 		m_mainclock->m_Q.net().set_time(netlist_time::zero());
 	//if (m_solver != nullptr)
-	//	m_solver->do_reset();
+	//  m_solver->do_reset();
 
 	// Reset all nets once !
 	for (auto & n : m_nets)
@@ -566,7 +564,7 @@ family_setter_t::family_setter_t(core_device_t &dev, const logic_family_desc_t *
 // FIXME: move somewhere central
 
 struct do_nothing_deleter{
-    template<typename T> void operator()(T*){}
+	template<typename T> void operator()(T*){}
 };
 
 
@@ -812,7 +810,7 @@ void core_terminal_t::set_net(net_t *anet)
 	m_net = anet;
 }
 
- void core_terminal_t::clear_net()
+	void core_terminal_t::clear_net()
 {
 	m_net = nullptr;
 }
@@ -952,7 +950,6 @@ nl_double param_model_t::model_value(const pstring &entity)
 
 	namespace devices
 	{
-
 	// ----------------------------------------------------------------------------------------
 	// mainclock
 	// ----------------------------------------------------------------------------------------
@@ -966,4 +963,3 @@ nl_double param_model_t::model_value(const pstring &entity)
 
 	} //namespace devices
 } // namespace netlist
-

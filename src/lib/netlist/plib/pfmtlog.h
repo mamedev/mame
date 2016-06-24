@@ -15,7 +15,6 @@
 #include "ptypes.h"
 
 namespace plib {
-
 template <typename T>
 struct ptype_treats
 {
