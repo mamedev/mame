@@ -40,7 +40,7 @@ public:
 
 	virtual const entry *read() override;
 
-	bool open(std::string const &dirname);
+	virtual bool opendir(std::string const &dirname) override;
 
 private:
 	HANDLE              m_find;                   // handle to the finder
@@ -106,10 +106,10 @@ const directory::entry *win_directory::read()
 
 
 //============================================================
-//  win_directory::open
+//  win_directory::opendir
 //============================================================
 
-bool win_directory::open(std::string const &dirname)
+bool win_directory::opendir(std::string const &dirname)
 {
 	assert(m_find == INVALID_HANDLE_VALUE);
 
@@ -121,7 +121,7 @@ bool win_directory::open(std::string const &dirname)
 	// append \*.* to the directory name
 	auto const dirfilter_size = _tcslen(t_dirname.get()) + 5;
 	std::unique_ptr<TCHAR []> dirfilter;
-	try { dirfilter.reset(new TCHAR[dirfilter_size]); }
+	try { dirfilter = std::make_unique<TCHAR[]>(dirfilter_size); }
 	catch (...) { return false; }
 	_sntprintf(dirfilter.get(), dirfilter_size, TEXT("%s\\*.*"), t_dirname.get());
 
@@ -129,6 +129,8 @@ bool win_directory::open(std::string const &dirname)
 	m_find = FindFirstFileEx(dirfilter.get(), FindExInfoStandard, &m_data, FindExSearchNameMatch, nullptr, 0);
 	if (m_find == INVALID_HANDLE_VALUE)
 		return false;
+
+	return true;
 }
 
 } // anonymous namespace
@@ -142,10 +144,10 @@ directory::ptr directory::open(std::string const &dirname)
 {
 	// allocate memory to hold the osd_tool_directory structure
 	ptr dir;
-	try { dir.reset(new win_directory()); }
+	try { dir = std::make_unique<win_directory>(); }
 	catch (...) { return nullptr; }
 
-	if (!dir->open(dirname))
+	if (!dir->opendir(dirname))
 		return false;
 
 	return dir;
