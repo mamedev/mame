@@ -1097,6 +1097,14 @@ static void tilemap_handle_keys(running_machine &machine, ui_gfx_state &state, i
 		state.bitmap_dirty = true;
 	}
 
+	// return to (0,0) (HOME)
+	if( machine.ui_input().pressed(IPT_UI_HOME))
+	{
+		state.tilemap.xoffs = 0;
+		state.tilemap.yoffs = 0;
+		state.bitmap_dirty = true;
+	}
+	
 	// handle navigation (up,down,left,right)
 	step = 8;
 	if (machine.input().code_pressed(KEYCODE_LSHIFT)) step = 1;
