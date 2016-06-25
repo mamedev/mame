@@ -37,12 +37,7 @@
 #endif
 #endif
 
-#undef _POSIX_C_SOURCE  // to get DT_xxx on OS X
-
-// #include this stuff before something else can #define _POSIX_C_SOURCE again
-#include <dirent.h>
-#include <sys/stat.h>
-#include <sys/types.h>
+#define _DARWIN_C_SOURCE  // to get DT_xxx on OS X
 
 #include "osdcore.h"
 #include "modules/lib/osdlib.h"
@@ -54,6 +49,10 @@
 #include <memory>
 #include <string>
 #include <utility>
+
+#include <dirent.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 
 
@@ -202,14 +201,14 @@ bool posix_directory::open(std::string const &dirname)
 
 directory::ptr directory::open(std::string const &dirname)
 {
-	ptr dir;
+	std::unique_ptr<posix_directory> dir;
 	try { dir.reset(new posix_directory); }
 	catch (...) { return nullptr; }
 
 	if (!dir->open(dirname))
 		return nullptr;
 
-	return dir;
+	return ptr(std::move(dir));
 }
 
 } // namespace osd

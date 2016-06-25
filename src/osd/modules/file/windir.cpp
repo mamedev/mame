@@ -140,14 +140,14 @@ bool win_directory::open(std::string const &dirname)
 directory::ptr directory::open(std::string const &dirname)
 {
 	// allocate memory to hold the osd_tool_directory structure
-	ptr dir;
+	std::unique_ptr<win_directory> dir;
 	try { dir.reset(new win_directory()); }
 	catch (...) { return nullptr; }
 
 	if (!dir->open(dirname))
 		return false;
 
-	return dir;
+	return ptr(std::move(dir));
 }
 
 } // namesapce osd
