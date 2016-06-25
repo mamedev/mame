@@ -57,8 +57,8 @@ public:
 	required_memory_region m_rom;
 	optional_device<sega8_cart_slot_device> m_cart;
 	optional_device<sg1000_expansion_slot_device> m_sgexpslot;
-	required_ioport m_pa7;
-	required_ioport m_pb7;
+	optional_ioport m_pa7;
+	optional_ioport m_pb7;
 
 	virtual void machine_start() override;
 
