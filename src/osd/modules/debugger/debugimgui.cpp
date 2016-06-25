@@ -32,7 +32,9 @@ public:
 			ofs_x(0),
 			ofs_y(0),
 			is_collapsed(false),
-			exec_cmd(false)
+			exec_cmd(false),
+			scroll_end(false),
+			scroll_follow(false)
 		{
 		this->view = machine.debug_view().alloc_view(type, nullptr, this);
 		this->type = type;
@@ -77,6 +79,8 @@ public:
 	bool                is_collapsed;
 	bool                exec_cmd;  // console only
 	int                 src_sel;
+	bool                scroll_end;
+	bool                scroll_follow;  // set if view is to stay at the end of a scrollable area (like a log window)
 	char                console_input[512];
 	std::vector<std::string> console_history;
 	std::string         console_prev;
@@ -610,6 +614,15 @@ void debug_imgui::draw_view(debug_area* view_ptr, bool exp_change)
 			ImVec2(view_ptr->ofs_x + view_ptr->view_width,view_ptr->ofs_y + ImGui::GetScrollY() + view_ptr->view_height),col);
 	}
 	
+	// if the vertical scroll bar is at the end, then force it to the maximum value in case of an update
+	if(view_ptr->scroll_end)
+		ImGui::SetScrollY(ImGui::GetScrollMaxY());
+	// and update the scroll end flag
+	view_ptr->scroll_end = false;
+	if(view_ptr->scroll_follow)
+		if(ImGui::GetScrollY() == ImGui::GetScrollMaxY() || ImGui::GetScrollMaxY() < 0)
+			view_ptr->scroll_end = true;
+	
 	ImGui::PopStyleVar(2);
 }
 
@@ -687,6 +700,7 @@ void debug_imgui::add_log(int id)
 	new_view->height = 300;
 	new_view->ofs_x = 0;
 	new_view->ofs_y = 0;
+	new_view->scroll_follow = true;
 	view_list_add(new_view);
 }
 
@@ -1127,6 +1141,7 @@ void debug_imgui::wait_for_debugger(device_t &device, bool firststop)
 		view_main_console->height = 200;
 		view_main_console->ofs_x = 0;
 		view_main_console->ofs_y = 0;
+		view_main_console->scroll_follow = true;
 		view_main_disasm = dview_alloc(device.machine(), DVT_DISASSEMBLY);
 		view_main_disasm->title = "Main Disassembly";
 		view_main_disasm->width = 500;
