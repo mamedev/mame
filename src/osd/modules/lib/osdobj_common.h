@@ -224,7 +224,6 @@ public:
 	virtual void exit_subsystems();
 	virtual void video_exit();
 	virtual void window_exit();
-	virtual void input_exit();
 
 	virtual void osd_exit();
 

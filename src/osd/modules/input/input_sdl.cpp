@@ -512,8 +512,13 @@ public:
 	{
 		sdl_input_module::input_init(machine);
 
-		SDL_EventType event_types[] = { SDL_KEYDOWN, SDL_KEYUP, SDL_TEXTINPUT };
-		sdl_event_manager::instance().subscribe(reinterpret_cast<int*>(event_types), ARRAY_LENGTH(event_types), this);
+		static int event_types[] = {
+			static_cast<int>(SDL_KEYDOWN), 
+			static_cast<int>(SDL_KEYUP),
+			static_cast<int>(SDL_TEXTINPUT)
+		};
+
+		sdl_event_manager::instance().subscribe(event_types, ARRAY_LENGTH(event_types), this);
 
 		sdl_keyboard_device *devinfo;
 
@@ -645,8 +650,14 @@ public:
 	{
 		sdl_input_module::input_init(machine);
 
-		SDL_EventType event_types[] = { SDL_MOUSEMOTION, SDL_MOUSEBUTTONDOWN, SDL_MOUSEBUTTONUP, SDL_MOUSEWHEEL };
-		sdl_event_manager::instance().subscribe(reinterpret_cast<int*>(event_types), ARRAY_LENGTH(event_types), this);
+		static int event_types[] = {
+			static_cast<int>(SDL_MOUSEMOTION),
+			static_cast<int>(SDL_MOUSEBUTTONDOWN),
+			static_cast<int>(SDL_MOUSEBUTTONUP),
+			static_cast<int>(SDL_MOUSEWHEEL)
+		};
+
+		sdl_event_manager::instance().subscribe(event_types, ARRAY_LENGTH(event_types), this);
 
 		sdl_mouse_device *devinfo;
 		char defname[20];
@@ -834,8 +845,15 @@ public:
 			}
 		}
 
-		SDL_EventType event_types[] = { SDL_JOYAXISMOTION, SDL_JOYBALLMOTION, SDL_JOYHATMOTION, SDL_JOYBUTTONDOWN, SDL_JOYBUTTONUP };
-		sdl_event_manager::instance().subscribe(reinterpret_cast<int*>(event_types), ARRAY_LENGTH(event_types), this);
+		static int event_types[] = {
+			static_cast<int>(SDL_JOYAXISMOTION),
+			static_cast<int>(SDL_JOYBALLMOTION),
+			static_cast<int>(SDL_JOYHATMOTION),
+			static_cast<int>(SDL_JOYBUTTONDOWN),
+			static_cast<int>(SDL_JOYBUTTONUP)
+		};
+
+		sdl_event_manager::instance().subscribe(event_types, ARRAY_LENGTH(event_types), this);
 
 		osd_printf_verbose("Joystick: End initialization\n");
 	}
