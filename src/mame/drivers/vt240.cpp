@@ -86,6 +86,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mem_map_sel_w);
 	DECLARE_READ8_MEMBER(char_buf_r);
 	DECLARE_WRITE8_MEMBER(char_buf_w);
+	DECLARE_WRITE8_MEMBER(patmult_w);
+	DECLARE_WRITE8_MEMBER(vpat_w);
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_READ8_MEMBER(vom_r);
@@ -107,6 +109,7 @@ public:
 	UINT8 m_char_buf[16];
 	UINT8 m_char_idx, m_mask, m_reg0, m_reg1;
 	UINT8 m_vom[16];
+	UINT8 m_vpat, m_patmult, m_patcnt, m_patidx;
 };
 
 WRITE_LINE_MEMBER(vt240_state::write_keyboard_clock)
@@ -232,6 +235,18 @@ WRITE8_MEMBER(vt240_state::char_buf_w)
 	m_char_idx &= 0xf;
 }
 
+WRITE8_MEMBER(vt240_state::patmult_w)
+{
+	m_patmult = data & 0xf;
+}
+
+WRITE8_MEMBER(vt240_state::vpat_w)
+{
+	m_vpat = ~data;
+	m_patcnt = m_patmult;
+	m_patidx = 0;
+}
+
 READ8_MEMBER(vt240_state::vom_r)
 {
 	return m_vom[offset];
@@ -255,12 +270,30 @@ WRITE8_MEMBER(vt240_state::vram_w)
 		data = m_video_ram[offset & 0xffff];
 	else if(BIT(m_reg0, 4))
 	{
-		data = m_char_buf[m_char_idx++];
-		m_char_idx &= 0xf;
-		offset = BIT(offset, 16) | (offset & 0xfffe);
+		UINT8 chr;
+		if(BIT(m_reg0, 6))
+		{
+			chr = BITSWAP8(m_vpat, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx);
+			if(m_patcnt-- == 0)
+			{
+				m_patcnt = m_patmult;
+				if(++m_patidx > 7)
+					m_patidx = 0;
+			}
+		}
+		else
+		{
+			chr = m_char_buf[m_char_idx++];
+			m_char_idx &= 0xf;
+			offset = BIT(offset, 16) | (offset & 0xfffe);
+		}
+		if(!BIT(m_reg0, 3))
+			data = (chr & ~m_mask) | (m_video_ram[offset & 0xffff] & m_mask);
+		else
+			data = (chr & ~data);
+		logerror("%x %x %x %x %x\n", offset, m_vpat, data, m_mask, chr);
 	}
-	if(!BIT(m_reg0, 3))
-		data = (data & ~m_mask) | (m_video_ram[offset & 0xffff] & m_mask);
+
 	m_video_ram[offset & 0xffff] = data;
 }
 
@@ -308,7 +341,9 @@ static ADDRESS_MAP_START( vt240_mem, AS_PROGRAM, 16, vt240_state )
 	AM_RANGE (0174000, 0174003) AM_DEVWRITE8("upd7220", upd7220_device, write, 0x00ff)
 	AM_RANGE (0174040, 0174077) AM_WRITE8(vom_w, 0x00ff)
 	AM_RANGE (0174140, 0174141) AM_WRITE8(char_buf_w, 0x00ff)
+	AM_RANGE (0174400, 0174401) AM_WRITE8(patmult_w, 0x00ff)
 	AM_RANGE (0174440, 0174441) AM_WRITE8(mask_w, 0x00ff)
+	AM_RANGE (0174500, 0174501) AM_WRITE8(vpat_w, 0x00ff)
 	AM_RANGE (0174600, 0174601) AM_WRITE8(reg0_w, 0x00ff)
 	AM_RANGE (0174640, 0174641) AM_WRITE8(reg1_w, 0x00ff)
 	AM_RANGE (0175000, 0175005) AM_READWRITE8(i8085_comm_r, i8085_comm_w, 0x00ff)
@@ -331,7 +366,9 @@ static ADDRESS_MAP_START(vt240_char_io, AS_IO, 8, vt240_state)
 	AM_RANGE(0x10, 0x1f) AM_READWRITE(vom_r, vom_w)
 	AM_RANGE(0x20, 0x20) AM_READWRITE(t11_comm_r, t11_comm_w)
 	AM_RANGE(0x30, 0x30) AM_READWRITE(char_buf_r, char_buf_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(patmult_w)
 	AM_RANGE(0x90, 0x90) AM_WRITE(mask_w)
+	AM_RANGE(0xa0, 0xa0) AM_WRITE(vpat_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(reg0_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(reg1_w)
 ADDRESS_MAP_END
@@ -349,6 +386,9 @@ void vt240_state::machine_reset()
 	m_mem_map_sel = 0;
 	m_t11 = 1;
 	m_i8085_rdy = 1;
+	m_char_idx = 0;
+	m_patcnt = 0;
+	m_patidx = 0;
 }
 
 static const gfx_layout vt240_chars_8x10 =
