@@ -918,9 +918,10 @@ const osd::directory::entry *zippath_readdir(zippath_directory *directory)
 	{
 		/* first thing's first - return parent directory */
 		directory->returned_parent = true;
-		memset(&directory->returned_entry, 0, sizeof(directory->returned_entry));
 		directory->returned_entry.name = "..";
 		directory->returned_entry.type = osd::directory::entry::entry_type::DIR;
+		directory->returned_entry.size = 0; // FIXME: what would stat say?
+		// FIXME: modified time?
 		result = &directory->returned_entry;
 	}
 	else if (directory->directory)
@@ -938,6 +939,8 @@ const osd::directory::entry *zippath_readdir(zippath_directory *directory)
 			/* copy; but change the entry type */
 			directory->returned_entry = *result;
 			directory->returned_entry.type = osd::directory::entry::entry_type::DIR;
+			directory->returned_entry.size = 0; // FIXME: what would stat say?
+			// FIXME: modified time?
 			result = &directory->returned_entry;
 		}
 	}
@@ -981,19 +984,20 @@ const osd::directory::entry *zippath_readdir(zippath_directory *directory)
 						directory->returned_dirlist.emplace_front(relpath, separator - relpath);
 
 						/* ...and return it */
-						memset(&directory->returned_entry, 0, sizeof(directory->returned_entry));
 						directory->returned_entry.name = directory->returned_dirlist.front().c_str();
 						directory->returned_entry.type = osd::directory::entry::entry_type::DIR;
+						directory->returned_entry.size = 0; // FIXME: what would stat say?
+						// FIXME: modified time?
 						result = &directory->returned_entry;
 					}
 				}
 				else
 				{
 					/* a real file */
-					memset(&directory->returned_entry, 0, sizeof(directory->returned_entry));
 					directory->returned_entry.name = relpath;
 					directory->returned_entry.type = osd::directory::entry::entry_type::FILE;
 					directory->returned_entry.size = directory->zipfile->current_uncompressed_length();
+					directory->returned_entry.last_modified = directory->zipfile->current_last_modified();
 					result = &directory->returned_entry;
 				}
 			}
