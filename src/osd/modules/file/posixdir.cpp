@@ -96,7 +96,7 @@ public:
 
 	virtual const entry *read() override;
 
-	bool open(std::string const &dirname);
+	bool open_impl(std::string const &dirname);
 
 private:
 	typedef std::unique_ptr<DIR, int (*)(DIR *)>	dir_ptr;
@@ -180,10 +180,10 @@ const osd::directory::entry *posix_directory::read()
 
 
 //============================================================
-//  posix_directory::open
+//  posix_directory::open_impl
 //============================================================
 
-bool posix_directory::open(std::string const &dirname)
+bool posix_directory::open_impl(std::string const &dirname)
 {
 	assert(!m_fd);
 
@@ -205,7 +205,7 @@ directory::ptr directory::open(std::string const &dirname)
 	try { dir.reset(new posix_directory); }
 	catch (...) { return nullptr; }
 
-	if (!dir->open(dirname))
+	if (!dir->open_impl(dirname))
 		return nullptr;
 
 	return ptr(std::move(dir));

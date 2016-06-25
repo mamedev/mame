@@ -40,7 +40,7 @@ public:
 
 	virtual const entry *read() override;
 
-	bool open(std::string const &dirname);
+	bool open_impl(std::string const &dirname);
 
 private:
 	HANDLE              m_find;                   // handle to the finder
@@ -106,10 +106,10 @@ const directory::entry *win_directory::read()
 
 
 //============================================================
-//  win_directory::open
+//  win_directory::open_impl
 //============================================================
 
-bool win_directory::open(std::string const &dirname)
+bool win_directory::open_impl(std::string const &dirname)
 {
 	assert(m_find == INVALID_HANDLE_VALUE);
 
@@ -144,7 +144,7 @@ directory::ptr directory::open(std::string const &dirname)
 	try { dir.reset(new win_directory()); }
 	catch (...) { return nullptr; }
 
-	if (!dir->open(dirname))
+	if (!dir->open_impl(dirname))
 		return false;
 
 	return ptr(std::move(dir));
