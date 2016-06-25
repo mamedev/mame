@@ -389,6 +389,8 @@
  		ffe80210: testing memory 		
  		ffe80274: loop that goes wobbly and fails
  		ffe80dc4: switch off boot mode, MMU maps ROM to copy in RAM from here on
+ 		
+ 		ffe813a4: where the decompressor writes bytes
 
 ****************************************************************************/
 
@@ -400,6 +402,11 @@
 #include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "bus/rs232/rs232.h"
+
+#include "debug/debugcon.h"
+#include "debug/debugcmd.h"
+#include "debug/debugcpu.h"
+#include "debugger.h"
 
 #define TIMEKEEPER_TAG  "timekpr"
 #define SCC1_TAG        "scc1"
@@ -502,6 +509,8 @@ private:
 	UINT8 m_segmap[8][4096];
 	UINT32 m_pagemap[8192];
 	UINT32 m_ram_size, m_ram_size_words;
+	
+	void l2p_command(int ref, int params, const char **param);
 };
 
 READ32_MEMBER( sun4_state::sun4_mmu_r )
@@ -509,12 +518,13 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 	UINT8 asi = m_maincpu->get_asi();
 	int page;
 
-	if (space.debugger_access()) return m_rom_ptr[offset & 0x1ffff];
+	// make debugger fetches emulate supervisor program for best compatibility with boot PROM execution
+	if (space.debugger_access()) asi = 9;
 	
 	// supervisor program fetches in boot state are special
 	if ((!(m_system_enable & ENA_NOTBOOT)) && (asi == 9))
 	{
-		return m_rom_ptr[offset & 0x1ffff];
+		return m_rom_ptr[offset & 0x7fff];
 	}
 	
 	switch (asi)
@@ -593,7 +603,7 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 				// magic EPROM bypass
 				if ((tmp >= (0x6000000>>2)) && (tmp <= (0x6ffffff>>2)))
 				{
-					return m_rom_ptr[offset & 0x1ffff];	
+					return m_rom_ptr[offset & 0x7fff];	
 				}
 				//printf("Read type 1 @ VA %08x, phys %08x\n", offset<<2, tmp<<2);
 				return m_type1space->read32(space, tmp, mem_mask);
@@ -637,7 +647,7 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 		switch (offset >> 26)
 		{
 			case 3: // context reg
-				printf("%08x to context, mask %08x\n", data, mem_mask);
+				printf("%08x to context, mask %08x, offset %x\n", data, mem_mask, offset);
 				m_context = data>>24;
 				return;
 
@@ -671,6 +681,7 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 	case 3: // segment map
 		{
 			UINT8 segdata = 0;
+			//printf("segment write, mask %08x, PC=%x\n", mem_mask, m_maincpu->pc());
 			if (mem_mask == 0xffff0000) segdata = (data >> 16) & 0x7f;
 			else if (mem_mask == 0xff000000) segdata = (data >> 24) & 0x7f;
 			else logerror("sun4: writing segment map with unknown mask %08x, PC=%x\n", mem_mask, m_maincpu->pc());
@@ -734,6 +745,30 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 	printf("sun4: %08x to asi %d byte offset %x, PC = %x, mask = %08x\n", data, asi, offset << 2, m_maincpu->pc(), mem_mask);
 }
 
+void sun4_state::l2p_command(int ref, int params, const char **param)
+{		
+	UINT64 addr, offset;
+	
+	if (!machine().debugger().commands().validate_number_parameter(param[0], &addr)) return;
+		
+	addr &= 0xffffffff;
+	offset = addr >> 2;
+		
+	UINT8 pmeg = m_segmap[m_context & 7][(offset >> 16) & 0xfff];
+	UINT32 entry = (pmeg << 6) + ((offset >> 10) & 0x3f);
+	UINT32 tmp = (m_pagemap[entry] & 0xffff) << 10;
+	tmp |= (offset & 0x3ff);
+
+	if (m_pagemap[entry] & PM_VALID)
+	{
+		machine().debugger().console().printf("logical %08x => phys %08x, type %d (pmeg %d, entry %d PTE %08x)\n", addr, tmp << 2, (m_pagemap[entry] >> 26) & 3, pmeg, entry, m_pagemap[entry]);
+	}
+	else
+	{
+		machine().debugger().console().printf("logical %08x points to an invalid PTE! (pmeg %d, entry %d PTE %08x)\n", addr, tmp << 2, pmeg, entry, m_pagemap[entry]);
+	}
+}
+
 static ADDRESS_MAP_START(sun4_mem, AS_PROGRAM, 32, sun4_state)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE( sun4_mmu_r, sun4_mmu_w )
 ADDRESS_MAP_END
@@ -755,6 +790,12 @@ void sun4_state::machine_start()
 	m_ram_ptr = (UINT32 *)m_ram->pointer();
 	m_ram_size = m_ram->size();
 	m_ram_size_words = m_ram_size >> 2;	
+	
+	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	{
+		using namespace std::placeholders;
+		machine().debugger().console().register_command("l2p", CMDFLAG_NONE, 0, 1, 1, std::bind(&sun4_state::l2p_command, this, _1, _2, _3));
+	}
 }
 
 READ32_MEMBER( sun4_state::ram_r )
@@ -822,6 +863,8 @@ WRITE32_MEMBER( sun4_state::ram_w )
 #endif
 
 	//printf("ram_w: %08x to %08x (mask %08x)\n", data, offset<<2, mem_mask);
+
+	//if ((offset<<2) == 0xfb2000) printf("write %08x to %08x, mask %08x, PC=%x\n", data, offset<<2, mem_mask, m_maincpu->pc());
 
 	if (offset < m_ram_size_words) 
 	{
