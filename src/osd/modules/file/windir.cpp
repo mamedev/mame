@@ -57,6 +57,7 @@ win_directory::win_directory()
 	: m_find(INVALID_HANDLE_VALUE)
 	, m_is_first(true)
 {
+	m_entry.name = nullptr;
 	std::memset(&m_data, 0, sizeof(m_data));
 }
 
