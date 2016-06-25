@@ -39,6 +39,10 @@
 
 #undef _POSIX_C_SOURCE  // to get DT_xxx on OS X
 
+// #include this stuff before something else can #define _POSIX_C_SOURCE again
+#include <dirent.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include "osdcore.h"
 #include "modules/lib/osdlib.h"
@@ -51,10 +55,6 @@
 #include <string>
 #include <utility>
 
-#include <dirent.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-
 
 
 namespace osd {
@@ -65,10 +65,8 @@ namespace {
 
 #if defined(WIN32)
 constexpr char PATHSEPCH = '\\';
-constexpr char INVPATHSEPCH = '/';
 #else
 constexpr char PATHSEPCH = '/';
-//constexpr char INVPATHSEPCH = '\\';
 #endif
 
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__) || defined(EMSCRIPTEN) || defined(__ANDROID__) || defined(WIN32) || defined(SDLMAME_NO64BITIO)

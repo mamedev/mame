@@ -127,8 +127,7 @@ bool win_directory::open(std::string const &dirname)
 
 	// attempt to find the first file
 	m_find = FindFirstFileEx(dirfilter.get(), FindExInfoStandard, &m_data, FindExSearchNameMatch, nullptr, 0);
-	if (m_find == INVALID_HANDLE_VALUE)
-		return false;
+	return m_find != INVALID_HANDLE_VALUE;
 }
 
 } // anonymous namespace
