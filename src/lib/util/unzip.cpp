@@ -617,9 +617,6 @@ public:
 
 	std::size_t total_length() const { return minimum_length(); }
 	static std::size_t minimum_length() { return 0x18; }
-
-private:
-	std::size_t m_length;
 };
 
 

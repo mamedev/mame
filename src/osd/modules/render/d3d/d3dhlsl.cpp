@@ -43,7 +43,7 @@ static void get_vector(const char *data, int count, float *out, bool report_erro
 //============================================================
 
 shaders::shaders() :
-	d3dintf(nullptr), machine(nullptr), d3d(nullptr), post_fx_enable(false), oversampling_enable(false), paused(true), num_screens(0), curr_screen(0), lastidx(-1),
+	d3dintf(nullptr), machine(nullptr), d3d(nullptr), post_fx_enable(false), oversampling_enable(false), paused(true), num_screens(0), curr_screen(0),
 	shadow_texture(nullptr), options(nullptr), avi_output_file(nullptr), avi_frame(0), avi_copy_surface(nullptr), avi_copy_texture(nullptr), avi_final_target(nullptr), avi_final_texture(nullptr),
 	black_surface(nullptr), black_texture(nullptr), render_snap(false), snap_rendered(false), snap_copy_target(nullptr), snap_copy_texture(nullptr), snap_target(nullptr), snap_texture(nullptr),
 	snap_width(0), snap_height(0), lines_pending(false), initialized(false), backbuffer(nullptr), curr_effect(nullptr), default_effect(nullptr), prescale_effect(nullptr), post_effect(nullptr),

@@ -146,7 +146,7 @@ directory::ptr directory::open(std::string const &dirname)
 	catch (...) { return nullptr; }
 
 	if (!dir->open_impl(dirname))
-		return false;
+		return nullptr;
 
 	return ptr(std::move(dir));
 }

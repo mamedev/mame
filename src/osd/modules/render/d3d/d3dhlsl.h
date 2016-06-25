@@ -387,7 +387,6 @@ private:
 	bool                    paused;                     // whether or not rendering is currently paused
 	int                     num_screens;                // number of emulated physical screens
 	int                     curr_screen;                // current screen for render target operations
-	int                     lastidx;                    // index of the last-encountered target
 	bitmap_argb32           shadow_bitmap;              // shadow mask bitmap for post-processing shader
 	texture_info *          shadow_texture;             // shadow mask texture for post-processing shader
 	hlsl_options *          options;                    // current options
