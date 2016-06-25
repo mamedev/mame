@@ -41,8 +41,12 @@ osd::directory::entry::entry_type win_attributes_to_entry_type(DWORD attributes)
 
 std::chrono::system_clock::time_point win_time_point_from_filetime(LPFILETIME file_time)
 {
-	return std::chrono::system_clock::time_point(std::chrono::system_clock::duration(
-		(static_cast<__int64>(file_time->dwHighDateTime) << 32) | file_time->dwLowDateTime));
+	ULARGE_INTEGER ull;
+	ull.LowPart = file_time->dwLowDateTime;
+	ull.HighPart = file_time->dwHighDateTime;
+
+	time_t t = ull.QuadPart / 10000000ULL - 11644473600ULL;
+	return std::chrono::system_clock::from_time_t(t);
 }
 
 
