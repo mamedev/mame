@@ -41,6 +41,15 @@ const UINT32 DASMFLAG_LENGTHMASK    = 0x0000ffff;   // the low 16-bits contain t
 
 
 //**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_DEVICE_DISASSEMBLE_OVERRIDE(_class, _func) \
+	device_disasm_interface::static_set_dasm_override(*device, &_class::_func);
+
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -50,6 +59,8 @@ const UINT32 DASMFLAG_LENGTHMASK    = 0x0000ffff;   // the low 16-bits contain t
 // class representing interface-specific live disasm
 class device_disasm_interface : public device_interface
 {
+	typedef offs_t (*dasm_override_func)(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
+
 public:
 	// construction/destruction
 	device_disasm_interface(const machine_config &mconfig, device_t &device);
@@ -59,14 +70,20 @@ public:
 	UINT32 min_opcode_bytes() const { return disasm_min_opcode_bytes(); }
 	UINT32 max_opcode_bytes() const { return disasm_max_opcode_bytes(); }
 
+	// static inline configuration helpers
+	static void static_set_dasm_override(device_t &device, dasm_override_func dasm_override);
+
 	// interface for disassembly
-	offs_t disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options = 0) { return disasm_disassemble(buffer, pc, oprom, opram, options); }
+	offs_t disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options = 0);
 
 protected:
 	// required operation overrides
 	virtual UINT32 disasm_min_opcode_bytes() const = 0;
 	virtual UINT32 disasm_max_opcode_bytes() const = 0;
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) = 0;
+
+private:
+	dasm_override_func      m_dasm_override;            // pointer to provided override function
 };
 
 // iterator

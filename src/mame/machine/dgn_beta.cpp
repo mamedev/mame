@@ -69,7 +69,6 @@
 #include "imagedev/flopdrv.h"
 
 #include "debugger.h"
-#include "debug/debugcpu.h"
 #include "debug/debugcon.h"
 #include "machine/ram.h"
 
@@ -86,9 +85,6 @@
 #define LOG_DISK(x) do { if (VERBOSE) logerror x; } while (0)
 #define LOG_INTS(x) do { if (VERBOSE) logerror x; } while (0)
 
-
-/* Debugging commands and handlers. */
-static offs_t dgnbeta_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
 
 //static int DMA_NMI;               /* DMA cpu has received an NMI */
 
@@ -939,10 +935,6 @@ void dgn_beta_state::machine_start()
 {
 	logerror("MACHINE_START( dgnbeta )\n");
 
-	if (machine().device<cpu_device>(MAINCPU_TAG)->debug()) {
-		machine().device<cpu_device>(MAINCPU_TAG)->debug()->set_dasm_override(dgnbeta_dasm_override);
-	}
-
 	/* setup debug commands */
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
@@ -1109,7 +1101,7 @@ static const char *const os9syscalls[] =
 };
 
 
-static offs_t dgnbeta_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
+offs_t dgn_beta_state::dgnbeta_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
 {
 	unsigned call;
 	unsigned result = 0;

@@ -221,6 +221,8 @@ public:
 	required_device<floppy_connector> m_floppy3;
 	required_device<palette_device> m_palette;
 
+	offs_t dgnbeta_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
+
 private:
 	void execute_beta_key_dump(int ref, int params, const char *param[]);
 	void execute_beta_dat_log(int ref, int params, const char *param[]);
