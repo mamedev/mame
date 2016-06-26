@@ -240,7 +240,7 @@ READ8_MEMBER(m2comm_device::zfg_r)
 {
 	UINT8 result = m_zfg | 0xFE;
 #ifdef __M2COMM_VERBOSE__
-	printf("m2comm-zfg_r: read register %02x for value %02x\n", offset, result);
+	osd_printf_verbose("m2comm-zfg_r: read register %02x for value %02x\n", offset, result);
 #endif
 	return result;
 }
@@ -248,7 +248,7 @@ READ8_MEMBER(m2comm_device::zfg_r)
 WRITE8_MEMBER(m2comm_device::zfg_w)
 {
 #ifdef __M2COMM_VERBOSE__
-	printf("m2comm-zfg_w: %02x\n", data);
+	osd_printf_verbose("m2comm-zfg_w: %02x\n", data);
 #endif
 	m_zfg = data & 0x01;
 }
@@ -257,7 +257,7 @@ READ8_MEMBER(m2comm_device::share_r)
 {
 	UINT8 result = m_shared[offset];
 #ifdef __M2COMM_VERBOSE__
-	printf("m2comm-share_r: read shared memory %02x for value %02x\n", offset, result);
+	osd_printf_verbose("m2comm-share_r: read shared memory %02x for value %02x\n", offset, result);
 #endif
 	return result;
 }
@@ -265,7 +265,7 @@ READ8_MEMBER(m2comm_device::share_r)
 WRITE8_MEMBER(m2comm_device::share_w)
 {
 #ifdef __M2COMM_VERBOSE__
-	printf("m2comm-share_w: %02x %02x\n", offset, data);
+	osd_printf_verbose("m2comm-share_w: %02x %02x\n", offset, data);
 #endif
 	m_shared[offset] = data;
 }
@@ -286,13 +286,13 @@ WRITE8_MEMBER(m2comm_device::cn_w)
 	if (!m_cn)
 	{
 		// reset command
-		printf("M2COMM: board disabled\n");
+		osd_printf_verbose("M2COMM: board disabled\n");
 		m_linkenable = 0x00;
 	}
 	else
 	{
 		// init command
-		printf("M2COMM: board enabled\n");
+		osd_printf_verbose("M2COMM: board enabled\n");
 		m_linkenable = 0x01;
 		m_linkid = 0x00;
 		m_linkalive = 0x00;
@@ -368,14 +368,14 @@ void m2comm_device::comm_tick()
 			// check rx socket
 			if (!m_line_rx.is_open())
 			{
-				printf("M2COMM: listen on %s\n", m_localhost);
+				osd_printf_verbose("M2COMM: listen on %s\n", m_localhost);
 				m_line_rx.open(m_localhost);
 			}
 
 			// check tx socket
 			if (!m_line_tx.is_open())
 			{
-				printf("M2COMM: connect to %s\n", m_remotehost);
+				osd_printf_verbose("M2COMM: connect to %s\n", m_remotehost);
 				m_line_tx.open(m_remotehost);
 			}
 
@@ -427,7 +427,7 @@ void m2comm_device::comm_tick()
 							}
 
 							// consider it done
-							printf("M2COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
+							osd_printf_verbose("M2COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
 							m_linkalive = 0x01;
 							m_linktimer = 0x01;
 
@@ -446,7 +446,7 @@ void m2comm_device::comm_tick()
 							recv = m_line_rx.read(m_buffer, togo);
 							togo -= recv;
 						}
-						printf("M2COMM: droped a message...\n");
+						osd_printf_verbose("M2COMM: droped a message...\n");
 					}
 
 					if (m_linkalive == 0x00)
@@ -476,7 +476,7 @@ void m2comm_device::comm_tick()
 						m_line_tx.write(m_buffer, dataSize);
 
 						// consider it done
-						printf("M2COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
+						osd_printf_verbose("M2COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
 						m_linkalive = 0x01;
 						m_linktimer = 0x00;
 
@@ -527,7 +527,7 @@ void m2comm_device::comm_tick()
 						recv = m_line_rx.read(m_buffer, togo);
 						togo -= recv;
 					}
-					printf("M2COMM: droped a message...\n");
+					osd_printf_verbose("M2COMM: droped a message...\n");
 				}
 				recv = m_line_rx.read(m_buffer, dataSize);
 			}
