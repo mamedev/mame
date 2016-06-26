@@ -163,6 +163,7 @@ void mb86901_device::device_start()
 	state_add(SPARC_WIM,		"WIM",		m_wim).formatstr("%08X");
 	state_add(SPARC_TBR,		"TBR",		m_tbr).formatstr("%08X");
 	state_add(SPARC_Y,			"Y",		m_y).formatstr("%08X");
+	state_add(SPARC_ANNUL,		"ANNUL",	m_annul).formatstr("%d");
 	state_add(SPARC_ICC,		"icc",		m_icc).formatstr("%4s");
 	state_add(SPARC_CWP,		"CWP",		m_cwp).formatstr("%2d");
 	char regname[3] = "g0";
@@ -365,7 +366,7 @@ UINT32 mb86901_device::read_sized_word(UINT8 asi, UINT32 address, int size)
 	}
 	else if (size == 2)
 	{
-		return m_program->read_word(address) << ((1 - (address & 1)) * 16);
+		return m_program->read_word(address) << ((2 - (address & 2)) * 8);
 	}
 	else
 	{
@@ -392,7 +393,7 @@ void mb86901_device::write_sized_word(UINT8 asi, UINT32 address, UINT32 data, in
 	}
 	else if (size == 2)
 	{
-		m_program->write_word(address, data >> ((1 - (address & 1)) * 16));
+		m_program->write_word(address, data >> ((2 - (address & 2)) * 8));
 	}
 	else
 	{
@@ -1953,9 +1954,13 @@ void mb86901_device::execute_load(UINT32 op)
 				else if ((address & 3) == 2) halfword = data & 0xffff;
 
 				if (LDSH || LDSHA)
+				{
 					word0 = (((INT32)halfword) << 16) >> 16;
+				}
 				else
+				{
 					word0 = halfword;
+				}
 			}
 			else
 			{
