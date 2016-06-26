@@ -17,6 +17,7 @@
 // MAMEOS headers
 #include "winutil.h"
 #include "strconv.h"
+#include "timeconv.h"
 
 
 //============================================================
@@ -41,12 +42,8 @@ osd::directory::entry::entry_type win_attributes_to_entry_type(DWORD attributes)
 
 std::chrono::system_clock::time_point win_time_point_from_filetime(LPFILETIME file_time)
 {
-	ULARGE_INTEGER ull;
-	ull.LowPart = file_time->dwLowDateTime;
-	ull.HighPart = file_time->dwHighDateTime;
-
-	time_t t = ull.QuadPart / 10000000ULL - 11644473600ULL;
-	return std::chrono::system_clock::from_time_t(t);
+	auto converted_file_time = util::ntfs_duration_from_filetime(file_time->dwHighDateTime, file_time->dwLowDateTime);
+	return util::system_clock_time_point_from_ntfs_duration(converted_file_time);
 }
 
 
