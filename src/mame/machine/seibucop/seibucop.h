@@ -270,6 +270,7 @@ private:
 	void dma_palette_buffer();
 	void dma_fill();
 	void dma_palette_brightness();
+	void dma_zsorting(UINT16 data);
 };
 
 extern const device_type RAIDEN2COP;
