@@ -294,24 +294,21 @@ static MACHINE_CONFIG_START( battlera, battlera_state )
 	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 12000000 / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(battlera_state, adpcm_int)) /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz            */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.85)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.85)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 
 	MCFG_SOUND_ADD("c6280", C6280, 21477270/6)
 	MCFG_C6280_CPU("audiocpu")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
 /******************************************************************************/
