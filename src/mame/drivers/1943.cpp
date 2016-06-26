@@ -701,7 +701,7 @@ ROM_START( 1943kai )
 	ROM_LOAD( "bm6.4b",    0x0b00, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )   /* video timing (not used) */
 ROM_END
 
-ROM_START( 1943mii ) /* Unknown if it's a prototype, location test or actual limited release */
+ROM_START( 1943mii ) /* Prototype, location test or actual limited release? - PCB had genuine CAPCOM labels for roms */
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for the banked ROMs images */
 	ROM_LOAD( "01.12d", 0x00000, 0x08000, CRC(8ba22485) SHA1(ed67992d2cf7dcba72bc9525fbce6d2cb03d78c4) ) /* had USA hand written in pen on labels */
 	ROM_LOAD( "02.13d", 0x10000, 0x10000, CRC(659a5455) SHA1(c4a2cea51c1326f7e60e404ae4d66e567abc4c96) )
@@ -756,8 +756,8 @@ ROM_START( 1943mii ) /* Unknown if it's a prototype, location test or actual lim
 	ROM_LOAD( "9.6l",     0x0500, 0x0100, CRC(75d5cc90) SHA1(2f04236e7635583fe096c11165fa0a8a0e121d70) )   /* foreground palette bank */
 	ROM_LOAD( "12.12m",   0x0600, 0x0100, CRC(784bdf33) SHA1(6a46c2048637770acd3f3d791e1b831e8caf8c99) )   /* background lookup table */
 	ROM_LOAD( "11.12l",   0x0700, 0x0100, CRC(6fb2e170) SHA1(91a84f7138c373da0b50d4833de36f17db9a553e) )   /* background palette bank */
-	ROM_LOAD( "k8.8c",    0x0800, 0x0100, CRC(dad17e2d) SHA1(fdb18ddc7574153bb7e27ba08b04b9dc87061c02) )   /* sprite lookup table */
-	ROM_LOAD( "k7.7c",    0x0900, 0x0100, CRC(76307f8d) SHA1(8d655e2a5c50541795316d924b2f18b55f4b9571) )   /* sprite palette bank */
+	ROM_LOAD( "8.8c",     0x0800, 0x0100, CRC(dad17e2d) SHA1(fdb18ddc7574153bb7e27ba08b04b9dc87061c02) )   /* sprite lookup table */
+	ROM_LOAD( "7.7c",     0x0900, 0x0100, CRC(76307f8d) SHA1(8d655e2a5c50541795316d924b2f18b55f4b9571) )   /* sprite palette bank */
 	ROM_LOAD( "4.12c",    0x0a00, 0x0100, CRC(91a8a2e1) SHA1(9583c87eff876f04bc2ccf7218cd8081f1bcdb94) )   /* priority encoder / palette selector (not used) */
 	ROM_LOAD( "6.4b",     0x0b00, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )   /* video timing (not used) */
 ROM_END
