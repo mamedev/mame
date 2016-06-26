@@ -356,7 +356,7 @@ To Do / Unknowns:
 #include "cpu/nec/v25.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z180/z180.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/3812intf.h"
 #include "sound/ymz280b.h"
 #include "includes/toaplan2.h"

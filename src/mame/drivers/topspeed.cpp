@@ -161,7 +161,7 @@ From JP manual
 #include "machine/z80ctc.h"
 #include "machine/taitoio.h"
 #include "audio/taitosnd.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/msm5205.h"
 #include "sound/flt_vol.h"
 #include "includes/taitoipt.h"

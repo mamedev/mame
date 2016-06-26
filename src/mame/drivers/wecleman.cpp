@@ -265,7 +265,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "wecleman.lh"
 #include "includes/wecleman.h"
 

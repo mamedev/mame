@@ -27,7 +27,7 @@
 
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
 

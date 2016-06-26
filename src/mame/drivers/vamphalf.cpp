@@ -64,7 +64,7 @@ TODO:
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "sound/qs1000.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 
 

@@ -453,7 +453,7 @@ $a00000 checks have been seen on the Final Lap boards.
 #include "cpu/m6809/m6809.h"
 #include "includes/namcoic.h"
 #include "machine/nvram.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/c140.h"
 
 #include "finallap.lh"

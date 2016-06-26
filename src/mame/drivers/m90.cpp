@@ -25,7 +25,7 @@
 #include "includes/iremipt.h"
 #include "machine/irem_cpu.h"
 #include "sound/dac.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "includes/m90.h"
 
 

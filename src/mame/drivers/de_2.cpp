@@ -15,7 +15,7 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/decopincpu.h"
 #include "machine/6821pia.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/msm5205.h"
 #include "de2.lh"
 #include "de2a3.lh"

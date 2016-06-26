@@ -12,7 +12,7 @@
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/2413intf.h"
 #include "sound/upd7759.h"
 #include "video/segaic16.h"

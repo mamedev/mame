@@ -81,7 +81,7 @@ Versions known to exist but not dumped:
 #include "cpu/z80/z80.h"
 #include "includes/cave.h"
 #include "sound/2203intf.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/ymz280b.h"
 
 #include "ppsatan.lh"

@@ -25,7 +25,7 @@ Bottom board - M75-B-A (all versions regardless of mask ROM/EPROM)
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/2203intf.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "includes/vigilant.h"
 #include "includes/iremipt.h"
 

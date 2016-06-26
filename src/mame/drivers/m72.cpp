@@ -188,7 +188,7 @@ other supported games as well.
 #include "cpu/nec/nec.h"
 #include "cpu/nec/v25.h"
 #include "machine/irem_cpu.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "includes/iremipt.h"
 #include "includes/m72.h"
 #include "cpu/mcs51/mcs51.h"

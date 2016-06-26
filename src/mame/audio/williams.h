@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "machine/6821pia.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "sound/hc55516.h"
 #include "sound/dac.h"

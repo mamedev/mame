@@ -626,7 +626,7 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 #include "includes/taitoipt.h"
 #include "sound/2203intf.h"
 #include "includes/tnzs.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 
 SAMPLES_START_CB_MEMBER(tnzs_state::kageki_init_samples)
 {

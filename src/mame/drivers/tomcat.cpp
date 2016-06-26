@@ -36,7 +36,7 @@
 #include "machine/6532riot.h"
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 
 
 

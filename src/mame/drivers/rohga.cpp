@@ -112,7 +112,7 @@
 #include "machine/decocrpt.h"
 #include "machine/gen_latch.h"
 #include "includes/rohga.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 
 READ16_MEMBER(rohga_state::rohga_irq_ack_r)

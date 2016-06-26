@@ -94,7 +94,7 @@
 #include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/k053260.h"
 #include "includes/konamipt.h"
 #include "includes/vendetta.h"

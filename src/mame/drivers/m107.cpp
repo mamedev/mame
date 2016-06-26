@@ -31,7 +31,7 @@ confirmed for m107 games as well.
 #include "includes/m107.h"
 #include "includes/iremipt.h"
 #include "machine/irem_cpu.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/iremga20.h"
 
 // this is the hacky code from m92.c, but better than per-game irq vector hacks.

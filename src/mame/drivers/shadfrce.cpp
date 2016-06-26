@@ -143,7 +143,7 @@ lev 7 : 0x7c : 0000 11d0 - just rte
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "includes/shadfrce.h"
 
 

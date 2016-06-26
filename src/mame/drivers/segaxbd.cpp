@@ -263,7 +263,7 @@ ROMs:
 #include "emu.h"
 #include "includes/segaxbd.h"
 #include "machine/nvram.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/segapcm.h"
 #include "includes/segaipt.h"
 

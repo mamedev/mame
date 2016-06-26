@@ -27,7 +27,7 @@ Notes:
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "includes/konamipt.h"
 #include "includes/mainevt.h"
 

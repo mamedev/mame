@@ -371,7 +371,7 @@ NOTE: There are several unpopulated locations (denoted by *) for additional rom 
 #include "machine/decocrpt.h"
 #include "machine/deco156.h"
 #include "includes/deco32.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 
 /**********************************************************************************/
 

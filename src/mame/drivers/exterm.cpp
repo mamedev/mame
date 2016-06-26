@@ -66,7 +66,7 @@
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/dac.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "includes/exterm.h"

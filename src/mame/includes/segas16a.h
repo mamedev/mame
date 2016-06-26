@@ -16,7 +16,7 @@
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
 #include "machine/watchdog.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "video/segaic16.h"
 #include "video/sega16sp.h"
 

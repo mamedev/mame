@@ -159,7 +159,7 @@ Note: The 'rastsagaa' set's rom numbers were named as RSxx_37 through RSxx_42
 #include "machine/watchdog.h"
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/msm5205.h"
 #include "includes/rastan.h"
 

@@ -78,7 +78,7 @@ Is there another alt program rom set labeled 9 & 10?
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "video/kan_pand.h"
 #include "machine/kaneko_hit.h"
