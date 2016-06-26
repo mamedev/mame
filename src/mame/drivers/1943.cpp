@@ -9,7 +9,7 @@
 
     Games supported:
         * 1943: The Battle of Midway (3 regions)
-		* 1943: The Battle of Midway Mark II (US)
+        * 1943: The Battle of Midway Mark II (US)
         * 1943 Kai: Midway Kaisen (Japan)
 
 ***************************************************************************/
@@ -360,13 +360,13 @@ ROM_START( 1943 )
 	ROM_LOAD( "bme03.14d", 0x20000, 0x10000, CRC(835822c2) SHA1(2c2fad13f062069efa7721abb9d807fb5a7625b4) ) /* These 3 roms have a BLUE stripe on them */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "bm04.5h", 0x00000, 0x8000, CRC(ee2bd2d7) SHA1(4d2d019a9f8452fbbb247e893280568a2e86073e) )
+	ROM_LOAD( "bm05.4k", 0x00000, 0x8000, CRC(ee2bd2d7) SHA1(4d2d019a9f8452fbbb247e893280568a2e86073e) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /*  C8751H-88 MCU Code */
 	ROM_LOAD( "bm.7k", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
-	ROM_LOAD( "bm05.4k", 0x00000, 0x8000, CRC(46cb9d3d) SHA1(96fd0e714b91fe13a2ca0d185ada9e4b4baa0c0b) )    /* characters */
+	ROM_LOAD( "bm04.5h", 0x00000, 0x8000, CRC(46cb9d3d) SHA1(96fd0e714b91fe13a2ca0d185ada9e4b4baa0c0b) )    /* characters */
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "bm15.10f", 0x00000, 0x8000, CRC(6b1a0443) SHA1(32337c840ccd6815fd5844c194365c58d708f6dc) )   /* bg tiles */
@@ -418,13 +418,13 @@ ROM_START( 1943u )
 	ROM_LOAD( "bmu03c.14d", 0x20000, 0x10000, CRC(3f0ee26c) SHA1(8da74fe91a6be3f23fc625f2a433f1f79c424994) ) /* These 3 roms have a RED stripe on them */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "bm04.5h", 0x00000, 0x8000, CRC(ee2bd2d7) SHA1(4d2d019a9f8452fbbb247e893280568a2e86073e) )
+	ROM_LOAD( "bm05.4k", 0x00000, 0x8000, CRC(ee2bd2d7) SHA1(4d2d019a9f8452fbbb247e893280568a2e86073e) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /*  C8751H-88 MCU Code */
 	ROM_LOAD( "bm.7k", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
-	ROM_LOAD( "bm05.4k", 0x00000, 0x8000, CRC(46cb9d3d) SHA1(96fd0e714b91fe13a2ca0d185ada9e4b4baa0c0b) )    /* characters */
+	ROM_LOAD( "bm04.5h", 0x00000, 0x8000, CRC(46cb9d3d) SHA1(96fd0e714b91fe13a2ca0d185ada9e4b4baa0c0b) )    /* characters */
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "bm15.10f", 0x00000, 0x8000, CRC(6b1a0443) SHA1(32337c840ccd6815fd5844c194365c58d708f6dc) )   /* bg tiles */
@@ -476,13 +476,13 @@ ROM_START( 1943ua )
 	ROM_LOAD( "bmu03.14d", 0x20000, 0x10000, CRC(9e7c07f7) SHA1(c437e5fd0e8eb87ef50a6d71a7a43efc38e4f128) ) /* These 3 roms have a RED stripe on them */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "bm04.5h", 0x00000, 0x8000, CRC(ee2bd2d7) SHA1(4d2d019a9f8452fbbb247e893280568a2e86073e) )
+	ROM_LOAD( "bm05.4k", 0x00000, 0x8000, CRC(ee2bd2d7) SHA1(4d2d019a9f8452fbbb247e893280568a2e86073e) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /*  C8751H-88 MCU Code */
 	ROM_LOAD( "bm.7k", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
-	ROM_LOAD( "bm05.4k", 0x00000, 0x8000, CRC(46cb9d3d) SHA1(96fd0e714b91fe13a2ca0d185ada9e4b4baa0c0b) )    /* characters */
+	ROM_LOAD( "bm04.5h", 0x00000, 0x8000, CRC(46cb9d3d) SHA1(96fd0e714b91fe13a2ca0d185ada9e4b4baa0c0b) )    /* characters */
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "bm15.10f", 0x00000, 0x8000, CRC(6b1a0443) SHA1(32337c840ccd6815fd5844c194365c58d708f6dc) )   /* bg tiles */
@@ -534,13 +534,13 @@ ROM_START( 1943j )
 	ROM_LOAD( "bm03b.14d", 0x20000, 0x10000, CRC(7093da2a) SHA1(27456593e47d69506a27804e32088b15c1f7d767) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "bm04.5h", 0x00000, 0x8000, CRC(ee2bd2d7) SHA1(4d2d019a9f8452fbbb247e893280568a2e86073e) )
+	ROM_LOAD( "bm05.4k", 0x00000, 0x8000, CRC(ee2bd2d7) SHA1(4d2d019a9f8452fbbb247e893280568a2e86073e) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /*  C8751H-88 MCU Code */
 	ROM_LOAD( "bm.7k", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
-	ROM_LOAD( "bm05.4k", 0x00000, 0x8000, CRC(46cb9d3d) SHA1(96fd0e714b91fe13a2ca0d185ada9e4b4baa0c0b) )    /* characters */
+	ROM_LOAD( "bm04.5h", 0x00000, 0x8000, CRC(46cb9d3d) SHA1(96fd0e714b91fe13a2ca0d185ada9e4b4baa0c0b) )    /* characters */
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "bm15.10f", 0x00000, 0x8000, CRC(6b1a0443) SHA1(32337c840ccd6815fd5844c194365c58d708f6dc) )   /* bg tiles */
@@ -592,13 +592,13 @@ ROM_START( 1943ja )
 	ROM_LOAD( "bm03.14d", 0x20000, 0x10000, CRC(300ec713) SHA1(f66d2356b413a418c887b4085a5315475c7a8bba) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "bm04.5h", 0x00000, 0x8000, CRC(ee2bd2d7) SHA1(4d2d019a9f8452fbbb247e893280568a2e86073e) )
+	ROM_LOAD( "bm05.4k", 0x00000, 0x8000, CRC(ee2bd2d7) SHA1(4d2d019a9f8452fbbb247e893280568a2e86073e) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /*  C8751H-88 MCU Code */
 	ROM_LOAD( "bm.7k", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
-	ROM_LOAD( "bm05.4k", 0x00000, 0x8000, CRC(46cb9d3d) SHA1(96fd0e714b91fe13a2ca0d185ada9e4b4baa0c0b) )    /* characters */
+	ROM_LOAD( "bm04.5h", 0x00000, 0x8000, CRC(46cb9d3d) SHA1(96fd0e714b91fe13a2ca0d185ada9e4b4baa0c0b) )    /* characters */
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "bm15.10f", 0x00000, 0x8000, CRC(6b1a0443) SHA1(32337c840ccd6815fd5844c194365c58d708f6dc) )   /* bg tiles */
@@ -650,13 +650,13 @@ ROM_START( 1943kai )
 	ROM_LOAD( "bmk03.14d", 0x20000, 0x10000, CRC(475a6ac5) SHA1(fa07a855ba9173b6f81641c806ec7d938b0c282e) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "bmk04.5h", 0x00000, 0x8000, CRC(25f37957) SHA1(1e50c2a920eb3b5c881843686db857e9fee5ba1d) )
+	ROM_LOAD( "bmk05.4k", 0x00000, 0x8000, CRC(25f37957) SHA1(1e50c2a920eb3b5c881843686db857e9fee5ba1d) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /*  C8751H-88 MCU Code */
 	ROM_LOAD( "bm.7k", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
-	ROM_LOAD( "bmk05.4k", 0x00000, 0x8000, CRC(884a8692) SHA1(027aa8c868dc07ccd9e27705031107881aef4b91) )   /* characters */
+	ROM_LOAD( "bmk04.5h", 0x00000, 0x8000, CRC(884a8692) SHA1(027aa8c868dc07ccd9e27705031107881aef4b91) )   /* characters */
 
 	ROM_REGION( 0x40000, "gfx2", 0 ) /* Yes, BM15 & BM19 are NOT BMK */
 	ROM_LOAD( "bm15.10f",  0x00000, 0x8000, CRC(6b1a0443) SHA1(32337c840ccd6815fd5844c194365c58d708f6dc) )  /* bg tiles */
@@ -701,22 +701,22 @@ ROM_START( 1943kai )
 	ROM_LOAD( "bm6.4b",    0x0b00, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )   /* video timing (not used) */
 ROM_END
 
-ROM_START( 1943mii ) /* Prototype, location test or actual limited release? - PCB had genuine CAPCOM labels for roms */
+ROM_START( 1943mii ) /* Prototype, location test or limited release? - PCB had genuine CAPCOM labels on the roms */
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for the banked ROMs images */
-	ROM_LOAD( "01.12d", 0x00000, 0x08000, CRC(8ba22485) SHA1(ed67992d2cf7dcba72bc9525fbce6d2cb03d78c4) ) /* had USA hand written in pen on labels */
+	ROM_LOAD( "01.12d", 0x00000, 0x08000, CRC(8ba22485) SHA1(ed67992d2cf7dcba72bc9525fbce6d2cb03d78c4) ) /* these 3 had USA hand written in pencil on labels */
 	ROM_LOAD( "02.13d", 0x10000, 0x10000, CRC(659a5455) SHA1(c4a2cea51c1326f7e60e404ae4d66e567abc4c96) )
 	ROM_LOAD( "03.14d", 0x20000, 0x10000, CRC(159ea771) SHA1(d95ff1773cdc566203befd84e1ba961a7dc8f69b) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "05.5h", 0x00000, 0x8000, CRC(25f37957) SHA1(1e50c2a920eb3b5c881843686db857e9fee5ba1d) )
+	ROM_LOAD( "05.4k", 0x00000, 0x8000, CRC(25f37957) SHA1(1e50c2a920eb3b5c881843686db857e9fee5ba1d) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /*  C8751H-88 MCU Code */
 	ROM_LOAD( "bm.7k", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
-	ROM_LOAD( "04.4k", 0x00000, 0x8000, CRC(8190e092) SHA1(17ca0fa8e61cc6f478d4807262a0333fdb3e4f94) )   /* characters - had USA hand written in pen on label */
+	ROM_LOAD( "04.5h", 0x00000, 0x8000, CRC(8190e092) SHA1(17ca0fa8e61cc6f478d4807262a0333fdb3e4f94) )   /* characters - had USA hand written in pencil on label */
 
-	ROM_REGION( 0x40000, "gfx2", 0 ) /* Mixture of standard and Kai roms */
+	ROM_REGION( 0x40000, "gfx2", 0 ) /* Mixture of Midway and Kai roms */
 	ROM_LOAD( "bm15.10f", 0x00000, 0x8000, CRC(6b1a0443) SHA1(32337c840ccd6815fd5844c194365c58d708f6dc) )  /* bg tiles */
 	ROM_LOAD( "bm16.11f", 0x08000, 0x8000, CRC(23c908c2) SHA1(42b83ff5781be9181802a21ff1b23c17ab1bc5a2) )
 	ROM_LOAD( "17.12f",   0x10000, 0x8000, CRC(3d5acab9) SHA1(887d45b648fda952ae2137579f383ab8ede1facd) ) /* Yes it's actually 17 & 18 instead of BMK17 & BMK18 */
@@ -769,7 +769,7 @@ ROM_START( 1943b )
 	ROM_LOAD( "bm03.14d", 0x20000, 0x10000, CRC(300ec713) SHA1(f66d2356b413a418c887b4085a5315475c7a8bba) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "bm04.5h", 0x00000, 0x8000, CRC(ee2bd2d7) SHA1(4d2d019a9f8452fbbb247e893280568a2e86073e) )
+	ROM_LOAD( "bm05.4k", 0x00000, 0x8000, CRC(ee2bd2d7) SHA1(4d2d019a9f8452fbbb247e893280568a2e86073e) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 ) // logo replaced
 	ROM_LOAD( "4.5h", 0x00000, 0x8000, CRC(0aba2096) SHA1(4833ad9f747b529ce92c4993388ab3516f8df4ed) )   /* characters */
@@ -820,10 +820,10 @@ ROM_START( 1943bj )
 	ROM_LOAD( "bm03.14d",  0x20000, 0x10000, CRC(300ec713) SHA1(f66d2356b413a418c887b4085a5315475c7a8bba) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "bm04.5h",   0x00000, 0x8000, CRC(ee2bd2d7) SHA1(4d2d019a9f8452fbbb247e893280568a2e86073e) )
+	ROM_LOAD( "bm05.4k",   0x00000, 0x8000, CRC(ee2bd2d7) SHA1(4d2d019a9f8452fbbb247e893280568a2e86073e) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
-	ROM_LOAD( "bm05.4k",   0x00000, 0x8000, CRC(46cb9d3d) SHA1(96fd0e714b91fe13a2ca0d185ada9e4b4baa0c0b) )    /* characters */
+	ROM_LOAD( "bm04.5h",   0x00000, 0x8000, CRC(46cb9d3d) SHA1(96fd0e714b91fe13a2ca0d185ada9e4b4baa0c0b) )    /* characters */
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
 	/* double size roms - same gfx different layout */
