@@ -768,7 +768,7 @@ int zip_file_impl::search(std::uint32_t search_crc, const std::string &search_fi
 					{
 						ntfs_times_reader const times(tag);
 						ntfs_duration const ticks(times.mtime());
-						m_header.modified = std::chrono::system_clock::from_time_t(0) + (ticks - s_ntfs_offset);
+						m_header.modified = std::chrono::system_clock::from_time_t(0) + std::chrono::duration_cast<std::chrono::system_clock::duration>(ticks - s_ntfs_offset);
 					}
 				}
 			}
