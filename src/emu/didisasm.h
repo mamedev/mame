@@ -83,7 +83,7 @@ protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) = 0;
 
 	// interface-level overrides
-	virtual void interface_pre_start();
+	virtual void interface_pre_start() override;
 
 private:
 	dasm_override_delegate  m_dasm_override;            // provided override function
