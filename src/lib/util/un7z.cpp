@@ -521,7 +521,7 @@ void m7z_file_impl::set_curr_modified()
 	{
 		CNtfsFileTime const &file_time(m_db.MTime.Vals[m_curr_file_idx]);
 		ntfs_duration const ticks((std::uint64_t(file_time.High) << 32) | std::uint64_t(file_time.Low));
-		m_curr_modified = std::chrono::system_clock::from_time_t(0) + (ticks - s_ntfs_offset);
+		m_curr_modified = std::chrono::system_clock::from_time_t(0) + std::chrono::duration_cast<std::chrono::system_clock::duration>(ticks - s_ntfs_offset);
 	}
 	else
 	{
