@@ -332,7 +332,7 @@ void text_layout::truncate_wrap()
 	float elipsis_width = get_char_width(elipsis, style.size);
 
 	// where should we really truncate from?
-	while (truncate_position > 0 && m_current_line->character(truncate_position).xoffset + elipsis_width < width())
+	while (truncate_position > 0 && m_current_line->character(truncate_position).xoffset + elipsis_width > width())
 		truncate_position--;
 
 	// truncate!!!
