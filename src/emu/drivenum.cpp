@@ -54,14 +54,22 @@ int driver_list::find(const char *name)
 //  account wildcards in the wildstring
 //-------------------------------------------------
 
-bool driver_list::matches(const char *wildstring, const char *string)
+bool driver_list::matches(const char *wildstring, const game_driver &driver)
 {
 	// can only match internal drivers if the wildstring starts with an underscore
-	if (string[0] == '_' && (wildstring == nullptr || wildstring[0] != '_'))
+	if (driver.name[0] == '_' && (wildstring == nullptr || wildstring[0] != '_'))
 		return false;
 
+	// null matches any normal driver
+	if (wildstring == nullptr)
+		return true;
+
+	// special case: match on source filename
+	if (wildstring[0] == '@')
+		return (core_stricmp(wildstring+1, core_filename_extract_base(driver.source_file).c_str()) == 0);
+
 	// match everything else normally
-	return (wildstring == nullptr || core_strwildcmp(wildstring, string) == 0);
+	return (core_strwildcmp(wildstring, driver.name) == 0);
 }
 
 
@@ -215,7 +223,7 @@ int driver_enumerator::filter(const char *filterstring)
 
 	// match name against each driver in the list
 	for (int index = 0; index < s_driver_count; index++)
-		if (matches(filterstring, s_drivers_sorted[index]->name))
+		if (matches(filterstring, *s_drivers_sorted[index]))
 			include(index);
 
 	return m_filtered_count;
@@ -253,7 +261,7 @@ void driver_enumerator::include_all()
 	// always exclude the empty driver
 	int empty = find("___empty");
 	assert(empty != -1);
-	m_included[empty] = 0;
+	exclude(empty);
 }
 
 
