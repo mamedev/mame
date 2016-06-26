@@ -163,7 +163,7 @@ void mb86901_device::device_start()
 	state_add(SPARC_WIM,		"WIM",		m_wim).formatstr("%08X");
 	state_add(SPARC_TBR,		"TBR",		m_tbr).formatstr("%08X");
 	state_add(SPARC_Y,			"Y",		m_y).formatstr("%08X");
-	state_add(SPARC_ANNUL,		"ANNUL",	m_annul).formatstr("%d");
+	state_add(SPARC_ANNUL,		"ANNUL",	m_annul).formatstr("%01d");
 	state_add(SPARC_ICC,		"icc",		m_icc).formatstr("%4s");
 	state_add(SPARC_CWP,		"CWP",		m_cwp).formatstr("%2d");
 	char regname[3] = "g0";
