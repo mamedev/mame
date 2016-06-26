@@ -59,7 +59,8 @@ public:
 		m_nvram(*this, "x2212"),
 		m_palette(*this, "palette"),
 		m_rom(*this, "maincpu"),
-		m_video_ram(*this, "vram"){ }
+		m_video_ram(*this, "vram"),
+		m_lk201(*this, "lk201"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_i8085;
@@ -71,11 +72,13 @@ public:
 	required_device<palette_device> m_palette;
 	required_region_ptr<UINT16> m_rom;
 	required_shared_ptr<UINT16> m_video_ram;
+	optional_device<lk201_device> m_lk201;
 
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
 	DECLARE_WRITE_LINE_MEMBER(i8085_rdy_w);
+	DECLARE_WRITE_LINE_MEMBER(lben_w);
+	DECLARE_WRITE_LINE_MEMBER(tx_w);
 	DECLARE_READ_LINE_MEMBER(i8085_sid_r);
-	DECLARE_READ8_MEMBER( test_r );
 	DECLARE_READ8_MEMBER(i8085_comm_r);
 	DECLARE_WRITE8_MEMBER(i8085_comm_w);
 	DECLARE_READ8_MEMBER(t11_comm_r);
@@ -111,12 +114,26 @@ public:
 	UINT8 m_char_idx, m_mask, m_reg0, m_reg1, m_lu;
 	UINT8 m_vom[16];
 	UINT8 m_vpat, m_patmult, m_patcnt, m_patidx;
+	bool m_lb;
 };
 
 WRITE_LINE_MEMBER(vt240_state::write_keyboard_clock)
 {
 	m_i8251->write_txc(state);
 	m_i8251->write_rxc(state);
+}
+
+WRITE_LINE_MEMBER(vt240_state::lben_w)
+{
+	m_lb = state ? false : true;
+}
+
+WRITE_LINE_MEMBER(vt240_state::tx_w)
+{
+	if(m_lb)
+		m_i8251->write_rxd(state);
+	else
+		m_lk201->rx_w(state);
 }
 
 WRITE_LINE_MEMBER(vt240_state::i8085_rdy_w)
@@ -285,7 +302,6 @@ WRITE16_MEMBER(vt240_state::vram_w)
 	UINT8 *video_ram = (UINT8 *)(&m_video_ram[0]);
 	offset <<= 1;
 	offset = ((offset & 0x30000) >> 1) | (offset & 0x7fff);
-	UINT8 chr = data;
 	if(!BIT(m_reg0, 3))
 		offset |= BIT(offset, 16);
 	else
@@ -298,6 +314,7 @@ WRITE16_MEMBER(vt240_state::vram_w)
 		else
 			data &= 0xff;
 	}
+	UINT8 chr = data;
 
 	if(BIT(m_reg1, 2))
 		chr = video_ram[offset & 0xffff];
@@ -500,10 +517,10 @@ static MACHINE_CONFIG_START( vt240, vt240_state )
 //  MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 
 	MCFG_DEVICE_ADD("i8251", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("lk201", lk201_device, rx_w))
-	//MCFG_I8251_DTR_HANDLER(WRITELINE(rainbow_state, irq_hi_w))
-	//MCFG_I8251_RXRDY_HANDLER(INPUTLINE("maincpu", ))
-	//MCFG_I8251_TXRDY_HANDLER(WRITELINE(rainbow_state, kbd_txready_w))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(vt240_state, tx_w))
+	MCFG_I8251_DTR_HANDLER(WRITELINE(vt240_state, lben_w))
+	MCFG_I8251_RXRDY_HANDLER(INPUTLINE("maincpu", 9))
+	MCFG_I8251_TXRDY_HANDLER(INPUTLINE("maincpu", 7))
 
 	MCFG_DEVICE_ADD("lk201", LK201, 0)
 	MCFG_LK201_TX_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxd))
