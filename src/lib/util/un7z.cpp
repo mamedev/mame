@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 /***************************************************************************
 
-    un7z.c
+    un7z.cpp
 
     Functions to manipulate data within 7z files.
 
@@ -14,6 +14,7 @@
 
 #include "corestr.h"
 #include "unicode.h"
+#include "timeconv.h"
 
 #include "lzma/C/7z.h"
 #include "lzma/C/7zAlloc.h"
@@ -154,8 +155,6 @@ public:
 	archive_file::error decompress(void *buffer, std::uint32_t length);
 
 private:
-	typedef std::chrono::duration<std::uint64_t, std::ratio<1, 10000000> > ntfs_duration;
-
 	m7z_file_impl(const m7z_file_impl &) = delete;
 	m7z_file_impl(m7z_file_impl &&) = delete;
 	m7z_file_impl &operator=(const m7z_file_impl &) = delete;
@@ -171,10 +170,7 @@ private:
 	void make_utf8_name(int index);
 	void set_curr_modified();
 
-	static ntfs_duration calculate_ntfs_offset();
-
 	static constexpr std::size_t            CACHE_SIZE = 8;
-	static const ntfs_duration              s_ntfs_offset;
 	static std::array<ptr, CACHE_SIZE>      s_cache;
 	static std::mutex                       s_cache_mutex;
 
@@ -246,7 +242,6 @@ private:
     GLOBAL VARIABLES
 ***************************************************************************/
 
-const m7z_file_impl::ntfs_duration m7z_file_impl::s_ntfs_offset(calculate_ntfs_offset());
 std::array<m7z_file_impl::ptr, m7z_file_impl::CACHE_SIZE> m7z_file_impl::s_cache;
 std::mutex m7z_file_impl::s_cache_mutex;
 
@@ -520,8 +515,8 @@ void m7z_file_impl::set_curr_modified()
 	if (SzBitWithVals_Check(&m_db.MTime, m_curr_file_idx))
 	{
 		CNtfsFileTime const &file_time(m_db.MTime.Vals[m_curr_file_idx]);
-		ntfs_duration const ticks((std::uint64_t(file_time.High) << 32) | std::uint64_t(file_time.Low));
-		m_curr_modified = std::chrono::system_clock::from_time_t(0) + std::chrono::duration_cast<std::chrono::system_clock::duration>(ticks - s_ntfs_offset);
+		auto ticks = ntfs_duration_from_filetime(file_time.High, file_time.Low);
+		m_curr_modified = system_clock_time_point_from_ntfs_duration(ticks);
 	}
 	else
 	{
@@ -529,39 +524,6 @@ void m7z_file_impl::set_curr_modified()
 	}
 }
 
-
-m7z_file_impl::ntfs_duration m7z_file_impl::calculate_ntfs_offset()
-{
-	constexpr auto days_in_year(365);
-	constexpr auto days_in_four_years((days_in_year * 4) + 1);
-	constexpr auto days_in_century((days_in_four_years * 25) - 1);
-	constexpr auto days_in_four_centuries((days_in_century * 4) + 1);
-
-	constexpr ntfs_duration day(std::chrono::hours(24));
-	constexpr ntfs_duration year(day * days_in_year);
-	constexpr ntfs_duration four_years(day * days_in_four_years);
-	constexpr ntfs_duration century(day * days_in_century);
-	constexpr ntfs_duration four_centuries(day * days_in_four_centuries);
-
-	std::time_t const zero(0);
-	std::tm const epoch(*std::gmtime(&zero));
-
-	ntfs_duration result(day * epoch.tm_yday);
-	result += std::chrono::hours(epoch.tm_hour);
-	result += std::chrono::minutes(epoch.tm_min);
-	result += std::chrono::seconds(epoch.tm_sec);
-
-	int years(1900 - 1601 + epoch.tm_year);
-	result += four_centuries * (years / 400);
-	years %= 400;
-	result += century * (years / 100);
-	years %= 100;
-	result += four_years * (years / 4);
-	years %= 4;
-	result += year * years;
-
-	return result;
-}
 
 } // anonymous namespace
 
