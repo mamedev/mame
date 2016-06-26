@@ -142,7 +142,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cart_w ) { cart_w((bool) state); }
 
 	// disassembly override
-	static offs_t dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
+	offs_t dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
 
 protected:
 	// device-level overrides
