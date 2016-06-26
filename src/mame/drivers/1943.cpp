@@ -9,6 +9,7 @@
 
     Games supported:
         * 1943: The Battle of Midway (3 regions)
+		* 1943: The Battle of Midway Mark II (US)
         * 1943 Kai: Midway Kaisen (Japan)
 
 ***************************************************************************/
@@ -700,6 +701,67 @@ ROM_START( 1943kai )
 	ROM_LOAD( "bm6.4b",    0x0b00, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )   /* video timing (not used) */
 ROM_END
 
+ROM_START( 1943mii ) /* Unknown if it's a prototype, location test or actual limited release */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for the banked ROMs images */
+	ROM_LOAD( "01.12d", 0x00000, 0x08000, CRC(8ba22485) SHA1(ed67992d2cf7dcba72bc9525fbce6d2cb03d78c4) ) /* had USA hand written in pen on labels */
+	ROM_LOAD( "02.13d", 0x10000, 0x10000, CRC(659a5455) SHA1(c4a2cea51c1326f7e60e404ae4d66e567abc4c96) )
+	ROM_LOAD( "03.14d", 0x20000, 0x10000, CRC(159ea771) SHA1(d95ff1773cdc566203befd84e1ba961a7dc8f69b) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "05.5h", 0x00000, 0x8000, CRC(25f37957) SHA1(1e50c2a920eb3b5c881843686db857e9fee5ba1d) )
+
+	ROM_REGION( 0x10000, "mcu", 0 ) /*  C8751H-88 MCU Code */
+	ROM_LOAD( "bm.7k", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+
+	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_LOAD( "04.4k", 0x00000, 0x8000, CRC(8190e092) SHA1(17ca0fa8e61cc6f478d4807262a0333fdb3e4f94) )   /* characters - had USA hand written in pen on label */
+
+	ROM_REGION( 0x40000, "gfx2", 0 ) /* Mixture of standard and Kai roms */
+	ROM_LOAD( "bm15.10f", 0x00000, 0x8000, CRC(6b1a0443) SHA1(32337c840ccd6815fd5844c194365c58d708f6dc) )  /* bg tiles */
+	ROM_LOAD( "bm16.11f", 0x08000, 0x8000, CRC(23c908c2) SHA1(42b83ff5781be9181802a21ff1b23c17ab1bc5a2) )
+	ROM_LOAD( "17.12f",   0x10000, 0x8000, CRC(3d5acab9) SHA1(887d45b648fda952ae2137579f383ab8ede1facd) ) /* Yes it's actually 17 & 18 instead of BMK17 & BMK18 */
+	ROM_LOAD( "18.14f",   0x18000, 0x8000, CRC(7b62da1d) SHA1(1926109a2ab2f550ca87b0d2af73abd2b4a7498d) ) /* additional hand written sticker "2-4 YZ SCR" */
+	ROM_LOAD( "bm19.10j", 0x20000, 0x8000, CRC(868ababc) SHA1(1c7be905f53c63bad25fbbd9b3cf82d2c7749bc3) )
+	ROM_LOAD( "bm20.11j", 0x28000, 0x8000, CRC(0917e5d4) SHA1(62dd277bc1fa54cfe168ae2380bc147bd17f4205) )
+	ROM_LOAD( "bm21.12j", 0x30000, 0x8000, CRC(8c7fe74a) SHA1(8846b57d7f47c10ab1f505c359ecf36dcbacb011) ) /* Yes it's actually BM21 & BM22 instead of BMK21 & BMK22 */
+	ROM_LOAD( "bm22.14j", 0x38000, 0x8000, CRC(d5ef8a0e) SHA1(2e42b1fbbfe823a33740a56d1334657db56d24d2) ) /* additional hand written sticker "2-4 WX SCR" */
+
+	ROM_REGION( 0x10000, "gfx3", 0 )
+	ROM_LOAD( "24.14k", 0x00000, 0x8000, CRC(a0074c68) SHA1(c219de2253d1964ae3e3daf60c5f9a563b94b4eb) )  /* fg tiles */
+	ROM_LOAD( "25.14l", 0x08000, 0x8000, CRC(f979b2f2) SHA1(06db7b812cf51b3e4476a56bca410ba04e55b925) )
+
+	ROM_REGION( 0x40000, "gfx4", 0 )
+	ROM_LOAD( "06.10a", 0x00000, 0x8000, CRC(b261d5d7) SHA1(4f249c213d2853b8a524baba148730fd4dd1536f) )  /* sprites */
+	ROM_LOAD( "07.11a", 0x08000, 0x8000, CRC(2af8a6f2) SHA1(f97a08dbdb57de01c21821ddcc30ebe2d57edb17) )
+	ROM_LOAD( "08.12a", 0x10000, 0x8000, CRC(159d51bd) SHA1(746aa49b18aff0eaf2fb875c573d455416d45a1d) )
+	ROM_LOAD( "09.14a", 0x18000, 0x8000, CRC(70d9f9a7) SHA1(c8d1d3ab4d8baca7fbb5b1d9b3de72c46af5bbd7) )
+	ROM_LOAD( "10.10c", 0x20000, 0x8000, CRC(de539920) SHA1(957ab527032e19e57ab1afa5e5e08763104d4c9a) )
+	ROM_LOAD( "11.11c", 0x28000, 0x8000, CRC(a6abf183) SHA1(97cf3d00d23e062e15bcba7914e184b249f2c714) )
+	ROM_LOAD( "12.12c", 0x30000, 0x8000, CRC(0f50c001) SHA1(0e6367d3f0ba39a00ee0fa6e42ae9d43d12da23d) )
+	ROM_LOAD( "13.14c", 0x38000, 0x8000, CRC(f065f619) SHA1(d45b3a7ce306b3dc7b2ccea2484c13c1ff08a0f7) )
+
+	ROM_REGION( 0x10000, "gfx5", 0 )    /* tilemaps */
+	ROM_LOAD( "14.5f", 0x0000, 0x8000, CRC(02a899f1) SHA1(0f094d925a6e38e922eb487af80da9c9ee7613aa) )    /* front background */
+	ROM_LOAD( "23.8k", 0x8000, 0x8000, CRC(b6dfdf85) SHA1(c223ae136f67e5f9910cbfa49b9827e5122e018e) )    /* back background */
+
+	ROM_REGION( 0x0c00, "proms", 0 )
+//  PCB had standard BM0x for bproms 1 through 3, but clearly these should use the Kai BPROMs for correct colors
+//  BPROMs 4 through 8 macth the Kai set - labels were a non descript yellow dot with prom number
+//  BPROMs 9 through 12 are unique - labels were a non descript yellow dot with prom number
+	ROM_LOAD( "bmk1.12a",  0x0000, 0x0100, CRC(e001ea33) SHA1(4204bdf87820ac84bab2a1b5571a2ee28c4cdfc5) )   /* red component */
+	ROM_LOAD( "bmk2.13a",  0x0100, 0x0100, CRC(af34d91a) SHA1(94bc6514c980fdd1cb013ff0819d6f32464c581c) )   /* green component */
+	ROM_LOAD( "bmk3.14a",  0x0200, 0x0100, CRC(43e9f6ef) SHA1(e1f58368fe0bd9b53f6c286ce5009b218a5197dc) )   /* blue component */
+	ROM_LOAD( "bmk5.7f",   0x0300, 0x0100, CRC(41878934) SHA1(8f28210ab1d409c89600169a136b74a706001cdf) )   /* char lookup table */
+	ROM_LOAD( "10.7l",     0x0400, 0x0100, CRC(db53adf0) SHA1(e3e3a3c262acc628541afa512cfa4ed0c6fc547f) )   /* foreground lookup table */
+	ROM_LOAD( "9.6l",      0x0500, 0x0100, CRC(75d5cc90) SHA1(2f04236e7635583fe096c11165fa0a8a0e121d70) )   /* foreground palette bank */
+	ROM_LOAD( "12.12m",    0x0600, 0x0100, CRC(784bdf33) SHA1(6a46c2048637770acd3f3d791e1b831e8caf8c99) )   /* background lookup table */
+	ROM_LOAD( "11.12l",    0x0700, 0x0100, CRC(6fb2e170) SHA1(91a84f7138c373da0b50d4833de36f17db9a553e) )   /* background palette bank */
+	ROM_LOAD( "bmk8.8c",   0x0800, 0x0100, CRC(dad17e2d) SHA1(fdb18ddc7574153bb7e27ba08b04b9dc87061c02) )   /* sprite lookup table */
+	ROM_LOAD( "bmk7.7c",   0x0900, 0x0100, CRC(76307f8d) SHA1(8d655e2a5c50541795316d924b2f18b55f4b9571) )   /* sprite palette bank */
+	ROM_LOAD( "bm4.12c",   0x0a00, 0x0100, CRC(91a8a2e1) SHA1(9583c87eff876f04bc2ccf7218cd8081f1bcdb94) )   /* priority encoder / palette selector (not used) */
+	ROM_LOAD( "bm6.4b",    0x0b00, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )   /* video timing (not used) */
+ROM_END
+
 ROM_START( 1943b )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for the banked ROMs images */
 	ROM_LOAD( "1.12d",    0x00000, 0x08000, CRC(9a2d70ab) SHA1(6f84e906656f132ffcb63022f6d067580d261431) ) // protection patched out, disclaimer patched out
@@ -832,3 +894,4 @@ GAME( 1987, 1943ja,   1943,  1943,   1943, _1943_state,  1943, ROT270,  "Capcom"
 GAME( 1987, 1943b,    1943,  1943,   1943, _1943_state,  1943b,ROT270,  "bootleg", "1943: Battle of Midway (bootleg, hack of Japan set)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, 1943bj,   1943,  1943,   1943, _1943_state,  1943b,ROT270,  "bootleg", "1943: Midway Kaisen (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, 1943kai,  0,     1943,   1943, _1943_state,  1943, ROT270,  "Capcom",  "1943 Kai: Midway Kaisen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, 1943mii,  0,     1943,   1943, _1943_state,  1943, ROT270,  "Capcom",  "1943: The Battle of Midway Mark II (US)", MACHINE_SUPPORTS_SAVE )
