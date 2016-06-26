@@ -13,6 +13,7 @@
 #include "corestr.h"
 #include "hashing.h"
 #include "osdcore.h"
+#include "timeconv.h"
 
 #include "lzma/C/LzmaDec.h"
 
@@ -173,8 +174,6 @@ public:
 	archive_file::error decompress(void *buffer, std::uint32_t length);
 
 private:
-	typedef std::chrono::duration<std::uint64_t, std::ratio<1, 10000000> > ntfs_duration;
-
 	zip_file_impl(const zip_file_impl &) = delete;
 	zip_file_impl(zip_file_impl &&) = delete;
 	zip_file_impl &operator=(const zip_file_impl &) = delete;
@@ -228,9 +227,6 @@ private:
 	archive_file::error decompress_data_type_8(std::uint64_t offset, void *buffer, std::uint32_t length);
 	archive_file::error decompress_data_type_14(std::uint64_t offset, void *buffer, std::uint32_t length);
 
-	// precalculation
-	static ntfs_duration calculate_ntfs_offset();
-
 	struct file_header
 	{
 		std::uint16_t                           version_created;        // version made by
@@ -259,7 +255,6 @@ private:
 
 	static constexpr std::size_t        DECOMPRESS_BUFSIZE = 16384;
 	static constexpr std::size_t        CACHE_SIZE = 8; // number of open files to cache
-	static const ntfs_duration          s_ntfs_offset;
 	static std::array<ptr, CACHE_SIZE>  s_cache;
 	static std::mutex                   s_cache_mutex;
 
@@ -646,7 +641,6 @@ private:
     GLOBAL VARIABLES
 ***************************************************************************/
 
-const zip_file_impl::ntfs_duration zip_file_impl::s_ntfs_offset(calculate_ntfs_offset());
 std::array<zip_file_impl::ptr, zip_file_impl::CACHE_SIZE> zip_file_impl::s_cache;
 std::mutex zip_file_impl::s_cache_mutex;
 
@@ -768,7 +762,7 @@ int zip_file_impl::search(std::uint32_t search_crc, const std::string &search_fi
 					{
 						ntfs_times_reader const times(tag);
 						ntfs_duration const ticks(times.mtime());
-						m_header.modified = std::chrono::system_clock::from_time_t(0) + std::chrono::duration_cast<std::chrono::system_clock::duration>(ticks - s_ntfs_offset);
+						m_header.modified = system_clock_time_point_from_ntfs_duration(ticks);
 					}
 				}
 			}
@@ -1406,40 +1400,6 @@ archive_file::error zip_file_impl::decompress_data_type_14(std::uint64_t offset,
 	{
 		return archive_file::error::NONE;
 	}
-}
-
-
-zip_file_impl::ntfs_duration zip_file_impl::calculate_ntfs_offset()
-{
-	constexpr auto days_in_year(365);
-	constexpr auto days_in_four_years((days_in_year * 4) + 1);
-	constexpr auto days_in_century((days_in_four_years * 25) - 1);
-	constexpr auto days_in_four_centuries((days_in_century * 4) + 1);
-
-	constexpr ntfs_duration day(std::chrono::hours(24));
-	constexpr ntfs_duration year(day * days_in_year);
-	constexpr ntfs_duration four_years(day * days_in_four_years);
-	constexpr ntfs_duration century(day * days_in_century);
-	constexpr ntfs_duration four_centuries(day * days_in_four_centuries);
-
-	std::time_t const zero(0);
-	std::tm const epoch(*std::gmtime(&zero));
-
-	ntfs_duration result(day * epoch.tm_yday);
-	result += std::chrono::hours(epoch.tm_hour);
-	result += std::chrono::minutes(epoch.tm_min);
-	result += std::chrono::seconds(epoch.tm_sec);
-
-	int years(1900 - 1601 + epoch.tm_year);
-	result += four_centuries * (years / 400);
-	years %= 400;
-	result += century * (years / 100);
-	years %= 100;
-	result += four_years * (years / 4);
-	years %= 4;
-	result += year * years;
-
-	return result;
 }
 
 } // anonymous namespace
