@@ -12482,7 +12482,7 @@
 		<description>Game Boy Advance Video - Teenage Mutant Ninja Turtles - Things Change (Euro, USA)</description>
 		<year>2004</year>
 		<publisher>Majesco</publisher>
-		<info name="serial" value="AGB-MTME-USA"/>
+		<info name="serial" value="AGB-MTME-USA, AGB-MTMP-UKV"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="game boy advance video - teenage mutant ninja turtles - things change (usa, europe).bin" size="33554432" crc="046589c8" sha1="8b9665ce2cefd663f7722f38b64f9271f7c00daa" offset="000000" />
@@ -12553,7 +12553,7 @@
 		<description>Game Boy Advance Video - Yu-Gi-Oh! - Yugi vs. Joey (Euro, USA)</description>
 		<year>2004</year>
 		<publisher>Majesco</publisher>
-		<info name="serial" value="AGB-MYGE-USA"/>
+		<info name="serial" value="AGB-MYGE-USA, AGB-MYGE-UKV"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="game boy advance video - yu-gi-oh! - yugi vs. joey (usa, europe).bin" size="33554432" crc="8d631f4e" sha1="6daf15bb61a10d1bbf94009886d6a76f9c937f8b" offset="000000" />
