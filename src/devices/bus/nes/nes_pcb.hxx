@@ -169,6 +169,8 @@ static const nes_pcb pcb_list[] =
 	{ "ks7031",           KAISER_KS7031 },  //  used in Dracula II (FDS Conversion)
 	{ "ks7012",           KAISER_KS7012 },     // used in Zanac (FDS Conversion)
 	{ "ks7013b",          KAISER_KS7013B },    // used in Highway Star (FDS Conversion)
+	{ "ks7016",           KAISER_KS7016 },	// used in Exciting Basketball (FDS Conversion)
+	{ "ks7037",           KAISER_KS7037 },	// Metroid FDS Chinese
 	{ "gs2015",           RCM_GS2015 },
 	{ "gs2004",           RCM_GS2004 },
 	{ "gs2013",           RCM_GS2013 },
@@ -299,6 +301,7 @@ static const nes_pcb pcb_list[] =
 	{ "unl_bb",           UNL_BB },
 	{ "unl_malisb",       UNL_MALISB },
 	{ "sgpipe",           BTL_SHUIGUAN },
+	{ "rt01",             UNL_RT01 },	// Russian Test Cart
 	{ "unl_whero",        UNL_WORLDHERO },
 	{ "unl_43272",        UNL_43272 },
 	{ "tf1201",           UNL_TF1201 },
@@ -325,9 +328,6 @@ static const nes_pcb pcb_list[] =
 	{ "unl_eh8813a",      UNSUPPORTED_BOARD },	// Dr. Mario II
 	{ "unl_158b",         UNSUPPORTED_BOARD },	// Blood of Jurassic
 	{ "unl_drgnfgt",      UNSUPPORTED_BOARD },	// Dragon Fighter by Flying Star
-	{ "ks7016",           UNSUPPORTED_BOARD },	// Exciting Basketball FDS
-	{ "ks7037",           UNSUPPORTED_BOARD },	// Metroid FDS Chinese
-	{ "rt01",             UNSUPPORTED_BOARD },	// Russian Test Cart
 	{ "test",             TEST_BOARD },
 	{ "unknown",          UNKNOWN_BOARD }  //  a few pirate dumps uses the wrong mapper...
 };

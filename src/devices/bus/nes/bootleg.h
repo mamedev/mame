@@ -453,6 +453,22 @@ private:
 };
 
 
+// ======================> nes_rt01_device
+
+class nes_rt01_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_rt01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	// device-level overrides
+	virtual void device_start() override;
+	virtual DECLARE_READ8_MEMBER(read_h) override;
+	
+	virtual void pcb_reset() override;
+};
+
+
 
 // device type definition
 extern const device_type NES_AX5705;
@@ -475,6 +491,7 @@ extern const device_type NES_AC08;
 extern const device_type NES_UNL_BB;
 extern const device_type NES_MMALEE;
 extern const device_type NES_SHUIGUAN;
+extern const device_type NES_RT01;
 
 
 #endif

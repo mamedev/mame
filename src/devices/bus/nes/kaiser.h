@@ -170,6 +170,50 @@ private:
 };
 
 
+// ======================> nes_ks7016_device
+
+class nes_ks7016_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_ks7016_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	// device-level overrides
+	virtual void device_start() override;
+	virtual DECLARE_READ8_MEMBER(read_m) override;
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	
+	virtual void pcb_reset() override;
+	
+private:
+	UINT8 m_reg;
+};
+
+// ======================> nes_ks7037_device
+
+class nes_ks7037_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_ks7037_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	// device-level overrides
+	virtual void device_start() override;
+	virtual DECLARE_READ8_MEMBER(read_m) override;
+	virtual DECLARE_READ8_MEMBER(read_h) override;
+	virtual DECLARE_WRITE8_MEMBER(write_m) override;
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	
+	virtual void pcb_reset() override;
+	
+private:
+	void update_prg();
+	UINT8 m_latch;
+	UINT8 m_reg[8];
+};
+
+
+
 
 // device type definition
 extern const device_type NES_KS7058;
@@ -180,5 +224,7 @@ extern const device_type NES_KS7017;
 extern const device_type NES_KS7012;
 extern const device_type NES_KS7013B;
 extern const device_type NES_KS7031;
+extern const device_type NES_KS7016;
+extern const device_type NES_KS7037;
 
 #endif

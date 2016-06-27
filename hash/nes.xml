@@ -66006,7 +66006,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="metroidk" supported="no">
+	<software name="metroidk" supported="partial">
 		<description>Metroid - Jin Ji Zhi Ling (Asia, FDS conversion)</description>
 		<year>19??</year>
 		<publisher>Kaiser</publisher>
@@ -66018,6 +66018,9 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -71122,8 +71125,12 @@ Other
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="rt01" />
 			<feature name="pcb" value="UNL-RT-01" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="8192">
 				<rom name="test ver. 1.01 dlya proverki tv pristavok (rt-01, by ss aka snake)(unl)[u][!].chr" size="2048" crc="76d0de59" sha1="e3832e8d7c65b79fb813a5e35493113efa0272b4" offset="0" />
+				<rom size="2048" offset="0x0800" loadflag="reload" />
+				<rom size="2048" offset="0x1000" loadflag="reload" />
+				<rom size="2048" offset="0x1800" loadflag="reload" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="test ver. 1.01 dlya proverki tv pristavok (rt-01, by ss aka snake)(unl)[u][!].prg" size="16384" crc="cea5abf3" sha1="d30b9f3711e318d699dba8468ff10df44c754df7" offset="0" />
@@ -81052,6 +81059,22 @@ that the real dumps might surface -->
 				<rom name="29lv160b.bin" size="2097152" crc="7dac8efe" sha1="ffb27ebb4299d5b9a4b976c418fcc7695200060c" offset="00000" />
 			</dataarea>
 			<dataarea name="vram" size="131072">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dcat8" supported="no">
+		<description>D-Cat 8</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="onebus" />
+			<feature name="pcb" value="UNL-OneBus" />
+			<dataarea name="prg" size="8388608">
+				<rom name="s29gl064.u6" size="8388608" crc="e28b1ef8" sha1="4a6f107d2189cbe1bb0b86b3738d0af58e24e0f7" offset="0" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
