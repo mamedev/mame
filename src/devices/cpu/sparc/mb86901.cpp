@@ -33,7 +33,7 @@ const int mb86901_device::NWINDOWS = 7;
 mb86901_device::mb86901_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, MB86901, "Fujitsu MB86901", tag, owner, clock, "mb86901", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32)
-	, m_dasm(7)
+	, m_dasm(this, 7)
 {
 }
 
@@ -2943,4 +2943,62 @@ void mb86901_device::execute_run()
 		}
 		--m_icount;
 	}
+}
+
+
+//-------------------------------------------------
+//  get_reg_r - get integer register value for
+//  disassembler
+//-------------------------------------------------
+
+UINT64 mb86901_device::get_reg_r(unsigned index) const
+{
+	return REG(index & 31);
+}
+
+
+//-------------------------------------------------
+//  get_reg_pc - get program counter value for
+//  disassembler
+//-------------------------------------------------
+
+UINT64 mb86901_device::get_translated_pc() const
+{
+	// FIXME: how do we apply translation to the address so it's in the same space the disassembler sees?
+	return m_pc;
+}
+
+
+//-------------------------------------------------
+//  get_icc - get integer condition codes for
+//  disassembler
+//-------------------------------------------------
+
+UINT8 mb86901_device::get_icc() const
+{
+	return m_icc;
+}
+
+
+//-------------------------------------------------
+//  get_icc - get extended integer condition codes
+//  for disassembler
+//-------------------------------------------------
+
+UINT8 mb86901_device::get_xcc() const
+{
+	// not present before SPARCv9
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  get_icc - get extended integer condition codes
+//  for disassembler
+//-------------------------------------------------
+
+UINT8 mb86901_device::get_fcc(unsigned index) const
+{
+	// only one fcc instance before SPARCv9
+	return (m_fsr >> 10) & 3;
 }

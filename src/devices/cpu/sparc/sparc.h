@@ -47,7 +47,7 @@
 #define MCFG_SPARC_ADD_ASI_DESC(desc) \
 	mb86901_device::add_asi_desc(*device, desc);
 
-class mb86901_device : public cpu_device
+class mb86901_device : public cpu_device, protected sparc_debug_state
 {
 public:
 	mb86901_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -136,6 +136,13 @@ protected:
 	// memory access
 	UINT32 read_sized_word(UINT8 asi, UINT32 address, int size);
 	void write_sized_word(UINT8 asi, UINT32 address, UINT32 data, int size);
+
+	// helpers for the disassembler
+	virtual UINT64 get_reg_r(unsigned index) const override;
+	virtual UINT64 get_translated_pc() const override;
+	virtual UINT8 get_icc() const override;
+	virtual UINT8 get_xcc() const override;
+	virtual UINT8 get_fcc(unsigned index) const override;
 
 	// general-purpose registers
 	UINT32 m_r[120];

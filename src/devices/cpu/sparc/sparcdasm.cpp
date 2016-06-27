@@ -16,6 +16,72 @@ namespace {
 	INT32 get_disp16(UINT32 op) { return DISP19; }
 	INT32 get_disp19(UINT32 op) { return DISP19; }
 	INT32 get_disp22(UINT32 op) { return DISP19; }
+
+	const char *bicc_comment(const sparc_debug_state *state, bool use_cc, offs_t pc, UINT32 op)
+	{
+		if (!state || (state->get_translated_pc() != pc)) return nullptr;
+		auto const cc((use_cc && (BRCC & 0x2)) ? state->get_xcc() : state->get_icc());
+		switch (COND)
+		{
+		case 0x0: return "will fall through";
+		case 0x1: return (cc & 0x4) ? "will branch" : "will fall through";
+		case 0x2: return ((cc & 0x04) | ((cc ^ (cc >> 2)) & 0x2)) ? "will branch" : "will fall through";
+		case 0x3: return ((cc ^ (cc >> 2)) & 0x2) ? "will branch" : "will fall through";
+		case 0x4: return (cc & 0x5) ? "will branch" : "will fall through";
+		case 0x5: return (cc & 0x1) ? "will branch" : "will fall through";
+		case 0x6: return (cc & 0x8) ? "will branch" : "will fall through";
+		case 0x7: return (cc & 0x2) ? "will branch" : "will fall through";
+		case 0x8: return "will branch";
+		case 0x9: return (cc & 0x4) ? "will fall through" : "will branch";
+		case 0xa: return ((cc & 0x04) | ((cc ^ (cc >> 2)) & 0x2)) ? "will fall through" : "will branch";
+		case 0xb: return ((cc ^ (cc >> 2)) & 0x2) ? "will fall through" : "will branch";
+		case 0xc: return (cc & 0x5) ? "will fall through" : "will branch";
+		case 0xd: return (cc & 0x1) ? "will fall through" : "will branch";
+		case 0xe: return (cc & 0x8) ? "will fall through" : "will branch";
+		case 0xf: return (cc & 0x2) ? "will fall through" : "will branch";
+		}
+		return nullptr;
+	}
+	const char *bfcc_comment(const sparc_debug_state *state, bool use_cc, offs_t pc, UINT32 op)
+	{
+		if (!state || (state->get_translated_pc() != pc)) return nullptr;
+		auto const fcc(state->get_fcc(use_cc ? BRCC : 0));
+		switch (COND)
+		{
+		case 0x0: return "will fall through";
+		case 0x1: return ((fcc == 1) || (fcc == 2) || (fcc == 3)) ? "will branch" : "will fall through";
+		case 0x2: return ((fcc == 1) || (fcc == 2)) ? "will branch" : "will fall through";
+		case 0x3: return ((fcc == 1) || (fcc == 3)) ? "will branch" : "will fall through";
+		case 0x4: return (fcc == 1) ? "will branch" : "will fall through";
+		case 0x5: return ((fcc == 2) || (fcc == 3)) ? "will branch" : "will fall through";
+		case 0x6: return (fcc == 2) ? "will branch" : "will fall through";
+		case 0x7: return (fcc == 3) ? "will branch" : "will fall through";
+		case 0x8: return "will branch";
+		case 0x9: return (fcc == 0) ? "will branch" : "will fall through";
+		case 0xa: return ((fcc == 0) || (fcc == 3)) ? "will branch" : "will fall through";
+		case 0xb: return ((fcc == 0) || (fcc == 2)) ? "will branch" : "will fall through";
+		case 0xc: return ((fcc == 0) || (fcc == 2) || (fcc == 3)) ? "will branch" : "will fall through";
+		case 0xd: return ((fcc == 0) || (fcc == 1)) ? "will branch" : "will fall through";
+		case 0xe: return ((fcc == 0) || (fcc == 1) || (fcc == 3)) ? "will branch" : "will fall through";
+		case 0xf: return ((fcc == 0) || (fcc == 1) || (fcc == 2)) ? "will branch" : "will fall through";
+		}
+		return nullptr;
+	}
+	const char *bpr_comment(const sparc_debug_state *state, bool use_cc, offs_t pc, UINT32 op)
+	{
+		if (!state || (state->get_translated_pc() != pc)) return nullptr;
+		const INT64 reg(state->get_reg_r(RS1));
+		switch (COND)
+		{
+		case 1: return (reg == 0) ? "will branch" : "will fall through";
+		case 2: return (reg <= 0) ? "will branch" : "will fall through";
+		case 3: return (reg < 0) ? "will branch" : "will fall through";
+		case 5: return (reg != 0) ? "will branch" : "will fall through";
+		case 6: return (reg > 0) ? "will branch" : "will fall through";
+		case 7: return (reg >= 0) ? "will branch" : "will fall through";
+		}
+		return nullptr;
+	}
 }
 
 const char * const sparc_disassembler::REG_NAMES[32] = {
@@ -26,7 +92,7 @@ const char * const sparc_disassembler::REG_NAMES[32] = {
 };
 
 const sparc_disassembler::branch_desc sparc_disassembler::EMPTY_BRANCH_DESC = {
-	nullptr, 0, false, false,
+	nullptr, nullptr, 0, false, false,
 	{ nullptr, nullptr, nullptr, nullptr },
 	{
 		nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
@@ -35,7 +101,7 @@ const sparc_disassembler::branch_desc sparc_disassembler::EMPTY_BRANCH_DESC = {
 };
 
 const sparc_disassembler::branch_desc sparc_disassembler::BPCC_DESC = {
-	&get_disp19, 6, true, true,
+	&get_disp19, &bicc_comment, 6, true, true,
 	{ "%icc", nullptr, "%xcc", nullptr },
 	{
 		"bn",    "be",    "ble",   "bl",    "bleu",  "bcs",   "bneg",  "bvs",
@@ -44,7 +110,7 @@ const sparc_disassembler::branch_desc sparc_disassembler::BPCC_DESC = {
 };
 
 const sparc_disassembler::branch_desc sparc_disassembler::BICC_DESC = {
-	&get_disp22, 6, false, false,
+	&get_disp22, &bicc_comment, 6, false, false,
 	{ nullptr, nullptr, nullptr, nullptr },
 	{
 		"bn",    "be",    "ble",   "bl",    "bleu",  "bcs",   "bneg",  "bvs",
@@ -53,7 +119,7 @@ const sparc_disassembler::branch_desc sparc_disassembler::BICC_DESC = {
 };
 
 const sparc_disassembler::branch_desc sparc_disassembler::BPR_DESC = {
-	&get_disp16, 5, true, false,
+	&get_disp16, &bpr_comment, 5, true, false,
 	{ nullptr, nullptr, nullptr, nullptr },
 	{
 		nullptr, "brz",   "brlez", "brlz",  nullptr, "brnz",  "brgz",  "brgez",
@@ -62,7 +128,7 @@ const sparc_disassembler::branch_desc sparc_disassembler::BPR_DESC = {
 };
 
 const sparc_disassembler::branch_desc sparc_disassembler::FBPFCC_DESC = {
-	&get_disp19, 6, true, true,
+	&get_disp19, &bfcc_comment, 6, true, true,
 	{ "%fcc0", "%fcc1", "%fcc2", "%fcc3" },
 	{
 		"fbn",   "fbne",  "fblg",  "fbul",  "fbl",   "fbug",  "fbg",   "fbu",
@@ -71,7 +137,7 @@ const sparc_disassembler::branch_desc sparc_disassembler::FBPFCC_DESC = {
 };
 
 const sparc_disassembler::branch_desc sparc_disassembler::FBFCC_DESC = {
-	&get_disp22, 6, false, false,
+	&get_disp22, &bfcc_comment, 6, false, false,
 	{ nullptr, nullptr, nullptr, nullptr },
 	{
 		"fbn",   "fbne",  "fblg",  "fbul",  "fbl",   "fbug",  "fbg",   "fbu",
@@ -80,7 +146,7 @@ const sparc_disassembler::branch_desc sparc_disassembler::FBFCC_DESC = {
 };
 
 const sparc_disassembler::branch_desc sparc_disassembler::CBCCC_DESC = {
-	&get_disp22, 6, false, false,
+	&get_disp22, nullptr, 6, false, false,
 	{ nullptr, nullptr, nullptr, nullptr },
 	{
 		"cbn",   "cb123", "cb12",  "cb13",  "cb1",   "cb23",  "cb2",   "cb3",
@@ -551,13 +617,14 @@ inline void sparc_disassembler::print(char *&output, const char *fmt, ...)
 }
 
 
-sparc_disassembler::sparc_disassembler(unsigned version)
-	: sparc_disassembler(version, vis_none)
+sparc_disassembler::sparc_disassembler(const sparc_debug_state *state, unsigned version)
+	: sparc_disassembler(state, version, vis_none)
 {
 }
 
-sparc_disassembler::sparc_disassembler(unsigned version, vis_level vis)
-	: m_version(version)
+sparc_disassembler::sparc_disassembler(const sparc_debug_state *state, unsigned version, vis_level vis)
+	: m_state(state)
+	, m_version(version)
 	, m_vis_level(vis)
 	, m_op_field_width(9)
 	, m_branch_desc{
@@ -986,12 +1053,14 @@ offs_t sparc_disassembler::dasm_branch(char *buf, offs_t pc, UINT32 op) const
 	const char * const mnemonic(desc.mnemonic[COND]);
 	if (!mnemonic || (desc.use_cc && !desc.reg_cc[BRCC])) return dasm_invalid(buf, pc, op);
 
-	print(ptr, "%s%s%s", mnemonic, ANNUL ? ",a" : "", (m_branch_desc[OP2].use_pred && !PRED) ? ",pn" : "");
+	print(ptr, "%s%s%s", mnemonic, ANNUL ? ",a" : "", (desc.use_pred && !PRED) ? ",pn" : "");
 	pad_op_field(buf, ptr);
 	if (desc.use_cc) print(ptr, "%s,", desc.reg_cc[BRCC]);
 	if (OP2 == 3) print(ptr, "%s,", REG_NAMES[RS1]);
 	const INT32 disp(desc.get_disp(op));
 	print(ptr, "%%pc%c0x%0*x ! 0x%08x", (disp < 0) ? '-' : '+', desc.disp_width, std::abs(disp), pc + disp);
+	//const char * const comment(desc.get_comment ? desc.get_comment(m_state, desc.use_cc, pc, op) : nullptr);
+	//if (comment) print(ptr, " - %s", comment);
 
 	return 4 | DASMFLAG_SUPPORTED;
 }

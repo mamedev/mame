@@ -12,6 +12,20 @@
 #include <map>
 
 
+class sparc_debug_state
+{
+public:
+	virtual UINT64 get_reg_r(unsigned index) const = 0;
+	virtual UINT64 get_translated_pc() const = 0;
+	virtual UINT8 get_icc() const = 0;
+	virtual UINT8 get_xcc() const = 0;
+	virtual UINT8 get_fcc(unsigned index) const = 0; // ?><=
+
+protected:
+	~sparc_debug_state() { }
+};
+
+
 class sparc_disassembler
 {
 public:
@@ -44,8 +58,8 @@ public:
 	};
 	typedef std::map<UINT8, prftch_desc> prftch_desc_map;
 
-	sparc_disassembler(unsigned version);
-	sparc_disassembler(unsigned version, vis_level vis);
+	sparc_disassembler(const sparc_debug_state *state, unsigned version);
+	sparc_disassembler(const sparc_debug_state *state, unsigned version, vis_level vis);
 
 	template <typename T> void add_state_reg_desc(const T &desc)
 	{
@@ -98,6 +112,7 @@ private:
 	struct branch_desc
 	{
 		INT32           (*get_disp)(UINT32 op);
+		const char *    (*get_comment)(const sparc_debug_state *state, bool use_cc, offs_t pc, UINT32 op);
 		int             disp_width;
 		bool            use_pred, use_cc;
 		const char      *reg_cc[4];
@@ -223,18 +238,19 @@ private:
 	static const vis_op_desc_map::value_type    VIS3_OP_DESC[];
 	static const vis_op_desc_map::value_type    VIS3B_OP_DESC[];
 
-	unsigned            m_version;
-	vis_level           m_vis_level;
-	int                 m_op_field_width;
-	branch_desc         m_branch_desc[8];
-	int_op_desc_map     m_int_op_desc;
-	state_reg_desc_map  m_state_reg_desc;
-	fpop1_desc_map      m_fpop1_desc;
-	fpop2_desc_map      m_fpop2_desc;
-	ldst_desc_map       m_ldst_desc;
-	asi_desc_map        m_asi_desc;
-	prftch_desc_map     m_prftch_desc;
-	vis_op_desc_map     m_vis_op_desc;
+	const sparc_debug_state *m_state;
+	unsigned                m_version;
+	vis_level               m_vis_level;
+	int                     m_op_field_width;
+	branch_desc             m_branch_desc[8];
+	int_op_desc_map         m_int_op_desc;
+	state_reg_desc_map      m_state_reg_desc;
+	fpop1_desc_map          m_fpop1_desc;
+	fpop2_desc_map          m_fpop2_desc;
+	ldst_desc_map           m_ldst_desc;
+	asi_desc_map            m_asi_desc;
+	prftch_desc_map         m_prftch_desc;
+	vis_op_desc_map         m_vis_op_desc;
 };
 
 #endif // MAME_DEVICES_CPU_SPARC_SPARC_DASM_H
