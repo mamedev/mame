@@ -53,9 +53,8 @@ class osd_monitor_info
 {
 public:
 	osd_monitor_info(void *handle, const char *monitor_device, float aspect)
-	: m_next(nullptr), m_is_primary(false), m_handle(handle), m_aspect(aspect)
+	: m_is_primary(false), m_name(monitor_device), m_handle(handle), m_aspect(aspect)
 	{
-		strncpy(m_name, monitor_device, ARRAY_LENGTH(m_name) - 1);
 	}
 
 	virtual ~osd_monitor_info() { }
@@ -67,7 +66,7 @@ public:
 	const osd_rect &position_size() const { return m_pos_size; }
 	const osd_rect &usuable_position_size() const { return m_usuable_pos_size; }
 
-	const char *devicename() { return m_name[0] ? m_name : "UNKNOWN"; }
+	const char *devicename() const { return m_name.length() ? m_name.c_str() : "UNKNOWN"; }
 
 	float aspect() const { return m_aspect; }
 	float pixel_aspect() const { return m_aspect / ((float)m_pos_size.width() / (float)m_pos_size.height()); }
@@ -76,20 +75,16 @@ public:
 	void set_aspect(const float a) { m_aspect = a; }
 	bool is_primary() const { return m_is_primary; }
 
-	osd_monitor_info    * next() const { return m_next; }   // pointer to next monitor in list
+	static std::shared_ptr<osd_monitor_info> pick_monitor(osd_options &options, int index);
 
-	static osd_monitor_info *pick_monitor(osd_options &options, int index);
-	static osd_monitor_info *list;
+	static std::list<std::shared_ptr<osd_monitor_info>> list;
 
-	// FIXME: should be private!
-	osd_monitor_info    *m_next;                   // pointer to next monitor in list
 protected:
 	osd_rect            m_pos_size;
 	osd_rect            m_usuable_pos_size;
 	bool                m_is_primary;
-	char                m_name[64];
+	std::string         m_name;
 private:
-
 	void *              m_handle;                 // handle to the monitor
 	float               m_aspect;                 // computed/configured aspect ratio of the physical device
 };
@@ -180,7 +175,7 @@ public:
 #ifndef OSD_SDL
 	virtual bool win_has_menu() = 0;
 	// FIXME: cann we replace winwindow_video_window_monitor(nullptr) with monitor() ?
-	virtual osd_monitor_info *winwindow_video_window_monitor(const osd_rect *proposed) = 0;
+	virtual std::shared_ptr<osd_monitor_info> winwindow_video_window_monitor(const osd_rect *proposed) = 0;
 
 	HDC                     m_dc;       // only used by GDI renderer!
 

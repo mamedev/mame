@@ -35,7 +35,7 @@
 osd_video_config video_config;
 
 // monitor info
-osd_monitor_info *osd_monitor_info::list = nullptr;
+std::list<std::shared_ptr<osd_monitor_info>> osd_monitor_info::list;
 
 
 //============================================================
@@ -161,12 +161,7 @@ void sdl_osd_interface::update(bool skip_redraw)
 
 void sdl_monitor_info::init()
 {
-	osd_monitor_info **tailptr;
-
 	// make a list of monitors
-	osd_monitor_info::list = nullptr;
-	tailptr = &osd_monitor_info::list;
-
 	{
 		int i;
 
@@ -174,24 +169,21 @@ void sdl_monitor_info::init()
 
 		for (i = 0; i < SDL_GetNumVideoDisplays(); i++)
 		{
-			sdl_monitor_info *monitor;
-
 			char temp[64];
 			snprintf(temp, sizeof(temp)-1, "%s%d", OSDOPTION_SCREEN,i);
 
 			// allocate a new monitor info
 
-			monitor = global_alloc_clear<sdl_monitor_info>(i, temp, 1.0f);
+			std::shared_ptr<osd_monitor_info> monitor = std::make_shared<sdl_monitor_info>(i, temp, 1.0f);
 
 			osd_printf_verbose("Adding monitor %s (%d x %d)\n", monitor->devicename(),
 					monitor->position_size().width(), monitor->position_size().height());
 
 			// guess the aspect ratio assuming square pixels
-			monitor->set_aspect((float)(monitor->position_size().width()) / (float)(monitor->position_size().height()));
+			monitor->set_aspect(static_cast<float>(monitor->position_size().width()) / static_cast<float>(monitor->position_size().height()));
 
 			// hook us into the list
-			*tailptr = monitor;
-			tailptr = &monitor->m_next;
+			osd_monitor_info::list.push_back(monitor);
 		}
 	}
 	osd_printf_verbose("Leave init_monitors\n");
@@ -200,11 +192,9 @@ void sdl_monitor_info::init()
 void sdl_monitor_info::exit()
 {
 	// free all of our monitor information
-	while (sdl_monitor_info::list != nullptr)
+	while (!osd_monitor_info::list.empty())
 	{
-		osd_monitor_info *temp = sdl_monitor_info::list;
-		sdl_monitor_info::list = temp->next();
-		global_free(temp);
+		osd_monitor_info::list.remove(osd_monitor_info::list.front());
 	}
 }
 
@@ -213,10 +203,10 @@ void sdl_monitor_info::exit()
 //  pick_monitor
 //============================================================
 
-osd_monitor_info *osd_monitor_info::pick_monitor(osd_options &generic_options, int index)
+std::shared_ptr<osd_monitor_info> osd_monitor_info::pick_monitor(osd_options &generic_options, int index)
 {
 	sdl_options &options = reinterpret_cast<sdl_options &>(generic_options);
-	osd_monitor_info *monitor;
+	std::shared_ptr<osd_monitor_info> monitor;
 	const char *scrname, *scrname2;
 	int moncount = 0;
 	float aspect;
@@ -235,24 +225,33 @@ osd_monitor_info *osd_monitor_info::pick_monitor(osd_options &generic_options, i
 	// look for a match in the name first
 	if (scrname != nullptr && (scrname[0] != 0))
 	{
-		for (monitor = osd_monitor_info::list; monitor != nullptr; monitor = monitor->next())
+		for (auto mon : osd_monitor_info::list)
 		{
 			moncount++;
-			if (strcmp(scrname, monitor->devicename()) == 0)
+			if (strcmp(scrname, mon->devicename()) == 0)
+			{
+				monitor = mon;
 				goto finishit;
+			}
 		}
 	}
 
 	// didn't find it; alternate monitors until we hit the jackpot
 	index %= moncount;
-	for (monitor = osd_monitor_info::list; monitor != nullptr; monitor = monitor->next())
+	for (auto mon : osd_monitor_info::list)
 		if (index-- == 0)
+		{
+			monitor = mon;
 			goto finishit;
+		}
 
 	// return the primary just in case all else fails
-	for (monitor = osd_monitor_info::list; monitor != nullptr; monitor = monitor->next())
-		if (monitor->is_primary())
+	for (auto mon : osd_monitor_info::list)
+		if (mon->is_primary())
+		{
+			monitor = mon;
 			goto finishit;
+		}
 
 	// FIXME: FatalError?
 finishit:
@@ -260,6 +259,7 @@ finishit:
 	{
 		monitor->set_aspect(aspect);
 	}
+
 	return monitor;
 }
 

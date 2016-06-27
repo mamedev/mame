@@ -42,7 +42,17 @@ struct osd_wstr_deleter
 	}
 };
 
+struct osd_str_deleter
+{
+	void operator () (char* str) const
+	{
+		if (str != nullptr)
+			osd_free(str);
+	}
+};
+
 typedef std::unique_ptr<wchar_t, osd_wstr_deleter> osd_unique_wstr;
+typedef std::unique_ptr<char, osd_str_deleter> osd_unique_str;
 
 #ifdef UNICODE
 #define tstring_from_utf8   wstring_from_utf8

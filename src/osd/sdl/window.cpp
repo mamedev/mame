@@ -890,7 +890,7 @@ osd_rect sdl_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	INT32 viswidth, visheight;
 	INT32 adjwidth, adjheight;
 	float pixel_aspect;
-	osd_monitor_info *monitor = m_monitor;
+	std::shared_ptr<osd_monitor_info> monitor = m_monitor;
 
 	// do not constrain aspect ratio for integer scaled views
 	if (m_target->scale_mode() != SCALE_FRACTIONAL)
@@ -1104,7 +1104,7 @@ osd_dim sdl_window_info::get_max_bounds(int constrain)
 //  construction and destruction
 //============================================================
 
-sdl_window_info::sdl_window_info(running_machine &a_machine, int index, osd_monitor_info *a_monitor,
+sdl_window_info::sdl_window_info(running_machine &a_machine, int index, std::shared_ptr<osd_monitor_info> a_monitor,
 		const osd_window_config *config)
 : osd_window(*config), m_next(nullptr), m_startmaximized(0),
 	// Following three are used by input code to defer resizes
