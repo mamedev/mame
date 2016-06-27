@@ -389,8 +389,9 @@
  		ffe80210: testing memory 		
  		ffe80274: loop that goes wobbly and fails
  		ffe80dc4: switch off boot mode, MMU maps ROM to copy in RAM from here on
- 		
- 		ffe813a4: where the decompressor writes bytes
+ 		ffe82000: start of FORTH (?) interpreter once decompressed
+                          text in decmopressed area claims to be FORTH-83 FCode, but the opcodes
+                          do not match the documented OpenFirmware FCode ones at all.
 
 ****************************************************************************/
 
@@ -524,7 +525,7 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 	// supervisor program fetches in boot state are special
 	if ((!(m_system_enable & ENA_NOTBOOT)) && (asi == 9))
 	{
-		return m_rom_ptr[offset & 0x7fff];
+		return m_rom_ptr[offset & 0x1ffff];
 	}
 	
 	switch (asi)
@@ -567,8 +568,20 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 		break;
 	case 3:	// segment map
 		//printf("sun4: read segment map @ %x (entry %d, mem_mask %08x, PC=%x)\n", offset << 2, (offset>>16) & 0xfff, mem_mask, m_maincpu->pc());
-		return m_segmap[m_context][(offset>>16) & 0xfff]<<24;
-		break;
+		if (mem_mask == 0xffff0000)
+		{
+			return m_segmap[m_context][(offset>>16) & 0xfff]<<16;
+		}
+		else if (mem_mask == 0xff000000)
+		{
+			return m_segmap[m_context][(offset>>16) & 0xfff]<<24;
+		}
+		else 
+		{
+		//	printf("sun4: read segment map w/unk mask %08x\n", mem_mask);
+		}
+		return 0x0;
+
 	case 4: // page map
 		page = m_segmap[m_context & 7][(offset >> 16) & 0xfff] << 6;
 		page += (offset >> 10) & 0x3f;
@@ -603,7 +616,7 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 				// magic EPROM bypass
 				if ((tmp >= (0x6000000>>2)) && (tmp <= (0x6ffffff>>2)))
 				{
-					return m_rom_ptr[offset & 0x7fff];	
+					return m_rom_ptr[offset & 0x1ffff];	
 				}
 				//printf("Read type 1 @ VA %08x, phys %08x\n", offset<<2, tmp<<2);
 				return m_type1space->read32(space, tmp, mem_mask);
@@ -615,10 +628,13 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 		}
 		else
 		{
+			if (!space.debugger_access())
+			{
 			printf("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
 			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
 			//m_buserror[0] = 0x88;	// read, invalid PTE
 			//m_buserror[1] = offset<<2;
+			}
 			return 0;
 		}	
 		}
@@ -647,7 +663,7 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 		switch (offset >> 26)
 		{
 			case 3: // context reg
-				printf("%08x to context, mask %08x, offset %x\n", data, mem_mask, offset);
+				//printf("%08x to context, mask %08x, offset %x\n", data, mem_mask, offset);
 				m_context = data>>24;
 				return;
 
@@ -1036,10 +1052,10 @@ U0501       Revision
 // Sun 4/300, Cypress Semiconductor CY7C601, Texas Instruments 8847 FPU
 ROM_START( sun4_300 )
 	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
-	ROM_LOAD( "1035-09.rom", 0x0000, 0x10000, CRC(4ae2f2ad) SHA1(9c17a80b3ce3efdf18b5eca969f1565ddaad3116))
-	ROM_LOAD( "1036-09.rom", 0x0000, 0x10000, CRC(cb3d45a7) SHA1(9d5da09ff87ec52dc99ffabd1003d30811eafdb0))
-	ROM_LOAD( "1037-09.rom", 0x0000, 0x10000, CRC(4f005bea) SHA1(db3f6133ea7c497ba440bc797123dde41abea6fd))
-	ROM_LOAD( "1038-09.rom", 0x0000, 0x10000, CRC(1e429d31) SHA1(498ce4d34a74ea6e3e369bb7eb9c2b87e12bd080))
+	ROM_LOAD32_BYTE( "1035-09.rom", 0x00003, 0x10000, CRC(4ae2f2ad) SHA1(9c17a80b3ce3efdf18b5eca969f1565ddaad3116))
+	ROM_LOAD32_BYTE( "1036-09.rom", 0x00000, 0x10000, CRC(cb3d45a7) SHA1(9d5da09ff87ec52dc99ffabd1003d30811eafdb0))
+	ROM_LOAD32_BYTE( "1037-09.rom", 0x00001, 0x10000, CRC(4f005bea) SHA1(db3f6133ea7c497ba440bc797123dde41abea6fd))
+	ROM_LOAD32_BYTE( "1038-09.rom", 0x00002, 0x10000, CRC(1e429d31) SHA1(498ce4d34a74ea6e3e369bb7eb9c2b87e12bd080))
 
 	ROM_REGION( 0x10000, "devices", ROMREGION_ERASEFF )
 	// CG3 Color frame buffer (cgthree)
