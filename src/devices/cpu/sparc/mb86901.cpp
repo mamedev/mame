@@ -2976,7 +2976,7 @@ UINT64 mb86901_device::get_translated_pc() const
 
 UINT8 mb86901_device::get_icc() const
 {
-	return m_icc;
+	return (m_psr & PSR_ICC_MASK) >> PSR_ICC_SHIFT;
 }
 
 

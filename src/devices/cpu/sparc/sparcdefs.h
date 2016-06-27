@@ -43,34 +43,34 @@
 #define ICC_N_SET			(m_psr & PSR_N_MASK)
 #define ICC_N				(ICC_N_SET ? 1 : 0)
 #define ICC_N_CLEAR			(!ICC_N_SET)
-#define SET_ICC_N_FLAG		do { m_psr |= PSR_N_MASK; } while(0);
-#define CLEAR_ICC_N_FLAG	do { m_psr &= ~PSR_N_MASK; } while(0);
+#define SET_ICC_N_FLAG		do { m_psr |= PSR_N_MASK; } while(0)
+#define CLEAR_ICC_N_FLAG	do { m_psr &= ~PSR_N_MASK; } while(0)
 
 #define ICC_Z_SET			(m_psr & PSR_Z_MASK)
 #define ICC_Z				(ICC_Z_SET ? 1 : 0)
 #define ICC_Z_CLEAR			(!ICC_Z_SET)
-#define SET_ICC_Z_FLAG		do { m_psr |= PSR_Z_MASK; } while(0);
-#define CLEAR_ICC_Z_FLAG	do { m_psr &= ~PSR_Z_MASK; } while(0);
+#define SET_ICC_Z_FLAG		do { m_psr |= PSR_Z_MASK; } while(0)
+#define CLEAR_ICC_Z_FLAG	do { m_psr &= ~PSR_Z_MASK; } while(0)
 
 #define ICC_V_SET			(m_psr & PSR_V_MASK)
 #define ICC_V				(ICC_V_SET ? 1 : 0)
 #define ICC_V_CLEAR			(!ICC_V_SET)
-#define SET_ICC_V_FLAG		do { m_psr |= PSR_V_MASK; } while(0);
-#define CLEAR_ICC_V_FLAG	do { m_psr &= ~PSR_V_MASK; } while(0);
+#define SET_ICC_V_FLAG		do { m_psr |= PSR_V_MASK; } while(0)
+#define CLEAR_ICC_V_FLAG	do { m_psr &= ~PSR_V_MASK; } while(0)
 
 #define ICC_C_SET			(m_psr & PSR_C_MASK)
 #define ICC_C				(ICC_C_SET ? 1 : 0)
 #define ICC_C_CLEAR			(!ICC_C_SET)
-#define SET_ICC_C_FLAG		do { m_psr |= PSR_C_MASK; } while(0);
-#define CLEAR_ICC_C_FLAG	do { m_psr &= ~PSR_C_MASK; } while(0);
+#define SET_ICC_C_FLAG		do { m_psr |= PSR_C_MASK; } while(0)
+#define CLEAR_ICC_C_FLAG	do { m_psr &= ~PSR_C_MASK; } while(0)
 
-#define CLEAR_ICC			do { m_psr &= ~PSR_ICC_MASK; } while(0);
+#define CLEAR_ICC			do { m_psr &= ~PSR_ICC_MASK; } while(0)
 
-#define TEST_ICC_NZ(x)		do { m_psr &= ~PSR_ICC_MASK; m_psr |= (x & 0x80000000) ? PSR_N_MASK : 0; m_psr |= (x == 0) ? PSR_Z_MASK : 0; } while (0);
+#define TEST_ICC_NZ(x)		do { m_psr &= ~PSR_ICC_MASK; m_psr |= (x & 0x80000000) ? PSR_N_MASK : 0; m_psr |= (x == 0) ? PSR_Z_MASK : 0; } while (0)
 
-#define MAKE_PSR			do { m_psr = (m_impl << PSR_IMPL_SHIFT) | (m_ver << PSR_VER_SHIFT) | (m_icc << PSR_ICC_SHIFT) | (m_ec ? PSR_EC_MASK : 0) | (m_ef ? PSR_EF_MASK : 0) | (m_pil << PSR_PIL_SHIFT) | (m_s ? PSR_S_MASK : 0) | (m_ps ? PSR_PS_MASK : 0) | (m_et ? PSR_ET_MASK : 0) | m_cwp; } while(0);
-#define BREAK_PSR			do { m_icc = (m_psr & PSR_ICC_MASK) >> PSR_ICC_SHIFT; m_ec = m_psr & PSR_EC_MASK; m_ef = m_psr & PSR_EF_MASK; m_pil = (m_psr & PSR_PIL_MASK) >> PSR_PIL_SHIFT; m_s = m_psr & PSR_S_MASK; m_ps = m_psr & PSR_PS_MASK; m_et = m_psr & PSR_ET_MASK; m_cwp = m_psr & PSR_CWP_MASK; } while(0);
-#define MAKE_ICC			do { m_icc = (m_psr & PSR_ICC_MASK) >> PSR_ICC_SHIFT; } while(0);
+#define MAKE_PSR			do { m_psr = (m_impl << PSR_IMPL_SHIFT) | (m_ver << PSR_VER_SHIFT) | (m_icc << PSR_ICC_SHIFT) | (m_ec ? PSR_EC_MASK : 0) | (m_ef ? PSR_EF_MASK : 0) | (m_pil << PSR_PIL_SHIFT) | (m_s ? PSR_S_MASK : 0) | (m_ps ? PSR_PS_MASK : 0) | (m_et ? PSR_ET_MASK : 0) | m_cwp; } while(0)
+#define BREAK_PSR			do { m_icc = (m_psr & PSR_ICC_MASK) >> PSR_ICC_SHIFT; m_ec = m_psr & PSR_EC_MASK; m_ef = m_psr & PSR_EF_MASK; m_pil = (m_psr & PSR_PIL_MASK) >> PSR_PIL_SHIFT; m_s = m_psr & PSR_S_MASK; m_ps = m_psr & PSR_PS_MASK; m_et = m_psr & PSR_ET_MASK; m_cwp = m_psr & PSR_CWP_MASK; } while(0)
+#define MAKE_ICC			do { m_icc = (m_psr & PSR_ICC_MASK) >> PSR_ICC_SHIFT; } while(0)
 
 #define CWP					m_cwp
 #define S					m_s
@@ -137,7 +137,7 @@
 #define RDREG	*m_regs[RD]
 #define RS1REG	*m_regs[RS1]
 #define RS2REG	*m_regs[RS2]
-#define SET_RDREG(x)	if(RD) { RDREG = (x); }
+#define SET_RDREG(x)	do { if(RD) { RDREG = (x); } } while (0)
 #define ADDRESS	(USEIMM ? (RS1REG + SIMM13) : (RS1REG + RS2REG))
 
 #define PC		m_pc
