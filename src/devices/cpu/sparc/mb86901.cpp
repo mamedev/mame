@@ -1983,7 +1983,7 @@ void mb86901_device::execute_load(UINT32 op)
 		else if (LDDC) { } // implementation-dependent actions
 	}
 
-	if (!m_trap)
+	if (!m_trap && (LDD || LDDA || LDDF || LDDC))
 	{
 		UINT32 word1 = read_sized_word(addr_space, address + 4, 4);
 		if (MAE)
@@ -2811,6 +2811,263 @@ void mb86901_device::execute_step()
 
 		UINT32 addr_space = (IS_USER ? 8 : 9);
 		UINT32 op = read_sized_word(addr_space, PC, 4);
+
+#if 0
+		if (PC == 0xffef0000)
+		{
+			UINT32 opcode = read_sized_word(11, REG(5), 2);
+			if (!(REG(5) & 2))
+			{
+				opcode >>= 16;
+			}
+			UINT32 l1 = opcode << 2;
+			l1 += REG(2);
+			UINT32 handler_offset = read_sized_word(11, l1, 2);
+			if (!(l1 & 2))
+			{
+				handler_offset >>= 16;
+			}
+			handler_offset <<= 2;
+			handler_offset += REG(2);
+			if (handler_offset == 0xffe87964)
+			{
+				printf("Opcode at %08x: %04x, handler is at %08x // call %08x\n", REG(5), opcode, handler_offset, l1 + 2);
+			}
+			else if (handler_offset == 0xffe8799c)
+			{
+				UINT32 address = REG(5) + 2;
+				UINT32 half = read_sized_word(11, address, 2);
+				if (!(address & 2)) half >>= 16;
+
+				printf("Opcode at %08x: %04x, handler is at %08x // push_data current result (%08x) + load address %08x\n", REG(5), opcode, handler_offset, REG(4), REG(3) + half);
+			}
+			else if (handler_offset == 0xffe879e4)
+			{
+				UINT32 address = l1 + 2;
+				UINT32 half0 = read_sized_word(11, address, 2);
+				if (address & 2) half0 <<= 16;
+
+				address = l1 + 4;
+				UINT32 half1 = read_sized_word(11, address, 2);
+				if (!(address & 2)) half1 >>= 16;
+
+				UINT32 value = half0 | half1;
+
+				printf("Opcode at %08x: %04x, handler is at %08x // push_data current result (%08x) + load immediate word from handler table (%08x)\n", REG(5), opcode, handler_offset, REG(4), value);
+			}
+			else if (handler_offset == 0xffe879c4)
+			{
+				UINT32 address = l1 + 2;
+				UINT32 l0 = read_sized_word(11, address, 2);
+				if (!(address & 2)) l0 >>= 16;
+
+				address = REG(3) + l0;
+				UINT32 l1_2 = read_sized_word(11, address, 2);
+				if (!(address & 2)) l1_2 >>= 16;
+
+				address = REG(2) + (l1_2 << 2);
+				UINT32 l0_2 = read_sized_word(11, address, 2);
+				if (!(address & 2)) l0_2 >>= 16;
+
+				UINT32 dest = REG(2) + (l0_2 << 2);
+
+				printf("Opcode at %08x: %04x, handler is at %08x // SPARC branch to %08x, calcs: g2(%08x) + halfword[g2(%04x) + (halfword[g3(%08x) + halfword[entry_point(%04x) + 2](%04x)](%04x) << 2)](%08x)\n", REG(5), opcode, handler_offset, dest, REG(2), REG(2), REG(3), l1, l0, l1_2, l0_2);
+				printf("                                                 // Target func: %08x\n", l0_2 << 2);
+				switch (l0_2 << 2)
+				{
+					case 0x10: // call
+						printf("                                                 // call %08x\n", (REG(2) + (l1_2 << 2)) + 2);
+						break;
+					default:
+						printf("                                                 // unknown handler address: %08x\n", REG(2) + (l0_2 << 2));
+						break;
+				}
+			}
+			else if (handler_offset == 0xffe8c838)
+			{
+				UINT32 address = l1 + 2;
+				UINT32 half0 = read_sized_word(11, address, 2);
+				if (address & 2) half0 <<= 16;
+
+				address = l1 + 4;
+				UINT32 half1 = read_sized_word(11, address, 2);
+				if (!(address & 2)) half1 >>= 16;
+
+				UINT32 value = half0 | half1;
+
+				printf("Opcode at %08x: %04x, handler is at %08x // add 32-bit word (%08x) from handler table to result (%08x + %08x = %08x)\n", REG(5), opcode, handler_offset, value, REG(4), value, REG(4) + value);
+			}
+			else if (opcode == 0x003f || opcode == 0x0066 || opcode == 0x0099 || opcode == 0x0121 || opcode == 0x0136 || opcode == 0x014f || opcode == 0x0155 || opcode == 0x01c7 || opcode == 0x01cd ||
+					 opcode == 0x0217 || opcode == 0x0289 || opcode == 0x0296 || opcode == 0x029d || opcode == 0x02f2 || opcode == 0x0334 || opcode == 0x0381 || opcode == 0x3d38)
+			{
+				switch(opcode)
+				{
+					case 0x003f:
+					{
+						UINT32 address = REG(5) + 2;
+						UINT32 half0 = read_sized_word(11, address, 2);
+						if (address & 2) half0 <<= 16;
+
+						address = REG(5) + 4;
+						UINT32 half1 = read_sized_word(11, address, 2);
+						if (!(address & 2)) half1 >>= 16;
+
+						UINT32 value = half0 | half1;
+
+						printf("Opcode at %08x: %04x, handler is at %08x // push_data current result (%08x) + load immediate word from instructions (%08x)\n", REG(5), opcode, handler_offset, REG(4), value);
+						break;
+					}
+
+					case 0x0066:
+					{
+						UINT32 address = REG(5) + 2;
+						UINT32 offset = read_sized_word(11, address, 2);
+						if (!(address & 2)) offset >>= 16;
+
+						UINT32 target = REG(5) + 2 + offset;
+
+						printf("Opcode at %08x: %04x, handler is at %08x // if result (%08x) is zero, jump to %08x\n", REG(5), opcode, handler_offset, REG(4), target);
+						break;
+					}
+
+					case 0x0099:
+					{
+						UINT32 l1_2 = REG(4);
+
+						UINT32 address = REG(7);
+						UINT32 l0_2 = read_sized_word(11, address, 4);
+
+						address = REG(7) + 4;
+						UINT32 popped_g4 = read_sized_word(11, address, 4);
+
+						address = REG(5) + 2;
+						UINT32 offset = read_sized_word(11, address, 2);
+						if (!(address & 2)) offset >>= 16;
+
+						UINT32 target = REG(5) + 2 + offset;
+
+						printf("Opcode at %08x: %04x, handler is at %08x // branch relative to %08x if data stack pop/top (%08x) == result (%08x), pop_data result (%08x)\n", REG(5), opcode, handler_offset, target, l0_2, l1_2, popped_g4);
+						if (l1_2 == l0_2)
+						{
+							printf("                                                 // branch will be taken\n");
+						}
+						else
+						{
+							printf("                                                 // branch will not be taken\n");
+							printf("                                                 // push pc (%08x) onto program stack\n", REG(5) + 2);
+							printf("                                                 // push previous data stack top + 0x80000000 (%08x) onto program stack\n", l0_2 + 0x8000000);
+							printf("                                                 // push diff of (result - stack top) (%08x - %08x = %08x)\n", popped_g4, l0_2 + 0x8000000, popped_g4 - (l0_2 + 0x80000000));
+						}
+
+						break;
+					}
+
+					case 0x0121:
+					{
+						UINT32 address = REG(7);
+						UINT32 word = read_sized_word(11, address, 4);
+						printf("Opcode at %08x: %04x, handler is at %08x // logical-AND result with data stack pop, store in result: %08x = %08x & %08x\n", REG(5), opcode, handler_offset, word & REG(4), word, REG(4));
+						break;
+					}
+
+					case 0x0136:
+						printf("Opcode at %08x: %04x, handler is at %08x // invert result (%08x -> %08x)\n", REG(5), opcode, handler_offset, REG(4), REG(4) ^ 0xffffffff);
+						break;
+
+					case 0x014f:
+					{
+						UINT32 address = REG(7);
+						UINT32 word = read_sized_word(11, address, 4);
+						printf("Opcode at %08x: %04x, handler is at %08x // add result to data stack pop, store in result: %08x = %08x + %08x\n", REG(5), opcode, handler_offset, word + REG(4), word, REG(4));
+						break;
+					}
+
+					case 0x0155:
+					{
+						UINT32 address = REG(7);
+						UINT32 word = read_sized_word(11, address, 4);
+						printf("Opcode at %08x: %04x, handler is at %08x // subtract result from data stack pop, store in result: %08x = %08x - %08x\n", REG(5), opcode, handler_offset, word - REG(4), word, REG(4));
+						break;
+					}
+
+					case 0x01c7:
+					{
+						UINT32 address = REG(6);
+						UINT32 half0 = read_sized_word(11, address, 2);
+						if (address & 2) half0 <<= 16;
+
+						address = REG(6) + 2;
+						UINT32 half1 = read_sized_word(11, address, 2);
+						if (!(address & 2)) half1 >>= 16;
+
+						UINT32 value = half0 | half1;
+
+						printf("Opcode at %08x: %04x, handler is at %08x // return (%08x) (pops off program stack)\n", REG(5), opcode, handler_offset, value);
+						break;
+					}
+
+					case 0x01cd:
+						printf("Opcode at %08x: %04x, handler is at %08x // insert result (%08x) between data stack top (%08x) and next data stack entry\n", REG(5), opcode, handler_offset, REG(4), read_sized_word(11, REG(7), 4));
+						break;
+
+					case 0x0217:
+					{
+						UINT32 value = read_sized_word(11, REG(7), 4);
+						printf("Opcode at %08x: %04x, handler is at %08x // if pop_data (%08x) >= result (%08x), set result to 0, otherwise -1 (%08x)\n", REG(5), opcode, handler_offset, value, REG(4), (value >= REG(4)) ? 0 : ~0);
+						break;
+					}
+
+					case 0x0289:
+						printf("Opcode at %08x: %04x, handler is at %08x // push_data(g4 (%08x))\n", REG(5), opcode, handler_offset, REG(4));
+						break;
+
+					case 0x0296:
+						printf("Opcode at %08x: %04x, handler is at %08x // swap result (%08x) with top of data stack (%08x)\n", REG(5), opcode, handler_offset, REG(4), read_sized_word(11, REG(7), 4));
+						break;
+
+					case 0x029d:
+					{
+						UINT32 top = read_sized_word(11, REG(7), 4);
+						UINT32 next = read_sized_word(11, REG(7) + 4, 4);
+						printf("Opcode at %08x: %04x, handler is at %08x // swap the top two values of the data stack (%08x <-> %08x), exchange second value with result (%08x <-> %08x)\n", REG(5), opcode, handler_offset, top, next, REG(4), next);
+						break;
+					}
+
+					case 0x02f2:
+						printf("Opcode at %08x: %04x, handler is at %08x // decrement g4 (%08x -> %08x)\n", REG(5), opcode, handler_offset, REG(4), REG(4) - 1);
+						break;
+
+					case 0x0334:
+					{
+						UINT32 address = REG(4);
+						UINT32 half0 = read_sized_word(11, address, 2);
+						if (address & 2) half0 <<= 16;
+
+						address = REG(4) + 2;
+						UINT32 half1 = read_sized_word(11, address, 2);
+						if (!(address & 2)) half1 >>= 16;
+
+						UINT32 value = half0 | half1;
+
+						printf("Opcode at %08x: %04x, handler is at %08x // load result with 32-bit word at result address (g4 = [%08x] (%08x)\n", REG(5), opcode, handler_offset, REG(4), value);
+						break;
+					}
+
+					case 0x0381:
+						printf("Opcode at %08x: %04x, handler is at %08x // word[g4 (%08x)] = pop_data(g7), result = pop_data(g7), g7 = %08x\n", REG(5), opcode, handler_offset, REG(4), REG(7));
+						break;
+
+					case 0x3d38:
+						printf("Opcode at %08x: %04x, handler is at %08x // call ffe8fe90\n", REG(5), opcode, handler_offset);
+						break;
+				}
+			}
+			else
+			{
+				printf("Opcode at %08x: %04x, handler is at %08x\n", REG(5), opcode, handler_offset);
+			}
+		}
+#endif
 
 		if (MAE && !m_annul)
 		{
