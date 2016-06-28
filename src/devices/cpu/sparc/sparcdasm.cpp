@@ -623,8 +623,7 @@ sparc_disassembler::sparc_disassembler(const sparc_debug_state *state, unsigned 
 }
 
 sparc_disassembler::sparc_disassembler(const sparc_debug_state *state, unsigned version, vis_level vis)
-	: m_state(state)
-	, m_version(version)
+	: m_version(version)
 	, m_vis_level(vis)
 	, m_op_field_width(9)
 	, m_branch_desc{
