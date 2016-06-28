@@ -484,7 +484,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		</part>
 	</software>
 
-	<software name="alondark">
+	<software name="aitdnn">
 		<!-- Notes: GBC only -->
 		<description>Alone in the Dark - The New Nightmare (Euro)</description>
 		<year>2001</year>
@@ -500,7 +500,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		</part>
 	</software>
 
-	<software name="alondarku" cloneof="alondark">
+	<software name="aitdnnu" cloneof="aitdnn">
 		<!-- Notes: GBC only -->
 		<description>Alone in the Dark - The New Nightmare (USA)</description>
 		<year>2001</year>
