@@ -184,7 +184,8 @@ WRITE32_MEMBER(dc_cons_state::dc_mess_g1_ctrl_w )
     - can be switched back to state 0 by write to SB_SECUR_EADR register, Dreamcast BIOS write 42FEh before jump into Mil-CD executables
 
     if values doesn't match - security system switch to state 2 (check fail):
-    - similar to state 0, but data summing seems not performed anymore,
+    - G1 ATA locked
+	- can be switched to state 0 by write to SB_SECUR_EADR register, however passing valid data block through security system set it back to state 2
     - the only exit from this state - power off/on or reset;
 
 	current state can be read from SB_SECUR_STATE register
