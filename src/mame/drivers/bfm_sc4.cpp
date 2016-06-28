@@ -319,9 +319,33 @@ WRITE8_MEMBER(bfm_sc45_state::mux_output2_w)
 
 	// others drive 7-segs with it..  so rendering it there as well in our debug layouts
 
-	// todo: reorder properly!
-	UINT8 bf7segdata = BITSWAP8(data,7,6,5,4,3,2,1,0);
-	output().set_digit_value(offset, bf7segdata);
+	if (m_segment_34_encoding)
+	{
+		m_segment_34_cache[offset] = data;
+
+		UINT16 short_data;
+		UINT8 byte_data_first_segment;
+		UINT8 byte_data_second_segment;
+		for (int digit = 0; digit < 32; digit += 2) 
+		{
+			short_data = (m_segment_34_cache[digit + 1] << 8) | m_segment_34_cache[digit];
+			byte_data_first_segment = (short_data >> 1) & 15;
+			byte_data_second_segment = (short_data >> 6) & 15;
+			output().set_digit_value(digit, SEGMENT_34_ENCODING_LOOKUP[byte_data_first_segment]);
+			output().set_digit_value(digit + 1, SEGMENT_34_ENCODING_LOOKUP[byte_data_second_segment]);
+
+			if (digit == 0 || digit == 2)
+			{
+				byte_data_first_segment = (short_data >> 11) & 15;
+				output().set_digit_value((digit / 2) + 32, SEGMENT_34_ENCODING_LOOKUP[byte_data_first_segment]);
+			}
+		}
+	}
+	else
+	{
+		UINT8 bf7segdata = BITSWAP8(data,0,7,6,5,4,3,2,1);
+		output().set_digit_value(offset, bf7segdata);
+	}
 }
 
 WRITE16_MEMBER(sc4_state::sc4_mem_w)
@@ -35665,6 +35689,8 @@ GAMEL( 200?, sc4dndcse   ,sc4dndcs,  sc4, sc4dndcs5, sc4_state, sc4dndcs, ROT0, 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4dndbb)
 {
+	m_segment_34_encoding = true;
+
 	DRIVER_INIT_CALL(sc4mbus);
 }
 
@@ -36337,6 +36363,8 @@ GAMEL( 200?, sc4dndrae   ,sc4dndra,  sc4_5reel_alt, sc4dndra70, sc4_state, sc4dn
 
 DRIVER_INIT_MEMBER(sc4_state,sc4dndbd)
 {
+	m_segment_34_encoding = true;
+
 	DRIVER_INIT_CALL(sc4mbus);
 }
 
@@ -36528,6 +36556,8 @@ GAMEL( 200?, sc4dndbrg   ,sc4dndbr,  sc4_5reel_alt, sc4dndbr70, sc4_state, sc4dn
 
 DRIVER_INIT_MEMBER(sc4_state,sc4dndcc)
 {
+	m_segment_34_encoding = true;
+
 	DRIVER_INIT_CALL(sc4mbus);
 }
 
@@ -36812,6 +36842,8 @@ GAMEL( 200?, sc4dnddfe   ,sc4dnddf,  sc4_200_alt, sc4dnddf70, sc4_state, sc4dndd
 
 DRIVER_INIT_MEMBER(sc4_state,sc4dndpg)
 {
+	m_segment_34_encoding = true;
+
 	DRIVER_INIT_CALL(sc4mbus);
 }
 
@@ -37451,6 +37483,8 @@ GAMEL( 200?, sc4dndben   ,sc4dndbe,  sc4_5reel_alt, sc4dndbe35, sc4_state, sc4dn
 
 DRIVER_INIT_MEMBER(sc4_state,sc4dndbc)
 {
+	m_segment_34_encoding = true;
+
 	DRIVER_INIT_CALL(sc4mbus);
 }
 
