@@ -106,7 +106,7 @@ driver modified by Hau
 #include "cpu/h8/h83006.h"
 #include "includes/metro.h"
 #include "machine/watchdog.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "sound/2610intf.h"
 #include "sound/ymf278b.h"
 

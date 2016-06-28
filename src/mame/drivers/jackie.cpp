@@ -47,7 +47,7 @@ Note
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 
 
 class jackie_state : public driver_device

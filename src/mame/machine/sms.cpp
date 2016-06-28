@@ -4,7 +4,7 @@
 #include "crsshair.h"
 #include "video/315_5124.h"
 #include "sound/sn76496.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "includes/sms.h"
 
 #define VERBOSE 0

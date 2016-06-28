@@ -149,7 +149,7 @@ Adder hardware:
 
 #include "video/bfm_adr2.h"
 
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "sound/upd7759.h"
 
 /* fruit machines only */

@@ -21,7 +21,7 @@
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/ticket.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "sound/msm5205.h"
 
 #include "wackygtr.lh"

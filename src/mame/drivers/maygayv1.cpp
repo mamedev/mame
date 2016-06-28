@@ -133,7 +133,7 @@ Find lamps/reels after UPD changes.
 #include "machine/i8279.h"
 #include "machine/6821pia.h"
 #include "machine/mc68681.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "sound/upd7759.h"
 #include "machine/nvram.h"
 

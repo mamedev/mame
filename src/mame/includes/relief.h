@@ -9,7 +9,7 @@
 #include "machine/atarigen.h"
 #include "video/atarimo.h"
 #include "sound/okim6295.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 
 class relief_state : public atarigen_state
 {

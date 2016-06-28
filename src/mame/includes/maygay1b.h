@@ -19,7 +19,7 @@
 #include "machine/roc10937.h"   // vfd
 #include "machine/steppers.h"   // stepper motor
 #include "sound/ay8910.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "sound/okim6376.h"
 #include "machine/nvram.h"
 #include "sound/upd7759.h"

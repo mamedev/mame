@@ -13,7 +13,7 @@
 
 
 #include "emu.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "sg1000exp.h"
 
 

@@ -40,7 +40,7 @@ fix comms so it boots, it's a bit of a hack for hyperduel at the moment ;-)
 #include "cpu/m68000/m68000.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "includes/hyprduel.h"
 
 /***************************************************************************

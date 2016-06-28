@@ -167,7 +167,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "video/ramdac.h"
 
 

@@ -20,7 +20,7 @@
 #include "includes/cbasebal.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 
 
 /*************************************
