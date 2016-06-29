@@ -551,20 +551,22 @@ protected:
 	virtual void before_poll(running_machine &machine) {}
 };
 
-inline static int generic_button_get_state(void *device_internal, void *item_internal)
+template <class TItem>
+int generic_button_get_state(void *device_internal, void *item_internal)
 {
-	device_info *devinfo = (device_info *)device_internal;
-	unsigned char *itemdata = (unsigned char*)item_internal;
+	device_info *devinfo = static_cast<device_info *>(device_internal);
+	TItem *itemdata = static_cast<TItem*>(item_internal);
 
 	// return the current state
 	devinfo->module().poll_if_necessary(devinfo->machine());
 	return *itemdata >> 7;
 }
 
-inline static int generic_axis_get_state(void *device_internal, void *item_internal)
+template <class TItem>
+int generic_axis_get_state(void *device_internal, void *item_internal)
 {
-	device_info *devinfo = (device_info *)device_internal;
-	int *axisdata = (int*)item_internal;
+	device_info *devinfo = static_cast<device_info *>(device_internal);
+	TItem *axisdata = static_cast<TItem*>(item_internal);
 
 	// return the current state
 	devinfo->module().poll_if_necessary(devinfo->machine());
