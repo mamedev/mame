@@ -2997,7 +2997,7 @@ Probably at some stage of development NAOMI was planned as non-JVS system as wel
 //  FPR-23489C - 1.02 not VxWorks based, no network, can not be software updated to 2.xx+
 // Net-DIMM firmwares:
 //  FPR23718   - 2.03 VxWorks based, introduced ALL.net features, can be updated up to 4.01
-//  ????????   - 3.03 VxWorks based, added network boot support, can be updated up to 4.01
+//  FPR23905   - 3.03 VxWorks based, added network boot support, supports Triforce and Chihiro, can be updated up to 4.01
 // update only - 4.01 VxWorks based, supports Compact Flash GD-ROM-replacement
 #define NAOMIGD_BIOS \
 	ROM_REGION( 0x200000, "maincpu", 0) \
@@ -3020,8 +3020,11 @@ Probably at some stage of development NAOMI was planned as non-JVS system as wel
 	ROM_SYSTEM_BIOS( 8, "bios8", "epr-21577e (USA)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 8, "epr-21577e.ic27",  0x000000, 0x200000, CRC(cf36e97b) SHA1(b085305982e7572e58b03a9d35f17ae319c3bbc6) ) \
 	ROM_REGION( 0x200000, "user2", 0) \
-	ROM_LOAD16_WORD_SWAP( "fpr-23489c.ic14", 0x000000, 0x200000, CRC(bc38bea1) SHA1(b36fcc6902f397d9749e9d02de1bbb7a5e29d468) ) \
-	ROM_LOAD16_WORD_SWAP( "fpr23718.ic14",   0x000000, 0x200000, CRC(a738ea1c) SHA1(6f55f1ae0606816a4eca6645ed36eb7f9c7ad9cf) )
+	ROM_LOAD("315-6301.ic11", 0x000000, 0x01ff01, NO_DUMP ) \
+	ROM_LOAD("315-6334.ic11", 0x000000, 0x01ff01, CRC(534c342d) SHA1(3e879f432c82305487922ab28c07107cf0f3c5cf) ) \
+	ROM_LOAD16_WORD_SWAP( "fpr-23489c.ic36", 0x000000, 0x200000, CRC(bc38bea1) SHA1(b36fcc6902f397d9749e9d02de1bbb7a5e29d468) ) \
+	ROM_LOAD16_WORD_SWAP( "fpr23718.ic36",   0x000000, 0x200000, CRC(a738ea1c) SHA1(6f55f1ae0606816a4eca6645ed36eb7f9c7ad9cf) ) \
+	ROM_LOAD16_WORD_SWAP( "fpr23905.ic36",   0x000000, 0x200000, CRC(ffffffff) SHA1(acade4362807c7571b1c2a48ed6067e4bddd404b) )
 
 /* NAOMI2 BIOS:
 
