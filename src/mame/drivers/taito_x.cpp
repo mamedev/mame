@@ -323,7 +323,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "includes/taito_x.h"
 #include "machine/cchip.h"
 #include "sound/2610intf.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 
 READ16_MEMBER(taitox_state::superman_dsw_input_r)
 {

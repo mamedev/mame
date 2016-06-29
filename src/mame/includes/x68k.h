@@ -18,7 +18,7 @@
 #include "sound/okim6258.h"
 #include "machine/ram.h"
 #include "machine/8530scc.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "machine/i8255.h"
 
 #define MC68901_TAG     "mc68901"

@@ -196,7 +196,7 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "video/mc6845.h"
 #include "machine/nvram.h"
 

@@ -25,7 +25,7 @@ are the same of IGS.  AMT may be previous IGS name.
 
 #include "emu.h"
 #include "cpu/z180/z180.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 
 
 class cabaret_state : public driver_device

@@ -1372,7 +1372,7 @@ Note: on screen copyright is (c)1998 Coinmaster.
 #include "sound/2612intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 

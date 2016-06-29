@@ -6,7 +6,7 @@
 
 #include "bus/msx_slot/slot.h"
 #include "bus/msx_slot/rom.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 
 
 extern const device_type MSX_SLOT_MUSIC;

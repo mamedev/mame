@@ -78,7 +78,7 @@ are almost identical, except for much darker BG layer colors).
 #include "cpu/m68000/m68000.h"
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "includes/dooyong.h"
 

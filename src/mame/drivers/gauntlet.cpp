@@ -125,7 +125,7 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/watchdog.h"
 #include "sound/tms5220.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/pokey.h"
 #include "includes/gauntlet.h"
 

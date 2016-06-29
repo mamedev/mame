@@ -29,7 +29,7 @@ Very likely to be 'whatever crystals we had on hand which were close enough for 
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "video/decospr.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 
 
 class silvmil_state : public driver_device

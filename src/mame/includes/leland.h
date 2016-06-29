@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "machine/eepromser.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/dac.h"
 #include "machine/pit8253.h"
 #include "cpu/i86/i186.h"

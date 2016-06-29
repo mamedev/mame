@@ -49,7 +49,7 @@ Note about version levels using Mutant Fighter as the example:
 #include "includes/cninja.h"
 #include "machine/decocrpt.h"
 #include "sound/2203intf.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 
 WRITE16_MEMBER(cninja_state::cninja_sound_w)

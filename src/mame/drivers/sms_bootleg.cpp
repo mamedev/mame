@@ -124,7 +124,7 @@ A Korean version has been seen too (unless this can be switched?)
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "video/315_5124.h"
 #include "includes/sms_bootleg.h"
 

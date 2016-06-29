@@ -30,7 +30,7 @@ f5
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
 #include "machine/eepromser.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 
 class mosaicf2_state : public driver_device

@@ -196,7 +196,7 @@ RoadBlasters (aka Future Vette):005*
 #include "machine/atarigen.h"
 #include "machine/6522via.h"
 #include "machine/watchdog.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/pokey.h"
 #include "video/atarimo.h"
 #include "includes/atarisy1.h"

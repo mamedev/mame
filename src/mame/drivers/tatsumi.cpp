@@ -143,7 +143,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/nec/nec.h"
 #include "includes/tatsumi.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "machine/nvram.h"
 
 #include "roundup5.lh"

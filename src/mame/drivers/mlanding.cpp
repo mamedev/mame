@@ -50,7 +50,7 @@
 #include "includes/taitoipt.h"
 #include "machine/z80ctc.h"
 #include "audio/taitosnd.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/msm5205.h"
 
 

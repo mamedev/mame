@@ -24,7 +24,7 @@
 #include "machine/watchdog.h"
 #include "machine/atarigen.h"
 #include "sound/okim6295.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "includes/relief.h"
 
 

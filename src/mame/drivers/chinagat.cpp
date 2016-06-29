@@ -76,7 +76,7 @@ Dip locations and factory settings verified with China Gate US manual.
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
 #include "includes/ddragon.h"

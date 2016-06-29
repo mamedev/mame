@@ -36,7 +36,7 @@
 #include "cpu/h6280/h6280.h"
 #include "includes/cbuster.h"
 #include "sound/2203intf.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 
 WRITE16_MEMBER(cbuster_state::twocrude_control_w)

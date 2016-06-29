@@ -95,7 +95,7 @@ Notes:
 #include "machine/decocrpt.h"
 #include "machine/gen_latch.h"
 #include "includes/funkyjet.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 
 

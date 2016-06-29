@@ -26,7 +26,7 @@ Note: To start a game, certain switches need to be activated.  You must first pr
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "sound/hc55516.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/dac.h"
 #include "audio/s11c_bg.h"
 #include "includes/s11a.h"

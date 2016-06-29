@@ -339,7 +339,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "sound/ym2151.h"
 #include "sound/dac.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "machine/fd1094.h"
 #include "machine/nvram.h"
 #include "video/segaic24.h"

@@ -25,7 +25,7 @@
 #include "machine/watchdog.h"
 #include "video/k052109.h"
 #include "video/k051960.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "includes/konamipt.h"
 
 

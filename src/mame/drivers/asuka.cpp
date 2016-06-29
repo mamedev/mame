@@ -223,7 +223,7 @@ DIP locations verified for:
 #include "audio/taitosnd.h"
 #include "machine/watchdog.h"
 #include "sound/2610intf.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/msm5205.h"
 #include "includes/asuka.h"
 #include "machine/bonzeadv.h"

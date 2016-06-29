@@ -274,7 +274,7 @@ Notes:
 #include "emu.h"
 #include "includes/segaorun.h"
 #include "machine/fd1089.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/segapcm.h"
 #include "includes/segaipt.h"
 

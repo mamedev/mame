@@ -524,7 +524,7 @@ Filter Board
 #include "cpu/m6809/m6809.h"
 #include "cpu/tms32025/tms32025.h"
 #include "includes/namcoic.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/c140.h"
 #include "includes/namcos21.h"
 #include "machine/nvram.h"

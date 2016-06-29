@@ -107,7 +107,7 @@ Main board:
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "video/ramdac.h"
 
 #define NVRAM_HACK
