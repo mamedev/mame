@@ -381,6 +381,7 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 #include "debugger.h"
 #include "includes/chihiro.h"
 #include "includes/xbox.h"
+#include "includes/xbox_usb.h"
 
 #define LOG_PCI
 //#define LOG_BASEBOARD
