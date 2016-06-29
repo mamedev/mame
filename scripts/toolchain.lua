@@ -772,9 +772,15 @@ function toolchain(_buildDir, _subDir)
 	configuration { "openbsd", "x64", "Debug" }
 		targetdir (_buildDir .. "openbsd" .. "/bin/x64/Debug")
 
+	configuration { "android-*", "Release" }
+		targetdir (_buildDir .. "android/bin/" .. _OPTIONS["PLATFORM"] .. "/Release")
+		objdir (_buildDir .. "android/obj/" .. _OPTIONS["PLATFORM"] .. "/Release")
+
+	configuration { "android-*", "Debug" }
+		targetdir (_buildDir .. "android/bin/" .. _OPTIONS["PLATFORM"] .. "/Debug")
+		objdir (_buildDir .. "android/obj/" .. _OPTIONS["PLATFORM"] .. "/Debug")
+
 	configuration { "android-*" }
-		targetdir (_buildDir .. "android-" .. _OPTIONS["PLATFORM"] .. "/bin")
-		objdir (_buildDir .. "android-" .. _OPTIONS["PLATFORM"] .. "/obj")
 		includedirs {
 			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libcxx/include",
