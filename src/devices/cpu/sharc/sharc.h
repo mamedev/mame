@@ -412,6 +412,7 @@ private:
 		float fp1;
 
 		UINT32 force_recompile;
+		UINT32 cache_dirty;
 	};
 
 	sharc_internal_state* m_core;
@@ -446,8 +447,6 @@ private:
 	uml::code_handle *m_swap_dag2_4_7;
 	uml::code_handle *m_swap_r0_7;
 	uml::code_handle *m_swap_r8_15;
-
-	bool m_cache_dirty;
 
 	UINT16 *m_internal_ram_block0, *m_internal_ram_block1;
 

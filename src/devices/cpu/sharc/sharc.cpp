@@ -444,7 +444,7 @@ void adsp21062_device::device_start()
 			m_regmap[3] = uml::I7;
 	}
 
-	m_cache_dirty = true;
+	m_core->cache_dirty = 1;
 
 
 	m_core->delayed_iop_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(adsp21062_device::sharc_iop_delayed_write_callback), this));

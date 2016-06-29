@@ -1099,10 +1099,10 @@ void adsp21062_device::execute_run_drc()
 //      printf("SHARC cache reset\n");
 
 	/* reset the cache if dirty */
-	if (m_cache_dirty)
+	if (m_core->cache_dirty)
 		flush_cache();
 
-	m_cache_dirty = false;
+	m_core->cache_dirty = 0;
 	m_core->force_recompile = 0;
 
 	/* execute */
@@ -1196,7 +1196,7 @@ void adsp21062_device::compile_block(offs_t pc)
 				// force recompilation at end of block, if needed
 				UML_CMP(block, mem(&m_core->force_recompile), 0);
 				UML_JMPc(block, COND_Z, compiler.labelnum);
-				UML_MOV(block, mem(&m_cache_dirty), 1);
+				UML_MOV(block, mem(&m_core->cache_dirty), 1);
 				UML_MOV(block, mem(&m_core->icount), 0);
 				UML_LABEL(block, compiler.labelnum++);
 
