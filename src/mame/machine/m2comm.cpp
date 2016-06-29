@@ -238,7 +238,7 @@ void m2comm_device::device_reset()
 
 READ8_MEMBER(m2comm_device::zfg_r)
 {
-	UINT8 result = m_zfg | 0xFE;
+	UINT8 result = m_zfg | (~m_fg << 7) | 0x7e;
 #ifdef __M2COMM_VERBOSE__
 	osd_printf_verbose("m2comm-zfg_r: read register %02x for value %02x\n", offset, result);
 #endif
@@ -288,6 +288,9 @@ WRITE8_MEMBER(m2comm_device::cn_w)
 		// reset command
 		osd_printf_verbose("M2COMM: board disabled\n");
 		m_linkenable = 0x00;
+		m_zfg = 0;
+		m_cn = 0;
+		m_fg = 0;
 	}
 	else
 	{
@@ -297,9 +300,19 @@ WRITE8_MEMBER(m2comm_device::cn_w)
 		m_linkid = 0x00;
 		m_linkalive = 0x00;
 		m_linkcount = 0x00;
-		m_linktimer = 0x00E8; // 58 fps * 4s
+		m_linktimer = 0x00e8; // 58 fps * 4s
 
-		comm_init();
+		// TODO - check EPR-16726 on Daytona USA and Sega Rally Championship
+		// EPR-18643(A) - these are accessed by VirtuaON and Sega Touring Car Championship
+
+		// frameSize - 0xe00
+		m_shared[0x12] = 0x00;
+		m_shared[0x13] = 0x0e;
+
+		// frameOffset - 0x1c0
+		m_shared[0x14] = 0xc0;
+		m_shared[0x15] = 0x01;
+
 		comm_tick();
 	}
 #endif
@@ -307,7 +320,7 @@ WRITE8_MEMBER(m2comm_device::cn_w)
 
 READ8_MEMBER(m2comm_device::fg_r)
 {
-	return m_fg | (~m_zfg << 7);
+	return m_fg | (~m_zfg << 7) | 0x7e;
 }
 
 WRITE8_MEMBER(m2comm_device::fg_w)
@@ -324,20 +337,6 @@ void m2comm_device::check_vint_irq()
 }
 
 #ifdef __M2COMM_SIMULATION__
-void m2comm_device::comm_init()
-{
-	// TODO - check EPR-16726 on Daytona USA and Sega Rally Championship
-	// EPR-18643(A) - these are accessed by VirtuaON and Sega Touring Car Championship
-
-	// frameSize - 0xe00
-	m_shared[0x12] = 0x00;
-	m_shared[0x13] = 0x0e;
-
-	// frameOffset - 0x1c0
-	m_shared[0x14] = 0xc0;
-	m_shared[0x15] = 0x01;
-}
-
 void m2comm_device::comm_tick()
 {
 	if (m_linkenable == 0x01)
@@ -501,11 +500,13 @@ void m2comm_device::comm_tick()
 		if (m_linkalive == 0x01)
 		{
 			int togo = 0;
+
 			// try to read one messages
 			int recv = m_line_rx.read(m_buffer, dataSize);
 			while (recv != 0)
 			{
 				m_linktimer = 0x00;
+
 				// check if complete message
 				if (recv == dataSize)
 				{
