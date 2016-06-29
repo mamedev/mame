@@ -1209,6 +1209,8 @@ if _OPTIONS["targetos"]=="android" then
 			targetdir(MAME_DIR .. "android-project/app/src/main/libs/x86_64")
 		end
 	end
+
+	strip()
 else
 	kind "StaticLib"
 end
