@@ -31285,6 +31285,19 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="cjmjclub">
+		<description>Chaoji Majiang Club (Tw)</description>
+		<year>1995</year>
+		<publisher>Creaton</publisher>
+		<info name="alt_title" value="超級麻將 ~ Super Majong Club"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_cjmjclub"/>
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="supermajonclubvers0000.bin" size="1048576" crc="2b4b40e3" sha1="48017a7fd32593e6932756db20a4bab6228693e7" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
 
 <!-- Are these unprotected versions legit? or were they hacked to work with emus? -->
 
