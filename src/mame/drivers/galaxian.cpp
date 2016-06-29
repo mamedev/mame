@@ -2112,7 +2112,7 @@ static ADDRESS_MAP_START( takeoff_sound_portmap, AS_IO, 8, galaxian_state )
 	AM_RANGE(0x40, 0x40) AM_DEVWRITE("8912", ay8912_device, address_w)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("8912", ay8912_device, data_r, data_w)
 ADDRESS_MAP_END
-	
+
 /* King and Balloon with DAC */
 static ADDRESS_MAP_START( kingball_sound_map, AS_PROGRAM, 8, galaxian_state )
 	ADDRESS_MAP_UNMAP_HIGH

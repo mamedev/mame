@@ -15,7 +15,6 @@
 #include "rendutil.h"
 
 namespace ui {
-
 /*-------------------------------------------------
     menu_video_targets - handle the video targets
     menu

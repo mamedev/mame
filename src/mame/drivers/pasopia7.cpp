@@ -817,8 +817,8 @@ WRITE8_MEMBER( pasopia7_state::video_misc_w )
 	*/
 	//if(data & 2)
 	//{
-	//	printf("VIDEO MISC %02x\n",data);
-	//	machine().debug_break();
+	//  printf("VIDEO MISC %02x\n",data);
+	//  machine().debug_break();
 	//}
 	m_cursor_blink = data & 0x20;
 	m_attr_wrap = data & 0x10;

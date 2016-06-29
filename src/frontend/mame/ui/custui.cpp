@@ -20,7 +20,6 @@
 #include "osdepend.h"
 
 namespace ui {
-
 const char *const menu_custom_ui::hide_status[] = {
 	__("Show All"),
 	__("Hide Filters"),

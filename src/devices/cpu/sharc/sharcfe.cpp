@@ -10,62 +10,62 @@
 #include "emu.h"
 #include "sharcfe.h"
 
-#define REG_USED(desc,x)			do { (desc).regin[0] |= 1 << (x); } while(0)
-#define REG_MODIFIED(desc,x)		do { (desc).regout[0] |= 1 << (x); } while(0)
+#define REG_USED(desc,x)            do { (desc).regin[0] |= 1 << (x); } while(0)
+#define REG_MODIFIED(desc,x)        do { (desc).regout[0] |= 1 << (x); } while(0)
 
-#define AZ_USED(desc)				do { (desc).regin[0] |= 1 << 16; } while(0)
-#define AZ_MODIFIED(desc)			do { (desc).regout[0] |= 1 << 16; } while(0)
-#define AV_USED(desc)				do { (desc).regin[0] |= 1 << 17; } while(0)
-#define AV_MODIFIED(desc)			do { (desc).regout[0] |= 1 << 17; } while(0)
-#define AN_USED(desc)				do { (desc).regin[0] |= 1 << 18; } while(0)
-#define AN_MODIFIED(desc)			do { (desc).regout[0] |= 1 << 18; } while(0)
-#define AC_USED(desc)				do { (desc).regin[0] |= 1 << 19; } while(0)
-#define AC_MODIFIED(desc)			do { (desc).regout[0] |= 1 << 19; } while(0)
-#define AS_USED(desc)				do { (desc).regin[0] |= 1 << 20; } while(0)
-#define AS_MODIFIED(desc)			do { (desc).regout[0] |= 1 << 20; } while(0)
-#define AI_USED(desc)				do { (desc).regin[0] |= 1 << 21; } while(0)
-#define AI_MODIFIED(desc)			do { (desc).regout[0] |= 1 << 21; } while(0)
-#define MN_USED(desc)				do { (desc).regin[0] |= 1 << 22; } while(0)
-#define MN_MODIFIED(desc)			do { (desc).regout[0] |= 1 << 22; } while(0)
-#define MV_USED(desc)				do { (desc).regin[0] |= 1 << 23; } while(0)
-#define MV_MODIFIED(desc)			do { (desc).regout[0] |= 1 << 23; } while(0)
-#define MU_USED(desc)				do { (desc).regin[0] |= 1 << 24; } while(0)
-#define MU_MODIFIED(desc)			do { (desc).regout[0] |= 1 << 24; } while(0)
-#define MI_USED(desc)				do { (desc).regin[0] |= 1 << 25; } while(0)
-#define MI_MODIFIED(desc)			do { (desc).regout[0] |= 1 << 25; } while(0)
-#define SV_USED(desc)				do { (desc).regin[0] |= 1 << 26; } while(0)
-#define SV_MODIFIED(desc)			do { (desc).regout[0] |= 1 << 26; } while(0)
-#define SZ_USED(desc)				do { (desc).regin[0] |= 1 << 27; } while(0)
-#define SZ_MODIFIED(desc)			do { (desc).regout[0] |= 1 << 27; } while(0)
-#define SS_USED(desc)				do { (desc).regin[0] |= 1 << 28; } while(0)
-#define SS_MODIFIED(desc)			do { (desc).regout[0] |= 1 << 28; } while(0)
-#define BTF_USED(desc)				do { (desc).regin[0] |= 1 << 29; } while(0)
-#define BTF_MODIFIED(desc)			do { (desc).regout[0] |= 1 << 29; } while(0)
-#define AF_USED(desc)				do { (desc).regin[0] |= 1 << 30; } while(0)
-#define AF_MODIFIED(desc)			do { (desc).regout[0] |= 1 << 30; } while(0)
+#define AZ_USED(desc)               do { (desc).regin[0] |= 1 << 16; } while(0)
+#define AZ_MODIFIED(desc)           do { (desc).regout[0] |= 1 << 16; } while(0)
+#define AV_USED(desc)               do { (desc).regin[0] |= 1 << 17; } while(0)
+#define AV_MODIFIED(desc)           do { (desc).regout[0] |= 1 << 17; } while(0)
+#define AN_USED(desc)               do { (desc).regin[0] |= 1 << 18; } while(0)
+#define AN_MODIFIED(desc)           do { (desc).regout[0] |= 1 << 18; } while(0)
+#define AC_USED(desc)               do { (desc).regin[0] |= 1 << 19; } while(0)
+#define AC_MODIFIED(desc)           do { (desc).regout[0] |= 1 << 19; } while(0)
+#define AS_USED(desc)               do { (desc).regin[0] |= 1 << 20; } while(0)
+#define AS_MODIFIED(desc)           do { (desc).regout[0] |= 1 << 20; } while(0)
+#define AI_USED(desc)               do { (desc).regin[0] |= 1 << 21; } while(0)
+#define AI_MODIFIED(desc)           do { (desc).regout[0] |= 1 << 21; } while(0)
+#define MN_USED(desc)               do { (desc).regin[0] |= 1 << 22; } while(0)
+#define MN_MODIFIED(desc)           do { (desc).regout[0] |= 1 << 22; } while(0)
+#define MV_USED(desc)               do { (desc).regin[0] |= 1 << 23; } while(0)
+#define MV_MODIFIED(desc)           do { (desc).regout[0] |= 1 << 23; } while(0)
+#define MU_USED(desc)               do { (desc).regin[0] |= 1 << 24; } while(0)
+#define MU_MODIFIED(desc)           do { (desc).regout[0] |= 1 << 24; } while(0)
+#define MI_USED(desc)               do { (desc).regin[0] |= 1 << 25; } while(0)
+#define MI_MODIFIED(desc)           do { (desc).regout[0] |= 1 << 25; } while(0)
+#define SV_USED(desc)               do { (desc).regin[0] |= 1 << 26; } while(0)
+#define SV_MODIFIED(desc)           do { (desc).regout[0] |= 1 << 26; } while(0)
+#define SZ_USED(desc)               do { (desc).regin[0] |= 1 << 27; } while(0)
+#define SZ_MODIFIED(desc)           do { (desc).regout[0] |= 1 << 27; } while(0)
+#define SS_USED(desc)               do { (desc).regin[0] |= 1 << 28; } while(0)
+#define SS_MODIFIED(desc)           do { (desc).regout[0] |= 1 << 28; } while(0)
+#define BTF_USED(desc)              do { (desc).regin[0] |= 1 << 29; } while(0)
+#define BTF_MODIFIED(desc)          do { (desc).regout[0] |= 1 << 29; } while(0)
+#define AF_USED(desc)               do { (desc).regin[0] |= 1 << 30; } while(0)
+#define AF_MODIFIED(desc)           do { (desc).regout[0] |= 1 << 30; } while(0)
 
-#define ALU_FLAGS_MODIFIED(desc)	do { AZ_MODIFIED(desc);AN_MODIFIED(desc);AV_MODIFIED(desc);AC_MODIFIED(desc);AS_MODIFIED(desc);AI_MODIFIED(desc); } while(0)
-#define MULT_FLAGS_MODIFIED(desc)	do { MN_MODIFIED(desc);MV_MODIFIED(desc);MU_MODIFIED(desc);MI_MODIFIED(desc); } while(0)
-#define SHIFT_FLAGS_MODIFIED(desc)	do { SZ_MODIFIED(desc);SV_MODIFIED(desc);SS_MODIFIED(desc); } while(0)
+#define ALU_FLAGS_MODIFIED(desc)    do { AZ_MODIFIED(desc);AN_MODIFIED(desc);AV_MODIFIED(desc);AC_MODIFIED(desc);AS_MODIFIED(desc);AI_MODIFIED(desc); } while(0)
+#define MULT_FLAGS_MODIFIED(desc)   do { MN_MODIFIED(desc);MV_MODIFIED(desc);MU_MODIFIED(desc);MI_MODIFIED(desc); } while(0)
+#define SHIFT_FLAGS_MODIFIED(desc)  do { SZ_MODIFIED(desc);SV_MODIFIED(desc);SS_MODIFIED(desc); } while(0)
 
 
-#define PM_I_USED(desc,x)			do { (desc).regin[1] |= 1 << (x); } while(0)
-#define PM_I_MODIFIED(desc,x)		do { (desc).regout[1] |= 1 << (x); } while(0)
-#define PM_M_USED(desc,x)			do { (desc).regin[1] |= 1 << ((x) + 8); } while(0)
-#define PM_M_MODIFIED(desc,x)		do { (desc).regout[1] |= 1 << ((x) + 8); } while(0)
-#define PM_B_USED(desc,x)			do { (desc).regin[1] |= 1 << ((x) + 16); } while(0)
-#define PM_B_MODIFIED(desc,x)		do { (desc).regout[1] |= 1 << ((x) + 16); } while(0)
-#define PM_L_USED(desc,x)			do { (desc).regin[1] |= 1 << ((x) + 24); } while(0)
-#define PM_L_MODIFIED(desc,x)		do { (desc).regout[1] |= 1 << ((x) + 24); } while(0)
+#define PM_I_USED(desc,x)           do { (desc).regin[1] |= 1 << (x); } while(0)
+#define PM_I_MODIFIED(desc,x)       do { (desc).regout[1] |= 1 << (x); } while(0)
+#define PM_M_USED(desc,x)           do { (desc).regin[1] |= 1 << ((x) + 8); } while(0)
+#define PM_M_MODIFIED(desc,x)       do { (desc).regout[1] |= 1 << ((x) + 8); } while(0)
+#define PM_B_USED(desc,x)           do { (desc).regin[1] |= 1 << ((x) + 16); } while(0)
+#define PM_B_MODIFIED(desc,x)       do { (desc).regout[1] |= 1 << ((x) + 16); } while(0)
+#define PM_L_USED(desc,x)           do { (desc).regin[1] |= 1 << ((x) + 24); } while(0)
+#define PM_L_MODIFIED(desc,x)       do { (desc).regout[1] |= 1 << ((x) + 24); } while(0)
 
-#define DM_I_USED(desc,x)			do { (desc).regin[2] |= 1 << (x); } while(0)
-#define DM_I_MODIFIED(desc,x)		do { (desc).regout[2] |= 1 << (x); } while(0)
-#define DM_M_USED(desc,x)			do { (desc).regin[2] |= 1 << ((x) + 8); } while(0)
-#define DM_M_MODIFIED(desc,x)		do { (desc).regout[2] |= 1 << ((x) + 8); } while(0)
-#define DM_B_USED(desc,x)			do { (desc).regin[2] |= 1 << ((x) + 16); } while(0)
-#define DM_B_MODIFIED(desc,x)		do { (desc).regout[2] |= 1 << ((x) + 16); } while(0)
-#define DM_L_USED(desc,x)			do { (desc).regin[2] |= 1 << ((x) + 24); } while(0)
-#define DM_L_MODIFIED(desc,x)		do { (desc).regout[2] |= 1 << ((x) + 24); } while(0)
+#define DM_I_USED(desc,x)           do { (desc).regin[2] |= 1 << (x); } while(0)
+#define DM_I_MODIFIED(desc,x)       do { (desc).regout[2] |= 1 << (x); } while(0)
+#define DM_M_USED(desc,x)           do { (desc).regin[2] |= 1 << ((x) + 8); } while(0)
+#define DM_M_MODIFIED(desc,x)       do { (desc).regout[2] |= 1 << ((x) + 8); } while(0)
+#define DM_B_USED(desc,x)           do { (desc).regin[2] |= 1 << ((x) + 16); } while(0)
+#define DM_B_MODIFIED(desc,x)       do { (desc).regout[2] |= 1 << ((x) + 16); } while(0)
+#define DM_L_USED(desc,x)           do { (desc).regin[2] |= 1 << ((x) + 24); } while(0)
+#define DM_L_MODIFIED(desc,x)       do { (desc).regout[2] |= 1 << ((x) + 24); } while(0)
 
 
 sharc_frontend::sharc_frontend(adsp21062_device *sharc, UINT32 window_start, UINT32 window_end, UINT32 max_sequence)
@@ -221,12 +221,12 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 	switch ((opcode >> 45) & 7)
 	{
-		case 0:				// subops
+		case 0:             // subops
 		{
 			UINT32 subop = (opcode >> 40) & 0x1f;
 			switch (subop)
 			{
-				case 0x00:			// NOP / idle						|000|00000|
+				case 0x00:          // NOP / idle                       |000|00000|
 					if (opcode & U64(0x008000000000))
 					{
 						// IDLE
@@ -236,9 +236,9 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					{
 						// NOP
 					}
-					break;				
+					break;
 
-				case 0x01:			// compute								|000|00001|
+				case 0x01:          // compute                              |000|00001|
 				{
 					int cond = (opcode >> 33) & 0x1f;
 					describe_if_condition(desc, cond);
@@ -248,7 +248,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					break;
 				}
 
-				case 0x02:			// immediate shift						|000|00010|
+				case 0x02:          // immediate shift                      |000|00010|
 				{
 					int shiftop = (opcode >> 16) & 0x3f;
 					int rn = (opcode >> 4) & 0xf;
@@ -261,8 +261,8 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 						return false;
 					break;
 				}
-					
-				case 0x04:			// compute / modify						|000|00100|
+
+				case 0x04:          // compute / modify                     |000|00100|
 				{
 					int g = (opcode >> 38) & 0x1;
 					int m = (opcode >> 27) & 0x7;
@@ -291,8 +291,8 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					break;
 				}
 
-				case 0x06:			// direct jump|call						|000|00110|
-				{					
+				case 0x06:          // direct jump|call                     |000|00110|
+				{
 					int j = (opcode >> 26) & 0x1;
 					int b = (opcode >> 39) & 0x1;
 					int cond = (opcode >> 33) & 0x1f;
@@ -312,7 +312,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					break;
 				}
 
-				case 0x07:			// direct jump|call						|000|00111|
+				case 0x07:          // direct jump|call                     |000|00111|
 				{
 					int j = (opcode >> 26) & 0x1;
 					int b = (opcode >> 39) & 0x1;
@@ -333,8 +333,8 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					break;
 				}
 
-				case 0x08:			// indirect jump|call / compute			|000|01000|
-				{					
+				case 0x08:          // indirect jump|call / compute         |000|01000|
+				{
 					int j = (opcode >> 26) & 0x1;
 					int b = (opcode >> 39) & 0x1;
 					int pmi = (opcode >> 30) & 0x7;
@@ -361,12 +361,12 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					break;
 				}
 
-				case 0x09:			// indirect jump|call / compute			|000|01001|
+				case 0x09:          // indirect jump|call / compute         |000|01001|
 				{
 					int j = (opcode >> 26) & 0x1;
 					int b = (opcode >> 39) & 0x1;
 					int cond = (opcode >> 33) & 0x1f;
-					
+
 					if (!describe_compute(desc, opcode))
 						return false;
 
@@ -384,7 +384,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					break;
 				}
 
-				case 0x0a:			// return from subroutine / compute		|000|01010|
+				case 0x0a:          // return from subroutine / compute     |000|01010|
 				{
 					int cond = (opcode >> 33) & 0x1f;
 					int j = (opcode >> 26) & 0x1;
@@ -404,7 +404,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					break;
 				}
 
-				case 0x0b:			// return from interrupt / compute		|000|01011|
+				case 0x0b:          // return from interrupt / compute      |000|01011|
 				{
 					int cond = (opcode >> 33) & 0x1f;
 					int j = (opcode >> 26) & 0x1;
@@ -424,7 +424,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					break;
 				}
 
-				case 0x0c:			// do until counter expired				|000|01100|
+				case 0x0c:          // do until counter expired             |000|01100|
 				{
 					int offset = SIGN_EXTEND24(opcode & 0xffffff);
 
@@ -439,7 +439,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					break;
 				}
 
-				case 0x0d:			// do until counter expired				|000|01101|
+				case 0x0d:          // do until counter expired             |000|01101|
 				{
 					int ureg = (opcode >> 32) & 0xff;
 					if (!describe_ureg_access(desc, ureg, UREG_READ))
@@ -458,7 +458,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					break;
 				}
 
-				case 0x0e:			// do until								|000|01110|
+				case 0x0e:          // do until                             |000|01110|
 				{
 					int offset = SIGN_EXTEND24(opcode & 0xffffff);
 					int cond = (opcode >> 33) & 0x1f;
@@ -472,8 +472,8 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					/*
 					loop.astat_check_pc = loop.end_pc - 2;
 					if (loop.astat_check_pc < loop.start_pc)
-						fatalerror("describe_compute: conditional loop < 2 at %08X", desc.pc);
-						*/
+					    fatalerror("describe_compute: conditional loop < 2 at %08X", desc.pc);
+					    */
 
 					int jump_diff = loop.end_pc - loop.start_pc;
 					if (jump_diff >= 2)
@@ -488,7 +488,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					break;
 				}
 
-				case 0x0f:			// immediate data -> ureg				|000|01111|
+				case 0x0f:          // immediate data -> ureg               |000|01111|
 				{
 					int ureg = (opcode >> 32) & 0xff;
 					if (!describe_ureg_access(desc, ureg, UREG_WRITE))
@@ -496,7 +496,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					break;
 				}
 
-				case 0x10:			// ureg <-> DM|PM (direct)				|000|100|G|D|
+				case 0x10:          // ureg <-> DM|PM (direct)              |000|100|G|D|
 				case 0x11:
 				case 0x12:
 				case 0x13:
@@ -518,7 +518,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					break;
 				}
 
-				case 0x14:			// system register bit manipulation		|000|10100|
+				case 0x14:          // system register bit manipulation     |000|10100|
 				{
 					int bop = (opcode >> 37) & 0x7;
 					int sreg = (opcode >> 32) & 0xf;
@@ -526,10 +526,10 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 					switch (bop)
 					{
-						case 0:		// SET
-						case 1:		// CLEAR
-						case 2:		// TOGGLE
-							if (sreg == 0x7c)	// ASTAT
+						case 0:     // SET
+						case 1:     // CLEAR
+						case 2:     // TOGGLE
+							if (sreg == 0x7c)   // ASTAT
 							{
 								if (data & adsp21062_device::AZ)
 								{
@@ -594,8 +594,8 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 							}
 							break;
 
-						case 4:		// TEST
-						case 5:		// XOR
+						case 4:     // TEST
+						case 5:     // XOR
 							BTF_MODIFIED(desc);
 							break;
 
@@ -606,13 +606,13 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					break;
 				}
 
-				case 0x16:			// I register modify / bit-reverse		|000|10110|
+				case 0x16:          // I register modify / bit-reverse      |000|10110|
 				{
-					if (opcode & U64(0x008000000000))	// bit reverse
+					if (opcode & U64(0x008000000000))   // bit reverse
 					{
 						fatalerror("sharc_frontend::describe: bit reverse unimplemented");
 					}
-					else			// modify
+					else            // modify
 					{
 						int g = (opcode >> 38) & 0x1;
 						int i = (opcode >> 32) & 0x7;
@@ -625,17 +625,17 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					break;
 				}
 
-				case 0x17:			// push|pop stacks / flush cache		|000|10111|					
+				case 0x17:          // push|pop stacks / flush cache        |000|10111|
 					break;
 
-				case 0x18:			// cjump								|000|11000|
+				case 0x18:          // cjump                                |000|11000|
 					fatalerror("sharc_frontend::describe: cjump unimplemented");
 					break;
 
-				case 0x19:			// rframe								|000|11001|
+				case 0x19:          // rframe                               |000|11001|
 					fatalerror("sharc_frontend::describe: rframe unimplemented");
 					break;
-				
+
 				default:
 					fatalerror("sharc_frontend::describe: unknown subop %02X in opcode %04X%08X", subop, (UINT16)(opcode >> 32), (UINT32)(opcode));
 					return false;
@@ -643,7 +643,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			break;
 		}
 
-		case 1:				// compute / dreg <-> DM / dreg <-> PM									|001|
+		case 1:             // compute / dreg <-> DM / dreg <-> PM                                  |001|
 		{
 			if (!describe_compute(desc, opcode))
 				return false;
@@ -689,7 +689,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			break;
 		}
 
-		case 2:				// compute / ureg <-> DM|PM, register modify							|010|
+		case 2:             // compute / ureg <-> DM|PM, register modify                            |010|
 		{
 			if (!describe_compute(desc, opcode))
 				return false;
@@ -737,7 +737,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			if (!describe_compute(desc, opcode))
 				return false;
 
-			if (opcode & U64(0x100000000000))	// compute / ureg <-> ureg							|011|1|
+			if (opcode & U64(0x100000000000))   // compute / ureg <-> ureg                          |011|1|
 			{
 				int src_ureg = (opcode >> 36) & 0xff;
 				int dst_ureg = (opcode >> 23) & 0xff;
@@ -750,7 +750,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 				if (!describe_ureg_access(desc, dst_ureg, UREG_WRITE))
 					return false;
 			}
-			else								// compute / dreg <-> DM|PM, immediate modify		|011|0|
+			else                                // compute / dreg <-> DM|PM, immediate modify       |011|0|
 			{
 				int u = (opcode >> 38) & 0x1;
 				int d = (opcode >> 39) & 0x1;
@@ -771,13 +771,13 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					REG_MODIFIED(desc, dreg);
 					desc.flags |= OPFLAG_READS_MEMORY;
 				}
-				
+
 				if (g)
 				{
 					// PM
 					PM_I_USED(desc, i);
 
-					if (u)	// post-modify with update
+					if (u)  // post-modify with update
 					{
 						PM_I_MODIFIED(desc, i);
 					}
@@ -787,7 +787,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					// DM
 					DM_I_USED(desc, i);
 
-					if (u)	// post-modify with update
+					if (u)  // post-modify with update
 					{
 						DM_I_MODIFIED(desc, i);
 					}
@@ -798,7 +798,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 		case 4:
 		{
-			if (opcode & U64(0x100000000000))	// immediate data -> DM|PM							|100|1|
+			if (opcode & U64(0x100000000000))   // immediate data -> DM|PM                          |100|1|
 			{
 				int i = (opcode >> 41) & 0x7;
 				int m = (opcode >> 38) & 0x7;
@@ -821,7 +821,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					DM_M_USED(desc, m);
 				}
 			}
-			else								// immediate shift / dreg <-> DM|PM					|100|0|
+			else                                // immediate shift / dreg <-> DM|PM                 |100|0|
 			{
 				int i = (opcode >> 41) & 0x7;
 				int m = (opcode >> 38) & 0x7;
@@ -867,7 +867,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			break;
 		}
 
-		case 5:								// ureg <-> DM|PM (indirect)							|101|
+		case 5:                             // ureg <-> DM|PM (indirect)                            |101|
 		{
 			int ureg = (opcode >> 32) & 0xff;
 			int d = (opcode >> 40) & 1;
@@ -890,11 +890,11 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			if (g)
 				PM_I_USED(desc, i);
 			else
-				DM_I_USED(desc, i);			
+				DM_I_USED(desc, i);
 			break;
 		}
 
-		case 6:								// indirect jump / compute / dreg <-> DM				|110|
+		case 6:                             // indirect jump / compute / dreg <-> DM                |110|
 		{
 			int d = (opcode >> 44) & 0x1;
 			int dmi = (opcode >> 41) & 0x7;
@@ -936,7 +936,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			break;
 		}
 
-		case 7:								// indirect jump / compute / dreg <-> DM				|111|
+		case 7:                             // indirect jump / compute / dreg <-> DM                |111|
 		{
 			int d = (opcode >> 44) & 0x1;
 			int dmi = (opcode >> 41) & 0x7;
@@ -990,7 +990,7 @@ bool sharc_frontend::describe_compute(opcode_desc &desc, UINT64 opcode)
 	int rx = (opcode >> 4) & 0xf;
 	int ry = (opcode >> 0) & 0xf;
 
-	if (opcode & 0x400000)		// multi-function operation
+	if (opcode & 0x400000)      // multi-function operation
 	{
 		UINT32 multiop = (opcode >> 16) & 0x3f;
 		int fm = rs;
@@ -1002,15 +1002,15 @@ bool sharc_frontend::describe_compute(opcode_desc &desc, UINT64 opcode)
 
 		switch (multiop)
 		{
-			case 0x00:			// Rn = MRxx
+			case 0x00:          // Rn = MRxx
 				REG_MODIFIED(desc, rn);
 				break;
-			case 0x01:			// MRxx = Rn
+			case 0x01:          // MRxx = Rn
 				REG_USED(desc, rn);
 				break;
 
-			case 0x07:			// Ra = Rx + Ry,   Rs = Rx - Ry
-			case 0x0f:			// Fa = Fx + Fy,   Fs = Fx - Fy
+			case 0x07:          // Ra = Rx + Ry,   Rs = Rx - Ry
+			case 0x0f:          // Fa = Fx + Fy,   Fs = Fx - Fy
 				REG_USED(desc, rx);
 				REG_USED(desc, ry);
 				REG_MODIFIED(desc, ra);
@@ -1018,9 +1018,9 @@ bool sharc_frontend::describe_compute(opcode_desc &desc, UINT64 opcode)
 				ALU_FLAGS_MODIFIED(desc);
 				break;
 
-			case 0x04:			// Rm = R3-0 * R7-4 (SSFR),   Ra = R11-8 + R15-12
-			case 0x05:			// Rm = R3-0 * R7-4 (SSFR),   Ra = R11-8 - R15-12
-			case 0x06:			// Rm = R3-0 * R7-4 (SSFR),   Ra = (R11-8 + R15-12) / 2
+			case 0x04:          // Rm = R3-0 * R7-4 (SSFR),   Ra = R11-8 + R15-12
+			case 0x05:          // Rm = R3-0 * R7-4 (SSFR),   Ra = R11-8 - R15-12
+			case 0x06:          // Rm = R3-0 * R7-4 (SSFR),   Ra = (R11-8 + R15-12) / 2
 				REG_USED(desc, fxm);
 				REG_USED(desc, fym);
 				REG_USED(desc, fxa);
@@ -1031,9 +1031,9 @@ bool sharc_frontend::describe_compute(opcode_desc &desc, UINT64 opcode)
 				MULT_FLAGS_MODIFIED(desc);
 				break;
 
-			case 0x08:			// MRF = MRF + R3-0 * R7-4 (SSF),   Ra = R11-8 + R15-12
-			case 0x09:			// MRF = MRF + R3-0 * R7-4 (SSF),   Ra = R11-8 - R15-12
-			case 0x0a:			// MRF = MRF + R3-0 * R7-4 (SSF),   Ra = (R11-8 + R15-12) / 2
+			case 0x08:          // MRF = MRF + R3-0 * R7-4 (SSF),   Ra = R11-8 + R15-12
+			case 0x09:          // MRF = MRF + R3-0 * R7-4 (SSF),   Ra = R11-8 - R15-12
+			case 0x0a:          // MRF = MRF + R3-0 * R7-4 (SSF),   Ra = (R11-8 + R15-12) / 2
 				REG_USED(desc, fxm);
 				REG_USED(desc, fym);
 				REG_USED(desc, fxa);
@@ -1042,33 +1042,9 @@ bool sharc_frontend::describe_compute(opcode_desc &desc, UINT64 opcode)
 				MULT_FLAGS_MODIFIED(desc);
 				break;
 
-			case 0x0c:			// Rm = MRF + R3-0 * R7-4 (SSFR),   Ra = R11-8 + R15-12
-			case 0x0d:			// Rm = MRF + R3-0 * R7-4 (SSFR),   Ra = R11-8 - R15-12
-			case 0x0e:			// Rm = MRF + R3-0 * R7-4 (SSFR),   Ra = (R11-8 + R15-12) / 2
-				REG_USED(desc, fxm);
-				REG_USED(desc, fym);
-				REG_USED(desc, fxa);
-				REG_USED(desc, fya);
-				REG_MODIFIED(desc, fm);
-				REG_MODIFIED(desc, fa);
-				ALU_FLAGS_MODIFIED(desc);
-				MULT_FLAGS_MODIFIED(desc);
-				break;
-
-			case 0x10:			// MRF = MRF - R3-0 * R7-4 (SSF),   Ra = R11-8 + R15-12
-			case 0x11:			// MRF = MRF - R3-0 * R7-4 (SSF),   Ra = R11-8 - R15-12
-			case 0x12:			// MRF = MRF - R3-0 * R7-4 (SSF),   Ra = (R11-8 + R15-12) / 2
-				REG_USED(desc, fxm);
-				REG_USED(desc, fym);
-				REG_USED(desc, fxa);
-				REG_USED(desc, fya);
-				ALU_FLAGS_MODIFIED(desc);
-				MULT_FLAGS_MODIFIED(desc);
-				break;
-
-			case 0x14:			// Rm = MRF - R3-0 * R7-4 (SSFR),   Ra = R11-8 + R15-12
-			case 0x15:			// Rm = MRF - R3-0 * R7-4 (SSFR),   Ra = R11-8 - R15-12
-			case 0x16:			// Rm = MRF - R3-0 * R7-4 (SSFR),   Ra = (R11-8 + R15-12) / 2
+			case 0x0c:          // Rm = MRF + R3-0 * R7-4 (SSFR),   Ra = R11-8 + R15-12
+			case 0x0d:          // Rm = MRF + R3-0 * R7-4 (SSFR),   Ra = R11-8 - R15-12
+			case 0x0e:          // Rm = MRF + R3-0 * R7-4 (SSFR),   Ra = (R11-8 + R15-12) / 2
 				REG_USED(desc, fxm);
 				REG_USED(desc, fym);
 				REG_USED(desc, fxa);
@@ -1079,13 +1055,20 @@ bool sharc_frontend::describe_compute(opcode_desc &desc, UINT64 opcode)
 				MULT_FLAGS_MODIFIED(desc);
 				break;
 
-			case 0x18:			// Fm = F3-0 * F7-4,   Fa = F11-8 + F15-12
-			case 0x19:			// Fm = F3-0 * F7-4,   Fa = F11-8 - F15-12
-			case 0x1a:			// Fm = F3-0 * F7-4,   Fa = FLOAT F11-8 BY R15-12
-			case 0x1b:			// Fm = F3-0 * F7-4,   Fa = FIX F11-8 BY R15-12
-			case 0x1c:			// Fm = F3-0 * F7-4,   Fa = (F11-8 + F15-12) / 2
-			case 0x1e:			// Fm = F3-0 * F7-4,   Fa = MAX(F11-8, F15-12)
-			case 0x1f:			// Fm = F3-0 * F7-4,   Fa = MIN(F11-8, F15-12)
+			case 0x10:          // MRF = MRF - R3-0 * R7-4 (SSF),   Ra = R11-8 + R15-12
+			case 0x11:          // MRF = MRF - R3-0 * R7-4 (SSF),   Ra = R11-8 - R15-12
+			case 0x12:          // MRF = MRF - R3-0 * R7-4 (SSF),   Ra = (R11-8 + R15-12) / 2
+				REG_USED(desc, fxm);
+				REG_USED(desc, fym);
+				REG_USED(desc, fxa);
+				REG_USED(desc, fya);
+				ALU_FLAGS_MODIFIED(desc);
+				MULT_FLAGS_MODIFIED(desc);
+				break;
+
+			case 0x14:          // Rm = MRF - R3-0 * R7-4 (SSFR),   Ra = R11-8 + R15-12
+			case 0x15:          // Rm = MRF - R3-0 * R7-4 (SSFR),   Ra = R11-8 - R15-12
+			case 0x16:          // Rm = MRF - R3-0 * R7-4 (SSFR),   Ra = (R11-8 + R15-12) / 2
 				REG_USED(desc, fxm);
 				REG_USED(desc, fym);
 				REG_USED(desc, fxa);
@@ -1096,7 +1079,24 @@ bool sharc_frontend::describe_compute(opcode_desc &desc, UINT64 opcode)
 				MULT_FLAGS_MODIFIED(desc);
 				break;
 
-			case 0x1d:			// Fm = F3-0 * F7-4,   Fa = ABS F11-8
+			case 0x18:          // Fm = F3-0 * F7-4,   Fa = F11-8 + F15-12
+			case 0x19:          // Fm = F3-0 * F7-4,   Fa = F11-8 - F15-12
+			case 0x1a:          // Fm = F3-0 * F7-4,   Fa = FLOAT F11-8 BY R15-12
+			case 0x1b:          // Fm = F3-0 * F7-4,   Fa = FIX F11-8 BY R15-12
+			case 0x1c:          // Fm = F3-0 * F7-4,   Fa = (F11-8 + F15-12) / 2
+			case 0x1e:          // Fm = F3-0 * F7-4,   Fa = MAX(F11-8, F15-12)
+			case 0x1f:          // Fm = F3-0 * F7-4,   Fa = MIN(F11-8, F15-12)
+				REG_USED(desc, fxm);
+				REG_USED(desc, fym);
+				REG_USED(desc, fxa);
+				REG_USED(desc, fya);
+				REG_MODIFIED(desc, fm);
+				REG_MODIFIED(desc, fa);
+				ALU_FLAGS_MODIFIED(desc);
+				MULT_FLAGS_MODIFIED(desc);
+				break;
+
+			case 0x1d:          // Fm = F3-0 * F7-4,   Fa = ABS F11-8
 				REG_USED(desc, fxm);
 				REG_USED(desc, fym);
 				REG_USED(desc, fxa);
@@ -1139,48 +1139,48 @@ bool sharc_frontend::describe_compute(opcode_desc &desc, UINT64 opcode)
 				return false;
 		}
 	}
-	else							// single-function operation
+	else                            // single-function operation
 	{
 		UINT32 operation = (opcode >> 12) & 0xff;
 
 		switch ((opcode >> 20) & 3)
 		{
-			case 0:				// ALU operations
+			case 0:             // ALU operations
 			{
 				switch (operation)
 				{
-					case 0x01:		// Rn = Rx + Ry
-					case 0x02:		// Rn = Rx - Ry
-					case 0x09:		// Rn = (Rx + Ry) / 2
-					case 0x40:		// Rn = Rx AND Ry						
-					case 0x41:		// Rn = Rx OR Ry
-					case 0x42:		// Rn = Rx XOR Ry
-					case 0x61:		// Rn = MIN(Rx, Ry)
-					case 0x62:		// Rn = MAX(Rx, Ry)
-					case 0x63:		// Rn = CLIP Rx BY Ry
-					case 0x81:		// Fn = Fx + Fy
-					case 0x82:		// Fn = Fx - Fy
-					case 0x91:		// Fn = ABS(Fx + Fy)
-					case 0x92:		// Fn = ABS(Fx - Fy)
-					case 0x89:		// Fn = (Fx + Fy) / 2
-					case 0xbd:		// Fn = SCALB Fx BY Ry
-					case 0xd9:		// Rn = FIX Fx BY Ry
-					case 0xdd:		// Rn = TRUNC Fx BY Ry
-					case 0xda:		// Fn = FLOAT Rx BY Ry
-					case 0xe1:		// Fn = MIN(Fx, Fy)
-					case 0xe2:		// Fn = MAX(Fx, Fy)
-					case 0xe3:		// Fn = CLIP Fx BY Fy
-					case 0xe0:		// Fn = Fx COPYSIGN Fy
+					case 0x01:      // Rn = Rx + Ry
+					case 0x02:      // Rn = Rx - Ry
+					case 0x09:      // Rn = (Rx + Ry) / 2
+					case 0x40:      // Rn = Rx AND Ry
+					case 0x41:      // Rn = Rx OR Ry
+					case 0x42:      // Rn = Rx XOR Ry
+					case 0x61:      // Rn = MIN(Rx, Ry)
+					case 0x62:      // Rn = MAX(Rx, Ry)
+					case 0x63:      // Rn = CLIP Rx BY Ry
+					case 0x81:      // Fn = Fx + Fy
+					case 0x82:      // Fn = Fx - Fy
+					case 0x91:      // Fn = ABS(Fx + Fy)
+					case 0x92:      // Fn = ABS(Fx - Fy)
+					case 0x89:      // Fn = (Fx + Fy) / 2
+					case 0xbd:      // Fn = SCALB Fx BY Ry
+					case 0xd9:      // Rn = FIX Fx BY Ry
+					case 0xdd:      // Rn = TRUNC Fx BY Ry
+					case 0xda:      // Fn = FLOAT Rx BY Ry
+					case 0xe1:      // Fn = MIN(Fx, Fy)
+					case 0xe2:      // Fn = MAX(Fx, Fy)
+					case 0xe3:      // Fn = CLIP Fx BY Fy
+					case 0xe0:      // Fn = Fx COPYSIGN Fy
 						REG_USED(desc, rx);
 						REG_USED(desc, ry);
 						REG_MODIFIED(desc, rn);
 						ALU_FLAGS_MODIFIED(desc);
 						break;
 
-					case 0x05:		// Rn = Rx + Ry + CI
-					case 0x06:		// Rn = Rx - Ry + CI - 1
-					case 0x25:		// Rn = Rx + CI
-					case 0x26:		// Rn = Rx + CI - 1
+					case 0x05:      // Rn = Rx + Ry + CI
+					case 0x06:      // Rn = Rx - Ry + CI - 1
+					case 0x25:      // Rn = Rx + CI
+					case 0x26:      // Rn = Rx + CI - 1
 						REG_USED(desc, rx);
 						REG_USED(desc, ry);
 						REG_MODIFIED(desc, rn);
@@ -1188,30 +1188,30 @@ bool sharc_frontend::describe_compute(opcode_desc &desc, UINT64 opcode)
 						ALU_FLAGS_MODIFIED(desc);
 						break;
 
-					case 0x0a:		// COMP(Rx, Ry)
-					case 0x8a:		// COMP(Fx, Fy)
+					case 0x0a:      // COMP(Rx, Ry)
+					case 0x8a:      // COMP(Fx, Fy)
 						REG_USED(desc, rx);
 						REG_USED(desc, ry);
 						ALU_FLAGS_MODIFIED(desc);
 						break;
 
-					case 0x29:		// Rn = Rx + 1
-					case 0x2a:		// Rn = Rx - 1
-					case 0x22:		// Rn = -Rx
-					case 0x30:		// Rn = ABS Rx
-					case 0x21:		// Rn = PASS Rx
-					case 0x43:		// Rn = NOT Rx
-					case 0xb0:		// Fn = ABS(Fx)
-					case 0xa1:		// Fn = PASS Fx
-					case 0xa2:		// Fn = -Fx
-					case 0xa5:		// Fn = RND Fx
-					case 0xad:		// Rn = MANT Fx
-					case 0xc1:		// Rn = LOGB Fx
-					case 0xc9:		// Rn = FIX Fx
-					case 0xcd:		// Rn = TRUNC Fx
-					case 0xca:		// Fn = FLOAT Rx
-					case 0xc4:		// Fn = RECIPS Fx
-					case 0xc5:		// Fn = RSQRTS Fx
+					case 0x29:      // Rn = Rx + 1
+					case 0x2a:      // Rn = Rx - 1
+					case 0x22:      // Rn = -Rx
+					case 0x30:      // Rn = ABS Rx
+					case 0x21:      // Rn = PASS Rx
+					case 0x43:      // Rn = NOT Rx
+					case 0xb0:      // Fn = ABS(Fx)
+					case 0xa1:      // Fn = PASS Fx
+					case 0xa2:      // Fn = -Fx
+					case 0xa5:      // Fn = RND Fx
+					case 0xad:      // Rn = MANT Fx
+					case 0xc1:      // Rn = LOGB Fx
+					case 0xc9:      // Rn = FIX Fx
+					case 0xcd:      // Rn = TRUNC Fx
+					case 0xca:      // Fn = FLOAT Rx
+					case 0xc4:      // Fn = RECIPS Fx
+					case 0xc5:      // Fn = RSQRTS Fx
 						REG_USED(desc, rx);
 						REG_MODIFIED(desc, rn);
 						ALU_FLAGS_MODIFIED(desc);
@@ -1248,151 +1248,76 @@ bool sharc_frontend::describe_compute(opcode_desc &desc, UINT64 opcode)
 				break;
 			}
 
-			case 1:				// multiplier operations
+			case 1:             // multiplier operations
 			{
 				switch (operation)
 				{
-					case 0x40:		// Rn = Rx * Ry (UUI)
-					case 0x48:		// Rn = Rx * Ry (UUF)
-					case 0x49:		// Rn = Rx * Ry (UUFR)
-					case 0x50:		// Rn = Rx * Ry (SUI)
-					case 0x58:		// Rn = Rx * Ry (SUF)
-					case 0x59:		// Rn = Rx * Ry (SUFR)
-					case 0x60:		// Rn = Rx * Ry (USI)
-					case 0x68:		// Rn = Rx * Ry (USF)
-					case 0x69:		// Rn = Rx * Ry (USFR)
-					case 0x70:		// Rn = Rx * Ry (SSI)
-					case 0x78:		// Rn = Rx * Ry (SSF)
-					case 0x79:		// Rn = Rx * Ry (SSFR)
+					case 0x40:      // Rn = Rx * Ry (UUI)
+					case 0x48:      // Rn = Rx * Ry (UUF)
+					case 0x49:      // Rn = Rx * Ry (UUFR)
+					case 0x50:      // Rn = Rx * Ry (SUI)
+					case 0x58:      // Rn = Rx * Ry (SUF)
+					case 0x59:      // Rn = Rx * Ry (SUFR)
+					case 0x60:      // Rn = Rx * Ry (USI)
+					case 0x68:      // Rn = Rx * Ry (USF)
+					case 0x69:      // Rn = Rx * Ry (USFR)
+					case 0x70:      // Rn = Rx * Ry (SSI)
+					case 0x78:      // Rn = Rx * Ry (SSF)
+					case 0x79:      // Rn = Rx * Ry (SSFR)
 						REG_USED(desc, rx);
 						REG_USED(desc, ry);
 						REG_MODIFIED(desc, rn);
 						MULT_FLAGS_MODIFIED(desc);
 						break;
 
-					case 0x44:		// MRF = Rx * Ry (UUI)
-					case 0x4c:		// MRF = Rx * Ry (UUF)
-					case 0x4d:		// MRF = Rx * Ry (UUFR)
-					case 0x54:		// MRF = Rx * Ry (SUI)
-					case 0x5c:		// MRF = Rx * Ry (SUF)
-					case 0x5d:		// MRF = Rx * Ry (SUFR)
-					case 0x64:		// MRF = Rx * Ry (USI)
-					case 0x6c:		// MRF = Rx * Ry (USF)
-					case 0x6d:		// MRF = Rx * Ry (USFR)
-					case 0x74:		// MRF = Rx * Ry (SSI)
-					case 0x7c:		// MRF = Rx * Ry (SSF)
-					case 0x7d:		// MRF = Rx * Ry (SSFR)
+					case 0x44:      // MRF = Rx * Ry (UUI)
+					case 0x4c:      // MRF = Rx * Ry (UUF)
+					case 0x4d:      // MRF = Rx * Ry (UUFR)
+					case 0x54:      // MRF = Rx * Ry (SUI)
+					case 0x5c:      // MRF = Rx * Ry (SUF)
+					case 0x5d:      // MRF = Rx * Ry (SUFR)
+					case 0x64:      // MRF = Rx * Ry (USI)
+					case 0x6c:      // MRF = Rx * Ry (USF)
+					case 0x6d:      // MRF = Rx * Ry (USFR)
+					case 0x74:      // MRF = Rx * Ry (SSI)
+					case 0x7c:      // MRF = Rx * Ry (SSF)
+					case 0x7d:      // MRF = Rx * Ry (SSFR)
 						// TODO: track MRF?
 						REG_USED(desc, rx);
 						REG_USED(desc, ry);
 						MULT_FLAGS_MODIFIED(desc);
 						break;
 
-					case 0x46:		// MRB = Rx * Ry (UUI)
-					case 0x4e:		// MRB = Rx * Ry (UUF)
-					case 0x4f:		// MRB = Rx * Ry (UUFR)
-					case 0x56:		// MRB = Rx * Ry (SUI)
-					case 0x5e:		// MRB = Rx * Ry (SUF)
-					case 0x5f:		// MRB = Rx * Ry (SUFR)
-					case 0x66:		// MRB = Rx * Ry (USI)
-					case 0x6e:		// MRB = Rx * Ry (USF)
-					case 0x6f:		// MRB = Rx * Ry (USFR)
-					case 0x76:		// MRB = Rx * Ry (SSI)
-					case 0x7e:		// MRB = Rx * Ry (SSF)
-					case 0x7f:		// MRB = Rx * Ry (SSFR)
+					case 0x46:      // MRB = Rx * Ry (UUI)
+					case 0x4e:      // MRB = Rx * Ry (UUF)
+					case 0x4f:      // MRB = Rx * Ry (UUFR)
+					case 0x56:      // MRB = Rx * Ry (SUI)
+					case 0x5e:      // MRB = Rx * Ry (SUF)
+					case 0x5f:      // MRB = Rx * Ry (SUFR)
+					case 0x66:      // MRB = Rx * Ry (USI)
+					case 0x6e:      // MRB = Rx * Ry (USF)
+					case 0x6f:      // MRB = Rx * Ry (USFR)
+					case 0x76:      // MRB = Rx * Ry (SSI)
+					case 0x7e:      // MRB = Rx * Ry (SSF)
+					case 0x7f:      // MRB = Rx * Ry (SSFR)
 						// TODO: track MRB?
 						REG_USED(desc, rx);
 						REG_USED(desc, ry);
 						MULT_FLAGS_MODIFIED(desc);
 						break;
 
-					case 0x80:		// Rn = MRF + Rx * Ry (UUI)
-					case 0x88:		// Rn = MRF + Rx * Ry (UUF)
-					case 0x89:		// Rn = MRF + Rx * Ry (UUFR)
-					case 0x90:		// Rn = MRF + Rx * Ry (SUI)
-					case 0x98:		// Rn = MRF + Rx * Ry (SUF)
-					case 0x99:		// Rn = MRF + Rx * Ry (SUFR)
-					case 0xa0:		// Rn = MRF + Rx * Ry (USI)
-					case 0xa8:		// Rn = MRF + Rx * Ry (USF)
-					case 0xa9:		// Rn = MRF + Rx * Ry (USFR)
-					case 0xb0:		// Rn = MRF + Rx * Ry (SSI)
-					case 0xb8:		// Rn = MRF + Rx * Ry (SSF)
-					case 0xb9:		// Rn = MRF + Rx * Ry (SSFR)
-						// TODO: track MRF?
-						REG_USED(desc, rx);
-						REG_USED(desc, ry);
-						REG_MODIFIED(desc, rn);
-						MULT_FLAGS_MODIFIED(desc);
-						break;
-
-					case 0x82:		// Rn = MRB + Rx * Ry (UUI)
-					case 0x8a:		// Rn = MRB + Rx * Ry (UUF)
-					case 0x8b:		// Rn = MRB + Rx * Ry (UUFR)
-					case 0x92:		// Rn = MRB + Rx * Ry (SUI)
-					case 0x9a:		// Rn = MRB + Rx * Ry (SUF)
-					case 0x9b:		// Rn = MRB + Rx * Ry (SUFR)
-					case 0xa2:		// Rn = MRB + Rx * Ry (USI)
-					case 0xaa:		// Rn = MRB + Rx * Ry (USF)
-					case 0xab:		// Rn = MRB + Rx * Ry (USFR)
-					case 0xb2:		// Rn = MRB + Rx * Ry (SSI)
-					case 0xba:		// Rn = MRB + Rx * Ry (SSF)
-					case 0xbb:		// Rn = MRB + Rx * Ry (SSFR)
-						// TODO: track MRB?
-						REG_USED(desc, rx);
-						REG_USED(desc, ry);
-						REG_MODIFIED(desc, rn);
-						MULT_FLAGS_MODIFIED(desc);
-						break;
-
-					case 0x84:		// MRF = MRF + Rx * Ry (UUI)
-					case 0x8c:		// MRF = MRF + Rx * Ry (UUF)
-					case 0x8d:		// MRF = MRF + Rx * Ry (UUFR)
-					case 0x94:		// MRF = MRF + Rx * Ry (SUI)
-					case 0x9c:		// MRF = MRF + Rx * Ry (SUF)
-					case 0x9d:		// MRF = MRF + Rx * Ry (SUFR)
-					case 0xa4:		// MRF = MRF + Rx * Ry (USI)
-					case 0xac:		// MRF = MRF + Rx * Ry (USF)
-					case 0xad:		// MRF = MRF + Rx * Ry (USFR)
-					case 0xb4:		// MRF = MRF + Rx * Ry (SSI)
-					case 0xbc:		// MRF = MRF + Rx * Ry (SSF)
-					case 0xbd:		// MRF = MRF + Rx * Ry (SSFR)
-						// TODO: track MRF?
-						REG_USED(desc, rx);
-						REG_USED(desc, ry);
-						MULT_FLAGS_MODIFIED(desc);
-						break;
-
-					case 0x86:		// MRB = MRB + Rx * Ry (UUI)
-					case 0x8e:		// MRB = MRB + Rx * Ry (UUF)
-					case 0x8f:		// MRB = MRB + Rx * Ry (UUFR)
-					case 0x96:		// MRB = MRB + Rx * Ry (SUI)
-					case 0x9e:		// MRB = MRB + Rx * Ry (SUF)
-					case 0x9f:		// MRB = MRB + Rx * Ry (SUFR)
-					case 0xa6:		// MRB = MRB + Rx * Ry (USI)
-					case 0xae:		// MRB = MRB + Rx * Ry (USF)
-					case 0xaf:		// MRB = MRB + Rx * Ry (USFR)
-					case 0xb6:		// MRB = MRB + Rx * Ry (SSI)
-					case 0xbe:		// MRB = MRB + Rx * Ry (SSF)
-					case 0xbf:		// MRB = MRB + Rx * Ry (SSFR)
-						break;
-						// TODO: track MRB?
-						REG_USED(desc, rx);
-						REG_USED(desc, ry);
-						MULT_FLAGS_MODIFIED(desc);
-						break;
-					
-					case 0xc0:		// Rn = MRF - Rx * Ry (UUI)
-					case 0xc8:		// Rn = MRF - Rx * Ry (UUF)
-					case 0xc9:		// Rn = MRF - Rx * Ry (UUFR)
-					case 0xd0:		// Rn = MRF - Rx * Ry (SUI)
-					case 0xd8:		// Rn = MRF - Rx * Ry (SUF)
-					case 0xd9:		// Rn = MRF - Rx * Ry (SUFR)
-					case 0xe0:		// Rn = MRF - Rx * Ry (USI)
-					case 0xe8:		// Rn = MRF - Rx * Ry (USF)
-					case 0xe9:		// Rn = MRF - Rx * Ry (USFR)
-					case 0xf0:		// Rn = MRF - Rx * Ry (SSI)
-					case 0xf8:		// Rn = MRF - Rx * Ry (SSF)
-					case 0xf9:		// Rn = MRF - Rx * Ry (SSFR)
+					case 0x80:      // Rn = MRF + Rx * Ry (UUI)
+					case 0x88:      // Rn = MRF + Rx * Ry (UUF)
+					case 0x89:      // Rn = MRF + Rx * Ry (UUFR)
+					case 0x90:      // Rn = MRF + Rx * Ry (SUI)
+					case 0x98:      // Rn = MRF + Rx * Ry (SUF)
+					case 0x99:      // Rn = MRF + Rx * Ry (SUFR)
+					case 0xa0:      // Rn = MRF + Rx * Ry (USI)
+					case 0xa8:      // Rn = MRF + Rx * Ry (USF)
+					case 0xa9:      // Rn = MRF + Rx * Ry (USFR)
+					case 0xb0:      // Rn = MRF + Rx * Ry (SSI)
+					case 0xb8:      // Rn = MRF + Rx * Ry (SSF)
+					case 0xb9:      // Rn = MRF + Rx * Ry (SSFR)
 						// TODO: track MRF?
 						REG_USED(desc, rx);
 						REG_USED(desc, ry);
@@ -1400,18 +1325,18 @@ bool sharc_frontend::describe_compute(opcode_desc &desc, UINT64 opcode)
 						MULT_FLAGS_MODIFIED(desc);
 						break;
 
-					case 0xc2:		// Rn = MRB - Rx * Ry (UUI)
-					case 0xca:		// Rn = MRB - Rx * Ry (UUF)
-					case 0xcb:		// Rn = MRB - Rx * Ry (UUFR)
-					case 0xd2:		// Rn = MRB - Rx * Ry (SUI)
-					case 0xda:		// Rn = MRB - Rx * Ry (SUF)
-					case 0xdb:		// Rn = MRB - Rx * Ry (SUFR)
-					case 0xe2:		// Rn = MRB - Rx * Ry (USI)
-					case 0xea:		// Rn = MRB - Rx * Ry (USF)
-					case 0xeb:		// Rn = MRB - Rx * Ry (USFR)
-					case 0xf2:		// Rn = MRB - Rx * Ry (SSI)
-					case 0xfa:		// Rn = MRB - Rx * Ry (SSF)
-					case 0xfb:		// Rn = MRB - Rx * Ry (SSFR)
+					case 0x82:      // Rn = MRB + Rx * Ry (UUI)
+					case 0x8a:      // Rn = MRB + Rx * Ry (UUF)
+					case 0x8b:      // Rn = MRB + Rx * Ry (UUFR)
+					case 0x92:      // Rn = MRB + Rx * Ry (SUI)
+					case 0x9a:      // Rn = MRB + Rx * Ry (SUF)
+					case 0x9b:      // Rn = MRB + Rx * Ry (SUFR)
+					case 0xa2:      // Rn = MRB + Rx * Ry (USI)
+					case 0xaa:      // Rn = MRB + Rx * Ry (USF)
+					case 0xab:      // Rn = MRB + Rx * Ry (USFR)
+					case 0xb2:      // Rn = MRB + Rx * Ry (SSI)
+					case 0xba:      // Rn = MRB + Rx * Ry (SSF)
+					case 0xbb:      // Rn = MRB + Rx * Ry (SSFR)
 						// TODO: track MRB?
 						REG_USED(desc, rx);
 						REG_USED(desc, ry);
@@ -1419,106 +1344,181 @@ bool sharc_frontend::describe_compute(opcode_desc &desc, UINT64 opcode)
 						MULT_FLAGS_MODIFIED(desc);
 						break;
 
-					case 0xc4:		// MRF = MRF - Rx * Ry (UUI)
-					case 0xcc:		// MRF = MRF - Rx * Ry (UUF)
-					case 0xcd:		// MRF = MRF - Rx * Ry (UUFR)
-					case 0xd4:		// MRF = MRF - Rx * Ry (SUI)
-					case 0xdc:		// MRF = MRF - Rx * Ry (SUF)
-					case 0xdd:		// MRF = MRF - Rx * Ry (SUFR)
-					case 0xe4:		// MRF = MRF - Rx * Ry (USI)
-					case 0xec:		// MRF = MRF - Rx * Ry (USF)
-					case 0xed:		// MRF = MRF - Rx * Ry (USFR)
-					case 0xf4:		// MRF = MRF - Rx * Ry (SSI)
-					case 0xfc:		// MRF = MRF - Rx * Ry (SSF)
-					case 0xfd:		// MRF = MRF - Rx * Ry (SSFR)
+					case 0x84:      // MRF = MRF + Rx * Ry (UUI)
+					case 0x8c:      // MRF = MRF + Rx * Ry (UUF)
+					case 0x8d:      // MRF = MRF + Rx * Ry (UUFR)
+					case 0x94:      // MRF = MRF + Rx * Ry (SUI)
+					case 0x9c:      // MRF = MRF + Rx * Ry (SUF)
+					case 0x9d:      // MRF = MRF + Rx * Ry (SUFR)
+					case 0xa4:      // MRF = MRF + Rx * Ry (USI)
+					case 0xac:      // MRF = MRF + Rx * Ry (USF)
+					case 0xad:      // MRF = MRF + Rx * Ry (USFR)
+					case 0xb4:      // MRF = MRF + Rx * Ry (SSI)
+					case 0xbc:      // MRF = MRF + Rx * Ry (SSF)
+					case 0xbd:      // MRF = MRF + Rx * Ry (SSFR)
 						// TODO: track MRF?
 						REG_USED(desc, rx);
 						REG_USED(desc, ry);
 						MULT_FLAGS_MODIFIED(desc);
 						break;
 
-					case 0xc6:		// MRB = MRB - Rx * Ry (UUI)
-					case 0xce:		// MRB = MRB - Rx * Ry (UUF)
-					case 0xcf:		// MRB = MRB - Rx * Ry (UUFR)
-					case 0xd6:		// MRB = MRB - Rx * Ry (SUI)
-					case 0xde:		// MRB = MRB - Rx * Ry (SUF)
-					case 0xdf:		// MRB = MRB - Rx * Ry (SUFR)
-					case 0xe6:		// MRB = MRB - Rx * Ry (USI)
-					case 0xee:		// MRB = MRB - Rx * Ry (USF)
-					case 0xef:		// MRB = MRB - Rx * Ry (USFR)
-					case 0xf6:		// MRB = MRB - Rx * Ry (SSI)
-					case 0xfe:		// MRB = MRB - Rx * Ry (SSF)
-					case 0xff:		// MRB = MRB - Rx * Ry (SSFR)
+					case 0x86:      // MRB = MRB + Rx * Ry (UUI)
+					case 0x8e:      // MRB = MRB + Rx * Ry (UUF)
+					case 0x8f:      // MRB = MRB + Rx * Ry (UUFR)
+					case 0x96:      // MRB = MRB + Rx * Ry (SUI)
+					case 0x9e:      // MRB = MRB + Rx * Ry (SUF)
+					case 0x9f:      // MRB = MRB + Rx * Ry (SUFR)
+					case 0xa6:      // MRB = MRB + Rx * Ry (USI)
+					case 0xae:      // MRB = MRB + Rx * Ry (USF)
+					case 0xaf:      // MRB = MRB + Rx * Ry (USFR)
+					case 0xb6:      // MRB = MRB + Rx * Ry (SSI)
+					case 0xbe:      // MRB = MRB + Rx * Ry (SSF)
+					case 0xbf:      // MRB = MRB + Rx * Ry (SSFR)
+						break;
 						// TODO: track MRB?
 						REG_USED(desc, rx);
 						REG_USED(desc, ry);
 						MULT_FLAGS_MODIFIED(desc);
 						break;
-					
-					case 0x00:		// Rn = SAT MRF (UI)
-					case 0x01:		// Rn = SAT MRF (SI)
-					case 0x08:		// Rn = SAT MRF (UF)
-					case 0x09:		// Rn = SAT MRF (SF)
+
+					case 0xc0:      // Rn = MRF - Rx * Ry (UUI)
+					case 0xc8:      // Rn = MRF - Rx * Ry (UUF)
+					case 0xc9:      // Rn = MRF - Rx * Ry (UUFR)
+					case 0xd0:      // Rn = MRF - Rx * Ry (SUI)
+					case 0xd8:      // Rn = MRF - Rx * Ry (SUF)
+					case 0xd9:      // Rn = MRF - Rx * Ry (SUFR)
+					case 0xe0:      // Rn = MRF - Rx * Ry (USI)
+					case 0xe8:      // Rn = MRF - Rx * Ry (USF)
+					case 0xe9:      // Rn = MRF - Rx * Ry (USFR)
+					case 0xf0:      // Rn = MRF - Rx * Ry (SSI)
+					case 0xf8:      // Rn = MRF - Rx * Ry (SSF)
+					case 0xf9:      // Rn = MRF - Rx * Ry (SSFR)
+						// TODO: track MRF?
+						REG_USED(desc, rx);
+						REG_USED(desc, ry);
+						REG_MODIFIED(desc, rn);
+						MULT_FLAGS_MODIFIED(desc);
+						break;
+
+					case 0xc2:      // Rn = MRB - Rx * Ry (UUI)
+					case 0xca:      // Rn = MRB - Rx * Ry (UUF)
+					case 0xcb:      // Rn = MRB - Rx * Ry (UUFR)
+					case 0xd2:      // Rn = MRB - Rx * Ry (SUI)
+					case 0xda:      // Rn = MRB - Rx * Ry (SUF)
+					case 0xdb:      // Rn = MRB - Rx * Ry (SUFR)
+					case 0xe2:      // Rn = MRB - Rx * Ry (USI)
+					case 0xea:      // Rn = MRB - Rx * Ry (USF)
+					case 0xeb:      // Rn = MRB - Rx * Ry (USFR)
+					case 0xf2:      // Rn = MRB - Rx * Ry (SSI)
+					case 0xfa:      // Rn = MRB - Rx * Ry (SSF)
+					case 0xfb:      // Rn = MRB - Rx * Ry (SSFR)
+						// TODO: track MRB?
+						REG_USED(desc, rx);
+						REG_USED(desc, ry);
+						REG_MODIFIED(desc, rn);
+						MULT_FLAGS_MODIFIED(desc);
+						break;
+
+					case 0xc4:      // MRF = MRF - Rx * Ry (UUI)
+					case 0xcc:      // MRF = MRF - Rx * Ry (UUF)
+					case 0xcd:      // MRF = MRF - Rx * Ry (UUFR)
+					case 0xd4:      // MRF = MRF - Rx * Ry (SUI)
+					case 0xdc:      // MRF = MRF - Rx * Ry (SUF)
+					case 0xdd:      // MRF = MRF - Rx * Ry (SUFR)
+					case 0xe4:      // MRF = MRF - Rx * Ry (USI)
+					case 0xec:      // MRF = MRF - Rx * Ry (USF)
+					case 0xed:      // MRF = MRF - Rx * Ry (USFR)
+					case 0xf4:      // MRF = MRF - Rx * Ry (SSI)
+					case 0xfc:      // MRF = MRF - Rx * Ry (SSF)
+					case 0xfd:      // MRF = MRF - Rx * Ry (SSFR)
+						// TODO: track MRF?
+						REG_USED(desc, rx);
+						REG_USED(desc, ry);
+						MULT_FLAGS_MODIFIED(desc);
+						break;
+
+					case 0xc6:      // MRB = MRB - Rx * Ry (UUI)
+					case 0xce:      // MRB = MRB - Rx * Ry (UUF)
+					case 0xcf:      // MRB = MRB - Rx * Ry (UUFR)
+					case 0xd6:      // MRB = MRB - Rx * Ry (SUI)
+					case 0xde:      // MRB = MRB - Rx * Ry (SUF)
+					case 0xdf:      // MRB = MRB - Rx * Ry (SUFR)
+					case 0xe6:      // MRB = MRB - Rx * Ry (USI)
+					case 0xee:      // MRB = MRB - Rx * Ry (USF)
+					case 0xef:      // MRB = MRB - Rx * Ry (USFR)
+					case 0xf6:      // MRB = MRB - Rx * Ry (SSI)
+					case 0xfe:      // MRB = MRB - Rx * Ry (SSF)
+					case 0xff:      // MRB = MRB - Rx * Ry (SSFR)
+						// TODO: track MRB?
+						REG_USED(desc, rx);
+						REG_USED(desc, ry);
+						MULT_FLAGS_MODIFIED(desc);
+						break;
+
+					case 0x00:      // Rn = SAT MRF (UI)
+					case 0x01:      // Rn = SAT MRF (SI)
+					case 0x08:      // Rn = SAT MRF (UF)
+					case 0x09:      // Rn = SAT MRF (SF)
 						// TODO: track MRF?
 						REG_MODIFIED(desc, rn);
 						MULT_FLAGS_MODIFIED(desc);
 						break;
 
-					case 0x02:		// Rn = SAT MRB (UI)
-					case 0x03:		// Rn = SAT MRB (SI)
-					case 0x0a:		// Rn = SAT MRB (UF)
-					case 0x0b:		// Rn = SAT MRB (SF)
+					case 0x02:      // Rn = SAT MRB (UI)
+					case 0x03:      // Rn = SAT MRB (SI)
+					case 0x0a:      // Rn = SAT MRB (UF)
+					case 0x0b:      // Rn = SAT MRB (SF)
 						// TODO: track MRB?
 						REG_MODIFIED(desc, rn);
 						MULT_FLAGS_MODIFIED(desc);
 						break;
 
-					case 0x04:		// MRF = SAT MRF (UI)
-					case 0x05:		// MRF = SAT MRF (SI)
-					case 0x0c:		// MRF = SAT MRF (UF)
-					case 0x0d:		// MRF = SAT MRF (SF)
+					case 0x04:      // MRF = SAT MRF (UI)
+					case 0x05:      // MRF = SAT MRF (SI)
+					case 0x0c:      // MRF = SAT MRF (UF)
+					case 0x0d:      // MRF = SAT MRF (SF)
 						// TODO: track MRF?
 						MULT_FLAGS_MODIFIED(desc);
 						break;
 
-					case 0x06:		// MRB = SAT MRB (UI)
-					case 0x07:		// MRB = SAT MRB (SI)
-					case 0x0e:		// MRB = SAT MRB (UF)
-					case 0x0f:		// MRB = SAT MRB (SF)
+					case 0x06:      // MRB = SAT MRB (UI)
+					case 0x07:      // MRB = SAT MRB (SI)
+					case 0x0e:      // MRB = SAT MRB (UF)
+					case 0x0f:      // MRB = SAT MRB (SF)
 						// TODO: track MRB?
 						MULT_FLAGS_MODIFIED(desc);
 						break;
 
-					case 0x18:		// Rn = RND MRF (U)
-					case 0x19:		// Rn = RND MRF (S)
+					case 0x18:      // Rn = RND MRF (U)
+					case 0x19:      // Rn = RND MRF (S)
 						REG_MODIFIED(desc, rn);
 						MULT_FLAGS_MODIFIED(desc);
 						break;
 
-					case 0x1a:		// Rn = RND MRB (U)
-					case 0x1b:		// Rn = RND MRB (S)
+					case 0x1a:      // Rn = RND MRB (U)
+					case 0x1b:      // Rn = RND MRB (S)
 						REG_MODIFIED(desc, rn);
 						MULT_FLAGS_MODIFIED(desc);
 						break;
 
-					case 0x1c:		// MRF = RND MRF (U)
-					case 0x1d:		// MRF = RND MRF (S)
+					case 0x1c:      // MRF = RND MRF (U)
+					case 0x1d:      // MRF = RND MRF (S)
 						MULT_FLAGS_MODIFIED(desc);
 						break;
 
-					case 0x1e:		// MRB = RND MRB (U)
-					case 0x1f:		// MRB = RND MRB (S)
+					case 0x1e:      // MRB = RND MRB (U)
+					case 0x1f:      // MRB = RND MRB (S)
 						MULT_FLAGS_MODIFIED(desc);
 						break;
 
-					case 0x14:		// MRF = 0
+					case 0x14:      // MRF = 0
 						MULT_FLAGS_MODIFIED(desc);
 						break;
-					case 0x16:		// MRB = 0
+					case 0x16:      // MRB = 0
 						MULT_FLAGS_MODIFIED(desc);
 						break;
 
-					case 0x30:		// Fn = Fx * Fy
+					case 0x30:      // Fn = Fx * Fy
 						REG_USED(desc, rx);
 						REG_USED(desc, ry);
 						REG_MODIFIED(desc, rn);
@@ -1531,48 +1531,48 @@ bool sharc_frontend::describe_compute(opcode_desc &desc, UINT64 opcode)
 				break;
 			}
 
-			case 2:				// shifter operations
+			case 2:             // shifter operations
 			{
 				switch (operation)
 				{
-					case 0x00:		// Rn = LSHIFT Rx BY Ry | <data8>
-					case 0x04:		// Rn = ASHIFT Rx BY Ry | <data8>
-					case 0x08:		// Rn = ROT Rx BY Ry | <data8>
-					case 0xc4:		// Rn = BCLR Rx BY Ry | <data8>
-					case 0xc0:		// Rn = BSET Rx BY Ry | <data8>
-					case 0x44:		// Rn = FDEP Rx BY Ry | <bit6>:<len6>
-					case 0x4c:		// Rn = FDEP Rx BY Ry | <bit6>:<len6> (SE)
-					case 0x40:		// Rn = FEXT Rx BY Ry | <bit6>:<len6>
-					case 0x48:		// Rn = FEXT Rx BY Ry | <bit6>:<len6> (SE)
+					case 0x00:      // Rn = LSHIFT Rx BY Ry | <data8>
+					case 0x04:      // Rn = ASHIFT Rx BY Ry | <data8>
+					case 0x08:      // Rn = ROT Rx BY Ry | <data8>
+					case 0xc4:      // Rn = BCLR Rx BY Ry | <data8>
+					case 0xc0:      // Rn = BSET Rx BY Ry | <data8>
+					case 0x44:      // Rn = FDEP Rx BY Ry | <bit6>:<len6>
+					case 0x4c:      // Rn = FDEP Rx BY Ry | <bit6>:<len6> (SE)
+					case 0x40:      // Rn = FEXT Rx BY Ry | <bit6>:<len6>
+					case 0x48:      // Rn = FEXT Rx BY Ry | <bit6>:<len6> (SE)
 						REG_USED(desc, rx);
 						REG_USED(desc, ry);
 						REG_MODIFIED(desc, rn);
 						SHIFT_FLAGS_MODIFIED(desc);
 						break;
 
-					case 0x20:		// Rn = Rn OR LSHIFT Rx BY Ry | <data8>
-					case 0x24:		// Rn = Rn OR ASHIFT Rx BY Ry | <data8>
-					case 0x64:		// Rn = Rn OR FDEP Rx BY Ry | <bit6>:<len6>
-					case 0x6c:		// Rn = Rn OR FDEP Rx BY Ry | <bit6>:<len6> (SE)
+					case 0x20:      // Rn = Rn OR LSHIFT Rx BY Ry | <data8>
+					case 0x24:      // Rn = Rn OR ASHIFT Rx BY Ry | <data8>
+					case 0x64:      // Rn = Rn OR FDEP Rx BY Ry | <bit6>:<len6>
+					case 0x6c:      // Rn = Rn OR FDEP Rx BY Ry | <bit6>:<len6> (SE)
 						REG_USED(desc, rx);
 						REG_USED(desc, ry);
 						REG_USED(desc, rn);
 						REG_MODIFIED(desc, rn);
 						SHIFT_FLAGS_MODIFIED(desc);
 						break;
-					
-					case 0xcc:		// BTST Rx BY Ry | <data8>
+
+					case 0xcc:      // BTST Rx BY Ry | <data8>
 						REG_USED(desc, rx);
 						REG_USED(desc, ry);
 						SHIFT_FLAGS_MODIFIED(desc);
 						break;
-				
-					case 0x80:		// Rn = EXP Rx
-					case 0x84:		// Rn = EXP Rx (EX)
-					case 0x88:		// Rn = LEFTZ Rx
-					case 0x8c:		// Rn = LEFTO Rx
-					case 0x90:		// Rn = FPACK Fx
-					case 0x94:		// Fn = FUNPACK Rx
+
+					case 0x80:      // Rn = EXP Rx
+					case 0x84:      // Rn = EXP Rx (EX)
+					case 0x88:      // Rn = LEFTZ Rx
+					case 0x8c:      // Rn = LEFTO Rx
+					case 0x90:      // Rn = FPACK Fx
+					case 0x94:      // Fn = FUNPACK Rx
 						REG_USED(desc, rx);
 						REG_MODIFIED(desc, rn);
 						SHIFT_FLAGS_MODIFIED(desc);
@@ -1657,34 +1657,34 @@ bool sharc_frontend::describe_ureg_access(opcode_desc &desc, int reg, UREG_ACCES
 				PM_B_MODIFIED(desc, reg & 7);
 			break;
 
-		case 0x60:		// FADDR
+		case 0x60:      // FADDR
 			break;
-		case 0x61:		// DADDR
+		case 0x61:      // DADDR
 			break;
-		case 0x63:		// PC
+		case 0x63:      // PC
 			break;
-		case 0x64:		// PCSTK
+		case 0x64:      // PCSTK
 			break;
-		case 0x65:		// PCSTKP
+		case 0x65:      // PCSTKP
 			break;
-		case 0x66:		// LADDR
+		case 0x66:      // LADDR
 			break;
-		case 0x67:		// CURLCNTR
+		case 0x67:      // CURLCNTR
 			break;
-		case 0x68:		// LCNTR
+		case 0x68:      // LCNTR
 			break;
-		case 0x70:		// USTAT1
+		case 0x70:      // USTAT1
 			break;
-		case 0x71:		// USTAT2
+		case 0x71:      // USTAT2
 			break;
-		case 0x79:		// IRPTL
+		case 0x79:      // IRPTL
 			break;
-		case 0x7a:		// MODE1
+		case 0x7a:      // MODE1
 			break;
-		case 0x7b:		// MODE2
+		case 0x7b:      // MODE2
 			break;
 
-		case 0x7c:		// ASTAT
+		case 0x7c:      // ASTAT
 			if (access == UREG_READ)
 			{
 				AZ_USED(desc);
@@ -1713,17 +1713,17 @@ bool sharc_frontend::describe_ureg_access(opcode_desc &desc, int reg, UREG_ACCES
 			}
 			break;
 
-		case 0x7d:		// IMASK
+		case 0x7d:      // IMASK
 			break;
-		case 0x7e:		// STKY
+		case 0x7e:      // STKY
 			break;
-		case 0x7f:		// IMASKP
+		case 0x7f:      // IMASKP
 			break;
-		case 0xdb:		// PX
+		case 0xdb:      // PX
 			break;
-		case 0xdc:		// PX1
+		case 0xdc:      // PX1
 			break;
-		case 0xdd:		// PX2
+		case 0xdd:      // PX2
 			break;
 
 		default:
@@ -1738,31 +1738,31 @@ bool sharc_frontend::describe_shiftop_imm(opcode_desc &desc, int shiftop, int rn
 {
 	switch (shiftop)
 	{
-		case 0x00:		// LSHIFT Rx BY <data8>
-		case 0x01:		// ASHIFT Rx BY <data8>
-		case 0x02:		// ROT Rx BY <data8>
-		case 0x10:		// FEXT Rx BY <data8>
-		case 0x11:		// FDEP Rx BY <data8>
-		case 0x12:		// FEXT Rx BY <bit6>:<len6> (SE)
-		case 0x13:		// FDEP Rx BY <bit6>:<len6> (SE)
-		case 0x30:		// BSET Rx BY <data8>
-		case 0x31:		// BCLR Rx By <data8>
-		case 0x32:		// BTGL Rx BY <data8>
+		case 0x00:      // LSHIFT Rx BY <data8>
+		case 0x01:      // ASHIFT Rx BY <data8>
+		case 0x02:      // ROT Rx BY <data8>
+		case 0x10:      // FEXT Rx BY <data8>
+		case 0x11:      // FDEP Rx BY <data8>
+		case 0x12:      // FEXT Rx BY <bit6>:<len6> (SE)
+		case 0x13:      // FDEP Rx BY <bit6>:<len6> (SE)
+		case 0x30:      // BSET Rx BY <data8>
+		case 0x31:      // BCLR Rx By <data8>
+		case 0x32:      // BTGL Rx BY <data8>
 			REG_USED(desc, rx);
 			REG_MODIFIED(desc, rn);
 			SHIFT_FLAGS_MODIFIED(desc);
 			break;
 
-		case 0x08:		// Rn = Rn OR LSHIFT Rx BY <data8>
-		case 0x19:		// Rn = Rn OR FDEP Rx BY <bit6>:<len6>
-		case 0x1b:		// Rn = Rn OR FDEP Rx BY <bit6>:<len6> (SE)
+		case 0x08:      // Rn = Rn OR LSHIFT Rx BY <data8>
+		case 0x19:      // Rn = Rn OR FDEP Rx BY <bit6>:<len6>
+		case 0x1b:      // Rn = Rn OR FDEP Rx BY <bit6>:<len6> (SE)
 			REG_USED(desc, rx);
 			REG_USED(desc, rn);
 			REG_MODIFIED(desc, rn);
 			SHIFT_FLAGS_MODIFIED(desc);
 			break;
 
-		case 0x33:		// BTST Rx BY <data8>
+		case 0x33:      // BTST Rx BY <data8>
 			REG_USED(desc, rx);
 			SHIFT_FLAGS_MODIFIED(desc);
 			break;

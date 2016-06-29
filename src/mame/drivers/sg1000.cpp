@@ -93,7 +93,7 @@ WRITE8_MEMBER( sg1000_state::omv_w )
 READ8_MEMBER( sg1000_state::peripheral_r )
 {
 	bool joy_ports_disabled = m_sgexpslot->is_readable(offset);
-	
+
 	if (joy_ports_disabled)
 	{
 		return m_sgexpslot->read(space, offset);
@@ -110,7 +110,7 @@ READ8_MEMBER( sg1000_state::peripheral_r )
 WRITE8_MEMBER( sg1000_state::peripheral_w )
 {
 	bool joy_ports_disabled = m_sgexpslot->is_writeable(offset);
-	
+
 	if (joy_ports_disabled)
 	{
 		m_sgexpslot->write(space, offset, data);

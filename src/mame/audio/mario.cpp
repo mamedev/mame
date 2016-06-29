@@ -883,7 +883,7 @@ MACHINE_CONFIG_FRAGMENT( mario_audio )
 	MCFG_CPU_IO_MAP(mario_sound_io_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")

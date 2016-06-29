@@ -18,7 +18,6 @@
 class floppy_image_format_t;
 
 namespace ui {
-
 // ======================> menu_confirm_save_as
 
 class menu_confirm_save_as : public menu
@@ -101,7 +100,7 @@ private:
 	bool                        m_has_create;
 	int *                       m_result;
 	file_selector_entry *       m_entrylist;
-	std::string				    m_hover_directory;
+	std::string                 m_hover_directory;
 	char                        m_filename_buffer[1024];
 
 	// methods

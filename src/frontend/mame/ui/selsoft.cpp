@@ -29,7 +29,6 @@
 
 
 namespace ui {
-
 std::string reselect_last::driver;
 std::string reselect_last::software;
 std::string reselect_last::swlist;

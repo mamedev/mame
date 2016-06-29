@@ -334,4 +334,3 @@ WRITE8_MEMBER( sega_sk1100_device::ppi_pc_w )
 
 	/* TODO printer */
 }
-

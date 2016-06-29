@@ -77,7 +77,7 @@ public:
 		: sg1000_state(mconfig, type, tag)
 	{ }
 
-	virtual void machine_start() override;	
+	virtual void machine_start() override;
 };
 
 class sf7000_state : public sc3000_state

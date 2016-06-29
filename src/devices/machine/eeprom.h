@@ -44,7 +44,7 @@
 // ======================> eeprom_base_device
 
 class eeprom_base_device :  public device_t,
-                            public device_nvram_interface
+							public device_nvram_interface
 {
 protected:
 	// construction/destruction

@@ -17,7 +17,6 @@
 
 
 namespace ui {
-
 void menu_plugin::handle()
 {
 	const event *menu_event = process(0);

@@ -11,7 +11,7 @@
 #include "sharcfe.h"
 
 
-#define DISABLE_FAST_REGISTERS		1
+#define DISABLE_FAST_REGISTERS      1
 
 
 
@@ -336,7 +336,7 @@ void adsp21062_device::external_dma_write(UINT32 address, UINT64 data)
 void adsp21062_device::device_start()
 {
 	int saveindex;
-	
+
 	m_core = (sharc_internal_state *)m_cache.alloc_near(sizeof(sharc_internal_state));
 	memset(m_core, 0, sizeof(sharc_internal_state));
 
@@ -356,7 +356,7 @@ void adsp21062_device::device_start()
 	// add UML symbols
 	m_drcuml->symbol_add(&m_core->pc, sizeof(m_core->pc), "pc");
 	m_drcuml->symbol_add(&m_core->icount, sizeof(m_core->icount), "icount");
-	
+
 	for (int i=0; i < 16; i++)
 	{
 		char buf[10];
@@ -412,7 +412,7 @@ void adsp21062_device::device_start()
 	m_drcuml->symbol_add(&m_core->astat_drc.sz, sizeof(m_core->astat_drc.sz), "astat_sz");
 	m_drcuml->symbol_add(&m_core->astat_drc.sv, sizeof(m_core->astat_drc.sv), "astat_sv");
 	m_drcuml->symbol_add(&m_core->astat_drc.ss, sizeof(m_core->astat_drc.ss), "astat_ss");
-	
+
 	m_drcuml->symbol_add(&m_core->arg0, sizeof(m_core->arg0), "arg0");
 	m_drcuml->symbol_add(&m_core->arg1, sizeof(m_core->arg1), "arg1");
 	m_drcuml->symbol_add(&m_core->arg2, sizeof(m_core->arg2), "arg2");

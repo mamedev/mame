@@ -124,12 +124,12 @@ static INPUT_PORTS_START( holeland )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( holeland2 )
-        PORT_INCLUDE( holeland )
+		PORT_INCLUDE( holeland )
 
-        PORT_MODIFY("DSW1")
-        PORT_DIPNAME( 0x04, 0x04, DEF_STR( Language ) )
+		PORT_MODIFY("DSW1")
+		PORT_DIPNAME( 0x04, 0x04, DEF_STR( Language ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
-        PORT_DIPSETTING(    0x04, DEF_STR( Spanish ) )
+		PORT_DIPSETTING(    0x04, DEF_STR( Spanish ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( crzrally )

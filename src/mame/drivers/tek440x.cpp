@@ -3,48 +3,48 @@
 /***************************************************************************
 
     Tektronix 440x "AI Workstations"
-    
+
     skeleton by R. Belmont
 
     Hardware overview:
         * 68010 (4404) or 68020 (4405) with custom MMU
-		* Intelligent floppy subsystem with 6502 driving a uPD765 controller
-		* NS32081 FPU
-		* 6551 debug console AICA
-		* SN76496 PSG for sound
-		* MC146818 RTC 
-		* MC68681 DUART / timer (3.6864 MHz clock) (serial channel A = keyboard, channel B = RS-232 port)
-		* AM9513 timer (source of timer IRQ)
-		* NCR5385 SCSI controller
-		
-		Video is a 640x480 1bpp window on a 1024x1024 VRAM area; smooth panning around that area
-		is possible as is flat-out changing the scanout address.
-		
-	IRQ levels:
-		7 = Debug (NMI)
-		6 = VBL
-		5 = UART
-		4 = Spare (exp slots)
-		3 = SCSI
-		2 = DMA
-		1 = Timer
-		0 = Unused
-		
-	MMU info:
-		Map control register (location unk): bit 15 = VM enable, bits 10-8 = process ID
-		
-		Map entries:
-			bit 15 = dirty
-			bit 14 = write enable
-			bit 13-11 = process ID
-			bits 10-0 = address bits 22-12 in the final address
+        * Intelligent floppy subsystem with 6502 driving a uPD765 controller
+        * NS32081 FPU
+        * 6551 debug console AICA
+        * SN76496 PSG for sound
+        * MC146818 RTC
+        * MC68681 DUART / timer (3.6864 MHz clock) (serial channel A = keyboard, channel B = RS-232 port)
+        * AM9513 timer (source of timer IRQ)
+        * NCR5385 SCSI controller
+
+        Video is a 640x480 1bpp window on a 1024x1024 VRAM area; smooth panning around that area
+        is possible as is flat-out changing the scanout address.
+
+    IRQ levels:
+        7 = Debug (NMI)
+        6 = VBL
+        5 = UART
+        4 = Spare (exp slots)
+        3 = SCSI
+        2 = DMA
+        1 = Timer
+        0 = Unused
+
+    MMU info:
+        Map control register (location unk): bit 15 = VM enable, bits 10-8 = process ID
+
+        Map entries:
+            bit 15 = dirty
+            bit 14 = write enable
+            bit 13-11 = process ID
+            bits 10-0 = address bits 22-12 in the final address
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
-#include "machine/mos6551.h"	// debug tty
+#include "machine/mos6551.h"    // debug tty
 #include "machine/mc146818.h"
 #include "bus/rs232/rs232.h"
 
@@ -58,7 +58,7 @@ public:
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram")
 	{}
-		
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -92,8 +92,8 @@ void tek440x_state::machine_reset()
 	UINT8 *RAM = (UINT8 *)m_mainram.target();
 
 	memcpy(RAM, ROM, 256);
-	
-	m_maincpu->reset();	
+
+	m_maincpu->reset();
 }
 
 
@@ -183,7 +183,7 @@ static MACHINE_CONFIG_START( tek4404, tek440x_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, 166666666)
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)
-	
+
 	MCFG_CPU_ADD("fdccpu", M6502, 1000000)
 	MCFG_CPU_PROGRAM_MAP(fdccpu_map)
 
@@ -197,7 +197,7 @@ static MACHINE_CONFIG_START( tek4404, tek440x_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tek440x_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	
+
 	MCFG_DEVICE_ADD("aica", MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
@@ -219,14 +219,14 @@ MACHINE_CONFIG_END
 
 ROM_START( tek4404 )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "tek_u158.bin", 0x000000, 0x004000, CRC(9939e660) SHA1(66b4309e93e4ff20c1295dc2ec2a8d6389b2578c) ) 
-	ROM_LOAD16_BYTE( "tek_u163.bin", 0x000001, 0x004000, CRC(a82dcbb1) SHA1(a7e4545e9ea57619faacc1556fa346b18f870084) ) 
-	
+	ROM_LOAD16_BYTE( "tek_u158.bin", 0x000000, 0x004000, CRC(9939e660) SHA1(66b4309e93e4ff20c1295dc2ec2a8d6389b2578c) )
+	ROM_LOAD16_BYTE( "tek_u163.bin", 0x000001, 0x004000, CRC(a82dcbb1) SHA1(a7e4545e9ea57619faacc1556fa346b18f870084) )
+
 	ROM_REGION( 0x1000, "fdccpu", 0 )
-	ROM_LOAD( "tek_u130.bin", 0x000000, 0x001000, CRC(2c11a3f1) SHA1(b29b3705692d50f15f7e8bbba12a24c69817d52e) ) 
-	
+	ROM_LOAD( "tek_u130.bin", 0x000000, 0x001000, CRC(2c11a3f1) SHA1(b29b3705692d50f15f7e8bbba12a24c69817d52e) )
+
 	ROM_REGION( 0x2000, "scsimfm", 0 )
-	ROM_LOAD( "scsi_mfm.bin", 0x000000, 0x002000, CRC(b4293435) SHA1(5e2b96c19c4f5c63a5afa2de504d29fe64a4c908) ) 
+	ROM_LOAD( "scsi_mfm.bin", 0x000000, 0x002000, CRC(b4293435) SHA1(5e2b96c19c4f5c63a5afa2de504d29fe64a4c908) )
 ROM_END
 
 /*************************************

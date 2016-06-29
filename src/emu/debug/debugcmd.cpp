@@ -94,8 +94,8 @@ UINT64 debugger_commands::cheat_read_extended(const cheat_system *cheatsys, addr
 
 debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu, debugger_console& console)
 	: m_machine(machine)
-    , m_cpu(cpu)
-    , m_console(console)
+	, m_cpu(cpu)
+	, m_console(console)
 {
 	m_global_array = auto_alloc_array_clear(m_machine, global_entry, MAX_GLOBALS);
 
@@ -271,7 +271,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	/* set up the initial debugscript if specified */
 	const char* name = m_machine.options().debug_script();
 	if (name[0] != 0)
-        m_cpu.source_script(name);
+		m_cpu.source_script(name);
 
 	m_cheat.cpu[0] = m_cheat.cpu[1] = 0;
 }
@@ -683,7 +683,7 @@ void debugger_commands::execute_tracelog(int ref, int params, const char *param[
 	/* then do a printf */
 	char buffer[1024];
 	if (mini_printf(buffer, param[0], params - 1, &values[1]))
-        m_cpu.get_visible_cpu()->debug()->trace_printf("%s", buffer);
+		m_cpu.get_visible_cpu()->debug()->trace_printf("%s", buffer);
 }
 
 
@@ -720,7 +720,7 @@ void debugger_commands::execute_step(int ref, int params, const char *param[])
 	if (!validate_number_parameter(param[0], &steps))
 		return;
 
-    m_cpu.get_visible_cpu()->debug()->single_step(steps);
+	m_cpu.get_visible_cpu()->debug()->single_step(steps);
 }
 
 
@@ -735,7 +735,7 @@ void debugger_commands::execute_over(int ref, int params, const char *param[])
 	if (!validate_number_parameter(param[0], &steps))
 		return;
 
-    m_cpu.get_visible_cpu()->debug()->single_step_over(steps);
+	m_cpu.get_visible_cpu()->debug()->single_step_over(steps);
 }
 
 
@@ -745,7 +745,7 @@ void debugger_commands::execute_over(int ref, int params, const char *param[])
 
 void debugger_commands::execute_out(int ref, int params, const char *param[])
 {
-    m_cpu.get_visible_cpu()->debug()->single_step_out();
+	m_cpu.get_visible_cpu()->debug()->single_step_out();
 }
 
 
@@ -761,7 +761,7 @@ void debugger_commands::execute_go(int ref, int params, const char *param[])
 	if (!validate_number_parameter(param[0], &addr))
 		return;
 
-    m_cpu.get_visible_cpu()->debug()->go(addr);
+	m_cpu.get_visible_cpu()->debug()->go(addr);
 }
 
 
@@ -772,7 +772,7 @@ void debugger_commands::execute_go(int ref, int params, const char *param[])
 
 void debugger_commands::execute_go_vblank(int ref, int params, const char *param[])
 {
-    m_cpu.get_visible_cpu()->debug()->go_vblank();
+	m_cpu.get_visible_cpu()->debug()->go_vblank();
 }
 
 
@@ -788,7 +788,7 @@ void debugger_commands::execute_go_interrupt(int ref, int params, const char *pa
 	if (!validate_number_parameter(param[0], &irqline))
 		return;
 
-    m_cpu.get_visible_cpu()->debug()->go_interrupt(irqline);
+	m_cpu.get_visible_cpu()->debug()->go_interrupt(irqline);
 }
 
 
@@ -804,7 +804,7 @@ void debugger_commands::execute_go_time(int ref, int params, const char *param[]
 	if (!validate_number_parameter(param[0], &milliseconds))
 		return;
 
-    m_cpu.get_visible_cpu()->debug()->go_milliseconds(milliseconds);
+	m_cpu.get_visible_cpu()->debug()->go_milliseconds(milliseconds);
 }
 
 
@@ -814,7 +814,7 @@ void debugger_commands::execute_go_time(int ref, int params, const char *param[]
 
 void debugger_commands::execute_next(int ref, int params, const char *param[])
 {
-    m_cpu.get_visible_cpu()->debug()->go_next_device();
+	m_cpu.get_visible_cpu()->debug()->go_next_device();
 }
 
 
@@ -1008,8 +1008,8 @@ void debugger_commands::execute_comment_del(int ref, int params, const char *par
 /**
  * @fn void execute_comment_list(running_machine &machine, int ref, int params, const char *param[])
  * @brief Print current list of comments in debugger
- * 
- *  
+ *
+ *
  */
 
 void debugger_commands::execute_comment_list(int ref, int params, const char *param[])
@@ -1029,7 +1029,7 @@ void debugger_commands::execute_comment_commit(int ref, int params, const char *
 	execute_comment_add(ref, params, param);
 	execute_comment_save(ref, params, param);
 }
- 
+
 /*-------------------------------------------------
     execute_comment - add a comment to a line
 -------------------------------------------------*/
@@ -1053,7 +1053,7 @@ void debugger_commands::execute_comment_save(int ref, int params, const char *pa
  * @todo add shorthand for color modify and save
  *
  */
- 
+
 
 
 /*-------------------------------------------------
@@ -1651,7 +1651,7 @@ void debugger_commands::execute_load(int ref, int params, const char *param[])
 		/* check if end of file has been reached and stop loading if it has */
 		if (feof(f))
 			break;
-        m_cpu.write_byte(*space, i, byte, true);
+		m_cpu.write_byte(*space, i, byte, true);
 	}
 	/* close the file */
 	fclose(f);
@@ -2513,7 +2513,7 @@ void debugger_commands::execute_traceover(int ref, int params, const char *param
 
 void debugger_commands::execute_traceflush(int ref, int params, const char *param[])
 {
-    m_cpu.flush_traces();
+	m_cpu.flush_traces();
 }
 
 
@@ -2733,7 +2733,7 @@ void debugger_commands::execute_snap(int ref, int params, const char *param[])
 
 void debugger_commands::execute_source(int ref, int params, const char *param[])
 {
-    m_cpu.source_script(param[0]);
+	m_cpu.source_script(param[0]);
 }
 
 

@@ -319,21 +319,21 @@ namespace osd
 				OTHER
 			};
 
-			const char *							name;           // name of the entry
-			entry_type								type;           // type of the entry
-			std::uint64_t							size;           // size of the entry
-			std::chrono::system_clock::time_point	last_modified;	// last modified time
+			const char *                            name;           // name of the entry
+			entry_type                              type;           // type of the entry
+			std::uint64_t                           size;           // size of the entry
+			std::chrono::system_clock::time_point   last_modified;  // last modified time
 		};
 
 		// -----------------------------------------------------------------------------
 		// osd::directory::open: open a directory for iteration
-		// 
+		//
 		// Parameters:
-		// 
+		//
 		// dirname - path to the directory in question
-		// 
+		//
 		// Return value:
-		// 
+		//
 		// upon success, this function should return an directory pointer
 		// which contains opaque data necessary to traverse the directory; on
 		// failure, this function should return nullptr
@@ -347,9 +347,9 @@ namespace osd
 
 		// -----------------------------------------------------------------------------
 		// osd::directory::read: return information about the next entry in the directory
-		// 
+		//
 		// Return value:
-		// 
+		//
 		// a constant pointer to an entry representing the current item
 		// in the directory, or nullptr, indicating that no more entries are
 		// present

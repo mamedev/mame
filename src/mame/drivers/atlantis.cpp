@@ -76,7 +76,7 @@
 #define LOG_RTC         (0)
 #define LOG_RED         (0)
 #define LOG_PORT        (0)
-#define LOG_IRQ			(0)
+#define LOG_IRQ         (0)
 
 class atlantis_state : public driver_device
 {
@@ -810,7 +810,7 @@ static MACHINE_CONFIG_START( mwskins, atlantis_state )
 	MCFG_PCI9050_SET_MAP(3, map3)
 	MCFG_PCI9050_USER_OUTPUT_CALLBACK(DEVWRITE32(":", atlantis_state, user_io_output))
 	MCFG_PCI9050_USER_INPUT_CALLBACK(DEVREAD32(":", atlantis_state, user_io_input))
-	
+
 	MCFG_NVRAM_ADD_0FILL("rtc")
 
 	MCFG_IDE_PCI_ADD(PCI_ID_IDE, 0x10950646, 0x03, 0x0)

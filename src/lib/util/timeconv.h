@@ -2,9 +2,9 @@
 // copyright-holders:Vas Crabb, Nathan Woods
 /***************************************************************************
 
-	timeconv.h
+    timeconv.h
 
-	Time conversion utility code
+    Time conversion utility code
 
 ***************************************************************************/
 
@@ -19,16 +19,15 @@
 
 
 namespace util {
-
 /***************************************************************************
-	TYPE DEFINITIONS
+    TYPE DEFINITIONS
 ***************************************************************************/
 
 typedef std::chrono::duration<std::uint64_t, std::ratio<1, 10000000> > ntfs_duration;
 
 
 /***************************************************************************
-	INLINE FUNCTIONS
+    INLINE FUNCTIONS
 ***************************************************************************/
 
 // -------------------------------------------------
@@ -42,7 +41,7 @@ inline constexpr ntfs_duration ntfs_duration_from_filetime(std::uint32_t high, s
 
 
 /***************************************************************************
-	FUNCTION PROTOTYPES
+    FUNCTION PROTOTYPES
 ***************************************************************************/
 
 std::chrono::system_clock::time_point system_clock_time_point_from_ntfs_duration(ntfs_duration d);

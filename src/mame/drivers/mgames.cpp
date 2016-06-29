@@ -652,7 +652,7 @@ static MACHINE_CONFIG_START( mgames, mgames_state )
 	MCFG_PALETTE_INIT_OWNER(mgames_state, mgames)
 
 	/* sound hardware */
-    //  to do...
+	//  to do...
 
 MACHINE_CONFIG_END
 

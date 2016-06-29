@@ -1523,26 +1523,26 @@ ROM_START( abc806 )
 
 	ROM_REGION( 0x104, "abc_p3", 0 )
 	/*
-		1   12MHz
-		2   DOT
-		3   RTF
-		4   GTF
-		5   BTF
-		6   RTB
-		7   GTB
-		8   BTB
-		9   SFG
-		10  GND
-		11  GND
-		12  RFG
-		13  GFG
-		14  >YL
-		15  >BL
-		16  >GL
-		17  >RL
-		18  BFG
-		19  >FGE
-		20  Vcc
+	    1   12MHz
+	    2   DOT
+	    3   RTF
+	    4   GTF
+	    5   BTF
+	    6   RTB
+	    7   GTB
+	    8   BTB
+	    9   SFG
+	    10  GND
+	    11  GND
+	    12  RFG
+	    13  GFG
+	    14  >YL
+	    15  >BL
+	    16  >GL
+	    17  >RL
+	    18  BFG
+	    19  >FGE
+	    20  Vcc
 	*/
 	ROM_LOAD( "60 90239-01.1b",  0x000, 0x104, CRC(f3d0ba00) SHA1(bcc0ee26ecac0028aef6bf5cb308133b509bb360) ) // "ABC P3-11" PAL16R4, color encoder
 

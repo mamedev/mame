@@ -7455,8 +7455,8 @@ static const gfx_layout cb3c_tiles8x32_layout =
 	{ 0, 1, 2, 3 },
 	{ 4, 0, 12, 8, 20, 16, 28, 24 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, 8*32, 9*32, 10*32, 11*32, 12*32,
-	  13*32, 14*32, 15*32, 16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32,
-	  24*32, 25*32, 26*32, 27*32, 28*32, 29*32, 30*32, 31*32 },
+		13*32, 14*32, 15*32, 16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32,
+		24*32, 25*32, 26*32, 27*32, 28*32, 29*32, 30*32, 31*32 },
 	32*32
 };
 
@@ -7541,9 +7541,9 @@ static const gfx_layout flaming7_tilelayout =
 	{ 0, 2, 4, 6 },
 	{ 2*8+0, 2*8+1, 3*8+0, 3*8+1, 0, 1, 1*8+0, 1*8+1 },
 	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8,
-	  32*8, 36*8, 40*8, 44*8, 48*8, 52*8, 56*8, 60*8,
-	  64*8, 68*8, 72*8, 76*8, 80*8, 84*8, 88*8, 92*8,
-	  96*8, 100*8, 104*8, 108*8, 112*8, 116*8, 120*8, 124*8 },
+		32*8, 36*8, 40*8, 44*8, 48*8, 52*8, 56*8, 60*8,
+		64*8, 68*8, 72*8, 76*8, 80*8, 84*8, 88*8, 92*8,
+		96*8, 100*8, 104*8, 108*8, 112*8, 116*8, 120*8, 124*8 },
 	128*8   /* every char takes 128 consecutive bytes */
 };
 
@@ -7566,9 +7566,9 @@ static const gfx_layout flam7_tw_tilelayout =  // FIXME
 	{ 0, 2, 4, 6 },
 	{ 3*8+0, 3*8+1, 2*8+0, 1*8+0, 1*8+1, 2*8+1, 0, 1 },
 	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8,
-	  32*8, 36*8, 40*8, 44*8, 48*8, 52*8, 56*8, 60*8,
-	  64*8, 68*8, 72*8, 76*8, 80*8, 84*8, 88*8, 92*8,
-	  96*8, 100*8, 104*8, 108*8, 112*8, 116*8, 120*8, 124*8 },
+		32*8, 36*8, 40*8, 44*8, 48*8, 52*8, 56*8, 60*8,
+		64*8, 68*8, 72*8, 76*8, 80*8, 84*8, 88*8, 92*8,
+		96*8, 100*8, 104*8, 108*8, 112*8, 116*8, 120*8, 124*8 },
 	128*8   /* every char takes 128 consecutive bytes */
 };
 
@@ -7695,8 +7695,8 @@ static const gfx_layout tiles8x32_4bpp_layout =
 	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7},
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8,
-	  13*8, 14*8, 15*8, 16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8,
-	  24*8, 25*8, 26*8, 27*8, 28*8, 29*8, 30*8, 31*8 },
+		13*8, 14*8, 15*8, 16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8,
+		24*8, 25*8, 26*8, 27*8, 28*8, 29*8, 30*8, 31*8 },
 	32*8
 };
 
@@ -7812,8 +7812,8 @@ static const gfx_layout cm97_layout32 =
 	{ 0,1,2,3 },
 	{ 8,12,0,4,24,28, 16,20 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, 8*32, 9*32, 10*32, 11*32,
-	  12*32, 13*32, 14*32, 15*32, 16*32, 17*32, 18*32, 19*32, 20*32, 21*32,
-	  22*32, 23*32, 24*32, 25*32, 26*32, 27*32, 28*32, 29*32, 30*32, 31*32 },
+		12*32, 13*32, 14*32, 15*32, 16*32, 17*32, 18*32, 19*32, 20*32, 21*32,
+		22*32, 23*32, 24*32, 25*32, 26*32, 27*32, 28*32, 29*32, 30*32, 31*32 },
 	32*32
 };
 
@@ -8419,7 +8419,7 @@ static MACHINE_CONFIG_DERIVED( flaming7, lucky8 )
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", flaming7)
 
-    // to do serial protection.
+	// to do serial protection.
 	MCFG_DEVICE_MODIFY("ppi8255_0")
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, fl7w4_outc802_w))
 
@@ -8433,7 +8433,7 @@ static MACHINE_CONFIG_DERIVED( flam7_tw, lucky8 )
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", flam7_tw)
 
-    // to do serial protection.
+	// to do serial protection.
 	MCFG_DEVICE_MODIFY("ppi8255_0")
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, fl7w4_outc802_w))
 
@@ -14308,7 +14308,7 @@ ROM_END
   Graphics: 4 different types, selectable through DIP switches.
 
   1) Regular Fruits.
-  2) Numbers.     (Custom Option 1 in W-4 HW) 
+  2) Numbers.     (Custom Option 1 in W-4 HW)
   3) Custom Set 1 (Custom Option 2 in W-4 HW)
   4) Custom Set 2 (Custom Option 3 in W-4 HW)
 
@@ -14455,7 +14455,7 @@ ROM_END
   | PAPER LOW SENSOR | OFF            |     |     |     |     | OFF | OFF | OFF | OFF |
   |                  | ON             |     |     |     |     | ON  | OFF | OFF | OFF |
   +------------------+----------------+-----+-----+-----+-----+-----+-----+-----+-----+
- 
+
 
   NOTE: Set bill validator DIP switches for 1 pulse per dollar. When you choose the
         demonation with the DIP switch on the board, the software will know how many
@@ -14567,15 +14567,15 @@ ROM_END
            Button Lock |15|51|
                        |16|52|
                        |17|53|
-         (DBA) Inuput0 |18|54| Coin Switch “A”
-       Coin Switch “B” |19|55|
+         (DBA) Inuput0 |18|54| Coin Switch "A"
+       Coin Switch "B" |19|55|
    Book Keeping Switch |20|56| Stats / Setup SW
             Collect SW |21|57|
     Hopper Full Switch |22|58|
-       Counter Out “A” |23|59|
+       Counter Out "A" |23|59|
                   Bell |24|60| Lockout mars (DBA)
             Tower Lamp |25|61|
-       Counter Out “D” |26|62|
+       Counter Out "D" |26|62|
           Played Meter |27|63| Lack of Hopper Counter
   Count down Meter Out |28|64|
             Start Lamp |29|65|
@@ -14641,10 +14641,10 @@ ROM_END
 
   2) Pin 39 from solder side (speaker GND) and pin 04 from components side (PPI 8255 pin 11, PC6)
      are wired with a DS2401 (sillicon serial number) device, to pins 1 & 2 (GND & DATA).
-	 
-	 DS2401 has 64bits of internal data: 8 bits for family type + 48 bits for serial + 8 bits for CRC.
 
-	 Maxim/Dallas 1-Wire devices use what is called Dow CRC to check that the data bytes were received correctly.
+     DS2401 has 64bits of internal data: 8 bits for family type + 48 bits for serial + 8 bits for CRC.
+
+     Maxim/Dallas 1-Wire devices use what is called Dow CRC to check that the data bytes were received correctly.
      This returns an 8-bit CRC value as the last byte and uses a polynomial of X^8 + X^5 + X^4 + X^0.
 
   3) Z80 /INT line (pin 16) is out of socket and wired to a 74161.
@@ -14658,9 +14658,9 @@ ROM_END
   Seems that there is an extra layer for the bonus graphics.
   This graphic is taken from Bank 2, and is the "representative"
   for the chosen gfx set.
-  
+
   Code writes the bonus graphics at 9A80-9A89, and the "reel scroll"
-  at B0C0-B0FF... 
+  at B0C0-B0FF...
 
   Tileset:
   Reels GFX 1: 00-00-01-02-03-04-05-06-07-00
@@ -14730,7 +14730,7 @@ ROM_END
   Main - 50.
   Custom Hardware.
 
-*/  
+*/
 ROM_START( fl7_50 )  // Serial 00000069A1C9.
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "50-main.u22",  0x0000, 0x8000, CRC(e097e317) SHA1(a903144cc2290b7e22045490784b592adbf9ba97) )
@@ -14762,7 +14762,7 @@ ROM_END
   Main - 500.
   Custom Hardware.
 
-*/  
+*/
 ROM_START( fl7_500 )  // Serial 000000125873.
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "500-main.u22",  0x0000, 0x8000, CRC(e2c82c67) SHA1(951b0044de9b6104f51aa5a3176d0ea475415f7c) )
@@ -14794,7 +14794,7 @@ ROM_END
   Main - 2000.
   Custom Hardware.
 
-*/  
+*/
 ROM_START( fl7_2000 )  // Serial 00000063A47F.
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "2000_main_27c256.u22",  0x0000, 0x8000, CRC(9659b045) SHA1(801b6733b70b35de65cd8faba6814fa013c05ad0) )
@@ -14826,7 +14826,7 @@ ROM_END
   2000 Bonus. Egyptian Gold.
   Custom Hardware.
 
-*/  
+*/
 ROM_START( fl7_2k16 )  // Serial 000000743111.
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "2000_bonus_27c256.u22",  0x0000, 0x8000, CRC(290c37b0) SHA1(a90093d2139fd5ca261870298c2d84648f14e6bc) )
@@ -14857,7 +14857,7 @@ ROM_END
 
   Needs proper graphics ROM decryption and gfxdecode...
 
-*/  
+*/
 ROM_START( fl7_tw )  // Serial 00000050E9B7.
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27c512_tw.u20",  0x0000, 0x10000, CRC(50927a1b) SHA1(2557069f497b23f13978294f3ac108229d9db544) )  // identical halves.
@@ -15532,7 +15532,7 @@ DRIVER_INIT_MEMBER(goldstar_state, wcherry)
 /*
   Flaming 7's
   Cyberdyne Systems.
-  
+
   Original custom hardware graphics decryption.
 
 */
@@ -15557,7 +15557,7 @@ DRIVER_INIT_MEMBER(wingco_state, flaming7)
 /*
   Flaming 7's
   Cyberdyne Systems.
-  
+
   Taiwanese custom hardware.
 
 */

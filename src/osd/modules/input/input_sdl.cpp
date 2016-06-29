@@ -513,7 +513,7 @@ public:
 		sdl_input_module::input_init(machine);
 
 		static int event_types[] = {
-			static_cast<int>(SDL_KEYDOWN), 
+			static_cast<int>(SDL_KEYDOWN),
 			static_cast<int>(SDL_KEYUP),
 			static_cast<int>(SDL_TEXTINPUT)
 		};

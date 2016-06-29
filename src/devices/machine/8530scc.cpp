@@ -480,8 +480,8 @@ UINT8 scc8530_t::read_reg(int offset)
 
 	switch(offset)
 	{
-		case 0:	/* Channel B (Printer Port) Control */
-		case 1:	/* Channel A (Modem Port) Control */
+		case 0: /* Channel B (Printer Port) Control */
+		case 1: /* Channel A (Modem Port) Control */
 
 			if (mode == 1)
 				mode = 0;
@@ -491,7 +491,7 @@ UINT8 scc8530_t::read_reg(int offset)
 			result = (offset == 0) ? getbreg() : getareg();
 			break;
 
-		case 2:	/* Channel B (Printer Port) Data */
+		case 2: /* Channel B (Printer Port) Data */
 		case 3:/* Channel A (Modem Port) Data */
 			result = channel[offset == 2 ? 1 : 0].rxData;
 			break;
@@ -527,8 +527,8 @@ void scc8530_t::write_reg(int offset, UINT8 data)
 	//Chan *pChan;
 	switch(offset)
 	{
-		case 0:	/* Channel B (Printer Port) Control */
-		case 1:	/* Channel A (Modem Port) Control */
+		case 0: /* Channel B (Printer Port) Control */
+		case 1: /* Channel A (Modem Port) Control */
 		{
 			int chan = ((offset == 2) ? 1 : 0);
 			if (mode == 0)
@@ -537,7 +537,7 @@ void scc8530_t::write_reg(int offset, UINT8 data)
 				{
 					mode = 1;
 					reg = data & 0x0f;
-//              	putbreg(data & 0xf0);
+//                  putbreg(data & 0xf0);
 				}
 				else if (data == 0x10)
 				{
@@ -555,8 +555,8 @@ void scc8530_t::write_reg(int offset, UINT8 data)
 			break;
 		}
 
-		case 2:	/* Channel B (Printer Port) Data */
-		case 3:	/* Channel A (Modem Port) Data */
+		case 2: /* Channel B (Printer Port) Data */
+		case 3: /* Channel A (Modem Port) Data */
 		{
 			int chan = ((offset == 2) ? 1 : 0);
 			if (channel[chan].txEnable)

@@ -4969,7 +4969,7 @@ ROM_END
   Golden Poker derivative, with blue killer circuitry.
   Suitable for "Good Luck" and "Buena Suerte" games.
   Addressing, ROM banks, and edge connector close to Magic Fly.
-  
+
   Discrete sound need to be traced...
 
   30x2-pins Edge connector + 10-pin connector.
@@ -4983,7 +4983,7 @@ ROM_END
             +5V.  | 01 |  +5V.
   (GND) Speaker-  | 02 |  Speaker- (GND)
                   | 03 |  Speaker+
-                  | 04 |  
+                  | 04 |
                   |    |
             Sync  | 05 |  Red
            Green  | 06 |  Blue
@@ -5007,8 +5007,8 @@ ROM_END
     Common D (4)  | 21 |  Common B (2)
                   |    |
                   | 22 |  n/c (5)
-                  | 23 |  
-                  | 24 |  
+                  | 23 |
+                  | 24 |
                   |    |
              GND  | 25 |  GND
          +12VAC.  | 26 |  +12VAC.
@@ -5020,10 +5020,10 @@ ROM_END
 
   (0) 12V. AV *IN*: for lamps, audio, and mech counters.
 
-  (1) = 
-  (2) = 
-  (3) = 
-  (4) = 
+  (1) =
+  (2) =
+  (3) =
+  (4) =
 
   Note: Each Common GND (A-B-C-D) are for their respective
   Multiplexed groups of inputs, since there are 4 groups
@@ -5038,10 +5038,10 @@ ROM_END
   ** 10-pin connector **
 
   Only the last 4 have a male connector. The rest are just marked on the PCB.
- 
+
   0000000000
   ++++
-  ||||    
+  ||||
   |||'-- Out Mech Counter.
   ||'--- Out Mech Counter.
   |'---- n/c (is routed to a place where another transistor could be mounted).

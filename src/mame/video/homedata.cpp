@@ -949,7 +949,7 @@ UINT32 homedata_state::screen_update_pteacher(screen_device &screen, bitmap_ind1
 	   246     = 96 17 ef db (mjjoship)
 	   35*8    = bc 0b ef f0
 	   51*8    = a6 07 ef db (mjikaga)
-           414     = b7 10 ef db (mjjoship, db becomes e8 after first loss)
+	       414     = b7 10 ef db (mjjoship, db becomes e8 after first loss)
 	   54*8    = bc 07 ef e8
 
 	   but in mjkinjas it's
@@ -987,17 +987,17 @@ UINT32 homedata_state::screen_update_pteacher(screen_device &screen, bitmap_ind1
 	}
 	else
 	{
-		if (m_vreg[0x3] == 0xa6) 
+		if (m_vreg[0x3] == 0xa6)
 		{
 			screen.set_visible_area(0*8, 51*8-1, 2*8, 30*8-1);
 			scroll_low = 7 - (m_vreg[0x4] & 0x0f);
 		}
-		else if (m_vreg[0x3] == 0xb7) 
+		else if (m_vreg[0x3] == 0xb7)
 		{
 			screen.set_visible_area(0*8, 52*8-3, 2*8, 30*8-1);
-                	scroll_low = 0;
+					scroll_low = 0;
 		}
-		else 
+		else
 		{
 			screen.set_visible_area(0*8, 54*8-1, 2*8, 30*8-1);
 			scroll_low = 7 - (m_vreg[0x4] & 0x0f);

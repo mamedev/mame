@@ -99,12 +99,12 @@ public:
 	bool open_impl(std::string const &dirname);
 
 private:
-	typedef std::unique_ptr<DIR, int (*)(DIR *)>	dir_ptr;
+	typedef std::unique_ptr<DIR, int (*)(DIR *)>    dir_ptr;
 
-	entry		m_entry;
-	sdl_dirent	*m_data;
-	dir_ptr		m_fd;
-	std::string	m_path;
+	entry       m_entry;
+	sdl_dirent  *m_data;
+	dir_ptr     m_fd;
+	std::string m_path;
 };
 
 

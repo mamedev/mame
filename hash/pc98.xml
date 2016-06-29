@@ -27836,7 +27836,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 			</dataarea>
 		</part>
 	</software>
-	
+
 <!-- confirmed as good by peter_j -->
 	<software name="3dgolfb" cloneof="3dgolf">
 		<description>New 3D Golf Simulation - Harukanaru Augusta (Alt Format)</description>
@@ -27872,7 +27872,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 			</dataarea>
 		</part>
 	</software>
-	
+
 <!-- confirmed as good by peter_j -->
 	<software name="3dgolf8la" cloneof="3dgolf">
 		<description>New 3D Golf Simulation - Eight Lakes G.C. (Alt Format)</description>
@@ -27917,7 +27917,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 			</dataarea>
 		</part>
 	</software>
-	
+
 <!-- confirmed as good by peter_j -->
 	<software name="3dgolfwka" cloneof="3dgolf">
 		<description>New 3D Golf Simulation - Waialae no Kiseki (Alt Format)</description>

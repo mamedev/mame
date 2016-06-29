@@ -460,11 +460,11 @@ class nes_rt01_device : public nes_nrom_device
 public:
 	// construction/destruction
 	nes_rt01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual DECLARE_READ8_MEMBER(read_h) override;
-	
+
 	virtual void pcb_reset() override;
 };
 

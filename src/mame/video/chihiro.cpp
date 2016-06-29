@@ -4617,7 +4617,7 @@ WRITE32_MEMBER(nv2a_renderer::geforce_w)
 			//printf("dmaget %08X dmaput %08X\n\r",*dmaget,*dmaput);
 			if (((*dmaput == 0x048cf000) && (*dmaget == 0x07f4d000)) || // only for outr2
 				((*dmaput == 0x07dca000) && (*dmaget == 0x07f4d000))) // only for crtaxihr
-			{ 
+			{
 				*dmaget = *dmaput;
 				puller_waiting = 0;
 				puller_timer->enable(false);

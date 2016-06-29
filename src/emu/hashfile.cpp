@@ -32,7 +32,7 @@ bool read_hash_config(device_image_interface &image, const char *sysname, std::s
 	pugi::xml_document doc;
 
 	pugi::xml_parse_result res = doc.load_file(file.fullpath());
-	if (res) 
+	if (res)
 	{
 		// Do search by CRC32 and SHA1
 		std::string query = "/hashfile/hash[";
@@ -46,7 +46,7 @@ bool read_hash_config(device_image_interface &image, const char *sysname, std::s
 			return true;
 		}
 
-		// Try search by CRC32 only 
+		// Try search by CRC32 only
 		query = "/hashfile/hash[";
 		query += "@crc32='" + crc + "']/extrainfo";
 		tools = doc.select_nodes(query.c_str());

@@ -389,11 +389,11 @@ UINT32 exerion_state::screen_update_exerion(screen_device &screen, bitmap_ind16 
 				code &= ~0x10, code2 |= 0x10;
 
 			gfx->transmask(bitmap,cliprect, code2, color, xflip, yflip, x, y + gfx->height(),
-						   m_palette->transpen_mask(*gfx, color, 0x10));
+							m_palette->transpen_mask(*gfx, color, 0x10));
 		}
 
 		gfx->transmask(bitmap,cliprect, code, color, xflip, yflip, x, y,
-					   m_palette->transpen_mask(*gfx, color, 0x10));
+						m_palette->transpen_mask(*gfx, color, 0x10));
 
 		if (doubled) i += 4;
 	}

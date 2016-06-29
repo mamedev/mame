@@ -74,7 +74,7 @@ READ8_MEMBER(sega_fm_unit_device::peripheral_r)
 		return m_audio_control & 0x01;
 	}
 	// will not be called for other offsets.
-	return 0xff; 
+	return 0xff;
 }
 
 //-------------------------------------------------
@@ -116,4 +116,3 @@ bool sega_fm_unit_device::is_writeable(UINT8 offset)
 {
 	return (offset <= 2) ? true : false;
 }
-

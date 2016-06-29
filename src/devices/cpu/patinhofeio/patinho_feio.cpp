@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Felipe Sanches
 /*
-	CPU emulation for Patinho Feio, the first computer designed and manufactured in Brazil
+    CPU emulation for Patinho Feio, the first computer designed and manufactured in Brazil
 */
 
 #include "emu.h"
@@ -91,11 +91,11 @@ void patinho_feio_cpu_device::device_start()
 //TODO: implement handling of these special purpose registers
 //      which are also mapped to the first few main memory positions:
 //
-//      ERI: "Endereço de Retorno de Interrupção"
+//      ERI: "Endereco de Retorno de Interrupcao"
 //           "Interrupt Return Address"
 //           stored at addresses 002 and 003
 //
-//      ETI: "início de uma rotina de tratamento de interrupção (se houver)"
+//      ETI: "inicio de uma rotina de tratamento de interrupcao (se houver)"
 //           "start of an interrupt service routine (if any)"
 //           stored at address 004 (and 005 as well?)
 //
@@ -333,7 +333,7 @@ void patinho_feio_cpu_device::execute_instruction()
 		case 0x90:
 			//ST 0 = "Se T=0, Pula"
 			//       If T is zero, skip the next instruction
-                        if ((FLAGS & T) == 0)
+						if ((FLAGS & T) == 0)
 				INCREMENT_PC_4K; //skip
 			return;
 		case 0x91:
@@ -348,7 +348,7 @@ void patinho_feio_cpu_device::execute_instruction()
 		case 0x92:
 			//ST 1 = "Se T=1, Pula"
 			//       If T is one, skip the next instruction
-                        if ((FLAGS & T) == 1)
+						if ((FLAGS & T) == 1)
 				INCREMENT_PC_4K; //skip
 			return;
 		case 0x93:
@@ -363,7 +363,7 @@ void patinho_feio_cpu_device::execute_instruction()
 		case 0x94:
 			//SV 0 = "Se V=0, Pula"
 			//       If V is zero, skip the next instruction
-                        if ((FLAGS & V) == 0)
+						if ((FLAGS & V) == 0)
 				INCREMENT_PC_4K; //skip
 			return;
 		case 0x95:
@@ -378,7 +378,7 @@ void patinho_feio_cpu_device::execute_instruction()
 		case 0x96:
 			//SV 1 = "Se V=1, Pula"
 			//       If V is one, skip the next instruction
-                        if ((FLAGS & V) == 1)
+						if ((FLAGS & V) == 1)
 				INCREMENT_PC_4K; //skip
 			return;
 		case 0x97:
@@ -391,17 +391,17 @@ void patinho_feio_cpu_device::execute_instruction()
 			}
 			return;
 		case 0x98:
-			//PUL="Pula para /002 a limpa estado de interrupção"
+			//PUL="Pula para /002 a limpa estado de interrupcao"
 			//     Jump to address /002 and disables interrupts
-                        PC = 0x002;
+						PC = 0x002;
 			m_interrupts_enabled = false;
 			return;
 		case 0x99:
-			//TRE="Troca conteúdos de ACC e EXT"
+			//TRE="Troca conteudos de ACC e EXT"
 			//     Exchange the value of the accumulator with the ACC extension register
-                        value = ACC;
-                        ACC = READ_ACC_EXTENSION_REG();
-                        WRITE_ACC_EXTENSION_REG(value);
+						value = ACC;
+						ACC = READ_ACC_EXTENSION_REG();
+						WRITE_ACC_EXTENSION_REG(value);
 			return;
 		case 0x9A:
 			//INIB="Inibe"
@@ -621,7 +621,7 @@ void patinho_feio_cpu_device::execute_instruction()
 					{
 						case 0:
 							// FNC /n0: Desliga flip-flop PERMITE/IMPEDE para
-							//          o dispositivo n (isto é, impede inter-
+							//          o dispositivo n (isto e, impede inter-
 							//          -rupcao do dispositivo n).
 							//
 							//          Turns off the interrupt ENABLE/DISABLE
@@ -654,7 +654,7 @@ void patinho_feio_cpu_device::execute_instruction()
 							break;
 						case 5:
 							// FNC /n5: Liga flip-flop PERMITE/IMPEDE para  o
-							//          dispositivo n (isto é, permite inter-
+							//          dispositivo n (isto e, permite inter-
 							//          -rupcao do dispositivo n).
 							//
 							//          Turns on the interrupt ENABLE/DISABLE
@@ -681,7 +681,7 @@ void patinho_feio_cpu_device::execute_instruction()
 							m_iodev_control[channel] = NO_REQUEST;
 							break;
 						case 8:
-							// FNC /n8: Só funciona na leitora de fita, ca-
+							// FNC /n8: So funciona na leitora de fita, ca-
 							//          nal /E. Ignora todos os "feed-fra-
 							//          -mes" ("bytes" nulos) da fita, ate' a
 							//          proxima perfuracao (1o "byte" nao
@@ -695,7 +695,7 @@ void patinho_feio_cpu_device::execute_instruction()
 								//TODO: Implement-me!
 							} else {
 								printf("Function 8 of the /FNC instruction can only be used with"\
-								       "the papertape reader device at channel /E.\n");
+										"the papertape reader device at channel /E.\n");
 							}
 							break;
 						default:
@@ -705,7 +705,7 @@ void patinho_feio_cpu_device::execute_instruction()
 				case 0x20:
 					//SAL="Salta"
 					//    Skips a couple bytes if a condition is met
-                                        skip = false;
+										skip = false;
 					switch(function)
 					{
 						case 1:

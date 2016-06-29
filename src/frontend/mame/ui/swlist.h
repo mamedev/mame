@@ -15,7 +15,6 @@
 
 
 namespace ui {
-
 // ======================> menu_software_parts
 
 class menu_software_parts : public menu

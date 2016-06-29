@@ -111,25 +111,25 @@ struct SHARC_DMA_OP
 #define MODE2_CAFRZ         0x80000     /* Cache freeze */
 
 
-#define SIGN_EXTEND6(x)				(((x) & 0x20) ? (0xffffffc0 | (x)) : (x))
-#define SIGN_EXTEND24(x)			(((x) & 0x800000) ? (0xff000000 | (x)) : (x))
+#define SIGN_EXTEND6(x)             (((x) & 0x20) ? (0xffffffc0 | (x)) : (x))
+#define SIGN_EXTEND24(x)            (((x) & 0x800000) ? (0xff000000 | (x)) : (x))
 #define MAKE_EXTRACT_MASK(start_bit, length)    ((0xffffffff << start_bit) & (((UINT32)0xffffffff) >> (32 - (start_bit + length))))
 
-#define OP_USERFLAG_COUNTER_LOOP			0x00000001
-#define OP_USERFLAG_COND_LOOP				0x00000002
-#define OP_USERFLAG_COND_FIELD				0x000003fc
-#define OP_USERFLAG_COND_FIELD_SHIFT		2
-#define OP_USERFLAG_ASTAT_DELAY_COPY_AZ		0x00001000
-#define OP_USERFLAG_ASTAT_DELAY_COPY_AN		0x00002000
-#define OP_USERFLAG_ASTAT_DELAY_COPY_AC		0x00004000
-#define OP_USERFLAG_ASTAT_DELAY_COPY_AV		0x00008000
-#define OP_USERFLAG_ASTAT_DELAY_COPY_MV		0x00010000
-#define OP_USERFLAG_ASTAT_DELAY_COPY_MN		0x00020000
-#define OP_USERFLAG_ASTAT_DELAY_COPY_SV		0x00040000
-#define OP_USERFLAG_ASTAT_DELAY_COPY_SZ		0x00080000
-#define OP_USERFLAG_ASTAT_DELAY_COPY_BTF	0x00100000
-#define OP_USERFLAG_ASTAT_DELAY_COPY		0x001ff000
-#define OP_USERFLAG_CALL					0x10000000
+#define OP_USERFLAG_COUNTER_LOOP            0x00000001
+#define OP_USERFLAG_COND_LOOP               0x00000002
+#define OP_USERFLAG_COND_FIELD              0x000003fc
+#define OP_USERFLAG_COND_FIELD_SHIFT        2
+#define OP_USERFLAG_ASTAT_DELAY_COPY_AZ     0x00001000
+#define OP_USERFLAG_ASTAT_DELAY_COPY_AN     0x00002000
+#define OP_USERFLAG_ASTAT_DELAY_COPY_AC     0x00004000
+#define OP_USERFLAG_ASTAT_DELAY_COPY_AV     0x00008000
+#define OP_USERFLAG_ASTAT_DELAY_COPY_MV     0x00010000
+#define OP_USERFLAG_ASTAT_DELAY_COPY_MN     0x00020000
+#define OP_USERFLAG_ASTAT_DELAY_COPY_SV     0x00040000
+#define OP_USERFLAG_ASTAT_DELAY_COPY_SZ     0x00080000
+#define OP_USERFLAG_ASTAT_DELAY_COPY_BTF    0x00100000
+#define OP_USERFLAG_ASTAT_DELAY_COPY        0x001ff000
+#define OP_USERFLAG_CALL                    0x10000000
 
 
 #define MCFG_SHARC_BOOT_MODE(boot_mode) \
@@ -439,7 +439,7 @@ private:
 	uml::code_handle *m_pop_loop;
 	uml::code_handle *m_push_status;
 	uml::code_handle *m_pop_status;
-	uml::code_handle *m_exception[EXCEPTION_COUNT];		// exception handlers
+	uml::code_handle *m_exception[EXCEPTION_COUNT];     // exception handlers
 	uml::code_handle *m_swap_dag1_0_3;
 	uml::code_handle *m_swap_dag1_4_7;
 	uml::code_handle *m_swap_dag2_0_3;
@@ -596,7 +596,7 @@ private:
 	{
 		UINT32 cycles;                             /* accumulated cycles */
 		UINT8  checkints;                          /* need to check interrupts before next instruction */
-		uml::code_label  labelnum;				   /* index for local labels */
+		uml::code_label  labelnum;                 /* index for local labels */
 		struct
 		{
 			int counter;

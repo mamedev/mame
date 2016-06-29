@@ -452,7 +452,7 @@ void gb_rom_mbc3_device::update_rtc()
 {
 	system_time curtime;
 	machine().current_datetime(curtime);
-	
+
 	m_rtc_regs[0] = curtime.local_time.second;
 	m_rtc_regs[1] = curtime.local_time.minute;
 	m_rtc_regs[2] = curtime.local_time.hour;
@@ -700,7 +700,7 @@ WRITE8_MEMBER(gb_rom_m161_device::write_bank)
 {
 	// the mapper (74HC161A) only has data lines D2..D0
 	data &= 0x07;
-	
+
 	// A15 is connected to #LOAD and overwritten by QD (m_load_disable)
 	switch (offset & 0x8000)
 	{
@@ -719,31 +719,30 @@ WRITE8_MEMBER(gb_rom_m161_device::write_bank)
 
 READ8_MEMBER(gb_rom_mmm01_device::read_rom)
 {
-
 	UINT16 romb = m_romb & ~m_romb_nwe;
 	UINT16 romb_base = m_romb & (0x1e0 | m_romb_nwe);
 	UINT8 ramb_masked = ((offset & 0x4000) | m_mode ? m_ramb : m_ramb & ~0x03);
-	
+
 	// zero-adjust RA18..RA14
 	romb = (romb ? romb : 0x01);
 	// if unmapped, force
 	romb = (m_map ? romb : 0x01);
-	
+
 	// RB 0 logic
 	if (!(offset & 0x4000))
 		romb = 0x00;
-	
+
 	// combine with base
 	romb |= romb_base;
-	
+
 	// multiplex with AA14..AA13
 	if (m_mux)
 		romb = (romb & ~0x60) | ((ramb_masked & 0x03) << 5);
-	
+
 	// if unmapped, force
 	if (!m_map)
 		romb |= 0x1fe;
-	
+
 	return m_rom[rom_bank_map[romb] * 0x4000 + (offset & 0x3fff)];
 }
 
@@ -751,7 +750,7 @@ WRITE8_MEMBER(gb_rom_mmm01_device::write_bank)
 {
 	// the mapper only has data lines D6..D0
 	data &= 0x7f;
-	
+
 	// the mapper only uses inputs A15..A13
 	switch (offset & 0xe000)
 	{
@@ -765,7 +764,7 @@ WRITE8_MEMBER(gb_rom_mmm01_device::write_bank)
 		case 0x2000: // RA20..RA19 RA18..RA14
 			if (!m_map)
 				m_romb = (m_romb & ~0x60) | (data & 0x60);
-			
+
 			m_romb = (m_romb & (~0x1f | m_romb_nwe)) | (data & (0x1f & ~m_romb_nwe));
 			break;
 		case 0x4000: // Mode #WE, RA22..RA21, AA16..AA15, AA14..AA13
@@ -774,7 +773,7 @@ WRITE8_MEMBER(gb_rom_mmm01_device::write_bank)
 				m_romb = (m_romb & ~0x180) | ((data & 0x30) << 3);
 				m_ramb = (m_ramb & ~0x0c) | (data & 0x0c);
 			}
-			
+
 			m_ramb = (m_ramb & (~0x03 | m_ramb_nwe)) | (data & (0x03 & ~m_ramb_nwe));
 			break;
 		case 0x6000: // Mux, RA18..RA15 #WE/Mask, ???, MBC1 Mode
@@ -783,7 +782,7 @@ WRITE8_MEMBER(gb_rom_mmm01_device::write_bank)
 				// m_romb_nwe is aligned to RA14, hence >> 1 instead of >> 2
 				m_romb_nwe = (data & 0x3c) >> 1;
 			}
-			
+
 			if (!m_mode_nwe)
 				m_mode = data & 0x01;
 			break;
@@ -796,11 +795,11 @@ READ8_MEMBER(gb_rom_mmm01_device::read_ram)
 {
 	UINT8 ramb_masked = ((offset & 0x4000) | m_mode ? m_ramb : m_ramb & ~0x03);
 	UINT8 ramb = ramb_masked;
-	
+
 	// multiplex with RA20..RA19
 	if (m_mux)
 		ramb = (ramb & ~0x03) | ((m_romb & 0x60) >> 5);
-	
+
 	if (!m_ram.empty() && m_ram_enable)
 	{
 		return m_ram[ram_bank_map[ramb] * 0x2000 + (offset & 0x1fff)];
@@ -813,11 +812,11 @@ WRITE8_MEMBER(gb_rom_mmm01_device::write_ram)
 {
 	UINT8 ramb_masked = ((offset & 0x4000) | m_mode ? m_ramb : m_ramb & ~0x03);
 	UINT8 ramb = ramb_masked;
-	
+
 	// multiplex with RA20..RA19
 	if (m_mux)
 		ramb = (ramb & ~0x03) | ((m_romb & 0x60) >> 5);
-	
+
 	if (!m_ram.empty() && m_ram_enable)
 	{
 		m_ram[ram_bank_map[ramb] * 0x2000 + (offset & 0x1fff)] = data;

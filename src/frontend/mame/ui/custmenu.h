@@ -18,7 +18,6 @@
 #include "ui/utils.h"
 
 namespace ui {
-
 // Software region
 struct c_sw_region
 {

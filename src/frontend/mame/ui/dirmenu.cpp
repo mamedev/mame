@@ -21,7 +21,6 @@
 
 
 namespace ui {
-
 static int ADDING = 1;
 static int CHANGE = 2;
 

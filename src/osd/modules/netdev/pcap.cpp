@@ -13,7 +13,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #undef interface
-#define LIB_NAME	"wpcap.dll"
+#define LIB_NAME    "wpcap.dll"
 
 #elif defined(SDLMAME_MACOSX)
 #include <pthread.h>

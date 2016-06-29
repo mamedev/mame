@@ -2510,7 +2510,7 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-<!-- 
+<!--
 This cart features a RTC, currently unemulated
 -->
 	<software name="doubutsu">
@@ -5745,7 +5745,7 @@ This cart features a RTC, currently unemulated
 		</part>
 	</software>
 
-<!-- 
+<!--
 This cart features two SmartMedia slots to import pictures to manipulate in the game, currently unemulated
 -->
 	<software name="mariopho">
@@ -6281,7 +6281,7 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 		</part>
 	</software>
 
-<!-- 
+<!--
 This cart features a built-in RJ-42 Modem Connection port to play online, currently unemulated
 -->
 	<software name="moritash">
@@ -9874,7 +9874,7 @@ patched out (+ a fix for internal checksum)
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-01" />
 			<feature name="u1" value="NUS-NSMP-0" />
-			<feature name="u2" value="BU9850" />		<!-- also found with BK4D-NUS -->
+			<feature name="u2" value="BU9850" />        <!-- also found with BK4D-NUS -->
 			<feature name="u3" value="CIC-NUS-7101" />
 			<feature name="cart_model" value="NUS-006(EUR)" />
 			<feature name="cart_back_label" value="NUS-EUR" />
@@ -10211,9 +10211,9 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-<!-- 
-The game came with the Nintendo-Seta Bio Sensor, a special controller with a clip on the end, to measure 
-user's heart beat. One end of the sensor plugs into the extension port on the controller, and the other end 
+<!--
+The game came with the Nintendo-Seta Bio Sensor, a special controller with a clip on the end, to measure
+user's heart beat. One end of the sensor plugs into the extension port on the controller, and the other end
 clips onto the player's ear.
 -->
 	<software name="tetris64">

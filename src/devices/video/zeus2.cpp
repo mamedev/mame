@@ -38,7 +38,7 @@ TIMER_CALLBACK_MEMBER(zeus2_device::display_irq_off)
 
 	///* if zero, adjust to next frame, otherwise we may get stuck in an infinite loop */
 	//if (vblank_period == attotime::zero)
-	//	vblank_period = m_screen->frame_period();
+	//  vblank_period = m_screen->frame_period();
 	//vblank_timer->adjust(vblank_period);
 	vblank_timer->adjust(m_screen->time_until_vblank_start());
 	//machine().scheduler().timer_set(attotime::from_hz(30000000), timer_expired_delegate(FUNC(zeus2_device::display_irq), this));
@@ -66,7 +66,6 @@ TIMER_CALLBACK_MEMBER(zeus2_device::int_timer_callback)
 
 void zeus2_device::device_start()
 {
-
 	/* allocate memory for "wave" RAM */
 	waveram[0] = auto_alloc_array(machine(), UINT32, WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8/4);
 	//waveram[1] = auto_alloc_array(machine(), UINT32, WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 12/4);
@@ -257,7 +256,7 @@ if (machine().input().code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popmessage("Z
 
 READ32_MEMBER( zeus2_device::zeus2_r )
 {
-	int logit = (offset != 0x00 && offset != 0x01 && 
+	int logit = (offset != 0x00 && offset != 0x01 &&
 		offset != 0x48 && offset != 0x49 &&
 		offset != 0x54 && offset != 0x58 && offset != 0x59 && offset != 0x5a);
 	logit &= LOG_REGS;
@@ -457,7 +456,7 @@ void zeus2_device::zeus2_register_update(offs_t offset, UINT32 oldval, int logit
 					m_zeusbase[0x41] += (m_zeusbase[0x41] & 0x400) << 6;
 					m_zeusbase[0x41] &= ~0xfc00;
 				}
-			}			
+			}
 			break;
 		case 0x41:
 			/* this is the address, except in read mode, where it latches values */
@@ -541,7 +540,7 @@ void zeus2_device::zeus2_register_update(offs_t offset, UINT32 oldval, int logit
 				//printf("Clearing buffer: numPixels: %08X addr: %08X reg50: %08X\n", numBytes/4, addr, m_zeusbase[0x50]);
 				memset(&m_frameColor[addr], m_fill_color, numBytes);
 				memset(&m_frameDepth[addr], m_fill_depth, numBytes/2);
-			} 
+			}
 			else if ((m_zeusbase[0x5e] >> 16) != 0xf208 && !(m_zeusbase[0x5e] & 0xffff)) {
 			/* If 0x5e==0xf20a0000 (atlantis) or 0xf20d0000 (the grid) then process the read/write now */
 				/*
@@ -585,16 +584,16 @@ void zeus2_device::zeus2_register_update(offs_t offset, UINT32 oldval, int logit
 			/* thegrid uses this to write either left or right halves of pixels */
 			//if (m_zeusbase[0x50] == 0x00e90000)
 			//{
-			//	UINT32 addr = frame_addr_from_reg51();
-			//	if (m_zeusbase[0x57] & 1)
-			//		m_frameColor[addr] = m_zeusbase[0x58];
-			//	if (m_zeusbase[0x57] & 4)
-			//		m_frameColor[addr+1] = m_zeusbase[0x59];
+			//  UINT32 addr = frame_addr_from_reg51();
+			//  if (m_zeusbase[0x57] & 1)
+			//      m_frameColor[addr] = m_zeusbase[0x58];
+			//  if (m_zeusbase[0x57] & 4)
+			//      m_frameColor[addr+1] = m_zeusbase[0x59];
 			//}
 
 			///* make sure we log anything else */
 			//else if (logit)
-			//	logerror("\t[50]=%08X [5E]=%08X\n", m_zeusbase[0x50], m_zeusbase[0x5e]);
+			//  logerror("\t[50]=%08X [5E]=%08X\n", m_zeusbase[0x50], m_zeusbase[0x5e]);
 			break;
 
 		case 0x58:
@@ -1246,39 +1245,39 @@ void zeus2_renderer::zeus2_draw_quad(const UINT32 *databuffer, UINT32 texdata, i
 	//case 0x95d:     /* crusnexo */
 	//case 0xc1d:     /* crusnexo */
 	//case 0xc5d:     /* crusnexo */
-	//	extra.texwidth = 256;
-	//	break;
+	//  extra.texwidth = 256;
+	//  break;
 
 	//case 0x18a:     // atlantis
 	//case 0x059:     /* crusnexo */
 	//case 0x0d9:     /* crusnexo */
 	//case 0x119:     /* crusnexo: license plates */
 	//case 0x159:     /* crusnexo */
-	//	extra.texwidth = 128;
-	//	break;
+	//  extra.texwidth = 128;
+	//  break;
 
 	//case 0x055:     /* crusnexo */
 	//case 0x145:     // atlantis
 	//case 0x155:     /* crusnexo */
-	//	extra.texwidth = 64;
-	//	break;
+	//  extra.texwidth = 64;
+	//  break;
 
 	//case 0x000:     // thegrid guess
 	//case 0x120:     // thegrid guess
 	//case 0x140:     // atlantis
 	//case 0x141:     // atlantis
-	//	extra.texwidth = 32;
-	//	break;
+	//  extra.texwidth = 32;
+	//  break;
 
 	//default:
 	//{
-	//	static UINT8 hits[0x10000];
-	//	if (!hits[(texdata & 0xffff)])
-	//	{
-	//		hits[(texdata & 0xffff)] = 1;
-	//		printf("texMode = %04X\n", (texdata & 0xffff));
-	//	}
-	//	break;
+	//  static UINT8 hits[0x10000];
+	//  if (!hits[(texdata & 0xffff)])
+	//  {
+	//      hits[(texdata & 0xffff)] = 1;
+	//      printf("texMode = %04X\n", (texdata & 0xffff));
+	//  }
+	//  break;
 	//}
 	//}
 

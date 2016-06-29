@@ -185,7 +185,7 @@ stack_walker::stack_walker()
 	m_sym_function_table_access_64 = m_dbghelp_dll->bind<SymFunctionTableAccess64_fn>("SymFunctionTableAccess64");
 	m_sym_get_module_base_64 = m_dbghelp_dll->bind<SymGetModuleBase64_fn>("SymGetModuleBase64");
 	m_rtl_capture_context = m_kernel32_dll->bind<RtlCaptureContext_fn>("RtlCaptureContext");
-	
+
 	// initialize the symbols
 	if (!s_initialized && m_sym_initialize && m_stack_walk_64 && m_sym_function_table_access_64 && m_sym_get_module_base_64)
 	{

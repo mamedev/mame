@@ -24,12 +24,12 @@
 #define LK_CMD_ENB_BELL         0x23    /* enable the bell - 1st param: volume */
 #define LK_CMD_BELL             0xa7    /* emit a bell - 1st param: volume */
 
-// TCR - Timer Compare Register 
+// TCR - Timer Compare Register
 #define TCR_OCIE 0x40 // Bit 6 (output compare IRQ enable)
-#define TCR_OLVL 0x01 // Bit 1 (output level)        
+#define TCR_OLVL 0x01 // Bit 1 (output level)
 
-// TSR - Timer Status Register 
-#define TSR_OCFL 0x40 // TSR (68HC05 output compare flag)  
+// TSR - Timer Status Register
+#define TSR_OCFL 0x40 // TSR (68HC05 output compare flag)
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS

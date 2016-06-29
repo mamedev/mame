@@ -365,7 +365,7 @@ PALETTE_INIT_MEMBER(lgp_state, lgp)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-//	for (i = 0; i < palette.entries(); i++)
+//  for (i = 0; i < palette.entries(); i++)
 	for (i = 0; i < 0x20; i++)
 	{
 		int r,g,b;
@@ -388,8 +388,8 @@ PALETTE_INIT_MEMBER(lgp_state, lgp)
 		bit1 = (color_prom[i] >> 4) & 0x01;
 		bit2 = (color_prom[i] >> 5) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		
-		
+
+
 		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 
@@ -513,7 +513,7 @@ ROM_START( lgp )
 	ROM_LOAD( "a02_39.109", 0x00300, 0x100, CRC(88363809) SHA1(b22a7bd8ce6b28bf7cfa64c3a08e4cf7f9b4cd20) )
 	ROM_LOAD( "a02_40.110", 0x00400, 0x100, CRC(fdfc7aac) SHA1(2413f7f9ad11c91d2adc0aab37bf70ff5c68ab6f) )
 
-	
+
 	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "lgp", 0, NO_DUMP )
 ROM_END

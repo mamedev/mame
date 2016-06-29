@@ -100,7 +100,7 @@ private:
 		// construction/destruction
 		item(const char *text, UINT64 value, int valformat)
 			: m_text(text),
-			  m_value(value, valformat) { }
+				m_value(value, valformat) { }
 
 		// getters
 		const number_and_format &value() const { return m_value; }
@@ -175,12 +175,12 @@ private:
 		void validate_format(const char *filename, int line);
 
 		// internal state
-		parsed_expression   m_condition;							// condition under which this is executed
-		parsed_expression   m_expression;							// expression to execute
-		std::string         m_format;								// string format to print
-		std::vector<std::unique_ptr<output_argument>> m_arglist;	// list of arguments
-		INT8                m_line;									// which line to print on
-		ui::text_layout::text_justify m_justify;					// justification when printing
+		parsed_expression   m_condition;                            // condition under which this is executed
+		parsed_expression   m_expression;                           // expression to execute
+		std::string         m_format;                               // string format to print
+		std::vector<std::unique_ptr<output_argument>> m_arglist;    // list of arguments
+		INT8                m_line;                                 // which line to print on
+		ui::text_layout::text_justify m_justify;                    // justification when printing
 
 		// constants
 		static const int MAX_ARGUMENTS = 32;
@@ -306,12 +306,12 @@ private:
 	std::vector<std::unique_ptr<cheat_entry>> m_cheatlist;                   // cheat list
 	UINT64              m_framecount;                       // frame count
 	std::vector<std::string>  m_output;                     // array of output strings
-	std::vector<ui::text_layout::text_justify> m_justify;	// justification for each string
+	std::vector<ui::text_layout::text_justify> m_justify;   // justification for each string
 	UINT8               m_numlines;                         // number of lines available for output
 	INT8                m_lastline;                         // last line used for output
 	bool                m_disabled;                         // true if the cheat engine is disabled
 	symbol_table        m_symtable;                         // global symbol table
-	std::unique_ptr<debugger_cpu> m_cpu;					// debugger interface for cpus/memory
+	std::unique_ptr<debugger_cpu> m_cpu;                    // debugger interface for cpus/memory
 
 	// constants
 	static constexpr int CHEAT_VERSION = 1;

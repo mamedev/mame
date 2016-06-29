@@ -252,7 +252,7 @@ void nes_ks7016_device::pcb_reset()
 	prg8_cd(0xe);
 	prg8_ef(0xf);
 	chr8(0, CHRRAM);
-	
+
 	m_reg = 4;
 }
 
@@ -270,7 +270,7 @@ void nes_ks7037_device::pcb_reset()
 	prg8_cd(0);
 	prg8_ef(0x1f);
 	chr8(0, CHRRAM);
-	
+
 	memset(m_reg, 0, sizeof(m_reg));
 	m_latch = 0;
 }
@@ -637,15 +637,15 @@ WRITE8_MEMBER(nes_ks7031_device::write_h)
 
 
 /*-------------------------------------------------
- 
+
  Kaiser Board KS7016
- 
+
  Games: Exciting Basket FDS Conversion
- 
+
  iNES:
- 
+
  In MESS: Unsupported.
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(nes_ks7016_device::read_m)
@@ -666,20 +666,20 @@ WRITE8_MEMBER(nes_ks7016_device::write_h)
 
 
 /*-------------------------------------------------
- 
+
  Kaiser Board KS7037
- 
+
  Games: Metroid (FDS conversion)
- 
+
  This PCB maps PRG in 0x7000-0x7fff in a very
  similar fashion to LH10 (see bootleg.cpp)
  but with WRAM split between 0x6000-0x6fff
  and 0xb000-0xbfff.
- 
+
  iNES:
- 
+
  In MESS: Unsupported.
- 
+
  -------------------------------------------------*/
 
 void nes_ks7037_device::update_prg()
@@ -696,7 +696,7 @@ void nes_ks7037_device::update_prg()
 
 READ8_MEMBER(nes_ks7037_device::read_m)
 {
-//	LOG_MMC(("ks7037 read_m, offset: %04x\n", offset));
+//  LOG_MMC(("ks7037 read_m, offset: %04x\n", offset));
 	if (offset < 0x1000)
 		return m_prgram[offset & 0x0fff];
 	else
@@ -712,18 +712,18 @@ WRITE8_MEMBER(nes_ks7037_device::write_m)
 
 READ8_MEMBER(nes_ks7037_device::read_h)
 {
-//	LOG_MMC(("ks7037 read_h, offset: %04x\n", offset));
-	
+//  LOG_MMC(("ks7037 read_h, offset: %04x\n", offset));
+
 	if (offset >= 0x3000 && offset < 0x4000)
 		return m_prgram[0x1000 + (offset & 0x0fff)];
-	
+
 	return hi_access_rom(offset);
 }
 
 WRITE8_MEMBER(nes_ks7037_device::write_h)
 {
 	LOG_MMC(("ks7037 write_h, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (offset >= 0x3000 && offset < 0x4000)
 		m_prgram[0x1000 + (offset & 0x0fff)] = data;
 	else
@@ -740,4 +740,3 @@ WRITE8_MEMBER(nes_ks7037_device::write_h)
 		}
 	}
 }
-

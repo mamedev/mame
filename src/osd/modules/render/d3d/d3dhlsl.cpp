@@ -47,7 +47,7 @@ shaders::shaders() :
 	shadow_texture(nullptr), options(nullptr), avi_output_file(nullptr), avi_frame(0), avi_copy_surface(nullptr), avi_copy_texture(nullptr), avi_final_target(nullptr), avi_final_texture(nullptr),
 	black_surface(nullptr), black_texture(nullptr), render_snap(false), snap_rendered(false), snap_copy_target(nullptr), snap_copy_texture(nullptr), snap_target(nullptr), snap_texture(nullptr),
 	snap_width(0), snap_height(0), lines_pending(false), initialized(false), backbuffer(nullptr), curr_effect(nullptr), default_effect(nullptr), prescale_effect(nullptr), post_effect(nullptr),
-	distortion_effect(nullptr),	focus_effect(nullptr), phosphor_effect(nullptr), deconverge_effect(nullptr), color_effect(nullptr), ntsc_effect(nullptr), bloom_effect(nullptr),
+	distortion_effect(nullptr), focus_effect(nullptr), phosphor_effect(nullptr), deconverge_effect(nullptr), color_effect(nullptr), ntsc_effect(nullptr), bloom_effect(nullptr),
 	downsample_effect(nullptr), vector_effect(nullptr), fsfx_vertices(nullptr), curr_texture(nullptr), curr_render_target(nullptr), curr_poly(nullptr), targethead(nullptr), cachehead(nullptr)
 {
 }

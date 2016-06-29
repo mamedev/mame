@@ -270,7 +270,7 @@ class md_rom_cjmjclub_device : public md_std_rom_device
 public:
 	// construction/destruction
 	md_rom_cjmjclub_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
 };

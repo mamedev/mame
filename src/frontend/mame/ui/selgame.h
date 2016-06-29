@@ -17,7 +17,6 @@
 
 
 namespace ui {
-
 class menu_select_game : public menu
 {
 public:

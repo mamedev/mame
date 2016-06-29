@@ -62,7 +62,7 @@
       [0x01 to 0x0d] ROM header, i.e. title for the loader
       [0x12 -  0x13] initial copy size
       [0x14 -  0x15] destination address start address
-      [0x16 to 0x17] start boot jump vector 
+      [0x16 to 0x17] start boot jump vector
       [0x1d to 0x1f] start boot data vector
     - Gruppe: shows a random bitmap graphic then returns "program load error" ... it wants that the floppy has write protection enabled (!) (btanb)
     - Maidum: you need to load BOTH disk with write protection disabled, otherwise it refuses to run. (btanb)

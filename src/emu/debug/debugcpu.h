@@ -603,36 +603,35 @@ private:
 	/* internal helpers */
 	void on_vblank(screen_device &device, bool vblank_state);
 
-	running_machine&	m_machine;
+	running_machine&    m_machine;
 
-	device_t *	m_livecpu;
-	device_t *	m_visiblecpu;
-	device_t *	m_breakcpu;
+	device_t *  m_livecpu;
+	device_t *  m_visiblecpu;
+	device_t *  m_breakcpu;
 
-	FILE *		m_source_file;			// script source file
+	FILE *      m_source_file;          // script source file
 
-	std::unique_ptr<symbol_table> m_symtable;			// global symbol table
+	std::unique_ptr<symbol_table> m_symtable;           // global symbol table
 
-	bool	m_within_instruction_hook;
-	bool	m_vblank_occurred;
-	bool	m_memory_modified;
-	bool	m_debugger_access;
+	bool    m_within_instruction_hook;
+	bool    m_vblank_occurred;
+	bool    m_memory_modified;
+	bool    m_debugger_access;
 
-	int			m_execution_state;
-	device_t *	m_stop_when_not_device;	// stop execution when the device ceases to be this
+	int         m_execution_state;
+	device_t *  m_stop_when_not_device; // stop execution when the device ceases to be this
 
-	UINT32		m_bpindex;
-	UINT32		m_wpindex;
-	UINT32		m_rpindex;
+	UINT32      m_bpindex;
+	UINT32      m_wpindex;
+	UINT32      m_rpindex;
 
-	UINT64		m_wpdata;
-	UINT64		m_wpaddr;
+	UINT64      m_wpdata;
+	UINT64      m_wpaddr;
 	std::unique_ptr<UINT64[]> m_tempvar;
 
-	osd_ticks_t	m_last_periodic_update_time;
+	osd_ticks_t m_last_periodic_update_time;
 
-	bool		m_comments_loaded;
+	bool        m_comments_loaded;
 };
 
 #endif
-

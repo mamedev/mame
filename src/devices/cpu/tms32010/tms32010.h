@@ -45,7 +45,7 @@ public:
 	// construction/destruction
 	tms32010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	tms32010_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int addr_mask);
-	
+
 	// static configuration helpers
 	template<class _Object> static devcb_base & set_bio_in_cb(device_t &device, _Object object) { return downcast<tms32010_device &>(device).m_bio_in.set_callback(object); }
 
@@ -78,7 +78,7 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 	address_space_config m_io_config;
-	
+
 	devcb_read_line m_bio_in;
 
 	typedef void ( tms32010_device::*opcode_func ) ();

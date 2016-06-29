@@ -148,9 +148,9 @@ public:
 	public:
 		// construction
 		direct_range(): m_bytestart(0),m_byteend(~0) { }
-		
+
 		inline bool operator==(direct_range val) noexcept
-		{	// return true if _Left and _Right identify the same thread
+		{   // return true if _Left and _Right identify the same thread
 			return (m_bytestart == val.m_bytestart) && (m_byteend == val.m_byteend);
 		}
 
@@ -521,7 +521,7 @@ class memory_bank
 		// construction/destruction
 		bank_reference(address_space &space, read_or_write readorwrite)
 			: m_space(space),
-			  m_readorwrite(readorwrite) { }
+				m_readorwrite(readorwrite) { }
 
 		// getters
 		address_space &space() const { return m_space; }

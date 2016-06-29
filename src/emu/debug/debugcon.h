@@ -124,12 +124,12 @@ private:
 		int             maxparams;
 	};
 
-	running_machine	&m_machine;
+	running_machine &m_machine;
 
-	text_buffer		*m_console_textbuf;
-	text_buffer		*m_errorlog_textbuf;
+	text_buffer     *m_console_textbuf;
+	text_buffer     *m_errorlog_textbuf;
 
-	debug_command	*m_commandlist;
+	debug_command   *m_commandlist;
 };
 
 #endif

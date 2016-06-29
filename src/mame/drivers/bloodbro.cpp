@@ -520,7 +520,7 @@ static MACHINE_CONFIG_DERIVED( weststry, bloodbro )
 	MCFG_PALETTE_ENTRIES(1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	// Bootleg video hardware is non-Seibu 
+	// Bootleg video hardware is non-Seibu
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(bloodbro_state, screen_update_weststry)
 	MCFG_DEVICE_REMOVE("crtc")

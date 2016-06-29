@@ -37,7 +37,6 @@
 extern const char UI_VERSION_TAG[];
 
 namespace ui {
-
 static bool first_start = true;
 static const char *dats_info[] = {
 	__("General Info"),
@@ -1100,11 +1099,11 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 	// special case for configure machine
 	else if ((FPTR)ui_swinfo == CONF_MACHINE)
 	{
-	    if (m_prev_selected != nullptr)
-	    {
-	        ui_software_info *swinfo = (ui_software_info *)m_prev_selected;
+		if (m_prev_selected != nullptr)
+		{
+			ui_software_info *swinfo = (ui_software_info *)m_prev_selected;
 			menu::stack_push<menu_machine_configure>(ui(), container, (const game_driver *)swinfo->driver);
-	    }
+		}
 		return;
 	}
 	// special case for configure plugins

@@ -1238,7 +1238,7 @@ READ8_MEMBER(nes_lh32_device::read_m)
 
 READ8_MEMBER(nes_lh32_device::read_h)
 {
-//	LOG_MMC(("lh32 read_h, offset: %04x\n", offset));
+//  LOG_MMC(("lh32 read_h, offset: %04x\n", offset));
 
 	if (offset >= 0x4000 && offset < 0x6000)
 		return m_prgram[offset & 0x1fff];
@@ -1294,7 +1294,7 @@ READ8_MEMBER(nes_lh10_device::read_m)
 
 READ8_MEMBER(nes_lh10_device::read_h)
 {
-//	LOG_MMC(("lh10 read_h, offset: %04x\n", offset));
+//  LOG_MMC(("lh10 read_h, offset: %04x\n", offset));
 
 	if (offset >= 0x4000 && offset < 0x6000)
 		return m_prgram[offset & 0x1fff];
@@ -1363,7 +1363,7 @@ READ8_MEMBER(nes_lh53_device::read_m)
 
 READ8_MEMBER(nes_lh53_device::read_h)
 {
-//	LOG_MMC(("lh53 read_h, offset: %04x\n", offset));
+//  LOG_MMC(("lh53 read_h, offset: %04x\n", offset));
 
 	if (offset >= 0x3800 && offset < 0x5800)
 		return m_battery[offset & 0x1fff];
@@ -1431,7 +1431,7 @@ WRITE8_MEMBER(nes_2708_device::write_m)
 
 READ8_MEMBER(nes_2708_device::read_h)
 {
-//	LOG_MMC(("btl-2708 read_h, offset: %04x\n", offset));
+//  LOG_MMC(("btl-2708 read_h, offset: %04x\n", offset));
 
 	if (offset >= 0x3800 && offset < 0x5800 && !m_reg[1])
 		return m_prgram[0x2000 + ((offset - 0x3800) & 0x1fff)]; // higher 8K of WRAM
@@ -1656,30 +1656,29 @@ READ8_MEMBER(nes_shuiguan_device::read_m)
 
 
 /*-------------------------------------------------
- 
+
  RT-01
- 
+
  Games: Russian test cart
- 
- The PRG EPROM has copy protected areas with 
+
+ The PRG EPROM has copy protected areas with
  "weak bits", which is tested at some points (info
  from Cah4e3).
- 
+
  iNES:
- 
+
  In MESS:
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(nes_rt01_device::read_h)
 {
-//	LOG_MMC(("rt01 read_h, offset: %04x\n", offset));
+//  LOG_MMC(("rt01 read_h, offset: %04x\n", offset));
 
 	if ((offset >= 0x4e80) && (offset < 0x4f00))
 		return 0xf2 | (machine().rand() & 0x0d);
 	if ((offset >= 0x7e80) && (offset < 0x7f00))
 		return 0xf2 | (machine().rand() & 0x0d);
-	
+
 	return hi_access_rom(offset);
 }
-

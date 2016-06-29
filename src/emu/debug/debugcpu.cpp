@@ -36,19 +36,19 @@ const size_t debugger_cpu::NUM_TEMP_VARIABLES = 10;
 
 debugger_cpu::debugger_cpu(running_machine &machine)
 	: m_machine(machine)
-    , m_livecpu(nullptr)
-    , m_visiblecpu(nullptr)
-    , m_breakcpu(nullptr)
-    , m_source_file(nullptr)
-    , m_symtable(nullptr)
-    , m_execution_state(EXECUTION_STATE_STOPPED)
-    , m_bpindex(1)
-    , m_wpindex(1)
-    , m_rpindex(1)
-    , m_wpdata(0)
-    , m_wpaddr(0)
+	, m_livecpu(nullptr)
+	, m_visiblecpu(nullptr)
+	, m_breakcpu(nullptr)
+	, m_source_file(nullptr)
+	, m_symtable(nullptr)
+	, m_execution_state(EXECUTION_STATE_STOPPED)
+	, m_bpindex(1)
+	, m_wpindex(1)
+	, m_rpindex(1)
+	, m_wpdata(0)
+	, m_wpaddr(0)
 	, m_last_periodic_update_time(0)
-    , m_comments_loaded(false)
+	, m_comments_loaded(false)
 {
 	screen_device *first_screen = m_machine.first_screen();
 
@@ -327,7 +327,7 @@ bool debugger_cpu::comment_load(bool is_inline)
 			{
 				if(is_inline == false)
 					m_machine.debugger().console().printf("@%s\n", cputag_name);
-				
+
 				if (!device->debug()->comment_import(*cpunode,is_inline))
 					throw emu_exception();
 			}
@@ -392,11 +392,11 @@ UINT8 debugger_cpu::read_byte(address_space &space, offs_t address, int apply_tr
 		result = 0xff;
 	}
 	else if (space.device().memory().read(space.spacenum(), address, 1, custom))
-	{	/* if there is a custom read handler, and it returns true, use that value */
+	{   /* if there is a custom read handler, and it returns true, use that value */
 		result = custom;
 	}
 	else
-	{	/* otherwise, call the byte reading function for the translated address */
+	{   /* otherwise, call the byte reading function for the translated address */
 		result = space.read_byte(address);
 	}
 
@@ -419,7 +419,7 @@ UINT16 debugger_cpu::read_word(address_space &space, offs_t address, int apply_t
 
 	UINT16 result;
 	if (!WORD_ALIGNED(address))
-	{	/* if this is misaligned read, or if there are no word readers, just read two bytes */
+	{   /* if this is misaligned read, or if there are no word readers, just read two bytes */
 		UINT8 byte0 = read_byte(space, address + 0, apply_translation);
 		UINT8 byte1 = read_byte(space, address + 1, apply_translation);
 
@@ -430,7 +430,7 @@ UINT16 debugger_cpu::read_word(address_space &space, offs_t address, int apply_t
 			result = byte1 | (byte0 << 8);
 	}
 	else
-	{	/* otherwise, this proceeds like the byte case */
+	{   /* otherwise, this proceeds like the byte case */
 
 		/* all accesses from this point on are for the debugger */
 		m_debugger_access = true;
@@ -443,11 +443,11 @@ UINT16 debugger_cpu::read_word(address_space &space, offs_t address, int apply_t
 			result = 0xffff;
 		}
 		else if (space.device().memory().read(space.spacenum(), address, 2, custom))
-		{	/* if there is a custom read handler, and it returns true, use that value */
+		{   /* if there is a custom read handler, and it returns true, use that value */
 			result = custom;
 		}
 		else
-		{	/* otherwise, call the byte reading function for the translated address */
+		{   /* otherwise, call the byte reading function for the translated address */
 			result = space.read_word(address);
 		}
 
@@ -472,7 +472,7 @@ UINT32 debugger_cpu::read_dword(address_space &space, offs_t address, int apply_
 
 	UINT32 result;
 	if (!DWORD_ALIGNED(address))
-	{	/* if this is a misaligned read, or if there are no dword readers, just read two words */
+	{   /* if this is a misaligned read, or if there are no dword readers, just read two words */
 		UINT16 word0 = read_word(space, address + 0, apply_translation);
 		UINT16 word1 = read_word(space, address + 2, apply_translation);
 
@@ -483,7 +483,7 @@ UINT32 debugger_cpu::read_dword(address_space &space, offs_t address, int apply_
 			result = word1 | (word0 << 16);
 	}
 	else
-	{	/* otherwise, this proceeds like the byte case */
+	{   /* otherwise, this proceeds like the byte case */
 
 		/* all accesses from this point on are for the debugger */
 		m_debugger_access = true;
@@ -491,15 +491,15 @@ UINT32 debugger_cpu::read_dword(address_space &space, offs_t address, int apply_
 
 		UINT64 custom;
 		if (apply_translation && !translate(space, TRANSLATE_READ_DEBUG, &address))
-		{	/* translate if necessary; if not mapped, return 0xffffffff */
+		{   /* translate if necessary; if not mapped, return 0xffffffff */
 			result = 0xffffffff;
 		}
 		else if (space.device().memory().read(space.spacenum(), address, 4, custom))
-		{	/* if there is a custom read handler, and it returns true, use that value */
+		{   /* if there is a custom read handler, and it returns true, use that value */
 			result = custom;
 		}
 		else
-		{	/* otherwise, call the byte reading function for the translated address */
+		{   /* otherwise, call the byte reading function for the translated address */
 			result = space.read_dword(address);
 		}
 
@@ -524,7 +524,7 @@ UINT64 debugger_cpu::read_qword(address_space &space, offs_t address, int apply_
 
 	UINT64 result;
 	if (!QWORD_ALIGNED(address))
-	{	/* if this is a misaligned read, or if there are no qword readers, just read two dwords */
+	{   /* if this is a misaligned read, or if there are no qword readers, just read two dwords */
 		UINT32 dword0 = read_dword(space, address + 0, apply_translation);
 		UINT32 dword1 = read_dword(space, address + 4, apply_translation);
 
@@ -535,7 +535,7 @@ UINT64 debugger_cpu::read_qword(address_space &space, offs_t address, int apply_
 			result = dword1 | ((UINT64)dword0 << 32);
 	}
 	else
-	{	/* otherwise, this proceeds like the byte case */
+	{   /* otherwise, this proceeds like the byte case */
 
 		/* all accesses from this point on are for the debugger */
 		m_debugger_access = true;
@@ -548,11 +548,11 @@ UINT64 debugger_cpu::read_qword(address_space &space, offs_t address, int apply_
 			result = ~(UINT64)0;
 		}
 		else if (space.device().memory().read(space.spacenum(), address, 8, custom))
-		{	/* if there is a custom read handler, and it returns true, use that value */
+		{   /* if there is a custom read handler, and it returns true, use that value */
 			result = custom;
 		}
 		else
-		{	/* otherwise, call the byte reading function for the translated address */
+		{   /* otherwise, call the byte reading function for the translated address */
 			result = space.read_qword(address);
 		}
 
@@ -1528,13 +1528,13 @@ void debugger_cpu::start_hook(device_t *device, bool stop_on_vblank)
 	if (m_execution_state != EXECUTION_STATE_STOPPED)
 	{
 		if (device == m_visiblecpu && osd_ticks() > m_last_periodic_update_time + osd_ticks_per_second() / 4)
-		{	// check for periodic updates
+		{   // check for periodic updates
 			m_machine.debug_view().update_all();
 			m_machine.debug_view().flush_osd_updates();
 			m_last_periodic_update_time = osd_ticks();
 		}
 		else if (device == m_breakcpu)
-		{	// check for pending breaks
+		{   // check for pending breaks
 			m_execution_state = EXECUTION_STATE_STOPPED;
 			m_breakcpu = nullptr;
 		}
@@ -2613,7 +2613,7 @@ bool device_debug::comment_export(xml_data_node &curnode)
 //-------------------------------------------------
 
 bool device_debug::comment_import(xml_data_node &cpunode,bool is_inline)
-{	
+{
 	// iterate through nodes
 	for (xml_data_node *datanode = xml_get_sibling(cpunode.child, "comment"); datanode; datanode = xml_get_sibling(datanode->next, "comment"))
 	{

@@ -54,21 +54,21 @@ const UINT32 UPDATE_HAS_NOT_CHANGED = 0x0001;   // the video has not changed
  @def VIDEO_UPDATE_BEFORE_VBLANK
  update_video called at the start of the VBLANK period
  @todo hack, remove me
- 
+
  @def VIDEO_UPDATE_AFTER_VBLANK
  update_video called at the end of the VBLANK period
  @todo hack, remove me
 
  @def VIDEO_SELF_RENDER
  indicates VIDEO_UPDATE will add container bits itself
- 
+
  @def VIDEO_ALWAYS_UPDATE
  force VIDEO_UPDATE to be called even for skipped frames.
  @todo in case you need this one for model updating, then you're doing it wrong (read: hack)
- 
+
  @def VIDEO_UPDATE_SCANLINE
  calls VIDEO_UPDATE for every visible scanline, even for skipped frames
- 
+
  @}
  */
 
@@ -377,82 +377,82 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
  @{
  @def MCFG_SCREEN_ADD
   Add a new legacy screen color device
- 
+
  @def MCFG_SCREEN_ADD_MONOCHROME
   Add a new legacy monochrome screen device
- 
+
  @def MCFG_SCREEN_MODIFY
   Modify a legacy screen device
- 
+
  @def MCFG_SCREEN_TYPE
   Modify the screen device type
   @see screen_type_enum
- 
+
  @def MCFG_SCREEN_RAW_PARAMS
-  Configures screen parameters for the given screen. 
+  Configures screen parameters for the given screen.
   @remark It's better than using @see MCFG_SCREEN_REFRESH_RATE and @see MCFG_SCREEN_VBLANK_TIME but still not enough.
- 
-  @param _pixclock 
+
+  @param _pixclock
   Pixel Clock frequency value
- 
-  @param _htotal 
+
+  @param _htotal
   Total number of horizontal pixels, including hblank period.
- 
-  @param _hbend 
+
+  @param _hbend
   Horizontal pixel position for HBlank end event, also first pixel where screen rectangle is visible.
- 
-  @param _hbstart 
+
+  @param _hbstart
   Horizontal pixel position for HBlank start event, also last pixel where screen rectangle is visible.
- 
-  @param _vtotal 
+
+  @param _vtotal
   Total number of vertical pixels, including vblank period.
- 
-  @param _vbend 
+
+  @param _vbend
   Vertical pixel position for VBlank end event, also first pixel where screen rectangle is visible.
- 
-  @param _vbstart 
+
+  @param _vbstart
   Vertical pixel position for VBlank start event, also last pixel where screen rectangle is visible.
- 
+
  @def MCFG_SCREEN_REFRESH_RATE
   Sets the number of Frames Per Second for this screen
   @remarks Please use @see MCFG_SCREEN_RAW_PARAMS instead. Gives imprecise timings.
 
-  @param _rate 
+  @param _rate
   FPS number
 
  @def MCFG_SCREEN_VBLANK_TIME
   Sets the vblank time of the given screen
   @remarks Please use @see MCFG_SCREEN_RAW_PARAMS instead. Gives imprecise timings.
- 
-  @param _time 
+
+  @param _time
   Time parameter, in attotime value
 
  @def MCFG_SCREEN_SIZE
   Sets total screen size, including H/V-Blanks
   @remarks Please use @see MCFG_SCREEN_RAW_PARAMS instead. Gives imprecise timings.
-  
-  @param _width 
+
+  @param _width
   Screen horizontal size
 
   @param _height
   Screen vertical size
-  
+
  @def MCFG_SCREEN_VISIBLE_AREA
   Sets screen visible area
   @remarks Please use MCFG_SCREEN_RAW_PARAMS instead. Gives imprecise timings.
 
-  @param _minx 
+  @param _minx
   Screen left border
-  
-  @param _maxx 
+
+  @param _maxx
   Screen right border, must be in N-1 format
- 
-  @param _miny 
+
+  @param _miny
   Screen top border
-  
-  @param _maxx 
+
+  @param _maxx
   Screen bottom border, must be in N-1 format
-  
+
  @}
  */
 

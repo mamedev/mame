@@ -156,7 +156,7 @@ private:
 	{
 		if (pfn_wglGetExtensionsStringEXT == nullptr)
 			return false;
-		
+
 		//  printf("%s\n", pfn_wglGetExtensionsStringEXT());
 
 		if (strstr(pfn_wglGetExtensionsStringEXT(), extension_name) != nullptr)

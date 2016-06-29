@@ -79,7 +79,7 @@ void namcos2_shared_state::namco_tilemap_init( int gfxbank, void *maskBaseAddr,
 			mTilemapInfo.tmap[i]->set_scrolldx( -dx, 288+dx );
 			mTilemapInfo.tmap[i]->set_scrolldy( -24, 224+24 );
 		}
-	
+
 	save_item(NAME(mTilemapInfo.control));
 	save_pointer(NAME(mTilemapInfo.videoram.get()), 0x10000);
 } /* namco_tilemap_init */
@@ -822,7 +822,7 @@ void namcos2_shared_state::c355_obj_init(int gfxbank, int pal_xor, c355_obj_code
 
 	memset(m_c355_obj_ram, 0, sizeof(m_c355_obj_ram)); // needed for Nebulas Ray
 	memset(m_c355_obj_position, 0, sizeof(m_c355_obj_position));
-	
+
 	save_item(NAME(m_c355_obj_position));
 	save_item(NAME(m_c355_obj_ram));
 	save_item(NAME(m_player_mux));

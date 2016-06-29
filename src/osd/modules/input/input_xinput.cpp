@@ -44,7 +44,7 @@ int xinput_api_helper::initialize()
 
 	XInputGetState = m_xinput_dll->bind<xinput_get_state_fn>("XInputGetState");
 	XInputGetCapabilities = m_xinput_dll->bind<xinput_get_caps_fn>("XInputGetCapabilities");
-	
+
 	if (!XInputGetState || !XInputGetCapabilities)
 	{
 		osd_printf_verbose("Could not find XInput. Please try to reinstall DirectX runtime package.\n");
