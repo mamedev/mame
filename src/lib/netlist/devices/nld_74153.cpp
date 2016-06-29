@@ -11,7 +11,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 /* FIXME: timing is not 100% accurate, Strobe and Select inputs have a
  *        slightly longer timing.
  *        Convert this to sub-devices at some time.
@@ -46,7 +45,6 @@ namespace netlist
 		, m_A(*this, "A")
 		, m_B(*this, "B")
 		{
-
 			register_subalias("C0", m_sub.m_C[0]);
 			register_subalias("C1",  m_sub.m_C[1]);
 			register_subalias("C2",  m_sub.m_C[2]);
@@ -71,7 +69,6 @@ namespace netlist
 		, m_A(*this, "14")   // m_2.m_B
 		, m_B(*this, "2")    // m_2.m_B
 		{
-
 			register_subalias("1", m_1.m_G);
 			register_subalias("3", m_1.m_C[3]);
 			register_subalias("4", m_1.m_C[2]);

@@ -958,7 +958,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mspacman" supported="no">
 		<description>Ms. Pac-Man</description>
 		<year>1986</year>

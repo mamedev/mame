@@ -329,7 +329,7 @@ public:
 			name = device_item_name(devinfo, keynum, defname, nullptr);
 
 			// add the item to the device
-			devinfo->device()->add_item(name.c_str(), itemid, generic_button_get_state, &devinfo->keyboard.state[keynum]);
+			devinfo->device()->add_item(name.c_str(), itemid, generic_button_get_state<std::uint8_t>, &devinfo->keyboard.state[keynum]);
 		}
 
 	exit:
@@ -406,7 +406,11 @@ public:
 		{
 			// add to the mouse device and optionally to the gun device as well
 			std::string name = device_item_name(devinfo, offsetof(DIMOUSESTATE, lX) + axisnum * sizeof(LONG), default_axis_name[axisnum], nullptr);
-			devinfo->device()->add_item(name.c_str(), static_cast<input_item_id>(ITEM_ID_XAXIS + axisnum), generic_axis_get_state, &devinfo->mouse.lX + axisnum);
+			devinfo->device()->add_item(
+				name.c_str(),
+				static_cast<input_item_id>(ITEM_ID_XAXIS + axisnum),
+				generic_axis_get_state<LONG>,
+				&devinfo->mouse.lX + axisnum);
 		}
 
 		// populate the buttons
@@ -416,7 +420,11 @@ public:
 
 			// add to the mouse device
 			std::string name = device_item_name(devinfo, offset, default_button_name(butnum), nullptr);
-			devinfo->device()->add_item(name.c_str(), static_cast<input_item_id>(ITEM_ID_BUTTON1 + butnum), generic_button_get_state, &devinfo->mouse.rgbButtons[butnum]);
+			devinfo->device()->add_item(
+				name.c_str(),
+				static_cast<input_item_id>(ITEM_ID_BUTTON1 + butnum),
+				generic_button_get_state<BYTE>,
+				&devinfo->mouse.rgbButtons[butnum]);
 		}
 
 	exit:
@@ -506,7 +514,11 @@ int dinput_joystick_device::configure()
 
 		// populate the item description as well
 		name = dinput_module::device_item_name(this, offsetof(DIJOYSTATE2, lX) + axisnum * sizeof(LONG), default_axis_name[axisnum], nullptr);
-		device()->add_item(name.c_str(), static_cast<input_item_id>(ITEM_ID_XAXIS + axisnum), generic_axis_get_state, &joystick.state.lX + axisnum);
+		device()->add_item(
+			name.c_str(),
+			static_cast<input_item_id>(ITEM_ID_XAXIS + axisnum),
+			generic_axis_get_state<LONG>,
+			&joystick.state.lX + axisnum);
 
 		axiscount++;
 	}
@@ -548,7 +560,7 @@ int dinput_joystick_device::configure()
 		else
 			itemid = ITEM_ID_OTHER_SWITCH;
 
-		device()->add_item(name.c_str(), itemid, generic_button_get_state, &joystick.state.rgbButtons[butnum]);
+		device()->add_item(name.c_str(), itemid, generic_button_get_state<BYTE>, &joystick.state.rgbButtons[butnum]);
 	}
 
 	return 0;

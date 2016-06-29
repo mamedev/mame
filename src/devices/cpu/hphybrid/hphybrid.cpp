@@ -1076,7 +1076,7 @@ void hp_hybrid_cpu_device::check_for_interrupts(void)
 
 				// Do a double-indirect JSM IV,I instruction
 				WM(AEC_CASE_C , ++m_reg_R , m_reg_P);
-				m_reg_P = RM(AEC_CASE_I , m_reg_IV + CURRENT_PA);
+				m_reg_P = RM(AEC_CASE_C , m_reg_IV + CURRENT_PA);
 				m_reg_I = fetch();
 }
 
@@ -1539,10 +1539,23 @@ UINT32 hp_5061_3001_cpu_device::add_mae(aec_cases_t aec_case , UINT16 addr)
 	bool top_half = BIT(addr , 15) != 0;
 
 	// Detect accesses to top half of base page
-	if ((aec_case == AEC_CASE_C || aec_case == AEC_CASE_I) && (addr & 0xfe00) == 0xfe00) {
+	if (aec_case == AEC_CASE_C && (addr & 0xfe00) == 0xfe00) {
 		aec_case = AEC_CASE_B;
 	}
 
+	// **** IM == 0 ****
+	// Case | Top | Bottom
+	//   A  | R34 | R33
+	//   B  | R36 | R33
+	//   C  | R32 | R35
+	//   D  | R32 | R37
+	//
+	// **** IM == 1 ****
+	// Case | Top | Bottom
+	//   A  | R34 |   5
+	//   B  |   1 |   5
+	//   C  |   0 | R35
+	//   D  | R32 | R37
 	switch (aec_case) {
 	case AEC_CASE_A:
 		if (top_half) {
@@ -1564,20 +1577,16 @@ UINT32 hp_5061_3001_cpu_device::add_mae(aec_cases_t aec_case , UINT16 addr)
 		break;
 
 	case AEC_CASE_C:
-		bsc_reg = top_half ? m_reg_aec[ HP_REG_R32_ADDR - HP_REG_R32_ADDR ] : m_reg_aec[ HP_REG_R35_ADDR - HP_REG_R32_ADDR ];
+		if (top_half) {
+			// Block 0 is used when IM bit overrides R32 value
+			bsc_reg = BIT(m_flags , HPHYBRID_IM_BIT) ? 0 : m_reg_aec[ HP_REG_R32_ADDR - HP_REG_R32_ADDR ];
+		} else {
+			bsc_reg = m_reg_aec[ HP_REG_R35_ADDR - HP_REG_R32_ADDR ];
+		}
 		break;
 
 	case AEC_CASE_D:
 		bsc_reg = top_half ? m_reg_aec[ HP_REG_R32_ADDR - HP_REG_R32_ADDR ] : m_reg_aec[ HP_REG_R37_ADDR - HP_REG_R32_ADDR ];
-		break;
-
-	case AEC_CASE_I:
-		// Behaviour of AEC during interrupt vector fetch is undocumented but it can be guessed from 9845B firmware.
-		// Basically in this case the integrated AEC seems to do what the discrete implementation in 9845A does:
-		// top half of memory is mapped to block 0 (fixed) and bottom half is mapped according to content of R35
-		// (see pg 334 of patent).
-		// I'm beginning to suspect that these values actually come from IM overriding case "C"
-		bsc_reg = top_half ? 0 : m_reg_aec[ HP_REG_R35_ADDR - HP_REG_R32_ADDR ];
 		break;
 
 	default:

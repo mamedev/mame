@@ -20,7 +20,6 @@
 #include "osdepend.h"
 
 namespace ui {
-
 const char *const menu_custom_ui::hide_status[] = {
 	__("Show All"),
 	__("Hide Filters"),
@@ -36,10 +35,10 @@ menu_custom_ui::menu_custom_ui(mame_ui_manager &mui, render_container *container
 	// load languages
 	file_enumerator path(mui.machine().options().language_path());
 	auto lang = mui.machine().options().language();
-	const osd_directory_entry *dirent;
+	const osd::directory::entry *dirent;
 	int cnt = 0;
 	while ((dirent = path.next()) != nullptr)
-		if (dirent->type == ENTTYPE_DIR && strcmp(dirent->name, ".") != 0 && strcmp(dirent->name, "..") != 0)
+		if (dirent->type == osd::directory::entry::entry_type::DIR && strcmp(dirent->name, ".") != 0 && strcmp(dirent->name, "..") != 0)
 		{
 			auto name = std::string(dirent->name);
 			auto i = strreplace(name, "_", " (");

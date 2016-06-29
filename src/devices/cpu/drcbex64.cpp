@@ -175,7 +175,6 @@
 
 // This is a trick to make it build on Android where the ARM SDK declares ::REG_Rn
 namespace drc {
-
 using namespace uml;
 using namespace x64emit;
 

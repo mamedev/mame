@@ -149,7 +149,7 @@ HRESULT SaveBitmap(IWICBitmap* bitmap, GUID pixelFormat, const WCHAR *filename)
 
 	HR_RETHR(frameEncode->Commit());
 	HR_RETHR(encoder->Commit());
-	
+
 	return S_OK;
 }
 

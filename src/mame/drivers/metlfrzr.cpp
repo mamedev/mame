@@ -6,8 +6,8 @@
     Metal Freezer (c) 1989 Seibu
 
     driver by Angelo Salese, based off initial work by David Haywood
-	thanks to Peter Wilhelmsen for the decryption
-	
+    thanks to Peter Wilhelmsen for the decryption
+
     HW seems the natural evolution of Dark Mist type.
 
     TODO:
@@ -131,7 +131,6 @@ void metlfrzr_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 
 	for(count=0x200-4;count>-1;count-=4)
 	{
-
 		gfx_element *cur_gfx = base_spriteram[count+1] & 0x40 ? gfx_3 : gfx_2;
 		UINT8 tile_bank = (base_spriteram[count+1] & 0x30) >> 4;
 		UINT16 tile = base_spriteram[count] | (tile_bank << 8);
@@ -140,7 +139,7 @@ void metlfrzr_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 		int x = base_spriteram[count+3];
 		if(base_spriteram[count+1] & 0x80)
 			x-=256;
-		
+
 		cur_gfx->transpen(bitmap,cliprect,tile,color,0,0,x,y,0xf);
 	}
 }
@@ -148,7 +147,7 @@ void metlfrzr_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 UINT32 metlfrzr_state::screen_update_metlfrzr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
-	
+
 	legacy_bg_draw(bitmap,cliprect);
 	legacy_obj_draw(bitmap,cliprect);
 	return 0;
@@ -168,7 +167,7 @@ WRITE8_MEMBER(metlfrzr_state::output_w)
 	m_fg_tilebank = (data & 0x10) >> 4;
 	membank("bank1")->set_entry((data & 0xc) >> 2);
 	m_rowscroll_enable = bool(BIT(data,1));
-	
+
 //  popmessage("%02x %02x",m_fg_tilebank,data & 3);
 }
 
@@ -249,14 +248,14 @@ static INPUT_PORTS_START( metlfrzr )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("SW1:1") 
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
 	PORT_SERVICE_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW1:2" )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_A ) )  PORT_DIPLOCATION("SW1:4,5,6") 
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_A ) )  PORT_DIPLOCATION("SW1:4,5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
@@ -265,35 +264,35 @@ static INPUT_PORTS_START( metlfrzr )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:7,8") 
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2") 
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x02, "A" )
 	PORT_DIPSETTING(    0x03, "B" )
 	PORT_DIPSETTING(    0x01, "C" )
 	PORT_DIPSETTING(    0x00, "D" )
 	// service mode returns these values divided by 10 (so 02/05/10 effectively means 20k, 50k, 100k)
 	// TODO: check if it extends
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:3,4") 
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, "20k, 50k, 100k" )
 	PORT_DIPSETTING(    0x0c, "30k, 80k, 150k" )
 	PORT_DIPSETTING(    0x04, "50k, 100k, 200k" )
 	PORT_DIPSETTING(    0x00, "100k, 200k, 400k" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:5,6") 
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x20, "1" )
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
 	// disabling following enables intro / how to play screens
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Level_Select ) )  PORT_DIPLOCATION("SW2:7") 
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Level_Select ) )  PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8") 
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END

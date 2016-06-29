@@ -19,11 +19,11 @@ LTO = -flto=4  -fuse-linker-plugin -flto-partition=balanced -Wodr
 CDEFS = -DPSTANDALONE=1 -DPTR64=1
 #-Werror
 #CFLAGS =  $(LTO) -g -O3 -std=c++98 -Doverride="" -march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra -Wno-long-long -Wno-unused-parameter -Wno-unused-result -Wno-variadic-macros -I..
-#LDFLAGS = $(LTO) -g -O3 -std=c++98 
+#LDFLAGS = $(LTO) -g -O3 -std=c++98
 CFLAGS =  $(LTO) -g -O3 -std=c++11 -march=native -I.. -Wall -Wpedantic -Wsign-compare -Wextra -Wno-unused-parameter
 LDFLAGS = $(LTO) -g -O3 -std=c++11 -lpthread -ldl
 
-CC = @g++-5
+CC = g++-5
 LD = @g++-5
 MD = @mkdir
 RM = @rm
@@ -34,23 +34,25 @@ NLOBJ = $(OBJ)
 POBJ = $(OBJ)/plib
 
 OBJDIRS = $(OBJ) \
-		  $(OBJ)/analog \
-		  $(OBJ)/solver \
-		  $(OBJ)/devices \
-		  $(OBJ)/plib \
-		  $(OBJ)/devices \
-		  $(OBJ)/macro \
-		  $(OBJ)/tools \
-		  $(OBJ)/prg \
-		  
+			$(OBJ)/analog \
+			$(OBJ)/solver \
+			$(OBJ)/devices \
+			$(OBJ)/plib \
+			$(OBJ)/devices \
+			$(OBJ)/macro \
+			$(OBJ)/tools \
+			$(OBJ)/prg \
+
 
 OBJS = $(POBJS) $(NLOBJS)
 
 POBJS := \
 	$(POBJ)/pstring.o \
 	$(POBJ)/palloc.o \
+	$(POBJ)/pchrono.o \
 	$(POBJ)/pdynlib.o \
 	$(POBJ)/pfmtlog.o \
+	$(POBJ)/poptions.o \
 	$(POBJ)/pparser.o \
 	$(POBJ)/pstate.o \
 	$(POBJ)/pstream.o \
@@ -101,14 +103,21 @@ NLOBJS := \
 	$(NLOBJ)/solver/nld_solver.o \
 	$(NLOBJ)/tools/nl_convert.o \
 
-all:	maketree $(TARGETS)
+ALL_OBJS = $(OBJS) $(NLOBJ)/prg/nltool.o $(NLOBJ)/prg/nlwav.o
+SOURCES = $(patsubst $(OBJ)%, $(SRC)%, $(ALL_OBJS:.o=.cpp))
+
+#-------------------------------------------------
+# all
+#-------------------------------------------------
+
+all:    maketree $(TARGETS)
 
 #-------------------------------------------------
 # clean
 #-------------------------------------------------
 
 clean:
-	$(RM) -rf $(OBJS) $(TARGETS)
+	$(RM) -rf $(OBJS) $(TARGETS) .depend
 
 #-------------------------------------------------
 # nltool
@@ -131,6 +140,20 @@ $(sort $(OBJDIRS)):
 
 maketree: $(sort $(OBJDIRS))
 
+#-------------------------------------------------
+# depends
+#-------------------------------------------------
+
+depend: .depend
+
+.depend: $(SOURCES)
+	@echo creating .depend
+	@rm -f ./.depend
+	@for i in $(SOURCES); do \
+		$(CC) $(CFLAGS) -MM $$i -MT `echo $$i | sed -e 's/$(SRC)/$(OBJ)/' -e 's/.cpp/.o/' ` >>./.depend; \
+	done
+
+-include .depend
 
 #-------------------------------------------------
 # generic rules
@@ -138,15 +161,15 @@ maketree: $(sort $(OBJDIRS))
 
 $(OBJ)/%.o: $(SRC)/%.cpp
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
+	@$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
 
 $(OBJ)/%.pp: $(SRC)/%.cpp | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CFLAGS) -E $< -o $@
+	@$(CC) $(CDEFS) $(CFLAGS) -E $< -o $@
 
 $(OBJ)/%.s: $(SRC)/%.cpp | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CFLAGS) -S $< -o $@
+	@$(CC) $(CDEFS) $(CFLAGS) -S $< -o $@
 
 $(OBJ)/%.a:
 	@echo Archiving $@...

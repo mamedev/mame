@@ -31,7 +31,7 @@
 
 #define MCFG_TMS32025_HOLD_ACK_OUT_CB(_devcb) \
 	devcb = &tms32025_device::set_hold_ack_out_cb(*device, DEVCB_##_devcb); /* HOLD Acknowledge output */
-	
+
 #define MCFG_TMS32025_XF_OUT_CB(_devcb) \
 	devcb = &tms32025_device::set_xf_out_cb(*device, DEVCB_##_devcb); /* XF output  */
 
@@ -41,7 +41,7 @@
 #define MCFG_TMS32025_DX_OUT_CB(_devcb) \
 	devcb = &tms32025_device::set_dx_out_cb(*device, DEVCB_##_devcb); /* Serial Data  Transmit output */
 
-	
+
 /****************************************************************************
  *  Interrupt constants
  */
@@ -83,7 +83,7 @@ public:
 	// construction/destruction
 	tms32025_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	tms32025_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	
+
 	// static configuration helpers
 	template<class _Object> static devcb_base & set_bio_in_cb(device_t &device, _Object object) { return downcast<tms32025_device &>(device).m_bio_in.set_callback(object); }
 	template<class _Object> static devcb_base & set_hold_in_cb(device_t &device, _Object object) { return downcast<tms32025_device &>(device).m_hold_in.set_callback(object); }

@@ -21,7 +21,6 @@
 
 
 namespace ui {
-
 static int ADDING = 1;
 static int CHANGE = 2;
 
@@ -466,7 +465,7 @@ void menu_add_change_folder::populate()
 	// open a path
 	const char *volume_name = nullptr;
 	file_enumerator path(m_current_path.c_str());
-	const osd_directory_entry *dirent;
+	const osd::directory::entry *dirent;
 	int folders_count = 0;
 
 	// add the drives
@@ -476,7 +475,7 @@ void menu_add_change_folder::populate()
 	// add the directories
 	while ((dirent = path.next()) != nullptr)
 	{
-		if (dirent->type == ENTTYPE_DIR && strcmp(dirent->name, ".") != 0)
+		if (dirent->type == osd::directory::entry::entry_type::DIR && strcmp(dirent->name, ".") != 0)
 			item_append(dirent->name, "[DIR]", 0, (void *)(FPTR)++folders_count);
 	}
 

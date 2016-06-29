@@ -16,7 +16,6 @@
 #include "ui/menu.h"
 
 namespace ui {
-
 class menu_pty_info : public menu
 {
 public:

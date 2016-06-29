@@ -33,7 +33,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 	} //namespace devices
 } // namespace netlist
 

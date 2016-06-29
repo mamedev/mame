@@ -44,7 +44,7 @@ int xinput_api_helper::initialize()
 
 	XInputGetState = m_xinput_dll->bind<xinput_get_state_fn>("XInputGetState");
 	XInputGetCapabilities = m_xinput_dll->bind<xinput_get_caps_fn>("XInputGetCapabilities");
-	
+
 	if (!XInputGetState || !XInputGetCapabilities)
 	{
 		osd_printf_verbose("Could not find XInput. Please try to reinstall DirectX runtime package.\n");
@@ -155,7 +155,7 @@ void xinput_joystick_device::configure()
 		device()->add_item(
 			xinput_axis_name[axisnum],
 			xinput_axis_ids[axisnum],
-			generic_axis_get_state,
+			generic_axis_get_state<LONG>,
 			&gamepad.left_thumb_x + axisnum);
 	}
 
@@ -166,7 +166,7 @@ void xinput_joystick_device::configure()
 		device()->add_item(
 			xinput_pov_names[povnum],
 			ITEM_ID_OTHER_SWITCH,
-			generic_button_get_state,
+			generic_button_get_state<BYTE>,
 			&gamepad.povs[povnum]);
 	}
 
@@ -176,20 +176,20 @@ void xinput_joystick_device::configure()
 		device()->add_item(
 			xinput_button_names[butnum],
 			static_cast<input_item_id>(ITEM_ID_BUTTON1 + butnum),
-			generic_button_get_state,
+			generic_button_get_state<BYTE>,
 			&gamepad.buttons[butnum]);
 	}
 
 	device()->add_item(
 		"Left Trigger",
 		ITEM_ID_ZAXIS,
-		generic_axis_get_state,
+		generic_axis_get_state<LONG>,
 		&gamepad.left_trigger);
 
 	device()->add_item(
 		"Right Trigger",
 		ITEM_ID_RZAXIS,
-		generic_axis_get_state,
+		generic_axis_get_state<LONG>,
 		&gamepad.right_trigger);
 
 	m_configured = true;

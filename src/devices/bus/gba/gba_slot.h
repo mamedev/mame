@@ -607,7 +607,7 @@ static const gba_chip_fix_item gba_chip_fix_rumble_list[] =
 	{ "KYGP" }, // Yoshi's Universal Gravitation (EUR)
 	{ "KYGE" }, // Yoshi - Topsy-Turvy (USA)
 	{ "KYGJ" }, // Yoshi no Banyuuinryoku (JPN)
-	{ "KHPJ" }	// Koro Koro Puzzle - Happy Panechu! (JPN)
+	{ "KHPJ" }  // Koro Koro Puzzle - Happy Panechu! (JPN)
 };
 
 

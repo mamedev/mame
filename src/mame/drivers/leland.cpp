@@ -3027,4 +3027,3 @@ GAME( 1990, wsf,      0,      wsf,     wsf,      leland_state, wsf,      ROT0,  
 GAME( 1991, indyheat, 0,      wsf,     indyheat, leland_state, indyheat, ROT0,   "Leland Corp.", "Danny Sullivan's Indy Heat", 0 )
 GAME( 1991, brutforc, 0,      wsf,     brutforc, leland_state, brutforc, ROT0,   "Leland Corp.", "Brute Force", 0 )
 GAME( 1991, asylum,   0,      wsf,     brutforc, leland_state, asylum,   ROT270, "Leland Corp.", "Asylum (prototype)", 0 )
-

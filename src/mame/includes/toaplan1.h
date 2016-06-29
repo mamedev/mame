@@ -89,7 +89,7 @@ public:
 	DECLARE_READ16_MEMBER(demonwld_dsp_r);
 	DECLARE_WRITE16_MEMBER(demonwld_dsp_w);
 	DECLARE_WRITE16_MEMBER(demonwld_dsp_bio_w);
-	DECLARE_READ16_MEMBER(demonwld_BIO_r);
+	DECLARE_READ_LINE_MEMBER(demonwld_BIO_r);
 	DECLARE_WRITE16_MEMBER(demonwld_dsp_ctrl_w);
 	DECLARE_READ16_MEMBER(samesame_port_6_word_r);
 	DECLARE_READ16_MEMBER(vimana_system_port_r);

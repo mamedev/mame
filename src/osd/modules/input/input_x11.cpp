@@ -19,7 +19,7 @@
 #include <X11/Xutil.h>
 
 // standard sdl header
-#include "sdlinc.h"
+#include <SDL2/SDL.h>
 #include <ctype.h>
 #include <stddef.h>
 #include <mutex>
@@ -471,10 +471,10 @@ public:
 
 			// Add X and Y axis
 			sprintf(defname, "X %s", devinfo->name());
-			devinfo->device()->add_item(defname, ITEM_ID_XAXIS, generic_axis_get_state, &devinfo->lightgun.lX);
+			devinfo->device()->add_item(defname, ITEM_ID_XAXIS, generic_axis_get_state<std::int32_t>, &devinfo->lightgun.lX);
 
 			sprintf(defname, "Y %s", devinfo->name());
-			devinfo->device()->add_item(defname, ITEM_ID_YAXIS, generic_axis_get_state, &devinfo->lightgun.lY);
+			devinfo->device()->add_item(defname, ITEM_ID_YAXIS, generic_axis_get_state<std::int32_t>, &devinfo->lightgun.lY);
 
 			// Save the device id
 			devinfo->x11_state.deviceid = info->id;
@@ -489,7 +489,7 @@ public:
 			x11_event_manager::instance().subscribe(event_types, ARRAY_LENGTH(event_types), this);
 		}
 
-		osd_printf_verbose("Lightgun: End initialization\n");
+		osd_printf_verbose("Lightgun: End initialization\n"); 
 	}
 
 	bool should_poll_devices(running_machine &machine) override
@@ -554,7 +554,7 @@ private:
 				for (int button = 0; button < b->num_buttons; button++)
 				{
 					input_item_id itemid = (input_item_id)(ITEM_ID_BUTTON1 + button);
-					devinfo->device()->add_item(default_button_name(button), itemid, generic_button_get_state, &devinfo->lightgun.buttons[button]);
+					devinfo->device()->add_item(default_button_name(button), itemid, generic_button_get_state<std::int32_t>, &devinfo->lightgun.buttons[button]);
 				}
 				break;
 			}

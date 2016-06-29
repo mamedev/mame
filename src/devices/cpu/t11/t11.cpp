@@ -191,38 +191,41 @@ static const struct irq_table_entry irq_table[] =
 	{ 7<<5, 0x60 }
 };
 
-void t11_device::t11_check_irqs()
+void t11_device::t11_check_irqs(int prio)
 {
-	const struct irq_table_entry *irq = &irq_table[m_irq_state & 15];
-	int priority = PSW & 0xe0;
+	int i, priority = PSW & 0xe0;
 
-	/* compare the priority of the interrupt to the PSW */
-	if (irq->priority > priority)
+	for(i = prio; i < 16; i++)
 	{
-		int vector = irq->vector;
-		int new_pc, new_psw;
-
-		/* call the callback; if we don't get -1 back, use the return value as our vector */
-		int new_vector = standard_irq_callback(m_irq_state & 15);
-		if (new_vector != -1)
-			vector = new_vector;
-
-		/* fetch the new PC and PSW from that vector */
-		assert((vector & 3) == 0);
-		new_pc = RWORD(vector);
-		new_psw = RWORD(vector + 2);
-
-		/* push the old state, set the new one */
-		PUSH(PSW);
-		PUSH(PC);
-		PCD = new_pc;
-		PSW = new_psw;
-		t11_check_irqs();
-
-		/* count cycles and clear the WAIT flag */
-		m_icount -= 114;
-		m_wait_state = 0;
+		if(((m_irq_state >> i) & 1) && (irq_table[i].priority > priority))
+			break;
 	}
+	if(i >= 16)
+		return;
+
+	int vector = irq_table[i].vector;
+	int new_pc, new_psw;
+
+	/* call the callback; if we don't get -1 back, use the return value as our vector */
+	int new_vector = standard_irq_callback(i);
+	if (new_vector != -1)
+		vector = new_vector;
+
+	/* fetch the new PC and PSW from that vector */
+	assert((vector & 3) == 0);
+	new_pc = RWORD(vector);
+	new_psw = RWORD(vector + 2);
+
+	/* push the old state, set the new one */
+	PUSH(PSW);
+	PUSH(PC);
+	PCD = new_pc;
+	PSW = new_psw;
+	t11_check_irqs(i + 1);
+
+	/* count cycles and clear the WAIT flag */
+	m_icount -= 114;
+	m_wait_state = 0;
 }
 
 

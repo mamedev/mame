@@ -121,7 +121,7 @@ WRITE16_MEMBER(toaplan1_state::demonwld_dsp_bio_w)
 	}
 }
 
-READ16_MEMBER(toaplan1_state::demonwld_BIO_r)
+READ_LINE_MEMBER(toaplan1_state::demonwld_BIO_r)
 {
 	return m_dsp_BIO;
 }

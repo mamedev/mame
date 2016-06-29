@@ -792,7 +792,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( outzonecv_main_map, AS_PROGRAM, 16, toaplan1_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-//	AM_RANGE(0x040000, 0x07ffff) AM_ROM
+//  AM_RANGE(0x040000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM
 	AM_RANGE(0x0c0000, 0x0c0003) AM_WRITE(toaplan1_tile_offsets_w)
 	AM_RANGE(0x0c0006, 0x0c0007) AM_WRITE(toaplan1_fcu_flipscreen_w)
@@ -933,7 +933,6 @@ static ADDRESS_MAP_START( DSP_io_map, AS_IO, 16, toaplan1_state )
 	AM_RANGE(0, 0) AM_WRITE(demonwld_dsp_addrsel_w)
 	AM_RANGE(1, 1) AM_READWRITE(demonwld_dsp_r, demonwld_dsp_w)
 	AM_RANGE(3, 3) AM_WRITE(demonwld_dsp_bio_w)
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(demonwld_BIO_r)
 ADDRESS_MAP_END
 
 
@@ -1979,6 +1978,7 @@ static MACHINE_CONFIG_START( demonwld, toaplan1_state )
 	MCFG_CPU_ADD("dsp", TMS32010, XTAL_28MHz/2)
 	MCFG_CPU_PROGRAM_MAP(DSP_program_map)
 	MCFG_CPU_IO_MAP(DSP_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(toaplan1_state, demonwld_BIO_r))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 

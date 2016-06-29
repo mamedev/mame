@@ -45,6 +45,7 @@ bool parser_t::parse(const pstring nlname)
 	m_tok_NET_C = register_token("NET_C");
 	m_tok_FRONTIER = register_token("OPTIMIZE_FRONTIER");
 	m_tok_PARAM = register_token("PARAM");
+	m_tok_HINT = register_token("HINT");
 	m_tok_NET_MODEL = register_token("NET_MODEL");
 	m_tok_INCLUDE = register_token("INCLUDE");
 	m_tok_LOCAL_SOURCE = register_token("LOCAL_SOURCE");
@@ -120,6 +121,8 @@ void parser_t::parse_netlist(ATTR_UNUSED const pstring &nlname)
 			frontier();
 		else if (token.is(m_tok_PARAM))
 			netdev_param();
+		else if (token.is(m_tok_HINT))
+			netdev_hint();
 		else if (token.is(m_tok_NET_MODEL))
 			net_model();
 		else if (token.is(m_tok_SUBMODEL))
@@ -153,13 +156,16 @@ void parser_t::net_truthtable_start()
 	require_token(m_tok_comma);
 	unsigned no = get_number_long();
 	require_token(m_tok_comma);
-	unsigned hs = get_number_long();
-	require_token(m_tok_comma);
 	pstring def_param = get_string();
 	require_token(m_tok_param_right);
 
-	plib::owned_ptr<netlist::devices::netlist_base_factory_truthtable_t> ttd = netlist::devices::nl_tt_factory_create(ni, no, hs,
-			name, name, "+" + def_param);
+	netlist::tt_desc desc;
+	desc.classname = name;
+	desc.name = name;
+	desc.ni = ni;
+	desc.no = no;
+	desc.def_param = "+" + def_param;
+	desc.family = "";
 
 	while (true)
 	{
@@ -168,19 +174,19 @@ void parser_t::net_truthtable_start()
 		if (token.is(m_tok_TT_HEAD))
 		{
 			require_token(m_tok_param_left);
-			ttd->m_desc.push_back(get_string());
+			desc.desc.push_back(get_string());
 			require_token(m_tok_param_right);
 		}
 		else if (token.is(m_tok_TT_LINE))
 		{
 			require_token(m_tok_param_left);
-			ttd->m_desc.push_back(get_string());
+			desc.desc.push_back(get_string());
 			require_token(m_tok_param_right);
 		}
 		else if (token.is(m_tok_TT_FAMILY))
 		{
 			require_token(m_tok_param_left);
-			ttd->m_family = m_setup.family_from_model(get_string());
+			desc.family = get_string();
 			require_token(m_tok_param_right);
 		}
 		else
@@ -188,7 +194,7 @@ void parser_t::net_truthtable_start()
 			require_token(token, m_tok_TRUTHTABLE_END);
 			require_token(m_tok_param_left);
 			require_token(m_tok_param_right);
-			m_setup.factory().register_device(std::move(ttd));
+			netlist::devices::tt_factory_create(m_setup, desc);
 			return;
 		}
 	}
@@ -339,6 +345,15 @@ void parser_t::netdev_param()
 	require_token(m_tok_param_right);
 }
 
+void parser_t::netdev_hint()
+{
+	pstring dev(get_identifier());
+	require_token(m_tok_comma);
+	pstring hint(get_identifier());
+	m_setup.register_param(dev + ".HINT_" + hint, 1);
+	require_token(m_tok_param_right);
+}
+
 void parser_t::device(const pstring &dev_type)
 {
 	if (m_setup.is_library_item(dev_type))
@@ -431,7 +446,7 @@ nl_double parser_t::eval_param(const token_t tok)
 		val = tok.str();
 		ret = val.as_double(&e);
 		if (e)
-			error("Error with parameter ...\n");
+			error(plib::pfmt("Error with parameter {1}...\n")(val));
 	}
 	return ret * facs[f];
 

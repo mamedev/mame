@@ -901,7 +901,7 @@ V.Baby (NOT V.Smile Baby)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="cinderlaa" cloneof="cinderla" supported="no">
 		<description>Cinderella - Cinderella's Magic Wishes (USA, Alt)</description>
 		<year>200?</year>
@@ -912,7 +912,7 @@ V.Baby (NOT V.Smile Baby)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="cinderlaf" cloneof="cinderla" supported="no">
 		<description>Cendrillon - Le Rêve Enchanté de Cendrillon (Fra)</description>
 		<year>200?</year>
@@ -1056,7 +1056,7 @@ V.Baby (NOT V.Smile Baby)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="kleinstn" supported="no">
 		<description>Kleine Einsteins (Ger)</description>
 		<year>200?</year>
@@ -1122,7 +1122,7 @@ V.Baby (NOT V.Smile Baby)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mickymag" supported="no">
 		<description>Disney's Mickey Mouse - Mickey's Magical Adventure (USA)</description>
 		<year>200?</year>
@@ -1342,7 +1342,7 @@ V.Baby (NOT V.Smile Baby)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="shrekf" cloneof="shrek" supported="no">
 		<description>Shrek - Le Rhume de Dragonne (Fra)</description>
 		<year>200?</year>
@@ -1463,7 +1463,7 @@ V.Baby (NOT V.Smile Baby)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="tingelng" supported="no">
 		<description>Tingeling (Swe)</description>
 		<year>200?</year>
@@ -1474,7 +1474,7 @@ V.Baby (NOT V.Smile Baby)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="toystor2" supported="no">
 		<description>Toy Story 2 - Operation: Rescue Woody! (USA)</description>
 		<year>2005</year>
@@ -1540,7 +1540,7 @@ V.Baby (NOT V.Smile Baby)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pooh1" cloneof="pooh" supported="no">
 		<description>My Friends Tigger &amp; Pooh - Die Honigjagd (Ger)</description>
 		<year>200?</year>
@@ -1617,7 +1617,7 @@ V.Baby (NOT V.Smile Baby)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="zayzoo" supported="no">
 		<description>Zayzoo - My Alien Classmate (USA)</description>
 		<year>200?</year>
@@ -1665,7 +1665,7 @@ V.Baby (NOT V.Smile Baby)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="poohhawa" supported="no">
 		<description>Pooh's Hundred Acre Wood Adventure (USA) (V.Smile Baby)</description>
 		<year>2007</year>
@@ -1713,7 +1713,7 @@ V.Baby (NOT V.Smile Baby)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="kleinsvm" supported="no">
 		<description>Kleine Einsteins (Ger) (V.Smile Motion)</description>
 		<year>200?</year>

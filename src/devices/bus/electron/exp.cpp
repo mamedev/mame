@@ -2,7 +2,7 @@
 // copyright-holders:Nigel Barnes
 /**********************************************************************
 
-		Electron Expansion Port emulation
+        Electron Expansion Port emulation
 
 **********************************************************************/
 

@@ -5182,7 +5182,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="ballade">
+	<software name="bfmaria">
 		<description>Ballade for Maria</description>
 		<year>1995</year>
 		<publisher>フェアリーテール ハードカバー (Fairytale Hardcover)</publisher>
@@ -13926,7 +13926,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="dngmster">
+	<software name="dmaster">
 		<description>Dungeon Master</description>
 		<year>1990</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
@@ -13939,7 +13939,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="dngmstera" cloneof="dngmster">
+	<software name="dmastera" cloneof="dmaster">
 		<description>Dungeon Master (Alt Format)</description>
 		<year>1990</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
@@ -13952,7 +13952,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="dngmstr2">
+	<software name="dmaster2">
 		<description>Dungeon Master II - Skullkeep</description>
 		<year>1993</year>
 		<publisher>ビクターエンタテインメント (Victor Entertainment)</publisher>
@@ -13984,7 +13984,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="dngmstr2a" cloneof="dngmstr2">
+	<software name="dmaster2a" cloneof="dmaster2">
 		<description>Dungeon Master II - Skullkeep (Alt Save Disk)</description>
 		<year>1993</year>
 		<publisher>ビクターエンタテインメント (Victor Entertainment)</publisher>
@@ -21735,7 +21735,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="kingsbty">
+	<software name="kbounty">
 		<description>King's Bounty</description>
 		<year>1994</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
@@ -22651,7 +22651,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="kyrandi2">
+	<software name="kyrand2">
 		<description>Kyrandia 2 - The Hand of Fate</description>
 		<year>1995</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
@@ -23798,7 +23798,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="lunatic2">
+	<software name="ldawn2">
 		<description>Lunatic Dawn II</description>
 		<year>1994</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -23857,7 +23857,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 	</software>
 
 	<software name="mparadox">
-		<description>Mad·Paradox</description>
+		<description>Mad Paradox</description>
 		<year>1992</year>
 		<publisher>クィーンソフト (Queensoft)</publisher>
 		<info name="alt_title" value="マッドパラドックス" />
@@ -27039,7 +27039,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="moonligh">
+	<software name="moonchan">
 		<description>Moonlight Chan Rin Shan</description>
 		<year>1993</year>
 		<publisher>ディー・オー (D.O.)</publisher>
@@ -27836,7 +27836,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 			</dataarea>
 		</part>
 	</software>
-	
+
 <!-- confirmed as good by peter_j -->
 	<software name="3dgolfb" cloneof="3dgolf">
 		<description>New 3D Golf Simulation - Harukanaru Augusta (Alt Format)</description>
@@ -27872,7 +27872,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 			</dataarea>
 		</part>
 	</software>
-	
+
 <!-- confirmed as good by peter_j -->
 	<software name="3dgolf8la" cloneof="3dgolf">
 		<description>New 3D Golf Simulation - Eight Lakes G.C. (Alt Format)</description>
@@ -27917,7 +27917,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 			</dataarea>
 		</part>
 	</software>
-	
+
 <!-- confirmed as good by peter_j -->
 	<software name="3dgolfwka" cloneof="3dgolf">
 		<description>New 3D Golf Simulation - Waialae no Kiseki (Alt Format)</description>
@@ -31548,7 +31548,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="provvidn">
+	<software name="provvdnz">
 		<description>Provvidenza - Legenda la Spada di Alfa</description>
 		<year>1991</year>
 		<publisher>きんぷくりん (Kinpukurin)</publisher>
@@ -31890,7 +31890,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="qnduelst">
+	<software name="tqod">
 		<description>The Queen of Duellist</description>
 		<year>1993</year>
 		<publisher>アグミックス (Agumix)</publisher>
@@ -31910,7 +31910,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="qnduelstap" cloneof="qnduelst">
+	<software name="tqodap" cloneof="tqod">
 		<description>The Queen of Duellist Gaiden α+</description>
 		<year>19??</year>
 		<publisher>アグミックス (Agumix)</publisher>
@@ -40228,7 +40228,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="tunnelst">
+	<software name="tuntroll">
 		<description>Tunnels &amp; Trolls - Crusaders of Khazan</description>
 		<year>1990</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
@@ -41070,7 +41070,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="ultimauw">
+	<software name="ultuw">
 		<description>Ultima Underworld - The Stygian Abyss</description>
 		<year>1993</year>
 		<publisher>エレクトロニック・アーツ・ビクター (Electronic Arts Victor)</publisher>
@@ -51597,7 +51597,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="alondark" supported="no">
+	<software name="aitd" supported="no">
 		<description>Alone in the Dark</description>
 		<year>1994</year>
 		<publisher>アローマイクロテックス (Arrow Micro-Techs)</publisher>
@@ -56209,7 +56209,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="lunatic" supported="no">
+	<software name="ldawn" supported="no">
 		<description>Lunatic Dawn</description>
 		<year>1993</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -56235,8 +56235,8 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="madparad" supported="no">
-		<description>Mad Paradox</description>
+	<software name="mparadoxa" cloneof="mparadox" supported="no">
+		<description>Mad Paradox (Alt Format)</description>
 		<year>1992</year>
 		<publisher>クィーンソフト (Queensoft)</publisher>
 		<info name="alt_title" value="マッドパラドックス" />
@@ -57755,7 +57755,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="shanglia" supported="no">
+	<software name="shangrl" supported="no">
 		<description>Shangrlia</description>
 		<year>1991</year>
 		<publisher>エルフ (Elf)</publisher>

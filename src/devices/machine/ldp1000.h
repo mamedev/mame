@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-	Sony LDP-1000 laserdisc emulation.
+    Sony LDP-1000 laserdisc emulation.
 
 ***************************************************************************/
 
@@ -46,27 +46,27 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual const rom_entry *device_rom_region() const override;
-	
+
 	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
 	virtual INT32 player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
 	virtual void player_overlay(bitmap_yuy16 &bitmap) override { }
 
 	enum ldp1000_status {
-		stat_undef = 		0x00,
-		stat_completion = 	0x01,
-		stat_error = 		0x02,
-		stat_pgm_end = 		0x04,
-		stat_not_target = 	0x05,
-		stat_no_frame = 	0x06,
-		stat_ack = 			0x0a,
-		stat_nak = 			0x0b
+		stat_undef =        0x00,
+		stat_completion =   0x01,
+		stat_error =        0x02,
+		stat_pgm_end =      0x04,
+		stat_not_target =   0x05,
+		stat_no_frame =     0x06,
+		stat_ack =          0x0a,
+		stat_nak =          0x0b
 	};
 
 	enum ldp1000_player_state {
 		player_standby = 0,
 		player_search
 	};
-	
+
 private:
 	UINT8 m_command;
 	ldp1000_status m_status;
@@ -79,7 +79,7 @@ private:
 	void exec_enter_cmd();
 	UINT8 m_internal_bcd[0x10];
 	UINT8 m_index_state;
-	
+
 };
 
 

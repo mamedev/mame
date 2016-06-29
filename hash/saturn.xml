@@ -79,7 +79,7 @@
 	  Albert Odyssey Gaiden: Legend of Eldean (Japan) (Satakore) [T-1517G]                  |  ??
 	  Album Club Mune Kyun: Saint Paulia Jogakuin (Japan) [T-21903G]                        | (albumclb)
 	  Alien Trilogy (Japan) [T-8113G]                                                       | (alientrij)
-	  Alone in the Dark 2 (Japan) [T-10602G]                                                | (alondrk2j)
+	  Alone in the Dark 2 (Japan) [T-10602G]                                                | (aitd2j)
 	  Amagi Shien (Japan) [T-1513G]                                                         | (amagishi)      gets stuck on sega logo
 	  America Oudan Ultra Quiz (Japan) [T-6004G]                                            | (amoudan)
 	  AMOK (Japan) [T-7637G]                                                                | (amokj)         playable?
@@ -305,7 +305,7 @@
 	  Dream Generation: Koi ka? Shigoto ka!?... (Japan) [T-2511G]                           | (dreamgen)
 	  Dream Square: Hinagata Akiko (Japan) [T-3002G]                                        | (dreamsq)
 	  Druid: Yami e no Tsuisekisha (Japan) [T-7670G]                                        | (druid)
-	  Dungeon Master Nexus (Japan) [T-9111G]                                                | (dngmster)
+	  Dungeon Master Nexus (Japan) [T-9111G]                                                | (dmastnx)
 	  Dungeons & Dragons Collection (Japan) [T-1224G]                                       | (ddtod) (ddsom)
 	  Dungeons & Dragons Collection (Japan) (Doukonban) [T-1245G]                           |  ??
 	  DX Jinsei Game (Japan) [T-10302G]                                                     | (dxjinsei)
@@ -2600,7 +2600,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Alone in the Dark 2 (Japan)... -->
-	<software name="alondrk2j" cloneof="alondrk2" supported="no">
+	<software name="aitd2j" cloneof="aitd2" supported="no">
 		<description>Alone in the Dark 2 (Jpn)</description>
 		<year>1996</year>
 		<publisher>Electronic Arts Victor</publisher>
@@ -14859,7 +14859,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Alone in the Dark 2 (T-10602G)... -->
-	<software name="alondrk2ja" cloneof="alondrk2" supported="no">
+	<software name="aitd2ja" cloneof="aitd2" supported="no">
 		<description>Alone in the Dark 2 (Jpn, Alt)</description>
 		<year>1996</year>
 		<publisher>Electronic Arts Victor</publisher>
@@ -28519,7 +28519,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Dungeon Master Nexus (Japan) [T-9111G]... -->
-	<software name="dngmster" supported="no">
+	<software name="dmastnx" supported="no">
 		<description>Dungeon Master Nexus (Jpn)</description>
 		<year>1998</year>
 		<publisher>Victor Interactive</publisher>
@@ -30082,7 +30082,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Alone in the Dark - Jack is Back v1.100 (1996)(Infogrames)(PAL)(M5)[!][T-15101HP-00738 A]... -->
-	<software name="alondrk2" supported="no">
+	<software name="aitd2" supported="no">
 		<description>Alone in the Dark - Jack is Back (Euro)</description>
 		<year>1996</year>
 		<publisher>Infogrames</publisher>
@@ -34600,7 +34600,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying dw-at-0792-Alone_in_the_Dark-usa... -->
-	<software name="alondrk2u" cloneof="alondrk2" supported="no">
+	<software name="aitd2u" cloneof="aitd2" supported="no">
 		<description>Alone in the Dark - One-Eyed Jack's Revenge (USA)</description>
 		<year>1996</year>
 		<publisher>Kokopeli</publisher>

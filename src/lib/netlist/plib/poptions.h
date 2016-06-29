@@ -17,7 +17,6 @@
 #include "putil.h"
 
 namespace plib {
-
 /***************************************************************************
     Options
 ***************************************************************************/
@@ -27,35 +26,34 @@ class options;
 class option
 {
 public:
-	option()
-	: m_short(""), m_long(""), m_help(""), m_has_argument(false)
-	{}
+	option();
+	option(options &parent, pstring ashort, pstring along, pstring help, bool has_argument);
 
-	option(pstring ashort, pstring along, pstring help, bool has_argument, options *parent = nullptr);
-
-	virtual ~option()
-	{
-	}
+	virtual ~option();
 
 	/* no_argument options will be called with "" argument */
 
-	virtual int parse(ATTR_UNUSED pstring argument) { return 0; }
+	virtual int parse(ATTR_UNUSED pstring argument) = 0;
 
+	pstring short_opt() { return m_short; }
+	pstring long_opt() { return m_long; }
+	pstring help() { return m_help; }
+	bool has_argument() { return m_has_argument ; }
+private:
 	pstring m_short;
 	pstring m_long;
 	pstring m_help;
 	bool m_has_argument;
-private:
 };
 
 class option_str : public option
 {
 public:
-	option_str(pstring ashort, pstring along, pstring defval, pstring help, options *parent = nullptr)
-	: option(ashort, along, help, true, parent), m_val(defval)
+	option_str(options &parent, pstring ashort, pstring along, pstring defval, pstring help)
+	: option(parent, ashort, along, help, true), m_val(defval)
 	{}
 
-	virtual int parse(pstring argument) override { m_val = argument; return 0; }
+	virtual int parse(pstring argument) override;
 
 	pstring operator ()() { return m_val; }
 private:
@@ -65,22 +63,15 @@ private:
 class option_str_limit : public option
 {
 public:
-	option_str_limit(pstring ashort, pstring along, pstring defval, pstring limit, pstring help, options *parent = nullptr)
-	: option(ashort, along, help, true, parent), m_val(defval), m_limit(limit, ":")
+	option_str_limit(options &parent, pstring ashort, pstring along, pstring defval, pstring limit, pstring help)
+	: option(parent, ashort, along, help, true), m_val(defval), m_limit(limit, ":")
 	{}
 
-	virtual int parse(pstring argument) override
-	{
-		if (plib::container::contains(m_limit, argument))
-		{
-			m_val = argument;
-			return 0;
-		}
-		else
-			return 1;
-	}
+	virtual int parse(pstring argument) override;
 
 	pstring operator ()() { return m_val; }
+	const plib::pstring_vector_t &limit() { return m_limit; }
+
 private:
 	pstring m_val;
 	plib::pstring_vector_t m_limit;
@@ -89,11 +80,11 @@ private:
 class option_bool : public option
 {
 public:
-	option_bool(pstring ashort, pstring along, pstring help, options *parent = nullptr)
-	: option(ashort, along, help, false, parent), m_val(false)
+	option_bool(options &parent, pstring ashort, pstring along, pstring help)
+	: option(parent, ashort, along, help, false), m_val(false)
 	{}
 
-	virtual int parse(ATTR_UNUSED pstring argument) override { m_val = true; return 0; }
+	virtual int parse(ATTR_UNUSED pstring argument) override;
 
 	bool operator ()() { return m_val; }
 private:
@@ -103,16 +94,11 @@ private:
 class option_double : public option
 {
 public:
-	option_double(pstring ashort, pstring along, double defval, pstring help, options *parent = nullptr)
-	: option(ashort, along, help, true, parent), m_val(defval)
+	option_double(options &parent, pstring ashort, pstring along, double defval, pstring help)
+	: option(parent, ashort, along, help, true), m_val(defval)
 	{}
 
-	virtual int parse(pstring argument) override
-	{
-		bool err = false;
-		m_val = argument.as_double(&err);
-		return (err ? 1 : 0);
-	}
+	virtual int parse(pstring argument) override;
 
 	double operator ()() { return m_val; }
 private:
@@ -123,117 +109,30 @@ class options
 {
 public:
 
-	options() {}
+	options();
+	explicit options(option *o[]);
 
-	options(option *o[])
-	{
-		int i=0;
-		while (o[i] != nullptr)
-		{
-			m_opts.push_back(o[i]);
-			i++;
-		}
-	}
+	~options();
 
-	~options()
-	{
-		m_opts.clear();
-	}
+	void register_option(option *opt);
+	int parse(int argc, char *argv[]);
 
-	void register_option(option *opt)
-	{
-		m_opts.push_back(opt);
-	}
+	pstring help(pstring description, pstring usage,
+			unsigned width = 72, unsigned ident = 20);
 
-	int parse(int argc, char *argv[])
-	{
-		m_app = argv[0];
-
-		for (int i=1; i<argc; )
-		{
-			pstring arg(argv[i]);
-			option *opt = nullptr;
-
-			if (arg.startsWith("--"))
-			{
-				opt = getopt_long(arg.substr(2));
-			}
-			else if (arg.startsWith("-"))
-			{
-				opt = getopt_short(arg.substr(1));
-			}
-			else
-				return i;
-			if (opt == nullptr)
-				return i;
-			if (opt->m_has_argument)
-			{
-				i++; // FIXME: are there more arguments?
-				if (opt->parse(argv[i]) != 0)
-					return i - 1;
-			}
-			else
-				opt->parse("");
-			i++;
-		}
-		return argc;
-	}
-
-	pstring help()
-	{
-		pstring ret;
-
-		for (auto & opt : m_opts )
-		{
-			pstring line = "";
-			if (opt->m_short != "")
-				line += "  -" + opt->m_short;
-			if (opt->m_long != "")
-			{
-				if (line != "")
-					line += ", ";
-				else
-					line = "     ";
-				line += "--" + opt->m_long;
-			}
-			line = line.rpad(" ", 20).cat(opt->m_help);
-			ret = ret + line + "\n";
-		}
-		return ret;
-	}
 	pstring app() { return m_app; }
 
 private:
+	static pstring split_paragraphs(pstring text, unsigned width, unsigned ident,
+			unsigned firstline_ident);
 
-	option *getopt_short(pstring arg)
-	{
-		for (auto & opt : m_opts)
-		{
-			if (opt->m_short == arg)
-				return opt;
-		}
-		return nullptr;
-	}
-	option *getopt_long(pstring arg)
-	{
-		for (auto & opt : m_opts)
-		{
-			if (opt->m_long == arg)
-				return opt;
-		}
-		return nullptr;
-	}
+	option *getopt_short(pstring arg);
+	option *getopt_long(pstring arg);
 
 	std::vector<option *> m_opts;
 	pstring m_app;
 };
 
-option::option(pstring ashort, pstring along, pstring help, bool has_argument, options *parent)
-: m_short(ashort), m_long(along), m_help(help), m_has_argument(has_argument)
-{
-	if (parent != nullptr)
-		parent->register_option(this);
-}
 
 }
 

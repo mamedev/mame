@@ -516,10 +516,10 @@ READ16_MEMBER( asic65_device::stat_r )
 }
 
 
-READ16_MEMBER( asic65_device::get_bio )
+READ_LINE_MEMBER( asic65_device::get_bio )
 {
 	if (!m_tfull)
-		space.device().execute().spin_until_interrupt();
+		m_ourcpu->spin_until_interrupt();
 	return m_tfull ? CLEAR_LINE : ASSERT_LINE;
 }
 
@@ -539,7 +539,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( asic65_io_map, AS_IO, 16, asic65_device )
 	AM_RANGE(0, 0) AM_MIRROR(6) AM_READWRITE(m68k_r, m68k_w)
 	AM_RANGE(1, 1) AM_MIRROR(6) AM_READWRITE(stat_r, stat_w)
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(get_bio)
 ADDRESS_MAP_END
 
 
@@ -556,6 +555,7 @@ MACHINE_CONFIG_FRAGMENT( asic65 )
 	MCFG_CPU_ADD("asic65cpu", TMS32010, 20000000)
 	MCFG_CPU_PROGRAM_MAP(asic65_program_map)
 	MCFG_CPU_IO_MAP(asic65_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(asic65_device, get_bio))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

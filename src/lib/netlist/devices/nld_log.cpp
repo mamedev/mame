@@ -16,13 +16,11 @@ namespace netlist
 {
 	namespace devices
 	{
-
 	NETLIB_OBJECT(log)
 	{
 		NETLIB_CONSTRUCTOR(log)
 		, m_I(*this, "I")
 		{
-
 			pstring filename = plib::pfmt("{1}.log")(this->name());
 			m_strm = plib::make_unique<plib::pofilestream>(filename);
 		}

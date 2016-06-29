@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 /***************************************************************************
 
-    un7z.c
+    un7z.cpp
 
     Functions to manipulate data within 7z files.
 
@@ -14,6 +14,7 @@
 
 #include "corestr.h"
 #include "unicode.h"
+#include "timeconv.h"
 
 #include "lzma/C/7z.h"
 #include "lzma/C/7zAlloc.h"
@@ -23,10 +24,13 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <chrono>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <ctime>
 #include <mutex>
+#include <ratio>
 #include <utility>
 #include <vector>
 
@@ -145,6 +149,7 @@ public:
 	bool current_is_directory() const { return m_curr_is_dir; }
 	const std::string &current_name() const { return m_curr_name; }
 	std::uint64_t current_uncompressed_length() const { return m_curr_length; }
+	virtual std::chrono::system_clock::time_point current_last_modified() const { return m_curr_modified; }
 	std::uint32_t current_crc() const { return m_curr_crc; }
 
 	archive_file::error decompress(void *buffer, std::uint32_t length);
@@ -163,34 +168,36 @@ private:
 			bool matchname,
 			bool partialpath);
 	void make_utf8_name(int index);
+	void set_curr_modified();
 
-	static constexpr std::size_t        CACHE_SIZE = 8;
-	static std::array<ptr, CACHE_SIZE>  s_cache;
-	static std::mutex                   s_cache_mutex;
+	static constexpr std::size_t            CACHE_SIZE = 8;
+	static std::array<ptr, CACHE_SIZE>      s_cache;
+	static std::mutex                       s_cache_mutex;
 
-	const std::string           m_filename;             // copy of _7Z filename (for caching)
+	const std::string                       m_filename;             // copy of _7Z filename (for caching)
 
-	int                         m_curr_file_idx;        // current file index
-	bool                        m_curr_is_dir;          // current file is directory
-	std::string                 m_curr_name;            // current file name
-	std::uint64_t               m_curr_length;          // current file uncompressed length
-	std::uint32_t               m_curr_crc;             // current file crc
+	int                                     m_curr_file_idx;        // current file index
+	bool                                    m_curr_is_dir;          // current file is directory
+	std::string                             m_curr_name;            // current file name
+	std::uint64_t                           m_curr_length;          // current file uncompressed length
+	std::chrono::system_clock::time_point   m_curr_modified;        // current file modification time
+	std::uint32_t                           m_curr_crc;             // current file crc
 
-	std::vector<UInt16>         m_utf16_buf;
-	std::vector<unicode_char>   m_uchar_buf;
-	std::vector<char>           m_utf8_buf;
+	std::vector<UInt16>                     m_utf16_buf;
+	std::vector<unicode_char>               m_uchar_buf;
+	std::vector<char>                       m_utf8_buf;
 
-	CFileInStream               m_archive_stream;
-	CLookToRead                 m_look_stream;
-	CSzArEx                     m_db;
-	ISzAlloc                    m_alloc_imp;
-	ISzAlloc                    m_alloc_temp_imp;
-	bool                        m_inited;
+	CFileInStream                           m_archive_stream;
+	CLookToRead                             m_look_stream;
+	CSzArEx                                 m_db;
+	ISzAlloc                                m_alloc_imp;
+	ISzAlloc                                m_alloc_temp_imp;
+	bool                                    m_inited;
 
 	// cached stuff for solid blocks
-	UInt32                      m_block_index;
-	Byte *                      m_out_buffer;
-	std::size_t                 m_out_buffer_size;
+	UInt32                                  m_block_index;
+	Byte *                                  m_out_buffer;
+	std::size_t                             m_out_buffer_size;
 
 };
 
@@ -220,6 +227,7 @@ public:
 	virtual bool current_is_directory() const override { return m_impl->current_is_directory(); }
 	virtual const std::string &current_name() const override { return m_impl->current_name(); }
 	virtual std::uint64_t current_uncompressed_length() const override { return m_impl->current_uncompressed_length(); }
+	virtual std::chrono::system_clock::time_point current_last_modified() const override { return m_impl->current_last_modified(); }
 	virtual std::uint32_t current_crc() const override { return m_impl->current_crc(); }
 
 	virtual error decompress(void *buffer, std::uint32_t length) override { return m_impl->decompress(buffer, length); }
@@ -277,6 +285,7 @@ m7z_file_impl::m7z_file_impl(const std::string &filename)
 	, m_curr_is_dir(false)
 	, m_curr_name()
 	, m_curr_length(0)
+	, m_curr_modified()
 	, m_curr_crc(0)
 	, m_utf16_buf(128)
 	, m_uchar_buf(128)
@@ -447,6 +456,7 @@ int m7z_file_impl::search(
 			m_curr_is_dir = is_dir;
 			m_curr_name = &m_utf8_buf[0];
 			m_curr_length = size;
+			set_curr_modified();
 			m_curr_crc = crc;
 
 			return i;
@@ -498,6 +508,22 @@ void m7z_file_impl::make_utf8_name(int index)
 	m_utf8_buf[out_pos++] = '\0';
 	m_utf8_buf.resize(out_pos);
 }
+
+
+void m7z_file_impl::set_curr_modified()
+{
+	if (SzBitWithVals_Check(&m_db.MTime, m_curr_file_idx))
+	{
+		CNtfsFileTime const &file_time(m_db.MTime.Vals[m_curr_file_idx]);
+		auto ticks = ntfs_duration_from_filetime(file_time.High, file_time.Low);
+		m_curr_modified = system_clock_time_point_from_ntfs_duration(ticks);
+	}
+	else
+	{
+		// FIXME: what do we do about a lack of time?
+	}
+}
+
 
 } // anonymous namespace
 

@@ -276,7 +276,6 @@ Stephh's notes (based on the games M6502 code and some tests) :
     - music freq (Satan of Saturn and clone)
     - correct music waveform/volume control
     - correct ROM names
-    - fantasy is German? (the continue text is in German)
 
 */
 
@@ -1595,7 +1594,7 @@ GAME( 1981, satansatind,satansat,satansat,satansat, driver_device, 0, ROT90, "bo
 GAME( 1981, vanguard, 0,        vanguard, vanguard, driver_device, 0, ROT90, "SNK", "Vanguard (SNK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, vanguardc,vanguard, vanguard, vanguard, driver_device, 0, ROT90, "SNK (Centuri license)", "Vanguard (Centuri)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, vanguardj,vanguard, vanguard, vanguard, driver_device, 0, ROT90, "SNK", "Vanguard (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, fantasy,  0,        fantasy,  fantasy, driver_device,  0, ROT90, "SNK", "Fantasy (World)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fantasy,  0,        fantasy,  fantasy, driver_device,  0, ROT90, "SNK", "Fantasy (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg?
 GAME( 1981, fantasyu, fantasy,  fantasy,  fantasyu, driver_device, 0, ROT90, "SNK (Rock-Ola license)", "Fantasy (US)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, fantasyj, fantasy,  fantasy,  fantasyu, driver_device, 0, ROT90, "SNK", "Fantasy (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, pballoon, 0,        pballoon, pballoon, driver_device, 0, ROT90, "SNK", "Pioneer Balloon", MACHINE_SUPPORTS_SAVE )

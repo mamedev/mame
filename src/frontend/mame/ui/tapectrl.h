@@ -17,7 +17,6 @@
 #include "ui/devctrl.h"
 
 namespace ui {
-
 class menu_tape_control : public menu_device_control<cassette_image_device>
 {
 public:

@@ -354,7 +354,7 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 //  osd_stat
 //============================================================
 
-osd_directory_entry *osd_stat(const std::string &path)
+std::unique_ptr<osd::directory::entry> osd_stat(const std::string &path)
 {
 	// convert the path to TCHARs
 	std::unique_ptr<TCHAR, void (*)(void *)> const t_path(tstring_from_utf8(path.c_str()), &osd_free);
@@ -379,17 +379,20 @@ osd_directory_entry *osd_stat(const std::string &path)
 		FindClose(find);
 	}
 
-	// create an osd_directory_entry; be sure to make sure that the caller can
-	// free all resources by just freeing the resulting osd_directory_entry
-	osd_directory_entry *const result = (osd_directory_entry *)osd_malloc_array(sizeof(*result) + path.length() + 1);
-	if (!result)
-		return nullptr;
+	// create an osd::directory::entry; be sure to make sure that the caller can
+	// free all resources by just freeing the resulting osd::directory::entry
+	osd::directory::entry *result;
+	try { result = reinterpret_cast<osd::directory::entry *>(::operator new(sizeof(*result) + path.length() + 1)); }
+	catch (...) { return nullptr; }
+	new (result) osd::directory::entry;
+
 	strcpy(((char *) result) + sizeof(*result), path.c_str());
 	result->name = ((char *) result) + sizeof(*result);
 	result->type = win_attributes_to_entry_type(find_data.dwFileAttributes);
 	result->size = find_data.nFileSizeLow | ((UINT64) find_data.nFileSizeHigh << 32);
+	result->last_modified = win_time_point_from_filetime(&find_data.ftLastWriteTime);
 
-	return result;
+	return std::unique_ptr<osd::directory::entry>(result);
 }
 
 

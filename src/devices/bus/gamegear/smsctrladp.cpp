@@ -45,7 +45,7 @@ void sms_ctrl_adaptor_device::device_start()
 
 
 //-------------------------------------------------
-//  sms_peripheral_r - rapid fire read
+//  sms_peripheral_r - sms_ctrl_adaptor read
 //-------------------------------------------------
 
 UINT8 sms_ctrl_adaptor_device::peripheral_r()
@@ -55,7 +55,7 @@ UINT8 sms_ctrl_adaptor_device::peripheral_r()
 
 
 //-------------------------------------------------
-//  sms_peripheral_w - rapid fire write
+//  sms_peripheral_w - sms_ctrl_adaptor write
 //-------------------------------------------------
 
 void sms_ctrl_adaptor_device::peripheral_w(UINT8 data)

@@ -4,7 +4,7 @@
 /******************************************************************************
 
     Fidelity Electronics 6502 based board driver
-    
+
     TODO:
     - EAS doesn't work, there's some activity if you boot/reset with 1-key held down
 
@@ -578,7 +578,7 @@ WRITE8_MEMBER(fidel6502_state::eas_ppi_portc_w)
 	// d0-d3: input/led mux
 	m_led_select = data & 0xf;
 	csc_prepare_display();
-	
+
 	// other: ?
 }
 
@@ -1322,7 +1322,7 @@ static MACHINE_CONFIG_START( eas, fidel6502_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( su9, csc )
-	
+
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M6502, 2000000) // same as csc?
 	MCFG_CPU_PROGRAM_MAP(su9_map)

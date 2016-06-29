@@ -2258,8 +2258,8 @@ void gba_state::machine_start()
 static SLOT_INTERFACE_START(gba_cart)
 	SLOT_INTERFACE_INTERNAL("gba_rom",          GBA_ROM_STD)
 	SLOT_INTERFACE_INTERNAL("gba_sram",         GBA_ROM_SRAM)
-	SLOT_INTERFACE_INTERNAL("gba_drilldoz",     GBA_ROM_DRILLDOZ)	// Rumble output unemulated
-	SLOT_INTERFACE_INTERNAL("gba_wariotws",     GBA_ROM_WARIOTWS)	// Rumble output unemulated
+	SLOT_INTERFACE_INTERNAL("gba_drilldoz",     GBA_ROM_DRILLDOZ)   // Rumble output unemulated
+	SLOT_INTERFACE_INTERNAL("gba_wariotws",     GBA_ROM_WARIOTWS)   // Rumble output unemulated
 	SLOT_INTERFACE_INTERNAL("gba_eeprom",       GBA_ROM_EEPROM)
 	SLOT_INTERFACE_INTERNAL("gba_eeprom_4k",    GBA_ROM_EEPROM)
 	SLOT_INTERFACE_INTERNAL("gba_yoshiug",      GBA_ROM_YOSHIUG)

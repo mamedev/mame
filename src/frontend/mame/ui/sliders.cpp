@@ -17,7 +17,6 @@
 #include "ui/slider.h"
 
 namespace ui {
-
 menu_sliders::menu_sliders(mame_ui_manager &mui, render_container *container, bool menuless_mode) : menu(mui, container)
 {
 	m_menuless_mode = m_hidden = menuless_mode;
@@ -28,7 +27,7 @@ menu_sliders::~menu_sliders()
 }
 
 //-------------------------------------------------
-//	menu_sliders - handle the sliders menu
+//  menu_sliders - handle the sliders menu
 //-------------------------------------------------
 
 void menu_sliders::handle()
@@ -132,8 +131,8 @@ void menu_sliders::handle()
 
 
 //-------------------------------------------------
-//	menu_sliders_populate - populate the sliders
-//	menu
+//  menu_sliders_populate - populate the sliders
+//  menu
 //-------------------------------------------------
 
 void menu_sliders::populate()
@@ -188,8 +187,8 @@ void menu_sliders::populate()
 }
 
 //-------------------------------------------------
-//	menu_sliders_custom_render - perform our special
-//	rendering
+//  menu_sliders_custom_render - perform our special
+//  rendering
 //-------------------------------------------------
 
 void menu_sliders::custom_render(void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2)
@@ -259,9 +258,9 @@ void menu_sliders::custom_render(void *selectedref, float top, float bottom, flo
 
 
 //-------------------------------------------------
-//	slider_ui_handler - pushes the slider
-//	menu on the stack and hands off to the
-//	standard menu handler
+//  slider_ui_handler - pushes the slider
+//  menu on the stack and hands off to the
+//  standard menu handler
 //-------------------------------------------------
 
 UINT32 menu_sliders::ui_handler(render_container *container, mame_ui_manager &mui)

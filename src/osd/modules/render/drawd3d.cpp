@@ -565,7 +565,7 @@ int renderer_d3d9::pre_window_draw_check()
 		m_shaders->toggle();
 		m_sliders_dirty = true;
 
-		// re-create resources 
+		// re-create resources
 		if (device_create_resources())
 		{
 			osd_printf_verbose("Direct3D: failed to recreate resources for device; failing permanently\n");
@@ -834,8 +834,8 @@ int renderer_d3d9::device_create(HWND device_hwnd)
 try_again:
 	// try for XRGB first
 	m_screen_format = D3DFMT_X8R8G8B8;
-	HRESULT result = d3dintf->d3dobj->CheckDeviceFormat(m_adapter, D3DDEVTYPE_HAL, m_pixformat, 
-		m_texture_manager->is_dynamic_supported() 
+	HRESULT result = d3dintf->d3dobj->CheckDeviceFormat(m_adapter, D3DDEVTYPE_HAL, m_pixformat,
+		m_texture_manager->is_dynamic_supported()
 			? D3DUSAGE_DYNAMIC
 			: 0,
 		D3DRTYPE_TEXTURE, m_screen_format);
@@ -865,7 +865,7 @@ try_again:
 
 	// create the D3D device
 	result = d3dintf->d3dobj->CreateDevice(
-		m_adapter, D3DDEVTYPE_HAL, device_hwnd,	D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE, &m_presentation, &m_device);
+		m_adapter, D3DDEVTYPE_HAL, device_hwnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE, &m_presentation, &m_device);
 	if (FAILED(result))
 	{
 		// if we got a "DEVICELOST" error, it may be transitory; count it and only fail if
@@ -923,7 +923,7 @@ int renderer_d3d9::device_create_resources()
 	HRESULT result = m_device->CreateVertexBuffer(
 		sizeof(vertex) * VERTEX_BUFFER_SIZE,
 		D3DUSAGE_DYNAMIC | D3DUSAGE_SOFTWAREPROCESSING | D3DUSAGE_WRITEONLY,
-		VERTEX_BASE_FORMAT | ((m_shaders->enabled() && d3dintf->post_fx_available) 
+		VERTEX_BASE_FORMAT | ((m_shaders->enabled() && d3dintf->post_fx_available)
 			? D3DFVF_XYZW
 			: D3DFVF_XYZRHW),
 		D3DPOOL_DEFAULT, &m_vertexbuf, nullptr);
@@ -935,8 +935,8 @@ int renderer_d3d9::device_create_resources()
 
 	// set the vertex format
 	result = m_device->SetFVF(
-		(D3DFORMAT)(VERTEX_BASE_FORMAT | ((m_shaders->enabled() && d3dintf->post_fx_available) 
-			? D3DFVF_XYZW 
+		(D3DFORMAT)(VERTEX_BASE_FORMAT | ((m_shaders->enabled() && d3dintf->post_fx_available)
+			? D3DFVF_XYZW
 			: D3DFVF_XYZRHW)));
 	if (FAILED(result))
 	{
@@ -993,9 +993,9 @@ renderer_d3d9::~renderer_d3d9()
 	// todo: throws error when switching from full screen to window mode
 	//if (m_shaders != nullptr)
 	//{
-	//	// delete the HLSL interface
-	//	global_free(m_shaders);
-	//	m_shaders = nullptr;
+	//  // delete the HLSL interface
+	//  global_free(m_shaders);
+	//  m_shaders = nullptr;
 	//}
 }
 
@@ -1686,7 +1686,7 @@ void renderer_d3d9::draw_line(const render_primitive &prim)
 	}
 
 	// now add a polygon entry
-	m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim.flags, nullptr,	D3DTOP_MODULATE, 0.0f, 1.0f, 0.0f, 0.0f);
+	m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim.flags, nullptr, D3DTOP_MODULATE, 0.0f, 1.0f, 0.0f, 0.0f);
 	m_numpolys++;
 }
 

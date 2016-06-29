@@ -13,19 +13,23 @@
 #include "corestr.h"
 #include "hashing.h"
 #include "osdcore.h"
+#include "timeconv.h"
+
+#include "lzma/C/LzmaDec.h"
+
+#include <zlib.h>
 
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <chrono>
 #include <cstring>
 #include <cstdlib>
+#include <ctime>
 #include <mutex>
+#include <ratio>
 #include <utility>
 #include <vector>
-
-#include <zlib.h>
-
-#include "lzma/C/LzmaDec.h"
 
 
 namespace util {
@@ -164,6 +168,7 @@ public:
 	bool current_is_directory() const { return m_curr_is_dir; }
 	const std::string &current_name() const { return m_header.file_name; }
 	std::uint64_t current_uncompressed_length() const { return m_header.uncompressed_length; }
+	std::chrono::system_clock::time_point current_last_modified() const { return m_header.modified; }
 	std::uint32_t current_crc() const { return m_header.crc; }
 
 	archive_file::error decompress(void *buffer, std::uint32_t length);
@@ -195,6 +200,24 @@ private:
 		return archive_file::error::NONE;
 	}
 
+	static std::chrono::system_clock::time_point decode_dos_time(std::uint16_t date, std::uint16_t time)
+	{
+		// FIXME: work out why this doesn't always work
+		// negative tm_isdst should automatically determine whether DST is in effect for the date,
+		// but on Windows apparently it doesn't, so you get time offsets
+		std::tm datetime;
+		datetime.tm_sec = (time << 1) & 0x003e;
+		datetime.tm_min = (time >> 5) & 0x003f;
+		datetime.tm_hour = (time >> 11) & 0x001f;
+		datetime.tm_mday = (date >> 0) & 0x001f;
+		datetime.tm_mon = ((date >> 5) & 0x000f) - 1;
+		datetime.tm_year = ((date >> 9) & 0x007f) + 80;
+		datetime.tm_wday = 0;
+		datetime.tm_yday = 0;
+		datetime.tm_isdst = -1;
+		return std::chrono::system_clock::from_time_t(std::mktime(&datetime));
+	}
+
 	// ZIP file parsing
 	archive_file::error read_ecd();
 	archive_file::error get_compressed_data_offset(std::uint64_t &offset);
@@ -206,16 +229,17 @@ private:
 
 	struct file_header
 	{
-		std::uint16_t   version_created;        // version made by
-		std::uint16_t   version_needed;         // version needed to extract
-		std::uint16_t   bit_flag;               // general purpose bit flag
-		std::uint16_t   compression;            // compression method
-		std::uint32_t   crc;                    // crc-32
-		std::uint64_t   compressed_length;      // compressed size
-		std::uint64_t   uncompressed_length;    // uncompressed size
-		std::uint32_t   start_disk_number;      // disk number start
-		std::uint64_t   local_header_offset;    // relative offset of local header
-		std::string     file_name;              // file name
+		std::uint16_t                           version_created;        // version made by
+		std::uint16_t                           version_needed;         // version needed to extract
+		std::uint16_t                           bit_flag;               // general purpose bit flag
+		std::uint16_t                           compression;            // compression method
+		std::chrono::system_clock::time_point   modified;               // last mod file date/time
+		std::uint32_t                           crc;                    // crc-32
+		std::uint64_t                           compressed_length;      // compressed size
+		std::uint64_t                           uncompressed_length;    // uncompressed size
+		std::uint32_t                           start_disk_number;      // disk number start
+		std::uint64_t                           local_header_offset;    // relative offset of local header
+		std::string                             file_name;              // file name
 	};
 
 	// contains extracted end of central directory information
@@ -274,6 +298,7 @@ public:
 	virtual bool current_is_directory() const override { return m_impl->current_is_directory(); }
 	virtual const std::string &current_name() const override { return m_impl->current_name(); }
 	virtual std::uint64_t current_uncompressed_length() const override { return m_impl->current_uncompressed_length(); }
+	virtual std::chrono::system_clock::time_point current_last_modified() const override { return m_impl->current_last_modified(); }
 	virtual std::uint32_t current_crc() const override { return m_impl->current_crc(); }
 
 	virtual error decompress(void *buffer, std::uint32_t length) override { return m_impl->decompress(buffer, length); }
@@ -540,6 +565,56 @@ private:
 };
 
 
+class ntfs_tag_reader : private reader_base
+{
+public:
+	ntfs_tag_reader(void const *buf, std::size_t len) : reader_base(buf), m_length(len) { }
+
+	std::uint16_t     tag() const       { return read_word(0x00); }
+	std::uint16_t     size() const      { return read_word(0x02); }
+	void const *      data() const      { return m_buffer + 0x04; }
+	ntfs_tag_reader   next() const      { return ntfs_tag_reader(m_buffer + total_length(), m_length - total_length()); }
+
+	bool length_sufficient() const { return (m_length >= minimum_length()) && (m_length >= total_length()); }
+
+	std::size_t total_length() const { return minimum_length() + size(); }
+	static std::size_t minimum_length() { return 0x04; }
+
+private:
+	std::size_t m_length;
+};
+
+
+class ntfs_reader : private reader_base
+{
+public:
+	ntfs_reader(extra_field_reader const &field) : reader_base(field.data()), m_length(field.data_size()) { }
+
+	std::uint32_t   reserved() const    { return read_dword(0x00); }
+	ntfs_tag_reader tag1() const        { return ntfs_tag_reader(m_buffer + 0x04, m_length - 4); }
+
+	std::size_t total_length() const { return m_length; }
+	static std::size_t minimum_length() { return 0x08; }
+
+private:
+	std::size_t m_length;
+};
+
+
+class ntfs_times_reader : private reader_base
+{
+public:
+	ntfs_times_reader(ntfs_tag_reader const &tag) : reader_base(tag.data()) { }
+
+	std::uint64_t   mtime() const   { return read_qword(0x00); }
+	std::uint64_t   atime() const   { return read_qword(0x08); }
+	std::uint64_t   ctime() const   { return read_qword(0x10); }
+
+	std::size_t total_length() const { return minimum_length(); }
+	static std::size_t minimum_length() { return 0x18; }
+};
+
+
 class general_flag_reader
 {
 public:
@@ -566,7 +641,6 @@ private:
     GLOBAL VARIABLES
 ***************************************************************************/
 
-/** @brief  The zip cache[ zip cache size]. */
 std::array<zip_file_impl::ptr, zip_file_impl::CACHE_SIZE> zip_file_impl::s_cache;
 std::mutex zip_file_impl::s_cache_mutex;
 
@@ -631,6 +705,7 @@ int zip_file_impl::search(std::uint32_t search_crc, const std::string &search_fi
 		m_header.version_needed      = reader.version_needed();
 		m_header.bit_flag            = reader.general_flag();
 		m_header.compression         = reader.compression_method();
+		m_header.modified            = decode_dos_time(reader.modified_date(), reader.modified_time());
 		m_header.crc                 = reader.crc32();
 		m_header.compressed_length   = reader.compressed_size();
 		m_header.uncompressed_length = reader.uncompressed_size();
@@ -673,6 +748,21 @@ int zip_file_impl::search(std::uint32_t search_crc, const std::string &search_fi
 					{
 						utf8path.unicode_name(m_header.file_name);
 						is_utf8 = true;
+					}
+				}
+			}
+
+			// look for NTFS extra field
+			if ((extra.header_id() == 0x000a) && (extra.data_size() >= ntfs_reader::minimum_length()))
+			{
+				ntfs_reader const ntfs(extra);
+				for (auto tag = ntfs.tag1(); tag.length_sufficient(); tag = tag.next())
+				{
+					if ((tag.tag() == 0x0001) && (tag.size() >= ntfs_times_reader::minimum_length()))
+					{
+						ntfs_times_reader const times(tag);
+						ntfs_duration const ticks(times.mtime());
+						m_header.modified = system_clock_time_point_from_ntfs_duration(ticks);
 					}
 				}
 			}

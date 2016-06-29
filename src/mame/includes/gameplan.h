@@ -70,7 +70,7 @@ public:
 	required_device<screen_device> m_screen;
 	optional_device<generic_latch_8_device> m_soundlatch;
 
-	
+
 	DECLARE_WRITE8_MEMBER(io_select_w);
 	DECLARE_READ8_MEMBER(io_port_r);
 	DECLARE_WRITE_LINE_MEMBER(coin_w);

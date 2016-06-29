@@ -2122,7 +2122,7 @@ ROM_END
 ROM_START( topbana )
 	ARISTOCRAT_MK5_BIOS
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	ROM_LOAD32_WORD("0100550v.u11", 0x0000002, 0x007fffa, BAD_DUMP CRC(140a73bc) SHA1(3fd88797b6310f5849e901d032fbeb8a2d8604fb) )	// This is a bad .u8 from Indian Dream, not proper Top Banana .u11!!
+	ROM_LOAD32_WORD("0100550v.u11", 0x0000002, 0x007fffa, BAD_DUMP CRC(140a73bc) SHA1(3fd88797b6310f5849e901d032fbeb8a2d8604fb) )   // This is a bad .u8 from Indian Dream, not proper Top Banana .u11!!
 	ROM_LOAD32_WORD("0100550v.u7", 0x0000000, 0x0080000, CRC(1f60241c) SHA1(3a6207d9c919319fc10b6de63bc030f8d335588e) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
@@ -2422,4 +2422,3 @@ GAME( 1996, wcougar,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk
 GAME( 1997, wcougaru,  wcougar,  aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Cougar (NHG0296-04, US)",                 MACHINE_FLAGS )  // 569/8,    D - 19/05/97
 GAME( 1999, wthing,    aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Thing (0101158V, NSW/ACT)",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND )  // 608/4, B - 14/12/99
 GAME( 1999, wtiger,    0,        aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "White Tiger Classic (0200954V, NSW/ACT)",      MACHINE_FLAGS )  // 638/1,    B - 08/07/99
-

@@ -296,7 +296,7 @@ ADDRESS_MAP_END
 
 IRQ_CALLBACK_MEMBER(galaxygame_state::galaxygame_irq_callback)
 {
-	device.execute().set_input_line(0, CLEAR_LINE);
+	device.execute().set_input_line(1, CLEAR_LINE);
 	return 0x40;
 }
 
@@ -304,7 +304,7 @@ INTERRUPT_GEN_MEMBER(galaxygame_state::galaxygame_irq)
 {
 	if ( m_clk & 0x40 )
 	{
-		device.execute().set_input_line(0, ASSERT_LINE);
+		device.execute().set_input_line(1, ASSERT_LINE);
 		m_interrupt = 1;
 	}
 }

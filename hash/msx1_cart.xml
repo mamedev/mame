@@ -4313,7 +4313,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="dngmster">
+	<software name="dmaster">
 		<description>Dungeon Master (Jpn)</description>
 		<year>1986</year>
 		<publisher>ASCII</publisher>

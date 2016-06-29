@@ -18,13 +18,8 @@
 
 
 
-/****************************************************************************
- * Use this in the I/O port address fields of your driver for the BIO pin
- * i.e,
- *  AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(twincobr_bio_line_r)
- */
-
-#define TMS32010_BIO            0x10        /* BIO input */
+#define MCFG_TMS32010_BIO_IN_CB(_devcb) \
+	devcb = &tms32010_device::set_bio_in_cb(*device, DEVCB_##_devcb); /* BIO input  */
 
 
 #define TMS32010_INT_PENDING    0x80000000
@@ -50,6 +45,9 @@ public:
 	// construction/destruction
 	tms32010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	tms32010_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int addr_mask);
+
+	// static configuration helpers
+	template<class _Object> static devcb_base & set_bio_in_cb(device_t &device, _Object object) { return downcast<tms32010_device &>(device).m_bio_in.set_callback(object); }
 
 protected:
 	// device-level overrides
@@ -80,6 +78,8 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 	address_space_config m_io_config;
+
+	devcb_read_line m_bio_in;
 
 	typedef void ( tms32010_device::*opcode_func ) ();
 	struct tms32010_opcode

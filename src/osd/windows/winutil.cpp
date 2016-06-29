@@ -17,20 +17,33 @@
 // MAMEOS headers
 #include "winutil.h"
 #include "strconv.h"
+#include "timeconv.h"
 
 
 //============================================================
 //  win_attributes_to_entry_type
 //============================================================
 
-osd_dir_entry_type win_attributes_to_entry_type(DWORD attributes)
+osd::directory::entry::entry_type win_attributes_to_entry_type(DWORD attributes)
 {
 	if (attributes == 0xFFFFFFFF)
-		return ENTTYPE_NONE;
+		return osd::directory::entry::entry_type::NONE;
 	else if (attributes & FILE_ATTRIBUTE_DIRECTORY)
-		return ENTTYPE_DIR;
+		return osd::directory::entry::entry_type::DIR;
 	else
-		return ENTTYPE_FILE;
+		return osd::directory::entry::entry_type::FILE;
+}
+
+
+
+//============================================================
+//  win_time_point_from_filetime
+//============================================================
+
+std::chrono::system_clock::time_point win_time_point_from_filetime(LPFILETIME file_time)
+{
+	auto converted_file_time = util::ntfs_duration_from_filetime(file_time->dwHighDateTime, file_time->dwLowDateTime);
+	return util::system_clock_time_point_from_ntfs_duration(converted_file_time);
 }
 
 

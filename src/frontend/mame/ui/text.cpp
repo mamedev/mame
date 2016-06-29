@@ -2,9 +2,9 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /*********************************************************************
 
-	text.cpp
+    text.cpp
 
-	Text functionality for MAME's crude user interface
+    Text functionality for MAME's crude user interface
 
 *********************************************************************/
 
@@ -13,7 +13,6 @@
 #include "render.h"
 
 namespace ui {
-
 /***************************************************************************
 INLINE FUNCTIONS
 ***************************************************************************/
@@ -91,7 +90,7 @@ text_layout::text_layout(render_font &font, float xscale, float yscale, float wi
 
 text_layout::text_layout(text_layout &&that)
 	: m_font(that.m_font), m_xscale(that.m_xscale), m_yscale(that.m_yscale), m_width(that.m_width), m_calculated_actual_width(that.m_calculated_actual_width), m_justify(that.m_justify), m_wrap(that.m_wrap), m_lines(std::move(that.m_lines)),
-	  m_current_line(that.m_current_line), m_last_break(that.m_last_break), m_text_position(that.m_text_position), m_truncating(false)
+		m_current_line(that.m_current_line), m_last_break(that.m_last_break), m_text_position(that.m_text_position), m_truncating(false)
 {
 	that.invalidate_calculated_actual_width();
 }
@@ -332,7 +331,7 @@ void text_layout::truncate_wrap()
 	float elipsis_width = get_char_width(elipsis, style.size);
 
 	// where should we really truncate from?
-	while (truncate_position > 0 && m_current_line->character(truncate_position).xoffset + elipsis_width < width())
+	while (truncate_position > 0 && m_current_line->character(truncate_position).xoffset + elipsis_width > width())
 		truncate_position--;
 
 	// truncate!!!
@@ -475,7 +474,7 @@ void text_layout::emit(render_container *container, float x, float y)
 		for (auto i = 0; i < line->character_count(); i++)
 		{
 			auto &ch = line->character(i);
-			
+
 			// position this specific character correctly (TODO - this doesn't
 			// handle differently sized text (yet)
 			float char_x = x + line_xoffset + ch.xoffset;

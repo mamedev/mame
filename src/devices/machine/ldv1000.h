@@ -129,7 +129,7 @@ protected:
 	UINT8               m_vbi[7*3];             /* VBI data */
 	bool                m_vbiready;             /* VBI ready flag */
 	UINT8               m_vbiindex;             /* index within the VBI data */
-	
+
 };
 
 

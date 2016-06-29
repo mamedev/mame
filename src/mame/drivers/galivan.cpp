@@ -23,14 +23,14 @@ TODO
 - bit 3 of ninjemak_gfxbank_w, there currently is a kludge to clear text RAM
   but it should really copy stuff from the extra ROM.
 - Ninja Emaki has minor protection issues, see NB1414M4 simulation for more info.
-- dangarj has unemulated protection at I/Os 0x80-1 for missing sprites. 
+- dangarj has unemulated protection at I/Os 0x80-1 for missing sprites.
   [0x80] W is data
   [0x81] W --11 xxxx address
   [0x80] R result
   The protection is used for a code snippet at 0xf9c0, that of course is the
-  sprite handling. The code snippet is sum8 with 0x27 at 0x9d74 so no, the 
+  sprite handling. The code snippet is sum8 with 0x27 at 0x9d74 so no, the
   later dangar US version snippet doesn't work ...
-  
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -721,7 +721,7 @@ ROM_START( dangarb ) /* all rom labels are simply numbers, with the owl logo and
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu code */
 	ROM_LOAD( "13.14b", 0x0000, 0x4000, CRC(3e041873) SHA1(8f9e1ec64509c8a7e9e45add9efc95f98f35fcfc) )
 	ROM_LOAD( "14.15b", 0x4000, 0x8000, CRC(488e3463) SHA1(73ff7ab061be54162f3a548f6bd9ef55b9dec5d9) )
-	
+
 	ROM_REGION( 0x04000, "gfx1", 0 )
 	ROM_LOAD( "11.13d",  0x00000, 0x4000, CRC(e804ffe1) SHA1(22f16c23b9a82f104dda24bc8fccc08f3f69cf97) )   /* chars */
 
@@ -758,7 +758,7 @@ ROM_START( dangarj ) /* all rom labels are simply numbers, with the owl logo and
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu code */
 	ROM_LOAD( "21.14b", 0x0000, 0x4000, CRC(3e041873) SHA1(8f9e1ec64509c8a7e9e45add9efc95f98f35fcfc) )
 	ROM_LOAD( "22.15b", 0x4000, 0x4000, CRC(1d484f68) SHA1(7de13d6c6850280fed011c1d1b211cdc5ea9f935) )
-	
+
 	ROM_REGION( 0x04000, "gfx1", 0 )
 	ROM_LOAD( "11.13d",  0x00000, 0x4000, CRC(e804ffe1) SHA1(22f16c23b9a82f104dda24bc8fccc08f3f69cf97) )   /* chars */
 

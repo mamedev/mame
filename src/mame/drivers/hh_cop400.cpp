@@ -999,7 +999,7 @@ MACHINE_CONFIG_END
 
   Milton Bradley Electronic Battleship (1982 version)
   * COP420 MCU label COP420-JWE/N
-  
+
   see hh_tms1k.cpp bship driver for more information
 
 ***************************************************************************/

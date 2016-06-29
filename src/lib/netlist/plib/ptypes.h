@@ -15,7 +15,6 @@
 
 namespace plib
 {
-
 	template<typename T> struct is_integral : public std::is_integral<T> { };
 	template<typename T> struct numeric_limits : public std::numeric_limits<T> { };
 

@@ -103,7 +103,7 @@ void netlist_mame_analog_output_t::custom_netlist_additions(netlist::setup_t &se
 
 	plib::owned_ptr<netlist::device_t> dev = plib::owned_ptr<netlist::device_t>::Create<NETLIB_NAME(analog_callback)>(setup.netlist(), setup.build_fqn(dname));
 	static_cast<NETLIB_NAME(analog_callback) *>(dev.get())->register_callback(m_delegate);
-	setup.register_dev(std::move(dev));
+	setup.netlist().register_dev(std::move(dev));
 	setup.register_link(dname + ".IN", m_in);
 }
 

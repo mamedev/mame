@@ -31,7 +31,7 @@ enum
 
 #define MCFG_V25_PORT_P1_READ_CB(_devcb) \
 	devcb = &v25_common_device::set_p1_in_cb(*device, DEVCB_##_devcb);
-	
+
 #define MCFG_V25_PORT_P2_READ_CB(_devcb) \
 	devcb = &v25_common_device::set_p2_in_cb(*device, DEVCB_##_devcb);
 
@@ -53,7 +53,7 @@ public:
 
 	// static configuration helpers
 	static void set_decryption_table(device_t &device, const UINT8 *decryption_table) { downcast<v25_common_device &>(device).m_v25v35_decryptiontable = decryption_table; }
-	
+
 	template<class _Object> static devcb_base & set_pt_in_cb(device_t &device, _Object object) { return downcast<v25_common_device &>(device).m_pt_in.set_callback(object); }
 	template<class _Object> static devcb_base & set_p0_in_cb(device_t &device, _Object object) { return downcast<v25_common_device &>(device).m_p0_in.set_callback(object); }
 	template<class _Object> static devcb_base & set_p1_in_cb(device_t &device, _Object object) { return downcast<v25_common_device &>(device).m_p1_in.set_callback(object); }

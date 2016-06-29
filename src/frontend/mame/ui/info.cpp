@@ -16,7 +16,6 @@
 #include "softlist.h"
 
 namespace ui {
-
 /*-------------------------------------------------
   menu_game_info - handle the game information
   menu

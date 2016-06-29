@@ -39,13 +39,13 @@ plugin_options::plugin_options()
 void plugin_options::parse_json(std::string path)
 {
 	// first try to open as a directory
-	osd_directory *directory = osd_opendir(path.c_str());
-	if (directory != nullptr)
+	osd::directory::ptr directory = osd::directory::open(path);
+	if (directory)
 	{
 		// iterate over all files in the directory
-		for (const osd_directory_entry *entry = osd_readdir(directory); entry != nullptr; entry = osd_readdir(directory))
+		for (const osd::directory::entry *entry = directory->read(); entry != nullptr; entry = directory->read())
 		{
-			if (entry->type == ENTTYPE_FILE)
+			if (entry->type == osd::directory::entry::entry_type::FILE)
 			{
 				std::string name = entry->name;
 				if (name == "plugin.json")
@@ -80,7 +80,7 @@ void plugin_options::parse_json(std::string path)
 
 				}
 			}
-			else if (entry->type == ENTTYPE_DIR)
+			else if (entry->type == osd::directory::entry::entry_type::DIR)
 			{
 				std::string name = entry->name;
 				if (!(name == "." || name == ".."))
@@ -89,8 +89,5 @@ void plugin_options::parse_json(std::string path)
 				}
 			}
 		}
-
-		// close the directory and be done
-		osd_closedir(directory);
 	}
 }

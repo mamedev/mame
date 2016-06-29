@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/*
+/*********************************************************************
+
+Similar to https://www.youtube.com/watch?v=FmyR-kL-QWo
 
 base unit contains
 
@@ -14,11 +16,11 @@ base unit contains
 
 (system has no bios ROM)
 
+Cart sizes: 1MB, 2MB, 4MB
 
-*/
+********************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "cpu/tlcs90/tlcs90.h"
 #include "softlist.h"
 #include "bus/generic/slot.h"
@@ -29,9 +31,9 @@ class pockchalv1_state : public driver_device
 {
 public:
 	pockchalv1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_cart(*this, "cartslot")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cart(*this, "cartslot")
 		{ }
 
 	virtual void machine_start() override;
@@ -41,9 +43,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	UINT32  m_rom_size;
-	memory_region *m_cart_rom;
-	UINT8* m_cart_base;
-	DECLARE_READ8_MEMBER(read_rom);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pockchalv1_cart);
 };
 
@@ -67,7 +66,7 @@ UINT32 pockchalv1_state::screen_update_pockchalv1(screen_device &screen, bitmap_
 
 
 static ADDRESS_MAP_START( pockchalv1_map, AS_PROGRAM, 8, pockchalv1_state )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(read_rom)
+	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -78,18 +77,13 @@ INPUT_PORTS_END
 
 void pockchalv1_state::machine_start()
 {
-	std::string region_tag;
-	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-	m_cart_base = m_cart_rom->base();
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	if (m_cart->exists())
+		space.install_read_handler(0x0000, 0x7fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
 void pockchalv1_state::machine_reset()
 {
-}
-
-READ8_MEMBER(pockchalv1_state::read_rom)
-{
-	return m_cart_base[offset];
 }
 
 
@@ -128,4 +122,5 @@ MACHINE_CONFIG_END
 ROM_START( pockchal )
 ROM_END
 
-GAME( 199?, pockchal,  0,    pockchalv1, pockchalv1, driver_device,  0, ROT0, "Benesse Corporation", "Pocket Challenge W (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*     YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT       CLASS          INIT        COMPANY               FULLNAME*/
+CONS( 199?, pockchal,  0,     0,      pockchalv1, pockchalv1, driver_device,  0, "Benesse Corporation", "Pocket Challenge W (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

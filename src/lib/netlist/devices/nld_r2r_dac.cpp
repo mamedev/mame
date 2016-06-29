@@ -12,7 +12,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 	NETLIB_OBJECT_DERIVED(r2r_dac, twoterm)
 	{
 		NETLIB_CONSTRUCTOR_DERIVED(r2r_dac, twoterm)

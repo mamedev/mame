@@ -170,6 +170,7 @@ public:
 	DECLARE_DRIVER_INIT(lucky8a);
 	DECLARE_DRIVER_INIT(magoddsc);
 	DECLARE_DRIVER_INIT(flaming7);
+	DECLARE_DRIVER_INIT(flam7_tw);
 
 	DECLARE_VIDEO_START(bingowng);
 	DECLARE_VIDEO_START(magical);

@@ -214,7 +214,7 @@ WRITE16_MEMBER(coolpool_state::amerdart_misc_w)
 	m_dsp->set_input_line(INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ16_MEMBER(coolpool_state::amerdart_dsp_bio_line_r)
+READ_LINE_MEMBER(coolpool_state::amerdart_dsp_bio_line_r)
 {
 	/* Skip idle checking */
 	if (m_old_cmd == m_cmd_pending)
@@ -225,7 +225,7 @@ READ16_MEMBER(coolpool_state::amerdart_dsp_bio_line_r)
 	if (m_same_cmd_count >= 5)
 	{
 		m_same_cmd_count = 5;
-		space.device().execute().spin();
+		m_dsp->spin();
 	}
 	m_old_cmd = m_cmd_pending;
 
@@ -664,7 +664,6 @@ static ADDRESS_MAP_START( amerdart_dsp_io_map, AS_IO, 16, coolpool_state )
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN0")
 	AM_RANGE(0x06, 0x06) AM_READ(amerdart_trackball_r)
 	AM_RANGE(0x07, 0x07) AM_READ(amerdart_dsp_cmd_r)
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(amerdart_dsp_bio_line_r)
 ADDRESS_MAP_END
 
 
@@ -799,6 +798,7 @@ static MACHINE_CONFIG_START( amerdart, coolpool_state )
 	MCFG_CPU_PROGRAM_MAP(amerdart_dsp_pgm_map)
 	/* Data Map is internal to the CPU */
 	MCFG_CPU_IO_MAP(amerdart_dsp_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(coolpool_state, amerdart_dsp_bio_line_r))
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("audioint", coolpool_state, amerdart_audio_int_gen, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,amerdart)

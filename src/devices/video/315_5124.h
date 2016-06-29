@@ -68,6 +68,7 @@ public:
 
 
 	template<class _Object> static devcb_base &set_int_callback(device_t &device, _Object object) { return downcast<sega315_5124_device &>(device).m_int_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_csync_callback(device_t &device, _Object object) { return downcast<sega315_5124_device &>(device).m_csync_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_pause_callback(device_t &device, _Object object) { return downcast<sega315_5124_device &>(device).m_pause_cb.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( vram_read );
@@ -156,6 +157,7 @@ protected:
 	int              m_current_palette[32];
 	bool             m_is_pal;             /* false = NTSC, true = PAL */
 	devcb_write_line m_int_cb;       /* Interrupt callback function */
+	devcb_write_line m_csync_cb;     /* C-Sync callback function */
 	devcb_write_line m_pause_cb;     /* Pause callback function */
 	emu_timer        *m_display_timer;
 	emu_timer        *m_hint_timer;
@@ -224,6 +226,9 @@ protected:
 #define MCFG_SEGA315_5124_INT_CB(_devcb) \
 	devcb = &sega315_5124_device::set_int_callback(*device, DEVCB_##_devcb);
 
+#define MCFG_SEGA315_5124_CSYNC_CB(_devcb) \
+	devcb = &sega315_5124_device::set_csync_callback(*device, DEVCB_##_devcb);
+
 #define MCFG_SEGA315_5124_PAUSE_CB(_devcb) \
 	devcb = &sega315_5124_device::set_pause_callback(*device, DEVCB_##_devcb);
 
@@ -236,6 +241,9 @@ protected:
 #define MCFG_SEGA315_5246_INT_CB(_devcb) \
 	devcb = &sega315_5246_device::set_int_callback(*device, DEVCB_##_devcb);
 
+#define MCFG_SEGA315_5246_CSYNC_CB(_devcb) \
+	devcb = &sega315_5246_device::set_csync_callback(*device, DEVCB_##_devcb);
+
 #define MCFG_SEGA315_5246_PAUSE_CB(_devcb) \
 	devcb = &sega315_5246_device::set_pause_callback(*device, DEVCB_##_devcb);
 
@@ -247,6 +255,9 @@ protected:
 
 #define MCFG_SEGA315_5378_INT_CB(_devcb) \
 	devcb = &sega315_5378_device::set_int_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_SEGA315_5378_CSYNC_CB(_devcb) \
+	devcb = &sega315_5378_device::set_csync_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_SEGA315_5378_PAUSE_CB(_devcb) \
 	devcb = &sega315_5378_device::set_pause_callback(*device, DEVCB_##_devcb);

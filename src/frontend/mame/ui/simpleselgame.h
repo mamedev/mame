@@ -18,7 +18,6 @@
 class driver_enumerator;
 
 namespace ui {
-
 class simple_menu_select_game : public menu {
 public:
 	simple_menu_select_game(mame_ui_manager &mui, render_container *container, const char *gamename);

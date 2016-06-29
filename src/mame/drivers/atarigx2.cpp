@@ -5,7 +5,7 @@
     Atari GX2 hardware
 
     driver by Aaron Giles
- 
+
     Moto Frenzy protection reverse engineered by:
         Morten Shearman Kirkegaard, Samuel Neves, Peter Wilhelmsen
 
@@ -1181,7 +1181,7 @@ READ32_MEMBER(atarigx2_state::atarigx2_protection_r)
 
 READ32_MEMBER( atarigx2_state::rrreveng_prot_r )
 {
-    return 0;
+	return 0;
 }
 
 
@@ -1468,7 +1468,7 @@ static MACHINE_CONFIG_START( atarigx2, atarigx2_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(atarigx2_state,atarigx2)
 
-    MCFG_DEVICE_ADD("xga", ATARI_XGA, 0);
+	MCFG_DEVICE_ADD("xga", ATARI_XGA, 0);
 
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
@@ -2220,7 +2220,7 @@ ROM_END
 DRIVER_INIT_MEMBER(atarigx2_state,spclords)
 {
 	m_playfield_base = 0x000;
-    m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32_delegate(FUNC(atarigx2_state::atarigx2_protection_r),this), write32_delegate(FUNC(atarigx2_state::atarigx2_protection_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32_delegate(FUNC(atarigx2_state::atarigx2_protection_r),this), write32_delegate(FUNC(atarigx2_state::atarigx2_protection_w),this));
 }
 
 
@@ -2249,14 +2249,14 @@ XMEM=68.A23*E.A22*!E.A21*68.A20                                 = 1101 xxxx = d0
     +68.A23*E.A22*!E.A21*!68.A20*68.A19                         = 1100 1xxx = c80000-cfffff
     +!68.A23*!E.A22*!E.A21                                      = 000x xxxx = 000000-1fffff
 */
-    m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32_delegate(FUNC(atari_xga_device::read),&(*m_xga)), write32_delegate(FUNC(atari_xga_device::write),&(*m_xga)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32_delegate(FUNC(atari_xga_device::read),&(*m_xga)), write32_delegate(FUNC(atari_xga_device::write),&(*m_xga)));
 }
 
 DRIVER_INIT_MEMBER(atarigx2_state,rrreveng)
 {
 	m_playfield_base = 0x000;
 
-    m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32_delegate(FUNC(atarigx2_state::atarigx2_protection_r),this), write32_delegate(FUNC(atarigx2_state::atarigx2_protection_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32_delegate(FUNC(atarigx2_state::atarigx2_protection_r),this), write32_delegate(FUNC(atarigx2_state::atarigx2_protection_w),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xca0fc0, 0xca0fc3, read32_delegate(FUNC(atarigx2_state::rrreveng_prot_r),this));
 }
 

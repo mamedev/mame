@@ -14,7 +14,6 @@
 
 
 namespace ui {
-
 /*-------------------------------------------------
  device_config - handle the game information
  menu

@@ -69,50 +69,50 @@
 
         25/08/2009 Skeleton driver.
         31/05/2016 Main screen turn on.
-           
-How the architecture works:
-	- There are 3 address sub-spaces: CPU layer, MMU layer, and device layer
-	- CPU layer uses MOVS instructions to output FC 3.
-	- CPU layer: the low-order address bits A4-A1 specify the device
-		0100x = ID Prom
-		0101x = Diagnostic register (8 bits, 8 LEDs, bit = 0 for ON, 1 for OFF)
-		0110x = Bus error register
-		0111x = System enable register
-		
-		Bits A5+ address the actual individual parts of these things.  ID Prom bytes
-		are at 0x0008, 0x0808, 0x1008, 0x1808, 0x2008, 0x2808, 0x3008, etc.
-		
-		System enable bits:
-			b0 = enable parity generation
-			b1 = cause level 1 IRQ
-			b2 = cause level 2 IRQ
-			b3 = cause level 3 IRQ
-			b4 = enable parity error checking
-			b5 = enable DVMA
-			b6 = enable all interrupts
-			b7 = boot state (0 = boot, 1 = normal) 
-				In boot state, all supervisor program reads go to the EPROM.
 
-	- MMU layer: also accessed via FC 3
-		PAGE MAP at 0 + V
-		SEGMENT MAP at 4 + V
-		CONTEXT REG at 6 + V
-		
-	There are 8 hardware contexts.  Supervisor and User FCs can have different contexts.
-	
-	Segment map is 4096 entries, from bits 23-15 of the virtual address + 3 context bits.
-	Entries are 8 bits, which point to a page map entry group (PMEG), which is 16 consecutive
-	page table entries (32 KB of space).
-	
-	Page map is 4096 entries each mapping a 2K page.  There are 256 groups of 16 entries;
-	the PMEG points to these 256 groups.  The page map contains a 20-bit page number, 
-	which combines with the 11 low bits of the original address to get a 31-bit physical address.
-	The entry from 0-15 is picked with bits 15-11 of the original address.	
-	
-	Page map entries are written to the PMEG determined by their segment map entry; you must
-	set the segment map validly in order to write to the page map.  This is how they get away
-	with having 16 MB of segment entries and only 8 MB of PMEGs.
-	
+How the architecture works:
+    - There are 3 address sub-spaces: CPU layer, MMU layer, and device layer
+    - CPU layer uses MOVS instructions to output FC 3.
+    - CPU layer: the low-order address bits A4-A1 specify the device
+        0100x = ID Prom
+        0101x = Diagnostic register (8 bits, 8 LEDs, bit = 0 for ON, 1 for OFF)
+        0110x = Bus error register
+        0111x = System enable register
+
+        Bits A5+ address the actual individual parts of these things.  ID Prom bytes
+        are at 0x0008, 0x0808, 0x1008, 0x1808, 0x2008, 0x2808, 0x3008, etc.
+
+        System enable bits:
+            b0 = enable parity generation
+            b1 = cause level 1 IRQ
+            b2 = cause level 2 IRQ
+            b3 = cause level 3 IRQ
+            b4 = enable parity error checking
+            b5 = enable DVMA
+            b6 = enable all interrupts
+            b7 = boot state (0 = boot, 1 = normal)
+                In boot state, all supervisor program reads go to the EPROM.
+
+    - MMU layer: also accessed via FC 3
+        PAGE MAP at 0 + V
+        SEGMENT MAP at 4 + V
+        CONTEXT REG at 6 + V
+
+    There are 8 hardware contexts.  Supervisor and User FCs can have different contexts.
+
+    Segment map is 4096 entries, from bits 23-15 of the virtual address + 3 context bits.
+    Entries are 8 bits, which point to a page map entry group (PMEG), which is 16 consecutive
+    page table entries (32 KB of space).
+
+    Page map is 4096 entries each mapping a 2K page.  There are 256 groups of 16 entries;
+    the PMEG points to these 256 groups.  The page map contains a 20-bit page number,
+    which combines with the 11 low bits of the original address to get a 31-bit physical address.
+    The entry from 0-15 is picked with bits 15-11 of the original address.
+
+    Page map entries are written to the PMEG determined by their segment map entry; you must
+    set the segment map validly in order to write to the page map.  This is how they get away
+    with having 16 MB of segment entries and only 8 MB of PMEGs.
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -128,11 +128,11 @@ How the architecture works:
 #define RS232B_TAG      "rs232b"
 
 // page table entry constants
-#define PM_VALID	(0x80000000)	// page is valid
-#define PM_PROTMASK (0x7e000000)	// protection mask
-#define PM_TYPEMASK (0x01c00000)	// type mask
-#define PM_ACCESSED (0x00200000)	// accessed flag
-#define PM_MODIFIED (0x00100000)	// modified flag
+#define PM_VALID    (0x80000000)    // page is valid
+#define PM_PROTMASK (0x7e000000)    // protection mask
+#define PM_TYPEMASK (0x01c00000)    // type mask
+#define PM_ACCESSED (0x00200000)    // accessed flag
+#define PM_MODIFIED (0x00100000)    // modified flag
 
 class sun2_state : public driver_device
 {
@@ -155,20 +155,20 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<address_map_bank_device> m_type0space, m_type1space, m_type2space, m_type3space;
 	required_shared_ptr<UINT16> m_bw2_vram;
-	
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	
+
 	DECLARE_READ16_MEMBER( tl_mmu_r );
 	DECLARE_WRITE16_MEMBER( tl_mmu_w );
 	DECLARE_READ16_MEMBER( video_ctrl_r );
 	DECLARE_WRITE16_MEMBER( video_ctrl_w );
 	DECLARE_READ16_MEMBER( ram_r );
 	DECLARE_WRITE16_MEMBER( ram_w );
-		
+
 	UINT32 bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-private:	
+private:
 	UINT16 *m_rom_ptr, *m_ram_ptr;
 	UINT8 *m_idprom_ptr;
 	UINT16 m_diagreg, m_sysenable, m_buserror;
@@ -196,49 +196,49 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 
 	if ((fc == 3) && !space.debugger_access())
 	{
-		if (offset & 0x4)	// set for CPU space
+		if (offset & 0x4)   // set for CPU space
 		{
 			switch (offset & 7)
 			{
 				case 4:
 					//printf("sun2: Read IDPROM @ %x (PC=%x)\n", offset<<1, m_maincpu->pc);
 					return m_idprom_ptr[(offset>>10) & 0x1f]<<8;
-					
+
 				case 5:
 					//printf("sun2: Read diag reg\n");
 					return m_diagreg;
-					
+
 				case 6:
 					//printf("sun2: Read bus error @ PC %x\n", m_maincpu->pc);
 					return m_buserror;
-					
+
 				case 7:
 					//printf("sun2: Read sysenable\n");
 					return m_sysenable;
 			}
 		}
-		else				// clear for MMU space
+		else                // clear for MMU space
 		{
 			int page;
-			
+
 			switch (offset & 3)
 			{
-				case 0:	// page map
+				case 0: // page map
 				case 1:
 					page = m_segmap[m_context & 7][offset >> 14] << 4;
 					page += ((offset >> 10) & 0xf);
-										
+
 					//printf("sun2: Read page map at %x (entry %d)\n", offset<<1, page);
-					if (offset & 1)	// low-order 16 bits
+					if (offset & 1) // low-order 16 bits
 					{
 						return m_pagemap[page] & 0xffff;
 					}
 					return m_pagemap[page] >> 16;
-					
+
 				case 2: // segment map
 					//printf("sun2: Read segment map at %x (entry %d, user ctx %d)\n", offset<<1, offset>>14, m_context & 7);
 					return m_segmap[m_context & 7][offset >> 14];
-					
+
 				case 3: // context reg
 					//printf("sun2: Read context reg\n");
 					return m_context;
@@ -251,66 +251,66 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 	{
 		return m_rom_ptr[offset & 0x3fff];
 	}
-	
+
 	// debugger hack
 	if ((space.debugger_access()) && (offset >= (0xef0000>>1)) && (offset <= (0xef8000>>1)))
 	{
 		return m_rom_ptr[offset & 0x3fff];
 	}
-	
+
 	// it's translation time
 	UINT8 context = (fc & 4) ? ((m_context >> 8) & 7) : (m_context & 7);
 	UINT8 pmeg = m_segmap[context][offset >> 14];
 	UINT32 entry = (pmeg << 4) + ((offset >> 10) & 0xf);
 
-	//	printf("sun2: Context = %d, pmeg = %d, offset >> 14 = %x, entry = %d, page = %d\n", context, pmeg, offset >> 14, entry, (offset >> 10) & 0xf);
+	//  printf("sun2: Context = %d, pmeg = %d, offset >> 14 = %x, entry = %d, page = %d\n", context, pmeg, offset >> 14, entry, (offset >> 10) & 0xf);
 
 	if (m_pagemap[entry] & PM_VALID)
 	{
 		m_pagemap[entry] |= PM_ACCESSED;
-		
+
 		// Sun2 implementations only use 12 bits from the page entry
 		UINT32 tmp = (m_pagemap[entry] & 0xfff) << 10;
 		tmp |= (offset & 0x3ff);
-		
-	//	if (!space.debugger_access())
-	//		printf("sun2: Translated addr: %08x, type %d (page %d page entry %08x, orig virt %08x, FC %d)\n", tmp << 1, (m_pagemap[entry] >> 22) & 7, entry, m_pagemap[entry], offset<<1, fc);
+
+	//  if (!space.debugger_access())
+	//      printf("sun2: Translated addr: %08x, type %d (page %d page entry %08x, orig virt %08x, FC %d)\n", tmp << 1, (m_pagemap[entry] >> 22) & 7, entry, m_pagemap[entry], offset<<1, fc);
 
 		switch ((m_pagemap[entry] >> 22) & 7)
 		{
-			case 0:	// type 0 space
+			case 0: // type 0 space
 				return m_type0space->read16(space, tmp, mem_mask);
-				
+
 			case 1: // type 1 space
 				// EPROM space is special: the MMU has a trap door
 				// where the original bits of the virtual address are
-				// restored so that the entire 32K EPROM can be 
+				// restored so that the entire 32K EPROM can be
 				// accessed via a 2K single page view.  This isn't
-				// obvious in the sun2 manual, but the sun3 manual 
+				// obvious in the sun2 manual, but the sun3 manual
 				// (sun3 has the same mechanism) explains it well.
 				// the 2/50 ROM tests this specifically at $EF0DF0.
-				if (m_idprom_ptr[1] == 0x02)	// 2/50 VMEbus has EPROM at 0x7F0000
+				if (m_idprom_ptr[1] == 0x02)    // 2/50 VMEbus has EPROM at 0x7F0000
 				{
 					if ((tmp >= (0x7f0000>>1)) && (tmp <= (0x7f07ff>>1)))
 					{
-						return m_rom_ptr[offset & 0x3fff];	
+						return m_rom_ptr[offset & 0x3fff];
 					}
 				}
-				else	// Multibus has EPROM at 0x000000
+				else    // Multibus has EPROM at 0x000000
 				{
 					if (tmp <= (0x7ff>>1))
 					{
-						return m_rom_ptr[offset & 0x3fff];	
+						return m_rom_ptr[offset & 0x3fff];
 					}
 				}
-				
+
 				//printf("read device space @ %x\n", tmp<<1);
 				return m_type1space->read16(space, tmp, mem_mask);
-				
-			case 2:	// type 2 space
+
+			case 2: // type 2 space
 				return m_type2space->read16(space, tmp, mem_mask);
-				
-			case 3:	// type 3 space
+
+			case 3: // type 3 space
 				return m_type3space->read16(space, tmp, mem_mask);
 		}
 	}
@@ -318,28 +318,28 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 	{
 		if (!space.debugger_access()) printf("sun2: pagemap entry not valid!\n");
 	}
-	
+
 	if (!space.debugger_access()) printf("sun2: Unmapped read @ %08x (FC %d, mask %04x, PC=%x, seg %x)\n", offset<<1, fc, mem_mask, m_maincpu->pc, offset>>15);
-	
+
 	return 0xffff;
 }
 
 WRITE16_MEMBER( sun2_state::tl_mmu_w )
 {
 	UINT8 fc = m_maincpu->get_fc();
-	
+
 	//printf("sun2: Write %04x (FC %d, mask %04x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc, offset<<1);
-	
+
 	if (fc == 3)
 	{
-		if (offset & 0x4)	// set for CPU space
+		if (offset & 0x4)   // set for CPU space
 		{
 			switch (offset & 7)
 			{
 				case 4:
 					//printf("sun2: Write? IDPROM @ %x\n", offset<<1);
 					return;
-					
+
 				case 5:
 					// XOR to match Table 2-1 in the 2/50 Field Service Manual
 					printf("sun2: CPU LEDs to %02x (PC=%x) => ", (data & 0xff) ^ 0xff, m_maincpu->pc);
@@ -357,30 +357,30 @@ WRITE16_MEMBER( sun2_state::tl_mmu_w )
 					}
 					printf("\n");
 					return;
-					
+
 				case 6:
 					//printf("sun2: Write %04x to bus error not allowed\n", data);
 					return;
-					
+
 				case 7:
 					//printf("sun2: Write %04x to system enable\n", data);
 					COMBINE_DATA(&m_sysenable);
 					return;
 			}
 		}
-		else				// clear for MMU space
+		else                // clear for MMU space
 		{
 			int page;
-			
+
 			switch (offset & 3)
 			{
-				case 0:	// page map
+				case 0: // page map
 				case 1:
 					page = m_segmap[m_context & 7][offset >> 14] << 4;
 					page += ((offset >> 10) & 0xf);
-					
+
 					//printf("sun2: Write %04x to page map at %x (entry %d), ", data, offset<<1, page);
-					if (offset & 1)	// low-order 16 bits
+					if (offset & 1) // low-order 16 bits
 					{
 						m_pagemap[page] &= 0xffff0000;
 						m_pagemap[page] |= data;
@@ -392,12 +392,12 @@ WRITE16_MEMBER( sun2_state::tl_mmu_w )
 					}
 					//printf("entry now %08x (adr %08x  PC=%x)\n", m_pagemap[page], (m_pagemap[page] & 0xfffff) << 11, m_maincpu->pc);
 					return;
-					
+
 				case 2: // segment map
 					//printf("sun2: Write %02x to segment map at %x (entry %d, user ctx %d PC=%x)\n", data & 0xff, offset<<1, offset>>14, m_context & 7, m_maincpu->pc);
 					m_segmap[m_context & 7][offset >> 14] = data & 0xff;
 					return;
-					
+
 				case 3: // context reg
 					//printf("sun2: Write %04x to context\n", data);
 					COMBINE_DATA(&m_context);
@@ -405,16 +405,16 @@ WRITE16_MEMBER( sun2_state::tl_mmu_w )
 			}
 		}
 	}
-	
+
 	// it's translation time
 	UINT8 context = (fc & 4) ? ((m_context >> 8) & 7) : (m_context & 7);
 	UINT8 pmeg = m_segmap[context][offset >> 14];
 	UINT32 entry = (pmeg << 4) + ((offset >> 10) & 0xf);
-	
+
 	if (m_pagemap[entry] & PM_VALID)
 	{
 		m_pagemap[entry] |= (PM_ACCESSED | PM_MODIFIED);
-		
+
 		// only 12 of the 20 bits in the page table entry are used on either Sun2 implementation
 		UINT32 tmp = (m_pagemap[entry] & 0xfff) << 10;
 		tmp |= (offset & 0x3ff);
@@ -423,20 +423,20 @@ WRITE16_MEMBER( sun2_state::tl_mmu_w )
 
 		switch ((m_pagemap[entry] >> 22) & 7)
 		{
-			case 0:	// type 0
+			case 0: // type 0
 				m_type0space->write16(space, tmp, data, mem_mask);
 				return;
-				
+
 			case 1: // type 1
-				//printf("write device space @ %x\n", tmp<<1);				
+				//printf("write device space @ %x\n", tmp<<1);
 				m_type1space->write16(space, tmp, data, mem_mask);
 				return;
-				
-			case 2:	// type 2
+
+			case 2: // type 2
 				m_type2space->write16(space, tmp, data, mem_mask);
 				return;
-				
-			case 3:	// type 3
+
+			case 3: // type 3
 				m_type3space->write16(space, tmp, data, mem_mask);
 				return;
 		}
@@ -445,7 +445,7 @@ WRITE16_MEMBER( sun2_state::tl_mmu_w )
 	{
 		if (!space.debugger_access()) printf("sun2: pagemap entry not valid!\n");
 	}
-	
+
 	printf("sun2: Unmapped write %04x (FC %d, mask %04x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc, offset<<1);
 }
 
@@ -475,7 +475,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(vmetype1space_map, AS_PROGRAM, 16, sun2_state)
 	AM_RANGE(0x000000, 0x01ffff) AM_RAM AM_SHARE("bw2_vram")
 	AM_RANGE(0x020000, 0x020001) AM_READWRITE( video_ctrl_r, video_ctrl_w )
-	AM_RANGE(0x7f0000, 0x7f07ff) AM_ROM AM_REGION("bootprom", 0)	// uses MMU loophole to read 32k from a 2k window
+	AM_RANGE(0x7f0000, 0x7f07ff) AM_ROM AM_REGION("bootprom", 0)    // uses MMU loophole to read 32k from a 2k window
 	// 7f0800-7f0fff: Ethernet interface
 	// 7f1000-7f17ff: AM9518 encryption processor
 	//AM_RANGE(0x7f1800, 0x7f1801) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, cb_r, cb_w, 0xff00)
@@ -509,7 +509,7 @@ ADDRESS_MAP_END
 
 // type 1 device space
 static ADDRESS_MAP_START(mbustype1space_map, AS_PROGRAM, 16, sun2_state)
-	AM_RANGE(0x000000, 0x0007ff) AM_ROM AM_REGION("bootprom", 0)	// uses MMU loophole to read 32k from a 2k window
+	AM_RANGE(0x000000, 0x0007ff) AM_ROM AM_REGION("bootprom", 0)    // uses MMU loophole to read 32k from a 2k window
 	// 001000-0017ff: AM9518 encryption processor
 	// 001800-001fff: Parallel port
 	AM_RANGE(0x002000, 0x0027ff) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00)
@@ -577,7 +577,7 @@ void sun2_state::machine_reset()
 	m_buserror = 0;
 	memset(m_segmap, 0, sizeof(m_segmap));
 	memset(m_pagemap, 0, sizeof(m_pagemap));
-	
+
 	m_maincpu->reset();
 }
 
@@ -585,46 +585,46 @@ static MACHINE_CONFIG_START( sun2vme, sun2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, 16670000)
 	MCFG_CPU_PROGRAM_MAP(sun2_mem)
-	
+
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("4M,6M,8M")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
-	
+
 	// MMU Type 0 device space
 	MCFG_DEVICE_ADD("type0", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(vmetype0space_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
-	
+
 	// MMU Type 1 device space
 	MCFG_DEVICE_ADD("type1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(vmetype1space_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
-	
+
 	// MMU Type 2 device space
 	MCFG_DEVICE_ADD("type2", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(vmetype2space_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
-	
+
 	// MMU Type 3 device space
 	MCFG_DEVICE_ADD("type3", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(vmetype3space_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
-	
+
 	MCFG_SCREEN_ADD("bwtwo", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(sun2_state, bw2_update)
 	MCFG_SCREEN_SIZE(1152,900)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
 	MCFG_SCREEN_REFRESH_RATE(72)
-	
+
 	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
 	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
@@ -645,46 +645,46 @@ static MACHINE_CONFIG_START( sun2mbus, sun2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, 16670000)
 	MCFG_CPU_PROGRAM_MAP(sun2_mem)
-	
+
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("4M")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
-	
+
 	// MMU Type 0 device space
 	MCFG_DEVICE_ADD("type0", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(mbustype0space_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
-	
+
 	// MMU Type 1 device space
 	MCFG_DEVICE_ADD("type1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(mbustype1space_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
-	
+
 	// MMU Type 2 device space
 	MCFG_DEVICE_ADD("type2", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(mbustype2space_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
-	
+
 	// MMU Type 3 device space
 	MCFG_DEVICE_ADD("type3", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(mbustype3space_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
-	
+
 	MCFG_SCREEN_ADD("bwtwo", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(sun2_state, bw2_update)
 	MCFG_SCREEN_SIZE(1152,900)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
 	MCFG_SCREEN_REFRESH_RATE(72)
-	
+
 	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
 	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
@@ -707,7 +707,7 @@ ROM_START( sun2_120 )
 	ROM_LOAD16_WORD_SWAP( "sun2-multi-rev-r.bin", 0x0000, 0x8000, CRC(4df0df77) SHA1(4d6bcf09ddc9cc8f5823847b8ea88f98fe4a642e))
 
 	ROM_REGION( 0x20, "idprom", ROMREGION_ERASEFF)
-	ROM_LOAD( "sun2120-idprom.bin", 0x000000, 0x000020, CRC(eec8cd1d) SHA1(6a78dc0ea6f9cc7687cffea754d65864fb751ebf) ) 
+	ROM_LOAD( "sun2120-idprom.bin", 0x000000, 0x000020, CRC(eec8cd1d) SHA1(6a78dc0ea6f9cc7687cffea754d65864fb751ebf) )
 ROM_END
 
 ROM_START( sun2_50 )
@@ -716,7 +716,7 @@ ROM_START( sun2_50 )
 	ROM_LOAD16_BYTE( "250_q_0.rom", 0x0000, 0x4000, CRC(2ee29abe) SHA1(82f52b9f25e92387329581f7c8ba50a171784968))
 
 	ROM_REGION( 0x20, "idprom", ROMREGION_ERASEFF)
-	ROM_LOAD( "sun250-idprom.bin", 0x000000, 0x000020, CRC(927744ab) SHA1(d29302b69128165e69dd3a79b8c8d45f2163b88a) ) 
+	ROM_LOAD( "sun250-idprom.bin", 0x000000, 0x000020, CRC(927744ab) SHA1(d29302b69128165e69dd3a79b8c8d45f2163b88a) )
 ROM_END
 
 /* Driver */

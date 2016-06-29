@@ -172,7 +172,6 @@ char *osd_get_clipboard_text(void)
 //============================================================
 
 namespace osd {
-
 class dynamic_module_posix_impl : public dynamic_module
 {
 public:
@@ -210,7 +209,7 @@ protected:
 
 				if (function != nullptr)
 				{
-					m_module = module;		
+					m_module = module;
 					return function;
 				}
 				else
@@ -219,7 +218,7 @@ protected:
 				}
 			}
 		}
-		
+
 		return nullptr;
 	}
 

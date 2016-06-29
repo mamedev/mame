@@ -512,8 +512,13 @@ public:
 	{
 		sdl_input_module::input_init(machine);
 
-		SDL_EventType event_types[] = { SDL_KEYDOWN, SDL_KEYUP, SDL_TEXTINPUT };
-		sdl_event_manager::instance().subscribe(reinterpret_cast<int*>(event_types), ARRAY_LENGTH(event_types), this);
+		static int event_types[] = {
+			static_cast<int>(SDL_KEYDOWN),
+			static_cast<int>(SDL_KEYUP),
+			static_cast<int>(SDL_TEXTINPUT)
+		};
+
+		sdl_event_manager::instance().subscribe(event_types, ARRAY_LENGTH(event_types), this);
 
 		sdl_keyboard_device *devinfo;
 
@@ -536,7 +541,7 @@ public:
 			char defname[20];
 			snprintf(defname, sizeof(defname) - 1, "%s", local_table[keynum].ui_name);
 
-			devinfo->device()->add_item(defname, itemid, generic_button_get_state, &devinfo->keyboard.state[local_table[keynum].sdl_scancode]);
+			devinfo->device()->add_item(defname, itemid, generic_button_get_state<std::int32_t>, &devinfo->keyboard.state[local_table[keynum].sdl_scancode]);
 		}
 
 		osd_printf_verbose("Keyboard: Registered %s\n", devinfo->name());
@@ -645,8 +650,14 @@ public:
 	{
 		sdl_input_module::input_init(machine);
 
-		SDL_EventType event_types[] = { SDL_MOUSEMOTION, SDL_MOUSEBUTTONDOWN, SDL_MOUSEBUTTONUP, SDL_MOUSEWHEEL };
-		sdl_event_manager::instance().subscribe(reinterpret_cast<int*>(event_types), ARRAY_LENGTH(event_types), this);
+		static int event_types[] = {
+			static_cast<int>(SDL_MOUSEMOTION),
+			static_cast<int>(SDL_MOUSEBUTTONDOWN),
+			static_cast<int>(SDL_MOUSEBUTTONUP),
+			static_cast<int>(SDL_MOUSEWHEEL)
+		};
+
+		sdl_event_manager::instance().subscribe(event_types, ARRAY_LENGTH(event_types), this);
 
 		sdl_mouse_device *devinfo;
 		char defname[20];
@@ -658,15 +669,15 @@ public:
 		devinfo = devicelist()->create_device<sdl_mouse_device>(machine, "System mouse", *this);
 
 		// add the axes
-		devinfo->device()->add_item("X", ITEM_ID_XAXIS, generic_axis_get_state, &devinfo->mouse.lX);
-		devinfo->device()->add_item("Y", ITEM_ID_YAXIS, generic_axis_get_state, &devinfo->mouse.lY);
+		devinfo->device()->add_item("X", ITEM_ID_XAXIS, generic_axis_get_state<std::int32_t>, &devinfo->mouse.lX);
+		devinfo->device()->add_item("Y", ITEM_ID_YAXIS, generic_axis_get_state<std::int32_t>, &devinfo->mouse.lY);
 
 		for (button = 0; button < 4; button++)
 		{
 			input_item_id itemid = (input_item_id)(ITEM_ID_BUTTON1 + button);
 			snprintf(defname, sizeof(defname), "B%d", button + 1);
 
-			devinfo->device()->add_item(defname, itemid, generic_button_get_state, &devinfo->mouse.buttons[button]);
+			devinfo->device()->add_item(defname, itemid, generic_button_get_state<std::int32_t>, &devinfo->mouse.buttons[button]);
 		}
 
 		osd_printf_verbose("Mouse: Registered %s\n", devinfo->name());
@@ -777,7 +788,7 @@ public:
 					itemid = ITEM_ID_OTHER_AXIS_ABSOLUTE;
 
 				snprintf(tempname, sizeof(tempname), "A%d %s", axis, devinfo->name());
-				devinfo->device()->add_item(tempname, itemid, generic_axis_get_state, &devinfo->joystick.axes[axis]);
+				devinfo->device()->add_item(tempname, itemid, generic_axis_get_state<std::int32_t>, &devinfo->joystick.axes[axis]);
 			}
 
 			// loop over all buttons
@@ -795,7 +806,7 @@ public:
 					itemid = ITEM_ID_OTHER_SWITCH;
 
 				snprintf(tempname, sizeof(tempname), "button %d", button);
-				devinfo->device()->add_item(tempname, itemid, generic_button_get_state, &devinfo->joystick.buttons[button]);
+				devinfo->device()->add_item(tempname, itemid, generic_button_get_state<std::int32_t>, &devinfo->joystick.buttons[button]);
 			}
 
 			// loop over all hats
@@ -805,16 +816,16 @@ public:
 
 				snprintf(tempname, sizeof(tempname), "hat %d Up", hat);
 				itemid = (input_item_id)((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1UP + 4 * hat : ITEM_ID_OTHER_SWITCH);
-				devinfo->device()->add_item(tempname, itemid, generic_button_get_state, &devinfo->joystick.hatsU[hat]);
+				devinfo->device()->add_item(tempname, itemid, generic_button_get_state<std::int32_t>, &devinfo->joystick.hatsU[hat]);
 				snprintf(tempname, sizeof(tempname), "hat %d Down", hat);
 				itemid = (input_item_id)((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1DOWN + 4 * hat : ITEM_ID_OTHER_SWITCH);
-				devinfo->device()->add_item(tempname, itemid, generic_button_get_state, &devinfo->joystick.hatsD[hat]);
+				devinfo->device()->add_item(tempname, itemid, generic_button_get_state<std::int32_t>, &devinfo->joystick.hatsD[hat]);
 				snprintf(tempname, sizeof(tempname), "hat %d Left", hat);
 				itemid = (input_item_id)((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1LEFT + 4 * hat : ITEM_ID_OTHER_SWITCH);
-				devinfo->device()->add_item(tempname, itemid, generic_button_get_state, &devinfo->joystick.hatsL[hat]);
+				devinfo->device()->add_item(tempname, itemid, generic_button_get_state<std::int32_t>, &devinfo->joystick.hatsL[hat]);
 				snprintf(tempname, sizeof(tempname), "hat %d Right", hat);
 				itemid = (input_item_id)((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1RIGHT + 4 * hat : ITEM_ID_OTHER_SWITCH);
-				devinfo->device()->add_item(tempname, itemid, generic_button_get_state, &devinfo->joystick.hatsR[hat]);
+				devinfo->device()->add_item(tempname, itemid, generic_button_get_state<std::int32_t>, &devinfo->joystick.hatsR[hat]);
 			}
 
 			// loop over all (track)balls
@@ -828,14 +839,21 @@ public:
 					itemid = ITEM_ID_OTHER_AXIS_RELATIVE;
 
 				snprintf(tempname, sizeof(tempname), "R%d %s", ball * 2, devinfo->name());
-				devinfo->device()->add_item(tempname, (input_item_id)itemid, generic_axis_get_state, &devinfo->joystick.balls[ball * 2]);
+				devinfo->device()->add_item(tempname, (input_item_id)itemid, generic_axis_get_state<std::int32_t>, &devinfo->joystick.balls[ball * 2]);
 				snprintf(tempname, sizeof(tempname), "R%d %s", ball * 2 + 1, devinfo->name());
-				devinfo->device()->add_item(tempname, (input_item_id)(itemid + 1), generic_axis_get_state, &devinfo->joystick.balls[ball * 2 + 1]);
+				devinfo->device()->add_item(tempname, (input_item_id)(itemid + 1), generic_axis_get_state<std::int32_t>, &devinfo->joystick.balls[ball * 2 + 1]);
 			}
 		}
 
-		SDL_EventType event_types[] = { SDL_JOYAXISMOTION, SDL_JOYBALLMOTION, SDL_JOYHATMOTION, SDL_JOYBUTTONDOWN, SDL_JOYBUTTONUP };
-		sdl_event_manager::instance().subscribe(reinterpret_cast<int*>(event_types), ARRAY_LENGTH(event_types), this);
+		static int event_types[] = {
+			static_cast<int>(SDL_JOYAXISMOTION),
+			static_cast<int>(SDL_JOYBALLMOTION),
+			static_cast<int>(SDL_JOYHATMOTION),
+			static_cast<int>(SDL_JOYBUTTONDOWN),
+			static_cast<int>(SDL_JOYBUTTONUP)
+		};
+
+		sdl_event_manager::instance().subscribe(event_types, ARRAY_LENGTH(event_types), this);
 
 		osd_printf_verbose("Joystick: End initialization\n");
 	}

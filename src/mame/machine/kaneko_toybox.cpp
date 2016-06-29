@@ -192,7 +192,7 @@ void kaneko_toybox_device::mcu_run()
 
 		case 0x42:  // Write to NVRAM
 		{
-		    eeprom_serial_93cxx_device *eeprom = machine().device<eeprom_serial_93cxx_device>(":eeprom");
+			eeprom_serial_93cxx_device *eeprom = machine().device<eeprom_serial_93cxx_device>(":eeprom");
 			UINT8* nvdat = (UINT8*)&m_mcuram[mcu_offset];
 			for (int i=0;i<0x80;i++)
 			{

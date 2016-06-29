@@ -24,7 +24,7 @@ BUGS / ISSUES
 The former is used in startup tests, the latter seems less relevant (must use menu self test "S").
 
 (2) serial ports do not work, so serial communication failure (ERROR 60) and ERROR 40 (serial
-printer interface) result. 
+printer interface) result.
 
 (3) while DOS 3 and UCSD systems (fort_sys, pas_sys) + diag disks boot, CPM 2.x and DOS 2.x die
 in secondary boot loader with a RESTORE (seek track 0) when track 2 sector 1 should be loaded.

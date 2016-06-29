@@ -14,8 +14,8 @@
 
 ***************************************************************************/
 
-#ifndef __MAME_UTIL_VECSTREAM_H__
-#define __MAME_UTIL_VECSTREAM_H__
+#ifndef MAME_UTIL_VECSTREAM_H
+#define MAME_UTIL_VECSTREAM_H
 
 #include <algorithm>
 #include <cassert>
@@ -395,4 +395,4 @@ void swap(basic_vectorstream<CharT, Traits, Allocator> &a, basic_vectorstream<Ch
 
 } // namespace util
 
-#endif // __MAME_UTIL_VECSTREAM_H__
+#endif // MAME_UTIL_VECSTREAM_H

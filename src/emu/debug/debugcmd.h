@@ -157,9 +157,9 @@ private:
 	void execute_input(int ref, int params, const char **param);
 	void execute_dumpkbd(int ref, int params, const char **param);
 
-	running_machine&	m_machine;
-    debugger_cpu& m_cpu;
-    debugger_console& m_console;
+	running_machine&    m_machine;
+	debugger_cpu& m_cpu;
+	debugger_console& m_console;
 
 	global_entry *m_global_array;
 	cheat_system m_cheat;

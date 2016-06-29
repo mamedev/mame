@@ -195,7 +195,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 	virtual DECLARE_READ8_MEMBER(read_ram) override;
 	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
-	
+
 	UINT16 m_romb;
 	UINT8  m_romb_nwe;
 	UINT8  m_ramb;

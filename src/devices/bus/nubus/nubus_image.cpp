@@ -271,7 +271,7 @@ READ32_MEMBER( nubus_image_device::image_super_r )
 
 WRITE32_MEMBER( nubus_image_device::file_cmd_w )
 {
-	const osd_directory_entry *dp;
+	const osd::directory::entry *dp;
 	char fullpath[1024];
 	UINT64 filesize;
 
@@ -290,11 +290,10 @@ WRITE32_MEMBER( nubus_image_device::file_cmd_w )
 		}
 		break;
 	case kFileCmdGetFirstListing:
-		if(filectx.dirp) osd_closedir(filectx.dirp);
-		filectx.dirp = osd_opendir((const char *)filectx.curdir);
+		filectx.dirp = osd::directory::open((const char *)filectx.curdir);
 	case kFileCmdGetNextListing:
 		if (filectx.dirp) {
-			dp = osd_readdir(filectx.dirp);
+			dp = filectx.dirp->read();
 			if(dp) {
 				strncpy((char*)filectx.filename, dp->name, sizeof(filectx.filename));
 			} else {

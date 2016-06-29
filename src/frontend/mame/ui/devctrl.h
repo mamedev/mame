@@ -26,7 +26,6 @@
 #include "ui/menu.h"
 
 namespace ui {
-
 template<class DeviceType>
 class menu_device_control : public menu
 {

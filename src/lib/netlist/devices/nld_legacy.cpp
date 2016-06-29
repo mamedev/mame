@@ -12,7 +12,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 	NETLIB_OBJECT(nicRSFF)
 	{
 		NETLIB_CONSTRUCTOR(nicRSFF)

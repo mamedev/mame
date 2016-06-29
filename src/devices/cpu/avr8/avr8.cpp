@@ -2915,7 +2915,7 @@ READ8_MEMBER( avr8_device::regs_r )
 
 		default:
 			printf("[%08X] AVR8: Unknown Register Read: 0x%03X\n", m_shifted_pc, offset);
-//      	machine().debug_break();
+//          machine().debug_break();
 			return 0;
 	}
 }

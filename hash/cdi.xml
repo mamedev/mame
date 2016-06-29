@@ -2,9 +2,9 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="cdi" description="CD-i CD-ROMs">
 
-<!-- 
-	These are converted from old TOSEC set (I think v2009-04-05), but a double check is being performed, at
-	least for discs that can still be found for this set
+<!--
+    These are converted from old TOSEC set (I think v2009-04-05), but a double check is being performed, at
+    least for discs that can still be found for this set
 -->
 
 	<software name="3degree">
@@ -10591,7 +10591,7 @@
 
 
 <!--
-	These are converted from rips released on the web
+    These are converted from rips released on the web
 -->
 
 	<software name="frogfeas">
@@ -10647,7 +10647,7 @@
 		Origin: Unknown
 		<rom name="voyeur ii (v1.04)(11-06-96)(testing-beta)(access code 3333) (disc1).bin" size="601528704" crc="0a337e76" sha1="10c15630f7cbcfc7751e7ae1948947cad48850b2" offset="0" />
 		<rom name="voyeur ii (v1.04)(11-06-96)(testing-beta)(access code 3333) (disc1).cue" size="133" crc="7d9bbe3f" sha1="fc746593b61ac9d3d24296a0c1ab7101b25db49d" offset="0" />
-	 
+
 		<rom name="voyeur ii (v1.04)(11-06-96)(testing-beta)(access code 3333) (disc2).bin" size="595354704" crc="8024edf4" sha1="ba86e8850304afb918e2a4c7411e8648b3f90a4a" offset="0" />
 		<rom name="voyeur ii (v1.04)(11-06-96)(testing-beta)(access code 3333) (disc2).cue" size="133" crc="7cc698ee" sha1="3622939d9c37f43749907cc964cc4738e58ad3b7" offset="0" />
 		-->
@@ -10670,7 +10670,7 @@
 
 
 <!--
-	These are non-tosec sourced, and could be bad
+    These are non-tosec sourced, and could be bad
 -->
 
 

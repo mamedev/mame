@@ -473,7 +473,7 @@ Address in ROM:
  *
  *************************************/
 
- // TODO: DIPs still needs work
+	// TODO: DIPs still needs work
 static INPUT_PORTS_START( dlair )
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("A:1")
@@ -500,7 +500,7 @@ static INPUT_PORTS_START( dlair )
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "Sound every 8 attracts" ) PORT_DIPLOCATION("B:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )	
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("B:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -652,7 +652,7 @@ static INPUT_PORTS_START( spaceace )
 	PORT_DIPSETTING(    0x20, "1 out of eight times" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_HIGH, "A:7")
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_HIGH, "A:8")
-	
+
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "LD Player" ) PORT_DIPLOCATION("B:1")
 	PORT_DIPSETTING(    0x00, "LD-PR7820" )
@@ -663,7 +663,7 @@ static INPUT_PORTS_START( spaceace )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("B:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x00, "Unlimited Lives" ) PORT_DIPLOCATION("B:6") 
+	PORT_DIPNAME( 0x20, 0x00, "Unlimited Lives" ) PORT_DIPLOCATION("B:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x40, 0x00, "Enable Frame Display" ) PORT_DIPLOCATION("B:7") // ?

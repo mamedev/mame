@@ -9,23 +9,23 @@ driver by Nicola Salmoria, qwijibo
 deviations from schematics verified on set 2 pcb:
 
   main pcb:
-	- U33.3 connected to /IRQ line via inverter U67.9,
-	  providing timer IRQ for input polling.
+    - U33.3 connected to /IRQ line via inverter U67.9,
+      providing timer IRQ for input polling.
 
-	- U43 removed from timer circuit, U52.9 wired directly to
-	  U32.5, increasing timer frequency to 250 Hz.
+    - U43 removed from timer circuit, U52.9 wired directly to
+      U32.5, increasing timer frequency to 250 Hz.
 
   audio pcb:
-	- U6.10 wired to U14.21, cut from R14/16
-	- R16 wired to R1 in series, R1 cut from GND
-	- R14 wired to GND instead of U6.10
+    - U6.10 wired to U14.21, cut from R14/16
+    - R16 wired to R1 in series, R1 cut from GND
+    - R14 wired to GND instead of U6.10
 
-	- U5.10 wired to U15.21, cut from R13/15
-	- R15 wired to R2 in series, R2 cut from GND
-	- R13 wired to GND instead of U5.10
+    - U5.10 wired to U15.21, cut from R13/15
+    - R15 wired to R2 in series, R2 cut from GND
+    - R13 wired to GND instead of U5.10
 
-	- EXT VCO DACs (U11, U12) and surrounding logic not placed
-	- Numerous changes to SN74677 timing component R & C values
+    - EXT VCO DACs (U11, U12) and surrounding logic not placed
+    - Numerous changes to SN74677 timing component R & C values
 
 TODO:
 - The game reads some unmapped memory addresses, missing ROMs? There's an empty

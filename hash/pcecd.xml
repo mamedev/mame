@@ -1319,7 +1319,7 @@
 		</part>
 	</software>
 
-	<software name="dngmsterj" cloneof="dngmster">
+	<software name="dmasterj" cloneof="dmaster">
 		<description>Dungeon Master - Theron's Quest (SCD)(Jpn)</description>
 		<year>1992</year>
 		<publisher>Victor Entertainment</publisher>
@@ -7140,7 +7140,7 @@
 		</part>
 	</software>
 
-	<software name="dngmster">
+	<software name="dmaster">
 		<description>Dungeon Master - Theron's Quest (SCD)(USA)</description>
 		<year>1993</year>
 		<publisher>FTL Games</publisher>

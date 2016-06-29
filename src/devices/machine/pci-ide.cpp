@@ -132,7 +132,6 @@ WRITE_LINE_MEMBER(ide_pci_device::ide_interrupt)
 
 	// PCI646U2 Offset 0x50 is interrupt status
 	if (main_id == 0x10950646) {
-
 		if (state)
 			m_config_data[0x10 / 4] |= 0x4;
 		else

@@ -324,6 +324,19 @@ pdc_device::pdc_device(const machine_config &mconfig, const char *tag, device_t 
 
 void pdc_device::device_start()
 {
+
+	/* Save States */
+	save_item(NAME(reg_p0));
+	save_item(NAME(reg_p1));
+	save_item(NAME(reg_p2));
+	save_item(NAME(reg_p3));
+	save_item(NAME(reg_p4));
+	save_item(NAME(reg_p5));
+	save_item(NAME(reg_p6));
+	save_item(NAME(reg_p7));
+	save_item(NAME(reg_p21));
+	save_item(NAME(reg_p38));
+	save_item(NAME(fdd_68k_dma_address));
 }
 
 //-------------------------------------------------

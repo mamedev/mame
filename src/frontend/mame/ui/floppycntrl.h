@@ -17,7 +17,6 @@
 #include "formats/flopimg.h"
 
 namespace ui {
-
 class menu_control_floppy_image : public menu_control_device_image
 {
 public:

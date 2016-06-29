@@ -2,12 +2,12 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-	Sony LDP-1000 laserdisc emulation.
+    Sony LDP-1000 laserdisc emulation.
 
-	TODO:
-	- Dump BIOSes (seven of them according to docs);
-	- Serial interface, needs BIOS dump;
-	- Hookup with Sony SMC-70 / SMC-777;
+    TODO:
+    - Dump BIOSes (seven of them according to docs);
+    - Serial interface, needs BIOS dump;
+    - Hookup with Sony SMC-70 / SMC-777;
 
 ***************************************************************************/
 
@@ -71,7 +71,7 @@ void sony_ldp1000_device::device_start()
 void sony_ldp1000_device::device_reset()
 {
 	laserdisc_device::device_reset();
-	
+
 	for(int i=0;i<0x10;i++)
 		m_internal_bcd[i] = 0;
 
@@ -152,12 +152,12 @@ UINT32 sony_ldp1000_device::bcd_to_raw()
 void sony_ldp1000_device::exec_enter_cmd()
 {
 	//const UINT32 saved_frame = bcd_to_raw();
-	
+
 	switch(m_player_state)
 	{
 		case player_standby:
 			throw emu_fatalerror("Unimplemented standby state detected");
-			
+
 		case player_search:
 			// TODO: move to timer
 			//advance_slider(1);
@@ -187,18 +187,18 @@ WRITE8_MEMBER( sony_ldp1000_device::command_w )
 			exec_enter_cmd();
 			m_status = stat_ack;
 			break;
-		
+
 		case 0x43: // search
 			set_new_player_state(player_search);
 			m_status = stat_ack;
 			break;
-		
+
 		/*
-			audio channels absolute enable / disable
-			---- --x- select channel
-			---- ---x enable channel (active low)
+		    audio channels absolute enable / disable
+		    ---- --x- select channel
+		    ---- ---x enable channel (active low)
 		*/
-		case 0x46: 
+		case 0x46:
 		case 0x47:
 		case 0x48:
 		case 0x49:

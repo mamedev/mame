@@ -646,7 +646,7 @@ static const struct {
 } hacks[3] = { { "chihiro", { { 0x6a79f/*3f79f*/, 0x01 }, { 0x6a7a0/*3f7a0*/, 0x00 }, { 0x6b575/*40575*/, 0x00 }, { 0x6b576/*40576*/, 0x00 }, { 0x6b5af/*405af*/, 0x75 }, { 0x6b78a/*4078a*/, 0x75 }, { 0x6b7ca/*407ca*/, 0x00 }, { 0x6b7b8/*407b8*/, 0x00 }, { 0x8f5b2, 0x75 }, { 0x79a9e/*2ea9e*/, 0x74 }, { 0x79b80/*2eb80*/, 0xeb }, { 0x79b97/*2eb97*/, 0x74 }, { 0, 0 } } },
 				{ "outr2", { { 0x12e4cf, 0x01 }, { 0x12e4d0, 0x00 }, { 0x4793e, 0x01 }, { 0x4793f, 0x00 }, { 0x47aa3, 0x01 }, { 0x47aa4, 0x00 }, { 0x14f2b6, 0x84 }, { 0x14f2d1, 0x75 }, { 0x8732f, 0x7d }, { 0x87384, 0x7d }, { 0x87388, 0xeb }, { 0, 0 } } },
 				{ "crtaxihr", { { 0x121dce/*f6dce*/, 0xeb }, { 0x121deb/*f6deb*/, 0xeb }, { 0x121fa0/*f6fa0*/, 0xeb }, { 0x14ada5/*11fda5*/, 0x90 }, { 0x14ada6/*11fda6*/, 0x90 }, /*{ 0x8d0bc 620bc , 0xeb },*/ { 0, 0 } } }
-			 };
+				};
 
 void chihiro_state::hack_usb()
 {
@@ -1558,4 +1558,4 @@ ROM_END
 // 0022
 // 0023
 // 0024     GAME( 2009, ccfboxo,  ccfboxa,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Chihiro Firmware Update For Compact Flash Box (GDX-0024)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-/* 0024A */ GAME( 2009, ccfboxa,  chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Chihiro Firmware Update For Compact Flash Box (Rev A) (GDX-0024A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0024A */ GAME( 2009, ccfboxa,  chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Chihiro Firmware Update For Compact Flash Box (4.01) (GDX-0024A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )

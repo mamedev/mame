@@ -15,7 +15,6 @@
 #include "ptypes.h"
 
 namespace plib {
-
 template <typename T>
 struct ptype_treats
 {
@@ -154,8 +153,8 @@ protected:
 class pfmt : public pformat_base<pfmt>
 {
 public:
-	pfmt(const pstring &fmt);
-	pfmt(const char *fmt);
+	explicit pfmt(const pstring &fmt);
+	explicit pfmt(const char *fmt);
 	virtual ~pfmt();
 
 	operator pstring() const { return m_str; }
@@ -245,7 +244,7 @@ template <plog_level::e L, bool build_enabled = true>
 class plog_channel : public pfmt_writer_t<build_enabled>
 {
 public:
-	plog_channel(plog_dispatch_intf *b) : pfmt_writer_t<build_enabled>(),  m_base(b) { }
+	explicit plog_channel(plog_dispatch_intf *b) : pfmt_writer_t<build_enabled>(),  m_base(b) { }
 	virtual ~plog_channel() { }
 
 protected:
@@ -270,7 +269,7 @@ class plog_base
 {
 public:
 
-	plog_base(plog_dispatch_intf *proxy)
+	explicit plog_base(plog_dispatch_intf *proxy)
 	: debug(proxy),
 		info(proxy),
 		verbose(proxy),

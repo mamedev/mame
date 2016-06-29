@@ -87,39 +87,6 @@ static ADDRESS_MAP_START( scramble_sound_io_map, AS_IO, 8, scramble_state )
 ADDRESS_MAP_END
 
 
-
-static ADDRESS_MAP_START( turpins_map, AS_PROGRAM, 8, scramble_state )
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9400, 0x97ff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w)
-	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
-	AM_RANGE(0x9840, 0x985f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9860, 0x987f) AM_RAM AM_SHARE("bulletsram")
-	AM_RANGE(0x9880, 0x98ff) AM_RAM
-
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
-	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN1")
-	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("IN2")
-
-	AM_RANGE(0xa801, 0xa801) AM_WRITE(galaxold_nmi_enable_w)
-	AM_RANGE(0xa802, 0xa802) AM_WRITE(galaxold_coin_counter_w)
-	AM_RANGE(0xa804, 0xa804) AM_WRITE(galaxold_stars_enable_w)
-	AM_RANGE(0xa806, 0xa806) AM_WRITE(galaxold_flip_screen_x_w)
-	AM_RANGE(0xa807, 0xa807) AM_WRITE(galaxold_flip_screen_y_w)
-	/* don't know where these are */
-//  AM_RANGE(0x8100, 0x8103) AM_WRITE("ppi8255_0", i8255_device, write)
-//  AM_RANGE(0x8200, 0x8203) AM_WRITE("ppi8255_1", i8255_device, write)
-
-	AM_RANGE(0xb800, 0xb800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-//  AM_RANGE(0x8100, 0x8103) AM_READ("ppi8255_0", i8255_device, read)
-//  AM_RANGE(0x8200, 0x8203) AM_READ("ppi8255_1", i8255_device, read)
-
-	AM_RANGE(0xf000, 0xffff) AM_READONLY
-ADDRESS_MAP_END
-
-
-
 static ADDRESS_MAP_START( ckongs_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6bff) AM_RAM
@@ -515,50 +482,6 @@ static INPUT_PORTS_START( 800fath )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL )    /* protection bit */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )    /* protection bit */
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( turpins )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably space for button 2 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
-
-	PORT_START("IN1")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x03, "126 (Cheat)")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably space for player 2 button 2 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, "A 1/1 B 2/1 C 1/1" )
-	PORT_DIPSETTING(    0x02, "A 1/2 B 1/1 C 1/2" )
-	PORT_DIPSETTING(    0x04, "A 1/3 B 3/1 C 1/3" )
-	PORT_DIPSETTING(    0x06, "A 1/4 B 4/1 C 1/4" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( triplep )
@@ -1687,13 +1610,6 @@ static MACHINE_CONFIG_START( ad2083, scramble_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( turpins, scramble )
-
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(turpins_map)
-
-MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( harem, scramble )
 
@@ -2294,27 +2210,6 @@ ROM_START( ad2083 )
 ROM_END
 
 
-ROM_START( turpins )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "t1.bin",   0x0000, 0x1000, CRC(89dd50cc) SHA1(90e18f71324056a63272a02cabb0a6fe2a96dd0d) )
-	ROM_LOAD( "t3.bin",   0x1000, 0x1000, CRC(9562dc29) SHA1(e4fe51176e554d159342f2ba6ff6886723df0ec4) )
-	ROM_LOAD( "t4.bin",   0x2000, 0x1000, CRC(62291652) SHA1(82965d3e9608afde4ff06cba1d7a4b11cd904c11) )
-	ROM_LOAD( "t5.bin",   0x3000, 0x1000, CRC(804118e8) SHA1(6f733d0f688df73e36bac6635aa9e9163fbae141) )
-	ROM_LOAD( "t2.bin",   0x4000, 0x1000, CRC(8024f678) SHA1(3285f64ad55b3f4131d70e027751d587313c18ac) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "8tur.bin",  0x0000, 0x1000, CRC(c97ed8ab) SHA1(675e464eff7b2fa4a5c909d807a454440e7c96c9) )
-	ROM_LOAD( "5tur.bin",  0x1000, 0x1000, CRC(af5fc43c) SHA1(8a49c55feba094b07380615cf0b6f0878c25a260) )
-
-	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "tur.4f",  0x0000, 0x0800, CRC(e5999d52) SHA1(bc3f52cf6c6e19dfd2dacd1e8c9128f437e995fc) )
-	ROM_LOAD( "tur.5f",  0x0800, 0x0800, CRC(c3ffd655) SHA1(dee51d77be262a2944488e381541c10a2b6e5d83) )
-
-	ROM_REGION( 0x0020, "proms", 0 ) // missing, but the original hw is so close to scramble that the original prom works
-	ROM_LOAD( "turtles.clr",     0x0000, 0x0020, CRC(f3ef02dd) SHA1(09fd795170d7d30f101d579f57553da5ff3800ab) )
-ROM_END
-
-
 ROM_START( harem ) /* Main PCB version simular to Scorpion (also developed by I.G.R), sound PCB is identical to Scorpion */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "harem_prom0.ic85", 0x0000, 0x2000, CRC(4521b753) SHA1(9033f9c3be8fec1e5ff251e9f60faaf3848a1a1e) )
@@ -2375,7 +2270,5 @@ GAME( 1982, mimonscr, mimonkey, mimonscr, mimonscr, scramble_state, mimonscr,   
 GAME( 1982, mimonscra,mimonkey, mimonscr, mimonscr, scramble_state, mimonscr,     ROT90, "bootleg (Kaina Games)","Mighty Monkey (Kaina Games, bootleg on Scramble hardware)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, ad2083,   0,        ad2083,   ad2083,   scramble_state, ad2083,       ROT90, "Midcoin",             "A. D. 2083",                     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-
-GAME( 1981, turpins,  turtles,  turpins,  turpins,  driver_device,  0,            ROT90, "bootleg",             "Turpin (bootleg on Scramble hardware)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // haven't hooked up the sound CPU yet
 
 GAME( 1983, harem,    0,        harem,    harem,    scramble_state, harem,        ROT90, "I.G.R.",              "Harem",                          MACHINE_SUPPORTS_SAVE )
