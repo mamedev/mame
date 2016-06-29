@@ -978,14 +978,6 @@ static ADDRESS_MAP_START( base_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000490, 0x00000493) AM_WRITE(video_dma_length_w)
 	AM_RANGE(0x00000494, 0x00000497) AM_WRITE(video_dma_address_w)
 	AM_RANGE(0x00000498, 0x0000049b) AM_WRITENOP // ? dma address high bits? (always writes 0)
-	AM_RANGE(0x0000050c, 0x0000050f) AM_WRITE16(sprite_dma_start_w, 0xffff0000)
-	AM_RANGE(0x00000524, 0x00000527) AM_WRITENOP // SEI252 sprite decryption key, see machine/spisprit.c
-	AM_RANGE(0x00000528, 0x0000052b) AM_WRITENOP // SEI252 sprite decryption unknown
-	AM_RANGE(0x00000530, 0x00000533) AM_WRITENOP // SEI252 sprite decryption table key, see machine/spisprit.c
-	AM_RANGE(0x00000534, 0x00000537) AM_WRITENOP // SEI252 sprite decryption unknown
-	AM_RANGE(0x0000053c, 0x0000053f) AM_WRITENOP // SEI252 sprite decryption table index, see machine/spisprit.c
-	AM_RANGE(0x0000054c, 0x0000054f) AM_WRITENOP // RISE10/11 sprite decryption key, see machine/seibuspi.c
-	AM_RANGE(0x00000560, 0x00000563) AM_WRITE16(sprite_dma_start_w, 0xffff0000)
 	AM_RANGE(0x00000600, 0x00000603) AM_READ8(spi_status_r, 0x000000ff)
 	AM_RANGE(0x00000604, 0x00000607) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x00000608, 0x0000060b) AM_READ_PORT("UNKNOWN")
@@ -993,6 +985,20 @@ static ADDRESS_MAP_START( base_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share1")
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share1") // ROM location in real-mode
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sei252_map, AS_PROGRAM, 32, seibuspi_state )
+	AM_RANGE(0x0000050c, 0x0000050f) AM_WRITE16(sprite_dma_start_w, 0xffff0000)
+	AM_RANGE(0x00000524, 0x00000527) AM_WRITENOP // SEI252 sprite decryption key, see machine/spisprit.c
+	AM_RANGE(0x00000528, 0x0000052b) AM_WRITENOP // SEI252 sprite decryption unknown
+	AM_RANGE(0x00000530, 0x00000533) AM_WRITENOP // SEI252 sprite decryption table key, see machine/spisprit.c
+	AM_RANGE(0x00000534, 0x00000537) AM_WRITENOP // SEI252 sprite decryption unknown
+	AM_RANGE(0x0000053c, 0x0000053f) AM_WRITENOP // SEI252 sprite decryption table index, see machine/spisprit.c
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( rise_map, AS_PROGRAM, 32, seibuspi_state )
+	AM_RANGE(0x0000054c, 0x0000054f) AM_WRITENOP // RISE10/11 sprite decryption key, see machine/seibuspi.c
+	AM_RANGE(0x00000560, 0x00000563) AM_WRITE16(sprite_dma_start_w, 0xffff0000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32, seibuspi_state )
@@ -1010,6 +1016,25 @@ static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x000006dc, 0x000006df) AM_READ8(spi_ds2404_unknown_r, 0x0000ff00)
 	AM_RANGE(0x00a00000, 0x013fffff) AM_ROM AM_REGION("sound01", 0)
 	AM_IMPORT_FROM( base_map )
+	AM_IMPORT_FROM( sei252_map )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( rdft2_map, AS_PROGRAM, 32, seibuspi_state )
+	AM_RANGE(0x00000600, 0x00000603) AM_WRITENOP // ?
+	AM_RANGE(0x00000680, 0x00000683) AM_DEVREAD8("soundfifo2", fifo7200_device, data_byte_r, 0x000000ff)
+	AM_RANGE(0x00000680, 0x00000683) AM_DEVWRITE8("soundfifo1", fifo7200_device, data_byte_w, 0x000000ff)
+	AM_RANGE(0x00000684, 0x00000687) AM_READ8(sound_fifo_status_r, 0x000000ff)
+	AM_RANGE(0x00000688, 0x0000068b) AM_WRITE8(z80_prg_transfer_w, 0x000000ff)
+	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(z80_enable_w, 0x000000ff)
+	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(rf2_layer_bank_w, 0x00ff0000)
+	AM_RANGE(0x000006d0, 0x000006d3) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_1w_reset_w, 0x000000ff)
+	AM_RANGE(0x000006d4, 0x000006d7) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_data_w, 0x000000ff)
+	AM_RANGE(0x000006d8, 0x000006db) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_clk_w, 0x000000ff)
+	AM_RANGE(0x000006dc, 0x000006df) AM_DEVREAD8("ds2404", ds2404_device, ds2404_data_r, 0x000000ff)
+	AM_RANGE(0x000006dc, 0x000006df) AM_READ8(spi_ds2404_unknown_r, 0x0000ff00)
+	AM_RANGE(0x00a00000, 0x013fffff) AM_ROM AM_REGION("sound01", 0)
+	AM_IMPORT_FROM( base_map )
+	AM_IMPORT_FROM( rise_map )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sxx2e_map, AS_PROGRAM, 32, seibuspi_state )
@@ -1024,6 +1049,7 @@ static ADDRESS_MAP_START( sxx2e_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x000006dc, 0x000006df) AM_DEVREAD8("ds2404", ds2404_device, ds2404_data_r, 0x000000ff)
 	AM_RANGE(0x000006dc, 0x000006df) AM_READ8(spi_ds2404_unknown_r, 0x0000ff00)
 	AM_IMPORT_FROM( base_map )
+	AM_IMPORT_FROM( sei252_map )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sxx2f_map, AS_PROGRAM, 32, seibuspi_state )
@@ -1034,6 +1060,7 @@ static ADDRESS_MAP_START( sxx2f_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(spi_layerbanks_eeprom_w, 0x00ff0000)
 	AM_RANGE(0x00000690, 0x00000693) AM_WRITENOP // ?
 	AM_IMPORT_FROM( base_map )
+	AM_IMPORT_FROM( rise_map )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sys386i_map, AS_PROGRAM, 32, seibuspi_state )
@@ -1042,15 +1069,23 @@ static ADDRESS_MAP_START( sys386i_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x01200000, 0x01200003) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x000000ff)
 	AM_RANGE(0x01200004, 0x01200007) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x000000ff)
 	AM_IMPORT_FROM( base_map )
+	AM_IMPORT_FROM( rise_map )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sys386f_map, AS_PROGRAM, 32, seibuspi_state )
+	AM_RANGE(0x00000010, 0x00000013) AM_READ8(spi_status_r, 0x000000ff)
 	AM_RANGE(0x00000400, 0x00000403) AM_WRITE(ejsakura_input_select_w)
 	AM_RANGE(0x00000404, 0x00000407) AM_WRITE8(eeprom_w, 0x000000ff)
 	AM_RANGE(0x00000408, 0x0000040f) AM_DEVWRITE8("ymz", ymz280b_device, write, 0x000000ff)
+	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
+	AM_RANGE(0x00000490, 0x00000493) AM_WRITE(video_dma_length_w)
+	AM_RANGE(0x00000494, 0x00000497) AM_WRITE(video_dma_address_w)
 	AM_RANGE(0x00000600, 0x00000607) AM_DEVREAD8("ymz", ymz280b_device, read, 0x000000ff)
 	AM_RANGE(0x0000060c, 0x0000060f) AM_READ(ejsakura_keyboard_r)
-	AM_IMPORT_FROM( base_map )
+	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM AM_SHARE("mainram")
+	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share1")
+	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share1") // ROM location in real-mode
+	AM_IMPORT_FROM( rise_map )
 ADDRESS_MAP_END
 
 
@@ -1867,6 +1902,11 @@ static MACHINE_CONFIG_DERIVED( ejanhs, spi )
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, ejanhs)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( rdft2, spi )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(rdft2_map)
 MACHINE_CONFIG_END
 
 
@@ -3888,25 +3928,25 @@ GAME( 1996, rdftit,     rdft,     spi,     spi_3button, seibuspi_state, rdft,   
 GAME( 1996, rdfta,      rdft,     spi,     spi_3button, seibuspi_state, rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Austria)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // this is one revision
-GAME( 1997, rdft2,      0,        spi,     spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters 2 - Operation Hell Dive (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, rdft2j,     rdft2,    spi,     spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Japan set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, rdft2a,     rdft2,    spi,     spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden Fighters 2 - Operation Hell Dive (Hong Kong)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, rdft2,      0,        rdft2,   spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters 2 - Operation Hell Dive (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, rdft2j,     rdft2,    rdft2,   spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Japan set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, rdft2a,     rdft2,    rdft2,   spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden Fighters 2 - Operation Hell Dive (Hong Kong)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // this is another
-GAME( 1997, rdft2ja,    rdft2,    spi,     spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Japan set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, rdft2aa,    rdft2,    spi,     spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu (Dream Island license)",  "Raiden Fighters 2 - Operation Hell Dive (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, rdft2it,    rdft2,    spi,     spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, rdft2ja,    rdft2,    rdft2,   spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Japan set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, rdft2aa,    rdft2,    rdft2,   spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu (Dream Island license)",  "Raiden Fighters 2 - Operation Hell Dive (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, rdft2it,    rdft2,    rdft2,   spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // these 2 are both unique
-GAME( 1997, rdft2t,     rdft2,    spi,     spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Taiwan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, rdft2u,     rdft2,    spi,     spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters 2 - Operation Hell Dive (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, rdft2t,     rdft2,    rdft2,   spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Taiwan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, rdft2u,     rdft2,    rdft2,   spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters 2 - Operation Hell Dive (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 
 
 
-GAME( 1998, rfjet,      0,        spi,     spi_2button, seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters Jet (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, rfjetu,     rfjet,    spi,     spi_2button, seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters Jet (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, rfjetj,     rfjet,    spi,     spi_2button, seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters Jet (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, rfjeta,     rfjet,    spi,     spi_2button, seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu (Dream Island license)",  "Raiden Fighters Jet (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, rfjett,     rfjet,    spi,     spi_2button, seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters Jet (Taiwan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, rfjet,      0,        rdft2,   spi_2button, seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters Jet (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, rfjetu,     rfjet,    rdft2,   spi_2button, seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters Jet (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, rfjetj,     rfjet,    rdft2,   spi_2button, seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters Jet (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, rfjeta,     rfjet,    rdft2,   spi_2button, seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu (Dream Island license)",  "Raiden Fighters Jet (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, rfjett,     rfjet,    rdft2,   spi_2button, seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters Jet (Taiwan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 /* SXX2E */
 GAME( 1996, rdfts,      rdft,     sxx2e,   sxx2e,       seibuspi_state, rdft,     ROT270, "Seibu Kaihatsu (Explorer System Corp. license)", "Raiden Fighters (Taiwan, single board)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
