@@ -464,6 +464,7 @@ void m2comm_device::comm_tick()
 						m_buffer[1] = 0x01;
 						m_buffer[2] = 0x00;
 						m_line_tx.write(m_buffer, dataSize);
+						m_linktimer = 0x00e8; // 58 fps * 4s
 					}
 
 					// send second packet
