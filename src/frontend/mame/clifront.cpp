@@ -53,7 +53,9 @@
 #define CLICOMMAND_LISTFULL             "listfull"
 #define CLICOMMAND_LISTSOURCE           "listsource"
 #define CLICOMMAND_LISTCLONES           "listclones"
+#define CLICOMMAND_LISTCLONESOURCE      "listclonesource"
 #define CLICOMMAND_LISTBROTHERS         "listbrothers"
+#define CLICOMMAND_LISTTREE             "listtree"
 #define CLICOMMAND_LISTCRC              "listcrc"
 #define CLICOMMAND_LISTROMS             "listroms"
 #define CLICOMMAND_LISTSAMPLES          "listsamples"
@@ -92,7 +94,9 @@ static const options_entry cli_option_entries[] =
 	{ CLICOMMAND_LISTFULL ";ll",        "0",       OPTION_COMMAND,    "short name, full name" },
 	{ CLICOMMAND_LISTSOURCE ";ls",      "0",       OPTION_COMMAND,    "driver sourcefile" },
 	{ CLICOMMAND_LISTCLONES ";lc",      "0",       OPTION_COMMAND,    "show clones" },
+	{ CLICOMMAND_LISTCLONESOURCE ";lcs", "0",      OPTION_COMMAND,    "show clones and sourcefiles", },
 	{ CLICOMMAND_LISTBROTHERS ";lb",    "0",       OPTION_COMMAND,    "show \"brothers\", or other drivers from same sourcefile" },
+	{ CLICOMMAND_LISTTREE ";lt",        "0",       OPTION_COMMAND,    "show drivers in tree format" },
 	{ CLICOMMAND_LISTCRC,               "0",       OPTION_COMMAND,    "CRC-32s" },
 	{ CLICOMMAND_LISTROMS ";lr",        "0",       OPTION_COMMAND,    "list required roms for a driver" },
 	{ CLICOMMAND_LISTSAMPLES,           "0",       OPTION_COMMAND,    "list optional samples for a driver" },
@@ -293,7 +297,7 @@ int cli_frontend::execute(int argc, char **argv)
 
 		// if a game was specified, wasn't a wildcard, and our error indicates this was the
 		// reason for failure, offer some suggestions
-		if (m_result == EMU_ERR_NO_SUCH_GAME && *(m_options.system_name()) != 0 && strchr(m_options.system_name(), '*') == nullptr && mame_options::system(m_options) == nullptr)
+		if (m_result == EMU_ERR_NO_SUCH_GAME && *(m_options.system_name()) != 0 && *(m_options.system_name()) != '@' && strchr(m_options.system_name(), '*') == nullptr && mame_options::system(m_options) == nullptr)
 		{
 			// get the top 16 approximate matches
 			driver_enumerator drivlist(m_options);
@@ -404,21 +408,36 @@ void cli_frontend::listclones(const char *gamename)
 	// start with a filtered list of drivers
 	driver_enumerator drivlist(m_options, gamename);
 	int original_count = drivlist.count();
+	bool any_clones = false;
+
+	// add all parent sets
+	while (drivlist.next())
+	{
+		int clone_of = drivlist.non_bios_clone();
+		if (clone_of != -1)
+		{
+			drivlist.include(clone_of);
+			any_clones = true;
+		}
+	}
 
 	// iterate through the remaining ones to see if their parent matches
+	drivlist.reset();
 	while (drivlist.next_excluded())
 	{
 		// if we have a non-bios clone and it matches, keep it
-		int clone_of = drivlist.clone();
-		if (clone_of != -1 && (drivlist.driver(clone_of).flags & MACHINE_IS_BIOS_ROOT) == 0)
-			if (drivlist.matches(gamename, drivlist.driver(clone_of).name))
-				drivlist.include();
+		int clone_of = drivlist.non_bios_clone();
+		if (clone_of != -1 && drivlist.included(clone_of))
+		{
+			drivlist.include();
+			any_clones = true;
+		}
 	}
 
-	// return an error if none found
-	if (drivlist.count() == 0)
+	// see if we match but just weren't a clone
+	if (!any_clones)
 	{
-		// see if we match but just weren't a clone
+		// return an error if none found
 		if (original_count == 0)
 			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 		else
@@ -433,9 +452,58 @@ void cli_frontend::listclones(const char *gamename)
 	drivlist.reset();
 	while (drivlist.next())
 	{
-		int clone_of = drivlist.clone();
-		if (clone_of != -1 && (drivlist.driver(clone_of).flags & MACHINE_IS_BIOS_ROOT) == 0)
+		int clone_of = drivlist.non_bios_clone();
+		if (clone_of != -1)
 			osd_printf_info("%-16s %-8s\n", drivlist.driver().name, drivlist.driver(clone_of).name);
+	}
+}
+
+
+//-------------------------------------------------
+//  listclonesource - output the name, parent and
+//  source file of all clones matching the given
+//  pattern
+//-------------------------------------------------
+
+void cli_frontend::listclonesource(const char *gamename)
+{
+	// start with a filtered list of drivers
+	driver_enumerator drivlist(m_options, gamename);
+
+	// return an error if none found
+	if (drivlist.count() == 0)
+	{
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
+		return;
+	}
+
+	// add all parent sets
+	while (drivlist.next())
+	{
+		int clone_of = drivlist.non_bios_clone();
+		if (clone_of != -1)
+			drivlist.include(clone_of);
+	}
+
+	// iterate through the remaining ones to see if their parent matches
+	drivlist.reset();
+	while (drivlist.next_excluded())
+	{
+		// if we have a non-bios clone and it matches, keep it
+		int clone_of = drivlist.non_bios_clone();
+		if (clone_of != -1 && drivlist.included(clone_of))
+			drivlist.include();
+	}
+
+	// print the header
+	osd_printf_info("Name:            Clone of:        Source:\n");
+
+	// iterate through drivers and output the info
+	drivlist.reset();
+	while (drivlist.next())
+	{
+		int clone_of = drivlist.non_bios_clone();
+		osd_printf_info("%-16s %-16s %s\n", drivlist.driver().name, (clone_of != -1) ? drivlist.driver(clone_of).name : "", core_filename_extract_base(drivlist.driver().source_file).c_str());
 	}
 }
 
@@ -480,6 +548,125 @@ void cli_frontend::listbrothers(const char *gamename)
 	{
 		int clone_of = drivlist.clone();
 		osd_printf_info("%-16s %-16s %-16s\n", core_filename_extract_base(drivlist.driver().source_file).c_str(), drivlist.driver().name, (clone_of == -1 ? "" : drivlist.driver(clone_of).name));
+	}
+}
+
+
+//-------------------------------------------------
+//  listtree - output a tree of matching games,
+//  their parents and BIOS roots, separated by
+//  source file
+//-------------------------------------------------
+
+void cli_frontend::listtree(const char *gamename)
+{
+	// start with a filtered list of drivers; return an error if none found
+	driver_enumerator initial_drivlist(m_options, gamename);
+	if (initial_drivlist.count() == 0)
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
+
+	// scan through the initially-selected drivers
+	bool first = true;
+	while (initial_drivlist.next())
+	{
+		// get the source file and print the header
+		if (!first)
+			osd_printf_info("\n");
+		first = false;
+		const char *source = initial_drivlist.driver().source_file;
+		osd_printf_info("Drivers in source file %s:\n", core_filename_extract_base(source).c_str());
+
+		// build a new brother list for each source file
+		driver_enumerator drivlist(m_options);
+		driver_enumerator brotherlist(m_options);
+		driver_enumerator bioslist(m_options);
+		drivlist.exclude_all();
+		brotherlist.exclude_all();
+		bioslist.exclude_all();
+
+		// walk the initial driver list and mark those with the same source
+		initial_drivlist.reset();
+		while (initial_drivlist.next())
+		{
+			if (strcmp(initial_drivlist.driver().source_file, source) == 0)
+			{
+				brotherlist.include(initial_drivlist.current());
+				int parent = initial_drivlist.non_bios_clone();
+				drivlist.include(parent != -1 ? parent : initial_drivlist.current());
+				int bios = initial_drivlist.bios_root();
+				if (bios != -1)
+					bioslist.include(bios);
+				initial_drivlist.exclude();
+			}
+		}
+
+		// output the entries found for each source file (with BIOS root)
+		bioslist.reset();
+		while (bioslist.next())
+		{
+			if (strcmp(bioslist.driver().source_file, source) != 0)
+				osd_printf_info("%-16s        (BIOS root in %s)\n", bioslist.driver().name, core_filename_extract_base(bioslist.driver().source_file).c_str());
+			else
+			{
+				osd_printf_info("%-16s        %s\n", bioslist.driver().name, bioslist.driver().description);
+				brotherlist.exclude(bioslist.current());
+				drivlist.exclude(bioslist.current());
+			}
+			drivlist.reset();
+			while (drivlist.next())
+			{
+				// drivers with this BIOS
+				if (drivlist.bios_root() != bioslist.current())
+					continue;
+
+				// print the parent
+				if (strcmp(drivlist.driver().source_file, source) != 0)
+					osd_printf_info("  %-16s      (parent set in %s)\n", drivlist.driver().name, core_filename_extract_base(drivlist.driver().source_file).c_str());
+				else
+				{
+					osd_printf_info("  %-16s      %s\n", drivlist.driver().name, drivlist.driver().description);
+					brotherlist.exclude(drivlist.current());
+				}
+
+				// print the clones
+				brotherlist.reset();
+				while (brotherlist.next())
+				{
+					if (!brotherlist.is_clone_of(drivlist.current()))
+						continue;
+					osd_printf_info("    %-16s    %s\n", brotherlist.driver().name, brotherlist.driver().description);
+					brotherlist.exclude();
+				}
+				drivlist.exclude();
+			}
+		}
+
+		// output the entries found for each source file (no BIOS root)
+		drivlist.reset();
+		while (drivlist.next())
+		{
+			// print the parent
+			if (strcmp(drivlist.driver().source_file, source) != 0)
+				osd_printf_info("%-16s        (parent set in %s)\n", drivlist.driver().name, core_filename_extract_base(drivlist.driver().source_file).c_str());
+			else
+			{
+				osd_printf_info("%-16s        %s\n", drivlist.driver().name, drivlist.driver().description);
+				brotherlist.exclude(drivlist.current());
+			}
+
+			// print the clones
+			brotherlist.reset();
+			while (brotherlist.next())
+			{
+				if (!brotherlist.is_clone_of(drivlist.current()))
+					continue;
+				osd_printf_info("  %-16s      %s\n", brotherlist.driver().name, brotherlist.driver().description);
+				brotherlist.exclude();
+			}
+		}
+
+		// reset for next source
+		initial_drivlist.reset();
 	}
 }
 
@@ -1721,7 +1908,9 @@ void cli_frontend::execute_commands(const char *exename)
 		{ CLICOMMAND_LISTFULL,      &cli_frontend::listfull },
 		{ CLICOMMAND_LISTSOURCE,    &cli_frontend::listsource },
 		{ CLICOMMAND_LISTCLONES,    &cli_frontend::listclones },
+		{ CLICOMMAND_LISTCLONESOURCE, &cli_frontend::listclonesource },
 		{ CLICOMMAND_LISTBROTHERS,  &cli_frontend::listbrothers },
+		{ CLICOMMAND_LISTTREE,      &cli_frontend::listtree },
 		{ CLICOMMAND_LISTCRC,       &cli_frontend::listcrc },
 		{ CLICOMMAND_LISTDEVICES,   &cli_frontend::listdevices },
 		{ CLICOMMAND_LISTSLOTS,     &cli_frontend::listslots },

@@ -40,7 +40,9 @@ public:
 	void listfull(const char *gamename = "*");
 	void listsource(const char *gamename = "*");
 	void listclones(const char *gamename = "*");
+	void listclonesource(const char *gamename = "*");
 	void listbrothers(const char *gamename = "*");
+	void listtree(const char *gamename = "*");
 	void listcrc(const char *gamename = "*");
 	void listroms(const char *gamename = "*");
 	void listsamples(const char *gamename = "*");

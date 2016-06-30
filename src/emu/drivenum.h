@@ -42,21 +42,23 @@ public:
 
 	// any item by index
 	static const game_driver &driver(int index) { assert(index >= 0 && index < s_driver_count); return *s_drivers_sorted[index]; }
-	static int clone(int index) { return find(driver(index).parent); }
-	static int non_bios_clone(int index) { int result = find(driver(index).parent); return (result != -1 && (driver(result).flags & MACHINE_IS_BIOS_ROOT) == 0) ? result : -1; }
-	static int compatible_with(int index) { return find(driver(index).compatible_with); }
+	static int clone(int index) { return clone(driver(index)); }
+	static int non_bios_clone(int index) { return non_bios_clone(driver(index)); }
+	static int bios_root(int index) { return bios_root(driver(index)); }
+	static int compatible_with(int index) { return compatible_with(driver(index)); }
 
 	// any item by driver
-	static int clone(const game_driver &driver) { int index = find(driver); assert(index != -1); return clone(index); }
-	static int non_bios_clone(const game_driver &driver) { int index = find(driver); assert(index != -1); return non_bios_clone(index); }
-	static int compatible_with(const game_driver &driver) { int index = find(driver); assert(index != -1); return compatible_with(index); }
+	static int clone(const game_driver &driver) { return find(driver.parent); }
+	static int non_bios_clone(const game_driver &driver) { int result = find(driver.parent); return (result != -1 && (driver_list::driver(result).flags & MACHINE_IS_BIOS_ROOT) == 0) ? result : -1; }
+	static int bios_root(const game_driver &driver) { int result = find(driver.parent); return (result == -1) ? -1 : ((driver_list::driver(result).flags & MACHINE_IS_BIOS_ROOT) == 0) ? bios_root(result) : result; }
+	static int compatible_with(const game_driver &driver) { return find(driver.compatible_with); }
 
 	// general helpers
 	static int find(const char *name);
 	static int find(const game_driver &driver) { return find(driver.name); }
 
 	// static helpers
-	static bool matches(const char *wildstring, const char *string);
+	static bool matches(const char *wildstring, const game_driver &driver);
 	static int penalty_compare(const char *source, const char *target);
 
 protected:
@@ -93,7 +95,10 @@ public:
 	machine_config &config() const { return config(m_current, m_options); }
 	int clone() const { return driver_list::clone(m_current); }
 	int non_bios_clone() const { return driver_list::non_bios_clone(m_current); }
+	int bios_root() const { return driver_list::bios_root(m_current); }
 	int compatible_with() const { return driver_list::compatible_with(m_current); }
+	bool is_clone_of(int index) const { return strcmp(driver_list::driver(index).name, driver_list::driver(m_current).parent) == 0; }
+	bool is_clone_of(const game_driver &driver) const { return strcmp(driver.name, driver_list::driver(m_current).parent) == 0; }
 	void include() { include(m_current); }
 	void exclude() { exclude(m_current); }
 
@@ -107,6 +112,7 @@ public:
 	using driver_list::driver;
 	using driver_list::clone;
 	using driver_list::non_bios_clone;
+	using driver_list::bios_root;
 	using driver_list::compatible_with;
 
 	// filtering/iterating
