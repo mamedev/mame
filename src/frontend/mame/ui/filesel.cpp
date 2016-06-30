@@ -420,16 +420,28 @@ int menu_file_selector::compare_entries(const file_selector_entry *e1, const fil
 //-------------------------------------------------
 
 menu_file_selector::file_selector_entry *menu_file_selector::append_entry(
-	file_selector_entry_type entry_type, const char *entry_basename, const char *entry_fullpath)
+	file_selector_entry_type entry_type, const std::string &entry_basename, const std::string &entry_fullpath)
+{
+	return append_entry(entry_type, std::string(entry_basename), std::string(entry_fullpath));
+}
+
+
+//-------------------------------------------------
+//  append_entry - appends a new
+//  file selector entry to an entry list
+//-------------------------------------------------
+
+menu_file_selector::file_selector_entry *menu_file_selector::append_entry(
+	file_selector_entry_type entry_type, std::string &&entry_basename, std::string &&entry_fullpath)
 {
 	// allocate a new entry
 	file_selector_entry entry;
 	entry.type = entry_type;
-	entry.basename.assign(entry_basename ? entry_basename : "");
-	entry.fullpath.assign(entry_fullpath ? entry_fullpath : "");
+	entry.basename = std::move(entry_basename);
+	entry.fullpath = std::move(entry_fullpath);
 
 	// find the end of the list
-	m_entrylist.push_back(entry);
+	m_entrylist.emplace_back(std::move(entry));
 	return &m_entrylist[m_entrylist.size() - 1];
 }
 
@@ -467,7 +479,7 @@ menu_file_selector::file_selector_entry *menu_file_selector::append_dirent_entry
 	entry = append_entry(
 		entry_type,
 		dirent->name,
-		buffer.c_str());
+		std::move(buffer));
 
 	return entry;
 }
@@ -540,19 +552,19 @@ void menu_file_selector::populate()
 	if (m_has_empty)
 	{
 		// add the "[empty slot]" entry
-		append_entry(SELECTOR_ENTRY_TYPE_EMPTY, nullptr, nullptr);
+		append_entry(SELECTOR_ENTRY_TYPE_EMPTY, "", "");
 	}
 
 	if (m_has_create)
 	{
 		// add the "[create]" entry
-		append_entry(SELECTOR_ENTRY_TYPE_CREATE, nullptr, nullptr);
+		append_entry(SELECTOR_ENTRY_TYPE_CREATE, "", "");
 	}
 
 	if (m_has_softlist)
 	{
 		// add the "[software list]" entry
-		entry = append_entry(SELECTOR_ENTRY_TYPE_SOFTWARE_LIST, nullptr, nullptr);
+		entry = append_entry(SELECTOR_ENTRY_TYPE_SOFTWARE_LIST, "", "");
 		selected_entry = entry;
 	}
 
