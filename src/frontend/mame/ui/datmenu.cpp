@@ -247,7 +247,7 @@ void menu_dats_view::get_data()
 	for (int x = 0; x < lines; ++x)
 	{
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));
-		item_append(tempbuf.c_str(), nullptr, (FLAG_UI_DATS | FLAG_DISABLE), (void *)(FPTR)(x + 1));
+		item_append(tempbuf, "", (FLAG_UI_DATS | FLAG_DISABLE), (void *)(FPTR)(x + 1));
 	}
 }
 
@@ -270,7 +270,7 @@ void menu_dats_view::get_data_sw()
 	for (int x = 0; x < lines; ++x)
 	{
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));
-		item_append(tempbuf.c_str(), nullptr, (FLAG_UI_DATS | FLAG_DISABLE), (void *)(FPTR)(x + 1));
+		item_append(tempbuf, "", (FLAG_UI_DATS | FLAG_DISABLE), (void *)(FPTR)(x + 1));
 	}
 }
 

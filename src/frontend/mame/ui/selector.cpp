@@ -137,7 +137,7 @@ void menu_selector::populate()
 		find_matches(m_search);
 
 		for (int curitem = 0; m_searchlist[curitem]; ++curitem)
-			item_append(m_searchlist[curitem]->c_str(), nullptr, 0, (void *)m_searchlist[curitem]);
+			item_append(m_searchlist[curitem]->c_str(), "", 0, (void *)m_searchlist[curitem]);
 	}
 	else
 	{
@@ -148,7 +148,7 @@ void menu_selector::populate()
 					selected = added;
 
 				added++;
-				item_append(m_str_items[index].c_str(), nullptr, 0, (void *)&m_str_items[index]);
+				item_append(m_str_items[index].c_str(), "", 0, (void *)&m_str_items[index]);
 			}
 	}
 

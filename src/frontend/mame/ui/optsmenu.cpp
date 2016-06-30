@@ -267,23 +267,23 @@ void menu_game_options::populate()
 		{
 			fbuff = _("^!Setup custom filter");
 			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), nullptr, 0, (void *)(FPTR)CUSTOM_FILTER);
+			item_append(fbuff.c_str(), "", 0, (void *)(FPTR)CUSTOM_FILTER);
 		}
 
 		item_append(menu_item_type::SEPARATOR);
 
 		// add options items
-		item_append(_("Customize UI"), nullptr, 0, (void *)(FPTR)CUSTOM_MENU);
-		item_append(_("Configure Directories"), nullptr, 0, (void *)(FPTR)CONF_DIR);
+		item_append(_("Customize UI"), "", 0, (void *)(FPTR)CUSTOM_MENU);
+		item_append(_("Configure Directories"), "", 0, (void *)(FPTR)CONF_DIR);
 	}
-	item_append(_(submenu::video_options[0].description), nullptr, 0, (void *)(FPTR)DISPLAY_MENU);
-	item_append(_("Sound Options"), nullptr, 0, (void *)(FPTR)SOUND_MENU);
-	item_append(_(submenu::misc_options[0].description), nullptr, 0, (void *)(FPTR)MISC_MENU);
-	item_append(_(submenu::control_options[0].description), nullptr, 0, (void *)(FPTR)CONTROLLER_MENU);
-	item_append(_("General Inputs"), nullptr, 0, (void *)(FPTR)CGI_MENU);
-	item_append(_(submenu::advanced_options[0].description), nullptr, 0, (void *)(FPTR)ADVANCED_MENU);
+	item_append(_(submenu::video_options[0].description), "", 0, (void *)(FPTR)DISPLAY_MENU);
+	item_append(_("Sound Options"), "", 0, (void *)(FPTR)SOUND_MENU);
+	item_append(_(submenu::misc_options[0].description), "", 0, (void *)(FPTR)MISC_MENU);
+	item_append(_(submenu::control_options[0].description), "", 0, (void *)(FPTR)CONTROLLER_MENU);
+	item_append(_("General Inputs"), "", 0, (void *)(FPTR)CGI_MENU);
+	item_append(_(submenu::advanced_options[0].description), "", 0, (void *)(FPTR)ADVANCED_MENU);
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Save Configuration"), nullptr, 0, (void *)(FPTR)SAVE_CONFIG);
+	item_append(_("Save Configuration"), "", 0, (void *)(FPTR)SAVE_CONFIG);
 
 	custombottom = 2.0f * ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
