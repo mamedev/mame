@@ -84,11 +84,9 @@ private:
 
 	struct file_selector_entry
 	{
-		file_selector_entry *next;
-
 		file_selector_entry_type type;
-		const char *basename;
-		const char *fullpath;
+		std::string basename;
+		std::string fullpath;
 	};
 
 	// internal state
@@ -99,7 +97,7 @@ private:
 	bool                        m_has_softlist;
 	bool                        m_has_create;
 	int *                       m_result;
-	file_selector_entry *       m_entrylist;
+	std::vector<file_selector_entry>	m_entrylist;
 	std::string                 m_hover_directory;
 	char                        m_filename_buffer[1024];
 
