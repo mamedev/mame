@@ -13,7 +13,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 	NETLIB_OBJECT(74193)
 	{
 		NETLIB_CONSTRUCTOR(74193)

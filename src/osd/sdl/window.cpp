@@ -212,27 +212,40 @@ void sdl_osd_interface::window_exit()
 
 void sdl_window_info::capture_pointer()
 {
-	if (!SDL_GetWindowGrab(platform_window<SDL_Window*>()))
+	if (!m_mouse_captured)
+	{
 		SDL_SetWindowGrab(platform_window<SDL_Window*>(), SDL_TRUE);
-	SDL_SetRelativeMouseMode(SDL_TRUE);
+		SDL_SetRelativeMouseMode(SDL_TRUE);
+		m_mouse_captured = true;
+	}
 }
 
 void sdl_window_info::release_pointer()
 {
-	if (SDL_GetWindowGrab(platform_window<SDL_Window*>()))
+	if (m_mouse_captured)
+	{
 		SDL_SetWindowGrab(platform_window<SDL_Window*>(), SDL_FALSE);
-	SDL_SetRelativeMouseMode(SDL_FALSE);
+		SDL_SetRelativeMouseMode(SDL_FALSE);
+		m_mouse_captured = false;
+	}
 }
 
 void sdl_window_info::hide_pointer()
 {
-	SDL_ShowCursor(SDL_DISABLE);
+	if (!m_mouse_hidden)
+	{
+		SDL_ShowCursor(SDL_DISABLE);
+		m_mouse_hidden = true;
+	}
 }
 
 void sdl_window_info::show_pointer()
 {
-	SDL_ShowCursor(SDL_ENABLE);
-
+	if (m_mouse_hidden)
+	{
+		SDL_ShowCursor(SDL_ENABLE);
+		m_mouse_hidden = false;
+	}
 }
 
 
@@ -429,12 +442,17 @@ error:
 
 void sdl_window_info::complete_destroy()
 {
+	// Release pointer grab and hide if needed
+	show_pointer();
+	release_pointer();
+
 	if (fullscreen() && video_config.switchres)
 	{
 		SDL_SetWindowFullscreen(platform_window<SDL_Window*>(), 0);    // Try to set mode
 		SDL_SetWindowDisplayMode(platform_window<SDL_Window*>(), &m_original_mode->mode);    // Try to set mode
 		SDL_SetWindowFullscreen(platform_window<SDL_Window*>(), SDL_WINDOW_FULLSCREEN);    // Try to set mode
 	}
+
 	SDL_DestroyWindow(platform_window<SDL_Window*>());
 	// release all keys ...
 	downcast<sdl_osd_interface &>(machine().osd()).release_keys();

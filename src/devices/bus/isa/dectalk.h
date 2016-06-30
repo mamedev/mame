@@ -33,7 +33,7 @@ public:
 	DECLARE_READ16_MEMBER(dsp_dma_r);
 	DECLARE_WRITE16_MEMBER(dsp_dma_w);
 	DECLARE_WRITE16_MEMBER(output_ctl_w);
-	DECLARE_READ16_MEMBER(bio_line_r);
+	DECLARE_READ_LINE_MEMBER(bio_line_r);
 	DECLARE_WRITE16_MEMBER(irq_line_w);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 

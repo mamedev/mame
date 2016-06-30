@@ -5,7 +5,7 @@
         MITS Altair 8800b Turnkey
 
         04/12/2009 Initial driver by Miodrag Milanovic
-        
+
         Supposedly introduced October 1977.
 
         Commands:
@@ -17,7 +17,7 @@
         D - Memory Dump
         J - Jump to address
         M - Modify memory
-        
+
         Reference:
         http://www.computercloset.org/MITSAltair8800bt.htm
 

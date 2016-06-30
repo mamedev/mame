@@ -168,8 +168,8 @@
 
 #pragma once
 
-#ifndef __MAME_UTIL_STRFORMAT_H__
-#define __MAME_UTIL_STRFORMAT_H__
+#ifndef MAME_UTIL_STRFORMAT_H
+#define MAME_UTIL_STRFORMAT_H
 
 #include <algorithm>
 #include <array>
@@ -185,18 +185,18 @@
 #include <type_traits>
 #include <utility>
 
-#if defined(__GLIBCXX__) && (__GLIBCXX__ < 20150413)
-namespace std
-{
-template<class _Container>
-	inline constexpr auto
-	cbegin(const _Container& __cont) noexcept(noexcept(std::begin(__cont)))-> decltype(std::begin(__cont))
-	{ return std::begin(__cont); }
+#if defined(__GLIBCXX__)
+namespace std {
+namespace mame_cxx14_compat {
+template <typename T>
+inline constexpr auto cbegin(const T& cont) noexcept(noexcept(std::begin(cont))) -> decltype(std::begin(cont))
+{ return std::begin(cont); }
 
-template<class _Container>
-	inline constexpr auto
-	cend(const _Container& __cont) noexcept(noexcept(std::end(__cont)))-> decltype(std::end(__cont))
-	{ return std::end(__cont); }
+template <typename T>
+inline constexpr auto cend(const T& cont) noexcept(noexcept(std::end(cont))) -> decltype(std::end(cont))
+{ return std::end(cont); }
+}
+using namespace mame_cxx14_compat;
 }
 #endif
 
@@ -1746,4 +1746,4 @@ using detail::make_format_argument_pack;
 
 using util::string_format;
 
-#endif // __MAME_UTIL_STRFORMAT_H__
+#endif // MAME_UTIL_STRFORMAT_H

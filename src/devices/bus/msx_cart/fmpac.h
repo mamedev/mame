@@ -4,7 +4,7 @@
 #define __MSX_CART_FMPAC_H
 
 #include "bus/msx_cart/cartridge.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 
 
 extern const device_type MSX_CART_FMPAC;

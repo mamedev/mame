@@ -87,7 +87,7 @@ VBlank = 58Hz
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/z80/z80.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "includes/vball.h"
 

@@ -77,13 +77,13 @@ memory_region *device_t::memregion(const char *_tag) const
 	if (_tag)
 	{
 		auto search = machine().memory().regions().find(subtag(_tag).c_str());
-		if (search != machine().memory().regions().end()) 
-			return search->second.get(); 
-		else 
+		if (search != machine().memory().regions().end())
+			return search->second.get();
+		else
 			return nullptr;
-	} 
+	}
 	else
-		return nullptr; 	
+		return nullptr;
 }
 
 
@@ -104,7 +104,7 @@ memory_share *device_t::memshare(const char *_tag) const
 			return nullptr;
 	}
 	else
-		return nullptr; 
+		return nullptr;
 }
 
 

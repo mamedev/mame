@@ -86,7 +86,7 @@ public:
 			_snprintf(name, ARRAY_LENGTH(name), "Scan%03d", keynum);
 
 			// add the item to the device
-			devinfo->device()->add_item(name, itemid, generic_button_get_state, &devinfo->keyboard.state[keynum]);
+			devinfo->device()->add_item(name, itemid, generic_button_get_state<std::uint8_t>, &devinfo->keyboard.state[keynum]);
 		}
 	}
 
@@ -208,13 +208,21 @@ public:
 		// populate the axes
 		for (axisnum = 0; axisnum < 2; axisnum++)
 		{
-			devinfo->device()->add_item(default_axis_name[axisnum], (input_item_id)(ITEM_ID_XAXIS + axisnum), generic_axis_get_state, &devinfo->mouse.lX + axisnum);
+			devinfo->device()->add_item(
+				default_axis_name[axisnum],
+				static_cast<input_item_id>(ITEM_ID_XAXIS + axisnum),
+				generic_axis_get_state<LONG>,
+				&devinfo->mouse.lX + axisnum);
 		}
 
 		// populate the buttons
 		for (butnum = 0; butnum < 2; butnum++)
 		{
-			devinfo->device()->add_item(default_button_name(butnum), (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state, &devinfo->mouse.rgbButtons[butnum]);
+			devinfo->device()->add_item(
+				default_button_name(butnum),
+				static_cast<input_item_id>(ITEM_ID_BUTTON1 + butnum),
+				generic_button_get_state<BYTE>,
+				&devinfo->mouse.rgbButtons[butnum]);
 		}
 	}
 
@@ -383,13 +391,21 @@ public:
 			// populate the axes
 			for (axisnum = 0; axisnum < 2; axisnum++)
 			{
-				devinfo->device()->add_item(default_axis_name[axisnum], (input_item_id)(ITEM_ID_XAXIS + axisnum), generic_axis_get_state, &devinfo->mouse.lX + axisnum);
+				devinfo->device()->add_item(
+					default_axis_name[axisnum],
+					static_cast<input_item_id>(ITEM_ID_XAXIS + axisnum),
+					generic_axis_get_state<LONG>,
+					&devinfo->mouse.lX + axisnum);
 			}
 
 			// populate the buttons
 			for (butnum = 0; butnum < 2; butnum++)
 			{
-				devinfo->device()->add_item(default_button_name(butnum), (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state, &devinfo->mouse.rgbButtons[butnum]);
+				devinfo->device()->add_item(
+					default_button_name(butnum),
+					static_cast<input_item_id>(ITEM_ID_BUTTON1 + butnum),
+					generic_button_get_state<BYTE>,
+					&devinfo->mouse.rgbButtons[butnum]);
 			}
 		}
 	}

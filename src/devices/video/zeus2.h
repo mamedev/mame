@@ -89,7 +89,7 @@ public:
 
 	void render_poly_8bit(INT32 scanline, const extent_t& extent, const zeus2_poly_extra_data& object, int threadid);
 
-	void zeus2_draw_quad(const UINT32 *databuffer, UINT32 texoffs, int logit);
+	void zeus2_draw_quad(const UINT32 *databuffer, UINT32 texdata, int logit);
 
 private:
 	zeus2_device* m_state;
@@ -131,7 +131,7 @@ public:
 	int m_ieee754_float; // Used to switch to using IEEE754 floating point format
 
 	UINT32 m_zeusbase[0x80];
-	UINT32 m_renderRegs[0x100];
+	UINT32 m_renderRegs[0x40];
 
 	zeus2_renderer* poly;
 
@@ -141,7 +141,7 @@ public:
 	float zeus_point[3];
 	float zeus_point2[3];
 	UINT32 zeus_texbase;
-	UINT32 zeus_unknown_40;
+	UINT32 m_renderMode;
 	int zeus_quad_size;
 
 	UINT32 *waveram[2];
@@ -166,7 +166,7 @@ private:
 	void zeus2_register32_w(offs_t offset, UINT32 data, int logit);
 	void zeus2_register_update(offs_t offset, UINT32 oldval, int logit);
 	int zeus2_fifo_process(const UINT32 *data, int numwords);
-	void zeus2_pointer_write(UINT8 which, UINT32 value);
+	void zeus2_pointer_write(UINT8 which, UINT32 value, int logit);
 	void zeus2_draw_model(UINT32 baseaddr, UINT16 count, int logit);
 	void log_fifo_command(const UINT32 *data, int numwords, const char *suffix);
 

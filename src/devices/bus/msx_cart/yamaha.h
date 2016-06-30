@@ -4,7 +4,7 @@
 #define __MSX_CART_YAMAHA_H
 
 #include "bus/msx_cart/cartridge.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "bus/msx_cart/msx_audio_kb.h"
 #include "machine/ym2148.h"
 

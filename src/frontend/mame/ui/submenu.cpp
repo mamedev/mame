@@ -17,7 +17,6 @@
 #include <limits>
 
 namespace ui {
-
 std::vector<submenu::option> submenu::misc_options = {
 	{ submenu::option_type::HEAD, __("Miscellaneous Options") },
 	{ submenu::option_type::UI,   __("Re-select last machine played"),           OPTION_REMEMBER_LAST },

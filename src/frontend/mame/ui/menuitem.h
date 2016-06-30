@@ -17,7 +17,6 @@
 #include "emu.h"
 
 namespace ui {
-
 // special menu item for separators
 #define MENU_SEPARATOR_ITEM         "---"
 

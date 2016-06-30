@@ -268,7 +268,7 @@ void gba_rom_3dmatrix_device::device_reset()
  This is a preliminary implementation of the
  General Purpose I/O Port embedded in the GBA PCBs
  as described at : http://problemkaputt.de/gbatek.htm#gbacartioportgpio
- 
+
  Functions read_gpio/write_gpio only give the
  I/O interface while the actual on-cart devices
  are read and written through gpio_dev_read/gpio_dev_write
@@ -400,7 +400,7 @@ void gba_rom_wariotws_device::gpio_dev_write(UINT16 data, int gpio_dirs)
 
 		if (data & 1)
 			m_counter = 15;
-		
+
 		m_last_val = data & 0x0b;
 	}
 }
@@ -586,19 +586,19 @@ WRITE32_MEMBER(gba_rom_eeprom64_device::write_ram)
 
 /*-------------------------------------------------
  Carts with EEPROM + Tilt Sensor
- 
- Note about the calibration: this can seem a bit 
+
+ Note about the calibration: this can seem a bit
  tricky at first, because the emulated screen
  does not turn as the GBA would...
  In order to properly calibrate the sensor, just
  keep pressed right for a few seconds when requested
- to calibrate right inclination (first calibration 
- screen in Yoshi Universal Gravitation) so to get the 
- full right range; then keep pressed for left for a 
+ to calibrate right inclination (first calibration
+ screen in Yoshi Universal Gravitation) so to get the
+ full right range; then keep pressed for left for a
  few seconds when requested to calibrate left
- inclination (second calibration screen in Yoshi 
+ inclination (second calibration screen in Yoshi
  Universal Gravitation) so to get the full left range
- 
+
  -------------------------------------------------*/
 
 static INPUT_PORTS_START( yoshiug_tilt )
@@ -700,14 +700,14 @@ void gba_rom_boktai_device::gpio_dev_write(UINT16 data, int gpio_dirs)
 	{
 		if (data & 2)
 			m_counter = 0;
-		
+
 		if ((data & 1) && !(m_last_val & 1))
 		{
 			m_counter++;
 			if (m_counter == 0x100)
 				m_counter = 0;
 		}
-		
+
 		m_last_val = data & 7;
 	}
 }
@@ -775,7 +775,7 @@ WRITE32_MEMBER(gba_rom_3dmatrix_device::write_mapper)
 
 /*-------------------------------------------------
  Seiko S-3511 RTC implementation
- 
+
  TODO: transform this into a separate device, using
  also dirtc.cpp!
  -------------------------------------------------*/
@@ -789,7 +789,7 @@ gba_s3511_device::gba_s3511_device(running_machine &machine) :
 	m_command = 0;
 	m_data_len = 1;
 	m_data[0] = 0;
-	
+
 	m_machine.save().save_item(m_phase, "GBA_RTC/m_phase");
 	m_machine.save().save_item(m_data, "GBA_RTC/m_data");
 	m_machine.save().save_item(m_last_val, "GBA_RTC/m_last_val");
@@ -808,7 +808,7 @@ void gba_s3511_device::update_time(int len)
 {
 	system_time curtime;
 	m_machine.current_datetime(curtime);
-	
+
 	if (len == 7)
 	{
 		m_data[0] = convert_to_bcd(curtime.local_time.year);
@@ -840,7 +840,7 @@ int gba_s3511_device::read_line()
 			if (m_bits == 8 * m_data_len)
 			{
 				//for (int i = 0; i < m_data_len; i++)
-				//	printf("RTC DATA OUT COMPLETE %X (reg %d) \n", m_data[i], i);
+				//  printf("RTC DATA OUT COMPLETE %X (reg %d) \n", m_data[i], i);
 				m_bits = 0;
 				m_phase = S3511_RTC_IDLE;
 			}
@@ -852,7 +852,7 @@ int gba_s3511_device::read_line()
 
 void gba_s3511_device::write(UINT16 data, int gpio_dirs)
 {
-//	printf("gpio_dev_write data %X\n", data);
+//  printf("gpio_dev_write data %X\n", data);
 	if (m_phase == S3511_RTC_IDLE && (m_last_val & 5) == 1 && (data & 5) == 5)
 	{
 		m_phase = S3511_RTC_COMMAND;
@@ -861,8 +861,8 @@ void gba_s3511_device::write(UINT16 data, int gpio_dirs)
 	}
 	else
 	{
-//		if (m_phase == 3)
-//			printf("RTC command OK\n");
+//      if (m_phase == 3)
+//          printf("RTC command OK\n");
 		if (!(m_last_val & 1) && (data & 1))
 		{
 			// bit transfer
@@ -877,7 +877,7 @@ void gba_s3511_device::write(UINT16 data, int gpio_dirs)
 						if (m_bits == 8 * m_data_len)
 						{
 							//for (int i = 0; i < m_data_len; i++)
-							//	printf("RTC DATA IN COMPLETE %X (reg %d) \n", m_data[i], i);
+							//  printf("RTC DATA IN COMPLETE %X (reg %d) \n", m_data[i], i);
 							m_bits = 0;
 							m_phase = S3511_RTC_IDLE;
 						}
@@ -940,7 +940,7 @@ void gba_s3511_device::write(UINT16 data, int gpio_dirs)
 
 /*-------------------------------------------------
  GBA EEPROM Device
- 
+
  TODO: can this sketchy EEPROM device be merged
        with the core implementation?
  -------------------------------------------------*/
@@ -954,7 +954,7 @@ gba_eeprom_device::gba_eeprom_device(running_machine &machine, UINT8 *eeprom, UI
 	m_data = eeprom;
 	m_data_size = size;
 	m_addr_bits = addr_bits;
-	
+
 	m_machine.save().save_item(m_state, "GBA_EEPROM/m_state");
 	m_machine.save().save_item(m_command, "GBA_EEPROM/m_command");
 	m_machine.save().save_item(m_count, "GBA_EEPROM/m_count");
@@ -966,16 +966,16 @@ gba_eeprom_device::gba_eeprom_device(running_machine &machine, UINT8 *eeprom, UI
 UINT32 gba_eeprom_device::read()
 {
 	UINT32 out;
-	
+
 	switch (m_state)
 	{
 		case EEP_IDLE:
 //          printf("eeprom_r: @ %x, mask %08x (state %d) (PC=%x) = %d\n", offset, ~mem_mask, m_state, activecpu_get_pc(), 1);
 			return 0x00010001;  // "ready"
-			
+
 		case EEP_READFIRST:
 			m_count--;
-			
+
 			if (!m_count)
 			{
 				m_count = 64;
@@ -996,19 +996,19 @@ UINT32 gba_eeprom_device::read()
 				m_addr++;
 				m_bits = 8;
 			}
-			
+
 			out = (m_eep_data & 0x80) ? 1 : 0;
 			out |= (out<<16);
 			m_eep_data <<= 1;
-			
+
 			m_bits--;
 			m_count--;
-			
+
 			if (!m_count)
 			{
 				m_state = EEP_IDLE;
 			}
-			
+
 //          printf("out = %08x\n", out);
 //          printf("eeprom_r: @ %x, mask %08x (state %d) (PC=%x) = %08x\n", offset, ~mem_mask, m_state, activecpu_get_pc(), out);
 			return out;
@@ -1026,7 +1026,7 @@ void gba_eeprom_device::write(UINT32 data)
 			if (data == 1)
 				m_state++;
 			break;
-			
+
 		case EEP_COMMAND:
 			if (data == 1)
 				m_command = EEP_READFIRST;
@@ -1036,7 +1036,7 @@ void gba_eeprom_device::write(UINT32 data)
 			m_count = m_addr_bits;
 			m_addr = 0;
 			break;
-			
+
 		case EEP_ADDR:
 			m_addr <<= 1;
 			m_addr |= (data & 1);
@@ -1055,7 +1055,7 @@ void gba_eeprom_device::write(UINT32 data)
 				}
 			}
 			break;
-			
+
 		case EEP_AFTERADDR:
 			m_state = m_command;
 			m_count = 64;
@@ -1064,32 +1064,31 @@ void gba_eeprom_device::write(UINT32 data)
 			if (m_state == EEP_READFIRST)
 				m_count = 4;
 			break;
-			
+
 		case EEP_WRITE:
 			m_eep_data <<= 1;
 			m_eep_data |= (data & 1);
 			m_bits--;
 			m_count--;
-			
+
 			if (m_bits == 0)
 			{
 				osd_printf_verbose("%08x: EEPROM: %02x to %x\n", machine().device("maincpu")->safe_pc(), m_eep_data, m_addr);
 				if (m_addr >= m_data_size)
 					fatalerror("eeprom: invalid address (%x)\n", m_addr);
-				
+
 				m_data[m_addr] = m_eep_data;
 				m_addr++;
 				m_eep_data = 0;
 				m_bits = 8;
 			}
-			
+
 			if (!m_count)
 				m_state = EEP_AFTERWRITE;
 			break;
-			
+
 		case EEP_AFTERWRITE:
 			m_state = EEP_IDLE;
 			break;
 	}
 }
-

@@ -60,7 +60,7 @@ MB89372 - Uses 3 serial data transfer protocols: ASYNC, COP & BOP. Has a built
 #include "includes/segaybd.h"
 #include "machine/mb8421.h"
 #include "machine/nvram.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/segapcm.h"
 #include "includes/segaipt.h"
 

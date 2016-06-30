@@ -14,6 +14,11 @@ project "netlist"
 	kind (LIBTYPE)
 
 	addprojectflags()
+	
+	
+	defines {
+		"__STDC_CONSTANT_MACROS",
+	}
 
 	includedirs {
 		MAME_DIR .. "src/lib/netlist",
@@ -38,11 +43,14 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/plib/pconfig.h",
 		MAME_DIR .. "src/lib/netlist/plib/palloc.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/palloc.h",
+    MAME_DIR .. "src/lib/netlist/plib/pchrono.cpp",
+    MAME_DIR .. "src/lib/netlist/plib/pchrono.h",
 		MAME_DIR .. "src/lib/netlist/plib/pfmtlog.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/pfmtlog.h",
 		MAME_DIR .. "src/lib/netlist/plib/plists.h",
     MAME_DIR .. "src/lib/netlist/plib/pdynlib.cpp",
     MAME_DIR .. "src/lib/netlist/plib/pdynlib.h",
+    MAME_DIR .. "src/lib/netlist/plib/poptions.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/poptions.h",
 		MAME_DIR .. "src/lib/netlist/plib/pparser.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/pparser.h",

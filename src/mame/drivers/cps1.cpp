@@ -242,7 +242,7 @@ Stephh's log (2006.09.20) :
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "sound/qsound.h"
 #include "machine/kabuki.h"

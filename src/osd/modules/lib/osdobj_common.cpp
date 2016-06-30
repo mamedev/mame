@@ -701,7 +701,6 @@ void osd_common_t::input_resume()
 void osd_common_t::exit_subsystems()
 {
 	video_exit();
-	input_exit();
 }
 
 void osd_common_t::video_exit()
@@ -710,18 +709,6 @@ void osd_common_t::video_exit()
 
 void osd_common_t::window_exit()
 {
-}
-
-void osd_common_t::input_exit()
-{
-	if (m_keyboard_input)
-		m_keyboard_input->exit();
-	if (m_mouse_input)
-		m_mouse_input->exit();
-	if (m_lightgun_input)
-		m_lightgun_input->exit();
-	if (m_joystick_input)
-		m_joystick_input->exit();
 }
 
 void osd_common_t::osd_exit()

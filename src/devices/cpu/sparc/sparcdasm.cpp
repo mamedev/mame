@@ -8,12 +8,80 @@
 #include "sparcdasm.h"
 #include "sparcdefs.h"
 
+#include <algorithm>
 #include <cstdio>
 
+
 namespace {
-	const sparc_disassembler DASM_V7(7);
-	const sparc_disassembler DASM_V8(8);
-	const sparc_disassembler DASM_V9(9);
+	INT32 get_disp16(UINT32 op) { return DISP19; }
+	INT32 get_disp19(UINT32 op) { return DISP19; }
+	INT32 get_disp22(UINT32 op) { return DISP19; }
+
+	const char *bicc_comment(const sparc_debug_state *state, bool use_cc, offs_t pc, UINT32 op)
+	{
+		if (!state || (state->get_translated_pc() != pc)) return nullptr;
+		auto const cc((use_cc && (BRCC & 0x2)) ? state->get_xcc() : state->get_icc());
+		switch (COND)
+		{
+		case 0x0: return "will fall through";
+		case 0x1: return (cc & 0x4) ? "will branch" : "will fall through";
+		case 0x2: return ((cc & 0x04) | ((cc ^ (cc >> 2)) & 0x2)) ? "will branch" : "will fall through";
+		case 0x3: return ((cc ^ (cc >> 2)) & 0x2) ? "will branch" : "will fall through";
+		case 0x4: return (cc & 0x5) ? "will branch" : "will fall through";
+		case 0x5: return (cc & 0x1) ? "will branch" : "will fall through";
+		case 0x6: return (cc & 0x8) ? "will branch" : "will fall through";
+		case 0x7: return (cc & 0x2) ? "will branch" : "will fall through";
+		case 0x8: return "will branch";
+		case 0x9: return (cc & 0x4) ? "will fall through" : "will branch";
+		case 0xa: return ((cc & 0x04) | ((cc ^ (cc >> 2)) & 0x2)) ? "will fall through" : "will branch";
+		case 0xb: return ((cc ^ (cc >> 2)) & 0x2) ? "will fall through" : "will branch";
+		case 0xc: return (cc & 0x5) ? "will fall through" : "will branch";
+		case 0xd: return (cc & 0x1) ? "will fall through" : "will branch";
+		case 0xe: return (cc & 0x8) ? "will fall through" : "will branch";
+		case 0xf: return (cc & 0x2) ? "will fall through" : "will branch";
+		}
+		return nullptr;
+	}
+	const char *bfcc_comment(const sparc_debug_state *state, bool use_cc, offs_t pc, UINT32 op)
+	{
+		if (!state || (state->get_translated_pc() != pc)) return nullptr;
+		auto const fcc(state->get_fcc(use_cc ? BRCC : 0));
+		switch (COND)
+		{
+		case 0x0: return "will fall through";
+		case 0x1: return ((fcc == 1) || (fcc == 2) || (fcc == 3)) ? "will branch" : "will fall through";
+		case 0x2: return ((fcc == 1) || (fcc == 2)) ? "will branch" : "will fall through";
+		case 0x3: return ((fcc == 1) || (fcc == 3)) ? "will branch" : "will fall through";
+		case 0x4: return (fcc == 1) ? "will branch" : "will fall through";
+		case 0x5: return ((fcc == 2) || (fcc == 3)) ? "will branch" : "will fall through";
+		case 0x6: return (fcc == 2) ? "will branch" : "will fall through";
+		case 0x7: return (fcc == 3) ? "will branch" : "will fall through";
+		case 0x8: return "will branch";
+		case 0x9: return (fcc == 0) ? "will branch" : "will fall through";
+		case 0xa: return ((fcc == 0) || (fcc == 3)) ? "will branch" : "will fall through";
+		case 0xb: return ((fcc == 0) || (fcc == 2)) ? "will branch" : "will fall through";
+		case 0xc: return ((fcc == 0) || (fcc == 2) || (fcc == 3)) ? "will branch" : "will fall through";
+		case 0xd: return ((fcc == 0) || (fcc == 1)) ? "will branch" : "will fall through";
+		case 0xe: return ((fcc == 0) || (fcc == 1) || (fcc == 3)) ? "will branch" : "will fall through";
+		case 0xf: return ((fcc == 0) || (fcc == 1) || (fcc == 2)) ? "will branch" : "will fall through";
+		}
+		return nullptr;
+	}
+	const char *bpr_comment(const sparc_debug_state *state, bool use_cc, offs_t pc, UINT32 op)
+	{
+		if (!state || (state->get_translated_pc() != pc)) return nullptr;
+		const INT64 reg(state->get_reg_r(RS1));
+		switch (COND)
+		{
+		case 1: return (reg == 0) ? "will branch" : "will fall through";
+		case 2: return (reg <= 0) ? "will branch" : "will fall through";
+		case 3: return (reg < 0) ? "will branch" : "will fall through";
+		case 5: return (reg != 0) ? "will branch" : "will fall through";
+		case 6: return (reg > 0) ? "will branch" : "will fall through";
+		case 7: return (reg >= 0) ? "will branch" : "will fall through";
+		}
+		return nullptr;
+	}
 }
 
 const char * const sparc_disassembler::REG_NAMES[32] = {
@@ -24,7 +92,7 @@ const char * const sparc_disassembler::REG_NAMES[32] = {
 };
 
 const sparc_disassembler::branch_desc sparc_disassembler::EMPTY_BRANCH_DESC = {
-	nullptr, 0, false, false,
+	nullptr, nullptr, 0, false, false,
 	{ nullptr, nullptr, nullptr, nullptr },
 	{
 		nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
@@ -33,7 +101,7 @@ const sparc_disassembler::branch_desc sparc_disassembler::EMPTY_BRANCH_DESC = {
 };
 
 const sparc_disassembler::branch_desc sparc_disassembler::BPCC_DESC = {
-	[](UINT32 op) { return DISP19; }, 6, true, true,
+	&get_disp19, &bicc_comment, 6, true, true,
 	{ "%icc", nullptr, "%xcc", nullptr },
 	{
 		"bn",    "be",    "ble",   "bl",    "bleu",  "bcs",   "bneg",  "bvs",
@@ -42,7 +110,7 @@ const sparc_disassembler::branch_desc sparc_disassembler::BPCC_DESC = {
 };
 
 const sparc_disassembler::branch_desc sparc_disassembler::BICC_DESC = {
-	[](UINT32 op) { return DISP22; }, 6, false, false,
+	&get_disp22, &bicc_comment, 6, false, false,
 	{ nullptr, nullptr, nullptr, nullptr },
 	{
 		"bn",    "be",    "ble",   "bl",    "bleu",  "bcs",   "bneg",  "bvs",
@@ -51,7 +119,7 @@ const sparc_disassembler::branch_desc sparc_disassembler::BICC_DESC = {
 };
 
 const sparc_disassembler::branch_desc sparc_disassembler::BPR_DESC = {
-	[](UINT32 op) { return DISP16; }, 5, true, false,
+	&get_disp16, &bpr_comment, 5, true, false,
 	{ nullptr, nullptr, nullptr, nullptr },
 	{
 		nullptr, "brz",   "brlez", "brlz",  nullptr, "brnz",  "brgz",  "brgez",
@@ -60,7 +128,7 @@ const sparc_disassembler::branch_desc sparc_disassembler::BPR_DESC = {
 };
 
 const sparc_disassembler::branch_desc sparc_disassembler::FBPFCC_DESC = {
-	[](UINT32 op) { return DISP19; }, 6, true, true,
+	&get_disp19, &bfcc_comment, 6, true, true,
 	{ "%fcc0", "%fcc1", "%fcc2", "%fcc3" },
 	{
 		"fbn",   "fbne",  "fblg",  "fbul",  "fbl",   "fbug",  "fbg",   "fbu",
@@ -69,7 +137,7 @@ const sparc_disassembler::branch_desc sparc_disassembler::FBPFCC_DESC = {
 };
 
 const sparc_disassembler::branch_desc sparc_disassembler::FBFCC_DESC = {
-	[](UINT32 op) { return DISP22; }, 6, false, false,
+	&get_disp22, &bfcc_comment, 6, false, false,
 	{ nullptr, nullptr, nullptr, nullptr },
 	{
 		"fbn",   "fbne",  "fblg",  "fbul",  "fbl",   "fbug",  "fbg",   "fbu",
@@ -78,7 +146,7 @@ const sparc_disassembler::branch_desc sparc_disassembler::FBFCC_DESC = {
 };
 
 const sparc_disassembler::branch_desc sparc_disassembler::CBCCC_DESC = {
-	[](UINT32 op) { return DISP22; }, 6, false, false,
+	&get_disp22, nullptr, 6, false, false,
 	{ nullptr, nullptr, nullptr, nullptr },
 	{
 		"cbn",   "cb123", "cb12",  "cb13",  "cb1",   "cb23",  "cb2",   "cb3",
@@ -123,12 +191,12 @@ const sparc_disassembler::int_op_desc_map::value_type sparc_disassembler::V9_INT
 };
 
 const sparc_disassembler::state_reg_desc_map::value_type sparc_disassembler::V9_STATE_REG_DESC[] = {
-	{ 1, { true,  nullptr, nullptr } },
-	{ 2, { false, "%ccr",  "%ccr"  } },
-	{ 3, { false, "%asi",  "%asi"  } },
-	{ 4, { false, "%tick", nullptr } },
-	{ 5, { false, "%pc",   nullptr } },
-	{ 6, { false, "%fprs", "%fprs" } }
+	{  1, { true,  nullptr, nullptr } },
+	{  2, { false, "%ccr",  "%ccr"  } },
+	{  3, { false, "%asi",  "%asi"  } },
+	{  4, { false, "%tick", nullptr } },
+	{  5, { false, "%pc",   nullptr } },
+	{  6, { false, "%fprs", "%fprs" } }
 };
 
 const char * const sparc_disassembler::MOVCC_CC_NAMES[8] = {
@@ -281,13 +349,222 @@ const sparc_disassembler::asi_desc_map::value_type sparc_disassembler::V9_ASI_DE
 	{ 0x8b, { "#ASI_SNF_L",  nullptr } }
 };
 
-const sparc_disassembler::prftch_desc_map::value_type sparc_disassembler::V9_PRFTCH_DESC[] =
-{
+const sparc_disassembler::prftch_desc_map::value_type sparc_disassembler::V9_PRFTCH_DESC[] = {
 	{ 0x00, { "#n_reads"   } },
 	{ 0x01, { "#one_read"  } },
 	{ 0x02, { "#n_writes"  } },
 	{ 0x03, { "#one_write" } },
 	{ 0x04, { "#page"      } }
+};
+
+const sparc_disassembler::vis_op_desc_map::value_type sparc_disassembler::VIS1_OP_DESC[] = {
+	{ 0x000, { vis_op_desc::R,  vis_op_desc::R,  vis_op_desc::R,  false, "edge8"       } },
+	{ 0x002, { vis_op_desc::R,  vis_op_desc::R,  vis_op_desc::R,  false, "edge8l"      } },
+	{ 0x004, { vis_op_desc::R,  vis_op_desc::R,  vis_op_desc::R,  false, "edge16"      } },
+	{ 0x006, { vis_op_desc::R,  vis_op_desc::R,  vis_op_desc::R,  false, "edge16l"     } },
+	{ 0x008, { vis_op_desc::R,  vis_op_desc::R,  vis_op_desc::R,  false, "edge32"      } },
+	{ 0x00a, { vis_op_desc::R,  vis_op_desc::R,  vis_op_desc::R,  false, "edge32l"     } },
+
+	{ 0x010, { vis_op_desc::R,  vis_op_desc::R,  vis_op_desc::R,  false, "array8"      } },
+	{ 0x012, { vis_op_desc::R,  vis_op_desc::R,  vis_op_desc::R,  false, "array16"     } },
+	{ 0x014, { vis_op_desc::R,  vis_op_desc::R,  vis_op_desc::R,  false, "array32"     } },
+	{ 0x018, { vis_op_desc::R,  vis_op_desc::R,  vis_op_desc::R,  true,  "alignaddr"   } },
+	{ 0x01a, { vis_op_desc::R,  vis_op_desc::R,  vis_op_desc::R,  true,  "alignaddrl"  } },
+
+	{ 0x020, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::R,  false, "fcmple16"    } },
+	{ 0x022, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::R,  false, "fcmpne16"    } },
+	{ 0x024, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::R,  false, "fcmple32"    } },
+	{ 0x026, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::R,  false, "fcmpne32"    } },
+	{ 0x028, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::R,  false, "fcmpgt16"    } },
+	{ 0x02a, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::R,  false, "fcmpeq16"    } },
+	{ 0x02c, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::R,  false, "fcmpgt32"    } },
+	{ 0x02e, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::R,  false, "fcmpeq32"    } },
+
+	{ 0x031, { vis_op_desc::Fs, vis_op_desc::Fd, vis_op_desc::Fd, false, "fmul8x16"    } },
+	{ 0x033, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fd, false, "fmul8x16au"  } },
+	{ 0x035, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fd, false, "fmul8x16al"  } },
+	{ 0x036, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fmul8sux16"  } },
+	{ 0x037, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fmul8ulx16"  } },
+	{ 0x038, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fd, false, "fmuld8sux16" } },
+	{ 0x039, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fd, false, "fmuld8ulx16" } },
+	{ 0x03a, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fpack32"     } },
+	{ 0x03b, { vis_op_desc::X,  vis_op_desc::Fd, vis_op_desc::Fs, false, "fpack16"     } },
+	{ 0x03d, { vis_op_desc::X,  vis_op_desc::Fd, vis_op_desc::Fs, false, "fpackfix"    } },
+	{ 0x03e, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "pdist"       } },
+
+	{ 0x048, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "faligndata"  } },
+	{ 0x04b, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fd, false, "fpmerge"     } },
+	{ 0x04d, { vis_op_desc::X,  vis_op_desc::Fs, vis_op_desc::Fd, false, "fexpand"     } },
+
+	{ 0x050, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fpadd16"     } },
+	{ 0x051, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fpadd16s"    } },
+	{ 0x052, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fpadd32"     } },
+	{ 0x053, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fpadd32s"    } },
+	{ 0x054, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fpsub16"     } },
+	{ 0x055, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fpsub16s"    } },
+	{ 0x056, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fpsub32"     } },
+	{ 0x057, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fpsub32s"    } },
+
+	{ 0x060, { vis_op_desc::X,  vis_op_desc::X,  vis_op_desc::Fd, false, "fzero"       } },
+	{ 0x061, { vis_op_desc::X,  vis_op_desc::X,  vis_op_desc::Fs, false, "fzeros"      } },
+	{ 0x062, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fnor"        } },
+	{ 0x063, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fnors"       } },
+	{ 0x064, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fandnot2"    } },
+	{ 0x065, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fandnot2s"   } },
+	{ 0x066, { vis_op_desc::X,  vis_op_desc::Fd, vis_op_desc::Fd, false, "fnot2"       } },
+	{ 0x067, { vis_op_desc::X,  vis_op_desc::Fs, vis_op_desc::Fs, false, "fnot2s"      } },
+	{ 0x068, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fandnot1"    } },
+	{ 0x069, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fandnot1s"   } },
+	{ 0x06a, { vis_op_desc::Fd, vis_op_desc::X,  vis_op_desc::Fd, false, "fnot1"       } },
+	{ 0x06b, { vis_op_desc::Fs, vis_op_desc::X,  vis_op_desc::Fs, false, "fnot1s"      } },
+	{ 0x06c, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fxor"        } },
+	{ 0x06d, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fxors"       } },
+	{ 0x06e, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fnand"       } },
+	{ 0x06f, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fnands"      } },
+
+	{ 0x070, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fand"        } },
+	{ 0x071, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fands"       } },
+	{ 0x072, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fxnor"       } },
+	{ 0x073, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fxnors"      } },
+	{ 0x074, { vis_op_desc::Fd, vis_op_desc::X,  vis_op_desc::Fd, false, "fsrc1"       } },
+	{ 0x075, { vis_op_desc::Fs, vis_op_desc::X,  vis_op_desc::Fs, false, "fsrc1s"      } },
+	{ 0x076, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fornot2"     } },
+	{ 0x077, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fornot2s"    } },
+	{ 0x078, { vis_op_desc::X,  vis_op_desc::Fd, vis_op_desc::Fd, false, "fsrc2"       } },
+	{ 0x079, { vis_op_desc::X,  vis_op_desc::Fs, vis_op_desc::Fs, false, "fsrc2s"      } },
+	{ 0x07a, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fornot1"     } },
+	{ 0x07b, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fornot1s"    } },
+	{ 0x07c, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "for"         } },
+	{ 0x07d, { vis_op_desc::Fs, vis_op_desc::Fs, vis_op_desc::Fs, false, "fors"        } },
+	{ 0x07e, { vis_op_desc::X,  vis_op_desc::X,  vis_op_desc::Fd, false, "fone"        } },
+	{ 0x07f, { vis_op_desc::X,  vis_op_desc::X,  vis_op_desc::Fs, false, "fones"       } },
+
+	{ 0x080, { vis_op_desc::X,  vis_op_desc::X,  vis_op_desc::X,  false, "shutdown"    } }
+};
+
+const sparc_disassembler::state_reg_desc_map::value_type sparc_disassembler::VIS1_STATE_REG_DESC[] = {
+	{ 19, { false,  "%gsr",  "%gsr"  } }
+};
+
+const sparc_disassembler::asi_desc_map::value_type sparc_disassembler::VIS1_ASI_DESC[] = {
+	{ 0x2c, { "#ASI_NUCLEUS_QUAD_LDD_L", nullptr } },
+	{ 0x70, { "#ASI_BLK_AIUP",           nullptr } },
+	{ 0x71, { "#ASI_BLK_AIUS",           nullptr } },
+	{ 0x78, { "#ASI_BLK_AIUPL",          nullptr } },
+	{ 0x79, { "#ASI_BLK_AIUSL",          nullptr } },
+	{ 0xc0, { "#ASI_PST8_P",             nullptr } },
+	{ 0xc1, { "#ASI_PST8_S",             nullptr } },
+	{ 0xc2, { "#ASI_PST16_P",            nullptr } },
+	{ 0xc3, { "#ASI_PST16_S",            nullptr } },
+	{ 0xc4, { "#ASI_PST32_P",            nullptr } },
+	{ 0xc5, { "#ASI_PST32_S",            nullptr } },
+	{ 0xc8, { "#ASI_PST8_PL",            nullptr } },
+	{ 0xc9, { "#ASI_PST8_SL",            nullptr } },
+	{ 0xca, { "#ASI_PST16_PL",           nullptr } },
+	{ 0xcb, { "#ASI_PST16_SL",           nullptr } },
+	{ 0xcc, { "#ASI_PST32_PL",           nullptr } },
+	{ 0xcd, { "#ASI_PST32_SL",           nullptr } },
+	{ 0xd0, { "#ASI_FL8_P",              nullptr } },
+	{ 0xd1, { "#ASI_FL8_S",              nullptr } },
+	{ 0xd2, { "#ASI_FL16_P",             nullptr } },
+	{ 0xd3, { "#ASI_FL16_S",             nullptr } },
+	{ 0xd8, { "#ASI_FL8_PL",             nullptr } },
+	{ 0xd9, { "#ASI_FL8_SL",             nullptr } },
+	{ 0xda, { "#ASI_FL16_PL",            nullptr } },
+	{ 0xdb, { "#ASI_FL16_SL",            nullptr } },
+	{ 0xe0, { "#ASI_BLK_COMMIT_P",       nullptr } },
+	{ 0xe1, { "#ASI_BLK_COMMIT_S",       nullptr } },
+	{ 0xf0, { "#ASI_BLK_P",              nullptr } },
+	{ 0xf1, { "#ASI_BLK_S",              nullptr } },
+	{ 0xf8, { "#ASI_BLK_PL",             nullptr } },
+	{ 0xf9, { "#ASI_BLK_SL",             nullptr } }
+};
+
+const sparc_disassembler::vis_op_desc_map::value_type sparc_disassembler::VIS2_OP_DESC[] = {
+	{ 0x001, { vis_op_desc::R,  vis_op_desc::R,  vis_op_desc::R,  false, "edge8n"      } },
+	{ 0x003, { vis_op_desc::R,  vis_op_desc::R,  vis_op_desc::R,  false, "edge8ln"     } },
+	{ 0x005, { vis_op_desc::R,  vis_op_desc::R,  vis_op_desc::R,  false, "edge16n"     } },
+	{ 0x007, { vis_op_desc::R,  vis_op_desc::R,  vis_op_desc::R,  false, "edge16ln"    } },
+	{ 0x009, { vis_op_desc::R,  vis_op_desc::R,  vis_op_desc::R,  false, "edge32n"     } },
+	{ 0x00b, { vis_op_desc::R,  vis_op_desc::R,  vis_op_desc::R,  false, "edge32ln"    } },
+
+	{ 0x019, { vis_op_desc::R,  vis_op_desc::R,  vis_op_desc::R,  true,  "bmask"       } },
+
+	{ 0x04c, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "bshuffle"    } }
+};
+
+const sparc_disassembler::asi_desc_map::value_type sparc_disassembler::VIS2P_ASI_DESC[] = {
+	{ 0x22, { "#ASI_TWINX_AIUP",         nullptr } },
+	{ 0x23, { "#ASI_TWINX_AIUS",         nullptr } },
+	{ 0x26, { "#ASI_TWINX_REAL",         nullptr } },
+	{ 0x27, { "#ASI_TWINX_N",            nullptr } },
+	{ 0x2a, { "#ASI_TWINX_AIUP_L",       nullptr } },
+	{ 0x2b, { "#ASI_TWINX_AIUS_L",       nullptr } },
+	{ 0x2e, { "#ASI_TWINX_REAL_L",       nullptr } },
+	{ 0x2f, { "#ASI_TWINX_NL",           nullptr } },
+	{ 0xe2, { "#ASI_TWINX_P",            nullptr } },
+	{ 0xe3, { "#ASI_TWINX_S",            nullptr } },
+	{ 0xea, { "#ASI_TWINX_PL",           nullptr } },
+	{ 0xeb, { "#ASI_TWINX_SL",           nullptr } }
+};
+
+const sparc_disassembler::fpop1_desc_map::value_type sparc_disassembler::VIS3_FPOP1_DESC[] = {
+	{ 0x051, { true,  false, false, false, "fnadds"  } },
+	{ 0x052, { true,  true,  true,  true,  "fnaddd"  } },
+	{ 0x059, { true,  false, false, false, "fnmuls"  } },
+	{ 0x05a, { true,  true,  true,  true,  "fnmuld"  } },
+
+	{ 0x061, { true,  false, false, false, "fhadds"  } },
+	{ 0x062, { true,  true,  true,  true,  "fhaddd"  } },
+	{ 0x065, { true,  false, false, false, "fhsubs"  } },
+	{ 0x066, { true,  true,  true,  true,  "fhsubd"  } },
+
+	{ 0x071, { true,  false, false, false, "fnhadds" } },
+	{ 0x072, { true,  true,  true,  true,  "fnhaddd" } },
+	{ 0x079, { true,  false, false, true,  "fnsmuld" } }
+};
+
+const sparc_disassembler::vis_op_desc_map::value_type sparc_disassembler::VIS3_OP_DESC[] = {
+	{ 0x011, { vis_op_desc::R,  vis_op_desc::R,  vis_op_desc::R,  false, "addxc"          } },
+	{ 0x013, { vis_op_desc::R,  vis_op_desc::R,  vis_op_desc::R,  false, "addxccc"        } },
+	{ 0x016, { vis_op_desc::R,  vis_op_desc::R,  vis_op_desc::R,  false, "umulxhi"        } },
+	{ 0x017, { vis_op_desc::X,  vis_op_desc::R,  vis_op_desc::R,  false, "lzcnt"          } },
+	{ 0x01b, { vis_op_desc::X,  vis_op_desc::R,  vis_op_desc::X,  false, "cmask8"         } },
+	{ 0x01d, { vis_op_desc::X,  vis_op_desc::R,  vis_op_desc::X,  false, "cmask16"        } },
+	{ 0x01f, { vis_op_desc::X,  vis_op_desc::R,  vis_op_desc::X,  false, "cmask32"        } },
+
+	{ 0x021, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fsll16"         } },
+	{ 0x023, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fsrl16"         } },
+	{ 0x025, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fsll32"         } },
+	{ 0x027, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fsrl32"         } },
+	{ 0x029, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fslas16"        } },
+	{ 0x02b, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fsra16"         } },
+	{ 0x02d, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fslas32"        } },
+	{ 0x02f, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fsra32"         } },
+
+	{ 0x03f, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::R,  false, "pdistn"         } },
+
+	{ 0x040, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fmean16"        } },
+	{ 0x044, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fchksm16"       } },
+
+	{ 0x115, { vis_op_desc::R,  vis_op_desc::R,  vis_op_desc::R,  false, "xmulx"          } },
+	{ 0x116, { vis_op_desc::R,  vis_op_desc::R,  vis_op_desc::R,  false, "xmulxhi"        } }
+};
+
+const sparc_disassembler::vis_op_desc_map::value_type sparc_disassembler::VIS3B_OP_DESC[] = {
+	{ 0x042, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fpadd64"        } },
+	{ 0x046, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::Fd, false, "fpsub64"        } },
+
+	{ 0x110, { vis_op_desc::X,  vis_op_desc::Fd, vis_op_desc::R,  false, "movdtox"        } },
+	{ 0x111, { vis_op_desc::X,  vis_op_desc::Fs, vis_op_desc::R,  false, "movstouw"       } },
+	{ 0x113, { vis_op_desc::X,  vis_op_desc::Fs, vis_op_desc::R,  false, "movstosw"       } },
+	{ 0x118, { vis_op_desc::X,  vis_op_desc::R,  vis_op_desc::Fd, false, "movxtod"        } },
+	{ 0x119, { vis_op_desc::X,  vis_op_desc::R,  vis_op_desc::Fs, false, "movwtos"        } },
+
+	{ 0x120, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::R,  false, "fpcmpule8"      } },
+	{ 0x122, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::R,  false, "fpcmpune8"      } },
+	{ 0x128, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::R,  false, "fpcmpugt8"      } },
+	{ 0x12a, { vis_op_desc::Fd, vis_op_desc::Fd, vis_op_desc::R,  false, "fpcmpueq8"      } }
 };
 
 
@@ -320,6 +597,12 @@ template <typename T> inline void sparc_disassembler::add_ldst_desc(const T &des
 		m_ldst_desc.insert(it);
 }
 
+template <typename T> inline void sparc_disassembler::add_vis_op_desc(const T &desc)
+{
+	for (const auto &it : desc)
+		m_vis_op_desc.insert(it);
+}
+
 inline void sparc_disassembler::pad_op_field(char *buf, char *&output) const
 {
 	while ((output - buf) < m_op_field_width) *output++ = ' ';
@@ -334,8 +617,14 @@ inline void sparc_disassembler::print(char *&output, const char *fmt, ...)
 }
 
 
-sparc_disassembler::sparc_disassembler(unsigned version)
+sparc_disassembler::sparc_disassembler(const sparc_debug_state *state, unsigned version)
+	: sparc_disassembler(state, version, vis_none)
+{
+}
+
+sparc_disassembler::sparc_disassembler(const sparc_debug_state *state, unsigned version, vis_level vis)
 	: m_version(version)
+	, m_vis_level(vis)
 	, m_op_field_width(9)
 	, m_branch_desc{
 		EMPTY_BRANCH_DESC,
@@ -354,6 +643,7 @@ sparc_disassembler::sparc_disassembler(unsigned version)
 	, m_ldst_desc(std::begin(V7_LDST_DESC), std::end(V7_LDST_DESC))
 	, m_asi_desc()
 	, m_prftch_desc()
+	, m_vis_op_desc()
 {
 	if (m_version >= 8)
 	{
@@ -388,6 +678,55 @@ sparc_disassembler::sparc_disassembler(unsigned version)
 
 		add_prftch_desc(V9_PRFTCH_DESC);
 	}
+
+	switch (m_vis_level)
+	{
+	case vis_3b:
+		add_vis_op_desc(VIS3B_OP_DESC);
+	case vis_3:
+		add_fpop1_desc(VIS3_FPOP1_DESC);
+		add_vis_op_desc(VIS3_OP_DESC);
+	case vis_2p:
+		add_asi_desc(VIS2P_ASI_DESC);
+	case vis_2:
+		add_vis_op_desc(VIS2_OP_DESC);
+	case vis_1:
+		m_op_field_width = std::max(m_op_field_width, 12);
+		add_vis_op_desc(VIS1_OP_DESC);
+		add_state_reg_desc(VIS1_STATE_REG_DESC);
+		add_asi_desc(VIS1_ASI_DESC);
+		if (m_vis_level >= vis_3)
+		{
+			m_vis_op_desc.find(0x020)->second.mnemonic = "fpcmple16";
+			m_vis_op_desc.find(0x022)->second.mnemonic = "fpcmpne16";
+			m_vis_op_desc.find(0x024)->second.mnemonic = "fpcmple32";
+			m_vis_op_desc.find(0x026)->second.mnemonic = "fpcmpne32";
+			m_vis_op_desc.find(0x028)->second.mnemonic = "fpcmpgt16";
+			m_vis_op_desc.find(0x02a)->second.mnemonic = "fpcmpeq16";
+			m_vis_op_desc.find(0x02c)->second.mnemonic = "fpcmpgt32";
+			m_vis_op_desc.find(0x02e)->second.mnemonic = "fpcmpeq32";
+
+			m_vis_op_desc.find(0x060)->second.mnemonic = "fzerod";
+			m_vis_op_desc.find(0x062)->second.mnemonic = "fnord";
+			m_vis_op_desc.find(0x064)->second.mnemonic = "fandnot2d";
+			m_vis_op_desc.find(0x066)->second.mnemonic = "fnot2d";
+			m_vis_op_desc.find(0x068)->second.mnemonic = "fandnot1d";
+			m_vis_op_desc.find(0x06a)->second.mnemonic = "fnot1d";
+			m_vis_op_desc.find(0x06c)->second.mnemonic = "fxord";
+			m_vis_op_desc.find(0x06e)->second.mnemonic = "fnandd";
+
+			m_vis_op_desc.find(0x070)->second.mnemonic = "fandd";
+			m_vis_op_desc.find(0x072)->second.mnemonic = "fxnord";
+			m_vis_op_desc.find(0x074)->second.mnemonic = "fsrc1d";
+			m_vis_op_desc.find(0x076)->second.mnemonic = "fornot2d";
+			m_vis_op_desc.find(0x078)->second.mnemonic = "fsrc2d";
+			m_vis_op_desc.find(0x07a)->second.mnemonic = "fornot1d";
+			m_vis_op_desc.find(0x07c)->second.mnemonic = "ford";
+			m_vis_op_desc.find(0x07e)->second.mnemonic = "foned";
+		}
+	case vis_none:
+		break;
+	}
 }
 
 
@@ -412,7 +751,7 @@ offs_t sparc_disassembler::dasm(char *buf, offs_t pc, UINT32 op) const
 		}
 		return 4 | DASMFLAG_SUPPORTED;
 	case 1:
-		print(buf, "%-*s%%pc%c0x%08x ! %08x", m_op_field_width, "call", (DISP30 < 0) ? '-' : '+', std::abs(DISP30), pc + DISP30);
+		print(buf, "%-*s%%pc%c0x%08x ! 0x%08x", m_op_field_width, "call", (DISP30 < 0) ? '-' : '+', std::abs(DISP30), pc + DISP30);
 		return 4 | DASMFLAG_SUPPORTED;
 	case 2:
 		switch (OP3)
@@ -616,8 +955,7 @@ offs_t sparc_disassembler::dasm(char *buf, offs_t pc, UINT32 op) const
 		case 0x35:
 			return dasm_fpop2(buf, pc, op);
 		case 0x36:
-			// TODO: hooks for IMPDEP1/CPop1
-			break;
+			return dasm_impdep1(buf, pc, op);
 		case 0x37:
 			// TODO: hooks for IMPDEP2/CPop2
 			break;
@@ -714,12 +1052,14 @@ offs_t sparc_disassembler::dasm_branch(char *buf, offs_t pc, UINT32 op) const
 	const char * const mnemonic(desc.mnemonic[COND]);
 	if (!mnemonic || (desc.use_cc && !desc.reg_cc[BRCC])) return dasm_invalid(buf, pc, op);
 
-	print(ptr, "%s%s%s", mnemonic, ANNUL ? ",a" : "", (m_branch_desc[OP2].use_pred && !PRED) ? ",pn" : "");
+	print(ptr, "%s%s%s", mnemonic, ANNUL ? ",a" : "", (desc.use_pred && !PRED) ? ",pn" : "");
 	pad_op_field(buf, ptr);
 	if (desc.use_cc) print(ptr, "%s,", desc.reg_cc[BRCC]);
 	if (OP2 == 3) print(ptr, "%s,", REG_NAMES[RS1]);
 	const INT32 disp(desc.get_disp(op));
 	print(ptr, "%%pc%c0x%0*x ! 0x%08x", (disp < 0) ? '-' : '+', desc.disp_width, std::abs(disp), pc + disp);
+	//const char * const comment(desc.get_comment ? desc.get_comment(m_state, desc.use_cc, pc, op) : nullptr);
+	//if (comment) print(ptr, " - %s", comment);
 
 	return 4 | DASMFLAG_SUPPORTED;
 }
@@ -828,7 +1168,7 @@ offs_t sparc_disassembler::dasm_write_state_reg(char *buf, offs_t pc, UINT32 op)
 				}
 				else
 				{
-					const char *const comment((RD < 16) ? "reserved" : "implementation-dependent");
+					const char * const comment((RD < 16) ? "reserved" : "implementation-dependent");
 					if (USEIMM) print(buf, "%-*s%s,%d,%%asr%d ! %s", m_op_field_width, "wr", REG_NAMES[RS1], SIMM13, RD, comment);
 					else        print(buf, "%-*s%s,%s,%%asr%d ! %s", m_op_field_width, "wr", REG_NAMES[RS1], REG_NAMES[RS2], RD, comment);
 				}
@@ -893,7 +1233,7 @@ offs_t sparc_disassembler::dasm_fpop2(char *buf, offs_t pc, UINT32 op) const
 		case 1:  mnemonic = "fmovs"; shift = false; break;
 		case 2:  mnemonic = "fmovd"; shift = true; break;
 		case 3:  mnemonic = "fmovq"; shift = true; break;
-		default: mnemonic = nullptr;
+		default: mnemonic = nullptr; shift = false; break;
 		}
 		if (mnemonic)
 		{
@@ -927,6 +1267,56 @@ offs_t sparc_disassembler::dasm_fpop2(char *buf, offs_t pc, UINT32 op) const
 			return 4 | DASMFLAG_SUPPORTED;
 		}
 	}
+
+	return dasm_invalid(buf, pc, op);
+}
+
+
+offs_t sparc_disassembler::dasm_impdep1(char *buf, offs_t pc, UINT32 op) const
+{
+	const auto it(m_vis_op_desc.find(OPF));
+	if (it != m_vis_op_desc.end())
+	{
+		print(buf, "%-*s", m_op_field_width, it->second.mnemonic);
+		bool args(false);
+		if (it->second.collapse && !RS1)
+		{
+			dasm_vis_arg(buf, args, it->second.rs2, RS2);
+		}
+		else if (it->second.collapse && !RS2)
+		{
+			dasm_vis_arg(buf, args, it->second.rs1, RS1);
+		}
+		else
+		{
+			dasm_vis_arg(buf, args, it->second.rs1, RS1);
+			dasm_vis_arg(buf, args, it->second.rs2, RS2);
+		}
+		dasm_vis_arg(buf, args, it->second.rd, RD);
+		return 4 | DASMFLAG_SUPPORTED;
+	}
+
+	switch (OPF)
+	{
+	case 0x081:
+		if (m_vis_level >= vis_2)
+		{
+			print(buf, "%-*s0x%x", m_op_field_width, "siam", IAMODE);
+			return 4 | DASMFLAG_SUPPORTED;
+		}
+		break;
+	case 0x151:
+	case 0x152:
+		if (m_vis_level >= vis_3)
+		{
+			const bool shift(OPF == 0x152);
+			print(buf, "%-*s%%fcc%d,%%f%d,%%f%d", m_op_field_width, (shift) ? "flcmpd" : "flcmps", RD & 3, freg(RS1, shift), freg(RS2, shift));
+			return 4 | DASMFLAG_SUPPORTED;
+		}
+		break;
+	}
+
+	// TODO: driver hook for other kinds of coprocessor?
 
 	return dasm_invalid(buf, pc, op);
 }
@@ -1004,6 +1394,12 @@ offs_t sparc_disassembler::dasm_ldst(char *buf, offs_t pc, UINT32 op) const
 				print(buf, "],%%fsr");
 				return 4 | DASMFLAG_SUPPORTED;
 			}
+			else if ((RD == 3) && (m_vis_level >= vis_3b))
+			{
+				print(buf, "%-*s[", m_op_field_width, "ldx");
+				dasm_address(buf, op);
+				print(buf, "],%%efsr");
+			}
 			break;
 		case 0x25: // Store floating-point state register
 			if ((RD == 0) || (RD == 1))
@@ -1011,6 +1407,7 @@ offs_t sparc_disassembler::dasm_ldst(char *buf, offs_t pc, UINT32 op) const
 				print(buf, "%-*s%%fsr,[", m_op_field_width, (RD == 1) ? "stx" : "st");
 				dasm_address(buf, op);
 				*buf++ = ']';
+				*buf = '\0';
 				return 4 | DASMFLAG_SUPPORTED;
 			}
 			break;
@@ -1047,7 +1444,7 @@ offs_t sparc_disassembler::dasm_ldst(char *buf, offs_t pc, UINT32 op) const
 				if (OP3 == 0x3d) dasm_asi(buf, op);
 				const auto it(m_prftch_desc.find(RD));
 				if (it != m_prftch_desc.end())  print(buf, ",%s", it->second.name);
-				else                                print(buf, ",0x%02x", RD);
+				else                            print(buf, ",0x%02x", RD);
 				if (OP3 == 0x3d) dasm_asi_comment(buf, op);
 			}
 			return 4 | DASMFLAG_SUPPORTED;
@@ -1068,12 +1465,14 @@ offs_t sparc_disassembler::dasm_ldst(char *buf, offs_t pc, UINT32 op) const
 			print(buf, "%-*s%%%csr,[", m_op_field_width, "st", (OP3 == 0x35) ? 'c' : 'f');
 			dasm_address(buf, op);
 			*buf++ = ']';
+			*buf = '\0';
 			return 4 | DASMFLAG_SUPPORTED;
 		case 0x26: // Store Floating-point deferred-trap Queue
 		case 0x36: // Store Coprocessor deferred-trap Queue
 			print(buf, "%-*s%%%cq,[", m_op_field_width, "std", (OP3 == 0x36) ? 'c' : 'f');
 			dasm_address(buf, op);
 			*buf++ = ']';
+			*buf = '\0';
 			return 4 | DASMFLAG_SUPPORTED;
 		}
 	}
@@ -1090,6 +1489,7 @@ offs_t sparc_disassembler::dasm_ldst(char *buf, offs_t pc, UINT32 op) const
 		print(buf, "%-*s[", m_op_field_width, it->second.g0_synth);
 		dasm_address(buf, op);
 		*buf++ = ']';
+		*buf = '\0';
 		if (it->second.alternate)
 		{
 			dasm_asi(buf, op);
@@ -1107,6 +1507,7 @@ offs_t sparc_disassembler::dasm_ldst(char *buf, offs_t pc, UINT32 op) const
 		*buf++ = '[';
 		dasm_address(buf, op);
 		*buf++ = ']';
+		*buf = '\0';
 		if (it->second.alternate) dasm_asi(buf, op);
 		if (!it->second.rd_first)
 		{
@@ -1163,20 +1564,20 @@ void sparc_disassembler::dasm_asi_comment(char *&output, UINT32 op) const
 }
 
 
-CPU_DISASSEMBLE( sparcv7 )
+void sparc_disassembler::dasm_vis_arg(char *&output, bool &args, vis_op_desc::arg fmt, UINT32 reg) const
 {
-	UINT32 op = *reinterpret_cast<const UINT32 *>(oprom);
-	return DASM_V7.dasm(buffer, pc, BIG_ENDIANIZE_INT32(op));
-}
-
-CPU_DISASSEMBLE( sparcv8 )
-{
-	UINT32 op = *reinterpret_cast<const UINT32 *>(oprom);
-	return DASM_V8.dasm(buffer, pc, BIG_ENDIANIZE_INT32(op));
-}
-
-CPU_DISASSEMBLE( sparcv9 )
-{
-	UINT32 op = *reinterpret_cast<const UINT32 *>(oprom);
-	return DASM_V9.dasm(buffer, pc, BIG_ENDIANIZE_INT32(op));
+	switch (fmt)
+	{
+	case vis_op_desc::X:
+		break;
+	case vis_op_desc::R:
+		print(output, args ? ",%s" : "%s", REG_NAMES[reg]);
+		args = true;
+		break;
+	case vis_op_desc::Fs:
+	case vis_op_desc::Fd:
+		print(output, args ? ",%%f%d" : "%%f%d", freg(reg, (fmt == vis_op_desc::Fd)));
+		args = true;
+		break;
+	};
 }

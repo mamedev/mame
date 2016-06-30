@@ -68,7 +68,7 @@ FIX: PK Tetris have an input named AMUSE which I couldn't map.  Maybe it is
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "sound/okim6295.h"
 #include "igspoker.lh"
 

@@ -39,7 +39,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "includes/exzisus.h"
 
 

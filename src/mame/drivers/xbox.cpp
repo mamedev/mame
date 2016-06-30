@@ -25,6 +25,7 @@
 #include "debugger.h"
 #include "includes/chihiro.h"
 #include "includes/xbox.h"
+#include "includes/xbox_usb.h"
 
 #define CPU_DIV 64
 

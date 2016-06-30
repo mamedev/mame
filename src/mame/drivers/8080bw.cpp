@@ -3552,14 +3552,14 @@ ROM_END
 
 ROM_START( sicv1 ) // Original Taito board AA017742B - data match for sicv, just smaller program roms (2708s vs. 2716s)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cv11.s1",     0x0000, 0x0400, CRC(309d4582) SHA1(e60a1a696111502c115ee00d84cd418c85aba9af) ) 
-	ROM_LOAD( "cv12.r1",     0x0400, 0x0400, CRC(70153e09) SHA1(b75068b7738aa232f75272c539fca04b3d0c2c4a) ) 
-	ROM_LOAD( "cv13.np1",    0x0800, 0x0400, CRC(2ca24fee) SHA1(4b516ebd5a777b001443159233d89fc0a331f756) ) 
-	ROM_FILL(                0x0c00, 0x0400, 0xff ) /* rom socket at M1 is unpopulated */        
+	ROM_LOAD( "cv11.s1",     0x0000, 0x0400, CRC(309d4582) SHA1(e60a1a696111502c115ee00d84cd418c85aba9af) )
+	ROM_LOAD( "cv12.r1",     0x0400, 0x0400, CRC(70153e09) SHA1(b75068b7738aa232f75272c539fca04b3d0c2c4a) )
+	ROM_LOAD( "cv13.np1",    0x0800, 0x0400, CRC(2ca24fee) SHA1(4b516ebd5a777b001443159233d89fc0a331f756) )
+	ROM_FILL(                0x0c00, 0x0400, 0xff ) /* rom socket at M1 is unpopulated */
 	ROM_FILL(                0x1000, 0x0400, 0xff ) /* rom socket at L1 is unpopulated */
-	ROM_LOAD( "cv14.jk1",    0x1400, 0x0400, CRC(556d9a97) SHA1(fb792e981658d79d1c801b01f06345c237e9e803) ) 
-	ROM_LOAD( "cv15.i1",     0x1800, 0x0400, CRC(ac520cf5) SHA1(47281256083d64a2754b2045c252e74fe5b71153) ) 
-	ROM_LOAD( "cv16.g1",     0x1c00, 0x0400, CRC(285cfb59) SHA1(53eab8ed07dc9ca107e2e91b4556b9424a073530) ) 
+	ROM_LOAD( "cv14.jk1",    0x1400, 0x0400, CRC(556d9a97) SHA1(fb792e981658d79d1c801b01f06345c237e9e803) )
+	ROM_LOAD( "cv15.i1",     0x1800, 0x0400, CRC(ac520cf5) SHA1(47281256083d64a2754b2045c252e74fe5b71153) )
+	ROM_LOAD( "cv16.g1",     0x1c00, 0x0400, CRC(285cfb59) SHA1(53eab8ed07dc9ca107e2e91b4556b9424a073530) )
 
 	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
 	ROM_LOAD( "cv01.1",      0x0000, 0x0400, CRC(037e16ac) SHA1(d585030aaff428330c91ae94d7cd5c96ebdd67dd) )
@@ -4590,7 +4590,7 @@ ROM_END
 /*
 
 ------------------------------
-Ozma Wars by SHIN NIHON KIKAKU                
+Ozma Wars by SHIN NIHON KIKAKU
 ------------------------------
 
 Location       Type      File ID      Checksum

@@ -468,7 +468,7 @@ static MACHINE_CONFIG_START( rblaster, deco_ld_state )
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_LASERDISC_LDP1000_ADD("laserdisc") 
+	MCFG_LASERDISC_LDP1000_ADD("laserdisc")
 	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, deco_ld_state, screen_update_rblaster)
 	//MCFG_LASERDISC_OVERLAY_CLIP(0, 256-1, 8, 240-1)
 	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
@@ -482,7 +482,7 @@ static MACHINE_CONFIG_START( rblaster, deco_ld_state )
 	//MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 	//MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("laserdisc", sony_ldp1000_device, write))
 	//MCFG_ACIA6850_RXD_HANDLER(DEVREADLINE("laserdisc", sony_ldp1000_device, read))
-	
+
 	/* sound hardware */
 	/* TODO: mixing */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

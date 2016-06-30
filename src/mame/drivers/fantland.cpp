@@ -49,7 +49,7 @@ Year + Game             Main CPU    Sound CPU    Sound            Video
 #include "cpu/z80/z80.h"
 #include "cpu/nec/nec.h"
 #include "cpu/i86/i86.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/3526intf.h"
 #include "sound/dac.h"
 #include "includes/fantland.h"

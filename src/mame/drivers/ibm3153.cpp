@@ -59,7 +59,7 @@ private:
 
 static ADDRESS_MAP_START(ibm3153_mem, AS_PROGRAM, 8, ibm3153_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000,0x3ffff) AM_ROM AM_REGION("user1", 0)
+	AM_RANGE(0x00000,0x0ffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ibm3153_io, AS_IO, 8, ibm3153_state)

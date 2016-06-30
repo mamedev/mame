@@ -211,7 +211,7 @@ Dip locations verified with US conversion kit manual.
 #include "cpu/h6280/h6280.h"
 #include "includes/dassault.h"
 #include "sound/2203intf.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 
 /**********************************************************************************/
 

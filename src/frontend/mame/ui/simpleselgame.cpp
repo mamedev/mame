@@ -26,7 +26,6 @@
 
 
 namespace ui {
-
 //-------------------------------------------------
 //  ctor
 //-------------------------------------------------
@@ -63,7 +62,7 @@ void simple_menu_select_game::build_driver_list()
 
 	// open a path to the ROMs and find them in the array
 	file_enumerator path(machine().options().media_path());
-	const osd_directory_entry *dir;
+	const osd::directory::entry *dir;
 
 	// iterate while we get new objects
 	while ((dir = path.next()) != nullptr)

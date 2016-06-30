@@ -20,7 +20,6 @@
 
 namespace netlist
 {
-
 	// -----------------------------------------------------------------------------
 	// net_dev class factory
 	// -----------------------------------------------------------------------------
@@ -65,7 +64,7 @@ namespace netlist
 		}
 	};
 
-	class factory_list_t : public std::vector<plib::owned_ptr<base_factory_t>>
+	class factory_list_t : public std::vector<std::unique_ptr<base_factory_t>>
 	{
 	public:
 		factory_list_t(setup_t &m_setup);
@@ -75,10 +74,10 @@ namespace netlist
 		void register_device(const pstring &name, const pstring &classname,
 				const pstring &def_param)
 		{
-			register_device(plib::owned_ptr<base_factory_t>::Create<factory_t<device_class>>(name, classname, def_param));
+			register_device(std::unique_ptr<base_factory_t>(new factory_t<device_class>(name, classname, def_param)));
 		}
 
-		void register_device(plib::owned_ptr<base_factory_t> factory)
+		void register_device(std::unique_ptr<base_factory_t> factory)
 		{
 			for (auto & e : *this)
 				if (e->name() == factory->name())
@@ -104,14 +103,14 @@ namespace netlist
 	// factory_creator_ptr_t
 	// -----------------------------------------------------------------------------
 
-	using factory_creator_ptr_t = plib::owned_ptr<base_factory_t> (*)(const pstring &name, const pstring &classname,
+	using factory_creator_ptr_t = std::unique_ptr<base_factory_t> (*)(const pstring &name, const pstring &classname,
 			const pstring &def_param);
 
 	template <typename T>
-	plib::owned_ptr<base_factory_t> factory_creator_t(const pstring &name, const pstring &classname,
+	std::unique_ptr<base_factory_t> factory_creator_t(const pstring &name, const pstring &classname,
 			const pstring &def_param)
 	{
-		return plib::owned_ptr<base_factory_t>::Create<factory_t<T>>(name, classname, def_param);
+		return std::unique_ptr<base_factory_t>(new factory_t<T>(name, classname, def_param));
 	}
 
 }

@@ -341,7 +341,7 @@ ROM_START( enchlamp )
 	ROM_REGION32_BE( 0x1800000, "flash", ROMREGION_ERASE00 )
 	ROM_LOAD( "enl5r211.fmu.bin", 0x0000, 0x1800000, CRC(592c3c7f) SHA1(119b3c6223d656981c399c399d7edccfdbb50dc7) )
 
-	ROM_REGION32_BE( 0x100, "eeprom", 0 )
+	ROM_REGION16_BE( 0x100, "eeprom", 0 )
 	ROM_LOAD( "93c56.u98", 0x00, 0x100, CRC(b2521a6a) SHA1(f44711545bee7e9c772a3dc23b79f0ea8059ec50) )          // empty eeprom with Konami header
 ROM_END
 
@@ -471,7 +471,7 @@ ROM_START( konzero )
 
 	ROM_REGION32_BE( 0x1800000, "flash", ROMREGION_ERASE00 )
 
-	ROM_REGION32_BE( 0x100, "eeprom", 0 )
+	ROM_REGION16_BE( 0x100, "eeprom", 0 )
 	ROM_LOAD( "93c56.u98", 0x00, 0x100, CRC(b2521a6a) SHA1(f44711545bee7e9c772a3dc23b79f0ea8059ec50) )          // empty eeprom with Konami header
 ROM_END
 

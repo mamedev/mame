@@ -31,7 +31,7 @@
 #include "video/k053250.h"
 #include "machine/eepromser.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/k053260.h"
 #include "includes/overdriv.h"
 

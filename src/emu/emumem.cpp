@@ -1766,14 +1766,14 @@ void address_space::allocate(std::vector<std::unique_ptr<address_space>> &space_
 		case 8:
 			if (config.endianness() == ENDIANNESS_LITTLE)
 			{
-				if (large) 
+				if (large)
 					space_list.push_back(std::make_unique<address_space_8le_large>(manager, memory, spacenum));
 				else
 					space_list.push_back(std::make_unique<address_space_8le_small>(manager, memory, spacenum));
 			}
 			else
 			{
-				if (large) 
+				if (large)
 					space_list.push_back(std::make_unique<address_space_8be_large>(manager, memory, spacenum));
 				else
 					space_list.push_back(std::make_unique<address_space_8be_small>(manager, memory, spacenum));
@@ -1783,7 +1783,7 @@ void address_space::allocate(std::vector<std::unique_ptr<address_space>> &space_
 		case 16:
 			if (config.endianness() == ENDIANNESS_LITTLE)
 			{
-				if (large) 
+				if (large)
 					space_list.push_back(std::make_unique<address_space_16le_large>(manager, memory, spacenum));
 				else
 					space_list.push_back(std::make_unique<address_space_16le_small>(manager, memory, spacenum));
@@ -1832,7 +1832,7 @@ void address_space::allocate(std::vector<std::unique_ptr<address_space>> &space_
 			break;
 		default:
 			throw emu_fatalerror("Invalid width %d specified for address_space::allocate", config.data_width());
-	}	
+	}
 }
 
 
@@ -2208,7 +2208,7 @@ void address_space::allocate_memory()
 
 	// loop over all blocks just allocated and assign pointers from them
 	address_map_entry *unassigned = nullptr;
-	
+
 	for (auto memblock = blocklist.begin() + tail; memblock != blocklist.end(); ++memblock)
 		unassigned = block_assign_intersecting(memblock->get()->bytestart(), memblock->get()->byteend(), memblock->get()->data());
 
@@ -2252,7 +2252,7 @@ void address_space::allocate_memory()
 		offs_t curbytestart = curblockstart * MEMORY_BLOCK_CHUNK;
 		offs_t curbyteend = curblockend * MEMORY_BLOCK_CHUNK + (MEMORY_BLOCK_CHUNK - 1);
 		auto block = std::make_unique<memory_block>(*this, curbytestart, curbyteend);
-		
+
 		// assign memory that intersected the new block
 		unassigned = block_assign_intersecting(curbytestart, curbyteend, block.get()->data());
 		blocklist.push_back(std::move(block));
@@ -2577,7 +2577,7 @@ void address_space::install_ram_generic(offs_t addrstart, offs_t addrend, offs_t
 		{
 			if (machine().phase() >= MACHINE_PHASE_RESET)
 				fatalerror("Attempted to call install_ram_generic() after initialization time without a baseptr!\n");
-			auto block = std::make_unique<memory_block>(*this, address_to_byte(addrstart), address_to_byte_end(addrend));			
+			auto block = std::make_unique<memory_block>(*this, address_to_byte(addrstart), address_to_byte_end(addrend));
 			bank.set_base(block.get()->data());
 			manager().m_blocklist.push_back(std::move(block));
 		}
@@ -4262,7 +4262,7 @@ void memory_bank::configure_entries(int startentry, int numentries, void *base, 
 //-------------------------------------------------
 
 memory_region::memory_region(running_machine &machine, const char *name, UINT32 length, UINT8 width, endianness_t endian)
-	: m_machine(machine),		
+	: m_machine(machine),
 		m_name(name),
 		m_buffer(length),
 		m_endianness(endian),
@@ -4474,7 +4474,7 @@ void handler_entry::description(char *buffer) const
 								m_subunit_infos[i].m_shift,
 								m_subunit_infos[i].m_offset,
 								m_subunit_infos[i].m_multiplier,
-							    m_subunit_infos[i].m_bytemask,
+								m_subunit_infos[i].m_bytemask,
 								subunit_name(i));
 		}
 	}

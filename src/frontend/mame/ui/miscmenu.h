@@ -21,7 +21,6 @@
 
 
 namespace ui {
-
 class menu_keyboard_mode : public menu
 {
 public:

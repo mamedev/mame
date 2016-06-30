@@ -287,7 +287,7 @@ int sound_xaudio2::init(osd_options const &options)
 	// Make sure our XAudio2Create entrypoint is bound
 	if (!XAudio2Create)
 	{
-		osd_printf_error("Could not find XAudio2. Please try to reinstall DirectX runtime package.\n");		
+		osd_printf_error("Could not find XAudio2. Please try to reinstall DirectX runtime package.\n");
 		return 1;
 	}
 
@@ -342,7 +342,7 @@ void sound_xaudio2::exit()
 		SetEvent(m_hEventExiting);
 		m_hEventExiting = nullptr;
 	}
-	
+
 	if (m_audioThread.joinable())
 		m_audioThread.join();
 

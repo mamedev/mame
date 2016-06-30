@@ -51,41 +51,41 @@ static MACHINE_CONFIG_START( qs7, qs_state )
 	MCFG_CPU_ADD("maincpu", H83048, XTAL_10MHz) /* FIX-ME! Actual CPU is H8/510 and XTAL value is a guess */
 	MCFG_CPU_PROGRAM_MAP(qs7_prog_map)
 
-        //MCFG_ALESIS_KEYSCAN_ASIC_ADD("keyscan")
+		//MCFG_ALESIS_KEYSCAN_ASIC_ADD("keyscan")
 
-        /* Alesis Sound Generator ASIC */
-        //MCFG_ALESIS_SG_ASIC_ADD("sndgen")
+		/* Alesis Sound Generator ASIC */
+		//MCFG_ALESIS_SG_ASIC_ADD("sndgen")
 
-        /* Alesis Sound Effects Processor ASIC */
-        //MCFG_ALESIS_FX_ASIC_ADD("sfx")
+		/* Alesis Sound Effects Processor ASIC */
+		//MCFG_ALESIS_FX_ASIC_ADD("sfx")
 
 	/* video hardware */
-        //TODO: add LCD display controller here
+		//TODO: add LCD display controller here
 
 	/* sound hardware */
 	//MCFG_SPEAKER_STANDARD_STEREO("stereo")
 	//MCFG_ALESIS_QS_SERIES_ADD("sound", SND_CLOCK)
 	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "stereo", 1.0)
 
-        /* Interfaces */
-        //MCFG_PCMCIA_ADD("pcmcia")
-        //MIDI
-        //RS232
+		/* Interfaces */
+		//MCFG_PCMCIA_ADD("pcmcia")
+		//MIDI
+		//RS232
 MACHINE_CONFIG_END
 
 ROM_START( alesqs7 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "2-31-0069_q7_v1.02_alesis_sp_09_12_96_cs_dbcc.u18", 0x00000, 0x80000, CRC(6e5404cb) SHA1(f00598b66ab7a83b16105cbb73e09c66ce3493a7) )
 
-//	ROM_REGION( 0x200000, "sound", 0 ) /* Samples ROMs (2Mbyte each) */
-//	ROM_LOAD( "?.u?", 0x00000, 0x200000, NO_DUMP )
-//	ROM_LOAD( "?.u?", 0x00000, 0x200000, NO_DUMP )
-//	ROM_LOAD( "?.u?", 0x00000, 0x200000, NO_DUMP )
-//	ROM_LOAD( "?.u?", 0x00000, 0x200000, NO_DUMP )
-//	ROM_LOAD( "?.u?", 0x00000, 0x200000, NO_DUMP )
-//	ROM_LOAD( "?.u?", 0x00000, 0x200000, NO_DUMP )
-//	ROM_LOAD( "?.u?", 0x00000, 0x200000, NO_DUMP )
-//	ROM_LOAD( "?.u?", 0x00000, 0x200000, NO_DUMP )
+//  ROM_REGION( 0x200000, "sound", 0 ) /* Samples ROMs (2Mbyte each) */
+//  ROM_LOAD( "?.u?", 0x00000, 0x200000, NO_DUMP )
+//  ROM_LOAD( "?.u?", 0x00000, 0x200000, NO_DUMP )
+//  ROM_LOAD( "?.u?", 0x00000, 0x200000, NO_DUMP )
+//  ROM_LOAD( "?.u?", 0x00000, 0x200000, NO_DUMP )
+//  ROM_LOAD( "?.u?", 0x00000, 0x200000, NO_DUMP )
+//  ROM_LOAD( "?.u?", 0x00000, 0x200000, NO_DUMP )
+//  ROM_LOAD( "?.u?", 0x00000, 0x200000, NO_DUMP )
+//  ROM_LOAD( "?.u?", 0x00000, 0x200000, NO_DUMP )
 ROM_END
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  INIT               COMPANY   FULLNAME                       FLAGS  */

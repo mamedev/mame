@@ -32,13 +32,16 @@ public:
 			ofs_x(0),
 			ofs_y(0),
 			is_collapsed(false),
-			exec_cmd(false)
+			exec_cmd(false),
+			scroll_end(false),
+			scroll_follow(false)
 		{
 		this->view = machine.debug_view().alloc_view(type, nullptr, this);
 		this->type = type;
 		this->m_machine = &machine;
 		this->width = 300;
 		this->height = 300;
+		this->console_prev.clear();
 
 		/* specials */
 		switch (type)
@@ -76,8 +79,11 @@ public:
 	bool                is_collapsed;
 	bool                exec_cmd;  // console only
 	int                 src_sel;
+	bool                scroll_end;
+	bool                scroll_follow;  // set if view is to stay at the end of a scrollable area (like a log window)
 	char                console_input[512];
 	std::vector<std::string> console_history;
+	std::string         console_prev;
 };
 
 class debug_imgui : public osd_module, public debug_module
@@ -465,7 +471,12 @@ void debug_imgui::handle_console(running_machine* machine)
 			m_running = true;
 		if(strcmp(view_main_console->console_input,"next") == 0)
 			m_running = true;
-		view_main_console->console_history.push_back(std::string(view_main_console->console_input));
+		// don't bother adding to history if the current command matches the previous one
+		if(view_main_console->console_prev != view_main_console->console_input)
+		{
+			view_main_console->console_history.push_back(std::string(view_main_console->console_input));
+			view_main_console->console_prev = view_main_console->console_input;
+		}
 		history_pos = view_main_console->console_history.size();
 		strcpy(view_main_console->console_input,"");
 		view_main_console->exec_cmd = false;
@@ -493,7 +504,7 @@ int debug_imgui::history_set(ImGuiTextEditCallbackData* data)
 		data->CursorPos = data->BufTextLen = (int)snprintf(data->Buf, (size_t)data->BufSize, "%s", "");
 	else
 		data->CursorPos = data->BufTextLen = (int)snprintf(data->Buf, (size_t)data->BufSize, "%s", view_main_console->console_history[history_pos].c_str());
-	
+
 	data->BufDirty = true;
 	return 0;
 }
@@ -602,7 +613,16 @@ void debug_imgui::draw_view(debug_area* view_ptr, bool exp_change)
 		drawlist->AddRect(ImVec2(view_ptr->ofs_x,view_ptr->ofs_y + ImGui::GetScrollY()),
 			ImVec2(view_ptr->ofs_x + view_ptr->view_width,view_ptr->ofs_y + ImGui::GetScrollY() + view_ptr->view_height),col);
 	}
-	
+
+	// if the vertical scroll bar is at the end, then force it to the maximum value in case of an update
+	if(view_ptr->scroll_end)
+		ImGui::SetScrollY(ImGui::GetScrollMaxY());
+	// and update the scroll end flag
+	view_ptr->scroll_end = false;
+	if(view_ptr->scroll_follow)
+		if(ImGui::GetScrollY() == ImGui::GetScrollMaxY() || ImGui::GetScrollMaxY() < 0)
+			view_ptr->scroll_end = true;
+
 	ImGui::PopStyleVar(2);
 }
 
@@ -680,6 +700,7 @@ void debug_imgui::add_log(int id)
 	new_view->height = 300;
 	new_view->ofs_x = 0;
 	new_view->ofs_y = 0;
+	new_view->scroll_follow = true;
 	view_list_add(new_view);
 }
 
@@ -861,7 +882,7 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 		ImGui::End();
 	}
 	else
-		view_ptr->is_collapsed = true;			
+		view_ptr->is_collapsed = true;
 }
 
 void debug_imgui::add_memory(int id)
@@ -981,7 +1002,7 @@ void debug_imgui::draw_console()
 		draw_view(view_main_console,false);
 		ImGui::EndChild();
 		ImGui::Separator();
-		
+
 		ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackHistory;
 		if(m_running)
 			flags |= ImGuiInputTextFlags_ReadOnly;
@@ -1120,6 +1141,7 @@ void debug_imgui::wait_for_debugger(device_t &device, bool firststop)
 		view_main_console->height = 200;
 		view_main_console->ofs_x = 0;
 		view_main_console->ofs_y = 0;
+		view_main_console->scroll_follow = true;
 		view_main_disasm = dview_alloc(device.machine(), DVT_DISASSEMBLY);
 		view_main_disasm->title = "Main Disassembly";
 		view_main_disasm->width = 500;

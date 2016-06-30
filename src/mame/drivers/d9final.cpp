@@ -23,7 +23,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 
 
 class d9final_state : public driver_device

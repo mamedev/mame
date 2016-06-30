@@ -176,7 +176,7 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	optional_device<samples_device> m_samples;
 	required_device<generic_latch_8_device> m_soundlatch;
-	
+
 	DECLARE_WRITE8_MEMBER(m63_videoram_w);
 	DECLARE_WRITE8_MEMBER(m63_colorram_w);
 	DECLARE_WRITE8_MEMBER(m63_videoram2_w);

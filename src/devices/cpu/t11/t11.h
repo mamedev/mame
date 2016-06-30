@@ -76,7 +76,7 @@ protected:
 	PAIR                m_psw;
 	UINT16              m_initial_pc;
 	UINT8               m_wait_state;
-	UINT8               m_irq_state;
+	UINT16              m_irq_state;
 	int                 m_icount;
 	address_space *m_program;
 	direct_read_data *m_direct;
@@ -88,7 +88,7 @@ protected:
 	inline void WWORD(int addr, int data);
 	inline void PUSH(int val);
 	inline int POP();
-	void t11_check_irqs();
+	void t11_check_irqs(int prio = 0);
 
 	typedef void ( t11_device::*opcode_func )(UINT16 op);
 	static const opcode_func s_opcode_table[65536 >> 3];

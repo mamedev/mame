@@ -12,11 +12,29 @@
 #include <map>
 
 
+class sparc_debug_state
+{
+public:
+	virtual UINT64 get_reg_r(unsigned index) const = 0;
+	virtual UINT64 get_translated_pc() const = 0;
+	virtual UINT8 get_icc() const = 0;
+	virtual UINT8 get_xcc() const = 0;
+	virtual UINT8 get_fcc(unsigned index) const = 0; // ?><=
+
+protected:
+	~sparc_debug_state() { }
+};
+
+
 class sparc_disassembler
 {
 public:
+	enum vis_level { vis_none, vis_1, vis_2, vis_2p, vis_3, vis_3b };
+
 	struct asi_desc
 	{
+		asi_desc() { }
+		asi_desc(const char *name_, const char *desc_) : name(name_), desc(desc_) { }
 		const char *name = nullptr;
 		const char *desc = nullptr;
 	};
@@ -24,19 +42,24 @@ public:
 
 	struct state_reg_desc
 	{
-		bool reserved = false;
-		const char *read_name = nullptr;
-		const char *write_name = nullptr;
+		state_reg_desc() { }
+		state_reg_desc(bool reserved_, const char *read_name_, const char *write_name_) : reserved(reserved_), read_name(read_name_), write_name(write_name_) { }
+		bool        reserved = false;
+		const char  *read_name = nullptr;
+		const char  *write_name = nullptr;
 	};
 	typedef std::map<UINT8, state_reg_desc> state_reg_desc_map;
 
 	struct prftch_desc
 	{
+		prftch_desc() { }
+		prftch_desc(const char *name_) : name(name_) { }
 		const char *name = nullptr;
 	};
 	typedef std::map<UINT8, prftch_desc> prftch_desc_map;
 
-	sparc_disassembler(unsigned version);
+	sparc_disassembler(const sparc_debug_state *state, unsigned version);
+	sparc_disassembler(const sparc_debug_state *state, unsigned version, vis_level vis);
 
 	template <typename T> void add_state_reg_desc(const T &desc)
 	{
@@ -89,6 +112,7 @@ private:
 	struct branch_desc
 	{
 		INT32           (*get_disp)(UINT32 op);
+		const char *    (*get_comment)(const sparc_debug_state *state, bool use_cc, offs_t pc, UINT32 op);
 		int             disp_width;
 		bool            use_pred, use_cc;
 		const char      *reg_cc[4];
@@ -104,6 +128,8 @@ private:
 
 	struct fpop1_desc
 	{
+		fpop1_desc() { }
+		fpop1_desc(bool three_op_, bool rs1_shift_, bool rs2_shift_, bool rd_shift_, const char *mnemonic_) : three_op(three_op_), rs1_shift(rs1_shift_), rs2_shift(rs2_shift_), rd_shift(rd_shift_), mnemonic(mnemonic_) { }
 		bool        three_op = true;
 		bool        rs1_shift = false;
 		bool        rs2_shift = false;
@@ -114,6 +140,8 @@ private:
 
 	struct fpop2_desc
 	{
+		fpop2_desc() { }
+		fpop2_desc(bool int_rs1_, bool shift_, const char *mnemonic_) : int_rs1(int_rs1_), shift(shift_), mnemonic(mnemonic_) { }
 		bool        int_rs1 = false;
 		bool        shift = false;
 		const char  *mnemonic = nullptr;
@@ -122,6 +150,8 @@ private:
 
 	struct ldst_desc
 	{
+		ldst_desc() { }
+		ldst_desc(bool rd_first_, bool alternate_, char rd_alt_reg_, bool rd_shift_, const char *mnemonic_, const char *g0_synth_) : rd_first(rd_first_), alternate(alternate_), rd_alt_reg(rd_alt_reg_), rd_shift(rd_shift_), mnemonic(mnemonic_), g0_synth(g0_synth_) { }
 		bool        rd_first = false;
 		bool        alternate = false;
 		char        rd_alt_reg = '\0';
@@ -130,6 +160,19 @@ private:
 		const char  *g0_synth = nullptr;
 	};
 	typedef std::map<UINT8, ldst_desc> ldst_desc_map;
+
+	struct vis_op_desc
+	{
+		enum arg { X, R, Fs, Fd };
+		vis_op_desc() { }
+		vis_op_desc(arg rs1_, arg rs2_, arg rd_, bool collapse_, const char *mnemonic_) : rs1(rs1_), rs2(rs2_), rd(rd_), collapse(collapse_), mnemonic(mnemonic_) { }
+		arg         rs1 = X;
+		arg         rs2 = X;
+		arg         rd = X;
+		bool        collapse = false;
+		const char  *mnemonic = nullptr;
+	};
+	typedef std::map<UINT16, vis_op_desc> vis_op_desc_map;
 
 	offs_t dasm_invalid(char *buf, offs_t pc, UINT32 op) const;
 	offs_t dasm_branch(char *buf, offs_t pc, UINT32 op) const;
@@ -140,6 +183,7 @@ private:
 	offs_t dasm_move_reg_cond(char *buf, offs_t pc, UINT32 op) const;
 	offs_t dasm_fpop1(char *buf, offs_t pc, UINT32 op) const;
 	offs_t dasm_fpop2(char *buf, offs_t pc, UINT32 op) const;
+	offs_t dasm_impdep1(char *buf, offs_t pc, UINT32 op) const;
 	offs_t dasm_jmpl(char *buf, offs_t pc, UINT32 op) const;
 	offs_t dasm_return(char *buf, offs_t pc, UINT32 op) const;
 	offs_t dasm_tcc(char *buf, offs_t pc, UINT32 op) const;
@@ -148,6 +192,7 @@ private:
 	void dasm_address(char *&output, UINT32 op) const;
 	void dasm_asi(char *&output, UINT32 op) const;
 	void dasm_asi_comment(char *&output, UINT32 op) const;
+	void dasm_vis_arg(char *&output, bool &args, vis_op_desc::arg fmt, UINT32 reg) const;
 
 	UINT32 freg(UINT32 val, bool shift) const;
 
@@ -155,6 +200,7 @@ private:
 	template <typename T> void add_fpop1_desc(const T &desc);
 	template <typename T> void add_fpop2_desc(const T &desc);
 	template <typename T> void add_ldst_desc(const T &desc);
+	template <typename T> void add_vis_op_desc(const T &desc);
 
 	void pad_op_field(char *buf, char *&output) const;
 	ATTR_PRINTF(2, 3) static void print(char *&output, const char *fmt, ...);
@@ -183,21 +229,28 @@ private:
 	static const ldst_desc_map::value_type      V9_LDST_DESC[];
 	static const asi_desc_map::value_type       V9_ASI_DESC[];
 	static const prftch_desc_map::value_type    V9_PRFTCH_DESC[];
+	static const vis_op_desc_map::value_type    VIS1_OP_DESC[];
+	static const state_reg_desc_map::value_type VIS1_STATE_REG_DESC[];
+	static const asi_desc_map::value_type       VIS1_ASI_DESC[];
+	static const vis_op_desc_map::value_type    VIS2_OP_DESC[];
+	static const asi_desc_map::value_type       VIS2P_ASI_DESC[];
+	static const fpop1_desc_map::value_type     VIS3_FPOP1_DESC[];
+	static const vis_op_desc_map::value_type    VIS3_OP_DESC[];
+	static const vis_op_desc_map::value_type    VIS3B_OP_DESC[];
 
-	unsigned            m_version;
-	int                 m_op_field_width;
-	branch_desc         m_branch_desc[8];
-	int_op_desc_map     m_int_op_desc;
-	state_reg_desc_map  m_state_reg_desc;
-	fpop1_desc_map      m_fpop1_desc;
-	fpop2_desc_map      m_fpop2_desc;
-	ldst_desc_map       m_ldst_desc;
-	asi_desc_map        m_asi_desc;
-	prftch_desc_map     m_prftch_desc;
+	//const sparc_debug_state *m_state;
+	unsigned                m_version;
+	vis_level               m_vis_level;
+	int                     m_op_field_width;
+	branch_desc             m_branch_desc[8];
+	int_op_desc_map         m_int_op_desc;
+	state_reg_desc_map      m_state_reg_desc;
+	fpop1_desc_map          m_fpop1_desc;
+	fpop2_desc_map          m_fpop2_desc;
+	ldst_desc_map           m_ldst_desc;
+	asi_desc_map            m_asi_desc;
+	prftch_desc_map         m_prftch_desc;
+	vis_op_desc_map         m_vis_op_desc;
 };
-
-CPU_DISASSEMBLE( sparcv7 );
-CPU_DISASSEMBLE( sparcv8 );
-CPU_DISASSEMBLE( sparcv9 );
 
 #endif // MAME_DEVICES_CPU_SPARC_SPARC_DASM_H

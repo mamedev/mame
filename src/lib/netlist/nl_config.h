@@ -11,6 +11,7 @@
 #include <cstdint>
 
 #include "plib/pconfig.h"
+#include "plib/pchrono.h"
 
 //============================================================
 //  SETUP
@@ -74,18 +75,18 @@
 //  GENERAL
 //============================================================
 
-#define NL_USE_MEMPOOL				(0)
-#define USE_TRUTHTABLE          	(1)
+#define NL_USE_MEMPOOL              (0)
+#define USE_TRUTHTABLE              (1)
 
 //============================================================
 //  Solver defines
 //============================================================
 
-#define USE_MATRIX_GS 				(0)
-#define USE_GABS 					(1)
+#define USE_MATRIX_GS               (0)
+#define USE_GABS                    (1)
 // savings are eaten up by effort
 // FIXME: Convert into solver parameter
-#define USE_LINEAR_PREDICTION 		(0)
+#define USE_LINEAR_PREDICTION       (0)
 #define NETLIST_GMIN_DEFAULT     (1e-9)
 
 
@@ -111,18 +112,16 @@
 //  Performance tracking
 //============================================================
 
+namespace netlist
+{
 #if NL_KEEP_STATISTICS
-#define add_to_stat(v,x)        do { v += (x); } while (0)
-#define inc_stat(v)             add_to_stat(v, 1)
-#define begin_timing(v)         do { v -= plib::profile_ticks(); } while (0)
-#define end_timing(v)           do { v += plib::profile_ticks(); } while (0)
+using nperftime_t = plib::timer<plib::exact_ticks, true>;
+using nperfcount_t = plib::counter<true>;
 #else
-#define add_to_stat(v,x)        do { } while (0)
-#define inc_stat(v)             add_to_stat(v, 1)
-#define begin_timing(v)         do { } while (0)
-#define end_timing(v)           do { } while (0)
+using nperftime_t = plib::chrono::timer<plib::chrono::exact_ticks, false>;
+using nperfcount_t = plib::chrono::counter<false>;
 #endif
-
+}
 //============================================================
 //  General
 //============================================================

@@ -79,6 +79,7 @@ Sega PC BD MODEL2 A-CRX COMMUNICATION 837-11525
 
     EEPROM:
         16726.7    Sega Rally Championship
+        18643.7    ManxTT
         18643A.7   ManxTT
 
 
@@ -163,6 +164,8 @@ Sega PC BD MODEL2 C-CRX COMMUNICATION 837-12839
         18643A.7   Sega Touring Car Championship
 */
 
+#include "emu.h"
+#include "emuopts.h"
 #include "machine/m2comm.h"
 
 //#define __M2COMM_VERBOSE__
@@ -228,7 +231,6 @@ void m2comm_device::device_start()
 
 void m2comm_device::device_reset()
 {
-	set_linktype(16726);
 	m_zfg = 0;
 	m_cn = 0;
 	m_fg = 0;
@@ -238,7 +240,7 @@ READ8_MEMBER(m2comm_device::zfg_r)
 {
 	UINT8 result = m_zfg | 0xFE;
 #ifdef __M2COMM_VERBOSE__
-	printf("m2comm-zfg_r: read register %02x for value %02x\n", offset, result);
+	osd_printf_verbose("m2comm-zfg_r: read register %02x for value %02x\n", offset, result);
 #endif
 	return result;
 }
@@ -246,7 +248,7 @@ READ8_MEMBER(m2comm_device::zfg_r)
 WRITE8_MEMBER(m2comm_device::zfg_w)
 {
 #ifdef __M2COMM_VERBOSE__
-	printf("m2comm-zfg_w: %02x\n", data);
+	osd_printf_verbose("m2comm-zfg_w: %02x\n", data);
 #endif
 	m_zfg = data & 0x01;
 }
@@ -255,7 +257,7 @@ READ8_MEMBER(m2comm_device::share_r)
 {
 	UINT8 result = m_shared[offset];
 #ifdef __M2COMM_VERBOSE__
-	printf("m2comm-share_r: read shared memory %02x for value %02x\n", offset, result);
+	osd_printf_verbose("m2comm-share_r: read shared memory %02x for value %02x\n", offset, result);
 #endif
 	return result;
 }
@@ -263,7 +265,7 @@ READ8_MEMBER(m2comm_device::share_r)
 WRITE8_MEMBER(m2comm_device::share_w)
 {
 #ifdef __M2COMM_VERBOSE__
-	printf("m2comm-share_w: %02x %02x\n", offset, data);
+	osd_printf_verbose("m2comm-share_w: %02x %02x\n", offset, data);
 #endif
 	m_shared[offset] = data;
 }
@@ -284,19 +286,20 @@ WRITE8_MEMBER(m2comm_device::cn_w)
 	if (!m_cn)
 	{
 		// reset command
-		printf("M2COMM: board disabled\n");
+		osd_printf_verbose("M2COMM: board disabled\n");
 		m_linkenable = 0x00;
 	}
 	else
 	{
 		// init command
-		printf("M2COMM: board enabled\n");
+		osd_printf_verbose("M2COMM: board enabled\n");
 		m_linkenable = 0x01;
 		m_linkid = 0x00;
 		m_linkalive = 0x00;
 		m_linkcount = 0x00;
-		m_linktimer = 0x04; //0x00E8; // 58 fps * 4s
+		m_linktimer = 0x00E8; // 58 fps * 4s
 
+		comm_init();
 		comm_tick();
 	}
 #endif
@@ -321,46 +324,38 @@ void m2comm_device::check_vint_irq()
 }
 
 #ifdef __M2COMM_SIMULATION__
-void m2comm_device::set_linktype(UINT16 linktype)
+void m2comm_device::comm_init()
 {
-	m_linktype = linktype;
+	// TODO - check EPR-16726 on Daytona USA and Sega Rally Championship
+	// EPR-18643(A) - these are accessed by VirtuaON and Sega Touring Car Championship
 
-	switch (m_linktype)
-	{
-		case 16726:
-			// Daytona USA / Sega Rally Championship
-			printf("M2COMM: set mode 'EPR-16726 - Daytona USA'\n");
-			break;
-	}
+	// frameSize - 0xe00
+	m_shared[0x12] = 0x00;
+	m_shared[0x13] = 0x0e;
+
+	// frameOffset - 0x1c0
+	m_shared[0x14] = 0xc0;
+	m_shared[0x15] = 0x01;
 }
 
 void m2comm_device::comm_tick()
-{
-	switch (m_linktype)
-	{
-		case 16726:
-			// Daytona USA / Sega Rally Championship
-			comm_tick_16726();
-			break;
-	}
-}
-
-void m2comm_device::comm_tick_16726()
 {
 	if (m_linkenable == 0x01)
 	{
 		m_zfg ^= 1;
 
-		int frameStart = 0x2000;
-		int frameOffset = 0x0000;
-		int frameSize = 0x01c0;
+		int frameSize = m_shared[0x13] << 8 | m_shared[0x12];
+		int frameOffset = m_shared[0x15] << 8 | m_shared[0x14];
+
 		int dataSize = frameSize + 1;
 		int togo = 0;
 		int recv = 0;
 		int idx = 0;
 
-		bool isMaster = (m_fg == 0x01);
-		bool isSlave = (m_fg == 0x00);
+		// EPR-16726 uses m_fg for Master/Slave
+		// EPR-18643(A) seems to check m_shared[1], with a fallback to m_fg
+		bool isMaster = (m_fg == 0x01 || m_shared[1] == 0x01);
+		bool isSlave = !isMaster && (m_fg == 0x00);
 
 		// if link not yet established...
 		if (m_linkalive == 0x00)
@@ -373,14 +368,14 @@ void m2comm_device::comm_tick_16726()
 			// check rx socket
 			if (!m_line_rx.is_open())
 			{
-				printf("M2COMM: listen on %s\n", m_localhost);
+				osd_printf_verbose("M2COMM: listen on %s\n", m_localhost);
 				m_line_rx.open(m_localhost);
 			}
 
 			// check tx socket
 			if (!m_line_tx.is_open())
 			{
-				printf("M2COMM: connect to %s\n", m_remotehost);
+				osd_printf_verbose("M2COMM: connect to %s\n", m_remotehost);
 				m_line_tx.open(m_remotehost);
 			}
 
@@ -409,8 +404,8 @@ void m2comm_device::comm_tick_16726()
 							}
 							else if (isSlave)
 							{
+								// increase linkcount
 								m_buffer[1]++;
-								m_linkid = m_buffer[1];
 
 								// forward message
 								m_line_tx.write(m_buffer, dataSize);
@@ -422,15 +417,19 @@ void m2comm_device::comm_tick_16726()
 						{
 							if (isSlave)
 							{
+								// fetch linkcount and linkid, then decrease linkid
 								m_linkcount = m_buffer[1];
+								m_linkid = m_buffer[2];
+								m_buffer[2]--;
 
 								// forward message
 								m_line_tx.write(m_buffer, dataSize);
 							}
 
 							// consider it done
-							printf("M2COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
+							osd_printf_verbose("M2COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
 							m_linkalive = 0x01;
+							m_linktimer = 0x01;
 
 							// write to shared mem
 							m_shared[0] = 0x01;
@@ -447,7 +446,7 @@ void m2comm_device::comm_tick_16726()
 							recv = m_line_rx.read(m_buffer, togo);
 							togo -= recv;
 						}
-						printf("M2COMM: droped a message...\n");
+						osd_printf_verbose("M2COMM: droped a message...\n");
 					}
 
 					if (m_linkalive == 0x00)
@@ -464,6 +463,7 @@ void m2comm_device::comm_tick_16726()
 					{
 						m_buffer[0] = 0xff;
 						m_buffer[1] = 0x01;
+						m_buffer[2] = 0x00;
 						m_line_tx.write(m_buffer, dataSize);
 					}
 
@@ -472,11 +472,13 @@ void m2comm_device::comm_tick_16726()
 					{
 						m_buffer[0] = 0xfe;
 						m_buffer[1] = m_linkcount;
+						m_buffer[2] = m_linkcount;
 						m_line_tx.write(m_buffer, dataSize);
 
 						// consider it done
-						printf("M2COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
+						osd_printf_verbose("M2COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
 						m_linkalive = 0x01;
+						m_linktimer = 0x00;
 
 						// write to shared mem
 						m_shared[0] = 0x01;
@@ -503,52 +505,16 @@ void m2comm_device::comm_tick_16726()
 			int recv = m_line_rx.read(m_buffer, dataSize);
 			while (recv != 0)
 			{
+				m_linktimer = 0x00;
 				// check if complete message
 				if (recv == dataSize)
 				{
 					// check if valid id
 					int idx = m_buffer[0];
-					if (idx > 0 && idx <= m_linkcount) {
-						int slotFrom = m_linkid - idx;
-						int slotDest = slotFrom + m_linkcount;
-						while (slotDest < 9) {
-							slotDest += m_linkcount;
-						}
-						while (slotDest - m_linkcount > 0) {
-							slotFrom = slotDest - m_linkcount;
-							if (slotDest < 9) {
-								int frameOffset1 = frameStart + slotFrom * frameSize;
-								int frameOffset2 = frameStart + slotDest * frameSize;
-								for (int j = 0x00 ; j < frameSize ; j++)
-								{
-									m_shared[frameOffset2 + j] = m_shared[frameOffset1 + j];
-								}
-							}
-							slotDest -= m_linkcount;
-						}
-						if (slotDest > 0) {
-							// save message to "ring buffer"
-							frameOffset = frameStart + (slotDest * frameSize);
-							for (int j = 0x00 ; j < frameSize ; j++)
-							{
-								m_shared[frameOffset + j] = m_buffer[1 + j];
-							}
-						}
-						if (idx != m_linkid)
+					if (idx >= 0 && idx <= m_linkcount) {
+						for (int j = 0x00 ; j < frameSize ; j++)
 						{
-							// forward message to other nodes
-							m_line_tx.write(m_buffer, dataSize);
-						}
-					} else {
-						if (!isMaster && idx == 0xF0){
-							// 0xF0 - master addional bytes
-							for (int j = 0x05 ; j < 0x10 ; j++)
-							{
-								m_shared[j] = m_buffer[1 + j];
-							}
-
-							// forward message to other nodes
-							m_line_tx.write(m_buffer, dataSize);
+							m_shared[0x2000 + frameOffset + j] = m_buffer[1 + j];
 						}
 					}
 				}
@@ -561,37 +527,23 @@ void m2comm_device::comm_tick_16726()
 						recv = m_line_rx.read(m_buffer, togo);
 						togo -= recv;
 					}
-					printf("M2COMM: droped a message...\n");
+					osd_printf_verbose("M2COMM: droped a message...\n");
 				}
 				recv = m_line_rx.read(m_buffer, dataSize);
 			}
 
-			// push message to other nodes
-			m_buffer[0] = m_linkid;
-			for (int j = 0x00 ; j < frameSize ; j++)
+			if (m_linktimer == 0x00)
 			{
-				m_buffer[1 + j] = m_shared[frameStart + j];
-			}
-			m_line_tx.write(m_buffer, dataSize);
-
-			// master sends some additional status bytes
-			if (isMaster){
-				m_buffer[0] = 0xF0;
+				// push message to other nodes
+				m_buffer[0] = m_linkid;
 				for (int j = 0x00 ; j < frameSize ; j++)
 				{
-					m_buffer[1 + j] = 0x00;
+					m_buffer[1 + j] = m_shared[0x2000 + j];
 				}
-				for (int j = 0x05 ; j < 0x10 ; j++)
-				{
-					m_buffer[1 + j] = m_shared[j];
-				}
-				// push message to other nodes
 				m_line_tx.write(m_buffer, dataSize);
+				m_linktimer = 0x01;
 			}
 		}
-
-		// clear 03
-		//TODO:m_shared[3] = 0x00;
 	}
 }
 #endif

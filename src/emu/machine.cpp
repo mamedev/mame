@@ -568,7 +568,7 @@ void running_machine::set_saveload_filename(const char *filename)
 		// take into account the statename option
 		const char *stateopt = options().state_name();
 		std::string statename = get_statename(stateopt);
-		m_saveload_pending_file.assign(statename.c_str()).append(PATH_SEPARATOR).append(filename).append(".sta");
+		m_saveload_pending_file = string_format("%s%s%s.sta", statename, PATH_SEPARATOR, filename);
 	}
 }
 
@@ -844,7 +844,7 @@ void running_machine::handle_saveload()
 					break;
 
 				case STATERR_INVALID_HEADER:
-					popmessage("Error: Unable to %s state due to an invalid header. Make sure the save state is correct for this game.", opname);
+					popmessage("Error: Unable to %s state due to an invalid header. Make sure the save state is correct for this machine.", opname);
 					break;
 
 				case STATERR_READ_ERROR:
@@ -857,7 +857,7 @@ void running_machine::handle_saveload()
 
 				case STATERR_NONE:
 					if (!(m_system.flags & MACHINE_SUPPORTS_SAVE))
-						popmessage("State successfully %s.\nWarning: Save states are not officially supported for this game.", opnamed);
+						popmessage("State successfully %s.\nWarning: Save states are not officially supported for this machine.", opnamed);
 					else
 						popmessage("State successfully %s.", opnamed);
 					break;

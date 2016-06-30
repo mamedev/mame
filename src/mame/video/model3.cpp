@@ -711,20 +711,20 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
     - Color table (is this featured in Model 3?)
 
     0x00:   xxxxxxxx xxxxxxxx xxxxxx-- -------- Viewport number
-			-------- -------- ------xx -------- Viewport select 0-3
-			-------- -------- -------- x------- Display select
-			-------- -------- -------- -x------ Fix point centroid
-			-------- -------- -------- --x----- Viewport off
+            -------- -------- ------xx -------- Viewport select 0-3
+            -------- -------- -------- x------- Display select
+            -------- -------- -------- -x------ Fix point centroid
+            -------- -------- -------- --x----- Viewport off
             -------- -------- -------- ---xx--- Viewport priority
-			-------- -------- -------- -----x-- "clr_xlator_tbl_sel"
-			-------- -------- -------- ------xx Node type
+            -------- -------- -------- -----x-- "clr_xlator_tbl_sel"
+            -------- -------- -------- ------xx Node type
 
     0x01:   -------x -------- -------- -------- Sibling null
-			-------- xxxxxxxx xxxxxxxx xxxxxxxx Sibling pointer
+            -------- xxxxxxxx xxxxxxxx xxxxxxxx Sibling pointer
 
     0x02:   -----x-- -------- -------- -------- Child is sibling table
-			-------x -------- -------- -------- Leaf node
-			-------- xxxxxxxx xxxxxxxx xxxxxxxx Child pointer
+            -------x -------- -------- -------- Leaf node
+            -------- xxxxxxxx xxxxxxxx xxxxxxxx Child pointer
 
     0x03:   "cota" (float) Affected by frustum angles and viewport size
     0x04:   Sun light vector X-component (float)
@@ -763,7 +763,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
     0x1b:   Copy of word 0x00
 
     0x1c:   xxxxxxxx xxxxxxxx -------- -------- "lj"
-			-------- -------- xxxxxxxx xxxxxxxx "li"
+            -------- -------- xxxxxxxx xxxxxxxx "li"
 
     0x1d:   -------- xxxxxxxx -------- -------- Spotlight Y size
             -------- -------- xxxxxxxx xxxxxxxx Spotlight Y position (13.3 fixed-point?)
@@ -775,7 +775,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 
     0x20:   xxxxxxxx -------- -------- -------- ?
             -------- xxxxxxxx -------- -------- ?
-			-------- -------- -x------ -------- Parallel projection
+            -------- -------- -x------ -------- Parallel projection
             -------- -------- --xxx--- -------- Light RGB (RGB111?)
             -------- -------- -----xxx -------- Light RGB Fog (RGB111?)
             -------- -------- -------- xxxxxxxx Scroll Fog (0.8 fixed-point?) What is this???
@@ -789,15 +789,15 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
             -------- -------- -------- xxxxxxxx Scroll attenuation (0.8 fixed-point) What is this???
 
     0x25:   -------- xxxxxxxx -------- -------- Ambient fog
-			-------- -------- xxxxxxxx xxxxxxxx Fog offset
+            -------- -------- xxxxxxxx xxxxxxxx Fog offset
 
     0x26:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Spot light
-			-------- -------- -------- x------- Clear viewport
-			-------- -------- -------- -x------ New sun parameters
+            -------- -------- -------- x------- Clear viewport
+            -------- -------- -------- -x------ New sun parameters
 
     0x27:   x------- -------- -------- -------- Valid spot light
-			-x------ -------- -------- -------- Pro 1000 dummy
-			-------- --xxxxxx xxxxxxxx xxxxxxxx "upgrade_wd_10"
+            -x------ -------- -------- -------- Pro 1000 dummy
+            -------- --xxxxxx xxxxxxxx xxxxxxxx "upgrade_wd_10"
 
     0x28:   Fog layer altitude (float)
 
@@ -806,7 +806,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
     0x2a:   Bottom fog density (float)
 
     0x2b:   Near clipping plane (float)
-	
+
     0x2c:   Far clipping plane (float)
 
     0x2d:   Pfog offset top
@@ -851,22 +851,22 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
     Instance Node?
 
     0x00:   x------- -------- -------- -------- Is UF ref
-			-x------ -------- -------- -------- Is 3D model
-			--x----- -------- -------- -------- Is point
-			---x---- -------- -------- -------- Is point ref
-			----x--- -------- -------- -------- Is animation
-			-----x-- -------- -------- -------- Is billboard
-			------x- -------- -------- -------- Child is billboard
-			-------x -------- -------- -------- Extra child pointer needed
-			-------- -----xxx xxxxxx-- -------- Node ID
+            -x------ -------- -------- -------- Is 3D model
+            --x----- -------- -------- -------- Is point
+            ---x---- -------- -------- -------- Is point ref
+            ----x--- -------- -------- -------- Is animation
+            -----x-- -------- -------- -------- Is billboard
+            ------x- -------- -------- -------- Child is billboard
+            -------x -------- -------- -------- Extra child pointer needed
+            -------- -----xxx xxxxxx-- -------- Node ID
 
-			-------- -------- -------- x------- Reset matrix
-			-------- -------- -------- -x------ Use child pointer
-			-------- -------- -------- --x----- Use sibling pointer
-			-------- -------- -------- ---x---- No matrix
-			-------- -------- -------- ----x--- Indirect child
-			-------- -------- -------- -----x-- Valid color table
-			-------- -------- -------- ------xx Node type (0 = viewport, 1 = root node, 2 = culling node)
+            -------- -------- -------- x------- Reset matrix
+            -------- -------- -------- -x------ Use child pointer
+            -------- -------- -------- --x----- Use sibling pointer
+            -------- -------- -------- ---x---- No matrix
+            -------- -------- -------- ----x--- Indirect child
+            -------- -------- -------- -----x-- Valid color table
+            -------- -------- -------- ------xx Node type (0 = viewport, 1 = root node, 2 = culling node)
 
     0x01,0x02 only present on Step 2+
 
@@ -885,14 +885,14 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
     0x06:   Translation Z coordinate
 
     0x07:   xxxx---- -------- -------- -------- Color table address 2
-			-----x-- -------- -------- -------- Sibling table
-			------x- -------- -------- -------- Point
-			-------x -------- -------- -------- Leaf node
-			-------- xxxxxxxx xxxxxxxx xxxxxxxx Child pointer
-    
-	0x08:   xxxxxxx- -------- -------- -------- Color table address 3
-			-------x -------- -------- -------- Null sibling
-			-------- xxxxxxxx xxxxxxxx xxxxxxxx Sibling pointer
+            -----x-- -------- -------- -------- Sibling table
+            ------x- -------- -------- -------- Point
+            -------x -------- -------- -------- Leaf node
+            -------- xxxxxxxx xxxxxxxx xxxxxxxx Child pointer
+
+    0x08:   xxxxxxx- -------- -------- -------- Color table address 3
+            -------x -------- -------- -------- Null sibling
+            -------- xxxxxxxx xxxxxxxx xxxxxxxx Sibling pointer
 
     0x09:   xxxxxxxx xxxxxxxx -------- -------- Blend radius
             -------- -------- xxxxxxxx xxxxxxxx Culling radius

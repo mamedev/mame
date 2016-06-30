@@ -515,7 +515,7 @@ if (0) {
 		{
 			if (!(flags & IGNORE_0)) BLOCK_WIPE_COMMON
 
-		    dst_ptr += wclip;
+			dst_ptr += wclip;
 			ecx = wclip = -wclip;
 			edx = src_dx;
 
@@ -539,7 +539,7 @@ if (0) {
 					while (--hclip);
 				}
 				else
-			    {
+				{
 					do {
 						do {
 							al |= *src1_ptr;
@@ -605,7 +605,7 @@ if (0) {
 		if ((flags & (RGB_MASK | COLOR_ON)) == RGB_MASK + COLOR_ON)
 		{
 			if (!(flags & IGNORE_0)) BLOCK_WIPE_COMMON
-		    dst_ptr += wclip;
+			dst_ptr += wclip;
 			ecx = wclip = -wclip;
 			al = ah = (UINT8)pen0;
 			ebx = rgbmask[color & PENCOLOR] | 0xffffff00;
@@ -708,7 +708,7 @@ if (0) {
 
 //--------------------------------------------------------------------------
 
-	    // End of Standard Mode
+		// End of Standard Mode
 		return;
 
 //--------------------------------------------------------------------------

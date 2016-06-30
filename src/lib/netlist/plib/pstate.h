@@ -20,7 +20,6 @@
 // ----------------------------------------------------------------------------------------
 
 namespace plib {
-
 class state_manager_t
 {
 public:
@@ -30,7 +29,7 @@ public:
 		datatype_t(std::size_t bsize, bool bptr, bool bintegral, bool bfloat)
 		: size(bsize), is_ptr(bptr), is_integral(bintegral), is_float(bfloat), is_custom(false)
 		{}
-		datatype_t(bool bcustom)
+		explicit datatype_t(bool bcustom)
 		: size(0), is_ptr(false), is_integral(false), is_float(false), is_custom(bcustom)
 		{}
 
@@ -84,12 +83,12 @@ public:
 
 		~entry_t() { }
 
-		pstring 			m_name;
-		const datatype_t	m_dt;
-		const void *		m_owner;
-		callback_t *		m_callback;
-		const std::size_t	m_count;
-		void *				m_ptr;
+		pstring             m_name;
+		const datatype_t    m_dt;
+		const void *        m_owner;
+		callback_t *        m_callback;
+		const std::size_t   m_count;
+		void *              m_ptr;
 
 		template<typename T>
 		T *resolved()

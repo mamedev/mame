@@ -11,7 +11,7 @@ driver by Nicola Salmoria
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "includes/shisen.h"
 
 READ8_MEMBER(shisen_state::dsw1_r)

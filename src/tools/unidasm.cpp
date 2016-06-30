@@ -9,7 +9,13 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "cpu/sparc/sparcdasm.h"
+
+#include <algorithm>
+#include <cstring>
+
 #include <ctype.h>
+
 
 enum display_type
 {
@@ -206,161 +212,178 @@ CPU_DISASSEMBLE( z8 );
 CPU_DISASSEMBLE( z80 );
 CPU_DISASSEMBLE( z8000 );
 
+CPU_DISASSEMBLE( sparcv7 )      { static sparc_disassembler dasm(nullptr, 7);                             return dasm.dasm(buffer, pc, BIG_ENDIANIZE_INT32(*reinterpret_cast<const UINT32 *>(oprom))); }
+CPU_DISASSEMBLE( sparcv8 )      { static sparc_disassembler dasm(nullptr, 8);                             return dasm.dasm(buffer, pc, BIG_ENDIANIZE_INT32(*reinterpret_cast<const UINT32 *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9 )      { static sparc_disassembler dasm(nullptr, 9);                             return dasm.dasm(buffer, pc, BIG_ENDIANIZE_INT32(*reinterpret_cast<const UINT32 *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9vis1 )  { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_1);  return dasm.dasm(buffer, pc, BIG_ENDIANIZE_INT32(*reinterpret_cast<const UINT32 *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9vis2 )  { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_2);  return dasm.dasm(buffer, pc, BIG_ENDIANIZE_INT32(*reinterpret_cast<const UINT32 *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9vis2p ) { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_2p); return dasm.dasm(buffer, pc, BIG_ENDIANIZE_INT32(*reinterpret_cast<const UINT32 *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9vis3 )  { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_3);  return dasm.dasm(buffer, pc, BIG_ENDIANIZE_INT32(*reinterpret_cast<const UINT32 *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9vis3b ) { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_3b); return dasm.dasm(buffer, pc, BIG_ENDIANIZE_INT32(*reinterpret_cast<const UINT32 *>(oprom))); }
+
 
 static const dasm_table_entry dasm_table[] =
 {
-	{ "8x300",      _16be,  0, CPU_DISASSEMBLE_NAME(n8x300) },
-	{ "adsp21xx",   _24le, -2, CPU_DISASSEMBLE_NAME(adsp21xx) },
-	{ "alpha8201",  _8bit,  0, CPU_DISASSEMBLE_NAME(alpha8201) },
-	{ "am29000",    _32be,  0, CPU_DISASSEMBLE_NAME(am29000) },
-	{ "amis2000",   _8bit,  0, CPU_DISASSEMBLE_NAME(amis2000) },
-	{ "apexc",      _32be,  0, CPU_DISASSEMBLE_NAME(apexc) },
-	{ "arm",        _32le,  0, CPU_DISASSEMBLE_NAME(arm) },
-	{ "arm_be",     _32be,  0, CPU_DISASSEMBLE_NAME(arm_be) },
-	{ "arm7",       _32le,  0, CPU_DISASSEMBLE_NAME(arm7arm) },
-	{ "arm7_be",    _32be,  0, CPU_DISASSEMBLE_NAME(arm7arm_be) },
-	{ "arm7thumb",  _16le,  0, CPU_DISASSEMBLE_NAME(arm7thumb) },
-	{ "arm7thumbb", _16be,  0, CPU_DISASSEMBLE_NAME(arm7thumb_be) },
-	{ "asap",       _32le,  0, CPU_DISASSEMBLE_NAME(asap) },
-	{ "avr8",       _16le,  0, CPU_DISASSEMBLE_NAME(avr8) },
-	{ "ccpu",       _8bit,  0, CPU_DISASSEMBLE_NAME(ccpu) },
-	{ "cdp1801",    _8bit,  0, CPU_DISASSEMBLE_NAME(cdp1801) },
-	{ "cdp1802",    _8bit,  0, CPU_DISASSEMBLE_NAME(cdp1802) },
-	{ "coldfire",   _16be,  0, CPU_DISASSEMBLE_NAME(coldfire) },
-	{ "cop410",     _8bit,  0, CPU_DISASSEMBLE_NAME(cop410) },
-	{ "cop420",     _8bit,  0, CPU_DISASSEMBLE_NAME(cop420) },
-	{ "cop444",     _8bit,  0, CPU_DISASSEMBLE_NAME(cop444) },
-	{ "cp1610",     _16be, -1, CPU_DISASSEMBLE_NAME(cp1610) },
-	{ "cquestlin",  _64be, -3, CPU_DISASSEMBLE_NAME(cquestlin) },
-	{ "cquestrot",  _64be, -3, CPU_DISASSEMBLE_NAME(cquestrot) },
-	{ "cquestsnd",  _64be, -3, CPU_DISASSEMBLE_NAME(cquestsnd) },
-	{ "ds5002fp",   _8bit,  0, CPU_DISASSEMBLE_NAME(ds5002fp) },
-	{ "dsp16a",     _16le, -1, CPU_DISASSEMBLE_NAME(dsp16a) },
-	{ "dsp32c",     _32le,  0, CPU_DISASSEMBLE_NAME(dsp32c) },
-	{ "dsp56k",     _16le, -1, CPU_DISASSEMBLE_NAME(dsp56k) },
-	{ "e0c6200",    _16be, -1, CPU_DISASSEMBLE_NAME(e0c6200) },
-	{ "esrip",      _64be,  0, CPU_DISASSEMBLE_NAME(esrip) },
-	{ "f8",         _8bit,  0, CPU_DISASSEMBLE_NAME(f8) },
-	{ "g65816",     _8bit,  0, CPU_DISASSEMBLE_NAME(g65816_generic) },
-	{ "h6280",      _8bit,  0, CPU_DISASSEMBLE_NAME(h6280) },
-//  { "h8",         _16be,  0, CPU_DISASSEMBLE_NAME(h8) },
-//  { "h8_24",      _16be,  0, CPU_DISASSEMBLE_NAME(h8_24) },
-//  { "h8_32",      _16be,  0, CPU_DISASSEMBLE_NAME(h8_32) },
-	{ "hc11",       _8bit,  0, CPU_DISASSEMBLE_NAME(mb88) },
-	{ "hcd62121",   _16be,  0, CPU_DISASSEMBLE_NAME(hcd62121) },
-	{ "hd61700",    _8bit,  0, CPU_DISASSEMBLE_NAME(hd61700) },
-	{ "hd6301",     _8bit,  0, CPU_DISASSEMBLE_NAME(hd6301) },
-	{ "hd6309",     _8bit,  0, CPU_DISASSEMBLE_NAME(hd6309) },
-	{ "hd63701",    _8bit,  0, CPU_DISASSEMBLE_NAME(hd63701) },
-	{ "hmcs40",     _16le, -1, CPU_DISASSEMBLE_NAME(hmcs40) },
-	{ "hyperstone", _16be,  0, CPU_DISASSEMBLE_NAME(hyperstone_generic) },
-	{ "i4004",      _8bit,  0, CPU_DISASSEMBLE_NAME(i4004) },
-	{ "i8008",      _8bit,  0, CPU_DISASSEMBLE_NAME(i8008) },
-	{ "i8051",      _8bit,  0, CPU_DISASSEMBLE_NAME(i8051) },
-	{ "i8052",      _8bit,  0, CPU_DISASSEMBLE_NAME(i8052) },
-	{ "i8085",      _8bit,  0, CPU_DISASSEMBLE_NAME(i8085) },
-	{ "i8089",      _8bit,  0, CPU_DISASSEMBLE_NAME(i8089) },
-	{ "i80c51",     _8bit,  0, CPU_DISASSEMBLE_NAME(i80c51) },
-	{ "i80c52",     _8bit,  0, CPU_DISASSEMBLE_NAME(i80c52) },
-	{ "i860",       _64le,  0, CPU_DISASSEMBLE_NAME(i860) },
-	{ "i960",       _32le,  0, CPU_DISASSEMBLE_NAME(i960) },
-	{ "ie15",       _8bit,  0, CPU_DISASSEMBLE_NAME(ie15) },
-	{ "jaguardsp",  _16be,  0, CPU_DISASSEMBLE_NAME(jaguardsp) },
-	{ "jaguargpu",  _16be,  0, CPU_DISASSEMBLE_NAME(jaguargpu) },
-	{ "kb1013vk12", _8bit,  0, CPU_DISASSEMBLE_NAME(kb1013vk12) },
-	{ "konami",     _8bit,  0, CPU_DISASSEMBLE_NAME(konami) },
-	{ "lh5801",     _8bit,  0, CPU_DISASSEMBLE_NAME(lh5801) },
-	{ "lr35902",    _8bit,  0, CPU_DISASSEMBLE_NAME(lr35902) },
-	{ "m58846",     _16le, -1, CPU_DISASSEMBLE_NAME(m58846) },
-	{ "m37710",     _8bit,  0, CPU_DISASSEMBLE_NAME(m37710_generic) },
-	{ "m6800",      _8bit,  0, CPU_DISASSEMBLE_NAME(m6800) },
-	{ "m68000",     _16be,  0, CPU_DISASSEMBLE_NAME(m68000) },
-	{ "m68008",     _16be,  0, CPU_DISASSEMBLE_NAME(m68008) },
-	{ "m6801",      _8bit,  0, CPU_DISASSEMBLE_NAME(m6801) },
-	{ "m68010",     _16be,  0, CPU_DISASSEMBLE_NAME(m68010) },
-	{ "m6802",      _8bit,  0, CPU_DISASSEMBLE_NAME(m6802) },
-	{ "m68020",     _16be,  0, CPU_DISASSEMBLE_NAME(m68020) },
-	{ "m6803",      _8bit,  0, CPU_DISASSEMBLE_NAME(m6803) },
-	{ "m68030",     _16be,  0, CPU_DISASSEMBLE_NAME(m68030) },
-	{ "m68040",     _16be,  0, CPU_DISASSEMBLE_NAME(m68040) },
-	{ "m6805",      _8bit,  0, CPU_DISASSEMBLE_NAME(m6805) },
-	{ "m6808",      _8bit,  0, CPU_DISASSEMBLE_NAME(m6808) },
-	{ "m6809",      _8bit,  0, CPU_DISASSEMBLE_NAME(m6809) },
-	{ "m68340",     _16be,  0, CPU_DISASSEMBLE_NAME(m68340) },
-	{ "mb86233",    _32le, -2, CPU_DISASSEMBLE_NAME(mb86233) },
-	{ "mb88",       _8bit,  0, CPU_DISASSEMBLE_NAME(mb88) },
-	{ "mcs48",      _8bit,  0, CPU_DISASSEMBLE_NAME(mcs48) },
-	{ "minx",       _8bit,  0, CPU_DISASSEMBLE_NAME(minx) },
-	{ "mips3be",    _32be,  0, CPU_DISASSEMBLE_NAME(mips3be) },
-	{ "mips3le",    _32le,  0, CPU_DISASSEMBLE_NAME(mips3le) },
-	{ "mn10200",    _16le,  0, CPU_DISASSEMBLE_NAME(mn10200) },
-	{ "nec",        _8bit,  0, CPU_DISASSEMBLE_NAME(nec) },
-	{ "nsc8105",    _8bit,  0, CPU_DISASSEMBLE_NAME(nsc8105) },
-	{ "pdp1",       _32be,  0, CPU_DISASSEMBLE_NAME(pdp1) },
-	{ "pic16c5x",   _16le, -1, CPU_DISASSEMBLE_NAME(pic16c5x) },
-	{ "pic16c62x",  _16le, -1, CPU_DISASSEMBLE_NAME(pic16c62x) },
-	{ "powerpc",    _32be,  0, CPU_DISASSEMBLE_NAME(powerpc) },
-	{ "pps4",       _8bit,  0, CPU_DISASSEMBLE_NAME(pps4) },
-	{ "psxcpu",     _32le,  0, CPU_DISASSEMBLE_NAME(psxcpu_generic) },
-	{ "r3000be",    _32be,  0, CPU_DISASSEMBLE_NAME(r3000be) },
-	{ "r3000le",    _32le,  0, CPU_DISASSEMBLE_NAME(r3000le) },
-	{ "rsp",        _32le,  0, CPU_DISASSEMBLE_NAME(rsp) },
-	{ "s2650",      _8bit,  0, CPU_DISASSEMBLE_NAME(s2650) },
-	{ "saturn",     _8bit,  0, CPU_DISASSEMBLE_NAME(saturn) },
-	{ "sc61860",    _8bit,  0, CPU_DISASSEMBLE_NAME(sc61860) },
-	{ "scmp",       _8bit,  0, CPU_DISASSEMBLE_NAME(scmp) },
-	{ "scudsp",     _32be,  0, CPU_DISASSEMBLE_NAME(scudsp) },
-	{ "se3208",     _16le,  0, CPU_DISASSEMBLE_NAME(se3208) },
-	{ "sh2",        _16be,  0, CPU_DISASSEMBLE_NAME(sh2) },
-	{ "sh4",        _16le,  0, CPU_DISASSEMBLE_NAME(sh4) },
-	{ "sh4be",      _16be,  0, CPU_DISASSEMBLE_NAME(sh4be) },
-	{ "sharc",      _48le, -2, CPU_DISASSEMBLE_NAME(sharc) },
-	{ "sm500",      _8bit,  0, CPU_DISASSEMBLE_NAME(sm500) },
-	{ "sm510",      _8bit,  0, CPU_DISASSEMBLE_NAME(sm510) },
-	{ "sm511",      _8bit,  0, CPU_DISASSEMBLE_NAME(sm511) },
-	{ "sm8500",     _8bit,  0, CPU_DISASSEMBLE_NAME(sm8500) },
-	{ "spc700",     _8bit,  0, CPU_DISASSEMBLE_NAME(spc700) },
-	{ "ssem",       _32le,  0, CPU_DISASSEMBLE_NAME(ssem) },
-	{ "ssp1601",    _16be, -1, CPU_DISASSEMBLE_NAME(ssp1601) },
-//  { "superfx",    _8bit,  0, CPU_DISASSEMBLE_NAME(superfx) },
-	{ "t11",        _16le,  0, CPU_DISASSEMBLE_NAME(t11) },
-//  { "t90",        _8bit,  0, CPU_DISASSEMBLE_NAME(t90) },
-	{ "tlcs900",    _8bit,  0, CPU_DISASSEMBLE_NAME(tlcs900) },
-	{ "tms0980",    _16be,  0, CPU_DISASSEMBLE_NAME(tms0980) },
-	{ "tms1000",    _8bit,  0, CPU_DISASSEMBLE_NAME(tms1000) },
-	{ "tms1100",    _8bit,  0, CPU_DISASSEMBLE_NAME(tms1100) },
-	{ "tms32010",   _16be, -1, CPU_DISASSEMBLE_NAME(tms32010) },
-	{ "tms32025",   _16be, -1, CPU_DISASSEMBLE_NAME(tms32025) },
-	{ "tms3203x",   _32le, -2, CPU_DISASSEMBLE_NAME(tms3203x) },
-	{ "tms32051",   _16le, -1, CPU_DISASSEMBLE_NAME(tms32051) },
-	{ "tms34010",   _8bit,  3, CPU_DISASSEMBLE_NAME(tms34010) },
-	{ "tms34020",   _8bit,  3, CPU_DISASSEMBLE_NAME(tms34020) },
-	{ "tms57002",   _32le, -2, CPU_DISASSEMBLE_NAME(tms57002) },
-	{ "tms7000",    _8bit,  0, CPU_DISASSEMBLE_NAME(tms7000) },
-	{ "tms9900",    _16be,  0, CPU_DISASSEMBLE_NAME(tms9900) },
-	{ "tms9980",    _8bit,  0, CPU_DISASSEMBLE_NAME(tms9980) },
-	{ "tms9995",    _8bit,  0, CPU_DISASSEMBLE_NAME(tms9995) },
-	{ "tp0320",     _16be,  0, CPU_DISASSEMBLE_NAME(tp0320) },
-	{ "tx0_64kw",   _32be, -2, CPU_DISASSEMBLE_NAME(tx0_64kw) },
-	{ "tx0_8kw",    _32be, -2, CPU_DISASSEMBLE_NAME(tx0_8kw) },
-	{ "ucom4",      _8bit,  0, CPU_DISASSEMBLE_NAME(ucom4) },
-	{ "unsp",       _16be,  0, CPU_DISASSEMBLE_NAME(unsp) },
-	{ "upd7725",    _32be,  0, CPU_DISASSEMBLE_NAME(unsp) },
-	{ "upd7801",    _8bit,  0, CPU_DISASSEMBLE_NAME(upd7801) },
-	{ "upd7807",    _8bit,  0, CPU_DISASSEMBLE_NAME(upd7807) },
-	{ "upd7810",    _8bit,  0, CPU_DISASSEMBLE_NAME(upd7810) },
-	{ "upd78c05",   _8bit,  0, CPU_DISASSEMBLE_NAME(upd78c05) },
-	{ "upi41",      _8bit,  0, CPU_DISASSEMBLE_NAME(upi41) },
-	{ "v60",        _8bit,  0, CPU_DISASSEMBLE_NAME(v60) },
-	{ "v70",        _8bit,  0, CPU_DISASSEMBLE_NAME(v70) },
-	{ "v810",       _16le,  0, CPU_DISASSEMBLE_NAME(v810) },
-	{ "x86_16",     _8bit,  0, CPU_DISASSEMBLE_NAME(x86_16) },
-	{ "x86_32",     _8bit,  0, CPU_DISASSEMBLE_NAME(x86_32) },
-	{ "x86_64",     _8bit,  0, CPU_DISASSEMBLE_NAME(x86_64) },
-	{ "z180",       _8bit,  0, CPU_DISASSEMBLE_NAME(z180) },
-	{ "z8",         _8bit,  0, CPU_DISASSEMBLE_NAME(z8) },
-	{ "z80",        _8bit,  0, CPU_DISASSEMBLE_NAME(z80) },
-//  { "z8000",      _16be,  0, CPU_DISASSEMBLE_NAME(z8000) },
+	{ "8x300",       _16be,  0, CPU_DISASSEMBLE_NAME(n8x300) },
+	{ "adsp21xx",    _24le, -2, CPU_DISASSEMBLE_NAME(adsp21xx) },
+	{ "alpha8201",   _8bit,  0, CPU_DISASSEMBLE_NAME(alpha8201) },
+	{ "am29000",     _32be,  0, CPU_DISASSEMBLE_NAME(am29000) },
+	{ "amis2000",    _8bit,  0, CPU_DISASSEMBLE_NAME(amis2000) },
+	{ "apexc",       _32be,  0, CPU_DISASSEMBLE_NAME(apexc) },
+	{ "arm",         _32le,  0, CPU_DISASSEMBLE_NAME(arm) },
+	{ "arm_be",      _32be,  0, CPU_DISASSEMBLE_NAME(arm_be) },
+	{ "arm7",        _32le,  0, CPU_DISASSEMBLE_NAME(arm7arm) },
+	{ "arm7_be",     _32be,  0, CPU_DISASSEMBLE_NAME(arm7arm_be) },
+	{ "arm7thumb",   _16le,  0, CPU_DISASSEMBLE_NAME(arm7thumb) },
+	{ "arm7thumbb",  _16be,  0, CPU_DISASSEMBLE_NAME(arm7thumb_be) },
+	{ "asap",        _32le,  0, CPU_DISASSEMBLE_NAME(asap) },
+	{ "avr8",        _16le,  0, CPU_DISASSEMBLE_NAME(avr8) },
+	{ "ccpu",        _8bit,  0, CPU_DISASSEMBLE_NAME(ccpu) },
+	{ "cdp1801",     _8bit,  0, CPU_DISASSEMBLE_NAME(cdp1801) },
+	{ "cdp1802",     _8bit,  0, CPU_DISASSEMBLE_NAME(cdp1802) },
+	{ "coldfire",    _16be,  0, CPU_DISASSEMBLE_NAME(coldfire) },
+	{ "cop410",      _8bit,  0, CPU_DISASSEMBLE_NAME(cop410) },
+	{ "cop420",      _8bit,  0, CPU_DISASSEMBLE_NAME(cop420) },
+	{ "cop444",      _8bit,  0, CPU_DISASSEMBLE_NAME(cop444) },
+	{ "cp1610",      _16be, -1, CPU_DISASSEMBLE_NAME(cp1610) },
+	{ "cquestlin",   _64be, -3, CPU_DISASSEMBLE_NAME(cquestlin) },
+	{ "cquestrot",   _64be, -3, CPU_DISASSEMBLE_NAME(cquestrot) },
+	{ "cquestsnd",   _64be, -3, CPU_DISASSEMBLE_NAME(cquestsnd) },
+	{ "ds5002fp",    _8bit,  0, CPU_DISASSEMBLE_NAME(ds5002fp) },
+	{ "dsp16a",      _16le, -1, CPU_DISASSEMBLE_NAME(dsp16a) },
+	{ "dsp32c",      _32le,  0, CPU_DISASSEMBLE_NAME(dsp32c) },
+	{ "dsp56k",      _16le, -1, CPU_DISASSEMBLE_NAME(dsp56k) },
+	{ "e0c6200",     _16be, -1, CPU_DISASSEMBLE_NAME(e0c6200) },
+	{ "esrip",       _64be,  0, CPU_DISASSEMBLE_NAME(esrip) },
+	{ "f8",          _8bit,  0, CPU_DISASSEMBLE_NAME(f8) },
+	{ "g65816",      _8bit,  0, CPU_DISASSEMBLE_NAME(g65816_generic) },
+	{ "h6280",       _8bit,  0, CPU_DISASSEMBLE_NAME(h6280) },
+//  { "h8",          _16be,  0, CPU_DISASSEMBLE_NAME(h8) },
+//  { "h8_24",       _16be,  0, CPU_DISASSEMBLE_NAME(h8_24) },
+//  { "h8_32",       _16be,  0, CPU_DISASSEMBLE_NAME(h8_32) },
+	{ "hc11",        _8bit,  0, CPU_DISASSEMBLE_NAME(mb88) },
+	{ "hcd62121",    _16be,  0, CPU_DISASSEMBLE_NAME(hcd62121) },
+	{ "hd61700",     _8bit,  0, CPU_DISASSEMBLE_NAME(hd61700) },
+	{ "hd6301",      _8bit,  0, CPU_DISASSEMBLE_NAME(hd6301) },
+	{ "hd6309",      _8bit,  0, CPU_DISASSEMBLE_NAME(hd6309) },
+	{ "hd63701",     _8bit,  0, CPU_DISASSEMBLE_NAME(hd63701) },
+	{ "hmcs40",      _16le, -1, CPU_DISASSEMBLE_NAME(hmcs40) },
+	{ "hyperstone",  _16be,  0, CPU_DISASSEMBLE_NAME(hyperstone_generic) },
+	{ "i4004",       _8bit,  0, CPU_DISASSEMBLE_NAME(i4004) },
+	{ "i8008",       _8bit,  0, CPU_DISASSEMBLE_NAME(i8008) },
+	{ "i8051",       _8bit,  0, CPU_DISASSEMBLE_NAME(i8051) },
+	{ "i8052",       _8bit,  0, CPU_DISASSEMBLE_NAME(i8052) },
+	{ "i8085",       _8bit,  0, CPU_DISASSEMBLE_NAME(i8085) },
+	{ "i8089",       _8bit,  0, CPU_DISASSEMBLE_NAME(i8089) },
+	{ "i80c51",      _8bit,  0, CPU_DISASSEMBLE_NAME(i80c51) },
+	{ "i80c52",      _8bit,  0, CPU_DISASSEMBLE_NAME(i80c52) },
+	{ "i860",        _64le,  0, CPU_DISASSEMBLE_NAME(i860) },
+	{ "i960",        _32le,  0, CPU_DISASSEMBLE_NAME(i960) },
+	{ "ie15",        _8bit,  0, CPU_DISASSEMBLE_NAME(ie15) },
+	{ "jaguardsp",   _16be,  0, CPU_DISASSEMBLE_NAME(jaguardsp) },
+	{ "jaguargpu",   _16be,  0, CPU_DISASSEMBLE_NAME(jaguargpu) },
+	{ "kb1013vk12",  _8bit,  0, CPU_DISASSEMBLE_NAME(kb1013vk12) },
+	{ "konami",      _8bit,  0, CPU_DISASSEMBLE_NAME(konami) },
+	{ "lh5801",      _8bit,  0, CPU_DISASSEMBLE_NAME(lh5801) },
+	{ "lr35902",     _8bit,  0, CPU_DISASSEMBLE_NAME(lr35902) },
+	{ "m58846",      _16le, -1, CPU_DISASSEMBLE_NAME(m58846) },
+	{ "m37710",      _8bit,  0, CPU_DISASSEMBLE_NAME(m37710_generic) },
+	{ "m6800",       _8bit,  0, CPU_DISASSEMBLE_NAME(m6800) },
+	{ "m68000",      _16be,  0, CPU_DISASSEMBLE_NAME(m68000) },
+	{ "m68008",      _16be,  0, CPU_DISASSEMBLE_NAME(m68008) },
+	{ "m6801",       _8bit,  0, CPU_DISASSEMBLE_NAME(m6801) },
+	{ "m68010",      _16be,  0, CPU_DISASSEMBLE_NAME(m68010) },
+	{ "m6802",       _8bit,  0, CPU_DISASSEMBLE_NAME(m6802) },
+	{ "m68020",      _16be,  0, CPU_DISASSEMBLE_NAME(m68020) },
+	{ "m6803",       _8bit,  0, CPU_DISASSEMBLE_NAME(m6803) },
+	{ "m68030",      _16be,  0, CPU_DISASSEMBLE_NAME(m68030) },
+	{ "m68040",      _16be,  0, CPU_DISASSEMBLE_NAME(m68040) },
+	{ "m6805",       _8bit,  0, CPU_DISASSEMBLE_NAME(m6805) },
+	{ "m6808",       _8bit,  0, CPU_DISASSEMBLE_NAME(m6808) },
+	{ "m6809",       _8bit,  0, CPU_DISASSEMBLE_NAME(m6809) },
+	{ "m68340",      _16be,  0, CPU_DISASSEMBLE_NAME(m68340) },
+	{ "mb86233",     _32le, -2, CPU_DISASSEMBLE_NAME(mb86233) },
+	{ "mb88",        _8bit,  0, CPU_DISASSEMBLE_NAME(mb88) },
+	{ "mcs48",       _8bit,  0, CPU_DISASSEMBLE_NAME(mcs48) },
+	{ "minx",        _8bit,  0, CPU_DISASSEMBLE_NAME(minx) },
+	{ "mips3be",     _32be,  0, CPU_DISASSEMBLE_NAME(mips3be) },
+	{ "mips3le",     _32le,  0, CPU_DISASSEMBLE_NAME(mips3le) },
+	{ "mn10200",     _16le,  0, CPU_DISASSEMBLE_NAME(mn10200) },
+	{ "nec",         _8bit,  0, CPU_DISASSEMBLE_NAME(nec) },
+	{ "nsc8105",     _8bit,  0, CPU_DISASSEMBLE_NAME(nsc8105) },
+	{ "pdp1",        _32be,  0, CPU_DISASSEMBLE_NAME(pdp1) },
+	{ "pic16c5x",    _16le, -1, CPU_DISASSEMBLE_NAME(pic16c5x) },
+	{ "pic16c62x",   _16le, -1, CPU_DISASSEMBLE_NAME(pic16c62x) },
+	{ "powerpc",     _32be,  0, CPU_DISASSEMBLE_NAME(powerpc) },
+	{ "pps4",        _8bit,  0, CPU_DISASSEMBLE_NAME(pps4) },
+	{ "psxcpu",      _32le,  0, CPU_DISASSEMBLE_NAME(psxcpu_generic) },
+	{ "r3000be",     _32be,  0, CPU_DISASSEMBLE_NAME(r3000be) },
+	{ "r3000le",     _32le,  0, CPU_DISASSEMBLE_NAME(r3000le) },
+	{ "rsp",         _32le,  0, CPU_DISASSEMBLE_NAME(rsp) },
+	{ "s2650",       _8bit,  0, CPU_DISASSEMBLE_NAME(s2650) },
+	{ "saturn",      _8bit,  0, CPU_DISASSEMBLE_NAME(saturn) },
+	{ "sc61860",     _8bit,  0, CPU_DISASSEMBLE_NAME(sc61860) },
+	{ "scmp",        _8bit,  0, CPU_DISASSEMBLE_NAME(scmp) },
+	{ "scudsp",      _32be,  0, CPU_DISASSEMBLE_NAME(scudsp) },
+	{ "se3208",      _16le,  0, CPU_DISASSEMBLE_NAME(se3208) },
+	{ "sh2",         _16be,  0, CPU_DISASSEMBLE_NAME(sh2) },
+	{ "sh4",         _16le,  0, CPU_DISASSEMBLE_NAME(sh4) },
+	{ "sh4be",       _16be,  0, CPU_DISASSEMBLE_NAME(sh4be) },
+	{ "sharc",       _48le, -2, CPU_DISASSEMBLE_NAME(sharc) },
+	{ "sm500",       _8bit,  0, CPU_DISASSEMBLE_NAME(sm500) },
+	{ "sm510",       _8bit,  0, CPU_DISASSEMBLE_NAME(sm510) },
+	{ "sm511",       _8bit,  0, CPU_DISASSEMBLE_NAME(sm511) },
+	{ "sm8500",      _8bit,  0, CPU_DISASSEMBLE_NAME(sm8500) },
+	{ "sparcv7",     _32be,  0, CPU_DISASSEMBLE_NAME(sparcv7) },
+	{ "sparcv8",     _32be,  0, CPU_DISASSEMBLE_NAME(sparcv8) },
+	{ "sparcv9",     _32be,  0, CPU_DISASSEMBLE_NAME(sparcv9) },
+	{ "sparcv9vis1", _32be,  0, CPU_DISASSEMBLE_NAME(sparcv9vis1) },
+	{ "sparcv9vis2", _32be,  0, CPU_DISASSEMBLE_NAME(sparcv9vis2) },
+	{ "sparcv9vis2p",_32be,  0, CPU_DISASSEMBLE_NAME(sparcv9vis2p) },
+	{ "sparcv9vis3", _32be,  0, CPU_DISASSEMBLE_NAME(sparcv9vis3) },
+	{ "sparcv9vis3b",_32be,  0, CPU_DISASSEMBLE_NAME(sparcv9vis3b) },
+	{ "spc700",      _8bit,  0, CPU_DISASSEMBLE_NAME(spc700) },
+	{ "ssem",        _32le,  0, CPU_DISASSEMBLE_NAME(ssem) },
+	{ "ssp1601",     _16be, -1, CPU_DISASSEMBLE_NAME(ssp1601) },
+//  { "superfx",     _8bit,  0, CPU_DISASSEMBLE_NAME(superfx) },
+	{ "t11",         _16le,  0, CPU_DISASSEMBLE_NAME(t11) },
+//  { "t90",         _8bit,  0, CPU_DISASSEMBLE_NAME(t90) },
+	{ "tlcs900",     _8bit,  0, CPU_DISASSEMBLE_NAME(tlcs900) },
+	{ "tms0980",     _16be,  0, CPU_DISASSEMBLE_NAME(tms0980) },
+	{ "tms1000",     _8bit,  0, CPU_DISASSEMBLE_NAME(tms1000) },
+	{ "tms1100",     _8bit,  0, CPU_DISASSEMBLE_NAME(tms1100) },
+	{ "tms32010",    _16be, -1, CPU_DISASSEMBLE_NAME(tms32010) },
+	{ "tms32025",    _16be, -1, CPU_DISASSEMBLE_NAME(tms32025) },
+	{ "tms3203x",    _32le, -2, CPU_DISASSEMBLE_NAME(tms3203x) },
+	{ "tms32051",    _16le, -1, CPU_DISASSEMBLE_NAME(tms32051) },
+	{ "tms34010",    _8bit,  3, CPU_DISASSEMBLE_NAME(tms34010) },
+	{ "tms34020",    _8bit,  3, CPU_DISASSEMBLE_NAME(tms34020) },
+	{ "tms57002",    _32le, -2, CPU_DISASSEMBLE_NAME(tms57002) },
+	{ "tms7000",     _8bit,  0, CPU_DISASSEMBLE_NAME(tms7000) },
+	{ "tms9900",     _16be,  0, CPU_DISASSEMBLE_NAME(tms9900) },
+	{ "tms9980",     _8bit,  0, CPU_DISASSEMBLE_NAME(tms9980) },
+	{ "tms9995",     _8bit,  0, CPU_DISASSEMBLE_NAME(tms9995) },
+	{ "tp0320",      _16be,  0, CPU_DISASSEMBLE_NAME(tp0320) },
+	{ "tx0_64kw",    _32be, -2, CPU_DISASSEMBLE_NAME(tx0_64kw) },
+	{ "tx0_8kw",     _32be, -2, CPU_DISASSEMBLE_NAME(tx0_8kw) },
+	{ "ucom4",       _8bit,  0, CPU_DISASSEMBLE_NAME(ucom4) },
+	{ "unsp",        _16be,  0, CPU_DISASSEMBLE_NAME(unsp) },
+	{ "upd7725",     _32be,  0, CPU_DISASSEMBLE_NAME(unsp) },
+	{ "upd7801",     _8bit,  0, CPU_DISASSEMBLE_NAME(upd7801) },
+	{ "upd7807",     _8bit,  0, CPU_DISASSEMBLE_NAME(upd7807) },
+	{ "upd7810",     _8bit,  0, CPU_DISASSEMBLE_NAME(upd7810) },
+	{ "upd78c05",    _8bit,  0, CPU_DISASSEMBLE_NAME(upd78c05) },
+	{ "upi41",       _8bit,  0, CPU_DISASSEMBLE_NAME(upi41) },
+	{ "v60",         _8bit,  0, CPU_DISASSEMBLE_NAME(v60) },
+	{ "v70",         _8bit,  0, CPU_DISASSEMBLE_NAME(v70) },
+	{ "v810",        _16le,  0, CPU_DISASSEMBLE_NAME(v810) },
+	{ "x86_16",      _8bit,  0, CPU_DISASSEMBLE_NAME(x86_16) },
+	{ "x86_32",      _8bit,  0, CPU_DISASSEMBLE_NAME(x86_32) },
+	{ "x86_64",      _8bit,  0, CPU_DISASSEMBLE_NAME(x86_64) },
+	{ "z180",        _8bit,  0, CPU_DISASSEMBLE_NAME(z180) },
+	{ "z8",          _8bit,  0, CPU_DISASSEMBLE_NAME(z8) },
+	{ "z80",         _8bit,  0, CPU_DISASSEMBLE_NAME(z80) },
+//  { "z8000",       _16be,  0, CPU_DISASSEMBLE_NAME(z8000) },
 };
 
 
@@ -371,14 +394,11 @@ static int parse_options(int argc, char *argv[], options *opts)
 	int pending_mode = FALSE;
 	int pending_skip = FALSE;
 	int pending_count = FALSE;
-	int curarch;
-	int numrows;
-	int arg;
 
 	memset(opts, 0, sizeof(*opts));
 
 	// loop through arguments
-	for (arg = 1; arg < argc; arg++)
+	for (unsigned arg = 1; arg < argc; arg++)
 	{
 		char *curarg = argv[arg];
 
@@ -436,6 +456,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 		// architecture
 		else if (pending_arch)
 		{
+			int curarch;
 			for (curarch = 0; curarch < ARRAY_LENGTH(dasm_table); curarch++)
 				if (core_stricmp(curarg, dasm_table[curarch].name) == 0)
 					break;
@@ -485,15 +506,17 @@ usage:
 	printf("   [-skip <n>] [-count <n>]\n");
 	printf("\n");
 	printf("Supported architectures:");
-	numrows = (ARRAY_LENGTH(dasm_table) + 6) / 7;
-	for (curarch = 0; curarch < numrows * 7; curarch++)
+	const int colwidth = 1 + std::strlen(std::max_element(std::begin(dasm_table), std::end(dasm_table), [](const dasm_table_entry &a, const dasm_table_entry &b) { return std::strlen(a.name) < std::strlen(b.name); })->name);
+	const int columns = std::max(1, 80 / colwidth);
+	const int numrows = (ARRAY_LENGTH(dasm_table) + columns - 1) / columns;
+	for (unsigned curarch = 0; curarch < numrows * columns; curarch++)
 	{
-		int row = curarch / 7;
-		int col = curarch % 7;
-		int index = col * numrows + row;
+		const int row = curarch / columns;
+		const int col = curarch % columns;
+		const int index = col * numrows + row;
 		if (col == 0)
 			printf("\n  ");
-		printf("%-11s", (index < ARRAY_LENGTH(dasm_table)) ? dasm_table[index].name : "");
+		printf("%-*s", colwidth, (index < ARRAY_LENGTH(dasm_table)) ? dasm_table[index].name : "");
 	}
 	printf("\n");
 	return 1;

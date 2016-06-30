@@ -328,7 +328,7 @@ public:
 	DECLARE_WRITE16_MEMBER(spc_latch_outfifo_error_stats);
 	DECLARE_READ16_MEMBER(spc_infifo_data_r);
 	DECLARE_WRITE16_MEMBER(spc_outfifo_data_w);
-	DECLARE_READ16_MEMBER(spc_semaphore_r);
+	DECLARE_READ_LINE_MEMBER(spc_semaphore_r);
 	DECLARE_DRIVER_INIT(dectalk);
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(outfifo_read_cb);
@@ -735,7 +735,7 @@ WRITE16_MEMBER(dectalk_state::spc_outfifo_data_w)
 	//dectalk_outfifo_check(); // outfifo check should only be done in the audio 10khz polling function
 }
 
-READ16_MEMBER(dectalk_state::spc_semaphore_r)// Return state of d-latch 74ls74 @ E64 'lower half' in d0 which indicates whether infifo is readable
+READ_LINE_MEMBER(dectalk_state::spc_semaphore_r)// Return state of d-latch 74ls74 @ E64 'lower half' in d0 which indicates whether infifo is readable
 {
 #ifdef SPC_LOG_DSP
 	//logerror("dsp: read infifo semaphore, returned %d\n", m_infifo_semaphore); // commented due to extreme annoyance factor
@@ -793,7 +793,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(tms32010_io, AS_IO, 16, dectalk_state )
 	AM_RANGE(0, 0) AM_WRITE(spc_latch_outfifo_error_stats) // *set* the outfifo_status_r semaphore, and also latch the error bit at D0.
 	AM_RANGE(1, 1) AM_READWRITE(spc_infifo_data_r, spc_outfifo_data_w) //read from input fifo, write to sound fifo
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(spc_semaphore_r) //read infifo-has-data-in-it fifo readable status
 	//AM_RANGE(8, 8) //the newer firmware seems to want something mapped here?
 ADDRESS_MAP_END
 
@@ -877,6 +876,7 @@ static MACHINE_CONFIG_START( dectalk, dectalk_state )
 	MCFG_CPU_ADD("dsp", TMS32010, XTAL_20MHz) /* Y1 20MHz xtal */
 	MCFG_CPU_PROGRAM_MAP(tms32010_mem)
 	MCFG_CPU_IO_MAP(tms32010_io)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(dectalk_state, spc_semaphore_r)) //read infifo-has-data-in-it fifo readable status
 #ifdef USE_LOOSE_TIMING
 	MCFG_QUANTUM_TIME(attotime::from_hz(100))
 #else

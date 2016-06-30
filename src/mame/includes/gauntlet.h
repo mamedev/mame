@@ -8,7 +8,7 @@
 
 #include "machine/atarigen.h"
 #include "video/atarimo.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
 

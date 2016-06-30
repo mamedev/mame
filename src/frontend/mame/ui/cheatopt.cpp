@@ -18,7 +18,6 @@
 
 
 namespace ui {
-
 // itemrefs for key menu items
 #define ITEMREF_CHEATS_RESET_ALL            ((void *) 0x0001)
 #define ITEMREF_CHEATS_RELOAD_ALL           ((void *) 0x0002)

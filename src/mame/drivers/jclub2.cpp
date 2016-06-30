@@ -1262,7 +1262,7 @@ ROM_START( jclub2o )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // z80 core (used for sound?)
 	ROM_LOAD( "sx006-04.u87", 0x00000, 0x80000, CRC(a87adedd) SHA1(1cd5af2d03738fff2230b46241659179467c828c) )
 
-	ROM_REGION( 0x100, "eeprom", 0 ) // eeprom 16 bit one!!!
+	ROM_REGION16_BE( 0x100, "eeprom", 0 ) // eeprom 16 bit one!!!
 	ROM_LOAD( "eeprom-jclub2o.bin", 0x0000, 0x100, CRC(dd1c88ec) SHA1(acb67e41e832f203361e0f93afcd4eaf963fd13e) )   //jclub2ob ones
 ROM_END
 
@@ -1283,7 +1283,7 @@ ROM_START( jclub2ob )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // z80 core (used for sound?)
 	ROM_LOAD( "sx006-04.u87", 0x00000, 0x80000, CRC(a87adedd) SHA1(1cd5af2d03738fff2230b46241659179467c828c) )
 
-	ROM_REGION( 0x100, "eeprom", 0 ) // eeprom 16 bit one!!!
+	ROM_REGION16_BE( 0x100, "eeprom", 0 ) // eeprom 16 bit one!!!
 	ROM_LOAD( "eeprom-jclub2o.bin", 0x0000, 0x100, CRC(dd1c88ec) SHA1(acb67e41e832f203361e0f93afcd4eaf963fd13e) )
 ROM_END
 

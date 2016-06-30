@@ -30,7 +30,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 //#define nl_ext_double _float128 // slow, very slow
 //#define nl_ext_double long double // slightly slower
 #define nl_ext_double nl_double

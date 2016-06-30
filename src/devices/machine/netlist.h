@@ -66,11 +66,11 @@
 // Extensions to interface netlist with MAME code ....
 // ----------------------------------------------------------------------------------------
 
-class netlist_source_memregion_t : public netlist::setup_t::source_t
+class netlist_source_memregion_t : public netlist::source_t
 {
 public:
 	netlist_source_memregion_t(pstring name)
-	: netlist::setup_t::source_t(), m_name(name)
+	: netlist::source_t(), m_name(name)
 	{
 	}
 
@@ -80,7 +80,7 @@ private:
 };
 
 #define MEMREGION_SOURCE(_name) \
-		setup.register_source(std::make_shared<netlist_source_memregion_t>(_name));
+		setup.register_source(plib::make_unique_base<netlist::source_t, netlist_source_memregion_t>(_name));
 
 #define NETDEV_ANALOG_CALLBACK_MEMBER(_name) \
 	void _name(const double data, const attotime &time)
@@ -680,8 +680,6 @@ public:
 	, m_feedback(*this, "FB") // clock part
 	, m_Q(*this, "Q")
 	{
-
-
 		connect_late(m_feedback, m_Q);
 		m_inc = netlist::netlist_time::from_nsec(1);
 

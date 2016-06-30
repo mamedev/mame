@@ -666,6 +666,7 @@ BUSES["SATURN"] = true
 BUSES["SCSI"] = true
 BUSES["SCV"] = true
 BUSES["SEGA8"] = true
+BUSES["SG1000_EXP"] = true
 BUSES["SMS_CTRL"] = true
 BUSES["SMS_EXP"] = true
 BUSES["SNES"] = true
@@ -1069,6 +1070,7 @@ files {
 	MAME_DIR .. "src/mame/video/cps1.cpp",
 	MAME_DIR .. "src/mame/video/chihiro.cpp",
 	MAME_DIR .. "src/mame/machine/xbox.cpp",
+	MAME_DIR .. "src/mame/machine/xbox_usb.cpp",
 	MAME_DIR .. "src/mame/includes/saturn.h",
 	MAME_DIR .. "src/mame/drivers/saturn.cpp",
 	MAME_DIR .. "src/mame/machine/saturn.cpp",
@@ -2017,6 +2019,7 @@ createMESSProjects(_target, _subtarget, "microsoft")
 files {
 	MAME_DIR .. "src/mame/drivers/xbox.cpp",
 	MAME_DIR .. "src/mame/includes/xbox.h",
+	MAME_DIR .. "src/mame/includes/xbox_usb.h",
 }
 
 createMESSProjects(_target, _subtarget, "mit")

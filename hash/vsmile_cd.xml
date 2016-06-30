@@ -117,7 +117,7 @@ Language:
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="bratz" supported="no">
 		<!--
 		 Original files:
@@ -135,7 +135,7 @@ Language:
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="cars" supported="no">
 		<!--
 		 Original files:
@@ -153,7 +153,7 @@ Language:
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="carsg" cloneof="cars" supported="no">
 		<!--
 		 Original files (from TeamEurope)
@@ -170,7 +170,7 @@ Language:
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="princess" supported="no">
 		<!--
 		 Original files:
@@ -188,7 +188,7 @@ Language:
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="princessg" cloneof="princess" supported="no">
 		<!--
 		 Original files (from TeamEurope)
@@ -225,7 +225,7 @@ Language:
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="incredibg" cloneof="incredib" supported="no">
 		<!--
 		Original files (from TeamEurope)
@@ -242,7 +242,7 @@ Language:
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="msportg" supported="no">
 		<!--
 		 Original files (from TeamEurope)
@@ -279,7 +279,7 @@ Language:
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="shrek3" supported="no">
 		<!--
 		 Original files:
@@ -297,7 +297,7 @@ Language:
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="shrek3g" cloneof="shrek3" supported="no">
 		<!--
 		Original files (from TeamEurope)
@@ -314,7 +314,7 @@ Language:
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="spongeis" supported="no">
 		<!--
 		 Original files:
@@ -349,7 +349,7 @@ Language:
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- disk mounted as 93120_003 -->
 	<software name="wackyrac" supported="no">
 		<!--

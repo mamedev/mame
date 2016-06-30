@@ -87,7 +87,7 @@
 #include "machine/deco102.h"
 #include "machine/decocrpt.h"
 #include "machine/gen_latch.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 
 READ16_MEMBER( boogwing_state::boogwing_protection_region_0_104_r )

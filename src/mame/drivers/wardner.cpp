@@ -232,7 +232,6 @@ static ADDRESS_MAP_START( DSP_io_map, AS_IO, 16, wardner_state )
 	AM_RANGE(0x00, 0x00) AM_WRITE(wardner_dsp_addrsel_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(wardner_dsp_r, wardner_dsp_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(twincobr_dsp_bio_w)
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(twincobr_BIO_r)
 ADDRESS_MAP_END
 
 
@@ -384,6 +383,7 @@ static MACHINE_CONFIG_START( wardner, wardner_state )
 	MCFG_CPU_PROGRAM_MAP(DSP_program_map)
 	/* Data Map is internal to the CPU */
 	MCFG_CPU_IO_MAP(DSP_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(wardner_state, twincobr_BIO_r))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))      /* 100 CPU slices per frame */
 

@@ -17,7 +17,6 @@
 #include "palloc.h"
 
 namespace plib {
-
 pfmt::pfmt(const pstring &fmt)
 : m_str(m_str_buf), m_allocated(0), m_arg(0)
 {
@@ -141,4 +140,3 @@ void pfmt::format_element(const char *f, const char *l, const char *fmt_spec,  .
 }
 
 }
-

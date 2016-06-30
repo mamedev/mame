@@ -21,7 +21,7 @@ likewise a 2 screen game
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
 #include "cpu/z80/z80.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "rendlay.h"
 #include "includes/xmen.h"
 #include "includes/konamipt.h"

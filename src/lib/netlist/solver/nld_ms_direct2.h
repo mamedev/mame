@@ -15,7 +15,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 class matrix_solver_direct2_t: public matrix_solver_direct_t<2,2>
 {
 public:

@@ -10,11 +10,8 @@
 
 namespace netlist
 {
-
-
 	namespace devices
 	{
-
 	NETLIB_OBJECT(CD4020_sub)
 	{
 		NETLIB_CONSTRUCTOR(CD4020_sub)

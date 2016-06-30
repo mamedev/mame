@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( pandoras_sound_map, AS_PROGRAM, 8, pandoras_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pandoras_i8039_map, AS_PROGRAM, 8, pandoras_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pandoras_i8039_io_map, AS_IO, 8, pandoras_state )

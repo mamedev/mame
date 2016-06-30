@@ -13,9 +13,9 @@
  * In this specific implementation, u is a unit vector specifying the row which
  * changed. Thus v contains the changed column.
  *
- * Than z = A⁻¹ u ,  w = transpose(A⁻¹) v , lambda = v z
+ * Than z = A^-1 u ,  w = transpose(A^-1) v , lambda = v z
  *
- * A⁻¹ <- 1.0 / (1.0 + lambda) * (z x w)
+ * A^-1 <- 1.0 / (1.0 + lambda) * (z x w)
  *
  * The approach is iterative and applied for each row changed.
  *
@@ -43,7 +43,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 //#define nl_ext_double _float128 // slow, very slow
 //#define nl_ext_double long double // slightly slower
 #define nl_ext_double nl_double

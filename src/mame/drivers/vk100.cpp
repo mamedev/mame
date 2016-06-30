@@ -728,7 +728,7 @@ ADDRESS_MAP_END
 */
 static ADDRESS_MAP_START(vk100_io, AS_IO, 8, vk100_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x7f) // guess, probably correct
+	ADDRESS_MAP_GLOBAL_MASK(0xff) // guess, probably correct
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xBE) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0xBE) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	// Comments are from page 118 (5-14) of http://web.archive.org/web/20091015205827/http://www.computer.museum.uq.edu.au/pdf/EK-VK100-TM-001%20VK100%20Technical%20Manual.pdf

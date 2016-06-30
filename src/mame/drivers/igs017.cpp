@@ -48,7 +48,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z180/z180.h"
 #include "machine/i8255.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "sound/okim6295.h"
 #include "machine/igs025.h"
 #include "machine/igs022.h"

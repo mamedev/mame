@@ -14,7 +14,6 @@
 #define MAME_FRONTEND_UI_MAINMENU_H
 
 namespace ui {
-
 class menu_main : public menu
 {
 public:

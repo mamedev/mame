@@ -42,7 +42,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 /*
  * Type = 0: Impedance changer
  *        1; Idealized opamp

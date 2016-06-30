@@ -42,7 +42,7 @@ namespace netlist
 
 		constexpr explicit ptime(const double t) = delete;
 		//: m_time((internal_type) ( t * (double) resolution)) { }
-		constexpr explicit ptime(const internal_type nom, const internal_type den)
+		constexpr explicit ptime(const internal_type nom, const internal_type den) NOEXCEPT
 		: m_time(nom * (resolution / den)) { }
 
 		ptime &operator=(const ptime rhs) { m_time = rhs.m_time; return *this; }
@@ -100,7 +100,7 @@ namespace netlist
 
 		friend bool operator!=(const ptime &lhs, const ptime &rhs)
 		{
-			return lhs.m_time != rhs.m_time;
+			return !(lhs == rhs);
 		}
 
 		constexpr internal_type as_raw() const { return m_time; }
@@ -109,16 +109,16 @@ namespace netlist
 		// for save states ....
 		internal_type *get_internaltype_ptr() { return &m_time; }
 
-		static inline constexpr ptime from_nsec(const internal_type ns) { return ptime(ns, UINT64_C(1000000000)); }
-		static inline constexpr ptime from_usec(const internal_type us) { return ptime(us, UINT64_C(1000000)); }
-		static inline constexpr ptime from_msec(const internal_type ms) { return ptime(ms, UINT64_C(1000)); }
-		static inline constexpr ptime from_hz(const internal_type hz) { return ptime(1 , hz); }
-		static inline constexpr ptime from_raw(const internal_type raw) { return ptime(raw, resolution); }
-		static inline constexpr ptime from_double(const double t) { return ptime((internal_type) ( t * (double) resolution), resolution); }
+		static constexpr ptime from_nsec(const internal_type ns) { return ptime(ns, UINT64_C(1000000000)); }
+		static constexpr ptime from_usec(const internal_type us) { return ptime(us, UINT64_C(1000000)); }
+		static constexpr ptime from_msec(const internal_type ms) { return ptime(ms, UINT64_C(1000)); }
+		static constexpr ptime from_hz(const internal_type hz) { return ptime(1 , hz); }
+		static constexpr ptime from_raw(const internal_type raw) { return ptime(raw, resolution); }
+		static constexpr ptime from_double(const double t) { return ptime((internal_type) ( t * (double) resolution), resolution); }
 
-		static inline constexpr ptime zero() { return ptime(0, resolution); }
-		static inline constexpr ptime quantum() { return ptime(1, resolution); }
-		static inline constexpr ptime never() { return ptime(plib::numeric_limits<internal_type>::max(), resolution); }
+		static constexpr ptime zero() { return ptime(0, resolution); }
+		static constexpr ptime quantum() { return ptime(1, resolution); }
+		static constexpr ptime never() { return ptime(plib::numeric_limits<internal_type>::max(), resolution); }
 	private:
 		internal_type m_time;
 	};

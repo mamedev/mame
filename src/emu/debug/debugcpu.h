@@ -172,12 +172,8 @@ public:
 	symbol_table &symtable() { return m_symtable; }
 
 	// commonly-used pass-throughs
-	offs_t pc() const { return (m_state != nullptr) ? m_state->pc() : 0; }
-	int logaddrchars(address_spacenum spacenum = AS_0) const { return (m_memory != nullptr && m_memory->has_space(spacenum)) ? m_memory->space(spacenum).logaddrchars() : 8; }
-	int min_opcode_bytes() const { return (m_disasm != nullptr) ? m_disasm->max_opcode_bytes() : 1; }
-	int max_opcode_bytes() const { return (m_disasm != nullptr) ? m_disasm->max_opcode_bytes() : 1; }
+	int logaddrchars() const { return (m_memory != nullptr && m_memory->has_space(AS_PROGRAM)) ? m_memory->space(AS_PROGRAM).logaddrchars() : 8; }
 	device_t& device() const { return m_device; }
-
 
 	// hooks used by the rest of the system
 	void start_hook(const attotime &endtime);
@@ -322,7 +318,6 @@ private:
 
 	// disassembly
 	dasm_override_func      m_dasm_override;            // pointer to provided override function
-	UINT8                   m_opwidth;                  // width of an opcode
 
 	// stepping information
 	offs_t                  m_stepaddr;                 // step target address for DEBUG_FLAG_STEPPING_OVER
@@ -608,36 +603,35 @@ private:
 	/* internal helpers */
 	void on_vblank(screen_device &device, bool vblank_state);
 
-	running_machine&	m_machine;
+	running_machine&    m_machine;
 
-	device_t *	m_livecpu;
-	device_t *	m_visiblecpu;
-	device_t *	m_breakcpu;
+	device_t *  m_livecpu;
+	device_t *  m_visiblecpu;
+	device_t *  m_breakcpu;
 
-	FILE *		m_source_file;			// script source file
+	FILE *      m_source_file;          // script source file
 
-	std::unique_ptr<symbol_table> m_symtable;			// global symbol table
+	std::unique_ptr<symbol_table> m_symtable;           // global symbol table
 
-	bool	m_within_instruction_hook;
-	bool	m_vblank_occurred;
-	bool	m_memory_modified;
-	bool	m_debugger_access;
+	bool    m_within_instruction_hook;
+	bool    m_vblank_occurred;
+	bool    m_memory_modified;
+	bool    m_debugger_access;
 
-	int			m_execution_state;
-	device_t *	m_stop_when_not_device;	// stop execution when the device ceases to be this
+	int         m_execution_state;
+	device_t *  m_stop_when_not_device; // stop execution when the device ceases to be this
 
-	UINT32		m_bpindex;
-	UINT32		m_wpindex;
-	UINT32		m_rpindex;
+	UINT32      m_bpindex;
+	UINT32      m_wpindex;
+	UINT32      m_rpindex;
 
-	UINT64		m_wpdata;
-	UINT64		m_wpaddr;
+	UINT64      m_wpdata;
+	UINT64      m_wpaddr;
 	std::unique_ptr<UINT64[]> m_tempvar;
 
-	osd_ticks_t	m_last_periodic_update_time;
+	osd_ticks_t m_last_periodic_update_time;
 
-	bool		m_comments_loaded;
+	bool        m_comments_loaded;
 };
 
 #endif
-

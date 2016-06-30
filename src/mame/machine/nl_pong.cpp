@@ -27,7 +27,6 @@ NETLIST_START(pong_fast)
 	TTL_INPUT(high, 1)
 	TTL_INPUT(low, 0)
 
-#if 1
 #if (FAST_CLOCK)
 	/* abstracting this, performance increases by 60%
 	 * No surprise, the clock is extremely expensive */
@@ -37,12 +36,6 @@ NETLIST_START(pong_fast)
 	MAINCLOCK(xclk, 14318000.0) //7159000.0*2
 	TTL_74107(ic_f6a, xclk, high, high, high)
 	ALIAS(clk, ic_f6a.Q)
-#endif
-#else
-	// benchmarking ...
-	NETDEV_TTL_CONST(clk, 0)
-	MAINCLOCK(xclk)
-	PARAM(xclk.FREQ, 7159000.0*2)
 #endif
 
 	/* 3V Logic - Just a resistor - the value is not given in schematics */
@@ -577,5 +570,41 @@ NETLIST_START(pong_fast)
 	NET_C(RV2.2, RV3.2)
 
 	ALIAS(videomix, RV3.2)
+#if 1
+	HINT(clk, NO_DEACTIVATE)
+	HINT(ic_e1d, NO_DEACTIVATE)
+	HINT(ic_e1c, NO_DEACTIVATE)
+	HINT(ic_f1.A, NO_DEACTIVATE)
+	HINT(ic_f1.D, NO_DEACTIVATE)
+	HINT(ic_g1d, NO_DEACTIVATE)
+	HINT(ic_h1a, NO_DEACTIVATE)
+	HINT(ic_h1d, NO_DEACTIVATE)
+	HINT(ic_h3b.sub, NO_DEACTIVATE)
+	HINT(ic_g6b.sub, NO_DEACTIVATE)
+	HINT(ic_c2a.sub, NO_DEACTIVATE)
+	HINT(hit_sound, NO_DEACTIVATE)
+	HINT(topbothitsound, NO_DEACTIVATE)
+	HINT(ic_c9b, NO_DEACTIVATE)
+	HINT(ic_b8.D, NO_DEACTIVATE)
+	HINT(ic_b7a, NO_DEACTIVATE)
+	HINT(ic_a7b, NO_DEACTIVATE)
+	HINT(ic_c9a, NO_DEACTIVATE)
+	HINT(ic_a8.D, NO_DEACTIVATE)
+	HINT(ic_b7d, NO_DEACTIVATE)
+	HINT(ic_a7a, NO_DEACTIVATE)
+	HINT(ic_g1a, NO_DEACTIVATE)
+	HINT(ic_c8a.sub, NO_DEACTIVATE)
+	HINT(ic_c8b.sub, NO_DEACTIVATE)
+	HINT(ic_d8b, NO_DEACTIVATE)
+	HINT(ic_d6a.sub, NO_DEACTIVATE)
+	HINT(ic_d6b.sub, NO_DEACTIVATE)
+	HINT(ic_c6a.sub, NO_DEACTIVATE)
+	HINT(ic_c6b.sub, NO_DEACTIVATE)
+	HINT(ic_e5b, NO_DEACTIVATE)
+	HINT(ic_e4c, NO_DEACTIVATE)
+	HINT(ic_d4b, NO_DEACTIVATE)
+	HINT(ic_g1b, NO_DEACTIVATE)
+#endif
+
 
 NETLIST_END()

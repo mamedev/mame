@@ -55,7 +55,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "machine/eepromser.h"
 
 

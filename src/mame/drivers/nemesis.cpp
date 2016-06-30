@@ -54,7 +54,7 @@ So this is the correct behavior of real hardware, not an emulation bug.
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/3812intf.h"
 #include "sound/k051649.h"
 #include "includes/nemesis.h"

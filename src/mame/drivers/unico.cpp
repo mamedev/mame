@@ -28,7 +28,7 @@ Year + Game         PCB             Notes
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "includes/unico.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 

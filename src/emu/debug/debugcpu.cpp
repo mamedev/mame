@@ -36,19 +36,19 @@ const size_t debugger_cpu::NUM_TEMP_VARIABLES = 10;
 
 debugger_cpu::debugger_cpu(running_machine &machine)
 	: m_machine(machine)
-    , m_livecpu(nullptr)
-    , m_visiblecpu(nullptr)
-    , m_breakcpu(nullptr)
-    , m_source_file(nullptr)
-    , m_symtable(nullptr)
-    , m_execution_state(EXECUTION_STATE_STOPPED)
-    , m_bpindex(1)
-    , m_wpindex(1)
-    , m_rpindex(1)
-    , m_wpdata(0)
-    , m_wpaddr(0)
+	, m_livecpu(nullptr)
+	, m_visiblecpu(nullptr)
+	, m_breakcpu(nullptr)
+	, m_source_file(nullptr)
+	, m_symtable(nullptr)
+	, m_execution_state(EXECUTION_STATE_STOPPED)
+	, m_bpindex(1)
+	, m_wpindex(1)
+	, m_rpindex(1)
+	, m_wpdata(0)
+	, m_wpaddr(0)
 	, m_last_periodic_update_time(0)
-    , m_comments_loaded(false)
+	, m_comments_loaded(false)
 {
 	screen_device *first_screen = m_machine.first_screen();
 
@@ -327,7 +327,7 @@ bool debugger_cpu::comment_load(bool is_inline)
 			{
 				if(is_inline == false)
 					m_machine.debugger().console().printf("@%s\n", cputag_name);
-				
+
 				if (!device->debug()->comment_import(*cpunode,is_inline))
 					throw emu_exception();
 			}
@@ -392,11 +392,11 @@ UINT8 debugger_cpu::read_byte(address_space &space, offs_t address, int apply_tr
 		result = 0xff;
 	}
 	else if (space.device().memory().read(space.spacenum(), address, 1, custom))
-	{	/* if there is a custom read handler, and it returns true, use that value */
+	{   /* if there is a custom read handler, and it returns true, use that value */
 		result = custom;
 	}
 	else
-	{	/* otherwise, call the byte reading function for the translated address */
+	{   /* otherwise, call the byte reading function for the translated address */
 		result = space.read_byte(address);
 	}
 
@@ -419,7 +419,7 @@ UINT16 debugger_cpu::read_word(address_space &space, offs_t address, int apply_t
 
 	UINT16 result;
 	if (!WORD_ALIGNED(address))
-	{	/* if this is misaligned read, or if there are no word readers, just read two bytes */
+	{   /* if this is misaligned read, or if there are no word readers, just read two bytes */
 		UINT8 byte0 = read_byte(space, address + 0, apply_translation);
 		UINT8 byte1 = read_byte(space, address + 1, apply_translation);
 
@@ -430,7 +430,7 @@ UINT16 debugger_cpu::read_word(address_space &space, offs_t address, int apply_t
 			result = byte1 | (byte0 << 8);
 	}
 	else
-	{	/* otherwise, this proceeds like the byte case */
+	{   /* otherwise, this proceeds like the byte case */
 
 		/* all accesses from this point on are for the debugger */
 		m_debugger_access = true;
@@ -443,11 +443,11 @@ UINT16 debugger_cpu::read_word(address_space &space, offs_t address, int apply_t
 			result = 0xffff;
 		}
 		else if (space.device().memory().read(space.spacenum(), address, 2, custom))
-		{	/* if there is a custom read handler, and it returns true, use that value */
+		{   /* if there is a custom read handler, and it returns true, use that value */
 			result = custom;
 		}
 		else
-		{	/* otherwise, call the byte reading function for the translated address */
+		{   /* otherwise, call the byte reading function for the translated address */
 			result = space.read_word(address);
 		}
 
@@ -472,7 +472,7 @@ UINT32 debugger_cpu::read_dword(address_space &space, offs_t address, int apply_
 
 	UINT32 result;
 	if (!DWORD_ALIGNED(address))
-	{	/* if this is a misaligned read, or if there are no dword readers, just read two words */
+	{   /* if this is a misaligned read, or if there are no dword readers, just read two words */
 		UINT16 word0 = read_word(space, address + 0, apply_translation);
 		UINT16 word1 = read_word(space, address + 2, apply_translation);
 
@@ -483,7 +483,7 @@ UINT32 debugger_cpu::read_dword(address_space &space, offs_t address, int apply_
 			result = word1 | (word0 << 16);
 	}
 	else
-	{	/* otherwise, this proceeds like the byte case */
+	{   /* otherwise, this proceeds like the byte case */
 
 		/* all accesses from this point on are for the debugger */
 		m_debugger_access = true;
@@ -491,15 +491,15 @@ UINT32 debugger_cpu::read_dword(address_space &space, offs_t address, int apply_
 
 		UINT64 custom;
 		if (apply_translation && !translate(space, TRANSLATE_READ_DEBUG, &address))
-		{	/* translate if necessary; if not mapped, return 0xffffffff */
+		{   /* translate if necessary; if not mapped, return 0xffffffff */
 			result = 0xffffffff;
 		}
 		else if (space.device().memory().read(space.spacenum(), address, 4, custom))
-		{	/* if there is a custom read handler, and it returns true, use that value */
+		{   /* if there is a custom read handler, and it returns true, use that value */
 			result = custom;
 		}
 		else
-		{	/* otherwise, call the byte reading function for the translated address */
+		{   /* otherwise, call the byte reading function for the translated address */
 			result = space.read_dword(address);
 		}
 
@@ -524,7 +524,7 @@ UINT64 debugger_cpu::read_qword(address_space &space, offs_t address, int apply_
 
 	UINT64 result;
 	if (!QWORD_ALIGNED(address))
-	{	/* if this is a misaligned read, or if there are no qword readers, just read two dwords */
+	{   /* if this is a misaligned read, or if there are no qword readers, just read two dwords */
 		UINT32 dword0 = read_dword(space, address + 0, apply_translation);
 		UINT32 dword1 = read_dword(space, address + 4, apply_translation);
 
@@ -535,7 +535,7 @@ UINT64 debugger_cpu::read_qword(address_space &space, offs_t address, int apply_
 			result = dword1 | ((UINT64)dword0 << 32);
 	}
 	else
-	{	/* otherwise, this proceeds like the byte case */
+	{   /* otherwise, this proceeds like the byte case */
 
 		/* all accesses from this point on are for the debugger */
 		m_debugger_access = true;
@@ -548,11 +548,11 @@ UINT64 debugger_cpu::read_qword(address_space &space, offs_t address, int apply_
 			result = ~(UINT64)0;
 		}
 		else if (space.device().memory().read(space.spacenum(), address, 8, custom))
-		{	/* if there is a custom read handler, and it returns true, use that value */
+		{   /* if there is a custom read handler, and it returns true, use that value */
 			result = custom;
 		}
 		else
-		{	/* otherwise, call the byte reading function for the translated address */
+		{   /* otherwise, call the byte reading function for the translated address */
 			result = space.read_qword(address);
 		}
 
@@ -1528,13 +1528,13 @@ void debugger_cpu::start_hook(device_t *device, bool stop_on_vblank)
 	if (m_execution_state != EXECUTION_STATE_STOPPED)
 	{
 		if (device == m_visiblecpu && osd_ticks() > m_last_periodic_update_time + osd_ticks_per_second() / 4)
-		{	// check for periodic updates
+		{   // check for periodic updates
 			m_machine.debug_view().update_all();
 			m_machine.debug_view().flush_osd_updates();
 			m_last_periodic_update_time = osd_ticks();
 		}
 		else if (device == m_breakcpu)
-		{	// check for pending breaks
+		{   // check for pending breaks
 			m_execution_state = EXECUTION_STATE_STOPPED;
 			m_breakcpu = nullptr;
 		}
@@ -1632,7 +1632,6 @@ device_debug::device_debug(device_t &device)
 	, m_symtable(&device, device.machine().debugger().cpu().get_global_symtable())
 	, m_instrhook(nullptr)
 	, m_dasm_override(nullptr)
-	, m_opwidth(0)
 	, m_stepaddr(0)
 	, m_stepsleft(0)
 	, m_stopaddr(0)
@@ -1698,7 +1697,6 @@ device_debug::device_debug(device_t &device)
 	if (m_exec != nullptr)
 	{
 		m_flags = DEBUG_FLAG_OBSERVING | DEBUG_FLAG_HISTORY;
-		m_opwidth = min_opcode_bytes();
 
 		// if no curpc, add one
 		if (m_state != nullptr && m_symtable.find("curpc") == nullptr)
@@ -1920,7 +1918,7 @@ void device_debug::instruction_hook(offs_t curpc)
 
 	// handle step out/over on the instruction we are about to execute
 	if ((m_flags & (DEBUG_FLAG_STEPPING_OVER | DEBUG_FLAG_STEPPING_OUT)) != 0 && m_stepaddr == ~0)
-		prepare_for_step_overout(pc());
+		prepare_for_step_overout(m_device.safe_pc());
 
 	// no longer in debugger code
 	debugcpu.set_within_instruction(false);
@@ -1997,7 +1995,7 @@ offs_t device_debug::disassemble(char *buffer, offs_t pc, const UINT8 *oprom, co
 		result = m_disasm->disassemble(buffer, pc, oprom, opram, 0);
 
 	// make sure we get good results
-	assert((result & DASMFLAG_LENGTHMASK) != 0);
+	assert((result & DASMFLAG_LENGTHMASK) != 0 || m_disasm == nullptr);
 #ifdef MAME_DEBUG
 	if (m_memory != nullptr && m_disasm != nullptr)
 	{
@@ -2615,7 +2613,7 @@ bool device_debug::comment_export(xml_data_node &curnode)
 //-------------------------------------------------
 
 bool device_debug::comment_import(xml_data_node &cpunode,bool is_inline)
-{	
+{
 	// iterate through nodes
 	for (xml_data_node *datanode = xml_get_sibling(cpunode.child, "comment"); datanode; datanode = xml_get_sibling(datanode->next, "comment"))
 	{
@@ -2653,7 +2651,7 @@ UINT32 device_debug::compute_opcode_crc32(offs_t pc) const
 
 	// fetch the bytes up to the maximum
 	UINT8 opbuf[64], argbuf[64];
-	int maxbytes = max_opcode_bytes();
+	int maxbytes = (m_disasm != nullptr) ? m_disasm->max_opcode_bytes() : 1;
 	for (int numbytes = 0; numbytes < maxbytes; numbytes++)
 	{
 		opbuf[numbytes] = m_device.machine().debugger().cpu().read_opcode(decrypted_space, pcbyte + numbytes, 1);
@@ -2966,7 +2964,7 @@ void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t addre
 				{
 					"0bytes", "byte", "word", "3bytes", "dword", "5bytes", "6bytes", "7bytes", "qword"
 				};
-				offs_t pc = space.device().debug()->pc();
+				offs_t pc = space.device().safe_pc();
 				std::string buffer;
 
 				if (type & WATCHPOINT_WRITE)
@@ -2996,7 +2994,7 @@ void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t addre
 
 void device_debug::hotspot_check(address_space &space, offs_t address)
 {
-	offs_t curpc = pc();
+	offs_t curpc = m_device.safe_pc();
 
 	// see if we have a match in our list
 	unsigned int hotindex;
@@ -3051,7 +3049,7 @@ UINT32 device_debug::dasm_wrapped(std::string &buffer, offs_t pc)
 
 	// fetch the bytes up to the maximum
 	UINT8 opbuf[64], argbuf[64];
-	int maxbytes = max_opcode_bytes();
+	int maxbytes = m_disasm->max_opcode_bytes();
 	for (int numbytes = 0; numbytes < maxbytes; numbytes++)
 	{
 		opbuf[numbytes] = m_device.machine().debugger().cpu().read_opcode(decrypted_space, pcbyte + numbytes, 1);
@@ -3075,7 +3073,7 @@ UINT32 device_debug::dasm_wrapped(std::string &buffer, offs_t pc)
 UINT64 device_debug::get_current_pc(symbol_table &table, void *ref)
 {
 	device_t *device = reinterpret_cast<device_t *>(table.globalref());
-	return device->debug()->pc();
+	return device->safe_pc();
 }
 
 

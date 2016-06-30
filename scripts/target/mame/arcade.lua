@@ -642,6 +642,7 @@ BUSES["SAT_CTRL"] = true
 BUSES["SCSI"] = true
 --BUSES["SCV"] = true
 BUSES["SEGA8"] = true
+BUSES["SG1000_EXP"] = true
 BUSES["SMS_CTRL"] = true
 BUSES["SMS_EXP"] = true
 --BUSES["SNES"] = true
@@ -3050,6 +3051,8 @@ files {
 	MAME_DIR .. "src/mame/machine/s32comm.h",
 	MAME_DIR .. "src/mame/machine/m1comm.cpp",
 	MAME_DIR .. "src/mame/machine/m1comm.h",
+	MAME_DIR .. "src/mame/machine/m2comm.cpp",
+	MAME_DIR .. "src/mame/machine/m2comm.h",
 	MAME_DIR .. "src/mame/audio/dsbz80.cpp",
 	MAME_DIR .. "src/mame/audio/dsbz80.h",
 	MAME_DIR .. "src/mame/drivers/model2.cpp",
@@ -3224,6 +3227,7 @@ files {
 	MAME_DIR .. "src/mame/machine/gdrom.cpp",
 	MAME_DIR .. "src/mame/machine/gdrom.h",
 	MAME_DIR .. "src/mame/machine/xbox.cpp",
+	MAME_DIR .. "src/mame/machine/xbox_usb.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "seibu")

@@ -381,6 +381,7 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 #include "debugger.h"
 #include "includes/chihiro.h"
 #include "includes/xbox.h"
+#include "includes/xbox_usb.h"
 
 #define LOG_PCI
 //#define LOG_BASEBOARD
@@ -646,7 +647,7 @@ static const struct {
 } hacks[3] = { { "chihiro", { { 0x6a79f/*3f79f*/, 0x01 }, { 0x6a7a0/*3f7a0*/, 0x00 }, { 0x6b575/*40575*/, 0x00 }, { 0x6b576/*40576*/, 0x00 }, { 0x6b5af/*405af*/, 0x75 }, { 0x6b78a/*4078a*/, 0x75 }, { 0x6b7ca/*407ca*/, 0x00 }, { 0x6b7b8/*407b8*/, 0x00 }, { 0x8f5b2, 0x75 }, { 0x79a9e/*2ea9e*/, 0x74 }, { 0x79b80/*2eb80*/, 0xeb }, { 0x79b97/*2eb97*/, 0x74 }, { 0, 0 } } },
 				{ "outr2", { { 0x12e4cf, 0x01 }, { 0x12e4d0, 0x00 }, { 0x4793e, 0x01 }, { 0x4793f, 0x00 }, { 0x47aa3, 0x01 }, { 0x47aa4, 0x00 }, { 0x14f2b6, 0x84 }, { 0x14f2d1, 0x75 }, { 0x8732f, 0x7d }, { 0x87384, 0x7d }, { 0x87388, 0xeb }, { 0, 0 } } },
 				{ "crtaxihr", { { 0x121dce/*f6dce*/, 0xeb }, { 0x121deb/*f6deb*/, 0xeb }, { 0x121fa0/*f6fa0*/, 0xeb }, { 0x14ada5/*11fda5*/, 0x90 }, { 0x14ada6/*11fda6*/, 0x90 }, /*{ 0x8d0bc 620bc , 0xeb },*/ { 0, 0 } } }
-			 };
+				};
 
 void chihiro_state::hack_usb()
 {
@@ -733,7 +734,9 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 	// default valuse for data stage
 	for (int n = 0; n < setup->wLength; n++)
 		endpoints[endpoint].buffer[n] = 0x50 ^ n;
-	endpoints[endpoint].buffer[1] = 0x4b; // bits 4-1 special value, must be 10 xor 15
+	endpoints[endpoint].buffer[1] = 0x4b; // PINSA register, bits 4-1 special value, must be 10 xor 15, but bit 3 is ignored since its used as the CS pin of the chip
+	endpoints[endpoint].buffer[2] = 0x52; // PINSB register, bit 4 connected to re/de pins of max485, bits 2-3 used as uart pins, bit 0 is the sense pin of the jvs connector
+	endpoints[endpoint].buffer[3] = 0x53; // OUTB register
 	// bRequest is a command value
 	if (setup->bRequest == 0x16)
 	{
@@ -743,8 +746,9 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 		// data will be transferred to the host using endpoint 1 (IN)
 		endpoints[1].remain = setup->wIndex & 255;
 		endpoints[1].position = region + setup->wValue; // usually wValue is 0x1f00
+		endpoints[endpoint].buffer[0] = 0;
 	}
-	if (setup->bRequest == 0x17)
+	else if (setup->bRequest == 0x17)
 	{
 		// this command is used to read data from the second i2c serial eeprom connected to the chip
 		// setup->wValue = start address to read from
@@ -752,22 +756,101 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 		// data will be transferred to the host using endpoint 2 (IN)
 		endpoints[2].remain = setup->wIndex & 255;
 		endpoints[2].position = region + 0x2000 + setup->wValue;
+		endpoints[endpoint].buffer[0] = 0;
 	}
-	if (setup->bRequest == 0x19) // 19 used to receive packet, 20 to send ?
+	else if (setup->bRequest == 0x18)
 	{
-		// amount to transfer with endpoint 4
-		endpoints[endpoint].buffer[5] = 20 >> 8;
-		endpoints[endpoint].buffer[4] = (20 & 0xff);
-		endpoints[4].remain = 20;
+		// this command is used to read data from external memory (with respect to the internal 8051 cpu)
+		// setup->wValue = start address to read from
+		// setup->wIndex = number of bytes to read
+		// data will be transferred to the host using endpoint 3 (IN)
+		endpoints[endpoint].buffer[0] = 0;
+	}
+	else if (setup->bRequest == 0x19)
+	{
+		const int tosend = 20;
+		// this command is used to retreive the jvs packets that have been received in response to the ones of 0x20
+		// data for the packets will be transferred to the host using endpoint 4 (IN)
+		// the nuber of bytes to transfer is returned at bytes 4 and 5 in the data stage of this control transfer
+		// data transferred starts with a byte with value 0, then a byte with value the number of packets received, then a block of bytes for each packet
+		// the bytes for a packet start with the jvs node address, then a dummy one, then a 16 bit number in little endian format that specifies how many bytes follow
+		// the bytes that follow contain the body of the packet as received from the jvs bus
+		endpoints[endpoint].buffer[0] = 0; // 0 if not busy
+		endpoints[endpoint].buffer[5] = tosend >> 8; // amount to transfer with endpoint 4
+		endpoints[endpoint].buffer[4] = (tosend & 0xff);
+		endpoints[4].remain = tosend;
 		endpoints[4].position = endpoints[4].buffer;
 		memset(endpoints[4].buffer, 0, 20);
+		endpoints[endpoint].buffer[0] = 0;
 	}
-	if (setup->bRequest == 0x20)
+	else if (setup->bRequest == 0x1c)
 	{
-		printf(" Jvs packet of %d bytes\n\r", setup->wIndex-3);
+		// this command is used to read from the RV5C386A chip
+		// setup->wValue = what to read
+		// setup->wIndex = number of bytes to read
+		// data will be transferred to the host using endpoint 5 (IN)
+		endpoints[endpoint].buffer[0] = 0;
 	}
+	else if (setup->bRequest == 0x1d)
+	{
+		// this command is used to write data to the first i2c serial eeprom connected to the chip
+		// no more than 32 bytes can be written at a time
+		// setup->wValue = start address to write to
+		// setup->wIndex = number of bytes to write
+		// data will be transferred from the host using endpoint 1 (OUT)
+		endpoints[endpoint].buffer[0] = 0;
+	}
+	else if (setup->bRequest == 0x1e)
+	{
+		// this command is used to write data to the second i2c serial eeprom connected to the chip
+		// no more than 8 bytes can be written at a time
+		// setup->wValue = start address to write to
+		// setup->wIndex = number of bytes to write
+		// data will be transferred from the host using endpoint 2 (OUT)
+		endpoints[endpoint].buffer[0] = 0;
+	} 
+	else if (setup->bRequest == 0x1f)
+	{
+		// this command is used to write data to external memory (with respect to the internal 8051 cpu)
+		// setup->wValue = start address to write to
+		// setup->wIndex = number of bytes to write
+		// data will be transferred from the host using endpoint 3 (OUT)
+		endpoints[endpoint].buffer[0] = 0;
+	} 
+	else if (setup->bRequest == 0x20)
+	{
+		// this command is used to send a set of jvs packets, each to a different node
+		// for each packet sent, the respective answer will be stored, and can be retrieved with 0x19
+		// setup->wIndex = number of bytes to be sent by the host
+		// data for the packets will be transferred from the host using endpoint 4 (OUT)
+		// data sent by the host contains first a byte with value 0 that is ignored, then a byte specifying the number of packets that follow, then the data for each packet
+		// the data for each packet contains first a byte with value 0, then the sync byte (0xe0) then all the other bytes of the packet ending with the checksum byte
+		printf(" Jvs packets data of %d bytes\n\r", setup->wIndex);
+		endpoints[endpoint].buffer[0] = 0;
+	}
+	else if (setup->bRequest == 0x24)
+	{
+		// this command is used to write to the RV5C386A chip
+		// no more than 0x20 bytes can be written
+		// setup->wValue = what to read
+		// data will be transferred from the host using endpoint 5 (OUT)
+		endpoints[endpoint].buffer[0] = 0;
+	}
+	else if (setup->bRequest == 0x30)
+	{
+		// this command first disables external interrupt 0 if the lower 8 bits of setup->wValue are 0 
+		// or enables it if those bits, seen as a signed 8 bit value, represent a number greater than 0
+		// then it will return in byte 4 of the data stage the value 0 if external interrupt 0 has been disabled or value 1 if it has been enabled
+		// and in byte 5 the value of an 8 bit counter that is incremented at every external interrupt 0
+		endpoints[endpoint].buffer[0] = 0;
+		if ((setup->wValue & 255) == 0)
+			endpoints[endpoint].buffer[4] = 0;
+		else if ((setup->wValue & 255) < 128)
+			endpoints[endpoint].buffer[4] = 1;
+		endpoints[endpoint].buffer[5] = 0;
+	} else
+		endpoints[endpoint].buffer[0] = 0x99; // usnupported command
 
-	endpoints[endpoint].buffer[0] = 0;
 	endpoints[endpoint].position = endpoints[endpoint].buffer;
 	endpoints[endpoint].remain = setup->wLength;
 	return 0;
@@ -1558,4 +1641,4 @@ ROM_END
 // 0022
 // 0023
 // 0024     GAME( 2009, ccfboxo,  ccfboxa,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Chihiro Firmware Update For Compact Flash Box (GDX-0024)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-/* 0024A */ GAME( 2009, ccfboxa,  chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Chihiro Firmware Update For Compact Flash Box (Rev A) (GDX-0024A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0024A */ GAME( 2009, ccfboxa,  chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Chihiro Firmware Update For Compact Flash Box (4.01) (GDX-0024A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )

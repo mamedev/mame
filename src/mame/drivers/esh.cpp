@@ -15,9 +15,9 @@ Notes:
 
 Todo:
     - LD TROUBLE appears at POST. Sync/timing issue?
-	- Performance spike after some time of gameplay, CPU comms gets corrupt?
-	- How to init NVRAM? Current defaults definitely aren't.
-	- Wrong overlay colors;
+    - Performance spike after some time of gameplay, CPU comms gets corrupt?
+    - How to init NVRAM? Current defaults definitely aren't.
+    - Wrong overlay colors;
     - Convert to tilemaps (see next ToDo for feasibility).
     - Rumor has it there's an analog beep hanging off 0xf5?  Implement it and finish off 0xf5 bits.
     - NVRAM range 0xe000-0xe800 might be too large.  It doesn't seem to write past 0xe600...
@@ -85,7 +85,7 @@ UINT32 esh_state::screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap,
 	/* clear */
 	bitmap.fill(0, cliprect);
 
-	
+
 	/* Draw tiles */
 	for (charx = 0; charx < 32; charx++)
 	{
@@ -98,26 +98,26 @@ UINT32 esh_state::screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap,
 			bool blinkLine = bool((m_tile_control_ram[current_screen_character] & 0x40) >> 6);
 			bool blinkChar = bool((m_tile_control_ram[current_screen_character] & 0x80) >> 7);
 
-			
+
 			// TODO: blink timing
 			if(blinkChar == true && m_screen->frame_number() & 8)
 			{
 				if(trans_mask == 0)
 					continue;
-				
+
 				for(int yi=0;yi<8;yi++)
 					for(int xi=0;xi<8;xi++)
 						bitmap.pix32(yi+chary*8, xi+charx*8) = m_palette->pen(palIndex * 8 + pal_bank * 0x100);
 
 				continue;
 			}
-			
+
 			if(blinkLine == true && m_screen->frame_number() & 8)
 				gfx = m_gfxdecode->gfx(1);
 			else
 				gfx = m_gfxdecode->gfx(0);
-			
-			
+
+
 			gfx->transpen(bitmap,cliprect,
 				m_tile_ram[current_screen_character] + (0x100 * tileOffs),
 				palIndex + pal_bank,
@@ -193,9 +193,9 @@ WRITE8_MEMBER(esh_state::nmi_line_w)
 	// 0 -> 1 transition enables this, else disabled?
 	m_nmi_enable = (data & 1) == 1;
 	//if (data == 0x00)
-	//	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	//  m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	//if (data == 0x01)
-	//	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	//  m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	if (data & 0xfe)
 		logerror("NMI line unknown bit set %02x\n",data);
@@ -305,7 +305,7 @@ PALETTE_INIT_MEMBER(esh_state, esh)
 			bit2 = (color_prom[i+0x100] >> 6) & 0x01;
 			b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		}
-		
+
 		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 
@@ -333,7 +333,7 @@ INTERRUPT_GEN_MEMBER(esh_state::vblank_callback_esh)
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-// TODO: 0xfe NMI enabled after writing to LD command port, NMI reads LD port. 
+// TODO: 0xfe NMI enabled after writing to LD command port, NMI reads LD port.
 WRITE_LINE_MEMBER(esh_state::ld_command_strobe_cb)
 {
 	if(m_nmi_enable)
@@ -352,7 +352,7 @@ static MACHINE_CONFIG_START( esh, esh_state )
 	MCFG_CPU_PROGRAM_MAP(z80_0_mem)
 	MCFG_CPU_IO_MAP(z80_0_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", esh_state,  vblank_callback_esh)
-	
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
@@ -380,8 +380,7 @@ MACHINE_CONFIG_END
 #define ROM_INTERLACED_GFX \
 	ROM_REGION( 0x3000, "gfx2", 0 ) \
 	ROM_COPY( "gfx1", 0, 0, 0x3000 ) \
-	ROMX_FILL( 0, 0x3000, 0x00, ROM_SKIP(1) ) \
-
+	ROMX_FILL( 0, 0x3000, 0x00, ROM_SKIP(1) )
 ROM_START( esh )
 	/* Main program CPU */
 	ROM_REGION( 0x4000, "maincpu", 0 )

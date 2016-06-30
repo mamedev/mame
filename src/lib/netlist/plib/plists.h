@@ -19,14 +19,13 @@
 #include "pstring.h"
 
 namespace plib {
-
 /* ----------------------------------------------------------------------------------------
  * uninitialised_array_t:
- * 		fixed size array allowing to override constructor and initialize
- * 		members by placement new.
+ *      fixed size array allowing to override constructor and initialize
+ *      members by placement new.
  *
- * 		Use with care. This template is provided to improve locality of storage
- * 		in high frequency applications. It should not be used for anything else.
+ *      Use with care. This template is provided to improve locality of storage
+ *      in high frequency applications. It should not be used for anything else.
  * ---------------------------------------------------------------------------------------- */
 
 template <class C, std::size_t N>
@@ -96,8 +95,8 @@ public:
 	{
 		LC* p;
 	public:
-		constexpr iter_t(LC* x) noexcept : p(x) {}
-		iter_t(const iter_t &rhs) noexcept = default;
+		explicit constexpr iter_t(LC* x) noexcept : p(x) {}
+		explicit iter_t(const iter_t &rhs) noexcept = default;
 		iter_t(iter_t &&rhs) noexcept = default;
 		iter_t& operator++() noexcept {p = p->next();return *this;}
 		iter_t operator++(int) noexcept {iter_t tmp(*this); operator++(); return tmp;}

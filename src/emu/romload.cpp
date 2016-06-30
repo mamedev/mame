@@ -811,7 +811,7 @@ void rom_load_manager::fill_rom_data(const rom_entry *romp)
 	/* make sure the length was valid */
 	if (numbytes == 0)
 		fatalerror("Error in RomModule definition: FILL has an invalid length\n");
-	
+
 	/* fill the data (filling value is stored in place of the hashdata) */
 	if(skip != 0)
 	{

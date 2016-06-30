@@ -15,8 +15,8 @@
 		NET_REGISTER_DEV(TTL_7400_GATE, name)
 
 #define TTL_7400_NAND(name, cA, cB)                                           \
-		NET_REGISTER_DEV(TTL_7400_NAND, name)                         		   \
-		NET_CONNECT(name, A, cA)                                      		   \
+		NET_REGISTER_DEV(TTL_7400_NAND, name)                                  \
+		NET_CONNECT(name, A, cA)                                               \
 		NET_CONNECT(name, B, cB)
 
 #define TTL_7400_DIP(name)                                                    \
@@ -50,8 +50,8 @@
 		NET_REGISTER_DEV(TTL_7408_GATE, name)
 
 #define TTL_7408_AND(name, cA, cB)                                            \
-		NET_REGISTER_DEV(TTL_7408_AND, name)                         		   \
-		NET_CONNECT(name, A, cA)                                      		   \
+		NET_REGISTER_DEV(TTL_7408_AND, name)                                   \
+		NET_CONNECT(name, A, cA)                                               \
 		NET_CONNECT(name, B, cB)
 
 #define TTL_7408_DIP(name)                                                    \
@@ -166,8 +166,8 @@
 		NET_REGISTER_DEV(TTL_7437_GATE, name)
 
 #define TTL_7437_NAND(name, cA, cB)                                           \
-		NET_REGISTER_DEV(TTL_7437_NAND, name)                         		   \
-		NET_CONNECT(name, A, cA)                                      		   \
+		NET_REGISTER_DEV(TTL_7437_NAND, name)                                  \
+		NET_CONNECT(name, A, cA)                                               \
 		NET_CONNECT(name, B, cB)
 
 #define TTL_7437_DIP(name)                                                    \

@@ -6,14 +6,14 @@
 
 static const char *regname[128] =
 {
-	"MA0",	"MA1",	"MA2",	"MA3",	"MA4",	"MA5",	"MA6",	"MA7",
-	"AA0",	"AA1",	"AA2",	"AA3",	"AA4",	"AA5",	"AA6",	"AA7",
-	"EB",	"EBU",	"EBL",	"EO",	"SP",	"ST",	"MOD",	"LRPC",
-	"AR0",	"AR1",	"AR2",	"AR3",	"AR4",	"AR5",	"AR6",	"AR7",
-	"MB0",	"MB1",	"MB2",	"MB3",	"MB4",	"MB5",	"MB6",	"MB7",
-	"AB0",	"AB1",	"AB2",	"AB3",	"AB4",	"AB5",	"AB6",	"AB7",
-	"PR",	"FI",	"FO0",	"FO1",	"PDR",	"DDR",	"PRP",	"PWP",
-	"???",	"???",	"???",	"???",	"???",	"???",	"???",	"???"
+	"MA0",  "MA1",  "MA2",  "MA3",  "MA4",  "MA5",  "MA6",  "MA7",
+	"AA0",  "AA1",  "AA2",  "AA3",  "AA4",  "AA5",  "AA6",  "AA7",
+	"EB",   "EBU",  "EBL",  "EO",   "SP",   "ST",   "MOD",  "LRPC",
+	"AR0",  "AR1",  "AR2",  "AR3",  "AR4",  "AR5",  "AR6",  "AR7",
+	"MB0",  "MB1",  "MB2",  "MB3",  "MB4",  "MB5",  "MB6",  "MB7",
+	"AB0",  "AB1",  "AB2",  "AB3",  "AB4",  "AB5",  "AB6",  "AB7",
+	"PR",   "FI",   "FO0",  "FO1",  "PDR",  "DDR",  "PRP",  "PWP",
+	"???",  "???",  "???",  "???",  "???",  "???",  "???",  "???"
 };
 
 static const char *db_mnemonic[64] =
@@ -69,22 +69,22 @@ static const char *mi1_field[16] =
 
 static const char *mi2_field[32] =
 { "MA0", "MA1", "MA2", "MA3", "MA4", "MA5", "MA6", "MA7", "MB0", "MB1", "MB2", "MB3", "MB4", "MB5", "MB6", "MB7",
-  "PR", "PR++", "PR--", "PR#0", "???", "???", "???", "???", "-1.0E+0", "0.0E+0", "0.5E+0", "1.0E+0", "1.5E+0", "2.0E+0", "3.0E+0", "5.0E+0" };
+	"PR", "PR++", "PR--", "PR#0", "???", "???", "???", "???", "-1.0E+0", "0.0E+0", "0.5E+0", "1.0E+0", "1.5E+0", "2.0E+0", "3.0E+0", "5.0E+0" };
 
-static const char *mo_field[32] = 
+static const char *mo_field[32] =
 { "MA0", "MA1", "MA2", "MA3", "MA4", "MA5", "MA6", "MA7", "MB0", "MB1", "MB2", "MB3", "MB4", "MB5", "MB6", "MB7",
-  "AA0", "AA1", "AA2", "AA3", "AA4", "AA5", "AA6", "AA7", "AB0", "AB1", "AB2", "AB3", "AB4", "AB5", "AB6", "AB7" };
+	"AA0", "AA1", "AA2", "AA3", "AA4", "AA5", "AA6", "AA7", "AB0", "AB1", "AB2", "AB3", "AB4", "AB5", "AB6", "AB7" };
 
-static const char *ai1_field[16] = 
+static const char *ai1_field[16] =
 { "AA0", "AA1", "AA2", "AA3", "AA4", "AA5", "AA6", "AA7", "AB0", "AB1", "AB2", "AB3", "AB4", "AB5", "AB6", "AB7" };
 
 static const char *ai2_field[32] =
 { "AA0", "AA1", "AA2", "AA3", "AA4", "AA5", "AA6", "AA7", "AB0", "AB1", "AB2", "AB3", "AB4", "AB5", "AB6", "AB7",
-  "PR", "PR++", "PR--", "PR#0", "???", "???", "???", "???", "0", "1", "-1", "???", "???", "???", "???", "???" };
+	"PR", "PR++", "PR--", "PR#0", "???", "???", "???", "???", "0", "1", "-1", "???", "???", "???", "???", "???" };
 
 static const char *ai2f_field[32] =
 { "AA0", "AA1", "AA2", "AA3", "AA4", "AA5", "AA6", "AA7", "AB0", "AB1", "AB2", "AB3", "AB4", "AB5", "AB6", "AB7",
-  "PR", "PR++", "PR--", "PR#0", "???", "???", "???", "???", "-1.0E+0", "0.0E+0", "0.5E+0", "1.0E+0", "1.5E+0", "2.0E+0", "3.0E+0", "5.0E+0" };
+	"PR", "PR++", "PR--", "PR#0", "???", "???", "???", "???", "-1.0E+0", "0.0E+0", "0.5E+0", "1.0E+0", "1.5E+0", "2.0E+0", "3.0E+0", "5.0E+0" };
 
 static char* get_ea(int md, int arx, int ary, int disp)
 {
@@ -196,7 +196,7 @@ static char* dasm_alu_mul(UINT64 opcode, bool twoop)
 				break;
 		}
 	}
-	
+
 	// multiplication
 	if (twoop)
 	{
@@ -211,7 +211,7 @@ static char* dasm_alu_mul(UINT64 opcode, bool twoop)
 	else
 	{
 		if (ma == 0)
-		{			
+		{
 			if (opcode & ((UINT64)(1) << 56))
 				p += sprintf(p, "FMUL %s, %s, %s", mi1_field[i1], mi2_field[i2], mo_field[o]);
 			else
@@ -296,12 +296,12 @@ static char* dasm_control(UINT32 pc, UINT64 opcode)
 			p += sprintf(p, "DRET");
 			break;
 
-		case 0x10:		// DBcc
-		case 0x11:		// DBNcc
-		case 0x18:		// DCcc
-		case 0x19:		// DCNcc
-		case 0x1a:		// DCALL
-		case 0x12:		// DJMP
+		case 0x10:      // DBcc
+		case 0x11:      // DBNcc
+		case 0x18:      // DCcc
+		case 0x19:      // DCNcc
+		case 0x1a:      // DCALL
+		case 0x12:      // DJMP
 		{
 			if (cop == 0x10)
 				p += sprintf(p, "%s ", db_mnemonic[ef1]);
@@ -798,25 +798,25 @@ static unsigned dasm_mb86235(char *buffer, UINT32 pc, UINT64 opcode)
 
 	switch ((opcode >> 61) & 7)
 	{
-		case 0:		// ALU / MUL / double transfer (type 1)
+		case 0:     // ALU / MUL / double transfer (type 1)
 			p += sprintf(p, "%s : %s", dasm_alu_mul(opcode, true), dasm_double_xfer1(opcode));
 			break;
-		case 1:		// ALU / MYL / transfer (type 1)
+		case 1:     // ALU / MYL / transfer (type 1)
 			p += sprintf(p, "%s : %s", dasm_alu_mul(opcode, true), dasm_xfer1(opcode));
 			break;
-		case 2:		// ALU / MUL / control
+		case 2:     // ALU / MUL / control
 			p += sprintf(p, "%s : %s", dasm_alu_mul(opcode, true), dasm_control(pc, opcode));
 			break;
-		case 4:		// ALU or MUL / double transfer (type 2)
+		case 4:     // ALU or MUL / double transfer (type 2)
 			p += sprintf(p, "%s : %s", dasm_alu_mul(opcode, false), dasm_double_xfer2(opcode));
 			break;
-		case 5:		// ALU or MUL / transfer (type 2)
+		case 5:     // ALU or MUL / transfer (type 2)
 			p += sprintf(p, "%s : %s", dasm_alu_mul(opcode, false), dasm_xfer2(opcode));
 			break;
-		case 6:		// ALU or MUL / control
+		case 6:     // ALU or MUL / control
 			p += sprintf(p, "%s : %s", dasm_alu_mul(opcode, false), dasm_control(pc, opcode));
 			break;
-		case 7:		// transfer (type 3)
+		case 7:     // transfer (type 3)
 			p += sprintf(p, "%s", dasm_xfer3(opcode));
 			break;
 

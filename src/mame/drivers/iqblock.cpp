@@ -56,7 +56,7 @@ Grndtour:
 #include "cpu/z180/z180.h"
 #include "machine/i8255.h"
 #include "includes/iqblock.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 
 
 WRITE8_MEMBER(iqblock_state::iqblock_prot_w)

@@ -377,11 +377,10 @@ static ADDRESS_MAP_START( srmp5_mem, AS_PROGRAM, 32, srmp5_state )
 	AM_RANGE(0x0a180000, 0x0a180003) AM_READNOP // write 0x00000400
 	AM_RANGE(0x0a180000, 0x0a18011f) AM_READWRITE(srmp5_vidregs_r, srmp5_vidregs_w)
 	AM_RANGE(0x0a200000, 0x0a3fffff) AM_READWRITE(tileram_r, tileram_w)
+	AM_RANGE(0x0fc00000, 0x0fdfffff) AM_MIRROR(0x10000000) AM_ROM AM_REGION("sub", 0)
 
 	AM_RANGE(0x1eff0000, 0x1eff001f) AM_WRITEONLY
 	AM_RANGE(0x1eff003c, 0x1eff003f) AM_READ(irq_ack_clear)
-	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("sub", 0)
-	AM_RANGE(0x2fc00000, 0x2fdfffff) AM_ROM AM_REGION("sub", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, srmp5_state )

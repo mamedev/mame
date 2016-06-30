@@ -1056,9 +1056,11 @@ void neogeo_state::init_cpu()
 	UINT32 len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->bytes() : m_slots[m_curr_slot]->get_rom_size();
 
 	if (len > 0x100000)
-		m_bank_cartridge->set_base(ROM + 0x100000);
+		m_bank_base = 0x100000;
 	else
-		m_bank_cartridge->set_base(ROM);
+		m_bank_base = 0;
+
+	m_bank_cartridge->set_base(ROM + m_bank_base);
 }
 
 void neogeo_state::init_audio()

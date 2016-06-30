@@ -516,7 +516,7 @@ ROM_START(fireball)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("euroball-89-07-13-c026.bin", 0x0000, 0x2000, CRC(cab3fc1c) SHA1(bcf0d17e26f2d9f5e20bda258728c989ea138702))
 
-	ROM_REGION( 0x20, "eeprom", 0 ) // default eeprom must have some specific value at 0x03 at least
+	ROM_REGION16_BE( 0x20, "eeprom", 0 ) // default eeprom must have some specific value at 0x03 at least
 	ROM_LOAD( "fireball.nv", 0x0000, 0x020, CRC(1d0f5f0f) SHA1(8e68fcd8782f39ed3b1df6162db9be83cb3335e4) )  //default setting
 ROM_END
 

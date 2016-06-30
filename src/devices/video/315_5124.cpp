@@ -45,7 +45,7 @@ A scanline contains the following sections:
 
 NTSC frame timing
                        256x192         256x224        256x240 (doesn't work on real hardware)
-  - vertical blanking   3  D5-D7        3  E5-E7       3  ED-EF
+  - vertical sync       3  D5-D7        3  E5-E7       3  ED-EF
   - top blanking       13  D8-E4       13  E8-F4      13  F0-FC
   - top border         27  E5-FF       11  F5-FF       3  FD-FF
   - active display    192  00-BF      224  00-DF     240  00-EF
@@ -55,7 +55,7 @@ NTSC frame timing
 
 PAL frame timing
                        256x192         256x224        256x240
-  - vertical blanking   3  BA-BC        3  CA-CC       3  D2-D4
+  - vertical sync       3  BA-BC        3  CA-CC       3  D2-D4
   - top blanking       13  BD-C9       13  CD-D9      13  D5-E1
   - top border         54  CA-FF       38  DA-FF      30  E2-FF
   - active display    192  00-BF      224  00-DF     240  00-EF
@@ -90,7 +90,7 @@ PAL frame timing
 #define PRIORITY_BIT          0x1000
 #define BACKDROP_COLOR        ((m_vdp_mode == 4 ? 0x10 : 0x00) + (m_reg[0x07] & 0x0f))
 
-#define VERTICAL_BLANKING     0
+#define VERTICAL_SYNC         0
 #define TOP_BLANKING          1
 #define TOP_BORDER            2
 #define ACTIVE_DISPLAY_V      3
@@ -169,6 +169,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, const ch
 	, m_supports_224_240( false )
 	, m_is_pal(false)
 	, m_int_cb(*this)
+	, m_csync_cb(*this)
 	, m_pause_cb(*this)
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(sega315_5124))
 	, m_palette(*this, "palette")
@@ -185,6 +186,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 	, m_supports_224_240( supports_224_240 )
 	, m_is_pal(false)
 	, m_int_cb(*this)
+	, m_csync_cb(*this)
 	, m_pause_cb(*this)
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(sega315_5124))
 	, m_palette(*this, "palette")
@@ -289,7 +291,7 @@ void sega315_5124_device::set_frame_timing()
 
 READ8_MEMBER( sega315_5124_device::vcount_read )
 {
-	const int active_scr_start = m_frame_timing[VERTICAL_BLANKING] + m_frame_timing[TOP_BLANKING] + m_frame_timing[TOP_BORDER];
+	const int active_scr_start = m_frame_timing[VERTICAL_SYNC] + m_frame_timing[TOP_BLANKING] + m_frame_timing[TOP_BORDER];
 	int vpos = m_screen->vpos();
 
 	if (m_screen->hpos() < VCOUNT_CHANGE_HPOS)
@@ -415,13 +417,29 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 void sega315_5124_device::process_line_timer()
 {
 	const int vpos = m_screen->vpos();
-	int vpos_limit = m_frame_timing[VERTICAL_BLANKING] + m_frame_timing[TOP_BLANKING]
+	int vpos_limit = m_frame_timing[VERTICAL_SYNC] + m_frame_timing[TOP_BLANKING]
 					+ m_frame_timing[TOP_BORDER] + m_frame_timing[ACTIVE_DISPLAY_V]
 					+ m_frame_timing[BOTTOM_BORDER] + m_frame_timing[BOTTOM_BLANKING];
 
 	/* copy current values in case they are not changed until latch time */
 	m_display_disabled = !(m_reg[0x01] & 0x40);
 	m_reg8copy = m_reg[0x08];
+
+	/* Check if the /CSYNC signal must be active (low) */
+	if ( !m_csync_cb.isnull() )
+	{
+		/* /CSYNC is signals /HSYNC and /VSYNC (both internals) ANDed together.
+		   According to Charles MacDonald, /HSYNC goes low for 28 pixels on beginning
+		   (before active screen) of all lines except on vertical sync area, where
+		   /VSYNC goes low for 3 full lines, and except the two lines that follows,
+		   because /VSYNC goes high for another line and remains high until the
+		   active screen of the next line, what avoids a /HSYNC pulse there.
+		*/
+		if (vpos == 0 || vpos > (m_frame_timing[VERTICAL_SYNC] + 1))
+		{
+			m_csync_cb(0);
+		}
+	}
 
 	vpos_limit -= m_frame_timing[BOTTOM_BLANKING];
 
@@ -529,7 +547,7 @@ void sega315_5124_device::process_line_timer()
 		return;
 	}
 
-	/* we're in the vertical or top blanking area */
+	/* we're in the vertical sync or top blanking areas */
 	m_line_counter = m_reg[0x0a];
 }
 
@@ -1575,6 +1593,7 @@ void sega315_5124_device::device_start()
 {
 	/* Resolve callbacks */
 	m_int_cb.resolve();
+	m_csync_cb.resolve();
 	m_pause_cb.resolve();
 
 	/* Allocate video RAM */

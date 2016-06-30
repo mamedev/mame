@@ -324,7 +324,7 @@ static int compare_list_entries(const void *p1, const void *p2)
 
 static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std::string &dstdir, std::string &tempheader, std::string &tempfooter)
 {
-	static const osd_dir_entry_type typelist[] = { ENTTYPE_DIR, ENTTYPE_FILE };
+	static const osd::directory::entry::entry_type typelist[] = { osd::directory::entry::entry_type::DIR, osd::directory::entry::entry_type::FILE };
 
 	// extract a normalized subpath
 	std::string srcdir_subpath;
@@ -344,10 +344,10 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 	int result = 0;
 	for (int entindex = 0; entindex < ARRAY_LENGTH(typelist) && result == 0; entindex++)
 	{
-		osd_dir_entry_type entry_type = typelist[entindex];
+		auto entry_type = typelist[entindex];
 
 		// open the directory and iterate through it
-		osd_directory *dir = osd_opendir(srcdir.c_str());
+		auto dir = osd::directory::open(srcdir.c_str());
 		if (dir == nullptr)
 		{
 			result = 1;
@@ -355,10 +355,10 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 		}
 
 		// build up the list of files
-		const osd_directory_entry *entry;
+		const osd::directory::entry *entry;
 		int found = 0;
 		list_entry *list = nullptr;
-		while ((entry = osd_readdir(dir)) != nullptr)
+		while ((entry = dir->read()) != nullptr)
 			if (entry->type == entry_type && entry->name[0] != '.')
 			{
 				auto lentry = new list_entry;
@@ -369,7 +369,7 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 			}
 
 		// close the directory
-		osd_closedir(dir);
+		dir.reset();
 
 		// skip if nothing found
 		if (found == 0)
@@ -398,7 +398,7 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 		{
 			// add a header
 			if (curlist == list)
-				indexfile->printf("\t<h2>%s</h2>\n\t<ul>\n", (entry_type == ENTTYPE_DIR) ? "Directories" : "Files");
+				indexfile->printf("\t<h2>%s</h2>\n\t<ul>\n", (entry_type == osd::directory::entry::entry_type::DIR) ? "Directories" : "Files");
 
 			// build the source filename
 			std::string srcfile;
@@ -406,7 +406,7 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 
 			// if we have a file, output it
 			std::string dstfile;
-			if (entry_type == ENTTYPE_FILE)
+			if (entry_type == osd::directory::entry::entry_type::FILE)
 			{
 				// make sure we care, first
 				file_type type = FILE_TYPE_INVALID;

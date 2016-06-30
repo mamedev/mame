@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 #include "machine/msm6242.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "sound/msm5205.h"
 #include "sound/okim6295.h"
 

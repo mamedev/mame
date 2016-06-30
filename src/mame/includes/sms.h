@@ -22,6 +22,7 @@
 #define CONTROL2_TAG   "ctrl2"
 
 #include "bus/sega8/sega8_slot.h"
+#include "bus/sg1000_exp/sg1000exp.h"
 #include "bus/sms_exp/smsexp.h"
 #include "bus/sms_ctrl/smsctrl.h"
 #include "bus/gamegear/ggext.h"
@@ -44,6 +45,7 @@ public:
 		m_port_gg_dc(*this, "GG_PORT_DC"),
 		m_port_pause(*this, "PAUSE"),
 		m_port_reset(*this, "RESET"),
+		m_port_rapid(*this, "RAPID"),
 		m_port_start(*this, "START"),
 		m_port_scope(*this, "SEGASCOPE"),
 		m_port_scope_binocular(*this, "SSCOPE_BINOCULAR"),
@@ -51,14 +53,13 @@ public:
 		m_region_maincpu(*this, "maincpu"),
 		m_mainram(nullptr),
 		m_is_gamegear(0),
-		m_is_gg_region_japan(0),
 		m_is_smsj(0),
 		m_is_mark_iii(0),
 		m_is_sdisp(0),
+		m_ioctrl_region_is_japan(0),
 		m_has_bios_0400(0),
 		m_has_bios_2000(0),
 		m_has_bios_full(0),
-		m_has_fm(0),
 		m_has_jpn_sms_cart_slot(0),
 		m_store_cart_selection_data(0) { }
 
@@ -76,6 +77,7 @@ public:
 	optional_ioport m_port_gg_dc;
 	optional_ioport m_port_pause;
 	optional_ioport m_port_reset;
+	optional_ioport m_port_rapid;
 	optional_ioport m_port_start;
 	optional_ioport m_port_scope;
 	optional_ioport m_port_scope_binocular;
@@ -104,14 +106,13 @@ public:
 
 	// model identifiers
 	UINT8 m_is_gamegear;
-	UINT8 m_is_gg_region_japan;
 	UINT8 m_is_smsj;
 	UINT8 m_is_mark_iii;
 	UINT8 m_is_sdisp;
+	UINT8 m_ioctrl_region_is_japan;
 	UINT8 m_has_bios_0400;
 	UINT8 m_has_bios_2000;
 	UINT8 m_has_bios_full;
-	UINT8 m_has_fm;
 	UINT8 m_has_jpn_sms_cart_slot;
 
 	// [0] for 0x400-0x3fff, [1] for 0x4000-0x7fff, [2] for 0x8000-0xffff, [3] for 0x0000-0x0400
@@ -122,7 +123,7 @@ public:
 	UINT8 m_io_ctrl_reg;
 	UINT8 m_mem_ctrl_reg;
 	UINT8 m_mem_device_enabled;
-	UINT8 m_audio_control;
+	UINT8 m_smsj_audio_control;
 	UINT8 m_port_dc_reg;
 	UINT8 m_port_dd_reg;
 	UINT8 m_gg_sio[5];
@@ -140,10 +141,18 @@ public:
 	UINT8 m_sscope_state;
 	UINT8 m_frame_sscope_state;
 
+	// Data needed for Rapid button (smsj, sms1kr, sms1krfm)
+	UINT16 m_csync_counter;
+	UINT8 m_rapid_mode;
+	UINT8 m_rapid_read_state;
+	UINT8 m_rapid_last_dc;
+	UINT8 m_rapid_last_dd;
+
 	// slot devices
 	sega8_cart_slot_device *m_cartslot;
 	sega8_card_slot_device *m_cardslot;
-	sms_expansion_slot_device *m_expslot;
+	sms_expansion_slot_device *m_smsexpslot;
+	sg1000_expansion_slot_device *m_sgexpslot;
 
 	// these are only used by the Store Display unit, but we keep them here temporarily to avoid the need of separate start/reset
 	sega8_cart_slot_device *m_slots[16];
@@ -168,19 +177,22 @@ public:
 	DECLARE_READ8_MEMBER(sms_input_port_dc_r);
 	DECLARE_READ8_MEMBER(sms_input_port_dd_r);
 	DECLARE_READ8_MEMBER(gg_input_port_00_r);
+	DECLARE_READ8_MEMBER(sg1000m3_peripheral_r);
+	DECLARE_WRITE8_MEMBER(sg1000m3_peripheral_w);
 	DECLARE_READ8_MEMBER(gg_sio_r);
 	DECLARE_WRITE8_MEMBER(gg_sio_w);
 	DECLARE_WRITE8_MEMBER(gg_psg_stereo_w);
 	DECLARE_WRITE8_MEMBER(gg_psg_w);
 	DECLARE_WRITE8_MEMBER(sms_psg_w);
-	DECLARE_READ8_MEMBER(sms_audio_control_r);
-	DECLARE_WRITE8_MEMBER(sms_audio_control_w);
-	DECLARE_WRITE8_MEMBER(sms_ym2413_register_port_w);
-	DECLARE_WRITE8_MEMBER(sms_ym2413_data_port_w);
+	DECLARE_READ8_MEMBER(smsj_audio_control_r);
+	DECLARE_WRITE8_MEMBER(smsj_audio_control_w);
+	DECLARE_WRITE8_MEMBER(smsj_ym2413_register_port_w);
+	DECLARE_WRITE8_MEMBER(smsj_ym2413_data_port_w);
 	DECLARE_READ8_MEMBER(sms_sscope_r);
 	DECLARE_WRITE8_MEMBER(sms_sscope_w);
 
 	DECLARE_WRITE_LINE_MEMBER(sms_pause_callback);
+	DECLARE_WRITE_LINE_MEMBER(sms_csync_callback);
 	DECLARE_WRITE_LINE_MEMBER(sms_ctrl1_th_input);
 	DECLARE_WRITE_LINE_MEMBER(sms_ctrl2_th_input);
 	DECLARE_WRITE_LINE_MEMBER(gg_ext_th_input);
@@ -194,6 +206,7 @@ public:
 	DECLARE_DRIVER_INIT(smskr);
 	DECLARE_DRIVER_INIT(smsj);
 	DECLARE_DRIVER_INIT(sms1);
+	DECLARE_DRIVER_INIT(sms);
 	DECLARE_MACHINE_START(sms);
 	DECLARE_MACHINE_RESET(sms);
 	DECLARE_VIDEO_START(gamegear);

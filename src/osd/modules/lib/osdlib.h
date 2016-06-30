@@ -78,7 +78,6 @@ char *osd_get_clipboard_text(void);
 -----------------------------------------------------------------------------*/
 
 namespace osd {
-
 class dynamic_module
 {
 public:

@@ -65,7 +65,7 @@ Notes:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "sound/3812intf.h"
 #include "sound/ics2115.h"
 #include "machine/nvram.h"

@@ -26,6 +26,7 @@
 1943j                           // 6/1987 (c) 1987 (Japan) Rev B
 1943ja                          // 6/1987 (c) 1987 (Japan)
 1943kai                         // 6/1988 (c) 1987 (Japan)
+1943mii                         // 6/1988 (c) 1987 (US)
 1943u                           // 6/1987 (c) 1987 (US) Rev C
 1943ua                          // 6/1987 (c) 1987 (US)
 
@@ -9203,8 +9204,8 @@ dking                           // Crazy Kong Bootleg
 guzzler                         // (c) 1983 Tehkan
 guzzlers                        // (c) 1983 Tehkan (Swimmer Conversion)
 monkeyd                         // bootleg
-rpatrol							// (c) 1981.01 Orca
-rpatrola                        // bootleg 
+rpatrol                         // (c) 1981.01 Orca
+rpatrola                        // bootleg
 rpatrolb                        // bootleg
 silvland                        // Falcon
 swimmer                         // (c) 1982 Tehkan
@@ -13322,6 +13323,7 @@ bsuerter                        // 1991, Unknown
 bsuertes                        // 1991, Unknown
 bsuertet                        // 1991, Unknown
 bsuerteu                        // 1991, Unknown
+bsuertev                        // 1991, Unknown
 caspoker                        // 1987, PM / Beck Elektronik.
 falcnwld                        // 1991, TVG
 falcnwlda                       // (c) 1990, Video Klein
@@ -14196,6 +14198,7 @@ mjkinjas                        // (c) 1991 Home Data
 mjkojink                        // (c) 1989 Home Data
 mjprivat                        // (c) 1991 Matoba
 mjyougo                         // (c) 1989 Home Data
+mjjoship            // (c) 1988 Home Data
 mrokumei                        // (c) 1988 Home Data
 reikaids                        // (c) 1988 Home Data
 vitaminc                        // (c) 1989 Home Data
@@ -28251,6 +28254,7 @@ ryuuha                          // (c) 1987
 secolove                        // (c) 1986
 seiha                           // (c) 1987
 seiham                          // (c) 1987
+swinggal			// (c) 1987 Digital Denshi
 vipclub                         // (c) 1988 Daiichi Denshi
 
 @source:nbmj8891.cpp
@@ -33274,12 +33278,18 @@ gamegear                        // Sega GameGear
 sg1000m3                        // Sega SG-1000 Mark III (Japan)
 sms                             // Sega Master System II (NTSC)
 sms1                            // Sega Master System I (NTSC)
+sms1br                          // Tec Toy Master System I (Brazil)
 sms1kr                          // Samsung Gam*Boy I (Korea)
 sms1krfm                        // Samsung Gam*Boy I (Korea) with FM Chip
 sms1pal                         // Sega Master System I (PAL)
+sms1paln                        // Tec Toy Master System I (PAL-N)
+sms2br                          // Tec Toy Master System II (Brazil)
+sms2paln                        // Tec Toy Master System II (PAL-N)
+smsbr                           // Tec Toy Master System III Compact (Brazil)
 smsj                            // Sega Master System (Japan) with FM Chip
 smskr                           // Samsung Gam*Boy II (Korea)
 smspal                          // Sega Master System II (PAL)
+smspaln                         // Tec Toy Master System III Compact (PAL-N)
 smssdisp                        // Sega Master System Store Display Unit
 
 @source:smsmcorp.cpp

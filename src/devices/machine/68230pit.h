@@ -105,7 +105,7 @@
 //**************************************************************************
 class pit68230_device :  public device_t, public device_execute_interface
 {
- public:
+	public:
 	// construction/destruction
 	pit68230_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
 	pit68230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -161,7 +161,7 @@ class pit68230_device :  public device_t, public device_execute_interface
 protected:
 
 	enum {
-		REG_TCR_ENABLE =	0x01
+		REG_TCR_ENABLE =    0x01
 	};
 
 	// device-level overrides
@@ -171,16 +171,16 @@ protected:
 	virtual void execute_run () override;
 	int m_icount;
 
-	devcb_write8		m_pa_out_cb;
-	devcb_read8			m_pa_in_cb;
-	devcb_write8		m_pb_out_cb;
-	devcb_read8			m_pb_in_cb;
-	devcb_write8		m_pc_out_cb;
-	devcb_read8			m_pc_in_cb;
-	devcb_write_line	m_h1_out_cb;
-	devcb_write_line	m_h2_out_cb;
-	devcb_write_line	m_h3_out_cb;
-	devcb_write_line	m_h4_out_cb;
+	devcb_write8        m_pa_out_cb;
+	devcb_read8         m_pa_in_cb;
+	devcb_write8        m_pb_out_cb;
+	devcb_read8         m_pb_in_cb;
+	devcb_write8        m_pc_out_cb;
+	devcb_read8         m_pc_in_cb;
+	devcb_write_line    m_h1_out_cb;
+	devcb_write_line    m_h2_out_cb;
+	devcb_write_line    m_h3_out_cb;
+	devcb_write_line    m_h4_out_cb;
 
 	// peripheral ports
 	UINT8 m_pgcr;           // Port General Control register
@@ -193,12 +193,12 @@ protected:
 	UINT8 m_padr;           // Port A Data register
 	UINT8 m_pbdr;           // Port B Data register
 	UINT8 m_psr;            // Port Status Register
-	UINT8 m_tcr;		// Timer Control Register
-	int m_cpr;			// Counter Preload Registers (3 x 8 = 24 bits) 
-	//	UINT8 m_cprh;	// Counter Preload Register High
-	//	UINT8 m_cprm;	// Counter Preload Register Mid
-	//	UINT8 m_cprl;	// Counter Preload Register Low
-	int   m_cntr;		// - The 24 bit Counter 
+	UINT8 m_tcr;        // Timer Control Register
+	int m_cpr;          // Counter Preload Registers (3 x 8 = 24 bits)
+	//  UINT8 m_cprh;   // Counter Preload Register High
+	//  UINT8 m_cprm;   // Counter Preload Register Mid
+	//  UINT8 m_cprl;   // Counter Preload Register Low
+	int   m_cntr;       // - The 24 bit Counter
 };
 
 // device type definition

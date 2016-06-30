@@ -56,7 +56,7 @@ public:
 	optional_shared_ptr<UINT16> m_nmk_bgvideoram3;
 	optional_shared_ptr<UINT16> m_afega_scroll_0;
 	optional_shared_ptr<UINT16> m_afega_scroll_1;
-	
+
 
 	int m_sprdma_base;
 	int mask[4*2];

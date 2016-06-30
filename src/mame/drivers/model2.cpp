@@ -1341,61 +1341,6 @@ READ32_MEMBER(model2_state::maxx_r)
 	return ROM[offset + (0x040000/4)];
 }
 
-/* Network board emulation */
-
-
-
-READ32_MEMBER(model2_state::network_r)
-{
-	if ((mem_mask == 0xffffffff) || (mem_mask == 0x0000ffff) || (mem_mask == 0xffff0000))
-	{
-		return 0xffffffff;
-	}
-
-	if (offset < 0x4000/4)
-	{
-		return m_netram[offset];
-	}
-
-	if (mem_mask == 0x00ff0000)
-	{
-		return m_sysres<<16;
-	}
-	else if (mem_mask == 0x000000ff)
-	{
-		return m_zflagi;
-	}
-
-	return 0xffffffff;
-}
-
-WRITE32_MEMBER(model2_state::network_w)
-{
-	if ((mem_mask == 0xffffffff) || (mem_mask == 0x0000ffff) || (mem_mask == 0xffff0000))
-	{
-		COMBINE_DATA(&m_netram[offset+0x4000/4]);
-		return;
-	}
-
-	if (offset < 0x4000/4)
-	{
-		COMBINE_DATA(&m_netram[offset]);
-		return;
-	}
-
-	if (mem_mask == 0x00ff0000)
-	{
-		m_sysres = data>>16;
-	}
-	else if (mem_mask == 0x000000ff)
-	{
-		m_zflagi = data;
-		m_zflag = 0;
-		if (data & 0x01) m_zflag |= 0x80;
-		if (data & 0x80) m_zflag |= 0x01;
-	}
-}
-
 #ifdef UNUSED_FUNCTION
 WRITE32_MEMBER(model2_state::copro_w)
 {
@@ -1516,7 +1461,9 @@ static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x01800000, 0x01803fff) AM_READWRITE16(model2_palette_r,model2_palette_w,0xffffffff)
 	AM_RANGE(0x01810000, 0x0181bfff) AM_RAM AM_SHARE("colorxlat")
 	AM_RANGE(0x0181c000, 0x0181c003) AM_WRITE(model2_3d_zclip_w)
-	AM_RANGE(0x01a10000, 0x01a1ffff) AM_READWRITE(network_r, network_w)
+	AM_RANGE(0x01a10000, 0x01a13fff) AM_DEVREADWRITE8("m2comm", m2comm_device, share_r, share_w, 0xffffffff)
+	AM_RANGE(0x01a14000, 0x01a14003) AM_DEVREADWRITE8("m2comm", m2comm_device, cn_r, cn_w, 0x000000ff)
+	AM_RANGE(0x01a14000, 0x01a14003) AM_DEVREADWRITE8("m2comm", m2comm_device, fg_r, fg_w, 0x00ff0000)
 	AM_RANGE(0x01d00000, 0x01d03fff) AM_RAM AM_SHARE("backup1") // Backup sram
 	AM_RANGE(0x02000000, 0x03ffffff) AM_ROM AM_REGION("user1", 0)
 
@@ -2238,6 +2185,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_interrupt)
 		if(m_intena & 1<<0)
 			m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
 		model2_check_irq_state();
+		if (m_m2comm != nullptr)
+			m_m2comm->check_vint_irq();
 	}
 	else if(scanline == 0)
 	{
@@ -2259,6 +2208,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2c_interrupt)
 		if(m_intena & 1<<0)
 			m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
 		model2_check_irq_state();
+		if (m_m2comm != nullptr)
+			m_m2comm->check_vint_irq();
 	}
 	else if(scanline == 0) // 384
 	{
@@ -2427,6 +2378,8 @@ static MACHINE_CONFIG_START( model2o, model2_state )
 	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
 
 	MCFG_SEGAM1AUDIO_ADD("m1audio")
+
+	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END
 
 /* 2A-CRX */
@@ -2478,6 +2431,8 @@ static MACHINE_CONFIG_START( model2a, model2_state )
 	MCFG_SCSP_IRQ_CB(WRITE8(model2_state,scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+
+	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( manxttdx, model2a ) /* Includes a Model 1 Sound board for additional sounds - Deluxe version only */
@@ -2593,6 +2548,8 @@ static MACHINE_CONFIG_START( model2b, model2_state )
 	MCFG_SCSP_IRQ_CB(WRITE8(model2_state,scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+
+	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END
 
 
@@ -2656,6 +2613,8 @@ static MACHINE_CONFIG_START( model2c, model2_state )
 	MCFG_SCSP_IRQ_CB(WRITE8(model2_state, scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+
+	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( stcc, model2c )
@@ -5923,48 +5882,14 @@ DRIVER_INIT_MEMBER(model2_state,daytonam)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x240000, 0x24ffff, read32_delegate(FUNC(model2_state::maxx_r),this));
 }
 
-/* very crude support for let the game set itself into stand-alone mode */
-
-READ32_MEMBER(model2_state::jaleco_network_r)
-{
-	if(offset == 0x4000/4)
-	{
-		if(m_netram[offset] == 0x00000000)
-			m_jnet_time_out = 0;
-
-		if((m_netram[offset] & 0xffff) == 0x0001)
-			m_jnet_time_out++;
-
-		if(m_jnet_time_out > 0x80)
-			m_netram[offset]|= 0x00800000;
-
-		return m_netram[offset];
-	}
-
-	return m_netram[offset];
-}
-
-WRITE32_MEMBER(model2_state::jaleco_network_w)
-{
-	COMBINE_DATA(&m_netram[offset]);
-}
-
 DRIVER_INIT_MEMBER(model2_state,sgt24h)
 {
 //  DRIVER_INIT_CALL(genprot);
-
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x01a10000, 0x01a1ffff, read32_delegate(FUNC(model2_state::jaleco_network_r),this), write32_delegate(FUNC(model2_state::jaleco_network_w),this));
 
 	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
 	ROM[0x56578/4] = 0x08000004;
 	//ROM[0x5b3e8/4] = 0x08000004;
 }
-
-DRIVER_INIT_MEMBER(model2_state,overrev)
-{
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x01a10000, 0x01a1ffff, read32_delegate(FUNC(model2_state::jaleco_network_r),this), write32_delegate(FUNC(model2_state::jaleco_network_w),this));
-}
-
 
 DRIVER_INIT_MEMBER(model2_state,doa)
 {
@@ -6037,7 +5962,7 @@ GAME( 1996, von,             0, model2b,      model2,  driver_device, 0,       R
 GAME( 1996, vonj,          von, model2b,      model2,  driver_device, 0,       ROT0, "Sega",   "Cyber Troopers Virtual-On (Japan, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, dynabb,          0, model2b,      model2,  driver_device, 0,       ROT0, "Sega",   "Dynamite Baseball", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, dynabb97,        0, model2b,      model2,  driver_device, 0,       ROT0, "Sega",   "Dynamite Baseball 97 (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, overrevb,  overrev, model2b,      srallyc, model2_state,  overrev, ROT0, "Jaleco", "Over Rev (Model 2B, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, overrevb,  overrev, model2b,      srallyc, driver_device, 0,       ROT0, "Jaleco", "Over Rev (Model 2B, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, zerogun,         0, model2b_5881, model2,  model2_state,  zerogun, ROT0, "Psikyo", "Zero Gunner (Export, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, zerogunj,  zerogun, model2b_5881, model2,  model2_state,  zerogun, ROT0, "Psikyo", "Zero Gunner (Japan, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, dynamcopb,dynamcop, model2b_5881, model2,  model2_state,  genprot, ROT0, "Sega",   "Dynamite Cop (Export, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
@@ -6052,7 +5977,7 @@ GAME( 1996, stccb,        stcc,    stcc,      model2,  driver_device, 0,       R
 GAME( 1996, stcca,        stcc,    stcc,      model2,  driver_device, 0,       ROT0, "Sega",   "Sega Touring Car Championship (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, waverunr,        0, model2c,      model2,  driver_device, 0,       ROT0, "Sega",   "Wave Runner (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, hotd,            0, model2c,      model2,  driver_device, 0,       ROT0, "Sega",   "House of the Dead", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, overrev,         0, model2c,      srallyc, model2_state,  overrev, ROT0, "Jaleco", "Over Rev (Model 2C, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, overrev,         0, model2c,      srallyc, driver_device, 0,       ROT0, "Jaleco", "Over Rev (Model 2C, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, segawski,        0, model2c,      model2,  driver_device, 0,       ROT0, "Sega",   "Sega Water Ski (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, topskatr,        0, model2c,      model2,  driver_device, 0,       ROT0, "Sega",   "Top Skater (Export, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, topskatru,topskatr, model2c,      model2,  driver_device, 0,       ROT0, "Sega",   "Top Skater (USA, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

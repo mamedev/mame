@@ -111,6 +111,8 @@ private:
 	// monitor info
 	osd_monitor_info *  m_monitor;
 	int                 m_fullscreen;
+	bool                m_mouse_captured;
+	bool                m_mouse_hidden;
 
 	void measure_fps(int update);
 

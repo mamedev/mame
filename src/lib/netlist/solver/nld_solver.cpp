@@ -59,7 +59,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 void terms_t::add(terminal_t *term, int net_other, bool sorted)
 {
 	if (sorted)

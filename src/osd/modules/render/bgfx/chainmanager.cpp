@@ -91,12 +91,12 @@ void chain_manager::destroy_unloaded_chains()
 
 void chain_manager::find_available_chains(std::string root, std::string path)
 {
-	osd_directory *directory = osd_opendir((root + path).c_str());
+	osd::directory::ptr directory = osd::directory::open(root + path);
 	if (directory != nullptr)
 	{
-		for (const osd_directory_entry *entry = osd_readdir(directory); entry != nullptr; entry = osd_readdir(directory))
+		for (const osd::directory::entry *entry = directory->read(); entry != nullptr; entry = directory->read())
 		{
-			if (entry->type == ENTTYPE_FILE)
+			if (entry->type == osd::directory::entry::entry_type::FILE)
 			{
 				std::string name(entry->name);
 				std::string extension(".json");
@@ -114,7 +114,7 @@ void chain_manager::find_available_chains(std::string root, std::string path)
 					}
 				}
 			}
-			else if (entry->type == ENTTYPE_DIR)
+			else if (entry->type == osd::directory::entry::entry_type::DIR)
 			{
 				std::string name = entry->name;
 				if (!(name == "." || name == ".."))
@@ -128,8 +128,6 @@ void chain_manager::find_available_chains(std::string root, std::string path)
 				}
 			}
 		}
-
-		osd_closedir(directory);
 	}
 }
 
@@ -295,17 +293,17 @@ void chain_manager::process_screen_quad(uint32_t view, uint32_t screen, render_p
 	bgfx_texture *texture = new bgfx_texture(full_name, bgfx::TextureFormat::RGBA8, tex_width, tex_height, mem, BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT);
 	m_textures.add_provider(full_name, texture);
 
-    const bool any_targets_rebuilt = m_targets.update_target_sizes(screen, tex_width, tex_height, TARGET_STYLE_GUEST);
+	const bool any_targets_rebuilt = m_targets.update_target_sizes(screen, tex_width, tex_height, TARGET_STYLE_GUEST);
 	if (any_targets_rebuilt)
-    {
-        for (bgfx_chain* chain : m_screen_chains)
-        {
-            if (chain != nullptr)
-            {
-                chain->repopulate_targets();
-            }
-        }
-    }
+	{
+		for (bgfx_chain* chain : m_screen_chains)
+		{
+			if (chain != nullptr)
+			{
+				chain->repopulate_targets();
+			}
+		}
+	}
 
 	bgfx_chain* chain = screen_chain(screen);
 	chain->process(prim, view, screen, m_textures, window, bgfx_util::get_blend_state(PRIMFLAG_GET_BLENDMODE(prim->flags)));
@@ -443,19 +441,19 @@ uint32_t chain_manager::handle_screen_chains(uint32_t view, render_primitive *st
 			std::swap(screen_width, screen_height);
 		}
 
-        const bool any_targets_rebuilt = m_targets.update_target_sizes(screen_index, screen_width, screen_height, TARGET_STYLE_NATIVE);
-        if (any_targets_rebuilt)
-        {
-            for (bgfx_chain* chain : m_screen_chains)
-            {
-                if (chain != nullptr)
-                {
-                    chain->repopulate_targets();
-                }
-            }
-        }
+		const bool any_targets_rebuilt = m_targets.update_target_sizes(screen_index, screen_width, screen_height, TARGET_STYLE_NATIVE);
+		if (any_targets_rebuilt)
+		{
+			for (bgfx_chain* chain : m_screen_chains)
+			{
+				if (chain != nullptr)
+				{
+					chain->repopulate_targets();
+				}
+			}
+		}
 
-        process_screen_quad(view + used_views, screen_index, prim, window);
+		process_screen_quad(view + used_views, screen_index, prim, window);
 		used_views += screen_chain(screen_index)->applicable_passes();
 
 		screen_index++;

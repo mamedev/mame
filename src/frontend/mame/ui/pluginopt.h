@@ -21,7 +21,6 @@
 
 
 namespace ui {
-
 class menu_plugin : public menu
 {
 public:

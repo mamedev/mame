@@ -91,7 +91,7 @@ CPU_DISASSEMBLE( asap )
 					sprintf(buffer, "mov%s  %s,%s", setcond[cond], reg[rsrc1], reg[rdst]);
 					else
 					sprintf(buffer, "add%s  %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);
-		  break;
+			break;
 		case 0x09:  sprintf(buffer, "sub%s  %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);   break;
 		case 0x0a:  sprintf(buffer, "addc%s %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);   break;
 		case 0x0b:  sprintf(buffer, "subc%s %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);   break;

@@ -32,7 +32,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 class NETLIB_NAME(solver);
 
 

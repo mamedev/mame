@@ -2,9 +2,9 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /***************************************************************************
 
-	text.h
+    text.h
 
-	Text functionality for MAME's crude user interface
+    Text functionality for MAME's crude user interface
 
 ***************************************************************************/
 
@@ -20,7 +20,6 @@ class render_font;
 class render_container;
 
 namespace ui {
-
 /***************************************************************************
 TYPE DEFINITIONS
 ***************************************************************************/

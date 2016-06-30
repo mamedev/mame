@@ -16,7 +16,6 @@
 #include "ui/menu.h"
 
 namespace ui {
-
 class menu_video_targets : public menu
 {
 public:

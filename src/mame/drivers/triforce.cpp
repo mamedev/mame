@@ -1065,7 +1065,7 @@ ROM_END
 /* 0010A */ GAME( 2004, avalnc12, avalnc13, triforcegd,    triforce, driver_device, 0, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon 1.2 - Summon The New Monsters (client) (Rev A) (GDT-0010A)", MACHINE_IS_SKELETON )
 // 0010B    GAME( 2004, avalc13b, avalnc13, triforcegd,    triforce, driver_device, 0, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon 1.? - ??? (client) (Rev B) (GDT-0010B)", MACHINE_IS_SKELETON )
 /* 0010C */ GAME( 2004, avalnc13, triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon 1.3 - Chaotic Sabbat (client) (Rev C) (GDT-0010C)", MACHINE_IS_SKELETON )
-/* 0011  */ GAME( 2004, tfupdate, triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Triforce DIMM Updater (GDT-0011)", MACHINE_IS_SKELETON )
+/* 0011  */ GAME( 2004, tfupdate, triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Triforce DIMM Updater (3.17) (GDT-0011)", MACHINE_IS_SKELETON )
 // 0012
 // 0013     GAME( 2005, vs4jo,    vs4j,     triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Virtua Striker 4 (Japan) (GDT-0013)", MACHINE_IS_SKELETON )
 // 0013A    GAME( 2005, vs4ja,    vs4j,     triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Virtua Striker 4 (Japan) (Rev A) (GDT-0013A)", MACHINE_IS_SKELETON )
@@ -1092,7 +1092,7 @@ ROM_END
 /* 0020D */ GAME( 2006, vs42006,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Virtua Striker 4 Ver.2006 (Japan) (Rev D) (GDT-0020D)", MACHINE_IS_SKELETON )
 /* 0021  */ GAME( 2006, vs42k6ex, triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Virtua Striker 4 Ver.2006 (Export) (GDT-0021)", MACHINE_IS_SKELETON )
 // 0022     GAME( 2006, tcfboxo,  tcfboxa,  triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Triforce Firmware Update For Compact Flash Box (GDT-0022)", MACHINE_IS_SKELETON )
-/* 0022A */ GAME( 2006, tcfboxa,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Triforce Firmware Update For Compact Flash Box (Rev A) (GDT-0022A)", MACHINE_IS_SKELETON )
+/* 0022A */ GAME( 2006, tcfboxa,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Triforce Firmware Update For Compact Flash Box (4.01) (GDT-0022A)", MACHINE_IS_SKELETON )
 
 // 837-xxxxx (Sega cart games)
 /* 14343-4T1  */ GAME( 2005, mkartagp, triforce, triforce_base, triforce, driver_device, 0, ROT0, "Namco / Nintendo", "Mario Kart Arcade GP (Japan, MKA1 Ver.A1)", MACHINE_IS_SKELETON )

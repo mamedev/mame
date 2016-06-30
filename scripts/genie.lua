@@ -1110,6 +1110,7 @@ configuration { "mingw*" }
 			"-static-libgcc",
 			"-static-libstdc++",
 			"-static",
+			"-Wl,--start-group",
 		}
 		links {
 			"user32",

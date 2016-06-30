@@ -24,7 +24,6 @@
 #include "ui/submenu.h"
 
 namespace ui {
-
 /***************************************************************************
     MENU HANDLERS
 ***************************************************************************/
@@ -433,7 +432,7 @@ void menu_crosshair::populate()
 
 			/* open a path to the crosshairs */
 			file_enumerator path(machine().options().crosshair_path());
-			const osd_directory_entry *dir;
+			const osd::directory::entry *dir;
 			/* reset search flags */
 			bool using_default = false;
 			bool finished = false;

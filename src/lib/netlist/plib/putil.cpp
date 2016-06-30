@@ -156,6 +156,3 @@ namespace plib
 		return pstring(buf);
 	}
 } // namespace plib
-
-
-

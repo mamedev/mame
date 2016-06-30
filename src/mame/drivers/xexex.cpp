@@ -137,7 +137,7 @@ Unresolved Issues:
 #include "machine/eepromser.h"
 #include "machine/k053252.h"
 #include "sound/k054539.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/flt_vol.h"
 #include "includes/xexex.h"
 #include "includes/konamipt.h"

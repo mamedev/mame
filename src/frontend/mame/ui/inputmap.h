@@ -17,7 +17,6 @@
 
 
 namespace ui {
-
 class menu_input_groups : public menu
 {
 public:

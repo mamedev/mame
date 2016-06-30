@@ -524,7 +524,7 @@ Filter Board
 #include "cpu/m6809/m6809.h"
 #include "cpu/tms32025/tms32025.h"
 #include "includes/namcoic.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/c140.h"
 #include "includes/namcos21.h"
 #include "machine/nvram.h"
@@ -993,9 +993,6 @@ static ADDRESS_MAP_START( master_dsp_io, AS_IO, 16, namcos21_state )
 	AM_RANGE(0x0b,0x0b) AM_READWRITE(dsp_portb_r,dsp_portb_w)
 	AM_RANGE(0x0c,0x0c) AM_WRITE(dsp_portc_w)
 	AM_RANGE(0x0f,0x0f) AM_READ(dsp_portf_r)
-	AM_RANGE(TMS32025_HOLD,  TMS32025_HOLD)  AM_READNOP
-	AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITENOP
-	AM_RANGE(TMS32025_XF,    TMS32025_XF)    AM_WRITE(dsp_xf_w )
 ADDRESS_MAP_END
 
 /************************************************************************************/
@@ -1111,9 +1108,6 @@ static ADDRESS_MAP_START( slave_dsp_io, AS_IO, 16, namcos21_state )
 	AM_RANGE(0x02,0x02) AM_READ(slave_port2_r)
 	AM_RANGE(0x03,0x03) AM_READWRITE(slave_port3_r,slave_port3_w)
 	AM_RANGE(0x0f,0x0f) AM_READ(slave_portf_r)
-	AM_RANGE(TMS32025_HOLD,  TMS32025_HOLD)  AM_READNOP
-	AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITENOP
-	AM_RANGE(TMS32025_XF,    TMS32025_XF)    AM_WRITE(slave_XF_output_w)
 ADDRESS_MAP_END
 
 /************************************************************************************/
@@ -1424,20 +1418,7 @@ static ADDRESS_MAP_START( winrun_dsp_io, AS_IO, 16, namcos21_state )
 	AM_RANGE(0x0a,0x0a) AM_WRITE(winrun_dsp_render_w)
 	AM_RANGE(0x0b,0x0b) AM_WRITENOP
 	AM_RANGE(0x0c,0x0c) AM_WRITE(winrun_dsp_complete_w)
-	AM_RANGE(TMS32025_BIO,   TMS32025_BIO)   AM_READ(winrun_poly_reset_r )
-	AM_RANGE(TMS32025_HOLD,  TMS32025_HOLD)  AM_READNOP
-	AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITENOP
-	AM_RANGE(TMS32025_XF,    TMS32025_XF)    AM_WRITENOP
 ADDRESS_MAP_END
-
-READ16_MEMBER(namcos21_state::winrun_gpucomram_r)
-{
-	return m_winrun_gpucomram[offset];
-}
-WRITE16_MEMBER(namcos21_state::winrun_gpucomram_w)
-{
-	COMBINE_DATA( &m_winrun_gpucomram[offset] );
-}
 
 WRITE16_MEMBER(namcos21_state::winrun_dspbios_w)
 {
@@ -1491,7 +1472,7 @@ static ADDRESS_MAP_START( am_master_winrun, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x3c0000, 0x3c1fff) AM_READWRITE(winrun_68k_dspcomram_r,winrun_68k_dspcomram_w)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(pointram_control_w)
 	AM_RANGE(0x440000, 0x440001) AM_READWRITE(pointram_data_r,pointram_data_w)
-	AM_RANGE(0x600000, 0x60ffff) AM_READWRITE(winrun_gpucomram_r,winrun_gpucomram_w)
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("gpu_comram")
 	AM_RANGE(0x800000, 0x87ffff) AM_ROM AM_REGION("data", 0)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(namcos2_68k_dualportram_word_r,namcos2_68k_dualportram_word_w)
@@ -1503,7 +1484,7 @@ static ADDRESS_MAP_START( am_slave_winrun, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM
 	AM_RANGE(0x1c0000, 0x1fffff) AM_READWRITE(namcos2_68k_slave_C148_r,namcos2_68k_slave_C148_w)
-	AM_RANGE(0x600000, 0x60ffff) AM_READWRITE(winrun_gpucomram_r,winrun_gpucomram_w)
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("gpu_comram")
 	AM_RANGE(0x800000, 0x87ffff) AM_ROM AM_REGION("data", 0)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(namcos2_68k_dualportram_word_r,namcos2_68k_dualportram_word_w)
@@ -1516,7 +1497,7 @@ static ADDRESS_MAP_START( am_gpu_winrun, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x100000, 0x100001) AM_READWRITE(winrun_gpu_color_r,winrun_gpu_color_w) /* ? */
 	AM_RANGE(0x180000, 0x19ffff) AM_RAM /* work RAM */
 	AM_RANGE(0x1c0000, 0x1fffff) AM_READWRITE(namcos21_68k_gpu_C148_r,namcos21_68k_gpu_C148_w)
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("winrun_comram")
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("gpu_comram")
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x410000, 0x41ffff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x600000, 0x6fffff) AM_ROM AM_REGION("gdata", 0)
@@ -1667,11 +1648,17 @@ static MACHINE_CONFIG_START( namcos21, namcos21_state )
 	MCFG_CPU_PROGRAM_MAP(master_dsp_program)
 	MCFG_CPU_DATA_MAP(master_dsp_data)
 	MCFG_CPU_IO_MAP(master_dsp_io)
+	MCFG_TMS32025_HOLD_IN_CB(NOOP)
+	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
+	MCFG_TMS32025_XF_OUT_CB(WRITE16(namcos21_state, dsp_xf_w))
 
 	MCFG_CPU_ADD("dspslave", TMS32025,24000000*4) /* 24 MHz?; overclocked */
 	MCFG_CPU_PROGRAM_MAP(slave_dsp_program)
 	MCFG_CPU_DATA_MAP(slave_dsp_data)
 	MCFG_CPU_IO_MAP(slave_dsp_io)
+	MCFG_TMS32025_HOLD_IN_CB(NOOP)
+	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
+	MCFG_TMS32025_XF_OUT_CB(WRITE16(namcos21_state, slave_XF_output_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
@@ -1729,6 +1716,10 @@ static MACHINE_CONFIG_START( driveyes, namcos21_state )
 	MCFG_CPU_PROGRAM_MAP(winrun_dsp_program)
 	MCFG_CPU_DATA_MAP(winrun_dsp_data)
 	MCFG_CPU_IO_MAP(winrun_dsp_io)
+	MCFG_TMS32025_BIO_IN_CB(READ16(namcos21_state, winrun_poly_reset_r))
+	MCFG_TMS32025_HOLD_IN_CB(NOOP)
+	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
+	MCFG_TMS32025_XF_OUT_CB(NOOP)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
@@ -1786,6 +1777,10 @@ static MACHINE_CONFIG_START( winrun, namcos21_state )
 	MCFG_CPU_PROGRAM_MAP(winrun_dsp_program)
 	MCFG_CPU_DATA_MAP(winrun_dsp_data)
 	MCFG_CPU_IO_MAP(winrun_dsp_io)
+	MCFG_TMS32025_BIO_IN_CB(READ16(namcos21_state, winrun_poly_reset_r))
+	MCFG_TMS32025_HOLD_IN_CB(NOOP)
+	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
+	MCFG_TMS32025_XF_OUT_CB(NOOP)
 
 	MCFG_CPU_ADD("gpu", M68000,12288000) /* graphics coprocessor */
 	MCFG_CPU_PROGRAM_MAP(am_gpu_winrun)

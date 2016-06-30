@@ -232,22 +232,22 @@ static INPUT_PORTS_START( patinho_feio )
 	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 11") PORT_CODE(KEYCODE_1) PORT_TOGGLE
 
 	PORT_START("BUTTONS")
-	/* Modo de Operação: EXECUÇÃO */
+	/* Modo de Operacao: EXECUCAO */
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NORMAL") PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CICLO ÚNICO") PORT_CODE(KEYCODE_S)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("INSTRUÇÃO ÚNICA") PORT_CODE(KEYCODE_D)
-	/* Modo de Operação: MEMÓRIA */
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENDEREÇAMENTO") PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CICLO UNICO") PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("INSTRUCAO UNICA") PORT_CODE(KEYCODE_D)
+	/* Modo de Operacao: MEMORIA */
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENDERECAMENTO") PORT_CODE(KEYCODE_Z)
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ARMAZENAMENTO") PORT_CODE(KEYCODE_X)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("EXPOSIÇÃO") PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("EXPOSICAO") PORT_CODE(KEYCODE_C)
 	/* Comando: */
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ESPERA") PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("INTERRUPÇÃO") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("INTERRUPCAO") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("PARTIDA") PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("PREPARAÇÃO") PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("PREPARACAO") PORT_CODE(KEYCODE_R)
 	/* Switches */
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENDEREÇAMENTO (Fixo/Sequencial)") PORT_CODE(KEYCODE_N) PORT_TOGGLE
-	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("MEMÓRIA (Liberada/Protegida)") PORT_CODE(KEYCODE_M) PORT_TOGGLE
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENDERECAMENTO (Fixo/Sequencial)") PORT_CODE(KEYCODE_N) PORT_TOGGLE
+	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("MEMORIA (Liberada/Protegida)") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( patinho_feio, patinho_feio_state )
@@ -258,13 +258,13 @@ static MACHINE_CONFIG_START( patinho_feio, patinho_feio_state )
 	MCFG_PATINHO_BUTTONS_READ_CB(READ16(patinho_feio_state, buttons_r))
 
 	/* Printer */
-//	MCFG_PATINHO_IODEV_WRITE_CB(0x5, WRITE8(patinho_feio_state, printer_data_w))
+//  MCFG_PATINHO_IODEV_WRITE_CB(0x5, WRITE8(patinho_feio_state, printer_data_w))
 
 	/* Papertape Puncher */
-//	MCFG_PATINHO_IODEV_WRITE_CB(0x8, WRITE8(patinho_feio_state, papertape_punch_data_w))
+//  MCFG_PATINHO_IODEV_WRITE_CB(0x8, WRITE8(patinho_feio_state, papertape_punch_data_w))
 
 	/* Card Reader */
-//	MCFG_PATINHO_IODEV_READ_CB(0x9, READ8(patinho_feio_state, cardreader_data_r))
+//  MCFG_PATINHO_IODEV_READ_CB(0x9, READ8(patinho_feio_state, cardreader_data_r))
 
 	/* DECWRITER
 	   (max. speed: ?) */
@@ -279,7 +279,7 @@ static MACHINE_CONFIG_START( patinho_feio, patinho_feio_state )
 	/* Papertape Reader
 	   Hewlett-Packard HP-2737-A
 	   Optical Papertape Reader (max. speed: 300 characteres per second) */
-//	MCFG_PATINHO_IODEV_READ_CB(0xE, READ8(patinho_feio_state, papertapereader_data_r))
+//  MCFG_PATINHO_IODEV_READ_CB(0xE, READ8(patinho_feio_state, papertapereader_data_r))
 
 	/* DECWRITER */
 	MCFG_DEVICE_ADD("decwriter", TELEPRINTER, 0)
@@ -297,7 +297,7 @@ static MACHINE_CONFIG_START( patinho_feio, patinho_feio_state )
 	MCFG_DEFAULT_LAYOUT(layout_patinho)
 
 	// software lists
-//	MCFG_SOFTWARE_LIST_ADD("tape_list", "patinho")
+//  MCFG_SOFTWARE_LIST_ADD("tape_list", "patinho")
 MACHINE_CONFIG_END
 
 ROM_START( patinho )
@@ -313,7 +313,7 @@ ROM_START( patinho )
 	/* Micro pre-loader:
 	   This was re-created by professor Joao Jose Neto based on his vague
 	   recollection of sequences of opcode values from almost 40 years ago :-) */
-	ROM_REGION( 0x02a, "micro_pre_loader", 0 ) 
+	ROM_REGION( 0x02a, "micro_pre_loader", 0 )
 	ROM_LOAD( "micro-pre-loader.bin", 0x000, 0x02a, CRC(1921feab) SHA1(bb063102e44e9ab963f95b45710141dc2c5046b0) )
 ROM_END
 

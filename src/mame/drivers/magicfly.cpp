@@ -163,8 +163,8 @@
     (4) = Coin 1, Coin 2, Coupon.
 
     Note: Each Common GND (A-B-C-D) are for their respective
-	multiplexed groups of inputs, since there are 4 groups
-	with 5 valid inputs each one.
+    multiplexed groups of inputs, since there are 4 groups
+    with 5 valid inputs each one.
 
 
     **** 10-Pins connector ****

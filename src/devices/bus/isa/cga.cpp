@@ -1814,12 +1814,12 @@ WRITE8_MEMBER( isa8_ec1841_0002_device::io_write )
 		m_p3df = data;
 		if (data & 1) {
 			m_isa->install_memory(0xb8000, 0xb9fff,
-								  read8_delegate( FUNC(isa8_ec1841_0002_device::char_ram_read), this),
-								  write8_delegate(FUNC(isa8_ec1841_0002_device::char_ram_write), this) );
+									read8_delegate( FUNC(isa8_ec1841_0002_device::char_ram_read), this),
+									write8_delegate(FUNC(isa8_ec1841_0002_device::char_ram_write), this) );
 			if(m_vram_size == 0x4000)
 				m_isa->install_memory(0xbc000, 0xbdfff,
-									  read8_delegate( FUNC(isa8_ec1841_0002_device::char_ram_read), this),
-									  write8_delegate(FUNC(isa8_ec1841_0002_device::char_ram_write), this) );
+										read8_delegate( FUNC(isa8_ec1841_0002_device::char_ram_read), this),
+										write8_delegate(FUNC(isa8_ec1841_0002_device::char_ram_write), this) );
 		} else {
 			m_isa->install_bank(0xb8000, 0xb8000 + MIN(0x8000,m_vram_size) - 1, "bank_cga", &m_vram[0]);
 			if(m_vram_size == 0x4000)

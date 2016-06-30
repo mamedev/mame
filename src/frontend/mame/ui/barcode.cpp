@@ -14,7 +14,6 @@
 #include "ui/ui.h"
 
 namespace ui {
-
 // itemrefs for key menu items
 #define ITEMREF_NEW_BARCODE    ((void *) 0x0001)
 #define ITEMREF_ENTER_BARCODE  ((void *) 0x0002)

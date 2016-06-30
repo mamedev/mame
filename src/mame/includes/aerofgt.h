@@ -52,7 +52,7 @@ public:
 	optional_device<vsystem_spr2_device> m_spr_old; // every other (non-bootleg) uses this
 	optional_device<vsystem_spr2_device> m_spr_old2; //  or a pair of them..
 	optional_device<generic_latch_8_device> m_soundlatch;
-	
+
 
 
 	/* video-related */

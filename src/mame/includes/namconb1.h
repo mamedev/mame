@@ -95,7 +95,7 @@ public:
 	UINT32 screen_update_namconb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scantimer);
-	
+
 	int NB1objcode2tile(int code);
 	int NB2objcode2tile(int code);
 };

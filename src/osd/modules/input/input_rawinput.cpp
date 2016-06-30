@@ -617,7 +617,7 @@ protected:
 			name = utf8_from_tstring(keyname);
 
 			// add the item to the device
-			devinfo->device()->add_item(name, itemid, generic_button_get_state, &devinfo->keyboard.state[keynum]);
+			devinfo->device()->add_item(name, itemid, generic_button_get_state<std::uint8_t>, &devinfo->keyboard.state[keynum]);
 			osd_free(name);
 		}
 	}
@@ -652,13 +652,21 @@ protected:
 		// populate the axes
 		for (int axisnum = 0; axisnum < 3; axisnum++)
 		{
-			devinfo->device()->add_item(default_axis_name[axisnum], static_cast<input_item_id>(ITEM_ID_XAXIS + axisnum), generic_axis_get_state, &devinfo->mouse.lX + axisnum);
+			devinfo->device()->add_item(
+				default_axis_name[axisnum],
+				static_cast<input_item_id>(ITEM_ID_XAXIS + axisnum),
+				generic_axis_get_state<LONG>,
+				&devinfo->mouse.lX + axisnum);
 		}
 
 		// populate the buttons
 		for (int butnum = 0; butnum < 5; butnum++)
 		{
-			devinfo->device()->add_item(default_button_name(butnum), static_cast<input_item_id>(ITEM_ID_BUTTON1 + butnum), generic_button_get_state, &devinfo->mouse.rgbButtons[butnum]);
+			devinfo->device()->add_item(
+				default_button_name(butnum),
+				static_cast<input_item_id>(ITEM_ID_BUTTON1 + butnum),
+				generic_button_get_state<BYTE>,
+				&devinfo->mouse.rgbButtons[butnum]);
 		}
 	}
 };

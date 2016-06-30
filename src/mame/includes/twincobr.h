@@ -68,7 +68,7 @@ public:
 	DECLARE_WRITE16_MEMBER(twincobr_dsp_bio_w);
 	DECLARE_READ16_MEMBER(fsharkbt_dsp_r);
 	DECLARE_WRITE16_MEMBER(fsharkbt_dsp_w);
-	DECLARE_READ16_MEMBER(twincobr_BIO_r);
+	DECLARE_READ_LINE_MEMBER(twincobr_BIO_r);
 	DECLARE_WRITE16_MEMBER(twincobr_control_w);
 	DECLARE_WRITE8_MEMBER(wardner_control_w);
 	DECLARE_READ16_MEMBER(twincobr_sharedram_r);

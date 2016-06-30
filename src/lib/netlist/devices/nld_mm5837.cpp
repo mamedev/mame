@@ -16,7 +16,6 @@ namespace netlist
 {
 	namespace devices
 	{
-
 	NETLIB_OBJECT(MM5837_dip)
 	{
 		NETLIB_CONSTRUCTOR(MM5837_dip)

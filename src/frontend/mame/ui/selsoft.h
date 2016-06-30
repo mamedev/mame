@@ -15,7 +15,6 @@
 #include "ui/custmenu.h"
 
 namespace ui {
-
 using s_bios = std::vector<std::pair<std::string, int>>;
 using s_parts = std::unordered_map<std::string, std::string>;
 

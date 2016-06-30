@@ -43,7 +43,7 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
 	required_device<generic_latch_8_device> m_soundlatch3;
-	
+
 	/* 68k-side shared ram */
 	required_shared_ptr<UINT32> m_shared_ram;
 

@@ -18,7 +18,7 @@
 #include "machine/wd_fdc.h"
 #include "machine/z80dma.h"
 #include "video/mc6845.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/ay8910.h"
 #include "sound/wave.h"
 #include "imagedev/cassette.h"
