@@ -302,10 +302,30 @@ void renderer_d3d9::set_blendmode(int blendmode)
 	switch (blendmode)
 	{
 		default:
-		case BLENDMODE_NONE:            blendenable = FALSE;    blendop = D3DBLENDOP_ADD;   blendsrc = D3DBLEND_SRCALPHA;   blenddst = D3DBLEND_INVSRCALPHA;    break;
-		case BLENDMODE_ALPHA:           blendenable = TRUE;     blendop = D3DBLENDOP_ADD;   blendsrc = D3DBLEND_SRCALPHA;   blenddst = D3DBLEND_INVSRCALPHA;    break;
-		case BLENDMODE_RGB_MULTIPLY:    blendenable = TRUE;     blendop = D3DBLENDOP_ADD;   blendsrc = D3DBLEND_DESTCOLOR;  blenddst = D3DBLEND_ZERO;           break;
-		case BLENDMODE_ADD:             blendenable = TRUE;     blendop = D3DBLENDOP_ADD;   blendsrc = D3DBLEND_SRCALPHA;   blenddst = D3DBLEND_ONE;            break;
+		case BLENDMODE_NONE:
+			blendenable = FALSE;
+			blendop = D3DBLENDOP_ADD;
+			blendsrc = D3DBLEND_SRCALPHA;
+			blenddst = D3DBLEND_INVSRCALPHA;
+			break;
+		case BLENDMODE_ALPHA:
+			blendenable = TRUE;
+			blendop = D3DBLENDOP_ADD;
+			blendsrc = D3DBLEND_SRCALPHA;
+			blenddst = D3DBLEND_INVSRCALPHA;
+			break;
+		case BLENDMODE_RGB_MULTIPLY:
+			blendenable = TRUE;
+			blendop = D3DBLENDOP_ADD;
+			blendsrc = D3DBLEND_DESTCOLOR;
+			blenddst = D3DBLEND_ZERO;
+			break;
+		case BLENDMODE_ADD:
+			blendenable = TRUE;
+			blendop = D3DBLENDOP_ADD;
+			blendsrc = D3DBLEND_SRCALPHA;
+			blenddst = D3DBLEND_ONE;
+            break;
 	}
 
 	// adjust the bits that changed
@@ -522,7 +542,7 @@ renderer_d3d9::renderer_d3d9(std::shared_ptr<osd_window> window)
 	: osd_renderer(window, FLAG_NONE), m_adapter(0), m_width(0), m_height(0), m_refresh(0), m_create_error_count(0), m_device(nullptr), m_gamma_supported(0), m_pixformat(),
 	m_vertexbuf(nullptr), m_lockedbuf(nullptr), m_numverts(0), m_vectorbatch(nullptr), m_batchindex(0), m_numpolys(0), m_toggle(false),
 	m_screen_format(), m_last_texture(nullptr), m_last_texture_flags(0), m_last_blendenable(0), m_last_blendop(0), m_last_blendsrc(0), m_last_blenddst(0), m_last_filter(0),
-	m_last_wrap(), m_last_modmode(0), m_hlsl_buf(nullptr), m_shaders(nullptr), m_texture_manager(nullptr)
+	m_last_wrap(), m_last_modmode(0), m_shaders(nullptr), m_texture_manager(nullptr)
 {
 }
 
@@ -609,16 +629,9 @@ void d3d_texture_manager::update_textures()
 			texture_info *texture = find_texinfo(&prim.texture, prim.flags);
 			if (texture == nullptr)
 			{
-				if (m_renderer->get_shaders()->enabled())
-				{
-					// if there isn't one, create a new texture without prescale
-					texture = global_alloc(texture_info(this, &prim.texture, 1, prim.flags));
-				}
-				else
-				{
-					// if there isn't one, create a new texture
-					texture = global_alloc(texture_info(this, &prim.texture, win->prescale(), prim.flags));
-				}
+				int prescale = m_renderer->get_shaders()->enabled() ? 1 : win->prescale();
+
+				texture = global_alloc(texture_info(this, &prim.texture, prescale, prim.flags));
 			}
 			else
 			{
@@ -677,13 +690,8 @@ void renderer_d3d9::begin_frame()
 	if (FAILED(result))
 		osd_printf_verbose("Direct3D: Error %08lX during device BeginScene call\n", result);
 
-	m_lockedbuf = nullptr;
-
-	if(m_shaders->enabled())
-	{
-		m_hlsl_buf = (void*)mesh_alloc(6);
-		m_shaders->init_fsfx_quad(m_hlsl_buf);
-	}
+	if (m_shaders->enabled())
+		m_shaders->init_fsfx_quad();
 }
 
 void renderer_d3d9::process_primitives()
@@ -1519,7 +1527,7 @@ void renderer_d3d9::batch_vectors(int vector_count)
 	}
 
 	// now add a polygon entry
-	m_poly[m_numpolys].init(D3DPT_TRIANGLELIST, triangle_count, vertex_count, cached_flags, nullptr, D3DTOP_MODULATE, 0.0f, 1.0f, quad_width, quad_height);
+	m_poly[m_numpolys].init(D3DPT_TRIANGLELIST, triangle_count, vertex_count, cached_flags, nullptr, D3DTOP_MODULATE, quad_width, quad_height);
 	m_numpolys++;
 }
 
@@ -1686,7 +1694,7 @@ void renderer_d3d9::draw_line(const render_primitive &prim)
 	}
 
 	// now add a polygon entry
-	m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim.flags, nullptr, D3DTOP_MODULATE, 0.0f, 1.0f, 0.0f, 0.0f);
+	m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim.flags, nullptr, D3DTOP_MODULATE, 0.0f, 0.0f);
 	m_numpolys++;
 }
 
@@ -1760,30 +1768,6 @@ void renderer_d3d9::draw_quad(const render_primitive &prim)
 	m_numpolys++;
 }
 
-void poly_info::init(D3DPRIMITIVETYPE type, UINT32 count, UINT32 numverts,
-							UINT32 flags, texture_info *texture, UINT32 modmode,
-							float line_time, float line_length,
-							float prim_width, float prim_height)
-{
-	init(type, count, numverts, flags, texture, modmode, prim_width, prim_height);
-	m_line_time = line_time;
-	m_line_length = line_length;
-}
-
-void poly_info::init(D3DPRIMITIVETYPE type, UINT32 count, UINT32 numverts,
-							UINT32 flags, texture_info *texture, UINT32 modmode,
-							float prim_width, float prim_height)
-{
-	m_type = type;
-	m_count = count;
-	m_numverts = numverts;
-	m_flags = flags;
-	m_texture = texture;
-	m_modmode = modmode;
-	m_prim_width = prim_width;
-	m_prim_height = prim_height;
-}
-
 
 //============================================================
 //  primitive_alloc
@@ -1798,11 +1782,8 @@ vertex *renderer_d3d9::mesh_alloc(int numverts)
 	{
 		primitive_flush_pending();
 
-		if(m_shaders->enabled())
-		{
-			m_hlsl_buf = (void*)mesh_alloc(6);
-			m_shaders->init_fsfx_quad(m_hlsl_buf);
-		}
+		if (m_shaders->enabled())
+			m_shaders->init_fsfx_quad();
 	}
 
 	// if we don't have a lock, grab it now
@@ -1820,6 +1801,7 @@ vertex *renderer_d3d9::mesh_alloc(int numverts)
 		m_numverts += numverts;
 		return &m_lockedbuf[oldverts];
 	}
+
 	return nullptr;
 }
 
@@ -1857,8 +1839,8 @@ void renderer_d3d9::primitive_flush_pending()
 	// now do the polys
 	for (int polynum = 0; polynum < m_numpolys; polynum++)
 	{
-		UINT32 flags = m_poly[polynum].get_flags();
-		texture_info *texture = m_poly[polynum].get_texture();
+		UINT32 flags = m_poly[polynum].flags();
+		texture_info *texture = m_poly[polynum].texture();
 		int newfilter;
 
 		// set the texture if different
@@ -1872,21 +1854,19 @@ void renderer_d3d9::primitive_flush_pending()
 				newfilter = video_config.filter;
 			set_filter(newfilter);
 			set_wrap(PRIMFLAG_GET_TEXWRAP(flags) ? D3DTADDRESS_WRAP : D3DTADDRESS_CLAMP);
-			set_modmode(m_poly[polynum].get_modmode());
-
-			m_shaders->init_effect_info(&m_poly[polynum]);
+			set_modmode(m_poly[polynum].modmode());
 		}
 
 		// set the blendmode if different
 		set_blendmode(PRIMFLAG_GET_BLENDMODE(flags));
 
-		if (vertnum + m_poly[polynum].get_vertcount() > m_numverts)
+		if (vertnum + m_poly[polynum].numverts() > m_numverts)
 		{
-			osd_printf_error("Error: vertnum (%d) plus poly vertex count (%d) > %d\n", vertnum, m_poly[polynum].get_vertcount(), m_numverts);
+			osd_printf_error("Error: vertnum (%d) plus poly vertex count (%d) > %d\n", vertnum, m_poly[polynum].numverts(), m_numverts);
 			fflush(stdout);
 		}
 
-		assert(vertnum + m_poly[polynum].get_vertcount() <= m_numverts);
+		assert(vertnum + m_poly[polynum].numverts() <= m_numverts);
 
 		if(m_shaders->enabled() && d3dintf->post_fx_available)
 		{
@@ -1895,12 +1875,12 @@ void renderer_d3d9::primitive_flush_pending()
 		else
 		{
 			// add the primitives
-			result = m_device->DrawPrimitive(m_poly[polynum].get_type(), vertnum, m_poly[polynum].get_count());
+			result = m_device->DrawPrimitive(m_poly[polynum].type(), vertnum, m_poly[polynum].count());
 			if (FAILED(result))
 				osd_printf_verbose("Direct3D: Error %08lX during device draw_primitive call\n", result);
 		}
 
-		vertnum += m_poly[polynum].get_vertcount();
+		vertnum += m_poly[polynum].numverts();
 	}
 
 	m_shaders->end_draw();
@@ -2126,9 +2106,6 @@ texture_info::texture_info(d3d_texture_manager *manager, const render_texinfo* t
 	set_data(texsource, flags);
 
 	// add us to the texture list
-	if(m_texture_manager->get_texlist() != nullptr)
-		m_texture_manager->get_texlist()->m_prev = this;
-	m_prev = nullptr;
 	m_next = m_texture_manager->get_texlist();
 	m_texture_manager->set_texlist(this);
 	return;
@@ -2746,12 +2723,12 @@ void texture_info::prescale()
 			osd_printf_verbose("Direct3D: Error %08lX during device SetTexture call\n", result);
 
 		// lock the vertex buffer
-		result = m_renderer->get_vertex_buffer()->Lock(0, 0, m_renderer->get_locked_buffer_ptr(), D3DLOCK_DISCARD);
+		vertex *lockedbuf;
+		result = m_renderer->get_vertex_buffer()->Lock(0, 0, (VOID **)&lockedbuf, D3DLOCK_DISCARD);
 		if (FAILED(result))
 			osd_printf_verbose("Direct3D: Error %08lX during vertex buffer lock call\n", result);
 
 		// configure the X/Y coordinates on the target surface
-		vertex *lockedbuf = m_renderer->get_locked_buffer();
 		lockedbuf[0].x = -0.5f;
 		lockedbuf[0].y = -0.5f;
 		lockedbuf[1].x = (float)((m_texinfo.width + 2 * m_xborderpix) * m_xprescale) - 0.5f;
@@ -2783,7 +2760,6 @@ void texture_info::prescale()
 		result = m_renderer->get_vertex_buffer()->Unlock();
 		if (FAILED(result))
 			osd_printf_verbose("Direct3D: Error %08lX during vertex buffer unlock call\n", result);
-		m_renderer->set_locked_buffer(nullptr);
 
 		// set the stream and draw the triangle strip
 		result = m_renderer->get_device()->SetStreamSource(0, m_renderer->get_vertex_buffer(), 0, sizeof(vertex));
@@ -2817,11 +2793,11 @@ void texture_info::prescale()
 
 cache_target::~cache_target()
 {
-	if (last_texture != nullptr)
-		last_texture->Release();
+	if (texture != nullptr)
+		texture->Release();
 
-	if (last_target != nullptr)
-		last_target->Release();
+	if (target != nullptr)
+		target->Release();
 }
 
 
@@ -2829,18 +2805,19 @@ cache_target::~cache_target()
 //  cache_target::init - initializes a target cache
 //============================================================
 
-bool cache_target::init(renderer_d3d9 *d3d, d3d_base *d3dintf, int source_width, int source_height, int target_width, int target_height)
+bool cache_target::init(renderer_d3d9 *d3d, int source_width, int source_height, int target_width, int target_height, int screen_index)
 {
 	this->width = source_width;
 	this->height = source_height;
 	this->target_width = target_width;
 	this->target_height = target_height;
+	this->screen_index = screen_index;
 
-	HRESULT result = d3d->get_device()->CreateTexture(target_width, target_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &last_texture, nullptr);
+	HRESULT result = d3d->get_device()->CreateTexture(target_width, target_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture, nullptr);
 	if (FAILED(result))
 		return false;
 
-	last_texture->GetSurfaceLevel(0, &last_target);
+	texture->GetSurfaceLevel(0, &target);
 
 	return true;
 }
@@ -2882,7 +2859,7 @@ d3d_render_target::~d3d_render_target()
 //  d3d_render_target::init - initializes a render target
 //============================================================
 
-bool d3d_render_target::init(renderer_d3d9 *d3d, d3d_base *d3dintf, int source_width, int source_height, int target_width, int target_height)
+bool d3d_render_target::init(renderer_d3d9 *d3d, int source_width, int source_height, int target_width, int target_height, int screen_index, int page_index)
 {
 	HRESULT result;
 
@@ -2891,6 +2868,9 @@ bool d3d_render_target::init(renderer_d3d9 *d3d, d3d_base *d3dintf, int source_w
 
 	this->target_width = target_width;
 	this->target_height = target_height;
+
+	this->screen_index = screen_index;
+	this->page_index = page_index;
 
 	for (int index = 0; index < 2; index++)
 	{
