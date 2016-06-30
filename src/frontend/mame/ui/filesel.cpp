@@ -491,8 +491,8 @@ menu_file_selector::file_selector_entry *menu_file_selector::append_dirent_entry
 
 void menu_file_selector::append_entry_menu_item(const file_selector_entry *entry)
 {
-	const char *text = nullptr;
-	const char *subtext = nullptr;
+	std::string text;
+	std::string subtext;
 
 	switch(entry->type)
 	{
