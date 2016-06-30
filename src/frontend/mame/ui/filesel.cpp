@@ -106,10 +106,10 @@ menu_confirm_save_as::~menu_confirm_save_as()
 
 void menu_confirm_save_as::populate()
 {
-	item_append(_("File Already Exists - Override?"), nullptr, FLAG_DISABLE, nullptr);
+	item_append(_("File Already Exists - Override?"), "", FLAG_DISABLE, nullptr);
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("No"), nullptr, 0, ITEMREF_NO);
-	item_append(_("Yes"), nullptr, 0, ITEMREF_YES);
+	item_append(_("No"), "", 0, ITEMREF_NO);
+	item_append(_("Yes"), "", 0, ITEMREF_YES);
 }
 
 //-------------------------------------------------
@@ -232,7 +232,7 @@ void menu_file_create::populate()
 
 	// finish up the menu
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Create"), nullptr, 0, ITEMREF_CREATE);
+	item_append(_("Create"), "", 0, ITEMREF_CREATE);
 
 	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
@@ -293,7 +293,6 @@ menu_file_selector::menu_file_selector(mame_ui_manager &mui, render_container *c
 	: menu(mui, container)
 	, m_current_directory(current_directory)
 	, m_current_file(current_file)
-	, m_entrylist(nullptr)
 {
 	m_image = image;
 	m_has_empty = has_empty;
@@ -384,8 +383,8 @@ bool menu_file_selector::custom_mouse_down()
 int menu_file_selector::compare_entries(const file_selector_entry *e1, const file_selector_entry *e2)
 {
 	int result;
-	const char *e1_basename = (e1->basename != nullptr) ? e1->basename : "";
-	const char *e2_basename = (e2->basename != nullptr) ? e2->basename : "";
+	const char *e1_basename = e1->basename.c_str();
+	const char *e2_basename = e2->basename.c_str();
 
 	if (e1->type < e2->type)
 	{
@@ -420,28 +419,30 @@ int menu_file_selector::compare_entries(const file_selector_entry *e1, const fil
 //  file selector entry to an entry list
 //-------------------------------------------------
 
-menu_file_selector::file_selector_entry *menu_file_selector::append_entry(
-	file_selector_entry_type entry_type, const char *entry_basename, const char *entry_fullpath)
+menu_file_selector::file_selector_entry &menu_file_selector::append_entry(
+	file_selector_entry_type entry_type, const std::string &entry_basename, const std::string &entry_fullpath)
 {
-	file_selector_entry *entry;
-	file_selector_entry **entryptr;
+	return append_entry(entry_type, std::string(entry_basename), std::string(entry_fullpath));
+}
 
+
+//-------------------------------------------------
+//  append_entry - appends a new
+//  file selector entry to an entry list
+//-------------------------------------------------
+
+menu_file_selector::file_selector_entry &menu_file_selector::append_entry(
+	file_selector_entry_type entry_type, std::string &&entry_basename, std::string &&entry_fullpath)
+{
 	// allocate a new entry
-	entry = (file_selector_entry *) m_pool_alloc(sizeof(*entry));
-	memset(entry, 0, sizeof(*entry));
-	entry->type = entry_type;
-	entry->basename = (entry_basename != nullptr) ? pool_strdup(entry_basename) : entry_basename;
-	entry->fullpath = (entry_fullpath != nullptr) ? pool_strdup(entry_fullpath) : entry_fullpath;
+	file_selector_entry entry;
+	entry.type = entry_type;
+	entry.basename = std::move(entry_basename);
+	entry.fullpath = std::move(entry_fullpath);
 
 	// find the end of the list
-	entryptr = &m_entrylist;
-	while ((*entryptr != nullptr) && (compare_entries(entry, *entryptr) >= 0))
-		entryptr = &(*entryptr)->next;
-
-	// insert the entry
-	entry->next = *entryptr;
-	*entryptr = entry;
-	return entry;
+	m_entrylist.emplace_back(std::move(entry));
+	return m_entrylist[m_entrylist.size() - 1];
 }
 
 
@@ -475,10 +476,10 @@ menu_file_selector::file_selector_entry *menu_file_selector::append_dirent_entry
 	util::zippath_combine(buffer, m_current_directory.c_str(), dirent->name);
 
 	// create the file selector entry
-	entry = append_entry(
+	entry = &append_entry(
 		entry_type,
 		dirent->name,
-		buffer.c_str());
+		std::move(buffer));
 
 	return entry;
 }
@@ -491,8 +492,8 @@ menu_file_selector::file_selector_entry *menu_file_selector::append_dirent_entry
 
 void menu_file_selector::append_entry_menu_item(const file_selector_entry *entry)
 {
-	const char *text = nullptr;
-	const char *subtext = nullptr;
+	std::string text;
+	std::string subtext;
 
 	switch(entry->type)
 	{
@@ -523,7 +524,7 @@ void menu_file_selector::append_entry_menu_item(const file_selector_entry *entry
 			subtext = "[FILE]";
 			break;
 	}
-	item_append(text, subtext, 0, (void *) entry);
+	item_append(std::move(text), std::move(subtext), 0, (void *) entry);
 }
 
 
@@ -546,24 +547,24 @@ void menu_file_selector::populate()
 	err = util::zippath_opendir(path, &directory);
 
 	// clear out the menu entries
-	m_entrylist = nullptr;
+	m_entrylist.clear();
 
 	if (m_has_empty)
 	{
 		// add the "[empty slot]" entry
-		append_entry(SELECTOR_ENTRY_TYPE_EMPTY, nullptr, nullptr);
+		append_entry(SELECTOR_ENTRY_TYPE_EMPTY, "", "");
 	}
 
 	if (m_has_create)
 	{
 		// add the "[create]" entry
-		append_entry(SELECTOR_ENTRY_TYPE_CREATE, nullptr, nullptr);
+		append_entry(SELECTOR_ENTRY_TYPE_CREATE, "", "");
 	}
 
 	if (m_has_softlist)
 	{
 		// add the "[software list]" entry
-		entry = append_entry(SELECTOR_ENTRY_TYPE_SOFTWARE_LIST, nullptr, nullptr);
+		entry = &append_entry(SELECTOR_ENTRY_TYPE_SOFTWARE_LIST, "", "");
 		selected_entry = entry;
 	}
 
@@ -598,8 +599,8 @@ void menu_file_selector::populate()
 	}
 
 	// append all of the menu entries
-	for (entry = m_entrylist; entry != nullptr; entry = entry->next)
-		append_entry_menu_item(entry);
+	for (auto &entry : m_entrylist)
+		append_entry_menu_item(&entry);
 
 	// set the selection (if we have one)
 	if (selected_entry != nullptr)
@@ -620,7 +621,6 @@ void menu_file_selector::populate()
 void menu_file_selector::handle()
 {
 	osd_file::error err;
-	const file_selector_entry *entry;
 	const file_selector_entry *selected_entry = nullptr;
 	int bestmatch = 0;
 
@@ -631,7 +631,7 @@ void menu_file_selector::handle()
 		// handle selections
 		if (event->iptkey == IPT_UI_SELECT)
 		{
-			entry = (const file_selector_entry *) event->itemref;
+			auto entry = (const file_selector_entry *) event->itemref;
 			switch (entry->type)
 			{
 			case SELECTOR_ENTRY_TYPE_EMPTY:
@@ -654,7 +654,7 @@ void menu_file_selector::handle()
 			case SELECTOR_ENTRY_TYPE_DRIVE:
 			case SELECTOR_ENTRY_TYPE_DIRECTORY:
 				// drive/directory - first check the path
-				err = util::zippath_opendir(entry->fullpath, nullptr);
+				err = util::zippath_opendir(entry->fullpath.c_str(), nullptr);
 				if (err != osd_file::error::NONE)
 				{
 					// this path is problematic; present the user with an error and bail
@@ -709,41 +709,21 @@ void menu_file_selector::handle()
 				const file_selector_entry *cur_selected = (const file_selector_entry *)get_selection();
 
 				// check for entries which matches our m_filename_buffer:
-				// from current entry to the end
-				for (entry = cur_selected; entry != nullptr; entry = entry->next)
+				for (auto &entry : m_entrylist)
 				{
-					if (entry->basename != nullptr && m_filename_buffer[0] != '\0')
+					if (cur_selected != &entry)
 					{
 						int match = 0;
 						for (int i = 0; i < ARRAY_LENGTH(m_filename_buffer); i++)
 						{
-							if (core_strnicmp(entry->basename, m_filename_buffer, i) == 0)
+							if (core_strnicmp(entry.basename.c_str(), m_filename_buffer, i) == 0)
 								match = i;
 						}
 
 						if (match > bestmatch)
 						{
 							bestmatch = match;
-							selected_entry = entry;
-						}
-					}
-				}
-				// and from the first entry to current one
-				for (entry = m_entrylist; entry != cur_selected; entry = entry->next)
-				{
-					if (entry->basename != nullptr && m_filename_buffer[0] != '\0')
-					{
-						int match = 0;
-						for (int i = 0; i < ARRAY_LENGTH(m_filename_buffer); i++)
-						{
-							if (core_strnicmp(entry->basename, m_filename_buffer, i) == 0)
-								match = i;
-						}
-
-						if (match > bestmatch)
-						{
-							bestmatch = match;
-							selected_entry = entry;
+							selected_entry = &entry;
 						}
 					}
 				}
@@ -799,7 +779,7 @@ menu_select_format::~menu_select_format()
 
 void menu_select_format::populate()
 {
-	item_append(_("Select image format"), nullptr, FLAG_DISABLE, nullptr);
+	item_append(_("Select image format"), "", FLAG_DISABLE, nullptr);
 	for (int i = 0; i < m_total_usable; i++)
 	{
 		const floppy_image_format_t *fmt = m_formats[i];
@@ -859,12 +839,12 @@ menu_select_rw::~menu_select_rw()
 
 void menu_select_rw::populate()
 {
-	item_append(_("Select access mode"), nullptr, FLAG_DISABLE, nullptr);
-	item_append(_("Read-only"), nullptr, 0, (void *)READONLY);
+	item_append(_("Select access mode"), "", FLAG_DISABLE, nullptr);
+	item_append(_("Read-only"), "", 0, (void *)READONLY);
 	if (m_can_in_place)
-		item_append(_("Read-write"), nullptr, 0, (void *)READWRITE);
-	item_append(_("Read this image, write to another image"), nullptr, 0, (void *)WRITE_OTHER);
-	item_append(_("Read this image, write to diff"), nullptr, 0, (void *)WRITE_DIFF);
+		item_append(_("Read-write"), "", 0, (void *)READWRITE);
+	item_append(_("Read this image, write to another image"), "", 0, (void *)WRITE_OTHER);
+	item_append(_("Read this image, write to diff"), "", 0, (void *)WRITE_DIFF);
 }
 
 

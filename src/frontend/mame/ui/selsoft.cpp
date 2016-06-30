@@ -432,7 +432,7 @@ void menu_select_software::populate()
 	{
 		// if the device can be loaded empty, add an item
 		if (m_has_empty_start)
-			item_append("[Start empty]", nullptr, flags_ui, (void *)&m_swinfo[0]);
+			item_append("[Start empty]", "", flags_ui, (void *)&m_swinfo[0]);
 
 		m_displaylist.clear();
 		m_tmp.clear();
@@ -477,7 +477,7 @@ void menu_select_software::populate()
 			else if (m_displaylist[curitem]->shortname == reselect_last::software && m_displaylist[curitem]->listname == reselect_last::swlist)
 				old_software = m_has_empty_start ? curitem + 1 : curitem;
 
-			item_append(m_displaylist[curitem]->longname.c_str(), m_displaylist[curitem]->devicetype.c_str(),
+			item_append(m_displaylist[curitem]->longname, m_displaylist[curitem]->devicetype,
 						m_displaylist[curitem]->parentname.empty() ? flags_ui : (FLAG_INVERT | flags_ui), (void *)m_displaylist[curitem]);
 		}
 	}
@@ -487,7 +487,7 @@ void menu_select_software::populate()
 		find_matches(m_search, VISIBLE_GAMES_IN_SEARCH);
 
 		for (int curitem = 0; m_searchlist[curitem] != nullptr; ++curitem)
-			item_append(m_searchlist[curitem]->longname.c_str(), m_searchlist[curitem]->devicetype.c_str(),
+			item_append(m_searchlist[curitem]->longname, m_searchlist[curitem]->devicetype,
 						m_searchlist[curitem]->parentname.empty() ? flags_ui : (FLAG_INVERT | flags_ui),
 						(void *)m_searchlist[curitem]);
 	}
@@ -1938,7 +1938,7 @@ software_parts::~software_parts()
 void software_parts::populate()
 {
 	for (auto & elem : m_parts)
-		item_append(elem.first.c_str(), elem.second.c_str(), 0, (void *)&elem);
+		item_append(elem.first, elem.second, 0, (void *)&elem);
 
 	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
@@ -2036,7 +2036,7 @@ bios_selection::~bios_selection()
 void bios_selection::populate()
 {
 	for (auto & elem : m_bios)
-		item_append(elem.first.c_str(), nullptr, 0, (void *)&elem.first);
+		item_append(elem.first, "", 0, (void *)&elem.first);
 
 	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);

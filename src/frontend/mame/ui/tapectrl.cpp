@@ -59,7 +59,7 @@ void menu_tape_control::populate()
 	if (current_device())
 	{
 		// name of tape
-		item_append(current_display_name().c_str(), current_device()->exists() ? current_device()->filename() : "No Tape Image loaded", current_display_flags(), TAPECMD_SELECT);
+		item_append(current_display_name(), current_device()->exists() ? current_device()->filename() : "No Tape Image loaded", current_display_flags(), TAPECMD_SELECT);
 
 		if (current_device()->exists())
 		{
@@ -92,19 +92,19 @@ void menu_tape_control::populate()
 						TAPECMD_SLIDER);
 
 			// pause or stop
-			item_append(_("Pause/Stop"), nullptr, 0, TAPECMD_STOP);
+			item_append(_("Pause/Stop"), "", 0, TAPECMD_STOP);
 
 			// play
-			item_append(_("Play"), nullptr, 0, TAPECMD_PLAY);
+			item_append(_("Play"), "", 0, TAPECMD_PLAY);
 
 			// record
-			item_append(_("Record"), nullptr, 0, TAPECMD_RECORD);
+			item_append(_("Record"), "", 0, TAPECMD_RECORD);
 
 			// rewind
-			item_append(_("Rewind"), nullptr, 0, TAPECMD_REWIND);
+			item_append(_("Rewind"), "", 0, TAPECMD_REWIND);
 
 			// fast forward
-			item_append(_("Fast Forward"), nullptr, 0, TAPECMD_FAST_FORWARD);
+			item_append(_("Fast Forward"), "", 0, TAPECMD_FAST_FORWARD);
 		}
 	}
 }

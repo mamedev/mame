@@ -50,14 +50,13 @@ void menu_input_groups::populate()
 	int player;
 
 	/* build up the menu */
-	item_append(_("User Interface"), nullptr, 0, (void *)(IPG_UI + 1));
+	item_append(_("User Interface"), "", 0, (void *)(IPG_UI + 1));
 	for (player = 0; player < MAX_PLAYERS; player++)
 	{
-		char buffer[40];
-		sprintf(buffer, "Player %d Controls", player + 1);
-		item_append(buffer, nullptr, 0, (void *)(FPTR)(IPG_PLAYER1 + player + 1));
+		auto s = string_format("Player %d Controls", player + 1);
+		item_append(s, "", 0, (void *)(FPTR)(IPG_PLAYER1 + player + 1));
 	}
-	item_append(_("Other Controls"), nullptr, 0, (void *)(FPTR)(IPG_OTHER + 1));
+	item_append(_("Other Controls"), "", 0, (void *)(FPTR)(IPG_OTHER + 1));
 }
 
 menu_input_groups::~menu_input_groups()
@@ -416,7 +415,7 @@ void menu_input::populate_and_sort(input_item_data *itemlist)
 				first_entry = false;
 			else
 				item_append(menu_item_type::SEPARATOR);
-			item_append(string_format("[root%s]", item->owner_name).c_str(), nullptr, 0, nullptr);
+			item_append(string_format("[root%s]", item->owner_name), "", 0, nullptr);
 			prev_owner.assign(item->owner_name);
 		}
 
@@ -437,7 +436,7 @@ void menu_input::populate_and_sort(input_item_data *itemlist)
 		}
 
 		/* add the item */
-		item_append(text.c_str(), subtext.c_str(), flags, item);
+		item_append(text, subtext, flags, item);
 	}
 }
 
@@ -567,7 +566,7 @@ void menu_settings::populate()
 					else
 						item_append(menu_item_type::SEPARATOR);
 					string_format("[root%s]", field.device().tag());
-					item_append(string_format("[root%s]", field.device().tag()).c_str(), nullptr, 0, nullptr);
+					item_append(string_format("[root%s]", field.device().tag()), "", 0, nullptr);
 					prev_owner.assign(field.device().tag());
 				}
 
@@ -619,7 +618,7 @@ void menu_settings::populate()
 		custombottom = dipcount ? dipcount * (DIP_SWITCH_HEIGHT + DIP_SWITCH_SPACING) + DIP_SWITCH_SPACING : 0;
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Reset"),  nullptr, 0, (void *)1);
+	item_append(_("Reset"), "", 0, (void *)1);
 }
 
 menu_settings::~menu_settings()
@@ -811,8 +810,6 @@ menu_analog::menu_analog(mame_ui_manager &mui, render_container *container) : me
 
 void menu_analog::populate()
 {
-	std::string text;
-	std::string subtext;
 	std::string prev_owner;
 	bool first_entry = true;
 
@@ -857,13 +854,15 @@ void menu_analog::populate()
 					{
 						analog_item_data *data;
 						UINT32 flags = 0;
+						std::string text;
+						std::string subtext;
 						if (strcmp(field.device().tag(), prev_owner.c_str()) != 0)
 						{
 							if (first_entry)
 								first_entry = false;
 							else
 								item_append(menu_item_type::SEPARATOR);
-							item_append(string_format("[root%s]", field.device().tag()).c_str(), nullptr, 0, nullptr);
+							item_append(string_format("[root%s]", field.device().tag()), "", 0, nullptr);
 							prev_owner.assign(field.device().tag());
 						}
 
@@ -920,7 +919,7 @@ void menu_analog::populate()
 							flags |= FLAG_RIGHT_ARROW;
 
 						/* append a menu item */
-						item_append(text.c_str(), subtext.c_str(), flags, data);
+						item_append(std::move(text), std::move(subtext), flags, data);
 					}
 			}
 }

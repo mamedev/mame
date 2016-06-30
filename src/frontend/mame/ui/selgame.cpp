@@ -552,7 +552,7 @@ void menu_select_game::populate()
 				if (cloneof)
 					flags_ui |= FLAG_INVERT;
 
-				item_append(elem->description, nullptr, flags_ui, (void *)elem);
+				item_append(elem->description, "", flags_ui, (void *)elem);
 				curitem++;
 			}
 		}
@@ -581,13 +581,13 @@ void menu_select_game::populate()
 				if (cloneof)
 					flags_ui |= FLAG_INVERT;
 
-				item_append(mfavorite.longname.c_str(), nullptr, flags_ui, (void *)&mfavorite);
+				item_append(mfavorite.longname, "", flags_ui, (void *)&mfavorite);
 			}
 			else
 			{
 				if (old_item_selected == -1 && mfavorite.shortname == reselect_last::driver)
 					old_item_selected = curitem;
-				item_append(mfavorite.longname.c_str(), mfavorite.devicetype.c_str(),
+				item_append(mfavorite.longname, mfavorite.devicetype,
 					mfavorite.parentname.empty() ? flags_ui : (FLAG_INVERT | flags_ui), (void *)&mfavorite);
 			}
 			curitem++;
@@ -600,12 +600,12 @@ void menu_select_game::populate()
 	if (menu::stack_has_special_main_menu())
 	{
 		UINT32 flags_ui = FLAG_UI | FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
-		item_append(_("Configure Options"), nullptr, flags_ui, (void *)(FPTR)CONF_OPTS);
-		item_append(_("Configure Machine"), nullptr, flags_ui, (void *)(FPTR)CONF_MACHINE);
+		item_append(_("Configure Options"), "", flags_ui, (void *)(FPTR)CONF_OPTS);
+		item_append(_("Configure Machine"), "", flags_ui, (void *)(FPTR)CONF_MACHINE);
 		skip_main_items = 2;
 		if (machine().options().plugins())
 		{
-			item_append(_("Plugins"), nullptr, flags_ui, (void *)(FPTR)CONF_PLUGINS);
+			item_append(_("Plugins"), "", flags_ui, (void *)(FPTR)CONF_PLUGINS);
 			skip_main_items++;
 		}
 	}
@@ -1549,7 +1549,7 @@ void menu_select_game::populate_search()
 			if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
 				cloneof = false;
 		}
-		item_append(m_searchlist[curitem]->description, nullptr, (!cloneof) ? flags_ui : (FLAG_INVERT | flags_ui),
+		item_append(m_searchlist[curitem]->description, "", (!cloneof) ? flags_ui : (FLAG_INVERT | flags_ui),
 			(void *)m_searchlist[curitem]);
 	}
 }

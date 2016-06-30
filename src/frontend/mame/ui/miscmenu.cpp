@@ -93,7 +93,7 @@ void menu_bios_selection::populate()
 	}
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Reset"),  nullptr, 0, (void *)1);
+	item_append(_("Reset"), "", 0, (void *)1);
 }
 
 menu_bios_selection::~menu_bios_selection()
@@ -265,7 +265,7 @@ void menu_bookkeeping::populate()
 	}
 
 	/* append the single item */
-	item_append(tempstring.str().c_str(), nullptr, FLAG_MULTILINE, nullptr);
+	item_append(tempstring.str(), "", FLAG_MULTILINE, nullptr);
 }
 
 /*-------------------------------------------------
@@ -672,9 +672,9 @@ void menu_export::handle()
 void menu_export::populate()
 {
 	// add options items
-	item_append(_("Export list in XML format (like -listxml)"), nullptr, 0, (void *)(FPTR)1);
-	item_append(_("Export list in XML format (like -listxml, but exclude devices)"), nullptr, 0, (void *)(FPTR)3);
-	item_append(_("Export list in TXT format (like -listfull)"), nullptr, 0, (void *)(FPTR)2);
+	item_append(_("Export list in XML format (like -listxml)"), "", 0, (void *)(FPTR)1);
+	item_append(_("Export list in XML format (like -listxml, but exclude devices)"), "", 0, (void *)(FPTR)3);
+	item_append(_("Export list in TXT format (like -listfull)"), "", 0, (void *)(FPTR)2);
 	item_append(menu_item_type::SEPARATOR);
 }
 
@@ -771,28 +771,28 @@ void menu_machine_configure::handle()
 void menu_machine_configure::populate()
 {
 	// add options items
-	item_append(_("Bios"), nullptr, FLAG_DISABLE | FLAG_UI_HEADING, nullptr);
+	item_append(_("Bios"), "", FLAG_DISABLE | FLAG_UI_HEADING, nullptr);
 	if (!m_bios.empty())
 	{
 		UINT32 arrows = get_arrow_flags(0, m_bios.size() - 1, m_curbios);
-		item_append(_("Driver"), m_bios[m_curbios].first.c_str(), arrows, (void *)(FPTR)BIOS);
+		item_append(_("Driver"), m_bios[m_curbios].first, arrows, (void *)(FPTR)BIOS);
 	}
 	else
-		item_append(_("This machine has no bios."), nullptr, FLAG_DISABLE, nullptr);
+		item_append(_("This machine has no bios."), "", FLAG_DISABLE, nullptr);
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_(submenu::advanced_options[0].description), nullptr, 0, (void *)(FPTR)ADVANCED);
-	item_append(_(submenu::video_options[0].description), nullptr, 0, (void *)(FPTR)VIDEO);
-	item_append(_(submenu::control_options[0].description), nullptr, 0, (void *)(FPTR)CONTROLLER);
+	item_append(_(submenu::advanced_options[0].description), "", 0, (void *)(FPTR)ADVANCED);
+	item_append(_(submenu::video_options[0].description), "", 0, (void *)(FPTR)VIDEO);
+	item_append(_(submenu::control_options[0].description), "", 0, (void *)(FPTR)CONTROLLER);
 	item_append(menu_item_type::SEPARATOR);
 
 	if (!mame_machine_manager::instance()->favorite().isgame_favorite(m_drv))
-		item_append(_("Add To Favorites"), nullptr, 0, (void *)ADDFAV);
+		item_append(_("Add To Favorites"), "", 0, (void *)ADDFAV);
 	else
-		item_append(_("Remove From Favorites"), nullptr, 0, (void *)DELFAV);
+		item_append(_("Remove From Favorites"), "", 0, (void *)DELFAV);
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Save machine configuration"), nullptr, 0, (void *)(FPTR)SAVE);
+	item_append(_("Save machine configuration"), "", 0, (void *)(FPTR)SAVE);
 	item_append(menu_item_type::SEPARATOR);
 	customtop = 2.0f * ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }

@@ -176,7 +176,7 @@ void menu_custom_filter::populate()
 			arrow_flags = get_arrow_flags(0, c_mnfct::ui.size() - 1, custfltr::mnfct[x]);
 			std::string fbuff(_("^!Manufacturer"));
 			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), c_mnfct::ui[custfltr::mnfct[x]].c_str(), arrow_flags, (void *)(FPTR)(MNFCT_FILTER + x));
+			item_append(fbuff, c_mnfct::ui[custfltr::mnfct[x]], arrow_flags, (void *)(FPTR)(MNFCT_FILTER + x));
 		}
 
 		// add year subitem
@@ -185,17 +185,17 @@ void menu_custom_filter::populate()
 			arrow_flags = get_arrow_flags(0, c_year::ui.size() - 1, custfltr::year[x]);
 			std::string fbuff(_("^!Year"));
 			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), c_year::ui[custfltr::year[x]].c_str(), arrow_flags, (void *)(FPTR)(YEAR_FILTER + x));
+			item_append(fbuff, c_year::ui[custfltr::year[x]], arrow_flags, (void *)(FPTR)(YEAR_FILTER + x));
 		}
 	}
 
 	item_append(menu_item_type::SEPARATOR);
 
 	if (custfltr::numother > 0)
-		item_append(_("Remove last filter"), nullptr, 0, (void *)(FPTR)REMOVE_FILTER);
+		item_append(_("Remove last filter"), "", 0, (void *)(FPTR)REMOVE_FILTER);
 
 	if (custfltr::numother < MAX_CUST_FILTER - 2)
-		item_append(_("Add filter"), nullptr, 0, (void *)(FPTR)ADD_FILTER);
+		item_append(_("Add filter"), "", 0, (void *)(FPTR)ADD_FILTER);
 
 	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
@@ -463,7 +463,7 @@ void menu_swcustom_filter::populate()
 			arrow_flags = get_arrow_flags(0, m_filter.publisher.ui.size() - 1, sw_custfltr::mnfct[x]);
 			std::string fbuff(_("^!Publisher"));
 			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), m_filter.publisher.ui[sw_custfltr::mnfct[x]].c_str(), arrow_flags, (void *)(FPTR)(MNFCT_FILTER + x));
+			item_append(fbuff, m_filter.publisher.ui[sw_custfltr::mnfct[x]], arrow_flags, (void *)(FPTR)(MNFCT_FILTER + x));
 		}
 
 		// add year subitem
@@ -472,7 +472,7 @@ void menu_swcustom_filter::populate()
 			arrow_flags = get_arrow_flags(0, m_filter.year.ui.size() - 1, sw_custfltr::year[x]);
 			std::string fbuff(_("^!Year"));
 			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), m_filter.year.ui[sw_custfltr::year[x]].c_str(), arrow_flags, (void *)(FPTR)(YEAR_FILTER + x));
+			item_append(fbuff, m_filter.year.ui[sw_custfltr::year[x]], arrow_flags, (void *)(FPTR)(YEAR_FILTER + x));
 		}
 
 		// add year subitem
@@ -481,7 +481,7 @@ void menu_swcustom_filter::populate()
 			arrow_flags = get_arrow_flags(0, m_filter.swlist.name.size() - 1, sw_custfltr::list[x]);
 			std::string fbuff(_("^!Software List"));
 			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), m_filter.swlist.description[sw_custfltr::list[x]].c_str(), arrow_flags, (void *)(FPTR)(LIST_FILTER + x));
+			item_append(fbuff, m_filter.swlist.description[sw_custfltr::list[x]], arrow_flags, (void *)(FPTR)(LIST_FILTER + x));
 		}
 
 		// add device type subitem
@@ -490,7 +490,7 @@ void menu_swcustom_filter::populate()
 			arrow_flags = get_arrow_flags(0, m_filter.type.ui.size() - 1, sw_custfltr::type[x]);
 			std::string fbuff(_("^!Device type"));
 			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), m_filter.type.ui[sw_custfltr::type[x]].c_str(), arrow_flags, (void *)(FPTR)(TYPE_FILTER + x));
+			item_append(fbuff, m_filter.type.ui[sw_custfltr::type[x]], arrow_flags, (void *)(FPTR)(TYPE_FILTER + x));
 		}
 
 		// add region subitem
@@ -499,17 +499,17 @@ void menu_swcustom_filter::populate()
 			arrow_flags = get_arrow_flags(0, m_filter.region.ui.size() - 1, sw_custfltr::region[x]);
 			std::string fbuff(_("^!Region"));
 			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), m_filter.region.ui[sw_custfltr::region[x]].c_str(), arrow_flags, (void *)(FPTR)(REGION_FILTER + x));
+			item_append(fbuff, m_filter.region.ui[sw_custfltr::region[x]], arrow_flags, (void *)(FPTR)(REGION_FILTER + x));
 		}
 	}
 
 	item_append(menu_item_type::SEPARATOR);
 
 	if (sw_custfltr::numother > 0)
-		item_append(_("Remove last filter"), nullptr, 0, (void *)(FPTR)REMOVE_FILTER);
+		item_append(_("Remove last filter"), "", 0, (void *)(FPTR)REMOVE_FILTER);
 
 	if (sw_custfltr::numother < MAX_CUST_FILTER - 2)
-		item_append(_("Add filter"), nullptr, 0, (void *)(FPTR)ADD_FILTER);
+		item_append(_("Add filter"), "", 0, (void *)(FPTR)ADD_FILTER);
 
 	item_append(menu_item_type::SEPARATOR);
 

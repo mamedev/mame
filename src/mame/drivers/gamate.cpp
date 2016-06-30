@@ -4,7 +4,10 @@
  PeT mess@utanet.at 2007, 2014
  Peter Wilhelmsen peter.wilhelmsen@gmail.com
  Morten Shearman Kirkegaard morten+gamate@afdelingp.dk
- Juan F??lix Mateos vectrex@hackermesh.org
+ Juan Felix Mateos vectrex@hackermesh.org
+
+ A complete hardware description can be found at
+ http://blog.kevtris.org/blogfiles/Gamate%20Inside.txt
 
  nmi unknown
  bomb blast top status line missing
