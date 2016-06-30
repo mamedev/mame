@@ -419,7 +419,7 @@ int menu_file_selector::compare_entries(const file_selector_entry *e1, const fil
 //  file selector entry to an entry list
 //-------------------------------------------------
 
-menu_file_selector::file_selector_entry *menu_file_selector::append_entry(
+menu_file_selector::file_selector_entry &menu_file_selector::append_entry(
 	file_selector_entry_type entry_type, const std::string &entry_basename, const std::string &entry_fullpath)
 {
 	return append_entry(entry_type, std::string(entry_basename), std::string(entry_fullpath));
@@ -431,7 +431,7 @@ menu_file_selector::file_selector_entry *menu_file_selector::append_entry(
 //  file selector entry to an entry list
 //-------------------------------------------------
 
-menu_file_selector::file_selector_entry *menu_file_selector::append_entry(
+menu_file_selector::file_selector_entry &menu_file_selector::append_entry(
 	file_selector_entry_type entry_type, std::string &&entry_basename, std::string &&entry_fullpath)
 {
 	// allocate a new entry
@@ -442,7 +442,7 @@ menu_file_selector::file_selector_entry *menu_file_selector::append_entry(
 
 	// find the end of the list
 	m_entrylist.emplace_back(std::move(entry));
-	return &m_entrylist[m_entrylist.size() - 1];
+	return m_entrylist[m_entrylist.size() - 1];
 }
 
 
@@ -476,7 +476,7 @@ menu_file_selector::file_selector_entry *menu_file_selector::append_dirent_entry
 	util::zippath_combine(buffer, m_current_directory.c_str(), dirent->name);
 
 	// create the file selector entry
-	entry = append_entry(
+	entry = &append_entry(
 		entry_type,
 		dirent->name,
 		std::move(buffer));
@@ -564,7 +564,7 @@ void menu_file_selector::populate()
 	if (m_has_softlist)
 	{
 		// add the "[software list]" entry
-		entry = append_entry(SELECTOR_ENTRY_TYPE_SOFTWARE_LIST, "", "");
+		entry = &append_entry(SELECTOR_ENTRY_TYPE_SOFTWARE_LIST, "", "");
 		selected_entry = entry;
 	}
 
