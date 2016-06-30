@@ -810,8 +810,6 @@ menu_analog::menu_analog(mame_ui_manager &mui, render_container *container) : me
 
 void menu_analog::populate()
 {
-	std::string text;
-	std::string subtext;
 	std::string prev_owner;
 	bool first_entry = true;
 
@@ -856,6 +854,8 @@ void menu_analog::populate()
 					{
 						analog_item_data *data;
 						UINT32 flags = 0;
+						std::string text;
+						std::string subtext;
 						if (strcmp(field.device().tag(), prev_owner.c_str()) != 0)
 						{
 							if (first_entry)
@@ -919,7 +919,7 @@ void menu_analog::populate()
 							flags |= FLAG_RIGHT_ARROW;
 
 						/* append a menu item */
-						item_append(text.c_str(), subtext.c_str(), flags, data);
+						item_append(std::move(text), std::move(subtext), flags, data);
 					}
 			}
 }

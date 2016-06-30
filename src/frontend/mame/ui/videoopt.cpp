@@ -187,7 +187,7 @@ void menu_video_options::populate()
 		/* create a string for the item, replacing underscores with spaces */
 		tempstring.assign(name);
 		strreplace(tempstring, "_", " ");
-		item_append(tempstring.c_str(), "", 0, (void *)(FPTR)(VIDEO_ITEM_VIEW + viewnum));
+		item_append(tempstring, "", 0, (void *)(FPTR)(VIDEO_ITEM_VIEW + viewnum));
 	}
 
 	/* add a separator */

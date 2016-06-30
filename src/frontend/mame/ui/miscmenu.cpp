@@ -775,7 +775,7 @@ void menu_machine_configure::populate()
 	if (!m_bios.empty())
 	{
 		UINT32 arrows = get_arrow_flags(0, m_bios.size() - 1, m_curbios);
-		item_append(_("Driver"), m_bios[m_curbios].first.c_str(), arrows, (void *)(FPTR)BIOS);
+		item_append(_("Driver"), m_bios[m_curbios].first, arrows, (void *)(FPTR)BIOS);
 	}
 	else
 		item_append(_("This machine has no bios."), "", FLAG_DISABLE, nullptr);

@@ -57,7 +57,7 @@ void menu_barcode_reader::populate()
 		const char *new_barcode;
 
 		// selected device
-		item_append(current_display_name().c_str(), "", current_display_flags(), ITEMREF_SELECT_READER);
+		item_append(current_display_name(), "", current_display_flags(), ITEMREF_SELECT_READER);
 
 		// append the "New Barcode" item
 		if (get_selection() == ITEMREF_NEW_BARCODE)

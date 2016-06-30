@@ -587,7 +587,7 @@ void menu_select_game::populate()
 			{
 				if (old_item_selected == -1 && mfavorite.shortname == reselect_last::driver)
 					old_item_selected = curitem;
-				item_append(mfavorite.longname.c_str(), mfavorite.devicetype.c_str(),
+				item_append(mfavorite.longname, mfavorite.devicetype,
 					mfavorite.parentname.empty() ? flags_ui : (FLAG_INVERT | flags_ui), (void *)&mfavorite);
 			}
 			curitem++;

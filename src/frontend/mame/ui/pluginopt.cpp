@@ -106,7 +106,7 @@ void menu_plugin_opt::populate()
 		else if(item.flags == "lr")
 			flags = FLAG_RIGHT_ARROW | FLAG_LEFT_ARROW;
 
-		item_append(item.text.c_str(), item.subtext.c_str(), flags, (void *)i++);
+		item_append(item.text, item.subtext, flags, (void *)i++);
 	}
 	item_append(menu_item_type::SEPARATOR);
 }

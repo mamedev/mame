@@ -239,12 +239,12 @@ void menu_game_options::populate()
 			arrow_flags = get_arrow_flags(0, inif.total() - 1, inif.cur_file());
 			fbuff = _(" ^!File");
 			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), inif.get_file().c_str(), arrow_flags, (void *)(FPTR)FILE_CATEGORY_FILTER);
+			item_append(fbuff, inif.get_file(), arrow_flags, (void *)(FPTR)FILE_CATEGORY_FILTER);
 
 			arrow_flags = get_arrow_flags(0, inif.cat_total() - 1, inif.cur_cat());
 			fbuff = _(" ^!Category");
 			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), inif.get_category().c_str(), arrow_flags, (void *)(FPTR)CATEGORY_FILTER);
+			item_append(fbuff, inif.get_category(), arrow_flags, (void *)(FPTR)CATEGORY_FILTER);
 		}
 		// add manufacturer subitem
 		else if (m_main == FILTER_MANUFACTURER && c_mnfct::ui.size() > 0)
@@ -252,7 +252,7 @@ void menu_game_options::populate()
 			arrow_flags = get_arrow_flags(0, c_mnfct::ui.size() - 1, c_mnfct::actual);
 			fbuff = _("^!Manufacturer");
 			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), c_mnfct::ui[c_mnfct::actual].c_str(), arrow_flags, (void *)(FPTR)MANUFACT_CAT_FILTER);
+			item_append(fbuff, c_mnfct::ui[c_mnfct::actual], arrow_flags, (void *)(FPTR)MANUFACT_CAT_FILTER);
 		}
 		// add year subitem
 		else if (m_main == FILTER_YEAR && c_year::ui.size() > 0)
@@ -260,14 +260,14 @@ void menu_game_options::populate()
 			arrow_flags = get_arrow_flags(0, c_year::ui.size() - 1, c_year::actual);
 			fbuff.assign(_("^!Year"));
 			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), c_year::ui[c_year::actual].c_str(), arrow_flags, (void *)(FPTR)YEAR_CAT_FILTER);
+			item_append(fbuff, c_year::ui[c_year::actual], arrow_flags, (void *)(FPTR)YEAR_CAT_FILTER);
 		}
 		// add custom subitem
 		else if (m_main == FILTER_CUSTOM)
 		{
 			fbuff = _("^!Setup custom filter");
 			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), "", 0, (void *)(FPTR)CUSTOM_FILTER);
+			item_append(fbuff, "", 0, (void *)(FPTR)CUSTOM_FILTER);
 		}
 
 		item_append(menu_item_type::SEPARATOR);
