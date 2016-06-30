@@ -1063,12 +1063,12 @@ function strip()
 	configuration { "mingw*", "x64", "Release" }
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
-			"$(SILENT) " .. (_OPTIONS['TOOLCHAIN'] and toolchainPrefix or "$(MINGW64)/bin/") .. "strip -s \"$(TARGET)\"",
+			"$(SILENT) " .. (_OPTIONS['TOOLCHAIN'] or "$(MINGW64)/bin/") .. "strip -s \"$(TARGET)\"",
 		}
 	configuration { "mingw*", "x32", "Release" }
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
-			"$(SILENT) " .. (_OPTIONS['TOOLCHAIN'] and toolchainPrefix or "$(MINGW32)/bin/") .. "strip -s \"$(TARGET)\"",
+			"$(SILENT) " .. (_OPTIONS['TOOLCHAIN'] or "$(MINGW32)/bin/") .. "strip -s \"$(TARGET)\"",
 		}
 
 	configuration { "pnacl" }
