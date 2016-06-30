@@ -4096,7 +4096,7 @@ GAME( 1988, korinaim, korinai,  korinaim,        korinaim, driver_device,  0,   
 /* pure 16-bit palette (+ LCD in some) */
 GAME( 1987, housemnq, 0,        housemnq,        housemnq, driver_device,  0,        ROT0, "Nichibutsu", "House Mannequin (Japan 870217)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, housemn2, 0,        housemn2,        housemn2, driver_device,  0,        ROT0, "Nichibutsu", "House Mannequin Roppongi Live hen (Japan 870418)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, livegal,  0,        livegal,         livegal,  driver_device,  0,        ROT0, "Central Denshi", "Live Gal (Japan 870530)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, livegal,  0,        livegal,         livegal,  driver_device,  0,        ROT0, "Central Denshi", "Live Gal [BET] (Japan 870530)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, bijokkoy, 0,        bijokkoy,        bijokkoy, driver_device,  0,        ROT0, "Nichibutsu", "Bijokko Yume Monogatari (Japan 870925)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, bijokkog, 0,        bijokkog,        bijokkog, driver_device,  0,        ROT0, "Nichibutsu", "Bijokko Gakuen (Japan 880116)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, orangec,  0,        orangec,         orangec,  driver_device,  0,        ROT0, "Daiichi Denshi", "Orange Club - Maruhi Kagai Jugyou (Japan 880213)", MACHINE_SUPPORTS_SAVE )
