@@ -463,17 +463,6 @@ void *menu::m_pool_alloc(size_t size)
 
 
 //-------------------------------------------------
-//  pool_strdup - make a temporary string
-//  copy in the menu's memory pool
-//-------------------------------------------------
-
-const char *menu::pool_strdup(const char *string)
-{
-	return strcpy((char *)m_pool_alloc(strlen(string) + 1), string);
-}
-
-
-//-------------------------------------------------
 //  get_selection - retrieves the index
 //  of the currently selected menu item
 //-------------------------------------------------
