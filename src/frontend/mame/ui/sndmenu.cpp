@@ -131,7 +131,7 @@ void menu_sound_options::populate()
 
 	// add options items
 	item_append(_("Sound"), m_sound ? _("On") : _("Off"), m_sound ? FLAG_RIGHT_ARROW : FLAG_LEFT_ARROW, (void *)(FPTR)ENABLE_SOUND);
-	item_append(_("Sample Rate"), string_format("%d", m_sample_rate).c_str(), arrow_flags, (void *)(FPTR)SAMPLE_RATE);
+	item_append(_("Sample Rate"), string_format("%d", m_sample_rate), arrow_flags, (void *)(FPTR)SAMPLE_RATE);
 	item_append(_("Use External Samples"), m_samples ? _("On") : _("Off"), m_samples ? FLAG_RIGHT_ARROW : FLAG_LEFT_ARROW, (void *)(FPTR)ENABLE_SAMPLES);
 	item_append(menu_item_type::SEPARATOR);
 

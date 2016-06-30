@@ -90,7 +90,7 @@ void menu_software_parts::populate()
 				menu_part_name.append(" (").append(swpart.feature("part_id")).append(")");
 			entry->type = T_ENTRY;
 			entry->part = &swpart;
-			item_append(m_info->shortname(), menu_part_name.c_str(), 0, entry);
+			item_append(m_info->shortname(), menu_part_name, 0, entry);
 		}
 	}
 }

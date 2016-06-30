@@ -345,7 +345,7 @@ void menu_font_ui::populate()
 
 	// add fonts option
 	arrow_flags = get_arrow_flags(0, m_fonts.size() - 1, m_actual);
-	item_append(_("UI Font"), m_fonts[m_actual].second.c_str(), arrow_flags, (void *)(FPTR)MUI_FNT);
+	item_append(_("UI Font"), m_fonts[m_actual].second, arrow_flags, (void *)(FPTR)MUI_FNT);
 
 #ifdef UI_WINDOWS
 	if (m_fonts[m_actual].first != "default")
@@ -356,13 +356,13 @@ void menu_font_ui::populate()
 #endif
 
 	arrow_flags = get_arrow_flags(m_font_min, m_font_max, m_font_size);
-	item_append(_("Lines"), string_format("%2d", m_font_size).c_str(), arrow_flags, (void *)(FPTR)FONT_SIZE);
+	item_append(_("Lines"), string_format("%2d", m_font_size), arrow_flags, (void *)(FPTR)FONT_SIZE);
 
 	item_append(menu_item_type::SEPARATOR);
 
 	// add item
 	arrow_flags = get_arrow_flags(m_info_min, m_info_max, m_info_size);
-	item_append(_("Infos text size"), string_format("%3.2f", m_info_size).c_str(), arrow_flags, (void *)(FPTR)INFOS_SIZE);
+	item_append(_("Infos text size"), string_format("%3.2f", m_info_size), arrow_flags, (void *)(FPTR)INFOS_SIZE);
 
 	item_append(menu_item_type::SEPARATOR);
 
@@ -833,34 +833,34 @@ void menu_rgb_ui::populate()
 	if (m_lock_ref != RGB_ALPHA)
 	{
 		arrow_flags = get_arrow_flags(0, 255, m_color->a());
-		item_append(_("Alpha"), string_format("%3u", m_color->a()).c_str(), arrow_flags, (void *)(FPTR)RGB_ALPHA);
+		item_append(_("Alpha"), string_format("%3u", m_color->a()), arrow_flags, (void *)(FPTR)RGB_ALPHA);
 	}
 	else
-		item_append(_("Alpha"), s_text.c_str(), 0, (void *)(FPTR)RGB_ALPHA);
+		item_append(_("Alpha"), s_text, 0, (void *)(FPTR)RGB_ALPHA);
 
 	if (m_lock_ref != RGB_RED)
 	{
 		arrow_flags = get_arrow_flags(0, 255, m_color->r());
-		item_append(_("Red"), string_format("%3u", m_color->r()).c_str(), arrow_flags, (void *)(FPTR)RGB_RED);
+		item_append(_("Red"), string_format("%3u", m_color->r()), arrow_flags, (void *)(FPTR)RGB_RED);
 	}
 	else
-		item_append(_("Red"), s_text.c_str(), 0, (void *)(FPTR)RGB_RED);
+		item_append(_("Red"), s_text, 0, (void *)(FPTR)RGB_RED);
 
 	if (m_lock_ref != RGB_GREEN)
 	{
 		arrow_flags = get_arrow_flags(0, 255, m_color->g());
-		item_append(_("Green"), string_format("%3u", m_color->g()).c_str(), arrow_flags, (void *)(FPTR)RGB_GREEN);
+		item_append(_("Green"), string_format("%3u", m_color->g()), arrow_flags, (void *)(FPTR)RGB_GREEN);
 	}
 	else
-		item_append(_("Green"), s_text.c_str(), 0, (void *)(FPTR)RGB_GREEN);
+		item_append(_("Green"), s_text, 0, (void *)(FPTR)RGB_GREEN);
 
 	if (m_lock_ref != RGB_BLUE)
 	{
 		arrow_flags = get_arrow_flags(0, 255, m_color->b());
-		item_append(_("Blue"), string_format("%3u", m_color->b()).c_str(), arrow_flags, (void *)(FPTR)RGB_BLUE);
+		item_append(_("Blue"), string_format("%3u", m_color->b()), arrow_flags, (void *)(FPTR)RGB_BLUE);
 	}
 	else
-		item_append(_("Blue"), s_text.c_str(), 0, (void *)(FPTR)RGB_BLUE);
+		item_append(_("Blue"), s_text, 0, (void *)(FPTR)RGB_BLUE);
 
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_("Choose from palette"), "", 0, (void *)(FPTR)PALETTE_CHOOSE);
