@@ -361,11 +361,11 @@ void menu::item_append(std::string &&text, std::string &&subtext, UINT32 flags, 
 	auto index = item.size();
 	if (!item.empty())
 	{
-		item.insert(item.end() - 1, pitem);
+		item.emplace(item.end() - 1, std::move(pitem));
 		--index;
 	}
 	else
-		item.push_back(pitem);
+		item.emplace_back(std::move(pitem));
 
 	// update the selection if we need to
 	if (resetpos == index || (resetref != nullptr && resetref == ref))
