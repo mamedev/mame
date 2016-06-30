@@ -31,6 +31,12 @@ enum class menu_item_type
 class menu_item
 {
 public:
+	menu_item() = default;
+	menu_item(menu_item const &) = default;
+	menu_item(menu_item &&) = default;
+	menu_item &operator=(menu_item const &) = default;
+	menu_item &operator=(menu_item &&) = default;
+
 	std::string     text;
 	std::string     subtext;
 	UINT32          flags;
