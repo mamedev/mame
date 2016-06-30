@@ -358,7 +358,7 @@ void menu::item_append(std::string &&text, std::string &&subtext, UINT32 flags, 
 	pitem.type = type;
 
 	// append to array
-	int index = item.size();
+	auto index = item.size();
 	if (!item.empty())
 	{
 		item.insert(item.end() - 1, pitem);
