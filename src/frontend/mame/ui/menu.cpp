@@ -351,8 +351,8 @@ void menu::item_append(std::string &&text, std::string &&subtext, UINT32 flags, 
 
 	// allocate a new item and populate it
 	menu_item pitem;
-	pitem.text = text;
-	pitem.subtext = subtext;
+	pitem.text = std::move(text);
+	pitem.subtext = std::move(subtext);
 	pitem.flags = flags;
 	pitem.ref = ref;
 	pitem.type = type;

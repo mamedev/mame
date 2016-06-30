@@ -523,7 +523,7 @@ void menu_file_selector::append_entry_menu_item(const file_selector_entry *entry
 			subtext = "[FILE]";
 			break;
 	}
-	item_append(text, subtext, 0, (void *) entry);
+	item_append(std::move(text), std::move(subtext), 0, (void *) entry);
 }
 
 
