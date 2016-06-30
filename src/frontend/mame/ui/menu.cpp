@@ -331,7 +331,7 @@ void menu::item_append(menu_item_type type)
 
 void menu::item_append(const std::string &text, const std::string &subtext, UINT32 flags, void *ref, menu_item_type type)
 {
-	item_append((std::string&&)text, (std::string&&)subtext, flags, ref, type);
+	item_append(std::string(text), std::string(subtext), flags, ref, type);
 }
 
 //-------------------------------------------------
