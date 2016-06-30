@@ -181,7 +181,7 @@ c1526_base_t:: c1526_base_t(const machine_config &mconfig, device_type type, con
 //-------------------------------------------------
 
 c1526_t::c1526_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	c1526_base_t(mconfig, C1526, "1526", tag, owner, clock, "c1526", __FILE__),
+	c1526_base_t(mconfig, C1526, "MPS802/C1526 Printer", tag, owner, clock, "c1526", __FILE__),
 	device_cbm_iec_interface(mconfig, *this)
 {
 }
@@ -192,7 +192,7 @@ c1526_t::c1526_t(const machine_config &mconfig, const char *tag, device_t *owner
 //-------------------------------------------------
 
 c4023_t::c4023_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	c1526_base_t(mconfig, C4023, "4023", tag, owner, clock, "c4023", __FILE__),
+	c1526_base_t(mconfig, C4023, "C4023 Printer", tag, owner, clock, "c4023", __FILE__),
 	device_ieee488_interface(mconfig, *this)
 {
 }
