@@ -15,7 +15,6 @@
 #include <signal.h>
 #include <dlfcn.h>
 
-#include <codecvt>
 #include <iomanip>
 #include <memory>
 
