@@ -60,7 +60,7 @@ public:
 class d3d_texture_manager
 {
 public:
-	d3d_texture_manager(): m_renderer(nullptr), m_texlist(nullptr), m_dynamic_supported(0), m_stretch_supported(0), m_yuv_format(), m_texture_caps(0), m_texture_max_aspect(0), m_texture_max_width(0), m_texture_max_height(0), m_default_texture(nullptr)
+	d3d_texture_manager(): m_renderer(nullptr), m_dynamic_supported(0), m_stretch_supported(0), m_yuv_format(), m_texture_caps(0), m_texture_max_aspect(0), m_texture_max_width(0), m_texture_max_height(0), m_default_texture(nullptr)
 	{ }
 
 	d3d_texture_manager(renderer_d3d9 *d3d);
@@ -73,8 +73,6 @@ public:
 	texture_info *          find_texinfo(const render_texinfo *texture, UINT32 flags);
 	UINT32                  texture_compute_hash(const render_texinfo *texture, UINT32 flags);
 
-	texture_info *          get_texlist() const { return m_texlist; }
-	void                    set_texlist(texture_info *texlist) { m_texlist = texlist; }
 	bool                    is_dynamic_supported() const { return (bool)m_dynamic_supported; }
 	void                    set_dynamic_supported(bool dynamic_supported) { m_dynamic_supported = dynamic_supported; }
 	bool                    is_stretch_supported() const { return (bool)m_stretch_supported; }
@@ -89,10 +87,10 @@ public:
 
 	renderer_d3d9 *         get_d3d() const { return m_renderer; }
 
+	std::vector<std::unique_ptr<texture_info>> m_texture_list;  // list of active textures
+
 private:
 	renderer_d3d9 *         m_renderer;
-
-	texture_info *          m_texlist;                  // list of active textures
 	int                     m_dynamic_supported;        // are dynamic textures supported?
 	int                     m_stretch_supported;        // is StretchRect with point filtering supported?
 	D3DFORMAT               m_yuv_format;               // format to use for YUV textures
@@ -125,8 +123,6 @@ public:
 
 	void                    set_data(const render_texinfo *texsource, UINT32 flags);
 
-	texture_info *          get_next() const { return m_next; }
-
 	UINT32                  get_hash() const { return m_hash; }
 
 	void                    increment_frame_count() { m_cur_frame++; }
@@ -150,8 +146,6 @@ private:
 	d3d_texture_manager *   m_texture_manager;          // texture manager pointer
 
 	renderer_d3d9 *         m_renderer;                 // renderer pointer
-
-	texture_info *          m_next;                     // next texture in the list
 
 	UINT32                  m_hash;                     // hash value for the texture
 	UINT32                  m_flags;                    // rendering flags
@@ -226,7 +220,7 @@ class cache_target
 {
 public:
 	// construction/destruction
-	cache_target(): target(nullptr), texture(nullptr), target_width(0), target_height(0), width(0), height(0), screen_index(0), next(nullptr), prev(nullptr)
+	cache_target(): target(nullptr), texture(nullptr), target_width(0), target_height(0), width(0), height(0), screen_index(0)
 	{ }
 
 	~cache_target();
@@ -243,9 +237,6 @@ public:
 	int height;
 
 	int screen_index;
-
-	cache_target *next;
-	cache_target *prev;
 };
 
 /* d3d_render_target is the information about a Direct3D render target chain */
@@ -253,8 +244,22 @@ class d3d_render_target
 {
 public:
 	// construction/destruction
-	d3d_render_target(): target_width(0), target_height(0), width(0), height(0), screen_index(0), page_index(0), next(nullptr), prev(nullptr), bloom_count(0)
-	{ }
+	d3d_render_target(): target_width(0), target_height(0), width(0), height(0), screen_index(0), page_index(0), bloom_count(0)
+	{
+		for (int index = 0; index < MAX_BLOOM_COUNT; index++)
+		{
+			bloom_texture[index] = nullptr;
+			bloom_surface[index] = nullptr;
+		}
+
+		for (int index = 0; index < 2; index++)
+		{
+			source_texture[index] = nullptr;
+			source_surface[index] = nullptr;
+			target_texture[index] = nullptr;
+			target_surface[index] = nullptr;
+		}
+	}
 
 	~d3d_render_target();
 
@@ -276,9 +281,6 @@ public:
 	IDirect3DTexture9 *target_texture[2];
 	IDirect3DSurface9 *source_surface[2];
 	IDirect3DTexture9 *source_texture[2];
-
-	d3d_render_target *next;
-	d3d_render_target *prev;
 
 	IDirect3DSurface9 *bloom_surface[MAX_BLOOM_COUNT];
 	IDirect3DTexture9 *bloom_texture[MAX_BLOOM_COUNT];

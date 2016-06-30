@@ -378,7 +378,6 @@ d3d_texture_manager::d3d_texture_manager(renderer_d3d9 *d3d)
 {
 	m_renderer = d3d;
 
-	m_texlist = nullptr;
 	m_default_texture = nullptr;
 
 	D3DCAPS9 caps;
@@ -441,7 +440,9 @@ void d3d_texture_manager::create_resources()
 		texture.seqid = 0;
 
 		// now create it
-		m_default_texture = global_alloc(texture_info(this, &texture, win->prescale(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32)));
+		auto tex = std::make_unique<texture_info>(this, &texture, win->prescale(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
+		m_default_texture = tex.get();
+		m_texture_list.push_back(std::move(tex));
 	}
 }
 
@@ -452,12 +453,7 @@ void d3d_texture_manager::delete_resources()
 	m_default_texture = nullptr;
 
 	// free all textures
-	while (m_texlist != nullptr)
-	{
-		texture_info *tex = m_texlist;
-		m_texlist = tex->get_next();
-		global_free(tex);
-	}
+	m_texture_list.clear();
 }
 
 UINT32 d3d_texture_manager::texture_compute_hash(const render_texinfo *texture, UINT32 flags)
@@ -468,37 +464,32 @@ UINT32 d3d_texture_manager::texture_compute_hash(const render_texinfo *texture, 
 texture_info *d3d_texture_manager::find_texinfo(const render_texinfo *texinfo, UINT32 flags)
 {
 	UINT32 hash = texture_compute_hash(texinfo, flags);
-	texture_info *texture;
 
 	// find a match
-	for (texture = m_renderer->get_texture_manager()->get_texlist(); texture != nullptr; texture = texture->get_next())
+	for (auto it = m_texture_list.begin(); it != m_texture_list.end(); it++)
 	{
-		UINT32 test_screen = (UINT32)texture->get_texinfo().osddata >> 1;
-		UINT32 test_page = (UINT32)texture->get_texinfo().osddata & 1;
+		UINT32 test_screen = (UINT32)(*it)->get_texinfo().osddata >> 1;
+		UINT32 test_page = (UINT32)(*it)->get_texinfo().osddata & 1;
 		UINT32 prim_screen = (UINT32)texinfo->osddata >> 1;
 		UINT32 prim_page = (UINT32)texinfo->osddata & 1;
 		if (test_screen != prim_screen || test_page != prim_page)
-		{
 			continue;
-		}
-
-		if (texture->get_hash() == hash &&
-			texture->get_texinfo().base == texinfo->base &&
-			texture->get_texinfo().width == texinfo->width &&
-			texture->get_texinfo().height == texinfo->height &&
-			((texture->get_flags() ^ flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0)
+		
+		if ((*it)->get_hash() == hash &&
+			(*it)->get_texinfo().base == texinfo->base &&
+			(*it)->get_texinfo().width == texinfo->width &&
+			(*it)->get_texinfo().height == texinfo->height &&
+			(((*it)->get_flags() ^ flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0)
 		{
 			// Reject a texture if it belongs to an out-of-date render target, so as to cause the HLSL system to re-cache
 			if (m_renderer->get_shaders()->enabled() && texinfo->width != 0 && texinfo->height != 0 && (flags & PRIMFLAG_SCREENTEX_MASK) != 0)
 			{
-				if (m_renderer->get_shaders()->find_render_target(texture) != nullptr)
-				{
-					return texture;
-				}
+				if (m_renderer->get_shaders()->find_render_target((*it).get()) != nullptr)
+					return (*it).get();
 			}
 			else
 			{
-				return texture;
+				return (*it).get();
 			}
 		}
 	}
@@ -514,23 +505,23 @@ texture_info *d3d_texture_manager::find_texinfo(const render_texinfo *texinfo, U
 		UINT32 prim_screen = texinfo->osddata >> 1;
 		UINT32 prim_page = texinfo->osddata & 1;
 
-		for (texture = m_renderer->get_texture_manager()->get_texlist(); texture != nullptr; texture = texture->get_next())
+		for (auto it = m_texture_list.begin(); it != m_texture_list.end(); it++)
 		{
-			UINT32 test_screen = texture->get_texinfo().osddata >> 1;
-			UINT32 test_page = texture->get_texinfo().osddata & 1;
+			UINT32 test_screen = (*it)->get_texinfo().osddata >> 1;
+			UINT32 test_page = (*it)->get_texinfo().osddata & 1;
 			if (test_screen != prim_screen || test_page != prim_page)
 			{
 				continue;
 			}
 
 			// Clear out our old texture reference
-			if (texture->get_hash() == hash &&
-				texture->get_texinfo().base == texinfo->base &&
-				((texture->get_flags() ^ flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0 &&
-				(texture->get_texinfo().width != texinfo->width ||
-					texture->get_texinfo().height != texinfo->height))
+			if ((*it)->get_hash() == hash &&
+				(*it)->get_texinfo().base == texinfo->base &&
+				(((*it)->get_flags() ^ flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0 &&
+				((*it)->get_texinfo().width != texinfo->width ||
+				(*it)->get_texinfo().height != texinfo->height))
 			{
-				m_renderer->get_shaders()->remove_render_target(texture);
+				m_renderer->get_shaders()->remove_render_target((*it).get());
 			}
 		}
 	}
@@ -631,7 +622,9 @@ void d3d_texture_manager::update_textures()
 			{
 				int prescale = m_renderer->get_shaders()->enabled() ? 1 : win->prescale();
 
-				texture = global_alloc(texture_info(this, &prim.texture, prescale, prim.flags));
+				auto tex = std::make_unique<texture_info>(this, &prim.texture, prescale, prim.flags);
+				texture = tex.get();
+				m_texture_list.push_back(std::move(tex));
 			}
 			else
 			{
@@ -2105,9 +2098,6 @@ texture_info::texture_info(d3d_texture_manager *manager, const render_texinfo* t
 	// copy the data to the texture
 	set_data(texsource, flags);
 
-	// add us to the texture list
-	m_next = m_texture_manager->get_texlist();
-	m_texture_manager->set_texlist(this);
 	return;
 
 error:

@@ -48,7 +48,7 @@ shaders::shaders() :
 	black_surface(nullptr), black_texture(nullptr), render_snap(false), snap_rendered(false), snap_copy_target(nullptr), snap_copy_texture(nullptr), snap_target(nullptr), snap_texture(nullptr),
 	snap_width(0), snap_height(0), initialized(false), backbuffer(nullptr), curr_effect(nullptr), default_effect(nullptr), prescale_effect(nullptr), post_effect(nullptr),
 	distortion_effect(nullptr), focus_effect(nullptr), phosphor_effect(nullptr), deconverge_effect(nullptr), color_effect(nullptr), ntsc_effect(nullptr), bloom_effect(nullptr),
-	downsample_effect(nullptr), vector_effect(nullptr), curr_texture(nullptr), curr_render_target(nullptr), curr_poly(nullptr), targethead(nullptr), cachehead(nullptr)
+	downsample_effect(nullptr), vector_effect(nullptr), curr_texture(nullptr), curr_render_target(nullptr), curr_poly(nullptr)
 {
 }
 
@@ -68,22 +68,6 @@ shaders::~shaders()
 	{
 		global_free(options);
 		options = nullptr;
-	}
-
-	cache_target *currcache = cachehead;
-	while(cachehead != nullptr)
-	{
-		cachehead = currcache->next;
-		global_free(currcache);
-		currcache = cachehead;
-	}
-
-	d3d_render_target *currtarget = targethead;
-	while(targethead != nullptr)
-	{
-		targethead = currtarget->next;
-		global_free(currtarget);
-		currtarget = targethead;
 	}
 }
 
@@ -444,22 +428,14 @@ void shaders::remove_cache_target(cache_target *cache)
 	if (cache == nullptr)
 		return;
 
-	if (cache == cachehead)
+	for (auto it = m_cache_target_list.begin(); it != m_cache_target_list.end(); it++)
 	{
-		cachehead = cachehead->next;
+		if ((*it).get() == cache)
+		{
+			m_cache_target_list.erase(it);
+			break;
+		}
 	}
-
-	if (cache->prev != nullptr)
-	{
-		cache->prev->next = cache->next;
-	}
-
-	if (cache->next != nullptr)
-	{
-		cache->next->prev = cache->prev;
-	}
-
-	global_free(cache);
 }
 
 
@@ -482,29 +458,21 @@ void shaders::remove_render_target(d3d_render_target *rt)
 	if (rt == nullptr)
 		return;
 
-	if (rt == targethead)
-	{
-		targethead = targethead->next;
-	}
-
-	if (rt->prev != nullptr)
-	{
-		rt->prev->next = rt->next;
-	}
-
-	if (rt->next != nullptr)
-	{
-		rt->next->prev = rt->prev;
-	}
-
-	remove_cache_target(find_cache_target(rt->screen_index, rt->width, rt->height));
-
 	int screen_index = rt->screen_index;
 	int other_page = 1 - rt->page_index;
 	int width = rt->width;
 	int height = rt->height;
 
-	global_free(rt);
+	for (auto it = m_render_target_list.begin(); it != m_render_target_list.end(); it++)
+	{
+		if ((*it).get() == rt)
+		{
+			m_render_target_list.erase(it);
+			break;
+		}
+	}
+
+	remove_cache_target(find_cache_target(screen_index, width, height));
 
 	// Remove other double-buffered page (if it exists)
 	remove_render_target(width, height, screen_index, other_page);
@@ -829,7 +797,9 @@ int shaders::create_resources()
 		texture.seqid = 0;
 
 		// now create it (no prescale, no wrap)
-		shadow_texture = global_alloc(texture_info(d3d->get_texture_manager(), &texture, 1, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32)));
+		auto tex = std::make_unique<texture_info>(d3d->get_texture_manager(), &texture, 1, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
+		shadow_texture = tex.get();
+		d3d->get_texture_manager()->m_texture_list.push_back(std::move(tex));
 	}
 
 	const char *fx_dir = downcast<windows_options &>(machine->options()).screen_post_fx_dir();
@@ -1067,17 +1037,7 @@ d3d_render_target* shaders::find_render_target(texture_info *texture)
 	UINT32 screen_index = screen_index_data >> 1;
 	UINT32 page_index = screen_index_data & 1;
 
-	d3d_render_target *curr = targethead;
-	while (curr != nullptr && (
-		curr->screen_index != screen_index ||
-		curr->page_index != page_index ||
-		curr->width != texture->get_width() ||
-		curr->height != texture->get_height()))
-	{
-		curr = curr->next;
-	}
-
-	return curr;
+	return find_render_target(texture->get_width(), texture->get_height(), screen_index, page_index);
 }
 
 
@@ -1087,17 +1047,18 @@ d3d_render_target* shaders::find_render_target(texture_info *texture)
 
 d3d_render_target* shaders::find_render_target(int source_width, int source_height, UINT32 screen_index, UINT32 page_index)
 {
-	d3d_render_target *curr = targethead;
-	while (curr != nullptr && (
-		curr->width != source_width ||
-		curr->height != source_height ||
-		curr->screen_index != screen_index ||
-		curr->page_index != page_index))
+	for (auto it = m_render_target_list.begin(); it != m_render_target_list.end(); it++)
 	{
-		curr = curr->next;
+		if ((*it)->width == source_width &&
+			(*it)->height == source_height &&
+			(*it)->screen_index == screen_index &&
+			(*it)->page_index == page_index)
+		{
+			return (*it).get();
+		}
 	}
 
-	return curr;
+	return nullptr;
 }
 
 
@@ -1107,16 +1068,17 @@ d3d_render_target* shaders::find_render_target(int source_width, int source_heig
 
 cache_target *shaders::find_cache_target(UINT32 screen_index, int width, int height)
 {
-	cache_target *curr = cachehead;
-	while (curr != nullptr && (
-		curr->screen_index != screen_index ||
-		curr->width != width ||
-		curr->height != height))
+	for (auto it = m_cache_target_list.begin(); it != m_cache_target_list.end(); it++)
 	{
-		curr = curr->next;
+		if ((*it)->screen_index == screen_index &&
+			(*it)->width == width &&
+			(*it)->height == height)
+		{
+			return (*it).get();
+		}
 	}
 
-	return curr;
+	return nullptr;
 }
 
 int shaders::ntsc_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
@@ -1693,22 +1655,12 @@ void shaders::end_draw()
 
 bool shaders::add_cache_target(renderer_d3d9* d3d, texture_info* texture, int source_width, int source_height, int target_width, int target_height, int screen_index)
 {
-	cache_target* target = (cache_target*)global_alloc_clear<cache_target>();
+	auto target = std::make_unique<cache_target>();
 
 	if (!target->init(d3d, source_width, source_height, target_width, target_height, screen_index))
-	{
-		global_free(target);
 		return false;
-	}
 
-	target->next = cachehead;
-	target->prev = nullptr;
-
-	if (cachehead != nullptr)
-	{
-		cachehead->prev = target;
-	}
-	cachehead = target;
+	m_cache_target_list.push_back(std::move(target));
 
 	return true;
 }
@@ -1835,55 +1787,33 @@ bool shaders::add_render_target(renderer_d3d9* d3d, render_primitive *prim, text
 	UINT32 page_index = 0;
 	if (texture != nullptr)
 	{
-		d3d_render_target *existing_target = find_render_target(texture);
-		if (existing_target != nullptr)
-		{
-			remove_render_target(existing_target);
-		}
-
 		UINT32 screen_index_data = (UINT32)texture->get_texinfo().osddata;
 		screen_index = screen_index_data >> 1;
 		page_index = screen_index_data & 1;
+
+		remove_render_target(find_render_target(texture));
 	}
 	else
 	{
-		d3d_render_target *existing_target = find_render_target(source_width, source_height, 0, 0);
-		if (existing_target != nullptr)
-		{
-			remove_render_target(existing_target);
-		}
+		remove_render_target(find_render_target(source_width, source_height, 0, 0));
 	}
 
-	d3d_render_target* target = (d3d_render_target*)global_alloc_clear<d3d_render_target>();
+	auto target = std::make_unique<d3d_render_target>();
 
 	if (!target->init(d3d, source_width, source_height, target_width, target_height, screen_index, page_index))
-	{
-		global_free(target);
 		return false;
-	}
-
-	target->next = targethead;
-	target->prev = nullptr;
-
-	if (targethead != nullptr)
-	{
-		targethead->prev = target;
-	}
-	targethead = target;
 
 	// cached target only for screen texture and vector buffer
 	if (PRIMFLAG_GET_SCREENTEX(prim->flags) || PRIMFLAG_GET_VECTORBUF(prim->flags))
 	{
-		cache_target* cache = find_cache_target(target->screen_index, source_width, source_height);
-		if (cache == nullptr)
+		if (!find_cache_target(target->screen_index, source_width, source_height))
 		{
 			if (!add_cache_target(d3d, texture, source_width, source_height, target_width, target_height, target->screen_index))
-			{
-				global_free(target);
 				return false;
-			}
 		}
 	}
+
+	m_render_target_list.push_back(std::move(target));
 
 	return true;
 }
@@ -1953,21 +1883,9 @@ void shaders::delete_resources()
 		last_options = *options;
 	}
 
-	cache_target *currcache = cachehead;
-	while(cachehead != nullptr)
-	{
-		cachehead = currcache->next;
-		global_free(currcache);
-		currcache = cachehead;
-	}
+	m_cache_target_list.clear();
 
-	d3d_render_target *currtarget = targethead;
-	while(targethead != nullptr)
-	{
-		targethead = currtarget->next;
-		global_free(currtarget);
-		currtarget = targethead;
-	}
+	m_render_target_list.clear();
 
 	if (downsample_effect != nullptr)
 	{
@@ -2510,14 +2428,8 @@ uniform::uniform(effect *shader, const char *name, uniform_type type, int id)
 {
 	m_shader = shader;
 	m_type = type;
-	m_next = nullptr;
 	m_handle = m_shader->get_parameter(nullptr, name);
 	m_id = id;
-}
-
-void uniform::set_next(uniform *next)
-{
-	m_next = next;
 }
 
 void uniform::update()
@@ -2774,8 +2686,6 @@ effect::effect(shaders *shadersys, IDirect3DDevice9 *dev, const char *name, cons
 	LPD3DXBUFFER buffer_errors = nullptr;
 
 	m_shaders = shadersys;
-	m_uniform_head = nullptr;
-	m_uniform_tail = nullptr;
 	m_valid = false;
 
 	char name_cstr[1024];
@@ -2806,45 +2716,17 @@ effect::effect(shaders *shadersys, IDirect3DDevice9 *dev, const char *name, cons
 effect::~effect()
 {
 	m_effect->Release();
-	m_effect = nullptr;
-	uniform *curr = m_uniform_head;
-	while (curr != nullptr)
-	{
-		uniform *next = curr->get_next();
-		delete curr;
-		curr = next;
-	}
-	m_uniform_head = nullptr;
-	m_uniform_tail = nullptr;
 }
 
 void effect::add_uniform(const char *name, uniform::uniform_type type, int id)
 {
-	uniform *newuniform = new uniform(this, name, type, id);
-	if (newuniform == nullptr)
-	{
-		return;
-	}
-
-	if (m_uniform_head == nullptr)
-	{
-		m_uniform_head = newuniform;
-	}
-	if (m_uniform_tail != nullptr)
-	{
-		m_uniform_tail->set_next(newuniform);
-	}
-	m_uniform_tail = newuniform;
+	m_uniform_list.push_back(std::make_unique<uniform>(this, name, type, id));
 }
 
 void effect::update_uniforms()
 {
-	uniform *curr = m_uniform_head;
-	while(curr != nullptr)
-	{
-		curr->update();
-		curr = curr->get_next();
-	}
+	for (auto &uniform : m_uniform_list)
+		(*uniform).update();
 }
 
 void effect::begin(UINT *passes, DWORD flags)

@@ -104,14 +104,9 @@ public:
 
 	uniform(effect *shader, const char *name, uniform_type type, int id);
 
-	void        set_next(uniform *next);
-	uniform *   get_next() { return m_next; }
-
 	void        update();
 
 protected:
-	uniform     *m_next;
-
 	uniform_type m_type;
 	int         m_id;
 
@@ -152,8 +147,8 @@ public:
 	bool        is_valid() { return m_valid; }
 
 private:
-	uniform     *m_uniform_head;
-	uniform     *m_uniform_tail;
+	std::vector<std::unique_ptr<uniform>> m_uniform_list;
+
 	ID3DXEffect *m_effect;
 	shaders     *m_shaders;
 
@@ -412,8 +407,9 @@ private:
 	texture_info *          curr_texture;
 	d3d_render_target *     curr_render_target;
 	poly_info *             curr_poly;
-	d3d_render_target *     targethead;
-	cache_target *          cachehead;
+
+	std::vector<std::unique_ptr<d3d_render_target>> m_render_target_list;
+	std::vector<std::unique_ptr<cache_target>> m_cache_target_list;
 
 	std::vector<slider*>    internal_sliders;
 	std::vector<ui::menu_item> m_sliders;
