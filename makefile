@@ -1066,14 +1066,14 @@ endif
 # android-arm
 #-------------------------------------------------
 
-$(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm/Makefile: makefile android-ndk $(SCRIPTS) $(GENIE)
+$(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef ANDROID_NDK_ARM
 	$(error ANDROID_NDK_ARM is not set)
 endif
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm --gcc_version=3.8.0 --osd=sdl --targetos=android --PLATFORM=arm --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --DONT_USE_NETWORK=1 --NOASM=1 $(MAKETYPE)
 
 .PHONY: android-arm
-android-arm: generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm/Makefile
+android-arm: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm config=$(CONFIG)
 
@@ -1081,14 +1081,14 @@ android-arm: generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm/Makefile
 # android-arm64
 #-------------------------------------------------
 
-$(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm64/Makefile: makefile android-ndk $(SCRIPTS) $(GENIE)
+$(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm64/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef ANDROID_NDK_ARM64
 	$(error ANDROID_NDK_ARM64 is not set)
 endif
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm64 --gcc_version=3.8.0 --osd=sdl --targetos=android --PLATFORM=arm64 --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --DONT_USE_NETWORK=1 --NOASM=1 $(MAKETYPE)
 
 .PHONY: android-arm64
-android-arm64: generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm64/Makefile
+android-arm64: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm64/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm64 config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm64 config=$(CONFIG)
 
@@ -1096,14 +1096,14 @@ android-arm64: generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm64/Makefile
 # android-mips
 #-------------------------------------------------
 
-$(PROJECTDIR_SDL)/$(MAKETYPE)-android-mips/Makefile: makefile android-ndk $(SCRIPTS) $(GENIE)
+$(PROJECTDIR_SDL)/$(MAKETYPE)-android-mips/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef ANDROID_NDK_MIPS
 	$(error ANDROID_NDK_MIPS is not set)
 endif
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips --gcc_version=3.8.0 --osd=sdl --targetos=android --PLATFORM=mips --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --DONT_USE_NETWORK=1 --NOASM=1 $(MAKETYPE)
 
 .PHONY: android-mips
-android-mips: generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-mips/Makefile
+android-mips: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-mips/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-android-mips config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-android-mips config=$(CONFIG)
 
@@ -1111,14 +1111,14 @@ android-mips: generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-mips/Makefile
 # android-mips64
 #-------------------------------------------------
 
-$(PROJECTDIR_SDL)/$(MAKETYPE)-android-mips64/Makefile: makefile android-ndk $(SCRIPTS) $(GENIE)
+$(PROJECTDIR_SDL)/$(MAKETYPE)-android-mips64/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef ANDROID_NDK_MIPS64
 	$(error ANDROID_NDK_MIPS64 is not set)
 endif
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips64 --gcc_version=3.8.0 --osd=sdl --targetos=android --PLATFORM=mips64 --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --DONT_USE_NETWORK=1 --NOASM=1 $(MAKETYPE)
 
 .PHONY: android-mips64
-android-mips64: generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-mips64/Makefile
+android-mips64: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-mips64/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-android-mips64 config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-android-mips64 config=$(CONFIG)
 
@@ -1126,14 +1126,14 @@ android-mips64: generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-mips64/Makefile
 # android-x86
 #-------------------------------------------------
 
-$(PROJECTDIR_SDL)/$(MAKETYPE)-android-x86/Makefile: makefile android-ndk $(SCRIPTS) $(GENIE)
+$(PROJECTDIR_SDL)/$(MAKETYPE)-android-x86/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef ANDROID_NDK_X86
 	$(error ANDROID_NDK_X86 is not set)
 endif
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x86 --gcc_version=3.8.0 --osd=sdl --targetos=android --PLATFORM=x86 --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --DONT_USE_NETWORK=1 $(MAKETYPE)
 
 .PHONY: android-x86
-android-x86: generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x86/Makefile
+android-x86: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x86/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x86 config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x86 config=$(CONFIG)
 
@@ -1141,14 +1141,14 @@ android-x86: generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x86/Makefile
 # android-x64
 #-------------------------------------------------
 
-$(PROJECTDIR_SDL)/$(MAKETYPE)-android-x64/Makefile: makefile android-ndk $(SCRIPTS) $(GENIE)
+$(PROJECTDIR_SDL)/$(MAKETYPE)-android-x64/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef ANDROID_NDK_X64
 	$(error ANDROID_NDK_X64 is not set)
 endif
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x64 --gcc_version=3.8.0 --osd=sdl --targetos=android --PLATFORM=x64 --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --DONT_USE_NETWORK=1 $(MAKETYPE)
 
 .PHONY: android-x64
-android-x64: generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x64/Makefile
+android-x64: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x64/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x64 config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x64 config=$(CONFIG)
 
