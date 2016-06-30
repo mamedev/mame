@@ -133,7 +133,7 @@ void menu_cheat::populate()
 	std::string subtext;
 
 	// add the autofire menu
-	item_append(_("Autofire Settings"), nullptr, 0, (void *)ITEMREF_CHEATS_AUTOFIRE_SETTINGS);
+	item_append(_("Autofire Settings"), "", 0, (void *)ITEMREF_CHEATS_AUTOFIRE_SETTINGS);
 
 	/* add a separator */
 	item_append(menu_item_type::SEPARATOR);
@@ -147,17 +147,17 @@ void menu_cheat::populate()
 			if (text == MENU_SEPARATOR_ITEM)
 				item_append(menu_item_type::SEPARATOR);
 			else
-				item_append(text.c_str(), subtext.c_str(), flags, curcheat.get());
+				item_append(text, subtext, flags, curcheat.get());
 		}
 
 		/* add a separator */
 		item_append(menu_item_type::SEPARATOR);
 
 		/* add a reset all option */
-		item_append(_("Reset All"), nullptr, 0, (void *)ITEMREF_CHEATS_RESET_ALL);
+		item_append(_("Reset All"), "", 0, (void *)ITEMREF_CHEATS_RESET_ALL);
 
 		/* add a reload all cheats option */
-		item_append(_("Reload All"), nullptr, 0, (void *)ITEMREF_CHEATS_RELOAD_ALL);
+		item_append(_("Reload All"), "", 0, (void *)ITEMREF_CHEATS_RELOAD_ALL);
 	}
 }
 
@@ -313,7 +313,7 @@ void menu_autofire::populate()
 	if (menu_items==0)
 	{
 		item_append(menu_item_type::SEPARATOR);
-		item_append(_("No buttons found on this machine!"), nullptr, FLAG_DISABLE, nullptr);
+		item_append(_("No buttons found on this machine!"), "", FLAG_DISABLE, nullptr);
 	}
 
 	/* add a separator */

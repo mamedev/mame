@@ -63,8 +63,8 @@ public:
 	std::vector<menu_item>  item;         // array of items
 
 	// append a new item to the end of the menu
-	void item_append(const char *text, const char *subtext, UINT32 flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
 	void item_append(const std::string &text, const std::string &subtext, UINT32 flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
+	void item_append(std::string &&text, std::string &&subtext, UINT32 flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
 	void item_append(menu_item item);
 	void item_append(menu_item_type type);
 

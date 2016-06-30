@@ -261,21 +261,21 @@ void menu::reset(reset_options options)
 	// add an item to return
 	if (!m_parent)
 	{
-		item_append(_("Return to Machine"), nullptr, 0, nullptr);
+		item_append(_("Return to Machine"), "", 0, nullptr);
 	}
 	else if (m_parent->is_special_main_menu())
 	{
 		if (machine().options().ui() == emu_options::UI_SIMPLE)
-			item_append(_("Exit"), nullptr, 0, nullptr);
+			item_append(_("Exit"), "", 0, nullptr);
 		else
-			item_append(_("Exit"), nullptr, FLAG_UI | FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, nullptr);
+			item_append(_("Exit"), "", FLAG_UI | FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, nullptr);
 	}
 	else
 	{
 		if (machine().options().ui() != emu_options::UI_SIMPLE && menu::stack_has_special_main_menu())
-			item_append(_("Return to Previous Menu"), nullptr, FLAG_UI | FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, nullptr);
+			item_append(_("Return to Previous Menu"), "", FLAG_UI | FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, nullptr);
 		else
-			item_append(_("Return to Previous Menu"), nullptr, 0, nullptr);
+			item_append(_("Return to Previous Menu"), "", 0, nullptr);
 	}
 
 }
@@ -321,23 +321,7 @@ void menu::item_append(menu_item item)
 void menu::item_append(menu_item_type type)
 {
 	if (type == menu_item_type::SEPARATOR)
-		item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr, menu_item_type::SEPARATOR);
-}
-
-//-------------------------------------------------
-//  item_append - append a new item to the
-//  end of the menu
-//-------------------------------------------------
-
-void menu::item_append(const char *text, const char *subtext, UINT32 flags, void *ref, menu_item_type type)
-{
-	// need distinct overload because we might get nullptr
-	item_append(
-		std::string(text ? text : ""),
-		std::string(subtext ? subtext : ""),
-		flags,
-		ref,
-		type);
+		item_append(MENU_SEPARATOR_ITEM, "", 0, nullptr, menu_item_type::SEPARATOR);
 }
 
 //-------------------------------------------------
@@ -346,6 +330,16 @@ void menu::item_append(const char *text, const char *subtext, UINT32 flags, void
 //-------------------------------------------------
 
 void menu::item_append(const std::string &text, const std::string &subtext, UINT32 flags, void *ref, menu_item_type type)
+{
+	item_append((std::string&&)text, (std::string&&)subtext, flags, ref, type);
+}
+
+//-------------------------------------------------
+//  item_append - append a new item to the
+//  end of the menu
+//-------------------------------------------------
+
+void menu::item_append(std::string &&text, std::string &&subtext, UINT32 flags, void *ref, menu_item_type type)
 {
 	// only allow multiline as the first item
 	if ((flags & FLAG_MULTILINE) != 0)

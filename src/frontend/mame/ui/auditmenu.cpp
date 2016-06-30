@@ -168,7 +168,7 @@ void menu_audit::handle()
 
 void menu_audit::populate()
 {
-	item_append("Dummy", nullptr, 0, (void *)(FPTR)1);
+	item_append("Dummy", "", 0, (void *)(FPTR)1);
 }
 
 //-------------------------------------------------

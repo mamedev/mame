@@ -192,10 +192,10 @@ void menu_custom_filter::populate()
 	item_append(menu_item_type::SEPARATOR);
 
 	if (custfltr::numother > 0)
-		item_append(_("Remove last filter"), nullptr, 0, (void *)(FPTR)REMOVE_FILTER);
+		item_append(_("Remove last filter"), "", 0, (void *)(FPTR)REMOVE_FILTER);
 
 	if (custfltr::numother < MAX_CUST_FILTER - 2)
-		item_append(_("Add filter"), nullptr, 0, (void *)(FPTR)ADD_FILTER);
+		item_append(_("Add filter"), "", 0, (void *)(FPTR)ADD_FILTER);
 
 	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
@@ -506,10 +506,10 @@ void menu_swcustom_filter::populate()
 	item_append(menu_item_type::SEPARATOR);
 
 	if (sw_custfltr::numother > 0)
-		item_append(_("Remove last filter"), nullptr, 0, (void *)(FPTR)REMOVE_FILTER);
+		item_append(_("Remove last filter"), "", 0, (void *)(FPTR)REMOVE_FILTER);
 
 	if (sw_custfltr::numother < MAX_CUST_FILTER - 2)
-		item_append(_("Add filter"), nullptr, 0, (void *)(FPTR)ADD_FILTER);
+		item_append(_("Add filter"), "", 0, (void *)(FPTR)ADD_FILTER);
 
 	item_append(menu_item_type::SEPARATOR);
 

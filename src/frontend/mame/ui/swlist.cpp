@@ -64,18 +64,18 @@ void menu_software_parts::populate()
 		software_part_menu_entry *entry1 = (software_part_menu_entry *) m_pool_alloc(sizeof(*entry1));
 		entry1->type = T_EMPTY;
 		entry1->part = nullptr;
-		item_append(_("[empty slot]"), nullptr, 0, entry1);
+		item_append(_("[empty slot]"), "", 0, entry1);
 
 		software_part_menu_entry *entry2 = (software_part_menu_entry *) m_pool_alloc(sizeof(*entry2));
 		entry2->type = T_FMGR;
 		entry2->part = nullptr;
-		item_append(_("[file manager]"), nullptr, 0, entry2);
+		item_append(_("[file manager]"), "", 0, entry2);
 
 
 		software_part_menu_entry *entry3 = (software_part_menu_entry *) m_pool_alloc(sizeof(*entry3));
 		entry3->type = T_SWLIST;
 		entry3->part = nullptr;
-		item_append(_("[software list]"), nullptr, 0, entry3);
+		item_append(_("[software list]"), "", 0, entry3);
 	}
 
 	for (const software_part &swpart : m_info->parts())
@@ -234,7 +234,7 @@ void menu_software_list::populate()
 		append_software_entry(swinfo);
 
 	// add an entry to change ordering
-	item_append(_("Switch Item Ordering"), nullptr, 0, (void *)1);
+	item_append(_("Switch Item Ordering"), "", 0, (void *)1);
 
 	// append all of the menu entries
 	for (entry_info *entry = m_entrylist; entry != nullptr; entry = entry->next)
@@ -422,7 +422,7 @@ void menu_software::populate()
 					if (swinfo.first_part()->matches_interface(m_interface))
 						found = true;
 				if (found)
-					item_append(swlistdev.description(), nullptr, 0, (void *)&swlistdev);
+					item_append(swlistdev.description(), "", 0, (void *)&swlistdev);
 			}
 
 	// add compatible software lists for this system
@@ -437,8 +437,8 @@ void menu_software::populate()
 				if (found)
 				{
 					if (!have_compatible)
-						item_append(_("[compatible lists]"), nullptr, FLAG_DISABLE, nullptr);
-					item_append(swlistdev.description(), nullptr, 0, (void *)&swlistdev);
+						item_append(_("[compatible lists]"), "", FLAG_DISABLE, nullptr);
+					item_append(swlistdev.description(), "", 0, (void *)&swlistdev);
 				}
 				have_compatible = true;
 			}

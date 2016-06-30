@@ -102,7 +102,7 @@ void menu_directory::handle()
 void menu_directory::populate()
 {
 	for (auto & elem : s_folders)
-		item_append(_(elem.name), nullptr, 0, (void *)(FPTR)elem.action);
+		item_append(_(elem.name), "", 0, (void *)(FPTR)elem.action);
 
 	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
@@ -199,7 +199,7 @@ void menu_display_actual::populate()
 	item_append((s_folders[m_ref].action == CHANGE) ? _("Change Folder") : _("Add Folder"), nullptr, 0, (void *)ADD_CHANGE);
 
 	if (m_folders.size() > 1)
-		item_append(_("Remove Folder"), nullptr, 0, (void *)REMOVE);
+		item_append(_("Remove Folder"), "", 0, (void *)REMOVE);
 
 	item_append(menu_item_type::SEPARATOR);
 	customtop = (m_folders.size() + 1) * ui().get_line_height() + 6.0f * UI_BOX_TB_BORDER;
@@ -626,7 +626,7 @@ void menu_remove_folder::populate()
 {
 	int folders_count = 0;
 	for (auto & elem : m_folders)
-		item_append(elem.c_str(), nullptr, 0, (void *)(FPTR)++folders_count);
+		item_append(elem, "", 0, (void *)(FPTR)++folders_count);
 
 	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;

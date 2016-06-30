@@ -54,7 +54,7 @@ void menu_video_targets::populate()
 
 		/* add a menu item */
 		sprintf(buffer, _("Screen #%d"), targetnum);
-		item_append(buffer, nullptr, 0, target);
+		item_append(buffer, "", 0, target);
 	}
 }
 
@@ -187,7 +187,7 @@ void menu_video_options::populate()
 		/* create a string for the item, replacing underscores with spaces */
 		tempstring.assign(name);
 		strreplace(tempstring, "_", " ");
-		item_append(tempstring.c_str(), nullptr, 0, (void *)(FPTR)(VIDEO_ITEM_VIEW + viewnum));
+		item_append(tempstring.c_str(), "", 0, (void *)(FPTR)(VIDEO_ITEM_VIEW + viewnum));
 	}
 
 	/* add a separator */

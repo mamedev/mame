@@ -432,7 +432,7 @@ void menu_select_software::populate()
 	{
 		// if the device can be loaded empty, add an item
 		if (m_has_empty_start)
-			item_append("[Start empty]", nullptr, flags_ui, (void *)&m_swinfo[0]);
+			item_append("[Start empty]", "", flags_ui, (void *)&m_swinfo[0]);
 
 		m_displaylist.clear();
 		m_tmp.clear();
@@ -2036,7 +2036,7 @@ bios_selection::~bios_selection()
 void bios_selection::populate()
 {
 	for (auto & elem : m_bios)
-		item_append(elem.first.c_str(), nullptr, 0, (void *)&elem.first);
+		item_append(elem.first, "", 0, (void *)&elem.first);
 
 	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);

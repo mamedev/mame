@@ -140,8 +140,8 @@ void menu_custom_ui::handle()
 void menu_custom_ui::populate()
 {
 	UINT32 arrow_flags;
-	item_append(_("Fonts"), nullptr, 0, (void *)(FPTR)FONT_MENU);
-	item_append(_("Colors"), nullptr, 0, (void *)(FPTR)COLORS_MENU);
+	item_append(_("Fonts"), "", 0, (void *)(FPTR)FONT_MENU);
+	item_append(_("Colors"), "", 0, (void *)(FPTR)COLORS_MENU);
 
 	if (!m_lang.empty())
 	{
@@ -503,25 +503,25 @@ void menu_colors_ui::handle()
 
 void menu_colors_ui::populate()
 {
-	item_append(_("Normal text"), nullptr, 0, (void *)(FPTR)MUI_TEXT_COLOR);
-	item_append(_("Selected color"), nullptr, 0, (void *)(FPTR)MUI_SELECTED_COLOR);
-	item_append(_("Normal text background"), nullptr, 0, (void *)(FPTR)MUI_TEXT_BG_COLOR);
-	item_append(_("Selected background color"), nullptr, 0, (void *)(FPTR)MUI_SELECTED_BG_COLOR);
-	item_append(_("Subitem color"), nullptr, 0, (void *)(FPTR)MUI_SUBITEM_COLOR);
-	item_append(_("Clone"), nullptr, 0, (void *)(FPTR)MUI_CLONE_COLOR);
-	item_append(_("Border"), nullptr, 0, (void *)(FPTR)MUI_BORDER_COLOR);
-	item_append(_("Background"), nullptr, 0, (void *)(FPTR)MUI_BACKGROUND_COLOR);
-	item_append(_("Dipswitch"), nullptr, 0, (void *)(FPTR)MUI_DIPSW_COLOR);
-	item_append(_("Unavailable color"), nullptr, 0, (void *)(FPTR)MUI_UNAVAILABLE_COLOR);
-	item_append(_("Slider color"), nullptr, 0, (void *)(FPTR)MUI_SLIDER_COLOR);
-	item_append(_("Gfx viewer background"), nullptr, 0, (void *)(FPTR)MUI_GFXVIEWER_BG_COLOR);
-	item_append(_("Mouse over color"), nullptr, 0, (void *)(FPTR)MUI_MOUSEOVER_COLOR);
-	item_append(_("Mouse over background color"), nullptr, 0, (void *)(FPTR)MUI_MOUSEOVER_BG_COLOR);
-	item_append(_("Mouse down color"), nullptr, 0, (void *)(FPTR)MUI_MOUSEDOWN_COLOR);
-	item_append(_("Mouse down background color"), nullptr, 0, (void *)(FPTR)MUI_MOUSEDOWN_BG_COLOR);
+	item_append(_("Normal text"), "", 0, (void *)(FPTR)MUI_TEXT_COLOR);
+	item_append(_("Selected color"), "", 0, (void *)(FPTR)MUI_SELECTED_COLOR);
+	item_append(_("Normal text background"), "", 0, (void *)(FPTR)MUI_TEXT_BG_COLOR);
+	item_append(_("Selected background color"), "", 0, (void *)(FPTR)MUI_SELECTED_BG_COLOR);
+	item_append(_("Subitem color"), "", 0, (void *)(FPTR)MUI_SUBITEM_COLOR);
+	item_append(_("Clone"), "", 0, (void *)(FPTR)MUI_CLONE_COLOR);
+	item_append(_("Border"), "", 0, (void *)(FPTR)MUI_BORDER_COLOR);
+	item_append(_("Background"), "", 0, (void *)(FPTR)MUI_BACKGROUND_COLOR);
+	item_append(_("Dipswitch"), "", 0, (void *)(FPTR)MUI_DIPSW_COLOR);
+	item_append(_("Unavailable color"), "", 0, (void *)(FPTR)MUI_UNAVAILABLE_COLOR);
+	item_append(_("Slider color"), "", 0, (void *)(FPTR)MUI_SLIDER_COLOR);
+	item_append(_("Gfx viewer background"), "", 0, (void *)(FPTR)MUI_GFXVIEWER_BG_COLOR);
+	item_append(_("Mouse over color"), "", 0, (void *)(FPTR)MUI_MOUSEOVER_COLOR);
+	item_append(_("Mouse over background color"), "", 0, (void *)(FPTR)MUI_MOUSEOVER_BG_COLOR);
+	item_append(_("Mouse down color"), "", 0, (void *)(FPTR)MUI_MOUSEDOWN_COLOR);
+	item_append(_("Mouse down background color"), "", 0, (void *)(FPTR)MUI_MOUSEDOWN_BG_COLOR);
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Restore originals colors"), nullptr, 0, (void *)(FPTR)MUI_RESTORE);
+	item_append(_("Restore originals colors"), "", 0, (void *)(FPTR)MUI_RESTORE);
 
 	custombottom = customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
@@ -863,7 +863,7 @@ void menu_rgb_ui::populate()
 		item_append(_("Blue"), s_text.c_str(), 0, (void *)(FPTR)RGB_BLUE);
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Choose from palette"), nullptr, 0, (void *)(FPTR)PALETTE_CHOOSE);
+	item_append(_("Choose from palette"), "", 0, (void *)(FPTR)PALETTE_CHOOSE);
 	item_append(menu_item_type::SEPARATOR);
 
 	custombottom = customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;

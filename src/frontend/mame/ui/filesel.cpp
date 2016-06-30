@@ -106,10 +106,10 @@ menu_confirm_save_as::~menu_confirm_save_as()
 
 void menu_confirm_save_as::populate()
 {
-	item_append(_("File Already Exists - Override?"), nullptr, FLAG_DISABLE, nullptr);
+	item_append(_("File Already Exists - Override?"), "", FLAG_DISABLE, nullptr);
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("No"), nullptr, 0, ITEMREF_NO);
-	item_append(_("Yes"), nullptr, 0, ITEMREF_YES);
+	item_append(_("No"), "", 0, ITEMREF_NO);
+	item_append(_("Yes"), "", 0, ITEMREF_YES);
 }
 
 //-------------------------------------------------
@@ -232,7 +232,7 @@ void menu_file_create::populate()
 
 	// finish up the menu
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Create"), nullptr, 0, ITEMREF_CREATE);
+	item_append(_("Create"), "", 0, ITEMREF_CREATE);
 
 	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
@@ -799,7 +799,7 @@ menu_select_format::~menu_select_format()
 
 void menu_select_format::populate()
 {
-	item_append(_("Select image format"), nullptr, FLAG_DISABLE, nullptr);
+	item_append(_("Select image format"), "", FLAG_DISABLE, nullptr);
 	for (int i = 0; i < m_total_usable; i++)
 	{
 		const floppy_image_format_t *fmt = m_formats[i];
@@ -859,12 +859,12 @@ menu_select_rw::~menu_select_rw()
 
 void menu_select_rw::populate()
 {
-	item_append(_("Select access mode"), nullptr, FLAG_DISABLE, nullptr);
-	item_append(_("Read-only"), nullptr, 0, (void *)READONLY);
+	item_append(_("Select access mode"), "", FLAG_DISABLE, nullptr);
+	item_append(_("Read-only"), "", 0, (void *)READONLY);
 	if (m_can_in_place)
-		item_append(_("Read-write"), nullptr, 0, (void *)READWRITE);
-	item_append(_("Read this image, write to another image"), nullptr, 0, (void *)WRITE_OTHER);
-	item_append(_("Read this image, write to diff"), nullptr, 0, (void *)WRITE_DIFF);
+		item_append(_("Read-write"), "", 0, (void *)READWRITE);
+	item_append(_("Read this image, write to another image"), "", 0, (void *)WRITE_OTHER);
+	item_append(_("Read this image, write to diff"), "", 0, (void *)WRITE_DIFF);
 }
 
 
