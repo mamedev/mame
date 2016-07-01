@@ -59,7 +59,6 @@ DAC and bitbanger values written should be reflected in the read.
 
 #include "includes/coco.h"
 #include "cpu/m6809/m6809.h"
-#include "debug/debugcpu.h"
 
 
 
@@ -159,12 +158,6 @@ void coco_state::device_start()
 	save_item(NAME(m_dclg_state));
 	save_item(NAME(m_dclg_timer));
 	save_item(NAME(m_vhd_select));
-
-	/* set up disassembly override */
-	if (m_maincpu->debug())
-	{
-		m_maincpu->debug()->set_dasm_override(dasm_override);
-	}
 
 	// miscellaneous
 	m_in_floating_bus_read = false;

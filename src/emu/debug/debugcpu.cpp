@@ -1631,7 +1631,6 @@ device_debug::device_debug(device_t &device)
 	, m_flags(0)
 	, m_symtable(&device, device.machine().debugger().cpu().get_global_symtable())
 	, m_instrhook(nullptr)
-	, m_dasm_override(nullptr)
 	, m_stepaddr(0)
 	, m_stepsleft(0)
 	, m_stopaddr(0)
@@ -1984,20 +1983,16 @@ void device_debug::set_instruction_hook(debug_instruction_hook_func hook)
 
 offs_t device_debug::disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram) const
 {
-	offs_t result = 0;
-
-	// check for disassembler override
-	if (m_dasm_override != nullptr)
-		result = (*m_dasm_override)(m_device, buffer, pc, oprom, opram, 0);
+	if (m_disasm == nullptr)
+		return 0;
 
 	// if we have a disassembler, run it
-	if (result == 0 && m_disasm != nullptr)
-		result = m_disasm->disassemble(buffer, pc, oprom, opram, 0);
+	offs_t result = m_disasm->disassemble(buffer, pc, oprom, opram, 0);
 
 	// make sure we get good results
-	assert((result & DASMFLAG_LENGTHMASK) != 0 || m_disasm == nullptr);
+	assert((result & DASMFLAG_LENGTHMASK) != 0);
 #ifdef MAME_DEBUG
-	if (m_memory != nullptr && m_disasm != nullptr)
+	if (m_memory != nullptr)
 	{
 		address_space &space = m_memory->space(AS_PROGRAM);
 		int bytes = space.address_to_byte(result & DASMFLAG_LENGTHMASK);

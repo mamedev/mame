@@ -94,8 +94,6 @@
 #include "includes/mac.h"
 #include "machine/applefdc.h"
 #include "machine/sonydriv.h"
-#include "debug/debugcpu.h"
-#include "debugger.h"
 
 #define AUDIO_IS_CLASSIC (m_model <= MODEL_MAC_CLASSIC)
 #define MAC_HAS_VIA2    ((m_model >= MODEL_MAC_II) && (m_model != MODEL_MAC_IIFX))
@@ -117,8 +115,6 @@
 #define LOG_KEYBOARD    0
 #define LOG_MEMORY      0
 #endif
-
-static offs_t mac_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
 
 // returns non-zero if this Mac has ADB
 int mac_state::has_adb()
@@ -1986,10 +1982,6 @@ void mac_state::machine_reset()
 	}
 
 	m_scsi_interrupt = 0;
-	if ((m_maincpu->debug()) && (m_model < MODEL_MAC_POWERMAC_6100))
-	{
-		m_maincpu->debug()->set_dasm_override(mac_dasm_override);
-	}
 
 	m_drive_select = 0;
 	m_scsiirq_enable = 0;
@@ -3185,7 +3177,7 @@ const char *lookup_trap(UINT16 opcode)
 
 
 
-static offs_t mac_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
+offs_t mac_state::mac_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
 {
 	UINT16 opcode;
 	unsigned result = 0;
