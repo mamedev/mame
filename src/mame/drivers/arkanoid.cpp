@@ -12,19 +12,24 @@
     Here are the versions we have:
 
     arkanoid    The earlier revisions. They each differ in the country byte. These
-    arkanoiduo    versions work fine both the bootleg a75-06 MCU rom and the
-    arkanoidjb    genuine decapped Taito A75-06.IC16 M68705 MCU.
+    arkanoiduo    versions work fine both the bootleg A75-06.IC16 MCU rom and the
+    arkanoidjb    genuine decapped Taito A75__06.IC16 M68705 MCU.
     arkanoidu   USA version. A later revision, code has been inserted NOT patched.
-                The 68705 code for this one was not available; I made it up from
-                the current A75-06.IC16 changing the level data pointer table.
+                  The 68705 code for this one was not available; Brad Oliver[?]
+                  made it up from the bootleg A75-06.IC16 by changing the level
+                  data pointer table.
     arkanoidj   Japanese version.  Final revision, MCU code not dumped.
-    arkanoidja  Japanese version. A later revision with level selector.
-                  The 68705 code for this one was not available; I made it up from
-                  the current A75-06.IC16 changing the level data pointer table.
+                  Someone[who?] made a placeholder MCU for this set based on the
+                  bootleg A75-06.IC16 by changing the level data pointer table.
+    arkanoidja  Japanese version.  A later revision with level selector.
+                  The 68705 code for this one was not available; Brad Oliver[?]
+                  made it up from the bootleg A75-06.IC16 by changing the level
+                  data pointer table.
     arkanoidjbl Bootleg of the early Japanese version. The only difference is
                   that the warning text has been replaced by "WAIT"
                   This version came with its own 68705p3 MCU ROM which is based on
-                  the original Taito one.
+                  the original Taito A75__06.IC16 one, which the pirates must have
+                  extracted somehow.
     arkatayt    Another bootleg of the early Japanese one, more heavily modified
     arkblock    Another bootleg of the early Japanese one, more heavily modified
     arkbloc2    Another bootleg
@@ -43,7 +48,27 @@ Measured Clocks:
    Z80 - 5997077Hz (6Mhz)
 M68705 - 2998533Hz (3Mhz)
 YM2149 - 2998531Hz (3Mhz)
+****************************************************************************
 
+Game Credits:
+There is a nopped-out (unless there is some secret way to make this display?)
+set of game credits for arkanoidj (the 2.x japan set), whose activation is described on
+https://tcrf.net/Arkanoid_(Arcade)
+
+The hidden credits (with full names, if known):
+    Directed and Programmed by: Yasumasa Sasabe
+    Director of Hardware & Co-Programmer: Toshiyuki Sanada
+    Assistant Programmer: Toru. T
+    Graphic Designer: Hiroshi Tsujino(Onijust.H)
+    Sound Composer: Hisayoshi Ogura
+    Sound Effects: Tadashi Kimijima
+    Pattern Designer: Akira Iwai
+    Software Analyser: Hidehiro Fujiwara(Hidegons)
+    Mechanical Engineer: H. Yamaguchi
+    Publicity Supervisor: Varis. I
+    Game Designed by: Akira Fujita
+
+The "Yasu" mentioned in the MCU code as a comment is probably Yasumasa Sasabe
 
 ****************************************************************************
 
@@ -62,8 +87,8 @@ white paint.
 
 The following MCU images were tested on an original Arkanoid PCB using sets
 'arkanoid', 'arkanoidu' and 'arkanoiduo' and work as expected.
-(1) MCU image with CRC 0x389a8cfb <- this is a deprotected copy of the original Taito A75__06 MCU code
-(2) MCU image with CRC 0x515d77b6 <- this is a blackbox-reverse engineered bootleg MCU written by pirates
+(1) MCU image with CRC 0x389a8cfb [<- this is a deprotected copy of the original Taito A75__06 MCU code]
+(2) MCU image with CRC 0x515d77b6 [<- this is a blackbox-reverse engineered bootleg MCU written by pirates]
 
 An MCU found on a Tournament Arkanoid PCB was an unprotected type MC68705P3
 and when read the CRC matched (1). So we assumed the MCUs for Arkanoid and
