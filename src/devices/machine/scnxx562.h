@@ -40,6 +40,7 @@
 #define __SCNXX562_H__
 
 #include "emu.h"
+#include "cpu/z80/z80daisy.h"
 
 //**************************************************************************
 //  DEVICE CONFIGURATION MACROS
@@ -110,7 +111,7 @@
 class duscc_device;
 
 class duscc_channel : public device_t,
-		public device_serial_interface
+	public device_serial_interface
 {
 	friend class duscc_device;
 
@@ -152,9 +153,8 @@ public:
 	UINT8 do_dusccreg_gsr_r();
 	UINT8 do_dusccreg_ier_r();
 	UINT8 do_dusccreg_cid_r();
-	UINT8 do_dusccreg_ivr_r();
+	UINT8 do_dusccreg_ivr_ivrm_r();
 	UINT8 do_dusccreg_icr_r();
-	UINT8 do_dusccreg_ivrm_r();
 	UINT8 do_dusccreg_mrr_r();
 	UINT8 do_dusccreg_ier1_r();
 	UINT8 do_dusccreg_ier2_r();
@@ -189,7 +189,7 @@ public:
 	//  void do_dusccreg_rea_w(UINT8 data); // Short cutted non complex feature
 	void do_dusccreg_ivr_w(UINT8 data);
 	void do_dusccreg_icr_w(UINT8 data);
-	//  void do_dusccreg_sea_w(UINT8 data); // Short cutted non complex feature
+	void do_dusccreg_sea_rea_w(UINT8 data); // Short cutted non complex feature
 	void do_dusccreg_mrr_w(UINT8 data);
 	void do_dusccreg_ier1_w(UINT8 data);
 	void do_dusccreg_ier2_w(UINT8 data);
@@ -231,12 +231,14 @@ public:
 	UINT8 m_ttr;
 	UINT8 m_rpr;
 	UINT8 m_rtr;
-	UINT8 m_ctprh;
-	UINT8 m_ctprl;
+	//	UINT8 m_ctprh;
+	//	UINT8 m_ctprl;
+	unsigned int m_ctpr;
 	UINT8 m_ctcr;
 	UINT8 m_omr;
-	UINT8 m_cth;
-	UINT8 m_ctl;
+	//	UINT8 m_cth;
+	//	UINT8 m_ctl;
+	unsigned int m_ct;
 	UINT8 m_pcr;
 	UINT8 m_ccr;
 	UINT8 m_txfifo[4];
@@ -244,14 +246,14 @@ public:
 	UINT8 m_rsr;
 	UINT8 m_trsr;
 	UINT8 m_ictsr;
-	UINT8 m_gsr;
+	//	UINT8 m_gsr; // moved to the device since it is global
 	UINT8 m_ier;
 	//  UINT8 m_rea;
 	UINT8 m_cid;
-	UINT8 m_ivr;
-	UINT8 m_icr;
-	//  UINT8 m_sea;
-	UINT8 m_ivrm;
+	//UINT8 m_ivr;
+	//UINT8 m_icr;
+	//	UINT8 m_sea;
+	//UINT8 m_ivrm;
 	UINT8 m_mrr;
 	UINT8 m_ier1;
 	UINT8 m_ier2;
@@ -263,12 +265,12 @@ public:
 	UINT8 m_telr;
 
 protected:
-	enum
+	enum // Needs to be 0-3 in unmodified prio level 
 	{
-		INT_TRANSMIT = 0,
-		INT_EXTERNAL = 1,
-		INT_RECEIVE  = 2,
-		INT_SPECIAL  = 3
+		INT_RXREADY		= 0,
+		INT_TXREADY		= 1,
+		INT_RXTXSTAT	= 2,
+		INT_EXTCTSTAT	= 3
 	};
 
 	enum
@@ -387,7 +389,19 @@ protected:
 
 	enum
 	{
-		REG_RSR_OVERRUN_ERROR       = 0x20,
+		REG_RSR_CHAR_COMPARE 		= 0x80,
+		REG_RSR_OVERRUN_ERROR		= 0x20,
+		REG_RSR_FRAMING_ERROR		= 0x02,
+		REG_RSR_PARITY_ERROR		= 0x01,
+	};
+
+	enum
+	{
+		REG_GSR_CHAN_A_RXREADY 		= 0x01,
+		REG_GSR_CHAN_B_RXREADY 		= 0x10,
+		REG_GSR_CHAN_A_TXREADY 		= 0x02,
+		REG_GSR_CHAN_B_TXREADY 		= 0x20,
+		REG_GSR_XXREADY_MASK		= 0x33
 	};
 
 	enum
@@ -399,10 +413,14 @@ protected:
 
 	enum
 	{
-		REG_GSR_CHAN_A_RXREADY      = 0x01,
-		REG_GSR_CHAN_B_RXREADY      = 0x10,
-		REG_GSR_CHAN_A_TXREADY      = 0x02,
-		REG_GSR_CHAN_B_TXREADY      = 0x20,
+		REG_IER_DCD_CTS				= 0x80,
+		REG_IER_TXRDY				= 0x40,
+		REG_IER_TRSR73				= 0x20,
+		REG_IER_RXRDY 				= 0x10,
+		REG_IER_RSR76 				= 0x08,
+		REG_IER_RSR54 				= 0x04,
+		REG_IER_RSR32 				= 0x02,
+		REG_IER_RSR10 				= 0x01,
 	};
 
 	// Register offsets, stripped from channel bit 0x20 but including A7 bit
@@ -521,7 +539,6 @@ protected:
 	int m_rx_clock;     // receive clock pulse count
 	int m_rx_first;     // first character received
 	int m_rx_break;     // receive break condition
-	//  UINT8 m_rx_rr0_latch;   // read register 0 latched
 
 	int m_rxd;
 	int m_ri;       // ring indicator latch
@@ -551,7 +568,7 @@ protected:
 
 
 class duscc_device :  public device_t
-//      ,public device_z80daisy_interface
+		,public device_z80daisy_interface
 {
 	friend class duscc_channel;
 
@@ -611,6 +628,11 @@ protected:
 	virtual void device_reset() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
+	// device_z80daisy_interface overrides
+	virtual int z80daisy_irq_state() override;
+	virtual int z80daisy_irq_ack() override;
+	virtual void z80daisy_irq_reti() override;
+
 	// internal interrupt management
 	void check_interrupts();
 	void reset_interrupts();
@@ -658,9 +680,29 @@ protected:
 	devcb_write_line    m_out_rtsb_cb;
 	devcb_write_line    m_out_syncb_cb;
 
-	int m_int_state[6]; // interrupt state
+	devcb_write_line    m_out_int_cb;
+
+
+	int m_int_state[8]; // interrupt state
 
 	int m_variant;
+	UINT8 m_gsr;
+	UINT8 m_ivr;
+	UINT8 m_ivrm;
+	UINT8 m_icr;
+
+	enum
+	{
+		REG_ICR_CHB				= 0x01,
+		REG_ICR_CHA				= 0x02,
+		REG_ICR_VEC_MOD			= 0x04,
+		REG_ICR_V2V4_MOD		= 0x08,
+		REG_ICR_PRIO_MASK		= 0xC0,
+		REG_ICR_PRIO_AHI		= 0x00,
+		REG_ICR_PRIO_BHI		= 0x40,
+		REG_ICR_PRIO_AINT		= 0x80,
+		REG_ICR_PRIO_BINT		= 0xC0,
+	};
 };
 
 // device type definition

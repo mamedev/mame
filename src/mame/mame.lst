@@ -12083,6 +12083,9 @@ fccpu30                         //
 @source:fcscsi.cpp
 fcscsi1                         //
 
+@source:fcisio.cpp
+fcisio1                         //
+
 @source:fcombat.cpp
 fcombat                         // (c) 1985 Jaleco
 
