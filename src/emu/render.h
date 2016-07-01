@@ -650,60 +650,30 @@ private:
 	// a component represents an image, rectangle, or disk in an element
 	class component
 	{
-		friend class layout_element;
+		//friend class layout_element;
 		friend class simple_list<component>;
 
 	public:
 		// construction/destruction
 		component(running_machine &machine, xml_data_node &compnode, const char *dirname);
-		~component();
+		virtual ~component() = default;
+
+		// setup
+		void normalize_bounds(float xoffs, float yoffs, float xscale, float yscale);
 
 		// getters
 		component *next() const { return m_next; }
+		int state() const { return m_state; }
+		virtual int maxstate() const { return m_state; }
 		const render_bounds &bounds() const { return m_bounds; }
+		const render_color &color() const { return m_color; }
 
 		// operations
-		void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state);
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) = 0;
 
-	private:
-		// component types
-		enum component_type
-		{
-			CTYPE_INVALID = 0,
-			CTYPE_IMAGE,
-			CTYPE_RECT,
-			CTYPE_DISK,
-			CTYPE_TEXT,
-			CTYPE_LED7SEG,
-			CTYPE_LED8SEG_GTS1,
-			CTYPE_LED14SEG,
-			CTYPE_LED16SEG,
-			CTYPE_LED14SEGSC,
-			CTYPE_LED16SEGSC,
-			CTYPE_DOTMATRIX,
-			CTYPE_DOTMATRIX5DOT,
-			CTYPE_DOTMATRIXDOT,
-			CTYPE_SIMPLECOUNTER,
-			CTYPE_REEL,
-			CTYPE_MAX
-		};
-
+	protected:
 		// helpers
-		void draw_rect(bitmap_argb32 &dest, const rectangle &bounds);
-		void draw_disk(bitmap_argb32 &dest, const rectangle &bounds);
-		void draw_text(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds);
-		void draw_simplecounter(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state);
-		void draw_reel(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state);
-		void draw_beltreel(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state);
-		void load_bitmap();
-		void load_reel_bitmap(int number);
-		void draw_led7seg(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
-		void draw_led8seg_gts1(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
-		void draw_led14seg(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
-		void draw_led14segsc(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
-		void draw_led16seg(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
-		void draw_led16segsc(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
-		void draw_dotmatrix(int dots,bitmap_argb32 &dest, const rectangle &bounds, int pattern);
+		void draw_text(render_font &font, bitmap_argb32 &dest, const rectangle &bounds, const char *str, int align);
 		void draw_segment_horizontal_caps(bitmap_argb32 &dest, int minx, int maxx, int midy, int width, int caps, rgb_t color);
 		void draw_segment_horizontal(bitmap_argb32 &dest, int minx, int maxx, int midy, int width, rgb_t color);
 		void draw_segment_vertical_caps(bitmap_argb32 &dest, int miny, int maxy, int midx, int width, int caps, rgb_t color);
@@ -714,17 +684,213 @@ private:
 		void draw_segment_comma(bitmap_argb32 &dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color);
 		void apply_skew(bitmap_argb32 &dest, int skewwidth);
 
-		#define MAX_BITMAPS 32
-
+	private:
 		// internal state
 		component *         m_next;                     // link to next component
-		component_type      m_type;                     // type of component
 		int                 m_state;                    // state where this component is visible (-1 means all states)
 		render_bounds       m_bounds;                   // bounds of the element
 		render_color        m_color;                    // color of the element
+	};
+
+	// image
+	class image_component : public component
+	{
+	public:
+		// construction/destruction
+		image_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	protected:
+		// overrides
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
+
+	private:
+		// internal helpers
+		void load_bitmap();
+
+		// internal state
+		bitmap_argb32       m_bitmap;                   // source bitmap for images
+		std::string         m_dirname;                  // directory name of image file (for lazy loading)
+		std::unique_ptr<emu_file> m_file;               // file object for reading image/alpha files
+		std::string         m_imagefile;                // name of the image file (for lazy loading)
+		std::string         m_alphafile;                // name of the alpha file (for lazy loading)
+		bool                m_hasalpha;                 // is there any alpha component present?
+	};
+
+	// rectangle
+	class rect_component : public component
+	{
+	public:
+		// construction/destruction
+		rect_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	protected:
+		// overrides
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
+	};
+
+	// ellipse
+	class disk_component : public component
+	{
+	public:
+		// construction/destruction
+		disk_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	protected:
+		// overrides
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
+	};
+
+	// text string
+	class text_component : public component
+	{
+	public:
+		// construction/destruction
+		text_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	protected:
+		// overrides
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
+
+	private:
+		// internal state
 		std::string         m_string;                   // string for text components
+		int                 m_textalign;                // text alignment to box
+	};
+
+	// 7-segment LCD
+	class led7seg_component : public component
+	{
+	public:
+		// construction/destruction
+		led7seg_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	protected:
+		// overrides
+		virtual int maxstate() const override { return 255; }
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
+	};
+
+	// 8-segment fluorescent (Gottlieb System 1)
+	class led8seg_gts1_component : public component
+	{
+	public:
+		// construction/destruction
+		led8seg_gts1_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	protected:
+		// overrides
+		virtual int maxstate() const override { return 255; }
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
+	};
+
+	// 14-segment LCD
+	class led14seg_component : public component
+	{
+	public:
+		// construction/destruction
+		led14seg_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	protected:
+		// overrides
+		virtual int maxstate() const override { return 16383; }
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
+	};
+
+	// 16-segment LCD
+	class led16seg_component : public component
+	{
+	public:
+		// construction/destruction
+		led16seg_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	protected:
+		// overrides
+		virtual int maxstate() const override { return 65535; }
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
+	};
+
+	// 14-segment LCD with semicolon (2 extra segments)
+	class led14segsc_component : public component
+	{
+	public:
+		// construction/destruction
+		led14segsc_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	protected:
+		// overrides
+		virtual int maxstate() const override { return 65535; }
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
+	};
+
+	// 16-segment LCD with semicolon (2 extra segments)
+	class led16segsc_component : public component
+	{
+	public:
+		// construction/destruction
+		led16segsc_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	protected:
+		// overrides
+		virtual int maxstate() const override { return 262143; }
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
+	};
+
+	// row of dots for a dotmatrix
+	class dotmatrix_component : public component
+	{
+	public:
+		// construction/destruction
+		dotmatrix_component(int dots, running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	protected:
+		// overrides
+		virtual int maxstate() const override { return (1 << m_dots) - 1; }
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
+
+	private:
+		// internal state
+		int                 m_dots;
+	};
+
+	// simple counter
+	class simplecounter_component : public component
+	{
+	public:
+		// construction/destruction
+		simplecounter_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	protected:
+		// overrides
+		virtual int maxstate() const override { return m_maxstate; }
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
+
+	private:
+		// internal state
 		int                 m_digits;                   // number of digits for simple counters
 		int                 m_textalign;                // text alignment to box
+		int                 m_maxstate;
+	};
+
+	// fruit machine reel
+	class reel_component : public component
+	{
+		static constexpr unsigned MAX_BITMAPS = 32;
+
+	public:
+		// construction/destruction
+		reel_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	protected:
+		// overrides
+		virtual int maxstate() const override { return 65535; }
+		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override;
+
+	private:
+		// internal helpers
+		void draw_beltreel(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state);
+		void load_reel_bitmap(int number);
+
+		// internal state
 		bitmap_argb32       m_bitmap[MAX_BITMAPS];      // source bitmap for images
 		std::string         m_dirname;                  // directory name of image file (for lazy loading)
 		std::unique_ptr<emu_file> m_file[MAX_BITMAPS];        // file object for reading image/alpha files
@@ -732,7 +898,6 @@ private:
 		std::string         m_alphafile[MAX_BITMAPS];   // name of the alpha file (for lazy loading)
 		bool                m_hasalpha[MAX_BITMAPS];    // is there any alpha component present?
 
-		// stuff for fruit machine reels
 		// basically made up of multiple text strings / gfx
 		int                 m_numstops;
 		std::string         m_stopnames[MAX_BITMAPS];
