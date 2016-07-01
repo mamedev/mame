@@ -394,6 +394,7 @@ void tms3203x_device::device_start()
 	save_item(NAME(m_delayed));
 	save_item(NAME(m_irq_pending));
 	save_item(NAME(m_is_idling));
+	save_item(NAME(m_mcbl_mode));
 
 	// register our state for the debugger
 	state_add(TMS3203X_PC,      "PC",        m_pc);
