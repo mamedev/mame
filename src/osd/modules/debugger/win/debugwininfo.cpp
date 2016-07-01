@@ -24,7 +24,6 @@ bool debugwin_info::s_window_class_registered = false;
 debugwin_info::debugwin_info(debugger_windows_interface &debugger, bool is_main_console, LPCSTR title, WNDPROC handler) :
 	debugbase_info(debugger),
 	m_is_main_console(is_main_console),
-	m_next(nullptr),
 	m_wnd(nullptr),
 	m_handler(handler),
 	m_minwidth(200),
