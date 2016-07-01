@@ -157,6 +157,11 @@ static ADDRESS_MAP_START( jailbrek_map, AS_PROGRAM, 8, jailbrek_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( vlm_map, AS_0, 8, jailbrek_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+ADDRESS_MAP_END
+
 
 
 static INPUT_PORTS_START( jailbrek )
@@ -279,6 +284,7 @@ static MACHINE_CONFIG_START( jailbrek, jailbrek_state )
 
 	MCFG_SOUND_ADD("vlm", VLM5030, VOICE_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, vlm_map)
 MACHINE_CONFIG_END
 
 
@@ -287,6 +293,15 @@ MACHINE_CONFIG_END
   Game driver(s)
 
 ***************************************************************************/
+
+	/*
+	   Check if the rom used for the speech is not a 2764, but a 27128.  If a
+	   27128 is used then the data is stored in the upper half of the eprom.
+	   (The schematics and board refer to a 2764, but all the boards I have seen
+	   use a 27128.  According to the schematics pin 26 is tied high so if a 2764
+	   is used then the pin is ignored, but if a 27128 is used then pin 26
+	   represents address line A13.)
+	*/
 
 ROM_START( jailbrek )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -310,7 +325,7 @@ ROM_START( jailbrek )
 	ROM_LOAD( "507j12.6f",  0x0140, 0x0100, CRC(0266c7db) SHA1(a8f21e86e6d974c9bfd92a147689d0e7316d66e2) ) /* sprites lookup */
 
 	ROM_REGION( 0x4000, "vlm", 0 ) /* speech rom */
-	ROM_LOAD( "507l01.8c",  0x0000, 0x4000, CRC(0c8a3605) SHA1(d886b66d3861c3a90a1825ccf5bf0011831ca366) )
+	ROM_LOAD( "507l01.8c",  0x0000, 0x4000, CRC(0c8a3605) SHA1(d886b66d3861c3a90a1825ccf5bf0011831ca366) ) // same data in both halves
 ROM_END
 
 ROM_START( manhatan )
@@ -335,7 +350,8 @@ ROM_START( manhatan )
 	ROM_LOAD( "507j12.6f",  0x0140, 0x0100, CRC(0266c7db) SHA1(a8f21e86e6d974c9bfd92a147689d0e7316d66e2) ) /* sprites lookup */
 
 	ROM_REGION( 0x4000, "vlm", 0 ) /* speech rom */
-	ROM_LOAD( "507p01.8c",  0x0000, 0x4000, CRC(973fa351) SHA1(ac360d05ed4d03334e00c80e70d5ae939d93af5f) )
+	ROM_LOAD( "507p01.8c",  0x2000, 0x2000, CRC(973fa351) SHA1(ac360d05ed4d03334e00c80e70d5ae939d93af5f) ) // top half is blank
+	ROM_CONTINUE( 0x0000, 0x2000 )
 ROM_END
 
 /*
@@ -401,29 +417,6 @@ ROM_START( jailbrekb )
 	ROM_LOAD( "k8.bin",  0x0000, 0x0001, NO_DUMP ) /* PAL16L8 */
 ROM_END
 
-DRIVER_INIT_MEMBER(jailbrek_state,jailbrek)
-{
-	UINT8 *SPEECH_ROM = memregion("vlm")->base();
-	int ind;
-
-	/*
-	   Check if the rom used for the speech is not a 2764, but a 27128.  If a
-	   27128 is used then the data is stored in the upper half of the eprom.
-	   (The schematics and board refer to a 2764, but all the boards I have seen
-	   use a 27128.  According to the schematics pin 26 is tied high so if a 2764
-	   is used then the pin is ignored, but if a 27128 is used then pin 26
-	   represents address line A13.)
-	*/
-
-	if (memregion("vlm")->bytes() == 0x4000)
-	{
-		for (ind = 0; ind < 0x2000; ++ind)
-		{
-			SPEECH_ROM[ind] = SPEECH_ROM[ind + 0x2000];
-		}
-	}
-}
-
-GAME( 1986, jailbrek, 0,        jailbrek, jailbrek, jailbrek_state, jailbrek, ROT0, "Konami", "Jail Break", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, jailbrekb,jailbrek, jailbrek, jailbrek, jailbrek_state, jailbrek, ROT0, "bootleg","Jail Break (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, manhatan, jailbrek, jailbrek, jailbrek, jailbrek_state, jailbrek, ROT0, "Konami", "Manhattan 24 Bunsyo (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, jailbrek, 0,        jailbrek, jailbrek, driver_device, 0, ROT0, "Konami", "Jail Break", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, jailbrekb,jailbrek, jailbrek, jailbrek, driver_device, 0, ROT0, "bootleg","Jail Break (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, manhatan, jailbrek, jailbrek, jailbrek, driver_device, 0, ROT0, "Konami", "Manhattan 24 Bunsyo (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -879,11 +879,17 @@ msx_cart_keyboard_master::msx_cart_keyboard_master(const machine_config &mconfig
 }
 
 
+static ADDRESS_MAP_START( vlm_map, AS_0, 8, msx_cart_keyboard_master )
+	AM_RANGE(0x0000, 0xffff) AM_READ(read_vlm)
+ADDRESS_MAP_END
+
+
 static MACHINE_CONFIG_FRAGMENT( msx_cart_keyboard_master )
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("vlm5030", VLM5030, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, vlm_map)
 MACHINE_CONFIG_END
 
 
@@ -909,7 +915,6 @@ void msx_cart_keyboard_master::initialize_cartridge()
 	{
 		fatalerror("keyboard_master: Invalid ROM size\n");
 	}
-	m_vlm5030->set_rom(&m_rom_vlm5030[0]);
 }
 
 
@@ -920,6 +925,12 @@ READ8_MEMBER(msx_cart_keyboard_master::read_cart)
 		return m_rom[offset & 0x3fff];
 	}
 	return 0xff;
+}
+
+
+READ8_MEMBER(msx_cart_keyboard_master::read_vlm)
+{
+	return m_rom_vlm5030[offset];
 }
 
 
