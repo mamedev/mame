@@ -80,8 +80,6 @@ READ8_MEMBER(ddribble_state::ddribble_vlm5030_busy_r)
 
 WRITE8_MEMBER(ddribble_state::ddribble_vlm5030_ctrl_w)
 {
-	UINT8 *SPEECH_ROM = memregion("vlm")->base();
-
 	/* b7 : vlm data bus OE   */
 
 	/* b6 : VLM5030-RST       */
@@ -94,7 +92,7 @@ WRITE8_MEMBER(ddribble_state::ddribble_vlm5030_ctrl_w)
 	m_vlm->vcu(data & 0x10 ? 1 : 0);
 
 	/* b3 : ROM bank select   */
-	m_vlm->set_rom(&SPEECH_ROM[data & 0x08 ? 0x10000 : 0]);
+	membank("vlmbank")->set_entry(data & 0x08 ? 1 : 0);
 
 	/* b2 : SSG-C rc filter enable */
 	m_filter3->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
@@ -140,6 +138,10 @@ static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, ddribble_state )
 	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)    /* YM2203 */
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("vlm", vlm5030_device, data_w)          /* Speech data */
 	AM_RANGE(0x8000, 0xffff) AM_ROM                                     /* ROM */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( vlm_map, AS_0, 8, ddribble_state )
+	AM_RANGE(0x0000, 0xffff) AM_ROMBANK("vlmbank")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ddribble )
@@ -226,6 +228,7 @@ GFXDECODE_END
 void ddribble_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base(), 0x2000);
+	membank("vlmbank")->configure_entries(0, 2, memregion("vlm")->base(), 0x10000);
 
 	save_item(NAME(m_int_enable_0));
 	save_item(NAME(m_int_enable_1));
@@ -298,6 +301,7 @@ static MACHINE_CONFIG_START( ddribble, ddribble_state )
 
 	MCFG_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, vlm_map)
 
 	MCFG_FILTER_RC_ADD("filter1", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

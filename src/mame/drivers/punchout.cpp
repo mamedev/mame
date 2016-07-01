@@ -205,6 +205,12 @@ static ADDRESS_MAP_START( punchout_io_map, AS_IO, 8, punchout_state )
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( punchout_vlm_map, AS_0, 8, punchout_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+ADDRESS_MAP_END
+
+
 // Super Punch-Out!! comes with an extra security PCB that plugs into the Z80 socket
 // CHS1-01-EXP, has Z80 CPU, RP5C01, RP5H01
 
@@ -673,6 +679,7 @@ static MACHINE_CONFIG_START( punchout, punchout_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("vlm", VLM5030, XTAL_21_4772MHz/6)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, punchout_vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 MACHINE_CONFIG_END
 
@@ -1124,7 +1131,7 @@ ROM_START( spnchout )
 	ROM_LOAD( "chs1-b-8f_white.8f", 0x1a00, 0x0200, CRC(1663eed7) SHA1(90ff876a6b885f8a80c17531cde8b91864f1a6a5) )  /* B */
 	ROM_LOAD( "chs1-v.2d",          0x2000, 0x0100, CRC(71dc0d48) SHA1(dd6609f547d74887f520d7e71a1a00317ff181d0) )  /* timing - not used */
 
-	ROM_REGION( 0x10000, "vlm", 0 ) /* 64k for the VLM5030 data */
+	ROM_REGION( 0x4000, "vlm", 0 )  /* 16k for the VLM5030 data */
 	ROM_LOAD( "chs1-c.6p",    0x0000, 0x4000, CRC(ad8b64b8) SHA1(0f1232a10faf71b782f9f6653cca8570243c17e0) )
 ROM_END
 
@@ -1270,7 +1277,7 @@ ROM_START( spnchoutj )
 	ROM_LOAD( "chs1-b-8f_white.8f", 0x1a00, 0x0200, CRC(1663eed7) SHA1(90ff876a6b885f8a80c17531cde8b91864f1a6a5) )  /* B */
 	ROM_LOAD( "chs1-v.2d",          0x2000, 0x0100, CRC(71dc0d48) SHA1(dd6609f547d74887f520d7e71a1a00317ff181d0) )  /* timing - not used */
 
-	ROM_REGION( 0x10000, "vlm", 0 ) /* 64k for the VLM5030 data */
+	ROM_REGION( 0x4000, "vlm", 0 )  /* 16k for the VLM5030 data */
 	ROM_LOAD( "chs1c6pa.bin", 0x0000, 0x4000, CRC(d05fb730) SHA1(9f4c4c7e5113739312558eff4d3d3e42d513aa31) )
 ROM_END
 
@@ -1326,7 +1333,7 @@ ROM_START( armwrest )
 	ROM_LOAD( "chv1-b.3c",    0x0c00, 0x0100, CRC(c3f92ea2) SHA1(1a82cca1b9a8d9bd4a1d121d8c131a7d0be554bc) )    /* priority encoder - not used */
 	ROM_LOAD( "chpv-v.2d",    0x0d00, 0x0100, CRC(71dc0d48) SHA1(dd6609f547d74887f520d7e71a1a00317ff181d0) )    /* timing - not used */
 
-	ROM_REGION( 0x10000, "vlm", 0 ) /* 64k for the VLM5030 data */
+	ROM_REGION( 0x4000, "vlm", 0 )  /* 16k for the VLM5030 data */
 	ROM_LOAD( "chv1-c.6p",    0x0000, 0x4000, CRC(31b52896) SHA1(395f59ac38b46042f79e9224ac6bc7d3dc299906) )
 ROM_END
 

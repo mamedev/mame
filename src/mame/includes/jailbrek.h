@@ -51,7 +51,6 @@ public:
 	DECLARE_WRITE8_MEMBER(colorram_w);
 	DECLARE_READ8_MEMBER(speech_r);
 	DECLARE_WRITE8_MEMBER(speech_w);
-	DECLARE_DRIVER_INIT(jailbrek);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

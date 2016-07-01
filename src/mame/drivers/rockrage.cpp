@@ -124,6 +124,11 @@ static ADDRESS_MAP_START( rockrage_sound_map, AS_PROGRAM, 8, rockrage_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM                                             /* ROM */
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( rockrage_vlm_map, AS_0, 8, rockrage_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+ADDRESS_MAP_END
+
 /***************************************************************************
 
     Input Ports
@@ -285,6 +290,7 @@ static MACHINE_CONFIG_START( rockrage, rockrage_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 
 	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, rockrage_vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 MACHINE_CONFIG_END
