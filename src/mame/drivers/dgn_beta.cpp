@@ -320,6 +320,7 @@ static MACHINE_CONFIG_START( dgnbeta, dgn_beta_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(dgnbeta_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(dgn_beta_state, dgnbeta_dasm_override)
 
 	/* both cpus in the beta share the same address/data busses */
 	MCFG_CPU_ADD(DMACPU_TAG, M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
