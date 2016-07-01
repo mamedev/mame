@@ -12269,8 +12269,8 @@ fccpu1                          //
 pesadelo                        // (c) 1989 Forte II Games
 
 @source:fortecar.cpp
-fortecar                        //
-fortecrd                        //
+fortecrd                        // (c) 1994, Fortex Ltd.
+fortecar                        // (c) 1994, Fortex Ltd.
 
 @source:fp1100.cpp
 fp1100                          //
