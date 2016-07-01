@@ -296,10 +296,10 @@ VIDEO_START_MEMBER(legionna_state,denjinmk)
 	
 	m_sprite_pri_mask[0] = 0xfff0;
 	m_sprite_pri_mask[1] = 0xfff8;
-	// TODO: 2 is used by the door at the end of sewers part in level 1, 3 is the briefing guy
-	//       yet another swapped behaviour caused by a specific port?
+	// TODO: 2 is used by the door at the end of sewers part in level 1, 3 are briefing guy in pre-stage and portraits before a boss fight
+	//       I assume that 3 goes above everything else, and assume that this thing is programmable somehow ...
 	m_sprite_pri_mask[2] = 0xfffe;
-	m_sprite_pri_mask[3] = 0xfffc;
+	m_sprite_pri_mask[3] = 0x0000;
 	
 //  m_background_layer->set_transparent_pen(15);
 	m_midground_layer->set_transparent_pen(15);
