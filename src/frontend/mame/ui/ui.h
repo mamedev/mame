@@ -271,7 +271,6 @@ private:
 	std::unique_ptr<UINT8[]> m_non_char_keys_down;
 	render_texture *        m_mouse_arrow_texture;
 	bool                    m_mouse_show;
-	bool                    m_load_save_hold;
 	ui_options              m_ui_options;
 
 	// static variables
@@ -289,7 +288,6 @@ private:
 	UINT32 handler_messagebox(render_container *container);
 	UINT32 handler_messagebox_anykey(render_container *container);
 	UINT32 handler_ingame(render_container *container);
-	UINT32 handler_load_save(render_container *container, UINT32 state);
 	UINT32 handler_confirm_quit(render_container *container);
 
 	// private methods
