@@ -159,7 +159,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vlm_map, AS_0, 8, jailbrek_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("vlm", 0x2000)
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -325,7 +325,7 @@ ROM_START( jailbrek )
 	ROM_LOAD( "507j12.6f",  0x0140, 0x0100, CRC(0266c7db) SHA1(a8f21e86e6d974c9bfd92a147689d0e7316d66e2) ) /* sprites lookup */
 
 	ROM_REGION( 0x4000, "vlm", 0 ) /* speech rom */
-	ROM_LOAD( "507l01.8c",  0x0000, 0x2000, CRC(0c8a3605) SHA1(d886b66d3861c3a90a1825ccf5bf0011831ca366) )
+	ROM_LOAD( "507l01.8c",  0x0000, 0x4000, CRC(0c8a3605) SHA1(d886b66d3861c3a90a1825ccf5bf0011831ca366) ) // same data in both halves
 ROM_END
 
 ROM_START( manhatan )
@@ -350,7 +350,8 @@ ROM_START( manhatan )
 	ROM_LOAD( "507j12.6f",  0x0140, 0x0100, CRC(0266c7db) SHA1(a8f21e86e6d974c9bfd92a147689d0e7316d66e2) ) /* sprites lookup */
 
 	ROM_REGION( 0x4000, "vlm", 0 ) /* speech rom */
-	ROM_LOAD( "507p01.8c",  0x0000, 0x4000, CRC(973fa351) SHA1(ac360d05ed4d03334e00c80e70d5ae939d93af5f) )
+	ROM_LOAD( "507p01.8c",  0x2000, 0x2000, CRC(973fa351) SHA1(ac360d05ed4d03334e00c80e70d5ae939d93af5f) ) // top half is blank
+	ROM_CONTINUE( 0x0000, 0x2000 )
 ROM_END
 
 /*
@@ -406,8 +407,8 @@ ROM_START( jailbrekb )
 	ROM_LOAD( "prom.d6", 0x0040, 0x0100, CRC(d4fe5c97) SHA1(972e9dab6c53722545dd3a43e3ada7921e88708b) ) /* char lookup */
 	ROM_LOAD( "prom.e6", 0x0140, 0x0100, CRC(0266c7db) SHA1(a8f21e86e6d974c9bfd92a147689d0e7316d66e2) ) /* sprites lookup */
 
-	ROM_REGION( 0x4000, "vlm", 0 ) /* speech rom */
-	ROM_LOAD( "2.i6",    0x2000, 0x4000, CRC(d91d15e3) SHA1(475fe50aafbf8f2fb79880ef0e2c25158eda5270) )
+	ROM_REGION( 0x2000, "vlm", 0 ) /* speech rom */
+	ROM_LOAD( "2.i6",    0x0000, 0x2000, CRC(d91d15e3) SHA1(475fe50aafbf8f2fb79880ef0e2c25158eda5270) )
 
 	ROM_REGION( 0x0004, "plds", 0 )
 	ROM_LOAD( "k4.bin",  0x0000, 0x0001, NO_DUMP ) /* PAL16L8 */

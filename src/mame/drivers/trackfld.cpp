@@ -1422,7 +1422,7 @@ ROM_START( wizzquiz )
 	ROM_LOAD( "361b17.b16",   0x0020, 0x0100, CRC(d2ba4d32) SHA1(894b5cedf01ba9225a0d6215291857e455b84903) ) /* sprite lookup table */
 	ROM_LOAD( "361b18.e15",   0x0120, 0x0100, CRC(053e5861) SHA1(6740a62cf7b6938a4f936a2fed429704612060a5) ) /* char lookup table */
 
-	ROM_REGION( 0x10000, "vlm", ROMREGION_ERASE00 ) /* 64k for speech rom */
+	ROM_REGION( 0x2000, "vlm", ROMREGION_ERASE00 ) /* 8k for the VLM5030 data */
 	/* not used */
 ROM_END
 
@@ -1465,7 +1465,7 @@ ROM_START( wizzquiza )
 	ROM_LOAD( "361b17.b16",   0x0020, 0x0100, CRC(d2ba4d32) SHA1(894b5cedf01ba9225a0d6215291857e455b84903) ) /* sprite lookup table */
 	ROM_LOAD( "361b18.e15",   0x0120, 0x0100, CRC(053e5861) SHA1(6740a62cf7b6938a4f936a2fed429704612060a5) ) /* char lookup table */
 
-	ROM_REGION( 0x10000, "vlm", ROMREGION_ERASE00 ) /* 64k for speech rom */
+	ROM_REGION( 0x2000, "vlm", ROMREGION_ERASE00 ) /* 8k for the VLM5030 data */
 	/* not used */
 ROM_END
 
