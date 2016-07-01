@@ -12,6 +12,11 @@
 #include "debugvw.h"
 #include "dvstate.h"
 
+const int debug_view_state::REG_DIVIDER;
+const int debug_view_state::REG_CYCLES;
+const int debug_view_state::REG_BEAMX;
+const int debug_view_state::REG_BEAMY;
+const int debug_view_state::REG_FRAME;
 
 
 //**************************************************************************
