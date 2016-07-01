@@ -74,9 +74,6 @@ public:
 	// allocate temporary memory from the menu's memory pool
 	void *m_pool_alloc(size_t size);
 
-	// make a temporary string copy in the menu's memory pool
-	const char *pool_strdup(const char *string);
-
 	// retrieves the index of the currently selected menu item
 	void *get_selection();
 

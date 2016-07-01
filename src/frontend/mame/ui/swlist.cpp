@@ -128,7 +128,6 @@ menu_software_list::menu_software_list(mame_ui_manager &mui, render_container *c
 {
 	m_swlist = swlist;
 	m_interface = interface;
-	m_entrylist = nullptr;
 	m_ordered_by_shortname = true;
 }
 
@@ -146,34 +145,16 @@ menu_software_list::~menu_software_list()
 //  compare_entries
 //-------------------------------------------------
 
-int menu_software_list::compare_entries(const entry_info *e1, const entry_info *e2, bool shortname)
+int menu_software_list::compare_entries(const entry_info &e1, const entry_info &e2, bool shortname)
 {
 	int result;
-	const char *e1_basename;
-	const char *e2_basename;
-
-	if (shortname)
-	{
-		e1_basename = (e1->short_name != nullptr) ? e1->short_name : "";
-		e2_basename = (e2->short_name != nullptr) ? e2->short_name : "";
-	}
-	else
-	{
-		e1_basename = (e1->long_name != nullptr) ? e1->long_name : "";
-		e2_basename = (e2->long_name != nullptr) ? e2->long_name : "";
-	}
+	const char *e1_basename = shortname ? e1.short_name.c_str() : e1.long_name.c_str();
+	const char *e2_basename = shortname ? e2.short_name.c_str() : e2.long_name.c_str();
 
 	result = core_stricmp(e1_basename, e2_basename);
 	if (result == 0)
 	{
 		result = strcmp(e1_basename, e2_basename);
-		if (result == 0)
-		{
-			if (e1 < e2)
-				result = -1;
-			else if (e1 > e2)
-				result = 1;
-		}
 	}
 
 	return result;
@@ -184,24 +165,19 @@ int menu_software_list::compare_entries(const entry_info *e1, const entry_info *
 //  append_software_entry - populate a specific list
 //-------------------------------------------------
 
-menu_software_list::entry_info *menu_software_list::append_software_entry(const software_info &swinfo)
+void menu_software_list::append_software_entry(const software_info &swinfo)
 {
-	entry_info *entry = nullptr;
-	entry_info **entryptr;
-	bool entry_updated = FALSE;
+	entry_info entry;
+	bool entry_updated = false;
 
 	// check if at least one of the parts has the correct interface and add a menu entry only in this case
 	for (const software_part &swpart : swinfo.parts())
 	{
 		if (swpart.matches_interface(m_interface) && swpart.is_compatible(*m_swlist) == SOFTWARE_IS_COMPATIBLE)
 		{
-			entry_updated = TRUE;
-			// allocate a new entry
-			entry = (entry_info *) m_pool_alloc(sizeof(*entry));
-			memset(entry, 0, sizeof(*entry));
-
-			entry->short_name = pool_strdup(swinfo.shortname());
-			entry->long_name = pool_strdup(swinfo.longname());
+			entry_updated = true;
+			entry.short_name.assign(swinfo.shortname());
+			entry.long_name.assign(swinfo.longname());
 			break;
 		}
 	}
@@ -210,16 +186,12 @@ menu_software_list::entry_info *menu_software_list::append_software_entry(const 
 	if (entry_updated)
 	{
 		// find the end of the list
-		entryptr = &m_entrylist;
-		while ((*entryptr != nullptr) && (compare_entries(entry, *entryptr, m_ordered_by_shortname) >= 0))
-			entryptr = &(*entryptr)->next;
+		auto iter = m_entrylist.begin();
+		while (iter != m_entrylist.end() && compare_entries(entry, *iter, m_ordered_by_shortname) >= 0)
+			++iter;
 
-		// insert the entry
-		entry->next = *entryptr;
-		*entryptr = entry;
+		m_entrylist.emplace(iter, std::move(entry));
 	}
-
-	return entry;
 }
 
 
@@ -237,8 +209,8 @@ void menu_software_list::populate()
 	item_append(_("Switch Item Ordering"), "", 0, (void *)1);
 
 	// append all of the menu entries
-	for (entry_info *entry = m_entrylist; entry != nullptr; entry = entry->next)
-		item_append(entry->short_name, entry->long_name, 0, entry);
+	for (auto &entry : m_entrylist)
+		item_append(entry.short_name, entry.long_name, 0, &entry);
 }
 
 
@@ -248,7 +220,6 @@ void menu_software_list::populate()
 
 void menu_software_list::handle()
 {
-	const entry_info *entry;
 	const entry_info *selected_entry = nullptr;
 	int bestmatch = 0;
 
@@ -260,7 +231,6 @@ void menu_software_list::handle()
 		if ((FPTR)event->itemref == 1 && event->iptkey == IPT_UI_SELECT)
 		{
 			m_ordered_by_shortname = !m_ordered_by_shortname;
-			m_entrylist = nullptr;
 
 			// reset the char buffer if we change ordering criterion
 			memset(m_filename_buffer, '\0', ARRAY_LENGTH(m_filename_buffer));
@@ -305,55 +275,30 @@ void menu_software_list::handle()
 
 			if (update_selected)
 			{
-				const entry_info *cur_selected;
+				// identify the selected entry
+				const entry_info *cur_selected = ((FPTR)event->itemref != 1)
+					? (const entry_info *)get_selection()
+					: nullptr;
 
-				// if the current selection is a software entry, start search from here
-				if ((FPTR)event->itemref != 1)
-					cur_selected= (const entry_info *)get_selection();
-				// else (if we are on the 'Switch Order' entry) start from the beginning
-				else
-					cur_selected = m_entrylist;
-
-				// check for entries which matches our filename_buffer:
-				// from current entry to the end
-				for (entry = cur_selected; entry != nullptr; entry = entry->next)
+				// loop through all entries
+				for (auto &entry : m_entrylist)
 				{
-					const char *compare_name = m_ordered_by_shortname ? entry->short_name : entry->long_name;
-
-					if (compare_name != nullptr && m_filename_buffer != nullptr)
+					// is this entry the selected entry?
+					if (cur_selected != &entry)
 					{
+						auto &compare_name = m_ordered_by_shortname ? entry.short_name : entry.long_name;
+
 						int match = 0;
 						for (int i = 0; i < ARRAY_LENGTH(m_filename_buffer); i++)
 						{
-							if (core_strnicmp(compare_name, m_filename_buffer, i) == 0)
+							if (core_strnicmp(compare_name.c_str(), m_filename_buffer, i) == 0)
 								match = i;
 						}
 
 						if (match > bestmatch)
 						{
 							bestmatch = match;
-							selected_entry = entry;
-						}
-					}
-				}
-				// and from the first entry to current one
-				for (entry = m_entrylist; entry != cur_selected; entry = entry->next)
-				{
-					const char *compare_name = m_ordered_by_shortname ? entry->short_name : entry->long_name;
-
-					if (compare_name != nullptr && m_filename_buffer != nullptr)
-					{
-						int match = 0;
-						for (int i = 0; i < ARRAY_LENGTH(m_filename_buffer); i++)
-						{
-							if (core_strnicmp(compare_name, m_filename_buffer, i) == 0)
-								match = i;
-						}
-
-						if (match > bestmatch)
-						{
-							bestmatch = match;
-							selected_entry = entry;
+							selected_entry = &entry;
 						}
 					}
 				}
