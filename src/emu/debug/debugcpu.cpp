@@ -1685,10 +1685,10 @@ device_debug::device_debug(device_t &device)
 
 		// add all registers into it
 		std::string tempstr;
-		for (const device_state_entry &entry : m_state->state_entries())
+		for (auto &entry : m_state->state_entries())
 		{
-			strmakelower(tempstr.assign(entry.symbol()));
-			m_symtable.add(tempstr.c_str(), (void *)(FPTR)entry.index(), get_state, set_state);
+			strmakelower(tempstr.assign(entry->symbol()));
+			m_symtable.add(tempstr.c_str(), (void *)(FPTR)entry->index(), get_state, set_state);
 		}
 	}
 

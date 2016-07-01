@@ -758,10 +758,10 @@ luabridge::LuaRef lua_engine::l_dev_get_states(const device_t *d)
 	if(!dynamic_cast<device_state_interface *>(dev))
 		return st_table;
 
-	for (device_state_entry &s : dev->state().state_entries())
+	for (auto &s : dev->state().state_entries())
 	{
 		// XXX: refrain from exporting non-visible entries?
-		st_table[s.symbol()] = &s;
+		st_table[s->symbol()] = &s;
 	}
 
 	return st_table;

@@ -44,9 +44,7 @@ enum
 class device_state_entry
 {
 	friend class device_state_interface;
-	friend class simple_list<device_state_entry>;
-
-private:
+public:
 	// construction/destruction
 	device_state_entry(int index, const char *symbol, void *dataptr, UINT8 size, device_state_interface *dev);
 	device_state_entry(int index, device_state_interface *dev);
@@ -59,9 +57,6 @@ public:
 	device_state_entry &callimport() { m_flags |= DSF_IMPORT; return *this; }
 	device_state_entry &callexport() { m_flags |= DSF_EXPORT; return *this; }
 	device_state_entry &noshow() { m_flags |= DSF_NOSHOW; return *this; }
-
-	// iteration helpers
-	device_state_entry *next() const { return m_next; }
 
 	// query information
 	int index() const { return m_index; }
@@ -99,7 +94,6 @@ protected:
 
 	// public state description
 	device_state_interface *m_device_state;         // link to parent device state
-	device_state_entry *    m_next;                 // link to next item
 	UINT32                  m_index;                // index by which this item is referred
 	generic_ptr             m_dataptr;              // pointer to where the data lives
 	UINT64                  m_datamask;             // mask that applies to the data
@@ -124,7 +118,7 @@ public:
 	virtual ~device_state_interface();
 
 	// configuration access
-	const simple_list<device_state_entry> &state_entries() const { return m_state_list; }
+	const std::vector<std::unique_ptr<device_state_entry>> &state_entries() const { return m_state_list; }
 
 	// state getters
 	UINT64 state_int(int index);
@@ -176,7 +170,7 @@ protected:
 	static const int FAST_STATE_MAX = 256;                          // lookups
 
 	// state
-	simple_list<device_state_entry>         m_state_list;           // head of state list
+	std::vector<std::unique_ptr<device_state_entry>>       m_state_list;           // head of state list
 	device_state_entry *                    m_fast_state[FAST_STATE_MAX + 1 - FAST_STATE_MIN];
 																	// fast access to common entries
 };
