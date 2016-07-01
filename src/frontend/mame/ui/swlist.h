@@ -54,6 +54,12 @@ public:
 private:
 	struct entry_info
 	{
+		entry_info() = default;
+		entry_info(entry_info const &) = default;
+		entry_info(entry_info &&) = default;
+		entry_info &operator=(entry_info const &) = default;
+		entry_info &operator=(entry_info &&) = default;
+
 		std::string short_name;
 		std::string long_name;
 	};

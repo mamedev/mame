@@ -188,9 +188,9 @@ void menu_software_list::append_software_entry(const software_info &swinfo)
 		// find the end of the list
 		auto iter = m_entrylist.begin();
 		while (iter != m_entrylist.end() && compare_entries(entry, *iter, m_ordered_by_shortname) >= 0)
-			iter++;
+			++iter;
 
-		m_entrylist.insert(iter, entry);
+		m_entrylist.emplace(iter, std::move(entry));
 	}
 }
 
