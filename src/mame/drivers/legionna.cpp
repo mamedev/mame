@@ -245,14 +245,6 @@ static ADDRESS_MAP_START( godzilla_map, AS_PROGRAM, 16, legionna_state )
 ADDRESS_MAP_END
 
 
-/* did they swap the lines, or does the protection device swap the words during the DMA?? */
-WRITE16_MEMBER(legionna_state::wordswapram_w)
-{
-	offset^=1;
-	COMBINE_DATA(&m_wordswapram[offset]);
-}
-
-
 static ADDRESS_MAP_START( denjinmk_map, AS_PROGRAM, 16, legionna_state )
 	AM_IMPORT_FROM( legionna_cop_mem )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
@@ -271,7 +263,7 @@ static ADDRESS_MAP_START( denjinmk_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x101800, 0x101fff) AM_RAM // _WRITE(legionna_foreground_w) AM_SHARE("fore_data")
 	AM_RANGE(0x102000, 0x1027ff) AM_RAM // _WRITE(legionna_midground_w) AM_SHARE("mid_data")
 	AM_RANGE(0x102800, 0x103fff) AM_RAM // _WRITE(legionna_text_w) AM_SHARE("textram")
-	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(wordswapram_w) AM_SHARE("wordswapram")
+	AM_RANGE(0x104000, 0x104fff) AM_RAM
 	AM_RANGE(0x105000, 0x105fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x106000, 0x107fff) AM_RAM
 	AM_RANGE(0x108000, 0x11dfff) AM_RAM
@@ -1279,7 +1271,7 @@ static MACHINE_CONFIG_START( heatbrl, legionna_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(36*8, 36*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_legionna)
+	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_heatbrl)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
@@ -1293,7 +1285,7 @@ static MACHINE_CONFIG_START( heatbrl, legionna_state )
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(legionna_state,legionna)
+	MCFG_VIDEO_START_OVERRIDE(legionna_state,heatbrl)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000)

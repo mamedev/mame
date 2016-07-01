@@ -4,7 +4,7 @@
 
     Legionnaire / Heated Barrel video hardware (derived from D-Con)
 
-    priority test (preliminary):
+    priority test (used by Legionnaire, front to bottom):
     - OBJ 0
     - TXT
     - OBJ 1
@@ -13,6 +13,8 @@
     - MBK
     - OBJ 3
     - LBK
+	Anything else doesn't seem to match this scheme, guess it's selectable by
+	PROM, CRTC or COP ...
 
 ***************************************************************************/
 
@@ -106,6 +108,7 @@ WRITE16_MEMBER(legionna_state::videowrite_cb_w)
 	}
 }
 
+// TODO: move to COP device
 WRITE16_MEMBER(legionna_state::grainbow_layer_config_w)
 {
 	// (0x8000|0x1ff), 0x200, 0x1ff, 0x200 written in sequence at startup
@@ -181,12 +184,11 @@ TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info_cupsoc)
 	SET_TILE_INFO_MEMBER(1,tile,color,0);
 }
 
-TILE_GET_INFO_MEMBER(legionna_state::get_fore_tile_info)/* this is giving bad tiles... */
+TILE_GET_INFO_MEMBER(legionna_state::get_fore_tile_info)
 {
 	int tile=m_fore_data[tile_index];
 	int color=(tile>>12)&0xf;
 
-	// legionnaire tile numbers / gfx set wrong, see screen after coin insertion
 	tile &= 0xfff;
 
 	SET_TILE_INFO_MEMBER(4,tile,color,0);
@@ -213,9 +215,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_text_tile_info)
 	SET_TILE_INFO_MEMBER(0,tile,color,0);
 }
 
-
-
-VIDEO_START_MEMBER(legionna_state,legionna)
+void legionna_state::common_video_start()
 {
 	m_back_data = make_unique_clear<UINT16[]>(0x800/2);
 	m_fore_data =  make_unique_clear<UINT16[]>(0x800/2);
@@ -240,6 +240,41 @@ VIDEO_START_MEMBER(legionna_state,legionna)
 	m_text_layer->set_transparent_pen(15);
 }
 
+VIDEO_START_MEMBER(legionna_state,legionna)
+{
+	common_video_start();
+	
+	m_sprite_pri_mask[0] = 0x0000;
+	m_sprite_pri_mask[1] = 0xfff0;
+	m_sprite_pri_mask[2] = 0xfffc;
+	m_sprite_pri_mask[3] = 0xfffe;
+}
+
+VIDEO_START_MEMBER(legionna_state,heatbrl)
+{
+	common_video_start();
+
+	m_sprite_pri_mask[0] = 0xfff0;
+	m_sprite_pri_mask[1] = 0xfffc;
+	m_sprite_pri_mask[2] = 0xfffe;
+	// TODO: not shown?
+	m_sprite_pri_mask[3] = 0xffff;
+}
+
+VIDEO_START_MEMBER(legionna_state,godzilla)
+{
+	VIDEO_START_CALL_MEMBER(legionna);
+
+	m_has_extended_banking = 1;
+	m_has_extended_priority = 0;
+	
+	m_sprite_pri_mask[0] = 0xfff0;
+	m_sprite_pri_mask[1] = 0xfffc;
+	m_sprite_pri_mask[2] = 0xfffe;
+	// TODO: not shown?
+	m_sprite_pri_mask[3] = 0xffff;
+}
+
 VIDEO_START_MEMBER(legionna_state,denjinmk)
 {
 	m_back_data = make_unique_clear<UINT16[]>(0x800/2);
@@ -258,7 +293,14 @@ VIDEO_START_MEMBER(legionna_state,denjinmk)
 
 	m_has_extended_banking = 1;
 	m_has_extended_priority = 0;
-
+	
+	m_sprite_pri_mask[0] = 0xfff0;
+	m_sprite_pri_mask[1] = 0xfff8;
+	// TODO: 2 is used by the door at the end of sewers part in level 1, 3 is the briefing guy
+	//       yet another swapped behaviour caused by a specific port?
+	m_sprite_pri_mask[2] = 0xfffe;
+	m_sprite_pri_mask[3] = 0xfffc;
+	
 //  m_background_layer->set_transparent_pen(15);
 	m_midground_layer->set_transparent_pen(15);
 	m_foreground_layer->set_transparent_pen(15);
@@ -299,14 +341,6 @@ VIDEO_START_MEMBER(legionna_state,grainbow)
 	m_has_extended_priority = 1;
 
 	m_layer_config = std::make_unique<UINT16[]>(0x8/2);
-}
-
-VIDEO_START_MEMBER(legionna_state,godzilla)
-{
-	VIDEO_START_CALL_MEMBER(legionna);
-
-	m_has_extended_banking = 1;
-	m_has_extended_priority = 0;
 }
 
 /*************************************************************************
@@ -384,15 +418,43 @@ void legionna_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 		else
 		{
 			cur_pri = (spriteram16[offs+1] & 0xc000) >> 14;
-
-			switch (cur_pri)
+			pri_mask = m_sprite_pri_mask[cur_pri];
+			#if 0
+			// quick and dirty priority tester
+			if(cur_pri == 3)
 			{
-				case 0: pri_mask = 0xfffc; break; //?
-				case 1: pri_mask = 0xfffc; break; //?
-				case 2: pri_mask = 0xfffc; break; // player sprites in legionnaire
-				case 3: pri_mask = 0xfffe; break; // stuff that goes behind the playfield (barriers on train level in legionnaire)
-			}
+				static UINT16 test = 0xffff;
+				
+				if(machine().input().code_pressed_once(KEYCODE_Q))
+					test^=1;
 
+				if(machine().input().code_pressed_once(KEYCODE_W))
+					test^=2;
+
+				if(machine().input().code_pressed_once(KEYCODE_E))
+					test^=4;
+
+				if(machine().input().code_pressed_once(KEYCODE_R))
+					test^=8;
+
+				if(machine().input().code_pressed_once(KEYCODE_T))
+					test^=0x10;
+
+				if(machine().input().code_pressed_once(KEYCODE_Y))
+					test^=0x20;
+
+				if(machine().input().code_pressed_once(KEYCODE_U))
+					test^=0x40;
+
+				if(machine().input().code_pressed_once(KEYCODE_I))
+					test^=0x80;				
+
+				pri_mask = 0xffff & test;
+				data = (data & 0xffc0) | (machine().rand() & 0x3f);
+				popmessage("%04x %04x %d",pri_mask,test,cur_pri);
+				//pri_mask = test;
+			}
+			#endif
 		}
 
 		sprite = spriteram16[offs+1];
@@ -495,22 +557,40 @@ void legionna_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 	}
 }
 
-#define LAYER_DB 0
-
 UINT32 legionna_state::screen_update_legionna(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* Setup the tilemaps */
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->black_pen(), cliprect);    /* wrong color? */
 
-	/* m_layer_disable is a guess based on 'stage 1' screen in heatbrl  */
-
-	if (!(m_layer_disable&0x0020)) m_foreground_layer->draw(screen, bitmap, cliprect, 0, 0);
-	if (!(m_layer_disable&0x0010)) m_midground_layer->draw(screen, bitmap, cliprect, 0, 0);
+	if (!(m_layer_disable&0x0001)) m_midground_layer->draw(screen, bitmap, cliprect, 0, 0);
 	if (!(m_layer_disable&0x0002)) m_background_layer->draw(screen, bitmap, cliprect, 0, 1);
-	if (!(m_layer_disable&0x0001)) m_text_layer->draw(screen, bitmap, cliprect, 0, 2);
+	if (!(m_layer_disable&0x0004)) m_foreground_layer->draw(screen, bitmap, cliprect, 0, 2);
+	if (!(m_layer_disable&0x0008)) m_text_layer->draw(screen, bitmap, cliprect, 0, 4);
 
-	draw_sprites(screen,bitmap,cliprect);
+	if (!(m_layer_disable&0x0010))
+		draw_sprites(screen,bitmap,cliprect);
+
+	if (machine().input().code_pressed_once(KEYCODE_Z))
+		if (m_raiden2cop) m_raiden2cop->dump_table();
+
+	return 0;
+}
+
+UINT32 legionna_state::screen_update_heatbrl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	/* Setup the tilemaps */
+	screen.priority().fill(0, cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);    /* wrong color? */
+	
+	// TODO: priority order is different than anything else?
+	if (!(m_layer_disable&0x0004)) m_foreground_layer->draw(screen, bitmap, cliprect, 0, 0);
+	if (!(m_layer_disable&0x0002)) m_midground_layer->draw(screen, bitmap, cliprect, 0, 1);
+	if (!(m_layer_disable&0x0001)) m_background_layer->draw(screen, bitmap, cliprect, 0, 2);
+	if (!(m_layer_disable&0x0008)) m_text_layer->draw(screen, bitmap, cliprect, 0, 4);
+
+	if (!(m_layer_disable&0x0010))
+		draw_sprites(screen,bitmap,cliprect);
 
 	if (machine().input().code_pressed_once(KEYCODE_Z))
 		if (m_raiden2cop) m_raiden2cop->dump_table();
@@ -524,12 +604,13 @@ UINT32 legionna_state::screen_update_godzilla(screen_device &screen, bitmap_ind1
 	bitmap.fill(0x0200, cliprect);
 	screen.priority().fill(0, cliprect);
 
-	if (!(m_layer_disable&0x0001)) m_background_layer->draw(screen, bitmap, cliprect, 0,0);
-	if (!(m_layer_disable&0x0002)) m_midground_layer->draw(screen, bitmap, cliprect, 0,0);
-	if (!(m_layer_disable&0x0004)) m_foreground_layer->draw(screen, bitmap, cliprect, 0,1);
-	if (!(m_layer_disable&0x0008)) m_text_layer->draw(screen, bitmap, cliprect, 0,2);
+	if (!(m_layer_disable&0x0001)) m_background_layer->draw(screen, bitmap, cliprect, 0, 0);
+	if (!(m_layer_disable&0x0002)) m_midground_layer->draw(screen, bitmap, cliprect, 0, 1);
+	if (!(m_layer_disable&0x0004)) m_foreground_layer->draw(screen, bitmap, cliprect, 0, 2);
+	if (!(m_layer_disable&0x0008)) m_text_layer->draw(screen, bitmap, cliprect, 0, 4);
 
-	draw_sprites(screen,bitmap,cliprect);
+	if (!(m_layer_disable&0x0010))
+		draw_sprites(screen,bitmap,cliprect);
 
 	if (machine().input().code_pressed_once(KEYCODE_Z))
 		if (m_raiden2cop) m_raiden2cop->dump_table();
@@ -555,7 +636,8 @@ UINT32 legionna_state::screen_update_grainbow(screen_device &screen, bitmap_ind1
 	if(!(m_layer_disable & 8))
 		m_text_layer->draw(screen, bitmap, cliprect, 0,8);
 
-	draw_sprites(screen,bitmap,cliprect);
+	if (!(m_layer_disable&0x0010))
+		draw_sprites(screen,bitmap,cliprect);
 
 	if (machine().input().code_pressed_once(KEYCODE_Z))
 		if (m_raiden2cop) m_raiden2cop->dump_table();
