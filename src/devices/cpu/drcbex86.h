@@ -22,6 +22,7 @@
 
 
 
+namespace drc {
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -336,5 +337,8 @@ private:
 	static opcode_generate_func s_opcode_table[uml::OP_MAX];
 };
 
+} // namespace drc
 
-#endif /* __DRCBEC_H__ */
+using drc::drcbe_x86;
+
+#endif /* __DRCBEX86_H__ */

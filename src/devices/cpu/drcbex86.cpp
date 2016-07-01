@@ -89,9 +89,19 @@
 #include "drcuml.h"
 #include "drcbex86.h"
 
+// This is a trick to make it build on Android where the x86 SDK declares ::REG_Exx
+namespace drc {
 using namespace uml;
 using namespace x86emit;
 
+using x86emit::REG_EAX;
+using x86emit::REG_ECX;
+using x86emit::REG_EDX;
+using x86emit::REG_EBX;
+using x86emit::REG_ESP;
+using x86emit::REG_EBP;
+using x86emit::REG_ESI;
+using x86emit::REG_EDI;
 
 //**************************************************************************
 //  DEBUGGING
@@ -6733,3 +6743,5 @@ int drcbe_x86::ddivs(UINT64 &dstlo, UINT64 &dsthi, INT64 src1, INT64 src2)
 		dsthi = src1 % src2;
 	return ((dstlo == 0) << 2) | ((dstlo >> 60) & FLAG_S);
 }
+
+} // namespace drc
