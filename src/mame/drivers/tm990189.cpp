@@ -176,17 +176,17 @@ MACHINE_RESET_MEMBER(tm990189_state,tm990_189)
 
 MACHINE_START_MEMBER(tm990189_state,tm990_189)
 {
-	m_displayena_timer = machine().scheduler().timer_alloc(FUNC_NULL);
+	m_displayena_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 }
 
 MACHINE_START_MEMBER(tm990189_state,tm990_189_v)
 {
-	m_displayena_timer = machine().scheduler().timer_alloc(FUNC_NULL);
+	m_displayena_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 
-	m_joy1x_timer = machine().scheduler().timer_alloc(FUNC_NULL);
-	m_joy1y_timer = machine().scheduler().timer_alloc(FUNC_NULL);
-	m_joy2x_timer = machine().scheduler().timer_alloc(FUNC_NULL);
-	m_joy2y_timer = machine().scheduler().timer_alloc(FUNC_NULL);
+	m_joy1x_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
+	m_joy1y_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
+	m_joy2x_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
+	m_joy2y_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 }
 
 MACHINE_RESET_MEMBER(tm990189_state,tm990_189_v)

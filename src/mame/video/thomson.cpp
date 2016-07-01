@@ -1161,7 +1161,7 @@ VIDEO_START_MEMBER( thomson_state, thom )
 	save_item(NAME(m_thom_floppy_rcount));
 	output().set_value( "floppy", 0 );
 
-	m_thom_video_timer = machine().scheduler().timer_alloc(FUNC_NULL);
+	m_thom_video_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 
 	m_thom_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thomson_state::thom_scanline_start),this));
 

@@ -72,8 +72,8 @@ static emu_timer *timer[2];
 
 MACHINE_START_MEMBER(midzeus_state,midzeus)
 {
-	timer[0] = machine().scheduler().timer_alloc(FUNC_NULL);
-	timer[1] = machine().scheduler().timer_alloc(FUNC_NULL);
+	timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate());
+	timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate());
 
 	gun_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus_state::invasn_gun_callback),this));
 	gun_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus_state::invasn_gun_callback),this));
