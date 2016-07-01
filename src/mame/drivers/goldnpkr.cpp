@@ -4962,7 +4962,7 @@ ROM_END
 /*
   Buena Suerte.
 
-  Protel HW.
+  Prodel HW.
   Copacabana, Rio de Janeiro.
   Brazil.
 
@@ -4973,6 +4973,8 @@ ROM_END
   Discrete sound need to be traced...
 
   30x2-pins Edge connector + 10-pin connector.
+
+  The PCB looks like a cheap copy of a more vintage hardware.
 
 
   *********** Edge connector (WIP) ************
@@ -5049,7 +5051,7 @@ ROM_END
 
 */
 ROM_START( bsuerten )
-	ROM_REGION( 0x10000, "maincpu", 0 )  // bs_x10: BS normal, fast. Protel PCB.
+	ROM_REGION( 0x10000, "maincpu", 0 )  // bs_x10: BS normal, fast. Prodel PCB.
 	ROM_LOAD( "bs_x10__27c128.16a", 0x4000, 0x4000, CRC(2549ceeb) SHA1(8c17849c7e9c138c35df584cdc0eabf536edb3d9) )
 
 	ROM_REGION( 0x6000, "gfx", 0 )
@@ -10015,9 +10017,12 @@ ROM_END
   1983.
 
   6502 CPU
-  2*6821 ios
-  mc6845 video chip
-  10mhz (?) xtal
+  2*6821 PIAs
+  MC6845 CRTC
+  10mhz xtal.
+
+  PCB is similar to Prodel, with internal PSU and
+  30x2 edge connector.
 
   There are French strings related to the game, so maybe is
   a leftover, or maybe there is a unknown way to switch the
@@ -10873,7 +10878,7 @@ GAMEL( 1991, bsuertej,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        
 GAMEL( 1991, bsuertek,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 12)",             0,                layout_goldnpkr )
 GAMEL( 1991, bsuertel,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 13)",             0,                layout_goldnpkr )
 GAMEL( 1991, bsuertem,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 14)",             0,                layout_goldnpkr )
-GAMEL( 1991, bsuerten,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 15, Protel PCB)", 0,                layout_goldnpkr )
+GAMEL( 1991, bsuerten,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 15, Prodel PCB)", 0,                layout_goldnpkr )
 GAMEL( 1991, bsuerteo,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 16)",             0,                layout_goldnpkr )
 GAMEL( 1991, bsuertep,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 17)",             0,                layout_goldnpkr )
 GAMEL( 1991, bsuerteq,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 18)",             0,                layout_goldnpkr )
