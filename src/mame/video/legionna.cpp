@@ -13,8 +13,8 @@
     - MBK
     - OBJ 3
     - LBK
-	Anything else doesn't seem to match this scheme, guess it's selectable by
-	PROM, CRTC or COP ...
+	TODO: Anything else doesn't match this scheme (most notably Denjin Makai), 
+	      guess it's selectable by PROM, CRTC or COP ...
 
 ***************************************************************************/
 
@@ -294,12 +294,10 @@ VIDEO_START_MEMBER(legionna_state,denjinmk)
 	m_has_extended_banking = 1;
 	m_has_extended_priority = 0;
 	
-	m_sprite_pri_mask[0] = 0xfff0;
-	m_sprite_pri_mask[1] = 0xfff8;
-	// TODO: 2 is used by the door at the end of sewers part in level 1, 3 are briefing guy in pre-stage and portraits before a boss fight
-	//       I assume that 3 goes above everything else, and assume that this thing is programmable somehow ...
-	m_sprite_pri_mask[2] = 0xfffe;
-	m_sprite_pri_mask[3] = 0x0000;
+	m_sprite_pri_mask[0] = 0xfff0; // normal sprites
+	m_sprite_pri_mask[1] = 0xfffc; // luna park horse rides
+	m_sprite_pri_mask[2] = 0xfffe; // door at the end of sewers part in level 1
+	m_sprite_pri_mask[3] = 0x0000; // briefing guy in pre-stage and portraits before a boss fight
 	
 //  m_background_layer->set_transparent_pen(15);
 	m_midground_layer->set_transparent_pen(15);
@@ -420,8 +418,19 @@ void legionna_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 			cur_pri = (spriteram16[offs+1] & 0xc000) >> 14;
 			pri_mask = m_sprite_pri_mask[cur_pri];
 			#if 0
+			static UINT8 pri_test;
+			
+			if(machine().input().code_pressed_once(KEYCODE_A))
+				pri_test++;
+				
+			if(machine().input().code_pressed_once(KEYCODE_A))
+				pri_test--;
+
+			pri_test&=3;
+			popmessage("%02x",pri_test);
+			
 			// quick and dirty priority tester
-			if(cur_pri == 3)
+			if(cur_pri == pri_test)
 			{
 				static UINT16 test = 0xffff;
 				
@@ -451,7 +460,7 @@ void legionna_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 
 				pri_mask = 0xffff & test;
 				data = (data & 0xffc0) | (machine().rand() & 0x3f);
-				popmessage("%04x %04x %d",pri_mask,test,cur_pri);
+				popmessage("%04x %04x %d",pri_mask,test,pri_test);
 				//pri_mask = test;
 			}
 			#endif
