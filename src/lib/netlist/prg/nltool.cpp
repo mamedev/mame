@@ -26,39 +26,56 @@ class tool_options_t : public plib::options
 public:
 	tool_options_t() :
 		plib::options(),
-		opt_ttr (*this,     "t", "time_to_run", 1.0,        "time to run the emulation (seconds)"),
-		opt_name(*this,     "n", "name",        "",         "netlist in file to run; default is first one"),
-		opt_logs(*this,     "l", "logs",        "",         "colon separated list of terminals to log"),
-		opt_file(*this,     "f", "file",        "-",        "file to process (default is stdin)"),
-		opt_type(*this,     "y", "type",        "spice",    "spice:eagle", "type of file to be converted: spice,eagle"),
+		opt_grp1(*this,     "General options",              "The following options apply to all commands."),
 		opt_cmd (*this,     "c", "cmd",         "run",      "run:convert:listdevices:static", "run|convert|listdevices|static"),
-		opt_inp(*this,      "i", "input",       "",         "input file to process (default is none)"),
+		opt_file(*this,     "f", "file",        "-",        "file to process (default is stdin)"),
+		opt_defines(*this,  "D", "define",                  "predefine value as macro, e.g. -Dname=value. If '=value' is omitted predefine it as 1. This option may be specified repeatedly."),
 		opt_verb(*this,     "v", "verbose",                 "be verbose - this produces lots of output"),
 		opt_quiet(*this,    "q", "quiet",                   "be quiet - no warnings"),
 		opt_version(*this,  "",  "version",                 "display version and exit"),
-		opt_help(*this,     "h", "help",                    "display help and exit")
-	{}
+		opt_help(*this,     "h", "help",                    "display help and exit"),
+		opt_grp2(*this,     "Options for run and static commands",   "These options apply to run and static commands."),
+		opt_name(*this,     "n", "name",        "",         "the netlist in file specified by ""-f"" option to run; default is first one"),
+		opt_grp3(*this,     "Options for run command",		"These options are only used by the run command."),
+		opt_ttr (*this,     "t", "time_to_run", 1.0,        "time to run the emulation (seconds)"),
+		opt_logs(*this,     "l", "log" ,                    "define terminal to log. This option may be specified repeatedly."),
+		opt_inp(*this,      "i", "input",       "",         "input file to process (default is none)"),
+		opt_grp4(*this,     "Options for convert command",  "These options are only used by the convert command."),
+		opt_type(*this,     "y", "type",        "spice",    "spice:eagle", "type of file to be converted: spice,eagle"),
 
-	plib::option_double opt_ttr;
-	plib::option_str    opt_name;
-	plib::option_str    opt_logs;
-	plib::option_str    opt_file;
-	plib::option_str_limit opt_type;
+		opt_ex1(*this,     "nltool -c run -t 3.5 -f nl_examples/cdelay.c -n cap_delay",
+				"Run netlist \"cap_delay\" from file nl_examples/cdelay.c for 3.5 seconds"),
+		opt_ex2(*this,     "nltool --cmd=listdevices",
+				"List all known devices.")
+		{}
+
+	plib::option_group  opt_grp1;
 	plib::option_str_limit opt_cmd;
-	plib::option_str    opt_inp;
+	plib::option_str    opt_file;
+	plib::option_vec    opt_defines;
 	plib::option_bool   opt_verb;
 	plib::option_bool   opt_quiet;
 	plib::option_bool   opt_version;
 	plib::option_bool   opt_help;
+	plib::option_group  opt_grp2;
+	plib::option_str    opt_name;
+	plib::option_group  opt_grp3;
+	plib::option_double opt_ttr;
+	plib::option_vec    opt_logs;
+	plib::option_str    opt_inp;
+	plib::option_group  opt_grp4;
+	plib::option_str_limit opt_type;
+	plib::option_example opt_ex1;
+	plib::option_example opt_ex2;
 };
 
-plib::pstdout pout_strm;
-plib::pstderr perr_strm;
+static plib::pstdout pout_strm;
+static plib::pstderr perr_strm;
 
-plib::pstream_fmt_writer_t pout(pout_strm);
-plib::pstream_fmt_writer_t perr(perr_strm);
+static plib::pstream_fmt_writer_t pout(pout_strm);
+static plib::pstream_fmt_writer_t perr(perr_strm);
 
-NETLIST_START(dummy)
+static NETLIST_START(dummy)
 	/* Standard stuff */
 
 	CLOCK(clk, 1000) // 1000 Hz
@@ -75,7 +92,7 @@ class netlist_tool_t : public netlist::netlist_t
 public:
 
 	netlist_tool_t(const pstring &aname)
-	: netlist::netlist_t(aname), m_opts(nullptr), m_setup(nullptr)
+	: netlist::netlist_t(aname), m_setup(nullptr)
 	{
 	}
 
@@ -83,21 +100,26 @@ public:
 	{
 		if (m_setup != nullptr)
 			plib::pfree(m_setup);
-	};
+	}
 
 	void init()
 	{
 		m_setup = plib::palloc<netlist::setup_t>(*this);
 	}
 
-	void read_netlist(const pstring &filename, const pstring &name)
+	void read_netlist(const pstring &filename, const pstring &name,
+			const std::vector<pstring> &logs,
+			const std::vector<pstring> &defines)
 	{
 		// read the netlist ...
+
+		for (auto & d : defines)
+			m_setup->register_define(d);
 
 		m_setup->register_source(plib::make_unique_base<netlist::source_t,
 				netlist::source_file_t>(filename));
 		m_setup->include(name);
-		log_setup();
+		log_setup(logs);
 
 		// start devices
 		m_setup->start_devices();
@@ -106,11 +128,10 @@ public:
 		this->reset();
 	}
 
-	void log_setup()
+	void log_setup(const std::vector<pstring> &logs)
 	{
 		log().debug("Creating dynamic logs ...\n");
-		plib::pstring_vector_t ll(m_opts ? m_opts->opt_logs() : "" , ":");
-		for (auto & log : ll)
+		for (auto & log : logs)
 		{
 			pstring name = "log_" + log;
 			/*netlist_device_t *nc = */ m_setup->register_dev("LOG", name);
@@ -119,8 +140,6 @@ public:
 	}
 
 	netlist::setup_t &setup() { return *m_setup; }
-
-	tool_options_t *m_opts;
 
 protected:
 
@@ -135,6 +154,9 @@ private:
 	netlist::setup_t *m_setup;
 };
 
+
+// FIXME: usage should go elsewhere
+void usage(tool_options_t &opts);
 
 void usage(tool_options_t &opts)
 {
@@ -208,13 +230,12 @@ static std::vector<input_t> read_input(const netlist::setup_t &setup, pstring fn
 
 static void run(tool_options_t &opts)
 {
-	netlist_tool_t nt("netlist");
 	plib::chrono::timer<plib::chrono::system_ticks> t;
-	//plib::perftime_t<plib::exact_ticks> t;
-
 	t.start();
 
-	nt.m_opts = &opts;
+	netlist_tool_t nt("netlist");
+	//plib::perftime_t<plib::exact_ticks> t;
+
 	nt.init();
 
 	if (!opts.opt_verb())
@@ -222,7 +243,9 @@ static void run(tool_options_t &opts)
 	if (opts.opt_quiet())
 		nt.log().warning.set_enabled(false);
 
-	nt.read_netlist(opts.opt_file(), opts.opt_name());
+	nt.read_netlist(opts.opt_file(), opts.opt_name(),
+			opts.opt_logs(),
+			opts.opt_defines());
 
 	std::vector<input_t> inps = read_input(nt.setup(), opts.opt_inp());
 
@@ -258,13 +281,14 @@ static void static_compile(tool_options_t &opts)
 {
 	netlist_tool_t nt("netlist");
 
-	nt.m_opts = &opts;
 	nt.init();
 
 	nt.log().verbose.set_enabled(false);
 	nt.log().warning.set_enabled(false);
 
-	nt.read_netlist(opts.opt_file(), opts.opt_name());
+	nt.read_netlist(opts.opt_file(), opts.opt_name(),
+			opts.opt_logs(),
+			opts.opt_defines());
 
 	nt.solver()->create_solver_code(pout_strm);
 
@@ -276,15 +300,21 @@ static void static_compile(tool_options_t &opts)
     listdevices - list all known devices
 -------------------------------------------------*/
 
-static void listdevices()
+static void listdevices(tool_options_t &opts)
 {
 	netlist_tool_t nt("netlist");
 	nt.init();
+	if (!opts.opt_verb())
+		nt.log().verbose.set_enabled(false);
+	if (opts.opt_quiet())
+		nt.log().warning.set_enabled(false);
+
 	netlist::factory_list_t &list = nt.setup().factory();
 
 	nt.setup().register_source(plib::make_unique_base<netlist::source_t,
 			netlist::source_proc_t>("dummy", &netlist_dummy));
 	nt.setup().include("dummy");
+
 
 	nt.setup().start_devices();
 	nt.setup().resolve_inputs();
@@ -294,7 +324,7 @@ static void listdevices()
 	for (auto & f : list)
 	{
 		pstring out = plib::pfmt("{1} {2}(<id>")(f->classname(),"-20")(f->name());
-		pstring terms("");
+		std::vector<pstring> terms;
 
 		auto d = f->Create(nt.setup().netlist(), f->name() + "_lc");
 		// get the list of terminals ...
@@ -305,7 +335,7 @@ static void listdevices()
 			{
 				pstring tn(t.second->name().substr(d->name().len()+1));
 				if (tn.find(".")<0)
-					terms += ", " + tn;
+					terms.push_back(tn);
 			}
 		}
 
@@ -315,14 +345,23 @@ static void listdevices()
 			{
 				pstring tn(t.first.substr(d->name().len()+1));
 				if (tn.find(".")<0)
-					terms += ", " + tn;
+				{
+					terms.push_back(tn);
+					pstring resolved = nt.setup().resolve_alias(t.first);
+					if (resolved != t.first)
+					{
+						auto found = std::find(terms.begin(), terms.end(), resolved.substr(d->name().len()+1));
+						if (found!=terms.end())
+							terms.erase(found);
+					}
+				}
 			}
 		}
 
 		if (f->param_desc().startsWith("+"))
 		{
 			out += "," + f->param_desc().substr(1);
-			terms = "";
+			terms.clear();
 		}
 		else if (f->param_desc() == "-")
 		{
@@ -334,8 +373,13 @@ static void listdevices()
 		}
 		out += ")";
 		printf("%s\n", out.cstr());
-		if (terms != "")
-			printf("Terminals: %s\n", terms.substr(1).cstr());
+		if (terms.size() > 0)
+		{
+			pstring t = "";
+			for (auto & j : terms)
+				t += "," + j;
+			printf("Terminals: %s\n", t.substr(1).cstr());
+		}
 		devs.push_back(std::move(d));
 	}
 }
@@ -390,7 +434,7 @@ int main(int argc, char *argv[])
 
 	pstring cmd = opts.opt_cmd();
 	if (cmd == "listdevices")
-		listdevices();
+		listdevices(opts);
 	else if (cmd == "run")
 		run(opts);
 	else if (cmd == "static")

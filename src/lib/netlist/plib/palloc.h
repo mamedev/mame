@@ -24,8 +24,10 @@ namespace plib {
 class pexception : public std::exception
 {
 public:
-	pexception(const pstring &text);
-	virtual ~pexception() throw() {}
+	explicit pexception(const pstring text);
+	pexception(const pexception &e) : std::exception(e) { m_text = e.m_text; }
+
+	virtual ~pexception() noexcept {}
 
 	const pstring &text() { return m_text; }
 

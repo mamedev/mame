@@ -14,14 +14,15 @@ SRC = ..
 
 #-fuse-ld=gold -Wpedantic -march=native -march=native
 
-LTO = -flto=4  -fuse-linker-plugin -flto-partition=balanced -Wodr
+# LTO = -flto=4  -fuse-linker-plugin -flto-partition=balanced -Wodr
 
-CDEFS = -DPSTANDALONE=1 -DPTR64=1
 #-Werror
 #CFLAGS =  $(LTO) -g -O3 -std=c++98 -Doverride="" -march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra -Wno-long-long -Wno-unused-parameter -Wno-unused-result -Wno-variadic-macros -I..
 #LDFLAGS = $(LTO) -g -O3 -std=c++98
-CFLAGS =  $(LTO) -g -O3 -std=c++11 -march=native -I.. -Wall -Wpedantic -Wsign-compare -Wextra -Wno-unused-parameter
-LDFLAGS = $(LTO) -g -O3 -std=c++11 -lpthread -ldl
+
+CFLAGS =  $(CEXTRAFLAGS) $(LTO) -g -O3 -std=c++11 -march=native -I.. -Wall -Wpedantic -Wsign-compare -Wextra -Wno-unused-parameter
+LDFLAGS = $(LTO) -g -O3 -std=c++11 
+LIBS = -lpthread -ldl
 
 CC = g++-5
 LD = @g++-5
@@ -125,11 +126,11 @@ clean:
 
 nltool: $(OBJ)/prg/nltool.o $(OBJS)
 	@echo Linking $@...
-	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
+	@$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
 
 nlwav: $(OBJ)/prg/nlwav.o $(OBJS)
 	@echo Linking $@...
-	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
+	@$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
 
 #-------------------------------------------------
 # directories
@@ -156,6 +157,17 @@ depend: .depend
 -include .depend
 
 #-------------------------------------------------
+# Special targets
+#-------------------------------------------------
+
+.PHONY: clang
+clang: 
+	$(MAKE) CC=clang++ LD=clang++ CEXTRAFLAGS="-Weverything -Werror -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wno-conversion -Wno-c++98-compat -Wno-float-equal -Wno-cast-align -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-exit-time-destructors -Wno-format-nonliteral -Wno-weak-template-vtables"
+
+# -Wno-old-style-cast
+# FIX:  -Wno-weak-vtables -Wno-missing-variable-declarations -Wno-conversion -Wno-old-style-cast -Wno-exit-time-destructors
+
+#-------------------------------------------------
 # generic rules
 #-------------------------------------------------
 
@@ -163,11 +175,11 @@ $(OBJ)/%.o: $(SRC)/%.cpp
 	@echo Compiling $<...
 	@$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
 
-$(OBJ)/%.pp: $(SRC)/%.cpp | $(OSPREBUILD)
+$(OBJ)/%.pp: $(SRC)/%.cpp 
 	@echo Compiling $<...
 	@$(CC) $(CDEFS) $(CFLAGS) -E $< -o $@
 
-$(OBJ)/%.s: $(SRC)/%.cpp | $(OSPREBUILD)
+$(OBJ)/%.s: $(SRC)/%.cpp
 	@echo Compiling $<...
 	@$(CC) $(CDEFS) $(CFLAGS) -S $< -o $@
 

@@ -676,11 +676,7 @@ void netlist_mame_sound_device_t::sound_stream_update(sound_stream &stream, stre
 
 bool netlist_source_memregion_t::parse(netlist::setup_t &setup, const pstring &name)
 {
-	// FIXME: preprocessor should be a stream!
 	memory_region *mem = downcast<netlist_mame_t &>(setup.netlist()).machine().root_device().memregion(m_name.cstr());
 	plib::pimemstream istrm(mem->base(),mem->bytes() );
-	plib::pomemstream ostrm;
-
-	plib::pimemstream istrm2(plib::ppreprocessor().process(istrm, ostrm));
-	return netlist::parser_t(istrm2, setup).parse(name);
+	return setup.parse_stream(istrm, name);
 }

@@ -9,7 +9,7 @@
  *   Generic layout with 4 opamps, VCC on pint 4 and GND on pin 11
  */
 
-NETLIST_START(opamp_layout_4_4_11)
+static NETLIST_START(opamp_layout_4_4_11)
 	DIPPINS(      /*   +--------------+   */
 		A.OUT,    /*   |1     ++    14|   */ D.OUT,
 		A.MINUS,  /*   |2           13|   */ D.MINUS,
@@ -28,7 +28,7 @@ NETLIST_END()
  *   Generic layout with 2 opamps, VCC on pint 8 and GND on pin 4
  */
 
-NETLIST_START(opamp_layout_2_8_4)
+static NETLIST_START(opamp_layout_2_8_4)
 	DIPPINS(      /*   +--------------+   */
 		A.OUT,    /*   |1     ++     8|   */ A.VCC,
 		A.MINUS,  /*   |2            7|   */ B.OUT,
@@ -40,7 +40,7 @@ NETLIST_START(opamp_layout_2_8_4)
 	NET_C(A.VCC, B.VCC)
 NETLIST_END()
 
-NETLIST_START(MB3614_DIP)
+static NETLIST_START(MB3614_DIP)
 	OPAMP(A, "MB3614")
 	OPAMP(B, "MB3614")
 	OPAMP(C, "MB3614")
@@ -50,7 +50,7 @@ NETLIST_START(MB3614_DIP)
 
 NETLIST_END()
 
-NETLIST_START(LM324_DIP)
+static NETLIST_START(LM324_DIP)
 	OPAMP(A, "LM324")
 	OPAMP(B, "LM324")
 	OPAMP(C, "LM324")
@@ -60,7 +60,7 @@ NETLIST_START(LM324_DIP)
 
 NETLIST_END()
 
-NETLIST_START(LM358_DIP)
+static NETLIST_START(LM358_DIP)
 	OPAMP(A, "LM358")
 	OPAMP(B, "LM358")
 

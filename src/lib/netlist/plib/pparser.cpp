@@ -253,7 +253,7 @@ void ptokenizer::error(const pstring &errs)
 // A simple preprocessor
 // ----------------------------------------------------------------------------------------
 
-ppreprocessor::ppreprocessor()
+ppreprocessor::ppreprocessor(std::vector<define_t> *defines)
 : m_ifflag(0), m_level(0), m_lineno(0)
 {
 	m_expr_sep.push_back("!");
@@ -268,6 +268,13 @@ ppreprocessor::ppreprocessor()
 	m_expr_sep.push_back("\t");
 
 	m_defines.insert({"__PLIB_PREPROCESSOR__", define_t("__PLIB_PREPROCESSOR__", "1")});
+	if (defines != nullptr)
+	{
+		for (auto & p : *defines)
+		{
+			m_defines.insert({p.m_name, p});
+		}
+	}
 }
 
 void ppreprocessor::error(const pstring &err)

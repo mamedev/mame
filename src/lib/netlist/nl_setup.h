@@ -16,7 +16,9 @@
 #include "plib/pstring.h"
 #include "plib/palloc.h"
 #include "plib/pfmtlog.h"
+#include "plib/pstream.h"
 #include "plib/putil.h"
+#include "plib/pparser.h"
 #include "nl_config.h"
 #include "nl_base.h"
 #include "nl_factory.h"
@@ -156,6 +158,7 @@ namespace netlist
 		virtual ~source_t() { }
 
 		virtual bool parse(setup_t &setup, const pstring &name) = 0;
+
 	private:
 	};
 
@@ -222,12 +225,17 @@ namespace netlist
 
 		void include(const pstring &netlist_name);
 
+		bool parse_stream(plib::pistream &istrm, const pstring &name);
+
 		/* register a source */
 
 		void register_source(std::unique_ptr<source_t> &&src)
 		{
 			m_sources.push_back(std::move(src));
 		}
+
+		void register_define(pstring def, pstring val) { m_defines.push_back(plib::ppreprocessor::define_t(def, val)); }
+		void register_define(pstring defstr);
 
 		factory_list_t &factory() { return m_factory; }
 		const factory_list_t &factory() const { return m_factory; }
@@ -251,6 +259,9 @@ namespace netlist
 
 		void tt_factory_create(tt_desc &desc);
 
+		/* helper - also used by nltool */
+		const pstring resolve_alias(const pstring &name) const;
+
 	protected:
 
 	private:
@@ -267,7 +278,6 @@ namespace netlist
 		// helpers
 		pstring objtype_as_str(device_object_t &in) const;
 
-		const pstring resolve_alias(const pstring &name) const;
 		devices::nld_base_proxy *get_d_a_proxy(core_terminal_t &out);
 
 		netlist_t &m_netlist;
@@ -290,6 +300,7 @@ namespace netlist
 
 		std::stack<pstring> m_namespace_stack;
 		source_t::list_t m_sources;
+		std::vector<plib::ppreprocessor::define_t> m_defines;
 		std::vector<pstring> m_lib;
 
 	};

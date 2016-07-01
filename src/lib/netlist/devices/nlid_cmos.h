@@ -22,8 +22,8 @@ namespace netlist
 		{
 		}
 
-		NETLIB_UPDATEI() {};
-		NETLIB_RESETI() {};
+		NETLIB_UPDATEI() {}
+		NETLIB_RESETI() {}
 
 	public:
 		inline nl_double vdd() { return INPANALOG(m_vdd); }
