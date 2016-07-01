@@ -650,9 +650,6 @@ private:
 	// a component represents an image, rectangle, or disk in an element
 	class component
 	{
-		//friend class layout_element;
-		friend class simple_list<component>;
-
 	public:
 		// construction/destruction
 		component(running_machine &machine, xml_data_node &compnode, const char *dirname);
@@ -662,7 +659,6 @@ private:
 		void normalize_bounds(float xoffs, float yoffs, float xscale, float yscale);
 
 		// getters
-		component *next() const { return m_next; }
 		int state() const { return m_state; }
 		virtual int maxstate() const { return m_state; }
 		const render_bounds &bounds() const { return m_bounds; }
@@ -686,7 +682,6 @@ private:
 
 	private:
 		// internal state
-		component *         m_next;                     // link to next component
 		int                 m_state;                    // state where this component is visible (-1 means all states)
 		render_bounds       m_bounds;                   // bounds of the element
 		render_color        m_color;                    // color of the element
@@ -926,7 +921,7 @@ private:
 	layout_element *    m_next;             // link to next element
 	running_machine &   m_machine;          // reference to the owning machine
 	std::string         m_name;             // name of this element
-	simple_list<component> m_complist;      // list of components
+	std::vector<std::unique_ptr<component>> m_complist;      // list of components
 	int                 m_defstate;         // default state of this element
 	int                 m_maxstate;         // maximum state value for all components
 	std::vector<texture>     m_elemtex;       // array of element textures used for managing the scaled bitmaps

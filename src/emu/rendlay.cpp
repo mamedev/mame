@@ -424,70 +424,67 @@ layout_element::layout_element(running_machine &machine, xml_data_node &elemnode
 	render_bounds bounds = { 0 };
 	for (xml_data_node *compnode = elemnode.child; compnode != nullptr; compnode = compnode->next)
 	{
-		component *newcomp;
+		std::unique_ptr<component> newcomp;
 
 		// image nodes
 		if (strcmp(compnode->name, "image") == 0)
-			newcomp = global_alloc(image_component(machine, *compnode, dirname));
+			newcomp = std::make_unique<image_component>(machine, *compnode, dirname);
 
 		// text nodes
 		else if (strcmp(compnode->name, "text") == 0)
-			newcomp = global_alloc(text_component(machine, *compnode, dirname));
+			newcomp = std::make_unique<text_component>(machine, *compnode, dirname);
 
 		// dotmatrix nodes
 		else if (strcmp(compnode->name, "dotmatrix") == 0)
-			newcomp = global_alloc(dotmatrix_component(8, machine, *compnode, dirname));
+			newcomp = std::make_unique<dotmatrix_component>(8, machine, *compnode, dirname);
 		else if (strcmp(compnode->name, "dotmatrix5dot") == 0)
-			newcomp = global_alloc(dotmatrix_component(5, machine, *compnode, dirname));
+			newcomp = std::make_unique<dotmatrix_component>(5, machine, *compnode, dirname);
 		else if (strcmp(compnode->name, "dotmatrixdot") == 0)
-			newcomp = global_alloc(dotmatrix_component(1, machine, *compnode, dirname));
+			newcomp = std::make_unique<dotmatrix_component>(1, machine, *compnode, dirname);
 
 		// simplecounter nodes
 		else if (strcmp(compnode->name, "simplecounter") == 0)
-			newcomp = global_alloc(simplecounter_component(machine, *compnode, dirname));
+			newcomp = std::make_unique<simplecounter_component>(machine, *compnode, dirname);
 
 		// fruit machine reels
 		else if (strcmp(compnode->name, "reel") == 0)
-			newcomp = global_alloc(reel_component(machine, *compnode, dirname));
+			newcomp = std::make_unique<reel_component>(machine, *compnode, dirname);
 
 		// led7seg nodes
 		else if (strcmp(compnode->name, "led7seg") == 0)
-			newcomp = global_alloc(led7seg_component(machine, *compnode, dirname));
+			newcomp = std::make_unique<led7seg_component>(machine, *compnode, dirname);
 
 		// led8seg_gts1 nodes
 		else if (strcmp(compnode->name, "led8seg_gts1") == 0)
-			newcomp = global_alloc(led8seg_gts1_component(machine, *compnode, dirname));
+			newcomp = std::make_unique<led8seg_gts1_component>(machine, *compnode, dirname);
 
 		// led14seg nodes
 		else if (strcmp(compnode->name, "led14seg") == 0)
-			newcomp = global_alloc(led14seg_component(machine, *compnode, dirname));
+			newcomp = std::make_unique<led14seg_component>(machine, *compnode, dirname);
 
 		// led14segsc nodes
 		else if (strcmp(compnode->name, "led14segsc") == 0)
-			newcomp = global_alloc(led14segsc_component(machine, *compnode, dirname));
+			newcomp = std::make_unique<led14segsc_component>(machine, *compnode, dirname);
 
 		// led16seg nodes
 		else if (strcmp(compnode->name, "led16seg") == 0)
-			newcomp = global_alloc(led16seg_component(machine, *compnode, dirname));
+			newcomp = std::make_unique<led16seg_component>(machine, *compnode, dirname);
 
 		// led16segsc nodes
 		else if (strcmp(compnode->name, "led16segsc") == 0)
-			newcomp = global_alloc(led16segsc_component(machine, *compnode, dirname));
+			newcomp = std::make_unique<led16segsc_component>(machine, *compnode, dirname);
 
 		// rect nodes
 		else if (strcmp(compnode->name, "rect") == 0)
-			newcomp = global_alloc(rect_component(machine, *compnode, dirname));
+			newcomp = std::make_unique<rect_component>(machine, *compnode, dirname);
 
 		// disk nodes
 		else if (strcmp(compnode->name, "disk") == 0)
-			newcomp = global_alloc(disk_component(machine, *compnode, dirname));
+			newcomp = std::make_unique<disk_component>(machine, *compnode, dirname);
 
 		// error otherwise
 		else
 			throw emu_fatalerror("Unknown element component: %s", compnode->name);
-
-		// insert the new component into the list
-		m_complist.append(*newcomp);
 
 		// accumulate bounds
 		if (first)
@@ -498,6 +495,9 @@ layout_element::layout_element(running_machine &machine, xml_data_node &elemnode
 
 		// determine the maximum state
 		m_maxstate = std::max(m_maxstate, newcomp->maxstate());
+
+		// insert the new component into the list
+		m_complist.push_back(std::move(newcomp));
 	}
 
 	if (!m_complist.empty())
@@ -509,8 +509,8 @@ layout_element::layout_element(running_machine &machine, xml_data_node &elemnode
 		float yscale = 1.0f / (bounds.y1 - bounds.y0);
 
 		// normalize all the component bounds
-		for (component &curcomp : m_complist)
-			curcomp.normalize_bounds(xoffs, yoffs, xscale, yscale);
+		for (auto &curcomp : m_complist)
+			curcomp->normalize_bounds(xoffs, yoffs, xscale, yscale);
 	}
 
 	// allocate an array of element textures for the states
@@ -557,19 +557,19 @@ void layout_element::element_scale(bitmap_argb32 &dest, bitmap_argb32 &source, c
 	texture *elemtex = (texture *)param;
 
 	// iterate over components that are part of the current state
-	for (component &curcomp : elemtex->m_element->m_complist)
-		if (curcomp.state() == -1 || curcomp.state() == elemtex->m_state)
+	for (auto &curcomp : elemtex->m_element->m_complist)
+		if (curcomp->state() == -1 || curcomp->state() == elemtex->m_state)
 		{
 			// get the local scaled bounds
 			rectangle bounds;
-			bounds.min_x = render_round_nearest(curcomp.bounds().x0 * dest.width());
-			bounds.min_y = render_round_nearest(curcomp.bounds().y0 * dest.height());
-			bounds.max_x = render_round_nearest(curcomp.bounds().x1 * dest.width());
-			bounds.max_y = render_round_nearest(curcomp.bounds().y1 * dest.height());
+			bounds.min_x = render_round_nearest(curcomp->bounds().x0 * dest.width());
+			bounds.min_y = render_round_nearest(curcomp->bounds().y0 * dest.height());
+			bounds.max_x = render_round_nearest(curcomp->bounds().x1 * dest.width());
+			bounds.max_y = render_round_nearest(curcomp->bounds().y1 * dest.height());
 			bounds &= dest.cliprect();
 
 			// based on the component type, add to the texture
-			curcomp.draw(elemtex->m_element->machine(), dest, bounds, elemtex->m_state);
+			curcomp->draw(elemtex->m_element->machine(), dest, bounds, elemtex->m_state);
 		}
 }
 
@@ -611,8 +611,7 @@ layout_element::texture::~texture()
 //-------------------------------------------------
 
 layout_element::component::component(running_machine &machine, xml_data_node &compnode, const char *dirname)
-	: m_next(nullptr),
-		m_state(0)
+	: m_state(0)
 {
 	// fetch common data
 	m_state = xml_get_attribute_int_with_subst(machine, compnode, "state", -1);
