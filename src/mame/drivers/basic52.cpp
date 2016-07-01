@@ -44,8 +44,7 @@ class basic52_state : public driver_device
 public:
 	basic52_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
+		m_maincpu(*this, "maincpu")
 	{
 	}
 
@@ -53,9 +52,6 @@ public:
 	DECLARE_READ8_MEMBER(unk_r);
 	UINT8 m_term_data;
 	required_device<mcs51_cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
-	virtual void machine_reset() override;
-	DECLARE_WRITE8_MEMBER(to_term);
 	DECLARE_READ8_MEMBER(from_term);
 };
 
@@ -83,11 +79,6 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( basic52 )
 INPUT_PORTS_END
 
-// won't compile unless these are static
-WRITE8_MEMBER( basic52_state::to_term)
-{
-	m_terminal->write(space, 0, data);
-}
 
 READ8_MEMBER(basic52_state::from_term)
 {
@@ -99,11 +90,6 @@ READ8_MEMBER( basic52_state::unk_r)
 	return m_term_data; // won't boot without this
 }
 
-void basic52_state::machine_reset()
-{
-	m_maincpu->i8051_set_serial_tx_callback(write8_delegate(FUNC(basic52_state::to_term),this));
-	m_maincpu->i8051_set_serial_rx_callback(read8_delegate(FUNC(basic52_state::from_term),this));
-}
 
 WRITE8_MEMBER( basic52_state::kbd_put )
 {
@@ -117,7 +103,8 @@ static MACHINE_CONFIG_START( basic31, basic52_state )
 	MCFG_CPU_ADD("maincpu", I8031, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(basic52_mem)
 	MCFG_CPU_IO_MAP(basic52_io)
-
+	MCFG_MCS51_SERIAL_TX_CB(DEVWRITE8(TERMINAL_TAG, generic_terminal_device, write))
+	MCFG_MCS51_SERIAL_RX_CB(READ8(basic52_state, from_term))
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
@@ -131,6 +118,8 @@ static MACHINE_CONFIG_DERIVED( basic52, basic31 )
 	MCFG_CPU_REPLACE("maincpu", I8052, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(basic52_mem)
 	MCFG_CPU_IO_MAP(basic52_io)
+	MCFG_MCS51_SERIAL_TX_CB(DEVWRITE8(TERMINAL_TAG, generic_terminal_device, write))
+	MCFG_MCS51_SERIAL_RX_CB(READ8(basic52_state, from_term))
 MACHINE_CONFIG_END
 
 /* ROM definition */

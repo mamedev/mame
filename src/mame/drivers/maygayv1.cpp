@@ -842,9 +842,6 @@ void maygayv1_state::machine_start()
 	i82716.line_buf = std::make_unique<UINT8[]>(512);
 
 	save_pointer(NAME(i82716.dram.get()), 0x40000);
-
-	m_soundcpu->i8051_set_serial_tx_callback(write8_delegate(FUNC(maygayv1_state::data_from_i8031),this));
-	m_soundcpu->i8051_set_serial_rx_callback(read8_delegate(FUNC(maygayv1_state::data_to_i8031),this));
 }
 
 void maygayv1_state::machine_reset()
@@ -872,6 +869,8 @@ static MACHINE_CONFIG_START( maygayv1, maygayv1_state )
 	MCFG_CPU_PROGRAM_MAP(sound_prg)
 	MCFG_CPU_DATA_MAP(sound_data)
 	MCFG_CPU_IO_MAP(sound_io)
+	MCFG_MCS51_SERIAL_TX_CB(WRITE8(maygayv1_state, data_from_i8031))
+	MCFG_MCS51_SERIAL_RX_CB(READ8(maygayv1_state, data_to_i8031))
 
 	/* U25 ST 2 9148 EF68B21P */
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)

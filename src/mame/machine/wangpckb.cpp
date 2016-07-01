@@ -113,6 +113,8 @@ ADDRESS_MAP_END
 static MACHINE_CONFIG_FRAGMENT( wangpc_keyboard )
 	MCFG_CPU_ADD(I8051_TAG, I8051, XTAL_4MHz)
 	MCFG_CPU_IO_MAP(wangpc_keyboard_io)
+	MCFG_MCS51_SERIAL_TX_CB(WRITE8(wangpc_keyboard_device, mcs51_tx_callback))
+	MCFG_MCS51_SERIAL_RX_CB(READ8(wangpc_keyboard_device, mcs51_rx_callback))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -403,9 +405,6 @@ void wangpc_keyboard_device::device_start()
 {
 	m_txd_handler.resolve_safe();
 
-	// set serial callbacks
-	m_maincpu->i8051_set_serial_tx_callback(WRITE8_DELEGATE(wangpc_keyboard_device, mcs51_tx_callback));
-	m_maincpu->i8051_set_serial_rx_callback(READ8_DELEGATE(wangpc_keyboard_device, mcs51_rx_callback));
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_2);
 }
 
