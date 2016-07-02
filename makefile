@@ -1624,7 +1624,6 @@ cppcheck:
 .PHONY: shaders bgfx-tools
 
 bgfx-tools:
-	-@rm -rf 3rdparty/bgfx/.build/projects
 	$(SILENT) $(MAKE) -C 3rdparty/bgfx -f makefile shaderc CC="$(CC)" CXX="$(CXX)" MINGW="$(MINGW)"
 
 shaders: bgfx-tools
