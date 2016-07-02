@@ -43,17 +43,22 @@
 
 ***************************************************************************/
 
-#ifndef __RENDER_H__
-#define __RENDER_H__
+#ifndef MAME_EMU_RENDER_H
+#define MAME_EMU_RENDER_H
 
 //#include "osdepend.h"
-
-#include <math.h>
-#include <mutex>
 
 #include "emu.h"
 //#include "bitmap.h"
 //#include "screen.h"
+
+#include <math.h>
+#include <map>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <vector>
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -651,6 +656,8 @@ private:
 	class component
 	{
 	public:
+		typedef std::unique_ptr<component> ptr;
+
 		// construction/destruction
 		component(running_machine &machine, xml_data_node &compnode, const char *dirname);
 		virtual ~component() = default;
@@ -907,24 +914,37 @@ private:
 	{
 	public:
 		texture();
+		texture(texture const &that) = delete;
+		texture(texture &&that);
+
 		~texture();
+
+		texture &operator=(texture const &that) = delete;
+		texture &operator=(texture &&that);
 
 		layout_element *    m_element;      // pointer back to the element
 		render_texture *    m_texture;      // texture for this state
 		int                 m_state;        // associated state number
 	};
 
+	typedef component::ptr (*make_component_func)(running_machine &machine, xml_data_node &compnode, const char *dirname);
+	typedef std::map<std::string, make_component_func> make_component_map;
+
 	// internal helpers
 	static void element_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
+	template <typename T> static component::ptr make_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+	template <int D> static component::ptr make_dotmatrix_component(running_machine &machine, xml_data_node &compnode, const char *dirname);
+
+	static make_component_map const s_make_component; // maps component XML names to creator functions
 
 	// internal state
-	layout_element *    m_next;             // link to next element
-	running_machine &   m_machine;          // reference to the owning machine
-	std::string         m_name;             // name of this element
-	std::vector<std::unique_ptr<component>> m_complist;      // list of components
-	int                 m_defstate;         // default state of this element
-	int                 m_maxstate;         // maximum state value for all components
-	std::vector<texture>     m_elemtex;       // array of element textures used for managing the scaled bitmaps
+	layout_element *            m_next;         // link to next element
+	running_machine &           m_machine;      // reference to the owning machine
+	std::string                 m_name;         // name of this element
+	std::vector<component::ptr> m_complist;     // list of components
+	int                         m_defstate;     // default state of this element
+	int                         m_maxstate;     // maximum state value for all components
+	std::vector<texture>        m_elemtex;      // array of element textures used for managing the scaled bitmaps
 };
 
 
@@ -1269,4 +1289,4 @@ private:
 	simple_list<render_container>   m_screen_container_list; // list of containers for the screen
 };
 
-#endif  // __RENDER_H__
+#endif  // MAME_EMU_RENDER_H

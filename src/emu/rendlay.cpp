@@ -400,6 +400,24 @@ static void parse_orientation(running_machine &machine, xml_data_node *orientnod
 //  LAYOUT ELEMENT
 //**************************************************************************
 
+layout_element::make_component_map const layout_element::s_make_component{
+	{ "image",         &make_component<image_component>         },
+	{ "text",          &make_component<text_component>          },
+	{ "dotmatrix",     &make_dotmatrix_component<8>             },
+	{ "dotmatrix5dot", &make_dotmatrix_component<5>             },
+	{ "dotmatrixdot",  &make_dotmatrix_component<1>             },
+	{ "simplecounter", &make_component<simplecounter_component> },
+	{ "reel",          &make_component<reel_component>          },
+	{ "led7seg",       &make_component<led7seg_component>       },
+	{ "led8seg_gts1",  &make_component<led8seg_gts1_component>  },
+	{ "led14seg",      &make_component<led14seg_component>      },
+	{ "led14segsc",    &make_component<led14segsc_component>    },
+	{ "led16seg",      &make_component<led16seg_component>      },
+	{ "led16segsc",    &make_component<led16segsc_component>    },
+	{ "rect",          &make_component<rect_component>          },
+	{ "disk",          &make_component<disk_component>          }
+};
+
 //-------------------------------------------------
 //  layout_element - constructor
 //-------------------------------------------------
@@ -422,82 +440,25 @@ layout_element::layout_element(running_machine &machine, xml_data_node &elemnode
 	// parse components in order
 	bool first = true;
 	render_bounds bounds = { 0 };
-	for (xml_data_node *compnode = elemnode.child; compnode != nullptr; compnode = compnode->next)
+	for (auto compnode = elemnode.child; compnode; compnode = compnode->next)
 	{
-		std::unique_ptr<component> newcomp;
-
-		// image nodes
-		if (strcmp(compnode->name, "image") == 0)
-			newcomp = std::make_unique<image_component>(machine, *compnode, dirname);
-
-		// text nodes
-		else if (strcmp(compnode->name, "text") == 0)
-			newcomp = std::make_unique<text_component>(machine, *compnode, dirname);
-
-		// dotmatrix nodes
-		else if (strcmp(compnode->name, "dotmatrix") == 0)
-			newcomp = std::make_unique<dotmatrix_component>(8, machine, *compnode, dirname);
-		else if (strcmp(compnode->name, "dotmatrix5dot") == 0)
-			newcomp = std::make_unique<dotmatrix_component>(5, machine, *compnode, dirname);
-		else if (strcmp(compnode->name, "dotmatrixdot") == 0)
-			newcomp = std::make_unique<dotmatrix_component>(1, machine, *compnode, dirname);
-
-		// simplecounter nodes
-		else if (strcmp(compnode->name, "simplecounter") == 0)
-			newcomp = std::make_unique<simplecounter_component>(machine, *compnode, dirname);
-
-		// fruit machine reels
-		else if (strcmp(compnode->name, "reel") == 0)
-			newcomp = std::make_unique<reel_component>(machine, *compnode, dirname);
-
-		// led7seg nodes
-		else if (strcmp(compnode->name, "led7seg") == 0)
-			newcomp = std::make_unique<led7seg_component>(machine, *compnode, dirname);
-
-		// led8seg_gts1 nodes
-		else if (strcmp(compnode->name, "led8seg_gts1") == 0)
-			newcomp = std::make_unique<led8seg_gts1_component>(machine, *compnode, dirname);
-
-		// led14seg nodes
-		else if (strcmp(compnode->name, "led14seg") == 0)
-			newcomp = std::make_unique<led14seg_component>(machine, *compnode, dirname);
-
-		// led14segsc nodes
-		else if (strcmp(compnode->name, "led14segsc") == 0)
-			newcomp = std::make_unique<led14segsc_component>(machine, *compnode, dirname);
-
-		// led16seg nodes
-		else if (strcmp(compnode->name, "led16seg") == 0)
-			newcomp = std::make_unique<led16seg_component>(machine, *compnode, dirname);
-
-		// led16segsc nodes
-		else if (strcmp(compnode->name, "led16segsc") == 0)
-			newcomp = std::make_unique<led16segsc_component>(machine, *compnode, dirname);
-
-		// rect nodes
-		else if (strcmp(compnode->name, "rect") == 0)
-			newcomp = std::make_unique<rect_component>(machine, *compnode, dirname);
-
-		// disk nodes
-		else if (strcmp(compnode->name, "disk") == 0)
-			newcomp = std::make_unique<disk_component>(machine, *compnode, dirname);
-
-		// error otherwise
-		else
+		auto const make_func(s_make_component.find(compnode->name));
+		if (make_func == s_make_component.end())
 			throw emu_fatalerror("Unknown element component: %s", compnode->name);
+
+		// insert the new component into the list
+		m_complist.emplace_back(make_func->second(machine, *compnode, dirname));
+		auto const &newcomp(*m_complist.back());
 
 		// accumulate bounds
 		if (first)
-			bounds = newcomp->bounds();
+			bounds = newcomp.bounds();
 		else
-			union_render_bounds(&bounds, &newcomp->bounds());
+			union_render_bounds(&bounds, &newcomp.bounds());
 		first = false;
 
 		// determine the maximum state
-		m_maxstate = std::max(m_maxstate, newcomp->maxstate());
-
-		// insert the new component into the list
-		m_complist.push_back(std::move(newcomp));
+		m_maxstate = std::max(m_maxstate, newcomp.maxstate());
 	}
 
 	if (!m_complist.empty())
@@ -574,19 +535,49 @@ void layout_element::element_scale(bitmap_argb32 &dest, bitmap_argb32 &source, c
 }
 
 
+//-------------------------------------------------
+//  make_component - create component of given type
+//-------------------------------------------------
+
+template <typename T>
+layout_element::component::ptr layout_element::make_component(running_machine &machine, xml_data_node &compnode, const char *dirname)
+{
+	return std::make_unique<T>(machine, compnode, dirname);
+}
+
+
+//-------------------------------------------------
+//  make_component - create dotmatrix component
+//  with given vertical resolution
+//-------------------------------------------------
+
+template <int D>
+layout_element::component::ptr layout_element::make_dotmatrix_component(running_machine &machine, xml_data_node &compnode, const char *dirname)
+{
+	return std::make_unique<dotmatrix_component>(D, machine, compnode, dirname);
+}
+
+
+
 //**************************************************************************
 //  LAYOUT ELEMENT TEXTURE
 //**************************************************************************
 
 //-------------------------------------------------
-//  texture - constructor
+//  texture - constructors
 //-------------------------------------------------
 
 layout_element::texture::texture()
-	: m_element(nullptr),
-		m_texture(nullptr),
-		m_state(0)
+	: m_element(nullptr)
+	, m_texture(nullptr)
+	, m_state(0)
 {
+}
+
+
+layout_element::texture::texture(texture &&that) : texture()
+{
+	operator=(std::move(that));
 }
 
 
@@ -598,6 +589,20 @@ layout_element::texture::~texture()
 {
 	if (m_element != nullptr)
 		m_element->machine().render().texture_free(m_texture);
+}
+
+
+//-------------------------------------------------
+//  opearator= - move assignment
+//-------------------------------------------------
+
+layout_element::texture &layout_element::texture::operator=(texture &&that)
+{
+	using std::swap;
+	swap(m_element, that.m_element);
+	swap(m_texture, that.m_texture);
+	swap(m_state, that.m_state);
+	return *this;
 }
 
 
