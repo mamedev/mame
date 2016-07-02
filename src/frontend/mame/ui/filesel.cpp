@@ -680,7 +680,7 @@ void menu_file_selector::handle()
 		else if (event->iptkey == IPT_SPECIAL)
 		{
 			auto const buflen = std::strlen(m_filename_buffer);
-			bool update_selected = FALSE;
+			bool update_selected = false;
 
 			if ((event->unichar == 8) || (event->unichar == 0x7f))
 			{
@@ -688,7 +688,7 @@ void menu_file_selector::handle()
 				if (0 < buflen)
 				{
 					*const_cast<char *>(utf8_previous_char(&m_filename_buffer[buflen])) = 0;
-					update_selected = TRUE;
+					update_selected = true;
 
 					ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
 				}
@@ -698,7 +698,7 @@ void menu_file_selector::handle()
 				// if it's any other key and we're not maxed out, update
 				if (event->append_char(m_filename_buffer, buflen))
 				{
-					update_selected = TRUE;
+					update_selected = true;
 
 					ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
 				}
