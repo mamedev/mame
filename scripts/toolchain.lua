@@ -774,13 +774,12 @@ function toolchain(_buildDir, _subDir)
 
 	configuration { "android-*", "Release" }
 		targetdir (_buildDir .. "android/bin/" .. _OPTIONS["PLATFORM"] .. "/Release")
-		objdir (_buildDir .. "android/obj/" .. _OPTIONS["PLATFORM"] .. "/Release")
 
 	configuration { "android-*", "Debug" }
 		targetdir (_buildDir .. "android/bin/" .. _OPTIONS["PLATFORM"] .. "/Debug")
-		objdir (_buildDir .. "android/obj/" .. _OPTIONS["PLATFORM"] .. "/Debug")
 
 	configuration { "android-*" }
+		objdir (_buildDir .. "android/obj/" .. _OPTIONS["PLATFORM"])
 		includedirs {
 			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libcxx/include",
