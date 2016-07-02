@@ -247,6 +247,19 @@ int utf8_from_uchar(char *utf8string, size_t count, unicode_char uchar)
 
 
 //-------------------------------------------------
+//  utf8_from_uchar - convert a unicode character
+//  into a UTF-8 sequence
+//-------------------------------------------------
+
+std::string utf8_from_uchar(unicode_char uchar)
+{
+	char buffer[UTF8_CHAR_MAX];
+	auto len = utf8_from_uchar(buffer, ARRAY_LENGTH(buffer), uchar);
+	return std::string(buffer, len);
+}
+
+
+//-------------------------------------------------
 //  utf16_from_uchar - convert a unicode character
 //  into a UTF-16 sequence
 //-------------------------------------------------

@@ -49,7 +49,7 @@ private:
 	std::string &                   m_current_directory;
 	std::string &                   m_current_file;
 	const image_device_format *     m_current_format;
-	char                            m_filename_buffer[1024];
+	std::string						m_filename;
 
 protected:
 	bool *                          m_ok;

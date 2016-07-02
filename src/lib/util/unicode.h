@@ -97,6 +97,7 @@ int uchar_from_utf16f(unicode_char *uchar, const utf16_char *utf16char, size_t c
 
 // converting 32-bit Unicode chars to strings
 int utf8_from_uchar(char *utf8string, size_t count, unicode_char uchar);
+std::string utf8_from_uchar(unicode_char uchar);
 int utf16_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar);
 int utf16f_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar);
 
