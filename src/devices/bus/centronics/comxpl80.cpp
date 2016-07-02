@@ -161,7 +161,7 @@ ioport_constructor comx_pl80_device::device_input_ports() const
 comx_pl80_device::comx_pl80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, COMX_PL80, "COMX PL-80", tag, owner, clock, "comx_pl80", __FILE__),
 		device_centronics_peripheral_interface(mconfig, *this),
-		m_plotter(*this, "PLOTTER"),
+		m_plotter(*this, "gfx1"),
 		m_font(*this, "FONT"),
 		m_sw(*this, "SW"), m_font_addr(0), m_x_motor_phase(0), m_y_motor_phase(0), m_z_motor_phase(0), m_plotter_data(0), m_plotter_ack(0), m_plotter_online(0), m_data(0)
 {
