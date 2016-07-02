@@ -560,7 +560,7 @@ void menu_file_selector::populate()
 		append_entry(SELECTOR_ENTRY_TYPE_EMPTY, "", "");
 	}
 
-	if (m_has_create)
+	if (m_has_create && !util::zippath_is_zip(directory))
 	{
 		// add the "[create]" entry
 		append_entry(SELECTOR_ENTRY_TYPE_CREATE, "", "");

@@ -177,16 +177,8 @@ void menu_control_device_image::handle()
 {
 	switch(state) {
 	case START_FILE: {
-		bool can_create = false;
-		if(image->is_creatable()) {
-			util::zippath_directory *directory = nullptr;
-			osd_file::error err = util::zippath_opendir(current_directory.c_str(), &directory);
-			can_create = err == osd_file::error::NONE && !util::zippath_is_zip(directory);
-			if(directory)
-				util::zippath_closedir(directory);
-		}
 		submenu_result = -1;
-		menu::stack_push<menu_file_selector>(ui(), container, image, current_directory, current_file, true, image->image_interface()!=nullptr, can_create, &submenu_result);
+		menu::stack_push<menu_file_selector>(ui(), container, image, current_directory, current_file, true, image->image_interface()!=nullptr, image->is_creatable(), &submenu_result);
 		state = SELECT_FILE;
 		break;
 	}
