@@ -41,7 +41,7 @@ private:
 	UINT32 m_enabled_mask;
 
 	void slot_selected(int slot);
-	static void *itemref_from_slot_number(int slot);
+	static void *itemref_from_slot_number(unsigned int slot);
 	std::unique_ptr<osd::directory::entry> stat_searchpath(std::string const &path, const char *searchpath);
 };
 

@@ -52,9 +52,9 @@ menu_load_save_state_base::~menu_load_save_state_base()
 //  itemref_from_slot_number
 //-------------------------------------------------
 
-void *menu_load_save_state_base::itemref_from_slot_number(int slot)
+void *menu_load_save_state_base::itemref_from_slot_number(unsigned int slot)
 {
-	return (void *)(size_t)slot;
+	return (void *)(std::uintptr_t(slot));
 }
 
 
@@ -67,7 +67,7 @@ void menu_load_save_state_base::populate()
 	m_enabled_mask = 0;
 
 	// populate all slots
-	for (int i = 0; i < SLOT_COUNT; i++)
+	for (unsigned int i = 0; i < SLOT_COUNT; i++)
 	{
 		// name the save state
 		std::string name = string_format("%d", i);
