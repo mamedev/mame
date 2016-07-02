@@ -1637,7 +1637,7 @@ ROM_END
 
 //*************************************************************************************************************************
 //  Outrun Deluxe (Japan)
-//  CPU: FD1089A
+//  CPU: FD1089A (317-0019)
 //   GAME BD  834-6065-01
 //   CPU BD   837-6063-01
 //   VIDEO BD 837-6064-02
@@ -1652,11 +1652,10 @@ ROM_START( outrundxj )
 	ROM_LOAD16_BYTE( "epr-10334.ic117", 0x020001, 0x10000, CRC(ff22ad0b) SHA1(41f7c075e0c84a16c0ac46e35bff5e9484920664) )
 
 	ROM_REGION( 0x60000, "subcpu", 0 ) // second 68000 CPU
-	// note, this fails the ROM test because the checksums present in the ROMs have not been changed from the unencrypted version!
-	ROM_LOAD16_BYTE( "epr-10327a.76", 0x00000, 0x10000, CRC(e28a5baf) SHA1(f715bde96c73ed47035acf5a41630fdeb41bb2f9) )
-	ROM_LOAD16_BYTE( "epr-10329a.58", 0x00001, 0x10000, CRC(da131c81) SHA1(57d5219bd0e2fd886217e37e8773fd76be9b40eb) )
-	ROM_LOAD16_BYTE( "epr-10328a.75", 0x20000, 0x10000, CRC(d5ec5e5d) SHA1(a4e3cfca4d803e72bc4fcf91ab00e21bf3f8959f) )
-	ROM_LOAD16_BYTE( "epr-10330a.57", 0x20001, 0x10000, CRC(ba9ec82a) SHA1(2136c9572e26b7ae6de402c0cd53174407cc6018) )
+	ROM_LOAD16_BYTE( "epr-10327.76", 0x00000, 0x10000, CRC(da99d855) SHA1(77d18092e3c10a400e62eeba562f161398fe37a7) )
+	ROM_LOAD16_BYTE( "epr-10329.58", 0x00001, 0x10000, CRC(fe0fa5e2) SHA1(e63fe5f7950af35131539836f18fa056767c2c80) )
+	ROM_LOAD16_BYTE( "epr-10328.75", 0x20000, 0x10000, CRC(3c0e9a7f) SHA1(0e182fdac70423a85dc2b996c70bcb3954e75e10) )
+	ROM_LOAD16_BYTE( "epr-10330.57", 0x20001, 0x10000, CRC(59786e99) SHA1(834bf361ca67cee3793c324bb26cf0ec82a72068) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
 	ROM_LOAD( "opr-10268.99",  0x00000, 0x08000, CRC(95344b04) SHA1(b3480714b11fc49b449660431f85d4ba92f799ba) )
@@ -2977,7 +2976,7 @@ DRIVER_INIT_MEMBER(segaorun_state,shangon)
 GAMEL(1986, outrun,    0,       outrun,          outrun,   segaorun_state,outrun,  ROT0,   "Sega",    "Out Run (sitdown/upright, Rev B)", 0,                        layout_outrun ) // Upright/Sitdown determined by dipswitch settings
 GAMEL(1986, outrunra,  outrun,  outrun,          outrun,   segaorun_state,outrun,  ROT0,   "Sega",    "Out Run (sitdown/upright, Rev A)", 0,                        layout_outrun ) // Upright/Sitdown determined by dipswitch settings
 GAMEL(1986, outrundx,  outrun,  outrun,          outrundx, segaorun_state,outrun,  ROT0,   "Sega",    "Out Run (deluxe sitdown)", 0,                                layout_outrun )
-GAMEL(1986, outrundxj, outrun,  outrun_fd1089a,  outrundx, segaorun_state,outrun,  ROT0,   "Sega",    "Out Run (Japan, deluxe sitdown) (FD1089A 317-0019)", 0,       layout_outrun ) // No Japanese text, different course order
+GAMEL(1986, outrundxj, outrun,  outrun_fd1089a,  outrundx, segaorun_state,outrun,  ROT0,   "Sega",    "Out Run (Japan, deluxe sitdown) (FD1089A 317-0019)", 0,      layout_outrun ) // No Japanese text, different course order
 GAMEL(1986, outrundxa, outrun,  outrundx,        outrundx, segaorun_state,outrun,  ROT0,   "Sega",    "Out Run (deluxe sitdown earlier version)", 0,                layout_outrun )
 GAMEL(1986, outrunb,   outrun,  outrun,          outrun,   segaorun_state,outrunb, ROT0,   "bootleg", "Out Run (bootleg)", 0,                                       layout_outrun )
 
