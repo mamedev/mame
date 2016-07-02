@@ -29,12 +29,12 @@
     CONSTANTS
 ***************************************************************************/
 
-/* these defines specify the maximum size of different types of Unicode
- * character encodings */
+// these defines specify the maximum size of different types of Unicode
+// character encodings
 #define UTF8_CHAR_MAX   6
 #define UTF16_CHAR_MAX  2
 
-/* these are UTF-8 encoded strings for common characters */
+// these are UTF-8 encoded strings for common characters
 #define UTF8_NBSP               "\xc2\xa0"          /* non-breaking space */
 
 #define UTF8_MULTIPLY           "\xc3\x97"          /* multiplication sign */
@@ -87,22 +87,22 @@ typedef UINT32 unicode_char;
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-/* tests to see if a unicode char is a valid code point */
-int uchar_isvalid(unicode_char uchar);
+// tests to see if a unicode char is a valid code point
+bool uchar_isvalid(unicode_char uchar);
 
-/* converting strings to 32-bit Unicode chars */
+// converting strings to 32-bit Unicode chars
 int uchar_from_utf8(unicode_char *uchar, const char *utf8char, size_t count);
 int uchar_from_utf16(unicode_char *uchar, const utf16_char *utf16char, size_t count);
 int uchar_from_utf16f(unicode_char *uchar, const utf16_char *utf16char, size_t count);
 
-/* converting 32-bit Unicode chars to strings */
+// converting 32-bit Unicode chars to strings
 int utf8_from_uchar(char *utf8string, size_t count, unicode_char uchar);
 int utf16_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar);
 int utf16f_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar);
 
-/* misc UTF-8 helpers */
+// misc UTF-8 helpers
 const char *utf8_previous_char(const char *utf8string);
-int utf8_is_valid_string(const char *utf8string);
+bool utf8_is_valid_string(const char *utf8string);
 
 
 
