@@ -1619,6 +1619,14 @@ cppcheck:
 
 #-------------------------------------------------
 # BGFX shaders
+#
+# to build all just use : make shaders 
+#
+# to build specific chain use for example : make shaders CHAIN=eagle
+# data for chain is taken from src/osd/modules/render/bgfx/shaders/chains/
+# subfolder named in CHAIN
+# NOTE: shaders can be only built on Windows for now
+# due to restrictions of way how hlsl shaders are compiled
 #-------------------------------------------------
 
 .PHONY: shaders bgfx-tools
