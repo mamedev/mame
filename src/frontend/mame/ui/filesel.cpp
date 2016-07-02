@@ -679,34 +679,33 @@ void menu_file_selector::handle()
 			}
 
 			// reset the char buffer when pressing IPT_UI_SELECT
-			if (m_filename_buffer[0] != '\0')
-				memset(m_filename_buffer, '\0', ARRAY_LENGTH(m_filename_buffer));
+			m_filename.clear();
 		}
 		else if (event->iptkey == IPT_SPECIAL)
 		{
-			auto const buflen = std::strlen(m_filename_buffer);
 			bool update_selected = false;
 
 			if ((event->unichar == 8) || (event->unichar == 0x7f))
 			{
 				// if it's a backspace and we can handle it, do so
+				auto const buflen = m_filename.size();
 				if (0 < buflen)
 				{
-					*const_cast<char *>(utf8_previous_char(&m_filename_buffer[buflen])) = 0;
+					auto buffer_oldend = m_filename.c_str() + buflen;
+					auto buffer_newend = utf8_previous_char(buffer_oldend);
+					m_filename.resize(buffer_newend - m_filename.c_str());
 					update_selected = true;
 
-					ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
+					ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename.c_str());
 				}
 			}
 			else if (event->is_char_printable())
 			{
 				// if it's any other key and we're not maxed out, update
-				if (event->append_char(m_filename_buffer, buflen))
-				{
-					update_selected = true;
+				m_filename += utf8_from_uchar(event->unichar);
+				update_selected = true;
 
-					ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
-				}
+				ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename.c_str());
 			}
 
 			if (update_selected)
@@ -719,9 +718,9 @@ void menu_file_selector::handle()
 					if (cur_selected != &entry)
 					{
 						int match = 0;
-						for (int i = 0; i < ARRAY_LENGTH(m_filename_buffer); i++)
+						for (int i = 0; i < m_filename.size(); i++)
 						{
-							if (core_strnicmp(entry.basename.c_str(), m_filename_buffer, i) == 0)
+							if (core_strnicmp(entry.basename.c_str(), m_filename.c_str(), i) == 0)
 								match = i;
 						}
 
@@ -743,8 +742,7 @@ void menu_file_selector::handle()
 		else if (event->iptkey == IPT_UI_CANCEL)
 		{
 			// reset the char buffer also in this case
-			if (m_filename_buffer[0] != '\0')
-				memset(m_filename_buffer, '\0', ARRAY_LENGTH(m_filename_buffer));
+			m_filename.clear();
 		}
 	}
 }

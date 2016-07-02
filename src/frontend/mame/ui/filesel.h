@@ -99,7 +99,7 @@ private:
 	int *                       m_result;
 	std::vector<file_selector_entry>	m_entrylist;
 	std::string                 m_hover_directory;
-	char                        m_filename_buffer[1024];
+	std::string					m_filename;
 
 	// methods
 	int compare_entries(const file_selector_entry *e1, const file_selector_entry *e2);
