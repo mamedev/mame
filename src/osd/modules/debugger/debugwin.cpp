@@ -30,7 +30,7 @@
 #include "../input/input_windows.h"
 
 
-class debugger_windows : public osd_module, public debug_module, public debugger_windows_interface
+class debugger_windows : public osd_module, public debug_module, protected debugger_windows_interface
 {
 public:
 	debugger_windows() :
@@ -250,7 +250,7 @@ void debugger_windows::hide_all()
 template <typename T> T *debugger_windows::create_window()
 {
 	// allocate memory
-	std::unique_ptr<T> info = std::make_unique<T>(*this);
+	std::unique_ptr<T> info = std::make_unique<T>(static_cast<debugger_windows_interface &>(*this));
 	if (info->is_valid())
 	{
 		m_window_list.push_back(std::move(info));
