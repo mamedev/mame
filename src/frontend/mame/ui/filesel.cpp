@@ -340,7 +340,7 @@ void menu_file_selector::custom_render(void *selectedref, float top, float botto
 		// we're hovering over a directory!  highlight it
 		auto target_dir_start = m_current_directory.rfind(PATH_SEPARATOR, hit_start) + 1;
 		auto target_dir_end = m_current_directory.find(PATH_SEPARATOR, hit_start + hit_span);
-		m_hover_directory = m_current_directory.substr(0, target_dir_end);
+		m_hover_directory = m_current_directory.substr(0, target_dir_end + strlen(PATH_SEPARATOR));
 
 		// highlight the text in question
 		rgb_t fgcolor = UI_MOUSEOVER_COLOR;
