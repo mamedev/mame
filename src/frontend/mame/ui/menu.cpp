@@ -318,10 +318,10 @@ void menu::item_append(menu_item item)
 //  end of the menu
 //-------------------------------------------------
 
-void menu::item_append(menu_item_type type)
+void menu::item_append(menu_item_type type, UINT32 flags)
 {
 	if (type == menu_item_type::SEPARATOR)
-		item_append(MENU_SEPARATOR_ITEM, "", 0, nullptr, menu_item_type::SEPARATOR);
+		item_append(MENU_SEPARATOR_ITEM, "", flags, nullptr, menu_item_type::SEPARATOR);
 }
 
 //-------------------------------------------------

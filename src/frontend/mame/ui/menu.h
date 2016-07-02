@@ -66,7 +66,7 @@ public:
 	void item_append(const std::string &text, const std::string &subtext, UINT32 flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
 	void item_append(std::string &&text, std::string &&subtext, UINT32 flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
 	void item_append(menu_item item);
-	void item_append(menu_item_type type);
+	void item_append(menu_item_type type, UINT32 flags = 0);
 
 	// configure the menu for custom rendering
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
