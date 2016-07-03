@@ -180,7 +180,7 @@ static ADDRESS_MAP_START( legionna_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100470, 0x100471) AM_WRITENOP // toggles 0x2000 / 0x0000, tile bank on some games
 	AM_RANGE(0x100600, 0x10063f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
-	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // D0 written on every update
+	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
 	AM_RANGE(0x100700, 0x10071f) AM_READWRITE(sound_comms_r,sound_comms_w)
 	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100744, 0x100745) AM_READ_PORT("PLAYERS12")
@@ -202,7 +202,7 @@ static ADDRESS_MAP_START( heatbrl_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100470, 0x100471) AM_WRITE(heatbrl_setgfxbank)
-	AM_RANGE(0x100600, 0x100601) AM_WRITENOP // 0xffff written on every update
+	AM_RANGE(0x100600, 0x100601) AM_WRITENOP // irq ack?
 	AM_RANGE(0x100640, 0x10068f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100744, 0x100745) AM_READ_PORT("PLAYERS12")
@@ -224,7 +224,7 @@ static ADDRESS_MAP_START( godzilla_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100470, 0x100471) AM_WRITE(denjinmk_setgfxbank)
 	AM_RANGE(0x100600, 0x10063f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
-	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // D0 written on every update
+	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
 	AM_RANGE(0x100700, 0x10071f) AM_READWRITE(sound_comms_r,sound_comms_w)
 	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100744, 0x100745) AM_READ_PORT("PLAYERS12")
@@ -251,7 +251,7 @@ static ADDRESS_MAP_START( denjinmk_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100470, 0x100471) AM_WRITE(denjinmk_setgfxbank)
 	AM_RANGE(0x100600, 0x10063f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
-	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // D0 written on every update
+	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
 	AM_RANGE(0x100700, 0x10071f) AM_READWRITE(sound_comms_r,sound_comms_w)
 	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100744, 0x100745) AM_READ_PORT("PLAYERS12")
@@ -277,7 +277,7 @@ static ADDRESS_MAP_START( grainbow_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100480, 0x100487) AM_WRITE(grainbow_layer_config_w) // probably a COP feature
 	AM_RANGE(0x100600, 0x10063f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
-	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // D0 written on every update
+	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
 	AM_RANGE(0x100700, 0x10071f) AM_READWRITE(sound_comms_r,sound_comms_w)
 	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100744, 0x100745) AM_READ_PORT("PLAYERS12")
@@ -301,7 +301,7 @@ static ADDRESS_MAP_START( cupsoc_mem, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100600, 0x10063f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
-	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // D0 written on every update
+	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
 	AM_RANGE(0x100700, 0x10071f) AM_READWRITE(sound_comms_r,sound_comms_w)
 	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100744, 0x100745) AM_READ_PORT("PLAYERS12")
@@ -329,7 +329,7 @@ static ADDRESS_MAP_START( cupsocs_mem, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100600, 0x10060f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)//?
 	AM_RANGE(0x100640, 0x10067f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
-	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // D0 written on every update
+	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
 	AM_RANGE(0x100700, 0x100701) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100704, 0x100705) AM_READ_PORT("PLAYERS12")
 	AM_RANGE(0x100708, 0x100709) AM_READ_PORT("PLAYERS34")
@@ -357,7 +357,7 @@ static ADDRESS_MAP_START( cupsocbl_mem, AS_PROGRAM, 16, legionna_state )
 	//AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100600, 0x10060f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)//?
 	AM_RANGE(0x100640, 0x10067f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
-	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // D0 written on every update
+	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
 	AM_RANGE(0x100700, 0x100701) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100704, 0x100705) AM_READ_PORT("PLAYERS12")
 	AM_RANGE(0x100708, 0x100709) AM_READ_PORT("PLAYERS34")
@@ -2761,9 +2761,9 @@ GAME( 1992, heatbrlo, heatbrl,  heatbrl,  heatbrl, driver_device,  0,         RO
 GAME( 1992, heatbrlu, heatbrl,  heatbrl,  heatbrl, driver_device,  0,         ROT0, "TAD Corporation", "Heated Barrel (US)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1992, heatbrle, heatbrl,  heatbrl,  heatbrl, driver_device,  0,         ROT0, "TAD Corporation (Electronic Devices license)", "Heated Barrel (Electronic Devices license)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 
-GAME( 1993, godzilla, 0,        godzilla, godzilla, driver_device, 0,         ROT0, "Banpresto", "Godzilla (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, godzilla, 0,        godzilla, godzilla, driver_device, 0,         ROT0, "Banpresto", "Godzilla (Japan)", 0 )
 GAME( 1993, grainbow, 0,        grainbow, grainbow, driver_device, 0,         ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1993, denjinmk, 0,        denjinmk, denjinmk, legionna_state,denjinmk,  ROT0, "Winkysoft (Banpresto license)", "Denjin Makai", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, denjinmk, 0,        denjinmk, denjinmk, legionna_state,denjinmk,  ROT0, "Winkysoft (Banpresto license)", "Denjin Makai", MACHINE_IMPERFECT_COLORS )
 
 GAME( 1992, cupsoc,   0,        cupsoc,   cupsoc, legionna_state,  cupsoc,    ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1992, cupsoca,  cupsoc,   cupsoc,   cupsoc, legionna_state,  cupsoc,    ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )

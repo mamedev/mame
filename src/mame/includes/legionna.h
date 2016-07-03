@@ -102,5 +102,5 @@ public:
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<raiden2cop_device> m_raiden2cop;
-
 };
+

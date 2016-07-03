@@ -307,7 +307,7 @@ VIDEO_START_MEMBER(legionna_state,denjinmk)
 	m_sprite_pri_mask[2] = 0xfffe; // door at the end of sewers part in level 1
 	m_sprite_pri_mask[3] = 0x0000; // briefing guy in pre-stage and portraits before a boss fight
 	
-	m_background_layer->set_transparent_pen(15);
+//	m_background_layer->set_transparent_pen(15);
 	m_midground_layer->set_transparent_pen(15);
 	m_foreground_layer->set_transparent_pen(15);
 	m_text_layer->set_transparent_pen(7);//?
