@@ -134,7 +134,7 @@ private:
 	void send_port(address_space &space, UINT8 offset, UINT8 data);
 	void update_interrupts();
 
-	int m_kbd_state;
+	int m_beep_state, m_kbd_state, m_reset_done;
 
 	devcb_write_line m_tx_handler;
 };
