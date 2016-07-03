@@ -535,6 +535,10 @@ void lk201_device::device_reset()
 
 	transmit_register_reset();
 	receive_register_reset();
+	
+	m_kbd_state = 0;
+	m_beep_state = 0;
+	m_reset_done = 0;
 }
 
 void lk201_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -549,15 +553,22 @@ void lk201_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		break;
 
 	case 2:
-		m_speaker->set_output_gain(0, 0);
-		m_speaker->set_state(0);
+		if (m_beep_state == 2)
+		{
+			m_beeper->adjust(attotime::never);
+
+			m_speaker->set_state(0);
+			m_beep_state = 0;  // ready for new beep.
+
+		} else
+			m_beeper->adjust(attotime::from_msec(20));
+		
 		break;
 
 	default:
 		device_serial_interface::device_timer(timer, id, param, ptr);
+	}
 }
-}
-
 
 void lk201_device::rcv_complete()
 {
@@ -565,9 +576,11 @@ void lk201_device::rcv_complete()
 	update_interrupts();
 	receive_register_extract();
 
-	int data = get_received_char();
-	m_kbd_state = data;
-//  printf("\nlk201 got %02x\n", m_kbd_state);
+	m_kbd_state = get_received_char();
+//	printf("\nlk201 got %02x\n", m_kbd_state);
+
+	if(m_kbd_state == 0xfd)
+		m_reset_done = 1;
 }
 
 void lk201_device::tra_complete()
@@ -686,14 +699,28 @@ void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 olddata)
 
 	switch (offset)
 	{
-		case 0: // port A
-			break;
+	case 0: // port A
+		break;
 
-		case 1: // port B
-			break;
+	case 1: // port B
+		break;
 
-		case 2: // port C
-			// Check for keyboard read strobe
+	case 2: // port C
+
+		// Check for LED update strobe
+		if (((portc & 0x80) == 0) && (olddata & 0x80))
+		{
+			if (ddrs[2] != 0x00)
+			{	// Lower nibble contains the LED values (1 = on, 0 = off)
+				machine().output().set_value("led_wait", (led_data & 0x1) == 1);
+				machine().output().set_value("led_compose", (led_data & 0x2) == 2);
+				machine().output().set_value("led_lock", (led_data & 0x4) == 4);
+				machine().output().set_value("led_hold", (led_data & 0x8) == 8);
+			}
+		}
+
+		if (m_reset_done)
+		{	// Check for keyboard read strobe
 			if (((portc & 0x40) == 0) && (olddata & 0x40))
 			{
 				if (porta & 0x1) kbd_data = m_kbd0->read();
@@ -719,56 +746,61 @@ void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 olddata)
 			// Check for LED update strobe
 			if (((portc & 0x80) == 0) && (olddata & 0x80))
 			{
-			if(ddrs[2] != 0x00)
-			{   // Lower nibble contains the LED values (1 = on, 0 = off)
-				machine().output().set_value("led_wait"   , (led_data & 0x1) == 1);
-				machine().output().set_value("led_compose", (led_data & 0x2) == 2);
-				machine().output().set_value("led_lock"   , (led_data & 0x4) == 4);
-				machine().output().set_value("led_hold"   , (led_data & 0x8) == 8);
-			}
-			if (led_data & 0xf0)
-			{
-				m_speaker->set_state(1);
-				// Beeps < 20 ms are clipped. A key click on a LK201 lasts 2 ms...
-				if(m_kbd_state == LK_CMD_BELL)
-					m_beeper->adjust(attotime::from_msec(125));
-				else
-					m_beeper->adjust(attotime::from_msec(25)); // see note
-	}
-			// Upper 4 bits of LED_DATA contain encoded volume info
-			switch (led_data & 0xf0)
-			{
-				case 0xf0: // 8  - (see TABLE 4 in 68HC05xx ROM)
-					m_speaker->set_output_gain(0, 100.0f);
-					break;
-				case 0xd0: // 7
-					m_speaker->set_output_gain(0, (100 - (12 * 1)) / 100.0f);
-					break;
-				case 0xc0: // 6
-					m_speaker->set_output_gain(0, (100 - (12 * 2)) / 100.0f);
-					break;
-				case 0x60: // 5
-					m_speaker->set_output_gain(0, (100 - (12 * 3)) / 100.0f);
-					break;
-				case 0xb0: // 4
-					m_speaker->set_output_gain(0, (100 - (12 * 4)) / 100.0f);
-					break;
-				case 0xa0: // 3
-					m_speaker->set_output_gain(0, (100 - (12 * 5)) / 100.0f);
-					break;
-				case 0x30: // 2
-					m_speaker->set_output_gain(0, (100 - (12 * 6)) / 100.0f);
-					break;
-				case 0x90: // 1
-					m_speaker->set_output_gain(0, (100 - (12 * 7)) / 100.0f);
-					break;
-				default:
-					;
-			} // switch (volume)
+				if (ddrs[2] != 0x00)
+				{	
+					if (led_data & 0xf0)
+					{
+						if (m_beep_state == 0)
+						{
+							m_beep_state = 1;
+							m_speaker->set_state(1);
 
-		} // if (update_strobe)
+							// Beeps < 20 ms are clipped. A key click on a LK201 lasts 2 ms...
+							m_beeper->adjust(attotime::from_msec(20));
+						}
+					}
 
-		} // outer switch
+					// Upper 4 bits of LED_DATA contain encoded volume info 
+					switch (led_data & 0xf0)
+					{
+					case 0x00: // zero / off 
+						if (m_beep_state == 1)
+							m_beep_state = 2;
+						break;
+
+					case 0xf0: // 8  - (see TABLE 4 in 68HC05xx ROM)
+						m_speaker->set_output_gain(0, 100.0f);
+						break;
+					case 0xd0: // 7
+						m_speaker->set_output_gain(0, (100 - (12 * 1)) / 100.0f);
+						break;
+					case 0xc0: // 6
+						m_speaker->set_output_gain(0, (100 - (12 * 2)) / 100.0f);
+						break;
+					case 0x60: // 5
+						m_speaker->set_output_gain(0, (100 - (12 * 3)) / 100.0f);
+						break;
+					case 0xb0: // 4
+						m_speaker->set_output_gain(0, (100 - (12 * 4)) / 100.0f);
+						break;
+					case 0xa0: // 3
+						m_speaker->set_output_gain(0, (100 - (12 * 5)) / 100.0f);
+						break;
+					case 0x30: // 2
+						m_speaker->set_output_gain(0, (100 - (12 * 6)) / 100.0f);
+						break;
+					case 0x90: // 1
+						m_speaker->set_output_gain(0, (100 - (12 * 7)) / 100.0f);
+						break;
+					default:
+						;
+					} // switch (volume)
+				} // DDRS
+
+			} // if (update_strobe)
+		} // if (reset_done)
+
+	} // switch(offset)
 }
 
 READ8_MEMBER( lk201_device::sci_r )
