@@ -931,6 +931,7 @@ int lua_engine::lua_addr_space::l_mem_read(lua_State *L)
 	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
 	offs_t address = lua_tounsigned(L, 2);
 	T mem_content = 0;
+	address = sp.address_to_byte(address);
 	switch(sizeof(mem_content) * 8) {
 		case 8:
 			mem_content = sp.read_byte(address);
@@ -984,6 +985,7 @@ int lua_engine::lua_addr_space::l_mem_write(lua_State *L)
 	luaL_argcheck(L, lua_isnumber(L, 3), 3, "value (integer) expected");
 	offs_t address = lua_tounsigned(L, 2);
 	T val = lua_tounsigned(L, 3);
+	address = sp.address_to_byte(address);
 
 	switch(sizeof(val) * 8) {
 		case 8:
@@ -1030,6 +1032,7 @@ int lua_engine::lua_addr_space::l_log_mem_read(lua_State *L)
 	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
 	offs_t address = lua_tounsigned(L, 2);
 	T mem_content = 0;
+	address = sp.address_to_byte(address);
 	if(!lsp.dev->translate(sp.spacenum(), TRANSLATE_READ_DEBUG, address))
 		return 0;
 
@@ -1087,6 +1090,7 @@ int lua_engine::lua_addr_space::l_log_mem_write(lua_State *L)
 	offs_t address = lua_tounsigned(L, 2);
 	T val = lua_tounsigned(L, 3);
 
+	address = sp.address_to_byte(address);
 	if(!lsp.dev->translate(sp.spacenum(), TRANSLATE_WRITE_DEBUG, address))
 		return 0;
 
