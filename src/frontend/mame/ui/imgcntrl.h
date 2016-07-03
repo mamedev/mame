@@ -38,8 +38,8 @@ protected:
 	int state;
 	device_image_interface *image;
 	int submenu_result;
-	std::string current_directory;
-	std::string current_file;
+	std::string m_current_directory;
+	std::string m_current_file;
 
 	// methods
 	virtual void hook_load(std::string filename, bool softlist);

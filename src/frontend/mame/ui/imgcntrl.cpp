@@ -51,7 +51,7 @@ menu_control_device_image::menu_control_device_image(mame_ui_manager &mui, rende
 	if(swi)
 	{
 		state = START_OTHER_PART;
-		current_directory.assign(image->working_directory());
+		m_current_directory.assign(image->working_directory());
 	}
 	else
 	{
@@ -60,14 +60,14 @@ menu_control_device_image::menu_control_device_image(mame_ui_manager &mui, rende
 		/* if the image exists, set the working directory to the parent directory */
 		if (image->exists())
 		{
-			current_file.assign(image->filename());
-			current_directory = util::zippath_parent(current_file.c_str());
+			m_current_file.assign(image->filename());
+			m_current_directory = util::zippath_parent(m_current_file.c_str());
 		} else
-			current_directory.assign(image->working_directory());
+			m_current_directory.assign(image->working_directory());
 
 		/* check to see if the path exists; if not clear it */
-		if (util::zippath_opendir(current_directory.c_str(), nullptr) != osd_file::error::NONE)
-			current_directory.clear();
+		if (util::zippath_opendir(m_current_directory.c_str(), nullptr) != osd_file::error::NONE)
+			m_current_directory.clear();
 	}
 }
 
@@ -90,7 +90,7 @@ void menu_control_device_image::test_create(bool &can_create, bool &need_confirm
 	osd::directory::entry::entry_type file_type;
 
 	/* assemble the full path */
-	auto path = util::zippath_combine(current_directory.c_str(), current_file.c_str());
+	auto path = util::zippath_combine(m_current_directory.c_str(), m_current_file.c_str());
 
 	/* does a file or a directory exist at the path */
 	auto entry = osd_stat(path.c_str());
@@ -178,7 +178,7 @@ void menu_control_device_image::handle()
 	switch(state) {
 	case START_FILE: {
 		submenu_result = -1;
-		menu::stack_push<menu_file_selector>(ui(), container, image, current_directory, current_file, true, image->image_interface()!=nullptr, image->is_creatable(), &submenu_result);
+		menu::stack_push<menu_file_selector>(ui(), container, image, m_current_directory, m_current_file, true, image->image_interface()!=nullptr, image->is_creatable(), &submenu_result);
 		state = SELECT_FILE;
 		break;
 	}
@@ -274,11 +274,11 @@ void menu_control_device_image::handle()
 			break;
 
 		case menu_file_selector::R_FILE:
-			hook_load(current_file, false);
+			hook_load(m_current_file, false);
 			break;
 
 		case menu_file_selector::R_CREATE:
-			menu::stack_push<menu_file_create>(ui(), container, image, current_directory, current_file, &create_ok);
+			menu::stack_push<menu_file_create>(ui(), container, image, m_current_directory, m_current_file, &create_ok);
 			state = CHECK_CREATE;
 			break;
 
@@ -322,7 +322,7 @@ void menu_control_device_image::handle()
 		break;
 
 	case DO_CREATE: {
-		auto path = util::zippath_combine(current_directory.c_str(), current_file.c_str());
+		auto path = util::zippath_combine(m_current_directory.c_str(), m_current_file.c_str());
 		int err = image->create(path.c_str(), nullptr, nullptr);
 		if (err != 0)
 			machine().popmessage("Error: %s", image->error());

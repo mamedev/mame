@@ -109,14 +109,14 @@ void menu_control_floppy_image::handle()
 			for(floppy_image_format_t *i = fif_list; i; i = i->next) {
 			if(!i->supports_save())
 				continue;
-			if (i->extension_matches(current_file.c_str()))
+			if (i->extension_matches(m_current_file.c_str()))
 				format_array[total_usable++] = i;
 		}
 		ext_match = total_usable;
 		for(floppy_image_format_t *i = fif_list; i; i = i->next) {
 			if(!i->supports_save())
 				continue;
-			if (!i->extension_matches(current_file.c_str()))
+			if (!i->extension_matches(m_current_file.c_str()))
 				format_array[total_usable++] = i;
 		}
 		submenu_result = -1;
@@ -131,7 +131,7 @@ void menu_control_floppy_image::handle()
 			state = START_FILE;
 			handle();
 		} else {
-			output_filename = util::zippath_combine(current_directory.c_str(), current_file.c_str());
+			output_filename = util::zippath_combine(m_current_directory.c_str(), m_current_file.c_str());
 			output_format = format_array[submenu_result];
 			do_load_create();
 			menu::stack_pop(machine());
@@ -157,7 +157,7 @@ void menu_control_floppy_image::handle()
 			break;
 
 		case menu_select_rw::WRITE_OTHER:
-			menu::stack_push<menu_file_create>(ui(), container, image, current_directory, current_file, &create_ok);
+			menu::stack_push<menu_file_create>(ui(), container, image, m_current_directory, m_current_file, &create_ok);
 			state = CHECK_CREATE;
 			break;
 
