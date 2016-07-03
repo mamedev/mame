@@ -16,6 +16,9 @@ public:
 
 	DECLARE_READ16_MEMBER( reg_lo_addr_r );
 	DECLARE_READ16_MEMBER( reg_hi_addr_r );
+	DECLARE_READ16_MEMBER( status_r );
+	DECLARE_READ16_MEMBER( dist_r );
+	DECLARE_READ16_MEMBER( angle_r );
 	DECLARE_WRITE16_MEMBER( reg_lo_addr_w );
 	DECLARE_WRITE16_MEMBER( reg_hi_addr_w );
 	DECLARE_WRITE16_MEMBER( cmd_trigger_w );
@@ -35,6 +38,7 @@ private:
 	inline void write_word(offs_t address, UINT16 data);
 
 	UINT32 m_reg[8];
+	UINT16 m_angle,m_dist,m_status;
 	int m_dx,m_dy;
 	//required_device<raiden2cop_device> m_raiden2cop;
 };

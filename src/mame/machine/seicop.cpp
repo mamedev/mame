@@ -7,6 +7,9 @@
 
   Notice that only the bare minimum is supported, which is what the bootleg device actually 
   do.
+  Apparently it's an Actel PL84c FPGA programmed to be a Seibu COP clone. 
+  The internal operations are actually loaded via the ROMs, we use the original algorithm 
+  for the trigger until we find the proper hookup.
 
 ********************************************************************************************/
 
@@ -46,8 +49,22 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			//printf("trigger write %04x\n",data);
 			break;
 		case 0x0000:
+		case 0xf105:
 			break;
+		case 0xdde5:
+		{
+			UINT8 offs;
+			int div;
+			INT16 dir_offset;
+			offs = (offset & 3) * 4;
 
+			div = m_host_space->read_word(m_reg[4] + offs);
+			dir_offset = m_host_space->read_word(m_reg[4] + offs + 8);
+			if (div == 0) { div = 1; }
+
+			m_host_space->write_word((m_reg[6] + offs + 4), ((m_host_space->read_word(m_reg[5] + offs + 4) + dir_offset) / div));
+			break;
+		}
 		case 0x0205:
 		{
 			UINT8 offs;
@@ -62,27 +79,33 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			break;
 		}
 		
+		case 0x138e:
+		case 0xe30e:
 		case 0xe18e:
 		{
-			int dy = m_host_space->read_dword(m_reg[1]+4) - m_host_space->read_dword(m_reg[0]+4);
-			int dx = m_host_space->read_dword(m_reg[1]+8) - m_host_space->read_dword(m_reg[0]+8);
-			UINT16 angle;
-				
-			//m_raiden2cop->cop_status = 7;
+			int target_reg = data & 0x200 ? 2 : 1;
+			int dy = (m_host_space->read_dword(m_reg[target_reg]+4) >> 16) - (m_host_space->read_dword(m_reg[0]+4) >> 16);
+			int dx = (m_host_space->read_dword(m_reg[target_reg]+8) >> 16) - (m_host_space->read_dword(m_reg[0]+8) >> 16);
+			
+			//m_status = 7;
 			if(!dx) {
-				//m_raiden2cop->cop_status |= 0x8000;
-				angle = 0;
+				m_status = 0x8000;
+				m_angle = 0;
 			} else {
-				angle = atan(double(dy)/double(dx)) * 128.0 / M_PI;
+				m_status = 0;
+				m_angle =  atan(double(dy)/double(dx)) * 128.0 / M_PI;
+
 				if(dx<0)
-					angle += 0x80;
+				{
+					m_angle += 0x80;
+				}
 			}
 
 			m_dy = dy;
 			m_dx = dx;
 
-			//if(m_cop_mcu_ram[offset] & 0x80)
-			m_host_space->write_word(m_reg[0]+(0x34^2), angle & 0xff);
+			if(data & 0x80)
+				m_host_space->write_word(m_reg[0]+(0x34^2), m_angle & 0xff);
 
 			break;
 		}
@@ -91,13 +114,12 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 		{
 			int dy = m_dy;
 			int dx = m_dx;
-			UINT16 dist;
 
 			dx >>= 16;
 			dy >>= 16;
-			dist = sqrt((double)(dx*dx+dy*dy));
+			m_dist = sqrt((double)(dx*dx+dy*dy));
 
-			m_host_space->write_word(m_reg[0]+(0x38), dist);
+			m_host_space->write_word(m_reg[0]+(0x38), m_dist);
 
 			break;
 		}
@@ -143,11 +165,31 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 	
 }
 
+READ16_MEMBER(seibu_cop_bootleg_device::status_r)
+{
+	return m_status;
+}
+
+READ16_MEMBER(seibu_cop_bootleg_device::dist_r)
+{
+	return m_dist;
+}
+
+READ16_MEMBER(seibu_cop_bootleg_device::angle_r)
+{
+	return m_angle;
+}
+
+// anything that is read thru ROM range 0xc**** is replacement code, therefore on this HW they are latches.
 static ADDRESS_MAP_START( seibucopbl_map, AS_0, 16, seibu_cop_bootleg_device )
-	AM_RANGE(0x070, 0x07f) AM_RAM // DMA registers, resolved at PC=0xc0034
+	AM_RANGE(0x01e, 0x01f) AM_RAM // angle step, PC=0xc0186
+	AM_RANGE(0x070, 0x07f) AM_RAM // DMA registers, PC=0xc0034
 	AM_RANGE(0x0a0, 0x0af) AM_READWRITE(reg_hi_addr_r,reg_hi_addr_w)
 	AM_RANGE(0x0c0, 0x0cf) AM_READWRITE(reg_lo_addr_r,reg_lo_addr_w)
 	AM_RANGE(0x100, 0x105) AM_WRITE(cmd_trigger_w)
+	AM_RANGE(0x1b0, 0x1b1) AM_READ(status_r)
+	AM_RANGE(0x1b2, 0x1b3) AM_READ(dist_r)
+	AM_RANGE(0x1b4, 0x1b5) AM_READ(angle_r)
 ADDRESS_MAP_END
 
 seibu_cop_bootleg_device::seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -216,66 +258,4 @@ READ16_MEMBER( seibu_cop_bootleg_device::copdxbl_0_r )
 WRITE16_MEMBER( seibu_cop_bootleg_device::copdxbl_0_w )
 {
 	write_word(offset,data);
-	
-	switch((offset+0x400)/2)
-	{
-		default:
-		{
-			//logerror("%06x: COPX unhandled write data %04x at offset %04x\n", space.device().safe_pc(), data, offset*2+0x400);
-			break;
-		}
-
-		#if 0
-		case (0x500/2):
-		case (0x502/2):
-		case (0x504/2):
-			switch(m_cop_mcu_ram[offset])
-			{
-				case 0x130e:
-				case 0x138e:
-				{
-					int dy = m_host_space.read_dword(m_reg[1]+4) - m_host_space.read_dword(m_reg[0]+4);
-					int dx = m_host_space.read_dword(m_reg[1]+8) - m_host_space.read_dword(m_reg[0]+8);
-
-					m_raiden2cop->cop_status = 7;
-					if(!dx) {
-						m_raiden2cop->cop_status |= 0x8000;
-						m_raiden2cop->cop_angle = 0;
-					} else {
-						m_raiden2cop->cop_angle = atan(double(dy)/double(dx)) * 128.0 / M_PI;
-						if(dx<0)
-							m_raiden2cop->cop_angle += 0x80;
-					}
-
-					m_dy = dy;
-					m_dx = dx;
-
-					if(m_cop_mcu_ram[offset] & 0x80)
-						m_host_space.write_word(m_reg[0]+(0x34^2), m_raiden2cop->cop_angle);
-
-					break;
-				}
-				case 0x3b30:
-				case 0x3bb0:
-				{
-					int dy = m_raiden2cop->m_LEGACY_r0;
-					int dx = m_raiden2cop->m_LEGACY_r1;
-
-					dx >>= 16;
-					dy >>= 16;
-					m_raiden2cop->cop_dist = sqrt((double)(dx*dx+dy*dy));
-
-					if(m_cop_mcu_ram[offset] & 0x80)
-						m_host_space.write_word(m_reg[0]+(0x38), m_raiden2cop->cop_dist);
-
-					break;
-				}
-				default:
-					printf("%04x\n",m_cop_mcu_ram[offset]);
-					break;
-			}
-			break;
-		#endif
-
-	}
 }
