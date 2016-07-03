@@ -60,7 +60,6 @@ public:
 	
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(seicupbl);
 	DECLARE_WRITE8_MEMBER(okim_rombank_w);
 	DECLARE_WRITE8_MEMBER(sound_cmd_w);
 	DECLARE_WRITE16_MEMBER(vram_sc0_w);
@@ -276,6 +275,7 @@ UINT32 seicupbl_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->black_pen(), cliprect);    /* wrong color? */
 
+	// compared to regular CRTC, it looks like it mixes the two values instead (hence the -0x1f0)
 	for(int i=0;i<4;i++)
 	{
 		m_sc_layer[i]->set_scrollx(0, m_vregs[i*2+0] - 0x1f0);
@@ -325,9 +325,6 @@ WRITE16_MEMBER(seicupbl_state::vram_sc3_w)
 static ADDRESS_MAP_START( cupsocbl_mem, AS_PROGRAM, 16, seicupbl_state )
 //	AM_IMPORT_FROM( legionna_cop_mem )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	//AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	//AM_RANGE(0x100600, 0x10060f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)//?
-	//AM_RANGE(0x100640, 0x10067f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	AM_RANGE(0x100400, 0x1005ff) AM_DEVREADWRITE("seibucop_boot", seibu_cop_bootleg_device, copdxbl_0_r,copdxbl_0_w) AM_SHARE("cop_mcu_ram")
 	AM_RANGE(0x100660, 0x10066f) AM_RAM AM_SHARE("vregs")
 	AM_RANGE(0x100700, 0x100701) AM_READ_PORT("DSW1")
@@ -341,14 +338,10 @@ static ADDRESS_MAP_START( cupsocbl_mem, AS_PROGRAM, 16, seicupbl_state )
 	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(vram_sc1_w) AM_SHARE("mid_data")
 	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(vram_sc3_w) AM_SHARE("textram")
 	AM_RANGE(0x103000, 0x103fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x104000, 0x104fff) AM_RAM
-	AM_RANGE(0x105000, 0x106fff) AM_RAM
+	AM_RANGE(0x104000, 0x106fff) AM_RAM
 	AM_RANGE(0x107000, 0x1077ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x107800, 0x107fff) AM_RAM
-	AM_RANGE(0x108000, 0x10ffff) AM_RAM
-	AM_RANGE(0x110000, 0x119fff) AM_RAM
-	AM_RANGE(0x11a000, 0x11dfff) AM_RAM
-	AM_RANGE(0x11e000, 0x11ffff) AM_RAM 
+	AM_RANGE(0x108000, 0x11ffff) AM_RAM
 ADDRESS_MAP_END
 
 WRITE8_MEMBER(seicupbl_state::okim_rombank_w)
@@ -490,32 +483,11 @@ static INPUT_PORTS_START( cupsoc )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ RGN_FRAC(0,1) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-static GFXDECODE_START( seicupbl )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
-GFXDECODE_END
-
-
 void seicupbl_state::machine_start()
 {
 }
 
 void seicupbl_state::machine_reset()
-{
-}
-
-
-PALETTE_INIT_MEMBER(seicupbl_state, seicupbl)
 {
 }
 
