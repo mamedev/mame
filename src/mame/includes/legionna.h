@@ -93,6 +93,7 @@ public:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void descramble_legionnaire_gfx(UINT8* src);
 	void common_video_start();
+	void common_video_allocate_ptr();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<seibu_sound_device> m_seibu_sound;
