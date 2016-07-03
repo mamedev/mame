@@ -1977,36 +1977,6 @@ void device_debug::set_instruction_hook(debug_instruction_hook_func hook)
 
 
 //-------------------------------------------------
-//  disassemble - disassemble a line at a given
-//  PC on a given device
-//-------------------------------------------------
-
-offs_t device_debug::disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram) const
-{
-	if (m_disasm == nullptr)
-		return 0;
-
-	// if we have a disassembler, run it
-	offs_t result = m_disasm->disassemble(buffer, pc, oprom, opram, 0);
-
-	// make sure we get good results
-	assert((result & DASMFLAG_LENGTHMASK) != 0);
-#ifdef MAME_DEBUG
-	if (m_memory != nullptr)
-	{
-		address_space &space = m_memory->space(AS_PROGRAM);
-		int bytes = space.address_to_byte(result & DASMFLAG_LENGTHMASK);
-		assert(bytes >= m_disasm->min_opcode_bytes());
-		assert(bytes <= m_disasm->max_opcode_bytes());
-		(void) bytes; // appease compiler
-	}
-#endif
-
-	return result;
-}
-
-
-//-------------------------------------------------
 //  ignore - ignore/observe a given device
 //-------------------------------------------------
 
@@ -2653,10 +2623,14 @@ UINT32 device_debug::compute_opcode_crc32(offs_t pc) const
 		argbuf[numbytes] = m_device.machine().debugger().cpu().read_opcode(space, pcbyte + numbytes, 1);
 	}
 
-	// disassemble to our buffer
-	char diasmbuf[200];
-	memset(diasmbuf, 0x00, 200);
-	UINT32 numbytes = disassemble(diasmbuf, pc, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
+	UINT32 numbytes = maxbytes;
+	if (m_disasm != nullptr)
+	{
+		// disassemble to our buffer
+		char diasmbuf[200];
+		memset(diasmbuf, 0x00, 200);
+		numbytes = m_disasm->disassemble(diasmbuf, pc, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
+	}
 
 	// return a CRC of the exact count of opcode bytes
 	return core_crc32(0, opbuf, numbytes);
@@ -3054,7 +3028,7 @@ UINT32 device_debug::dasm_wrapped(std::string &buffer, offs_t pc)
 	// disassemble to our buffer
 	char diasmbuf[200];
 	memset(diasmbuf, 0x00, 200);
-	UINT32 result = disassemble(diasmbuf, pc, opbuf, argbuf);
+	UINT32 result = m_disasm->disassemble(diasmbuf, pc, opbuf, argbuf);
 	buffer.assign(diasmbuf);
 	return result;
 }

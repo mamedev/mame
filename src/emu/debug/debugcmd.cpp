@@ -2391,7 +2391,7 @@ void debugger_commands::execute_dasm(int ref, int params, const char *param[])
 			}
 
 			/* disassemble the result */
-			i += numbytes = space->device().debug()->disassemble(disasm, offset + i, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
+			i += numbytes = dasmintf->disassemble(disasm, offset + i, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
 		}
 
 		/* print the bytes */
@@ -2544,7 +2544,12 @@ void debugger_commands::execute_history(int ref, int params, const char *param[]
 
 	/* loop over lines */
 	device_disasm_interface *dasmintf;
-	int maxbytes = space->device().interface(dasmintf) ? dasmintf->max_opcode_bytes() : 1;
+	if (!space->device().interface(dasmintf))
+	{
+		m_console.printf("No disassembler available for %s\n", space->device().name());
+		return;
+	}
+	int maxbytes = dasmintf->max_opcode_bytes();
 	for (int index = 0; index < (int) count; index++)
 	{
 		offs_t pc = debug->history_pc(-index);
@@ -2559,7 +2564,7 @@ void debugger_commands::execute_history(int ref, int params, const char *param[]
 		}
 
 		char buffer[200];
-		debug->disassemble(buffer, pc, opbuf, argbuf);
+		dasmintf->disassemble(buffer, pc, opbuf, argbuf);
 
 		m_console.printf("%0*X: %s\n", space->logaddrchars(), pc, buffer);
 	}

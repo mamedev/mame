@@ -185,9 +185,6 @@ public:
 	// hooks into our operations
 	void set_instruction_hook(debug_instruction_hook_func hook);
 
-	// disassembly
-	offs_t disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram) const;
-
 	// debugger focus
 	void ignore(bool ignore = true);
 	bool observing() const { return ((m_flags & DEBUG_FLAG_OBSERVING) != 0); }
