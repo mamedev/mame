@@ -9,10 +9,11 @@ A down-grade of the Seibu SPI Hardware with SH-2 as main cpu.
 driver by Angelo Salese & Nicola Salmoria
 
 TODO:
-- Add SRAM;
-- Add hoppers;
-- Add lamps;
-- Real Time Clock emulation (uses a JRC 6355E / NJU6355E)
+- Make RTC writes actually go through (SH2 interrupt/timing issue?)
+- Determine what buttons 5-7 actually do
+- Find out where the NVRAM maps to
+- Layout including lamps
+- Add hopper, etc.
 
 ============================================================================
 
@@ -67,6 +68,7 @@ U0564 LH28F800SU OBJ4-1
 #include "machine/seibuspi.h"
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
+#include "machine/rtc4543.h"
 
 
 class feversoc_state : public driver_device
@@ -79,6 +81,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
 		m_eeprom(*this, "eeprom"),
+		m_rtc(*this, "rtc"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
@@ -93,6 +96,7 @@ public:
 	required_device<sh2_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<jrc6355e_device> m_rtc;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };
@@ -157,10 +161,22 @@ WRITE32_MEMBER(feversoc_state::output_w)
 		m_eeprom->di_write((data & 0x80000000) ? 1 : 0);
 		m_eeprom->clk_write((data & 0x40000000) ? ASSERT_LINE : CLEAR_LINE);
 		m_eeprom->cs_write((data & 0x20000000) ? ASSERT_LINE : CLEAR_LINE);
+
+		m_rtc->data_w((data & 0x08000000) ? 1 : 0);
+		m_rtc->wr_w((data & 0x04000000) ? ASSERT_LINE : CLEAR_LINE);
+		m_rtc->clk_w((data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE);
+		m_rtc->ce_w((data & 0x01000000) ? ASSERT_LINE : CLEAR_LINE);
 	}
 	if(ACCESSING_BITS_0_15)
 	{
-		/* -xxx xxxx lamps*/
+		machine().output().set_lamp_value(1, BIT(data, 0)); // LAMP1
+		machine().output().set_lamp_value(2, BIT(data, 1)); // LAMP2
+		machine().output().set_lamp_value(3, BIT(data, 2)); // LAMP3
+		machine().output().set_lamp_value(4, BIT(data, 3)); // LAMP4
+		machine().output().set_lamp_value(5, BIT(data, 4)); // LAMP5
+		machine().output().set_lamp_value(6, BIT(data, 5)); // LAMP6
+		machine().output().set_lamp_value(7, BIT(data, 6)); // LAMP7
+
 		machine().bookkeeping().coin_counter_w(2,data & 0x2000); //key in
 		//data & 0x4000 key out
 	}
@@ -206,11 +222,9 @@ static INPUT_PORTS_START( feversoc )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) //hopper i/o
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper") PORT_TOGGLE PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED ) //PORT_NAME("Slottle") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("rtc", rtc4543_device, data_r)
 	PORT_DIPNAME( 0x0100, 0x0100, "DIP 1-1" )
 	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
@@ -236,13 +250,13 @@ static INPUT_PORTS_START( feversoc )
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 (BTN1)") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop 2 (BTN2)") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop 3 (BTN3)") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Bet (BTN4)") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B) // ?
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_N) // ?
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_CODE(KEYCODE_M) // ?
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 (BTN1)")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop 2 (BTN2)")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop 3 (BTN3)")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Bet (BTN4)")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("BTN5") // ?
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("BTN6") // ?
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_HALF ) PORT_NAME("BTN7") // ?
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Reset")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -280,6 +294,7 @@ static MACHINE_CONFIG_START( feversoc, feversoc_state )
 
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
 
+	MCFG_JRC6355E_ADD("rtc", XTAL_32_768kHz)
 MACHINE_CONFIG_END
 
 /***************************************************************************
