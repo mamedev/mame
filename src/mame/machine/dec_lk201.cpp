@@ -559,10 +559,11 @@ void lk201_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 			m_speaker->set_state(0);
 			m_beep_state = 0;  // ready for new beep.
-
-		} else
+		} 
+		else
+		{	
 			m_beeper->adjust(attotime::from_msec(20));
-		
+		} 
 		break;
 
 	default:
@@ -579,7 +580,7 @@ void lk201_device::rcv_complete()
 	m_kbd_state = get_received_char();
 //	printf("\nlk201 got %02x\n", m_kbd_state);
 
-	if(m_kbd_state == 0xfd)
+	if (m_kbd_state == 0xfd)
 		m_reset_done = 1;
 }
 
@@ -623,7 +624,7 @@ READ8_MEMBER( lk201_device::timer_r )
 		break;
 	}
 
-	if(m_timer.tsr)
+	if (m_timer.tsr)
 	{
 		m_timer.tsr = 0;
 		m_maincpu->set_input_line(M68HC05EG_INT_TIMER, CLEAR_LINE);
