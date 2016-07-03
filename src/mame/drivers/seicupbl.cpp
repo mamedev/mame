@@ -27,6 +27,7 @@ public:
 			m_fore_data(*this, "fore_data"),
 			m_mid_data(*this, "mid_data"),
 			m_textram(*this, "textram"),
+			m_spriteram(*this, "spriteram"),
 			m_oki(*this, "oki"),
 			m_soundlatch(*this, "soundlatch"),
 			m_gfxdecode(*this, "gfxdecode"),
@@ -36,10 +37,11 @@ public:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_shared_ptr <UINT16> m_back_data;
-	required_shared_ptr <UINT16> m_fore_data;
-	required_shared_ptr <UINT16> m_mid_data;
-	required_shared_ptr <UINT16> m_textram;
+	required_shared_ptr<UINT16> m_back_data;
+	required_shared_ptr<UINT16> m_fore_data;
+	required_shared_ptr<UINT16> m_mid_data;
+	required_shared_ptr<UINT16> m_textram;
+	required_shared_ptr<UINT16> m_spriteram;
 	required_device<okim6295_device> m_oki;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -63,12 +65,16 @@ public:
 	TILE_GET_INFO_MEMBER(get_sc1_tileinfo);
 	TILE_GET_INFO_MEMBER(get_sc2_tileinfo);
 	TILE_GET_INFO_MEMBER(get_sc3_tileinfo);
+	
 protected:
 	// driver_device overrides
 	virtual void machine_start();
 	virtual void machine_reset();
 
 	virtual void video_start();
+	
+private:
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 };
 
 TILE_GET_INFO_MEMBER(seicupbl_state::get_sc0_tileinfo)
@@ -115,6 +121,138 @@ TILE_GET_INFO_MEMBER(seicupbl_state::get_sc3_tileinfo)
 	SET_TILE_INFO_MEMBER(0,tile,color,0);
 }
 
+void seicupbl_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
+{
+	UINT16 *spriteram16 = m_spriteram;
+	int offs,fx,fy,x,y,color,sprite,cur_pri;
+	int dx,dy,ax,ay;
+	int pri_mask;
+
+	for (offs = 0;offs < 0x400;offs += 4)
+	{
+		UINT16 data = spriteram16[offs];
+		if (!(data &0x8000)) continue;
+
+		pri_mask = 0;
+
+		cur_pri = (spriteram16[offs+1] & 0xc000) >> 14;
+
+		if(data & 0x0040)
+			cur_pri |= 0x4; // definitely seems to be needed by grainbow
+
+		//
+		// -4 behind bg? (mask sprites)
+		// -32 behind mid
+		// -256 behind tx
+		// 0    above all
+
+		// is the low bit REALLY priority?
+
+		#if 0
+		switch (cur_pri)
+		{
+			case 0: pri_mask = -256; break; // gumdam swamp monster l2
+			case 1: pri_mask = -256; break; // cupsoc
+			case 2: pri_mask = -4; break; // masking effect for gundam l2 monster
+			case 3: pri_mask = -4; break; // cupsoc (not sure what..)
+			case 4: pri_mask = -32; break; // gundam level 2/3 player
+			//case 5: pri_mask = 0; break;
+			case 6: pri_mask = 0; break; // insert coin in gundam
+			//case 7: pri_mask = 0; break;
+
+			default: printf("unhandled pri %d\n",cur_pri); pri_mask=0;
+		}
+		#endif
+		pri_mask = 0;
+
+		sprite = spriteram16[offs+1];
+
+		sprite &= 0x3fff;
+
+		y = spriteram16[offs+3];
+		x = spriteram16[offs+2];
+
+		/* heated barrel hardware seems to need 0x1ff with 0x100 sign bit for sprite warp,
+		   this doesn't work on denjin makai as the visible area is larger */
+		if (cliprect.max_x<(320-1))
+		{
+			x&=0x1ff;
+			y&=0x1ff;
+
+			if (x&0x100) x-=0x200;
+			if (y&0x100) y-=0x200;
+		}
+		else
+		{
+			x&=0xfff;
+			y&=0xfff;
+
+			if (x&0x800) x-=0x1000;
+			if (y&0x800) y-=0x1000;
+
+		}
+
+
+		color = (data &0x3f) + 0x40;
+		fx =  (data &0x4000) >> 14;
+		fy =  (data &0x2000) >> 13;
+		dy = ((data &0x0380) >> 7)  + 1;
+		dx = ((data &0x1c00) >> 10) + 1;
+
+		if (!fx)
+		{
+			if(!fy)
+			{
+				for (ax=0; ax<dx; ax++)
+					for (ay=0; ay<dy; ay++)
+					{
+						m_gfxdecode->gfx(3)->prio_transpen(bitmap,cliprect,
+						sprite++,
+						color,fx,fy,(x+ax*16),y+ay*16,
+						screen.priority(),pri_mask, 15);
+					}
+			}
+			else
+			{
+				for (ax=0; ax<dx; ax++)
+					for (ay=0; ay<dy; ay++)
+					{
+						m_gfxdecode->gfx(3)->prio_transpen(bitmap,cliprect,
+						sprite++,
+						color,fx,fy,(x+ax*16),y+(dy-ay-1)*16,
+						screen.priority(),pri_mask,15);
+					}
+			}
+		}
+		else
+		{
+			if(!fy)
+			{
+				for (ax=0; ax<dx; ax++)
+					for (ay=0; ay<dy; ay++)
+					{
+						m_gfxdecode->gfx(3)->prio_transpen(bitmap,cliprect,
+						sprite++,
+						color,fx,fy,(x+(dx-ax-1)*16)+0,y+ay*16,
+						screen.priority(),pri_mask,15);
+					}
+			}
+			else
+			{
+				for (ax=0; ax<dx; ax++)
+					for (ay=0; ay<dy; ay++)
+					{
+						m_gfxdecode->gfx(3)->prio_transpen(bitmap,cliprect,
+						sprite++,
+						color,fx,fy,(x+(dx-ax-1)*16)+0,y+(dy-ay-1)*16,
+						screen.priority(),pri_mask, 15);
+					}
+			}
+		}
+	}
+}
+
+
 void seicupbl_state::video_start()
 {
 	m_background_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seicupbl_state::get_sc0_tileinfo),this),TILEMAP_SCAN_ROWS,16,16,32,32);
@@ -140,7 +278,7 @@ UINT32 seicupbl_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 	/*if (!(m_layer_disable&0x0008)) */m_text_layer->draw(screen, bitmap, cliprect, 0, 4);
 
 	//if (!(m_layer_disable&0x0010))
-	//	draw_sprites(screen,bitmap,cliprect);
+		draw_sprites(screen,bitmap,cliprect);
 	return 0;
 }
 
@@ -195,12 +333,12 @@ static ADDRESS_MAP_START( cupsocbl_mem, AS_PROGRAM, 16, seicupbl_state )
 	AM_RANGE(0x103000, 0x103fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x104000, 0x104fff) AM_RAM
 	AM_RANGE(0x105000, 0x106fff) AM_RAM
-//	AM_RANGE(0x107000, 0x1077ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x107800, 0x107fff) AM_RAM /*Ani Dsp(?) Ram*/
+	AM_RANGE(0x107000, 0x1077ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x107800, 0x107fff) AM_RAM
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM
 	AM_RANGE(0x110000, 0x119fff) AM_RAM
 	AM_RANGE(0x11a000, 0x11dfff) AM_RAM
-	AM_RANGE(0x11e000, 0x11ffff) AM_RAM /*Stack Ram*/
+	AM_RANGE(0x11e000, 0x11ffff) AM_RAM 
 ADDRESS_MAP_END
 
 WRITE8_MEMBER(seicupbl_state::okim_rombank_w)
