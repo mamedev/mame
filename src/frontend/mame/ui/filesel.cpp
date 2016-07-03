@@ -53,24 +53,25 @@ namespace ui {
 //  into a buffer
 //-------------------------------------------------
 
-template <std::size_t N, typename F>
-static void input_character(char (&buffer)[N], unicode_char unichar, F &&filter)
+template <typename F>
+static void input_character(std::string &buffer, unicode_char unichar, F &&filter)
 {
-	auto buflen = std::strlen(buffer);
+	auto buflen = buffer.size();
 
 	if ((unichar == 8) || (unichar == 0x7f))
 	{
+		// backspace
 		if (0 < buflen)
-			*const_cast<char *>(utf8_previous_char(&buffer[buflen])) = 0;
+		{
+			auto buffer_oldend = buffer.c_str() + buflen;
+			auto buffer_newend = utf8_previous_char(buffer_oldend);
+			buffer.resize(buffer_newend - buffer.c_str());
+		}
 	}
 	else if ((unichar >= ' ') && (!filter || filter(unichar)))
 	{
-		auto const chlen = utf8_from_uchar(&buffer[buflen], N - buflen - 1, unichar);
-		if (0 <= chlen)
-		{
-			buflen += chlen;
-			buffer[buflen] = 0;
-		}
+		// append this character
+		buffer += utf8_from_uchar(unichar);
 	}
 }
 
@@ -175,7 +176,11 @@ menu_file_create::menu_file_create(mame_ui_manager &mui, render_container *conta
 	m_ok = ok;
 	*m_ok = true;
 	auto const sep = current_file.rfind(PATH_SEPARATOR);
-	std::strncpy(m_filename_buffer, current_file.c_str() + ((std::string::npos == sep) ? 0 : (sep + 1)), sizeof(m_filename_buffer));
+
+	m_filename.reserve(1024);
+	m_filename = sep != std::string::npos
+		? current_file.substr(sep + strlen(PATH_SEPARATOR), current_file.size() - sep - strlen(PATH_SEPARATOR))
+		: current_file;
 }
 
 
@@ -208,19 +213,19 @@ void menu_file_create::populate()
 {
 	std::string buffer;
 	const image_device_format *format;
-	const char *new_image_name;
+	const std::string *new_image_name;
 
 	// append the "New Image Name" item
 	if (get_selection() == ITEMREF_NEW_IMAGE_NAME)
 	{
-		buffer.append(m_filename_buffer).append("_");
-		new_image_name = buffer.c_str();
+		buffer = m_filename + "_";
+		new_image_name = &buffer;
 	}
 	else
 	{
-		new_image_name = m_filename_buffer;
+		new_image_name = &m_filename;
 	}
-	item_append(_("New Image Name:"), new_image_name, 0, ITEMREF_NEW_IMAGE_NAME);
+	item_append(_("New Image Name:"), *new_image_name, 0, ITEMREF_NEW_IMAGE_NAME);
 
 	// do we support multiple formats?
 	if (ENABLE_FORMATS) format = m_image->formatlist().front().get();
@@ -256,10 +261,10 @@ void menu_file_create::handle()
 		case IPT_UI_SELECT:
 			if ((event->itemref == ITEMREF_CREATE) || (event->itemref == ITEMREF_NEW_IMAGE_NAME))
 			{
-				std::string tmp_file(m_filename_buffer);
+				std::string tmp_file(m_filename);
 				if (tmp_file.find(".") != -1 && tmp_file.find(".") < tmp_file.length() - 1)
 				{
-					m_current_file = m_filename_buffer;
+					m_current_file = m_filename;
 					menu::stack_pop(machine());
 				}
 				else
@@ -270,7 +275,7 @@ void menu_file_create::handle()
 		case IPT_SPECIAL:
 			if (get_selection() == ITEMREF_NEW_IMAGE_NAME)
 			{
-				input_character(m_filename_buffer,event->unichar, &is_valid_filename_char);
+				input_character(m_filename, event->unichar, &is_valid_filename_char);
 				reset(reset_options::REMEMBER_POSITION);
 			}
 			break;
@@ -340,7 +345,7 @@ void menu_file_selector::custom_render(void *selectedref, float top, float botto
 		// we're hovering over a directory!  highlight it
 		auto target_dir_start = m_current_directory.rfind(PATH_SEPARATOR, hit_start) + 1;
 		auto target_dir_end = m_current_directory.find(PATH_SEPARATOR, hit_start + hit_span);
-		m_hover_directory = m_current_directory.substr(0, target_dir_end);
+		m_hover_directory = m_current_directory.substr(0, target_dir_end + strlen(PATH_SEPARATOR));
 
 		// highlight the text in question
 		rgb_t fgcolor = UI_MOUSEOVER_COLOR;
@@ -674,34 +679,33 @@ void menu_file_selector::handle()
 			}
 
 			// reset the char buffer when pressing IPT_UI_SELECT
-			if (m_filename_buffer[0] != '\0')
-				memset(m_filename_buffer, '\0', ARRAY_LENGTH(m_filename_buffer));
+			m_filename.clear();
 		}
 		else if (event->iptkey == IPT_SPECIAL)
 		{
-			auto const buflen = std::strlen(m_filename_buffer);
-			bool update_selected = FALSE;
+			bool update_selected = false;
 
 			if ((event->unichar == 8) || (event->unichar == 0x7f))
 			{
 				// if it's a backspace and we can handle it, do so
+				auto const buflen = m_filename.size();
 				if (0 < buflen)
 				{
-					*const_cast<char *>(utf8_previous_char(&m_filename_buffer[buflen])) = 0;
-					update_selected = TRUE;
+					auto buffer_oldend = m_filename.c_str() + buflen;
+					auto buffer_newend = utf8_previous_char(buffer_oldend);
+					m_filename.resize(buffer_newend - m_filename.c_str());
+					update_selected = true;
 
-					ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
+					ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename.c_str());
 				}
 			}
 			else if (event->is_char_printable())
 			{
 				// if it's any other key and we're not maxed out, update
-				if (event->append_char(m_filename_buffer, buflen))
-				{
-					update_selected = TRUE;
+				m_filename += utf8_from_uchar(event->unichar);
+				update_selected = true;
 
-					ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
-				}
+				ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename.c_str());
 			}
 
 			if (update_selected)
@@ -714,9 +718,9 @@ void menu_file_selector::handle()
 					if (cur_selected != &entry)
 					{
 						int match = 0;
-						for (int i = 0; i < ARRAY_LENGTH(m_filename_buffer); i++)
+						for (int i = 0; i < m_filename.size(); i++)
 						{
-							if (core_strnicmp(entry.basename.c_str(), m_filename_buffer, i) == 0)
+							if (core_strnicmp(entry.basename.c_str(), m_filename.c_str(), i) == 0)
 								match = i;
 						}
 
@@ -738,8 +742,7 @@ void menu_file_selector::handle()
 		else if (event->iptkey == IPT_UI_CANCEL)
 		{
 			// reset the char buffer also in this case
-			if (m_filename_buffer[0] != '\0')
-				memset(m_filename_buffer, '\0', ARRAY_LENGTH(m_filename_buffer));
+			m_filename.clear();
 		}
 	}
 }
