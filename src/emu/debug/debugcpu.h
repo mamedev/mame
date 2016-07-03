@@ -508,9 +508,6 @@ public:
 
 	/* ----- debugger memory accessors ----- */
 
-	/* return the physical address corresponding to the given logical address */
-	bool translate(address_space &space, int intention, offs_t *address);
-
 	/* return a byte from the specified memory space */
 	UINT8 read_byte(address_space &space, offs_t address, int apply_translation);
 

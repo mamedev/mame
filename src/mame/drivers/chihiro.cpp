@@ -377,7 +377,6 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 #include "video/poly.h"
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
-#include "debug/debugcpu.h"
 #include "debugger.h"
 #include "includes/chihiro.h"
 #include "includes/xbox.h"
@@ -506,7 +505,7 @@ St.     Instr.       Comment
 void chihiro_state::jamtable_disasm(address_space &space, UINT32 address, UINT32 size) // 0xff000080 == fff00080
 {
 	offs_t addr = (offs_t)address;
-	if (!machine().debugger().cpu().translate(space, TRANSLATE_READ_DEBUG, &addr))
+	if (!space.device().memory().translate(space.spacenum(), TRANSLATE_READ_DEBUG, addr))
 	{
 		machine().debugger().console().printf("Address is unmapped.\n");
 		return;

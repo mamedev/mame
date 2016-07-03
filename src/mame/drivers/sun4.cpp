@@ -406,7 +406,6 @@
 
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
-#include "debug/debugcpu.h"
 #include "debugger.h"
 
 #define TIMEKEEPER_TAG  "timekpr"

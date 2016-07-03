@@ -269,7 +269,7 @@ offs_t debug_view_disasm::find_pc_backwards(offs_t targetpc, int numinstrs)
 
 			// get the disassembly, but only if mapped
 			instlen = 1;
-			if (machine().debugger().cpu().translate(source.m_space, TRANSLATE_FETCH, &physpcbyte))
+			if (source.m_space.device().memory().translate(source.m_space.spacenum(), TRANSLATE_FETCH, physpcbyte))
 			{
 				char dasmbuffer[100];
 				instlen = source.m_disasmintf->disassemble(dasmbuffer, scanpc, &opbuf[1000 + scanpcbyte - targetpcbyte], &argbuf[1000 + scanpcbyte - targetpcbyte]) & DASMFLAG_LENGTHMASK;
@@ -395,7 +395,7 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 		char buffer[100];
 		int numbytes = 0;
 		offs_t physpcbyte = pcbyte;
-		if (machine().debugger().cpu().translate(source.m_space, TRANSLATE_FETCH_DEBUG, &physpcbyte))
+		if (source.m_space.device().memory().translate(source.m_space.spacenum(), TRANSLATE_FETCH_DEBUG, physpcbyte))
 		{
 			UINT8 opbuf[64], argbuf[64];
 

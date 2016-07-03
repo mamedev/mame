@@ -349,24 +349,6 @@ bool debugger_cpu::comment_load(bool is_inline)
 
 
 /***************************************************************************
-    MEMORY AND DISASSEMBLY HELPERS
-***************************************************************************/
-
-/*-------------------------------------------------
-    translate - return the physical address
-    corresponding to the given logical address
--------------------------------------------------*/
-
-bool debugger_cpu::translate(address_space &space, int intention, offs_t *address)
-{
-	device_memory_interface *memory;
-	if (space.device().interface(memory))
-		return memory->translate(space.spacenum(), intention, *address);
-	return true;
-}
-
-
-/***************************************************************************
     DEBUGGER MEMORY ACCESSORS
 ***************************************************************************/
 
@@ -377,6 +359,8 @@ bool debugger_cpu::translate(address_space &space, int intention, offs_t *addres
 
 UINT8 debugger_cpu::read_byte(address_space &space, offs_t address, int apply_translation)
 {
+	device_memory_interface &memory = space.device().memory();
+
 	/* mask against the logical byte mask */
 	address &= space.logbytemask();
 
@@ -387,11 +371,11 @@ UINT8 debugger_cpu::read_byte(address_space &space, offs_t address, int apply_tr
 	/* translate if necessary; if not mapped, return 0xff */
 	UINT64 custom;
 	UINT8 result;
-	if (apply_translation && !translate(space, TRANSLATE_READ_DEBUG, &address))
+	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
 	{
 		result = 0xff;
 	}
-	else if (space.device().memory().read(space.spacenum(), address, 1, custom))
+	else if (memory.read(space.spacenum(), address, 1, custom))
 	{   /* if there is a custom read handler, and it returns true, use that value */
 		result = custom;
 	}
@@ -431,6 +415,7 @@ UINT16 debugger_cpu::read_word(address_space &space, offs_t address, int apply_t
 	}
 	else
 	{   /* otherwise, this proceeds like the byte case */
+		device_memory_interface &memory = space.device().memory();
 
 		/* all accesses from this point on are for the debugger */
 		m_debugger_access = true;
@@ -438,11 +423,11 @@ UINT16 debugger_cpu::read_word(address_space &space, offs_t address, int apply_t
 
 		/* translate if necessary; if not mapped, return 0xffff */
 		UINT64 custom;
-		if (apply_translation && !translate(space, TRANSLATE_READ_DEBUG, &address))
+		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
 		{
 			result = 0xffff;
 		}
-		else if (space.device().memory().read(space.spacenum(), address, 2, custom))
+		else if (memory.read(space.spacenum(), address, 2, custom))
 		{   /* if there is a custom read handler, and it returns true, use that value */
 			result = custom;
 		}
@@ -484,17 +469,18 @@ UINT32 debugger_cpu::read_dword(address_space &space, offs_t address, int apply_
 	}
 	else
 	{   /* otherwise, this proceeds like the byte case */
+		device_memory_interface &memory = space.device().memory();
 
 		/* all accesses from this point on are for the debugger */
 		m_debugger_access = true;
 		space.set_debugger_access(true);
 
 		UINT64 custom;
-		if (apply_translation && !translate(space, TRANSLATE_READ_DEBUG, &address))
+		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
 		{   /* translate if necessary; if not mapped, return 0xffffffff */
 			result = 0xffffffff;
 		}
-		else if (space.device().memory().read(space.spacenum(), address, 4, custom))
+		else if (memory.read(space.spacenum(), address, 4, custom))
 		{   /* if there is a custom read handler, and it returns true, use that value */
 			result = custom;
 		}
@@ -536,6 +522,7 @@ UINT64 debugger_cpu::read_qword(address_space &space, offs_t address, int apply_
 	}
 	else
 	{   /* otherwise, this proceeds like the byte case */
+		device_memory_interface &memory = space.device().memory();
 
 		/* all accesses from this point on are for the debugger */
 		m_debugger_access = true;
@@ -543,11 +530,11 @@ UINT64 debugger_cpu::read_qword(address_space &space, offs_t address, int apply_
 
 		/* translate if necessary; if not mapped, return 0xffffffffffffffff */
 		UINT64 custom;
-		if (apply_translation && !translate(space, TRANSLATE_READ_DEBUG, &address))
+		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
 		{
 			result = ~(UINT64)0;
 		}
-		else if (space.device().memory().read(space.spacenum(), address, 8, custom))
+		else if (memory.read(space.spacenum(), address, 8, custom))
 		{   /* if there is a custom read handler, and it returns true, use that value */
 			result = custom;
 		}
@@ -591,6 +578,8 @@ UINT64 debugger_cpu::read_memory(address_space &space, offs_t address, int size,
 
 void debugger_cpu::write_byte(address_space &space, offs_t address, UINT8 data, int apply_translation)
 {
+	device_memory_interface &memory = space.device().memory();
+
 	/* mask against the logical byte mask */
 	address &= space.logbytemask();
 
@@ -599,11 +588,11 @@ void debugger_cpu::write_byte(address_space &space, offs_t address, UINT8 data, 
 	space.set_debugger_access(true);
 
 	/* translate if necessary; if not mapped, we're done */
-	if (apply_translation && !translate(space, TRANSLATE_WRITE_DEBUG, &address))
+	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
 		;
 
 	/* if there is a custom write handler, and it returns true, use that */
-	else if (space.device().memory().write(space.spacenum(), address, 1, data))
+	else if (memory.write(space.spacenum(), address, 1, data))
 		;
 
 	/* otherwise, call the byte reading function for the translated address */
@@ -646,16 +635,18 @@ void debugger_cpu::write_word(address_space &space, offs_t address, UINT16 data,
 	/* otherwise, this proceeds like the byte case */
 	else
 	{
+		device_memory_interface &memory = space.device().memory();
+
 		/* all accesses from this point on are for the debugger */
 		m_debugger_access = true;
 		space.set_debugger_access(true);
 
 		/* translate if necessary; if not mapped, we're done */
-		if (apply_translation && !translate(space, TRANSLATE_WRITE_DEBUG, &address))
+		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
 			;
 
 		/* if there is a custom write handler, and it returns true, use that */
-		else if (space.device().memory().write(space.spacenum(), address, 2, data))
+		else if (memory.write(space.spacenum(), address, 2, data))
 			;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -699,15 +690,17 @@ void debugger_cpu::write_dword(address_space &space, offs_t address, UINT32 data
 	/* otherwise, this proceeds like the byte case */
 	else
 	{
+		device_memory_interface &memory = space.device().memory();
+
 		/* all accesses from this point on are for the debugger */
 		space.set_debugger_access(m_debugger_access = true);
 
 		/* translate if necessary; if not mapped, we're done */
-		if (apply_translation && !translate(space, TRANSLATE_WRITE_DEBUG, &address))
+		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
 			;
 
 		/* if there is a custom write handler, and it returns true, use that */
-		else if (space.device().memory().write(space.spacenum(), address, 4, data))
+		else if (memory.write(space.spacenum(), address, 4, data))
 			;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -751,16 +744,18 @@ void debugger_cpu::write_qword(address_space &space, offs_t address, UINT64 data
 	/* otherwise, this proceeds like the byte case */
 	else
 	{
+		device_memory_interface &memory = space.device().memory();
+
 		/* all accesses from this point on are for the debugger */
 		m_debugger_access = true;
 		space.set_debugger_access(true);
 
 		/* translate if necessary; if not mapped, we're done */
-		if (apply_translation && !translate(space, TRANSLATE_WRITE_DEBUG, &address))
+		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
 			;
 
 		/* if there is a custom write handler, and it returns true, use that */
-		else if (space.device().memory().write(space.spacenum(), address, 8, data))
+		else if (memory.write(space.spacenum(), address, 8, data))
 			;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -800,6 +795,8 @@ void debugger_cpu::write_memory(address_space &space, offs_t address, UINT64 dat
 
 UINT64 debugger_cpu::read_opcode(address_space &space, offs_t address, int size)
 {
+	device_memory_interface &memory = space.device().memory();
+
 	UINT64 result = ~(UINT64)0 & (~(UINT64)0 >> (64 - 8*size)), result2;
 
 	/* keep in logical range */
@@ -808,8 +805,7 @@ UINT64 debugger_cpu::read_opcode(address_space &space, offs_t address, int size)
 	/* return early if we got the result directly */
 	m_debugger_access = true;
 	space.set_debugger_access(true);
-	device_memory_interface *memory;
-	if (space.device().interface(memory) && memory->readop(address, size, result2))
+	if (memory.readop(address, size, result2))
 	{
 		m_debugger_access = false;
 		space.set_debugger_access(false);
@@ -830,7 +826,7 @@ UINT64 debugger_cpu::read_opcode(address_space &space, offs_t address, int size)
 	}
 
 	/* translate to physical first */
-	if (!translate(space, TRANSLATE_FETCH_DEBUG, &address))
+	if (!memory.translate(space.spacenum(), TRANSLATE_FETCH_DEBUG, address))
 		return result;
 
 	/* keep in physical range */
