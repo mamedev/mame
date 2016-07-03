@@ -101,6 +101,7 @@ public:
 		m_p_rowscroll(*this, "p_rowscroll"),
 		m_p_palette(*this, "p_palette"),
 		m_p_spriteram(*this, "p_spriteram"),
+		m_bank(*this, "cart"),
 		m_bios_rom(*this, "bios"),
 		m_io_p1(*this, "P1")
 	{ }
@@ -118,8 +119,7 @@ public:
 	required_shared_ptr<UINT16> m_p_rowscroll;
 	required_shared_ptr<UINT16> m_p_palette;
 	required_shared_ptr<UINT16> m_p_spriteram;
-
-	std::vector<UINT16> m_p_cart;
+	required_memory_bank m_bank;
 
 	UINT32 m_current_bank;
 
@@ -585,10 +585,7 @@ void vii_state::switch_bank(UINT32 bank)
 	if (bank != m_current_bank)
 	{
 		m_current_bank = bank;
-		if (m_cart_rom)
-			memcpy(&m_p_cart[0], m_cart_rom->base() + 0x400000 * bank * 2, 0x400000 * 2);
-		else
-			memcpy(&m_p_cart[0], m_bios_rom->base() + 0x400000 * bank * 2, 0x400000 * 2);
+		m_bank->set_entry(bank);
 	}
 }
 
@@ -892,11 +889,6 @@ WRITE16_MEMBER( vii_state::spriteram_w )
 }
 */
 
-READ16_MEMBER( vii_state::rom_r )
-{
-	return m_p_cart[offset + 0x4000];
-}
-
 static ADDRESS_MAP_START( vii_mem, AS_PROGRAM, 16, vii_state )
 	AM_RANGE( 0x000000, 0x0027ff ) AM_RAM AM_SHARE("p_ram")
 	AM_RANGE( 0x002800, 0x0028ff ) AM_READWRITE(video_r, video_w)
@@ -905,7 +897,7 @@ static ADDRESS_MAP_START( vii_mem, AS_PROGRAM, 16, vii_state )
 	AM_RANGE( 0x002c00, 0x002fff ) AM_RAM AM_SHARE("p_spriteram")
 	AM_RANGE( 0x003000, 0x0037ff ) AM_READWRITE(audio_r, audio_w)
 	AM_RANGE( 0x003d00, 0x003eff ) AM_READWRITE(io_r,    io_w)
-	AM_RANGE( 0x004000, 0x3fffff ) AM_READ(rom_r)
+	AM_RANGE( 0x000000, 0x3fffff ) AM_ROMBANK("cart")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( vii )
@@ -1020,18 +1012,23 @@ void vii_state::machine_start()
 	m_controller_input[6] = 0xff;
 	m_controller_input[7] = 0;
 
-	m_p_cart.resize(0x400000);
-
 	if (m_cart && m_cart->exists())
 	{
 		std::string region_tag;
 		m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-		memcpy(&m_p_cart[0], m_cart_rom->base(), 0x400000 * 2);
+		m_bank->configure_entries(0, ceilf((float)m_cart_rom->bytes()/0x800000), m_cart_rom->base(), 0x800000 );
+		m_bank->set_entry(0);
 	}
 	else if (m_spg243_mode == SPG243_VII)   // Vii bios is banked
-		memcpy(&m_p_cart[0], m_bios_rom->base(), 0x400000 * 2);
+	{
+		m_bank->configure_entries(0, ceilf((float)m_bios_rom->bytes()/0x800000), m_bios_rom->base(), 0x800000 );
+		m_bank->set_entry(0);
+	}
 	else
-		memcpy(&m_p_cart[0], memregion("maincpu")->base(), 0x400000 * 2);
+	{
+		m_bank->configure_entries(0, ceilf((float)memregion("maincpu")->bytes()/0x800000), memregion("maincpu")->base(), 0x800000 );
+		m_bank->set_entry(0);
+	}
 
 	m_video_regs[0x36] = 0xffff;
 	m_video_regs[0x37] = 0xffff;
