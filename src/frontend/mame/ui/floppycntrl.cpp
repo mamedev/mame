@@ -93,8 +93,8 @@ void menu_control_floppy_image::hook_load(std::string filename, bool softlist)
 		else
 			can_in_place = false;
 	}
-	submenu_result = -1;
-	menu::stack_push<menu_select_rw>(ui(), container, can_in_place, &submenu_result);
+	submenu_result.rw = menu_select_rw::result::INVALID;
+	menu::stack_push<menu_select_rw>(ui(), container, can_in_place, &submenu_result.rw);
 	state = SELECT_RW;
 }
 
@@ -119,49 +119,49 @@ void menu_control_floppy_image::handle()
 			if (!i->extension_matches(m_current_file.c_str()))
 				format_array[total_usable++] = i;
 		}
-		submenu_result = -1;
-		menu::stack_push<menu_select_format>(ui(), container, format_array, ext_match, total_usable, &submenu_result);
+		submenu_result.i = -1;
+		menu::stack_push<menu_select_format>(ui(), container, format_array, ext_match, total_usable, &submenu_result.i);
 
 		state = SELECT_FORMAT;
 		break;
 	}
 
 	case SELECT_FORMAT:
-		if(submenu_result == -1) {
+		if(submenu_result.i == -1) {
 			state = START_FILE;
 			handle();
 		} else {
 			output_filename = util::zippath_combine(m_current_directory.c_str(), m_current_file.c_str());
-			output_format = format_array[submenu_result];
+			output_format = format_array[submenu_result.i];
 			do_load_create();
 			menu::stack_pop(machine());
 		}
 		break;
 
 	case SELECT_RW:
-		switch(submenu_result) {
-		case menu_select_rw::READONLY:
+		switch(submenu_result.rw) {
+		case menu_select_rw::result::READONLY:
 			do_load_create();
 			menu::stack_pop(machine());
 			break;
 
-		case menu_select_rw::READWRITE:
+		case menu_select_rw::result::READWRITE:
 			output_format = input_format;
 			do_load_create();
 			menu::stack_pop(machine());
 			break;
 
-		case menu_select_rw::WRITE_DIFF:
+		case menu_select_rw::result::WRITE_DIFF:
 			machine().popmessage("Sorry, diffs are not supported yet\n");
 			menu::stack_pop(machine());
 			break;
 
-		case menu_select_rw::WRITE_OTHER:
+		case menu_select_rw::result::WRITE_OTHER:
 			menu::stack_push<menu_file_create>(ui(), container, image, m_current_directory, m_current_file, &create_ok);
 			state = CHECK_CREATE;
 			break;
 
-		case -1:
+		case menu_select_rw::result::INVALID:
 			state = START_FILE;
 			break;
 		}

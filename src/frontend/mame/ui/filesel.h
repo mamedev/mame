@@ -21,8 +21,16 @@ namespace ui {
 class menu_file_selector : public menu
 {
 public:
-	enum { R_EMPTY, R_SOFTLIST, R_CREATE, R_FILE };
-	menu_file_selector(mame_ui_manager &mui, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool has_empty, bool has_softlist, bool has_create, int *result);
+	enum class result
+	{
+		INVALID = -1,
+		EMPTY = 0x1000,
+		SOFTLIST,
+		CREATE,
+		FILE
+	};
+
+	menu_file_selector(mame_ui_manager &mui, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool has_empty, bool has_softlist, bool has_create, result *result);
 	virtual ~menu_file_selector() override;
 	virtual void populate() override;
 	virtual void handle() override;
@@ -56,7 +64,7 @@ private:
 	bool                        m_has_empty;
 	bool                        m_has_softlist;
 	bool                        m_has_create;
-	int *                       m_result;
+	result *                    m_result;
 	std::vector<file_selector_entry>	m_entrylist;
 	std::string                 m_hover_directory;
 	std::string					m_filename;
@@ -75,9 +83,16 @@ private:
 class menu_select_rw : public menu
 {
 public:
-	enum { READONLY, READWRITE, WRITE_OTHER, WRITE_DIFF };
+	enum class result
+	{
+		INVALID = -1,
+		READONLY = 0x3000,
+		READWRITE,
+		WRITE_OTHER,
+		WRITE_DIFF
+	};
 	menu_select_rw(mame_ui_manager &mui, render_container *container,
-						bool can_in_place, int *result);
+						bool can_in_place, result *result);
 	virtual ~menu_select_rw() override;
 	virtual void populate() override;
 	virtual void handle() override;
@@ -85,7 +100,7 @@ public:
 private:
 	// internal state
 	bool        m_can_in_place;
-	int *       m_result;
+	result *    m_result;
 };
 
 } // namespace ui

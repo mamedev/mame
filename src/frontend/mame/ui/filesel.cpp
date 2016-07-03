@@ -44,7 +44,7 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-menu_file_selector::menu_file_selector(mame_ui_manager &mui, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool has_empty, bool has_softlist, bool has_create, int *result)
+menu_file_selector::menu_file_selector(mame_ui_manager &mui, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool has_empty, bool has_softlist, bool has_create, menu_file_selector::result *result)
 	: menu(mui, container)
 	, m_current_directory(current_directory)
 	, m_current_file(current_file)
@@ -391,18 +391,18 @@ void menu_file_selector::handle()
 			{
 			case SELECTOR_ENTRY_TYPE_EMPTY:
 				// empty slot - unload
-				*m_result = R_EMPTY;
+				*m_result = result::EMPTY;
 				menu::stack_pop(machine());
 				break;
 
 			case SELECTOR_ENTRY_TYPE_CREATE:
 				// create
-				*m_result = R_CREATE;
+				*m_result = result::CREATE;
 				menu::stack_pop(machine());
 				break;
 
 			case SELECTOR_ENTRY_TYPE_SOFTWARE_LIST:
-				*m_result = R_SOFTLIST;
+				*m_result = result::SOFTLIST;
 				menu::stack_pop(machine());
 				break;
 
@@ -423,7 +423,7 @@ void menu_file_selector::handle()
 			case SELECTOR_ENTRY_TYPE_FILE:
 				// file
 				m_current_file.assign(entry->fullpath);
-				*m_result = R_FILE;
+				*m_result = result::FILE;
 				menu::stack_pop(machine());
 				break;
 			}
@@ -508,7 +508,7 @@ void menu_file_selector::handle()
 //-------------------------------------------------
 
 menu_select_rw::menu_select_rw(mame_ui_manager &mui, render_container *container,
-										bool can_in_place, int *result)
+										bool can_in_place, result *result)
 	: menu(mui, container)
 {
 	m_can_in_place = can_in_place;
@@ -532,11 +532,11 @@ menu_select_rw::~menu_select_rw()
 void menu_select_rw::populate()
 {
 	item_append(_("Select access mode"), "", FLAG_DISABLE, nullptr);
-	item_append(_("Read-only"), "", 0, (void *)READONLY);
+	item_append(_("Read-only"), "", 0, (void *) result::READONLY);
 	if (m_can_in_place)
-		item_append(_("Read-write"), "", 0, (void *)READWRITE);
-	item_append(_("Read this image, write to another image"), "", 0, (void *)WRITE_OTHER);
-	item_append(_("Read this image, write to diff"), "", 0, (void *)WRITE_DIFF);
+		item_append(_("Read-write"), "", 0, (void *)result::READWRITE);
+	item_append(_("Read this image, write to another image"), "", 0, (void *)result::WRITE_OTHER);
+	item_append(_("Read this image, write to diff"), "", 0, (void *)result::WRITE_DIFF);
 }
 
 
@@ -550,7 +550,7 @@ void menu_select_rw::handle()
 	const event *event = process(0);
 	if (event != nullptr && event->iptkey == IPT_UI_SELECT)
 	{
-		*m_result = int(FPTR(event->itemref));
+		*m_result = result(FPTR(event->itemref));
 		menu::stack_pop(machine());
 	}
 }
