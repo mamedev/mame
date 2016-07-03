@@ -23,22 +23,46 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
+			m_back_data(*this, "back_data"),
+			m_fore_data(*this, "fore_data"),
+			m_mid_data(*this, "mid_data"),
+			m_textram(*this, "textram"),
 			m_oki(*this, "oki"),
-			m_soundlatch(*this, "soundlatch")
+			m_soundlatch(*this, "soundlatch"),
+			m_gfxdecode(*this, "gfxdecode"),
+			m_palette(*this, "palette")
 	{ }
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_shared_ptr <UINT16> m_back_data;
+	required_shared_ptr <UINT16> m_fore_data;
+	required_shared_ptr <UINT16> m_mid_data;
+	required_shared_ptr <UINT16> m_textram;
 	required_device<okim6295_device> m_oki;
-	optional_device<generic_latch_8_device> m_soundlatch;
-
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	
+	tilemap_t *m_background_layer;
+	tilemap_t *m_foreground_layer;
+	tilemap_t *m_midground_layer;
+	tilemap_t *m_text_layer;
+	
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(seicupbl);
 	DECLARE_WRITE8_MEMBER(okim_rombank_w);
 	DECLARE_WRITE8_MEMBER(sound_cmd_w);
-	
+	DECLARE_WRITE16_MEMBER(vram_sc0_w);
+	DECLARE_WRITE16_MEMBER(vram_sc1_w);
+	DECLARE_WRITE16_MEMBER(vram_sc2_w);
+	DECLARE_WRITE16_MEMBER(vram_sc3_w);
+	TILE_GET_INFO_MEMBER(get_sc0_tileinfo);
+	TILE_GET_INFO_MEMBER(get_sc1_tileinfo);
+	TILE_GET_INFO_MEMBER(get_sc2_tileinfo);
+	TILE_GET_INFO_MEMBER(get_sc3_tileinfo);
 protected:
 	// driver_device overrides
 	virtual void machine_start();
@@ -47,12 +71,76 @@ protected:
 	virtual void video_start();
 };
 
+TILE_GET_INFO_MEMBER(seicupbl_state::get_sc0_tileinfo)
+{
+	int tile=m_back_data[tile_index];
+	int color=(tile>>12)&0xf;
+
+	tile &= 0xfff;
+	//tile |= m_back_gfx_bank;        /* Heatbrl uses banking */
+
+	SET_TILE_INFO_MEMBER(1,tile,color,0);
+}
+
+TILE_GET_INFO_MEMBER(seicupbl_state::get_sc1_tileinfo)
+{
+	int tile=m_mid_data[tile_index];
+	int color=(tile>>12)&0xf;
+
+	tile &= 0xfff;
+
+	tile |= 0x1000;
+	color += 0x10;
+
+	SET_TILE_INFO_MEMBER(1,tile,color,0);
+}
+
+TILE_GET_INFO_MEMBER(seicupbl_state::get_sc2_tileinfo)
+{
+	int tile=m_fore_data[tile_index];
+	int color=(tile>>12)&0xf;
+
+	tile &= 0xfff;
+
+	SET_TILE_INFO_MEMBER(4,tile,color,0);
+}
+
+TILE_GET_INFO_MEMBER(seicupbl_state::get_sc3_tileinfo)
+{
+	int tile = m_textram[tile_index];
+	int color=(tile>>12)&0xf;
+
+	tile &= 0xfff;
+
+	SET_TILE_INFO_MEMBER(0,tile,color,0);
+}
+
 void seicupbl_state::video_start()
 {
+	m_background_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seicupbl_state::get_sc0_tileinfo),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_midground_layer =  &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seicupbl_state::get_sc1_tileinfo),this), TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_foreground_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seicupbl_state::get_sc2_tileinfo),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_text_layer =       &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seicupbl_state::get_sc3_tileinfo),this),TILEMAP_SCAN_ROWS,  8,8,64,32);
+
+	m_background_layer->set_transparent_pen(15);
+	m_midground_layer->set_transparent_pen(15);
+	m_foreground_layer->set_transparent_pen(15);
+	m_text_layer->set_transparent_pen(15);
 }
 
 UINT32 seicupbl_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
+	/* Setup the tilemaps */
+	screen.priority().fill(0, cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);    /* wrong color? */
+
+	/*if (!(m_layer_disable&0x0001)) */m_midground_layer->draw(screen, bitmap, cliprect, 0, 0);
+	/*if (!(m_layer_disable&0x0002)) */m_background_layer->draw(screen, bitmap, cliprect, 0, 1);
+	/*if (!(m_layer_disable&0x0004)) */m_foreground_layer->draw(screen, bitmap, cliprect, 0, 2);
+	/*if (!(m_layer_disable&0x0008)) */m_text_layer->draw(screen, bitmap, cliprect, 0, 4);
+
+	//if (!(m_layer_disable&0x0010))
+	//	draw_sprites(screen,bitmap,cliprect);
 	return 0;
 }
 
@@ -60,6 +148,30 @@ WRITE8_MEMBER(seicupbl_state::sound_cmd_w)
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
+}
+
+WRITE16_MEMBER(seicupbl_state::vram_sc0_w)
+{
+	COMBINE_DATA(&m_back_data[offset]);
+	m_background_layer->mark_tile_dirty(offset);
+}
+
+WRITE16_MEMBER(seicupbl_state::vram_sc1_w)
+{
+	COMBINE_DATA(&m_mid_data[offset]);
+	m_midground_layer->mark_tile_dirty(offset);
+}
+
+WRITE16_MEMBER(seicupbl_state::vram_sc2_w)
+{
+	COMBINE_DATA(&m_fore_data[offset]);
+	m_foreground_layer->mark_tile_dirty(offset);
+}
+
+WRITE16_MEMBER(seicupbl_state::vram_sc3_w)
+{
+	COMBINE_DATA(&m_textram[offset]);
+	m_text_layer->mark_tile_dirty(offset);
 }
 
 static ADDRESS_MAP_START( cupsocbl_mem, AS_PROGRAM, 16, seicupbl_state )
@@ -74,11 +186,12 @@ static ADDRESS_MAP_START( cupsocbl_mem, AS_PROGRAM, 16, seicupbl_state )
 	AM_RANGE(0x100704, 0x100705) AM_READ_PORT("PLAYERS12")
 	AM_RANGE(0x100708, 0x100709) AM_READ_PORT("PLAYERS34")
 	AM_RANGE(0x10070c, 0x10070d) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x10071c, 0x10071d) AM_READ_PORT("DSW2")
 	AM_RANGE(0x100740, 0x100741) AM_WRITE8(sound_cmd_w,0x00ff)
-//	AM_RANGE(0x100800, 0x100fff) AM_RAM // _WRITE(legionna_background_w) AM_SHARE("back_data")
-//	AM_RANGE(0x101000, 0x1017ff) AM_RAM // _WRITE(legionna_foreground_w) AM_SHARE("fore_data")
-//	AM_RANGE(0x101800, 0x101fff) AM_RAM // _WRITE(legionna_midground_w) AM_SHARE("mid_data")
-//	AM_RANGE(0x102000, 0x102fff) AM_RAM // _WRITE(legionna_text_w) AM_SHARE("textram")
+	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(vram_sc0_w) AM_SHARE("back_data")
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(vram_sc2_w) AM_SHARE("fore_data")
+	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(vram_sc1_w) AM_SHARE("mid_data")
+	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(vram_sc3_w) AM_SHARE("textram")
 	AM_RANGE(0x103000, 0x103fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x104000, 0x104fff) AM_RAM
 	AM_RANGE(0x105000, 0x106fff) AM_RAM
