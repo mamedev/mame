@@ -140,11 +140,12 @@ static void parse_parent_path(const char *path, int *beginpos, int *endpos)
 //	zippath_parent - retrieves the parent directory
 // -------------------------------------------------
 
-std::string &zippath_parent(std::string &dst, const char *path)
+std::string zippath_parent(const char *path)
 {
 	int pos;
 	parse_parent_path(path, &pos, nullptr);
 
+	std::string dst;
 	if (pos >= 0)
 		dst.assign(path, pos + 1);
 	else
@@ -170,8 +171,9 @@ std::string &zippath_parent(std::string &dst, const char *path)
  * @return  A std::string&amp;
  */
 
-std::string &zippath_parent_basename(std::string &dst, const char *path)
+std::string zippath_parent_basename(const char *path)
 {
+	std::string dst;
 	int beginpos, endpos;
 	parse_parent_path(path, &beginpos, &endpos);
 	dst.copy((char*)(path + beginpos + 1), endpos - beginpos);
@@ -196,15 +198,16 @@ std::string &zippath_parent_basename(std::string &dst, const char *path)
  * @return  A std::string&amp;
  */
 
-std::string &zippath_combine(std::string &dst, const char *path1, const char *path2)
+std::string zippath_combine(const char *path1, const char *path2)
 {
+	std::string dst;
 	if (!strcmp(path2, "."))
 	{
 		dst.assign(path1);
 	}
 	else if (!strcmp(path2, ".."))
 	{
-		zippath_parent(dst, path1);
+		dst = zippath_parent(path1);
 	}
 	else if (osd_is_absolute_path(path2))
 	{
@@ -401,8 +404,7 @@ osd_file::error zippath_fopen(const char *filename, UINT32 openflags, util::core
 		if (filerr != osd_file::error::NONE)
 		{
 			/* go up a directory */
-			std::string temp;
-			zippath_parent(temp, mainpath.c_str());
+			auto temp = zippath_parent(mainpath.c_str());
 
 			/* append to the sub path */
 			if (subpath.length() > 0)
@@ -714,8 +716,7 @@ static osd_file::error zippath_resolve(const char *path, osd::directory::entry::
 			// if we have not found the file or directory, go up
 			current_entry_type = osd::directory::entry::entry_type::NONE;
 			went_up = true;
-			std::string parent;
-			apath = zippath_parent(parent, apath.c_str());
+			apath = zippath_parent(apath.c_str());
 		}
 	}
 	while ((current_entry_type == osd::directory::entry::entry_type::NONE) && !is_root(apath.c_str()));

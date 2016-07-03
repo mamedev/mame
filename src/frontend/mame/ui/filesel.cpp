@@ -228,7 +228,7 @@ menu_file_selector::file_selector_entry *menu_file_selector::append_dirent_entry
 	}
 
 	// determine the full path
-	util::zippath_combine(buffer, m_current_directory.c_str(), dirent->name);
+	buffer = util::zippath_combine(m_current_directory.c_str(), dirent->name);
 
 	// create the file selector entry
 	entry = &append_entry(

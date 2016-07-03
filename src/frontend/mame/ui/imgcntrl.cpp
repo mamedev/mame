@@ -61,7 +61,7 @@ menu_control_device_image::menu_control_device_image(mame_ui_manager &mui, rende
 		if (image->exists())
 		{
 			current_file.assign(image->filename());
-			util::zippath_parent(current_directory, current_file.c_str());
+			current_directory = util::zippath_parent(current_file.c_str());
 		} else
 			current_directory.assign(image->working_directory());
 
@@ -87,11 +87,10 @@ menu_control_device_image::~menu_control_device_image()
 
 void menu_control_device_image::test_create(bool &can_create, bool &need_confirm)
 {
-	std::string path;
 	osd::directory::entry::entry_type file_type;
 
 	/* assemble the full path */
-	util::zippath_combine(path, current_directory.c_str(), current_file.c_str());
+	auto path = util::zippath_combine(current_directory.c_str(), current_file.c_str());
 
 	/* does a file or a directory exist at the path */
 	auto entry = osd_stat(path.c_str());
@@ -323,8 +322,7 @@ void menu_control_device_image::handle()
 		break;
 
 	case DO_CREATE: {
-		std::string path;
-		util::zippath_combine(path, current_directory.c_str(), current_file.c_str());
+		auto path = util::zippath_combine(current_directory.c_str(), current_file.c_str());
 		int err = image->create(path.c_str(), nullptr, nullptr);
 		if (err != 0)
 			machine().popmessage("Error: %s", image->error());

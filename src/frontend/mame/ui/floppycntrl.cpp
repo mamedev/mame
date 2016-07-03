@@ -131,7 +131,7 @@ void menu_control_floppy_image::handle()
 			state = START_FILE;
 			handle();
 		} else {
-			util::zippath_combine(output_filename, current_directory.c_str(), current_file.c_str());
+			output_filename = util::zippath_combine(current_directory.c_str(), current_file.c_str());
 			output_format = format_array[submenu_result];
 			do_load_create();
 			menu::stack_pop(machine());
