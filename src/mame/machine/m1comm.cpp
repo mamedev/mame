@@ -65,7 +65,7 @@ Notes:
 static ADDRESS_MAP_START( m1comm_mem, AS_PROGRAM, 8, m1comm_device )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xC000, 0xffff) AM_READWRITE(share_r, share_w)
+	AM_RANGE(0xc000, 0xffff) AM_READWRITE(share_r, share_w)
 ADDRESS_MAP_END
 
 /*************************************
@@ -73,11 +73,10 @@ ADDRESS_MAP_END
  *************************************/
 static ADDRESS_MAP_START( m1comm_io, AS_IO, 8, m1comm_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1F) AM_READWRITE(dlc_reg_r, dlc_reg_w)
-	AM_RANGE(0x20, 0x2F) AM_READWRITE(dma_reg_r, dma_reg_w)
+	AM_RANGE(0x00, 0x1f) AM_READWRITE(dlc_reg_r, dlc_reg_w)
+	AM_RANGE(0x20, 0x2f) AM_READWRITE(dma_reg_r, dma_reg_w)
 	AM_RANGE(0x40, 0x40) AM_READWRITE(syn_r, syn_w)
 	AM_RANGE(0x60, 0x60) AM_READWRITE(zfg_r, zfg_w)
-	AM_RANGE(0xFFFF, 0xFFFF) AM_RAM
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_FRAGMENT( m1comm )
@@ -88,7 +87,7 @@ MACHINE_CONFIG_END
 
 ROM_START( m1comm )
 	ROM_REGION( 0x20000, Z80_TAG, ROMREGION_ERASEFF )
-	ROM_LOAD( "epr-15112.17", 0x0000, 0x20000, CRC(4950E771) )
+	ROM_LOAD( "epr-15112.17", 0x0000, 0x20000, CRC(4950e771) )
 ROM_END
 
 //**************************************************************************
@@ -173,7 +172,7 @@ READ8_MEMBER(m1comm_device::dlc_reg_r)
 	if (!m_cn)
 	{
 		device_reset();
-		return 0xFF;
+		return 0xff;
 	}
 	// dirty hack to keep Z80 in RESET state
 
@@ -211,7 +210,7 @@ WRITE8_MEMBER(m1comm_device::dma_reg_w)
 
 READ8_MEMBER(m1comm_device::syn_r)
 {
-	UINT8 result = m_syn | 0xFC;
+	UINT8 result = m_syn | 0xfc;
 #ifdef __M1COMM_VERBOSE__
 	osd_printf_verbose("m1comm-syn_r: read register %02x for value %02x\n", offset, result);
 #endif

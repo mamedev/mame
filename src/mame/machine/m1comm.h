@@ -69,13 +69,13 @@ private:
 	UINT8 m_shared[0x1000]; // 2x 2k = 4k; model1 accesses this with 16bit data and 11bit address (A0 to A10)
 	UINT8 m_dlc_reg[0x20];  // MB89374 registers
 	UINT8 m_dma_reg[0x20];  // MB89237A registers
-	UINT8   m_syn;                      // bit0 is stored; purpose unknown, bit1 is used to enable/disable VINT/IRQ5
-	UINT8   m_zfg;                      // z80 flip gate? purpose unknown, bit0 is stored
-	UINT8   m_cn;                           // bit0 is used to enable/disable the comm board
-	UINT8   m_fg;                           // flip gate? purpose unknown, bit0 is stored, bit7 is connected to ZFG bit 0
+	UINT8 m_syn;            // bit0 is used to sync the video boards over network, bit1 is used to enable/disable VINT/IRQ5
+	UINT8 m_zfg;            // z80 flip gate. purpose unknown, bit0 is stored
+	UINT8 m_cn;             // bit0 is used to enable/disable the comm board
+	UINT8 m_fg;             // v60 flip gate. purpose unknown, bit0 is stored, bit7 is connected to ZFG bit 0
 
-	emu_file m_line_rx;    // rx line - can be either differential, simple serial or toslink
-	emu_file m_line_tx;    // tx line - is differential, simple serial and toslink
+	emu_file m_line_rx;     // rx line - can be either differential, simple serial or toslink
+	emu_file m_line_tx;     // tx line - is differential, simple serial and toslink
 	char m_localhost[256];
 	char m_remotehost[256];
 	UINT8 m_buffer[0x1000];
