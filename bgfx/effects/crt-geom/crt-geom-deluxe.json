@@ -1,0 +1,43 @@
+{
+    "blend": {
+    	"equation": "add",
+    	"srcColor": "1",
+    	"dstColor": "0",
+    	"srcAlpha": "1",
+    	"dstAlpha": "0"
+    },
+    "depth": {
+    	"function": "always",
+    	"writeenable": false
+    },
+    "cull": {
+    	"mode": "none"
+    },
+    "write": {
+    	"rgb": true,
+    	"alpha": true
+    },
+    "vertex": "chains/crt-geom/vs_crt-geom",
+    "fragment": "chains/crt-geom/fs_crt-geom-deluxe",
+    "uniforms": [
+	{ "name": "u_tex_size0",     "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
+	{ "name": "u_tex_size1",     "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
+	{ "name": "u_quad_dims",     "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
+	{ "name": "u_rotation_type", "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },
+	{ "name": "mpass_texture",  "type": "int",  "values": [ 0 ] },
+	{ "name": "mask_texture",   "type": "int",  "values": [ 1 ] },
+	{ "name": "blur_texture",   "type": "int",  "values": [ 1 ] },
+     	{ "name": "curvature",      "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] }, 
+     	{ "name": "CRTgamma",       "type": "vec4", "values": [ 2.4, 0.0, 0.0, 0.0 ] }, 
+     	{ "name": "monitorgamma",   "type": "vec4", "values": [ 2.2, 0.0, 0.0, 0.0 ] },
+     	{ "name": "overscan",       "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
+     	{ "name": "aspect",         "type": "vec4", "values": [ 1.0, 0.75,0.0, 0.0 ] },
+     	{ "name": "d",              "type": "vec4", "values": [ 2.0, 0.0, 0.0, 0.0 ] },
+    	{ "name": "R",              "type": "vec4", "values": [ 3.5, 0.0, 0.0, 0.0 ] },
+     	{ "name": "angle",          "type": "vec4", "values": [ 0.0,-0.05,0.0, 0.0 ] },
+     	{ "name": "cornersize",     "type": "vec4", "values": [ 0.01,0.0, 0.0, 0.0 ] },
+     	{ "name": "cornersmooth",   "type": "vec4", "values": [ 1000.0,0.0,0.0,0.0 ] },
+     	{ "name": "aperture_strength",   "type": "vec4", "values": [ 0.25,0.0,0.0,0.0 ] },
+     	{ "name": "halation",   "type": "vec4", "values": [ 0.1,0.0,0.0,0.0 ] }
+    ]
+}
