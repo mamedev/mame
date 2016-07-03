@@ -24,8 +24,8 @@ const device_type SEIBU_COP_BOOTLEG = &device_creator<seibu_cop_bootleg_device>;
 
 seibu_cop_bootleg_device::seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEIBU_COP_BOOTLEG, "Seibu COP (Bootleg)", tag, owner, clock, "seibu_cop_boot", __FILE__),
-	m_cop_mcu_ram(nullptr),
-	m_raiden2cop(*this, ":raiden2cop")
+	m_cop_mcu_ram(nullptr)
+	//m_raiden2cop(*this, ":raiden2cop")
 {
 }
 
@@ -72,25 +72,11 @@ READ16_MEMBER( seibu_cop_bootleg_device::copdxbl_0_r )
 			logerror("%06x: COPX unhandled read returning %04x from offset %04x\n", space.device().safe_pc(), retvalue, offset*2);
 			return retvalue;
 		}
-
-
-
-		//case (0x47e/2):
-		//case (0x5b0/2):
-		//case (0x5b4/2):
-		//  return m_cop_mcu_ram[offset];
-
-		case (0x700/2): return space.machine().root_device().ioport("DSW1")->read();
-		case (0x704/2): return space.machine().root_device().ioport("PLAYERS12")->read();
-		case (0x708/2): return space.machine().root_device().ioport("PLAYERS34")->read();
-		case (0x70c/2): return space.machine().root_device().ioport("SYSTEM")->read();
-		case (0x71c/2): return space.machine().root_device().ioport("DSW2")->read();
 	}
 }
 
 WRITE16_MEMBER( seibu_cop_bootleg_device::copdxbl_0_w )
 {
-	legionna_state *state = space.machine().driver_data<legionna_state>();
 	COMBINE_DATA(&m_cop_mcu_ram[offset]);
 
 	switch(offset)
@@ -101,7 +87,7 @@ WRITE16_MEMBER( seibu_cop_bootleg_device::copdxbl_0_w )
 			break;
 		}
 
-
+		#if 0
 		case (0x500/2):
 		case (0x502/2):
 		case (0x504/2):
@@ -209,12 +195,6 @@ WRITE16_MEMBER( seibu_cop_bootleg_device::copdxbl_0_w )
 		case (0x66a/2): { state->m_scrollram16[5] = m_cop_mcu_ram[offset]; break; }
 		case (0x66c/2): { state->m_scrollram16[6] = m_cop_mcu_ram[offset] - 0x1f0; break; }
 		case (0x66e/2): { state->m_scrollram16[7] = m_cop_mcu_ram[offset]; break; }
-
-		case (0x740/2):
-		{
-			state->m_soundlatch->write(space, 0, data & 0xff);
-			state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
-			break;
-		}
+		#endif
 	}
 }

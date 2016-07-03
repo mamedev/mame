@@ -23,7 +23,6 @@ public:
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch"),
 		m_raiden2cop(*this, "raiden2cop")
 	{
 		memset(scrollvals, 0, sizeof(UINT16)*6);
@@ -60,7 +59,6 @@ public:
 	DECLARE_WRITE16_MEMBER(legionna_midground_w);
 	DECLARE_WRITE16_MEMBER(legionna_foreground_w);
 	DECLARE_WRITE16_MEMBER(legionna_text_w);
-	DECLARE_WRITE8_MEMBER(okim_rombank_w);
 	DECLARE_READ16_MEMBER(sound_comms_r);
 	DECLARE_WRITE16_MEMBER(sound_comms_w);
 	DECLARE_WRITE16_MEMBER(denjinmk_setgfxbank);
@@ -100,7 +98,6 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<raiden2cop_device> m_raiden2cop;
 };
 
