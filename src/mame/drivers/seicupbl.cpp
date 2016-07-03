@@ -2,8 +2,15 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-Template for skeleton drivers
+	Seibu Cup Soccer bootlegs
 
+	Splitted since it definitely doesn't use neither real COP nor CRTC
+	
+	
+	TODO:
+	- tilemap chip drawings might be merged between this and other 
+      Seibu implementations.	
+	
 ***************************************************************************/
 
 
@@ -28,6 +35,7 @@ public:
 			m_mid_data(*this, "mid_data"),
 			m_textram(*this, "textram"),
 			m_spriteram(*this, "spriteram"),
+			m_vregs(*this, "vregs"),
 			m_oki(*this, "oki"),
 			m_soundlatch(*this, "soundlatch"),
 			m_gfxdecode(*this, "gfxdecode"),
@@ -42,15 +50,13 @@ public:
 	required_shared_ptr<UINT16> m_mid_data;
 	required_shared_ptr<UINT16> m_textram;
 	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_vregs;
 	required_device<okim6295_device> m_oki;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	
-	tilemap_t *m_background_layer;
-	tilemap_t *m_foreground_layer;
-	tilemap_t *m_midground_layer;
-	tilemap_t *m_text_layer;
+	tilemap_t *m_sc_layer[4];
 	
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -255,15 +261,13 @@ void seicupbl_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 
 void seicupbl_state::video_start()
 {
-	m_background_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seicupbl_state::get_sc0_tileinfo),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_midground_layer =  &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seicupbl_state::get_sc1_tileinfo),this), TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_foreground_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seicupbl_state::get_sc2_tileinfo),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_text_layer =       &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seicupbl_state::get_sc3_tileinfo),this),TILEMAP_SCAN_ROWS,  8,8,64,32);
+	m_sc_layer[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seicupbl_state::get_sc0_tileinfo),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_sc_layer[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seicupbl_state::get_sc1_tileinfo),this), TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_sc_layer[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seicupbl_state::get_sc2_tileinfo),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_sc_layer[3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seicupbl_state::get_sc3_tileinfo),this),TILEMAP_SCAN_ROWS,  8,8,64,32);
 
-	m_background_layer->set_transparent_pen(15);
-	m_midground_layer->set_transparent_pen(15);
-	m_foreground_layer->set_transparent_pen(15);
-	m_text_layer->set_transparent_pen(15);
+	for(int i=0;i<4;i++)
+		m_sc_layer[i]->set_transparent_pen(15);
 }
 
 UINT32 seicupbl_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -272,10 +276,16 @@ UINT32 seicupbl_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->black_pen(), cliprect);    /* wrong color? */
 
-	/*if (!(m_layer_disable&0x0001)) */m_midground_layer->draw(screen, bitmap, cliprect, 0, 0);
-	/*if (!(m_layer_disable&0x0002)) */m_background_layer->draw(screen, bitmap, cliprect, 0, 1);
-	/*if (!(m_layer_disable&0x0004)) */m_foreground_layer->draw(screen, bitmap, cliprect, 0, 2);
-	/*if (!(m_layer_disable&0x0008)) */m_text_layer->draw(screen, bitmap, cliprect, 0, 4);
+	for(int i=0;i<4;i++)
+	{
+		m_sc_layer[i]->set_scrollx(0, m_vregs[i*2+0] - 0x1f0);
+		m_sc_layer[i]->set_scrolly(0, m_vregs[i*2+1]);
+	}
+	
+	/*if (!(m_layer_disable&0x0001)) */m_sc_layer[0]->draw(screen, bitmap, cliprect, 0, 0);
+	/*if (!(m_layer_disable&0x0002)) */m_sc_layer[1]->draw(screen, bitmap, cliprect, 0, 1);
+	/*if (!(m_layer_disable&0x0004)) */m_sc_layer[2]->draw(screen, bitmap, cliprect, 0, 2);
+	/*if (!(m_layer_disable&0x0008)) */m_sc_layer[3]->draw(screen, bitmap, cliprect, 0, 4);
 
 	//if (!(m_layer_disable&0x0010))
 		draw_sprites(screen,bitmap,cliprect);
@@ -291,25 +301,25 @@ WRITE8_MEMBER(seicupbl_state::sound_cmd_w)
 WRITE16_MEMBER(seicupbl_state::vram_sc0_w)
 {
 	COMBINE_DATA(&m_back_data[offset]);
-	m_background_layer->mark_tile_dirty(offset);
+	m_sc_layer[0]->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(seicupbl_state::vram_sc1_w)
 {
 	COMBINE_DATA(&m_mid_data[offset]);
-	m_midground_layer->mark_tile_dirty(offset);
+	m_sc_layer[1]->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(seicupbl_state::vram_sc2_w)
 {
 	COMBINE_DATA(&m_fore_data[offset]);
-	m_foreground_layer->mark_tile_dirty(offset);
+	m_sc_layer[2]->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(seicupbl_state::vram_sc3_w)
 {
 	COMBINE_DATA(&m_textram[offset]);
-	m_text_layer->mark_tile_dirty(offset);
+	m_sc_layer[3]->mark_tile_dirty(offset);
 }
 
 static ADDRESS_MAP_START( cupsocbl_mem, AS_PROGRAM, 16, seicupbl_state )
@@ -319,7 +329,7 @@ static ADDRESS_MAP_START( cupsocbl_mem, AS_PROGRAM, 16, seicupbl_state )
 	//AM_RANGE(0x100600, 0x10060f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)//?
 	//AM_RANGE(0x100640, 0x10067f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	AM_RANGE(0x100400, 0x1005ff) AM_DEVREADWRITE("seibucop_boot", seibu_cop_bootleg_device, copdxbl_0_r,copdxbl_0_w) AM_SHARE("cop_mcu_ram")
-	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
+	AM_RANGE(0x100660, 0x10066f) AM_RAM AM_SHARE("vregs")
 	AM_RANGE(0x100700, 0x100701) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100704, 0x100705) AM_READ_PORT("PLAYERS12")
 	AM_RANGE(0x100708, 0x100709) AM_READ_PORT("PLAYERS34")

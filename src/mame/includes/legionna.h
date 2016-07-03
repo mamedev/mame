@@ -13,17 +13,13 @@ public:
 	legionna_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_spriteram(*this, "spriteram"),
-		/*m_back_data(*this, "back_data"),
-		m_fore_data(*this, "fore_data"),
-		m_mid_data(*this, "mid_data"),
-		m_textram(*this, "textram"),*/
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_seibu_sound(*this, "seibu_sound"),
-		m_oki(*this, "oki"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_raiden2cop(*this, "raiden2cop")
+			m_maincpu(*this, "maincpu"),
+			m_audiocpu(*this, "audiocpu"),
+			m_seibu_sound(*this, "seibu_sound"),
+			m_oki(*this, "oki"),
+			m_gfxdecode(*this, "gfxdecode"),
+			m_palette(*this, "palette"),
+			m_raiden2cop(*this, "raiden2cop")
 	{
 		memset(scrollvals, 0, sizeof(UINT16)*6);
 	}
