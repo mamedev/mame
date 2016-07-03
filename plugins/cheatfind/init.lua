@@ -65,10 +65,10 @@ function cheatfind.startplugin()
 			local j = 1
 			for i = start, start + size do
 				if j < 65536 then
-					temp[j] = string.pack("B", space:read_u8(i))
+					temp[j] = string.pack("B", space:read_u8(i, true))
 					j = j + 1
 				else
-					block = block .. table.concat(temp) .. string.pack("B", space:read_u8(i))
+					block = block .. table.concat(temp) .. string.pack("B", space:read_u8(i, true))
 					temp = {}
 					j = 1
 				end
@@ -604,7 +604,7 @@ function cheatfind.startplugin()
 									cheat.script.run = "ram:write(" .. match.addr .. "," .. match.newval .. ")"
 								else
 									cheat.space = { cpu = { tag = dev.tag, type = "program" } }
-									cheat.script.run = "cpu:write_" .. wid .. "(" .. match.addr .. "," .. match.newval .. ")"
+									cheat.script.run = "cpu:write_" .. wid .. "(" .. match.addr .. "," .. match.newval .. ", true)"
 								end
 								if match.mode == 1 then
 									if not _G.ce then

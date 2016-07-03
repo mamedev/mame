@@ -929,9 +929,11 @@ int lua_engine::lua_addr_space::l_mem_read(lua_State *L)
 	lua_addr_space &lsp = luabridge::Stack<lua_addr_space &>::get(L, 1);
 	address_space &sp = lsp.space;
 	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
+	luaL_argcheck(L, lua_isboolean(L, 3) || lua_isnone(L, 3), 3, "optional argument: disable address shift (bool) expected");
 	offs_t address = lua_tounsigned(L, 2);
 	T mem_content = 0;
-	address = sp.address_to_byte(address);
+	if(!lua_toboolean(L, 3))
+		address = sp.address_to_byte(address);
 	switch(sizeof(mem_content) * 8) {
 		case 8:
 			mem_content = sp.read_byte(address);
@@ -983,10 +985,11 @@ int lua_engine::lua_addr_space::l_mem_write(lua_State *L)
 	address_space &sp = lsp.space;
 	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
 	luaL_argcheck(L, lua_isnumber(L, 3), 3, "value (integer) expected");
+	luaL_argcheck(L, lua_isboolean(L, 4) || lua_isnone(L, 4), 4, "optional argument: disable address shift (bool) expected");
 	offs_t address = lua_tounsigned(L, 2);
 	T val = lua_tounsigned(L, 3);
-	address = sp.address_to_byte(address);
-
+	if(!lua_toboolean(L, 4))
+		address = sp.address_to_byte(address);
 	switch(sizeof(val) * 8) {
 		case 8:
 			sp.write_byte(address, val);
