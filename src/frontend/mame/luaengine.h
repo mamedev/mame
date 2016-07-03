@@ -161,12 +161,20 @@ private:
 		int l_logerror(lua_State *L);
 	};
 	struct lua_addr_space {
+		lua_addr_space(address_space *space, device_memory_interface *dev) :
+			space(*space), dev(dev) {}
 		template<typename T> int l_mem_read(lua_State *L);
 		template<typename T> int l_mem_write(lua_State *L);
+		template<typename T> int l_log_mem_read(lua_State *L);
+		template<typename T> int l_log_mem_write(lua_State *L);
 		template<typename T> int l_direct_mem_read(lua_State *L);
 		template<typename T> int l_direct_mem_write(lua_State *L);
+		const char *name() const { return space.name(); }
+
+		address_space &space;
+		device_memory_interface *dev;
 	};
-	static luabridge::LuaRef l_addr_space_map(const address_space *as);
+	static luabridge::LuaRef l_addr_space_map(const lua_addr_space *sp);
 
 	static luabridge::LuaRef l_machine_get_screens(const running_machine *r);
 	struct lua_screen {
