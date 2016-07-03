@@ -9,6 +9,7 @@
 #include "emu.h"
 
 #include "ui/filesel.h"
+#include "ui/filecreate.h"
 #include "ui/floppycntrl.h"
 
 #include "zippath.h"

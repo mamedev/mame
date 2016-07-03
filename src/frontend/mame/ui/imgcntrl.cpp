@@ -4,7 +4,7 @@
 
     ui/imgcntrl.cpp
 
-    MESS's clunky built-in file manager
+    MAME's clunky built-in file manager
 
 ***************************************************************************/
 
@@ -14,6 +14,7 @@
 
 #include "ui/ui.h"
 #include "ui/filesel.h"
+#include "ui/filecreate.h"
 #include "ui/swlist.h"
 
 #include "audit.h"
