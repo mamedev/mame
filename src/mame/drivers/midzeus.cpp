@@ -357,6 +357,12 @@ READ32_MEMBER(midzeus_state::linkram_r)
 		return 0x30313042;
 	else if (offset == 0x3c)
 		return 0xffffffff;
+	else if (offset == 0x30)
+		// ???
+		return 0xffffffff;
+	else if (offset == 0xc)
+		// ???
+		return 0xffffffff;
 	return m_linkram[offset];
 }
 
