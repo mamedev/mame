@@ -33,7 +33,7 @@ public:
 private:
 	// internal state
 	enum { VISIBLE_GAMES_IN_LIST = 15 };
-	UINT8                   m_error;
+	bool                    m_error;
 	bool                    m_rerandomize;
 	char                    m_search[40];
 	int                     m_matchlist[VISIBLE_GAMES_IN_LIST];

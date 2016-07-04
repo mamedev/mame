@@ -66,9 +66,7 @@ void menu_barcode_reader::populate()
 			new_barcode = buffer.c_str();
 		}
 		else
-		{
 			new_barcode = m_barcode_buffer;
-		}
 
 		item_append(_("New Barcode:"), new_barcode, 0, ITEMREF_NEW_BARCODE);
 
@@ -92,7 +90,7 @@ void menu_barcode_reader::handle()
 	populate();
 
 	// process the menu
-	const event *event = process(PROCESS_LR_REPEAT);
+	auto event = process(PROCESS_LR_REPEAT);
 
 	// process the event
 	if (event)

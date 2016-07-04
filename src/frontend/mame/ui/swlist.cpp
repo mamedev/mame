@@ -21,7 +21,7 @@ namespace ui {
     CONSTANTS
 ***************************************************************************/
 
-/* time (in seconds) to display errors */
+// time (in seconds) to display errors
 #define ERROR_MESSAGE_TIME      5
 
 
@@ -129,6 +129,7 @@ menu_software_list::menu_software_list(mame_ui_manager &mui, render_container *c
 	m_swlist = swlist;
 	m_interface = interface;
 	m_ordered_by_shortname = true;
+	memset(m_filename_buffer, '\0', ARRAY_LENGTH(m_filename_buffer));
 }
 
 

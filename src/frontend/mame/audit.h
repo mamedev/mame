@@ -22,8 +22,8 @@
 //**************************************************************************
 
 // hashes to use for validation
-#define AUDIT_VALIDATE_FAST             "R"     /* CRC only */
-#define AUDIT_VALIDATE_FULL             "RS"    /* CRC + SHA1 */
+#define AUDIT_VALIDATE_FAST             "R"     // CRC only
+#define AUDIT_VALIDATE_FULL             "RS"    // CRC + SHA1
 
 
 
@@ -111,15 +111,15 @@ public:
 private:
 	// internal state
 	audit_record *      m_next;
-	media_type          m_type;                 /* type of item that was audited */
-	audit_status        m_status;               /* status of audit on this item */
-	audit_substatus     m_substatus;            /* finer-detail status */
-	const char *        m_name;                 /* name of item */
-	UINT64              m_explength;            /* expected length of item */
-	UINT64              m_length;               /* actual length of item */
-	hash_collection     m_exphashes;            /* expected hash data */
-	hash_collection     m_hashes;               /* actual hash information */
-	device_t *          m_shared_device;        /* device that shares the rom */
+	media_type          m_type;                 // type of item that was audited
+	audit_status        m_status;               // status of audit on this item
+	audit_substatus     m_substatus;            // finer-detail status
+	const char *        m_name;                 // name of item
+	UINT64              m_explength;            // expected length of item
+	UINT64              m_length;               // actual length of item
+	hash_collection     m_exphashes;            // expected hash data
+	hash_collection     m_hashes;               // actual hash information
+	device_t *          m_shared_device;        // device that shares the rom
 };
 
 

@@ -56,7 +56,7 @@ menu_control_device_image::menu_control_device_image(mame_ui_manager &mui, rende
 	{
 		state = START_FILE;
 
-		/* if the image exists, set the working directory to the parent directory */
+		// if the image exists, set the working directory to the parent directory
 		if (image->exists())
 		{
 			current_file.assign(image->filename());
@@ -64,7 +64,7 @@ menu_control_device_image::menu_control_device_image(mame_ui_manager &mui, rende
 		} else
 			current_directory.assign(image->working_directory());
 
-		/* check to see if the path exists; if not clear it */
+		// check to see if the path exists; if not clear it
 		if (util::zippath_opendir(current_directory.c_str(), nullptr) != osd_file::error::NONE)
 			current_directory.clear();
 	}
@@ -89,29 +89,29 @@ void menu_control_device_image::test_create(bool &can_create, bool &need_confirm
 	std::string path;
 	osd::directory::entry::entry_type file_type;
 
-	/* assemble the full path */
+	// assemble the full path
 	util::zippath_combine(path, current_directory.c_str(), current_file.c_str());
 
-	/* does a file or a directory exist at the path */
+	// does a file or a directory exist at the path
 	auto entry = osd_stat(path.c_str());
 	file_type = (entry != nullptr) ? entry->type : osd::directory::entry::entry_type::NONE;
 
 	switch(file_type)
 	{
 		case osd::directory::entry::entry_type::NONE:
-			/* no file/dir here - always create */
+			// no file/dir here - always create
 			can_create = true;
 			need_confirm = false;
 			break;
 
 		case osd::directory::entry::entry_type::FILE:
-			/* a file exists here - ask for permission from the user */
+			// a file exists here - ask for permission from the user
 			can_create = true;
 			need_confirm = true;
 			break;
 
 		case osd::directory::entry::entry_type::DIR:
-			/* a directory exists here - we can't save over it */
+			// a directory exists here - we can't save over it
 			ui().popup_time(5, "%s", _("Cannot save over directory"));
 			can_create = false;
 			need_confirm = false;

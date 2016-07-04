@@ -45,7 +45,7 @@ private:
 		VIDEO_ITEM_VIEW
 	};
 
-	render_target *target;
+	render_target *m_target;
 };
 
 } // namespace ui

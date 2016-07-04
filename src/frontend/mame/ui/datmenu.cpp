@@ -81,7 +81,7 @@ menu_dats_view::~menu_dats_view()
 
 void menu_dats_view::handle()
 {
-	const event *menu_event = process(FLAG_UI_DATS);
+	auto menu_event = process(FLAG_UI_DATS);
 	if (menu_event != nullptr)
 	{
 		if (menu_event->iptkey == IPT_UI_LEFT && m_actual > 0)

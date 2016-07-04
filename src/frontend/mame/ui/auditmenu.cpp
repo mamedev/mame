@@ -26,8 +26,8 @@ inline int cs_stricmp(const char *s1, const char *s2)
 {
 	for (;;)
 	{
-		int c1 = tolower(*s1++);
-		int c2 = tolower(*s2++);
+		auto c1 = tolower(*s1++);
+		auto c2 = tolower(*s2++);
 		if (c1 == 0 || c1 != c2)
 			return c1 - c2;
 	}
@@ -35,8 +35,8 @@ inline int cs_stricmp(const char *s1, const char *s2)
 
 bool sorted_game_list(const game_driver *x, const game_driver *y)
 {
-	bool clonex = (x->parent[0] != '0');
-	bool cloney = (y->parent[0] != '0');
+	auto clonex = (x->parent[0] != '0');
+	auto cloney = (y->parent[0] != '0');
 
 	if (!clonex && !cloney)
 		return (cs_stricmp(x->description, y->description) < 0);
@@ -120,13 +120,13 @@ void menu_audit::handle()
 
 	if (m_audit_mode == 1)
 	{
-		vptr_game::iterator iter = m_unavailablesorted.begin();
+		auto iter = m_unavailablesorted.begin();
 		while (iter != m_unavailablesorted.end())
 		{
 			driver_enumerator enumerator(machine().options(), (*iter)->name);
 			enumerator.next();
 			media_auditor auditor(enumerator);
-			media_auditor::summary summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
+			auto summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
 
 			// if everything looks good, include the driver
 			if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
@@ -144,7 +144,7 @@ void menu_audit::handle()
 		media_auditor auditor(enumerator);
 		while (enumerator.next())
 		{
-			media_auditor::summary summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
+			auto summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
 
 			// if everything looks good, include the driver
 			if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
@@ -188,16 +188,16 @@ void menu_audit::save_available_machines()
 		util::stream_format(buffer, "%d\n", m_unavailablesorted.size());
 
 		// generate available list
-		for (size_t x = 0; x < m_availablesorted.size(); ++x)
+		for (auto & e : m_availablesorted)
 		{
-			int find = driver_list::find(m_availablesorted[x]->name);
+			auto find = driver_list::find(e->name);
 			util::stream_format(buffer, "%d\n", find);
 		}
 
 		// generate unavailable list
-		for (size_t x = 0; x < m_unavailablesorted.size(); ++x)
+		for (auto & e : m_unavailablesorted)
 		{
-			int find = driver_list::find(m_unavailablesorted[x]->name);
+			auto find = driver_list::find(e->name);
 			util::stream_format(buffer, "%d\n", find);
 		}
 		file.puts(buffer.str().c_str());

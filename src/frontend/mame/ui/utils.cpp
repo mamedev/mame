@@ -81,7 +81,7 @@ char* chartrimcarriage(char str[])
 
 const char* strensure(const char* s)
 {
-	return s == nullptr ? "" : s;
+	return (s == nullptr) ? "" : s;
 }
 
 int getprecisionchr(const char* s)
@@ -100,11 +100,11 @@ std::vector<std::string> tokenize(const std::string &text, char sep)
 	std::size_t start = 0, end = 0;
 	while ((end = text.find(sep, start)) != std::string::npos)
 	{
-		std::string temp = text.substr(start, end - start);
+		auto temp = text.substr(start, end - start);
 		if (!temp.empty()) tokens.push_back(temp);
 		start = end + 1;
 	}
-	std::string temp = text.substr(start);
+	auto temp = text.substr(start);
 	if (!temp.empty()) tokens.push_back(temp);
 	return tokens;
 }

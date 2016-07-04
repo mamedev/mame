@@ -22,8 +22,8 @@ namespace ui {
 
 void menu_video_targets::handle()
 {
-	/* process the menu */
-	const event *menu_event = process(0);
+	// process the menu
+	auto menu_event = process(0);
 	if (menu_event != nullptr && menu_event->iptkey == IPT_UI_SELECT)
 		menu::stack_push<menu_video_options>(ui(), container, static_cast<render_target *>(menu_event->itemref));
 }
@@ -34,25 +34,24 @@ void menu_video_targets::handle()
     video targets menu
 -------------------------------------------------*/
 
-menu_video_targets::menu_video_targets(mame_ui_manager &mui, render_container *container) : menu(mui, container)
+menu_video_targets::menu_video_targets(mame_ui_manager &mui, render_container *container) 
+	: menu(mui, container)
 {
 }
 
 void menu_video_targets::populate()
 {
-	int targetnum;
-
-	/* find the targets */
-	for (targetnum = 0; ; targetnum++)
+	// find the targets
+	for (int targetnum = 0; ; ++targetnum)
 	{
-		render_target *target = machine().render().target_by_index(targetnum);
+		auto target = machine().render().target_by_index(targetnum);
 		char buffer[40];
 
-		/* stop when we run out */
+		// stop when we run out
 		if (target == nullptr)
 			break;
 
-		/* add a menu item */
+		// add a menu item
 		sprintf(buffer, _("Screen #%d"), targetnum);
 		item_append(buffer, "", 0, target);
 	}
@@ -69,21 +68,21 @@ menu_video_targets::~menu_video_targets()
 
 void menu_video_options::handle()
 {
-	bool changed = false;
+	auto changed = false;
 
-	/* process the menu */
-	const event *menu_event = process(0);
+	// process the menu
+	auto menu_event = process(0);
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
 		switch ((FPTR)menu_event->itemref)
 		{
-			/* rotate adds rotation depending on the direction */
+			// rotate adds rotation depending on the direction
 			case VIDEO_ITEM_ROTATE:
 				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 				{
 					int delta = (menu_event->iptkey == IPT_UI_LEFT) ? ROT270 : ROT90;
-					target->set_orientation(orientation_add(delta, target->orientation()));
-					if (target->is_ui_target())
+					m_target->set_orientation(orientation_add(delta, m_target->orientation()));
+					if (m_target->is_ui_target())
 					{
 						render_container::user_settings settings;
 						container->get_user_settings(settings);
@@ -94,11 +93,11 @@ void menu_video_options::handle()
 				}
 				break;
 
-			/* layer config bitmasks handle left/right keys the same (toggle) */
+			// layer config bitmasks handle left/right keys the same (toggle)
 			case VIDEO_ITEM_BACKDROPS:
 				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 				{
-					target->set_backdrops_enabled(!target->backdrops_enabled());
+					m_target->set_backdrops_enabled(!m_target->backdrops_enabled());
 					changed = true;
 				}
 				break;
@@ -106,7 +105,7 @@ void menu_video_options::handle()
 			case VIDEO_ITEM_OVERLAYS:
 				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 				{
-					target->set_overlays_enabled(!target->overlays_enabled());
+					m_target->set_overlays_enabled(!m_target->overlays_enabled());
 					changed = true;
 				}
 				break;
@@ -114,7 +113,7 @@ void menu_video_options::handle()
 			case VIDEO_ITEM_BEZELS:
 				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 				{
-					target->set_bezels_enabled(!target->bezels_enabled());
+					m_target->set_bezels_enabled(!m_target->bezels_enabled());
 					changed = true;
 				}
 				break;
@@ -122,7 +121,7 @@ void menu_video_options::handle()
 			case VIDEO_ITEM_CPANELS:
 				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 				{
-					target->set_cpanels_enabled(!target->cpanels_enabled());
+					m_target->set_cpanels_enabled(!m_target->cpanels_enabled());
 					changed = true;
 				}
 				break;
@@ -130,7 +129,7 @@ void menu_video_options::handle()
 			case VIDEO_ITEM_MARQUEES:
 				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 				{
-					target->set_marquees_enabled(!target->marquees_enabled());
+					m_target->set_marquees_enabled(!m_target->marquees_enabled());
 					changed = true;
 				}
 				break;
@@ -138,23 +137,23 @@ void menu_video_options::handle()
 			case VIDEO_ITEM_ZOOM:
 				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 				{
-					target->set_zoom_to_screen(!target->zoom_to_screen());
+					m_target->set_zoom_to_screen(!m_target->zoom_to_screen());
 					changed = true;
 				}
 				break;
 
-			/* anything else is a view item */
+			// anything else is a view item
 			default:
 				if (menu_event->iptkey == IPT_UI_SELECT && (int)(FPTR)menu_event->itemref >= VIDEO_ITEM_VIEW)
 				{
-					target->set_view((FPTR)menu_event->itemref - VIDEO_ITEM_VIEW);
+					m_target->set_view((FPTR)menu_event->itemref - VIDEO_ITEM_VIEW);
 					changed = true;
 				}
 				break;
 		}
 	}
 
-	/* if something changed, rebuild the menu */
+	// if something changed, rebuild the menu
 	if (changed)
 		reset(reset_options::REMEMBER_REF);
 }
@@ -165,36 +164,36 @@ void menu_video_options::handle()
     video options menu
 -------------------------------------------------*/
 
-menu_video_options::menu_video_options(mame_ui_manager &mui, render_container *container, render_target *_target) : menu(mui, container)
+menu_video_options::menu_video_options(mame_ui_manager &mui, render_container *container, render_target *_target) 
+	: menu(mui, container)
+	, m_target(_target)
 {
-	target = _target;
 }
 
 void menu_video_options::populate()
 {
 	const char *subtext = "";
 	std::string tempstring;
-	int viewnum;
-	int enabled;
+	bool enabled;
 
-	/* add items for each view */
-	for (viewnum = 0; ; viewnum++)
+	// add items for each view
+	for (int viewnum = 0; ; ++viewnum)
 	{
-		const char *name = target->view_name(viewnum);
+		const char *name = m_target->view_name(viewnum);
 		if (name == nullptr)
 			break;
 
-		/* create a string for the item, replacing underscores with spaces */
+		// create a string for the item, replacing underscores with spaces
 		tempstring.assign(name);
 		strreplace(tempstring, "_", " ");
 		item_append(tempstring, "", 0, (void *)(FPTR)(VIDEO_ITEM_VIEW + viewnum));
 	}
 
-	/* add a separator */
+	// add a separator
 	item_append(menu_item_type::SEPARATOR);
 
-	/* add a rotate item */
-	switch (target->orientation())
+	// add a rotate item
+	switch (m_target->orientation())
 	{
 		case ROT0:      subtext = "None";                   break;
 		case ROT90:     subtext = "CW 90" UTF8_DEGREES;     break;
@@ -203,28 +202,28 @@ void menu_video_options::populate()
 	}
 	item_append(_("Rotate"), subtext, FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, (void *)VIDEO_ITEM_ROTATE);
 
-	/* backdrop item */
-	enabled = target->backdrops_enabled();
+	// backdrop item
+	enabled = m_target->backdrops_enabled();
 	item_append(_("Backdrops"), enabled ? _("Enabled") : _("Disabled"), enabled ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW, (void *)VIDEO_ITEM_BACKDROPS);
 
-	/* overlay item */
-	enabled = target->overlays_enabled();
+	// overlay item
+	enabled = m_target->overlays_enabled();
 	item_append(_("Overlays"), enabled ? _("Enabled") : _("Disabled"), enabled ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW, (void *)VIDEO_ITEM_OVERLAYS);
 
-	/* bezel item */
-	enabled = target->bezels_enabled();
+	// bezel item
+	enabled = m_target->bezels_enabled();
 	item_append(_("Bezels"), enabled ? _("Enabled") : _("Disabled"), enabled ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW, (void *)VIDEO_ITEM_BEZELS);
 
-	/* cpanel item */
-	enabled = target->cpanels_enabled();
+	// cpanel item
+	enabled = m_target->cpanels_enabled();
 	item_append(_("CPanels"), enabled ? _("Enabled") : _("Disabled"), enabled ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW, (void *)VIDEO_ITEM_CPANELS);
 
-	/* marquee item */
-	enabled = target->marquees_enabled();
+	// marquee item
+	enabled = m_target->marquees_enabled();
 	item_append(_("Marquees"), enabled ? _("Enabled") : _("Disabled"), enabled ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW, (void *)VIDEO_ITEM_MARQUEES);
 
-	/* cropping */
-	enabled = target->zoom_to_screen();
+	// cropping
+	enabled = m_target->zoom_to_screen();
 	item_append(_("View"), enabled ? _("Cropped") : _("Full"), enabled ? FLAG_RIGHT_ARROW : FLAG_LEFT_ARROW, (void *)VIDEO_ITEM_ZOOM);
 }
 

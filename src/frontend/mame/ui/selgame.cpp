@@ -180,9 +180,6 @@ void menu_select_game::handle()
 	if (m_prev_selected == nullptr)
 		m_prev_selected = item[0].ref;
 
-	bool check_filter = false;
-	bool enabled_dats = ui().options().enabled_dats();
-
 	// if i have to load datfile, performe an hard reset
 	if (ui_globals::reset)
 	{
@@ -200,11 +197,14 @@ void menu_select_game::handle()
 		return;
 	}
 
+	auto check_filter = false;
+	auto enabled_dats = ui().options().enabled_dats();
+
 	// ignore pause keys by swallowing them before we process the menu
 	machine().ui_input().pressed(IPT_UI_PAUSE);
 
 	// process the menu
-	const event *menu_event = process(PROCESS_LR_REPEAT);
+	auto menu_event = process(PROCESS_LR_REPEAT);
 	if (menu_event && menu_event->itemref)
 	{
 		if (ui_error)
@@ -257,7 +257,7 @@ void menu_select_game::handle()
 				// Infos
 				if (!isfavorite())
 				{
-					const game_driver *drv = (const game_driver *)menu_event->itemref;
+					auto drv = (const game_driver *)menu_event->itemref;
 					if ((FPTR)drv > skip_main_items && ui_globals::curdats_view > UI_FIRST_LOAD)
 					{
 						ui_globals::curdats_view--;
@@ -266,7 +266,7 @@ void menu_select_game::handle()
 				}
 				else
 				{
-					ui_software_info *drv = (ui_software_info *)menu_event->itemref;
+					auto drv = (ui_software_info *)menu_event->itemref;
 					if (drv->startempty == 1 && ui_globals::curdats_view > UI_FIRST_LOAD)
 					{
 						ui_globals::curdats_view--;
@@ -295,7 +295,7 @@ void menu_select_game::handle()
 				// Infos
 				if (!isfavorite())
 				{
-					const game_driver *drv = (const game_driver *)menu_event->itemref;
+					auto drv = (const game_driver *)menu_event->itemref;
 					if ((FPTR)drv > skip_main_items && ui_globals::curdats_view < UI_LAST_LOAD)
 					{
 						ui_globals::curdats_view++;
@@ -304,7 +304,7 @@ void menu_select_game::handle()
 				}
 				else
 				{
-					ui_software_info *drv = (ui_software_info *)menu_event->itemref;
+					auto drv = (ui_software_info *)menu_event->itemref;
 					if (drv->startempty == 1 && ui_globals::curdats_view < UI_LAST_LOAD)
 					{
 						ui_globals::curdats_view++;
@@ -349,14 +349,14 @@ void menu_select_game::handle()
 			// handle UI_DATS
 			if (!isfavorite())
 			{
-				const game_driver *driver = (const game_driver *)menu_event->itemref;
+				auto driver = (const game_driver *)menu_event->itemref;
 				if ((FPTR)driver > skip_main_items && mame_machine_manager::instance()->datfile().has_data(driver))
 					menu::stack_push<menu_dats_view>(ui(), container, driver);
 			}
 			else
 			{
-				ui_software_info *ui_swinfo  = (ui_software_info *)menu_event->itemref;
-				datfile_manager &mdat = mame_machine_manager::instance()->datfile();
+				auto ui_swinfo  = (ui_software_info *)menu_event->itemref;
+				auto mdat = mame_machine_manager::instance()->datfile();
 
 				if ((FPTR)ui_swinfo > skip_main_items)
 				{
@@ -372,10 +372,10 @@ void menu_select_game::handle()
 			// handle UI_FAVORITES
 			if (!isfavorite())
 			{
-				const game_driver *driver = (const game_driver *)menu_event->itemref;
+				auto driver = (const game_driver *)menu_event->itemref;
 				if ((FPTR)driver > skip_main_items)
 				{
-					favorite_manager &mfav = mame_machine_manager::instance()->favorite();
+					auto mfav = mame_machine_manager::instance()->favorite();
 					if (!mfav.isgame_favorite(driver))
 					{
 						mfav.add_favorite_game(driver);
@@ -391,7 +391,7 @@ void menu_select_game::handle()
 			}
 			else
 			{
-				ui_software_info *swinfo = (ui_software_info *)menu_event->itemref;
+				auto swinfo = (ui_software_info *)menu_event->itemref;
 				if ((FPTR)swinfo > skip_main_items)
 				{
 					machine().popmessage(_("%s\n removed from favorites list."), swinfo->longname.c_str());
@@ -632,7 +632,7 @@ void menu_select_game::populate()
 
 void menu_select_game::build_available_list()
 {
-	int m_total = driver_list::total();
+	auto m_total = driver_list::total();
 	std::vector<bool> m_included(m_total, false);
 
 	// open a path to the ROMs and find them in the array
@@ -651,7 +651,7 @@ void menu_select_game::build_available_list()
 			*dst++ = tolower((UINT8) * src);
 
 		*dst = 0;
-		int drivnum = driver_list::find(drivername);
+		auto drivnum = driver_list::find(drivername);
 		if (drivnum != -1 && !m_included[drivnum])
 		{
 			m_availsortedlist.push_back(&driver_list::driver(drivnum));
@@ -665,7 +665,7 @@ void menu_select_game::build_available_list()
 		auto driver = &driver_list::driver(x);
 		if (!m_included[x] && driver != &GAME_NAME(___empty))
 		{
-			const rom_entry *rom = driver->rom;
+			auto rom = driver->rom;
 			auto noroms = true;
 
 			// check NO-DUMP
@@ -680,7 +680,7 @@ void menu_select_game::build_available_list()
 			if (!noroms)
 			{
 				// check if clone == parent
-				int cx = driver_list::clone(*driver);
+				auto cx = driver_list::clone(*driver);
 				if (cx != -1 && m_included[cx])
 				{
 					auto drv = &driver_list::driver(cx);
@@ -752,9 +752,9 @@ void menu_select_game::custom_render(void *selectedref, float top, float bottom,
 	float width, maxwidth = origx2 - origx1;
 	std::string tempbuf[5];
 	rgb_t color = UI_BACKGROUND_COLOR;
-	bool isstar = false;
-	inifile_manager &inifile = mame_machine_manager::instance()->inifile();
-	float tbarspace = ui().get_line_height();
+	auto isstar = false;
+	auto inifile = mame_machine_manager::instance()->inifile();
+	auto tbarspace = ui().get_line_height();
 	float text_size = 1.0f;
 
 	tempbuf[0] = string_format(_("%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"),

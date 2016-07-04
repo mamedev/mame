@@ -271,7 +271,7 @@ void menu_device_config::populate()
 
 void menu_device_config::handle()
 {
-	/* process the menu */
+	// process the menu
 	process(0);
 }
 

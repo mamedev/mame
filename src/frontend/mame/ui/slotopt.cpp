@@ -153,10 +153,10 @@ menu_slot_devices::menu_slot_devices(mame_ui_manager &mui, render_container *con
 
 void menu_slot_devices::populate()
 {
-	/* cycle through all devices for this system */
+	// cycle through all devices for this system
 	for (device_slot_interface &slot : slot_interface_iterator(machine().root_device()))
 	{
-		/* record the menu item */
+		// record the menu item
 		const device_slot_option *option = slot_get_current_option(slot);
 		std::string opt_name;
 		if (option == nullptr)
@@ -184,7 +184,7 @@ menu_slot_devices::~menu_slot_devices()
 
 void menu_slot_devices::handle()
 {
-	/* process the menu */
+	// process the menu
 	const event *menu_event = process(0);
 
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
