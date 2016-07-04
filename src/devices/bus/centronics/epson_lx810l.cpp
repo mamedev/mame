@@ -50,7 +50,7 @@ const device_type EPSON_AP2000 = &device_creator<epson_ap2000_t>;
 ROM_START( lx810l )
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD("lx810l.ic3c", 0x0000, 0x8000, CRC(a66454e1) SHA1(8e6f2f98abcbd8af6e34b9ba746edf0d18aef843) )
-	ROM_REGION(0x20, "eeprom", 0)
+	ROM_REGION16_BE(0x20, "eeprom", 0)
 	ROM_LOAD( "at93c06", 0x00, 0x20, NO_DUMP )
 ROM_END
 
@@ -62,7 +62,7 @@ ROM_END
 ROM_START( ap2000 )
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD("ap2k.ic3c", 0x0000, 0x8000, CRC(ee7294b7) SHA1(219ffa6ff661ce95d5772c9fc1967093718f04e9) )
-	ROM_REGION(0x20, "eeprom", 0)
+	ROM_REGION16_BE(0x20, "eeprom", 0)
 	ROM_LOAD( "at93c06", 0x00, 0x20, NO_DUMP )
 ROM_END
 
