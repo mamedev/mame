@@ -11,7 +11,12 @@
 
 #include "sparcdasm.h"
 
-#define SPARCV8		(0)
+#define SPARCV8			(0)
+#define LOG_FCODES		(0)
+
+#if LOG_FCODES
+#include <map>
+#endif
 
 #define SPARC_NO_TRAP						256
 #define SPARC_RESET							0
@@ -78,11 +83,6 @@ public:
 	UINT8 get_asi() { return m_asi; }
 	UINT32 pc() { return m_pc; }
 
-	void trap(UINT8 type, UINT8 tt_override = 0);
-	void set_mae() { m_mae = true; }
-	void hold_bus() { m_hold_bus = true; }
-	void release_bus() { m_hold_bus = false; }
-
 	template<typename T> static void add_asi_desc(device_t &device, const T &desc) { return downcast<mb86901_device &>(device).add_asi_desc(desc); }
 
 protected:
@@ -130,6 +130,11 @@ protected:
 	void reset_step();
 	void error_step();
 
+#if LOG_FCODES
+	void indent();
+	void disassemble_ss1_fcode(UINT32 r5, UINT32 opcode, UINT32 handler_base, UINT32 entry_point, UINT32 stack);
+#endif
+
 	// address spaces
 	const address_space_config m_program_config;
 
@@ -167,6 +172,7 @@ protected:
 	bool m_pb_error;
 	bool m_pb_block_ldst_byte;
 	bool m_pb_block_ldst_word;
+	UINT16 m_irq_state;
 
 	// trap and error registers
 	bool m_trap;
@@ -235,16 +241,21 @@ protected:
 	// address spaces
 	address_space *m_program;
 
+#if LOG_FCODES
+	UINT32 m_ss1_next_pc;
+	UINT32 m_ss1_next_opcode;
+	UINT32 m_ss1_next_handler_base;
+	UINT32 m_ss1_next_entry_point;
+	UINT32 m_ss1_next_stack;
+	std::map<UINT16, std::string> m_ss1_fcode_table;
+#endif
+
 	// processor configuration
 	static const int NWINDOWS;
 };
 
 // device type definition
 extern const device_type MB86901;
-
-/***************************************************************************
-    REGISTER ENUMERATION
-***************************************************************************/
 
 enum
 {
@@ -278,6 +289,26 @@ enum
 	SPARC_R64,	SPARC_R65,	SPARC_R66,	SPARC_R67,	SPARC_R68,	SPARC_R69,	SPARC_R70,	SPARC_R71,	SPARC_R72,	SPARC_R73,	SPARC_R74,	SPARC_R75,	SPARC_R76,	SPARC_R77,	SPARC_R78,	SPARC_R79,
 	SPARC_R80,	SPARC_R81,	SPARC_R82,	SPARC_R83,	SPARC_R84,	SPARC_R85,	SPARC_R86,	SPARC_R87,	SPARC_R88,	SPARC_R89,	SPARC_R90,	SPARC_R91,	SPARC_R92,	SPARC_R93,	SPARC_R94,	SPARC_R95,
 	SPARC_R96,	SPARC_R97,	SPARC_R98,	SPARC_R99,	SPARC_R100,	SPARC_R101,	SPARC_R102,	SPARC_R103,	SPARC_R104,	SPARC_R105,	SPARC_R106,	SPARC_R107,	SPARC_R108,	SPARC_R109,	SPARC_R110,	SPARC_R111
+};
+
+enum
+{
+	SPARC_IRQ1,
+	SPARC_IRQ2,
+	SPARC_IRQ3,
+	SPARC_IRQ4,
+	SPARC_IRQ5,
+	SPARC_IRQ6,
+	SPARC_IRQ7,
+	SPARC_IRQ8,
+	SPARC_IRQ9,
+	SPARC_IRQ10,
+	SPARC_IRQ11,
+	SPARC_IRQ12,
+	SPARC_IRQ13,
+	SPARC_IRQ14,
+	SPARC_NMI,
+	SPARC_MAE
 };
 
 #endif /* __SPARC_H__ */
