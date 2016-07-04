@@ -15,6 +15,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	virtual WRITE_LINE_MEMBER( input_txd ) override { device_serial_interface::rx_w(state); }
+	virtual WRITE_LINE_MEMBER( input_rts ) override { m_rts = (line_state) state; }
 
 	DECLARE_WRITE_LINE_MEMBER(update_serial);
 
@@ -46,6 +47,7 @@ private:
 	UINT32 m_input_count;
 	UINT32 m_input_index;
 	emu_timer *m_timer_poll;
+	line_state m_rts;
 };
 
 extern const device_type NULL_MODEM;
