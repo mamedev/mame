@@ -247,7 +247,7 @@ WRITE8_MEMBER(vt100_video_device::dc012_w)
 //		if (MHFU_FLAG == false)
 //			printf("MHFU  ___ENABLED___ %05x \n", space.device().safe_pc());
 		MHFU_FLAG = true;
-		MHFU_counter = 0;  // TEST-DEBUG ***********
+		MHFU_counter = 0;  
 	}
 
 	if (!(data & 0x08))
@@ -276,13 +276,13 @@ WRITE8_MEMBER(vt100_video_device::dc012_w)
 			m_write_clear_video_interrupt(0);
 			break;
 		case 0x0a:
-			// set reverse field on
-			m_reverse_field = 1;
-			break;
-		case 0x0b:
-			// set reverse field off
+			// PDF: reverse field ON
 			m_reverse_field = 0;
 			break;
+		case 0x0b: 			
+			// PDF: reverse field OFF 
+			// SETUP: dark screen selected 
+			m_reverse_field = 1; 
 
 			//  Writing a 11XX bit combination clears the blink-flip flop (valid for 0x0C - 0x0F):
 		case 0x0c:
