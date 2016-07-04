@@ -1372,7 +1372,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 // all 3 Legionnaire sets differ only by the region byte at 0x1ef in rom 4 (Japan 0x00, US 0x01, World 0x02)
-// bitrot in unused program code above 0x28000 is probably due to manufacturer error
+// unused program code above 0x28c00 has many bad bits, probably a defective copy of a previous build
 ROM_START( legionna )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD32_BYTE( "1.u025",  0x00000, 0x20000, CRC(9e2d3ec8) SHA1(8af9ca349389cbbd2b541aafa09de57f87f6fd72) )
