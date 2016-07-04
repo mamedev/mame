@@ -10,7 +10,6 @@
 #define __WIN_D3DHLSL__
 
 #include <vector>
-#include "aviio.h"
 #include "../frontend/mame/ui/menuitem.h"
 #include "../frontend/mame/ui/slider.h"
 #include "modules/lib/osdlib.h"
@@ -158,6 +157,7 @@ private:
 class d3d_render_target;
 class cache_target;
 class renderer_d3d9;
+class movie_recorder;
 
 /* hlsl_options is the information about runtime-mutable Direct3D HLSL options */
 /* in the future this will be moved into an OSD/emu shared buffer */
@@ -284,9 +284,6 @@ public:
 	d3d_render_target* get_vector_target(render_primitive *prim);
 	bool create_vector_target(render_primitive *prim);
 
-	void begin_frame();
-	void end_frame();
-
 	void begin_draw();
 	void end_draw();
 
@@ -297,13 +294,9 @@ public:
 	bool add_render_target(renderer_d3d9* d3d, render_primitive *prim, texture_info* texture, int source_width, int source_height, int target_width, int target_height);
 	bool add_cache_target(renderer_d3d9* d3d, texture_info* texture, int source_width, int source_height, int target_width, int target_height, int screen_index);
 
-	void window_save();
-	void window_record();
-	bool recording() const { return avi_output_file != nullptr; }
+	void save_snapshot();
+	void record_movie();
 
-	void avi_update_snap(IDirect3DSurface9 *surface);
-	void render_snapshot(IDirect3DSurface9 *surface);
-	void record_texture();
 	void init_fsfx_quad();
 
 	void                    set_texture(texture_info *info);
@@ -326,8 +319,7 @@ private:
 	void                    blit(IDirect3DSurface9 *dst, bool clear_dst, D3DPRIMITIVETYPE prim_type, UINT32 prim_index, UINT32 prim_count);
 	void                    enumerate_screens();
 
-	void                    end_avi_recording();
-	void                    begin_avi_recording(const char *name);
+	void                    render_snapshot(IDirect3DSurface9 *surface);
 
 	d3d_render_target*      find_render_target(int source_width, int source_height, UINT32 screen_index, UINT32 page_index);
 	cache_target *          find_cache_target(UINT32 screen_index, int width, int height);
@@ -364,21 +356,13 @@ private:
 	texture_info *          shadow_texture;             // shadow mask texture for post-processing shader
 	hlsl_options *          options;                    // current options
 
-	avi_file::ptr           avi_output_file;            // AVI file
-	bitmap_rgb32            avi_snap;                   // AVI snapshot
-	int                     avi_frame;                  // AVI frame
-	attotime                avi_frame_period;           // AVI frame period
-	attotime                avi_next_frame_time;        // AVI next frame time
-	IDirect3DSurface9 *     avi_copy_surface;           // AVI destination surface in system memory
-	IDirect3DTexture9 *     avi_copy_texture;           // AVI destination texture in system memory
-	IDirect3DSurface9 *     avi_final_target;           // AVI upscaled surface
-	IDirect3DTexture9 *     avi_final_texture;          // AVI upscaled texture
-
 	IDirect3DSurface9 *     black_surface;              // black dummy surface
 	IDirect3DTexture9 *     black_texture;              // black dummy texture
 
+	bool                    recording_movie;            // ongoing movie recording
+	std::unique_ptr<movie_recorder> recorder;           // HLSL post-render movie recorder
+
 	bool                    render_snap;                // whether or not to take HLSL post-render snapshot
-	bool                    snap_rendered;              // whether we just rendered our HLSL post-render shot or not
 	IDirect3DSurface9 *     snap_copy_target;           // snapshot destination surface in system memory
 	IDirect3DTexture9 *     snap_copy_texture;          // snapshot destination surface in system memory
 	IDirect3DSurface9 *     snap_target;                // snapshot upscaled surface
