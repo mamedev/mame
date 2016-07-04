@@ -88,12 +88,12 @@ public:
 			m_vid_surface->Release();
 	}
 
-	void record(std::string name)
+	void record()
 	{
 		if (!m_initialized)
 			return;
 
-		m_avi_writer->record(name);
+		m_avi_writer->record();
 	}
 
 	void save_frame()
@@ -230,15 +230,9 @@ void shaders::record_movie()
 		return;
 	}
 
-	windows_options &options = downcast<windows_options &>(machine->options());
-	std::string filename(options.d3d_hlsl_write());
-
-	if (!filename.empty())
-	{
-		recorder = std::make_unique<movie_recorder>(*machine, d3d, snap_width, snap_height);
-		recorder->record(filename);
-		recording_movie = true;
-	}
+	recorder = std::make_unique<movie_recorder>(*machine, d3d, snap_width, snap_height);
+	recorder->record();
+	recording_movie = true;
 }
 
 
