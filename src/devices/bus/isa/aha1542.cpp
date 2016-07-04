@@ -139,13 +139,13 @@ const device_type AHA1542 = &device_creator<aha1542_device>;
 
 READ8_MEMBER( aha1542_device::aha1542_r )
 {
-	printf("%s aha1542_r(): offset=%d\n", machine().describe_context(), offset);
+	logerror("%s aha1542_r(): offset=%d\n", machine().describe_context(), offset);
 	return 0xff;
 }
 
 WRITE8_MEMBER( aha1542_device::aha1542_w )
 {
-	printf("%s aha1542_w(): offset=%d data=0x%02x\n", machine().describe_context(), offset, data);
+	logerror("%s aha1542_w(): offset=%d data=0x%02x\n", machine().describe_context(), offset, data);
 }
 
 //-------------------------------------------------
