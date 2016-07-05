@@ -1071,7 +1071,10 @@ void mb86901_device::execute_rdsr(UINT32 op)
 			}
 		}
 		else if (RDPSR)
+		{
+			MAKE_PSR;
 			RDREG = PSR;
+		}
 		else if (RDWIM)
 			RDREG = WIM;
 		else if (RDTBR)
@@ -1170,7 +1173,9 @@ void mb86901_device::execute_wrsr(UINT32 op)
 		else
 		{
 			PSR = result &~ PSR_ZERO_MASK;
+			printf("WRPSR: %08x\n", result);
 		}
+		BREAK_PSR;
 	}
 	else if (WRWIM)
 	{
@@ -1194,6 +1199,7 @@ void mb86901_device::execute_wrsr(UINT32 op)
 		else
 		{
 			TBR = result & 0xfffff000;
+			printf("TBR: %08x\n", TBR);
 		}
 	}
 }
@@ -2602,6 +2608,8 @@ void mb86901_device::select_trap()
 		m_tt = 0x10 | m_interrupt_level;
 
 	TBR |= m_tt << 4;
+	printf("TBR is now: %08x\n", TBR);
+	m_trap = 0;
 	m_instruction_access_exception = 0;
 	m_illegal_instruction = 0;
 	m_privileged_instruction = 0;
@@ -2719,7 +2727,10 @@ void mb86901_device::execute_trap()
 	{
 		ET = 0;
 		PS = S;
+		S = 1;
 		CWP = ((CWP + NWINDOWS) - 1) % NWINDOWS;
+		MAKE_PSR;
+		update_gpr_pointers();
 
 		if (m_annul == 0)
 		{
@@ -2733,22 +2744,20 @@ void mb86901_device::execute_trap()
 			m_annul = 0;
 		}
 
-		S = 1;
 		if (!m_reset_trap)
 		{
 			PC = TBR;
 			nPC = TBR + 4;
+			printf("Not reset trap, new PC: %08x\n", PC);
 		}
 		else
 		{
+			printf("Reset trap, new PC: %08x\n", PC);
 			PC = 0;
 			nPC = 4;
 			m_reset_trap = 0;
 		}
 	}
-
-	MAKE_PSR;
-	update_gpr_pointers();
 }
 
 
@@ -2947,9 +2956,14 @@ void mb86901_device::execute_step()
 	{
 		m_trap = 1;
 		m_interrupt_level = m_bp_irl;
+		printf("trap 1, interrupt level %d\n", m_bp_irl);
 	}
 
-	if (m_trap) execute_trap();
+	if (m_trap)
+	{
+		execute_trap();
+		debugger_instruction_hook(this, PC);
+	}
 
 	if (m_execute_mode)
 	{
@@ -3114,7 +3128,7 @@ void mb86901_device::execute_run()
 			continue;
 		}
 
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(this, PC);
 
 		if (m_reset_mode)
 		{
