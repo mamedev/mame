@@ -156,7 +156,7 @@ void device_image_interface::device_compute_hash(hash_collection &hashes, const 
 image_error_t device_image_interface::set_image_filename(const char *filename)
 {
 	m_image_name = filename;
-	m_working_directory = util::zippath_parent(filename);
+	util::zippath_parent(m_working_directory, filename);
 	m_basename.assign(m_image_name);
 
 	int loc1 = m_image_name.find_last_of('\\');

@@ -140,17 +140,29 @@ static void parse_parent_path(const char *path, int *beginpos, int *endpos)
 //	zippath_parent - retrieves the parent directory
 // -------------------------------------------------
 
-std::string zippath_parent(const char *path)
+std::string &zippath_parent(std::string &dst, const char *path)
 {
 	int pos;
 	parse_parent_path(path, &pos, nullptr);
 
-	std::string dst;
 	if (pos >= 0)
 		dst.assign(path, pos + 1);
 	else
 		dst.clear();
 	return dst;
+}
+
+
+
+// -------------------------------------------------
+//	zippath_parent - retrieves the parent directory
+// -------------------------------------------------
+
+std::string zippath_parent(const char *path)
+{
+	std::string result;
+	zippath_parent(result, path);
+	return result;
 }
 
 
@@ -171,13 +183,26 @@ std::string zippath_parent(const char *path)
  * @return  A std::string&amp;
  */
 
-std::string zippath_parent_basename(const char *path)
+std::string &zippath_parent_basename(std::string &dst, const char *path)
 {
-	std::string dst;
 	int beginpos, endpos;
 	parse_parent_path(path, &beginpos, &endpos);
 	dst.copy((char*)(path + beginpos + 1), endpos - beginpos);
 	return dst;
+}
+
+
+
+// -------------------------------------------------
+//	zippath_parent_basename - retrieves the parent
+//	directory basename
+// -------------------------------------------------
+
+std::string zippath_parent_basename(const char *path)
+{
+	std::string result;
+	zippath_parent_basename(result, path);
+	return result;
 }
 
 
@@ -198,9 +223,8 @@ std::string zippath_parent_basename(const char *path)
  * @return  A std::string&amp;
  */
 
-std::string zippath_combine(const char *path1, const char *path2)
+std::string &zippath_combine(std::string &dst, const char *path1, const char *path2)
 {
-	std::string dst;
 	if (!strcmp(path2, "."))
 	{
 		dst.assign(path1);
@@ -222,6 +246,19 @@ std::string zippath_combine(const char *path1, const char *path2)
 		dst.assign(path1).append(path2);
 	}
 	return dst;
+}
+
+
+
+// -------------------------------------------------
+//	zippath_combine - combines two paths
+// -------------------------------------------------
+
+std::string zippath_combine(const char *path1, const char *path2)
+{
+	std::string result;
+	zippath_combine(result, path1, path2);
+	return result;
 }
 
 

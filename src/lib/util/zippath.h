@@ -34,12 +34,15 @@ class zippath_directory;
 // ----- path operations -----
 
 // retrieves the parent directory
+std::string &zippath_parent(std::string &dst, const char *path);
 std::string zippath_parent(const char *path);
 
 // retrieves the parent directory basename
+std::string &zippath_parent_basename(std::string &dst, const char *path);
 std::string zippath_parent_basename(const char *path);
 
 // combines two paths
+std::string &zippath_combine(std::string &dst, const char *path1, const char *path2);
 std::string zippath_combine(const char *path1, const char *path2);
 
 
