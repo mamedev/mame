@@ -390,7 +390,7 @@ osd_file::error osd_get_full_path(std::string &dst, std::string const &path)
 			return osd_file::error::FAILURE;
 		}
 #else
-		std::unique_ptr<char, void (*)(void *)> canonical(::realpath(path.c_str(), nullptr), &std::free);
+		std::unique_ptr<char, void (*)(void *)> canonical(::realpath(path.c_str(), nullptr), &osd_free);
 		if (canonical)
 		{
 			dst = canonical.get();
