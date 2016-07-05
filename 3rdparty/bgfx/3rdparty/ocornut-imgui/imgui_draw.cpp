@@ -18,9 +18,11 @@
 #include "imgui_internal.h"
 
 #include <stdio.h>      // vsnprintf, sscanf, printf
-#if !defined(alloca) && !defined(__FreeBSD__) && !defined(__DragonFly__)
-#ifdef _WIN32
+#if !defined(alloca)
+#if defined(_WIN32)
 #include <malloc.h>     // alloca
+#elif defined(__FreeBSD__) || defined(__DragonFly__)
+#include <stdlib.h>     // alloca
 #else
 #include <alloca.h>     // alloca
 #endif
