@@ -31,9 +31,9 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-menu_game_options::menu_game_options(mame_ui_manager &mui, render_container *container) 
-	: menu(mui, container), m_main(main_filters::actual)
+menu_game_options::menu_game_options(mame_ui_manager &mui, render_container *container) : menu(mui, container)
 {
+	m_main = main_filters::actual;
 }
 
 //-------------------------------------------------
@@ -54,7 +54,7 @@ menu_game_options::~menu_game_options()
 
 void menu_game_options::handle()
 {
-	auto changed = false;
+	bool changed = false;
 
 	// process the menu
 	const event *menu_event;
@@ -85,7 +85,7 @@ void menu_game_options::handle()
 					for (int index = 0; index < total; ++index)
 						s_sel[index] = main_filters::text[index];
 
-					menu::stack_push<menu_selector>(ui(), container, std::move(s_sel), m_main);
+					menu::stack_push<menu_selector>(ui(), container, s_sel, m_main);
 				}
 				break;
 			}
@@ -110,7 +110,7 @@ void menu_game_options::handle()
 					for (size_t index = 0; index < total; ++index)
 						s_sel[index] = ifile.get_file(index);
 
-					menu::stack_push<menu_selector>(ui(), container, std::move(s_sel), ifile.cur_file(), menu_selector::INIFILE);
+					menu::stack_push<menu_selector>(ui(), container, s_sel, ifile.cur_file(), menu_selector::INIFILE);
 				}
 				break;
 			}
@@ -128,13 +128,13 @@ void menu_game_options::handle()
 				}
 				else if (menu_event->iptkey == IPT_UI_SELECT)
 				{
-					auto ifile = mame_machine_manager::instance()->inifile();
-					auto total = ifile.cat_total();
+					inifile_manager &ifile = mame_machine_manager::instance()->inifile();
+					int total = ifile.cat_total();
 					std::vector<std::string> s_sel(total);
-					for (size_t index = 0; index < total; ++index)
+					for (int index = 0; index < total; ++index)
 						s_sel[index] = ifile.get_category(index);
 
-					menu::stack_push<menu_selector>(ui(), container, std::move(s_sel), ifile.cur_cat(), menu_selector::CATEGORY);
+					menu::stack_push<menu_selector>(ui(), container, s_sel, ifile.cur_cat(), menu_selector::CATEGORY);
 				}
 				break;
 			}
@@ -228,13 +228,13 @@ void menu_game_options::populate()
 		std::string fbuff;
 
 		// add filter item
-		auto arrow_flags = get_arrow_flags((int)FILTER_FIRST, (int)FILTER_LAST, m_main);
+		UINT32 arrow_flags = get_arrow_flags((int)FILTER_FIRST, (int)FILTER_LAST, m_main);
 		item_append(_("Filter"), main_filters::text[m_main], arrow_flags, (void *)(FPTR)FILTER_MENU);
 
 		// add category subitem
 		if (m_main == FILTER_CATEGORY && mame_machine_manager::instance()->inifile().total() > 0)
 		{
-			auto inif = mame_machine_manager::instance()->inifile();
+			inifile_manager &inif = mame_machine_manager::instance()->inifile();
 
 			arrow_flags = get_arrow_flags(0, inif.total() - 1, inif.cur_file());
 			fbuff = _(" ^!File");
@@ -297,7 +297,7 @@ void menu_game_options::custom_render(void *selectedref, float top, float bottom
 {
 	float width;
 	ui().draw_text_full(container, _("Settings"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-		mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+									mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
 
@@ -317,7 +317,8 @@ void menu_game_options::custom_render(void *selectedref, float top, float bottom
 
 	// draw the text within it
 	ui().draw_text_full(container, _("Settings"), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-		mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+									mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
+
 
 } // namespace ui

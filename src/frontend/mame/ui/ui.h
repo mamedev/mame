@@ -32,20 +32,20 @@ class menu_item;
     CONSTANTS
 ***************************************************************************/
 
-// preferred font height; use ui_get_line_height() to get actual height
+/* preferred font height; use ui_get_line_height() to get actual height */
 #define UI_TARGET_FONT_ROWS     get_font_rows()
 
 #define UI_TARGET_FONT_HEIGHT   (1.0f / (float)UI_TARGET_FONT_ROWS)
 #define UI_MAX_FONT_HEIGHT      (1.0f / 15.0f)
 
-// width of lines drawn in the UI
+/* width of lines drawn in the UI */
 #define UI_LINE_WIDTH           (1.0f / 500.0f)
 
-// border between outlines and inner text on left/right and top/bottom sides
+/* border between outlines and inner text on left/right and top/bottom sides */
 #define UI_BOX_LR_BORDER        (UI_TARGET_FONT_HEIGHT * 0.25f)
 #define UI_BOX_TB_BORDER        (UI_TARGET_FONT_HEIGHT * 0.25f)
 
-// handy colors
+/* handy colors */
 #define UI_GREEN_COLOR          rgb_t(0xef,0x10,0x60,0x10)
 #define UI_YELLOW_COLOR         rgb_t(0xef,0x60,0x60,0x10)
 #define UI_RED_COLOR            rgb_t(0xf0,0x60,0x10,0x10)
@@ -66,7 +66,7 @@ class menu_item;
 #define UI_DIPSW_COLOR          decode_ui_color(14)
 #define UI_SLIDER_COLOR         decode_ui_color(15)
 
-// cancel return value for a UI handler
+/* cancel return value for a UI handler */
 #define UI_HANDLER_CANCEL       ((UINT32)~0)
 
 #define SLIDER_DEVICE_SPACING   0x0ff

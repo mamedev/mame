@@ -124,7 +124,9 @@ std::vector<submenu::option> submenu::video_options = {
 //-------------------------------------------------
 
 submenu::submenu(mame_ui_manager &mui, render_container *container, std::vector<option> &suboptions, const game_driver *drv, emu_options *options)
-	: menu(mui, container), m_options(suboptions), m_driver(drv)
+	: menu(mui, container)
+	, m_options(suboptions)
+	, m_driver(drv)
 {
 	core_options *opts = nullptr;
 	if (m_driver == nullptr)
@@ -206,17 +208,17 @@ submenu::~submenu()
 
 void submenu::handle()
 {
-	auto changed = false;
+	bool changed = false;
 	std::string error_string, tmptxt;
 	float f_cur, f_step;
 
 	// process the menu
-	auto menu_event = process(PROCESS_LR_REPEAT);
+	const event *menu_event = process(PROCESS_LR_REPEAT);
 
 	if (menu_event != nullptr && menu_event->itemref != nullptr &&
 			(menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT || menu_event->iptkey == IPT_UI_SELECT))
 	{
-		auto sm_option = *reinterpret_cast<option *>(menu_event->itemref);
+		option &sm_option = *reinterpret_cast<option *>(menu_event->itemref);
 
 		switch (sm_option.type)
 		{
@@ -234,7 +236,7 @@ void submenu::handle()
 				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 				{
 					changed = true;
-					auto i_cur = atoi(sm_option.entry->value());
+					int i_cur = atoi(sm_option.entry->value());
 					(menu_event->iptkey == IPT_UI_LEFT) ? i_cur-- : i_cur++;
 					sm_option.options->set_value(sm_option.name, i_cur, OPTION_PRIORITY_CMDLINE, error_string);
 					sm_option.entry->mark_changed();
@@ -249,20 +251,22 @@ void submenu::handle()
 					{
 						f_step = atof(sm_option.entry->minimum());
 						if (f_step <= 0.0f) {
-							auto pmin = getprecisionchr(sm_option.entry->minimum());
-							auto pmax = getprecisionchr(sm_option.entry->maximum());
+							int pmin = getprecisionchr(sm_option.entry->minimum());
+							int pmax = getprecisionchr(sm_option.entry->maximum());
 							tmptxt = '1' + std::string((pmin > pmax) ? pmin : pmax, '0');
 							f_step = 1 / atof(tmptxt.c_str());
 						}
 					}
 					else
 					{
-						auto precision = getprecisionchr(sm_option.entry->default_value());
+						int precision = getprecisionchr(sm_option.entry->default_value());
 						tmptxt = '1' + std::string(precision, '0');
 						f_step = 1 / atof(tmptxt.c_str());
 					}
-					
-					(menu_event->iptkey == IPT_UI_LEFT) ? f_cur -= f_step : f_cur += f_step;
+					if (menu_event->iptkey == IPT_UI_LEFT)
+						f_cur -= f_step;
+					else
+						f_cur += f_step;
 					tmptxt = string_format("%g", f_cur);
 					sm_option.options->set_value(sm_option.name, tmptxt.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 					sm_option.entry->mark_changed();
@@ -274,7 +278,10 @@ void submenu::handle()
 					changed = true;
 					std::string v_cur(sm_option.entry->value());
 					int cur_value = std::distance(sm_option.value.begin(), std::find(sm_option.value.begin(), sm_option.value.end(), v_cur));
-					v_cur = (menu_event->iptkey == IPT_UI_LEFT) ? sm_option.value[--cur_value] : sm_option.value[++cur_value];
+					if (menu_event->iptkey == IPT_UI_LEFT)
+						v_cur = sm_option.value[--cur_value];
+					else
+						v_cur = sm_option.value[++cur_value];
 					sm_option.options->set_value(sm_option.name, v_cur.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 					sm_option.entry->mark_changed();
 				}
@@ -364,7 +371,7 @@ void submenu::populate()
 						f_max = std::numeric_limits<float>::max();
 					}
 					arrow_flags = get_arrow_flags(f_min, f_max, f_cur);
-					auto tmptxt = string_format("%g", f_cur);
+					std::string tmptxt = string_format("%g", f_cur);
 					item_append(_(sm_option->description),
 						tmptxt.c_str(),
 						arrow_flags,
@@ -432,11 +439,11 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 
 	if (selectedref != nullptr)
 	{
-		auto selected_sm_option = *reinterpret_cast<option *>(selectedref);
+		option &selected_sm_option = *reinterpret_cast<option *>(selectedref);
 		if (selected_sm_option.entry != nullptr)
 		{
 			ui().draw_text_full(container, selected_sm_option.entry->description(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-				mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+					mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 
 			width += 2 * UI_BOX_LR_BORDER;
 			maxwidth = MAX(origx2 - origx1, width);
@@ -457,7 +464,7 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 
 			// draw the text within it
 			ui().draw_text_full(container, selected_sm_option.entry->description(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-				mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+					mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 		}
 	}
 }

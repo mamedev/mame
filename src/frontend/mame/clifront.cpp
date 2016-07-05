@@ -1260,7 +1260,7 @@ void cli_frontend::output_single_softlist(FILE *out, software_list_device &swlis
 			for (feature_list_item &flist : part.featurelist())
 				fprintf(out, "\t\t\t\t<feature name=\"%s\" value=\"%s\" />\n", flist.name(), xml_normalize_string(flist.value()));
 
-			// TODO: display rom region information
+			/* TODO: display rom region information */
 			for (const rom_entry *region = part.romdata(); region; region = rom_next_region(region))
 			{
 				int is_disk = ROMREGION_ISDISKDATA(region);
@@ -1279,7 +1279,7 @@ void cli_frontend::output_single_softlist(FILE *out, software_list_device &swlis
 						else
 							fprintf( out, "\t\t\t\t\t<disk name=\"%s\"", xml_normalize_string(ROM_GETNAME(rom)) );
 
-						// dump checksum information only if there is a known dump
+						/* dump checksum information only if there is a known dump */
 						hash_collection hashes(ROM_GETHASHDATA(rom));
 						if ( !hashes.flag(hash_collection::FLAG_NO_DUMP) )
 							fprintf( out, " %s", hashes.attribute_string().c_str() );

@@ -44,7 +44,7 @@ private:
 	s_filter            m_filter;
 	int                 highlight;
 
-	std::array<ui_software_info *, VISIBLE_GAMES_IN_SEARCH + 1> m_searchlist;
+	ui_software_info                  *m_searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
 	std::vector<ui_software_info *>   m_displaylist, m_tmp, m_sortedlist;
 	std::vector<ui_software_info>     m_swinfo;
 

@@ -21,10 +21,9 @@ const int menu_sound_options::m_sound_rate[] = { 11025, 22050, 44100, 48000 };
 //  ctor
 //-------------------------------------------------
 
-menu_sound_options::menu_sound_options(mame_ui_manager &mui, render_container *container) 
-	: menu(mui, container)
+menu_sound_options::menu_sound_options(mame_ui_manager &mui, render_container *container) : menu(mui, container)
 {
-	auto options = downcast<osd_options &>(mui.machine().options());
+	osd_options &options = downcast<osd_options &>(mui.machine().options());
 
 	m_sample_rate = mui.machine().options().sample_rate();
 	m_sound = (strcmp(options.sound(), OSDOPTVAL_NONE) && strcmp(options.sound(), "0"));
@@ -32,7 +31,7 @@ menu_sound_options::menu_sound_options(mame_ui_manager &mui, render_container *c
 
 	int total = ARRAY_LENGTH(m_sound_rate);
 
-	for (m_cur_rates = 0; m_cur_rates < total; ++m_cur_rates)
+	for (m_cur_rates = 0; m_cur_rates < total; m_cur_rates++)
 		if (m_sample_rate == m_sound_rate[m_cur_rates])
 			break;
 
@@ -47,21 +46,19 @@ menu_sound_options::menu_sound_options(mame_ui_manager &mui, render_container *c
 menu_sound_options::~menu_sound_options()
 {
 	std::string error_string;
-	auto moptions = machine().options();
+	emu_options &moptions = machine().options();
 
-	if (strcmp(moptions.value(OSDOPTION_SOUND), m_sound ? OSDOPTVAL_AUTO : OSDOPTVAL_NONE) != 0)
+	if (strcmp(moptions.value(OSDOPTION_SOUND),m_sound ? OSDOPTVAL_AUTO : OSDOPTVAL_NONE)!=0)
 	{
 		moptions.set_value(OSDOPTION_SOUND, m_sound ? OSDOPTVAL_AUTO : OSDOPTVAL_NONE, OPTION_PRIORITY_CMDLINE, error_string);
 		machine().options().mark_changed(OSDOPTION_SOUND);
 	}
-
-	if (moptions.int_value(OPTION_SAMPLERATE) != m_sound_rate[m_cur_rates])
+	if (moptions.int_value(OPTION_SAMPLERATE)!=m_sound_rate[m_cur_rates])
 	{
 		moptions.set_value(OPTION_SAMPLERATE, m_sound_rate[m_cur_rates], OPTION_PRIORITY_CMDLINE, error_string);
 		machine().options().mark_changed(OPTION_SAMPLERATE);
 	}
-
-	if (moptions.bool_value(OPTION_SAMPLES) != m_samples)
+	if (moptions.bool_value(OPTION_SAMPLES)!=m_samples)
 	{
 		moptions.set_value(OPTION_SAMPLES, m_samples, OPTION_PRIORITY_CMDLINE, error_string);
 		machine().options().mark_changed(OPTION_SAMPLES);
@@ -74,17 +71,17 @@ menu_sound_options::~menu_sound_options()
 
 void menu_sound_options::handle()
 {
-	auto changed = false;
+	bool changed = false;
 
 	// process the menu
-	auto event = process(0);
+	const event *menu_event = process(0);
 
-	if (event != nullptr && event->itemref != nullptr)
+	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
-		switch ((FPTR)event->itemref)
+		switch ((FPTR)menu_event->itemref)
 		{
 		case ENABLE_SOUND:
-			if (event->iptkey == IPT_UI_LEFT || event->iptkey == IPT_UI_RIGHT || event->iptkey == IPT_UI_SELECT)
+			if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT || menu_event->iptkey == IPT_UI_SELECT)
 			{
 				m_sound = !m_sound;
 				changed = true;
@@ -92,23 +89,24 @@ void menu_sound_options::handle()
 			break;
 
 		case SAMPLE_RATE:
-			if (event->iptkey == IPT_UI_LEFT || event->iptkey == IPT_UI_RIGHT)
+			if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 			{
-				(event->iptkey == IPT_UI_LEFT) ? m_cur_rates-- : m_cur_rates++;
+				(menu_event->iptkey == IPT_UI_LEFT) ? m_cur_rates-- : m_cur_rates++;
 				changed = true;
 			}
-			else if (event->iptkey == IPT_UI_SELECT)
+			else if (menu_event->iptkey == IPT_UI_SELECT)
 			{
-				std::vector<std::string> s_sel;
-				for (auto e : m_sound_rate)
-					s_sel.emplace_back(std::to_string(e));
+				int total = ARRAY_LENGTH(m_sound_rate);
+				std::vector<std::string> s_sel(total);
+				for (int index = 0; index < total; index++)
+					s_sel[index] = std::to_string(m_sound_rate[index]);
 
-				menu::stack_push<menu_selector>(ui(), container, std::move(s_sel), m_cur_rates);
+				menu::stack_push<menu_selector>(ui(), container, s_sel, m_cur_rates);
 			}
 			break;
 
 		case ENABLE_SAMPLES:
-			if (event->iptkey == IPT_UI_LEFT || event->iptkey == IPT_UI_RIGHT || event->iptkey == IPT_UI_SELECT)
+			if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT || menu_event->iptkey == IPT_UI_SELECT)
 			{
 				m_samples = !m_samples;
 				changed = true;
@@ -128,7 +126,7 @@ void menu_sound_options::handle()
 
 void menu_sound_options::populate()
 {
-	auto arrow_flags = get_arrow_flags(0, ARRAY_LENGTH(m_sound_rate) - 1, m_cur_rates);
+	UINT32 arrow_flags = get_arrow_flags(0, ARRAY_LENGTH(m_sound_rate) - 1, m_cur_rates);
 	m_sample_rate = m_sound_rate[m_cur_rates];
 
 	// add options items
@@ -148,7 +146,7 @@ void menu_sound_options::custom_render(void *selectedref, float top, float botto
 {
 	float width;
 	ui().draw_text_full(container, _("Sound Options"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-		mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+									mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
 
@@ -168,7 +166,7 @@ void menu_sound_options::custom_render(void *selectedref, float top, float botto
 
 	// draw the text within it
 	ui().draw_text_full(container, _("Sound Options"), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-		mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+									mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
 } // namespace ui

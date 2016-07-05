@@ -25,7 +25,9 @@ namespace ui {
 //  ctor / dtor
 //-------------------------------------------------
 menu_custom_filter::menu_custom_filter(mame_ui_manager &mui, render_container *container, bool _single_menu)
-	: menu(mui, container), m_single_menu(_single_menu), m_added(false)
+	: menu(mui, container)
+	, m_single_menu(_single_menu)
+	, m_added(false)
 {
 }
 
@@ -41,11 +43,11 @@ menu_custom_filter::~menu_custom_filter()
 //-------------------------------------------------
 void menu_custom_filter::handle()
 {
-	auto changed = false;
+	bool changed = false;
 	m_added = false;
 
 	// process the menu
-	auto menu_event = process(PROCESS_LR_REPEAT);
+	const event *menu_event = process(PROCESS_LR_REPEAT);
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
 		switch ((FPTR)menu_event->itemref)
@@ -61,7 +63,8 @@ void menu_custom_filter::handle()
 			case ADD_FILTER:
 				if (menu_event->iptkey == IPT_UI_SELECT)
 				{
-					custfltr::other[++custfltr::numother] = FILTER_UNAVAILABLE + 1;
+					custfltr::numother++;
+					custfltr::other[custfltr::numother] = FILTER_UNAVAILABLE + 1;
 					m_added = true;
 				}
 				break;
@@ -69,7 +72,8 @@ void menu_custom_filter::handle()
 			case REMOVE_FILTER:
 				if (menu_event->iptkey == IPT_UI_SELECT)
 				{
-					custfltr::other[custfltr::numother--] = FILTER_UNAVAILABLE + 1;
+					custfltr::other[custfltr::numother] = FILTER_UNAVAILABLE + 1;
+					custfltr::numother--;
 					changed = true;
 				}
 				break;
@@ -77,7 +81,7 @@ void menu_custom_filter::handle()
 
 		if ((FPTR)menu_event->itemref >= OTHER_FILTER && (FPTR)menu_event->itemref < OTHER_FILTER + MAX_CUST_FILTER)
 		{
-			auto pos = (int)((FPTR)menu_event->itemref - OTHER_FILTER);
+			int pos = (int)((FPTR)menu_event->itemref - OTHER_FILTER);
 			if (menu_event->iptkey == IPT_UI_LEFT && custfltr::other[pos] > FILTER_UNAVAILABLE + 1)
 			{
 				custfltr::other[pos]--;
@@ -94,7 +98,7 @@ void menu_custom_filter::handle()
 			}
 			else if (menu_event->iptkey == IPT_UI_SELECT)
 			{
-				auto total = main_filters::length;
+				size_t total = main_filters::length;
 				std::vector<std::string> s_sel(total);
 				for (size_t index = 0; index < total; ++index)
 					if (index <= FILTER_UNAVAILABLE || index == FILTER_CATEGORY || index == FILTER_FAVORITE || index == FILTER_CUSTOM)
@@ -102,12 +106,12 @@ void menu_custom_filter::handle()
 					else
 						s_sel[index] = main_filters::text[index];
 
-				menu::stack_push<menu_selector>(ui(), container, std::move(s_sel), custfltr::other[pos]);
+				menu::stack_push<menu_selector>(ui(), container, s_sel, custfltr::other[pos]);
 			}
 		}
 		else if ((FPTR)menu_event->itemref >= YEAR_FILTER && (FPTR)menu_event->itemref < YEAR_FILTER + MAX_CUST_FILTER)
 		{
-			auto pos = (int)((FPTR)menu_event->itemref - YEAR_FILTER);
+			int pos = (int)((FPTR)menu_event->itemref - YEAR_FILTER);
 			if (menu_event->iptkey == IPT_UI_LEFT && custfltr::year[pos] > 0)
 			{
 				custfltr::year[pos]--;
@@ -123,7 +127,7 @@ void menu_custom_filter::handle()
 		}
 		else if ((FPTR)menu_event->itemref >= MNFCT_FILTER && (FPTR)menu_event->itemref < MNFCT_FILTER + MAX_CUST_FILTER)
 		{
-			auto pos = (int)((FPTR)menu_event->itemref - MNFCT_FILTER);
+			int pos = (int)((FPTR)menu_event->itemref - MNFCT_FILTER);
 			if (menu_event->iptkey == IPT_UI_LEFT && custfltr::mnfct[pos] > 0)
 			{
 				custfltr::mnfct[pos]--;
@@ -151,11 +155,11 @@ void menu_custom_filter::handle()
 void menu_custom_filter::populate()
 {
 	// add main filter
-	auto arrow_flags = get_arrow_flags((int)FILTER_ALL, (int)FILTER_UNAVAILABLE, custfltr::main);
+	UINT32 arrow_flags = get_arrow_flags((int)FILTER_ALL, (int)FILTER_UNAVAILABLE, custfltr::main);
 	item_append(_("Main filter"), main_filters::text[custfltr::main], arrow_flags, (void *)(FPTR)MAIN_FILTER);
 
 	// add other filters
-	for (int x = 1; x <= custfltr::numother; ++x)
+	for (int x = 1; x <= custfltr::numother; x++)
 	{
 		item_append(menu_item_type::SEPARATOR);
 
@@ -244,7 +248,7 @@ void menu_custom_filter::save_custom_filters()
 		util::stream_format(cinfo, "Total filters = %d\n", (custfltr::numother + 1));
 		util::stream_format(cinfo, "Main filter = %s\n", main_filters::text[custfltr::main]);
 
-		for (int x = 1; x <= custfltr::numother; ++x)
+		for (int x = 1; x <= custfltr::numother; x++)
 		{
 			util::stream_format(cinfo, "Other filter = %s\n", main_filters::text[custfltr::other[x]]);
 			if (custfltr::other[x] == FILTER_MANUFACTURER)
@@ -264,7 +268,10 @@ void menu_custom_filter::save_custom_filters()
 //  ctor / dtor
 //-------------------------------------------------
 menu_swcustom_filter::menu_swcustom_filter(mame_ui_manager &mui, render_container *container, const game_driver *_driver, s_filter &_filter)
-	: menu(mui, container), m_added(false), m_filter(_filter), m_driver(_driver)
+	: menu(mui, container)
+	, m_added(false)
+	, m_filter(_filter)
+	, m_driver(_driver)
 {
 }
 
@@ -279,11 +286,11 @@ menu_swcustom_filter::~menu_swcustom_filter()
 //-------------------------------------------------
 void menu_swcustom_filter::handle()
 {
-	auto changed = false;
+	bool changed = false;
 	m_added = false;
 
 	// process the menu
-	auto menu_event = process(PROCESS_LR_REPEAT);
+	const event *menu_event = process(PROCESS_LR_REPEAT);
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
 		switch ((FPTR)menu_event->itemref)
@@ -299,7 +306,8 @@ void menu_swcustom_filter::handle()
 			case ADD_FILTER:
 				if (menu_event->iptkey == IPT_UI_SELECT)
 				{
-					sw_custfltr::other[++sw_custfltr::numother] = UI_SW_UNAVAILABLE + 1;
+					sw_custfltr::numother++;
+					sw_custfltr::other[sw_custfltr::numother] = UI_SW_UNAVAILABLE + 1;
 					m_added = true;
 				}
 				break;
@@ -307,7 +315,8 @@ void menu_swcustom_filter::handle()
 			case REMOVE_FILTER:
 				if (menu_event->iptkey == IPT_UI_SELECT)
 				{
-					sw_custfltr::other[sw_custfltr::numother--] = UI_SW_UNAVAILABLE + 1;
+					sw_custfltr::other[sw_custfltr::numother] = UI_SW_UNAVAILABLE + 1;
+					sw_custfltr::numother--;
 					changed = true;
 				}
 				break;
@@ -315,7 +324,7 @@ void menu_swcustom_filter::handle()
 
 		if ((FPTR)menu_event->itemref >= OTHER_FILTER && (FPTR)menu_event->itemref < OTHER_FILTER + MAX_CUST_FILTER)
 		{
-			auto pos = (int)((FPTR)menu_event->itemref - OTHER_FILTER);
+			int pos = (int)((FPTR)menu_event->itemref - OTHER_FILTER);
 			if (menu_event->iptkey == IPT_UI_LEFT && sw_custfltr::other[pos] > UI_SW_UNAVAILABLE + 1)
 			{
 				sw_custfltr::other[pos]--;
@@ -328,7 +337,7 @@ void menu_swcustom_filter::handle()
 			}
 			else if (menu_event->iptkey == IPT_UI_SELECT)
 			{
-				auto total = sw_filters::length;
+				size_t total = sw_filters::length;
 				std::vector<std::string> s_sel(total);
 				for (size_t index = 0; index < total; ++index)
 					if (index <= UI_SW_UNAVAILABLE|| index == UI_SW_CUSTOM)
@@ -336,12 +345,12 @@ void menu_swcustom_filter::handle()
 					else
 						s_sel[index] = sw_filters::text[index];
 
-				menu::stack_push<menu_selector>(ui(), container, std::move(s_sel), sw_custfltr::other[pos]);
+				menu::stack_push<menu_selector>(ui(), container, s_sel, sw_custfltr::other[pos]);
 			}
 		}
 		else if ((FPTR)menu_event->itemref >= YEAR_FILTER && (FPTR)menu_event->itemref < YEAR_FILTER + MAX_CUST_FILTER)
 		{
-			auto pos = (int)((FPTR)menu_event->itemref - YEAR_FILTER);
+			int pos = (int)((FPTR)menu_event->itemref - YEAR_FILTER);
 			if (menu_event->iptkey == IPT_UI_LEFT && sw_custfltr::year[pos] > 0)
 			{
 				sw_custfltr::year[pos]--;
@@ -357,7 +366,7 @@ void menu_swcustom_filter::handle()
 		}
 		else if ((FPTR)menu_event->itemref >= TYPE_FILTER && (FPTR)menu_event->itemref < TYPE_FILTER + MAX_CUST_FILTER)
 		{
-			auto pos = (int)((FPTR)menu_event->itemref - TYPE_FILTER);
+			int pos = (int)((FPTR)menu_event->itemref - TYPE_FILTER);
 			if (menu_event->iptkey == IPT_UI_LEFT && sw_custfltr::type[pos] > 0)
 			{
 				sw_custfltr::type[pos]--;
@@ -373,7 +382,7 @@ void menu_swcustom_filter::handle()
 		}
 		else if ((FPTR)menu_event->itemref >= MNFCT_FILTER && (FPTR)menu_event->itemref < MNFCT_FILTER + MAX_CUST_FILTER)
 		{
-			auto pos = (int)((FPTR)menu_event->itemref - MNFCT_FILTER);
+			int pos = (int)((FPTR)menu_event->itemref - MNFCT_FILTER);
 			if (menu_event->iptkey == IPT_UI_LEFT && sw_custfltr::mnfct[pos] > 0)
 			{
 				sw_custfltr::mnfct[pos]--;
@@ -389,7 +398,7 @@ void menu_swcustom_filter::handle()
 		}
 		else if ((FPTR)menu_event->itemref >= REGION_FILTER && (FPTR)menu_event->itemref < REGION_FILTER + MAX_CUST_FILTER)
 		{
-			auto pos = (int)((FPTR)menu_event->itemref - REGION_FILTER);
+			int pos = (int)((FPTR)menu_event->itemref - REGION_FILTER);
 			if (menu_event->iptkey == IPT_UI_LEFT && sw_custfltr::region[pos] > 0)
 			{
 				sw_custfltr::region[pos]--;
@@ -405,7 +414,7 @@ void menu_swcustom_filter::handle()
 		}
 		else if ((FPTR)menu_event->itemref >= LIST_FILTER && (FPTR)menu_event->itemref < LIST_FILTER + MAX_CUST_FILTER)
 		{
-			auto pos = (int)((FPTR)menu_event->itemref - LIST_FILTER);
+			int pos = (int)((FPTR)menu_event->itemref - LIST_FILTER);
 			if (menu_event->iptkey == IPT_UI_LEFT && sw_custfltr::list[pos] > 0)
 			{
 				sw_custfltr::list[pos]--;
@@ -433,11 +442,11 @@ void menu_swcustom_filter::handle()
 void menu_swcustom_filter::populate()
 {
 	// add main filter
-	auto arrow_flags = get_arrow_flags((int)UI_SW_ALL, (int)UI_SW_UNAVAILABLE, sw_custfltr::main);
+	UINT32 arrow_flags = get_arrow_flags((int)UI_SW_ALL, (int)UI_SW_UNAVAILABLE, sw_custfltr::main);
 	item_append(_("Main filter"), sw_filters::text[sw_custfltr::main], arrow_flags, (void *)(FPTR)MAIN_FILTER);
 
 	// add other filters
-	for (int x = 1; x <= sw_custfltr::numother; ++x)
+	for (int x = 1; x <= sw_custfltr::numother; x++)
 	{
 		item_append(menu_item_type::SEPARATOR);
 
@@ -554,7 +563,7 @@ void menu_swcustom_filter::save_sw_custom_filters()
 		util::stream_format(cinfo, "Total filters = %d\n", (sw_custfltr::numother + 1));
 		util::stream_format(cinfo, "Main filter = %s\n", sw_filters::text[sw_custfltr::main]);
 
-		for (int x = 1; x <= sw_custfltr::numother; ++x)
+		for (int x = 1; x <= sw_custfltr::numother; x++)
 		{
 			util::stream_format(cinfo, "Other filter = %s\n", sw_filters::text[sw_custfltr::other[x]]);
 			if (sw_custfltr::other[x] == UI_SW_PUBLISHERS)
