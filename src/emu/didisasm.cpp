@@ -74,5 +74,19 @@ offs_t device_disasm_interface::disassemble(char *buffer, offs_t pc, const UINT8
 	if (result == 0)
 		result = disasm_disassemble(buffer, pc, oprom, opram, options);
 
+	// make sure we get good results
+	assert((result & DASMFLAG_LENGTHMASK) != 0);
+#ifdef MAME_DEBUG
+	device_memory_interface *memory;
+	if (device().interface(memory))
+	{
+		address_space &space = memory->space(AS_PROGRAM);
+		int bytes = space.address_to_byte(result & DASMFLAG_LENGTHMASK);
+		assert(bytes >= min_opcode_bytes());
+		assert(bytes <= max_opcode_bytes());
+		(void) bytes; // appease compiler
+	}
+#endif
+
 	return result;
 }

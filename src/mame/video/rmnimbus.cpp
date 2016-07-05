@@ -27,7 +27,6 @@
 
 #include "emu.h"
 #include "debugger.h"
-#include "debug/debugcpu.h"
 #include "debug/debugcon.h"
 #include "includes/rmnimbus.h"
 
