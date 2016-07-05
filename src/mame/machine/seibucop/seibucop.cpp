@@ -50,7 +50,7 @@
     - palette dims too much on attract / continue screen.
       It's known that the DMA data arrangement gives same results on a real Legionnaire board, so shrug?
 
-    Tech notes (to move into mainpage):
+    Tech notes (to move into own file with doxy mainpage):
     -----------
     [0x6fc] DMA mode bit scheme:
     ---1 ---1 ---- ---- fill op if true, else transfer
@@ -58,6 +58,14 @@
     ---- ---- ---x ---- internal buffer selector
     ---- ---- ---- x--- size modifier? Bus transfer size actually?
     ---- ---- ---- -xxx select channel
+	
+	work RAM object structure (in seibu cup soccer)
+	all object have a [0x40] boundary
+	[0x04-0x07] Y position
+	[0x08-0x0b] X position
+	[0x10-0x13] Y offset (a.k.a. calculated sine)
+	[0x14-0x17] X offset (a.k.a. calculated cosine)
+	[0x37] angle direction
 
 ***************************************************************************/
 
@@ -727,12 +735,14 @@ WRITE16_MEMBER(raiden2cop_device::cop_dma_trigger_w)
 		case 0x85:
 		case 0x86:
 		case 0x87:
-		{   dma_palette_brightness();
+		{   
+			dma_palette_brightness();
 			break;
 		}
 
 	/********************************************************************************************************************/
-	case 0x09: {
+	case 0x09: 
+	{
 		UINT32 src, dst, size;
 		int i;
 
@@ -1459,8 +1469,8 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 
 	if (check_command_matches(command, 0xb80, 0xb82, 0xb84, 0xb86, 0x000, 0x000, 0x000, 0x000, funcval, funcmask))
 	{
-		execute_a100(offset, data);
 		executed = 1;
+		execute_a100(offset, data);
 		return;
 	}
 
@@ -1505,8 +1515,6 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 
 	// cupsoc 1b | 5 | 7ff7 | dde5 | f80 aa2 984 0c2
 	/* radar x/y positions */
-	/* FIXME: x/ys are offsetted */
-	/* FIXME: uses 0x10044a for something */
 	if (check_command_matches(command, 0xf80, 0xaa2, 0x984, 0x0c2, 0x000, 0x000, 0x000, 0x000, 5, 0x7ff7))
 	{
 		executed = 1;
@@ -1548,12 +1556,40 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 		LEGACY_execute_d104(offset, data);
 		return;
 	}
+/*
+	[:raiden2cop] COPDIS: 5105 s=50 f1=0 l=3 f2=05 5 fefb 50 a80 15.0.00 [:raiden2cop] sub32 (r0)
+	[:raiden2cop] COPDIS: 5105 s=50 f1=0 l=3 f2=05 5 fefb 51 984 13.0.04 [:raiden2cop] write16h 8(r0)
+	[:raiden2cop] COPDIS: 5105 s=50 f1=0 l=3 f2=05 5 fefb 52 082 01.0.02 [:raiden2cop] addmem32 4(r0)
+*/
 
+	if (check_command_matches(command, 0xa80, 0x984, 0x082, 0x000, 0x000, 0x000, 0x000, 0x000, 5, 0xfefb))
+	{
+		//executed = 1;
+		printf("5105\n");
+		return;
+	}
+
+/*
+[:raiden2cop] COPDIS: 5905 s=58 f1=0 l=3 f2=05 5 fffb 58 9c8 13.2.08 [:raiden2cop] write16h 10(r2)
+[:raiden2cop] COPDIS: 5905 s=58 f1=0 l=3 f2=05 5 fffb 59 a84 15.0.04 [:raiden2cop] sub32 8(r0)
+[:raiden2cop] COPDIS: 5905 s=58 f1=0 l=3 f2=05 5 fffb 5a 0a2 01.1.02 [:raiden2cop] addmem32 4(r1)*/
+
+	if (check_command_matches(command, 0x9c8, 0xa84, 0x0a2, 0x000, 0x000, 0x000, 0x000, 0x000, 5, 0xfffb))
+	{
+		//executed = 1;
+		printf("5905\n");
+		return;
+	}
+	
+	// player to ball collision
+	if (check_command_matches(command, 0xa88, 0x994, 0x088, 0x000, 0x000, 0x000, 0x000, 0x000, 5, 0xfefb))
+	{
+		execute_f105(offset,data);
+		return;
+	}
+	
 	if (executed == 0)
 	{
-		if(data == 0xf105) // cupsoc transition from presentation to kick off
-			return;
-
 		printf("did not execute %04x\n", data); // cup soccer triggers this a lot (and others)
 	}
 }
