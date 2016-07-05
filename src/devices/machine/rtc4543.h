@@ -26,6 +26,9 @@
 #define MCFG_RTC4543_DATA_CALLBACK(_devcb) \
 	devcb = &rtc4543_device::set_data_cb(*device, DEVCB_##_devcb);
 
+#define MCFG_JRC6355E_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, JRC6355E, _clock)
+
 
 
 //**************************************************************************
@@ -37,9 +40,12 @@
 class rtc4543_device :  public device_t,
 						public device_rtc_interface
 {
+	static const char *s_reg_names[7];
+
 public:
 	// construction/destruction
 	rtc4543_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	rtc4543_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *filename);
 
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( wr_w );
@@ -59,16 +65,20 @@ protected:
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 	virtual bool rtc_feature_leap_year() override { return true; }
 
-private:
+	// helpers
+	virtual void clk_rising();
+	virtual void clk_falling();
+	void load_bit(int reg);
+	void store_bit(int reg);
+	void advance_bit();
+
 	devcb_write_line data_cb;
 
 	int m_ce;
 	int m_clk;
 	int m_wr;
 	int m_data;
-	int m_shiftreg;
 	int m_regs[7];
-	int m_curreg;
 	int m_curbit;
 
 	// timers
@@ -76,7 +86,24 @@ private:
 };
 
 
+
+// ======================> jrc6355e_device
+
+class jrc6355e_device : public rtc4543_device
+{
+public:
+	// construction/destruction
+	jrc6355e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	// rtc4543 overrides
+	virtual void clk_rising() override;
+	virtual void clk_falling() override;
+};
+
+
 // device type definition
 extern const device_type RTC4543;
+extern const device_type JRC6355E;
 
 #endif
