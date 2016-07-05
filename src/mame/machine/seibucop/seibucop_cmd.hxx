@@ -72,16 +72,20 @@ void raiden2cop_device::LEGACY_execute_130e_cupsoc(int offset, UINT16 data)
 {
 	int dy = m_host_space->read_dword(cop_regs[1] + 4) - m_host_space->read_dword(cop_regs[0] + 4);
 	int dx = m_host_space->read_dword(cop_regs[1] + 8) - m_host_space->read_dword(cop_regs[0] + 8);
-
+	
 	cop_status = 7;
+
 	if (!dx) {
 		cop_status |= 0x8000;
 		cop_angle = 0;
 	}
-	else {
+	else 
+	{
 		cop_angle = (int)(atan(double(dy) / double(dx)) * 128.0 / M_PI);
 		if (dx < 0)
 			cop_angle += 0x80;
+		
+		cop_angle &= 0xff;
 	}
 
 	m_LEGACY_r0 = dy;
@@ -90,7 +94,7 @@ void raiden2cop_device::LEGACY_execute_130e_cupsoc(int offset, UINT16 data)
 	//printf("%d %d %f %04x\n",dx,dy,atan(double(dy)/double(dx)) * 128 / M_PI,cop_angle);
 
 	if (data & 0x80)
-		m_host_space->write_word(cop_regs[0] + (0x34 ^ 2), cop_angle);
+		cop_write_byte(cop_regs[0] + (0x34), cop_angle);
 }
 
 /*
