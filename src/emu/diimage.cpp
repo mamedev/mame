@@ -316,7 +316,7 @@ bool device_image_interface::try_change_working_directory(const char *subdir)
 
 	/* did we successfully identify the directory? */
 	if (success)
-		util::zippath_combine(m_working_directory, m_working_directory.c_str(), subdir);
+		m_working_directory = util::zippath_combine(m_working_directory.c_str(), subdir);
 
 	return success;
 }
