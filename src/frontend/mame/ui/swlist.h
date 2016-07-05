@@ -29,7 +29,7 @@ public:
 		ENTRY
 	};
 
-	menu_software_parts(mame_ui_manager &mui, render_container *container, const software_info *info, const char *interface, const software_part **part, bool other_opt, result *result);
+	menu_software_parts(mame_ui_manager &mui, render_container *container, const software_info *info, const char *interface, const software_part **part, bool other_opt, result &result);
 	virtual ~menu_software_parts() override;
 	virtual void populate() override;
 	virtual void handle() override;
@@ -45,7 +45,7 @@ private:
 	const char *            m_interface;
 	const software_part **  m_selected_part;
 	bool                    m_other_opt;
-	result *                m_result;
+	result &                m_result;
 };
 
 

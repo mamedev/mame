@@ -94,7 +94,7 @@ void menu_control_floppy_image::hook_load(std::string filename, bool softlist)
 			can_in_place = false;
 	}
 	submenu_result.rw = menu_select_rw::result::INVALID;
-	menu::stack_push<menu_select_rw>(ui(), container, can_in_place, &submenu_result.rw);
+	menu::stack_push<menu_select_rw>(ui(), container, can_in_place, submenu_result.rw);
 	state = SELECT_RW;
 }
 

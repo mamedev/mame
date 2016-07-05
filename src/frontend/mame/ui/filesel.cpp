@@ -44,16 +44,16 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-menu_file_selector::menu_file_selector(mame_ui_manager &mui, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool has_empty, bool has_softlist, bool has_create, menu_file_selector::result *result)
+menu_file_selector::menu_file_selector(mame_ui_manager &mui, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool has_empty, bool has_softlist, bool has_create, menu_file_selector::result &result)
 	: menu(mui, container)
 	, m_current_directory(current_directory)
 	, m_current_file(current_file)
+	, m_result(result)
 {
 	m_image = image;
 	m_has_empty = has_empty;
 	m_has_softlist = has_softlist;
 	m_has_create = has_create;
-	m_result = result;
 }
 
 
@@ -391,18 +391,18 @@ void menu_file_selector::handle()
 			{
 			case SELECTOR_ENTRY_TYPE_EMPTY:
 				// empty slot - unload
-				*m_result = result::EMPTY;
+				m_result = result::EMPTY;
 				menu::stack_pop(machine());
 				break;
 
 			case SELECTOR_ENTRY_TYPE_CREATE:
 				// create
-				*m_result = result::CREATE;
+				m_result = result::CREATE;
 				menu::stack_pop(machine());
 				break;
 
 			case SELECTOR_ENTRY_TYPE_SOFTWARE_LIST:
-				*m_result = result::SOFTLIST;
+				m_result = result::SOFTLIST;
 				menu::stack_pop(machine());
 				break;
 
@@ -423,7 +423,7 @@ void menu_file_selector::handle()
 			case SELECTOR_ENTRY_TYPE_FILE:
 				// file
 				m_current_file.assign(entry->fullpath);
-				*m_result = result::FILE;
+				m_result = result::FILE;
 				menu::stack_pop(machine());
 				break;
 			}
@@ -508,11 +508,11 @@ void menu_file_selector::handle()
 //-------------------------------------------------
 
 menu_select_rw::menu_select_rw(mame_ui_manager &mui, render_container *container,
-										bool can_in_place, result *result)
-	: menu(mui, container)
+										bool can_in_place, result &result)
+	: menu(mui, container),
+	  m_can_in_place(can_in_place),
+	  m_result(result)
 {
-	m_can_in_place = can_in_place;
-	m_result = result;
 }
 
 
@@ -532,11 +532,11 @@ menu_select_rw::~menu_select_rw()
 void menu_select_rw::populate()
 {
 	item_append(_("Select access mode"), "", FLAG_DISABLE, nullptr);
-	item_append(_("Read-only"), "", 0, (void *) result::READONLY);
+	item_append(_("Read-only"), "", 0, itemref_from_result(result::READONLY));
 	if (m_can_in_place)
-		item_append(_("Read-write"), "", 0, (void *)result::READWRITE);
-	item_append(_("Read this image, write to another image"), "", 0, (void *)result::WRITE_OTHER);
-	item_append(_("Read this image, write to diff"), "", 0, (void *)result::WRITE_DIFF);
+		item_append(_("Read-write"), "", 0, itemref_from_result(result::READWRITE));
+	item_append(_("Read this image, write to another image"), "", 0, itemref_from_result(result::WRITE_OTHER));
+	item_append(_("Read this image, write to diff"), "", 0, itemref_from_result(result::WRITE_DIFF));
 }
 
 
@@ -550,9 +550,30 @@ void menu_select_rw::handle()
 	const event *event = process(0);
 	if (event != nullptr && event->iptkey == IPT_UI_SELECT)
 	{
-		*m_result = result(FPTR(event->itemref));
+		m_result = result_from_itemref(event->itemref);
 		menu::stack_pop(machine());
 	}
 }
+
+
+//-------------------------------------------------
+//  itemref_from_result
+//-------------------------------------------------
+
+void *menu_select_rw::itemref_from_result(menu_select_rw::result result)
+{
+	return (void *)(FPTR)(unsigned int)result;
+}
+
+
+//-------------------------------------------------
+//  result_from_itemref
+//-------------------------------------------------
+
+menu_select_rw::result menu_select_rw::result_from_itemref(void *itemref)
+{
+	return (menu_select_rw::result) (unsigned int) (FPTR)itemref;
+}
+
 
 } // namespace ui

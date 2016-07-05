@@ -33,14 +33,14 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-menu_software_parts::menu_software_parts(mame_ui_manager &mui, render_container *container, const software_info *info, const char *interface, const software_part **part, bool other_opt, result *result)
-	: menu(mui, container)
+menu_software_parts::menu_software_parts(mame_ui_manager &mui, render_container *container, const software_info *info, const char *interface, const software_part **part, bool other_opt, result &result)
+	: menu(mui, container),
+	  m_result(result)
 {
 	m_info = info;
 	m_interface = interface;
 	m_selected_part = part;
 	m_other_opt = other_opt;
-	m_result = result;
 }
 
 
@@ -108,7 +108,7 @@ void menu_software_parts::handle()
 	if (event != nullptr && event->iptkey == IPT_UI_SELECT && event->itemref != nullptr)
 	{
 		software_part_menu_entry *entry = (software_part_menu_entry *) event->itemref;
-		*m_result = entry->type;
+		m_result = entry->type;
 		*m_selected_part = entry->part;
 		menu::stack_pop(machine());
 	}

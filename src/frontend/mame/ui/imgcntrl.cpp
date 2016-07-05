@@ -178,7 +178,7 @@ void menu_control_device_image::handle()
 	switch(state) {
 	case START_FILE: {
 		submenu_result.filesel = menu_file_selector::result::INVALID;
-		menu::stack_push<menu_file_selector>(ui(), container, image, m_current_directory, m_current_file, true, image->image_interface()!=nullptr, image->is_creatable(), &submenu_result.filesel);
+		menu::stack_push<menu_file_selector>(ui(), container, image, m_current_directory, m_current_file, true, image->image_interface()!=nullptr, image->is_creatable(), submenu_result.filesel);
 		state = SELECT_FILE;
 		break;
 	}
@@ -191,7 +191,7 @@ void menu_control_device_image::handle()
 
 	case START_OTHER_PART: {
 		submenu_result.swparts = menu_software_parts::result::INVALID;
-		menu::stack_push<menu_software_parts>(ui(), container, swi, swp->interface(), &swp, true, &submenu_result.swparts);
+		menu::stack_push<menu_software_parts>(ui(), container, swi, swp->interface(), &swp, true, submenu_result.swparts);
 		state = SELECT_OTHER_PART;
 		break;
 	}
@@ -214,7 +214,7 @@ void menu_control_device_image::handle()
 		{
 			submenu_result.swparts = menu_software_parts::result::INVALID;
 			swp = nullptr;
-			menu::stack_push<menu_software_parts>(ui(), container, swi, image->image_interface(), &swp, false, &submenu_result.swparts);
+			menu::stack_push<menu_software_parts>(ui(), container, swi, image->image_interface(), &swp, false, submenu_result.swparts);
 			state = SELECT_ONE_PART;
 		}
 		else
