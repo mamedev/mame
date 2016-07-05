@@ -23,6 +23,7 @@ Board names displayed on test mode menu:
 
 Heated Barrel includes only the I/O test, and Legionnaire only has a DSW
 display. These can be accessed by holding down the P1 joystick at reset.
+(Legionnaire's program contains remnants of a more complete test mode.)
 
 
 TODO
@@ -1119,51 +1120,6 @@ static GFXDECODE_START( cupsoc )
 GFXDECODE_END
 
 
-static const gfx_layout cupsocsb_spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ 4,0,12,8,20,16,28,24, 512+4, 512+0, 512+12, 512+8, 512+20, 512+16, 512+28, 512+24 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, 8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	32*32
-};
-
-static const gfx_layout cupsocsb_8x8_tilelayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 8,12,0,4 },
-	{ 0,3,2,1,16,19,18,17 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	8*32
-};
-
-
-static const gfx_layout cupsocsb_tilelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 8,12,0,4 },
-	{ 0,3,2,1,16,19,18,17,  512+0,512+3,512+2,512+1,512+16,512+19,512+18,512+17 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, 8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	32*32
-};
-
-
-static GFXDECODE_START( heatbrl_csb )
-	GFXDECODE_ENTRY( "char", 0, cupsocsb_8x8_tilelayout,    48*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, cupsocsb_tilelayout,        0*16, 32 )
-	GFXDECODE_ENTRY( "gfx4", 0, cupsocsb_tilelayout,        32*16, 16 ) /* unused */
-	GFXDECODE_ENTRY( "sprite", 0, cupsocsb_spritelayout,      0*16, 8*16 )
-	GFXDECODE_ENTRY( "gfx5", 0, cupsocsb_tilelayout,        32*16, 16 )
-	GFXDECODE_ENTRY( "gfx6", 0, cupsocsb_tilelayout,        16*16, 16 )
-GFXDECODE_END
-
-
 static GFXDECODE_START( grainbow )
 	GFXDECODE_ENTRY( "char", 0, legionna_new_charlayout,    48*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, legionna_tilelayout,        0*16, 16 )
@@ -1416,6 +1372,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 // all 3 Legionnaire sets differ only by the region byte at 0x1ef in rom 4 (Japan 0x00, US 0x01, World 0x02)
+// unused program code above 0x28c00 has many bad bits, probably a defective copy of a previous build
 ROM_START( legionna )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD32_BYTE( "1.u025",  0x00000, 0x20000, CRC(9e2d3ec8) SHA1(8af9ca349389cbbd2b541aafa09de57f87f6fd72) )
