@@ -130,7 +130,7 @@ VIDEO_START_MEMBER(namconb1_state,namconb1)
 {
 	namco_tilemap_init(NAMCONB1_TILEGFX, memregion(NAMCONB1_TILEMASKREGION)->base(), NB1TilemapCB );
 	c355_obj_init(NAMCONB1_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(FUNC(namconb1_state::NB1objcode2tile), this));
-	
+
 	save_item(NAME(m_tilemap_tile_bank));
 } /* namconb1 */
 
@@ -189,6 +189,6 @@ VIDEO_START_MEMBER(namconb1_state,namconb2)
 	namco_tilemap_init(NAMCONB1_TILEGFX, memregion(NAMCONB1_TILEMASKREGION)->base(), NB2TilemapCB );
 	c355_obj_init(NAMCONB1_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(FUNC(namconb1_state::NB2objcode2tile), this));
 	c169_roz_init(NAMCONB1_ROTGFX,NAMCONB1_ROTMASKREGION);
-	
+
 	save_item(NAME(m_tilemap_tile_bank));
 } /* namconb2_vh_start */

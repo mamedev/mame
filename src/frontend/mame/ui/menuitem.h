@@ -17,7 +17,6 @@
 #include "emu.h"
 
 namespace ui {
-
 // special menu item for separators
 #define MENU_SEPARATOR_ITEM         "---"
 
@@ -32,8 +31,14 @@ enum class menu_item_type
 class menu_item
 {
 public:
-	const char      *text;
-	const char      *subtext;
+	menu_item() = default;
+	menu_item(menu_item const &) = default;
+	menu_item(menu_item &&) = default;
+	menu_item &operator=(menu_item const &) = default;
+	menu_item &operator=(menu_item &&) = default;
+
+	std::string     text;
+	std::string     subtext;
 	UINT32          flags;
 	void            *ref;
 	menu_item_type  type;   // item type (eventually will go away when itemref is proper ui_menu_item class rather than void*)

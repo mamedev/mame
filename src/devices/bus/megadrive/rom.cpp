@@ -930,7 +930,7 @@ READ16_MEMBER(md_rom_cjmjclub_device::read)
 {
 	if (offset == 0x400000/2)   return 0x9000;
 	if (offset == 0x400002/2)   return 0xd300;
-	
+
 	// non-protection accesses
 	if (offset < 0x400000/2)
 		return m_rom[MD_ADDR(offset)];

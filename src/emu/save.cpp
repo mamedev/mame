@@ -88,10 +88,10 @@ void save_manager::allow_registration(bool allowed)
 
 const char *save_manager::indexed_item(int index, void *&base, UINT32 &valsize, UINT32 &valcount) const
 {
-	state_entry *entry = m_entry_list.find(index);
-	if (entry == nullptr)
+	if (index >= m_entry_list.size() || index < 0)
 		return nullptr;
 
+	state_entry *entry = m_entry_list.at(index).get();
 	base = entry->m_data;
 	valsize = entry->m_typesize;
 	valcount = entry->m_typecount;
@@ -112,12 +112,12 @@ void save_manager::register_presave(save_prepost_delegate func)
 		fatalerror("Attempt to register callback function after state registration is closed!\n");
 
 	// scan for duplicates and push through to the end
-	for (state_callback &cb : m_presave_list)
-		if (cb.m_func == func)
-			fatalerror("Duplicate save state function (%s/%s)\n", cb.m_func.name(), func.name());
+	for (auto &cb : m_presave_list)
+		if (cb->m_func == func)
+			fatalerror("Duplicate save state function (%s/%s)\n", cb->m_func.name(), func.name());
 
 	// allocate a new entry
-	m_presave_list.append(*global_alloc(state_callback(func)));
+	m_presave_list.push_back(std::make_unique<state_callback>(func));
 }
 
 
@@ -133,12 +133,12 @@ void save_manager::register_postload(save_prepost_delegate func)
 		fatalerror("Attempt to register callback function after state registration is closed!\n");
 
 	// scan for duplicates and push through to the end
-	for (state_callback &cb : m_postload_list)
-		if (cb.m_func == func)
-			fatalerror("Duplicate save state function (%s/%s)\n", cb.m_func.name(), func.name());
+	for (auto &cb : m_postload_list)
+		if (cb->m_func == func)
+			fatalerror("Duplicate save state function (%s/%s)\n", cb->m_func.name(), func.name());
 
 	// allocate a new entry
-	m_postload_list.append(*global_alloc(state_callback(func)));
+	m_postload_list.push_back(std::make_unique<state_callback>(func));
 }
 
 
@@ -169,21 +169,21 @@ void save_manager::save_memory(device_t *device, const char *module, const char 
 		totalname = string_format("%s/%X/%s", module, index, name);
 
 	// look for duplicates and an entry to insert in front of
-	state_entry *insert_after = nullptr;
-	for (state_entry &entry : m_entry_list)
+	std::vector<std::unique_ptr<state_entry>>::iterator  insert_after = m_entry_list.begin();
+	for (auto it = m_entry_list.begin(); it!= m_entry_list.end(); ++it)
 	{
 		// stop when we find an entry whose name is after ours
-		if (entry.m_name.compare(totalname)>0)
+		if (it->get()->m_name.compare(totalname)>0)
 			break;
-		insert_after = &entry;
+		insert_after = it;
 
 		// error if we are equal
-		if (entry.m_name.compare(totalname)==0)
+		if (it->get()->m_name.compare(totalname)==0)
 			fatalerror("Duplicate save state registration entry (%s)\n", totalname.c_str());
 	}
 
 	// insert us into the list
-	m_entry_list.insert_after(*global_alloc(state_entry(val, totalname.c_str(), device, module, tag ? tag : "", index, valsize, valcount)), insert_after);
+	m_entry_list.insert(insert_after,std::make_unique<state_entry>(val, totalname.c_str(), device, module, tag ? tag : "", index, valsize, valcount));
 }
 
 
@@ -221,8 +221,8 @@ save_error save_manager::check_file(running_machine &machine, emu_file &file, co
 
 void save_manager::dispatch_postload()
 {
-	for (state_callback &func : m_postload_list)
-		func.m_func();
+	for (auto &func : m_postload_list)
+		func->m_func();
 }
 
 //-------------------------------------------------
@@ -252,15 +252,15 @@ save_error save_manager::read_file(emu_file &file)
 	bool flip = NATIVE_ENDIAN_VALUE_LE_BE((header[9] & SS_MSB_FIRST) != 0, (header[9] & SS_MSB_FIRST) == 0);
 
 	// read all the data, flipping if necessary
-	for (state_entry &entry : m_entry_list)
+	for (auto &entry : m_entry_list)
 	{
-		UINT32 totalsize = entry.m_typesize * entry.m_typecount;
-		if (file.read(entry.m_data, totalsize) != totalsize)
+		UINT32 totalsize = entry->m_typesize * entry->m_typecount;
+		if (file.read(entry->m_data, totalsize) != totalsize)
 			return STATERR_READ_ERROR;
 
 		// handle flipping
 		if (flip)
-			entry.flip_data();
+			entry->flip_data();
 	}
 
 	// call the post-load functions
@@ -277,8 +277,8 @@ save_error save_manager::read_file(emu_file &file)
 
 void save_manager::dispatch_presave()
 {
-	for (state_callback &func : m_presave_list)
-		func.m_func();
+	for (auto &func : m_presave_list)
+		func->m_func();
 }
 
 //-------------------------------------------------
@@ -311,10 +311,10 @@ save_error save_manager::write_file(emu_file &file)
 	dispatch_presave();
 
 	// then write all the data
-	for (state_entry &entry : m_entry_list)
+	for (auto &entry : m_entry_list)
 	{
-		UINT32 totalsize = entry.m_typesize * entry.m_typecount;
-		if (file.write(entry.m_data, totalsize) != totalsize)
+		UINT32 totalsize = entry->m_typesize * entry->m_typecount;
+		if (file.write(entry->m_data, totalsize) != totalsize)
 			return STATERR_WRITE_ERROR;
 	}
 	return STATERR_NONE;
@@ -330,15 +330,15 @@ UINT32 save_manager::signature() const
 {
 	// iterate over entries
 	UINT32 crc = 0;
-	for (state_entry &entry : m_entry_list)
+	for (auto &entry : m_entry_list)
 	{
 		// add the entry name to the CRC
-		crc = core_crc32(crc, (UINT8 *)entry.m_name.c_str(), entry.m_name.length());
+		crc = core_crc32(crc, (UINT8 *)entry->m_name.c_str(), entry->m_name.length());
 
 		// add the type and size to the CRC
 		UINT32 temp[2];
-		temp[0] = LITTLE_ENDIANIZE_INT32(entry.m_typecount);
-		temp[1] = LITTLE_ENDIANIZE_INT32(entry.m_typesize);
+		temp[0] = LITTLE_ENDIANIZE_INT32(entry->m_typecount);
+		temp[1] = LITTLE_ENDIANIZE_INT32(entry->m_typesize);
 		crc = core_crc32(crc, (UINT8 *)&temp[0], sizeof(temp));
 	}
 	return crc;
@@ -352,8 +352,8 @@ UINT32 save_manager::signature() const
 
 void save_manager::dump_registry() const
 {
-	for (state_entry &entry : m_entry_list)
-		LOG(("%s: %d x %d\n", entry.m_name.c_str(), entry.m_typesize, entry.m_typecount));
+	for (auto &entry : m_entry_list)
+		LOG(("%s: %d x %d\n", entry->m_name.c_str(), entry->m_typesize, entry->m_typecount));
 }
 
 
@@ -409,8 +409,7 @@ save_error save_manager::validate_header(const UINT8 *header, const char *gamena
 //-------------------------------------------------
 
 save_manager::state_callback::state_callback(save_prepost_delegate callback)
-	: m_next(nullptr),
-		m_func(std::move(callback))
+	: m_func(std::move(callback))
 {
 }
 
@@ -420,8 +419,7 @@ save_manager::state_callback::state_callback(save_prepost_delegate callback)
 //-------------------------------------------------
 
 state_entry::state_entry(void *data, const char *name, device_t *device, const char *module, const char *tag, int index, UINT8 size, UINT32 count)
-	: m_next(nullptr),
-		m_data(data),
+	: m_data(data),
 		m_name(name),
 		m_device(device),
 		m_module(module),

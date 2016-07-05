@@ -24,7 +24,7 @@ BUGS / ISSUES
 The former is used in startup tests, the latter seems less relevant (must use menu self test "S").
 
 (2) serial ports do not work, so serial communication failure (ERROR 60) and ERROR 40 (serial
-printer interface) result. 
+printer interface) result.
 
 (3) while DOS 3 and UCSD systems (fort_sys, pas_sys) + diag disks boot, CPM 2.x and DOS 2.x die
 in secondary boot loader with a RESTORE (seek track 0) when track 2 sector 1 should be loaded.
@@ -2383,17 +2383,19 @@ ROM_END
 // A Readme from January 1985 mentions 'recent ROM changes for MASS 11' (a VAX word processor).
 // It is *likely* that the sole differences between 5.05 and 5.03 affect terminal emulation.
 
-// FIXME: ROM names are * made up *.
-// Someone who knows the DEC naming conventions should correct them -
 ROM_START(rainbow190)
 ROM_REGION(0x100000, "maincpu", 0)
-ROM_LOAD("dec190rom0.bin", 0xf0000, 0x4000, CRC(fac191d2) SHA1(4aff5b1e031d3b5eafc568b23e68235270bb34de))
+ROM_LOAD("dec190rom0.bin", 0xf0000, 0x4000, CRC(fac191d2) SHA1(4aff5b1e031d3b5eafc568b23e68235270bb34de)) //FIXME: need correct rom name
 ROM_RELOAD(0xf4000, 0x4000)
-ROM_LOAD("dec190rom1.bin", 0xf8000, 0x4000, CRC(5ce59632) SHA1(d29793f7014c57a4e7cb77bbf6e84f9113635ed2))
+ROM_LOAD("dec190rom1.bin", 0xf8000, 0x4000, CRC(5ce59632) SHA1(d29793f7014c57a4e7cb77bbf6e84f9113635ed2)) //FIXME: need correct rom name
 
 ROM_RELOAD(0xfc000, 0x4000)
 ROM_REGION(0x1000, "chargen", 0)
-ROM_LOAD("chargen.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f))
+ROM_LOAD("23-037e3.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f))
+
+// Z80 ARBITRATION PROM
+ROM_REGION(0x100, "prom", 0)
+ROM_LOAD("23-090b1.mmi6308-ij.e13", 0x0000, 0x0100, CRC(cac3a7e3) SHA1(2d0468cda36fa287f705364c56dbf62f548d2e4c) ) // MMI 6308-IJ; Silkscreen stamp: "LM8413 // 090B1"; 256x8 Open Collector prom @E13, same prom is @E11 on 100-A
 ROM_END
 //----------------------------------------------------------------------------------------
 

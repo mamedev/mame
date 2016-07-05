@@ -118,9 +118,6 @@ public:
 	D3DPRESENT_PARAMETERS * get_presentation() { return &m_presentation; }
 
 	IDirect3DVertexBuffer9 *get_vertex_buffer() const { return m_vertexbuf; }
-	vertex *                get_locked_buffer() const { return m_lockedbuf; }
-	VOID **                 get_locked_buffer_ptr()const { return (VOID **)&m_lockedbuf; }
-	void                    set_locked_buffer(vertex *lockedbuf) { m_lockedbuf = lockedbuf; }
 
 	void                    set_toggle(bool toggle) { m_toggle = toggle; }
 
@@ -172,7 +169,6 @@ private:
 	UINT32                  m_last_wrap;                // previous wrap state
 	int                     m_last_modmode;             // previous texture modulation
 
-	void *                  m_hlsl_buf;                 // HLSL vertex data
 	shaders *               m_shaders;                  // HLSL interface
 
 	d3d_texture_manager *   m_texture_manager;          // texture manager

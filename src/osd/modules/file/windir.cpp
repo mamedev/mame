@@ -45,7 +45,7 @@ public:
 private:
 	HANDLE              m_find;                   // handle to the finder
 	bool                m_is_first;               // true if this is the first entry
-	entry				m_entry;                  // current entry's data
+	entry               m_entry;                  // current entry's data
 	WIN32_FIND_DATA     m_data;                   // current raw data
 };
 

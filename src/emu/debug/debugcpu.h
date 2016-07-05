@@ -46,8 +46,6 @@ struct xml_data_node;
 
 class device_debug
 {
-	typedef offs_t (*dasm_override_func)(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
-
 public:
 	// breakpoint class
 	class breakpoint
@@ -186,7 +184,6 @@ public:
 
 	// hooks into our operations
 	void set_instruction_hook(debug_instruction_hook_func hook);
-	void set_dasm_override(dasm_override_func dasm_override) { m_dasm_override = dasm_override; }
 
 	// disassembly
 	offs_t disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram) const;
@@ -315,9 +312,6 @@ private:
 	UINT32                      m_flags;                // debugging flags for this CPU
 	symbol_table                m_symtable;             // symbol table for expression evaluation
 	debug_instruction_hook_func m_instrhook;            // per-instruction callback hook
-
-	// disassembly
-	dasm_override_func      m_dasm_override;            // pointer to provided override function
 
 	// stepping information
 	offs_t                  m_stepaddr;                 // step target address for DEBUG_FLAG_STEPPING_OVER
@@ -603,36 +597,35 @@ private:
 	/* internal helpers */
 	void on_vblank(screen_device &device, bool vblank_state);
 
-	running_machine&	m_machine;
+	running_machine&    m_machine;
 
-	device_t *	m_livecpu;
-	device_t *	m_visiblecpu;
-	device_t *	m_breakcpu;
+	device_t *  m_livecpu;
+	device_t *  m_visiblecpu;
+	device_t *  m_breakcpu;
 
-	FILE *		m_source_file;			// script source file
+	FILE *      m_source_file;          // script source file
 
-	std::unique_ptr<symbol_table> m_symtable;			// global symbol table
+	std::unique_ptr<symbol_table> m_symtable;           // global symbol table
 
-	bool	m_within_instruction_hook;
-	bool	m_vblank_occurred;
-	bool	m_memory_modified;
-	bool	m_debugger_access;
+	bool    m_within_instruction_hook;
+	bool    m_vblank_occurred;
+	bool    m_memory_modified;
+	bool    m_debugger_access;
 
-	int			m_execution_state;
-	device_t *	m_stop_when_not_device;	// stop execution when the device ceases to be this
+	int         m_execution_state;
+	device_t *  m_stop_when_not_device; // stop execution when the device ceases to be this
 
-	UINT32		m_bpindex;
-	UINT32		m_wpindex;
-	UINT32		m_rpindex;
+	UINT32      m_bpindex;
+	UINT32      m_wpindex;
+	UINT32      m_rpindex;
 
-	UINT64		m_wpdata;
-	UINT64		m_wpaddr;
+	UINT64      m_wpdata;
+	UINT64      m_wpaddr;
 	std::unique_ptr<UINT64[]> m_tempvar;
 
-	osd_ticks_t	m_last_periodic_update_time;
+	osd_ticks_t m_last_periodic_update_time;
 
-	bool		m_comments_loaded;
+	bool        m_comments_loaded;
 };
 
 #endif
-

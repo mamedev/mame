@@ -22,30 +22,6 @@ pstr_t pstring_t<putf8_traits>::m_zero = pstr_t(0);
 template<>
 pstr_t pstring_t<pu8_traits>::m_zero = pstr_t(0);
 
-
-/*
- * Uncomment the following to override defaults
- */
-
-#define IMMEDIATE_MODE  (1)
-//#define DEBUG_MODE      (0)
-
-#ifdef MAME_DEBUG
-	#ifndef IMMEDIATE_MODE
-		#define IMMEDIATE_MODE  (1)
-	#endif
-	#ifndef DEBUG_MODE
-		#define DEBUG_MODE      (0)
-	#endif
-#else
-	#ifndef IMMEDIATE_MODE
-		#define IMMEDIATE_MODE  (1)
-	#endif
-	#ifndef DEBUG_MODE
-		#define DEBUG_MODE      (0)
-	#endif
-#endif
-
 template<typename F>
 pstring_t<F>::~pstring_t()
 {
@@ -117,29 +93,22 @@ void pstring_t<F>::pcopy(const mem_t *from, int size)
 }
 
 template<typename F>
-const pstring_t<F> pstring_t<F>::substr(int start, int count) const
+const pstring_t<F> pstring_t<F>::substr(unsigned start, unsigned count) const
 {
 	pstring_t ret;
-	int alen = (int) len();
-	if (start < 0)
-		start = 0;
-	if (start >= alen)
+	unsigned alen = len();
+	if (start >= alen || count == 0)
 		return ret;
-	if (count <0 || start + count > alen)
+	if (start + count > alen)
 		count = alen - start;
-	const char *p = cstr();
-	if (count <= 0)
-		ret.pcopy(p, 0);
-	else
-	{
-		// find start
-		for (int i=0; i<start; i++)
-			p += F::codelen(p);
-		const char *e = p;
-		for (int i=0; i<count; i++)
-			e += F::codelen(e);
-		ret.pcopy(p, e-p);
-	}
+	const mem_t *p = cstr();
+	// find start
+	for (unsigned i=0; i<start; i++)
+		p += F::codelen(p);
+	const char *e = p;
+	for (unsigned i=0; i<count; i++)
+		e += F::codelen(e);
+	ret.pcopy(p, e-p);
 	return ret;
 }
 
@@ -446,9 +415,9 @@ int pstring_t<F>::find(const pstring_t &search, unsigned start) const
 {
 	const unsigned tlen = len();
 	const unsigned slen = search.len();
-	const char *s = search.cstr();
+	const mem_t *s = search.cstr();
 	const unsigned startt = std::min(start, tlen);
-	const char *t = cstr();
+	const mem_t *t = cstr();
 	for (std::size_t  i=0; i<startt; i++)
 		t += F::codelen(t);
 	for (int i=0; i <= (int) tlen - (int) startt - (int) slen; i++)

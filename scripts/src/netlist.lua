@@ -14,6 +14,11 @@ project "netlist"
 	kind (LIBTYPE)
 
 	addprojectflags()
+	
+	
+	defines {
+		"__STDC_CONSTANT_MACROS",
+	}
 
 	includedirs {
 		MAME_DIR .. "src/lib/netlist",

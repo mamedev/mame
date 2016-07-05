@@ -191,7 +191,7 @@ DIP locations verified from manuals for:
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/3812intf.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "sound/2203intf.h"
 #include "includes/alpha68k.h"
 

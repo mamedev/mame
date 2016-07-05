@@ -11,21 +11,21 @@
 #include "unicode.h"
 
 
-/*-------------------------------------------------
-    uchar_isvalid - return true if a given
-    character is a legitimate unicode character
--------------------------------------------------*/
+//-------------------------------------------------
+//  uchar_isvalid - return true if a given
+//  character is a legitimate unicode character
+//-------------------------------------------------
 
-int uchar_isvalid(unicode_char uchar)
+bool uchar_isvalid(unicode_char uchar)
 {
 	return (uchar < 0x110000) && !((uchar >= 0xd800) && (uchar <= 0xdfff));
 }
 
 
-/*-------------------------------------------------
-    uchar_from_utf8 - convert a UTF-8 sequence
-    into a unicode character
--------------------------------------------------*/
+//-------------------------------------------------
+//  uchar_from_utf8 - convert a UTF-8 sequence
+//  into a unicode character
+//-----------------------------------------------
 
 int uchar_from_utf8(unicode_char *uchar, const char *utf8char, size_t count)
 {
@@ -33,74 +33,74 @@ int uchar_from_utf8(unicode_char *uchar, const char *utf8char, size_t count)
 	int auxlen, i;
 	char auxchar;
 
-	/* validate parameters */
+	// validate parameters
 	if (utf8char == nullptr || count == 0)
 		return 0;
 
-	/* start with the first byte */
+	// start with the first byte
 	c = (unsigned char) *utf8char;
 	count--;
 	utf8char++;
 
-	/* based on that, determine how many additional bytes we need */
+	// based on that, determine how many additional bytes we need
 	if (c < 0x80)
 	{
-		/* unicode char 0x00000000 - 0x0000007F */
+		// unicode char 0x00000000 - 0x0000007F
 		c &= 0x7f;
 		auxlen = 0;
 		minchar = 0x00000000;
 	}
 	else if (c >= 0xc0 && c < 0xe0)
 	{
-		/* unicode char 0x00000080 - 0x000007FF */
+		// unicode char 0x00000080 - 0x000007FF
 		c &= 0x1f;
 		auxlen = 1;
 		minchar = 0x00000080;
 	}
 	else if (c >= 0xe0 && c < 0xf0)
 	{
-		/* unicode char 0x00000800 - 0x0000FFFF */
+		// unicode char 0x00000800 - 0x0000FFFF
 		c &= 0x0f;
 		auxlen = 2;
 		minchar = 0x00000800;
 	}
 	else if (c >= 0xf0 && c < 0xf8)
 	{
-		/* unicode char 0x00010000 - 0x001FFFFF */
+		// unicode char 0x00010000 - 0x001FFFFF
 		c &= 0x07;
 		auxlen = 3;
 		minchar = 0x00010000;
 	}
 	else if (c >= 0xf8 && c < 0xfc)
 	{
-		/* unicode char 0x00200000 - 0x03FFFFFF */
+		// unicode char 0x00200000 - 0x03FFFFFF
 		c &= 0x03;
 		auxlen = 4;
 		minchar = 0x00200000;
 	}
 	else if (c >= 0xfc && c < 0xfe)
 	{
-		/* unicode char 0x04000000 - 0x7FFFFFFF */
+		// unicode char 0x04000000 - 0x7FFFFFFF
 		c &= 0x01;
 		auxlen = 5;
 		minchar = 0x04000000;
 	}
 	else
 	{
-		/* invalid */
+		// invalid
 		return -1;
 	}
 
-	/* exceeds the count? */
+	// exceeds the count?
 	if (auxlen > count)
 		return -1;
 
-	/* we now know how long the char is, now compute it */
+	// we now know how long the char is, now compute it
 	for (i = 0; i < auxlen; i++)
 	{
 		auxchar = utf8char[i];
 
-		/* all auxillary chars must be between 0x80-0xbf */
+		// all auxillary chars must be between 0x80-0xbf 
 		if ((auxchar & 0xc0) != 0x80)
 			return -1;
 
@@ -108,7 +108,7 @@ int uchar_from_utf8(unicode_char *uchar, const char *utf8char, size_t count)
 		c |= auxchar & 0x3f;
 	}
 
-	/* make sure that this char is above the minimum */
+	// make sure that this char is above the minimum
 	if (c < minchar)
 		return -1;
 
@@ -117,20 +117,20 @@ int uchar_from_utf8(unicode_char *uchar, const char *utf8char, size_t count)
 }
 
 
-/*-------------------------------------------------
-    uchar_from_utf16 - convert a UTF-16 sequence
-    into a unicode character
--------------------------------------------------*/
+//-------------------------------------------------
+//  uchar_from_utf16 - convert a UTF-16 sequence
+//  into a unicode character
+//-------------------------------------------------
 
 int uchar_from_utf16(unicode_char *uchar, const utf16_char *utf16char, size_t count)
 {
 	int rc = -1;
 
-	/* validate parameters */
+	// validate parameters
 	if (utf16char == nullptr || count == 0)
 		return 0;
 
-	/* handle the two-byte case */
+	// handle the two-byte case
 	if (utf16char[0] >= 0xd800 && utf16char[0] <= 0xdbff)
 	{
 		if (count > 1 && utf16char[1] >= 0xdc00 && utf16char[1] <= 0xdfff)
@@ -140,7 +140,7 @@ int uchar_from_utf16(unicode_char *uchar, const utf16_char *utf16char, size_t co
 		}
 	}
 
-	/* handle the one-byte case */
+	// handle the one-byte case
 	else if (utf16char[0] < 0xdc00 || utf16char[0] > 0xdfff)
 	{
 		*uchar = utf16char[0];
@@ -151,11 +151,11 @@ int uchar_from_utf16(unicode_char *uchar, const utf16_char *utf16char, size_t co
 }
 
 
-/*-------------------------------------------------
-    uchar_from_utf16f - convert a UTF-16 sequence
-    into a unicode character from a flipped
-    byte order
--------------------------------------------------*/
+//-------------------------------------------------
+//  uchar_from_utf16f - convert a UTF-16 sequence
+//  into a unicode character from a flipped
+//  byte order
+//-------------------------------------------------
 
 int uchar_from_utf16f(unicode_char *uchar, const utf16_char *utf16char, size_t count)
 {
@@ -168,30 +168,30 @@ int uchar_from_utf16f(unicode_char *uchar, const utf16_char *utf16char, size_t c
 }
 
 
-/*-------------------------------------------------
-    utf8_from_uchar - convert a unicode character
-    into a UTF-8 sequence
--------------------------------------------------*/
+//-------------------------------------------------
+//  utf8_from_uchar - convert a unicode character
+//  into a UTF-8 sequence
+//-------------------------------------------------
 
 int utf8_from_uchar(char *utf8string, size_t count, unicode_char uchar)
 {
 	int rc = 0;
 
-	/* error on invalid characters */
+	// error on invalid characters
 	if (!uchar_isvalid(uchar))
 		return -1;
 
-	/* based on the value, output the appropriate number of bytes */
+	// based on the value, output the appropriate number of bytes
 	if (uchar < 0x80)
 	{
-		/* unicode char 0x00000000 - 0x0000007F */
+		// unicode char 0x00000000 - 0x0000007F
 		if (count < 1)
 			return -1;
 		utf8string[rc++] = (char) uchar;
 	}
 	else if (uchar < 0x800)
 	{
-		/* unicode char 0x00000080 - 0x000007FF */
+		// unicode char 0x00000080 - 0x000007FF
 		if (count < 2)
 			return -1;
 		utf8string[rc++] = ((char) (uchar >> 6)) | 0xC0;
@@ -199,7 +199,7 @@ int utf8_from_uchar(char *utf8string, size_t count, unicode_char uchar)
 	}
 	else if (uchar < 0x10000)
 	{
-		/* unicode char 0x00000800 - 0x0000FFFF */
+		// unicode char 0x00000800 - 0x0000FFFF
 		if (count < 3)
 			return -1;
 		utf8string[rc++] = ((char) (uchar >> 12)) | 0xE0;
@@ -208,7 +208,7 @@ int utf8_from_uchar(char *utf8string, size_t count, unicode_char uchar)
 	}
 	else if (uchar < 0x00200000)
 	{
-		/* unicode char 0x00010000 - 0x001FFFFF */
+		// unicode char 0x00010000 - 0x001FFFFF
 		if (count < 4)
 			return -1;
 		utf8string[rc++] = ((char) (uchar >> 18)) | 0xF0;
@@ -218,7 +218,7 @@ int utf8_from_uchar(char *utf8string, size_t count, unicode_char uchar)
 	}
 	else if (uchar < 0x04000000)
 	{
-		/* unicode char 0x00200000 - 0x03FFFFFF */
+		// unicode char 0x00200000 - 0x03FFFFFF
 		if (count < 5)
 			return -1;
 		utf8string[rc++] = ((char) (uchar >> 24)) | 0xF8;
@@ -229,7 +229,7 @@ int utf8_from_uchar(char *utf8string, size_t count, unicode_char uchar)
 	}
 	else if (uchar < 0x80000000)
 	{
-		/* unicode char 0x04000000 - 0x7FFFFFFF */
+		// unicode char 0x04000000 - 0x7FFFFFFF
 		if (count < 6)
 			return -1;
 		utf8string[rc++] = ((char) (uchar >> 30)) | 0xFC;
@@ -246,20 +246,33 @@ int utf8_from_uchar(char *utf8string, size_t count, unicode_char uchar)
 }
 
 
-/*-------------------------------------------------
-    utf16_from_uchar - convert a unicode character
-    into a UTF-16 sequence
--------------------------------------------------*/
+//-------------------------------------------------
+//  utf8_from_uchar - convert a unicode character
+//  into a UTF-8 sequence
+//-------------------------------------------------
+
+std::string utf8_from_uchar(unicode_char uchar)
+{
+	char buffer[UTF8_CHAR_MAX];
+	auto len = utf8_from_uchar(buffer, ARRAY_LENGTH(buffer), uchar);
+	return std::string(buffer, len);
+}
+
+
+//-------------------------------------------------
+//  utf16_from_uchar - convert a unicode character
+//  into a UTF-16 sequence
+//-------------------------------------------------
 
 int utf16_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar)
 {
 	int rc;
 
-	/* error on invalid characters */
+	// error on invalid characters
 	if (!uchar_isvalid(uchar))
 		return -1;
 
-	/* single word case */
+	// single word case
 	if (uchar < 0x10000)
 	{
 		if (count < 1)
@@ -268,7 +281,7 @@ int utf16_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar)
 		rc = 1;
 	}
 
-	/* double word case */
+	// double word case
 	else if (uchar < 0x100000)
 	{
 		if (count < 2)
@@ -283,10 +296,10 @@ int utf16_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar)
 }
 
 
-/*-------------------------------------------------
-    utf16_from_uchar - convert a unicode character
-    into a UTF-16 sequence with flipped endianness
--------------------------------------------------*/
+//-------------------------------------------------
+//  utf16_from_uchar - convert a unicode character
+//  into a UTF-16 sequence with flipped endianness
+//-------------------------------------------------
 
 int utf16f_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar)
 {
@@ -303,10 +316,10 @@ int utf16f_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar)
 }
 
 
-/*-------------------------------------------------
-    utf8_previous_char - return a pointer to the
-    previous character in a string
--------------------------------------------------*/
+//-------------------------------------------------
+//  utf8_previous_char - return a pointer to the
+//  previous character in a string
+//-------------------------------------------------
 
 /**
  * @fn  const char *utf8_previous_char(const char *utf8string)
@@ -326,11 +339,11 @@ const char *utf8_previous_char(const char *utf8string)
 }
 
 
-/*-------------------------------------------------
-    utf8_is_valid_string - return true if the
-    given string is a properly formed sequence of
-    UTF-8 characters
--------------------------------------------------*/
+//-------------------------------------------------
+//  utf8_is_valid_string - return true if the
+//  given string is a properly formed sequence of
+//    UTF-8 characters
+//-------------------------------------------------
 
 /**
  * @fn  int utf8_is_valid_string(const char *utf8string)
@@ -342,7 +355,7 @@ const char *utf8_previous_char(const char *utf8string)
  * @return  An int.
  */
 
-int utf8_is_valid_string(const char *utf8string)
+bool utf8_is_valid_string(const char *utf8string)
 {
 	int remaining_length = strlen(utf8string);
 
@@ -351,15 +364,15 @@ int utf8_is_valid_string(const char *utf8string)
 		unicode_char uchar = 0;
 		int charlen;
 
-		/* extract the current character and verify it */
+		// extract the current character and verify it
 		charlen = uchar_from_utf8(&uchar, utf8string, remaining_length);
 		if (charlen <= 0 || uchar == 0 || !uchar_isvalid(uchar))
-			return FALSE;
+			return false;
 
-		/* advance */
+		// advance
 		utf8string += charlen;
 		remaining_length -= charlen;
 	}
 
-	return TRUE;
+	return true;
 }

@@ -76,7 +76,7 @@
 #define LOG_RTC         (0)
 #define LOG_RED         (0)
 #define LOG_PORT        (0)
-#define LOG_IRQ			(0)
+#define LOG_IRQ         (0)
 
 class atlantis_state : public driver_device
 {
@@ -555,8 +555,9 @@ WRITE32_MEMBER(atlantis_state::port_ctrl_w)
 	UINT32 newOffset = offset >> 17;
 	COMBINE_DATA(&m_port_ctrl_reg[newOffset]);
 
-	//switch (newOffset) {
-	if (newOffset == 1) {
+	switch (newOffset) {
+	case 1:
+	{
 		UINT32 bits = ioport("KEYPAD")->read();
 		m_port_ctrl_reg[2] = 0;
 		if (!(data & 0x8))
@@ -569,10 +570,18 @@ WRITE32_MEMBER(atlantis_state::port_ctrl_w)
 			m_port_ctrl_reg[2] = (bits >> 12) & 7; // Row 3
 		if (LOG_PORT)
 			logerror("%s: port_ctrl_w Keypad Row Sel = %04X bits = %08X\n", machine().describe_context(), data, bits);
+		break;
 	}
-	else {
+	case 3:
+		if (data==0x8f)
+			m_port_ctrl_reg[4] = ioport("AN.1")->read();
+		else
+			m_port_ctrl_reg[4] = ioport("AN.0")->read();
+		break;
+	default:
 		if (LOG_PORT)
 			logerror("%s: port_ctrl_w write to offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
+		break;
 	}
 }
 
@@ -657,13 +666,13 @@ static ADDRESS_MAP_START( map1, AS_PROGRAM, 32, atlantis_state )
 	AM_RANGE(0x00200000, 0x00200003) AM_WRITE(dcs3_fifo_full_w)
 	AM_RANGE(0x00400000, 0x00400003) AM_DEVWRITE("dcs", dcs_audio_device, dsio_idma_addr_w)
 	AM_RANGE(0x00600000, 0x00600003) AM_DEVREADWRITE("dcs", dcs_audio_device, dsio_idma_data_r, dsio_idma_data_w)
-	AM_RANGE(0x00800000, 0x00900003) AM_READWRITE(port_ctrl_r, port_ctrl_w)
+	AM_RANGE(0x00800000, 0x00a00003) AM_READWRITE(port_ctrl_r, port_ctrl_w)
 	//AM_RANGE(0x00800000, 0x00800003) // Written once = 0000fff8
 	//AM_RANGE(0x00880000, 0x00880003) // Initial write 0000fff0, follow by sequence ffef, ffdf, ffbf, fff7. Row Select?
 	//AM_RANGE(0x00900000, 0x00900003) // Read once before each sequence write to 0x00880000. Code checks bits 0,1,2. Keypad?
 	//AM_RANGE(0x00980000, 0x00980003) // Read / Write.  Bytes written 0x8f, 0xcf. Code if read 0x1 then read 00a00000. POTs?
 	//AM_RANGE(0x00a00000, 0x00a00003)
-	AM_RANGE(0x00980000, 0x00980003) AM_NOP // AM_WRITE(asic_fifo_w)
+	//AM_RANGE(0x00980000, 0x00980003) AM_NOP // AM_WRITE(asic_fifo_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(map2, AS_PROGRAM, 32, atlantis_state)
@@ -769,6 +778,12 @@ static INPUT_PORTS_START( mwskins )
 	//PORT_BIT(0x0007, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, atlantis_state, port_mod_r, "KEYPAD")
 	PORT_BIT(0xffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
+	PORT_START("AN.0")
+	PORT_BIT(0x1ff, 0x100, IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("AN.1")
+	PORT_BIT(0x1ff, 0x100, IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
 	PORT_START("KEYPAD")
 	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD)   /* keypad 1 */
 	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD)   /* keypad 2 */
@@ -810,7 +825,7 @@ static MACHINE_CONFIG_START( mwskins, atlantis_state )
 	MCFG_PCI9050_SET_MAP(3, map3)
 	MCFG_PCI9050_USER_OUTPUT_CALLBACK(DEVWRITE32(":", atlantis_state, user_io_output))
 	MCFG_PCI9050_USER_INPUT_CALLBACK(DEVREAD32(":", atlantis_state, user_io_input))
-	
+
 	MCFG_NVRAM_ADD_0FILL("rtc")
 
 	MCFG_IDE_PCI_ADD(PCI_ID_IDE, 0x10950646, 0x03, 0x0)

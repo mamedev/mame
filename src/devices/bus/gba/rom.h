@@ -20,19 +20,19 @@ class gba_s3511_device
 public:
 	gba_s3511_device(running_machine &machine);
 	running_machine &machine() const { return m_machine; }
-	
+
 	void update_time(int len);
 	UINT8 convert_to_bcd(int val);
-	
+
 	int read_line();
 	void write(UINT16 data, int gpio_dirs);
-	
+
 protected:
 	int m_phase;
 	UINT8 m_last_val, m_bits, m_command;
 	int m_data_len;
 	UINT8 m_data[7];
-	
+
 	running_machine& m_machine;
 };
 
@@ -58,10 +58,10 @@ class gba_eeprom_device
 public:
 	gba_eeprom_device(running_machine &machine, UINT8 *eeprom, UINT32 size, int addr_bits);
 	running_machine &machine() const { return m_machine; }
-	
+
 	UINT32 read();
 	void write(UINT32 data);
-	
+
 protected:
 	UINT8 *m_data;
 	UINT32 m_data_size;
@@ -72,7 +72,7 @@ protected:
 	int m_bits;
 	int m_addr_bits;
 	UINT8 m_eep_data;
-	
+
 	running_machine& m_machine;
 };
 
@@ -97,7 +97,7 @@ public:
 
 	virtual DECLARE_READ32_MEMBER(read_gpio) override;
 	virtual DECLARE_WRITE32_MEMBER(write_gpio) override;
-	
+
 	virtual UINT16 gpio_dev_read(int gpio_dirs) { return 0; }
 	virtual void gpio_dev_write(UINT16 data, int gpio_dirs) {}
 
@@ -129,7 +129,7 @@ class gba_rom_drilldoz_device : public gba_rom_sram_device
 public:
 	// construction/destruction
 	gba_rom_drilldoz_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void gpio_dev_write(UINT16 data, int gpio_dirs) override;
 };
@@ -190,12 +190,12 @@ class gba_rom_flash_rtc_device : public gba_rom_flash_device
 public:
 	// construction/destruction
 	gba_rom_flash_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual UINT16 gpio_dev_read(int gpio_dirs) override;
 	virtual void gpio_dev_write(UINT16 data, int gpio_dirs) override;
-	
+
 private:
 	std::unique_ptr<gba_s3511_device> m_rtc;
 };
@@ -232,7 +232,7 @@ class gba_rom_flash1m_rtc_device : public gba_rom_flash1m_device
 public:
 	// construction/destruction
 	gba_rom_flash1m_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual UINT16 gpio_dev_read(int gpio_dirs) override;
@@ -271,16 +271,16 @@ class gba_rom_yoshiug_device : public gba_rom_eeprom_device
 public:
 	// construction/destruction
 	gba_rom_yoshiug_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual ioport_constructor device_input_ports() const override;
-	
+
 	// reading and writing
 	virtual DECLARE_READ32_MEMBER(read_tilt) override;
 	virtual DECLARE_WRITE32_MEMBER(write_tilt) override;
-	
+
 private:
 	int m_tilt_ready;
 	UINT16 m_xpos, m_ypos;
@@ -317,7 +317,7 @@ class gba_rom_boktai_device : public gba_rom_eeprom64_device
 public:
 	// construction/destruction
 	gba_rom_boktai_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -325,7 +325,7 @@ public:
 
 	virtual UINT16 gpio_dev_read(int gpio_dirs) override;
 	virtual void gpio_dev_write(UINT16 data, int gpio_dirs) override;
-	
+
 private:
 	std::unique_ptr<gba_s3511_device> m_rtc;
 	required_ioport m_sensor;

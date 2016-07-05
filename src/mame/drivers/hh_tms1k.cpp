@@ -3722,7 +3722,7 @@ MACHINE_CONFIG_END
 
   This is a 2-player electronic board game. It still needs game pieces like the
   original Battleship board game.
-  
+
   It went through 3 hardware revisions:
   1977: model 4750A or B, see notes above
   1979: model 4750C: cost-reduced single chip design, lesser quality game board.
@@ -5759,10 +5759,10 @@ MACHINE_CONFIG_END
   U.S. Games Super Sports-4
   * TMS1100 MP1219 (no decap)
   * 4 7seg LEDs, 49 other LEDs, 1-bit sound
-  
+
   This handheld includes 4 games: Basketball, Football, Soccer, Hockey.
   MAME external artwork is needed for the switchable overlays.
-  
+
   The later Coleco Total Control 4 is clearly based on this.
 
 ***************************************************************************/
@@ -5786,7 +5786,7 @@ void ssports4_state::prepare_display()
 {
 	// R0,R1 and R8,R9 are 7segs
 	set_display_segmask(0x303, 0x7f);
-	
+
 	// note: R2 is an extra column
 	display_matrix(9, 10, m_o | (m_r << 6 & 0x100), m_r);
 }
@@ -5795,7 +5795,7 @@ WRITE16_MEMBER(ssports4_state::write_r)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
-	
+
 	// R0-R9: led select/data
 	m_r = data;
 	prepare_display();

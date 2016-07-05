@@ -228,7 +228,7 @@ WRITE8_MEMBER( funkball_state::serial_w )
 {
 	if(offset == 0)
 	{
-		// TODO: hack, main CPU sends a CR only here, actually expecting Windows-style newline. 
+		// TODO: hack, main CPU sends a CR only here, actually expecting Windows-style newline.
 		if(data == 0x0d)
 			m_terminal->write(space,0,0x0a);
 		else
@@ -839,7 +839,7 @@ static MACHINE_CONFIG_START( funkball, funkball_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 16, 447)
 
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-	
+
 	MCFG_INTEL_28F320J5_ADD("u29")
 	MCFG_INTEL_28F320J5_ADD("u30")
 	MCFG_INTEL_28F320J5_ADD("u3")

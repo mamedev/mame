@@ -62,7 +62,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	
+
 	DECLARE_WRITE16_MEMBER(sound_cmd_w);
 	DECLARE_WRITE8_MEMBER(go2000_pcm_1_bankswitch_w);
 	virtual void machine_start() override;

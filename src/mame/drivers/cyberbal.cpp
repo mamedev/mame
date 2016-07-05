@@ -23,7 +23,7 @@
 
 #include "emu.h"
 #include "machine/watchdog.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "rendlay.h"
 #include "includes/cyberbal.h"
 

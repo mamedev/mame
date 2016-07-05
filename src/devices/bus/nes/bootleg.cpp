@@ -58,6 +58,7 @@ const device_type NES_AC08 = &device_creator<nes_ac08_device>;
 const device_type NES_UNL_BB = &device_creator<nes_unl_bb_device>;
 const device_type NES_MMALEE = &device_creator<nes_mmalee_device>;
 const device_type NES_SHUIGUAN = &device_creator<nes_shuiguan_device>;
+const device_type NES_RT01 = &device_creator<nes_rt01_device>;
 
 
 nes_ax5705_device::nes_ax5705_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -157,7 +158,12 @@ nes_mmalee_device::nes_mmalee_device(const machine_config &mconfig, const char *
 
 nes_shuiguan_device::nes_shuiguan_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_SHUIGUAN, "NES Cart Shui Guan Pipe Pirate PCB", tag, owner, clock, "nes_shuiguan", __FILE__), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
-				{
+{
+}
+
+nes_rt01_device::nes_rt01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: nes_nrom_device(mconfig, NES_RT01, "NES Cart RT-01 PCB", tag, owner, clock, "nes_rt01", __FILE__)
+{
 }
 
 
@@ -527,6 +533,21 @@ void nes_shuiguan_device::pcb_reset()
 	memset(m_mmc_vrom_bank, 0, sizeof(m_mmc_vrom_bank));
 }
 
+
+void nes_rt01_device::device_start()
+{
+	common_start();
+}
+
+void nes_rt01_device::pcb_reset()
+{
+	chr2_0(0, CHRROM);
+	chr2_2(0, CHRROM);
+	chr2_4(0, CHRROM);
+	chr2_6(0, CHRROM);
+	prg16_89ab(0);
+	prg16_cdef(0);
+}
 
 
 /*-------------------------------------------------
@@ -1217,7 +1238,7 @@ READ8_MEMBER(nes_lh32_device::read_m)
 
 READ8_MEMBER(nes_lh32_device::read_h)
 {
-	LOG_MMC(("lh32 read_h, offset: %04x\n", offset));
+//  LOG_MMC(("lh32 read_h, offset: %04x\n", offset));
 
 	if (offset >= 0x4000 && offset < 0x6000)
 		return m_prgram[offset & 0x1fff];
@@ -1251,8 +1272,7 @@ WRITE8_MEMBER(nes_lh32_device::write_h)
  Games: Fuuun Shaolin Kyo (FDS conversion)
 
  This PCB maps WRAM in 0xc000-0xdfff and PRG in 0x6000-0x7fff
- This is very similar to KS7037 (not sure which conversion
- uses that one)
+ This is very similar to KS7037 (see kaiser.cpp)
 
  iNES:
 
@@ -1274,7 +1294,7 @@ READ8_MEMBER(nes_lh10_device::read_m)
 
 READ8_MEMBER(nes_lh10_device::read_h)
 {
-	LOG_MMC(("lh10 read_h, offset: %04x\n", offset));
+//  LOG_MMC(("lh10 read_h, offset: %04x\n", offset));
 
 	if (offset >= 0x4000 && offset < 0x6000)
 		return m_prgram[offset & 0x1fff];
@@ -1343,7 +1363,7 @@ READ8_MEMBER(nes_lh53_device::read_m)
 
 READ8_MEMBER(nes_lh53_device::read_h)
 {
-	LOG_MMC(("lh53 read_h, offset: %04x\n", offset));
+//  LOG_MMC(("lh53 read_h, offset: %04x\n", offset));
 
 	if (offset >= 0x3800 && offset < 0x5800)
 		return m_battery[offset & 0x1fff];
@@ -1411,7 +1431,7 @@ WRITE8_MEMBER(nes_2708_device::write_m)
 
 READ8_MEMBER(nes_2708_device::read_h)
 {
-	LOG_MMC(("btl-2708 read_h, offset: %04x\n", offset));
+//  LOG_MMC(("btl-2708 read_h, offset: %04x\n", offset));
 
 	if (offset >= 0x3800 && offset < 0x5800 && !m_reg[1])
 		return m_prgram[0x2000 + ((offset - 0x3800) & 0x1fff)]; // higher 8K of WRAM
@@ -1632,4 +1652,33 @@ READ8_MEMBER(nes_shuiguan_device::read_m)
 	// always first bank??
 	LOG_MMC(("shuiguan read_m, offset: %04x\n", offset));
 	return m_prg[offset & 0x1fff];
+}
+
+
+/*-------------------------------------------------
+
+ RT-01
+
+ Games: Russian test cart
+
+ The PRG EPROM has copy protected areas with
+ "weak bits", which is tested at some points (info
+ from Cah4e3).
+
+ iNES:
+
+ In MESS:
+
+ -------------------------------------------------*/
+
+READ8_MEMBER(nes_rt01_device::read_h)
+{
+//  LOG_MMC(("rt01 read_h, offset: %04x\n", offset));
+
+	if ((offset >= 0x4e80) && (offset < 0x4f00))
+		return 0xf2 | (machine().rand() & 0x0d);
+	if ((offset >= 0x7e80) && (offset < 0x7f00))
+		return 0xf2 | (machine().rand() & 0x0d);
+
+	return hi_access_rom(offset);
 }

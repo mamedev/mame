@@ -3,14 +3,14 @@
 /***************************************************************************
 
     Kyuukoukabakugekitai - Dive Bomber Squad
- 
+
     (C) Konami 1989
 
 ****************************************************************************
- 
+
  PCB Layout
  ----------
- 
+
  GX840 PWB35165
 |--------------------------------------------------------------------------|
 |                                                                          |
@@ -40,22 +40,22 @@
 |              U22                                             SN76489  VR |
 |                                                                          |
 |--------------------------------------------------------------------------|
- 
+
  Notes:
      There are numerous wire modificationss connecting pins of U15-U18 to
      various other components on the PCB
- 
+
      MB81C86    - 64kx4 SRAM
      HM6116AP   - 2kx8 SRAM
      8464A      - 8kx8 SRAM
      MN53060KGB - Panasonic CMOS gate array (6016 gates)
      051316     - Konami PSAC
      CN1/CN2    - ROM board connectors
- 
- 
+
+
  ROM Board
  ---------
- 
+
  GX840 PWB451716
  |--------------------------|
  |                          |
@@ -68,15 +68,15 @@
  |    U41     U5     U9     |
  |                          |
  |--------------------------|
- 
+
  Notes:
      All ROMs are 27512 EPROMs
- 
+
 
 To do:
  * Verify layer alignment
  * Deduce unknown DIP switch settings
- 
+
 To verify against original HW:
  * Game has no sprites when you reach level 4 and becomes unplayable
  * Game often hangs (sprites no longer animate, screen scrolls/rotates endlessly) due to a communication breakdown
@@ -132,44 +132,44 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(divebomb_state::fgcpu_spr_comm_r)
 {
-    has_fromsprite = false;
-    update_irqs();
-    return from_sprite;
+	has_fromsprite = false;
+	update_irqs();
+	return from_sprite;
 }
 
 
 WRITE8_MEMBER(divebomb_state::fgcpu_spr_comm_w)
 {
-    m_spritecpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-    to_spritecpu = data;
+	m_spritecpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	to_spritecpu = data;
 }
 
 
 READ8_MEMBER(divebomb_state::fgcpu_roz_comm_r)
 {
-    has_fromroz = false;
-    update_irqs();
-    return from_roz;
+	has_fromroz = false;
+	update_irqs();
+	return from_roz;
 }
 
 
 WRITE8_MEMBER(divebomb_state::fgcpu_roz_comm_w)
 {
-    m_rozcpucpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-    to_rozcpu = data;
+	m_rozcpucpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	to_rozcpu = data;
 }
 
 
 READ8_MEMBER(divebomb_state::fgcpu_comm_flags_r)
 {
-    UINT8 result = 0;
-    
-    if (has_fromroz)
-        result |= 1;
-    if (has_fromsprite)
-        result |= 2;
-    
-    return result;
+	UINT8 result = 0;
+
+	if (has_fromroz)
+		result |= 1;
+	if (has_fromsprite)
+		result |= 2;
+
+	return result;
 }
 
 
@@ -183,7 +183,7 @@ READ8_MEMBER(divebomb_state::fgcpu_comm_flags_r)
 static ADDRESS_MAP_START( divebomb_spritecpu_map, AS_PROGRAM, 8, divebomb_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("spriteram")
-    AM_RANGE(0xc800, 0xdfff) AM_WRITENOP
+	AM_RANGE(0xc800, 0xdfff) AM_WRITENOP
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -197,23 +197,23 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(divebomb_state::spritecpu_comm_r)
 {
-    m_spritecpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-    return to_spritecpu;
+	m_spritecpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	return to_spritecpu;
 }
 
 
 WRITE8_MEMBER(divebomb_state::spritecpu_comm_w)
 {
-    from_sprite = data;
-    has_fromsprite = true;
-    update_irqs();
+	from_sprite = data;
+	has_fromsprite = true;
+	update_irqs();
 }
 
 
 WRITE8_MEMBER(divebomb_state::spritecpu_port00_w)
 {
-    // Written with 0x00 on reset
-    // Written with 0x34 7 times in succession on occasion (see PC:0x00E3)
+	// Written with 0x00 on reset
+	// Written with 0x34 7 times in succession on occasion (see PC:0x00E3)
 }
 
 
@@ -226,7 +226,7 @@ WRITE8_MEMBER(divebomb_state::spritecpu_port00_w)
 
 static ADDRESS_MAP_START( divebomb_rozcpu_map, AS_PROGRAM, 8, divebomb_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1") 
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_DEVREADWRITE("k051316_1", k051316_device, read, write)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_DEVREADWRITE("k051316_2", k051316_device, read, write)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
@@ -249,26 +249,26 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(divebomb_state::rozcpu_bank_w)
 {
-    UINT32 bank = BITSWAP8(data, 4, 5, 6, 7, 3, 2, 1, 0) >> 4;
-    m_bank1->set_entry(bank);
+	UINT32 bank = BITSWAP8(data, 4, 5, 6, 7, 3, 2, 1, 0) >> 4;
+	m_bank1->set_entry(bank);
 
-    if (data & 0x0f)
-        logerror("rozcpu_bank_w %02x\n", data);
+	if (data & 0x0f)
+		logerror("rozcpu_bank_w %02x\n", data);
 }
 
 
 READ8_MEMBER(divebomb_state::rozcpu_comm_r)
 {
-    m_rozcpucpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-    return to_rozcpu;
+	m_rozcpucpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	return to_rozcpu;
 }
 
 
 WRITE8_MEMBER(divebomb_state::rozcpu_comm_w)
 {
-    from_roz = data;
-    has_fromroz = true;
-    update_irqs();
+	from_roz = data;
+	has_fromroz = true;
+	update_irqs();
 }
 
 
@@ -281,10 +281,10 @@ WRITE8_MEMBER(divebomb_state::rozcpu_comm_w)
 
 void divebomb_state::update_irqs()
 {
-    if (has_fromsprite || has_fromroz)
-        m_fgcpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-    else
-        m_fgcpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	if (has_fromsprite || has_fromroz)
+		m_fgcpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	else
+		m_fgcpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 
@@ -328,9 +328,9 @@ static INPUT_PORTS_START( divebomb )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x01, "7" )
 	PORT_DIPSETTING(    0x00, "9" )
-    PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:3")
-    PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-    PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -348,24 +348,24 @@ static INPUT_PORTS_START( divebomb )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-    PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW3:1" )
-    PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW3:2" )
-    PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW3:3" )
-    PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW3:4" )
-    PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW3:5" )
-    PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW3:6" )
-    PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW3:7" )
-    PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW3:8" )
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW3:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW3:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW3:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW3:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW3:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW3:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW3:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW3:8" )
 
-    PORT_START("DSW4")
-    PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW4:1" )
-    PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW4:2" )
-    PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW4:3" )
-    PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW4:4" )
-    PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW4:5" )
-    PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW4:6" )
-    PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW4:7" )
-    PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW4:8" )
+	PORT_START("DSW4")
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW4:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW4:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW4:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW4:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW4:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW4:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW4:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW4:8" )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -388,14 +388,14 @@ static INPUT_PORTS_START( divebomb )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
 	PORT_START("SYSTEM")
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -476,10 +476,10 @@ static MACHINE_CONFIG_START( divebomb, divebomb_state )
 	MCFG_K051316_OFFSETS(-88, -16)
 	MCFG_K051316_CB(divebomb_state, zoom_callback_2)
 
-    MCFG_MACHINE_START_OVERRIDE(divebomb_state, divebomb)
-    MCFG_MACHINE_RESET_OVERRIDE(divebomb_state, divebomb)
+	MCFG_MACHINE_START_OVERRIDE(divebomb_state, divebomb)
+	MCFG_MACHINE_RESET_OVERRIDE(divebomb_state, divebomb)
 
-    MCFG_VIDEO_START_OVERRIDE(divebomb_state, divebomb)
+	MCFG_VIDEO_START_OVERRIDE(divebomb_state, divebomb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -498,7 +498,7 @@ static MACHINE_CONFIG_START( divebomb, divebomb_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-    // All frequencies unverified
+	// All frequencies unverified
 	MCFG_SOUND_ADD("sn0", SN76489, XTAL1/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 	MCFG_SOUND_ADD("sn1", SN76489, XTAL1/8)
@@ -524,7 +524,7 @@ MACHINE_CONFIG_END
 ROM_START( divebomb )
 	ROM_REGION( 0x08000, "fgcpu", 0 )
 	ROM_LOAD( "U20.27256", 0x00000, 0x08000, CRC(89a30c82) SHA1(ecb3dcc00192b9646dab55ec6c102ab1d2e403e8) )
-	
+
 	ROM_REGION( 0x08000, "spritecpu", 0 )
 	ROM_LOAD( "U21.27256", 0x00000, 0x08000, CRC(3896d3f6) SHA1(86d10c907bf00977656d8fa426b2f1ac211acdb3) )
 
@@ -565,17 +565,17 @@ ROM_START( divebomb )
 	ROM_LOAD( "u36.MB7122.bin", 0x400, 0x400, CRC(0c1ecdb5) SHA1(4ba9e283c747d6a760fe2e0a8b2bfdfcc55a3969) )
 	ROM_LOAD( "u37.MB7122.bin", 0x000, 0x400, CRC(55c17465) SHA1(153e99a09604467ddd8c641d60c5f1b8d9a205b4) )
 
-    ROM_REGION( 0xc00, "k051316_1_pr", 0 ) // front roz ( k051316_1 )
-    // looks like banks 0,1,2 are valid
-    ROM_LOAD( "u29.MB7122.bin", 0x000, 0x400, CRC(8b3d60d2) SHA1(a9ac4d3dd5e72522717dd18c32d3f88b75bb077c) ) // the last 0x100 block is invalid (copy of data in u33)
-    ROM_LOAD( "u30.MB7122.bin", 0x400, 0x400, CRC(0aeb1a88) SHA1(7b00e85ced210a5f7dfc100c15baa9e1735c7c80) ) // the last 0x100 block is empty
-    ROM_LOAD( "u31.MB7122.bin", 0x800, 0x400, CRC(75cf5f3d) SHA1(ec02b99ab65e561596b773918569b28313f21835) ) // the last 0x100 block is invalid (copy of data in u33)
+	ROM_REGION( 0xc00, "k051316_1_pr", 0 ) // front roz ( k051316_1 )
+	// looks like banks 0,1,2 are valid
+	ROM_LOAD( "u29.MB7122.bin", 0x000, 0x400, CRC(8b3d60d2) SHA1(a9ac4d3dd5e72522717dd18c32d3f88b75bb077c) ) // the last 0x100 block is invalid (copy of data in u33)
+	ROM_LOAD( "u30.MB7122.bin", 0x400, 0x400, CRC(0aeb1a88) SHA1(7b00e85ced210a5f7dfc100c15baa9e1735c7c80) ) // the last 0x100 block is empty
+	ROM_LOAD( "u31.MB7122.bin", 0x800, 0x400, CRC(75cf5f3d) SHA1(ec02b99ab65e561596b773918569b28313f21835) ) // the last 0x100 block is invalid (copy of data in u33)
 
 	ROM_REGION( 0xc00, "k051316_2_pr", 0 ) // back roz ( k051316_2 )
 	// 4 valid palettes but our code is only using 1
-    ROM_LOAD( "u34.MB7122.bin", 0x000, 0x400, CRC(e0e2d93b) SHA1(9043929520abde15727e9333c153cf97104c9003) )
-    ROM_LOAD( "u33.MB7122.bin", 0x400, 0x400, CRC(4df75f4f) SHA1(0157d6e268cdd797622c712648eb2e88214b12d9) )
-    ROM_LOAD( "u32.MB7122.bin", 0x800, 0x400, CRC(e2e4b443) SHA1(e97a4e2988e29f992c5dec6f817a783b14535742) )
+	ROM_LOAD( "u34.MB7122.bin", 0x000, 0x400, CRC(e0e2d93b) SHA1(9043929520abde15727e9333c153cf97104c9003) )
+	ROM_LOAD( "u33.MB7122.bin", 0x400, 0x400, CRC(4df75f4f) SHA1(0157d6e268cdd797622c712648eb2e88214b12d9) )
+	ROM_LOAD( "u32.MB7122.bin", 0x800, 0x400, CRC(e2e4b443) SHA1(e97a4e2988e29f992c5dec6f817a783b14535742) )
 
 	ROM_REGION( 0x300, "spr_proms", 0 ) // sprite layer palette
 	ROM_LOAD( "u83.MB7114.bin", 0x000, 0x100, CRC(d216110d) SHA1(3de935dbf876f82864b8b69049c8681101619411) )
@@ -593,30 +593,30 @@ ROM_END
 
 MACHINE_START_MEMBER(divebomb_state, divebomb)
 {
-    m_bank1->configure_entries(0, 16, memregion("rozcpudata")->base(), 0x4000);
-    
-    save_item(NAME(roz1_enable));
-    save_item(NAME(roz2_enable));
-    save_item(NAME(roz1_wrap));
-    save_item(NAME(roz2_wrap));
-    save_item(NAME(to_spritecpu));
-    save_item(NAME(to_rozcpu));
-    save_item(NAME(has_fromsprite));
-    save_item(NAME(has_fromroz));
-    save_item(NAME(from_sprite));
-    save_item(NAME(from_roz));
-    save_item(NAME(roz_pal));
+	m_bank1->configure_entries(0, 16, memregion("rozcpudata")->base(), 0x4000);
+
+	save_item(NAME(roz1_enable));
+	save_item(NAME(roz2_enable));
+	save_item(NAME(roz1_wrap));
+	save_item(NAME(roz2_wrap));
+	save_item(NAME(to_spritecpu));
+	save_item(NAME(to_rozcpu));
+	save_item(NAME(has_fromsprite));
+	save_item(NAME(has_fromroz));
+	save_item(NAME(from_sprite));
+	save_item(NAME(from_roz));
+	save_item(NAME(roz_pal));
 }
 
 
 MACHINE_RESET_MEMBER(divebomb_state, divebomb)
 {
-    roz1_enable = false;
-    roz2_enable = false;
-    roz1_wrap = false;
-    roz2_wrap = false;
-    has_fromsprite = false;
-    has_fromroz = false;
+	roz1_enable = false;
+	roz2_enable = false;
+	roz1_wrap = false;
+	roz2_wrap = false;
+	has_fromsprite = false;
+	has_fromroz = false;
 }
 
 

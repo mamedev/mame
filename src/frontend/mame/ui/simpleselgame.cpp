@@ -26,7 +26,6 @@
 
 
 namespace ui {
-
 //-------------------------------------------------
 //  ctor
 //-------------------------------------------------
@@ -243,7 +242,7 @@ void simple_menu_select_game::populate()
 				"the docs directory for information on configuring %2$s."),
 				emulator_info::get_configname(),
 				emulator_info::get_appname());
-		item_append(txt.c_str(), nullptr, FLAG_MULTILINE | FLAG_REDTEXT, nullptr);
+		item_append(txt, "", FLAG_MULTILINE | FLAG_REDTEXT, nullptr);
 		return;
 	}
 
@@ -268,7 +267,7 @@ void simple_menu_select_game::populate()
 	if (menu::stack_has_special_main_menu())
 	{
 		item_append(menu_item_type::SEPARATOR);
-		item_append(_("Configure Options"), nullptr, 0, (void *)1);
+		item_append(_("Configure Options"), "", 0, (void *)1);
 		skip_main_items = 1;
 	}
 

@@ -103,9 +103,9 @@
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-class pit68230_device :  public device_t, public device_execute_interface
+class pit68230_device :  public device_t//, public device_execute_interface
 {
- public:
+	public:
 	// construction/destruction
 	pit68230_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
 	pit68230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -131,56 +131,85 @@ class pit68230_device :  public device_t, public device_execute_interface
 	void wr_pitreg_paddr(UINT8 data);
 	void wr_pitreg_pbddr(UINT8 data);
 	void wr_pitreg_pcddr(UINT8 data);
+	void wr_pitreg_pivr(UINT8 data);
 	void wr_pitreg_pacr(UINT8 data);
 	void wr_pitreg_pbcr(UINT8 data);
 	void wr_pitreg_padr(UINT8 data);
+	void wr_pitreg_pbdr(UINT8 data);
 	void wr_pitreg_paar(UINT8 data);
 	void wr_pitreg_pbar(UINT8 data);
+	void wr_pitreg_pcdr(UINT8 data);
 	void wr_pitreg_psr(UINT8 data);
 	void wr_pitreg_tcr(UINT8 data);
+	void wr_pitreg_tivr(UINT8 data);
 	void wr_pitreg_cprh(UINT8 data);
 	void wr_pitreg_cprm(UINT8 data);
 	void wr_pitreg_cprl(UINT8 data);
+	void wr_pitreg_tsr(UINT8 data);
 
 	UINT8 rr_pitreg_pgcr();
 	UINT8 rr_pitreg_psrr();
 	UINT8 rr_pitreg_paddr();
 	UINT8 rr_pitreg_pbddr();
 	UINT8 rr_pitreg_pcddr();
+	UINT8 rr_pitreg_pivr();
 	UINT8 rr_pitreg_pacr();
 	UINT8 rr_pitreg_pbcr();
 	UINT8 rr_pitreg_padr();
 	UINT8 rr_pitreg_pbdr();
 	UINT8 rr_pitreg_paar();
 	UINT8 rr_pitreg_pbar();
+	UINT8 rr_pitreg_pcdr();
 	UINT8 rr_pitreg_psr();
+	UINT8 rr_pitreg_tcr();
+	UINT8 rr_pitreg_tivr();
+	UINT8 rr_pitreg_cprh();
+	UINT8 rr_pitreg_cprm();
+	UINT8 rr_pitreg_cprl();
 	UINT8 rr_pitreg_cntrh();
 	UINT8 rr_pitreg_cntrm();
 	UINT8 rr_pitreg_cntrl();
+	UINT8 rr_pitreg_tsr();
 
 protected:
 
 	enum {
-		REG_TCR_ENABLE =	0x01
+		REG_TCR_ENABLE 			= 0x01,
+		REG_TCR_CC_MASK			= 0x06,
+		REG_TCR_CC_PC2_CLK_PSC	= 0x00,
+		REG_TCR_CC_TEN_CLK_PSC	= 0x02,
+		REG_TCR_CC_TIN_PSC		= 0x04,
+		REG_TCR_CC_TIN_RAW		= 0x06,
+		REG_TCR_ZR				= 0x08,
+		REG_TCR_ZD				= 0x10,
+		REG_TCR_TOUT_TIACK_MASK	= 0xe0, // 1 1 1
+		REG_TCR_PC3_PC7			= 0x00, // 0 0 0
+		REG_TCR_PC3_PC7_DC		= 0x20, // 0 0 1
+		REG_TCR_TOUT_PC7_SQ		= 0x40, // 0 1 0
+		REG_TCR_TOUT_PC7_SQ_DC	= 0x60, // 0 1 1
+		REG_TCR_TOUT_TIACK		= 0x80, // 1 0 0
+		REG_TCR_TOUT_TIACK_INT	= 0xa0, // 1 0 1
+		REG_TCR_TOUT_PC7		= 0xc0, // 1 1 0
+		REG_TCR_TOUT_PC7_INT	= 0xe0, // 1 1 1
 	};
 
 	// device-level overrides
 	virtual void device_start () override;
 	virtual void device_reset () override;
 	virtual void device_timer (emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual void execute_run () override;
+	//	virtual void execute_run () override;
 	int m_icount;
 
-	devcb_write8		m_pa_out_cb;
-	devcb_read8			m_pa_in_cb;
-	devcb_write8		m_pb_out_cb;
-	devcb_read8			m_pb_in_cb;
-	devcb_write8		m_pc_out_cb;
-	devcb_read8			m_pc_in_cb;
-	devcb_write_line	m_h1_out_cb;
-	devcb_write_line	m_h2_out_cb;
-	devcb_write_line	m_h3_out_cb;
-	devcb_write_line	m_h4_out_cb;
+	devcb_write8        m_pa_out_cb;
+	devcb_read8         m_pa_in_cb;
+	devcb_write8        m_pb_out_cb;
+	devcb_read8         m_pb_in_cb;
+	devcb_write8        m_pc_out_cb;
+	devcb_read8         m_pc_in_cb;
+	devcb_write_line    m_h1_out_cb;
+	devcb_write_line    m_h2_out_cb;
+	devcb_write_line    m_h3_out_cb;
+	devcb_write_line    m_h4_out_cb;
 
 	// peripheral ports
 	UINT8 m_pgcr;           // Port General Control register
@@ -188,19 +217,29 @@ protected:
 	UINT8 m_paddr;          // Port A Data Direction register
 	UINT8 m_pbddr;          // Port B Data Direction register
 	UINT8 m_pcddr;          // Port C Data Direction register
+	UINT8 m_pivr;           // Ports Interrupt vector 
 	UINT8 m_pacr;           // Port A Control register
 	UINT8 m_pbcr;           // Port B Control register
 	UINT8 m_padr;           // Port A Data register
 	UINT8 m_pbdr;           // Port B Data register
+	UINT8 m_pcdr;           // Port C Data register
 	UINT8 m_psr;            // Port Status Register
 	UINT8 m_tcr;		// Timer Control Register
+	UINT8 m_tivr;		// Timer Interrupt Vector register
 	int m_cpr;			// Counter Preload Registers (3 x 8 = 24 bits) 
-	//	UINT8 m_cprh;	// Counter Preload Register High
-	//	UINT8 m_cprm;	// Counter Preload Register Mid
-	//	UINT8 m_cprl;	// Counter Preload Register Low
 	int   m_cntr;		// - The 24 bit Counter 
+	UINT8 m_tsr;		// Timer Status Register
+
+	// Timers
+	emu_timer *pit_timer;
+
+	enum
+	{
+		TIMER_ID_PIT
+	};
 };
 
 // device type definition
 extern const device_type PIT68230;
+
 #endif /* __68230PIT_H__ */

@@ -9761,7 +9761,7 @@ but dumps still have to be confirmed.
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="16mj2">
 		<description>Shi Liu Zhang Ma Jiang II</description>
 		<year>199?</year>
@@ -13806,7 +13806,7 @@ but dumps still have to be confirmed.
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="deathdlp" cloneof="deathdl">
 		<description>Death Duel (USA, Prototype 19920506)</description>
 		<year>1992</year>
@@ -16602,7 +16602,7 @@ but dumps still have to be confirmed.
 			</dataarea>
 		</part>
 	</software>
-	
+
 <!-- This is the same as the final, but without the padding up to 512Kb and with different checksum in the internal header -->
 	<software name="homea2p" cloneof="homea2">
 		<description>Home Alone 2 - Lost in New York (USA, Prototype 19930929)</description>
@@ -17638,7 +17638,7 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="kingsbty">
+	<software name="kbounty">
 		<description>King's Bounty - The Conqueror's Quest (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
@@ -21462,7 +21462,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="paperboyp" cloneof="paperboy">
 		<description>Paperboy (USA, Prototype 19911028)</description>
 		<year>1992</year>
@@ -22861,7 +22861,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- This is the same as the final, but without the padding up to 1Mb and with no checksum in the internal header -->
 	<software name="renstimp" cloneof="renstim">
 		<description>Stimpy's Invention Starring Starring Ren Hoëk &amp; Stimpy (Euro, Prototype 19931209)</description>
@@ -23248,7 +23248,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="roadblstp" cloneof="roadblst">
 		<description>RoadBlasters (USA, Prototype 19910627)</description>
 		<year>1992</year>
@@ -25222,7 +25222,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="speedbl2up" cloneof="speedbl2">
 		<description>Speedball 2 - Brutal Deluxe (USA, Prototype 19910607)</description>
 		<year>1991</year>
@@ -26377,7 +26377,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="lasordap" cloneof="suprleag">
 		<description>Tommy Lasorda Baseball (USA, Prototype 19890430)</description>
 		<year>1989</year>
@@ -27537,7 +27537,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- This is the same as the final, but with "Sega_Channel" XORed at the end. -->
 	<software name="toejam2p2" cloneof="toejam2">
 		<description>Toe Jam &amp; Earl in Panic on Funkotron (Prototype 19930911)</description>
@@ -30378,7 +30378,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="xinqig1" cloneof="beggarp">
 		<description>Xin Qi Gai Wang Zi (Chi, Alt)</description>
 		<year>1996</year>
@@ -31286,6 +31286,19 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="cjmjclub">
+		<description>Chaoji Majiang Club (Tw)</description>
+		<year>1995</year>
+		<publisher>Creaton</publisher>
+		<info name="alt_title" value="超級麻將 ~ Super Majong Club"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_cjmjclub"/>
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="supermajonclubvers0000.bin" size="1048576" crc="2b4b40e3" sha1="48017a7fd32593e6932756db20a4bab6228693e7" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!-- Are these unprotected versions legit? or were they hacked to work with emus? -->
 
 	<software name="chinf3a" cloneof="chinf3">
@@ -31347,7 +31360,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="jujimj2">
 		<description>Ju Ji Ma Jiang II</description>
 		<year>199?</year>

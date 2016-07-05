@@ -14,7 +14,6 @@
 
 
 namespace ui {
-
 /*-------------------------------------------------
  device_config - handle the game information
  menu
@@ -267,12 +266,12 @@ void menu_device_config::populate()
 			str << "[None]\n";
 
 	const_cast<machine_config &>(machine().config()).device_remove(&machine().config().root_device(), m_option->name());
-	item_append(str.str().c_str(), nullptr, FLAG_MULTILINE, nullptr);
+	item_append(str.str(), "", FLAG_MULTILINE, nullptr);
 }
 
 void menu_device_config::handle()
 {
-	/* process the menu */
+	// process the menu
 	process(0);
 }
 

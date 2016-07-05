@@ -15,7 +15,6 @@
 
 
 namespace ui {
-
 // ======================> menu_software_parts
 
 class menu_software_parts : public menu
@@ -53,24 +52,29 @@ public:
 	virtual void handle() override;
 
 private:
-	struct entry_info {
-		entry_info *next;
+	struct entry_info
+	{
+		entry_info() = default;
+		entry_info(entry_info const &) = default;
+		entry_info(entry_info &&) = default;
+		entry_info &operator=(entry_info const &) = default;
+		entry_info &operator=(entry_info &&) = default;
 
-		const char *short_name;
-		const char *long_name;
+		std::string short_name;
+		std::string long_name;
 	};
 
 	// variables
 	software_list_device *          m_swlist; // currently selected list
 	const char *                    m_interface;
 	std::string &                   m_result;
-	entry_info *                    m_entrylist;
+	std::vector<entry_info>			m_entrylist;
 	char                            m_filename_buffer[1024];
 	bool                            m_ordered_by_shortname;
 
 	// functions
-	int compare_entries(const entry_info *e1, const entry_info *e2, bool shortname);
-	entry_info *append_software_entry(const software_info &swinfo);
+	int compare_entries(const entry_info &e1, const entry_info &e2, bool shortname);
+	void append_software_entry(const software_info &swinfo);
 };
 
 

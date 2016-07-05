@@ -185,6 +185,7 @@ public:
 
 	virtual DECLARE_READ8_MEMBER(read_cart) override;
 
+	DECLARE_READ8_MEMBER(read_vlm);
 	DECLARE_WRITE8_MEMBER(io_20_w);
 	DECLARE_READ8_MEMBER(io_00_r);
 

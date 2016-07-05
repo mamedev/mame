@@ -15,7 +15,7 @@ namespace plib {
 //  Exceptions
 //============================================================
 
-pexception::pexception(const pstring &text)
+pexception::pexception(const pstring text)
 {
 	m_text = text;
 	fprintf(stderr, "%s\n", m_text.cstr());

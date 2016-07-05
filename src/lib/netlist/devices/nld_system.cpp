@@ -133,7 +133,7 @@ namespace netlist
 			const nl_double R = state ? m_RON.Value() : m_ROFF.Value();
 
 			// We only need to update the net first if this is a time stepping net
-			if (0) // m_R->m_P.net().as_analog().solver()->is_timestep())
+			if ((0)) // m_R->m_P.net().as_analog().solver()->is_timestep())
 			{
 				m_R.update_dev();
 				m_R.set_R(R);

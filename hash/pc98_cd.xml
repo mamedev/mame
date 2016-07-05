@@ -2,15 +2,15 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="pc98_cd" description="NEC PC-9801 CD-ROMs">
 
-	<!-- 
+	<!--
 
 	Partial list of PC-9801/PC-9821 CD-ROMs.
-	
+
 	Floppy disks are also included where needed. They are attached to the floppy_5_25 interface
 	for convenience, as the PC-98x1 driver always emulates 5.25" drives. This isn't realistic,
 	though, as CD-ROM software was generally released very late in the life of the plaform,
 	when 3.5" floppies were much more common.
-	
+
 	-->
 
 <!--  OS disks  -->
@@ -20,9 +20,9 @@
 		<!--
 		Origin: Unknown
 		<rom name="Windows 2000 Professional (PC-9821) - W2PCCP_JA.iso" size="409946112" crc="ffffffff" sha1="f0ad97e933a8fe835fdb7211ef9034862b68d7f9"/>
-		
+
 		CUE file used for conversion:
-		<rom name="Windows 2000 Professional (PC-9821) - W2PCCP_JA.cue" size="108" crc="5e4281a4" sha1="60b45b2155b2bce7d550f7ed99d4b95247e2c786"/>		
+		<rom name="Windows 2000 Professional (PC-9821) - W2PCCP_JA.cue" size="108" crc="5e4281a4" sha1="60b45b2155b2bce7d550f7ed99d4b95247e2c786"/>
 		-->
 		<description>Windows 2000 Professional (Upgrade, W2PCCP)</description>
 		<year>2000</year>
@@ -38,7 +38,7 @@
 		<!--
 		Origin: Unknown
 		<rom name="Windows 2000 Professional (PC-9821) - W2PFPP_JA.iso" size="409946112" crc="ffffffff" sha1="ef5035b8c6b566552eba9f16e085272632e259b4"/>
-		
+
 		CUE file used for conversion:
 		<rom name="Windows 2000 Professional (PC-9821) - W2PFPP_JA.cue" size="108" crc="90edbbcd" sha1="a2b214d641906d27172e10d35094e652647d4194"/>
 		-->
@@ -56,7 +56,7 @@
 		<!--
 		Origin: Unknown
 		<rom name="Windows 2000 Professional (PC-9821) - W2PSEL_JA.iso" size="409946112" crc="ffffffff" sha1="b48ebce2da480ab8a7e7b1e82b33bb01543b2b21"/>
-		
+
 		CUE file used for conversion:
 		<rom name="Windows 2000 Professional (PC-9821) - W2PSEL_JA.cue" size="108" crc="9c9e146b" sha1="0be47b35ebfa297868cadc79bb77bdd56f3aa1ef"/>
 		-->
@@ -74,7 +74,7 @@
 		<!--
 		Origin: Unknown
 		<rom name="Windows 2000 Professional with SP4 (PC-9821) - ZRMPFPP_JA.iso" size="420202496" crc="ffffffff" sha1="8bf88f199b4919c8d340cd40a80bfb9b6e001f49"/>
-		
+
 		CUE file used for conversion:
 		<rom name="Windows 2000 Professional with SP4 (PC-9821) - ZRMPFPP_JA.cue" size="118" crc="f4714a5e" sha1="b1890c27ba93ac56e4e7bed741c5323f3695da58"/>
 		-->
@@ -92,7 +92,7 @@
 		<!--
 		Origin: Unknown
 		<rom name="Windows 2000 Server (PC-9821) - W2SFPP_JA.iso" size="479168512" crc="ffffffff" sha1="57ec6c59bf0d5918031e5e4aa115743616fc5200"/>
-		
+
 		CUE file used for conversion:
 		<rom name="Windows 2000 Server (PC-9821) - W2SFPP_JA.cue" size="102" crc="a2b02fad" sha1="3086c000c75d4a3a254caa867f7adab8b74ad09f"/>
 		-->
@@ -110,7 +110,7 @@
 		<!--
 		Origin: Unknown
 		<rom name="Windows 2000 Server (PC-9821) - W2SSEL_JA.iso" size="479168512" crc="ffffffff" sha1="325e1f718981603fc21b88f34643efb71e0ee7e1"/>
-		
+
 		CUE file used for conversion:
 		<rom name="Windows 2000 Server (PC-9821) - W2SSEL_JA.cue" size="102" crc="aec3800b" sha1="6a64d6297d6906ce672ce77967d3bde940202eac"/>
 		-->
@@ -128,7 +128,7 @@
 		<!--
 		Origin: Unknown
 		<rom name="Windows 2000 Server with SP4 (PC-9821) - ZRMSFPP_JA.iso" size="488269824" crc="ffffffff" sha1="f43c06cfa45289228ce47f815aa96efb8b9d1574"/>
-		
+
 		CUE file used for conversion:
 		<rom name="Windows 2000 Server with SP4 (PC-9821) - ZRMSFPP_JA.cue" size="112" crc="6b01db5c" sha1="8b58fb3e2bbfc31d201b4c58e905075da7eb8031"/>
 		-->
@@ -148,7 +148,7 @@
 		Origin: Unknown
 		<rom name="disc2.ISO" size="434356224" crc="ffffffff" sha1="e2db9d9e3aab1401979d103d2d6109bfe3eff3ed"/>
 		<rom name="image.ISO" size="531824640" crc="ffffffff" sha1="e906c512ec2ab1e6244eec85388551a993bee0a7"/>
-		
+
 		CUE files used for conversion:
 		<rom name="disc2.cue" size="66" crc="2cabba7b" sha1="38cfe76167cf3065478036c386c69693fa0bf5f3"/>
 		<rom name="image.cue" size="66" crc="3f846e22" sha1="d3d798255e5d26cd8485a5c5f7aa086a51368ebe"/>
@@ -172,7 +172,7 @@
 		<!--
 		Origin: Unknown
 		<rom name="Microsoft Windows 95 PC-98 (JPN).iso" size="81395712" crc="d402c155" sha1="14d10f62db11397ea46bdf02d1619f1b8e1ff345"/>
-		
+
 		CUE file used for conversion:
 		<rom name="Microsoft Windows 95 PC-98 (JPN).cue" size="93" crc="c4113669" sha1="3ee6d0113b8efe9cf0ee19fe6054165233fa9906"/>
 		-->
@@ -191,7 +191,7 @@
 		<!--
 		Origin: Unknown
 		<rom name="Microsoft Windows 98 x86 &amp; PC-98 (JPN).iso" size="508647424" crc="f82c51a9" sha1="3607d2cc8fea57ca915954e9ff2e2cbc82a02fff"/>
-		
+
 		CUE file used for conversion:
 		<rom name="Microsoft Windows 98 x86 &amp; PC-98 (JPN).cue" size="99" crc="1229745f" sha1="5181dc844bf7f7d5acd3e2fad4ad2e2c8af70297"/>
 		-->
@@ -309,7 +309,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="akikogld">
 		<!--
 		 Origin: peter_j (Super Lonely Terminal)
@@ -361,13 +361,13 @@
 		<rom name="Image.cue" size="1488" crc="5585f53a" sha1="ab10e702dcca182e12a551b0fa11c419704dccae"/>
 		<rom name="Image.img" size="658393008" crc="f3b99e90" sha1="9fcdc50989886636f074354745bbf16bbed24b67"/>
 		<rom name="Image.sub" size="26873184" crc="eed944ab" sha1="1b486d3f029634da68bd1a2465b6a8a43e75b6c5"/>
-		
+
 		The original CUE indicates MODE1/2352 for the data track, but this seems to be wrong, as all the data
 		sectors in track 1 are actually mode 2, and MS-DOS doesn't recognize the file system. To avoid this, the
 		CHD was converted through a modified CUE with MODE2/2352.
-		
+
 		Also, this disc has a PlayStation header in sector 16. Bad dump or just a mastering mistake?
-		
+
 		<rom name="Image_mode2.cue" size="1488" crc="2f235ede" sha1="ecc220ebebb859889406b95d5538f025321e4991"/>
 		 -->
 		<description>Appare-den - Fukuryuu no Shou</description>
@@ -422,9 +422,9 @@
 		<!--
 		Origin: P2P
 		<rom name="br1.iso" size="4431168" crc="28ca5237" sha1="6de45ad7c24195e9eed8b3f578305698150671aa"/>
-		
+
 		CUE file used for conversion:
-		<rom name="br1.cue" size="64" crc="55b42ab8" sha1="f1f3e6612d5c205bbe3c771506ac3a95febe6067"/>		
+		<rom name="br1.cue" size="64" crc="55b42ab8" sha1="f1f3e6612d5c205bbe3c771506ac3a95febe6067"/>
 		-->
 		<description>Brandish Campaign-ban</description>
 		<year>1996</year>
@@ -473,9 +473,9 @@
 		<!--
 		Origin: P2P
 		<rom name="br3.iso" size="11275488" crc="8cdbb15b" sha1="692df1bae5459c16469e79b581fb5deb212665e3"/>
-		
+
 		CUE file used for conversion:
-		<rom name="br3.cue" size="64" crc="6e9e0d16" sha1="f17c32e361745b7a93fc231826a9af4160692fb4"/>		
+		<rom name="br3.cue" size="64" crc="6e9e0d16" sha1="f17c32e361745b7a93fc231826a9af4160692fb4"/>
 		-->
 		<description>Brandish 3 - Spirit of Balcan - Campaign-ban</description>
 		<year>1996</year>
@@ -544,13 +544,47 @@
 		</part>
 	</software>
 
+	<software name="dawnpat">
+		<!--
+		Origin: P2P
+		<rom name="DAWN PATROL (1997)(KSS).bin" size="16113552" crc="bac07915" sha1="d320f4c0f79b3b430a0915e43ea089bc3add565c"/>
+		<rom name="DAWN PATROL (1997)(KSS).cue" size="87" crc="57f17fa9" sha1="22a577ea5a30c1a11fe960ba09ecf4148aded4f1"/>
+		-->
+		<description>Dawn Patrol - Yoake no Pilot</description>
+		<year>1997</year>
+		<publisher>ケイエスエス (KSS)</publisher>
+		<info name="alt_title" value="ドーンパトロール 夜明けのパイロット" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dawn patrol (1997)(kss)" sha1="437aabffa45d26aeedddd8cefa9362ef48d6c08c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dlunch">
+		<!--
+		Origin: P2P
+		<rom name="Delicious Lunch Pack (1996)(ScooP).bin" size="9056256" crc="b7edf982" sha1="c7a3e3ae987f2ef4eed96fb41d1b3fc916bfdff7"/>
+		<rom name="Delicious Lunch Pack (1996)(ScooP).cue" size="100" crc="9e5b4353" sha1="5cb7bec576e601dd974c9ad916c2fa4ff69c3dba"/>
+		-->
+		<description>Delicious - Lunch Pack</description>
+		<year>1996</year>
+		<publisher>ScooP</publisher>
+		<info name="alt_title" value="デリシャスらんちぱっく" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="delicious lunch pack (1996)(scoop)" sha1="529d1b311de74d39c7be2e7fa27f2ba1bab24156" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="digipara">
 		<!--
 		Origin: P2P
 		<rom name="美少女パソコンソフト大全 デジ・パラ Vol.1.iso" size="219504640" crc="e92a4b2a" sha1="10c86cd519a28fc583fd01473eed9d9b3baee789"/>
-		
+
 		CUE file used for conversion:
-		<rom name="美少女パソコンソフト大全 デジ・パラ Vol.1.cue" size="119" crc="91bd2775" sha1="ee1f59ef736d2243a75ef86e5c471a72ba9fa222"/>		
+		<rom name="美少女パソコンソフト大全 デジ・パラ Vol.1.cue" size="119" crc="91bd2775" sha1="ee1f59ef736d2243a75ef86e5c471a72ba9fa222"/>
 		-->
 		<description>Bishoujo Pasocom Soft Taizen - Digi-para - Digital Paradise - Vol. 1</description>
 		<year>1996</year>
@@ -644,7 +678,44 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
+	<!-- PC-98x1 / DOS/V hybrid -->
+	<software name="duelsucp">
+		<!--
+		Origin: P2P
+		<rom name="DUEL succession Plus kit (1996)(Kure Software Koubou).ccd" size="3636" crc="8317e961" sha1="57b2aa6bf0a6cf0db7c8d4dfab48d9bc84822736"/>
+		<rom name="DUEL succession Plus kit (1996)(Kure Software Koubou).img" size="589771056" crc="b49423ab" sha1="66817c10f4cbc7bdf2d7b6dbc46720ccd64b30da"/>
+		<rom name="DUEL succession Plus kit (1996)(Kure Software Koubou).sub" size="24072288" crc="669c9cdf" sha1="fa434b92fad08829bd67d57b23385c856e77ac9f"/>
+		
+		*after conversion with IsoBuster+EAC *
+		<rom name="DUEL succession Plus kit (1996)(Kure Software Koubou).cue" size="2073" crc="7d4b0d08" sha1="515751787775ca770e3c431914b71f89759d8b1c"/>
+		<rom name="Track01.bin" size="22226400" crc="db0ebcdb" sha1="6eb45ea96131da6a27b47589999b4363a4fe9cfb"/>
+		<rom name="Track02.bin" size="39229008" crc="0d599d4b" sha1="837382d129c309a5eee55a01645490590fb6f64d"/>
+		<rom name="Track03.bin" size="30042096" crc="eea6b19c" sha1="ff709c5eb45e4ba72e0acccdef9cd312f0195830"/>
+		<rom name="Track04.bin" size="42794640" crc="b30cc0de" sha1="1e9ed1c6bb79ee176facb02d63358ba5450e71f0"/>
+		<rom name="Track05.bin" size="47889072" crc="acab45fd" sha1="cd1c2dfbcfff42f759e5881c081712bf56152273"/>
+		<rom name="Track06.bin" size="27838272" crc="718b8b0d" sha1="7b9b2fdea3f351db5b6c0beb87049d64e44815ca"/>
+		<rom name="Track07.bin" size="35240016" crc="6356880c" sha1="6d7399fc136d0407d0cc55475a2f9d516c0763df"/>
+		<rom name="Track08.bin" size="38876208" crc="f689d4fd" sha1="280dd7d4ef415261715b08744c971178d15ff74b"/>
+		<rom name="Track09.bin" size="20478864" crc="20151a27" sha1="aba80d0ece83f4e41888861a017afeb78a732d3c"/>
+		<rom name="Track10.bin" size="27170304" crc="0f4351eb" sha1="73b93a76013099c6ffdc1059bd3c987e442b4d1c"/>
+		<rom name="Track11.bin" size="41550432" crc="c7fb977f" sha1="9b0f1cca04250c73a794055b4943405214f3a995"/>
+		<rom name="Track12.bin" size="44391648" crc="0115c848" sha1="c5b656b02471bf50b3c435035837846d2d9c697b"/>
+		<rom name="Track13.bin" size="41719776" crc="7789d3ea" sha1="9669b19d8ed5354ac59a3efbf392dfa23c935993"/>
+		<rom name="Track14.bin" size="42982800" crc="e9e42bdc" sha1="3674ef646654873291fa69ca7e07f0243f447ec1"/>
+		<rom name="Track15.bin" size="47719728" crc="62a3a5be" sha1="88ecd22da67dc8c155e3596f8db92fcfd7a8bc30"/>
+		<rom name="Track16.bin" size="39621792" crc="defde6fc" sha1="b5d1e3f2c8f36feab18a2233c9d508807fc87fab"/>
+		-->
+		<description>Duel Succession Plus Kit</description>
+		<year>1996</year>
+		<publisher>呉ソフトウエア工房 (Kure Software Koubou)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="duel succession plus kit (1996)(kure software koubou)" sha1="4eafebe00b9880eb31bcb05acee72e7c79449839" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="emit1">
 		<!--
 		 Origin: peter_j (Super Lonely Terminal)
@@ -675,7 +746,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="emit2">
 		<!--
 		 Origin: peter_j (Super Lonely Terminal)
@@ -698,7 +769,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="emit3">
 		<!--
 		 Origin: peter_j (Super Lonely Terminal)
@@ -778,13 +849,34 @@
 		</part>
 	</software>
 
+	<!-- Hybrid disc, also included in fmtowns_cd.xml -->
+	<software name="gakuking">
+		<!--
+		Origin: Neo Kobe Collection
+		<rom name="Gakuen King.ccd" size="6333" crc="fc049869" sha1="8d4b31de08452583a97ab4fd258e757ff5f03eec"/>
+		<rom name="Gakuen King.cue" size="1241" crc="426edd8f" sha1="10832a02adf37c87a0a26877f8b5ab806e987729"/>
+		<rom name="Gakuen King.img" size="623980896" crc="5caecd8f" sha1="ddeffc003d00c39e36ae9dee007df34a0cae903c"/>
+		<rom name="Gakuen King.sub" size="25468608" crc="1eaa81f9" sha1="22fee18d3ea2b10125dceca54e051246a1bc814a"/>
+		-->
+		<description>Gakuen King: Hidehiko Gakkou wo Tsukuru</description>
+		<year>1996</year>
+		<publisher>アリスソフト (AliceSoft)</publisher>
+		<info name="release" value="199606xx" />
+		<info name="usage" value="Requires HDD installation"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="gakuen king" sha1="c02be1aa661a23f536e8ccb2413e0cc528226757" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="galpani">
 		<!--
 		Origin: Unknown
 		<rom name="galpani (1995)(kaneko - creo i).ccd" size="3120" crc="788eda2a" sha1="12dd368e864857dc3d206dae6890621536d322da"/>
 		<rom name="galpani (1995)(kaneko - creo i).img" size="497229264" crc="8b3ce23e" sha1="9bd91b2e62d5847cc65bd363e7a59bd7bda15613"/>
 		<rom name="galpani (1995)(kaneko - creo i).sub" size="20295072" crc="c2670009" sha1="c0cf2725384ef328682d5c28f017f9dddbc6f28b"/>
-		
+
 		After conversion with IsoBuster + EAC:
 		<rom name="galpani.cue" size="1725" crc="17aa363e" sha1="4cb40d4ec35eff243114029f3ddc90d81eb646d3"/>
 		<rom name="track01.bin" size="103473888" crc="18ce00b3" sha1="3d6ed2ff296d77ad8df3e76c2765f1cc5ca69115"/>
@@ -812,11 +904,30 @@
 		</part>
 	</software>
 
+	<software name="gedou">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="844" crc="8b1a6879" sha1="2a4356b2d496acf16042e19a658f60e7edf0cff5"/>
+		<rom name="Image.cue" size="71" crc="b496048a" sha1="8590392ca153b7559d50bef2f83defc45e315624"/>
+		<rom name="Image.img" size="10057152" crc="573e912b" sha1="3d1434c175c99ba64325fa2dafe1cd2a8af247ac"/>
+		<rom name="Image.sub" size="410496" crc="ba6b9d13" sha1="fa220affa9e88ce716a4155488e6af2a5676ba87"/>
+		-->
+		<description>Gedou Kyoushi - Ryoujoku Shuukan</description>
+		<year>1997</year>
+		<publisher>ミスティ (Misty)</publisher>
+		<info name="alt_title" value="外道教師 凌辱週間" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="gedou" sha1="d207337bf1857f79e3b0001c606fa46eb3dbbeac" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="giripara">
 		<!--
 		Origin: P2P
 		<rom name="GIRI GIRI PARADISE (1996)(May-Be Soft).ISO" size="75416880" crc="881e38b6" sha1="a836803d3af8d9554edfa304d9007bf9176a92db"/>
-		
+
 		CUE file used for conversion:
 		<rom name="GIRI GIRI PARADISE (1996)(May-Be Soft).cue" size="99" crc="bdb48d15" sha1="f52ce65cbb8f7ee719a6c7874b45149f1a9ac5cd"/>
 		-->
@@ -866,7 +977,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="inhearth">
 		<!--
 		Origin unknwon
@@ -906,6 +1017,25 @@
 		</part>
 	</software>
 
+	<software name="kusuriyu">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="845" crc="54e7cf55" sha1="6c67377815a675a61963e9b2fd7d0e398e0ede39"/>
+		<rom name="Image.cue" size="71" crc="b496048a" sha1="8590392ca153b7559d50bef2f83defc45e315624"/>
+		<rom name="Image.img" size="23317728" crc="62a4ba1e" sha1="2dc95ea50fb173f50094cb792de23efa8b3719d4"/>
+		<rom name="Image.sub" size="951744" crc="9d11e765" sha1="314990941259645c5102afd57a7164440ada277e"/>
+		-->
+		<description>Kusuriyubi no Kyoukasho</description>
+		<year>1996</year>
+		<publisher>アクティブ (Active)</publisher>
+		<info name="alt_title" value="くすり指の教科書" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="kusuriyu" sha1="56daaf671b62e2b6b2a28cc84b83c63d49e74d49"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="letspir">
 		<!--
 		Origin: Unknown
@@ -941,7 +1071,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="lodoss">
 		<!--
 		Origin unknwon
@@ -1093,6 +1223,22 @@
 		</part>
 	</software>
 
+	<software name="mujintou">
+		<!--
+		Origin: P2P
+		<rom name="mmmv.iso" size="23649360" crc="ce63887b" sha1="1739e81de226ae9337d0d9965072f5d5a6cef550"/>
+		-->
+		<description>Mujintou Monogatari Memorial Version</description>
+		<year>1997</year>
+		<publisher>ケイエスエス (KSS)</publisher>
+		<info name="alt_title" value="無人島物語メモリアルバージョン" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="mmmv" sha1="356f8166c098430a6950ffb799e7162b8b1f1cac" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="panzerg">
 		<!--
 		Origin: redump.org
@@ -1161,9 +1307,9 @@
 		<!--
 		Origin: P2P
 		<rom name="Ponytail Anthology vol.1 (1996)(Ponytail Soft).iso" size="16652288" crc="0c2af0dc" sha1="392fdfdf0de6bc0d469f802b207b38fbd7fef9f6"/>
-		
+
 		CUE file used for conversion:
-		<rom name="Ponytail Anthology vol.1 (1996)(Ponytail Soft).cue" size="107" crc="1a019c62" sha1="0ad502b5a8be7e178c05de19d8a74a4542a588e3"/>		
+		<rom name="Ponytail Anthology vol.1 (1996)(Ponytail Soft).cue" size="107" crc="1a019c62" sha1="0ad502b5a8be7e178c05de19d8a74a4542a588e3"/>
 		-->
 		<description>Ponytail Anthology Vol. 1</description>
 		<year>1996</year>
@@ -1180,9 +1326,9 @@
 		<!--
 		Origin: P2P
 		<rom name="Ponytail Anthology vol.2 (1996)(Ponytail Soft).iso" size="12025856" crc="216080b4" sha1="42402615993baea8b09987463c6c2ebe08ff93d0"/>
-		
+
 		CUE file used for conversion:
-		<rom name="Ponytail Anthology vol.2 (1996)(Ponytail Soft).cue" size="107" crc="c795a04c" sha1="4fef4206c9ee3bb2cae2207313aebbdc21369b39"/>		
+		<rom name="Ponytail Anthology vol.2 (1996)(Ponytail Soft).cue" size="107" crc="c795a04c" sha1="4fef4206c9ee3bb2cae2207313aebbdc21369b39"/>
 		-->
 		<description>Ponytail Anthology Vol. 2</description>
 		<year>1996</year>
@@ -1199,9 +1345,9 @@
 		<!--
 		Origin: P2P
 		<rom name="Ponytail Anthology vol.3 (1996)(Ponytail Soft).iso" size="19972096" crc="798581ae" sha1="52b663b863017e21e25c8855ad0da39a89a382d9"/>
-		
+
 		CUE file used for conversion:
-		<rom name="Ponytail Anthology vol.3 (1996)(Ponytail Soft).cue" size="107" crc="3a36b669" sha1="9b446abf11350f2d0ea8640f43a3f93784f1e2ce"/>		
+		<rom name="Ponytail Anthology vol.3 (1996)(Ponytail Soft).cue" size="107" crc="3a36b669" sha1="9b446abf11350f2d0ea8640f43a3f93784f1e2ce"/>
 		-->
 		<description>Ponytail Anthology Vol. 3</description>
 		<year>1996</year>
@@ -1221,11 +1367,11 @@
 		<rom name="Image.cue" size="1611" crc="426e02ab" sha1="b41aca944329184740ae31642d209e13123132d7"/>
 		<rom name="Image.img" size="333958128" crc="26163a8c" sha1="b18171ceba72e72d23ca502e05173158c4de5538"/>
 		<rom name="Image.sub" size="13630944" crc="5c783df4" sha1="f17dd7023dc4ffad27e4741ba000326e49329bc9"/>
-		
+
 		The original CUE indicates MODE1/2352 for the data track, but this seems to be wrong, as all the data
 		sectors in track 1 are actually mode 2, and MS-DOS doesn't recognize the file system. To avoid this, the
 		CHD was converted through a modified CUE with MODE2/2352.
-		
+
 		<rom name="Image_mode2.cue" size="1611" crc="6071e32b" sha1="be8aaa23a63272e7a5b7f3f5972d982345c1d65d"/>
 		-->
 		<description>Professional Baseball 1996</description>
@@ -1295,6 +1441,26 @@
 		</part>
 	</software>
 
+	<!-- PC-98x1 / FM Towns hybrid -->
+	<software name="rinkan">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="2046" crc="54f0ec1f" sha1="686a7ecc6a53e9b2ede8ff3396ad0c6e38b87e3c"/>
+		<rom name="Image.cue" size="340" crc="c0ad3f7d" sha1="6d39c08ccbd98363f1cc7bbc79038baacae268f4"/>
+		<rom name="Image.img" size="379859760" crc="fef77566" sha1="fd7569f8c41405fd2898577ffc1806d57e47bd7d"/>
+		<rom name="Image.sub" size="15504480" crc="1d0cc31c" sha1="8f56ddae02360a9f22821ba35ae1c7def1462c13"/>
+		-->
+		<description>Rinkan Gakkou</description>
+		<year>1995</year>
+		<publisher>フォスター (Foster)</publisher>
+		<info name="alt_title" value="林間学校" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="rinkan" sha1="2574f07d8495ea197b5a04136f860b5466fa1ad5" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="rookies">
 		<!--
 		Origin: P2P
@@ -1332,9 +1498,9 @@
 		<!--
 		Origin: P2P
 		<rom name="Ryouki no Ori 1 (1996)(PLANTECH-ZEROSYSTEM).ISO" size="119138304" crc="193e09d1" sha1="caffe3f19e618cc10af3fcbe6df7c48ab717a928"/>
-		
+
 		CUE file used for conversion:
-		<rom name="Ryouki no Ori 1 (1996)(PLANTECH-ZEROSYSTEM).cue" size="104" crc="176f9e3f" sha1="22080c96d5566c7de03beb349c5fa026c677fa94"/>		
+		<rom name="Ryouki no Ori 1 (1996)(PLANTECH-ZEROSYSTEM).cue" size="104" crc="176f9e3f" sha1="22080c96d5566c7de03beb349c5fa026c677fa94"/>
 		-->
 		<description>Ryouki no Ori</description>
 		<year>1995</year>
@@ -1352,9 +1518,9 @@
 		<!--
 		Origin: P2P
 		<rom name="Ryouki no Ori 2 (1997)(PLANTECH-ZEROSYSTEM).ISO" size="119138304" crc="193e09d1" sha1="caffe3f19e618cc10af3fcbe6df7c48ab717a928"/>
-		
+
 		CUE file used for conversion:
-		<rom name="Ryouki no Ori 2 (1997)(PLANTECH-ZEROSYSTEM).cue" size="104" crc="50b6c537" sha1="b64354c20cddc43c21c9e406320e1fd673ee5912"/>		
+		<rom name="Ryouki no Ori 2 (1997)(PLANTECH-ZEROSYSTEM).cue" size="104" crc="50b6c537" sha1="b64354c20cddc43c21c9e406320e1fd673ee5912"/>
 		-->
 		<description>Ryouki no Ori Dai-2-Shou</description>
 		<year>1996</year>
@@ -1488,12 +1654,69 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
+	<software name="schwargx">
+		<!--
+		Origin: P2P
+		<rom name="Schwarzschild GX CD (1997)(KOGADO).ccd" size="7542" crc="ac4f05b3" sha1="add60653a0482dddd836c9de107b90b61eae96d2"/>
+		<rom name="Schwarzschild GX CD (1997)(KOGADO).img" size="560345184" crc="5b18f6a7" sha1="55605ee1ef9d3c316de2bf6d2f40265423a9b0a6"/>
+		<rom name="Schwarzschild GX CD (1997)(KOGADO).sub" size="22871232" crc="5a7443c6" sha1="c3e385106fe5994a935f1e6245502c5df7646383"/>
+		
+		*after conversion with IsoBuster+EAC *
+		<rom name="Schwarzschild GX CD (1997)(KOGADO).cue" size="4493" crc="a777c5dc" sha1="82d1aa50f8bebaa042eb1ffc3ca3a84994474a4b"/>
+		<rom name="Track01.bin" size="22111152" crc="ea405f75" sha1="010e133a25f397140eefdcf98a1f47a8a52d9391"/>
+		<rom name="Track02.bin" size="1411200" crc="96ddfabe" sha1="842a3c7a1ba76191f196f6fa6f64862347d4c28d"/>
+		<rom name="Track03.bin" size="19161744" crc="b6d75d6e" sha1="27e31f0705b7c6096e0117ccc3538aed37677e9a"/>
+		<rom name="Track04.bin" size="22680336" crc="43559b63" sha1="90b7ac3a84f9ecb484c5766fc630fed6b6dfa45f"/>
+		<rom name="Track05.bin" size="17898720" crc="d074ded1" sha1="c715bd09b6304bd5e954f4880fec841255687c11"/>
+		<rom name="Track06.bin" size="19808544" crc="b3d2cd24" sha1="735e1e77c9cf78903a0da4240a9c7960bd3f2265"/>
+		<rom name="Track07.bin" size="18724272" crc="23887f84" sha1="ffa880b0f2a2f539f2de2983c3c8068c7e2f6934"/>
+		<rom name="Track08.bin" size="9941904" crc="541a82c4" sha1="67f8fa3cd9999aa0baeb7e64739a0a72e73ba31d"/>
+		<rom name="Track09.bin" size="15412656" crc="cb1ad81c" sha1="7c44432c6796e006def0434f05cdde566d8025d9"/>
+		<rom name="Track10.bin" size="15092784" crc="7ea10a5a" sha1="8f59ad2bae40bc1256a8dae508e46a51526977ba"/>
+		<rom name="Track11.bin" size="11040288" crc="cc644633" sha1="997e9d170f3df6f976477cb83f621e72b3c62bb2"/>
+		<rom name="Track12.bin" size="14657664" crc="4e60087c" sha1="6191fe6f1554fa912b4eb201f4a4a33d5d26d0d8"/>
+		<rom name="Track13.bin" size="15739584" crc="43aa2f4c" sha1="69d92042040a069d31e21b3fc007ef9285dc0eae"/>
+		<rom name="Track14.bin" size="18251520" crc="e23c4d20" sha1="bfd3f278bedb72a9ad7d3cb2f4f8e6a3dadcafdd"/>
+		<rom name="Track15.bin" size="16111200" crc="f4b8fda5" sha1="27efff152546d9bd0bce334d6c3217e2c0f4d60f"/>
+		<rom name="Track16.bin" size="12009312" crc="c5d679ad" sha1="151ae62efccd4cc67268269f1591ed7962d2cd91"/>
+		<rom name="Track17.bin" size="32763360" crc="ad6282fc" sha1="d670ec36430bc9251710e2d60bd2dd67802e9388"/>
+		<rom name="Track18.bin" size="48218352" crc="4a8af34c" sha1="598512c5f9fe3224173c75ee548c41cbc9c076bc"/>
+		<rom name="Track19.bin" size="50483328" crc="b4be8681" sha1="9a40b5cc1ce623dc672e456d10bf324ac83df48e"/>
+		<rom name="Track20.bin" size="3455088" crc="04e65bc6" sha1="cb807210846976da5a19bf4c34ab501a649938d8"/>
+		<rom name="Track21.bin" size="5854128" crc="037b032a" sha1="1157ebcc1fa1f0e1d69a457236a5df1c7fabef02"/>
+		<rom name="Track22.bin" size="14387184" crc="04fd9192" sha1="52504d1b78c62929e73e8d9130d02309b0190cae"/>
+		<rom name="Track23.bin" size="3426864" crc="a4027014" sha1="5724b98c79ecb9d41dba8c37adb2315428d97181"/>
+		<rom name="Track24.bin" size="2469600" crc="8bca924a" sha1="dd663d8476b314b61ab14fb321f289b601ea0c01"/>
+		<rom name="Track25.bin" size="12117504" crc="dfcb280d" sha1="4c35fc433176af42f452bc37484fbc45de095894"/>
+		<rom name="Track26.bin" size="18564336" crc="5f332575" sha1="0b08a6aa2f09839d708775f83618f2e2fd9fb1a2"/>
+		<rom name="Track27.bin" size="23929248" crc="5ed350ab" sha1="919f86d32141b0134868578036376083b2758a20"/>
+		<rom name="Track28.bin" size="10699248" crc="71c975b2" sha1="5be6ece028b670f4332d5495dd97e3cbf7326899"/>
+		<rom name="Track29.bin" size="7526400" crc="3ef32e52" sha1="d7642b457700f15f8400b13cec78d7ac412303e7"/>
+		<rom name="Track30.bin" size="20114304" crc="4cbf40e1" sha1="e58f6521d09a23395bbd1387f5205d44f96d11f8"/>
+		<rom name="Track31.bin" size="8347248" crc="7f1599be" sha1="bad1cd67ef8c78afffe082a5eb0e6115978b1054"/>
+		<rom name="Track32.bin" size="10696896" crc="1aad8a60" sha1="7d56611f13d909021e30490dbaee767bd7753945"/>
+		<rom name="Track33.bin" size="6905472" crc="140f86cb" sha1="7e74284b66bf4e37c2be615eeb18a9a101caa425"/>
+		<rom name="Track34.bin" size="8761200" crc="8b939bfd" sha1="e2b96f88412a8c1ce16c916bb7f7cd770a694103"/>
+		<rom name="Track35.bin" size="9758448" crc="393a430a" sha1="4977a91e035164b2d9f1f789556c07f00f0322f8"/>
+		<rom name="Track36.bin" size="11814096" crc="30450f84" sha1="f0347acbb558b4a040f14467af375a6eb431fba9"/>
+		-->
+		<description>Schwarzschild GX: Sabita Sousei</description>
+		<year>1997</year>
+		<publisher>工画堂 (Kogado)</publisher>
+		<info name="alt_title" value="シュヴァルツシルトGX 錆びた蒼星" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="schwarzschild gx cd (1997)(kogado)" sha1="4f37477d1fc04b1d3a11316b4084ae96fe0e28cc" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="sela">
 		<!--
 		 Origin: peter_j (Super Lonely Terminal)
 		 <rom name="sela_cd.iso" size="198440960" crc="82598cf7" sha1="366f4c38b16d865c1e826b447dc566d94633aa7b"/>
-		 
+
 		 <rom name="sela_music_cd.bin" size="511383600" crc="53c9cd59" sha1="9955790be92eb99d54c449b808e0ccc5e42111d7"/>
 		 <rom name="sela_music_cd.cue" size="714" crc="e92f82d0" sha1="e0d88a3d6d36b69268e0f471db540508e708f26c"/>
 		 -->
@@ -1556,7 +1779,23 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
+	<software name="sofcom9">
+		<!--
+		Origin: Tokugawa Corporate Forums (peter_j)
+		<rom name="SOFCOM_9.BIN" size="549930528" crc="6eb19b66" sha1="d7d8b83679cb3fe37dfca2c367ec3a7218bff8c5"/>
+		<rom name="SOFCOM_9.CUE" size="328" crc="001aa5e9" sha1="3d05f5e1ece778f7f21498477588adc39a1fe6d3"/>
+		-->
+		<description>Sofcom CD-ROM No. 9 - Winter 1996</description>
+		<year>1996</year>
+		<publisher>ソフコム (Sofcom)</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sofcom_9" sha1="d01434ca403896b811cc43931916cfa3e8c5f546"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="srmp4f">
 		<!--
 		Origin unknwon
@@ -1580,7 +1819,7 @@
 		<!--
 		Origin: Unknown
 		<rom name="strike commander plus.iso" size="86388960" crc="d8953dae" sha1="80f27e2682f41ee5d82a3c8cad59bb5aeb7e9817"/>
-		
+
 		CUE file used for conversion:
 		<rom name="strike commander plus.cue" size="82" crc="0f9a2f59" sha1="90970d4595d29c7efd90f39e07dea9e46b5e297f"/>
 		-->
@@ -1595,7 +1834,24 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
+	<software name="sweetday">
+		<!--
+		Origin: P2P
+		<rom name="Sweet Days CD (1997)(Pearl Soft).iso" size="56271600" crc="0bfa203b" sha1="7976cac0526d2e12f2a93094af6db10aa23ff522"/>
+		-->
+		<description>Sweet Days</description>
+		<year>1997</year>
+		<publisher>パールソフト (Pearl Soft)</publisher>
+		<info name="alt_title" value="スウィートデイズ" />
+		<info name="release" value="19971031" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sweet days cd (1997)(pearl soft)" sha1="895526e3f19b2f383cf2ed4893dc867a0101c0d9" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- This contains some doujin games for PC-98 and some for Windows3.1/95 -->
 	<software name="takerud1">
 		<!--
@@ -1712,7 +1968,27 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
+	<!-- PC-98x1 / FM Towns hybrid -->
+	<software name="toushin2">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="7055" crc="878fdc3f" sha1="d0a1af456f758de8a3aae8ca5aae4407a29a21ee"/>
+		<rom name="Image.cue" size="1406" crc="ab5112e6" sha1="caddbfdaa9002bd2cbd9d44a0320de0ba83188e4"/>
+		<rom name="Image.img" size="604240560" crc="3a4479b0" sha1="59fa6c2e95b8e2a79d25ec3b70b9c7902642faf5"/>
+		<rom name="Image.sub" size="24662880" crc="20f890dc" sha1="4fe043a928835600b7cdddc517aac410323384bd"/>
+		-->
+		<description>Toushin Toshi II</description>
+		<year>1996</year>
+		<publisher>アリスソフト (AliceSoft)</publisher>
+		<info name="alt_title" value="闘神都市 II" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="toushin2" sha1="780273f0ece50759e03589c3a7202eddfaf9eeb4" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="usnf">
 		<!--
 		 Origin: peter_j (Super Lonely Terminal)
@@ -1803,9 +2079,9 @@
 		<!--
 		Origin: Unknown
 		<rom name="ZAI_METAJO CD (1996)(ANJIN).ISO" size="40092192" crc="c41f199f" sha1="08aae335ff1fff2a674a1012be423720f3273535"/>
-		
+
 		CUE file used for conversion:
-		<rom name="ZAI_METAJO CD (1996)(ANJIN).cue" size="88" crc="3c3cbf79" sha1="504effcd208f11f867c340d2bc046d46f5519ab5"/>		
+		<rom name="ZAI_METAJO CD (1996)(ANJIN).cue" size="88" crc="3c3cbf79" sha1="504effcd208f11f867c340d2bc046d46f5519ab5"/>
 		-->
 		<description>Zai Metajo</description>
 		<year>1996</year>

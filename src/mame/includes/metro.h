@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "sound/okim6295.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/es8712.h"
 #include "video/k053936.h"
 #include "machine/eepromser.h"

@@ -249,15 +249,15 @@ WRITE8_MEMBER(vt100_video_device::dc012_w)
 			printf("MHFU  ___ENABLED___ %05x \n", space.device().safe_pc());
 
 		MHFU_FLAG = true;
-		MHFU_counter = 0; 
+		MHFU_counter = 0;
 	}
 
 	if (!(data & 0x08))
 	{
 		if (!(data & 0x04))
 		{
-			m_scroll_latch_valid = false; 
-			m_scroll_latch = data & 0x03; // LSB is written first. 
+			m_scroll_latch_valid = false;
+			m_scroll_latch = data & 0x03; // LSB is written first.
 		}
 		else // set MSB of scroll_latch
 		{

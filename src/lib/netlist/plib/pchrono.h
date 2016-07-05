@@ -82,7 +82,7 @@ namespace chrono {
 	#endif
 
 
-	/* Based on "How to Benchmark Code Execution Times on Intel® IA-32 and IA-64
+	/* Based on "How to Benchmark Code Execution Times on Intel?? IA-32 and IA-64
 	 * Instruction Set Architectures", Intel, 2010
 	 *
 	 */

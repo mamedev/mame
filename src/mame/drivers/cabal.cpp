@@ -47,7 +47,7 @@ Dip locations verified with Fabtek manual for the trackball version
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/msm5205.h"
 #include "includes/cabal.h"
 

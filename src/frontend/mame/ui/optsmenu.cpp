@@ -27,14 +27,13 @@
 #include "rendfont.h"
 
 namespace ui {
-
 //-------------------------------------------------
 //  ctor
 //-------------------------------------------------
 
-menu_game_options::menu_game_options(mame_ui_manager &mui, render_container *container) : menu(mui, container)
+menu_game_options::menu_game_options(mame_ui_manager &mui, render_container *container) 
+	: menu(mui, container), m_main(main_filters::actual)
 {
-	m_main = main_filters::actual;
 }
 
 //-------------------------------------------------
@@ -55,7 +54,7 @@ menu_game_options::~menu_game_options()
 
 void menu_game_options::handle()
 {
-	bool changed = false;
+	auto changed = false;
 
 	// process the menu
 	const event *menu_event;
@@ -86,7 +85,7 @@ void menu_game_options::handle()
 					for (int index = 0; index < total; ++index)
 						s_sel[index] = main_filters::text[index];
 
-					menu::stack_push<menu_selector>(ui(), container, s_sel, m_main);
+					menu::stack_push<menu_selector>(ui(), container, std::move(s_sel), m_main);
 				}
 				break;
 			}
@@ -111,7 +110,7 @@ void menu_game_options::handle()
 					for (size_t index = 0; index < total; ++index)
 						s_sel[index] = ifile.get_file(index);
 
-					menu::stack_push<menu_selector>(ui(), container, s_sel, ifile.cur_file(), menu_selector::INIFILE);
+					menu::stack_push<menu_selector>(ui(), container, std::move(s_sel), ifile.cur_file(), menu_selector::INIFILE);
 				}
 				break;
 			}
@@ -129,13 +128,13 @@ void menu_game_options::handle()
 				}
 				else if (menu_event->iptkey == IPT_UI_SELECT)
 				{
-					inifile_manager &ifile = mame_machine_manager::instance()->inifile();
-					int total = ifile.cat_total();
+					auto ifile = mame_machine_manager::instance()->inifile();
+					auto total = ifile.cat_total();
 					std::vector<std::string> s_sel(total);
-					for (int index = 0; index < total; ++index)
+					for (size_t index = 0; index < total; ++index)
 						s_sel[index] = ifile.get_category(index);
 
-					menu::stack_push<menu_selector>(ui(), container, s_sel, ifile.cur_cat(), menu_selector::CATEGORY);
+					menu::stack_push<menu_selector>(ui(), container, std::move(s_sel), ifile.cur_cat(), menu_selector::CATEGORY);
 				}
 				break;
 			}
@@ -229,23 +228,23 @@ void menu_game_options::populate()
 		std::string fbuff;
 
 		// add filter item
-		UINT32 arrow_flags = get_arrow_flags((int)FILTER_FIRST, (int)FILTER_LAST, m_main);
+		auto arrow_flags = get_arrow_flags((int)FILTER_FIRST, (int)FILTER_LAST, m_main);
 		item_append(_("Filter"), main_filters::text[m_main], arrow_flags, (void *)(FPTR)FILTER_MENU);
 
 		// add category subitem
 		if (m_main == FILTER_CATEGORY && mame_machine_manager::instance()->inifile().total() > 0)
 		{
-			inifile_manager &inif = mame_machine_manager::instance()->inifile();
+			auto inif = mame_machine_manager::instance()->inifile();
 
 			arrow_flags = get_arrow_flags(0, inif.total() - 1, inif.cur_file());
 			fbuff = _(" ^!File");
 			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), inif.get_file().c_str(), arrow_flags, (void *)(FPTR)FILE_CATEGORY_FILTER);
+			item_append(fbuff, inif.get_file(), arrow_flags, (void *)(FPTR)FILE_CATEGORY_FILTER);
 
 			arrow_flags = get_arrow_flags(0, inif.cat_total() - 1, inif.cur_cat());
 			fbuff = _(" ^!Category");
 			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), inif.get_category().c_str(), arrow_flags, (void *)(FPTR)CATEGORY_FILTER);
+			item_append(fbuff, inif.get_category(), arrow_flags, (void *)(FPTR)CATEGORY_FILTER);
 		}
 		// add manufacturer subitem
 		else if (m_main == FILTER_MANUFACTURER && c_mnfct::ui.size() > 0)
@@ -253,7 +252,7 @@ void menu_game_options::populate()
 			arrow_flags = get_arrow_flags(0, c_mnfct::ui.size() - 1, c_mnfct::actual);
 			fbuff = _("^!Manufacturer");
 			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), c_mnfct::ui[c_mnfct::actual].c_str(), arrow_flags, (void *)(FPTR)MANUFACT_CAT_FILTER);
+			item_append(fbuff, c_mnfct::ui[c_mnfct::actual], arrow_flags, (void *)(FPTR)MANUFACT_CAT_FILTER);
 		}
 		// add year subitem
 		else if (m_main == FILTER_YEAR && c_year::ui.size() > 0)
@@ -261,30 +260,30 @@ void menu_game_options::populate()
 			arrow_flags = get_arrow_flags(0, c_year::ui.size() - 1, c_year::actual);
 			fbuff.assign(_("^!Year"));
 			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), c_year::ui[c_year::actual].c_str(), arrow_flags, (void *)(FPTR)YEAR_CAT_FILTER);
+			item_append(fbuff, c_year::ui[c_year::actual], arrow_flags, (void *)(FPTR)YEAR_CAT_FILTER);
 		}
 		// add custom subitem
 		else if (m_main == FILTER_CUSTOM)
 		{
 			fbuff = _("^!Setup custom filter");
 			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), nullptr, 0, (void *)(FPTR)CUSTOM_FILTER);
+			item_append(fbuff, "", 0, (void *)(FPTR)CUSTOM_FILTER);
 		}
 
 		item_append(menu_item_type::SEPARATOR);
 
 		// add options items
-		item_append(_("Customize UI"), nullptr, 0, (void *)(FPTR)CUSTOM_MENU);
-		item_append(_("Configure Directories"), nullptr, 0, (void *)(FPTR)CONF_DIR);
+		item_append(_("Customize UI"), "", 0, (void *)(FPTR)CUSTOM_MENU);
+		item_append(_("Configure Directories"), "", 0, (void *)(FPTR)CONF_DIR);
 	}
-	item_append(_(submenu::video_options[0].description), nullptr, 0, (void *)(FPTR)DISPLAY_MENU);
-	item_append(_("Sound Options"), nullptr, 0, (void *)(FPTR)SOUND_MENU);
-	item_append(_(submenu::misc_options[0].description), nullptr, 0, (void *)(FPTR)MISC_MENU);
-	item_append(_(submenu::control_options[0].description), nullptr, 0, (void *)(FPTR)CONTROLLER_MENU);
-	item_append(_("General Inputs"), nullptr, 0, (void *)(FPTR)CGI_MENU);
-	item_append(_(submenu::advanced_options[0].description), nullptr, 0, (void *)(FPTR)ADVANCED_MENU);
+	item_append(_(submenu::video_options[0].description), "", 0, (void *)(FPTR)DISPLAY_MENU);
+	item_append(_("Sound Options"), "", 0, (void *)(FPTR)SOUND_MENU);
+	item_append(_(submenu::misc_options[0].description), "", 0, (void *)(FPTR)MISC_MENU);
+	item_append(_(submenu::control_options[0].description), "", 0, (void *)(FPTR)CONTROLLER_MENU);
+	item_append(_("General Inputs"), "", 0, (void *)(FPTR)CGI_MENU);
+	item_append(_(submenu::advanced_options[0].description), "", 0, (void *)(FPTR)ADVANCED_MENU);
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Save Configuration"), nullptr, 0, (void *)(FPTR)SAVE_CONFIG);
+	item_append(_("Save Configuration"), "", 0, (void *)(FPTR)SAVE_CONFIG);
 
 	custombottom = 2.0f * ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
@@ -298,7 +297,7 @@ void menu_game_options::custom_render(void *selectedref, float top, float bottom
 {
 	float width;
 	ui().draw_text_full(container, _("Settings"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-									mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+		mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
 
@@ -318,8 +317,7 @@ void menu_game_options::custom_render(void *selectedref, float top, float bottom
 
 	// draw the text within it
 	ui().draw_text_full(container, _("Settings"), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-									mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+		mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
-
 
 } // namespace ui

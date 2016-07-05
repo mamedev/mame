@@ -243,10 +243,15 @@ void emu_timer::register_save()
 	// for non-device timers, it is an index based on the callback function name
 	if (m_device == nullptr)
 	{
-		name = m_callback.name();
+		name = m_callback.name() ? m_callback.name() : "unnamed";
 		for (emu_timer *curtimer = machine().scheduler().first_timer(); curtimer != nullptr; curtimer = curtimer->next())
-			if (!curtimer->m_temporary && curtimer->m_device == nullptr && strcmp(curtimer->m_callback.name(), m_callback.name()) == 0)
-				index++;
+			if (!curtimer->m_temporary && curtimer->m_device == nullptr)
+			{
+				if (curtimer->m_callback.name() != nullptr && m_callback.name() != nullptr && strcmp(curtimer->m_callback.name(), m_callback.name()) == 0)
+					index++;
+				else if (curtimer->m_callback.name() == nullptr && m_callback.name() == nullptr)
+					index++;
+			}
 	}
 
 	// for device timers, it is an index based on the device and timer ID

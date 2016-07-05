@@ -22,7 +22,6 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_paletteram(*this, "paletteram"),
 		m_gx400_shared_ram(*this, "gx400_shared"),
-		m_voiceram(*this, "voiceram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_filter1(*this, "filter1"),
@@ -49,7 +48,6 @@ public:
 	required_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_paletteram;
 	optional_shared_ptr<UINT8> m_gx400_shared_ram;
-	optional_shared_ptr<UINT8> m_voiceram;
 
 	/* video-related */
 	tilemap_t *m_background;

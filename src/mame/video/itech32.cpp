@@ -198,6 +198,15 @@ void itech32_state::video_start()
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(itech32_state::scanline_interrupt),this));
 	m_enable_latch[0] = 1;
 	m_enable_latch[1] = (m_planes > 1) ? 1 : 0;
+	
+	save_item(NAME(m_xfer_xcount));
+	save_item(NAME(m_xfer_ycount));
+	save_item(NAME(m_xfer_xcur));
+	save_item(NAME(m_xfer_ycur));
+	save_item(NAME(m_grom_bank));
+	save_item(NAME(m_color_latch));
+	save_item(NAME(m_enable_latch));
+	save_pointer(NAME(m_videoram.get()), VRAM_WIDTH * (m_vram_height + 16) * 2);
 }
 
 

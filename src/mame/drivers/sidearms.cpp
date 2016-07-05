@@ -49,7 +49,7 @@ Notes:
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "includes/sidearms.h"
 
 void sidearms_state::machine_start()

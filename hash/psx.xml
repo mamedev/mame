@@ -801,7 +801,7 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 		</part>
 	</software>
 
-	<software name="alondrk2">
+	<software name="aitd2">
 		<!-- Original images (Redump)
 		<rom name="Alone in the Dark - One-Eyed Jack's Revenge (USA).cue" size="115" crc="e7e7f0de" sha1="4e282f1c2fe8f2252ce18601611673feceb3fb64"/>
 		<rom name="Alone in the Dark - One-Eyed Jack's Revenge (USA).bin" size="715309056" crc="83f2a2d1" sha1="d928e147ca1ef265929e1c51d8f8ae39de2a24f9"/>
@@ -818,7 +818,7 @@ Furthermore, for an overview of US PS1 discs that have not been dumped and added
 		</part>
 	</software>
 
-	<software name="alondrk4">
+	<software name="aitdnn">
 		<!-- Original images (Redump)
 		<rom name="Alone in the Dark - The New Nightmare (USA) (Disc 1).cue" size="274" crc="fb7a5702" sha1="3efdecfbbc1e5bda7644422cef8a80529d199db2"/>
 		<rom name="Alone in the Dark - The New Nightmare (USA) (Disc 1) (Track 1).bin" size="605487120" crc="891b72c5" sha1="920a9b59cc6f1bc24166885dea5e5c86d6473b93"/>
@@ -45866,7 +45866,7 @@ TODO: Check if these match the corresponding redump dumps.
 		</part>
 	</software>
 
-	<software name="lunatic3" supported="no">
+	<software name="ldawn3" supported="no">
 		<!-- Unknown source
 		<rom name="Lunatic Dawn III (Japan) (Track 1) [SLPS-01749].bin" size="284048688" crc="bf796818" sha1="10a309580092c67865c046da36c96517645857b9"/>
 		<rom name="Lunatic Dawn III (Japan) (Track 2) [SLPS-01749].bin" size="37046352" crc="4ff10625" sha1="35d845a346df6ad33f97b209c7a77fd89794fc1e"/>
@@ -45886,7 +45886,7 @@ TODO: Check if these match the corresponding redump dumps.
 		</part>
 	</software>
 
-	<software name="lunatody" supported="no">
+	<software name="ldawnody" supported="no">
 		<!-- Unknown source
 		<rom name="Lunatic Dawn Odyssey (Japan) (Track 1) [SLPS-02420].bin" size="364440048" crc="6a695ead" sha1="abb976b45030a088d2f7a07dd3cd5b39e8211fbd"/>
 		<rom name="Lunatic Dawn Odyssey (Japan) (Track 2) [SLPS-02420].bin" size="37046352" crc="4ff10625" sha1="35d845a346df6ad33f97b209c7a77fd89794fc1e"/>

@@ -71,7 +71,7 @@ void matsucd_init( cdrom_image_device *cdrom_device, const char *cdda_tag )
 	cd.cdrom = cdrom_device->get_cdrom_file();
 	cd.cdda = cdrom_device->machine().device<cdda_device>(cdda_tag);
 
-	cd.frame_timer = cdrom_device->machine().scheduler().timer_alloc(FUNC(matsu_subcode_proc));
+	cd.frame_timer = cdrom_device->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(matsu_subcode_proc),&cdrom_device->machine()));
 
 	cd.stch_signal = 1;
 }
@@ -269,7 +269,7 @@ static void matsucd_set_status( running_machine &machine, UINT8 status )
 		if ( cd.stch_signal != 0 )
 		{
 			update_status_changed( machine, 0 );
-			machine.scheduler().timer_set(attotime::from_msec(1), FUNC(matsucd_set_status_end));
+			machine.scheduler().timer_set(attotime::from_msec(1), timer_expired_delegate(FUNC(matsucd_set_status_end),&machine));
 		}
 	}
 }

@@ -238,7 +238,7 @@ private:
 	static const vis_op_desc_map::value_type    VIS3_OP_DESC[];
 	static const vis_op_desc_map::value_type    VIS3B_OP_DESC[];
 
-	const sparc_debug_state *m_state;
+	//const sparc_debug_state *m_state;
 	unsigned                m_version;
 	vis_level               m_vis_level;
 	int                     m_op_field_width;

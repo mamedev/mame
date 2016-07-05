@@ -2,9 +2,9 @@
 // copyright-holders:Vas Crabb, Nathan Woods
 /*********************************************************************
 
-	timeconv.cpp
+    timeconv.cpp
 
-	Time conversion utility code
+    Time conversion utility code
 
 ***************************************************************************/
 
@@ -16,21 +16,21 @@
 namespace util {
 namespace {
 /***************************************************************************
-	PROTOTYPES
+    PROTOTYPES
 ***************************************************************************/
 
 util::ntfs_duration calculate_ntfs_offset();
 
 
 /***************************************************************************
-	GLOBAL VARIABLES
+    GLOBAL VARIABLES
 ***************************************************************************/
 
 util::ntfs_duration f_ntfs_offset(calculate_ntfs_offset());
 
 
 /***************************************************************************
-	IMPLEMENTATION
+    IMPLEMENTATION
 ***************************************************************************/
 
 util::ntfs_duration calculate_ntfs_offset()

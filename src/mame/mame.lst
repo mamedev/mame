@@ -9204,8 +9204,8 @@ dking                           // Crazy Kong Bootleg
 guzzler                         // (c) 1983 Tehkan
 guzzlers                        // (c) 1983 Tehkan (Swimmer Conversion)
 monkeyd                         // bootleg
-rpatrol							// (c) 1981.01 Orca
-rpatrola                        // bootleg 
+rpatrol                         // (c) 1981.01 Orca
+rpatrola                        // bootleg
 rpatrolb                        // bootleg
 silvland                        // Falcon
 swimmer                         // (c) 1982 Tehkan
@@ -12083,6 +12083,9 @@ fccpu30                         //
 @source:fcscsi.cpp
 fcscsi1                         //
 
+@source:fcisio.cpp
+fcisio1                         //
+
 @source:fcombat.cpp
 fcombat                         // (c) 1985 Jaleco
 
@@ -12269,8 +12272,8 @@ fccpu1                          //
 pesadelo                        // (c) 1989 Forte II Games
 
 @source:fortecar.cpp
-fortecar                        //
-fortecrd                        //
+fortecrd                        // (c) 1994, Fortex Ltd.
+fortecar                        // (c) 1994, Fortex Ltd.
 
 @source:fp1100.cpp
 fp1100                          //
@@ -14198,7 +14201,7 @@ mjkinjas                        // (c) 1991 Home Data
 mjkojink                        // (c) 1989 Home Data
 mjprivat                        // (c) 1991 Matoba
 mjyougo                         // (c) 1989 Home Data
-mjjoship			// (c) 1988 Home Data
+mjjoship            // (c) 1988 Home Data
 mrokumei                        // (c) 1988 Home Data
 reikaids                        // (c) 1988 Home Data
 vitaminc                        // (c) 1989 Home Data
@@ -28254,6 +28257,7 @@ ryuuha                          // (c) 1987
 secolove                        // (c) 1986
 seiha                           // (c) 1987
 seiham                          // (c) 1987
+swinggal			// (c) 1987 Digital Denshi
 vipclub                         // (c) 1988 Daiichi Denshi
 
 @source:nbmj8891.cpp

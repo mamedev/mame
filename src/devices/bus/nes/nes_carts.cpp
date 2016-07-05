@@ -199,6 +199,8 @@ SLOT_INTERFACE_START(nes_cart)
 	SLOT_INTERFACE_INTERNAL("ks7012",           NES_KS7012)  // used in Zanac (FDS Conversion)
 	SLOT_INTERFACE_INTERNAL("ks7013b",          NES_KS7013B) // used in Highway Star (FDS Conversion)
 	SLOT_INTERFACE_INTERNAL("ks7031",           NES_KS7031) //  used in Dracula II (FDS Conversion)
+	SLOT_INTERFACE_INTERNAL("ks7016",           NES_KS7016) //  used in Exciting Basket (FDS Conversion)
+	SLOT_INTERFACE_INTERNAL("ks7037",           NES_KS7037) //  used in Metroid (FDS Conversion)
 	SLOT_INTERFACE_INTERNAL("gs2015",           NES_GS2015)
 	SLOT_INTERFACE_INTERNAL("gs2004",           NES_GS2004)
 	SLOT_INTERFACE_INTERNAL("gs2013",           NES_GS2013)
@@ -243,6 +245,7 @@ SLOT_INTERFACE_START(nes_cart)
 	SLOT_INTERFACE_INTERNAL("unl_ac08",         NES_AC08) //  used by Green Beret FDS conversion
 	SLOT_INTERFACE_INTERNAL("unl_bb",           NES_UNL_BB) //  used by a few FDS conversions
 	SLOT_INTERFACE_INTERNAL("sgpipe",           NES_SHUIGUAN)    // mapper 183
+	SLOT_INTERFACE_INTERNAL("rt01",             NES_RT01)
 // misc MMC3 clone boards
 	SLOT_INTERFACE_INTERNAL("dbz5",             NES_REX_DBZ5)
 	SLOT_INTERFACE_INTERNAL("sl1632",           NES_REX_SL1632)
@@ -350,9 +353,6 @@ SLOT_INTERFACE_START(nes_cart)
 	SLOT_INTERFACE_INTERNAL("unl_eh8813a",      NES_NROM)    // UNSUPPORTED
 	SLOT_INTERFACE_INTERNAL("unl_158b",         NES_NROM)    // UNSUPPORTED
 	SLOT_INTERFACE_INTERNAL("unl_drgnfgt",      NES_NROM)    // UNSUPPORTED
-	SLOT_INTERFACE_INTERNAL("ks7016",           NES_NROM)    // UNSUPPORTED
-	SLOT_INTERFACE_INTERNAL("ks7037",           NES_NROM)    // UNSUPPORTED
-	SLOT_INTERFACE_INTERNAL("rt01",             NES_NROM)    // UNSUPPORTED
 // are there dumps of games with these boards?
 	SLOT_INTERFACE_INTERNAL("bmc_hik_kof",      NES_NROM) // mapper 251 - UNSUPPORTED
 	SLOT_INTERFACE_INTERNAL("bmc_13in1jy110",   NES_NROM) //  [mentioned in FCEUMM source - we need more info] - UNSUPPORTED

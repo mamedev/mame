@@ -25,7 +25,7 @@ public:
 	virtual ~output_module() { }
 
 	virtual void notify(const char *outname, INT32 value) = 0;
-	
+
 	void set_machine(running_machine *machine) { m_machine = machine;  };
 	running_machine &machine() const { return *m_machine; }
 private:

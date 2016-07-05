@@ -58,7 +58,7 @@ Dip locations verified with manual for ddragon & ddragon2
 #include "cpu/m6805/m6805.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "includes/ddragon.h"
 

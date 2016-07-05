@@ -338,7 +338,7 @@ C - uses sub board with support for player 3 and 4 controls
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6800.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "machine/nvram.h"
 #include "includes/namcos1.h"
 

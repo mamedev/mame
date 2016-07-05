@@ -14,7 +14,6 @@
 #define MAME_FRONTEND_UI_FILEMNGR_H
 
 namespace ui {
-
 class menu_file_manager : public menu
 {
 public:

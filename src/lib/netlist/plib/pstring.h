@@ -113,39 +113,40 @@ public:
 	double as_double(bool *error = nullptr) const;
 	long as_long(bool *error = nullptr) const;
 
-	/*
-	 * everything below MAY not work for utf8.
-	 * Example a=s.find(EUROSIGN); b=s.substr(a,1); will deliver invalid utf8
-	 */
-
 	unsigned len() const
 	{
 		return F::len(m_ptr);
 	}
 
 	pstring_t& operator+=(const code_t c) { mem_t buf[F::MAXCODELEN+1] = { 0 }; F::encode(c, buf); pcat(buf); return *this; }
-	friend pstring_t operator+(const pstring_t &lhs, const mem_t rhs) { return pstring_t(lhs) += rhs; }
+	friend pstring_t operator+(const pstring_t &lhs, const code_t rhs) { return pstring_t(lhs) += rhs; }
 
 	int find(const pstring_t &search, unsigned start = 0) const;
 	int find(const mem_t *search, unsigned start = 0) const;
-	int find(const code_t search, unsigned start = 0) const { mem_t buf[F::MAXCODELEN+1] = { 0 }; F::encode(search, buf); return find(buf, start); };
+	int find(const code_t search, unsigned start = 0) const { mem_t buf[F::MAXCODELEN+1] = { 0 }; F::encode(search, buf); return find(buf, start); }
 
-	const pstring_t substr(int start, int count = -1) const ;
+	const pstring_t substr(unsigned start, unsigned count) const ;
+	const pstring_t substr(unsigned start) const { if (start>=len()) return pstring_t(""); else return substr(start, len()-start); }
 
 	const pstring_t left(unsigned count) const { return substr(0, count); }
-	const pstring_t right(unsigned count) const  { return substr((int) len() - (int) count, count); }
+	const pstring_t right(unsigned count) const  { if (len()<count) return pstring_t(*this); else return substr(len() - count, count); }
 
 	int find_first_not_of(const pstring_t &no) const;
 	int find_last_not_of(const pstring_t &no) const;
-
-	// FIXME:
-	code_t code_at(const unsigned pos) const { return F::code(F::nthcode(m_ptr->str(),pos)); }
 
 	const pstring_t ltrim(const pstring_t &ws = " \t\n\r") const;
 	const pstring_t rtrim(const pstring_t &ws = " \t\n\r") const;
 	const pstring_t trim(const pstring_t &ws = " \t\n\r") const { return this->ltrim(ws).rtrim(ws); }
 
 	const pstring_t rpad(const pstring_t &ws, const unsigned cnt) const;
+
+	/*
+	 * everything below MAY not work for utf8.
+	 * Example a=s.find(EUROSIGN); b=s.substr(a,1); will deliver invalid utf8
+	 */
+
+	// FIXME:
+	code_t code_at(const unsigned pos) const { return F::code(F::nthcode(m_ptr->str(),pos)); }
 
 	const pstring_t ucase() const;
 
@@ -332,6 +333,8 @@ public:
 	// construction with copy
 	pstringbuffer(const char *string) {init(); if (string != nullptr) pcopy(string); }
 	pstringbuffer(const pstring &string) {init(); pcopy(string); }
+	pstringbuffer(const pstringbuffer &stringb) {init(); pcopy(stringb); }
+	pstringbuffer(pstringbuffer &&b) : m_ptr(b.m_ptr), m_size(b.m_size), m_len(b.m_len) { b.m_ptr = nullptr; b.m_size = 0; b.m_len = 0; }
 
 	// assignment operators
 	pstringbuffer &operator=(const char *string) { pcopy(string); return *this; }

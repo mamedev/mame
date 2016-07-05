@@ -29,7 +29,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "machine/mc68681.h"
 #include "machine/mc68901.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "machine/nvram.h"
 #include "includes/micro3d.h"
 
@@ -309,6 +309,8 @@ static MACHINE_CONFIG_START( micro3d, micro3d_state )
 	MCFG_CPU_ADD("audiocpu", I8051, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(soundmem_prg)
 	MCFG_CPU_IO_MAP(soundmem_io)
+	MCFG_MCS51_SERIAL_TX_CB(WRITE8(micro3d_state, data_from_i8031))
+	MCFG_MCS51_SERIAL_RX_CB(READ8(micro3d_state, data_to_i8031))
 
 	MCFG_MC68681_ADD("duart68681", XTAL_3_6864MHz)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(micro3d_state, duart_irq_handler))

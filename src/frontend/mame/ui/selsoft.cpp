@@ -29,7 +29,6 @@
 
 
 namespace ui {
-
 std::string reselect_last::driver;
 std::string reselect_last::software;
 std::string reselect_last::swlist;
@@ -126,14 +125,16 @@ bool has_multiple_bios(const game_driver *driver, s_bios &biosname)
 //  ctor
 //-------------------------------------------------
 
-menu_select_software::menu_select_software(mame_ui_manager &mui, render_container *container, const game_driver *driver) : menu(mui, container)
+menu_select_software::menu_select_software(mame_ui_manager &mui, render_container *container, const game_driver *driver) 
+	: menu(mui, container)
 {
 	if (reselect_last::get())
 		reselect_last::set(false);
 
 	sw_filters::actual = 0;
 	highlight = 0;
-
+	m_has_empty_start = false;
+	m_searchlist.fill(nullptr);
 	m_driver = driver;
 	build_software_list();
 	load_sw_custom_filters();
@@ -433,7 +434,7 @@ void menu_select_software::populate()
 	{
 		// if the device can be loaded empty, add an item
 		if (m_has_empty_start)
-			item_append("[Start empty]", nullptr, flags_ui, (void *)&m_swinfo[0]);
+			item_append("[Start empty]", "", flags_ui, (void *)&m_swinfo[0]);
 
 		m_displaylist.clear();
 		m_tmp.clear();
@@ -470,16 +471,17 @@ void menu_select_software::populate()
 		}
 
 		// iterate over entries
-		for (size_t curitem = 0; curitem < m_displaylist.size(); ++curitem)
+		int curitem = 0;
+		for (auto & e : m_displaylist)
 		{
 			if (reselect_last::software == "[Start empty]" && !reselect_last::driver.empty())
 				old_software = 0;
 
-			else if (m_displaylist[curitem]->shortname == reselect_last::software && m_displaylist[curitem]->listname == reselect_last::swlist)
+			else if (e->shortname == reselect_last::software && e->listname == reselect_last::swlist)
 				old_software = m_has_empty_start ? curitem + 1 : curitem;
 
-			item_append(m_displaylist[curitem]->longname.c_str(), m_displaylist[curitem]->devicetype.c_str(),
-						m_displaylist[curitem]->parentname.empty() ? flags_ui : (FLAG_INVERT | flags_ui), (void *)m_displaylist[curitem]);
+			item_append(e->longname, e->devicetype,	e->parentname.empty() ? flags_ui : (FLAG_INVERT | flags_ui), (void *)e);
+			curitem++;
 		}
 	}
 
@@ -487,13 +489,13 @@ void menu_select_software::populate()
 	{
 		find_matches(m_search, VISIBLE_GAMES_IN_SEARCH);
 
-		for (int curitem = 0; m_searchlist[curitem] != nullptr; ++curitem)
-			item_append(m_searchlist[curitem]->longname.c_str(), m_searchlist[curitem]->devicetype.c_str(),
+		for (int curitem = 0; m_searchlist[curitem]; ++curitem)
+			item_append(m_searchlist[curitem]->longname, m_searchlist[curitem]->devicetype,
 						m_searchlist[curitem]->parentname.empty() ? flags_ui : (FLAG_INVERT | flags_ui),
 						(void *)m_searchlist[curitem]);
 	}
 
-	item_append(menu_item_type::SEPARATOR);
+	item_append(menu_item_type::SEPARATOR, flags_ui);
 
 	// configure the custom rendering
 	customtop = 4.0f * ui().get_line_height() + 5.0f * UI_BOX_TB_BORDER;
@@ -504,7 +506,6 @@ void menu_select_software::populate()
 		selected = old_software;
 		top_line = selected - (ui_globals::visible_sw_lines / 2);
 	}
-
 	reselect_last::reset();
 }
 
@@ -586,7 +587,7 @@ void menu_select_software::build_software_list()
 		if (!m_swinfo[y].parentname.empty())
 		{
 			std::string lparent(m_swinfo[y].parentname);
-			bool found = false;
+			auto found = false;
 
 			// first scan backward
 			for (int x = y; x > 0; --x)
@@ -660,13 +661,13 @@ void menu_select_software::custom_render(void *selectedref, float top, float bot
 	const game_driver *driver = nullptr;
 	float width;
 	std::string tempbuf[5], filtered;
-	rgb_t color = UI_BACKGROUND_COLOR;
-	bool isstar = false;
+	auto color = UI_BACKGROUND_COLOR;
+	auto isstar = false;
 	float tbarspace = ui().get_line_height();
 	float text_size = 1.0f;
 
 	// determine the text for the header
-	int vis_item = (m_search[0] != 0) ? visible_items : (m_has_empty_start ? visible_items - 1 : visible_items);
+	auto vis_item = (m_search[0] != 0) ? visible_items : (m_has_empty_start ? visible_items - 1 : visible_items);
 	tempbuf[0] = string_format(_("%1$s %2$s ( %3$d / %4$d software packages )"), emulator_info::get_appname(), bare_build_version, vis_item, m_swinfo.size() - 1);
 	tempbuf[1] = string_format(_("Driver: \"%1$s\" software list "), m_driver->description);
 
@@ -882,8 +883,8 @@ void menu_select_software::custom_render(void *selectedref, float top, float bot
 
 void menu_select_software::inkey_select(const event *menu_event)
 {
-	ui_software_info *ui_swinfo = (ui_software_info *)menu_event->itemref;
-	ui_options &mopt = ui().options();
+	auto ui_swinfo = (ui_software_info *)menu_event->itemref;
+	auto mopt = ui().options();
 
 	if (ui_swinfo->startempty == 1)
 	{
@@ -908,10 +909,10 @@ void menu_select_software::inkey_select(const event *menu_event)
 		driver_enumerator drivlist(machine().options(), *ui_swinfo->driver);
 		media_auditor auditor(drivlist);
 		drivlist.next();
-		software_list_device *swlist = software_list_device::find_by_name(drivlist.config(), ui_swinfo->listname.c_str());
-		software_info *swinfo = swlist->find(ui_swinfo->shortname.c_str());
+		auto swlist = software_list_device::find_by_name(drivlist.config(), ui_swinfo->listname.c_str());
+		auto swinfo = swlist->find(ui_swinfo->shortname.c_str());
 
-		media_auditor::summary summary = auditor.audit_software(swlist->list_name(), swinfo, AUDIT_VALIDATE_FAST);
+		auto summary = auditor.audit_software(swlist->list_name(), swinfo, AUDIT_VALIDATE_FAST);
 
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
@@ -1068,7 +1069,7 @@ void menu_select_software::load_sw_custom_filters()
 
 		// get number of filters
 		file.gets(buffer, MAX_CHAR_INFO);
-		char *pb = strchr(buffer, '=');
+		auto pb = strchr(buffer, '=');
 		sw_custfltr::numother = atoi(++pb) - 1;
 
 		// get main filter
@@ -1085,8 +1086,8 @@ void menu_select_software::load_sw_custom_filters()
 		for (int x = 1; x <= sw_custfltr::numother; ++x)
 		{
 			file.gets(buffer, MAX_CHAR_INFO);
-			char *cb = strchr(buffer, '=') + 2;
-			for (int y = 0; y < sw_filters::length; y++)
+			auto cb = strchr(buffer, '=') + 2;
+			for (int y = 0; y < sw_filters::length; ++y)
 			{
 				if (!strncmp(cb, sw_filters::text[y], strlen(sw_filters::text[y])))
 				{
@@ -1155,11 +1156,11 @@ std::string c_sw_region::getname(std::string &str)
 {
 	std::string fullname(str);
 	strmakelower(fullname);
-	size_t found = fullname.find("(");
+	auto found = fullname.find("(");
 
 	if (found != std::string::npos)
 	{
-		size_t ends = fullname.find_first_not_of("abcdefghijklmnopqrstuvwxyz", found + 1);
+		auto ends = fullname.find_first_not_of("abcdefghijklmnopqrstuvwxyz", found + 1);
 		std::string temp(fullname.substr(found + 1, ends - found - 1));
 
 		for (auto & elem : region_lists)
@@ -1199,7 +1200,7 @@ void c_sw_year::set(std::string &str)
 
 void c_sw_publisher::set(std::string &str)
 {
-	std::string name = getname(str);
+	auto name = getname(str);
 	if (std::find(ui.begin(), ui.end(), name) != ui.end())
 		return;
 
@@ -1208,7 +1209,7 @@ void c_sw_publisher::set(std::string &str)
 
 std::string c_sw_publisher::getname(std::string &str)
 {
-	size_t found = str.find("(");
+	auto found = str.find("(");
 
 	if (found != std::string::npos)
 		return (str.substr(0, found - 1));
@@ -1269,7 +1270,7 @@ void menu_select_software::build_list(std::vector<ui_software_info *> &s_drivers
 
 		case UI_SW_REGION:
 			{
-				std::string name = m_filter.region.getname(s_driver->longname);
+				auto name = m_filter.region.getname(s_driver->longname);
 
 				if(!name.empty() && name == filter_text)
 					m_displaylist.push_back(s_driver);
@@ -1278,7 +1279,7 @@ void menu_select_software::build_list(std::vector<ui_software_info *> &s_drivers
 
 		case UI_SW_PUBLISHERS:
 			{
-				std::string name = m_filter.publisher.getname(s_driver->publisher);
+				auto name = m_filter.publisher.getname(s_driver->publisher);
 
 				if(!name.empty() && name == filter_text)
 					m_displaylist.push_back(s_driver);
@@ -1399,8 +1400,8 @@ float menu_select_software::draw_left_panel(float x1, float y1, float x2, float 
 		float l_height = ui().get_line_height();
 		float line_height = l_height * text_size;
 		float left_width = 0.0f;
-		int text_lenght = sw_filters::length;
-		int afilter = sw_filters::actual;
+		auto text_lenght = sw_filters::length;
+		auto afilter = sw_filters::actual;
 		int phover = HOVER_SW_FILTER_FIRST;
 		const char **text = sw_filters::text;
 		float sc = y2 - y1 - (2.0f * UI_BOX_TB_BORDER);
@@ -1412,13 +1413,11 @@ float menu_select_software::draw_left_panel(float x1, float y1, float x2, float 
 			line_height = l_height * text_size;
 		}
 
-		float text_sign = ui().get_string_width("_# ", text_size);
+		auto text_sign = ui().get_string_width("_# ", text_size);
 		for (int x = 0; x < text_lenght; ++x)
 		{
-			float total_width;
-
 			// compute width of left hand side
-			total_width = ui().get_string_width(text[x], text_size);
+			auto total_width = ui().get_string_width(text[x], text_size);
 			total_width += text_sign;
 
 			// track the maximum
@@ -1499,7 +1498,7 @@ float menu_select_software::draw_left_panel(float x1, float y1, float x2, float 
 		y2 = origy2;
 		float space = x2 - x1;
 		float lr_arrow_width = 0.4f * space * machine().render().ui_aspect();
-		rgb_t fgcolor = UI_TEXT_COLOR;
+		auto fgcolor = UI_TEXT_COLOR;
 
 		// set left-right arrows dimension
 		float ar_x0 = 0.5f * (x2 + x1) - 0.5f * lr_arrow_width;
@@ -1522,7 +1521,7 @@ float menu_select_software::draw_left_panel(float x1, float y1, float x2, float 
 	{
 		float space = x2 - x1;
 		float lr_arrow_width = 0.4f * space * machine().render().ui_aspect();
-		rgb_t fgcolor = UI_TEXT_COLOR;
+		auto fgcolor = UI_TEXT_COLOR;
 
 		// set left-right arrows dimension
 		float ar_x0 = 0.5f * (x2 + x1) - 0.5f * lr_arrow_width;
@@ -1939,7 +1938,7 @@ software_parts::~software_parts()
 void software_parts::populate()
 {
 	for (auto & elem : m_parts)
-		item_append(elem.first.c_str(), elem.second.c_str(), 0, (void *)&elem);
+		item_append(elem.first, elem.second, 0, (void *)&elem);
 
 	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
@@ -2037,7 +2036,7 @@ bios_selection::~bios_selection()
 void bios_selection::populate()
 {
 	for (auto & elem : m_bios)
-		item_append(elem.first.c_str(), nullptr, 0, (void *)&elem.first);
+		item_append(elem.first, "", 0, (void *)&elem.first);
 
 	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);

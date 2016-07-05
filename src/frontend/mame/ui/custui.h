@@ -16,7 +16,6 @@
 #include "ui/menu.h"
 
 namespace ui {
-
 //-------------------------------------------------
 //  Custom UI menu
 //-------------------------------------------------
@@ -38,7 +37,7 @@ private:
 		COLORS_MENU,
 		HIDE_MENU
 	};
-	static const char *const hide_status[];
+	static std::vector<std::string> hide_status;
 	std::vector<std::string> m_lang;
 	std::uint16_t m_currlang;
 };

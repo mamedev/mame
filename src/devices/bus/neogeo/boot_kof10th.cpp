@@ -31,6 +31,7 @@ neogeo_kof10th_cart::neogeo_kof10th_cart(const machine_config &mconfig, const ch
 void neogeo_kof10th_cart::device_start()
 {
 	save_pointer(NAME(m_fixed), 0x40000);
+	save_item(NAME(m_special_bank));
 	save_item(NAME(m_cart_ram));
 	save_item(NAME(m_cart_ram2));
 }

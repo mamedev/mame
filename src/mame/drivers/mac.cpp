@@ -893,6 +893,7 @@ static MACHINE_CONFIG_START( mac512ke, mac_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, C7M)        /* 7.8336 MHz */
 	MCFG_CPU_PROGRAM_MAP(mac512ke_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -1023,6 +1024,7 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, C15M)
 	MCFG_CPU_PROGRAM_MAP(macprtb_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -1084,6 +1086,7 @@ static MACHINE_CONFIG_START( macii, mac_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68020PMMU, C15M)
 	MCFG_CPU_PROGRAM_MAP(macii_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_PALETTE_ADD("palette", 256)
 
@@ -1153,6 +1156,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( maciihmu, macii )
 	MCFG_CPU_REPLACE("maincpu", M68020HMMU, C15M)
 	MCFG_CPU_PROGRAM_MAP(macii_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( maciifx, mac_state )
@@ -1160,6 +1164,7 @@ static MACHINE_CONFIG_START( maciifx, mac_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68030, 40000000)
 	MCFG_CPU_PROGRAM_MAP(maciifx_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1221,6 +1226,7 @@ static MACHINE_CONFIG_DERIVED( maclc, macii )
 	MCFG_CPU_REPLACE("maincpu", M68020HMMU, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(256)
@@ -1277,6 +1283,7 @@ static MACHINE_CONFIG_DERIVED( maclc2, maclc )
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
@@ -1301,6 +1308,7 @@ static MACHINE_CONFIG_DERIVED( maclc3, maclc )
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(maclc3_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macsonora)
 	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macsonora)
@@ -1341,6 +1349,7 @@ static MACHINE_CONFIG_DERIVED( maciivx, maclc )
 	MCFG_CPU_REPLACE("maincpu", M68030, C32M)
 	MCFG_CPU_PROGRAM_MAP(maclc3_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macv8)
 	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
@@ -1376,6 +1385,7 @@ static MACHINE_CONFIG_DERIVED( maciivi, maclc )
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc3_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macv8)
 	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
@@ -1410,6 +1420,7 @@ static MACHINE_CONFIG_DERIVED( maciix, macii )
 
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(macii_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
@@ -1426,6 +1437,7 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 
 	MCFG_CPU_ADD("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(macse30_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
@@ -1503,6 +1515,7 @@ static MACHINE_CONFIG_START( macpb140, mac_state )
 
 	MCFG_CPU_ADD("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(macpb140_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
@@ -1568,6 +1581,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( macpb145, macpb140 )
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(macpb140_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
@@ -1578,6 +1592,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( macpb170, macpb140 )
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(macpb140_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
@@ -1588,6 +1603,7 @@ static MACHINE_CONFIG_START( macpb160, mac_state )
 
 	MCFG_CPU_ADD("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(macpb160_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
@@ -1652,6 +1668,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( macpb180, macpb160 )
 	MCFG_CPU_REPLACE("maincpu", M68030, 33000000)
 	MCFG_CPU_PROGRAM_MAP(macpb160_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
@@ -1661,6 +1678,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( macpb180c, macpb160 )
 	MCFG_CPU_REPLACE("maincpu", M68030, 33000000)
 	MCFG_CPU_PROGRAM_MAP(macpb165c_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_SCREEN_MODIFY(MAC_SCREEN_NAME)
 	MCFG_SCREEN_SIZE(800, 525)
@@ -1676,6 +1694,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( macpd210, macpb160 )
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(macpd210_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
@@ -1686,6 +1705,7 @@ static MACHINE_CONFIG_DERIVED( macclas2, maclc )
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macv8)
 	MCFG_VIDEO_RESET_OVERRIDE(mac_state,maceagle)
@@ -1715,6 +1735,7 @@ static MACHINE_CONFIG_DERIVED( maciici, macii )
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(maciici_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(256)
@@ -1745,6 +1766,7 @@ static MACHINE_CONFIG_DERIVED( maciisi, macii )
 	MCFG_CPU_REPLACE("maincpu", M68030, 20000000)
 	MCFG_CPU_PROGRAM_MAP(maciici_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(256)
@@ -1855,6 +1877,7 @@ static MACHINE_CONFIG_START( macqd700, mac_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68040, 25000000)
 	MCFG_CPU_PROGRAM_MAP(quadra700_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(75.08)

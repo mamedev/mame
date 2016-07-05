@@ -16,8 +16,6 @@
 #include "machine/mc68328.h"
 #include "machine/ram.h"
 #include "sound/dac.h"
-#include "debugger.h"
-#include "debug/debugcpu.h"
 #include "rendlay.h"
 
 #define MC68328_TAG "dragonball"
@@ -65,9 +63,9 @@ public:
 	required_ioport m_io_peny;
 	required_ioport m_io_penb;
 	required_ioport m_io_portd;
-};
 
-static offs_t palm_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
+	offs_t palm_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
+};
 
 
 /***************************************************************************
@@ -141,9 +139,6 @@ void palm_state::machine_start()
 
 	save_item(NAME(m_port_f_latch));
 	save_item(NAME(m_spim_data));
-
-	if (m_maincpu->debug())
-		m_maincpu->debug()->set_dasm_override(palm_dasm_override);
 }
 
 void palm_state::machine_reset()
@@ -192,6 +187,7 @@ static MACHINE_CONFIG_START( palm, palm_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", M68000, 32768*506 )        /* 16.580608 MHz */
 	MCFG_CPU_PROGRAM_MAP( palm_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(palm_state, palm_dasm_override)
 
 	MCFG_QUANTUM_TIME( attotime::from_hz(60) )
 

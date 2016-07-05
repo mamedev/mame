@@ -17,7 +17,6 @@
 #include "ui/devctrl.h"
 
 namespace ui {
-
 class menu_barcode_reader : public menu_device_control<barcode_reader_device> {
 public:
 	menu_barcode_reader(mame_ui_manager &mui, render_container *container, barcode_reader_device *device);

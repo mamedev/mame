@@ -3,7 +3,7 @@
 /*
     DEC LK-201 keyboard
     Emulation by R. Belmont & M. Burke
-with contributions by Cracyc and Karl-Ludwig Deisenhofer (2016) 
+with contributions by Cracyc and Karl-Ludwig Deisenhofer (2016)
 
 This is the later "cost-reduced" 6805 version with green LEDs; there's also an 8048 version.
     The LK-201 mechanical elements are described in US Patent 4,467,150
@@ -181,10 +181,10 @@ const device_type LK201 = &device_creator<lk201_device>;
 ROM_START( lk201 )
 	ROM_REGION(0x2000, LK201_CPU_TAG, 0)
 
-//	23-001s9-00.bin is for the newer LK201 version (green LEDs, Motorola 6805)
+//  23-001s9-00.bin is for the newer LK201 version (green LEDs, Motorola 6805)
 	ROM_LOAD( "23-001s9-00.bin", 0x0000, 0x2000, CRC(be293c51) SHA1(a11ae004d2d6055d7279da3560c3e56610a19fdb) )
 
-//  23-004M1 or 23-004M2 are in the older LK201 keyboard with red LEDs (8051) 
+//  23-004M1 or 23-004M2 are in the older LK201 keyboard with red LEDs (8051)
 
 ROM_END
 
@@ -541,10 +541,10 @@ void lk201_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 {
 	switch (id)
 	{
-	case 1:  
-		m_timer.tsr |= TSR_OCFL; 
+	case 1:
+		m_timer.tsr |= TSR_OCFL;
 
-		if ((m_timer.tcr & TCR_OCIE) && (m_timer.tsr & TSR_OCFL)) 
+		if ((m_timer.tcr & TCR_OCIE) && (m_timer.tsr & TSR_OCFL))
 			m_maincpu->set_input_line(M68HC05EG_INT_TIMER, ASSERT_LINE);
 		break;
 
@@ -567,7 +567,7 @@ void lk201_device::rcv_complete()
 
 	int data = get_received_char();
 	m_kbd_state = data;
-//	printf("\nlk201 got %02x\n", m_kbd_state);
+//  printf("\nlk201 got %02x\n", m_kbd_state);
 }
 
 void lk201_device::tra_complete()
@@ -602,7 +602,7 @@ READ8_MEMBER( lk201_device::timer_r )
 	switch (offset)
 	{
 	case 8:  // ACRH (high value is stored and reused when reading low)
-		count = (m_maincpu->total_cycles() / 4) & 0x0000ffff; 
+		count = (m_maincpu->total_cycles() / 4) & 0x0000ffff;
 		ret = count >> 8;
 		break;
 	case 9:  // ACRL
@@ -637,7 +637,7 @@ WRITE8_MEMBER( lk201_device::timer_w )
 		count |= m_timer.ocrl;
 		m_timer.ocrh = count >> 8;
 
-		m_timer.tsr = save_tsr; // restore flags  
+		m_timer.tsr = save_tsr; // restore flags
 		break;
 	}
 }
@@ -675,7 +675,7 @@ WRITE8_MEMBER( lk201_device::ports_w )
 	UINT8 olddata = ports[offset];
 	ports[offset] = data;            //   "port writes are independent of DDRC"
 	send_port(space, offset, olddata & ddrs[offset]);
-//	printf("\nPORT %c write %02x (OLD = %02x) (DDR = %02x) (PC=%x)\n", 'A' + offset, data, olddata, ddrs[offset], m_maincpu->pc());
+//  printf("\nPORT %c write %02x (OLD = %02x) (DDR = %02x) (PC=%x)\n", 'A' + offset, data, olddata, ddrs[offset], m_maincpu->pc());
 }
 
 void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 olddata)
@@ -719,8 +719,8 @@ void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 olddata)
 			// Check for LED update strobe
 			if (((portc & 0x80) == 0) && (olddata & 0x80))
 			{
-			if(ddrs[2] != 0x00) 
-			{	// Lower nibble contains the LED values (1 = on, 0 = off)
+			if(ddrs[2] != 0x00)
+			{   // Lower nibble contains the LED values (1 = on, 0 = off)
 				machine().output().set_value("led_wait"   , (led_data & 0x1) == 1);
 				machine().output().set_value("led_compose", (led_data & 0x2) == 2);
 				machine().output().set_value("led_lock"   , (led_data & 0x4) == 4);
@@ -731,11 +731,11 @@ void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 olddata)
 				m_speaker->set_state(1);
 				// Beeps < 20 ms are clipped. A key click on a LK201 lasts 2 ms...
 				if(m_kbd_state == LK_CMD_BELL)
-					m_beeper->adjust(attotime::from_msec(125)); 
-				else   
+					m_beeper->adjust(attotime::from_msec(125));
+				else
 					m_beeper->adjust(attotime::from_msec(25)); // see note
 	}
-			// Upper 4 bits of LED_DATA contain encoded volume info 
+			// Upper 4 bits of LED_DATA contain encoded volume info
 			switch (led_data & 0xf0)
 			{
 				case 0xf0: // 8  - (see TABLE 4 in 68HC05xx ROM)
@@ -765,10 +765,10 @@ void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 olddata)
 				default:
 					;
 			} // switch (volume)
-			
+
 		} // if (update_strobe)
- 
-	 } // outer switch
+
+		} // outer switch
 }
 
 READ8_MEMBER( lk201_device::sci_r )

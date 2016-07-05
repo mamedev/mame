@@ -1372,7 +1372,7 @@ Note: on screen copyright is (c)1998 Coinmaster.
 #include "sound/2612intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 
@@ -5193,10 +5193,10 @@ static INPUT_PORTS_START( metafox )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Hard )    )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x0c00, 0x0000, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:3,4")
-	PORT_DIPSETTING(      0x000c, DEF_STR( None ) )
-	PORT_DIPSETTING(      0x0008, "60K Only" )
-	PORT_DIPSETTING(      0x0000, "60k & 90k" )
-	PORT_DIPSETTING(      0x0004, "90K Only" )
+	PORT_DIPSETTING(      0x0c00, DEF_STR( None ) )
+	PORT_DIPSETTING(      0x0800, "600K Only" )
+	PORT_DIPSETTING(      0x0000, "600k & 900k" )
+	PORT_DIPSETTING(      0x0400, "900K Only" )
 	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Lives ) )    PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(      0x1000, "1" )
 	PORT_DIPSETTING(      0x0000, "2" )

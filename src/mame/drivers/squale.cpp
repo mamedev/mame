@@ -844,9 +844,6 @@ ROM_START( squale )
 	ROMX_LOAD( "sqmon_2r1.bin", 0x0000, 0x2000, CRC(ed57c707) SHA1(c8bd33a6fb07fe7f881f2605ad867b7e82366bfc), ROM_BIOS(1) )
 
 	// place ROM v1.2 signature here.
-
-	ROM_REGION( 0x1E0, "ef9365", 0 )
-	ROM_LOAD( "charset_ef9365.rom", 0x0000, 0x01E0, CRC(8d3053be) SHA1(0f9a64d217a0f7f04ee0720d49c5b680ad0ae359) )
 ROM_END
 
 /* Driver */

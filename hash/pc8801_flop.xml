@@ -35021,7 +35021,7 @@ ExtractDisk  [02]"PROGRAM        " -> "transylvania_02.d88"
 		</part>
 	</software>
 
-	<software name="tunnelst">
+	<software name="tuntroll">
 		<description>Tunnels &amp; Trolls</description>
 		<year>1990</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
@@ -35116,7 +35116,7 @@ ExtractDisk  [02]"PROGRAM        " -> "transylvania_02.d88"
 		</part>
 	</software>
 
-	<software name="tunnelsta" cloneof="tunnelst">
+	<software name="tuntrolla" cloneof="tuntroll">
 		<description>Tunnels &amp; Trolls (Alt Player Disk)</description>
 		<year>1990</year>
 		<publisher>スタークラフト (Starcraft)</publisher>

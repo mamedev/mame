@@ -1258,7 +1258,7 @@ static const help_item static_help_list[] =
 		"\n"
 		"  commit[/*] <address>,<comment>\n"
 		"\n"
-		"Adds a string <comment> to the disassembled code at <address> then saves to file. Basically same as comadd + comsave via a single line.\n" 
+		"Adds a string <comment> to the disassembled code at <address> then saves to file. Basically same as comadd + comsave via a single line.\n"
 		"The shortcut for this command is simply '/*'\n"
 		"\n"
 		"Examples:\n"

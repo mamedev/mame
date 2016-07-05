@@ -792,7 +792,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( outzonecv_main_map, AS_PROGRAM, 16, toaplan1_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-//	AM_RANGE(0x040000, 0x07ffff) AM_ROM
+//  AM_RANGE(0x040000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM
 	AM_RANGE(0x0c0000, 0x0c0003) AM_WRITE(toaplan1_tile_offsets_w)
 	AM_RANGE(0x0c0006, 0x0c0007) AM_WRITE(toaplan1_fcu_flipscreen_w)

@@ -17,30 +17,19 @@
 #include "mame.h"
 
 namespace ui {
-
 //-------------------------------------------------
 //  ctor / dtor
 //-------------------------------------------------
 
 menu_selector::menu_selector(mame_ui_manager &mui, render_container *container, std::vector<std::string> const &s_sel, UINT16 &s_actual, int category, int _hover)
-	: menu(mui, container)
-	, m_selector(s_actual)
-	, m_category(category)
-	, m_hover(_hover)
-	, m_first_pass(true)
-	, m_str_items(s_sel)
+	: menu(mui, container), m_selector(s_actual), m_category(category), m_hover(_hover), m_first_pass(true), m_str_items(s_sel)
 {
 	m_search[0] = '\0';
 	m_searchlist[0] = nullptr;
 }
 
 menu_selector::menu_selector(mame_ui_manager &mui, render_container *container, std::vector<std::string> &&s_sel, UINT16 &s_actual, int category, int _hover)
-	: menu(mui, container)
-	, m_selector(s_actual)
-	, m_category(category)
-	, m_hover(_hover)
-	, m_first_pass(true)
-	, m_str_items(std::move(s_sel))
+	: menu(mui, container), m_selector(s_actual), m_category(category), m_hover(_hover), m_first_pass(true), m_str_items(std::move(s_sel))
 {
 	m_search[0] = '\0';
 	m_searchlist[0] = nullptr;
@@ -57,7 +46,7 @@ menu_selector::~menu_selector()
 void menu_selector::handle()
 {
 	// process the menu
-	const event *menu_event = process(0);
+	auto menu_event = process(0);
 
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
@@ -136,9 +125,8 @@ void menu_selector::populate()
 	if (m_search[0] != 0)
 	{
 		find_matches(m_search);
-
 		for (int curitem = 0; m_searchlist[curitem]; ++curitem)
-			item_append(m_searchlist[curitem]->c_str(), nullptr, 0, (void *)m_searchlist[curitem]);
+			item_append(*m_searchlist[curitem], "", 0, (void *)m_searchlist[curitem]);
 	}
 	else
 	{
@@ -149,7 +137,7 @@ void menu_selector::populate()
 					selected = added;
 
 				added++;
-				item_append(m_str_items[index].c_str(), nullptr, 0, (void *)&m_str_items[index]);
+				item_append(m_str_items[index], "", 0, (void *)&m_str_items[index]);
 			}
 	}
 

@@ -5,7 +5,7 @@
 
 #include "nxrom.h"
 #include "sound/vrc6.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 
 
 // ======================> nes_konami_vrc1_device

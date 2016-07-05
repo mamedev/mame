@@ -15,7 +15,6 @@
 #include "ui/custmenu.h"
 
 namespace ui {
-
 using s_bios = std::vector<std::pair<std::string, int>>;
 using s_parts = std::unordered_map<std::string, std::string>;
 
@@ -45,7 +44,7 @@ private:
 	s_filter            m_filter;
 	int                 highlight;
 
-	ui_software_info                  *m_searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
+	std::array<ui_software_info *, VISIBLE_GAMES_IN_SEARCH + 1> m_searchlist;
 	std::vector<ui_software_info *>   m_displaylist, m_tmp, m_sortedlist;
 	std::vector<ui_software_info>     m_swinfo;
 

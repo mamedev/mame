@@ -2,7 +2,7 @@
 // copyright-holders:Bryan McPhail
 #include "emu.h"
 #include "includes/tatsumi.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 
 

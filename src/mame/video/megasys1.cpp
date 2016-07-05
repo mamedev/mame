@@ -447,7 +447,7 @@ WRITE16_MEMBER(megasys1_state::megasys1_vregs_A_w)
 							break;
 
 		case 0x308/2   :    if (!m_hardware_type_z)
-							{	
+							{
 								m_soundlatch->write(space,0,new_data,0xffff);
 								m_audiocpu->set_input_line(4, HOLD_LINE);
 							}

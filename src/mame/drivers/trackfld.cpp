@@ -427,6 +427,11 @@ static ADDRESS_MAP_START( hyprolyb_sound_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0xe004, 0xe004) AM_MIRROR(0x1ff8) AM_DEVWRITE("hyprolyb_adpcm", hyprolyb_adpcm_device, write)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( vlm_map, AS_0, 8, trackfld_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+ADDRESS_MAP_END
+
 static INPUT_PORTS_START( trackfld )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -935,6 +940,7 @@ static MACHINE_CONFIG_START( trackfld, trackfld_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("vlm", VLM5030, VLM_CLOCK)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -992,6 +998,7 @@ static MACHINE_CONFIG_START( yieartf, trackfld_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("vlm", VLM5030, VLM_CLOCK)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1078,7 +1085,7 @@ ROM_START( trackfld )
 	ROM_LOAD( "361b17.b16",   0x0020, 0x0100, CRC(d2ba4d32) SHA1(894b5cedf01ba9225a0d6215291857e455b84903) ) /* sprite lookup table */
 	ROM_LOAD( "361b18.e15",   0x0120, 0x0100, CRC(053e5861) SHA1(6740a62cf7b6938a4f936a2fed429704612060a5) ) /* char lookup table */
 
-	ROM_REGION( 0x10000, "vlm", 0 ) /* 64k for speech rom */
+	ROM_REGION( 0x2000, "vlm", 0 ) /* 8k for the VLM5030 data */
 	ROM_LOAD( "c9_d15.bin",   0x0000, 0x2000, CRC(f546a56b) SHA1(caee3d8546eb7a75ce2a578c6a1a630246aec6b8) )
 ROM_END
 
@@ -1110,7 +1117,7 @@ ROM_START( trackfldnz )
 	ROM_LOAD( "gold.18d",   0x0020, 0x0100, CRC(d2ba4d32) SHA1(894b5cedf01ba9225a0d6215291857e455b84903) ) /* sprite lookup table */
 	ROM_LOAD( "gold.4j",   0x0120, 0x0100, CRC(053e5861) SHA1(6740a62cf7b6938a4f936a2fed429704612060a5) ) /* char lookup table */
 
-	ROM_REGION( 0x10000, "vlm", 0 ) /* 64k for speech rom */
+	ROM_REGION( 0x2000, "vlm", 0 ) /* 8k for the VLM5030 data */
 	ROM_LOAD( "gold.d9",   0x0000, 0x2000, CRC(f546a56b) SHA1(caee3d8546eb7a75ce2a578c6a1a630246aec6b8) )
 ROM_END
 
@@ -1142,7 +1149,7 @@ ROM_START( trackfldc )
 	ROM_LOAD( "361b17.b16",   0x0020, 0x0100, CRC(d2ba4d32) SHA1(894b5cedf01ba9225a0d6215291857e455b84903) ) /* sprite lookup table */
 	ROM_LOAD( "361b18.e15",   0x0120, 0x0100, CRC(053e5861) SHA1(6740a62cf7b6938a4f936a2fed429704612060a5) ) /* char lookup table */
 
-	ROM_REGION( 0x10000, "vlm", 0 ) /* 64k for speech rom */
+	ROM_REGION( 0x2000, "vlm", 0 ) /* 8k for the VLM5030 data */
 	ROM_LOAD( "c9_d15.bin",   0x0000, 0x2000, CRC(f546a56b) SHA1(caee3d8546eb7a75ce2a578c6a1a630246aec6b8) )
 ROM_END
 
@@ -1173,7 +1180,7 @@ ROM_START( hyprolym ) /* GX361 */
 	ROM_LOAD( "361b17.b16",   0x0020, 0x0100, CRC(d2ba4d32) SHA1(894b5cedf01ba9225a0d6215291857e455b84903) ) /* sprite lookup table */
 	ROM_LOAD( "361b18.e15",   0x0120, 0x0100, CRC(053e5861) SHA1(6740a62cf7b6938a4f936a2fed429704612060a5) ) /* char lookup table */
 
-	ROM_REGION( 0x10000, "vlm", 0 ) /* 64k for speech rom */
+	ROM_REGION( 0x2000, "vlm", 0 ) /* 8k for the VLM5030 data */
 	ROM_LOAD( "c9_d15.bin",   0x0000, 0x2000, CRC(f546a56b) SHA1(caee3d8546eb7a75ce2a578c6a1a630246aec6b8) ) /* 361-d15.c09 */
 ROM_END
 
@@ -1372,7 +1379,7 @@ ROM_START( mastkin )
 	ROM_LOAD( "prom.3",       0x0020, 0x0100, NO_DUMP ) /* sprite lookup table */
 	ROM_LOAD( "prom.2",       0x0120, 0x0100, NO_DUMP ) /* char lookup table */
 
-	ROM_REGION( 0x10000, "vlm", 0 ) /* 64k for speech rom */
+	ROM_REGION( 0x2000, "vlm", 0 ) /* 8k for the VLM5030 data */
 	ROM_LOAD( "mk2",          0x0000, 0x2000, CRC(f546a56b) SHA1(caee3d8546eb7a75ce2a578c6a1a630246aec6b8) )
 ROM_END
 
@@ -1415,7 +1422,7 @@ ROM_START( wizzquiz )
 	ROM_LOAD( "361b17.b16",   0x0020, 0x0100, CRC(d2ba4d32) SHA1(894b5cedf01ba9225a0d6215291857e455b84903) ) /* sprite lookup table */
 	ROM_LOAD( "361b18.e15",   0x0120, 0x0100, CRC(053e5861) SHA1(6740a62cf7b6938a4f936a2fed429704612060a5) ) /* char lookup table */
 
-	ROM_REGION( 0x10000, "vlm", ROMREGION_ERASE00 ) /* 64k for speech rom */
+	ROM_REGION( 0x2000, "vlm", ROMREGION_ERASE00 ) /* 8k for the VLM5030 data */
 	/* not used */
 ROM_END
 
@@ -1458,7 +1465,7 @@ ROM_START( wizzquiza )
 	ROM_LOAD( "361b17.b16",   0x0020, 0x0100, CRC(d2ba4d32) SHA1(894b5cedf01ba9225a0d6215291857e455b84903) ) /* sprite lookup table */
 	ROM_LOAD( "361b18.e15",   0x0120, 0x0100, CRC(053e5861) SHA1(6740a62cf7b6938a4f936a2fed429704612060a5) ) /* char lookup table */
 
-	ROM_REGION( 0x10000, "vlm", ROMREGION_ERASE00 ) /* 64k for speech rom */
+	ROM_REGION( 0x2000, "vlm", ROMREGION_ERASE00 ) /* 8k for the VLM5030 data */
 	/* not used */
 ROM_END
 
@@ -1498,7 +1505,7 @@ ROM_START( reaktor )
 	ROM_LOAD( "361b17.b16",   0x0020, 0x0100, CRC(d2ba4d32) SHA1(894b5cedf01ba9225a0d6215291857e455b84903) ) /* sprite lookup table */
 	ROM_LOAD( "361b18.e15",   0x0120, 0x0100, CRC(053e5861) SHA1(6740a62cf7b6938a4f936a2fed429704612060a5) ) /* char lookup table */
 
-	ROM_REGION( 0x10000, "vlm", 0 ) /* 64k for speech rom */
+	ROM_REGION( 0x2000, "vlm", 0 ) /* 8k for the VLM5030 data */
 	ROM_LOAD( "c9_d15.bin",   0x0000, 0x2000, CRC(f546a56b) SHA1(caee3d8546eb7a75ce2a578c6a1a630246aec6b8) )
 ROM_END
 

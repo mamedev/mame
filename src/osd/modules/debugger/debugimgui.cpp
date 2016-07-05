@@ -504,7 +504,7 @@ int debug_imgui::history_set(ImGuiTextEditCallbackData* data)
 		data->CursorPos = data->BufTextLen = (int)snprintf(data->Buf, (size_t)data->BufSize, "%s", "");
 	else
 		data->CursorPos = data->BufTextLen = (int)snprintf(data->Buf, (size_t)data->BufSize, "%s", view_main_console->console_history[history_pos].c_str());
-	
+
 	data->BufDirty = true;
 	return 0;
 }
@@ -613,7 +613,7 @@ void debug_imgui::draw_view(debug_area* view_ptr, bool exp_change)
 		drawlist->AddRect(ImVec2(view_ptr->ofs_x,view_ptr->ofs_y + ImGui::GetScrollY()),
 			ImVec2(view_ptr->ofs_x + view_ptr->view_width,view_ptr->ofs_y + ImGui::GetScrollY() + view_ptr->view_height),col);
 	}
-	
+
 	// if the vertical scroll bar is at the end, then force it to the maximum value in case of an update
 	if(view_ptr->scroll_end)
 		ImGui::SetScrollY(ImGui::GetScrollMaxY());
@@ -622,7 +622,7 @@ void debug_imgui::draw_view(debug_area* view_ptr, bool exp_change)
 	if(view_ptr->scroll_follow)
 		if(ImGui::GetScrollY() == ImGui::GetScrollMaxY() || ImGui::GetScrollMaxY() < 0)
 			view_ptr->scroll_end = true;
-	
+
 	ImGui::PopStyleVar(2);
 }
 
@@ -882,7 +882,7 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 		ImGui::End();
 	}
 	else
-		view_ptr->is_collapsed = true;			
+		view_ptr->is_collapsed = true;
 }
 
 void debug_imgui::add_memory(int id)
@@ -1002,7 +1002,7 @@ void debug_imgui::draw_console()
 		draw_view(view_main_console,false);
 		ImGui::EndChild();
 		ImGui::Separator();
-		
+
 		ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackHistory;
 		if(m_running)
 			flags |= ImGuiInputTextFlags_ReadOnly;

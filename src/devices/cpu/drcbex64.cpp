@@ -174,10 +174,22 @@
 #include "drcbex64.h"
 
 // This is a trick to make it build on Android where the ARM SDK declares ::REG_Rn
+// and the x64 SDK declares ::REG_Exx and ::REG_Rxx
 namespace drc {
-
 using namespace uml;
 using namespace x64emit;
+
+using x64emit::REG_EAX;
+using x64emit::REG_ECX;
+using x64emit::REG_EDX;
+using x64emit::REG_RAX;
+using x64emit::REG_RCX;
+using x64emit::REG_RDX;
+using x64emit::REG_RBX;
+using x64emit::REG_RSP;
+using x64emit::REG_RBP;
+using x64emit::REG_RSI;
+using x64emit::REG_RDI;
 
 using x64emit::REG_R8;
 using x64emit::REG_R9;

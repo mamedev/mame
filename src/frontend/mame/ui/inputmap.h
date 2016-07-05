@@ -17,7 +17,6 @@
 
 
 namespace ui {
-
 class menu_input_groups : public menu
 {
 public:
@@ -43,18 +42,18 @@ protected:
 		INPUT_TYPE_TOTAL = INPUT_TYPE_ANALOG + SEQ_TYPE_TOTAL
 	};
 
-	/* internal input menu item data */
+	// internal input menu item data
 	struct input_item_data
 	{
-		input_item_data *   next;               /* pointer to next item in the list */
-		const void *        ref;                /* reference to type description for global inputs or field for game inputs */
-		input_seq_type      seqtype;            /* sequence type */
-		input_seq           seq;                /* copy of the live sequence */
-		const input_seq *   defseq;             /* pointer to the default sequence */
-		const char *        name;               /* pointer to the base name of the item */
-		const char *        owner_name;         /* pointer to the name of the owner of the item */
-		UINT32              sortorder;          /* sorting information */
-		UINT8               type;               /* type of port */
+		input_item_data *   next;               // pointer to next item in the list
+		const void *        ref;                // reference to type description for global inputs or field for game inputs
+		input_seq_type      seqtype;            // sequence type
+		input_seq           seq;                // copy of the live sequence
+		const input_seq *   defseq;             // pointer to the default sequence
+		const char *        name;               // pointer to the base name of the item
+		const char *        owner_name;         // pointer to the name of the owner of the item
+		UINT32              sortorder;          // sorting information
+		UINT8               type;               // type of port
 	};
 
 	void populate_and_sort(struct input_item_data *itemlist);
@@ -106,7 +105,7 @@ public:
 	virtual void handle() override;
 
 protected:
-	/* DIP switch descriptor */
+	// DIP switch descriptor
 	struct dip_descriptor
 	{
 		dip_descriptor *    next;
@@ -155,7 +154,7 @@ private:
 		ANALOG_ITEM_COUNT
 	};
 
-	/* internal analog menu item data */
+	// internal analog menu item data
 	struct analog_item_data {
 		ioport_field *field;
 		int                 type;

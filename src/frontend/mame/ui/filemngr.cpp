@@ -23,7 +23,6 @@
 
 
 namespace ui {
-
 /***************************************************************************
     FILE MANAGER
 ***************************************************************************/
@@ -111,8 +110,8 @@ void menu_file_manager::populate()
 
 	if (!m_warnings.empty())
 	{
-		item_append(m_warnings.c_str(), nullptr, FLAG_DISABLE, nullptr);
-		item_append("", nullptr, FLAG_DISABLE, nullptr);
+		item_append(m_warnings, "", FLAG_DISABLE, nullptr);
+		item_append("", "", FLAG_DISABLE, nullptr);
 	}
 
 	// cycle through all devices for this system
@@ -144,18 +143,18 @@ void menu_file_manager::populate()
 								first_entry = false;
 							else
 								item_append(menu_item_type::SEPARATOR);
-							item_append(string_format("[root%s]", dev.tag()).c_str(), nullptr, 0, nullptr);
+							item_append(string_format("[root%s]", dev.tag()), "", 0, nullptr);
 							tag_appended = true;
 						}
 						// finally, append the image interface to the menu
 						fill_image_line(&scan, tmp_inst, tmp_name);
-						item_append(tmp_inst.c_str(), tmp_name.c_str(), 0, (void *)&scan);
+						item_append(tmp_inst, tmp_name, 0, (void *)&scan);
 					}
 			}
 		}
 	}
 	item_append(menu_item_type::SEPARATOR);
-	item_append("Reset",  nullptr, 0, (void *)1);
+	item_append("Reset", "", 0, (void *)1);
 
 	custombottom = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }

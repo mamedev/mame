@@ -106,7 +106,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="hanshind">
 		<description>1995.1.17 Hanshin Daishinsai (Jpn)</description>
 		<year>1996</year>
-		<publisher>Keikakudo</publisher>	<!-- 計画堂 -->
+		<publisher>Keikakudo</publisher>    <!-- 計画堂 -->
 		<info name="serial" value="BDS-20005" />
 		<info name="alt_title" value="1995.1.17 阪神大震災" />
 		<part name="cdrom" interface="pippin_cdrom">
@@ -236,7 +236,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="chisatom">
 		<description>Chisato Moritaka CD-Rom Watarase Bashi (Jpn)</description>
 		<year>1996</year>
-		<publisher>Oracion</publisher>	<!-- オラシオン -->
+		<publisher>Oracion</publisher>  <!-- オラシオン -->
 		<info name="serial" value="BDE-10007" />
 		<info name="alt_title" value="森高千里CD-ROM　渡良瀬橋" />
 		<part name="cdrom" interface="pippin_cdrom">
@@ -249,7 +249,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="circus">
 		<description>Circus! (Jpn)</description>
 		<year>1996</year>
-		<publisher>Voyager</publisher>	<!-- ボイジャー -->
+		<publisher>Voyager</publisher>  <!-- ボイジャー -->
 		<info name="serial" value="BDS-20031" />
 		<info name="alt_title" value="サーカス！" />
 		<part name="cdrom" interface="pippin_cdrom">
@@ -274,7 +274,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="dazzloid">
 		<description>Dazzeloids (Jpn)</description>
 		<year>1996</year>
-		<publisher>Voyager</publisher>	<!-- ボイジャー -->
+		<publisher>Voyager</publisher>  <!-- ボイジャー -->
 		<info name="serial" value="BDS-20030" />
 		<info name="alt_title" value="ダズロイド" />
 		<part name="cdrom" interface="pippin_cdrom">
@@ -336,7 +336,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="ffaliens">
 		<description>Funky Funny Aliens (Jpn)</description>
 		<year>1996</year>
-		<publisher>Amuse</publisher>	<!-- アミューズ -->
+		<publisher>Amuse</publisher>    <!-- アミューズ -->
 		<info name="serial" value="BDS-20014" />
 		<info name="alt_title" value="ファンキー ファニー エイリアンズ" />
 		<part name="cdrom" interface="pippin_cdrom">
@@ -349,7 +349,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="gadget">
 		<description>Gadget (Jpn)</description>
 		<year>1996</year>
-		<publisher>Synergy Ikunangaku</publisher>	<!-- シナジー幾何学 -->
+		<publisher>Synergy Ikunangaku</publisher>   <!-- シナジー幾何学 -->
 		<info name="serial" value="BDS-20033" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
@@ -361,7 +361,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="gakkoku">
 		<description>Gakko no Kowai Uwasa - Hanako-san ga Kita!! (Jpn)</description>
 		<year>1996</year>
-		<publisher>Amuse</publisher>	<!-- アミューズ -->
+		<publisher>Amuse</publisher>    <!-- アミューズ -->
 		<info name="serial" value="BDS-20012" />
 		<info name="alt_title" value="学校のコワイうわさ　花子さんがきた!!" />
 		<part name="cdrom" interface="pippin_cdrom">
@@ -425,7 +425,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="kidsbox">
 		<description>Kids Box (Jpn)</description>
 		<year>1996</year>
-		<publisher>Ask Kodansha</publisher>	<!-- アスク講談社 -->
+		<publisher>Ask Kodansha</publisher> <!-- アスク講談社 -->
 		<info name="serial" value="BDS-20003" />
 		<info name="alt_title" value="キッズ・ボックス" />
 		<part name="cdrom" interface="pippin_cdrom">
@@ -475,7 +475,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="lzone">
 		<description>L-Zone (Jpn)</description>
 		<year>1996</year>
-		<publisher>Synergy Ikunangaku</publisher>	<!-- シナジー幾何学 -->
+		<publisher>Synergy Ikunangaku</publisher>   <!-- シナジー幾何学 -->
 		<info name="serial" value="BDS-20017" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
@@ -561,7 +561,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="music1">
 		<description>Music Island Vol. 1 (Prokofiev Peter &amp; the Wolf) (Jpn)</description>
 		<year>1996</year>
-		<publisher>Oracion</publisher>	<!-- オラシオン -->
+		<publisher>Oracion</publisher>  <!-- オラシオン -->
 		<info name="serial" value="BDS-20007" />
 		<info name="alt_title" value="MUSIC ISLAND プロコフィエフ　ピーターと狼 PETER AND THE WOLF" />
 		<part name="cdrom" interface="pippin_cdrom">
@@ -574,7 +574,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="music2">
 		<description>Music Island Vol. 2 (Tchaikovsky The Nutcracker) (Jpn)</description>
 		<year>1996</year>
-		<publisher>Oracion</publisher>	<!-- オラシオン -->
+		<publisher>Oracion</publisher>  <!-- オラシオン -->
 		<info name="serial" value="BDS-20027" />
 		<info name="alt_title" value="MUSIC ISLAND チャイコフスキー　くるみわり人形 The Nutcracker" />
 		<part name="cdrom" interface="pippin_cdrom">
@@ -587,7 +587,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="music3">
 		<description>Music Island Vol. 3 (Vivaldi The Four Seasons) (Jpn)</description>
 		<year>1996</year>
-		<publisher>Oracion</publisher>	<!-- オラシオン -->
+		<publisher>Oracion</publisher>  <!-- オラシオン -->
 		<info name="serial" value="BDS-20028" />
 		<info name="alt_title" value="MUSIC ISLAND ヴィヴァルディ　四季 The Four Seasons" />
 		<part name="cdrom" interface="pippin_cdrom">
@@ -600,7 +600,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="music4">
 		<description>Music Island Vol. 4 (Saint-Saens Carnival of the Animals) (Jpn)</description>
 		<year>1996</year>
-		<publisher>Oracion</publisher>	<!-- オラシオン -->
+		<publisher>Oracion</publisher>  <!-- オラシオン -->
 		<info name="serial" value="BDS-20029" />
 		<info name="alt_title" value="MUSIC ISLAND サン=サーンス 動物の謝肉祭 Carnival of the Animals" />
 		<part name="cdrom" interface="pippin_cdrom">
@@ -613,7 +613,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="nemuyoru">
 		<description>Nemurenu Yoru no Chiisana Ohanashi (Jpn)</description>
 		<year>1996</year>
-		<publisher>Amuse</publisher>	<!-- アミューズ -->
+		<publisher>Amuse</publisher>    <!-- アミューズ -->
 		<info name="serial" value="BDS-20015" />
 		<info name="alt_title" value="眠れぬ夜の小さなお話" />
 		<part name="cdrom" interface="pippin_cdrom">
@@ -809,7 +809,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="seesawc1">
 		<description>SeesawC 1 - My favorite things - Sukinamonodake Eitango 120 (Jpn)</description>
 		<year>1996</year>
-		<publisher>Aigaareba Daijoubu</publisher>	<!-- 愛があれば大丈夫 -->
+		<publisher>Aigaareba Daijoubu</publisher>   <!-- 愛があれば大丈夫 -->
 		<info name="serial" value="BDE-10006" />
 		<info name="alt_title" value="シーソーシー1" />
 		<part name="cdrom" interface="pippin_cdrom">
@@ -822,7 +822,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="seesawc2">
 		<description>SeesawC 2 - My favorite places - Sukinatokorode Eitango 400 (Jpn)</description>
 		<year>1996</year>
-		<publisher>Aigaareba Daijoubu</publisher>	<!-- 愛があれば大丈夫 -->
+		<publisher>Aigaareba Daijoubu</publisher>   <!-- 愛があれば大丈夫 -->
 		<info name="serial" value="BDE-10023" />
 		<info name="alt_title" value="シーソーシー2" />
 		<part name="cdrom" interface="pippin_cdrom">
@@ -835,7 +835,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="shichiso">
 		<description>Shichisokusen (Jpn)</description>
 		<year>1996</year>
-		<publisher>Media Five</publisher>	<!-- メディアファイブ -->
+		<publisher>Media Five</publisher>   <!-- メディアファイブ -->
 		<info name="serial" value="BDS-20019" />
 		<info name="alt_title" value="死地則戦 ビジネスエデュテイメントソフト" />
 		<part name="cdrom" interface="pippin_cdrom">
@@ -885,7 +885,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="tbreak">
 		<description>T-Break (Jpn)</description>
 		<year>1996</year>
-		<publisher>Infocity</publisher>	<!-- インフォシティ -->
+		<publisher>Infocity</publisher> <!-- インフォシティ -->
 		<info name="serial" value="BDS-20026" />
 		<info name="alt_title" value="ティ・ブレイク" />
 		<part name="cdrom" interface="pippin_cdrom">
@@ -912,7 +912,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="tropicis">
 		<description>Tropic Island (Jpn)</description>
 		<year>1996</year>
-		<publisher>Momoderazu Brand</publisher>	<!-- モモデラーズブランド -->
+		<publisher>Momoderazu Brand</publisher> <!-- モモデラーズブランド -->
 		<info name="serial" value="BDS-20011" />
 		<info name="alt_title" value="トロピック　アイランド" />
 		<part name="cdrom" interface="pippin_cdrom">
@@ -1069,7 +1069,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="yellow1">
 		<description>Yellow Brick Road I (Jpn)</description>
 		<year>1996</year>
-		<publisher>Synergy Ikunangaku</publisher>	<!-- シナジー幾何学 -->
+		<publisher>Synergy Ikunangaku</publisher>   <!-- シナジー幾何学 -->
 		<info name="serial" value="BDS-20022" />
 		<info name="alt_title" value="イエロー・ブリック・ロード I" />
 		<part name="cdrom" interface="pippin_cdrom">
@@ -1082,7 +1082,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="yellow2">
 		<description>Yellow Brick Road II - Glinda to Nishi no Majo (Jpn)</description>
 		<year>1996</year>
-		<publisher>Synergy Ikunangaku</publisher>	<!-- シナジー幾何学 -->
+		<publisher>Synergy Ikunangaku</publisher>   <!-- シナジー幾何学 -->
 		<info name="serial" value="BDS-20023" />
 		<info name="alt_title" value="イエロー・ブリック・ロード II　グリンダと西の魔女" />
 		<part name="cdrom1" interface="scd_cdrom">
@@ -1102,7 +1102,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="yellows">
 		<description>Yellows - Akira Gomi Photographs (Jpn)</description>
 		<year>1996</year>
-		<publisher>Digitalogue</publisher>	<!-- デジタローグ -->
+		<publisher>Digitalogue</publisher>  <!-- デジタローグ -->
 		<info name="serial" value="BDS-20001" />
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
@@ -1114,7 +1114,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="yellws2">
 		<description>Yellows 2.0 - Tokyo 1993 Akira Gomi Photographs (Jpn)</description>
 		<year>1996</year>
-		<publisher>Digitalogue</publisher>	<!-- デジタローグ -->
+		<publisher>Digitalogue</publisher>  <!-- デジタローグ -->
 		<info name="serial" value="BDS-20002" />
 		<info name="alt_title" value="イエローズ 2.0" />
 		<part name="cdrom" interface="pippin_cdrom">
@@ -1127,7 +1127,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="yokumite">
 		<description>Yoku Mite Goran! (Jpn)</description>
 		<year>1996</year>
-		<publisher>Voyager</publisher>	<!-- ボイジャー -->
+		<publisher>Voyager</publisher>  <!-- ボイジャー -->
 		<info name="serial" value="BDS-20018" />
 		<info name="alt_title" value="よく見てごらん！美術館へ行こう" />
 		<part name="cdrom" interface="pippin_cdrom">

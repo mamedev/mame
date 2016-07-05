@@ -14,7 +14,6 @@
 #include "ui/ui.h"
 
 namespace ui {
-
 // itemrefs for key menu items
 #define ITEMREF_NEW_BARCODE    ((void *) 0x0001)
 #define ITEMREF_ENTER_BARCODE  ((void *) 0x0002)
@@ -58,7 +57,7 @@ void menu_barcode_reader::populate()
 		const char *new_barcode;
 
 		// selected device
-		item_append(current_display_name().c_str(), "", current_display_flags(), ITEMREF_SELECT_READER);
+		item_append(current_display_name(), "", current_display_flags(), ITEMREF_SELECT_READER);
 
 		// append the "New Barcode" item
 		if (get_selection() == ITEMREF_NEW_BARCODE)
@@ -67,15 +66,13 @@ void menu_barcode_reader::populate()
 			new_barcode = buffer.c_str();
 		}
 		else
-		{
 			new_barcode = m_barcode_buffer;
-		}
 
 		item_append(_("New Barcode:"), new_barcode, 0, ITEMREF_NEW_BARCODE);
 
 		// finish up the menu
 		item_append(menu_item_type::SEPARATOR);
-		item_append(_("Enter Code"), nullptr, 0, ITEMREF_ENTER_BARCODE);
+		item_append(_("Enter Code"), "", 0, ITEMREF_ENTER_BARCODE);
 
 		customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 	}
@@ -93,7 +90,7 @@ void menu_barcode_reader::handle()
 	populate();
 
 	// process the menu
-	const event *event = process(PROCESS_LR_REPEAT);
+	auto event = process(PROCESS_LR_REPEAT);
 
 	// process the event
 	if (event)

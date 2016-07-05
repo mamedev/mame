@@ -126,12 +126,12 @@ READ32_MEMBER(dc_cons_state::dc_mess_g1_ctrl_r )
 		case SB_GDLEND:
 			//machine().debug_break();
 			return atapi_xferlen; // TODO: check me
-		case SB_SECUR_EADR:		// always read 0xFF on hardware
+		case SB_SECUR_EADR:     // always read 0xFF on hardware
 			return 0x000000ff;
-		case SB_SECUR_STATE:	// state of BIOS checksum security system (R/O):
+		case SB_SECUR_STATE:    // state of BIOS checksum security system (R/O):
 								// 3 - check passed OK, G1 ATA (5F70xx) registers area accessible
-								// 2 - check failed, G1 ATA area blocked (read FFFFFFFFh) 
-								// 0 - check in progress, BIOS data summed, G1 ATA area blocked (read FFFFFFFFh) 
+								// 2 - check failed, G1 ATA area blocked (read FFFFFFFFh)
+								// 0 - check in progress, BIOS data summed, G1 ATA area blocked (read FFFFFFFFh)
 			return 3;
 		default:
 			printf("G1CTRL:  Unmapped read %08x\n", 0x5f7400+offset*4);
@@ -184,10 +184,11 @@ WRITE32_MEMBER(dc_cons_state::dc_mess_g1_ctrl_w )
     - can be switched back to state 0 by write to SB_SECUR_EADR register, Dreamcast BIOS write 42FEh before jump into Mil-CD executables
 
     if values doesn't match - security system switch to state 2 (check fail):
-    - similar to state 0, but data summing seems not performed anymore,
+    - G1 ATA locked
+    - can be switched to state 0 by write to SB_SECUR_EADR register, however passing valid data block through security system set it back to state 2
     - the only exit from this state - power off/on or reset;
 
-	current state can be read from SB_SECUR_STATE register
+    current state can be read from SB_SECUR_STATE register
     actual checksum algorithm is unknown, but its supposed to be simple and weak,
     known few modded BIOSes which succesfully passes this CRC check, because of good luck
 

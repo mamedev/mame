@@ -245,6 +245,7 @@ static MACHINE_CONFIG_START( coco3, coco3_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(MAINCPU_TAG, M6809E, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(coco3_mem)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(coco_state, dasm_override)
 
 	// devices
 	MCFG_DEVICE_ADD(PIA0_TAG, PIA6821, 0)

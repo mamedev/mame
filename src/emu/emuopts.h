@@ -198,7 +198,7 @@ public:
 		UI_CABINET,
 		UI_SIMPLE
 	};
-	
+
 	// construction/destruction
 	emu_options();
 

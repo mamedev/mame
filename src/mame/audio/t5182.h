@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Jonathan Gevaryahu
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "cpu/z80/z80.h"
 
 class t5182_device : public device_t

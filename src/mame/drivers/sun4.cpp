@@ -381,15 +381,15 @@
 
         21/11/2011 Skeleton driver.
         20/06/2016 Much less skeletony.
-        
+
         4/60 ROM notes:
-        
+
         ffe809fc: call to print "Sizing Memory" to the UART
- 		ffe80a70: call to "Setting up RAM for monitor" that goes wrong
- 		ffe80210: testing memory 		
- 		ffe80274: loop that goes wobbly and fails
- 		ffe80dc4: switch off boot mode, MMU maps ROM to copy in RAM from here on
- 		ffe82000: start of FORTH (?) interpreter once decompressed
+        ffe80a70: call to "Setting up RAM for monitor" that goes wrong
+        ffe80210: testing memory
+        ffe80274: loop that goes wobbly and fails
+        ffe80dc4: switch off boot mode, MMU maps ROM to copy in RAM from here on
+        ffe82000: start of FORTH (?) interpreter once decompressed
                           text in decmopressed area claims to be FORTH-83 FCode, but the opcodes
                           do not match the documented OpenFirmware FCode ones at all.
 
@@ -415,26 +415,26 @@
 #define RS232A_TAG      "rs232a"
 #define RS232B_TAG      "rs232b"
 
-#define ENA_NOTBOOT		(0x80)
-#define ENA_SDVMA		(0x20)
-#define ENA_CACHE		(0x10)
-#define ENA_RESET		(0x04)
-#define ENA_DIAG		(0x01)
+#define ENA_NOTBOOT     (0x80)
+#define ENA_SDVMA       (0x20)
+#define ENA_CACHE       (0x10)
+#define ENA_RESET       (0x04)
+#define ENA_DIAG        (0x01)
 
 // page table entry constants
-#define PM_VALID	(0x80000000)	// page is valid
-#define PM_WRITEMASK (0x40000000)	// writable?
-#define PM_SYSMASK	(0x20000000)	// system use only?
-#define PM_CACHE	(0x10000000)	// cachable?
-#define PM_TYPEMASK (0x0c000000)	// type mask
-#define PM_ACCESSED (0x02000000)	// accessed flag
-#define PM_MODIFIED (0x01000000)	// modified flag
+#define PM_VALID    (0x80000000)    // page is valid
+#define PM_WRITEMASK (0x40000000)   // writable?
+#define PM_SYSMASK  (0x20000000)    // system use only?
+#define PM_CACHE    (0x10000000)    // cachable?
+#define PM_TYPEMASK (0x0c000000)    // type mask
+#define PM_ACCESSED (0x02000000)    // accessed flag
+#define PM_MODIFIED (0x01000000)    // modified flag
 
 namespace
 {
 const sparc_disassembler::asi_desc_map::value_type sun4_asi_desc[] = {
-													 { 0x10, { nullptr, "Flush I-Cache (Segment)" } },
-													 { 0x11, { nullptr, "Flush I-Cache (Page)"    } },
+														{ 0x10, { nullptr, "Flush I-Cache (Segment)" } },
+														{ 0x11, { nullptr, "Flush I-Cache (Page)"    } },
 	{ 0x02, { nullptr, "System Space"           } }, { 0x12, { nullptr, "Flush I-Cache (Context)" } },
 	{ 0x03, { nullptr, "Segment Map"            } }, { 0x13, { nullptr, "Flush I-Cache (User)"    } },
 	{ 0x04, { nullptr, "Page Map"               } }, { 0x14, { nullptr, "Flush D-Cache (Segment)" } },
@@ -452,16 +452,16 @@ const sparc_disassembler::asi_desc_map::value_type sun4_asi_desc[] = {
 };
 /* TODO: make SPARCstation-1 a different machine type so it can load its own ASI descriptions - it's a subset of Sun4
 const sparc_disassembler::asi_desc_map::value_type sun4c_asi_desc[] = {
-	{ 0x02, { nullptr, "System Space"           } },
-	{ 0x03, { nullptr, "Segment Map"            } },
-	{ 0x04, { nullptr, "Page Map"               } },
-	{ 0x08, { nullptr, "User Instruction"       } },
-	{ 0x09, { nullptr, "Supervisor Instruction" } },
-	{ 0x0a, { nullptr, "User Data"              } },
-	{ 0x0b, { nullptr, "Supervisor Data"        } },
-	{ 0x0c, { nullptr, "Flush Cache (Segment)"  } },
-	{ 0x0d, { nullptr, "Flush Cache (Page)"     } },
-	{ 0x0e, { nullptr, "Flush Cache (Context)"  } }
+    { 0x02, { nullptr, "System Space"           } },
+    { 0x03, { nullptr, "Segment Map"            } },
+    { 0x04, { nullptr, "Page Map"               } },
+    { 0x08, { nullptr, "User Instruction"       } },
+    { 0x09, { nullptr, "Supervisor Instruction" } },
+    { 0x0a, { nullptr, "User Data"              } },
+    { 0x0b, { nullptr, "Supervisor Data"        } },
+    { 0x0c, { nullptr, "Flush Cache (Segment)"  } },
+    { 0x0d, { nullptr, "Flush Cache (Page)"     } },
+    { 0x0e, { nullptr, "Flush Cache (Context)"  } }
 };
 */
 }
@@ -492,7 +492,7 @@ public:
 	DECLARE_WRITE32_MEMBER( ram_w );
 	DECLARE_READ32_MEMBER( ss1_sl0_id );
 	DECLARE_READ32_MEMBER( ss1_sl3_id );
-	
+
 protected:
 	required_device<mb86901_device> m_maincpu;
 	required_device<z80scc_device> m_scc1;
@@ -510,7 +510,7 @@ private:
 	UINT8 m_segmap[8][4096];
 	UINT32 m_pagemap[8192];
 	UINT32 m_ram_size, m_ram_size_words;
-	
+
 	void l2p_command(int ref, int params, const char **param);
 };
 
@@ -521,18 +521,18 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 
 	// make debugger fetches emulate supervisor program for best compatibility with boot PROM execution
 	if (space.debugger_access()) asi = 9;
-	
+
 	// supervisor program fetches in boot state are special
 	if ((!(m_system_enable & ENA_NOTBOOT)) && (asi == 9))
 	{
 		return m_rom_ptr[offset & 0x1ffff];
 	}
-	
+
 	switch (asi)
 	{
-	case 2:	// system space
+	case 2: // system space
 		switch (offset >> 26)
-		{		
+		{
 			case 3: // context reg
 				return m_context<<24;
 
@@ -550,8 +550,8 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 			case 9: // (d-)cache data
 				logerror("sun4: read dcache data @ %x, PC = %x\n", offset, m_maincpu->pc());
 				return 0xffffffff;
-				
-			case 0xf:	// UART bypass
+
+			case 0xf:   // UART bypass
 				//printf("read UART bypass @ %x mask %08x\n", offset<<2, mem_mask);
 				switch (offset & 3)
 				{
@@ -566,7 +566,7 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 				return 0;
 		}
 		break;
-	case 3:	// segment map
+	case 3: // segment map
 		//printf("sun4: read segment map @ %x (entry %d, mem_mask %08x, PC=%x)\n", offset << 2, (offset>>16) & 0xfff, mem_mask, m_maincpu->pc());
 		if (mem_mask == 0xffff0000)
 		{
@@ -576,9 +576,9 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 		{
 			return m_segmap[m_context][(offset>>16) & 0xfff]<<24;
 		}
-		else 
+		else
 		{
-		//	printf("sun4: read segment map w/unk mask %08x\n", mem_mask);
+		//  printf("sun4: read segment map w/unk mask %08x\n", mem_mask);
 		}
 		return 0x0;
 
@@ -588,7 +588,7 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 		//printf("sun4: read page map @ %x (entry %d, mem_mask %08x, PC=%x)\n", offset << 2, page, mem_mask, m_maincpu->pc());
 		return m_pagemap[page];
 		break;
-		
+
 	case 8:
 	case 9:
 	case 10:
@@ -601,26 +601,26 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 		if (m_pagemap[entry] & PM_VALID)
 		{
 			m_pagemap[entry] |= PM_ACCESSED;
-			
+
 			UINT32 tmp = (m_pagemap[entry] & 0xffff) << 10;
 			tmp |= (offset & 0x3ff);
-			
+
 			//printf("sun4: read translated vaddr %08x to phys %08x type %d, PTE %08x, PC=%x\n", offset<<2, tmp<<2, (m_pagemap[entry]>>26) & 3, m_pagemap[entry], m_maincpu->pc());
-			
+
 			switch ((m_pagemap[entry] >> 26) & 3)
 			{
-			case 0:	// type 0 space
+			case 0: // type 0 space
 				return m_type0space->read32(space, tmp, mem_mask);
-				
+
 			case 1: // type 1 space
 				// magic EPROM bypass
 				if ((tmp >= (0x6000000>>2)) && (tmp <= (0x6ffffff>>2)))
 				{
-					return m_rom_ptr[offset & 0x1ffff];	
+					return m_rom_ptr[offset & 0x1ffff];
 				}
 				//printf("Read type 1 @ VA %08x, phys %08x\n", offset<<2, tmp<<2);
 				return m_type1space->read32(space, tmp, mem_mask);
-				
+
 			default:
 				printf("sun4: access to memory type not defined in sun4c\n");
 				return 0;
@@ -632,19 +632,19 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 			{
 			printf("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
 			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
-			//m_buserror[0] = 0x88;	// read, invalid PTE
+			//m_buserror[0] = 0x88; // read, invalid PTE
 			//m_buserror[1] = offset<<2;
 			}
 			return 0;
-		}	
+		}
 		}
 		break;
-		
+
 	default:
 		if (!space.debugger_access()) printf("sun4: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
 		return 0;
 	}
-	
+
 	printf("sun4: read asi %d byte offset %x, PC = %x\n", asi, offset << 2, m_maincpu->pc());
 
 	return 0;
@@ -678,8 +678,8 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 			case 9: // cache data
 				logerror("sun4: %08x to cache data @ %x, PC = %x\n", data, offset, m_maincpu->pc());
 				return;
-				
-			case 0xf:	// UART bypass
+
+			case 0xf:   // UART bypass
 				//printf("%08x to UART @ %d, mask %08x\n", data, offset & 3, mem_mask);
 				switch (offset & 3)
 				{
@@ -701,18 +701,18 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 			if (mem_mask == 0xffff0000) segdata = (data >> 16) & 0x7f;
 			else if (mem_mask == 0xff000000) segdata = (data >> 24) & 0x7f;
 			else logerror("sun4: writing segment map with unknown mask %08x, PC=%x\n", mem_mask, m_maincpu->pc());
-			 
+
 			//printf("sun4: %08x to segment map @ %x (entry %d, mem_mask %08x, PC=%x)\n", segdata, offset << 2, (offset>>16) & 0xfff, mem_mask, m_maincpu->pc());
-			m_segmap[m_context & 7][(offset>>16) & 0xfff] = segdata;	// only 7 bits of the segment are necessary
+			m_segmap[m_context & 7][(offset>>16) & 0xfff] = segdata;    // only 7 bits of the segment are necessary
 		}
 		return;
-		
+
 	case 4: // page map
-		page = m_segmap[m_context & 7][(offset >> 16) & 0xfff] << 6;	// get the PMEG
-		page += (offset >> 10) & 0x3f;	// add the offset
+		page = m_segmap[m_context & 7][(offset >> 16) & 0xfff] << 6;    // get the PMEG
+		page += (offset >> 10) & 0x3f;  // add the offset
 		//printf("sun4: %08x to page map @ %x (entry %d, mem_mask %08x, PC=%x)\n", data, offset << 2, page, mem_mask, m_maincpu->pc());
 		COMBINE_DATA(&m_pagemap[page]);
-		m_pagemap[page] &= 0xff00ffff;	// these 8 bits are cleared when written and tested as such
+		m_pagemap[page] &= 0xff00ffff;  // these 8 bits are cleared when written and tested as such
 		return;
 	case 8:
 	case 9:
@@ -725,20 +725,20 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 		if (m_pagemap[entry] & PM_VALID)
 		{
 			m_pagemap[entry] |= PM_ACCESSED;
-			
+
 			UINT32 tmp = (m_pagemap[entry] & 0xffff) << 10;
 			tmp |= (offset & 0x3ff);
-			
+
 			//printf("sun4: write translated vaddr %08x to phys %08x type %d, PTE %08x, PC=%x\n", offset<<2, tmp<<2, (m_pagemap[entry]>>26) & 3, m_pagemap[entry], m_maincpu->pc());
 
 			switch ((m_pagemap[entry] >> 26) & 3)
 			{
-			case 0:	// type 0
+			case 0: // type 0
 				m_type0space->write32(space, tmp, data, mem_mask);
 				return;
-				
+
 			case 1: // type 1
-				//printf("write device space @ %x\n", tmp<<1);				
+				//printf("write device space @ %x\n", tmp<<1);
 				m_type1space->write32(space, tmp, data, mem_mask);
 				return;
 			default:
@@ -750,26 +750,26 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 		{
 			printf("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
 			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
-			//m_buserror[0] = 0x8;	// invalid PTE
+			//m_buserror[0] = 0x8;  // invalid PTE
 			//m_buserror[1] = offset<<2;
 			return;
 		}
 		break;
-		
+
 	}
 
 	printf("sun4: %08x to asi %d byte offset %x, PC = %x, mask = %08x\n", data, asi, offset << 2, m_maincpu->pc(), mem_mask);
 }
 
 void sun4_state::l2p_command(int ref, int params, const char **param)
-{		
+{
 	UINT64 addr, offset;
-	
+
 	if (!machine().debugger().commands().validate_number_parameter(param[0], &addr)) return;
-		
+
 	addr &= 0xffffffff;
 	offset = addr >> 2;
-		
+
 	UINT8 pmeg = m_segmap[m_context & 7][(offset >> 16) & 0xfff];
 	UINT32 entry = (pmeg << 6) + ((offset >> 10) & 0x3f);
 	UINT32 tmp = (m_pagemap[entry] & 0xffff) << 10;
@@ -805,8 +805,8 @@ void sun4_state::machine_start()
 	m_rom_ptr = (UINT32 *)m_rom->base();
 	m_ram_ptr = (UINT32 *)m_ram->pointer();
 	m_ram_size = m_ram->size();
-	m_ram_size_words = m_ram_size >> 2;	
-	
+	m_ram_size_words = m_ram_size >> 2;
+
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
@@ -867,10 +867,10 @@ WRITE32_MEMBER( sun4_state::ram_w )
 				m_parregs[0] |= 0x0f<<24;
 				break;
 		}
-		
+
 		// indicate parity interrupt
 		m_parregs[0] |= 0x80000000;
-	
+
 		// and can we take that now?
 		if (m_parregs[0] & 0x40000000)
 		{
@@ -882,7 +882,7 @@ WRITE32_MEMBER( sun4_state::ram_w )
 
 	//if ((offset<<2) == 0xfb2000) printf("write %08x to %08x, mask %08x, PC=%x\n", data, offset<<2, mem_mask, m_maincpu->pc());
 
-	if (offset < m_ram_size_words) 
+	if (offset < m_ram_size_words)
 	{
 		COMBINE_DATA(&m_ram_ptr[offset]);
 		return;
@@ -897,9 +897,9 @@ static ADDRESS_MAP_START(type1space_map, AS_PROGRAM, 32, sun4_state)
 	AM_RANGE(0x00000000, 0x0000000f) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00ff00)
 	AM_RANGE(0x01000000, 0x0100000f) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00ff00)
 	AM_RANGE(0x02000000, 0x020007ff) AM_DEVREADWRITE8(TIMEKEEPER_TAG, timekeeper_device, read, write, 0xffffffff)
-	AM_RANGE(0x06000000, 0x0607ffff) AM_ROM AM_REGION("user1", 0) 
-	AM_RANGE(0x08000000, 0x08000003) AM_READ(ss1_sl0_id)	// slot 0 contains SCSI/DMA/Ethernet
-	AM_RANGE(0x0e000000, 0x0e000003) AM_READ(ss1_sl3_id)	// slot 3 contains video board
+	AM_RANGE(0x06000000, 0x0607ffff) AM_ROM AM_REGION("user1", 0)
+	AM_RANGE(0x08000000, 0x08000003) AM_READ(ss1_sl0_id)    // slot 0 contains SCSI/DMA/Ethernet
+	AM_RANGE(0x0e000000, 0x0e000003) AM_READ(ss1_sl3_id)    // slot 3 contains video board
 ADDRESS_MAP_END
 
 // indicate 4/60 SCSI/DMA/Ethernet card exists
@@ -932,7 +932,7 @@ static MACHINE_CONFIG_START( sun4, sun4_state )
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(32)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
-	
+
 	// MMU Type 1 device space
 	MCFG_DEVICE_ADD("type1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(type1space_map)
@@ -1077,7 +1077,10 @@ ROM_END
 // SPARCstation IPX (Sun 4/50)
 ROM_START( sun4_50 )
 	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
-	ROM_LOAD( "ipx-29.rom", 0x0000, 0x40000, CRC(1910aa65) SHA1(7d8832fea8e299b89e6ec7137fcde497673c14f8))
+	ROM_SYSTEM_BIOS( 0, "v29", "V2.9")
+	ROMX_LOAD( "ipx-29.h1.u0501", 0x0000, 0x40000, CRC(1910aa65) SHA1(7d8832fea8e299b89e6ec7137fcde497673c14f8), ROM_BIOS(1)) // 525-1177-06(?) Boot (Version 2.9 version 20, supposedly?)
+	ROM_SYSTEM_BIOS( 1, "v26", "V2.6")
+	ROMX_LOAD( "525-1177-05__(c)_sun_1992.am27c020.h1.u0501", 0x0000, 0x40000, CRC(aad28dee) SHA1(18075afa479fdc8d318df9aef9847dfb20591d79), ROM_BIOS(2)) // 525-1177-05 Boot (Version 2.6 version 410, supposedly?)
 ROM_END
 
 // SPARCstation SLC (Sun 4/20)

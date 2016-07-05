@@ -125,7 +125,7 @@ debugger_manager::debugger_manager(running_machine &machine)
 	/* initialize the submodules */
 	m_cpu = std::make_unique<debugger_cpu>(machine);
 	m_console = std::make_unique<debugger_console>(machine);
-    m_commands = std::make_unique<debugger_commands>(machine, cpu(), console());
+	m_commands = std::make_unique<debugger_commands>(machine, cpu(), console());
 
 	g_machine = &machine;
 

@@ -35,18 +35,18 @@ enum
 #define REQUEST true
 #define NO_REQUEST false
 
-#define	BUTTON_NORMAL                (1 << 0)  /* normal CPU execution */
-#define	BUTTON_CICLO_UNICO           (1 << 1)  /* single-cycle step */
-#define	BUTTON_INSTRUCAO_UNICA       (1 << 2)  /* single-instruction step */
-#define	BUTTON_ENDERECAMENTO         (1 << 3)  /* addressing action */
-#define	BUTTON_ARMAZENAMENTO         (1 << 4)  /* storage action */
-#define	BUTTON_EXPOSICAO             (1 << 5)  /* memory viewing action */
-#define	BUTTON_ESPERA                (1 << 6)  /* wait */
-#define	BUTTON_INTERRUPCAO           (1 << 7)  /* interrupt */
-#define	BUTTON_PARTIDA               (1 << 8)  /* startup */
-#define	BUTTON_PREPARACAO            (1 << 9)  /* reset */
-#define	BUTTON_TIPO_DE_ENDERECAMENTO (1 << 10) /* Addressing mode (0: Fixed / 1: Sequential) */
-#define	BUTTON_PROTECAO_DE_MEMORIA   (1 << 11) /* Memory protection (in the address range 0xF80-0xFFF (1: write-only / 0: read-write) */
+#define BUTTON_NORMAL                (1 << 0)  /* normal CPU execution */
+#define BUTTON_CICLO_UNICO           (1 << 1)  /* single-cycle step */
+#define BUTTON_INSTRUCAO_UNICA       (1 << 2)  /* single-instruction step */
+#define BUTTON_ENDERECAMENTO         (1 << 3)  /* addressing action */
+#define BUTTON_ARMAZENAMENTO         (1 << 4)  /* storage action */
+#define BUTTON_EXPOSICAO             (1 << 5)  /* memory viewing action */
+#define BUTTON_ESPERA                (1 << 6)  /* wait */
+#define BUTTON_INTERRUPCAO           (1 << 7)  /* interrupt */
+#define BUTTON_PARTIDA               (1 << 8)  /* startup */
+#define BUTTON_PREPARACAO            (1 << 9)  /* reset */
+#define BUTTON_TIPO_DE_ENDERECAMENTO (1 << 10) /* Addressing mode (0: Fixed / 1: Sequential) */
+#define BUTTON_PROTECAO_DE_MEMORIA   (1 << 11) /* Memory protection (in the address range 0xF80-0xFFF (1: write-only / 0: read-write) */
 
 class patinho_feio_cpu_device : public cpu_device {
 public:
@@ -76,14 +76,14 @@ protected:
 	/* processor registers */
 	unsigned char m_acc; /* accumulator (8 bits) */
 	unsigned int m_pc;   /* program counter (12 bits)
-	                      * Actual register name is CI, which
-	                      * stands for "Contador de Instrucao"
-	                      * or "instructions counter".
-	                      */
+                          * Actual register name is CI, which
+                          * stands for "Contador de Instrucao"
+                          * or "instructions counter".
+                          */
 	unsigned int m_rc; /* RC = "Registrador de Chaves" (Keys Register)
-	                    * It represents the 12 bits of input data
-	                    * from toggle switches in the computer panel
-	                    */
+                        * It represents the 12 bits of input data
+                        * from toggle switches in the computer panel
+                        */
 	unsigned char m_idx; /* IDX = Index Register */
 	unsigned char m_ext; /* EXT = Accumulator Extension Register */
 

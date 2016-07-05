@@ -26,7 +26,7 @@ public:
 	optional_device<cpu_device> m_audio3;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	optional_device<generic_latch_8_device> m_soundlatch; // vsgongf only 
+	optional_device<generic_latch_8_device> m_soundlatch; // vsgongf only
 
 	required_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_colorram;

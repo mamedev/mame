@@ -88,7 +88,7 @@ public:
 	// force symbols to be cached
 	void cache_symbols() { scan_file_for_address(0, true); }
 
-	void reset_cache() { m_cache.reset(); }
+	void reset_cache() { m_cache.clear(); }
 private:
 	// internal helpers
 	bool query_system_for_address(FPTR address);
@@ -103,14 +103,12 @@ private:
 	struct cache_entry
 	{
 		cache_entry(FPTR address, const char *symbol) :
-			m_next(nullptr), m_address(address), m_name(symbol) { }
-		cache_entry *next() const { return m_next; }
+			m_address(address), m_name(symbol) { }
 
-		cache_entry *   m_next;
 		FPTR            m_address;
 		std::string     m_name;
 	};
-	simple_list<cache_entry> m_cache;
+	std::vector<std::unique_ptr<cache_entry>> m_cache;
 
 	std::string     m_mapfile;
 	std::string     m_symfile;
@@ -185,7 +183,7 @@ stack_walker::stack_walker()
 	m_sym_function_table_access_64 = m_dbghelp_dll->bind<SymFunctionTableAccess64_fn>("SymFunctionTableAccess64");
 	m_sym_get_module_base_64 = m_dbghelp_dll->bind<SymGetModuleBase64_fn>("SymGetModuleBase64");
 	m_rtl_capture_context = m_kernel32_dll->bind<RtlCaptureContext_fn>("RtlCaptureContext");
-	
+
 	// initialize the symbols
 	if (!s_initialized && m_sym_initialize && m_stack_walk_64 && m_sym_function_table_access_64 && m_sym_get_module_base_64)
 	{
@@ -445,7 +443,7 @@ void symbol_manager::scan_file_for_address(FPTR address, bool create_cache)
 
 			// also create a cache entry if we can
 			if (create_cache)
-				m_cache.append(*global_alloc(cache_entry(addr, symbol.c_str())));
+				m_cache.push_back(std::make_unique<cache_entry>(addr, symbol.c_str()));
 		}
 	}
 
@@ -470,13 +468,13 @@ void symbol_manager::scan_cache_for_address(FPTR address)
 	FPTR best_addr = 0;
 
 	// walk the cache, looking for valid entries
-	for (cache_entry &entry : m_cache)
+	for (auto &entry : m_cache)
 
 		// if this is the best one so far, remember it
-		if (entry.m_address <= address && entry.m_address > best_addr)
+		if (entry->m_address <= address && entry->m_address > best_addr)
 		{
-			best_addr = entry.m_address;
-			best_symbol = entry.m_name;
+			best_addr = entry->m_address;
+			best_symbol = entry->m_name;
 		}
 
 	// format the symbol and remember the last base

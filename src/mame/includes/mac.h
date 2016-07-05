@@ -557,6 +557,7 @@ public:
 	void mac_driver_init(model_t model);
 	void mac_install_memory(offs_t memory_begin, offs_t memory_end,
 		offs_t memory_size, void *memory_data, int is_rom, const char *bank);
+	offs_t mac_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
 };
 
 #endif /* MAC_H_ */

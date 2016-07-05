@@ -24,10 +24,10 @@ bool windows_osd_interface::should_hide_mouse() const
 {
 	bool hidemouse = false;
 	wininput_module* mod;
-	
+
 	mod = dynamic_cast<wininput_module*>(m_keyboard_input);
 	if (mod) hidemouse |= mod->should_hide_mouse();
-	
+
 	mod = dynamic_cast<wininput_module*>(m_mouse_input);
 	if (mod) hidemouse |= mod->should_hide_mouse();
 

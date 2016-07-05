@@ -582,8 +582,8 @@ void vegas_state::machine_start()
 	m_voodoo = (voodoo_device*)machine().device("voodoo");
 
 	/* allocate timers for the NILE */
-	m_timer[0] = machine().scheduler().timer_alloc(FUNC_NULL);
-	m_timer[1] = machine().scheduler().timer_alloc(FUNC_NULL);
+	m_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate());
+	m_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate());
 	m_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vegas_state::nile_timer_callback),this));
 	m_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vegas_state::nile_timer_callback),this));
 
@@ -1057,7 +1057,7 @@ READ32_MEMBER( vegas_state::nile_r )
 			if (m_nile_regs[offset - 1] & 1)
 			{
 				//if (m_nile_regs[offset - 1] & 2)
-				//	logerror("Unexpected value: timer %d is prescaled\n", which);
+				//  logerror("Unexpected value: timer %d is prescaled\n", which);
 				UINT32 scale = 1;
 				if (m_nile_regs[offset - 1] & 2) {
 					UINT32 scaleSrc = (m_nile_regs[offset - 1] >> 2) & 0x3;
@@ -1192,7 +1192,7 @@ WRITE32_MEMBER( vegas_state::nile_w )
 			{
 				UINT32 scale = m_nile_regs[offset - 1];
 				//if (m_nile_regs[offset] & 2)
-				//	logerror("Unexpected value: timer %d is prescaled\n", which);
+				//  logerror("Unexpected value: timer %d is prescaled\n", which);
 				if (m_nile_regs[offset] & 2) {
 					UINT32 scaleSrc = (m_nile_regs[offset] >> 2) & 0x3;
 					scale *= m_nile_regs[NREG_T0CTRL + scaleSrc * 4];
@@ -1207,7 +1207,7 @@ WRITE32_MEMBER( vegas_state::nile_w )
 			else if ((olddata & 1) && !(m_nile_regs[offset] & 1))
 			{
 				//if (m_nile_regs[offset] & 2)
-				//	logerror("Unexpected value: timer %d is prescaled\n", which);
+				//  logerror("Unexpected value: timer %d is prescaled\n", which);
 				UINT32 scale = 1;
 				if (m_nile_regs[offset] & 2) {
 					UINT32 scaleSrc = (m_nile_regs[offset] >> 2) & 0x3;
@@ -1230,7 +1230,7 @@ WRITE32_MEMBER( vegas_state::nile_w )
 			if (m_nile_regs[offset - 1] & 1)
 			{
 				//if (m_nile_regs[offset - 1] & 2)
-				//	logerror("Unexpected value: timer %d is prescaled\n", which);
+				//  logerror("Unexpected value: timer %d is prescaled\n", which);
 				UINT32 scale = 1;
 				if (m_nile_regs[offset - 1] & 2) {
 					UINT32 scaleSrc = (m_nile_regs[offset - 1] >> 2) & 0x3;

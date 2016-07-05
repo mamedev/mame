@@ -176,7 +176,7 @@ void pioneer_ldv1000_device::device_start()
 
 	// allocate timers
 	m_multitimer = timer_alloc(TID_MULTIJUMP);
-	
+
 	m_command_strobe_cb.resolve_safe();
 }
 
@@ -653,7 +653,7 @@ WRITE8_MEMBER( pioneer_ldv1000_device::ppi1_portc_w )
 
 	// bit 4 sends a command strobe signal to Host CPU
 	m_command_strobe_cb(bool(data & 0x10));
-	
+
 	// video squelch is controlled by bit 3
 	set_video_squelch((data & 0x08) == 0);
 

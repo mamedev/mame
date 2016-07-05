@@ -92,7 +92,7 @@ vbl_zpg
 	TMP2 = read_pc();
 	A = io->read_byte(0);
 	//if(DECO16_VERBOSE)
-	//	logerror("%s: VBL %02x (%04x)\n", tag(), NPC, TMP2);
+	//  logerror("%s: VBL %02x (%04x)\n", tag(), NPC, TMP2);
 	prefetch();
 
 #   exceptions

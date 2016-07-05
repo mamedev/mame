@@ -29,6 +29,21 @@
 * Memory map:
 * * 0x00000000 - 0x00ffffff : RAM 12MB to 16MB known, up to 128MB?
 * * 0x08000000 - 0x0800ffff : PROM Region
+* * 0x5ff00000 - 0x5fffffff : System boards
+* * 0xff010000 - 0xfff8ffff : CPU board registers
+*
+* Working:
+* * Floppy Disk IO (PDC device)
+* * SMIOC terminal (preliminary)
+*
+* TODO:
+* * Identify registers required for OS booting
+* * Hard disk support
+* * SMIOC ports (1-8)
+* * Identify various LED registers for system boards
+* * ROLMLink (RLI) board support
+* * Analog Telephone Interface (ATI) board support
+* * T1 (T1DN) board support
 *
 ******************************************************************************/
 
@@ -125,12 +140,12 @@ UINT32 r9751_state::debug_a6()
 
 UINT32 r9751_state::debug_a5()
 {
-		return m_maincpu->space(AS_PROGRAM).read_dword(ptr_m68000->dar[13]);
+	return m_maincpu->space(AS_PROGRAM).read_dword(ptr_m68000->dar[13]);
 }
 
 UINT32 r9751_state::debug_a5_20()
 {
-		return m_maincpu->space(AS_PROGRAM).read_dword(ptr_m68000->dar[13] + 0x20);
+	return m_maincpu->space(AS_PROGRAM).read_dword(ptr_m68000->dar[13] + 0x20);
 }
 
 READ8_MEMBER(r9751_state::pdc_dma_r)
@@ -161,6 +176,17 @@ DRIVER_INIT_MEMBER(r9751_state,r9751)
 	m_mem = &m_maincpu->space(AS_PROGRAM);
 
 	m_maincpu->interface<m68000_base_device>(ptr_m68000);
+
+	/* Save states */
+	save_item(NAME(reg_ff050004));
+	save_item(NAME(reg_fff80040));
+	save_item(NAME(fdd_dest_address));
+	save_item(NAME(fdd_cmd_complete));
+	save_item(NAME(smioc_out_addr));
+	save_item(NAME(smioc_dma_bank));
+	save_item(NAME(fdd_dma_bank));
+	save_item(NAME(timer_32khz_last));
+
 }
 
 void r9751_state::machine_reset()

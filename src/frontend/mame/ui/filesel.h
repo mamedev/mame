@@ -18,7 +18,6 @@
 class floppy_image_format_t;
 
 namespace ui {
-
 // ======================> menu_confirm_save_as
 
 class menu_confirm_save_as : public menu
@@ -50,7 +49,7 @@ private:
 	std::string &                   m_current_directory;
 	std::string &                   m_current_file;
 	const image_device_format *     m_current_format;
-	char                            m_filename_buffer[1024];
+	std::string						m_filename;
 
 protected:
 	bool *                          m_ok;
@@ -85,11 +84,9 @@ private:
 
 	struct file_selector_entry
 	{
-		file_selector_entry *next;
-
 		file_selector_entry_type type;
-		const char *basename;
-		const char *fullpath;
+		std::string basename;
+		std::string fullpath;
 	};
 
 	// internal state
@@ -100,13 +97,14 @@ private:
 	bool                        m_has_softlist;
 	bool                        m_has_create;
 	int *                       m_result;
-	file_selector_entry *       m_entrylist;
-	std::string				    m_hover_directory;
-	char                        m_filename_buffer[1024];
+	std::vector<file_selector_entry>	m_entrylist;
+	std::string                 m_hover_directory;
+	std::string					m_filename;
 
 	// methods
 	int compare_entries(const file_selector_entry *e1, const file_selector_entry *e2);
-	file_selector_entry *append_entry(file_selector_entry_type entry_type, const char *entry_basename, const char *entry_fullpath);
+	file_selector_entry &append_entry(file_selector_entry_type entry_type, const std::string &entry_basename, const std::string &entry_fullpath);
+	file_selector_entry &append_entry(file_selector_entry_type entry_type, std::string &&entry_basename, std::string &&entry_fullpath);
 	file_selector_entry *append_dirent_entry(const osd::directory::entry *dirent);
 	void append_entry_menu_item(const file_selector_entry *entry);
 };

@@ -18,7 +18,6 @@
 class driver_enumerator;
 
 namespace ui {
-
 class simple_menu_select_game : public menu {
 public:
 	simple_menu_select_game(mame_ui_manager &mui, render_container *container, const char *gamename);
@@ -34,7 +33,7 @@ public:
 private:
 	// internal state
 	enum { VISIBLE_GAMES_IN_LIST = 15 };
-	UINT8                   m_error;
+	bool                    m_error;
 	bool                    m_rerandomize;
 	char                    m_search[40];
 	int                     m_matchlist[VISIBLE_GAMES_IN_LIST];

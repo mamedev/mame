@@ -328,7 +328,7 @@ void m2comm_device::comm_init()
 {
 	// TODO - check EPR-16726 on Daytona USA and Sega Rally Championship
 	// EPR-18643(A) - these are accessed by VirtuaON and Sega Touring Car Championship
-	
+
 	// frameSize - 0xe00
 	m_shared[0x12] = 0x00;
 	m_shared[0x13] = 0x0e;
@@ -343,10 +343,10 @@ void m2comm_device::comm_tick()
 	if (m_linkenable == 0x01)
 	{
 		m_zfg ^= 1;
-		
+
 		int frameSize = m_shared[0x13] << 8 | m_shared[0x12];
 		int frameOffset = m_shared[0x15] << 8 | m_shared[0x14];
-		
+
 		int dataSize = frameSize + 1;
 		int togo = 0;
 		int recv = 0;

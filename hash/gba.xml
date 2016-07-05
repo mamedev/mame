@@ -12327,7 +12327,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="v_sharkt" supported="no">
 		<description>Game Boy Advance Video - Shark Tale (USA, Rev. 6)</description>
 		<year>2004?</year>
@@ -12340,7 +12340,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="v_sharkta" cloneof="v_sharkt" supported="no">
 		<description>Game Boy Advance Video - Shark Tale (USA, Rev. 5)</description>
 		<year>2004?</year>
@@ -12379,7 +12379,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="v_2shrst" supported="no">
 		<description>Game Boy Advance Video - Shrek + Shark Tale (USA)</description>
 		<year>2004?</year>
@@ -12482,7 +12482,7 @@
 		<description>Game Boy Advance Video - Teenage Mutant Ninja Turtles - Things Change (Euro, USA)</description>
 		<year>2004</year>
 		<publisher>Majesco</publisher>
-		<info name="serial" value="AGB-MTME-USA"/>
+		<info name="serial" value="AGB-MTME-USA, AGB-MTMP-UKV"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="game boy advance video - teenage mutant ninja turtles - things change (usa, europe).bin" size="33554432" crc="046589c8" sha1="8b9665ce2cefd663f7722f38b64f9271f7c00daa" offset="000000" />
@@ -12553,7 +12553,7 @@
 		<description>Game Boy Advance Video - Yu-Gi-Oh! - Yugi vs. Joey (Euro, USA)</description>
 		<year>2004</year>
 		<publisher>Majesco</publisher>
-		<info name="serial" value="AGB-MYGE-USA"/>
+		<info name="serial" value="AGB-MYGE-USA, AGB-MYGE-UKV"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="game boy advance video - yu-gi-oh! - yugi vs. joey (usa, europe).bin" size="33554432" crc="8d631f4e" sha1="6daf15bb61a10d1bbf94009886d6a76f9c937f8b" offset="000000" />
@@ -30364,7 +30364,7 @@
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="AGB-ASOP-(EUR,UKV)"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="pcb" value="AGB-E02-30" />	<!-- Also found on AGB-E02-20 -->
+			<feature name="pcb" value="AGB-E02-30" />   <!-- Also found on AGB-E02-20 -->
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 512K/1M FLASH [39VF512]" />
 			<feature name="slot" value="gba_flash" />
@@ -32407,7 +32407,7 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="AGB-AMAE-USA, AGB-AMAP"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="pcb" value="AGB-E03-01" />	<!-- Also found on AGB-E03-10 -->
+			<feature name="pcb" value="AGB-E03-01" />   <!-- Also found on AGB-E03-10 -->
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />

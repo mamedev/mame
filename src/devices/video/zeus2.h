@@ -43,6 +43,10 @@ struct zeus2_poly_extra_data
 	UINT16          texwidth;
 	UINT16          color;
 	UINT32          alpha;
+	UINT32          ctrl_word;
+	bool            blend_enable;
+	bool            depth_test_enable;
+	bool            depth_write_enable;
 };
 
 /*************************************
@@ -127,8 +131,8 @@ public:
 	devcb_write_line   m_vblank;
 	devcb_write_line   m_irq;
 
-	void set_float_mode(int mode) { m_ieee754_float = mode; }
-	int m_ieee754_float; // Used to switch to using IEEE754 floating point format
+	void set_float_mode(int mode) { m_atlantis = mode; }
+	int m_atlantis; // Used to switch to using IEEE754 floating point format for atlantis
 
 	UINT32 m_zeusbase[0x80];
 	UINT32 m_renderRegs[0x40];
@@ -143,6 +147,7 @@ public:
 	UINT32 zeus_texbase;
 	UINT32 m_renderMode;
 	int zeus_quad_size;
+	UINT32 m_renderPtr;
 
 	UINT32 *waveram[2];
 	std::unique_ptr<UINT32[]> m_frameColor;
@@ -150,7 +155,6 @@ public:
 
 	emu_timer *int_timer;
 	emu_timer *vblank_timer;
-	int m_yScale;
 	int yoffs;
 	int texel_width;
 	float zbase;
@@ -169,7 +173,8 @@ private:
 	void zeus2_pointer_write(UINT8 which, UINT32 value, int logit);
 	void zeus2_draw_model(UINT32 baseaddr, UINT16 count, int logit);
 	void log_fifo_command(const UINT32 *data, int numwords, const char *suffix);
-
+	void print_fifo_command(const UINT32 *data, int numwords, const char *suffix);
+	void log_render_info();
 	/*************************************
 	*  Member variables
 	*************************************/
@@ -180,6 +185,8 @@ private:
 
 	UINT32 m_fill_color;
 	UINT32 m_fill_depth;
+
+	int m_yScale;
 
 #if TRACK_REG_USAGE
 	struct reg_info
@@ -202,38 +209,39 @@ public:
 	*************************************/
 	inline float convert_float(UINT32 val)
 	{
-		if (m_ieee754_float)
+		if (m_atlantis) {
 			return reinterpret_cast<float&>(val);
+		}
 		else
 			return tms3203x_device::fp_to_float(val);
 	}
 
 	inline UINT32 frame_addr_from_xy(UINT32 x, UINT32 y, bool render)
 	{
-		UINT32 addr = render ? frame_addr_from_expanded_addr(m_renderRegs[0x4] << 16)
-			: frame_addr_from_expanded_addr(m_zeusbase[0x38]);
-		addr += ((y * WAVERAM1_WIDTH) << (1 - m_yScale)) + x;
+		UINT32 addr = render ? frame_addr_from_phys_addr(m_renderRegs[0x4] << (15 + m_yScale))
+			: frame_addr_from_phys_addr((m_zeusbase[0x38] >> 1) << (m_yScale << 1));
+		addr += (y << (9 + m_yScale)) + x;
 		return addr;
 	}
 
 	// Convert 0xRRRRCCCC to frame buffer addresss
-	inline UINT32 frame_addr_from_expanded_addr(UINT32 addr)
-	{
-		return (((addr & 0x3ff0000) >> (16 - 9 + m_yScale)) | (addr & 0x1ff)) << 1;
-	}
+	//inline UINT32 frame_addr_from_expanded_addr(UINT32 addr)
+	//{
+	//	return (((addr & 0x3ff0000) >> (16 - 9 + 1)) | (addr & 0x1ff)) << 1;
+	//}
 
 	// Convert Physical 0xRRRRCCCC to frame buffer addresss
 	// Based on address reg 51 (no scaling)
-	inline UINT32 frame_addr_from_reg51()
+	inline UINT32 frame_addr_from_phys_addr(UINT32 physAddr)
 	{
-		UINT32 addr = (((m_zeusbase[0x51] & 0x3ff0000) >> (16 - 9)) | (m_zeusbase[0x51] & 0x1ff)) << 1;
+		UINT32 addr = (((physAddr & 0x3ff0000) >> (16 - 9)) | (physAddr & 0x1ff)) << 1;
 		return addr;
 	}
 
 	// Read from frame buffer
 	inline void frame_read()
 	{
-		UINT32 addr = frame_addr_from_reg51();
+		UINT32 addr = frame_addr_from_phys_addr(m_zeusbase[0x51]);
 		m_zeusbase[0x58] = m_frameColor[addr];
 		m_zeusbase[0x59] = m_frameColor[addr + 1];
 		m_zeusbase[0x5a] = *(UINT32*)&m_frameDepth[addr];
@@ -248,7 +256,7 @@ public:
 	// Write to frame buffer
 	inline void frame_write()
 	{
-		UINT32 addr = frame_addr_from_reg51();
+		UINT32 addr = frame_addr_from_phys_addr(m_zeusbase[0x51]);
 		if (m_zeusbase[0x57] & 0x1)
 			m_frameColor[addr] = m_zeusbase[0x58];
 		if (m_zeusbase[0x5e] & 0x20) {
@@ -293,6 +301,10 @@ public:
 	/*************************************
 	*  Inlines for rendering
 	*************************************/
+	inline UINT32 conv_rgb555_to_rgb32(UINT16 color)
+	{
+		return ((color & 0x7c00) << 9) | ((color & 0x3e0) << 6) | ((color & 0x1f) << 3);
+	}
 
 #ifdef UNUSED_FUNCTION
 	inline void WAVERAM_plot(int y, int x, UINT32 color)

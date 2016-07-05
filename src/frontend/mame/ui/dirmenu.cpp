@@ -21,7 +21,6 @@
 
 
 namespace ui {
-
 static int ADDING = 1;
 static int CHANGE = 2;
 
@@ -72,7 +71,8 @@ static const folders_entry s_folders[] =
 //  ctor / dtor
 //-------------------------------------------------
 
-menu_directory::menu_directory(mame_ui_manager &mui, render_container *container) : menu(mui, container)
+menu_directory::menu_directory(mame_ui_manager &mui, render_container *container) 
+	: menu(mui, container)
 {
 }
 
@@ -90,7 +90,7 @@ menu_directory::~menu_directory()
 void menu_directory::handle()
 {
 	// process the menu
-	const event *menu_event = process(0);
+	auto menu_event = process(0);
 
 	if (menu_event != nullptr && menu_event->itemref != nullptr && menu_event->iptkey == IPT_UI_SELECT)
 		menu::stack_push<menu_display_actual>(ui(), container, selected);
@@ -103,7 +103,7 @@ void menu_directory::handle()
 void menu_directory::populate()
 {
 	for (auto & elem : s_folders)
-		item_append(_(elem.name), nullptr, 0, (void *)(FPTR)elem.action);
+		item_append(_(elem.name), "", 0, (void *)(FPTR)elem.action);
 
 	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
@@ -165,7 +165,7 @@ menu_display_actual::~menu_display_actual()
 void menu_display_actual::handle()
 {
 	// process the menu
-	const event *menu_event = process(0);
+	auto menu_event = process(0);
 	if (menu_event != nullptr && menu_event->itemref != nullptr && menu_event->iptkey == IPT_UI_SELECT)
 		switch ((FPTR)menu_event->itemref)
 		{
@@ -197,10 +197,10 @@ void menu_display_actual::populate()
 	while (path.next(curpath, nullptr))
 		m_folders.push_back(curpath);
 
-	item_append((s_folders[m_ref].action == CHANGE) ? _("Change Folder") : _("Add Folder"), nullptr, 0, (void *)ADD_CHANGE);
+	item_append((s_folders[m_ref].action == CHANGE) ? _("Change Folder") : _("Add Folder"), "", 0, (void *)ADD_CHANGE);
 
 	if (m_folders.size() > 1)
-		item_append(_("Remove Folder"), nullptr, 0, (void *)REMOVE);
+		item_append(_("Remove Folder"), "", 0, (void *)REMOVE);
 
 	item_append(menu_item_type::SEPARATOR);
 	customtop = (m_folders.size() + 1) * ui().get_line_height() + 6.0f * UI_BOX_TB_BORDER;
@@ -217,13 +217,15 @@ void menu_display_actual::custom_render(void *selectedref, float top, float bott
 
 	for (auto & elem : m_folders)
 	{
-		ui().draw_text_full(container, elem.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::LEFT, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+		ui().draw_text_full(container, elem.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::LEFT, ui::text_layout::TRUNCATE, 
+			mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 		width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
 		maxwidth = MAX(maxwidth, width);
 	}
 
 	// get the size of the text
-	ui().draw_text_full(container, m_tempbuf.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+	ui().draw_text_full(container, m_tempbuf.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE, 
+		mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
 	maxwidth = MAX(width, maxwidth);
 
@@ -276,9 +278,9 @@ MENU ADD FOLDER
 //  ctor / dtor
 //-------------------------------------------------
 
-menu_add_change_folder::menu_add_change_folder(mame_ui_manager &mui, render_container *container, int ref) : menu(mui, container)
+menu_add_change_folder::menu_add_change_folder(mame_ui_manager &mui, render_container *container, int ref) 
+	: menu(mui, container), m_ref(ref)
 {
-	m_ref = ref;
 	m_change = (s_folders[ref].action == CHANGE);
 	m_search[0] = '\0';
 
@@ -308,7 +310,7 @@ menu_add_change_folder::~menu_add_change_folder()
 void menu_add_change_folder::handle()
 {
 	// process the menu
-	const event *menu_event = process(0);
+	auto menu_event = process(0);
 
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
@@ -318,7 +320,7 @@ void menu_add_change_folder::handle()
 			const menu_item &pitem = item[index];
 
 			// go up to the parent path
-			if (!strcmp(pitem.text, ".."))
+			if (!strcmp(pitem.text.c_str(), ".."))
 			{
 				size_t first_sep = m_current_path.find_first_of(PATH_SEPARATOR[0]);
 				size_t last_sep = m_current_path.find_last_of(PATH_SEPARATOR[0]);
@@ -328,7 +330,7 @@ void menu_add_change_folder::handle()
 			else
 			{
 				// if isn't a drive, appends the directory
-				if (strcmp(pitem.subtext, "[DRIVE]") != 0)
+				if (strcmp(pitem.subtext.c_str(), "[DRIVE]") != 0)
 				{
 					if (m_current_path[m_current_path.length() - 1] == PATH_SEPARATOR[0])
 						m_current_path.append(pitem.text);
@@ -415,7 +417,7 @@ void menu_add_change_folder::handle()
 						int match = 0;
 						for (int i = 0; i < ARRAY_LENGTH(m_search); i++)
 						{
-							if (core_strnicmp(item[entry].text, m_search, i) == 0)
+							if (core_strnicmp(item[entry].text.c_str(), m_search, i) == 0)
 								match = i;
 						}
 
@@ -434,7 +436,7 @@ void menu_add_change_folder::handle()
 						int match = 0;
 						for (int i = 0; i < ARRAY_LENGTH(m_search); i++)
 						{
-							if (core_strnicmp(item[entry].text, m_search, i) == 0)
+							if (core_strnicmp(item[entry].text.c_str(), m_search, i) == 0)
 								match = i;
 						}
 
@@ -569,9 +571,9 @@ void menu_add_change_folder::custom_render(void *selectedref, float top, float b
 //  ctor / dtor
 //-------------------------------------------------
 
-menu_remove_folder::menu_remove_folder(mame_ui_manager &mui, render_container *container, int ref) : menu(mui, container)
+menu_remove_folder::menu_remove_folder(mame_ui_manager &mui, render_container *container, int ref) 
+	: menu(mui, container), m_ref(ref)
 {
-	m_ref = ref;
 	if (mui.options().exists(s_folders[m_ref].option))
 		m_searchpath.assign(mui.options().value(s_folders[m_ref].option));
 	else
@@ -594,7 +596,7 @@ menu_remove_folder::~menu_remove_folder()
 void menu_remove_folder::handle()
 {
 	// process the menu
-	const event *menu_event = process(0);
+	auto menu_event = process(0);
 	if (menu_event != nullptr && menu_event->itemref != nullptr && menu_event->iptkey == IPT_UI_SELECT)
 	{
 		std::string tmppath, error_string;
@@ -627,7 +629,7 @@ void menu_remove_folder::populate()
 {
 	int folders_count = 0;
 	for (auto & elem : m_folders)
-		item_append(elem.c_str(), nullptr, 0, (void *)(FPTR)++folders_count);
+		item_append(elem, "", 0, (void *)(FPTR)++folders_count);
 
 	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
@@ -643,7 +645,8 @@ void menu_remove_folder::custom_render(void *selectedref, float top, float botto
 	std::string tempbuf = string_format(_("Remove %1$s Folder"), _(s_folders[m_ref].name));
 
 	// get the size of the text
-	ui().draw_text_full(container, tempbuf.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER, mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+	ui().draw_text_full(container, tempbuf.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER, 
+		mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
 	float maxwidth = MAX(width, origx2 - origx1);
 
@@ -662,8 +665,8 @@ void menu_remove_folder::custom_render(void *selectedref, float top, float botto
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	ui().draw_text_full(container, tempbuf.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER, mame_ui_manager::NORMAL,
-		UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+	ui().draw_text_full(container, tempbuf.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER, 
+		mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
 } // namespace ui

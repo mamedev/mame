@@ -82,10 +82,4 @@ protected:
 	}
 };
 
-//============================================================
-//  INLINE FUNCTIONS
-//============================================================
-
-INT32 generic_button_get_state(void *device_internal, void *item_internal);
-INT32 generic_axis_get_state(void *device_internal, void *item_internal);
 #endif

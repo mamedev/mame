@@ -10,9 +10,9 @@
 #ifndef RAIDEN2COP_H
 #define RAIDEN2COP_H
 
-#define LOG_Commands 	0
-#define LOG_Phytagoras 	0
-#define LOG_Division  	0
+#define LOG_Commands    0
+#define LOG_Phytagoras  0
+#define LOG_Division    0
 #define LOG_Move0205    0
 #define LOG_Move0905    0
 
@@ -211,14 +211,14 @@ private:
 	// internal state
 	devcb_write16       m_videoramout_cb;
 	required_device<palette_device> m_palette;
-	
-	cpu_device *m_host_cpu; 	 /**< reference to the host cpu */
-	address_space *m_host_space; /**< reference to the host cpu space */
-	bool m_host_endian;			 /**< reference to the host cpu endianness, some commands cares! */
-	UINT8 m_byte_endian_val;	 /**< 2 if m_host_endian is big (68k) else 0 */
-	UINT8 m_word_endian_val;	 /**< 3 if m_host_endian is big (68k) else 0 */
 
-	
+	cpu_device *m_host_cpu;      /**< reference to the host cpu */
+	address_space *m_host_space; /**< reference to the host cpu space */
+	bool m_host_endian;          /**< reference to the host cpu endianness, some commands cares! */
+	UINT8 m_byte_endian_val;     /**< 2 if m_host_endian is big (68k) else 0 */
+	UINT8 m_word_endian_val;     /**< 3 if m_host_endian is big (68k) else 0 */
+
+
 	void cop_collision_read_pos(int slot, UINT32 spradr, bool allow_swap);
 
 	// commands, TODO: needs commenting!
@@ -257,15 +257,15 @@ private:
 	void LEGACY_execute_d104(int offset, UINT16 data);
 	void LEGACY_execute_6980(int offset, UINT16 data);
 	void LEGACY_execute_c480(int offset, UINT16 data);
-	
+
 	void cop_collision_update_hitbox(UINT16 data, int slot, UINT32 hitadr);
 	void bcd_update();
-	
+
 	UINT16 cop_read_word(int address);
 	UINT8 cop_read_byte(int address);
 	void cop_write_word(int address, UINT16 data);
 	void cop_write_byte(int address, UINT8 data);
-	
+
 	void dma_tilemap_buffer();
 	void dma_palette_buffer();
 	void dma_fill();

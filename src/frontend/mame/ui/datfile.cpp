@@ -60,7 +60,7 @@ bool datfile_manager::first_run = true;
 //-------------------------------------------------
 // ctor
 //-------------------------------------------------
-datfile_manager::datfile_manager(running_machine &machine, ui_options &moptions) 
+datfile_manager::datfile_manager(running_machine &machine, ui_options &moptions)
 	: m_machine(machine)
 	, m_options(moptions)
 {

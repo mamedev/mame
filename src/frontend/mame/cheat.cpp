@@ -401,7 +401,7 @@ void cheat_script::save(emu_file &cheatfile) const
 
 cheat_script::script_entry::script_entry(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &entrynode, bool isaction)
 	: m_condition(&symbols),
-	  m_expression(&symbols)
+		m_expression(&symbols)
 {
 	const char *expression = nullptr;
 	try
@@ -444,7 +444,7 @@ cheat_script::script_entry::script_entry(cheat_manager &manager, symbol_table &s
 			int totalargs = 0;
 			for (xml_data_node *argnode = xml_get_sibling(entrynode.child, "argument"); argnode != nullptr; argnode = xml_get_sibling(argnode->next, "argument"))
 			{
-				auto curarg = std::make_unique<output_argument>(manager, symbols, filename, *argnode);				
+				auto curarg = std::make_unique<output_argument>(manager, symbols, filename, *argnode);
 				// verify we didn't overrun the argument count
 				totalargs += curarg->count();
 
@@ -610,7 +610,7 @@ void cheat_script::script_entry::validate_format(const char *filename, int line)
 
 cheat_script::script_entry::output_argument::output_argument(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &argnode)
 	: m_expression(&symbols),
-	  m_count(0)
+		m_count(0)
 {
 	// first extract attributes
 	m_count = xml_get_attribute_int(&argnode, "count", 1);

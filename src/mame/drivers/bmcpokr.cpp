@@ -18,7 +18,7 @@ Other:  BMC B816140 (CPLD)
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "video/ramdac.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"

@@ -4,7 +4,7 @@
 #include "crsshair.h"
 #include "video/315_5124.h"
 #include "sound/sn76496.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "includes/sms.h"
 
 #define VERBOSE 0
@@ -800,7 +800,7 @@ WRITE8_MEMBER(sms_state::sms_mem_control_w)
 READ8_MEMBER(sms_state::sg1000m3_peripheral_r)
 {
 	bool joy_ports_disabled = m_sgexpslot->is_readable(offset);
-	
+
 	if (joy_ports_disabled)
 	{
 		return m_sgexpslot->read(space, offset);
@@ -818,7 +818,7 @@ READ8_MEMBER(sms_state::sg1000m3_peripheral_r)
 WRITE8_MEMBER(sms_state::sg1000m3_peripheral_w)
 {
 	bool joy_ports_disabled = m_sgexpslot->is_writeable(offset);
-	
+
 	if (joy_ports_disabled)
 	{
 		m_sgexpslot->write(space, offset, data);

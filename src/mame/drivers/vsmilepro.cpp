@@ -6,13 +6,13 @@
 
     30/05/2016
 
-	Some information about the hardware can be found at
- 
-	http://www.x86-secret.com/dossier-64-VTech_V_Smile_Pro.html
+    Some information about the hardware can be found at
+
+    http://www.x86-secret.com/dossier-64-VTech_V_Smile_Pro.html
 
 
-	In particular
-	- It uses a LSI Zevio 1020 CPU + peripherals which comprises ARM926EJ-S CPU,
+    In particular
+    - It uses a LSI Zevio 1020 CPU + peripherals which comprises ARM926EJ-S CPU,
       ZSP400 DPS, 3D graphics processor & 2D graphics processor
     - The CD controller is a Sony CXD3059AR
 

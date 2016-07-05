@@ -43,12 +43,12 @@ static void get_vector(const char *data, int count, float *out, bool report_erro
 //============================================================
 
 shaders::shaders() :
-	d3dintf(nullptr), machine(nullptr), d3d(nullptr), post_fx_enable(false), oversampling_enable(false), paused(true), num_screens(0), curr_screen(0),
+	d3dintf(nullptr), machine(nullptr), d3d(nullptr), post_fx_enable(false), oversampling_enable(false), num_screens(0), curr_screen(0),
 	shadow_texture(nullptr), options(nullptr), avi_output_file(nullptr), avi_frame(0), avi_copy_surface(nullptr), avi_copy_texture(nullptr), avi_final_target(nullptr), avi_final_texture(nullptr),
 	black_surface(nullptr), black_texture(nullptr), render_snap(false), snap_rendered(false), snap_copy_target(nullptr), snap_copy_texture(nullptr), snap_target(nullptr), snap_texture(nullptr),
-	snap_width(0), snap_height(0), lines_pending(false), initialized(false), backbuffer(nullptr), curr_effect(nullptr), default_effect(nullptr), prescale_effect(nullptr), post_effect(nullptr),
-	distortion_effect(nullptr),	focus_effect(nullptr), phosphor_effect(nullptr), deconverge_effect(nullptr), color_effect(nullptr), ntsc_effect(nullptr), bloom_effect(nullptr),
-	downsample_effect(nullptr), vector_effect(nullptr), fsfx_vertices(nullptr), curr_texture(nullptr), curr_render_target(nullptr), curr_poly(nullptr), targethead(nullptr), cachehead(nullptr)
+	snap_width(0), snap_height(0), initialized(false), backbuffer(nullptr), curr_effect(nullptr), default_effect(nullptr), prescale_effect(nullptr), post_effect(nullptr),
+	distortion_effect(nullptr), focus_effect(nullptr), phosphor_effect(nullptr), deconverge_effect(nullptr), color_effect(nullptr), ntsc_effect(nullptr), bloom_effect(nullptr),
+	downsample_effect(nullptr), vector_effect(nullptr), curr_texture(nullptr), curr_render_target(nullptr), curr_poly(nullptr)
 {
 }
 
@@ -69,22 +69,6 @@ shaders::~shaders()
 		global_free(options);
 		options = nullptr;
 	}
-
-	cache_target *currcache = cachehead;
-	while(cachehead != nullptr)
-	{
-		cachehead = currcache->next;
-		global_free(currcache);
-		currcache = cachehead;
-	}
-
-	d3d_render_target *currtarget = targethead;
-	while(targethead != nullptr)
-	{
-		targethead = currtarget->next;
-		global_free(currtarget);
-		currtarget = targethead;
-	}
 }
 
 
@@ -102,7 +86,7 @@ void shaders::window_save()
 	HRESULT result = d3d->get_device()->CreateTexture(snap_width, snap_height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &snap_copy_texture, nullptr);
 	if (FAILED(result))
 	{
-		osd_printf_verbose("Direct3D: Unable to init system-memory target for HLSL snapshot (%08x), bailing\n", (UINT32)result);
+		osd_printf_verbose("Direct3D: Unable to init system-memory target for HLSL snapshot (%08lX), bailing\n", result);
 		return;
 	}
 	snap_copy_texture->GetSurfaceLevel(0, &snap_copy_target);
@@ -110,7 +94,7 @@ void shaders::window_save()
 	result = d3d->get_device()->CreateTexture(snap_width, snap_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &snap_texture, nullptr);
 	if (FAILED(result))
 	{
-		osd_printf_verbose("Direct3D: Unable to init video-memory target for HLSL snapshot (%08x), bailing\n", (UINT32)result);
+		osd_printf_verbose("Direct3D: Unable to init video-memory target for HLSL snapshot (%08lX), bailing\n", result);
 		return;
 	}
 	snap_texture->GetSurfaceLevel(0, &snap_target);
@@ -159,9 +143,9 @@ void shaders::avi_update_snap(IDirect3DSurface9 *surface)
 	D3DLOCKED_RECT rect;
 
 	// if we don't have a bitmap, or if it's not the right size, allocate a new one
-	if (!avi_snap.valid() || (int)snap_width != avi_snap.width() || (int)snap_height != avi_snap.height())
+	if (!avi_snap.valid() || snap_width != avi_snap.width() || snap_height != avi_snap.height())
 	{
-		avi_snap.allocate((int)snap_width, (int)snap_height);
+		avi_snap.allocate(snap_width, snap_height);
 	}
 
 	// copy the texture
@@ -179,7 +163,7 @@ void shaders::avi_update_snap(IDirect3DSurface9 *surface)
 	}
 
 	// loop over Y
-	for (int srcy = 0; srcy < (int)snap_height; srcy++)
+	for (int srcy = 0; srcy < snap_height; srcy++)
 	{
 		DWORD *src = (DWORD *)((BYTE *)rect.pBits + srcy * rect.Pitch);
 		UINT32 *dst = &avi_snap.pix32(srcy);
@@ -344,7 +328,7 @@ void shaders::record_texture()
 
 
 //============================================================
-//  shaders::end_hlsl_avi_recording
+//  shaders::end_avi_recording
 //============================================================
 
 void shaders::end_avi_recording()
@@ -403,27 +387,24 @@ void shaders::begin_avi_recording(const char *name)
 	// create a new temporary movie file
 	osd_file::error filerr;
 	std::string fullpath;
+
+	emu_file tempfile(machine->options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	if (name != nullptr)
 	{
-		emu_file tempfile(machine->options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (name != nullptr)
-		{
-			filerr = tempfile.open(name);
-		}
-		else
-		{
-			filerr = machine->video().open_next(tempfile, "avi");
-		}
+		filerr = tempfile.open(name);
+	}
+	else
+	{
+		filerr = machine->video().open_next(tempfile, "avi");
+	}
 
-		// compute the frame time
-		{
-			avi_frame_period = attotime::from_seconds(1000) / info.video_timescale;
-		}
+	// compute the frame time
+	avi_frame_period = attotime::from_seconds(1000) / info.video_timescale;
 
-		// if we succeeded, make a copy of the name and create the real file over top
-		if (filerr == osd_file::error::NONE)
-		{
-			fullpath = tempfile.fullpath();
-		}
+	// if we succeeded, make a copy of the name and create the real file over top
+	if (filerr == osd_file::error::NONE)
+	{
+		fullpath = tempfile.fullpath();
 	}
 
 	if (filerr == osd_file::error::NONE)
@@ -439,30 +420,21 @@ void shaders::begin_avi_recording(const char *name)
 
 
 //============================================================
-//  remove_cache_target - remove an active cache target when
-//  refcount hits zero
+//  remove_cache_target - remove an active cache target
 //============================================================
 
 void shaders::remove_cache_target(cache_target *cache)
 {
-	if (cache != nullptr)
+	if (cache == nullptr)
+		return;
+
+	for (auto it = m_cache_target_list.begin(); it != m_cache_target_list.end(); it++)
 	{
-		if (cache == cachehead)
+		if ((*it).get() == cache)
 		{
-			cachehead = cachehead->next;
+			m_cache_target_list.erase(it);
+			break;
 		}
-
-		if (cache->prev != nullptr)
-		{
-			cache->prev->next = cache->next;
-		}
-
-		if (cache->next != nullptr)
-		{
-			cache->next->prev = cache->prev;
-		}
-
-		global_free(cache);
 	}
 }
 
@@ -478,48 +450,32 @@ void shaders::remove_render_target(texture_info *texture)
 
 void shaders::remove_render_target(int source_width, int source_height, UINT32 screen_index, UINT32 page_index)
 {
-	d3d_render_target *target = find_render_target(source_width, source_height, screen_index, page_index);
-	if (target != nullptr)
-	{
-		remove_render_target(target);
-	}
+	remove_render_target(find_render_target(source_width, source_height, screen_index, page_index));
 }
 
 void shaders::remove_render_target(d3d_render_target *rt)
 {
-	if (rt != nullptr)
+	if (rt == nullptr)
+		return;
+
+	int screen_index = rt->screen_index;
+	int other_page = 1 - rt->page_index;
+	int width = rt->width;
+	int height = rt->height;
+
+	for (auto it = m_render_target_list.begin(); it != m_render_target_list.end(); it++)
 	{
-		if (rt == targethead)
+		if ((*it).get() == rt)
 		{
-			targethead = targethead->next;
+			m_render_target_list.erase(it);
+			break;
 		}
-
-		if (rt->prev != nullptr)
-		{
-			rt->prev->next = rt->next;
-		}
-
-		if (rt->next != nullptr)
-		{
-			rt->next->prev = rt->prev;
-		}
-
-		cache_target *cache = find_cache_target(rt->screen_index, rt->width, rt->height);
-		if (cache != nullptr)
-		{
-			remove_cache_target(cache);
-		}
-
-		int screen_index = rt->screen_index;
-		int other_page = 1 - rt->page_index;
-		int width = rt->width;
-		int height = rt->height;
-
-		global_free(rt);
-
-		// Remove other double-buffered page (if it exists)
-		remove_render_target(width, height, screen_index, other_page);
 	}
+
+	remove_cache_target(find_cache_target(screen_index, width, height));
+
+	// Remove other double-buffered page (if it exists)
+	remove_render_target(width, height, screen_index, other_page);
 }
 
 
@@ -532,12 +488,6 @@ void shaders::set_texture(texture_info *texture)
 	if (!enabled())
 	{
 		return;
-	}
-
-	if (texture != nullptr)
-	{
-		paused = texture->paused();
-		texture->advance_frame();
 	}
 
 	// set initial texture to use
@@ -704,76 +654,72 @@ bool shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 
 //============================================================
 //  shaders::init_fsfx_quad
+//
+//  Called always at the start of each frame so that the two
+//  triangles used for the post-processing effects are always
+//  at the beginning of the vertex buffer
 //============================================================
 
-void shaders::init_fsfx_quad(void *vertbuf)
+void shaders::init_fsfx_quad()
 {
-	// Called at the start of each frame by the D3D code in order to reserve two triangles
-	// that are guaranteed to be at a fixed position so as to simply use D3DPT_TRIANGLELIST, 0, 2
-	// instead of having to do bookkeeping about a specific screen quad
 	if (!enabled())
-	{
 		return;
-	}
 
-	// get a pointer to the vertex buffer
-	fsfx_vertices = (vertex *)vertbuf;
-	if (fsfx_vertices == nullptr)
-	{
+	vertex *vertbuf = d3d->mesh_alloc(6);
+	if (vertbuf == nullptr)
 		return;
-	}
 
 	// fill in the vertexes clockwise
-	fsfx_vertices[0].x = 0.0f;
-	fsfx_vertices[0].y = 0.0f;
-	fsfx_vertices[1].x = d3d->get_width();
-	fsfx_vertices[1].y = 0.0f;
-	fsfx_vertices[2].x = 0.0f;
-	fsfx_vertices[2].y = d3d->get_height();
-	fsfx_vertices[3].x = d3d->get_width();
-	fsfx_vertices[3].y = 0.0f;
-	fsfx_vertices[4].x = 0.0f;
-	fsfx_vertices[4].y = d3d->get_height();
-	fsfx_vertices[5].x = d3d->get_width();
-	fsfx_vertices[5].y = d3d->get_height();
+	vertbuf[0].x = 0.0f;
+	vertbuf[0].y = 0.0f;
+	vertbuf[1].x = d3d->get_width();
+	vertbuf[1].y = 0.0f;
+	vertbuf[2].x = 0.0f;
+	vertbuf[2].y = d3d->get_height();
+	vertbuf[3].x = d3d->get_width();
+	vertbuf[3].y = 0.0f;
+	vertbuf[4].x = 0.0f;
+	vertbuf[4].y = d3d->get_height();
+	vertbuf[5].x = d3d->get_width();
+	vertbuf[5].y = d3d->get_height();
 
-	fsfx_vertices[0].u0 = 0.0f;
-	fsfx_vertices[0].v0 = 0.0f;
+	vertbuf[0].u0 = 0.0f;
+	vertbuf[0].v0 = 0.0f;
 
-	fsfx_vertices[1].u0 = 1.0f;
-	fsfx_vertices[1].v0 = 0.0f;
+	vertbuf[1].u0 = 1.0f;
+	vertbuf[1].v0 = 0.0f;
 
-	fsfx_vertices[2].u0 = 0.0f;
-	fsfx_vertices[2].v0 = 1.0f;
+	vertbuf[2].u0 = 0.0f;
+	vertbuf[2].v0 = 1.0f;
 
-	fsfx_vertices[3].u0 = 1.0f;
-	fsfx_vertices[3].v0 = 0.0f;
+	vertbuf[3].u0 = 1.0f;
+	vertbuf[3].v0 = 0.0f;
 
-	fsfx_vertices[4].u0 = 0.0f;
-	fsfx_vertices[4].v0 = 1.0f;
+	vertbuf[4].u0 = 0.0f;
+	vertbuf[4].v0 = 1.0f;
 
-	fsfx_vertices[5].u0 = 1.0f;
-	fsfx_vertices[5].v0 = 1.0f;
+	vertbuf[5].u0 = 1.0f;
+	vertbuf[5].v0 = 1.0f;
 
-	fsfx_vertices[0].u1 = 0.0f;
-	fsfx_vertices[0].v1 = 0.0f;
-	fsfx_vertices[1].u1 = 0.0f;
-	fsfx_vertices[1].v1 = 0.0f;
-	fsfx_vertices[2].u1 = 0.0f;
-	fsfx_vertices[2].v1 = 0.0f;
-	fsfx_vertices[3].u1 = 0.0f;
-	fsfx_vertices[3].v1 = 0.0f;
-	fsfx_vertices[4].u1 = 0.0f;
-	fsfx_vertices[4].v1 = 0.0f;
-	fsfx_vertices[5].u1 = 0.0f;
-	fsfx_vertices[5].v1 = 0.0f;
+	vertbuf[0].u1 = 0.0f;
+	vertbuf[0].v1 = 0.0f;
+	vertbuf[1].u1 = 0.0f;
+	vertbuf[1].v1 = 0.0f;
+	vertbuf[2].u1 = 0.0f;
+	vertbuf[2].v1 = 0.0f;
+	vertbuf[3].u1 = 0.0f;
+	vertbuf[3].v1 = 0.0f;
+	vertbuf[4].u1 = 0.0f;
+	vertbuf[4].v1 = 0.0f;
+	vertbuf[5].u1 = 0.0f;
+	vertbuf[5].v1 = 0.0f;
 
 	// set the color, Z parameters to standard values
 	for (int i = 0; i < 6; i++)
 	{
-		fsfx_vertices[i].z = 0.0f;
-		fsfx_vertices[i].rhw = 1.0f;
-		fsfx_vertices[i].color = D3DCOLOR_ARGB(255, 255, 255, 255);
+		vertbuf[i].z = 0.0f;
+		vertbuf[i].rhw = 1.0f;
+		vertbuf[i].color = D3DCOLOR_ARGB(255, 255, 255, 255);
 	}
 }
 
@@ -804,7 +750,7 @@ int shaders::create_resources()
 	result = d3d->get_device()->CreateTexture(4, 4, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &black_texture, nullptr);
 	if (FAILED(result))
 	{
-		osd_printf_verbose("Direct3D: Unable to init video-memory target for black texture (%08x)\n", (UINT32)result);
+		osd_printf_verbose("Direct3D: Unable to init video-memory target for black texture (%08lX)\n", result);
 		return 1;
 	}
 	black_texture->GetSurfaceLevel(0, &black_surface);
@@ -818,18 +764,18 @@ int shaders::create_resources()
 	if (FAILED(result))
 		osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
 
-	result = d3d->get_device()->CreateTexture((int)snap_width, (int)snap_height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &avi_copy_texture, nullptr);
+	result = d3d->get_device()->CreateTexture(snap_width, snap_height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &avi_copy_texture, nullptr);
 	if (FAILED(result))
 	{
-		osd_printf_verbose("Direct3D: Unable to init system-memory target for HLSL AVI dumping (%08x)\n", (UINT32)result);
+		osd_printf_verbose("Direct3D: Unable to init system-memory target for HLSL AVI dumping (%08lX)\n", result);
 		return 1;
 	}
 	avi_copy_texture->GetSurfaceLevel(0, &avi_copy_surface);
 
-	result = d3d->get_device()->CreateTexture((int)snap_width, (int)snap_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &avi_final_texture, nullptr);
+	result = d3d->get_device()->CreateTexture(snap_width, snap_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &avi_final_texture, nullptr);
 	if (FAILED(result))
 	{
-		osd_printf_verbose("Direct3D: Unable to init video-memory target for HLSL AVI dumping (%08x)\n", (UINT32)result);
+		osd_printf_verbose("Direct3D: Unable to init video-memory target for HLSL AVI dumping (%08lX)\n", result);
 		return 1;
 	}
 	avi_final_texture->GetSurfaceLevel(0, &avi_final_target);
@@ -851,7 +797,9 @@ int shaders::create_resources()
 		texture.seqid = 0;
 
 		// now create it (no prescale, no wrap)
-		shadow_texture = global_alloc(texture_info(d3d->get_texture_manager(), &texture, 1, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32)));
+		auto tex = std::make_unique<texture_info>(d3d->get_texture_manager(), &texture, 1, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
+		shadow_texture = tex.get();
+		d3d->get_texture_manager()->m_texture_list.push_back(std::move(tex));
 	}
 
 	const char *fx_dir = downcast<windows_options &>(machine->options()).screen_post_fx_dir();
@@ -1076,23 +1024,6 @@ void shaders::end_frame()
 	{
 		render_snapshot(snap_target);
 	}
-
-	if (!lines_pending)
-	{
-		return;
-	}
-
-	lines_pending = false;
-}
-
-
-//============================================================
-//  shaders::init_effect_info
-//============================================================
-
-void shaders::init_effect_info(poly_info *poly)
-{
-	// nothing to do
 }
 
 
@@ -1106,17 +1037,7 @@ d3d_render_target* shaders::find_render_target(texture_info *texture)
 	UINT32 screen_index = screen_index_data >> 1;
 	UINT32 page_index = screen_index_data & 1;
 
-	d3d_render_target *curr = targethead;
-	while (curr != nullptr && (
-		curr->screen_index != screen_index ||
-		curr->page_index != page_index ||
-		curr->width != texture->get_width() ||
-		curr->height != texture->get_height()))
-	{
-		curr = curr->next;
-	}
-
-	return curr;
+	return find_render_target(texture->get_width(), texture->get_height(), screen_index, page_index);
 }
 
 
@@ -1126,17 +1047,18 @@ d3d_render_target* shaders::find_render_target(texture_info *texture)
 
 d3d_render_target* shaders::find_render_target(int source_width, int source_height, UINT32 screen_index, UINT32 page_index)
 {
-	d3d_render_target *curr = targethead;
-	while (curr != nullptr && (
-		curr->width != source_width ||
-		curr->height != source_height ||
-		curr->screen_index != screen_index ||
-		curr->page_index != page_index))
+	for (auto it = m_render_target_list.begin(); it != m_render_target_list.end(); it++)
 	{
-		curr = curr->next;
+		if ((*it)->width == source_width &&
+			(*it)->height == source_height &&
+			(*it)->screen_index == screen_index &&
+			(*it)->page_index == page_index)
+		{
+			return (*it).get();
+		}
 	}
 
-	return curr;
+	return nullptr;
 }
 
 
@@ -1144,18 +1066,19 @@ d3d_render_target* shaders::find_render_target(int source_width, int source_heig
 //  shaders::find_cache_target
 //============================================================
 
-cache_target* shaders::find_cache_target(UINT32 screen_index, int width, int height)
+cache_target *shaders::find_cache_target(UINT32 screen_index, int width, int height)
 {
-	cache_target *curr = cachehead;
-	while (curr != nullptr && (
-		curr->screen_index != screen_index ||
-		curr->width != width ||
-		curr->height != height))
+	for (auto it = m_cache_target_list.begin(); it != m_cache_target_list.end(); it++)
 	{
-		curr = curr->next;
+		if ((*it)->screen_index == screen_index &&
+			(*it)->width == width &&
+			(*it)->height == height)
+		{
+			return (*it).get();
+		}
 	}
 
-	return curr;
+	return nullptr;
 }
 
 int shaders::ntsc_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
@@ -1310,7 +1233,7 @@ int shaders::phosphor_pass(d3d_render_target *rt, cache_target *ct, int source_i
 	curr_effect = phosphor_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
-	curr_effect->set_texture("LastPass", ct->last_texture);
+	curr_effect->set_texture("LastPass", ct->texture);
 	curr_effect->set_bool("Passthrough", false);
 
 	next_index = rt->next_index(next_index);
@@ -1323,7 +1246,7 @@ int shaders::phosphor_pass(d3d_render_target *rt, cache_target *ct, int source_i
 	curr_effect->set_bool("Passthrough", true);
 
 	// Avoid changing targets due to page flipping
-	blit(ct->last_target, true, D3DPT_TRIANGLELIST, 0, 2);
+	blit(ct->target, true, D3DPT_TRIANGLELIST, 0, 2);
 
 	return next_index;
 }
@@ -1483,7 +1406,7 @@ int shaders::vector_pass(d3d_render_target *rt, int source_index, poly_info *pol
 	curr_effect->set_float("LengthScale", options->vector_length_scale);
 	curr_effect->set_float("BeamSmooth", options->vector_beam_smooth);
 
-	blit(rt->target_surface[next_index], true, poly->get_type(), vertnum, poly->get_count());
+	blit(rt->target_surface[next_index], true, poly->type(), vertnum, poly->count());
 
 	return next_index;
 }
@@ -1515,11 +1438,11 @@ int shaders::screen_pass(d3d_render_target *rt, int source_index, poly_info *pol
 	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
 
 	// we do not clear the backbuffer here because multiple screens might be rendered into
-	blit(backbuffer, false, poly->get_type(), vertnum, poly->get_count());
+	blit(backbuffer, false, poly->type(), vertnum, poly->count());
 
 	if (avi_output_file != nullptr)
 	{
-		blit(avi_final_target, false, poly->get_type(), vertnum, poly->get_count());
+		blit(avi_final_target, false, poly->type(), vertnum, poly->count());
 
 		HRESULT result = d3d->get_device()->SetRenderTarget(0, backbuffer);
 		if (FAILED(result))
@@ -1530,7 +1453,7 @@ int shaders::screen_pass(d3d_render_target *rt, int source_index, poly_info *pol
 
 	if (render_snap)
 	{
-		blit(snap_target, false, poly->get_type(), vertnum, poly->get_count());
+		blit(snap_target, false, poly->type(), vertnum, poly->count());
 
 		HRESULT result = d3d->get_device()->SetRenderTarget(0, backbuffer);
 		if (FAILED(result))
@@ -1550,7 +1473,7 @@ void shaders::ui_pass(poly_info *poly, int vertnum)
 	curr_effect->update_uniforms();
 	curr_effect->set_technique("UiTechnique");
 
-	blit(nullptr, false, poly->get_type(), vertnum, poly->get_count());
+	blit(nullptr, false, poly->type(), vertnum, poly->count());
 }
 
 
@@ -1565,7 +1488,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		return;
 	}
 
-	curr_texture = poly->get_texture();
+	curr_texture = poly->texture();
 	curr_poly = poly;
 
 	auto win = d3d->assert_window();
@@ -1617,12 +1540,10 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 		curr_screen++;
 	}
-	else if (PRIMFLAG_GET_VECTOR(poly->get_flags()))
+	else if (PRIMFLAG_GET_VECTOR(poly->flags()))
 	{
-		lines_pending = true;
-
-		int source_width = int(poly->get_prim_width() + 0.5f);
-		int source_height = int(poly->get_prim_height() + 0.5f);
+		int source_width = int(poly->prim_width() + 0.5f);
+		int source_height = int(poly->prim_height() + 0.5f);
 		if (win->swap_xy())
 		{
 			std::swap(source_width, source_height);
@@ -1646,12 +1567,12 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 			osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
 		}
 	}
-	else if (PRIMFLAG_GET_VECTORBUF(poly->get_flags()))
+	else if (PRIMFLAG_GET_VECTORBUF(poly->flags()))
 	{
 		curr_screen = curr_screen < num_screens ? curr_screen : 0;
 
-		int source_width = int(poly->get_prim_width() + 0.5f);
-		int source_height = int(poly->get_prim_height() + 0.5f);
+		int source_width = int(poly->prim_width() + 0.5f);
+		int source_height = int(poly->prim_height() + 0.5f);
 		if (win->swap_xy())
 		{
 			std::swap(source_width, source_height);
@@ -1698,8 +1619,6 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 			osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
 		}
 
-		lines_pending = false;
-
 		curr_screen++;
 	}
 	else
@@ -1736,29 +1655,18 @@ void shaders::end_draw()
 
 bool shaders::add_cache_target(renderer_d3d9* d3d, texture_info* texture, int source_width, int source_height, int target_width, int target_height, int screen_index)
 {
-	cache_target* target = (cache_target*)global_alloc_clear<cache_target>();
+	auto target = std::make_unique<cache_target>();
 
-	if (!target->init(d3d, d3dintf, source_width, source_height, target_width, target_height))
-	{
-		global_free(target);
+	if (!target->init(d3d, source_width, source_height, target_width, target_height, screen_index))
 		return false;
-	}
 
-	target->screen_index = screen_index;
-	target->next = cachehead;
-	target->prev = nullptr;
-
-	if (cachehead != nullptr)
-	{
-		cachehead->prev = target;
-	}
-	cachehead = target;
+	m_cache_target_list.push_back(std::move(target));
 
 	return true;
 }
 
 //============================================================
-//  shaders::get_texture_target(render_primitive::prim, texture_info::texture)
+//  shaders::get_texture_target
 //============================================================
 
 d3d_render_target* shaders::get_texture_target(render_primitive *prim, texture_info *texture)
@@ -1879,57 +1787,33 @@ bool shaders::add_render_target(renderer_d3d9* d3d, render_primitive *prim, text
 	UINT32 page_index = 0;
 	if (texture != nullptr)
 	{
-		d3d_render_target *existing_target = find_render_target(texture);
-		if (existing_target != nullptr)
-		{
-			remove_render_target(existing_target);
-		}
-
 		UINT32 screen_index_data = (UINT32)texture->get_texinfo().osddata;
 		screen_index = screen_index_data >> 1;
 		page_index = screen_index_data & 1;
+
+		remove_render_target(find_render_target(texture));
 	}
 	else
 	{
-		d3d_render_target *existing_target = find_render_target(source_width, source_height, 0, 0);
-		if (existing_target != nullptr)
-		{
-			remove_render_target(existing_target);
-		}
+		remove_render_target(find_render_target(source_width, source_height, 0, 0));
 	}
 
-	d3d_render_target* target = (d3d_render_target*)global_alloc_clear<d3d_render_target>();
+	auto target = std::make_unique<d3d_render_target>();
 
-	if (!target->init(d3d, d3dintf, source_width, source_height, target_width, target_height))
-	{
-		global_free(target);
+	if (!target->init(d3d, source_width, source_height, target_width, target_height, screen_index, page_index))
 		return false;
-	}
-
-	target->screen_index = screen_index;
-	target->page_index = page_index;
-	target->next = targethead;
-	target->prev = nullptr;
-
-	if (targethead != nullptr)
-	{
-		targethead->prev = target;
-	}
-	targethead = target;
 
 	// cached target only for screen texture and vector buffer
 	if (PRIMFLAG_GET_SCREENTEX(prim->flags) || PRIMFLAG_GET_VECTORBUF(prim->flags))
 	{
-		cache_target* cache = find_cache_target(target->screen_index, source_width, source_height);
-		if (cache == nullptr)
+		if (!find_cache_target(target->screen_index, source_width, source_height))
 		{
 			if (!add_cache_target(d3d, texture, source_width, source_height, target_width, target_height, target->screen_index))
-			{
-				global_free(target);
 				return false;
-			}
 		}
 	}
+
+	m_render_target_list.push_back(std::move(target));
 
 	return true;
 }
@@ -1999,21 +1883,9 @@ void shaders::delete_resources()
 		last_options = *options;
 	}
 
-	cache_target *currcache = cachehead;
-	while(cachehead != nullptr)
-	{
-		cachehead = currcache->next;
-		global_free(currcache);
-		currcache = cachehead;
-	}
+	m_cache_target_list.clear();
 
-	d3d_render_target *currtarget = targethead;
-	while(targethead != nullptr)
-	{
-		targethead = currtarget->next;
-		global_free(currtarget);
-		currtarget = targethead;
-	}
+	m_render_target_list.clear();
 
 	if (downsample_effect != nullptr)
 	{
@@ -2197,7 +2069,6 @@ INT32 slider::update(std::string *str, INT32 newval)
 		case SLIDER_INT_ENUM:
 		{
 			INT32 *val_ptr = reinterpret_cast<INT32 *>(m_value);
-			*m_dirty = true;
 			if (newval != SLIDER_NOCHANGE)
 			{
 				*val_ptr = newval;
@@ -2212,7 +2083,6 @@ INT32 slider::update(std::string *str, INT32 newval)
 		case SLIDER_INT:
 		{
 			int *val_ptr = reinterpret_cast<int *>(m_value);
-			*m_dirty = true;
 			if (newval != SLIDER_NOCHANGE)
 			{
 				*val_ptr = newval;
@@ -2227,7 +2097,6 @@ INT32 slider::update(std::string *str, INT32 newval)
 		default:
 		{
 			float *val_ptr = reinterpret_cast<float *>(m_value);
-			*m_dirty = true;
 			if (newval != SLIDER_NOCHANGE)
 			{
 				*val_ptr = (float)newval * m_desc->scale;
@@ -2559,42 +2428,8 @@ uniform::uniform(effect *shader, const char *name, uniform_type type, int id)
 {
 	m_shader = shader;
 	m_type = type;
-	m_next = nullptr;
 	m_handle = m_shader->get_parameter(nullptr, name);
-	m_ival = 0;
-	m_bval = false;
-	memset(m_vec, 0, sizeof(float) * 4);
-	m_mval = nullptr;
-	m_texture = nullptr;
 	m_id = id;
-
-	switch (type)
-	{
-		case UT_BOOL:
-		case UT_INT:
-		case UT_FLOAT:
-		case UT_MATRIX:
-		case UT_SAMPLER:
-			m_count = 1;
-			break;
-		case UT_VEC2:
-			m_count = 2;
-			break;
-		case UT_VEC3:
-			m_count = 3;
-			break;
-		case UT_VEC4:
-			m_count = 4;
-			break;
-		default:
-			m_count = 1;
-			break;
-	}
-}
-
-void uniform::set_next(uniform *next)
-{
-	m_next = next;
 }
 
 void uniform::update()
@@ -2663,8 +2498,8 @@ void uniform::update()
 			{
 				float quaddims[2] = {
 					// round
-					static_cast<float>(static_cast<int>(shadersys->curr_poly->get_prim_width() + 0.5f)),
-					static_cast<float>(static_cast<int>(shadersys->curr_poly->get_prim_height() + 0.5f)) };
+					static_cast<float>(static_cast<int>(shadersys->curr_poly->prim_width() + 0.5f)),
+					static_cast<float>(static_cast<int>(shadersys->curr_poly->prim_height() + 0.5f)) };
 				m_shader->set_vector("QuadDims", 2, quaddims);
 			}
 			break;
@@ -2841,79 +2676,6 @@ void uniform::update()
 	}
 }
 
-void uniform::set(float x, float y, float z, float w)
-{
-	m_vec[0] = x;
-	m_vec[1] = y;
-	m_vec[2] = z;
-	m_vec[3] = w;
-}
-
-void uniform::set(float x, float y, float z)
-{
-	m_vec[0] = x;
-	m_vec[1] = y;
-	m_vec[2] = z;
-}
-
-void uniform::set(float x, float y)
-{
-	m_vec[0] = x;
-	m_vec[1] = y;
-}
-
-void uniform::set(float x)
-{
-	m_vec[0] = x;
-}
-
-void uniform::set(int x)
-{
-	m_ival = x;
-}
-
-void uniform::set(bool x)
-{
-	m_bval = x;
-}
-
-void uniform::set(D3DMATRIX *mat)
-{
-	m_mval = mat;
-}
-
-void uniform::set(IDirect3DTexture9 *tex)
-{
-	m_texture = tex;
-}
-
-void uniform::upload()
-{
-	switch (m_type)
-	{
-		case UT_BOOL:
-			m_shader->set_bool(m_handle, m_bval);
-			break;
-		case UT_INT:
-			m_shader->set_int(m_handle, m_ival);
-			break;
-		case UT_FLOAT:
-			m_shader->set_float(m_handle, m_vec[0]);
-			break;
-		case UT_VEC2:
-		case UT_VEC3:
-		case UT_VEC4:
-			m_shader->set_vector(m_handle, m_count, m_vec);
-			break;
-		case UT_MATRIX:
-			m_shader->set_matrix(m_handle, m_mval);
-			break;
-		case UT_SAMPLER:
-			m_shader->set_texture(m_handle, m_texture);
-			break;
-	}
-}
-
 
 //============================================================
 //  effect functions
@@ -2924,9 +2686,6 @@ effect::effect(shaders *shadersys, IDirect3DDevice9 *dev, const char *name, cons
 	LPD3DXBUFFER buffer_errors = nullptr;
 
 	m_shaders = shadersys;
-	m_uniform_head = nullptr;
-	m_uniform_tail = nullptr;
-	m_effect = nullptr;
 	m_valid = false;
 
 	char name_cstr[1024];
@@ -2939,11 +2698,11 @@ effect::effect(shaders *shadersys, IDirect3DDevice9 *dev, const char *name, cons
 		if (buffer_errors != nullptr)
 		{
 			LPVOID compile_errors = buffer_errors->GetBufferPointer();
-			printf("Unable to compile shader: %s\n", (const char*)compile_errors); fflush(stdout);
+			osd_printf_verbose("Unable to compile shader: %s\n", (const char*)compile_errors);
 		}
 		else
 		{
-			printf("Shader %s is missing, corrupt or cannot be compiled.\n", (const char*)name); fflush(stdout);
+			osd_printf_verbose("Shader %s is missing, corrupt or cannot be compiled.\n", (const char*)name);
 		}
 	}
 	else
@@ -2957,45 +2716,17 @@ effect::effect(shaders *shadersys, IDirect3DDevice9 *dev, const char *name, cons
 effect::~effect()
 {
 	m_effect->Release();
-	m_effect = nullptr;
-	uniform *curr = m_uniform_head;
-	while (curr != nullptr)
-	{
-		uniform *next = curr->get_next();
-		delete curr;
-		curr = next;
-	}
-	m_uniform_head = nullptr;
-	m_uniform_tail = nullptr;
 }
 
 void effect::add_uniform(const char *name, uniform::uniform_type type, int id)
 {
-	uniform *newuniform = new uniform(this, name, type, id);
-	if (newuniform == nullptr)
-	{
-		return;
-	}
-
-	if (m_uniform_head == nullptr)
-	{
-		m_uniform_head = newuniform;
-	}
-	if (m_uniform_tail != nullptr)
-	{
-		m_uniform_tail->set_next(newuniform);
-	}
-	m_uniform_tail = newuniform;
+	m_uniform_list.push_back(std::make_unique<uniform>(this, name, type, id));
 }
 
 void effect::update_uniforms()
 {
-	uniform *curr = m_uniform_head;
-	while(curr != nullptr)
-	{
-		curr->update();
-		curr = curr->get_next();
-	}
+	for (auto &uniform : m_uniform_list)
+		(*uniform).update();
 }
 
 void effect::begin(UINT *passes, DWORD flags)
@@ -3060,9 +2791,9 @@ void effect::set_bool(D3DXHANDLE param, bool value)
 	m_effect->SetBool(param, value);
 }
 
-void effect::set_matrix(D3DXHANDLE param, D3DMATRIX *matrix)
+void effect::set_matrix(D3DXHANDLE param, D3DXMATRIX *matrix)
 {
-	m_effect->SetMatrix(param, (D3DXMATRIX*)matrix);
+	m_effect->SetMatrix(param, matrix);
 }
 
 void effect::set_texture(D3DXHANDLE param, IDirect3DTexture9 *tex)
@@ -3073,9 +2804,4 @@ void effect::set_texture(D3DXHANDLE param, IDirect3DTexture9 *tex)
 D3DXHANDLE effect::get_parameter(D3DXHANDLE param, const char *name)
 {
 	return m_effect->GetParameterByName(param, name);
-}
-
-ULONG effect::release()
-{
-	return m_effect->Release();
 }

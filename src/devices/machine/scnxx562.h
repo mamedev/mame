@@ -40,6 +40,7 @@
 #define __SCNXX562_H__
 
 #include "emu.h"
+#include "cpu/z80/z80daisy.h"
 
 //**************************************************************************
 //  DEVICE CONFIGURATION MACROS
@@ -110,7 +111,7 @@
 class duscc_device;
 
 class duscc_channel : public device_t,
-		public device_serial_interface
+	public device_serial_interface
 {
 	friend class duscc_device;
 
@@ -152,9 +153,8 @@ public:
 	UINT8 do_dusccreg_gsr_r();
 	UINT8 do_dusccreg_ier_r();
 	UINT8 do_dusccreg_cid_r();
-	UINT8 do_dusccreg_ivr_r();
+	UINT8 do_dusccreg_ivr_ivrm_r();
 	UINT8 do_dusccreg_icr_r();
-	UINT8 do_dusccreg_ivrm_r();
 	UINT8 do_dusccreg_mrr_r();
 	UINT8 do_dusccreg_ier1_r();
 	UINT8 do_dusccreg_ier2_r();
@@ -186,10 +186,10 @@ public:
 	void do_dusccreg_ictsr_w(UINT8 data);
 	void do_dusccreg_gsr_w(UINT8 data);
 	void do_dusccreg_ier_w(UINT8 data);
-	//	void do_dusccreg_rea_w(UINT8 data); // Short cutted non complex feature
+	//  void do_dusccreg_rea_w(UINT8 data); // Short cutted non complex feature
 	void do_dusccreg_ivr_w(UINT8 data);
 	void do_dusccreg_icr_w(UINT8 data);
-	//	void do_dusccreg_sea_w(UINT8 data); // Short cutted non complex feature
+	void do_dusccreg_sea_rea_w(UINT8 data); // Short cutted non complex feature
 	void do_dusccreg_mrr_w(UINT8 data);
 	void do_dusccreg_ier1_w(UINT8 data);
 	void do_dusccreg_ier2_w(UINT8 data);
@@ -201,8 +201,8 @@ public:
 	UINT8 read(offs_t &offset);
 	void write(UINT8 data, offs_t &offset);
 
-	//	UINT8 data_read();
-	//	void data_write(UINT8 data);
+	//  UINT8 data_read();
+	//  void data_write(UINT8 data);
 
 	void receive_data(UINT8 data);
 	void m_tx_fifo_rp_step();
@@ -231,12 +231,14 @@ public:
 	UINT8 m_ttr;
 	UINT8 m_rpr;
 	UINT8 m_rtr;
-	UINT8 m_ctprh;
-	UINT8 m_ctprl;
+	//	UINT8 m_ctprh;
+	//	UINT8 m_ctprl;
+	unsigned int m_ctpr;
 	UINT8 m_ctcr;
 	UINT8 m_omr;
-	UINT8 m_cth;
-	UINT8 m_ctl;
+	//	UINT8 m_cth;
+	//	UINT8 m_ctl;
+	unsigned int m_ct;
 	UINT8 m_pcr;
 	UINT8 m_ccr;
 	UINT8 m_txfifo[4];
@@ -244,14 +246,14 @@ public:
 	UINT8 m_rsr;
 	UINT8 m_trsr;
 	UINT8 m_ictsr;
-	UINT8 m_gsr;
+	//	UINT8 m_gsr; // moved to the device since it is global
 	UINT8 m_ier;
-	//	UINT8 m_rea;
+	//  UINT8 m_rea;
 	UINT8 m_cid;
-	UINT8 m_ivr;
-	UINT8 m_icr;
+	//UINT8 m_ivr;
+	//UINT8 m_icr;
 	//	UINT8 m_sea;
-	UINT8 m_ivrm;
+	//UINT8 m_ivrm;
 	UINT8 m_mrr;
 	UINT8 m_ier1;
 	UINT8 m_ier2;
@@ -261,36 +263,36 @@ public:
 	UINT8 m_ftlr;
 	UINT8 m_trmsr;
 	UINT8 m_telr;
-    
+
 protected:
-	enum
+	enum // Needs to be 0-3 in unmodified prio level 
 	{
-		INT_TRANSMIT = 0,
-		INT_EXTERNAL = 1,
-		INT_RECEIVE  = 2,
-		INT_SPECIAL  = 3
+		INT_RXREADY		= 0,
+		INT_TXREADY		= 1,
+		INT_RXTXSTAT	= 2,
+		INT_EXTCTSTAT	= 3
 	};
 
 	enum
 	{
-		REG_CCR_RESET_TX	= 0x00,
-		REG_CCR_ENABLE_TX	= 0x02,
-		REG_CCR_DISABLE_TX	= 0x03,
-		REG_CCR_RESET_RX	= 0x40,
-		REG_CCR_ENABLE_RX	= 0x42,
-		REG_CCR_DISABLE_RX	= 0x43
+		REG_CCR_RESET_TX    = 0x00,
+		REG_CCR_ENABLE_TX   = 0x02,
+		REG_CCR_DISABLE_TX  = 0x03,
+		REG_CCR_RESET_RX    = 0x40,
+		REG_CCR_ENABLE_RX   = 0x42,
+		REG_CCR_DISABLE_RX  = 0x43
 	};
 
 	enum
 	{
-		REG_CMR1_PARITY 		= 0x20,
-		REG_CMR1_PMMODE_MASK	= 0x18,
-		REG_CMR1_PMMODE_NONE	= 0x00,
-		REG_CMR1_PMMODE_RES		= 0x01,
-		REG_CMR1_PMMODE_PARITY	= 0x10,
-		REG_CMR1_PMMODE_FORCED	= 0x11,
-		REG_CMR1_CPMODE_MASK	= 0x07,
-		REG_CMR1_CPMODE_ASYNC	= 0x07
+		REG_CMR1_PARITY         = 0x20,
+		REG_CMR1_PMMODE_MASK    = 0x18,
+		REG_CMR1_PMMODE_NONE    = 0x00,
+		REG_CMR1_PMMODE_RES     = 0x01,
+		REG_CMR1_PMMODE_PARITY  = 0x10,
+		REG_CMR1_PMMODE_FORCED  = 0x11,
+		REG_CMR1_CPMODE_MASK    = 0x07,
+		REG_CMR1_CPMODE_ASYNC   = 0x07
 	};
 
 	enum
@@ -301,100 +303,96 @@ protected:
 
 	enum
 	{
-		REG_RPR_DATA_BITS_MASK	= 0x03,
-		REG_RPR_DATA_BITS_5BIT	= 0x00,
-		REG_RPR_DATA_BITS_6BIT	= 0x01,
-		REG_RPR_DATA_BITS_7BIT	= 0x02,
-		REG_RPR_DATA_BITS_8BIT	= 0x03,
-		REG_RPR_DCD 			= 0x04,
-		REG_RPR_STRIP_PARITY	= 0x08,
-		REG_RPR_RTS 			= 0x10
+		REG_RPR_DATA_BITS_MASK  = 0x03,
+		REG_RPR_DATA_BITS_5BIT  = 0x00,
+		REG_RPR_DATA_BITS_6BIT  = 0x01,
+		REG_RPR_DATA_BITS_7BIT  = 0x02,
+		REG_RPR_DATA_BITS_8BIT  = 0x03,
+		REG_RPR_DCD             = 0x04,
+		REG_RPR_STRIP_PARITY    = 0x08,
+		REG_RPR_RTS             = 0x10
 	};
 
 	enum
 	{
-		REG_TPR_DATA_BITS_MASK	= 0x03,
-		REG_TPR_DATA_BITS_5BIT	= 0x00,
-		REG_TPR_DATA_BITS_6BIT	= 0x01,
-		REG_TPR_DATA_BITS_7BIT	= 0x02,
-		REG_TPR_DATA_BITS_8BIT	= 0x03,
-		REG_TPR_CTS 			= 0x04,
-		REG_TPR_RTS 			= 0x08,
-		REG_TPR_STOP_BITS_MASK	= 0xf0
+		REG_TPR_DATA_BITS_MASK  = 0x03,
+		REG_TPR_DATA_BITS_5BIT  = 0x00,
+		REG_TPR_DATA_BITS_6BIT  = 0x01,
+		REG_TPR_DATA_BITS_7BIT  = 0x02,
+		REG_TPR_DATA_BITS_8BIT  = 0x03,
+		REG_TPR_CTS             = 0x04,
+		REG_TPR_RTS             = 0x08,
+		REG_TPR_STOP_BITS_MASK  = 0xf0
 	};
 
 	enum
 	{
-		REG_TTR_EXT				= 0x80,
-		REG_TTR_TXCLK_MASK		= 0x70,
-		REG_TTR_TXCLK_1XEXT		= 0x00,
-		REG_TTR_TXCLK_16XEXT	= 0x10,
-		REG_TTR_TXCLK_DPLL		= 0x20,
-		REG_TTR_TXCLK_BRG 		= 0x30,
-		REG_TTR_TXCLK_2X_OTHER	= 0x40,
-		REG_TTR_TXCLK_32X_OTHER	= 0x50,
-		REG_TTR_TXCLK_2X_OWN	= 0x60,
-		REG_TTR_TXCLK_32X_OWN	= 0x70,
-		REG_TTR_BRG_RATE_MASK	= 0x0f,
+		REG_TTR_EXT             = 0x80,
+		REG_TTR_TXCLK_MASK      = 0x70,
+		REG_TTR_TXCLK_1XEXT     = 0x00,
+		REG_TTR_TXCLK_16XEXT    = 0x10,
+		REG_TTR_TXCLK_DPLL      = 0x20,
+		REG_TTR_TXCLK_BRG       = 0x30,
+		REG_TTR_TXCLK_2X_OTHER  = 0x40,
+		REG_TTR_TXCLK_32X_OTHER = 0x50,
+		REG_TTR_TXCLK_2X_OWN    = 0x60,
+		REG_TTR_TXCLK_32X_OWN   = 0x70,
+		REG_TTR_BRG_RATE_MASK   = 0x0f,
 	};
 
 	enum
 	{
-		REG_RTR_EXT				= 0x80,
-		REG_RTR_RXCLK_MASK		= 0x70,
-		REG_RTR_RXCLK_1XEXT		= 0x00,
-		REG_RTR_RXCLK_16XEXT	= 0x10,
-		REG_RTR_RXCLK_BRG 		= 0x20,
-		REG_RTR_RXCLK_CT		= 0x30,
-		REG_RTR_RXCLK_DPLL_64X_X1	= 0x40,
-		REG_RTR_RXCLK_DPLL_32X_EXT	= 0x50,
-		REG_RTR_RXCLK_DPLL_32X_BRG	= 0x60,
-		REG_RTR_RXCLK_DPLL_32X_CT	= 0x70,
-		REG_RTR_BRG_RATE_MASK		= 0x0f,
+		REG_RTR_EXT             = 0x80,
+		REG_RTR_RXCLK_MASK      = 0x70,
+		REG_RTR_RXCLK_1XEXT     = 0x00,
+		REG_RTR_RXCLK_16XEXT    = 0x10,
+		REG_RTR_RXCLK_BRG       = 0x20,
+		REG_RTR_RXCLK_CT        = 0x30,
+		REG_RTR_RXCLK_DPLL_64X_X1   = 0x40,
+		REG_RTR_RXCLK_DPLL_32X_EXT  = 0x50,
+		REG_RTR_RXCLK_DPLL_32X_BRG  = 0x60,
+		REG_RTR_RXCLK_DPLL_32X_CT   = 0x70,
+		REG_RTR_BRG_RATE_MASK       = 0x0f,
 	};
 
 	enum
 	{
-		REG_PCR_X2_IDC				= 0x80,
-		REG_PCR_GP02_RTS			= 0x40,
-		REG_PCR_SYNOUT_RTS			= 0x20,
-		REG_PCR_RTXC_MASK			= 0x18,
-		REG_PCR_RTXC_INPUT			= 0x00,
-		REG_PCR_RTXC_CNTR_OUT		= 0x08,
-		REG_PCR_RTXC_TXCLK_OUT		= 0x10,
-		REG_PCR_RTXC_RXCLK_OUT		= 0x18,
-		REG_PCR_TRXC_MASK			= 0x07,
-		REG_PCR_TRXC_INPUT			= 0x00,
-		REG_PCR_TRXC_CRYST_OUT		= 0x01,
-		REG_PCR_TRXC_DPLL_OUT		= 0x02,
-		REG_PCR_TRXC_CNTR_OUT		= 0x03,
-		REG_PCR_TRXC_TXBRG_OUT		= 0x04,
-		REG_PCR_TRXC_RXBRG_OUT		= 0x05,
-		REG_PCR_TRXC_TXCLK_OUT		= 0x06,
-		REG_PCR_TRXC_RXCLK_OUT		= 0x07,
+		REG_PCR_X2_IDC              = 0x80,
+		REG_PCR_GP02_RTS            = 0x40,
+		REG_PCR_SYNOUT_RTS          = 0x20,
+		REG_PCR_RTXC_MASK           = 0x18,
+		REG_PCR_RTXC_INPUT          = 0x00,
+		REG_PCR_RTXC_CNTR_OUT       = 0x08,
+		REG_PCR_RTXC_TXCLK_OUT      = 0x10,
+		REG_PCR_RTXC_RXCLK_OUT      = 0x18,
+		REG_PCR_TRXC_MASK           = 0x07,
+		REG_PCR_TRXC_INPUT          = 0x00,
+		REG_PCR_TRXC_CRYST_OUT      = 0x01,
+		REG_PCR_TRXC_DPLL_OUT       = 0x02,
+		REG_PCR_TRXC_CNTR_OUT       = 0x03,
+		REG_PCR_TRXC_TXBRG_OUT      = 0x04,
+		REG_PCR_TRXC_RXBRG_OUT      = 0x05,
+		REG_PCR_TRXC_TXCLK_OUT      = 0x06,
+		REG_PCR_TRXC_RXCLK_OUT      = 0x07,
 	};
 
 	enum
 	{
-		REG_OMR_TXRCL_MASK			= 0xe0,
-		REG_OMR_TXRCL_8BIT			= 0xe0,
-		REG_OMR_TXRDY_ACTIVATED		= 0x10,
-		REG_OMR_RXRDY_ACTIVATED		= 0x08,
-		REG_OMR_GP02           		= 0x04,
-		REG_OMR_GP01           		= 0x02,
-		REG_OMR_RTS            		= 0x01,
+		REG_OMR_TXRCL_MASK          = 0xe0,
+		REG_OMR_TXRCL_8BIT          = 0xe0,
+		REG_OMR_TXRDY_ACTIVATED     = 0x10,
+		REG_OMR_RXRDY_ACTIVATED     = 0x08,
+		REG_OMR_GP02                = 0x04,
+		REG_OMR_GP01                = 0x02,
+		REG_OMR_RTS                 = 0x01,
 	};
 
 	enum
 	{
+		REG_RSR_CHAR_COMPARE 		= 0x80,
 		REG_RSR_OVERRUN_ERROR		= 0x20,
-	};
-
-	enum
-	{
-		REG_ICTSR_DELTA_CTS       	= 0x10,
-		REG_ICTSR_DCD				= 0x08,
-		REG_ICTSR_CTS				= 0x04,
+		REG_RSR_FRAMING_ERROR		= 0x02,
+		REG_RSR_PARITY_ERROR		= 0x01,
 	};
 
 	enum
@@ -403,27 +401,47 @@ protected:
 		REG_GSR_CHAN_B_RXREADY 		= 0x10,
 		REG_GSR_CHAN_A_TXREADY 		= 0x02,
 		REG_GSR_CHAN_B_TXREADY 		= 0x20,
+		REG_GSR_XXREADY_MASK		= 0x33
+	};
+
+	enum
+	{
+		REG_ICTSR_DELTA_CTS         = 0x10,
+		REG_ICTSR_DCD               = 0x08,
+		REG_ICTSR_CTS               = 0x04,
+	};
+
+	enum
+	{
+		REG_IER_DCD_CTS				= 0x80,
+		REG_IER_TXRDY				= 0x40,
+		REG_IER_TRSR73				= 0x20,
+		REG_IER_RXRDY 				= 0x10,
+		REG_IER_RSR76 				= 0x08,
+		REG_IER_RSR54 				= 0x04,
+		REG_IER_RSR32 				= 0x02,
+		REG_IER_RSR10 				= 0x01,
 	};
 
 	// Register offsets, stripped from channel bit 0x20 but including A7 bit
 	enum
 	{
-		REG_CMR1	= 0x00,
-		REG_CMR2	= 0x01,
-		REG_S1R		= 0x02,
-		REG_S2R		= 0x03,
-		REG_TPR		= 0x04,
-		REG_TTR		= 0x05,
-		REG_RPR		= 0x06,
-		REG_RTR		= 0x07,
-		REG_CTPRH	= 0x08,
-		REG_CTPRL	= 0x09,
-		REG_CTCR	= 0x0a,
-		REG_OMR		= 0x0b,
-		REG_CTH		= 0x0c,
-		REG_CTL		= 0x0d,
-		REG_PCR		= 0x0e,
-		REG_CCR		= 0x0f,
+		REG_CMR1    = 0x00,
+		REG_CMR2    = 0x01,
+		REG_S1R     = 0x02,
+		REG_S2R     = 0x03,
+		REG_TPR     = 0x04,
+		REG_TTR     = 0x05,
+		REG_RPR     = 0x06,
+		REG_RTR     = 0x07,
+		REG_CTPRH   = 0x08,
+		REG_CTPRL   = 0x09,
+		REG_CTCR    = 0x0a,
+		REG_OMR     = 0x0b,
+		REG_CTH     = 0x0c,
+		REG_CTL     = 0x0d,
+		REG_PCR     = 0x0e,
+		REG_CCR     = 0x0f,
 		REG_TXFIFO_0= 0x10,
 		REG_TXFIFO_1= 0x11,
 		REG_TXFIFO_2= 0x12,
@@ -432,26 +450,26 @@ protected:
 		REG_RXFIFO_1= 0x15,
 		REG_RXFIFO_2= 0x16,
 		REG_RXFIFO_3= 0x17,
-		REG_RSR		= 0x18,
-		REG_TRSR	= 0x19,
-		REG_ICTSR	= 0x1a,
-		REG_GSR		= 0x1b,
-		REG_IER		= 0x1c,
-		REG_REA		= 0x1d,
-		REG_CID		= 0x1d,
-		REG_IVR		= 0x1e,
-		REG_ICR		= 0x1f,
-		REG_SEA		= 0x1d,
-		REG_IVRM	= 0x1e,
-		REG_MRR		= 0x1f,
-		REG_IER1	= 0x42,
-		REG_IER2	= 0x43,
-		REG_IER3	= 0x45,
-		REG_TRCR	= 0x47,
-		REG_RFLR	= 0x4e,
-		REG_FTLR	= 0x5c,
-		REG_TRMSR	= 0x5e,
-		REG_TELR	= 0x5f,
+		REG_RSR     = 0x18,
+		REG_TRSR    = 0x19,
+		REG_ICTSR   = 0x1a,
+		REG_GSR     = 0x1b,
+		REG_IER     = 0x1c,
+		REG_REA     = 0x1d,
+		REG_CID     = 0x1d,
+		REG_IVR     = 0x1e,
+		REG_ICR     = 0x1f,
+		REG_SEA     = 0x1d,
+		REG_IVRM    = 0x1e,
+		REG_MRR     = 0x1f,
+		REG_IER1    = 0x42,
+		REG_IER2    = 0x43,
+		REG_IER3    = 0x45,
+		REG_TRCR    = 0x47,
+		REG_RFLR    = 0x4e,
+		REG_FTLR    = 0x5c,
+		REG_TRMSR   = 0x5e,
+		REG_TELR    = 0x5f,
 	};
 
 	enum
@@ -471,22 +489,22 @@ protected:
 	{
 		switch (br)
 		{
-		case 0x00: return	50; break;
-		case 0x01: return	75; break;
-		case 0x02: return	110; break;
-		case 0x03: return	134; break;
-		case 0x04: return	150; break;
-		case 0x05: return	200; break;
-		case 0x06: return	300; break;
-		case 0x07: return	600; break;
-		case 0x08: return	1050; break;
-		case 0x09: return	1200; break;
-		case 0x0a: return	2000; break;
-		case 0x0b: return	2400; break;
-		case 0x0c: return	4800; break;
-		case 0x0d: return	9600; break;
-		case 0x0e: return	19200; break;
-		case 0x0f: return	38400; break;
+		case 0x00: return   50; break;
+		case 0x01: return   75; break;
+		case 0x02: return   110; break;
+		case 0x03: return   134; break;
+		case 0x04: return   150; break;
+		case 0x05: return   200; break;
+		case 0x06: return   300; break;
+		case 0x07: return   600; break;
+		case 0x08: return   1050; break;
+		case 0x09: return   1200; break;
+		case 0x0a: return   2000; break;
+		case 0x0b: return   2400; break;
+		case 0x0c: return   4800; break;
+		case 0x0d: return   9600; break;
+		case 0x0e: return   19200; break;
+		case 0x0f: return   38400; break;
 		};
 		return 0;
 	}
@@ -503,47 +521,46 @@ protected:
 
 	/* FIFOs and rx/tx status */
 	/* Receiver */
-	UINT8 m_rx_data_fifo[16];	// data FIFO
-	UINT8 m_rx_error_fifo[16];	// error FIFO
-	int m_rx_fifo_rp;			// FIFO read pointer
-	int m_rx_fifo_wp;			// FIFO write pointer
-	int m_rx_fifo_sz;			// FIFO size
-	UINT8 m_rx_error;			// current error
+	UINT8 m_rx_data_fifo[16];   // data FIFO
+	UINT8 m_rx_error_fifo[16];  // error FIFO
+	int m_rx_fifo_rp;           // FIFO read pointer
+	int m_rx_fifo_wp;           // FIFO write pointer
+	int m_rx_fifo_sz;           // FIFO size
+	UINT8 m_rx_error;           // current error
 
-    /* Transmitter */
-	UINT8 m_tx_data_fifo[16];	// data FIFO
-	UINT8 m_tx_error_fifo[16];	// error FIFO
-	int m_tx_fifo_rp;			// FIFO read pointer
-	int m_tx_fifo_wp;			// FIFO write pointer
-	int m_tx_fifo_sz;			// FIFO size
-	UINT8 m_tx_error;			// current error
+	/* Transmitter */
+	UINT8 m_tx_data_fifo[16];   // data FIFO
+	UINT8 m_tx_error_fifo[16];  // error FIFO
+	int m_tx_fifo_rp;           // FIFO read pointer
+	int m_tx_fifo_wp;           // FIFO write pointer
+	int m_tx_fifo_sz;           // FIFO size
+	UINT8 m_tx_error;           // current error
 
-	int m_rx_clock;	    // receive clock pulse count
-	int m_rx_first;	    // first character received
-	int m_rx_break;	    // receive break condition
-	//	UINT8 m_rx_rr0_latch;	// read register 0 latched
+	int m_rx_clock;     // receive clock pulse count
+	int m_rx_first;     // first character received
+	int m_rx_break;     // receive break condition
 
 	int m_rxd;
-	int m_ri;	    // ring indicator latch
-	int m_cts;	    // clear to send latch
-	int m_dcd;	    // data carrier detect latch
+	int m_ri;       // ring indicator latch
+	int m_cts;      // clear to send latch
+	int m_dcd;      // data carrier detect latch
 
 	// transmitter state
-	UINT8 m_tx_data;	// transmit data register
-	int m_tx_clock;		// transmit clock pulse count
+	UINT8 m_tx_data;    // transmit data register
+	int m_tx_clock;     // transmit clock pulse count
 
-	int m_dtr;	    // data terminal ready
-	int m_rts;	    // request to send
+	int m_dtr;      // data terminal ready
+	int m_rts;      // request to send
 
 	// synchronous state
-	UINT16 m_sync;	    // sync character
+	UINT16 m_sync;      // sync character
 
 	int m_rcv_mode;
 	int m_index;
 	duscc_device *m_uart;
 
 	// CDUSCC specifics
-	int m_a7;	    // Access additional registers
+	int m_a7;       // Access additional registers
 };
 
 
@@ -551,7 +568,7 @@ protected:
 
 
 class duscc_device :  public device_t
-//		,public device_z80daisy_interface
+		,public device_z80daisy_interface
 {
 	friend class duscc_channel;
 
@@ -585,7 +602,7 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 	// interrupt acknowledge
-	//	int m1_r();
+	//  int m1_r();
 
 	DECLARE_WRITE_LINE_MEMBER( rxa_w ) { m_chanA->write_rx(state); }
 	DECLARE_WRITE_LINE_MEMBER( rxb_w ) { m_chanB->write_rx(state); }
@@ -596,7 +613,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ria_w ) { m_chanA->ri_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( rib_w ) { m_chanB->ri_w(state); }
 #if 0
-   	DECLARE_WRITE_LINE_MEMBER( rxca_w ) { m_chanA->rxc_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( rxca_w ) { m_chanA->rxc_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( rxcb_w ) { m_chanB->rxc_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( txca_w ) { m_chanA->txc_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( txcb_w ) { m_chanB->txc_w(state); }
@@ -610,6 +627,11 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
+
+	// device_z80daisy_interface overrides
+	virtual int z80daisy_irq_state() override;
+	virtual int z80daisy_irq_ack() override;
+	virtual void z80daisy_irq_reti() override;
 
 	// internal interrupt management
 	void check_interrupts();
@@ -658,9 +680,29 @@ protected:
 	devcb_write_line    m_out_rtsb_cb;
 	devcb_write_line    m_out_syncb_cb;
 
-	int m_int_state[6]; // interrupt state
+	devcb_write_line    m_out_int_cb;
+
+
+	int m_int_state[8]; // interrupt state
 
 	int m_variant;
+	UINT8 m_gsr;
+	UINT8 m_ivr;
+	UINT8 m_ivrm;
+	UINT8 m_icr;
+
+	enum
+	{
+		REG_ICR_CHB				= 0x01,
+		REG_ICR_CHA				= 0x02,
+		REG_ICR_VEC_MOD			= 0x04,
+		REG_ICR_V2V4_MOD		= 0x08,
+		REG_ICR_PRIO_MASK		= 0xC0,
+		REG_ICR_PRIO_AHI		= 0x00,
+		REG_ICR_PRIO_BHI		= 0x40,
+		REG_ICR_PRIO_AINT		= 0x80,
+		REG_ICR_PRIO_BINT		= 0xC0,
+	};
 };
 
 // device type definition

@@ -121,11 +121,9 @@ function osdmodulesbuild()
 			MAME_DIR .. "3rdparty/compat/mingw",
 		}
 
-		if _OPTIONS["MODERN_WIN_API"]~="1" then
-			includedirs {
-				MAME_DIR .. "3rdparty/compat/winsdk-override",
-			}
-		end
+		includedirs {
+			MAME_DIR .. "3rdparty/compat/winsdk-override",
+		}
 	end
 
 	if _OPTIONS["NO_OPENGL"]=="1" then

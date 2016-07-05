@@ -16,7 +16,6 @@
 #include "softlist.h"
 
 namespace ui {
-
 /*-------------------------------------------------
   menu_game_info - handle the game information
   menu
@@ -33,7 +32,7 @@ menu_game_info::~menu_game_info()
 void menu_game_info::populate()
 {
 	std::string tempstring;
-	item_append(ui().game_info_astring(tempstring).c_str(), nullptr, FLAG_MULTILINE, nullptr);
+	item_append(ui().game_info_astring(tempstring), "", FLAG_MULTILINE, nullptr);
 }
 
 void menu_game_info::handle()
@@ -58,8 +57,8 @@ menu_image_info::~menu_image_info()
 
 void menu_image_info::populate()
 {
-	item_append(machine().system().description, nullptr, FLAG_DISABLE, nullptr);
-	item_append("", nullptr, FLAG_DISABLE, nullptr);
+	item_append(machine().system().description, "", FLAG_DISABLE, nullptr);
+	item_append("", "", FLAG_DISABLE, nullptr);
 
 	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 		image_info(&image);
@@ -91,7 +90,7 @@ void menu_image_info::image_info(device_image_interface *image)
 			item_append(image->longname(), "", FLAG_DISABLE, nullptr);
 
 			// display manufacturer and year
-			item_append(string_format("%s, %s", image->manufacturer(), image->year()).c_str(), "", FLAG_DISABLE, nullptr);
+			item_append(string_format("%s, %s", image->manufacturer(), image->year()), "", FLAG_DISABLE, nullptr);
 
 			// display supported information, if available
 			switch (image->supported())
@@ -109,7 +108,7 @@ void menu_image_info::image_info(device_image_interface *image)
 	}
 	else
 		item_append(image->brief_instance_name(), _("[empty]"), 0, nullptr);
-	item_append("", nullptr, FLAG_DISABLE, nullptr);
+	item_append("", "", FLAG_DISABLE, nullptr);
 }
 
 } // namespace ui

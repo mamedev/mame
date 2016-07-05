@@ -16,7 +16,6 @@
 #include "ui/menu.h"
 
 namespace ui {
-
 class menu_video_targets : public menu
 {
 public:
@@ -46,7 +45,7 @@ private:
 		VIDEO_ITEM_VIEW
 	};
 
-	render_target *target;
+	render_target *m_target;
 };
 
 } // namespace ui

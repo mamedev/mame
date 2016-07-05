@@ -600,6 +600,7 @@ static MACHINE_CONFIG_FRAGMENT(tandy1000_common)
 
 	/* video hardware */
 	MCFG_PCVIDEO_T1000_ADD("pcvideo_t1000")
+	MCFG_VIDEO_SET_SCREEN("pcvideo_t1000:screen")
 	MCFG_GFXDECODE_ADD("gfxdecode", "pcvideo_t1000:palette", t1000)
 
 	/* sound hardware */

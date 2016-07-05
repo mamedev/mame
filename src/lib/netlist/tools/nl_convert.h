@@ -23,7 +23,7 @@ class nl_convert_base_t
 {
 public:
 
-	nl_convert_base_t() : out(m_buf) {};
+	nl_convert_base_t() : out(m_buf) {}
 	virtual ~nl_convert_base_t()
 	{
 		m_nets.clear();
@@ -143,7 +143,7 @@ class nl_convert_spice_t : public nl_convert_base_t
 {
 public:
 
-	nl_convert_spice_t() : nl_convert_base_t() {};
+	nl_convert_spice_t() : nl_convert_base_t() {}
 	~nl_convert_spice_t()
 	{
 	}
@@ -162,7 +162,7 @@ class nl_convert_eagle_t : public nl_convert_base_t
 {
 public:
 
-	nl_convert_eagle_t() : nl_convert_base_t() {};
+	nl_convert_eagle_t() : nl_convert_base_t() {}
 	~nl_convert_eagle_t()
 	{
 	}

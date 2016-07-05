@@ -359,7 +359,7 @@ void cassette_image_device::call_unload()
 
 //-------------------------------------------------
 //  display a small tape animation, with the
-//	current position in the tape image
+//  current position in the tape image
 //-------------------------------------------------
 
 std::string cassette_image_device::call_display()
@@ -389,10 +389,10 @@ std::string cassette_image_device::call_display()
 			? u8"\u25BA"
 			: u8"\u25CF";
 
-		// Since you can have anything in a BDF file, we will use crude ascii characters instead 
+		// Since you can have anything in a BDF file, we will use crude ascii characters instead
 		result = string_format("%s %s %02d:%02d (%04d) [%02d:%02d (%04d)]",
-			shapes[n],					// animation
-			status_icon,				// play or record
+			shapes[n],                  // animation
+			status_icon,                // play or record
 			((int)position / 60),
 			((int)position % 60),
 			(int)position,

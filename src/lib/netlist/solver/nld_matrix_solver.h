@@ -126,8 +126,7 @@ public:
 	, m_stat_vsolver_calls(*this, "m_stat_vsolver_calls", 0)
 	, m_iterative_fail(*this, "m_iterative_fail", 0)
 	, m_iterative_total(*this, "m_iterative_total", 0)
-	, m_last_step(*this, "m_last_step", netlist_time::quantum())
-	, m_cur_ts(*this, "m_cur_ts", 0)
+	, m_last_step(*this, "m_last_step", netlist_time::zero())
 	, m_fb_sync(*this, "FB_sync")
 	, m_Q_sync(*this, "Q_sync")
 	, m_sort(sort)
@@ -139,7 +138,7 @@ public:
 
 	void setup(analog_net_t::list_t &nets) { vsetup(nets); }
 
-	const netlist_time solve_base();
+	void solve_base();
 
 	const netlist_time solve();
 
@@ -149,7 +148,7 @@ public:
 	void update_forced();
 	void update_after(const netlist_time &after)
 	{
-		m_Q_sync.net().toggle_new_Q();
+		m_Q_sync.net().force_queue_execution();
 		m_Q_sync.net().reschedule_in_queue(after);
 	}
 
@@ -177,7 +176,7 @@ protected:
 	virtual void vsetup(analog_net_t::list_t &nets) = 0;
 	virtual int vsolve_non_dynamic(const bool newton_raphson) = 0;
 
-	/* virtual */ netlist_time compute_next_timestep();
+	netlist_time compute_next_timestep(const double cur_ts);
 	/* virtual */ void  add_term(int net_idx, terminal_t *term);
 
 	template <typename T>
@@ -204,11 +203,9 @@ protected:
 	state_var<int> m_iterative_fail;
 	state_var<int> m_iterative_total;
 
-	inline nl_double current_timestep() { return m_cur_ts; }
 private:
 
 	state_var<netlist_time> m_last_step;
-	state_var<nl_double> m_cur_ts;
 	std::vector<core_device_t *> m_step_devices;
 	std::vector<core_device_t *> m_dynamic_devices;
 

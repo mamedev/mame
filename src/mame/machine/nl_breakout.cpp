@@ -77,7 +77,7 @@ static Astable555Desc b2_555_desc(OHM(560.0), M_OHM(1.8), U_FARAD(0.1));
 static Mono555Desc c9_555_desc(OHM(47000.0), U_FARAD(1.0)); // R33, C21
 
 static CapacitorDesc c32_desc(U_FARAD(0.1));
-static CapacitorDesc c36_desc(N_FARAD(1.0));    //0.001uF = 1nF
+static CapacitorDesc c36_desc(N_FARAD(1.0*.7));    //0.001uF = 1nF - determines horizontal gap between bricks
 static CapacitorDesc c37_desc(P_FARAD(330.0));
 
 static Mono9602Desc n8_desc(K_OHM(33.0), U_FARAD(100.0), K_OHM(5.6), P_FARAD(0)); // No capacitor on 2nd 9602
@@ -96,8 +96,10 @@ CIRCUIT_LAYOUT( breakout )
 	SOLVER(Solver, 48000)
 	PARAM(Solver.ACCURACY, 1e-6)
 	PARAM(Solver.GS_THRESHOLD, 6)
-	// FIXME: PARALLEL Doesn't work in breakout.
-	PARAM(Solver.PARALLEL, 0)
+	PARAM(Solver.DYNAMIC_TS, 0)
+	//PARAM(Solver.LTE, 1e-10)
+	PARAM(Solver.MIN_TIMESTEP, 1e-8)
+	PARAM(Solver.ITERATIVE, "MAT_CR")
 #endif
 	PARAM(NETLIST.USE_DEACTIVATE, 1)
 
