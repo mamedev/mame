@@ -26,6 +26,14 @@ const device_type MB86901 = &device_creator<mb86901_device>;
 
 const int mb86901_device::NWINDOWS = 7;
 
+#if LOG_FCODES
+#include "ss1fcode.ipp"
+#endif
+
+#if SPARCV8
+#include "sparcv8ops.ipp"
+#endif
+
 //-------------------------------------------------
 //  mb86901_device - constructor
 //-------------------------------------------------
@@ -40,13 +48,87 @@ mb86901_device::mb86901_device(const machine_config &mconfig, const char *tag, d
 
 void mb86901_device::device_start()
 {
+#if LOG_FCODES
+	m_ss1_fcode_table.clear();
+	FILE* input = fopen("names.txt", "rb");
+
+	if (input != NULL)
+	{
+		fseek(input, 0, SEEK_END);
+		size_t filesize = ftell(input);
+		fseek(input, 0, SEEK_SET);
+
+		UINT8 *buf = new UINT8[filesize];
+		fread(buf, 1, filesize, input);
+		fclose(input);
+
+		size_t pos = 0;
+		while (pos < filesize)
+		{
+			// eat newlines
+			while (pos < filesize && (buf[pos] == 0x0d || buf[pos] == 0x0a))
+				pos++;
+
+			if (pos >= filesize)
+				break;
+
+			// get opcode
+			UINT16 opcode = 0;
+			for (int shift = 12; shift >= 0 && pos < filesize; shift -= 4)
+			{
+				UINT8 digit = buf[pos];
+				if (digit >= 'a' && digit <= 'z')
+				{
+					digit &= ~0x20;
+				}
+
+				if (digit >= '0' && digit <= '9')
+				{
+					opcode |= (digit - 0x30) << shift;
+				}
+				else if (digit >= 'A' && digit <= 'F')
+				{
+					opcode |= ((digit - 0x41) + 10) << shift;
+				}
+				pos++;
+			}
+
+			if (pos >= filesize)
+				break;
+
+			// skip " : "
+			pos += 3;
+
+			if (pos >= filesize)
+				break;
+
+			// read description
+			std::string description;
+			while (buf[pos] != ';' && pos < filesize)
+			{
+				description += char(buf[pos]);
+				pos++;
+			}
+
+			if (pos >= filesize)
+				break;
+
+			if (buf[pos] == ';')
+				pos++;
+
+			m_ss1_fcode_table[opcode & ~1] = description;
+		}
+		delete [] buf;
+	}
+#endif
 	m_bp_reset_in = false;
-	m_bp_irl = 0;
 	m_bp_fpu_present = false;
 	m_bp_cp_present = false;
 	m_pb_error = false;
 	m_pb_block_ldst_byte = false;
 	m_pb_block_ldst_word = false;
+	m_bp_irl = 0;
+	m_irq_state = 0;
 
 	memset(m_dbgregs, 0, 24 * sizeof(UINT32));
 
@@ -298,6 +380,9 @@ void mb86901_device::device_reset()
 	m_fpu_sequence_err = 0;
 	m_cp_sequence_err = 0;
 
+	m_bp_irl = 0;
+	m_irq_state = 0;
+
 	m_asi = 0;
 	MAE = false;
 	HOLD_BUS = false;
@@ -329,6 +414,14 @@ void mb86901_device::device_reset()
 		m_regs[i] = m_r + i;
 	}
 	update_gpr_pointers();
+
+#if LOG_FCODES
+	m_ss1_next_pc = ~0;
+	m_ss1_next_opcode = ~0;
+	m_ss1_next_handler_base = ~0;
+	m_ss1_next_entry_point = ~0;
+	m_ss1_next_stack = ~0;
+#endif
 }
 
 
@@ -495,7 +588,7 @@ UINT32 mb86901_device::execute_max_cycles() const
 
 UINT32 mb86901_device::execute_input_lines() const
 {
-	return 0;
+	return 16;
 }
 
 
@@ -506,12 +599,52 @@ UINT32 mb86901_device::execute_input_lines() const
 
 void mb86901_device::execute_set_input(int inputnum, int state)
 {
+	switch (inputnum)
+	{
+		case SPARC_IRQ1:
+		case SPARC_IRQ2:
+		case SPARC_IRQ3:
+		case SPARC_IRQ4:
+		case SPARC_IRQ5:
+		case SPARC_IRQ6:
+		case SPARC_IRQ7:
+		case SPARC_IRQ8:
+		case SPARC_IRQ9:
+		case SPARC_IRQ10:
+		case SPARC_IRQ11:
+		case SPARC_IRQ12:
+		case SPARC_IRQ13:
+		case SPARC_IRQ14:
+		case SPARC_NMI:
+		{
+			int index = (inputnum - SPARC_IRQ1) + 1;
+			if (state)
+			{
+				m_irq_state |= 1 << index;
+			}
+			else
+			{
+				m_irq_state &= ~(1 << index);
+			}
+
+			for(index = 15; index > 0; index--)
+			{
+				if (m_irq_state & (1 << index))
+				{
+					break;
+				}
+			}
+
+			m_bp_irl = index;
+			break;
+		}
+
+		case SPARC_MAE:
+			m_mae = (state != 0) ? 1 : 0;
+			break;
+	}
 }
 
-
-#if SPARCV8
-#include "sparcv8ops.ipp"
-#endif
 
 //-------------------------------------------------
 //  execute_add - execute an add-type opcode
@@ -541,14 +674,14 @@ void mb86901_device::execute_add(UINT32 op)
 	        ((not result<31>) and (r[rs1]<31> or operand2<31>))
 	);
 	*/
+	UINT32 rs1 = RS1REG;
 	UINT32 operand2 = USEIMM ? SIMM13 : RS2REG;
 
 	UINT32 result = 0;
 	if (ADD || ADDCC)
-		result = RS1REG + operand2;
+		result = rs1 + operand2;
 	else if (ADDX || ADDXCC)
-		result = RS1REG + operand2 + ICC_C;
-
+		result = rs1 + operand2 + ICC_C;
 
 	if (RD != 0)
 		RDREG = result;
@@ -558,10 +691,10 @@ void mb86901_device::execute_add(UINT32 op)
 		CLEAR_ICC;
 		PSR |= (BIT31(result)) ? PSR_N_MASK : 0;
 		PSR |= (result == 0) ? PSR_Z_MASK : 0;
-		PSR |= ((BIT31(RS1REG) && BIT31(operand2) && !BIT31(result)) ||
-				(!BIT31(RS1REG) && !BIT31(operand2) && BIT31(result))) ? PSR_V_MASK : 0;
-		PSR |= ((BIT31(RS1REG) && BIT31(operand2)) ||
-				(!BIT31(result) && (BIT31(RS1REG) || BIT31(operand2)))) ? PSR_C_MASK : 0;
+		PSR |= ((BIT31(rs1) && BIT31(operand2) && !BIT31(result)) ||
+		       (!BIT31(rs1) && !BIT31(operand2) && BIT31(result))) ? PSR_V_MASK : 0;
+		PSR |= ((BIT31(rs1) && BIT31(operand2)) ||
+			   (!BIT31(result) && (BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
 	}
 }
 
@@ -598,13 +731,14 @@ void mb86901_device::execute_taddcc(UINT32 op)
 	        r[rd] <- result;
 	);
 	*/
+	UINT32 rs1 = RS1REG;
 	UINT32 operand2 = USEIMM ? SIMM13 : RS2REG;
 
-	UINT32 result = RS1REG + operand2;
+	UINT32 result = rs1 + operand2;
 
-	bool temp_v = (BIT31(RS1REG) && BIT31(operand2) && !BIT31(result)) ||
-					(!BIT31(RS1REG) && !BIT31(operand2) && BIT31(result)) ||
-					((RS1REG & 3) != 0 || (RS1REG & 3) != 0) ? true : false;
+	bool temp_v = (BIT31(rs1) && BIT31(operand2) && !BIT31(result)) ||
+	              (!BIT31(rs1) && !BIT31(operand2) && BIT31(result)) ||
+	              ((rs1 & 3) != 0 || (operand2 & 3) != 0) ? true : false;
 
 	if (TADDCCTV && temp_v)
 	{
@@ -617,8 +751,8 @@ void mb86901_device::execute_taddcc(UINT32 op)
 		PSR |= (BIT31(result)) ? PSR_N_MASK : 0;
 		PSR |= (result == 0) ? PSR_Z_MASK : 0;
 		PSR |= temp_v ? PSR_V_MASK : 0;
-		PSR |= ((BIT31(RS1REG) && BIT31(operand2)) ||
-				(!BIT31(result) && (BIT31(RS1REG) || BIT31(operand2)))) ? PSR_C_MASK : 0;
+		PSR |= ((BIT31(rs1) && BIT31(operand2)) ||
+		       (!BIT31(result) && (BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
 
 		if (RD != 0)
 			RDREG = result;
@@ -655,13 +789,14 @@ void mb86901_device::execute_sub(UINT32 op)
 	         (result<31> and ((not r[rs1]<31>) or operand2<31>))
 	);
 	*/
+	UINT32 rs1 = RS1REG;
 	UINT32 operand2 = USEIMM ? SIMM13 : RS2REG;
 
 	UINT32 result = 0;
 	if (SUB || SUBCC)
-		result = RS1REG - operand2;
+		result = rs1 - operand2;
 	else if (SUBX || SUBXCC)
-		result = RS1REG - operand2 - ICC_C;
+		result = rs1 - operand2 - ICC_C;
 
 	if (RD != 0)
 		RDREG = result;
@@ -671,10 +806,10 @@ void mb86901_device::execute_sub(UINT32 op)
 		CLEAR_ICC;
 		PSR |= (BIT31(result)) ? PSR_N_MASK : 0;
 		PSR |= (result == 0) ? PSR_Z_MASK : 0;
-		PSR |= ((BIT31(RS1REG) && !BIT31(operand2) && !BIT31(result)) ||
-				(!BIT31(RS1REG) && BIT31(operand2) && BIT31(result))) ? PSR_V_MASK : 0;
-		PSR |= ((!BIT31(RS1REG) && BIT31(operand2)) ||
-				(BIT31(result) && (!BIT31(RS1REG) || BIT31(operand2)))) ? PSR_C_MASK : 0;
+		PSR |= ((BIT31(rs1) && !BIT31(operand2) && !BIT31(result)) ||
+		       (!BIT31(rs1) && BIT31(operand2) && BIT31(result))) ? PSR_V_MASK : 0;
+		PSR |= ((!BIT31(rs1) && BIT31(operand2)) ||
+		       (BIT31(result) && (!BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
 	}
 }
 
@@ -712,13 +847,14 @@ void mb86901_device::execute_tsubcc(UINT32 op)
 	);
 	*/
 
+	UINT32 rs1 = RS1REG;
 	UINT32 operand2 = USEIMM ? SIMM13 : RS2REG;
 
-	UINT32 result = RS1REG - operand2;
+	UINT32 result = rs1 - operand2;
 
-	bool temp_v = (BIT31(RS1REG) && !BIT31(operand2) && !BIT31(result)) ||
-					(!BIT31(RS1REG) && BIT31(operand2) && BIT31(result)) ||
-					((RS1REG & 3) != 0 || (RS1REG & 3) != 0) ? true : false;
+	bool temp_v = (BIT31(rs1) && !BIT31(operand2) && !BIT31(result)) ||
+	              (!BIT31(rs1) && BIT31(operand2) && BIT31(result)) ||
+	              ((rs1 & 3) != 0 || (operand2 & 3) != 0) ? true : false;
 
 	if (TSUBCCTV && temp_v)
 	{
@@ -731,8 +867,8 @@ void mb86901_device::execute_tsubcc(UINT32 op)
 		PSR |= (BIT31(result)) ? PSR_N_MASK : 0;
 		PSR |= (result == 0) ? PSR_Z_MASK : 0;
 		PSR |= temp_v ? PSR_V_MASK : 0;
-		PSR |= ((!BIT31(RS1REG) && BIT31(operand2)) ||
-				(BIT31(result) && (!BIT31(RS1REG) || BIT31(operand2)))) ? PSR_C_MASK : 0;
+		PSR |= ((!BIT31(rs1) && BIT31(operand2)) ||
+		       (BIT31(result) && (!BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
 
 		if (RD != 0)
 			RDREG = result;
@@ -1111,8 +1247,14 @@ void mb86901_device::execute_rett(UINT32 op)
 	if (ET)
 	{
 		m_trap = 1;
-		if (IS_USER) m_privileged_instruction = 1;
-		else m_illegal_instruction = 1;
+		if (IS_USER)
+		{
+			m_privileged_instruction = 1;
+		}
+		else
+		{
+			m_illegal_instruction = 1;
+		}
 	}
 	else if (IS_USER)
 	{
@@ -1129,7 +1271,6 @@ void mb86901_device::execute_rett(UINT32 op)
 		m_tt = 6;
 		m_execute_mode = 0;
 		m_error_mode = 1;
-
 	}
 	else if (address & 3)
 	{
@@ -1384,9 +1525,11 @@ void mb86901_device::execute_group2(UINT32 op)
 #endif
 
 		default:
+		{
 			m_trap = 1;
 			m_illegal_instruction = 1;
 			break;
+		}
 	}
 }
 
@@ -2408,6 +2551,7 @@ void mb86901_device::select_trap()
 
 	if (m_reset_trap)
 	{
+		m_reset_trap = 0;
 		m_trap = 0;
 		return;
 	}
@@ -2457,6 +2601,7 @@ void mb86901_device::select_trap()
 	else if (m_interrupt_level > 0)
 		m_tt = 0x10 | m_interrupt_level;
 
+	TBR |= m_tt << 4;
 	m_instruction_access_exception = 0;
 	m_illegal_instruction = 0;
 	m_privileged_instruction = 0;
@@ -2472,6 +2617,7 @@ void mb86901_device::select_trap()
 	m_division_by_zero = 0;
 	m_trap_instruction = 0;
 	m_interrupt_level = 0;
+	m_mae = 0;
 }
 
 
@@ -2563,7 +2709,9 @@ void mb86901_device::execute_trap()
 	*/
 
 	if (!m_trap)
+	{
 		return;
+	}
 
 	select_trap();
 
@@ -2702,7 +2850,6 @@ void mb86901_device::dispatch_instruction(UINT32 op)
 	{
 		m_trap = 1;
 		m_illegal_instruction = 1;
-
 	}
 	if (((OP == OP_ALU && (FPOP1 || FPOP2)) || (OP == OP_TYPE0 && OP2 == OP2_FBFCC)) && (!EF || !m_bp_fpu_present))
 	{
@@ -2730,7 +2877,6 @@ void mb86901_device::dispatch_instruction(UINT32 op)
 void mb86901_device::complete_fp_execution(UINT32 /*op*/)
 {
 }
-
 
 //-------------------------------------------------
 //  execute_step - perform one step in execute
@@ -2812,7 +2958,7 @@ void mb86901_device::execute_step()
 		UINT32 addr_space = (IS_USER ? 8 : 9);
 		UINT32 op = read_sized_word(addr_space, PC, 4);
 
-#if 0
+#if LOG_FCODES
 		if (PC == 0xffef0000)
 		{
 			UINT32 opcode = read_sized_word(11, REG(5), 2);
@@ -2820,252 +2966,47 @@ void mb86901_device::execute_step()
 			{
 				opcode >>= 16;
 			}
-			UINT32 l1 = opcode << 2;
-			l1 += REG(2);
-			UINT32 handler_offset = read_sized_word(11, l1, 2);
-			if (!(l1 & 2))
+
+			UINT32 handler_base = opcode << 2;
+			handler_base += REG(2); // l1 = r2 + opcode << 2
+
+			UINT32 entry_point = read_sized_word(11, handler_base, 2);
+			if (!(handler_base & 2))
 			{
-				handler_offset >>= 16;
+				entry_point >>= 16;
 			}
-			handler_offset <<= 2;
-			handler_offset += REG(2);
-			if (handler_offset == 0xffe87964)
+			entry_point <<= 2;
+			entry_point += REG(2); // l0 = r2 + entry_point << 2
+
+#if 0
+			// Doesn't seem to work
+			UINT32 name_length_addr = (REG(2) + ((opcode & ~1) << 2)) - 1;
+			UINT32 name_length_shift = (3 - (name_length_addr & 3)) * 8;
+			UINT32 name_length = (read_sized_word(11, name_length_addr, 1) >> name_length_shift) & 0x7f;
+			UINT32 name_start_addr = name_length_addr - name_length;
+			char name_buf[129];
+			memset(name_buf, 0, 129);
+			if (name_length > 0)
 			{
-				printf("Opcode at %08x: %04x, handler is at %08x // call %08x\n", REG(5), opcode, handler_offset, l1 + 2);
-			}
-			else if (handler_offset == 0xffe8799c)
-			{
-				UINT32 address = REG(5) + 2;
-				UINT32 half = read_sized_word(11, address, 2);
-				if (!(address & 2)) half >>= 16;
-
-				printf("Opcode at %08x: %04x, handler is at %08x // push_data current result (%08x) + load address %08x\n", REG(5), opcode, handler_offset, REG(4), REG(3) + half);
-			}
-			else if (handler_offset == 0xffe879e4)
-			{
-				UINT32 address = l1 + 2;
-				UINT32 half0 = read_sized_word(11, address, 2);
-				if (address & 2) half0 <<= 16;
-
-				address = l1 + 4;
-				UINT32 half1 = read_sized_word(11, address, 2);
-				if (!(address & 2)) half1 >>= 16;
-
-				UINT32 value = half0 | half1;
-
-				printf("Opcode at %08x: %04x, handler is at %08x // push_data current result (%08x) + load immediate word from handler table (%08x)\n", REG(5), opcode, handler_offset, REG(4), value);
-			}
-			else if (handler_offset == 0xffe879c4)
-			{
-				UINT32 address = l1 + 2;
-				UINT32 l0 = read_sized_word(11, address, 2);
-				if (!(address & 2)) l0 >>= 16;
-
-				address = REG(3) + l0;
-				UINT32 l1_2 = read_sized_word(11, address, 2);
-				if (!(address & 2)) l1_2 >>= 16;
-
-				address = REG(2) + (l1_2 << 2);
-				UINT32 l0_2 = read_sized_word(11, address, 2);
-				if (!(address & 2)) l0_2 >>= 16;
-
-				UINT32 dest = REG(2) + (l0_2 << 2);
-
-				printf("Opcode at %08x: %04x, handler is at %08x // SPARC branch to %08x, calcs: g2(%08x) + halfword[g2(%04x) + (halfword[g3(%08x) + halfword[entry_point(%04x) + 2](%04x)](%04x) << 2)](%08x)\n", REG(5), opcode, handler_offset, dest, REG(2), REG(2), REG(3), l1, l0, l1_2, l0_2);
-				printf("                                                 // Target func: %08x\n", l0_2 << 2);
-				switch (l0_2 << 2)
+				for (int i = 0; i < name_length; i++)
 				{
-					case 0x10: // call
-						printf("                                                 // call %08x\n", (REG(2) + (l1_2 << 2)) + 2);
-						break;
-					default:
-						printf("                                                 // unknown handler address: %08x\n", REG(2) + (l0_2 << 2));
-						break;
+					UINT32 char_addr = name_start_addr + i;
+					UINT32 char_shift = (3 - (char_addr & 3)) * 8;
+					name_buf[i] = (read_sized_word(11, char_addr, 1) >> char_shift) & 0xff;
 				}
 			}
-			else if (handler_offset == 0xffe8c838)
-			{
-				UINT32 address = l1 + 2;
-				UINT32 half0 = read_sized_word(11, address, 2);
-				if (address & 2) half0 <<= 16;
+#endif
 
-				address = l1 + 4;
-				UINT32 half1 = read_sized_word(11, address, 2);
-				if (!(address & 2)) half1 >>= 16;
-
-				UINT32 value = half0 | half1;
-
-				printf("Opcode at %08x: %04x, handler is at %08x // add 32-bit word (%08x) from handler table to result (%08x + %08x = %08x)\n", REG(5), opcode, handler_offset, value, REG(4), value, REG(4) + value);
-			}
-			else if (opcode == 0x003f || opcode == 0x0066 || opcode == 0x0099 || opcode == 0x0121 || opcode == 0x0136 || opcode == 0x014f || opcode == 0x0155 || opcode == 0x01c7 || opcode == 0x01cd ||
-						opcode == 0x0217 || opcode == 0x0289 || opcode == 0x0296 || opcode == 0x029d || opcode == 0x02f2 || opcode == 0x0334 || opcode == 0x0381 || opcode == 0x3d38)
-			{
-				switch(opcode)
-				{
-					case 0x003f:
-					{
-						UINT32 address = REG(5) + 2;
-						UINT32 half0 = read_sized_word(11, address, 2);
-						if (address & 2) half0 <<= 16;
-
-						address = REG(5) + 4;
-						UINT32 half1 = read_sized_word(11, address, 2);
-						if (!(address & 2)) half1 >>= 16;
-
-						UINT32 value = half0 | half1;
-
-						printf("Opcode at %08x: %04x, handler is at %08x // push_data current result (%08x) + load immediate word from instructions (%08x)\n", REG(5), opcode, handler_offset, REG(4), value);
-						break;
-					}
-
-					case 0x0066:
-					{
-						UINT32 address = REG(5) + 2;
-						UINT32 offset = read_sized_word(11, address, 2);
-						if (!(address & 2)) offset >>= 16;
-
-						UINT32 target = REG(5) + 2 + offset;
-
-						printf("Opcode at %08x: %04x, handler is at %08x // if result (%08x) is zero, jump to %08x\n", REG(5), opcode, handler_offset, REG(4), target);
-						break;
-					}
-
-					case 0x0099:
-					{
-						UINT32 l1_2 = REG(4);
-
-						UINT32 address = REG(7);
-						UINT32 l0_2 = read_sized_word(11, address, 4);
-
-						address = REG(7) + 4;
-						UINT32 popped_g4 = read_sized_word(11, address, 4);
-
-						address = REG(5) + 2;
-						UINT32 offset = read_sized_word(11, address, 2);
-						if (!(address & 2)) offset >>= 16;
-
-						UINT32 target = REG(5) + 2 + offset;
-
-						printf("Opcode at %08x: %04x, handler is at %08x // branch relative to %08x if data stack pop/top (%08x) == result (%08x), pop_data result (%08x)\n", REG(5), opcode, handler_offset, target, l0_2, l1_2, popped_g4);
-						if (l1_2 == l0_2)
-						{
-							printf("                                                 // branch will be taken\n");
-						}
-						else
-						{
-							printf("                                                 // branch will not be taken\n");
-							printf("                                                 // push pc (%08x) onto program stack\n", REG(5) + 2);
-							printf("                                                 // push previous data stack top + 0x80000000 (%08x) onto program stack\n", l0_2 + 0x8000000);
-							printf("                                                 // push diff of (result - stack top) (%08x - %08x = %08x)\n", popped_g4, l0_2 + 0x8000000, popped_g4 - (l0_2 + 0x80000000));
-						}
-
-						break;
-					}
-
-					case 0x0121:
-					{
-						UINT32 address = REG(7);
-						UINT32 word = read_sized_word(11, address, 4);
-						printf("Opcode at %08x: %04x, handler is at %08x // logical-AND result with data stack pop, store in result: %08x = %08x & %08x\n", REG(5), opcode, handler_offset, word & REG(4), word, REG(4));
-						break;
-					}
-
-					case 0x0136:
-						printf("Opcode at %08x: %04x, handler is at %08x // invert result (%08x -> %08x)\n", REG(5), opcode, handler_offset, REG(4), REG(4) ^ 0xffffffff);
-						break;
-
-					case 0x014f:
-					{
-						UINT32 address = REG(7);
-						UINT32 word = read_sized_word(11, address, 4);
-						printf("Opcode at %08x: %04x, handler is at %08x // add result to data stack pop, store in result: %08x = %08x + %08x\n", REG(5), opcode, handler_offset, word + REG(4), word, REG(4));
-						break;
-					}
-
-					case 0x0155:
-					{
-						UINT32 address = REG(7);
-						UINT32 word = read_sized_word(11, address, 4);
-						printf("Opcode at %08x: %04x, handler is at %08x // subtract result from data stack pop, store in result: %08x = %08x - %08x\n", REG(5), opcode, handler_offset, word - REG(4), word, REG(4));
-						break;
-					}
-
-					case 0x01c7:
-					{
-						UINT32 address = REG(6);
-						UINT32 half0 = read_sized_word(11, address, 2);
-						if (address & 2) half0 <<= 16;
-
-						address = REG(6) + 2;
-						UINT32 half1 = read_sized_word(11, address, 2);
-						if (!(address & 2)) half1 >>= 16;
-
-						UINT32 value = half0 | half1;
-
-						printf("Opcode at %08x: %04x, handler is at %08x // return (%08x) (pops off program stack)\n", REG(5), opcode, handler_offset, value);
-						break;
-					}
-
-					case 0x01cd:
-						printf("Opcode at %08x: %04x, handler is at %08x // insert result (%08x) between data stack top (%08x) and next data stack entry\n", REG(5), opcode, handler_offset, REG(4), read_sized_word(11, REG(7), 4));
-						break;
-
-					case 0x0217:
-					{
-						UINT32 value = read_sized_word(11, REG(7), 4);
-						printf("Opcode at %08x: %04x, handler is at %08x // if pop_data (%08x) >= result (%08x), set result to 0, otherwise -1 (%08x)\n", REG(5), opcode, handler_offset, value, REG(4), (value >= REG(4)) ? 0 : ~0);
-						break;
-					}
-
-					case 0x0289:
-						printf("Opcode at %08x: %04x, handler is at %08x // push_data(g4 (%08x))\n", REG(5), opcode, handler_offset, REG(4));
-						break;
-
-					case 0x0296:
-						printf("Opcode at %08x: %04x, handler is at %08x // swap result (%08x) with top of data stack (%08x)\n", REG(5), opcode, handler_offset, REG(4), read_sized_word(11, REG(7), 4));
-						break;
-
-					case 0x029d:
-					{
-						UINT32 top = read_sized_word(11, REG(7), 4);
-						UINT32 next = read_sized_word(11, REG(7) + 4, 4);
-						printf("Opcode at %08x: %04x, handler is at %08x // swap the top two values of the data stack (%08x <-> %08x), exchange second value with result (%08x <-> %08x)\n", REG(5), opcode, handler_offset, top, next, REG(4), next);
-						break;
-					}
-
-					case 0x02f2:
-						printf("Opcode at %08x: %04x, handler is at %08x // decrement g4 (%08x -> %08x)\n", REG(5), opcode, handler_offset, REG(4), REG(4) - 1);
-						break;
-
-					case 0x0334:
-					{
-						UINT32 address = REG(4);
-						UINT32 half0 = read_sized_word(11, address, 2);
-						if (address & 2) half0 <<= 16;
-
-						address = REG(4) + 2;
-						UINT32 half1 = read_sized_word(11, address, 2);
-						if (!(address & 2)) half1 >>= 16;
-
-						UINT32 value = half0 | half1;
-
-						printf("Opcode at %08x: %04x, handler is at %08x // load result with 32-bit word at result address (g4 = [%08x] (%08x)\n", REG(5), opcode, handler_offset, REG(4), value);
-						break;
-					}
-
-					case 0x0381:
-						printf("Opcode at %08x: %04x, handler is at %08x // word[g4 (%08x)] = pop_data(g7), result = pop_data(g7), g7 = %08x\n", REG(5), opcode, handler_offset, REG(4), REG(7));
-						break;
-
-					case 0x3d38:
-						printf("Opcode at %08x: %04x, handler is at %08x // call ffe8fe90\n", REG(5), opcode, handler_offset);
-						break;
-				}
-			}
-			else
-			{
-				printf("Opcode at %08x: %04x, handler is at %08x\n", REG(5), opcode, handler_offset);
-			}
+			disassemble_ss1_fcode(REG(5), opcode, handler_base, entry_point, REG(7));
+		}
+		else if (PC == m_ss1_next_entry_point)
+		{
+			disassemble_ss1_fcode(m_ss1_next_pc, m_ss1_next_opcode, m_ss1_next_handler_base, m_ss1_next_entry_point, m_ss1_next_stack);
+			m_ss1_next_pc = ~0;
+			m_ss1_next_opcode = ~0;
+			m_ss1_next_handler_base = ~0;
+			m_ss1_next_entry_point = ~0;
+			m_ss1_next_stack = ~0;
 		}
 #endif
 
