@@ -1377,35 +1377,32 @@ void hp_taco_device::cmd_fsm(void)
 						break;
 
 				case CMD_SCAN_RECORDS:
-					// It's probably more correct to implement this to alternate between next data and next gap by using different
-					// FSM states. It times out sooner if the record being searched for doesn't exist on tape. With the current
-					// implementation it has to wait until a hole is reached at either end of the tape.
-						if (m_cmd_state == CMD_PH0) {
-								// PH0
-								if (next_data(m_rd_it , m_tape_pos , true)) {
-										cmd_duration = time_to_target(farthest_end(m_rd_it));
+						if (m_cmd_state == CMD_PH0 || m_cmd_state == CMD_PH2) {
+							// PH0 and PH2
+							if (m_cmd_state == CMD_PH2) {
+								m_tach_reg++;
+								if (m_tach_reg == 0) {
+									// All gaps found, bail out
+									cmd_duration = attotime::zero;
+									m_cmd_state = CMD_END;
+									break;
 								}
-								// Set T/O for data
-								set_data_timeout(true);
-								m_cmd_state = CMD_PH1;
-						} else {
-								// PH1
-								tape_pos_t target = m_tape_pos;
-								// Tach. register is incremented at each gap. Command ends when this register goes positive (b15 = 0).
-								unsigned n_gaps;
-								if (BIT(m_tach_reg , 15)) {
-										n_gaps = 0x10000U - m_tach_reg;
-										m_tach_reg = 0;
-								} else {
-										n_gaps = 1;
-										m_tach_reg++;
-								}
-								if (next_n_gap(target, n_gaps, min_gap_size())) {
-										LOG_0(("%u gaps @%d\n" , n_gaps, target));
-										cmd_duration = time_to_target(target);
-								}
-								m_timeout_timer->reset();
-								m_cmd_state = CMD_END;
+							}
+							if (next_data(m_rd_it , m_tape_pos , true)) {
+								cmd_duration = time_to_target(farthest_end(m_rd_it));
+							}
+							// Set T/O for data
+							set_data_timeout(true);
+							m_cmd_state = CMD_PH1;
+						} else if (m_cmd_state == CMD_PH1) {
+							// PH1
+							tape_pos_t target = m_tape_pos;
+							if (next_n_gap(target, 1, min_gap_size())) {
+								LOG_0(("Gap @%d (%u to go)\n" , target , 0x10000U - m_tach_reg));
+								cmd_duration = time_to_target(target);
+							}
+							m_timeout_timer->reset();
+							m_cmd_state = CMD_PH2;
 						}
 						break;
 
@@ -1420,8 +1417,7 @@ void hp_taco_device::cmd_fsm(void)
 								if (next_data(m_rd_it , m_tape_pos , true)) {
 										cmd_duration = time_to_target(farthest_end(m_rd_it));
 								}
-								// Set T/O for data
-								set_data_timeout(true);
+								// Apparently this cmd doesn't set no-data T/O
 								m_cmd_state = CMD_END;
 						}
 						break;
