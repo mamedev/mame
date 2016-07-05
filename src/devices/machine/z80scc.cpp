@@ -1948,6 +1948,7 @@ void z80scc_channel::control_write(UINT8 data)
 		update_serial();
 		transmit_register_reset();
 		update_rts();
+		m_rr0 |= RR0_TX_BUFFER_EMPTY;
 		break;
 	case REG_WR6_SYNC_OR_SDLC_A:  do_sccreg_wr6(data); break;
 	case REG_WR7_SYNC_OR_SDLC_F:  do_sccreg_wr7(data); break;
