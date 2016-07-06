@@ -53,20 +53,23 @@
 	- Handles collision detection via the 130e/3bb0 macros
 	  130e version in this makes a sub instead of an add as last opcode, which in turn reflects with
 	  the distance (which we do know that is internally loaded somehow). 
-013F3C: 3D7C 130E 0100             move.w  #$130e, ($100,A6)	// angle macro
-013F42: 302E 01B4                  move.w  ($1b4,A6), D0    // take the angle
-013F46: 082E 000F 01B0             btst    #$f, ($1b0,A6)   // is status exception flag raised?
+          d104 macro is called before this, it likely sets the range for the 130e snippets.
+          Example snippet (note: there are multiple calls to 130e)
+013F3C: 3D7C 130E 0100             move.w  #$130e, ($100,A6)    // angle macro
+013F42: 302E 01B4                  move.w  ($1b4,A6), D0        // take the angle
+013F46: 082E 000F 01B0             btst    #$f, ($1b0,A6)       // is status exception flag raised?
 013F4C: 6712                       beq     $13f60
 013F4E: 2228 0004                  move.l  ($4,A0), D1		
-013F52: B2A8 0044                  cmp.l   ($44,A0), D1		// compares Y value against the next object (yes, cop_regs[1] + 0x40 = cop_regs[0])
-013F56: 6708                       beq     $13f60			// if equal then check the distance
+013F52: B2A8 0044                  cmp.l   ($44,A0), D1	        // compares Y value against the next object (yes, cop_regs[1] + 0x40 = cop_regs[0])
+013F56: 6708                       beq     $13f60               // if equal then check the distance
 013F58: 6E04                       bgt     $13f5e
-013F5A: 7040                       moveq   #$40, D0			// set angle direction left ...
+013F5A: 7040                       moveq   #$40, D0             // set angle direction left ...
 013F5C: 6002                       bra     $13f60
-013F5E: 70C0                       moveq   #-$40, D0		// ... or right
-013F60: 3D7C 3BB0 0100             move.w  #$3bb0, ($100,A6) // dist macro
-013F66: 1140 003D                  move.b  D0, ($3d,A0)		// move angle value to [0x3d]
+013F5E: 70C0                       moveq   #-$40, D0            // ... or right
+013F60: 3D7C 3BB0 0100             move.w  #$3bb0, ($100,A6)    // dist macro
+013F66: 1140 003D                  move.b  D0, ($3d,A0)         // move angle value to [0x3d]
 013F6A: 4E75                       rts
+
 	
     Tech notes (to move into own file with doxy mainpage):
     -----------
