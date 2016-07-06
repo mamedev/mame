@@ -42,6 +42,7 @@
 
 #include <cassert>
 #include <cerrno>
+#include <cstdlib>
 #include <cstring>
 #include <memory>
 #include <type_traits>
