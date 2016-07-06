@@ -162,15 +162,15 @@ static int is_valid_filename_char(unicode_char unichar)
 //  ctor
 //-------------------------------------------------
 
-menu_file_create::menu_file_create(mame_ui_manager &mui, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool *ok)
+menu_file_create::menu_file_create(mame_ui_manager &mui, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool &ok)
 	: menu(mui, container)
 	, m_current_directory(current_directory)
 	, m_current_file(current_file)
 	, m_current_format(nullptr)
+	, m_ok(ok)
 {
 	m_image = image;
-	m_ok = ok;
-	*m_ok = true;
+	m_ok = true;
 	auto const sep = current_file.rfind(PATH_SEPARATOR);
 
 	m_filename.reserve(1024);
@@ -276,7 +276,7 @@ void menu_file_create::handle()
 			}
 			break;
 		case IPT_UI_CANCEL:
-			*m_ok = false;
+			m_ok = false;
 			break;
 		}
 	}

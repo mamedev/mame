@@ -278,7 +278,7 @@ void menu_control_device_image::handle()
 			break;
 
 		case menu_file_selector::result::CREATE:
-			menu::stack_push<menu_file_create>(ui(), container, image, m_current_directory, m_current_file, &create_ok);
+			menu::stack_push<menu_file_create>(ui(), container, image, m_current_directory, m_current_file, create_ok);
 			state = CHECK_CREATE;
 			break;
 

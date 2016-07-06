@@ -38,7 +38,7 @@ private:
 class menu_file_create : public menu
 {
 public:
-	menu_file_create(mame_ui_manager &mui, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool *ok);
+	menu_file_create(mame_ui_manager &mui, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool &ok);
 	virtual ~menu_file_create() override;
 	virtual void populate() override;
 	virtual void handle() override;
@@ -52,7 +52,7 @@ private:
 	std::string						m_filename;
 
 protected:
-	bool *                          m_ok;
+	bool &                          m_ok;
 };
 
 // ======================> menu_select_format
