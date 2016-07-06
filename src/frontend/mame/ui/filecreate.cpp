@@ -136,29 +136,6 @@ FILE CREATE MENU
 ***************************************************************************/
 
 //-------------------------------------------------
-//  is_valid_filename_char - tests to see if a
-//  character is valid in a filename
-//-------------------------------------------------
-
-static int is_valid_filename_char(unicode_char unichar)
-{
-	// this should really be in the OSD layer, and it shouldn't be 7-bit bullshit
-	static const char valid_filename_char[] =
-	{
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,     // 00-0f
-		0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,     // 10-1f
-		1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0,     //  !"#$%&'()*+,-./
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,     // 0123456789:;<=>?
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     // @ABCDEFGHIJKLMNO
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1,     // PQRSTUVWXYZ[\]^_
-		0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     // `abcdefghijklmno
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0,     // pqrstuvwxyz{|}~
-	};
-	return (unichar < ARRAY_LENGTH(valid_filename_char)) && valid_filename_char[unichar];
-}
-
-
-//-------------------------------------------------
 //  ctor
 //-------------------------------------------------
 
@@ -271,7 +248,7 @@ void menu_file_create::handle()
 		case IPT_SPECIAL:
 			if (get_selection() == ITEMREF_NEW_IMAGE_NAME)
 			{
-				input_character(m_filename, event->unichar, &is_valid_filename_char);
+				input_character(m_filename, event->unichar, &osd_is_valid_filename_char);
 				reset(reset_options::REMEMBER_POSITION);
 			}
 			break;
