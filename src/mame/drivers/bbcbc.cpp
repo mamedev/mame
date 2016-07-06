@@ -43,17 +43,19 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pio(*this, "z80pio"),
-		m_cart(*this, "cartslot")
+		m_cart(*this, "cartslot"),
+		m_buttons(*this, "BUTTONS")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<generic_slot_device> m_cart;
+	required_ioport_array<3> m_buttons;
 
 	UINT8 m_input_select;
 
-	void machine_start() override;
-	void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER(pio_r);
 	DECLARE_WRITE8_MEMBER(pio_w);
@@ -90,21 +92,21 @@ ADDRESS_MAP_END
 
 // Input bits are read through the PIO four at a time, then stored individually in RAM at E030-E03B
 static INPUT_PORTS_START( bbcbc )
-	PORT_START("BUTTONS1")
+	PORT_START("BUTTONS.0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Pass") PORT_CODE(KEYCODE_A) // Grey button
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Spades") PORT_CODE(KEYCODE_Z) // Grey button
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Clubs") PORT_CODE(KEYCODE_V) // Grey button
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Rdbl") PORT_CODE(KEYCODE_F) // Grey button
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("BUTTONS2")
+	PORT_START("BUTTONS.1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("NT") PORT_CODE(KEYCODE_S) // Grey button
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Hearts, Up") PORT_CODE(KEYCODE_X) // Grey button
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Play, Yes") // Yellow button
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("Back") // Red button
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("BUTTONS3")
+	PORT_START("BUTTONS.2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Dbl") PORT_CODE(KEYCODE_D) // Grey button
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Diamonds, Down") PORT_CODE(KEYCODE_C) // Grey button
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_START) PORT_NAME("Start") // Red button
@@ -159,11 +161,11 @@ READ8_MEMBER(bbcbc_state::input_r)
 	switch (m_input_select)
 	{
 		case 0xef:
-			return ioport("BUTTONS1")->read();
+			return m_buttons[0]->read();
 		case 0xdf:
-			return ioport("BUTTONS2")->read();
+			return m_buttons[1]->read();
 		case 0xbf:
-			return ioport("BUTTONS3")->read();
+			return m_buttons[2]->read();
 	}
 	logerror("Unknown input select: %02x\n", m_input_select);
 	return 0xff;
