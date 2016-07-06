@@ -203,6 +203,8 @@ void esq2x40_t::write_char(int data)
 	// ESQ-1 sends (cursor move) 0xfa 0xYY to mark YY characters as underlined at the current cursor location
 	if (m_lastchar == 0xfa)
 	{
+		if ((m_cursx + data) > m_rows)
+			data = m_rows - m_cursx;
 		for (int i = 0; i < data; i++)
 		{
 			m_attrs[m_cursy][m_cursx + i] |= AT_UNDERLINE;
