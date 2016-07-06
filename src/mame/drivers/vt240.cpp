@@ -60,6 +60,7 @@ public:
 		m_palette(*this, "palette"),
 		m_rom(*this, "maincpu"),
 		m_video_ram(*this, "vram"),
+		m_monitor(*this, "monitor"),
 		m_lk201(*this, "lk201"){ }
 
 	required_device<cpu_device> m_maincpu;
@@ -72,6 +73,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_region_ptr<UINT16> m_rom;
 	required_shared_ptr<UINT16> m_video_ram;
+	required_ioport m_monitor;
 	optional_device<lk201_device> m_lk201;
 
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
@@ -144,7 +146,7 @@ WRITE_LINE_MEMBER(vt240_state::i8085_rdy_w)
 
 READ_LINE_MEMBER(vt240_state::i8085_sid_r)
 {
-	return !m_t11;
+	return m_t11 ? CLEAR_LINE : ASSERT_LINE;
 }
 
 UPD7220_DISPLAY_PIXELS_MEMBER( vt240_state::hgdc_draw )
@@ -152,7 +154,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( vt240_state::hgdc_draw )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
 	int xi, gfx1, gfx2;
-	UINT8 pen;
+	UINT8 vom;
 
 	if(!BIT(m_reg0, 7))
 	{
@@ -163,10 +165,11 @@ UPD7220_DISPLAY_PIXELS_MEMBER( vt240_state::hgdc_draw )
 	gfx1 = m_video_ram[(address & 0x7fff) >> 1];
 	gfx2 = m_video_ram[((address & 0x7fff) + 0x8000) >> 1];
 
+	bool color = m_monitor->read() ? true : false;
 	for(xi=0;xi<16;xi++)
 	{
-		pen = ((gfx1 >> xi) & 1) + ((gfx2 >> xi) & 1);
-		bitmap.pix32(y, x + xi) = palette[pen];
+		vom = BIT(gfx1, xi) | (BIT(gfx2, xi) << 1) | ((m_reg0 & 3) << 2);
+		bitmap.pix32(y, x + xi) = palette[color ? (vom + 16) : vom];
 	}
 }
 
@@ -188,6 +191,11 @@ READ8_MEMBER(vt240_state::i8085_comm_r)
 	{
 		case 0:
 			return m_i8085_out;
+		case 2:
+			m_i8085->set_input_line(I8085_RST65_LINE, CLEAR_LINE);
+			m_i8085->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			m_t11 = 1;
+			break;
 	}
 	return 0xff;
 }
@@ -202,9 +210,9 @@ WRITE8_MEMBER(vt240_state::i8085_comm_w)
 			m_i8085->set_input_line(I8085_RST65_LINE, ASSERT_LINE);
 			break;
 		case 2:
+			m_i8085->set_input_line(I8085_RST65_LINE, CLEAR_LINE);
 			m_i8085->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 			m_t11 = 1;
-			m_i8085->set_input_line(I8085_RST65_LINE, CLEAR_LINE);
 			break;
 	}
 }
@@ -220,7 +228,7 @@ WRITE8_MEMBER(vt240_state::mem_map_cs_w)
 
 READ8_MEMBER(vt240_state::ctrl_r)
 {
-	return m_mem_map_sel | (m_i8085_rdy << 6) | (m_t11 << 7);
+	return m_mem_map_sel | ((m_lb ? 0 : 1) << 3) | (m_i8085_rdy << 6) | (m_t11 << 7);
 }
 
 WRITE8_MEMBER(vt240_state::mem_map_sel_w)
@@ -267,32 +275,37 @@ WRITE8_MEMBER(vt240_state::patmult_w)
 
 WRITE8_MEMBER(vt240_state::vpat_w)
 {
-	m_vpat = BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);
+	m_vpat = data;
 	m_patcnt = m_patmult;
-	m_patidx = 0;
+	m_patidx = 7;
 }
 
 READ8_MEMBER(vt240_state::vom_r)
 {
-	return m_vom[offset];
+	if(!BIT(m_reg0, 2))
+		return m_vom[offset];
+	return 0;
 }
 
 WRITE8_MEMBER(vt240_state::vom_w)
 {
-	m_vom[offset] = data;
+	if(!BIT(m_reg0, 2))
+	{
+		m_vom[offset] = data;
+		data = ~BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);
+		m_palette->set_pen_color(offset, pal2bit(data >> 6), pal2bit(data >> 6), pal2bit(data >> 6));
+		m_palette->set_pen_color((offset + 16), pal2bit(data >> 0), pal2bit(data >> 2), pal2bit(data >> 4));
+	}
 }
 
 READ16_MEMBER(vt240_state::vram_r)
 {
-	UINT8 *video_ram = (UINT8 *)(&m_video_ram[0]);
 	if(space.debugger_access())
-		return m_video_ram[offset & 0x7fff];
+		return m_video_ram[offset & 0x3fff];
 	if(!BIT(m_reg0, 3))
 	{
-		offset <<= 1;
-		offset = ((offset & 0x30000) >> 1) | (offset & 0xffff);
-		offset = BIT(offset, 16) | (offset & 0xfffe);
-		return video_ram[offset & 0xffff] & m_mask;
+		offset = ((offset & 0x18000) >> 1) | (offset & 0x3fff);
+		return m_video_ram[offset & 0x3fff];
 	}
 	return 0;
 }
@@ -314,23 +327,21 @@ WRITE16_MEMBER(vt240_state::vram_w)
 		else
 			data &= 0xff;
 	}
+	offset &= 0xffff;
 	UINT8 chr = data;
 
 	if(BIT(m_reg1, 2))
-		chr = video_ram[offset & 0xffff];
+		chr = video_ram[offset];
 	else if(BIT(m_reg0, 4))
 	{
 		if(BIT(m_reg0, 6))
 		{
-			if(!BIT(m_reg0, 7))
-				chr = 0;
-			else
-				chr = BITSWAP8(m_vpat, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx);
+			chr = BITSWAP8(m_vpat, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx);
 			if(m_patcnt-- == 0)
 			{
 				m_patcnt = m_patmult;
-				if(++m_patidx > 7)
-					m_patidx = 0;
+				if(m_patidx-- == 0)
+					m_patidx = 7;
 			}
 		}
 		else
@@ -341,21 +352,40 @@ WRITE16_MEMBER(vt240_state::vram_w)
 		int ps = ~m_lu & 3;
 		for(int i = 0; i <= (ps >> 1); i++)
 		{
-			if(ps == 2)
+			if(ps == 0)
 				i++;
+			UINT8 mem = video_ram[(offset & 0x7fff) + (0x8000 * i)];
+			switch(m_lu >> 6)
+			{
+				case 0:
+					break;
+				case 1:
+					chr |= mem;
+					break;
+				case 2:
+					logerror("invalid logic unit mode 2\n");
+					break;
+				case 3:
+					chr ^= mem;
+					break;
+			}
+			UINT8 out = 0, ifore = BIT(m_lu, (i ? 5 : 4)), iback = BIT(m_lu, (i ? 3 : 2));
+			for(int j = 0; j < 8; j++)
+				out |= BIT(chr, j) ? (ifore << j) : (iback << j);
+			logerror("%x %x %x %x %x\n", chr, out, data, ifore, iback);
 			if(!BIT(m_reg0, 3))
-				data = (chr & ~m_mask) | (video_ram[(offset & 0x7fff) + (0x8000 * i)] & m_mask);
+				out = (out & ~m_mask) | (mem & m_mask);
 			else
-				data = (chr & data) | (video_ram[(offset & 0x7fff) + (0x8000 * i)] & ~data);
-			video_ram[(offset & 0x7fff) + (0x8000 * i)] = data;
+				out = (out & data) | (mem & ~data);
+			video_ram[(offset & 0x7fff) + (0x8000 * i)] = out;
 		}
 		return;
 	}
 	if(!BIT(m_reg0, 3))
-		data = (chr & ~m_mask) | (video_ram[offset & 0xffff] & m_mask);
+		data = (chr & ~m_mask) | (video_ram[offset] & m_mask);
 	else
-		data = (chr & ~data) | (video_ram[offset & 0xffff] & data);
-	video_ram[offset & 0xffff] = data;
+		data = (chr & data) | (video_ram[offset] & ~data);
+	video_ram[offset] = data;
 }
 
 WRITE8_MEMBER(vt240_state::mask_w)
@@ -475,6 +505,13 @@ static GFXDECODE_START( vt240 )
 	GFXDECODE_ENTRY( "charcpu", 0x338*10-3, vt240_chars_8x10, 0, 8 )
 GFXDECODE_END
 
+static INPUT_PORTS_START( vt240 )
+	PORT_START("monitor")
+	PORT_CONFNAME(0x01, 0x01, "Monitor Type")
+	PORT_CONFSETTING(0x00, "Monochrome")
+	PORT_CONFSETTING(0x01, "Color")
+INPUT_PORTS_END
+
 static MACHINE_CONFIG_START( vt240, vt240_state )
 	MCFG_CPU_ADD("maincpu", T11, XTAL_7_3728MHz) // confirm
 	MCFG_CPU_PROGRAM_MAP(vt240_mem)
@@ -498,7 +535,7 @@ static MACHINE_CONFIG_START( vt240, vt240_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vt240)
 
 	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL_4MHz / 4)
@@ -605,7 +642,7 @@ ROM_START( vt240 )
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT          CLASS   INIT    COMPANY                      FULLNAME       FLAGS */
-COMP( 1983, vt240,  0,      0,       vt240,    0, driver_device,   0,  "Digital Equipment Corporation", "VT240", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1983, vt240,  0,      0,       vt240,    vt240, driver_device,   0,  "Digital Equipment Corporation", "VT240", MACHINE_NOT_WORKING )
 //COMP( 1983, vt241,  0,      0,       vt220,     vt220, driver_device,   0,  "Digital Equipment Corporation", "VT241", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 // NOTE: the only difference between VT240 and VT241 is the latter comes with a VR241 Color monitor, while the former comes with a mono display; the ROMs and operation are identical.
-COMP( 1983, mc7105, 0,      0,       mc7105,    0, driver_device,   0,  "Elektronika",                  "MC7105", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1983, mc7105, 0,      0,       mc7105,    vt240, driver_device,   0,  "Elektronika",                  "MC7105", MACHINE_NOT_WORKING )
