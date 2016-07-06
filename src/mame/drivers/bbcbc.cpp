@@ -23,7 +23,7 @@
 
     (C) 1985 Unicard Ltd.
 
-    The title BBC Bridge is under license from BBC Enterprises Ltd.
+    The title BBC Bridge is under licence from BBC Enterprises Ltd.
 
 ***************************************************************************/
 
@@ -176,7 +176,7 @@ WRITE8_MEMBER(bbcbc_state::input_select_w)
 
 
 ROM_START( bbcbc )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("br_4_1.ic3", 0x0000, 0x2000, CRC(7c880d75) SHA1(954db096bd9e8edfef72946637a12f1083841fb0))
 	ROM_LOAD("br_4_2.ic4", 0x2000, 0x2000, CRC(16a33aef) SHA1(9529f9f792718a3715af2063b91a5fb18f741226))
 ROM_END
