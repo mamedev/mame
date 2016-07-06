@@ -728,5 +728,22 @@ void raiden2cop_device::LEGACY_execute_42c2(int offset, UINT16 data)
 	m_host_space->write_word(cop_regs[0] + (0x38 ^ 2), res);
 }
 
+// used by seibu cup soccer, not sure if right so left out
+void raiden2cop_device::execute_5105(int offset, UINT16 data)
+{
+	int res = m_host_space->read_dword(cop_regs[0]) +  m_host_space->read_dword(cop_regs[0]+8);
+	m_host_space->write_dword(cop_regs[0]+4, res);
+}
+
+/*
+[:raiden2cop] COPDIS: 5905 s=58 f1=0 l=3 f2=05 5 fffb 58 9c8 13.2.08 [:raiden2cop] write16h 10(r2)
+[:raiden2cop] COPDIS: 5905 s=58 f1=0 l=3 f2=05 5 fffb 59 a84 15.0.04 [:raiden2cop] sub32 8(r0)
+[:raiden2cop] COPDIS: 5905 s=58 f1=0 l=3 f2=05 5 fffb 5a 0a2 01.1.02 [:raiden2cop] addmem32 4(r1)
+*/
+void raiden2cop_device::execute_5905(int offset, UINT16 data)
+{
+	int res = m_host_space->read_dword(cop_regs[2]+10 + offset*4) - m_host_space->read_dword(cop_regs[0]+8 + offset*4);
+	m_host_space->write_dword(cop_regs[1]+4 + offset *4, res);
+}
 
 #endif
