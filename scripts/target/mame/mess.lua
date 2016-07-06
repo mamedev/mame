@@ -585,6 +585,7 @@ MACHINES["APPLE_DRIVE"] = true
 MACHINES["APPLE_FDC"] = true
 MACHINES["SONY_DRIVE"] = true
 MACHINES["SCNXX562"] = true
+MACHINES["FGA002"] = true
 
 --------------------------------------------------
 -- specify available bus cores
