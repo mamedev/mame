@@ -42,13 +42,13 @@
 #define __OPRESOLV_H__
 
 #include <stdlib.h>
+#include <vector>
+#include <string>
 
 
-/***************************************************************************
-
-    Type definitions
-
-***************************************************************************/
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
 enum option_type
 {
@@ -85,69 +85,83 @@ struct option_guide
 	{ OPTIONTYPE_ENUM_VALUE, (value), (identifier), (display_name) },
 #define OPTION_ENUM_END
 
+namespace util {
 
-enum optreserr_t
+class option_resolution
 {
-	OPTIONRESOLUTION_ERROR_SUCCESS,
-	OPTIONRESOLUTION_ERROR_OUTOFMEMORY,
-	OPTIONRESOLUTION_ERROR_PARAMOUTOFRANGE,
-	OPTIONRESOLUTION_ERROR_PARAMNOTSPECIFIED,
-	OPTIONRESOLUTION_ERROR_PARAMNOTFOUND,
-	OPTIONRESOLUTION_ERROR_PARAMALREADYSPECIFIED,
-	OPTIONRESOLUTION_ERROR_BADPARAM,
-	OPTIONRESOLUTION_ERROR_SYNTAX,
-	OPTIONRESOLTUION_ERROR_INTERNAL
+public:
+	enum class error
+	{
+		SUCCESS,
+		OUTOFMEMORY,
+		PARAMOUTOFRANGE,
+		PARAMNOTSPECIFIED,
+		PARAMNOTFOUND,
+		PARAMALREADYSPECIFIED,
+		BADPARAM,
+		SYNTAX,
+		INTERNAL
+	};
+
+	struct range
+	{
+		int min, max;
+	};
+
+	option_resolution(const option_guide *guide, const char *specification);
+	~option_resolution();
+
+	// processing options with option_resolution objects
+	error add_param(const char *param, const std::string &value);
+	error finish();
+	int lookup_int(int option_char) const;
+	const char *lookup_string(int option_char) const;
+
+	// accessors
+	const char *specification() const { return m_specification; }
+	const option_guide *find_option(int option_char) const;
+	const option_guide *index_option(int indx) const;
+
+	// processing option guides
+	static int count_options(const option_guide *guide, const char *specification);
+
+	// processing option specifications
+	static error list_ranges(const char *specification, int option_char,
+		range *range, size_t range_count);
+	static error get_default(const char *specification, int option_char, int *val);
+	static error is_valid_value(const char *specification, int option_char, int val);
+	static bool contains(const char *specification, int option_char);
+
+	// misc
+	static const char *error_string(error err);
+
+private:
+	enum class entry_state
+	{
+		UNSPECIFIED,
+		SPECIFIED
+	};
+
+	struct entry
+	{
+		const option_guide *guide_entry;
+		entry_state state;
+		std::string value;
+
+		int int_value() const;
+		void set_int_value(int i);
+	};
+
+	const char *m_specification;
+	std::vector<entry> m_entries;
+
+	static error resolve_single_param(const char *specification, entry *param_value,
+		struct range *range, size_t range_count);
+	static const char *lookup_in_specification(const char *specification, const option_guide *option);
+	const entry *lookup_entry(int option_char) const;
 };
 
 
-
-struct OptionResolutionError
-{
-	const option_guide *option;
-	optreserr_t error;
-};
-
-
-
-struct option_resolution;
-
-struct OptionRange
-{
-	int min, max;
-};
-
-
-
-/***************************************************************************
-
-    Prototypes
-
-***************************************************************************/
-
-/* processing options with option_resolution objects */
-option_resolution *option_resolution_create(const option_guide *guide, const char *specification);
-optreserr_t option_resolution_add_param(option_resolution *resolution, const char *param, const char *value);
-optreserr_t option_resolution_finish(option_resolution *resolution);
-void option_resolution_close(option_resolution *resolution);
-int option_resolution_lookup_int(option_resolution *resolution, int option_char);
-const char *option_resolution_lookup_string(option_resolution *resolution, int option_char);
-
-/* option resolution accessors */
-const char *option_resolution_specification(option_resolution *resolution);
-const option_guide *option_resolution_find_option(option_resolution *resolution, int option_char);
-const option_guide *option_resolution_index_option(option_resolution *resolution, int indx);
-
-/* processing option guides */
-int option_resolution_countoptions(const option_guide *guide, const char *specification);
-
-/* processing option specifications */
-optreserr_t option_resolution_listranges(const char *specification, int option_char,
-	struct OptionRange *range, size_t range_count);
-optreserr_t option_resolution_getdefault(const char *specification, int option_char, int *val);
-optreserr_t option_resolution_isvalidvalue(const char *specification, int option_char, int val);
-int option_resolution_contains(const char *specification, int option_char);
-
-/* misc */
-const char *option_resolution_error_string(optreserr_t err);
+} // namespace util
 
 #endif /* __OPRESOLV_H__ */

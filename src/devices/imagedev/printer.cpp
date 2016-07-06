@@ -80,7 +80,7 @@ void printer_image_device::output(UINT8 data)
     DEVICE_IMAGE_CREATE( printer )
 -------------------------------------------------*/
 
-bool printer_image_device::call_create(int format_type, option_resolution *format_options)
+bool printer_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	return call_load();
 }
