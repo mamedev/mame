@@ -78,10 +78,10 @@ public:
 			m_extensions(extensions),
 			m_optspec(optspec)  { }
 
-	const char *name() const { return m_name.c_str(); }
-	const char *description() const { return m_description.c_str(); }
-	const char *extensions() const { return m_extensions.c_str(); }
-	const char *optspec() const { return m_optspec.c_str(); }
+	const std::string &name() const { return m_name; }
+	const std::string &description() const { return m_description; }
+	const std::string &extensions() const { return m_extensions; }
+	const std::string &optspec() const { return m_optspec; }
 
 private:
 	std::string m_name;

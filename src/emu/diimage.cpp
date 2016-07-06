@@ -198,7 +198,7 @@ image_error_t device_image_interface::set_image_filename(const char *filename)
 const image_device_format *device_image_interface::device_get_named_creatable_format(const char *format_name)
 {
 	for (auto &format : m_formatlist)
-		if (strcmp(format->name(), format_name) == 0)
+		if (strcmp(format->name().c_str(), format_name) == 0)
 			return format.get();
 	return nullptr;
 }
