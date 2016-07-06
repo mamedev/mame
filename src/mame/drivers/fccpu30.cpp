@@ -183,12 +183,12 @@
 class fccpu30_state : public driver_device
 {
 public:
-fccpu30_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device (mconfig, type, tag),
-		m_maincpu (*this, "maincpu")
-		,m_dusccterm(*this, "duscc")
-		,m_pit1 (*this, "pit1")
-		,m_pit2 (*this, "pit2")
+fccpu30_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device (mconfig, type, tag)
+		, m_maincpu (*this, "maincpu")
+		, m_dusccterm(*this, "duscc")
+		, m_pit1 (*this, "pit1")
+		, m_pit2 (*this, "pit2")
 	{
 	}
 
@@ -231,13 +231,13 @@ static ADDRESS_MAP_START (fccpu30_mem, AS_PROGRAM, 32, fccpu30_state)
 	AM_RANGE (0x00000000, 0x00000007) AM_ROM AM_READ  (bootvect_r)   /* ROM mirror just during reset */
 	AM_RANGE (0x00000000, 0x00000007) AM_RAM AM_WRITE (bootvect_w)   /* After first write we act as RAM */
 	AM_RANGE (0x00000008, 0x003fffff) AM_RAM /* 4 Mb RAM */
-	AM_RANGE (0xff000000, 0xff7fffff) AM_ROM AM_REGION("maincpu", 0xff000000)
+	AM_RANGE (0xff000000, 0xff7fffff) AM_ROM AM_REGION("roms", 0x000000)
 	AM_RANGE (0xff802000, 0xff8021ff) AM_DEVREADWRITE8("duscc", duscc68562_device, read, write, 0xffffffff) /* Port 1&2 - Dual serial port DUSCC   */
 	AM_RANGE (0xff800c00, 0xff800dff) AM_DEVREADWRITE8("pit1", pit68230_device, read, write, 0xffffffff)
 	AM_RANGE (0xff800e00, 0xff800fff) AM_DEVREADWRITE8("pit2", pit68230_device, read, write, 0xffffffff)
 	AM_RANGE (0xffc00000, 0xffcfffff) AM_RAM AM_SHARE ("nvram") /* On-board SRAM with battery backup (nvram) */
 	AM_RANGE (0xffd00000, 0xffd004ff) AM_READWRITE8(fga8_r, fga8_w, 0xffffffff)  /* FGA-002 Force Gate Array */
-	AM_RANGE (0xffe00000, 0xffefffff) AM_ROM AM_REGION("maincpu", 0xffe00000)
+	AM_RANGE (0xffe00000, 0xffefffff) AM_ROM AM_REGION("roms", 0x800000)
 
 	//AM_RANGE(0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
 	//AM_RANGE(0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
@@ -351,7 +351,7 @@ void fccpu30_state::machine_start ()
 	save_pointer (NAME (m_fga002), sizeof(m_fga002));
 
 	/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
-	m_sysrom = (UINT32*)(memregion ("maincpu")->base () + 0xffe00000);
+	m_sysrom = (UINT32*)(memregion ("roms")->base () + 0x800000);
 }
 
 void fccpu30_state::machine_reset ()
@@ -360,7 +360,7 @@ void fccpu30_state::machine_reset ()
 
 	/* Reset pointer to bootvector in ROM for bootvector handler bootvect_r */
 	if (m_sysrom == &m_sysram[0]) /* Condition needed because memory map is not setup first time */
-		m_sysrom = (UINT32*)(memregion ("maincpu")->base () + 0xffe00000);
+		m_sysrom = (UINT32*)(memregion ("roms")->base () + 0x800000);
 
 	/* Reset values for the FGA-002 */
 	memset(&m_fga002[0], 0, sizeof(m_fga002));
@@ -744,11 +744,13 @@ MACHINE_CONFIG_END
 
 /* ROM definitions */
 ROM_START (fccpu30)
-ROM_REGION32_BE(0xfff00000, "maincpu", 0)
-
-ROM_LOAD16_BYTE("CPU30LO.BIN",  0xff000000, 0x20000, CRC (fefa88ed) SHA1 (71a9ad807c0c2da5c6f6a6dc68c73ad8b52f3ea9))
-ROM_LOAD16_BYTE("CPU30UP.BIN",  0xff000001, 0x20000, CRC (dfed1f68) SHA1 (71478a77d5ab5da0fabcd78e69537919b560e3b8))
-ROM_LOAD("PGA-002.BIN",         0xffe00000, 0x10000, CRC (faa38972) SHA1 (651dfc2f9a865fc6adf49dad90f9e705f2889919))
+	ROM_REGION32_BE(0x900000, "roms", 0)
+	ROM_LOAD32_BYTE("CPU30UU.bin",  0x000000, 0x20000, CRC(66e95cc2) SHA1(acdb468a3a5974295b81271d617de7f101098891) )
+	ROM_LOAD32_BYTE("CPU30UP.bin",  0x000001, 0x20000, CRC(dfed1f68) SHA1(71478a77d5ab5da0fabcd78e69537919b560e3b8) )
+	ROM_LOAD32_BYTE("CPU30LO.bin",  0x000002, 0x20000, CRC(fefa88ed) SHA1(71a9ad807c0c2da5c6f6a6dc68c73ad8b52f3ea9) )
+	ROM_LOAD32_BYTE("CPU30LL.bin",  0x000003, 0x20000, CRC(a03ebf46) SHA1(48fa0268cb10e20679c093e02574dbd9925f95d1) )
+	ROM_LOAD       ("PGA-002.bin",  0x800000, 0x10000, CRC(faa38972) SHA1(651dfc2f9a865fc6adf49dad90f9e705f2889919) )
+ROM_END
 
 /*
  * System ROM information
@@ -794,7 +796,6 @@ ROM_LOAD("PGA-002.BIN",         0xffe00000, 0x10000, CRC (faa38972) SHA1 (651dfc
  *    read  <- REG_GSR
  *  until something needs attention
  */
-ROM_END
 
 /* Driver */
 /*    YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT     CLASS          INIT COMPANY                  FULLNAME          FLAGS */
