@@ -1008,7 +1008,7 @@ void mb86901_device::execute_mulscc(UINT32 op)
 	*/
 	UINT32 operand1 = (ICC_N != ICC_V ? 0x80000000 : 0) | (RS1REG >> 1);
 
-	UINT32 operand2 = (Y & 1) ? 0 : (USEIMM ? SIMM13 : RS2REG);
+	UINT32 operand2 = (Y & 1) ? (USEIMM ? SIMM13 : RS2REG) : 0;
 
 	UINT32 result = operand1 + operand2;
 	Y = ((RS1REG & 1) ? 0x80000000 : 0) | (Y >> 1);
