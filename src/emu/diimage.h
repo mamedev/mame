@@ -133,6 +133,8 @@ typedef void (*device_image_partialhash_func)(hash_collection &, const unsigned 
 class device_image_interface : public device_interface
 {
 public:
+	typedef std::vector<std::unique_ptr<image_device_format>> formatlist_type;
+
 	// construction/destruction
 	device_image_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_image_interface();
@@ -221,7 +223,7 @@ public:
 	const char *instance_name() const { return m_instance_name.c_str(); }
 	const char *brief_instance_name() const { return m_brief_instance_name.c_str(); }
 	bool uses_file_extension(const char *file_extension) const;
-	const std::vector<std::unique_ptr<image_device_format>> &formatlist() const { return m_formatlist; }
+	const formatlist_type &formatlist() const { return m_formatlist; }
 
 	bool load(const char *path);
 	bool open_image_file(emu_options &options);
@@ -315,7 +317,7 @@ protected:
 	std::string m_instance_name;
 
 	/* creation info */
-	std::vector<std::unique_ptr<image_device_format>> m_formatlist;
+	formatlist_type m_formatlist;
 
 	/* in the case of arcade cabinet with fixed carts inserted,
 	 we want to disable command line cart loading... */
