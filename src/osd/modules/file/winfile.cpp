@@ -493,6 +493,7 @@ bool osd_is_valid_filepath_char(unicode_char uchar)
 		&& uchar != '|'
 		&& uchar != '?'
 		&& uchar != '*'
+		&& !(uchar >= '\x7F' && uchar <= '\x9F')
 		&& uchar_isvalid(uchar);
 }
 
