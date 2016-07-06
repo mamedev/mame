@@ -470,6 +470,8 @@ void hp_taco_device::device_timer(emu_timer &timer, device_timer_id id, int para
 								m_rw_pos = m_tape_pos;
 								break;
 
+						case CMD_INIT_WRITE:
+						case CMD_RECORD_WRITE:
 						case CMD_MOVE_INGAP:
 								m_hole_timer->adjust(time_to_next_hole());
 								// No IRQ at holes
@@ -759,8 +761,6 @@ bool hp_taco_device::start_tape_cmd(UINT16 cmd_reg , UINT16 must_be_1 , UINT16 m
 				m_tape_wr = (must_be_0 & STATUS_WPR_MASK) != 0;
 				m_tape_fwd = DIR_FWD(m_cmd_reg);
 				m_tape_fast = SPEED_FAST(m_cmd_reg);
-				// TODO: remove?
-				BIT_CLR(m_status_reg, STATUS_HOLE_BIT);
 
 				if (m_tape_wr) {
 						// Write command: disable gap detector
