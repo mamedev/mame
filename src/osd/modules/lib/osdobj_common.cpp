@@ -147,6 +147,7 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_BGFX_DEBUG,                   "0",               OPTION_BOOLEAN, "enable BGFX debugging statistics" },
 	{ OSDOPTION_BGFX_SCREEN_CHAINS,           "default",         OPTION_STRING, "comma-delimited list of screen chain JSON names, colon-delimited per-window" },
 	{ OSDOPTION_BGFX_SHADOW_MASK,             "slot-mask.png",   OPTION_STRING, "shadow mask texture name" },
+	{ OSDOPTION_BGFX_AVI_NAME,                OSDOPTVAL_AUTO,    OPTION_STRING, "filename for BGFX output logging" },
 
 		// End of list
 	{ nullptr }

@@ -270,7 +270,7 @@ void renderer_bgfx::record()
 	}
 	else
 	{
-		m_avi_writer->record();
+		m_avi_writer->record(m_options.bgfx_avi_name());
 		m_avi_target = m_targets->create_target("avibuffer", bgfx::TextureFormat::RGBA8, m_width[0], m_height[0], TARGET_STYLE_CUSTOM, false, true, 1, 0);
 		m_avi_texture = bgfx::createTexture2D(m_width[0], m_height[0], 1, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_BLIT_DST | BGFX_TEXTURE_READ_BACK);
 	}

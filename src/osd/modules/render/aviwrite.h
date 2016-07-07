@@ -22,7 +22,7 @@ public:
 	avi_write(running_machine& machine, uint32_t width, uint32_t height);
 	~avi_write();
 
-	void record();
+	void record(const char *name);
 	void stop();
 	void audio_frame(const INT16 *buffer, int samples_this_frame);
 	void video_frame(bitmap_rgb32& snap);
@@ -31,7 +31,7 @@ public:
 	bool recording() const { return m_recording; }
 
 private:
-	void begin_avi_recording();
+	void begin_avi_recording(const char *name);
 	void end_avi_recording();
 
 	running_machine&        m_machine;
