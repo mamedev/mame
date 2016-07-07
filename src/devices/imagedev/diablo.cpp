@@ -114,6 +114,7 @@ bool diablo_image_device::call_create(int create_format, util::option_resolution
 	UINT32 sectorsize, hunksize;
 	UINT32 cylinders, heads, sectors, totalsectors;
 
+	assert_always(create_args != nullptr, "Expected create_args to not be nullptr");
 	cylinders   = create_args->lookup_int('C');
 	heads       = create_args->lookup_int('H');
 	sectors     = create_args->lookup_int('S');

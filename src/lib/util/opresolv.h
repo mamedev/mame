@@ -123,7 +123,7 @@ public:
 	const option_guide *index_option(int indx) const;
 
 	// processing option guides
-	static int count_options(const option_guide *guide, const char *specification);
+	static size_t count_options(const option_guide *guide, const char *specification);
 
 	// processing option specifications
 	static error list_ranges(const char *specification, int option_char,

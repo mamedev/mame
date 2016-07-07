@@ -437,9 +437,9 @@ const option_guide *option_resolution::index_option(int indx) const
 //	count_options
 // -------------------------------------------------
 
-int option_resolution::count_options(const option_guide *guide, const char *specification)
+size_t option_resolution::count_options(const option_guide *guide, const char *specification)
 {
-	int option_count = 0;
+	size_t option_count = 0;
 
 	while(guide->option_type != OPTIONTYPE_END)
 	{
