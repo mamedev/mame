@@ -157,7 +157,7 @@ void menu_control_floppy_image::handle()
 			break;
 
 		case menu_select_rw::result::WRITE_OTHER:
-			menu::stack_push<menu_file_create>(ui(), container, image, m_current_directory, m_current_file, &create_ok);
+			menu::stack_push<menu_file_create>(ui(), container, image, m_current_directory, m_current_file, create_ok);
 			state = CHECK_CREATE;
 			break;
 
