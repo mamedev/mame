@@ -72,22 +72,19 @@ struct image_device_type_info
 class image_device_format
 {
 public:
-	image_device_format(const char *name, const char *description, const char *extensions, const char *optspec)
-		: m_name(name),
-			m_description(description),
-			m_extensions(extensions),
-			m_optspec(optspec)  { }
+	image_device_format(const std::string &name, const std::string &description, const std::string &extensions, const std::string &optspec);
+	~image_device_format();
 
 	const std::string &name() const { return m_name; }
 	const std::string &description() const { return m_description; }
-	const std::string &extensions() const { return m_extensions; }
+	const std::vector<std::string> &extensions() const { return m_extensions; }
 	const std::string &optspec() const { return m_optspec; }
 
 private:
-	std::string m_name;
-	std::string m_description;
-	std::string m_extensions;
-	std::string m_optspec;
+	std::string					m_name;
+	std::string					m_description;
+	std::vector<std::string>	m_extensions;
+	std::string					m_optspec;
 };
 
 
