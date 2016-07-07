@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "string.h"
-#include "debug/debugcpu.h"
+#include "debug/devdebug.h"
 
 
 //**************************************************************************

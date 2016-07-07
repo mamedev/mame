@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "debug/debugcpu.h"
+#include "debug/devdebug.h"
 
 #import <Cocoa/Cocoa.h>
 

@@ -14,6 +14,7 @@
 #include "debugcmd.h"
 #include "debugcon.h"
 #include "debugcpu.h"
+#include "devdebug.h"
 #include "express.h"
 #include "debughlp.h"
 #include "debugvw.h"

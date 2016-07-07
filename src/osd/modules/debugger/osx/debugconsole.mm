@@ -23,6 +23,7 @@
 #include "debugger.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
+#include "debug/devdebug.h"
 
 
 @implementation MAMEDebugConsole

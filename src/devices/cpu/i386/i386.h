@@ -7,7 +7,6 @@
 
 #include "softfloat/milieu.h"
 #include "softfloat/softfloat.h"
-#include "debug/debugcpu.h"
 #include "divtlb.h"
 
 
@@ -23,6 +22,8 @@
 	i386_device::set_smiact(*device, DEVCB_##_devcb);
 
 #define X86_NUM_CPUS        4
+
+class symbol_table;
 
 class i386_device : public cpu_device, public device_vtlb_interface
 {

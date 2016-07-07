@@ -10,6 +10,7 @@
 
 #include "debugger.h"
 #include "debug/debugcpu.h"
+#include "debug/devdebug.h"
 
 #include "modules/lib/osdobj_common.h"
 

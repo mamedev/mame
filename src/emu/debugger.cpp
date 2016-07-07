@@ -14,6 +14,7 @@
 #include "debug/debugcmd.h"
 #include "debug/debugcon.h"
 #include "debug/debugvw.h"
+#include "debug/devdebug.h"
 #include <ctype.h>
 
 /***************************************************************************

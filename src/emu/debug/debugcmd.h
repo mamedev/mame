@@ -14,9 +14,9 @@
 #define __DEBUGCMD_H__
 
 #include "emu.h"
-#include "debugcpu.h"
-#include "debugcon.h"
 
+class debugger_cpu;
+class debugger_console;
 class parsed_expression;
 class symbol_table;
 

@@ -188,6 +188,8 @@ files {
 	MAME_DIR .. "src/emu/debug/debughlp.h",
 	MAME_DIR .. "src/emu/debug/debugvw.cpp",
 	MAME_DIR .. "src/emu/debug/debugvw.h",
+	MAME_DIR .. "src/emu/debug/devdebug.cpp",
+	MAME_DIR .. "src/emu/debug/devdebug.h",
 	MAME_DIR .. "src/emu/debug/dvdisasm.cpp",
 	MAME_DIR .. "src/emu/debug/dvdisasm.h",
 	MAME_DIR .. "src/emu/debug/dvmemory.cpp",

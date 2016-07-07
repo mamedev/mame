@@ -10,6 +10,7 @@
 
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
+#include "debug/devdebug.h"
 #include "debug/dvdisasm.h"
 
 

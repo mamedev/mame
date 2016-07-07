@@ -13,6 +13,7 @@
 #include "dvdisasm.h"
 #include "debugcpu.h"
 #include "debugger.h"
+#include "devdebug.h"
 
 
 //**************************************************************************

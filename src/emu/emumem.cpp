@@ -181,7 +181,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
-#include "debug/debugcpu.h"
+#include "debug/devdebug.h"
 
 
 //**************************************************************************

@@ -13,6 +13,7 @@
 #include "dvmemory.h"
 #include "debugcpu.h"
 #include "debugger.h"
+#include "devdebug.h"
 #include <ctype.h>
 
 
