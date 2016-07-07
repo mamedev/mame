@@ -22,6 +22,8 @@ public:
 	DECLARE_WRITE16_MEMBER( reg_lo_addr_w );
 	DECLARE_WRITE16_MEMBER( reg_hi_addr_w );
 	DECLARE_WRITE16_MEMBER( cmd_trigger_w );
+	DECLARE_READ16_MEMBER( d104_move_r );
+	DECLARE_WRITE16_MEMBER( d104_move_w );
 
 protected:
 	// device-level overrides
@@ -40,6 +42,7 @@ private:
 	UINT32 m_reg[8];
 	UINT16 m_angle,m_dist,m_status;
 	int m_dx,m_dy;
+	UINT32 m_d104_move_offset;
 	//required_device<raiden2cop_device> m_raiden2cop;
 };
 

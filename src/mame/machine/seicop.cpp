@@ -43,20 +43,25 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::reg_hi_addr_w)
 WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 {
 	//printf("%04x %08x %08x\n",data,m_reg[0],m_reg[1]);
+	UINT8 offs;
+
+	offs = (offset & 3) * 4;
+	
 	switch(data)
 	{
 		default:
-			//printf("trigger write %04x\n",data);
+			printf("trigger write %04x\n",data);
 			break;
 		case 0x0000:
+			break;
+		
 		case 0xf105:
 			break;
+
 		case 0xdde5:
 		{
-			UINT8 offs;
 			int div;
 			INT16 dir_offset;
-			offs = (offset & 3) * 4;
 
 			div = m_host_space->read_word(m_reg[4] + offs);
 			dir_offset = m_host_space->read_word(m_reg[4] + offs + 8);
@@ -67,9 +72,6 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 		}
 		case 0x0205:
 		{
-			UINT8 offs;
-
-			offs = (offset & 3) * 4;
 			int ppos = m_host_space->read_dword(m_reg[0] + 4 + offs);
 			int npos = ppos + m_host_space->read_dword(m_reg[0] + 0x10 + offs);
 			int delta = (npos >> 16) - (ppos >> 16);
@@ -78,7 +80,8 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			m_host_space->write_word(m_reg[0] + 0x1c + offs, m_host_space->read_word(m_reg[0] + 0x1c + offs) + delta);
 			break;
 		}
-		
+
+		case 0x130e:
 		case 0x138e:
 		case 0xe30e:
 		case 0xe18e:
@@ -88,12 +91,12 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			int dx = (m_host_space->read_dword(m_reg[target_reg]+8) >> 16) - (m_host_space->read_dword(m_reg[0]+8) >> 16);
 			
 			//m_status = 7;
-			if(!dx) {
+			if(!dy) {
 				m_status = 0x8000;
 				m_angle = 0;
 			} else {
 				m_status = 0;
-				m_angle =  atan(double(dy)/double(dx)) * 128.0 / M_PI;
+				m_angle =  atan(double(dx)/double(dy)) * 128.0 / M_PI;
 
 				if(dx<0)
 				{
@@ -105,7 +108,7 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			m_dx = dx;
 
 			if(data & 0x80)
-				m_host_space->write_word(m_reg[0]+(0x34^2), m_angle & 0xff);
+				m_host_space->write_byte(m_reg[0]+(0x37), m_angle & 0xff);
 
 			break;
 		}
@@ -118,24 +121,58 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			dx >>= 16;
 			dy >>= 16;
 			m_dist = sqrt((double)(dx*dx+dy*dy));
-
+	
+			// TODO: is this right?
 			m_host_space->write_word(m_reg[0]+(0x38), m_dist);
 
 			break;
 		}
-			
+		
+		// TODO: wrong
+		case 0x42c2:
+		{
+			int div = m_host_space->read_word(m_reg[0] + (0x34));
+
+			if (!div)
+			{
+				m_status |= 0x8000;
+				m_host_space->write_dword(m_reg[0] + (0x38), 0);
+				break;
+			}
+
+			m_host_space->write_dword(m_reg[0] + (0x38), (m_dist << (5 - 1)) / div);
+			break;
+		}
+		
+		/*
+	        00000-0ffff:
+	        amp = x/256
+	        ang = x & 255
+	        s = sin(ang*2*pi/256)
+	        val = trunc(s*amp)
+	        if(s<0)
+	        val--
+	        if(s == 192)
+	        val = -2*amp
+	    */
 		case 0x8100:
 		{
+			UINT16 sin_offs; //= m_host_space->read_dword(m_reg[0]+(0x34));
+			sin_offs = m_host_space->read_byte(m_reg[0]+(0x35));
+			sin_offs |= m_host_space->read_byte(m_reg[0]+(0x37)) << 8;
 			int raw_angle = (m_host_space->read_word(m_reg[0]+(0x34^2)) & 0xff);
 			double angle = raw_angle * M_PI / 128;
 			double amp = (65536 >> 5)*(m_host_space->read_word(m_reg[0]+(0x36^2)) & 0xff);
 			int res;
+			
 
-		/* TODO: up direction, why? */
+			/* TODO: up direction, why? */
 			if(raw_angle == 0xc0)
 				amp*=2;
 
 			res = int(amp*sin(angle)) << 1;//m_raiden2cop->cop_scale;
+
+			printf("%04x %02x %08x\n",sin_offs,raw_angle,res);
 
 			m_host_space->write_dword(m_reg[0] + 0x10, res);
 
@@ -160,7 +197,11 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			break;
 		}
 
-	
+		case 0xd104:
+		{
+			//m_host_space->write_dword(m_reg[0] + 4 + offs, 0x04000000);
+			break;
+		}
 	}
 	
 }
@@ -180,9 +221,23 @@ READ16_MEMBER(seibu_cop_bootleg_device::angle_r)
 	return m_angle;
 }
 
+READ16_MEMBER(seibu_cop_bootleg_device::d104_move_r)
+{
+	return m_d104_move_offset >> offset*16;
+}
+
+WRITE16_MEMBER(seibu_cop_bootleg_device::d104_move_w)
+{
+	if(offset == 1)
+		m_d104_move_offset = (m_d104_move_offset & 0xffff0000) | (data & 0xffff); 
+	else
+		m_d104_move_offset = (m_d104_move_offset & 0xffff) | (data << 16); 
+}
+
 // anything that is read thru ROM range 0xc**** is replacement code, therefore on this HW they are latches.
 static ADDRESS_MAP_START( seibucopbl_map, AS_0, 16, seibu_cop_bootleg_device )
 	AM_RANGE(0x01e, 0x01f) AM_RAM // angle step, PC=0xc0186
+	AM_RANGE(0x046, 0x049) AM_READWRITE(d104_move_r,d104_move_w)
 	AM_RANGE(0x070, 0x07f) AM_RAM // DMA registers, PC=0xc0034
 	AM_RANGE(0x0a0, 0x0af) AM_READWRITE(reg_hi_addr_r,reg_hi_addr_w)
 	AM_RANGE(0x0c0, 0x0cf) AM_READWRITE(reg_lo_addr_r,reg_lo_addr_w)

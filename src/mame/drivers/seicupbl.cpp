@@ -797,10 +797,10 @@ ROM_START( cupsocsb3 )
 	ROM_COPY( "adpcm", 0xe0000, 0x1e0000, 0x20000 )
 
 	/* these are maths tables, for whatever COP replacement the bootlegs use */
-	ROM_REGION( 0x500000, "unknown0", 0 )
+	ROM_REGION( 0x020000, "unknown0", 0 )
 	ROM_LOAD16_BYTE( "sc_13.bin", 0x00000, 0x010000, CRC(229bddd8) SHA1(0924bf29db9c5a970546f154e7752697fdce6a58) )
 	ROM_LOAD16_BYTE( "sc_12.bin", 0x00001, 0x010000, CRC(dabfa826) SHA1(0db587c846755491b169ef7751ba8e7cdc2607e6) )
-	ROM_REGION( 0x500000, "unknown1", 0 )
+	ROM_REGION( 0x100000, "unknown1", 0 )
 	ROM_LOAD16_BYTE( "sc_15.bin", 0x00000, 0x080000, CRC(8fd87e65) SHA1(acc9fd0289fa9ab60bec16d3e642039380e5180a) )
 	ROM_LOAD16_BYTE( "sc_14.bin", 0x00001, 0x080000, CRC(566086c2) SHA1(b7d09ce978f99ecc0d1975b31330ed49317701d5) )
 ROM_END

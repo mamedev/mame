@@ -38,8 +38,8 @@
     - (btanb) Throw is made by quickly double jumping (!)
     Heated Barrel
     - gives random value to hi-score if you continue (only the first time, not a bug?);
-    - (fixed?) throws random address exceptions at level 3 and above, a RAM address arrives corrupt in the snippet at 0x136a;
-    - (fixed?) some corrupt sprites, probably a non-fatal version of the one above;
+    - (fixed) throws random address exceptions at level 3 and above, a RAM address arrives corrupt in the snippet at 0x136a;
+    - (fixed) some corrupt sprites, probably a non-fatal version of the one above;
     - stage 2 boss attacks only in vertical (regressed with the 130e / 3b30 / 42c2 command merge);
     - (fixed) level 3+ boss movements looks wrong;
     - stage 3 "homing" missiles doesn't seem to like our 6200 hookup here, except it's NOT 6200!?
@@ -69,7 +69,10 @@
 013F60: 3D7C 3BB0 0100             move.w  #$3bb0, ($100,A6)    // dist macro
 013F66: 1140 003D                  move.b  D0, ($3d,A0)         // move angle value to [0x3d]
 013F6A: 4E75                       rts
-
+	Zero Team
+	- Bird Boss jumps to wrong direction
+	  the sequence called is: 
+	  write to reg 4 then execute 0xfc84 and 0xf790, finally reads the distance.
 	
     Tech notes (to move into own file with doxy mainpage):
     -----------
@@ -311,16 +314,17 @@ WRITE16_MEMBER(raiden2cop_device::cop_pgm_data_w)
 	cop_func_trigger[idx] = cop_latch_trigger;
 	cop_func_value[idx]   = cop_latch_value;
 	cop_func_mask[idx]    = cop_latch_mask;
-
+	bool upper_regs = ((cop_latch_trigger >> 10) & 1) == 1; // f1
+	
 	if(data) {
 		int off = data & 31;
-		int reg = (data >> 5) & 3;
+		int reg = ((data >> 5) & 3) + (upper_regs == true ? 4 : 0);
 		int op = (data >> 7) & 31;
 
 		logerror("COPDIS: %04x s=%02x f1=%x l=%x f2=%02x %x %04x %02x %03x %02x.%x.%02x ", cop_latch_trigger,  (cop_latch_trigger >> 11) << 3, (cop_latch_trigger >> 10) & 1, ((cop_latch_trigger >> 7) & 7)+1, cop_latch_trigger & 0x7f, cop_latch_value, cop_latch_mask, cop_latch_addr, data, op, reg, off);
 
 		off *= 2;
-
+		
 		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 00 188 03.0.08 read32 10(r0)
 		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 01 282 05.0.02 add32 4(r0)
 		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 02 082 01.0.02 write32 4(r0)
@@ -1140,7 +1144,7 @@ WRITE16_MEMBER( raiden2cop_device::cop_cmd_w)
 	case 0x7e05:
 		execute_7e05(offset, data);
 		break;
-
+		
 	case 0xa100:
 	case 0xa180:
 		execute_a100(offset, data); // collisions
