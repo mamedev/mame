@@ -1580,27 +1580,50 @@ void z80scc_channel::do_sccreg_wr3(UINT8 data)
 	LOG(("- Receiver Enable %u\n", (data & WR3_RX_ENABLE) ? 1 : 0));
 	LOG(("- Auto Enables %u\n", (data & WR3_AUTO_ENABLES) ? 1 : 0));
 	LOG(("- Receiver Bits/Character %u\n", get_rx_word_length()));
+	update_serial();
+	receive_register_reset();
 }
 
 void z80scc_channel::do_sccreg_wr4(UINT8 data)
 {
 	LOG(("%s(%02x) Setting up asynchronous frame format and clock\n", FUNCNAME, data));
-	m_wr4 = data;
-	LOG(("- Parity Enable %u\n", (data & WR4_PARITY_ENABLE) ? 1 : 0));
-	LOG(("- Parity %s\n", (data & WR4_PARITY_EVEN) ? "Even" : "Odd"));
-	LOG(("- Stop Bits %s\n", stop_bits_tostring(get_stop_bits())));
-	LOG(("- Clock Mode %uX\n", get_clock_mode()));
+	if (data == m_wr4)
+	{
+		logerror("- supressing reinit of Tx as write to wr4 is identical to previous value\n");
+	} 
+	else
+	{
+		m_wr4 = data;
+		LOG(("- Parity Enable %u\n", (data & WR4_PARITY_ENABLE) ? 1 : 0));
+		LOG(("- Parity %s\n", (data & WR4_PARITY_EVEN) ? "Even" : "Odd"));
+		LOG(("- Stop Bits %s\n", stop_bits_tostring(get_stop_bits())));
+		LOG(("- Clock Mode %uX\n", get_clock_mode()));
+		update_serial();
+		safe_transmit_register_reset();
+		receive_register_reset();
+	}
 }
 
 void z80scc_channel::do_sccreg_wr5(UINT8 data)
 {
 	LOG(("%s(%02x) Setting up the transmitter\n", FUNCNAME, data));
-	m_wr5 = data;
-	LOG(("- Transmitter Enable %u\n", (data & WR5_TX_ENABLE) ? 1 : 0));
-	LOG(("- Transmitter Bits/Character %u\n", get_tx_word_length()));
-	LOG(("- Send Break %u\n", (data & WR5_SEND_BREAK) ? 1 : 0));
-	LOG(("- Request to Send %u\n", (data & WR5_RTS) ? 1 : 0));
-	LOG(("- Data Terminal Ready %u\n", (data & WR5_DTR) ? 1 : 0));
+	if (data == m_wr5)
+	{
+		logerror("- supressing reinit of Tx as write to wr5 is identical to previous value\n");
+	} 
+	else
+	{
+		m_wr5 = data;
+		LOG(("- Transmitter Enable %u\n", (data & WR5_TX_ENABLE) ? 1 : 0));
+		LOG(("- Transmitter Bits/Character %u\n", get_tx_word_length()));
+		LOG(("- Send Break %u\n", (data & WR5_SEND_BREAK) ? 1 : 0));
+		LOG(("- Request to Send %u\n", (data & WR5_RTS) ? 1 : 0));
+		LOG(("- Data Terminal Ready %u\n", (data & WR5_DTR) ? 1 : 0));
+		update_serial();
+		safe_transmit_register_reset();
+		update_rts();
+		m_rr0 |= RR0_TX_BUFFER_EMPTY;
+	}
 }
 
 void z80scc_channel::do_sccreg_wr6(UINT8 data)
@@ -1929,37 +1952,22 @@ void z80scc_channel::control_write(UINT8 data)
 	/* TODO. Sort out 80X30 & other SCC variants limitations in register access */
 	switch (reg)
 	{
-	case REG_WR0_COMMAND_REGPT:   do_sccreg_wr0(data); ;break;
-	case REG_WR1_INT_DMA_ENABLE:  do_sccreg_wr1(data); m_uart->check_interrupts(); break;
-	case REG_WR2_INT_VECTOR:      do_sccreg_wr2(data); break;
-	case REG_WR3_RX_CONTROL:
-		do_sccreg_wr3(data);
-		update_serial();
-		receive_register_reset();
-		break;
-	case REG_WR4_RX_TX_MODES:
-		do_sccreg_wr4(data);
-		update_serial();
-		transmit_register_reset();
-		receive_register_reset();
-		break;
-	case REG_WR5_TX_CONTROL:
-		do_sccreg_wr5(data);
-		update_serial();
-		transmit_register_reset();
-		update_rts();
-		m_rr0 |= RR0_TX_BUFFER_EMPTY;
-		break;
-	case REG_WR6_SYNC_OR_SDLC_A:  do_sccreg_wr6(data); break;
-	case REG_WR7_SYNC_OR_SDLC_F:  do_sccreg_wr7(data); break;
-	case REG_WR8_TRANSMIT_DATA:   do_sccreg_wr8(data); break;
-	case REG_WR9_MASTER_INT_CTRL: do_sccreg_wr9(data); break;
-	case REG_WR10_MSC_RX_TX_CTRL: do_sccreg_wr10(data); break;
-	case REG_WR11_CLOCK_MODES:    do_sccreg_wr11(data); break;
-	case REG_WR12_LO_BAUD_GEN:    do_sccreg_wr12(data); break;
-	case REG_WR13_HI_BAUD_GEN:    do_sccreg_wr13(data); break;
-	case REG_WR14_MISC_CTRL:      do_sccreg_wr14(data); break;
-	case REG_WR15_EXT_ST_INT_CTRL:do_sccreg_wr15(data); break;
+	case REG_WR0_COMMAND_REGPT:		do_sccreg_wr0(data); ;break;
+	case REG_WR1_INT_DMA_ENABLE:	do_sccreg_wr1(data); m_uart->check_interrupts(); break;
+	case REG_WR2_INT_VECTOR:		do_sccreg_wr2(data); break;
+	case REG_WR3_RX_CONTROL:		do_sccreg_wr3(data); break;
+	case REG_WR4_RX_TX_MODES:		do_sccreg_wr4(data); break;
+	case REG_WR5_TX_CONTROL:		do_sccreg_wr5(data); break;
+	case REG_WR6_SYNC_OR_SDLC_A:	do_sccreg_wr6(data); break;
+	case REG_WR7_SYNC_OR_SDLC_F:	do_sccreg_wr7(data); break;
+	case REG_WR8_TRANSMIT_DATA:		do_sccreg_wr8(data); break;
+	case REG_WR9_MASTER_INT_CTRL:	do_sccreg_wr9(data); break;
+	case REG_WR10_MSC_RX_TX_CTRL:	do_sccreg_wr10(data); break;
+	case REG_WR11_CLOCK_MODES:		do_sccreg_wr11(data); break;
+	case REG_WR12_LO_BAUD_GEN:		do_sccreg_wr12(data); break;
+	case REG_WR13_HI_BAUD_GEN:		do_sccreg_wr13(data); break;
+	case REG_WR14_MISC_CTRL:		do_sccreg_wr14(data); break;
+	case REG_WR15_EXT_ST_INT_CTRL:	do_sccreg_wr15(data); break;
 	default:
 		logerror("\"%s\": %c : Unsupported WRx register:%02x\n", m_owner->tag(), 'A' + m_index, reg);
 	}
@@ -2340,6 +2348,27 @@ WRITE_LINE_MEMBER( z80scc_channel::txc_w )
 				m_tx_clock = 0;
 		}
 	}
+}
+
+//--------------------------------------------------------------------------------------------------------
+//  safe_transmit_register_reset -  wait for the transmitter shift register to be 
+//	 emptied before apply the new value of wr5 and/or wr4. In the case of a Tx FIFO 
+//   the change will occur before next character is started. From the specification:
+//
+//   "The character length may be changed on the fly, but the desired length must be selected before the
+//   character is loaded into the Transmit Shift register from the transmit data FIFO. The easiest way to
+//   ensure this is to write to WR5 to change the character length before writing the data to the transmit
+//   buffer." 
+//
+//  Right now we only detect the problem and log an error
+//---------------------------------------------------------------------------------------------------------
+void z80scc_channel::safe_transmit_register_reset()
+{
+	if (!is_transmit_register_empty())
+	{
+		logerror("Attempt to reset transmit shift register while busy detected, please report\n");
+	}
+	transmit_register_reset();
 }
 
 //-------------------------------------------------
