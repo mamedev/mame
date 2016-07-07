@@ -286,7 +286,6 @@ hp_taco_device::hp_taco_device(const machine_config &mconfig, device_type type, 
 			m_irq_handler(*this),
 			m_flg_handler(*this),
 			m_sts_handler(*this),
-			m_tape_pos(TAPE_INIT_POS),
 			m_image_dirty(false)
 {
 		clear_state();
@@ -298,7 +297,6 @@ hp_taco_device::hp_taco_device(const machine_config &mconfig, const char *tag, d
 			m_irq_handler(*this),
 			m_flg_handler(*this),
 			m_sts_handler(*this),
-			m_tape_pos(TAPE_INIT_POS),
 			m_image_dirty(false)
 {
 		clear_state();
@@ -444,6 +442,10 @@ void hp_taco_device::device_reset()
 		m_irq_handler(false);
 		m_flg_handler(true);
 		set_error(false);
+
+		m_tape_timer->reset();
+		m_hole_timer->reset();
+		m_timeout_timer->reset();
 }
 
 void hp_taco_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -544,7 +546,7 @@ void hp_taco_device::clear_state(void)
 		m_clear_checksum_reg = false;
 		m_timing_reg = 0;
 		m_cmd_state = CMD_IDLE;
-		// m_tape_pos is not reset, tape stays where it is
+		m_tape_pos = TAPE_INIT_POS;
 		m_start_time = attotime::never;
 		m_tape_fwd = false;
 		m_tape_fast = false;
@@ -1044,9 +1046,9 @@ bool hp_taco_device::next_n_gap(tape_pos_t& pos , unsigned n_gaps , tape_pos_t m
 
 void hp_taco_device::clear_tape(void)
 {
-		for (unsigned track_n = 0; track_n < 2; track_n++) {
-				m_tracks[ track_n ].clear();
-		}
+	for (tape_track_t& track : m_tracks) {
+		track.clear();
+	}
 }
 
 void hp_taco_device::dump_sequence(tape_track_t::const_iterator it_start , unsigned n_words)
@@ -1077,8 +1079,7 @@ void hp_taco_device::save_tape(void)
 	tmp32 = FILE_MAGIC;
 	fwrite(&tmp32 , sizeof(tmp32));
 
-	for (unsigned track_n = 0; track_n < 2; track_n++) {
-		const tape_track_t& track = m_tracks[ track_n ];
+	for (const tape_track_t& track : m_tracks) {
 		tape_pos_t next_pos = (tape_pos_t)-1;
 		unsigned n_words = 0;
 		tape_track_t::const_iterator it_start;
@@ -1143,8 +1144,8 @@ bool hp_taco_device::load_tape(void)
 				return false;
 		}
 
-		for (unsigned track_n = 0; track_n < 2; track_n++) {
-				if (!load_track(m_tracks[ track_n ])) {
+		for (tape_track_t& track : m_tracks) {
+				if (!load_track(track)) {
 						LOG(("load_tape failed"));
 						clear_tape();
 						return false;
@@ -1680,6 +1681,9 @@ void hp_taco_device::start_cmd_exec(UINT16 new_cmd_reg)
 bool hp_taco_device::call_load()
 {
 		LOG(("call_load %d\n" , has_been_created()));
+
+		device_reset();
+
 		if (has_been_created()) {
 				clear_tape();
 				save_tape();
@@ -1704,6 +1708,9 @@ bool hp_taco_device::call_create(int format_type, util::option_resolution *forma
 void hp_taco_device::call_unload()
 {
 		LOG(("call_unload dirty=%d\n" , m_image_dirty));
+
+		device_reset();
+
 		if (m_image_dirty) {
 				save_tape();
 				m_image_dirty = false;
