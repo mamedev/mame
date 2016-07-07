@@ -805,6 +805,8 @@ static INPUT_PORTS_START( tm2k )
 	PORT_INCLUDE( tm )
 
 	PORT_MODIFY("COIN")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )    // "M. Coin 1 Input"
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )    // "M. Coin 2 Input"
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN3 )    // "E. Coin 1" (ECA mech) The rest of the tm games
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN4 )    // "E. Coin 2" (ECA mech) Default to m. coin
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN5 )    // "E. Coin 3" (ECA mech) So these are coin3-coin6
