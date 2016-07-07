@@ -64,7 +64,7 @@ Arbiter is also involved in refresh and shared memory contention (affects Z80/80
 => INPUTS on E13 (PC-100 B):
 
 SH5 RF SH REQ H   -> Pin 19 (A7) shared memory request / refresh ?
-1K -> +5 V   -> Pin 18 (A6) < UNUSED >
+     1K -> +5 V   -> Pin 18 (A6) < UNUSED >
 SH 2 BDL ACK (L)  -> Pin 17 (A5) BUNDLE OPTION: IRQ acknowledged
 SH 2 NONSHRCYC H  -> Pin 5 (A4) unshared memory cycle is in progress
 SH 2 PRECHARGE H  -> Pin 4 (A3)
@@ -1146,17 +1146,17 @@ WRITE8_MEMBER(rainbow_state::share_z80_w)
 #define RTC_RESET_MACRO  m_rtc->chip_reset(); \
 							UINT8 *rom = memregion("maincpu")->base();
 
-#define RTC_ENABLE_MACRO						\
-	if (m_inp11->read() == 0x01)				\
-	{	if (offset & 1)							\
-			m_rtc->read_1(space, 0);			\
-		else									\
-			m_rtc->read_0(space, 0);     }		\
+#define RTC_ENABLE_MACRO				\
+	if (m_inp11->read() == 0x01)			\
+	{	if (offset & 1)				\
+			m_rtc->read_1(space, 0);	\
+		else					\
+			m_rtc->read_0(space, 0);  }	\
 	UINT8 *rom = memregion("maincpu")->base();
 
 #define RTC_READ_MACRO \
-	if (m_rtc->chip_enable() && (m_inp11->read() == 0x01))  \
-		return (m_rtc->read_data(space, 0) & 0x01);         \
+	if (m_rtc->chip_enable() && (m_inp11->read() == 0x01))	\
+		return (m_rtc->read_data(space, 0) & 0x01);	\
 	UINT8 *rom = memregion("maincpu")->base();
 
 // *********** RTC RESET **************
@@ -2343,15 +2343,15 @@ WRITE_LINE_MEMBER(rainbow_state::irq_hi_w)
 /* F4 Character Displayer */
 static const gfx_layout rainbow_charlayout =
 {
-	8, 10,                  /* 8 x 16 characters */
-	256,                    /* 256 characters */
-	1,                  /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes */
-							/* x offsets */
+	8, 10,          /* 8 x 16 characters */
+	256,            /* 256 characters */
+	1,              /* 1 bits per pixel */
+	{ 0 },          /* no bitplanes */
+			/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 15 * 8, 0 * 8, 1 * 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8, 8 * 8 },
-	8 * 16                    /* every char takes 16 bytes */
+	8 * 16		/* every char takes 16 bytes */
 };
 
 static GFXDECODE_START(rainbow)
