@@ -172,8 +172,6 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 
 			res = int(amp*sin(angle)) << 1;//m_raiden2cop->cop_scale;
 
-			printf("%04x %02x %08x\n",sin_offs,raw_angle,res);
-
 			m_host_space->write_dword(m_reg[0] + 0x10, res);
 
 			break;
