@@ -1268,13 +1268,13 @@ static INPUT_PORTS_START( kakumei )
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW2:2" )   // Unused according to the manual
+	PORT_DIPUNUSED_DIPLOC( 0x0002, 0x0002, "SW2:2" )   // Unused according to the manual
 	PORT_SERVICE_DIPLOC( 0x0004, IP_ACTIVE_LOW, "SW2:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW2:4" )   // Unused according to the manual
-	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW2:5" )   // Unused according to the manual
-	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW2:6" )   // Unused according to the manual
-	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW2:7" )   // Unused according to the manual
-	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW2:8" )   // Unused according to the manual
+	PORT_DIPUNUSED_DIPLOC( 0x0008, 0x0008, "SW2:4" )   // Unused according to the manual
+	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW2:5" )   // Unused according to the manual
+	PORT_DIPUNUSED_DIPLOC( 0x0020, 0x0020, "SW2:6" )   // Unused according to the manual
+	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW2:7" )   // Unused according to the manual
+	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW2:8" )   // Unused according to the manual
 	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(      0x0100, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 3C_1C ) )
@@ -1289,9 +1289,9 @@ static INPUT_PORTS_START( kakumei )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW1:6" )   // Unused according to the manual
-	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW1:7" )   // Unused according to the manual
-	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "SW1:8" )   // Unused according to the manual
+	PORT_DIPUNUSED_DIPLOC( 0x2000, 0x2000, "SW1:6" )   // Unused according to the manual
+	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW1:7" )   // Unused according to the manual
+	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW1:8" )   // Unused according to the manual
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kakumei2 )
