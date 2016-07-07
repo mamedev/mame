@@ -45,8 +45,6 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	, m_bpindex(1)
 	, m_wpindex(1)
 	, m_rpindex(1)
-	, m_wpdata(0)
-	, m_wpaddr(0)
 	, m_last_periodic_update_time(0)
 	, m_comments_loaded(false)
 {
@@ -59,10 +57,6 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 
 	// configure our base memory accessors
 	configure_memory(*m_symtable);
-
-	/* add "wpaddr", "wpdata", "cycles", "cpunum", "logunmap" to the global symbol table */
-	m_symtable->add("wpaddr", symbol_table::READ_ONLY, &m_wpaddr);
-	m_symtable->add("wpdata", symbol_table::READ_ONLY, &m_wpdata);
 
 	using namespace std::placeholders;
 	m_symtable->add("cpunum", nullptr, std::bind(&debugger_cpu::get_cpunum, this, _1, _2));
@@ -1665,6 +1659,8 @@ device_debug::device_debug(device_t &device)
 	, m_pc_history_index(0)
 	, m_bplist(nullptr)
 	, m_rplist(nullptr)
+	, m_wpdata(0)
+	, m_wpaddr(0)
 	, m_trace(nullptr)
 	, m_hotspot_threshhold(0)
 	, m_track_pc_set()
@@ -1703,6 +1699,9 @@ device_debug::device_debug(device_t &device)
 				m_symtable.add("logunmapd", (void *)&m_memory->space(AS_DATA), get_logunmap, set_logunmap);
 			if (m_memory->has_space(AS_IO))
 				m_symtable.add("logunmapi", (void *)&m_memory->space(AS_IO), get_logunmap, set_logunmap);
+
+			m_symtable.add("wpaddr", symbol_table::READ_ONLY, &m_wpaddr);
+			m_symtable.add("wpdata", symbol_table::READ_ONLY, &m_wpdata);
 		}
 
 		// add all registers into it
@@ -2883,16 +2882,13 @@ void device_debug::watchpoint_update_flags(address_space &space)
 
 void device_debug::watchpoint_check(address_space& space, int type, offs_t address, UINT64 value_to_write, UINT64 mem_mask)
 {
-	space.machine().debugger().cpu().watchpoint_check(space, type, address, value_to_write, mem_mask, m_wplist);
-}
+	debugger_cpu &debugcpu = m_device.machine().debugger().cpu();
 
-void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t address, UINT64 value_to_write, UINT64 mem_mask, device_debug::watchpoint** wplist)
-{
 	// if we're within debugger code, don't stop
-	if (m_within_instruction_hook || m_debugger_access)
+	if (debugcpu.within_instruction_hook() || debugcpu.accessing_memory())
 		return;
 
-	m_within_instruction_hook = true;
+	debugcpu.set_within_instruction(true);
 
 	// adjust address, size & value_to_write based on mem_mask.
 	offs_t size = 0;
@@ -2938,18 +2934,18 @@ void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t addre
 		m_wpdata = value_to_write;
 
 	// see if we match
-	for (device_debug::watchpoint *wp = wplist[space.spacenum()]; wp != nullptr; wp = wp->next())
+	for (watchpoint *wp = m_wplist[space.spacenum()]; wp != nullptr; wp = wp->next())
 		if (wp->hit(type, address, size))
 		{
 			// halt in the debugger by default
-			m_execution_state = EXECUTION_STATE_STOPPED;
+			debugcpu.set_execution_state(EXECUTION_STATE_STOPPED);
 
 			// if we hit, evaluate the action
 			if (strlen(wp->action()) > 0)
-				m_machine.debugger().console().execute_command(wp->action(), false);
+				m_device.machine().debugger().console().execute_command(wp->action(), false);
 
 			// print a notification, unless the action made us go again
-			if (m_execution_state == EXECUTION_STATE_STOPPED)
+			if (debugcpu.execution_state() == EXECUTION_STATE_STOPPED)
 			{
 				static const char *const sizes[] =
 				{
@@ -2968,13 +2964,13 @@ void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t addre
 				}
 				else
 					buffer = string_format("Stopped at watchpoint %X reading %s from %08X (PC=%X)", wp->index(), sizes[size], space.byte_to_address(address), pc);
-				m_machine.debugger().console().printf("%s\n", buffer.c_str());
-				space.device().debug()->compute_debug_flags();
+				m_device.machine().debugger().console().printf("%s\n", buffer.c_str());
+				compute_debug_flags();
 			}
 			break;
 		}
 
-	m_within_instruction_hook = false;
+	debugcpu.set_within_instruction(false);
 }
 
 

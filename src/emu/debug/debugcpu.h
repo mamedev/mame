@@ -331,6 +331,8 @@ private:
 	breakpoint *            m_bplist;                   // list of breakpoints
 	watchpoint *            m_wplist[ADDRESS_SPACES];   // watchpoint lists for each address space
 	registerpoint *         m_rplist;                   // list of registerpoints
+	UINT64                  m_wpdata;
+	UINT64                  m_wpaddr;
 
 	// tracing
 	class tracer
@@ -545,6 +547,7 @@ public:
 	// getters
 	bool within_instruction_hook() const { return m_within_instruction_hook; }
 	bool memory_modified() const { return m_memory_modified; }
+	bool accessing_memory() const { return m_debugger_access; }
 	int execution_state() const { return m_execution_state; }
 	device_t *live_cpu() { return m_livecpu; }
 	UINT32 get_breakpoint_index() { return m_bpindex++; }
@@ -614,8 +617,6 @@ private:
 	UINT32      m_wpindex;
 	UINT32      m_rpindex;
 
-	UINT64      m_wpdata;
-	UINT64      m_wpaddr;
 	std::unique_ptr<UINT64[]> m_tempvar;
 
 	osd_ticks_t m_last_periodic_update_time;
