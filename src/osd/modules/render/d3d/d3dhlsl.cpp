@@ -88,12 +88,12 @@ public:
 			m_vid_surface->Release();
 	}
 
-	void record()
+	void record(const char *name)
 	{
 		if (!m_initialized)
 			return;
 
-		m_avi_writer->record();
+		m_avi_writer->record(name);
 	}
 
 	void save_frame()
@@ -231,7 +231,7 @@ void shaders::record_movie()
 	}
 
 	recorder = std::make_unique<movie_recorder>(*machine, d3d, snap_width, snap_height);
-	recorder->record();
+	recorder->record(downcast<windows_options &>(machine->options()).d3d_hlsl_write());
 	recording_movie = true;
 }
 
