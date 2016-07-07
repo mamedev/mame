@@ -485,10 +485,10 @@ void upd3301_device::draw_scanline()
 
 UINT32 upd3301_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	m_bitmap = &bitmap;
 	if (m_status & STATUS_VE)
 	{
 		m_y = 0;
-		m_bitmap = &bitmap;
 		m_data_fifo_pos = 0;
 		m_attr_fifo_pos = 0;
 
