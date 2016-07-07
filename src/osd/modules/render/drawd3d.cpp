@@ -142,12 +142,12 @@ void renderer_d3d9::toggle_fsfx()
 
 void renderer_d3d9::record()
 {
-	get_shaders()->window_record();
+	get_shaders()->record_movie();
 }
 
 void renderer_d3d9::save()
 {
-	get_shaders()->window_save();
+	get_shaders()->save_snapshot();
 }
 
 
@@ -671,8 +671,6 @@ void renderer_d3d9::begin_frame()
 	if (FAILED(result))
 		osd_printf_verbose("Direct3D: Error %08lX during device clear call\n", result);
 
-	m_shaders->begin_frame();
-
 	win->m_primlist->acquire_lock();
 
 	// first update any textures
@@ -739,8 +737,6 @@ void renderer_d3d9::end_frame()
 
 	// flush any pending polygons
 	primitive_flush_pending();
-
-	m_shaders->end_frame();
 
 	// finish the scene
 	HRESULT result = m_device->EndScene();

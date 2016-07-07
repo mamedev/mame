@@ -19,16 +19,12 @@
 // MAMEOS headers
 #include "winmain.h"
 #include "window.h"
+#include "modules/render/aviwrite.h"
 #include "modules/render/drawd3d.h"
 #include "d3dcomm.h"
 #include "strconv.h"
 #include "d3dhlsl.h"
 #include "../frontend/mame/ui/slider.h"
-
-
-//============================================================
-//  GLOBALS
-//============================================================
 
 
 //============================================================
@@ -39,16 +35,133 @@ static void get_vector(const char *data, int count, float *out, bool report_erro
 
 
 //============================================================
+//  HLSL post-render AVI recorder
+//============================================================
+
+class movie_recorder
+{
+public:
+	movie_recorder(running_machine& machine, renderer_d3d9 *d3d, int width, int height)
+		: m_initialized(false), m_d3d(d3d), m_width(width), m_height(height)
+		, m_sys_texture(nullptr), m_sys_surface(nullptr)
+		, m_vid_texture(nullptr), m_vid_surface(nullptr)
+	{
+		HRESULT result;
+
+		m_avi_writer = std::make_unique<avi_write>(machine, width, height);				
+
+		m_frame.allocate(width, height);
+		if (!m_frame.valid())
+			return;
+	
+		result = d3d->get_device()->CreateTexture(width, height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &m_sys_texture, nullptr);
+		if (FAILED(result))
+		{
+			osd_printf_verbose("Direct3D: Unable to init system-memory target for HLSL AVI dumping (%08lX)\n", result);
+			return;
+		}
+		m_sys_texture->GetSurfaceLevel(0, &m_sys_surface);
+
+		result = d3d->get_device()->CreateTexture(width, height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_vid_texture, nullptr);
+		if (FAILED(result))
+		{
+			osd_printf_verbose("Direct3D: Unable to init video-memory target for HLSL AVI dumping (%08lX)\n", result);
+			return;
+		}
+		m_vid_texture->GetSurfaceLevel(0, &m_vid_surface);
+		
+		m_initialized = true;
+	}
+
+	~movie_recorder()
+	{
+		if (m_sys_texture != nullptr)
+			m_sys_texture->Release();
+
+		if (m_sys_surface != nullptr)
+			m_sys_surface->Release();
+
+		if (m_vid_texture != nullptr)
+			m_vid_texture->Release();
+
+		if (m_vid_surface != nullptr)
+			m_vid_surface->Release();
+	}
+
+	void record()
+	{
+		if (!m_initialized)
+			return;
+
+		m_avi_writer->record();
+	}
+
+	void save_frame()
+	{
+		if (!m_initialized)
+			return;
+
+		// copy the frame from video memory, where it is not accessible, to system memory
+		HRESULT result = m_d3d->get_device()->GetRenderTargetData(m_vid_surface, m_sys_surface);
+		if (FAILED(result))
+			return;
+
+		D3DLOCKED_RECT rect;
+		result = m_sys_surface->LockRect(&rect, nullptr, D3DLOCK_DISCARD);
+		if (FAILED(result))
+			return;
+
+		for (int y = 0; y < m_height; y++)
+		{
+			DWORD *src = (DWORD *)((BYTE *)rect.pBits + y * rect.Pitch);
+			UINT32 *dst = &m_frame.pix32(y);
+
+			for (int x = 0; x < m_width; x++)
+			{
+				*dst++ = *src++;
+			}
+		}
+
+		result = m_sys_surface->UnlockRect();
+		if (FAILED(result))
+			osd_printf_verbose("Direct3D: Error %08lX during texture UnlockRect call\n", result);
+
+		m_avi_writer->video_frame(m_frame);
+	}
+
+	IDirect3DSurface9 * target_surface() { return m_vid_surface; }
+
+private:
+	bool                m_initialized;
+
+	renderer_d3d9     * m_d3d;
+
+	std::unique_ptr<avi_write> m_avi_writer;
+
+	bitmap_rgb32        m_frame;
+	int                 m_width;
+	int                 m_height;
+	IDirect3DTexture9 * m_sys_texture; // texture in system memory
+	IDirect3DSurface9 * m_sys_surface; // surface in system memory
+	IDirect3DTexture9 * m_vid_texture; // texture in video memory
+	IDirect3DSurface9 * m_vid_surface; // surface in video memory
+};
+
+
+//============================================================
 //  shader manager constructor
 //============================================================
 
 shaders::shaders() :
-	d3dintf(nullptr), machine(nullptr), d3d(nullptr), post_fx_enable(false), oversampling_enable(false), num_screens(0), curr_screen(0),
-	shadow_texture(nullptr), options(nullptr), avi_output_file(nullptr), avi_frame(0), avi_copy_surface(nullptr), avi_copy_texture(nullptr), avi_final_target(nullptr), avi_final_texture(nullptr),
-	black_surface(nullptr), black_texture(nullptr), render_snap(false), snap_rendered(false), snap_copy_target(nullptr), snap_copy_texture(nullptr), snap_target(nullptr), snap_texture(nullptr),
-	snap_width(0), snap_height(0), initialized(false), backbuffer(nullptr), curr_effect(nullptr), default_effect(nullptr), prescale_effect(nullptr), post_effect(nullptr),
-	distortion_effect(nullptr), focus_effect(nullptr), phosphor_effect(nullptr), deconverge_effect(nullptr), color_effect(nullptr), ntsc_effect(nullptr), bloom_effect(nullptr),
-	downsample_effect(nullptr), vector_effect(nullptr), curr_texture(nullptr), curr_render_target(nullptr), curr_poly(nullptr)
+	d3dintf(nullptr), machine(nullptr), d3d(nullptr), post_fx_enable(false), oversampling_enable(false),
+	num_screens(0), curr_screen(0), shadow_texture(nullptr), options(nullptr), black_surface(nullptr),
+	black_texture(nullptr), recording_movie(false),render_snap(false), snap_copy_target(nullptr),
+	snap_copy_texture(nullptr), snap_target(nullptr), snap_texture(nullptr), snap_width(0), snap_height(0),
+	initialized(false), backbuffer(nullptr), curr_effect(nullptr), default_effect(nullptr),
+	prescale_effect(nullptr), post_effect(nullptr), distortion_effect(nullptr), focus_effect(nullptr),
+	phosphor_effect(nullptr), deconverge_effect(nullptr), color_effect(nullptr), ntsc_effect(nullptr),
+	bloom_effect(nullptr), downsample_effect(nullptr), vector_effect(nullptr), curr_texture(nullptr),
+	curr_render_target(nullptr), curr_poly(nullptr)
 {
 }
 
@@ -73,15 +186,13 @@ shaders::~shaders()
 
 
 //============================================================
-//  shaders::window_save
+//  shaders::save_snapshot
 //============================================================
 
-void shaders::window_save()
+void shaders::save_snapshot()
 {
 	if (!enabled())
-	{
 		return;
-	}
 
 	HRESULT result = d3d->get_device()->CreateTexture(snap_width, snap_height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &snap_copy_texture, nullptr);
 	if (FAILED(result))
@@ -100,86 +211,29 @@ void shaders::window_save()
 	snap_texture->GetSurfaceLevel(0, &snap_target);
 
 	render_snap = true;
-	snap_rendered = false;
 }
 
 
 //============================================================
-//  shaders::window_record
+//  shaders::record_movie
 //============================================================
 
-void shaders::window_record()
+void shaders::record_movie()
 {
 	if (!enabled())
+		return;
+
+	if (recording_movie)
 	{
+		recorder.reset();
+		recording_movie = false;
 		return;
 	}
 
-	windows_options &options = downcast<windows_options &>(machine->options());
-	const char *filename = options.d3d_hlsl_write();
-
-	if (avi_output_file != nullptr)
-	{
-		end_avi_recording();
-	}
-	else if (filename[0] != 0)
-	{
-		begin_avi_recording(filename);
-	}
+	recorder = std::make_unique<movie_recorder>(*machine, d3d, snap_width, snap_height);
+	recorder->record();
+	recording_movie = true;
 }
-
-
-//============================================================
-//  shaders::avi_update_snap
-//============================================================
-
-void shaders::avi_update_snap(IDirect3DSurface9 *surface)
-{
-	if (!enabled())
-	{
-		return;
-	}
-
-	D3DLOCKED_RECT rect;
-
-	// if we don't have a bitmap, or if it's not the right size, allocate a new one
-	if (!avi_snap.valid() || snap_width != avi_snap.width() || snap_height != avi_snap.height())
-	{
-		avi_snap.allocate(snap_width, snap_height);
-	}
-
-	// copy the texture
-	HRESULT result = d3d->get_device()->GetRenderTargetData(surface, avi_copy_surface);
-	if (FAILED(result))
-	{
-		return;
-	}
-
-	// lock the texture
-	result = avi_copy_surface->LockRect(&rect, nullptr, D3DLOCK_DISCARD);
-	if (FAILED(result))
-	{
-		return;
-	}
-
-	// loop over Y
-	for (int srcy = 0; srcy < snap_height; srcy++)
-	{
-		DWORD *src = (DWORD *)((BYTE *)rect.pBits + srcy * rect.Pitch);
-		UINT32 *dst = &avi_snap.pix32(srcy);
-
-		for (int x = 0; x < snap_width; x++)
-		{
-			*dst++ = *src++;
-		}
-	}
-
-	// unlock
-	result = avi_copy_surface->UnlockRect();
-	if (FAILED(result))
-		osd_printf_verbose("Direct3D: Error %08lX during texture UnlockRect call\n", result);
-}
-
 
 
 //============================================================
@@ -189,39 +243,26 @@ void shaders::avi_update_snap(IDirect3DSurface9 *surface)
 void shaders::render_snapshot(IDirect3DSurface9 *surface)
 {
 	if (!enabled())
-	{
 		return;
-	}
 
-	D3DLOCKED_RECT rect;
-
-	render_snap = false;
-
-	// if we don't have a bitmap, or if it's not the right size, allocate a new one
-	if (!avi_snap.valid() || snap_width != avi_snap.width() || snap_height != avi_snap.height())
-	{
-		avi_snap.allocate(snap_width, snap_height);
-	}
+	bitmap_rgb32 snapshot(snap_width, snap_height);
+	if (!snapshot.valid())
+		return;
 
 	// copy the texture
 	HRESULT result = d3d->get_device()->GetRenderTargetData(surface, snap_copy_target);
 	if (FAILED(result))
-	{
 		return;
-	}
 
-	// lock the texture
+	D3DLOCKED_RECT rect;
 	result = snap_copy_target->LockRect(&rect, nullptr, D3DLOCK_DISCARD);
 	if (FAILED(result))
-	{
 		return;
-	}
 
-	// loop over Y
-	for (int srcy = 0; srcy < snap_height; srcy++)
+	for (int y = 0; y < snap_height; y++)
 	{
-		DWORD *src = (DWORD *)((BYTE *)rect.pBits + srcy * rect.Pitch);
-		UINT32 *dst = &avi_snap.pix32(srcy);
+		DWORD *src = (DWORD *)((BYTE *)rect.pBits + y * rect.Pitch);
+		UINT32 *dst = &snapshot.pix32(y);
 
 		for (int x = 0; x < snap_width; x++)
 		{
@@ -232,9 +273,7 @@ void shaders::render_snapshot(IDirect3DSurface9 *surface)
 	emu_file file(machine->options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	osd_file::error filerr = machine->video().open_next(file, "png");
 	if (filerr != osd_file::error::NONE)
-	{
 		return;
-	}
 
 	// add two text entries describing the image
 	std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(emulator_info::get_build_version());
@@ -244,16 +283,13 @@ void shaders::render_snapshot(IDirect3DSurface9 *surface)
 	png_add_text(&pnginfo, "System", text2.c_str());
 
 	// now do the actual work
-	png_error error = png_write_bitmap(file, &pnginfo, avi_snap, 1 << 24, nullptr);
+	png_error error = png_write_bitmap(file, &pnginfo, snapshot, 1 << 24, nullptr);
 	if (error != PNGERR_NONE)
-	{
 		osd_printf_error("Error generating PNG for HLSL snapshot: png_error = %d\n", error);
-	}
 
 	// free any data allocated
 	png_free(&pnginfo);
 
-	// unlock
 	result = snap_copy_target->UnlockRect();
 	if (FAILED(result))
 		osd_printf_verbose("Direct3D: Error %08lX during texture UnlockRect call\n", result);
@@ -280,141 +316,6 @@ void shaders::render_snapshot(IDirect3DSurface9 *surface)
 	{
 		snap_copy_target->Release();
 		snap_copy_target = nullptr;
-	}
-}
-
-
-//============================================================
-//  shaders::record_texture
-//============================================================
-
-void shaders::record_texture()
-{
-	if (!enabled())
-	{
-		return;
-	}
-
-	IDirect3DSurface9 *surface = avi_final_target;
-
-	// ignore if nothing to do
-	if (avi_output_file == nullptr || surface == nullptr)
-	{
-		return;
-	}
-
-	// get the current time
-	attotime curtime = machine->time();
-
-	avi_update_snap(surface);
-
-	// loop until we hit the right time
-	while (avi_next_frame_time <= curtime)
-	{
-		// handle an AVI recording
-		// write the next frame
-		avi_file::error avierr = avi_output_file->append_video_frame(avi_snap);
-		if (avierr != avi_file::error::NONE)
-		{
-			end_avi_recording();
-			return;
-		}
-
-		// advance time
-		avi_next_frame_time += avi_frame_period;
-		avi_frame++;
-	}
-}
-
-
-//============================================================
-//  shaders::end_avi_recording
-//============================================================
-
-void shaders::end_avi_recording()
-{
-	if (!enabled())
-	{
-		return;
-	}
-
-	if (avi_output_file)
-	{
-		avi_output_file.reset();
-	}
-
-	avi_output_file = nullptr;
-	avi_frame = 0;
-}
-
-
-//============================================================
-//  shaders::begin_avi_recording
-//============================================================
-
-void shaders::begin_avi_recording(const char *name)
-{
-	if (!enabled())
-	{
-		return;
-	}
-
-	// stop any existing recording
-	end_avi_recording();
-
-	// reset the state
-	avi_frame = 0;
-	avi_next_frame_time = machine->time();
-
-	// build up information about this new movie
-	avi_file::movie_info info;
-	info.video_format = 0;
-	info.video_timescale = 1000 * ((machine->first_screen() != nullptr) ? ATTOSECONDS_TO_HZ(machine->first_screen()->frame_period().m_attoseconds) : screen_device::DEFAULT_FRAME_RATE);
-	info.video_sampletime = 1000;
-	info.video_numsamples = 0;
-	info.video_width = snap_width;
-	info.video_height = snap_height;
-	info.video_depth = 24;
-
-	info.audio_format = 0;
-	info.audio_timescale = machine->sample_rate();
-	info.audio_sampletime = 1;
-	info.audio_numsamples = 0;
-	info.audio_channels = 2;
-	info.audio_samplebits = 16;
-	info.audio_samplerate = machine->sample_rate();
-
-	// create a new temporary movie file
-	osd_file::error filerr;
-	std::string fullpath;
-
-	emu_file tempfile(machine->options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	if (name != nullptr)
-	{
-		filerr = tempfile.open(name);
-	}
-	else
-	{
-		filerr = machine->video().open_next(tempfile, "avi");
-	}
-
-	// compute the frame time
-	avi_frame_period = attotime::from_seconds(1000) / info.video_timescale;
-
-	// if we succeeded, make a copy of the name and create the real file over top
-	if (filerr == osd_file::error::NONE)
-	{
-		fullpath = tempfile.fullpath();
-	}
-
-	if (filerr == osd_file::error::NONE)
-	{
-		// create the file and free the string
-		avi_file::error avierr = avi_file::create(fullpath, info, avi_output_file);
-		if (avierr != avi_file::error::NONE)
-		{
-			osd_printf_error("Error creating AVI: %s\n", avi_file::error_string(avierr));
-		}
 	}
 }
 
@@ -757,28 +658,14 @@ int shaders::create_resources()
 	result = d3d->get_device()->SetRenderTarget(0, black_surface);
 	if (FAILED(result))
 		osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
+
 	result = d3d->get_device()->Clear(0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
 	if (FAILED(result))
 		osd_printf_verbose("Direct3D: Error %08lX during device clear call\n", result);
+
 	result = d3d->get_device()->SetRenderTarget(0, backbuffer);
 	if (FAILED(result))
 		osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
-
-	result = d3d->get_device()->CreateTexture(snap_width, snap_height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &avi_copy_texture, nullptr);
-	if (FAILED(result))
-	{
-		osd_printf_verbose("Direct3D: Unable to init system-memory target for HLSL AVI dumping (%08lX)\n", result);
-		return 1;
-	}
-	avi_copy_texture->GetSurfaceLevel(0, &avi_copy_surface);
-
-	result = d3d->get_device()->CreateTexture(snap_width, snap_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &avi_final_texture, nullptr);
-	if (FAILED(result))
-	{
-		osd_printf_verbose("Direct3D: Unable to init video-memory target for HLSL AVI dumping (%08lX)\n", result);
-		return 1;
-	}
-	avi_final_texture->GetSurfaceLevel(0, &avi_final_target);
 
 	emu_file file(machine->options().art_path(), OPEN_FLAG_READ);
 	render_load_png(shadow_bitmap, file, nullptr, options->shadow_mask_texture);
@@ -948,16 +835,6 @@ void shaders::begin_draw()
 
 
 //============================================================
-//  shaders::begin_frame
-//============================================================
-
-void shaders::begin_frame()
-{
-	record_texture();
-}
-
-
-//============================================================
 //  shaders::blit
 //============================================================
 
@@ -1006,24 +883,6 @@ void shaders::blit(
 	}
 
 	curr_effect->end();
-}
-
-
-//============================================================
-//  shaders::end_frame
-//============================================================
-
-void shaders::end_frame()
-{
-	if (!enabled())
-	{
-		return;
-	}
-
-	if (render_snap && snap_rendered)
-	{
-		render_snapshot(snap_target);
-	}
 }
 
 
@@ -1400,8 +1259,6 @@ int shaders::vector_pass(d3d_render_target *rt, int source_index, poly_info *pol
 
 	curr_effect = vector_effect;
 	curr_effect->update_uniforms();
-	// curr_effect->set_float("TimeRatio", options->vector_time_ratio);
-	// curr_effect->set_float("TimeScale", options->vector_time_scale);
 	curr_effect->set_float("LengthRatio", options->vector_length_ratio);
 	curr_effect->set_float("LengthScale", options->vector_length_scale);
 	curr_effect->set_float("BeamSmooth", options->vector_beam_smooth);
@@ -1440,15 +1297,15 @@ int shaders::screen_pass(d3d_render_target *rt, int source_index, poly_info *pol
 	// we do not clear the backbuffer here because multiple screens might be rendered into
 	blit(backbuffer, false, poly->type(), vertnum, poly->count());
 
-	if (avi_output_file != nullptr)
+	if (recording_movie)
 	{
-		blit(avi_final_target, false, poly->type(), vertnum, poly->count());
+		blit(recorder->target_surface(), false, poly->type(), vertnum, poly->count());
 
 		HRESULT result = d3d->get_device()->SetRenderTarget(0, backbuffer);
 		if (FAILED(result))
-		{
 			osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
-		}
+
+		recorder->save_frame();
 	}
 
 	if (render_snap)
@@ -1457,11 +1314,11 @@ int shaders::screen_pass(d3d_render_target *rt, int source_index, poly_info *pol
 
 		HRESULT result = d3d->get_device()->SetRenderTarget(0, backbuffer);
 		if (FAILED(result))
-		{
 			osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
-		}
 
-		snap_rendered = true;
+		render_snapshot(snap_target);
+
+		render_snap = false;
 	}
 
 	return next_index;
@@ -1875,7 +1732,8 @@ void shaders::delete_resources()
 		return;
 	}
 
-	end_avi_recording();
+	recording_movie = false;
+	recorder.reset();
 
 	if (options != nullptr)
 	{
@@ -1963,30 +1821,6 @@ void shaders::delete_resources()
 	{
 		black_texture->Release();
 		black_texture = nullptr;
-	}
-
-	if (avi_copy_texture != nullptr)
-	{
-		avi_copy_texture->Release();
-		avi_copy_texture = nullptr;
-	}
-
-	if (avi_copy_surface != nullptr)
-	{
-		avi_copy_surface->Release();
-		avi_copy_surface = nullptr;
-	}
-
-	if (avi_final_texture != nullptr)
-	{
-		avi_final_texture->Release();
-		avi_final_texture = nullptr;
-	}
-
-	if (avi_final_target != nullptr)
-	{
-		avi_final_target->Release();
-		avi_final_target = nullptr;
 	}
 
 	shadow_bitmap.reset();
