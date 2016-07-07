@@ -9,7 +9,6 @@ A down-grade of the Seibu SPI Hardware with SH-2 as main cpu.
 driver by Angelo Salese & Nicola Salmoria
 
 TODO:
-- Make RTC writes actually go through (SH2 interrupt/timing issue?)
 - Determine what buttons 5-7 actually do
 - Find out where the NVRAM maps to
 - Layout including lamps

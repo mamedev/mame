@@ -66,11 +66,14 @@ protected:
 	virtual bool rtc_feature_leap_year() override { return true; }
 
 	// helpers
+	virtual void ce_rising();
+	virtual void ce_falling();
 	virtual void clk_rising();
 	virtual void clk_falling();
 	void load_bit(int reg);
 	void store_bit(int reg);
 	void advance_bit();
+	void update_effective();
 
 	devcb_write_line data_cb;
 
@@ -97,6 +100,8 @@ public:
 
 protected:
 	// rtc4543 overrides
+	virtual void ce_rising() override;
+	virtual void ce_falling() override;
 	virtual void clk_rising() override;
 	virtual void clk_falling() override;
 };

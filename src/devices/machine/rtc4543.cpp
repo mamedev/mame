@@ -8,6 +8,10 @@
     JRC 6355E / NJU6355E is basically similar, but order of registers
     is reversed and readouts happen on falling CLK edge.
 
+    The clock's seven registers are read out as 52 consecutive bits of
+    data, with the middle register being only 4 bits wide. The bits
+    are numbered 0-27 and 32-55 here for implementation convenience.
+
 **********************************************************************/
 
 #include "rtc4543.h"
@@ -122,6 +126,7 @@ void rtc4543_device::rtc_clock_updated(int year, int month, int day, int day_of_
 	m_regs[6] = convert_to_bcd(year % 100);                 // year (BCD, 0-99)
 }
 
+
 //-------------------------------------------------
 //  ce_w - chip enable write
 //-------------------------------------------------
@@ -131,12 +136,12 @@ WRITE_LINE_MEMBER( rtc4543_device::ce_w )
 	if (!state && m_ce) // complete transfer
 	{
 		if (VERBOSE) logerror("CE falling edge\n", state);
+		ce_falling();
 	}
 	else if (state && !m_ce) // start new data transfer
 	{
 		if (VERBOSE) logerror("CE rising edge\n", state);
-
-		m_curbit = 0; // force immediate reload of output data
+		ce_rising();
 	}
 
 	m_ce = state;
@@ -144,6 +149,26 @@ WRITE_LINE_MEMBER( rtc4543_device::ce_w )
 	// timer disabled during writes
 	m_clock_timer->enable(!m_ce || !m_wr);
 }
+
+
+//-------------------------------------------------
+//  ce_rising - CE rising edge trigger
+//-------------------------------------------------
+
+void rtc4543_device::ce_rising()
+{
+	m_curbit = 0; // force immediate reload of output data
+}
+
+
+//-------------------------------------------------
+//  ce_falling - CE falling edge trigger
+//-------------------------------------------------
+
+void rtc4543_device::ce_falling()
+{
+}
+
 
 //-------------------------------------------------
 //  wr_w - data direction line write
@@ -156,6 +181,7 @@ WRITE_LINE_MEMBER( rtc4543_device::wr_w )
 
 	m_wr = state;
 }
+
 
 //-------------------------------------------------
 //  clk_w - serial clock write
@@ -199,6 +225,10 @@ void rtc4543_device::clk_rising()
 		store_bit(m_curbit / 8);
 
 	advance_bit();
+
+	// update only occurs when a write goes all the way through
+	if (m_wr && m_curbit == 56)
+		update_effective();
 }
 
 
@@ -291,17 +321,25 @@ void rtc4543_device::advance_bit()
 		// skip 4 bits, Brother Maynard
 		m_curbit += 4;
 	}
+}
 
-	// update only occurs when a write goes all the way through
-	if (m_wr && m_curbit == 56)
-		set_time(false,
-			bcd_to_integer(m_regs[6]),      // year
-			bcd_to_integer(m_regs[5]),      // month
-			bcd_to_integer(m_regs[4]),      // day
-			(m_regs[3] % 7) + 1,            // day of week
-			bcd_to_integer(m_regs[2]),      // hour
-			bcd_to_integer(m_regs[1]),      // minute
-			bcd_to_integer(m_regs[0]));     // second
+
+//-------------------------------------------------
+//  update_effective - update the RTC
+//-------------------------------------------------
+
+void rtc4543_device::update_effective()
+{
+	if (VERBOSE)
+		logerror("RTC updated: %02x.%02x.%02x (%01x) %02x:%02x:%02x\n", m_regs[6], m_regs[5], m_regs[4], m_regs[3], m_regs[2], m_regs[1], m_regs[0]);
+	set_time(false,
+		bcd_to_integer(m_regs[6]),      // year
+		bcd_to_integer(m_regs[5]),      // month
+		bcd_to_integer(m_regs[4]),      // day
+		(m_regs[3] % 7) + 1,            // day of week
+		bcd_to_integer(m_regs[2]),      // hour
+		bcd_to_integer(m_regs[1]),      // minute
+		bcd_to_integer(m_regs[0]));     // second
 }
 
 
@@ -324,6 +362,34 @@ jrc6355e_device::jrc6355e_device(const machine_config &mconfig, const char *tag,
 
 
 //-------------------------------------------------
+//  ce_rising - CE rising edge trigger
+//-------------------------------------------------
+
+void jrc6355e_device::ce_rising()
+{
+	m_curbit = 0; // force immediate reload of output data
+	load_bit(6);
+}
+
+
+
+//-------------------------------------------------
+//  ce_falling - CE falling edge trigger
+//-------------------------------------------------
+
+void jrc6355e_device::ce_falling()
+{
+	// update occurs on falling edge of CE after minutes are written
+	if (m_wr && m_curbit >= 48)
+	{
+		// seconds are zeroed
+		m_regs[0] = 0;
+		update_effective();
+	}
+}
+
+
+//-------------------------------------------------
 //  clk_rising - CLK rising edge trigger
 //-------------------------------------------------
 
@@ -334,8 +400,6 @@ void jrc6355e_device::clk_rising()
 
 	if (m_wr)
 		store_bit(6 - (m_curbit / 8));
-
-	advance_bit();
 }
 
 
@@ -348,6 +412,8 @@ void jrc6355e_device::clk_falling()
 	if (m_curbit == 56)
 		return;
 
-	if (!m_wr)
+	advance_bit();
+
+	if (!m_wr && m_curbit != 56)
 		load_bit(6 - (m_curbit / 8));
 }
