@@ -444,7 +444,7 @@ void menu_add_change_folder::handle()
 						}
 					}
 				}
-				top_line = selected - (visible_lines / 2);
+				centre_selection();
 			}
 		}
 		else if (menu_event->iptkey == IPT_UI_CANCEL)

@@ -54,7 +54,6 @@ public:
 
 	render_container        *container;   // render_container we render to
 	int                     hover;        // which item is being hovered over
-	int                     visitems;     // number of visible items
 	float                   customtop;    // amount of extra height to add at the top
 	float                   custombottom; // amount of extra height to add at the bottom
 	std::vector<menu_item>  item;         // array of items
@@ -70,9 +69,6 @@ public:
 
 	// allocate temporary memory from the menu's memory pool
 	void *m_pool_alloc(size_t size);
-
-	// request the specific handling of the game selection main menu
-	bool is_special_main_menu() const;
 
 	// Global initialization
 	static void init(running_machine &machine, ui_options &mopt);
@@ -248,7 +244,6 @@ protected:
 
 	menu(mame_ui_manager &mui, render_container *container);
 
-	// free all items in the menu, and all memory allocated from the memory pool
 	void reset(reset_options options);
 	void reset_parent(reset_options options) { m_parent->reset(options); }
 	static void reset_topmost(reset_options options) { if (menu_stack) menu_stack->reset(options); }
@@ -268,6 +263,9 @@ protected:
 
 	// changes the index of the currently selected menu item
 	void set_selection(void *selected_itemref);
+
+	// scroll position control
+	void centre_selection() { top_line = selected - (m_visible_lines / 2); }
 
 	// draw right box
 	float draw_right_box_title(float x1, float y1, float x2, float y2);
@@ -291,7 +289,6 @@ protected:
 	template <typename T>
 	static T *topmost_menu() { return dynamic_cast<T *>(menu_stack.get()); }
 
-	int visible_lines;        // main box visible lines
 	int right_visible_lines;  // right box lines
 
 	static std::unique_ptr<bitmap_argb32> snapx_bitmap;
@@ -319,6 +316,7 @@ private:
 	static render_texture *icons_texture[];
 
 	// request the specific handling of the game selection main menu
+	bool is_special_main_menu() const;
 	void set_special_main_menu(bool disable);
 
 	// push a new menu onto the stack
@@ -348,16 +346,23 @@ private:
 	float draw_icon(int linenum, void *selectedref, float x1, float y1);
 	void extra_text_draw_box(float origx1, float origx2, float origy, float yspan, const char *text, int direction);
 
+	bool first_item_visible() const { return top_line <= 0; }
+	bool last_item_visible() const { return (top_line + m_visible_lines) >= item.size(); }
+
 	bool                    m_special_main_menu;
-	mame_ui_manager         &m_ui;         // UI we are attached to
-	std::unique_ptr<menu>   m_parent;      // pointer to parent menu
-	bool                    m_pressed;     // mouse button held down
+	mame_ui_manager         &m_ui;              // UI we are attached to
+	std::unique_ptr<menu>   m_parent;           // pointer to parent menu
+	bool                    m_pressed;          // mouse button held down
 	osd_ticks_t             m_repeat;
-	event                   m_event;       // the UI event that occurred
-	pool                    *m_pool;       // list of memory pools
+	event                   m_event;            // the UI event that occurred
+	pool                    *m_pool;            // list of memory pools
 	focused_menu            m_focus;
-	int                     m_resetpos;     // reset position
-	void                    *m_resetref;    // reset reference
+
+	int                     m_visible_lines;    // main box visible lines
+	int                     m_visible_items;    // number of visible items
+
+	int                     m_resetpos;         // reset position
+	void                    *m_resetref;        // reset reference
 
 	static std::vector<const game_driver *> m_old_icons;
 

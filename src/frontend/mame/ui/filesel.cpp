@@ -485,7 +485,7 @@ void menu_file_selector::handle()
 				if (selected_entry != nullptr && selected_entry != cur_selected)
 				{
 					set_selection((void *)selected_entry);
-					top_line = selected - (visible_lines / 2);
+					centre_selection();
 				}
 			}
 		}
