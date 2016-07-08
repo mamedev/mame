@@ -2997,7 +2997,7 @@ void thomson_state::to8_kbd_reset()
 void thomson_state::to8_kbd_init()
 {
 	m_to8_kbd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thomson_state::to8_kbd_timer_cb),this));
-	m_to8_kbd_signal = machine().scheduler().timer_alloc(FUNC_NULL);
+	m_to8_kbd_signal = machine().scheduler().timer_alloc(timer_expired_delegate());
 	save_item(NAME(m_to8_kbd_ack));
 	save_item(NAME(m_to8_kbd_data));
 	save_item(NAME(m_to8_kbd_step));

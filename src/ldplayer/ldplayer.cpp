@@ -181,7 +181,7 @@ chd_file *ldplayer_state::get_disc()
 	file_enumerator path(machine().options().media_path());
 
 	// iterate while we get new objects
-	const osd_directory_entry *dir;
+	const osd::directory::entry *dir;
 	while ((dir = path.next()) != NULL)
 	{
 		int length = strlen(dir->name);

@@ -246,7 +246,7 @@ function toolchain(_buildDir, _subDir)
 			if not os.getenv("MINGW32") then
 				print("Set MINGW32 envrionment variable.")
 			end
-			if not toolchainPrefix then
+			if toolchainPrefix == nil or toolchainPrefix == "" then
 				toolchainPrefix = "$(MINGW32)/bin/i686-w64-mingw32-"
 			end
 			premake.gcc.cc  = toolchainPrefix .. "gcc"
@@ -266,7 +266,7 @@ function toolchain(_buildDir, _subDir)
 			if not os.getenv("MINGW64") then
 				print("Set MINGW64 envrionment variable.")
 			end
-			if not toolchainPrefix then
+			if toolchainPrefix == nil or toolchainPrefix == "" then
 				toolchainPrefix = "$(MINGW64)/bin/x86_64-w64-mingw32-"
 			end
 			premake.gcc.cc  = toolchainPrefix .. "gcc"
@@ -772,9 +772,14 @@ function toolchain(_buildDir, _subDir)
 	configuration { "openbsd", "x64", "Debug" }
 		targetdir (_buildDir .. "openbsd" .. "/bin/x64/Debug")
 
+	configuration { "android-*", "Release" }
+		targetdir (_buildDir .. "android/bin/" .. _OPTIONS["PLATFORM"] .. "/Release")
+
+	configuration { "android-*", "Debug" }
+		targetdir (_buildDir .. "android/bin/" .. _OPTIONS["PLATFORM"] .. "/Debug")
+
 	configuration { "android-*" }
-		targetdir (_buildDir .. "android-" .. _OPTIONS["PLATFORM"] .. "/bin")
-		objdir (_buildDir .. "android-" .. _OPTIONS["PLATFORM"] .. "/obj")
+		objdir (_buildDir .. "android/obj/" .. _OPTIONS["PLATFORM"])
 		includedirs {
 			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libcxx/include",
@@ -1063,12 +1068,12 @@ function strip()
 	configuration { "mingw*", "x64", "Release" }
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
-			"$(SILENT) " .. (_OPTIONS['TOOLCHAIN'] and toolchainPrefix or "$(MINGW64)/bin/") .. "strip -s \"$(TARGET)\"",
+			"$(SILENT) " .. (_OPTIONS['TOOLCHAIN'] or "$(MINGW64)/bin/") .. "strip -s \"$(TARGET)\"",
 		}
 	configuration { "mingw*", "x32", "Release" }
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
-			"$(SILENT) " .. (_OPTIONS['TOOLCHAIN'] and toolchainPrefix or "$(MINGW32)/bin/") .. "strip -s \"$(TARGET)\"",
+			"$(SILENT) " .. (_OPTIONS['TOOLCHAIN'] or "$(MINGW32)/bin/") .. "strip -s \"$(TARGET)\"",
 		}
 
 	configuration { "pnacl" }

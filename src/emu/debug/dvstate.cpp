@@ -12,6 +12,11 @@
 #include "debugvw.h"
 #include "dvstate.h"
 
+const int debug_view_state::REG_DIVIDER;
+const int debug_view_state::REG_CYCLES;
+const int debug_view_state::REG_BEAMX;
+const int debug_view_state::REG_BEAMY;
+const int debug_view_state::REG_FRAME;
 
 
 //**************************************************************************
@@ -42,8 +47,7 @@ debug_view_state_source::debug_view_state_source(const char *name, device_t &dev
 debug_view_state::debug_view_state(running_machine &machine, debug_view_osd_update_func osdupdate, void *osdprivate)
 	: debug_view(machine, DVT_STATE, osdupdate, osdprivate),
 		m_divider(0),
-		m_last_update(0),
-		m_state_list(nullptr)
+		m_last_update(0)
 {
 	// fail if no available sources
 	enumerate_sources();
@@ -92,12 +96,7 @@ void debug_view_state::enumerate_sources()
 void debug_view_state::reset()
 {
 	// free all items in the state list
-	while (m_state_list != nullptr)
-	{
-		state_item *oldhead = m_state_list;
-		m_state_list = oldhead->m_next;
-		global_free(oldhead);
-	}
+	m_state_list.clear();
 }
 
 
@@ -114,48 +113,39 @@ void debug_view_state::recompute()
 	reset();
 
 	// add a cycles entry: cycles:99999999
-	state_item **tailptr = &m_state_list;
-	*tailptr = global_alloc(state_item(REG_CYCLES, "cycles", 8));
-	tailptr = &(*tailptr)->m_next;
+	m_state_list.push_back(std::make_unique<state_item>(REG_CYCLES, "cycles", 8));
 
 	// add a beam entry: beamx:1234
-	*tailptr = global_alloc(state_item(REG_BEAMX, "beamx", 4));
-	tailptr = &(*tailptr)->m_next;
+	m_state_list.push_back(std::make_unique<state_item>(REG_BEAMX, "beamx", 4));
 
 	// add a beam entry: beamy:5678
-	*tailptr = global_alloc(state_item(REG_BEAMY, "beamy", 4));
-	tailptr = &(*tailptr)->m_next;
+	m_state_list.push_back(std::make_unique<state_item>(REG_BEAMY, "beamy", 4));
 
 	// add a beam entry: frame:123456
-	*tailptr = global_alloc(state_item(REG_FRAME, "frame", 6));
-	tailptr = &(*tailptr)->m_next;
+	m_state_list.push_back(std::make_unique<state_item>(REG_FRAME, "frame", 6));
 
 	// add a flags entry: flags:xxxxxxxx
-	*tailptr = global_alloc(state_item(STATE_GENFLAGS, "flags", source.m_stateintf->state_string_max_length(STATE_GENFLAGS)));
-	tailptr = &(*tailptr)->m_next;
+	m_state_list.push_back(std::make_unique<state_item>(STATE_GENFLAGS, "flags", source.m_stateintf->state_string_max_length(STATE_GENFLAGS)));
 
 	// add a divider entry
-	*tailptr = global_alloc(state_item(REG_DIVIDER, "", 0));
-	tailptr = &(*tailptr)->m_next;
+	m_state_list.push_back(std::make_unique<state_item>(REG_DIVIDER, "", 0));
 
 	// add all registers into it
-	for (const device_state_entry &entry : source.m_stateintf->state_entries())
-		if (entry.divider())
+	for (auto &entry : source.m_stateintf->state_entries())
+		if (entry->divider())
 		{
-			*tailptr = global_alloc(state_item(REG_DIVIDER, "", 0));
-			tailptr = &(*tailptr)->m_next;
+			m_state_list.push_back(std::make_unique<state_item>(REG_DIVIDER, "", 0));
 		}
-		else if (entry.visible())
+		else if (entry->visible())
 		{
-			*tailptr = global_alloc(state_item(entry.index(), entry.symbol(), source.m_stateintf->state_string_max_length(entry.index())));
-			tailptr = &(*tailptr)->m_next;
+			m_state_list.push_back(std::make_unique<state_item>(entry->index(), entry->symbol(), source.m_stateintf->state_string_max_length(entry->index())));
 		}
 
 	// count the entries and determine the maximum tag and value sizes
 	int count = 0;
 	int maxtaglen = 0;
 	int maxvallen = 0;
-	for (state_item *item = m_state_list; item != nullptr; item = item->m_next)
+	for (auto &item : m_state_list)
 	{
 		count++;
 		maxtaglen = MAX(maxtaglen, item->m_symbol.length());
@@ -204,9 +194,7 @@ void debug_view_state::view_update()
 		total_cycles = source.m_execintf->total_cycles();
 
 	// find the first entry
-	state_item *curitem = m_state_list;
-	for (int index = 0; curitem != nullptr && index < m_topleft.y; index++)
-		curitem = curitem->m_next;
+	auto it = m_state_list.begin();
 
 	// loop over visible rows
 	screen_device *screen = machine().first_screen();
@@ -214,10 +202,12 @@ void debug_view_state::view_update()
 	for (UINT32 row = 0; row < m_visible.y; row++)
 	{
 		UINT32 col = 0;
-
+		
 		// if this visible row is valid, add it to the buffer
-		if (curitem != nullptr)
+		if (it != m_state_list.end())
 		{
+			state_item *curitem = it->get();
+
 			UINT32 effcol = m_topleft.x;
 			UINT8 attrib = DCA_NORMAL;
 			UINT32 len = 0;
@@ -311,7 +301,7 @@ void debug_view_state::view_update()
 			}
 
 			// advance to the next item
-			curitem = curitem->m_next;
+			++it;
 		}
 
 		// fill the rest with blanks
@@ -334,8 +324,7 @@ void debug_view_state::view_update()
 //-------------------------------------------------
 
 debug_view_state::state_item::state_item(int index, const char *name, UINT8 valuechars)
-	: m_next(nullptr),
-		m_lastval(0),
+	: m_lastval(0),
 		m_currval(0),
 		m_index(index),
 		m_vallen(valuechars),

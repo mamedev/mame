@@ -123,6 +123,7 @@ private:
 	{
 		bool            hex_imm;
 		const char      *mnemonic;
+		const char      *g0_synth;
 	};
 	typedef std::map<UINT8, int_op_desc> int_op_desc_map;
 

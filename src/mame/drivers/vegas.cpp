@@ -582,8 +582,8 @@ void vegas_state::machine_start()
 	m_voodoo = (voodoo_device*)machine().device("voodoo");
 
 	/* allocate timers for the NILE */
-	m_timer[0] = machine().scheduler().timer_alloc(FUNC_NULL);
-	m_timer[1] = machine().scheduler().timer_alloc(FUNC_NULL);
+	m_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate());
+	m_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate());
 	m_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vegas_state::nile_timer_callback),this));
 	m_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vegas_state::nile_timer_callback),this));
 

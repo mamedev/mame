@@ -32,6 +32,13 @@
 #define __MCS51_H__
 
 
+#define MCFG_MCS51_SERIAL_RX_CB(_devcb) \
+	devcb = &mcs51_cpu_device::set_serial_rx_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_MCS51_SERIAL_TX_CB(_devcb) \
+	devcb = &mcs51_cpu_device::set_serial_tx_cb(*device, DEVCB_##_devcb);
+
+
 enum
 {
 	MCS51_PC=1, MCS51_SP, MCS51_PSW, MCS51_ACC, MCS51_B, MCS51_DPH, MCS51_DPL, MCS51_IE,
@@ -79,11 +86,10 @@ public:
 	// construction/destruction
 	mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features = 0);
 
-	void i8051_set_serial_tx_callback(write8_delegate tx_func);
-	void i8051_set_serial_rx_callback(read8_delegate rx_func);
-
 	// configuration helpers
 	static void set_port_forced_input(device_t &device, UINT8 port, UINT8 forced_input) { downcast<mcs51_cpu_device &>(device).m_forced_inputs[port] = forced_input; }
+	template<class _Object> static devcb_base & set_serial_rx_cb(device_t &device, _Object object) { return downcast<mcs51_cpu_device &>(device).m_serial_rx_cb.set_callback(object); }
+	template<class _Object> static devcb_base & set_serial_tx_cb(device_t &device, _Object object) { return downcast<mcs51_cpu_device &>(device).m_serial_tx_cb.set_callback(object); }
 
 protected:
 	// device-level overrides
@@ -170,9 +176,8 @@ protected:
 	address_space *m_io;
 
 	/* Serial Port TX/RX Callbacks */
-	// TODO: Move to special port r/w
-	write8_delegate m_serial_tx_callback;    //Call back funciton when sending data out of serial port
-	read8_delegate m_serial_rx_callback;    //Call back function to retrieve data when receiving serial port data
+	devcb_write8 m_serial_tx_cb;    //Call back function when sending data out of serial port
+	devcb_read8 m_serial_rx_cb;    //Call back function to retrieve data when receiving serial port data
 
 	/* DS5002FP */
 	struct {

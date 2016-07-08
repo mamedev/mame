@@ -218,12 +218,6 @@ void pes_state::machine_reset()
     timer_set(attotime::from_hz(10000), TIMER_OUTFIFO_READ);
 }*/
 
-DRIVER_INIT_MEMBER(pes_state,pes)
-{
-	m_maincpu->i8051_set_serial_tx_callback(write8_delegate(FUNC(pes_state::data_from_i8031),this));
-	m_maincpu->i8051_set_serial_rx_callback(read8_delegate(FUNC(pes_state::data_to_i8031),this));
-}
-
 /******************************************************************************
  Address Maps
 ******************************************************************************/
@@ -255,6 +249,8 @@ static MACHINE_CONFIG_START( pes, pes_state )
 	MCFG_CPU_ADD("maincpu", I80C31, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(i80c31_mem)
 	MCFG_CPU_IO_MAP(i80c31_io)
+	MCFG_MCS51_SERIAL_TX_CB(WRITE8(pes_state, data_from_i8031))
+	MCFG_MCS51_SERIAL_RX_CB(READ8(pes_state, data_to_i8031))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -282,4 +278,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY                        FULLNAME            FLAGS */
-COMP( 1987, pes,    0,      0,      pes,        pes, pes_state,    pes, "Pacific Educational Systems", "VPU-01 Speech box", MACHINE_NOT_WORKING )
+COMP( 1987, pes,    0,      0,      pes,        pes, driver_device,    0, "Pacific Educational Systems", "VPU-01 Speech box", MACHINE_NOT_WORKING )

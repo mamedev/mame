@@ -298,7 +298,7 @@ void windows_osd_interface::window_exit()
 win_window_info::win_window_info(
 	running_machine &machine,
 	int index,
-	osd_monitor_info *monitor,
+	std::shared_ptr<osd_monitor_info> monitor,
 	const osd_window_config *config) : osd_window(*config),
 		m_next(nullptr),
 		m_init_state(0),
@@ -718,7 +718,7 @@ void winwindow_update_cursor_state(running_machine &machine)
 //  (main thread)
 //============================================================
 
-void win_window_info::create(running_machine &machine, int index, osd_monitor_info *monitor, const osd_window_config *config)
+void win_window_info::create(running_machine &machine, int index, std::shared_ptr<osd_monitor_info> monitor, const osd_window_config *config)
 {
 	assert(GetCurrentThreadId() == main_threadid);
 
@@ -746,7 +746,7 @@ void win_window_info::create(running_machine &machine, int index, osd_monitor_in
 	// see if we are safe for fullscreen
 	window->m_fullscreen_safe = TRUE;
 	for (auto win : osd_common_t::s_window_list)
-		if (win->monitor() == monitor)
+		if (win->monitor() == monitor.get())
 			window->m_fullscreen_safe = FALSE;
 
 	// add us to the list
@@ -875,9 +875,9 @@ void win_window_info::update()
 //  (window thread)
 //============================================================
 
-osd_monitor_info *win_window_info::winwindow_video_window_monitor(const osd_rect *proposed)
+std::shared_ptr<osd_monitor_info> win_window_info::winwindow_video_window_monitor(const osd_rect *proposed)
 {
-	osd_monitor_info *monitor;
+	std::shared_ptr<osd_monitor_info> monitor;
 
 	// in window mode, find the nearest
 	if (!fullscreen())
@@ -1426,7 +1426,7 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	INT32 viswidth, visheight;
 	INT32 adjwidth, adjheight;
 	float pixel_aspect;
-	osd_monitor_info *monitor = winwindow_video_window_monitor(&rect);
+	std::shared_ptr<osd_monitor_info> monitor = winwindow_video_window_monitor(&rect);
 
 	assert(GetCurrentThreadId() == window_threadid);
 
@@ -1727,7 +1727,7 @@ void win_window_info::adjust_window_position_after_major_change()
 	// in full screen, make sure it covers the primary display
 	else
 	{
-		osd_monitor_info *monitor = winwindow_video_window_monitor(nullptr);
+		std::shared_ptr<osd_monitor_info> monitor = winwindow_video_window_monitor(nullptr);
 		newrect = monitor->position_size();
 	}
 

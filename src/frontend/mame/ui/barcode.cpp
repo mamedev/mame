@@ -57,7 +57,7 @@ void menu_barcode_reader::populate()
 		const char *new_barcode;
 
 		// selected device
-		item_append(current_display_name().c_str(), "", current_display_flags(), ITEMREF_SELECT_READER);
+		item_append(current_display_name(), "", current_display_flags(), ITEMREF_SELECT_READER);
 
 		// append the "New Barcode" item
 		if (get_selection() == ITEMREF_NEW_BARCODE)
@@ -74,7 +74,7 @@ void menu_barcode_reader::populate()
 
 		// finish up the menu
 		item_append(menu_item_type::SEPARATOR);
-		item_append(_("Enter Code"), nullptr, 0, ITEMREF_ENTER_BARCODE);
+		item_append(_("Enter Code"), "", 0, ITEMREF_ENTER_BARCODE);
 
 		customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 	}

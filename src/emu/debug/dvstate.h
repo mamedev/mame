@@ -52,7 +52,6 @@ private:
 	{
 		state_item(int index, const char *name, UINT8 valuechars);
 
-		state_item *        m_next;             // next item
 		UINT64              m_lastval;          // last value
 		UINT64              m_currval;          // current value
 		int                 m_index;            // index
@@ -68,7 +67,7 @@ private:
 	// internal state
 	int                 m_divider;              // dividing column
 	UINT64              m_last_update;          // execution counter at last update
-	state_item *        m_state_list;           // state data
+	std::vector<std::unique_ptr<state_item>>  m_state_list;           // state data
 
 	// constants
 	static const int REG_DIVIDER    = -10;

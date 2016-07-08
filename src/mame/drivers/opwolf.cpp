@@ -234,7 +234,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
   - Sets :
       * 'opwolfa' : region = 0x0003
   - There is only ONE byte of difference at 0x03fff5.b with 'opwolf'
-    but its effect is unknown as this address doesn't seem to be read !
+    it changes behaviour in the 'continue game' screen
 
 3) 'opwolfb'
 
@@ -255,10 +255,6 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 TODO
 ====
-
-Need to verify Opwolf against original board: various reports
-claim there are discrepancies (perhaps limitations of the fake
-Z80 c-chip substitute to blame?).
 
 There are a few unmapped writes for the sound Z80 in the log.
 
@@ -470,7 +466,10 @@ void opwolf_state::opwolf_msm5205_vck(msm5205_device *device,int chip)
 		device->data_w(m_adpcm_data[chip] & 0x0f);
 		m_adpcm_data[chip] = -1;
 		if (m_adpcm_pos[chip] == m_adpcm_end[chip])
+		{
 			device->reset_w(1);
+			//logerror("reset device %d\n", chip);
+		}
 	}
 	else
 	{
@@ -504,6 +503,7 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_b_w)
 		m_adpcm_pos[0] = start;
 		m_adpcm_end[0] = end;
 		m_msm1->reset_w(0);
+		//logerror("TRIGGER MSM1\n");
 	}
 
 //  logerror("CPU #1     b00%i-data=%2x   pc=%4x\n",offset,data,space.device().safe_pc() );
@@ -526,6 +526,8 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_c_w)
 		m_adpcm_pos[1] = start;
 		m_adpcm_end[1] = end;
 		m_msm2->reset_w(0);
+
+		//logerror("TRIGGER MSM2\n");
 	}
 
 //  logerror("CPU #1     c00%i-data=%2x   pc=%4x\n",offset,data,space.device().safe_pc() );
@@ -1104,7 +1106,10 @@ DRIVER_INIT_MEMBER(opwolf_state,opwolfp)
 	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 }
 
+// Prototype rom set includes the string - 'T KATO 10/6/87'
+// Regular rom set includes the string '11 Sep 1987'
 
+// MACHINE_IMPERFECT_SOUND is present because the credit sound appears to double trigger.  All other sounds seem correct.
 
 /*    year  rom       parent    machine   inp       init */
 GAME( 1987, opwolf,   0,        opwolf,   opwolf,  opwolf_state,  opwolf,   ROT0, "Taito Corporation Japan", "Operation Wolf (World, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

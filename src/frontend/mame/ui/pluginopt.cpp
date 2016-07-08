@@ -37,7 +37,7 @@ menu_plugin::menu_plugin(mame_ui_manager &mui, render_container *container) :
 void menu_plugin::populate()
 {
 	for (auto &curplugin : m_plugins)
-		item_append(curplugin.c_str(), nullptr, 0, (void *)curplugin.c_str());
+		item_append(curplugin, "", 0, (void *)curplugin.c_str());
 	item_append(menu_item_type::SEPARATOR);
 }
 
@@ -106,7 +106,13 @@ void menu_plugin_opt::populate()
 		else if(item.flags == "lr")
 			flags = FLAG_RIGHT_ARROW | FLAG_LEFT_ARROW;
 
-		item_append(item.text.c_str(), item.subtext.c_str(), flags, (void *)i++);
+		if(item.text == "---")
+		{
+			item_append(menu_item_type::SEPARATOR);
+			i++;
+		}
+		else
+			item_append(item.text, item.subtext, flags, (void *)i++);
 	}
 	item_append(menu_item_type::SEPARATOR);
 }

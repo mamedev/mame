@@ -149,6 +149,9 @@ static MACHINE_CONFIG_FRAGMENT( pcx_video )
 	MCFG_CPU_ADD("graphics", I8031, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(pcx_vid_map)
 	MCFG_CPU_IO_MAP(pcx_vid_io)
+	
+	MCFG_MCS51_SERIAL_TX_CB(WRITE8(pcx_video_device, tx_callback))
+	MCFG_MCS51_SERIAL_RX_CB(READ8(pcx_video_device, rx_callback))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -430,13 +433,9 @@ ADDRESS_MAP_END
 
 void pcx_video_device::device_start()
 {
-	mcs51_cpu_device *mcu = downcast<mcs51_cpu_device *>(m_mcu.target());
 	m_maincpu->space(AS_IO).install_readwrite_handler(0xfb00, 0xfb01, read8_delegate(FUNC(pcdx_video_device::detect_r), this), write8_delegate(FUNC(pcdx_video_device::detect_w), this), 0x00ff);
 	m_txd_handler.resolve_safe();
 
-	// set serial callbacks
-	mcu->i8051_set_serial_tx_callback(WRITE8_DELEGATE(pcx_video_device, tx_callback));
-	mcu->i8051_set_serial_rx_callback(READ8_DELEGATE(pcx_video_device, rx_callback));
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
 	set_rate(600*2);  // FIXME: fix the keyboard when the mc2661 baud rate calc is fixed
 

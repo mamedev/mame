@@ -168,10 +168,10 @@ void menu_slot_devices::populate()
 				opt_name.append(_(" [internal]"));
 		}
 
-		item_append(slot.device().tag() + 1, opt_name.c_str(), (slot.fixed() || slot_get_length(slot) == 0) ? 0 : (FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW), (void *)&slot);
+		item_append(slot.device().tag() + 1, opt_name, (slot.fixed() || slot_get_length(slot) == 0) ? 0 : (FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW), (void *)&slot);
 	}
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Reset"),  nullptr, 0, (void *)1);
+	item_append(_("Reset"), "", 0, (void *)1);
 }
 
 menu_slot_devices::~menu_slot_devices()

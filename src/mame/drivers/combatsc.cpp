@@ -646,7 +646,7 @@ MACHINE_START_MEMBER(combatsc_state,combatsc)
 	m_page[0] = MEM + 0x4000;
 	m_page[1] = MEM + 0x6000;
 
-	m_interleave_timer = machine().scheduler().timer_alloc(FUNC_NULL);
+	m_interleave_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 
 	membank("bank1")->configure_entries(0, 10, memregion("maincpu")->base() + 0x10000, 0x4000);
 

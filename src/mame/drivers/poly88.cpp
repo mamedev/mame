@@ -6,6 +6,24 @@
 
         18/05/2009 Initial implementation
 
+        Poly-88 ToDo:
+        MT 06231: Cassette saving hangs. Also, the system has different
+        formats depending on a switch. Only one format is currently
+        emulated.
+
+
+        Poly-8813 is a disk-based computer with 3 mini-floppy drives.
+        Booting is done by pressing the "Load" button, mounted on the
+        front panel near the power switch. Although user manuals are easy
+        to obtain, technical information and schematics are not. The bios
+        makes use of illegal instructions which we do not correctly emulate.
+        The first of these is at 0x006A (print a character routine), while
+        the other is at 0x0100 (an internal copy routine). The code at 0x100
+        can be replaced by 7E 12 13 23 03 79 B0 C2 00 01 C9, which exactly
+        fits into the available space. The disk format is known to be
+        256 bytes per sector, 10 sectors per track, 35 tracks, single sided,
+        for a total of 89600 bytes.
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -194,7 +212,7 @@ static MACHINE_CONFIG_START( poly88, poly88_state )
 	MCFG_I8251_RXRDY_HANDLER(WRITELINE(poly88_state,poly88_usart_rxready))
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", poly88_state, poly88, "img", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", poly88_state, poly88, "img", 2)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( poly8813, poly88 )

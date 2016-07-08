@@ -271,6 +271,8 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 	, m_features(features)
 	, m_ram_mask( (data_width == 8) ? 0xFF : 0x7F )
 	, m_num_interrupts(5)
+	, m_serial_tx_cb(*this)
+	, m_serial_rx_cb(*this)
 	, m_rtemp(0)
 {
 	m_ds5002fp.mcon = 0;
@@ -969,8 +971,7 @@ void mcs51_cpu_device::transmit_receive(int source)
 			m_uart.bits_to_send--;
 			if(m_uart.bits_to_send == 0) {
 				//Call the callback function
-				if(!m_serial_tx_callback.isnull())
-					m_serial_tx_callback(*m_io, 0, m_uart.data_out, 0xff);
+				m_serial_tx_cb(*m_io, 0, m_uart.data_out, 0xff);
 				//Set Interrupt Flag
 				SET_TI(1);
 			}
@@ -988,8 +989,7 @@ void mcs51_cpu_device::transmit_receive(int source)
 			{
 				int data = 0;
 				//Call our callball function to retrieve the data
-				if(!m_serial_rx_callback.isnull())
-					data = m_serial_rx_callback(*m_io, 0, 0xff);
+				data = m_serial_rx_cb(*m_io, 0, 0xff);
 				LOG(("RX Deliver %d\n", data));
 				SET_SBUF(data);
 				//Flag the IRQ
@@ -1322,20 +1322,6 @@ void mcs51_cpu_device::update_irq_prio(UINT8 ipl, UINT8 iph)
 		m_irq_prio[i] = ((ipl >> i) & 1) | (((iph >>i ) & 1) << 1);
 }
 
-/***************************************************************************
-    CALLBACKS - TODO: Remove
-***************************************************************************/
-
-
-void mcs51_cpu_device::i8051_set_serial_tx_callback(write8_delegate tx_func)
-{
-	m_serial_tx_callback = tx_func;
-}
-
-void mcs51_cpu_device::i8051_set_serial_rx_callback(read8_delegate rx_func)
-{
-	m_serial_rx_callback = rx_func;
-}
 
 /***************************************************************************
     OPCODES
@@ -2115,6 +2101,9 @@ void mcs51_cpu_device::device_start()
 
 	/* ensure these pointers are set before get_info is called */
 	update_ptrs();
+	
+	m_serial_rx_cb.resolve_safe(0);
+	m_serial_tx_cb.resolve_safe();
 
 	/* Save states */
 

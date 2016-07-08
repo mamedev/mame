@@ -38,7 +38,7 @@ typedef uintptr_t HashT;
 class sdl_window_info : public osd_window
 {
 public:
-	sdl_window_info(running_machine &a_machine, int index, osd_monitor_info *a_monitor,
+	sdl_window_info(running_machine &a_machine, int index, std::shared_ptr<osd_monitor_info> a_monitor,
 			const osd_window_config *config);
 
 	~sdl_window_info();
@@ -63,7 +63,7 @@ public:
 	int xy_to_render_target(int x, int y, int *xt, int *yt);
 
 	running_machine &machine() const override { return m_machine; }
-	osd_monitor_info *monitor() const override { return m_monitor; }
+	osd_monitor_info *monitor() const override { return m_monitor.get(); }
 	int fullscreen() const override { return m_fullscreen; }
 
 	render_target *target() override { return m_target; }
@@ -108,11 +108,12 @@ private:
 
 	// Pointer to machine
 	running_machine &   m_machine;
+
 	// monitor info
-	osd_monitor_info *  m_monitor;
-	int                 m_fullscreen;
-	bool                m_mouse_captured;
-	bool                m_mouse_hidden;
+	std::shared_ptr<osd_monitor_info>  m_monitor;
+	int                                m_fullscreen;
+	bool                               m_mouse_captured;
+	bool                               m_mouse_hidden;
 
 	void measure_fps(int update);
 

@@ -110,7 +110,7 @@ void menu_dats_view::populate()
 
 	(m_issoft == true) ? get_data_sw() : get_data();
 
-	item_append(menu_item_type::SEPARATOR);
+	item_append(menu_item_type::SEPARATOR, (FLAG_UI_DATS | FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW));
 	customtop = 2.0f * ui().get_line_height() + 4.0f * UI_BOX_TB_BORDER;
 	custombottom = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 
@@ -247,7 +247,7 @@ void menu_dats_view::get_data()
 	for (int x = 0; x < lines; ++x)
 	{
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));
-		item_append(tempbuf.c_str(), nullptr, (FLAG_UI_DATS | FLAG_DISABLE), (void *)(FPTR)(x + 1));
+		item_append(tempbuf, "", (FLAG_UI_DATS | FLAG_DISABLE), (void *)(FPTR)(x + 1));
 	}
 }
 
@@ -270,7 +270,7 @@ void menu_dats_view::get_data_sw()
 	for (int x = 0; x < lines; ++x)
 	{
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));
-		item_append(tempbuf.c_str(), nullptr, (FLAG_UI_DATS | FLAG_DISABLE), (void *)(FPTR)(x + 1));
+		item_append(tempbuf, "", (FLAG_UI_DATS | FLAG_DISABLE), (void *)(FPTR)(x + 1));
 	}
 }
 

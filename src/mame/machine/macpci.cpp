@@ -16,7 +16,6 @@
 #include "machine/applefdc.h"
 #include "machine/sonydriv.h"
 #include "includes/macpci.h"
-#include "debug/debugcpu.h"
 #include "machine/ram.h"
 #include "debugger.h"
 

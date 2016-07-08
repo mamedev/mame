@@ -76,7 +76,7 @@ private:
 	running_machine             *m_machine;
 	std::unique_ptr<ui_metrics>    m_metrics;
 	bool                        m_waiting_for_debugger;
-	simple_list<debugwin_info>  m_window_list;
+	std::vector<std::unique_ptr<debugwin_info>>  m_window_list;
 	consolewin_info             *m_main_console;
 };
 
@@ -84,8 +84,8 @@ private:
 void debugger_windows::exit()
 {
 	// loop over windows and free them
-	while (m_window_list.first() != nullptr)
-		m_window_list.first()->destroy();
+	while (!m_window_list.empty())
+		m_window_list.front()->destroy();
 
 	m_main_console = nullptr;
 	m_metrics.reset();
@@ -164,8 +164,8 @@ void debugger_windows::debugger_update()
 			m_machine->debugger().cpu().get_visible_cpu()->debug()->halt_on_next_instruction("User-initiated break\n");
 
 			// if we were focused on some window's edit box, reset it to default
-			for (debugwin_info &info : m_window_list)
-				info.restore_field(focuswnd);
+			for (auto &info : m_window_list)
+				info->restore_field(focuswnd);
 		}
 	}
 }
@@ -224,39 +224,40 @@ bool debugger_windows::seq_pressed() const
 
 void debugger_windows::remove_window(debugwin_info &info)
 {
-	m_window_list.remove(info);
+	for (auto it = m_window_list.begin(); it != m_window_list.end(); ++it)
+		if (it->get() == &info) {
+			m_window_list.erase(it);
+			return;
+		}
 }
 
 
 void debugger_windows::show_all()
 {
-	for (debugwin_info &info : m_window_list)
-		info.show();
+	for (auto &info : m_window_list)
+		info->show();
 }
 
 
 void debugger_windows::hide_all()
 {
 	SetForegroundWindow(osd_common_t::s_window_list.front()->platform_window<HWND>());
-	for (debugwin_info &info : m_window_list)
-		info.hide();
+	for (auto &info : m_window_list)
+		info->hide();
 }
 
 
 template <typename T> T *debugger_windows::create_window()
 {
 	// allocate memory
-	T *info = global_alloc(T(*this));
+	std::unique_ptr<T> info = std::make_unique<T>(static_cast<debugger_windows_interface &>(*this));
 	if (info->is_valid())
 	{
-		m_window_list.prepend(*info);
-		return info;
+		m_window_list.push_back(std::move(info));
+		T *ptr = dynamic_cast<T*>(m_window_list.back().get());
+		return ptr;
 	}
-	else
-	{
-		global_free(info);
-		return nullptr;
-	}
+	return nullptr;
 }
 
 

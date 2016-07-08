@@ -534,6 +534,7 @@ protected:
 	stop_bits_t get_stop_bits();
 	int get_rx_word_length();
 	int get_tx_word_length();
+	void safe_transmit_register_reset();
 
 	// receiver state
 	UINT8 m_rx_data_fifo[8];    // receive data FIFO
@@ -664,9 +665,11 @@ protected:
 	void reset_interrupts();
 	UINT8 modify_vector(UINT8 vect, int i, UINT8 src);
 	void trigger_interrupt(int index, int state);
+
+
 	int get_channel_index(z80scc_channel *ch) { return (ch == m_chanA) ? 0 : 1; }
 
-		// Variants in the SCC family
+	// Variants in the SCC family
 	enum
 	{
 		TYPE_Z80SCC   = 0x001,

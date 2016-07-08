@@ -41,10 +41,6 @@
 // timer callbacks look like this
 typedef delegate<void (void *, INT32)> timer_expired_delegate;
 
-// old-skool callbacks are like this
-typedef void (*timer_expired_func)(running_machine &machine, void *ptr, INT32 param);
-
-
 // ======================> emu_timer
 
 class emu_timer
@@ -140,14 +136,6 @@ public:
 	void timer_set(const attotime &duration, timer_expired_delegate callback, int param = 0, void *ptr = nullptr);
 	void timer_pulse(const attotime &period, timer_expired_delegate callback, int param = 0, void *ptr = nullptr);
 	void synchronize(timer_expired_delegate callback = timer_expired_delegate(), int param = 0, void *ptr = nullptr) { timer_set(attotime::zero, callback, param, ptr); }
-
-	// timers with old-skool callbacks
-#ifdef USE_STATIC_DELEGATE
-	emu_timer *timer_alloc(timer_expired_func callback, const char *name, void *ptr = nullptr) { return timer_alloc(timer_expired_delegate(callback, name, &machine()), ptr); }
-	void timer_set(const attotime &duration, timer_expired_func callback, const char *name, int param = 0, void *ptr = nullptr) { timer_set(duration, timer_expired_delegate(callback, name, &machine()), param, ptr); }
-	void timer_pulse(const attotime &period, timer_expired_func callback, const char *name, int param = 0, void *ptr = nullptr) { timer_pulse(period, timer_expired_delegate(callback, name, &machine()), param, ptr); }
-	void synchronize(timer_expired_func callback, const char *name = nullptr, int param = 0, void *ptr = nullptr) { timer_set(attotime::zero, callback, name, param, ptr); }
-#endif
 
 	// timers, specified by device/id; generally devices should use the device_t methods instead
 	emu_timer *timer_alloc(device_t &device, device_timer_id id = 0, void *ptr = nullptr);

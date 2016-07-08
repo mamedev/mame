@@ -62,7 +62,7 @@ public:
 	public:
 		using list_t = std::vector<callback_t *>;
 
-		virtual ~callback_t() { };
+		virtual ~callback_t() { }
 
 		virtual void register_state(state_manager_t &manager, const pstring &module) = 0;
 		virtual void on_pre_save() = 0;

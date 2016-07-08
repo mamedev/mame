@@ -3,38 +3,35 @@
 #include "emu.h"
 #include "osdnet.h"
 
-static class simple_list<osd_netdev::entry_t> netdev_list;
+static class std::vector<std::unique_ptr<osd_netdev::entry_t>> netdev_list;
 
 void add_netdev(const char *name, const char *description, create_netdev func)
 {
-	auto entry = global_alloc_clear<osd_netdev::entry_t>();
-	entry->id = netdev_list.count();
+	auto entry = make_unique_clear<osd_netdev::entry_t>();
+	entry->id = netdev_list.size();
 	strncpy(entry->name, name, 255);
 	entry->name[255] = '\0';
 	strncpy(entry->description, (description != nullptr) ? description : "(no name)", 255);
 	entry->description[255] = '\0';
 	entry->func = func;
-	netdev_list.append(*entry);
+	netdev_list.push_back(std::move(entry));
 }
 
 void clear_netdev()
 {
-	netdev_list.reset();
+	netdev_list.clear();
 }
 
-const osd_netdev::entry_t *netdev_first() {
-	return netdev_list.first();
+const std::vector<std::unique_ptr<osd_netdev::entry_t>>& get_netdev_list()
+{
+	return netdev_list;
 }
 
 class osd_netdev *open_netdev(int id, class device_network_interface *ifdev, int rate)
 {
-	osd_netdev::entry_t *entry = netdev_list.first();
-	while(entry) {
+	for(auto &entry : netdev_list)
 		if(entry->id==id)
 			return entry->func(entry->name, ifdev, rate);
-		entry = entry->m_next;
-	}
-
 	return nullptr;
 }
 
@@ -110,13 +107,13 @@ const char *osd_netdev::get_mac()
 
 int netdev_count()
 {
-	return netdev_list.count();
+	return netdev_list.size();
 }
 
 void osd_list_network_adapters(void)
 {
 	#ifdef USE_NETWORK
-	int num_devs = netdev_list.count();
+	int num_devs = netdev_list.size();
 
 	if (num_devs == 0)
 	{
@@ -125,10 +122,9 @@ void osd_list_network_adapters(void)
 	}
 
 	printf("Available network adapters:\n");
-	const osd_netdev::entry_t *entry = netdev_first();
-	while(entry) {
+	for (auto &entry : netdev_list)
+	{
 		printf("    %s\n", entry->description);
-		entry = entry->m_next;
 	}
 
 	#else

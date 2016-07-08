@@ -10,7 +10,6 @@
 #define __WIN_D3DHLSL__
 
 #include <vector>
-#include "aviio.h"
 #include "../frontend/mame/ui/menuitem.h"
 #include "../frontend/mame/ui/slider.h"
 #include "modules/lib/osdlib.h"
@@ -77,7 +76,6 @@ public:
 		CU_FOCUS_SIZE,
 
 		CU_PHOSPHOR_LIFE,
-		CU_PHOSPHOR_IGNORE,
 
 		CU_POST_VIGNETTING,
 		CU_POST_DISTORTION,
@@ -105,30 +103,9 @@ public:
 
 	uniform(effect *shader, const char *name, uniform_type type, int id);
 
-	void        set_next(uniform *next);
-	uniform *   get_next() { return m_next; }
-
-	void        set(float x, float y, float z, float w);
-	void        set(float x, float y, float z);
-	void        set(float x, float y);
-	void        set(float x);
-	void        set(int x);
-	void        set(bool x);
-	void        set(D3DMATRIX *mat);
-	void        set(IDirect3DTexture9 *tex);
-
-	void        upload();
 	void        update();
 
 protected:
-	uniform     *m_next;
-
-	float       m_vec[4];
-	int         m_ival;
-	bool        m_bval;
-	D3DMATRIX   *m_mval;
-	IDirect3DTexture9 *m_texture;
-	int         m_count;
 	uniform_type m_type;
 	int         m_id;
 
@@ -156,7 +133,7 @@ public:
 	void        set_float(D3DXHANDLE param, float value);
 	void        set_int(D3DXHANDLE param, int value);
 	void        set_bool(D3DXHANDLE param, bool value);
-	void        set_matrix(D3DXHANDLE param, D3DMATRIX *matrix);
+	void        set_matrix(D3DXHANDLE param, D3DXMATRIX *matrix);
 	void        set_texture(D3DXHANDLE param, IDirect3DTexture9 *tex);
 
 	void        add_uniform(const char *name, uniform::uniform_type type, int id);
@@ -164,15 +141,13 @@ public:
 
 	D3DXHANDLE  get_parameter(D3DXHANDLE param, const char *name);
 
-	ULONG       release();
-
 	shaders*    get_shaders() { return m_shaders; }
 
 	bool        is_valid() { return m_valid; }
 
 private:
-	uniform     *m_uniform_head;
-	uniform     *m_uniform_tail;
+	std::vector<std::unique_ptr<uniform>> m_uniform_list;
+
 	ID3DXEffect *m_effect;
 	shaders     *m_shaders;
 
@@ -182,6 +157,7 @@ private:
 class d3d_render_target;
 class cache_target;
 class renderer_d3d9;
+class movie_recorder;
 
 /* hlsl_options is the information about runtime-mutable Direct3D HLSL options */
 /* in the future this will be moved into an OSD/emu shared buffer */
@@ -281,14 +257,13 @@ struct slider_desc
 class slider
 {
 public:
-	slider(slider_desc *desc, void *value, bool *dirty) : m_desc(desc), m_value(value), m_dirty(dirty) { }
+	slider(slider_desc *desc, void *value, bool *dirty) : m_desc(desc), m_value(value) { }
 
 	INT32 update(std::string *str, INT32 newval);
 
 private:
 	slider_desc *   m_desc;
 	void *          m_value;
-	bool *          m_dirty;
 };
 
 class shaders : public slider_changed_notifier
@@ -309,13 +284,9 @@ public:
 	d3d_render_target* get_vector_target(render_primitive *prim);
 	bool create_vector_target(render_primitive *prim);
 
-	void begin_frame();
-	void end_frame();
-
 	void begin_draw();
 	void end_draw();
 
-	void init_effect_info(poly_info *poly);
 	void render_quad(poly_info *poly, int vertnum);
 
 	bool register_texture(render_primitive *prim, texture_info *texture);
@@ -323,14 +294,10 @@ public:
 	bool add_render_target(renderer_d3d9* d3d, render_primitive *prim, texture_info* texture, int source_width, int source_height, int target_width, int target_height);
 	bool add_cache_target(renderer_d3d9* d3d, texture_info* texture, int source_width, int source_height, int target_width, int target_height, int screen_index);
 
-	void window_save();
-	void window_record();
-	bool recording() const { return avi_output_file != nullptr; }
+	void save_snapshot();
+	void record_movie();
 
-	void avi_update_snap(IDirect3DSurface9 *surface);
-	void render_snapshot(IDirect3DSurface9 *surface);
-	void record_texture();
-	void init_fsfx_quad(void *vertbuf);
+	void init_fsfx_quad();
 
 	void                    set_texture(texture_info *info);
 	d3d_render_target *     find_render_target(texture_info *texture);
@@ -352,8 +319,7 @@ private:
 	void                    blit(IDirect3DSurface9 *dst, bool clear_dst, D3DPRIMITIVETYPE prim_type, UINT32 prim_index, UINT32 prim_count);
 	void                    enumerate_screens();
 
-	void                    end_avi_recording();
-	void                    begin_avi_recording(const char *name);
+	void                    render_snapshot(IDirect3DSurface9 *surface);
 
 	d3d_render_target*      find_render_target(int source_width, int source_height, UINT32 screen_index, UINT32 page_index);
 	cache_target *          find_cache_target(UINT32 screen_index, int width, int height);
@@ -384,35 +350,25 @@ private:
 
 	bool                    post_fx_enable;             // overall enable flag
 	bool                    oversampling_enable;        // oversampling enable flag
-	bool                    paused;                     // whether or not rendering is currently paused
 	int                     num_screens;                // number of emulated physical screens
 	int                     curr_screen;                // current screen for render target operations
 	bitmap_argb32           shadow_bitmap;              // shadow mask bitmap for post-processing shader
 	texture_info *          shadow_texture;             // shadow mask texture for post-processing shader
 	hlsl_options *          options;                    // current options
 
-	avi_file::ptr           avi_output_file;            // AVI file
-	bitmap_rgb32            avi_snap;                   // AVI snapshot
-	int                     avi_frame;                  // AVI frame
-	attotime                avi_frame_period;           // AVI frame period
-	attotime                avi_next_frame_time;        // AVI next frame time
-	IDirect3DSurface9 *     avi_copy_surface;           // AVI destination surface in system memory
-	IDirect3DTexture9 *     avi_copy_texture;           // AVI destination texture in system memory
-	IDirect3DSurface9 *     avi_final_target;           // AVI upscaled surface
-	IDirect3DTexture9 *     avi_final_texture;          // AVI upscaled texture
-
 	IDirect3DSurface9 *     black_surface;              // black dummy surface
 	IDirect3DTexture9 *     black_texture;              // black dummy texture
 
+	bool                    recording_movie;            // ongoing movie recording
+	std::unique_ptr<movie_recorder> recorder;           // HLSL post-render movie recorder
+
 	bool                    render_snap;                // whether or not to take HLSL post-render snapshot
-	bool                    snap_rendered;              // whether we just rendered our HLSL post-render shot or not
 	IDirect3DSurface9 *     snap_copy_target;           // snapshot destination surface in system memory
 	IDirect3DTexture9 *     snap_copy_texture;          // snapshot destination surface in system memory
 	IDirect3DSurface9 *     snap_target;                // snapshot upscaled surface
 	IDirect3DTexture9 *     snap_texture;               // snapshot upscaled texture
 	int                     snap_width;                 // snapshot width
 	int                     snap_height;                // snapshot height
-	bool                    lines_pending;              // whether or not we have lines to flush on the next quad
 
 	bool                    initialized;                // whether or not we're initialized
 
@@ -431,13 +387,13 @@ private:
 	effect *                bloom_effect;               // pointer to the bloom composite effect
 	effect *                downsample_effect;          // pointer to the bloom downsample effect
 	effect *                vector_effect;              // pointer to the vector-effect object
-	vertex *                fsfx_vertices;              // pointer to our full-screen-quad object
 
 	texture_info *          curr_texture;
 	d3d_render_target *     curr_render_target;
 	poly_info *             curr_poly;
-	d3d_render_target *     targethead;
-	cache_target *          cachehead;
+
+	std::vector<std::unique_ptr<d3d_render_target>> m_render_target_list;
+	std::vector<std::unique_ptr<cache_target>> m_cache_target_list;
 
 	std::vector<slider*>    internal_sliders;
 	std::vector<ui::menu_item> m_sliders;

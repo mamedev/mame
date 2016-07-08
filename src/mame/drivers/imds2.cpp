@@ -835,6 +835,7 @@ static MACHINE_CONFIG_START(imds2 , imds2_state)
 		MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(imds2_state , crtc_display_pixels)
 		MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("iocdma" , i8257_device , dreq2_w))
 		MCFG_I8275_IRQ_CALLBACK(INPUTLINE("ioccpu" , I8085_INTR_LINE))
+		MCFG_VIDEO_SET_SCREEN("screen")
 
 		MCFG_SCREEN_ADD("screen" , RASTER)
 		MCFG_SCREEN_UPDATE_DEVICE("ioccrtc" , i8275_device , screen_update)

@@ -14,7 +14,6 @@
 #include "debugger.h"
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
-#include "debug/debugcpu.h"
 #include "includes/chihiro.h"
 #include "includes/xbox.h"
 #include "includes/xbox_usb.h"
@@ -35,7 +34,7 @@ void xbox_base_state::dump_string_command(int ref, int params, const char **para
 		return;
 
 	offs_t address = (offs_t)addr;
-	if (!machine().debugger().cpu().translate(space, TRANSLATE_READ_DEBUG, &address))
+	if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
 	{
 		machine().debugger().console().printf("Address is unmapped.\n");
 		return;
@@ -47,7 +46,7 @@ void xbox_base_state::dump_string_command(int ref, int params, const char **para
 	machine().debugger().console().printf("Length %d word\n", length);
 	machine().debugger().console().printf("MaximumLength %d word\n", maximumlength);
 	machine().debugger().console().printf("Buffer %08X byte* ", buffer);
-	if (!machine().debugger().cpu().translate(space, TRANSLATE_READ_DEBUG, &buffer))
+	if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, buffer))
 	{
 		machine().debugger().console().printf("\nBuffer is unmapped.\n");
 		return;
@@ -76,7 +75,7 @@ void xbox_base_state::dump_process_command(int ref, int params, const char **par
 		return;
 
 	offs_t address = (offs_t)addr;
-	if (!machine().debugger().cpu().translate(space, TRANSLATE_READ_DEBUG, &address))
+	if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
 	{
 		machine().debugger().console().printf("Address is unmapped.\n");
 		return;
@@ -113,7 +112,7 @@ void xbox_base_state::dump_list_command(int ref, int params, const char **param)
 
 	UINT64 start = addr;
 	offs_t address = (offs_t)addr;
-	if (!machine().debugger().cpu().translate(space, TRANSLATE_READ_DEBUG, &address))
+	if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
 	{
 		machine().debugger().console().printf("Address is unmapped.\n");
 		return;
@@ -137,7 +136,7 @@ void xbox_base_state::dump_list_command(int ref, int params, const char **param)
 		if (addr == old)
 			break;
 		address = (offs_t)addr;
-		if (!machine().debugger().cpu().translate(space, TRANSLATE_READ_DEBUG, &address))
+		if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
 			break;
 	}
 }
@@ -154,7 +153,7 @@ void xbox_base_state::dump_dpc_command(int ref, int params, const char **param)
 		return;
 
 	offs_t address = (offs_t)addr;
-	if (!machine().debugger().cpu().translate(space, TRANSLATE_READ_DEBUG, &address))
+	if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
 	{
 		machine().debugger().console().printf("Address is unmapped.\n");
 		return;
@@ -181,7 +180,7 @@ void xbox_base_state::dump_timer_command(int ref, int params, const char **param
 		return;
 
 	offs_t address = (offs_t)addr;
-	if (!machine().debugger().cpu().translate(space, TRANSLATE_READ_DEBUG, &address))
+	if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
 	{
 		machine().debugger().console().printf("Address is unmapped.\n");
 		return;
@@ -204,7 +203,7 @@ void xbox_base_state::curthread_command(int ref, int params, const char **param)
 
 	UINT64 fsbase = m_maincpu->state_int(44);
 	offs_t address = (offs_t)fsbase + 0x28;
-	if (!machine().debugger().cpu().translate(space, TRANSLATE_READ_DEBUG, &address))
+	if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
 	{
 		machine().debugger().console().printf("Address is unmapped.\n");
 		return;
@@ -214,14 +213,14 @@ void xbox_base_state::curthread_command(int ref, int params, const char **param)
 	machine().debugger().console().printf("Current thread is %08X\n", kthrd);
 
 	address = (offs_t)kthrd + 0x1c;
-	if (!machine().debugger().cpu().translate(space, TRANSLATE_READ_DEBUG, &address))
+	if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
 		return;
 
 	UINT32 topstack = space.read_dword_unaligned(address);
 	machine().debugger().console().printf("Current thread stack top is %08X\n", topstack);
 
 	address = (offs_t)kthrd + 0x28;
-	if (!machine().debugger().cpu().translate(space, TRANSLATE_READ_DEBUG, &address))
+	if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
 		return;
 
 	UINT32 tlsdata = space.read_dword_unaligned(address);
@@ -229,7 +228,7 @@ void xbox_base_state::curthread_command(int ref, int params, const char **param)
 		address = (offs_t)topstack - 0x210 - 8;
 	else
 		address = (offs_t)tlsdata - 8;
-	if (!machine().debugger().cpu().translate(space, TRANSLATE_READ_DEBUG, &address))
+	if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
 		return;
 	machine().debugger().console().printf("Current thread function is %08X\n", space.read_dword_unaligned(address));
 }
@@ -325,7 +324,7 @@ void xbox_base_state::vprogdis_command(int ref, int params, const char **param)
 		if (type == 1)
 		{
 			offs_t addr = (offs_t)address;
-			if (!machine().debugger().cpu().translate(space, TRANSLATE_READ_DEBUG, &addr))
+			if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, addr))
 				return;
 			instruction[0] = space.read_dword_unaligned(address);
 			instruction[1] = space.read_dword_unaligned(address + 4);

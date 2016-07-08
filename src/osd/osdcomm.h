@@ -85,6 +85,11 @@ using INT64 = std::int64_t;
 /* pointer-sized values */
 using FPTR = uintptr_t;
 
+/* unicode types */
+using utf16_char = std::uint16_t;
+using unicode_char = std::uint32_t;
+
+
 
 
 /***************************************************************************

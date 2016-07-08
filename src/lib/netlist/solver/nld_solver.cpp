@@ -172,7 +172,8 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 						log().debug("Added input\n");
 					}
 					break;
-				default:
+				case terminal_t::OUTPUT:
+				case terminal_t::PARAM:
 					log().fatal("unhandled element found\n");
 					break;
 			}
@@ -335,7 +336,7 @@ void matrix_solver_t::setup_matrix()
 	}
 	log().verbose("Number of mults/adds for {1}: {2}", name(), ops);
 
-	if (0)
+	if ((0))
 		for (unsigned k = 0; k < iN; k++)
 		{
 			pstring line = plib::pfmt("{1}")(k, "3");
@@ -390,7 +391,7 @@ void matrix_solver_t::update() NOEXCEPT
 
 	if (m_params.m_dynamic && has_timestep_devices() && new_timestep > netlist_time::zero())
 	{
-		m_Q_sync.net().toggle_new_Q();
+		m_Q_sync.net().force_queue_execution();
 		m_Q_sync.net().reschedule_in_queue(new_timestep);
 	}
 }
@@ -401,7 +402,7 @@ void matrix_solver_t::update_forced()
 
 	if (m_params.m_dynamic && has_timestep_devices())
 	{
-		m_Q_sync.net().toggle_new_Q();
+		m_Q_sync.net().force_queue_execution();
 		m_Q_sync.net().reschedule_in_queue(netlist_time::from_double(m_params.m_min_timestep));
 	}
 }
@@ -413,7 +414,7 @@ void matrix_solver_t::step(const netlist_time &delta)
 		m_step_devices[k]->step_time(dd);
 }
 
-const netlist_time matrix_solver_t::solve_base()
+void matrix_solver_t::solve_base()
 {
 	m_stat_vsolver_calls++;
 	if (has_dynamic_devices())
@@ -441,7 +442,6 @@ const netlist_time matrix_solver_t::solve_base()
 	{
 		this->vsolve_non_dynamic(false);
 	}
-	return this->compute_next_timestep();
 }
 
 const netlist_time matrix_solver_t::solve()
@@ -451,18 +451,17 @@ const netlist_time matrix_solver_t::solve()
 
 	// We are already up to date. Avoid oscillations.
 	// FIXME: Make this a parameter!
-	if (delta < netlist_time::from_nsec(1)) // 20000
-		return netlist_time::from_nsec(0);
+	if (delta < netlist_time::quantum())
+		return netlist_time::zero();
 
 	/* update all terminals for new time step */
 	m_last_step = now;
-	m_cur_ts = delta.as_double();
-
 	step(delta);
-
-	const netlist_time next_time_step = solve_base();
+	solve_base();
+	const netlist_time next_time_step = compute_next_timestep(delta.as_double());
 
 	update_inputs();
+
 	return next_time_step;
 }
 
@@ -496,7 +495,7 @@ void matrix_solver_t::add_term(int k, terminal_t *term)
 	}
 }
 
-netlist_time matrix_solver_t::compute_next_timestep()
+netlist_time matrix_solver_t::compute_next_timestep(const double cur_ts)
 {
 	nl_double new_solver_timestep = m_params.m_max_timestep;
 
@@ -512,15 +511,15 @@ netlist_time matrix_solver_t::compute_next_timestep()
 			terms_t *t = m_terms[k];
 
 			const nl_double DD_n = (n->Q_Analog() - t->m_last_V);
-			const nl_double hn = current_timestep();
+			const nl_double hn = cur_ts;
 
 			nl_double DD2 = (DD_n / hn - t->m_DD_n_m_1 / t->m_h_n_m_1) / (hn + t->m_h_n_m_1);
 			nl_double new_net_timestep;
 
 			t->m_h_n_m_1 = hn;
 			t->m_DD_n_m_1 = DD_n;
-			if (std::abs(DD2) > NL_FCONST(1e-30)) // avoid div-by-zero
-				new_net_timestep = std::sqrt(m_params.m_lte / std::abs(NL_FCONST(0.5)*DD2));
+			if (std::fabs(DD2) > NL_FCONST(1e-60)) // avoid div-by-zero
+				new_net_timestep = std::sqrt(m_params.m_lte / std::fabs(NL_FCONST(0.5)*DD2));
 			else
 				new_net_timestep = m_params.m_max_timestep;
 
@@ -534,7 +533,10 @@ netlist_time matrix_solver_t::compute_next_timestep()
 	}
 	//if (new_solver_timestep > 10.0 * hn)
 	//    new_solver_timestep = 10.0 * hn;
-	return netlist_time::from_double(new_solver_timestep);
+	/*
+	 * FIXME: Factor 2 below is important. Without, we get timing issues. This must be a bug elsewhere.
+	 */
+	return std::max(netlist_time::from_double(new_solver_timestep), netlist_time::quantum() * 2);
 }
 
 
@@ -713,12 +715,14 @@ void NETLIB_NAME(solver)::post_start()
 
 	if (m_params.m_dynamic)
 	{
-		m_params.m_max_timestep *= NL_FCONST(1000.0);
+		m_params.m_max_timestep *= 1;//NL_FCONST(1000.0);
 	}
 	else
 	{
 		m_params.m_min_timestep = m_params.m_max_timestep;
 	}
+
+	//m_params.m_max_timestep = std::max(m_params.m_max_timestep, m_params.m_max_timestep::)
 
 	// Override log statistics
 	pstring p = plib::util::environment("NL_STATS");

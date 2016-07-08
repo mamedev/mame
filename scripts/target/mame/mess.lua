@@ -585,6 +585,7 @@ MACHINES["APPLE_DRIVE"] = true
 MACHINES["APPLE_FDC"] = true
 MACHINES["SONY_DRIVE"] = true
 MACHINES["SCNXX562"] = true
+MACHINES["FGA002"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -883,6 +884,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"trs",
 		"ultimachine",
 		"ultratec",
+		"unicard",
 		"unisonic",
 		"unisys",
 		"usp",
@@ -1106,7 +1108,6 @@ files {
 	MAME_DIR .. "src/mame/includes/bbc.h",
 	MAME_DIR .. "src/mame/machine/bbc.cpp",
 	MAME_DIR .. "src/mame/video/bbc.cpp",
-	MAME_DIR .. "src/mame/drivers/bbcbc.cpp",
 	MAME_DIR .. "src/mame/drivers/electron.cpp",
 	MAME_DIR .. "src/mame/includes/electron.h",
 	MAME_DIR .. "src/mame/machine/electron.cpp",
@@ -2887,6 +2888,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/minicom.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "unicard")
+files {
+	MAME_DIR .. "src/mame/drivers/bbcbc.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "unisonic")
 files {
 	MAME_DIR .. "src/mame/drivers/unichamp.cpp",
@@ -3099,6 +3105,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/fanucs15.cpp",
 	MAME_DIR .. "src/mame/drivers/fanucspmg.cpp",
 	MAME_DIR .. "src/mame/drivers/fc100.cpp",
+	MAME_DIR .. "src/mame/drivers/fcisio.cpp",
 	MAME_DIR .. "src/mame/drivers/fcscsi.cpp",
 	MAME_DIR .. "src/mame/drivers/fk1.cpp",
 	MAME_DIR .. "src/mame/drivers/ft68m.cpp",

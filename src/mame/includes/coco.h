@@ -140,6 +140,10 @@ public:
 	DECLARE_READ8_MEMBER( floating_bus_read )   { return floating_bus_read(); }
 
 	DECLARE_WRITE_LINE_MEMBER( cart_w ) { cart_w((bool) state); }
+
+	// disassembly override
+	offs_t dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -227,9 +231,6 @@ private:
 
 	// floating bus
 	UINT8 floating_bus_read(void);
-
-	// disassembly override
-	static offs_t dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
 
 	// input ports
 	ioport_port *m_keyboard[7];

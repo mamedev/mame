@@ -51,7 +51,6 @@ const UINT64 device_state_entry::k_decimal_divisor[] =
 
 device_state_entry::device_state_entry(int index, const char *symbol, void *dataptr, UINT8 size, device_state_interface *dev)
 	: m_device_state(dev),
-		m_next(nullptr),
 		m_index(index),
 		m_dataptr(dataptr),
 		m_datamask(0),
@@ -89,7 +88,6 @@ device_state_entry::device_state_entry(int index, const char *symbol, void *data
 
 device_state_entry::device_state_entry(int index, device_state_interface *dev)
 	: m_device_state(dev),
-		m_next(nullptr),
 		m_index(index),
 		m_dataptr(nullptr),
 		m_datamask(0),
@@ -523,17 +521,14 @@ device_state_entry &device_state_interface::state_add(int index, const char *sym
 	assert(size == 1 || size == 2 || size == 4 || size == 8);
 	assert(symbol != nullptr);
 
-	// allocate new entry
-	auto entry = global_alloc(device_state_entry(index, symbol, data, size, this));
-
 	// append to the end of the list
-	m_state_list.append(*entry);
+	m_state_list.push_back(std::make_unique<device_state_entry>(index, symbol, data, size, this));
 
 	// set the fast entry if applicable
 	if (index >= FAST_STATE_MIN && index <= FAST_STATE_MAX)
-		m_fast_state[index - FAST_STATE_MIN] = entry;
+		m_fast_state[index - FAST_STATE_MIN] = m_state_list.back().get();
 
-	return *entry;
+	return *m_state_list.back().get();
 }
 
 //-------------------------------------------------
@@ -543,13 +538,10 @@ device_state_entry &device_state_interface::state_add(int index, const char *sym
 
 device_state_entry &device_state_interface::state_add_divider(int index)
 {
-	// allocate new entry
-	auto entry = global_alloc(device_state_entry(index, this));
-
 	// append to the end of the list
-	m_state_list.append(*entry);
+	m_state_list.push_back(std::make_unique<device_state_entry>(index, this));
 
-	return *entry;
+	return *m_state_list.back().get();
 }
 
 //-------------------------------------------------
@@ -604,7 +596,7 @@ void device_state_interface::state_string_export(const device_state_entry &entry
 void device_state_interface::interface_post_start()
 {
 	// make sure we got something during startup
-	if (m_state_list.count() == 0)
+	if (m_state_list.size() == 0)
 		throw emu_fatalerror("No state registered for device '%s' that supports it!", m_device.tag());
 }
 
@@ -621,9 +613,9 @@ const device_state_entry *device_state_interface::state_find_entry(int index) co
 		return m_fast_state[index - FAST_STATE_MIN];
 
 	// otherwise, scan the first
-	for (const device_state_entry *entry = m_state_list.first(); entry != nullptr; entry = entry->m_next)
+	for (auto &entry : m_state_list)
 		if (entry->m_index == index)
-			return entry;
+			return entry.get();
 
 	// handle failure by returning nullptr
 	return nullptr;

@@ -33,7 +33,7 @@ public:
 	// static
 
 	static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data);
-	static osd_monitor_info *monitor_from_handle(HMONITOR monitor);
+	static std::shared_ptr<osd_monitor_info> monitor_from_handle(HMONITOR monitor);
 
 	HMONITOR handle() const { return m_handle; }
 

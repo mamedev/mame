@@ -36,7 +36,7 @@
 osd_video_config video_config;
 
 // monitor info
-osd_monitor_info *osd_monitor_info::list = nullptr;
+std::list<std::shared_ptr<osd_monitor_info>> osd_monitor_info::list;
 
 
 //============================================================
@@ -94,11 +94,9 @@ void windows_osd_interface::video_exit()
 	window_exit();
 
 	// free all of our monitor information
-	while (osd_monitor_info::list != nullptr)
+	while (!osd_monitor_info::list.empty())
 	{
-		osd_monitor_info *temp = osd_monitor_info::list;
-		osd_monitor_info::list = temp->m_next;
-		global_free(temp);
+		osd_monitor_info::list.remove(osd_monitor_info::list.front());
 	}
 }
 
@@ -124,13 +122,12 @@ void win_monitor_info::refresh()
 
 	// fetch the latest info about the monitor
 	m_info.cbSize = sizeof(m_info);
-	result = GetMonitorInfo(m_handle, (LPMONITORINFO)&m_info);
+	result = GetMonitorInfo(m_handle, static_cast<LPMONITORINFO>(&m_info));
 	assert(result);
-	char *temp = utf8_from_tstring(m_info.szDevice);
 
-	if (temp) strncpy(m_name, temp, sizeof(m_name));
+	osd_unique_str temp(utf8_from_tstring(m_info.szDevice));
 
-	osd_free(temp);
+	if (temp) m_name.assign(temp.get());
 
 	m_pos_size = RECT_to_osd_rect(m_info.rcMonitor);
 	m_usuable_pos_size = RECT_to_osd_rect(m_info.rcWork);
@@ -144,14 +141,13 @@ void win_monitor_info::refresh()
 //  winvideo_monitor_from_handle
 //============================================================
 
-osd_monitor_info *win_monitor_info::monitor_from_handle(HMONITOR hmonitor)
+std::shared_ptr<osd_monitor_info> win_monitor_info::monitor_from_handle(HMONITOR hmonitor)
 {
-	osd_monitor_info *monitor;
-
 	// find the matching monitor
-	for (monitor = osd_monitor_info::list; monitor != nullptr; monitor = monitor->m_next)
-		if (*((HMONITOR *)monitor->oshandle()) == hmonitor)
+	for (auto monitor : osd_monitor_info::list)
+		if (*((HMONITOR*)monitor->oshandle()) == hmonitor)
 			return monitor;
+	
 	return nullptr;
 }
 
@@ -193,8 +189,6 @@ void windows_osd_interface::update(bool skip_redraw)
 
 BOOL CALLBACK win_monitor_info::monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data)
 {
-	osd_monitor_info ***tailptr = (osd_monitor_info ***)data;
-	osd_monitor_info *monitor;
 	MONITORINFOEX info;
 	BOOL result;
 
@@ -205,17 +199,16 @@ BOOL CALLBACK win_monitor_info::monitor_enum_callback(HMONITOR handle, HDC dc, L
 	(void)result; // to silence gcc 4.6
 
 	// guess the aspect ratio assuming square pixels
-	float aspect = (float)(info.rcMonitor.right - info.rcMonitor.left) / (float)(info.rcMonitor.bottom - info.rcMonitor.top);
+	float aspect = static_cast<float>(info.rcMonitor.right - info.rcMonitor.left) / static_cast<float>(info.rcMonitor.bottom - info.rcMonitor.top);
 
 	// allocate a new monitor info
-	char *temp = utf8_from_tstring(info.szDevice);
+	osd_unique_str temp(utf8_from_tstring(info.szDevice));
+
 	// copy in the data
-	monitor = global_alloc(win_monitor_info(handle, temp, aspect));
-	osd_free(temp);
+	auto monitor = std::make_shared<win_monitor_info>(handle, temp.get(), aspect);
 
 	// hook us into the list
-	**tailptr = monitor;
-	*tailptr = &monitor->m_next;
+	osd_monitor_info::list.push_back(monitor);
 
 	// enumerate all the available monitors so to list their names in verbose mode
 	return TRUE;
@@ -231,14 +224,11 @@ static void init_monitors(void)
 	osd_monitor_info **tailptr;
 
 	// make a list of monitors
-	osd_monitor_info::list = nullptr;
-	tailptr = &osd_monitor_info::list;
 	EnumDisplayMonitors(nullptr, nullptr, win_monitor_info::monitor_enum_callback, (LPARAM)&tailptr);
 
 	// if we're verbose, print the list of monitors
 	{
-		osd_monitor_info *monitor;
-		for (monitor = osd_monitor_info::list; monitor != nullptr; monitor = monitor->m_next)
+		for (auto monitor : osd_monitor_info::list)
 		{
 			osd_printf_verbose("Video: Monitor %p = \"%s\" %s\n", monitor->oshandle(), monitor->devicename(), monitor->is_primary() ? "(primary)" : "");
 		}
@@ -250,10 +240,10 @@ static void init_monitors(void)
 //  pick_monitor
 //============================================================
 
-osd_monitor_info *osd_monitor_info::pick_monitor(osd_options &osdopts, int index)
+std::shared_ptr<osd_monitor_info> osd_monitor_info::pick_monitor(osd_options &osdopts, int index)
 {
 	windows_options &options = reinterpret_cast<windows_options &>(osdopts);
-	osd_monitor_info *monitor;
+	std::shared_ptr<osd_monitor_info> monitor;
 	const char *scrname, *scrname2;
 	int moncount = 0;
 	float aspect;
@@ -272,24 +262,37 @@ osd_monitor_info *osd_monitor_info::pick_monitor(osd_options &osdopts, int index
 	// look for a match in the name first
 	if (scrname != nullptr && (scrname[0] != 0))
 	{
-		for (monitor = osd_monitor_info::list; monitor != nullptr; monitor = monitor->next())
+		for (auto mon : osd_monitor_info::list)
 		{
 			moncount++;
-			if (strcmp(scrname, monitor->devicename()) == 0)
+			if (strcmp(scrname, mon->devicename()) == 0)
+			{
+				monitor = mon;
 				goto finishit;
+			}
 		}
 	}
 
 	// didn't find it; alternate monitors until we hit the jackpot
 	index %= moncount;
-	for (monitor = osd_monitor_info::list; monitor != nullptr; monitor = monitor->next())
+	for (auto mon : osd_monitor_info::list)
+	{
 		if (index-- == 0)
+		{
+			monitor = mon;
 			goto finishit;
+		}
+	}
 
 	// return the primary just in case all else fails
-	for (monitor = osd_monitor_info::list; monitor != nullptr; monitor = monitor->next())
-		if (monitor->is_primary())
+	for (auto mon : osd_monitor_info::list)
+	{
+		if (mon->is_primary())
+		{
+			monitor = mon;
 			goto finishit;
+		}
+	}
 
 	// FIXME: FatalError?
 finishit:
@@ -297,6 +300,7 @@ finishit:
 	{
 		monitor->set_aspect(aspect);
 	}
+
 	return monitor;
 }
 

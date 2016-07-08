@@ -31,6 +31,7 @@ std::vector<submenu::option> submenu::misc_options = {
 	{ submenu::option_type::UI,   __("Skip bios selection menu"),                OPTION_SKIP_BIOS_MENU },
 	{ submenu::option_type::UI,   __("Skip software parts selection menu"),      OPTION_SKIP_PARTS_MENU },
 	{ submenu::option_type::UI,   __("Info auto audit"),                         OPTION_INFO_AUTO_AUDIT },
+	{ submenu::option_type::UI,   __("Hide romless machine from available list"),OPTION_HIDE_ROMLESS },
 };
 
 std::vector<submenu::option> submenu::advanced_options = {
@@ -314,13 +315,13 @@ void submenu::populate()
 		switch (sm_option->type)
 		{
 		case option_type::HEAD:
-			item_append(_(sm_option->description), nullptr, FLAG_DISABLE | FLAG_UI_HEADING, nullptr);
+			item_append(_(sm_option->description), "", FLAG_DISABLE | FLAG_UI_HEADING, nullptr);
 			break;
 		case option_type::SEP:
 			item_append(menu_item_type::SEPARATOR);
 			break;
 		case option_type::CMD:
-			item_append(_(sm_option->description), nullptr, 0, static_cast<void*>(&(*sm_option)));
+			item_append(_(sm_option->description), "", 0, static_cast<void*>(&(*sm_option)));
 			break;
 		case option_type::EMU:
 		case option_type::UI:

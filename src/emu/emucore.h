@@ -208,7 +208,6 @@ inline void operator--(_Type &value, int) { value = (_Type)((int)value - 1); }
 
 // this macro wraps a function 'x' and can be used to pass a function followed by its name
 #define FUNC(x) &x, #x
-#define FUNC_NULL nullptr, "(null)"
 
 
 // standard assertion macros

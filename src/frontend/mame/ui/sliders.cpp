@@ -152,7 +152,7 @@ void menu_sliders::populate()
 				flags |= FLAG_LEFT_ARROW;
 			if (curval < slider->maxval)
 				flags |= FLAG_RIGHT_ARROW;
-			item_append(slider->description, tempstring.c_str(), flags, (void *)slider, menu_item_type::SLIDER);
+			item_append(slider->description, tempstring, flags, (void *)slider, menu_item_type::SLIDER);
 		}
 		else
 		{
@@ -175,7 +175,7 @@ void menu_sliders::populate()
 				flags |= FLAG_LEFT_ARROW;
 			if (curval < slider->maxval)
 				flags |= FLAG_RIGHT_ARROW;
-			item_append(slider->description, tempstring.c_str(), flags, (void *)slider, menu_item_type::SLIDER);
+			item_append(slider->description, tempstring, flags, (void *)slider, menu_item_type::SLIDER);
 		}
 		else
 		{
