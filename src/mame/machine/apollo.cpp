@@ -1000,7 +1000,7 @@ bool apollo_ni::call_load()
  DEVICE_IMAGE_CREATE( rom )
  -------------------------------------------------*/
 
-bool apollo_ni::call_create(int format_type, option_resolution *format_options)
+bool apollo_ni::call_create(int format_type, util::option_resolution *format_options)
 {
 	CLOG1(("apollo_ni::call_create:"));
 

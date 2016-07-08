@@ -967,7 +967,7 @@ bool hp48_port_image_device::call_load()
 	return IMAGE_INIT_PASS;
 }
 
-bool hp48_port_image_device::call_create(int format_type, option_resolution *format_options)
+bool hp48_port_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	hp48_state *state = machine().driver_data<hp48_state>();
 	int size = m_max_size;
