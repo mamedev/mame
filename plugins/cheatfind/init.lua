@@ -295,7 +295,9 @@ function cheatfind.startplugin()
 		local menu = {}
 
 		local function menu_lim(val, min, max, menuitem)
-			if val == min then
+			if min == max then
+				menuitem[3] = 0
+			elseif val == min then
 				menuitem[3] = "r"
 			elseif val == max then
 				menuitem[3] = "l"
@@ -319,11 +321,7 @@ function cheatfind.startplugin()
 	
 		menu[#menu + 1] = function()
 			local m = { "CPU or RAM", devtable[devsel].tag, 0 }
-			if #devtable == 1 then
-				m[3] = 0
-			else
-				menu_lim(devsel, 1, #devtable, m)
-			end
+			menu_lim(devsel, 1, #devtable, m)
 			local function f(event)
 				if (event == "left" or event == "right") and #menu_blocks ~= 0 then
 					manager:machine():popmessage("Changes to this only take effect when \"Start new search\" is selected")
