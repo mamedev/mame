@@ -29,9 +29,6 @@ public:
 	m6502_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	m6502_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	DECLARE_WRITE_LINE_MEMBER( irq_line );
-	DECLARE_WRITE_LINE_MEMBER( nmi_line );
-
 	bool get_sync() const { return sync; }
 	void disable_direct() { direct_disabled = true; }
 

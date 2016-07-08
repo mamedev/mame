@@ -17,8 +17,6 @@
 #include "s2650.h"
 #include "s2650cpu.h"
 
-#define S2650_SENSE_LINE INPUT_LINE_IRQ1
-
 /* define this to have some interrupt information logged */
 #define VERBOSE 0
 
@@ -961,11 +959,6 @@ void s2650_device::s2650_set_sense(int state)
 		set_psu(m_psu | SI);
 	else
 		set_psu(m_psu & ~SI);
-}
-
-WRITE_LINE_MEMBER(s2650_device::write_sense)
-{
-	set_input_line(S2650_SENSE_LINE, state);
 }
 
 void s2650_device::execute_run()

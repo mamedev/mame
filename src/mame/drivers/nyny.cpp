@@ -363,7 +363,7 @@ WRITE_LINE_MEMBER(nyny_state::display_enable_changed)
 WRITE8_MEMBER(nyny_state::audio_1_command_w)
 {
 	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(M6800_IRQ_LINE, HOLD_LINE);
+	m_audiocpu->set_input_line(M6802_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -390,7 +390,7 @@ WRITE8_MEMBER(nyny_state::nyny_ay8910_37_port_a_w)
 WRITE8_MEMBER(nyny_state::audio_2_command_w)
 {
 	m_soundlatch2->write(space, 0, (data & 0x60) >> 5);
-	m_audiocpu2->set_input_line(M6800_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu2->set_input_line(M6802_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

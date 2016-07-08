@@ -343,8 +343,8 @@ static MACHINE_CONFIG_START( taito, taito_state )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(taito_state, pia_pb_w))
 	//MCFG_PIA_CA2_HANDLER(WRITELINE(taito_state, pia_ca2_w))
 	//MCFG_PIA_CB2_HANDLER(WRITELINE(taito_state, pia_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("audiocpu", m6802_cpu_device, nmi_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("audiocpu", m6802_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("audiocpu", M6802_IRQ_LINE))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_a", taito_state, timer_a, attotime::from_hz(200))
 MACHINE_CONFIG_END
@@ -376,8 +376,8 @@ static MACHINE_CONFIG_DERIVED( taito4, taito )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(taito_state, pia_pb_w))
 	//MCFG_PIA_CA2_HANDLER(WRITELINE(taito_state, pia_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(taito_state, pia_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("audiocpu", m6802_cpu_device, nmi_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("audiocpu", m6802_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("audiocpu", M6802_IRQ_LINE))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( taito_ay_audio )

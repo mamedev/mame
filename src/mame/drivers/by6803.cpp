@@ -390,8 +390,8 @@ static MACHINE_CONFIG_START( by6803, by6803_state )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(by6803_state, pia0_b_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(by6803_state, pia0_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(by6803_state, pia0_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6803_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6803_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6803_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6803_IRQ_LINE))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_z", by6803_state, pia0_timer, attotime::from_hz(120)) // mains freq*2
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)

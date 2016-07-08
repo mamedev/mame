@@ -248,14 +248,14 @@ void s8a_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	case TIMER_IRQ:
 		if(param == 1)
 		{
-			m_maincpu->set_input_line(M6800_IRQ_LINE,ASSERT_LINE);
+			m_maincpu->set_input_line(M6802_IRQ_LINE, ASSERT_LINE);
 			m_irq_timer->adjust(attotime::from_ticks(32,1e6),0);
 			m_pia28->ca1_w(BIT(ioport("DIAGS")->read(), 2));  // Advance
 			m_pia28->cb1_w(BIT(ioport("DIAGS")->read(), 3));  // Up/Down
 		}
 		else
 		{
-			m_maincpu->set_input_line(M6800_IRQ_LINE,CLEAR_LINE);
+			m_maincpu->set_input_line(M6802_IRQ_LINE, CLEAR_LINE);
 			m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
 			m_pia28->ca1_w(1);
 			m_pia28->cb1_w(1);
@@ -330,8 +330,8 @@ static MACHINE_CONFIG_START( s8a, s8a_state )
 	MCFG_DEVICE_ADD("pias", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(s8a_state, dac_r))
 	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("dac", dac_device, write_unsigned8))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("audiocpu", m6808_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("audiocpu", m6808_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("audiocpu", M6808_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("audiocpu", M6808_IRQ_LINE))
 MACHINE_CONFIG_END
 
 

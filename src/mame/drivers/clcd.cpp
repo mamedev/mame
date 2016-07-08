@@ -206,7 +206,7 @@ public:
 
 	void update_irq()
 	{
-		m_maincpu->irq_line(m_irq_via0 | m_irq_via1 | m_irq_acia);
+		m_maincpu->set_input_line(M65C02_IRQ_LINE, m_irq_via0 | m_irq_via1 | m_irq_acia);
 	}
 
 	WRITE_LINE_MEMBER(write_irq_via0)
