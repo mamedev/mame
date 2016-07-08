@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-15 17:42+0200\n"
+"POT-Creation-Date: 2016-07-07 23:13+0200\n"
 "PO-Revision-Date: 2016-02-20 18:03+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: MAME Language Team\n"
@@ -18,23 +18,23 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/emu/ui/auditmenu.cpp:115
+#: src/frontend/mame/ui/auditmenu.cpp:116
 msgid "Audit in progress..."
 msgstr "Bezig met controle..."
 
-#: src/emu/ui/barcode.cpp:72
+#: src/frontend/mame/ui/barcode.cpp:73
 msgid "New Barcode:"
 msgstr "Nieuwe barcode:"
 
-#: src/emu/ui/barcode.cpp:76
+#: src/frontend/mame/ui/barcode.cpp:77
 msgid "Enter Code"
 msgstr "Vul code in"
 
-#: src/emu/ui/barcode.cpp:118
+#: src/frontend/mame/ui/barcode.cpp:119
 msgid "Barcode length invalid!"
 msgstr "Ongeldige barcode lengte"
 
-#: src/emu/ui/cheatopt.cpp:77
+#: src/frontend/mame/ui/cheatopt.cpp:92
 #, c-format
 msgid ""
 "Cheat Comment:\n"
@@ -43,599 +43,600 @@ msgstr ""
 "Cheat commentaar:\n"
 "\n"
 
-#: src/emu/ui/cheatopt.cpp:90
+#: src/frontend/mame/ui/cheatopt.cpp:105
 msgid "All cheats reloaded"
 msgstr "Alle cheats opnieuw ingelezen"
 
-#: src/emu/ui/cheatopt.cpp:121
+#: src/frontend/mame/ui/cheatopt.cpp:136
 msgid "Autofire Settings"
 msgstr "Autofire instellingen"
 
-#: src/emu/ui/cheatopt.cpp:139
+#: src/frontend/mame/ui/cheatopt.cpp:157
 msgid "Reset All"
 msgstr "Reset alles"
 
-#: src/emu/ui/cheatopt.cpp:142
+#: src/frontend/mame/ui/cheatopt.cpp:160
 msgid "Reload All"
 msgstr "Alles opnieuw inlezen"
 
-#: src/emu/ui/cheatopt.cpp:256
+#: src/frontend/mame/ui/cheatopt.cpp:273
 msgid "Autofire Status"
 msgstr "Autofire status"
 
-#: src/emu/ui/cheatopt.cpp:256 src/emu/ui/ui.cpp:1695
-#: src/emu/ui/videoopt.cpp:207 src/emu/ui/videoopt.cpp:211
-#: src/emu/ui/videoopt.cpp:215 src/emu/ui/videoopt.cpp:219
-#: src/emu/ui/videoopt.cpp:223
+#: src/frontend/mame/ui/cheatopt.cpp:273 src/frontend/mame/ui/ui.cpp:1478
+#: src/frontend/mame/ui/videoopt.cpp:208 src/frontend/mame/ui/videoopt.cpp:212
+#: src/frontend/mame/ui/videoopt.cpp:216 src/frontend/mame/ui/videoopt.cpp:220
+#: src/frontend/mame/ui/videoopt.cpp:224
 msgid "Disabled"
 msgstr "Uitgeschakeld"
 
-#: src/emu/ui/cheatopt.cpp:256 src/emu/ui/ui.cpp:1695
-#: src/emu/ui/videoopt.cpp:207 src/emu/ui/videoopt.cpp:211
-#: src/emu/ui/videoopt.cpp:215 src/emu/ui/videoopt.cpp:219
-#: src/emu/ui/videoopt.cpp:223
+#: src/frontend/mame/ui/cheatopt.cpp:273 src/frontend/mame/ui/ui.cpp:1478
+#: src/frontend/mame/ui/videoopt.cpp:208 src/frontend/mame/ui/videoopt.cpp:212
+#: src/frontend/mame/ui/videoopt.cpp:216 src/frontend/mame/ui/videoopt.cpp:220
+#: src/frontend/mame/ui/videoopt.cpp:224
 msgid "Enabled"
 msgstr "Ingeschakeld"
 
-#: src/emu/ui/cheatopt.cpp:282 src/emu/ui/cheatopt.cpp:288
-#: src/emu/ui/menu.cpp:755 src/emu/ui/miscmenu.cpp:936
-#: src/emu/ui/sndmenu.cpp:133 src/emu/ui/sndmenu.cpp:135
+#: src/frontend/mame/ui/cheatopt.cpp:299 src/frontend/mame/ui/cheatopt.cpp:305
+#: src/frontend/mame/ui/menu.cpp:712 src/frontend/mame/ui/miscmenu.cpp:942
+#: src/frontend/mame/ui/sndmenu.cpp:133 src/frontend/mame/ui/sndmenu.cpp:135
 msgid "On"
 msgstr "Aan"
 
-#: src/emu/ui/cheatopt.cpp:282 src/emu/ui/cheatopt.cpp:288
-#: src/emu/ui/menu.cpp:758 src/emu/ui/miscmenu.cpp:936
-#: src/emu/ui/sndmenu.cpp:133 src/emu/ui/sndmenu.cpp:135
+#: src/frontend/mame/ui/cheatopt.cpp:299 src/frontend/mame/ui/cheatopt.cpp:305
+#: src/frontend/mame/ui/menu.cpp:715 src/frontend/mame/ui/miscmenu.cpp:942
+#: src/frontend/mame/ui/sndmenu.cpp:133 src/frontend/mame/ui/sndmenu.cpp:135
 msgid "Off"
 msgstr "Uit"
 
-#: src/emu/ui/cheatopt.cpp:299
+#: src/frontend/mame/ui/cheatopt.cpp:316
 msgid "No buttons found on this machine!"
 msgstr "Geen knoppen gevonden op deze machine!"
 
-#: src/emu/ui/cheatopt.cpp:310 src/emu/ui/cheatopt.cpp:314
+#: src/frontend/mame/ui/cheatopt.cpp:327 src/frontend/mame/ui/cheatopt.cpp:331
 msgid "Autofire Delay"
 msgstr "Vertraging autofire"
 
-#: src/emu/ui/custmenu.cpp:157 src/emu/ui/custmenu.cpp:445
+#: src/frontend/mame/ui/custmenu.cpp:159 src/frontend/mame/ui/custmenu.cpp:446
 msgid "Main filter"
 msgstr "Hoofdfilter"
 
-#: src/emu/ui/custmenu.cpp:166 src/emu/ui/custmenu.cpp:454
+#: src/frontend/mame/ui/custmenu.cpp:168 src/frontend/mame/ui/custmenu.cpp:455
 msgid "Other filter"
 msgstr "Ander filter"
 
-#: src/emu/ui/custmenu.cpp:175 src/emu/ui/optsmenu.cpp:238
+#: src/frontend/mame/ui/custmenu.cpp:177 src/frontend/mame/ui/optsmenu.cpp:253
 msgid "^!Manufacturer"
 msgstr "^!Fabrikant"
 
-#: src/emu/ui/custmenu.cpp:184 src/emu/ui/custmenu.cpp:472
-#: src/emu/ui/optsmenu.cpp:246
+#: src/frontend/mame/ui/custmenu.cpp:186 src/frontend/mame/ui/custmenu.cpp:473
+#: src/frontend/mame/ui/optsmenu.cpp:261
 msgid "^!Year"
 msgstr "^!Jaar"
 
-#: src/emu/ui/custmenu.cpp:193 src/emu/ui/custmenu.cpp:508
+#: src/frontend/mame/ui/custmenu.cpp:195 src/frontend/mame/ui/custmenu.cpp:509
 msgid "Remove last filter"
 msgstr "Verwijder laatste filter"
 
-#: src/emu/ui/custmenu.cpp:196 src/emu/ui/custmenu.cpp:511
+#: src/frontend/mame/ui/custmenu.cpp:198 src/frontend/mame/ui/custmenu.cpp:512
 msgid "Add filter"
 msgstr "Voeg filter toe"
 
-#: src/emu/ui/custmenu.cpp:211 src/emu/ui/custmenu.cpp:231
-#: src/emu/ui/custmenu.cpp:527 src/emu/ui/custmenu.cpp:547
+#: src/frontend/mame/ui/custmenu.cpp:212 src/frontend/mame/ui/custmenu.cpp:232
+#: src/frontend/mame/ui/custmenu.cpp:527 src/frontend/mame/ui/custmenu.cpp:547
 msgid "Select custom filters:"
 msgstr "Kies custom filter:"
 
-#: src/emu/ui/custmenu.cpp:463
+#: src/frontend/mame/ui/custmenu.cpp:464
 msgid "^!Publisher"
 msgstr "^!Uitgever"
 
-#: src/emu/ui/custmenu.cpp:481
+#: src/frontend/mame/ui/custmenu.cpp:482
 msgid "^!Software List"
 msgstr "^!Softwarelijst"
 
-#: src/emu/ui/custmenu.cpp:490
+#: src/frontend/mame/ui/custmenu.cpp:491
 msgid "^!Device type"
 msgstr "^!Device type"
 
-#: src/emu/ui/custmenu.cpp:499
+#: src/frontend/mame/ui/custmenu.cpp:500
 msgid "^!Region"
 msgstr "^!Regio"
 
-#: src/emu/ui/custui.cpp:22
+#: src/frontend/mame/ui/custui.cpp:24
 msgid "Show All"
 msgstr "Toon alles"
 
-#: src/emu/ui/custui.cpp:23
+#: src/frontend/mame/ui/custui.cpp:25
 msgid "Hide Filters"
 msgstr "Verberg filters"
 
-#: src/emu/ui/custui.cpp:24
+#: src/frontend/mame/ui/custui.cpp:26
 msgid "Hide Info/Image"
 msgstr "Verberg info/plaatje"
 
-#: src/emu/ui/custui.cpp:25
+#: src/frontend/mame/ui/custui.cpp:27
 msgid "Hide Both"
 msgstr "Verberg beide"
 
-#: src/emu/ui/custui.cpp:141
+#: src/frontend/mame/ui/custui.cpp:143
 msgid "Fonts"
 msgstr "Lettertypes"
 
-#: src/emu/ui/custui.cpp:142
+#: src/frontend/mame/ui/custui.cpp:144
 msgid "Colors"
 msgstr "Kleuren"
 
-#: src/emu/ui/custui.cpp:147 src/emu/ui/dirmenu.cpp:33
+#: src/frontend/mame/ui/custui.cpp:149 src/frontend/mame/ui/dirmenu.cpp:38
 msgid "Language"
 msgstr "Taal"
 
-#: src/emu/ui/custui.cpp:151
+#: src/frontend/mame/ui/custui.cpp:153
 msgid "Show side panels"
 msgstr "Toon zijpanelen"
 
-#: src/emu/ui/custui.cpp:166 src/emu/ui/custui.cpp:186
+#: src/frontend/mame/ui/custui.cpp:167 src/frontend/mame/ui/custui.cpp:187
 msgid "Custom UI Settings"
 msgstr "Instellingen gebruikersinterface"
 
-#: src/emu/ui/custui.cpp:244
+#: src/frontend/mame/ui/custui.cpp:245
 msgid "default"
 msgstr "standaard"
 
-#: src/emu/ui/custui.cpp:347
+#: src/frontend/mame/ui/custui.cpp:348
 msgid "UI Font"
 msgstr "Lettertype gebruikersinterface"
 
-#: src/emu/ui/custui.cpp:352
+#: src/frontend/mame/ui/custui.cpp:353
 msgid "Bold"
 msgstr "Vet"
 
-#: src/emu/ui/custui.cpp:353
+#: src/frontend/mame/ui/custui.cpp:354
 msgid "Italic"
 msgstr "Cursief"
 
-#: src/emu/ui/custui.cpp:358
+#: src/frontend/mame/ui/custui.cpp:359
 msgid "Lines"
 msgstr "Lijnen"
 
-#: src/emu/ui/custui.cpp:364
+#: src/frontend/mame/ui/custui.cpp:365
 msgid "Infos text size"
 msgstr "Tekstgrootte informatie"
 
-#: src/emu/ui/custui.cpp:381
+#: src/frontend/mame/ui/custui.cpp:381
 msgid "UI Fonts Settings"
 msgstr "Instellingen lettertype gebruikersinterface"
 
-#: src/emu/ui/custui.cpp:408
+#: src/frontend/mame/ui/custui.cpp:408
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 msgstr ""
 "Voorbeeldtekst - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
-#: src/emu/ui/custui.cpp:506
+#: src/frontend/mame/ui/custui.cpp:506
 msgid "Normal text"
 msgstr "Normale tekst"
 
-#: src/emu/ui/custui.cpp:507
+#: src/frontend/mame/ui/custui.cpp:507
 msgid "Selected color"
 msgstr "Geselecteerde kleur"
 
-#: src/emu/ui/custui.cpp:508
+#: src/frontend/mame/ui/custui.cpp:508
 msgid "Normal text background"
 msgstr "Normale tekst achtergrond"
 
-#: src/emu/ui/custui.cpp:509
+#: src/frontend/mame/ui/custui.cpp:509
 msgid "Selected background color"
 msgstr "Geselecteerde achtergrondkleur"
 
-#: src/emu/ui/custui.cpp:510
+#: src/frontend/mame/ui/custui.cpp:510
 msgid "Subitem color"
 msgstr "Kleur subitem"
 
-#: src/emu/ui/custui.cpp:511 src/emu/ui/custui.cpp:606
+#: src/frontend/mame/ui/custui.cpp:511 src/frontend/mame/ui/custui.cpp:605
 msgid "Clone"
 msgstr "Clone/Variant"
 
-#: src/emu/ui/custui.cpp:512
+#: src/frontend/mame/ui/custui.cpp:512
 msgid "Border"
 msgstr "Rand"
 
-#: src/emu/ui/custui.cpp:513
+#: src/frontend/mame/ui/custui.cpp:513
 msgid "Background"
 msgstr "Achtergrond"
 
-#: src/emu/ui/custui.cpp:514
+#: src/frontend/mame/ui/custui.cpp:514
 msgid "Dipswitch"
 msgstr "Dipswitch"
 
-#: src/emu/ui/custui.cpp:515
+#: src/frontend/mame/ui/custui.cpp:515
 msgid "Unavailable color"
 msgstr "Niet beschikbaar kleur"
 
-#: src/emu/ui/custui.cpp:516
+#: src/frontend/mame/ui/custui.cpp:516
 msgid "Slider color"
 msgstr "Slider kleur"
 
-#: src/emu/ui/custui.cpp:517
+#: src/frontend/mame/ui/custui.cpp:517
 msgid "Gfx viewer background"
 msgstr "Gfx-viewer achtergrond"
 
-#: src/emu/ui/custui.cpp:518
+#: src/frontend/mame/ui/custui.cpp:518
 msgid "Mouse over color"
 msgstr "Muis-over kleur"
 
-#: src/emu/ui/custui.cpp:519
+#: src/frontend/mame/ui/custui.cpp:519
 msgid "Mouse over background color"
 msgstr "Muis-over achtergrond kleur"
 
-#: src/emu/ui/custui.cpp:520
+#: src/frontend/mame/ui/custui.cpp:520
 msgid "Mouse down color"
 msgstr "Muis-down kleur"
 
-#: src/emu/ui/custui.cpp:521
+#: src/frontend/mame/ui/custui.cpp:521
 msgid "Mouse down background color"
 msgstr "Muis-down achtergrond kleur"
 
-#: src/emu/ui/custui.cpp:524
+#: src/frontend/mame/ui/custui.cpp:524
 msgid "Restore originals colors"
 msgstr "Herstel originele kleuren"
 
-#: src/emu/ui/custui.cpp:540
+#: src/frontend/mame/ui/custui.cpp:539
 msgid "UI Colors Settings"
 msgstr "Kleurinstellingen gebruikersinterface"
 
-#: src/emu/ui/custui.cpp:568
+#: src/frontend/mame/ui/custui.cpp:567
 #, c-format
 msgid "Double click or press %1$s to change the color value"
 msgstr "Dubbelklik of druk op %1$s om de kleurwaarde te wijzigen"
 
-#: src/emu/ui/custui.cpp:594
+#: src/frontend/mame/ui/custui.cpp:593
 msgid "Menu Preview"
 msgstr "Menu Voorbeeld"
 
-#: src/emu/ui/custui.cpp:602
+#: src/frontend/mame/ui/custui.cpp:601
 msgid "Normal"
 msgstr "Normaal"
 
-#: src/emu/ui/custui.cpp:603
+#: src/frontend/mame/ui/custui.cpp:602
 msgid "Subitem"
 msgstr "Onderdeel"
 
-#: src/emu/ui/custui.cpp:604
+#: src/frontend/mame/ui/custui.cpp:603
 msgid "Selected"
 msgstr "Geselecteerd"
 
-#: src/emu/ui/custui.cpp:605
+#: src/frontend/mame/ui/custui.cpp:604
 msgid "Mouse Over"
 msgstr "Muis-over"
 
-#: src/emu/ui/custui.cpp:837 src/emu/ui/custui.cpp:840
+#: src/frontend/mame/ui/custui.cpp:836 src/frontend/mame/ui/custui.cpp:839
 msgid "Alpha"
 msgstr "Alpha"
 
-#: src/emu/ui/custui.cpp:845 src/emu/ui/custui.cpp:848
-#: src/emu/ui/custui.cpp:1007
+#: src/frontend/mame/ui/custui.cpp:844 src/frontend/mame/ui/custui.cpp:847
+#: src/frontend/mame/ui/custui.cpp:1009
 msgid "Red"
 msgstr "Rood"
 
-#: src/emu/ui/custui.cpp:853 src/emu/ui/custui.cpp:856
-#: src/emu/ui/custui.cpp:1010
+#: src/frontend/mame/ui/custui.cpp:852 src/frontend/mame/ui/custui.cpp:855
+#: src/frontend/mame/ui/custui.cpp:1012
 msgid "Green"
 msgstr "Groen"
 
-#: src/emu/ui/custui.cpp:861 src/emu/ui/custui.cpp:864
-#: src/emu/ui/custui.cpp:1011
+#: src/frontend/mame/ui/custui.cpp:860 src/frontend/mame/ui/custui.cpp:863
+#: src/frontend/mame/ui/custui.cpp:1013
 msgid "Blue"
 msgstr "Blauw"
 
-#: src/emu/ui/custui.cpp:867
+#: src/frontend/mame/ui/custui.cpp:866
 msgid "Choose from palette"
 msgstr "Kies uit palet"
 
-#: src/emu/ui/custui.cpp:883
+#: src/frontend/mame/ui/custui.cpp:881
 msgid " - ARGB Settings"
 msgstr " - ARGB Instellingen"
 
-#: src/emu/ui/custui.cpp:907
+#: src/frontend/mame/ui/custui.cpp:905
 msgid "Color preview ="
 msgstr "Kleur voorbeeld ="
 
-#: src/emu/ui/custui.cpp:1003
+#: src/frontend/mame/ui/custui.cpp:1005
 msgid "White"
 msgstr "Wit"
 
-#: src/emu/ui/custui.cpp:1004
+#: src/frontend/mame/ui/custui.cpp:1006
 msgid "Silver"
 msgstr "Zilver"
 
-#: src/emu/ui/custui.cpp:1005
+#: src/frontend/mame/ui/custui.cpp:1007
 msgid "Gray"
 msgstr "Grijs"
 
-#: src/emu/ui/custui.cpp:1006
+#: src/frontend/mame/ui/custui.cpp:1008
 msgid "Black"
 msgstr "Zwart"
 
-#: src/emu/ui/custui.cpp:1008
+#: src/frontend/mame/ui/custui.cpp:1010
 msgid "Orange"
 msgstr "Oranje"
 
-#: src/emu/ui/custui.cpp:1009
+#: src/frontend/mame/ui/custui.cpp:1011
 msgid "Yellow"
 msgstr "Geel"
 
-#: src/emu/ui/custui.cpp:1012
+#: src/frontend/mame/ui/custui.cpp:1014
 msgid "Violet"
 msgstr "Violet"
 
-#: src/emu/ui/datmenu.cpp:64
+#: src/frontend/mame/ui/datmenu.cpp:65
 msgid "Software History"
 msgstr "Softwaregeschiedenis"
 
-#: src/emu/ui/datmenu.cpp:66
+#: src/frontend/mame/ui/datmenu.cpp:67
 msgid "Software Usage"
 msgstr "Softwaregebruik"
 
-#: src/emu/ui/datmenu.cpp:196
+#: src/frontend/mame/ui/datmenu.cpp:195
 msgid "Revision: "
 msgstr "Revisie: "
 
-#: src/emu/ui/datmenu.cpp:284 src/emu/ui/selgame.cpp:39
-#: src/emu/ui/selgame.cpp:2158 src/emu/ui/selgame.cpp:2167
-#: src/emu/ui/selsoft.cpp:1574 src/emu/ui/selsoft.cpp:1592
-#: src/emu/ui/selsoft.cpp:1601
+#: src/frontend/mame/ui/datmenu.cpp:281 src/frontend/mame/ui/selgame.cpp:43
+#: src/frontend/mame/ui/selgame.cpp:2177 src/frontend/mame/ui/selgame.cpp:2186
+#: src/frontend/mame/ui/selsoft.cpp:1569 src/frontend/mame/ui/selsoft.cpp:1587
+#: src/frontend/mame/ui/selsoft.cpp:1596
 msgid "History"
 msgstr "Geschiedenis"
 
-#: src/emu/ui/datmenu.cpp:286 src/emu/ui/selgame.cpp:40
+#: src/frontend/mame/ui/datmenu.cpp:283 src/frontend/mame/ui/selgame.cpp:44
 msgid "Mameinfo"
 msgstr "Mameinfo"
 
-#: src/emu/ui/datmenu.cpp:288 src/emu/ui/selgame.cpp:42
+#: src/frontend/mame/ui/datmenu.cpp:285 src/frontend/mame/ui/selgame.cpp:46
 msgid "Messinfo"
 msgstr "Messinfo"
 
-#: src/emu/ui/datmenu.cpp:290 src/emu/ui/selgame.cpp:41
+#: src/frontend/mame/ui/datmenu.cpp:287 src/frontend/mame/ui/selgame.cpp:45
 msgid "Sysinfo"
 msgstr "Sysinfo"
 
-#: src/emu/ui/datmenu.cpp:292 src/emu/ui/selgame.cpp:45
+#: src/frontend/mame/ui/datmenu.cpp:289 src/frontend/mame/ui/selgame.cpp:49
 msgid "Mamescore"
 msgstr "Mamescore"
 
-#: src/emu/ui/datmenu.cpp:294 src/emu/ui/selgame.cpp:44
+#: src/frontend/mame/ui/datmenu.cpp:291 src/frontend/mame/ui/selgame.cpp:48
 msgid "Gameinit"
 msgstr ""
 
-#: src/emu/ui/datmenu.cpp:296 src/emu/ui/selgame.cpp:43
+#: src/frontend/mame/ui/datmenu.cpp:293 src/frontend/mame/ui/selgame.cpp:47
 msgid "Command"
 msgstr "Commando"
 
-#: src/emu/ui/dirmenu.cpp:31
+#: src/frontend/mame/ui/dirmenu.cpp:36
 msgid "ROMs"
 msgstr "ROMs"
 
-#: src/emu/ui/dirmenu.cpp:32
+#: src/frontend/mame/ui/dirmenu.cpp:37
 msgid "UI"
 msgstr "Gebruikersinterface"
 
-#: src/emu/ui/dirmenu.cpp:34
+#: src/frontend/mame/ui/dirmenu.cpp:39
 msgid "Samples"
 msgstr "Samples"
 
-#: src/emu/ui/dirmenu.cpp:35
+#: src/frontend/mame/ui/dirmenu.cpp:40
 msgid "DATs"
 msgstr "DATs"
 
-#: src/emu/ui/dirmenu.cpp:36
+#: src/frontend/mame/ui/dirmenu.cpp:41
 msgid "INIs"
 msgstr "INIs"
 
-#: src/emu/ui/dirmenu.cpp:37
+#: src/frontend/mame/ui/dirmenu.cpp:42
 msgid "Extra INIs"
 msgstr "Extra INIs"
 
-#: src/emu/ui/dirmenu.cpp:38
+#: src/frontend/mame/ui/dirmenu.cpp:43
 msgid "Icons"
 msgstr "Iconen"
 
-#: src/emu/ui/dirmenu.cpp:39
+#: src/frontend/mame/ui/dirmenu.cpp:44 src/frontend/mame/ui/submenu.cpp:25
 msgid "Cheats"
 msgstr "Cheats"
 
-#: src/emu/ui/dirmenu.cpp:40 src/emu/ui/menu.cpp:44
+#: src/frontend/mame/ui/dirmenu.cpp:45 src/frontend/mame/ui/menu.cpp:41
 msgid "Snapshots"
 msgstr "Schermafbeeldingen"
 
-#: src/emu/ui/dirmenu.cpp:41 src/emu/ui/menu.cpp:45
+#: src/frontend/mame/ui/dirmenu.cpp:46 src/frontend/mame/ui/menu.cpp:42
 msgid "Cabinets"
 msgstr "Kasten"
 
-#: src/emu/ui/dirmenu.cpp:42 src/emu/ui/menu.cpp:48
+#: src/frontend/mame/ui/dirmenu.cpp:47 src/frontend/mame/ui/menu.cpp:45
 msgid "Flyers"
 msgstr "Flyers"
 
-#: src/emu/ui/dirmenu.cpp:43 src/emu/ui/menu.cpp:49
+#: src/frontend/mame/ui/dirmenu.cpp:48 src/frontend/mame/ui/menu.cpp:46
 msgid "Titles"
 msgstr "Titels"
 
-#: src/emu/ui/dirmenu.cpp:44 src/emu/ui/menu.cpp:50
+#: src/frontend/mame/ui/dirmenu.cpp:49 src/frontend/mame/ui/menu.cpp:47
 msgid "Ends"
 msgstr "Eindes"
 
-#: src/emu/ui/dirmenu.cpp:45 src/emu/ui/menu.cpp:47
+#: src/frontend/mame/ui/dirmenu.cpp:50 src/frontend/mame/ui/menu.cpp:44
 msgid "PCBs"
 msgstr "Printplaten"
 
-#: src/emu/ui/dirmenu.cpp:46 src/emu/ui/menu.cpp:59 src/emu/ui/videoopt.cpp:223
+#: src/frontend/mame/ui/dirmenu.cpp:51 src/frontend/mame/ui/menu.cpp:56
+#: src/frontend/mame/ui/videoopt.cpp:224
 msgid "Marquees"
 msgstr "Marquees"
 
-#: src/emu/ui/dirmenu.cpp:47
+#: src/frontend/mame/ui/dirmenu.cpp:52
 msgid "Controls Panels"
 msgstr "Controlepanelen"
 
-#: src/emu/ui/dirmenu.cpp:48
+#: src/frontend/mame/ui/dirmenu.cpp:53
 msgid "Crosshairs"
 msgstr "Vizier"
 
-#: src/emu/ui/dirmenu.cpp:49
+#: src/frontend/mame/ui/dirmenu.cpp:54
 msgid "Artworks"
 msgstr "Artwork"
 
-#: src/emu/ui/dirmenu.cpp:50 src/emu/ui/menu.cpp:52
+#: src/frontend/mame/ui/dirmenu.cpp:55 src/frontend/mame/ui/menu.cpp:49
 msgid "Bosses"
 msgstr "Eindbazen"
 
-#: src/emu/ui/dirmenu.cpp:51
+#: src/frontend/mame/ui/dirmenu.cpp:56
 msgid "Artworks Preview"
 msgstr "Artworkvoorvertoning"
 
-#: src/emu/ui/dirmenu.cpp:52 src/emu/ui/menu.cpp:58
+#: src/frontend/mame/ui/dirmenu.cpp:57 src/frontend/mame/ui/menu.cpp:55
 msgid "Select"
 msgstr "Selecteer"
 
-#: src/emu/ui/dirmenu.cpp:53
+#: src/frontend/mame/ui/dirmenu.cpp:58
 msgid "GameOver"
 msgstr "Game over"
 
-#: src/emu/ui/dirmenu.cpp:54 src/emu/ui/menu.cpp:56
+#: src/frontend/mame/ui/dirmenu.cpp:59 src/frontend/mame/ui/menu.cpp:53
 msgid "HowTo"
 msgstr "Hoe te bedienen"
 
-#: src/emu/ui/dirmenu.cpp:55 src/emu/ui/menu.cpp:53
+#: src/frontend/mame/ui/dirmenu.cpp:60 src/frontend/mame/ui/menu.cpp:50
 msgid "Logos"
 msgstr "Logos"
 
-#: src/emu/ui/dirmenu.cpp:56 src/emu/ui/menu.cpp:57
+#: src/frontend/mame/ui/dirmenu.cpp:61 src/frontend/mame/ui/menu.cpp:54
 msgid "Scores"
 msgstr "Scores"
 
-#: src/emu/ui/dirmenu.cpp:57 src/emu/ui/menu.cpp:54
+#: src/frontend/mame/ui/dirmenu.cpp:62 src/frontend/mame/ui/menu.cpp:51
 msgid "Versus"
 msgstr "Tegen"
 
-#: src/emu/ui/dirmenu.cpp:58 src/emu/ui/menu.cpp:60
+#: src/frontend/mame/ui/dirmenu.cpp:63 src/frontend/mame/ui/menu.cpp:57
 msgid "Covers"
 msgstr "Hoesjes"
 
-#: src/emu/ui/dirmenu.cpp:116 src/emu/ui/dirmenu.cpp:136
+#: src/frontend/mame/ui/dirmenu.cpp:120 src/frontend/mame/ui/dirmenu.cpp:140
 msgid "Folders Setup"
 msgstr "Map instellingen"
 
-#: src/emu/ui/dirmenu.cpp:183
+#: src/frontend/mame/ui/dirmenu.cpp:187
 #, c-format
 msgid "Current %1$s Folders"
 msgstr "Huidige %1$s mappen"
 
-#: src/emu/ui/dirmenu.cpp:195
+#: src/frontend/mame/ui/dirmenu.cpp:199
 msgid "Change Folder"
 msgstr "Wijzig map"
 
-#: src/emu/ui/dirmenu.cpp:195
+#: src/frontend/mame/ui/dirmenu.cpp:199
 msgid "Add Folder"
 msgstr "Voeg map toe"
 
-#: src/emu/ui/dirmenu.cpp:198
+#: src/frontend/mame/ui/dirmenu.cpp:202
 msgid "Remove Folder"
 msgstr "Verwijder map"
 
-#: src/emu/ui/dirmenu.cpp:496
+#: src/frontend/mame/ui/dirmenu.cpp:499
 #, c-format
 msgid "Change %1$s Folder - Search: %2$s_"
 msgstr "Wijzig %1$s map - Zoek: %2$s_"
 
-#: src/emu/ui/dirmenu.cpp:497
+#: src/frontend/mame/ui/dirmenu.cpp:500
 #, c-format
 msgid "Add %1$s Folder - Search: %2$s_"
 msgstr "Voeg %1$s map toe - Zoek: %2$s_"
 
-#: src/emu/ui/dirmenu.cpp:534
+#: src/frontend/mame/ui/dirmenu.cpp:537
 msgid "Press TAB to set"
 msgstr "Druk op TAB om te kiezen"
 
-#: src/emu/ui/dirmenu.cpp:640
+#: src/frontend/mame/ui/dirmenu.cpp:642
 #, c-format
 msgid "Remove %1$s Folder"
 msgstr "Verwijder %1$s map"
 
-#: src/emu/ui/filesel.cpp:161
+#: src/frontend/mame/ui/filecreate.cpp:106
 msgid "File Already Exists - Override?"
 msgstr "Bestand bestaat al - Overschrijven?"
 
-#: src/emu/ui/filesel.cpp:163 src/emu/ui/selgame.cpp:1576
-#: src/emu/ui/selgame.cpp:1577 src/emu/ui/selgame.cpp:1578
-#: src/emu/ui/selgame.cpp:1579 src/emu/ui/selgame.cpp:1580
-#: src/emu/ui/selgame.cpp:1581 src/emu/ui/selgame.cpp:1582
-#: src/emu/ui/selgame.cpp:1591
+#: src/frontend/mame/ui/filecreate.cpp:108
+#: src/frontend/mame/ui/selgame.cpp:1594 src/frontend/mame/ui/selgame.cpp:1595
+#: src/frontend/mame/ui/selgame.cpp:1596 src/frontend/mame/ui/selgame.cpp:1597
+#: src/frontend/mame/ui/selgame.cpp:1598 src/frontend/mame/ui/selgame.cpp:1599
+#: src/frontend/mame/ui/selgame.cpp:1600 src/frontend/mame/ui/selgame.cpp:1609
 msgid "No"
 msgstr "Nee"
 
-#: src/emu/ui/filesel.cpp:164 src/emu/ui/selgame.cpp:1576
-#: src/emu/ui/selgame.cpp:1577 src/emu/ui/selgame.cpp:1578
-#: src/emu/ui/selgame.cpp:1579 src/emu/ui/selgame.cpp:1580
-#: src/emu/ui/selgame.cpp:1581 src/emu/ui/selgame.cpp:1582
-#: src/emu/ui/selgame.cpp:1591
+#: src/frontend/mame/ui/filecreate.cpp:109
+#: src/frontend/mame/ui/selgame.cpp:1594 src/frontend/mame/ui/selgame.cpp:1595
+#: src/frontend/mame/ui/selgame.cpp:1596 src/frontend/mame/ui/selgame.cpp:1597
+#: src/frontend/mame/ui/selgame.cpp:1598 src/frontend/mame/ui/selgame.cpp:1599
+#: src/frontend/mame/ui/selgame.cpp:1600 src/frontend/mame/ui/selgame.cpp:1609
 msgid "Yes"
 msgstr "Ja"
 
-#: src/emu/ui/filesel.cpp:275
+#: src/frontend/mame/ui/filecreate.cpp:201
 msgid "New Image Name:"
 msgstr "Nieuwe bestandsnaam:"
 
-#: src/emu/ui/filesel.cpp:281
+#: src/frontend/mame/ui/filecreate.cpp:207
 msgid "Image Format:"
 msgstr "Bestandsformaat:"
 
-#: src/emu/ui/filesel.cpp:287
+#: src/frontend/mame/ui/filecreate.cpp:213
 msgid "Create"
 msgstr "Aanmaken"
 
-#: src/emu/ui/filesel.cpp:318
+#: src/frontend/mame/ui/filecreate.cpp:244
 msgid "Please enter a file extension too"
 msgstr "Vul ook een bestandsextensie in"
 
-#: src/emu/ui/filesel.cpp:506 src/emu/ui/swlist.cpp:65
-msgid "[empty slot]"
-msgstr "[lege plek]"
-
-#: src/emu/ui/filesel.cpp:510
-msgid "[create]"
-msgstr "[aanmaken]"
-
-#: src/emu/ui/filesel.cpp:514 src/emu/ui/swlist.cpp:76
-msgid "[software list]"
-msgstr "[software lijst]"
-
-#: src/emu/ui/filesel.cpp:806
+#: src/frontend/mame/ui/filecreate.cpp:296
 msgid "Select image format"
 msgstr "Selecteer bestandsformaat"
 
-#: src/emu/ui/filesel.cpp:866
+#: src/frontend/mame/ui/filesel.cpp:256 src/frontend/mame/ui/swlist.cpp:67
+msgid "[empty slot]"
+msgstr "[lege plek]"
+
+#: src/frontend/mame/ui/filesel.cpp:260
+msgid "[create]"
+msgstr "[aanmaken]"
+
+#: src/frontend/mame/ui/filesel.cpp:264 src/frontend/mame/ui/swlist.cpp:78
+msgid "[software list]"
+msgstr "[software lijst]"
+
+#: src/frontend/mame/ui/filesel.cpp:534
 msgid "Select access mode"
 msgstr "Selecteer toegangsmodus"
 
-#: src/emu/ui/filesel.cpp:867
+#: src/frontend/mame/ui/filesel.cpp:535
 msgid "Read-only"
 msgstr "Alleen lezen"
 
-#: src/emu/ui/filesel.cpp:869
+#: src/frontend/mame/ui/filesel.cpp:537
 msgid "Read-write"
 msgstr "Lezen en schrijven"
 
-#: src/emu/ui/filesel.cpp:870
+#: src/frontend/mame/ui/filesel.cpp:538
 msgid "Read this image, write to another image"
 msgstr "Lees dit bestamd, schrijf naar een ander bestand"
 
-#: src/emu/ui/filesel.cpp:871
+#: src/frontend/mame/ui/filesel.cpp:539
 msgid "Read this image, write to diff"
 msgstr "Lees dit bestand, schrijf naar een diff"
 
-#: src/emu/ui/imgcntrl.cpp:116
+#: src/frontend/mame/ui/imgcntrl.cpp:115
 msgid "Cannot save over directory"
 msgstr "Kan geen map vervangen"
 
-#: src/emu/ui/imgcntrl.cpp:150
+#: src/frontend/mame/ui/imgcntrl.cpp:145
 msgid ""
 "The software selected is missing one or more required ROM or CHD images. "
 "Please select a different one."
@@ -643,196 +644,196 @@ msgstr ""
 "De geselecteerde software mist een of meerdere benodigde ROM of CHD "
 "bestanden. Kies een andere."
 
-#: src/emu/ui/info.cpp:98
+#: src/frontend/mame/ui/info.cpp:99
 msgid "Not supported"
 msgstr "Niet ondersteund"
 
-#: src/emu/ui/info.cpp:101
+#: src/frontend/mame/ui/info.cpp:102
 msgid "Partially supported"
 msgstr "Gedeeltelijk ondersteund"
 
-#: src/emu/ui/info.cpp:109
+#: src/frontend/mame/ui/info.cpp:110
 msgid "[empty]"
 msgstr "[leeg]"
 
-#: src/emu/ui/info_pty.cpp:26 src/emu/ui/mainmenu.cpp:96
+#: src/frontend/mame/ui/info_pty.cpp:28 src/frontend/mame/ui/mainmenu.cpp:93
 msgid "Pseudo terminals"
 msgstr "Pseudoterminals"
 
-#: src/emu/ui/info_pty.cpp:35
+#: src/frontend/mame/ui/info_pty.cpp:37
 msgid "[failed]"
 msgstr "[gefaald]"
 
-#: src/emu/ui/inputmap.cpp:52
+#: src/frontend/mame/ui/inputmap.cpp:53
 msgid "User Interface"
 msgstr "Gebruikersinterface"
 
-#: src/emu/ui/inputmap.cpp:59
+#: src/frontend/mame/ui/inputmap.cpp:59
 msgid "Other Controls"
 msgstr "Andere controls"
 
-#: src/emu/ui/inputmap.cpp:622 src/emu/ui/miscmenu.cpp:92
-#: src/emu/ui/slotopt.cpp:172
+#: src/frontend/mame/ui/inputmap.cpp:621 src/frontend/mame/ui/miscmenu.cpp:96
+#: src/frontend/mame/ui/slotopt.cpp:174
 msgid "Reset"
 msgstr "Herstel"
 
-#: src/emu/ui/mainmenu.cpp:54
+#: src/frontend/mame/ui/mainmenu.cpp:54
 msgid "Input (general)"
 msgstr "Invoer (algemeen)"
 
-#: src/emu/ui/mainmenu.cpp:56
+#: src/frontend/mame/ui/mainmenu.cpp:56
 msgid "Input (this Machine)"
 msgstr "Invoer (deze machine)"
 
-#: src/emu/ui/mainmenu.cpp:60
+#: src/frontend/mame/ui/mainmenu.cpp:60
 msgid "Analog Controls"
 msgstr "Analoge controls"
 
-#: src/emu/ui/mainmenu.cpp:62
+#: src/frontend/mame/ui/mainmenu.cpp:62
 msgid "Dip Switches"
 msgstr "DIP-schakelaars"
 
-#: src/emu/ui/mainmenu.cpp:65
+#: src/frontend/mame/ui/mainmenu.cpp:65
 msgid "Machine Configuration"
 msgstr "Machineconfiguratie"
 
-#: src/emu/ui/mainmenu.cpp:69
+#: src/frontend/mame/ui/mainmenu.cpp:69
 msgid "Bookkeeping Info"
 msgstr "Boekhoudinginformatie"
 
-#: src/emu/ui/mainmenu.cpp:72
+#: src/frontend/mame/ui/mainmenu.cpp:72
 msgid "Machine Information"
 msgstr "Machineinformatie"
 
-#: src/emu/ui/mainmenu.cpp:80
+#: src/frontend/mame/ui/mainmenu.cpp:79
 msgid "Image Information"
 msgstr "Bestandsinformatie"
 
-#: src/emu/ui/mainmenu.cpp:83
+#: src/frontend/mame/ui/mainmenu.cpp:82
 msgid "File Manager"
 msgstr "Bestandsbeheer"
 
-#: src/emu/ui/mainmenu.cpp:92
+#: src/frontend/mame/ui/mainmenu.cpp:90
 msgid "Tape Control"
 msgstr "Cassettebediening"
 
-#: src/emu/ui/mainmenu.cpp:99
+#: src/frontend/mame/ui/mainmenu.cpp:96
 msgid "Bios Selection"
 msgstr "Biosselectie"
 
-#: src/emu/ui/mainmenu.cpp:104
+#: src/frontend/mame/ui/mainmenu.cpp:100
 msgid "Slot Devices"
 msgstr "Insteekapparaten"
 
-#: src/emu/ui/mainmenu.cpp:109
+#: src/frontend/mame/ui/mainmenu.cpp:104
 msgid "Barcode Reader"
 msgstr "Barcodelezer"
 
-#: src/emu/ui/mainmenu.cpp:114
+#: src/frontend/mame/ui/mainmenu.cpp:108
 msgid "Network Devices"
 msgstr "Netwerkapparaten"
 
-#: src/emu/ui/mainmenu.cpp:118
+#: src/frontend/mame/ui/mainmenu.cpp:112
 msgid "Keyboard Mode"
 msgstr "Keyboardmodus"
 
-#: src/emu/ui/mainmenu.cpp:121
+#: src/frontend/mame/ui/mainmenu.cpp:115
 msgid "Slider Controls"
 msgstr "Schuifinstellingen"
 
-#: src/emu/ui/mainmenu.cpp:124
+#: src/frontend/mame/ui/mainmenu.cpp:118 src/frontend/mame/ui/submenu.cpp:99
 msgid "Video Options"
 msgstr "Videoopties"
 
-#: src/emu/ui/mainmenu.cpp:128
+#: src/frontend/mame/ui/mainmenu.cpp:122
 msgid "Crosshair Options"
 msgstr "Vizieropties"
 
-#: src/emu/ui/mainmenu.cpp:132
+#: src/frontend/mame/ui/mainmenu.cpp:126
 msgid "Cheat"
 msgstr "Cheat"
 
-#: src/emu/ui/mainmenu.cpp:135
+#: src/frontend/mame/ui/mainmenu.cpp:129
 msgid "Plugin Options"
 msgstr ""
 
-#: src/emu/ui/mainmenu.cpp:139
+#: src/frontend/mame/ui/mainmenu.cpp:133
 msgid "External DAT View"
 msgstr "Externe DAT overzicht"
 
-#: src/emu/ui/mainmenu.cpp:145 src/emu/ui/miscmenu.cpp:785
+#: src/frontend/mame/ui/mainmenu.cpp:139 src/frontend/mame/ui/miscmenu.cpp:789
 msgid "Add To Favorites"
 msgstr "Voeg toe aan favorieten"
 
-#: src/emu/ui/mainmenu.cpp:147 src/emu/ui/miscmenu.cpp:787
+#: src/frontend/mame/ui/mainmenu.cpp:141 src/frontend/mame/ui/miscmenu.cpp:791
 msgid "Remove From Favorites"
 msgstr "Verwijder van favorieten"
 
-#: src/emu/ui/mainmenu.cpp:154
+#: src/frontend/mame/ui/mainmenu.cpp:148
 msgid "Select New Machine"
 msgstr "Selecteer nieuwe machine"
 
-#: src/emu/ui/menu.cpp:46
+#: src/frontend/mame/ui/menu.cpp:43
 msgid "Control Panels"
 msgstr "Bedieningspanelen"
 
-#: src/emu/ui/menu.cpp:51
+#: src/frontend/mame/ui/menu.cpp:48
 msgid "Artwork Preview"
 msgstr "Voorvertoning Artwork"
 
-#: src/emu/ui/menu.cpp:55
+#: src/frontend/mame/ui/menu.cpp:52
 msgid "Game Over"
 msgstr "Game over"
 
-#: src/emu/ui/menu.cpp:65
+#: src/frontend/mame/ui/menu.cpp:61
 msgid "Add or remove favorites"
 msgstr "Naar of van favorietenlijst"
 
-#: src/emu/ui/menu.cpp:66
+#: src/frontend/mame/ui/menu.cpp:62
 msgid "Export displayed list to file"
 msgstr "Exporteer getoonde lijst naar bestand"
 
-#: src/emu/ui/menu.cpp:67
+#: src/frontend/mame/ui/menu.cpp:63
 msgid "Show DATs view"
 msgstr "Laat DATs zien"
 
-#: src/emu/ui/menu.cpp:254
+#: src/frontend/mame/ui/menu.cpp:264
 msgid "Return to Machine"
 msgstr "Terug naar machine"
 
-#: src/emu/ui/menu.cpp:258 src/emu/ui/menu.cpp:260
+#: src/frontend/mame/ui/menu.cpp:269 src/frontend/mame/ui/menu.cpp:271
 msgid "Exit"
 msgstr "Afsluiten"
 
-#: src/emu/ui/menu.cpp:265 src/emu/ui/menu.cpp:267
+#: src/frontend/mame/ui/menu.cpp:276 src/frontend/mame/ui/menu.cpp:278
 msgid "Return to Previous Menu"
 msgstr "Terug naar vorig menu"
 
-#: src/emu/ui/menu.cpp:761
+#: src/frontend/mame/ui/menu.cpp:718
 msgid "Auto"
 msgstr "Automatisch"
 
-#: src/emu/ui/menu.cpp:2195
+#: src/frontend/mame/ui/menu.cpp:2132
 msgid "Images"
 msgstr "Plaatjes"
 
-#: src/emu/ui/menu.cpp:2196
+#: src/frontend/mame/ui/menu.cpp:2133
 msgid "Infos"
 msgstr "Informatie"
 
-#: src/emu/ui/miscmenu.cpp:38
+#: src/frontend/mame/ui/miscmenu.cpp:42
 msgid "Keyboard Mode:"
 msgstr "Toetsenboordmodus:"
 
-#: src/emu/ui/miscmenu.cpp:38
+#: src/frontend/mame/ui/miscmenu.cpp:42
 msgid "Natural"
 msgstr "Natuurlijk"
 
-#: src/emu/ui/miscmenu.cpp:38
+#: src/frontend/mame/ui/miscmenu.cpp:42
 msgid "Emulated"
 msgstr "Geëmuleerd"
 
-#: src/emu/ui/miscmenu.cpp:241
+#: src/frontend/mame/ui/miscmenu.cpp:243
 #, c-format
 msgid ""
 "Uptime: %1$d:%2$02d:%3$02d\n"
@@ -841,7 +842,7 @@ msgstr ""
 "In bedrijf: %1$d:%2$02d:%3$02d\n"
 "\n"
 
-#: src/emu/ui/miscmenu.cpp:243
+#: src/frontend/mame/ui/miscmenu.cpp:245
 #, c-format
 msgid ""
 "Uptime: %1$d:%2$02d\n"
@@ -850,7 +851,7 @@ msgstr ""
 "In bedrijf: %1$d:%2$02d\n"
 "\n"
 
-#: src/emu/ui/miscmenu.cpp:247
+#: src/frontend/mame/ui/miscmenu.cpp:249
 #, c-format
 msgid ""
 "Tickets dispensed: %1$d\n"
@@ -859,50 +860,50 @@ msgstr ""
 "Kaartjes uitgegeven: %1$d\n"
 "\n"
 
-#: src/emu/ui/miscmenu.cpp:258
+#: src/frontend/mame/ui/miscmenu.cpp:260
 msgid "Coin %1$c: NA%3$s\n"
 msgstr "Munt %1$c: n.v.t.%3$s\n"
 
-#: src/emu/ui/miscmenu.cpp:258
+#: src/frontend/mame/ui/miscmenu.cpp:260
 #, c-format
 msgid "Coin %1$c: %2$d%3$s\n"
 msgstr "Munt %1$c: %2$d%3$s\n"
 
-#: src/emu/ui/miscmenu.cpp:261
+#: src/frontend/mame/ui/miscmenu.cpp:263
 msgid " (locked)"
 msgstr " (afgeschermd)"
 
-#: src/emu/ui/miscmenu.cpp:520
+#: src/frontend/mame/ui/miscmenu.cpp:517
 msgid "Visible Delay"
 msgstr "Vertraging zichtbaarheid"
 
-#: src/emu/ui/miscmenu.cpp:619
+#: src/frontend/mame/ui/miscmenu.cpp:616
 #, c-format
 msgid "%s.xml saved under ui folder."
 msgstr "%s.xml is opgeslagen in de map 'ui'."
 
-#: src/emu/ui/miscmenu.cpp:647
+#: src/frontend/mame/ui/miscmenu.cpp:644
 msgid "Name:             Description:\n"
 msgstr "Naam:             Omschrijving:\n"
 
-#: src/emu/ui/miscmenu.cpp:659
+#: src/frontend/mame/ui/miscmenu.cpp:656
 #, c-format
 msgid "%s.txt saved under ui folder."
 msgstr "%s.txt is opgeslagen in de map 'ui'."
 
-#: src/emu/ui/miscmenu.cpp:677
+#: src/frontend/mame/ui/miscmenu.cpp:674
 msgid "Export list in XML format (like -listxml)"
 msgstr ""
 
-#: src/emu/ui/miscmenu.cpp:678
+#: src/frontend/mame/ui/miscmenu.cpp:675
 msgid "Export list in XML format (like -listxml, but exclude devices)"
 msgstr ""
 
-#: src/emu/ui/miscmenu.cpp:679
+#: src/frontend/mame/ui/miscmenu.cpp:676
 msgid "Export list in TXT format (like -listfull)"
 msgstr ""
 
-#: src/emu/ui/miscmenu.cpp:729 src/emu/ui/optsmenu.cpp:376
+#: src/frontend/mame/ui/miscmenu.cpp:726 src/frontend/mame/ui/ui.cpp:2557
 msgid ""
 "\n"
 "    Configuration saved    \n"
@@ -912,95 +913,90 @@ msgstr ""
 "    Configuratie opgeslagen\n"
 "\n"
 
-#: src/emu/ui/miscmenu.cpp:774
+#: src/frontend/mame/ui/miscmenu.cpp:773
 msgid "Bios"
 msgstr ""
 
-#: src/emu/ui/miscmenu.cpp:776
+#: src/frontend/mame/ui/miscmenu.cpp:777
 msgid "Driver"
 msgstr ""
 
-#: src/emu/ui/miscmenu.cpp:790
+#: src/frontend/mame/ui/miscmenu.cpp:780
+msgid "This machine has no bios."
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:794
 msgid "Save machine configuration"
 msgstr "Sla machineconfiguratie op"
 
-#: src/emu/ui/miscmenu.cpp:806
+#: src/frontend/mame/ui/miscmenu.cpp:809
 msgid "Configure machine:"
 msgstr ""
 
-#: src/emu/ui/miscmenu.cpp:868 src/emu/ui/selsoft.cpp:109
+#: src/frontend/mame/ui/miscmenu.cpp:870 src/frontend/mame/ui/selsoft.cpp:114
 msgid " (default)"
 msgstr " (standaard)"
 
-#: src/emu/ui/miscmenu.cpp:953 src/emu/ui/miscmenu.cpp:973
-#: src/emu/ui/selgame.cpp:600
+#: src/frontend/mame/ui/miscmenu.cpp:958 src/frontend/mame/ui/miscmenu.cpp:978
+#: src/frontend/mame/ui/selgame.cpp:602
 msgid "Plugins"
 msgstr "Plugins"
 
-#: src/emu/ui/optsmenu.cpp:217
+#: src/frontend/mame/ui/optsmenu.cpp:232
 msgid "Filter"
 msgstr "Filter"
 
-#: src/emu/ui/optsmenu.cpp:225
+#: src/frontend/mame/ui/optsmenu.cpp:240
 msgid " ^!File"
 msgstr " ^!Bestand"
 
-#: src/emu/ui/optsmenu.cpp:230
+#: src/frontend/mame/ui/optsmenu.cpp:245
 msgid " ^!Category"
 msgstr " ^!Categorie"
 
-#: src/emu/ui/optsmenu.cpp:253
+#: src/frontend/mame/ui/optsmenu.cpp:268
 msgid "^!Setup custom filter"
 msgstr "^!Stel eigen filter in"
 
-#: src/emu/ui/optsmenu.cpp:261
+#: src/frontend/mame/ui/optsmenu.cpp:276
 msgid "Customize UI"
 msgstr "Pas gebruikersinterface aan"
 
-#: src/emu/ui/optsmenu.cpp:262
+#: src/frontend/mame/ui/optsmenu.cpp:277
 msgid "Configure Directories"
 msgstr "Configureer mappen"
 
-#: src/emu/ui/optsmenu.cpp:265 src/emu/ui/sndmenu.cpp:149
-#: src/emu/ui/sndmenu.cpp:169
+#: src/frontend/mame/ui/optsmenu.cpp:280 src/frontend/mame/ui/sndmenu.cpp:148
+#: src/frontend/mame/ui/sndmenu.cpp:168
 msgid "Sound Options"
 msgstr "Geluidsopties"
 
-#: src/emu/ui/optsmenu.cpp:268
+#: src/frontend/mame/ui/optsmenu.cpp:283
 msgid "General Inputs"
 msgstr "Algemene invoer"
 
-#: src/emu/ui/optsmenu.cpp:271
+#: src/frontend/mame/ui/optsmenu.cpp:286
 msgid "Save Configuration"
 msgstr "Sla configuratie op"
 
-#: src/emu/ui/optsmenu.cpp:285 src/emu/ui/optsmenu.cpp:305
+#: src/frontend/mame/ui/optsmenu.cpp:299 src/frontend/mame/ui/optsmenu.cpp:319
 msgid "Settings"
 msgstr "Instellingen"
 
-#: src/emu/ui/optsmenu.cpp:325
-msgid "**Error saving ui.ini**"
-msgstr "**Fout bij het opslaan van ui.ini**"
-
-#: src/emu/ui/optsmenu.cpp:372
-#, c-format
-msgid "**Error saving %s.ini**"
-msgstr "**Fout bij het opslaan van %s.ini**"
-
-#: src/emu/ui/selector.cpp:165
+#: src/frontend/mame/ui/selector.cpp:167
 msgid "Selection List - Search: "
 msgstr "Selectielijst - Zoeken: "
 
-#: src/emu/ui/selector.cpp:194
+#: src/frontend/mame/ui/selector.cpp:196
 #, c-format
 msgid "Double click or press %1$s to select"
 msgstr "Dubbelklik of druk %1$s om te selecteren"
 
-#: src/emu/ui/selgame.cpp:38
+#: src/frontend/mame/ui/selgame.cpp:42
 msgid "General Info"
 msgstr "Algemene informatie"
 
-#: src/emu/ui/selgame.cpp:380 src/emu/ui/selsoft.cpp:281
+#: src/frontend/mame/ui/selgame.cpp:382 src/frontend/mame/ui/selsoft.cpp:279
 #, c-format
 msgid ""
 "%s\n"
@@ -1009,8 +1005,8 @@ msgstr ""
 "%s\n"
 " toegevoegd aan favorietenlijst."
 
-#: src/emu/ui/selgame.cpp:386 src/emu/ui/selgame.cpp:395
-#: src/emu/ui/selsoft.cpp:286
+#: src/frontend/mame/ui/selgame.cpp:388 src/frontend/mame/ui/selgame.cpp:397
+#: src/frontend/mame/ui/selsoft.cpp:284
 #, c-format
 msgid ""
 "%s\n"
@@ -1019,7 +1015,7 @@ msgstr ""
 "%s\n"
 " verwijderd van favorietenlijst."
 
-#: src/emu/ui/selgame.cpp:457
+#: src/frontend/mame/ui/selgame.cpp:465
 msgid ""
 "The selected machine is missing one or more required ROM or CHD images. "
 "Please select a different machine.\n"
@@ -1027,260 +1023,261 @@ msgid ""
 "Press any key to continue."
 msgstr ""
 
-#: src/emu/ui/selgame.cpp:595 src/emu/ui/simpleselgame.cpp:265
+#: src/frontend/mame/ui/selgame.cpp:597
+#: src/frontend/mame/ui/simpleselgame.cpp:270
 msgid "Configure Options"
 msgstr "Configureer opties"
 
-#: src/emu/ui/selgame.cpp:596
+#: src/frontend/mame/ui/selgame.cpp:598
 msgid "Configure Machine"
 msgstr "Configureer machine"
 
-#: src/emu/ui/selgame.cpp:758
+#: src/frontend/mame/ui/selgame.cpp:762
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"
 msgstr "%1$s %2$s ( %3$d / %4$d machines (waarvan %5$d BIOS) )"
 
-#: src/emu/ui/selgame.cpp:768
+#: src/frontend/mame/ui/selgame.cpp:772
 #, c-format
 msgid "%1$s (%2$s - %3$s) - "
 msgstr "%1$s (%2$s - %3$s) - "
 
-#: src/emu/ui/selgame.cpp:775 src/emu/ui/selgame.cpp:781
+#: src/frontend/mame/ui/selgame.cpp:779 src/frontend/mame/ui/selgame.cpp:785
 #, c-format
 msgid "%1$s (%2$s) - "
 msgstr "%1$s (%2$s) - "
 
-#: src/emu/ui/selgame.cpp:790
+#: src/frontend/mame/ui/selgame.cpp:794
 #, c-format
 msgid "%1$s Search: %2$s_"
 msgstr "%1$s Zoek: %2$s_"
 
-#: src/emu/ui/selgame.cpp:844
+#: src/frontend/mame/ui/selgame.cpp:848
 #, c-format
 msgid "Romset: %1$-.100s"
 msgstr "Romset: %1$-.100s"
 
-#: src/emu/ui/selgame.cpp:847 src/emu/ui/selgame.cpp:896
-#: src/emu/ui/selsoft.cpp:750 src/emu/ui/selsoft.cpp:800
-#: src/emu/ui/simpleselgame.cpp:328
+#: src/frontend/mame/ui/selgame.cpp:851 src/frontend/mame/ui/selgame.cpp:900
+#: src/frontend/mame/ui/selsoft.cpp:736 src/frontend/mame/ui/selsoft.cpp:785
+#: src/frontend/mame/ui/simpleselgame.cpp:333
 #, c-format
 msgid "%1$s, %2$-.100s"
 msgstr "%1$s, %2$-.100s"
 
-#: src/emu/ui/selgame.cpp:853 src/emu/ui/selsoft.cpp:756
+#: src/frontend/mame/ui/selgame.cpp:857 src/frontend/mame/ui/selsoft.cpp:742
 #, c-format
 msgid "Driver is clone of: %1$-.100s"
 msgstr "Driver is een variant van: %1$-.100s"
 
-#: src/emu/ui/selgame.cpp:855 src/emu/ui/selsoft.cpp:758
+#: src/frontend/mame/ui/selgame.cpp:859 src/frontend/mame/ui/selsoft.cpp:744
 msgid "Driver is parent"
 msgstr "Driver is hoofddriver"
 
-#: src/emu/ui/selgame.cpp:859 src/emu/ui/selsoft.cpp:762
-#: src/emu/ui/simpleselgame.cpp:335
+#: src/frontend/mame/ui/selgame.cpp:863 src/frontend/mame/ui/selsoft.cpp:748
+#: src/frontend/mame/ui/simpleselgame.cpp:340
 msgid "Overall: NOT WORKING"
 msgstr "Status: WERKT NIET"
 
-#: src/emu/ui/selgame.cpp:861 src/emu/ui/selsoft.cpp:764
-#: src/emu/ui/simpleselgame.cpp:337
+#: src/frontend/mame/ui/selgame.cpp:865 src/frontend/mame/ui/selsoft.cpp:750
+#: src/frontend/mame/ui/simpleselgame.cpp:342
 msgid "Overall: Unemulated Protection"
 msgstr "Status: Beveiliging niet geëmuleerd"
 
-#: src/emu/ui/selgame.cpp:863 src/emu/ui/selsoft.cpp:766
-#: src/emu/ui/simpleselgame.cpp:339
+#: src/frontend/mame/ui/selgame.cpp:867 src/frontend/mame/ui/selsoft.cpp:752
+#: src/frontend/mame/ui/simpleselgame.cpp:344
 msgid "Overall: Working"
 msgstr "Status: Werkt"
 
-#: src/emu/ui/selgame.cpp:867 src/emu/ui/selsoft.cpp:770
+#: src/frontend/mame/ui/selgame.cpp:871 src/frontend/mame/ui/selsoft.cpp:756
 msgid "Graphics: Imperfect, "
 msgstr "Beeld: Niet volledig, "
 
-#: src/emu/ui/selgame.cpp:869 src/emu/ui/selsoft.cpp:772
+#: src/frontend/mame/ui/selgame.cpp:873 src/frontend/mame/ui/selsoft.cpp:758
 msgid "Graphics: OK, "
 msgstr "Beeld: OK, "
 
-#: src/emu/ui/selgame.cpp:872 src/emu/ui/selsoft.cpp:775
+#: src/frontend/mame/ui/selgame.cpp:876 src/frontend/mame/ui/selsoft.cpp:761
 msgid "Sound: Unimplemented"
 msgstr "Geluid: Niet geïmplementeerd"
 
-#: src/emu/ui/selgame.cpp:874 src/emu/ui/selsoft.cpp:777
+#: src/frontend/mame/ui/selgame.cpp:878 src/frontend/mame/ui/selsoft.cpp:763
 msgid "Sound: Imperfect"
 msgstr "Geluid: Niet volledig"
 
-#: src/emu/ui/selgame.cpp:876 src/emu/ui/selsoft.cpp:779
+#: src/frontend/mame/ui/selgame.cpp:880 src/frontend/mame/ui/selsoft.cpp:765
 msgid "Sound: OK"
 msgstr "Geluid: OK"
 
-#: src/emu/ui/selgame.cpp:893
+#: src/frontend/mame/ui/selgame.cpp:897
 #, c-format
 msgid "System: %1$-.100s"
 msgstr "Systeem: %1$-.100s"
 
-#: src/emu/ui/selgame.cpp:900 src/emu/ui/selsoft.cpp:804
+#: src/frontend/mame/ui/selgame.cpp:904 src/frontend/mame/ui/selsoft.cpp:789
 #, c-format
 msgid "Software is clone of: %1$-.100s"
 msgstr "Software is een variant van: %1$-.100s"
 
-#: src/emu/ui/selgame.cpp:902 src/emu/ui/selsoft.cpp:806
+#: src/frontend/mame/ui/selgame.cpp:906 src/frontend/mame/ui/selsoft.cpp:791
 msgid "Software is parent"
 msgstr "Software is hoofdsoftware"
 
-#: src/emu/ui/selgame.cpp:907 src/emu/ui/selsoft.cpp:811
+#: src/frontend/mame/ui/selgame.cpp:911 src/frontend/mame/ui/selsoft.cpp:796
 msgid "Supported: No"
 msgstr "Ondersteund: Nee"
 
-#: src/emu/ui/selgame.cpp:912 src/emu/ui/selsoft.cpp:816
+#: src/frontend/mame/ui/selgame.cpp:916 src/frontend/mame/ui/selsoft.cpp:801
 msgid "Supported: Partial"
 msgstr "Ondersteund: Gedeeltelijk"
 
-#: src/emu/ui/selgame.cpp:917 src/emu/ui/selsoft.cpp:821
+#: src/frontend/mame/ui/selgame.cpp:921 src/frontend/mame/ui/selsoft.cpp:806
 msgid "Supported: Yes"
 msgstr "Ondersteund: Ja"
 
-#: src/emu/ui/selgame.cpp:922 src/emu/ui/selsoft.cpp:826
+#: src/frontend/mame/ui/selgame.cpp:926 src/frontend/mame/ui/selsoft.cpp:811
 #, c-format
 msgid "romset: %1$-.100s"
 msgstr "romset: %1$-.100s"
 
-#: src/emu/ui/selgame.cpp:929
+#: src/frontend/mame/ui/selgame.cpp:934
 #, c-format
 msgid "%1$s %2$s"
 msgstr "%1$s %2$s"
 
-#: src/emu/ui/selgame.cpp:1543
+#: src/frontend/mame/ui/selgame.cpp:1561
 #, c-format
 msgid "Romset: %1$-.100s\n"
 msgstr "Romset: %1$-.100s\n"
 
-#: src/emu/ui/selgame.cpp:1544
+#: src/frontend/mame/ui/selgame.cpp:1562
 #, c-format
 msgid "Year: %1$s\n"
 msgstr "Jaar: %1$s\n"
 
-#: src/emu/ui/selgame.cpp:1545
+#: src/frontend/mame/ui/selgame.cpp:1563
 #, c-format
 msgid "Manufacturer: %1$-.100s\n"
 msgstr "Fabrikant: %1$-.100s\n"
 
-#: src/emu/ui/selgame.cpp:1549
+#: src/frontend/mame/ui/selgame.cpp:1567
 #, c-format
 msgid "Driver is Clone of: %1$-.100s\n"
 msgstr "Driver is een variant van: %1$-.100s\n"
 
-#: src/emu/ui/selgame.cpp:1551
+#: src/frontend/mame/ui/selgame.cpp:1569
 msgid "Driver is Parent\n"
 msgstr "Driver is hoofddriver\n"
 
-#: src/emu/ui/selgame.cpp:1554
+#: src/frontend/mame/ui/selgame.cpp:1572
 msgid "Overall: NOT WORKING\n"
 msgstr "Status: WERKT NIET\n"
 
-#: src/emu/ui/selgame.cpp:1556
+#: src/frontend/mame/ui/selgame.cpp:1574
 msgid "Overall: Unemulated Protection\n"
 msgstr "Status: Beveiliging niet geëmuleerd\n"
 
-#: src/emu/ui/selgame.cpp:1558
+#: src/frontend/mame/ui/selgame.cpp:1576
 msgid "Overall: Working\n"
 msgstr "Status: Werkt\n"
 
-#: src/emu/ui/selgame.cpp:1561
+#: src/frontend/mame/ui/selgame.cpp:1579
 msgid "Graphics: Imperfect Colors\n"
 msgstr "Beeld: Kleuren niet juist\n"
 
-#: src/emu/ui/selgame.cpp:1565
+#: src/frontend/mame/ui/selgame.cpp:1583
 msgid "Graphics: Imperfect\n"
 msgstr "Beeld: Onvolledig\n"
 
-#: src/emu/ui/selgame.cpp:1567
+#: src/frontend/mame/ui/selgame.cpp:1585
 msgid "Graphics: OK\n"
 msgstr "Beeld: OK\n"
 
-#: src/emu/ui/selgame.cpp:1570
+#: src/frontend/mame/ui/selgame.cpp:1588
 msgid "Sound: Unimplemented\n"
 msgstr "Geluid: Niet geïmplementeerd\n"
 
-#: src/emu/ui/selgame.cpp:1572
+#: src/frontend/mame/ui/selgame.cpp:1590
 msgid "Sound: Imperfect\n"
 msgstr "Geluid: Onvolledig\n"
 
-#: src/emu/ui/selgame.cpp:1574
+#: src/frontend/mame/ui/selgame.cpp:1592
 msgid "Sound: OK\n"
 msgstr "Geluid: OK\n"
 
-#: src/emu/ui/selgame.cpp:1576
+#: src/frontend/mame/ui/selgame.cpp:1594
 #, c-format
 msgid "Driver is Skeleton: %1$s\n"
 msgstr "Raamwerkdriver: %1$s\n"
 
-#: src/emu/ui/selgame.cpp:1577
+#: src/frontend/mame/ui/selgame.cpp:1595
 #, c-format
 msgid "Game is Mechanical: %1$s\n"
 msgstr "Machine heeft mechanische onderdelen: %1$s\n"
 
-#: src/emu/ui/selgame.cpp:1578
+#: src/frontend/mame/ui/selgame.cpp:1596
 #, c-format
 msgid "Requires Artwork: %1$s\n"
 msgstr "Vereist artwork: %1$s\n"
 
-#: src/emu/ui/selgame.cpp:1579
+#: src/frontend/mame/ui/selgame.cpp:1597
 #, c-format
 msgid "Requires Clickable Artwork: %1$s\n"
 msgstr "Vereist klikbare artwork: %1$s\n"
 
-#: src/emu/ui/selgame.cpp:1580
+#: src/frontend/mame/ui/selgame.cpp:1598
 #, c-format
 msgid "Support Cocktail: %1$s\n"
 msgstr "Ondersteunt cocktail: %1$s\n"
 
-#: src/emu/ui/selgame.cpp:1581
+#: src/frontend/mame/ui/selgame.cpp:1599
 #, c-format
 msgid "Driver is Bios: %1$s\n"
 msgstr "Driver is een BIOS-driver: %1$s\n"
 
-#: src/emu/ui/selgame.cpp:1582
+#: src/frontend/mame/ui/selgame.cpp:1600
 #, c-format
 msgid "Support Save: %1$s\n"
 msgstr "Ondersteund opslag: %1$s\n"
 
-#: src/emu/ui/selgame.cpp:1583
+#: src/frontend/mame/ui/selgame.cpp:1601
 #, c-format
 msgid "Screen Orientation: %1$s\n"
 msgstr "Schermoriëntatie: %1$s\n"
 
-#: src/emu/ui/selgame.cpp:1583
+#: src/frontend/mame/ui/selgame.cpp:1601
 msgid "Vertical"
 msgstr "Verticaal"
 
-#: src/emu/ui/selgame.cpp:1583
+#: src/frontend/mame/ui/selgame.cpp:1601
 msgid "Horizontal"
 msgstr "Horizontaal"
 
-#: src/emu/ui/selgame.cpp:1591
+#: src/frontend/mame/ui/selgame.cpp:1609
 #, c-format
 msgid "Requires CHD: %1$s\n"
 msgstr "Vereist CHD: %1$s\n"
 
-#: src/emu/ui/selgame.cpp:1604
+#: src/frontend/mame/ui/selgame.cpp:1622
 msgid "Roms Audit Pass: OK\n"
 msgstr "Roms controle: OK\n"
 
-#: src/emu/ui/selgame.cpp:1606
+#: src/frontend/mame/ui/selgame.cpp:1624
 msgid "Roms Audit Pass: BAD\n"
 msgstr "Roms controle: FOUT\n"
 
-#: src/emu/ui/selgame.cpp:1609
+#: src/frontend/mame/ui/selgame.cpp:1627
 msgid "Samples Audit Pass: None Needed\n"
 msgstr "Samples controle: Niet nodig\n"
 
-#: src/emu/ui/selgame.cpp:1611
+#: src/frontend/mame/ui/selgame.cpp:1629
 msgid "Samples Audit Pass: OK\n"
 msgstr "Samples controle: OK\n"
 
-#: src/emu/ui/selgame.cpp:1613
+#: src/frontend/mame/ui/selgame.cpp:1631
 msgid "Samples Audit Pass: BAD\n"
 msgstr "Samples controle: FOUT\n"
 
-#: src/emu/ui/selgame.cpp:1616
+#: src/frontend/mame/ui/selgame.cpp:1634
 msgid ""
 "Roms Audit Pass: Disabled\n"
 "Samples Audit Pass: Disabled\n"
@@ -1288,16 +1285,16 @@ msgstr ""
 "Roms controle: Uitgeschakeld\n"
 "Samples controle: Uitgeschakeld\n"
 
-#: src/emu/ui/selgame.cpp:2055 src/emu/ui/selgame.cpp:2216
-#: src/emu/ui/selsoft.cpp:1655
+#: src/frontend/mame/ui/selgame.cpp:2074 src/frontend/mame/ui/selgame.cpp:2235
+#: src/frontend/mame/ui/selsoft.cpp:1650
 msgid "No Infos Available"
 msgstr "Geen informatie beschikbaar"
 
-#: src/emu/ui/selgame.cpp:2168 src/emu/ui/selsoft.cpp:1602
+#: src/frontend/mame/ui/selgame.cpp:2187 src/frontend/mame/ui/selsoft.cpp:1597
 msgid "Usage"
 msgstr "Gebruik"
 
-#: src/emu/ui/selsoft.cpp:380
+#: src/frontend/mame/ui/selsoft.cpp:375
 msgid ""
 "The selected software is missing one or more required files. Please select a "
 "different software.\n"
@@ -1305,61 +1302,61 @@ msgid ""
 "Press any key to continue."
 msgstr ""
 
-#: src/emu/ui/selsoft.cpp:683
+#: src/frontend/mame/ui/selsoft.cpp:669
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d software packages )"
 msgstr ""
 
-#: src/emu/ui/selsoft.cpp:684
+#: src/frontend/mame/ui/selsoft.cpp:670
 #, c-format
 msgid "Driver: \"%1$s\" software list "
 msgstr "Driver: \"%1$s\" softwarelijst "
 
-#: src/emu/ui/selsoft.cpp:687
+#: src/frontend/mame/ui/selsoft.cpp:673
 #, c-format
 msgid "Region: %1$s -"
 msgstr "Regio: %1$s -"
 
-#: src/emu/ui/selsoft.cpp:689
+#: src/frontend/mame/ui/selsoft.cpp:675
 #, c-format
 msgid "Publisher: %1$s -"
 msgstr "Uitgever: %1$s -"
 
-#: src/emu/ui/selsoft.cpp:691
+#: src/frontend/mame/ui/selsoft.cpp:677
 #, c-format
 msgid "Year: %1$s -"
 msgstr "Jaar: %1$s -"
 
-#: src/emu/ui/selsoft.cpp:693
+#: src/frontend/mame/ui/selsoft.cpp:679
 #, c-format
 msgid "Software List: %1$s -"
 msgstr "Softwarelijst: %1$s -"
 
-#: src/emu/ui/selsoft.cpp:695
+#: src/frontend/mame/ui/selsoft.cpp:681
 #, c-format
 msgid "Device type: %1$s -"
 msgstr "Apparaattype: %1$s -"
 
-#: src/emu/ui/selsoft.cpp:697
+#: src/frontend/mame/ui/selsoft.cpp:683
 #, c-format
 msgid "%s Search: %s_"
 msgstr "%s Zoek: %s_"
 
-#: src/emu/ui/selsoft.cpp:747 src/emu/ui/selsoft.cpp:797
-#: src/emu/ui/simpleselgame.cpp:325
+#: src/frontend/mame/ui/selsoft.cpp:733 src/frontend/mame/ui/selsoft.cpp:782
+#: src/frontend/mame/ui/simpleselgame.cpp:330
 #, c-format
 msgid "%1$-.100s"
 msgstr "%1$-.100s"
 
-#: src/emu/ui/selsoft.cpp:1991 src/emu/ui/selsoft.cpp:2011
+#: src/frontend/mame/ui/selsoft.cpp:1988 src/frontend/mame/ui/selsoft.cpp:2008
 msgid "Software part selection:"
 msgstr "Softwareonderdeel selectie:"
 
-#: src/emu/ui/selsoft.cpp:2129 src/emu/ui/selsoft.cpp:2149
+#: src/frontend/mame/ui/selsoft.cpp:2129 src/frontend/mame/ui/selsoft.cpp:2149
 msgid "Bios selection:"
 msgstr "Bios selectie:"
 
-#: src/emu/ui/simpleselgame.cpp:235
+#: src/frontend/mame/ui/simpleselgame.cpp:240
 #, c-format
 msgid ""
 "No machines found. Please check the rompath specified in the %1$s.ini file.\n"
@@ -1373,123 +1370,429 @@ msgstr ""
 "Als dit de eerste keer is dat je %2$s gebruikt, lees dan het bestand config."
 "txt in de docs map voor informatie hoe %2$s te configureren."
 
-#: src/emu/ui/simpleselgame.cpp:290
+#: src/frontend/mame/ui/simpleselgame.cpp:295
 #, c-format
 msgid "Type name or select: %1$s_"
 msgstr "Type naam of selecteer: %1$s_"
 
-#: src/emu/ui/simpleselgame.cpp:292
+#: src/frontend/mame/ui/simpleselgame.cpp:297
 msgid "Type name or select: (random)"
 msgstr "Type naam of selecteer: (willekeurig)"
 
-#: src/emu/ui/simpleselgame.cpp:331
+#: src/frontend/mame/ui/simpleselgame.cpp:336
 #, c-format
 msgid "Driver: %1$-.100s"
 msgstr "Driver: %1$-.100s"
 
-#: src/emu/ui/simpleselgame.cpp:343 src/emu/ui/simpleselgame.cpp:350
+#: src/frontend/mame/ui/simpleselgame.cpp:348
+#: src/frontend/mame/ui/simpleselgame.cpp:355
 msgid "Imperfect"
 msgstr "Onvolledig"
 
-#: src/emu/ui/simpleselgame.cpp:345 src/emu/ui/simpleselgame.cpp:352
+#: src/frontend/mame/ui/simpleselgame.cpp:350
+#: src/frontend/mame/ui/simpleselgame.cpp:357
 msgid "OK"
 msgstr "OK"
 
-#: src/emu/ui/simpleselgame.cpp:348
+#: src/frontend/mame/ui/simpleselgame.cpp:353
 msgid "Unimplemented"
 msgstr "Niet geïmplementeerd"
 
-#: src/emu/ui/simpleselgame.cpp:354
+#: src/frontend/mame/ui/simpleselgame.cpp:359
 #, c-format
 msgid "Gfx: %s, Sound: %s"
 msgstr "Beeld: %s, Geluid: %s"
 
-#: src/emu/ui/slotopt.cpp:166
+#: src/frontend/mame/ui/slotopt.cpp:168
 msgid " [internal]"
 msgstr " [intern]"
 
-#: src/emu/ui/sndmenu.cpp:133
+#: src/frontend/mame/ui/sndmenu.cpp:133
 msgid "Sound"
 msgstr "Geluid"
 
-#: src/emu/ui/sndmenu.cpp:134
+#: src/frontend/mame/ui/sndmenu.cpp:134
 msgid "Sample Rate"
 msgstr "Samplesnelheid"
 
-#: src/emu/ui/sndmenu.cpp:135
+#: src/frontend/mame/ui/sndmenu.cpp:135
 msgid "Use External Samples"
 msgstr "Gebruik externe samples"
 
-#: src/emu/ui/swlist.cpp:70
+#: src/frontend/mame/ui/submenu.cpp:21
+msgid "Miscellaneous Options"
+msgstr "Overige opties"
+
+#: src/frontend/mame/ui/submenu.cpp:22
+msgid "Re-select last machine played"
+msgstr "Kies laatst gespeelde machine opnieuw"
+
+#: src/frontend/mame/ui/submenu.cpp:23
+msgid "Enlarge images in the right panel"
+msgstr "Vergroot plaatjes in het rechter paneel"
+
+#: src/frontend/mame/ui/submenu.cpp:24
+msgid "DATs info"
+msgstr "DATs informatie"
+
+#: src/frontend/mame/ui/submenu.cpp:26
+msgid "Show mouse pointer"
+msgstr "Toon muispointer"
+
+#: src/frontend/mame/ui/submenu.cpp:27
+msgid "Confirm quit from machines"
+msgstr "Machine afsluiten bevestigen"
+
+#: src/frontend/mame/ui/submenu.cpp:28
+msgid "Skip information screen at startup"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:29
+msgid "Force 4:3 aspect for snapshot display"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:30
+msgid "Use image as background"
+msgstr "Gebruik plaatje als achtergrond"
+
+#: src/frontend/mame/ui/submenu.cpp:31
+msgid "Skip bios selection menu"
+msgstr "Sla bios selectie menu over"
+
+#: src/frontend/mame/ui/submenu.cpp:32
+msgid "Skip software parts selection menu"
+msgstr "Sla software onderdelen selectie menu over"
+
+#: src/frontend/mame/ui/submenu.cpp:33
+msgid "Info auto audit"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:34
+msgid "Hide romless machine from available list"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:38
+msgid "Advanced Options"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:39
+msgid "Performance Options"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:40
+msgid "Auto frame skip"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:41
+msgid "Frame skip"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:42
+msgid "Throttle"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:43
+msgid "Sleep"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:44
+msgid "Speed"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:45
+msgid "Refresh speed"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:47
+msgid "Rotation Options"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:48 src/frontend/mame/ui/videoopt.cpp:204
+msgid "Rotate"
+msgstr "Draai"
+
+#: src/frontend/mame/ui/submenu.cpp:49
+msgid "Rotate right"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:50
+msgid "Rotate left"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:51
+msgid "Auto rotate right"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:52
+msgid "Auto rotate left"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:53
+msgid "Flip X"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:54
+msgid "Flip Y"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:56
+msgid "Artwork Options"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:57
+msgid "Artwork Crop"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:58
+msgid "Use Backdrops"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:59
+msgid "Use Overlays"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:60
+msgid "Use Bezels"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:61
+msgid "Use Control Panels"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:62
+msgid "Use Marquees"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:64
+msgid "State/Playback Options"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:65
+msgid "Automatic save/restore"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:66
+msgid "Bilinear snapshot"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:67
+msgid "Burn-in"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:69
+msgid "Input Options"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:70
+msgid "Coin lockout"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:71
+msgid "Mouse"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:72
+msgid "Joystick"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:73
+msgid "Lightgun"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:74
+msgid "Multi-keyboard"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:75
+msgid "Multi-mouse"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:76
+msgid "Steadykey"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:77
+msgid "UI active"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:78
+msgid "Offscreen reload"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:79
+msgid "Joystick deadzone"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:80
+msgid "Joystick saturation"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:81
+msgid "Natural keyboard"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:82
+msgid "Simultaneous contradictory"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:83
+msgid "Coin impulse"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:87
+msgid "Device Mapping"
+msgstr "Invoerapparaat mapping"
+
+#: src/frontend/mame/ui/submenu.cpp:88
+msgid "Lightgun Device Assignment"
+msgstr "Lightgun toewijzing"
+
+#: src/frontend/mame/ui/submenu.cpp:89
+msgid "Trackball Device Assignment"
+msgstr "Trackball toewijzing"
+
+#: src/frontend/mame/ui/submenu.cpp:90
+msgid "Pedal Device Assignment"
+msgstr "Pedaal toewijzing"
+
+#: src/frontend/mame/ui/submenu.cpp:91
+msgid "Adstick Device Assignment"
+msgstr "Adstick toewijzing"
+
+#: src/frontend/mame/ui/submenu.cpp:92
+msgid "Paddle Device Assignment"
+msgstr "Paddle toewijzing"
+
+#: src/frontend/mame/ui/submenu.cpp:93
+msgid "Dial Device Assignment"
+msgstr "Dial-apparaat toewijzing"
+
+#: src/frontend/mame/ui/submenu.cpp:94
+msgid "Positional Device Assignment"
+msgstr "Positie-apparaat toewijzing"
+
+#: src/frontend/mame/ui/submenu.cpp:95
+msgid "Mouse Device Assignment"
+msgstr "Muis toewijzing"
+
+#: src/frontend/mame/ui/submenu.cpp:100
+msgid "Video Mode"
+msgstr "Video modus"
+
+#: src/frontend/mame/ui/submenu.cpp:101
+msgid "Number Of Screens"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:103
+msgid "Triple Buffering"
+msgstr "Drievoudige buffering"
+
+#: src/frontend/mame/ui/submenu.cpp:104
+msgid "HLSL"
+msgstr "HLSL"
+
+#: src/frontend/mame/ui/submenu.cpp:106
+msgid "GLSL"
+msgstr "GLSL"
+
+#: src/frontend/mame/ui/submenu.cpp:107
+msgid "Bilinear Filtering"
+msgstr "Bilineaire filtering"
+
+#: src/frontend/mame/ui/submenu.cpp:108
+msgid "Bitmap Prescaling"
+msgstr "Bitmap prescaling"
+
+#: src/frontend/mame/ui/submenu.cpp:109
+msgid "Window Mode"
+msgstr "Schermmodus"
+
+#: src/frontend/mame/ui/submenu.cpp:110
+msgid "Enforce Aspect Ratio"
+msgstr "Forceer aspectratio"
+
+#: src/frontend/mame/ui/submenu.cpp:111
+msgid "Start Out Maximized"
+msgstr "Start gemaximaliseerd"
+
+#: src/frontend/mame/ui/submenu.cpp:112
+msgid "Synchronized Refresh"
+msgstr "Gesynchroniseerde verversing"
+
+#: src/frontend/mame/ui/submenu.cpp:113
+msgid "Wait Vertical Sync"
+msgstr "Wacht V-Sync"
+
+#: src/frontend/mame/ui/swlist.cpp:72
 msgid "[file manager]"
 msgstr "[Bestandsbeheer]"
 
-#: src/emu/ui/swlist.cpp:235
+#: src/frontend/mame/ui/swlist.cpp:209
 msgid "Switch Item Ordering"
 msgstr "Wijzig de volgorde van de onderdelen"
 
-#: src/emu/ui/swlist.cpp:268
+#: src/frontend/mame/ui/swlist.cpp:240
 #, c-format
 msgid "Switched Order: entries now ordered by %s"
 msgstr "Volgorde gewijzigd: de elementen zijn nu gesorteerd op %s"
 
-#: src/emu/ui/swlist.cpp:268
+#: src/frontend/mame/ui/swlist.cpp:240
 msgid "shortname"
 msgstr "korte naam"
 
-#: src/emu/ui/swlist.cpp:268
+#: src/frontend/mame/ui/swlist.cpp:240
 msgid "description"
 msgstr "omschrijving"
 
-#: src/emu/ui/swlist.cpp:436
+#: src/frontend/mame/ui/swlist.cpp:385
 msgid "[compatible lists]"
 msgstr "[compatibele lijsten]"
 
-#: src/emu/ui/tapectrl.cpp:84
+#: src/frontend/mame/ui/tapectrl.cpp:85
 msgid "stopped"
 msgstr "gestopt"
 
-#: src/emu/ui/tapectrl.cpp:86
+#: src/frontend/mame/ui/tapectrl.cpp:87
 msgid "playing"
 msgstr "afspelen"
 
-#: src/emu/ui/tapectrl.cpp:86
+#: src/frontend/mame/ui/tapectrl.cpp:87
 msgid "(playing)"
 msgstr "(aan het afspelen)"
 
-#: src/emu/ui/tapectrl.cpp:87
+#: src/frontend/mame/ui/tapectrl.cpp:88
 msgid "recording"
 msgstr "opnemen"
 
-#: src/emu/ui/tapectrl.cpp:87
+#: src/frontend/mame/ui/tapectrl.cpp:88
 msgid "(recording)"
 msgstr "(aan het opnemen)"
 
-#: src/emu/ui/tapectrl.cpp:94
+#: src/frontend/mame/ui/tapectrl.cpp:95
 msgid "Pause/Stop"
 msgstr "Pauzeer/Stop"
 
-#: src/emu/ui/tapectrl.cpp:97
+#: src/frontend/mame/ui/tapectrl.cpp:98
 msgid "Play"
 msgstr "Speel af"
 
-#: src/emu/ui/tapectrl.cpp:100
+#: src/frontend/mame/ui/tapectrl.cpp:101
 msgid "Record"
 msgstr "Neem op"
 
-#: src/emu/ui/tapectrl.cpp:103
+#: src/frontend/mame/ui/tapectrl.cpp:104
 msgid "Rewind"
 msgstr "Terug spoelen"
 
-#: src/emu/ui/tapectrl.cpp:106
+#: src/frontend/mame/ui/tapectrl.cpp:107
 msgid "Fast Forward"
 msgstr "Vooruit spoelen"
 
-#: src/emu/ui/ui.cpp:418
+#: src/frontend/mame/ui/ui.cpp:320
 msgid "This driver requires images to be loaded in the following device(s): "
 msgstr "Deze driver vereist software ingelezen in de volgende device(s): "
 
-#: src/emu/ui/ui.cpp:1071
+#: src/frontend/mame/ui/ui.cpp:776
 msgid ""
 "One or more ROMs/CHDs for this machine are incorrect. The machine may not "
 "run correctly.\n"
@@ -1497,7 +1800,7 @@ msgstr ""
 "Één of meerdere ROMs/CHDs voor deze machine zijn niet correct. De machine "
 "kan mogelijk niet goed functioneren.\n"
 
-#: src/emu/ui/ui.cpp:1084
+#: src/frontend/mame/ui/ui.cpp:789
 msgid ""
 "There are known problems with this machine\n"
 "\n"
@@ -1505,49 +1808,49 @@ msgstr ""
 "Er zijn problemen bekend met de emulatie van deze machine\n"
 "\n"
 
-#: src/emu/ui/ui.cpp:1088
+#: src/frontend/mame/ui/ui.cpp:793
 msgid ""
 "One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
 msgstr ""
 "Één of meerdere ROMs/CHDs voor deze machine zijn niet correct gedumpt.\n"
 
-#: src/emu/ui/ui.cpp:1092
+#: src/frontend/mame/ui/ui.cpp:797
 #, c-format
 msgid "The keyboard emulation may not be 100% accurate.\n"
 msgstr "De toetsenbordemulatie is mogelijk niet 100% accuraat.\n"
 
-#: src/emu/ui/ui.cpp:1094
+#: src/frontend/mame/ui/ui.cpp:799
 #, c-format
 msgid "The colors aren't 100% accurate.\n"
 msgstr "De kleuren zijn niet 100% accuraat.\n"
 
-#: src/emu/ui/ui.cpp:1096
+#: src/frontend/mame/ui/ui.cpp:801
 msgid "The colors are completely wrong.\n"
 msgstr "De kleuren zijn zeker fout.\n"
 
-#: src/emu/ui/ui.cpp:1098
+#: src/frontend/mame/ui/ui.cpp:803
 #, c-format
 msgid "The video emulation isn't 100% accurate.\n"
 msgstr "De beeldemulatie is niet 100% accuraat.\n"
 
-#: src/emu/ui/ui.cpp:1100
+#: src/frontend/mame/ui/ui.cpp:805
 #, c-format
 msgid "The sound emulation isn't 100% accurate.\n"
 msgstr "De geluidsemulatie is niet 100% accuraat.\n"
 
-#: src/emu/ui/ui.cpp:1102
+#: src/frontend/mame/ui/ui.cpp:807
 msgid "The machine lacks sound.\n"
 msgstr "Deze machine heeft geen geluid.\n"
 
-#: src/emu/ui/ui.cpp:1105
+#: src/frontend/mame/ui/ui.cpp:810
 msgid "Screen flipping in cocktail mode is not supported.\n"
 msgstr "Schermflippen wordt in cocktailmodus niet ondersteund.\n"
 
-#: src/emu/ui/ui.cpp:1109
+#: src/frontend/mame/ui/ui.cpp:814
 msgid "The machine requires external artwork files\n"
 msgstr "Deze machine vereist externe artwork bestanden\n"
 
-#: src/emu/ui/ui.cpp:1114
+#: src/frontend/mame/ui/ui.cpp:819
 msgid ""
 "This machine was never completed. It may exhibit strange behavior or missing "
 "elements that are not bugs in the emulation.\n"
@@ -1555,7 +1858,7 @@ msgstr ""
 "Deze machine was nooit afgemaakt. Het kan vreemd gedrag vertonen of "
 "elementen missen; dit zijn geen fouten van de emulatie.\n"
 
-#: src/emu/ui/ui.cpp:1119
+#: src/frontend/mame/ui/ui.cpp:824
 msgid ""
 "This machine has no sound hardware, MAME will produce no sounds, this is "
 "expected behaviour.\n"
@@ -1563,12 +1866,12 @@ msgstr ""
 "Deze machine heeft geen geluidshardware, MAME zal geen geluid produceren, "
 "dit is verwacht gedrag.\n"
 
-#: src/emu/ui/ui.cpp:1127
+#: src/frontend/mame/ui/ui.cpp:832
 msgid "The machine has protection which isn't fully emulated.\n"
 msgstr ""
 "Deze machine heeft een beveiliging die nog niet volledig is geëmuleerd.\n"
 
-#: src/emu/ui/ui.cpp:1130
+#: src/frontend/mame/ui/ui.cpp:835
 msgid ""
 "\n"
 "THIS MACHINE DOESN'T WORK. The emulation for this machine is not yet "
@@ -1579,7 +1882,7 @@ msgstr ""
 "compleet. Er is niets wat je kunt doen om dit probleem te verhelpen afgezien "
 "van het afwachten tot ontwikkelaars de emulatie verder verbeteren.\n"
 
-#: src/emu/ui/ui.cpp:1134
+#: src/frontend/mame/ui/ui.cpp:839
 msgid ""
 "\n"
 "Certain elements of this machine cannot be emulated as it requires actual "
@@ -1591,7 +1894,7 @@ msgstr ""
 "verband met fysieke interactie of het gebruik van mechanische componenten. "
 "Het is niet mogelijk om deze machine volledig te spelen.\n"
 
-#: src/emu/ui/ui.cpp:1153
+#: src/frontend/mame/ui/ui.cpp:858
 msgid ""
 "\n"
 "\n"
@@ -1601,14 +1904,14 @@ msgstr ""
 "\n"
 "Dit zijn werkende klonen van de machine: "
 
-#: src/emu/ui/ui.cpp:1167
+#: src/frontend/mame/ui/ui.cpp:872
 msgid ""
 "\n"
 "\n"
 "Press any key to continue"
 msgstr ""
 
-#: src/emu/ui/ui.cpp:1182
+#: src/frontend/mame/ui/ui.cpp:887
 #, c-format
 msgid ""
 "%1$s\n"
@@ -1623,15 +1926,15 @@ msgstr ""
 "\n"
 "Processor:\n"
 
-#: src/emu/ui/ui.cpp:1218 src/emu/ui/ui.cpp:1257
+#: src/frontend/mame/ui/ui.cpp:922 src/frontend/mame/ui/ui.cpp:960
 msgid "MHz"
 msgstr "MHz"
 
-#: src/emu/ui/ui.cpp:1218 src/emu/ui/ui.cpp:1257
+#: src/frontend/mame/ui/ui.cpp:922 src/frontend/mame/ui/ui.cpp:960
 msgid "kHz"
 msgstr "kHz"
 
-#: src/emu/ui/ui.cpp:1232
+#: src/frontend/mame/ui/ui.cpp:936
 msgid ""
 "\n"
 "Sound:\n"
@@ -1639,7 +1942,7 @@ msgstr ""
 "\n"
 "Geluid:\n"
 
-#: src/emu/ui/ui.cpp:1261
+#: src/frontend/mame/ui/ui.cpp:964
 msgid ""
 "\n"
 "Video:\n"
@@ -1647,78 +1950,78 @@ msgstr ""
 "\n"
 "Beeld:\n"
 
-#: src/emu/ui/ui.cpp:1265
+#: src/frontend/mame/ui/ui.cpp:968
 msgid "None\n"
 msgstr "Geen\n"
 
-#: src/emu/ui/ui.cpp:1272
+#: src/frontend/mame/ui/ui.cpp:975
 msgid "Vector"
 msgstr "Vector"
 
-#: src/emu/ui/ui.cpp:1283
+#: src/frontend/mame/ui/ui.cpp:986
 #, c-format
 msgid "%1$s: %2$s\n"
 msgstr "%1$s: %2$s\n"
 
-#: src/emu/ui/ui.cpp:1283
+#: src/frontend/mame/ui/ui.cpp:986
 msgid "%2$s\n"
 msgstr "%2$s\n"
 
-#: src/emu/ui/ui.cpp:1538 src/emu/ui/ui.cpp:1548
+#: src/frontend/mame/ui/ui.cpp:1318 src/frontend/mame/ui/ui.cpp:1328
 msgid "Keyboard Emulation Status"
 msgstr "Toetsenbord emulatiestatus"
 
-#: src/emu/ui/ui.cpp:1540
+#: src/frontend/mame/ui/ui.cpp:1320
 msgid "Mode: PARTIAL Emulation"
 msgstr "Modus: GEDEELTELIJKE emulatie"
 
-#: src/emu/ui/ui.cpp:1541
+#: src/frontend/mame/ui/ui.cpp:1321
 msgid "UI:   Enabled"
 msgstr "UI:   Ingeschakeld"
 
-#: src/emu/ui/ui.cpp:1543 src/emu/ui/ui.cpp:1553
+#: src/frontend/mame/ui/ui.cpp:1323 src/frontend/mame/ui/ui.cpp:1333
 msgid "**Use ScrLock to toggle**"
 msgstr "**Gebruik ScrLock om te wisselen**"
 
-#: src/emu/ui/ui.cpp:1550
+#: src/frontend/mame/ui/ui.cpp:1330
 msgid "Mode: FULL Emulation"
 msgstr "Modus: VOLLEDIGE emulatie"
 
-#: src/emu/ui/ui.cpp:1551
+#: src/frontend/mame/ui/ui.cpp:1331
 msgid "UI:   Disabled"
 msgstr "UI:   Uitgeschakeld"
 
-#: src/emu/ui/ui.cpp:1689
+#: src/frontend/mame/ui/ui.cpp:1472
 msgid "Autofire can't be enabled"
 msgstr "Autofire kan niet worden ingeschakeld"
 
-#: src/emu/ui/ui.cpp:1728
+#: src/frontend/mame/ui/ui.cpp:1511
 msgid "Select position to save to"
 msgstr "Selecteer positie om naar op te slaan"
 
-#: src/emu/ui/ui.cpp:1730
+#: src/frontend/mame/ui/ui.cpp:1513
 msgid "Select position to load from"
 msgstr "Selecteer positie om van in te lezen"
 
-#: src/emu/ui/ui.cpp:1754
+#: src/frontend/mame/ui/ui.cpp:1537
 msgid "Save cancelled"
 msgstr "Opslaan afgebroken"
 
-#: src/emu/ui/ui.cpp:1756
+#: src/frontend/mame/ui/ui.cpp:1539
 msgid "Load cancelled"
 msgstr "Inlezen afgebroken"
 
-#: src/emu/ui/ui.cpp:1799
+#: src/frontend/mame/ui/ui.cpp:1582
 #, c-format
 msgid "Save to position %s"
 msgstr "Opslaan naar positie %s"
 
-#: src/emu/ui/ui.cpp:1804
+#: src/frontend/mame/ui/ui.cpp:1587
 #, c-format
 msgid "Load from position %s"
 msgstr "Inlezen van positie %s"
 
-#: src/emu/ui/ui.cpp:1844
+#: src/frontend/mame/ui/ui.cpp:1629
 #, c-format
 msgid ""
 "Are you sure you want to quit?\n"
@@ -1731,219 +2034,226 @@ msgstr ""
 "Druk op ''%1%s'' om te stoppen,\n"
 "druk op ''%2$s'' om terug te keren naar de emulatie."
 
-#: src/emu/ui/ui.cpp:1914
+#: src/frontend/mame/ui/ui.cpp:1702
 msgid "Master Volume"
 msgstr "Hoofdvolume"
 
-#: src/emu/ui/ui.cpp:1923
+#: src/frontend/mame/ui/ui.cpp:1711
 #, c-format
 msgid "%1$s Volume"
 msgstr "%1$s volume"
 
-#: src/emu/ui/ui.cpp:1946
+#: src/frontend/mame/ui/ui.cpp:1735
 #, c-format
 msgid "Overclock CPU %1$s"
 msgstr "Overklok CPU %1$s"
 
-#: src/emu/ui/ui.cpp:1965
+#: src/frontend/mame/ui/ui.cpp:1755
 #, c-format
 msgid "%1$s Refresh Rate"
 msgstr "%1$s verversingfrequentie"
 
-#: src/emu/ui/ui.cpp:1970
+#: src/frontend/mame/ui/ui.cpp:1760
 #, c-format
 msgid "%1$s Brightness"
 msgstr "%1$s helderheid"
 
-#: src/emu/ui/ui.cpp:1972
+#: src/frontend/mame/ui/ui.cpp:1762
 #, c-format
 msgid "%1$s Contrast"
 msgstr "%1$s contrast"
 
-#: src/emu/ui/ui.cpp:1974
+#: src/frontend/mame/ui/ui.cpp:1764
 #, c-format
 msgid "%1$s Gamma"
 msgstr "%1$s gamma"
 
-#: src/emu/ui/ui.cpp:1978
+#: src/frontend/mame/ui/ui.cpp:1768
 #, c-format
 msgid "%1$s Horiz Stretch"
 msgstr "%1$s horizontale stretch"
 
-#: src/emu/ui/ui.cpp:1980
+#: src/frontend/mame/ui/ui.cpp:1770
 #, c-format
 msgid "%1$s Horiz Position"
 msgstr "%1$s horizontale positie"
 
-#: src/emu/ui/ui.cpp:1982
+#: src/frontend/mame/ui/ui.cpp:1772
 #, c-format
 msgid "%1$s Vert Stretch"
 msgstr "%1$s verticale stretch"
 
-#: src/emu/ui/ui.cpp:1984
+#: src/frontend/mame/ui/ui.cpp:1774
 #, c-format
 msgid "%1$s Vert Position"
 msgstr "%1$s verticale positie"
 
-#: src/emu/ui/ui.cpp:2002
+#: src/frontend/mame/ui/ui.cpp:1793
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Stretch"
 msgstr "Laserdisc '%1$s' horizontale stretch"
 
-#: src/emu/ui/ui.cpp:2004
+#: src/frontend/mame/ui/ui.cpp:1795
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Position"
 msgstr "Laserdisc '%1$s' horizontale positie"
 
-#: src/emu/ui/ui.cpp:2006
+#: src/frontend/mame/ui/ui.cpp:1797
 #, c-format
 msgid "Laserdisc '%1$s' Vert Stretch"
 msgstr "Laserdic '%1$s' verticale stretch"
 
-#: src/emu/ui/ui.cpp:2008
+#: src/frontend/mame/ui/ui.cpp:1799
 #, c-format
 msgid "Laserdisc '%1$s' Vert Position"
 msgstr "Laserdisc '%1$s' verticale positie"
 
-#: src/emu/ui/ui.cpp:2018
+#: src/frontend/mame/ui/ui.cpp:1811
 msgid "Vector Flicker"
 msgstr ""
 
-#: src/emu/ui/ui.cpp:2019
+#: src/frontend/mame/ui/ui.cpp:1812
 msgid "Beam Width Minimum"
 msgstr "Minimale straalbreedte"
 
-#: src/emu/ui/ui.cpp:2020
+#: src/frontend/mame/ui/ui.cpp:1813
 msgid "Beam Width Maximum"
 msgstr "Maximale straalbreedte"
 
-#: src/emu/ui/ui.cpp:2021
+#: src/frontend/mame/ui/ui.cpp:1814
 msgid "Beam Intensity Weight"
 msgstr "Gewicht straalintensiteit"
 
-#: src/emu/ui/ui.cpp:2034
+#: src/frontend/mame/ui/ui.cpp:1829
 #, c-format
 msgid "Crosshair Scale %1$s"
 msgstr "Vizier schaal %1$s"
 
-#: src/emu/ui/ui.cpp:2034 src/emu/ui/ui.cpp:2036
+#: src/frontend/mame/ui/ui.cpp:1829 src/frontend/mame/ui/ui.cpp:1831
 msgid "X"
 msgstr "X"
 
-#: src/emu/ui/ui.cpp:2034 src/emu/ui/ui.cpp:2036
+#: src/frontend/mame/ui/ui.cpp:1829 src/frontend/mame/ui/ui.cpp:1831
 msgid "Y"
 msgstr "Y"
 
-#: src/emu/ui/ui.cpp:2036
+#: src/frontend/mame/ui/ui.cpp:1831
 #, c-format
 msgid "Crosshair Offset %1$s"
 msgstr "Vizier offset %1$s"
 
-#: src/emu/ui/ui.cpp:2068
+#: src/frontend/mame/ui/ui.cpp:1919
 #, c-format
 msgid "%1$3ddB"
 msgstr "%1$3d dB"
 
-#: src/emu/ui/ui.cpp:2112
+#: src/frontend/mame/ui/ui.cpp:1963
 #, c-format
 msgid "%1$d%%"
 msgstr "%1$d%%"
 
-#: src/emu/ui/ui.cpp:2128
+#: src/frontend/mame/ui/ui.cpp:1979
 #, c-format
 msgid "%1$3.0f%%"
 msgstr "%1$3.0f%%"
 
-#: src/emu/ui/ui.cpp:2151
+#: src/frontend/mame/ui/ui.cpp:2002
 #, c-format
 msgid "%1$.3ffps"
 msgstr "%1$.3f fps"
 
-#: src/emu/ui/ui.cpp:2174 src/emu/ui/ui.cpp:2196 src/emu/ui/ui.cpp:2217
-#: src/emu/ui/ui.cpp:2239 src/emu/ui/ui.cpp:2261 src/emu/ui/ui.cpp:2283
-#: src/emu/ui/ui.cpp:2305 src/emu/ui/ui.cpp:2327 src/emu/ui/ui.cpp:2349
-#: src/emu/ui/ui.cpp:2371 src/emu/ui/ui.cpp:2393
+#: src/frontend/mame/ui/ui.cpp:2025 src/frontend/mame/ui/ui.cpp:2047
+#: src/frontend/mame/ui/ui.cpp:2068 src/frontend/mame/ui/ui.cpp:2090
+#: src/frontend/mame/ui/ui.cpp:2112 src/frontend/mame/ui/ui.cpp:2134
+#: src/frontend/mame/ui/ui.cpp:2156 src/frontend/mame/ui/ui.cpp:2178
+#: src/frontend/mame/ui/ui.cpp:2200 src/frontend/mame/ui/ui.cpp:2222
+#: src/frontend/mame/ui/ui.cpp:2244
 #, c-format
 msgid "%1$.3f"
 msgstr "%1$.3f"
 
-#: src/emu/ui/ui.cpp:2408 src/emu/ui/ui.cpp:2423 src/emu/ui/ui.cpp:2438
-#: src/emu/ui/ui.cpp:2453
+#: src/frontend/mame/ui/ui.cpp:2259 src/frontend/mame/ui/ui.cpp:2274
+#: src/frontend/mame/ui/ui.cpp:2289 src/frontend/mame/ui/ui.cpp:2304
 #, c-format
 msgid "%1$1.2f"
 msgstr "%1$1.2f"
 
-#: src/emu/ui/ui.cpp:2469
+#: src/frontend/mame/ui/ui.cpp:2317
 #, c-format
 msgid "Screen '%1$s'"
 msgstr "Scherm '%1$s'"
 
-#: src/emu/ui/ui.cpp:2471
+#: src/frontend/mame/ui/ui.cpp:2319
 msgid "Screen"
 msgstr "Scherm"
 
-#: src/emu/ui/ui.cpp:2487
+#: src/frontend/mame/ui/ui.cpp:2335
 #, c-format
 msgid "Crosshair Scale X %1$1.3f"
 msgstr "Vizier X-schaal %1$1.3f"
 
-#: src/emu/ui/ui.cpp:2487
+#: src/frontend/mame/ui/ui.cpp:2335
 #, c-format
 msgid "Crosshair Scale Y %1$1.3f"
 msgstr "Vizier Y-schaal %1$1.3f"
 
-#: src/emu/ui/ui.cpp:2506
+#: src/frontend/mame/ui/ui.cpp:2354
 #, c-format
 msgid "Crosshair Offset X %1$1.3f"
 msgstr "Vizier X-offset %1$1.3f"
 
-#: src/emu/ui/ui.cpp:2506
+#: src/frontend/mame/ui/ui.cpp:2354
 #, c-format
 msgid "Crosshair Offset Y %1$1.3f"
 msgstr "Vizier Y-offset %1$1.3f"
 
-#: src/emu/ui/videoopt.cpp:55
+#: src/frontend/mame/ui/ui.cpp:2506
+msgid "**Error saving ui.ini**"
+msgstr "**Fout bij het opslaan van ui.ini**"
+
+#: src/frontend/mame/ui/ui.cpp:2553
+#, c-format
+msgid "**Error saving %s.ini**"
+msgstr "**Fout bij het opslaan van %s.ini**"
+
+#: src/frontend/mame/ui/videoopt.cpp:56
 #, c-format
 msgid "Screen #%d"
 msgstr "Scherm #%d"
 
-#: src/emu/ui/videoopt.cpp:203
-msgid "Rotate"
-msgstr "Draai"
-
-#: src/emu/ui/videoopt.cpp:207
+#: src/frontend/mame/ui/videoopt.cpp:208
 msgid "Backdrops"
 msgstr ""
 
-#: src/emu/ui/videoopt.cpp:211
+#: src/frontend/mame/ui/videoopt.cpp:212
 msgid "Overlays"
 msgstr ""
 
-#: src/emu/ui/videoopt.cpp:215
+#: src/frontend/mame/ui/videoopt.cpp:216
 msgid "Bezels"
 msgstr ""
 
-#: src/emu/ui/videoopt.cpp:219
+#: src/frontend/mame/ui/videoopt.cpp:220
 msgid "CPanels"
 msgstr ""
 
-#: src/emu/ui/videoopt.cpp:227
+#: src/frontend/mame/ui/videoopt.cpp:228
 msgid "View"
 msgstr ""
 
-#: src/emu/ui/videoopt.cpp:227
+#: src/frontend/mame/ui/videoopt.cpp:228
 msgid "Cropped"
 msgstr ""
 
-#: src/emu/ui/videoopt.cpp:227
+#: src/frontend/mame/ui/videoopt.cpp:228
 msgid "Full"
 msgstr "Volledig"
 
-#: src/emu/ui/viewgfx.cpp:391
+#: src/frontend/mame/ui/viewgfx.cpp:381
 msgid " COLORS"
 msgstr " KLEUREN"
 
-#: src/emu/ui/viewgfx.cpp:391
+#: src/frontend/mame/ui/viewgfx.cpp:381
 msgid " PENS"
 msgstr " PENNEN"
 
@@ -1958,66 +2268,6 @@ msgstr " PENNEN"
 
 #~ msgid "%1$s %2$s ( %3$d / %4$d softwares )"
 #~ msgstr "%1$s %2$s ( %3$d / %4$d software )"
-
-#~ msgid "Lightgun Device Assignment"
-#~ msgstr "Lightgun toewijzing"
-
-#~ msgid "Trackball Device Assignment"
-#~ msgstr "Trackball toewijzing"
-
-#~ msgid "Pedal Device Assignment"
-#~ msgstr "Pedaal toewijzing"
-
-#~ msgid "Adstick Device Assignment"
-#~ msgstr "Adstick toewijzing"
-
-#~ msgid "Paddle Device Assignment"
-#~ msgstr "Paddle toewijzing"
-
-#~ msgid "Dial Device Assignment"
-#~ msgstr "Dial-apparaat toewijzing"
-
-#~ msgid "Positional Device Assignment"
-#~ msgstr "Positie-apparaat toewijzing"
-
-#~ msgid "Mouse Device Assignment"
-#~ msgstr "Muis toewijzing"
-
-#~ msgid "Device Mapping"
-#~ msgstr "Invoerapparaat mapping"
-
-#~ msgid "Video Mode"
-#~ msgstr "Video modus"
-
-#~ msgid "Triple Buffering"
-#~ msgstr "Drievoudige buffering"
-
-#~ msgid "HLSL"
-#~ msgstr "HLSL"
-
-#~ msgid "GLSL"
-#~ msgstr "GLSL"
-
-#~ msgid "Bilinear Filtering"
-#~ msgstr "Bilineaire filtering"
-
-#~ msgid "Bitmap Prescaling"
-#~ msgstr "Bitmap prescaling"
-
-#~ msgid "Window Mode"
-#~ msgstr "Schermmodus"
-
-#~ msgid "Enforce Aspect Ratio"
-#~ msgstr "Forceer aspectratio"
-
-#~ msgid "Start Out Maximized"
-#~ msgstr "Start gemaximaliseerd"
-
-#~ msgid "Synchronized Refresh"
-#~ msgstr "Gesynchroniseerde verversing"
-
-#~ msgid "Wait Vertical Sync"
-#~ msgstr "Wacht V-Sync"
 
 #~ msgid "Display Options"
 #~ msgstr "Video-opties"
@@ -2044,38 +2294,11 @@ msgstr " PENNEN"
 #~ "\n"
 #~ "Druk een toets (behalve ESC) om verder te gaan."
 
-#~ msgid "Re-select last machine played"
-#~ msgstr "Kies laatst gespeelde machine opnieuw"
-
-#~ msgid "Enlarge images in the right panel"
-#~ msgstr "Vergroot plaatjes in het rechter paneel"
-
-#~ msgid "DATs info"
-#~ msgstr "DATs informatie"
-
-#~ msgid "Show mouse pointer"
-#~ msgstr "Toon muispointer"
-
-#~ msgid "Confirm quit from machines"
-#~ msgstr "Machine afsluiten bevestigen"
-
 #~ msgid "Skip displaying information's screen at startup"
 #~ msgstr "Sla informatiescherm bij het opstarten over"
 
 #~ msgid "Force 4:3 appearance for software snapshot"
 #~ msgstr "Toon software snapshot altijd in 4:3 formaat"
-
-#~ msgid "Use image as background"
-#~ msgstr "Gebruik plaatje als achtergrond"
-
-#~ msgid "Skip bios selection menu"
-#~ msgstr "Sla bios selectie menu over"
-
-#~ msgid "Skip software parts selection menu"
-#~ msgstr "Sla software onderdelen selectie menu over"
-
-#~ msgid "Miscellaneous Options"
-#~ msgstr "Overige opties"
 
 #~ msgid ""
 #~ "\n"
