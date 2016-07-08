@@ -488,7 +488,7 @@ static MACHINE_CONFIG_START( bmcbowl, bmcbowl_state )
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(bmcbowl_state, via_a_out))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bmcbowl_state, via_b_out))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(bmcbowl_state, via_ca2_out))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m68000_device, write_irq4))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_4))
 MACHINE_CONFIG_END
 
 ROM_START( bmcbowl )
