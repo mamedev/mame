@@ -211,6 +211,8 @@ menu::menu(mame_ui_manager &mui, render_container *_container)
 	, m_event()
 	, m_pool(nullptr)
 	, m_focus(focused_menu::main)
+	, m_resetpos(0)
+	, m_resetref(nullptr)
 {
 	container = _container;
 
@@ -244,12 +246,12 @@ menu::~menu()
 void menu::reset(reset_options options)
 {
 	// based on the reset option, set the reset info
-	resetpos = 0;
-	resetref = nullptr;
+	m_resetpos = 0;
+	m_resetref = nullptr;
 	if (options == reset_options::REMEMBER_POSITION)
-		resetpos = selected;
+		m_resetpos = selected;
 	else if (options == reset_options::REMEMBER_REF)
-		resetref = item[selected].ref;
+		m_resetref = get_selection_ref();
 
 	// reset all the pools and the item.size() back to 0
 	for (pool *ppool = m_pool; ppool != nullptr; ppool = ppool->next)
@@ -368,9 +370,9 @@ void menu::item_append(std::string &&text, std::string &&subtext, UINT32 flags, 
 		item.emplace_back(std::move(pitem));
 
 	// update the selection if we need to
-	if (resetpos == index || (resetref != nullptr && resetref == ref))
+	if (m_resetpos == index || (m_resetref != nullptr && m_resetref == ref))
 		selected = index;
-	if (resetpos == item.size() - 1)
+	if (m_resetpos == (item.size() - 1))
 		selected = item.size() - 1;
 }
 
@@ -420,7 +422,7 @@ const menu::event *menu::process(UINT32 flags, float x0, float y0)
 	}
 
 	// update the selected item in the event
-	if (m_event.iptkey != IPT_INVALID && selected >= 0 && selected < item.size())
+	if ((m_event.iptkey != IPT_INVALID) && selection_valid())
 	{
 		m_event.itemref = item[selected].ref;
 		m_event.type = item[selected].type;
@@ -463,17 +465,6 @@ void *menu::m_pool_alloc(size_t size)
 
 
 //-------------------------------------------------
-//  get_selection - retrieves the index
-//  of the currently selected menu item
-//-------------------------------------------------
-
-void *menu::get_selection()
-{
-	return (selected >= 0 && selected < item.size()) ? item[selected].ref : nullptr;
-}
-
-
-//-------------------------------------------------
 //  set_selection - changes the index
 //  of the currently selected menu item
 //-------------------------------------------------
@@ -482,11 +473,13 @@ void menu::set_selection(void *selected_itemref)
 {
 	selected = -1;
 	for (int itemnum = 0; itemnum < item.size(); itemnum++)
+	{
 		if (item[itemnum].ref == selected_itemref)
 		{
 			selected = itemnum;
 			break;
 		}
+	}
 }
 
 
@@ -570,7 +563,7 @@ void menu::draw(UINT32 flags, float origx0, float origy0)
 	if (!customonly)
 		ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
-	if (top_line < 0 || selected == 0)
+	if (top_line < 0 || is_first_selected())
 		top_line = 0;
 	if (selected >= (top_line + visible_lines))
 		top_line = selected - (visible_lines / 2);
@@ -778,7 +771,7 @@ void menu::draw(UINT32 flags, float origx0, float origy0)
 	}
 
 	// if there is something special to add, do it by calling the virtual method
-	custom_render((selected >= 0 && selected < item.size()) ? item[selected].ref : nullptr, customtop, custombottom, x1, y1, x2, y2);
+	custom_render(get_selection_ref(), customtop, custombottom, x1, y1, x2, y2);
 }
 
 void menu::custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
@@ -907,7 +900,7 @@ void menu::handle_events(UINT32 flags)
 				{
 					selected = hover;
 					m_event.iptkey = IPT_UI_SELECT;
-					if (selected == item.size() - 1)
+					if (is_last_selected())
 					{
 						m_event.iptkey = IPT_UI_CANCEL;
 						menu::stack_pop(machine());
@@ -927,7 +920,7 @@ void menu::handle_events(UINT32 flags)
 							top_line -= local_menu_event.num_lines;
 							return;
 						}
-						(selected == 0) ? selected = top_line = item.size() - 1 : selected -= local_menu_event.num_lines;
+						is_first_selected() ? selected = top_line = item.size() - 1 : selected -= local_menu_event.num_lines;
 						validate_selection(-1);
 						top_line -= (selected <= top_line && top_line != 0);
 						if (selected <= top_line && visitems != visible_lines)
@@ -940,7 +933,7 @@ void menu::handle_events(UINT32 flags)
 							top_line += local_menu_event.num_lines;
 							return;
 						}
-						(selected == item.size() - 1) ? selected = top_line = 0 : selected += local_menu_event.num_lines;
+						is_last_selected() ? selected = top_line = 0 : selected += local_menu_event.num_lines;
 						validate_selection(1);
 						top_line += (selected >= top_line + visitems + (top_line != 0));
 						if (selected >= (top_line + visitems + (top_line != 0)))
@@ -981,7 +974,7 @@ void menu::handle_keys(UINT32 flags)
 	// if we hit select, return TRUE or pop the stack, depending on the item
 	if (exclusive_input_pressed(IPT_UI_SELECT, 0))
 	{
-		if (selected == item.size() - 1)
+		if (is_last_selected())
 		{
 			m_event.iptkey = IPT_UI_CANCEL;
 			menu::stack_pop(machine());
@@ -1025,7 +1018,7 @@ void menu::handle_keys(UINT32 flags)
 			top_line--;
 			return;
 		}
-		(selected == 0) ? selected = top_line = item.size() - 1 : --selected;
+		is_first_selected() ? selected = top_line = item.size() - 1 : --selected;
 		validate_selection(-1);
 		top_line -= (selected <= top_line && top_line != 0);
 		if (selected <= top_line && visitems != visible_lines)
@@ -1040,7 +1033,7 @@ void menu::handle_keys(UINT32 flags)
 			top_line++;
 			return;
 		}
-		(selected == item.size() - 1) ? selected = top_line = 0 : ++selected;
+		is_last_selected() ? selected = top_line = 0 : ++selected;
 		validate_selection(1);
 		top_line += (selected >= top_line + visitems + (top_line != 0));
 		if (selected >= (top_line + visitems + (top_line != 0)))
@@ -1484,7 +1477,7 @@ void menu::draw_select_game(UINT32 flags)
 
 	if (visible_items < visible_lines)
 		visible_lines = visible_items;
-	if (top_line < 0 || selected == 0)
+	if (top_line < 0 || is_first_selected())
 		top_line = 0;
 	if (selected < visible_items && top_line + visible_lines >= visible_items)
 		top_line = visible_items - visible_lines;
@@ -1633,13 +1626,13 @@ void menu::draw_select_game(UINT32 flags)
 	x1 = x2;
 	x2 += right_panel_size;
 
-	draw_right_panel((selected >= 0 && selected < item.size()) ? item[selected].ref : nullptr, x1, y1, x2, y2);
+	draw_right_panel(get_selection_ref(), x1, y1, x2, y2);
 
 	x1 = primary_left - UI_BOX_LR_BORDER;
 	x2 = primary_left + primary_width + UI_BOX_LR_BORDER;
 
 	// if there is something special to add, do it by calling the virtual method
-	custom_render((selected >= 0 && selected < item.size()) ? item[selected].ref : nullptr, customtop, custombottom, x1, y1, x2, y2);
+	custom_render(get_selection_ref(), customtop, custombottom, x1, y1, x2, y2);
 
 	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
 	visitems = visible_lines - (top_line != 0) - (top_line + visible_lines != visible_items);
@@ -1711,7 +1704,7 @@ void menu::handle_main_keys(UINT32 flags)
 	// if we hit select, return TRUE or pop the stack, depending on the item
 	if (exclusive_input_pressed(IPT_UI_SELECT, 0))
 	{
-		if (selected == item.size() - 1 && m_focus == focused_menu::main)
+		if (is_last_selected() && m_focus == focused_menu::main)
 		{
 			m_event.iptkey = IPT_UI_CANCEL;
 			menu::stack_pop(machine());
@@ -1771,7 +1764,7 @@ void menu::handle_main_keys(UINT32 flags)
 			return;
 		}
 
-		if (selected == visible_items + 1 || selected == 0 || ui_error)
+		if (selected == visible_items + 1 || is_first_selected() || ui_error)
 			return;
 
 		selected--;
@@ -1798,7 +1791,7 @@ void menu::handle_main_keys(UINT32 flags)
 			return;
 		}
 
-		if (selected == item.size() - 1 || selected == visible_items - 1 || ui_error)
+		if (is_last_selected() || selected == visible_items - 1 || ui_error)
 			return;
 
 		selected++;
@@ -2744,7 +2737,7 @@ void menu::draw_palette_menu()
 	}
 
 	// if there is something special to add, do it by calling the virtual method
-	custom_render((selected >= 0 && selected < item.size()) ? item[selected].ref : nullptr, customtop, custombottom, x1, y1, x2, y2);
+	custom_render(get_selection_ref(), customtop, custombottom, x1, y1, x2, y2);
 
 	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
 	visitems = visible_lines - (top_line != 0) - (top_line + visible_lines != item.size());
@@ -2890,7 +2883,7 @@ void menu::draw_dats_menu()
 	}
 
 	// if there is something special to add, do it by calling the virtual method
-	custom_render((selected >= 0 && selected < item.size()) ? item[selected].ref : nullptr, customtop, custombottom, x1, y1, x2, y2);
+	custom_render(get_selection_ref(), customtop, custombottom, x1, y1, x2, y2);
 
 	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
 	visitems = visible_lines - (top_line != 0) - (top_line + visible_lines != visible_items);

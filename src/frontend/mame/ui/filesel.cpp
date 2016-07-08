@@ -460,7 +460,7 @@ void menu_file_selector::handle()
 
 			if (update_selected)
 			{
-				const file_selector_entry *cur_selected = (const file_selector_entry *)get_selection();
+				file_selector_entry const *const cur_selected(reinterpret_cast<file_selector_entry const *>(get_selection_ref()));
 
 				// check for entries which matches our m_filename_buffer:
 				for (auto &entry : m_entrylist)

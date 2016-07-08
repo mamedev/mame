@@ -189,7 +189,7 @@ void menu_file_create::populate()
 	const std::string *new_image_name;
 
 	// append the "New Image Name" item
-	if (get_selection() == ITEMREF_NEW_IMAGE_NAME)
+	if (get_selection_ref() == ITEMREF_NEW_IMAGE_NAME)
 	{
 		buffer = m_filename + "_";
 		new_image_name = &buffer;
@@ -246,7 +246,7 @@ void menu_file_create::handle()
 			break;
 
 		case IPT_SPECIAL:
-			if (get_selection() == ITEMREF_NEW_IMAGE_NAME)
+			if (get_selection_ref() == ITEMREF_NEW_IMAGE_NAME)
 			{
 				input_character(m_filename, event->unichar, &osd_is_valid_filename_char);
 				reset(reset_options::REMEMBER_POSITION);

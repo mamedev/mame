@@ -145,13 +145,8 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container *conta
 menu_select_game::~menu_select_game()
 {
 	std::string error_string, last_driver;
-	const game_driver *driver = nullptr;
-	ui_software_info *swinfo = nullptr;
-	ui_options &mopt = ui().options();
-	if (isfavorite())
-		swinfo = (selected >= 0 && selected < item.size()) ? (ui_software_info *)item[selected].ref : nullptr;
-	else
-		driver = (selected >= 0 && selected < item.size()) ? (const game_driver *)item[selected].ref : nullptr;
+	game_driver const *const driver(isfavorite() ? nullptr : reinterpret_cast<game_driver const *>(get_selection_ref()));
+	ui_software_info *const swinfo(isfavorite() ? reinterpret_cast<ui_software_info *>(get_selection_ref()) : nullptr);
 
 	if ((FPTR)driver > skip_main_items)
 		last_driver = driver->name;
@@ -165,6 +160,7 @@ menu_select_game::~menu_select_game()
 	else if (main_filters::actual == FILTER_YEAR)
 		filter.append(",").append(c_year::ui[c_year::actual]);
 
+	ui_options &mopt = ui().options();
 	mopt.set_value(OPTION_LAST_USED_FILTER, filter.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 	mopt.set_value(OPTION_LAST_USED_MACHINE, last_driver.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 	mopt.set_value(OPTION_HIDE_PANELS, ui_globals::panels_status, OPTION_PRIORITY_CMDLINE, error_string);
