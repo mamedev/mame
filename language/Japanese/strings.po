@@ -915,7 +915,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/miscmenu.cpp:773
 msgid "Bios"
-msgstr ""
+msgstr "BIOS"
 
 #: src/frontend/mame/ui/miscmenu.cpp:777
 msgid "Driver"
@@ -923,7 +923,7 @@ msgstr "ドライバ"
 
 #: src/frontend/mame/ui/miscmenu.cpp:780
 msgid "This machine has no bios."
-msgstr ""
+msgstr "このマシンにはBIOSがありません。"
 
 #: src/frontend/mame/ui/miscmenu.cpp:794
 msgid "Save machine configuration"
@@ -1453,7 +1453,7 @@ msgstr "マシン終了時に確認"
 
 #: src/frontend/mame/ui/submenu.cpp:28
 msgid "Skip information screen at startup"
-msgstr ""
+msgstr "起動時に情報画面をスキップ"
 
 #: src/frontend/mame/ui/submenu.cpp:29
 msgid "Force 4:3 aspect for snapshot display"
@@ -1481,11 +1481,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:38
 msgid "Advanced Options"
-msgstr ""
+msgstr "詳細設定"
 
 #: src/frontend/mame/ui/submenu.cpp:39
 msgid "Performance Options"
-msgstr ""
+msgstr "パフォーマンス設定"
 
 #: src/frontend/mame/ui/submenu.cpp:40
 msgid "Auto frame skip"
@@ -1513,7 +1513,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:47
 msgid "Rotation Options"
-msgstr ""
+msgstr "回転設定"
 
 #: src/frontend/mame/ui/submenu.cpp:48 src/frontend/mame/ui/videoopt.cpp:204
 msgid "Rotate"
@@ -1521,11 +1521,11 @@ msgstr "回転"
 
 #: src/frontend/mame/ui/submenu.cpp:49
 msgid "Rotate right"
-msgstr ""
+msgstr "右に回転"
 
 #: src/frontend/mame/ui/submenu.cpp:50
 msgid "Rotate left"
-msgstr ""
+msgstr "左に回転​​"
 
 #: src/frontend/mame/ui/submenu.cpp:51
 msgid "Auto rotate right"
@@ -1553,23 +1553,23 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:58
 msgid "Use Backdrops"
-msgstr ""
+msgstr "背景画像使用"
 
 #: src/frontend/mame/ui/submenu.cpp:59
 msgid "Use Overlays"
-msgstr ""
+msgstr "オーバーレイ画像使用"
 
 #: src/frontend/mame/ui/submenu.cpp:60
 msgid "Use Bezels"
-msgstr ""
+msgstr "ベゼル画像使用"
 
 #: src/frontend/mame/ui/submenu.cpp:61
 msgid "Use Control Panels"
-msgstr ""
+msgstr "操作パネル画像使用"
 
 #: src/frontend/mame/ui/submenu.cpp:62
 msgid "Use Marquees"
-msgstr ""
+msgstr "マーキー画像使用"
 
 #: src/frontend/mame/ui/submenu.cpp:64
 msgid "State/Playback Options"
@@ -1589,7 +1589,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:69
 msgid "Input Options"
-msgstr ""
+msgstr "入力設定"
 
 #: src/frontend/mame/ui/submenu.cpp:70
 msgid "Coin lockout"
@@ -1597,15 +1597,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:71
 msgid "Mouse"
-msgstr ""
+msgstr "マウス"
 
 #: src/frontend/mame/ui/submenu.cpp:72
 msgid "Joystick"
-msgstr ""
+msgstr "ジョイスティック"
 
 #: src/frontend/mame/ui/submenu.cpp:73
 msgid "Lightgun"
-msgstr ""
+msgstr "ライトガン"
 
 #: src/frontend/mame/ui/submenu.cpp:74
 msgid "Multi-keyboard"
@@ -1689,7 +1689,7 @@ msgstr "ビデオモード"
 
 #: src/frontend/mame/ui/submenu.cpp:101
 msgid "Number Of Screens"
-msgstr ""
+msgstr "画面数"
 
 #: src/frontend/mame/ui/submenu.cpp:103
 msgid "Triple Buffering"
@@ -2267,20 +2267,8 @@ msgstr " 色"
 msgid " PENS"
 msgstr " ペン"
 
-#~ msgid "Export XML format (like -listxml)"
-#~ msgstr "XML形式で出力（-listxml同様）"
-
-#~ msgid "Export TXT format (like -listfull)"
-#~ msgstr "TXT形式で出力（-listfull同様）"
-
-#~ msgid "Dummy"
-#~ msgstr "ダミー"
-
 #~ msgid "%1$s %2$s ( %3$d / %4$d softwares )"
 #~ msgstr "%1$s %2$s ( %3$d / %4$d ソフトウェア )"
-
-#~ msgid "Display Options"
-#~ msgstr "表示オプション"
 
 #~ msgid ""
 #~ "The selected machine is missing one or more required ROM or CHD images. "
@@ -2304,9 +2292,6 @@ msgstr " ペン"
 #~ "\n"
 #~ "進めるには、何かキー（ESC以外）を押してください。"
 
-#~ msgid "Skip displaying information's screen at startup"
-#~ msgstr "起動時に情報画面をスキップ"
-
 #~ msgid "Force 4:3 appearance for software snapshot"
 #~ msgstr "スクリーンショットを4:3の比率で保存する"
 
@@ -2326,21 +2311,6 @@ msgstr " ペン"
 #~ "下さい。\n"
 #~ "\n"
 #~ "そうでなければOKとタイプするかジョイスティックを左右に入力して進みます。"
-
-#~ msgid ""
-#~ "\n"
-#~ "\n"
-#~ "Type OK or move the joystick left then right to continue"
-#~ msgstr ""
-#~ "\n"
-#~ "\n"
-#~ "OKとタイプするか、ジョイスティックを左右に動かして進む"
-
-#~ msgid "Multi-Threaded Rendering"
-#~ msgstr "マルチスレッド描画"
-
-#~ msgid "Hardware Stretch"
-#~ msgstr "ハードウェアによる拡大"
 
 #~ msgid "**Error loading %s.ini**"
 #~ msgstr "*** %s.iniの読み込みエラー ***"
