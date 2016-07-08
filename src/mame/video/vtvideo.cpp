@@ -283,6 +283,7 @@ WRITE8_MEMBER(vt100_video_device::dc012_w)
 			// PDF: reverse field OFF 
 			// SETUP: dark screen selected 
 			m_reverse_field = 1; 
+			break;
 
 			//  Writing a 11XX bit combination clears the blink-flip flop (valid for 0x0C - 0x0F):
 		case 0x0c:
