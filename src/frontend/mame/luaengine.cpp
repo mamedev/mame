@@ -663,7 +663,7 @@ luabridge::LuaRef lua_engine::l_ioport_get_ports(const ioport_manager *m)
 	luabridge::LuaRef port_table = luabridge::LuaRef::newTable(L);
 
 	for (auto &port : im->ports()) {
-		port_table[port.second->tag()] = &port;
+		port_table[port.second->tag()] = port.second.get();
 	}
 
 	return port_table;
@@ -762,7 +762,7 @@ luabridge::LuaRef lua_engine::l_dev_get_states(const device_t *d)
 	for (auto &s : dev->state().state_entries())
 	{
 		// XXX: refrain from exporting non-visible entries?
-		st_table[s->symbol()] = &s;
+		st_table[s->symbol()] = s.get();
 	}
 
 	return st_table;
