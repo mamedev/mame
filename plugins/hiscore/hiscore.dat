@@ -6187,7 +6187,7 @@ ninjemak:
 
 
 dangar:
-dangar2:
+dangara:
 dangarb:
 @:maincpu,program,e209,82,00,20
 @:maincpu,program,e394,3,00,00
@@ -17187,3 +17187,5 @@ percuss:
 ;Moguchan (by GeoMan)
 moguchan:
 @:maincpu,program,5eda,6,0,0
+
+
