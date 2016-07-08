@@ -272,7 +272,7 @@ WRITE8_MEMBER(m2comm_device::share_w)
 
 READ8_MEMBER(m2comm_device::cn_r)
 {
-	return m_cn;
+	return m_cn | 0xfe;
 }
 
 WRITE8_MEMBER(m2comm_device::cn_w)
@@ -302,14 +302,24 @@ WRITE8_MEMBER(m2comm_device::cn_w)
 		m_linkcount = 0x00;
 		m_linktimer = 0x00e8; // 58 fps * 4s
 
+		// zero memory
+		for (int i = 0; i < 0x4000; i++)
+		{
+			m_shared[i] = 0x00;
+		}
+
 		// TODO - check EPR-16726 on Daytona USA and Sega Rally Championship
 		// EPR-18643(A) - these are accessed by VirtuaON and Sega Touring Car Championship
 
-		// frameSize - 0xe00
+		// frameAddr - 0x2000
+		m_shared[0x10] = 0x00;
+		m_shared[0x11] = 0x20;
+
+		// frameSize - 0x0e00
 		m_shared[0x12] = 0x00;
 		m_shared[0x13] = 0x0e;
 
-		// frameOffset - 0x1c0
+		// frameOffset - 0x01c0
 		m_shared[0x14] = 0xc0;
 		m_shared[0x15] = 0x01;
 
