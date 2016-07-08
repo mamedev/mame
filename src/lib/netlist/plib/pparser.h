@@ -25,7 +25,7 @@ public:
 	virtual ~ptokenizer() {}
 
 	explicit ptokenizer(pistream &strm)
-	: m_strm(strm), m_lineno(1), m_px(0), m_string('"')
+	: m_strm(strm), m_lineno(0), m_px(0), m_string('"')
 	{}
 
 	enum token_type
