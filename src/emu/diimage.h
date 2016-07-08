@@ -144,7 +144,7 @@ public:
 
 	virtual bool call_load() { return FALSE; }
 	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) { return FALSE; }
-	virtual bool call_create(int format_type, option_resolution *format_options) { return FALSE; }
+	virtual bool call_create(int format_type, util::option_resolution *format_options) { return FALSE; }
 	virtual void call_unload() { }
 	virtual std::string call_display() { return std::string(); }
 	virtual device_image_partialhash_func get_partial_hash() const { return nullptr; }
@@ -226,7 +226,7 @@ public:
 	bool open_image_file(emu_options &options);
 	bool finish_load();
 	void unload();
-	bool create(const char *path, const image_device_format *create_format, option_resolution *create_args);
+	bool create(const char *path, const image_device_format *create_format, util::option_resolution *create_args);
 	bool load_software(software_list_device &swlist, const char *swname, const rom_entry *entry);
 	int reopen_for_write(const char *path);
 
@@ -242,7 +242,7 @@ public:
 	bool user_loadable() const { return m_user_loadable; }
 
 protected:
-	bool load_internal(const char *path, bool is_create, int create_format, option_resolution *create_args, bool just_load);
+	bool load_internal(const char *path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load);
 	void determine_open_plan(int is_create, UINT32 *open_plan);
 	image_error_t load_image_by_path(UINT32 open_flags, const char *path);
 	void clear();
@@ -306,7 +306,7 @@ protected:
 
 	/* special - used when creating */
 	int m_create_format;
-	option_resolution *m_create_args;
+	util::option_resolution *m_create_args;
 
 	hash_collection m_hash;
 

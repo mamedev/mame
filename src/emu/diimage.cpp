@@ -933,7 +933,7 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 //	load_internal - core image loading
 //-------------------------------------------------
 
-bool device_image_interface::load_internal(const char *path, bool is_create, int create_format, option_resolution *create_args, bool just_load)
+bool device_image_interface::load_internal(const char *path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load)
 {
 	UINT32 open_plan[4];
 	int i;
@@ -1143,7 +1143,7 @@ bool device_image_interface::finish_load()
 //	create - create a image
 //-------------------------------------------------
 
-bool device_image_interface::create(const char *path, const image_device_format *create_format, option_resolution *create_args)
+bool device_image_interface::create(const char *path, const image_device_format *create_format, util::option_resolution *create_args)
 {
 	int format_index = 0;
 	int cnt = 0;
