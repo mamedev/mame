@@ -103,7 +103,6 @@ private:
 				CMD_PH0,
 				CMD_PH1,
 				CMD_PH2,
-				CMD_PH3,
 				CMD_END,
 				CMD_STOPPING
 		} cmd_state_t;
@@ -118,6 +117,7 @@ private:
 		// Timers
 		emu_timer *m_tape_timer;
 		emu_timer *m_hole_timer;
+	emu_timer *m_timeout_timer;
 
 		// Content of tape tracks
 		tape_track_t m_tracks[ 2 ];
@@ -180,6 +180,7 @@ private:
 		attotime time_to_next_hole(void) const;
 		attotime time_to_tach_pulses(void) const;
 		void terminate_cmd_now(void);
+	void set_data_timeout(bool long_timeout);
 		void cmd_fsm(void);
 		void start_cmd_exec(UINT16 new_cmd_reg);
 };
