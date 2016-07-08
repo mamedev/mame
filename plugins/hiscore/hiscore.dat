@@ -12,7 +12,7 @@
 ; <gamename>,<softwarename>:
 ; for machines with softlists
 ; @<cputag>,<addressspace>,<address>,<length>,<value to wait for 
-; in the first byte/word>,<value to wait for in the last byte/word>
+; in the first byte/word>,<value to wait for in the last byte/word>,<optional prefill>
 ; [repeat the above as many times as necessary]
 ;
 ; *** All Entries Without Name Done By Me !! ( Leezer ) ;0) ***
