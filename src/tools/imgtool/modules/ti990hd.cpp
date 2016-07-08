@@ -395,10 +395,10 @@ static void ti990_image_closeenum(imgtool_directory *enumeration);
 static imgtoolerr_t ti990_image_freespace(imgtool_partition *partition, UINT64 *size);
 #ifdef UNUSED_FUNCTION
 static imgtoolerr_t ti990_image_readfile(imgtool_partition *partition, const char *fpath, imgtool_stream *destf);
-static imgtoolerr_t ti990_image_writefile(imgtool_partition *partition, const char *fpath, imgtool_stream *sourcef, option_resolution *writeoptions);
+static imgtoolerr_t ti990_image_writefile(imgtool_partition *partition, const char *fpath, imgtool_stream *sourcef, util::option_resolution *writeoptions);
 static imgtoolerr_t ti990_image_deletefile(imgtool_partition *partition, const char *fpath);
 #endif
-static imgtoolerr_t ti990_image_create(imgtool_image *image, imgtool_stream *f, option_resolution *createoptions);
+static imgtoolerr_t ti990_image_create(imgtool_image *image, imgtool_stream *f, util::option_resolution *createoptions);
 
 enum
 {
@@ -1550,7 +1550,7 @@ static imgtoolerr_t ti990_image_readfile(imgtool_partition *partition, const cha
 /*
     Add a file to a ti990_image.
 */
-static imgtoolerr_t ti990_image_writefile(imgtool_partition *partition, const char *fpath, imgtool_stream *sourcef, option_resolution *writeoptions)
+static imgtoolerr_t ti990_image_writefile(imgtool_partition *partition, const char *fpath, imgtool_stream *sourcef, util::option_resolution *writeoptions)
 {
 	imgtool_image *img = imgtool_partition_image(partition);
 	ti990_image *image = (ti990_image *) imgtool_image_extra_bytes(img);
@@ -1764,7 +1764,7 @@ static imgtoolerr_t ti990_image_deletefile(imgtool_partition *partition, const c
 /*
     Create a blank ti990_image.
 */
-static imgtoolerr_t ti990_image_create(imgtool_image *image, imgtool_stream *f, option_resolution *createoptions)
+static imgtoolerr_t ti990_image_create(imgtool_image *image, imgtool_stream *f, util::option_resolution *createoptions)
 {
 	//const char *volname;
 	ti990_geometry geometry;
@@ -1776,11 +1776,11 @@ static imgtoolerr_t ti990_image_create(imgtool_image *image, imgtool_stream *f, 
 	int i;
 
 	/* read options */
-	//volname = option_resolution_lookup_string(createoptions, ti990_createopts_volname);
-	geometry.cylinders = option_resolution_lookup_int(createoptions, ti990_createopts_cylinders);
-	geometry.heads = option_resolution_lookup_int(createoptions, ti990_createopts_heads);
-	geometry.sectors_per_track = option_resolution_lookup_int(createoptions, ti990_createopts_sectors);
-	geometry.bytes_per_sector = option_resolution_lookup_int(createoptions, ti990_createopts_sectorsize);
+	//volname = createoptions->lookup_string(ti990_createopts_volname);
+	geometry.cylinders = createoptions->lookup_int(ti990_createopts_cylinders);
+	geometry.heads = createoptions->lookup_int(ti990_createopts_heads);
+	geometry.sectors_per_track = createoptions->lookup_int(ti990_createopts_sectors);
+	geometry.bytes_per_sector = createoptions->lookup_int(ti990_createopts_sectorsize);
 
 	totsecs = geometry.cylinders * geometry.heads * geometry.sectors_per_track;
 

@@ -660,7 +660,7 @@ done:
 
 /* ----------------------------------------------------------------------- */
 
-static imgtoolerr_t prodos_diskimage_create(imgtool_image *image, option_resolution *opts)
+static imgtoolerr_t prodos_diskimage_create(imgtool_image *image, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
 	UINT32 heads, tracks, sectors, sector_bytes;
@@ -668,10 +668,10 @@ static imgtoolerr_t prodos_diskimage_create(imgtool_image *image, option_resolut
 	UINT32 volume_bitmap_block_count, total_blocks;
 	UINT8 buffer[BLOCK_SIZE];
 
-	heads = option_resolution_lookup_int(opts, 'H');
-	tracks = option_resolution_lookup_int(opts, 'T');
-	sectors = option_resolution_lookup_int(opts, 'S');
-	sector_bytes = option_resolution_lookup_int(opts, 'L');
+	heads = opts->lookup_int('H');
+	tracks = opts->lookup_int('T');
+	sectors = opts->lookup_int('S');
+	sector_bytes = opts->lookup_int('L');
 
 	dirent_size = 39;
 	volume_bitmap_block = 6;
@@ -702,7 +702,7 @@ static imgtoolerr_t prodos_diskimage_create(imgtool_image *image, option_resolut
 
 
 
-static imgtoolerr_t prodos_diskimage_create_525(imgtool_image *image, imgtool_stream *stream, option_resolution *opts)
+static imgtoolerr_t prodos_diskimage_create_525(imgtool_image *image, imgtool_stream *stream, util::option_resolution *opts)
 {
 	prodos_setprocs_525(image);
 	return prodos_diskimage_create(image, opts);
@@ -710,7 +710,7 @@ static imgtoolerr_t prodos_diskimage_create_525(imgtool_image *image, imgtool_st
 
 
 
-static imgtoolerr_t prodos_diskimage_create_35(imgtool_image *image, imgtool_stream *stream, option_resolution *opts)
+static imgtoolerr_t prodos_diskimage_create_35(imgtool_image *image, imgtool_stream *stream, util::option_resolution *opts)
 {
 	prodos_setprocs_35(image);
 	return prodos_diskimage_create(image, opts);
@@ -1744,7 +1744,7 @@ static imgtoolerr_t prodos_diskimage_readfile(imgtool_partition *partition, cons
 
 
 
-static imgtoolerr_t prodos_diskimage_writefile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, option_resolution *opts)
+static imgtoolerr_t prodos_diskimage_writefile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
 	imgtool_image *image = imgtool_partition_image(partition);

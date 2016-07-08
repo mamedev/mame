@@ -232,16 +232,16 @@ static imgtoolerr_t pc_chd_read_partition_header(imgtool_image *image)
 
 
 
-static imgtoolerr_t pc_chd_image_create(imgtool_image *image, imgtool_stream *f, option_resolution *opts)
+static imgtoolerr_t pc_chd_image_create(imgtool_image *image, imgtool_stream *f, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
 	UINT32 cylinders, heads, sectors;
 	pc_chd_image_info *info;
 	UINT8 header_block[FAT_SECLEN];
 
-	cylinders = option_resolution_lookup_int(opts, 'T');
-	heads = option_resolution_lookup_int(opts, 'H');
-	sectors = option_resolution_lookup_int(opts, 'S');
+	cylinders = opts->lookup_int('T');
+	heads = opts->lookup_int('H');
+	sectors = opts->lookup_int('S');
 
 	info = pc_chd_get_image_info(image);
 

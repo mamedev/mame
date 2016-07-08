@@ -182,7 +182,7 @@ static imgtoolerr_t macbinary_readfile(imgtool_partition *partition, const char 
 
 
 static imgtoolerr_t write_fork(imgtool_partition *partition, const char *filename, const char *fork,
-	imgtool_stream *sourcef, UINT64 pos, UINT64 fork_len, option_resolution *opts)
+	imgtool_stream *sourcef, UINT64 pos, UINT64 fork_len, util::option_resolution *opts)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	imgtool_stream *mem_stream = NULL;
@@ -216,7 +216,7 @@ done:
 
 
 
-static imgtoolerr_t macbinary_writefile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, option_resolution *opts)
+static imgtoolerr_t macbinary_writefile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
 {
 	static const UINT32 attrs[] =
 	{

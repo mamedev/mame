@@ -200,11 +200,11 @@ static FLOPPY_CONSTRUCT(coco_jvc_construct)
 	{
 		/* create */
 		memset(&geometry, 0, sizeof(geometry));
-		geometry.heads              = option_resolution_lookup_int(params, PARAM_HEADS);
-		geometry.tracks             = option_resolution_lookup_int(params, PARAM_TRACKS);
-		geometry.sectors            = option_resolution_lookup_int(params, PARAM_SECTORS);
-		geometry.first_sector_id    = option_resolution_lookup_int(params, PARAM_FIRST_SECTOR_ID);
-		geometry.sector_length      = option_resolution_lookup_int(params, PARAM_SECTOR_LENGTH);
+		geometry.heads              = params->lookup_int(PARAM_HEADS);
+		geometry.tracks             = params->lookup_int(PARAM_TRACKS);
+		geometry.sectors            = params->lookup_int(PARAM_SECTORS);
+		geometry.first_sector_id    = params->lookup_int(PARAM_FIRST_SECTOR_ID);
+		geometry.sector_length      = params->lookup_int(PARAM_SECTOR_LENGTH);
 
 		header[0] = (UINT8) geometry.sectors;
 		header[1] = (UINT8) geometry.heads;
@@ -325,7 +325,7 @@ static floperr_t coco_os9_readheader(floppy_image_legacy *floppy, struct basicds
 
 
 
-static floperr_t coco_os9_post_format(floppy_image_legacy *floppy, option_resolution *params)
+static floperr_t coco_os9_post_format(floppy_image_legacy *floppy, util::option_resolution *params)
 {
 	UINT8 header[0x0400];
 	floperr_t err;
@@ -333,9 +333,9 @@ static floperr_t coco_os9_post_format(floppy_image_legacy *floppy, option_resolu
 	struct tm *ltime;
 	int heads, tracks, sectors, total_sectors;
 
-	heads   = option_resolution_lookup_int(params, PARAM_HEADS);
-	tracks  = option_resolution_lookup_int(params, PARAM_TRACKS);
-	sectors = option_resolution_lookup_int(params, PARAM_SECTORS);
+	heads   = params->lookup_int(PARAM_HEADS);
+	tracks  = params->lookup_int(PARAM_TRACKS);
+	sectors = params->lookup_int(PARAM_SECTORS);
 	total_sectors = heads * tracks * sectors;
 
 	/* write the initial header */
@@ -439,11 +439,11 @@ static FLOPPY_CONSTRUCT(coco_os9_construct)
 	{
 		/* create */
 		memset(&geometry, 0, sizeof(geometry));
-		geometry.heads              = option_resolution_lookup_int(params, PARAM_HEADS);
-		geometry.tracks             = option_resolution_lookup_int(params, PARAM_TRACKS);
-		geometry.sectors            = option_resolution_lookup_int(params, PARAM_SECTORS);
-		geometry.first_sector_id    = option_resolution_lookup_int(params, PARAM_FIRST_SECTOR_ID);
-		geometry.sector_length      = option_resolution_lookup_int(params, PARAM_SECTOR_LENGTH);
+		geometry.heads              = params->lookup_int(PARAM_HEADS);
+		geometry.tracks             = params->lookup_int(PARAM_TRACKS);
+		geometry.sectors            = params->lookup_int(PARAM_SECTORS);
+		geometry.first_sector_id    = params->lookup_int(PARAM_FIRST_SECTOR_ID);
+		geometry.sector_length      = params->lookup_int(PARAM_SECTOR_LENGTH);
 	}
 	else
 	{
@@ -549,8 +549,8 @@ static FLOPPY_CONSTRUCT(coco_vdk_construct)
 	{
 		/* create */
 		memset(&geometry, 0, sizeof(geometry));
-		geometry.heads = option_resolution_lookup_int(params, PARAM_HEADS);
-		geometry.tracks = option_resolution_lookup_int(params, PARAM_TRACKS);
+		geometry.heads = params->lookup_int(PARAM_HEADS);
+		geometry.tracks = params->lookup_int(PARAM_TRACKS);
 		geometry.sectors = 18;
 		geometry.first_sector_id = 1;
 		geometry.sector_length = 256;
@@ -707,7 +707,7 @@ static floperr_t coco_dmk_get_track_data_offset(floppy_image_legacy *floppy, int
 
 
 
-static floperr_t coco_dmk_format_track(floppy_image_legacy *floppy, int head, int track, option_resolution *params)
+static floperr_t coco_dmk_format_track(floppy_image_legacy *floppy, int head, int track, util::option_resolution *params)
 {
 	int sectors;
 	int sector_length;
@@ -724,10 +724,10 @@ static floperr_t coco_dmk_format_track(floppy_image_legacy *floppy, int head, in
 	UINT32 max_track_size;
 	std::vector<int> sector_map;
 
-	sectors         = option_resolution_lookup_int(params, PARAM_SECTORS);
-	sector_length   = option_resolution_lookup_int(params, PARAM_SECTOR_LENGTH);
-	interleave      = option_resolution_lookup_int(params, PARAM_INTERLEAVE);
-	first_sector_id = option_resolution_lookup_int(params, PARAM_FIRST_SECTOR_ID);
+	sectors         = params->lookup_int(PARAM_SECTORS);
+	sector_length   = params->lookup_int(PARAM_SECTOR_LENGTH);
+	interleave      = params->lookup_int(PARAM_INTERLEAVE);
+	first_sector_id = params->lookup_int(PARAM_FIRST_SECTOR_ID);
 
 	max_track_size = get_dmk_tag(floppy)->track_size;
 
@@ -1102,10 +1102,10 @@ FLOPPY_CONSTRUCT(coco_dmk_construct)
 
 	if (params)
 	{
-		heads           = option_resolution_lookup_int(params, PARAM_HEADS);
-		tracks          = option_resolution_lookup_int(params, PARAM_TRACKS);
-		sectors         = option_resolution_lookup_int(params, PARAM_SECTORS);
-		sector_length   = option_resolution_lookup_int(params, PARAM_SECTOR_LENGTH);
+		heads           = params->lookup_int(PARAM_HEADS);
+		tracks          = params->lookup_int(PARAM_TRACKS);
+		sectors         = params->lookup_int(PARAM_SECTORS);
+		sector_length   = params->lookup_int(PARAM_SECTOR_LENGTH);
 
 		track_size = coco_dmk_min_track_size(sectors, sector_length) + DMK_EXTRA_TRACK_LENGTH;
 

@@ -17,7 +17,7 @@
 #define FAT_SECLEN              512
 
 
-static imgtoolerr_t fat_image_create(imgtool_image *image, imgtool_stream *stream, option_resolution *opts)
+static imgtoolerr_t fat_image_create(imgtool_image *image, imgtool_stream *stream, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
 	UINT32 tracks, heads, sectors;
@@ -25,9 +25,9 @@ static imgtoolerr_t fat_image_create(imgtool_image *image, imgtool_stream *strea
 	imgtool_class imgclass = { fat_get_info };
 	imgtoolerr_t (*fat_partition_create)(imgtool_image *image, UINT64 first_block, UINT64 block_count);
 
-	tracks = option_resolution_lookup_int(opts, 'T');
-	heads = option_resolution_lookup_int(opts, 'H');
-	sectors = option_resolution_lookup_int(opts, 'S');
+	tracks = opts->lookup_int('T');
+	heads = opts->lookup_int('H');
+	sectors = opts->lookup_int('S');
 
 	/* set up just enough of a boot sector to specify geometry */
 	memset(buffer, 0, sizeof(buffer));
