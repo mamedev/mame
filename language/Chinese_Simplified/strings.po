@@ -1520,7 +1520,7 @@ msgstr "左旋转"
 
 #: src/frontend/mame/ui/submenu.cpp:51
 msgid "Auto rotate right"
-msgstr 自动右旋转""
+msgstr "自动右旋转"
 
 #: src/frontend/mame/ui/submenu.cpp:52
 msgid "Auto rotate left"
