@@ -144,7 +144,7 @@
 // Debugging
 #define VERBOSE 1
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
-#define VERBOSE_0 1
+#define VERBOSE_0 0
 #define LOG_0(x)  do { if (VERBOSE_0) logerror x; } while (0)
 
 // Macros to clear/set single bits
