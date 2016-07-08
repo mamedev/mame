@@ -919,7 +919,7 @@ msgstr "驅動程式"
 
 #: src/frontend/mame/ui/miscmenu.cpp:780
 msgid "This machine has no bios."
-msgstr ""
+msgstr "此機台沒有 BIOS。"
 
 #: src/frontend/mame/ui/miscmenu.cpp:794
 msgid "Save machine configuration"
@@ -1420,91 +1420,91 @@ msgstr "使用外部樣本檔"
 
 #: src/frontend/mame/ui/submenu.cpp:21
 msgid "Miscellaneous Options"
-msgstr ""
+msgstr "其他選項"
 
 #: src/frontend/mame/ui/submenu.cpp:22
 msgid "Re-select last machine played"
-msgstr ""
+msgstr "重新選擇上次執行的機台"
 
 #: src/frontend/mame/ui/submenu.cpp:23
 msgid "Enlarge images in the right panel"
-msgstr ""
+msgstr "放大右側面版的圖片"
 
 #: src/frontend/mame/ui/submenu.cpp:24
 msgid "DATs info"
-msgstr ""
+msgstr "DAT 資訊"
 
 #: src/frontend/mame/ui/submenu.cpp:26
 msgid "Show mouse pointer"
-msgstr ""
+msgstr "顯示滑鼠指標"
 
 #: src/frontend/mame/ui/submenu.cpp:27
 msgid "Confirm quit from machines"
-msgstr ""
+msgstr "確認離開機台"
 
 #: src/frontend/mame/ui/submenu.cpp:28
 msgid "Skip information screen at startup"
-msgstr ""
+msgstr "略過起始的資訊畫面"
 
 #: src/frontend/mame/ui/submenu.cpp:29
 msgid "Force 4:3 aspect for snapshot display"
-msgstr ""
+msgstr "強制擷圖顯示比例為 4:3"
 
 #: src/frontend/mame/ui/submenu.cpp:30
 msgid "Use image as background"
-msgstr ""
+msgstr "使用圖片作為背景"
 
 #: src/frontend/mame/ui/submenu.cpp:31
 msgid "Skip bios selection menu"
-msgstr ""
+msgstr "略過 BIOS 選擇選單"
 
 #: src/frontend/mame/ui/submenu.cpp:32
 msgid "Skip software parts selection menu"
-msgstr ""
+msgstr "略過軟體部分選擇選單"
 
 #: src/frontend/mame/ui/submenu.cpp:33
 msgid "Info auto audit"
-msgstr ""
+msgstr "資訊自動驗證"
 
 #: src/frontend/mame/ui/submenu.cpp:34
 msgid "Hide romless machine from available list"
-msgstr ""
+msgstr "在可用清單中隱藏無 ROM 機台"
 
 #: src/frontend/mame/ui/submenu.cpp:38
 msgid "Advanced Options"
-msgstr ""
+msgstr "進階選項"
 
 #: src/frontend/mame/ui/submenu.cpp:39
 msgid "Performance Options"
-msgstr ""
+msgstr "效能選項"
 
 #: src/frontend/mame/ui/submenu.cpp:40
 msgid "Auto frame skip"
-msgstr ""
+msgstr "自動省略畫格"
 
 #: src/frontend/mame/ui/submenu.cpp:41
 msgid "Frame skip"
-msgstr ""
+msgstr "省略畫格"
 
 #: src/frontend/mame/ui/submenu.cpp:42
 msgid "Throttle"
-msgstr ""
+msgstr "限制速度"
 
 #: src/frontend/mame/ui/submenu.cpp:43
 msgid "Sleep"
-msgstr ""
+msgstr "休眠"
 
 #: src/frontend/mame/ui/submenu.cpp:44
 msgid "Speed"
-msgstr ""
+msgstr "速度"
 
 #: src/frontend/mame/ui/submenu.cpp:45
 msgid "Refresh speed"
-msgstr ""
+msgstr "更新速度"
 
 #: src/frontend/mame/ui/submenu.cpp:47
 msgid "Rotation Options"
-msgstr ""
+msgstr "選轉選項"
 
 #: src/frontend/mame/ui/submenu.cpp:48 src/frontend/mame/ui/videoopt.cpp:204
 msgid "Rotate"
@@ -1512,83 +1512,83 @@ msgstr "旋轉"
 
 #: src/frontend/mame/ui/submenu.cpp:49
 msgid "Rotate right"
-msgstr ""
+msgstr "右旋轉"
 
 #: src/frontend/mame/ui/submenu.cpp:50
 msgid "Rotate left"
-msgstr ""
+msgstr "左旋轉"
 
 #: src/frontend/mame/ui/submenu.cpp:51
 msgid "Auto rotate right"
-msgstr ""
+msgstr 自動右旋轉""
 
 #: src/frontend/mame/ui/submenu.cpp:52
 msgid "Auto rotate left"
-msgstr ""
+msgstr "自動左旋轉"
 
 #: src/frontend/mame/ui/submenu.cpp:53
 msgid "Flip X"
-msgstr ""
+msgstr "翻轉 X"
 
 #: src/frontend/mame/ui/submenu.cpp:54
 msgid "Flip Y"
-msgstr ""
+msgstr "翻轉 Y"
 
 #: src/frontend/mame/ui/submenu.cpp:56
 msgid "Artwork Options"
-msgstr ""
+msgstr "裝飾圖選項"
 
 #: src/frontend/mame/ui/submenu.cpp:57
 msgid "Artwork Crop"
-msgstr ""
+msgstr "裝飾圖裁切"
 
 #: src/frontend/mame/ui/submenu.cpp:58
 msgid "Use Backdrops"
-msgstr ""
+msgstr "使用背景圖"
 
 #: src/frontend/mame/ui/submenu.cpp:59
 msgid "Use Overlays"
-msgstr ""
+msgstr "使用覆疊圖"
 
 #: src/frontend/mame/ui/submenu.cpp:60
 msgid "Use Bezels"
-msgstr ""
+msgstr "使用外框圖"
 
 #: src/frontend/mame/ui/submenu.cpp:61
 msgid "Use Control Panels"
-msgstr ""
+msgstr "使用控制面版圖"
 
 #: src/frontend/mame/ui/submenu.cpp:62
 msgid "Use Marquees"
-msgstr ""
+msgstr "使用機檯標題圖"
 
 #: src/frontend/mame/ui/submenu.cpp:64
 msgid "State/Playback Options"
-msgstr ""
+msgstr "狀態/播放選項"
 
 #: src/frontend/mame/ui/submenu.cpp:65
 msgid "Automatic save/restore"
-msgstr ""
+msgstr "自動儲存/還原"
 
 #: src/frontend/mame/ui/submenu.cpp:66
 msgid "Bilinear snapshot"
-msgstr ""
+msgstr "雙線過濾擷圖"
 
 #: src/frontend/mame/ui/submenu.cpp:67
 msgid "Burn-in"
-msgstr ""
+msgstr "烙印擷圖"
 
 #: src/frontend/mame/ui/submenu.cpp:69
 msgid "Input Options"
-msgstr ""
+msgstr "輸入選項"
 
 #: src/frontend/mame/ui/submenu.cpp:70
 msgid "Coin lockout"
-msgstr ""
+msgstr "投幣鎖定"
 
 #: src/frontend/mame/ui/submenu.cpp:71
 msgid "Mouse"
-msgstr ""
+msgstr "滑鼠"
 
 #: src/frontend/mame/ui/submenu.cpp:72
 msgid "Joystick"
@@ -1596,7 +1596,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:73
 msgid "Lightgun"
-msgstr ""
+msgstr "光線槍"
 
 #: src/frontend/mame/ui/submenu.cpp:74
 msgid "Multi-keyboard"
@@ -1612,7 +1612,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:77
 msgid "UI active"
-msgstr ""
+msgstr "UI 啟動"
 
 #: src/frontend/mame/ui/submenu.cpp:78
 msgid "Offscreen reload"
@@ -1628,7 +1628,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:81
 msgid "Natural keyboard"
-msgstr ""
+msgstr "自然鍵盤"
 
 #: src/frontend/mame/ui/submenu.cpp:82
 msgid "Simultaneous contradictory"
@@ -1668,35 +1668,35 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:94
 msgid "Positional Device Assignment"
-msgstr ""
+msgstr "分配指向裝置"
 
 #: src/frontend/mame/ui/submenu.cpp:95
 msgid "Mouse Device Assignment"
-msgstr ""
+msgstr "分配滑鼠裝置"
 
 #: src/frontend/mame/ui/submenu.cpp:100
 msgid "Video Mode"
-msgstr ""
+msgstr "視訊模式"
 
 #: src/frontend/mame/ui/submenu.cpp:101
 msgid "Number Of Screens"
-msgstr ""
+msgstr "畫面數"
 
 #: src/frontend/mame/ui/submenu.cpp:103
 msgid "Triple Buffering"
-msgstr ""
+msgstr "三重緩衝"
 
 #: src/frontend/mame/ui/submenu.cpp:104
 msgid "HLSL"
-msgstr ""
+msgstr "HLSL"
 
 #: src/frontend/mame/ui/submenu.cpp:106
 msgid "GLSL"
-msgstr ""
+msgstr "GLSL"
 
 #: src/frontend/mame/ui/submenu.cpp:107
 msgid "Bilinear Filtering"
-msgstr ""
+msgstr "雙線過濾"
 
 #: src/frontend/mame/ui/submenu.cpp:108
 msgid "Bitmap Prescaling"
@@ -1704,7 +1704,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:109
 msgid "Window Mode"
-msgstr ""
+msgstr "視窗模式"
 
 #: src/frontend/mame/ui/submenu.cpp:110
 msgid "Enforce Aspect Ratio"
@@ -1716,11 +1716,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:112
 msgid "Synchronized Refresh"
-msgstr ""
+msgstr "同步更新"
 
 #: src/frontend/mame/ui/submenu.cpp:113
 msgid "Wait Vertical Sync"
-msgstr ""
+msgstr "等待垂直同步"
 
 #: src/frontend/mame/ui/swlist.cpp:72
 msgid "[file manager]"
