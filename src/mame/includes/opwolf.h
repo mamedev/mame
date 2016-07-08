@@ -61,6 +61,17 @@ public:
 	UINT8        m_c588;
 	UINT8        m_c589;
 	UINT8        m_c58a; // These variables derived from the bootleg
+	UINT8        m_triggeredLevel1b; // These variables derived from comparison to unprotection version
+	UINT8        m_triggeredLevel2;
+	UINT8        m_triggeredLevel2b;
+	UINT8        m_triggeredLevel2c;
+	UINT8        m_triggeredLevel3b;
+	UINT8        m_triggeredLevel13b;
+	UINT8        m_triggeredLevel4;
+	UINT8        m_triggeredLevel5;
+	UINT8        m_triggeredLevel7;
+	UINT8        m_triggeredLevel8;
+	UINT8        m_triggeredLevel9;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

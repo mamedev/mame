@@ -12,17 +12,18 @@ namespace plib {
     Options
 ***************************************************************************/
 
-	option::option()
-	: m_short(""), m_long(""), m_help(""), m_has_argument(false)
-	{}
-
-	option::option(options &parent, pstring ashort, pstring along, pstring help, bool has_argument)
-	: m_short(ashort), m_long(along), m_help(help), m_has_argument(has_argument)
+	option_base::option_base(options &parent, pstring help)
+	: m_help(help)
 	{
 		parent.register_option(this);
 	}
 
-	option::~option()
+	option_base::~option_base()
+	{
+	}
+
+	option::option(options &parent, pstring ashort, pstring along, pstring help, bool has_argument)
+	: option_base(parent, help), m_short(ashort), m_long(along),  m_has_argument(has_argument)
 	{
 	}
 
@@ -56,6 +57,13 @@ namespace plib {
 		return (err ? 1 : 0);
 	}
 
+	int option_vec::parse(pstring argument)
+	{
+		bool err = false;
+		m_val.push_back(argument);
+		return (err ? 1 : 0);
+	}
+
 	options::options()
 	{
 	}
@@ -75,7 +83,7 @@ namespace plib {
 		m_opts.clear();
 	}
 
-	void options::register_option(option *opt)
+	void options::register_option(option_base *opt)
 	{
 		m_opts.push_back(opt);
 	}
@@ -96,11 +104,21 @@ namespace plib {
 				auto v = pstring_vector_t(arg.substr(2),"=");
 				opt = getopt_long(v[0]);
 				has_equal_arg = (v.size() > 1);
-				if (has_equal_arg) opt_arg = v[1];
+				if (has_equal_arg)
+				{
+					for (unsigned j = 1; j < v.size() - 1; j++)
+						opt_arg = opt_arg + v[j] + "=";
+					opt_arg += v[v.size()-1];
+				}
 			}
 			else if (arg.startsWith("-"))
 			{
-				opt = getopt_short(arg.substr(1));
+				opt = getopt_short(arg.substr(1,1));
+				if (arg.len() > 2)
+				{
+					has_equal_arg = true;
+					opt_arg = arg.substr(2);
+				}
 			}
 			else
 				return i;
@@ -131,21 +149,21 @@ namespace plib {
 		return argc;
 	}
 
-	pstring options::split_paragraphs(pstring text, unsigned width, unsigned ident,
-			unsigned firstline_ident)
+	pstring options::split_paragraphs(pstring text, unsigned width, unsigned indent,
+			unsigned firstline_indent)
 	{
 		auto paragraphs = pstring_vector_t(text,"\n");
 		pstring ret("");
 
 		for (auto &p : paragraphs)
 		{
-			pstring line = pstring("").rpad(" ", firstline_ident);
+			pstring line = pstring("").rpad(" ", firstline_indent);
 			for (auto &s : pstring_vector_t(p, " "))
 			{
 				if (line.len() + s.len() > width)
 				{
 					ret += line + "\n";
-					line = pstring("").rpad(" ", ident);
+					line = pstring("").rpad(" ", indent);
 				}
 				line += s + " ";
 			}
@@ -155,67 +173,91 @@ namespace plib {
 	}
 
 	pstring options::help(pstring description, pstring usage,
-			unsigned width, unsigned ident)
+			unsigned width, unsigned indent)
 	{
 		pstring ret;
 
 		ret = split_paragraphs(description, width, 0, 0) + "\n";
-		ret += "Usage:\t" + usage + "\n\nOptions:\n";
+		ret += "Usage:\t" + usage + "\n\nOptions:\n\n";
 
-		for (auto & opt : m_opts )
+		for (auto & optbase : m_opts )
 		{
-			pstring line = "";
-			if (opt->short_opt() != "")
-				line += "  -" + opt->short_opt();
-			if (opt->long_opt() != "")
+			if (auto opt = dynamic_cast<option *>(optbase))
 			{
-				if (line != "")
-					line += ", ";
-				else
-					line = "      ";
-				line += "--" + opt->long_opt();
-				if (opt->has_argument())
+				pstring line = "";
+				if (opt->short_opt() != "")
+					line += "  -" + opt->short_opt();
+				if (opt->long_opt() != "")
 				{
-					line += "=";
-					option_str_limit *ol = dynamic_cast<option_str_limit *>(opt);
-					if (ol)
-					{
-						for (auto &v : ol->limit())
-						{
-							line += v + "|";
-						}
-						line = line.left(line.len() - 1);
-					}
+					if (line != "")
+						line += ", ";
 					else
-						line += "Value";
+						line = "      ";
+					line += "--" + opt->long_opt();
+					if (opt->has_argument())
+					{
+						line += "=";
+						option_str_limit *ol = dynamic_cast<option_str_limit *>(opt);
+						if (ol)
+						{
+							for (auto &v : ol->limit())
+							{
+								line += v + "|";
+							}
+							line = line.left(line.len() - 1);
+						}
+						else
+							line += "Value";
+					}
 				}
+				line = line.rpad(" ", indent - 2) + "  ";
+				if (line.len() > indent)
+				{
+					//ret += "TestGroup abc\n  def gef\nxyz\n\n" ;
+					ret += line + "\n";
+					ret += split_paragraphs(opt->help(), width, indent, indent);
+				}
+				else
+					ret += split_paragraphs(line + opt->help(), width, indent, 0);
 			}
-			line = line.rpad(" ", 20) + " ";
-			if (line.len() > 21)
+			else if (auto grp = dynamic_cast<option_group *>(optbase))
 			{
-				ret += line + "\n";
-				ret += split_paragraphs(opt->help(), 72, 21, 21);
+				ret += "\n" + grp->group() + ":\n";
+				if (grp->help() != "") ret += split_paragraphs(grp->help(), width, 4, 4) + "\n";
 			}
-			else
-				ret += split_paragraphs(line + opt->help(), 72, 21, 0);
+		}
+		pstring ex("");
+		for (auto & optbase : m_opts )
+		{
+			if (auto example = dynamic_cast<option_example *>(optbase))
+			{
+				ex += "> " + example->example()+"\n\n";
+				ex += split_paragraphs(example->help(), width, 4, 4) + "\n";
+			}
+		}
+		if (ex.len() > 0)
+		{
+			ret += "\n\nExamples:\n\n" + ex;
 		}
 		return ret;
 	}
 
 	option *options::getopt_short(pstring arg)
 	{
-		for (auto & opt : m_opts)
+		for (auto & optbase : m_opts)
 		{
-			if (opt->short_opt() == arg)
+			auto opt = dynamic_cast<option *>(optbase);
+			if (opt && opt->short_opt() == arg)
 				return opt;
 		}
 		return nullptr;
 	}
 	option *options::getopt_long(pstring arg)
 	{
-		for (auto & opt : m_opts)
+		for (auto & optbase : m_opts)
 		{
-			if (opt->long_opt() == arg)
+			auto opt = dynamic_cast<option *>(optbase);
+			if (opt && opt->long_opt() == arg)
 				return opt;
 		}
 		return nullptr;

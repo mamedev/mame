@@ -185,7 +185,8 @@ function cheat.startplugin()
 			script, err = load(script, cheat.desc .. name, "t", cheat.cheat_env)
 			if not script then
 				emu.print_verbose("error loading cheat script: " .. cheat.desc .. " " .. err)
-				cheat = { desc = cheat.desc .. " error" }
+				cheat.desc = cheat.desc .. " error"
+				cheat.script = nil
 				return
 			end
 			cheat.script[name] = script
@@ -199,18 +200,21 @@ function cheat.startplugin()
 				local cpu, mem
 				cpu = manager:machine().devices[space.tag]
 				if not cpu then
-					emu.print_verbose("error loading cheat script: " .. cheat.desc)
-					cheat = { desc = cheat.desc .. " error" }
+					emu.print_verbose("error loading cheat script: " .. cheat.desc .. " missing device " .. space.tag)
+					cheat.desc = cheat.desc .. " error"
+					cheat.script = nil
 					return
 				end
 				if space.type then
 					mem = cpu.spaces[space.type]
 				else
+					space.type = "program"
 					mem = cpu.spaces["program"]
 				end
 				if not mem then
-					emu.print_verbose("error loading cheat script: " .. cheat.desc)
-					cheat = { desc = cheat.desc .. " error" }
+					emu.print_verbose("error loading cheat script: " .. cheat.desc .. " missing space " .. space.type)
+					cheat.desc = cheat.desc .. " error"
+					cheat.script = nil
 					return
 				end
 				cheat.cheat_env[name] = mem
@@ -230,8 +234,9 @@ function cheat.startplugin()
 			for name, region in pairs(cheat.region) do
 				local mem = manager:machine():memory().regions[region]
 				if not mem then
-					emu.print_verbose("error loading cheat script: " .. cheat.desc)
-					cheat = { desc = cheat.desc .. " error" }
+					emu.print_verbose("error loading cheat script: " .. cheat.desc .. " missing region " .. region)
+					cheat.desc = cheat.desc .. " error"
+					cheat.script = nil
 					return
 				end
 				cheat.cheat_env[name] = mem
@@ -241,8 +246,9 @@ function cheat.startplugin()
 			for name, tag in pairs(cheat.ram) do
 				local ram = manager:machine().devices[tag]
 				if not ram then
-					emu.print_verbose("error loading cheat script: " .. cheat.desc)
-					cheat = { desc = cheat.desc .. " error" }
+					emu.print_verbose("error loading cheat script: " .. cheat.desc .. " missing ram device " .. ram)
+					cheat.desc = cheat.desc .. " error"
+					cheat.script = nil
 					return
 				end
 				cheat.cheat_env[name] = emu.item(ram.items["0/m_pointer"])

@@ -377,7 +377,7 @@ void matrix_solver_direct_t<m_N, storage_N>::LE_back_subst(
 
 
 template <unsigned m_N, unsigned storage_N>
-int matrix_solver_direct_t<m_N, storage_N>::solve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
+int matrix_solver_direct_t<m_N, storage_N>::solve_non_dynamic(const bool newton_raphson)
 {
 	nl_double new_V[storage_N]; // = { 0.0 };
 

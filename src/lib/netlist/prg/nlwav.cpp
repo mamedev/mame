@@ -126,7 +126,7 @@ private:
 
 };
 
-void convert(nlwav_options_t &opts)
+static void convert(nlwav_options_t &opts)
 {
 	plib::pofilestream fo(opts.opt_out());
 	if (fo.bad())
@@ -157,8 +157,8 @@ void convert(nlwav_options_t &opts)
 	while(fin.readline(line))
 	{
 #if 1
-		float t = 0.0; float v = 0.0;
-		sscanf(line.cstr(), "%f %f", &t, &v);
+		double t = 0.0; double v = 0.0;
+		sscanf(line.cstr(), "%lf %lf", &t, &v);
 		while (t >= ct)
 		{
 			outsam += (ct - lt) * cursam;
@@ -214,7 +214,7 @@ void convert(nlwav_options_t &opts)
 
 }
 
-void usage(plib::pstream_fmt_writer_t &fw, nlwav_options_t &opts)
+static void usage(plib::pstream_fmt_writer_t &fw, nlwav_options_t &opts)
 {
 	fw("{}\n", opts.help("Convert netlist log files into wav files.\n",
 			"nltool [options]").cstr());

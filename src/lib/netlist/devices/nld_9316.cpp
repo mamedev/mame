@@ -162,7 +162,7 @@ namespace netlist
 	{
 		if (m_loadq)
 		{
-			switch (m_cnt)
+			switch (m_cnt())
 			{
 				case MAXCNT - 1:
 					m_cnt = MAXCNT;

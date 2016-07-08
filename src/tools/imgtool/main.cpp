@@ -33,14 +33,14 @@ static void writeusage(FILE *f, int write_word_usage, const struct command *c, c
 /* ----------------------------------------------------------------------- */
 
 static int parse_options(int argc, char *argv[], int minunnamed, int maxunnamed,
-	option_resolution *resolution, filter_getinfoproc *filter, const char **fork)
+	util::option_resolution *resolution, filter_getinfoproc *filter, const char **fork)
 {
 	int i;
 	int lastunnamed = 0;
 	char *s;
 	char *name = nullptr;
 	char *value = nullptr;
-	optreserr_t oerr;
+	util::option_resolution::error oerr;
 	static char buf[256];
 
 	if (filter)
@@ -97,8 +97,8 @@ static int parse_options(int argc, char *argv[], int minunnamed, int maxunnamed,
 				if (i < minunnamed)
 					goto error; /* Too few unnamed */
 
-				oerr = option_resolution_add_param(resolution, name, value);
-				if (oerr)
+				oerr = resolution->add_param(name, value);
+				if (oerr != util::option_resolution::error::SUCCESS)
 					goto opterror;
 			}
 		}
@@ -114,7 +114,7 @@ optionalreadyspecified:
 	return -1;
 
 opterror:
-	fprintf(stderr, "%s: %s\n", name, option_resolution_error_string(oerr));
+	fprintf(stderr, "%s: %s\n", name, util::option_resolution::error_string(oerr));
 	return -1;
 
 error:
@@ -125,7 +125,7 @@ error:
 
 
 void reporterror(imgtoolerr_t err, const struct command *c, const char *format, const char *imagename,
-	const char *filename, const char *newname, option_resolution *opts)
+	const char *filename, const char *newname, util::option_resolution *opts)
 {
 	const char *src = "imgtool";
 	const char *err_name;
@@ -322,7 +322,7 @@ static int cmd_put(const struct command *c, int argc, char *argv[])
 	int unnamedargs;
 	filter_getinfoproc filter;
 	const imgtool_module *module;
-	option_resolution *resolution = nullptr;
+	std::unique_ptr<util::option_resolution> resolution;
 	const char *fork;
 	const char *new_filename;
 	char **filename_list;
@@ -358,8 +358,8 @@ static int cmd_put(const struct command *c, int argc, char *argv[])
 
 		if (writefile_optguide && writefile_optspec)
 		{
-			resolution = option_resolution_create(writefile_optguide, writefile_optspec);
-			if (!resolution)
+			try { resolution.reset(new util::option_resolution(writefile_optguide, writefile_optspec)); }
+			catch (...)
 			{
 				err = IMGTOOLERR_OUTOFMEMORY;
 				goto done;
@@ -367,7 +367,7 @@ static int cmd_put(const struct command *c, int argc, char *argv[])
 		}
 	}
 
-	unnamedargs = parse_options(argc, argv, 4, 0xffff, resolution, &filter, &fork);
+	unnamedargs = parse_options(argc, argv, 4, 0xffff, resolution.get(), &filter, &fork);
 	if (unnamedargs < 0)
 		return -1;
 
@@ -381,7 +381,7 @@ static int cmd_put(const struct command *c, int argc, char *argv[])
 	{
 		filename = filename_list[i];
 		printf("Putting file '%s'...\n", filename);
-		err = imgtool_partition_put_file(partition, new_filename, fork, filename, resolution, filter);
+		err = imgtool_partition_put_file(partition, new_filename, fork, filename, resolution.get(), filter);
 		if (err)
 			goto done;
 	}
@@ -391,10 +391,8 @@ done:
 		imgtool_partition_close(partition);
 	if (image)
 		imgtool_image_close(image);
-	if (resolution)
-		option_resolution_close(resolution);
 	if (err)
-		reporterror(err, c, argv[0], argv[1], filename, nullptr, resolution);
+		reporterror(err, c, argv[0], argv[1], filename, nullptr, resolution.get());
 	return err ? -1 : 0;
 }
 
@@ -561,18 +559,19 @@ static int cmd_identify(const struct command *c, int argc, char *argv[])
 
 	err = imgtool_identify_file(argv[0], modules, ARRAY_LENGTH(modules));
 	if (err)
-		goto error;
-
-	for (i = 0; modules[i]; i++)
 	{
-		printf("%.16s %s\n", modules[i]->name, modules[i]->description);
+		reporterror(err, c, nullptr, argv[0], nullptr, nullptr, nullptr);
+		return -1;
 	}
+	else
+	{
+		for (i = 0; modules[i]; i++)
+		{
+			printf("%.16s %s\n", modules[i]->name, modules[i]->description);
+		}
 
-	return 0;
-
-error:
-	reporterror(err, c, nullptr, argv[0], nullptr, nullptr, nullptr);
-	return -1;
+		return 0;
+	}
 }
 
 
@@ -582,7 +581,7 @@ static int cmd_create(const struct command *c, int argc, char *argv[])
 	imgtoolerr_t err;
 	int unnamedargs;
 	const imgtool_module *module;
-	option_resolution *resolution = nullptr;
+	std::unique_ptr<util::option_resolution> resolution;
 
 	module = imgtool_find_module(argv[0]);
 	if (!module)
@@ -593,29 +592,25 @@ static int cmd_create(const struct command *c, int argc, char *argv[])
 
 	if (module->createimage_optguide && module->createimage_optspec)
 	{
-		resolution = option_resolution_create(module->createimage_optguide, module->createimage_optspec);
-		if (!resolution)
+		try { resolution.reset(new util::option_resolution(module->createimage_optguide, module->createimage_optspec)); }
+		catch (...)
 		{
 			err = IMGTOOLERR_OUTOFMEMORY;
 			goto error;
 		}
 	}
 
-	unnamedargs = parse_options(argc, argv, 2, 3, resolution, nullptr, nullptr);
+	unnamedargs = parse_options(argc, argv, 2, 3, resolution.get(), nullptr, nullptr);
 	if (unnamedargs < 0)
 		return -1;
 
-	err = imgtool_image_create(module, argv[1], resolution, nullptr);
+	err = imgtool_image_create(module, argv[1], resolution.get(), nullptr);
 	if (err)
 		goto error;
 
-	if (resolution)
-		option_resolution_close(resolution);
 	return 0;
 
 error:
-	if (resolution)
-		option_resolution_close(resolution);
 	reporterror(err, c, argv[0], argv[1], nullptr, nullptr, nullptr);
 	return -1;
 }
@@ -751,7 +746,7 @@ static void listoptions(const option_guide *opt_guide, const char *opt_spec)
 {
 	char opt_name[32];
 	const char *opt_desc;
-	struct OptionRange range[32];
+	util::option_resolution::range range[32];
 	char range_buffer[512];
 	char buf[32];
 	int i;
@@ -776,7 +771,7 @@ static void listoptions(const option_guide *opt_guide, const char *opt_spec)
 
 		switch(opt_guide->option_type) {
 		case OPTIONTYPE_INT:
-			option_resolution_listranges(opt_spec, opt_guide->parameter,
+			util::option_resolution::list_ranges(opt_spec, opt_guide->parameter,
 				range, ARRAY_LENGTH(range));
 
 			for (i = 0; range[i].max >= 0; i++)
@@ -831,7 +826,10 @@ static int cmd_listdriveroptions(const struct command *c, int argc, char *argv[]
 
 	mod = imgtool_find_module(argv[0]);
 	if (!mod)
-		goto error;
+	{
+		reporterror((imgtoolerr_t)(IMGTOOLERR_MODULENOTFOUND|IMGTOOLERR_SRC_MODULE), c, argv[0], nullptr, nullptr, nullptr, nullptr);
+		return -1;
+	}
 
 	fprintf(stdout, "Driver specific options for module '%s':\n\n", argv[0]);
 
@@ -863,10 +861,6 @@ static int cmd_listdriveroptions(const struct command *c, int argc, char *argv[]
 	}
 
 	return 0;
-
-error:
-	reporterror((imgtoolerr_t)(IMGTOOLERR_MODULENOTFOUND|IMGTOOLERR_SRC_MODULE), c, argv[0], nullptr, nullptr, nullptr, nullptr);
-	return -1;
 }
 
 

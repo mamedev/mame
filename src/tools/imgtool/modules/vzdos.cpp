@@ -700,7 +700,7 @@ static imgtoolerr_t vzdos_writefile(imgtool_partition *partition, int offset, im
 }
 
 /* create a new file or overwrite a file */
-static imgtoolerr_t vzdos_diskimage_writefile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, option_resolution *opts)
+static imgtoolerr_t vzdos_diskimage_writefile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
 {
 	imgtoolerr_t ret;
 	int ftype;
@@ -711,7 +711,7 @@ static imgtoolerr_t vzdos_diskimage_writefile(imgtool_partition *partition, cons
 		return IMGTOOLERR_BADFILENAME;
 
 	/* prepare directory entry */
-	ftype = option_resolution_lookup_int(opts, 'T');
+	ftype = opts->lookup_int('T');
 
 	switch (ftype) {
 		case 0:
@@ -789,7 +789,7 @@ static imgtoolerr_t vzdos_diskimage_suggesttransfer(imgtool_partition *partition
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t vzdos_diskimage_create(imgtool_image *img, imgtool_stream *stream, option_resolution *opts)
+static imgtoolerr_t vzdos_diskimage_create(imgtool_image *img, imgtool_stream *stream, util::option_resolution *opts)
 {
 	imgtoolerr_t ret;
 	int track, sector;
@@ -852,7 +852,7 @@ static imgtoolerr_t vzsnapshot_readfile(imgtool_partition *partition, const char
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t vzsnapshot_writefile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, option_resolution *opts)
+static imgtoolerr_t vzsnapshot_writefile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
 {
 	imgtoolerr_t ret;
 	int fnameopt;
@@ -868,7 +868,7 @@ static imgtoolerr_t vzsnapshot_writefile(imgtool_partition *partition, const cha
 	entry.start_address = pick_integer_le(header, 22, 2);
 
 	/* filename from header or directly? */
-	fnameopt = option_resolution_lookup_int(opts, 'F');
+	fnameopt = opts->lookup_int('F');
 
 	if (fnameopt == 0) {
 		memcpy(&entry.fname, &header[4], 8);

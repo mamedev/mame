@@ -59,6 +59,26 @@
 
 #define SC45_BUTTON_MATRIX_20_0 IPT_SERVICE1 // green / test
 
+static const UINT8 SEGMENT_34_ENCODING_LOOKUP[16] = 
+{
+	63,	// 0
+	6,	// 1
+	91,	// 2
+	79,	// 3
+	102,// 4
+	109,// 5
+	125,// 6
+	7,	// 7
+	127,// 8
+	103,// 9
+	0,	// 10
+	121,// 11
+	121,// 12
+	121,// 13
+	121,// 14
+	121,// 15
+};
+
 // common base class for things shared between sc4 and sc5
 class bfm_sc45_state : public driver_device
 {
@@ -85,6 +105,10 @@ public:
 
 	UINT8 vfd_ser_value;
 	int vfd_ser_count;
+
+	// 34 segment custom encoding used by some sc4/5 machines such as Box Clever, Break The Bank, The Big Deal, The Crazy Chair, The Perfect Game
+	bool m_segment_34_encoding;
+	UINT8 m_segment_34_cache[32];
 
 	DECLARE_WRITE8_MEMBER(mux_output_w);
 	DECLARE_WRITE8_MEMBER(mux_output2_w);

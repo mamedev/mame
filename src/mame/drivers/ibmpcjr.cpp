@@ -612,7 +612,8 @@ static MACHINE_CONFIG_START( ibmpcjr, pcjr_state)
 
 	/* video hardware */
 	MCFG_PCVIDEO_PCJR_ADD("pcvideo_pcjr")
-
+	MCFG_VIDEO_SET_SCREEN("pcvideo_pcjr:screen")
+	
 	MCFG_GFXDECODE_ADD("gfxdecode", "pcvideo_pcjr:palette", pcjr)
 
 	/* sound hardware */

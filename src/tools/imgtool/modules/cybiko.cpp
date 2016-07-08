@@ -364,12 +364,12 @@ static void cybiko_image_close( imgtool_image *image)
 	stream_close( cfs->stream);
 }
 
-static imgtoolerr_t cybiko_image_create( imgtool_image *image, imgtool_stream *stream, option_resolution *opts)
+static imgtoolerr_t cybiko_image_create( imgtool_image *image, imgtool_stream *stream, util::option_resolution *opts)
 {
 	cybiko_file_system *cfs = (cybiko_file_system*)imgtool_image_extra_bytes( image);
 	int flash_type;
 	// init
-	flash_type = flash_option_to_flash_type( option_resolution_lookup_int( opts, 'F'));
+	flash_type = flash_option_to_flash_type(opts->lookup_int('F'));
 	if (!cfs_init( cfs, stream, flash_type)) return IMGTOOLERR_CORRUPTIMAGE;
 	// format
 	if (!cfs_format( cfs)) return IMGTOOLERR_CORRUPTIMAGE;
@@ -458,7 +458,7 @@ static imgtoolerr_t cybiko_image_read_file( imgtool_partition *partition, const 
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t cybiko_image_write_file( imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, option_resolution *opts)
+static imgtoolerr_t cybiko_image_write_file( imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
 {
 	imgtool_image *image = imgtool_partition_image( partition);
 	cybiko_file_system *cfs = (cybiko_file_system*)imgtool_image_extra_bytes( image);

@@ -162,13 +162,12 @@ void menu_network_devices::populate()
 	{
 		int curr = network.get_interface();
 		const char *title = nullptr;
-		const osd_netdev::entry_t *entry = netdev_first();
-		while(entry) {
+		for(auto &entry : get_netdev_list())
+		{		
 			if(entry->id==curr) {
 				title = entry->description;
 				break;
 			}
-			entry = entry->m_next;
 		}
 
 		item_append(network.device().tag(),  (title) ? title : "------", FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, (void *)network);

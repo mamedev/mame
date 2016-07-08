@@ -26,7 +26,6 @@ public:
 		m_ticket(*this, "ticket")
 	{ }
 
-	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_WRITE8_MEMBER(mcs51_tx_callback);
@@ -113,12 +112,6 @@ static INPUT_PORTS_START( piggypas )
 INPUT_PORTS_END
 
 
-
-void piggypas_state::machine_start()
-{
-	m_maincpu->i8051_set_serial_tx_callback(WRITE8_DELEGATE(piggypas_state, mcs51_tx_callback));
-}
-
 void piggypas_state::machine_reset()
 {
 	m_digit_idx = 0;
@@ -136,6 +129,7 @@ static MACHINE_CONFIG_START( piggypas, piggypas_state )
 	MCFG_CPU_ADD("maincpu", I8031, 8000000) // unknown variant
 	MCFG_CPU_PROGRAM_MAP(piggypas_map)
 	MCFG_CPU_IO_MAP(piggypas_io)
+	MCFG_MCS51_SERIAL_TX_CB(WRITE8(piggypas_state, mcs51_tx_callback))
 //  MCFG_CPU_VBLANK_INT_DRIVER("screen", piggypas_state,  irq0_line_hold)
 
 	MCFG_SCREEN_ADD("screen", LCD)

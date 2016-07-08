@@ -417,7 +417,7 @@ void legacy_floppy_image_device::floppy_drive_set_controller(device_t *controlle
 	m_controller = controller;
 }
 
-int legacy_floppy_image_device::internal_floppy_device_load(int create_format, option_resolution *create_args)
+int legacy_floppy_image_device::internal_floppy_device_load(int create_format, util::option_resolution *create_args)
 {
 	floperr_t err;
 	const struct FloppyFormat *floppy_options;
@@ -830,7 +830,7 @@ void legacy_floppy_image_device::device_config_complete()
 	update_names();
 }
 
-bool legacy_floppy_image_device::call_create(int format_type, option_resolution *format_options)
+bool legacy_floppy_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	return internal_floppy_device_load(format_type, format_options);
 }

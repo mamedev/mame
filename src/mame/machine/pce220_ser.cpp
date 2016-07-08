@@ -240,7 +240,7 @@ bool pce220_serial_device::call_load()
     DEVICE_IMAGE_CREATE( pce220_serial )
 -------------------------------------------------*/
 
-bool pce220_serial_device::call_create(int format_type, option_resolution *format_options)
+bool pce220_serial_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	m_state = SIO_WAIT;
 	m_bytes_count = 0;

@@ -1542,7 +1542,7 @@ struct mfs_dirref
 
 
 
-static imgtoolerr_t mfs_image_create(imgtool_image *image, imgtool_stream *stream, option_resolution *opts)
+static imgtoolerr_t mfs_image_create(imgtool_image *image, imgtool_stream *stream, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
 	UINT8 buffer[512];
@@ -1550,9 +1550,9 @@ static imgtoolerr_t mfs_image_create(imgtool_image *image, imgtool_stream *strea
 	UINT32 total_disk_blocks, total_allocation_blocks, allocation_block_size;
 	UINT32 free_allocation_blocks;
 
-	heads = option_resolution_lookup_int(opts, 'H');
-	tracks = option_resolution_lookup_int(opts, 'T');
-	sector_bytes = option_resolution_lookup_int(opts, 'L');
+	heads = opts->lookup_int('H');
+	tracks = opts->lookup_int('T');
+	sector_bytes = opts->lookup_int('L');
 
 	get_imgref(image)->l1_img.image = image;
 	get_imgref(image)->l1_img.heads = heads;
@@ -5277,7 +5277,7 @@ static imgtoolerr_t mac_image_beginenum(imgtool_directory *enumeration, const ch
 static imgtoolerr_t mac_image_nextenum(imgtool_directory *enumeration, imgtool_dirent *ent);
 static imgtoolerr_t mac_image_freespace(imgtool_partition *partition, UINT64 *size);
 static imgtoolerr_t mac_image_readfile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *destf);
-static imgtoolerr_t mac_image_writefile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, option_resolution *writeoptions);
+static imgtoolerr_t mac_image_writefile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *writeoptions);
 
 #ifdef UNUSED_FUNCTION
 /*
@@ -5660,7 +5660,7 @@ static imgtoolerr_t mac_image_readfile(imgtool_partition *partition, const char 
 /*
     Add a file to a disk image.
 */
-static imgtoolerr_t mac_image_writefile(imgtool_partition *partition, const char *fpath, const char *fork, imgtool_stream *sourcef, option_resolution *writeoptions)
+static imgtoolerr_t mac_image_writefile(imgtool_partition *partition, const char *fpath, const char *fork, imgtool_stream *sourcef, util::option_resolution *writeoptions)
 {
 	imgtool_image *img = imgtool_partition_image(partition);
 	struct mac_l2_imgref *image = get_imgref(img);

@@ -112,9 +112,9 @@ static FLOPPY_CONSTRUCT(pc_dsk_construct)
 	{
 		/* create */
 		memset(&geometry, 0, sizeof(geometry));
-		geometry.heads = option_resolution_lookup_int(params, PARAM_HEADS);
-		geometry.tracks = option_resolution_lookup_int(params, PARAM_TRACKS);
-		geometry.sectors = option_resolution_lookup_int(params, PARAM_SECTORS);
+		geometry.heads = params->lookup_int(PARAM_HEADS);
+		geometry.tracks = params->lookup_int(PARAM_TRACKS);
+		geometry.sectors = params->lookup_int(PARAM_SECTORS);
 		geometry.first_sector_id = 1;
 		geometry.sector_length = 512;
 	}

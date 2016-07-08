@@ -1162,7 +1162,7 @@ static const char *lookup_trap(UINT16 opcode)
 	return nullptr;
 }
 
-static offs_t palm_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
+offs_t palm_state::palm_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
 {
 	UINT16 opcode;
 	unsigned result = 0;

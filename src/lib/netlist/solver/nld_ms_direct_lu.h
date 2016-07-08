@@ -198,6 +198,8 @@ nl_double matrix_solver_direct_t<m_N, storage_N>::compute_next_timestep()
 		}
 		if (new_solver_timestep < m_params.m_min_timestep)
 			new_solver_timestep = m_params.m_min_timestep;
+		if (new_solver_timestep > m_params.m_max_timestep)
+			new_solver_timestep = m_params.m_max_timestep;
 	}
 	//if (new_solver_timestep > 10.0 * hn)
 	//    new_solver_timestep = 10.0 * hn;
@@ -566,7 +568,7 @@ void matrix_solver_direct_t<m_N, storage_N>::store(
 
 
 template <unsigned m_N, unsigned storage_N>
-int matrix_solver_direct_t<m_N, storage_N>::solve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
+int matrix_solver_direct_t<m_N, storage_N>::solve_non_dynamic(const bool newton_raphson)
 {
 	nl_double new_V[storage_N]; // = { 0.0 };
 

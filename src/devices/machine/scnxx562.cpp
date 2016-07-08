@@ -36,13 +36,13 @@ DONE (x) (p=partly)         NMOS         CMOS
     Channels                2 FD         2 FD
     Synch data rates        4Mbps        10Mbps
  ----- asynchrounous features ------------------
- p  5-8 bit per char         Y             Y
- y  1,1.5,2 stop bits        Y             Y     in 1/16 bit increments
- p  odd/even parity          Y             Y
+ x  5-8 bit per char         Y             Y
+ p  1-2 stop bits			 Y             Y	TODO: 1/16 bit increments
+ p  odd/even parity          Y             Y	TODO: parity generation on Tx
     x1,x16                   Y             Y
     break det/gen            Y             Y
-    parity, framing &        Y             Y
-    overrun error det
+ p  parity, framing &        Y             Y	TODO: parity check on Rx
+    overrun error det                                                 
     -- byte oriented synchrounous features --
     Int/ext char sync        Y             Y
     1/2 synch chars          ?             ?
@@ -56,15 +56,15 @@ DONE (x) (p=partly)         NMOS         CMOS
     CRC gen/det              Y             Y
     SDLC loop w EOP          Y             Y
     --
-    Receiver FIFO            4             16
-    Transmitter FIFO         4             16
-    NRZ, NRZI, FM1 or        Y             Y
+ x  Receiver FIFO            4             16
+ x  Transmitter FIFO         4             16
+    NRZ, NRZI, FM1 or        Y             Y   
      FM2 enc/dec
     Manchester dec           Y             Y
-    Baud gen per chan        Y             Y
+ x  Baud gen per chan        Y             Y
     DPLL clock recov         Y             Y
     -- Additional features CMOS versions -----
-    Status FIFO              N             Y
+ p  Status FIFO              N             Y
     Watchdog timer           N             Y
     Fifo Fill status         N             Y
     DMA frame status         N             Y
@@ -85,11 +85,11 @@ DONE (x) (p=partly)         NMOS         CMOS
 /* Useful temporary debug printout format */
 // printf("TAG %lld %s%s Data:%d\n", machine().firstcpu->total_cycles(), __PRETTY_FUNCTION__, m_owner->tag(), data);
 
-#define VERBOSE 2
+#define VERBOSE 0
 
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
-#define LOGR(x)
-#if VERBOSE == 0
+#define LOGR(x) 
+#if VERBOSE > 1
 #define logerror printf
 #endif
 
@@ -137,24 +137,33 @@ machine_config_constructor duscc_device::device_mconfig_additions() const
 //-------------------------------------------------
 duscc_device::duscc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		//  device_z80daisy_interface(mconfig, *this),
-	m_chanA(*this, CHANA_TAG),
-	m_chanB(*this, CHANB_TAG),
+		device_z80daisy_interface(mconfig, *this),
+		m_chanA(*this, CHANA_TAG),
+		m_chanB(*this, CHANB_TAG),
 #if 0
-	m_rxca(0),
-	m_txca(0),
-	m_rxcb(0),
-	m_txcb(0),
+		m_rxca(0),
+		m_txca(0),
+		m_rxcb(0),
+		m_txcb(0),
 #endif
-	m_out_txda_cb(*this),
-	m_out_dtra_cb(*this),
-	m_out_rtsa_cb(*this),
-	m_out_synca_cb(*this),
-	m_out_txdb_cb(*this),
-	m_out_dtrb_cb(*this),
-	m_out_rtsb_cb(*this),
-	m_out_syncb_cb(*this),
-	m_variant(variant)
+		m_out_txda_cb(*this),
+		m_out_dtra_cb(*this),
+		m_out_rtsa_cb(*this),
+		m_out_synca_cb(*this),
+		m_out_rtxca_cb(*this),
+		m_out_trxca_cb(*this),
+		m_out_txdb_cb(*this),
+		m_out_dtrb_cb(*this),
+		m_out_rtsb_cb(*this),
+		m_out_syncb_cb(*this),
+		m_out_rtxcb_cb(*this),
+		m_out_trxcb_cb(*this),
+		m_out_int_cb(*this),
+		m_variant(variant),
+		m_gsr(0),
+		m_ivr(0),
+		m_ivrm(0),
+		m_icr(0)
 {
 	for (auto & elem : m_int_state)
 		elem = 0;
@@ -162,17 +171,27 @@ duscc_device::duscc_device(const machine_config &mconfig, device_type type, cons
 
 duscc_device::duscc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DUSCC, "DUSCC", tag, owner, clock, "duscc", __FILE__),
-	m_chanA(*this, CHANA_TAG),
-	m_chanB(*this, CHANB_TAG),
-	m_out_txda_cb(*this),
-	m_out_dtra_cb(*this),
-	m_out_rtsa_cb(*this),
-	m_out_synca_cb(*this),
-	m_out_txdb_cb(*this),
-	m_out_dtrb_cb(*this),
-	m_out_rtsb_cb(*this),
-	m_out_syncb_cb(*this),
-	m_variant(TYPE_DUSCC)
+		device_z80daisy_interface(mconfig, *this),
+		m_chanA(*this, CHANA_TAG),
+		m_chanB(*this, CHANB_TAG),
+		m_out_txda_cb(*this),
+		m_out_dtra_cb(*this),
+		m_out_rtsa_cb(*this),
+		m_out_synca_cb(*this),
+		m_out_rtxca_cb(*this),
+		m_out_trxca_cb(*this),
+		m_out_txdb_cb(*this),
+		m_out_dtrb_cb(*this),
+		m_out_rtsb_cb(*this),
+		m_out_syncb_cb(*this),
+		m_out_rtxcb_cb(*this),
+		m_out_trxcb_cb(*this),
+		m_out_int_cb(*this),
+		m_variant(TYPE_DUSCC),
+		m_gsr(0),
+		m_ivr(0),
+		m_ivrm(0),
+		m_icr(0)
 {
 	for (auto & elem : m_int_state)
 		elem = 0;
@@ -197,19 +216,32 @@ duscc68C562_device::duscc68C562_device(const machine_config &mconfig, const char
 void duscc_device::device_start()
 {
 	LOG(("%s\n", FUNCNAME));
+
 	// resolve callbacks
 	m_out_txda_cb.resolve_safe();
 	m_out_dtra_cb.resolve_safe();
 	m_out_rtsa_cb.resolve_safe();
 	m_out_synca_cb.resolve_safe();
+	m_out_rtxca_cb.resolve_safe();
+	m_out_trxca_cb.resolve_safe();
+
 	m_out_txdb_cb.resolve_safe();
 	m_out_dtrb_cb.resolve_safe();
 	m_out_rtsb_cb.resolve_safe();
 	m_out_syncb_cb.resolve_safe();
+	m_out_rtxcb_cb.resolve_safe();
+	m_out_trxcb_cb.resolve_safe();
 
-	// state saving
-	//save_item(NAME(m_int_state));
+	m_out_int_cb.resolve_safe();
 
+	// state saving - stuff with runtime values
+	save_item(NAME(m_int_state));
+	save_item(NAME(m_gsr));
+	save_item(NAME(m_icr));
+	save_item(NAME(m_ivr));
+	save_item(NAME(m_ivrm));
+
+	// TODO: add serial device and daisy device save states
 	LOG((" - DUSCC variant %02x\n", m_variant));
 }
 
@@ -224,16 +256,138 @@ void duscc_device::device_reset()
 
 	m_chanA->reset();
 	m_chanB->reset();
+	m_gsr  = 0x00;
+	m_icr  = 0x00;
+	m_ivr  = 0x0f;
+	m_ivrm = 0x00;
 }
 
+/*
+ * Interrupt Control
+   A single interrupt output (IRON) is provided which is activated upon the occurrence of any of the following conditions:
+   - Channel A external or CIT special condition
+   - Channel B external or CIT special condition
+   - Channel A RxlTx error or special condition
+   - Channel B RxlTx error or special condition
+   - Channel A TxRDY
+   - Channel B TxRDY
+   - Channel A RxRDY
+   - Channel B RxRDY
+   Each of the above conditions occupies a bit in the General Status Register (GSR). If ICR[2] is set, the eight conditions are encoded
+   into three bits which are inserted into bits [2:0] or [4:2] of the interrupt vector register. This forms the content of the IVRM during
+   an interrupt acknowledge cycle. Unmodified and modified vectors can read directly through specified registers. Two of the conditions
+   are the inclusive OR of several other maskable conditions: 
+   - Extemal or CIT special condition: Delta DCD, Delta CTS or CIT zero count (ICTSR[6:4j).
+   - Rxrrx error or special condition: any condition in the Receiver Status Register (RSR[7:0J) or a transmitter or DPLL condition in
+     the Transmitter and Receiver Status Register (TRSR[7:3J).
+   The TxRDY and RxRDY conditions are defined by OMR[4] and OMR[3], respectively. Also associated with the interrupt system are
+   the Interrupt Enable Register (IER), one bit in the Countermmer Control Register (CTCR), and the Interrupt Control Register (lCR).
+   
+   The IER is programmed to enable specified conditions or groups of conditions to cause an interrupt by asserting the corresponding bit.
+   A negated bit prevents an interrupt from occurring when the condition is active and hence masks the interrupt. In addition to the
+   IER, CTCR[?] could be programmed to enable or disable an interrupt upon the CfT zero count condition. The interrupt priorities
+   within a channel are fixed. Priority between channels is controlled by ICR[7:6]. Reier to Table 8 and ICR[7:6].
+
+   The ICR contains the master interrupt enables for each channel (ICR[I] andICR[OJ) which must be set if the corresponding channel
+   is to cause an interrupt. The CPU vector mode is specified by ICR[5:4] which selects either vectored or non-vectored operation. If
+   vectored mode is selected, the content of the IVR or IVRM is placed on the data bus when lACK is activated. If ICR[2] is set, the content
+   of IVRM is output which contains the content of IVR and the encoded status of the interrupting condition.
+   Upon receiving an interrupt acknowledge, the DUSCC locks its current interrupt status until the end of the acknowledge cycle. 
+   If it has an active interrupt pending, it responds with the appropriate vector and then asserts DTACKN. If it does not have an interrupt, it
+   propagates the acknowledge through its X2/1DCN output if this function is programmed in PCRA[7]; otherwise, the IACKN is
+   ignored. Locking the interrupt status at the leading edge of IACKN prevents a device at a High position in the interrupt daisy chain from
+   responding to an lACK issued for a lower priority device while the  acknowledge is being propagated to that device.*/
 //-------------------------------------------------
-//  check_interrupts -
+//  z80daisy_irq_state - get interrupt status
 //-------------------------------------------------
+
+int duscc_device::z80daisy_irq_state()
+{
+	int state = 0;
+
+	LOG(("%s %s A:[%02x][%02x][%02x][%02x] B:[%02x][%02x][%02x][%02x] ",tag(), FUNCNAME,
+		 m_int_state[0], m_int_state[1], m_int_state[2], m_int_state[3],
+		 m_int_state[4], m_int_state[5], m_int_state[6], m_int_state[7]));
+
+	// loop over all interrupt sources
+	for (auto & elem : m_int_state)
+	{
+		// if we're servicing a request, don't indicate more interrupts
+		if (elem & Z80_DAISY_IEO)
+		{
+			state |= Z80_DAISY_IEO;
+			break;
+		}
+		state |= elem;
+	}
+
+	LOG(("Interrupt State %02x\n", state));
+
+	return state;
+}
+
+
+//-------------------------------------------------
+//  z80daisy_irq_ack - interrupt acknowledge
+//-------------------------------------------------
+
+int duscc_device::z80daisy_irq_ack()
+{
+
+	LOG(("%s %s()\n",tag(), FUNCNAME));
+
+	// loop over all interrupt sources
+	for (auto & elem : m_int_state)
+	{
+		// find the first channel with an interrupt requested
+		if (elem & Z80_DAISY_INT)
+		{
+			// clear interrupt, switch to the IEO state, and update the IRQs
+			elem = Z80_DAISY_IEO;
+			check_interrupts();
+
+			return m_ivrm;
+		}
+	}
+
+	return m_ivrm;
+}
+
+
+//-------------------------------------------------
+//  z80daisy_irq_reti - return from interrupt
+//-------------------------------------------------
+
+void duscc_device::z80daisy_irq_reti()
+{
+
+	LOG(("%s %s \n",tag(), FUNCNAME));
+
+	// loop over all interrupt sources
+	for (auto & elem : m_int_state)
+	{
+		// find the first channel with an IEO pending
+		if (elem & Z80_DAISY_IEO)
+		{
+			// clear the IEO state and update the IRQs
+			elem &= ~Z80_DAISY_IEO;
+			check_interrupts();
+			return;
+		}
+
+	}
+}
 
 void duscc_device::check_interrupts()
 {
-	LOG(("%s %s - not implemented\n",tag(), FUNCNAME));
-	//  m_out_int_cb(state);
+	LOG(("%s %s()\n",tag(), FUNCNAME));
+	int state = (z80daisy_irq_state() & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE;	
+
+	// "If no interrupt is pending, an H'FF' is output when reading the IVRM."
+	if (state == 0)
+		m_ivrm = 0xff;
+
+	m_out_int_cb(state);
 }
 
 
@@ -244,7 +398,7 @@ void duscc_device::check_interrupts()
 void duscc_device::reset_interrupts()
 {
 	LOG(("%s %s - not implemented \n",tag(), FUNCNAME));
-#if 0
+
 	// reset internal interrupt sources
 	for (auto & elem : m_int_state)
 	{
@@ -253,22 +407,93 @@ void duscc_device::reset_interrupts()
 
 	// check external interrupt sources
 	check_interrupts();
-#endif
 }
 
 UINT8 duscc_device::modify_vector(UINT8 vec, int i, UINT8 src)
 {
+		/*
+		  Interrupt Vector Modification
+		  V2 V1 V0 if ICR[2] = 1 and ICR[3] = 0
+		  V4 V3 V2 if ICR[2] = 1 and ICR[3] = 1
+--------------------------------------------------
+		  0  0  0 Ch A Receiver ready
+		  0  0  1 Ch A Transmitter ready
+		  0  1  0 Ch A Rx/Tx Status
+		  0  1  1 Ch A external or C/T status
+		  1  0  0 Ch B Receiver ready
+		  1  0  1 Ch B Transmitter ready
+		  1  1  0 Ch B Rx/Tx Status
+		  1  1  1 Ch B external or C/T status
+--------------------------------------------------
+		*/
 	LOG(("%s %s - not implemented\n",tag(), FUNCNAME));
+	//TODO: Prevent modification if no vector has been programmed, even if it is the default vector.
+	if ((m_icr & REG_ICR_VEC_MOD) != 0) // Affect vector?
+	{
+		// Modify vector according to "Vector Include Status" bit (REG_ICR_V2V4_MOD)
+		if ((m_icr & REG_ICR_V2V4_MOD) != 0) 
+	    {                 // Affect V2-V4
+			vec &= 0x07 << 3;
+			vec |= src  << 3;
+		}
+		else              // Affect V0-V2
+		{
+			vec &= 0x07 << 0;
+			vec |= src  << 0;
+		}
+	}
 	return vec;
 }
 
 
-//-------------------------------------------------
-//  trigger_interrupt -
+/* Interrupt Control and Status Registers
+   This group of registers define mechanisms for communications between the DUSCC and the processor and contain the device status 
+   information. Four registers, available for each channel, and four common device registers comprise this group which consists of
+   the following:
+   1. Interrupt Enable Register (IERA/B).
+   2. Receiver Status Register (RSRA/B).
+   3. Transmitter and Receiver Status Register (TRSRA/B).
+   4. Input and Coutnermmer Status Register (ICTSRA/B).
+   5. interrupt Vector Register (IVR) and Modified Interrupt Vector Register (IVRM).
+   6. Interrupt control register (lCR).
+   7. General status register (GSR)
+*/
+
+//-----------------------------------------------------------------------
+//  trigger_interrupt - called when a potential interrupt condition occurs and will only issue an interrupt if the DUSCC is
+//  programmed to do so.
 //-------------------------------------------------
 void duscc_device::trigger_interrupt(int index, int state)
 {
-	LOG(("%s %s - not implemented\n",tag(), FUNCNAME));
+	UINT8 vector = m_ivr;
+	UINT8 source = 0;
+	int priority_level = 0;
+
+	LOG(("%s %s:%c %02x \n",FUNCNAME, tag(), 'A' + index, state));
+
+	/* The Interrup Controll Register (ICR) bits, must be set for the correspondning channel */
+	if ((m_icr & (index == CHANNEL_A ? REG_ICR_CHA : REG_ICR_CHB)) == 0)
+	{
+		LOG(("The Interrupt Control Register [%02x] bit for this channel is not set, blocking attempt to interrupt\n", m_icr));
+		return;
+	}
+
+	// Modify priority level
+	switch (m_icr & REG_ICR_PRIO_MASK)
+	{
+	case REG_ICR_PRIO_AHI:  priority_level = state + (index == CHANNEL_A ? 0 : 4); break;
+	case REG_ICR_PRIO_BHI:  priority_level = state + (index == CHANNEL_A ? 4 : 0); break;
+	case REG_ICR_PRIO_AINT: priority_level = state * 2 + (index == CHANNEL_A ? 0 : 1); break;
+	case REG_ICR_PRIO_BINT: priority_level = state * 2 + (index == CHANNEL_A ? 1 : 0); break;
+	default: logerror("Programming error, please report/fix\n"); // Will not happen
+	}
+
+	// Vector modification requested?
+	source = state + (index == CHANNEL_A ? 0 : 4); // bit in interrupt queue register of a certain priotiry level
+	m_ivrm = modify_vector(vector, index, source);
+
+	// trigger interrupt
+	m_int_state[priority_level] |= Z80_DAISY_INT;
 }
 
 READ8_MEMBER( duscc_device::read )
@@ -313,22 +538,25 @@ duscc_channel::duscc_channel(const machine_config &mconfig, const char *tag, dev
 	LOG(("%s\n",FUNCNAME));
 
 	// Reset all registers
-	m_cmr1 =  m_cmr2 =  m_s1r =  m_s2r =  m_tpr =  m_ttr =  m_rpr =  m_rtr
-		=  m_ctprh =  m_ctprl =  m_ctcr =  m_omr =  m_cth =  m_ctl =  m_pcr
-		=  m_ccr =  m_rsr =  m_trsr =  m_ictsr =  m_gsr =  m_ier /* =  m_rea  */
-		=  m_cid =  m_ivr =  m_icr =  /*m_sea =*/  m_ivrm =  m_mrr =  m_ier1
+	m_cmr1 =  m_cmr2 =  m_s1r =  m_s2r =  m_tpr =  m_ttr =  m_rpr =  m_rtr 
+		=  /* m_ctprh =  m_ctprl = */  m_ctpr = m_ctcr =  m_omr 
+		= /*  m_cth =  m_ctl = */ m_ct =  m_pcr 
+		=  m_ccr =  m_rsr =  m_trsr =  m_ictsr /*=  m_gsr*/ =  m_ier /*=  m_rea*/
+		=  m_cid =  /*m_ivr =  m_icr = m_sea =  m_ivrm = */  m_mrr =  m_ier1 
 		=  m_ier2 =  m_ier3 =  m_trcr =  m_rflr =  m_ftlr =  m_trmsr =  m_telr = 0;
 
-	for (int i = 0; i < sizeof(m_rx_data_fifo); i++)
-	{
-		m_rx_data_fifo[i] = 0;
-		m_rx_error_fifo[i] = 0;
-	}
-	for (int i = 0; i < sizeof(m_tx_data_fifo); i++)
-	{
-		m_tx_data_fifo[i] = 0;
-		m_tx_error_fifo[i] = 0;
-	}
+	// Reset all states
+	m_rtxc = 0;
+	m_trxc = 0;
+
+	for (auto & elem : m_rx_data_fifo)
+		elem = 0;
+	for (auto & elem : m_rx_error_fifo)
+		elem = 0;
+	for (auto & elem : m_tx_data_fifo)
+		elem = 0;
+	for (auto & elem : m_tx_error_fifo)
+		elem = 0;
 }
 
 //-------------------------------------------------
@@ -349,6 +577,11 @@ void duscc_channel::device_start()
 
 	m_cid = (m_uart->m_variant & SET_CMOS) ? 0x7f : 0xff; // TODO: support CMOS rev A = 0xbf
 
+	// Timers
+	duscc_timer = timer_alloc(TIMER_ID);
+	rtxc_timer = timer_alloc(TIMER_ID_RTXC);
+	trxc_timer = timer_alloc(TIMER_ID_TRXC);
+
 	// state saving
 	save_item(NAME(m_cmr1));
 	save_item(NAME(m_cmr2));
@@ -358,12 +591,14 @@ void duscc_channel::device_start()
 	save_item(NAME(m_ttr));
 	save_item(NAME(m_rpr));
 	save_item(NAME(m_rtr));
-	save_item(NAME(m_ctprh));
-	save_item(NAME(m_ctprl));
+	//	save_item(NAME(m_ctprh));
+	//	save_item(NAME(m_ctprl));
+	save_item(NAME(m_ctpr));
 	save_item(NAME(m_ctcr));
 	save_item(NAME(m_omr));
-	save_item(NAME(m_cth));
-	save_item(NAME(m_ctl));
+	//	save_item(NAME(m_cth));
+	//	save_item(NAME(m_ctl));
+	save_item(NAME(m_ct));
 	save_item(NAME(m_pcr));
 	save_item(NAME(m_ccr));
 	save_item(NAME(m_txfifo));
@@ -371,14 +606,14 @@ void duscc_channel::device_start()
 	save_item(NAME(m_rsr));
 	save_item(NAME(m_trsr));
 	save_item(NAME(m_ictsr));
-	save_item(NAME(m_gsr)); // TODO: Move this to the device instead, it is a global register
+	//	save_item(NAME(m_gsr)); // Moved this to the device instead, it is a global register
 	save_item(NAME(m_ier));
-	//  save_item(NAME(m_rea));
+	//	save_item(NAME(m_rea)); 
 	save_item(NAME(m_cid));
-	save_item(NAME(m_ivr));
-	save_item(NAME(m_icr));
-	//  save_item(NAME(m_sea));
-	save_item(NAME(m_ivrm));
+	//	save_item(NAME(m_ivr)); // Moved this to the device instead, it is a global register
+	//	save_item(NAME(m_icr)); // Moved this to the device instead, it is a global register
+	//	save_item(NAME(m_sea));
+	//	save_item(NAME(m_ivrm)); // Moved this to the device instead, it is a global register
 	save_item(NAME(m_mrr));
 	save_item(NAME(m_ier1));
 	save_item(NAME(m_ier2));
@@ -388,6 +623,8 @@ void duscc_channel::device_start()
 	save_item(NAME(m_ftlr));
 	save_item(NAME(m_trmsr));
 	save_item(NAME(m_telr));
+	save_item(NAME(m_rtxc));
+	save_item(NAME(m_trxc));
 	save_item(NAME(m_rx_data_fifo));
 	save_item(NAME(m_rx_error_fifo));
 	save_item(NAME(m_rx_fifo_rp));
@@ -405,7 +642,7 @@ void duscc_channel::device_start()
 	save_item(NAME(m_rts));
 	save_item(NAME(m_sync));
 
-	device_serial_interface::register_save_state(machine().save(), this);
+	//	device_serial_interface::register_save_state(machine().save(), this);
 }
 
 
@@ -422,37 +659,40 @@ void duscc_channel::device_reset()
 	transmit_register_reset();
 
 	// Soft/Channel Reset values according to DUSCC users guide
-	m_cmr1      =0x00;
-	m_cmr2      =0x00;
-	m_s1r       =0x00;
-	m_s2r       =0x00;
-	m_tpr       =0x00;
-	m_ttr       =0x00;
-	m_rpr       =0x00;
-	m_rtr       =0x00;
-	m_ctcr      =0x00;
-	m_omr       =0x00;
-	m_pcr       =0x00;
-	m_ccr       =0x00;
-	m_rsr       =0x00;
-	m_trsr      =0x00;
-	m_ictsr     =0x00;
-	m_gsr       =0x00;
-	m_ier       =0x00;
-	//  m_rea       =0x00;
-	m_ivr       =0x0f;
-	m_icr       =0x00;
-	//  m_sea       =0x00;
-	m_ivrm      =0x00;
-	m_mrr       =0x00; // TODO: Need a read after reset to enable CMOS features
-	m_ier1      =0x00;
-	m_ier2      =0x00;
-	m_ier3      =0x00;
-	m_trcr      =0x00;
-	m_rflr      =0x00;
-	m_ftlr      =0x33;
-	m_trmsr     =0x00;
-	m_telr      =0x10;
+	m_cmr1		=0x00;
+	m_cmr2		=0x00;
+	m_s1r		=0x00;
+	m_s2r		=0x00;
+	m_tpr		=0x00;
+	m_ttr		=0x00;
+	m_rpr		=0x00;
+	m_rtr		=0x00;
+	m_ctcr		=0x00;
+	m_omr		=0x00;
+	m_pcr		=0x00;
+	m_ccr		=0x00;
+	m_rsr		=0x00;
+	m_trsr		=0x00;
+	m_ictsr		=0x00;
+	//	m_gsr		=0x00;
+	m_ier		=0x00;
+	//	m_rea		=0x00;
+	//	m_ivr		=0x0f;
+	//	m_icr		=0x00;
+	//	m_sea		=0x00;
+	//	m_ivrm		=0x00;
+	m_mrr		=0x00; // TODO: Need a read after reset to enable CMOS features
+	m_ier1		=0x00; 
+	m_ier2		=0x00;
+	m_ier3		=0x00;
+	m_trcr		=0x00;
+	m_rflr		=0x00;
+	m_ftlr		=0x33;
+	m_trmsr		=0x00;
+	m_telr		=0x10;
+	m_rtxc		=0x00;
+	m_trxc		=0x00;
+
 
 	// reset external lines TODO: check relation to control bits and reset
 	set_rts(1);
@@ -469,10 +709,220 @@ void duscc_channel::device_reset()
 
 void duscc_channel::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
+	switch(id)
+	{
+	case TIMER_ID: 
+	    if (m_ct-- == 0) // Zero detect
+	    {
+			m_ictsr |= REG_ICTSR_ZERO_DET; // set zero detection bit
+
+			// Generate interrupt?
+			if ( ( (m_ctcr & REG_CTCR_ZERO_DET_INT) == 1 ) && 
+				 ( (m_uart->m_icr & (m_index == duscc_device::CHANNEL_A ? duscc_device::REG_ICR_CHA : duscc_device::REG_ICR_CHB) ) != 0) ) 
+			{
+				//trigger_interrupt();
+			}
+
+			// Preload or rollover?
+			if (( m_ctcr & REG_CTCR_ZERO_DET_CTL) == 0)
+			{
+				m_ct = m_ctpr;
+			}
+			else 
+			{
+				m_ct = 0xffff;
+			}
+
+			// Is Counter/Timer output on the RTxC pin?
+			if (( m_pcr & REG_PCR_RTXC_MASK) == REG_PCR_RTXC_CNTR_OUT)
+			{
+				if ((m_ctcr & REG_CTCR_TIM_OC) == 0) // Toggle?
+				{
+					m_rtxc = (~m_rtxc) & 1;
+				}
+				else // Pulse!
+				{
+					m_rtxc = 1;
+					rtxc_timer->adjust(attotime::from_hz(clock()), TIMER_ID_RTXC, attotime::from_hz(clock()));
+				}
+				if (m_index == duscc_device::CHANNEL_A)
+					m_uart->m_out_rtxca_cb(m_rtxc);
+				else
+					m_uart->m_out_rtxcb_cb(m_rtxc);
+			}
+
+			// Is Counter/Timer output on the TRXC pin?
+			if (( m_pcr & REG_PCR_TRXC_MASK) == REG_PCR_TRXC_CNTR_OUT)
+			{
+				if ((m_ctcr & REG_CTCR_TIM_OC) == 0) // Toggle?
+				{
+					m_trxc = (~m_trxc) & 1;
+				}
+				else // Pulse!
+				{
+					m_trxc = 1;
+					trxc_timer->adjust(attotime::from_hz(clock()), TIMER_ID_TRXC, attotime::from_hz(clock()));
+				}
+				if (m_index == duscc_device::CHANNEL_A)
+					m_uart->m_out_trxca_cb(m_trxc);
+				else
+					m_uart->m_out_trxcb_cb(m_trxc);
+			}
+		}
+		else
+		{   // clear zero detection bit
+			m_ictsr &= ~REG_ICTSR_ZERO_DET;
+		}
+		break;
+	case TIMER_ID_RTXC: // Terminate zero detection pulse 
+		m_rtxc = 0;
+		rtxc_timer->adjust(attotime::never);
+		if (m_index == duscc_device::CHANNEL_A)
+			m_uart->m_out_rtxca_cb(m_rtxc);
+		else
+			m_uart->m_out_rtxcb_cb(m_rtxc);
+		break;
+	case TIMER_ID_TRXC:  // Terminate zero detection pulse 
+		m_trxc = 0;
+		trxc_timer->adjust(attotime::never);
+		if (m_index == duscc_device::CHANNEL_A)
+			m_uart->m_out_trxca_cb(m_trxc);
+		else
+			m_uart->m_out_trxcb_cb(m_trxc);
+		break;
+	default: 
+		LOGR(("Unhandled Timer ID %d\n", id)); 
+		break; 
+	}
 	//  LOG(("%s %d\n", FUNCNAME, id));
 	device_serial_interface::device_timer(timer, id, param, ptr);
 }
 
+/*	The DUSCC 16 bit Timer
+	Counter/Timer Control and Value Registers
+	There are five registers in this set consisting of the following:
+	1. Counterltimer control register (CTCRAlB).
+	2. Counterltimer preset Highland Low registers (CTPRHAlB, CTPRLAlB). 
+	3. Counter/bmer (current value) High and Low registers (CTHAlB, CTLAlB) 
+	The control register contains the operational information for the counterltimer. The preset registers contain the count which is
+	loaded into the counterltimer circuits. The third group contains the current value of the counterltimer as it operates.
+*/
+/* Counter/Timer Control Register (CTCRA/CTCRB)
+	[7] Zero Detect Interrupt - This bit determines whether the assertion of the CIT ZERO COUNT status bit (ICTSR[6)) causes an 
+	interrupt to be generated if set to 1 and the Master interrupt control bit (ICR[0:1]) is set
+	[6] Zero Detect Control - his bit determines the action of the counter upon reaching zero count
+	0 - The counter/timer is preset to the value contained in the counterltimer preset registers (CTPRL, CTPRH) at the next clock edge.
+	1 - The counterltimer continues counting without preset. The value at the next clock edge will be H'FFFF'.
+	[5] CounterlTimer Output Control - This bit selects the output waveform when the counterltimer is selected to be output on TRxC or RTxC.
+	0 - The output toggles each time the CIT reaches zero count. The output is cleared to Low by either of the preset counterltimer commands.
+	1 - The output is a single clock positive width pulse each time the CIT reaches zero count. (The duration of this pulse is one clock period.)
+	[4:3] Clock Select - This field selects whether the clock selected by [2:0J is prescaled prior to being applied to the input of the CIT.
+	 0 0 No prescaling.
+	 0 1 Divide clock by 16.
+	 1 0 Divide clock by 32.
+	 1 1 Divide clock by 64.
+	[2:0] Clock Source - This field selects the clock source for the counterltimer.
+	 000 RTxC pin. Pin must be programmed as input.
+	 001 TRxC pin. Pin must be programmed as input.
+	 010 Source is the crystal oscillator or system clock input divided by four.
+	 011 This selects a special mode of operation. In this mode the counter, after receiving the 'start CIT' command, delays the
+	     start of counting until the RxD input goes Low. It continues counting until the RxD input goes High, then stops and sets
+		 the CIT zero count status bit. The CPU can use the value in the CIT to determine the bit rate of the incoming data.
+		 The clock is the crystal oscillator or system clock input divided by four.
+	 100 Source is the 32X BRG output selected by RTR[3:0J of own channel.
+	 101 Source is the 32X BRG output selected by TTR[3:0J of own channel.
+	 110 Source is the internal signal which loads received characters from the receive shift register into the receiver
+	     FIFO. When operating in this mode, the FIFOed EOM status bit (RSR[7)) shall be set when the character which
+		 causes the count to go to zero is loaded into the receive FIFO.
+	 111 Source is the internal signal which transfers characters from the data bus into the transmit FIFO. When operating in this
+	     mode, and if the TEOM on zero count or done control bit (TPR[4)) is asserted, the FIFOed send EOM command will
+		 be automatically asserted when the character which causes the count to go to zero is loaded into the transmit FIFO.
+*/
+UINT8 duscc_channel::do_dusccreg_ctcr_r()
+{
+	LOG(("%s(%02x)\n", FUNCNAME, m_ctcr));
+	return m_ctcr;
+}
+
+void duscc_channel::do_dusccreg_ctcr_w(UINT8 data)
+{
+	LOG(("%s(%02x) -  not supported yet\n", FUNCNAME, data));
+	m_ctcr = data;
+	return;
+}
+
+/* Counterrrimer Preset High Register (CTPRHA, CTPRHB)
+	[7:0) MSB - This register contains the eight most significant bits of the value loaded into the counter/timer upon receipt of the load CIT
+	from preset regsiter command or when.the counter/timer reaches zero count and the zero detect control bit (CTCR[6]) is negated.
+	The minimum 16-bit counter/timer preset value is H'0002'.
+*/
+UINT8 duscc_channel::do_dusccreg_ctprh_r()
+{
+	UINT8 ret = ((m_ctpr >> 8) & 0xff );
+	LOG(("%s(%02x)\n", FUNCNAME, ret));
+
+	//	return m_ctprh;
+	return ret;
+}
+
+void duscc_channel::do_dusccreg_ctprh_w(UINT8 data)
+{ 
+	LOG(("%s(%02x) -  not supported yet\n", FUNCNAME, data));
+	//	m_ctprh = data;
+	m_ctpr &= ~0x0000ff00;
+	m_ctpr |= ((data << 8) & 0x0000ff00);
+	return; 
+}
+
+/* CounterfTimer Preset Low Register (CTPRLA, CTPRLB)
+	[7:0) lSB - This register contains the eight least significant bits of the value loaded into the counter/timer upon receipt of the load CIT
+	from preset register command or when the counter/timer reaches zero count and the zero detect control bit (CTCR[6]) is negated.
+	The minimum 16-bit counter/timer preset value is H'0002'.
+*/
+UINT8 duscc_channel::do_dusccreg_ctprl_r()
+{
+	UINT8 ret = (m_ctpr & 0xff);
+	LOG(("%s(%02x)\n", FUNCNAME, ret));
+	//	return m_ctprl;
+	return ret;
+}
+
+void duscc_channel::do_dusccreg_ctprl_w(UINT8 data)
+{ 
+	LOG(("%s(%02x) -  not supported yet\n", FUNCNAME, data));
+	//	m_ctprl = data;
+	m_ctpr &= ~0x000000ff;
+	m_ctpr |= (data & 0x000000ff);
+	return; 
+}
+
+/* Counter/Timer High Register (CTHA, CTHB) Read only
+	[7:0] MSB - A read of this 'register' provides the eight most significant bits of the current value of the counter/timer. it is
+	recommended that the CIT be stopped via a stop counter command before it is read in order to prevent errors which may occur due to
+	the read being performed while the CIT is changing. This count may be continued after the register is read.
+*/
+
+UINT8 duscc_channel::do_dusccreg_cth_r()
+{
+	UINT8 ret = ((m_ct >> 8) & 0xff );
+	LOG(("%s(%02x)\n", FUNCNAME, ret));
+
+	return ret;
+}
+
+
+/* Counter/Timer Low Register (CTLA, CTLB) Read only
+	[7:0] lSB - A read of this 'register' provides the eight least significant bits of the current value of the counter/timer. It is
+	recommended that the CIT be stopped via a stop counter command before it is read, in order to prevent errors which may occur due to
+	the read being performed while the CIT is changing. This count may be continued after the register is read.
+*/
+UINT8 duscc_channel::do_dusccreg_ctl_r()
+{
+	UINT8 ret = (m_ct & 0xff);
+	LOG(("%s(%02x)\n", FUNCNAME, ret));
+	//	return m_ctl;
+	return ret;
+}
 
 //-------------------------------------------------
 //  tra_callback -
@@ -518,10 +968,10 @@ void duscc_channel::tra_complete()
 		if (m_omr & REG_OMR_TXRDY_ACTIVATED)// Wait until FIFO empty before ready for more data?
 		{
 			if (m_tx_fifo_wp == m_tx_fifo_rp) // So is Tx FIFO empty?
-				m_gsr |= (m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_TXREADY : REG_GSR_CHAN_B_TXREADY);
+				m_uart->m_gsr |= (m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_TXREADY : REG_GSR_CHAN_B_TXREADY);
 		}
 		else // Always ready for more!
-			m_gsr |= (m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_TXREADY : REG_GSR_CHAN_B_TXREADY);
+			m_uart->m_gsr |= (m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_TXREADY : REG_GSR_CHAN_B_TXREADY);
 	}
 }
 
@@ -681,21 +1131,67 @@ int duscc_channel::get_tx_word_length()
 	return bits;
 }
 
-UINT8 duscc_channel::do_dusccreg_cmr1_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_cmr2_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_s1r_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_s2r_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_tpr_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_ttr_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_rpr_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_rtr_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_ctprh_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_ctprl_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_ctcr_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_omr_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_cth_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_ctl_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_pcr_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
+// register read methods - see correspondning write method for details on each register
+
+UINT8 duscc_channel::do_dusccreg_cmr1_r()
+{ 
+	LOG(("%s(%02x)\n", FUNCNAME, m_cmr1));
+	return m_cmr1; 
+}
+
+UINT8 duscc_channel::do_dusccreg_cmr2_r()
+{ 
+	LOG(("%s(%02x)\n", FUNCNAME, m_cmr2));
+	return m_cmr2; 
+}
+
+UINT8 duscc_channel::do_dusccreg_s1r_r()
+{
+	LOG(("%s(%02x)\n", FUNCNAME, m_s1r));
+	return m_s1r; 
+}
+
+UINT8 duscc_channel::do_dusccreg_s2r_r()
+{
+	LOG(("%s(%02x)\n", FUNCNAME, m_s2r));
+	return m_s2r; 
+}
+
+UINT8 duscc_channel::do_dusccreg_tpr_r()
+{ 
+	LOG(("%s(%02x)\n", FUNCNAME, m_tpr));
+	return m_tpr;
+}
+
+UINT8 duscc_channel::do_dusccreg_ttr_r()
+{
+	LOG(("%s(%02x)\n", FUNCNAME, m_ttr));
+	return m_ttr;
+}
+
+UINT8 duscc_channel::do_dusccreg_rpr_r()
+{
+	LOG(("%s(%02x)\n", FUNCNAME, m_rpr));
+	return m_rpr;
+}
+
+UINT8 duscc_channel::do_dusccreg_rtr_r()
+{
+	LOG(("%s(%02x)\n", FUNCNAME, m_rtr));
+	return m_rtr;
+}
+
+UINT8 duscc_channel::do_dusccreg_omr_r()
+{
+	LOG(("%s(%02x)\n", FUNCNAME, m_omr));
+	return m_omr;
+}
+
+UINT8 duscc_channel::do_dusccreg_pcr_r()
+{
+	LOG(("%s(%02x)\n", FUNCNAME, m_pcr));
+	return m_pcr;
+}
 
 /* Commands to the DUSCC are entered through the channel command register.A read of this
    register returns the last invoked command (with bits 4 and 5 set to 1). */
@@ -716,7 +1212,9 @@ UINT8 duscc_channel::do_dusccreg_rxfifo_r()
 	if (m_rx_fifo_rp != m_rx_fifo_wp)
 	{
 		data = m_rx_data_fifo[m_rx_fifo_rp];
+		m_rx_error_fifo[m_rx_fifo_rp] = 0;  // Loose the old errors
 		m_rx_fifo_rp_step();
+		m_rsr |= (m_rx_error_fifo[m_rx_fifo_rp] & (REG_RSR_CHAR_COMPARE | REG_RSR_FRAMING_ERROR | REG_RSR_PARITY_ERROR)); // Get new errors
 		LOG((" - RX reading out data:%02x '%c'\n", data, isalnum(data) ? data : ' '));
 	}
 	else
@@ -728,12 +1226,22 @@ UINT8 duscc_channel::do_dusccreg_rxfifo_r()
 	return (UINT8) data;
 }
 
-UINT8 duscc_channel::do_dusccreg_rsr_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_trsr_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_ictsr_r()
+UINT8 duscc_channel::do_dusccreg_rsr_r()
+{ 
+	LOG(("%s: %02x\n", FUNCNAME, m_rsr));
+	return (UINT8) m_rsr; 
+}
+
+UINT8 duscc_channel::do_dusccreg_trsr_r()
 {
-	logerror("register access method %s is not implemented yet\n", FUNCNAME);
-	return (UINT8) m_ictsr;
+	LOG(("%s(%02x)\n", FUNCNAME, m_trsr));
+	return m_trsr;
+}
+
+UINT8 duscc_channel::do_dusccreg_ictsr_r()
+{ 
+	logerror("%s is not implemented yet\n", FUNCNAME); 
+	return (UINT8) m_ictsr; 
 }
 
 /* General Status Register (GSR)
@@ -758,12 +1266,16 @@ UINT8 duscc_channel::do_dusccreg_ictsr_r()
     receiver' command is invoked.
 */
 UINT8 duscc_channel::do_dusccreg_gsr_r()
-{
-	LOGR(("%s <- %02x\n", FUNCNAME, m_gsr));
-	return (UINT8) m_gsr;
+{ 
+	LOGR(("%s <- %02x\n", FUNCNAME, m_uart->m_gsr));
+	return (UINT8) m_uart->m_gsr; 
 }
 
-UINT8 duscc_channel::do_dusccreg_ier_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
+UINT8 duscc_channel::do_dusccreg_ier_r()
+{ 
+	LOGR(("%s <- %02x\n", FUNCNAME, m_uart->m_ier));
+	return (UINT8) 0; 
+}
 
 UINT8 duscc_channel::do_dusccreg_cid_r()
 {
@@ -782,23 +1294,91 @@ UINT8 duscc_channel::do_dusccreg_cid_r()
 		return m_cid;
 }
 
-UINT8 duscc_channel::do_dusccreg_ivr_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_icr_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_ivrm_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_mrr_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_ier1_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_ier2_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_ier3_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_trcr_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_rflr_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_ftlr_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_trmsr_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
-UINT8 duscc_channel::do_dusccreg_telr_r(){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return (UINT8) 0; }
+UINT8 duscc_channel::do_dusccreg_ivr_ivrm_r()
+{
+	LOG(("%s", FUNCNAME));
+	if ( m_index == duscc_device::CHANNEL_A )
+	{
+		LOG(("(%02x)\n", m_uart->m_ivr));
+		return m_uart->m_ivr; // Interrupt vector as programmed
+	}
+	else
+	{
+		LOG((" - IVRM\n"));
+		return m_uart->m_ivrm; // Modified Interrupt vector
+	}
+}
 
-	// write register handlers
-/* CMR1 register
-    [7:6] Data Encoding - These bits select the data encoding for the received and transmitted data:
-     00 If the DPLL is set to NRZI mode (see DPLL commands), it selects positive logic (1 = high, 0 = low).
+UINT8 duscc_channel::do_dusccreg_icr_r()
+{ 
+	LOG(("%s(%02x)\n", FUNCNAME, m_uart->m_icr));
+	return m_uart->m_icr;
+}
+
+UINT8 duscc_channel::do_dusccreg_mrr_r()
+{
+	LOG(("%s(%02x)\n", FUNCNAME, m_mrr));
+	return m_mrr;
+}
+
+UINT8 duscc_channel::do_dusccreg_ier1_r()
+{
+	LOG(("%s(%02x)\n", FUNCNAME, m_ier1));
+	return m_ier1;
+}
+
+UINT8 duscc_channel::do_dusccreg_ier2_r()
+{
+	LOG(("%s(%02x)\n", FUNCNAME, m_ier2));
+	return m_ier2;
+}
+
+UINT8 duscc_channel::do_dusccreg_ier3_r()
+{
+	LOG(("%s(%02x)\n", FUNCNAME, m_ier3));
+	return m_ier3;
+}
+
+UINT8 duscc_channel::do_dusccreg_trcr_r()
+{
+	LOG(("%s(%02x)\n", FUNCNAME, m_trcr));
+	return m_trcr;
+}
+
+UINT8 duscc_channel::do_dusccreg_rflr_r()
+{
+	LOG(("%s(%02x)\n", FUNCNAME, m_rflr));
+	return m_rflr;
+}
+
+UINT8 duscc_channel::do_dusccreg_ftlr_r()
+{
+	LOG(("%s(%02x)\n", FUNCNAME, m_ftlr));
+	return m_ftlr;
+}
+
+UINT8 duscc_channel::do_dusccreg_trmsr_r()
+{
+	LOG(("%s(%02x)\n", FUNCNAME, m_trmsr));
+	return m_trmsr;
+}
+
+UINT8 duscc_channel::do_dusccreg_telr_r()
+{
+	LOG(("%s(%02x)\n", FUNCNAME, m_telr));
+	return m_telr;
+}
+
+// write register handlers
+
+/* Channel Mode Configuration and Pin Description Registers
+   There are five registers in this group for each channel. The bit format for each of these registers is contained in Table 2. The
+   primary function of these registers is to define configuration of the channels and the function of the programmable pins. A channel
+   cannot be dynamically reconfigured. Do not write to CMRI or CMR2 if the receiver or transmitter is enabled.
+ */
+/* CMR1 register -  
+	[7:6] Data Encoding - These bits select the data encoding for the received and transmitted data: 
+	 00 If the DPLL is set to NRZI mode (see DPLL commands), it selects positive logic (1 = high, 0 = low). 
         If the DPLL is set to FM mode (see DPLL commands), Manchester (bi-phase level) encoding is selected.
      01 NRZI. Non-return-to-zero inverted.
      10 FMO. Bi-phase space.
@@ -933,8 +1513,38 @@ void duscc_channel::do_dusccreg_cmr2_w(UINT8 data)
 	return;
 }
 
-void duscc_channel::do_dusccreg_s1r_w(UINT8 data){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return; }
-void duscc_channel::do_dusccreg_s2r_w(UINT8 data){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return; }
+/* SYN1/Secondary Address 1 Register (S1RA, S1RB)
+   [7:O} Character Compare 
+   - In ASYNC mode this register holds a 5 to 8-bit long bit pattern which is ocmpared with received
+   characters. if a match occurs, the character compare status bit (RSR[7]) is set. This field is ignored if the receivEII is in a break
+   condition.
+   - In COP modes, this register contains the 5- to 8-bit SYNl bit pattern, right justified. Parity bit need not be included in the value
+   placed in the register even is parity is specmad in CMR1[4:3J. However, a character received with parity error, when parity is
+   specified, will not match. In ASYNC, or COP modes, if parity is specified, then any unused bits in this register must be programmed
+   to zeros. In BOP secondary mode it contains the address used to compare the first received address octet. The register is not used in
+   BOP primary mode or secondary modes where address comparisons are not made, such as when extended addressing is specified.
+   TODO: Add check in receive_data and set status bits accordingly
+*/
+void duscc_channel::do_dusccreg_s1r_w(UINT8 data)
+{ 
+	LOG(("%s(%02x) -  not supported yet\n", FUNCNAME, data));
+	m_s1r = data;
+	return; 
+}
+
+/* SYN2ISecondary Address 2 Register (S2RA, S2RB)
+   [7:0] - This register is not used in ASYNC, COP single SYN, BOP primary modes, BOP secondary modes with single address field:
+   and BOP secondary modes where address comparisons are not made, such as when extended addressing is specified.
+   In COP dual SYN modes,it contains the 5- to 8-b~'SYN2 bit pattern, right justWiad, Par~ bit need not be included in the value placed in
+   the register even if parity is specified in CMR1[4:3J. However, a character received w~ parity error, when parity is specified, will not
+   match. If parity Is specified, then any unused bits in this register must be programmed to zeros. In BOP secondary mode using two
+   address octets, it contains the partial address used to compare the second received address octet.*/
+void duscc_channel::do_dusccreg_s2r_w(UINT8 data)
+{ 
+	LOG(("%s(%02x) -  not supported yet\n", FUNCNAME, data));
+	m_s2r = data;
+	return; 
+}
 
 /* Transmitter Parameter Register (TPRA, TPRB)
     SYNC mode
@@ -1025,7 +1635,7 @@ void duscc_channel::do_dusccreg_ttr_w(UINT8 data)
 	m_ttr = data;
 	LOG(("- External source: %s\n", (m_ttr & REG_TTR_EXT) ? "TRxC" : "RTxC"));
 	LOG(("- Transmit Clock: "));
-#if VERBOSE > 0
+
 	switch(m_ttr & REG_TTR_TXCLK_MASK)
 	{
 	case REG_TTR_TXCLK_1XEXT:       LOG(("1x External - not implemented\n")); break;
@@ -1041,7 +1651,6 @@ void duscc_channel::do_dusccreg_ttr_w(UINT8 data)
 	case REG_TTR_TXCLK_32X_OWN:     LOG(("32x own channel C/T - not implemented\n")); break;
 	default: LOG(("Wrong programming\n")); break; // Should never happen
 	}
-#endif
 
 	LOG(("- BRG Tx rate %u assuming a 14.7456MHz CLK crystal\n", get_baudrate(m_ttr & REG_TTR_BRG_RATE_MASK)));
 	update_serial();
@@ -1163,7 +1772,6 @@ void duscc_channel::do_dusccreg_rtr_w(UINT8 data)
 	LOG(("- External source: %s\n", (m_rtr & REG_RTR_EXT) ? "TRxC" : "RTxC"));
 	LOG(("- Receiver Clock: "));
 
-#if VERBOSE > 0
 	switch(m_rtr & REG_RTR_RXCLK_MASK)
 	{
 	case REG_RTR_RXCLK_1XEXT:       LOG(("1x External - not implemented\n")); break;
@@ -1179,17 +1787,12 @@ void duscc_channel::do_dusccreg_rtr_w(UINT8 data)
 	case REG_RTR_RXCLK_DPLL_32X_CT: LOG(("DPLL, source = 32X C/T - not implemented\n")); break;
 	default: LOG(("Wrong programming\n")); break; // Should never happen
 	}
-#endif
 
 	LOG(("- BRG Rx rate %u assuming a 14.7456MHz CLK crystal\n", get_baudrate(m_rtr & REG_RTR_BRG_RATE_MASK)));
 	update_serial();
 
 	return;
 }
-
-void duscc_channel::do_dusccreg_ctprh_w(UINT8 data){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return; }
-void duscc_channel::do_dusccreg_ctprl_w(UINT8 data){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return; }
-void duscc_channel::do_dusccreg_ctcr_w(UINT8 data){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return; }
 
 /* Output and Miscellaneous Register (OMRA, OMRB)
     [7:5] Transmitted Residual Character Length - In BOP modes, this field determines the number of bits transmitted for the last
@@ -1281,7 +1884,6 @@ void duscc_channel::do_dusccreg_pcr_w(UINT8 data)
 	LOG(("- The GP02/RTS pin is %s\n", m_pcr & REG_PCR_GP02_RTS ?  "RTS" : "GP02"));
 	LOG(("- The SYNOUT/RTS pin is %s\n", m_pcr & REG_PCR_SYNOUT_RTS ? "RTS" : "SYNOUT"));
 
-#if VERBOSE > 0
 	LOG(("- The RTxC pin is "));
 	switch ( m_pcr & REG_PCR_RTXC_MASK )
 	{
@@ -1305,9 +1907,7 @@ void duscc_channel::do_dusccreg_pcr_w(UINT8 data)
 	default: LOG(("Wrong programming\n")); break; // Should never happen
 	}
 
-#endif
-
-	return;
+	return; 
 }
 
 /*
@@ -1318,6 +1918,8 @@ void duscc_channel::do_dusccreg_pcr_w(UINT8 data)
  */
 void duscc_channel::do_dusccreg_ccr_w(UINT8 data)
 {
+	int rate;
+
 	m_ccr = data;
 	LOG(("%s\n", FUNCNAME));
 	switch(m_ccr)
@@ -1333,14 +1935,14 @@ void duscc_channel::do_dusccreg_ccr_w(UINT8 data)
 		set_tra_rate(0);
 		m_tx_fifo_wp = m_tx_fifo_rp = 0;
 		m_trsr &= 0x0f;
-		m_gsr &= ~(m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_TXREADY : REG_GSR_CHAN_B_TXREADY);
+		m_uart->m_gsr &= ~(m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_TXREADY : REG_GSR_CHAN_B_TXREADY);
 		break;
 
 	/* Enable transmitter. Enables transmitter operation, conditioned by the state of
 	   the CTS ENABLE Tx bit, TPR[2]. Has no effect if invoked when the transmitter has
 	   previously been enabled.*/
-	case REG_CCR_ENABLE_TX: LOG(("- Enable Tx\n"));
-		m_gsr |= (m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_TXREADY : REG_GSR_CHAN_B_TXREADY);
+	case REG_CCR_ENABLE_TX: LOG(("- Enable Tx\n")); 
+		m_uart->m_gsr |= (m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_TXREADY : REG_GSR_CHAN_B_TXREADY);
 		m_tra = 1;
 		set_tra_rate(m_brg_tx_rate);
 		break;
@@ -1353,7 +1955,7 @@ void duscc_channel::do_dusccreg_ccr_w(UINT8 data)
 	case REG_CCR_DISABLE_TX: LOG(("- Disable Tx\n"));
 		set_tra_rate(0);
 		m_tra = 0;
-		m_gsr &= ~(m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_TXREADY : REG_GSR_CHAN_B_TXREADY);
+		m_uart->m_gsr &= ~(m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_TXREADY : REG_GSR_CHAN_B_TXREADY);
 		break;
 
 	// RECEIVER COMMANDS
@@ -1367,7 +1969,7 @@ void duscc_channel::do_dusccreg_ccr_w(UINT8 data)
 		m_rx_fifo_wp = m_rx_fifo_rp = 0;
 		m_trsr &= 0xf0;
 		m_rsr = 0;
-		m_gsr &= ~(m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_RXREADY : REG_GSR_CHAN_B_RXREADY);
+		m_uart->m_gsr &= ~(m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_RXREADY : REG_GSR_CHAN_B_RXREADY);
 		break;
 
 	/* Enable receiver. Causes receiver operation to begin, conditioned by the state of the DCD
@@ -1376,15 +1978,41 @@ void duscc_channel::do_dusccreg_ccr_w(UINT8 data)
 	case REG_CCR_ENABLE_RX: LOG(("- Enable Rx\n"));
 		m_rcv = 1;
 		set_rcv_rate(m_brg_rx_rate);
-		//m_gsr |= (m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_RXREADY : REG_GSR_CHAN_B_RXREADY);
 		break;
 
 	/* Disable receiver. Terminates operation of the receiver. Any character currently being assembled
 	   will be lost. Does not affect FIFO or any status.*/
 	case REG_CCR_DISABLE_RX: LOG(("- Disable Rx\n"));
 		m_rcv = 0;
-		m_gsr &= ~(m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_RXREADY : REG_GSR_CHAN_B_RXREADY);
+		m_uart->m_gsr &= ~(m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_RXREADY : REG_GSR_CHAN_B_RXREADY);
 		break;
+
+		// COUNTER/TIMER COMMANDS
+
+	/* Start. Starts the counteritimer and prescaler. */
+	case REG_CCR_START_TIMER:  LOG(("- Start Counter/Timer\n"));
+		rate = 100; // TODO: calculate correct rate
+		duscc_timer->adjust(attotime::from_hz(rate), TIMER_ID_RTXC, attotime::from_hz(rate));
+		break;
+
+	/* Stop. Stops the counter/timer and prescaler. Since the command may be asynchronous with the selected clock source, 
+	   the counter/timer and/or prescaler may count one or more additional cycles before stopping.. */
+	case REG_CCR_STOP_TIMER:   LOG(("- Stop Counter/Timer\n"));
+		duscc_timer->adjust(attotime::never);
+		break;
+
+	/* Preset to FFFF. Presets the counter timer to H'FFFF' and the prescaler to its initial value. This command causes the
+	   C/T output to go Low.*/
+	case REG_CCR_PRST_FFFF:   LOG(("- Preset 0xffff to Counter/Timer\n"));
+		m_ct = 0xffff;
+		break;
+
+	/* Preset from CTPRH/CTPRL. Transfers the current value in the counter/timer preset registers to the counter/timer and
+	   presets the prescaler to its initial value. This command causes the C/T output to go Low. */
+	case REG_CCR_PRST_CTPR:   LOG(("- Preset CTPR to Counter/Timer\n"));
+		m_ct = m_ctpr;
+		break;
+
 	default: LOG((" - command %02x not implemented yet\n", data));
 	}
 	return;
@@ -1404,8 +2032,6 @@ void duscc_channel::do_dusccreg_txfifo_w(UINT8 data)
 	else // ..there is still room
 	{
 		m_tx_data_fifo[m_tx_fifo_wp++] = data;
-		//m_rsr &= ~REG_RSR_OVERRUN_ERROR;
-		//m_gsr |= (m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_RXREADY : REG_GSR_CHAN_B_RXREADY);
 		if (m_tx_fifo_wp >= m_tx_fifo_sz)
 		{
 			m_tx_fifo_wp = 0;
@@ -1425,35 +2051,122 @@ void duscc_channel::do_dusccreg_txfifo_w(UINT8 data)
 	// check if Tx FIFO is FULL and set TxREADY accordingly
 	if (m_tx_fifo_wp + 1 == m_tx_fifo_rp || ( (m_tx_fifo_wp + 1 == m_tx_fifo_sz) && (m_tx_fifo_rp == 0) ))
 	{
-		m_gsr &= ~(m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_TXREADY : REG_GSR_CHAN_B_TXREADY);
+		m_uart->m_gsr &= ~(m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_TXREADY : REG_GSR_CHAN_B_TXREADY);
 	}
 	else
 	{
-		m_gsr |= (m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_TXREADY : REG_GSR_CHAN_B_TXREADY);
+		m_uart->m_gsr |= (m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_TXREADY : REG_GSR_CHAN_B_TXREADY);
 	}
 
 	return;
 }
 
-void duscc_channel::do_dusccreg_rsr_w(UINT8 data){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return; }
-void duscc_channel::do_dusccreg_trsr_w(UINT8 data){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return; }
-void duscc_channel::do_dusccreg_ictsr_w(UINT8 data){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return; }
-void duscc_channel::do_dusccreg_gsr_w(UINT8 data){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return; }
-void duscc_channel::do_dusccreg_ier_w(UINT8 data){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return; }
-void duscc_channel::do_dusccreg_ivr_w(UINT8 data){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return; }
-void duscc_channel::do_dusccreg_icr_w(UINT8 data){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return; }
+/* Receiver Status Register (RSRA, RSRB)
+   This register informs the CPU of receiver status. Bits indicated as 'not used';n a particular mode will read as zero. The logical OR of
+   these bits is presented in GSR[2] or GSR[6] (ORed with the bits of TRSR) for Channels A and B, respectively. Unless otherwise
+   indicated, asserted status bits are reset only be performing a write operation to the status register with the bits to be reset being ones in
+   the accompanying data word, or when the RESETN input is asserted, or when a 'reset receiver' command is issued.
+   Certain status bits are specified as being FIFOed. This means that they occupy positions in a status FIFO that correspond to the data
+   FIFO. As the data is brought to the top of the FIFO (the position read when the RxFIFO is read), the FIFOed status bits are logically
+   ORed with the previous contents of the corresponding bits in the status register. This permits the user to obtain status either
+   character by character or on a block basis. For character by character status, the SR bits should be read and then cleared
+   before reading the character data from RxFIFO. For block status, the status register is initially cleared and then read after the
+   message is received. Asserted status bits can be programmed to generate an interrupt (see Interrupt Enable Register).*/
+void duscc_channel::do_dusccreg_rsr_w(UINT8 data)
+{ 
+	LOG(("%s: %02x\n", FUNCNAME, data));
+	m_rsr &= ~data; // Clear only bits which are 1:s
+	return; 
+}
 
-/* Short cutted non complex features */
-//void duscc_channel::do_dusccreg_rea_w(UINT8 data){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return; }
-//void duscc_channel::do_dusccreg_sea_w(UINT8 data){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return; }
+void duscc_channel::do_dusccreg_trsr_w(UINT8 data)
+{ 
+	LOG(("%s: %02x - not supported yet\n", FUNCNAME, data));
+	m_trsr = data;
+	return;
+}
 
-void duscc_channel::do_dusccreg_mrr_w(UINT8 data){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return; }
-void duscc_channel::do_dusccreg_ier1_w(UINT8 data){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return; }
-void duscc_channel::do_dusccreg_ier2_w(UINT8 data){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return; }
-void duscc_channel::do_dusccreg_ier3_w(UINT8 data){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return; }
-void duscc_channel::do_dusccreg_trcr_w(UINT8 data){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return; }
-void duscc_channel::do_dusccreg_ftlr_w(UINT8 data){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return; }
-void duscc_channel::do_dusccreg_trmsr_w(UINT8 data){ logerror("register access method %s is not implemented yet\n", FUNCNAME); return; }
+void duscc_channel::do_dusccreg_ictsr_w(UINT8 data)
+{ 
+	LOG(("%s: %02x - not supported yet\n", FUNCNAME, data));
+	m_ictsr = data;
+	return;
+}
+
+/* This register provides a 'quick look' at the overall status of both channels of the DUSCC. A write to this register with ls at the
+   corresponding bit pOSitions causes TxRDY (bits 5 and 1) and/or RxRDY (bits 4 and 0) to be reset. The other status bits can be reset
+   only by resetting the individual status bits that they point to. 
+   [7] Channel 8 External or Coutnerrrimer Status - This bit indicates that one of the following status bits is asserted: ICTSRB[6:4].
+   [6] Channel B Receiver or Transmitter Status - This bit indicates that one of the following status bits is asserted: RSRB[7:0], TRSRB[7:3].
+   [5] Channel 8 Transmitter Ready - The assertion of this bit indicates that one or more characters may be loaded into the Channel B 
+       transmitter FIFO to be serialized by the transmit shift register. See description of OMR[4j. This bit can be asserted only
+	   when the transmitter is enabled. Reselling the transmitter negates TxRDY.
+   [4] Channel 8 Receiver Ready - The assertion of this bit indicates that one or more characters are available in the Channel B receiver
+       FIFO to be read by the CPU. See deSCription of OMR[3]. RxRDY is initially reset (negated) by a chip reset or when a 'reset Channel B
+	   receiver' command is invoked.
+   [3] Channel A External or Countermmer Status - This bit indicates that one of the following status bits is asserted: ICTSRA[6:4].
+   [2] Channel A Receiver or Transmitter Status - This bit indicates that one of the following status bits is asserted: RSRA(7:0], TRSRA(7:3].
+   [1) Channel A Transmitter Ready - The assertion of this bit indicates that one or more characters may be loaded into the Channel A 
+       transmitter FIFO to be serialized by the transmit shift register. See description of OMR[4]. This bit can be asserted only
+       when the transmitter is enabled. Resetting the transmitter negates TxRDY.
+   [0) Channel A Receiver Ready - The assertion of this bit indicates that one or more characters are available in the Channel A receiver
+       FIFO to be read by the CPU. See description of OMR[3]. RxRDY is initially reset (negated) by a chip reset or when a 'reset Channel A
+	   receiver' command is invoked.*/
+void duscc_channel::do_dusccreg_gsr_w(UINT8 data)
+{ 
+	LOG(("%s(%02x)\n", FUNCNAME, data));
+	m_uart->m_gsr &= (data & REG_GSR_XXREADY_MASK); // Reset only XXREADY bits, the rest needs to be reset by the source
+	return; // TODO: Check of the XXREADY source bits should be reset too 
+}
+
+/* Interrupt Enable Register (IERA, IERB)
+   This register controls whether the assertion of bits in the channel's status registers causes an interrupt to be generated. An additional
+   condition for an interrupt to be generated is that the channel's master interrupt enabled bit, ICR[O] or ICR[1], be asserted.*/
+void duscc_channel::do_dusccreg_ier_w(UINT8 data)
+{ 
+	m_ier = data;
+	LOG(("%s(%02x)\n", FUNCNAME, data));
+	m_uart->check_interrupts();
+	return; 
+}
+
+void duscc_channel::do_dusccreg_ivr_w(UINT8 data)
+{ 
+	m_uart->m_ivr = data;
+	LOG(("%s(%02x)\n", FUNCNAME, data));
+	return;
+}
+
+void duscc_channel::do_dusccreg_icr_w(UINT8 data)
+{ 
+	m_uart->m_icr = data;
+	LOG(("%s(%02x)\n", FUNCNAME, data));
+	return;
+}
+
+void duscc_channel::do_dusccreg_sea_rea_w(UINT8 data)
+{ 
+	LOG(("%s(%02x)\n", FUNCNAME, data));
+	if ( m_uart->m_variant != SET_CMOS )
+	{
+		logerror("Attempt set/clear the CDUSCC A7 bit on an NDUSCC\n");
+		m_a7 = 0; // refuse access to CDUSCC registers on an NDUSCC
+	}
+	else
+	{
+		m_a7 = (m_index == duscc_device::CHANNEL_A ? 0x40 : 0); // Set or Reset depending in channel
+	}
+
+	return; 
+}
+
+void duscc_channel::do_dusccreg_mrr_w(UINT8 data){ logerror("%s is not implemented yet\n", FUNCNAME); return; }
+void duscc_channel::do_dusccreg_ier1_w(UINT8 data){ logerror("%s is not implemented yet\n", FUNCNAME); return; }
+void duscc_channel::do_dusccreg_ier2_w(UINT8 data){ logerror("%s is not implemented yet\n", FUNCNAME); return; }
+void duscc_channel::do_dusccreg_ier3_w(UINT8 data){ logerror("%s is not implemented yet\n", FUNCNAME); return; }
+void duscc_channel::do_dusccreg_trcr_w(UINT8 data){ logerror("%s is not implemented yet\n", FUNCNAME); return; }
+void duscc_channel::do_dusccreg_ftlr_w(UINT8 data){ logerror("%s is not implemented yet\n", FUNCNAME); return; }
+void duscc_channel::do_dusccreg_trmsr_w(UINT8 data){ logerror("%s is not implemented yet\n", FUNCNAME); return; }
 
 //-------------------------------------------------
 //  control_read - read register
@@ -1461,17 +2174,40 @@ void duscc_channel::do_dusccreg_trmsr_w(UINT8 data){ logerror("register access m
 UINT8 duscc_channel::read(offs_t &offset)
 {
 	UINT8 data = 0;
-	int reg = offset | m_a7;
+	int reg = (offset | m_a7) & ~0x20; // Add extended rgisters and remove the channel B bit from offset
 
 	switch (reg)
 	{
-	case REG_CID:       data = do_dusccreg_cid_r(); break;
-	case REG_CCR:       data = do_dusccreg_ccr_r(); break;
-	case REG_RXFIFO_0:  data = do_dusccreg_rxfifo_r(); break;
-	case REG_RXFIFO_1:  data = do_dusccreg_rxfifo_r(); break;
-	case REG_RXFIFO_2:  data = do_dusccreg_rxfifo_r(); break;
-	case REG_RXFIFO_3:  data = do_dusccreg_rxfifo_r(); break;
-	case REG_GSR:       data = do_dusccreg_gsr_r(); break;
+	case REG_CMR1:		data = do_dusccreg_cmr1_r(); break;
+	case REG_CMR2:		data = do_dusccreg_cmr2_r(); break;
+	case REG_S1R:		data = do_dusccreg_s1r_r(); break;
+	case REG_S2R:		data = do_dusccreg_s2r_r(); break;
+	case REG_TPR:		data = do_dusccreg_tpr_r(); break;
+	case REG_TTR:		data = do_dusccreg_ttr_r(); break;
+	case REG_RPR:		data = do_dusccreg_rpr_r(); break;
+	case REG_RTR:		data = do_dusccreg_rtr_r(); break;
+	case REG_CTPRH:		data = do_dusccreg_ctprh_r(); break;
+	case REG_CTPRL:		data = do_dusccreg_ctprl_r(); break;
+	case REG_CTCR:		data = do_dusccreg_ctcr_r(); break;
+	case REG_OMR:		data = do_dusccreg_omr_r(); break;
+	case REG_CTH:		data = do_dusccreg_cth_r(); break;
+	case REG_CTL:		data = do_dusccreg_ctl_r(); break;
+	case REG_PCR:		data = do_dusccreg_pcr_r(); break;
+	case REG_CCR: 		data = do_dusccreg_ccr_r(); break;
+	case REG_RXFIFO_0:	data = do_dusccreg_rxfifo_r(); break;
+	case REG_RXFIFO_1:	data = do_dusccreg_rxfifo_r(); break;
+	case REG_RXFIFO_2:	data = do_dusccreg_rxfifo_r(); break;
+	case REG_RXFIFO_3:	data = do_dusccreg_rxfifo_r(); break;
+	case REG_RSR: 		data = do_dusccreg_rsr_r(); break;
+	case REG_TRSR: 		data = do_dusccreg_trsr_r(); break;
+	case REG_ICTSR:		data = do_dusccreg_ictsr_r(); break;
+	case REG_GSR: 		data = do_dusccreg_gsr_r(); break;
+	case REG_IER: 		data = do_dusccreg_ier_r(); break;
+	//	case REG_IVR: 		data = do_dusccreg_ivr_r(); break; // Chan A = IVR, B = IVRM 
+	case REG_IVRM: 		data = do_dusccreg_ivr_ivrm_r(); break;
+	case REG_ICR:		data = do_dusccreg_icr_r(); break;
+	// CDUSCC Extended registers - requires A7 to be set through REG_SEA
+	case REG_CID:		data = do_dusccreg_cid_r(); break;
 	default:
 		logerror(" \"%s\" %s: %c : Unsupported RRx register:%02x\n", m_owner->tag(), FUNCNAME, 'A' + m_index, reg);
 	}
@@ -1485,61 +2221,51 @@ UINT8 duscc_channel::read(offs_t &offset)
 //-------------------------------------------------
 
 void duscc_channel::write(UINT8 data, offs_t &offset)
-//WRITE8_MEMBER( duscc_channel::write)
 {
-	int reg = offset | m_a7;
+	int reg = (offset | m_a7) & ~0x20; // Add extended rgisters and remove the channel B bit from offset
 
+	LOG((" *  %c Reg %02x <- %02x  \n", 'A' + m_index, reg, data));
 	LOG(("\"%s\" %s: %c : Register write '%02x' -> [%02x]", m_owner->tag(), FUNCNAME, 'A' + m_index, data, reg ));
 	switch (reg)
 	{
-	case REG_SEA: /*Also REG_REA depending on which channel is written to */
-		if ( m_uart->m_variant != SET_CMOS )
-		{
-			logerror("Attempt set/clear the CDUSCC A7 bit on an NDUSCC\n");
-			m_a7 = 0;
-		}
-		else
-			m_a7 = (m_index == duscc_device::CHANNEL_A ? 0x40 : 0);
-		break;
-	case REG_CMR1:      do_dusccreg_cmr1_w(data); break;
-	case REG_CMR2:      do_dusccreg_cmr2_w(data); break;
-	case REG_S1R:       LOG(("REG_S1R \n")); break;
-	case REG_S2R:       LOG(("REG_S2R \n")); break;
-	case REG_TPR:       do_dusccreg_tpr_w(data); break;
-	case REG_TTR:       do_dusccreg_ttr_w(data); break;
-	case REG_RPR:       do_dusccreg_rpr_w(data); break;
-	case REG_RTR:       do_dusccreg_rtr_w(data); break;
-	case REG_CTPRH:     LOG(("REG_CTPRH\n")); break;
-	case REG_CTPRL:     LOG(("REG_CTPRL\n")); break;
-	case REG_CTCR:      LOG(("REG_CTCR\n")); break;
-	case REG_OMR:       do_dusccreg_omr_w(data); break;
-	case REG_CTH:       LOG(("REG_CTH   \n")); break;
-	case REG_CTL:       LOG(("REG_CTL   \n")); break;
-	case REG_PCR:       do_dusccreg_pcr_w(data); break;
-	case REG_CCR:       do_dusccreg_ccr_w(data); break;
-	case REG_TXFIFO_0:  do_dusccreg_txfifo_w(data); break;
-	case REG_TXFIFO_1:  do_dusccreg_txfifo_w(data); break;
-	case REG_TXFIFO_2:  do_dusccreg_txfifo_w(data); break;
-	case REG_TXFIFO_3:  do_dusccreg_txfifo_w(data); break;
-	case REG_RSR:       LOG(("REG_RSR   \n")); break;
-	case REG_TRSR:      LOG(("REG_TRSR\n")); break;
-	case REG_ICTSR:     LOG(("REG_ICTSR\n")); break;
-	case REG_GSR:       LOG(("REG_GSR   \n")); break;
-	case REG_IER:       LOG(("REG_IER   \n")); break;
-//  case REG_CID:       LOG(("REG_CID   \n")); break;
-	case REG_IVR:       LOG(("REG_IVR   \n")); break;
-	case REG_ICR:       LOG(("REG_ICR   \n")); break;
-//  case REG_SEA:       LOG(("REG_SEA   \n")); break;
-//  case REG_IVRM:      LOG(("REG_IVRM\n")); break;
-//  case REG_MRR:       LOG(("REG_MRR   \n")); break;
-	case REG_IER1:      LOG(("REG_IER1\n")); break;
-	case REG_IER2:      LOG(("REG_IER2\n")); break;
-	case REG_IER3:      LOG(("REG_IER3\n")); break;
-	case REG_TRCR:      LOG(("REG_TRCR\n")); break;
-	case REG_RFLR:      LOG(("REG_RFLR\n")); break;
-	case REG_FTLR:      LOG(("REG_FTLR\n")); break;
-	case REG_TRMSR:     LOG(("REG_TRMSR\n")); break;
-	case REG_TELR:      LOG(("REG_TELR\n")); break;
+	case REG_CMR1:		do_dusccreg_cmr1_w(data); break;
+	case REG_CMR2:		do_dusccreg_cmr2_w(data); break;
+	case REG_S1R:		do_dusccreg_s1r_w(data); break;
+	case REG_S2R:		do_dusccreg_s2r_w(data); break;
+	case REG_TPR:		do_dusccreg_tpr_w(data); break;
+	case REG_TTR:		do_dusccreg_ttr_w(data); break;
+	case REG_RPR:		do_dusccreg_rpr_w(data); break;
+	case REG_RTR:		do_dusccreg_rtr_w(data); break;
+	case REG_CTPRH:		do_dusccreg_ctprh_w(data); break;
+	case REG_CTPRL:		do_dusccreg_ctprl_w(data); break;
+	case REG_CTCR:		do_dusccreg_ctcr_w(data); break;
+	case REG_OMR:		do_dusccreg_omr_w(data); break;
+//	case REG_CTH:		LOG(("REG_CTH	\n")); break; // Read only register
+//	case REG_CTL:		LOG(("REG_CTL	\n")); break; // Read only register
+	case REG_PCR:		do_dusccreg_pcr_w(data); break;
+	case REG_CCR:		do_dusccreg_ccr_w(data); break;
+	case REG_TXFIFO_0:	do_dusccreg_txfifo_w(data); break;
+	case REG_TXFIFO_1:	do_dusccreg_txfifo_w(data); break;
+	case REG_TXFIFO_2:	do_dusccreg_txfifo_w(data); break;
+	case REG_TXFIFO_3:	do_dusccreg_txfifo_w(data); break;
+	case REG_RSR:		do_dusccreg_rsr_w(data); break;
+	case REG_TRSR:		do_dusccreg_trsr_w(data); break;
+	case REG_ICTSR:		do_dusccreg_ictsr_w(data); break;
+	case REG_GSR:		do_dusccreg_gsr_w(data); break;
+	case REG_IER:		do_dusccreg_ier_w(data); break;
+	case REG_IVR:		do_dusccreg_ivr_w(data); break;
+	case REG_ICR:		do_dusccreg_icr_w(data); break;
+// CDUSCC Extended registers - requires A7 to be set through REG_SEA
+//	case REG_MRR:		LOG(("REG_MRR	\n")); break;
+	case REG_SEA: 		do_dusccreg_sea_rea_w(data); break; /* Also supports REG_REA depending on which channel is written to */
+	case REG_IER1:		LOG(("REG_IER1\n")); break;
+	case REG_IER2:		LOG(("REG_IER2\n")); break;
+	case REG_IER3:		LOG(("REG_IER3\n")); break;
+	case REG_TRCR:		LOG(("REG_TRCR\n")); break;
+	case REG_RFLR:		LOG(("REG_RFLR\n")); break;
+	case REG_FTLR:		LOG(("REG_FTLR\n")); break;
+	case REG_TRMSR:		LOG(("REG_TRMSR\n")); break;
+	case REG_TELR:		LOG(("REG_TELR\n")); break;
 
 	default:
 		logerror(" \"%s\" %s: %c : Unsupported WRx register:%02x(%02x)\n", m_owner->tag(), FUNCNAME, 'A' + m_index, reg, data);
@@ -1571,8 +2297,7 @@ void duscc_channel::m_rx_fifo_rp_step()
 		if (m_rx_fifo_rp == m_rx_fifo_wp)
 		{
 				// no more characters available in the FIFO
-			//              m_rr0 &= ~ RR0_RX_CHAR_AVAILABLE;
-			m_gsr &= ~(m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_RXREADY : REG_GSR_CHAN_B_RXREADY);
+			m_uart->m_gsr &= ~(m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_RXREADY : REG_GSR_CHAN_B_RXREADY);
 		}
 }
 
@@ -1598,20 +2323,23 @@ void duscc_channel::receive_data(UINT8 data)
 	{
 		// receive overrun error detected
 		m_rsr |= REG_RSR_OVERRUN_ERROR;
+		//	m_rx_error_fifo[m_rx_fifo_wp] &= ~REG_RSR_OVERRUN_ERROR; // The overrun error is NOT fifoed obviously...
 		logerror("Receive_data() Error %02x\n", m_rsr);
 	}
 	else
 	{
 		m_rx_data_fifo[m_rx_fifo_wp] = data;
-		m_rx_error_fifo[m_rx_fifo_wp] &= ~REG_RSR_OVERRUN_ERROR;
 		m_rsr &= ~REG_RSR_OVERRUN_ERROR;
-		m_gsr |= (m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_RXREADY : REG_GSR_CHAN_B_RXREADY);
+		m_uart->m_gsr |= (m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_RXREADY : REG_GSR_CHAN_B_RXREADY);
 
 		m_rx_fifo_wp++;
 		if (m_rx_fifo_wp >= m_rx_fifo_sz)
 		{
 			m_rx_fifo_wp = 0;
 		}
+
+		//		if (m_eir & REG_IER_)
+
 	}
 }
 
@@ -1638,7 +2366,7 @@ WRITE_LINE_MEMBER( duscc_channel::cts_w )
 
 		if (m_tpr & REG_TPR_CTS && m_tra)
 		{
-			m_gsr |= (m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_TXREADY : REG_GSR_CHAN_B_TXREADY);
+			m_uart->m_gsr |= (m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_TXREADY : REG_GSR_CHAN_B_TXREADY);
 		}
 
 		// set clear to send

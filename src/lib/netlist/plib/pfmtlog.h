@@ -277,7 +277,7 @@ public:
 		error(proxy),
 		fatal(proxy)
 	{}
-	virtual ~plog_base() {};
+	virtual ~plog_base() {}
 
 	plog_channel<plog_level::DEBUG, debug_enabled> debug;
 	plog_channel<plog_level::INFO> info;

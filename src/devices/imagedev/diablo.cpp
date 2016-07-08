@@ -108,17 +108,18 @@ bool diablo_image_device::call_load()
 
 }
 
-bool diablo_image_device::call_create(int create_format, option_resolution *create_args)
+bool diablo_image_device::call_create(int create_format, util::option_resolution *create_args)
 {
 	int err;
 	UINT32 sectorsize, hunksize;
 	UINT32 cylinders, heads, sectors, totalsectors;
 
-	cylinders   = option_resolution_lookup_int(create_args, 'C');
-	heads       = option_resolution_lookup_int(create_args, 'H');
-	sectors     = option_resolution_lookup_int(create_args, 'S');
-	sectorsize  = option_resolution_lookup_int(create_args, 'L') * sizeof(UINT16);
-	hunksize    = option_resolution_lookup_int(create_args, 'K');
+	assert_always(create_args != nullptr, "Expected create_args to not be nullptr");
+	cylinders   = create_args->lookup_int('C');
+	heads       = create_args->lookup_int('H');
+	sectors     = create_args->lookup_int('S');
+	sectorsize  = create_args->lookup_int('L') * sizeof(UINT16);
+	hunksize    = create_args->lookup_int('K');
 
 	totalsectors = cylinders * heads * sectors;
 

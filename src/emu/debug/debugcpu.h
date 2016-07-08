@@ -46,8 +46,6 @@ struct xml_data_node;
 
 class device_debug
 {
-	typedef offs_t (*dasm_override_func)(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
-
 public:
 	// breakpoint class
 	class breakpoint
@@ -186,10 +184,6 @@ public:
 
 	// hooks into our operations
 	void set_instruction_hook(debug_instruction_hook_func hook);
-	void set_dasm_override(dasm_override_func dasm_override) { m_dasm_override = dasm_override; }
-
-	// disassembly
-	offs_t disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram) const;
 
 	// debugger focus
 	void ignore(bool ignore = true);
@@ -315,9 +309,6 @@ private:
 	UINT32                      m_flags;                // debugging flags for this CPU
 	symbol_table                m_symtable;             // symbol table for expression evaluation
 	debug_instruction_hook_func m_instrhook;            // per-instruction callback hook
-
-	// disassembly
-	dasm_override_func      m_dasm_override;            // pointer to provided override function
 
 	// stepping information
 	offs_t                  m_stepaddr;                 // step target address for DEBUG_FLAG_STEPPING_OVER
@@ -516,9 +507,6 @@ public:
 
 
 	/* ----- debugger memory accessors ----- */
-
-	/* return the physical address corresponding to the given logical address */
-	bool translate(address_space &space, int intention, offs_t *address);
 
 	/* return a byte from the specified memory space */
 	UINT8 read_byte(address_space &space, offs_t address, int apply_translation);

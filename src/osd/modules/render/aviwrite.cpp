@@ -27,17 +27,14 @@ avi_write::~avi_write()
 	}
 }
 
-void avi_write::record(std::string name)
+void avi_write::record(const char *name)
 {
 	if (m_recording)
 	{
 		end_avi_recording();
 	}
 
-	if (name != "")
-	{
-		begin_avi_recording(name);
-	}
+	begin_avi_recording(name);
 }
 
 void avi_write::stop()
@@ -46,7 +43,7 @@ void avi_write::stop()
 	end_avi_recording();
 }
 
-void avi_write::begin_avi_recording(std::string name)
+void avi_write::begin_avi_recording(const char *name)
 {
 	// stop any existing recording
 	end_avi_recording();
@@ -73,25 +70,21 @@ void avi_write::begin_avi_recording(std::string name)
 	info.audio_samplebits = 16;
 	info.audio_samplerate = m_machine.sample_rate();
 
+	// compute the frame time
+	m_frame_period = attotime::from_seconds(1000) / info.video_timescale;
+
 	// create a new temporary movie file
-	osd_file::error filerr;
-	std::string fullpath;
-	{
-		emu_file tempfile(m_machine.options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		filerr = tempfile.open(name.c_str());
+	emu_file tempfile(m_machine.options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	const osd_file::error filerr = (!name || !name[0] || !std::strcmp(name, OSDOPTVAL_AUTO))
+			? m_machine.video().open_next(tempfile, "avi")
+			: tempfile.open(name);
 
-		// compute the frame time
-		m_frame_period = attotime::from_seconds(1000) / info.video_timescale;
-
-		// if we succeeded, make a copy of the name and create the real file over top
-		if (filerr == osd_file::error::NONE)
-		{
-			fullpath = tempfile.fullpath();
-		}
-	}
-
+	// if we succeeded, make a copy of the name and create the real file over top
 	if (filerr == osd_file::error::NONE)
 	{
+		const std::string fullpath = tempfile.fullpath();
+		tempfile.close();
+
 		// create the file and free the string
 		avi_file::error avierr = avi_file::create(fullpath, info, m_output_file);
 		if (avierr != avi_file::error::NONE)
@@ -107,13 +100,8 @@ void avi_write::begin_avi_recording(std::string name)
 
 void avi_write::end_avi_recording()
 {
-	if (m_output_file)
-	{
-		m_output_file.reset();
-	}
-
 	m_recording = false;
-	m_output_file = nullptr;
+	m_output_file.reset();
 	m_frame = 0;
 }
 

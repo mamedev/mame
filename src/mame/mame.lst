@@ -12083,6 +12083,9 @@ fccpu30                         //
 @source:fcscsi.cpp
 fcscsi1                         //
 
+@source:fcisio.cpp
+fcisio1                         //
+
 @source:fcombat.cpp
 fcombat                         // (c) 1985 Jaleco
 
@@ -12269,8 +12272,8 @@ fccpu1                          //
 pesadelo                        // (c) 1989 Forte II Games
 
 @source:fortecar.cpp
-fortecar                        //
-fortecrd                        //
+fortecrd                        // (c) 1994, Fortex Ltd.
+fortecar                        // (c) 1994, Fortex Ltd.
 
 @source:fp1100.cpp
 fp1100                          //
@@ -34042,6 +34045,7 @@ sun4_300                        //
 sun4_40                         //
 sun4_50                         //
 sun4_60                         //
+sun4_65							//
 sun4_75                         //
 
 @source:suna16.cpp

@@ -14,6 +14,7 @@
 #include "strconv.h"
 #include "winutil.h"
 #include "winutf8.h"
+#include "unicode.h"
 
 // MAME headers
 #include "osdcore.h"
@@ -461,6 +462,39 @@ const char *osd_get_volume_name(int idx)
 	}
 
 	return p;
+}
+
+
+
+//============================================================
+//  osd_is_valid_filename_char
+//============================================================
+
+bool osd_is_valid_filename_char(unicode_char uchar)
+{
+	return osd_is_valid_filepath_char(uchar)
+		&& uchar != '/'
+		&& uchar != '\\'
+		&& uchar != ':';
+}
+
+
+
+//============================================================
+//  osd_is_valid_filepath_char
+//============================================================
+
+bool osd_is_valid_filepath_char(unicode_char uchar)
+{
+	return uchar >= 0x20
+		&& uchar != '<'
+		&& uchar != '>'
+		&& uchar != '\"'
+		&& uchar != '|'
+		&& uchar != '?'
+		&& uchar != '*'
+		&& !(uchar >= '\x7F' && uchar <= '\x9F')
+		&& uchar_isvalid(uchar);
 }
 
 

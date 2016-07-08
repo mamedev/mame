@@ -245,8 +245,9 @@ private:
 	void execute_a900(int offset, UINT16 data);
 	void execute_b100(int offset, UINT16 data);
 	void execute_b900(int offset, UINT16 data);
+	void execute_f105(int offset, UINT16 data);
 
-	// TODO: remove these
+	// TODO: remove/rename these
 	//void LEGACY_execute_130e(int offset, UINT16 data);
 	void LEGACY_execute_130e_cupsoc(int offset, UINT16 data);
 	//void LEGACY_execute_3b30(int offset, UINT16 data);
@@ -257,7 +258,7 @@ private:
 	void LEGACY_execute_d104(int offset, UINT16 data);
 	void LEGACY_execute_6980(int offset, UINT16 data);
 	void LEGACY_execute_c480(int offset, UINT16 data);
-
+	
 	void cop_collision_update_hitbox(UINT16 data, int slot, UINT32 hitadr);
 	void bcd_update();
 

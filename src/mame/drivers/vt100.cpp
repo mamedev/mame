@@ -816,8 +816,13 @@ ROM_START( vt131 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt131 mainboa
 // ROMS have the set up page C in them
 // 8085 based instead of I8080
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "23-226e4-00.e71", 0x0000, 0x2000, CRC(85c9279a) SHA1(3283d27e9c45d9e384227a7e6e98ee8d54b92bcb)) // shared with vt102
-	ROM_LOAD( "23-225e4-00.e69", 0x8000, 0x2000, CRC(3567c760) SHA1(672473162e9c92cd237e4dbf92c2700a31c5374b)) // shared with vt102
+	ROM_DEFAULT_BIOS( "vt131" )
+	ROM_SYSTEM_BIOS( 0, "vt131o", "VT131 older roms" )
+	ROMX_LOAD( "23-042e4-00.e71", 0x0000, 0x2000, CRC(e8aa006c) SHA1(8ac2a84a8d2a9fa0c6cd583ae35e4c21f863b45b), ROM_BIOS(1)) // shared with vt102
+	ROMX_LOAD( "23-041e4-00.e69", 0x8000, 0x2000, CRC(b11d331e) SHA1(8b0f885c7e032d1d709e3913d279d6950bbd4b6a), ROM_BIOS(1)) // shared with vt102
+	ROM_SYSTEM_BIOS( 1, "vt131", "VT131 newer roms" )
+	ROMX_LOAD( "23-226e4-00.e71", 0x0000, 0x2000, CRC(85c9279a) SHA1(3283d27e9c45d9e384227a7e6e98ee8d54b92bcb), ROM_BIOS(2)) // shared with vt102
+	ROMX_LOAD( "23-225e4-00.e69", 0x8000, 0x2000, CRC(3567c760) SHA1(672473162e9c92cd237e4dbf92c2700a31c5374b), ROM_BIOS(2)) // shared with vt102
 	ROM_LOAD( "23-280e2-00.e67", 0xA000, 0x0800, CRC(71b4172e) SHA1(5a82c7dc313bb92b9829eb8350840e072825a797)) // called "VT131 ROM" in the vt101 quick reference guide; pins 20, 18 and 21 are /CE /CE2 and /CE3 on this mask rom
 
 	ROM_REGION(0x1000, "chargen", 0)

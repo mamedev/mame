@@ -1279,6 +1279,46 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="appare1">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="4898" crc="0b4cb169" sha1="ecbca01b234847a14e6b8f55c6daf19302bc51d4"/>
+		<rom name="Image.cue" size="955" crc="0b2c709e" sha1="fa59b24673f52ef2aac7ea405b55423b511f3303"/>
+		<rom name="Image.img" size="658677600" crc="786b67fb" sha1="79a7b6ff9ece0339e93a2fc32a12fd0fd953040a"/>
+		<rom name="Image.sub" size="26884800" crc="3f131e25" sha1="e2a29c832f81efa437e71c5a652d4b252cef7484"/>
+		-->
+		<description>Appare CD Vol. 1 - Hiryuu no Maki</description>
+		<year>1994</year>
+		<publisher>ソフトバンク (Softbank)</publisher>
+		<info name="alt_title" value="天晴CD Vol.1 飛龍の巻" />
+		<info name="release" value="199411xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="appare1" sha1="b597d3b3b593ba395c5c132200bde2b98db5a4ab" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="appare2">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="1626" crc="1b6ba702" sha1="2ad5623a51b5e521ed2e14c2fc65e2e1c479a93f"/>
+		<rom name="Image.cue" size="258" crc="4a450045" sha1="69284c04ea7490c17b6a2a9e191c8bafe5c400fd"/>
+		<rom name="Image.img" size="584653104" crc="10f01bb5" sha1="a3743c9b50edf27c9907906ba0e7bc288a519b50"/>
+		<rom name="Image.sub" size="23863392" crc="21738ad8" sha1="c58c481d7b23eabec01893e40c34cb34f66834e1"/>
+		-->
+		<description>Appare CD Vol. 2 - Houou no Maki</description>
+		<year>1995</year>
+		<publisher>ソフトバンク (Softbank)</publisher>
+		<info name="alt_title" value="天晴CD Vol.1 鳳凰の巻" />
+		<info name="release" value="199408xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="appare2" sha1="0ec13c22ba5760984b7fac6f0a85dda952e4b8d5" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="genchohi">
 		<!--
 		Origin: Neo Kobe Collection
@@ -1576,6 +1616,44 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="beast 3" sha1="5505a0105fa9abe32b3240bac1144555b22740ee" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="bellsav1">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="868" crc="3c52017a" sha1="a5f35cb4c10e6d380cb753d90cde7ea79b1636a6"/>
+		<rom name="Image.cue" size="71" crc="b496048a" sha1="8590392ca153b7559d50bef2f83defc45e315624"/>
+		<rom name="Image.img" size="5005056" crc="eb863174" sha1="80ffaac952567fc924621ff668032e7652cd9496"/>
+		<rom name="Image.sub" size="204288" crc="7bc415d1" sha1="582bca43d243c5dc21193aa4a884d76a4ca4b9cc"/>
+		-->
+		<description>Bell's Avenue Vol. 1</description>
+		<year>1994?</year>
+		<publisher>シグナワークス (Signa Works)</publisher>
+		<info name="alt_title" value="ベルズ・アベニュー Vol.1" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="bellsav1" sha1="e085475aa75a2d2f274700f93484bcb6bbcc42ea" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="bellsav2">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="868" crc="63675719" sha1="fa2aa05c7cd3ad9676acb1a490911138106c9e71"/>
+		<rom name="Image.cue" size="71" crc="b496048a" sha1="8590392ca153b7559d50bef2f83defc45e315624"/>
+		<rom name="Image.img" size="5992896" crc="4f23167d" sha1="79efe054b0a816397e61b6c17342fc3330c8aefc"/>
+		<rom name="Image.sub" size="244608" crc="3dd77ccf" sha1="fb5e200113b601fd5ff729c6fd48fbdffae0c2b8"/>
+		-->
+		<description>Bell's Avenue Vol. 2</description>
+		<year>1994?</year>
+		<publisher>シグナワークス (Signa Works)</publisher>
+		<info name="alt_title" value="ベルズ・アベニュー Vol.2" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="bellsav2" sha1="c910ef48ea6677c77d40518f75af2160e58ae763" />
 			</diskarea>
 		</part>
 	</software>
@@ -1886,6 +1964,25 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="chuumon">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="2381" crc="6f123af3" sha1="2893690cd8552bb75605955b90487fe0bfd01624"/>
+		<rom name="Image.cue" size="422" crc="df1ebf9a" sha1="54a79694d1b25b32d2fdfb6abaec59547fdbe724"/>
+		<rom name="Image.img" size="456170400" crc="59eb0ba3" sha1="415dd0da0c3ed763db07503d071dfc3b7d0ecca3"/>
+		<rom name="Image.sub" size="18619200" crc="167ddbb0" sha1="cf2face7e3c49945e1c32161a1e772d65bfd23ca"/>
+		-->
+		<description>Chuumon no Ooi Ryouriten</description>
+		<year>1990</year>
+		<publisher>トップビジネスシステム (Top Business System)</publisher>
+		<info name="release" value="199108xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="chuumon" sha1="ac7a8e5b18cc5ad213a0e5191a115683b309f883" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="classrod">
 		<!--
 		Origin: Neo Kobe Collection
@@ -2189,6 +2286,25 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="de.fana" sha1="935c63b0c38c56e7f19957cf6fe7cc2472728964" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="debut2">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="1075" crc="864a0aef" sha1="11b84a227e6791d8e834bbf76946d374abe122c2"/>
+		<rom name="Image.cue" size="135" crc="91c153ba" sha1="0132e1b16c784454c243b5777a5a4b87e5c5b546"/>
+		<rom name="Image.img" size="388350480" crc="8f97aabc" sha1="d1a36e26284f679a41650f02426436fd04ae3dfa"/>
+		<rom name="Image.sub" size="15851040" crc="f76f8c39" sha1="8a46276e7a01f33b7b4eb99210be6c8826b6760d"/>
+		-->
+		<description>Debut Shimasu... 2 - Nogami Aki</description>
+		<year>1994?</year>
+		<publisher>アイリスプラン (Ilis Plan)</publisher>
+		<info name="alt_title" value="デビューします･･･２ 野上アキ" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="debut2" sha1="8490214513d8533565d50fb9b5e0aaf0cf344d21" />
 			</diskarea>
 		</part>
 	</software>
@@ -2654,6 +2770,23 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="ehonwrit">
+		<!--
+		Origin: P2P
+		<rom name="Image.cue" size="71" crc="b496048a" sha1="8590392ca153b7559d50bef2f83defc45e315624"/>
+		<rom name="Image.img" size="116071200" crc="13c5bf27" sha1="42a972831b03c79cf7209b8f179a79c11889d6ce"/>
+		-->
+		<description>Ehon Writer School v1.1 L20</description>
+		<year>1995</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="alt_title" value="えほんらいたー SCHOOL" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ehonwrit" sha1="093d955515b1f06cbb67ccc5aeccf45402ec0587" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="eimmy">
 		<!--
 		Origin: Neo Kobe Collection
@@ -2752,6 +2885,26 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="emerald dragon" sha1="87147a20f1a7422e8ced81c664180538be39f9ae" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="enkaio2">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="18389" crc="b507034d" sha1="1c5f4b11a989fe3765851fffe0a6e8635707bacd"/>
+		<rom name="Image.cue" size="3825" crc="2550ea50" sha1="8637e405a43a72776056f15a6a9acb934150abb6"/>
+		<rom name="Image.img" size="479974992" crc="f348dfcd" sha1="665d1a685ef894856bbdbe949dbb5696b6ab17e1"/>
+		<rom name="Image.sub" size="19590816" crc="fa1a3bcc" sha1="c4d77e4165f1d6af42c0a5e7b761dffabd00a7e3"/>
+		-->
+		<description>Enkaiou no Gyakushuu</description>
+		<year>1991</year>
+		<publisher>電脳商会 (Dennou Shoukai)</publisher>
+		<info name="alt_title" value="宴会王の逆襲" />
+		<info name="release" value="199108xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="enkaio2" sha1="ae073ccdac82eae6da15ee3d9fbcb7046f542721" />
 			</diskarea>
 		</part>
 	</software>
@@ -3493,6 +3646,25 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="grimm">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="5668" crc="3b07aab8" sha1="8730e1aa92035db646f0353e642f3cdcd0b5f097"/>
+		<rom name="Image.cue" size="1119" crc="a072d80f" sha1="d84ae30f32917deb9eacaf0bd7a5763f3b84833f"/>
+		<rom name="Image.img" size="307265280" crc="abb4d067" sha1="43e7e83a1b2226f743bb5c03d877eeb492aec598"/>
+		<rom name="Image.sub" size="12541440" crc="916d6a80" sha1="e37fd45a1c4abc83f355bcfeedab75f07645ec50"/>
+		-->
+		<description>Märchen Toshokan - Grimm Douwa - Akazukin</description>
+		<year>1989?</year>
+		<publisher>ぎょうせい (Gyousei)</publisher>
+		<info name="alt_title" value="メルヘン図書館　グリム童話　赤ずきん" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="grimm" sha1="78e0cbc80ad750219b9cf247052e1018a57c4f78" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="gunblaze">
 		<!--
 		Origin: Neo Kobe Collection
@@ -3607,6 +3779,26 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="hanafuda de pon!" sha1="e6c9322b57da82c08ac7a7d91e50771214820806" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hanayor2">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="843" crc="4fe85809" sha1="7af321cce2aae668a10f13aa99b6358d1c585f2e"/>
+		<rom name="Image.cue" size="71" crc="b496048a" sha1="8590392ca153b7559d50bef2f83defc45e315624"/>
+		<rom name="Image.img" size="20815200" crc="67a16c01" sha1="7cad0a4d55500a4bf0b1da5f09b9b8008c4ce4f8"/>
+		<rom name="Image.sub" size="849600" crc="b98d7330" sha1="a7d46563a513045cdac84401d3a9c8d62ab3d1f5"/>
+		-->
+		<description>Hana yori Dango 2</description>
+		<year>1993</year>
+		<publisher>アクティブ (Active)</publisher>
+		<info name="alt_title" value="花よりダンゴ２" />
+		<info name="release" value="19930417" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="hanayor2" sha1="ab06b43b315e497b4e54da99a0c41b56f3f527b4" />
 			</diskarea>
 		</part>
 	</software>
@@ -3798,6 +3990,25 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="idol project" sha1="3de1bb37efe32d490c32acc9211765ce6f578779" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="if2">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="866" crc="8a41e3f9" sha1="4cd23a08dac86d5cd9538f5676ea3b8ff5f077fd"/>
+		<rom name="Image.cue" size="71" crc="b496048a" sha1="8590392ca153b7559d50bef2f83defc45e315624"/>
+		<rom name="Image.img" size="20815200" crc="2b674736" sha1="cfc887aa25a66dc5bccd35153989d0a7590a9755"/>
+		<rom name="Image.sub" size="849600" crc="02771f97" sha1="5d0f77b63936392b2cc9db8a21f8e90d78ca0f5a"/>
+		-->
+		<description>If 2</description>
+		<year>1993</year>
+		<publisher>アクティブ (Active)</publisher>
+		<info name="release" value="19931119" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="if2" sha1="5c3e29a04bc8cb173f06be5476a22d609410613a" />
 			</diskarea>
 		</part>
 	</software>
@@ -5462,6 +5673,25 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="musicmac">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="3347" crc="a049d27c" sha1="74cbee93729fdd87d3eddba95d2f3f3d42b4ea04"/>
+		<rom name="Image.cue" size="627" crc="472c64bb" sha1="3ac1a131481a0fbad19d36b6a2fd86248fdbb543"/>
+		<rom name="Image.img" size="414363600" crc="0d49c9ce" sha1="c97c88ec1ef50a4b6c5993d60a69976dc35979ec"/>
+		<rom name="Image.sub" size="16912800" crc="0050ca58" sha1="5ce4e954f1da8ea4fa0e175a1a8ca018c2f51f18"/>
+		-->
+		<description>Mr. Ed Bogas' Music Machine Lite</description>
+		<year>1993</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="release" value="19931126" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="musicmac" sha1="fd43146d8d7bcdb233b7ca06f164ae52550c5476" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="mustowns">
 		<!--
 		Origin: Neo Kobe Collection
@@ -6707,6 +6937,23 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="sangoku3">
+		<!--
+		Origin: P2P
+		<rom name="三国志III.cue" size="1286" crc="9f5389d1" sha1="61f888904698ec3a83f66b109c91420d0d1f1e93"/>
+		<rom name="三国志III.img" size="478163952" crc="aec21c99" sha1="4716da4da9535036db3858cb27e84c5da07666f8"/>
+		-->
+		<description>Sangokushi III</description>
+		<year>1992</year>
+		<publisher>光栄 (Koei)</publisher>
+		<info name="alt_title" value="三国志Ⅲ" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="sangoku3" sha1="613793fb3915b6a3b2b2634584604bd50a9151d8" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="sayaka">
 		<!--
 		Origin: Neo Kobe Collection
@@ -6844,6 +7091,26 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="schwarzschild iv" sha1="813091a4a7fe385da8014f6d3e22a06dc5ec275e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="secre2">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="868" crc="e2827fdd" sha1="a8dfb0ec2d824679ab5b6bf656b2df2991053a26"/>
+		<rom name="Image.cue" size="71" crc="b496048a" sha1="8590392ca153b7559d50bef2f83defc45e315624"/>
+		<rom name="Image.img" size="190159200" crc="94d412e7" sha1="25de11d990386d0dea64c55ba9e1501caacc023e"/>
+		<rom name="Image.sub" size="7761600" crc="0b7ced10" sha1="7b58d25b6d4e5dbe794ae304d60ba165da30385e"/>
+		-->
+		<description>Secre Volume 2 - Oikawa Mai</description>
+		<year>1993</year>
+		<publisher>グラムス (Glams)</publisher>
+		<info name="alt_title" value="Secre VOLUME 2 及川麻衣" />
+		<info name="release" value="19930819" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="secre2" sha1="ccd2a47f886e0ef66b5477aabbf128bb8118b684" />
 			</diskarea>
 		</part>
 	</software>
@@ -7115,6 +7382,26 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="super odyssey" sha1="c96c408d52c6d89374b7236de7af9751b0bcdefb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="softcon2">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="2798" crc="3a49663d" sha1="91a5dda191bbffe8d05397ebea8ea8044fe5b599"/>
+		<rom name="Image.cue" size="504" crc="0967077e" sha1="7bbf695474254fbf7f5e14c7cc801acb4c2702f4"/>
+		<rom name="Image.img" size="593769456" crc="47dd4200" sha1="620db81b1c3e263fa9eb72afb4a92dbd0f6ea952"/>
+		<rom name="Image.sub" size="24235488" crc="95400d7e" sha1="4b7a4198f4e776442c529acacb7e100f1d466bdb"/>
+		-->
+		<description>Software Contest Nyuusen Sakuhinshuu Vol. 2</description>
+		<year>1993</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="alt_title" value="ソフトウェアコンテスト入選作品集 Vol.2" />
+		<info name="release" value="199301xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="softcon2" sha1="204589dd46a5e2db1a65c9252e17844868650583" />
 			</diskarea>
 		</part>
 	</software>
@@ -7742,6 +8029,44 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="toukou2">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="1092" crc="64e86da4" sha1="9bde9b10ec2146df7170170f0499e21e27340082"/>
+		<rom name="Image.cue" size="135" crc="5e56f12c" sha1="f84a11cf3caf8e7c83a250a1bc43b32b1cb7dd36"/>
+		<rom name="Image.img" size="264531792" crc="7b1cf7cb" sha1="7825977b8f98d7db7d31571560df41099d66e564"/>
+		<rom name="Image.sub" size="10797216" crc="971b0745" sha1="9778f27530219b8fb7a0646a43ea655cee2a4d0e"/>
+		-->
+		<description>That's Toukou Part 2</description>
+		<year>1994?</year>
+		<publisher>バーディーソフト (Birdy Soft)</publisher>
+		<info name="alt_title" value="THAT'S 投稿 PART2" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="toukou2" sha1="e3d9e3cf9695ab63064de8e02b014e29664a5422" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="toukoun">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="1051" crc="c727bfbf" sha1="ddb522444ce145127b5759318de7a91b4a5bd4df"/>
+		<rom name="Image.cue" size="135" crc="b3d21508" sha1="290a6f890d92a512cf99a3d327524cedb8a7e1c5"/>
+		<rom name="Image.img" size="608556480" crc="c82fca28" sha1="bf441c81187a2c1e8bff0b96b10e99e3841d12e0"/>
+		<rom name="Image.sub" size="24839040" crc="13770962" sha1="e8cc6e3bad3f0d26eb730f41208358e789ba0114"/>
+		-->
+		<description>That's Toukou - Natsu no Daitokushuugou</description>
+		<year>1994?</year>
+		<publisher>バーディーソフト (Birdy Soft)</publisher>
+		<info name="alt_title" value="THAT'S 投稿 夏の大特集号" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="toukoun" sha1="d5f81c0d5fc7dd61573ea09233ef83aa98d6c6b6" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="toutrun">
 		<!--
 		Origin: Neo Kobe Collection
@@ -8208,6 +8533,24 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="weltowns">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="2386" crc="2def7326" sha1="c4082e70feb3e1b962d3b39ec88f39fa8077d9a1"/>
+		<rom name="Image.cue" size="422" crc="5b8e2b26" sha1="e4a48f4bd93169c4ac3d931c7798c57a126d67be"/>
+		<rom name="Image.img" size="593767104" crc="ab811e94" sha1="9c3f0317400dd75fff06d42001379d4bc1574aba"/>
+		<rom name="Image.sub" size="24235392" crc="504f0723" sha1="2492808f9cbcd86261a915778ae786ffc8e81fb0"/>
+		-->
+		<description>Welcome to FM Towns</description>
+		<year>1994</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="weltowns" sha1="81318dcbf6689d005e400fefae51cd775ddea0fe" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="wingcmar">
 		<!--
 		Origin: Neo Kobe Collection
@@ -8491,6 +8834,26 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="xenon" sha1="d6544b946ece77ce93fb6cf1db3ffb231b464ac0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows / Mac / FM Towns hybrid -->
+	<software name="yamane">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="846" crc="4ac3798a" sha1="161c359022316373a8bf391ae95d59ec8ed85cc8"/>
+		<rom name="Image.cue" size="71" crc="b496048a" sha1="8590392ca153b7559d50bef2f83defc45e315624"/>
+		<rom name="Image.img" size="222685008" crc="b11f3172" sha1="44d900320fc2e8835c1dc60e18c5b4c3eff9d3e8"/>
+		<rom name="Image.sub" size="9089184" crc="5c9d4b57" sha1="411a1d54dd28d8fef4cef74e25c61689c98379b1"/>
+		-->
+		<description>Yamane no Sumu Mori</description>
+		<year>1995</year>
+		<publisher>インターリミテッドロジック (Inter Limited Logic)</publisher>
+		<info name="alt_title" value="ヤマネの棲む森" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="yamane" sha1="4a672f5b90f0fb81238915b60a4e093e672dd2dd" />
 			</diskarea>
 		</part>
 	</software>

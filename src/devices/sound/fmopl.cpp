@@ -1746,7 +1746,7 @@ static int OPL_LockTable(device_t *device)
 	{
 		cymfile = fopen("3812_.cym","wb");
 		if (cymfile)
-			device->machine().scheduler().timer_pulse ( attotime::from_hz(110), FUNC(cymfile_callback)); /*110 Hz pulse timer*/
+			device->machine().scheduler().timer_pulse ( attotime::from_hz(110), timer_expired_delegate(FUNC(cymfile_callback),&device->machine())); /*110 Hz pulse timer*/
 		else
 			device->logerror("Could not create file 3812_.cym\n");
 	}

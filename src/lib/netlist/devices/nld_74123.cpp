@@ -10,9 +10,6 @@
 #include "nlid_system.h"
 #include "analog/nld_twoterm.h"
 
-#define R_OFF (1E20)
-#define R_ON (m_RI.Value())
-
 namespace netlist
 {
 	namespace devices

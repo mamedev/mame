@@ -22,7 +22,7 @@ static floperr_t basicdsk_get_sector_length(floppy_image_legacy *floppy, int hea
 static floperr_t basicdsk_get_indexed_sector_info(floppy_image_legacy *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags);
 static int basicdsk_get_heads_per_disk(floppy_image_legacy *floppy);
 static int basicdsk_get_tracks_per_disk(floppy_image_legacy *floppy);
-static floperr_t basicdsk_format_track(floppy_image_legacy *floppy, int head, int track, option_resolution *params);
+static floperr_t basicdsk_format_track(floppy_image_legacy *floppy, int head, int track, util::option_resolution *params);
 
 
 
@@ -180,7 +180,7 @@ static floperr_t basicdsk_write_indexed_sector(floppy_image_legacy *floppy, int 
 
 
 
-static floperr_t basicdsk_format_track(floppy_image_legacy *floppy, int head, int track, option_resolution *params)
+static floperr_t basicdsk_format_track(floppy_image_legacy *floppy, int head, int track, util::option_resolution *params)
 {
 	floperr_t err = FLOPPY_ERROR_SUCCESS;
 	UINT8 local_buffer[512];
@@ -288,24 +288,23 @@ static floperr_t basicdsk_get_indexed_sector_info(floppy_image_legacy *floppy, i
 
 static void basicdsk_default_geometry(const struct FloppyFormat *format, struct basicdsk_geometry *geometry)
 {
-	optreserr_t err;
 	int sector_length;
 	memset(geometry, 0, sizeof(*geometry));
 
-	err = option_resolution_getdefault(format->param_guidelines, PARAM_HEADS,           &geometry->heads);
-	assert(!err);
-	err = option_resolution_getdefault(format->param_guidelines, PARAM_TRACKS,          &geometry->tracks);
-	assert(!err);
-	err = option_resolution_getdefault(format->param_guidelines, PARAM_SECTORS,         &geometry->sectors);
-	assert(!err);
-	err = option_resolution_getdefault(format->param_guidelines, PARAM_FIRST_SECTOR_ID, &geometry->first_sector_id);
-	assert(!err);
-	err = option_resolution_getdefault(format->param_guidelines, PARAM_INTERLEAVE,      &geometry->interleave);
-	if (err!=0) {
+	auto err = util::option_resolution::get_default(format->param_guidelines, PARAM_HEADS,           &geometry->heads);
+	assert(err == util::option_resolution::error::SUCCESS);
+	err = util::option_resolution::get_default(format->param_guidelines, PARAM_TRACKS,          &geometry->tracks);
+	assert(err == util::option_resolution::error::SUCCESS);
+	err = util::option_resolution::get_default(format->param_guidelines, PARAM_SECTORS,         &geometry->sectors);
+	assert(err == util::option_resolution::error::SUCCESS);
+	err = util::option_resolution::get_default(format->param_guidelines, PARAM_FIRST_SECTOR_ID, &geometry->first_sector_id);
+	assert(err == util::option_resolution::error::SUCCESS);
+	err = util::option_resolution::get_default(format->param_guidelines, PARAM_INTERLEAVE,      &geometry->interleave);
+	if (err != util::option_resolution::error::SUCCESS) {
 		geometry->interleave = 1;
 	}
-	err = option_resolution_getdefault(format->param_guidelines, PARAM_SECTOR_LENGTH,   &sector_length);
-	assert(!err);
+	err = util::option_resolution::get_default(format->param_guidelines, PARAM_SECTOR_LENGTH,   &sector_length);
+	assert(err == util::option_resolution::error::SUCCESS);
 	geometry->sector_length = sector_length;
 
 	if (geometry->interleave > 1)

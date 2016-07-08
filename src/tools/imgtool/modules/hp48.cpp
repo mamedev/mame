@@ -365,12 +365,12 @@ static imgtoolerr_t hp48_open(imgtool_image *img, imgtool_stream *stream)
 
 static imgtoolerr_t hp48_create(imgtool_image* img,
 				imgtool_stream *stream,
-				option_resolution *opts)
+				util::option_resolution *opts)
 {
 	hp48_card* c = (hp48_card*) imgtool_image_extra_bytes( img );
 	int size;
 
-		size = option_resolution_lookup_int(opts, 'S');
+		size = opts->lookup_int('S');
 
 		c->stream = stream;
 		c->modified = 1;
@@ -614,7 +614,7 @@ static imgtoolerr_t hp48_writefile(imgtool_partition *part,
 									const char *filename,
 									const char *fork,
 									imgtool_stream *sourcef,
-									option_resolution *opts)
+									util::option_resolution *opts)
 {
 	imgtool_image* img = imgtool_partition_image( part );
 		hp48_card* c = (hp48_card*) imgtool_image_extra_bytes( img );

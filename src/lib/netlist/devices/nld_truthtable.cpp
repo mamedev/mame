@@ -229,7 +229,7 @@ void truthtable_desc_t::setup(const plib::pstring_vector_t &truthtable, uint_lea
 		if (ign[i] == all_set)
 		{
 			int tign;
-			if (0)
+			if ((0))
 			{
 				tign = get_ignored_simple(i);
 				ign[i] = tign;

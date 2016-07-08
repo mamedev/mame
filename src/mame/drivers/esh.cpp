@@ -29,6 +29,7 @@ Todo:
 #include "cpu/z80/z80.h"
 #include "machine/ldv1000.h"
 #include "machine/nvram.h"
+#include "sound/beep.h"
 
 
 class esh_state : public driver_device
@@ -42,6 +43,7 @@ public:
 			m_tile_control_ram(*this, "tile_ctrl_ram"),
 			m_maincpu(*this, "maincpu"),
 			m_gfxdecode(*this, "gfxdecode"),
+			m_beep(*this, "beeper"),
 			m_palette(*this, "palette")  { }
 
 	required_device<pioneer_ldv1000_device> m_laserdisc;
@@ -63,6 +65,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ld_command_strobe_cb);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<beep_device> m_beep;
 	required_device<palette_device> m_palette;
 
 protected:
@@ -147,9 +150,9 @@ WRITE8_MEMBER(esh_state::misc_write)
 {
 	/* Bit 0 unknown */
 
-	if (data & 0x02)
-		logerror("BEEP!\n");
-
+//	if (data & 0x02)
+//		logerror("BEEP!\n");
+	m_beep->set_state(BIT(data, 1)); // polarity unknown
 	/* Bit 2 unknown */
 	m_ld_video_visible = bool(!((data & 0x08) >> 3));
 
@@ -374,6 +377,9 @@ static MACHINE_CONFIG_START( esh, esh_state )
 	MCFG_SOUND_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beeper", BEEP, 2000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 // we just disable even lines so we can simulate line blinking

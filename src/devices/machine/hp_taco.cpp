@@ -1668,7 +1668,7 @@ bool hp_taco_device::call_load()
 	return IMAGE_INIT_PASS;
 }
 
-bool hp_taco_device::call_create(int format_type, option_resolution *format_options)
+bool hp_taco_device::call_create(int format_type, util::option_resolution *format_options)
 {
 		LOG(("call_create %d\n" , has_been_created()));
 		return call_load();

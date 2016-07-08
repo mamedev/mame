@@ -29,7 +29,7 @@ public:
 	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	virtual bool call_load() override;
-	virtual bool call_create(int format_type, option_resolution *format_options) override;
+	virtual bool call_create(int format_type, util::option_resolution *format_options) override;
 
 	void disable(bool state) { m_disabled = state; if(state) unload(); }
 

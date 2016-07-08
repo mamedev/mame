@@ -23,13 +23,44 @@ namespace plib {
 
 class options;
 
-class option
+class option_base
 {
 public:
-	option();
-	option(options &parent, pstring ashort, pstring along, pstring help, bool has_argument);
+	option_base(options &parent, pstring help);
+	virtual ~option_base();
 
-	virtual ~option();
+	pstring help() { return m_help; }
+private:
+	pstring m_help;
+};
+
+class option_group : public option_base
+{
+public:
+	option_group(options &parent, pstring group, pstring help)
+	: option_base(parent, help), m_group(group) { }
+
+	pstring group() { return m_group; }
+private:
+	pstring m_group;
+};
+
+class option_example : public option_base
+{
+public:
+	option_example(options &parent, pstring group, pstring help)
+	: option_base(parent, help), m_example(group) { }
+
+	pstring example() { return m_example; }
+private:
+	pstring m_example;
+};
+
+
+class option : public option_base
+{
+public:
+	option(options &parent, pstring ashort, pstring along, pstring help, bool has_argument);
 
 	/* no_argument options will be called with "" argument */
 
@@ -37,12 +68,10 @@ public:
 
 	pstring short_opt() { return m_short; }
 	pstring long_opt() { return m_long; }
-	pstring help() { return m_help; }
 	bool has_argument() { return m_has_argument ; }
 private:
 	pstring m_short;
 	pstring m_long;
-	pstring m_help;
 	bool m_has_argument;
 };
 
@@ -105,6 +134,20 @@ private:
 	double m_val;
 };
 
+class option_vec : public option
+{
+public:
+	option_vec(options &parent, pstring ashort, pstring along, pstring help)
+	: option(parent, ashort, along, help, true)
+	{}
+
+	virtual int parse(pstring argument) override;
+
+	std::vector<pstring> operator ()() { return m_val; }
+private:
+	std::vector<pstring> m_val;
+};
+
 class options
 {
 public:
@@ -114,22 +157,22 @@ public:
 
 	~options();
 
-	void register_option(option *opt);
+	void register_option(option_base *opt);
 	int parse(int argc, char *argv[]);
 
 	pstring help(pstring description, pstring usage,
-			unsigned width = 72, unsigned ident = 20);
+			unsigned width = 72, unsigned indent = 20);
 
 	pstring app() { return m_app; }
 
 private:
-	static pstring split_paragraphs(pstring text, unsigned width, unsigned ident,
-			unsigned firstline_ident);
+	static pstring split_paragraphs(pstring text, unsigned width, unsigned indent,
+			unsigned firstline_indent);
 
 	option *getopt_short(pstring arg);
 	option *getopt_long(pstring arg);
 
-	std::vector<option *> m_opts;
+	std::vector<option_base *> m_opts;
 	pstring m_app;
 };
 

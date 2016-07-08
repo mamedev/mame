@@ -219,7 +219,7 @@ void matrix_solver_sm_t<m_N, storage_N>::LE_compute_x(
 
 
 template <unsigned m_N, unsigned storage_N>
-int matrix_solver_sm_t<m_N, storage_N>::solve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
+int matrix_solver_sm_t<m_N, storage_N>::solve_non_dynamic(const bool newton_raphson)
 {
 	static const bool incremental = true;
 	static unsigned cnt = 0;

@@ -27,7 +27,6 @@
 #include "emu.h"
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
-#include "debug/debugcpu.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"

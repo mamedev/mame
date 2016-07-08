@@ -589,9 +589,6 @@ DRIVER_INIT_MEMBER(micro3d_state,micro3d)
 {
 	address_space &space = m_drmath->space(AS_DATA);
 
-	m_audiocpu->i8051_set_serial_tx_callback(write8_delegate(FUNC(micro3d_state::data_from_i8031),this));
-	m_audiocpu->i8051_set_serial_rx_callback(read8_delegate(FUNC(micro3d_state::data_to_i8031),this));
-
 	/* The Am29000 program seems to rely on RAM from 0x00470000 onwards being
 	non-zero on a reset, otherwise the 3D object data doesn't get uploaded! */
 	space.write_dword(0x00470000, 0xa5a5a5a5);
