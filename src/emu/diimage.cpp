@@ -8,14 +8,17 @@
 
 ***************************************************************************/
 
-#include <regex>
 #include "emu.h"
+
 #include "emuopts.h"
 #include "drivenum.h"
 #include "ui/uimain.h"
 #include "zippath.h"
 #include "softlist.h"
 #include "formats/ioprocs.h"
+
+#include <regex>
+
 
 //**************************************************************************
 //  DEVICE CONFIG IMAGE INTERFACE
