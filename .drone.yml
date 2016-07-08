@@ -11,6 +11,7 @@ build:
     - MINGW32=/c/msys32/mingw32
     - MAME_EXE=mametiny.exe
     - IGNORE_GIT=1
+    - TOOLS=1
 #    - SOURCES=src/mame/drivers/pacman.cpp
   commands:
 #    - pacman -S -q --noprogressbar --noconfirm winpty
