@@ -6297,6 +6297,12 @@ gaunt2:
 @:maincpu,program,904DE8,C8,00,E3
 
 
+;@s:gb.cpp
+
+gameboy,tetris:
+@:maincpu,program,d654,32,0,0,ff
+
+
 ;@s:gberet.cpp
 
 gberet:
@@ -9550,6 +9556,12 @@ popbounc:
 ;(aero fighters 2/sonic wings 2)
 sonicwi2:
 @:maincpu,program,10000e,52,48,03
+
+
+;@s:nes.cpp
+
+nes,smb:
+@:maincpu,program,7df,4,0,0,ff
 
 
 ;@s:news.cpp
@@ -17175,5 +17187,3 @@ percuss:
 ;Moguchan (by GeoMan)
 moguchan:
 @:maincpu,program,5eda,6,0,0
-
-
