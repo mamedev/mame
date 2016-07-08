@@ -72,7 +72,7 @@ void ng_memcard_device::call_unload()
 	fwrite(m_memcard_data, 0x800);
 }
 
-bool ng_memcard_device::call_create(int format_type, option_resolution *format_options)
+bool ng_memcard_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	memset(m_memcard_data, 0, 0x800);
 

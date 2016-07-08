@@ -47,7 +47,7 @@ void x68k_hdc_image_device::device_start()
 	m_phase = SASI_PHASE_BUSFREE;
 }
 
-bool x68k_hdc_image_device::call_create(int format_type, option_resolution *format_options)
+bool x68k_hdc_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	// create 20MB HD
 	int x;
