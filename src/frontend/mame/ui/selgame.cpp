@@ -145,13 +145,8 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container *conta
 menu_select_game::~menu_select_game()
 {
 	std::string error_string, last_driver;
-	const game_driver *driver = nullptr;
-	ui_software_info *swinfo = nullptr;
-	ui_options &mopt = ui().options();
-	if (isfavorite())
-		swinfo = (selected >= 0 && selected < item.size()) ? (ui_software_info *)item[selected].ref : nullptr;
-	else
-		driver = (selected >= 0 && selected < item.size()) ? (const game_driver *)item[selected].ref : nullptr;
+	game_driver const *const driver(isfavorite() ? nullptr : reinterpret_cast<game_driver const *>(get_selection_ref()));
+	ui_software_info *const swinfo(isfavorite() ? reinterpret_cast<ui_software_info *>(get_selection_ref()) : nullptr);
 
 	if ((FPTR)driver > skip_main_items)
 		last_driver = driver->name;
@@ -165,6 +160,7 @@ menu_select_game::~menu_select_game()
 	else if (main_filters::actual == FILTER_YEAR)
 		filter.append(",").append(c_year::ui[c_year::actual]);
 
+	ui_options &mopt = ui().options();
 	mopt.set_value(OPTION_LAST_USED_FILTER, filter.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 	mopt.set_value(OPTION_LAST_USED_MACHINE, last_driver.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 	mopt.set_value(OPTION_HIDE_PANELS, ui_globals::panels_status, OPTION_PRIORITY_CMDLINE, error_string);
@@ -660,75 +656,77 @@ void menu_select_game::build_available_list()
 	}
 
 	// now check and include NONE_NEEDED
-	for (int x = 0; x < m_total; ++x)
+	if (!ui().options().hide_romless())
 	{
-		auto driver = &driver_list::driver(x);
-		if (!m_included[x] && driver != &GAME_NAME(___empty))
+		for (int x = 0; x < m_total; ++x)
 		{
-			const rom_entry *rom = driver->rom;
-			auto noroms = true;
-
-			// check NO-DUMP
-			for (; !ROMENTRY_ISEND(rom) && noroms == true; ++rom)
-				if (ROMENTRY_ISFILE(rom))
-				{
-					hash_collection hashes(ROM_GETHASHDATA(rom));
-					if (!hashes.flag(hash_collection::FLAG_NO_DUMP) && !ROM_ISOPTIONAL(rom))
-						noroms = false;
-				}
-
-			if (!noroms)
+			auto driver = &driver_list::driver(x);
+			if (!m_included[x] && driver != &GAME_NAME(___empty))
 			{
-				// check if clone == parent
-				int cx = driver_list::clone(*driver);
-				if (cx != -1 && m_included[cx])
-				{
-					auto drv = &driver_list::driver(cx);
-					auto parentrom = drv->rom;
-					if ((rom = driver->rom) == parentrom)
-						noroms = true;
+				const rom_entry *rom = driver->rom;
+				bool noroms = true;
 
-					// check if clone < parent
-					if (!noroms)
+				// check NO-DUMP
+				for (; !ROMENTRY_ISEND(rom) && noroms == true; ++rom)
+					if (ROMENTRY_ISFILE(rom))
 					{
-						noroms = true;
-						for (; !ROMENTRY_ISEND(rom) && noroms == true; ++rom)
+						hash_collection hashes(ROM_GETHASHDATA(rom));
+						if (!hashes.flag(hash_collection::FLAG_NO_DUMP) && !ROM_ISOPTIONAL(rom))
+							noroms = false;
+					}
+
+				if (!noroms)
+				{
+					// check if clone == parent
+					auto cx = driver_list::clone(*driver);
+					if (cx != -1 && m_included[cx])
+					{
+						auto drv = &driver_list::driver(cx);
+						auto parentrom = drv->rom;
+						if ((rom = driver->rom) == parentrom)
+							noroms = true;
+
+						// check if clone < parent
+						if (!noroms)
 						{
-							if (ROMENTRY_ISFILE(rom))
+							noroms = true;
+							for (; !ROMENTRY_ISEND(rom) && noroms == true; ++rom)
 							{
-								hash_collection hashes(ROM_GETHASHDATA(rom));
-								if (hashes.flag(hash_collection::FLAG_NO_DUMP) || ROM_ISOPTIONAL(rom))
-									continue;
-
-								UINT64 lenght = ROM_GETLENGTH(rom);
-								auto found = false;
-								for (parentrom = drv->rom; !ROMENTRY_ISEND(parentrom) && found == false; ++parentrom)
+								if (ROMENTRY_ISFILE(rom))
 								{
-									if (ROMENTRY_ISFILE(parentrom) && ROM_GETLENGTH(parentrom) == lenght)
-									{
-										hash_collection parenthashes(ROM_GETHASHDATA(parentrom));
-										if (parenthashes.flag(hash_collection::FLAG_NO_DUMP) || ROM_ISOPTIONAL(parentrom))
-											continue;
+									hash_collection hashes(ROM_GETHASHDATA(rom));
+									if (hashes.flag(hash_collection::FLAG_NO_DUMP) || ROM_ISOPTIONAL(rom))
+										continue;
 
-										if (hashes == parenthashes)
-											found = true;
+									UINT64 lenght = ROM_GETLENGTH(rom);
+									auto found = false;
+									for (parentrom = drv->rom; !ROMENTRY_ISEND(parentrom) && found == false; ++parentrom)
+									{
+										if (ROMENTRY_ISFILE(parentrom) && ROM_GETLENGTH(parentrom) == lenght)
+										{
+											hash_collection parenthashes(ROM_GETHASHDATA(parentrom));
+											if (parenthashes.flag(hash_collection::FLAG_NO_DUMP) || ROM_ISOPTIONAL(parentrom))
+												continue;
+
+											if (hashes == parenthashes)
+												found = true;
+										}
 									}
+									noroms = found;
 								}
-								noroms = found;
 							}
 						}
 					}
 				}
-			}
 
-			if (noroms)
-			{
-				m_availsortedlist.push_back(&driver_list::driver(x));
-				m_included[x] = true;
+				if (noroms)
+				{
+					m_availsortedlist.push_back(&driver_list::driver(x));
+					m_included[x] = true;
+				}
 			}
 		}
 	}
-
 	// sort
 	std::stable_sort(m_availsortedlist.begin(), m_availsortedlist.end(), sorted_game_list);
 

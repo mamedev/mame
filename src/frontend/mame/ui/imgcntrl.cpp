@@ -4,7 +4,7 @@
 
     ui/imgcntrl.cpp
 
-    MESS's clunky built-in file manager
+    MAME's clunky built-in file manager
 
 ***************************************************************************/
 
@@ -14,6 +14,7 @@
 
 #include "ui/ui.h"
 #include "ui/filesel.h"
+#include "ui/filecreate.h"
 #include "ui/swlist.h"
 
 #include "audit.h"
@@ -34,11 +35,11 @@ namespace ui {
 
 menu_control_device_image::menu_control_device_image(mame_ui_manager &mui, render_container *container, device_image_interface *_image)
 	: menu(mui, container),
-		submenu_result(0),
 		create_ok(false),
 		create_confirmed(false)
 {
 	image = _image;
+	submenu_result.i = -1;
 
 	if (image->software_list_name())
 		sld = software_list_device::find_by_name(mui.machine().config(), image->software_list_name());
@@ -50,7 +51,7 @@ menu_control_device_image::menu_control_device_image(mame_ui_manager &mui, rende
 	if(swi)
 	{
 		state = START_OTHER_PART;
-		current_directory.assign(image->working_directory());
+		m_current_directory.assign(image->working_directory());
 	}
 	else
 	{
@@ -59,14 +60,14 @@ menu_control_device_image::menu_control_device_image(mame_ui_manager &mui, rende
 		/* if the image exists, set the working directory to the parent directory */
 		if (image->exists())
 		{
-			current_file.assign(image->filename());
-			util::zippath_parent(current_directory, current_file.c_str());
+			m_current_file.assign(image->filename());
+			util::zippath_parent(m_current_directory, m_current_file.c_str());
 		} else
-			current_directory.assign(image->working_directory());
+			m_current_directory.assign(image->working_directory());
 
 		/* check to see if the path exists; if not clear it */
-		if (util::zippath_opendir(current_directory.c_str(), nullptr) != osd_file::error::NONE)
-			current_directory.clear();
+		if (util::zippath_opendir(m_current_directory.c_str(), nullptr) != osd_file::error::NONE)
+			m_current_directory.clear();
 	}
 }
 
@@ -86,11 +87,10 @@ menu_control_device_image::~menu_control_device_image()
 
 void menu_control_device_image::test_create(bool &can_create, bool &need_confirm)
 {
-	std::string path;
 	osd::directory::entry::entry_type file_type;
 
 	/* assemble the full path */
-	util::zippath_combine(path, current_directory.c_str(), current_file.c_str());
+	auto path = util::zippath_combine(m_current_directory.c_str(), m_current_file.c_str());
 
 	/* does a file or a directory exist at the path */
 	auto entry = osd_stat(path.c_str());
@@ -177,16 +177,8 @@ void menu_control_device_image::handle()
 {
 	switch(state) {
 	case START_FILE: {
-		bool can_create = false;
-		if(image->is_creatable()) {
-			util::zippath_directory *directory = nullptr;
-			osd_file::error err = util::zippath_opendir(current_directory.c_str(), &directory);
-			can_create = err == osd_file::error::NONE && !util::zippath_is_zip(directory);
-			if(directory)
-				util::zippath_closedir(directory);
-		}
-		submenu_result = -1;
-		menu::stack_push<menu_file_selector>(ui(), container, image, current_directory, current_file, true, image->image_interface()!=nullptr, can_create, &submenu_result);
+		submenu_result.filesel = menu_file_selector::result::INVALID;
+		menu::stack_push<menu_file_selector>(ui(), container, image, m_current_directory, m_current_file, true, image->image_interface()!=nullptr, image->is_creatable(), submenu_result.filesel);
 		state = SELECT_FILE;
 		break;
 	}
@@ -198,8 +190,8 @@ void menu_control_device_image::handle()
 		break;
 
 	case START_OTHER_PART: {
-		submenu_result = -1;
-		menu::stack_push<menu_software_parts>(ui(), container, swi, swp->interface(), &swp, true, &submenu_result);
+		submenu_result.swparts = menu_software_parts::result::INVALID;
+		menu::stack_push<menu_software_parts>(ui(), container, swi, swp->interface(), &swp, true, submenu_result.swparts);
 		state = SELECT_OTHER_PART;
 		break;
 	}
@@ -220,9 +212,9 @@ void menu_control_device_image::handle()
 			state = START_SOFTLIST;
 		else if(swi->has_multiple_parts(image->image_interface()))
 		{
-			submenu_result = -1;
+			submenu_result.swparts = menu_software_parts::result::INVALID;
 			swp = nullptr;
-			menu::stack_push<menu_software_parts>(ui(), container, swi, image->image_interface(), &swp, false, &submenu_result);
+			menu::stack_push<menu_software_parts>(ui(), container, swi, image->image_interface(), &swp, false, submenu_result.swparts);
 			state = SELECT_ONE_PART;
 		}
 		else
@@ -233,13 +225,13 @@ void menu_control_device_image::handle()
 		break;
 
 	case SELECT_ONE_PART:
-		switch(submenu_result) {
-		case menu_software_parts::T_ENTRY: {
+		switch(submenu_result.swparts) {
+		case menu_software_parts::result::ENTRY: {
 			load_software_part();
 			break;
 		}
 
-		case -1: // return to list
+		default: // return to list
 			state = SELECT_SOFTLIST;
 			break;
 
@@ -247,27 +239,27 @@ void menu_control_device_image::handle()
 		break;
 
 	case SELECT_OTHER_PART:
-		switch(submenu_result) {
-		case menu_software_parts::T_ENTRY:
+		switch(submenu_result.swparts) {
+		case menu_software_parts::result::ENTRY:
 			load_software_part();
 			break;
 
-		case menu_software_parts::T_FMGR:
+		case menu_software_parts::result::FMGR:
 			state = START_FILE;
 			handle();
 			break;
 
-		case menu_software_parts::T_EMPTY:
+		case menu_software_parts::result::EMPTY:
 			image->unload();
 			menu::stack_pop(machine());
 			break;
 
-		case menu_software_parts::T_SWLIST:
+		case menu_software_parts::result::SWLIST:
 			state = START_SOFTLIST;
 			handle();
 			break;
 
-		case -1: // return to system
+		case menu_software_parts::result::INVALID: // return to system
 			menu::stack_pop(machine());
 			break;
 
@@ -275,27 +267,27 @@ void menu_control_device_image::handle()
 		break;
 
 	case SELECT_FILE:
-		switch(submenu_result) {
-		case menu_file_selector::R_EMPTY:
+		switch(submenu_result.filesel) {
+		case menu_file_selector::result::EMPTY:
 			image->unload();
 			menu::stack_pop(machine());
 			break;
 
-		case menu_file_selector::R_FILE:
-			hook_load(current_file, false);
+		case menu_file_selector::result::FILE:
+			hook_load(m_current_file, false);
 			break;
 
-		case menu_file_selector::R_CREATE:
-			menu::stack_push<menu_file_create>(ui(), container, image, current_directory, current_file, &create_ok);
+		case menu_file_selector::result::CREATE:
+			menu::stack_push<menu_file_create>(ui(), container, image, m_current_directory, m_current_file, create_ok);
 			state = CHECK_CREATE;
 			break;
 
-		case menu_file_selector::R_SOFTLIST:
+		case menu_file_selector::result::SOFTLIST:
 			state = START_SOFTLIST;
 			handle();
 			break;
 
-		case -1: // return to system
+		default: // return to system
 			menu::stack_pop(machine());
 			break;
 		}
@@ -330,8 +322,7 @@ void menu_control_device_image::handle()
 		break;
 
 	case DO_CREATE: {
-		std::string path;
-		util::zippath_combine(path, current_directory.c_str(), current_file.c_str());
+		auto path = util::zippath_combine(m_current_directory.c_str(), m_current_file.c_str());
 		int err = image->create(path.c_str(), nullptr, nullptr);
 		if (err != 0)
 			machine().popmessage("Error: %s", image->error());

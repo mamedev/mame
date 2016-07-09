@@ -210,7 +210,7 @@ static floperr_t sap_get_indexed_sector_info(floppy_image_legacy *floppy, int he
 	return err;
 }
 
-static floperr_t sap_post_format(floppy_image_legacy *floppy, option_resolution *params)
+static floperr_t sap_post_format(floppy_image_legacy *floppy, util::option_resolution *params)
 {
 		int track,sector;
 		int pos;

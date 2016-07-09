@@ -54,6 +54,7 @@ const options_entry ui_options::s_option_entries[] =
 	{ OPTION_LAST_USED_FILTER,              "",         OPTION_STRING,      "latest used filter" },
 	{ OPTION_LAST_USED_MACHINE,             "",         OPTION_STRING,      "latest used machine" },
 	{ OPTION_INFO_AUTO_AUDIT,               "0",        OPTION_BOOLEAN,     "enable auto audit in the general info panel" },
+	{ OPTION_HIDE_ROMLESS,                  "1",        OPTION_BOOLEAN,     "hide romless machine from available list" },
 
 	// UI options
 	{ nullptr,                              nullptr,        OPTION_HEADER,      "UI OPTIONS" },

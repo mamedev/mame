@@ -409,7 +409,7 @@ static imgtoolerr_t rsdos_diskimage_readfile(imgtool_partition *partition, const
 
 
 
-static imgtoolerr_t rsdos_diskimage_writefile(imgtool_partition *partition, const char *fname, const char *fork, imgtool_stream *sourcef, option_resolution *writeoptions)
+static imgtoolerr_t rsdos_diskimage_writefile(imgtool_partition *partition, const char *fname, const char *fork, imgtool_stream *sourcef, util::option_resolution *writeoptions)
 {
 	floperr_t ferr;
 	imgtoolerr_t err;
@@ -441,8 +441,8 @@ static imgtoolerr_t rsdos_diskimage_writefile(imgtool_partition *partition, cons
 	if (err)
 		return err;
 
-	ent.ftype = option_resolution_lookup_int(writeoptions, RSDOS_OPTIONS_FTYPE);
-	ent.asciiflag = ((UINT8) option_resolution_lookup_int(writeoptions, RSDOS_OPTIONS_ASCII)) - 1;
+	ent.ftype = writeoptions->lookup_int(RSDOS_OPTIONS_FTYPE);
+	ent.asciiflag = UINT8(writeoptions->lookup_int(RSDOS_OPTIONS_ASCII)) - 1;
 	ent.lastsectorbytes_lsb = sz % 256;
 	ent.lastsectorbytes_msb = (((sz % 256) == 0) && (sz > 0)) ? 1 : 0;
 	gptr = &ent.first_granule;

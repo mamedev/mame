@@ -403,19 +403,19 @@ static imgtoolerr_t datapack_open( imgtool_image *image, imgtool_stream *stream)
 		return IMGTOOLERR_CORRUPTIMAGE;
 }
 
-static imgtoolerr_t datapack_create( imgtool_image *image, imgtool_stream *stream, option_resolution *opts)
+static imgtoolerr_t datapack_create( imgtool_image *image, imgtool_stream *stream, util::option_resolution *opts)
 {
 	psion_pack *pack = (psion_pack*)imgtool_image_extra_bytes(image);
 	static const UINT8 opk_magic[4] = {'O', 'P', 'K', 0x00};
 	UINT8 pack_head[8] = {0x40, 0x00, 0x59, 0x01, 0x01, 0x01, 0x00, 0x00};
 	UINT16 checksum;
 
-	pack_head[0] |= (option_resolution_lookup_int(opts, 'R')) ? 0x00 : 0x02;
-	pack_head[0] |= (option_resolution_lookup_int(opts, 'P')) ? 0x04 : 0x00;
-	pack_head[0] |= (option_resolution_lookup_int(opts, 'W')) ? 0x00 : 0x08;
-	pack_head[0] |= (option_resolution_lookup_int(opts, 'B')) ? 0x00 : 0x10;
-	pack_head[0] |= (option_resolution_lookup_int(opts, 'C')) ? 0x20 : 0x00;
-	pack_head[1] = option_resolution_lookup_int(opts, 'S');
+	pack_head[0] |= (opts->lookup_int('R')) ? 0x00 : 0x02;
+	pack_head[0] |= (opts->lookup_int('P')) ? 0x04 : 0x00;
+	pack_head[0] |= (opts->lookup_int('W')) ? 0x00 : 0x08;
+	pack_head[0] |= (opts->lookup_int('B')) ? 0x00 : 0x10;
+	pack_head[0] |= (opts->lookup_int('C')) ? 0x20 : 0x00;
+	pack_head[1] = opts->lookup_int('S');
 
 	checksum = head_checksum(pack_head);
 
@@ -543,15 +543,15 @@ static imgtoolerr_t datapack_read_file(imgtool_partition *partition, const char 
 		return IMGTOOLERR_FILENOTFOUND;
 }
 
-static imgtoolerr_t datapack_write_file( imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, option_resolution *opts)
+static imgtoolerr_t datapack_write_file( imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
 {
 	imgtool_image *image = imgtool_partition_image(partition);
 	psion_pack *pack = (psion_pack*)imgtool_image_extra_bytes(image);
 	static const UINT8 data_head[4] = {0x02, 0x80, 0x00, 0x00};
 	UINT8 head[3];
 	UINT16 size = 0;
-	UINT8 type = option_resolution_lookup_int(opts, 'T');
-	UINT8 file_id = option_resolution_lookup_int(opts, 'I');
+	UINT8 type = opts->lookup_int('T');
+	UINT8 file_id = opts->lookup_int('I');
 
 	if (!pack->eop)
 		return IMGTOOLERR_CORRUPTIMAGE;

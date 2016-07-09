@@ -196,7 +196,7 @@ void menu_display_actual::populate()
 	while (path.next(curpath, nullptr))
 		m_folders.push_back(curpath);
 
-	item_append((s_folders[m_ref].action == CHANGE) ? _("Change Folder") : _("Add Folder"), nullptr, 0, (void *)ADD_CHANGE);
+	item_append((s_folders[m_ref].action == CHANGE) ? _("Change Folder") : _("Add Folder"), "", 0, (void *)ADD_CHANGE);
 
 	if (m_folders.size() > 1)
 		item_append(_("Remove Folder"), "", 0, (void *)REMOVE);
@@ -444,7 +444,7 @@ void menu_add_change_folder::handle()
 						}
 					}
 				}
-				top_line = selected - (visible_lines / 2);
+				centre_selection();
 			}
 		}
 		else if (menu_event->iptkey == IPT_UI_CANCEL)

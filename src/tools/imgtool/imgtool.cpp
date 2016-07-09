@@ -53,7 +53,7 @@ struct imgtool_partition
 	void            (*close_enum)   (imgtool_directory *enumeration);
 	imgtoolerr_t    (*free_space)   (imgtool_partition *partition, UINT64 *size);
 	imgtoolerr_t    (*read_file)    (imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *destf);
-	imgtoolerr_t    (*write_file)   (imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, option_resolution *opts);
+	imgtoolerr_t    (*write_file)   (imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts);
 	imgtoolerr_t    (*delete_file)  (imgtool_partition *partition, const char *filename);
 	imgtoolerr_t    (*list_forks)   (imgtool_partition *partition, const char *path, imgtool_forkent *ents, size_t len);
 	imgtoolerr_t    (*create_dir)   (imgtool_partition *partition, const char *path);
@@ -788,7 +788,7 @@ imgtoolerr_t imgtool_partition_open(imgtool_image *image, int partition_index, i
 	p->next_enum                    = (imgtoolerr_t (*)(imgtool_directory *, imgtool_dirent *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_NEXT_ENUM);
 	p->free_space                   = (imgtoolerr_t (*)(imgtool_partition *, UINT64 *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_FREE_SPACE);
 	p->read_file                    = (imgtoolerr_t (*)(imgtool_partition *, const char *, const char *, imgtool_stream *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_READ_FILE);
-	p->write_file                   = (imgtoolerr_t (*)(imgtool_partition *, const char *, const char *, imgtool_stream *, option_resolution *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_WRITE_FILE);
+	p->write_file                   = (imgtoolerr_t (*)(imgtool_partition *, const char *, const char *, imgtool_stream *, util::option_resolution *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_WRITE_FILE);
 	p->delete_file                  = (imgtoolerr_t (*)(imgtool_partition *, const char *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_DELETE_FILE);
 	p->list_forks                   = (imgtoolerr_t (*)(imgtool_partition *, const char *, imgtool_forkent *, size_t)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_LIST_FORKS);
 	p->create_dir                   = (imgtoolerr_t (*)(imgtool_partition *, const char *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_CREATE_DIR);
@@ -1018,15 +1018,15 @@ int imgtool_validitychecks(void)
 			if (module->createimage_optguide && module->createimage_optspec)
 			{
 				guide_entry = module->createimage_optguide;
-				while(guide_entry->option_type != OPTIONTYPE_END)
+				while (guide_entry->option_type != OPTIONTYPE_END)
 				{
-					if (option_resolution_contains(module->createimage_optspec, guide_entry->parameter))
+					if (util::option_resolution::contains(module->createimage_optspec, guide_entry->parameter))
 					{
-						switch(guide_entry->option_type)
+						switch (guide_entry->option_type)
 						{
 							case OPTIONTYPE_INT:
 							case OPTIONTYPE_ENUM_BEGIN:
-								err = (imgtoolerr_t)option_resolution_getdefault(module->createimage_optspec,
+								err = (imgtoolerr_t)util::option_resolution::get_default(module->createimage_optspec,
 									guide_entry->parameter, &val);
 								if (err)
 									goto done;
@@ -1088,7 +1088,7 @@ char *imgtool_temp_str(void)
 ***************************************************************************/
 
 static imgtoolerr_t internal_open(const imgtool_module *module, const char *fname,
-	int read_or_write, option_resolution *createopts, imgtool_image **outimg)
+	int read_or_write, util::option_resolution *createopts, imgtool_image **outimg)
 {
 	imgtoolerr_t err;
 	imgtool_stream *f = nullptr;
@@ -1211,33 +1211,21 @@ void imgtool_image_close(imgtool_image *image)
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_image_create(const imgtool_module *module, const char *fname,
-	option_resolution *opts, imgtool_image **image)
+	util::option_resolution *opts, imgtool_image **image)
 {
-	imgtoolerr_t err;
-	option_resolution *alloc_resolution = nullptr;
+	std::unique_ptr<util::option_resolution> alloc_resolution;
 
 	/* allocate dummy options if necessary */
 	if (!opts && module->createimage_optguide)
 	{
-		alloc_resolution = option_resolution_create(module->createimage_optguide, module->createimage_optspec);
-		if (!alloc_resolution)
-		{
-			err = (imgtoolerr_t)IMGTOOLERR_OUTOFMEMORY;
-			goto done;
-		}
-		opts = alloc_resolution;
+		try { alloc_resolution.reset(new util::option_resolution(module->createimage_optguide, module->createimage_optspec)); }
+		catch (...) { return (imgtoolerr_t)IMGTOOLERR_OUTOFMEMORY; }
+		opts = alloc_resolution.get();
 	}
 	if (opts)
-		option_resolution_finish(opts);
+		opts->finish();
 
-	err = internal_open(module, fname, OSD_FOPEN_RW_CREATE, opts, image);
-	if (err)
-		goto done;
-
-done:
-	if (alloc_resolution)
-		option_resolution_close(alloc_resolution);
-	return err;
+	return internal_open(module, fname, OSD_FOPEN_RW_CREATE, opts, image);
 }
 
 
@@ -1247,7 +1235,7 @@ done:
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_image_create_byname(const char *modulename, const char *fname,
-	option_resolution *opts, imgtool_image **image)
+	util::option_resolution *opts, imgtool_image **image)
 {
 	const imgtool_module *module;
 
@@ -1949,12 +1937,12 @@ done:
     to a new file on an image with a stream
 -------------------------------------------------*/
 
-imgtoolerr_t imgtool_partition_write_file(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, option_resolution *opts, filter_getinfoproc filter)
+imgtoolerr_t imgtool_partition_write_file(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts, filter_getinfoproc filter)
 {
 	imgtoolerr_t err;
 	char *buf = nullptr;
 	char *s;
-	option_resolution *alloc_resolution = nullptr;
+	std::unique_ptr<util::option_resolution> alloc_resolution;
 	char *alloc_path = nullptr;
 	UINT64 free_space;
 	UINT64 file_size;
@@ -2012,16 +2000,16 @@ imgtoolerr_t imgtool_partition_write_file(imgtool_partition *partition, const ch
 		/* allocate dummy options if necessary */
 		if (!opts && partition->writefile_optguide)
 		{
-			alloc_resolution = option_resolution_create(partition->writefile_optguide, partition->writefile_optspec);
-			if (!alloc_resolution)
+			try { alloc_resolution.reset(new util::option_resolution(partition->writefile_optguide, partition->writefile_optspec)); }
+			catch (...)
 			{
 				err = IMGTOOLERR_OUTOFMEMORY;
 				goto done;
 			}
-			opts = alloc_resolution;
+			opts = alloc_resolution.get();
 		}
 		if (opts)
-			option_resolution_finish(opts);
+			opts->finish();
 
 		/* if free_space is implemented; do a quick check to see if space is available */
 		if (partition->free_space)
@@ -2056,8 +2044,6 @@ done:
 		free(buf);
 	if (alloc_path)
 		free(alloc_path);
-	if (alloc_resolution)
-		option_resolution_close(alloc_resolution);
 	return err;
 }
 
@@ -2137,7 +2123,7 @@ done:
 -------------------------------------------------*/
 
 imgtoolerr_t imgtool_partition_put_file(imgtool_partition *partition, const char *newfname, const char *fork,
-	const char *source, option_resolution *opts, filter_getinfoproc filter)
+	const char *source, util::option_resolution *opts, filter_getinfoproc filter)
 {
 	imgtoolerr_t err;
 	imgtool_stream *f = nullptr;

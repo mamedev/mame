@@ -175,7 +175,7 @@ done:
 
 static imgtoolerr_t basic_writefile(const basictokens *tokens,
 	imgtool_partition *partition, const char *filename,
-	const char *fork, imgtool_stream *sourcef, option_resolution *opts)
+	const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
 	imgtool_stream *mem_stream;
@@ -2965,7 +2965,7 @@ static imgtoolerr_t cocobas_readfile(imgtool_partition *partition, const char *f
 }
 
 static imgtoolerr_t cocobas_writefile(imgtool_partition *partition, const char *filename,
-	const char *fork, imgtool_stream *sourcef, option_resolution *opts)
+	const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
 {
 	return basic_writefile(&cocobas_tokens, partition, filename, fork, sourcef, opts);
 }
@@ -3009,7 +3009,7 @@ static imgtoolerr_t dragonbas_readfile(imgtool_partition *partition, const char 
 }
 
 static imgtoolerr_t dragonbas_writefile(imgtool_partition *partition, const char *filename,
-	const char *fork, imgtool_stream *sourcef, option_resolution *opts)
+	const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
 {
 	return basic_writefile(&dragonbas_tokens, partition, filename, fork, sourcef, opts);
 }
@@ -3054,7 +3054,7 @@ static imgtoolerr_t vzbas_readfile(imgtool_partition *partition, const char *fil
 }
 
 static imgtoolerr_t vzbas_writefile(imgtool_partition *partition, const char *filename,
-	const char *fork, imgtool_stream *sourcef, option_resolution *opts)
+	const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
 {
 	return basic_writefile(&vzbas_tokens, partition, filename, fork, sourcef, opts);
 }
@@ -3098,7 +3098,7 @@ static imgtoolerr_t bml3bas_readfile(imgtool_partition *partition, const char *f
 }
 
 static imgtoolerr_t bml3bas_writefile(imgtool_partition *partition, const char *filename,
-	const char *fork, imgtool_stream *sourcef, option_resolution *opts)
+	const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
 {
 	return basic_writefile(&bml3bas_tokens, partition, filename, fork, sourcef, opts);
 }

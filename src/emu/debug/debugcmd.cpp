@@ -39,7 +39,7 @@ const size_t debugger_commands::MAX_GLOBALS = 1000;
 
 bool debugger_commands::cheat_address_is_valid(address_space &space, offs_t address)
 {
-	return m_cpu.translate(space, TRANSLATE_READ, &address) && (space.get_write_ptr(address) != nullptr);
+	return space.device().memory().translate(space.spacenum(), TRANSLATE_READ, address) && (space.get_write_ptr(address) != nullptr);
 }
 
 
@@ -1727,7 +1727,7 @@ void debugger_commands::execute_dump(int ref, int params, const char *param[])
 			if (i + j <= endoffset)
 			{
 				offs_t curaddr = i + j;
-				if (m_cpu.translate(*space, TRANSLATE_READ_DEBUG, &curaddr))
+				if (space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr))
 				{
 					UINT64 value = m_cpu.read_memory(*space, i + j, width, TRUE);
 					util::stream_format(output, " %0*X", width * 2, value);
@@ -1748,7 +1748,7 @@ void debugger_commands::execute_dump(int ref, int params, const char *param[])
 			for (UINT64 j = 0; j < 16 && (i + j) <= endoffset; j++)
 			{
 				offs_t curaddr = i + j;
-				if (m_cpu.translate(*space, TRANSLATE_READ_DEBUG, &curaddr))
+				if (space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr))
 				{
 					UINT8 byte = m_cpu.read_byte(*space, i + j, TRUE);
 					util::stream_format(output, "%c", (byte >= 32 && byte < 127) ? byte : '.');
@@ -2379,7 +2379,7 @@ void debugger_commands::execute_dasm(int ref, int params, const char *param[])
 
 		/* make sure we can translate the address */
 		tempaddr = pcbyte;
-		if (m_cpu.translate(*space, TRANSLATE_FETCH_DEBUG, &tempaddr))
+		if (space->device().memory().translate(space->spacenum(), TRANSLATE_FETCH_DEBUG, tempaddr))
 		{
 			UINT8 opbuf[64], argbuf[64];
 
@@ -2391,7 +2391,7 @@ void debugger_commands::execute_dasm(int ref, int params, const char *param[])
 			}
 
 			/* disassemble the result */
-			i += numbytes = space->device().debug()->disassemble(disasm, offset + i, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
+			i += numbytes = dasmintf->disassemble(disasm, offset + i, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
 		}
 
 		/* print the bytes */
@@ -2544,7 +2544,12 @@ void debugger_commands::execute_history(int ref, int params, const char *param[]
 
 	/* loop over lines */
 	device_disasm_interface *dasmintf;
-	int maxbytes = space->device().interface(dasmintf) ? dasmintf->max_opcode_bytes() : 1;
+	if (!space->device().interface(dasmintf))
+	{
+		m_console.printf("No disassembler available for %s\n", space->device().name());
+		return;
+	}
+	int maxbytes = dasmintf->max_opcode_bytes();
 	for (int index = 0; index < (int) count; index++)
 	{
 		offs_t pc = debug->history_pc(-index);
@@ -2559,7 +2564,7 @@ void debugger_commands::execute_history(int ref, int params, const char *param[]
 		}
 
 		char buffer[200];
-		debug->disassemble(buffer, pc, opbuf, argbuf);
+		dasmintf->disassemble(buffer, pc, opbuf, argbuf);
 
 		m_console.printf("%0*X: %s\n", space->logaddrchars(), pc, buffer);
 	}
@@ -2761,7 +2766,7 @@ void debugger_commands::execute_map(int ref, int params, const char *param[])
 	{
 		static const char *const intnames[] = { "Read", "Write", "Fetch" };
 		taddress = space->address_to_byte(address) & space->bytemask();
-		if (m_cpu.translate(*space, intention, &taddress))
+		if (space->device().memory().translate(space->spacenum(), intention, taddress))
 		{
 			const char *mapname = space->get_handler_string((intention == TRANSLATE_WRITE_DEBUG) ? ROW_WRITE : ROW_READ, taddress);
 			m_console.printf(

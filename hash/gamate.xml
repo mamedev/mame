@@ -195,6 +195,18 @@ C1066 - ??
 		</part>
 	</software>
 
+	<software name="volpanic" supported="no">
+		<description>Volcano Panic</description>
+		<year>1991</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="C1016" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="c1-016.bin" size="131072" crc="1c2921df" sha1="958f4936f3aa8db5e76d315ee6acc6aee0e010b4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dvcastle" supported="no">
 		<description>Devil Castle</description>
 		<year>1991</year>

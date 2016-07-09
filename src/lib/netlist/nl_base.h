@@ -238,11 +238,11 @@ class NETLIB_NAME(name) : public device_t
 //============================================================
 
 #if defined(MAME_DEBUG)
-#define nl_assert(x)               do { if (1) if (!(x)) throw fatalerror_e(plib::pfmt("assert: {1}:{2}: {3}")(__FILE__)(__LINE__)(#x) ); } while (0)
+#define nl_assert(x)               do { if (1) if (!(x)) throw nl_exception(plib::pfmt("assert: {1}:{2}: {3}")(__FILE__)(__LINE__)(#x) ); } while (0)
 #else
-#define nl_assert(x)               do { if (0) if (!(x)) throw fatalerror_e(plib::pfmt("assert: {1}:{2}: {3}")(__FILE__)(__LINE__)(#x) ); } while (0)
+#define nl_assert(x)               do { if (0) if (!(x)) throw nl_exception(plib::pfmt("assert: {1}:{2}: {3}")(__FILE__)(__LINE__)(#x) ); } while (0)
 #endif
-#define nl_assert_always(x, msg)    do { if (!(x)) throw fatalerror_e(plib::pfmt("Fatal error: {1}\nCaused by assert: {2}:{3}: {4}")(msg)(__FILE__)(__LINE__)(#x)); } while (0)
+#define nl_assert_always(x, msg)    do { if (!(x)) throw nl_exception(plib::pfmt("Fatal error: {1}\nCaused by assert: {2}:{3}: {4}")(msg)(__FILE__)(__LINE__)(#x)); } while (0)
 
 
 // -----------------------------------------------------------------------------
@@ -270,12 +270,12 @@ namespace netlist
 	//  Exceptions
 	//============================================================
 
-	class fatalerror_e : public plib::pexception
+	class nl_exception : public plib::pexception
 	{
 	public:
-		explicit fatalerror_e(const pstring text) : plib::pexception(text) { }
-		fatalerror_e(const fatalerror_e &e) : plib::pexception(e) { }
-		virtual ~fatalerror_e() noexcept {}
+		explicit nl_exception(const pstring text) : plib::pexception(text) { }
+		nl_exception(const nl_exception &e) : plib::pexception(e) { }
+		virtual ~nl_exception() noexcept {}
 	};
 
 	class logic_output_t;

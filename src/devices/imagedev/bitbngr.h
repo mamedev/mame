@@ -18,7 +18,7 @@ public:
 
 	// image-level overrides
 	virtual bool call_load() override;
-	virtual bool call_create(int format_type, option_resolution *format_options) override;
+	virtual bool call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 
 	// image device

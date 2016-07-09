@@ -17,6 +17,11 @@
 #ifndef __DIIMAGE_H__
 #define __DIIMAGE_H__
 
+#include <memory>
+#include <string>
+#include <vector>
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -72,22 +77,19 @@ struct image_device_type_info
 class image_device_format
 {
 public:
-	image_device_format(const char *name, const char *description, const char *extensions, const char *optspec)
-		: m_name(name),
-			m_description(description),
-			m_extensions(extensions),
-			m_optspec(optspec)  { }
+	image_device_format(const std::string &name, const std::string &description, const std::string &extensions, const std::string &optspec);
+	~image_device_format();
 
-	const char *name() const { return m_name.c_str(); }
-	const char *description() const { return m_description.c_str(); }
-	const char *extensions() const { return m_extensions.c_str(); }
-	const char *optspec() const { return m_optspec.c_str(); }
+	const std::string &name() const { return m_name; }
+	const std::string &description() const { return m_description; }
+	const std::vector<std::string> &extensions() const { return m_extensions; }
+	const std::string &optspec() const { return m_optspec; }
 
 private:
-	std::string m_name;
-	std::string m_description;
-	std::string m_extensions;
-	std::string m_optspec;
+	std::string					m_name;
+	std::string					m_description;
+	std::vector<std::string>	m_extensions;
+	std::string					m_optspec;
 };
 
 
@@ -133,6 +135,8 @@ typedef void (*device_image_partialhash_func)(hash_collection &, const unsigned 
 class device_image_interface : public device_interface
 {
 public:
+	typedef std::vector<std::unique_ptr<image_device_format>> formatlist_type;
+
 	// construction/destruction
 	device_image_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_image_interface();
@@ -145,7 +149,7 @@ public:
 
 	virtual bool call_load() { return FALSE; }
 	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) { return FALSE; }
-	virtual bool call_create(int format_type, option_resolution *format_options) { return FALSE; }
+	virtual bool call_create(int format_type, util::option_resolution *format_options) { return FALSE; }
 	virtual void call_unload() { }
 	virtual std::string call_display() { return std::string(); }
 	virtual device_image_partialhash_func get_partial_hash() const { return nullptr; }
@@ -221,13 +225,13 @@ public:
 	const char *instance_name() const { return m_instance_name.c_str(); }
 	const char *brief_instance_name() const { return m_brief_instance_name.c_str(); }
 	bool uses_file_extension(const char *file_extension) const;
-	const std::vector<std::unique_ptr<image_device_format>> &formatlist() const { return m_formatlist; }
+	const formatlist_type &formatlist() const { return m_formatlist; }
 
 	bool load(const char *path);
 	bool open_image_file(emu_options &options);
 	bool finish_load();
 	void unload();
-	bool create(const char *path, const image_device_format *create_format, option_resolution *create_args);
+	bool create(const char *path, const image_device_format *create_format, util::option_resolution *create_args);
 	bool load_software(software_list_device &swlist, const char *swname, const rom_entry *entry);
 	int reopen_for_write(const char *path);
 
@@ -243,7 +247,7 @@ public:
 	bool user_loadable() const { return m_user_loadable; }
 
 protected:
-	bool load_internal(const char *path, bool is_create, int create_format, option_resolution *create_args, bool just_load);
+	bool load_internal(const char *path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load);
 	void determine_open_plan(int is_create, UINT32 *open_plan);
 	image_error_t load_image_by_path(UINT32 open_flags, const char *path);
 	void clear();
@@ -307,7 +311,7 @@ protected:
 
 	/* special - used when creating */
 	int m_create_format;
-	option_resolution *m_create_args;
+	util::option_resolution *m_create_args;
 
 	hash_collection m_hash;
 
@@ -315,7 +319,7 @@ protected:
 	std::string m_instance_name;
 
 	/* creation info */
-	std::vector<std::unique_ptr<image_device_format>> m_formatlist;
+	formatlist_type m_formatlist;
 
 	/* in the case of arcade cabinet with fixed carts inserted,
 	 we want to disable command line cart loading... */

@@ -16,7 +16,7 @@
 #include "machine/i8251.h"
 #include "machine/ram.h"
 #include "machine/upd1990a.h"
-#include "sound/speaker.h"
+#include "sound/beep.h"
 #include "video/upd3301.h"
 
 #define Z80_TAG         "z80"
@@ -40,7 +40,7 @@ public:
 			m_cassette(*this, "cassette"),
 			m_centronics(*this, CENTRONICS_TAG),
 			m_cent_data_out(*this, "cent_data_out"),
-			m_speaker(*this, "speaker"),
+			m_beep(*this, "beeper"),
 			m_ram(*this, RAM_TAG),
 			m_rom(*this, Z80_TAG),
 			m_char_rom(*this, UPD3301_TAG)
@@ -53,7 +53,7 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
-	required_device<speaker_sound_device> m_speaker;
+	required_device<beep_device> m_beep;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;

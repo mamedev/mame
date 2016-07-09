@@ -87,6 +87,12 @@
 #define MCFG_DUSCC_OUT_SYNCA_CB(_devcb) \
 	devcb = &duscc_device::set_out_synca_callback(*device, DEVCB_##_devcb);
 
+#define MCFG_DUSCC_OUT_TRXCA_CB(_devcb) \
+	devcb = &duscc_device::set_out_trxca_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_DUSCC_OUT_RTXCA_CB(_devcb) \
+	devcb = &duscc_device::set_out_rtxca_callback(*device, DEVCB_##_devcb);
+
 // Port B callbacks
 #define MCFG_DUSCC_OUT_TXDB_CB(_devcb) \
 	devcb = &duscc_device::set_out_txdb_callback(*device, DEVCB_##_devcb);
@@ -100,7 +106,11 @@
 #define MCFG_DUSCC_OUT_SYNCB_CB(_devcb) \
 	devcb = &duscc_device::set_out_syncb_callback(*device, DEVCB_##_devcb);
 
+#define MCFG_DUSCC_OUT_TRXCB_CB(_devcb) \
+	devcb = &duscc_device::set_out_trxcb_callback(*device, DEVCB_##_devcb);
 
+#define MCFG_DUSCC_OUT_RTXCB_CB(_devcb) \
+	devcb = &duscc_device::set_out_rtxcb_callback(*device, DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -280,7 +290,11 @@ protected:
 		REG_CCR_DISABLE_TX  = 0x03,
 		REG_CCR_RESET_RX    = 0x40,
 		REG_CCR_ENABLE_RX   = 0x42,
-		REG_CCR_DISABLE_RX  = 0x43
+		REG_CCR_DISABLE_RX  = 0x43,
+		REG_CCR_START_TIMER = 0x80,
+		REG_CCR_STOP_TIMER	= 0x81,
+		REG_CCR_PRST_FFFF	= 0x82,
+		REG_CCR_PRST_CTPR	= 0x83,
 	};
 
 	enum
@@ -406,6 +420,7 @@ protected:
 
 	enum
 	{
+		REG_ICTSR_ZERO_DET			= 0x40,
 		REG_ICTSR_DELTA_CTS         = 0x10,
 		REG_ICTSR_DCD               = 0x08,
 		REG_ICTSR_CTS               = 0x04,
@@ -472,10 +487,25 @@ protected:
 		REG_TELR    = 0x5f,
 	};
 
+	// Timers
+	emu_timer *duscc_timer;
+	emu_timer *rtxc_timer;
+	emu_timer *trxc_timer;
+
+	UINT8 m_rtxc;
+	UINT8 m_trxc;
+	
+
 	enum
 	{
-		TIMER_ID_BAUD,
-		TIMER_ID_XTAL,
+		REG_CTCR_ZERO_DET_INT	= 0x80,
+		REG_CTCR_ZERO_DET_CTL	= 0x40,
+		REG_CTCR_TIM_OC			= 0x20,
+	};
+
+	enum
+	{
+		TIMER_ID,
 		TIMER_ID_RTXC,
 		TIMER_ID_TRXC
 	};
@@ -581,11 +611,15 @@ public:
 	template<class _Object> static devcb_base &set_out_dtra_callback(device_t &device, _Object object) { return downcast<duscc_device &>(device).m_out_dtra_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_rtsa_callback(device_t &device, _Object object) { return downcast<duscc_device &>(device).m_out_rtsa_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_synca_callback(device_t &device, _Object object) { return downcast<duscc_device &>(device).m_out_synca_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_rtxca_callback(device_t &device, _Object object) { return downcast<duscc_device &>(device).m_out_rtxca_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_trxca_callback(device_t &device, _Object object) { return downcast<duscc_device &>(device).m_out_trxca_cb.set_callback(object); }
 
 	template<class _Object> static devcb_base &set_out_txdb_callback(device_t &device, _Object object) { return downcast<duscc_device &>(device).m_out_txdb_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_dtrb_callback(device_t &device, _Object object) { return downcast<duscc_device &>(device).m_out_dtrb_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_rtsb_callback(device_t &device, _Object object) { return downcast<duscc_device &>(device).m_out_rtsb_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_syncb_callback(device_t &device, _Object object) { return downcast<duscc_device &>(device).m_out_syncb_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_rtxcb_callback(device_t &device, _Object object) { return downcast<duscc_device &>(device).m_out_rtxcb_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_trxcb_callback(device_t &device, _Object object) { return downcast<duscc_device &>(device).m_out_trxcb_cb.set_callback(object); }
 
 	static void configure_channels(device_t &device, int rxa, int txa, int rxb, int txb)
 	{
@@ -674,11 +708,15 @@ protected:
 	devcb_write_line    m_out_dtra_cb;
 	devcb_write_line    m_out_rtsa_cb;
 	devcb_write_line    m_out_synca_cb;
+	devcb_write_line    m_out_rtxca_cb;
+	devcb_write_line    m_out_trxca_cb;
 
 	devcb_write_line    m_out_txdb_cb;
 	devcb_write_line    m_out_dtrb_cb;
 	devcb_write_line    m_out_rtsb_cb;
 	devcb_write_line    m_out_syncb_cb;
+	devcb_write_line    m_out_rtxcb_cb;
+	devcb_write_line    m_out_trxcb_cb;
 
 	devcb_write_line    m_out_int_cb;
 

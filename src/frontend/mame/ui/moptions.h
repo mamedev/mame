@@ -48,6 +48,8 @@
 #define OPTION_LAST_USED_FILTER       "last_used_filter"
 #define OPTION_LAST_USED_MACHINE      "last_used_machine"
 #define OPTION_INFO_AUTO_AUDIT        "info_audit_enabled"
+#define OPTION_HIDE_ROMLESS           "hide_romless"
+
 
 // core UI options
 #define OPTION_INFOS_SIZE             "infos_text_size"
@@ -110,6 +112,7 @@ public:
 	const char *last_used_machine() const { return value(OPTION_LAST_USED_MACHINE); }
 	const char *last_used_filter() const { return value(OPTION_LAST_USED_FILTER); }
 	bool info_audit() const { return bool_value(OPTION_INFO_AUTO_AUDIT); }
+	bool hide_romless() const { return bool_value(OPTION_HIDE_ROMLESS); }
 
 	// UI options
 	float infos_size() const { return float_value(OPTION_INFOS_SIZE); }

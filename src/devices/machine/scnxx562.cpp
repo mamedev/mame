@@ -150,10 +150,14 @@ duscc_device::duscc_device(const machine_config &mconfig, device_type type, cons
 		m_out_dtra_cb(*this),
 		m_out_rtsa_cb(*this),
 		m_out_synca_cb(*this),
+		m_out_rtxca_cb(*this),
+		m_out_trxca_cb(*this),
 		m_out_txdb_cb(*this),
 		m_out_dtrb_cb(*this),
 		m_out_rtsb_cb(*this),
 		m_out_syncb_cb(*this),
+		m_out_rtxcb_cb(*this),
+		m_out_trxcb_cb(*this),
 		m_out_int_cb(*this),
 		m_variant(variant),
 		m_gsr(0),
@@ -174,10 +178,14 @@ duscc_device::duscc_device(const machine_config &mconfig, const char *tag, devic
 		m_out_dtra_cb(*this),
 		m_out_rtsa_cb(*this),
 		m_out_synca_cb(*this),
+		m_out_rtxca_cb(*this),
+		m_out_trxca_cb(*this),
 		m_out_txdb_cb(*this),
 		m_out_dtrb_cb(*this),
 		m_out_rtsb_cb(*this),
 		m_out_syncb_cb(*this),
+		m_out_rtxcb_cb(*this),
+		m_out_trxcb_cb(*this),
 		m_out_int_cb(*this),
 		m_variant(TYPE_DUSCC),
 		m_gsr(0),
@@ -208,16 +216,22 @@ duscc68C562_device::duscc68C562_device(const machine_config &mconfig, const char
 void duscc_device::device_start()
 {
 	LOG(("%s\n", FUNCNAME));
+
 	// resolve callbacks
 	m_out_txda_cb.resolve_safe();
 	m_out_dtra_cb.resolve_safe();
 	m_out_rtsa_cb.resolve_safe();
 	m_out_synca_cb.resolve_safe();
+	m_out_rtxca_cb.resolve_safe();
+	m_out_trxca_cb.resolve_safe();
 
 	m_out_txdb_cb.resolve_safe();
 	m_out_dtrb_cb.resolve_safe();
 	m_out_rtsb_cb.resolve_safe();
 	m_out_syncb_cb.resolve_safe();
+	m_out_rtxcb_cb.resolve_safe();
+	m_out_trxcb_cb.resolve_safe();
+
 	m_out_int_cb.resolve_safe();
 
 	// state saving - stuff with runtime values
@@ -531,6 +545,10 @@ duscc_channel::duscc_channel(const machine_config &mconfig, const char *tag, dev
 		=  m_cid =  /*m_ivr =  m_icr = m_sea =  m_ivrm = */  m_mrr =  m_ier1 
 		=  m_ier2 =  m_ier3 =  m_trcr =  m_rflr =  m_ftlr =  m_trmsr =  m_telr = 0;
 
+	// Reset all states
+	m_rtxc = 0;
+	m_trxc = 0;
+
 	for (auto & elem : m_rx_data_fifo)
 		elem = 0;
 	for (auto & elem : m_rx_error_fifo)
@@ -558,6 +576,11 @@ void duscc_channel::device_start()
 	m_tx_fifo_wp = m_tx_fifo_rp = 0;
 
 	m_cid = (m_uart->m_variant & SET_CMOS) ? 0x7f : 0xff; // TODO: support CMOS rev A = 0xbf
+
+	// Timers
+	duscc_timer = timer_alloc(TIMER_ID);
+	rtxc_timer = timer_alloc(TIMER_ID_RTXC);
+	trxc_timer = timer_alloc(TIMER_ID_TRXC);
 
 	// state saving
 	save_item(NAME(m_cmr1));
@@ -600,6 +623,8 @@ void duscc_channel::device_start()
 	save_item(NAME(m_ftlr));
 	save_item(NAME(m_trmsr));
 	save_item(NAME(m_telr));
+	save_item(NAME(m_rtxc));
+	save_item(NAME(m_trxc));
 	save_item(NAME(m_rx_data_fifo));
 	save_item(NAME(m_rx_error_fifo));
 	save_item(NAME(m_rx_fifo_rp));
@@ -665,6 +690,9 @@ void duscc_channel::device_reset()
 	m_ftlr		=0x33;
 	m_trmsr		=0x00;
 	m_telr		=0x10;
+	m_rtxc		=0x00;
+	m_trxc		=0x00;
+
 
 	// reset external lines TODO: check relation to control bits and reset
 	set_rts(1);
@@ -681,10 +709,220 @@ void duscc_channel::device_reset()
 
 void duscc_channel::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
+	switch(id)
+	{
+	case TIMER_ID: 
+	    if (m_ct-- == 0) // Zero detect
+	    {
+			m_ictsr |= REG_ICTSR_ZERO_DET; // set zero detection bit
+
+			// Generate interrupt?
+			if ( ( (m_ctcr & REG_CTCR_ZERO_DET_INT) == 1 ) && 
+				 ( (m_uart->m_icr & (m_index == duscc_device::CHANNEL_A ? duscc_device::REG_ICR_CHA : duscc_device::REG_ICR_CHB) ) != 0) ) 
+			{
+				//trigger_interrupt();
+			}
+
+			// Preload or rollover?
+			if (( m_ctcr & REG_CTCR_ZERO_DET_CTL) == 0)
+			{
+				m_ct = m_ctpr;
+			}
+			else 
+			{
+				m_ct = 0xffff;
+			}
+
+			// Is Counter/Timer output on the RTxC pin?
+			if (( m_pcr & REG_PCR_RTXC_MASK) == REG_PCR_RTXC_CNTR_OUT)
+			{
+				if ((m_ctcr & REG_CTCR_TIM_OC) == 0) // Toggle?
+				{
+					m_rtxc = (~m_rtxc) & 1;
+				}
+				else // Pulse!
+				{
+					m_rtxc = 1;
+					rtxc_timer->adjust(attotime::from_hz(clock()), TIMER_ID_RTXC, attotime::from_hz(clock()));
+				}
+				if (m_index == duscc_device::CHANNEL_A)
+					m_uart->m_out_rtxca_cb(m_rtxc);
+				else
+					m_uart->m_out_rtxcb_cb(m_rtxc);
+			}
+
+			// Is Counter/Timer output on the TRXC pin?
+			if (( m_pcr & REG_PCR_TRXC_MASK) == REG_PCR_TRXC_CNTR_OUT)
+			{
+				if ((m_ctcr & REG_CTCR_TIM_OC) == 0) // Toggle?
+				{
+					m_trxc = (~m_trxc) & 1;
+				}
+				else // Pulse!
+				{
+					m_trxc = 1;
+					trxc_timer->adjust(attotime::from_hz(clock()), TIMER_ID_TRXC, attotime::from_hz(clock()));
+				}
+				if (m_index == duscc_device::CHANNEL_A)
+					m_uart->m_out_trxca_cb(m_trxc);
+				else
+					m_uart->m_out_trxcb_cb(m_trxc);
+			}
+		}
+		else
+		{   // clear zero detection bit
+			m_ictsr &= ~REG_ICTSR_ZERO_DET;
+		}
+		break;
+	case TIMER_ID_RTXC: // Terminate zero detection pulse 
+		m_rtxc = 0;
+		rtxc_timer->adjust(attotime::never);
+		if (m_index == duscc_device::CHANNEL_A)
+			m_uart->m_out_rtxca_cb(m_rtxc);
+		else
+			m_uart->m_out_rtxcb_cb(m_rtxc);
+		break;
+	case TIMER_ID_TRXC:  // Terminate zero detection pulse 
+		m_trxc = 0;
+		trxc_timer->adjust(attotime::never);
+		if (m_index == duscc_device::CHANNEL_A)
+			m_uart->m_out_trxca_cb(m_trxc);
+		else
+			m_uart->m_out_trxcb_cb(m_trxc);
+		break;
+	default: 
+		LOGR(("Unhandled Timer ID %d\n", id)); 
+		break; 
+	}
 	//  LOG(("%s %d\n", FUNCNAME, id));
 	device_serial_interface::device_timer(timer, id, param, ptr);
 }
 
+/*	The DUSCC 16 bit Timer
+	Counter/Timer Control and Value Registers
+	There are five registers in this set consisting of the following:
+	1. Counterltimer control register (CTCRAlB).
+	2. Counterltimer preset Highland Low registers (CTPRHAlB, CTPRLAlB). 
+	3. Counter/bmer (current value) High and Low registers (CTHAlB, CTLAlB) 
+	The control register contains the operational information for the counterltimer. The preset registers contain the count which is
+	loaded into the counterltimer circuits. The third group contains the current value of the counterltimer as it operates.
+*/
+/* Counter/Timer Control Register (CTCRA/CTCRB)
+	[7] Zero Detect Interrupt - This bit determines whether the assertion of the CIT ZERO COUNT status bit (ICTSR[6)) causes an 
+	interrupt to be generated if set to 1 and the Master interrupt control bit (ICR[0:1]) is set
+	[6] Zero Detect Control - his bit determines the action of the counter upon reaching zero count
+	0 - The counter/timer is preset to the value contained in the counterltimer preset registers (CTPRL, CTPRH) at the next clock edge.
+	1 - The counterltimer continues counting without preset. The value at the next clock edge will be H'FFFF'.
+	[5] CounterlTimer Output Control - This bit selects the output waveform when the counterltimer is selected to be output on TRxC or RTxC.
+	0 - The output toggles each time the CIT reaches zero count. The output is cleared to Low by either of the preset counterltimer commands.
+	1 - The output is a single clock positive width pulse each time the CIT reaches zero count. (The duration of this pulse is one clock period.)
+	[4:3] Clock Select - This field selects whether the clock selected by [2:0J is prescaled prior to being applied to the input of the CIT.
+	 0 0 No prescaling.
+	 0 1 Divide clock by 16.
+	 1 0 Divide clock by 32.
+	 1 1 Divide clock by 64.
+	[2:0] Clock Source - This field selects the clock source for the counterltimer.
+	 000 RTxC pin. Pin must be programmed as input.
+	 001 TRxC pin. Pin must be programmed as input.
+	 010 Source is the crystal oscillator or system clock input divided by four.
+	 011 This selects a special mode of operation. In this mode the counter, after receiving the 'start CIT' command, delays the
+	     start of counting until the RxD input goes Low. It continues counting until the RxD input goes High, then stops and sets
+		 the CIT zero count status bit. The CPU can use the value in the CIT to determine the bit rate of the incoming data.
+		 The clock is the crystal oscillator or system clock input divided by four.
+	 100 Source is the 32X BRG output selected by RTR[3:0J of own channel.
+	 101 Source is the 32X BRG output selected by TTR[3:0J of own channel.
+	 110 Source is the internal signal which loads received characters from the receive shift register into the receiver
+	     FIFO. When operating in this mode, the FIFOed EOM status bit (RSR[7)) shall be set when the character which
+		 causes the count to go to zero is loaded into the receive FIFO.
+	 111 Source is the internal signal which transfers characters from the data bus into the transmit FIFO. When operating in this
+	     mode, and if the TEOM on zero count or done control bit (TPR[4)) is asserted, the FIFOed send EOM command will
+		 be automatically asserted when the character which causes the count to go to zero is loaded into the transmit FIFO.
+*/
+UINT8 duscc_channel::do_dusccreg_ctcr_r()
+{
+	LOG(("%s(%02x)\n", FUNCNAME, m_ctcr));
+	return m_ctcr;
+}
+
+void duscc_channel::do_dusccreg_ctcr_w(UINT8 data)
+{
+	LOG(("%s(%02x) -  not supported yet\n", FUNCNAME, data));
+	m_ctcr = data;
+	return;
+}
+
+/* Counterrrimer Preset High Register (CTPRHA, CTPRHB)
+	[7:0) MSB - This register contains the eight most significant bits of the value loaded into the counter/timer upon receipt of the load CIT
+	from preset regsiter command or when.the counter/timer reaches zero count and the zero detect control bit (CTCR[6]) is negated.
+	The minimum 16-bit counter/timer preset value is H'0002'.
+*/
+UINT8 duscc_channel::do_dusccreg_ctprh_r()
+{
+	UINT8 ret = ((m_ctpr >> 8) & 0xff );
+	LOG(("%s(%02x)\n", FUNCNAME, ret));
+
+	//	return m_ctprh;
+	return ret;
+}
+
+void duscc_channel::do_dusccreg_ctprh_w(UINT8 data)
+{ 
+	LOG(("%s(%02x) -  not supported yet\n", FUNCNAME, data));
+	//	m_ctprh = data;
+	m_ctpr &= ~0x0000ff00;
+	m_ctpr |= ((data << 8) & 0x0000ff00);
+	return; 
+}
+
+/* CounterfTimer Preset Low Register (CTPRLA, CTPRLB)
+	[7:0) lSB - This register contains the eight least significant bits of the value loaded into the counter/timer upon receipt of the load CIT
+	from preset register command or when the counter/timer reaches zero count and the zero detect control bit (CTCR[6]) is negated.
+	The minimum 16-bit counter/timer preset value is H'0002'.
+*/
+UINT8 duscc_channel::do_dusccreg_ctprl_r()
+{
+	UINT8 ret = (m_ctpr & 0xff);
+	LOG(("%s(%02x)\n", FUNCNAME, ret));
+	//	return m_ctprl;
+	return ret;
+}
+
+void duscc_channel::do_dusccreg_ctprl_w(UINT8 data)
+{ 
+	LOG(("%s(%02x) -  not supported yet\n", FUNCNAME, data));
+	//	m_ctprl = data;
+	m_ctpr &= ~0x000000ff;
+	m_ctpr |= (data & 0x000000ff);
+	return; 
+}
+
+/* Counter/Timer High Register (CTHA, CTHB) Read only
+	[7:0] MSB - A read of this 'register' provides the eight most significant bits of the current value of the counter/timer. it is
+	recommended that the CIT be stopped via a stop counter command before it is read in order to prevent errors which may occur due to
+	the read being performed while the CIT is changing. This count may be continued after the register is read.
+*/
+
+UINT8 duscc_channel::do_dusccreg_cth_r()
+{
+	UINT8 ret = ((m_ct >> 8) & 0xff );
+	LOG(("%s(%02x)\n", FUNCNAME, ret));
+
+	return ret;
+}
+
+
+/* Counter/Timer Low Register (CTLA, CTLB) Read only
+	[7:0] lSB - A read of this 'register' provides the eight least significant bits of the current value of the counter/timer. It is
+	recommended that the CIT be stopped via a stop counter command before it is read, in order to prevent errors which may occur due to
+	the read being performed while the CIT is changing. This count may be continued after the register is read.
+*/
+UINT8 duscc_channel::do_dusccreg_ctl_r()
+{
+	UINT8 ret = (m_ct & 0xff);
+	LOG(("%s(%02x)\n", FUNCNAME, ret));
+	//	return m_ctl;
+	return ret;
+}
 
 //-------------------------------------------------
 //  tra_callback -
@@ -943,49 +1181,10 @@ UINT8 duscc_channel::do_dusccreg_rtr_r()
 	return m_rtr;
 }
 
-UINT8 duscc_channel::do_dusccreg_ctprh_r()
-{
-	UINT8 ret = ((m_ctpr >> 8) & 0xff );
-	LOG(("%s(%02x)\n", FUNCNAME, ret));
-
-	//	return m_ctprh;
-	return ret;
-}
-
-UINT8 duscc_channel::do_dusccreg_ctprl_r()
-{
-	UINT8 ret = (m_ctpr & 0xff);
-	LOG(("%s(%02x)\n", FUNCNAME, ret));
-	//	return m_ctprl;
-	return ret;
-}
-
-UINT8 duscc_channel::do_dusccreg_ctcr_r()
-{
-	LOG(("%s(%02x)\n", FUNCNAME, m_ctcr));
-	return m_ctcr;
-}
-
 UINT8 duscc_channel::do_dusccreg_omr_r()
 {
 	LOG(("%s(%02x)\n", FUNCNAME, m_omr));
 	return m_omr;
-}
-
-UINT8 duscc_channel::do_dusccreg_cth_r()
-{
-	UINT8 ret = ((m_ct >> 8) & 0xff );
-	LOG(("%s(%02x)\n", FUNCNAME, ret));
-
-	return ret;
-}
-
-UINT8 duscc_channel::do_dusccreg_ctl_r()
-{
-	UINT8 ret = (m_ct & 0xff);
-	LOG(("%s(%02x)\n", FUNCNAME, ret));
-	//	return m_ctl;
-	return ret;
 }
 
 UINT8 duscc_channel::do_dusccreg_pcr_r()
@@ -1595,31 +1794,6 @@ void duscc_channel::do_dusccreg_rtr_w(UINT8 data)
 	return;
 }
 
-void duscc_channel::do_dusccreg_ctprh_w(UINT8 data)
-{ 
-	LOG(("%s(%02x) -  not supported yet\n", FUNCNAME, data));
-	//	m_ctprh = data;
-	m_ctpr &= ~0x0000ff00;
-	m_ctpr |= ((data << 8) & 0x0000ff00);
-	return; 
-}
-
-void duscc_channel::do_dusccreg_ctprl_w(UINT8 data)
-{ 
-	LOG(("%s(%02x) -  not supported yet\n", FUNCNAME, data));
-	//	m_ctprl = data;
-	m_ctpr &= ~0x000000ff;
-	m_ctpr |= (data & 0x000000ff);
-	return; 
-}
-
-void duscc_channel::do_dusccreg_ctcr_w(UINT8 data)
-{
-	LOG(("%s(%02x) -  not supported yet\n", FUNCNAME, data));
-	m_ctcr = data;
-	return;
-}
-
 /* Output and Miscellaneous Register (OMRA, OMRB)
     [7:5] Transmitted Residual Character Length - In BOP modes, this field determines the number of bits transmitted for the last
           character in the information field. This length applies to:
@@ -1744,6 +1918,8 @@ void duscc_channel::do_dusccreg_pcr_w(UINT8 data)
  */
 void duscc_channel::do_dusccreg_ccr_w(UINT8 data)
 {
+	int rate;
+
 	m_ccr = data;
 	LOG(("%s\n", FUNCNAME));
 	switch(m_ccr)
@@ -1810,6 +1986,33 @@ void duscc_channel::do_dusccreg_ccr_w(UINT8 data)
 		m_rcv = 0;
 		m_uart->m_gsr &= ~(m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_RXREADY : REG_GSR_CHAN_B_RXREADY);
 		break;
+
+		// COUNTER/TIMER COMMANDS
+
+	/* Start. Starts the counteritimer and prescaler. */
+	case REG_CCR_START_TIMER:  LOG(("- Start Counter/Timer\n"));
+		rate = 100; // TODO: calculate correct rate
+		duscc_timer->adjust(attotime::from_hz(rate), TIMER_ID_RTXC, attotime::from_hz(rate));
+		break;
+
+	/* Stop. Stops the counter/timer and prescaler. Since the command may be asynchronous with the selected clock source, 
+	   the counter/timer and/or prescaler may count one or more additional cycles before stopping.. */
+	case REG_CCR_STOP_TIMER:   LOG(("- Stop Counter/Timer\n"));
+		duscc_timer->adjust(attotime::never);
+		break;
+
+	/* Preset to FFFF. Presets the counter timer to H'FFFF' and the prescaler to its initial value. This command causes the
+	   C/T output to go Low.*/
+	case REG_CCR_PRST_FFFF:   LOG(("- Preset 0xffff to Counter/Timer\n"));
+		m_ct = 0xffff;
+		break;
+
+	/* Preset from CTPRH/CTPRL. Transfers the current value in the counter/timer preset registers to the counter/timer and
+	   presets the prescaler to its initial value. This command causes the C/T output to go Low. */
+	case REG_CCR_PRST_CTPR:   LOG(("- Preset CTPR to Counter/Timer\n"));
+		m_ct = m_ctpr;
+		break;
+
 	default: LOG((" - command %02x not implemented yet\n", data));
 	}
 	return;

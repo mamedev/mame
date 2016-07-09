@@ -122,7 +122,7 @@ static MACHINE_CONFIG_START( beezer, beezer_state )
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(beezer_state, b_via_0_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(beezer_state, b_via_0_pb_w))
 	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE("via6522_1", via6522_device, write_ca1))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, 0)
 	MCFG_VIA6522_READPA_HANDLER(READ8(beezer_state, b_via_1_pa_r))
@@ -130,7 +130,7 @@ static MACHINE_CONFIG_START( beezer, beezer_state )
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(beezer_state, b_via_1_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(beezer_state, b_via_1_pb_w))
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("via6522_0", via6522_device, write_cb1))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6809_device, irq_line))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_IRQ_LINE))
 MACHINE_CONFIG_END
 
 /***************************************************************************

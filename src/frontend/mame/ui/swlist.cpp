@@ -33,14 +33,14 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-menu_software_parts::menu_software_parts(mame_ui_manager &mui, render_container *container, const software_info *info, const char *interface, const software_part **part, bool other_opt, int *result)
-	: menu(mui, container)
+menu_software_parts::menu_software_parts(mame_ui_manager &mui, render_container *container, const software_info *info, const char *interface, const software_part **part, bool other_opt, result &result)
+	: menu(mui, container),
+	  m_result(result)
 {
 	m_info = info;
 	m_interface = interface;
 	m_selected_part = part;
 	m_other_opt = other_opt;
-	m_result = result;
 }
 
 
@@ -62,18 +62,18 @@ void menu_software_parts::populate()
 	if (m_other_opt)
 	{
 		software_part_menu_entry *entry1 = (software_part_menu_entry *) m_pool_alloc(sizeof(*entry1));
-		entry1->type = T_EMPTY;
+		entry1->type = result::EMPTY;
 		entry1->part = nullptr;
 		item_append(_("[empty slot]"), "", 0, entry1);
 
 		software_part_menu_entry *entry2 = (software_part_menu_entry *) m_pool_alloc(sizeof(*entry2));
-		entry2->type = T_FMGR;
+		entry2->type = result::FMGR;
 		entry2->part = nullptr;
 		item_append(_("[file manager]"), "", 0, entry2);
 
 
 		software_part_menu_entry *entry3 = (software_part_menu_entry *) m_pool_alloc(sizeof(*entry3));
-		entry3->type = T_SWLIST;
+		entry3->type = result::SWLIST;
 		entry3->part = nullptr;
 		item_append(_("[software list]"), "", 0, entry3);
 	}
@@ -88,7 +88,7 @@ void menu_software_parts::populate()
 			std::string menu_part_name(swpart.name());
 			if (swpart.feature("part_id") != nullptr)
 				menu_part_name.append(" (").append(swpart.feature("part_id")).append(")");
-			entry->type = T_ENTRY;
+			entry->type = result::ENTRY;
 			entry->part = &swpart;
 			item_append(m_info->shortname(), menu_part_name, 0, entry);
 		}
@@ -108,7 +108,7 @@ void menu_software_parts::handle()
 	if (event != nullptr && event->iptkey == IPT_UI_SELECT && event->itemref != nullptr)
 	{
 		software_part_menu_entry *entry = (software_part_menu_entry *) event->itemref;
-		*m_result = entry->type;
+		m_result = entry->type;
 		*m_selected_part = entry->part;
 		menu::stack_pop(machine());
 	}
@@ -276,9 +276,9 @@ void menu_software_list::handle()
 			if (update_selected)
 			{
 				// identify the selected entry
-				const entry_info *cur_selected = ((FPTR)event->itemref != 1)
-					? (const entry_info *)get_selection()
-					: nullptr;
+				entry_info const *const cur_selected = (FPTR(event->itemref) != 1)
+						? reinterpret_cast<entry_info const *>(get_selection_ref())
+						: nullptr;
 
 				// loop through all entries
 				for (auto &entry : m_entrylist)
@@ -306,7 +306,7 @@ void menu_software_list::handle()
 				if (selected_entry != nullptr && selected_entry != cur_selected)
 				{
 					set_selection((void *)selected_entry);
-					top_line = selected - (visible_lines / 2);
+					centre_selection();
 				}
 			}
 		}

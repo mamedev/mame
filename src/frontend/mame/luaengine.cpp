@@ -663,7 +663,7 @@ luabridge::LuaRef lua_engine::l_ioport_get_ports(const ioport_manager *m)
 	luabridge::LuaRef port_table = luabridge::LuaRef::newTable(L);
 
 	for (auto &port : im->ports()) {
-		port_table[port.second->tag()] = &port;
+		port_table[port.second->tag()] = port.second.get();
 	}
 
 	return port_table;
@@ -731,13 +731,14 @@ luabridge::LuaRef lua_engine::l_dev_get_memspaces(const device_t *d)
 	device_t *dev = const_cast<device_t *>(d);
 	lua_State *L = luaThis->m_lua_state;
 	luabridge::LuaRef sp_table = luabridge::LuaRef::newTable(L);
+	device_memory_interface *memdev = dynamic_cast<device_memory_interface *>(dev);
 
-	if(!dynamic_cast<device_memory_interface *>(dev))
+	if(!memdev)
 		return sp_table;
 
 	for (address_spacenum sp = AS_0; sp < ADDRESS_SPACES; ++sp) {
-		if (dev->memory().has_space(sp)) {
-			sp_table[dev->memory().space(sp).name()] = &(dev->memory().space(sp));
+		if (memdev->has_space(sp)) {
+			sp_table[memdev->space(sp).name()] = lua_addr_space(&memdev->space(sp), memdev);
 		}
 	}
 
@@ -761,7 +762,7 @@ luabridge::LuaRef lua_engine::l_dev_get_states(const device_t *d)
 	for (auto &s : dev->state().state_entries())
 	{
 		// XXX: refrain from exporting non-visible entries?
-		st_table[s->symbol()] = &s;
+		st_table[s->symbol()] = s.get();
 	}
 
 	return st_table;
@@ -925,10 +926,14 @@ void lua_engine::l_state_set_value(device_state_entry *d, UINT64 val)
 template <typename T>
 int lua_engine::lua_addr_space::l_mem_read(lua_State *L)
 {
-	address_space &sp = luabridge::Stack<address_space &>::get(L, 1);
+	lua_addr_space &lsp = luabridge::Stack<lua_addr_space &>::get(L, 1);
+	address_space &sp = lsp.space;
 	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
+	luaL_argcheck(L, lua_isboolean(L, 3) || lua_isnone(L, 3), 3, "optional argument: disable address shift (bool) expected");
 	offs_t address = lua_tounsigned(L, 2);
 	T mem_content = 0;
+	if(!lua_toboolean(L, 3))
+		address = sp.address_to_byte(address);
 	switch(sizeof(mem_content) * 8) {
 		case 8:
 			mem_content = sp.read_byte(address);
@@ -976,11 +981,121 @@ int lua_engine::lua_addr_space::l_mem_read(lua_State *L)
 template <typename T>
 int lua_engine::lua_addr_space::l_mem_write(lua_State *L)
 {
-	address_space &sp = luabridge::Stack<address_space &>::get(L, 1);
+	lua_addr_space &lsp = luabridge::Stack<lua_addr_space &>::get(L, 1);
+	address_space &sp = lsp.space;
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 3), 3, "value (integer) expected");
+	luaL_argcheck(L, lua_isboolean(L, 4) || lua_isnone(L, 4), 4, "optional argument: disable address shift (bool) expected");
+	offs_t address = lua_tounsigned(L, 2);
+	T val = lua_tounsigned(L, 3);
+	if(!lua_toboolean(L, 4))
+		address = sp.address_to_byte(address);
+	switch(sizeof(val) * 8) {
+		case 8:
+			sp.write_byte(address, val);
+			break;
+		case 16:
+			if (WORD_ALIGNED(address)) {
+				sp.write_word(address, val);
+			} else {
+				sp.write_word_unaligned(address, val);
+			}
+			break;
+		case 32:
+			if (DWORD_ALIGNED(address)) {
+				sp.write_dword(address, val);
+			} else {
+				sp.write_dword_unaligned(address, val);
+			}
+			break;
+		case 64:
+			if (QWORD_ALIGNED(address)) {
+				sp.write_qword(address, val);
+			} else {
+				sp.write_qword_unaligned(address, val);
+			}
+			break;
+		default:
+			break;
+	}
+
+	return 0;
+}
+
+//-------------------------------------------------
+//  log_mem_read - templated logical memory readers for <sign>,<size>
+//  -> manager:machine().devices[":maincpu"].spaces["program"]:read_log_i8(0xC000)
+//-------------------------------------------------
+
+template <typename T>
+int lua_engine::lua_addr_space::l_log_mem_read(lua_State *L)
+{
+	lua_addr_space &lsp = luabridge::Stack<lua_addr_space &>::get(L, 1);
+	address_space &sp = lsp.space;
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
+	offs_t address = lua_tounsigned(L, 2);
+	T mem_content = 0;
+	if(!lsp.dev->translate(sp.spacenum(), TRANSLATE_READ_DEBUG, address))
+		return 0;
+	address = sp.address_to_byte(address);
+
+	switch(sizeof(mem_content) * 8) {
+		case 8:
+			mem_content = sp.read_byte(address);
+			break;
+		case 16:
+			if (WORD_ALIGNED(address)) {
+				mem_content = sp.read_word(address);
+			} else {
+				mem_content = sp.read_word_unaligned(address);
+			}
+			break;
+		case 32:
+			if (DWORD_ALIGNED(address)) {
+				mem_content = sp.read_dword(address);
+			} else {
+				mem_content = sp.read_dword_unaligned(address);
+			}
+			break;
+		case 64:
+			if (QWORD_ALIGNED(address)) {
+				mem_content = sp.read_qword(address);
+			} else {
+				mem_content = sp.read_qword_unaligned(address);
+			}
+			break;
+		default:
+			break;
+	}
+
+	if (std::numeric_limits<T>::is_signed) {
+		lua_pushinteger(L, mem_content);
+	} else {
+		lua_pushunsigned(L, mem_content);
+	}
+
+	return 1;
+
+}
+
+//-------------------------------------------------
+//  log_mem_write - templated logical memory writer for <sign>,<size>
+//  -> manager:machine().devices[":maincpu"].spaces["program"]:write_log_u16(0xC000, 0xF00D)
+//-------------------------------------------------
+
+template <typename T>
+int lua_engine::lua_addr_space::l_log_mem_write(lua_State *L)
+{
+	lua_addr_space &lsp = luabridge::Stack<lua_addr_space &>::get(L, 1);
+	address_space &sp = lsp.space;
 	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
 	luaL_argcheck(L, lua_isnumber(L, 3), 3, "value (integer) expected");
 	offs_t address = lua_tounsigned(L, 2);
 	T val = lua_tounsigned(L, 3);
+
+	if(!lsp.dev->translate(sp.spacenum(), TRANSLATE_WRITE_DEBUG, address))
+		return 0;
+	address = sp.address_to_byte(address);
 
 	switch(sizeof(val) * 8) {
 		case 8:
@@ -1022,7 +1137,8 @@ int lua_engine::lua_addr_space::l_mem_write(lua_State *L)
 template <typename T>
 int lua_engine::lua_addr_space::l_direct_mem_read(lua_State *L)
 {
-	address_space &sp = luabridge::Stack<address_space &>::get(L, 1);
+	lua_addr_space &lsp = luabridge::Stack<lua_addr_space &>::get(L, 1);
+	address_space &sp = lsp.space;
 	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
 	offs_t address = lua_tounsigned(L, 2);
 	T mem_content = 0;
@@ -1057,7 +1173,8 @@ int lua_engine::lua_addr_space::l_direct_mem_read(lua_State *L)
 template <typename T>
 int lua_engine::lua_addr_space::l_direct_mem_write(lua_State *L)
 {
-	address_space &sp = luabridge::Stack<address_space &>::get(L, 1);
+	lua_addr_space &lsp = luabridge::Stack<lua_addr_space &>::get(L, 1);
+	address_space &sp = lsp.space;
 	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
 	luaL_argcheck(L, lua_isnumber(L, 3), 3, "value (integer) expected");
 	offs_t address = lua_tounsigned(L, 2);
@@ -1207,17 +1324,18 @@ int lua_engine::lua_memory_share::l_share_write(lua_State *L)
 	return 0;
 }
 
-luabridge::LuaRef lua_engine::l_addr_space_map(const address_space *space)
+luabridge::LuaRef lua_engine::l_addr_space_map(const lua_addr_space *sp)
 {
+	address_space &space = sp->space;
 	lua_State *L = luaThis->m_lua_state;
 	luabridge::LuaRef map = luabridge::LuaRef::newTable(L);
 
 	int i = 1;
-	for (address_map_entry &entry : space->map()->m_entrylist)
+	for (address_map_entry &entry : space.map()->m_entrylist)
 	{
 		luabridge::LuaRef mapentry = luabridge::LuaRef::newTable(L);
-		mapentry["offset"] = space->address_to_byte(entry.m_addrstart) & space->bytemask();
-		mapentry["endoff"] = space->address_to_byte(entry.m_addrend) & space->bytemask();
+		mapentry["offset"] = space.address_to_byte(entry.m_addrstart) & space.bytemask();
+		mapentry["endoff"] = space.address_to_byte(entry.m_addrend) & space.bytemask();
 		mapentry["readtype"] = entry.m_read.m_type;
 		mapentry["writetype"] = entry.m_write.m_type;
 		map[i++] = mapentry;
@@ -2359,6 +2477,7 @@ void lua_engine::initialize()
 				.addProperty <float, float> ("throttle_rate", &video_manager::throttle_rate, &video_manager::set_throttle_rate)
 			.endClass()
 			.beginClass <lua_addr_space> ("lua_addr_space")
+				.addConstructor <void (*)(address_space *, device_memory_interface *)> ()
 				.addCFunction ("read_i8", &lua_addr_space::l_mem_read<INT8>)
 				.addCFunction ("read_u8", &lua_addr_space::l_mem_read<UINT8>)
 				.addCFunction ("read_i16", &lua_addr_space::l_mem_read<INT16>)
@@ -2375,6 +2494,22 @@ void lua_engine::initialize()
 				.addCFunction ("write_u32", &lua_addr_space::l_mem_write<UINT32>)
 				.addCFunction ("write_i64", &lua_addr_space::l_mem_write<INT64>)
 				.addCFunction ("write_u64", &lua_addr_space::l_mem_write<UINT64>)
+				.addCFunction ("read_log_i8", &lua_addr_space::l_log_mem_read<INT8>)
+				.addCFunction ("read_log_u8", &lua_addr_space::l_log_mem_read<UINT8>)
+				.addCFunction ("read_log_i16", &lua_addr_space::l_log_mem_read<INT16>)
+				.addCFunction ("read_log_u16", &lua_addr_space::l_log_mem_read<UINT16>)
+				.addCFunction ("read_log_i32", &lua_addr_space::l_log_mem_read<INT32>)
+				.addCFunction ("read_log_u32", &lua_addr_space::l_log_mem_read<UINT32>)
+				.addCFunction ("read_log_i64", &lua_addr_space::l_log_mem_read<INT64>)
+				.addCFunction ("read_log_u64", &lua_addr_space::l_log_mem_read<UINT64>)
+				.addCFunction ("write_log_i8", &lua_addr_space::l_log_mem_write<INT8>)
+				.addCFunction ("write_log_u8", &lua_addr_space::l_log_mem_write<UINT8>)
+				.addCFunction ("write_log_i16", &lua_addr_space::l_log_mem_write<INT16>)
+				.addCFunction ("write_log_u16", &lua_addr_space::l_log_mem_write<UINT16>)
+				.addCFunction ("write_log_i32", &lua_addr_space::l_log_mem_write<INT32>)
+				.addCFunction ("write_log_u32", &lua_addr_space::l_log_mem_write<UINT32>)
+				.addCFunction ("write_log_i64", &lua_addr_space::l_log_mem_write<INT64>)
+				.addCFunction ("write_log_u64", &lua_addr_space::l_log_mem_write<UINT64>)
 				.addCFunction ("read_direct_i8", &lua_addr_space::l_direct_mem_read<INT8>)
 				.addCFunction ("read_direct_u8", &lua_addr_space::l_direct_mem_read<UINT8>)
 				.addCFunction ("read_direct_i16", &lua_addr_space::l_direct_mem_read<INT16>)
@@ -2391,9 +2526,7 @@ void lua_engine::initialize()
 				.addCFunction ("write_direct_u32", &lua_addr_space::l_direct_mem_write<UINT32>)
 				.addCFunction ("write_direct_i64", &lua_addr_space::l_direct_mem_write<INT64>)
 				.addCFunction ("write_direct_u64", &lua_addr_space::l_direct_mem_write<UINT64>)
-			.endClass()
-			.deriveClass <address_space, lua_addr_space> ("addr_space")
-				.addFunction("name", &address_space::name)
+				.addProperty <const char *> ("name", &lua_addr_space::name)
 				.addProperty <luabridge::LuaRef, void> ("map", &lua_engine::l_addr_space_map)
 			.endClass()
 			.beginClass <lua_ui_input> ("lua_input")

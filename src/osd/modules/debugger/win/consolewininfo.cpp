@@ -180,8 +180,8 @@ void consolewin_info::update_menu()
 
 			AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_OPEN, TEXT("Mount..."));
 
-			//if (img.is_creatable())
-				//AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_CREATE, TEXT("Create..."));
+			if (img.is_creatable())
+				AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_CREATE, TEXT("Create..."));
 			AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CLOSE, TEXT("Unmount"));
 
 			if (img.device().type() == CASSETTE)
@@ -262,8 +262,49 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 					}
 				}
 				return true;
-			//case DEVOPTION_CREATE:
-				//return true;
+			case DEVOPTION_CREATE:
+				{
+					std::string filter;
+					build_generic_filter(img, true, filter);
+					LPTSTR t_filter = tstring_from_utf8(filter.c_str());
+					if (t_filter)
+					{
+						// convert a pipe-char delimited string into a NUL delimited string
+						for (int i = 0; t_filter[i] != '\0'; i++)
+						{
+							if (t_filter[i] == '|')
+								t_filter[i] = '\0';
+						}
+
+						TCHAR selectedFilename[MAX_PATH];
+						selectedFilename[0] = '\0';
+						OPENFILENAME ofn;
+						memset(&ofn, 0, sizeof(ofn));
+						ofn.lStructSize = sizeof(ofn);
+						ofn.hwndOwner = nullptr;
+						ofn.lpstrFile = selectedFilename;
+						ofn.lpstrFile[0] = '\0';
+						ofn.nMaxFile = MAX_PATH;
+						ofn.lpstrFilter = t_filter;
+						ofn.nFilterIndex = 1;
+						ofn.lpstrFileTitle = nullptr;
+						ofn.nMaxFileTitle = 0;
+						ofn.lpstrInitialDir = nullptr;
+						ofn.Flags = OFN_PATHMUSTEXIST;
+
+						if (GetSaveFileName(&ofn))
+						{
+							char *utf8_buf = utf8_from_tstring(selectedFilename);
+							if (utf8_buf != nullptr)
+							{
+								img->create(utf8_buf, img->device_get_indexed_creatable_format(0), nullptr);
+								osd_free(utf8_buf);
+							}
+						}
+						osd_free(t_filter);
+					}
+				}
+				return true;
 			case DEVOPTION_CLOSE:
 				img->unload();
 				return 1;
@@ -310,15 +351,17 @@ void consolewin_info::process_string(char const *string)
 
 void consolewin_info::build_generic_filter(device_image_interface *img, bool is_save, std::string &filter)
 {
-	// common image types
-	add_filter_entry(filter, "Common image types", img->file_extensions());
+	std::string file_extension = img->file_extensions();
 
-	// compressed
 	if (!is_save)
-		filter.append("Compressed Images (*.zip)|*.zip|");
+		file_extension.append(",zip,7z");
 
-	// all files
+	add_filter_entry(filter, "Common image types", file_extension.c_str());
+
 	filter.append("All files (*.*)|*.*|");
+
+	if (!is_save)
+		filter.append("Compressed Images (*.zip;*.7z)|*.zip;*.7z|");
 }
 
 

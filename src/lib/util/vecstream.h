@@ -143,7 +143,7 @@ public:
 	}
 
 protected:
-	pos_type seekoff(off_type off, std::ios_base::seekdir dir, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) override
+	virtual pos_type seekoff(off_type off, std::ios_base::seekdir dir, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) override
 	{
 		bool const in(which & std::ios_base::in);
 		bool const out(which & std::ios_base::out);

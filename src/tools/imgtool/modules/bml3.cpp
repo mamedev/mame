@@ -696,7 +696,7 @@ static imgtoolerr_t bml3_diskimage_readfile(imgtool_partition *partition, const 
 
 
 
-static imgtoolerr_t bml3_diskimage_writefile(imgtool_partition *partition, const char *fname, const char *fork, imgtool_stream *sourcef, option_resolution *writeoptions)
+static imgtoolerr_t bml3_diskimage_writefile(imgtool_partition *partition, const char *fname, const char *fork, imgtool_stream *sourcef, util::option_resolution *writeoptions)
 {
 	floperr_t ferr;
 	imgtoolerr_t err;
@@ -737,8 +737,8 @@ static imgtoolerr_t bml3_diskimage_writefile(imgtool_partition *partition, const
 	if (err)
 		return err;
 
-	ent.ftype = option_resolution_lookup_int(writeoptions, BML3_OPTIONS_FTYPE);
-	ent.asciiflag = ((UINT8) option_resolution_lookup_int(writeoptions, BML3_OPTIONS_ASCII)) - 1;
+	ent.ftype = writeoptions->lookup_int(BML3_OPTIONS_FTYPE);
+	ent.asciiflag = UINT8(writeoptions->lookup_int(BML3_OPTIONS_ASCII)) - 1;
 	gptr = &ent.first_granule;
 
 	ferr = get_granule_map(img, granule_map, &granule_count);

@@ -433,6 +433,7 @@ void pit68230_device::wr_pitreg_tcr(UINT8 data)
 	}
 	else
 	{
+		pit_timer->adjust(attotime::never, TIMER_ID_PIT, attotime::never);
 		m_tcr = tout + tiack + irq + sqr; // remove this when the variables are used for the different modes!! Just here to to avoid warnings
 	}
 }

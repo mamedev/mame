@@ -39,9 +39,11 @@
 
 // MAME headers
 #include "posixfile.h"
+#include "unicode.h"
 
 #include <cassert>
 #include <cerrno>
+#include <cstdlib>
 #include <cstring>
 #include <memory>
 #include <type_traits>
@@ -65,7 +67,6 @@ constexpr char PATHSEPCH = '\\';
 constexpr char INVPATHSEPCH = '/';
 #else
 constexpr char PATHSEPCH = '/';
-constexpr char INVPATHSEPCH = '\\';
 #endif
 
 
@@ -163,7 +164,11 @@ private:
 
 bool is_path_separator(char c)
 {
+#if defined(WIN32)
 	return (c == PATHSEPCH) || (c == INVPATHSEPCH);
+#else
+	return c == PATHSEPCH;
+#endif
 }
 
 
@@ -175,7 +180,7 @@ osd_file::error create_path_recursive(std::string const &path)
 {
 	// if there's still a separator, and it's not the root, nuke it and recurse
 	auto const sep = path.rfind(PATHSEPCH);
-	if ((sep != std::string::npos) && (sep > 0) && (path[sep] != ':') && (path[sep - 1] != PATHSEPCH))
+	if ((sep != std::string::npos) && (sep > 0) && (path[sep - 1] != PATHSEPCH))
 	{
 		osd_file::error const err = create_path_recursive(path.substr(0, sep));
 		if (err != osd_file::error::NONE)
@@ -234,8 +239,10 @@ osd_file::error osd_file::open(std::string const &path, std::uint32_t openflags,
 
 	// convert the path into something compatible
 	dst = path;
+#if defined(WIN32)
 	for (auto it = dst.begin(); it != dst.end(); ++it)
 		*it = (INVPATHSEPCH == *it) ? PATHSEPCH : *it;
+#endif
 	osd_subst_env(dst, dst);
 
 	// attempt to open the file
@@ -390,6 +397,13 @@ osd_file::error osd_get_full_path(std::string &dst, std::string const &path)
 			return osd_file::error::FAILURE;
 		}
 #else
+		std::unique_ptr<char, void (*)(void *)> canonical(::realpath(path.c_str(), nullptr), &std::free);
+		if (canonical)
+		{
+			dst = canonical.get();
+			return osd_file::error::NONE;
+		}
+
 		std::vector<char> path_buffer(PATH_MAX);
 		if (::realpath(path.c_str(), &path_buffer[0]))
 		{
@@ -453,7 +467,48 @@ const char *osd_get_volume_name(int idx)
 		return "/";
 	else
 		return nullptr;
-	}
+}
+
+
+//============================================================
+//  osd_is_valid_filename_char
+//============================================================
+
+bool osd_is_valid_filename_char(unicode_char uchar)
+{
+	// The only one that's actually invalid is the slash
+	// The other two are just problematic because they're the escape character and path separator
+	return osd_is_valid_filepath_char(uchar)
+#if defined(WIN32)
+		&& uchar != PATHSEPCH
+		&& uchar != INVPATHSEPCH
+#else
+		&& uchar != PATHSEPCH
+		&& uchar != '\\'
+#endif
+		&& uchar != ':';
+}
+
+
+//============================================================
+//  osd_is_valid_filepath_char
+//============================================================
+
+bool osd_is_valid_filepath_char(unicode_char uchar)
+{
+	// One could argue that colon should be in here too because it functions as path separator
+	return uchar >= 0x20
+		&& !(uchar >= '\x7F' && uchar <= '\x9F')
+#if defined(WIN32)
+		&& uchar != '<'
+		&& uchar != '>'
+		&& uchar != '\"'
+		&& uchar != '|'
+		&& uchar != '?'
+		&& uchar != '*'
+#endif
+		&& uchar_isvalid(uchar);
+}
 
 
 //============================================================

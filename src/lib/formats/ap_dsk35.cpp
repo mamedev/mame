@@ -862,7 +862,7 @@ static FLOPPY_CONSTRUCT(apple35_raw_construct)
 	if (params)
 	{
 		/* create */
-		sides = option_resolution_lookup_int(params, PARAM_HEADS);
+		sides = params->lookup_int(PARAM_HEADS);
 		size = 80*sides*10*512;
 		is_1440k = FALSE;
 	}
@@ -995,7 +995,7 @@ static FLOPPY_CONSTRUCT(apple35_diskcopy_construct)
 	if (params)
 	{
 		/* create */
-		sides = option_resolution_lookup_int(params, PARAM_HEADS);
+		sides = params->lookup_int(PARAM_HEADS);
 
 		data_size = 80*sides*10*512;
 		tag_size = 80*sides*10*12;
@@ -1139,7 +1139,7 @@ static FLOPPY_CONSTRUCT(apple35_2img_construct)
 	if (params)
 	{
 		/* create */
-		sides = option_resolution_lookup_int(params, PARAM_HEADS);
+		sides = params->lookup_int(PARAM_HEADS);
 
 		data_offset = sizeof(header);
 		data_size = 80*sides*10*512;

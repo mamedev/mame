@@ -479,7 +479,7 @@ void floppy_image_device::call_unload()
 	}
 }
 
-bool floppy_image_device::call_create(int format_type, option_resolution *format_options)
+bool floppy_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	image = global_alloc(floppy_image(tracks, sides, form_factor));
 	output_format = nullptr;

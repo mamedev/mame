@@ -27,6 +27,26 @@ enum
 
 enum
 {
+	M6802_IRQ_LINE = M6800_IRQ_LINE
+};
+
+enum
+{
+	M6803_IRQ_LINE = M6800_IRQ_LINE
+};
+
+enum
+{
+	M6808_IRQ_LINE = M6800_IRQ_LINE
+};
+
+enum
+{
+	HD6301_IRQ_LINE = M6800_IRQ_LINE
+};
+
+enum
+{
 	M6801_MODE_0 = 0,
 	M6801_MODE_1,
 	M6801_MODE_2,
@@ -66,9 +86,6 @@ public:
 
 	DECLARE_READ8_MEMBER( m6801_io_r );
 	DECLARE_WRITE8_MEMBER( m6801_io_w );
-
-	DECLARE_WRITE_LINE_MEMBER( irq_line );
-	DECLARE_WRITE_LINE_MEMBER( nmi_line );
 
 protected:
 	// device-level overrides

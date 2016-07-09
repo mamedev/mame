@@ -72,16 +72,20 @@ void raiden2cop_device::LEGACY_execute_130e_cupsoc(int offset, UINT16 data)
 {
 	int dy = m_host_space->read_dword(cop_regs[1] + 4) - m_host_space->read_dword(cop_regs[0] + 4);
 	int dx = m_host_space->read_dword(cop_regs[1] + 8) - m_host_space->read_dword(cop_regs[0] + 8);
-
+	
 	cop_status = 7;
+
 	if (!dx) {
 		cop_status |= 0x8000;
 		cop_angle = 0;
 	}
-	else {
+	else 
+	{
 		cop_angle = (int)(atan(double(dy) / double(dx)) * 128.0 / M_PI);
 		if (dx < 0)
 			cop_angle += 0x80;
+		
+		cop_angle &= 0xff;
 	}
 
 	m_LEGACY_r0 = dy;
@@ -90,7 +94,7 @@ void raiden2cop_device::LEGACY_execute_130e_cupsoc(int offset, UINT16 data)
 	//printf("%d %d %f %04x\n",dx,dy,atan(double(dy)/double(dx)) * 128 / M_PI,cop_angle);
 
 	if (data & 0x80)
-		m_host_space->write_word(cop_regs[0] + (0x34 ^ 2), cop_angle);
+		cop_write_byte(cop_regs[0] + (0x34), cop_angle);
 }
 
 /*
@@ -584,14 +588,16 @@ void raiden2cop_device::LEGACY_execute_dde5(int offset, UINT16 data)
 1c - e38e ( 1c) (  38e) :  (984, ac4, d82, ac2, 39b, b9a, b9a, a9a)  5     b07f   (cupsoc, grainbow)
 1c - e105 ( 1c) (  105) :  (a88, 994, 088, 000, 000, 000, 000, 000)  5     06fb   (zeroteam, xsedae)
 */
-
+// controls GK position, aligned to the ball position
 void raiden2cop_device::LEGACY_execute_e30e(int offset, UINT16 data)
-{
+{	
 	int dy = m_host_space->read_dword(cop_regs[2] + 4) - m_host_space->read_dword(cop_regs[0] + 4);
 	int dx = m_host_space->read_dword(cop_regs[2] + 8) - m_host_space->read_dword(cop_regs[0] + 8);
 
+	
 	cop_status = 7;
-	if (!dx) {
+	if (!dx)
+	{
 		cop_status |= 0x8000;
 		cop_angle = 0;
 	}
@@ -599,15 +605,17 @@ void raiden2cop_device::LEGACY_execute_e30e(int offset, UINT16 data)
 		cop_angle = (int)(atan(double(dy) / double(dx)) * 128.0 / M_PI);
 		if (dx < 0)
 			cop_angle += 0x80;
+
+		cop_angle &= 0xff;
 	}
+	
+#if LOG_Phytagoras
+	printf("cmd %04x: dx = %d dy = %d angle = %02x %04x\n",data,dx,dy,cop_angle);
+#endif
 
-	m_LEGACY_r0 = dy;
-	m_LEGACY_r1 = dx;
-
-	//printf("%d %d %f %04x\n",dx,dy,atan(double(dy)/double(dx)) * 128 / M_PI,cop_angle);
-
-	if (data & 0x80)
-		m_host_space->write_word(cop_regs[0] + (0x34 ^ 2), cop_angle);
+	// TODO: byte or word?
+	if (data & 0x0080)
+		cop_write_byte(cop_regs[0] + 0x34, cop_angle);
 }
 
 /*
@@ -632,6 +640,18 @@ void raiden2cop_device::execute_f205(int offset, UINT16 data)
 ## - trig (up5) (low11) :  (sq0, sq1, sq2, sq3, sq4, sq5, sq6, sq7)  valu  mask
 1f - fc84 ( 1f) (  484) :  (182, 280, 000, 000, 000, 000, 000, 000)  6     00ff   (zeroteam, xsedae)
 */
+
+
+/*
+[:raiden2cop] COPDIS: f105 s=f0 f1=0 l=3 f2=05 5 fefb f0 a88 15.0.08 [:raiden2cop] sub32 10(r0)
+[:raiden2cop] COPDIS: f105 s=f0 f1=0 l=3 f2=05 5 fefb f1 994 13.0.14 [:raiden2cop] write16h 28(r0)
+[:raiden2cop] COPDIS: f105 s=f0 f1=0 l=3 f2=05 5 fefb f2 088 01.0.08 [:raiden2cop] addmem32 10(r0)
+*/
+// seibu cup soccer, before cosine (ball dribbling actually?)
+void raiden2cop_device::execute_f105(int offset, UINT16 data)
+{
+	// ...
+}
 
 #ifdef UNUSED_COMMANDS
 
@@ -708,5 +728,22 @@ void raiden2cop_device::LEGACY_execute_42c2(int offset, UINT16 data)
 	m_host_space->write_word(cop_regs[0] + (0x38 ^ 2), res);
 }
 
+// used by seibu cup soccer, not sure if right so left out
+void raiden2cop_device::execute_5105(int offset, UINT16 data)
+{
+	int res = m_host_space->read_dword(cop_regs[0]) +  m_host_space->read_dword(cop_regs[0]+8);
+	m_host_space->write_dword(cop_regs[0]+4, res);
+}
+
+/*
+[:raiden2cop] COPDIS: 5905 s=58 f1=0 l=3 f2=05 5 fffb 58 9c8 13.2.08 [:raiden2cop] write16h 10(r2)
+[:raiden2cop] COPDIS: 5905 s=58 f1=0 l=3 f2=05 5 fffb 59 a84 15.0.04 [:raiden2cop] sub32 8(r0)
+[:raiden2cop] COPDIS: 5905 s=58 f1=0 l=3 f2=05 5 fffb 5a 0a2 01.1.02 [:raiden2cop] addmem32 4(r1)
+*/
+void raiden2cop_device::execute_5905(int offset, UINT16 data)
+{
+	int res = m_host_space->read_dword(cop_regs[2]+10 + offset*4) - m_host_space->read_dword(cop_regs[0]+8 + offset*4);
+	m_host_space->write_dword(cop_regs[1]+4 + offset *4, res);
+}
 
 #endif
