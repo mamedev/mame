@@ -160,7 +160,9 @@ void mame_machine_manager::start_luaengine()
 		osd_file::error filerr = file.open("boot.lua");
 		if (filerr == osd_file::error::NONE)
 		{
-			m_lua->load_script(file.fullpath());
+			std::string exppath;
+			osd_subst_env(exppath, std::string(file.fullpath()));
+			m_lua->load_script(exppath.c_str());
 		}
 	}
 }
