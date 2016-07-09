@@ -310,15 +310,17 @@ void consolewin_info::process_string(char const *string)
 
 void consolewin_info::build_generic_filter(device_image_interface *img, bool is_save, std::string &filter)
 {
-	// common image types
-	add_filter_entry(filter, "Common image types", img->file_extensions());
+	std::string file_extension = img->file_extensions();
 
-	// compressed
 	if (!is_save)
-		filter.append("Compressed Images (*.zip)|*.zip|");
+		file_extension.append(",zip,7z");
 
-	// all files
+	add_filter_entry(filter, "Common image types", file_extension.c_str());
+
 	filter.append("All files (*.*)|*.*|");
+
+	if (!is_save)
+		filter.append("Compressed Images (*.zip;*.7z)|*.zip;*.7z|");
 }
 
 
