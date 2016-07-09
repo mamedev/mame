@@ -314,8 +314,8 @@ static MACHINE_CONFIG_START( cpu09, tavernie_state )
 	MCFG_PIA_READCA1_HANDLER(READLINE(tavernie_state, ca1_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(tavernie_state, pa_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(tavernie_state, pb_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
 	// all i/o lines connect to the 40-pin expansion connector

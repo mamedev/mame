@@ -62,7 +62,7 @@ void decocpu_type1_device::device_timer(emu_timer &timer, device_timer_id id, in
 	case TIMER_IRQ:
 		if(param == 1)
 		{
-			m_cpu->set_input_line(M6800_IRQ_LINE,ASSERT_LINE);
+			m_cpu->set_input_line(M6808_IRQ_LINE, ASSERT_LINE);
 			m_irq_timer->adjust(attotime::from_ticks(32,E_CLOCK),0);
 			m_irq_active = true;
 			m_pia28->ca1_w(BIT(ioport("DIAGS")->read(), 2));
@@ -70,7 +70,7 @@ void decocpu_type1_device::device_timer(emu_timer &timer, device_timer_id id, in
 		}
 		else
 		{
-			m_cpu->set_input_line(M6800_IRQ_LINE,CLEAR_LINE);
+			m_cpu->set_input_line(M6808_IRQ_LINE, CLEAR_LINE);
 			m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
 			m_irq_active = false;
 			m_pia28->ca1_w(1);
@@ -117,7 +117,7 @@ WRITE_LINE_MEMBER( decocpu_type1_device::pia21_ca2_w )
 
 WRITE8_MEMBER( decocpu_type1_device::lamp0_w )
 {
-	m_cpu->set_input_line(M6800_IRQ_LINE, CLEAR_LINE);
+	m_cpu->set_input_line(M6808_IRQ_LINE, CLEAR_LINE);
 	m_write_lamp(0,data,0xff);
 }
 
