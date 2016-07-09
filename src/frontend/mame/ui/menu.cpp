@@ -53,7 +53,7 @@ std::unique_ptr<bitmap_rgb32> menu::hilight_main_bitmap;
     INLINE FUNCTIONS
 ***************************************************************************/
 
-inline menu::global_state_ptr menu::get_global_state(running_machine &machine)
+menu::global_state_ptr menu::get_global_state(running_machine &machine)
 {
 	std::lock_guard<std::mutex> guard(s_global_state_guard);
 	auto const it(s_global_states.find(&machine));
