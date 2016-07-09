@@ -1715,11 +1715,11 @@ UINT32 cave_state::screen_update_ppsatan_top(screen_device &screen, bitmap_rgb32
 }
 UINT32 cave_state::screen_update_ppsatan_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	machine().crosshair().set_screen(1, &screen);
+	machine().crosshair().get_crosshair(1).set_screen(&screen);
 	return screen_update_ppsatan_core(screen, bitmap, cliprect, 1);
 }
 UINT32 cave_state::screen_update_ppsatan_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	machine().crosshair().set_screen(0, &screen);
+	machine().crosshair().get_crosshair(0).set_screen(&screen);
 	return screen_update_ppsatan_core(screen, bitmap, cliprect, 2);
 }
