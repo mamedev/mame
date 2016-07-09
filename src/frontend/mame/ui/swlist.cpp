@@ -110,7 +110,7 @@ void menu_software_parts::handle()
 		software_part_menu_entry *entry = (software_part_menu_entry *) event->itemref;
 		m_result = entry->type;
 		*m_selected_part = entry->part;
-		menu::stack_pop(machine());
+		stack_pop();
 	}
 }
 
@@ -244,7 +244,7 @@ void menu_software_list::handle()
 		{
 			entry_info *info = (entry_info *) event->itemref;
 			m_result = info->short_name;
-			menu::stack_pop(machine());
+			stack_pop();
 		}
 		else if (event->iptkey == IPT_SPECIAL)
 		{
@@ -316,7 +316,7 @@ void menu_software_list::handle()
 			if (m_filename_buffer[0] != '\0')
 				memset(m_filename_buffer, '\0', ARRAY_LENGTH(m_filename_buffer));
 			m_result = m_filename_buffer;
-			menu::stack_pop(machine());
+			stack_pop();
 		}
 	}
 }
@@ -402,7 +402,7 @@ void menu_software::handle()
 	if (event != nullptr && event->iptkey == IPT_UI_SELECT) {
 		//menu::stack_push<menu_software_list>(ui(), container, (software_list_config *)event->itemref, image);
 		*m_result = (software_list_device *)event->itemref;
-		menu::stack_pop(machine());
+		stack_pop();
 	}
 }
 

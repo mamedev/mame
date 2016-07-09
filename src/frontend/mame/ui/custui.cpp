@@ -1045,7 +1045,7 @@ void menu_palette_sel::handle()
 		{
 			m_original = rgb_t((UINT32)strtoul(item[selected].subtext.c_str(), nullptr, 16));
 			reset_parent(reset_options::SELECT_FIRST);
-			menu::stack_pop(machine());
+			stack_pop();
 		}
 	}
 }

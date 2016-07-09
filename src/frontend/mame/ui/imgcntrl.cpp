@@ -156,7 +156,7 @@ void menu_control_device_image::hook_load(std::string name, bool softlist)
 {
 	if (image->is_reset_on_load()) image->set_init_phase();
 	image->load(name.c_str());
-	menu::stack_pop(machine());
+	stack_pop();
 }
 
 
@@ -198,7 +198,7 @@ void menu_control_device_image::handle()
 
 	case SELECT_SOFTLIST:
 		if(!sld) {
-			menu::stack_pop(machine());
+			stack_pop();
 			break;
 		}
 		software_info_name = "";
@@ -251,7 +251,7 @@ void menu_control_device_image::handle()
 
 		case menu_software_parts::result::EMPTY:
 			image->unload();
-			menu::stack_pop(machine());
+			stack_pop();
 			break;
 
 		case menu_software_parts::result::SWLIST:
@@ -260,7 +260,7 @@ void menu_control_device_image::handle()
 			break;
 
 		case menu_software_parts::result::INVALID: // return to system
-			menu::stack_pop(machine());
+			stack_pop();
 			break;
 
 		}
@@ -270,7 +270,7 @@ void menu_control_device_image::handle()
 		switch(submenu_result.filesel) {
 		case menu_file_selector::result::EMPTY:
 			image->unload();
-			menu::stack_pop(machine());
+			stack_pop();
 			break;
 
 		case menu_file_selector::result::FILE:
@@ -288,7 +288,7 @@ void menu_control_device_image::handle()
 			break;
 
 		default: // return to system
-			menu::stack_pop(machine());
+			stack_pop();
 			break;
 		}
 		break;
@@ -326,7 +326,7 @@ void menu_control_device_image::handle()
 		int err = image->create(path.c_str(), nullptr, nullptr);
 		if (err != 0)
 			machine().popmessage("Error: %s", image->error());
-		menu::stack_pop(machine());
+		stack_pop();
 		break;
 	}
 	}

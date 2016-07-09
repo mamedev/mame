@@ -392,7 +392,7 @@ void menu_add_change_folder::handle()
 				}
 
 				reset_parent(reset_options::SELECT_FIRST);
-				menu::stack_pop(machine());
+				stack_pop();
 			}
 			else if (menu_event->is_char_printable())
 			{
@@ -614,7 +614,7 @@ void menu_remove_folder::handle()
 		}
 
 		reset_parent(reset_options::REMEMBER_REF);
-		menu::stack_pop(machine());
+		stack_pop();
 	}
 }
 

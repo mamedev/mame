@@ -125,7 +125,7 @@ void menu_confirm_save_as::handle()
 			*m_yes = true;
 
 		// no matter what, pop out
-		menu::stack_pop(machine());
+		stack_pop();
 	}
 }
 
@@ -238,7 +238,7 @@ void menu_file_create::handle()
 				if (tmp_file.find(".") != -1 && tmp_file.find(".") < tmp_file.length() - 1)
 				{
 					m_current_file = m_filename;
-					menu::stack_pop(machine());
+					stack_pop();
 				}
 				else
 					ui().popup_time(1, "%s", _("Please enter a file extension too"));
@@ -316,7 +316,7 @@ void menu_select_format::handle()
 	if (event != nullptr && event->iptkey == IPT_UI_SELECT)
 	{
 		*m_result = int(FPTR(event->itemref));
-		menu::stack_pop(machine());
+		stack_pop();
 	}
 }
 

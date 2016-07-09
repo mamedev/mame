@@ -125,7 +125,8 @@ bool has_multiple_bios(const game_driver *driver, s_bios &biosname)
 //  ctor
 //-------------------------------------------------
 
-menu_select_software::menu_select_software(mame_ui_manager &mui, render_container *container, const game_driver *driver) : menu(mui, container)
+menu_select_software::menu_select_software(mame_ui_manager &mui, render_container *container, const game_driver *driver)
+	: menu_select_launch(mui, container, true)
 {
 	if (reselect_last::get())
 		reselect_last::set(false);
@@ -174,10 +175,10 @@ void menu_select_software::handle()
 
 	if (menu_event && menu_event->itemref)
 	{
-		if (ui_error)
+		if (m_ui_error)
 		{
 			// reset the error on any future event
-			ui_error = false;
+			m_ui_error = false;
 			machine().ui_input().reset();
 		}
 		else if (menu_event->iptkey == IPT_UI_SELECT)
@@ -208,7 +209,7 @@ void menu_select_software::handle()
 			{
 				// Infos
 				ui_globals::cur_sw_dats_view--;
-				topline_datsview = 0;
+				m_topline_datsview = 0;
 			}
 		}
 		else if (menu_event->iptkey == IPT_UI_RIGHT)
@@ -225,7 +226,7 @@ void menu_select_software::handle()
 			{
 				// Infos
 				ui_globals::cur_sw_dats_view++;
-				topline_datsview = 0;
+				m_topline_datsview = 0;
 			}
 		}
 		else if (menu_event->iptkey == IPT_UI_UP_FILTER && highlight > UI_SW_FIRST)
@@ -322,7 +323,7 @@ void menu_select_software::handle()
 			{
 				// Infos
 				ui_globals::cur_sw_dats_view--;
-				topline_datsview = 0;
+				m_topline_datsview = 0;
 			}
 		}
 		else if (menu_event->iptkey == IPT_UI_RIGHT)
@@ -339,7 +340,7 @@ void menu_select_software::handle()
 			{
 				// Infos
 				ui_globals::cur_sw_dats_view++;
-				topline_datsview = 0;
+				m_topline_datsview = 0;
 			}
 		}
 		else if (menu_event->iptkey == IPT_UI_LEFT_PANEL)
@@ -371,7 +372,7 @@ void menu_select_software::handle()
 	}
 
 	// if we're in an error state, overlay an error message
-	if (ui_error)
+	if (m_ui_error)
 		ui().draw_text_box(container, _("The selected software is missing one or more required files. "
 									"Please select a different software.\n\nPress any key to continue."),
 									ui::text_layout::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
@@ -415,7 +416,7 @@ void menu_select_software::handle()
 
 void menu_select_software::populate()
 {
-	UINT32 flags_ui = FLAG_UI_SWLIST | FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
+	UINT32 flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
 	m_has_empty_start = true;
 	int old_software = -1;
 
@@ -897,7 +898,7 @@ void menu_select_software::inkey_select(const event *menu_event)
 			reselect_last::set(true);
 			mame_machine_manager::instance()->schedule_new_driver(*ui_swinfo->driver);
 			machine().schedule_hard_reset();
-			menu::stack_reset(machine());
+			stack_reset();
 		}
 	}
 
@@ -948,14 +949,14 @@ void menu_select_software::inkey_select(const event *menu_event)
 			reselect_last::set(true);
 			mame_machine_manager::instance()->schedule_new_driver(drivlist.driver());
 			machine().schedule_hard_reset();
-			menu::stack_reset(machine());
+			stack_reset();
 		}
 
 		// otherwise, display an error
 		else
 		{
 			reset(reset_options::REMEMBER_POSITION);
-			ui_error = true;
+			m_ui_error = true;
 		}
 	}
 }
@@ -1652,27 +1653,27 @@ void menu_select_software::infos_render(void *selectedref, float origx1, float o
 		return;
 	}
 	else
-		totallines = ui().wrap_text(container, buffer.c_str(), origx1, origy1, origx2 - origx1 - (2.0f * gutter_width), xstart, xend, text_size);
+		m_total_lines = ui().wrap_text(container, buffer.c_str(), origx1, origy1, origx2 - origx1 - (2.0f * gutter_width), xstart, xend, text_size);
 
 	int r_visible_lines = floor((origy2 - oy1) / (line_height * text_size));
-	if (totallines < r_visible_lines)
-		r_visible_lines = totallines;
-	if (topline_datsview < 0)
-			topline_datsview = 0;
-	if (topline_datsview + r_visible_lines >= totallines)
-			topline_datsview = totallines - r_visible_lines;
+	if (m_total_lines < r_visible_lines)
+		r_visible_lines = m_total_lines;
+	if (m_topline_datsview < 0)
+		m_topline_datsview = 0;
+	if (m_topline_datsview + r_visible_lines >= m_total_lines)
+		m_topline_datsview = m_total_lines - r_visible_lines;
 
 	for (int r = 0; r < r_visible_lines; ++r)
 	{
-		int itemline = r + topline_datsview;
+		int itemline = r + m_topline_datsview;
 		std::string tempbuf;
 		tempbuf.assign(buffer.substr(xstart[itemline], xend[itemline] - xstart[itemline]));
 
 		// up arrow
-		if (r == 0 && topline_datsview != 0)
+		if (r == 0 && m_topline_datsview != 0)
 			info_arrow(0, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
 		// bottom arrow
-		else if (r == r_visible_lines - 1 && itemline != totallines - 1)
+		else if (r == r_visible_lines - 1 && itemline != m_total_lines - 1)
 			info_arrow(1, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
 		else
 			ui().draw_text_full(container, tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1,
@@ -1682,7 +1683,7 @@ void menu_select_software::infos_render(void *selectedref, float origx1, float o
 	}
 
 	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
-	right_visible_lines = r_visible_lines - (topline_datsview != 0) - (topline_datsview + r_visible_lines != totallines);
+	right_visible_lines = r_visible_lines - (m_topline_datsview != 0) - (m_topline_datsview + r_visible_lines != m_total_lines);
 }
 
 //-------------------------------------------------
@@ -1972,7 +1973,7 @@ void software_parts::handle()
 
 				mame_machine_manager::instance()->schedule_new_driver(*m_uiinfo->driver);
 				machine().schedule_hard_reset();
-				menu::stack_reset(machine());
+				stack_reset();
 			}
 		}
 	}
@@ -2074,7 +2075,7 @@ void bios_selection::handle()
 					moptions.set_value(OPTION_BIOS, elem.second, OPTION_PRIORITY_CMDLINE, error);
 					mame_machine_manager::instance()->schedule_new_driver(*s_driver);
 					machine().schedule_hard_reset();
-					menu::stack_reset(machine());
+					stack_reset();
 				}
 				else
 				{
@@ -2112,7 +2113,7 @@ void bios_selection::handle()
 					reselect_last::set(true);
 					mame_machine_manager::instance()->schedule_new_driver(drivlist.driver());
 					machine().schedule_hard_reset();
-					menu::stack_reset(machine());
+					stack_reset();
 				}
 			}
 		}

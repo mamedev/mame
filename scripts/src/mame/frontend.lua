@@ -110,6 +110,8 @@ files {
 	MAME_DIR .. "src/frontend/mame/ui/info_pty.h",
 	MAME_DIR .. "src/frontend/mame/ui/inputmap.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/inputmap.h",
+	MAME_DIR .. "src/frontend/mame/ui/selmenu.cpp",
+	MAME_DIR .. "src/frontend/mame/ui/selmenu.h",
 	MAME_DIR .. "src/frontend/mame/ui/sliders.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/sliders.h",
 	MAME_DIR .. "src/frontend/mame/ui/slotopt.cpp",

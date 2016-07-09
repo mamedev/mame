@@ -95,7 +95,7 @@ void menu_selector::handle()
 			}
 
 			ui_globals::switch_image = true;
-			menu::stack_pop(machine());
+			stack_pop();
 		}
 		else if (menu_event->iptkey == IPT_SPECIAL)
 		{

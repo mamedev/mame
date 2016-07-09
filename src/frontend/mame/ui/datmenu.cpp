@@ -18,6 +18,10 @@
 #include "mame.h"
 #include "rendfont.h"
 #include "softlist.h"
+#include "uiinput.h"
+
+#include <cmath>
+
 
 namespace ui {
 //-------------------------------------------------
@@ -116,6 +120,147 @@ void menu_dats_view::populate()
 
 	if (!paused)
 		machine().resume();
+}
+
+//-------------------------------------------------
+//  draw - draw dats menu
+//-------------------------------------------------
+
+void menu_dats_view::draw(UINT32 flags)
+{
+	auto line_height = ui().get_line_height();
+	auto ud_arrow_width = line_height * machine().render().ui_aspect();
+	auto gutter_width = 0.52f * line_height * machine().render().ui_aspect();
+	mouse_x = -1, mouse_y = -1;
+	float visible_width = 1.0f - 2.0f * UI_BOX_LR_BORDER;
+	float visible_left = (1.0f - visible_width) * 0.5f;
+
+	draw_background();
+
+	hover = item.size() + 1;
+	visible_items = item.size() - 2;
+	float extra_height = 2.0f * line_height;
+	float visible_extra_menu_height = customtop + custombottom + extra_height;
+
+	// locate mouse
+	mouse_hit = false;
+	mouse_button = false;
+	mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
+	if (mouse_target != nullptr)
+		if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, *container, mouse_x, mouse_y))
+			mouse_hit = true;
+
+	// account for extra space at the top and bottom
+	float visible_main_menu_height = 1.0f - 2.0f * UI_BOX_TB_BORDER - visible_extra_menu_height;
+	m_visible_lines = int(std::trunc(visible_main_menu_height / line_height));
+	visible_main_menu_height = float(m_visible_lines) * line_height;
+
+	// compute top/left of inner menu area by centering
+	float visible_top = (1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f;
+
+	// if the menu is at the bottom of the extra, adjust
+	visible_top += customtop;
+
+	// compute left box size
+	float x1 = visible_left;
+	float y1 = visible_top - UI_BOX_TB_BORDER;
+	float x2 = x1 + visible_width;
+	float y2 = visible_top + visible_main_menu_height + UI_BOX_TB_BORDER + extra_height;
+	float line = visible_top + float(m_visible_lines) * line_height;
+
+	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+
+	m_visible_lines = (std::min)(visible_items, m_visible_lines);
+	top_line = (std::max)(0, top_line);
+	if (top_line + m_visible_lines >= visible_items)
+		top_line = visible_items - m_visible_lines;
+
+	// determine effective positions taking into account the hilighting arrows
+	float effective_width = visible_width - 2.0f * gutter_width;
+	float effective_left = visible_left + gutter_width;
+
+	int const n_loop = (std::min)(visible_items, m_visible_lines);
+	for (int linenum = 0; linenum < n_loop; linenum++)
+	{
+		float line_y = visible_top + (float)linenum * line_height;
+		int itemnum = top_line + linenum;
+		const menu_item &pitem = item[itemnum];
+		const char *itemtext = pitem.text.c_str();
+		rgb_t fgcolor = UI_TEXT_COLOR;
+		rgb_t bgcolor = UI_TEXT_BG_COLOR;
+		float line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
+		float line_y0 = line_y;
+		float line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
+		float line_y1 = line_y + line_height;
+
+		// if we're on the top line, display the up arrow
+		if (linenum == 0 && top_line != 0)
+		{
+			draw_arrow(container, 0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
+				0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0);
+
+			if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y)
+			{
+				fgcolor = UI_MOUSEOVER_COLOR;
+				bgcolor = UI_MOUSEOVER_BG_COLOR;
+				highlight(container, line_x0, line_y0, line_x1, line_y1, bgcolor);
+				hover = HOVER_ARROW_UP;
+			}
+		}
+		// if we're on the bottom line, display the down arrow
+		else if (linenum == m_visible_lines - 1 && itemnum != visible_items - 1)
+		{
+			draw_arrow(container, 0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
+				0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0 ^ ORIENTATION_FLIP_Y);
+
+			if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y)
+			{
+				fgcolor = UI_MOUSEOVER_COLOR;
+				bgcolor = UI_MOUSEOVER_BG_COLOR;
+				highlight(container, line_x0, line_y0, line_x1, line_y1, bgcolor);
+				hover = HOVER_ARROW_DOWN;
+			}
+		}
+
+		// draw dats text
+		else if (pitem.subtext.empty())
+		{
+			ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width, ui::text_layout::LEFT, ui::text_layout::NEVER,
+				mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+		}
+	}
+
+	for (size_t count = visible_items; count < item.size(); count++)
+	{
+		const menu_item &pitem = item[count];
+		const char *itemtext = pitem.text.c_str();
+		float line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
+		float line_y0 = line;
+		float line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
+		float line_y1 = line + line_height;
+		rgb_t fgcolor = UI_SELECTED_COLOR;
+		rgb_t bgcolor = UI_SELECTED_BG_COLOR;
+
+		if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y && is_selectable(pitem))
+			hover = count;
+
+		if (pitem.type == menu_item_type::SEPARATOR)
+			container->add_line(visible_left, line + 0.5f * line_height, visible_left + visible_width, line + 0.5f * line_height,
+				UI_LINE_WIDTH, UI_TEXT_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		else
+		{
+			highlight(container, line_x0, line_y0, line_x1, line_y1, bgcolor);
+			ui().draw_text_full(container, itemtext, effective_left, line, effective_width, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+				mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+		}
+		line += line_height;
+	}
+
+	// if there is something special to add, do it by calling the virtual method
+	custom_render(get_selection_ref(), customtop, custombottom, x1, y1, x2, y2);
+
+	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
+	m_visible_items = m_visible_lines - (top_line != 0) - (top_line + m_visible_lines != visible_items);
 }
 
 //-------------------------------------------------

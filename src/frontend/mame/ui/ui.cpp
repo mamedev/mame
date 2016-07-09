@@ -289,7 +289,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 
 	// loop over states
 	set_handler(UI_CALLBACK_TYPE_GENERAL, &mame_ui_manager::handler_ingame);
-	for (state = 0; state < maxstate && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(); state++)
+	for (state = 0; state < maxstate && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(machine()); state++)
 	{
 		// default to standard colors
 		messagebox_backcolor = UI_BACKGROUND_COLOR;
@@ -328,7 +328,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 		while (machine().input().poll_switches() != INPUT_CODE_INVALID) { }
 
 		// loop while we have a handler
-		while (m_handler_callback_type == UI_CALLBACK_TYPE_MODAL && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu())
+		while (m_handler_callback_type == UI_CALLBACK_TYPE_MODAL && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(machine()))
 		{
 			machine().video().frame_update();
 		}
@@ -339,7 +339,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 	}
 
 	// if we're the empty driver, force the menus on
-	if (ui::menu::stack_has_special_main_menu())
+	if (ui::menu::stack_has_special_main_menu(machine()))
 		show_menu();
 }
 
@@ -381,7 +381,7 @@ void mame_ui_manager::update_and_render(render_container *container)
 	if (machine().phase() >= MACHINE_PHASE_RESET && (single_step() || machine().paused()))
 	{
 		int alpha = (1.0f - machine().options().pause_brightness()) * 255.0f;
-		if (ui::menu::stack_has_special_main_menu())
+		if (ui::menu::stack_has_special_main_menu(machine()))
 			alpha = 255;
 		if (alpha > 255)
 			alpha = 255;

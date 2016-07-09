@@ -392,18 +392,18 @@ void menu_file_selector::handle()
 			case SELECTOR_ENTRY_TYPE_EMPTY:
 				// empty slot - unload
 				m_result = result::EMPTY;
-				menu::stack_pop(machine());
+				stack_pop();
 				break;
 
 			case SELECTOR_ENTRY_TYPE_CREATE:
 				// create
 				m_result = result::CREATE;
-				menu::stack_pop(machine());
+				stack_pop();
 				break;
 
 			case SELECTOR_ENTRY_TYPE_SOFTWARE_LIST:
 				m_result = result::SOFTLIST;
-				menu::stack_pop(machine());
+				stack_pop();
 				break;
 
 			case SELECTOR_ENTRY_TYPE_DRIVE:
@@ -424,7 +424,7 @@ void menu_file_selector::handle()
 				// file
 				m_current_file.assign(entry->fullpath);
 				m_result = result::FILE;
-				menu::stack_pop(machine());
+				stack_pop();
 				break;
 			}
 
@@ -551,7 +551,7 @@ void menu_select_rw::handle()
 	if (event != nullptr && event->iptkey == IPT_UI_SELECT)
 	{
 		m_result = result_from_itemref(event->itemref);
-		menu::stack_pop(machine());
+		stack_pop();
 	}
 }
 

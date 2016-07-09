@@ -53,7 +53,7 @@ void menu_sliders::handle()
 				// toggle visibility
 				case IPT_UI_ON_SCREEN_DISPLAY:
 					if (m_menuless_mode)
-						menu::stack_pop(machine());
+						stack_pop();
 					else
 						m_hidden = !m_hidden;
 					break;
@@ -268,7 +268,7 @@ UINT32 menu_sliders::ui_handler(render_container *container, mame_ui_manager &mu
 	UINT32 result;
 
 	// if this is the first call, push the sliders menu
-	if (topmost_menu<menu_sliders>() == nullptr)
+	if (topmost_menu<menu_sliders>(mui.machine()) == nullptr)
 		menu::stack_push<menu_sliders>(mui, container, true);
 
 	// handle standard menus
@@ -278,7 +278,7 @@ UINT32 menu_sliders::ui_handler(render_container *container, mame_ui_manager &mu
 	if (result == UI_HANDLER_CANCEL)
 		menu::stack_pop(mui.machine());
 
-	menu_sliders *uim = topmost_menu<menu_sliders>();
+	menu_sliders *uim = topmost_menu<menu_sliders>(mui.machine());
 	return uim && uim->m_menuless_mode ? 0 : UI_HANDLER_CANCEL;
 }
 

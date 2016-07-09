@@ -13,13 +13,14 @@
 #define MAME_FRONTEND_UI_SELSOFT_H
 
 #include "ui/custmenu.h"
+#include "ui/selmenu.h"
 
 namespace ui {
 using s_bios = std::vector<std::pair<std::string, int>>;
 using s_parts = std::unordered_map<std::string, std::string>;
 
 // Menu Class
-class menu_select_software : public menu
+class menu_select_software : public menu_select_launch
 {
 public:
 	menu_select_software(mame_ui_manager &mui, render_container *container, const game_driver *driver);

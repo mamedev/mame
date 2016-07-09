@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_MENU_H
 #define MAME_FRONTEND_UI_MENU_H
+
+#pragma once
 
 #include "ui/ui.h"
 #include "ui/menuitem.h"
@@ -19,7 +19,10 @@
 #include "language.h"
 #include "render.h"
 
+#include <functional>
+#include <map>
 #include <memory>
+#include <mutex>
 
 
 namespace ui {
@@ -39,9 +42,7 @@ public:
 		FLAG_MULTILINE      = (1 << 3),
 		FLAG_REDTEXT        = (1 << 4),
 		FLAG_DISABLE        = (1 << 5),
-		FLAG_UI             = (1 << 6),
 		FLAG_UI_DATS        = (1 << 7),
-		FLAG_UI_SWLIST      = (1 << 8),
 		FLAG_UI_FAVORITE    = (1 << 9),
 		FLAG_UI_PALETTE     = (1 << 10),
 		FLAG_UI_HEADING     = (1 << 11)
@@ -72,10 +73,9 @@ public:
 
 	// Global initialization
 	static void init(running_machine &machine, ui_options &mopt);
-	static void exit(running_machine &machine);
 
 	// reset the menus, clearing everything
-	static void stack_reset(running_machine &machine);
+	static void stack_reset(running_machine &machine) { get_global_state(machine)->stack_reset(); }
 
 	// push a new menu onto the stack
 	template <typename T, typename... Params>
@@ -92,16 +92,13 @@ public:
 	}
 
 	// pop a menu from the stack
-	static void stack_pop(running_machine &machine);
+	static void stack_pop(running_machine &machine) { get_global_state(machine)->stack_pop(); }
 
 	// test if one of the menus in the stack requires hide disable
-	static bool stack_has_special_main_menu();
+	static bool stack_has_special_main_menu(running_machine &machine) { return get_global_state(machine)->stack_has_special_main_menu(); }
 
 	// highlight
 	static void highlight(render_container *container, float x0, float y0, float x1, float y1, rgb_t bgcolor);
-
-	// draw arrow
-	static void draw_arrow(render_container *container, float x0, float y0, float x1, float y1, rgb_t fgcolor, UINT32 orientation);
 
 	// master handler
 	static UINT32 ui_handler(render_container *container, mame_ui_manager &mui);
@@ -122,22 +119,15 @@ public:
 
 private:
 	static std::unique_ptr<bitmap_rgb32> hilight_bitmap;
-	static render_texture *hilight_texture, *arrow_texture;
+	static render_texture *hilight_texture;
 
-	void draw(UINT32 flags, float x0 = 0.0f, float y0 = 0.0f);
+	virtual void draw(UINT32 flags);
 	void draw_text_box();
-	void handle_events(UINT32 flags);
-	void handle_keys(UINT32 flags);
 
-	inline bool exclusive_input_pressed(int key, int repeat);
-	static void clear_free_list(running_machine &machine);
 	static void render_triangle(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
 
 public:
 	void *m_prev_selected;
-
-	int  visible_items;
-	bool ui_error;
 
 	// mouse handling
 	bool mouse_hit, mouse_button;
@@ -145,17 +135,11 @@ public:
 	INT32 mouse_target_x, mouse_target_y;
 	float mouse_x, mouse_y;
 
-	// draw toolbar
-	void draw_toolbar(float x1, float y1, float x2, float y2, bool software = false);
-
 	// draw left panel
 	virtual float draw_left_panel(float x1, float y1, float x2, float y2) { return 0; }
 
 	// draw right panel
 	virtual void draw_right_panel(void *selectedref, float origx1, float origy1, float origx2, float origy2) { };
-
-	// draw star
-	void draw_star(float x0, float y0);
 
 	// Global initialization
 	static void init_ui(running_machine &machine, ui_options &mopt);
@@ -171,6 +155,10 @@ public:
 	}
 
 protected:
+	using cleanup_callback = std::function<void(running_machine &)>;
+	using bitmap_ptr = std::unique_ptr<bitmap_argb32>;
+	using texture_ptr = std::unique_ptr<render_texture, std::function<void(render_texture *)> >;
+
 	// flags to pass to process
 	enum
 	{
@@ -188,15 +176,6 @@ protected:
 		SELECT_FIRST,
 		REMEMBER_POSITION,
 		REMEMBER_REF
-	};
-
-	// tab navigation
-	enum class focused_menu
-	{
-		main,
-		left,
-		righttop,
-		rightbottom
 	};
 
 	// menu-related events
@@ -234,26 +213,32 @@ protected:
 		}
 	};
 
-	int topline_datsview;      // right box top line
-	int top_line;              // main box top line
+	int top_line;           // main box top line
 	int l_sw_hover;
 	int l_hover;
-	int totallines;
 	int skip_main_items;
-	int selected;              // which item is selected
+	int selected;           // which item is selected
+
+	int m_visible_lines;    // main box visible lines
+	int m_visible_items;    // number of visible items
 
 	menu(mame_ui_manager &mui, render_container *container);
 
 	void reset(reset_options options);
 	void reset_parent(reset_options options) { m_parent->reset(options); }
-	static void reset_topmost(reset_options options) { if (menu_stack) menu_stack->reset(options); }
+	void reset_topmost(reset_options options) { m_global_state->reset_topmost(options); }
+
+	template <typename T> T *topmost_menu() const { return m_global_state->topmost_menu<T>(); }
+	template <typename T> static T *topmost_menu(running_machine &machine) { return get_global_state(machine)->topmost_menu<T>(); }
+	void stack_pop() { m_global_state->stack_pop(); }
+	void stack_reset() { m_global_state->stack_reset(); }
+	bool stack_has_special_main_menu() const { return m_global_state->stack_has_special_main_menu(); }
+
+	void add_cleanup_callback(cleanup_callback &&callback) { m_global_state->add_cleanup_callback(std::move(callback)); }
 
 	// process a menu, drawing it and returning any interesting events
 	const event *process(UINT32 flags, float x0 = 0.0f, float y0 = 0.0f);
 	void process_parent() { m_parent->process(PROCESS_NOINPUT); }
-
-	focused_menu get_focus() const { return m_focus; }
-	void set_focus(focused_menu focus) { m_focus = focus; }
 
 	// retrieves the ref of the currently selected menu item or nullptr
 	void *get_selection_ref() const { return selection_valid() ? item[selected].ref : nullptr; }
@@ -267,37 +252,81 @@ protected:
 	// scroll position control
 	void centre_selection() { top_line = selected - (m_visible_lines / 2); }
 
-	// draw right box
-	float draw_right_box_title(float x1, float y1, float x2, float y2);
+	// test if the given key is pressed and we haven't already reported a key
+	bool exclusive_input_pressed(int &iptkey, int key, int repeat);
 
 	// draw arrow
+	void draw_arrow(render_container *container, float x0, float y0, float x1, float y1, rgb_t fgcolor, UINT32 orientation);
 	void draw_common_arrow(float origx1, float origy1, float origx2, float origy2, int current, int dmin, int dmax, float title);
 	void info_arrow(int ub, float origx1, float origx2, float oy1, float line_height, float text_size, float ud_arrow_width);
-
-	// images render
-	std::string arts_render_common(float origx1, float origy1, float origx2, float origy2);
-	void arts_render_images(bitmap_argb32 *bitmap, float origx1, float origy1, float origx2, float origy2);
 
 	// draw header and footer text
 	void extra_text_render(float top, float bottom, float origx1, float origy1, float origx2, float origy2, const char *header, const char *footer);
 	void extra_text_position(float origx1, float origx2, float origy, float yspan, text_layout &layout,
 		int direction, float &x1, float &y1, float &x2, float &y2);
 
-	// custom events
+	void draw_background();
+
+	// overridable event handling
+	virtual void handle_events(UINT32 flags, event &ev);
+	virtual void handle_keys(UINT32 flags, int &iptkey);
 	virtual bool custom_mouse_down() { return false; }
 
-	template <typename T>
-	static T *topmost_menu() { return dynamic_cast<T *>(menu_stack.get()); }
+	static bool is_selectable(menu_item const &item)
+	{
+		return ((item.flags & (menu::FLAG_MULTILINE | menu::FLAG_DISABLE)) == 0 && item.type != menu_item_type::SEPARATOR);
+	}
 
 	int right_visible_lines;  // right box lines
 
-	static std::unique_ptr<bitmap_argb32> snapx_bitmap;
+	static bitmap_ptr snapx_bitmap;
 	static render_texture *snapx_texture;
 
 	static std::unique_ptr<bitmap_rgb32> hilight_main_bitmap;
 	static render_texture *hilight_main_texture;
 
 private:
+	class global_state
+	{
+	public:
+		global_state(running_machine &machine, ui_options const &options);
+		global_state(global_state const &) = delete;
+		global_state(global_state &&) = delete;
+		~global_state();
+
+		void add_cleanup_callback(cleanup_callback &&callback);
+
+		render_texture * arrow_texture() { return m_arrow_texture.get(); }
+		bitmap_argb32 *bgrnd_bitmap() { return m_bgrnd_bitmap.get(); }
+		render_texture * bgrnd_texture() { return m_bgrnd_texture.get(); }
+
+		void reset_topmost(reset_options options) { if (m_stack) m_stack->reset(options); }
+
+		template <typename T>
+		T *topmost_menu() const { return dynamic_cast<T *>(m_stack.get()); }
+
+		void stack_push(std::unique_ptr<menu> &&menu);
+		void stack_pop();
+		void stack_reset();
+		void clear_free_list();
+		bool stack_has_special_main_menu() const;
+
+	private:
+		using cleanup_callback_vector = std::vector<cleanup_callback>;
+
+		running_machine           &m_machine;
+		cleanup_callback_vector   m_cleanup_callbacks;
+
+		texture_ptr               m_arrow_texture;
+		bitmap_ptr                m_bgrnd_bitmap;
+		texture_ptr               m_bgrnd_texture;
+
+		std::unique_ptr<menu>     m_stack;
+		std::unique_ptr<menu>     m_free;
+	};
+	using global_state_ptr = std::shared_ptr<global_state>;
+	using global_state_map = std::map<running_machine *, global_state_ptr>;
+
 	struct pool
 	{
 		pool   *next;    // chain to next one
@@ -305,69 +334,36 @@ private:
 		UINT8  *end;     // end of the pool
 	};
 
-
-	void reset_pressed() { m_pressed = false; m_repeat = 0; }
-	bool mouse_pressed() { return (osd_ticks() >= m_repeat); }
-	void set_pressed();
-
-	static std::unique_ptr<bitmap_argb32> no_avail_bitmap, bgrnd_bitmap, star_bitmap;
-	static render_texture *bgrnd_texture, *star_texture;
-	static std::vector<std::unique_ptr<bitmap_argb32>> icons_bitmap;
-	static render_texture *icons_texture[];
-
 	// request the specific handling of the game selection main menu
 	bool is_special_main_menu() const;
 	void set_special_main_menu(bool disable);
 
 	// push a new menu onto the stack
-	static void stack_push(std::unique_ptr<menu> &&menu);
-
-	// toolbar
-	static std::vector<std::shared_ptr<bitmap_argb32>> toolbar_bitmap, sw_toolbar_bitmap;
-	static render_texture *toolbar_texture[], *sw_toolbar_texture[];
-
-	// draw game list
-	void draw_select_game(UINT32 flags);
+	static void stack_push(std::unique_ptr<menu> &&menu) { get_global_state(menu->machine())->stack_push(std::move(menu)); }
 
 	// draw palette menu
 	void draw_palette_menu();
 
-	// draw dats menu
-	void draw_dats_menu();
-
-	void get_title_search(std::string &title, std::string &search);
-
-	// handle keys
-	void handle_main_keys(UINT32 flags);
-
-	// handle mouse
-	void handle_main_events();
-
-	float draw_icon(int linenum, void *selectedref, float x1, float y1);
 	void extra_text_draw_box(float origx1, float origx2, float origy, float yspan, const char *text, int direction);
 
 	bool first_item_visible() const { return top_line <= 0; }
 	bool last_item_visible() const { return (top_line + m_visible_lines) >= item.size(); }
 
+	static void exit(running_machine &machine);
+	static global_state_ptr get_global_state(running_machine &machine);
+
+	global_state_ptr const  m_global_state;
 	bool                    m_special_main_menu;
 	mame_ui_manager         &m_ui;              // UI we are attached to
 	std::unique_ptr<menu>   m_parent;           // pointer to parent menu
-	bool                    m_pressed;          // mouse button held down
-	osd_ticks_t             m_repeat;
 	event                   m_event;            // the UI event that occurred
 	pool                    *m_pool;            // list of memory pools
-	focused_menu            m_focus;
-
-	int                     m_visible_lines;    // main box visible lines
-	int                     m_visible_items;    // number of visible items
 
 	int                     m_resetpos;         // reset position
 	void                    *m_resetref;        // reset reference
 
-	static std::vector<const game_driver *> m_old_icons;
-
-	static std::unique_ptr<menu> menu_stack;
-	static std::unique_ptr<menu> menu_free;
+	static std::mutex       s_global_state_guard;
+	static global_state_map s_global_states;
 };
 
 } // namespace ui

@@ -548,7 +548,7 @@ void menu_quit_game::handle()
 	machine().schedule_exit();
 
 	/* reset the menu stack */
-	menu::stack_reset(machine());
+	stack_reset();
 }
 
 //-------------------------------------------------

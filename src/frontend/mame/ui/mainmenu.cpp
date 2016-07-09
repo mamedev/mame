@@ -272,7 +272,7 @@ void menu_main::handle()
 			break;
 
 		case QUIT_GAME:
-			menu::stack_pop(machine());
+			stack_pop();
 			ui().request_quit();
 			break;
 

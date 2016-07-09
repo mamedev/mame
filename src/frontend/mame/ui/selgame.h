@@ -13,11 +13,11 @@
 #ifndef MAME_FRONTEND_UI_SELGAME_H
 #define MAME_FRONTEND_UI_SELGAME_H
 
-#include "ui/menu.h"
+#include "ui/selmenu.h"
 
 
 namespace ui {
-class menu_select_game : public menu
+class menu_select_game : public menu_select_launch
 {
 public:
 	menu_select_game(mame_ui_manager &mui, render_container *container, const char *gamename);

@@ -164,7 +164,7 @@ void simple_menu_select_game::inkey_select(const event *menu_event)
 		{
 			mame_machine_manager::instance()->schedule_new_driver(*driver);
 			machine().schedule_hard_reset();
-			menu::stack_reset(machine());
+			stack_reset();
 		}
 
 		// otherwise, display an error
@@ -264,7 +264,7 @@ void simple_menu_select_game::populate()
 	}
 
 	// if we're forced into this, allow general input configuration as well
-	if (menu::stack_has_special_main_menu())
+	if (stack_has_special_main_menu())
 	{
 		item_append(menu_item_type::SEPARATOR);
 		item_append(_("Configure Options"), "", 0, (void *)1);

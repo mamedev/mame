@@ -38,6 +38,10 @@ public:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
+	// draw dats menu
+	virtual void draw(UINT32 flags) override;
+
+	int visible_items;
 	int m_actual;
 	const game_driver  *m_driver;
 	ui_software_info *m_swinfo;
