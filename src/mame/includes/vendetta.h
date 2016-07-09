@@ -52,19 +52,24 @@ public:
 	optional_device<k053252_device> m_k053252;
 	optional_device<k054000_device> m_k054000;
 	required_device<palette_device> m_palette;
-	DECLARE_WRITE8_MEMBER(vendetta_eeprom_w);
-	DECLARE_READ8_MEMBER(vendetta_K052109_r);
-	DECLARE_WRITE8_MEMBER(vendetta_K052109_w);
-	DECLARE_WRITE8_MEMBER(vendetta_5fe0_w);
+
+	DECLARE_WRITE8_MEMBER(eeprom_w);
+	DECLARE_READ8_MEMBER(K052109_r);
+	DECLARE_WRITE8_MEMBER(K052109_w);
+	DECLARE_WRITE8_MEMBER(_5fe0_w);
 	DECLARE_WRITE8_MEMBER(z80_arm_nmi_w);
 	DECLARE_WRITE8_MEMBER(z80_irq_w);
 	DECLARE_READ8_MEMBER(z80_irq_r);
+
 	DECLARE_DRIVER_INIT(vendetta);
 	DECLARE_DRIVER_INIT(esckids);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_vendetta(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vendetta_irq);
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	INTERRUPT_GEN_MEMBER(irq);
+
 	void vendetta_video_banking( int select );
 	K052109_CB_MEMBER(vendetta_tile_callback);
 	K052109_CB_MEMBER(esckids_tile_callback);
