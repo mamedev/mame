@@ -42,10 +42,9 @@ public:
 		FLAG_MULTILINE      = (1 << 3),
 		FLAG_REDTEXT        = (1 << 4),
 		FLAG_DISABLE        = (1 << 5),
-		FLAG_UI_DATS        = (1 << 7),
-		FLAG_UI_FAVORITE    = (1 << 9),
-		FLAG_UI_PALETTE     = (1 << 10),
-		FLAG_UI_HEADING     = (1 << 11)
+		FLAG_UI_DATS        = (1 << 6),
+		FLAG_UI_FAVORITE    = (1 << 7),
+		FLAG_UI_HEADING     = (1 << 8)
 	};
 
 	virtual ~menu();
@@ -333,9 +332,6 @@ private:
 
 	// push a new menu onto the stack
 	static void stack_push(std::unique_ptr<menu> &&menu) { get_global_state(menu->machine())->stack_push(std::move(menu)); }
-
-	// draw palette menu
-	void draw_palette_menu();
 
 	void extra_text_draw_box(float origx1, float origx2, float origy, float yspan, const char *text, int direction);
 

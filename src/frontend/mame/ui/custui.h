@@ -168,8 +168,10 @@ public:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
+	// draw palette menu
+	virtual void draw(UINT32 flags) override;
 
-	static std::vector<std::pair<const char *, const char *>> m_palette;
+	static std::pair<const char *, const char *> const s_palette[];
 	rgb_t &m_original;
 };
 
