@@ -30,16 +30,19 @@ namespace ui {
 class menu_dats_view : public menu
 {
 public:
-	menu_dats_view(mame_ui_manager &mui, render_container *container, ui_software_info *swinfo, const game_driver *driver = nullptr);
-	menu_dats_view(mame_ui_manager &mui, render_container *container, const game_driver *driver = nullptr);
+	menu_dats_view(mame_ui_manager &mui, render_container &container, ui_software_info *swinfo, const game_driver *driver = nullptr);
+	menu_dats_view(mame_ui_manager &mui, render_container &container, const game_driver *driver = nullptr);
 	virtual ~menu_dats_view() override;
-	virtual void populate() override;
-	virtual void handle() override;
+
+protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
 	// draw dats menu
 	virtual void draw(UINT32 flags) override;
+
+	virtual void populate() override;
+	virtual void handle() override;
 
 	int visible_items;
 	int m_actual;

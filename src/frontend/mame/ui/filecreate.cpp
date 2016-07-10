@@ -2,12 +2,12 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-	ui/filecreate.cpp
+    ui/filecreate.cpp
 
-	MAME's clunky built-in file manager
+    MAME's clunky built-in file manager
 
-	TODO
-		- Support image creation arguments
+    TODO
+        - Support image creation arguments
 
 ***************************************************************************/
 
@@ -80,7 +80,7 @@ CONFIRM SAVE AS MENU
 //  ctor
 //-------------------------------------------------
 
-menu_confirm_save_as::menu_confirm_save_as(mame_ui_manager &mui, render_container *container, bool *yes)
+menu_confirm_save_as::menu_confirm_save_as(mame_ui_manager &mui, render_container &container, bool *yes)
 	: menu(mui, container)
 {
 	m_yes = yes;
@@ -139,12 +139,12 @@ FILE CREATE MENU
 //  ctor
 //-------------------------------------------------
 
-menu_file_create::menu_file_create(mame_ui_manager &mui, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool &ok)
+menu_file_create::menu_file_create(mame_ui_manager &mui, render_container &container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool &ok)
 	: menu(mui, container)
+	, m_ok(ok)
 	, m_current_directory(current_directory)
 	, m_current_file(current_file)
 	, m_current_format(nullptr)
-	, m_ok(ok)
 {
 	m_image = image;
 	m_ok = true;
@@ -268,7 +268,7 @@ SELECT FORMAT MENU
 //  ctor
 //-------------------------------------------------
 
-menu_select_format::menu_select_format(mame_ui_manager &mui, render_container *container, floppy_image_format_t **formats, int ext_match, int total_usable, int *result)
+menu_select_format::menu_select_format(mame_ui_manager &mui, render_container &container, floppy_image_format_t **formats, int ext_match, int total_usable, int *result)
 	: menu(mui, container)
 {
 	m_formats = formats;

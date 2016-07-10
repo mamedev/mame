@@ -39,7 +39,7 @@ protected:
 		rightbottom
 	};
 
-	menu_select_launch(mame_ui_manager &mui, render_container *container, bool is_swlist);
+	menu_select_launch(mame_ui_manager &mui, render_container &container, bool is_swlist);
 
 	focused_menu get_focus() const { return m_focus; }
 	void set_focus(focused_menu focus) { m_focus = focus; }
@@ -111,6 +111,12 @@ private:
 	bool mouse_pressed() const { return (osd_ticks() >= m_repeat); }
 	void set_pressed();
 
+	// draw left panel
+	virtual float draw_left_panel(float x1, float y1, float x2, float y2) = 0;
+
+	// draw right panel
+	virtual void draw_right_panel(void *selectedref, float origx1, float origy1, float origx2, float origy2) = 0;
+
 	float draw_icon(int linenum, void *selectedref, float x1, float y1);
 
 	void get_title_search(std::string &title, std::string &search);
@@ -127,7 +133,7 @@ private:
 	// cleanup function
 	static void exit(running_machine &machine);
 
-	cache_ptr		m_cache;
+	cache_ptr       m_cache;
 	bool            m_is_swlist;
 	focused_menu    m_focus;
 	bool            m_pressed;          // mouse button held down

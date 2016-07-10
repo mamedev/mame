@@ -1630,7 +1630,7 @@ int lua_engine::lua_screen::l_draw_box(lua_State *L)
 
 	// draw the box
 	render_container &rc = sc->container();
-	mame_machine_manager::instance()->ui().draw_outlined_box(&rc, x1, y1, x2, y2, fgcolor, bgcolor);
+	mame_machine_manager::instance()->ui().draw_outlined_box(rc, x1, y1, x2, y2, fgcolor, bgcolor);
 
 	return 0;
 }
@@ -1716,7 +1716,7 @@ int lua_engine::lua_screen::l_draw_text(lua_State *L)
 
 	// draw the text
 	render_container &rc = sc->container();
-	mame_machine_manager::instance()->ui().draw_text_full(&rc, msg, x, y, (1.0f - x),
+	mame_machine_manager::instance()->ui().draw_text_full(rc, msg, x, y, (1.0f - x),
 						justify, ui::text_layout::WORD, mame_ui_manager::NORMAL, textcolor,
 						bgcolor, nullptr, nullptr);
 	return 0;

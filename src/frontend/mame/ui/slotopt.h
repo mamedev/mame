@@ -20,12 +20,13 @@ namespace ui {
 class menu_slot_devices : public menu
 {
 public:
-	menu_slot_devices(mame_ui_manager &mui, render_container *container);
+	menu_slot_devices(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_slot_devices() override;
+
+private:
 	virtual void populate() override;
 	virtual void handle() override;
 
-private:
 	device_slot_option *slot_get_current_option(device_slot_interface &slot);
 	int slot_get_current_index(device_slot_interface &slot);
 	int slot_get_length(device_slot_interface &slot);

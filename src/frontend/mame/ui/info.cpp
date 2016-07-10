@@ -21,7 +21,7 @@ namespace ui {
   menu
  -------------------------------------------------*/
 
-menu_game_info::menu_game_info(mame_ui_manager &mui, render_container *container) : menu(mui, container)
+menu_game_info::menu_game_info(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
 }
 
@@ -47,7 +47,7 @@ void menu_game_info::handle()
   menu
  -------------------------------------------------*/
 
-menu_image_info::menu_image_info(mame_ui_manager &mui, render_container *container) : menu(mui, container)
+menu_image_info::menu_image_info(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
 }
 

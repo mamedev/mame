@@ -2,9 +2,9 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-	ui/filecreate.h
+    ui/filecreate.h
 
-	MESS's clunky built-in file manager
+    MESS's clunky built-in file manager
 
 ***************************************************************************/
 
@@ -23,12 +23,13 @@ namespace ui {
 class menu_confirm_save_as : public menu
 {
 public:
-	menu_confirm_save_as(mame_ui_manager &mui, render_container *container, bool *yes);
+	menu_confirm_save_as(mame_ui_manager &mui, render_container &container, bool *yes);
 	virtual ~menu_confirm_save_as() override;
+
+private:
 	virtual void populate() override;
 	virtual void handle() override;
 
-private:
 	bool *m_yes;
 };
 
@@ -38,21 +39,23 @@ private:
 class menu_file_create : public menu
 {
 public:
-	menu_file_create(mame_ui_manager &mui, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool &ok);
+	menu_file_create(mame_ui_manager &mui, render_container &container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool &ok);
 	virtual ~menu_file_create() override;
-	virtual void populate() override;
-	virtual void handle() override;
+
+protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
+	bool &                          m_ok;
+
 private:
+	virtual void populate() override;
+	virtual void handle() override;
+
 	device_image_interface *        m_image;
 	std::string &                   m_current_directory;
 	std::string &                   m_current_file;
 	const image_device_format *     m_current_format;
-	std::string						m_filename;
-
-protected:
-	bool &                          m_ok;
+	std::string                     m_filename;
 };
 
 // ======================> menu_select_format
@@ -60,13 +63,14 @@ protected:
 class menu_select_format : public menu
 {
 public:
-	menu_select_format(mame_ui_manager &mui, render_container *container,
+	menu_select_format(mame_ui_manager &mui, render_container &container,
 		floppy_image_format_t **formats, int ext_match, int total_usable, int *result);
 	virtual ~menu_select_format() override;
+
+private:
 	virtual void populate() override;
 	virtual void handle() override;
 
-private:
 	// internal state
 	floppy_image_format_t **    m_formats;
 	int                         m_ext_match;

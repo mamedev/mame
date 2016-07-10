@@ -28,7 +28,7 @@ namespace ui {
 //  ctor / dtor
 //-------------------------------------------------
 
-menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container *container, const game_driver *driver)
+menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container, const game_driver *driver)
 	: menu(mui, container)
 	, m_actual(0)
 	, m_driver((driver == nullptr) ? &mui.machine().system() : driver)
@@ -53,7 +53,7 @@ menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container *container
 //  ctor
 //-------------------------------------------------
 
-menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container *container, ui_software_info *swinfo, const game_driver *driver)
+menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container, ui_software_info *swinfo, const game_driver *driver)
 	: menu(mui, container)
 	, m_actual(0)
 	, m_driver((driver == nullptr) ? &mui.machine().system() : driver)
@@ -147,7 +147,7 @@ void menu_dats_view::draw(UINT32 flags)
 	mouse_button = false;
 	mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
 	if (mouse_target != nullptr)
-		if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, *container, mouse_x, mouse_y))
+		if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, container(), mouse_x, mouse_y))
 			mouse_hit = true;
 
 	// account for extra space at the top and bottom
@@ -168,7 +168,7 @@ void menu_dats_view::draw(UINT32 flags)
 	float y2 = visible_top + visible_main_menu_height + UI_BOX_TB_BORDER + extra_height;
 	float line = visible_top + float(m_visible_lines) * line_height;
 
-	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	m_visible_lines = (std::min)(visible_items, m_visible_lines);
 	top_line = (std::max)(0, top_line);
@@ -196,28 +196,28 @@ void menu_dats_view::draw(UINT32 flags)
 		// if we're on the top line, display the up arrow
 		if (linenum == 0 && top_line != 0)
 		{
-			draw_arrow(container, 0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
+			draw_arrow(0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
 				0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0);
 
 			if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y)
 			{
 				fgcolor = UI_MOUSEOVER_COLOR;
 				bgcolor = UI_MOUSEOVER_BG_COLOR;
-				highlight(container, line_x0, line_y0, line_x1, line_y1, bgcolor);
+				highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
 				hover = HOVER_ARROW_UP;
 			}
 		}
 		// if we're on the bottom line, display the down arrow
 		else if (linenum == m_visible_lines - 1 && itemnum != visible_items - 1)
 		{
-			draw_arrow(container, 0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
+			draw_arrow(0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
 				0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0 ^ ORIENTATION_FLIP_Y);
 
 			if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y)
 			{
 				fgcolor = UI_MOUSEOVER_COLOR;
 				bgcolor = UI_MOUSEOVER_BG_COLOR;
-				highlight(container, line_x0, line_y0, line_x1, line_y1, bgcolor);
+				highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
 				hover = HOVER_ARROW_DOWN;
 			}
 		}
@@ -225,7 +225,7 @@ void menu_dats_view::draw(UINT32 flags)
 		// draw dats text
 		else if (pitem.subtext.empty())
 		{
-			ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width, ui::text_layout::LEFT, ui::text_layout::NEVER,
+			ui().draw_text_full(container(), itemtext, effective_left, line_y, effective_width, ui::text_layout::LEFT, ui::text_layout::NEVER,
 				mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 		}
 	}
@@ -245,12 +245,12 @@ void menu_dats_view::draw(UINT32 flags)
 			hover = count;
 
 		if (pitem.type == menu_item_type::SEPARATOR)
-			container->add_line(visible_left, line + 0.5f * line_height, visible_left + visible_width, line + 0.5f * line_height,
+			container().add_line(visible_left, line + 0.5f * line_height, visible_left + visible_width, line + 0.5f * line_height,
 				UI_LINE_WIDTH, UI_TEXT_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		else
 		{
-			highlight(container, line_x0, line_y0, line_x1, line_y1, bgcolor);
-			ui().draw_text_full(container, itemtext, effective_left, line, effective_width, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+			highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
+			ui().draw_text_full(container(), itemtext, effective_left, line, effective_width, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 				mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 		}
 		line += line_height;
@@ -273,7 +273,7 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	float width;
 	std::string driver = (m_issoft == true) ? m_swinfo->longname : m_driver->description;
 
-	ui().draw_text_full(container, driver.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+	ui().draw_text_full(container(), driver.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 		mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(maxwidth, width);
@@ -285,20 +285,20 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	float y2 = origy1 - 2.0f * UI_BOX_TB_BORDER - ui().get_line_height();
 
 	// draw a box
-	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
 	x2 -= UI_BOX_LR_BORDER;
 	y1 += UI_BOX_TB_BORDER;
 
-	ui().draw_text_full(container, driver.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
+	ui().draw_text_full(container(), driver.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
 		mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 	maxwidth = 0;
 	for (auto & elem : m_items_list)
 	{
-		ui().draw_text_full(container, elem.label.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
+		ui().draw_text_full(container(), elem.label.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
 			mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 		maxwidth += width;
 	}
@@ -312,7 +312,7 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	y2 += ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;
 
 	// draw a box
-	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	// take off the borders
 	y1 += UI_BOX_TB_BORDER;
@@ -324,13 +324,13 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 		x1 += space;
 		rgb_t fcolor = (m_actual == x) ? rgb_t(0xff, 0xff, 0xff, 0x00) : UI_TEXT_COLOR;
 		rgb_t bcolor = (m_actual == x) ? rgb_t(0xff, 0xff, 0xff, 0xff) : UI_TEXT_BG_COLOR;
-		ui().draw_text_full(container, elem.label.c_str(), x1, y1, 1.0f, ui::text_layout::LEFT, ui::text_layout::NEVER, mame_ui_manager::NONE, fcolor, bcolor, &width, nullptr);
+		ui().draw_text_full(container(), elem.label.c_str(), x1, y1, 1.0f, ui::text_layout::LEFT, ui::text_layout::NEVER, mame_ui_manager::NONE, fcolor, bcolor, &width, nullptr);
 
 		if (bcolor != UI_TEXT_BG_COLOR)
-			ui().draw_textured_box(container, x1 - (space / 2), y1, x1 + width + (space / 2), y2, bcolor, rgb_t(255, 43, 43, 43),
+			ui().draw_textured_box(container(), x1 - (space / 2), y1, x1 + width + (space / 2), y2, bcolor, rgb_t(255, 43, 43, 43),
 				hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
-		ui().draw_text_full(container, elem.label.c_str(), x1, y1, 1.0f, ui::text_layout::LEFT, ui::text_layout::NEVER, mame_ui_manager::NORMAL, fcolor, bcolor, &width, nullptr);
+		ui().draw_text_full(container(), elem.label.c_str(), x1, y1, 1.0f, ui::text_layout::LEFT, ui::text_layout::NEVER, mame_ui_manager::NORMAL, fcolor, bcolor, &width, nullptr);
 		x1 += width + space;
 		++x;
 	}
@@ -338,7 +338,7 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	// bottom
 	std::string revision;
 	revision.assign(_("Revision: ")).append(m_items_list[m_actual].revision);
-	ui().draw_text_full(container, revision.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+	ui().draw_text_full(container(), revision.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(origx2 - origx1, width);
 
@@ -349,7 +349,7 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	y2 = origy2 + bottom;
 
 	// draw a box
-	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -357,7 +357,7 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	ui().draw_text_full(container, revision.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+	ui().draw_text_full(container(), revision.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 		mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
@@ -388,7 +388,7 @@ void menu_dats_view::get_data()
 	else
 		mame_machine_manager::instance()->datfile().load_data_info(m_driver, buffer, m_items_list[m_actual].option);
 
-	auto lines = ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
+	auto lines = ui().wrap_text(container(), buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
 	for (int x = 0; x < lines; ++x)
 	{
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));
@@ -411,7 +411,7 @@ void menu_dats_view::get_data_sw()
 			mame_machine_manager::instance()->datfile().load_software_info(m_swinfo->listname, buffer, m_swinfo->shortname, m_swinfo->parentname);
 	}
 
-	auto lines = ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
+	auto lines = ui().wrap_text(container(), buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
 	for (int x = 0; x < lines; ++x)
 	{
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));

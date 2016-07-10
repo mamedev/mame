@@ -21,19 +21,22 @@ public:
 	std::string current_file;
 	device_image_interface *selected_device;
 
-	static void force_file_manager(mame_ui_manager &mui, render_container *container, const char *warnings);
+	static void force_file_manager(mame_ui_manager &mui, render_container &container, const char *warnings);
 
-	menu_file_manager(mame_ui_manager &mui, render_container *container, const char *warnings);
+	menu_file_manager(mame_ui_manager &mui, render_container &container, const char *warnings);
 	virtual ~menu_file_manager();
+
+protected:
+	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+
+private:
 	virtual void populate() override;
 	virtual void handle() override;
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 	void fill_image_line(device_image_interface *img, std::string &instance, std::string &filename);
 
-private:
 	std::string m_warnings;
-	bool m_curr_selected;
+	bool        m_curr_selected;
 };
 
 } // namespace ui

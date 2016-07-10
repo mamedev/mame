@@ -108,7 +108,7 @@ void menu_cheat::handle()
 		/* handle autofire menu */
 		if (menu_event->itemref == ITEMREF_CHEATS_AUTOFIRE_SETTINGS && menu_event->iptkey == IPT_UI_SELECT)
 		{
-			menu::stack_push<menu_autofire>(ui(), container);
+			menu::stack_push<menu_autofire>(ui(), container());
 		}
 
 		/* if things changed, update */
@@ -122,7 +122,7 @@ void menu_cheat::handle()
     menu_cheat_populate - populate the cheat menu
 -------------------------------------------------*/
 
-menu_cheat::menu_cheat(mame_ui_manager &mui, render_container *container) : menu(mui, container)
+menu_cheat::menu_cheat(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
 }
 
@@ -174,7 +174,7 @@ menu_cheat::~menu_cheat()
     menu
 -------------------------------------------------*/
 
-menu_autofire::menu_autofire(mame_ui_manager &mui, render_container *container) : menu(mui, container), last_toggle(false)
+menu_autofire::menu_autofire(mame_ui_manager &mui, render_container &container) : menu(mui, container), last_toggle(false)
 {
 	const screen_device *screen = mui.machine().first_screen();
 

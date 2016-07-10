@@ -125,7 +125,7 @@ bool has_multiple_bios(const game_driver *driver, s_bios &biosname)
 //  ctor
 //-------------------------------------------------
 
-menu_select_software::menu_select_software(mame_ui_manager &mui, render_container *container, const game_driver *driver)
+menu_select_software::menu_select_software(mame_ui_manager &mui, render_container &container, const game_driver *driver)
 	: menu_select_launch(mui, container, true)
 {
 	if (reselect_last::get())
@@ -246,9 +246,9 @@ void menu_select_software::handle()
 			datfile_manager &mdat = mame_machine_manager::instance()->datfile();
 
 			if (ui_swinfo->startempty == 1 && mdat.has_history(ui_swinfo->driver))
-				menu::stack_push<menu_dats_view>(ui(), container, ui_swinfo->driver);
+				menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo->driver);
 			else if (mdat.has_software(ui_swinfo->listname, ui_swinfo->shortname, ui_swinfo->parentname) || !ui_swinfo->usage.empty())
-				menu::stack_push<menu_dats_view>(ui(), container, ui_swinfo);
+				menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo);
 		}
 		else if (menu_event->iptkey == IPT_UI_LEFT_PANEL)
 		{
@@ -373,7 +373,7 @@ void menu_select_software::handle()
 
 	// if we're in an error state, overlay an error message
 	if (m_ui_error)
-		ui().draw_text_box(container, _("The selected software is missing one or more required files. "
+		ui().draw_text_box(container(), _("The selected software is missing one or more required files. "
 									"Please select a different software.\n\nPress any key to continue."),
 									ui::text_layout::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 
@@ -384,23 +384,23 @@ void menu_select_software::handle()
 		switch (l_sw_hover)
 		{
 		case UI_SW_REGION:
-			menu::stack_push<menu_selector>(ui(), container, m_filter.region.ui, m_filter.region.actual, menu_selector::SOFTWARE, l_sw_hover);
+			menu::stack_push<menu_selector>(ui(), container(), m_filter.region.ui, m_filter.region.actual, menu_selector::SOFTWARE, l_sw_hover);
 			break;
 		case UI_SW_YEARS:
-			menu::stack_push<menu_selector>(ui(), container, m_filter.year.ui, m_filter.year.actual, menu_selector::SOFTWARE, l_sw_hover);
+			menu::stack_push<menu_selector>(ui(), container(), m_filter.year.ui, m_filter.year.actual, menu_selector::SOFTWARE, l_sw_hover);
 			break;
 		case UI_SW_LIST:
-			menu::stack_push<menu_selector>(ui(), container, m_filter.swlist.description, m_filter.swlist.actual, menu_selector::SOFTWARE, l_sw_hover);
+			menu::stack_push<menu_selector>(ui(), container(), m_filter.swlist.description, m_filter.swlist.actual, menu_selector::SOFTWARE, l_sw_hover);
 			break;
 		case UI_SW_TYPE:
-			menu::stack_push<menu_selector>(ui(), container, m_filter.type.ui, m_filter.type.actual, menu_selector::SOFTWARE, l_sw_hover);
+			menu::stack_push<menu_selector>(ui(), container(), m_filter.type.ui, m_filter.type.actual, menu_selector::SOFTWARE, l_sw_hover);
 			break;
 		case UI_SW_PUBLISHERS:
-			menu::stack_push<menu_selector>(ui(), container, m_filter.publisher.ui, m_filter.publisher.actual, menu_selector::SOFTWARE, l_sw_hover);
+			menu::stack_push<menu_selector>(ui(), container(), m_filter.publisher.ui, m_filter.publisher.actual, menu_selector::SOFTWARE, l_sw_hover);
 			break;
 		case UI_SW_CUSTOM:
 			sw_filters::actual = l_sw_hover;
-			menu::stack_push<menu_swcustom_filter>(ui(), container, m_driver, m_filter);
+			menu::stack_push<menu_swcustom_filter>(ui(), container(), m_driver, m_filter);
 			break;
 		default:
 			sw_filters::actual = l_sw_hover;
@@ -688,7 +688,7 @@ void menu_select_software::custom_render(void *selectedref, float top, float bot
 
 	for (int line = 0; line < 3; ++line)
 	{
-		ui().draw_text_full(container, tempbuf[line].c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
+		ui().draw_text_full(container(), tempbuf[line].c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
 			mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = MAX(width, maxwidth);
@@ -707,7 +707,7 @@ void menu_select_software::custom_render(void *selectedref, float top, float bot
 	float y2 = origy1 - 3.0f * UI_BOX_TB_BORDER - tbarspace;
 
 	// draw a box
-	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -717,8 +717,8 @@ void menu_select_software::custom_render(void *selectedref, float top, float bot
 	// draw the text within it
 	for (int line = 0; line < 3; ++line)
 	{
-		ui().draw_text_full(container, tempbuf[line].c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-			mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
+		ui().draw_text_full(container(), tempbuf[line].c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
+				mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
 		y1 += ui().get_line_height();
 	}
 
@@ -835,10 +835,10 @@ void menu_select_software::custom_render(void *selectedref, float top, float bot
 	// get the size of the text
 	maxwidth = origx2 - origx1;
 
-	for (auto & elem : tempbuf)
+	for (auto &elem : tempbuf)
 	{
-		ui().draw_text_full(container, elem.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
-			mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+		ui().draw_text_full(container(), elem.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
+				mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = MAX(maxwidth, width);
 	}
@@ -856,7 +856,7 @@ void menu_select_software::custom_render(void *selectedref, float top, float bot
 	y2 = origy2 + bottom;
 
 	// draw a box
-	ui().draw_outlined_box(container, x1, y1, x2, y2, color);
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, color);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -870,8 +870,8 @@ void menu_select_software::custom_render(void *selectedref, float top, float bot
 	// draw all lines
 	for (auto & elem : tempbuf)
 	{
-		ui().draw_text_full(container, elem.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-			mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
+		ui().draw_text_full(container(), elem.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
+				mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
 		y1 += ui().get_line_height();
 	}
 }
@@ -889,7 +889,9 @@ void menu_select_software::inkey_select(const event *menu_event)
 	{
 		s_bios biosname;
 		if (!mopt.skip_bios_menu() && has_multiple_bios(ui_swinfo->driver, biosname))
-			menu::stack_push<bios_selection>(ui(), container, biosname, (void *)ui_swinfo->driver, false, true);
+		{
+			menu::stack_push<bios_selection>(ui(), container(), biosname, (void *)ui_swinfo->driver, false, true);
+		}
 		else
 		{
 			reselect_last::driver = ui_swinfo->driver->name;
@@ -918,7 +920,7 @@ void menu_select_software::inkey_select(const event *menu_event)
 			s_bios biosname;
 			if (!mopt.skip_bios_menu() && has_multiple_bios(ui_swinfo->driver, biosname))
 			{
-				menu::stack_push<bios_selection>(ui(), container, biosname, (void *)ui_swinfo, true, false);
+				menu::stack_push<bios_selection>(ui(), container(), biosname, (void *)ui_swinfo, true, false);
 				return;
 			}
 			else if (!mopt.skip_parts_menu() && swinfo->has_multiple_parts(ui_swinfo->interface.c_str()))
@@ -934,7 +936,7 @@ void menu_select_software::inkey_select(const event *menu_event)
 						parts.emplace(swpart.name(), menu_part_name);
 					}
 				}
-				menu::stack_push<software_parts>(ui(), container, parts, ui_swinfo);
+				menu::stack_push<software_parts>(ui(), container(), parts, ui_swinfo);
 				return;
 			}
 
@@ -1427,7 +1429,7 @@ float menu_select_software::draw_left_panel(float x1, float y1, float x2, float 
 		}
 
 		x2 = x1 + left_width + 2.0f * UI_BOX_LR_BORDER;
-		ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+		ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 		// take off the borders
 		x1 += UI_BOX_LR_BORDER;
@@ -1455,8 +1457,10 @@ float menu_select_software::draw_left_panel(float x1, float y1, float x2, float 
 			}
 
 			if (bgcolor != UI_TEXT_BG_COLOR)
-				ui().draw_textured_box(container, x1, y1, x2, y1 + line_height, bgcolor, rgb_t(255, 43, 43, 43),
-					hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+			{
+				ui().draw_textured_box(container(), x1, y1, x2, y1 + line_height, bgcolor, rgb_t(255, 43, 43, 43),
+						hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+			}
 
 			float x1t = x1 + text_sign;
 			if (afilter == UI_SW_CUSTOM)
@@ -1488,8 +1492,8 @@ float menu_select_software::draw_left_panel(float x1, float y1, float x2, float 
 				convert_command_glyph(str);
 			}
 
-			ui().draw_text_full(container, str.c_str(), x1t, y1, x2 - x1, ui::text_layout::LEFT, ui::text_layout::NEVER,
-				mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, text_size);
+			ui().draw_text_full(container(), str.c_str(), x1t, y1, x2 - x1, ui::text_layout::LEFT, ui::text_layout::NEVER,
+					mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, text_size);
 			y1 += line_height;
 		}
 
@@ -1507,7 +1511,7 @@ float menu_select_software::draw_left_panel(float x1, float y1, float x2, float 
 		float ar_x1 = ar_x0 + lr_arrow_width;
 		float ar_y1 = 0.5f * (y2 + y1) + 0.9f * space;
 
-		ui().draw_outlined_box(container, x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
+		ui().draw_outlined_box(container(), x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
 
 		if (mouse_hit && x1 <= mouse_x && x2 > mouse_x && y1 <= mouse_y && y2 > mouse_y)
 		{
@@ -1515,7 +1519,7 @@ float menu_select_software::draw_left_panel(float x1, float y1, float x2, float 
 			hover = HOVER_LPANEL_ARROW;
 		}
 
-		draw_arrow(container, ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90 ^ ORIENTATION_FLIP_X);
+		draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90 ^ ORIENTATION_FLIP_X);
 		return x2 + UI_BOX_LR_BORDER;
 	}
 	else
@@ -1530,7 +1534,7 @@ float menu_select_software::draw_left_panel(float x1, float y1, float x2, float 
 		float ar_x1 = ar_x0 + lr_arrow_width;
 		float ar_y1 = 0.5f * (y2 + y1) + 0.9f * space;
 
-		ui().draw_outlined_box(container, x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
+		ui().draw_outlined_box(container(), x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
 
 		if (mouse_hit && x1 <= mouse_x && x2 > mouse_x && y1 <= mouse_y && y2 > mouse_y)
 		{
@@ -1538,7 +1542,7 @@ float menu_select_software::draw_left_panel(float x1, float y1, float x2, float 
 			hover = HOVER_LPANEL_ARROW;
 		}
 
-		draw_arrow(container, ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90);
+		draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90);
 		return x2 + UI_BOX_LR_BORDER;
 	}
 }
@@ -1567,8 +1571,8 @@ void menu_select_software::infos_render(void *selectedref, float origx1, float o
 	{
 		float title_size = 0.0f;
 
-		ui().draw_text_full(container, _("History"), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-			mame_ui_manager::NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &title_size, nullptr);
+		ui().draw_text_full(container(), _("History"), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+				mame_ui_manager::NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &title_size, nullptr);
 		title_size += 0.01f;
 
 		rgb_t fgcolor = UI_TEXT_COLOR;
@@ -1582,11 +1586,11 @@ void menu_select_software::infos_render(void *selectedref, float origx1, float o
 		float middle = origx2 - origx1;
 
 		if (bgcolor != UI_TEXT_BG_COLOR)
-			ui().draw_textured_box(container, origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
-				origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+			ui().draw_textured_box(container(), origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
+					origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
-		ui().draw_text_full(container, _("History"), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-			mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+		ui().draw_text_full(container(), _("History"), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER, ui::text_layout::NEVER,
+				mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 		ui_globals::cur_sw_dats_view = 0;
 	}
 	else
@@ -1599,8 +1603,8 @@ void menu_select_software::infos_render(void *selectedref, float origx1, float o
 
 		for (auto & elem : t_text)
 		{
-			ui().draw_text_full(container, elem.c_str(), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-				mame_ui_manager::NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, nullptr);
+			ui().draw_text_full(container(), elem.c_str(), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER, ui::text_layout::NEVER,
+					mame_ui_manager::NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, nullptr);
 			txt_lenght += 0.01f;
 			title_size = MAX(txt_lenght, title_size);
 		}
@@ -1621,11 +1625,11 @@ void menu_select_software::infos_render(void *selectedref, float origx1, float o
 		title_size *= tmp_size;
 
 		if (bgcolor != UI_TEXT_BG_COLOR)
-			ui().draw_textured_box(container, origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
-				origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+			ui().draw_textured_box(container(), origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
+					origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
-		ui().draw_text_full(container, t_text[ui_globals::cur_sw_dats_view].c_str(), origx1, origy1, origx2 - origx1,
-			ui::text_layout::CENTER, ui::text_layout::NEVER, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, tmp_size);
+		ui().draw_text_full(container(), t_text[ui_globals::cur_sw_dats_view].c_str(), origx1, origy1, origx2 - origx1,
+				ui::text_layout::CENTER, ui::text_layout::NEVER, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, tmp_size);
 
 		draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::cur_sw_dats_view, 0, 1, title_size);
 	}
@@ -1648,12 +1652,12 @@ void menu_select_software::infos_render(void *selectedref, float origx1, float o
 
 	if (buffer.empty())
 	{
-		ui().draw_text_full(container, _("No Infos Available"), origx1, (origy2 + origy1) * 0.5f, origx2 - origx1, ui::text_layout::CENTER,
-			ui::text_layout::WORD, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+		ui().draw_text_full(container(), _("No Infos Available"), origx1, (origy2 + origy1) * 0.5f, origx2 - origx1, ui::text_layout::CENTER,
+				ui::text_layout::WORD, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 		return;
 	}
 	else
-		m_total_lines = ui().wrap_text(container, buffer.c_str(), origx1, origy1, origx2 - origx1 - (2.0f * gutter_width), xstart, xend, text_size);
+		m_total_lines = ui().wrap_text(container(), buffer.c_str(), origx1, origy1, origx2 - origx1 - (2.0f * gutter_width), xstart, xend, text_size);
 
 	int r_visible_lines = floor((origy2 - oy1) / (line_height * text_size));
 	if (m_total_lines < r_visible_lines)
@@ -1676,9 +1680,9 @@ void menu_select_software::infos_render(void *selectedref, float origx1, float o
 		else if (r == r_visible_lines - 1 && itemline != m_total_lines - 1)
 			draw_info_arrow(1, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
 		else
-			ui().draw_text_full(container, tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1,
-				ui::text_layout::LEFT, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
-				nullptr, nullptr, text_size);
+			ui().draw_text_full(container(), tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1,
+					ui::text_layout::LEFT, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
+					nullptr, nullptr, text_size);
 		oy1 += (line_height * text_size);
 	}
 
@@ -1871,7 +1875,7 @@ void menu_select_software::draw_right_panel(void *selectedref, float origx1, flo
 	float ar_x1 = ar_x0 + lr_arrow_width;
 	float ar_y1 = 0.5f * (origy2 + origy1) + 0.9f * space;
 
-	ui().draw_outlined_box(container, origx1, origy1, origx2, origy2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
+	ui().draw_outlined_box(container(), origx1, origy1, origx2, origy2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
 
 	if (mouse_hit && origx1 <= mouse_x && x2 > mouse_x && origy1 <= mouse_y && origy2 > mouse_y)
 	{
@@ -1881,11 +1885,11 @@ void menu_select_software::draw_right_panel(void *selectedref, float origx1, flo
 
 	if (hide)
 	{
-		draw_arrow(container, ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90 ^ ORIENTATION_FLIP_X);
+		draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90 ^ ORIENTATION_FLIP_X);
 		return;
 	}
 
-	draw_arrow(container, ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90);
+	draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90);
 	origx1 = x2;
 	origy1 = draw_right_box_title(origx1, origy1, origx2, origy2);
 
@@ -1899,7 +1903,7 @@ void menu_select_software::draw_right_panel(void *selectedref, float origx1, flo
 //  ctor
 //-------------------------------------------------
 
-software_parts::software_parts(mame_ui_manager &mui, render_container *container, s_parts parts, ui_software_info *ui_info) : menu(mui, container)
+software_parts::software_parts(mame_ui_manager &mui, render_container &container, s_parts parts, ui_software_info *ui_info) : menu(mui, container)
 {
 	m_parts = parts;
 	m_uiinfo = ui_info;
@@ -1967,7 +1971,7 @@ void software_parts::handle()
 void software_parts::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width;
-	ui().draw_text_full(container, _("Software part selection:"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+	ui().draw_text_full(container(), _("Software part selection:"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 									mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
@@ -1979,7 +1983,7 @@ void software_parts::custom_render(void *selectedref, float top, float bottom, f
 	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -1987,7 +1991,7 @@ void software_parts::custom_render(void *selectedref, float top, float bottom, f
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	ui().draw_text_full(container, _("Software part selection:"), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+	ui().draw_text_full(container(), _("Software part selection:"), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 									mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 
@@ -1995,7 +1999,7 @@ void software_parts::custom_render(void *selectedref, float top, float bottom, f
 //  ctor
 //-------------------------------------------------
 
-bios_selection::bios_selection(mame_ui_manager &mui, render_container *container, s_bios biosname, void *_driver, bool _software, bool _inlist) : menu(mui, container)
+bios_selection::bios_selection(mame_ui_manager &mui, render_container &container, s_bios biosname, void *_driver, bool _software, bool _inlist) : menu(mui, container)
 {
 	m_bios = biosname;
 	m_driver = _driver;
@@ -2080,7 +2084,7 @@ void bios_selection::handle()
 								parts.emplace(swpart.name(), menu_part_name);
 							}
 						}
-						menu::stack_push<software_parts>(ui(), container, parts, ui_swinfo);
+						menu::stack_push<software_parts>(ui(), container(), parts, ui_swinfo);
 						return;
 					}
 					std::string error_string;
@@ -2108,7 +2112,7 @@ void bios_selection::handle()
 void bios_selection::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width;
-	ui().draw_text_full(container, _("Bios selection:"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+	ui().draw_text_full(container(), _("Bios selection:"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 									mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
@@ -2120,7 +2124,7 @@ void bios_selection::custom_render(void *selectedref, float top, float bottom, f
 	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -2128,7 +2132,7 @@ void bios_selection::custom_render(void *selectedref, float top, float bottom, f
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	ui().draw_text_full(container, _("Bios selection:"), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+	ui().draw_text_full(container(), _("Bios selection:"), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 									mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 

@@ -9,10 +9,10 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_CUSTMENU_H
 #define MAME_FRONTEND_UI_CUSTMENU_H
+
+#pragma once
 
 #include "ui/menu.h"
 #include "ui/utils.h"
@@ -75,10 +75,10 @@ struct s_filter
 class menu_swcustom_filter : public menu
 {
 public:
-	menu_swcustom_filter(mame_ui_manager &mui, render_container *container, const game_driver *_driver, s_filter &_filter);
+	menu_swcustom_filter(mame_ui_manager &mui, render_container &container, const game_driver *_driver, s_filter &_filter);
 	virtual ~menu_swcustom_filter() override;
-	virtual void populate() override;
-	virtual void handle() override;
+
+protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
@@ -95,11 +95,14 @@ private:
 		OTHER_FILTER  = LIST_FILTER   + MAX_CUST_FILTER + 1
 	};
 
+	virtual void populate() override;
+	virtual void handle() override;
+
+	void save_sw_custom_filters();
+
 	bool               m_added;
 	s_filter           &m_filter;
 	const game_driver  *m_driver;
-
-	void save_sw_custom_filters();
 };
 
 //-------------------------------------------------
@@ -108,10 +111,10 @@ private:
 class menu_custom_filter : public menu
 {
 public:
-	menu_custom_filter(mame_ui_manager &mui, render_container *container, bool _single_menu = false);
+	menu_custom_filter(mame_ui_manager &mui, render_container &container, bool _single_menu = false);
 	virtual ~menu_custom_filter() override;
-	virtual void populate() override;
-	virtual void handle() override;
+
+protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
@@ -125,9 +128,12 @@ private:
 		SCREEN_FILTER = YEAR_FILTER   + MAX_CUST_FILTER + 1,
 		OTHER_FILTER  = SCREEN_FILTER + MAX_CUST_FILTER + 1
 	};
+	virtual void populate() override;
+	virtual void handle() override;
+
+	void save_custom_filters();
 
 	bool m_single_menu, m_added;
-	void save_custom_filters();
 };
 
 } // namespace ui

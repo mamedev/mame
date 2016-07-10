@@ -31,25 +31,28 @@ public:
 		SOFTWARE
 	};
 
-	menu_selector(mame_ui_manager &mui, render_container *container, std::vector<std::string> const &_sel, UINT16 &_actual, int _category = 0, int _hover = 0);
-	menu_selector(mame_ui_manager &mui, render_container *container, std::vector<std::string> &&_sel, UINT16 &_actual, int _category = 0, int _hover = 0);
+	menu_selector(mame_ui_manager &mui, render_container &container, std::vector<std::string> const &_sel, UINT16 &_actual, int _category = 0, int _hover = 0);
+	menu_selector(mame_ui_manager &mui, render_container &container, std::vector<std::string> &&_sel, UINT16 &_actual, int _category = 0, int _hover = 0);
 	virtual ~menu_selector() override;
-	virtual void populate() override;
-	virtual void handle() override;
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
+protected:
+	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 	virtual bool menu_has_search_active() override { return (m_search[0] != 0); }
 
 private:
 	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
+
+	virtual void populate() override;
+	virtual void handle() override;
+
+	void find_matches(const char *str);
+
 	char                       m_search[40];
 	UINT16                     &m_selector;
 	int                        m_category, m_hover;
 	bool                       m_first_pass;
 	std::vector<std::string>   m_str_items;
 	std::string                *m_searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
-
-	void find_matches(const char *str);
 };
 
 } // namespace ui

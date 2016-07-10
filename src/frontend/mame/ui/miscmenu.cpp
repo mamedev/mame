@@ -32,7 +32,7 @@ namespace ui {
     menu_keyboard_mode - menu that
 -------------------------------------------------*/
 
-menu_keyboard_mode::menu_keyboard_mode(mame_ui_manager &mui, render_container *container) : menu(mui, container)
+menu_keyboard_mode::menu_keyboard_mode(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
 }
 
@@ -69,7 +69,7 @@ void menu_keyboard_mode::handle()
     bios selection menu
 -------------------------------------------------*/
 
-menu_bios_selection::menu_bios_selection(mame_ui_manager &mui, render_container *container) : menu(mui, container)
+menu_bios_selection::menu_bios_selection(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
 }
 
@@ -142,7 +142,7 @@ void menu_bios_selection::handle()
 
 
 
-menu_network_devices::menu_network_devices(mame_ui_manager &mui, render_container *container) : menu(mui, container)
+menu_network_devices::menu_network_devices(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
 }
 
@@ -163,7 +163,7 @@ void menu_network_devices::populate()
 		int curr = network.get_interface();
 		const char *title = nullptr;
 		for(auto &entry : get_netdev_list())
-		{		
+		{
 			if(entry->id==curr) {
 				title = entry->description;
 				break;
@@ -224,7 +224,7 @@ void menu_bookkeeping::handle()
     menu_bookkeeping - handle the bookkeeping
     information menu
 -------------------------------------------------*/
-menu_bookkeeping::menu_bookkeeping(mame_ui_manager &mui, render_container *container) : menu(mui, container)
+menu_bookkeeping::menu_bookkeeping(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
 }
 
@@ -373,7 +373,7 @@ void menu_crosshair::handle()
     crosshair settings menu
 -------------------------------------------------*/
 
-menu_crosshair::menu_crosshair(mame_ui_manager &mui, render_container *container) : menu(mui, container)
+menu_crosshair::menu_crosshair(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
 }
 
@@ -530,7 +530,7 @@ menu_crosshair::~menu_crosshair()
     quitting the game
 -------------------------------------------------*/
 
-menu_quit_game::menu_quit_game(mame_ui_manager &mui, render_container *container) : menu(mui, container)
+menu_quit_game::menu_quit_game(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
 }
 
@@ -555,7 +555,7 @@ void menu_quit_game::handle()
 //  ctor / dtor
 //-------------------------------------------------
 
-menu_export::menu_export(mame_ui_manager &mui, render_container *container, std::vector<const game_driver *> drvlist)
+menu_export::menu_export(mame_ui_manager &mui, render_container &container, std::vector<const game_driver *> drvlist)
 	: menu(mui, container), m_list(drvlist)
 {
 }
@@ -681,7 +681,7 @@ void menu_export::populate()
 //  ctor / dtor
 //-------------------------------------------------
 
-menu_machine_configure::menu_machine_configure(mame_ui_manager &mui, render_container *container, const game_driver *prev, float _x0, float _y0)
+menu_machine_configure::menu_machine_configure(mame_ui_manager &mui, render_container &container, const game_driver *prev, float _x0, float _y0)
 	: menu(mui, container)
 	, m_drv(prev)
 	, m_opts(mui.machine().options())
@@ -738,15 +738,15 @@ void menu_machine_configure::handle()
 					break;
 				case CONTROLLER:
 					if (menu_event->iptkey == IPT_UI_SELECT)
-						menu::stack_push<submenu>(ui(), container, submenu::control_options, m_drv, &m_opts);
+						menu::stack_push<submenu>(ui(), container(), submenu::control_options, m_drv, &m_opts);
 					break;
 				case VIDEO:
 					if (menu_event->iptkey == IPT_UI_SELECT)
-						menu::stack_push<submenu>(ui(), container, submenu::video_options, m_drv, &m_opts);
+						menu::stack_push<submenu>(ui(), container(), submenu::video_options, m_drv, &m_opts);
 					break;
 				case ADVANCED:
 					if (menu_event->iptkey == IPT_UI_SELECT)
-						menu::stack_push<submenu>(ui(), container, submenu::advanced_options, m_drv, &m_opts);
+						menu::stack_push<submenu>(ui(), container(), submenu::advanced_options, m_drv, &m_opts);
 					break;
 				default:
 					break;
@@ -773,7 +773,7 @@ void menu_machine_configure::populate()
 	item_append(_("Bios"), "", FLAG_DISABLE | FLAG_UI_HEADING, nullptr);
 	if (!m_bios.empty())
 	{
-		UINT32 arrows = get_arrow_flags(0, m_bios.size() - 1, m_curbios);
+		UINT32 arrows = get_arrow_flags(std::size_t(0), m_bios.size() - 1, m_curbios);
 		item_append(_("Driver"), m_bios[m_curbios].first, arrows, (void *)(FPTR)BIOS);
 	}
 	else
@@ -811,7 +811,7 @@ void menu_machine_configure::custom_render(void *selectedref, float top, float b
 
 	for (auto & elem : text)
 	{
-		ui().draw_text_full(container, elem.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+		ui().draw_text_full(container(), elem.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 			mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = MAX(maxwidth, width);
@@ -824,7 +824,7 @@ void menu_machine_configure::custom_render(void *selectedref, float top, float b
 	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -834,7 +834,7 @@ void menu_machine_configure::custom_render(void *selectedref, float top, float b
 	// draw the text within it
 	for (auto & elem : text)
 	{
-		ui().draw_text_full(container, elem.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+		ui().draw_text_full(container(), elem.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 			mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 		y1 += ui().get_line_height();
 	}
@@ -851,7 +851,7 @@ void menu_machine_configure::setup_bios()
 		if (ROMENTRY_ISDEFAULT_BIOS(rom))
 			default_name = ROM_GETNAME(rom);
 
-	int bios_count = 0;
+	std::size_t bios_count = 0;
 	for (const rom_entry *rom = m_drv->rom; !ROMENTRY_ISEND(rom); ++rom)
 	{
 		if (ROMENTRY_ISSYSTEM_BIOS(rom))
@@ -883,7 +883,7 @@ void menu_machine_configure::setup_bios()
 //  ctor / dtor
 //-------------------------------------------------
 
-menu_plugins_configure::menu_plugins_configure(mame_ui_manager &mui, render_container *container)
+menu_plugins_configure::menu_plugins_configure(mame_ui_manager &mui, render_container &container)
 	: menu(mui, container)
 {
 }
@@ -955,7 +955,7 @@ void menu_plugins_configure::custom_render(void *selectedref, float top, float b
 {
 	float width;
 
-	ui().draw_text_full(container, _("Plugins"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+	ui().draw_text_full(container(), _("Plugins"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 		mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
@@ -967,7 +967,7 @@ void menu_plugins_configure::custom_render(void *selectedref, float top, float b
 	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -975,7 +975,7 @@ void menu_plugins_configure::custom_render(void *selectedref, float top, float b
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	ui().draw_text_full(container, _("Plugins"), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+	ui().draw_text_full(container(), _("Plugins"), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 		mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 

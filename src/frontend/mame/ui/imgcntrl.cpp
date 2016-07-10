@@ -33,7 +33,7 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-menu_control_device_image::menu_control_device_image(mame_ui_manager &mui, render_container *container, device_image_interface *_image)
+menu_control_device_image::menu_control_device_image(mame_ui_manager &mui, render_container &container, device_image_interface *_image)
 	: menu(mui, container),
 		create_ok(false),
 		create_confirmed(false)
@@ -178,20 +178,20 @@ void menu_control_device_image::handle()
 	switch(state) {
 	case START_FILE: {
 		submenu_result.filesel = menu_file_selector::result::INVALID;
-		menu::stack_push<menu_file_selector>(ui(), container, image, m_current_directory, m_current_file, true, image->image_interface()!=nullptr, image->is_creatable(), submenu_result.filesel);
+		menu::stack_push<menu_file_selector>(ui(), container(), image, m_current_directory, m_current_file, true, image->image_interface()!=nullptr, image->is_creatable(), submenu_result.filesel);
 		state = SELECT_FILE;
 		break;
 	}
 
 	case START_SOFTLIST:
 		sld = nullptr;
-		menu::stack_push<menu_software>(ui(), container, image->image_interface(), &sld);
+		menu::stack_push<menu_software>(ui(), container(), image->image_interface(), &sld);
 		state = SELECT_SOFTLIST;
 		break;
 
 	case START_OTHER_PART: {
 		submenu_result.swparts = menu_software_parts::result::INVALID;
-		menu::stack_push<menu_software_parts>(ui(), container, swi, swp->interface(), &swp, true, submenu_result.swparts);
+		menu::stack_push<menu_software_parts>(ui(), container(), swi, swp->interface(), &swp, true, submenu_result.swparts);
 		state = SELECT_OTHER_PART;
 		break;
 	}
@@ -202,7 +202,7 @@ void menu_control_device_image::handle()
 			break;
 		}
 		software_info_name = "";
-		menu::stack_push<menu_software_list>(ui(), container, sld, image->image_interface(), software_info_name);
+		menu::stack_push<menu_software_list>(ui(), container(), sld, image->image_interface(), software_info_name);
 		state = SELECT_PARTLIST;
 		break;
 
@@ -214,7 +214,7 @@ void menu_control_device_image::handle()
 		{
 			submenu_result.swparts = menu_software_parts::result::INVALID;
 			swp = nullptr;
-			menu::stack_push<menu_software_parts>(ui(), container, swi, image->image_interface(), &swp, false, submenu_result.swparts);
+			menu::stack_push<menu_software_parts>(ui(), container(), swi, image->image_interface(), &swp, false, submenu_result.swparts);
 			state = SELECT_ONE_PART;
 		}
 		else
@@ -278,7 +278,7 @@ void menu_control_device_image::handle()
 			break;
 
 		case menu_file_selector::result::CREATE:
-			menu::stack_push<menu_file_create>(ui(), container, image, m_current_directory, m_current_file, create_ok);
+			menu::stack_push<menu_file_create>(ui(), container(), image, m_current_directory, m_current_file, create_ok);
 			state = CHECK_CREATE;
 			break;
 
@@ -298,7 +298,7 @@ void menu_control_device_image::handle()
 		test_create(can_create, need_confirm);
 		if(can_create) {
 			if(need_confirm) {
-				menu::stack_push<menu_confirm_save_as>(ui(), container, &create_confirmed);
+				menu::stack_push<menu_confirm_save_as>(ui(), container(), &create_confirmed);
 				state = CREATE_CONFIRM;
 			} else {
 				state = DO_CREATE;

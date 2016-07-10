@@ -19,7 +19,7 @@ namespace ui {
  menu
  -------------------------------------------------*/
 
-menu_device_config::menu_device_config(mame_ui_manager &mui, render_container *container, device_slot_interface *slot, device_slot_option *option) : menu(mui, container)
+menu_device_config::menu_device_config(mame_ui_manager &mui, render_container &container, device_slot_interface *slot, device_slot_option *option) : menu(mui, container)
 {
 	m_option = option;
 	m_owner = slot;

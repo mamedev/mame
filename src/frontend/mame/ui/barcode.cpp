@@ -31,7 +31,7 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-menu_barcode_reader::menu_barcode_reader(mame_ui_manager &mui, render_container *container, barcode_reader_device *device)
+menu_barcode_reader::menu_barcode_reader(mame_ui_manager &mui, render_container &container, barcode_reader_device *device)
 	: menu_device_control<barcode_reader_device>(mui, container, device)
 {
 }

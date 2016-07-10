@@ -20,12 +20,13 @@ namespace ui {
 class menu_tape_control : public menu_device_control<cassette_image_device>
 {
 public:
-	menu_tape_control(mame_ui_manager &mui, render_container *container, cassette_image_device *device);
+	menu_tape_control(mame_ui_manager &mui, render_container &container, cassette_image_device *device);
 	virtual ~menu_tape_control() override;
+
+private:
 	virtual void populate() override;
 	virtual void handle() override;
 
-private:
 	static void get_time_string(std::string &dest, cassette_image_device *cassette, int *curpos, int *endpos);
 };
 

@@ -197,7 +197,8 @@ void mame_ui_manager::init()
 	decode_ui_color(0, &machine());
 
 	// more initialization
-	set_handler(UI_CALLBACK_TYPE_GENERAL, &mame_ui_manager::handler_messagebox);
+	using namespace std::placeholders;
+	set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_messagebox, this, _1));
 	m_non_char_keys_down = std::make_unique<UINT8[]>((ARRAY_LENGTH(non_char_keys) + 7) / 8);
 	m_mouse_show = machine().system().flags & MACHINE_CLICKABLE_ARTWORK ? true : false;
 
@@ -257,9 +258,9 @@ void mame_ui_manager::initialize(running_machine &machine)
 //  pair for the current UI handler
 //-------------------------------------------------
 
-void mame_ui_manager::set_handler(ui_callback_type callback_type, const std::function<UINT32 (render_container *)> callback)
+void mame_ui_manager::set_handler(ui_callback_type callback_type, const std::function<UINT32 (render_container &)> &&callback)
 {
-	m_handler_callback = callback;
+	m_handler_callback = std::move(callback);
 	m_handler_callback_type = callback_type;
 }
 
@@ -288,7 +289,8 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 	#endif
 
 	// loop over states
-	set_handler(UI_CALLBACK_TYPE_GENERAL, &mame_ui_manager::handler_ingame);
+	using namespace std::placeholders;
+	set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_ingame, this, _1));
 	for (state = 0; state < maxstate && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(machine()); state++)
 	{
 		// default to standard colors
@@ -300,7 +302,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 			case 0:
 				if (show_warnings && warnings_string(messagebox_text).length() > 0)
 				{
-					set_handler(UI_CALLBACK_TYPE_MODAL, &mame_ui_manager::handler_messagebox_anykey);
+					set_handler(ui_callback_type::MODAL, std::bind(&mame_ui_manager::handler_messagebox_anykey, this, _1));
 					if (machine().system().flags & (MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_KEYBOARD | MACHINE_NO_SOUND))
 						messagebox_backcolor = UI_YELLOW_COLOR;
 					if (machine().system().flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_MECHANICAL))
@@ -310,7 +312,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 
 			case 1:
 				if (show_gameinfo && game_info_astring(messagebox_text).length() > 0)
-					set_handler(UI_CALLBACK_TYPE_MODAL, &mame_ui_manager::handler_messagebox_anykey);
+					set_handler(ui_callback_type::MODAL, std::bind(&mame_ui_manager::handler_messagebox_anykey, this, _1));
 				break;
 
 			case 2:
@@ -318,7 +320,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 				{
 					std::string warning;
 					warning.assign(_("This driver requires images to be loaded in the following device(s): ")).append(messagebox_text.substr(0, messagebox_text.length() - 2));
-					ui::menu_file_manager::force_file_manager(*this, &machine().render().ui_container(), warning.c_str());
+					ui::menu_file_manager::force_file_manager(*this, machine().render().ui_container(), warning.c_str());
 				}
 				break;
 		}
@@ -328,13 +330,13 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 		while (machine().input().poll_switches() != INPUT_CODE_INVALID) { }
 
 		// loop while we have a handler
-		while (m_handler_callback_type == UI_CALLBACK_TYPE_MODAL && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(machine()))
+		while (m_handler_callback_type == ui_callback_type::MODAL && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(machine()))
 		{
 			machine().video().frame_update();
 		}
 
 		// clear the handler and force an update
-		set_handler(UI_CALLBACK_TYPE_GENERAL, &mame_ui_manager::handler_ingame);
+		set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_ingame, this, _1));
 		machine().video().frame_update();
 	}
 
@@ -372,10 +374,10 @@ void mame_ui_manager::set_startup_text(const char *text, bool force)
 //  render it; called by video.c
 //-------------------------------------------------
 
-void mame_ui_manager::update_and_render(render_container *container)
+void mame_ui_manager::update_and_render(render_container &container)
 {
 	// always start clean
-	container->empty();
+	container.empty();
 
 	// if we're paused, dim the whole screen
 	if (machine().phase() >= MACHINE_PHASE_RESET && (single_step() || machine().paused()))
@@ -386,14 +388,14 @@ void mame_ui_manager::update_and_render(render_container *container)
 		if (alpha > 255)
 			alpha = 255;
 		if (alpha >= 0)
-			container->add_rect(0.0f, 0.0f, 1.0f, 1.0f, rgb_t(alpha,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			container.add_rect(0.0f, 0.0f, 1.0f, 1.0f, rgb_t(alpha,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	}
 
 	// render any cheat stuff at the bottom
 	if (machine().phase() >= MACHINE_PHASE_RESET)
 	{
 		mame_machine_manager::instance()->lua()->on_frame_done();
-		mame_machine_manager::instance()->cheat().render_text(*this, *container);
+		mame_machine_manager::instance()->cheat().render_text(*this, container);
 	}
 
 	// call the current UI handler
@@ -415,17 +417,20 @@ void mame_ui_manager::update_and_render(render_container *container)
 		if (mouse_target != nullptr)
 		{
 			float mouse_y=-1,mouse_x=-1;
-			if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, *container, mouse_x, mouse_y))
+			if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, container, mouse_x, mouse_y))
 			{
 				const float cursor_size = 0.6 * get_line_height();
-				container->add_quad(mouse_x, mouse_y, mouse_x + cursor_size*container->manager().ui_aspect(container), mouse_y + cursor_size, UI_TEXT_COLOR, m_mouse_arrow_texture, PRIMFLAG_ANTIALIAS(1) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				container.add_quad(mouse_x, mouse_y, mouse_x + cursor_size * container.manager().ui_aspect(&container), mouse_y + cursor_size, UI_TEXT_COLOR, m_mouse_arrow_texture, PRIMFLAG_ANTIALIAS(1) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 			}
 		}
 	}
 
 	// cancel takes us back to the ingame handler
 	if (m_handler_param == UI_HANDLER_CANCEL)
-		set_handler(UI_CALLBACK_TYPE_GENERAL, &mame_ui_manager::handler_ingame);
+	{
+		using namespace std::placeholders;
+		set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_ingame, this, _1));
+	}
 }
 
 
@@ -515,7 +520,7 @@ float mame_ui_manager::get_string_width(const char *s, float text_size)
 //  color
 //-------------------------------------------------
 
-void mame_ui_manager::draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor)
+void mame_ui_manager::draw_outlined_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t backcolor)
 {
 	draw_outlined_box(container, x0, y0, x1, y1, UI_BORDER_COLOR, backcolor);
 }
@@ -527,13 +532,13 @@ void mame_ui_manager::draw_outlined_box(render_container *container, float x0, f
 //  color
 //-------------------------------------------------
 
-void mame_ui_manager::draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t fgcolor, rgb_t bgcolor)
+void mame_ui_manager::draw_outlined_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t fgcolor, rgb_t bgcolor)
 {
-	container->add_rect(x0, y0, x1, y1, bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-	container->add_line(x0, y0, x1, y0, UI_LINE_WIDTH, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-	container->add_line(x1, y0, x1, y1, UI_LINE_WIDTH, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-	container->add_line(x1, y1, x0, y1, UI_LINE_WIDTH, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-	container->add_line(x0, y1, x0, y0, UI_LINE_WIDTH, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	container.add_rect(x0, y0, x1, y1, bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	container.add_line(x0, y0, x1, y0, UI_LINE_WIDTH, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	container.add_line(x1, y0, x1, y1, UI_LINE_WIDTH, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	container.add_line(x1, y1, x0, y1, UI_LINE_WIDTH, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	container.add_line(x0, y1, x0, y0, UI_LINE_WIDTH, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 }
 
 
@@ -541,7 +546,7 @@ void mame_ui_manager::draw_outlined_box(render_container *container, float x0, f
 //  draw_text - simple text renderer
 //-------------------------------------------------
 
-void mame_ui_manager::draw_text(render_container *container, const char *buf, float x, float y)
+void mame_ui_manager::draw_text(render_container &container, const char *buf, float x, float y)
 {
 	draw_text_full(container, buf, x, y, 1.0f - x, ui::text_layout::LEFT, ui::text_layout::WORD, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
@@ -553,7 +558,7 @@ void mame_ui_manager::draw_text(render_container *container, const char *buf, fl
 //  and full size computation
 //-------------------------------------------------
 
-void mame_ui_manager::draw_text_full(render_container *container, const char *origs, float x, float y, float origwrapwidth, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap, draw_mode draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight, float text_size)
+void mame_ui_manager::draw_text_full(render_container &container, const char *origs, float x, float y, float origwrapwidth, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap, draw_mode draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight, float text_size)
 {
 	// create the layout
 	auto layout = create_layout(container, origwrapwidth, justify, wrap);
@@ -582,7 +587,7 @@ void mame_ui_manager::draw_text_full(render_container *container, const char *or
 //  message with a box around it
 //-------------------------------------------------
 
-void mame_ui_manager::draw_text_box(render_container *container, const char *text, ui::text_layout::text_justify justify, float xpos, float ypos, rgb_t backcolor)
+void mame_ui_manager::draw_text_box(render_container &container, const char *text, ui::text_layout::text_justify justify, float xpos, float ypos, rgb_t backcolor)
 {
 	// cap the maximum width
 	float maximum_width = 1.0f - UI_BOX_LR_BORDER * 2;
@@ -603,7 +608,7 @@ void mame_ui_manager::draw_text_box(render_container *container, const char *tex
 //  message with a box around it
 //-------------------------------------------------
 
-void mame_ui_manager::draw_text_box(render_container *container, ui::text_layout &layout, float xpos, float ypos, rgb_t backcolor)
+void mame_ui_manager::draw_text_box(render_container &container, ui::text_layout &layout, float xpos, float ypos, rgb_t backcolor)
 {
 	// xpos and ypos are where we want to "pin" the layout, but we need to adjust for the actual size of the payload
 	auto actual_left = layout.actual_left();
@@ -614,10 +619,10 @@ void mame_ui_manager::draw_text_box(render_container *container, ui::text_layout
 
 	// add a box around that
 	draw_outlined_box(container,
-		x - UI_BOX_LR_BORDER,
-		y - UI_BOX_TB_BORDER,
-		x + actual_width + UI_BOX_LR_BORDER,
-		y + actual_height + UI_BOX_TB_BORDER, backcolor);
+			x - UI_BOX_LR_BORDER,
+			y - UI_BOX_TB_BORDER,
+			x + actual_width + UI_BOX_LR_BORDER,
+			y + actual_height + UI_BOX_TB_BORDER, backcolor);
 
 	// emit the text
 	layout.emit(container, x - actual_left, y);
@@ -629,7 +634,7 @@ void mame_ui_manager::draw_text_box(render_container *container, ui::text_layout
 //  message with a box around it
 //-------------------------------------------------
 
-void mame_ui_manager::draw_message_window(render_container *container, const char *text)
+void mame_ui_manager::draw_message_window(render_container &container, const char *text)
 {
 	draw_text_box(container, text, ui::text_layout::text_justify::LEFT, 0.5f, 0.5f, UI_BACKGROUND_COLOR);
 }
@@ -714,7 +719,8 @@ bool mame_ui_manager::show_profiler() const
 
 void mame_ui_manager::show_menu()
 {
-	set_handler<mame_ui_manager&>(UI_CALLBACK_TYPE_MENU, ui::menu::ui_handler, *this);
+	using namespace std::placeholders;
+	set_handler(ui_callback_type::MENU, std::bind(&ui::menu::ui_handler, _1, std::ref(*this)));
 }
 
 
@@ -735,7 +741,7 @@ void mame_ui_manager::show_mouse(bool status)
 
 bool mame_ui_manager::is_menu_active(void)
 {
-	return m_handler_callback_type == UI_CALLBACK_TYPE_MENU;
+	return m_handler_callback_type == ui_callback_type::MENU;
 }
 
 
@@ -1002,7 +1008,7 @@ std::string &mame_ui_manager::game_info_astring(std::string &str)
 //  messagebox_text string but handles no input
 //-------------------------------------------------
 
-UINT32 mame_ui_manager::handler_messagebox(render_container *container)
+UINT32 mame_ui_manager::handler_messagebox(render_container &container)
 {
 	draw_text_box(container, messagebox_text.c_str(), ui::text_layout::LEFT, 0.5f, 0.5f, messagebox_backcolor);
 	return 0;
@@ -1015,7 +1021,7 @@ UINT32 mame_ui_manager::handler_messagebox(render_container *container)
 //  any keypress
 //-------------------------------------------------
 
-UINT32 mame_ui_manager::handler_messagebox_anykey(render_container *container)
+UINT32 mame_ui_manager::handler_messagebox_anykey(render_container &container)
 {
 	UINT32 state = 0;
 
@@ -1167,7 +1173,7 @@ void mame_ui_manager::paste()
 //  draw_fps_counter
 //-------------------------------------------------
 
-void mame_ui_manager::draw_fps_counter(render_container *container)
+void mame_ui_manager::draw_fps_counter(render_container &container)
 {
 	draw_text_full(container, machine().video().speed_text().c_str(), 0.0f, 0.0f, 1.0f,
 		ui::text_layout::RIGHT, ui::text_layout::WORD, OPAQUE_, rgb_t::white, rgb_t::black, nullptr, nullptr);
@@ -1178,7 +1184,7 @@ void mame_ui_manager::draw_fps_counter(render_container *container)
 //  draw_timecode_counter
 //-------------------------------------------------
 
-void mame_ui_manager::draw_timecode_counter(render_container *container)
+void mame_ui_manager::draw_timecode_counter(render_container &container)
 {
 	std::string tempstring;
 	draw_text_full(container, machine().video().timecode_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
@@ -1190,7 +1196,7 @@ void mame_ui_manager::draw_timecode_counter(render_container *container)
 //  draw_timecode_total
 //-------------------------------------------------
 
-void mame_ui_manager::draw_timecode_total(render_container *container)
+void mame_ui_manager::draw_timecode_total(render_container &container)
 {
 	std::string tempstring;
 	draw_text_full(container, machine().video().timecode_total_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
@@ -1202,7 +1208,7 @@ void mame_ui_manager::draw_timecode_total(render_container *container)
 //  draw_profiler
 //-------------------------------------------------
 
-void mame_ui_manager::draw_profiler(render_container *container)
+void mame_ui_manager::draw_profiler(render_container &container)
 {
 	const char *text = g_profiler.text(machine());
 	draw_text_full(container, text, 0.0f, 0.0f, 1.0f, ui::text_layout::LEFT, ui::text_layout::WORD, OPAQUE_, rgb_t::white, rgb_t::black, nullptr, nullptr);
@@ -1217,7 +1223,8 @@ void mame_ui_manager::start_save_state()
 {
 	machine().pause();
 	m_load_save_hold = true;
-	set_handler(UI_CALLBACK_TYPE_GENERAL, &mame_ui_manager::handler_load_save, (UINT32)LOADSAVE_SAVE);
+	using namespace std::placeholders;
+	set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_load_save, this, _1, UINT32(LOADSAVE_SAVE)));
 }
 
 
@@ -1229,7 +1236,8 @@ void mame_ui_manager::start_load_state()
 {
 	machine().pause();
 	m_load_save_hold = true;
-	set_handler(UI_CALLBACK_TYPE_GENERAL, &mame_ui_manager::handler_load_save, (UINT32)LOADSAVE_LOAD);
+	using namespace std::placeholders;
+	set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_load_save, this, _1, UINT32(LOADSAVE_LOAD)));
 }
 
 
@@ -1243,7 +1251,7 @@ void mame_ui_manager::image_handler_ingame()
 	// run display routine for devices
 	if (machine().phase() == MACHINE_PHASE_RUNNING)
 	{
-		auto layout = create_layout(&machine().render().ui_container());
+		auto layout = create_layout(machine().render().ui_container());
 
 		// loop through all devices, build their text into the layout
 		for (device_image_interface &image : image_interface_iterator(machine().root_device()))
@@ -1261,7 +1269,7 @@ void mame_ui_manager::image_handler_ingame()
 		{
 			float x = 0.2f;
 			float y = 0.5f * get_line_height() + 2.0f * UI_BOX_TB_BORDER;
-			draw_text_box(&machine().render().ui_container(), layout, x, y, UI_BACKGROUND_COLOR);
+			draw_text_box(machine().render().ui_container(), layout, x, y, UI_BACKGROUND_COLOR);
 		}
 	}
 }
@@ -1271,7 +1279,7 @@ void mame_ui_manager::image_handler_ingame()
 //  of the standard keypresses
 //-------------------------------------------------
 
-UINT32 mame_ui_manager::handler_ingame(render_container *container)
+UINT32 mame_ui_manager::handler_ingame(render_container &container)
 {
 	bool is_paused = machine().paused();
 
@@ -1370,7 +1378,8 @@ UINT32 mame_ui_manager::handler_ingame(render_container *container)
 	// if the on-screen display isn't up and the user has toggled it, turn it on
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0 && machine().ui_input().pressed(IPT_UI_ON_SCREEN_DISPLAY))
 	{
-		set_handler<mame_ui_manager&>(UI_CALLBACK_TYPE_MENU, ui::menu_sliders::ui_handler, *this);
+		using namespace std::placeholders;
+		set_handler(ui_callback_type::MENU, std::bind(&ui::menu_sliders::ui_handler, _1, std::ref(*this)));
 		return 1;
 	}
 
@@ -1385,7 +1394,8 @@ UINT32 mame_ui_manager::handler_ingame(render_container *container)
 	{
 		if (!is_paused)
 			machine().pause();
-		set_handler<mame_ui_manager&, bool>(UI_CALLBACK_TYPE_GENERAL, ui_gfx_ui_handler, *this, is_paused);
+		using namespace std::placeholders;
+		set_handler(ui_callback_type::GENERAL, std::bind(&ui_gfx_ui_handler, _1, std::ref(*this), is_paused));
 		return is_paused ? 1 : 0;
 	}
 
@@ -1497,7 +1507,7 @@ UINT32 mame_ui_manager::handler_ingame(render_container *container)
 //  specifying a game to save or load
 //-------------------------------------------------
 
-UINT32 mame_ui_manager::handler_load_save(render_container *container, UINT32 state)
+UINT32 mame_ui_manager::handler_load_save(render_container &container, UINT32 state)
 {
 	char filename[20];
 	char file = 0;
@@ -1603,10 +1613,11 @@ UINT32 mame_ui_manager::handler_load_save(render_container *container, UINT32 st
 
 void mame_ui_manager::request_quit()
 {
+	using namespace std::placeholders;
 	if (!machine().options().confirm_quit())
 		machine().schedule_exit();
 	else
-		set_handler(UI_CALLBACK_TYPE_GENERAL, &mame_ui_manager::handler_confirm_quit);
+		set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_confirm_quit, this, _1));
 }
 
 
@@ -1615,7 +1626,7 @@ void mame_ui_manager::request_quit()
 //  confirming quit emulation
 //-------------------------------------------------
 
-UINT32 mame_ui_manager::handler_confirm_quit(render_container *container)
+UINT32 mame_ui_manager::handler_confirm_quit(render_container &container)
 {
 	UINT32 state = 0;
 
@@ -2374,11 +2385,11 @@ void mame_ui_manager::set_use_natural_keyboard(bool use_natural_keyboard)
 //  wrap_text
 //-------------------------------------------------
 
-ui::text_layout mame_ui_manager::create_layout(render_container *container, float width, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap)
+ui::text_layout mame_ui_manager::create_layout(render_container &container, float width, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap)
 {
 	// determine scale factors
 	float yscale = get_line_height();
-	float xscale = yscale * machine().render().ui_aspect(container);
+	float xscale = yscale * machine().render().ui_aspect(&container);
 
 	// create the layout
 	return ui::text_layout(*get_font(), xscale, yscale, width, justify, wrap);
@@ -2389,17 +2400,17 @@ ui::text_layout mame_ui_manager::create_layout(render_container *container, floa
 //  wrap_text
 //-------------------------------------------------
 
-int mame_ui_manager::wrap_text(render_container *container, const char *origs, float x, float y, float origwrapwidth, std::vector<int> &xstart, std::vector<int> &xend, float text_size)
+int mame_ui_manager::wrap_text(render_container &container, const char *origs, float x, float y, float origwrapwidth, std::vector<int> &xstart, std::vector<int> &xend, float text_size)
 {
 	// create the layout
 	auto layout = create_layout(container, origwrapwidth, ui::text_layout::LEFT, ui::text_layout::WORD);
 
 	// add the text
 	layout.add_text(
-		origs,
-		rgb_t::black,
-		rgb_t::black,
-		text_size);
+			origs,
+			rgb_t::black,
+			rgb_t::black,
+			text_size);
 
 	// and get the wrapping info
 	return layout.get_wrap_info(xstart, xend);
@@ -2411,13 +2422,13 @@ int mame_ui_manager::wrap_text(render_container *container, const char *origs, f
 //  textured background and line color
 //-------------------------------------------------
 
-void mame_ui_manager::draw_textured_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor, rgb_t linecolor, render_texture *texture, UINT32 flags)
+void mame_ui_manager::draw_textured_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t backcolor, rgb_t linecolor, render_texture *texture, UINT32 flags)
 {
-	container->add_quad(x0, y0, x1, y1, backcolor, texture, flags);
-	container->add_line(x0, y0, x1, y0, UI_LINE_WIDTH, linecolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-	container->add_line(x1, y0, x1, y1, UI_LINE_WIDTH, linecolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-	container->add_line(x1, y1, x0, y1, UI_LINE_WIDTH, linecolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-	container->add_line(x0, y1, x0, y0, UI_LINE_WIDTH, linecolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	container.add_quad(x0, y0, x1, y1, backcolor, texture, flags);
+	container.add_line(x0, y0, x1, y0, UI_LINE_WIDTH, linecolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	container.add_line(x1, y0, x1, y1, UI_LINE_WIDTH, linecolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	container.add_line(x1, y1, x0, y1, UI_LINE_WIDTH, linecolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	container.add_line(x0, y1, x0, y0, UI_LINE_WIDTH, linecolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 }
 
 //-------------------------------------------------

@@ -33,9 +33,9 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-menu_software_parts::menu_software_parts(mame_ui_manager &mui, render_container *container, const software_info *info, const char *interface, const software_part **part, bool other_opt, result &result)
+menu_software_parts::menu_software_parts(mame_ui_manager &mui, render_container &container, const software_info *info, const char *interface, const software_part **part, bool other_opt, result &result)
 	: menu(mui, container),
-	  m_result(result)
+		m_result(result)
 {
 	m_info = info;
 	m_interface = interface;
@@ -123,7 +123,7 @@ void menu_software_parts::handle()
 //  ctor
 //-------------------------------------------------
 
-menu_software_list::menu_software_list(mame_ui_manager &mui, render_container *container, software_list_device *swlist, const char *interface, std::string &result)
+menu_software_list::menu_software_list(mame_ui_manager &mui, render_container &container, software_list_device *swlist, const char *interface, std::string &result)
 	: menu(mui, container), m_result(result)
 {
 	m_swlist = swlist;
@@ -331,7 +331,7 @@ void menu_software_list::handle()
 //  ctor
 //-------------------------------------------------
 
-menu_software::menu_software(mame_ui_manager &mui, render_container *container, const char *interface, software_list_device **result)
+menu_software::menu_software(mame_ui_manager &mui, render_container &container, const char *interface, software_list_device **result)
 	: menu(mui, container)
 {
 	m_interface = interface;
@@ -399,9 +399,10 @@ void menu_software::handle()
 	// process the menu
 	const event *event = process(0);
 
-	if (event != nullptr && event->iptkey == IPT_UI_SELECT) {
-		//menu::stack_push<menu_software_list>(ui(), container, (software_list_config *)event->itemref, image);
-		*m_result = (software_list_device *)event->itemref;
+	if (event != nullptr && event->iptkey == IPT_UI_SELECT)
+	{
+		//menu::stack_push<menu_software_list>(ui(), container(), (software_list_config *)event->itemref, image);
+		*m_result = reinterpret_cast<software_list_device *>(event->itemref);
 		stack_pop();
 	}
 }

@@ -19,8 +19,10 @@ namespace ui {
 class menu_cheat : public menu
 {
 public:
-	menu_cheat(mame_ui_manager &mui, render_container *container);
+	menu_cheat(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_cheat() override;
+
+private:
 	virtual void populate() override;
 	virtual void handle() override;
 };
@@ -29,12 +31,13 @@ public:
 class menu_autofire : public menu
 {
 public:
-	menu_autofire(mame_ui_manager &mui, render_container *container);
+	menu_autofire(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_autofire() override;
+
+private:
 	virtual void populate() override;
 	virtual void handle() override;
 
-private:
 	float refresh;
 	bool last_toggle;
 };

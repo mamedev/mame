@@ -30,7 +30,7 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-simple_menu_select_game::simple_menu_select_game(mame_ui_manager &mui, render_container *container, const char *gamename) : menu(mui, container), m_driverlist(driver_list::total() + 1)
+simple_menu_select_game::simple_menu_select_game(mame_ui_manager &mui, render_container &container, const char *gamename) : menu(mui, container), m_driverlist(driver_list::total() + 1)
 {
 	build_driver_list();
 	if(gamename)
@@ -132,7 +132,7 @@ void simple_menu_select_game::handle()
 
 	// if we're in an error state, overlay an error message
 	if (m_error)
-		ui().draw_text_box(container,
+		ui().draw_text_box(container(),
 							"The selected game is missing one or more required ROM or CHD images. "
 							"Please select a different game.\n\nPress any key to continue.",
 							ui::text_layout::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
@@ -149,7 +149,7 @@ void simple_menu_select_game::inkey_select(const event *menu_event)
 
 	// special case for configure inputs
 	if ((FPTR)driver == 1)
-		menu::stack_push<menu_game_options>(ui(), container);
+		menu::stack_push<menu_game_options>(ui(), container());
 	// anything else is a driver
 	else
 	{
@@ -297,7 +297,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 		tempbuf[0] = _("Type name or select: (random)");
 
 	// get the size of the text
-	ui().draw_text_full(container, tempbuf[0].c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+	ui().draw_text_full(container(), tempbuf[0].c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 						mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(width, origx2 - origx1);
@@ -309,7 +309,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -317,7 +317,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	ui().draw_text_full(container, tempbuf[0].c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+	ui().draw_text_full(container(), tempbuf[0].c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 						mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 	// determine the text to render below
@@ -387,7 +387,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	maxwidth = origx2 - origx1;
 	for (line = 0; line < 4; line++)
 	{
-		ui().draw_text_full(container, tempbuf[line].c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+		ui().draw_text_full(container(), tempbuf[line].c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 							mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = MAX(maxwidth, width);
@@ -407,7 +407,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 		color = UI_YELLOW_COLOR;
 	if (driver != nullptr && (driver->flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION)) != 0)
 		color = UI_RED_COLOR;
-	ui().draw_outlined_box(container, x1, y1, x2, y2, color);
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, color);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -417,7 +417,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	// draw all lines
 	for (line = 0; line < 4; line++)
 	{
-		ui().draw_text_full(container, tempbuf[line].c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+		ui().draw_text_full(container(), tempbuf[line].c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 							mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 		y1 += ui().get_line_height();
 	}
@@ -429,7 +429,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 //  select menu to be visible and inescapable
 //-------------------------------------------------
 
-void simple_menu_select_game::force_game_select(mame_ui_manager &mui, render_container *container)
+void simple_menu_select_game::force_game_select(mame_ui_manager &mui, render_container &container)
 {
 	char *gamename = (char *)mui.machine().options().system_name();
 

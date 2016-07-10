@@ -20,22 +20,15 @@ namespace ui {
 class menu_select_game : public menu_select_launch
 {
 public:
-	menu_select_game(mame_ui_manager &mui, render_container *container, const char *gamename);
+	menu_select_game(mame_ui_manager &mui, render_container &container, const char *gamename);
 	virtual ~menu_select_game();
-	virtual void populate() override;
-	virtual void handle() override;
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 	// force game select menu
-	static void force_game_select(mame_ui_manager &mui, render_container *container);
+	static void force_game_select(mame_ui_manager &mui, render_container &container);
 
+protected:
+	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 	virtual bool menu_has_search_active() override { return (m_search[0] != 0); }
-
-	// draw left panel
-	virtual float draw_left_panel(float x1, float y1, float x2, float y2) override;
-
-	// draw right panel
-	virtual void draw_right_panel(void *selectedref, float origx1, float origy1, float origx2, float origy2) override;
 
 private:
 	enum
@@ -56,6 +49,15 @@ private:
 	std::vector<const game_driver *> m_displaylist;
 
 	const game_driver *m_searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
+
+	virtual void populate() override;
+	virtual void handle() override;
+
+	// draw left panel
+	virtual float draw_left_panel(float x1, float y1, float x2, float y2) override;
+
+	// draw right panel
+	virtual void draw_right_panel(void *selectedref, float origx1, float origy1, float origx2, float origy2) override;
 
 	// internal methods
 	void build_custom();
