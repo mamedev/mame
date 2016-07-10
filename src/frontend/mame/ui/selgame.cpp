@@ -1635,19 +1635,17 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 
 void menu_select_game::inkey_export()
 {
-	std::vector<const game_driver *> list;
+	std::vector<game_driver const *> list;
 	if (m_search[0] != 0)
 	{
 		for (int curitem = 0; m_searchlist[curitem]; ++curitem)
-		{
 			list.push_back(m_searchlist[curitem]);
-		}
 	}
 	else
 	{
 		list = m_displaylist;
 	}
-	menu::stack_push<menu_export>(ui(), container(), list);
+	menu::stack_push<menu_export>(ui(), container(), std::move(list));
 }
 
 //-------------------------------------------------

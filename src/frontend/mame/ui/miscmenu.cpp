@@ -555,8 +555,8 @@ void menu_quit_game::handle()
 //  ctor / dtor
 //-------------------------------------------------
 
-menu_export::menu_export(mame_ui_manager &mui, render_container &container, std::vector<const game_driver *> drvlist)
-	: menu(mui, container), m_list(drvlist)
+menu_export::menu_export(mame_ui_manager &mui, render_container &container, std::vector<const game_driver *> &&drvlist)
+	: menu(mui, container), m_list(std::move(drvlist))
 {
 }
 

@@ -115,7 +115,7 @@ private:
 class menu_export : public menu
 {
 public:
-	menu_export(mame_ui_manager &mui, render_container &container, std::vector<const game_driver*> list);
+	menu_export(mame_ui_manager &mui, render_container &container, std::vector<const game_driver*> &&list);
 	virtual ~menu_export();
 
 private:
