@@ -15,6 +15,7 @@
 
 #include "ui/ui.h"
 #include "ui/menuitem.h"
+#include "ui/widgets.h"
 
 #include "language.h"
 #include "render.h"
@@ -98,8 +99,6 @@ private:
 	virtual void draw(UINT32 flags);
 	void draw_text_box();
 
-	static void render_triangle(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
-
 public:
 	void *m_prev_selected;
 
@@ -111,8 +110,8 @@ public:
 
 protected:
 	using cleanup_callback = std::function<void(running_machine &)>;
-	using bitmap_ptr = std::unique_ptr<bitmap_argb32>;
-	using texture_ptr = std::unique_ptr<render_texture, std::function<void(render_texture *)> >;
+	using bitmap_ptr = widgets_manager::bitmap_ptr;
+	using texture_ptr = widgets_manager::texture_ptr;
 
 	// flags to pass to process
 	enum
@@ -257,7 +256,7 @@ protected:
 	int right_visible_lines;  // right box lines
 
 private:
-	class global_state
+	class global_state : public widgets_manager
 	{
 	public:
 		global_state(running_machine &machine, ui_options const &options);
@@ -266,12 +265,6 @@ private:
 		~global_state();
 
 		void add_cleanup_callback(cleanup_callback &&callback);
-
-		render_texture *hilight_texture() { return m_hilight_texture.get(); }
-		render_texture *hilight_main_texture() { return m_hilight_main_texture.get(); }
-		render_texture *arrow_texture() { return m_arrow_texture.get(); }
-		bitmap_argb32 *bgrnd_bitmap() { return m_bgrnd_bitmap.get(); }
-		render_texture * bgrnd_texture() { return m_bgrnd_texture.get(); }
 
 		void reset_topmost(reset_options options) { if (m_stack) m_stack->reset(options); }
 
@@ -289,14 +282,6 @@ private:
 
 		running_machine         &m_machine;
 		cleanup_callback_vector m_cleanup_callbacks;
-
-		bitmap_ptr              m_hilight_bitmap;
-		texture_ptr             m_hilight_texture;
-		bitmap_ptr              m_hilight_main_bitmap;
-		texture_ptr             m_hilight_main_texture;
-		texture_ptr             m_arrow_texture;
-		bitmap_ptr              m_bgrnd_bitmap;
-		texture_ptr             m_bgrnd_texture;
 
 		std::unique_ptr<menu>   m_stack;
 		std::unique_ptr<menu>   m_free;

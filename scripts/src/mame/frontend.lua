@@ -160,4 +160,6 @@ files {
 	MAME_DIR .. "src/frontend/mame/ui/toolbar.h",
 	MAME_DIR .. "src/frontend/mame/ui/utils.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/utils.h",
+	MAME_DIR .. "src/frontend/mame/ui/widgets.cpp",
+	MAME_DIR .. "src/frontend/mame/ui/widgets.h",
 }
