@@ -97,9 +97,6 @@ public:
 	// test if one of the menus in the stack requires hide disable
 	static bool stack_has_special_main_menu(running_machine &machine) { return get_global_state(machine)->stack_has_special_main_menu(); }
 
-	// highlight
-	static void highlight(render_container *container, float x0, float y0, float x1, float y1, rgb_t bgcolor);
-
 	// master handler
 	static UINT32 ui_handler(render_container *container, mame_ui_manager &mui);
 
@@ -118,9 +115,6 @@ public:
 	virtual bool menu_has_search_active() { return false; }
 
 private:
-	static std::unique_ptr<bitmap_rgb32> hilight_bitmap;
-	static render_texture *hilight_texture;
-
 	virtual void draw(UINT32 flags);
 	void draw_text_box();
 
@@ -140,9 +134,6 @@ public:
 
 	// draw right panel
 	virtual void draw_right_panel(void *selectedref, float origx1, float origy1, float origx2, float origy2) { };
-
-	// Global initialization
-	static void init_ui(running_machine &machine, ui_options &mopt);
 
 	// get arrows status
 	template <typename _T1, typename _T2, typename _T3>
@@ -255,10 +246,12 @@ protected:
 	// test if the given key is pressed and we haven't already reported a key
 	bool exclusive_input_pressed(int &iptkey, int key, int repeat);
 
+	// highlight
+	void highlight(render_container *container, float x0, float y0, float x1, float y1, rgb_t bgcolor);
+	render_texture *hilight_main_texture() { return m_global_state->hilight_main_texture(); }
+
 	// draw arrow
 	void draw_arrow(render_container *container, float x0, float y0, float x1, float y1, rgb_t fgcolor, UINT32 orientation);
-	void draw_common_arrow(float origx1, float origy1, float origx2, float origy2, int current, int dmin, int dmax, float title);
-	void info_arrow(int ub, float origx1, float origx2, float oy1, float line_height, float text_size, float ud_arrow_width);
 
 	// draw header and footer text
 	void extra_text_render(float top, float bottom, float origx1, float origy1, float origx2, float origy2, const char *header, const char *footer);
@@ -279,12 +272,6 @@ protected:
 
 	int right_visible_lines;  // right box lines
 
-	static bitmap_ptr snapx_bitmap;
-	static render_texture *snapx_texture;
-
-	static std::unique_ptr<bitmap_rgb32> hilight_main_bitmap;
-	static render_texture *hilight_main_texture;
-
 private:
 	class global_state
 	{
@@ -296,7 +283,9 @@ private:
 
 		void add_cleanup_callback(cleanup_callback &&callback);
 
-		render_texture * arrow_texture() { return m_arrow_texture.get(); }
+		render_texture *hilight_texture() { return m_hilight_texture.get(); }
+		render_texture *hilight_main_texture() { return m_hilight_main_texture.get(); }
+		render_texture *arrow_texture() { return m_arrow_texture.get(); }
 		bitmap_argb32 *bgrnd_bitmap() { return m_bgrnd_bitmap.get(); }
 		render_texture * bgrnd_texture() { return m_bgrnd_texture.get(); }
 
@@ -314,15 +303,19 @@ private:
 	private:
 		using cleanup_callback_vector = std::vector<cleanup_callback>;
 
-		running_machine           &m_machine;
-		cleanup_callback_vector   m_cleanup_callbacks;
+		running_machine         &m_machine;
+		cleanup_callback_vector m_cleanup_callbacks;
 
-		texture_ptr               m_arrow_texture;
-		bitmap_ptr                m_bgrnd_bitmap;
-		texture_ptr               m_bgrnd_texture;
+		bitmap_ptr              m_hilight_bitmap;
+		texture_ptr             m_hilight_texture;
+		bitmap_ptr              m_hilight_main_bitmap;
+		texture_ptr             m_hilight_main_texture;
+		texture_ptr             m_arrow_texture;
+		bitmap_ptr              m_bgrnd_bitmap;
+		texture_ptr             m_bgrnd_texture;
 
-		std::unique_ptr<menu>     m_stack;
-		std::unique_ptr<menu>     m_free;
+		std::unique_ptr<menu>   m_stack;
+		std::unique_ptr<menu>   m_free;
 	};
 	using global_state_ptr = std::shared_ptr<global_state>;
 	using global_state_map = std::map<running_machine *, global_state_ptr>;

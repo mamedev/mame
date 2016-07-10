@@ -1456,7 +1456,7 @@ float menu_select_software::draw_left_panel(float x1, float y1, float x2, float 
 
 			if (bgcolor != UI_TEXT_BG_COLOR)
 				ui().draw_textured_box(container, x1, y1, x2, y1 + line_height, bgcolor, rgb_t(255, 43, 43, 43),
-					hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+					hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
 			float x1t = x1 + text_sign;
 			if (afilter == UI_SW_CUSTOM)
@@ -1583,7 +1583,7 @@ void menu_select_software::infos_render(void *selectedref, float origx1, float o
 
 		if (bgcolor != UI_TEXT_BG_COLOR)
 			ui().draw_textured_box(container, origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
-				origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+				origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
 		ui().draw_text_full(container, _("History"), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER, ui::text_layout::NEVER,
 			mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
@@ -1622,7 +1622,7 @@ void menu_select_software::infos_render(void *selectedref, float origx1, float o
 
 		if (bgcolor != UI_TEXT_BG_COLOR)
 			ui().draw_textured_box(container, origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
-				origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+				origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
 		ui().draw_text_full(container, t_text[ui_globals::cur_sw_dats_view].c_str(), origx1, origy1, origx2 - origx1,
 			ui::text_layout::CENTER, ui::text_layout::NEVER, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, tmp_size);
@@ -1671,10 +1671,10 @@ void menu_select_software::infos_render(void *selectedref, float origx1, float o
 
 		// up arrow
 		if (r == 0 && m_topline_datsview != 0)
-			info_arrow(0, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
+			draw_info_arrow(0, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
 		// bottom arrow
 		else if (r == r_visible_lines - 1 && itemline != m_total_lines - 1)
-			info_arrow(1, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
+			draw_info_arrow(1, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
 		else
 			ui().draw_text_full(container, tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1,
 				ui::text_layout::LEFT, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
@@ -1692,7 +1692,6 @@ void menu_select_software::infos_render(void *selectedref, float origx1, float o
 
 void menu_select_software::arts_render(void *selectedref, float origx1, float origy1, float origx2, float origy2)
 {
-	float line_height = ui().get_line_height();
 	static ui_software_info *oldsoft = nullptr;
 	static const game_driver *olddriver = nullptr;
 	const game_driver *driver = nullptr;
@@ -1715,7 +1714,7 @@ void menu_select_software::arts_render(void *selectedref, float origx1, float or
 		searchstr = arts_render_common(origx1, origy1, origx2, origy2);
 
 		// loads the image if necessary
-		if (driver != olddriver || !snapx_bitmap->valid() || ui_globals::switch_image)
+		if (driver != olddriver || !snapx_valid() || ui_globals::switch_image)
 		{
 			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
 			snapfile.set_restrict_to_mediapath(true);
@@ -1774,16 +1773,7 @@ void menu_select_software::arts_render(void *selectedref, float origx1, float or
 		}
 
 		// if the image is available, loaded and valid, display it
-		if (snapx_bitmap->valid())
-		{
-			float x1 = origx1 + 0.01f;
-			float x2 = origx2 - 0.01f;
-			float y1 = origy1 + UI_BOX_TB_BORDER + line_height;
-			float y2 = origy2 - UI_BOX_TB_BORDER - line_height;
-
-			// apply texture
-			container->add_quad( x1, y1, x2, y2, rgb_t::white, snapx_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-		}
+		draw_snapx(origx1, origy1, origx2, origy2);
 	}
 	else if (soft != nullptr)
 	{
@@ -1797,7 +1787,7 @@ void menu_select_software::arts_render(void *selectedref, float origx1, float or
 		searchstr = arts_render_common(origx1, origy1, origx2, origy2);
 
 		// loads the image if necessary
-		if (soft != oldsoft || !snapx_bitmap->valid() || ui_globals::switch_image)
+		if (soft != oldsoft || !snapx_valid() || ui_globals::switch_image)
 		{
 			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
 			bitmap_argb32 *tmp_bitmap;
@@ -1863,16 +1853,7 @@ void menu_select_software::arts_render(void *selectedref, float origx1, float or
 		}
 
 		// if the image is available, loaded and valid, display it
-		if (snapx_bitmap->valid())
-		{
-			float x1 = origx1 + 0.01f;
-			float x2 = origx2 - 0.01f;
-			float y1 = origy1 + UI_BOX_TB_BORDER + line_height;
-			float y2 = origy2 - UI_BOX_TB_BORDER - line_height;
-
-			// apply texture
-			container->add_quad(x1, y1, x2, y2, rgb_t::white, snapx_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-		}
+		draw_snapx(origx1, origy1, origx2, origy2);
 	}
 }
 

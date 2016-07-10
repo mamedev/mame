@@ -71,7 +71,9 @@ menu_select_launch::cache_ptr_map menu_select_launch::s_caches;
 
 
 menu_select_launch::cache::cache(running_machine &machine)
-	: m_no_avail_bitmap(std::make_unique<bitmap_argb32>(256, 256))
+	: m_snapx_bitmap(std::make_unique<bitmap_argb32>(0, 0))
+	, m_snapx_texture()
+	, m_no_avail_bitmap(std::make_unique<bitmap_argb32>(256, 256))
 	, m_star_bitmap(std::make_unique<bitmap_argb32>(32, 32))
 	, m_star_texture()
 	, m_toolbar_bitmap()
@@ -82,9 +84,12 @@ menu_select_launch::cache::cache(running_machine &machine)
 	render_manager &render(machine.render());
 	auto const texture_free([&render](render_texture *texture) { render.texture_free(texture); });
 
-	std::memcpy(&m_no_avail_bitmap->pix32(0), no_avail_bmp, 256 * 256 * sizeof(UINT32));
-	std::memcpy(&m_star_bitmap->pix32(0), favorite_star_bmp, 32 * 32 * sizeof(UINT32));
+	// create a texture for snapshot
+	m_snapx_texture = texture_ptr(render.texture_alloc(render_texture::hq_scale), texture_free);
 
+	std::memcpy(&m_no_avail_bitmap->pix32(0), no_avail_bmp, 256 * 256 * sizeof(UINT32));
+
+	std::memcpy(&m_star_bitmap->pix32(0), favorite_star_bmp, 32 * 32 * sizeof(UINT32));
 	m_star_texture = texture_ptr(render.texture_alloc(), texture_free);
 	m_star_texture->set_bitmap(*m_star_bitmap, m_star_bitmap->cliprect(), TEXFORMAT_ARGB32);
 
@@ -236,7 +241,7 @@ float menu_select_launch::draw_right_box_title(float x1, float y1, float x2, flo
 			fgcolor = rgb_t(0xff, 0xff, 0x00);
 			bgcolor = rgb_t(0xff, 0xff, 0xff);
 			ui().draw_textured_box(container, x1 + UI_LINE_WIDTH, y1 + UI_LINE_WIDTH, x1 + midl - UI_LINE_WIDTH, y1 + line_height,
-				bgcolor, rgb_t(43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+				bgcolor, rgb_t(43, 43, 43), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 		}
 		else if (bgcolor == UI_MOUSEOVER_BG_COLOR)
 			container->add_rect(x1 + UI_LINE_WIDTH, y1 + UI_LINE_WIDTH, x1 + midl - UI_LINE_WIDTH, y1 + line_height,
@@ -285,7 +290,7 @@ std::string menu_select_launch::arts_render_common(float origx1, float origy1, f
 
 	if (bgcolor != UI_TEXT_BG_COLOR)
 		ui().draw_textured_box(container, origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
-			origy1 + line_height, bgcolor, rgb_t(43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+			origy1 + line_height, bgcolor, rgb_t(43, 43, 43), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
 	ui().draw_text_full(container, snaptext.c_str(), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 		mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, tmp_size);
@@ -318,6 +323,7 @@ void menu_select_launch::arts_render_images(bitmap_argb32 *tmp_bitmap, float ori
 		no_available = true;
 	}
 
+	bitmap_argb32 &snapx_bitmap(m_cache->snapx_bitmap());
 	if (tmp_bitmap->valid())
 	{
 		float panel_width = origx2 - origx1 - 0.02f;
@@ -370,21 +376,98 @@ void menu_select_launch::arts_render_images(bitmap_argb32 *tmp_bitmap, float ori
 		else
 			dest_bitmap = tmp_bitmap;
 
-		snapx_bitmap->allocate(panel_width_pixel, panel_height_pixel);
+		snapx_bitmap.allocate(panel_width_pixel, panel_height_pixel);
 		int x1 = (0.5f * panel_width_pixel) - (0.5f * dest_xPixel);
 		int y1 = (0.5f * panel_height_pixel) - (0.5f * dest_yPixel);
 
 		for (int x = 0; x < dest_xPixel; x++)
 			for (int y = 0; y < dest_yPixel; y++)
-				snapx_bitmap->pix32(y + y1, x + x1) = dest_bitmap->pix32(y, x);
+				snapx_bitmap.pix32(y + y1, x + x1) = dest_bitmap->pix32(y, x);
 
 		auto_free(machine(), dest_bitmap);
 
 		// apply bitmap
-		snapx_texture->set_bitmap(*snapx_bitmap, snapx_bitmap->cliprect(), TEXFORMAT_ARGB32);
+		m_cache->snapx_texture()->set_bitmap(snapx_bitmap, snapx_bitmap.cliprect(), TEXFORMAT_ARGB32);
 	}
 	else
-		snapx_bitmap->reset();
+	{
+		snapx_bitmap.reset();
+	}
+}
+
+
+//-------------------------------------------------
+//  draw common arrows
+//-------------------------------------------------
+
+void menu_select_launch::draw_common_arrow(float origx1, float origy1, float origx2, float origy2, int current, int dmin, int dmax, float title_size)
+{
+	auto line_height = ui().get_line_height();
+	auto lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
+	auto gutter_width = lr_arrow_width * 1.3f;
+
+	// set left-right arrows dimension
+	float ar_x0 = 0.5f * (origx2 + origx1) + 0.5f * title_size + gutter_width - lr_arrow_width;
+	float ar_y0 = origy1 + 0.1f * line_height;
+	float ar_x1 = 0.5f * (origx2 + origx1) + 0.5f * title_size + gutter_width;
+	float ar_y1 = origy1 + 0.9f * line_height;
+
+	float al_x0 = 0.5f * (origx2 + origx1) - 0.5f * title_size - gutter_width;
+	float al_y0 = origy1 + 0.1f * line_height;
+	float al_x1 = 0.5f * (origx2 + origx1) - 0.5f * title_size - gutter_width + lr_arrow_width;
+	float al_y1 = origy1 + 0.9f * line_height;
+
+	rgb_t fgcolor_right, fgcolor_left;
+	fgcolor_right = fgcolor_left = UI_TEXT_COLOR;
+
+	// set hover
+	if (mouse_hit && ar_x0 <= mouse_x && ar_x1 > mouse_x && ar_y0 <= mouse_y && ar_y1 > mouse_y && current != dmax)
+	{
+		ui().draw_textured_box(container, ar_x0 + 0.01f, ar_y0, ar_x1 - 0.01f, ar_y1, UI_MOUSEOVER_BG_COLOR, rgb_t(43, 43, 43),
+			hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+		hover = HOVER_UI_RIGHT;
+		fgcolor_right = UI_MOUSEOVER_COLOR;
+	}
+	else if (mouse_hit && al_x0 <= mouse_x && al_x1 > mouse_x && al_y0 <= mouse_y && al_y1 > mouse_y && current != dmin)
+	{
+		ui().draw_textured_box(container, al_x0 + 0.01f, al_y0, al_x1 - 0.01f, al_y1, UI_MOUSEOVER_BG_COLOR, rgb_t(43, 43, 43),
+			hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+		hover = HOVER_UI_LEFT;
+		fgcolor_left = UI_MOUSEOVER_COLOR;
+	}
+
+	// apply arrow
+	if (current == dmin)
+		draw_arrow(container, ar_x0, ar_y0, ar_x1, ar_y1, fgcolor_right, ROT90);
+	else if (current == dmax)
+		draw_arrow(container, al_x0, al_y0, al_x1, al_y1, fgcolor_left, ROT90 ^ ORIENTATION_FLIP_X);
+	else
+	{
+		draw_arrow(container, ar_x0, ar_y0, ar_x1, ar_y1, fgcolor_right, ROT90);
+		draw_arrow(container, al_x0, al_y0, al_x1, al_y1, fgcolor_left, ROT90 ^ ORIENTATION_FLIP_X);
+	}
+}
+
+
+//-------------------------------------------------
+//  draw info arrow
+//-------------------------------------------------
+
+void menu_select_launch::draw_info_arrow(int ub, float origx1, float origx2, float oy1, float line_height, float text_size, float ud_arrow_width)
+{
+	rgb_t fgcolor = UI_TEXT_COLOR;
+	UINT32 orientation = (!ub) ? ROT0 : ROT0 ^ ORIENTATION_FLIP_Y;
+
+	if (mouse_hit && origx1 <= mouse_x && origx2 > mouse_x && oy1 <= mouse_y && oy1 + (line_height * text_size) > mouse_y)
+	{
+		ui().draw_textured_box(container, origx1 + 0.01f, oy1, origx2 - 0.01f, oy1 + (line_height * text_size), UI_MOUSEOVER_BG_COLOR,
+			rgb_t(43, 43, 43), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+		hover = (!ub) ? HOVER_DAT_UP : HOVER_DAT_DOWN;
+		fgcolor = UI_MOUSEOVER_COLOR;
+	}
+
+	draw_arrow(container, 0.5f * (origx1 + origx2) - 0.5f * (ud_arrow_width * text_size), oy1 + 0.25f * (line_height * text_size),
+		0.5f * (origx1 + origx2) + 0.5f * (ud_arrow_width * text_size), oy1 + 0.75f * (line_height * text_size), fgcolor, orientation);
 }
 
 
@@ -443,6 +526,27 @@ void menu_select_launch::draw_star(float x0, float y0)
 	float y1 = y0 + ui().get_line_height();
 	float x1 = x0 + ui().get_line_height() * container->manager().ui_aspect();
 	container->add_quad(x0, y0, x1, y1, rgb_t::white, m_cache->star_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_PACKABLE);
+}
+
+
+//-------------------------------------------------
+//  draw snapshot
+//-------------------------------------------------
+
+void menu_select_launch::draw_snapx(float origx1, float origy1, float origx2, float origy2)
+{
+	// if the image is available, loaded and valid, display it
+	if (snapx_valid())
+	{
+		float const line_height = ui().get_line_height();
+		float const x1 = origx1 + 0.01f;
+		float const x2 = origx2 - 0.01f;
+		float const y1 = origy1 + UI_BOX_TB_BORDER + line_height;
+		float const y2 = origy2 - UI_BOX_TB_BORDER - line_height;
+
+		// apply texture
+		container->add_quad(x1, y1, x2, y2, rgb_t::white, m_cache->snapx_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	}
 }
 
 
@@ -1140,7 +1244,7 @@ void menu_select_launch::draw(UINT32 flags)
 			bgcolor = rgb_t(0xff, 0xff, 0xff);
 			fgcolor3 = rgb_t(0xcc, 0xcc, 0x00);
 			ui().draw_textured_box(container, line_x0 + 0.01f, line_y0, line_x1 - 0.01f, line_y1, bgcolor, rgb_t(43, 43, 43),
-				hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+				hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 		}
 		// else if the mouse is over this item, draw with a different background
 		else if (itemnum == hover)
@@ -1154,7 +1258,7 @@ void menu_select_launch::draw(UINT32 flags)
 			fgcolor = fgcolor3 = UI_MOUSEOVER_COLOR;
 			bgcolor = UI_MOUSEOVER_BG_COLOR;
 			ui().draw_textured_box(container, line_x0 + 0.01f, line_y0, line_x1 - 0.01f, line_y1, bgcolor, rgb_t(43, 43, 43),
-				hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+				hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 		}
 
 		if (linenum == 0 && top_line != 0)
@@ -1230,7 +1334,7 @@ void menu_select_launch::draw(UINT32 flags)
 			fgcolor = rgb_t(0xff, 0xff, 0x00);
 			bgcolor = rgb_t(0xff, 0xff, 0xff);
 			ui().draw_textured_box(container, line_x0 + 0.01f, line_y0, line_x1 - 0.01f, line_y1, bgcolor, rgb_t(43, 43, 43),
-				hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+				hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 		}
 		// else if the mouse is over this item, draw with a different background
 		else if (count == hover)

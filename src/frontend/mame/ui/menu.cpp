@@ -25,6 +25,7 @@
 #include "uiinput.h"
 
 #include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <utility>
 
@@ -42,12 +43,6 @@ namespace ui {
 
 std::mutex menu::s_global_state_guard;
 menu::global_state_map menu::s_global_states;
-std::unique_ptr<bitmap_rgb32> menu::hilight_bitmap;
-render_texture *menu::hilight_texture;
-render_texture *menu::snapx_texture;
-render_texture *menu::hilight_main_texture;
-std::unique_ptr<bitmap_argb32> menu::snapx_bitmap;
-std::unique_ptr<bitmap_rgb32> menu::hilight_main_bitmap;
 
 /***************************************************************************
     INLINE FUNCTIONS
@@ -89,6 +84,10 @@ bool menu::exclusive_input_pressed(int &iptkey, int key, int repeat)
 menu::global_state::global_state(running_machine &machine, ui_options const &options)
 	: m_machine(machine)
 	, m_cleanup_callbacks()
+	, m_hilight_bitmap(std::make_unique<bitmap_argb32>(256, 1))
+	, m_hilight_texture()
+	, m_hilight_main_bitmap(std::make_unique<bitmap_argb32>(1, 128))
+	, m_hilight_main_texture()
 	, m_bgrnd_bitmap()
 	, m_bgrnd_texture()
 	, m_stack()
@@ -96,6 +95,28 @@ menu::global_state::global_state(running_machine &machine, ui_options const &opt
 {
 	render_manager &render(machine.render());
 	auto const texture_free([&render](render_texture *texture) { render.texture_free(texture); });
+
+	// create a texture for hilighting items
+	for (unsigned x = 0; x < 256; ++x)
+	{
+		unsigned const alpha((x < 25) ? (0xff * x / 25) : (x > (256 - 25)) ? (0xff * (255 - x) / 25) : 0xff);
+		m_hilight_bitmap->pix32(0, x) = rgb_t(alpha, 0xff, 0xff, 0xff);
+	}
+	m_hilight_texture = texture_ptr(render.texture_alloc(), texture_free);
+	m_hilight_texture->set_bitmap(*m_hilight_bitmap, m_hilight_bitmap->cliprect(), TEXFORMAT_ARGB32);
+
+	// create a texture for hilighting items in main menu
+	for (unsigned y = 0; y < 128; ++y)
+	{
+		constexpr unsigned r1(0), g1(169), b1 = (255); // any start color
+		constexpr unsigned r2(0), g2(39), b2 = (130); // any stop color
+		unsigned const r = r1 + (y * (r2 - r1) / 128);
+		unsigned const g = g1 + (y * (g2 - g1) / 128);
+		unsigned const b = b1 + (y * (b2 - b1) / 128);
+		m_hilight_main_bitmap->pix32(y, 0) = rgb_t(r, g, b);
+	}
+	m_hilight_main_texture = texture_ptr(render.texture_alloc(), texture_free);
+	m_hilight_main_texture->set_bitmap(*m_hilight_main_bitmap, m_hilight_main_bitmap->cliprect(), TEXFORMAT_ARGB32);
 
 	// create a texture for arrow icons
 	m_arrow_texture = texture_ptr(render.texture_alloc(render_triangle), texture_free);
@@ -194,26 +215,12 @@ void menu::init(running_machine &machine, ui_options &mopt)
 	{
 		std::lock_guard<std::mutex> guard(s_global_state_guard);
 		auto const ins(s_global_states.emplace(&machine, std::make_shared<global_state>(machine, mopt)));
+		assert(ins.second); // calling init twice is bad
 		if (ins.second)
 			machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(menu::exit), &machine)); // add an exit callback to free memory
 		else
 			ins.first->second->stack_reset();
 	}
-
-	// create a texture for hilighting items
-	hilight_bitmap = std::make_unique<bitmap_rgb32>(256, 1);
-	for (int x = 0; x < 256; x++)
-	{
-		int alpha = 0xff;
-		if (x < 25) alpha = 0xff * x / 25;
-		if (x > 256 - 25) alpha = 0xff * (255 - x) / 25;
-		hilight_bitmap->pix32(0, x) = rgb_t(alpha,0xff,0xff,0xff);
-	}
-	hilight_texture = machine.render().texture_alloc();
-	hilight_texture->set_bitmap(*hilight_bitmap, hilight_bitmap->cliprect(), TEXFORMAT_ARGB32);
-
-	// initialize ui
-	init_ui(machine, mopt);
 }
 
 
@@ -228,12 +235,6 @@ void menu::exit(running_machine &machine)
 		std::lock_guard<std::mutex> guard(s_global_state_guard);
 		s_global_states.erase(&machine);
 	}
-
-	// free textures
-	render_manager &mre = machine.render();
-	mre.texture_free(hilight_texture);
-	mre.texture_free(snapx_texture);
-	mre.texture_free(hilight_main_texture);
 }
 
 
@@ -258,6 +259,8 @@ menu::menu(mame_ui_manager &mui, render_container *_container)
 	, m_resetpos(0)
 	, m_resetref(nullptr)
 {
+	assert(m_global_state); // not calling init is bad
+
 	container = _container;
 
 	reset(reset_options::SELECT_FIRST);
@@ -1260,7 +1263,7 @@ void menu::render_triangle(bitmap_argb32 &dest, bitmap_argb32 &source, const rec
 
 void menu::highlight(render_container *container, float x0, float y0, float x1, float y1, rgb_t bgcolor)
 {
-	container->add_quad(x0, y0, x1, y1, bgcolor, hilight_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE) | PRIMFLAG_PACKABLE);
+	container->add_quad(x0, y0, x1, y1, bgcolor, m_global_state->hilight_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE) | PRIMFLAG_PACKABLE);
 }
 
 
@@ -1273,106 +1276,6 @@ void menu::draw_arrow(render_container *container, float x0, float y0, float x1,
 	container->add_quad(x0, y0, x1, y1, fgcolor, m_global_state->arrow_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(orientation) | PRIMFLAG_PACKABLE);
 }
 
-//-------------------------------------------------
-//  init - initialize the ui menu system
-//-------------------------------------------------
-
-void menu::init_ui(running_machine &machine, ui_options &mopt)
-{
-	render_manager &mrender = machine.render();
-	// create a texture for hilighting items in main menu
-	hilight_main_bitmap = std::make_unique<bitmap_rgb32>(1, 128);
-	int r1 = 0, g1 = 169, b1 = 255; //Any start color
-	int r2 = 0, g2 = 39, b2 = 130; //Any stop color
-	for (int y = 0; y < 128; y++)
-	{
-		int r = r1 + (y * (r2 - r1) / 128);
-		int g = g1 + (y * (g2 - g1) / 128);
-		int b = b1 + (y * (b2 - b1) / 128);
-		hilight_main_bitmap->pix32(y, 0) = rgb_t(r, g, b);
-	}
-
-	hilight_main_texture = mrender.texture_alloc();
-	hilight_main_texture->set_bitmap(*hilight_main_bitmap, hilight_main_bitmap->cliprect(), TEXFORMAT_ARGB32);
-
-	// create a texture for snapshot
-	snapx_bitmap = std::make_unique<bitmap_argb32>(0, 0);
-	snapx_texture = mrender.texture_alloc(render_texture::hq_scale);
-}
-
-
-//-------------------------------------------------
-//  draw common arrows
-//-------------------------------------------------
-
-void menu::draw_common_arrow(float origx1, float origy1, float origx2, float origy2, int current, int dmin, int dmax, float title_size)
-{
-	auto line_height = ui().get_line_height();
-	auto lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
-	auto gutter_width = lr_arrow_width * 1.3f;
-
-	// set left-right arrows dimension
-	float ar_x0 = 0.5f * (origx2 + origx1) + 0.5f * title_size + gutter_width - lr_arrow_width;
-	float ar_y0 = origy1 + 0.1f * line_height;
-	float ar_x1 = 0.5f * (origx2 + origx1) + 0.5f * title_size + gutter_width;
-	float ar_y1 = origy1 + 0.9f * line_height;
-
-	float al_x0 = 0.5f * (origx2 + origx1) - 0.5f * title_size - gutter_width;
-	float al_y0 = origy1 + 0.1f * line_height;
-	float al_x1 = 0.5f * (origx2 + origx1) - 0.5f * title_size - gutter_width + lr_arrow_width;
-	float al_y1 = origy1 + 0.9f * line_height;
-
-	rgb_t fgcolor_right, fgcolor_left;
-	fgcolor_right = fgcolor_left = UI_TEXT_COLOR;
-
-	// set hover
-	if (mouse_hit && ar_x0 <= mouse_x && ar_x1 > mouse_x && ar_y0 <= mouse_y && ar_y1 > mouse_y && current != dmax)
-	{
-		ui().draw_textured_box(container, ar_x0 + 0.01f, ar_y0, ar_x1 - 0.01f, ar_y1, UI_MOUSEOVER_BG_COLOR, rgb_t(43, 43, 43),
-			hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
-		hover = HOVER_UI_RIGHT;
-		fgcolor_right = UI_MOUSEOVER_COLOR;
-	}
-	else if (mouse_hit && al_x0 <= mouse_x && al_x1 > mouse_x && al_y0 <= mouse_y && al_y1 > mouse_y && current != dmin)
-	{
-		ui().draw_textured_box(container, al_x0 + 0.01f, al_y0, al_x1 - 0.01f, al_y1, UI_MOUSEOVER_BG_COLOR, rgb_t(43, 43, 43),
-			hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
-		hover = HOVER_UI_LEFT;
-		fgcolor_left = UI_MOUSEOVER_COLOR;
-	}
-
-	// apply arrow
-	if (current == dmin)
-		draw_arrow(container, ar_x0, ar_y0, ar_x1, ar_y1, fgcolor_right, ROT90);
-	else if (current == dmax)
-		draw_arrow(container, al_x0, al_y0, al_x1, al_y1, fgcolor_left, ROT90 ^ ORIENTATION_FLIP_X);
-	else
-	{
-		draw_arrow(container, ar_x0, ar_y0, ar_x1, ar_y1, fgcolor_right, ROT90);
-		draw_arrow(container, al_x0, al_y0, al_x1, al_y1, fgcolor_left, ROT90 ^ ORIENTATION_FLIP_X);
-	}
-}
-
-//-------------------------------------------------
-//  draw info arrow
-//-------------------------------------------------
-
-void menu::info_arrow(int ub, float origx1, float origx2, float oy1, float line_height, float text_size, float ud_arrow_width)
-{
-	rgb_t fgcolor = UI_TEXT_COLOR;
-	UINT32 orientation = (!ub) ? ROT0 : ROT0 ^ ORIENTATION_FLIP_Y;
-
-	if (mouse_hit && origx1 <= mouse_x && origx2 > mouse_x && oy1 <= mouse_y && oy1 + (line_height * text_size) > mouse_y)
-	{
-		ui().draw_textured_box(container, origx1 + 0.01f, oy1, origx2 - 0.01f, oy1 + (line_height * text_size), UI_MOUSEOVER_BG_COLOR,
-			rgb_t(43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
-		hover = (!ub) ? HOVER_DAT_UP : HOVER_DAT_DOWN;
-		fgcolor = UI_MOUSEOVER_COLOR;
-	}
-
-	draw_arrow(container, 0.5f * (origx1 + origx2) - 0.5f * (ud_arrow_width * text_size), oy1 + 0.25f * (line_height * text_size),
-		0.5f * (origx1 + origx2) + 0.5f * (ud_arrow_width * text_size), oy1 + 0.75f * (line_height * text_size), fgcolor, orientation);
-}
 
 //-------------------------------------------------
 //  draw - draw palette menu
