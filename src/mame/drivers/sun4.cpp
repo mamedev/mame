@@ -426,6 +426,8 @@
 #include "debug/debugcmd.h"
 #include "debugger.h"
 
+#define SUN4_LOG_FCODES	(0)
+
 #define TIMEKEEPER_TAG  "timekpr"
 #define SCC1_TAG        "scc1"
 #define SCC2_TAG        "scc2"
@@ -561,7 +563,9 @@ private:
 	
 	emu_timer *m_c0_timer, *m_c1_timer;
 	
+	void start_timer(int num);
 	void l2p_command(int ref, int params, const char **param);
+	void fcodes_command(int ref, int params, const char **param);
 };
 
 READ32_MEMBER( sun4_state::sun4c_mmu_r )
@@ -1128,6 +1132,27 @@ void sun4_state::l2p_command(int ref, int params, const char **param)
 	}
 }
 
+void sun4_state::fcodes_command(int ref, int params, const char **param)
+{
+#if SUN4_LOG_FCODES
+	if (params < 1)
+		return;
+
+	bool is_on = strcmp(param[0], "on") == 0;
+	bool is_off = strcmp(param[0], "off") == 0;
+
+	if (!is_on && !is_off)
+	{
+		machine().debugger().console().printf("Please specify 'on' or 'off'.\n");
+		return;
+	}
+
+	bool enabled = is_on;
+
+	m_maincpu->enable_log_fcodes(enabled);
+#endif
+}
+
 static ADDRESS_MAP_START(sun4_mem, AS_PROGRAM, 32, sun4_state)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE( sun4_mmu_r, sun4_mmu_w )
 ADDRESS_MAP_END
@@ -1160,6 +1185,9 @@ void sun4_state::machine_start()
 	{
 		using namespace std::placeholders;
 		machine().debugger().console().register_command("l2p", CMDFLAG_NONE, 0, 1, 1, std::bind(&sun4_state::l2p_command, this, _1, _2, _3));
+		#if SUN4_LOG_FCODES
+		machine().debugger().console().register_command("fcodes", CMDFLAG_NONE, 0, 1, 1, std::bind(&sun4_state::fcodes_command, this, _1, _2, _3));
+		#endif
 	}
 	
 	// allocate timers for the built-in two channel timer
@@ -1291,21 +1319,25 @@ void sun4_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 			//printf("Timer 0 expired\n");
 			m_counter[0] = 0x80000000 | (1 << 10);
 			m_counter[1] |= 0x80000000;
-			m_c0_timer->adjust(attotime::never);
+			//m_c0_timer->adjust(attotime::never);
+			start_timer(0);
 			if ((m_irq_reg & 0x21) == 0x21)
 			{
-			//	printf("Taking INT10\n");
 				m_maincpu->set_input_line(SPARC_IRQ10, ASSERT_LINE);
+				printf("Taking INT10\n");
 			}
 			break;
-			
+
 		case TIMER_1:
+			//printf("Timer 1 expired\n");
 			m_counter[2] = 0x80000000 | (1 << 10);
 			m_counter[3] |= 0x80000000;
-			m_c0_timer->adjust(attotime::never);
+			start_timer(1);
+			//m_c1_timer->adjust(attotime::never);
 			if ((m_irq_reg & 0x81) == 0x81)
 			{
 				m_maincpu->set_input_line(SPARC_IRQ14, ASSERT_LINE);
+				//printf("Taking INT14\n");
 			}
 			break;
 	}
@@ -1313,36 +1345,81 @@ void sun4_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 READ32_MEMBER( sun4_state::timer_r )
 {
-	//printf("Read timer @ %x, mask %08x\n", offset, mem_mask);
+	UINT32 ret = m_counter[offset];
+
+	// reading limt 0
+	if (offset == 0)
+	{
+		printf("Read timer counter 0 (%08x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
+	}
 	if (offset == 1)
 	{
+		printf("Read timer limit 0 (%08x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
+		m_counter[0] &= ~0x80000000;
+		m_counter[1] &= ~0x80000000;
 		m_maincpu->set_input_line(SPARC_IRQ10, CLEAR_LINE);
 	}
-	else if (offset == 3)
+
+	if (offset == 2)
 	{
+		printf("Read timer counter 1 (%08x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
+	}
+	if (offset == 3)
+	{
+		//printf("Read timer limit 1 (%08x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
+		m_counter[2] &= ~0x80000000;
+		m_counter[3] &= ~0x80000000;
 		m_maincpu->set_input_line(SPARC_IRQ14, CLEAR_LINE);
 	}
-	return m_counter[offset];
+	return ret;
+}
+
+void sun4_state::start_timer(int num)
+{
+	int shift = (num == 0 ? 10 : 20);
+	int mask = (num == 0 ? 0x1fffff : 0x7ff);
+	int period = (m_counter[num * 2 + 1] >> shift) & mask;
+	if (period == 0)
+		period = 0x200000;
+
+	//printf("Setting limit %d period to %d us\n", num, period);
+
+	if (num == 0)
+	{
+		m_c0_timer->adjust(attotime::from_usec(period));
+	}
+	else
+	{
+		m_c1_timer->adjust(attotime::from_usec(period));
+	}
 }
 
 WRITE32_MEMBER( sun4_state::timer_w )
 {
-	//printf("%08x to timer @ %x, mask %08x\n", data, offset<<2, mem_mask);
 	COMBINE_DATA(&m_counter[offset]);
-	
-	// writing limit 0?
+
+	if (offset == 0)
+	{
+		printf("%08x to timer counter 0 @ %x, mask %08x\n", data, m_maincpu->pc(), mem_mask);
+	}
+
+	// writing limit 0
 	if (offset == 1)
 	{
-		int period = (m_counter[1] >> 10) & 0x1fffff;
-	//	printf("Setting limit 1 period to %d us\n", period);
-		m_c0_timer->adjust(attotime::from_usec(period));
+		m_counter[0] = 1 << 10;
+		start_timer(0);
 	}
-	
-	// writing limit 1?
+
+	if (offset == 2)
+	{
+		printf("%08x to timer counter 1 @ %x, mask %08x\n", data, m_maincpu->pc(), mem_mask);
+	}
+
+	// writing limit 1
 	if (offset == 3)
 	{
-		int period = (m_counter[3] >> 10) & 0x1fffff;
-		m_c1_timer->adjust(attotime::from_usec(period));
+		m_counter[2] = 1 << 10;
+		start_timer(1);
 	}
 }
 
