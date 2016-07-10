@@ -45,12 +45,11 @@ public:
 protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
-	bool &                          m_ok;
-
 private:
 	virtual void populate() override;
 	virtual void handle() override;
 
+	bool &                          m_ok;
 	device_image_interface *        m_image;
 	std::string &                   m_current_directory;
 	std::string &                   m_current_file;
