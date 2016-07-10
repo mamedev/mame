@@ -1307,7 +1307,7 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_read_sector)
 
 	if (!m_hdc_write_gate) // do not read when WRITE GATE is on
 	{
-		UINT8 SDH = (m_hdc->read(space(AS_PROGRAM), 0x06));
+		UINT8 SDH = (m_hdc->read(generic_space(), 0x06));
 		int drv = (SDH & (8 + 16)) >> 3; // get DRIVE from SDH register
 
 		if ((state == 0) && (last_state == 1) && (drv == 0))
@@ -1317,9 +1317,9 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_read_sector)
 //			logerror("\nTRYING TO READ");
 			output().set_value("led1", 0);
 
-			int hi = (m_hdc->read(space(AS_PROGRAM), 0x05)) & 0x07;
-			UINT16 cylinder = (m_hdc->read(space(AS_PROGRAM), 0x04)) | (hi << 8);
-			UINT8 sector_number = m_hdc->read(space(AS_PROGRAM), 0x03);
+			int hi = (m_hdc->read(generic_space(), 0x05)) & 0x07;
+			UINT16 cylinder = (m_hdc->read(generic_space(), 0x04)) | (hi << 8);
+			UINT8 sector_number = m_hdc->read(generic_space(), 0x03);
 
 			hard_disk_file *local_hard_disk;
 			local_hard_disk = rainbow_hdc_file(0); // one hard disk for now.
@@ -1382,7 +1382,7 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_write_sector)
 	else
 		m_hdc_write_gate = true;
 
-	int drv = ((m_hdc->read(space(AS_PROGRAM), 0x06)) & (8 + 16)) >> 3; // get DRIVE from SDH register
+	int drv = ((m_hdc->read(generic_space(), 0x06)) & (8 + 16)) >> 3; // get DRIVE from SDH register
 
 	if (((state == 0) && (wg_last == 1))  // Check correct state transition and DRIVE 0 ....
 		&& (drv == 0)
@@ -1439,13 +1439,13 @@ int rainbow_state::do_write_sector()
 //			logerror("\n* TRYING TO WRITE * ");
 			output().set_value("led1", 1); // OFF
 
-			UINT8 SDH = (m_hdc->read(space(AS_PROGRAM), 0x06));
+			UINT8 SDH = (m_hdc->read(generic_space(), 0x06));
 
-			int hi = (m_hdc->read(space(AS_PROGRAM), 0x05)) & 0x07;
-			UINT16 cylinder = (m_hdc->read(space(AS_PROGRAM), 0x04)) | (hi << 8);
+			int hi = (m_hdc->read(generic_space(), 0x05)) & 0x07;
+			UINT16 cylinder = (m_hdc->read(generic_space(), 0x04)) | (hi << 8);
 
-			int sector_number = m_hdc->read(space(AS_PROGRAM), 0x03);
-			int sector_count = m_hdc->read(space(AS_PROGRAM), 0x02); // (1 = single sector)
+			int sector_number = m_hdc->read(generic_space(), 0x03);
+			int sector_count = m_hdc->read(generic_space(), 0x02); // (1 = single sector)
 
 			if (!((cylinder <= info->cylinders) &&                     // filter invalid cylinders
 				(SECTOR_SIZES[(SDH >> 5) & 0x03] == info->sectorbytes) // 512, may not vary
