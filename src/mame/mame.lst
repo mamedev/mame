@@ -27391,11 +27391,11 @@ murogmbl                        // ???
 @source:mustache.cpp
 mustache                        // (c) 1987 March
 
-@source:mvme350.cpp
-mvme350                         //
-
 @source:mvme147.cpp
 mvme147                         // (c) 1989 Motorola
+
+@source:mvme350.cpp
+mvme350                         //
 
 @source:mw18w.cpp
 18w                             // 653 (c) 1979 Midway
@@ -30566,6 +30566,9 @@ pockchal
 @source:pockstat.cpp
 pockstat                        // 1999 Sony PocketStation
 
+@source:pofo.cpp
+pofo                            //
+
 @source:poisk1.cpp
 poisk1                          //
 
@@ -30644,9 +30647,6 @@ popobear                        // (c) 2000 BMC
 
 @source:popper.cpp
 popper                          // (c) 1983 Omori Electric Co., Ltd.
-
-@source:portfoli.cpp
-pofo                            //
 
 @source:portrait.cpp
 portrait                        // (c) 1983 Olympia
