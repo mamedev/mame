@@ -113,49 +113,47 @@ void debug_view_state::recompute()
 	reset();
 
 	// add a cycles entry: cycles:99999999
-	m_state_list.push_back(std::make_unique<state_item>(REG_CYCLES, "cycles", 8));
+	m_state_list.emplace_back(REG_CYCLES, "cycles", 8);
 
 	// add a beam entry: beamx:1234
-	m_state_list.push_back(std::make_unique<state_item>(REG_BEAMX, "beamx", 4));
+	m_state_list.emplace_back(REG_BEAMX, "beamx", 4);
 
 	// add a beam entry: beamy:5678
-	m_state_list.push_back(std::make_unique<state_item>(REG_BEAMY, "beamy", 4));
+	m_state_list.emplace_back(REG_BEAMY, "beamy", 4);
 
 	// add a beam entry: frame:123456
-	m_state_list.push_back(std::make_unique<state_item>(REG_FRAME, "frame", 6));
+	m_state_list.emplace_back(REG_FRAME, "frame", 6);
 
 	// add a flags entry: flags:xxxxxxxx
-	m_state_list.push_back(std::make_unique<state_item>(STATE_GENFLAGS, "flags", source.m_stateintf->state_string_max_length(STATE_GENFLAGS)));
+	m_state_list.emplace_back(STATE_GENFLAGS, "flags", source.m_stateintf->state_string_max_length(STATE_GENFLAGS));
 
 	// add a divider entry
-	m_state_list.push_back(std::make_unique<state_item>(REG_DIVIDER, "", 0));
+	m_state_list.emplace_back(REG_DIVIDER, "", 0);
 
 	// add all registers into it
 	for (auto &entry : source.m_stateintf->state_entries())
+	{
 		if (entry->divider())
-		{
-			m_state_list.push_back(std::make_unique<state_item>(REG_DIVIDER, "", 0));
-		}
+			m_state_list.emplace_back(REG_DIVIDER, "", 0);
 		else if (entry->visible())
-		{
-			m_state_list.push_back(std::make_unique<state_item>(entry->index(), entry->symbol(), source.m_stateintf->state_string_max_length(entry->index())));
-		}
+			m_state_list.emplace_back(entry->index(), entry->symbol(), source.m_stateintf->state_string_max_length(entry->index()));
+	}
 
 	// count the entries and determine the maximum tag and value sizes
-	int count = 0;
-	int maxtaglen = 0;
-	int maxvallen = 0;
-	for (auto &item : m_state_list)
+	std::size_t count = 0;
+	std::size_t maxtaglen = 0;
+	UINT8 maxvallen = 0;
+	for (auto const &item : m_state_list)
 	{
 		count++;
-		maxtaglen = MAX(maxtaglen, item->m_symbol.length());
-		maxvallen = MAX(maxvallen, item->m_vallen);
+		maxtaglen = (std::max)(maxtaglen, item.m_symbol.length());
+		maxvallen = (std::max)(maxvallen, item.m_vallen);
 	}
 
 	// set the current divider and total cols
-	m_divider = 1 + maxtaglen + 1;
-	m_total.x = 1 + maxtaglen + 2 + maxvallen + 1;
-	m_total.y = count;
+	m_divider = unsigned(1U + maxtaglen + 1U);
+	m_total.x = UINT32(1U + maxtaglen + 2U + maxvallen + 1U);
+	m_total.y = UINT32(count);
 	m_topleft.x = 0;
 	m_topleft.y = 0;
 
@@ -195,6 +193,7 @@ void debug_view_state::view_update()
 
 	// find the first entry
 	auto it = m_state_list.begin();
+	for (INT32 index = 0; (index < m_topleft.y) && (it != m_state_list.end()); ++index, ++it) { }
 
 	// loop over visible rows
 	screen_device *screen = machine().first_screen();
@@ -206,7 +205,7 @@ void debug_view_state::view_update()
 		// if this visible row is valid, add it to the buffer
 		if (it != m_state_list.end())
 		{
-			state_item *curitem = it->get();
+			state_item &curitem = *it;
 
 			UINT32 effcol = m_topleft.x;
 			UINT8 attrib = DCA_NORMAL;
@@ -214,79 +213,79 @@ void debug_view_state::view_update()
 			std::string valstr;
 
 			// get the effective string
-			if (curitem->m_index >= REG_FRAME && curitem->m_index <= REG_DIVIDER)
+			if (curitem.m_index >= REG_FRAME && curitem.m_index <= REG_DIVIDER)
 			{
-				curitem->m_lastval = curitem->m_currval;
-				switch (curitem->m_index)
+				curitem.m_lastval = curitem.m_currval;
+				switch (curitem.m_index)
 				{
-					case REG_DIVIDER:
-						curitem->m_vallen = 0;
-						curitem->m_symbol.clear();
-						for (int i = 0; i < m_total.x; i++)
-							curitem->m_symbol.append("-");
-						break;
+				case REG_DIVIDER:
+					curitem.m_vallen = 0;
+					curitem.m_symbol.clear();
+					for (int i = 0; i < m_total.x; i++)
+						curitem.m_symbol.append("-");
+					break;
 
-					case REG_CYCLES:
-						if (source.m_execintf != nullptr)
-						{
-							curitem->m_currval = source.m_execintf->cycles_remaining();
-							valstr = string_format("%-8d", (UINT32)curitem->m_currval);
-						}
-						break;
+				case REG_CYCLES:
+					if (source.m_execintf != nullptr)
+					{
+						curitem.m_currval = source.m_execintf->cycles_remaining();
+						valstr = string_format("%-8d", UINT32(curitem.m_currval));
+					}
+					break;
 
-					case REG_BEAMX:
-						if (screen != nullptr)
-						{
-							curitem->m_currval = screen->hpos();
-							valstr = string_format("%4d", (UINT32)curitem->m_currval);
-						}
-						break;
+				case REG_BEAMX:
+					if (screen != nullptr)
+					{
+						curitem.m_currval = screen->hpos();
+						valstr = string_format("%4d", UINT32(curitem.m_currval));
+					}
+					break;
 
-					case REG_BEAMY:
-						if (screen != nullptr)
-						{
-							curitem->m_currval = screen->vpos();
-							valstr = string_format("%4d", (UINT32)curitem->m_currval);
-						}
-						break;
+				case REG_BEAMY:
+					if (screen != nullptr)
+					{
+						curitem.m_currval = screen->vpos();
+						valstr = string_format("%4d", UINT32(curitem.m_currval));
+					}
+					break;
 
-					case REG_FRAME:
-						if (screen != nullptr)
-						{
-							curitem->m_currval = screen->frame_number();
-							valstr = string_format("%6d", (UINT32)curitem->m_currval);
-						}
-						break;
+				case REG_FRAME:
+					if (screen != nullptr)
+					{
+						curitem.m_currval = screen->frame_number();
+						valstr = string_format("%6d", UINT32(curitem.m_currval));
+					}
+					break;
 				}
 			}
 			else
 			{
 				if (m_last_update != total_cycles)
-					curitem->m_lastval = curitem->m_currval;
-				curitem->m_currval = source.m_stateintf->state_int(curitem->m_index);
-				valstr = source.m_stateintf->state_string(curitem->m_index);
+					curitem.m_lastval = curitem.m_currval;
+				curitem.m_currval = source.m_stateintf->state_int(curitem.m_index);
+				valstr = source.m_stateintf->state_string(curitem.m_index);
 			}
 
 			// see if we changed
-			if (curitem->m_lastval != curitem->m_currval)
+			if (curitem.m_lastval != curitem.m_currval)
 				attrib = DCA_CHANGED;
 
 			// build up a string
 			char temp[256];
-			if (curitem->m_symbol.length() < m_divider - 1)
+			if (curitem.m_symbol.length() < m_divider - 1)
 			{
-				memset(&temp[len], ' ', m_divider - 1 - curitem->m_symbol.length());
-				len += m_divider - 1 - curitem->m_symbol.length();
+				memset(&temp[len], ' ', m_divider - 1 - curitem.m_symbol.length());
+				len += m_divider - 1 - curitem.m_symbol.length();
 			}
 
-			memcpy(&temp[len], curitem->m_symbol.c_str(), curitem->m_symbol.length());
-			len += curitem->m_symbol.length();
+			memcpy(&temp[len], curitem.m_symbol.c_str(), curitem.m_symbol.length());
+			len += curitem.m_symbol.length();
 
 			temp[len++] = ' ';
 			temp[len++] = ' ';
 
-			memcpy(&temp[len], valstr.c_str(), curitem->m_vallen);
-			len += curitem->m_vallen;
+			memcpy(&temp[len], valstr.c_str(), curitem.m_vallen);
+			len += curitem.m_vallen;
 
 			temp[len++] = ' ';
 			temp[len] = 0;
@@ -324,10 +323,10 @@ void debug_view_state::view_update()
 //-------------------------------------------------
 
 debug_view_state::state_item::state_item(int index, const char *name, UINT8 valuechars)
-	: m_lastval(0),
-		m_currval(0),
-		m_index(index),
-		m_vallen(valuechars),
-		m_symbol(name)
+	: m_lastval(0)
+	, m_currval(0)
+	, m_index(index)
+	, m_vallen(valuechars)
+	, m_symbol(name)
 {
 }
