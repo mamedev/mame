@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef __RGBVMX__
-#define __RGBVMX__
+#ifndef MAME_EMU_VIDEO_RGBVMX_H
+#define MAME_EMU_VIDEO_RGBVMX_H
 
 #include <altivec.h>
 
@@ -39,8 +39,8 @@ public:
 	inline void set(UINT32 rgba)
 	{
 		const VECU32 zero = { 0, 0, 0, 0 };
-		const VECS8 temp = vec_perm(vec_lde(0, &rgba), zero, vec_lvsl(0, &rgba));
-		m_value = vec_mergeh((VECS16)zero, (VECS16)vec_mergeh((VECS8)zero, temp));
+		const VECS8 temp = VECS8(vec_perm(vec_lde(0, &rgba), zero, vec_lvsl(0, &rgba)));
+		m_value = VECS32(vec_mergeh(VECS16(zero), VECS16(vec_mergeh(VECS8(zero), temp))));
 	}
 
 	inline void set(INT32 a, INT32 r, INT32 g, INT32 b)
@@ -52,14 +52,14 @@ public:
 	inline void set(rgb_t& rgb)
 	{
 		const VECU32 zero = { 0, 0, 0, 0 };
-		const VECS8 temp = vec_perm(vec_lde(0, rgb.ptr()), zero, vec_lvsl(0, rgb.ptr()));
-		m_value = vec_mergeh((VECS16)zero, (VECS16)vec_mergeh((VECS8)zero, temp));
+		const VECS8 temp = VECS8(vec_perm(vec_lde(0, rgb.ptr()), zero, vec_lvsl(0, rgb.ptr())));
+		m_value = VECS32(vec_mergeh(VECS16(zero), VECS16(vec_mergeh(VECS8(zero), temp))));
 	}
 
 	inline rgb_t to_rgba()
 	{
-		VECU32 temp = vec_packs(m_value, m_value);
-		temp = vec_packsu((VECS16)temp, (VECS16)temp);
+		VECU32 temp = VECU32(vec_packs(m_value, m_value));
+		temp = VECU32(vec_packsu(VECS16(temp), VECS16(temp)));
 		UINT32 result;
 		vec_ste(temp, 0, &result);
 		return result;
@@ -67,8 +67,8 @@ public:
 
 	inline rgb_t to_rgba_clamp()
 	{
-		VECU32 temp = vec_packs(m_value, m_value);
-		temp = vec_packsu((VECS16)temp, (VECS16)temp);
+		VECU32 temp = VECU32(vec_packs(m_value, m_value));
+		temp = VECU32(vec_packsu(VECS16(temp), VECS16(temp)));
 		UINT32 result;
 		vec_ste(temp, 0, &result);
 		return result;
@@ -152,28 +152,28 @@ public:
 	inline UINT8 get_a() const
 	{
 		UINT8 result;
-		vec_ste(vec_splat((VECU8)m_value, 3), 0, &result);
+		vec_ste(vec_splat(VECU8(m_value), 3), 0, &result);
 		return result;
 	}
 
 	inline UINT8 get_r() const
 	{
 		UINT8 result;
-		vec_ste(vec_splat((VECU8)m_value, 7), 0, &result);
+		vec_ste(vec_splat(VECU8(m_value), 7), 0, &result);
 		return result;
 	}
 
 	inline UINT8 get_g() const
 	{
 		UINT8 result;
-		vec_ste(vec_splat((VECU8)m_value, 11), 0, &result);
+		vec_ste(vec_splat(VECU8(m_value), 11), 0, &result);
 		return result;
 	}
 
 	inline UINT8 get_b() const
 	{
 		UINT8 result;
-		vec_ste(vec_splat((VECU8)m_value, 15), 0, &result);
+		vec_ste(vec_splat(VECU8(m_value), 15), 0, &result);
 		return result;
 	}
 
@@ -208,30 +208,30 @@ public:
 	inline void mul(const rgbaint_t& color)
 	{
 		const VECU32 shift = vec_splat_u32(-16);
-		const VECU32 temp = vec_msum((VECU16)m_value, (VECU16)vec_rl(color.m_value, shift), vec_splat_u32(0));
-		m_value = vec_add(vec_sl(temp, shift), vec_mulo((VECU16)m_value, (VECU16)color.m_value));
+		const VECU32 temp = vec_msum(VECU16(m_value), VECU16(vec_rl(color.m_value, shift)), vec_splat_u32(0));
+		m_value = VECS32(vec_add(vec_sl(temp, shift), vec_mulo(VECU16(m_value), VECU16(color.m_value))));
 	}
 
 	inline void mul_imm(const INT32 imm)
 	{
-		const VECU32 value = { imm, imm, imm, imm };
+		const VECU32 value = { UINT32(imm), UINT32(imm), UINT32(imm), UINT32(imm) };
 		const VECU32 shift = vec_splat_u32(-16);
-		const VECU32 temp = vec_msum((VECU16)m_value, (VECU16)vec_rl(value, shift), vec_splat_u32(0));
-		m_value = vec_add(vec_sl(temp, shift), vec_mulo((VECU16)m_value, (VECU16)value));
+		const VECU32 temp = vec_msum(VECU16(m_value), VECU16(vec_rl(value, shift)), vec_splat_u32(0));
+		m_value = VECS32(vec_add(vec_sl(temp, shift), vec_mulo(VECU16(m_value), VECU16(value))));
 	}
 
 	inline void mul_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
 	{
-		const VECU32 value = { a, r, g, b };
+		const VECU32 value = { UINT32(a), UINT32(r), UINT32(g), UINT32(b) };
 		const VECU32 shift = vec_splat_u32(-16);
-		const VECU32 temp = vec_msum((VECU16)m_value, (VECU16)vec_rl(value, shift), vec_splat_u32(0));
-		m_value = vec_add(vec_sl(temp, shift), vec_mulo((VECU16)m_value, (VECU16)value));
+		const VECU32 temp = vec_msum(VECU16(m_value), VECU16(vec_rl(value, shift)), vec_splat_u32(0));
+		m_value = VECS32(vec_add(vec_sl(temp, shift), vec_mulo(VECU16(m_value), VECU16(value))));
 	}
 
 	inline void shl(const rgbaint_t& shift)
 	{
 		const VECU32 limit = { 32, 32, 32, 32 };
-		m_value = vec_and(vec_sl(m_value, (VECU32)shift.m_value), vec_cmpgt(limit, (VECU32)shift.m_value));
+		m_value = vec_and(vec_sl(m_value, VECU32(shift.m_value)), vec_cmpgt(limit, VECU32(shift.m_value)));
 	}
 
 	inline void shl_imm(const UINT8 shift)
@@ -243,7 +243,7 @@ public:
 	inline void shr(const rgbaint_t& shift)
 	{
 		const VECU32 limit = { 32, 32, 32, 32 };
-		m_value = vec_and(vec_sr(m_value, (VECU32)shift.m_value), vec_cmpgt(limit, (VECU32)shift.m_value));
+		m_value = vec_and(vec_sr(m_value, VECU32(shift.m_value)), vec_cmpgt(limit, VECU32(shift.m_value)));
 	}
 
 	inline void shr_imm(const UINT8 shift)
@@ -255,7 +255,7 @@ public:
 	inline void sra(const rgbaint_t& shift)
 	{
 		const VECU32 limit = { 31, 31, 31, 31 };
-		m_value = vec_sra(m_value, vec_min((VECU32)shift.m_value, limit));
+		m_value = vec_sra(m_value, vec_min(VECU32(shift.m_value), limit));
 	}
 
 	inline void sra_imm(const UINT8 shift)
@@ -323,27 +323,27 @@ public:
 	inline void clamp_and_clear(const UINT32 sign)
 	{
 		const VECS32 vzero = { 0, 0, 0, 0 };
-		VECS32 vsign = { sign, sign, sign, sign };
+		VECS32 vsign = { INT32(sign), INT32(sign), INT32(sign), INT32(sign) };
 		m_value = vec_and(m_value, vec_cmpeq(vec_and(m_value, vsign), vzero));
 		vsign = vec_nor(vec_sra(vsign, vec_splat_u32(1)), vzero);
-		const VECS32 mask = vec_cmpgt(m_value, vsign);
+		const VECS32 mask = VECS32(vec_cmpgt(m_value, vsign));
 		m_value = vec_or(vec_and(vsign, mask), vec_and(m_value, vec_nor(mask, vzero)));
 	}
 
 	inline void clamp_to_uint8()
 	{
 		const VECU32 zero = { 0, 0, 0, 0 };
-		m_value = vec_packs(m_value, m_value);
-		m_value = vec_packsu((VECS16)m_value, (VECS16)m_value);
-		m_value = vec_mergeh((VECU8)zero, (VECU8)m_value);
-		m_value = vec_mergeh((VECS16)zero, (VECS16)m_value);
+		m_value = VECS32(vec_packs(m_value, m_value));
+		m_value = VECS32(vec_packsu(VECS16(m_value), VECS16(m_value)));
+		m_value = VECS32(vec_mergeh(VECU8(zero), VECU8(m_value)));
+		m_value = VECS32(vec_mergeh(VECS16(zero), VECS16(m_value)));
 	}
 
 	inline void sign_extend(const UINT32 compare, const UINT32 sign)
 	{
-		const VECS32 compare_vec = { compare, compare, compare, compare };
-		const VECS32 compare_mask = vec_cmpeq(vec_and(m_value, compare_vec), compare_vec);
-		const VECS32 sign_vec = { sign, sign, sign, sign };
+		const VECS32 compare_vec = { INT32(compare), INT32(compare), INT32(compare), INT32(compare) };
+		const VECS32 compare_mask = VECS32(vec_cmpeq(vec_and(m_value, compare_vec), compare_vec));
+		const VECS32 sign_vec = { INT32(sign), INT32(sign), INT32(sign), INT32(sign) };
 		m_value = vec_or(m_value, vec_and(sign_vec, compare_mask));
 	}
 
@@ -393,53 +393,53 @@ public:
 
 	inline void cmpeq(const rgbaint_t& value)
 	{
-		m_value = vec_cmpeq(m_value, value.m_value);
+		m_value = VECS32(vec_cmpeq(m_value, value.m_value));
 	}
 
 	inline void cmpeq_imm(const INT32 value)
 	{
 		const VECS32 temp = { value, value, value, value };
-		m_value = vec_cmpeq(m_value, temp);
+		m_value = VECS32(vec_cmpeq(m_value, temp));
 	}
 
 	inline void cmpeq_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
 	{
 		const VECS32 temp = { a, r, g, b };
-		m_value = vec_cmpeq(m_value, temp);
+		m_value = VECS32(vec_cmpeq(m_value, temp));
 	}
 
 	inline void cmpgt(const rgbaint_t& value)
 	{
-		m_value = vec_cmpgt(m_value, value.m_value);
+		m_value = VECS32(vec_cmpgt(m_value, value.m_value));
 	}
 
 	inline void cmpgt_imm(const INT32 value)
 	{
 		const VECS32 temp = { value, value, value, value };
-		m_value = vec_cmpgt(m_value, temp);
+		m_value = VECS32(vec_cmpgt(m_value, temp));
 	}
 
 	inline void cmpgt_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
 	{
 		const VECS32 temp = { a, r, g, b };
-		m_value = vec_cmpgt(m_value, temp);
+		m_value = VECS32(vec_cmpgt(m_value, temp));
 	}
 
 	inline void cmplt(const rgbaint_t& value)
 	{
-		m_value = vec_cmplt(m_value, value.m_value);
+		m_value = VECS32(vec_cmplt(m_value, value.m_value));
 	}
 
 	inline void cmplt_imm(const INT32 value)
 	{
 		const VECS32 temp = { value, value, value, value };
-		m_value = vec_cmplt(m_value, temp);
+		m_value = VECS32(vec_cmplt(m_value, temp));
 	}
 
 	inline void cmplt_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
 	{
 		const VECS32 temp = { a, r, g, b };
-		m_value = vec_cmplt(m_value, temp);
+		m_value = VECS32(vec_cmplt(m_value, temp));
 	}
 
 	inline rgbaint_t operator=(const rgbaint_t& other)
@@ -470,8 +470,8 @@ public:
 	inline rgbaint_t& operator*=(const rgbaint_t& other)
 	{
 		const VECU32 shift = vec_splat_u32(-16);
-		const VECU32 temp = vec_msum((VECU16)m_value, (VECU16)vec_rl(other.m_value, shift), vec_splat_u32(0));
-		m_value = vec_add(vec_sl(temp, shift), vec_mulo((VECU16)m_value, (VECU16)other.m_value));
+		const VECU32 temp = vec_msum(VECU16(m_value), VECU16(vec_rl(other.m_value, shift)), vec_splat_u32(0));
+		m_value = VECS32(vec_add(vec_sl(temp, shift), vec_mulo(VECU16(m_value), VECU16(other.m_value))));
 		return *this;
 	}
 
@@ -479,14 +479,14 @@ public:
 	{
 		const VECS32 value = { other, other, other, other };
 		const VECU32 shift = vec_splat_u32(-16);
-		const VECU32 temp = vec_msum((VECU16)m_value, (VECU16)vec_rl(value, shift), vec_splat_u32(0));
-		m_value = vec_add(vec_sl(temp, shift), vec_mulo((VECU16)m_value, (VECU16)value));
+		const VECU32 temp = vec_msum(VECU16(m_value), VECU16(vec_rl(value, shift)), vec_splat_u32(0));
+		m_value = VECS32(vec_add(vec_sl(temp, shift), vec_mulo(VECU16(m_value), VECU16(value))));
 		return *this;
 	}
 
 	inline rgbaint_t& operator>>=(const INT32 shift)
 	{
-		const VECU32 temp = { shift, shift, shift, shift };
+		const VECU32 temp = { UINT32(shift), UINT32(shift), UINT32(shift), UINT32(shift) };
 		m_value = vec_sra(m_value, temp);
 		return *this;
 	}
@@ -500,28 +500,28 @@ public:
 	{
 		const VECS32 zero = vec_splat_s32(0);
 
-		VECS32 color00 = vec_perm((VECS32)vec_lde(0, &rgb00), zero, vec_lvsl(0, &rgb00));
-		VECS32 color01 = vec_perm((VECS32)vec_lde(0, &rgb01), zero, vec_lvsl(0, &rgb01));
-		VECS32 color10 = vec_perm((VECS32)vec_lde(0, &rgb10), zero, vec_lvsl(0, &rgb10));
-		VECS32 color11 = vec_perm((VECS32)vec_lde(0, &rgb11), zero, vec_lvsl(0, &rgb11));
+		VECS32 color00 = vec_perm(VECS32(vec_lde(0, &rgb00)), zero, vec_lvsl(0, &rgb00));
+		VECS32 color01 = vec_perm(VECS32(vec_lde(0, &rgb01)), zero, vec_lvsl(0, &rgb01));
+		VECS32 color10 = vec_perm(VECS32(vec_lde(0, &rgb10)), zero, vec_lvsl(0, &rgb10));
+		VECS32 color11 = vec_perm(VECS32(vec_lde(0, &rgb11)), zero, vec_lvsl(0, &rgb11));
 
 		/* interleave color01 and color00 at the byte level */
-		color01 = vec_mergeh((VECU8)color01, (VECU8)color00);
-		color11 = vec_mergeh((VECU8)color11, (VECU8)color10);
-		color01 = vec_mergeh((VECU8)zero, (VECU8)color01);
-		color11 = vec_mergeh((VECU8)zero, (VECU8)color11);
-		color01 = vec_msum((VECS16)color01, scale_table[u], zero);
-		color11 = vec_msum((VECS16)color11, scale_table[u], zero);
+		color01 = VECS32(vec_mergeh(VECU8(color01), VECU8(color00)));
+		color11 = VECS32(vec_mergeh(VECU8(color11), VECU8(color10)));
+		color01 = VECS32(vec_mergeh(VECU8(zero), VECU8(color01)));
+		color11 = VECS32(vec_mergeh(VECU8(zero), VECU8(color11)));
+		color01 = vec_msum(VECS16(color01), scale_table[u], zero);
+		color11 = vec_msum(VECS16(color11), scale_table[u], zero);
 		color01 = vec_sl(color01, vec_splat_u32(15));
 		color11 = vec_sr(color11, vec_splat_u32(1));
-		color01 = vec_max((VECS16)color01, (VECS16)color11);
-		color01 = vec_msum((VECS16)color01, scale_table[v], zero);
+		color01 = VECS32(vec_max(VECS16(color01), VECS16(color11)));
+		color01 = vec_msum(VECS16(color01), scale_table[v], zero);
 		color01 = vec_sr(color01, vec_splat_u32(15));
-		color01 = vec_packs(color01, color01);
-		color01 = vec_packsu((VECS16)color01, (VECS16)color01);
+		color01 = VECS32(vec_packs(color01, color01));
+		color01 = VECS32(vec_packsu(VECS16(color01), VECS16(color01)));
 
 		UINT32 result;
-		vec_ste((VECU32)color01, 0, &result);
+		vec_ste(VECU32(color01), 0, &result);
 		return result;
 	}
 
@@ -529,22 +529,22 @@ public:
 	{
 		const VECS32 zero = vec_splat_s32(0);
 
-		VECS32 color00 = vec_perm((VECS32)vec_lde(0, &rgb00), zero, vec_lvsl(0, &rgb00));
-		VECS32 color01 = vec_perm((VECS32)vec_lde(0, &rgb01), zero, vec_lvsl(0, &rgb01));
-		VECS32 color10 = vec_perm((VECS32)vec_lde(0, &rgb10), zero, vec_lvsl(0, &rgb10));
-		VECS32 color11 = vec_perm((VECS32)vec_lde(0, &rgb11), zero, vec_lvsl(0, &rgb11));
+		VECS32 color00 = vec_perm(VECS32(vec_lde(0, &rgb00)), zero, vec_lvsl(0, &rgb00));
+		VECS32 color01 = vec_perm(VECS32(vec_lde(0, &rgb01)), zero, vec_lvsl(0, &rgb01));
+		VECS32 color10 = vec_perm(VECS32(vec_lde(0, &rgb10)), zero, vec_lvsl(0, &rgb10));
+		VECS32 color11 = vec_perm(VECS32(vec_lde(0, &rgb11)), zero, vec_lvsl(0, &rgb11));
 
 		/* interleave color01 and color00 at the byte level */
-		color01 = vec_mergeh((VECU8)color01, (VECU8)color00);
-		color11 = vec_mergeh((VECU8)color11, (VECU8)color10);
-		color01 = vec_mergeh((VECU8)zero, (VECU8)color01);
-		color11 = vec_mergeh((VECU8)zero, (VECU8)color11);
-		color01 = vec_msum((VECS16)color01, scale_table[u], zero);
-		color11 = vec_msum((VECS16)color11, scale_table[u], zero);
+		color01 = VECS32(vec_mergeh(VECU8(color01), VECU8(color00)));
+		color11 = VECS32(vec_mergeh(VECU8(color11), VECU8(color10)));
+		color01 = VECS32(vec_mergeh(VECU8(zero), VECU8(color01)));
+		color11 = VECS32(vec_mergeh(VECU8(zero), VECU8(color11)));
+		color01 = vec_msum(VECS16(color01), scale_table[u], zero);
+		color11 = vec_msum(VECS16(color11), scale_table[u], zero);
 		color01 = vec_sl(color01, vec_splat_u32(15));
 		color11 = vec_sr(color11, vec_splat_u32(1));
-		color01 = vec_max((VECS16)color01, (VECS16)color11);
-		color01 = vec_msum((VECS16)color01, scale_table[v], zero);
+		color01 = VECS32(vec_max(VECS16(color01), VECS16(color11)));
+		color01 = vec_msum(VECS16(color01), scale_table[v], zero);
 		m_value = vec_sr(color01, vec_splat_u32(15));
 	}
 
@@ -560,11 +560,15 @@ protected:
 
 
 
-// altivec.h somehow redefines "bool" in a bad way on PowerPC Mac OS X.  really.
-#ifdef OSX_PPC
+// altivec.h somehow redefines "bool" in a bad way.  really.
+#ifdef vector
 #undef vector
-#undef pixel
+#endif
+#ifdef bool
 #undef bool
 #endif
+#ifdef pixel
+#undef pixel
+#endif
 
-#endif /* __RGBVMX__ */
+#endif // MAME_EMU_VIDEO_RGBVMX_H
