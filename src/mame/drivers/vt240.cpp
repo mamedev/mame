@@ -372,7 +372,6 @@ WRITE16_MEMBER(vt240_state::vram_w)
 			UINT8 out = 0, ifore = BIT(m_lu, (i ? 5 : 4)), iback = BIT(m_lu, (i ? 3 : 2));
 			for(int j = 0; j < 8; j++)
 				out |= BIT(chr, j) ? (ifore << j) : (iback << j);
-			logerror("%x %x %x %x %x\n", chr, out, data, ifore, iback);
 			if(!BIT(m_reg0, 3))
 				out = (out & ~m_mask) | (mem & m_mask);
 			else
