@@ -154,7 +154,7 @@ MACHINE_CONFIG_FRAGMENT(zac1b111xx_base_config)
 	MCFG_PIA_READPA_HANDLER(READ8(zac1b111xx_melody_base, melodypia_porta_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(zac1b111xx_melody_base, melodypia_porta_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(zac1b111xx_melody_base, melodypia_portb_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("melodycpu", M6802_IRQ_LINE))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("melodycpu", INPUT_LINE_NMI))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("melodycpu", M6802_IRQ_LINE))
 
 	MCFG_SOUND_ADD("melodypsg1", AY8910, XTAL_3_579545MHz/2) // CPU clock divided using 4040
