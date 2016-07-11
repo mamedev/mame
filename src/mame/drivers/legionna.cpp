@@ -94,6 +94,15 @@ READ16_MEMBER(legionna_state::sound_comms_r)
 	return m_seibu_sound->main_word_r(space,(offset >> 1) & 7,0xffff);
 }
 
+READ16_MEMBER(legionna_state::denjinmk_sound_comms_r)
+{
+	// Routine at 5FDC spins indefinitely until the lowest bit becomes 1
+	if (offset == 10) // ($100714)
+		return 1;
+
+	return m_seibu_sound->main_word_r(space,(offset >> 1) & 7,0xffff);
+}
+
 WRITE16_MEMBER(legionna_state::sound_comms_w)
 {
 	m_seibu_sound->main_word_w(space,(offset >> 1) & 7,data,0x00ff);
@@ -253,7 +262,7 @@ static ADDRESS_MAP_START( denjinmk_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x100470, 0x100471) AM_WRITE(denjinmk_setgfxbank)
 	AM_RANGE(0x100600, 0x10063f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
-	AM_RANGE(0x100700, 0x10071f) AM_READWRITE(sound_comms_r,sound_comms_w)
+	AM_RANGE(0x100700, 0x10071f) AM_READWRITE(denjinmk_sound_comms_r,sound_comms_w)
 	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100744, 0x100745) AM_READ_PORT("PLAYERS12")
 	AM_RANGE(0x100748, 0x100749) AM_READ_PORT("PLAYERS34")
@@ -2401,13 +2410,6 @@ DRIVER_INIT_MEMBER(legionna_state,cupsoc)
 
 
 
-DRIVER_INIT_MEMBER(legionna_state,denjinmk)
-{
-	/* problem with audio comms? */
-	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
-	ROM[0x5fe4/2] = 0x4e71;
-}
-
 DRIVER_INIT_MEMBER(legionna_state,legiongfx)
 {
 	descramble_legionnaire_gfx(memregion("gfx5")->base() );
@@ -2427,7 +2429,7 @@ GAME( 1992, heatbrle, heatbrl,  heatbrl,  heatbrl, driver_device,  0,         RO
 
 GAME( 1993, godzilla, 0,        godzilla, godzilla, driver_device, 0,         ROT0, "Banpresto", "Godzilla (Japan)", 0 )
 GAME( 1993, grainbow, 0,        grainbow, grainbow, driver_device, 0,         ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1993, denjinmk, 0,        denjinmk, denjinmk, legionna_state,denjinmk,  ROT0, "Winkysoft (Banpresto license)", "Denjin Makai", MACHINE_IMPERFECT_COLORS )
+GAME( 1993, denjinmk, 0,        denjinmk, denjinmk, driver_device, 0,         ROT0, "Winkysoft (Banpresto license)", "Denjin Makai", MACHINE_IMPERFECT_COLORS )
 
 GAME( 1992, cupsoc,   0,        cupsoc,   cupsoc, legionna_state,  cupsoc,    ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1992, cupsoca,  cupsoc,   cupsoc,   cupsoc, legionna_state,  cupsoc,    ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
