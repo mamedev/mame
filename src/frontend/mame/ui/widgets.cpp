@@ -21,12 +21,11 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-widgets_manager::widgets_manager(running_machine &machine, ui_options const &options)
+widgets_manager::widgets_manager(running_machine &machine)
 	: m_hilight_bitmap(std::make_unique<bitmap_argb32>(256, 1))
 	, m_hilight_texture()
 	, m_hilight_main_bitmap(std::make_unique<bitmap_argb32>(1, 128))
 	, m_hilight_main_texture()
-	, m_bgrnd_bitmap()
 	, m_bgrnd_texture()
 {
 	render_manager &render(machine.render());
@@ -56,23 +55,6 @@ widgets_manager::widgets_manager(running_machine &machine, ui_options const &opt
 
 	// create a texture for arrow icons
 	m_arrow_texture = texture_ptr(render.texture_alloc(render_triangle), texture_free);
-
-	// create a texture for main menu background
-	m_bgrnd_texture = texture_ptr(render.texture_alloc(render_texture::hq_scale), texture_free);
-	if (options.use_background_image() && (&machine.system() == &GAME_NAME(___empty)))
-	{
-		m_bgrnd_bitmap = std::make_unique<bitmap_argb32>(0, 0);
-		emu_file backgroundfile(".", OPEN_FLAG_READ);
-		render_load_jpeg(*m_bgrnd_bitmap, backgroundfile, nullptr, "background.jpg");
-
-		if (!m_bgrnd_bitmap->valid())
-			render_load_png(*m_bgrnd_bitmap, backgroundfile, nullptr, "background.png");
-
-		if (m_bgrnd_bitmap->valid())
-			m_bgrnd_texture->set_bitmap(*m_bgrnd_bitmap, m_bgrnd_bitmap->cliprect(), TEXFORMAT_ARGB32);
-		else
-			m_bgrnd_bitmap->reset();
-	}
 }
 
 

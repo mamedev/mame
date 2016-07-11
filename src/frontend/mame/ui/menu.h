@@ -266,6 +266,9 @@ private:
 
 		void add_cleanup_callback(cleanup_callback &&callback);
 
+		bitmap_argb32 *bgrnd_bitmap() { return m_bgrnd_bitmap.get(); }
+		render_texture * bgrnd_texture() { return m_bgrnd_texture.get(); }
+
 		void reset_topmost(reset_options options) { if (m_stack) m_stack->reset(options); }
 
 		template <typename T>
@@ -282,6 +285,9 @@ private:
 
 		running_machine         &m_machine;
 		cleanup_callback_vector m_cleanup_callbacks;
+
+		bitmap_ptr              m_bgrnd_bitmap;
+		texture_ptr             m_bgrnd_texture;
 
 		std::unique_ptr<menu>   m_stack;
 		std::unique_ptr<menu>   m_free;

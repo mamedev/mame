@@ -28,12 +28,11 @@ TYPE DEFINITIONS
 class widgets_manager
 {
 public:
-	widgets_manager(running_machine &machine, ui_options const &options);
+	widgets_manager(running_machine &machine);
 
 	render_texture *hilight_texture() { return m_hilight_texture.get(); }
 	render_texture *hilight_main_texture() { return m_hilight_main_texture.get(); }
 	render_texture *arrow_texture() { return m_arrow_texture.get(); }
-	bitmap_argb32 *bgrnd_bitmap() { return m_bgrnd_bitmap.get(); }
 	render_texture * bgrnd_texture() { return m_bgrnd_texture.get(); }
 
 	using bitmap_ptr = std::unique_ptr<bitmap_argb32>;
@@ -45,7 +44,6 @@ private:
 	bitmap_ptr              m_hilight_main_bitmap;
 	texture_ptr             m_hilight_main_texture;
 	texture_ptr             m_arrow_texture;
-	bitmap_ptr              m_bgrnd_bitmap;
 	texture_ptr             m_bgrnd_texture;
 
 	static void render_triangle(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
