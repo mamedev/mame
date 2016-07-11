@@ -163,11 +163,11 @@ void rgbaint_t::blend(const rgbaint_t& other, UINT8 factor)
 	const VECS32 scale1 = { factor, factor, factor, factor };
 	const VECS32 scale2 = { 0x100 - factor, 0x100 - factor, 0x100 - factor, 0x100 - factor, };
 
-	VECU32 temp = vec_msum((VECU16)m_value, (VECU16)vec_rl(scale1, shift), vec_splat_u32(0));
-	temp = vec_msum((VECU16)other.m_value, (VECU16)vec_rl(scale2, shift), temp);
+	VECU32 temp = vec_msum(VECU16(m_value), VECU16(vec_rl(scale1, shift)), vec_splat_u32(0));
+	temp = vec_msum(VECU16(other.m_value), VECU16(vec_rl(scale2, shift)), temp);
 
-	m_value = vec_msum((VECU16)m_value, (VECU16)scale1, vec_mulo((VECU16)other.m_value, (VECU16)scale2));
-	m_value = vec_add(vec_sl(temp, shift), (VECU32)m_value);
+	m_value = VECS32(vec_msum(VECU16(m_value), VECU16(scale1), vec_mulo(VECU16(other.m_value), VECU16(scale2))));
+	m_value = VECS32(vec_add(vec_sl(temp, shift), VECU32(m_value)));
 	sra_imm(8);
 }
 
