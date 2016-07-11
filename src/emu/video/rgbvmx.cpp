@@ -17,10 +17,17 @@
     TABLES
 ***************************************************************************/
 
+#ifdef __LITTLE_ENDIAN__
+const rgbaint_t::VECU8  rgbaint_t::alpha_perm   = {  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 28, 29, 30, 31 };
+const rgbaint_t::VECU8  rgbaint_t::red_perm     = {  0,  1,  2,  3,  4,  5,  6,  7, 28, 29, 30, 31, 12, 13, 14, 15 };
+const rgbaint_t::VECU8  rgbaint_t::green_perm   = {  0,  1,  2,  3, 28, 29, 30, 31,  8,  9, 10, 11, 12, 13, 14, 15 };
+const rgbaint_t::VECU8  rgbaint_t::blue_perm    = { 28, 29, 30, 31,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15 };
+#else
 const rgbaint_t::VECU8  rgbaint_t::alpha_perm   = { 16, 17, 18, 19,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15 };
 const rgbaint_t::VECU8  rgbaint_t::red_perm     = {  0,  1,  2,  3, 16, 17, 18, 19,  8,  9, 10, 11, 12, 13, 14, 15 };
 const rgbaint_t::VECU8  rgbaint_t::green_perm   = {  0,  1,  2,  3,  4,  5,  6,  7, 16, 17, 18, 19, 12, 13, 14, 15 };
 const rgbaint_t::VECU8  rgbaint_t::blue_perm    = {  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 16, 17, 18, 19 };
+#endif
 const rgbaint_t::VECS16 rgbaint_t::scale_table[256] = {
 	{   0, 256,   0, 256,   0, 256,   0, 256 }, {   1, 255,   1, 255,   1, 255,   1, 255 },
 	{   2, 254,   2, 254,   2, 254,   2, 254 }, {   3, 253,   3, 253,   3, 253,   3, 253 },

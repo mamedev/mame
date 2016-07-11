@@ -25,20 +25,20 @@ public:
 	inline rgbaint_t() { }
 	inline rgbaint_t(UINT32 rgba) { set(rgba); }
 	inline rgbaint_t(INT32 a, INT32 r, INT32 g, INT32 b) { set(a, r, g, b); }
-	inline rgbaint_t(rgb_t& rgb) { set(rgb); }
+	inline rgbaint_t(const rgb_t& rgb) { set(rgb); }
 	inline rgbaint_t(__m128i rgba) { m_value = rgba; }
 
 	inline void set(rgbaint_t& other) { m_value = other.m_value; }
 	inline void set(UINT32 rgba) { m_value = _mm_and_si128(_mm_set1_epi32(0xff), _mm_set_epi32(rgba >> 24, rgba >> 16, rgba >> 8, rgba)); }
 	inline void set(INT32 a, INT32 r, INT32 g, INT32 b) { m_value = _mm_set_epi32(a, r, g, b); }
-	inline void set(rgb_t& rgb) { m_value = _mm_unpacklo_epi16(_mm_unpacklo_epi8(_mm_cvtsi32_si128(rgb), _mm_setzero_si128()), _mm_setzero_si128()); }
+	inline void set(const rgb_t& rgb) { m_value = _mm_unpacklo_epi16(_mm_unpacklo_epi8(_mm_cvtsi32_si128(rgb), _mm_setzero_si128()), _mm_setzero_si128()); }
 
-	inline rgb_t to_rgba()
+	inline rgb_t to_rgba() const
 	{
 		return _mm_cvtsi128_si32(_mm_packus_epi16(_mm_packs_epi32(m_value, _mm_setzero_si128()), _mm_setzero_si128()));
 	}
 
-	inline rgb_t to_rgba_clamp()
+	inline rgb_t to_rgba_clamp() const
 	{
 		return _mm_cvtsi128_si32(_mm_packus_epi16(_mm_packs_epi32(m_value, _mm_setzero_si128()), _mm_setzero_si128()));
 	}

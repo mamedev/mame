@@ -22,7 +22,7 @@ public:
 	inline rgbaint_t(): m_a(0), m_r(0), m_g(0), m_b(0) { }
 	inline rgbaint_t(UINT32 rgba) { set(rgba); }
 	inline rgbaint_t(INT32 a, INT32 r, INT32 g, INT32 b) { set(a, r, g, b); }
-	inline rgbaint_t(rgb_t& rgba) { set(rgba); }
+	inline rgbaint_t(const rgb_t& rgba) { set(rgba); }
 
 	inline void set(rgbaint_t& other) { set(other.m_a, other.m_r, other.m_g, other.m_b); }
 	inline void set(UINT32 rgba) { set((rgba >> 24) & 0xff, (rgba >> 16) & 0xff, (rgba >> 8) & 0xff, rgba & 0xff); }
@@ -33,7 +33,7 @@ public:
 		m_g = g;
 		m_b = b;
 	}
-	inline void set(rgb_t& rgba) { set(rgba.a(), rgba.r(), rgba.g(), rgba.b()); }
+	inline void set(const rgb_t& rgba) { set(rgba.a(), rgba.r(), rgba.g(), rgba.b()); }
 
 	inline rgb_t to_rgba() const
 	{
