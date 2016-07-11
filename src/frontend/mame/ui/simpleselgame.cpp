@@ -333,7 +333,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), driver->year, driver->manufacturer);
 
 		// next line source path
-		tempbuf[2] = string_format(_("Driver: %1$-.100s"), core_filename_extract_base(driver->source_file).c_str());
+		tempbuf[2] = string_format(_("Driver: %1$-.100s"), core_filename_extract_base(driver->source_file));
 
 		// next line is overall driver status
 		if (driver->flags & MACHINE_NOT_WORKING)

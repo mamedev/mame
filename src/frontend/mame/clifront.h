@@ -7,11 +7,10 @@
     Command-line interface frontend for MAME.
 
 ***************************************************************************/
+#ifndef MAME_FRONTEND_CLIFRONT_H
+#define MAME_FRONTEND_CLIFRONT_H
 
 #pragma once
-
-#ifndef __CLIFRONT_H__
-#define __CLIFRONT_H__
 
 #include "emu.h"
 #include "emuopts.h"
@@ -69,7 +68,4 @@ private:
 	int                 m_result;
 };
 
-
-
-
-#endif  /* __CLIFRONT_H__ */
+#endif  /* MAME_FRONTEND_CLIFRONT_H */

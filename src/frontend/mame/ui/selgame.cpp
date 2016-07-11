@@ -894,11 +894,11 @@ void menu_select_game::custom_render(void *selectedref, float top, float bottom,
 		tempbuf[0] = string_format(_("System: %1$-.100s"), swinfo->driver->description);
 
 		// next line is year, publisher
-		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), swinfo->year.c_str(), swinfo->publisher.c_str());
+		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), swinfo->year, swinfo->publisher);
 
 		// next line is parent/clone
 		if (!swinfo->parentname.empty())
-			tempbuf[2] = string_format(_("Software is clone of: %1$-.100s"), !swinfo->parentlongname.empty() ? swinfo->parentlongname.c_str() : swinfo->parentname.c_str());
+			tempbuf[2] = string_format(_("Software is clone of: %1$-.100s"), !swinfo->parentlongname.empty() ? swinfo->parentlongname : swinfo->parentname);
 		else
 			tempbuf[2] = _("Software is parent");
 
@@ -920,7 +920,7 @@ void menu_select_game::custom_render(void *selectedref, float top, float bottom,
 		}
 
 		// last line is romset name
-		tempbuf[4] = string_format(_("romset: %1$-.100s"), swinfo->shortname.c_str());
+		tempbuf[4] = string_format(_("romset: %1$-.100s"), swinfo->shortname);
 	}
 	else
 	{
