@@ -190,17 +190,16 @@ const endianness_t ENDIANNESS_NATIVE = ENDIANNESS_BIG;
 //**************************************************************************
 
 // macro for defining a copy constructor and assignment operator to prevent copying
-#define DISABLE_COPYING(_Type) \
-private: \
-	_Type(const _Type &) = delete; \
-	_Type &operator=(const _Type &) = delete
+#define DISABLE_COPYING(TYPE) \
+	TYPE(const TYPE &) = delete; \
+	TYPE &operator=(const TYPE &) = delete
 
 // macro for declaring enumerator operators that increment/decrement like plain old C
-#define DECLARE_ENUM_OPERATORS(_Type) \
-inline void operator++(_Type &value) { value = (_Type)((int)value + 1); } \
-inline void operator++(_Type &value, int) { value = (_Type)((int)value + 1); } \
-inline void operator--(_Type &value) { value = (_Type)((int)value - 1); } \
-inline void operator--(_Type &value, int) { value = (_Type)((int)value - 1); }
+#define DECLARE_ENUM_OPERATORS(TYPE) \
+inline TYPE &operator++(TYPE &value) { return value = TYPE(std::underlying_type_t<TYPE>(value) + 1); } \
+inline TYPE operator++(TYPE &value, int) { TYPE const old(value); ++value; return old; } \
+inline TYPE &operator--(TYPE &value) { return value = TYPE(std::underlying_type_t<TYPE>(value) - 1); } \
+inline TYPE operator--(TYPE &value, int) { TYPE const old(value); --value; return old; }
 
 
 // this macro passes an item followed by a string version of itself as two consecutive parameters
