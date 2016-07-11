@@ -1270,11 +1270,11 @@ core_file::core_file()
     assumptions about path separators
 -------------------------------------------------*/
 
-std::string core_filename_extract_base(const char *name, bool strip_extension)
+std::string core_filename_extract_base(const std::string &name, bool strip_extension)
 {
 	/* find the start of the name */
-	const char *start = name + strlen(name);
-	while (start > name && !util::is_directory_separator(start[-1]))
+	const char *start = name.c_str() + name.length();
+	while (start > name.c_str() && !util::is_directory_separator(start[-1]))
 		start--;
 
 	/* copy the rest into an astring */
@@ -1292,17 +1292,17 @@ std::string core_filename_extract_base(const char *name, bool strip_extension)
     filename end with the specified extension?
 -------------------------------------------------*/
 
-int core_filename_ends_with(const char *filename, const char *extension)
+bool core_filename_ends_with(const std::string &filename, const std::string &extension)
 {
-	int namelen = strlen(filename);
-	int extlen = strlen(extension);
-	int matches = TRUE;
+	auto namelen = filename.length();
+	auto extlen = extension.length();
+	bool matches = true;
 
 	/* work backwards checking for a match */
 	while (extlen > 0)
 		if (tolower((UINT8)filename[--namelen]) != tolower((UINT8)extension[--extlen]))
 		{
-			matches = FALSE;
+			matches = false;
 			break;
 		}
 
