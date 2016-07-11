@@ -164,6 +164,8 @@ void xbox_state::hack_usb()
 
 void xbox_state::machine_start()
 {
+	ohci_game_controller_device *usb_device;
+
 	xbox_base_state::machine_start();
 	xbox_devs.ide = machine().device<bus_master_ide_controller_device>("ide");
 	usbhack_index = -1;
@@ -173,6 +175,11 @@ void xbox_state::machine_start()
 	        break;
 	    }*/
 	usbhack_counter = 0;
+	usb_device = machine().device<ohci_game_controller_device>("ohci_gamepad");
+	if (usb_device != nullptr) {
+		usb_device->initialize(machine(), ohci_usb);
+		ohci_usb->usb_ohci_plug(3, usb_device); // connect to root hub port 3, chihiro needs to use 1 and 2
+	}
 	// savestates
 	save_item(NAME(usbhack_counter));
 }
@@ -213,6 +220,8 @@ static MACHINE_CONFIG_DERIVED_CLASS(xbox, xbox_base, xbox_state)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 //  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+
+	MCFG_DEVICE_ADD("ohci_gamepad", OHCI_GAME_CONTROLLER, 0)
 MACHINE_CONFIG_END
 
 

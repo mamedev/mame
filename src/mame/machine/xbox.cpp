@@ -1105,8 +1105,6 @@ ADDRESS_MAP_END
 
 void xbox_base_state::machine_start()
 {
-	ohci_game_controller_device *usb_device;
-
 	nvidia_nv2a = std::make_unique<nv2a_renderer>(machine());
 	memset(pic16lc_buffer, 0, sizeof(pic16lc_buffer));
 	pic16lc_buffer[0] = 'B';
@@ -1139,9 +1137,6 @@ void xbox_base_state::machine_start()
 	pic16lc_buffer[0x1f] = 0x0f;
 	// usb
 	ohci_usb = machine().device<ohci_usb_controller>("ohci_usb");
-	usb_device = machine().device<ohci_game_controller_device>("ohci_gamepad");
-	usb_device->initialize(machine(), ohci_usb);
-	ohci_usb->usb_ohci_plug(3, usb_device); // connect to root hub port 3, chihiro needs to use 1 and 2
 	// super-io
 	memset(&superiost, 0, sizeof(superiost));
 	superiost.configuration_mode = false;
@@ -1202,7 +1197,6 @@ MACHINE_CONFIG_START(xbox_base, xbox_base_state)
 	// next line is temporary
 	MCFG_OHCI_USB_CONTROLLER_ADD("ohci_usb")
 	MCFG_OHCI_USB_CONTROLLER_INTERRUPT_HANDLER(WRITELINE(xbox_base_state, xbox_ohci_usb_interrupt_changed))
-	MCFG_DEVICE_ADD("ohci_gamepad", OHCI_GAME_CONTROLLER, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
