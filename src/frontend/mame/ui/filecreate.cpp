@@ -148,12 +148,9 @@ menu_file_create::menu_file_create(mame_ui_manager &mui, render_container &conta
 {
 	m_image = image;
 	m_ok = true;
-	auto const sep = current_file.rfind(PATH_SEPARATOR);
 
 	m_filename.reserve(1024);
-	m_filename = sep != std::string::npos
-		? current_file.substr(sep + strlen(PATH_SEPARATOR), current_file.size() - sep - strlen(PATH_SEPARATOR))
-		: current_file;
+	m_filename = core_filename_extract_base(current_file);
 }
 
 
