@@ -1272,17 +1272,21 @@ core_file::core_file()
 
 std::string core_filename_extract_base(const std::string &name, bool strip_extension)
 {
-	/* find the start of the name */
-	const char *start = name.c_str() + name.length();
-	while (start > name.c_str() && !util::is_directory_separator(start[-1]))
+	// find the start of the basename
+	auto start = name.end();
+	while (start != name.begin() && !util::is_directory_separator(start[-1]))
 		start--;
 
-	/* copy the rest into an astring */
-	std::string result(start);
+	// find the end of the basename
+	auto chop_position = strip_extension
+		? name.find_last_of('.')
+		: std::string::npos;
+	auto end = chop_position != std::string::npos
+		? name.begin() + chop_position
+		: name.end();
 
-	/* chop the extension if present */
-	if (strip_extension)
-		result = result.substr(0, result.find_last_of('.'));
+	// copy the result into an string
+	std::string result(start, end);
 	return result;
 }
 
