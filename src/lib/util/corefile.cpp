@@ -1300,8 +1300,8 @@ bool core_filename_ends_with(const std::string &filename, const std::string &ext
 	auto extlen = extension.length();
 	bool matches = true;
 
-	/* work backwards checking for a match */
-	while (extlen > 0)
+	// work backwards checking for a match
+	while (extlen > 0 && namelen > 0)
 		if (tolower((UINT8)filename[--namelen]) != tolower((UINT8)extension[--extlen]))
 		{
 			matches = false;
