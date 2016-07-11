@@ -13,7 +13,12 @@
 
 #pragma once
 
+#include <memory>
+#include <functional>
+
 #include "ui/ui.h"
+#include "bitmap.h"
+#include "render.h"
 
 namespace ui {
 /***************************************************************************
