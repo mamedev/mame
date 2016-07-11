@@ -310,9 +310,9 @@ media_auditor::summary media_auditor::summarize(const char *name, std::ostream *
 			{
 				device_t *const shared_device = record.shared_device();
 				if (shared_device)
-					util::stream_format(*output, "NOT FOUND\n");
-				else
 					util::stream_format(*output, "NOT FOUND (%s)\n", shared_device->shortname());
+				else
+					util::stream_format(*output, "NOT FOUND\n");
 			}
 			break;
 
