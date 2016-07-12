@@ -421,8 +421,13 @@ public:
 		const VECU32 zero = { 0, 0, 0, 0 };
 		m_value = VECS32(vec_packs(m_value, m_value));
 		m_value = VECS32(vec_packsu(VECS16(m_value), VECS16(m_value)));
+#ifdef __LITTLE_ENDIAN__
+		m_value = VECS32(vec_mergeh(VECU8(m_value), VECU8(zero)));
+		m_value = VECS32(vec_mergeh(VECS16(m_value), VECS16(zero)));
+#else
 		m_value = VECS32(vec_mergeh(VECU8(zero), VECU8(m_value)));
 		m_value = VECS32(vec_mergeh(VECS16(zero), VECS16(m_value)));
+#endif
 	}
 
 	inline void sign_extend(const UINT32 compare, const UINT32 sign)
