@@ -890,7 +890,7 @@ menu_plugins_configure::menu_plugins_configure(mame_ui_manager &mui, render_cont
 
 menu_plugins_configure::~menu_plugins_configure()
 {
-	emu_file file_plugin(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file file_plugin(machine().options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	if (file_plugin.open("plugin.ini") != osd_file::error::NONE)
 		// Can't throw in a destructor, so let's ignore silently for
 		// now.  We shouldn't write files in a destructor in any case.

@@ -4,20 +4,6 @@
 
         DEC VT240
 
-        31/03/2010 Skeleton driver.
-
-    TODO:
-    - understand how PCG works, it should be a funky i/o $30 to uPD7220 DMA
-      transfer;
-    - hook-up T11, rst65 irq + $20 reads are latches for that
-
-    ROM POST notes:
-    0x0139: ROM test
-    0x015f: RAM test
-    0x0071: RAM fill to 0x00
-    0x1c8f: UPD7220
-
-    // vt240: x2212 nvram at E56
 ****************************************************************************/
 
 #include "emu.h"
@@ -54,6 +40,7 @@ public:
 		m_i8085(*this, "charcpu"),
 		m_i8251(*this, "i8251"),
 		m_duart(*this, "duart"),
+		m_host(*this, "host"),
 		m_hgdc(*this, "upd7220"),
 		m_bank(*this, "bank"),
 		m_nvram(*this, "x2212"),
@@ -67,6 +54,7 @@ public:
 	required_device<cpu_device> m_i8085;
 	required_device<i8251_device> m_i8251;
 	required_device<mc68681_device> m_duart;
+	required_device<rs232_port_device> m_host;
 	required_device<upd7220_device> m_hgdc;
 	required_device<address_map_bank_device> m_bank;
 	required_device<x2212_device> m_nvram;
@@ -80,11 +68,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(i8085_rdy_w);
 	DECLARE_WRITE_LINE_MEMBER(lben_w);
 	DECLARE_WRITE_LINE_MEMBER(tx_w);
+	DECLARE_WRITE_LINE_MEMBER(t11_reset_w);
 	DECLARE_READ_LINE_MEMBER(i8085_sid_r);
 	DECLARE_READ8_MEMBER(i8085_comm_r);
 	DECLARE_WRITE8_MEMBER(i8085_comm_w);
 	DECLARE_READ8_MEMBER(t11_comm_r);
 	DECLARE_WRITE8_MEMBER(t11_comm_w);
+	DECLARE_READ8_MEMBER(duart_r);
+	DECLARE_WRITE8_MEMBER(duart_w);
+	DECLARE_WRITE8_MEMBER(duartout_w);
 	DECLARE_READ8_MEMBER(mem_map_cs_r);
 	DECLARE_WRITE8_MEMBER(mem_map_cs_w);
 	DECLARE_READ8_MEMBER(ctrl_r);
@@ -128,6 +120,17 @@ WRITE_LINE_MEMBER(vt240_state::write_keyboard_clock)
 WRITE_LINE_MEMBER(vt240_state::lben_w)
 {
 	m_lb = state ? false : true;
+}
+
+WRITE_LINE_MEMBER(vt240_state::t11_reset_w)
+{
+	if(state == ASSERT_LINE)
+	{
+		m_duart->reset();
+		m_i8251->reset();
+		m_nvram->recall(ASSERT_LINE);
+		m_nvram->recall(CLEAR_LINE);
+	}
 }
 
 WRITE_LINE_MEMBER(vt240_state::tx_w)
@@ -216,6 +219,30 @@ WRITE8_MEMBER(vt240_state::i8085_comm_w)
 			break;
 	}
 }
+
+READ8_MEMBER(vt240_state::duart_r)
+{
+	if(!(offset & 1))
+		return m_duart->read(space, offset >> 1);
+	return 0;
+}
+
+WRITE8_MEMBER(vt240_state::duart_w)
+{
+	if(offset & 1)
+		m_duart->write(space, offset >> 1, data);
+}
+
+WRITE8_MEMBER(vt240_state::duartout_w)
+{
+	m_host->write_rts(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
+	m_host->write_dtr(BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(15, BIT(data, 4) ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(14, BIT(data, 5) ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(11, BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(10, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
+}
+
 READ8_MEMBER(vt240_state::mem_map_cs_r)
 {
 	return ~m_mem_map[offset];
@@ -228,7 +255,7 @@ WRITE8_MEMBER(vt240_state::mem_map_cs_w)
 
 READ8_MEMBER(vt240_state::ctrl_r)
 {
-	return m_mem_map_sel | ((m_lb ? 0 : 1) << 3) | (m_i8085_rdy << 6) | (m_t11 << 7);
+	return m_mem_map_sel | ((m_lb ? 0 : 1) << 3) | (m_i8085_rdy << 6) | (m_t11 << 7) | (1<<5); // no modem
 }
 
 WRITE8_MEMBER(vt240_state::mem_map_sel_w)
@@ -284,7 +311,11 @@ READ8_MEMBER(vt240_state::vom_r)
 {
 	if(!BIT(m_reg0, 2))
 		return m_vom[offset];
-	return 0;
+	// this hack passes a self test, is not a useful value normally
+	// when vom read mode is disabled, the read latch is set to whatever map is
+	// enabled and color is currently drawn, the self test fills the screen with 0xff
+	// and reads it
+	return m_vom[((m_reg0 & 3) << 2) + 3];
 }
 
 WRITE8_MEMBER(vt240_state::vom_w)
@@ -300,12 +331,10 @@ WRITE8_MEMBER(vt240_state::vom_w)
 
 READ16_MEMBER(vt240_state::vram_r)
 {
-	if(space.debugger_access())
-		return m_video_ram[offset & 0x3fff];
-	if(!BIT(m_reg0, 3))
+	if(!BIT(m_reg0, 3) || space.debugger_access())
 	{
 		offset = ((offset & 0x18000) >> 1) | (offset & 0x3fff);
-		return m_video_ram[offset & 0x3fff];
+		return m_video_ram[offset & 0x7fff];
 	}
 	return 0;
 }
@@ -429,7 +458,7 @@ static ADDRESS_MAP_START( vt240_mem, AS_PROGRAM, 16, vt240_state )
 	AM_RANGE (0170140, 0170141) AM_WRITE8(nvr_store_w, 0x00ff)
 	AM_RANGE (0171000, 0171003) AM_DEVREADWRITE8("i8251", i8251_device, data_r, data_w, 0x00ff)
 	AM_RANGE (0171004, 0171007) AM_DEVREADWRITE8("i8251", i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE (0172000, 0172077) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
+	AM_RANGE (0172000, 0172077) AM_READWRITE8(duart_r, duart_w, 0x00ff)
 	AM_RANGE (0173000, 0173003) AM_DEVREAD8("upd7220", upd7220_device, read, 0x00ff)
 	AM_RANGE (0173040, 0173077) AM_READ8(vom_r, 0x00ff)
 	AM_RANGE (0173140, 0173141) AM_READ8(char_buf_r, 0x00ff)
@@ -515,6 +544,7 @@ static MACHINE_CONFIG_START( vt240, vt240_state )
 	MCFG_CPU_ADD("maincpu", T11, XTAL_7_3728MHz) // confirm
 	MCFG_CPU_PROGRAM_MAP(vt240_mem)
 	MCFG_T11_INITIAL_MODE(5 << 13)
+	MCFG_T11_RESET(WRITELINE(vt240_state, t11_reset_w))
 
 	MCFG_CPU_ADD("charcpu", I8085A, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(vt240_char_mem)
@@ -545,13 +575,10 @@ static MACHINE_CONFIG_START( vt240, vt240_state )
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_MC68681_ADD("duart", XTAL_3_6864MHz) /* 2681 duart (not 68681!) */
-//  MCFG_MC68681_IRQ_CALLBACK(WRITELINE(dectalk_state, dectalk_duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-//  MCFG_MC68681_B_TX_CALLBACK(WRITELINE(dectalk_state, dectalk_duart_txa))
-//  MCFG_MC68681_INPORT_CALLBACK(READ8(dectalk_state, dectalk_duart_input))
-//  MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(dectalk_state, dectalk_duart_output))
-//  MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-//  MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", 13))
+	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("host", rs232_port_device, write_txd))
+	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE("printer", rs232_port_device, write_txd))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(vt240_state, duartout_w))
 
 	MCFG_DEVICE_ADD("i8251", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(vt240_state, tx_w))
@@ -565,9 +592,14 @@ static MACHINE_CONFIG_START( vt240, vt240_state )
 	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4800 * 64) // 8251 is set to /64 on the clock input
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(vt240_state, write_keyboard_clock))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "null_modem")
+	MCFG_RS232_PORT_ADD("host", default_rs232_devices, "null_modem")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", mc68681_device, rx_a_w))
-//  MCFG_RS232_DSR_HANDLER(DEVWRITELINE("duart", mc68681_device, ipX_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("duart", mc68681_device, ip5_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("duart", mc68681_device, ip0_w))
+
+	MCFG_RS232_PORT_ADD("printer", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", mc68681_device, rx_b_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("duart", mc68681_device, ip1_w))
 
 	MCFG_X2212_ADD("x2212")
 MACHINE_CONFIG_END
