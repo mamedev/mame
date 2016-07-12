@@ -693,7 +693,7 @@ CPU_DISASSEMBLE( hd6309 )
 			if (pb & 0x40)
 				buffer += sprintf(buffer, "%s%s", (pb&0x3f)?",":"", (opcode==0x35)?"U":"S");
 			if (pb & 0x80)
-				buffer += sprintf(buffer, "%sPC ; (PUL? PC=RTS)", (pb&0x7f)?",":"");
+				buffer += sprintf(buffer, "%sPC", (pb&0x7f)?",":"");
 			break;
 		default:
 			// No operands
@@ -707,7 +707,7 @@ CPU_DISASSEMBLE( hd6309 )
 		break;
 
 	case DIR_IM:
-		buffer += sprintf(buffer, "#$%02X,", operandarray[0]);
+		buffer += sprintf(buffer, "#$%02X;", operandarray[0]);
 		buffer += sprintf(buffer, "$%02X", operandarray[1]);
 		break;
 
@@ -739,7 +739,7 @@ CPU_DISASSEMBLE( hd6309 )
 	case IND:
 		if (numoperands == 2)
 		{
-			buffer += sprintf(buffer, "#$%02X,", operandarray[0]);
+			buffer += sprintf(buffer, "#$%02X;", operandarray[0]);
 			pb = operandarray[1];
 		}
 		else
