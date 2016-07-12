@@ -89,6 +89,7 @@ public:
 	DECLARE_WRITE16_MEMBER(vram_w);
 	DECLARE_READ8_MEMBER(vom_r);
 	DECLARE_WRITE8_MEMBER(vom_w);
+	DECLARE_READ8_MEMBER(nvr_store_r);
 	DECLARE_WRITE8_MEMBER(nvr_store_w);
 	DECLARE_WRITE8_MEMBER(mask_w);
 	DECLARE_WRITE8_MEMBER(reg0_w);
@@ -421,6 +422,13 @@ WRITE8_MEMBER(vt240_state::mask_w)
 	m_mask = BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
+READ8_MEMBER(vt240_state::nvr_store_r)
+{
+	m_nvram->store(ASSERT_LINE);
+	m_nvram->store(CLEAR_LINE);
+	return 0;
+}
+
 WRITE8_MEMBER(vt240_state::nvr_store_w)
 {
 	m_nvram->store(ASSERT_LINE);
@@ -455,7 +463,7 @@ static ADDRESS_MAP_START( vt240_mem, AS_PROGRAM, 16, vt240_state )
 	AM_RANGE (0170000, 0170037) AM_READWRITE8(mem_map_cs_r, mem_map_cs_w, 0x00ff)
 	AM_RANGE (0170040, 0170041) AM_WRITE8(mem_map_sel_w, 0x00ff)
 	AM_RANGE (0170100, 0170101) AM_READ8(ctrl_r, 0x00ff)
-	AM_RANGE (0170140, 0170141) AM_WRITE8(nvr_store_w, 0x00ff)
+	AM_RANGE (0170140, 0170141) AM_READWRITE8(nvr_store_r, nvr_store_w, 0x00ff)
 	AM_RANGE (0171000, 0171003) AM_DEVREADWRITE8("i8251", i8251_device, data_r, data_w, 0x00ff)
 	AM_RANGE (0171004, 0171007) AM_DEVREADWRITE8("i8251", i8251_device, status_r, control_w, 0x00ff)
 	AM_RANGE (0172000, 0172077) AM_READWRITE8(duart_r, duart_w, 0x00ff)
@@ -670,6 +678,9 @@ ROM_START( vt240 )
 
 	ROM_REGION( 0x1000, "pals", 0 )
 	ROM_LOAD( "23-087j5.e182.e183.jed", 0x0000, 0x1000, NO_DUMP ) // PAL16L8ACN; "Logic Unit" Character Pattern Related
+
+	ROM_REGION( 0x100, "x2212", 0 ) // default nvram to avoid error 10
+	ROM_LOAD( "x2212", 0x000, 0x100, CRC(31c90c64) SHA1(21a0f1d4eec1ced04b85923151783bf23d18bfbd) )
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT          CLASS   INIT    COMPANY                      FULLNAME       FLAGS */
