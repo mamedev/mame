@@ -753,6 +753,7 @@ SCRIPTS = scripts/genie.lua \
 	scripts/src/main.lua \
 	scripts/src/3rdparty.lua \
 	scripts/src/cpu.lua \
+	scripts/src/mame/frontend.lua \
 	scripts/src/osd/modules.lua \
 	$(wildcard scripts/src/osd/$(OSD)*.lua) \
 	scripts/src/sound.lua \

@@ -8,9 +8,10 @@
 
 *********************************************************************/
 
+#include "emu.h"
+
 #include "widgets.h"
-#include "rendutil.h"
-#include "drivenum.h"
+
 
 namespace ui {
 /***************************************************************************
@@ -26,7 +27,6 @@ widgets_manager::widgets_manager(running_machine &machine)
 	, m_hilight_texture()
 	, m_hilight_main_bitmap(std::make_unique<bitmap_argb32>(1, 128))
 	, m_hilight_main_texture()
-	, m_bgrnd_texture()
 {
 	render_manager &render(machine.render());
 	auto const texture_free([&render](render_texture *texture) { render.texture_free(texture); });

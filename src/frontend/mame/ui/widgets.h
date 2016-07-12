@@ -13,12 +13,12 @@
 
 #pragma once
 
+#include "bitmap.h"
+#include "render.h"
+
 #include <memory>
 #include <functional>
 
-#include "ui/ui.h"
-#include "bitmap.h"
-#include "render.h"
 
 namespace ui {
 /***************************************************************************
@@ -33,20 +33,18 @@ public:
 	render_texture *hilight_texture() { return m_hilight_texture.get(); }
 	render_texture *hilight_main_texture() { return m_hilight_main_texture.get(); }
 	render_texture *arrow_texture() { return m_arrow_texture.get(); }
-	render_texture * bgrnd_texture() { return m_bgrnd_texture.get(); }
 
 	using bitmap_ptr = std::unique_ptr<bitmap_argb32>;
 	using texture_ptr = std::unique_ptr<render_texture, std::function<void(render_texture *)> >;
 
 private:
-	bitmap_ptr              m_hilight_bitmap;
-	texture_ptr             m_hilight_texture;
-	bitmap_ptr              m_hilight_main_bitmap;
-	texture_ptr             m_hilight_main_texture;
-	texture_ptr             m_arrow_texture;
-	texture_ptr             m_bgrnd_texture;
-
 	static void render_triangle(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
+
+	bitmap_ptr  m_hilight_bitmap;
+	texture_ptr m_hilight_texture;
+	bitmap_ptr  m_hilight_main_bitmap;
+	texture_ptr m_hilight_main_texture;
+	texture_ptr m_arrow_texture;
 };
 
 } // namespace ui

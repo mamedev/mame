@@ -18,6 +18,8 @@
 #include <algorithm>
 #include <cassert>
 #include <cstring>
+#include <iterator>
+
 #include <ctype.h>
 
 
@@ -1279,13 +1281,12 @@ std::string core_filename_extract_base(const std::string &name, bool strip_exten
 	auto const chop_position = strip_extension
 		? std::find(name.rbegin(), start, '.')
 		: start;
-	auto const end = (chop_position != start)
-		? chop_position + 1
+	auto const end = ((chop_position != start) && (std::next(chop_position) != start))
+		? std::next(chop_position)
 		: name.rbegin();
 
 	// copy the result into an string
-	std::string result(start.base(), end.base());
-	return result;
+	return std::string(start.base(), end.base());
 }
 
 
