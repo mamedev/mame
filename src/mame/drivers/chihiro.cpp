@@ -398,6 +398,9 @@ public:
 
 	// construction/destruction
 	jvs_master(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	int get_sense_line();
+	void send_packet(int destination, int length, UINT8 *data);
+	int received_packet(UINT8 *buffer);
 };
 
 const device_type JVS_MASTER = &device_creator<jvs_master>;
@@ -405,6 +408,39 @@ const device_type JVS_MASTER = &device_creator<jvs_master>;
 jvs_master::jvs_master(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: jvs_host(mconfig, JVS_MASTER, "JVS MASTER", tag, owner, clock, "jvs_master", __FILE__)
 {
+}
+
+int jvs_master::get_sense_line()
+{
+	if (get_presence_line() == false)
+		return 50;
+	if (get_address_set_line() == true)
+		return 0;
+	return 25;
+}
+
+void jvs_master::send_packet(int destination, int length, UINT8 *data)
+{
+	push((UINT8)destination);
+	push((UINT8)length);
+	while (length > 0)
+	{
+		push(*data);
+		data++;
+		length--;
+	}
+	commit_raw();
+}
+
+int jvs_master::received_packet(UINT8 *buffer)
+{
+	UINT32 length;
+	const UINT8 *data;
+
+	get_raw_reply(data, length);
+	if (length > 0)
+		memcpy(buffer, data, length);
+	return (int)length;
 }
 
 /////////////////////////
@@ -448,6 +484,7 @@ private:
 		UINT8 buffer_out[32768];
 		int buffer_out_used;
 		int buffer_out_packets;
+		jvs_master *master;
 	} jvs;
 };
 
@@ -731,6 +768,7 @@ ohci_hlean2131qc_device::ohci_hlean2131qc_device(const machine_config &mconfig, 
 	jvs.buffer_in_expected = 0;
 	jvs.buffer_out_used = 0;
 	jvs.buffer_out_packets = 0;
+	jvs.master = nullptr;
 }
 
 void ohci_hlean2131qc_device::initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager)
@@ -753,6 +791,7 @@ void ohci_hlean2131qc_device::initialize(running_machine &machine, ohci_usb_cont
 	add_string_descriptor(strdesc0);
 	add_string_descriptor(strdesc1);
 	add_string_descriptor(strdesc2);
+	jvs.master = machine.device<jvs_master>("jvs_master");
 }
 
 void ohci_hlean2131qc_device::set_region_base(UINT8 *data)
@@ -762,17 +801,24 @@ void ohci_hlean2131qc_device::set_region_base(UINT8 *data)
 
 int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
 {
+	int sense;
+
 	if (endpoint != 0)
 		return -1;
 	printf("Control request to an2131qc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
 	// default valuse for data stage
 	for (int n = 0; n < setup->wLength; n++)
 		endpoints[endpoint].buffer[n] = 0x50 ^ n;
+	sense = jvs.master->get_sense_line();
+	if (sense == 25)
+		sense = 3;
+	else
+		sense = 0; // need to check
 	// PINSA register, bits 4-1 special value, must be 10 xor 15, but bit 3 is ignored since its used as the CS pin of the chip
 	endpoints[endpoint].buffer[1] = 0x4b;
 	// PINSB register, bit 4 connected to re/de pins of max485, bits 2-3 used as uart pins, bit 0-1 is the sense pin of the jvs connector
 	// if bits 0-1 are 11, the not all the connected jvs devices have been assigned an address yet
-	endpoints[endpoint].buffer[2] = 0x52|3;
+	endpoints[endpoint].buffer[2] = 0x52 | sense;
 	// OUTB register
 	endpoints[endpoint].buffer[3] = 0x53;
 	// bRequest is a command value
@@ -962,9 +1008,26 @@ int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, UINT8 *buffe
 						continue;
 					}
 					// use data of this packet
+					jvs.master->send_packet(dest, len, jvs.buffer_in + p);
 					// generate response
+					int recv = jvs.master->received_packet(jvs.buffer_out + jvs.buffer_out_used + 5);
 					// update buffer_out
-
+					if (recv > 0)
+					{
+						jvs.buffer_out_packets++;
+						// jvs node address
+						jvs.buffer_out[jvs.buffer_out_used] = jvs.buffer_out[jvs.buffer_out_used + 5];
+						// dummy
+						jvs.buffer_out[jvs.buffer_out_used + 1] = 0;
+						// length following
+						recv++;
+						jvs.buffer_out[jvs.buffer_out_used + 2] = recv & 255;
+						jvs.buffer_out[jvs.buffer_out_used + 3] = (recv >> 8) & 255;
+						// body
+						jvs.buffer_out[jvs.buffer_out_used + 4] = 0xa0;
+						jvs.buffer_out_used = jvs.buffer_out_used + recv + 5;
+						jvs.buffer_out[1] = (UINT8)jvs.buffer_out_packets;
+					}
 					p = p + len;
 				}
 			}
