@@ -483,12 +483,12 @@ WRITE8_MEMBER(vt240_state::lu_w)
 	m_lu = data;
 }
 
-WRITE8_MEMBER(vt240_state::hbscrl_w)
+WRITE8_MEMBER(vt240_state::lbscrl_w)
 {
 	m_scrl = (m_scrl & 0xff00) | data;
 }
 
-WRITE8_MEMBER(vt240_state::lbscrl_w)
+WRITE8_MEMBER(vt240_state::hbscrl_w)
 {
 	m_scrl = (m_scrl & 0xff) | ((data & 0x3f) << 8);
 }
