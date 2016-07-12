@@ -1171,6 +1171,7 @@ void mb86901_device::execute_wrsr(UINT32 op)
 		else
 		{
 			PSR = result &~ PSR_ZERO_MASK;
+			update_gpr_pointers();
 		}
 	}
 	else if (WRWIM)
