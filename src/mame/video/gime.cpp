@@ -175,12 +175,9 @@ void gime_base_device::device_start(void)
 	m_cart_rom = m_cart_device->get_cart_base();
 
 	// populate palettes
-	for (int color = 0; color < 64; color++)
-	{
-		m_composite_palette[color] = get_composite_color(color);
-		m_composite_bw_palette[color] = black_and_white(m_composite_palette[color]);
-		m_rgb_palette[color] = get_rgb_color(color);
-	}
+	m_composite_phase_invert = false;
+	update_rgb_palette();
+	update_composite_palette();
 
 	// set up save states
 	save_pointer(NAME(m_gime_registers), ARRAY_LENGTH(m_gime_registers));
@@ -198,113 +195,64 @@ void gime_base_device::device_start(void)
 
 
 //-------------------------------------------------
+//  update_rgb_palette
+//-------------------------------------------------
+
+void gime_base_device::update_rgb_palette(void)
+{
+	for (int color = 0; color < 64; color++)
+	{
+		m_rgb_palette[color] = get_rgb_color(color);
+	}
+}
+
+
+
+//-------------------------------------------------
+//  update_composite_palette
+//-------------------------------------------------
+
+void gime_base_device::update_composite_palette(void)
+{
+	for (int color = 0; color < 64; color++)
+	{
+		m_composite_palette[color] = get_composite_color(color);
+		m_composite_bw_palette[color] = black_and_white(m_composite_palette[color]);
+	}
+}
+
+
+
+//-------------------------------------------------
 //  get_composite_color
 //-------------------------------------------------
 
 inline gime_base_device::pixel_t gime_base_device::get_composite_color(int color)
 {
-	/* CMP colors
-	 *
-	 * These colors are of the format IICCCC, where II is the intensity and
-	 * CCCC is the base color.  There is some weirdness because intensity
-	 * is often different for each base color.
-	 *
-	 * The code below is based on an algorithm specified in the following
-	 * CoCo BASIC program was used to approximate composite colors.
-	 * (Program by SockMaster):
-	 *
-	 * 10 POKE65497,0:DIMR(63),G(63),B(63):WIDTH80:PALETTE0,0:PALETTE8,54:CLS1
-	 * 20 SAT=92:CON=70:BRI=-50:L(0)=0:L(1)=47:L(2)=120:L(3)=255
-	 * 30 W=.4195456981879*1.01:A=W*9.2:S=A+W*5:D=S+W*5:P=0:FORH=0TO3:P=P+1
-	 * 40 BRI=BRI+CON:FORG=1TO15:R(P)=COS(A)*SAT+BRI
-	 * 50 G(P)=(COS(S)*SAT)*1+BRI:B(P)=(COS(D)*SAT)*1+BRI:P=P+1
-	 * 55 A=A+W:S=S+W:D=D+W:NEXT:R(P-16)=L(H):G(P-16)=L(H):B(P-16)=L(H)
-	 * 60 NEXT:R(63)=R(48):G(63)=G(48):B(63)=B(48)
-	 * 70 FORH=0TO63STEP1:R=INT(R(H)):G=INT(G(H)):B=INT(B(H)):IFR<0THENR=0
-	 * 80 IFG<0THENG=0
-	 * 90 IFB<0THENB=0
-	 * 91 IFR>255THENR=255
-	 * 92 IFG>255THENG=255
-	 * 93 IFB>255THENB=255
-	 * 100 PRINTRIGHT$(STR$(H),2);" $";:R=R+256:G=G+256:B=B+256
-	 * 110 PRINTRIGHT$(HEX$(R),2);",$";RIGHT$(HEX$(G),2);",$";RIGHT$(HEX$(B),2)
-	 * 115 IF(H AND15)=15 THENIFINKEY$=""THEN115ELSEPRINT
-	 * 120 NEXT
-	 *
-	 *  At one point, we used a different SockMaster program, but the colors
-	 *  produced were too dark for people's taste
-	 *
-	 *  10 POKE65497,0:DIMR(63),G(63),B(63):WIDTH80:PALETTE0,0:PALETTE8,54:CLS1
-	 *  20 SAT=92:CON=53:BRI=-16:L(0)=0:L(1)=47:L(2)=120:L(3)=255
-	 *  30 W=.4195456981879*1.01:A=W*9.2:S=A+W*5:D=S+W*5:P=0:FORH=0TO3:P=P+1
-	 *  40 BRI=BRI+CON:FORG=1TO15:R(P)=COS(A)*SAT+BRI
-	 *  50 G(P)=(COS(S)*SAT)*.50+BRI:B(P)=(COS(D)*SAT)*1.9+BRI:P=P+1
-	 *  55 A=A+W:S=S+W:D=D+W:NEXT:R(P-16)=L(H):G(P-16)=L(H):B(P-16)=L(H)
-	 *  60 NEXT:R(63)=R(48):G(63)=G(48):B(63)=B(48)
-	 *  70 FORH=0TO63STEP1:R=INT(R(H)):G=INT(G(H)):B=INT(B(H)):IFR<0THENR=0
-	 *  80 IFG<0THENG=0
-	 *  90 IFB<0THENB=0
-	 *  91 IFR>255THENR=255
-	 *  92 IFG>255THENG=255
-	 *  93 IFB>255THENB=255
-	 *  100 PRINTRIGHT$(STR$(H),2);" $";:R=R+256:G=G+256:B=B+256
-	 *  110 PRINTRIGHT$(HEX$(R),2);",$";RIGHT$(HEX$(G),2);",$";RIGHT$(HEX$(B),2)
-	 *  115 IF(H AND15)=15 THENIFINKEY$=""THEN115ELSEPRINT
-	 *  120 NEXT
-	 */
+	static pixel_t composite_palette[64] = {
+		0x000000, 0x004c00, 0x004300, 0x0a3100, 0x2f1b00, 0x550100, 0x6c0000, 0x770006,
+		0x71004b, 0x5c008b, 0x3b00b8, 0x1100ca, 0x001499, 0x002c62, 0x004011, 0x004b00,
+		0x2d2d2d, 0x069800, 0x288f00, 0x537d00, 0x786700, 0xa04c00, 0xb63402, 0xc3224c,
+		0xbd1693, 0xa814d5, 0x881cfe, 0x5e2cff, 0x105ee9, 0x0076b2, 0x008b60, 0x009618,
+		0x747474, 0x41d714, 0x62cf00, 0x8ebd00, 0xb4a700, 0xdd8c01, 0xf5733a, 0xfe6085,
+		0xfd53ce, 0xe950ff, 0xc958ff, 0x9e67ff, 0x4e9aff, 0x36b3f7, 0x26c9a3, 0x2bd558,
+		0xfdfdfe, 0x88e85a, 0xa1e03f, 0xbed238, 0xd8c342, 0xf1b161, 0xfea08d, 0xfe95bf,
+		0xfd8ef1, 0xef8eff, 0xd895ff, 0xb9a1ff, 0x86c4ff, 0x78d4f2, 0x71e2b6, 0xffffff,
+	};
 
-	double saturation, brightness, contrast;
-	int offset;
-	double w;
-	int r, g, b;
+    // composite output with phase inverted
+	static pixel_t composite_palette_180[64] = {
+		0x000000, 0x5a0e5a, 0x4f0c4f, 0x360f40, 0x0d213c, 0x003334, 0x004141, 0x004943,
+		0x005409, 0x005600, 0x114c00, 0x263700, 0x392500, 0x491d00, 0x4f0f3e, 0x590e59,
+		0x2d2d2d, 0xb11fb7, 0x9932c1, 0x7248c5, 0x4a5bc2, 0x1a6eba, 0x0077a9, 0x008c62,
+		0x009619, 0x039700, 0x238f00, 0x467800, 0x9c4e00, 0xb23c00, 0xb92e59, 0xb6209e,
+		0x747474, 0xe852ff, 0xcd60ff, 0xa677ff, 0x7d8aff, 0x4d9eff, 0x32b4ed, 0x29c7a2,
+		0x2ad459, 0x39d223, 0x50c11a, 0x72a911, 0xcf831e, 0xf47733, 0xff5f85, 0xfe54d1,
+		0xfdfdfc, 0xef8fff, 0xd697ff, 0xb8a4ff, 0x9eb3ff, 0x86c6ff, 0x76d4e7, 0x74ddb3,
+		0x77e683, 0x80e170, 0x92d56b, 0xacc466, 0xeaac71, 0xffa385, 0xff95c1, 0xffffff
+	};
 
-	switch(color)
-	{
-		case 0:
-			r = g = b = 0;
-			break;
-
-		case 16:
-			r = g = b = 47;
-			break;
-
-		case 32:
-			r = g = b = 120;
-			break;
-
-		case 48:
-		case 63:
-			r = g = b = 255;
-			break;
-
-		default:
-			w = .4195456981879*1.01;
-			contrast = 70;
-			saturation = 92;
-			brightness = -50;
-			brightness += ((color / 16) + 1) * contrast;
-			offset = (color % 16) - 1 + (color / 16)*15;
-			r = cos(w*(offset +  9.2)) * saturation + brightness;
-			g = cos(w*(offset + 14.2)) * saturation + brightness;
-			b = cos(w*(offset + 19.2)) * saturation + brightness;
-
-			if (r < 0)
-				r = 0;
-			else if (r > 255)
-				r = 255;
-
-			if (g < 0)
-				g = 0;
-			else if (g > 255)
-				g = 255;
-
-			if (b < 0)
-				b = 0;
-			else if (b > 255)
-				b = 255;
-			break;
-	}
-	return (pixel_t) ((r << 16) | (g << 8) | (b << 0));
+	return (m_composite_phase_invert) ? composite_palette_180[color] : composite_palette[color];
 }
 
 
@@ -726,11 +674,13 @@ inline UINT8 gime_base_device::read_gime_register(offs_t offset)
 			}
 			break;
 
+#ifdef NOPE_NOT_READABLE
 		case 14:
 		case 15:
 			// these (I guess) are readable (Mametesters bug #05135)
 			result = m_gime_registers[offset];
 			break;
+#endif
 
 		default:
 			// the others are not readable; read floating bus (Mametesters bug #05135)
@@ -860,8 +810,7 @@ inline void gime_base_device::write_gime_register(offs_t offset, UINT8 data)
 			if (xorval & 0x01)
 				update_memory();
 
-			// I'm not sure about this one; as written this code will reset the timer
-			// with the _original_ value.  This is probably not correct.
+			// Reset the timer with the _original_ value.  (This is correct!)
 			if (xorval & 0x20)
 				reset_timer();
 			break;
@@ -946,6 +895,13 @@ inline void gime_base_device::write_gime_register(offs_t offset, UINT8 data)
 			//        Bit 4 MOCH 1 = Monochrome on Composite
 			//      ! Bit 3 H50 1 = 50 Hz power, 0 = 60 Hz power
 			//        Bits 0-2 LPR Lines per row
+			if (xorval & 0x20)
+			{
+				// on phase invert re-load the alternate composite palette                
+				m_composite_phase_invert = (data & 0x20);
+				update_composite_palette();
+			}
+
 			break;
 
 		case 0x09:
