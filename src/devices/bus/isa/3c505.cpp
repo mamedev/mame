@@ -1288,6 +1288,31 @@ UINT8 threecom3c505_device::read_command_port()
 			case CMD_TRANSMIT_PACKET_18_COMPLETE:
 				m_netstat.tot_xmit++;
 
+				// append the Ethernet Frame Check Sequence
+				// see also http://www.edaboard.com/thread120700.html
+				{
+					// compute the Ethernet Frame Check Sequence
+					static const UINT32 crc_table[] =
+					{ 0x4DBDF21C, 0x500AE278, 0x76D3D2D4, 0x6B64C2B0,
+							0x3B61B38C, 0x26D6A3E8, 0x000F9344, 0x1DB88320,
+							0xA005713C, 0xBDB26158, 0x9B6B51F4, 0x86DC4190,
+							0xD6D930AC, 0xCB6E20C8, 0xEDB71064, 0xF0000000 };
+					UINT32 n, crc = 0;
+					for (n = 0; n < m_tx_data_buffer.get_length(); n++)
+					{
+						UINT8 data = m_tx_data_buffer.get(n);
+						crc = (crc >> 4) ^ crc_table[(crc ^ (data >> 0)) & 0x0f]; /* lower nibble */
+						crc = (crc >> 4) ^ crc_table[(crc ^ (data >> 4)) & 0x0f]; /* upper nibble */
+					}
+
+					// append the Ethernet Frame Check Sequence
+					for (n = 0; n < 4; n++)
+					{
+						m_tx_data_buffer.append(crc & 0xff);
+						crc >>= 8;
+					}
+				}
+
 				if (!send(m_tx_data_buffer.get_data(),  m_tx_data_buffer.get_length()))
 				{
 					// FIXME: failed to send the Ethernet packet
