@@ -1261,7 +1261,7 @@ static MACHINE_CONFIG_DERIVED( shangon, outrun_base )
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 321, 262, 0, 224)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(segaorun_state, screen_update_shangon)
 
 	MCFG_SEGA_SYS16B_SPRITES_ADD("sprites")
