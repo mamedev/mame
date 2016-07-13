@@ -20,7 +20,7 @@
 #include "machine/x2212.h"
 #include "video/upd7220.h"
 
-#define VERBOSE_DBG 1       /* general debug messages */
+#define VERBOSE_DBG 0       /* general debug messages */
 
 #define DBG_LOG(N,M,A) \
 	do { \
@@ -386,44 +386,45 @@ WRITE16_MEMBER(vt240_state::vram_w)
 			if(ps == 0)
 				i++;
 			UINT8 mem = video_ram[(offset & 0x7fff) + (0x8000 * i)];
+			UINT8 out = 0, ifore = BIT(m_lu, (i ? 5 : 4)), iback = BIT(m_lu, (i ? 3 : 2));
+			for(int j = 0; j < 8; j++)
+				out |= BIT(chr, j) ? (ifore << j) : (iback << j);
 			switch(m_lu >> 6)
 			{
 				case 0:
 					break;
 				case 1:
-					chr |= mem;
+					out |= mem;
 					break;
 				case 2:
 					logerror("invalid logic unit mode 2\n");
 					break;
 				case 3:
-					chr ^= mem;
+					out ^= ~mem;
 					break;
 			}
-			UINT8 out = 0, ifore = BIT(m_lu, (i ? 5 : 4)), iback = BIT(m_lu, (i ? 3 : 2));
-			for(int j = 0; j < 8; j++)
-				out |= BIT(chr, j) ? (ifore << j) : (iback << j);
 			if(!BIT(m_reg0, 3))
 				out = (out & ~m_mask) | (mem & m_mask);
 			else
 				out = (out & data) | (mem & ~data);
 			if(BIT(m_reg1, 3))
 			{
+				UINT8 out2 = out;
 				if(BIT(m_reg1, 2))
 				{
-					out = mem;
-					video_ram[((m_scrl << 1) | (offset & 1)) + (0x8000 * i)] = out;
+					out = video_ram[((offset & 0x7ffe) | 0) + (0x8000 * i)];
+					out2 = video_ram[((offset & 0x7ffe) | 1) + (0x8000 * i)];
 				}
-				else
-				{
-					video_ram[((m_scrl << 1) | 0) + (0x8000 * i)] = out;
-					video_ram[((m_scrl << 1) | 1) + (0x8000 * i)] = out;
-				}
-				m_scrl += BIT(m_reg1, 1) ? -1 : 1;
-				m_scrl &= 0x3fff;
+				video_ram[((m_scrl << 1) | 0) + (0x8000 * i)] = out;
+				video_ram[((m_scrl << 1) | 1) + (0x8000 * i)] = out2;
 			}
 			else
 				video_ram[(offset & 0x7fff) + (0x8000 * i)] = out;
+		}
+		if(BIT(m_reg1, 3))
+		{
+			m_scrl += BIT(m_reg1, 1) ? -1 : 1;
+			m_scrl &= 0x3fff;
 		}
 		return;
 	}
@@ -433,16 +434,14 @@ WRITE16_MEMBER(vt240_state::vram_w)
 		data = (chr & data) | (video_ram[offset] & ~data);
 	if(BIT(m_reg1, 3))
 	{
+		UINT8 data2 = data;
 		if(BIT(m_reg1, 2))
 		{
-			data = video_ram[offset];
-			video_ram[(m_scrl << 1) | (offset & 1)] = data;
+			data = video_ram[(offset & ~1) | 0];
+			data2 = video_ram[(offset & ~1) | 1];
 		}
-		else
-		{
-			video_ram[(m_scrl << 1) | 0] = data;
-			video_ram[(m_scrl << 1) | 1] = data;
-		}
+		video_ram[(offset & 0x8000) | (m_scrl << 1) | 0] = data;
+		video_ram[(offset & 0x8000) | (m_scrl << 1) | 1] = data2;
 		m_scrl += BIT(m_reg1, 1) ? -1 : 1;
 		m_scrl &= 0x3fff;
 	}
@@ -731,7 +730,7 @@ ROM_START( vt240 )
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT          CLASS   INIT    COMPANY                      FULLNAME       FLAGS */
-COMP( 1983, vt240,  0,      0,       vt240,    vt240, driver_device,   0,  "Digital Equipment Corporation", "VT240", MACHINE_NOT_WORKING )
+COMP( 1983, vt240,  0,      0,       vt240,    vt240, driver_device,   0,  "Digital Equipment Corporation", "VT240", MACHINE_IMPERFECT_GRAPHICS )
 //COMP( 1983, vt241,  0,      0,       vt220,     vt220, driver_device,   0,  "Digital Equipment Corporation", "VT241", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 // NOTE: the only difference between VT240 and VT241 is the latter comes with a VR241 Color monitor, while the former comes with a mono display; the ROMs and operation are identical.
 COMP( 1983, mc7105, 0,      0,       mc7105,    vt240, driver_device,   0,  "Elektronika",                  "MC7105", MACHINE_NOT_WORKING )

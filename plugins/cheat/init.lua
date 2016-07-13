@@ -71,7 +71,6 @@ function cheat.startplugin()
 
 	local function load_cheats()
 		local filename = emu.romname()
-		local json = require("json")
 		local newcheats = {}
 		local file = emu.file(manager:machine():options().entries.cheatpath:value():gsub("([^;]+)", "%1;%1/cheat") , 1)
 		if emu.softname() ~= "" then
@@ -81,7 +80,7 @@ function cheat.startplugin()
 				end
 			end
 		end
-		function add(addcheats)
+		local function add(addcheats)
 			if not next(newcheats) then
 				newcheats = addcheats
 			else
@@ -90,6 +89,7 @@ function cheat.startplugin()
 				end
 			end
 		end
+		local json = require("json")
 		local ret = file:open(filename .. ".json")
 		while not ret do
 			add(json.parse(file:read(file:size())))
@@ -99,6 +99,12 @@ function cheat.startplugin()
 		ret = file:open(filename .. ".xml")
 		while not ret do
 			add(xml.conv_cheat(file:read(file:size())))
+			ret = file:open_next()
+		end
+		local simp = require("cheat/simple_conv")
+		ret = file:open("cheat.simple")
+		while not ret do
+			add(simp.conv_cheat(filename, file:read(file:size())))
 			ret = file:open_next()
 		end
 		return newcheats
