@@ -342,7 +342,7 @@ void n64_texture_pipe_t::cycle_linear_lerp(color_t* TEX, color_t* prev, INT32 SS
 		TEX->add(t0);
 		TEX->add(t2);
 		TEX->add(t3);
-		TEX->sra(2);
+		TEX->sra_imm(2);
 	}
 }
 
