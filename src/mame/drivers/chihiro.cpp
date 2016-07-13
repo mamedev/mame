@@ -423,6 +423,7 @@ void jvs_master::send_packet(int destination, int length, UINT8 *data)
 {
 	push((UINT8)destination);
 	push((UINT8)length);
+	length--;
 	while (length > 0)
 	{
 		push(*data);
@@ -979,9 +980,9 @@ int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, UINT8 *buffe
 			memcpy(endpoints[4].position, buffer, size);
 			endpoints[4].position = endpoints[4].position + size;
 			endpoints[4].remain = endpoints[4].remain - size;
-			printf("\n\r");
 			if (endpoints[4].remain == 0)
 			{
+				printf("\n\r");
 				// extract packets
 				int numpk = jvs.buffer_in[1];
 				int p = 2;
@@ -996,7 +997,7 @@ int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, UINT8 *buffe
 					p++;
 					int len = jvs.buffer_in[p];
 					p++;
-					if ((p + len) >= jvs.buffer_in_expected)
+					if ((p + len) > jvs.buffer_in_expected)
 						break;
 					int chk = dest + len;
 					for (int m = len - 1; m > 0; m--)
@@ -1014,18 +1015,22 @@ int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, UINT8 *buffe
 					// update buffer_out
 					if (recv > 0)
 					{
+						chk = 0;
+						for (int m = 0; m < recv; m++)
+							chk = chk + jvs.buffer_out[jvs.buffer_out_used + 5 + m];
+						jvs.buffer_out[jvs.buffer_out_used + 5 + recv] = chk & 255;
 						jvs.buffer_out_packets++;
 						// jvs node address
 						jvs.buffer_out[jvs.buffer_out_used] = jvs.buffer_out[jvs.buffer_out_used + 5];
 						// dummy
 						jvs.buffer_out[jvs.buffer_out_used + 1] = 0;
 						// length following
-						recv++;
+						recv += 2;
 						jvs.buffer_out[jvs.buffer_out_used + 2] = recv & 255;
 						jvs.buffer_out[jvs.buffer_out_used + 3] = (recv >> 8) & 255;
 						// body
-						jvs.buffer_out[jvs.buffer_out_used + 4] = 0xa0;
-						jvs.buffer_out_used = jvs.buffer_out_used + recv + 5;
+						jvs.buffer_out[jvs.buffer_out_used + 4] = 0xe0;
+						jvs.buffer_out_used = jvs.buffer_out_used + recv + 5 - 1;
 						jvs.buffer_out[1] = (UINT8)jvs.buffer_out_packets;
 					}
 					p = p + len;
