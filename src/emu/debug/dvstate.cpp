@@ -28,9 +28,9 @@ const int debug_view_state::REG_FRAME;
 //-------------------------------------------------
 
 debug_view_state_source::debug_view_state_source(const char *name, device_t &device)
-	: debug_view_source(name, &device),
-		m_stateintf(dynamic_cast<device_state_interface *>(&device)),
-		m_execintf(dynamic_cast<device_execute_interface *>(&device))
+	: debug_view_source(name, &device)
+	, m_stateintf(dynamic_cast<device_state_interface *>(&device))
+	, m_execintf(dynamic_cast<device_execute_interface *>(&device))
 {
 }
 
@@ -45,9 +45,9 @@ debug_view_state_source::debug_view_state_source(const char *name, device_t &dev
 //-------------------------------------------------
 
 debug_view_state::debug_view_state(running_machine &machine, debug_view_osd_update_func osdupdate, void *osdprivate)
-	: debug_view(machine, DVT_STATE, osdupdate, osdprivate),
-		m_divider(0),
-		m_last_update(0)
+	: debug_view(machine, DVT_STATE, osdupdate, osdprivate)
+	, m_divider(0)
+	, m_last_update(0)
 {
 	// fail if no available sources
 	enumerate_sources();
@@ -147,7 +147,7 @@ void debug_view_state::recompute()
 	{
 		count++;
 		maxtaglen = (std::max)(maxtaglen, item.m_symbol.length());
-		maxvallen = (std::max)(maxvallen, item.m_vallen);
+		maxvallen = (std::max)(maxvallen, item.value_length());
 	}
 
 	// set the current divider and total cols
@@ -186,125 +186,108 @@ void debug_view_state::view_update()
 		recompute();
 
 	// get cycle count if we have an execute interface
-	const debug_view_state_source &source = downcast<const debug_view_state_source &>(*m_source);
-	UINT64 total_cycles = 0;
-	if (source.m_execintf != nullptr)
-		total_cycles = source.m_execintf->total_cycles();
+	debug_view_state_source const &source(downcast<debug_view_state_source const &>(*m_source));
+	UINT64 const total_cycles(source.m_execintf ? source.m_execintf->total_cycles() : 0);
+	bool const cycles_changed(m_last_update != total_cycles);
 
-	// find the first entry
-	auto it = m_state_list.begin();
-	for (INT32 index = 0; (index < m_topleft.y) && (it != m_state_list.end()); ++index, ++it) { }
-
-	// loop over visible rows
-	screen_device *screen = machine().first_screen();
-	debug_view_char *dest = &m_viewdata[0];
-	for (UINT32 row = 0; row < m_visible.y; row++)
+	// loop over rows
+	auto it(m_state_list.begin());
+	screen_device const *const screen(machine().first_screen());
+	debug_view_char *dest(&m_viewdata[0]);
+	for (INT32 index = 0, limit = m_topleft.y + m_visible.y; (index < limit) || (it != m_state_list.end()); ++index)
 	{
-		UINT32 col = 0;
-		
-		// if this visible row is valid, add it to the buffer
+		bool const visible((index >= m_topleft.y) && (index < limit));
+		UINT32 col(0);
+
 		if (it != m_state_list.end())
 		{
-			state_item &curitem = *it;
+			// advance to the next item
+			state_item &curitem(*it++);
 
-			UINT32 effcol = m_topleft.x;
-			UINT8 attrib = DCA_NORMAL;
-			UINT32 len = 0;
+			// update item and get the effective string
 			std::string valstr;
-
-			// get the effective string
-			if (curitem.m_index >= REG_FRAME && curitem.m_index <= REG_DIVIDER)
+			switch (curitem.index())
 			{
-				curitem.m_lastval = curitem.m_currval;
-				switch (curitem.m_index)
+			case REG_DIVIDER:
+				curitem.m_symbol.clear();
+				curitem.m_symbol.resize(m_total.x, '-');
+				break;
+
+			case REG_CYCLES:
+				if (source.m_execintf)
 				{
-				case REG_DIVIDER:
-					curitem.m_vallen = 0;
-					curitem.m_symbol.clear();
-					for (int i = 0; i < m_total.x; i++)
-						curitem.m_symbol.append("-");
-					break;
+					curitem.update(source.m_execintf->cycles_remaining(), cycles_changed);
+					valstr = string_format("%-8d", curitem.value());
+				}
+				break;
 
-				case REG_CYCLES:
-					if (source.m_execintf != nullptr)
-					{
-						curitem.m_currval = source.m_execintf->cycles_remaining();
-						valstr = string_format("%-8d", UINT32(curitem.m_currval));
-					}
-					break;
+			case REG_BEAMX:
+				if (screen)
+				{
+					curitem.update(screen->hpos(), cycles_changed);
+					valstr = string_format("%4d", curitem.value());
+				}
+				break;
 
-				case REG_BEAMX:
-					if (screen != nullptr)
-					{
-						curitem.m_currval = screen->hpos();
-						valstr = string_format("%4d", UINT32(curitem.m_currval));
-					}
-					break;
+			case REG_BEAMY:
+				if (screen)
+				{
+					curitem.update(screen->vpos(), cycles_changed);
+					valstr = string_format("%4d", curitem.value());
+				}
+				break;
 
-				case REG_BEAMY:
-					if (screen != nullptr)
-					{
-						curitem.m_currval = screen->vpos();
-						valstr = string_format("%4d", UINT32(curitem.m_currval));
-					}
-					break;
+			case REG_FRAME:
+				if (screen)
+				{
+					curitem.update(screen->frame_number(), cycles_changed);
+					valstr = string_format("%6d", curitem.value());
+				}
+				break;
 
-				case REG_FRAME:
-					if (screen != nullptr)
-					{
-						curitem.m_currval = screen->frame_number();
-						valstr = string_format("%6d", UINT32(curitem.m_currval));
-					}
-					break;
+			default:
+				curitem.update(source.m_stateintf->state_int(curitem.index()), cycles_changed);
+				valstr = source.m_stateintf->state_string(curitem.index());
+			}
+
+			// if this row is visible, add it to the buffer
+			if (visible)
+			{
+				// see if we changed
+				const UINT8 attrib(curitem.changed() ? DCA_CHANGED: DCA_NORMAL);
+
+				// build up a string
+				char temp[256];
+				UINT32 len(0);
+				if (curitem.m_symbol.length() < (m_divider - 1))
+				{
+					memset(&temp[len], ' ', m_divider - 1 - curitem.m_symbol.length());
+					len += m_divider - 1 - curitem.m_symbol.length();
+				}
+
+				memcpy(&temp[len], curitem.m_symbol.c_str(), curitem.m_symbol.length());
+				len += curitem.m_symbol.length();
+
+				temp[len++] = ' ';
+				temp[len++] = ' ';
+
+				memcpy(&temp[len], valstr.c_str(), curitem.value_length());
+				len += curitem.value_length();
+
+				temp[len++] = ' ';
+				temp[len] = 0;
+
+				// copy data
+				for (UINT32 effcol = m_topleft.x; (col < m_visible.x) && (effcol < len); ++dest, ++col)
+				{
+					dest->byte = temp[effcol++];
+					dest->attrib = attrib | ((effcol <= m_divider) ? DCA_ANCILLARY : DCA_NORMAL);
 				}
 			}
-			else
-			{
-				if (m_last_update != total_cycles)
-					curitem.m_lastval = curitem.m_currval;
-				curitem.m_currval = source.m_stateintf->state_int(curitem.m_index);
-				valstr = source.m_stateintf->state_string(curitem.m_index);
-			}
-
-			// see if we changed
-			if (curitem.m_lastval != curitem.m_currval)
-				attrib = DCA_CHANGED;
-
-			// build up a string
-			char temp[256];
-			if (curitem.m_symbol.length() < m_divider - 1)
-			{
-				memset(&temp[len], ' ', m_divider - 1 - curitem.m_symbol.length());
-				len += m_divider - 1 - curitem.m_symbol.length();
-			}
-
-			memcpy(&temp[len], curitem.m_symbol.c_str(), curitem.m_symbol.length());
-			len += curitem.m_symbol.length();
-
-			temp[len++] = ' ';
-			temp[len++] = ' ';
-
-			memcpy(&temp[len], valstr.c_str(), curitem.m_vallen);
-			len += curitem.m_vallen;
-
-			temp[len++] = ' ';
-			temp[len] = 0;
-
-			// copy data
-			while (col < m_visible.x && effcol < len)
-			{
-				dest->byte = temp[effcol++];
-				dest->attrib = attrib | ((effcol <= m_divider) ? DCA_ANCILLARY : DCA_NORMAL);
-				dest++;
-				col++;
-			}
-
-			// advance to the next item
-			++it;
 		}
-
+	
 		// fill the rest with blanks
-		while (col < m_visible.x)
+		while (visible && (col < m_visible.x))
 		{
 			dest->byte = ' ';
 			dest->attrib = DCA_NORMAL;
@@ -329,4 +312,16 @@ debug_view_state::state_item::state_item(int index, const char *name, UINT8 valu
 	, m_vallen(valuechars)
 	, m_symbol(name)
 {
+}
+
+
+//-------------------------------------------------
+//  update - update value and save previous
+//-------------------------------------------------
+
+void debug_view_state::state_item::update(UINT64 newval, bool save)
+{
+	if (save)
+		m_lastval = m_currval;
+	m_currval = newval;
 }
