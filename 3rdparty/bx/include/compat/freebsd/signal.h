@@ -1,5 +1,5 @@
-#ifdef __GLIBC__
-#include_next <signal.h>
+#if defined(__GLIBC__)
+#	include_next <signal.h>
 #else
-#include <sys/signal.h>
+#	include <sys/signal.h>
 #endif

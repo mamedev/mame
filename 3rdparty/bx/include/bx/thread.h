@@ -6,27 +6,19 @@
 #ifndef BX_THREAD_H_HEADER_GUARD
 #define BX_THREAD_H_HEADER_GUARD
 
-#define BX_USE_GLIBC_PTHREAD_SETNAME_NP 0
-#if defined(__GLIBC__)
-#	if ( (__GLIBC__ > 2) || ( (__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 12) ) )
-#		define BX_USE_GLIBC_PTHREAD_SETNAME_NP 1
-#	endif
-#endif
-
 #if BX_PLATFORM_POSIX
 #	include <pthread.h>
-#	if BX_USE_GLIBC_PTHREAD_SETNAME_NP
-/* pthread.h provides pthread_setname_np */
-#	elif defined(BX_PLATFORM_LINUX)
-#		include <sys/prctl.h>
-#	elif defined(BX_PLATFORM_BSD)
+#	if defined(__FreeBSD__)
 #		include <pthread_np.h>
 #	endif
+#	if BX_PLATFORM_LINUX && (BX_CRT_GLIBC < 21200)
+#		include <sys/prctl.h>
+#	endif // BX_PLATFORM_
 #elif BX_PLATFORM_WINRT
 using namespace Platform;
 using namespace Windows::Foundation;
 using namespace Windows::System::Threading;
-#endif
+#endif // BX_PLATFORM_
 
 #include "sem.h"
 
@@ -165,16 +157,16 @@ namespace bx
 		{
 #if BX_PLATFORM_OSX || BX_PLATFORM_IOS
 			pthread_setname_np(_name);
-#elif BX_USE_GLIBC_PTHREAD_SETNAME_NP
+#elif (BX_CRT_GLIBC >= 21200)
 			pthread_setname_np(m_handle, _name);
 #elif BX_PLATFORM_LINUX
 			prctl(PR_SET_NAME,_name, 0, 0, 0);
 #elif BX_PLATFORM_BSD
-#ifdef __NetBSD__
-			pthread_setname_np(m_handle, "%s", (void *)_name);
-#else
+#	ifdef __NetBSD__
+			pthread_setname_np(m_handle, "%s", (void*)_name);
+#	else
 			pthread_set_name_np(m_handle, _name);
-#endif
+#	endif // __NetBSD__
 #elif BX_PLATFORM_WINDOWS && BX_COMPILER_MSVC
 #	pragma pack(push, 8)
 			struct ThreadName
