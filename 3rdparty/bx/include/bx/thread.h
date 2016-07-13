@@ -6,12 +6,19 @@
 #ifndef BX_THREAD_H_HEADER_GUARD
 #define BX_THREAD_H_HEADER_GUARD
 
+#define BX_USE_GLIBC_PTHREAD_SETNAME_NP 0
+#if defined(__GLIBC__)
+#	if ( (__GLIBC__ > 2) || ( (__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 12) ) )
+#		define BX_USE_GLIBC_PTHREAD_SETNAME_NP 1
+#	endif
+#endif
+
 #if BX_PLATFORM_POSIX
 #	include <pthread.h>
-#	if defined(__GLIBC__)
-#		if !( (__GLIBC__ > 2) || ( (__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 12) ) )
-#			include <sys/prctl.h>
-#		endif
+#	if BX_USE_GLIBC_PTHREAD_SETNAME_NP
+/* pthread.h provides pthread_setname_np */
+#	elif defined(BX_PLATFORM_LINUX)
+#		include <sys/prctl.h>
 #	elif defined(BX_PLATFORM_BSD)
 #		include <pthread_np.h>
 #	endif
@@ -158,7 +165,7 @@ namespace bx
 		{
 #if BX_PLATFORM_OSX || BX_PLATFORM_IOS
 			pthread_setname_np(_name);
-#elif defined(__GLIBC__) && (__GLIBC__ > 2) || ( (__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 12) )
+#elif BX_USE_GLIBC_PTHREAD_SETNAME_NP
 			pthread_setname_np(m_handle, _name);
 #elif BX_PLATFORM_LINUX
 			prctl(PR_SET_NAME,_name, 0, 0, 0);
