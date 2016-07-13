@@ -33274,6 +33274,9 @@ spielbud                        // (c) 1985 ADP
 @source:sm1800.cpp
 sm1800                          //
 
+@source:sm7238.cpp
+sm7238                          //
+
 @source:smc777.cpp
 smc777                          //
 
