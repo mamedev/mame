@@ -28,15 +28,15 @@ protected:
 	typedef __vector unsigned int   VECU32;
 
 public:
-	inline rgbaint_t() { set(0, 0, 0, 0); }
-	inline rgbaint_t(UINT32 rgba) { set(rgba); }
-	inline rgbaint_t(INT32 a, INT32 r, INT32 g, INT32 b) { set(a, r, g, b); }
-	inline rgbaint_t(const rgb_t& rgb) { set(rgb); }
-	inline rgbaint_t(VECS32 rgba) : m_value(rgba) { }
+	rgbaint_t() { set(0, 0, 0, 0); }
+	explicit rgbaint_t(UINT32 rgba) { set(rgba); }
+	rgbaint_t(INT32 a, INT32 r, INT32 g, INT32 b) { set(a, r, g, b); }
+	explicit rgbaint_t(const rgb_t& rgb) { set(rgb); }
+	explicit rgbaint_t(VECS32 rgba) : m_value(rgba) { }
 
-	inline void set(rgbaint_t& other) { m_value = other.m_value; }
+	void set(const rgbaint_t& other) { m_value = other.m_value; }
 
-	inline void set(UINT32 rgba)
+	void set(UINT32 rgba)
 	{
 		const VECU32 zero = { 0, 0, 0, 0 };
 #ifdef __LITTLE_ENDIAN__
@@ -48,7 +48,7 @@ public:
 #endif
 	}
 
-	inline void set(INT32 a, INT32 r, INT32 g, INT32 b)
+	void set(INT32 a, INT32 r, INT32 g, INT32 b)
 	{
 #ifdef __LITTLE_ENDIAN__
 		const VECS32 result = { b, g, r, a };
@@ -58,7 +58,7 @@ public:
 		m_value = result;
 	}
 
-	inline void set(const rgb_t& rgb)
+	void set(const rgb_t& rgb)
 	{
 		const VECU32 zero = { 0, 0, 0, 0 };
 #ifdef __LITTLE_ENDIAN__
@@ -85,6 +85,118 @@ public:
 		temp = VECU32(vec_packsu(VECS16(temp), VECS16(temp)));
 		UINT32 result;
 		vec_ste(temp, 0, &result);
+		return result;
+	}
+
+	void set_a(const INT32 value)
+	{
+		const VECS32 temp = { value, value, value, value };
+		m_value = vec_perm(m_value, temp, alpha_perm);
+	}
+
+	void set_r(const INT32 value)
+	{
+		const VECS32 temp = { value, value, value, value };
+		m_value = vec_perm(m_value, temp, red_perm);
+	}
+
+	void set_g(const INT32 value)
+	{
+		const VECS32 temp = { value, value, value, value };
+		m_value = vec_perm(m_value, temp, green_perm);
+	}
+
+	void set_b(const INT32 value)
+	{
+		const VECS32 temp = { value, value, value, value };
+		m_value = vec_perm(m_value, temp, blue_perm);
+	}
+
+	UINT8 get_a() const
+	{
+		UINT8 result;
+#ifdef __LITTLE_ENDIAN__
+		vec_ste(vec_splat(VECU8(m_value), 12), 0, &result);
+#else
+		vec_ste(vec_splat(VECU8(m_value), 3), 0, &result);
+#endif
+		return result;
+	}
+
+	UINT8 get_r() const
+	{
+		UINT8 result;
+#ifdef __LITTLE_ENDIAN__
+		vec_ste(vec_splat(VECU8(m_value), 8), 0, &result);
+#else
+		vec_ste(vec_splat(VECU8(m_value), 7), 0, &result);
+#endif
+		return result;
+	}
+
+	UINT8 get_g() const
+	{
+		UINT8 result;
+#ifdef __LITTLE_ENDIAN__
+		vec_ste(vec_splat(VECU8(m_value), 4), 0, &result);
+#else
+		vec_ste(vec_splat(VECU8(m_value), 11), 0, &result);
+#endif
+		return result;
+	}
+
+	UINT8 get_b() const
+	{
+		UINT8 result;
+#ifdef __LITTLE_ENDIAN__
+		vec_ste(vec_splat(VECU8(m_value), 0), 0, &result);
+#else
+		vec_ste(vec_splat(VECU8(m_value), 15), 0, &result);
+#endif
+		return result;
+	}
+
+	INT32 get_a32() const
+	{
+		INT32 result;
+#ifdef __LITTLE_ENDIAN__
+		vec_ste(vec_splat(m_value, 3), 0, &result);
+#else
+		vec_ste(vec_splat(m_value, 0), 0, &result);
+#endif
+		return result;
+	}
+
+	INT32 get_r32() const
+	{
+		INT32 result;
+#ifdef __LITTLE_ENDIAN__
+		vec_ste(vec_splat(m_value, 2), 0, &result);
+#else
+		vec_ste(vec_splat(m_value, 1), 0, &result);
+#endif
+		return result;
+	}
+
+	INT32 get_g32() const
+	{
+		INT32 result;
+#ifdef __LITTLE_ENDIAN__
+		vec_ste(vec_splat(m_value, 1), 0, &result);
+#else
+		vec_ste(vec_splat(m_value, 2), 0, &result);
+#endif
+		return result;
+	}
+
+	INT32 get_b32() const
+	{
+		INT32 result;
+#ifdef __LITTLE_ENDIAN__
+		vec_ste(vec_splat(m_value, 0), 0, &result);
+#else
+		vec_ste(vec_splat(m_value, 3), 0, &result);
+#endif
 		return result;
 	}
 
@@ -130,7 +242,7 @@ public:
 		m_value = vec_sub(m_value, temp);
 	}
 
-	inline void subr(rgbaint_t& color2)
+	inline void subr(const rgbaint_t& color2)
 	{
 		m_value = vec_sub(color2.m_value, m_value);
 	}
@@ -149,118 +261,6 @@ public:
 		const VECS32 temp = { a, r, g, b };
 #endif
 		m_value = vec_sub(temp, m_value);
-	}
-
-	inline void set_a(const INT32 value)
-	{
-		const VECS32 temp = { value, value, value, value };
-		m_value = vec_perm(m_value, temp, alpha_perm);
-	}
-
-	inline void set_r(const INT32 value)
-	{
-		const VECS32 temp = { value, value, value, value };
-		m_value = vec_perm(m_value, temp, red_perm);
-	}
-
-	inline void set_g(const INT32 value)
-	{
-		const VECS32 temp = { value, value, value, value };
-		m_value = vec_perm(m_value, temp, green_perm);
-	}
-
-	inline void set_b(const INT32 value)
-	{
-		const VECS32 temp = { value, value, value, value };
-		m_value = vec_perm(m_value, temp, blue_perm);
-	}
-
-	inline UINT8 get_a() const
-	{
-		UINT8 result;
-#ifdef __LITTLE_ENDIAN__
-		vec_ste(vec_splat(VECU8(m_value), 12), 0, &result);
-#else
-		vec_ste(vec_splat(VECU8(m_value), 3), 0, &result);
-#endif
-		return result;
-	}
-
-	inline UINT8 get_r() const
-	{
-		UINT8 result;
-#ifdef __LITTLE_ENDIAN__
-		vec_ste(vec_splat(VECU8(m_value), 8), 0, &result);
-#else
-		vec_ste(vec_splat(VECU8(m_value), 7), 0, &result);
-#endif
-		return result;
-	}
-
-	inline UINT8 get_g() const
-	{
-		UINT8 result;
-#ifdef __LITTLE_ENDIAN__
-		vec_ste(vec_splat(VECU8(m_value), 4), 0, &result);
-#else
-		vec_ste(vec_splat(VECU8(m_value), 11), 0, &result);
-#endif
-		return result;
-	}
-
-	inline UINT8 get_b() const
-	{
-		UINT8 result;
-#ifdef __LITTLE_ENDIAN__
-		vec_ste(vec_splat(VECU8(m_value), 0), 0, &result);
-#else
-		vec_ste(vec_splat(VECU8(m_value), 15), 0, &result);
-#endif
-		return result;
-	}
-
-	inline INT32 get_a32() const
-	{
-		INT32 result;
-#ifdef __LITTLE_ENDIAN__
-		vec_ste(vec_splat(m_value, 3), 0, &result);
-#else
-		vec_ste(vec_splat(m_value, 0), 0, &result);
-#endif
-		return result;
-	}
-
-	inline INT32 get_r32() const
-	{
-		INT32 result;
-#ifdef __LITTLE_ENDIAN__
-		vec_ste(vec_splat(m_value, 2), 0, &result);
-#else
-		vec_ste(vec_splat(m_value, 1), 0, &result);
-#endif
-		return result;
-	}
-
-	inline INT32 get_g32() const
-	{
-		INT32 result;
-#ifdef __LITTLE_ENDIAN__
-		vec_ste(vec_splat(m_value, 1), 0, &result);
-#else
-		vec_ste(vec_splat(m_value, 2), 0, &result);
-#endif
-		return result;
-	}
-
-	inline INT32 get_b32() const
-	{
-		INT32 result;
-#ifdef __LITTLE_ENDIAN__
-		vec_ste(vec_splat(m_value, 0), 0, &result);
-#else
-		vec_ste(vec_splat(m_value, 3), 0, &result);
-#endif
-		return result;
 	}
 
 	inline void mul(const rgbaint_t& color)
@@ -545,7 +545,7 @@ public:
 		m_value = VECS32(vec_cmplt(m_value, temp));
 	}
 
-	inline rgbaint_t operator=(const rgbaint_t& other)
+	inline rgbaint_t &operator=(const rgbaint_t& other)
 	{
 		m_value = other.m_value;
 		return *this;
@@ -607,7 +607,7 @@ public:
 		m_value = vec_perm(m_value, alpha.m_value, alpha_perm);
 	}
 
-	static UINT32 bilinear_filter(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v)
+	static UINT32 bilinear_filter(const UINT32 &rgb00, const UINT32 &rgb01, const UINT32 &rgb10, const UINT32 &rgb11, UINT8 u, UINT8 v)
 	{
 		const VECS32 zero = vec_splat_s32(0);
 
@@ -650,7 +650,7 @@ public:
 		return result;
 	}
 
-	inline void bilinear_filter_rgbaint(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v)
+	void bilinear_filter_rgbaint(const UINT32 &rgb00, const UINT32 &rgb01, const UINT32 &rgb10, const UINT32 &rgb11, UINT8 u, UINT8 v)
 	{
 		const VECS32 zero = vec_splat_s32(0);
 
@@ -688,13 +688,13 @@ public:
 	}
 
 protected:
-	VECS32                          m_value;
+	VECS32              m_value;
 
-	static const VECU8              alpha_perm;
-	static const VECU8              red_perm;
-	static const VECU8              green_perm;
-	static const VECU8              blue_perm;
-	static const VECS16             scale_table[256];
+	static const VECU8  alpha_perm;
+	static const VECU8  red_perm;
+	static const VECU8  green_perm;
+	static const VECU8  blue_perm;
+	static const VECS16 scale_table[256];
 };
 
 

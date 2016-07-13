@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_EMU_VALIDITY_H
+#define MAME_EMU_VALIDITY_H
 
-#ifndef __VALIDITY_H__
-#define __VALIDITY_H__
+#pragma once
 
 #include "emu.h"
 #include "drivenum.h"
@@ -28,10 +28,6 @@ class machine_config;
 // core validity checker class
 class validity_checker : public osd_output
 {
-	// internal map types
-	typedef std::unordered_map<std::string,const game_driver *> game_driver_map;
-	typedef std::unordered_map<std::string,FPTR> int_map;
-
 public:
 	validity_checker(emu_options &options);
 	~validity_checker();
@@ -63,6 +59,10 @@ protected:
 	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args) override;
 
 private:
+	// internal map types
+	typedef std::unordered_map<std::string,const game_driver *> game_driver_map;
+	typedef std::unordered_map<std::string,FPTR> int_map;
+
 	// internal helpers
 	const char *ioport_string_from_index(UINT32 index);
 	int get_defstr_index(const char *string, bool suppress_error = false);
@@ -75,6 +75,7 @@ private:
 	// internal sub-checks
 	void validate_core();
 	void validate_inlines();
+	void validate_rgb();
 	void validate_driver();
 	void validate_roms();
 	void validate_analog_input_field(ioport_field &field);
@@ -87,6 +88,12 @@ private:
 	void build_output_prefix(std::string &str);
 	void output_via_delegate(osd_output_channel channel, const char *format, ...) ATTR_PRINTF(3,4);
 	void output_indented_errors(std::string &text, const char *header);
+
+	// random number generation
+	INT32 random_i32();
+	UINT32 random_u32();
+	INT64 random_i64();
+	UINT64 random_u64();
 
 	// internal driver list
 	driver_enumerator       m_drivlist;
@@ -115,4 +122,4 @@ private:
 	bool                    m_validate_all;
 };
 
-#endif
+#endif // MAME_EMU_VALIDITY_H

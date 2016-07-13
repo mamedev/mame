@@ -60,7 +60,7 @@ public:
 		GOOD = 0,
 		FOUND_INVALID,
 		NOT_FOUND,
-		ERROR
+		UNVERIFIED = 100
 	};
 
 	// substatus values
@@ -74,7 +74,7 @@ public:
 		NOT_FOUND,
 		NOT_FOUND_NODUMP,
 		NOT_FOUND_OPTIONAL,
-		ERROR = 100
+		UNVERIFIED = 100
 	};
 
 	// summary values
