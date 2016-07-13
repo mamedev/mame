@@ -416,8 +416,8 @@ WRITE8_MEMBER(i8251_device::command_w)
 	        1 = transmit enable
 	*/
 
-	m_rts_handler(!BIT(data, 5));
-	m_dtr_handler(!BIT(data, 1));
+	m_rts_handler(BIT(data, 5));
+	m_dtr_handler(BIT(data, 1));
 
 	if (data & (1<<4))
 	{
