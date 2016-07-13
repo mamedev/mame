@@ -534,8 +534,8 @@ device_t *media_auditor::find_shared_device(device_t &device, const char *name, 
 
 media_auditor::audit_record::audit_record(const rom_entry &media, media_type type)
 	: m_type(type)
-	, m_status(audit_status::ERROR)
-	, m_substatus(audit_substatus::ERROR)
+	, m_status(audit_status::UNVERIFIED)
+	, m_substatus(audit_substatus::UNVERIFIED)
 	, m_name(ROM_GETNAME(&media))
 	, m_explength(rom_file_size(&media))
 	, m_length(0)
@@ -548,8 +548,8 @@ media_auditor::audit_record::audit_record(const rom_entry &media, media_type typ
 
 media_auditor::audit_record::audit_record(const char *name, media_type type)
 	: m_type(type)
-	, m_status(audit_status::ERROR)
-	, m_substatus(audit_substatus::ERROR)
+	, m_status(audit_status::UNVERIFIED)
+	, m_substatus(audit_substatus::UNVERIFIED)
 	, m_name(name)
 	, m_explength(0)
 	, m_length(0)
