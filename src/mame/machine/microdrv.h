@@ -61,7 +61,6 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *image_interface() const override { return "ql_cass"; }
 	virtual const char *file_extensions() const override { return "mdv"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// specific implementation
 	DECLARE_WRITE_LINE_MEMBER( clk_w );

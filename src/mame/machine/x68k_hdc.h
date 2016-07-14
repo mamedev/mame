@@ -92,9 +92,7 @@ public:
 	virtual bool is_creatable() const override { return 1; }
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *image_interface() const override { return nullptr; }
 	virtual const char *file_extensions() const override { return "hdf"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 	virtual bool call_create(int format_type, util::option_resolution *format_options) override;
 
 	DECLARE_WRITE16_MEMBER( hdc_w );

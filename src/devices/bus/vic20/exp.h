@@ -122,7 +122,6 @@ protected:
 	virtual bool is_reset_on_load() const override { return 1; }
 	virtual const char *image_interface() const override { return "vic1001_cart"; }
 	virtual const char *file_extensions() const override { return "20,40,60,70,a0,b0,crt"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software() override;

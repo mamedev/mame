@@ -162,7 +162,7 @@ public:
 	virtual bool is_reset_on_load() const = 0;
 	virtual const char *image_interface() const { return nullptr; }
 	virtual const char *file_extensions() const = 0;
-	virtual const option_guide *create_option_guide() const = 0;
+	virtual const option_guide *create_option_guide() const { return nullptr; }
 
 	const image_device_format *device_get_indexed_creatable_format(int index) const { if (index < m_formatlist.size()) return m_formatlist.at(index).get(); else return nullptr;  }
 	const image_device_format *device_get_named_creatable_format(const char *format_name);

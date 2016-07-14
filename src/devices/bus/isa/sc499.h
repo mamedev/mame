@@ -41,7 +41,6 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *image_interface() const override { return "sc499_cass"; }
 	virtual const char *file_extensions() const override { return "act,ct"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	UINT8 *read_block(int block_num);
 	void write_block(int block_num, UINT8 *ptr);
