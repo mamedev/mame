@@ -8,6 +8,15 @@
  *  Enhanced: R. Belmont, June 2007
  *  Angelo Salese, August 2010
  *
+ * Notes:
+ * - default NVRAM is plainly wrong. Use the status/configure commands to set up properly 
+ *   (Scroll Lock is currently mapped with Right SHIFT, use this to move to next page of status).
+ *   In order to load a floppy, you need at very least:
+ *   configure floppies 2
+ *   configure filesystem adfs
+ *   configure monitortype 12
+ *   Then reboot / reset the machine, and use cat to (attempt) to load a floppy contents.
+ *
  *  TODO:
  *  - Make floppies to work;
  *  - Attempting to load the GUI gives an exception;
@@ -67,7 +76,7 @@
 //#include "machine/aakart.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
-#include "formats/applix_dsk.h"
+#include "formats/ami_dsk.h"
 #include "softlist.h"
 
 class a310_state : public archimedes_state
@@ -327,7 +336,8 @@ static INPUT_PORTS_START( a310 )
 INPUT_PORTS_END
 
 FLOPPY_FORMATS_MEMBER( a310_state::floppy_formats )
-	FLOPPY_APPLIX_FORMAT
+	// TODO: same as amiga or not?
+	FLOPPY_ADF_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( a310_floppies )
@@ -335,7 +345,7 @@ static SLOT_INTERFACE_START( a310_floppies )
 SLOT_INTERFACE_END
 
 WRITE_LINE_MEMBER( archimedes_state::a310_kart_tx_w )
-{
+{	
 	if(state)
 		archimedes_request_irq_b(ARCHIMEDES_IRQB_KBD_RECV_FULL);
 	else
