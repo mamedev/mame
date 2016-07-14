@@ -196,22 +196,24 @@ static MACHINE_CONFIG_START( tim100, tim100_state )
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart_u17", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart_u17", i8251_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart_u17", i8251_device, write_cts))
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", tim100 )
 
 	MCFG_DEVICE_ADD("uart_u18", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
+
 	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, "terminal") //"keyboard")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart_u18", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart_u18", i8251_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart_u18", i8251_device, write_cts))
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", tim100 )
 
-//	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", tim100 )   // gives std::bad_cast
-//	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", tim100 )   // gives std::bad_cast
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(tim100_state, clock_w))
 MACHINE_CONFIG_END
