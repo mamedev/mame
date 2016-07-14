@@ -100,8 +100,6 @@ private:
 	void draw_text_box();
 
 public:
-	void *m_prev_selected;
-
 	// mouse handling
 	bool mouse_hit, mouse_button;
 	render_target *mouse_target;

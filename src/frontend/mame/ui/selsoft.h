@@ -44,8 +44,8 @@ private:
 	// draw left panel
 	virtual float draw_left_panel(float x1, float y1, float x2, float y2) override;
 
-	// draw right panel
-	virtual void draw_right_panel(void *selectedref, float origx1, float origy1, float origx2, float origy2) override;
+	// get selected software and/or driver
+	virtual void get_selection(ui_software_info const *&software, game_driver const *&driver) const override;
 
 	ui_software_info                  *m_searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
 	std::vector<ui_software_info *>   m_displaylist, m_tmp, m_sortedlist;
@@ -57,8 +57,7 @@ private:
 	void find_matches(const char *str, int count);
 	void load_sw_custom_filters();
 
-	void arts_render(void *selectedref, float x1, float y1, float x2, float y2);
-	void infos_render(void *selectedref, float x1, float y1, float x2, float y2);
+	virtual void infos_render(float x1, float y1, float x2, float y2) override;
 
 	// handlers
 	void inkey_select(const event *menu_event);

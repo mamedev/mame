@@ -56,8 +56,8 @@ private:
 	// draw left panel
 	virtual float draw_left_panel(float x1, float y1, float x2, float y2) override;
 
-	// draw right panel
-	virtual void draw_right_panel(void *selectedref, float origx1, float origy1, float origx2, float origy2) override;
+	// get selected software and/or driver
+	virtual void get_selection(ui_software_info const *&software, game_driver const *&driver) const override;
 
 	// internal methods
 	void build_custom();
@@ -71,11 +71,16 @@ private:
 	bool load_available_machines();
 	void load_custom_filters();
 
+	void *get_selection_ptr() const
+	{
+		void *const selected_ref(get_selection_ref());
+		return (FPTR(selected_ref) > skip_main_items) ? selected_ref : m_prev_selected;
+	}
+
 	// General info
 	void general_info(const game_driver *driver, std::string &buffer);
 
-	void arts_render(void *selectedref, float x1, float y1, float x2, float y2);
-	void infos_render(void *selectedref, float x1, float y1, float x2, float y2);
+	virtual void infos_render(float x1, float y1, float x2, float y2) override;
 
 	// handlers
 	void inkey_select(const event *menu_event);

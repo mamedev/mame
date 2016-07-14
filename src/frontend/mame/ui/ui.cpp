@@ -565,10 +565,10 @@ void mame_ui_manager::draw_text_full(render_container &container, const char *or
 
 	// append text to it
 	layout.add_text(
-		origs,
-		fgcolor,
-		draw == OPAQUE_ ? bgcolor : rgb_t::transparent,
-		text_size);
+			origs,
+			fgcolor,
+			draw == OPAQUE_ ? bgcolor : rgb_t::transparent,
+			text_size);
 
 	// and emit it (if we are asked to do so)
 	if (draw != NONE)

@@ -174,7 +174,7 @@ menu_select_game::~menu_select_game()
 
 void menu_select_game::handle()
 {
-	if (m_prev_selected == nullptr)
+	if (!m_prev_selected)
 		m_prev_selected = item[0].ref;
 
 	bool check_filter = false;
@@ -231,11 +231,19 @@ void menu_select_game::handle()
 		{
 			// handle IPT_CUSTOM (mouse right click)
 			if (!isfavorite())
-				menu::stack_push<menu_machine_configure>(ui(), container(), (const game_driver *)m_prev_selected, menu_event->mouse.x0, menu_event->mouse.y0);
+			{
+				menu::stack_push<menu_machine_configure>(
+						ui(), container(),
+						reinterpret_cast<const game_driver *>(m_prev_selected),
+						menu_event->mouse.x0, menu_event->mouse.y0);
+			}
 			else
 			{
-				ui_software_info *sw = (ui_software_info *)m_prev_selected;
-				menu::stack_push<menu_machine_configure>(ui(), container(), (const game_driver *)sw->driver, menu_event->mouse.x0, menu_event->mouse.y0);
+				ui_software_info *sw = reinterpret_cast<ui_software_info *>(m_prev_selected);
+				menu::stack_push<menu_machine_configure>(
+						ui(), container(),
+						(const game_driver *)sw->driver,
+						menu_event->mouse.x0, menu_event->mouse.y0);
 			}
 		}
 		else if (menu_event->iptkey == IPT_UI_LEFT)
@@ -746,7 +754,6 @@ void menu_select_game::build_available_list()
 
 void menu_select_game::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	const game_driver *driver = nullptr;
 	ui_software_info *swinfo = nullptr;
 	float width, maxwidth = origx2 - origx1;
 	std::string tempbuf[5];
@@ -828,16 +835,19 @@ void menu_select_game::custom_render(void *selectedref, float top, float bottom,
 	}
 
 	// determine the text to render below
+	const game_driver *driver = nullptr;
 	if (!isfavorite())
-		driver = ((FPTR)selectedref > skip_main_items) ? (const game_driver *)selectedref : ((m_prev_selected != nullptr) ? (const game_driver *)m_prev_selected : nullptr);
+	{
+		driver = (FPTR(selectedref) > skip_main_items) ? (const game_driver *)selectedref : reinterpret_cast<const game_driver *>(m_prev_selected);
+	}
 	else
 	{
-		swinfo = ((FPTR)selectedref > skip_main_items) ? (ui_software_info *)selectedref : ((m_prev_selected != nullptr) ? (ui_software_info *)m_prev_selected : nullptr);
+		swinfo = (FPTR(selectedref) > skip_main_items) ? (ui_software_info *)selectedref : reinterpret_cast<ui_software_info *>(m_prev_selected);
 		if (swinfo != nullptr && swinfo->startempty == 1)
 			driver = swinfo->driver;
 	}
 
-	if (driver != nullptr)
+	if (driver)
 	{
 		isstar = mame_machine_manager::instance()->favorite().isgame_favorite(driver);
 
@@ -885,7 +895,6 @@ void menu_select_game::custom_render(void *selectedref, float top, float bottom,
 		if ((driver->flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION)) != 0)
 			color = UI_RED_COLOR;
 	}
-
 	else if (swinfo != nullptr)
 	{
 		isstar = mame_machine_manager::instance()->favorite().isgame_favorite(*swinfo);
@@ -1021,10 +1030,10 @@ void menu_select_game::inkey_select(const event *menu_event)
 		menu::stack_push<menu_game_options>(ui(), container());
 
 	// special case for configure machine
-	else if ((FPTR)driver == CONF_MACHINE)
+	else if (FPTR(driver) == CONF_MACHINE)
 	{
-		if (m_prev_selected != nullptr)
-			menu::stack_push<menu_machine_configure>(ui(), container(), (const game_driver *)m_prev_selected);
+		if (m_prev_selected)
+			menu::stack_push<menu_machine_configure>(ui(), container(), reinterpret_cast<const game_driver *>(m_prev_selected));
 		return;
 	}
 
@@ -1086,22 +1095,24 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 	ui_software_info *ui_swinfo = (ui_software_info *)menu_event->itemref;
 	ui_options &mopt = ui().options();
 
-	// special case for configure options
 	if ((FPTR)ui_swinfo == CONF_OPTS)
+	{
+		// special case for configure options
 		menu::stack_push<menu_game_options>(ui(), container());
-	// special case for configure machine
+	}
 	else if ((FPTR)ui_swinfo == CONF_MACHINE)
 	{
-		if (m_prev_selected != nullptr)
+		// special case for configure machine
+		if (m_prev_selected)
 		{
-			ui_software_info *swinfo = (ui_software_info *)m_prev_selected;
+			ui_software_info *swinfo = reinterpret_cast<ui_software_info *>(m_prev_selected);
 			menu::stack_push<menu_machine_configure>(ui(), container(), (const game_driver *)swinfo->driver);
 		}
 		return;
 	}
-	// special case for configure plugins
 	else if ((FPTR)ui_swinfo == CONF_PLUGINS)
 	{
+		// special case for configure plugins
 		menu::stack_push<menu_plugins_configure>(ui(), container());
 	}
 	else if (ui_swinfo->startempty == 1)
@@ -1112,9 +1123,9 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 		media_auditor auditor(enumerator);
 		media_auditor::summary summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
 
-		// if everything looks good, schedule the new driver
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
+			// if everything looks good, schedule the new driver
 			s_bios biosname;
 			if (!mopt.skip_bios_menu() && has_multiple_bios(ui_swinfo->driver, biosname))
 				menu::stack_push<bios_selection>(ui(), container(), biosname, (void *)ui_swinfo->driver, false, false);
@@ -1129,10 +1140,9 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 				stack_reset();
 			}
 		}
-
-		// otherwise, display an error
 		else
 		{
+			// otherwise, display an error
 			reset(reset_options::REMEMBER_REF);
 			m_ui_error = true;
 		}
@@ -1269,7 +1279,7 @@ void menu_select_game::inkey_navigation()
 			else
 			{
 				set_focus(focused_menu::main);
-				if (m_prev_selected == nullptr)
+				if (!m_prev_selected)
 				{
 					selected = 0;
 					return;
@@ -1287,7 +1297,7 @@ void menu_select_game::inkey_navigation()
 
 		case focused_menu::rightbottom:
 			set_focus(focused_menu::main);
-			if (m_prev_selected == nullptr)
+			if (!m_prev_selected)
 			{
 				selected = 0;
 				return;
@@ -1954,7 +1964,7 @@ float menu_select_game::draw_left_panel(float x1, float y1, float x2, float y2)
 //  draw infos
 //-------------------------------------------------
 
-void menu_select_game::infos_render(void *selectedref, float origx1, float origy1, float origx2, float origy2)
+void menu_select_game::infos_render(float origx1, float origy1, float origx2, float origy2)
 {
 	float line_height = ui().get_line_height();
 	static std::string buffer;
@@ -1971,7 +1981,7 @@ void menu_select_game::infos_render(void *selectedref, float origx1, float origy
 
 	if (is_favorites)
 	{
-		soft = ((FPTR)selectedref > skip_main_items) ? (ui_software_info *)selectedref : ((m_prev_selected != nullptr) ? (ui_software_info *)m_prev_selected : nullptr);
+		soft = reinterpret_cast<ui_software_info *>(get_selection_ptr());
 		if (soft && soft->startempty == 1)
 		{
 			driver = soft->driver;
@@ -1982,7 +1992,7 @@ void menu_select_game::infos_render(void *selectedref, float origx1, float origy
 	}
 	else
 	{
-		driver = ((FPTR)selectedref > skip_main_items) ? (const game_driver *)selectedref : ((m_prev_selected != nullptr) ? (const game_driver *)m_prev_selected : nullptr);
+		driver = reinterpret_cast<const game_driver *>(get_selection_ptr());
 		oldsoft = nullptr;
 	}
 
@@ -2272,226 +2282,22 @@ void menu_select_game::infos_render(void *selectedref, float origx1, float origy
 	}
 }
 
+
 //-------------------------------------------------
-//  draw right panel
+//  get selected software and/or driver
 //-------------------------------------------------
 
-void menu_select_game::draw_right_panel(void *selectedref, float origx1, float origy1, float origx2, float origy2)
+void menu_select_game::get_selection(ui_software_info const *&software, game_driver const *&driver) const
 {
-	rgb_t fgcolor = UI_TEXT_COLOR;
-	bool hide = (ui_globals::panels_status == HIDE_RIGHT_PANEL || ui_globals::panels_status == HIDE_BOTH);
-	float x2 = (hide) ? origx2 : origx1 + 2.0f * UI_BOX_LR_BORDER;
-	float space = x2 - origx1;
-	float lr_arrow_width = 0.4f * space * machine().render().ui_aspect();
-
-	// set left-right arrows dimension
-	float ar_x0 = 0.5f * (x2 + origx1) - 0.5f * lr_arrow_width;
-	float ar_y0 = 0.5f * (origy2 + origy1) + 0.1f * space;
-	float ar_x1 = ar_x0 + lr_arrow_width;
-	float ar_y1 = 0.5f * (origy2 + origy1) + 0.9f * space;
-
-	ui().draw_outlined_box(container(), origx1, origy1, origx2, origy2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
-
-	if (mouse_hit && origx1 <= mouse_x && x2 > mouse_x && origy1 <= mouse_y && origy2 > mouse_y)
+	if (item[0].flags & FLAG_UI_FAVORITE) // TODO: work out why this doesn't use isfavorite()
 	{
-		fgcolor = UI_MOUSEOVER_COLOR;
-		hover = HOVER_RPANEL_ARROW;
-	}
-
-	if (hide)
-	{
-		draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90 ^ ORIENTATION_FLIP_X);
-		return;
-	}
-
-	draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90);
-	origx1 = x2;
-	origy1 = draw_right_box_title(origx1, origy1, origx2, origy2);
-
-	if (ui_globals::rpanel == RP_IMAGES)
-		arts_render(selectedref, origx1, origy1, origx2, origy2);
-	else
-		infos_render(selectedref, origx1, origy1, origx2, origy2);
-}
-
-//-------------------------------------------------
-//  perform our special rendering
-//-------------------------------------------------
-
-void menu_select_game::arts_render(void *selectedref, float origx1, float origy1, float origx2, float origy2)
-{
-	bool is_favorites = ((item[0].flags & FLAG_UI_FAVORITE) != 0);
-	static ui_software_info *oldsoft = nullptr;
-	static const game_driver *olddriver = nullptr;
-	const game_driver *driver = nullptr;
-	ui_software_info *soft = nullptr;
-
-	if (is_favorites)
-	{
-		soft = ((FPTR)selectedref > skip_main_items) ? (ui_software_info *)selectedref : ((m_prev_selected != nullptr) ? (ui_software_info *)m_prev_selected : nullptr);
-		if (soft && soft->startempty == 1)
-		{
-			driver = soft->driver;
-			oldsoft = nullptr;
-		}
-		else
-			olddriver = nullptr;
+		software = reinterpret_cast<ui_software_info const *>(get_selection_ptr());
+		driver = software ? software->driver : nullptr;
 	}
 	else
 	{
-		driver = ((FPTR)selectedref > skip_main_items) ? (const game_driver *)selectedref : ((m_prev_selected != nullptr) ? (const game_driver *)m_prev_selected : nullptr);
-		oldsoft = nullptr;
-	}
-
-	if (driver != nullptr)
-	{
-		if (ui_globals::default_image)
-			((driver->flags & MACHINE_TYPE_ARCADE) == 0) ? ui_globals::curimage_view = CABINETS_VIEW : ui_globals::curimage_view = SNAPSHOT_VIEW;
-
-		std::string searchstr;
-		searchstr = arts_render_common(origx1, origy1, origx2, origy2);
-
-		// loads the image if necessary
-		if (driver != olddriver || !snapx_valid() || ui_globals::switch_image)
-		{
-			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
-			snapfile.set_restrict_to_mediapath(true);
-			bitmap_argb32 *tmp_bitmap;
-			tmp_bitmap = auto_alloc(machine(), bitmap_argb32);
-
-			// try to load snapshot first from saved "0000.png" file
-			std::string fullname(driver->name);
-			render_load_png(*tmp_bitmap, snapfile, fullname.c_str(), "0000.png");
-
-			if (!tmp_bitmap->valid())
-				render_load_jpeg(*tmp_bitmap, snapfile, fullname.c_str(), "0000.jpg");
-
-			// if fail, attemp to load from standard file
-			if (!tmp_bitmap->valid())
-			{
-				fullname.assign(driver->name).append(".png");
-				render_load_png(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
-
-				if (!tmp_bitmap->valid())
-				{
-					fullname.assign(driver->name).append(".jpg");
-					render_load_jpeg(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
-				}
-			}
-
-			// if fail again, attemp to load from parent file
-			if (!tmp_bitmap->valid())
-			{
-				// set clone status
-				bool cloneof = strcmp(driver->parent, "0");
-				if (cloneof)
-				{
-					int cx = driver_list::find(driver->parent);
-					if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
-						cloneof = false;
-				}
-
-				if (cloneof)
-				{
-					fullname.assign(driver->parent).append(".png");
-					render_load_png(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
-
-					if (!tmp_bitmap->valid())
-					{
-						fullname.assign(driver->parent).append(".jpg");
-						render_load_jpeg(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
-					}
-				}
-			}
-
-			olddriver = driver;
-			ui_globals::switch_image = false;
-			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2);
-			auto_free(machine(), tmp_bitmap);
-		}
-
-		// if the image is available, loaded and valid, display it
-		draw_snapx(origx1, origy1, origx2, origy2);
-	}
-	else if (soft != nullptr)
-	{
-		std::string fullname, pathname;
-
-		if (ui_globals::default_image)
-			(soft->startempty == 0) ? ui_globals::curimage_view = SNAPSHOT_VIEW : ui_globals::curimage_view = CABINETS_VIEW;
-
-		// arts title and searchpath
-		std::string searchstr;
-		searchstr = arts_render_common(origx1, origy1, origx2, origy2);
-
-		// loads the image if necessary
-		if (soft != oldsoft || !snapx_valid() || ui_globals::switch_image)
-		{
-			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
-			bitmap_argb32 *tmp_bitmap;
-			tmp_bitmap = auto_alloc(machine(), bitmap_argb32);
-
-			if (soft->startempty == 1)
-			{
-				// Load driver snapshot
-				fullname.assign(soft->driver->name).append(".png");
-				render_load_png(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
-
-				if (!tmp_bitmap->valid())
-				{
-					fullname.assign(soft->driver->name).append(".jpg");
-					render_load_jpeg(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
-				}
-			}
-			else if (ui_globals::curimage_view == TITLES_VIEW)
-			{
-				// First attempt from name list
-				pathname.assign(soft->listname).append("_titles");
-				fullname.assign(soft->shortname).append(".png");
-				render_load_png(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-
-				if (!tmp_bitmap->valid())
-				{
-					fullname.assign(soft->shortname).append(".jpg");
-					render_load_jpeg(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-				}
-			}
-			else
-			{
-				// First attempt from name list
-				pathname = soft->listname;
-				fullname.assign(soft->shortname).append(".png");
-				render_load_png(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-
-				if (!tmp_bitmap->valid())
-				{
-					fullname.assign(soft->shortname).append(".jpg");
-					render_load_jpeg(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-				}
-
-				if (!tmp_bitmap->valid())
-				{
-					// Second attempt from driver name + part name
-					pathname.assign(soft->driver->name).append(soft->part);
-					fullname.assign(soft->shortname).append(".png");
-					render_load_png(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-
-					if (!tmp_bitmap->valid())
-					{
-						fullname.assign(soft->shortname).append(".jpg");
-						render_load_jpeg(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-					}
-				}
-			}
-
-			oldsoft = soft;
-			ui_globals::switch_image = false;
-			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2);
-			auto_free(machine(), tmp_bitmap);
-		}
-
-		// if the image is available, loaded and valid, display it
-		draw_snapx(origx1, origy1, origx2, origy2);
+		software = nullptr;
+		driver = reinterpret_cast<game_driver const *>(get_selection_ptr());
 	}
 }
 

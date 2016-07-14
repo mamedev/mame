@@ -21,6 +21,8 @@
 #include <vector>
 
 
+struct ui_software_info;
+
 namespace ui {
 class menu_select_launch : public menu
 {
@@ -48,6 +50,7 @@ protected:
 	float draw_right_box_title(float x1, float y1, float x2, float y2);
 
 	// images render
+	void arts_render(float origx1, float origy1, float origx2, float origy2);
 	std::string arts_render_common(float origx1, float origy1, float origx2, float origy2);
 	void arts_render_images(bitmap_argb32 *bitmap, float origx1, float origy1, float origx2, float origy2);
 
@@ -66,6 +69,7 @@ protected:
 	bool snapx_valid() const { return m_cache->snapx_bitmap().valid(); }
 
 	int     visible_items;
+	void    *m_prev_selected;
 	int     m_total_lines;
 	int     m_topline_datsview;   // right box top line
 	bool    m_ui_error;
@@ -114,8 +118,11 @@ private:
 	// draw left panel
 	virtual float draw_left_panel(float x1, float y1, float x2, float y2) = 0;
 
-	// draw right panel
-	virtual void draw_right_panel(void *selectedref, float origx1, float origy1, float origx2, float origy2) = 0;
+	// draw infos
+	virtual void infos_render(float x1, float y1, float x2, float y2) = 0;
+
+	// get selected software and/or driver
+	virtual void get_selection(ui_software_info const *&software, game_driver const *&driver) const = 0;
 
 	float draw_icon(int linenum, void *selectedref, float x1, float y1);
 
@@ -130,18 +137,24 @@ private:
 	// draw game list
 	virtual void draw(UINT32 flags) override;
 
+	// draw right panel
+	void draw_right_panel(float origx1, float origy1, float origx2, float origy2);
+
 	// cleanup function
 	static void exit(running_machine &machine);
 
-	cache_ptr       m_cache;
-	bool            m_is_swlist;
-	focused_menu    m_focus;
-	bool            m_pressed;          // mouse button held down
-	osd_ticks_t     m_repeat;
+	cache_ptr               m_cache;
+	bool                    m_is_swlist;
+	focused_menu            m_focus;
+	bool                    m_pressed;          // mouse button held down
+	osd_ticks_t             m_repeat;
 
-	render_texture      *m_icons_texture[MAX_ICONS_RENDER];
-	bitmap_ptr          m_icons_bitmap[MAX_ICONS_RENDER];
-	game_driver const   *m_old_icons[MAX_ICONS_RENDER];
+	game_driver const       *m_old_driver;      // driver/software for previously displayed artwork
+	ui_software_info const  *m_old_software;
+
+	render_texture          *m_icons_texture[MAX_ICONS_RENDER];
+	bitmap_ptr              m_icons_bitmap[MAX_ICONS_RENDER];
+	game_driver const       *m_old_icons[MAX_ICONS_RENDER];
 
 	static std::mutex       s_cache_guard;
 	static cache_ptr_map    s_caches;

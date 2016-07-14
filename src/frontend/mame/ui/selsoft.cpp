@@ -1551,14 +1551,14 @@ float menu_select_software::draw_left_panel(float x1, float y1, float x2, float 
 //  draw infos
 //-------------------------------------------------
 
-void menu_select_software::infos_render(void *selectedref, float origx1, float origy1, float origx2, float origy2)
+void menu_select_software::infos_render(float origx1, float origy1, float origx2, float origy2)
 {
 	float line_height = ui().get_line_height();
 	static std::string buffer;
 	std::vector<int> xstart;
 	std::vector<int> xend;
 	float text_size = ui().options().infos_size();
-	ui_software_info *soft = (selectedref != nullptr) ? (ui_software_info *)selectedref : ((m_prev_selected != nullptr) ? (ui_software_info *)m_prev_selected : nullptr);
+	ui_software_info *soft = (get_selection_ref() != nullptr) ? (ui_software_info *)get_selection_ref() : ((m_prev_selected != nullptr) ? (ui_software_info *)m_prev_selected : nullptr);
 	static ui_software_info *oldsoft = nullptr;
 	static int old_sw_view = -1;
 
@@ -1690,214 +1690,7 @@ void menu_select_software::infos_render(void *selectedref, float origx1, float o
 	right_visible_lines = r_visible_lines - (m_topline_datsview != 0) - (m_topline_datsview + r_visible_lines != m_total_lines);
 }
 
-//-------------------------------------------------
-//  perform our special rendering
-//-------------------------------------------------
 
-void menu_select_software::arts_render(void *selectedref, float origx1, float origy1, float origx2, float origy2)
-{
-	static ui_software_info *oldsoft = nullptr;
-	static const game_driver *olddriver = nullptr;
-	const game_driver *driver = nullptr;
-	ui_software_info *soft = (selectedref != nullptr) ? (ui_software_info *)selectedref : ((m_prev_selected != nullptr) ? (ui_software_info *)m_prev_selected : nullptr);
-
-	if (soft != nullptr && soft->startempty == 1)
-	{
-		driver = soft->driver;
-		oldsoft = nullptr;
-	}
-	else
-		olddriver = nullptr;
-
-	if (driver != nullptr)
-	{
-		if (ui_globals::default_image)
-			((driver->flags & MACHINE_TYPE_ARCADE) == 0) ? ui_globals::curimage_view = CABINETS_VIEW : ui_globals::curimage_view = SNAPSHOT_VIEW;
-
-		std::string searchstr;
-		searchstr = arts_render_common(origx1, origy1, origx2, origy2);
-
-		// loads the image if necessary
-		if (driver != olddriver || !snapx_valid() || ui_globals::switch_image)
-		{
-			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
-			snapfile.set_restrict_to_mediapath(true);
-			bitmap_argb32 *tmp_bitmap;
-			tmp_bitmap = auto_alloc(machine(), bitmap_argb32);
-
-			// try to load snapshot first from saved "0000.png" file
-			std::string fullname(driver->name);
-			render_load_png(*tmp_bitmap, snapfile, fullname.c_str(), "0000.png");
-
-			if (!tmp_bitmap->valid())
-				render_load_jpeg(*tmp_bitmap, snapfile, fullname.c_str(), "0000.jpg");
-
-			// if fail, attemp to load from standard file
-			if (!tmp_bitmap->valid())
-			{
-				fullname.assign(driver->name).append(".png");
-				render_load_png(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
-
-				if (!tmp_bitmap->valid())
-				{
-					fullname.assign(driver->name).append(".jpg");
-					render_load_jpeg(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
-				}
-			}
-
-			// if fail again, attemp to load from parent file
-			if (!tmp_bitmap->valid())
-			{
-				// set clone status
-				bool cloneof = strcmp(driver->parent, "0");
-				if (cloneof)
-				{
-					int cx = driver_list::find(driver->parent);
-					if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
-						cloneof = false;
-				}
-
-				if (cloneof)
-				{
-					fullname.assign(driver->parent).append(".png");
-					render_load_png(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
-
-					if (!tmp_bitmap->valid())
-					{
-						fullname.assign(driver->parent).append(".jpg");
-						render_load_jpeg(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
-					}
-				}
-			}
-
-			olddriver = driver;
-			ui_globals::switch_image = false;
-			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2);
-			auto_free(machine(), tmp_bitmap);
-		}
-
-		// if the image is available, loaded and valid, display it
-		draw_snapx(origx1, origy1, origx2, origy2);
-	}
-	else if (soft != nullptr)
-	{
-		std::string fullname, pathname;
-
-		if (ui_globals::default_image)
-			(soft->startempty == 0) ? ui_globals::curimage_view = SNAPSHOT_VIEW : ui_globals::curimage_view = CABINETS_VIEW;
-
-		// arts title and searchpath
-		std::string searchstr;
-		searchstr = arts_render_common(origx1, origy1, origx2, origy2);
-
-		// loads the image if necessary
-		if (soft != oldsoft || !snapx_valid() || ui_globals::switch_image)
-		{
-			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
-			bitmap_argb32 *tmp_bitmap;
-			tmp_bitmap = auto_alloc(machine(), bitmap_argb32);
-
-			if (soft->startempty == 1)
-			{
-				// Load driver snapshot
-				fullname.assign(soft->driver->name).append(".png");
-				render_load_png(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
-
-				if (!tmp_bitmap->valid())
-				{
-					fullname.assign(soft->driver->name).append(".jpg");
-					render_load_jpeg(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
-				}
-			}
-			else if (ui_globals::curimage_view == TITLES_VIEW)
-			{
-				// First attempt from name list
-				pathname.assign(soft->listname).append("_titles");
-				fullname.assign(soft->shortname).append(".png");
-				render_load_png(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-
-				if (!tmp_bitmap->valid())
-				{
-					fullname.assign(soft->shortname).append(".jpg");
-					render_load_jpeg(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-				}
-			}
-			else
-			{
-				// First attempt from name list
-				pathname = soft->listname;
-				fullname.assign(soft->shortname).append(".png");
-				render_load_png(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-
-				if (!tmp_bitmap->valid())
-				{
-					fullname.assign(soft->shortname).append(".jpg");
-					render_load_jpeg(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-				}
-
-				if (!tmp_bitmap->valid())
-				{
-					// Second attempt from driver name + part name
-					pathname.assign(soft->driver->name).append(soft->part);
-					fullname.assign(soft->shortname).append(".png");
-					render_load_png(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-
-					if (!tmp_bitmap->valid())
-					{
-						fullname.assign(soft->shortname).append(".jpg");
-						render_load_jpeg(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-					}
-				}
-			}
-
-			oldsoft = soft;
-			ui_globals::switch_image = false;
-			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2);
-			auto_free(machine(), tmp_bitmap);
-		}
-
-		// if the image is available, loaded and valid, display it
-		draw_snapx(origx1, origy1, origx2, origy2);
-	}
-}
-
-void menu_select_software::draw_right_panel(void *selectedref, float origx1, float origy1, float origx2, float origy2)
-{
-	rgb_t fgcolor = UI_TEXT_COLOR;
-	bool hide = (ui_globals::panels_status == HIDE_RIGHT_PANEL || ui_globals::panels_status == HIDE_BOTH);
-	float x2 = (hide) ? origx2 : origx1 + 2.0f * UI_BOX_LR_BORDER;
-	float space = x2 - origx1;
-	float lr_arrow_width = 0.4f * space * machine().render().ui_aspect();
-
-	// set left-right arrows dimension
-	float ar_x0 = 0.5f * (x2 + origx1) - 0.5f * lr_arrow_width;
-	float ar_y0 = 0.5f * (origy2 + origy1) + 0.1f * space;
-	float ar_x1 = ar_x0 + lr_arrow_width;
-	float ar_y1 = 0.5f * (origy2 + origy1) + 0.9f * space;
-
-	ui().draw_outlined_box(container(), origx1, origy1, origx2, origy2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
-
-	if (mouse_hit && origx1 <= mouse_x && x2 > mouse_x && origy1 <= mouse_y && origy2 > mouse_y)
-	{
-		fgcolor = UI_MOUSEOVER_COLOR;
-		hover = HOVER_RPANEL_ARROW;
-	}
-
-	if (hide)
-	{
-		draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90 ^ ORIENTATION_FLIP_X);
-		return;
-	}
-
-	draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90);
-	origx1 = x2;
-	origy1 = draw_right_box_title(origx1, origy1, origx2, origy2);
-
-	if (ui_globals::rpanel == RP_IMAGES)
-		arts_render(selectedref, origx1, origy1, origx2, origy2);
-	else
-		infos_render(selectedref, origx1, origy1, origx2, origy2);
-}
 
 //-------------------------------------------------
 //  ctor
@@ -2134,6 +1927,17 @@ void bios_selection::custom_render(void *selectedref, float top, float bottom, f
 	// draw the text within it
 	ui().draw_text_full(container(), _("Bios selection:"), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 									mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+}
+
+
+//-------------------------------------------------
+//  get selected software and/or driver
+//-------------------------------------------------
+
+void menu_select_software::get_selection(ui_software_info const *&software, game_driver const *&driver) const
+{
+	software = reinterpret_cast<ui_software_info const *>(get_selection_ref());
+	driver = software ? software->driver : nullptr;
 }
 
 } // namespace ui

@@ -145,6 +145,7 @@ menu_select_launch::~menu_select_launch()
 
 menu_select_launch::menu_select_launch(mame_ui_manager &mui, render_container &container, bool is_swlist)
 	: menu(mui, container)
+	, m_prev_selected(nullptr)
 	, m_total_lines(0)
 	, m_topline_datsview(0)
 	, m_ui_error(false)
@@ -153,6 +154,8 @@ menu_select_launch::menu_select_launch(mame_ui_manager &mui, render_container &c
 	, m_focus(focused_menu::main)
 	, m_pressed(false)
 	, m_repeat(0)
+	, m_old_driver(nullptr)
+	, m_old_software(nullptr)
 {
 	// set up persistent cache for machine run
 	{
@@ -259,35 +262,199 @@ float menu_select_launch::draw_right_box_title(float x1, float y1, float x2, flo
 
 
 //-------------------------------------------------
+//  perform our special rendering
+//-------------------------------------------------
+
+void menu_select_launch::arts_render(float origx1, float origy1, float origx2, float origy2)
+{
+	ui_software_info const *software;
+	game_driver const *driver;
+	get_selection(software, driver);
+
+	if (software && ((software->startempty != 1) || !driver))
+	{
+		m_old_driver = nullptr;
+
+		if (ui_globals::default_image)
+			(software->startempty == 0) ? ui_globals::curimage_view = SNAPSHOT_VIEW : ui_globals::curimage_view = CABINETS_VIEW;
+
+		// arts title and searchpath
+		std::string const searchstr = arts_render_common(origx1, origy1, origx2, origy2);
+
+		// loads the image if necessary
+		if ((software != m_old_software) || !snapx_valid() || ui_globals::switch_image)
+		{
+			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
+			bitmap_argb32 *tmp_bitmap;
+			tmp_bitmap = auto_alloc(machine(), bitmap_argb32);
+
+			if (software->startempty == 1)
+			{
+				// Load driver snapshot
+				std::string fullname = std::string(software->driver->name) + ".png";
+				render_load_png(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
+
+				if (!tmp_bitmap->valid())
+				{
+					fullname.assign(software->driver->name).append(".jpg");
+					render_load_jpeg(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
+				}
+			}
+			else if (ui_globals::curimage_view == TITLES_VIEW)
+			{
+				// First attempt from name list
+				std::string const pathname = software->listname + "_titles";
+				std::string fullname = software->shortname + ".png";
+				render_load_png(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+
+				if (!tmp_bitmap->valid())
+				{
+					fullname.assign(software->shortname).append(".jpg");
+					render_load_jpeg(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+				}
+			}
+			else
+			{
+				// First attempt from name list
+				std::string pathname = software->listname;
+				std::string fullname = software->shortname + ".png";
+				render_load_png(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+
+				if (!tmp_bitmap->valid())
+				{
+					fullname.assign(software->shortname).append(".jpg");
+					render_load_jpeg(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+				}
+
+				if (!tmp_bitmap->valid())
+				{
+					// Second attempt from driver name + part name
+					pathname.assign(software->driver->name).append(software->part);
+					fullname.assign(software->shortname).append(".png");
+					render_load_png(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+
+					if (!tmp_bitmap->valid())
+					{
+						fullname.assign(software->shortname).append(".jpg");
+						render_load_jpeg(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+					}
+				}
+			}
+
+			m_old_software = software;
+			ui_globals::switch_image = false;
+			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2);
+			auto_free(machine(), tmp_bitmap);
+		}
+
+		// if the image is available, loaded and valid, display it
+		draw_snapx(origx1, origy1, origx2, origy2);
+	}
+	else if (driver)
+	{
+		m_old_software = nullptr;
+
+		if (ui_globals::default_image)
+			((driver->flags & MACHINE_TYPE_ARCADE) == 0) ? ui_globals::curimage_view = CABINETS_VIEW : ui_globals::curimage_view = SNAPSHOT_VIEW;
+
+		std::string const searchstr = arts_render_common(origx1, origy1, origx2, origy2);
+
+		// loads the image if necessary
+		if ((driver != m_old_driver) || !snapx_valid() || ui_globals::switch_image)
+		{
+			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
+			snapfile.set_restrict_to_mediapath(true);
+			bitmap_argb32 *tmp_bitmap;
+			tmp_bitmap = auto_alloc(machine(), bitmap_argb32);
+
+			// try to load snapshot first from saved "0000.png" file
+			std::string fullname(driver->name);
+			render_load_png(*tmp_bitmap, snapfile, fullname.c_str(), "0000.png");
+
+			if (!tmp_bitmap->valid())
+				render_load_jpeg(*tmp_bitmap, snapfile, fullname.c_str(), "0000.jpg");
+
+			// if fail, attemp to load from standard file
+			if (!tmp_bitmap->valid())
+			{
+				fullname.assign(driver->name).append(".png");
+				render_load_png(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
+
+				if (!tmp_bitmap->valid())
+				{
+					fullname.assign(driver->name).append(".jpg");
+					render_load_jpeg(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
+				}
+			}
+
+			// if fail again, attemp to load from parent file
+			if (!tmp_bitmap->valid())
+			{
+				// set clone status
+				bool cloneof = strcmp(driver->parent, "0");
+				if (cloneof)
+				{
+					int cx = driver_list::find(driver->parent);
+					if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
+						cloneof = false;
+				}
+
+				if (cloneof)
+				{
+					fullname.assign(driver->parent).append(".png");
+					render_load_png(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
+
+					if (!tmp_bitmap->valid())
+					{
+						fullname.assign(driver->parent).append(".jpg");
+						render_load_jpeg(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
+					}
+				}
+			}
+
+			m_old_driver = driver;
+			ui_globals::switch_image = false;
+			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2);
+			auto_free(machine(), tmp_bitmap);
+		}
+
+		// if the image is available, loaded and valid, display it
+		draw_snapx(origx1, origy1, origx2, origy2);
+	}
+}
+
+
+//-------------------------------------------------
 //  common function for images render
 //-------------------------------------------------
 
 std::string menu_select_launch::arts_render_common(float origx1, float origy1, float origx2, float origy2)
 {
-	auto line_height = ui().get_line_height();
-	std::string snaptext, searchstr;
-	auto title_size = 0.0f;
-	auto txt_lenght = 0.0f;
-	auto gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
+	float const line_height = ui().get_line_height();
+	float const gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
 
+	std::string snaptext, searchstr;
 	get_title_search(snaptext, searchstr);
 
 	// apply title to right panel
+	float title_size = 0.0f;
 	for (int x = FIRST_VIEW; x < LAST_VIEW; x++)
 	{
-		ui().draw_text_full(container(), _(arts_info[x].first), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER,
-				ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &txt_lenght, nullptr);
-		txt_lenght += 0.01f;
-		title_size = MAX(txt_lenght, title_size);
+		float text_length;
+		ui().draw_text_full(container(),
+				_(arts_info[x].first), origx1, origy1, origx2 - origx1,
+				ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white, rgb_t::black,
+				&text_length, nullptr);
+		title_size = (std::max)(text_length + 0.01f, title_size);
 	}
 
-	rgb_t fgcolor = (m_focus == focused_menu::rightbottom) ? rgb_t(0xff, 0xff, 0x00) : UI_TEXT_COLOR;
-	rgb_t bgcolor = (m_focus == focused_menu::rightbottom) ? rgb_t(0xff, 0xff, 0xff) : UI_TEXT_BG_COLOR;
-	float middle = origx2 - origx1;
+	rgb_t const fgcolor = (m_focus == focused_menu::rightbottom) ? rgb_t(0xff, 0xff, 0x00) : UI_TEXT_COLOR;
+	rgb_t const bgcolor = (m_focus == focused_menu::rightbottom) ? rgb_t(0xff, 0xff, 0xff) : UI_TEXT_BG_COLOR;
+	float const middle = origx2 - origx1;
 
 	// check size
-	float sc = title_size + 2.0f * gutter_width;
-	float tmp_size = (sc > middle) ? ((middle - 2.0f * gutter_width) / sc) : 1.0f;
+	float const sc = title_size + 2.0f * gutter_width;
+	float const tmp_size = (sc > middle) ? ((middle - 2.0f * gutter_width) / sc) : 1.0f;
 	title_size *= tmp_size;
 
 	if (bgcolor != UI_TEXT_BG_COLOR)
@@ -296,8 +463,10 @@ std::string menu_select_launch::arts_render_common(float origx1, float origy1, f
 				origy1 + line_height, bgcolor, rgb_t(43, 43, 43), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 	}
 
-	ui().draw_text_full(container(), snaptext.c_str(), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-			mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, tmp_size);
+	ui().draw_text_full(container(),
+			snaptext.c_str(), origx1, origy1, origx2 - origx1,
+			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor,
+			nullptr, nullptr, tmp_size);
 
 	draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::curimage_view, FIRST_VIEW, LAST_VIEW, title_size);
 
@@ -1219,7 +1388,7 @@ void menu_select_launch::draw(UINT32 flags)
 	float effective_width = visible_width - 2.0f * gutter_width;
 	float effective_left = visible_left + gutter_width;
 
-	if (m_prev_selected != nullptr && m_focus == focused_menu::main && selected < visible_items)
+	if ((m_focus == focused_menu::main) && (selected < visible_items))
 		m_prev_selected = nullptr;
 
 	int const n_loop = (std::min)(m_visible_lines, visible_items);
@@ -1364,7 +1533,7 @@ void menu_select_launch::draw(UINT32 flags)
 	x1 = x2;
 	x2 += right_panel_size;
 
-	draw_right_panel(get_selection_ref(), x1, y1, x2, y2);
+	draw_right_panel(x1, y1, x2, y2);
 
 	x1 = primary_left - UI_BOX_LR_BORDER;
 	x2 = primary_left + primary_width + UI_BOX_LR_BORDER;
@@ -1387,6 +1556,48 @@ void menu_select_launch::draw(UINT32 flags)
 		if (alpha >= 0)
 			container().add_rect(0.0f, 0.0f, 1.0f, 1.0f, rgb_t(alpha, 0x00, 0x00, 0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	}
+}
+
+
+//-------------------------------------------------
+//  draw right panel
+//-------------------------------------------------
+
+void menu_select_launch::draw_right_panel(float origx1, float origy1, float origx2, float origy2)
+{
+	bool const hide((ui_globals::panels_status == HIDE_RIGHT_PANEL) || (ui_globals::panels_status == HIDE_BOTH));
+	float const x2(hide ? origx2 : (origx1 + 2.0f * UI_BOX_LR_BORDER));
+	float const space(x2 - origx1);
+	float const lr_arrow_width(0.4f * space * machine().render().ui_aspect());
+
+	// set left-right arrows dimension
+	float const ar_x0(0.5f * (x2 + origx1) - 0.5f * lr_arrow_width);
+	float const ar_y0(0.5f * (origy2 + origy1) + 0.1f * space);
+	float const ar_x1(ar_x0 + lr_arrow_width);
+	float const ar_y1(0.5f * (origy2 + origy1) + 0.9f * space);
+
+	ui().draw_outlined_box(container(), origx1, origy1, origx2, origy2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
+
+	rgb_t fgcolor(UI_TEXT_COLOR);
+	if (mouse_hit && origx1 <= mouse_x && x2 > mouse_x && origy1 <= mouse_y && origy2 > mouse_y)
+	{
+		fgcolor = UI_MOUSEOVER_COLOR;
+		hover = HOVER_RPANEL_ARROW;
+	}
+
+	if (hide)
+	{
+		draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90 ^ ORIENTATION_FLIP_X);
+		return;
+	}
+
+	draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90);
+	origy1 = draw_right_box_title(x2, origy1, origx2, origy2);
+
+	if (ui_globals::rpanel == RP_IMAGES)
+		arts_render(x2, origy1, origx2, origy2);
+	else
+		infos_render(x2, origy1, origx2, origy2);
 }
 
 
