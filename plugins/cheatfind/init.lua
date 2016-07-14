@@ -581,21 +581,21 @@ function cheatfind.startplugin()
 								if wid == "h" then
 									wid = "u16"
 									form = "%08x %04x"
-									xmlcheat = "pw"
+									xmlcheat = "w"
 								elseif wid == "l" then
 									wid = "u32"
 									form = "%08x %08x"
-									xmlcheat = "pd"
+									xmlcheat = "d"
 								elseif wid == "j" then
 									wid = "u64"
 									form = "%08x %016x"
-									xmlcheat = "pq"
+									xmlcheat = "q"
 								else
 									wid = "u8"
 									form = "%08x %02x"
-									xmlcheat = "pb"
+									xmlcheat = "b"
 								end
-								xmlcheat = string.format("<mamecheat version=1>\n<cheat desc=\"%s\">\n<script state=\"run\">\n<action>%s.%s@%X=%X</action>\n</script>\n</cheat>\n</mamecheat>", cheat.desc, dev.tag:sub(2), xmlcheat, match.addr, match.newval)
+
 
 								if dev.space.shortname then
 									cheat.ram = { ram = dev.tag }
@@ -611,15 +611,30 @@ function cheatfind.startplugin()
 										_G.ce.inject(cheat)
 									end
 								elseif match.mode == 2 then
-									local filename = string.format("%s/%s_%08X_cheat", manager:machine():options().entries.cheatpath:value():match("([^;]+)"), emu.romname(), match.addr)
+									-- lfs.env_replace is defined in boot.lua
+									local setname = emu.romname()
+									if emu.softname() ~= "" then
+										for name, image in pairs(manager:machine().images) do
+											if image:exists() and image:software_list_name() ~= "" then
+												setname = image:software_list_name() .. "/" .. emu.softname()
+											end
+										end
+									end
+									local cheatpath = lfs.env_replace(manager:machine():options().entries.cheatpath:value()):match("([^;]+)")
+									local filename = string.format("%s/%s_%08X_cheat", cheatpath, setname, match.addr)
 									local json = require("json")
 									local file = io.open(filename .. ".json", "w")
 									if file then
 										file:write(json.stringify({[1] = cheat}, {indent = true}))
 										file:close()
-										file = io.open(filename .. ".xml", "w")
-										file:write(xmlcheat)
-										file:close()
+										if not dev.space.shortname then -- no xml or simple for ram_device cheat
+											file = io.open(filename .. ".xml", "w")
+											file:write(string.format("<mamecheat version=1>\n<cheat desc=\"%s\">\n<script state=\"run\">\n<action>%s.pp%s@%X=%X</action>\n</script>\n</cheat>\n</mamecheat>", cheat.desc, dev.tag:sub(2), xmlcheat, match.addr, match.newval))
+											file:close()
+											file = io.open(cheatpath .. "/cheat.simple", "a")
+											file:write(string.format("%s,%s,%X,%s,%X,%s\n", setname, dev.tag, match.addr, xmlcheat, match.newval, cheat.desc))
+											file:close()
+										end
 										manager:machine():popmessage("Cheat written to " .. filename)
 									else
 										manager:machine():popmessage("Unable to write file\nCheck cheatpath dir exists")

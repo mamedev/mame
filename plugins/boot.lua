@@ -2,7 +2,8 @@
 -- copyright-holders:Miodrag Milanovic
 require('lfs')
 
-local function env_replace(str)
+-- add helper to lfs for plugins to use
+function lfs.env_replace(str)
 	local pathsep = package.config:sub(1,1)
 	local function dorep(val)
 		ret = os.getenv(val)
@@ -19,7 +20,7 @@ local function env_replace(str)
 	end
 	return str
 end
-local dir = env_replace(manager:options().entries.pluginspath:value())
+local dir = lfs.env_replace(manager:options().entries.pluginspath:value())
 
 package.path = package.path .. ";" .. dir .. "/?.lua;" .. dir .. "/?/init.lua"
 
