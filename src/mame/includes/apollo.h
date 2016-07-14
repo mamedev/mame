@@ -365,7 +365,6 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *image_interface() const override { return nullptr; }
 	virtual const char *file_extensions() const override { return "ani,bin"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	DECLARE_WRITE16_MEMBER(write);
 	DECLARE_READ16_MEMBER(read);

@@ -70,7 +70,6 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *image_interface() const override { return m_interface; }
 	virtual const char *file_extensions() const override { return m_extension_list; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// specific implementation
 	cassette_state get_state() { return m_state; }

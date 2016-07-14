@@ -55,7 +55,6 @@ public:
 	virtual bool must_be_loaded() const override { return false; }
 	virtual bool is_reset_on_load() const override { return false; }
 	virtual const char *file_extensions() const override;
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 		// Tape position, 1 unit = 1 inch / (968 * 1024)
 		typedef INT32 tape_pos_t;

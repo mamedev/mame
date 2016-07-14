@@ -121,8 +121,7 @@ protected:
 	bool is_reset_on_load() const override       { return false; }
 	const char *image_interface() const override { return "ti99_cart"; }
 	const char *file_extensions() const override { return "rpk"; }
-	const option_guide *create_option_guide() const override { return nullptr; }
-
+	
 private:
 	bool    m_readrom;
 	bool    m_softlist;

@@ -26,7 +26,6 @@ public:
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *file_extensions() const override { return "mc"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	virtual bool call_load() override;
 	virtual bool call_create(int format_type, util::option_resolution *format_options) override;

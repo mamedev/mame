@@ -37,7 +37,6 @@ public:
 	virtual bool is_reset_on_load() const override { return 1; }
 	virtual const char *image_interface() const override { return "cpc_rom"; }
 	virtual const char *file_extensions() const override { return "rom,bin"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	UINT8* base() { return m_base.get(); }
 

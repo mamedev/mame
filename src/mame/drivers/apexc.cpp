@@ -86,7 +86,6 @@ public:
 	virtual bool is_reset_on_load() const override { return 1; }
 	virtual const char *image_interface() const override { return nullptr; }
 	virtual const char *file_extensions() const override { return "apc"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	virtual bool call_load() override;
 	virtual void call_unload() override;
@@ -215,7 +214,6 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *image_interface() const override { return nullptr; }
 	virtual const char *file_extensions() const override { return "tap"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 protected:
 	// device-level overrides
 	virtual void device_config_complete() override { update_names(); }
@@ -249,7 +247,6 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *image_interface() const override { return nullptr; }
 	virtual const char *file_extensions() const override { return "tap"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 protected:
 	// device-level overrides
 	virtual void device_config_complete() override { update_names(); }

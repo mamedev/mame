@@ -38,8 +38,7 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *image_interface() const override { return nullptr; }
 	virtual const char *file_extensions() const override { return "vhd"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
-
+	
 	// specific implementation
 	DECLARE_READ8_MEMBER(read) { return read(offset); }
 	DECLARE_WRITE8_MEMBER(write) { write(offset, data); }

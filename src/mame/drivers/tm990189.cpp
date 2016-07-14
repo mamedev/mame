@@ -441,7 +441,6 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *image_interface() const override { return nullptr; }
 	virtual const char *file_extensions() const override { return ""; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
