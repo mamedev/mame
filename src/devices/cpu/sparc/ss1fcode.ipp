@@ -20,7 +20,7 @@ void mb86901_device::log_fcodes()
 			opcode >>= 16;
 		}
 
-		if (opcode == 0x4627)
+		if (false)//opcode == 0x6304)
 		{
 			m_log_fcodes = true;
 			//machine().debugger().debug_break();
@@ -29,10 +29,10 @@ void mb86901_device::log_fcodes()
 		{
 			return;
 		}
-		else if (opcode == 0x0cb8)
-		{
-			m_log_fcodes = false;
-		}
+		//else if (opcode == 0x0cb8)
+		//{
+		//	m_log_fcodes = false;
+		//}
 		UINT32 handler_base = opcode << 2;
 		handler_base += REG(2); // l1 = r2 + opcode << 2
 

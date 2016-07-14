@@ -2735,8 +2735,10 @@ void mb86901_device::execute_trap()
 		PSR |= PSR_S_MASK;
 
 		int cwp = PSR & PSR_CWP_MASK;
+		int new_cwp = ((cwp + NWINDOWS) - 1) % NWINDOWS;
+
 		PSR &= ~PSR_CWP_MASK;
-		PSR |= ((cwp + NWINDOWS) - 1) % NWINDOWS;
+		PSR |= new_cwp;
 
 		update_gpr_pointers();
 
@@ -2863,6 +2865,7 @@ void mb86901_device::dispatch_instruction(UINT32 op)
 
 	if (illegal_IU_instr)
 	{
+		printf("illegal instruction at %08x\n", PC);
 		m_trap = 1;
 		m_illegal_instruction = 1;
 	}
@@ -2958,7 +2961,7 @@ void mb86901_device::execute_step()
 		m_reset_mode = 1;
 		return;
 	}
-	else if ((PSR & PSR_ET_MASK) && (m_bp_irl == 15 || m_bp_irl > ((PSR >> PSR_PIL_SHIFT) & PSR_PIL_MASK)))
+	else if ((PSR & PSR_ET_MASK) && (m_bp_irl == 15 || m_bp_irl > ((PSR & PSR_PIL_MASK) >> PSR_PIL_SHIFT)))
 	{
 		m_trap = 1;
 		m_interrupt_level = m_bp_irl;
