@@ -349,6 +349,18 @@ static INPUT_PORTS_START( dealer )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( beastf )
+	PORT_INCLUDE(dealer)
+	
+	PORT_MODIFY("INPUTS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+INPUT_PORTS_END
 
 /*************************************
  *
@@ -597,6 +609,17 @@ ROM_START( revenger )
 	ROM_LOAD( "82s123.u66",     0x0000, 0x0020, NO_DUMP )   /* missing */
 ROM_END
 
+ROM_START( beastf )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "bf-b09084.u1",    0x0000, 0x2000, CRC(820d4019) SHA1(e953aaeeb626776dd86c521066b553d054ae4422) )
+	ROM_LOAD( "bf-b09084.u2",    0x2000, 0x2000, CRC(967405d8) SHA1(dd763be909e6966521b01ee878df9cef865c3b30) )
+	ROM_LOAD( "bf-b09084.u3",    0x4000, 0x2000, CRC(3edb5381) SHA1(14c236045e6df7a475c32222652860689d4f68ce) )
+	ROM_LOAD( "bf-b09084.u4",    0x6000, 0x2000, CRC(c8cd9640) SHA1(72da881b903ead873cc3f4df27646d1ffdd63c1c) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.u66",     0x0000, 0x0020, CRC(f4f6ddc5) BAD_DUMP SHA1(cab915acbefb5f451f538dd538bf9b3dd14bb1f5) )
+ROM_END
+
 DRIVER_INIT_MEMBER(epos_state,dealer)
 {
 	UINT8 *rom = memregion("maincpu")->base();
@@ -653,3 +676,4 @@ GAME( 1983, theglob3, suprglob, epos,   suprglob, driver_device, 0,       ROT270
 GAME( 1984, igmo,     0,        epos,   igmo, driver_device,     0,       ROT270, "Epos Corporation", "IGMO", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, dealer,   0,        dealer, dealer, epos_state,   dealer,   ROT270, "Epos Corporation", "The Dealer", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, revenger, 0,        dealer, dealer, epos_state,   dealer,   ROT270, "Epos Corporation", "Revenger", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, beastf,   0,        dealer, beastf, epos_state,   dealer,   ROT270, "Epos Corporation", "Beaste Feastie", MACHINE_SUPPORTS_SAVE )

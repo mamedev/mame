@@ -11801,6 +11801,7 @@ suprglob                        // (c) 1983
 theglob                         // (c) 1983
 theglob2                        // (c) 1983
 theglob3                        // (c) 1983
+beastf                          // (c) 1984
 
 @source:eprom.cpp
 eprom                           // 136069           (c) 1989
@@ -29083,7 +29084,7 @@ abscam                          // hack
 acitya                          // (c) 1983 Epos Corporation
 alibaba                         // (c) 1982 Sega
 alibabab                        // Mustafa" and 40 Thieves (Ali Baba bootleg)
-beastf                          // (c) 1984 Epos Corporation
+beastfp                         // (c) 1984 Epos Corporation
 bigbucks                        // (c) 1986 Dynasoft Inc.
 birdiy                          // (c) 1983 Mama Top
 bucaner                         // hack
