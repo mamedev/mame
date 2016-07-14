@@ -25,6 +25,9 @@ class debugger_commands
 public:
 	debugger_commands(running_machine& machine, debugger_cpu& cpu, debugger_console& console);
 
+	/* validates a parameter as a boolean value */
+	bool validate_boolean_parameter(const char *param, bool *result);
+
 	/* validates a parameter as a numeric value */
 	bool validate_number_parameter(const char *param, UINT64 *result);
 

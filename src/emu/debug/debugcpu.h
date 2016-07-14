@@ -263,7 +263,7 @@ public:
 	void track_mem_data_clear() { m_track_mem_set.clear(); }
 
 	// tracing
-	void trace(FILE *file, bool trace_over, const char *action);
+	void trace(FILE *file, bool trace_over, bool detect_loops, const char *action);
 	void trace_printf(const char *fmt, ...) ATTR_PRINTF(2,3);
 	void trace_flush() { if (m_trace != nullptr) m_trace->flush(); }
 
@@ -336,7 +336,7 @@ private:
 	class tracer
 	{
 	public:
-		tracer(device_debug &debug, FILE &file, bool trace_over, const char *action);
+		tracer(device_debug &debug, FILE &file, bool trace_over, bool detect_loops, const char *action);
 		~tracer();
 
 		void update(offs_t pc);
@@ -350,6 +350,7 @@ private:
 		FILE &              m_file;                     // tracing file for this CPU
 		std::string         m_action;                   // action to perform during a trace
 		offs_t              m_history[TRACE_LOOPS];     // history of recent PCs
+		bool				m_detect_loops;				// whether or not we should detect loops
 		int                 m_loops;                    // number of instructions in a loop
 		int                 m_nextdex;                  // next index
 		bool                m_trace_over;               // true if we're tracing over

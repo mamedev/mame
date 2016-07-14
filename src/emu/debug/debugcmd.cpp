@@ -380,6 +380,30 @@ bool debugger_commands::validate_number_parameter(const char *param, UINT64 *res
 
 
 /*-------------------------------------------------
+    validate_boolean_parameter - validates a
+    boolean parameter
+-------------------------------------------------*/
+
+bool debugger_commands::validate_boolean_parameter(const char *param, bool *result)
+{
+	/* nullptr parameter does nothing and returns no error */
+	if (param == nullptr)
+		return true;
+
+	/* evaluate the expression; success if no error */
+	bool is_true = (strcmp(param, "true") == 0 || strcmp(param, "TRUE") == 0 || strcmp(param, "1") == 0);
+	bool is_false = (strcmp(param, "false") == 0 || strcmp(param, "FALSE") == 0 || strcmp(param, "0") == 0);
+
+	if (!is_true && !is_false)
+		return false;
+
+	*result = is_true;
+
+	return true;
+}
+
+
+/*-------------------------------------------------
     validate_cpu_parameter - validates a
     parameter as a cpu
 -------------------------------------------------*/
@@ -2444,6 +2468,7 @@ void debugger_commands::execute_dasm(int ref, int params, const char *param[])
 void debugger_commands::execute_trace_internal(int ref, int params, const char *param[], bool trace_over)
 {
 	const char *action = nullptr;
+	bool detect_loops = true;
 	device_t *cpu;
 	FILE *f = nullptr;
 	const char *mode;
@@ -2455,7 +2480,9 @@ void debugger_commands::execute_trace_internal(int ref, int params, const char *
 	/* validate parameters */
 	if (!validate_cpu_parameter((params > 1) ? param[1] : nullptr, &cpu))
 		return;
-	if (!debug_command_parameter_command(action = param[2]))
+	if (!validate_boolean_parameter((params > 2) ? param[2] : nullptr, &detect_loops))
+		return;
+	if (!debug_command_parameter_command(action = param[3]))
 		return;
 
 	/* open the file */
@@ -2479,7 +2506,7 @@ void debugger_commands::execute_trace_internal(int ref, int params, const char *
 	}
 
 	/* do it */
-	cpu->debug()->trace(f, trace_over, action);
+	cpu->debug()->trace(f, trace_over, detect_loops, action);
 	if (f)
 		m_console.printf("Tracing CPU '%s' to file %s\n", cpu->tag(), filename.c_str());
 	else
