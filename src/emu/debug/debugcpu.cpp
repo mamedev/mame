@@ -2637,14 +2637,14 @@ UINT32 device_debug::compute_opcode_crc32(offs_t pc) const
 //  trace - trace execution of a given device
 //-------------------------------------------------
 
-void device_debug::trace(FILE *file, bool trace_over, const char *action)
+void device_debug::trace(FILE *file, bool trace_over, bool detect_loops, const char *action)
 {
 	// delete any existing tracers
 	m_trace = nullptr;
 
 	// if we have a new file, make a new tracer
 	if (file != nullptr)
-		m_trace = std::make_unique<tracer>(*this, *file, trace_over, action);
+		m_trace = std::make_unique<tracer>(*this, *file, trace_over, detect_loops, action);
 }
 
 
@@ -3305,14 +3305,15 @@ bool device_debug::registerpoint::hit()
 //  tracer - constructor
 //-------------------------------------------------
 
-device_debug::tracer::tracer(device_debug &debug, FILE &file, bool trace_over, const char *action)
-	: m_debug(debug),
-		m_file(file),
-		m_action((action != nullptr) ? action : ""),
-		m_loops(0),
-		m_nextdex(0),
-		m_trace_over(trace_over),
-		m_trace_over_target(~0)
+device_debug::tracer::tracer(device_debug &debug, FILE &file, bool trace_over, bool detect_loops, const char *action)
+	: m_debug(debug)
+	, m_file(file)
+	, m_action((action != nullptr) ? action : "")
+	, m_detect_loops(detect_loops)
+	, m_loops(0)
+	, m_nextdex(0)
+	, m_trace_over(trace_over)
+	, m_trace_over_target(~0)
 {
 	memset(m_history, 0, sizeof(m_history));
 }
@@ -3344,23 +3345,26 @@ void device_debug::tracer::update(offs_t pc)
 		m_trace_over_target = ~0;
 	}
 
-	// check for a loop condition
-	int count = 0;
-	for (auto & elem : m_history)
-		if (elem == pc)
-			count++;
-
-	// if more than 1 hit, just up the loop count and get out
-	if (count > 1)
+	if (m_detect_loops)
 	{
-		m_loops++;
-		return;
-	}
+		// check for a loop condition
+		int count = 0;
+		for (auto & elem : m_history)
+			if (elem == pc)
+				count++;
 
-	// if we just finished looping, indicate as much
-	if (m_loops != 0)
-		fprintf(&m_file, "\n   (loops for %d instructions)\n\n", m_loops);
-	m_loops = 0;
+		// if more than 1 hit, just up the loop count and get out
+		if (count > 1)
+		{
+			m_loops++;
+			return;
+		}
+
+		// if we just finished looping, indicate as much
+		if (m_loops != 0)
+			fprintf(&m_file, "\n   (loops for %d instructions)\n\n", m_loops);
+		m_loops = 0;
+	}
 
 	// execute any trace actions first
 	if (!m_action.empty())
