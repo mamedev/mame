@@ -14,24 +14,28 @@
 #include "ui/datfile.h"
 #include "ui/utils.h"
 
+namespace ui {
+namespace {
 //-------------------------------------------------
 //  TAGS
 //-------------------------------------------------
-static std::string DATAFILE_TAG("$");
-static std::string TAG_BIO("$bio");
-static std::string TAG_INFO("$info");
-static std::string TAG_MAME("$mame");
-static std::string TAG_COMMAND("$cmd");
-static std::string TAG_END("$end");
-static std::string TAG_DRIVER("$drv");
-static std::string TAG_STORY("$story");
-static std::string TAG_HISTORY_R("## REVISION:");
-static std::string TAG_MAMEINFO_R("# MAMEINFO.DAT");
-static std::string TAG_MESSINFO_R("#     MESSINFO.DAT");
-static std::string TAG_SYSINFO_R("# This file was generated on");
-static std::string TAG_STORY_R("# version");
-static std::string TAG_COMMAND_SEPARATOR("-----------------------------------------------");
-static std::string TAG_GAMEINIT_R("# GAMEINIT.DAT");
+std::string const DATAFILE_TAG("$");
+std::string const TAG_BIO("$bio");
+std::string const TAG_INFO("$info");
+std::string const TAG_MAME("$mame");
+std::string const TAG_COMMAND("$cmd");
+std::string const TAG_END("$end");
+std::string const TAG_DRIVER("$drv");
+std::string const TAG_STORY("$story");
+std::string const TAG_HISTORY_R("## REVISION:");
+std::string const TAG_MAMEINFO_R("# MAMEINFO.DAT");
+std::string const TAG_MESSINFO_R("#     MESSINFO.DAT");
+std::string const TAG_SYSINFO_R("# This file was generated on");
+std::string const TAG_STORY_R("# version");
+std::string const TAG_COMMAND_SEPARATOR("-----------------------------------------------");
+std::string const TAG_GAMEINIT_R("# GAMEINIT.DAT");
+
+} // anonymous namespace
 
 //-------------------------------------------------
 //  Statics
@@ -83,7 +87,7 @@ datfile_manager::datfile_manager(running_machine &machine, ui_options &moptions)
 void datfile_manager::init_sysinfo()
 {
 	int swcount = 0;
-	auto count = index_datafile(m_sysidx, swcount, TAG_SYSINFO_R, m_sysinfo_rev, '.');
+	auto count = index_datafile(m_sysidx, swcount, m_sysinfo_rev, TAG_SYSINFO_R, '.');
 	osd_printf_verbose("Sysinfo.dat games found = %i\n", count);
 	osd_printf_verbose("Rev = %s\n", m_sysinfo_rev.c_str());
 }
@@ -94,7 +98,7 @@ void datfile_manager::init_sysinfo()
 void datfile_manager::init_story()
 {
 	int swcount = 0;
-	auto count = index_datafile(m_storyidx, swcount, TAG_STORY_R, m_story_rev, 's');
+	auto count = index_datafile(m_storyidx, swcount, m_story_rev, TAG_STORY_R, 's');
 	osd_printf_verbose("Story.dat games found = %i\n", count);
 }
 
@@ -104,7 +108,7 @@ void datfile_manager::init_story()
 void datfile_manager::init_history()
 {
 	int swcount = 0;
-	auto count = index_datafile(m_histidx, swcount, TAG_HISTORY_R, m_history_rev, ' ');
+	auto count = index_datafile(m_histidx, swcount, m_history_rev, TAG_HISTORY_R, ' ');
 	osd_printf_verbose("History.dat systems found = %i\n", count);
 	osd_printf_verbose("History.dat software packages found = %i\n", swcount);
 	osd_printf_verbose("Rev = %s\n", m_history_rev.c_str());
@@ -152,30 +156,29 @@ void datfile_manager::init_messinfo()
 void datfile_manager::init_command()
 {
 	int swcount = 0;
-	std::string tmp, tmp2;
-	auto count = index_datafile(m_cmdidx, swcount, tmp, tmp2, 'c');
+	std::string tmp;
+	auto count = index_datafile(m_cmdidx, swcount, tmp, std::string(), 'c');
 	osd_printf_verbose("Command.dat games found = %i\n", count);
 }
 
-bool datfile_manager::has_software(std::string &softlist, std::string &softname, std::string &parentname)
+bool datfile_manager::has_software(std::string const &softlist, std::string const &softname, std::string const &parentname)
 {
 	// Find software in software list index
-	if (m_swindex.find(softlist) == m_swindex.end())
+	auto const found(m_swindex.find(softlist));
+	if (found == m_swindex.end())
 		return false;
 
-	m_itemsiter = m_swindex[softlist].find(softname);
-	if (m_itemsiter == m_swindex[softlist].end() && !parentname.empty())
-		m_itemsiter = m_swindex[softlist].find(parentname);
+	m_itemsiter = found->second.find(softname);
+	if ((m_itemsiter == found->second.end()) && !parentname.empty())
+		m_itemsiter = found->second.find(parentname);
 
-	if (m_itemsiter == m_swindex[softlist].end())
-		return false;
-
-	return true;
+	return m_itemsiter != found->second.end();
 }
+
 //-------------------------------------------------
 //  load software info
 //-------------------------------------------------
-void datfile_manager::load_software_info(std::string &softlist, std::string &buffer, std::string &softname, std::string &parentname)
+void datfile_manager::load_software_info(std::string const &softlist, std::string &buffer, std::string const &softname, std::string const &parentname)
 {
 	// Load history text
 	if (!m_swindex.empty() && parseopen("history.dat"))
@@ -214,38 +217,38 @@ void datfile_manager::load_data_info(const game_driver *drv, std::string &buffer
 
 	switch (type)
 	{
-		case UI_HISTORY_LOAD:
-			filename = "history.dat";
-			tag = TAG_BIO;
-			index_idx = m_histidx;
-			break;
-		case UI_MAMEINFO_LOAD:
-			filename = "mameinfo.dat";
-			tag = TAG_MAME;
-			index_idx = m_mameidx;
-			driver_idx = m_drvidx;
-			break;
-		case UI_SYSINFO_LOAD:
-			filename = "sysinfo.dat";
-			tag = TAG_BIO;
-			index_idx = m_sysidx;
-			break;
-		case UI_MESSINFO_LOAD:
-			filename = "messinfo.dat";
-			tag = TAG_MAME;
-			index_idx = m_messidx;
-			driver_idx = m_messdrvidx;
-			break;
-		case UI_STORY_LOAD:
-			filename = "story.dat";
-			tag = TAG_STORY;
-			index_idx = m_storyidx;
-			break;
-		case UI_GINIT_LOAD:
-			filename = "gameinit.dat";
-			tag = TAG_MAME;
-			index_idx = m_ginitidx;
-			break;
+	case UI_HISTORY_LOAD:
+		filename = "history.dat";
+		tag = TAG_BIO;
+		index_idx = m_histidx;
+		break;
+	case UI_MAMEINFO_LOAD:
+		filename = "mameinfo.dat";
+		tag = TAG_MAME;
+		index_idx = m_mameidx;
+		driver_idx = m_drvidx;
+		break;
+	case UI_SYSINFO_LOAD:
+		filename = "sysinfo.dat";
+		tag = TAG_BIO;
+		index_idx = m_sysidx;
+		break;
+	case UI_MESSINFO_LOAD:
+		filename = "messinfo.dat";
+		tag = TAG_MAME;
+		index_idx = m_messidx;
+		driver_idx = m_messdrvidx;
+		break;
+	case UI_STORY_LOAD:
+		filename = "story.dat";
+		tag = TAG_STORY;
+		index_idx = m_storyidx;
+		break;
+	case UI_GINIT_LOAD:
+		filename = "gameinit.dat";
+		tag = TAG_MAME;
+		index_idx = m_ginitidx;
+		break;
 	}
 
 	if (parseopen(filename.c_str()))
@@ -267,7 +270,7 @@ void datfile_manager::load_data_info(const game_driver *drv, std::string &buffer
 //-------------------------------------------------
 //  load a game text into the buffer
 //-------------------------------------------------
-void datfile_manager::load_data_text(const game_driver *drv, std::string &buffer, dataindex &idx, std::string &tag)
+void datfile_manager::load_data_text(const game_driver *drv, std::string &buffer, dataindex &idx, std::string const &tag)
 {
 	auto itemsiter = idx.find(drv);
 	if (itemsiter == idx.end())
@@ -309,7 +312,7 @@ void datfile_manager::load_data_text(const game_driver *drv, std::string &buffer
 //  load a driver name and offset into an
 //  indexed array
 //-------------------------------------------------
-void datfile_manager::load_driver_text(const game_driver *drv, std::string &buffer, drvindex &idx, std::string &tag)
+void datfile_manager::load_driver_text(const game_driver *drv, std::string &buffer, drvindex &idx, std::string const &tag)
 {
 	std::string s(core_filename_extract_base(drv->source_file));
 	auto index = idx.find(s);
@@ -399,28 +402,27 @@ int datfile_manager::index_mame_mess_info(dataindex &index, drvindex &index_drv,
 //  load a game name and offset into an
 //  indexed array
 //-------------------------------------------------
-int datfile_manager::index_datafile(dataindex &index, int &swcount, std::string &tag, std::string &str, char sep)
+int datfile_manager::index_datafile(dataindex &index, int &swcount, std::string &rev, std::string const &tag, char sep)
 {
 	std::string readbuf;
-	auto tag_size = tag.size();
-	auto t_info = TAG_INFO.size();
-	auto t_bio = TAG_BIO.size();
+	auto const tag_size = tag.size();
+	auto const t_info = TAG_INFO.size();
+	auto const t_bio = TAG_BIO.size();
 	char rbuf[64 * 1024];
 	while (fgets(rbuf, 64 * 1024, fp) != nullptr)
 	{
 		readbuf = chartrimcarriage(rbuf);
 
 		if (!tag.empty())
-			if (str.empty() && readbuf.compare(0, tag_size, tag) == 0)
+		{
+			if (rev.empty() && readbuf.compare(0, tag_size, tag) == 0)
 			{
 				if (sep != 's')
-				{
-					auto found = readbuf.find(sep, tag_size + 1);
-					str = readbuf.substr(tag_size + 1, found - tag_size);
-				}
+					rev = readbuf.substr(tag_size + 1, readbuf.find(sep, tag_size + 1) - tag_size);
 				else
-					str = readbuf.substr(tag_size + 1);
+					rev = readbuf.substr(tag_size + 1);
 			}
+		}
 
 		if (readbuf.compare(0, t_info, TAG_INFO) == 0)
 		{
@@ -477,26 +479,24 @@ bool datfile_manager::parseopen(const char *filename)
 //-------------------------------------------------
 //  create the menu index
 //-------------------------------------------------
-void datfile_manager::index_menuidx(const game_driver *drv, dataindex &idx, drvindex &index)
+void datfile_manager::index_menuidx(const game_driver *drv, dataindex const &idx, drvindex &index)
 {
-	dataindex::iterator itemsiter = idx.find(drv);
+	auto itemsiter = idx.find(drv);
 	if (itemsiter == idx.end())
 	{
-		auto cloneof = driver_list::non_bios_clone(*drv);
+		auto const cloneof = driver_list::non_bios_clone(*drv);
 		if (cloneof == -1)
 			return;
-		else
-		{
-			auto c_drv = &driver_list::driver(cloneof);
-			if ((itemsiter = idx.find(c_drv)) == idx.end())
-				return;
-		}
+
+		auto const c_drv = &driver_list::driver(cloneof);
+		if ((itemsiter = idx.find(c_drv)) == idx.end())
+			return;
 	}
 
 	// seek to correct point in datafile
-	auto s_offset = itemsiter->second;
+	auto const s_offset = itemsiter->second;
 	fseek(fp, s_offset, SEEK_SET);
-	auto tinfo = TAG_INFO.size();
+	auto const tinfo = TAG_INFO.size();
 	char rbuf[64 * 1024];
 	std::string readbuf;
 	while (fgets(rbuf, 64 * 1024, fp) != nullptr)
@@ -562,3 +562,5 @@ void datfile_manager::command_sub_menu(const game_driver *drv, std::vector<std::
 		parseclose();
 	}
 }
+
+} // namespace ui

@@ -298,7 +298,7 @@ void mame_machine_manager::create_custom(running_machine& machine)
 	m_autoboot_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(mame_machine_manager::autoboot_callback), this));
 
 	// start datfile manager
-	m_datfile = std::make_unique<datfile_manager>(machine, m_ui->options());
+	m_datfile = std::make_unique<ui::datfile_manager>(machine, m_ui->options());
 
 	// start favorite manager
 	m_favorite = std::make_unique<favorite_manager>(machine, m_ui->options());

@@ -49,11 +49,6 @@ protected:
 	// draw right box
 	float draw_right_box_title(float x1, float y1, float x2, float y2);
 
-	// images render
-	void arts_render(float origx1, float origy1, float origx2, float origy2);
-	std::string arts_render_common(float origx1, float origy1, float origx2, float origy2);
-	void arts_render_images(bitmap_argb32 *bitmap, float origx1, float origy1, float origx2, float origy2);
-
 	// draw arrow
 	void draw_common_arrow(float origx1, float origy1, float origx2, float origy2, int current, int dmin, int dmax, float title);
 	void draw_info_arrow(int ub, float origx1, float origx2, float oy1, float line_height, float text_size, float ud_arrow_width);
@@ -63,10 +58,6 @@ protected:
 
 	// draw star
 	void draw_star(float x0, float y0);
-
-	// draw snapshot if valid
-	void draw_snapx(float origx1, float origy1, float origx2, float origy2);
-	bool snapx_valid() const { return m_cache->snapx_bitmap().valid(); }
 
 	int     visible_items;
 	void    *m_prev_selected;
@@ -86,6 +77,11 @@ private:
 
 		bitmap_argb32 &snapx_bitmap() { return *m_snapx_bitmap; }
 		render_texture *snapx_texture() { return m_snapx_texture.get(); }
+		bool snapx_driver_is(game_driver const *value) const { return m_snapx_driver == value; }
+		bool snapx_software_is(ui_software_info const *software) const { return m_snapx_software == software; }
+		void set_snapx_driver(game_driver const *value) { m_snapx_driver = value; }
+		void set_snapx_software(ui_software_info const *software) { m_snapx_software = software; }
+
 		bitmap_argb32 &no_avail_bitmap() { return *m_no_avail_bitmap; }
 		render_texture *star_texture() { return m_star_texture.get(); }
 
@@ -95,16 +91,19 @@ private:
 		texture_ptr_vector const &sw_toolbar_texture() { return m_sw_toolbar_texture; }
 
 	private:
-		bitmap_ptr          m_snapx_bitmap;
-		texture_ptr         m_snapx_texture;
-		bitmap_ptr          m_no_avail_bitmap;
-		bitmap_ptr          m_star_bitmap;
-		texture_ptr         m_star_texture;
+		bitmap_ptr              m_snapx_bitmap;
+		texture_ptr             m_snapx_texture;
+		game_driver const       *m_snapx_driver;
+		ui_software_info const  *m_snapx_software;
 
-		bitmap_ptr_vector   m_toolbar_bitmap;
-		bitmap_ptr_vector   m_sw_toolbar_bitmap;
-		texture_ptr_vector  m_toolbar_texture;
-		texture_ptr_vector  m_sw_toolbar_texture;
+		bitmap_ptr              m_no_avail_bitmap;
+		bitmap_ptr              m_star_bitmap;
+		texture_ptr             m_star_texture;
+
+		bitmap_ptr_vector       m_toolbar_bitmap;
+		bitmap_ptr_vector       m_sw_toolbar_bitmap;
+		texture_ptr_vector      m_toolbar_texture;
+		texture_ptr_vector      m_sw_toolbar_texture;
 	};
 	using cache_ptr = std::shared_ptr<cache>;
 	using cache_ptr_map = std::map<running_machine *, cache_ptr>;
@@ -114,6 +113,8 @@ private:
 	void reset_pressed() { m_pressed = false; m_repeat = 0; }
 	bool mouse_pressed() const { return (osd_ticks() >= m_repeat); }
 	void set_pressed();
+
+	bool snapx_valid() const { return m_cache->snapx_bitmap().valid(); }
 
 	// draw left panel
 	virtual float draw_left_panel(float x1, float y1, float x2, float y2) = 0;
@@ -140,6 +141,12 @@ private:
 	// draw right panel
 	void draw_right_panel(float origx1, float origy1, float origx2, float origy2);
 
+	// images render
+	void arts_render(float origx1, float origy1, float origx2, float origy2);
+	std::string arts_render_common(float origx1, float origy1, float origx2, float origy2);
+	void arts_render_images(bitmap_argb32 *bitmap, float origx1, float origy1, float origx2, float origy2);
+	void draw_snapx(float origx1, float origy1, float origx2, float origy2);
+
 	// cleanup function
 	static void exit(running_machine &machine);
 
@@ -148,9 +155,6 @@ private:
 	focused_menu            m_focus;
 	bool                    m_pressed;          // mouse button held down
 	osd_ticks_t             m_repeat;
-
-	game_driver const       *m_old_driver;      // driver/software for previously displayed artwork
-	ui_software_info const  *m_old_software;
 
 	render_texture          *m_icons_texture[MAX_ICONS_RENDER];
 	bitmap_ptr              m_icons_bitmap[MAX_ICONS_RENDER];

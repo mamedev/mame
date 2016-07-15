@@ -16,9 +16,9 @@
 #include "ui/utils.h"
 
 // these hold static bitmap images
-#include "ui/defimg.h"
-#include "ui/starimg.h"
-#include "ui/toolbar.h"
+#include "ui/defimg.ipp"
+#include "ui/starimg.ipp"
+#include "ui/toolbar.ipp"
 
 #include "cheat.h"
 #include "mame.h"
@@ -73,6 +73,8 @@ menu_select_launch::cache_ptr_map menu_select_launch::s_caches;
 menu_select_launch::cache::cache(running_machine &machine)
 	: m_snapx_bitmap(std::make_unique<bitmap_argb32>(0, 0))
 	, m_snapx_texture()
+	, m_snapx_driver(nullptr)
+	, m_snapx_software(nullptr)
 	, m_no_avail_bitmap(std::make_unique<bitmap_argb32>(256, 256))
 	, m_star_bitmap(std::make_unique<bitmap_argb32>(32, 32))
 	, m_star_texture()
@@ -154,8 +156,6 @@ menu_select_launch::menu_select_launch(mame_ui_manager &mui, render_container &c
 	, m_focus(focused_menu::main)
 	, m_pressed(false)
 	, m_repeat(0)
-	, m_old_driver(nullptr)
-	, m_old_software(nullptr)
 {
 	// set up persistent cache for machine run
 	{
@@ -258,314 +258,6 @@ float menu_select_launch::draw_right_box_title(float x1, float y1, float x2, flo
 	}
 
 	return (y1 + line_height + UI_LINE_WIDTH);
-}
-
-
-//-------------------------------------------------
-//  perform our special rendering
-//-------------------------------------------------
-
-void menu_select_launch::arts_render(float origx1, float origy1, float origx2, float origy2)
-{
-	ui_software_info const *software;
-	game_driver const *driver;
-	get_selection(software, driver);
-
-	if (software && ((software->startempty != 1) || !driver))
-	{
-		m_old_driver = nullptr;
-
-		if (ui_globals::default_image)
-			(software->startempty == 0) ? ui_globals::curimage_view = SNAPSHOT_VIEW : ui_globals::curimage_view = CABINETS_VIEW;
-
-		// arts title and searchpath
-		std::string const searchstr = arts_render_common(origx1, origy1, origx2, origy2);
-
-		// loads the image if necessary
-		if ((software != m_old_software) || !snapx_valid() || ui_globals::switch_image)
-		{
-			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
-			bitmap_argb32 *tmp_bitmap;
-			tmp_bitmap = auto_alloc(machine(), bitmap_argb32);
-
-			if (software->startempty == 1)
-			{
-				// Load driver snapshot
-				std::string fullname = std::string(software->driver->name) + ".png";
-				render_load_png(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
-
-				if (!tmp_bitmap->valid())
-				{
-					fullname.assign(software->driver->name).append(".jpg");
-					render_load_jpeg(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
-				}
-			}
-			else if (ui_globals::curimage_view == TITLES_VIEW)
-			{
-				// First attempt from name list
-				std::string const pathname = software->listname + "_titles";
-				std::string fullname = software->shortname + ".png";
-				render_load_png(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-
-				if (!tmp_bitmap->valid())
-				{
-					fullname.assign(software->shortname).append(".jpg");
-					render_load_jpeg(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-				}
-			}
-			else
-			{
-				// First attempt from name list
-				std::string pathname = software->listname;
-				std::string fullname = software->shortname + ".png";
-				render_load_png(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-
-				if (!tmp_bitmap->valid())
-				{
-					fullname.assign(software->shortname).append(".jpg");
-					render_load_jpeg(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-				}
-
-				if (!tmp_bitmap->valid())
-				{
-					// Second attempt from driver name + part name
-					pathname.assign(software->driver->name).append(software->part);
-					fullname.assign(software->shortname).append(".png");
-					render_load_png(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-
-					if (!tmp_bitmap->valid())
-					{
-						fullname.assign(software->shortname).append(".jpg");
-						render_load_jpeg(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
-					}
-				}
-			}
-
-			m_old_software = software;
-			ui_globals::switch_image = false;
-			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2);
-			auto_free(machine(), tmp_bitmap);
-		}
-
-		// if the image is available, loaded and valid, display it
-		draw_snapx(origx1, origy1, origx2, origy2);
-	}
-	else if (driver)
-	{
-		m_old_software = nullptr;
-
-		if (ui_globals::default_image)
-			((driver->flags & MACHINE_TYPE_ARCADE) == 0) ? ui_globals::curimage_view = CABINETS_VIEW : ui_globals::curimage_view = SNAPSHOT_VIEW;
-
-		std::string const searchstr = arts_render_common(origx1, origy1, origx2, origy2);
-
-		// loads the image if necessary
-		if ((driver != m_old_driver) || !snapx_valid() || ui_globals::switch_image)
-		{
-			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
-			snapfile.set_restrict_to_mediapath(true);
-			bitmap_argb32 *tmp_bitmap;
-			tmp_bitmap = auto_alloc(machine(), bitmap_argb32);
-
-			// try to load snapshot first from saved "0000.png" file
-			std::string fullname(driver->name);
-			render_load_png(*tmp_bitmap, snapfile, fullname.c_str(), "0000.png");
-
-			if (!tmp_bitmap->valid())
-				render_load_jpeg(*tmp_bitmap, snapfile, fullname.c_str(), "0000.jpg");
-
-			// if fail, attemp to load from standard file
-			if (!tmp_bitmap->valid())
-			{
-				fullname.assign(driver->name).append(".png");
-				render_load_png(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
-
-				if (!tmp_bitmap->valid())
-				{
-					fullname.assign(driver->name).append(".jpg");
-					render_load_jpeg(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
-				}
-			}
-
-			// if fail again, attemp to load from parent file
-			if (!tmp_bitmap->valid())
-			{
-				// set clone status
-				bool cloneof = strcmp(driver->parent, "0");
-				if (cloneof)
-				{
-					int cx = driver_list::find(driver->parent);
-					if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
-						cloneof = false;
-				}
-
-				if (cloneof)
-				{
-					fullname.assign(driver->parent).append(".png");
-					render_load_png(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
-
-					if (!tmp_bitmap->valid())
-					{
-						fullname.assign(driver->parent).append(".jpg");
-						render_load_jpeg(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
-					}
-				}
-			}
-
-			m_old_driver = driver;
-			ui_globals::switch_image = false;
-			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2);
-			auto_free(machine(), tmp_bitmap);
-		}
-
-		// if the image is available, loaded and valid, display it
-		draw_snapx(origx1, origy1, origx2, origy2);
-	}
-}
-
-
-//-------------------------------------------------
-//  common function for images render
-//-------------------------------------------------
-
-std::string menu_select_launch::arts_render_common(float origx1, float origy1, float origx2, float origy2)
-{
-	float const line_height = ui().get_line_height();
-	float const gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
-
-	std::string snaptext, searchstr;
-	get_title_search(snaptext, searchstr);
-
-	// apply title to right panel
-	float title_size = 0.0f;
-	for (int x = FIRST_VIEW; x < LAST_VIEW; x++)
-	{
-		float text_length;
-		ui().draw_text_full(container(),
-				_(arts_info[x].first), origx1, origy1, origx2 - origx1,
-				ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white, rgb_t::black,
-				&text_length, nullptr);
-		title_size = (std::max)(text_length + 0.01f, title_size);
-	}
-
-	rgb_t const fgcolor = (m_focus == focused_menu::rightbottom) ? rgb_t(0xff, 0xff, 0x00) : UI_TEXT_COLOR;
-	rgb_t const bgcolor = (m_focus == focused_menu::rightbottom) ? rgb_t(0xff, 0xff, 0xff) : UI_TEXT_BG_COLOR;
-	float const middle = origx2 - origx1;
-
-	// check size
-	float const sc = title_size + 2.0f * gutter_width;
-	float const tmp_size = (sc > middle) ? ((middle - 2.0f * gutter_width) / sc) : 1.0f;
-	title_size *= tmp_size;
-
-	if (bgcolor != UI_TEXT_BG_COLOR)
-	{
-		ui().draw_textured_box(container(), origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
-				origy1 + line_height, bgcolor, rgb_t(43, 43, 43), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
-	}
-
-	ui().draw_text_full(container(),
-			snaptext.c_str(), origx1, origy1, origx2 - origx1,
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor,
-			nullptr, nullptr, tmp_size);
-
-	draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::curimage_view, FIRST_VIEW, LAST_VIEW, title_size);
-
-	return searchstr;
-}
-
-
-//-------------------------------------------------
-//  perform rendering of image
-//-------------------------------------------------
-
-void menu_select_launch::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float origy1, float origx2, float origy2)
-{
-	bool no_available = false;
-	float line_height = ui().get_line_height();
-
-	// if it fails, use the default image
-	if (!tmp_bitmap->valid())
-	{
-		tmp_bitmap->allocate(256, 256);
-		const bitmap_argb32 &src(m_cache->no_avail_bitmap());
-		for (int x = 0; x < 256; x++)
-		{
-			for (int y = 0; y < 256; y++)
-				tmp_bitmap->pix32(y, x) = src.pix32(y, x);
-		}
-		no_available = true;
-	}
-
-	bitmap_argb32 &snapx_bitmap(m_cache->snapx_bitmap());
-	if (tmp_bitmap->valid())
-	{
-		float panel_width = origx2 - origx1 - 0.02f;
-		float panel_height = origy2 - origy1 - 0.02f - (2.0f * UI_BOX_TB_BORDER) - (2.0f * line_height);
-		int screen_width = machine().render().ui_target().width();
-		int screen_height = machine().render().ui_target().height();
-
-		if (machine().render().ui_target().orientation() & ORIENTATION_SWAP_XY)
-			std::swap(screen_height, screen_width);
-
-		int panel_width_pixel = panel_width * screen_width;
-		int panel_height_pixel = panel_height * screen_height;
-
-		// Calculate resize ratios for resizing
-		auto ratioW = (float)panel_width_pixel / tmp_bitmap->width();
-		auto ratioH = (float)panel_height_pixel / tmp_bitmap->height();
-		auto ratioI = (float)tmp_bitmap->height() / tmp_bitmap->width();
-		auto dest_xPixel = tmp_bitmap->width();
-		auto dest_yPixel = tmp_bitmap->height();
-
-		// force 4:3 ratio min
-		if (ui().options().forced_4x3_snapshot() && ratioI < 0.75f && ui_globals::curimage_view == SNAPSHOT_VIEW)
-		{
-			// smaller ratio will ensure that the image fits in the view
-			dest_yPixel = tmp_bitmap->width() * 0.75f;
-			ratioH = (float)panel_height_pixel / dest_yPixel;
-			float ratio = MIN(ratioW, ratioH);
-			dest_xPixel = tmp_bitmap->width() * ratio;
-			dest_yPixel *= ratio;
-		}
-		// resize the bitmap if necessary
-		else if (ratioW < 1 || ratioH < 1 || (ui().options().enlarge_snaps() && !no_available))
-		{
-			// smaller ratio will ensure that the image fits in the view
-			float ratio = MIN(ratioW, ratioH);
-			dest_xPixel = tmp_bitmap->width() * ratio;
-			dest_yPixel = tmp_bitmap->height() * ratio;
-		}
-
-		bitmap_argb32 *dest_bitmap;
-
-		// resample if necessary
-		if (dest_xPixel != tmp_bitmap->width() || dest_yPixel != tmp_bitmap->height())
-		{
-			dest_bitmap = auto_alloc(machine(), bitmap_argb32);
-			dest_bitmap->allocate(dest_xPixel, dest_yPixel);
-			render_color color = { 1.0f, 1.0f, 1.0f, 1.0f };
-			render_resample_argb_bitmap_hq(*dest_bitmap, *tmp_bitmap, color, true);
-		}
-		else
-			dest_bitmap = tmp_bitmap;
-
-		snapx_bitmap.allocate(panel_width_pixel, panel_height_pixel);
-		int x1 = (0.5f * panel_width_pixel) - (0.5f * dest_xPixel);
-		int y1 = (0.5f * panel_height_pixel) - (0.5f * dest_yPixel);
-
-		for (int x = 0; x < dest_xPixel; x++)
-			for (int y = 0; y < dest_yPixel; y++)
-				snapx_bitmap.pix32(y + y1, x + x1) = dest_bitmap->pix32(y, x);
-
-		auto_free(machine(), dest_bitmap);
-
-		// apply bitmap
-		m_cache->snapx_texture()->set_bitmap(snapx_bitmap, snapx_bitmap.cliprect(), TEXFORMAT_ARGB32);
-	}
-	else
-	{
-		snapx_bitmap.reset();
-	}
 }
 
 
@@ -699,27 +391,6 @@ void menu_select_launch::draw_star(float x0, float y0)
 	float y1 = y0 + ui().get_line_height();
 	float x1 = x0 + ui().get_line_height() * container().manager().ui_aspect();
 	container().add_quad(x0, y0, x1, y1, rgb_t::white, m_cache->star_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_PACKABLE);
-}
-
-
-//-------------------------------------------------
-//  draw snapshot
-//-------------------------------------------------
-
-void menu_select_launch::draw_snapx(float origx1, float origy1, float origx2, float origy2)
-{
-	// if the image is available, loaded and valid, display it
-	if (snapx_valid())
-	{
-		float const line_height = ui().get_line_height();
-		float const x1 = origx1 + 0.01f;
-		float const x2 = origx2 - 0.01f;
-		float const y1 = origy1 + UI_BOX_TB_BORDER + line_height;
-		float const y2 = origy2 - UI_BOX_TB_BORDER - line_height;
-
-		// apply texture
-		container().add_quad(x1, y1, x2, y2, rgb_t::white, m_cache->snapx_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-	}
 }
 
 
@@ -1598,6 +1269,335 @@ void menu_select_launch::draw_right_panel(float origx1, float origy1, float orig
 		arts_render(x2, origy1, origx2, origy2);
 	else
 		infos_render(x2, origy1, origx2, origy2);
+}
+
+
+//-------------------------------------------------
+//  perform our special rendering
+//-------------------------------------------------
+
+void menu_select_launch::arts_render(float origx1, float origy1, float origx2, float origy2)
+{
+	ui_software_info const *software;
+	game_driver const *driver;
+	get_selection(software, driver);
+
+	if (software && ((software->startempty != 1) || !driver))
+	{
+		m_cache->set_snapx_driver(nullptr);
+
+		if (ui_globals::default_image)
+			(software->startempty == 0) ? ui_globals::curimage_view = SNAPSHOT_VIEW : ui_globals::curimage_view = CABINETS_VIEW;
+
+		// arts title and searchpath
+		std::string const searchstr = arts_render_common(origx1, origy1, origx2, origy2);
+
+		// loads the image if necessary
+		if (m_cache->snapx_software_is(software) || !snapx_valid() || ui_globals::switch_image)
+		{
+			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
+			bitmap_argb32 *tmp_bitmap;
+			tmp_bitmap = auto_alloc(machine(), bitmap_argb32);
+
+			if (software->startempty == 1)
+			{
+				// Load driver snapshot
+				std::string fullname = std::string(software->driver->name) + ".png";
+				render_load_png(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
+
+				if (!tmp_bitmap->valid())
+				{
+					fullname.assign(software->driver->name).append(".jpg");
+					render_load_jpeg(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
+				}
+			}
+			else if (ui_globals::curimage_view == TITLES_VIEW)
+			{
+				// First attempt from name list
+				std::string const pathname = software->listname + "_titles";
+				std::string fullname = software->shortname + ".png";
+				render_load_png(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+
+				if (!tmp_bitmap->valid())
+				{
+					fullname.assign(software->shortname).append(".jpg");
+					render_load_jpeg(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+				}
+			}
+			else
+			{
+				// First attempt from name list
+				std::string pathname = software->listname;
+				std::string fullname = software->shortname + ".png";
+				render_load_png(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+
+				if (!tmp_bitmap->valid())
+				{
+					fullname.assign(software->shortname).append(".jpg");
+					render_load_jpeg(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+				}
+
+				if (!tmp_bitmap->valid())
+				{
+					// Second attempt from driver name + part name
+					pathname.assign(software->driver->name).append(software->part);
+					fullname.assign(software->shortname).append(".png");
+					render_load_png(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+
+					if (!tmp_bitmap->valid())
+					{
+						fullname.assign(software->shortname).append(".jpg");
+						render_load_jpeg(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
+					}
+				}
+			}
+
+			m_cache->set_snapx_software(software);
+			ui_globals::switch_image = false;
+			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2);
+			auto_free(machine(), tmp_bitmap);
+		}
+
+		// if the image is available, loaded and valid, display it
+		draw_snapx(origx1, origy1, origx2, origy2);
+	}
+	else if (driver)
+	{
+		m_cache->set_snapx_software(nullptr);
+
+		if (ui_globals::default_image)
+			((driver->flags & MACHINE_TYPE_ARCADE) == 0) ? ui_globals::curimage_view = CABINETS_VIEW : ui_globals::curimage_view = SNAPSHOT_VIEW;
+
+		std::string const searchstr = arts_render_common(origx1, origy1, origx2, origy2);
+
+		// loads the image if necessary
+		if (!m_cache->snapx_driver_is(driver) || !snapx_valid() || ui_globals::switch_image)
+		{
+			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
+			snapfile.set_restrict_to_mediapath(true);
+			bitmap_argb32 *tmp_bitmap;
+			tmp_bitmap = auto_alloc(machine(), bitmap_argb32);
+
+			// try to load snapshot first from saved "0000.png" file
+			std::string fullname(driver->name);
+			render_load_png(*tmp_bitmap, snapfile, fullname.c_str(), "0000.png");
+
+			if (!tmp_bitmap->valid())
+				render_load_jpeg(*tmp_bitmap, snapfile, fullname.c_str(), "0000.jpg");
+
+			// if fail, attemp to load from standard file
+			if (!tmp_bitmap->valid())
+			{
+				fullname.assign(driver->name).append(".png");
+				render_load_png(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
+
+				if (!tmp_bitmap->valid())
+				{
+					fullname.assign(driver->name).append(".jpg");
+					render_load_jpeg(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
+				}
+			}
+
+			// if fail again, attemp to load from parent file
+			if (!tmp_bitmap->valid())
+			{
+				// set clone status
+				bool cloneof = strcmp(driver->parent, "0");
+				if (cloneof)
+				{
+					int cx = driver_list::find(driver->parent);
+					if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
+						cloneof = false;
+				}
+
+				if (cloneof)
+				{
+					fullname.assign(driver->parent).append(".png");
+					render_load_png(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
+
+					if (!tmp_bitmap->valid())
+					{
+						fullname.assign(driver->parent).append(".jpg");
+						render_load_jpeg(*tmp_bitmap, snapfile, nullptr, fullname.c_str());
+					}
+				}
+			}
+
+			m_cache->set_snapx_driver(driver);
+			ui_globals::switch_image = false;
+			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2);
+			auto_free(machine(), tmp_bitmap);
+		}
+
+		// if the image is available, loaded and valid, display it
+		draw_snapx(origx1, origy1, origx2, origy2);
+	}
+}
+
+
+//-------------------------------------------------
+//  common function for images render
+//-------------------------------------------------
+
+std::string menu_select_launch::arts_render_common(float origx1, float origy1, float origx2, float origy2)
+{
+	float const line_height = ui().get_line_height();
+	float const gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
+
+	std::string snaptext, searchstr;
+	get_title_search(snaptext, searchstr);
+
+	// apply title to right panel
+	float title_size = 0.0f;
+	for (int x = FIRST_VIEW; x < LAST_VIEW; x++)
+	{
+		float text_length;
+		ui().draw_text_full(container(),
+				_(arts_info[x].first), origx1, origy1, origx2 - origx1,
+				ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white, rgb_t::black,
+				&text_length, nullptr);
+		title_size = (std::max)(text_length + 0.01f, title_size);
+	}
+
+	rgb_t const fgcolor = (m_focus == focused_menu::rightbottom) ? rgb_t(0xff, 0xff, 0x00) : UI_TEXT_COLOR;
+	rgb_t const bgcolor = (m_focus == focused_menu::rightbottom) ? rgb_t(0xff, 0xff, 0xff) : UI_TEXT_BG_COLOR;
+	float const middle = origx2 - origx1;
+
+	// check size
+	float const sc = title_size + 2.0f * gutter_width;
+	float const tmp_size = (sc > middle) ? ((middle - 2.0f * gutter_width) / sc) : 1.0f;
+	title_size *= tmp_size;
+
+	if (bgcolor != UI_TEXT_BG_COLOR)
+	{
+		ui().draw_textured_box(container(), origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
+				origy1 + line_height, bgcolor, rgb_t(43, 43, 43), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+	}
+
+	ui().draw_text_full(container(),
+			snaptext.c_str(), origx1, origy1, origx2 - origx1,
+			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor,
+			nullptr, nullptr, tmp_size);
+
+	draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::curimage_view, FIRST_VIEW, LAST_VIEW, title_size);
+
+	return searchstr;
+}
+
+
+//-------------------------------------------------
+//  perform rendering of image
+//-------------------------------------------------
+
+void menu_select_launch::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float origy1, float origx2, float origy2)
+{
+	bool no_available = false;
+	float line_height = ui().get_line_height();
+
+	// if it fails, use the default image
+	if (!tmp_bitmap->valid())
+	{
+		tmp_bitmap->allocate(256, 256);
+		const bitmap_argb32 &src(m_cache->no_avail_bitmap());
+		for (int x = 0; x < 256; x++)
+		{
+			for (int y = 0; y < 256; y++)
+				tmp_bitmap->pix32(y, x) = src.pix32(y, x);
+		}
+		no_available = true;
+	}
+
+	bitmap_argb32 &snapx_bitmap(m_cache->snapx_bitmap());
+	if (tmp_bitmap->valid())
+	{
+		float panel_width = origx2 - origx1 - 0.02f;
+		float panel_height = origy2 - origy1 - 0.02f - (2.0f * UI_BOX_TB_BORDER) - (2.0f * line_height);
+		int screen_width = machine().render().ui_target().width();
+		int screen_height = machine().render().ui_target().height();
+
+		if (machine().render().ui_target().orientation() & ORIENTATION_SWAP_XY)
+			std::swap(screen_height, screen_width);
+
+		int panel_width_pixel = panel_width * screen_width;
+		int panel_height_pixel = panel_height * screen_height;
+
+		// Calculate resize ratios for resizing
+		auto ratioW = (float)panel_width_pixel / tmp_bitmap->width();
+		auto ratioH = (float)panel_height_pixel / tmp_bitmap->height();
+		auto ratioI = (float)tmp_bitmap->height() / tmp_bitmap->width();
+		auto dest_xPixel = tmp_bitmap->width();
+		auto dest_yPixel = tmp_bitmap->height();
+
+		// force 4:3 ratio min
+		if (ui().options().forced_4x3_snapshot() && ratioI < 0.75f && ui_globals::curimage_view == SNAPSHOT_VIEW)
+		{
+			// smaller ratio will ensure that the image fits in the view
+			dest_yPixel = tmp_bitmap->width() * 0.75f;
+			ratioH = (float)panel_height_pixel / dest_yPixel;
+			float ratio = MIN(ratioW, ratioH);
+			dest_xPixel = tmp_bitmap->width() * ratio;
+			dest_yPixel *= ratio;
+		}
+		// resize the bitmap if necessary
+		else if (ratioW < 1 || ratioH < 1 || (ui().options().enlarge_snaps() && !no_available))
+		{
+			// smaller ratio will ensure that the image fits in the view
+			float ratio = MIN(ratioW, ratioH);
+			dest_xPixel = tmp_bitmap->width() * ratio;
+			dest_yPixel = tmp_bitmap->height() * ratio;
+		}
+
+		bitmap_argb32 *dest_bitmap;
+
+		// resample if necessary
+		if (dest_xPixel != tmp_bitmap->width() || dest_yPixel != tmp_bitmap->height())
+		{
+			dest_bitmap = auto_alloc(machine(), bitmap_argb32);
+			dest_bitmap->allocate(dest_xPixel, dest_yPixel);
+			render_color color = { 1.0f, 1.0f, 1.0f, 1.0f };
+			render_resample_argb_bitmap_hq(*dest_bitmap, *tmp_bitmap, color, true);
+		}
+		else
+			dest_bitmap = tmp_bitmap;
+
+		snapx_bitmap.allocate(panel_width_pixel, panel_height_pixel);
+		int x1 = (0.5f * panel_width_pixel) - (0.5f * dest_xPixel);
+		int y1 = (0.5f * panel_height_pixel) - (0.5f * dest_yPixel);
+
+		for (int x = 0; x < dest_xPixel; x++)
+			for (int y = 0; y < dest_yPixel; y++)
+				snapx_bitmap.pix32(y + y1, x + x1) = dest_bitmap->pix32(y, x);
+
+		auto_free(machine(), dest_bitmap);
+
+		// apply bitmap
+		m_cache->snapx_texture()->set_bitmap(snapx_bitmap, snapx_bitmap.cliprect(), TEXFORMAT_ARGB32);
+	}
+	else
+	{
+		snapx_bitmap.reset();
+	}
+}
+
+
+//-------------------------------------------------
+//  draw snapshot
+//-------------------------------------------------
+
+void menu_select_launch::draw_snapx(float origx1, float origy1, float origx2, float origy2)
+{
+	// if the image is available, loaded and valid, display it
+	if (snapx_valid())
+	{
+		float const line_height = ui().get_line_height();
+		float const x1 = origx1 + 0.01f;
+		float const x2 = origx2 - 0.01f;
+		float const y1 = origy1 + UI_BOX_TB_BORDER + line_height;
+		float const y2 = origy2 - UI_BOX_TB_BORDER - line_height;
+
+		// apply texture
+		container().add_quad(x1, y1, x2, y2, rgb_t::white, m_cache->snapx_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	}
 }
 
 
