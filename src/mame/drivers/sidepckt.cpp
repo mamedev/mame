@@ -11,7 +11,7 @@ ernesto@imagina.com
 
 Thanks must go to Mirko Buffoni for testing the music.
 
-i8751 protection simluation and other fixes by Bryan McPhail, 15/10/00.
+i8751 protection simulation and other fixes by Bryan McPhail, 15/10/00.
 
 
 ToDo:
