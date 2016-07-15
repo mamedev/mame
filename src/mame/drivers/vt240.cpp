@@ -123,7 +123,7 @@ WRITE_LINE_MEMBER(vt240_state::write_keyboard_clock)
 
 WRITE_LINE_MEMBER(vt240_state::lben_w)
 {
-	m_lb = state ? false : true;
+	m_lb = state ? true : false;
 }
 
 WRITE_LINE_MEMBER(vt240_state::t11_reset_w)
@@ -670,7 +670,7 @@ static MACHINE_CONFIG_DERIVED( mc7105, vt240 )
 
 	// baud rate is supposed to be 4800 but keyboard is slightly faster
 	MCFG_DEVICE_REMOVE("keyboard_clock")
-	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4960*16)
+	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4960*64)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(vt240_state, write_keyboard_clock))
 MACHINE_CONFIG_END
 
@@ -733,4 +733,4 @@ ROM_END
 COMP( 1983, vt240,  0,      0,       vt240,    vt240, driver_device,   0,  "Digital Equipment Corporation", "VT240", MACHINE_IMPERFECT_GRAPHICS )
 //COMP( 1983, vt241,  0,      0,       vt220,     vt220, driver_device,   0,  "Digital Equipment Corporation", "VT241", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 // NOTE: the only difference between VT240 and VT241 is the latter comes with a VR241 Color monitor, while the former comes with a mono display; the ROMs and operation are identical.
-COMP( 1983, mc7105, 0,      0,       mc7105,    vt240, driver_device,   0,  "Elektronika",                  "MC7105", MACHINE_NOT_WORKING )
+COMP( 1983, mc7105, 0,      0,       mc7105,    vt240, driver_device,   0,  "Elektronika",                  "MC7105", MACHINE_IMPERFECT_GRAPHICS )

@@ -2336,7 +2336,7 @@ WRITE_LINE_MEMBER(rainbow_state::irq_hi_w)
 #ifdef		ASSUME_MODEL_A_HARDWARE
 	m_irq_high = 0;
 #else
-	m_irq_high = (state == ASSERT_LINE) ? 0x80 : 0;
+	m_irq_high = (state == ASSERT_LINE) ? 0 : 0x80;
 #endif
 }
 
