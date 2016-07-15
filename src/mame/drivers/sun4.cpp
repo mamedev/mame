@@ -434,6 +434,7 @@
 #define RS232A_TAG      "rs232a"
 #define RS232B_TAG      "rs232b"
 #define FDC_TAG			"fdc"
+#define SCSI_TAG		"ncr5390"
 
 #define ENA_NOTBOOT		(0x80)
 #define ENA_SDVMA		(0x20)
@@ -1396,7 +1397,7 @@ void sun4_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 			if ((m_irq_reg & 0x21) == 0x21)
 			{
 				m_maincpu->set_input_line(SPARC_IRQ10, ASSERT_LINE);
-				printf("Taking INT10\n");
+				//printf("Taking INT10\n");
 			}
 			break;
 
@@ -1422,11 +1423,11 @@ READ32_MEMBER( sun4_state::timer_r )
 	// reading limt 0
 	if (offset == 0)
 	{
-		printf("Read timer counter 0 (%08x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
+		//printf("Read timer counter 0 (%08x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
 	}
 	if (offset == 1)
 	{
-		printf("Read timer limit 0 (%08x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
+		//printf("Read timer limit 0 (%08x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
 		m_counter[0] &= ~0x80000000;
 		m_counter[1] &= ~0x80000000;
 		m_maincpu->set_input_line(SPARC_IRQ10, CLEAR_LINE);
@@ -1434,7 +1435,7 @@ READ32_MEMBER( sun4_state::timer_r )
 
 	if (offset == 2)
 	{
-		printf("Read timer counter 1 (%08x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
+		//printf("Read timer counter 1 (%08x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
 	}
 	if (offset == 3)
 	{
@@ -1448,9 +1449,7 @@ READ32_MEMBER( sun4_state::timer_r )
 
 void sun4_state::start_timer(int num)
 {
-	int shift = (num == 0 ? 10 : 20);
-	int mask = (num == 0 ? 0x1fffff : 0x7ff);
-	int period = (m_counter[num * 2 + 1] >> shift) & mask;
+	int period = (m_counter[num * 2 + 1] >> 10) & 0x1fffff;
 	if (period == 0)
 		period = 0x200000;
 
@@ -1515,6 +1514,18 @@ static SLOT_INTERFACE_START( sun_floppies )
 	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
 SLOT_INTERFACE_END
 
+//static SLOT_INTERFACE_START( sun_scsi_devices )
+	//SLOT_INTERFACE("cdrom", NSCSI_CDROM)
+	//SLOT_INTERFACE("harddisk", NSCSI_HARDDISK)
+	//SLOT_INTERFACE_INTERNAL("ncr5390", NCR5390)
+//SLOT_INTERFACE_END
+
+//static MACHINE_CONFIG_FRAGMENT( ncr5390 )
+	//MCFG_DEVICE_CLOCK(10000000)
+	//MCFG_NCR5390_IRQ_HANDLER(DEVWRITELINE(":", next_state, scsi_irq))
+	//MCFG_NCR5390_DRQ_HANDLER(DEVWRITELINE(":", next_state, scsi_drq))
+//MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( sun4, sun4_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MB86901, 16670000)
@@ -1558,6 +1569,16 @@ static MACHINE_CONFIG_START( sun4, sun4_state )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxb_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
+
+	//MCFG_NSCSI_ADD("scsibus:0", next_scsi_devices, "harddisk", false)
+	//MCFG_NSCSI_ADD("scsibus:1", next_scsi_devices, "cdrom", false)
+	//MCFG_NSCSI_ADD("scsibus:2", next_scsi_devices, nullptr, false)
+	//MCFG_NSCSI_ADD("scsibus:3", next_scsi_devices, nullptr, false)
+	//MCFG_NSCSI_ADD("scsibus:4", next_scsi_devices, nullptr, false)
+	//MCFG_NSCSI_ADD("scsibus:5", next_scsi_devices, nullptr, false)
+	//MCFG_NSCSI_ADD("scsibus:6", next_scsi_devices, nullptr, false)
+	//MCFG_NSCSI_ADD("scsibus:7", next_scsi_devices, SCSI_TAG, true)
+	//MCFG_DEVICE_CARD_MACHINE_CONFIG(SCSI_TAG, ncr5390)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sun4c, sun4_state )
