@@ -381,21 +381,21 @@
 
         21/11/2011 Skeleton driver.
         20/06/2016 Much less skeletony.
-        
+
         // sun4:  16 contexts, 4096 segments, each PMEG is 32 PTEs, each PTE is 8K
 		// VA lower 13 bits in page, next 5 bits select PTE in PMEG, next 12 bits select PMEG, top 2 must be 00 or 11.
-        
+
         4/60 ROM notes:
-        
+
         ffe809fc: call to print "Sizing Memory" to the UART
  		ffe80a70: call to "Setting up RAM for monitor" that goes wrong
- 		ffe80210: testing memory 		
+ 		ffe80210: testing memory
  		ffe80274: loop that goes wobbly and fails
  		ffe80dc4: switch off boot mode, MMU maps ROM to copy in RAM from here on
  		ffe82000: start of FORTH (?) interpreter once decompressed
                   text in decompressed area claims to be FORTH-83 FCode, but the opcodes
                   do not match the documented OpenFirmware FCode ones at all.
-                  
+
     	4/3xx ROM notes:
 		sun4: CPU LEDs to 00 (PC=ffe92398) => ........
 		sun4: CPU LEDs to 01 (PC=ffe92450) => *.......
@@ -485,7 +485,7 @@ const sparc_disassembler::asi_desc_map::value_type sun4c_asi_desc[] = {
 };
 }
 
-enum 
+enum
 {
 	ARCH_SUN4 = 0,
 	ARCH_SUN4C,
@@ -500,6 +500,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_scc1(*this, SCC1_TAG)
 		, m_scc2(*this, SCC2_TAG)
+		, m_fdc(*this, FDC_TAG)
 		, m_type0space(*this, "type0")
 		, m_type1space(*this, "type1")
 		, m_ram(*this, RAM_TAG)
@@ -512,7 +513,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	
+
 	static const device_timer_id TIMER_0 = 0;
 	static const device_timer_id TIMER_1 = 1;
 
@@ -528,18 +529,20 @@ public:
 	DECLARE_WRITE32_MEMBER( timer_w );
 	DECLARE_READ8_MEMBER( irq_r );
 	DECLARE_WRITE8_MEMBER( irq_w );
-	DECLARE_READ8_MEMBER( fake_fdc_r );
-	
+	DECLARE_READ8_MEMBER( fdc_r );
+	DECLARE_WRITE8_MEMBER( fdc_w );
+
 	DECLARE_DRIVER_INIT(sun4);
 	DECLARE_DRIVER_INIT(sun4c);
 	DECLARE_DRIVER_INIT(ss2);
-	
+
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
-	
+
 protected:
 	required_device<mb86901_device> m_maincpu;
 	required_device<z80scc_device> m_scc1;
 	required_device<z80scc_device> m_scc2;
+	required_device<n82077aa_device> m_fdc;
 	optional_device<address_map_bank_device> m_type0space, m_type1space;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
@@ -560,9 +563,9 @@ private:
 	UINT8 m_irq_reg;	// IRQ control
 	UINT8 m_diag;
 	int m_arch;
-	
+
 	emu_timer *m_c0_timer, *m_c1_timer;
-	
+
 	void start_timer(int num);
 	void l2p_command(int ref, int params, const char **param);
 	void fcodes_command(int ref, int params, const char **param);
@@ -575,18 +578,18 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 
 	// make debugger fetches emulate supervisor program for best compatibility with boot PROM execution
 	if (space.debugger_access()) asi = 9;
-	
+
 	// supervisor program fetches in boot state are special
 	if ((!(m_system_enable & ENA_NOTBOOT)) && (asi == 9))
 	{
 		return m_rom_ptr[offset & 0x1ffff];
 	}
-	
+
 	switch (asi)
 	{
 	case 2:	// system space
 		switch (offset >> 26)
-		{		
+		{
 			case 3: // context reg
 				if (mem_mask == 0x00ff0000) return m_context<<16;
 				return m_context<<24;
@@ -605,7 +608,7 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 			case 9: // (d-)cache data
 				logerror("sun4c: read dcache data @ %x, PC = %x\n", offset, m_maincpu->pc());
 				return 0xffffffff;
-				
+
 			case 0xf:	// UART bypass
 				//printf("read UART bypass @ %x mask %08x\n", offset<<2, mem_mask);
 				switch (offset & 3)
@@ -631,7 +634,7 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 		{
 			return m_segmap[m_context & m_ctx_mask][(offset>>16) & 0xfff]<<24;
 		}
-		else 
+		else
 		{
 		//	printf("sun4: read segment map w/unk mask %08x\n", mem_mask);
 		}
@@ -643,7 +646,7 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 		//printf("sun4: read page map @ %x (entry %d, seg %d, PMEG %d, mem_mask %08x, PC=%x)\n", offset << 2, page, (offset >> 16) & 0xfff, m_segmap[m_context & m_ctx_mask][(offset >> 16) & 0xfff] & m_pmeg_mask, mem_mask, m_maincpu->pc());
 		return m_pagemap[page];
 		break;
-		
+
 	case 8:
 	case 9:
 	case 10:
@@ -656,26 +659,26 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 		if (m_pagemap[entry] & PM_VALID)
 		{
 			m_pagemap[entry] |= PM_ACCESSED;
-			
+
 			UINT32 tmp = (m_pagemap[entry] & 0xffff) << 10;
 			tmp |= (offset & 0x3ff);
-			
+
 			//printf("sun4: read translated vaddr %08x to phys %08x type %d, PTE %08x, PC=%x\n", offset<<2, tmp<<2, (m_pagemap[entry]>>26) & 3, m_pagemap[entry], m_maincpu->pc());
-			
+
 			switch ((m_pagemap[entry] >> 26) & 3)
 			{
 			case 0:	// type 0 space
 				return m_type0space->read32(space, tmp, mem_mask);
-				
+
 			case 1: // type 1 space
 				// magic EPROM bypass
 				if ((tmp >= (0x6000000>>2)) && (tmp <= (0x6ffffff>>2)))
 				{
-					return m_rom_ptr[offset & 0x1ffff];	
+					return m_rom_ptr[offset & 0x1ffff];
 				}
 				//printf("Read type 1 @ VA %08x, phys %08x\n", offset<<2, tmp<<2);
 				return m_type1space->read32(space, tmp, mem_mask);
-				
+
 			default:
 				printf("sun4c: access to memory type not defined in sun4c\n");
 				return 0;
@@ -691,15 +694,15 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 			//m_buserror[1] = offset<<2;
 			}
 			return 0;
-		}	
+		}
 		}
 		break;
-		
+
 	default:
 		if (!space.debugger_access()) printf("sun4c: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
 		return 0;
 	}
-	
+
 	printf("sun4c: read asi %d byte offset %x, PC = %x\n", asi, offset << 2, m_maincpu->pc());
 
 	return 0;
@@ -735,7 +738,7 @@ WRITE32_MEMBER( sun4_state::sun4c_mmu_w )
 			case 9: // cache data
 				logerror("sun4c: %08x to cache data @ %x, PC = %x\n", data, offset, m_maincpu->pc());
 				return;
-				
+
 			case 0xf:	// UART bypass
 				//printf("%08x to UART bypass @ %x, mask %08x\n", data, offset<<2, mem_mask);
 				switch (offset & 3)
@@ -758,12 +761,12 @@ WRITE32_MEMBER( sun4_state::sun4c_mmu_w )
 			if (mem_mask == 0xffff0000) segdata = (data >> 16) & 0xff;
 			else if (mem_mask == 0xff000000) segdata = (data >> 24) & 0xff;
 			else logerror("sun4c: writing segment map with unknown mask %08x, PC=%x\n", mem_mask, m_maincpu->pc());
-			 
+
 			//printf("sun4: %08x to segment map @ %x (ctx %d entry %d, mem_mask %08x, PC=%x)\n", segdata, offset << 2, m_context, (offset>>16) & 0xfff, mem_mask, m_maincpu->pc());
 			m_segmap[m_context & m_ctx_mask][(offset>>16) & 0xfff] = segdata;	// only 7 bits of the segment are necessary
 		}
 		return;
-		
+
 	case 4: // page map
 		page = (m_segmap[m_context & m_ctx_mask][(offset >> 16) & 0xfff] & m_pmeg_mask) << 6;	// get the PMEG
 		page += (offset >> 10) & 0x3f;	// add the offset
@@ -782,10 +785,10 @@ WRITE32_MEMBER( sun4_state::sun4c_mmu_w )
 		if (m_pagemap[entry] & PM_VALID)
 		{
 			m_pagemap[entry] |= PM_ACCESSED;
-			
+
 			UINT32 tmp = (m_pagemap[entry] & 0xffff) << 10;
 			tmp |= (offset & 0x3ff);
-			
+
 			//printf("sun4: write translated vaddr %08x to phys %08x type %d, PTE %08x, PC=%x\n", offset<<2, tmp<<2, (m_pagemap[entry]>>26) & 3, m_pagemap[entry], m_maincpu->pc());
 
 			switch ((m_pagemap[entry] >> 26) & 3)
@@ -793,9 +796,9 @@ WRITE32_MEMBER( sun4_state::sun4c_mmu_w )
 			case 0:	// type 0
 				m_type0space->write32(space, tmp, data, mem_mask);
 				return;
-				
+
 			case 1: // type 1
-				//printf("write device space @ %x\n", tmp<<1);				
+				//printf("write device space @ %x\n", tmp<<1);
 				m_type1space->write32(space, tmp, data, mem_mask);
 				return;
 			default:
@@ -812,7 +815,7 @@ WRITE32_MEMBER( sun4_state::sun4c_mmu_w )
 			return;
 		}
 		break;
-		
+
 	}
 
 	printf("sun4c: %08x to asi %d byte offset %x, PC = %x, mask = %08x\n", data, asi, offset << 2, m_maincpu->pc(), mem_mask);
@@ -827,18 +830,18 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 
 	// make debugger fetches emulate supervisor program for best compatibility with boot PROM execution
 	if (space.debugger_access()) asi = 9;
-	
+
 	// supervisor program fetches in boot state are special
 	if ((!(m_system_enable & ENA_NOTBOOT)) && (asi == 9))
 	{
 		return m_rom_ptr[offset & 0x1ffff];
 	}
-	
+
 	switch (asi)
 	{
 	case 2:	// system space
 		switch (offset >> 26)
-		{		
+		{
 			case 3: // context reg
 				if (mem_mask == 0x00ff0000) return m_context<<16;
 				return m_context<<24;
@@ -857,7 +860,7 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 			case 9: // (d-)cache data
 				logerror("sun4: read dcache data @ %x, PC = %x\n", offset, m_maincpu->pc());
 				return 0xffffffff;
-				
+
 			case 0xf:	// UART bypass
 				//printf("read UART bypass @ %x mask %08x (PC=%x)\n", offset<<2, mem_mask, m_maincpu->pc());
 				switch (offset & 3)
@@ -883,7 +886,7 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 		{
 			return m_segmap[m_context][(offset>>16) & 0xfff]<<24;
 		}
-		else 
+		else
 		{
 		//	printf("sun4: read segment map w/unk mask %08x\n", mem_mask);
 		}
@@ -894,10 +897,10 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 		page += (offset >> 11) & 0x1f;
 		//printf("sun4: read page map @ %x (entry %d, seg %d, PMEG %d, mem_mask %08x, PC=%x)\n", offset << 2, page, (offset >> 16) & 0xfff, m_segmap[m_context & m_ctx_mask][(offset >> 16) & 0xfff] & m_pmeg_mask, mem_mask, m_maincpu->pc());
 		return m_pagemap[page];
-		
+
 	case 6:	// region map used in 4/4xx, I don't know anything about this
 		return 0;
-		
+
 	case 8:
 	case 9:
 	case 10:
@@ -910,26 +913,26 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 		if (m_pagemap[entry] & PM_VALID)
 		{
 			m_pagemap[entry] |= PM_ACCESSED;
-			
+
 			UINT32 tmp = (m_pagemap[entry] & 0x7ffff) << 11;
 			tmp |= (offset & 0x7ff);
-			
+
 			//printf("sun4: read translated vaddr %08x to phys %08x type %d, PTE %08x, PC=%x\n", offset<<2, tmp<<2, (m_pagemap[entry]>>26) & 3, m_pagemap[entry], m_maincpu->pc());
-			
+
 			switch ((m_pagemap[entry] >> 26) & 3)
 			{
 			case 0:	// type 0 space
 				return m_type0space->read32(space, tmp, mem_mask);
-				
+
 			case 1: // type 1 space
 				// magic EPROM bypass
 				if ((tmp >= (0x6000000>>2)) && (tmp <= (0x6ffffff>>2)))
 				{
-					return m_rom_ptr[offset & 0x1ffff];	
+					return m_rom_ptr[offset & 0x1ffff];
 				}
 				//printf("Read type 1 @ VA %08x, phys %08x\n", offset<<2, tmp<<2);
 				return m_type1space->read32(space, tmp, mem_mask);
-				
+
 			default:
 				printf("sun4: access to unhandled memory type\n");
 				return 0;
@@ -945,15 +948,15 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 			//m_buserror[1] = offset<<2;
 			}
 			return 0;
-		}	
+		}
 		}
 		break;
-		
+
 	default:
 		if (!space.debugger_access()) printf("sun4: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
 		return 0;
 	}
-	
+
 	printf("sun4: read asi %d byte offset %x, PC = %x\n", asi, offset << 2, m_maincpu->pc());
 
 	return 0;
@@ -988,9 +991,9 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 				for (int i = 0; i < 8; i++)
 				{
 					if (m_diag & (1<<i))
-					{	
-						printf(".");						
-					}		
+					{
+						printf(".");
+					}
 					else
 					{
 						printf("*");
@@ -999,7 +1002,7 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 				printf("\n");
 				#endif
 				return;
-				
+
 			case 8: // cache tags
 				//logerror("sun4: %08x to cache tags @ %x, PC = %x\n", data, offset, m_maincpu->pc());
 				m_cachetags[offset&0xfff] = data;
@@ -1008,7 +1011,7 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 			case 9: // cache data
 				logerror("sun4: %08x to cache data @ %x, PC = %x\n", data, offset, m_maincpu->pc());
 				return;
-				
+
 			case 0xf:	// UART bypass
 				//printf("%08x to UART bypass @ %x, mask %08x\n", data, offset<<2, mem_mask);
 				switch (offset & 3)
@@ -1031,12 +1034,12 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 			if (mem_mask == 0xffff0000) segdata = (data >> 16) & 0xff;
 			else if (mem_mask == 0xff000000) segdata = (data >> 24) & 0xff;
 			else logerror("sun4: writing segment map with unknown mask %08x, PC=%x\n", mem_mask, m_maincpu->pc());
-			 
+
 			//printf("sun4: %08x to segment map @ %x (ctx %d entry %d, mem_mask %08x, PC=%x)\n", segdata, offset << 2, m_context, (offset>>16) & 0xfff, mem_mask, m_maincpu->pc());
 			m_segmap[m_context][(offset>>16) & 0xfff] = segdata;
 		}
 		return;
-		
+
 	case 4: // page map
 		page = (m_segmap[m_context][(offset >> 16) & 0xfff]) << 5;	// get the PMEG
 		page += (offset >> 11) & 0x1f;	// add the offset
@@ -1044,10 +1047,10 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 		COMBINE_DATA(&m_pagemap[page]);
 		m_pagemap[page] &= 0xff07ffff;	// these bits are cleared when written and tested as such
 		return;
-		
+
 	case 6: // region map, used in 4/4xx
 		return;
-		
+
 	case 8:
 	case 9:
 	case 10:
@@ -1059,10 +1062,10 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 		if (m_pagemap[entry] & PM_VALID)
 		{
 			m_pagemap[entry] |= PM_ACCESSED;
-			
+
 			UINT32 tmp = (m_pagemap[entry] & 0x7ffff) << 11;
 			tmp |= (offset & 0x7ff);
-			
+
 			//printf("sun4: write translated vaddr %08x to phys %08x type %d, PTE %08x, PC=%x\n", offset<<2, tmp<<2, (m_pagemap[entry]>>26) & 3, m_pagemap[entry], m_maincpu->pc());
 
 			switch ((m_pagemap[entry] >> 26) & 3)
@@ -1070,9 +1073,9 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 			case 0:	// type 0
 				m_type0space->write32(space, tmp, data, mem_mask);
 				return;
-				
+
 			case 1: // type 1
-				//printf("write device space @ %x\n", tmp<<1);				
+				//printf("write device space @ %x\n", tmp<<1);
 				m_type1space->write32(space, tmp, data, mem_mask);
 				return;
 			default:
@@ -1089,24 +1092,24 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 			return;
 		}
 		break;
-		
+
 	}
 
 	printf("sun4: %08x to asi %d byte offset %x, PC = %x, mask = %08x\n", data, asi, offset << 2, m_maincpu->pc(), mem_mask);
 }
 
 void sun4_state::l2p_command(int ref, int params, const char **param)
-{		
+{
 	UINT64 addr, offset;
-	
+
 	if (!machine().debugger().commands().validate_number_parameter(param[0], &addr)) return;
-		
+
 	addr &= 0xffffffff;
 	offset = addr >> 2;
-		
+
 	UINT8 pmeg = 0;
 	UINT32 entry = 0, tmp = 0;
-		
+
 	if (m_arch == ARCH_SUN4)
 	{
 		pmeg = m_segmap[m_context][(offset >> 16) & 0xfff];
@@ -1179,8 +1182,8 @@ void sun4_state::machine_start()
 	m_rom_ptr = (UINT32 *)m_rom->base();
 	m_ram_ptr = (UINT32 *)m_ram->pointer();
 	m_ram_size = m_ram->size();
-	m_ram_size_words = m_ram_size >> 2;	
-	
+	m_ram_size_words = m_ram_size >> 2;
+
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
@@ -1189,7 +1192,7 @@ void sun4_state::machine_start()
 		machine().debugger().console().register_command("fcodes", CMDFLAG_NONE, 0, 1, 1, std::bind(&sun4_state::fcodes_command, this, _1, _2, _3));
 		#endif
 	}
-	
+
 	// allocate timers for the built-in two channel timer
 	m_c0_timer = timer_alloc(TIMER_0);
 	m_c1_timer = timer_alloc(TIMER_1);
@@ -1250,10 +1253,10 @@ WRITE32_MEMBER( sun4_state::ram_w )
 				m_parregs[0] |= 0x0f<<24;
 				break;
 		}
-		
+
 		// indicate parity interrupt
 		m_parregs[0] |= 0x80000000;
-	
+
 		// and can we take that now?
 		if (m_parregs[0] & 0x40000000)
 		{
@@ -1265,7 +1268,7 @@ WRITE32_MEMBER( sun4_state::ram_w )
 
 	//if ((offset<<2) == 0xfb2000) printf("write %08x to %08x, mask %08x, PC=%x\n", data, offset<<2, mem_mask, m_maincpu->pc());
 
-	if (offset < m_ram_size_words) 
+	if (offset < m_ram_size_words)
 	{
 		COMBINE_DATA(&m_ram_ptr[offset]);
 		return;
@@ -1282,9 +1285,9 @@ static ADDRESS_MAP_START(type1space_map, AS_PROGRAM, 32, sun4_state)
 	AM_RANGE(0x02000000, 0x020007ff) AM_DEVREADWRITE8(TIMEKEEPER_TAG, timekeeper_device, read, write, 0xffffffff)
 	AM_RANGE(0x03000000, 0x0300000f) AM_READWRITE(timer_r, timer_w) AM_MIRROR(0xfffff0)
 	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE8(irq_r, irq_w, 0xffffffff)
-	AM_RANGE(0x06000000, 0x0607ffff) AM_ROM AM_REGION("user1", 0) 
+	AM_RANGE(0x06000000, 0x0607ffff) AM_ROM AM_REGION("user1", 0)
 //	AM_RANGE(0x07200000, 0x07200007) AM_DEVICE8(FDC_TAG, n82077aa_device, map, 0xffffffff)
-	AM_RANGE(0x07200000, 0x07200003) AM_READ8(fake_fdc_r, 0xffffffff)
+	AM_RANGE(0x07200000, 0x07200003) AM_READWRITE8(fdc_r, fdc_w, 0xffffffff)
 	AM_RANGE(0x08000000, 0x08000003) AM_READ(ss1_sl0_id)	// slot 0 contains SCSI/DMA/Ethernet
 	AM_RANGE(0x0e000000, 0x0e000003) AM_READ(ss1_sl3_id)	// slot 3 contains video board
 ADDRESS_MAP_END
@@ -1294,9 +1297,43 @@ static ADDRESS_MAP_START(type1space_s4_map, AS_PROGRAM, 32, sun4_state)
 	AM_RANGE(0x01000000, 0x0100000f) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00ff00)
 ADDRESS_MAP_END
 
-READ8_MEMBER( sun4_state::fake_fdc_r )
+READ8_MEMBER( sun4_state::fdc_r )
 {
-	return 0x80;	// always ready
+	if (space.debugger_access())
+		return 0;
+
+	switch(offset)
+	{
+		case 0: // Main Status (R)
+			return m_fdc->msr_r(space, 0, 0xff);
+			break;
+
+		case 1: // FIFO Data Port (R)
+			return m_fdc->fifo_r(space, 0, 0xff);
+			break;
+
+		default:
+			break;
+	}
+
+	return 0;
+}
+
+WRITE8_MEMBER( sun4_state::fdc_w )
+{
+	switch(offset)
+	{
+		case 0: // Data Rate Select Register (W)
+			m_fdc->dsr_w(space, 0, data, 0xff);
+			break;
+
+		case 1: // FIFO Data Port (W)
+			m_fdc->fifo_w(space, 0, data, 0xff);
+			break;
+
+		default:
+			break;
+	}
 }
 
 READ8_MEMBER( sun4_state::irq_r )
@@ -1307,7 +1344,7 @@ READ8_MEMBER( sun4_state::irq_r )
 WRITE8_MEMBER( sun4_state::irq_w )
 {
 	//printf("%02x to IRQ\n", data);
-	
+
 	m_irq_reg = data;
 }
 
@@ -1464,7 +1501,7 @@ static MACHINE_CONFIG_START( sun4, sun4_state )
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(32)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
-	
+
 	// MMU Type 1 device space
 	MCFG_DEVICE_ADD("type1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(type1space_s4_map)
@@ -1509,7 +1546,7 @@ static MACHINE_CONFIG_START( sun4c, sun4_state )
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(32)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
-	
+
 	// MMU Type 1 device space
 	MCFG_DEVICE_ADD("type1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(type1space_map)
@@ -1628,10 +1665,10 @@ U0501       Revision
 
 ROM_START( sun4_110 )
 	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
-	ROM_LOAD32_BYTE( "520-1651-09_2.8.1.bin", 0x000003, 0x010000, CRC(9b439222) SHA1(b3589f65478e53338aee6355567484421a913d00) ) 
-	ROM_LOAD32_BYTE( "520-1652-09_2.8.1.bin", 0x000002, 0x010000, CRC(2bed25ec) SHA1(a9ff6c94ec8e0d6b084a300ff7bd8f2126c7a3b1) ) 
-	ROM_LOAD32_BYTE( "520-1653-09_2.8.1.bin", 0x000001, 0x010000, CRC(d44b7f76) SHA1(2acea449d7782a10fda7f6529279a7e1882549e3) ) 
-	ROM_LOAD32_BYTE( "520-1654-09_2.8.1.bin", 0x000000, 0x010000, CRC(1bef8469) SHA1(d5a89d29df7ffc01b305cd12d0b6eb77e126dcbf) ) 
+	ROM_LOAD32_BYTE( "520-1651-09_2.8.1.bin", 0x000003, 0x010000, CRC(9b439222) SHA1(b3589f65478e53338aee6355567484421a913d00) )
+	ROM_LOAD32_BYTE( "520-1652-09_2.8.1.bin", 0x000002, 0x010000, CRC(2bed25ec) SHA1(a9ff6c94ec8e0d6b084a300ff7bd8f2126c7a3b1) )
+	ROM_LOAD32_BYTE( "520-1653-09_2.8.1.bin", 0x000001, 0x010000, CRC(d44b7f76) SHA1(2acea449d7782a10fda7f6529279a7e1882549e3) )
+	ROM_LOAD32_BYTE( "520-1654-09_2.8.1.bin", 0x000000, 0x010000, CRC(1bef8469) SHA1(d5a89d29df7ffc01b305cd12d0b6eb77e126dcbf) )
 ROM_END
 
 // Sun 4/300, Cypress Semiconductor CY7C601, Texas Instruments 8847 FPU
@@ -1655,10 +1692,10 @@ ROM_END
 
 ROM_START( sun4_400 )
 	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
-	ROM_LOAD32_BYTE( "525-1103-06_4.1.1.bin", 0x000000, 0x010000, CRC(c129c0a8) SHA1(4ecd51fb924e65f773a09cae35ce16b1744bd7b9) ) 
-	ROM_LOAD32_BYTE( "525-1104-06_4.1.1.bin", 0x000001, 0x010000, CRC(fe3a95fc) SHA1(c3ebb89eb07d421ed4f3d7e1a66eb286f5a743e9) ) 
-	ROM_LOAD32_BYTE( "525-1105-06_4.1.1.bin", 0x000002, 0x010000, CRC(0dc3564f) SHA1(c86e640be0ef14636a4de065ab73b5671501c555) ) 
-	ROM_LOAD32_BYTE( "525-1106-06_4.1.1.bin", 0x000003, 0x010000, CRC(4464a98b) SHA1(41fd033296904476b53dfe7513eb8da403d7acd4) ) 
+	ROM_LOAD32_BYTE( "525-1103-06_4.1.1.bin", 0x000000, 0x010000, CRC(c129c0a8) SHA1(4ecd51fb924e65f773a09cae35ce16b1744bd7b9) )
+	ROM_LOAD32_BYTE( "525-1104-06_4.1.1.bin", 0x000001, 0x010000, CRC(fe3a95fc) SHA1(c3ebb89eb07d421ed4f3d7e1a66eb286f5a743e9) )
+	ROM_LOAD32_BYTE( "525-1105-06_4.1.1.bin", 0x000002, 0x010000, CRC(0dc3564f) SHA1(c86e640be0ef14636a4de065ab73b5671501c555) )
+	ROM_LOAD32_BYTE( "525-1106-06_4.1.1.bin", 0x000003, 0x010000, CRC(4464a98b) SHA1(41fd033296904476b53dfe7513eb8da403d7acd4) )
 ROM_END
 
 // SPARCstation IPC (Sun 4/40)
@@ -1691,7 +1728,7 @@ ROM_END
 // SPARCstation 1+ (Sun 4/65)
 ROM_START( sun4_65 )
 	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
-	ROM_LOAD( "525-1108-05_1.3_ver_4.bin", 0x000000, 0x020000, CRC(67f1b3e2) SHA1(276ec5ca1dcbdfa202120560f55d52036720f87d) ) 
+	ROM_LOAD( "525-1108-05_1.3_ver_4.bin", 0x000000, 0x020000, CRC(67f1b3e2) SHA1(276ec5ca1dcbdfa202120560f55d52036720f87d) )
 ROM_END
 
 // SPARCstation 2 (Sun 4/75)
