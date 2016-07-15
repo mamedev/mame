@@ -27,7 +27,6 @@ public:
 	virtual ~menu_select_software() override;
 
 protected:
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 	virtual bool menu_has_search_active() override { return (m_search[0] != 0); }
 
 private:
@@ -47,6 +46,11 @@ private:
 	// get selected software and/or driver
 	virtual void get_selection(ui_software_info const *&software, game_driver const *&driver) const override;
 
+	// text for main top/bottom panels
+	virtual void make_topbox_text(std::string &line0, std::string &line1, std::string &line2) const override;
+	virtual std::string make_driver_description(game_driver const &driver) const override;
+	virtual std::string make_software_description(ui_software_info const &software) const override;
+
 	ui_software_info                  *m_searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
 	std::vector<ui_software_info *>   m_displaylist, m_tmp, m_sortedlist;
 	std::vector<ui_software_info>     m_swinfo;
@@ -62,7 +66,6 @@ private:
 	// handlers
 	void inkey_select(const event *menu_event);
 	void inkey_special(const event *menu_event);
-	void inkey_navigation();
 };
 
 class software_parts : public menu

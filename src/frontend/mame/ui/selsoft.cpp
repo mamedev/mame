@@ -298,9 +298,10 @@ void menu_select_software::handle()
 			check_filter = true;
 			m_prev_selected = nullptr;
 		}
-
 		else if (menu_event->iptkey == IPT_UI_CONFIGURE)
+		{
 			inkey_navigation();
+		}
 	}
 
 	if (menu_event && !menu_event->itemref)
@@ -650,231 +651,6 @@ void menu_select_software::build_software_list()
 		m_sortedlist.push_back(&m_swinfo[x]);
 }
 
-//-------------------------------------------------
-//  perform our special rendering
-//-------------------------------------------------
-
-void menu_select_software::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
-{
-	ui_software_info *swinfo = (selectedref != nullptr) ? (ui_software_info *)selectedref : ((m_prev_selected != nullptr) ? (ui_software_info *)m_prev_selected : nullptr);
-	const game_driver *driver = nullptr;
-	float width;
-	std::string tempbuf[5], filtered;
-	rgb_t color = UI_BACKGROUND_COLOR;
-	bool isstar = false;
-	float tbarspace = ui().get_line_height();
-	float text_size = 1.0f;
-
-	// determine the text for the header
-	int vis_item = (m_search[0] != 0) ? visible_items : (m_has_empty_start ? visible_items - 1 : visible_items);
-	tempbuf[0] = string_format(_("%1$s %2$s ( %3$d / %4$d software packages )"), emulator_info::get_appname(), bare_build_version, vis_item, m_swinfo.size() - 1);
-	tempbuf[1] = string_format(_("Driver: \"%1$s\" software list "), m_driver->description);
-
-	if (sw_filters::actual == UI_SW_REGION && m_filter.region.ui.size() != 0)
-		filtered = string_format(_("Region: %1$s -"), m_filter.region.ui[m_filter.region.actual]);
-	else if (sw_filters::actual == UI_SW_PUBLISHERS)
-		filtered = string_format(_("Publisher: %1$s -"), m_filter.publisher.ui[m_filter.publisher.actual]);
-	else if (sw_filters::actual == UI_SW_YEARS)
-		filtered = string_format(_("Year: %1$s -"), m_filter.year.ui[m_filter.year.actual]);
-	else if (sw_filters::actual == UI_SW_LIST)
-		filtered = string_format(_("Software List: %1$s -"), m_filter.swlist.description[m_filter.swlist.actual]);
-	else if (sw_filters::actual == UI_SW_TYPE)
-		filtered = string_format(_("Device type: %1$s -"), m_filter.type.ui[m_filter.type.actual]);
-
-	tempbuf[2] = string_format(_("%s Search: %s_"), filtered, m_search);
-
-	// get the size of the text
-	float maxwidth = origx2 - origx1;
-
-	for (int line = 0; line < 3; ++line)
-	{
-		ui().draw_text_full(container(), tempbuf[line].c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
-			mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
-		width += 2 * UI_BOX_LR_BORDER;
-		maxwidth = MAX(width, maxwidth);
-	}
-
-	if (maxwidth > origx2 - origx1)
-	{
-		text_size = (origx2 - origx1) / maxwidth;
-		maxwidth = origx2 - origx1;
-	}
-
-	// compute our bounds
-	float x1 = 0.5f - 0.5f * maxwidth;
-	float x2 = x1 + maxwidth;
-	float y1 = origy1 - top;
-	float y2 = origy1 - 3.0f * UI_BOX_TB_BORDER - tbarspace;
-
-	// draw a box
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_BACKGROUND_COLOR);
-
-	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-
-	// draw the text within it
-	for (int line = 0; line < 3; ++line)
-	{
-		ui().draw_text_full(container(), tempbuf[line].c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-				mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
-		y1 += ui().get_line_height();
-	}
-
-	// determine the text to render below
-	if (swinfo != nullptr && swinfo->startempty == 1)
-		driver = swinfo->driver;
-
-	if (driver != nullptr)
-	{
-		isstar = mame_machine_manager::instance()->favorite().isgame_favorite(driver);
-
-		// first line is game description
-		tempbuf[0] = string_format(_("%1$-.100s"), driver->description);
-
-		// next line is year, manufacturer
-		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), driver->year, driver->manufacturer);
-
-		// next line is clone/parent status
-		int cloneof = driver_list::non_bios_clone(*driver);
-
-		if (cloneof != -1)
-			tempbuf[2] = string_format(_("Driver is clone of: %1$-.100s"), driver_list::driver(cloneof).description);
-		else
-			tempbuf[2] = _("Driver is parent");
-
-		// next line is overall driver status
-		if (driver->flags & MACHINE_NOT_WORKING)
-			tempbuf[3] = _("Overall: NOT WORKING");
-		else if (driver->flags & MACHINE_UNEMULATED_PROTECTION)
-			tempbuf[3] = _("Overall: Unemulated Protection");
-		else
-			tempbuf[3] = _("Overall: Working");
-
-		// next line is graphics, sound status
-		if (driver->flags & (MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS))
-			tempbuf[4] = _("Graphics: Imperfect, ");
-		else
-			tempbuf[4] = _("Graphics: OK, ");
-
-		if (driver->flags & MACHINE_NO_SOUND)
-			tempbuf[4].append(_("Sound: Unimplemented"));
-		else if (driver->flags & MACHINE_IMPERFECT_SOUND)
-			tempbuf[4].append(_("Sound: Imperfect"));
-		else
-			tempbuf[4].append(_("Sound: OK"));
-
-		color = UI_GREEN_COLOR;
-
-		if ((driver->flags & (MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS
-			| MACHINE_NO_SOUND | MACHINE_IMPERFECT_SOUND)) != 0)
-			color = UI_YELLOW_COLOR;
-
-		if ((driver->flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION)) != 0)
-			color = UI_RED_COLOR;
-	}
-
-	else if (swinfo != nullptr)
-	{
-		isstar = mame_machine_manager::instance()->favorite().isgame_favorite(*swinfo);
-
-		// first line is long name
-		tempbuf[0] = string_format(_("%1$-.100s"), swinfo->longname.c_str());
-
-		// next line is year, publisher
-		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), swinfo->year.c_str(), swinfo->publisher.c_str());
-
-		// next line is parent/clone
-		if (!swinfo->parentname.empty())
-			tempbuf[2] = string_format(_("Software is clone of: %1$-.100s"), !swinfo->parentlongname.empty() ? swinfo->parentlongname.c_str() : swinfo->parentname.c_str());
-		else
-			tempbuf[2] = _("Software is parent");
-
-		// next line is supported status
-		if (swinfo->supported == SOFTWARE_SUPPORTED_NO)
-		{
-			tempbuf[3] = _("Supported: No");
-			color = UI_RED_COLOR;
-		}
-		else if (swinfo->supported == SOFTWARE_SUPPORTED_PARTIAL)
-		{
-			tempbuf[3] = _("Supported: Partial");
-			color = UI_YELLOW_COLOR;
-		}
-		else
-		{
-			tempbuf[3] = _("Supported: Yes");
-			color = UI_GREEN_COLOR;
-		}
-
-		// last line is romset name
-		tempbuf[4] = string_format(_("romset: %1$-.100s"), swinfo->shortname.c_str());
-	}
-	else
-	{
-		std::string copyright(emulator_info::get_copyright());
-		size_t found = copyright.find("\n");
-
-		tempbuf[0].clear();
-		tempbuf[1] = string_format("%s %s", emulator_info::get_appname(), build_version);
-		tempbuf[2] = copyright.substr(0, found);
-		tempbuf[3] = copyright.substr(found + 1);
-		tempbuf[4].clear();
-	}
-
-	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = y2;
-	y2 = origy1 - UI_BOX_TB_BORDER;
-
-	// draw toolbar
-	draw_toolbar(x1, y1, x2, y2, true);
-
-	// get the size of the text
-	maxwidth = origx2 - origx1;
-
-	for (auto &elem : tempbuf)
-	{
-		ui().draw_text_full(container(), elem.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
-				mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
-		width += 2 * UI_BOX_LR_BORDER;
-		maxwidth = MAX(maxwidth, width);
-	}
-
-	if (maxwidth > origx2 - origx1)
-	{
-		text_size = (origx2 - origx1) / maxwidth;
-		maxwidth = origx2 - origx1;
-	}
-
-	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = origy2 + UI_BOX_TB_BORDER;
-	y2 = origy2 + bottom;
-
-	// draw a box
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, color);
-
-	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-
-	// is favorite? draw the star
-	if (isstar)
-		draw_star(x1, y1);
-
-	// draw all lines
-	for (auto & elem : tempbuf)
-	{
-		ui().draw_text_full(container(), elem.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-				mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
-		y1 += ui().get_line_height();
-	}
-}
 
 //-------------------------------------------------
 //  handle select key event
@@ -988,73 +764,6 @@ void menu_select_software::inkey_special(const event *menu_event)
 	}
 }
 
-
-void menu_select_software::inkey_navigation()
-{
-	switch (get_focus())
-	{
-		case focused_menu::main:
-			if (selected <= visible_items)
-			{
-				m_prev_selected = item[selected].ref;
-				selected = visible_items + 1;
-			}
-			else
-			{
-				if (ui_globals::panels_status != HIDE_LEFT_PANEL)
-					set_focus(focused_menu::left);
-
-				else if (ui_globals::panels_status == HIDE_BOTH)
-				{
-					for (int x = 0; x < item.size(); ++x)
-						if (item[x].ref == m_prev_selected)
-							selected = x;
-				}
-				else
-				{
-					set_focus(focused_menu::righttop);
-				}
-			}
-			break;
-
-		case focused_menu::left:
-			if (ui_globals::panels_status != HIDE_RIGHT_PANEL)
-			{
-				set_focus(focused_menu::righttop);
-			}
-			else
-			{
-				set_focus(focused_menu::main);
-				if (m_prev_selected == nullptr)
-				{
-					selected = 0;
-					return;
-				}
-
-				for (int x = 0; x < item.size(); ++x)
-					if (item[x].ref == m_prev_selected)
-						selected = x;
-			}
-			break;
-
-		case focused_menu::righttop:
-			set_focus(focused_menu::rightbottom);
-			break;
-
-		case focused_menu::rightbottom:
-			set_focus(focused_menu::main);
-			if (m_prev_selected == nullptr)
-			{
-				selected = 0;
-				return;
-			}
-
-			for (int x = 0; x < item.size(); ++x)
-				if (item[x].ref == m_prev_selected)
-					selected = x;
-			break;
-	}
-}
 
 //-------------------------------------------------
 //  load custom filters info from file
@@ -1938,6 +1647,43 @@ void menu_select_software::get_selection(ui_software_info const *&software, game
 {
 	software = reinterpret_cast<ui_software_info const *>(get_selection_ref());
 	driver = software ? software->driver : nullptr;
+}
+
+
+void menu_select_software::make_topbox_text(std::string &line0, std::string &line1, std::string &line2) const
+{
+	// determine the text for the header
+	int vis_item = (m_search[0] != 0) ? visible_items : (m_has_empty_start ? visible_items - 1 : visible_items);
+	line0 = string_format(_("%1$s %2$s ( %3$d / %4$d software packages )"), emulator_info::get_appname(), bare_build_version, vis_item, m_swinfo.size() - 1);
+	line1 = string_format(_("Driver: \"%1$s\" software list "), m_driver->description);
+
+	std::string filtered;
+	if (sw_filters::actual == UI_SW_REGION && m_filter.region.ui.size() != 0)
+		filtered = string_format(_("Region: %1$s -"), m_filter.region.ui[m_filter.region.actual]);
+	else if (sw_filters::actual == UI_SW_PUBLISHERS)
+		filtered = string_format(_("Publisher: %1$s -"), m_filter.publisher.ui[m_filter.publisher.actual]);
+	else if (sw_filters::actual == UI_SW_YEARS)
+		filtered = string_format(_("Year: %1$s -"), m_filter.year.ui[m_filter.year.actual]);
+	else if (sw_filters::actual == UI_SW_LIST)
+		filtered = string_format(_("Software List: %1$s -"), m_filter.swlist.description[m_filter.swlist.actual]);
+	else if (sw_filters::actual == UI_SW_TYPE)
+		filtered = string_format(_("Device type: %1$s -"), m_filter.type.ui[m_filter.type.actual]);
+
+	line2 = string_format(_("%s Search: %s_"), filtered, m_search);
+}
+
+
+std::string menu_select_software::make_driver_description(game_driver const &driver) const
+{
+	// first line is game description
+	return string_format(_("%1$-.100s"), driver.description);
+}
+
+
+std::string menu_select_software::make_software_description(ui_software_info const &software) const
+{
+	// first line is long name
+	return string_format(_("%1$-.100s"), software.longname);
 }
 
 } // namespace ui

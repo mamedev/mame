@@ -13,8 +13,11 @@
 
 #pragma once
 
+#include <cstdio>
+#include <memory>
 #include <string>
 #include <unordered_map>
+
 
 class ui_options;
 
@@ -33,7 +36,7 @@ public:
 
 	// actions
 	void load_data_info(const game_driver *drv, std::string &buffer, int type);
-	void load_command_info(std::string &buffer, std::string &sel);
+	void load_command_info(std::string &buffer, std::string const &sel);
 	void load_software_info(std::string const &softlist, std::string &buffer, std::string const &softname, std::string const &parentname);
 	void command_sub_menu(const game_driver *drv, std::vector<std::string> &menuitems);
 	void reset_run() { first_run = true; }
@@ -52,9 +55,7 @@ public:
 	bool has_sysinfo(game_driver const *driver) const { return m_sysidx.find(driver) != m_sysidx.end(); }
 	bool has_story(game_driver const *driver) const { return m_storyidx.find(driver) != m_storyidx.end(); }
 	bool has_gameinit(game_driver const *driver) const { return m_ginitidx.find(driver) != m_ginitidx.end(); }
-
-	// this isn't really just a getter - it affects some internal state
-	bool has_software(std::string const &softlist, std::string const &softname, std::string const &parentname);
+	bool has_software(std::string const &softlist, std::string const &softname, std::string const &parentname) const;
 
 	bool has_data(game_driver const *a = nullptr) const
 	{
@@ -66,6 +67,7 @@ private:
 	using drvindex = std::unordered_map<std::string, long>;
 	using dataindex = std::unordered_map<const game_driver *, long>;
 	using swindex = std::unordered_map<std::string, drvindex>;
+	using fileptr = std::unique_ptr<FILE, int (*)(FILE *)>;
 
 	// global index
 	static dataindex m_histidx, m_mameidx, m_messidx, m_cmdidx, m_sysidx, m_storyidx, m_ginitidx;
@@ -73,32 +75,29 @@ private:
 	static swindex m_swindex;
 
 	// internal helpers
-	void init_history();
-	void init_mameinfo();
-	void init_messinfo();
-	void init_command();
-	void init_sysinfo();
-	void init_story();
-	void init_gameinit();
+	void init_history(fileptr &&fp);
+	void init_mameinfo(fileptr &&fp);
+	void init_messinfo(fileptr &&fp);
+	void init_command(fileptr &&fp);
+	void init_sysinfo(fileptr &&fp);
+	void init_story(fileptr &&fp);
+	void init_gameinit(fileptr &&fp);
 
-	// file open/close/seek
-	bool parseopen(const char *filename);
-	void parseclose() { if (fp != nullptr) fclose(fp); }
+	fileptr parseopen(char const *filename);
 
-	int index_mame_mess_info(dataindex &index, drvindex &index_drv, int &drvcount);
-	int index_datafile(dataindex &index, int &swcount, std::string &rev, std::string const &tag, char sep);
-	void index_menuidx(const game_driver *drv, dataindex const &idx, drvindex &index);
-	drvindex::const_iterator m_itemsiter;
+	int index_mame_mess_info(fileptr &&fp, dataindex &index, drvindex &index_drv, int &drvcount);
+	int index_datafile(fileptr &&fp, dataindex &index, int &swcount, std::string &rev, std::string const &tag, char sep);
+	void index_menuidx(fileptr &&fp, game_driver const *drv, dataindex const &idx, drvindex &index);
 
-	void load_data_text(const game_driver *drv, std::string &buffer, dataindex &idx, const std::string &tag);
-	void load_driver_text(const game_driver *drv, std::string &buffer, drvindex &idx, const std::string &tag);
+	long const *find_software(std::string const &softlist, std::string const &softname, std::string const &parentname) const;
+
+	void load_data_text(FILE *fp, game_driver const *drv, std::string &buffer, dataindex const &idx, std::string const &tag);
+	void load_driver_text(FILE *fp, game_driver const *drv, std::string &buffer, drvindex const &idx, std::string const &tag);
 
 	// internal state
 	running_machine     &m_machine;             // reference to our machine
 	ui_options          &m_options;
-	std::string         m_fullpath;
 	static std::string  m_history_rev, m_mame_rev, m_mess_rev, m_sysinfo_rev, m_story_rev, m_ginit_rev;
-	FILE                *fp = nullptr;
 	static bool         first_run;
 };
 

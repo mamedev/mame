@@ -37,8 +37,8 @@
 extern const char UI_VERSION_TAG[];
 
 namespace ui {
-static bool first_start = true;
-static const char *dats_info[] = {
+namespace {
+char const *const dats_info[] = {
 	__("General Info"),
 	__("History"),
 	__("Mameinfo"),
@@ -46,8 +46,12 @@ static const char *dats_info[] = {
 	__("Messinfo"),
 	__("Command"),
 	__("Gameinit"),
-	__("Mamescore") };
+	__("Mamescore")
+};
 
+} // anonymous namespace
+
+bool menu_select_game::first_start = true;
 std::vector<const game_driver *> menu_select_game::m_sortedlist;
 int menu_select_game::m_isabios = 0;
 
@@ -57,8 +61,11 @@ int menu_select_game::m_isabios = 0;
 
 menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &container, const char *gamename)
 	: menu_select_launch(mui, container, false)
+	, m_info_buffer()
+	, m_info_driver(nullptr)
+	, m_info_software(nullptr)
+	, m_info_view(-1)
 {
-	set_focus(focused_menu::main);
 	highlight = 0;
 	std::string error_string, last_filter, sub_filter;
 	ui_options &moptions = mui.options();
@@ -426,8 +433,9 @@ void menu_select_game::handle()
 			inkey_special(menu_event);
 		}
 		else if (menu_event->iptkey == IPT_UI_CONFIGURE)
+		{
 			inkey_navigation();
-
+		}
 		else if (menu_event->iptkey == IPT_OTHER)
 		{
 			m_prev_selected = nullptr;
@@ -748,253 +756,6 @@ void menu_select_game::build_available_list()
 	std::stable_sort(m_unavailsortedlist.begin(), m_unavailsortedlist.end(), sorted_game_list);
 }
 
-//-------------------------------------------------
-//  perform our special rendering
-//-------------------------------------------------
-
-void menu_select_game::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
-{
-	ui_software_info *swinfo = nullptr;
-	float width, maxwidth = origx2 - origx1;
-	std::string tempbuf[5];
-	rgb_t color = UI_BACKGROUND_COLOR;
-	bool isstar = false;
-	inifile_manager &inifile = mame_machine_manager::instance()->inifile();
-	float tbarspace = ui().get_line_height();
-	float text_size = 1.0f;
-
-	tempbuf[0] = string_format(_("%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"),
-			emulator_info::get_appname(),
-			bare_build_version,
-			visible_items,
-			(driver_list::total() - 1),
-			m_isabios);
-
-	std::string filtered;
-	if (main_filters::actual == FILTER_CATEGORY && inifile.total() > 0)
-	{
-		filtered = string_format(_("%1$s (%2$s - %3$s) - "),
-				main_filters::text[main_filters::actual],
-				inifile.get_file(),
-				inifile.get_category());
-	}
-	else if (main_filters::actual == FILTER_MANUFACTURER)
-	{
-		filtered = string_format(_("%1$s (%2$s) - "),
-				main_filters::text[main_filters::actual],
-				c_mnfct::ui[c_mnfct::actual]);
-	}
-	else if (main_filters::actual == FILTER_YEAR)
-	{
-		filtered = string_format(_("%1$s (%2$s) - "),
-				main_filters::text[main_filters::actual],
-				c_year::ui[c_year::actual]);
-	}
-
-	// display the current typeahead
-	if (isfavorite())
-		tempbuf[1].clear();
-	else
-		tempbuf[1] = string_format(_("%1$s Search: %2$s_"), filtered, m_search);
-
-	// get the size of the text
-	for (int line = 0; line < 2; ++line)
-	{
-		ui().draw_text_full(container(), tempbuf[line].c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
-				mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
-		width += 2 * UI_BOX_LR_BORDER;
-		maxwidth = MAX(width, maxwidth);
-	}
-
-	if (maxwidth > origx2 - origx1)
-	{
-		text_size = (origx2 - origx1) / maxwidth;
-		maxwidth = origx2 - origx1;
-	}
-
-	// compute our bounds
-	float x1 = 0.5f - 0.5f * maxwidth;
-	float x2 = x1 + maxwidth;
-	float y1 = origy1 - top;
-	float y2 = origy1 - 3.0f * UI_BOX_TB_BORDER - tbarspace;
-
-	// draw a box
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_BACKGROUND_COLOR);
-
-	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-
-	// draw the text within it
-	for (int line = 0; line < 2; ++line)
-	{
-		ui().draw_text_full(container(), tempbuf[line].c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-				mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
-		y1 += ui().get_line_height();
-	}
-
-	// determine the text to render below
-	const game_driver *driver = nullptr;
-	if (!isfavorite())
-	{
-		driver = (FPTR(selectedref) > skip_main_items) ? (const game_driver *)selectedref : reinterpret_cast<const game_driver *>(m_prev_selected);
-	}
-	else
-	{
-		swinfo = (FPTR(selectedref) > skip_main_items) ? (ui_software_info *)selectedref : reinterpret_cast<ui_software_info *>(m_prev_selected);
-		if (swinfo != nullptr && swinfo->startempty == 1)
-			driver = swinfo->driver;
-	}
-
-	if (driver)
-	{
-		isstar = mame_machine_manager::instance()->favorite().isgame_favorite(driver);
-
-		// first line is game name
-		tempbuf[0] = string_format(_("Romset: %1$-.100s"), driver->name);
-
-		// next line is year, manufacturer
-		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), driver->year, driver->manufacturer);
-
-		// next line is clone/parent status
-		int cloneof = driver_list::non_bios_clone(*driver);
-
-		if (cloneof != -1)
-			tempbuf[2] = string_format(_("Driver is clone of: %1$-.100s"), driver_list::driver(cloneof).description);
-		else
-			tempbuf[2] = _("Driver is parent");
-
-		// next line is overall driver status
-		if (driver->flags & MACHINE_NOT_WORKING)
-			tempbuf[3] = _("Overall: NOT WORKING");
-		else if (driver->flags & MACHINE_UNEMULATED_PROTECTION)
-			tempbuf[3] = _("Overall: Unemulated Protection");
-		else
-			tempbuf[3] = _("Overall: Working");
-
-		// next line is graphics, sound status
-		if (driver->flags & (MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS))
-			tempbuf[4] = _("Graphics: Imperfect, ");
-		else
-			tempbuf[4] = _("Graphics: OK, ");
-
-		if (driver->flags & MACHINE_NO_SOUND)
-			tempbuf[4].append(_("Sound: Unimplemented"));
-		else if (driver->flags & MACHINE_IMPERFECT_SOUND)
-			tempbuf[4].append(_("Sound: Imperfect"));
-		else
-			tempbuf[4].append(_("Sound: OK"));
-
-		color = UI_GREEN_COLOR;
-
-		if ((driver->flags & (MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS
-			| MACHINE_NO_SOUND | MACHINE_IMPERFECT_SOUND)) != 0)
-			color = UI_YELLOW_COLOR;
-
-		if ((driver->flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION)) != 0)
-			color = UI_RED_COLOR;
-	}
-	else if (swinfo != nullptr)
-	{
-		isstar = mame_machine_manager::instance()->favorite().isgame_favorite(*swinfo);
-
-		// first line is system
-		tempbuf[0] = string_format(_("System: %1$-.100s"), swinfo->driver->description);
-
-		// next line is year, publisher
-		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), swinfo->year, swinfo->publisher);
-
-		// next line is parent/clone
-		if (!swinfo->parentname.empty())
-			tempbuf[2] = string_format(_("Software is clone of: %1$-.100s"), !swinfo->parentlongname.empty() ? swinfo->parentlongname : swinfo->parentname);
-		else
-			tempbuf[2] = _("Software is parent");
-
-		// next line is supported status
-		if (swinfo->supported == SOFTWARE_SUPPORTED_NO)
-		{
-			tempbuf[3] = _("Supported: No");
-			color = UI_RED_COLOR;
-		}
-		else if (swinfo->supported == SOFTWARE_SUPPORTED_PARTIAL)
-		{
-			tempbuf[3] = _("Supported: Partial");
-			color = UI_YELLOW_COLOR;
-		}
-		else
-		{
-			tempbuf[3] = _("Supported: Yes");
-			color = UI_GREEN_COLOR;
-		}
-
-		// last line is romset name
-		tempbuf[4] = string_format(_("romset: %1$-.100s"), swinfo->shortname);
-	}
-	else
-	{
-		std::string copyright(emulator_info::get_copyright());
-		size_t found = copyright.find("\n");
-
-		tempbuf[0].clear();
-		tempbuf[1] = string_format(_("%1$s %2$s"), emulator_info::get_appname(), build_version);
-		tempbuf[2] = copyright.substr(0, found);
-		tempbuf[3] = copyright.substr(found + 1);
-		tempbuf[4].clear();
-	}
-
-	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = y2;
-	y2 = origy1 - UI_BOX_TB_BORDER;
-
-	// draw toolbar
-	draw_toolbar(x1, y1, x2, y2);
-
-	// get the size of the text
-	maxwidth = origx2 - origx1;
-
-	for (auto & elem : tempbuf)
-	{
-		ui().draw_text_full(container(), elem.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
-				mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
-		width += 2 * UI_BOX_LR_BORDER;
-		maxwidth = MAX(maxwidth, width);
-	}
-
-	if (maxwidth > origx2 - origx1)
-	{
-		text_size = (origx2 - origx1) / maxwidth;
-		maxwidth = origx2 - origx1;
-	}
-
-	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = origy2 + UI_BOX_TB_BORDER;
-	y2 = origy2 + bottom;
-
-	// draw a box
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, color);
-
-	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-
-	// is favorite? draw the star
-	if (isstar)
-		draw_star(x1, y1);
-
-	// draw all lines
-	for (auto & elem : tempbuf)
-	{
-		ui().draw_text_full(container(), elem.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-				mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
-		y1 += ui().get_line_height();
-	}
-}
 
 //-------------------------------------------------
 //  force the game select menu to be visible
@@ -1209,7 +970,7 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 //  returns if the search can be activated
 //-------------------------------------------------
 
-inline bool menu_select_game::isfavorite()
+inline bool menu_select_game::isfavorite() const
 {
 	return (main_filters::actual == FILTER_FAVORITE);
 }
@@ -1242,73 +1003,6 @@ void menu_select_game::inkey_special(const event *menu_event)
 	}
 }
 
-
-void menu_select_game::inkey_navigation()
-{
-	switch (get_focus())
-	{
-		case focused_menu::main:
-			if (selected <= visible_items)
-			{
-				m_prev_selected = item[selected].ref;
-				selected = visible_items + 1;
-			}
-			else
-			{
-				if (ui_globals::panels_status != HIDE_LEFT_PANEL)
-					set_focus(focused_menu::left);
-
-				else if (ui_globals::panels_status == HIDE_BOTH)
-				{
-					for (int x = 0; x < item.size(); ++x)
-						if (item[x].ref == m_prev_selected)
-							selected = x;
-				}
-				else
-				{
-					set_focus(focused_menu::righttop);
-				}
-			}
-			break;
-
-		case focused_menu::left:
-			if (ui_globals::panels_status != HIDE_RIGHT_PANEL)
-			{
-				set_focus(focused_menu::righttop);
-			}
-			else
-			{
-				set_focus(focused_menu::main);
-				if (!m_prev_selected)
-				{
-					selected = 0;
-					return;
-				}
-
-				for (int x = 0; x < item.size(); ++x)
-					if (item[x].ref == m_prev_selected)
-						selected = x;
-			}
-			break;
-
-		case focused_menu::righttop:
-			set_focus(focused_menu::rightbottom);
-			break;
-
-		case focused_menu::rightbottom:
-			set_focus(focused_menu::main);
-			if (!m_prev_selected)
-			{
-				selected = 0;
-				return;
-			}
-
-			for (int x = 0; x < item.size(); ++x)
-				if (item[x].ref == m_prev_selected)
-					selected = x;
-			break;
-	}
-}
 
 //-------------------------------------------------
 //  build list
@@ -1966,38 +1660,127 @@ float menu_select_game::draw_left_panel(float x1, float y1, float x2, float y2)
 
 void menu_select_game::infos_render(float origx1, float origy1, float origx2, float origy2)
 {
-	float line_height = ui().get_line_height();
-	static std::string buffer;
+	float const line_height = ui().get_line_height();
+	float text_size = ui().options().infos_size();
 	std::vector<int> xstart;
 	std::vector<int> xend;
-	float text_size = ui().options().infos_size();
-	const game_driver *driver = nullptr;
-	ui_software_info *soft = nullptr;
-	bool is_favorites = ((item[0].flags & FLAG_UI_FAVORITE) != 0);
-	static ui_software_info *oldsoft = nullptr;
-	static const game_driver *olddriver = nullptr;
-	static int oldview = -1;
-	static int old_sw_view = -1;
 
-	if (is_favorites)
+	ui_software_info const *software;
+	game_driver const *driver;
+	get_selection(software, driver);
+
+	if (software && ((software->startempty != 1) || !driver))
 	{
-		soft = reinterpret_cast<ui_software_info *>(get_selection_ptr());
-		if (soft && soft->startempty == 1)
+		m_info_driver = nullptr;
+
+		float gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
+		float ud_arrow_width = line_height * machine().render().ui_aspect();
+		float oy1 = origy1 + line_height;
+
+		// apply title to right panel
+		if (software->usage.empty())
 		{
-			driver = soft->driver;
-			oldsoft = nullptr;
+			ui().draw_text_full(container(), _("History"), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+					mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+			ui_globals::cur_sw_dats_view = 0;
 		}
 		else
-			olddriver = nullptr;
-	}
-	else
-	{
-		driver = reinterpret_cast<const game_driver *>(get_selection_ptr());
-		oldsoft = nullptr;
-	}
+		{
+			float title_size = 0.0f;
+			float txt_length = 0.0f;
+			std::string t_text[2];
+			t_text[0] = _("History");
+			t_text[1] = _("Usage");
 
-	if (driver)
+			for (auto & elem: t_text)
+			{
+				ui().draw_text_full(container(), elem.c_str(), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+						mame_ui_manager::NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_length, nullptr);
+				txt_length += 0.01f;
+				title_size = (std::max)(txt_length, title_size);
+			}
+
+			rgb_t fgcolor = UI_TEXT_COLOR;
+			rgb_t bgcolor = UI_TEXT_BG_COLOR;
+			if (get_focus() == focused_menu::rightbottom)
+			{
+				fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
+				bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
+			}
+
+			float middle = origx2 - origx1;
+
+			if (bgcolor != UI_TEXT_BG_COLOR)
+			{
+				ui().draw_textured_box(container(), origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
+						origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+			}
+
+			ui().draw_text_full(container(), t_text[ui_globals::cur_sw_dats_view].c_str(), origx1, origy1, origx2 - origx1,
+					ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+
+			draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::cur_sw_dats_view, 0, 1, title_size);
+		}
+
+		if (m_info_software != software || m_info_view != ui_globals::cur_sw_dats_view)
+		{
+			m_info_buffer.clear();
+			m_info_view = ui_globals::cur_sw_dats_view;
+			m_info_software = software;
+			if (ui_globals::cur_sw_dats_view == 0)
+			{
+				if (software->startempty == 1)
+					mame_machine_manager::instance()->datfile().load_data_info(software->driver, m_info_buffer, UI_HISTORY_LOAD);
+				else
+					mame_machine_manager::instance()->datfile().load_software_info(software->listname, m_info_buffer, software->shortname, software->parentname);
+			}
+			else
+				m_info_buffer = software->usage;
+		}
+
+		if (m_info_buffer.empty())
+		{
+			ui().draw_text_full(container(), _("No Infos Available"), origx1, (origy2 + origy1) * 0.5f, origx2 - origx1, ui::text_layout::CENTER,
+					ui::text_layout::WORD, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+			return;
+		}
+		else
+		{
+			m_total_lines = ui().wrap_text(container(), m_info_buffer.c_str(), origx1, origy1, origx2 - origx1 - (2.0f * gutter_width), xstart, xend, text_size);
+		}
+
+		int r_visible_lines = floor((origy2 - oy1) / (line_height * text_size));
+		if (m_total_lines < r_visible_lines)
+			r_visible_lines = m_total_lines;
+		if (m_topline_datsview < 0)
+			m_topline_datsview = 0;
+		if (m_topline_datsview + r_visible_lines >= m_total_lines)
+			m_topline_datsview = m_total_lines - r_visible_lines;
+
+		for (int r = 0; r < r_visible_lines; ++r)
+		{
+			int itemline = r + m_topline_datsview;
+			std::string tempbuf(m_info_buffer.substr(xstart[itemline], xend[itemline] - xstart[itemline]));
+
+			// up arrow
+			if (r == 0 && m_topline_datsview != 0)
+				draw_info_arrow(0, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
+			// bottom arrow
+			else if (r == r_visible_lines - 1 && itemline != m_total_lines - 1)
+				draw_info_arrow(1, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
+			else
+				ui().draw_text_full(container(), tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1, ui::text_layout::LEFT,
+						ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
+			oy1 += (line_height * text_size);
+		}
+
+		// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
+		right_visible_lines = r_visible_lines - (m_topline_datsview != 0) - (m_topline_datsview + r_visible_lines != m_total_lines);
+	}
+	else if (driver)
 	{
+		m_info_software = nullptr;
+
 		float gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
 		float ud_arrow_width = line_height * machine().render().ui_aspect();
 		float oy1 = origy1 + line_height;
@@ -2046,19 +1829,19 @@ void menu_select_game::infos_render(float origx1, float origy1, float origx2, fl
 
 		draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::curdats_view, UI_FIRST_LOAD, UI_LAST_LOAD, title_size);
 
-		if (driver != olddriver || ui_globals::curdats_view != oldview)
+		if (driver != m_info_driver || ui_globals::curdats_view != m_info_view)
 		{
-			buffer.clear();
-			olddriver = driver;
-			oldview = ui_globals::curdats_view;
+			m_info_buffer.clear();
+			m_info_driver = driver;
+			m_info_view = ui_globals::curdats_view;
 			m_topline_datsview = 0;
 			m_total_lines = 0;
 			std::vector<std::string> m_item;
 
 			if (ui_globals::curdats_view == UI_GENERAL_LOAD)
-				general_info(driver, buffer);
+				general_info(driver, m_info_buffer);
 			else if (ui_globals::curdats_view != UI_COMMAND_LOAD)
-				mame_machine_manager::instance()->datfile().load_data_info(driver, buffer, ui_globals::curdats_view);
+				mame_machine_manager::instance()->datfile().load_data_info(driver, m_info_buffer, ui_globals::curdats_view);
 			else
 				mame_machine_manager::instance()->datfile().command_sub_menu(driver, m_item);
 
@@ -2067,25 +1850,25 @@ void menu_select_game::infos_render(float origx1, float origy1, float origx2, fl
 				for (size_t x = 0; x < m_item.size(); ++x)
 				{
 					std::string t_buffer;
-					buffer.append(m_item[x]).append("\n");
+					m_info_buffer.append(m_item[x]).append("\n");
 					mame_machine_manager::instance()->datfile().load_command_info(t_buffer, m_item[x]);
 					if (!t_buffer.empty())
-						buffer.append(t_buffer).append("\n");
+						m_info_buffer.append(t_buffer).append("\n");
 				}
-				convert_command_glyph(buffer);
+				convert_command_glyph(m_info_buffer);
 			}
 		}
 
-		if (buffer.empty())
+		if (m_info_buffer.empty())
 		{
 			ui().draw_text_full(container(), _("No Infos Available"), origx1, (origy2 + origy1) * 0.5f, origx2 - origx1, ui::text_layout::CENTER,
 					ui::text_layout::WORD, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 			return;
 		}
 		else if (ui_globals::curdats_view != UI_STORY_LOAD && ui_globals::curdats_view != UI_COMMAND_LOAD)
-			m_total_lines = ui().wrap_text(container(), buffer.c_str(), origx1, origy1, origx2 - origx1 - (2.0f * gutter_width), xstart, xend, text_size);
+			m_total_lines = ui().wrap_text(container(), m_info_buffer.c_str(), origx1, origy1, origx2 - origx1 - (2.0f * gutter_width), xstart, xend, text_size);
 		else
-			m_total_lines = ui().wrap_text(container(), buffer.c_str(), 0.0f, 0.0f, 1.0f - (2.0f * gutter_width), xstart, xend, text_size);
+			m_total_lines = ui().wrap_text(container(), m_info_buffer.c_str(), 0.0f, 0.0f, 1.0f - (2.0f * gutter_width), xstart, xend, text_size);
 
 		int r_visible_lines = floor((origy2 - oy1) / (line_height * text_size));
 		if (m_total_lines < r_visible_lines)
@@ -2099,7 +1882,7 @@ void menu_select_game::infos_render(float origx1, float origy1, float origx2, fl
 		for (int r = 0; r < r_visible_lines; ++r)
 		{
 			int itemline = r + m_topline_datsview;
-			std::string tempbuf(buffer.substr(xstart[itemline], xend[itemline] - xstart[itemline]));
+			std::string tempbuf(m_info_buffer.substr(xstart[itemline], xend[itemline] - xstart[itemline]));
 
 			// up arrow
 			if (r == 0 && m_topline_datsview != 0)
@@ -2159,8 +1942,10 @@ void menu_select_game::infos_render(float origx1, float origy1, float origx2, fl
 							ui::text_layout::RIGHT, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, tmp_size3);
 				}
 				else
+				{
 					ui().draw_text_full(container(), tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1, ui::text_layout::LEFT,
 							ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, tmp_size3);
+				}
 			}
 			else
 			{
@@ -2168,112 +1953,6 @@ void menu_select_game::infos_render(float origx1, float origy1, float origx2, fl
 						ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
 			}
 
-			oy1 += (line_height * text_size);
-		}
-
-		// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
-		right_visible_lines = r_visible_lines - (m_topline_datsview != 0) - (m_topline_datsview + r_visible_lines != m_total_lines);
-	}
-	else if (soft)
-	{
-		float gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
-		float ud_arrow_width = line_height * machine().render().ui_aspect();
-		float oy1 = origy1 + line_height;
-
-		// apply title to right panel
-		if (soft->usage.empty())
-		{
-			ui().draw_text_full(container(), _("History"), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-					mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
-			ui_globals::cur_sw_dats_view = 0;
-		}
-		else
-		{
-			float title_size = 0.0f;
-			float txt_length = 0.0f;
-			std::string t_text[2];
-			t_text[0] = _("History");
-			t_text[1] = _("Usage");
-
-			for (auto & elem: t_text)
-			{
-				ui().draw_text_full(container(), elem.c_str(), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-						mame_ui_manager::NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_length, nullptr);
-				txt_length += 0.01f;
-				title_size = (std::max)(txt_length, title_size);
-			}
-
-			rgb_t fgcolor = UI_TEXT_COLOR;
-			rgb_t bgcolor = UI_TEXT_BG_COLOR;
-			if (get_focus() == focused_menu::rightbottom)
-			{
-				fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
-				bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
-			}
-
-			float middle = origx2 - origx1;
-
-			if (bgcolor != UI_TEXT_BG_COLOR)
-			{
-				ui().draw_textured_box(container(), origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
-						origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
-			}
-
-			ui().draw_text_full(container(), t_text[ui_globals::cur_sw_dats_view].c_str(), origx1, origy1, origx2 - origx1,
-					ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
-
-			draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::cur_sw_dats_view, 0, 1, title_size);
-		}
-
-		if (oldsoft != soft || old_sw_view != ui_globals::cur_sw_dats_view)
-		{
-			buffer.clear();
-			old_sw_view = ui_globals::cur_sw_dats_view;
-			oldsoft = soft;
-			if (ui_globals::cur_sw_dats_view == 0)
-			{
-				if (soft->startempty == 1)
-					mame_machine_manager::instance()->datfile().load_data_info(soft->driver, buffer, UI_HISTORY_LOAD);
-				else
-					mame_machine_manager::instance()->datfile().load_software_info(soft->listname, buffer, soft->shortname, soft->parentname);
-			}
-			else
-				buffer = soft->usage;
-		}
-
-		if (buffer.empty())
-		{
-			ui().draw_text_full(container(), _("No Infos Available"), origx1, (origy2 + origy1) * 0.5f, origx2 - origx1, ui::text_layout::CENTER,
-					ui::text_layout::WORD, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
-			return;
-		}
-		else
-		{
-			m_total_lines = ui().wrap_text(container(), buffer.c_str(), origx1, origy1, origx2 - origx1 - (2.0f * gutter_width), xstart, xend, text_size);
-		}
-
-		int r_visible_lines = floor((origy2 - oy1) / (line_height * text_size));
-		if (m_total_lines < r_visible_lines)
-			r_visible_lines = m_total_lines;
-		if (m_topline_datsview < 0)
-			m_topline_datsview = 0;
-		if (m_topline_datsview + r_visible_lines >= m_total_lines)
-			m_topline_datsview = m_total_lines - r_visible_lines;
-
-		for (int r = 0; r < r_visible_lines; ++r)
-		{
-			int itemline = r + m_topline_datsview;
-			std::string tempbuf(buffer.substr(xstart[itemline], xend[itemline] - xstart[itemline]));
-
-			// up arrow
-			if (r == 0 && m_topline_datsview != 0)
-				draw_info_arrow(0, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
-			// bottom arrow
-			else if (r == r_visible_lines - 1 && itemline != m_total_lines - 1)
-				draw_info_arrow(1, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
-			else
-				ui().draw_text_full(container(), tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1, ui::text_layout::LEFT,
-						ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
 			oy1 += (line_height * text_size);
 		}
 
@@ -2299,6 +1978,62 @@ void menu_select_game::get_selection(ui_software_info const *&software, game_dri
 		software = nullptr;
 		driver = reinterpret_cast<game_driver const *>(get_selection_ptr());
 	}
+}
+
+
+void menu_select_game::make_topbox_text(std::string &line0, std::string &line1, std::string &line2) const
+{
+	inifile_manager &inifile = mame_machine_manager::instance()->inifile();
+
+	line0 = string_format(_("%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"),
+			emulator_info::get_appname(),
+			bare_build_version,
+			visible_items,
+			(driver_list::total() - 1),
+			m_isabios);
+
+	std::string filtered;
+	if (main_filters::actual == FILTER_CATEGORY && inifile.total() > 0)
+	{
+		filtered = string_format(_("%1$s (%2$s - %3$s) - "),
+				main_filters::text[main_filters::actual],
+				inifile.get_file(),
+				inifile.get_category());
+	}
+	else if (main_filters::actual == FILTER_MANUFACTURER)
+	{
+		filtered = string_format(_("%1$s (%2$s) - "),
+				main_filters::text[main_filters::actual],
+				c_mnfct::ui[c_mnfct::actual]);
+	}
+	else if (main_filters::actual == FILTER_YEAR)
+	{
+		filtered = string_format(_("%1$s (%2$s) - "),
+				main_filters::text[main_filters::actual],
+				c_year::ui[c_year::actual]);
+	}
+
+	// display the current typeahead
+	if (isfavorite())
+		line1.clear();
+	else
+		line1 = string_format(_("%1$s Search: %2$s_"), filtered, m_search);
+
+	line2.clear();
+}
+
+
+std::string menu_select_game::make_driver_description(game_driver const &driver) const
+{
+	// first line is game name
+	return string_format(_("Romset: %1$-.100s"), driver.name);
+}
+
+
+std::string menu_select_game::make_software_description(ui_software_info const &software) const
+{
+	// first line is system
+	return string_format(_("System: %1$-.100s"), software.driver->description);
 }
 
 } // namespace ui

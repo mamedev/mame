@@ -46,18 +46,14 @@ protected:
 	focused_menu get_focus() const { return m_focus; }
 	void set_focus(focused_menu focus) { m_focus = focus; }
 
-	// draw right box
-	float draw_right_box_title(float x1, float y1, float x2, float y2);
+	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+
+	// hanlders
+	void inkey_navigation();
 
 	// draw arrow
 	void draw_common_arrow(float origx1, float origy1, float origx2, float origy2, int current, int dmin, int dmax, float title);
 	void draw_info_arrow(int ub, float origx1, float origx2, float oy1, float line_height, float text_size, float ud_arrow_width);
-
-	// draw toolbar
-	void draw_toolbar(float x1, float y1, float x2, float y2, bool software = false);
-
-	// draw star
-	void draw_star(float x0, float y0);
 
 	int     visible_items;
 	void    *m_prev_selected;
@@ -124,7 +120,27 @@ private:
 
 	// get selected software and/or driver
 	virtual void get_selection(ui_software_info const *&software, game_driver const *&driver) const = 0;
+	void select_prev()
+	{
+		if (!m_prev_selected)
+		{
+			selected = 0;
+		}
+		else
+		{
+			for (int x = 0; x < item.size(); ++x)
+			{
+				if (item[x].ref == m_prev_selected)
+				{
+					selected = x;
+					break;
+				}
+			}
+		}
+	}
 
+	void draw_toolbar(float x1, float y1, float x2, float y2);
+	void draw_star(float x0, float y0);
 	float draw_icon(int linenum, void *selectedref, float x1, float y1);
 
 	void get_title_search(std::string &title, std::string &search);
@@ -140,12 +156,18 @@ private:
 
 	// draw right panel
 	void draw_right_panel(float origx1, float origy1, float origx2, float origy2);
+	float draw_right_box_title(float x1, float y1, float x2, float y2);
 
 	// images render
 	void arts_render(float origx1, float origy1, float origx2, float origy2);
 	std::string arts_render_common(float origx1, float origy1, float origx2, float origy2);
 	void arts_render_images(bitmap_argb32 *bitmap, float origx1, float origy1, float origx2, float origy2);
 	void draw_snapx(float origx1, float origy1, float origx2, float origy2);
+
+	// text for main top/bottom panels
+	virtual void make_topbox_text(std::string &line0, std::string &line1, std::string &line2) const = 0;
+	virtual std::string make_driver_description(game_driver const &driver) const = 0;
+	virtual std::string make_software_description(ui_software_info const &software) const = 0;
 
 	// cleanup function
 	static void exit(running_machine &machine);

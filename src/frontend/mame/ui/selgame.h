@@ -27,7 +27,6 @@ public:
 	static void force_game_select(mame_ui_manager &mui, render_container &container);
 
 protected:
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 	virtual bool menu_has_search_active() override { return (m_search[0] != 0); }
 
 private:
@@ -40,8 +39,14 @@ private:
 
 	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
 	char m_search[40];
+	static bool first_start;
 	static int m_isabios;
 	int highlight;
+
+	std::string             m_info_buffer;
+	game_driver const       *m_info_driver;
+	ui_software_info const  *m_info_software;
+	int                     m_info_view;
 
 	static std::vector<const game_driver *> m_sortedlist;
 	std::vector<const game_driver *> m_availsortedlist;
@@ -59,13 +64,18 @@ private:
 	// get selected software and/or driver
 	virtual void get_selection(ui_software_info const *&software, game_driver const *&driver) const override;
 
+	// text for main top/bottom panels
+	virtual void make_topbox_text(std::string &line0, std::string &line1, std::string &line2) const override;
+	virtual std::string make_driver_description(game_driver const &driver) const override;
+	virtual std::string make_software_description(ui_software_info const &software) const override;
+
 	// internal methods
 	void build_custom();
 	void build_category();
 	void build_available_list();
 	void build_list(const char *filter_text = nullptr, int filter = 0, bool bioscheck = false, std::vector<const game_driver *> vec = {});
 
-	bool isfavorite();
+	bool isfavorite() const;
 	void populate_search();
 	void init_sorted_list();
 	bool load_available_machines();
@@ -87,7 +97,6 @@ private:
 	void inkey_select_favorite(const event *menu_event);
 	void inkey_special(const event *menu_event);
 	void inkey_export();
-	void inkey_navigation();
 };
 
 } // namespace ui
