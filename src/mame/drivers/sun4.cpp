@@ -505,6 +505,7 @@ public:
 		, m_type1space(*this, "type1")
 		, m_ram(*this, RAM_TAG)
 		, m_rom(*this, "user1")
+		, m_bw2_vram(*this, "bw2_vram")
 		, m_rom_ptr(nullptr)
 		, m_system_enable(0)
 	{
@@ -538,6 +539,8 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
+	UINT32 bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 protected:
 	required_device<mb86901_device> m_maincpu;
 	required_device<z80scc_device> m_scc1;
@@ -546,6 +549,8 @@ protected:
 	optional_device<address_map_bank_device> m_type0space, m_type1space;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
+	optional_shared_ptr<UINT32> m_bw2_vram;
+
 	UINT32 *m_rom_ptr;
 	UINT32 m_context;
 	UINT8 m_system_enable;
@@ -570,6 +575,35 @@ private:
 	void l2p_command(int ref, int params, const char **param);
 	void fcodes_command(int ref, int params, const char **param);
 };
+
+UINT32 sun4_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	UINT32 *scanline;
+	int x, y;
+	UINT8 pixels;
+	static const UINT32 palette[2] = { 0xffffff, 0 };
+	UINT8 *m_vram = (UINT8 *)m_bw2_vram.target();
+
+	for (y = 0; y < 900; y++)
+	{
+		scanline = &bitmap.pix32(y);
+		for (x = 0; x < 1152/8; x++)
+		{
+			pixels = m_vram[(y * (1152/8)) + (BYTE4_XOR_BE(x))];
+
+			*scanline++ = palette[(pixels>>7)&1];
+			*scanline++ = palette[(pixels>>6)&1];
+			*scanline++ = palette[(pixels>>5)&1];
+			*scanline++ = palette[(pixels>>4)&1];
+			*scanline++ = palette[(pixels>>3)&1];
+			*scanline++ = palette[(pixels>>2)&1];
+			*scanline++ = palette[(pixels>>1)&1];
+			*scanline++ = palette[(pixels&1)];
+		}
+	}
+
+	return 0;
+}
 
 READ32_MEMBER( sun4_state::sun4c_mmu_r )
 {
@@ -1290,6 +1324,7 @@ static ADDRESS_MAP_START(type1space_map, AS_PROGRAM, 32, sun4_state)
 	AM_RANGE(0x07200000, 0x07200003) AM_READWRITE8(fdc_r, fdc_w, 0xffffffff)
 	AM_RANGE(0x08000000, 0x08000003) AM_READ(ss1_sl0_id)	// slot 0 contains SCSI/DMA/Ethernet
 	AM_RANGE(0x0e000000, 0x0e000003) AM_READ(ss1_sl3_id)	// slot 3 contains video board
+	AM_RANGE(0x0e800000, 0x0e8fffff) AM_RAM AM_SHARE("bw2_vram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(type1space_s4_map, AS_PROGRAM, 32, sun4_state)
@@ -1568,6 +1603,12 @@ static MACHINE_CONFIG_START( sun4c, sun4_state )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxb_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
+
+	MCFG_SCREEN_ADD("bwtwo", RASTER)
+	MCFG_SCREEN_UPDATE_DRIVER(sun4_state, bw2_update)
+	MCFG_SCREEN_SIZE(1152,900)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
+	MCFG_SCREEN_REFRESH_RATE(72)
 MACHINE_CONFIG_END
 
 /*
