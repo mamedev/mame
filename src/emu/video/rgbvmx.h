@@ -34,6 +34,9 @@ public:
 	explicit rgbaint_t(const rgb_t& rgb) { set(rgb); }
 	explicit rgbaint_t(VECS32 rgba) : m_value(rgba) { }
 
+	rgbaint_t(const rgbaint_t& other) = default;
+	rgbaint_t &operator=(const rgbaint_t& other) = default;
+
 	void set(const rgbaint_t& other) { m_value = other.m_value; }
 
 	void set(UINT32 rgba)
@@ -543,12 +546,6 @@ public:
 		const VECS32 temp = { a, r, g, b };
 #endif
 		m_value = VECS32(vec_cmplt(m_value, temp));
-	}
-
-	inline rgbaint_t &operator=(const rgbaint_t& other)
-	{
-		m_value = other.m_value;
-		return *this;
 	}
 
 	inline rgbaint_t& operator+=(const rgbaint_t& other)

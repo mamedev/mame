@@ -380,7 +380,7 @@ void validity_checker::validate_core()
 
 void validity_checker::validate_inlines()
 {
-	volatile UINT64 testu64a = random_i64();
+	volatile UINT64 testu64a = random_u64();
 	volatile INT64 testi64a = random_i64();
 	volatile UINT32 testu32a = random_u32();
 	volatile UINT32 testu32b = random_u32();
@@ -507,36 +507,40 @@ void validity_checker::validate_rgb()
 {
 	/*
 	    This performs cursory tests of most of the vector-optimised RGB
-		utilities, concentrating on the low-level maths.  It uses random
-		values most of the time for a quick go/no-go indication rather
-		than trying to exercise edge cases.  It doesn't matter too much
-		if the compiler optimises out some of the operations since it's
-		really intended to check for logic bugs in the vector code.
+	    utilities, concentrating on the low-level maths.  It uses random
+	    values most of the time for a quick go/no-go indication rather
+	    than trying to exercise edge cases.  It doesn't matter too much
+	    if the compiler optimises out some of the operations since it's
+	    really intended to check for logic bugs in the vector code.  If
+	    the compiler can work out that the code produces the expected
+	    result, that's good enough.
 
-		The following functions are not tested yet:
-		rgbaint_t()
-		clamp_and_clear(const UINT32)
-		sign_extend(const UINT32, const UINT32)
-		min(const INT32)
-		max(const INT32)
-		blend(const rgbaint_t&, UINT8)
-		scale_and_clamp(const rgbaint_t&)
-		scale_imm_and_clamp(const INT32)
-		scale2_add_and_clamp(const rgbaint_t&, const rgbaint_t&, const rgbaint_t&)
-		scale_add_and_clamp(const rgbaint_t&, const rgbaint_t&);
-		scale_imm_add_and_clamp(const INT32, const rgbaint_t&);
-		cmpeq(const rgbaint_t&)
-		cmpeq_imm(const INT32)
-		cmpeq_imm_rgba(const INT32, const INT32, const INT32, const INT32)
-		cmpgt(const rgbaint_t&)
-		cmpgt_imm(const INT32)
-		cmpgt_imm_rgba(const INT32, const INT32, const INT32, const INT32)
-		cmplt(const rgbaint_t&)
-		cmplt_imm(const INT32)
-		cmplt_imm_rgba(const INT32, const INT32, const INT32, const INT32)
-		static bilinear_filter(UINT32, UINT32, UINT32, UINT32, UINT8, UINT8)
-		bilinear_filter_rgbaint(UINT32, UINT32, UINT32, UINT32, UINT8, UINT8)
+	    The tests for bitwise logical operations are ordered to minimise
+	    the chance of all-zero or all-one patterns producing a
+	    misleading good result.
+
+	    The following functions are not tested yet:
+	    rgbaint_t()
+	    clamp_and_clear(const UINT32)
+	    sign_extend(const UINT32, const UINT32)
+	    min(const INT32)
+	    max(const INT32)
+	    blend(const rgbaint_t&, UINT8)
+	    scale_and_clamp(const rgbaint_t&)
+	    scale_imm_and_clamp(const INT32)
+	    scale2_add_and_clamp(const rgbaint_t&, const rgbaint_t&, const rgbaint_t&)
+	    scale_add_and_clamp(const rgbaint_t&, const rgbaint_t&);
+	    scale_imm_add_and_clamp(const INT32, const rgbaint_t&);
+	    static bilinear_filter(UINT32, UINT32, UINT32, UINT32, UINT8, UINT8)
+	    bilinear_filter_rgbaint(UINT32, UINT32, UINT32, UINT32, UINT8, UINT8)
 	*/
+
+	auto random_i32_nolimit = [this]
+	{
+		INT32 result;
+		do { result = random_i32(); } while ((result == std::numeric_limits<INT32>::min()) || (result == std::numeric_limits<INT32>::max()));
+		return result;
+	};
 
 	volatile INT32 expected_a, expected_r, expected_g, expected_b;
 	volatile INT32 actual_a, actual_r, actual_g, actual_b;
@@ -1034,6 +1038,291 @@ void validity_checker::validate_rgb()
 	rgb.set(actual_a, actual_r, actual_g, actual_b);
 	rgb >>= 11;
 	check_expected("rgbaint_t::operator>>=");
+
+	// test RGB equality comparison
+	actual_a = random_i32_nolimit();
+	actual_r = random_i32_nolimit();
+	actual_g = random_i32_nolimit();
+	actual_b = random_i32_nolimit();
+	expected_a = ~INT32(0);
+	expected_r = 0;
+	expected_g = 0;
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpeq(rgbaint_t(actual_a, actual_r - 1, actual_g + 1, std::numeric_limits<INT32>::min()));
+	check_expected("rgbaint_t::cmpeq");
+	expected_a = 0;
+	expected_r = ~INT32(0);
+	expected_g = 0;
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpeq(rgbaint_t(std::numeric_limits<INT32>::max(), actual_r, actual_g - 1, actual_b + 1));
+	check_expected("rgbaint_t::cmpeq");
+
+	// test immediate equality comparison
+	actual_a = random_i32_nolimit();
+	actual_r = random_i32_nolimit();
+	actual_g = random_i32_nolimit();
+	actual_b = random_i32_nolimit();
+	expected_a = ~INT32(0);
+	expected_r = (actual_r == actual_a) ? ~INT32(0) : 0;
+	expected_g = (actual_g == actual_a) ? ~INT32(0) : 0;
+	expected_b = (actual_b == actual_a) ? ~INT32(0) : 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpeq_imm(actual_a);
+	check_expected("rgbaint_t::cmpeq_imm");
+	expected_a = (actual_a == actual_r) ? ~INT32(0) : 0;
+	expected_r = ~INT32(0);
+	expected_g = (actual_g == actual_r) ? ~INT32(0) : 0;
+	expected_b = (actual_b == actual_r) ? ~INT32(0) : 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpeq_imm(actual_r);
+	check_expected("rgbaint_t::cmpeq_imm");
+	expected_a = (actual_a == actual_g) ? ~INT32(0) : 0;
+	expected_r = (actual_r == actual_g) ? ~INT32(0) : 0;
+	expected_g = ~INT32(0);
+	expected_b = (actual_b == actual_g) ? ~INT32(0) : 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpeq_imm(actual_g);
+	check_expected("rgbaint_t::cmpeq_imm");
+	expected_a = (actual_a == actual_b) ? ~INT32(0) : 0;
+	expected_r = (actual_r == actual_b) ? ~INT32(0) : 0;
+	expected_g = (actual_g == actual_b) ? ~INT32(0) : 0;
+	expected_b = ~INT32(0);
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpeq_imm(actual_b);
+	check_expected("rgbaint_t::cmpeq_imm");
+	expected_a = 0;
+	expected_r = 0;
+	expected_g = 0;
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpeq_imm(std::numeric_limits<INT32>::min());
+	check_expected("rgbaint_t::cmpeq_imm");
+	expected_a = !actual_a ? ~INT32(0) : 0;
+	expected_r = !actual_r ? ~INT32(0) : 0;
+	expected_g = !actual_g ? ~INT32(0) : 0;
+	expected_b = !actual_b ? ~INT32(0) : 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpeq_imm(0);
+	check_expected("rgbaint_t::cmpeq_imm");
+	expected_a = 0;
+	expected_r = 0;
+	expected_g = 0;
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpeq_imm(std::numeric_limits<INT32>::max());
+	check_expected("rgbaint_t::cmpeq_imm");
+
+	// test immediate RGB equality comparison
+	actual_a = random_i32_nolimit();
+	actual_r = random_i32_nolimit();
+	actual_g = random_i32_nolimit();
+	actual_b = random_i32_nolimit();
+	expected_a = 0;
+	expected_r = 0;
+	expected_g = ~INT32(0);
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpeq_imm_rgba(std::numeric_limits<INT32>::min(), std::numeric_limits<INT32>::max(), actual_g, actual_b - 1);
+	check_expected("rgbaint_t::cmpeq_imm_rgba");
+	expected_a = 0;
+	expected_r = 0;
+	expected_g = 0;
+	expected_b = ~INT32(0);
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpeq_imm_rgba(actual_a + 1, std::numeric_limits<INT32>::min(), std::numeric_limits<INT32>::max(), actual_b);
+	check_expected("rgbaint_t::cmpeq_imm_rgba");
+
+	// test RGB greater than comparison
+	actual_a = random_i32_nolimit();
+	actual_r = random_i32_nolimit();
+	actual_g = random_i32_nolimit();
+	actual_b = random_i32_nolimit();
+	expected_a = 0;
+	expected_r = ~INT32(0);
+	expected_g = 0;
+	expected_b = ~INT32(0);
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpgt(rgbaint_t(actual_a, actual_r - 1, actual_g + 1, std::numeric_limits<INT32>::min()));
+	check_expected("rgbaint_t::cmpgt");
+	expected_a = 0;
+	expected_r = 0;
+	expected_g = ~INT32(0);
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpgt(rgbaint_t(std::numeric_limits<INT32>::max(), actual_r, actual_g - 1, actual_b + 1));
+	check_expected("rgbaint_t::cmpgt");
+
+	// test immediate greater than comparison
+	actual_a = random_i32_nolimit();
+	actual_r = random_i32_nolimit();
+	actual_g = random_i32_nolimit();
+	actual_b = random_i32_nolimit();
+	expected_a = 0;
+	expected_r = (actual_r > actual_a) ? ~INT32(0) : 0;
+	expected_g = (actual_g > actual_a) ? ~INT32(0) : 0;
+	expected_b = (actual_b > actual_a) ? ~INT32(0) : 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpgt_imm(actual_a);
+	check_expected("rgbaint_t::cmpgt_imm");
+	expected_a = (actual_a > actual_r) ? ~INT32(0) : 0;
+	expected_r = 0;
+	expected_g = (actual_g > actual_r) ? ~INT32(0) : 0;
+	expected_b = (actual_b > actual_r) ? ~INT32(0) : 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpgt_imm(actual_r);
+	check_expected("rgbaint_t::cmpgt_imm");
+	expected_a = (actual_a > actual_g) ? ~INT32(0) : 0;
+	expected_r = (actual_r > actual_g) ? ~INT32(0) : 0;
+	expected_g =0;
+	expected_b = (actual_b > actual_g) ? ~INT32(0) : 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpgt_imm(actual_g);
+	check_expected("rgbaint_t::cmpgt_imm");
+	expected_a = (actual_a > actual_b) ? ~INT32(0) : 0;
+	expected_r = (actual_r > actual_b) ? ~INT32(0) : 0;
+	expected_g = (actual_g > actual_b) ? ~INT32(0) : 0;
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpgt_imm(actual_b);
+	check_expected("rgbaint_t::cmpgt_imm");
+	expected_a = ~INT32(0);
+	expected_r = ~INT32(0);
+	expected_g = ~INT32(0);
+	expected_b = ~INT32(0);
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpgt_imm(std::numeric_limits<INT32>::min());
+	check_expected("rgbaint_t::cmpgt_imm");
+	expected_a = (actual_a > 0) ? ~INT32(0) : 0;
+	expected_r = (actual_r > 0) ? ~INT32(0) : 0;
+	expected_g = (actual_g > 0) ? ~INT32(0) : 0;
+	expected_b = (actual_b > 0) ? ~INT32(0) : 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpgt_imm(0);
+	check_expected("rgbaint_t::cmpgt_imm");
+	expected_a = 0;
+	expected_r = 0;
+	expected_g = 0;
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpgt_imm(std::numeric_limits<INT32>::max());
+	check_expected("rgbaint_t::cmpgt_imm");
+
+	// test immediate RGB greater than comparison
+	actual_a = random_i32_nolimit();
+	actual_r = random_i32_nolimit();
+	actual_g = random_i32_nolimit();
+	actual_b = random_i32_nolimit();
+	expected_a = ~INT32(0);
+	expected_r = 0;
+	expected_g = 0;
+	expected_b = ~INT32(0);
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpgt_imm_rgba(std::numeric_limits<INT32>::min(), std::numeric_limits<INT32>::max(), actual_g, actual_b - 1);
+	check_expected("rgbaint_t::cmpgt_imm_rgba");
+	expected_a = 0;
+	expected_r = ~INT32(0);
+	expected_g = 0;
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpgt_imm_rgba(actual_a + 1, std::numeric_limits<INT32>::min(), std::numeric_limits<INT32>::max(), actual_b);
+	check_expected("rgbaint_t::cmpgt_imm_rgba");
+
+	// test RGB less than comparison
+	actual_a = random_i32_nolimit();
+	actual_r = random_i32_nolimit();
+	actual_g = random_i32_nolimit();
+	actual_b = random_i32_nolimit();
+	expected_a = 0;
+	expected_r = 0;
+	expected_g = ~INT32(0);
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmplt(rgbaint_t(actual_a, actual_r - 1, actual_g + 1, std::numeric_limits<INT32>::min()));
+	check_expected("rgbaint_t::cmplt");
+	expected_a = ~INT32(0);
+	expected_r = 0;
+	expected_g = 0;
+	expected_b = ~INT32(0);
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmplt(rgbaint_t(std::numeric_limits<INT32>::max(), actual_r, actual_g - 1, actual_b + 1));
+	check_expected("rgbaint_t::cmplt");
+
+	// test immediate less than comparison
+	actual_a = random_i32_nolimit();
+	actual_r = random_i32_nolimit();
+	actual_g = random_i32_nolimit();
+	actual_b = random_i32_nolimit();
+	expected_a = 0;
+	expected_r = (actual_r < actual_a) ? ~INT32(0) : 0;
+	expected_g = (actual_g < actual_a) ? ~INT32(0) : 0;
+	expected_b = (actual_b < actual_a) ? ~INT32(0) : 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmplt_imm(actual_a);
+	check_expected("rgbaint_t::cmplt_imm");
+	expected_a = (actual_a < actual_r) ? ~INT32(0) : 0;
+	expected_r = 0;
+	expected_g = (actual_g < actual_r) ? ~INT32(0) : 0;
+	expected_b = (actual_b < actual_r) ? ~INT32(0) : 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmplt_imm(actual_r);
+	check_expected("rgbaint_t::cmplt_imm");
+	expected_a = (actual_a < actual_g) ? ~INT32(0) : 0;
+	expected_r = (actual_r < actual_g) ? ~INT32(0) : 0;
+	expected_g =0;
+	expected_b = (actual_b < actual_g) ? ~INT32(0) : 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmplt_imm(actual_g);
+	check_expected("rgbaint_t::cmplt_imm");
+	expected_a = (actual_a < actual_b) ? ~INT32(0) : 0;
+	expected_r = (actual_r < actual_b) ? ~INT32(0) : 0;
+	expected_g = (actual_g < actual_b) ? ~INT32(0) : 0;
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmplt_imm(actual_b);
+	check_expected("rgbaint_t::cmplt_imm");
+	expected_a = 0;
+	expected_r = 0;
+	expected_g = 0;
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmplt_imm(std::numeric_limits<INT32>::min());
+	check_expected("rgbaint_t::cmplt_imm");
+	expected_a = (actual_a < 0) ? ~INT32(0) : 0;
+	expected_r = (actual_r < 0) ? ~INT32(0) : 0;
+	expected_g = (actual_g < 0) ? ~INT32(0) : 0;
+	expected_b = (actual_b < 0) ? ~INT32(0) : 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmplt_imm(0);
+	check_expected("rgbaint_t::cmplt_imm");
+	expected_a = ~INT32(0);
+	expected_r = ~INT32(0);
+	expected_g = ~INT32(0);
+	expected_b = ~INT32(0);
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmplt_imm(std::numeric_limits<INT32>::max());
+	check_expected("rgbaint_t::cmplt_imm");
+
+	// test immediate RGB less than comparison
+	actual_a = random_i32_nolimit();
+	actual_r = random_i32_nolimit();
+	actual_g = random_i32_nolimit();
+	actual_b = random_i32_nolimit();
+	expected_a = 0;
+	expected_r = ~INT32(0);
+	expected_g = 0;
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmplt_imm_rgba(std::numeric_limits<INT32>::min(), std::numeric_limits<INT32>::max(), actual_g, actual_b - 1);
+	check_expected("rgbaint_t::cmplt_imm_rgba");
+	expected_a = ~INT32(0);
+	expected_r = 0;
+	expected_g = ~INT32(0);
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmplt_imm_rgba(actual_a + 1, std::numeric_limits<INT32>::min(), std::numeric_limits<INT32>::max(), actual_b);
+	check_expected("rgbaint_t::cmplt_imm_rgba");
 }
 
 

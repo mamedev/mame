@@ -24,6 +24,9 @@ public:
 	rgbaint_t(INT32 a, INT32 r, INT32 g, INT32 b) { set(a, r, g, b); }
 	explicit rgbaint_t(const rgb_t& rgba) { set(rgba); }
 
+	rgbaint_t(const rgbaint_t& other) = default;
+	rgbaint_t &operator=(const rgbaint_t& other) = default;
+
 	void set(const rgbaint_t& other) { set(other.m_a, other.m_r, other.m_g, other.m_b); }
 	void set(UINT32 rgba) { set((rgba >> 24) & 0xff, (rgba >> 16) & 0xff, (rgba >> 8) & 0xff, rgba & 0xff); }
 	void set(INT32 a, INT32 r, INT32 g, INT32 b)
@@ -212,15 +215,15 @@ public:
 			m_b |= high_mask;
 	}
 
-	inline void or_reg(const rgbaint_t& color)
-	{
-		or_imm_rgba(color.m_a, color.m_r, color.m_g, color.m_b);
-	}
+	void or_reg(const rgbaint_t& color) { or_imm_rgba(color.m_a, color.m_r, color.m_g, color.m_b); }
+	void and_reg(const rgbaint_t& color) { and_imm_rgba(color.m_a, color.m_r, color.m_g, color.m_b); }
+	void xor_reg(const rgbaint_t& color) { xor_imm_rgba(color.m_a, color.m_r, color.m_g, color.m_b); }
 
-	inline void or_imm(const INT32 imm)
-	{
-		or_imm_rgba(imm, imm, imm, imm);
-	}
+	void andnot_reg(const rgbaint_t& color) { and_imm_rgba(~color.m_a, ~color.m_r, ~color.m_g, ~color.m_b); }
+
+	void or_imm(INT32 imm) { or_imm_rgba(imm, imm, imm, imm); }
+	void and_imm(INT32 imm) { and_imm_rgba(imm, imm, imm, imm); }
+	void xor_imm(INT32 imm) { xor_imm_rgba(imm, imm, imm, imm); }
 
 	inline void or_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
 	{
@@ -230,37 +233,12 @@ public:
 		m_b |= b;
 	}
 
-	inline void and_reg(const rgbaint_t& color)
-	{
-		and_imm_rgba(color.m_a, color.m_r, color.m_g, color.m_b);
-	}
-
-	inline void andnot_reg(const rgbaint_t& color)
-	{
-		and_imm_rgba(~color.m_a, ~color.m_r, ~color.m_g, ~color.m_b);
-	}
-
-	inline void and_imm(const INT32 imm)
-	{
-		and_imm_rgba(imm, imm, imm, imm);
-	}
-
 	inline void and_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
 	{
 		m_a &= a;
 		m_r &= r;
 		m_g &= g;
 		m_b &= b;
-	}
-
-	inline void xor_reg(const rgbaint_t& color)
-	{
-		xor_imm_rgba(color.m_a, color.m_r, color.m_g, color.m_b);
-	}
-
-	inline void xor_imm(const INT32 imm)
-	{
-		xor_imm_rgba(imm, imm, imm, imm);
 	}
 
 	inline void xor_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
@@ -328,63 +306,41 @@ public:
 	void scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other);
 	void scale_imm_add_and_clamp(const INT32 scale, const rgbaint_t& other);
 
-	inline void cmpeq(const rgbaint_t& value)
+	void cmpeq(const rgbaint_t& value) { cmpeq_imm_rgba(value.m_a, value.m_r, value.m_g, value.m_b); }
+	void cmpgt(const rgbaint_t& value) { cmpgt_imm_rgba(value.m_a, value.m_r, value.m_g, value.m_b); }
+	void cmplt(const rgbaint_t& value) { cmplt_imm_rgba(value.m_a, value.m_r, value.m_g, value.m_b); }
+
+	void cmpeq_imm(INT32 value) { cmpeq_imm_rgba(value, value, value, value); }
+	void cmpgt_imm(INT32 value) { cmpgt_imm_rgba(value, value, value, value); }
+	void cmplt_imm(INT32 value) { cmplt_imm_rgba(value, value, value, value); }
+
+	void cmpeq_imm_rgba(INT32 a, INT32 r, INT32 g, INT32 b)
 	{
-		m_a = (m_a == value.m_a) ? 0xffffffff : 0;
-		m_r = (m_r == value.m_r) ? 0xffffffff : 0;
-		m_g = (m_g == value.m_g) ? 0xffffffff : 0;
-		m_b = (m_b == value.m_b) ? 0xffffffff : 0;
+		m_a = (m_a == a) ? 0xffffffff : 0;
+		m_r = (m_r == r) ? 0xffffffff : 0;
+		m_g = (m_g == g) ? 0xffffffff : 0;
+		m_b = (m_b == b) ? 0xffffffff : 0;
 	}
 
-	inline void cmpeq_imm(const INT32 value)
+	void cmpgt_imm_rgba(INT32 a, INT32 r, INT32 g, INT32 b)
 	{
-		m_a = (m_a == value) ? 0xffffffff : 0;
-		m_r = (m_r == value) ? 0xffffffff : 0;
-		m_g = (m_g == value) ? 0xffffffff : 0;
-		m_b = (m_b == value) ? 0xffffffff : 0;
+		m_a = (m_a > a) ? 0xffffffff : 0;
+		m_r = (m_r > r) ? 0xffffffff : 0;
+		m_g = (m_g > g) ? 0xffffffff : 0;
+		m_b = (m_b > b) ? 0xffffffff : 0;
 	}
 
-	inline void cmpgt(const rgbaint_t& value)
+	void cmplt_imm_rgba(INT32 a, INT32 r, INT32 g, INT32 b)
 	{
-		m_a = (m_a > value.m_a) ? 0xffffffff : 0;
-		m_r = (m_r > value.m_r) ? 0xffffffff : 0;
-		m_g = (m_g > value.m_g) ? 0xffffffff : 0;
-		m_b = (m_b > value.m_b) ? 0xffffffff : 0;
+		m_a = (m_a < a) ? 0xffffffff : 0;
+		m_r = (m_r < r) ? 0xffffffff : 0;
+		m_g = (m_g < g) ? 0xffffffff : 0;
+		m_b = (m_b < b) ? 0xffffffff : 0;
 	}
 
-	inline void cmpgt_imm(const INT32 value)
-	{
-		m_a = (m_a > value) ? 0xffffffff : 0;
-		m_r = (m_r > value) ? 0xffffffff : 0;
-		m_g = (m_g > value) ? 0xffffffff : 0;
-		m_b = (m_b > value) ? 0xffffffff : 0;
-	}
-
-	inline void cmplt(const rgbaint_t& value)
-	{
-		m_a = (m_a < value.m_a) ? 0xffffffff : 0;
-		m_r = (m_r < value.m_r) ? 0xffffffff : 0;
-		m_g = (m_g < value.m_g) ? 0xffffffff : 0;
-		m_b = (m_b < value.m_b) ? 0xffffffff : 0;
-	}
-
-	inline void cmplt_imm(const INT32 value)
-	{
-		m_a = (m_a < value) ? 0xffffffff : 0;
-		m_r = (m_r < value) ? 0xffffffff : 0;
-		m_g = (m_g < value) ? 0xffffffff : 0;
-		m_b = (m_b < value) ? 0xffffffff : 0;
-	}
-
-	inline void merge_alpha(const rgbaint_t& alpha)
+	void merge_alpha(const rgbaint_t& alpha)
 	{
 		m_a = alpha.m_a;
-	}
-
-	rgbaint_t &operator=(const rgbaint_t& other)
-	{
-		set(other.m_a, other.m_r, other.m_g, other.m_b);
-		return *this;
 	}
 
 	rgbaint_t& operator+=(const rgbaint_t& other)
