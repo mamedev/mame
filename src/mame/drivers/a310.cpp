@@ -76,7 +76,7 @@
 //#include "machine/aakart.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
-#include "formats/ami_dsk.h"
+#include "formats/bbc_dsk.h"
 #include "softlist.h"
 
 class a310_state : public archimedes_state
@@ -336,8 +336,8 @@ static INPUT_PORTS_START( a310 )
 INPUT_PORTS_END
 
 FLOPPY_FORMATS_MEMBER( a310_state::floppy_formats )
-	// TODO: same as amiga or not?
-	FLOPPY_ADF_FORMAT
+	FLOPPY_BBC_DFS_FORMAT,
+	FLOPPY_BBC_ADFS_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( a310_floppies )

@@ -148,7 +148,8 @@ int bbc_adfs_format::find_size(io_generic *io, UINT32 form_factor)
 			continue;
 
 		// valid images will have sector counts adfs-s = 0x280; adfs-m = 0x500; adfs-l = 0xa00; though many adfs-s images are incorrect
-		if ((size == (UINT64)compute_track_size(f) * f.track_count * f.head_count) && (sectors == 0x280 || sectors == 0x500 || sectors == 0xa00)) {
+		// format d/e (size 819200) we accept on the size only
+		if ((size == (UINT64)compute_track_size(f) * f.track_count * f.head_count) && (sectors == 0x280 || sectors == 0x500 || sectors == 0xa00 || size == 819200)) {
 			return i;
 		}
 	}
@@ -197,6 +198,10 @@ const bbc_adfs_format::format bbc_adfs_format::formats[] =
 	{ // 640K 3 1/2 inch 80 track double sided double density (interleaved)
 		floppy_image::FF_35, floppy_image::DSQD, floppy_image::MFM,
 		2000, 16, 80, 2, 256, {}, -1, { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 }, 60, 22, 43
+	},
+	{ // 800K 3 1/2 inch 80 track double sided double density
+		floppy_image::FF_35, floppy_image::DSQD, floppy_image::MFM,
+		2000, 5, 80, 2, 1024, {}, -1, { 0,1,2,3,4 }, 60, 22, 43
 	},
 	{}
 };
