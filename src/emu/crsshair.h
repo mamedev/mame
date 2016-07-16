@@ -31,22 +31,64 @@
 #define CROSSHAIR_VISIBILITY_AUTOTIME_MAX           50
 #define CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT       15
 
-/* maximum crosshair pic filename size */
-#define CROSSHAIR_PIC_NAME_LENGTH               12
-
 
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-/* user-controllable settings for a player */
-struct crosshair_user_settings
+// ======================> render_crosshair
+
+class render_crosshair
 {
-	UINT8           used;       /* is used */
-	UINT8           mode;       /* visibility mode */
-	UINT8           auto_time;  /* time in seconds to blank crosshair if no movement */
-	char            name[CROSSHAIR_PIC_NAME_LENGTH + 1];        /* bitmap name */
+public:
+	// construction/destruction
+	render_crosshair(running_machine &machine, int player);
+	~render_crosshair();
+
+	// getters
+	running_machine &machine() const { return m_machine; }
+	int player() const { return m_player; }
+	bool is_used() const { return m_used; }
+	UINT8 mode() const { return m_mode; }
+	bool is_visible() const { return m_visible; }
+	screen_device *screen() const { return m_screen; }
+	float x() const { return m_x; }
+	float y() const { return m_y; }
+	const char *bitmap_name() const { return m_name.c_str(); }
+
+	// setters
+	void set_used(bool used) { m_used = used; }
+	void set_mode(UINT8 mode) { m_mode = mode; }
+	void set_visible(bool visible) { m_visible = visible; }
+	void set_screen(screen_device *screen) { m_screen = screen; }
+	//void setxy(float x, float y);
+	void set_bitmap_name(const char *name);
+	void set_default_bitmap();
+
+	// updates
+	void animate(UINT16 auto_time);
+	void draw(render_container &container, UINT8 fade);
+
+private:
+	// private helpers
+	void create_bitmap();
+
+	// private state
+	running_machine &   m_machine;  // reference to our machine
+	int                 m_player;   // player number
+	bool                m_used;     // usage for this crosshair
+	UINT8               m_mode;     // visibility mode for this crosshair
+	bool                m_visible;  // visibility for this crosshair
+	std::unique_ptr<bitmap_argb32>  m_bitmap;    // bitmap for this crosshair
+	render_texture *    m_texture;  // texture for this crosshair
+	screen_device *     m_screen;   // the screen on which this crosshair is drawn
+	float               m_x;        // current X position
+	float               m_y;        // current Y position
+	float               m_last_x;   // last X position
+	float               m_last_y;   // last Y position
+	UINT16              m_time;     // time since last movement
+	std::string         m_name;     // name of png file
 };
 
 
@@ -61,21 +103,16 @@ public:
 	/* draws crosshair(s) in a given screen, if necessary */
 	void render(screen_device &screen);
 
-	/* sets the screen(s) for a given player's crosshair */
-	void set_screen(int player, screen_device *screen) { m_screen[player] = screen; }
+	// return true if any crosshairs are used
+	bool get_usage() const { return m_usage; }
 
-	/* return TRUE if any crosshairs are used */
-	int get_usage() const { return m_usage; }
-
-	/* return the current crosshair settings for the given player */
-	void get_user_settings(UINT8 player, crosshair_user_settings *settings);
-
-	/* modify the current crosshair settings for the given player */
-	void set_user_settings(UINT8 player, crosshair_user_settings *settings);
 	// getters
 	running_machine &machine() const { return m_machine; }
+	render_crosshair &get_crosshair(int player) const { assert(player >= 0 && player < MAX_PLAYERS); assert(m_crosshair[player] != nullptr); return *m_crosshair[player]; }
+	UINT16 auto_time() const { return m_auto_time; }
+	void set_auto_time(UINT16 auto_time) { m_auto_time = auto_time; }
+
 private:
-	void create_bitmap(int player);
 	void exit();
 	void animate(screen_device &device, bool vblank_state);
 
@@ -85,22 +122,11 @@ private:
 	// internal state
 	running_machine &   m_machine;                  // reference to our machine
 
-	UINT8               m_usage;                  /* true if any crosshairs are used */
-	UINT8               m_used[MAX_PLAYERS];      /* usage per player */
-	UINT8               m_mode[MAX_PLAYERS];      /* visibility mode per player */
-	UINT8               m_visible[MAX_PLAYERS];   /* visibility per player */
-	std::unique_ptr<bitmap_argb32>  m_bitmap[MAX_PLAYERS];    /* bitmap per player */
-	render_texture *    m_texture[MAX_PLAYERS];   /* texture per player */
-	screen_device *     m_screen[MAX_PLAYERS];    /* the screen on which this player's crosshair is drawn */
-	float               m_x[MAX_PLAYERS];         /* current X position */
-	float               m_y[MAX_PLAYERS];         /* current Y position */
-	float               m_last_x[MAX_PLAYERS];    /* last X position */
-	float               m_last_y[MAX_PLAYERS];    /* last Y position */
-	UINT8               m_fade;                   /* color fading factor */
-	UINT8               m_animation_counter;      /* animation frame index */
-	UINT16              m_auto_time;              /* time in seconds to turn invisible */
-	UINT16              m_time[MAX_PLAYERS];      /* time since last movement */
-	char                m_name[MAX_PLAYERS][CROSSHAIR_PIC_NAME_LENGTH + 1];   /* name of crosshair png file */
+	bool                m_usage;                    // true if any crosshairs are used
+	std::unique_ptr<render_crosshair> m_crosshair[MAX_PLAYERS]; // per-player crosshair state
+	UINT8               m_fade;                     // color fading factor
+	UINT8               m_animation_counter;        // animation frame index
+	UINT16              m_auto_time;                // time in seconds to turn invisible
 };
 
 #endif  /* __CRSSHAIR_H__ */
