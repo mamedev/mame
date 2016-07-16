@@ -223,6 +223,14 @@
 
 #define HUFFYUV_PREDICT_DECORR   0x40
 
+ /**
+ * @def ENSURE_EVEN_WIDTH_HEIGHT
+ *
+ * @brief   Ensures that width and height of the output steam are even integers.
+ */
+
+#define ENSURE_EVEN_WIDTH_HEIGHT   1
+
 
 namespace {
 /***************************************************************************
@@ -288,12 +296,28 @@ public:
 
 	void initialize_video(avi_file::movie_info const &info)
 	{
+		std::uint32_t width = info.video_width;
+		std::uint32_t height = info.video_height;
+
+		/* ensure even width and height because most video players are not capable to playback a video stream with uneven width or height */
+		if (ENSURE_EVEN_WIDTH_HEIGHT)
+		{
+			if (width % 2 > 0)
+			{
+				width--;
+			}
+			if (height % 2 > 0)
+			{
+				height--;
+			}
+		}
+
 		m_type = STREAMTYPE_VIDS;
 		m_format = info.video_format;
 		m_rate = info.video_timescale;
 		m_scale = info.video_sampletime;
-		m_width = info.video_width;
-		m_height = info.video_height;
+		m_width = width;
+		m_height = height;
 		m_depth = info.video_depth;
 	}
 
