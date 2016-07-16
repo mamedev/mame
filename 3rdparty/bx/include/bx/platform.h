@@ -6,12 +6,37 @@
 #ifndef BX_PLATFORM_H_HEADER_GUARD
 #define BX_PLATFORM_H_HEADER_GUARD
 
+// Architecture
+#define BX_ARCH_32BIT 0
+#define BX_ARCH_64BIT 0
+
+// Compiler
 #define BX_COMPILER_CLANG           0
 #define BX_COMPILER_CLANG_ANALYZER  0
 #define BX_COMPILER_GCC             0
 #define BX_COMPILER_MSVC            0
-#define BX_COMPILER_MSVC_COMPATIBLE 0
+#define BX_COMPILER_MSVC_COMPATIBLE (BX_CRT_MSVC)
 
+// Endianess
+#define BX_CPU_ENDIAN_BIG    0
+#define BX_CPU_ENDIAN_LITTLE 0
+
+// CPU
+#define BX_CPU_ARM   0
+#define BX_CPU_JIT   0
+#define BX_CPU_MIPS  0
+#define BX_CPU_PPC   0
+#define BX_CPU_RISCV 0
+#define BX_CPU_X86   0
+
+// C Runtime
+#define BX_CRT_MSVC   0
+#define BX_CRT_GLIBC  0
+#define BX_CRT_NEWLIB 0
+#define BX_CRT_MINGW  0
+#define BX_CRT_MUSL   0
+
+// Platform
 #define BX_PLATFORM_ANDROID    0
 #define BX_PLATFORM_EMSCRIPTEN 0
 #define BX_PLATFORM_BSD        0
@@ -28,19 +53,6 @@
 #define BX_PLATFORM_XBOX360    0
 #define BX_PLATFORM_XBOXONE    0
 
-#define BX_CPU_ARM   0
-#define BX_CPU_JIT   0
-#define BX_CPU_MIPS  0
-#define BX_CPU_PPC   0
-#define BX_CPU_RISCV 0
-#define BX_CPU_X86   0
-
-#define BX_ARCH_32BIT 0
-#define BX_ARCH_64BIT 0
-
-#define BX_CPU_ENDIAN_BIG    0
-#define BX_CPU_ENDIAN_LITTLE 0
-
 // http://sourceforge.net/apps/mediawiki/predef/index.php?title=Compilers
 #if defined(__clang__)
 // clang defines __GNUC__ or _MSC_VER
@@ -51,17 +63,27 @@
 #		define BX_COMPILER_CLANG_ANALYZER 1
 #	endif // defined(__clang_analyzer__)
 #	if defined(_MSC_VER)
-#		undef  BX_COMPILER_MSVC_COMPATIBLE
-#		define BX_COMPILER_MSVC_COMPATIBLE _MSC_VER
-#	endif // defined(_MSC_VER)
+#		undef  BX_CRT_MSVC
+#		define BX_CRT_MSVC 1
+#	elif defined(__GLIBC__)
+#		undef  BX_CRT_GLIBC
+#		define BX_CRT_GLIBC (__GLIBC__ * 10000 + __GLIBC_MINOR__ * 100)
+#	endif // defined(__GLIBC__)
 #elif defined(_MSC_VER)
 #	undef  BX_COMPILER_MSVC
 #	define BX_COMPILER_MSVC _MSC_VER
-#	undef  BX_COMPILER_MSVC_COMPATIBLE
-#	define BX_COMPILER_MSVC_COMPATIBLE _MSC_VER
+#	undef  BX_CRT_MSVC
+#	define BX_CRT_MSVC 1
 #elif defined(__GNUC__)
 #	undef  BX_COMPILER_GCC
 #	define BX_COMPILER_GCC (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+#	if defined(__GLIBC__)
+#		undef  BX_CRT_GLIBC
+#		define BX_CRT_GLIBC (__GLIBC__ * 10000 + __GLIBC_MINOR__ * 100)
+#	elif defined(__MINGW32__) || defined(__MINGW64__)
+#		undef  BX_CRT_MINGW
+#		define BX_CRT_MINGW 1
+#	endif //
 #else
 #	error "BX_COMPILER_* is not defined!"
 #endif //

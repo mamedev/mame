@@ -340,7 +340,7 @@ project ("qtdbg_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/render",
 		MAME_DIR .. "3rdparty",
 	}
-	configuration { "linux-*" }
+	configuration { "linux-* or freebsd" }
 		buildoptions {
 			"-fPIC",
 		}
