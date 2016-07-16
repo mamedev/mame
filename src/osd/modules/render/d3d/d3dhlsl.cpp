@@ -129,6 +129,14 @@ public:
 		m_avi_writer->video_frame(m_frame);
 	}
 
+	void add_audio(const INT16 *buffer, int samples_this_frame)
+	{
+		if (!m_initialized)
+			return;
+
+		m_avi_writer->audio_frame(buffer, samples_this_frame);
+	}
+
 	IDirect3DSurface9 * target_surface() { return m_vid_surface; }
 
 private:
@@ -240,17 +248,27 @@ void shaders::record_movie()
 	}
 
 	auto win = d3d->assert_window();
+	osd_dim wdim = win->get_size();
 
-	int width = snap_width;
-	int height = snap_height;
-	if (win->swap_xy())
-	{
-		std::swap(width, height);
-	}
-
-	recorder = std::make_unique<movie_recorder>(*machine, d3d, width, height);
+	recorder = std::make_unique<movie_recorder>(*machine, d3d, wdim.width(), wdim.height());
 	recorder->record(downcast<windows_options &>(machine->options()).d3d_hlsl_write());
 	recording_movie = true;
+}
+
+
+//============================================================
+//  shaders::record_audio
+//============================================================
+
+void shaders::record_audio(const INT16 *buffer, int samples_this_frame)
+{
+	if (!enabled())
+		return;
+
+	if (recording_movie)
+	{
+		recorder->add_audio(buffer, samples_this_frame);
+	}
 }
 
 

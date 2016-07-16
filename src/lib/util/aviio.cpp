@@ -189,6 +189,14 @@
 
 #define AVI_INDEX_2FIELD        0x01
 
+ /**
+ * @def AVI_INTEGRAL_MULTIPLE
+ *
+ * @brief   Ensures the integral multiple of the video dimension, because most video players are not capable to playback a video stream with a lower multiple.
+ */
+
+#define AVI_INTEGRAL_MULTIPLE   4
+
 /* HuffYUV definitions */
 
 /**
@@ -222,14 +230,6 @@
  */
 
 #define HUFFYUV_PREDICT_DECORR   0x40
-
- /**
- * @def ENSURE_EVEN_WIDTH_HEIGHT
- *
- * @brief   Ensures that width and height of the output steam are even integers.
- */
-
-#define ENSURE_EVEN_WIDTH_HEIGHT   1
 
 
 namespace {
@@ -299,17 +299,11 @@ public:
 		std::uint32_t width = info.video_width;
 		std::uint32_t height = info.video_height;
 
-		/* ensure even width and height because most video players are not capable to playback a video stream with uneven width or height */
-		if (ENSURE_EVEN_WIDTH_HEIGHT)
+		std::uint32_t integal_multiple = std::uint32_t(AVI_INTEGRAL_MULTIPLE);
+		if (integal_multiple > 1)
 		{
-			if (width % 2 > 0)
-			{
-				width--;
-			}
-			if (height % 2 > 0)
-			{
-				height--;
-			}
+			width = width - (width % integal_multiple);
+			height = height - (height % integal_multiple);
 		}
 
 		m_type = STREAMTYPE_VIDS;

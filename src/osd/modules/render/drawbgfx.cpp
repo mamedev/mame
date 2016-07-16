@@ -256,9 +256,16 @@ int renderer_bgfx::create()
 void renderer_bgfx::record()
 {
 	auto win = assert_window();
-	if (m_avi_writer == nullptr || win->m_index > 0)
+	if (win->m_index > 0)
 	{
 		return;
+	}
+
+	if (m_avi_writer == nullptr)
+	{
+		m_avi_writer = new avi_write(win->machine(), m_width[0], m_height[0]);
+		m_avi_data = new uint8_t[m_width[0] * m_height[0] * 4];
+		m_avi_bitmap.allocate(m_width[0], m_height[0]);
 	}
 
 	if (m_avi_writer->recording())
@@ -674,26 +681,19 @@ int renderer_bgfx::draw(int update)
 {
 	auto win = assert_window();
 	int window_index = win->m_index;
-	if (window_index == 0)
-	{
-		s_current_view = 0;
-		if (m_avi_writer == nullptr)
-		{
-			uint32_t width = win->get_size().width();
-			uint32_t height = win->get_size().height();
-			m_avi_writer = new avi_write(win->machine(), width, height);
-			m_avi_data = new uint8_t[width * height * 4];
-			m_avi_bitmap.allocate(width, height);
-		}
-	}
 
 	m_seen_views.clear();
 	m_ui_view = -1;
 
-	// Set view 0 default viewport.
 	osd_dim wdim = win->get_size();
 	m_width[window_index] = wdim.width();
 	m_height[window_index] = wdim.height();
+
+	// Set view 0 default viewport.
+	if (window_index == 0)
+	{
+		s_current_view = 0;
+	}
 
 	win->m_primlist->acquire_lock();
 	s_current_view += m_chains->handle_screen_chains(s_current_view, win->m_primlist->first(), *win.get());
@@ -787,11 +787,16 @@ void renderer_bgfx::update_recording()
 	bgfx::blit(s_current_view > 0 ? s_current_view - 1 : 0, m_avi_texture, 0, 0, m_avi_target->target());
 	bgfx::readTexture(m_avi_texture, m_avi_data);
 
-	UINT32* start = &m_avi_bitmap.pix32(0);
-	// loop over Y
-	for (int i = 0; i < m_width[0] * m_height[0] * 4; i += 4)
+	int i = 0;
+	for (int y = 0; y < m_avi_bitmap.height(); y++)
 	{
-		*start++ = 0xff000000 | (m_avi_data[i + 0] << 16) | (m_avi_data[i + 1] << 8) | m_avi_data[i + 2];
+		UINT32 *dst = &m_avi_bitmap.pix32(y);
+
+		for (int x = 0; x < m_avi_bitmap.width(); x++)
+		{
+			*dst++ = 0xff000000 | (m_avi_data[i + 0] << 16) | (m_avi_data[i + 1] << 8) | m_avi_data[i + 2];
+			i += 4;
+		}
 	}
 
 	m_avi_writer->video_frame(m_avi_bitmap);
