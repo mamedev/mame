@@ -187,28 +187,26 @@ WRITE8_MEMBER(p1_state::p1_vram_w)
 
 WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
 {
-	address_space &space_prg = m_maincpu->space(AS_PROGRAM);
-
 	DBG_LOG(1,"color_select_68",("W $%02x\n", data));
 
 	// NMI DISABLE
-	if (BIT(data, 3) != BIT(m_video.color_select_68, 3)) {
+	if (BIT((data ^ m_video.color_select_68), 3)) {
 		if (BIT(data, 3)) {
-			space_prg.install_readwrite_bank( 0xb8000, 0xbbfff, "bank11" );
+			space.install_readwrite_bank( 0xb8000, 0xbbfff, "bank11" );
 		} else {
-			space_prg.install_read_bank( 0xb8000, 0xbbfff, "bank11" );
-			space_prg.install_write_handler( 0xb8000, 0xbbfff, WRITE8_DELEGATE(p1_state, p1_vram_w) );
+			space.install_read_bank( 0xb8000, 0xbbfff, "bank11" );
+			space.install_write_handler( 0xb8000, 0xbbfff, WRITE8_DELEGATE(p1_state, p1_vram_w) );
 		}
 	}
 	// DISPLAY BANK
-	if (BIT(data, 6) != BIT(m_video.color_select_68, 6)) {
+	if (BIT((data ^ m_video.color_select_68), 6)) {
 		if (BIT(data, 6))
 			m_video.videoram = m_video.videoram_base.get() + 0x4000;
 		else
 			m_video.videoram = m_video.videoram_base.get();
 	}
 	// HIRES -- XXX
-	if (BIT(data, 7) != BIT(m_video.color_select_68, 7)) {
+	if (BIT((data ^ m_video.color_select_68), 7)) {
 		if (BIT(data, 7))
 			machine().first_screen()->set_visible_area(0, 640-1, 0, 200-1);
 		else
