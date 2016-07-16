@@ -194,7 +194,16 @@ void shaders::save_snapshot()
 	if (!enabled())
 		return;
 
-	HRESULT result = d3d->get_device()->CreateTexture(snap_width, snap_height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &snap_copy_texture, nullptr);
+	auto win = d3d->assert_window();
+
+	int width = snap_width;
+	int height = snap_height;
+	if (win->swap_xy())
+	{
+		std::swap(width, height);
+	}
+
+	HRESULT result = d3d->get_device()->CreateTexture(width, height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &snap_copy_texture, nullptr);
 	if (FAILED(result))
 	{
 		osd_printf_verbose("Direct3D: Unable to init system-memory target for HLSL snapshot (%08lX), bailing\n", result);
@@ -202,7 +211,7 @@ void shaders::save_snapshot()
 	}
 	snap_copy_texture->GetSurfaceLevel(0, &snap_copy_target);
 
-	result = d3d->get_device()->CreateTexture(snap_width, snap_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &snap_texture, nullptr);
+	result = d3d->get_device()->CreateTexture(width, height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &snap_texture, nullptr);
 	if (FAILED(result))
 	{
 		osd_printf_verbose("Direct3D: Unable to init video-memory target for HLSL snapshot (%08lX), bailing\n", result);
@@ -230,7 +239,16 @@ void shaders::record_movie()
 		return;
 	}
 
-	recorder = std::make_unique<movie_recorder>(*machine, d3d, snap_width, snap_height);
+	auto win = d3d->assert_window();
+
+	int width = snap_width;
+	int height = snap_height;
+	if (win->swap_xy())
+	{
+		std::swap(width, height);
+	}
+
+	recorder = std::make_unique<movie_recorder>(*machine, d3d, width, height);
 	recorder->record(downcast<windows_options &>(machine->options()).d3d_hlsl_write());
 	recording_movie = true;
 }
@@ -245,7 +263,16 @@ void shaders::render_snapshot(IDirect3DSurface9 *surface)
 	if (!enabled())
 		return;
 
-	bitmap_rgb32 snapshot(snap_width, snap_height);
+	auto win = d3d->assert_window();
+
+	int width = snap_width;
+	int height = snap_height;
+	if (win->swap_xy())
+	{
+		std::swap(width, height);
+	}
+
+	bitmap_rgb32 snapshot(width, height);
 	if (!snapshot.valid())
 		return;
 
@@ -259,12 +286,12 @@ void shaders::render_snapshot(IDirect3DSurface9 *surface)
 	if (FAILED(result))
 		return;
 
-	for (int y = 0; y < snap_height; y++)
+	for (int y = 0; y < height; y++)
 	{
 		DWORD *src = (DWORD *)((BYTE *)rect.pBits + y * rect.Pitch);
 		UINT32 *dst = &snapshot.pix32(y);
 
-		for (int x = 0; x < snap_width; x++)
+		for (int x = 0; x < width; x++)
 		{
 			*dst++ = *src++;
 		}
