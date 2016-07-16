@@ -35,6 +35,14 @@ function addoptionsfromstring(str)
 	end
 end
 
+function pkgconfigcmd()
+	local pkgconfig = os.getenv("PKG_CONFIG")
+	if pkgconfig == nil then 
+		return "pkg-config" 
+	end
+	return pkgconfig
+end
+
 function osdmodulesbuild()
 
 	removeflags {
@@ -344,7 +352,7 @@ function qtdebuggerbuild()
 				}
 			else
 				buildoptions {
-					backtick("pkg-config --cflags Qt5Widgets"),
+					backtick(pkgconfigcmd() .. " --cflags Qt5Widgets"),
 				}
 			end
 		end
@@ -379,7 +387,7 @@ function osdmodulestargetconf()
 
 	if _OPTIONS["NO_USE_MIDI"]~="1" then
 		if _OPTIONS["targetos"]=="linux" then
-			local str = backtick("pkg-config --libs alsa")
+			local str = backtick(pkgconfigcmd() .. " --libs alsa")
 			addlibfromstring(str)
 			addoptionsfromstring(str)
 		elseif _OPTIONS["targetos"]=="macosx" then
@@ -420,7 +428,7 @@ function osdmodulestargetconf()
 					"Qt5Widgets",
 				}
 			else
-				local str = backtick("pkg-config --libs Qt5Widgets")
+				local str = backtick(pkgconfigcmd() .. " --libs Qt5Widgets")
 				addlibfromstring(str)
 				addoptionsfromstring(str)
 			end
