@@ -56,10 +56,8 @@ public:
 	DECLARE_WRITE8_MEMBER( rtc_address_w );
 	DECLARE_READ8_MEMBER( rtc_data_r );
 	DECLARE_WRITE8_MEMBER( rtc_data_w );
-	DECLARE_WRITE_LINE_MEMBER( rtc_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( adlc_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( econet_data_w );
-	DECLARE_WRITE_LINE_MEMBER( via_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( clk_en_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
@@ -102,8 +100,6 @@ protected:
 	// interrupt state
 	int m_adlc_ie;
 	int m_hdc_ie;
-	int m_rtc_irq;
-	int m_via_irq;
 	int m_hdc_irq;
 	int m_fdc_irq;
 	bool m_fdc_drq;
