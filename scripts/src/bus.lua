@@ -570,8 +570,6 @@ if (BUSES["ECONET"]~=null) then
 		MAME_DIR .. "src/devices/bus/econet/econet.h",
 		MAME_DIR .. "src/devices/bus/econet/e01.cpp",
 		MAME_DIR .. "src/devices/bus/econet/e01.h",
-		MAME_DIR .. "src/devices/bus/econet/ebridge.cpp",
-		MAME_DIR .. "src/devices/bus/econet/ebridge.h",
 	}
 end
 
