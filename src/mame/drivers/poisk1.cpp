@@ -23,6 +23,8 @@
 
 #include "cpu/i86/i86.h"
 
+#include "softlist.h"
+
 #define CGA_PALETTE_SETS 83
 /* one for colour, one for mono, 81 for colour composite */
 
@@ -640,6 +642,9 @@ static MACHINE_CONFIG_START( poisk1, p1_state )
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+
+	MCFG_SOFTWARE_LIST_ADD("flop_list","poisk1_flop")
+//	MCFG_SOFTWARE_LIST_ADD("cass_list","poisk1_cass")
 
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
 	MCFG_SOUND_ADD( "speaker", SPEAKER_SOUND, 0 )
