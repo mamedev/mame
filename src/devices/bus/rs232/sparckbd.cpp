@@ -6,54 +6,58 @@
 
 
 /*
-	HLE SPARC serial keyboard compatible with Sun Type 4/5/6
+    TODO: implement keyclick
+    TODO: determine default keyclick state on real keyboard
+    TODO: use 1,200 Baud properly once we work out what's going on with the SCC
+
+    HLE SPARC serial keyboard compatible with Sun Type 4/5/6
 
     messages from host to keyboard:
-	0000 0001               reset (keyboard responds with self test pass/fail)
-	0000 0010               bell on (480us period)
-	0000 0011               bell off
-	0000 1010               enable keyclick (5us duration 480us period on make)
-	0000 1011               disable keyclick
-	0000 1110  ---- lscn    LED (1 = on, l = caps lock, s = scroll lock, c = compose, n = num lock)
-	0000 1111               layout request (keyboard responds with layout response)
+    0000 0001               reset (keyboard responds with self test pass/fail)
+    0000 0010               bell on (480us period)
+    0000 0011               bell off
+    0000 1010               enable keyclick (5us duration 480us period on make)
+    0000 1011               disable keyclick
+    0000 1110  ---- lscn    LED (1 = on, l = caps lock, s = scroll lock, c = compose, n = num lock)
+    0000 1111               layout request (keyboard responds with layout response)
 
-	message from keyboad to host:
-	0xxx xxxx               key make
-	1xxx xxxx               key break
-	0111 1111               all keys up
-	1111 1110  00dd dddd    layout response (DIP switches 3 to 8 from MSB to LSB)
-	1111 1111  0000 0100    reset response (self test pass, always followed by all keys up or key make)
-	0111 1110  0000 0001    self test fal
+    message from keyboad to host:
+    0xxx xxxx               key make
+    1xxx xxxx               key break
+    0111 1111               all keys up
+    1111 1110  00dd dddd    layout response (DIP switches 3 to 8 from MSB to LSB)
+    1111 1111  0000 0100    reset response (self test pass, always followed by all keys up or key make)
+    0111 1110  0000 0001    self test fal
 
 
-	Type 5 US PC layout:
+    Type 5 US PC layout:
 
       76      1d      05  06  08  0a    0c  0e  10  11    12  07  09  0b    16  17  15    2d  02  04  30
 
-	01  03    2a  1e  1f  20  21  22  23  24  25  26  27  28  29      2b    2c  34  60    62  2e  2f  47
-	19  1a    35    36  37  38  39  3a  3b  3c  3d  3e  3f  40  41    58    42  4a  7b    44  45  46
-	31  33    77     4d  4e  4f  50  51  52  53  54  55  56  57       59                  5b  5c  5d  7d
-	48  49    63       64  65  66  67  68  69  6a  6b  6c  6d         6e        14        70  71  72  
-	5f  61    4c     78   13                79                0d  43  7a    18  1b  1c      5e    32  5a
+    01  03    2a  1e  1f  20  21  22  23  24  25  26  27  28  29      2b    2c  34  60    62  2e  2f  47
+    19  1a    35    36  37  38  39  3a  3b  3c  3d  3e  3f  40  41    58    42  4a  7b    44  45  46
+    31  33    77     4d  4e  4f  50  51  52  53  54  55  56  57       59                  5b  5c  5d  7d
+    48  49    63       64  65  66  67  68  69  6a  6b  6c  6d         6e        14        70  71  72
+    5f  61    4c     78   13                79                0d  43  7a    18  1b  1c      5e    32  5a
 
-	Type 5 US UNIX layout:
+    Type 5 US UNIX layout:
 
       76      xx      05  06  08  0a    0c  0e  10  11    12  07  09  0b    16  17  15    2d  02  04  30
 
-	01  03    1d  1e  1f  20  21  22  23  24  25  26  27  28  29  58  2a    2c  34  60    62  2e  2f  47
-	19  1a    35    36  37  38  39  3a  3b  3c  3d  3e  3f  40  41    2b    42  4a  7b    44  45  46
-	31  33    4c     4d  4e  4f  50  51  52  53  54  55  56  57       59                  5b  5c  5d  7d
-	48  49    63       64  65  66  67  68  69  6a  6b  6c  6d         6e        14        70  71  72  
-	5f  61    77     78   13                79                0d  43  7a    18  1b  1c      5e    32  5a
+    01  03    1d  1e  1f  20  21  22  23  24  25  26  27  28  29  58  2a    2c  34  60    62  2e  2f  47
+    19  1a    35    36  37  38  39  3a  3b  3c  3d  3e  3f  40  41    2b    42  4a  7b    44  45  46
+    31  33    4c     4d  4e  4f  50  51  52  53  54  55  56  57       59                  5b  5c  5d  7d
+    48  49    63       64  65  66  67  68  69  6a  6b  6c  6d         6e        14        70  71  72
+    5f  61    77     78   13                79                0d  43  7a    18  1b  1c      5e    32  5a
 
-	xx is a blank key
-	6f is assigned to linefeed, which is present on Type 4 keyboards, but absent on Type 5
+    xx is a blank key
+    6f is assigned to linefeed, which is present on Type 4 keyboards, but absent on Type 5
 */
 
 namespace {
 INPUT_PORTS_START( sparc_keyboard )
 	PORT_START("DIP")
-	PORT_DIPNAME( 0x3f, 0x21, "Layout"                                 ) PORT_DIPLOCATION("DIP:8,7,6,5,4,3")
+	PORT_DIPNAME( 0x3f, 0x21, "Layout"                                 ) PORT_DIPLOCATION("DIP:!8,!7,!6,!5,!4,!3")
 	PORT_DIPSETTING(    0x00, "U.S.A. (US4.kt)"                        )
 	PORT_DIPSETTING(    0x01, "U.S.A. (US4.kt)"                        )
 	PORT_DIPSETTING(    0x02, "Belgium (FranceBelg4.kt)"               )
@@ -102,10 +106,10 @@ INPUT_PORTS_START( sparc_keyboard )
 	PORT_DIPSETTING(    0x3b, "Lithuania (Lithuania5.kt)"              )
 	PORT_DIPSETTING(    0x3c, "Belgium (Belgium5.kt)"                  )
 	// 0x3d
-	PORT_DIPSETTING(    0x3e, "Turkey-Q5 (TurkeyQ5.kt)"                )
+	PORT_DIPSETTING(    0x3e, "Turkey-F5 (TurkeyF5.kt)"                )
 	PORT_DIPSETTING(    0x3f, "Canada/French (Canada_Fr5_TBITS5.kt)"   )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "DIP:2" )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "DIP:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "DIP:!2" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "DIP:!1" )
 
 	PORT_START("ROW0")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED   )
