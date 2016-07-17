@@ -42,8 +42,6 @@
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="ereader">
 			<dataarea name="rom" size="2912">
-		<part name="cart" interface="ereader">
-			<dataarea name="rom" size="2912">
 				<rom name="animal crossing-e - series 1 - bangle (usa).raw" size="2912" crc="90aa9849" sha1="6f6a92f33b131c148141bd5d45341fdeacb9c911"/>
 			</dataarea>
 		</part>
@@ -578,7 +576,7 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="acr1sab>
+	<software name="acr1sab">
 		<description>Animal Crossing-e - Series 1 - Sable Able (USA)</description>
 		<year>200?</year>
 		<publisher>Nintendo</publisher>
@@ -668,3 +666,4 @@
 			</dataarea>
 		</part>
 	</software>
+</softwarelist>
