@@ -127,7 +127,7 @@ const rom_entry *electron_m2105_device::device_rom_region() const
 //-------------------------------------------------
 
 electron_m2105_device::electron_m2105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ELECTRON_M2105, "BT Merlin M2105", tag, owner, clock, "electron_m2105", __FILE__),
+	: device_t(mconfig, ELECTRON_M2105, "Acorn M2105 Expansion", tag, owner, clock, "electron_m2105", __FILE__),
 		device_electron_expansion_interface(mconfig, *this),
 		m_exp_rom(*this, "exp_rom"),
 		m_via6522_0(*this, "via6522_0"),
