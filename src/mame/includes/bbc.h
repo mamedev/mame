@@ -29,6 +29,11 @@
 #include "sound/tms5220.h"
 #include "imagedev/cassette.h"
 
+#include "bus/bbc/analogue/analogue.h"
+#include "bus/bbc/1mhzbus/1mhzbus.h"
+#include "bus/bbc/tube/tube.h"
+#include "bus/bbc/userport/userport.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 

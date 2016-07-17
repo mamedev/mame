@@ -204,6 +204,58 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/bbc/analogue/analogue.h,BUSES["BBC_ANALOGUE"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_ANALOGUE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/analogue/analogue.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/analogue/analogue.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/bbc/1mhzbus/1mhzbus.h,BUSES["BBC_1MHZBUS"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_1MHZBUS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/1mhzbus.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/1mhzbus.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/bbc/tube/tube.h,BUSES["BBC_TUBE"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_TUBE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/bbc/userport/userport.h,BUSES["BBC_USERPORT"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_USERPORT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/userport/userport.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/userport/userport.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/bw2/exp.h,BUSES["BW2"] = true
 ---------------------------------------------------
 
