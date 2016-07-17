@@ -133,6 +133,26 @@ WRITE8_MEMBER(tiamc1_state::tiamc1_control_w)
 	machine().bookkeeping().coin_counter_w(0, data & 0x04);
 }
 
+void tiamc1_state::update_speaker()
+{
+	int level = (!(pi8253_line_0 || pi8253_line_1) || pi8253_line_2) ? 1 : 0;	// logic is guess
+	m_speaker->level_w(level);
+}
+WRITE_LINE_MEMBER(tiamc1_state::pit8253_0_w)
+{
+	pi8253_line_0 = state;
+	update_speaker();
+}
+WRITE_LINE_MEMBER(tiamc1_state::pit8253_1_w)
+{
+	pi8253_line_1 = state;
+	update_speaker();
+}
+WRITE_LINE_MEMBER(tiamc1_state::pit8253_2_w)
+{
+	pi8253_line_2 = state;
+	update_speaker();
+}
 
 static ADDRESS_MAP_START( tiamc1_map, AS_PROGRAM, 8, tiamc1_state )
 	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(tiamc1_videoram_w)
@@ -177,7 +197,7 @@ static ADDRESS_MAP_START( kotrybolov_io_map, AS_IO, 8, tiamc1_state )
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(tiamc1_bg_vshift_w)	// background V scroll
 	AM_RANGE(0xf4, 0xf4) AM_WRITE(tiamc1_bg_hshift_w)	// background H scroll
 	AM_RANGE(0xf8, 0xf8) AM_WRITE(kot_bankswitch_w)		// character rom offset, msb video on/off
-	AM_RANGE(0xc0, 0xc3) AM_DEVWRITE("2x8253", tiamc1_sound_device, tiamc1_timer0_w)   // TODO this PCB have single 8253
+	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
 	AM_RANGE(0xd0, 0xd0) AM_READ_PORT("IN0")
 	AM_RANGE(0xd1, 0xd1) AM_READ_PORT("IN1")
 	AM_RANGE(0xd2, 0xd2) AM_READ_PORT("IN2")
@@ -350,6 +370,18 @@ static MACHINE_CONFIG_DERIVED(kot, tiamc1)
 	MCFG_SCREEN_UPDATE_DRIVER(tiamc1_state, screen_update_kot)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", kot)
+
+	MCFG_DEVICE_REMOVE("2x8253")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(16000000 / 9)				// guess
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(tiamc1_state, pit8253_0_w))
+	MCFG_PIT8253_CLK1(16000000 / 9)				// guess
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(tiamc1_state, pit8253_1_w))
+	MCFG_PIT8253_CLK2(16000000 / 9)				// guess
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(tiamc1_state, pit8253_2_w))
 MACHINE_CONFIG_END
 
 
@@ -449,9 +481,8 @@ ROM_START( gorodki )
 
 ROM_END
 
-// not TIA-MC1 platform, uses single PCB main board and game ROM board
+// later (cost reduced ?) version of TIA-MC1 hardware, uses single PCB main board design, ROM-based tile generator, sinle bank tile map RAM, single i8253
 // notable ICs: i8080, i8255, i8253, 3x KR573RU8 2Kx8 SRAM, 2x KR541RU2 1Kx4 RAM, 9x KR531RU8 16x4 RAM
-// tile/character generator uses ROMs instead of RAM
 ROM_START( kot )
 	ROM_REGION( 0xc000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD( "854.6", 0x00000, 0x2000, CRC(44e5e8fc) SHA1(dafbace689f3834d5c6e952a2f6188fb190845e4) )
@@ -463,6 +494,7 @@ ROM_START( kot )
 	ROM_LOAD( "851.6", 0x02000, 0x2000, CRC(7db239a0) SHA1(af5772afff9009f63e2ab95c1cb00e047f3ed7e4) )
 	ROM_LOAD( "852.7", 0x04000, 0x2000, CRC(c7700f88) SHA1(1a20cc60b083259070e4f1687b09a31fc763d47e) )
 	ROM_LOAD( "853.8", 0x06000, 0x2000, CRC(b94bf1af) SHA1(da403c51fd78f99b82304c67f2197078f4ea0bf5) )
+
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_LOAD( "846.1", 0x00000, 0x2000, CRC(42447f4a) SHA1(bd35f2f5e468f9191680bf2c1800e09bb9ae1691) )	// tile gfx
 	ROM_LOAD( "847.2", 0x02000, 0x2000, CRC(99ada5e8) SHA1(9425a515105ec9e9989aae736645b270e39420be) )
@@ -475,4 +507,4 @@ GAME( 1988, sosterm,  0, tiamc1, tiamc1,  driver_device, 0, ROT0, "Terminal", "S
 GAME( 1988, koroleva, 0, tiamc1, tiamc1,  driver_device, 0, ROT0, "Terminal", "Snezhnaja Koroleva", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, bilyard,  0, tiamc1, tiamc1,  driver_device, 0, ROT0, "Terminal", "Billiard", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, gorodki,  0, tiamc1, gorodki, driver_device, 0, ROT0, "Terminal", "Gorodki", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kot,      0, kot,    kot,     driver_device, 0, ROT0, "Terminal", "Kot-Rybolov", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1988, kot,      0, kot,    kot,     driver_device, 0, ROT0, "Terminal", "Kot-Rybolov", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
