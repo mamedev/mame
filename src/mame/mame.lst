@@ -11178,7 +11178,6 @@ dvk_kcgd                        //
 
 @source:dvk_ksm.cpp
 dvk_ksm                         //
-dvk_ksm01                       //
 
 @source:dwarfd.cpp
 dwarfd                          // (c) 198? Electro-Sports
