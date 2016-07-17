@@ -88,7 +88,7 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
-#define LLFORMAT "%I64%"
+#define LLFORMAT "%I64d"
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
 #define LLFORMAT "%lld"

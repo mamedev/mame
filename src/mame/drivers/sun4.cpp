@@ -417,6 +417,7 @@
 #include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "bus/rs232/rs232.h"
+#include "bus/rs232/sparckbd.h"
 #include "machine/timekpr.h"
 #include "machine/upd765.h"
 #include "formats/pc_dsk.h"
@@ -431,6 +432,7 @@
 #define TIMEKEEPER_TAG  "timekpr"
 #define SCC1_TAG        "scc1"
 #define SCC2_TAG        "scc2"
+#define KEYBOARD_TAG    "keyboard"
 #define RS232A_TAG      "rs232a"
 #define RS232B_TAG      "rs232b"
 #define FDC_TAG			"fdc"
@@ -483,6 +485,11 @@ const sparc_disassembler::asi_desc_map::value_type sun4c_asi_desc[] = {
 	{ 0x0d, { nullptr, "Flush Cache (Page)"     } },
 	{ 0x0e, { nullptr, "Flush Cache (Context)"  } }
 };
+
+// TODO: put this somewhere common when sun4m, sun4d, sun4u, etc. are split out
+SLOT_INTERFACE_START(keyboard_devices)
+	SLOT_INTERFACE("keyboard", SPARC_KEYBOARD)
+SLOT_INTERFACE_END
 }
 
 enum
@@ -533,6 +540,9 @@ public:
 	DECLARE_READ8_MEMBER( fdc_r );
 	DECLARE_WRITE8_MEMBER( fdc_w );
 
+	DECLARE_WRITE_LINE_MEMBER( scc1_int );
+	DECLARE_WRITE_LINE_MEMBER( scc2_int );
+
 	DECLARE_DRIVER_INIT(sun4);
 	DECLARE_DRIVER_INIT(sun4c);
 	DECLARE_DRIVER_INIT(ss2);
@@ -567,6 +577,7 @@ private:
 	UINT8 m_ctx_mask;	// SS2 is sun4c but has 16 contexts; most have 8
 	UINT8 m_pmeg_mask;	// SS2 is sun4c but has 16384 PTEs; most have 8192
 	UINT8 m_irq_reg;	// IRQ control
+	UINT8 m_scc1_int, m_scc2_int;
 	UINT8 m_diag;
 	int m_arch;
 
@@ -850,7 +861,7 @@ WRITE32_MEMBER( sun4_state::sun4c_mmu_w )
 			UINT32 tmp = (m_pagemap[entry] & 0xffff) << 10;
 			tmp |= (offset & 0x3ff);
 
-			printf("sun4: write translated vaddr %08x to phys %08x type %d, PTE %08x, ASI %d, PC=%x\n", offset<<2, tmp<<2, (m_pagemap[entry]>>26) & 3, m_pagemap[entry], asi, m_maincpu->pc());
+			//printf("sun4: write translated vaddr %08x to phys %08x type %d, PTE %08x, ASI %d, PC=%x\n", offset<<2, tmp<<2, (m_pagemap[entry]>>26) & 3, m_pagemap[entry], asi, m_maincpu->pc());
 
 			switch ((m_pagemap[entry] >> 26) & 3)
 			{
@@ -1241,6 +1252,7 @@ void sun4_state::machine_reset()
 	m_context = 0;
 	m_system_enable = 0;
 	m_irq_reg = 0;
+	m_scc1_int = m_scc2_int = 0;
 	memset(m_counter, 0, sizeof(m_counter));
 }
 
@@ -1413,6 +1425,24 @@ WRITE8_MEMBER( sun4_state::irq_w )
 	//printf("%02x to IRQ\n", data);
 
 	m_irq_reg = data;
+
+	m_maincpu->set_input_line(SPARC_IRQ12, ((m_scc1_int || m_scc2_int) && (m_irq_reg & 0x01)) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER( sun4_state::scc1_int )
+{
+	printf("scc1 int: %d\n", state);
+	m_scc1_int = state;
+
+	m_maincpu->set_input_line(SPARC_IRQ12, ((m_scc1_int || m_scc2_int) && (m_irq_reg & 0x01)) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER( sun4_state::scc2_int )
+{
+	printf("scc2 int: %d\n", state);
+	m_scc2_int = state;
+
+	m_maincpu->set_input_line(SPARC_IRQ12, ((m_scc1_int || m_scc2_int) && (m_irq_reg & 0x01)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void sun4_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -1576,8 +1606,17 @@ static MACHINE_CONFIG_START( sun4, sun4_state )
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(32)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
 
+	// Keyboard/mouse
 	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(sun4_state, scc1_int))
+	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(KEYBOARD_TAG, rs232_port_device, write_txd))
+
+	MCFG_RS232_PORT_ADD(KEYBOARD_TAG, keyboard_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC1_TAG, z80scc_device, rxa_w))
+
+	// RS232 serial ports
 	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(sun4_state, scc2_int))
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
 
@@ -1621,8 +1660,17 @@ static MACHINE_CONFIG_START( sun4c, sun4_state )
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(32)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
 
+	// Keyboard/mouse
 	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(sun4_state, scc1_int))
+	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(KEYBOARD_TAG, rs232_port_device, write_txd))
+
+	MCFG_RS232_PORT_ADD(KEYBOARD_TAG, keyboard_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC1_TAG, z80scc_device, rxa_w))
+
+	// RS232 serial ports
 	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(sun4_state, scc2_int))
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
 
