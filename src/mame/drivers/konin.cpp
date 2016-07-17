@@ -2,11 +2,14 @@
 // copyright-holders:Miodrag Milanovic, Robbbert
 /***************************************************************************
 
-        Mera-Elzab Konin
+Mera-Elzab Konin
 
-        It's industrial computer used in Poland
+It's an industrial computer used in Poland
 
-        29/12/2011 Skeleton driver.
+No information has been found. All code is guesswork.
+
+2011-12-29 Skeleton driver.
+2016-07-15 Added terminal and uart.
 
 'maincpu' (0384): unmapped i/o memory write to 00F8 = 56 & FF
 'maincpu' (0388): unmapped i/o memory write to 00F8 = B6 & FF
@@ -28,22 +31,38 @@
 'maincpu' (2AC6): unmapped i/o memory write to 00FA = 03 & FF
 'maincpu' (0082): unmapped i/o memory write to 0024 = 06 & FF
 
+Debug stuff:
+- Start it up
+- Write FF to 7D57 to see some messages
+- Write 00 to 7D57 to silence it
+
+Even though it gives an input prompt, there's no code to accept anything
+
+Terminal settings: 8 data bits, 2 stop bits, no parity @ 9600
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/i8251.h"
+#include "bus/rs232/rs232.h"
+#include "machine/clock.h"
 
 class konin_state : public driver_device
 {
 public:
 	konin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_uart(*this, "uart")
+	{ }
 
+	WRITE_LINE_MEMBER(clock_w);
+
+private:
 	virtual void machine_reset() override;
-	virtual void video_start() override;
-	UINT32 screen_update_konin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<i8251_device> m_uart;
 };
 
 static ADDRESS_MAP_START( konin_mem, AS_PROGRAM, 8, konin_state )
@@ -55,24 +74,32 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( konin_io, AS_IO, 8, konin_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xf6, 0xf6) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
+	AM_RANGE(0xf7, 0xf7) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( konin )
 INPUT_PORTS_END
 
+static DEVICE_INPUT_DEFAULTS_START( konin )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
+DEVICE_INPUT_DEFAULTS_END
+
 
 void konin_state::machine_reset()
 {
 }
 
-void konin_state::video_start()
+DECLARE_WRITE_LINE_MEMBER( konin_state::clock_w )
 {
-}
-
-UINT32 konin_state::screen_update_konin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return 0;
+	m_uart->write_txc(state);
+	m_uart->write_rxc(state);
 }
 
 static MACHINE_CONFIG_START( konin, konin_state )
@@ -81,17 +108,19 @@ static MACHINE_CONFIG_START( konin, konin_state )
 	MCFG_CPU_PROGRAM_MAP(konin_mem)
 	MCFG_CPU_IO_MAP(konin_io)
 
+	MCFG_DEVICE_ADD("uart", I8251, 0)
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(konin_state, screen_update_konin)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", konin )
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(konin_state, clock_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */

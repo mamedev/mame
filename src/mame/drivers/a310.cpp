@@ -8,6 +8,15 @@
  *  Enhanced: R. Belmont, June 2007
  *  Angelo Salese, August 2010
  *
+ * Notes:
+ * - default NVRAM is plainly wrong. Use the status/configure commands to set up properly
+ *   (Scroll Lock is currently mapped with Right SHIFT, use this to move to next page of status).
+ *   In order to load a floppy, you need at very least:
+ *   configure floppies 2
+ *   configure filesystem adfs
+ *   configure monitortype 12
+ *   Then reboot / reset the machine, and use cat to (attempt) to load a floppy contents.
+ *
  *  TODO:
  *  - Make floppies to work;
  *  - Attempting to load the GUI gives an exception;
@@ -67,7 +76,7 @@
 //#include "machine/aakart.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
-#include "formats/applix_dsk.h"
+#include "formats/acorn_dsk.h"
 #include "softlist.h"
 
 class a310_state : public archimedes_state
@@ -327,7 +336,8 @@ static INPUT_PORTS_START( a310 )
 INPUT_PORTS_END
 
 FLOPPY_FORMATS_MEMBER( a310_state::floppy_formats )
-	FLOPPY_APPLIX_FORMAT
+	FLOPPY_ACORN_ADFS_NEW_FORMAT,
+	FLOPPY_ACORN_ADFS_OLD_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( a310_floppies )
@@ -381,7 +391,9 @@ static MACHINE_CONFIG_START( a310, a310_state )
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE( a310_state, a310_wd177x_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(a310_state, a310_wd177x_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", a310_floppies, "35dd", a310_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", a310_floppies, "35dd", a310_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "archimedes")
 

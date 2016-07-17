@@ -46,15 +46,15 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE8_MEMBER(sound_bank_w);
-	DECLARE_READ8_MEMBER(ajax_ls138_f10_r);
-	DECLARE_WRITE8_MEMBER(ajax_ls138_f10_w);
-	DECLARE_WRITE8_MEMBER(ajax_bankswitch_2_w);
-	DECLARE_WRITE8_MEMBER(ajax_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(ajax_lamps_w);
+	DECLARE_READ8_MEMBER(ls138_f10_r);
+	DECLARE_WRITE8_MEMBER(ls138_f10_w);
+	DECLARE_WRITE8_MEMBER(bankswitch_2_w);
+	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	DECLARE_WRITE8_MEMBER(lamps_w);
 	DECLARE_WRITE8_MEMBER(k007232_extvol_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_ajax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(volume_callback0);
 	DECLARE_WRITE8_MEMBER(volume_callback1);
 	K051316_CB_MEMBER(zoom_callback);

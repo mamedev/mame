@@ -234,6 +234,7 @@ public:
 	void strlog(const char *str) const;
 	UINT32 rand();
 	const char *describe_context();
+	std::string compose_saveload_filename(const char *base_filename, const char **searchpath = nullptr);
 
 	// CPU information
 	cpu_device *            firstcpu;           // first CPU

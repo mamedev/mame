@@ -710,7 +710,7 @@ static imgtoolerr_t os9_diskimage_open(imgtool_image *image, imgtool_stream *str
 
 
 
-static imgtoolerr_t os9_diskimage_create(imgtool_image *img, imgtool_stream *stream, option_resolution *opts)
+static imgtoolerr_t os9_diskimage_create(imgtool_image *img, imgtool_stream *stream, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
 	dynamic_buffer header;
@@ -727,11 +727,11 @@ static imgtoolerr_t os9_diskimage_create(imgtool_image *img, imgtool_stream *str
 	time(&t);
 	ltime = localtime(&t);
 
-	heads = option_resolution_lookup_int(opts, 'H');
-	tracks = option_resolution_lookup_int(opts, 'T');
-	sectors = option_resolution_lookup_int(opts, 'S');
-	sector_bytes = option_resolution_lookup_int(opts, 'L');
-	first_sector_id = option_resolution_lookup_int(opts, 'F');
+	heads = opts->lookup_int('H');
+	tracks = opts->lookup_int('T');
+	sectors = opts->lookup_int('S');
+	sector_bytes = opts->lookup_int('L');
+	first_sector_id = opts->lookup_int('F');
 	title = "";
 
 	header.resize(sector_bytes);
@@ -1026,7 +1026,7 @@ static imgtoolerr_t os9_diskimage_readfile(imgtool_partition *partition, const c
 
 
 
-static imgtoolerr_t os9_diskimage_writefile(imgtool_partition *partition, const char *path, const char *fork, imgtool_stream *sourcef, option_resolution *opts)
+static imgtoolerr_t os9_diskimage_writefile(imgtool_partition *partition, const char *path, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
 	imgtool_image *image = imgtool_partition_image(partition);

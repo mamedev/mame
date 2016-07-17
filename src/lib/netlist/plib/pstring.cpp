@@ -25,7 +25,8 @@ pstr_t pstring_t<pu8_traits>::m_zero = pstr_t(0);
 template<typename F>
 pstring_t<F>::~pstring_t()
 {
-	sfree(m_ptr);
+	if (m_ptr != nullptr)
+		sfree(m_ptr);
 }
 
 template<typename F>

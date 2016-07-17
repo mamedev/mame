@@ -250,7 +250,7 @@ void cassette_image_device::device_start()
 	m_value = 0;
 }
 
-bool cassette_image_device::call_create(int format_type, option_resolution *format_options)
+bool cassette_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	return call_load();
 }

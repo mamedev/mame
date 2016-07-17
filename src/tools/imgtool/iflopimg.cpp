@@ -144,20 +144,20 @@ static imgtoolerr_t imgtool_floppy_open(imgtool_image *image, imgtool_stream *f)
 
 
 
-static imgtoolerr_t imgtool_floppy_create(imgtool_image *image, imgtool_stream *f, option_resolution *opts)
+static imgtoolerr_t imgtool_floppy_create(imgtool_image *image, imgtool_stream *f, util::option_resolution *opts)
 {
 	floperr_t ferr;
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	struct imgtool_floppy_image *fimg;
 	const imgtool_class *imgclass;
 	const struct FloppyFormat *format;
-	imgtoolerr_t (*create)(imgtool_image *, imgtool_stream *, option_resolution *);
+	imgtoolerr_t (*create)(imgtool_image *, imgtool_stream *, util::option_resolution *);
 	imgtoolerr_t (*open)(imgtool_image *image, imgtool_stream *f);
 
 	fimg = (struct imgtool_floppy_image *) imgtool_image_extra_bytes(image);
 	imgclass = &imgtool_image_module(image)->imgclass;
 	format = (const struct FloppyFormat *) imgclass->derived_param;
-	create = (imgtoolerr_t (*)(imgtool_image *, imgtool_stream *, option_resolution *)) imgtool_get_info_ptr(imgclass, IMGTOOLINFO_PTR_FLOPPY_CREATE);
+	create = (imgtoolerr_t (*)(imgtool_image *, imgtool_stream *, util::option_resolution *)) imgtool_get_info_ptr(imgclass, IMGTOOLINFO_PTR_FLOPPY_CREATE);
 	open = (imgtoolerr_t (*)(imgtool_image *, imgtool_stream *)) imgtool_get_info_ptr(imgclass, IMGTOOLINFO_PTR_FLOPPY_OPEN);
 
 	/* open up the floppy */

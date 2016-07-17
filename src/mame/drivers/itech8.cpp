@@ -1685,7 +1685,7 @@ static MACHINE_CONFIG_START( itech8_core_lo, itech8_state )
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, CLOCK_8MHz/4)
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(itech8_state, pia_portb_out))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("soundcpu", m6809_device, firq_line))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("soundcpu", M6809_FIRQ_LINE))
 MACHINE_CONFIG_END
 
 

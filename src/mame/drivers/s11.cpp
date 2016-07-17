@@ -143,7 +143,7 @@ void s11_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	case TIMER_IRQ:
 		if(param == 1)
 		{
-			m_maincpu->set_input_line(M6800_IRQ_LINE,ASSERT_LINE);
+			m_maincpu->set_input_line(M6802_IRQ_LINE, ASSERT_LINE);
 			m_irq_timer->adjust(attotime::from_ticks(32,E_CLOCK),0);
 			if(m_pias)
 				m_pias->cb1_w(0);
@@ -153,7 +153,7 @@ void s11_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		}
 		else
 		{
-			m_maincpu->set_input_line(M6800_IRQ_LINE,CLEAR_LINE);
+			m_maincpu->set_input_line(M6802_IRQ_LINE, CLEAR_LINE);
 			m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
 			if(m_pias)
 				m_pias->cb1_w(1);
@@ -223,7 +223,7 @@ WRITE_LINE_MEMBER( s11_state::pia21_ca2_w )
 
 WRITE8_MEMBER( s11_state::lamp0_w )
 {
-	m_maincpu->set_input_line(M6800_IRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(M6802_IRQ_LINE, CLEAR_LINE);
 }
 
 WRITE8_MEMBER( s11_state::dig0_w )
@@ -470,8 +470,8 @@ static MACHINE_CONFIG_START( s11, s11_state )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, dac_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(s11_state, pias_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pias_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("audiocpu", m6808_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("audiocpu", m6808_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("audiocpu", M6808_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("audiocpu", M6808_IRQ_LINE))
 
 	/* Add the background music card */
 	MCFG_CPU_ADD("bgcpu", M6809E, 8000000) // MC68B09E
@@ -489,8 +489,8 @@ static MACHINE_CONFIG_START( s11, s11_state )
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11_state, pia40_pa_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, pia40_pb_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pia40_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("bgcpu", m6809e_device, firq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("bgcpu", m6809e_device, nmi_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("bgcpu", M6809_FIRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("bgcpu", INPUT_LINE_NMI))
 MACHINE_CONFIG_END
 
 

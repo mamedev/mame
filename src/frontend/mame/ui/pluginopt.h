@@ -24,22 +24,26 @@ namespace ui {
 class menu_plugin : public menu
 {
 public:
-	menu_plugin(mame_ui_manager &mui, render_container *container);
+	menu_plugin(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_plugin();
+
+private:
 	virtual void populate() override;
 	virtual void handle() override;
-private:
+
 	std::vector<std::string> &m_plugins;
 };
 
 class menu_plugin_opt : public menu
 {
 public:
-	menu_plugin_opt(mame_ui_manager &mui, render_container *container, char *menu);
+	menu_plugin_opt(mame_ui_manager &mui, render_container &container, char *menu);
 	virtual ~menu_plugin_opt();
+
+private:
 	virtual void populate() override;
 	virtual void handle() override;
-private:
+
 	std::string m_menu;
 };
 

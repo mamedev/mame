@@ -71,7 +71,7 @@ void archimedes_state::archimedes_request_fiq(int mask)
 	m_ioc_regs[FIQ_STATUS] |= mask;
 
 	//printf("STATUS:%02x IRQ:%02x MASK:%02x\n",m_ioc_regs[FIQ_STATUS],mask,m_ioc_regs[FIQ_MASK]);
-
+	
 	if (m_ioc_regs[FIQ_STATUS] & m_ioc_regs[FIQ_MASK])
 	{
 		generic_pulse_irq_line(m_maincpu, ARM_FIRQ_LINE, 1);

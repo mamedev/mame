@@ -41,11 +41,10 @@ public:
 	virtual bool must_be_loaded() const override { return false; }
 	virtual bool is_reset_on_load() const override { return false; }
 	virtual const char *file_extensions() const override { return "neo"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	virtual bool call_load() override;
 	virtual void call_unload() override;
-	virtual bool call_create(int format_type, option_resolution *format_options) override;
+	virtual bool call_create(int format_type, util::option_resolution *format_options) override;
 
 	// device-level overrides
 	virtual void device_start() override;

@@ -17,33 +17,39 @@
 #include "corestr.h"
 #include "opresolv.h"
 
-enum resolution_entry_state
-{
-	RESOLUTION_ENTRY_STATE_UNSPECIFIED,
-	RESOLUTION_ENTRY_STATE_SPECIFIED
-};
 
-struct option_resolution_entry
-{
-	const option_guide *guide_entry;
-	enum resolution_entry_state state;
-	union
-	{
-		int int_value;
-		const char *str_value;
-	} u;
-};
+namespace util {
 
-struct option_resolution
-{
-	object_pool *pool;
-	const char *specification;
-	size_t option_count;
-	struct option_resolution_entry *entries;
-};
+/***************************************************************************
+	option_resolution
+***************************************************************************/
 
-static optreserr_t resolve_single_param(const char *specification, int *param_value,
-	struct OptionRange *range, size_t range_count)
+// -------------------------------------------------
+//	entry::int_value
+// -------------------------------------------------
+
+int option_resolution::entry::int_value() const
+{
+	return atoi(value.c_str());
+}
+
+
+// -------------------------------------------------
+//	entry::set_int_value
+// -------------------------------------------------
+
+void option_resolution::entry::set_int_value(int i)
+{
+	value = string_format("%d", i);
+}
+
+
+// -------------------------------------------------
+//	resolve_single_param
+// -------------------------------------------------
+
+option_resolution::error option_resolution::resolve_single_param(const char *specification, option_resolution::entry *param_value,
+	struct range *range, size_t range_count)
 {
 	int FLAG_IN_RANGE           = 0x01;
 	int FLAG_IN_DEFAULT         = 0x02;
@@ -62,7 +68,7 @@ static optreserr_t resolve_single_param(const char *specification, int *param_va
 			/* range specifier */
 			if (flags & (FLAG_IN_RANGE|FLAG_IN_DEFAULT))
 			{
-				return OPTIONRESOLUTION_ERROR_SYNTAX;
+				return error::SYNTAX;
 			}
 			flags |= FLAG_IN_RANGE;
 			s++;
@@ -82,7 +88,7 @@ static optreserr_t resolve_single_param(const char *specification, int *param_va
 			/* begin default value */
 			if (flags & (FLAG_IN_DEFAULT|FLAG_DEFAULT_SPECIFIED))
 			{
-				return OPTIONRESOLUTION_ERROR_SYNTAX;
+				return error::SYNTAX;
 			}
 			flags |= FLAG_IN_DEFAULT;
 			s++;
@@ -92,21 +98,21 @@ static optreserr_t resolve_single_param(const char *specification, int *param_va
 			/* end default value */
 			if ((flags & FLAG_IN_DEFAULT) == 0)
 			{
-				return OPTIONRESOLUTION_ERROR_SYNTAX;
+				return error::SYNTAX;
 			}
 			flags &= ~FLAG_IN_DEFAULT;
 			flags |= FLAG_DEFAULT_SPECIFIED;
 			s++;
 
-			if (param_value && *param_value == -1)
-				*param_value = value;
+			if (param_value && param_value->int_value() == -1)
+				param_value->set_int_value(value);
 		}
 		else if (*s == '/')
 		{
 			/* value separator */
 			if (flags & (FLAG_IN_DEFAULT|FLAG_IN_RANGE))
 			{
-				return OPTIONRESOLUTION_ERROR_SYNTAX;
+				return error::SYNTAX;
 			}
 			s++;
 
@@ -147,35 +153,38 @@ static optreserr_t resolve_single_param(const char *specification, int *param_va
 				range->max = value;
 			}
 
-			/* if we have a value; check to see if it is out of range */
-			if (param_value && (*param_value != -1) && (*param_value != value))
+			// if we have a value; check to see if it is out of range
+			if (param_value && (param_value->int_value() != -1) && (param_value->int_value() != value))
 			{
-				if ((last_value < *param_value) && (*param_value < value))
+				if ((last_value < param_value->int_value()) && (param_value->int_value() < value))
 				{
 					if ((flags & FLAG_IN_RANGE) == 0)
-						return OPTIONRESOLUTION_ERROR_PARAMOUTOFRANGE;
+						return error::PARAMOUTOFRANGE;
 				}
 			}
 			flags &= ~FLAG_IN_RANGE;
 		}
 		else
 		{
-			return OPTIONRESOLUTION_ERROR_SYNTAX;
+			return error::SYNTAX;
 		}
 	}
 
-	/* we can't have zero length guidelines strings */
+	// we can't have zero length guidelines strings
 	if (s == specification)
 	{
-		return OPTIONRESOLUTION_ERROR_SYNTAX;
+		return error::SYNTAX;
 	}
 
-	return OPTIONRESOLUTION_ERROR_SUCCESS;
+	return error::SUCCESS;
 }
 
 
+// -------------------------------------------------
+//	lookup_in_specification
+// -------------------------------------------------
 
-static const char *lookup_in_specification(const char *specification, const option_guide *option)
+const char *option_resolution::lookup_in_specification(const char *specification, const option_guide *option)
 {
 	const char *s;
 	s = strchr(specification, option->parameter);
@@ -183,222 +192,191 @@ static const char *lookup_in_specification(const char *specification, const opti
 }
 
 
+// -------------------------------------------------
+//	ctor
+// -------------------------------------------------
 
-option_resolution *option_resolution_create(const option_guide *guide, const char *specification)
+option_resolution::option_resolution(const option_guide *guide, const char *specification)
 {
-	option_resolution *resolution = nullptr;
 	const option_guide *guide_entry;
 	int option_count;
 	int opt = -1;
-	object_pool *pool;
 
 	assert(guide);
 
-	/* first count the number of options specified in the guide */
-	option_count = option_resolution_countoptions(guide, specification);
+	// first count the number of options specified in the guide 
+	option_count = count_options(guide, specification);
 
-	/* create a memory pool for this structure */
-	pool = pool_alloc_lib(nullptr);
-	if (!pool)
-		goto outofmemory;
+	// set up the entries list
+	m_specification = specification;
+	m_entries.resize(option_count);
 
-	/* allocate the main structure */
-	resolution = (option_resolution *)pool_malloc_lib(pool, sizeof(option_resolution));
-	if (!resolution)
-		goto outofmemory;
-	memset(resolution, 0, sizeof(*resolution));
-	resolution->pool = pool;
-
-	/* set up the entries list */
-	resolution->option_count = option_count;
-	resolution->specification = specification;
-	resolution->entries = (option_resolution_entry *)pool_malloc_lib(resolution->pool, sizeof(struct option_resolution_entry) * option_count);
-	if (!resolution->entries)
-		goto outofmemory;
-	memset(resolution->entries, 0, sizeof(struct option_resolution_entry) * option_count);
-
-	/* initialize each of the entries */
+	// initialize each of the entries 
 	opt = 0;
 	guide_entry = guide;
 	while(guide_entry->option_type != OPTIONTYPE_END)
 	{
-		switch(guide_entry->option_type) {
+		switch(guide_entry->option_type)
+		{
 		case OPTIONTYPE_INT:
 		case OPTIONTYPE_ENUM_BEGIN:
 		case OPTIONTYPE_STRING:
 			if (lookup_in_specification(specification, guide_entry))
-				resolution->entries[opt++].guide_entry = guide_entry;
+				m_entries[opt++].guide_entry = guide_entry;
 			break;
+
 		case OPTIONTYPE_ENUM_VALUE:
 			break;
+
 		default:
-			goto unexpected;
+			assert(false && "Invalid option type");
+			break;
 		}
 		guide_entry++;
 	}
 	assert(opt == option_count);
-	return resolution;
-
-unexpected:
-	assert(FALSE);
-outofmemory:
-	if (resolution)
-		option_resolution_close(resolution);
-	return nullptr;
 }
 
 
+// -------------------------------------------------
+//	dtor
+// -------------------------------------------------
 
-optreserr_t option_resolution_add_param(option_resolution *resolution, const char *param, const char *value)
+option_resolution::~option_resolution()
+{
+}
+
+
+// -------------------------------------------------
+//	add_param
+// -------------------------------------------------
+
+option_resolution::error option_resolution::add_param(const char *param, const std::string &value)
 {
 	int i;
-	int must_resolve;
-	optreserr_t err;
+	bool must_resolve;
+	error err;
 	const char *option_specification;
-	struct option_resolution_entry *entry = nullptr;
+	entry *entry = nullptr;
 
-	for (i = 0; i < resolution->option_count; i++)
+	for(auto &this_entry : m_entries)
 	{
-		if (!strcmp(param, resolution->entries[i].guide_entry->identifier))
+		if (!strcmp(param, this_entry.guide_entry->identifier))
 		{
-			entry = &resolution->entries[i];
+			entry = &this_entry;
 			break;
 		}
 	}
-	if (!entry)
-		return OPTIONRESOLUTION_ERROR_PARAMNOTFOUND;
+	if (entry == nullptr)
+		return error::PARAMNOTFOUND;
 
-	if (entry->state != RESOLUTION_ENTRY_STATE_UNSPECIFIED)
-		return OPTIONRESOLUTION_ERROR_PARAMALREADYSPECIFIED;
+	if (entry->state != entry_state::UNSPECIFIED)
+		return error::PARAMALREADYSPECIFIED;
 
 	switch(entry->guide_entry->option_type) {
 	case OPTIONTYPE_INT:
-		entry->u.int_value = atoi(value);
-		entry->state = RESOLUTION_ENTRY_STATE_SPECIFIED;
-		must_resolve = TRUE;
+		entry->set_int_value(atoi(value.c_str()));
+		entry->state = entry_state::SPECIFIED;
+		must_resolve = true;
 		break;
 
 	case OPTIONTYPE_STRING:
-		entry->u.str_value = pool_strdup_lib(resolution->pool, value);
-		if (!entry->u.str_value)
-		{
-			err = OPTIONRESOLUTION_ERROR_OUTOFMEMORY;
-			goto done;
-		}
-		entry->state = RESOLUTION_ENTRY_STATE_SPECIFIED;
-		must_resolve = FALSE;
+		entry->value = value;
+		entry->state = entry_state::SPECIFIED;
+		must_resolve = false;
 		break;
 
 	case OPTIONTYPE_ENUM_BEGIN:
 		for (i = 1; entry->guide_entry[i].option_type == OPTIONTYPE_ENUM_VALUE; i++)
 		{
-			if (!core_stricmp(value, entry->guide_entry[i].identifier))
+			if (!core_stricmp(value.c_str(), entry->guide_entry[i].identifier))
 			{
-				entry->u.int_value = entry->guide_entry[i].parameter;
-				entry->state = RESOLUTION_ENTRY_STATE_SPECIFIED;
+				entry->set_int_value(entry->guide_entry[i].parameter);
+				entry->state = entry_state::SPECIFIED;
 				break;
 			}
 		}
-		if (entry->state != RESOLUTION_ENTRY_STATE_SPECIFIED)
-		{
-			err = OPTIONRESOLUTION_ERROR_BADPARAM;
-			goto done;
-		}
-		must_resolve = TRUE;
+		if (entry->state != entry_state::SPECIFIED)
+			return error::BADPARAM;
+
+		must_resolve = true;
 		break;
 
 	default:
-		err = OPTIONRESOLTUION_ERROR_INTERNAL;
 		assert(0);
-		goto done;
+		return error::INTERNAL;
 	}
 
-	/* do a resolution step if necessary */
+	// do a resolution step if necessary
 	if (must_resolve)
 	{
-		option_specification = lookup_in_specification(resolution->specification, entry->guide_entry);
-		err = resolve_single_param(option_specification, &entry->u.int_value, nullptr, 0);
-		if (err)
-			goto done;
+		option_specification = lookup_in_specification(m_specification, entry->guide_entry);
+		err = resolve_single_param(option_specification, entry, nullptr, 0);
+		if (err != error::SUCCESS)
+			return err;
 
-		/* did we not get a real value? */
-		if (entry->u.int_value < 0)
-		{
-			err = OPTIONRESOLUTION_ERROR_PARAMNOTSPECIFIED;
-			goto done;
-		}
+		// did we not get a real value?
+		if (entry->int_value() < 0)
+			return error::PARAMNOTSPECIFIED;
 	}
 
-	err = OPTIONRESOLUTION_ERROR_SUCCESS;
-
-done:
-	return err;
+	return error::SUCCESS;
 }
 
 
+// -------------------------------------------------
+//	finish
+// -------------------------------------------------
 
-void option_resolution_close(option_resolution *resolution)
+option_resolution::error option_resolution::finish()
 {
-	pool_free_lib(resolution->pool);
-}
-
-
-
-optreserr_t option_resolution_finish(option_resolution *resolution)
-{
-	int i;
-	optreserr_t err;
-	struct option_resolution_entry *entry;
 	const char *option_specification;
+	error err;
 
-	for (i = 0; i < resolution->option_count; i++)
+	for (auto &entry : m_entries)
 	{
-		entry = &resolution->entries[i];
-
-		if (entry->state == RESOLUTION_ENTRY_STATE_UNSPECIFIED)
+		if (entry.state == entry_state::UNSPECIFIED)
 		{
-			switch(entry->guide_entry->option_type) {
+			switch(entry.guide_entry->option_type) {
 			case OPTIONTYPE_INT:
 			case OPTIONTYPE_ENUM_BEGIN:
-				option_specification = lookup_in_specification(resolution->specification, entry->guide_entry);
+				option_specification = lookup_in_specification(m_specification, entry.guide_entry);
 				assert(option_specification);
-				entry->u.int_value = -1;
-				err = resolve_single_param(option_specification, &entry->u.int_value, nullptr, 0);
-				if (err)
+				entry.set_int_value(-1);
+				err = resolve_single_param(option_specification, &entry, nullptr, 0);
+				if (err != error::SUCCESS)
 					return err;
 				break;
 
 			case OPTIONTYPE_STRING:
-				entry->u.str_value = "";
+				entry.value = "";
 				break;
 
 			default:
 				assert(FALSE);
-				return OPTIONRESOLTUION_ERROR_INTERNAL;
+				return error::INTERNAL;
 			}
-			entry->state = RESOLUTION_ENTRY_STATE_SPECIFIED;
+			entry.state = entry_state::SPECIFIED;
 		}
 	}
-	return OPTIONRESOLUTION_ERROR_SUCCESS;
+	return error::SUCCESS;
 }
 
 
+// -------------------------------------------------
+//	lookup_entry
+// -------------------------------------------------
 
-static const struct option_resolution_entry *option_resolution_lookup_entry(option_resolution *resolution, int option_char)
+const option_resolution::entry *option_resolution::lookup_entry(int option_char) const
 {
-	size_t i;
-	const struct option_resolution_entry *entry;
-
-	for (i = 0; i < resolution->option_count; i++)
+	for (auto &entry : m_entries)
 	{
-		entry = &resolution->entries[i];
-
-		switch(entry->guide_entry->option_type) {
+		switch(entry.guide_entry->option_type) {
 		case OPTIONTYPE_INT:
 		case OPTIONTYPE_STRING:
 		case OPTIONTYPE_ENUM_BEGIN:
-			if (entry->guide_entry->parameter == option_char)
-				return entry;
+			if (entry.guide_entry->parameter == option_char)
+				return &entry;
 			break;
 
 		default:
@@ -410,53 +388,58 @@ static const struct option_resolution_entry *option_resolution_lookup_entry(opti
 }
 
 
+// -------------------------------------------------
+//	lookup_int
+// -------------------------------------------------
 
-int option_resolution_lookup_int(option_resolution *resolution, int option_char)
+int option_resolution::lookup_int(int option_char) const
 {
-	const struct option_resolution_entry *entry;
-	entry = option_resolution_lookup_entry(resolution, option_char);
-	return entry ? entry->u.int_value : -1;
+	auto entry = lookup_entry(option_char);
+	return entry ? entry->int_value() : -1;
 }
 
 
+// -------------------------------------------------
+//	lookup_string
+// -------------------------------------------------
 
-const char *option_resolution_lookup_string(option_resolution *resolution, int option_char)
+const char *option_resolution::lookup_string(int option_char) const
 {
-	const struct option_resolution_entry *entry;
-	entry = option_resolution_lookup_entry(resolution, option_char);
-	return entry ? entry->u.str_value : nullptr;
+	auto entry = lookup_entry(option_char);
+	return entry ? entry->value.c_str() : nullptr;
 }
 
 
+// -------------------------------------------------
+//	find_option
+// -------------------------------------------------
 
-const char *option_resolution_specification(option_resolution *resolution)
+const option_guide *option_resolution::find_option(int option_char) const
 {
-	return resolution->specification;
-}
-
-
-
-const option_guide *option_resolution_find_option(option_resolution *resolution, int option_char)
-{
-	const struct option_resolution_entry *entry;
-	entry = option_resolution_lookup_entry(resolution, option_char);
+	auto entry = lookup_entry(option_char);
 	return entry ? entry->guide_entry : nullptr;
 }
 
 
+// -------------------------------------------------
+//	index_option
+// -------------------------------------------------
 
-const option_guide *option_resolution_index_option(option_resolution *resolution, int indx)
+const option_guide *option_resolution::index_option(int indx) const
 {
-	if ((indx < 0) || (indx >= resolution->option_count))
+	if ((indx < 0) || (indx >= m_entries.size()))
 		return nullptr;
-	return resolution->entries[indx].guide_entry;
+	return m_entries[indx].guide_entry;
 }
 
 
+// -------------------------------------------------
+//	count_options
+// -------------------------------------------------
 
-int option_resolution_countoptions(const option_guide *guide, const char *specification)
+size_t option_resolution::count_options(const option_guide *guide, const char *specification)
 {
-	int option_count = 0;
+	size_t option_count = 0;
 
 	while(guide->option_type != OPTIONTYPE_END)
 	{
@@ -479,105 +462,104 @@ int option_resolution_countoptions(const option_guide *guide, const char *specif
 }
 
 
+// -------------------------------------------------
+//	list_ranges
+// -------------------------------------------------
 
-optreserr_t option_resolution_listranges(const char *specification, int option_char,
-	struct OptionRange *range, size_t range_count)
+option_resolution::error option_resolution::list_ranges(const char *specification, int option_char, range *range, size_t range_count)
 {
 	assert(range_count > 0);
 
-	/* clear out range */
+	// clear out range
 	memset(range, -1, sizeof(*range) * range_count);
 	range_count--;
 
 	specification = strchr(specification, option_char);
 	if (!specification)
 	{
-		return OPTIONRESOLUTION_ERROR_SYNTAX;
+		return error::SYNTAX;
 	}
 
 	return resolve_single_param(specification + 1, nullptr, range, range_count);
 }
 
 
+// -------------------------------------------------
+//	get_default
+// -------------------------------------------------
 
-optreserr_t option_resolution_getdefault(const char *specification, int option_char, int *val)
+option_resolution::error option_resolution::get_default(const char *specification, int option_char, int *val)
 {
 	assert(val);
 
-	/* clear out default */
+	// clear out default
 	*val = -1;
 
 	specification = strchr(specification, option_char);
 	if (!specification)
 	{
-		return OPTIONRESOLUTION_ERROR_SYNTAX;
+		return error::SYNTAX;
 	}
 
-	return resolve_single_param(specification + 1, val, nullptr, 0);
+	entry ent;
+	auto err = resolve_single_param(specification + 1, &ent, nullptr, 0);
+	*val = ent.int_value();
+	return err;
 }
 
 
+// -------------------------------------------------
+//	list_ranges
+// -------------------------------------------------
 
-optreserr_t option_resolution_isvalidvalue(const char *specification, int option_char, int val)
+option_resolution::error option_resolution::is_valid_value(const char *specification, int option_char, int val)
 {
-	optreserr_t err;
-	struct OptionRange ranges[256];
+	option_resolution::error err;
+	range ranges[256];
 	int i;
 
-	err = option_resolution_listranges(specification, option_char, ranges, ARRAY_LENGTH(ranges));
-	if (err)
+	err = list_ranges(specification, option_char, ranges, ARRAY_LENGTH(ranges));
+	if (err != error::SUCCESS)
 		return err;
 
 	for (i = 0; (ranges[i].min >= 0) && (ranges[i].max >= 0); i++)
 	{
 		if ((ranges[i].min <= val) && (ranges[i].max >= val))
-			return OPTIONRESOLUTION_ERROR_SUCCESS;
+			return error::SUCCESS;
 	}
-	return OPTIONRESOLUTION_ERROR_PARAMOUTOFRANGE;
+	return error::PARAMOUTOFRANGE;
 }
 
-/**
- * @fn  int option_resolution_contains(const char *specification, int option_char)
- *
- * @brief   Option resolution contains.
- *
- * @param   specification   The specification.
- * @param   option_char     The option character.
- *
- * @return  An int.
- */
 
-int option_resolution_contains(const char *specification, int option_char)
+// -------------------------------------------------
+//	contains
+// -------------------------------------------------
+
+bool option_resolution::contains(const char *specification, int option_char)
 {
 	return strchr(specification, option_char) != nullptr;
 }
 
-/**
- * @fn  const char *option_resolution_error_string(optreserr_t err)
- *
- * @brief   Option resolution error string.
- *
- * @param   err The error.
- *
- * @return  null if it fails, else a char*.
- */
 
-const char *option_resolution_error_string(optreserr_t err)
+// -------------------------------------------------
+//	error_string
+// -------------------------------------------------
+
+const char *option_resolution::error_string(option_resolution::error err)
 {
-	static const char *const errors[] =
+	switch (err)
 	{
-		"The operation completed successfully",     /* OPTIONRESOLUTION_ERROR_SUCCESS */
-		"Out of memory",                            /* OPTIONRESOLUTION_ERROR_OUTOFMEMORY */
-		"Parameter out of range",                   /* OPTIONRESOLUTION_ERROR_PARAMOUTOFRANGE */
-		"Parameter not specified",                  /* OPTIONRESOLUTION_ERROR_PARAMNOTSPECIFIED */
-		"Unknown parameter",                        /* OPTIONRESOLUTION_ERROR_PARAMNOTFOUND */
-		"Parameter specified multiple times",       /* OPTIONRESOLUTION_ERROR_PARAMALREADYSPECIFIED */
-		"Invalid parameter",                        /* OPTIONRESOLUTION_ERROR_BADPARAM */
-		"Syntax error",                             /* OPTIONRESOLUTION_ERROR_SYNTAX */
-		"Internal error"                            /* OPTIONRESOLTUION_ERROR_INTERNAL */
-	};
-
-	if ((err < 0) || (err >= ARRAY_LENGTH(errors)))
-		return nullptr;
-	return errors[err];
+	case error::SUCCESS:				return "The operation completed successfully";
+	case error::OUTOFMEMORY:			return "Out of memory";
+	case error::PARAMOUTOFRANGE:		return "Parameter out of range";
+	case error::PARAMNOTSPECIFIED:		return "Parameter not specified";
+	case error::PARAMNOTFOUND:			return "Unknown parameter";
+	case error::PARAMALREADYSPECIFIED:	return "Parameter specified multiple times";
+	case error::BADPARAM:				return "Invalid parameter";
+	case error::SYNTAX:					return "Syntax error";
+	case error::INTERNAL:				return "Internal error";
+	}
+	return nullptr;
 }
+
+} // namespace util

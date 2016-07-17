@@ -9,12 +9,16 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "emuopts.h"
 #include "drivenum.h"
 #include "ui/uimain.h"
 #include "zippath.h"
 #include "softlist.h"
 #include "formats/ioprocs.h"
+
+#include <regex>
+
 
 //**************************************************************************
 //  DEVICE CONFIG IMAGE INTERFACE
@@ -41,6 +45,34 @@ const image_device_type_info device_image_interface::m_device_info_array[] =
 		{ IO_MIDIIN,    "midiin",       "min"  }, /* 16 */
 		{ IO_MIDIOUT,   "midiout",      "mout" }  /* 17 */
 	};
+
+
+//**************************************************************************
+//  IMAGE DEVICE FORMAT
+//**************************************************************************
+
+//-------------------------------------------------
+//  ctor
+//-------------------------------------------------
+
+image_device_format::image_device_format(const std::string &name, const std::string &description, const std::string &extensions, const std::string &optspec)
+	: m_name(name), m_description(description),	m_optspec(optspec)
+{
+	std::regex comma_regex("\\,");
+	std::copy(
+		std::sregex_token_iterator(extensions.begin(), extensions.end(), comma_regex, -1),
+		std::sregex_token_iterator(),
+		std::back_inserter(m_extensions));
+}
+
+
+//-------------------------------------------------
+//  dtor
+//-------------------------------------------------
+
+image_device_format::~image_device_format()
+{
+}
 
 
 //**************************************************************************
@@ -904,7 +936,7 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 //	load_internal - core image loading
 //-------------------------------------------------
 
-bool device_image_interface::load_internal(const char *path, bool is_create, int create_format, option_resolution *create_args, bool just_load)
+bool device_image_interface::load_internal(const char *path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load)
 {
 	UINT32 open_plan[4];
 	int i;
@@ -1114,7 +1146,7 @@ bool device_image_interface::finish_load()
 //	create - create a image
 //-------------------------------------------------
 
-bool device_image_interface::create(const char *path, const image_device_format *create_format, option_resolution *create_args)
+bool device_image_interface::create(const char *path, const image_device_format *create_format, util::option_resolution *create_args)
 {
 	int format_index = 0;
 	int cnt = 0;

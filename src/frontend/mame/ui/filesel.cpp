@@ -44,7 +44,7 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-menu_file_selector::menu_file_selector(mame_ui_manager &mui, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool has_empty, bool has_softlist, bool has_create, menu_file_selector::result &result)
+menu_file_selector::menu_file_selector(mame_ui_manager &mui, render_container &container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool has_empty, bool has_softlist, bool has_create, menu_file_selector::result &result)
 	: menu(mui, container)
 	, m_current_directory(current_directory)
 	, m_current_file(current_file)
@@ -73,7 +73,7 @@ menu_file_selector::~menu_file_selector()
 void menu_file_selector::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	// lay out extra text
-	auto layout = ui().create_layout(container);
+	auto layout = ui().create_layout(container());
 	layout.add_text(m_current_directory.c_str());
 
 	// position this extra text
@@ -81,7 +81,7 @@ void menu_file_selector::custom_render(void *selectedref, float top, float botto
 	extra_text_position(origx1, origx2, origy1, top, layout, -1, x1, y1, x2, y2);
 
 	// draw a box
-	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -109,7 +109,7 @@ void menu_file_selector::custom_render(void *selectedref, float top, float botto
 	}
 
 	// draw the text within it
-	layout.emit(container, x1, y1);
+	layout.emit(container(), x1, y1);
 }
 
 
@@ -392,18 +392,18 @@ void menu_file_selector::handle()
 			case SELECTOR_ENTRY_TYPE_EMPTY:
 				// empty slot - unload
 				m_result = result::EMPTY;
-				menu::stack_pop(machine());
+				stack_pop();
 				break;
 
 			case SELECTOR_ENTRY_TYPE_CREATE:
 				// create
 				m_result = result::CREATE;
-				menu::stack_pop(machine());
+				stack_pop();
 				break;
 
 			case SELECTOR_ENTRY_TYPE_SOFTWARE_LIST:
 				m_result = result::SOFTLIST;
-				menu::stack_pop(machine());
+				stack_pop();
 				break;
 
 			case SELECTOR_ENTRY_TYPE_DRIVE:
@@ -424,7 +424,7 @@ void menu_file_selector::handle()
 				// file
 				m_current_file.assign(entry->fullpath);
 				m_result = result::FILE;
-				menu::stack_pop(machine());
+				stack_pop();
 				break;
 			}
 
@@ -460,7 +460,7 @@ void menu_file_selector::handle()
 
 			if (update_selected)
 			{
-				const file_selector_entry *cur_selected = (const file_selector_entry *)get_selection();
+				file_selector_entry const *const cur_selected(reinterpret_cast<file_selector_entry const *>(get_selection_ref()));
 
 				// check for entries which matches our m_filename_buffer:
 				for (auto &entry : m_entrylist)
@@ -485,7 +485,7 @@ void menu_file_selector::handle()
 				if (selected_entry != nullptr && selected_entry != cur_selected)
 				{
 					set_selection((void *)selected_entry);
-					top_line = selected - (visible_lines / 2);
+					centre_selection();
 				}
 			}
 		}
@@ -507,11 +507,11 @@ void menu_file_selector::handle()
 //  ctor
 //-------------------------------------------------
 
-menu_select_rw::menu_select_rw(mame_ui_manager &mui, render_container *container,
+menu_select_rw::menu_select_rw(mame_ui_manager &mui, render_container &container,
 										bool can_in_place, result &result)
 	: menu(mui, container),
-	  m_can_in_place(can_in_place),
-	  m_result(result)
+		m_can_in_place(can_in_place),
+		m_result(result)
 {
 }
 
@@ -551,7 +551,7 @@ void menu_select_rw::handle()
 	if (event != nullptr && event->iptkey == IPT_UI_SELECT)
 	{
 		m_result = result_from_itemref(event->itemref);
-		menu::stack_pop(machine());
+		stack_pop();
 	}
 }
 

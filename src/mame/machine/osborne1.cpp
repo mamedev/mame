@@ -102,18 +102,26 @@ WRITE8_MEMBER( osborne1_state::videoram_w )
 
 READ8_MEMBER( osborne1_state::opcode_r )
 {
-	// Update the flipflops that control bank selection and NMI
-	UINT8 const new_ub6a_q = (m_btn_reset->read() & 0x80) ? 1 : 0;
-	if (!m_rom_mode)
+	if (!space.debugger_access())
 	{
-		set_rom_mode(m_ub4a_q ? 0 : 1);
-		m_ub4a_q = m_ub6a_q;
+		// Update the flipflops that control bank selection and NMI
+		UINT8 const new_ub6a_q = (m_btn_reset->read() & 0x80) ? 1 : 0;
+		if (!m_rom_mode)
+		{
+			set_rom_mode(m_ub4a_q ? 0 : 1);
+			m_ub4a_q = m_ub6a_q;
+		}
+		m_ub6a_q = new_ub6a_q;
+		m_maincpu->set_input_line(INPUT_LINE_NMI, m_ub6a_q ? CLEAR_LINE : ASSERT_LINE);
 	}
-	m_ub6a_q = new_ub6a_q;
-	m_maincpu->set_input_line(INPUT_LINE_NMI, m_ub6a_q ? CLEAR_LINE : ASSERT_LINE);
 
 	// Now that's sorted out we can call the normal read handler
-	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+	address_space &program_space(m_maincpu->space(AS_PROGRAM));
+	bool const prev_debugger_access(program_space.debugger_access());
+	program_space.set_debugger_access(space.debugger_access());
+	UINT8 const data(program_space.read_byte(offset));
+	program_space.set_debugger_access(prev_debugger_access);
+	return data;
 }
 
 WRITE8_MEMBER( osborne1_state::bankswitch_w )

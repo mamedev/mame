@@ -19,15 +19,13 @@ namespace ui {
 class menu_game_options : public menu
 {
 public:
-	menu_game_options(mame_ui_manager &mui, render_container *container);
+	menu_game_options(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_game_options() override;
-	virtual void populate() override;
-	virtual void handle() override;
+
+protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
-	UINT16 m_main;
-
 	enum
 	{
 		FILTER_MENU = 1,
@@ -47,6 +45,11 @@ private:
 		CUSTOM_FILTER,
 		SAVE_CONFIG
 	};
+
+	virtual void populate() override;
+	virtual void handle() override;
+
+	UINT16 m_main;
 };
 
 } // namespace ui

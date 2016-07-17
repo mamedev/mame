@@ -31,7 +31,7 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-menu_file_manager::menu_file_manager(mame_ui_manager &mui, render_container *container, const char *warnings) : menu(mui, container), selected_device(nullptr)
+menu_file_manager::menu_file_manager(mame_ui_manager &mui, render_container &container, const char *warnings) : menu(mui, container), selected_device(nullptr)
 {
 	// This warning string is used when accessing from the force_file_manager call, i.e.
 	// when the file manager is loaded top front in the case of mandatory image devices
@@ -184,11 +184,11 @@ void menu_file_manager::handle()
 				floppy_image_device *floppy_device = dynamic_cast<floppy_image_device *>(selected_device);
 				if (floppy_device != nullptr)
 				{
-					menu::stack_push<menu_control_floppy_image>(ui(), container, floppy_device);
+					menu::stack_push<menu_control_floppy_image>(ui(), container(), floppy_device);
 				}
 				else
 				{
-					menu::stack_push<menu_control_device_image>(ui(), container, selected_device);
+					menu::stack_push<menu_control_device_image>(ui(), container(), selected_device);
 				}
 				// reset the existing menu
 				reset(reset_options::REMEMBER_POSITION);
@@ -198,7 +198,7 @@ void menu_file_manager::handle()
 }
 
 // force file manager menu
-void menu_file_manager::force_file_manager(mame_ui_manager &mui, render_container *container, const char *warnings)
+void menu_file_manager::force_file_manager(mame_ui_manager &mui, render_container &container, const char *warnings)
 {
 	// reset the menu stack
 	menu::stack_reset(mui.machine());

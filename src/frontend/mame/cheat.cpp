@@ -107,18 +107,18 @@ inline std::string number_and_format::format() const
 {
 	switch (m_format)
 	{
-		default:
-		case XML_INT_FORMAT_DECIMAL:
-			return string_format("%d", (UINT32)m_value);
+	default:
+	case XML_INT_FORMAT_DECIMAL:
+		return string_format("%d", UINT32(m_value));
 
-		case XML_INT_FORMAT_DECIMAL_POUND:
-			return string_format("#%d", (UINT32)m_value);
+	case XML_INT_FORMAT_DECIMAL_POUND:
+		return string_format("#%d", UINT32(m_value));
 
-		case XML_INT_FORMAT_HEX_DOLLAR:
-			return string_format("$%X", (UINT32)m_value);
+	case XML_INT_FORMAT_HEX_DOLLAR:
+		return string_format("$%X", UINT32(m_value));
 
-		case XML_INT_FORMAT_HEX_C:
-			return string_format("0x%X", (UINT32)m_value);
+	case XML_INT_FORMAT_HEX_C:
+		return string_format("0x%X", UINT32(m_value));
 	}
 }
 
@@ -1235,7 +1235,7 @@ void cheat_manager::render_text(mame_ui_manager &mui, render_container &containe
 		if (!m_output[linenum].empty())
 		{
 			// output the text
-			mui.draw_text_full(&container, m_output[linenum].c_str(),
+			mui.draw_text_full(container, m_output[linenum].c_str(),
 					0.0f, (float)linenum * mui.get_line_height(), 1.0f,
 					m_justify[linenum], ui::text_layout::NEVER, mame_ui_manager::OPAQUE_,
 					rgb_t::white, rgb_t::black, nullptr, nullptr);

@@ -584,14 +584,17 @@ WRITE8_MEMBER(astrocde_state::astrocade_data_chip_register_w)
 
 		case 0x0d:  /* interrupt feedback */
 			m_interrupt_vector = data;
+			m_maincpu->set_input_line(0, CLEAR_LINE);
 			break;
 
 		case 0x0e:  /* interrupt enable and mode */
 			m_interrupt_enabl = data;
+			m_maincpu->set_input_line(0, CLEAR_LINE);
 			break;
 
 		case 0x0f:  /* interrupt line */
 			m_interrupt_scanline = data;
+			m_maincpu->set_input_line(0, CLEAR_LINE);
 			break;
 
 		case 0x10:  /* master oscillator register */

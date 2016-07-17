@@ -182,6 +182,8 @@ fanucspmg.cpp
 fb01.cpp
 fc100.cpp
 fccpu30.cpp
+fcisio.cpp
+fcscsi.cpp
 fidel6502.cpp
 fidel68k.cpp
 fidelz80.cpp
@@ -358,6 +360,7 @@ mt735.cpp
 mtx.cpp
 multi16.cpp
 multi8.cpp
+mvme147.cpp
 mvme350.cpp
 mx2178.cpp
 myb3k.cpp
@@ -453,12 +456,12 @@ pmi80.cpp
 pockchal.cpp
 pocketc.cpp
 pockstat.cpp
+pofo.cpp
 poisk1.cpp
 pokemini.cpp
 poly.cpp
 poly88.cpp
 poly880.cpp
-portfoli.cpp
 pp01.cpp
 prestige.cpp
 primo.cpp
@@ -576,6 +579,7 @@ tec1.cpp
 tecnbras.cpp
 tek405x.cpp
 tek410x.cpp
+tek440x.cpp
 tekxp33x.cpp
 terak.cpp
 test_t400.cpp

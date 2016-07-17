@@ -17,6 +17,7 @@
 #include "pstring.h"
 
 namespace plib {
+
 //============================================================
 //  exception base
 //============================================================
@@ -24,7 +25,7 @@ namespace plib {
 class pexception : public std::exception
 {
 public:
-	explicit pexception(const pstring text);
+	pexception(const pstring text);
 	pexception(const pexception &e) : std::exception(e) { m_text = e.m_text; }
 
 	virtual ~pexception() noexcept {}
@@ -33,6 +34,42 @@ public:
 
 private:
 	pstring m_text;
+};
+
+class file_e : public plib::pexception
+{
+public:
+	explicit file_e(const pstring fmt, const pstring &filename);
+};
+
+class file_open_e : public file_e
+{
+public:
+	explicit file_open_e(const pstring &filename);
+};
+
+class file_read_e : public file_e
+{
+public:
+	explicit file_read_e(const pstring &filename);
+};
+
+class file_write_e : public file_e
+{
+public:
+	explicit file_write_e(const pstring &filename);
+};
+
+class null_argument_e : public plib::pexception
+{
+public:
+	explicit null_argument_e(const pstring &argument);
+};
+
+class out_of_mem_e : public plib::pexception
+{
+public:
+	explicit out_of_mem_e(const pstring &location);
 };
 
 //============================================================

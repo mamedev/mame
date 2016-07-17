@@ -10,7 +10,10 @@
 
 #include "emu.h"
 #include "validity.h"
+
 #include "emuopts.h"
+#include "video/rgbutil.h"
+
 #include <ctype.h>
 
 
@@ -47,6 +50,20 @@ inline int validity_checker::get_defstr_index(const char *string, bool suppress_
 		osd_printf_error("Must use DEF_STR( %s )\n", string);
 	return (strindex != m_defstr_map.end()) ? strindex->second : 0;
 }
+
+
+//-------------------------------------------------
+//  random_u64
+//  random_s64
+//  random_u32
+//  random_s32
+//-------------------------------------------------
+#undef rand
+inline INT32 validity_checker::random_i32() { return INT32(random_u32()); }
+inline UINT32 validity_checker::random_u32() { return rand() ^ (rand() << 15); }
+inline INT64 validity_checker::random_i64() { return INT64(random_u64()); }
+inline UINT64 validity_checker::random_u64() { return UINT64(random_u32()) ^ (UINT64(random_u32()) << 30); }
+
 
 
 //-------------------------------------------------
@@ -182,6 +199,7 @@ bool validity_checker::check_all_matching(const char *string)
 	validate_begin();
 	validate_core();
 	validate_inlines();
+	validate_rgb();
 
 	// if we had warnings or errors, output
 	if (m_errors > 0 || m_warnings > 0 || !m_verbose_text.empty())
@@ -362,13 +380,12 @@ void validity_checker::validate_core()
 
 void validity_checker::validate_inlines()
 {
-#undef rand
-	volatile UINT64 testu64a = rand() ^ (rand() << 15) ^ ((UINT64)rand() << 30) ^ ((UINT64)rand() << 45);
-	volatile INT64 testi64a = rand() ^ (rand() << 15) ^ ((INT64)rand() << 30) ^ ((INT64)rand() << 45);
-	volatile UINT32 testu32a = rand() ^ (rand() << 15);
-	volatile UINT32 testu32b = rand() ^ (rand() << 15);
-	volatile INT32 testi32a = rand() ^ (rand() << 15);
-	volatile INT32 testi32b = rand() ^ (rand() << 15);
+	volatile UINT64 testu64a = random_u64();
+	volatile INT64 testi64a = random_i64();
+	volatile UINT32 testu32a = random_u32();
+	volatile UINT32 testu32b = random_u32();
+	volatile INT32 testi32a = random_i32();
+	volatile INT32 testi32b = random_i32();
 	INT32 resulti32, expectedi32;
 	UINT32 resultu32, expectedu32;
 	INT64 resulti64, expectedi64;
@@ -478,6 +495,834 @@ void validity_checker::validate_inlines()
 	testi32a = (testi32a | 0xffff0000) & ~0x400000;
 	if (count_leading_ones(testi32a) != 9)
 		osd_printf_error("Error testing count_leading_ones\n");
+}
+
+
+//-------------------------------------------------
+//  validate_rgb - validate optimised RGB utility
+//  class
+//-------------------------------------------------
+
+void validity_checker::validate_rgb()
+{
+	/*
+	    This performs cursory tests of most of the vector-optimised RGB
+	    utilities, concentrating on the low-level maths.  It uses random
+	    values most of the time for a quick go/no-go indication rather
+	    than trying to exercise edge cases.  It doesn't matter too much
+	    if the compiler optimises out some of the operations since it's
+	    really intended to check for logic bugs in the vector code.  If
+	    the compiler can work out that the code produces the expected
+	    result, that's good enough.
+
+	    The tests for bitwise logical operations are ordered to minimise
+	    the chance of all-zero or all-one patterns producing a
+	    misleading good result.
+
+	    The following functions are not tested yet:
+	    rgbaint_t()
+	    clamp_and_clear(const UINT32)
+	    sign_extend(const UINT32, const UINT32)
+	    min(const INT32)
+	    max(const INT32)
+	    blend(const rgbaint_t&, UINT8)
+	    scale_and_clamp(const rgbaint_t&)
+	    scale_imm_and_clamp(const INT32)
+	    scale2_add_and_clamp(const rgbaint_t&, const rgbaint_t&, const rgbaint_t&)
+	    scale_add_and_clamp(const rgbaint_t&, const rgbaint_t&);
+	    scale_imm_add_and_clamp(const INT32, const rgbaint_t&);
+	    static bilinear_filter(UINT32, UINT32, UINT32, UINT32, UINT8, UINT8)
+	    bilinear_filter_rgbaint(UINT32, UINT32, UINT32, UINT32, UINT8, UINT8)
+	*/
+
+	auto random_i32_nolimit = [this]
+	{
+		INT32 result;
+		do { result = random_i32(); } while ((result == std::numeric_limits<INT32>::min()) || (result == std::numeric_limits<INT32>::max()));
+		return result;
+	};
+
+	volatile INT32 expected_a, expected_r, expected_g, expected_b;
+	volatile INT32 actual_a, actual_r, actual_g, actual_b;
+	volatile INT32 imm;
+	rgbaint_t rgb, other;
+	rgb_t packed;
+	auto check_expected = [&] (const char *desc)
+	{
+		const volatile INT32 a = rgb.get_a32();
+		const volatile INT32 r = rgb.get_r32();
+		const volatile INT32 g = rgb.get_g32();
+		const volatile INT32 b = rgb.get_b32();
+		if (a != expected_a) osd_printf_error("Error testing %s get_a32() = %d (expected %d)\n", desc, a, expected_a);
+		if (r != expected_r) osd_printf_error("Error testing %s get_r32() = %d (expected %d)\n", desc, r, expected_r);
+		if (g != expected_g) osd_printf_error("Error testing %s get_g32() = %d (expected %d)\n", desc, g, expected_g);
+		if (b != expected_b) osd_printf_error("Error testing %s get_b32() = %d (expected %d)\n", desc, b, expected_b);
+	};
+
+	// check set/get
+	expected_a = random_i32();
+	expected_r = random_i32();
+	expected_g = random_i32();
+	expected_b = random_i32();
+	rgb.set(expected_a, expected_r, expected_g, expected_b);
+	check_expected("rgbaint_t::set(a, r, g, b)");
+
+	// check construct/set
+	expected_a = random_i32();
+	expected_r = random_i32();
+	expected_g = random_i32();
+	expected_b = random_i32();
+	rgb.set(rgbaint_t(expected_a, expected_r, expected_g, expected_b));
+	check_expected("rgbaint_t::set(rgbaint_t)");
+
+	// check construct/assign
+	expected_a = random_i32();
+	expected_r = random_i32();
+	expected_g = random_i32();
+	expected_b = random_i32();
+	rgb = rgbaint_t(expected_a, expected_r, expected_g, expected_b);
+	check_expected("rgbaint_t assignment");
+
+	// check piecewise set
+	rgb.set_a(expected_a = random_i32());
+	check_expected("rgbaint_t::set_a");
+	rgb.set_r(expected_r = random_i32());
+	check_expected("rgbaint_t::set_r");
+	rgb.set_g(expected_g = random_i32());
+	check_expected("rgbaint_t::set_g");
+	rgb.set_b(expected_b = random_i32());
+	check_expected("rgbaint_t::set_b");
+
+	// test merge_alpha
+	expected_a = rand();
+	rgb.merge_alpha(rgbaint_t(expected_a, rand(), rand(), rand()));
+	check_expected("rgbaint_t::merge_alpha");
+
+	// test RGB addition (method)
+	expected_a += actual_a = random_i32();
+	expected_r += actual_r = random_i32();
+	expected_g += actual_g = random_i32();
+	expected_b += actual_b = random_i32();
+	rgb.add(rgbaint_t(actual_a, actual_r, actual_g, actual_b));
+	check_expected("rgbaint_t::add");
+
+	// test RGB addition (operator)
+	expected_a += actual_a = random_i32();
+	expected_r += actual_r = random_i32();
+	expected_g += actual_g = random_i32();
+	expected_b += actual_b = random_i32();
+	rgb += rgbaint_t(actual_a, actual_r, actual_g, actual_b);
+	check_expected("rgbaint_t::operator+=");
+
+	// test offset addition (method)
+	imm = random_i32();
+	expected_a += imm;
+	expected_r += imm;
+	expected_g += imm;
+	expected_b += imm;
+	rgb.add_imm(imm);
+	check_expected("rgbaint_t::add_imm");
+
+	// test offset addition (operator)
+	imm = random_i32();
+	expected_a += imm;
+	expected_r += imm;
+	expected_g += imm;
+	expected_b += imm;
+	rgb += imm;
+	check_expected("rgbaint_t::operator+=");
+
+	// test immediate RGB addition
+	expected_a += actual_a = random_i32();
+	expected_r += actual_r = random_i32();
+	expected_g += actual_g = random_i32();
+	expected_b += actual_b = random_i32();
+	rgb.add_imm_rgba(actual_a, actual_r, actual_g, actual_b);
+	check_expected("rgbaint_t::add_imm_rgba");
+
+	// test RGB subtraction (method)
+	expected_a -= actual_a = random_i32();
+	expected_r -= actual_r = random_i32();
+	expected_g -= actual_g = random_i32();
+	expected_b -= actual_b = random_i32();
+	rgb.sub(rgbaint_t(actual_a, actual_r, actual_g, actual_b));
+	check_expected("rgbaint_t::sub");
+
+	// test RGB subtraction (operator)
+	expected_a -= actual_a = random_i32();
+	expected_r -= actual_r = random_i32();
+	expected_g -= actual_g = random_i32();
+	expected_b -= actual_b = random_i32();
+	rgb -= rgbaint_t(actual_a, actual_r, actual_g, actual_b);
+	check_expected("rgbaint_t::operator-=");
+
+	// test offset subtraction
+	imm = random_i32();
+	expected_a -= imm;
+	expected_r -= imm;
+	expected_g -= imm;
+	expected_b -= imm;
+	rgb.sub_imm(imm);
+	check_expected("rgbaint_t::sub_imm");
+
+	// test immediate RGB subtraction
+	expected_a -= actual_a = random_i32();
+	expected_r -= actual_r = random_i32();
+	expected_g -= actual_g = random_i32();
+	expected_b -= actual_b = random_i32();
+	rgb.sub_imm_rgba(actual_a, actual_r, actual_g, actual_b);
+	check_expected("rgbaint_t::sub_imm_rgba");
+
+	// test reversed RGB subtraction
+	expected_a = (actual_a = random_i32()) - expected_a;
+	expected_r = (actual_r = random_i32()) - expected_r;
+	expected_g = (actual_g = random_i32()) - expected_g;
+	expected_b = (actual_b = random_i32()) - expected_b;
+	rgb.subr(rgbaint_t(actual_a, actual_r, actual_g, actual_b));
+	check_expected("rgbaint_t::subr");
+
+	// test reversed offset subtraction
+	imm = random_i32();
+	expected_a = imm - expected_a;
+	expected_r = imm - expected_r;
+	expected_g = imm - expected_g;
+	expected_b = imm - expected_b;
+	rgb.subr_imm(imm);
+	check_expected("rgbaint_t::subr_imm");
+
+	// test reversed immediate RGB subtraction
+	expected_a = (actual_a = random_i32()) - expected_a;
+	expected_r = (actual_r = random_i32()) - expected_r;
+	expected_g = (actual_g = random_i32()) - expected_g;
+	expected_b = (actual_b = random_i32()) - expected_b;
+	rgb.subr_imm_rgba(actual_a, actual_r, actual_g, actual_b);
+	check_expected("rgbaint_t::subr_imm_rgba");
+
+	// test RGB multiplication (method)
+	expected_a *= actual_a = random_i32();
+	expected_r *= actual_r = random_i32();
+	expected_g *= actual_g = random_i32();
+	expected_b *= actual_b = random_i32();
+	rgb.mul(rgbaint_t(actual_a, actual_r, actual_g, actual_b));
+	check_expected("rgbaint_t::mul");
+
+	// test RGB multiplication (operator)
+	expected_a *= actual_a = random_i32();
+	expected_r *= actual_r = random_i32();
+	expected_g *= actual_g = random_i32();
+	expected_b *= actual_b = random_i32();
+	rgb *= rgbaint_t(actual_a, actual_r, actual_g, actual_b);
+	check_expected("rgbaint_t::operator*=");
+
+	// test factor multiplication (method)
+	imm = random_i32();
+	expected_a *= imm;
+	expected_r *= imm;
+	expected_g *= imm;
+	expected_b *= imm;
+	rgb.mul_imm(imm);
+	check_expected("rgbaint_t::mul_imm");
+
+	// test factor multiplication (operator)
+	imm = random_i32();
+	expected_a *= imm;
+	expected_r *= imm;
+	expected_g *= imm;
+	expected_b *= imm;
+	rgb *= imm;
+	check_expected("rgbaint_t::operator*=");
+
+	// test immediate RGB multiplication
+	expected_a *= actual_a = random_i32();
+	expected_r *= actual_r = random_i32();
+	expected_g *= actual_g = random_i32();
+	expected_b *= actual_b = random_i32();
+	rgb.mul_imm_rgba(actual_a, actual_r, actual_g, actual_b);
+	check_expected("rgbaint_t::mul_imm_rgba");
+
+	// test RGB and not
+	expected_a &= ~(actual_a = random_i32());
+	expected_r &= ~(actual_r = random_i32());
+	expected_g &= ~(actual_g = random_i32());
+	expected_b &= ~(actual_b = random_i32());
+	rgb.andnot_reg(rgbaint_t(actual_a, actual_r, actual_g, actual_b));
+	check_expected("rgbaint_t::andnot_reg");
+
+	// test RGB or
+	expected_a |= actual_a = random_i32();
+	expected_r |= actual_r = random_i32();
+	expected_g |= actual_g = random_i32();
+	expected_b |= actual_b = random_i32();
+	rgb.or_reg(rgbaint_t(actual_a, actual_r, actual_g, actual_b));
+	check_expected("rgbaint_t::or_reg");
+
+	// test RGB and
+	expected_a &= actual_a = random_i32();
+	expected_r &= actual_r = random_i32();
+	expected_g &= actual_g = random_i32();
+	expected_b &= actual_b = random_i32();
+	rgb.and_reg(rgbaint_t(actual_a, actual_r, actual_g, actual_b));
+	check_expected("rgbaint_t::and_reg");
+
+	// test RGB xor
+	expected_a ^= actual_a = random_i32();
+	expected_r ^= actual_r = random_i32();
+	expected_g ^= actual_g = random_i32();
+	expected_b ^= actual_b = random_i32();
+	rgb.xor_reg(rgbaint_t(actual_a, actual_r, actual_g, actual_b));
+	check_expected("rgbaint_t::xor_reg");
+
+	// test uniform or
+	imm = random_i32();
+	expected_a |= imm;
+	expected_r |= imm;
+	expected_g |= imm;
+	expected_b |= imm;
+	rgb.or_imm(imm);
+	check_expected("rgbaint_t::or_imm");
+
+	// test uniform and
+	imm = random_i32();
+	expected_a &= imm;
+	expected_r &= imm;
+	expected_g &= imm;
+	expected_b &= imm;
+	rgb.and_imm(imm);
+	check_expected("rgbaint_t::and_imm");
+
+	// test uniform xor
+	imm = random_i32();
+	expected_a ^= imm;
+	expected_r ^= imm;
+	expected_g ^= imm;
+	expected_b ^= imm;
+	rgb.xor_imm(imm);
+	check_expected("rgbaint_t::xor_imm");
+
+	// test immediate RGB or
+	expected_a |= actual_a = random_i32();
+	expected_r |= actual_r = random_i32();
+	expected_g |= actual_g = random_i32();
+	expected_b |= actual_b = random_i32();
+	rgb.or_imm_rgba(actual_a, actual_r, actual_g, actual_b);
+	check_expected("rgbaint_t::or_imm_rgba");
+
+	// test immediate RGB and
+	expected_a &= actual_a = random_i32();
+	expected_r &= actual_r = random_i32();
+	expected_g &= actual_g = random_i32();
+	expected_b &= actual_b = random_i32();
+	rgb.and_imm_rgba(actual_a, actual_r, actual_g, actual_b);
+	check_expected("rgbaint_t::and_imm_rgba");
+
+	// test immediate RGB xor
+	expected_a ^= actual_a = random_i32();
+	expected_r ^= actual_r = random_i32();
+	expected_g ^= actual_g = random_i32();
+	expected_b ^= actual_b = random_i32();
+	rgb.xor_imm_rgba(actual_a, actual_r, actual_g, actual_b);
+	check_expected("rgbaint_t::xor_imm_rgba");
+
+	// test 8-bit get
+	expected_a = INT32(UINT32(expected_a) & 0x00ff);
+	expected_r = INT32(UINT32(expected_r) & 0x00ff);
+	expected_g = INT32(UINT32(expected_g) & 0x00ff);
+	expected_b = INT32(UINT32(expected_b) & 0x00ff);
+	actual_a = INT32(UINT32(rgb.get_a()));
+	actual_r = INT32(UINT32(rgb.get_r()));
+	actual_g = INT32(UINT32(rgb.get_g()));
+	actual_b = INT32(UINT32(rgb.get_b()));
+	if (actual_a != expected_a) osd_printf_error("Error testing rgbaint_t::get_a() = %d (expected %d)\n", actual_a, expected_a);
+	if (actual_r != expected_r) osd_printf_error("Error testing rgbaint_t::get_r() = %d (expected %d)\n", actual_r, expected_r);
+	if (actual_g != expected_g) osd_printf_error("Error testing rgbaint_t::get_g() = %d (expected %d)\n", actual_g, expected_g);
+	if (actual_b != expected_b) osd_printf_error("Error testing rgbaint_t::get_b() = %d (expected %d)\n", actual_b, expected_b);
+
+	// test set from packed RGBA
+	imm = random_i32();
+	expected_a = INT32((UINT32(imm) >> 24) & 0x00ff);
+	expected_r = INT32((UINT32(imm) >> 16) & 0x00ff);
+	expected_g = INT32((UINT32(imm) >> 8) & 0x00ff);
+	expected_b = INT32((UINT32(imm) >> 0) & 0x00ff);
+	rgb.set(UINT32(imm));
+	check_expected("rgbaint_t::set(UINT32)");
+
+	// while we have a value loaded that we know doesn't exceed 8-bit range, check the non-clamping convert-to-rgba
+	packed = rgb.to_rgba();
+	if (UINT32(imm) != UINT32(packed))
+		osd_printf_error("Error testing rgbaint_t::to_rgba() = %08x (expected %08x)\n", UINT32(packed), UINT32(imm));
+
+	// test construct from packed RGBA and assign
+	imm = random_i32();
+	expected_a = INT32((UINT32(imm) >> 24) & 0x00ff);
+	expected_r = INT32((UINT32(imm) >> 16) & 0x00ff);
+	expected_g = INT32((UINT32(imm) >> 8) & 0x00ff);
+	expected_b = INT32((UINT32(imm) >> 0) & 0x00ff);
+	rgb = rgbaint_t(UINT32(imm));
+	check_expected("rgbaint_t(UINT32)");
+
+	// while we have a value loaded that we know doesn't exceed 8-bit range, check the non-clamping convert-to-rgba
+	packed = rgb.to_rgba();
+	if (UINT32(imm) != UINT32(packed))
+		osd_printf_error("Error testing rgbaint_t::to_rgba() = %08x (expected %08x)\n", UINT32(packed), UINT32(imm));
+
+	// test set with rgb_t
+	packed = random_u32();
+	expected_a = INT32(UINT32(packed.a()));
+	expected_r = INT32(UINT32(packed.r()));
+	expected_g = INT32(UINT32(packed.g()));
+	expected_b = INT32(UINT32(packed.b()));
+	rgb.set(packed);
+	check_expected("rgbaint_t::set(rgba_t)");
+
+	// test construct with rgb_t
+	packed = random_u32();
+	expected_a = INT32(UINT32(packed.a()));
+	expected_r = INT32(UINT32(packed.r()));
+	expected_g = INT32(UINT32(packed.g()));
+	expected_b = INT32(UINT32(packed.b()));
+	rgb = rgbaint_t(packed);
+	check_expected("rgbaint_t::set(rgba_t)");
+
+	// test clamping convert-to-rgba with hand-crafted values to catch edge cases
+	rgb.set(std::numeric_limits<INT32>::min(), -1, 0, 1);
+	packed = rgb.to_rgba_clamp();
+	if (UINT32(0x00000001) != UINT32(packed))
+		osd_printf_error("Error testing rgbaint_t::to_rgba_clamp() = %08x (expected 0x00000001)\n", UINT32(packed));
+	rgb.set(254, 255, 256, std::numeric_limits<INT32>::max());
+	packed = rgb.to_rgba_clamp();
+	if (UINT32(0xfeffffff) != UINT32(packed))
+		osd_printf_error("Error testing rgbaint_t::to_rgba_clamp() = %08x (expected 0xfeffffff)\n", UINT32(packed));
+	rgb.set(std::numeric_limits<INT32>::max(), std::numeric_limits<INT32>::min(), 256, -1);
+	packed = rgb.to_rgba_clamp();
+	if (UINT32(0xff00ff00) != UINT32(packed))
+		osd_printf_error("Error testing rgbaint_t::to_rgba_clamp() = %08x (expected 0xff00ff00)\n", UINT32(packed));
+	rgb.set(0, 255, 1, 254);
+	packed = rgb.to_rgba_clamp();
+	if (UINT32(0x00ff01fe) != UINT32(packed))
+		osd_printf_error("Error testing rgbaint_t::to_rgba_clamp() = %08x (expected 0x00ff01fe)\n", UINT32(packed));
+
+	// test in-place clamping with hand-crafted values to catch edge cases
+	expected_a = 0;
+	expected_r = 0;
+	expected_g = 0;
+	expected_b = 1;
+	rgb.set(std::numeric_limits<INT32>::min(), -1, 0, 1);
+	rgb.clamp_to_uint8();
+	check_expected("rgbaint_t::clamp_to_uint8");
+	expected_a = 254;
+	expected_r = 255;
+	expected_g = 255;
+	expected_b = 255;
+	rgb.set(254, 255, 256, std::numeric_limits<INT32>::max());
+	rgb.clamp_to_uint8();
+	check_expected("rgbaint_t::clamp_to_uint8");
+	expected_a = 255;
+	expected_r = 0;
+	expected_g = 255;
+	expected_b = 0;
+	rgb.set(std::numeric_limits<INT32>::max(), std::numeric_limits<INT32>::min(), 256, -1);
+	rgb.clamp_to_uint8();
+	check_expected("rgbaint_t::clamp_to_uint8");
+	expected_a = 0;
+	expected_r = 255;
+	expected_g = 1;
+	expected_b = 254;
+	rgb.set(0, 255, 1, 254);
+	rgb.clamp_to_uint8();
+	check_expected("rgbaint_t::clamp_to_uint8");
+
+	// test shift left
+	expected_a = (actual_a = random_i32()) << 19;
+	expected_r = (actual_r = random_i32()) << 3;
+	expected_g = (actual_g = random_i32()) << 21;
+	expected_b = (actual_b = random_i32()) << 6;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.shl(rgbaint_t(19, 3, 21, 6));
+	check_expected("rgbaint_t::shl");
+
+	// test shift left immediate
+	expected_a = (actual_a = random_i32()) << 7;
+	expected_r = (actual_r = random_i32()) << 7;
+	expected_g = (actual_g = random_i32()) << 7;
+	expected_b = (actual_b = random_i32()) << 7;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.shl_imm(7);
+	check_expected("rgbaint_t::shl_imm");
+
+	// test logical shift right
+	expected_a = INT32(UINT32(actual_a = random_i32()) >> 8);
+	expected_r = INT32(UINT32(actual_r = random_i32()) >> 18);
+	expected_g = INT32(UINT32(actual_g = random_i32()) >> 26);
+	expected_b = INT32(UINT32(actual_b = random_i32()) >> 4);
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.shr(rgbaint_t(8, 18, 26, 4));
+	check_expected("rgbaint_t::shr");
+
+	// test logical shift right with opposite signs
+	expected_a = INT32(UINT32(actual_a = -actual_a) >> 21);
+	expected_r = INT32(UINT32(actual_r = -actual_r) >> 13);
+	expected_g = INT32(UINT32(actual_g = -actual_g) >> 11);
+	expected_b = INT32(UINT32(actual_b = -actual_b) >> 17);
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.shr(rgbaint_t(21, 13, 11, 17));
+	check_expected("rgbaint_t::shr");
+
+	// test logical shift right immediate
+	expected_a = INT32(UINT32(actual_a = random_i32()) >> 5);
+	expected_r = INT32(UINT32(actual_r = random_i32()) >> 5);
+	expected_g = INT32(UINT32(actual_g = random_i32()) >> 5);
+	expected_b = INT32(UINT32(actual_b = random_i32()) >> 5);
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.shr_imm(5);
+	check_expected("rgbaint_t::shr_imm");
+
+	// test logical shift right immediate with opposite signs
+	expected_a = INT32(UINT32(actual_a = -actual_a) >> 15);
+	expected_r = INT32(UINT32(actual_r = -actual_r) >> 15);
+	expected_g = INT32(UINT32(actual_g = -actual_g) >> 15);
+	expected_b = INT32(UINT32(actual_b = -actual_b) >> 15);
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.shr_imm(15);
+	check_expected("rgbaint_t::shr_imm");
+
+	// test arithmetic shift right
+	expected_a = (actual_a = random_i32()) >> 16;
+	expected_r = (actual_r = random_i32()) >> 20;
+	expected_g = (actual_g = random_i32()) >> 14;
+	expected_b = (actual_b = random_i32()) >> 2;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.sra(rgbaint_t(16, 20, 14, 2));
+	check_expected("rgbaint_t::sra");
+
+	// test arithmetic shift right with opposite signs
+	expected_a = (actual_a = -actual_a) >> 1;
+	expected_r = (actual_r = -actual_r) >> 29;
+	expected_g = (actual_g = -actual_g) >> 10;
+	expected_b = (actual_b = -actual_b) >> 22;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.sra(rgbaint_t(1, 29, 10, 22));
+	check_expected("rgbaint_t::sra");
+
+	// test arithmetic shift right immediate (method)
+	expected_a = (actual_a = random_i32()) >> 12;
+	expected_r = (actual_r = random_i32()) >> 12;
+	expected_g = (actual_g = random_i32()) >> 12;
+	expected_b = (actual_b = random_i32()) >> 12;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.sra_imm(12);
+	check_expected("rgbaint_t::sra_imm");
+
+	// test arithmetic shift right immediate with opposite signs (method)
+	expected_a = (actual_a = -actual_a) >> 9;
+	expected_r = (actual_r = -actual_r) >> 9;
+	expected_g = (actual_g = -actual_g) >> 9;
+	expected_b = (actual_b = -actual_b) >> 9;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.sra_imm(9);
+	check_expected("rgbaint_t::sra_imm");
+
+	// test arithmetic shift right immediate (operator)
+	expected_a = (actual_a = random_i32()) >> 7;
+	expected_r = (actual_r = random_i32()) >> 7;
+	expected_g = (actual_g = random_i32()) >> 7;
+	expected_b = (actual_b = random_i32()) >> 7;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb >>= 7;
+	check_expected("rgbaint_t::operator>>=");
+
+	// test arithmetic shift right immediate with opposite signs (operator)
+	expected_a = (actual_a = -actual_a) >> 11;
+	expected_r = (actual_r = -actual_r) >> 11;
+	expected_g = (actual_g = -actual_g) >> 11;
+	expected_b = (actual_b = -actual_b) >> 11;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb >>= 11;
+	check_expected("rgbaint_t::operator>>=");
+
+	// test RGB equality comparison
+	actual_a = random_i32_nolimit();
+	actual_r = random_i32_nolimit();
+	actual_g = random_i32_nolimit();
+	actual_b = random_i32_nolimit();
+	expected_a = ~INT32(0);
+	expected_r = 0;
+	expected_g = 0;
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpeq(rgbaint_t(actual_a, actual_r - 1, actual_g + 1, std::numeric_limits<INT32>::min()));
+	check_expected("rgbaint_t::cmpeq");
+	expected_a = 0;
+	expected_r = ~INT32(0);
+	expected_g = 0;
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpeq(rgbaint_t(std::numeric_limits<INT32>::max(), actual_r, actual_g - 1, actual_b + 1));
+	check_expected("rgbaint_t::cmpeq");
+
+	// test immediate equality comparison
+	actual_a = random_i32_nolimit();
+	actual_r = random_i32_nolimit();
+	actual_g = random_i32_nolimit();
+	actual_b = random_i32_nolimit();
+	expected_a = ~INT32(0);
+	expected_r = (actual_r == actual_a) ? ~INT32(0) : 0;
+	expected_g = (actual_g == actual_a) ? ~INT32(0) : 0;
+	expected_b = (actual_b == actual_a) ? ~INT32(0) : 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpeq_imm(actual_a);
+	check_expected("rgbaint_t::cmpeq_imm");
+	expected_a = (actual_a == actual_r) ? ~INT32(0) : 0;
+	expected_r = ~INT32(0);
+	expected_g = (actual_g == actual_r) ? ~INT32(0) : 0;
+	expected_b = (actual_b == actual_r) ? ~INT32(0) : 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpeq_imm(actual_r);
+	check_expected("rgbaint_t::cmpeq_imm");
+	expected_a = (actual_a == actual_g) ? ~INT32(0) : 0;
+	expected_r = (actual_r == actual_g) ? ~INT32(0) : 0;
+	expected_g = ~INT32(0);
+	expected_b = (actual_b == actual_g) ? ~INT32(0) : 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpeq_imm(actual_g);
+	check_expected("rgbaint_t::cmpeq_imm");
+	expected_a = (actual_a == actual_b) ? ~INT32(0) : 0;
+	expected_r = (actual_r == actual_b) ? ~INT32(0) : 0;
+	expected_g = (actual_g == actual_b) ? ~INT32(0) : 0;
+	expected_b = ~INT32(0);
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpeq_imm(actual_b);
+	check_expected("rgbaint_t::cmpeq_imm");
+	expected_a = 0;
+	expected_r = 0;
+	expected_g = 0;
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpeq_imm(std::numeric_limits<INT32>::min());
+	check_expected("rgbaint_t::cmpeq_imm");
+	expected_a = !actual_a ? ~INT32(0) : 0;
+	expected_r = !actual_r ? ~INT32(0) : 0;
+	expected_g = !actual_g ? ~INT32(0) : 0;
+	expected_b = !actual_b ? ~INT32(0) : 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpeq_imm(0);
+	check_expected("rgbaint_t::cmpeq_imm");
+	expected_a = 0;
+	expected_r = 0;
+	expected_g = 0;
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpeq_imm(std::numeric_limits<INT32>::max());
+	check_expected("rgbaint_t::cmpeq_imm");
+
+	// test immediate RGB equality comparison
+	actual_a = random_i32_nolimit();
+	actual_r = random_i32_nolimit();
+	actual_g = random_i32_nolimit();
+	actual_b = random_i32_nolimit();
+	expected_a = 0;
+	expected_r = 0;
+	expected_g = ~INT32(0);
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpeq_imm_rgba(std::numeric_limits<INT32>::min(), std::numeric_limits<INT32>::max(), actual_g, actual_b - 1);
+	check_expected("rgbaint_t::cmpeq_imm_rgba");
+	expected_a = 0;
+	expected_r = 0;
+	expected_g = 0;
+	expected_b = ~INT32(0);
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpeq_imm_rgba(actual_a + 1, std::numeric_limits<INT32>::min(), std::numeric_limits<INT32>::max(), actual_b);
+	check_expected("rgbaint_t::cmpeq_imm_rgba");
+
+	// test RGB greater than comparison
+	actual_a = random_i32_nolimit();
+	actual_r = random_i32_nolimit();
+	actual_g = random_i32_nolimit();
+	actual_b = random_i32_nolimit();
+	expected_a = 0;
+	expected_r = ~INT32(0);
+	expected_g = 0;
+	expected_b = ~INT32(0);
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpgt(rgbaint_t(actual_a, actual_r - 1, actual_g + 1, std::numeric_limits<INT32>::min()));
+	check_expected("rgbaint_t::cmpgt");
+	expected_a = 0;
+	expected_r = 0;
+	expected_g = ~INT32(0);
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpgt(rgbaint_t(std::numeric_limits<INT32>::max(), actual_r, actual_g - 1, actual_b + 1));
+	check_expected("rgbaint_t::cmpgt");
+
+	// test immediate greater than comparison
+	actual_a = random_i32_nolimit();
+	actual_r = random_i32_nolimit();
+	actual_g = random_i32_nolimit();
+	actual_b = random_i32_nolimit();
+	expected_a = 0;
+	expected_r = (actual_r > actual_a) ? ~INT32(0) : 0;
+	expected_g = (actual_g > actual_a) ? ~INT32(0) : 0;
+	expected_b = (actual_b > actual_a) ? ~INT32(0) : 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpgt_imm(actual_a);
+	check_expected("rgbaint_t::cmpgt_imm");
+	expected_a = (actual_a > actual_r) ? ~INT32(0) : 0;
+	expected_r = 0;
+	expected_g = (actual_g > actual_r) ? ~INT32(0) : 0;
+	expected_b = (actual_b > actual_r) ? ~INT32(0) : 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpgt_imm(actual_r);
+	check_expected("rgbaint_t::cmpgt_imm");
+	expected_a = (actual_a > actual_g) ? ~INT32(0) : 0;
+	expected_r = (actual_r > actual_g) ? ~INT32(0) : 0;
+	expected_g =0;
+	expected_b = (actual_b > actual_g) ? ~INT32(0) : 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpgt_imm(actual_g);
+	check_expected("rgbaint_t::cmpgt_imm");
+	expected_a = (actual_a > actual_b) ? ~INT32(0) : 0;
+	expected_r = (actual_r > actual_b) ? ~INT32(0) : 0;
+	expected_g = (actual_g > actual_b) ? ~INT32(0) : 0;
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpgt_imm(actual_b);
+	check_expected("rgbaint_t::cmpgt_imm");
+	expected_a = ~INT32(0);
+	expected_r = ~INT32(0);
+	expected_g = ~INT32(0);
+	expected_b = ~INT32(0);
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpgt_imm(std::numeric_limits<INT32>::min());
+	check_expected("rgbaint_t::cmpgt_imm");
+	expected_a = (actual_a > 0) ? ~INT32(0) : 0;
+	expected_r = (actual_r > 0) ? ~INT32(0) : 0;
+	expected_g = (actual_g > 0) ? ~INT32(0) : 0;
+	expected_b = (actual_b > 0) ? ~INT32(0) : 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpgt_imm(0);
+	check_expected("rgbaint_t::cmpgt_imm");
+	expected_a = 0;
+	expected_r = 0;
+	expected_g = 0;
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpgt_imm(std::numeric_limits<INT32>::max());
+	check_expected("rgbaint_t::cmpgt_imm");
+
+	// test immediate RGB greater than comparison
+	actual_a = random_i32_nolimit();
+	actual_r = random_i32_nolimit();
+	actual_g = random_i32_nolimit();
+	actual_b = random_i32_nolimit();
+	expected_a = ~INT32(0);
+	expected_r = 0;
+	expected_g = 0;
+	expected_b = ~INT32(0);
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpgt_imm_rgba(std::numeric_limits<INT32>::min(), std::numeric_limits<INT32>::max(), actual_g, actual_b - 1);
+	check_expected("rgbaint_t::cmpgt_imm_rgba");
+	expected_a = 0;
+	expected_r = ~INT32(0);
+	expected_g = 0;
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmpgt_imm_rgba(actual_a + 1, std::numeric_limits<INT32>::min(), std::numeric_limits<INT32>::max(), actual_b);
+	check_expected("rgbaint_t::cmpgt_imm_rgba");
+
+	// test RGB less than comparison
+	actual_a = random_i32_nolimit();
+	actual_r = random_i32_nolimit();
+	actual_g = random_i32_nolimit();
+	actual_b = random_i32_nolimit();
+	expected_a = 0;
+	expected_r = 0;
+	expected_g = ~INT32(0);
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmplt(rgbaint_t(actual_a, actual_r - 1, actual_g + 1, std::numeric_limits<INT32>::min()));
+	check_expected("rgbaint_t::cmplt");
+	expected_a = ~INT32(0);
+	expected_r = 0;
+	expected_g = 0;
+	expected_b = ~INT32(0);
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmplt(rgbaint_t(std::numeric_limits<INT32>::max(), actual_r, actual_g - 1, actual_b + 1));
+	check_expected("rgbaint_t::cmplt");
+
+	// test immediate less than comparison
+	actual_a = random_i32_nolimit();
+	actual_r = random_i32_nolimit();
+	actual_g = random_i32_nolimit();
+	actual_b = random_i32_nolimit();
+	expected_a = 0;
+	expected_r = (actual_r < actual_a) ? ~INT32(0) : 0;
+	expected_g = (actual_g < actual_a) ? ~INT32(0) : 0;
+	expected_b = (actual_b < actual_a) ? ~INT32(0) : 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmplt_imm(actual_a);
+	check_expected("rgbaint_t::cmplt_imm");
+	expected_a = (actual_a < actual_r) ? ~INT32(0) : 0;
+	expected_r = 0;
+	expected_g = (actual_g < actual_r) ? ~INT32(0) : 0;
+	expected_b = (actual_b < actual_r) ? ~INT32(0) : 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmplt_imm(actual_r);
+	check_expected("rgbaint_t::cmplt_imm");
+	expected_a = (actual_a < actual_g) ? ~INT32(0) : 0;
+	expected_r = (actual_r < actual_g) ? ~INT32(0) : 0;
+	expected_g =0;
+	expected_b = (actual_b < actual_g) ? ~INT32(0) : 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmplt_imm(actual_g);
+	check_expected("rgbaint_t::cmplt_imm");
+	expected_a = (actual_a < actual_b) ? ~INT32(0) : 0;
+	expected_r = (actual_r < actual_b) ? ~INT32(0) : 0;
+	expected_g = (actual_g < actual_b) ? ~INT32(0) : 0;
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmplt_imm(actual_b);
+	check_expected("rgbaint_t::cmplt_imm");
+	expected_a = 0;
+	expected_r = 0;
+	expected_g = 0;
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmplt_imm(std::numeric_limits<INT32>::min());
+	check_expected("rgbaint_t::cmplt_imm");
+	expected_a = (actual_a < 0) ? ~INT32(0) : 0;
+	expected_r = (actual_r < 0) ? ~INT32(0) : 0;
+	expected_g = (actual_g < 0) ? ~INT32(0) : 0;
+	expected_b = (actual_b < 0) ? ~INT32(0) : 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmplt_imm(0);
+	check_expected("rgbaint_t::cmplt_imm");
+	expected_a = ~INT32(0);
+	expected_r = ~INT32(0);
+	expected_g = ~INT32(0);
+	expected_b = ~INT32(0);
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmplt_imm(std::numeric_limits<INT32>::max());
+	check_expected("rgbaint_t::cmplt_imm");
+
+	// test immediate RGB less than comparison
+	actual_a = random_i32_nolimit();
+	actual_r = random_i32_nolimit();
+	actual_g = random_i32_nolimit();
+	actual_b = random_i32_nolimit();
+	expected_a = 0;
+	expected_r = ~INT32(0);
+	expected_g = 0;
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmplt_imm_rgba(std::numeric_limits<INT32>::min(), std::numeric_limits<INT32>::max(), actual_g, actual_b - 1);
+	check_expected("rgbaint_t::cmplt_imm_rgba");
+	expected_a = ~INT32(0);
+	expected_r = 0;
+	expected_g = ~INT32(0);
+	expected_b = 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.cmplt_imm_rgba(actual_a + 1, std::numeric_limits<INT32>::min(), std::numeric_limits<INT32>::max(), actual_b);
+	check_expected("rgbaint_t::cmplt_imm_rgba");
 }
 
 
@@ -1024,42 +1869,45 @@ void validity_checker::output_callback(osd_output_channel channel, const char *m
 	std::string output;
 	switch (channel)
 	{
-		case OSD_OUTPUT_CHANNEL_ERROR:
-			// count the error
-			m_errors++;
+	case OSD_OUTPUT_CHANNEL_ERROR:
+		// count the error
+		m_errors++;
 
-			// output the source(driver) device 'tag'
-			build_output_prefix(output);
+		// output the source(driver) device 'tag'
+		build_output_prefix(output);
 
-			// generate the string
-			strcatvprintf(output, msg, args);
-			m_error_text.append(output);
-			break;
-		case OSD_OUTPUT_CHANNEL_WARNING:
-			// count the error
-			m_warnings++;
+		// generate the string
+		strcatvprintf(output, msg, args);
+		m_error_text.append(output);
+		break;
 
-			// output the source(driver) device 'tag'
-			build_output_prefix(output);
+	case OSD_OUTPUT_CHANNEL_WARNING:
+		// count the error
+		m_warnings++;
 
-			// generate the string and output to the original target
-			strcatvprintf(output, msg, args);
-			m_warning_text.append(output);
-			break;
-		case OSD_OUTPUT_CHANNEL_VERBOSE:
-			// if we're not verbose, skip it
-			if (!m_print_verbose) break;
+		// output the source(driver) device 'tag'
+		build_output_prefix(output);
 
-			// output the source(driver) device 'tag'
-			build_output_prefix(output);
+		// generate the string and output to the original target
+		strcatvprintf(output, msg, args);
+		m_warning_text.append(output);
+		break;
 
-			// generate the string and output to the original target
-			strcatvprintf(output, msg, args);
-			m_verbose_text.append(output);
-			break;
-		default:
-			chain_output(channel, msg, args);
-			break;
+	case OSD_OUTPUT_CHANNEL_VERBOSE:
+		// if we're not verbose, skip it
+		if (!m_print_verbose) break;
+
+		// output the source(driver) device 'tag'
+		build_output_prefix(output);
+
+		// generate the string and output to the original target
+		strcatvprintf(output, msg, args);
+		m_verbose_text.append(output);
+		break;
+
+	default:
+		chain_output(channel, msg, args);
+		break;
 	}
 }
 
@@ -1075,7 +1923,7 @@ void validity_checker::output_via_delegate(osd_output_channel channel, const cha
 
 	// call through to the delegate with the proper parameters
 	va_start(argptr, format);
-	this->chain_output(channel, format, argptr);
+	chain_output(channel, format, argptr);
 	va_end(argptr);
 }
 

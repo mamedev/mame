@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_FRONTEND_UI_INIFILE_H
+#define MAME_FRONTEND_UI_INIFILE_H
 
-#ifndef __UI_INIFILE_H__
-#define __UI_INIFILE_H__
+#pragma once
 
 #include "../frontend/mame/ui/utils.h"
 
@@ -97,7 +97,7 @@ public:
 	// check
 	bool isgame_favorite();
 	bool isgame_favorite(const game_driver *driver);
-	bool isgame_favorite(ui_software_info &swinfo);
+	bool isgame_favorite(ui_software_info const &swinfo);
 
 	// save
 	void save_favorite_games();
@@ -120,4 +120,4 @@ private:
 	ui_options &m_options;
 };
 
-#endif  /* __UI_INIFILE_H__ */
+#endif  // MAME_FRONTEND_UI_INIFILE_H

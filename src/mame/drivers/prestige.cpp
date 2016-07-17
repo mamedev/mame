@@ -893,6 +893,11 @@ ROM_START( cars2lap )
 	ROM_LOAD("n25s16.u6", 0x00000, 0x200000, CRC(ec1ba96e) SHA1(51b8844ae77adf20f74f268d380d268c9ce19785))
 ROM_END
 
+ROM_START( princ )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD("29F800T.U4", 0x00000, 0x100000, CRC(30b6b864) SHA1(7ada3af85dd8dd3f95ca8965ad8e642c26445293))
+ROM_END
+
 
 /* Driver */
 
@@ -922,3 +927,7 @@ COMP( 2012, cars2lap,  0,       0,  prestige,   prestige, driver_device,     0, 
 // gl6600cx use a NSC1028 system-on-a-chip designed by National Semiconductor specifically for VTech
 // http://web.archive.org/web/19991127134657/http://www.national.com/news/item/0,1735,425,00.html
 COMP( 1999, gl6600cx,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Leader 6600CX (Germany)", MACHINE_IS_SKELETON)
+
+// TODO: move into a separate driver
+// Prin-C use a Fujitsu MB90611A MCU (F2MC-16L)
+COMP( ????, princ,   0,  0,  prestige ,  prestige , driver_device,   0, "Tomy",   "Prin-C",  MACHINE_IS_SKELETON)

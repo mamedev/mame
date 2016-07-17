@@ -41,9 +41,11 @@ pstring::code_t ptokenizer::getc()
 {
 	if (m_px >= m_cur_line.len())
 	{
+		m_lineno++;
 		if (m_strm.readline(m_cur_line))
 		{
-			m_cur_line += "\n";
+			if (m_cur_line.right(1) != "\n")
+				m_cur_line += "\n";
 			m_px = 0;
 		}
 		else
@@ -245,7 +247,7 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 
 void ptokenizer::error(const pstring &errs)
 {
-	verror("Error: " + errs, currentline_no(), currentline_str());
+	verror(errs, currentline_no(), currentline_str());
 	//throw error;
 }
 
@@ -459,7 +461,6 @@ pstring  ppreprocessor::process_line(const pstring &line)
 		if (m_ifflag == 0)
 		{
 			ret.cat(lt);
-			ret.cat("\n");
 		}
 	}
 	return ret;

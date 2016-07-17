@@ -85,7 +85,7 @@ bool sorted_game_list(const game_driver *x, const game_driver *y)
 //  ctor / dtor
 //-------------------------------------------------
 
-menu_audit::menu_audit(mame_ui_manager &mui, render_container *container, vptr_game &availablesorted, vptr_game &unavailablesorted,  int _audit_mode)
+menu_audit::menu_audit(mame_ui_manager &mui, render_container &container, vptr_game &availablesorted, vptr_game &unavailablesorted,  int _audit_mode)
 	: menu(mui, container)
 	, m_availablesorted(availablesorted)
 	, m_unavailablesorted(unavailablesorted)
@@ -113,7 +113,7 @@ void menu_audit::handle()
 
 	if (m_first)
 	{
-		ui().draw_text_box(container, _("Audit in progress..."), ui::text_layout::CENTER, 0.5f, 0.5f, UI_GREEN_COLOR);
+		ui().draw_text_box(container(), _("Audit in progress..."), ui::text_layout::CENTER, 0.5f, 0.5f, UI_GREEN_COLOR);
 		m_first = false;
 		return;
 	}
@@ -159,7 +159,7 @@ void menu_audit::handle()
 	std::stable_sort(m_unavailablesorted.begin(), m_unavailablesorted.end(), sorted_game_list);
 	save_available_machines();
 	reset_parent(reset_options::SELECT_FIRST);
-	menu::stack_pop(machine());
+	stack_pop();
 }
 
 //-------------------------------------------------

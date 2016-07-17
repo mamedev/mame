@@ -62,6 +62,14 @@
 	PORT_CHANGED_MEMBER(_base ":" _tag, netlist_mame_analog_input_t, input_changed, 0)
 
 
+#define MEMREGION_SOURCE(_name) \
+		setup.register_source(plib::make_unique_base<netlist::source_t, netlist_source_memregion_t>(_name));
+
+#define NETDEV_ANALOG_CALLBACK_MEMBER(_name) \
+	void _name(const double data, const attotime &time)
+
+
+
 // ----------------------------------------------------------------------------------------
 // Extensions to interface netlist with MAME code ....
 // ----------------------------------------------------------------------------------------
@@ -78,12 +86,6 @@ public:
 private:
 	pstring m_name;
 };
-
-#define MEMREGION_SOURCE(_name) \
-		setup.register_source(plib::make_unique_base<netlist::source_t, netlist_source_memregion_t>(_name));
-
-#define NETDEV_ANALOG_CALLBACK_MEMBER(_name) \
-	void _name(const double data, const attotime &time)
 
 class netlist_mame_device_t;
 
@@ -579,7 +581,7 @@ public:
 
 		// FIXME: make this a parameter
 		// avoid calls due to noise
-		if (fabs(cur - m_last) > 1e-6)
+		if (std::fabs(cur - m_last) > 1e-6)
 		{
 			m_cpu_device->update_time_x();
 			m_callback(cur, m_cpu_device->local_time());

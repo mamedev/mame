@@ -204,22 +204,22 @@ floperr_t floppy_open_choices(void *fp, const struct io_procs *procs, const char
 
 
 
-static floperr_t option_to_floppy_error(optreserr_t oerr)
+static floperr_t option_to_floppy_error(util::option_resolution::error oerr)
 {
 	floperr_t err;
 	switch(oerr) {
-	case OPTIONRESOLUTION_ERROR_SUCCESS:
+	case util::option_resolution::error::SUCCESS:
 		err = FLOPPY_ERROR_SUCCESS;
 		break;
-	case OPTIONRESOLUTION_ERROR_OUTOFMEMORY:
+	case util::option_resolution::error::OUTOFMEMORY:
 		err = FLOPPY_ERROR_OUTOFMEMORY;
 		break;
-	case OPTIONRESOLUTION_ERROR_PARAMOUTOFRANGE:
-	case OPTIONRESOLUTION_ERROR_PARAMNOTSPECIFIED:
-	case OPTIONRESOLUTION_ERROR_PARAMNOTFOUND:
-	case OPTIONRESOLUTION_ERROR_PARAMALREADYSPECIFIED:
-	case OPTIONRESOLUTION_ERROR_BADPARAM:
-	case OPTIONRESOLUTION_ERROR_SYNTAX:
+	case util::option_resolution::error::PARAMOUTOFRANGE:
+	case util::option_resolution::error::PARAMNOTSPECIFIED:
+	case util::option_resolution::error::PARAMNOTFOUND:
+	case util::option_resolution::error::PARAMALREADYSPECIFIED:
+	case util::option_resolution::error::BADPARAM:
+	case util::option_resolution::error::SYNTAX:
 	default:
 		err = FLOPPY_ERROR_INTERNAL;
 		break;
@@ -229,13 +229,13 @@ static floperr_t option_to_floppy_error(optreserr_t oerr)
 
 
 
-floperr_t floppy_create(void *fp, const struct io_procs *procs, const struct FloppyFormat *format, option_resolution *parameters, floppy_image_legacy **outfloppy)
+floperr_t floppy_create(void *fp, const struct io_procs *procs, const struct FloppyFormat *format, util::option_resolution *parameters, floppy_image_legacy **outfloppy)
 {
 	floppy_image_legacy *floppy = nullptr;
-	optreserr_t oerr;
+	util::option_resolution::error oerr;
 	floperr_t err;
 	int heads, tracks, h, t;
-	option_resolution *alloc_resolution = nullptr;
+	std::unique_ptr<util::option_resolution> alloc_resolution;
 
 	assert(format);
 
@@ -250,20 +250,20 @@ floperr_t floppy_create(void *fp, const struct io_procs *procs, const struct Flo
 	/* if this format expects creation parameters and none were specified, create some */
 	if (!parameters && format->param_guidelines)
 	{
-		alloc_resolution = option_resolution_create(floppy_option_guide, format->param_guidelines);
+		alloc_resolution = std::make_unique<util::option_resolution>(floppy_option_guide, format->param_guidelines);
 		if (!alloc_resolution)
 		{
 			err = FLOPPY_ERROR_OUTOFMEMORY;
 			goto done;
 		}
-		parameters = alloc_resolution;
+		parameters = alloc_resolution.get();
 	}
 
 	/* finish the parameters, if specified */
 	if (parameters)
 	{
-		oerr = option_resolution_finish(parameters);
-		if (oerr)
+		oerr = parameters->finish();
+		if (oerr != util::option_resolution::error::SUCCESS)
 		{
 			err = option_to_floppy_error(oerr);
 			goto done;
@@ -314,9 +314,6 @@ done:
 		*outfloppy = floppy;
 	else if (floppy)
 		floppy_close_internal(floppy, FALSE);
-
-	if (alloc_resolution)
-		option_resolution_close(alloc_resolution);
 	return err;
 }
 
@@ -679,48 +676,36 @@ floperr_t floppy_write_track_data(floppy_image_legacy *floppy, int head, int tra
 
 
 
-floperr_t floppy_format_track(floppy_image_legacy *floppy, int head, int track, option_resolution *parameters)
+floperr_t floppy_format_track(floppy_image_legacy *floppy, int head, int track, util::option_resolution *parameters)
 {
 	floperr_t err;
 	struct FloppyCallbacks *format;
-	option_resolution *alloc_resolution = nullptr;
-	optreserr_t oerr;
+	std::unique_ptr<util::option_resolution> alloc_resolution;
 
 	/* supported? */
 	format = floppy_callbacks(floppy);
 	if (!format->format_track)
-	{
-		err = FLOPPY_ERROR_UNSUPPORTED;
-		goto done;
-	}
+		return FLOPPY_ERROR_UNSUPPORTED;
 
 	/* create a dummy resolution; if no parameters were specified */
 	if (!parameters)
 	{
-		alloc_resolution = option_resolution_create(floppy_option_guide, floppy->floppy_option->param_guidelines);
+		alloc_resolution = std::make_unique<util::option_resolution>(floppy_option_guide, floppy->floppy_option->param_guidelines);
 		if (!alloc_resolution)
-		{
-			err = FLOPPY_ERROR_OUTOFMEMORY;
-			goto done;
-		}
-		parameters = alloc_resolution;
+			return FLOPPY_ERROR_OUTOFMEMORY;
+
+		parameters = alloc_resolution.get();
 	}
 
-	oerr = option_resolution_finish(parameters);
-	if (oerr)
-	{
-		err = option_to_floppy_error(oerr);
-		goto done;
-	}
+	auto oerr = parameters->finish();
+	if (oerr != util::option_resolution::error::SUCCESS)
+		return option_to_floppy_error(oerr);
 
 	err = format->format_track(floppy, head, track, parameters);
 	if (err)
-		goto done;
+		return err;
 
-done:
-	if (alloc_resolution)
-		option_resolution_close(alloc_resolution);
-	return err;
+	return FLOPPY_ERROR_SUCCESS;
 }
 
 

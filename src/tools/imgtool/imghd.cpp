@@ -215,7 +215,7 @@ const hard_disk_info *imghd_get_header(struct mess_hard_disk_file *disk)
 }
 
 
-static imgtoolerr_t mess_hd_image_create(imgtool_image *image, imgtool_stream *f, option_resolution *createoptions);
+static imgtoolerr_t mess_hd_image_create(imgtool_image *image, imgtool_stream *f, util::option_resolution *createoptions);
 
 enum
 {
@@ -254,16 +254,16 @@ void hd_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo 
 
 
 
-static imgtoolerr_t mess_hd_image_create(imgtool_image *image, imgtool_stream *f, option_resolution *createoptions)
+static imgtoolerr_t mess_hd_image_create(imgtool_image *image, imgtool_stream *f, util::option_resolution *createoptions)
 {
 	UINT32  blocksize, cylinders, heads, sectors, seclen;
 
 	/* read options */
-	blocksize = option_resolution_lookup_int(createoptions, mess_hd_createopts_blocksize);
-	cylinders = option_resolution_lookup_int(createoptions, mess_hd_createopts_cylinders);
-	heads = option_resolution_lookup_int(createoptions, mess_hd_createopts_heads);
-	sectors = option_resolution_lookup_int(createoptions, mess_hd_createopts_sectors);
-	seclen = option_resolution_lookup_int(createoptions, mess_hd_createopts_seclen);
+	blocksize = createoptions->lookup_int(mess_hd_createopts_blocksize);
+	cylinders = createoptions->lookup_int(mess_hd_createopts_cylinders);
+	heads = createoptions->lookup_int(mess_hd_createopts_heads);
+	sectors = createoptions->lookup_int(mess_hd_createopts_sectors);
+	seclen = createoptions->lookup_int(mess_hd_createopts_seclen);
 
 	return imghd_create(f, blocksize, cylinders, heads, sectors, seclen);
 }

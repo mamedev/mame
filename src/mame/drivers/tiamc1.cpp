@@ -12,12 +12,12 @@
       * Konek-Gorbunok (Little Humpbacked Horse)
       * Snezhnaja Koroleva (Snow Queen)
       * S.O.S.
+	  * Gorodki
+	  * Kot-Rybolov
 
   Other games known to exist on this hardware (interchangeable by the ROM swap):
       * Avtogonki
       * Istrebitel'
-      * Gorodki
-      * Kot-Rybolov
       * Kotigoroshko
       * Ostrov Drakona
       * Ostrov Sokrovisch
@@ -140,6 +140,12 @@ static ADDRESS_MAP_START( tiamc1_map, AS_PROGRAM, 8, tiamc1_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( kotrybolov_map, AS_PROGRAM, 8, tiamc1_state )
+	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(tiamc1_videoram_w)
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0xc000, 0xcfff) AM_RAM
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( tiamc1_io_map, AS_IO, 8, tiamc1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x4f) AM_WRITE(tiamc1_sprite_y_w) /* sprites Y */
@@ -159,6 +165,24 @@ static ADDRESS_MAP_START( tiamc1_io_map, AS_IO, 8, tiamc1_state )
 	AM_RANGE(0xd3, 0xd3) AM_WRITENOP                 /* 8255 ctrl. Used for i/o ports */
 	AM_RANGE(0xd4, 0xd7) AM_DEVWRITE("2x8253", tiamc1_sound_device, tiamc1_timer1_w)   /* timer 1 */
 	AM_RANGE(0xda, 0xda) AM_DEVWRITE("2x8253", tiamc1_sound_device, tiamc1_timer1_gate_w) /* timer 1 gate control */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( kotrybolov_io_map, AS_IO, 8, tiamc1_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x0f) AM_WRITE(tiamc1_sprite_y_w)	// sprites Y
+	AM_RANGE(0x10, 0x1f) AM_WRITE(tiamc1_sprite_x_w)	// sprites X
+	AM_RANGE(0x20, 0x2f) AM_WRITE(tiamc1_sprite_n_w)	// sprites #
+	AM_RANGE(0x30, 0x3f) AM_WRITE(tiamc1_sprite_a_w)	// sprites attributes
+	AM_RANGE(0xe0, 0xef) AM_WRITE(tiamc1_palette_w)		// color ram
+	AM_RANGE(0xf0, 0xf0) AM_WRITE(tiamc1_bg_vshift_w)	// background V scroll
+	AM_RANGE(0xf4, 0xf4) AM_WRITE(tiamc1_bg_hshift_w)	// background H scroll
+	AM_RANGE(0xf8, 0xf8) AM_WRITE(tiamc1_bankswitch_w)	// VRAM selector and character rom bank/offset ?
+	AM_RANGE(0xc0, 0xc3) AM_DEVWRITE("2x8253", tiamc1_sound_device, tiamc1_timer0_w)   // TODO this PCB have single 8253
+	AM_RANGE(0xd0, 0xd0) AM_READ_PORT("IN0")
+	AM_RANGE(0xd1, 0xd1) AM_READ_PORT("IN1")
+	AM_RANGE(0xd2, 0xd2) AM_READ_PORT("IN2")
+	AM_RANGE(0xd2, 0xd2) AM_WRITE(tiamc1_control_w)  // coin counter and lockout
+	AM_RANGE(0xd3, 0xd3) AM_WRITENOP                 // 8255 ctrl. Used for i/o ports
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( tiamc1 )
@@ -190,6 +214,25 @@ static INPUT_PORTS_START( tiamc1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) // Kick
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) // Jump
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gorodki )
+	PORT_START("IN0")
+	PORT_BIT( 0xff, 152, IPT_PADDLE ) PORT_MINMAX(96, 208) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin lockout */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* OUT:game counter */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* RAZR ??? */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) // right button
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) // left button
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
@@ -248,6 +291,12 @@ static MACHINE_CONFIG_START( tiamc1, tiamc1_state )
 
 	MCFG_SOUND_ADD("2x8253", TIAMC1, 16000000/9)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED(kot, tiamc1)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(kotrybolov_map)
+	MCFG_CPU_IO_MAP(kotrybolov_io_map)
 MACHINE_CONFIG_END
 
 
@@ -329,7 +378,47 @@ ROM_START( bilyard )
 	ROM_LOAD( "03.6a", 0x06000, 0x2000, CRC(8bfc0b15) SHA1(221efdce516274d3b1d9009d11dc9ed6cd67ef12) )
 ROM_END
 
-GAME( 1988, konek, 0, tiamc1, tiamc1, driver_device, 0, ROT0, "Terminal", "Konek-Gorbunok", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, sosterm, 0, tiamc1, tiamc1, driver_device, 0, ROT0, "Terminal", "S.O.S.", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, koroleva, 0, tiamc1, tiamc1, driver_device, 0, ROT0, "Terminal", "Snezhnaja Koroleva", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bilyard, 0, tiamc1, tiamc1, driver_device, 0, ROT0, "Terminal", "Billiard", MACHINE_SUPPORTS_SAVE )
+ROM_START( gorodki )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "70.1g", 0x00000, 0x2000, CRC(bd3eb624) SHA1(acfc7e7186daf399f858a0d0cf462b0eaabb3f9e) )
+	ROM_LOAD( "71.2g", 0x02000, 0x2000, CRC(5a9ebd8d) SHA1(4a6682a4bd2eb3c852c1383b0564fe491e7af30a) )
+	ROM_LOAD( "72.3g", 0x04000, 0x2000, CRC(edcc5c13) SHA1(6bebb4c28758a3b3c45318201eb13e5d81db7521) )
+	ROM_LOAD( "73.4g", 0x06000, 0x2000, CRC(ae69b9f3) SHA1(08882fbf917ba17e95b27ba21db666e7832c1894) )
+	ROM_FILL( 0x08000, 0x2000, 0x00 ) /* 08.5g is unpopulated */
+	ROM_FILL( 0x0a000, 0x2000, 0x00 ) /* 09.6g is unpopulated */
+	ROM_FILL( 0x0c000, 0x2000, 0x00 ) /* 10.7g is unpopulated */
+
+	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_LOAD( "66.2a", 0x00000, 0x2000, CRC(b3dd4dec) SHA1(2e399fca4ff0b98724f26a27b1ea8450d650cfb4) )
+	ROM_LOAD( "67.3a", 0x02000, 0x2000, CRC(c94f5579) SHA1(757f063c857c81478925b1ae169de3c81b3533d4) )
+	ROM_LOAD( "68.5a", 0x04000, 0x2000, CRC(0d64708d) SHA1(6a84b4293f0e983424ef361ab3ebf62ab5f8b21c) )
+	ROM_LOAD( "69.6a", 0x06000, 0x2000, CRC(57c8ae81) SHA1(c73bbfaa53195a19599dd2bbc3948c819597b035) )
+
+ROM_END
+
+// not TIA-MC1 platform, uses single PCB main board and game ROM board
+// notable ICs: i8080, i8255, i8253, 3x KR573RU8 2Kx8 SRAM, 2x KR541RU2 1Kx4 RAM, 9x KR531RU8 16x4 RAM
+// tile/character generator uses ROMs instead of RAM
+ROM_START( kot )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "854.6", 0x00000, 0x2000, CRC(44e5e8fc) SHA1(dafbace689f3834d5c6e952a2f6188fb190845e4) )
+	ROM_LOAD( "855.7", 0x02000, 0x2000, CRC(0bb2e4b2) SHA1(7bbb45b18e3b444e3b6006a4670453ec0792e5d3) )
+	ROM_LOAD( "856.8", 0x04000, 0x2000, CRC(9180c98f) SHA1(4085180b9e9772e965c487e7b02d88fcae973e87) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "850.5", 0x00000, 0x2000, CRC(5dc3a102) SHA1(e97d219f7004291438b991435b7fe5d5be01d468) )	// sprite gfx
+	ROM_LOAD( "851.6", 0x02000, 0x2000, CRC(7db239a0) SHA1(af5772afff9009f63e2ab95c1cb00e047f3ed7e4) )
+	ROM_LOAD( "852.7", 0x04000, 0x2000, CRC(c7700f88) SHA1(1a20cc60b083259070e4f1687b09a31fc763d47e) )
+	ROM_LOAD( "853.8", 0x06000, 0x2000, CRC(b94bf1af) SHA1(da403c51fd78f99b82304c67f2197078f4ea0bf5) )
+	ROM_LOAD( "846.1", 0x08000, 0x2000, CRC(42447f4a) SHA1(bd35f2f5e468f9191680bf2c1800e09bb9ae1691) )	// tile gfx
+	ROM_LOAD( "847.2", 0x0a000, 0x2000, CRC(99ada5e8) SHA1(9425a515105ec9e9989aae736645b270e39420be) )
+	ROM_LOAD( "848.3", 0x0c000, 0x2000, CRC(a124cff4) SHA1(d1d8e6f725a6f30058d52cdbe80b598149cd6052) )
+	ROM_LOAD( "849.4", 0x0e000, 0x2000, CRC(5d27fda6) SHA1(f1afb39c7422caaa5eff53388f1b7241dd7c1cd7) )
+ROM_END
+
+GAME( 1988, konek,    0, tiamc1, tiamc1,  driver_device, 0, ROT0, "Terminal", "Konek-Gorbunok", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, sosterm,  0, tiamc1, tiamc1,  driver_device, 0, ROT0, "Terminal", "S.O.S.", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, koroleva, 0, tiamc1, tiamc1,  driver_device, 0, ROT0, "Terminal", "Snezhnaja Koroleva", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bilyard,  0, tiamc1, tiamc1,  driver_device, 0, ROT0, "Terminal", "Billiard", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gorodki,  0, tiamc1, gorodki, driver_device, 0, ROT0, "Terminal", "Gorodki", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kot,      0, kot,    tiamc1,  driver_device, 0, ROT0, "Terminal", "Kot-Rybolov", MACHINE_NOT_WORKING )

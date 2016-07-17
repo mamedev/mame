@@ -31,7 +31,7 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-menu_game_options::menu_game_options(mame_ui_manager &mui, render_container *container) : menu(mui, container)
+menu_game_options::menu_game_options(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
 	m_main = main_filters::actual;
 }
@@ -85,7 +85,7 @@ void menu_game_options::handle()
 					for (int index = 0; index < total; ++index)
 						s_sel[index] = main_filters::text[index];
 
-					menu::stack_push<menu_selector>(ui(), container, s_sel, m_main);
+					menu::stack_push<menu_selector>(ui(), container(), s_sel, m_main);
 				}
 				break;
 			}
@@ -110,7 +110,7 @@ void menu_game_options::handle()
 					for (size_t index = 0; index < total; ++index)
 						s_sel[index] = ifile.get_file(index);
 
-					menu::stack_push<menu_selector>(ui(), container, s_sel, ifile.cur_file(), menu_selector::INIFILE);
+					menu::stack_push<menu_selector>(ui(), container(), s_sel, ifile.cur_file(), menu_selector::INIFILE);
 				}
 				break;
 			}
@@ -134,7 +134,7 @@ void menu_game_options::handle()
 					for (int index = 0; index < total; ++index)
 						s_sel[index] = ifile.get_category(index);
 
-					menu::stack_push<menu_selector>(ui(), container, s_sel, ifile.cur_cat(), menu_selector::CATEGORY);
+					menu::stack_push<menu_selector>(ui(), container(), s_sel, ifile.cur_cat(), menu_selector::CATEGORY);
 				}
 				break;
 			}
@@ -145,7 +145,7 @@ void menu_game_options::handle()
 					changed = true;
 				}
 				else if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<menu_selector>(ui(), container, c_mnfct::ui, c_mnfct::actual);
+					menu::stack_push<menu_selector>(ui(), container(), c_mnfct::ui, c_mnfct::actual);
 
 				break;
 			case YEAR_CAT_FILTER:
@@ -155,54 +155,54 @@ void menu_game_options::handle()
 					changed = true;
 				}
 				else if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<menu_selector>(ui(), container, c_year::ui, c_year::actual);
+					menu::stack_push<menu_selector>(ui(), container(), c_year::ui, c_year::actual);
 
 				break;
 			case CONF_DIR:
 				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<menu_directory>(ui(), container);
+					menu::stack_push<menu_directory>(ui(), container());
 				break;
 			case MISC_MENU:
 				if (menu_event->iptkey == IPT_UI_SELECT)
 				{
-					menu::stack_push<submenu>(ui(), container, submenu::misc_options);
+					menu::stack_push<submenu>(ui(), container(), submenu::misc_options);
 					ui_globals::reset = true;
 				}
 				break;
 			case SOUND_MENU:
 				if (menu_event->iptkey == IPT_UI_SELECT)
 				{
-					menu::stack_push<menu_sound_options>(ui(), container);
+					menu::stack_push<menu_sound_options>(ui(), container());
 					ui_globals::reset = true;
 				}
 				break;
 			case DISPLAY_MENU:
 				if (menu_event->iptkey == IPT_UI_SELECT)
 				{
-					menu::stack_push<submenu>(ui(), container, submenu::video_options);
+					menu::stack_push<submenu>(ui(), container(), submenu::video_options);
 					ui_globals::reset = true;
 				}
 				break;
 			case CUSTOM_MENU:
 				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<menu_custom_ui>(ui(), container);
+					menu::stack_push<menu_custom_ui>(ui(), container());
 				break;
 			case CONTROLLER_MENU:
 				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<submenu>(ui(), container, submenu::control_options);
+					menu::stack_push<submenu>(ui(), container(), submenu::control_options);
 				break;
 			case CGI_MENU:
 				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<menu_input_groups>(ui(), container);
+					menu::stack_push<menu_input_groups>(ui(), container());
 				break;
 			case CUSTOM_FILTER:
 				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<menu_custom_filter>(ui(), container);
+					menu::stack_push<menu_custom_filter>(ui(), container());
 				break;
 			case ADVANCED_MENU:
 				if (menu_event->iptkey == IPT_UI_SELECT)
 				{
-					menu::stack_push<submenu>(ui(), container, submenu::advanced_options);
+					menu::stack_push<submenu>(ui(), container(), submenu::advanced_options);
 					ui_globals::reset = true;
 				}
 				break;
@@ -228,7 +228,7 @@ void menu_game_options::populate()
 		std::string fbuff;
 
 		// add filter item
-		UINT32 arrow_flags = get_arrow_flags((int)FILTER_FIRST, (int)FILTER_LAST, m_main);
+		UINT32 arrow_flags = get_arrow_flags<UINT16>(FILTER_FIRST, FILTER_LAST, m_main);
 		item_append(_("Filter"), main_filters::text[m_main], arrow_flags, (void *)(FPTR)FILTER_MENU);
 
 		// add category subitem
@@ -236,12 +236,12 @@ void menu_game_options::populate()
 		{
 			inifile_manager &inif = mame_machine_manager::instance()->inifile();
 
-			arrow_flags = get_arrow_flags(0, inif.total() - 1, inif.cur_file());
+			arrow_flags = get_arrow_flags(UINT16(0), UINT16(inif.total() - 1), inif.cur_file());
 			fbuff = _(" ^!File");
 			convert_command_glyph(fbuff);
 			item_append(fbuff, inif.get_file(), arrow_flags, (void *)(FPTR)FILE_CATEGORY_FILTER);
 
-			arrow_flags = get_arrow_flags(0, inif.cat_total() - 1, inif.cur_cat());
+			arrow_flags = get_arrow_flags(UINT16(0), UINT16(inif.cat_total() - 1), inif.cur_cat());
 			fbuff = _(" ^!Category");
 			convert_command_glyph(fbuff);
 			item_append(fbuff, inif.get_category(), arrow_flags, (void *)(FPTR)CATEGORY_FILTER);
@@ -249,7 +249,7 @@ void menu_game_options::populate()
 		// add manufacturer subitem
 		else if (m_main == FILTER_MANUFACTURER && c_mnfct::ui.size() > 0)
 		{
-			arrow_flags = get_arrow_flags(0, c_mnfct::ui.size() - 1, c_mnfct::actual);
+			arrow_flags = get_arrow_flags(UINT16(0), UINT16(c_mnfct::ui.size() - 1), c_mnfct::actual);
 			fbuff = _("^!Manufacturer");
 			convert_command_glyph(fbuff);
 			item_append(fbuff, c_mnfct::ui[c_mnfct::actual], arrow_flags, (void *)(FPTR)MANUFACT_CAT_FILTER);
@@ -257,7 +257,7 @@ void menu_game_options::populate()
 		// add year subitem
 		else if (m_main == FILTER_YEAR && c_year::ui.size() > 0)
 		{
-			arrow_flags = get_arrow_flags(0, c_year::ui.size() - 1, c_year::actual);
+			arrow_flags = get_arrow_flags(UINT16(0), UINT16(c_year::ui.size() - 1), c_year::actual);
 			fbuff.assign(_("^!Year"));
 			convert_command_glyph(fbuff);
 			item_append(fbuff, c_year::ui[c_year::actual], arrow_flags, (void *)(FPTR)YEAR_CAT_FILTER);
@@ -296,7 +296,7 @@ void menu_game_options::populate()
 void menu_game_options::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	float width;
-	ui().draw_text_full(container, _("Settings"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+	ui().draw_text_full(container(), _("Settings"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 									mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
@@ -308,7 +308,7 @@ void menu_game_options::custom_render(void *selectedref, float top, float bottom
 	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -316,7 +316,7 @@ void menu_game_options::custom_render(void *selectedref, float top, float bottom
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	ui().draw_text_full(container, _("Settings"), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+	ui().draw_text_full(container(), _("Settings"), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 									mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 

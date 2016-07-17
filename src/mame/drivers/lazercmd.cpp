@@ -259,7 +259,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(lazercmd_state::lazercmd_timer)
 	{
 		m_timer_count = 0;
 		m_sense_state ^= 1;
-		m_maincpu->write_sense(m_sense_state ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(S2650_SENSE_LINE, m_sense_state ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 

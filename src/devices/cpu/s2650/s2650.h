@@ -6,6 +6,8 @@
 #define __S2650_H__
 
 
+#define S2650_SENSE_LINE INPUT_LINE_IRQ1
+
 enum
 {
 	S2650_PC=1, S2650_PS, S2650_R0, S2650_R1, S2650_R2, S2650_R3,
@@ -37,8 +39,6 @@ class s2650_device : public cpu_device
 public:
 	// construction/destruction
 	s2650_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	DECLARE_WRITE_LINE_MEMBER(write_sense);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_flag_handler(device_t &device, _Object object) { return downcast<s2650_device &>(device).m_flag_handler.set_callback(object); }

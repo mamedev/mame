@@ -140,6 +140,12 @@ endif
 ifneq ($(filter %86,$(UNAME_P)),)
 PLATFORM := x86
 endif 
+ifneq ($(filter alpha,$(UNAME_M)),)
+PLATFORM := alpha
+endif
+ifneq ($(filter alpha,$(UNAME_P)),)
+PLATFORM := alpha
+endif
 ifneq ($(filter arm%,$(UNAME_M)),)
 PLATFORM := arm
 endif 
@@ -155,6 +161,11 @@ endif
 ifneq ($(filter powerpc,$(UNAME_P)),)
 PLATFORM := powerpc
 endif 
+ifneq ($(filter mips64%,$(UNAME_M)),)
+ifeq ($(shell getconf LONG_BIT),64)
+PLATFORM := mips64
+endif
+endif
 ifeq ($(firstword $(filter Linux,$(UNAME))),Linux)
 OS := linux
 endif
@@ -753,6 +764,7 @@ SCRIPTS = scripts/genie.lua \
 	scripts/src/main.lua \
 	scripts/src/3rdparty.lua \
 	scripts/src/cpu.lua \
+	scripts/src/mame/frontend.lua \
 	scripts/src/osd/modules.lua \
 	$(wildcard scripts/src/osd/$(OSD)*.lua) \
 	scripts/src/sound.lua \

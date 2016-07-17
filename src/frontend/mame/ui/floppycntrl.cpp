@@ -20,7 +20,7 @@ namespace ui {
     IMPLEMENTATION
 ***************************************************************************/
 
-menu_control_floppy_image::menu_control_floppy_image(mame_ui_manager &mui, render_container *container, device_image_interface *_image) : menu_control_device_image(mui, container, _image)
+menu_control_floppy_image::menu_control_floppy_image(mame_ui_manager &mui, render_container &container, device_image_interface *_image) : menu_control_device_image(mui, container, _image)
 {
 	floppy_image_device *fd = static_cast<floppy_image_device *>(image);
 	const floppy_image_format_t *fif_list = fd->get_formats();
@@ -67,7 +67,7 @@ void menu_control_floppy_image::hook_load(std::string filename, bool softlist)
 	{
 		machine().popmessage("When loaded from software list, the disk is Read-only.\n");
 		image->load(filename.c_str());
-		menu::stack_pop(machine());
+		stack_pop();
 		return;
 	}
 
@@ -77,7 +77,7 @@ void menu_control_floppy_image::hook_load(std::string filename, bool softlist)
 	if (!input_format)
 	{
 		machine().popmessage("Error: %s\n", image->error());
-		menu::stack_pop(machine());
+		stack_pop();
 		return;
 	}
 
@@ -94,7 +94,7 @@ void menu_control_floppy_image::hook_load(std::string filename, bool softlist)
 			can_in_place = false;
 	}
 	submenu_result.rw = menu_select_rw::result::INVALID;
-	menu::stack_push<menu_select_rw>(ui(), container, can_in_place, submenu_result.rw);
+	menu::stack_push<menu_select_rw>(ui(), container(), can_in_place, submenu_result.rw);
 	state = SELECT_RW;
 }
 
@@ -120,7 +120,7 @@ void menu_control_floppy_image::handle()
 				format_array[total_usable++] = i;
 		}
 		submenu_result.i = -1;
-		menu::stack_push<menu_select_format>(ui(), container, format_array, ext_match, total_usable, &submenu_result.i);
+		menu::stack_push<menu_select_format>(ui(), container(), format_array, ext_match, total_usable, &submenu_result.i);
 
 		state = SELECT_FORMAT;
 		break;
@@ -134,7 +134,7 @@ void menu_control_floppy_image::handle()
 			output_filename = util::zippath_combine(m_current_directory.c_str(), m_current_file.c_str());
 			output_format = format_array[submenu_result.i];
 			do_load_create();
-			menu::stack_pop(machine());
+			stack_pop();
 		}
 		break;
 
@@ -142,22 +142,22 @@ void menu_control_floppy_image::handle()
 		switch(submenu_result.rw) {
 		case menu_select_rw::result::READONLY:
 			do_load_create();
-			menu::stack_pop(machine());
+			stack_pop();
 			break;
 
 		case menu_select_rw::result::READWRITE:
 			output_format = input_format;
 			do_load_create();
-			menu::stack_pop(machine());
+			stack_pop();
 			break;
 
 		case menu_select_rw::result::WRITE_DIFF:
 			machine().popmessage("Sorry, diffs are not supported yet\n");
-			menu::stack_pop(machine());
+			stack_pop();
 			break;
 
 		case menu_select_rw::result::WRITE_OTHER:
-			menu::stack_push<menu_file_create>(ui(), container, image, m_current_directory, m_current_file, create_ok);
+			menu::stack_push<menu_file_create>(ui(), container(), image, m_current_directory, m_current_file, create_ok);
 			state = CHECK_CREATE;
 			break;
 

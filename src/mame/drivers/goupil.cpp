@@ -455,10 +455,10 @@ static MACHINE_CONFIG_START( goupil_g1, goupil_g1_state )
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(goupil_g1_state, via_video_ca2_w))
 
 	MCFG_DEVICE_ADD("m_via_keyb", VIA6522, 0)
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6808_cpu_device, irq_line))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6808_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("m_via_modem", VIA6522, 0)
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6808_cpu_device, irq_line))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6808_IRQ_LINE))
 
 	/* Floppy */
 	MCFG_FD1791_ADD("fd1791", XTAL_8MHz )

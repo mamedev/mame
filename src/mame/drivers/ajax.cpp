@@ -21,25 +21,25 @@
 #include "includes/konamipt.h"
 
 static ADDRESS_MAP_START( ajax_main_map, AS_PROGRAM, 8, ajax_state )
-	AM_RANGE(0x0000, 0x01c0) AM_READWRITE(ajax_ls138_f10_r, ajax_ls138_f10_w)   /* bankswitch + sound command + FIRQ command */
+	AM_RANGE(0x0000, 0x01c0) AM_READWRITE(ls138_f10_r, ls138_f10_w)   /* bankswitch + sound command + FIRQ command */
 	AM_RANGE(0x0800, 0x0807) AM_DEVREADWRITE("k051960", k051960_device, k051937_r, k051937_w)                    /* sprite control registers */
 	AM_RANGE(0x0c00, 0x0fff) AM_DEVREADWRITE("k051960", k051960_device, k051960_r, k051960_w)                    /* sprite RAM 2128SL at J7 */
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")/* palette */
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("share1")                                  /* shared RAM with the 6809 */
 	AM_RANGE(0x4000, 0x5fff) AM_RAM                                             /* RAM 6264L at K10 */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank2")                                        /* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_ROM                                             /* ROM N11 */
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("mainbank")                             /* banked ROM */
+	AM_RANGE(0x8000, 0xffff) AM_ROM         /* ROM N11 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ajax_sub_map, AS_PROGRAM, 8, ajax_state )
 	AM_RANGE(0x0000, 0x07ff) AM_DEVREADWRITE("k051316", k051316_device, read, write)    /* 051316 zoom/rotation layer */
 	AM_RANGE(0x0800, 0x080f) AM_DEVWRITE("k051316", k051316_device, ctrl_w)              /* 051316 control registers */
 	AM_RANGE(0x1000, 0x17ff) AM_DEVREAD("k051316", k051316_device, rom_r)                /* 051316 (ROM test) */
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(ajax_bankswitch_2_w)          /* bankswitch control */
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(bankswitch_2_w)          /* bankswitch control */
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("share1")                      /* shared RAM with the 052001 */
 	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)        /* video RAM + color RAM + video registers */
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")                            /* banked ROM */
-	AM_RANGE(0xa000, 0xffff) AM_ROM                                 /* ROM I16 */
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("subbank")                            /* banked ROM */
+	AM_RANGE(0xa000, 0xffff) AM_ROM AM_REGION ("sub", 0x12000)     /* ROM I16 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ajax_sound_map, AS_PROGRAM, 8, ajax_state )
@@ -185,7 +185,7 @@ static MACHINE_CONFIG_START( ajax, ajax_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/3, 528, 112, 400, 256, 16, 240)
 //  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
 //  MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 396, hbend, hbstart, 256, 16, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(ajax_state, screen_update_ajax)
+	MCFG_SCREEN_UPDATE_DRIVER(ajax_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -242,15 +242,13 @@ MACHINE_CONFIG_END
 */
 
 ROM_START( ajax )
-	ROM_REGION( 0x28000, "maincpu", 0 ) /* 052001 code */
-	ROM_LOAD( "770_m01.n11",    0x10000, 0x08000, CRC(4a64e53a) SHA1(acd249bfcb5f248c41b3e40c7c1bce1b8c645d3a) )    /* banked ROM */
-	ROM_CONTINUE(               0x08000, 0x08000 )              /* fixed ROM */
-	ROM_LOAD( "770_l02.n12",    0x18000, 0x10000, CRC(ad7d592b) SHA1(c75d9696b16de231c479379dd02d33fe54021d88) )    /* banked ROM */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 052001 code */
+	ROM_LOAD( "770_m01.n11",    0x00000, 0x10000, CRC(4a64e53a) SHA1(acd249bfcb5f248c41b3e40c7c1bce1b8c645d3a) )    /* last 0x8000 fixed, first 0x8000 banked */
+	ROM_LOAD( "770_l02.n12",    0x10000, 0x10000, CRC(ad7d592b) SHA1(c75d9696b16de231c479379dd02d33fe54021d88) )    /* banked ROM */
 
-	ROM_REGION( 0x22000, "sub", 0 ) /* 64k + 72k for banked ROMs */
-	ROM_LOAD( "770_l05.i16",    0x20000, 0x02000, CRC(ed64fbb2) SHA1(429046edaf1299afa7fb9c385b4ef0c244ec2409) )    /* banked ROM */
-	ROM_CONTINUE(               0x0a000, 0x06000 )              /* fixed ROM */
-	ROM_LOAD( "770_f04.g16",    0x10000, 0x10000, CRC(e0e4ec9c) SHA1(15ae09c3ad67ec626d8178ec1417f0c57ca4eca4) )    /* banked ROM */
+	ROM_REGION( 0x18000, "sub", 0 ) /* 96k */
+	ROM_LOAD( "770_f04.g16",    0x00000, 0x10000, CRC(e0e4ec9c) SHA1(15ae09c3ad67ec626d8178ec1417f0c57ca4eca4) )    /* banked ROM */
+	ROM_LOAD( "770_l05.i16",    0x10000, 0x08000, CRC(ed64fbb2) SHA1(429046edaf1299afa7fb9c385b4ef0c244ec2409) )    /* last 0x6000 fixed, first 0x2000 banked */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the SOUND CPU */
 	ROM_LOAD( "770_h03.f16",    0x00000, 0x08000, CRC(2ffd2afc) SHA1(ca2ef684f87bcf9b70b3ec66ec80685edaf04b9b) )
@@ -308,15 +306,13 @@ ROM_START( ajax )
 ROM_END
 
 ROM_START( typhoon )
-	ROM_REGION( 0x28000, "maincpu", 0 ) /* 052001 code */
-	ROM_LOAD( "770_k01.n11",    0x10000, 0x08000, CRC(5ba74a22) SHA1(897d3309f2efb3bfa56e86581ee4a492e656788c) )    /* banked ROM */
-	ROM_CONTINUE(               0x08000, 0x08000 )              /* fixed ROM */
-	ROM_LOAD( "770_k02.n12",    0x18000, 0x10000, CRC(3bcf782a) SHA1(4b6127bced0b2519f8ad30587f32588a16368071) )    /* banked ROM */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 052001 code */
+	ROM_LOAD( "770_k01.n11",    0x00000, 0x10000, CRC(5ba74a22) SHA1(897d3309f2efb3bfa56e86581ee4a492e656788c) )    /* last 0x8000 fixed, first 0x8000 banked */
+	ROM_LOAD( "770_k02.n12",    0x10000, 0x10000, CRC(3bcf782a) SHA1(4b6127bced0b2519f8ad30587f32588a16368071) )    /* banked ROM */
 
-	ROM_REGION( 0x22000, "sub", 0 ) /* 64k + 72k for banked ROMs */
-	ROM_LOAD( "770_k05.i16",    0x20000, 0x02000, CRC(0f1bebbb) SHA1(012a8867ee0febaaadd7bcbc91e462bda5d3a411) )    /* banked ROM */
-	ROM_CONTINUE(               0x0a000, 0x06000 )              /* fixed ROM */
-	ROM_LOAD( "770_f04.g16",    0x10000, 0x10000, CRC(e0e4ec9c) SHA1(15ae09c3ad67ec626d8178ec1417f0c57ca4eca4) )    /* banked ROM */
+	ROM_REGION( 0x18000, "sub", 0 ) /* 96k */
+	ROM_LOAD( "770_f04.g16",    0x00000, 0x10000, CRC(e0e4ec9c) SHA1(15ae09c3ad67ec626d8178ec1417f0c57ca4eca4) )    /* banked ROM */
+	ROM_LOAD( "770_k05.i16",    0x10000, 0x08000, CRC(0f1bebbb) SHA1(012a8867ee0febaaadd7bcbc91e462bda5d3a411) )    /* last 0x6000 fixed, first 0x2000 banked */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the SOUND CPU */
 	ROM_LOAD( "770_h03.f16",    0x00000, 0x08000, CRC(2ffd2afc) SHA1(ca2ef684f87bcf9b70b3ec66ec80685edaf04b9b) )
@@ -344,15 +340,13 @@ ROM_START( typhoon )
 ROM_END
 
 ROM_START( ajaxj )
-	ROM_REGION( 0x28000, "maincpu", 0 ) /* 052001 code */
-	ROM_LOAD( "770_l01.n11",    0x10000, 0x08000, CRC(7cea5274) SHA1(8e3b2b11a8189e3a1703b3b4b453fbb386f5537f) )    /* banked ROM */
-	ROM_CONTINUE(               0x08000, 0x08000 )              /* fixed ROM */
-	ROM_LOAD( "770_l02.n12",    0x18000, 0x10000, CRC(ad7d592b) SHA1(c75d9696b16de231c479379dd02d33fe54021d88) )    /* banked ROM */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 052001 code */
+	ROM_LOAD( "770_l01.n11",    0x00000, 0x10000, CRC(7cea5274) SHA1(8e3b2b11a8189e3a1703b3b4b453fbb386f5537f) )    /* last 0x8000 fixed, first 0x8000 banked */
+	ROM_LOAD( "770_l02.n12",    0x10000, 0x10000, CRC(ad7d592b) SHA1(c75d9696b16de231c479379dd02d33fe54021d88) )    /* banked ROM */
 
-	ROM_REGION( 0x22000, "sub", 0 ) /* 64k + 72k for banked ROMs */
-	ROM_LOAD( "770_l05.i16",    0x20000, 0x02000, CRC(ed64fbb2) SHA1(429046edaf1299afa7fb9c385b4ef0c244ec2409) )    /* banked ROM */
-	ROM_CONTINUE(               0x0a000, 0x06000 )              /* fixed ROM */
-	ROM_LOAD( "770_f04.g16",    0x10000, 0x10000, CRC(e0e4ec9c) SHA1(15ae09c3ad67ec626d8178ec1417f0c57ca4eca4) )    /* banked ROM */
+	ROM_REGION( 0x18000, "sub", 0 ) /* 96k */
+	ROM_LOAD( "770_f04.g16",    0x00000, 0x10000, CRC(e0e4ec9c) SHA1(15ae09c3ad67ec626d8178ec1417f0c57ca4eca4) )   /* banked ROM */
+	ROM_LOAD( "770_l05.i16",    0x10000, 0x8000, CRC(ed64fbb2) SHA1(429046edaf1299afa7fb9c385b4ef0c244ec2409) )    /* last 0x6000 fixed, first 0x2000 banked */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the SOUND CPU */
 	ROM_LOAD( "770_f03.f16",    0x00000, 0x08000, CRC(3fe914fd) SHA1(c691920402bd859e2bf765084704a8bfad302cfa) )

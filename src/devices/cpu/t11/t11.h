@@ -31,6 +31,8 @@ enum
 #define MCFG_T11_INITIAL_MODE(_mode) \
 	t11_device::set_initial_mode(*device, _mode);
 
+#define MCFG_T11_RESET(_devcb) \
+	t11_device::set_out_reset_func(*device, DEVCB_##_devcb);
 
 class t11_device :  public cpu_device
 {
@@ -41,6 +43,7 @@ public:
 
 	// static configuration helpers
 	static void set_initial_mode(device_t &device, const UINT16 mode) { downcast<t11_device &>(device).c_initial_mode = mode; }
+	template<class _Object> static devcb_base &set_out_reset_func(device_t &device, _Object object) { return downcast<t11_device &>(device).m_out_reset_func.set_callback(object); }
 
 protected:
 	// device-level overrides
@@ -80,6 +83,7 @@ protected:
 	int                 m_icount;
 	address_space *m_program;
 	direct_read_data *m_direct;
+	devcb_write_line   m_out_reset_func;
 
 	inline int ROPCODE();
 	inline int RBYTE(int addr);

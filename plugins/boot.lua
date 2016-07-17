@@ -1,11 +1,31 @@
 -- license:BSD-3-Clause
 -- copyright-holders:Miodrag Milanovic
 require('lfs')
-local dir = manager:options().entries.pluginspath:value()
-package.path = dir .. "/?.lua;" .. dir .. "/?/init.lua"
+
+-- add helper to lfs for plugins to use
+function lfs.env_replace(str)
+	local pathsep = package.config:sub(1,1)
+	local function dorep(val)
+		ret = os.getenv(val)
+		if ret then
+			return ret
+		end
+		return val
+	end
+
+	if pathsep == '\\' then
+		str = str:gsub("%%(%w+)%%", dorep)
+	else
+		str = str:gsub("%$(%w+)", dorep)
+	end
+	return str
+end
+local dir = lfs.env_replace(manager:options().entries.pluginspath:value())
+
+package.path = package.path .. ";" .. dir .. "/?.lua;" .. dir .. "/?/init.lua"
 
 local json = require('json')
-function readAll(file)
+local function readAll(file)
     local f = io.open(file, "rb")
     local content = f:read("*all")
     f:close()

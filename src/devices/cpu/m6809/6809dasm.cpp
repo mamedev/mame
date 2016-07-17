@@ -453,7 +453,7 @@ CPU_DISASSEMBLE( m6809 )
 			if (pb & 0x40)
 				buffer += sprintf(buffer, "%s%s", (pb&0x3f)?",":"", (opcode==0x35)?"U":"S");
 			if (pb & 0x80)
-				buffer += sprintf(buffer, "%sPC ; (PUL? PC=RTS)", (pb&0x7f)?",":"");
+				buffer += sprintf(buffer, "%sPC", (pb&0x7f)?",":"");
 			break;
 		default:
 			// No operands

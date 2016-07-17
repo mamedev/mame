@@ -45,7 +45,7 @@ public:
 
 		// device_image_interface overrides
 	virtual bool call_load() override;
-	virtual bool call_create(int format_type, option_resolution *format_options) override;
+	virtual bool call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 	virtual std::string call_display() override;
 	virtual iodevice_t image_type() const override { return IO_MAGTAPE; }
@@ -55,7 +55,6 @@ public:
 	virtual bool must_be_loaded() const override { return false; }
 	virtual bool is_reset_on_load() const override { return false; }
 	virtual const char *file_extensions() const override;
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 		// Tape position, 1 unit = 1 inch / (968 * 1024)
 		typedef INT32 tape_pos_t;
@@ -103,7 +102,6 @@ private:
 				CMD_PH0,
 				CMD_PH1,
 				CMD_PH2,
-				CMD_PH3,
 				CMD_END,
 				CMD_STOPPING
 		} cmd_state_t;
@@ -118,6 +116,7 @@ private:
 		// Timers
 		emu_timer *m_tape_timer;
 		emu_timer *m_hole_timer;
+	emu_timer *m_timeout_timer;
 
 		// Content of tape tracks
 		tape_track_t m_tracks[ 2 ];
@@ -180,6 +179,7 @@ private:
 		attotime time_to_next_hole(void) const;
 		attotime time_to_tach_pulses(void) const;
 		void terminate_cmd_now(void);
+	void set_data_timeout(bool long_timeout);
 		void cmd_fsm(void);
 		void start_cmd_exec(UINT16 new_cmd_reg);
 };

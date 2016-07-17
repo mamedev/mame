@@ -704,41 +704,6 @@ static void m68k_cause_bus_error(m68000_base_device *m68k)
 	m68ki_jump_vector(m68k, EXCEPTION_BUS_ERROR);
 }
 
-WRITE_LINE_MEMBER( m68000_base_device::write_irq1 )
-{
-	set_input_line( M68K_IRQ_1, state );
-}
-
-WRITE_LINE_MEMBER( m68000_base_device::write_irq2 )
-{
-	set_input_line( M68K_IRQ_2, state );
-}
-
-WRITE_LINE_MEMBER( m68000_base_device::write_irq3 )
-{
-	set_input_line( M68K_IRQ_3, state );
-}
-
-WRITE_LINE_MEMBER( m68000_base_device::write_irq4 )
-{
-	set_input_line( M68K_IRQ_4, state );
-}
-
-WRITE_LINE_MEMBER( m68000_base_device::write_irq5 )
-{
-	set_input_line( M68K_IRQ_5, state );
-}
-
-WRITE_LINE_MEMBER( m68000_base_device::write_irq6 )
-{
-	set_input_line( M68K_IRQ_6, state );
-}
-
-WRITE_LINE_MEMBER( m68000_base_device::write_irq7 )
-{
-	set_input_line( M68K_IRQ_7, state );
-}
-
 bool m68000_base_device::memory_translate(address_spacenum space, int intention, offs_t &address)
 {
 	/* only applies to the program address space and only does something if the MMU's enabled */

@@ -2,12 +2,12 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-	ui/filecreate.cpp
+    ui/filecreate.cpp
 
-	MAME's clunky built-in file manager
+    MAME's clunky built-in file manager
 
-	TODO
-		- Support image creation arguments
+    TODO
+        - Support image creation arguments
 
 ***************************************************************************/
 
@@ -80,7 +80,7 @@ CONFIRM SAVE AS MENU
 //  ctor
 //-------------------------------------------------
 
-menu_confirm_save_as::menu_confirm_save_as(mame_ui_manager &mui, render_container *container, bool *yes)
+menu_confirm_save_as::menu_confirm_save_as(mame_ui_manager &mui, render_container &container, bool *yes)
 	: menu(mui, container)
 {
 	m_yes = yes;
@@ -125,7 +125,7 @@ void menu_confirm_save_as::handle()
 			*m_yes = true;
 
 		// no matter what, pop out
-		menu::stack_pop(machine());
+		stack_pop();
 	}
 }
 
@@ -139,21 +139,18 @@ FILE CREATE MENU
 //  ctor
 //-------------------------------------------------
 
-menu_file_create::menu_file_create(mame_ui_manager &mui, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool &ok)
+menu_file_create::menu_file_create(mame_ui_manager &mui, render_container &container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool &ok)
 	: menu(mui, container)
+	, m_ok(ok)
 	, m_current_directory(current_directory)
 	, m_current_file(current_file)
 	, m_current_format(nullptr)
-	, m_ok(ok)
 {
 	m_image = image;
 	m_ok = true;
-	auto const sep = current_file.rfind(PATH_SEPARATOR);
 
 	m_filename.reserve(1024);
-	m_filename = sep != std::string::npos
-		? current_file.substr(sep + strlen(PATH_SEPARATOR), current_file.size() - sep - strlen(PATH_SEPARATOR))
-		: current_file;
+	m_filename = core_filename_extract_base(current_file);
 }
 
 
@@ -189,7 +186,7 @@ void menu_file_create::populate()
 	const std::string *new_image_name;
 
 	// append the "New Image Name" item
-	if (get_selection() == ITEMREF_NEW_IMAGE_NAME)
+	if (get_selection_ref() == ITEMREF_NEW_IMAGE_NAME)
 	{
 		buffer = m_filename + "_";
 		new_image_name = &buffer;
@@ -238,7 +235,7 @@ void menu_file_create::handle()
 				if (tmp_file.find(".") != -1 && tmp_file.find(".") < tmp_file.length() - 1)
 				{
 					m_current_file = m_filename;
-					menu::stack_pop(machine());
+					stack_pop();
 				}
 				else
 					ui().popup_time(1, "%s", _("Please enter a file extension too"));
@@ -246,7 +243,7 @@ void menu_file_create::handle()
 			break;
 
 		case IPT_SPECIAL:
-			if (get_selection() == ITEMREF_NEW_IMAGE_NAME)
+			if (get_selection_ref() == ITEMREF_NEW_IMAGE_NAME)
 			{
 				input_character(m_filename, event->unichar, &osd_is_valid_filename_char);
 				reset(reset_options::REMEMBER_POSITION);
@@ -268,7 +265,7 @@ SELECT FORMAT MENU
 //  ctor
 //-------------------------------------------------
 
-menu_select_format::menu_select_format(mame_ui_manager &mui, render_container *container, floppy_image_format_t **formats, int ext_match, int total_usable, int *result)
+menu_select_format::menu_select_format(mame_ui_manager &mui, render_container &container, floppy_image_format_t **formats, int ext_match, int total_usable, int *result)
 	: menu(mui, container)
 {
 	m_formats = formats;
@@ -316,7 +313,7 @@ void menu_select_format::handle()
 	if (event != nullptr && event->iptkey == IPT_UI_SELECT)
 	{
 		*m_result = int(FPTR(event->itemref));
-		menu::stack_pop(machine());
+		stack_pop();
 	}
 }
 

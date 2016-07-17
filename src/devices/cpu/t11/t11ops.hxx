@@ -260,7 +260,7 @@ void t11_device::op_0000(UINT16 op)
 		case 0x02:  /* RTI   */ m_icount -= 24; PC = POP(); PSW = POP(); t11_check_irqs(); break;
 		case 0x03:  /* BPT   */ m_icount -= 48; PUSH(PSW); PUSH(PC); PC = RWORD(0x0c); PSW = RWORD(0x0e); t11_check_irqs(); break;
 		case 0x04:  /* IOT   */ m_icount -= 48; PUSH(PSW); PUSH(PC); PC = RWORD(0x10); PSW = RWORD(0x12); t11_check_irqs(); break;
-		case 0x05:  /* RESET */ m_icount -= 110; break;
+		case 0x05:  /* RESET */ m_out_reset_func(ASSERT_LINE); m_out_reset_func(CLEAR_LINE); m_icount -= 110; break;
 		case 0x06:  /* RTT   */ m_icount -= 33; PC = POP(); PSW = POP(); t11_check_irqs(); break;
 		default:    illegal(op); break;
 	}

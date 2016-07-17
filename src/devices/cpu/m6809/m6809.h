@@ -34,10 +34,6 @@ public:
 	// construction/destruction
 	m6809_base_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock, const device_type type, int divider, const char *shortname, const char *source);
 
-	DECLARE_WRITE_LINE_MEMBER( irq_line );
-	DECLARE_WRITE_LINE_MEMBER( firq_line );
-	DECLARE_WRITE_LINE_MEMBER( nmi_line );
-
 protected:
 	class memory_interface {
 	public:
@@ -85,6 +81,8 @@ protected:
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
+	virtual bool is_6809() { return true; };
 
 	// addressing modes
 	enum
@@ -140,13 +138,33 @@ protected:
 		VECTOR_RESET_FFFE   = 0xFFFE
 	};
 
+	union M6809Q
+	{
+		#ifdef LSB_FIRST
+			union 
+			{
+				struct { UINT8 f, e, b, a; };
+				struct { UINT16 w, d; };
+			} r;
+			struct { PAIR16 w, d; } p;
+		#else
+			union 
+			{
+				struct { UINT8 a, b, e, f; };
+				struct { UINT16 d, w; };
+			} r;
+			struct { PAIR16 d, w; } p;
+		#endif
+		UINT32 q;
+	};
+
 	// Memory interface
 	memory_interface *          m_mintf;
 
 	// CPU registers
 	PAIR16                      m_pc;               // program counter
 	PAIR16                      m_ppc;              // previous program counter
-	PAIR16                      m_d;                // accumulator a and b
+	M6809Q                      m_q;                // accumulator a and b (plus e and f on 6309)
 	PAIR16                      m_x, m_y;           // index registers
 	PAIR16                      m_u, m_s;           // stack pointers
 	UINT8                       m_dp;               // direct page register

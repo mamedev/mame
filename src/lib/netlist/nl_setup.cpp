@@ -975,7 +975,7 @@ nl_double setup_t::model_value(model_map_t &map, const pstring &entity)
 		case 'a': factor = 1e-18; break;
 		default:
 			if (numfac < "0" || numfac > "9")
-				fatalerror_e(plib::pfmt("Unknown number factor <{1}> in: {2}")(numfac)(entity));
+				nl_exception(plib::pfmt("Unknown number factor <{1}> in: {2}")(numfac)(entity));
 	}
 	if (factor != NL_FCONST(1.0))
 		tmp = tmp.left(tmp.len() - 1);

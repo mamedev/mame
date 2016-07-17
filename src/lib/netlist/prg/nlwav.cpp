@@ -49,7 +49,12 @@ public:
 	}
 	~wav_t()
 	{
-		close();
+		m_f.seek(0);
+		m_f.write(&m_fh, sizeof(m_fh));
+		m_f.write(&m_fmt, sizeof(m_fmt));
+
+		//data.len = fmt.block_align * n;
+		m_f.write(&m_data, sizeof(m_data));
 	}
 
 	unsigned channels() { return m_fmt.channels; }
@@ -62,15 +67,6 @@ public:
 		m_f.write(&ps, sizeof(ps));
 	}
 
-	void close()
-	{
-		m_f.seek(0);
-		m_f.write(&m_fh, sizeof(m_fh));
-		m_f.write(&m_fmt, sizeof(m_fmt));
-
-		//data.len = fmt.block_align * n;
-		m_f.write(&m_data, sizeof(m_data));
-	}
 private:
 	struct riff_chunk_t
 	{
@@ -129,15 +125,9 @@ private:
 static void convert(nlwav_options_t &opts)
 {
 	plib::pofilestream fo(opts.opt_out());
-	if (fo.bad())
-	{
-		throw netlist::fatalerror_e("Error opening output file: " + opts.opt_out());
-	}
 	wav_t wo(fo, 48000);
 
 	plib::pifilestream fin(opts.opt_inp());
-	if (fin.bad())
-		throw netlist::fatalerror_e("Error opening input file: " + opts.opt_inp());
 
 	double dt = 1.0 / (double) wo.sample_rate();
 	double ct = dt;
@@ -208,10 +198,6 @@ static void convert(nlwav_options_t &opts)
 	pout("Mean (static):          {}\n", means / (double) n);
 	pout("Amp + {}\n", 32000.0 / (maxsam- mean));
 	pout("Amp - {}\n", -32000.0 / (minsam- mean));
-	wo.close();
-	fo.close();
-	fin.close();
-
 }
 
 static void usage(plib::pstream_fmt_writer_t &fw, nlwav_options_t &opts)

@@ -278,19 +278,19 @@ bool datapack_device::call_load()
     DEVICE_IMAGE_CREATE( datapack )
 -------------------------------------------------*/
 
-bool datapack_device::call_create(int format_type, option_resolution *create_args)
+bool datapack_device::call_create(int format_type, util::option_resolution *create_args)
 {
 	static const UINT8 opk_head[6] = {'O', 'P', 'K', 0x00, 0x00, 0x00};
 
 	if (create_args != nullptr)
 	{
 		m_id = 0x40;
-		m_id |= (option_resolution_lookup_int(create_args, 'R')) ? 0x00 : 0x02;
-		m_id |= (option_resolution_lookup_int(create_args, 'P')) ? 0x04 : 0x00;
-		m_id |= (option_resolution_lookup_int(create_args, 'W')) ? 0x00 : 0x08;
-		m_id |= (option_resolution_lookup_int(create_args, 'B')) ? 0x00 : 0x10;
-		m_id |= (option_resolution_lookup_int(create_args, 'C')) ? 0x20 : 0x00;
-		m_size = option_resolution_lookup_int(create_args, 'S');
+		m_id |= (create_args->lookup_int('R')) ? 0x00 : 0x02;
+		m_id |= (create_args->lookup_int('P')) ? 0x04 : 0x00;
+		m_id |= (create_args->lookup_int('W')) ? 0x00 : 0x08;
+		m_id |= (create_args->lookup_int('B')) ? 0x00 : 0x10;
+		m_id |= (create_args->lookup_int('C')) ? 0x20 : 0x00;
+		m_size = create_args->lookup_int('S');
 	}
 	else
 	{

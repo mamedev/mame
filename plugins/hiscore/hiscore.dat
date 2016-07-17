@@ -12,7 +12,7 @@
 ; <gamename>,<softwarename>:
 ; for machines with softlists
 ; @<cputag>,<addressspace>,<address>,<length>,<value to wait for 
-; in the first byte/word>,<value to wait for in the last byte/word>
+; in the first byte/word>,<value to wait for in the last byte/word>,<optional prefill>
 ; [repeat the above as many times as necessary]
 ;
 ; *** All Entries Without Name Done By Me !! ( Leezer ) ;0) ***
@@ -6187,7 +6187,7 @@ ninjemak:
 
 
 dangar:
-dangar2:
+dangara:
 dangarb:
 @:maincpu,program,e209,82,00,20
 @:maincpu,program,e394,3,00,00
@@ -6295,6 +6295,12 @@ gauntlets:
 gaunt2:
 @:maincpu,program,904010,2,0,5
 @:maincpu,program,904DE8,C8,00,E3
+
+
+;@s:gb.cpp
+
+gameboy,tetris:
+@:maincpu,program,d654,32,0,0,ff
 
 
 ;@s:gberet.cpp
@@ -9550,6 +9556,12 @@ popbounc:
 ;(aero fighters 2/sonic wings 2)
 sonicwi2:
 @:maincpu,program,10000e,52,48,03
+
+
+;@s:nes.cpp
+
+nes,smb:
+@:maincpu,program,7df,4,0,0,ff
 
 
 ;@s:news.cpp

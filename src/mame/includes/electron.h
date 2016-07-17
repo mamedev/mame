@@ -76,6 +76,7 @@ public:
 		m_beeper(*this, "beeper"),
 		m_cart(*this, "cartslot"),
 		m_keybd(*this, "LINE")
+		m_exp(*this, "exp")
 	{ }
 
 	ULA m_ula;
@@ -105,6 +106,7 @@ public:
 	required_device<beep_device> m_beeper;
 	required_device<generic_slot_device> m_cart;
 	required_ioport_array<14> m_keybd;
+	required_device<electron_expansion_slot_device> m_exp;
 	inline UINT8 read_vram( UINT16 addr );
 	inline void electron_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
 	void electron_interrupt_handler(int mode, int interrupt);

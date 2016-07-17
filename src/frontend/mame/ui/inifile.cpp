@@ -313,7 +313,7 @@ bool favorite_manager::isgame_favorite(const game_driver *driver)
 //  check if game is already in favorite list
 //-------------------------------------------------
 
-bool favorite_manager::isgame_favorite(ui_software_info &swinfo)
+bool favorite_manager::isgame_favorite(ui_software_info const &swinfo)
 {
 	for (size_t x = 0; x < m_list.size(); x++)
 		if (m_list[x] == swinfo)

@@ -18,6 +18,8 @@
 #include <algorithm>
 #include <cassert>
 #include <cstring>
+#include <iterator>
+
 #include <ctype.h>
 
 
@@ -1270,20 +1272,21 @@ core_file::core_file()
     assumptions about path separators
 -------------------------------------------------*/
 
-std::string core_filename_extract_base(const char *name, bool strip_extension)
+std::string core_filename_extract_base(const std::string &name, bool strip_extension)
 {
-	/* find the start of the name */
-	const char *start = name + strlen(name);
-	while (start > name && !util::is_directory_separator(start[-1]))
-		start--;
+	// find the start of the basename
+	auto const start = std::find_if(name.rbegin(), name.rend(), [](char c) { return util::is_directory_separator(c); });
 
-	/* copy the rest into an astring */
-	std::string result(start);
+	// find the end of the basename
+	auto const chop_position = strip_extension
+		? std::find(name.rbegin(), start, '.')
+		: start;
+	auto const end = ((chop_position != start) && (std::next(chop_position) != start))
+		? std::next(chop_position)
+		: name.rbegin();
 
-	/* chop the extension if present */
-	if (strip_extension)
-		result = result.substr(0, result.find_last_of('.'));
-	return result;
+	// copy the result into an string
+	return std::string(start.base(), end.base());
 }
 
 
@@ -1292,19 +1295,20 @@ std::string core_filename_extract_base(const char *name, bool strip_extension)
     filename end with the specified extension?
 -------------------------------------------------*/
 
-int core_filename_ends_with(const char *filename, const char *extension)
+bool core_filename_ends_with(const std::string &filename, const std::string &extension)
 {
-	int namelen = strlen(filename);
-	int extlen = strlen(extension);
-	int matches = TRUE;
+	auto namelen = filename.length();
+	auto extlen = extension.length();
 
-	/* work backwards checking for a match */
-	while (extlen > 0)
+	// first if the extension is bigger than the name, we definitely don't match
+	bool matches = namelen >= extlen;
+	
+	// work backwards checking for a match
+	while (matches && extlen > 0 && namelen > 0)
+	{
 		if (tolower((UINT8)filename[--namelen]) != tolower((UINT8)extension[--extlen]))
-		{
-			matches = FALSE;
-			break;
-		}
+			matches = false;
+	}
 
 	return matches;
 }

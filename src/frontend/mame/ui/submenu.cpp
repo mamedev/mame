@@ -16,8 +16,9 @@
 
 #include <limits>
 
+
 namespace ui {
-std::vector<submenu::option> submenu::misc_options = {
+std::vector<submenu::option> const submenu::misc_options = {
 	{ submenu::option_type::HEAD, __("Miscellaneous Options") },
 	{ submenu::option_type::UI,   __("Re-select last machine played"),           OPTION_REMEMBER_LAST },
 	{ submenu::option_type::UI,   __("Enlarge images in the right panel"),       OPTION_ENLARGE_SNAPS },
@@ -34,7 +35,7 @@ std::vector<submenu::option> submenu::misc_options = {
 	{ submenu::option_type::UI,   __("Hide romless machine from available list"),OPTION_HIDE_ROMLESS },
 };
 
-std::vector<submenu::option> submenu::advanced_options = {
+std::vector<submenu::option> const submenu::advanced_options = {
 	{ submenu::option_type::HEAD, __("Advanced Options") },
 	{ submenu::option_type::HEAD, __("Performance Options") },
 	{ submenu::option_type::EMU,  __("Auto frame skip"),                         OPTION_AUTOFRAMESKIP },
@@ -83,7 +84,7 @@ std::vector<submenu::option> submenu::advanced_options = {
 	{ submenu::option_type::EMU,  __("Coin impulse"),                            OPTION_COIN_IMPULSE },
 };
 
-std::vector<submenu::option> submenu::control_options = {
+std::vector<submenu::option> const submenu::control_options = {
 	{ submenu::option_type::HEAD, __("Device Mapping") },
 	{ submenu::option_type::EMU,  __("Lightgun Device Assignment"),              OPTION_LIGHTGUN_DEVICE },
 	{ submenu::option_type::EMU,  __("Trackball Device Assignment"),             OPTION_TRACKBALL_DEVICE },
@@ -95,7 +96,7 @@ std::vector<submenu::option> submenu::control_options = {
 	{ submenu::option_type::EMU,  __("Mouse Device Assignment"),                 OPTION_MOUSE_DEVICE }
 };
 
-std::vector<submenu::option> submenu::video_options = {
+std::vector<submenu::option> const submenu::video_options = {
 	{ submenu::option_type::HEAD, __("Video Options") },
 	{ submenu::option_type::OSD,  __("Video Mode"),                              OSDOPTION_VIDEO },
 	{ submenu::option_type::OSD,  __("Number Of Screens"),                       OSDOPTION_NUMSCREENS },
@@ -113,7 +114,7 @@ std::vector<submenu::option> submenu::video_options = {
 	{ submenu::option_type::OSD,  __("Wait Vertical Sync"),                      OSDOPTION_WAITVSYNC }
 };
 
-//std::vector<submenu::option> submenu::export_options = {
+//std::vector<submenu::option> const submenu::export_options = {
 //  { ui_submenu::option_type::COMMAND, __("Export XML format (like -listxml)"),               "exportxml" },
 //  { ui_submenu::option_type::COMMAND, __("Export TXT format (like -listfull)"),              "exporttxt" },
 //};
@@ -123,9 +124,14 @@ std::vector<submenu::option> submenu::video_options = {
 //  ctor / dtor
 //-------------------------------------------------
 
-submenu::submenu(mame_ui_manager &mui, render_container *container, std::vector<option> &suboptions, const game_driver *drv, emu_options *options)
+submenu::submenu(mame_ui_manager &mui, render_container &container, std::vector<option> const &suboptions, const game_driver *drv, emu_options *options)
+	: submenu(mui, container, std::vector<option>(suboptions), drv, options)
+{
+}
+
+submenu::submenu(mame_ui_manager &mui, render_container &container, std::vector<option> &&suboptions, const game_driver *drv, emu_options *options)
 	: menu(mui, container)
-	, m_options(suboptions)
+	, m_options(std::move(suboptions))
 	, m_driver(drv)
 {
 	core_options *opts = nullptr;
@@ -138,62 +144,62 @@ submenu::submenu(mame_ui_manager &mui, render_container *container, std::vector<
 	{
 		switch (sm_option.type)
 		{
-			case option_type::EMU:
-				sm_option.entry = opts->get_entry(sm_option.name);
-				sm_option.options = opts;
-				if (sm_option.entry->type() == OPTION_STRING)
+		case option_type::EMU:
+			sm_option.entry = opts->get_entry(sm_option.name);
+			sm_option.options = opts;
+			if (sm_option.entry->type() == OPTION_STRING)
+			{
+				sm_option.value.clear();
+				std::string namestr(sm_option.entry->description());
+				int lparen = namestr.find_first_of('(', 0);
+				int vslash = namestr.find_first_of('|', lparen + 1);
+				int rparen = namestr.find_first_of(')', vslash + 1);
+				if (lparen != -1 && vslash != -1 && rparen != -1)
 				{
-					sm_option.value.clear();
-					std::string namestr(sm_option.entry->description());
-					int lparen = namestr.find_first_of('(', 0);
-					int vslash = namestr.find_first_of('|', lparen + 1);
-					int rparen = namestr.find_first_of(')', vslash + 1);
-					if (lparen != -1 && vslash != -1 && rparen != -1)
+					int semi;
+					namestr.erase(rparen);
+					namestr.erase(0, lparen + 1);
+					while ((semi = namestr.find_first_of('|')) != -1)
 					{
-						int semi;
-						namestr.erase(rparen);
-						namestr.erase(0, lparen + 1);
-						while ((semi = namestr.find_first_of('|')) != -1)
-						{
-							sm_option.value.emplace_back(namestr.substr(0, semi));
-							namestr.erase(0, semi + 1);
-						}
-						sm_option.value.emplace_back(namestr);
+						sm_option.value.emplace_back(namestr.substr(0, semi));
+						namestr.erase(0, semi + 1);
+					}
+					sm_option.value.emplace_back(namestr);
+				}
+			}
+			break;
+		case option_type::OSD:
+			sm_option.entry = opts->get_entry(sm_option.name);
+			sm_option.options = opts;
+			if (sm_option.entry->type() == OPTION_STRING)
+			{
+				sm_option.value.clear();
+				std::string descr(sm_option.entry->description()), delim(", ");
+				descr.erase(0, descr.find(":") + 2);
+				size_t p1, p2 = 0;
+				while ((p1 = descr.find_first_not_of(delim, p2)) != std::string::npos)
+				{
+					p2 = descr.find_first_of(delim, p1 + 1);
+					if (p2 != std::string::npos)
+					{
+						std::string txt(descr.substr(p1, p2 - p1));
+						if (txt != "or")
+							sm_option.value.push_back(txt);
+					}
+					else
+					{
+						sm_option.value.push_back(descr.substr(p1));
+						break;
 					}
 				}
-				break;
-			case option_type::OSD:
-				sm_option.entry = opts->get_entry(sm_option.name);
-				sm_option.options = opts;
-				if (sm_option.entry->type() == OPTION_STRING)
-				{
-					sm_option.value.clear();
-					std::string descr(sm_option.entry->description()), delim(", ");
-					descr.erase(0, descr.find(":") + 2);
-					size_t p1, p2 = 0;
-					while ((p1 = descr.find_first_not_of(delim, p2)) != std::string::npos)
-					{
-						p2 = descr.find_first_of(delim, p1 + 1);
-						if (p2 != std::string::npos)
-						{
-							std::string txt(descr.substr(p1, p2 - p1));
-							if (txt != "or")
-								sm_option.value.push_back(txt);
-						}
-						else
-						{
-							sm_option.value.push_back(descr.substr(p1));
-							break;
-						}
-					}
-				}
-				break;
-			case option_type::UI:
-				sm_option.entry = mui.options().get_entry(sm_option.name);
-				sm_option.options = dynamic_cast<core_options*>(&mui.options());
-				break;
-			default:
-				break;
+			}
+			break;
+		case option_type::UI:
+			sm_option.entry = mui.options().get_entry(sm_option.name);
+			sm_option.options = dynamic_cast<core_options*>(&mui.options());
+			break;
+		default:
+			break;
 		}
 	}
 }
@@ -380,12 +386,12 @@ void submenu::populate()
 				break;
 			case OPTION_STRING:
 				{
-					std::string v_cur(sm_option->entry->value());
-					int cur_value = std::distance(sm_option->value.begin(), std::find(sm_option->value.begin(), sm_option->value.end(), v_cur));
-					arrow_flags = get_arrow_flags(0, sm_option->value.size() - 1, cur_value);
+					std::string const v_cur(sm_option->entry->value());
+					int const cur_value = std::distance(sm_option->value.begin(), std::find(sm_option->value.begin(), sm_option->value.end(), v_cur));
+					arrow_flags = get_arrow_flags(0, int(unsigned(sm_option->value.size() - 1)), cur_value);
 					item_append(_(sm_option->description),
-						sm_option->options->value(sm_option->name),
-						arrow_flags, static_cast<void*>(&(*sm_option)));
+							sm_option->options->value(sm_option->name),
+							arrow_flags, static_cast<void*>(&(*sm_option)));
 				}
 				break;
 			default:
@@ -414,8 +420,8 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 {
 	float width;
 
-	ui().draw_text_full(container, _(m_options[0].description), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-		mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+	ui().draw_text_full(container(), _(m_options[0].description), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+			mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
 
@@ -426,7 +432,7 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -434,7 +440,7 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	ui().draw_text_full(container, _(m_options[0].description), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+	ui().draw_text_full(container(), _(m_options[0].description), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 		mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 	if (selectedref != nullptr)
@@ -442,7 +448,7 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 		option &selected_sm_option = *reinterpret_cast<option *>(selectedref);
 		if (selected_sm_option.entry != nullptr)
 		{
-			ui().draw_text_full(container, selected_sm_option.entry->description(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+			ui().draw_text_full(container(), selected_sm_option.entry->description(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 					mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 
 			width += 2 * UI_BOX_LR_BORDER;
@@ -455,7 +461,7 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 			y2 = origy2 + bottom;
 
 			// draw a box
-			ui().draw_outlined_box(container, x1, y1, x2, y2, UI_RED_COLOR);
+			ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_RED_COLOR);
 
 			// take off the borders
 			x1 += UI_BOX_LR_BORDER;
@@ -463,7 +469,7 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 			y1 += UI_BOX_TB_BORDER;
 
 			// draw the text within it
-			ui().draw_text_full(container, selected_sm_option.entry->description(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
+			ui().draw_text_full(container(), selected_sm_option.entry->description(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
 					mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 		}
 	}

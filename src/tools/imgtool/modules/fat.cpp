@@ -1931,7 +1931,7 @@ static imgtoolerr_t fat_partition_readfile(imgtool_partition *partition, const c
 
 
 
-static imgtoolerr_t fat_partition_writefile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, option_resolution *opts)
+static imgtoolerr_t fat_partition_writefile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
 	fat_file file;

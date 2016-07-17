@@ -82,7 +82,7 @@ public:
 	// image-level overrides
 	virtual bool call_load() override;
 	virtual void call_unload() override;
-	virtual bool call_create(int format_type, option_resolution *format_options) override;
+	virtual bool call_create(int format_type, util::option_resolution *format_options) override;
 	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override { return load_software(swlist, swname, start_entry); }
 	virtual const char *image_interface() const override = 0;
 	virtual iodevice_t image_type() const override { return IO_FLOPPY; }
@@ -93,7 +93,6 @@ public:
 	virtual bool must_be_loaded() const override { return false; }
 	virtual bool is_reset_on_load() const override { return false; }
 	virtual const char *file_extensions() const override { return extension_list; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 	void setup_write(floppy_image_format_t *output_format);
 
 	void setup_load_cb(load_cb cb);

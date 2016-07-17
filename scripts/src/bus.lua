@@ -583,6 +583,8 @@ if (BUSES["ELECTRON"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/electron/exp.cpp",
 		MAME_DIR .. "src/devices/bus/electron/exp.h",
+		MAME_DIR .. "src/devices/bus/electron/m2105.cpp",
+		MAME_DIR .. "src/devices/bus/electron/m2105.h",
 	}
 end
 

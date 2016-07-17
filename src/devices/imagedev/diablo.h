@@ -31,7 +31,7 @@ public:
 
 	// image-level overrides
 	virtual bool call_load() override;
-	virtual bool call_create(int create_format, option_resolution *create_args) override;
+	virtual bool call_create(int create_format, util::option_resolution *create_args) override;
 	virtual void call_unload() override;
 	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override { device().machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry ); return TRUE; }
 

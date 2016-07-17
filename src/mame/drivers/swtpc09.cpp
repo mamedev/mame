@@ -213,7 +213,7 @@ static MACHINE_CONFIG_START( swtpc09d3, swtpc09_state )
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(swtpc09_state, acia_interrupt))
-	MCFG_ACIA6850_IRQ_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
+	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(swtpc09_state, write_acia_clock))

@@ -33,9 +33,9 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-menu_software_parts::menu_software_parts(mame_ui_manager &mui, render_container *container, const software_info *info, const char *interface, const software_part **part, bool other_opt, result &result)
+menu_software_parts::menu_software_parts(mame_ui_manager &mui, render_container &container, const software_info *info, const char *interface, const software_part **part, bool other_opt, result &result)
 	: menu(mui, container),
-	  m_result(result)
+		m_result(result)
 {
 	m_info = info;
 	m_interface = interface;
@@ -110,7 +110,7 @@ void menu_software_parts::handle()
 		software_part_menu_entry *entry = (software_part_menu_entry *) event->itemref;
 		m_result = entry->type;
 		*m_selected_part = entry->part;
-		menu::stack_pop(machine());
+		stack_pop();
 	}
 }
 
@@ -123,7 +123,7 @@ void menu_software_parts::handle()
 //  ctor
 //-------------------------------------------------
 
-menu_software_list::menu_software_list(mame_ui_manager &mui, render_container *container, software_list_device *swlist, const char *interface, std::string &result)
+menu_software_list::menu_software_list(mame_ui_manager &mui, render_container &container, software_list_device *swlist, const char *interface, std::string &result)
 	: menu(mui, container), m_result(result)
 {
 	m_swlist = swlist;
@@ -244,7 +244,7 @@ void menu_software_list::handle()
 		{
 			entry_info *info = (entry_info *) event->itemref;
 			m_result = info->short_name;
-			menu::stack_pop(machine());
+			stack_pop();
 		}
 		else if (event->iptkey == IPT_SPECIAL)
 		{
@@ -276,9 +276,9 @@ void menu_software_list::handle()
 			if (update_selected)
 			{
 				// identify the selected entry
-				const entry_info *cur_selected = ((FPTR)event->itemref != 1)
-					? (const entry_info *)get_selection()
-					: nullptr;
+				entry_info const *const cur_selected = (FPTR(event->itemref) != 1)
+						? reinterpret_cast<entry_info const *>(get_selection_ref())
+						: nullptr;
 
 				// loop through all entries
 				for (auto &entry : m_entrylist)
@@ -306,7 +306,7 @@ void menu_software_list::handle()
 				if (selected_entry != nullptr && selected_entry != cur_selected)
 				{
 					set_selection((void *)selected_entry);
-					top_line = selected - (visible_lines / 2);
+					centre_selection();
 				}
 			}
 		}
@@ -316,7 +316,7 @@ void menu_software_list::handle()
 			if (m_filename_buffer[0] != '\0')
 				memset(m_filename_buffer, '\0', ARRAY_LENGTH(m_filename_buffer));
 			m_result = m_filename_buffer;
-			menu::stack_pop(machine());
+			stack_pop();
 		}
 	}
 }
@@ -331,7 +331,7 @@ void menu_software_list::handle()
 //  ctor
 //-------------------------------------------------
 
-menu_software::menu_software(mame_ui_manager &mui, render_container *container, const char *interface, software_list_device **result)
+menu_software::menu_software(mame_ui_manager &mui, render_container &container, const char *interface, software_list_device **result)
 	: menu(mui, container)
 {
 	m_interface = interface;
@@ -399,10 +399,11 @@ void menu_software::handle()
 	// process the menu
 	const event *event = process(0);
 
-	if (event != nullptr && event->iptkey == IPT_UI_SELECT) {
-		//menu::stack_push<menu_software_list>(ui(), container, (software_list_config *)event->itemref, image);
-		*m_result = (software_list_device *)event->itemref;
-		menu::stack_pop(machine());
+	if (event != nullptr && event->iptkey == IPT_UI_SELECT)
+	{
+		//menu::stack_push<menu_software_list>(ui(), container(), (software_list_config *)event->itemref, image);
+		*m_result = reinterpret_cast<software_list_device *>(event->itemref);
+		stack_pop();
 	}
 }
 

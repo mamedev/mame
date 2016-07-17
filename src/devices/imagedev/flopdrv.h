@@ -101,7 +101,7 @@ public:
 
 	virtual bool call_load() override;
 	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override {   return load_software(swlist, swname, start_entry); }
-	virtual bool call_create(int format_type, option_resolution *format_options) override;
+	virtual bool call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 
 	virtual iodevice_t image_type() const override { return IO_FLOPPY; }
@@ -162,7 +162,7 @@ private:
 	TIMER_CALLBACK_MEMBER(floppy_drive_index_callback);
 	void floppy_drive_init();
 	void floppy_drive_index_func();
-	int internal_floppy_device_load(int create_format, option_resolution *create_args);
+	int internal_floppy_device_load(int create_format, util::option_resolution *create_args);
 	TIMER_CALLBACK_MEMBER( set_wpt );
 
 protected:

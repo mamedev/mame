@@ -68,13 +68,8 @@
 
 #define TEST_ICC_NZ(x)      do { m_psr &= ~PSR_ICC_MASK; m_psr |= (x & 0x80000000) ? PSR_N_MASK : 0; m_psr |= (x == 0) ? PSR_Z_MASK : 0; } while (0)
 
-#define MAKE_PSR            do { m_psr = (m_impl << PSR_IMPL_SHIFT) | (m_ver << PSR_VER_SHIFT) | (m_icc << PSR_ICC_SHIFT) | (m_ec ? PSR_EC_MASK : 0) | (m_ef ? PSR_EF_MASK : 0) | (m_pil << PSR_PIL_SHIFT) | (m_s ? PSR_S_MASK : 0) | (m_ps ? PSR_PS_MASK : 0) | (m_et ? PSR_ET_MASK : 0) | m_cwp; } while(0)
 #define BREAK_PSR           do { m_icc = (m_psr & PSR_ICC_MASK) >> PSR_ICC_SHIFT; m_ec = m_psr & PSR_EC_MASK; m_ef = m_psr & PSR_EF_MASK; m_pil = (m_psr & PSR_PIL_MASK) >> PSR_PIL_SHIFT; m_s = m_psr & PSR_S_MASK; m_ps = m_psr & PSR_PS_MASK; m_et = m_psr & PSR_ET_MASK; m_cwp = m_psr & PSR_CWP_MASK; } while(0)
 #define MAKE_ICC            do { m_icc = (m_psr & PSR_ICC_MASK) >> PSR_ICC_SHIFT; } while(0)
-
-#define CWP                 m_cwp
-#define S                   m_s
-#define PS                  m_ps
 
 #define IS_SUPERVISOR       (m_psr & PSR_S_MASK)
 #define IS_USER             (!IS_SUPERVISOR)
@@ -144,11 +139,6 @@
 #define nPC     m_npc
 
 #define Y       m_y
-
-#define ET      m_et
-#define EF      m_ef
-#define EC      m_ec
-#define PIL     m_pil
 
 #define MAE         m_mae
 #define HOLD_BUS    m_hold_bus

@@ -174,6 +174,38 @@ void mc68681_device::update_interrupts()
 		write_irq(CLEAR_LINE);
 		m_read_vector = false;  // clear IACK too
 	}
+	if(OPCR & 0xf0)
+	{
+		if(BIT(OPCR, 4))
+		{
+			if(BIT(ISR, 1))
+				OPR |= 0x10;
+			else
+				OPR &= ~0x10;
+		}
+		if(BIT(OPCR, 5))
+		{
+			if(BIT(ISR, 5))
+				OPR |= 0x20;
+			else
+				OPR &= ~0x20;
+		}
+		if(BIT(OPCR, 6))
+		{
+			if(BIT(ISR, 0))
+				OPR |= 0x40;
+			else
+				OPR &= ~0x40;
+		}
+		if(BIT(OPCR, 7))
+		{
+			if(BIT(ISR, 4))
+				OPR |= 0x80;
+			else
+				OPR &= ~0x80;
+		}
+		write_outport(OPR ^ 0xff);
+	}
 }
 
 double mc68681_device::duart68681_get_ct_rate()
@@ -467,7 +499,7 @@ WRITE8_MEMBER( mc68681_device::write )
 			break;
 
 		case 0x0d: /* OPCR */
-			if ((data != 0x00) && ((data & 0xc) != 0x4))
+			if (((data & 0xf) != 0x00) && ((data & 0xc) != 0x4))
 				logerror( "68681 (%s): Unhandled OPCR value: %02x\n", tag(), data);
 			OPCR = data;
 			break;

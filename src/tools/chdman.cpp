@@ -2432,11 +2432,11 @@ static void do_extract_cd(parameters_t &params)
 			const cdrom_track_info &trackinfo = toc->tracks[tracknum];
 			if (mode == MODE_GDI)
 			{
-				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, core_filename_extract_base(trackbin_name.c_str()).c_str(), discoffs, outputoffs);
+				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, core_filename_extract_base(trackbin_name).c_str(), discoffs, outputoffs);
 			}
 			else
 			{
-				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, core_filename_extract_base(output_bin_file_str->c_str()).c_str(), discoffs, outputoffs);
+				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, core_filename_extract_base(*output_bin_file_str).c_str(), discoffs, outputoffs);
 			}
 
 			// If this is bin/cue output and the CHD contains subdata, warn the user and don't include

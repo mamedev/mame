@@ -156,7 +156,7 @@ void truthtable_desc_t::help(unsigned cur, plib::pstring_vector_t list,
 		{
 			// cutoff previous inputs and outputs for ignore
 			if (m_outs[nstate] != m_outs.adjust(all_set) &&  m_outs[nstate] != val)
-				fatalerror_e(plib::pfmt("Error in truthtable: State {1} already set, {2} != {3}\n")
+				nl_exception(plib::pfmt("Error in truthtable: State {1} already set, {2} != {3}\n")
 						.x(nstate,"04")(m_outs[nstate])(val) );
 			m_outs.set(nstate, val);
 			for (unsigned j=0; j<m_NO; j++)
@@ -252,7 +252,7 @@ void truthtable_desc_t::setup(const plib::pstring_vector_t &truthtable, uint_lea
 	for (size_t i=0; i<m_size; i++)
 	{
 		if (m_outs[i] == m_outs.adjust(all_set))
-			throw fatalerror_e(plib::pfmt("truthtable: found element not set {1}\n").x(i) );
+			throw nl_exception(plib::pfmt("truthtable: found element not set {1}\n").x(i) );
 		m_outs.set(i, m_outs[i] | ((ign[i] & ~disabled_ignore)  << m_NO));;
 	}
 	*m_initialized = true;

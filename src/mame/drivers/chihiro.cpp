@@ -381,9 +381,70 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 #include "includes/chihiro.h"
 #include "includes/xbox.h"
 #include "includes/xbox_usb.h"
+#include "machine/jvshost.h"
+#include "machine/jvs13551.h"
 
 #define LOG_PCI
 //#define LOG_BASEBOARD
+
+
+/////////////////////////
+extern const device_type JVS_MASTER;
+
+class jvs_master : public jvs_host
+{
+public:
+	//friend class mie_device;
+
+	// construction/destruction
+	jvs_master(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	int get_sense_line();
+	void send_packet(int destination, int length, UINT8 *data);
+	int received_packet(UINT8 *buffer);
+};
+
+const device_type JVS_MASTER = &device_creator<jvs_master>;
+
+jvs_master::jvs_master(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: jvs_host(mconfig, JVS_MASTER, "JVS MASTER", tag, owner, clock, "jvs_master", __FILE__)
+{
+}
+
+int jvs_master::get_sense_line()
+{
+	if (get_presence_line() == false)
+		return 50;
+	if (get_address_set_line() == true)
+		return 0;
+	return 25;
+}
+
+void jvs_master::send_packet(int destination, int length, UINT8 *data)
+{
+	push((UINT8)destination);
+	push((UINT8)length);
+	length--;
+	while (length > 0)
+	{
+		push(*data);
+		data++;
+		length--;
+	}
+	commit_raw();
+}
+
+int jvs_master::received_packet(UINT8 *buffer)
+{
+	UINT32 length;
+	const UINT8 *data;
+
+	get_raw_reply(data, length);
+	if (length > 0)
+		memcpy(buffer, data, length);
+	return (int)length;
+}
+
+/////////////////////////
 
 extern const device_type OHCI_HLEAN2131QC;
 
@@ -417,6 +478,15 @@ private:
 	static const UINT8 strdesc2[];
 	int maximum_send;
 	UINT8 *region;
+	struct
+	{
+		UINT8 buffer_in[32768];
+		int buffer_in_expected;
+		UINT8 buffer_out[32768];
+		int buffer_out_used;
+		int buffer_out_packets;
+		jvs_master *master;
+	} jvs;
 };
 
 const device_type OHCI_HLEAN2131QC = &device_creator<ohci_hlean2131qc_device>;
@@ -696,6 +766,10 @@ ohci_hlean2131qc_device::ohci_hlean2131qc_device(const machine_config &mconfig, 
 {
 	maximum_send = 0;
 	region = nullptr;
+	jvs.buffer_in_expected = 0;
+	jvs.buffer_out_used = 0;
+	jvs.buffer_out_packets = 0;
+	jvs.master = nullptr;
 }
 
 void ohci_hlean2131qc_device::initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager)
@@ -718,6 +792,7 @@ void ohci_hlean2131qc_device::initialize(running_machine &machine, ohci_usb_cont
 	add_string_descriptor(strdesc0);
 	add_string_descriptor(strdesc1);
 	add_string_descriptor(strdesc2);
+	jvs.master = machine.device<jvs_master>("jvs_master");
 }
 
 void ohci_hlean2131qc_device::set_region_base(UINT8 *data)
@@ -727,15 +802,26 @@ void ohci_hlean2131qc_device::set_region_base(UINT8 *data)
 
 int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
 {
+	int sense;
+
 	if (endpoint != 0)
 		return -1;
 	printf("Control request to an2131qc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
 	// default valuse for data stage
 	for (int n = 0; n < setup->wLength; n++)
 		endpoints[endpoint].buffer[n] = 0x50 ^ n;
-	endpoints[endpoint].buffer[1] = 0x4b; // PINSA register, bits 4-1 special value, must be 10 xor 15, but bit 3 is ignored since its used as the CS pin of the chip
-	endpoints[endpoint].buffer[2] = 0x52; // PINSB register, bit 4 connected to re/de pins of max485, bits 2-3 used as uart pins, bit 0 is the sense pin of the jvs connector
-	endpoints[endpoint].buffer[3] = 0x53; // OUTB register
+	sense = jvs.master->get_sense_line();
+	if (sense == 25)
+		sense = 3;
+	else
+		sense = 0; // need to check
+	// PINSA register, bits 4-1 special value, must be 10 xor 15, but bit 3 is ignored since its used as the CS pin of the chip
+	endpoints[endpoint].buffer[1] = 0x4b;
+	// PINSB register, bit 4 connected to re/de pins of max485, bits 2-3 used as uart pins, bit 0-1 is the sense pin of the jvs connector
+	// if bits 0-1 are 11, the not all the connected jvs devices have been assigned an address yet
+	endpoints[endpoint].buffer[2] = 0x52 | sense;
+	// OUTB register
+	endpoints[endpoint].buffer[3] = 0x53;
 	// bRequest is a command value
 	if (setup->bRequest == 0x16)
 	{
@@ -767,19 +853,19 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 	}
 	else if (setup->bRequest == 0x19)
 	{
-		const int tosend = 20;
 		// this command is used to retreive the jvs packets that have been received in response to the ones of 0x20
 		// data for the packets will be transferred to the host using endpoint 4 (IN)
 		// the nuber of bytes to transfer is returned at bytes 4 and 5 in the data stage of this control transfer
 		// data transferred starts with a byte with value 0, then a byte with value the number of packets received, then a block of bytes for each packet
-		// the bytes for a packet start with the jvs node address, then a dummy one, then a 16 bit number in little endian format that specifies how many bytes follow
-		// the bytes that follow contain the body of the packet as received from the jvs bus
+		// the bytes for a packet start with the jvs node address, then a dummy one (must be 0), then a 16 bit number in little endian format that specifies how many bytes follow
+		// the bytes that follow contain the body of the packet as received from the jvs bus, from the 0xa0 byte to the checksum
 		endpoints[endpoint].buffer[0] = 0; // 0 if not busy
-		endpoints[endpoint].buffer[5] = tosend >> 8; // amount to transfer with endpoint 4
-		endpoints[endpoint].buffer[4] = (tosend & 0xff);
-		endpoints[4].remain = tosend;
-		endpoints[4].position = endpoints[4].buffer;
-		memset(endpoints[4].buffer, 0, 20);
+		endpoints[endpoint].buffer[5] = jvs.buffer_out_used >> 8; // amount to transfer with endpoint 4
+		endpoints[endpoint].buffer[4] = (jvs.buffer_out_used & 0xff);
+		// the data to be sent is prepared in command 0x20
+		endpoints[4].remain = jvs.buffer_out_used;
+		endpoints[4].position = jvs.buffer_out;
+		jvs.buffer_out_used = 0;
 		endpoints[endpoint].buffer[0] = 0;
 	}
 	else if (setup->bRequest == 0x1c)
@@ -826,6 +912,16 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 		// the data for each packet contains first a byte with value 0, then the sync byte (0xe0) then all the other bytes of the packet ending with the checksum byte
 		printf(" Jvs packets data of %d bytes\n\r", setup->wIndex);
 		endpoints[endpoint].buffer[0] = 0;
+		if (jvs.buffer_out_used == 0)
+		{
+			jvs.buffer_out_packets = 0;
+			jvs.buffer_out[0] = 0;
+			jvs.buffer_out[1] = (UINT8)jvs.buffer_out_packets;
+			jvs.buffer_out_used = 2;
+		}
+		jvs.buffer_in_expected = setup->wIndex;
+		endpoints[4].remain = jvs.buffer_in_expected;
+		endpoints[4].position = jvs.buffer_in;
 	}
 	else if (setup->bRequest == 0x24)
 	{
@@ -858,7 +954,7 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, UINT8 *buffer, int size)
 {
 	printf("Bulk request: %x %d %x\n\r", endpoint, pid, size);
-	if (((endpoint == 1) || (endpoint == 2) || (endpoint == 4)) && (pid == InPid))
+	if (((endpoint == 1) || (endpoint == 2)) && (pid == InPid))
 	{
 		if (size > endpoints[endpoint].remain)
 			size = endpoints[endpoint].remain;
@@ -866,11 +962,81 @@ int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, UINT8 *buffe
 		endpoints[endpoint].position = endpoints[endpoint].position + size;
 		endpoints[endpoint].remain = endpoints[endpoint].remain - size;
 	}
+	if ((endpoint == 4) && (pid == InPid))
+	{
+		if (size > endpoints[4].remain)
+			size = endpoints[4].remain;
+		memcpy(buffer, endpoints[4].position, size);
+		endpoints[4].position = endpoints[4].position + size;
+		endpoints[4].remain = endpoints[4].remain - size;
+	}
 	if ((endpoint == 4) && (pid == OutPid))
 	{
+		if (size > endpoints[4].remain)
+			size = endpoints[4].remain;
 		for (int n = 0; n < size; n++)
-			printf(" %02x",buffer[n]);
-		printf("\n\r");
+			printf(" %02x", buffer[n]);
+		if (size > 0) {
+			memcpy(endpoints[4].position, buffer, size);
+			endpoints[4].position = endpoints[4].position + size;
+			endpoints[4].remain = endpoints[4].remain - size;
+			if (endpoints[4].remain == 0)
+			{
+				printf("\n\r");
+				// extract packets
+				int numpk = jvs.buffer_in[1];
+				int p = 2;
+
+				for (int n = 0;n < numpk;n++)
+				{
+					p++;
+					if (jvs.buffer_in[p] != 0xe0)
+						break;
+					p++;
+					int dest = jvs.buffer_in[p];
+					p++;
+					int len = jvs.buffer_in[p];
+					p++;
+					if ((p + len) > jvs.buffer_in_expected)
+						break;
+					int chk = dest + len;
+					for (int m = len - 1; m > 0; m--)
+						chk = chk + (int)jvs.buffer_in[p + m - 1];
+					chk = chk & 255;
+					if (chk != (int)jvs.buffer_in[p + len - 1])
+					{
+						p = p + len;
+						continue;
+					}
+					// use data of this packet
+					jvs.master->send_packet(dest, len, jvs.buffer_in + p);
+					// generate response
+					int recv = jvs.master->received_packet(jvs.buffer_out + jvs.buffer_out_used + 5);
+					// update buffer_out
+					if (recv > 0)
+					{
+						chk = 0;
+						for (int m = 0; m < recv; m++)
+							chk = chk + jvs.buffer_out[jvs.buffer_out_used + 5 + m];
+						jvs.buffer_out[jvs.buffer_out_used + 5 + recv] = chk & 255;
+						jvs.buffer_out_packets++;
+						// jvs node address
+						jvs.buffer_out[jvs.buffer_out_used] = jvs.buffer_out[jvs.buffer_out_used + 5];
+						// dummy
+						jvs.buffer_out[jvs.buffer_out_used + 1] = 0;
+						// length following
+						recv += 2;
+						jvs.buffer_out[jvs.buffer_out_used + 2] = recv & 255;
+						jvs.buffer_out[jvs.buffer_out_used + 3] = (recv >> 8) & 255;
+						// body
+						jvs.buffer_out[jvs.buffer_out_used + 4] = 0xe0;
+						jvs.buffer_out_used = jvs.buffer_out_used + recv + 5 - 1;
+						jvs.buffer_out[1] = (UINT8)jvs.buffer_out_packets;
+					}
+					p = p + len;
+				}
+			}
+		}
 	}
 	return size;
 }
@@ -1182,6 +1348,62 @@ static ADDRESS_MAP_START(chihiro_map_io, AS_IO, 32, chihiro_state)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(chihiro)
+	PORT_START("TILT")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_TILT)
+	PORT_BIT(0x7f, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("P1")
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_START1)
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_8WAY
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_8WAY
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_8WAY
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_8WAY
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1)
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2)
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3)
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4)
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_BUTTON5)
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_BUTTON6)
+	PORT_BIT(0x400f, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("P2")
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_START2)
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(2)
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(2)
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_PLAYER(2)
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_PLAYER(2)
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_PLAYER(2)
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_PLAYER(2)
+	PORT_BIT(0x400f, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	/* Dummy so we can easily get the analog ch # */
+	PORT_START("A0")
+	PORT_BIT(0x00ff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("A1")
+	PORT_BIT(0x01ff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("A2")
+	PORT_BIT(0x02ff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("A3")
+	PORT_BIT(0x03ff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("A4")
+	PORT_BIT(0x04ff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("A5")
+	PORT_BIT(0x05ff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("A6")
+	PORT_BIT(0x06ff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("A7")
+	PORT_BIT(0x07ff, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 void chihiro_state::machine_start()
@@ -1231,9 +1453,11 @@ static MACHINE_CONFIG_DERIVED_CLASS(chihiro_base, xbox_base, chihiro_state)
 	MCFG_DEVICE_MODIFY("ide:1")
 	MCFG_DEVICE_SLOT_INTERFACE(ide_baseboard, "bb", true)
 
-	// next line is temporary
+	// next lines are temporary
 	MCFG_DEVICE_ADD("ohci_hlean2131qc", OHCI_HLEAN2131QC, 0)
-MACHINE_CONFIG_END
+	MCFG_DEVICE_ADD("jvs_master", JVS_MASTER, 0)
+	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "jvs_master", ":TILT", ":P1", ":P2", ":A0", ":A1", ":A2", ":A3", ":A4", ":A5", ":A6", ":A7", ":OUTPUT")
+	MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(chihirogd, chihiro_base)
 	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", "^pic", nullptr, NOOP)

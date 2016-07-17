@@ -85,6 +85,12 @@ public:
 
 	template<typename T> static void add_asi_desc(device_t &device, const T &desc) { return downcast<mb86901_device &>(device).add_asi_desc(desc); }
 
+#if LOG_FCODES
+	void enable_log_fcodes(bool enable) { m_log_fcodes = enable; }
+#else
+	void enable_log_fcodes(bool /*enable*/) { }
+#endif
+
 protected:
 	template<typename T> void add_asi_desc(const T &desc) { m_dasm.add_asi_desc(desc); }
 
@@ -133,6 +139,7 @@ protected:
 #if LOG_FCODES
 	void indent();
 	void disassemble_ss1_fcode(UINT32 r5, UINT32 opcode, UINT32 handler_base, UINT32 entry_point, UINT32 stack);
+	void log_fcodes();
 #endif
 
 	// address spaces
@@ -248,6 +255,7 @@ protected:
 	UINT32 m_ss1_next_entry_point;
 	UINT32 m_ss1_next_stack;
 	std::map<UINT16, std::string> m_ss1_fcode_table;
+	bool m_log_fcodes;
 #endif
 
 	// processor configuration

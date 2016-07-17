@@ -28,59 +28,59 @@ MAIN:
 		case 0x0E:													%PULS;		return;
 		case 0x0F:													%PULU;		return;
 
-		case 0x10:				set_regop8(m_d.b.h);	set_imm();	%LD8;		return;
-		case 0x11:				set_regop8(m_d.b.l);	set_imm();	%LD8;		return;
-		case 0x12:				set_regop8(m_d.b.h);	%INDEXED;	%LD8;		return;
-		case 0x13:				set_regop8(m_d.b.l);	%INDEXED;	%LD8;		return;
-		case 0x14:				set_regop8(m_d.b.h);	set_imm();	%ADD8;		return;
-		case 0x15:				set_regop8(m_d.b.l);	set_imm();	%ADD8;		return;
-		case 0x16:				set_regop8(m_d.b.h);	%INDEXED;	%ADD8;		return;
-		case 0x17:				set_regop8(m_d.b.l);	%INDEXED;	%ADD8;		return;
-		case 0x18:				set_regop8(m_d.b.h);	set_imm();	%ADC8;		return;
-		case 0x19:				set_regop8(m_d.b.l);	set_imm();	%ADC8;		return;
-		case 0x1A:				set_regop8(m_d.b.h);	%INDEXED;	%ADC8;		return;
-		case 0x1B:				set_regop8(m_d.b.l);	%INDEXED;	%ADC8;		return;
-		case 0x1C:				set_regop8(m_d.b.h);	set_imm();	%SUB8;		return;
-		case 0x1D:				set_regop8(m_d.b.l);	set_imm();	%SUB8;		return;
-		case 0x1E:				set_regop8(m_d.b.h);	%INDEXED;	%SUB8;		return;
-		case 0x1F:				set_regop8(m_d.b.l);	%INDEXED;	%SUB8;		return;
+		case 0x10:				set_regop8(m_q.r.a);	set_imm();	%LD8;		return;
+		case 0x11:				set_regop8(m_q.r.b);	set_imm();	%LD8;		return;
+		case 0x12:				set_regop8(m_q.r.a);	%INDEXED;	%LD8;		return;
+		case 0x13:				set_regop8(m_q.r.b);	%INDEXED;	%LD8;		return;
+		case 0x14:				set_regop8(m_q.r.a);	set_imm();	%ADD8;		return;
+		case 0x15:				set_regop8(m_q.r.b);	set_imm();	%ADD8;		return;
+		case 0x16:				set_regop8(m_q.r.a);	%INDEXED;	%ADD8;		return;
+		case 0x17:				set_regop8(m_q.r.b);	%INDEXED;	%ADD8;		return;
+		case 0x18:				set_regop8(m_q.r.a);	set_imm();	%ADC8;		return;
+		case 0x19:				set_regop8(m_q.r.b);	set_imm();	%ADC8;		return;
+		case 0x1A:				set_regop8(m_q.r.a);	%INDEXED;	%ADC8;		return;
+		case 0x1B:				set_regop8(m_q.r.b);	%INDEXED;	%ADC8;		return;
+		case 0x1C:				set_regop8(m_q.r.a);	set_imm();	%SUB8;		return;
+		case 0x1D:				set_regop8(m_q.r.b);	set_imm();	%SUB8;		return;
+		case 0x1E:				set_regop8(m_q.r.a);	%INDEXED;	%SUB8;		return;
+		case 0x1F:				set_regop8(m_q.r.b);	%INDEXED;	%SUB8;		return;
 
-		case 0x20:				set_regop8(m_d.b.h);	set_imm();	%SBC8;		return;
-		case 0x21:				set_regop8(m_d.b.l);	set_imm();	%SBC8;		return;
-		case 0x22:				set_regop8(m_d.b.h);	%INDEXED;	%SBC8;		return;
-		case 0x23:				set_regop8(m_d.b.l);	%INDEXED;	%SBC8;		return;
-		case 0x24:				set_regop8(m_d.b.h);	set_imm();	%AND8;		return;
-		case 0x25:				set_regop8(m_d.b.l);	set_imm();	%AND8;		return;
-		case 0x26:				set_regop8(m_d.b.h);	%INDEXED;	%AND8;		return;
-		case 0x27:				set_regop8(m_d.b.l);	%INDEXED;	%AND8;		return;
-		case 0x28:				set_regop8(m_d.b.h);	set_imm();	%BIT8;		return;
-		case 0x29:				set_regop8(m_d.b.l);	set_imm();	%BIT8;		return;
-		case 0x2A:				set_regop8(m_d.b.h);	%INDEXED;	%BIT8;		return;
-		case 0x2B:				set_regop8(m_d.b.l);	%INDEXED;	%BIT8;		return;
-		case 0x2C:				set_regop8(m_d.b.h);	set_imm();	%EOR8;		return;
-		case 0x2D:				set_regop8(m_d.b.l);	set_imm();	%EOR8;		return;
-		case 0x2E:				set_regop8(m_d.b.h);	%INDEXED;	%EOR8;		return;
-		case 0x2F:				set_regop8(m_d.b.l);	%INDEXED;	%EOR8;		return;
+		case 0x20:				set_regop8(m_q.r.a);	set_imm();	%SBC8;		return;
+		case 0x21:				set_regop8(m_q.r.b);	set_imm();	%SBC8;		return;
+		case 0x22:				set_regop8(m_q.r.a);	%INDEXED;	%SBC8;		return;
+		case 0x23:				set_regop8(m_q.r.b);	%INDEXED;	%SBC8;		return;
+		case 0x24:				set_regop8(m_q.r.a);	set_imm();	%AND8;		return;
+		case 0x25:				set_regop8(m_q.r.b);	set_imm();	%AND8;		return;
+		case 0x26:				set_regop8(m_q.r.a);	%INDEXED;	%AND8;		return;
+		case 0x27:				set_regop8(m_q.r.b);	%INDEXED;	%AND8;		return;
+		case 0x28:				set_regop8(m_q.r.a);	set_imm();	%BIT8;		return;
+		case 0x29:				set_regop8(m_q.r.b);	set_imm();	%BIT8;		return;
+		case 0x2A:				set_regop8(m_q.r.a);	%INDEXED;	%BIT8;		return;
+		case 0x2B:				set_regop8(m_q.r.b);	%INDEXED;	%BIT8;		return;
+		case 0x2C:				set_regop8(m_q.r.a);	set_imm();	%EOR8;		return;
+		case 0x2D:				set_regop8(m_q.r.b);	set_imm();	%EOR8;		return;
+		case 0x2E:				set_regop8(m_q.r.a);	%INDEXED;	%EOR8;		return;
+		case 0x2F:				set_regop8(m_q.r.b);	%INDEXED;	%EOR8;		return;
 
-		case 0x30:				set_regop8(m_d.b.h);	set_imm();	%OR8;		return;
-		case 0x31:				set_regop8(m_d.b.l);	set_imm();	%OR8;		return;
-		case 0x32:				set_regop8(m_d.b.h);	%INDEXED;	%OR8;		return;
-		case 0x33:				set_regop8(m_d.b.l);	%INDEXED;	%OR8;		return;
-		case 0x34:				set_regop8(m_d.b.h);	set_imm();	%CMP8;		return;
-		case 0x35:				set_regop8(m_d.b.l);	set_imm();	%CMP8;		return;
-		case 0x36:				set_regop8(m_d.b.h);	%INDEXED;	%CMP8;		return;
-		case 0x37:				set_regop8(m_d.b.l);	%INDEXED;	%CMP8;		return;
+		case 0x30:				set_regop8(m_q.r.a);	set_imm();	%OR8;		return;
+		case 0x31:				set_regop8(m_q.r.b);	set_imm();	%OR8;		return;
+		case 0x32:				set_regop8(m_q.r.a);	%INDEXED;	%OR8;		return;
+		case 0x33:				set_regop8(m_q.r.b);	%INDEXED;	%OR8;		return;
+		case 0x34:				set_regop8(m_q.r.a);	set_imm();	%CMP8;		return;
+		case 0x35:				set_regop8(m_q.r.b);	set_imm();	%CMP8;		return;
+		case 0x36:				set_regop8(m_q.r.a);	%INDEXED;	%CMP8;		return;
+		case 0x37:				set_regop8(m_q.r.b);	%INDEXED;	%CMP8;		return;
 		case 0x38:										set_imm();	%SETLINE;	return;
 		case 0x39:										%INDEXED;	%SETLINE;	return;
-		case 0x3A:				set_regop8(m_d.b.h);	%INDEXED;	%ST8;		return;
-		case 0x3B:				set_regop8(m_d.b.l);	%INDEXED;	%ST8;		return;
+		case 0x3A:				set_regop8(m_q.r.a);	%INDEXED;	%ST8;		return;
+		case 0x3B:				set_regop8(m_q.r.b);	%INDEXED;	%ST8;		return;
 		case 0x3C:				set_imm();							%ANDCC;		return;
 		case 0x3D:				set_imm();							%ORCC;		return;
 		case 0x3E:													%EXG;		return;
 		case 0x3F:													%TFR;		return;
 
-		case 0x40:				set_regop16(m_d);		set_imm();	%LD16;		return;
-		case 0x41:				set_regop16(m_d);		%INDEXED;	%LD16;		return;
+		case 0x40:				set_regop16(m_q.p.d);	set_imm();	%LD16;		return;
+		case 0x41:				set_regop16(m_q.p.d);	%INDEXED;	%LD16;		return;
 		case 0x42:				set_regop16(m_x);		set_imm();	%LD16;		return;
 		case 0x43:				set_regop16(m_x);		%INDEXED;	%LD16;		return;
 		case 0x44:				set_regop16(m_y);		set_imm();	%LD16;		return;
@@ -89,8 +89,8 @@ MAIN:
 		case 0x47:				set_regop16(m_u);		%INDEXED;	%LD16;		return;
 		case 0x48:				set_regop16(m_s);		set_imm();	%LD16;		return;
 		case 0x49:				set_regop16(m_s);		%INDEXED;	%LD16;		return;
-		case 0x4A:				set_regop16(m_d);		set_imm();	%CMP16;		return;
-		case 0x4B:				set_regop16(m_d);		%INDEXED;	%CMP16;		return;
+		case 0x4A:				set_regop16(m_q.p.d);	set_imm();	%CMP16;		return;
+		case 0x4B:				set_regop16(m_q.p.d);	%INDEXED;	%CMP16;		return;
 		case 0x4C:				set_regop16(m_x);		set_imm();	%CMP16;		return;
 		case 0x4D:				set_regop16(m_x);		%INDEXED;	%CMP16;		return;
 		case 0x4E:				set_regop16(m_y);		set_imm();	%CMP16;		return;
@@ -100,11 +100,11 @@ MAIN:
 		case 0x51:				set_regop16(m_u);		%INDEXED;	%CMP16;		return;
 		case 0x52:				set_regop16(m_s);		set_imm();	%CMP16;		return;
 		case 0x53:				set_regop16(m_s);		%INDEXED;	%CMP16;		return;
-		case 0x54:				set_regop16(m_d);		set_imm();	%ADD16;		return;
-		case 0x55:				set_regop16(m_d);		%INDEXED;	%ADD16;		return;
-		case 0x56:				set_regop16(m_d);		set_imm();	%SUB16;		return;
-		case 0x57:				set_regop16(m_d);		%INDEXED;	%SUB16;		return;
-		case 0x58:				set_regop16(m_d);		%INDEXED;	%ST16;		return;
+		case 0x54:				set_regop16(m_q.p.d);	set_imm();	%ADD16;		return;
+		case 0x55:				set_regop16(m_q.p.d);	%INDEXED;	%ADD16;		return;
+		case 0x56:				set_regop16(m_q.p.d);	set_imm();	%SUB16;		return;
+		case 0x57:				set_regop16(m_q.p.d);	%INDEXED;	%SUB16;		return;
+		case 0x58:				set_regop16(m_q.p.d);	%INDEXED;	%ST16;		return;
 		case 0x59:				set_regop16(m_x);		%INDEXED;	%ST16;		return;
 		case 0x5A:				set_regop16(m_y);		%INDEXED;	%ST16;		return;
 		case 0x5B:				set_regop16(m_u);		%INDEXED;	%ST16;		return;
@@ -267,12 +267,12 @@ PUSH_REGISTERS:
 	}
 	if (m_temp.w & 0x04)
 	{
-		@write_memory(--regop16().w, m_d.b.l);
+		@write_memory(--regop16().w, m_q.r.b);
 		nop();
 	}
 	if (m_temp.w & 0x02)
 	{
-		@write_memory(--regop16().w, m_d.b.h);
+		@write_memory(--regop16().w, m_q.r.a);
 		nop();
 	}
 	if (m_temp.w & 0x01)
@@ -290,12 +290,12 @@ PULL_REGISTERS:
 	}
 	if (m_temp.w & 0x02)
 	{
-		@m_d.b.h = read_memory(regop16().w++);
+		@m_q.r.a = read_memory(regop16().w++);
 		nop();
 	}
 	if (m_temp.w & 0x04)
 	{
-		@m_d.b.l = read_memory(regop16().w++);
+		@m_q.r.b = read_memory(regop16().w++);
 		nop();
 	}
 	if (m_temp.w & 0x08)
@@ -397,19 +397,19 @@ INDEXED:
 
 		case 0xA0: case 0xB0: case 0xD0: case 0xE0: case 0xF0:
 			// relative to register A
-			m_temp.w = ireg() + (INT8) m_d.b.h;
+			m_temp.w = ireg() + (INT8) m_q.r.a;
 			@eat(1);
 			break;
 
 		case 0xA1: case 0xB1: case 0xD1: case 0xE1: case 0xF1:
 			// relative to register B
-			m_temp.w = ireg() + (INT8) m_d.b.l;
+			m_temp.w = ireg() + (INT8) m_q.r.b;
 			@eat(1);
 			break;
 
 		case 0xA7: case 0xB7: case 0xD7: case 0xE7: case 0xF7:
 			// relative to register D
-			m_temp.w = ireg() + (INT16) m_d.w;
+			m_temp.w = ireg() + (INT16) m_q.r.d;
 			@eat(4);
 			break;
 
@@ -480,7 +480,7 @@ BSET:
 	while(m_u.w != 0)
 	{
 		@eat(1);
-		@write_memory(m_x.w++, m_d.b.h);
+		@write_memory(m_x.w++, m_q.r.a);
 		m_u.w--;
 	}
 	return;
@@ -491,8 +491,8 @@ BSET2:
 	while(m_u.w != 0)
 	{
 		@eat(1);
-		@write_memory(m_x.w++, m_d.b.h);
-		@write_memory(m_x.w++, m_d.b.l);
+		@write_memory(m_x.w++, m_q.r.a);
+		@write_memory(m_x.w++, m_q.r.b);
 		m_u.w--;
 	}
 	return;
@@ -506,7 +506,7 @@ DECXJNZ:
 
 DECBJNZ:
 	// not sure if this affects V?
-	m_d.b.l = set_flags<UINT8>(CC_NZV, m_d.b.l, 1, m_d.b.l - 1);
+	m_q.r.b = set_flags<UINT8>(CC_NZV, m_q.r.b, 1, m_q.r.b - 1);
 	@eat(1);
 	set_cond(cond_ne());
 	goto BRANCH;
@@ -516,12 +516,12 @@ LSRD:
 	if (m_temp.b.l != 0x00)
 	{
 		// set C condition code
-		if (m_d.w & safe_shift_left(1, m_temp.b.l))
+		if (m_q.r.d & safe_shift_left(1, m_temp.b.l))
 			m_cc |= CC_C;
 		else
 			m_cc &= ~CC_C;
 
-		m_d.w = set_flags<UINT16>(CC_NZ, safe_shift_right_unsigned<UINT16>(m_d.w, m_temp.b.l));
+		m_q.r.d = set_flags<UINT16>(CC_NZ, safe_shift_right_unsigned<UINT16>(m_q.r.d, m_temp.b.l));
 	}
 	eat(1);
 	return;
@@ -531,12 +531,12 @@ ASLD:
 	if (m_temp.b.l != 0x00)
 	{
 		// set C condition code
-		if (m_d.w & safe_shift_right(0x10000, m_temp.b.l))
+		if (m_q.r.d & safe_shift_right(0x10000, m_temp.b.l))
 			m_cc |= CC_C;
 		else
 			m_cc &= ~CC_C;
 
-		m_d.w = set_flags<UINT16>(CC_NZV, safe_shift_left<INT16>(m_d.w, m_temp.b.l));
+		m_q.r.d = set_flags<UINT16>(CC_NZV, safe_shift_left<INT16>(m_q.r.d, m_temp.b.l));
 	}
 	eat(1);
 	return;
@@ -546,12 +546,12 @@ ASRD:
 	if (m_temp.b.l != 0x00)
 	{
 		// set C condition code
-		if (m_d.w & safe_shift_left(1, m_temp.b.l))
+		if (m_q.r.d & safe_shift_left(1, m_temp.b.l))
 			m_cc |= CC_C;
 		else
 			m_cc &= ~CC_C;
 
-		m_d.w = set_flags<UINT16>(CC_NZ, safe_shift_right<INT16>(m_d.w, m_temp.b.l));
+		m_q.r.d = set_flags<UINT16>(CC_NZ, safe_shift_right<INT16>(m_q.r.d, m_temp.b.l));
 	}
 	eat(1);
 	return;

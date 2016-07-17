@@ -82,7 +82,7 @@ done:
 
 
 
-static imgtoolerr_t ascii_writefile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, option_resolution *opts)
+static imgtoolerr_t ascii_writefile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
 	imgtool_stream *mem_stream = nullptr;

@@ -32,7 +32,7 @@ namespace ui {
     menu_keyboard_mode - menu that
 -------------------------------------------------*/
 
-menu_keyboard_mode::menu_keyboard_mode(mame_ui_manager &mui, render_container *container) : menu(mui, container)
+menu_keyboard_mode::menu_keyboard_mode(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
 }
 
@@ -69,7 +69,7 @@ void menu_keyboard_mode::handle()
     bios selection menu
 -------------------------------------------------*/
 
-menu_bios_selection::menu_bios_selection(mame_ui_manager &mui, render_container *container) : menu(mui, container)
+menu_bios_selection::menu_bios_selection(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
 }
 
@@ -142,7 +142,7 @@ void menu_bios_selection::handle()
 
 
 
-menu_network_devices::menu_network_devices(mame_ui_manager &mui, render_container *container) : menu(mui, container)
+menu_network_devices::menu_network_devices(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
 }
 
@@ -163,7 +163,7 @@ void menu_network_devices::populate()
 		int curr = network.get_interface();
 		const char *title = nullptr;
 		for(auto &entry : get_netdev_list())
-		{		
+		{
 			if(entry->id==curr) {
 				title = entry->description;
 				break;
@@ -224,7 +224,7 @@ void menu_bookkeeping::handle()
     menu_bookkeeping - handle the bookkeeping
     information menu
 -------------------------------------------------*/
-menu_bookkeeping::menu_bookkeeping(mame_ui_manager &mui, render_container *container) : menu(mui, container)
+menu_bookkeeping::menu_bookkeeping(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
 }
 
@@ -280,14 +280,13 @@ void menu_crosshair::handle()
 	/* handle events */
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
-		crosshair_user_settings settings;
 		crosshair_item_data *data = (crosshair_item_data *)menu_event->itemref;
 		bool changed = false;
 		//int set_def = false;
 		int newval = data->cur;
 
 		/* retreive the user settings */
-		machine().crosshair().get_user_settings(data->player, &settings);
+		render_crosshair &crosshair = machine().crosshair().get_crosshair(data->player);
 
 		switch (menu_event->iptkey)
 		{
@@ -321,13 +320,15 @@ void menu_crosshair::handle()
 			{
 				/* visibility state */
 				case CROSSHAIR_ITEM_VIS:
-					settings.mode = newval;
+					crosshair.set_mode(newval);
+					// set visibility as specified by mode - auto mode starts with visibility off
+					crosshair.set_visible(newval == CROSSHAIR_VISIBILITY_ON);
 					changed = true;
 					break;
 
 				/* auto time */
 				case CROSSHAIR_ITEM_AUTO_TIME:
-					settings.auto_time = newval;
+					machine().crosshair().set_auto_time(newval);
 					changed = true;
 					break;
 			}
@@ -339,18 +340,17 @@ void menu_crosshair::handle()
 			switch (menu_event->iptkey)
 			{
 				case IPT_UI_SELECT:
-					/* clear the name string to reset to default crosshair */
-					settings.name[0] = 0;
+					crosshair.set_default_bitmap();
 					changed = true;
 					break;
 
 				case IPT_UI_LEFT:
-					strcpy(settings.name, data->last_name);
+					crosshair.set_bitmap_name(data->last_name);
 					changed = true;
 					break;
 
 				case IPT_UI_RIGHT:
-					strcpy(settings.name, data->next_name);
+					crosshair.set_bitmap_name(data->next_name);
 					changed = true;
 					break;
 			}
@@ -358,9 +358,6 @@ void menu_crosshair::handle()
 
 		if (changed)
 		{
-			/* save the user settings */
-			machine().crosshair().set_user_settings(data->player, &settings);
-
 			/* rebuild the menu */
 			reset(reset_options::REMEMBER_POSITION);
 		}
@@ -373,13 +370,12 @@ void menu_crosshair::handle()
     crosshair settings menu
 -------------------------------------------------*/
 
-menu_crosshair::menu_crosshair(mame_ui_manager &mui, render_container *container) : menu(mui, container)
+menu_crosshair::menu_crosshair(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
 }
 
 void menu_crosshair::populate()
 {
-	crosshair_user_settings settings;
 	crosshair_item_data *data;
 	char temp_text[16];
 	int player;
@@ -390,16 +386,16 @@ void menu_crosshair::populate()
 	for (player = 0; player < MAX_PLAYERS; player++)
 	{
 		/* get the user settings */
-		machine().crosshair().get_user_settings(player, &settings);
+		render_crosshair &crosshair = machine().crosshair().get_crosshair(player);
 
 		/* add menu items for usable crosshairs */
-		if (settings.used)
+		if (crosshair.is_used())
 		{
 			/* Make sure to keep these matched to the CROSSHAIR_VISIBILITY_xxx types */
 			static const char *const vis_text[] = { "Off", "On", "Auto" };
 
 			/* track if we need the auto time menu */
-			if (settings.mode == CROSSHAIR_VISIBILITY_AUTO) use_auto = true;
+			if (crosshair.mode() == CROSSHAIR_VISIBILITY_AUTO) use_auto = true;
 
 			/* CROSSHAIR_ITEM_VIS - allocate a data item and fill it */
 			data = (crosshair_item_data *)m_pool_alloc(sizeof(*data));
@@ -408,7 +404,7 @@ void menu_crosshair::populate()
 			data->min = CROSSHAIR_VISIBILITY_OFF;
 			data->max = CROSSHAIR_VISIBILITY_AUTO;
 			data->defvalue = CROSSHAIR_VISIBILITY_DEFAULT;
-			data->cur = settings.mode;
+			data->cur = crosshair.mode();
 
 			/* put on arrows */
 			if (data->cur > data->min)
@@ -418,7 +414,7 @@ void menu_crosshair::populate()
 
 			/* add CROSSHAIR_ITEM_VIS menu */
 			sprintf(temp_text, "P%d Visibility", player + 1);
-			item_append(temp_text, vis_text[settings.mode], flags, data);
+			item_append(temp_text, vis_text[crosshair.mode()], flags, data);
 
 			/* CROSSHAIR_ITEM_PIC - allocate a data item and fill it */
 			data = (crosshair_item_data *)m_pool_alloc(sizeof(*data));
@@ -438,7 +434,7 @@ void menu_crosshair::populate()
 			bool found = false;
 
 			/* if we are using the default, then we just need to find the first in the list */
-			if (*(settings.name) == 0)
+			if (*crosshair.bitmap_name() == '\0')
 				using_default = true;
 
 			/* look for the current name, then remember the name before */
@@ -460,7 +456,7 @@ void menu_crosshair::populate()
 						data->next_name[length] = 0;
 						finished = true;
 					}
-					else if (!strncmp(dir->name, settings.name, length))
+					else if (!strncmp(dir->name, crosshair.bitmap_name(), length))
 					{
 						/* we found the current name */
 						/* so loop once more to find the next name */
@@ -490,21 +486,18 @@ void menu_crosshair::populate()
 
 			/* add CROSSHAIR_ITEM_PIC menu */
 			sprintf(temp_text, "P%d Crosshair", player + 1);
-			item_append(temp_text, using_default ? "DEFAULT" : settings.name, flags, data);
+			item_append(temp_text, using_default ? "DEFAULT" : crosshair.bitmap_name(), flags, data);
 		}
 	}
 	if (use_auto)
 	{
-		/* any player can be used to get the autotime */
-		machine().crosshair().get_user_settings(0, &settings);
-
 		/* CROSSHAIR_ITEM_AUTO_TIME - allocate a data item and fill it */
 		data = (crosshair_item_data *)m_pool_alloc(sizeof(*data));
 		data->type = CROSSHAIR_ITEM_AUTO_TIME;
 		data->min = CROSSHAIR_VISIBILITY_AUTOTIME_MIN;
 		data->max = CROSSHAIR_VISIBILITY_AUTOTIME_MAX;
 		data->defvalue = CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT;
-		data->cur = settings.auto_time;
+		data->cur = machine().crosshair().auto_time();
 
 		/* put on arrows in visible menu */
 		if (data->cur > data->min)
@@ -513,7 +506,7 @@ void menu_crosshair::populate()
 			flags |= FLAG_RIGHT_ARROW;
 
 		/* add CROSSHAIR_ITEM_AUTO_TIME menu */
-		sprintf(temp_text, "%d", settings.auto_time);
+		sprintf(temp_text, "%d", machine().crosshair().auto_time());
 		item_append(_("Visible Delay"), temp_text, flags, data);
 	}
 //  else
@@ -530,7 +523,7 @@ menu_crosshair::~menu_crosshair()
     quitting the game
 -------------------------------------------------*/
 
-menu_quit_game::menu_quit_game(mame_ui_manager &mui, render_container *container) : menu(mui, container)
+menu_quit_game::menu_quit_game(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
 }
 
@@ -548,15 +541,15 @@ void menu_quit_game::handle()
 	machine().schedule_exit();
 
 	/* reset the menu stack */
-	menu::stack_reset(machine());
+	stack_reset();
 }
 
 //-------------------------------------------------
 //  ctor / dtor
 //-------------------------------------------------
 
-menu_export::menu_export(mame_ui_manager &mui, render_container *container, std::vector<const game_driver *> drvlist)
-	: menu(mui, container), m_list(drvlist)
+menu_export::menu_export(mame_ui_manager &mui, render_container &container, std::vector<const game_driver *> &&drvlist)
+	: menu(mui, container), m_list(std::move(drvlist))
 {
 }
 
@@ -681,7 +674,7 @@ void menu_export::populate()
 //  ctor / dtor
 //-------------------------------------------------
 
-menu_machine_configure::menu_machine_configure(mame_ui_manager &mui, render_container *container, const game_driver *prev, float _x0, float _y0)
+menu_machine_configure::menu_machine_configure(mame_ui_manager &mui, render_container &container, const game_driver *prev, float _x0, float _y0)
 	: menu(mui, container)
 	, m_drv(prev)
 	, m_opts(mui.machine().options())
@@ -738,15 +731,15 @@ void menu_machine_configure::handle()
 					break;
 				case CONTROLLER:
 					if (menu_event->iptkey == IPT_UI_SELECT)
-						menu::stack_push<submenu>(ui(), container, submenu::control_options, m_drv, &m_opts);
+						menu::stack_push<submenu>(ui(), container(), submenu::control_options, m_drv, &m_opts);
 					break;
 				case VIDEO:
 					if (menu_event->iptkey == IPT_UI_SELECT)
-						menu::stack_push<submenu>(ui(), container, submenu::video_options, m_drv, &m_opts);
+						menu::stack_push<submenu>(ui(), container(), submenu::video_options, m_drv, &m_opts);
 					break;
 				case ADVANCED:
 					if (menu_event->iptkey == IPT_UI_SELECT)
-						menu::stack_push<submenu>(ui(), container, submenu::advanced_options, m_drv, &m_opts);
+						menu::stack_push<submenu>(ui(), container(), submenu::advanced_options, m_drv, &m_opts);
 					break;
 				default:
 					break;
@@ -773,7 +766,7 @@ void menu_machine_configure::populate()
 	item_append(_("Bios"), "", FLAG_DISABLE | FLAG_UI_HEADING, nullptr);
 	if (!m_bios.empty())
 	{
-		UINT32 arrows = get_arrow_flags(0, m_bios.size() - 1, m_curbios);
+		UINT32 arrows = get_arrow_flags(std::size_t(0), m_bios.size() - 1, m_curbios);
 		item_append(_("Driver"), m_bios[m_curbios].first, arrows, (void *)(FPTR)BIOS);
 	}
 	else
@@ -811,7 +804,7 @@ void menu_machine_configure::custom_render(void *selectedref, float top, float b
 
 	for (auto & elem : text)
 	{
-		ui().draw_text_full(container, elem.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+		ui().draw_text_full(container(), elem.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 			mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = MAX(maxwidth, width);
@@ -824,7 +817,7 @@ void menu_machine_configure::custom_render(void *selectedref, float top, float b
 	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -834,7 +827,7 @@ void menu_machine_configure::custom_render(void *selectedref, float top, float b
 	// draw the text within it
 	for (auto & elem : text)
 	{
-		ui().draw_text_full(container, elem.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+		ui().draw_text_full(container(), elem.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 			mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 		y1 += ui().get_line_height();
 	}
@@ -851,7 +844,7 @@ void menu_machine_configure::setup_bios()
 		if (ROMENTRY_ISDEFAULT_BIOS(rom))
 			default_name = ROM_GETNAME(rom);
 
-	int bios_count = 0;
+	std::size_t bios_count = 0;
 	for (const rom_entry *rom = m_drv->rom; !ROMENTRY_ISEND(rom); ++rom)
 	{
 		if (ROMENTRY_ISSYSTEM_BIOS(rom))
@@ -883,14 +876,14 @@ void menu_machine_configure::setup_bios()
 //  ctor / dtor
 //-------------------------------------------------
 
-menu_plugins_configure::menu_plugins_configure(mame_ui_manager &mui, render_container *container)
+menu_plugins_configure::menu_plugins_configure(mame_ui_manager &mui, render_container &container)
 	: menu(mui, container)
 {
 }
 
 menu_plugins_configure::~menu_plugins_configure()
 {
-	emu_file file_plugin(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file file_plugin(machine().options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	if (file_plugin.open("plugin.ini") != osd_file::error::NONE)
 		// Can't throw in a destructor, so let's ignore silently for
 		// now.  We shouldn't write files in a destructor in any case.
@@ -955,7 +948,7 @@ void menu_plugins_configure::custom_render(void *selectedref, float top, float b
 {
 	float width;
 
-	ui().draw_text_full(container, _("Plugins"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+	ui().draw_text_full(container(), _("Plugins"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 		mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
@@ -967,7 +960,7 @@ void menu_plugins_configure::custom_render(void *selectedref, float top, float b
 	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -975,7 +968,7 @@ void menu_plugins_configure::custom_render(void *selectedref, float top, float b
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	ui().draw_text_full(container, _("Plugins"), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+	ui().draw_text_full(container(), _("Plugins"), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 		mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 }
 

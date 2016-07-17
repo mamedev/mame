@@ -133,14 +133,6 @@ public:
 
 	m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_WRITE_LINE_MEMBER( write_irq1 );
-	DECLARE_WRITE_LINE_MEMBER( write_irq2 );
-	DECLARE_WRITE_LINE_MEMBER( write_irq3 );
-	DECLARE_WRITE_LINE_MEMBER( write_irq4 );
-	DECLARE_WRITE_LINE_MEMBER( write_irq5 );
-	DECLARE_WRITE_LINE_MEMBER( write_irq6 );
-	DECLARE_WRITE_LINE_MEMBER( write_irq7 );
-
 	void presave();
 	void postload();
 

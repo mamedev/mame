@@ -107,7 +107,39 @@ for num, entry in ipairs(entries) do
 	end
 end
 
-table.sort(sorted, function(a,b) if a.src and b.src then return a.src < b.src else return false end end)
+-- copyright 2010 Uli Schlachter GPLv2
+function stable_sort(list, comp)
+    -- A table could contain non-integer keys which we have to ignore.
+    local num = 0
+    for k, v in ipairs(list) do
+        num = num + 1
+    end
+
+    if num <= 1 then
+        -- Nothing to do
+        return
+    end
+
+    -- Sort until everything is sorted :)
+    local sorted = false
+    local n = num
+    while not sorted do
+        sorted = true
+        for i = 1, n - 1 do
+            -- Two equal elements won't be swapped -> we are stable
+            if comp(list[i+1], list[i]) then
+                local tmp = list[i]
+                list[i] = list[i+1]
+                list[i+1] = tmp
+
+                sorted = false
+            end
+        end
+        -- The last element is now guaranteed to be in the right spot
+        n = n - 1
+    end
+end
+stable_sort(sorted, function(a,b) if a.src and b.src then return a.src < b.src else return false end end)
 
 src = "error";
 

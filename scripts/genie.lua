@@ -982,6 +982,12 @@ end
 		end
 	end
 
+if (_OPTIONS["PLATFORM"]=="alpha") then
+	defines {
+		"PTR64=1",
+	}
+end
+
 if (_OPTIONS["PLATFORM"]=="arm") then
 	buildoptions {
 		"-Wno-cast-align",
@@ -992,6 +998,12 @@ if (_OPTIONS["PLATFORM"]=="arm64") then
 	buildoptions {
 		"-Wno-cast-align",
 	}
+	defines {
+		"PTR64=1",
+	}
+end
+
+if (_OPTIONS["PLATFORM"]=="mips64") then
 	defines {
 		"PTR64=1",
 	}

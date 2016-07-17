@@ -1101,8 +1101,8 @@ static MACHINE_CONFIG_START( by35, by35_state )
 	MCFG_PIA_READCB1_HANDLER(READLINE(by35_state, u10_cb1_r))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(by35_state, u10_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(by35_state, u10_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_z_freq", by35_state, timer_z_freq, attotime::from_hz(100)) // Mains Line Frequency * 2
 	MCFG_TIMER_DRIVER_ADD("timer_z_pulse", by35_state, timer_z_pulse)                                // Active pulse length from Zero Crossing detector
 
@@ -1114,8 +1114,8 @@ static MACHINE_CONFIG_START( by35, by35_state )
 	MCFG_PIA_READCB1_HANDLER(READLINE(by35_state, u11_cb1_r))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(by35_state, u11_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(by35_state, u11_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_d_freq", by35_state, u11_timer, attotime::from_hz(317)) // 555 timer
 	MCFG_TIMER_DRIVER_ADD("timer_d_pulse", by35_state, timer_d_pulse)                             // 555 Active pulse length
 MACHINE_CONFIG_END

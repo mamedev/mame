@@ -994,7 +994,7 @@ static imgtoolerr_t thom_write_file(imgtool_partition *part,
 					const char *filename,
 					const char *fork,
 					imgtool_stream *sourcef,
-					option_resolution *opts)
+					util::option_resolution *opts)
 {
 	int head = *( (int*) imgtool_partition_extra_bytes( part ) );
 	imgtool_image* img = imgtool_partition_image( part );
@@ -1003,7 +1003,6 @@ static imgtoolerr_t thom_write_file(imgtool_partition *part,
 	int size = stream_size( sourcef );
 	int blocks = thom_get_free_blocks( f, head );
 	char name[9], ext[4], fname[14];
-	const char* comment;
 	int is_new = 1;
 
 	if ( stream_isreadonly( f->stream ) ) return IMGTOOLERR_WRITEERROR;
@@ -1033,7 +1032,7 @@ static imgtoolerr_t thom_write_file(imgtool_partition *part,
 	memcpy( d.ext, ext, 4 );
 
 	/* file type */
-	switch ( option_resolution_lookup_int( opts, 'T' ) ) {
+	switch ( opts->lookup_int('T') ) {
 	case 0:
 	if ( ! is_new ) break;
 	if ( ! core_stricmp( ext, "BAS" ) ) d.ftype = 0;
@@ -1053,7 +1052,7 @@ static imgtoolerr_t thom_write_file(imgtool_partition *part,
 	}
 
 	/* format flag */
-	switch ( option_resolution_lookup_int( opts, 'F' ) ) {
+	switch ( opts->lookup_int('F') ) {
 	case 0:
 	if ( ! is_new ) break;
 	if ( ! core_stricmp( ext, "DAT" ) ) d.format = 0xff;
@@ -1066,9 +1065,9 @@ static imgtoolerr_t thom_write_file(imgtool_partition *part,
 	}
 
 	/* comment */
-	comment = option_resolution_lookup_string( opts, 'C' );
-	if ( comment && *comment )
-	strncpy( d.comment, comment, 8 );
+	char const *const comment = opts->lookup_string('C');
+	if (comment && *comment)
+		strncpy(d.comment, comment, 8);
 
 	/* write file */
 	thom_put_file( f, head, &d, sourcef );
@@ -1120,7 +1119,7 @@ static imgtoolerr_t thom_suggest_transfer(imgtool_partition *part,
 
 static imgtoolerr_t thom_create(imgtool_image* img,
 				imgtool_stream *stream,
-				option_resolution *opts)
+				util::option_resolution *opts)
 {
 	thom_floppy* f = (thom_floppy*) imgtool_image_extra_bytes( img );
 	int i;
@@ -1131,10 +1130,10 @@ static imgtoolerr_t thom_create(imgtool_image* img,
 	f->modified = 0;
 
 	/* get parameters */
-	f->heads = option_resolution_lookup_int( opts, 'H' );
-	f->tracks = option_resolution_lookup_int( opts, 'T' );
-	name = option_resolution_lookup_string( opts, 'N' );
-	switch ( option_resolution_lookup_int( opts, 'D' ) ) {
+	f->heads = opts->lookup_int('H');
+	f->tracks = opts->lookup_int('T');
+	name = opts->lookup_string('N');
+	switch ( opts->lookup_int('D') ) {
 	case 0: f->sector_size = 128; f->sectuse_size = 128; break;
 	case 1: f->sector_size = 256; f->sectuse_size = 255; break;
 	default: return IMGTOOLERR_PARAMCORRUPT;
@@ -1351,7 +1350,7 @@ static imgtoolerr_t thomcrypt_read_file(imgtool_partition *part,
 static imgtoolerr_t thomcrypt_write_file(imgtool_partition *part,
 						const char *name,
 						const char *fork, imgtool_stream *src,
-						option_resolution *opts)
+						util::option_resolution *opts)
 {
 	UINT8 buf[3];
 
@@ -1468,7 +1467,7 @@ static imgtoolerr_t thom_basic_write_file(imgtool_partition *part,
 						const char *name,
 						const char *fork,
 						imgtool_stream *src,
-						option_resolution *opts,
+						util::option_resolution *opts,
 						const char *const table[2][128])
 {
 	return IMGTOOLERR_UNIMPLEMENTED;
@@ -1487,7 +1486,7 @@ static imgtoolerr_t thom_basic_write_file(imgtool_partition *part,
 						const char *name,       \
 						const char *fork,       \
 						imgtool_stream *src,        \
-						option_resolution *opts)    \
+						util::option_resolution *opts)    \
 	{                                   \
 	return thom_basic_write_file( part, name, fork, src, opts, short ); \
 	}                                   \
