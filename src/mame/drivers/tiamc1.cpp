@@ -141,9 +141,9 @@ static ADDRESS_MAP_START( tiamc1_map, AS_PROGRAM, 8, tiamc1_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kotrybolov_map, AS_PROGRAM, 8, tiamc1_state )
-	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(tiamc1_videoram_w)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
+	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(kot_videoram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tiamc1_io_map, AS_IO, 8, tiamc1_state )
@@ -176,7 +176,7 @@ static ADDRESS_MAP_START( kotrybolov_io_map, AS_IO, 8, tiamc1_state )
 	AM_RANGE(0xe0, 0xef) AM_WRITE(tiamc1_palette_w)		// color ram
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(tiamc1_bg_vshift_w)	// background V scroll
 	AM_RANGE(0xf4, 0xf4) AM_WRITE(tiamc1_bg_hshift_w)	// background H scroll
-	AM_RANGE(0xf8, 0xf8) AM_WRITE(tiamc1_bankswitch_w)	// VRAM selector and character rom bank/offset ?
+	AM_RANGE(0xf8, 0xf8) AM_WRITE(kot_bankswitch_w)		// character rom offset, msb video on/off
 	AM_RANGE(0xc0, 0xc3) AM_DEVWRITE("2x8253", tiamc1_sound_device, tiamc1_timer0_w)   // TODO this PCB have single 8253
 	AM_RANGE(0xd0, 0xd0) AM_READ_PORT("IN0")
 	AM_RANGE(0xd1, 0xd1) AM_READ_PORT("IN1")
@@ -236,6 +236,38 @@ static INPUT_PORTS_START( gorodki )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( kot )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )    /* Player 0 JOYSTICK_RIGHT */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )    /* Player 2 JOYSTICK_RIGHT */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )    /* Player 3 JOYSTICK_RIGHT */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )    /* Player 0 JOYSTICK_LEFT */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )    /* Player 2 JOYSTICK_LEFT */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )    /* Player 3 JOYSTICK_LEFT */
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )    /* Player 0 JOYSTICK_UP */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )    /* Player 2 JOYSTICK_UP */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )    /* Player 3 JOYSTICK_UP */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )    /* Player 0 JOYSTICK_DOWN */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )    /* Player 2 JOYSTICK_DOWN */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin lockout */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* OUT:game counter */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* RAZR ??? */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) // Punch / Right
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // Kick / Left 
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+INPUT_PORTS_END
+
 static const gfx_layout sprites16x16_layout =
 {
 	16,16,
@@ -258,11 +290,26 @@ static const gfx_layout char_layout =
 	8*8
 };
 
+static const gfx_layout char_rom_layout =
+{
+	8,8,
+	256,
+	4,
+	{ 1024*8*8*3, 1024*8*8*2, 1024*8*8*1, 1024*8*8*0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
 static GFXDECODE_START( tiamc1 )
 	GFXDECODE_ENTRY( nullptr, 0x0000, char_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, sprites16x16_layout, 0, 16 )
 GFXDECODE_END
 
+static GFXDECODE_START( kot )
+	GFXDECODE_ENTRY( nullptr, 0x0000, char_rom_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, sprites16x16_layout, 0, 16 )
+GFXDECODE_END
 
 static MACHINE_CONFIG_START( tiamc1, tiamc1_state )
 	/* basic machine hardware */
@@ -297,6 +344,12 @@ static MACHINE_CONFIG_DERIVED(kot, tiamc1)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(kotrybolov_map)
 	MCFG_CPU_IO_MAP(kotrybolov_io_map)
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_VIDEO_START_OVERRIDE(tiamc1_state, kot)
+	MCFG_SCREEN_UPDATE_DRIVER(tiamc1_state, screen_update_kot)
+
+	MCFG_GFXDECODE_MODIFY("gfxdecode", kot)
 MACHINE_CONFIG_END
 
 
@@ -400,20 +453,21 @@ ROM_END
 // notable ICs: i8080, i8255, i8253, 3x KR573RU8 2Kx8 SRAM, 2x KR541RU2 1Kx4 RAM, 9x KR531RU8 16x4 RAM
 // tile/character generator uses ROMs instead of RAM
 ROM_START( kot )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0xc000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD( "854.6", 0x00000, 0x2000, CRC(44e5e8fc) SHA1(dafbace689f3834d5c6e952a2f6188fb190845e4) )
 	ROM_LOAD( "855.7", 0x02000, 0x2000, CRC(0bb2e4b2) SHA1(7bbb45b18e3b444e3b6006a4670453ec0792e5d3) )
 	ROM_LOAD( "856.8", 0x04000, 0x2000, CRC(9180c98f) SHA1(4085180b9e9772e965c487e7b02d88fcae973e87) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_REGION( 0x8000, "gfx1", 0 )
 	ROM_LOAD( "850.5", 0x00000, 0x2000, CRC(5dc3a102) SHA1(e97d219f7004291438b991435b7fe5d5be01d468) )	// sprite gfx
 	ROM_LOAD( "851.6", 0x02000, 0x2000, CRC(7db239a0) SHA1(af5772afff9009f63e2ab95c1cb00e047f3ed7e4) )
 	ROM_LOAD( "852.7", 0x04000, 0x2000, CRC(c7700f88) SHA1(1a20cc60b083259070e4f1687b09a31fc763d47e) )
 	ROM_LOAD( "853.8", 0x06000, 0x2000, CRC(b94bf1af) SHA1(da403c51fd78f99b82304c67f2197078f4ea0bf5) )
-	ROM_LOAD( "846.1", 0x08000, 0x2000, CRC(42447f4a) SHA1(bd35f2f5e468f9191680bf2c1800e09bb9ae1691) )	// tile gfx
-	ROM_LOAD( "847.2", 0x0a000, 0x2000, CRC(99ada5e8) SHA1(9425a515105ec9e9989aae736645b270e39420be) )
-	ROM_LOAD( "848.3", 0x0c000, 0x2000, CRC(a124cff4) SHA1(d1d8e6f725a6f30058d52cdbe80b598149cd6052) )
-	ROM_LOAD( "849.4", 0x0e000, 0x2000, CRC(5d27fda6) SHA1(f1afb39c7422caaa5eff53388f1b7241dd7c1cd7) )
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "846.1", 0x00000, 0x2000, CRC(42447f4a) SHA1(bd35f2f5e468f9191680bf2c1800e09bb9ae1691) )	// tile gfx
+	ROM_LOAD( "847.2", 0x02000, 0x2000, CRC(99ada5e8) SHA1(9425a515105ec9e9989aae736645b270e39420be) )
+	ROM_LOAD( "848.3", 0x04000, 0x2000, CRC(a124cff4) SHA1(d1d8e6f725a6f30058d52cdbe80b598149cd6052) )
+	ROM_LOAD( "849.4", 0x06000, 0x2000, CRC(5d27fda6) SHA1(f1afb39c7422caaa5eff53388f1b7241dd7c1cd7) )
 ROM_END
 
 GAME( 1988, konek,    0, tiamc1, tiamc1,  driver_device, 0, ROT0, "Terminal", "Konek-Gorbunok", MACHINE_SUPPORTS_SAVE )
@@ -421,4 +475,4 @@ GAME( 1988, sosterm,  0, tiamc1, tiamc1,  driver_device, 0, ROT0, "Terminal", "S
 GAME( 1988, koroleva, 0, tiamc1, tiamc1,  driver_device, 0, ROT0, "Terminal", "Snezhnaja Koroleva", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, bilyard,  0, tiamc1, tiamc1,  driver_device, 0, ROT0, "Terminal", "Billiard", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, gorodki,  0, tiamc1, gorodki, driver_device, 0, ROT0, "Terminal", "Gorodki", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kot,      0, kot,    tiamc1,  driver_device, 0, ROT0, "Terminal", "Kot-Rybolov", MACHINE_NOT_WORKING )
+GAME( 1988, kot,      0, kot,    kot,     driver_device, 0, ROT0, "Terminal", "Kot-Rybolov", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)

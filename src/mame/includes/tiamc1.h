@@ -33,12 +33,16 @@ public:
 	DECLARE_WRITE8_MEMBER(tiamc1_bg_vshift_w);
 	DECLARE_WRITE8_MEMBER(tiamc1_bg_hshift_w);
 	DECLARE_WRITE8_MEMBER(tiamc1_palette_w);
+	DECLARE_WRITE8_MEMBER(kot_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(kot_videoram_w);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+	DECLARE_VIDEO_START(kot);
 	DECLARE_PALETTE_INIT(tiamc1);
 	UINT32 screen_update_tiamc1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_kot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

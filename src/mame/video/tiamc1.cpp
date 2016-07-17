@@ -36,12 +36,25 @@ WRITE8_MEMBER(tiamc1_state::tiamc1_videoram_w)
 	}
 }
 
+WRITE8_MEMBER(tiamc1_state::kot_videoram_w)
+{
+	m_tileram[offset] = data;
+	m_bg_tilemap1->mark_tile_dirty(offset);
+}
+
 WRITE8_MEMBER(tiamc1_state::tiamc1_bankswitch_w)
 {
 	if ((data & 128) != (m_layers_ctrl & 128))
 		machine().tilemap().mark_all_dirty();
 
 	m_layers_ctrl = data;
+}
+
+WRITE8_MEMBER(tiamc1_state::kot_bankswitch_w)
+{
+	m_gfxdecode->gfx(0)->set_source(m_charram + (data >> 1) * 0x100);
+
+	m_layers_ctrl = data;	// bit 0 -  video enable/disable, unemulated
 }
 
 WRITE8_MEMBER(tiamc1_state::tiamc1_sprite_x_w)
@@ -154,6 +167,33 @@ void tiamc1_state::video_start()
 	m_gfxdecode->gfx(0)->set_source(m_charram);
 }
 
+VIDEO_START_MEMBER(tiamc1_state, kot)
+{
+	m_charram = memregion("gfx2")->base();
+
+	m_videoram    = make_unique_clear<UINT8[]>(0x440);
+	m_tileram     = m_videoram.get() + 0x000;
+	m_spriteram_y = m_videoram.get() + 0x400;
+	m_spriteram_x = m_videoram.get() + 0x410;
+	m_spriteram_n = m_videoram.get() + 0x420;
+	m_spriteram_a = m_videoram.get() + 0x430;
+
+	save_pointer(NAME(m_videoram.get()), 0x440);
+
+	m_bg_tilemap1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tiamc1_state::get_bg1_tile_info), this), TILEMAP_SCAN_ROWS,
+		8, 8, 32, 32);
+
+	m_bg_tilemap1->set_scrolldx(4, 4);
+
+	m_bg_vshift = 0;
+	m_bg_hshift = 0;
+
+	save_item(NAME(m_layers_ctrl));
+	save_item(NAME(m_bg_vshift));
+	save_item(NAME(m_bg_hshift));
+
+	m_gfxdecode->gfx(0)->set_source(m_charram);
+}
 void tiamc1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
@@ -198,6 +238,21 @@ UINT32 tiamc1_state::screen_update_tiamc1(screen_device &screen, bitmap_ind16 &b
 	else
 		m_bg_tilemap1->draw(screen, bitmap, cliprect, 0, 0);
 
+
+	draw_sprites(bitmap, cliprect);
+
+	return 0;
+}
+
+UINT32 tiamc1_state::screen_update_kot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int i = 0; i < 32; i++)
+		m_bg_tilemap1->set_scrolly(i, m_bg_vshift);
+
+	for (int i = 0; i < 32; i++)
+		m_bg_tilemap1->set_scrollx(i, m_bg_hshift);
+
+	m_bg_tilemap1->draw(screen, bitmap, cliprect, 0, 0);
 
 	draw_sprites(bitmap, cliprect);
 
