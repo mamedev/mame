@@ -386,7 +386,7 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 
 #define LOG_PCI
 //#define LOG_BASEBOARD
-
+//#define VERBOSE_MSG
 
 /////////////////////////
 extern const device_type JVS_MASTER;
@@ -804,9 +804,11 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 {
 	int sense;
 
+#ifdef VERBOSE_MSG
+	printf("Control request to an2131qc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
+#endif
 	if (endpoint != 0)
 		return -1;
-	printf("Control request to an2131qc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
 	// default valuse for data stage
 	for (int n = 0; n < setup->wLength; n++)
 		endpoints[endpoint].buffer[n] = 0x50 ^ n;
@@ -857,7 +859,7 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 		// data for the packets will be transferred to the host using endpoint 4 (IN)
 		// the nuber of bytes to transfer is returned at bytes 4 and 5 in the data stage of this control transfer
 		// data transferred starts with a byte with value 0, then a byte with value the number of packets received, then a block of bytes for each packet
-		// the bytes for a packet start with the jvs node address, then a dummy one (must be 0), then a 16 bit number in little endian format that specifies how many bytes follow
+		// the bytes for a packet start with the jvs node address of the sender, then a dummy one (must be 0), then a 16 bit number in little endian format that specifies how many bytes follow
 		// the bytes that follow contain the body of the packet as received from the jvs bus, from the 0xa0 byte to the checksum
 		endpoints[endpoint].buffer[0] = 0; // 0 if not busy
 		endpoints[endpoint].buffer[5] = jvs.buffer_out_used >> 8; // amount to transfer with endpoint 4
@@ -910,7 +912,10 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 		// data for the packets will be transferred from the host using endpoint 4 (OUT)
 		// data sent by the host contains first a byte with value 0 that is ignored, then a byte specifying the number of packets that follow, then the data for each packet
 		// the data for each packet contains first a byte with value 0, then the sync byte (0xe0) then all the other bytes of the packet ending with the checksum byte
+		// broadcast packets must have a destination node address of value 0xff
+#ifdef VERBOSE_MSG
 		printf(" Jvs packets data of %d bytes\n\r", setup->wIndex);
+#endif
 		endpoints[endpoint].buffer[0] = 0;
 		if (jvs.buffer_out_used == 0)
 		{
@@ -953,7 +958,9 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 
 int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, UINT8 *buffer, int size)
 {
+#ifdef VERBOSE_MSG
 	printf("Bulk request: %x %d %x\n\r", endpoint, pid, size);
+#endif
 	if (((endpoint == 1) || (endpoint == 2)) && (pid == InPid))
 	{
 		if (size > endpoints[endpoint].remain)
@@ -974,15 +981,19 @@ int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, UINT8 *buffe
 	{
 		if (size > endpoints[4].remain)
 			size = endpoints[4].remain;
+#ifdef VERBOSE_MSG
 		for (int n = 0; n < size; n++)
 			printf(" %02x", buffer[n]);
+#endif
 		if (size > 0) {
 			memcpy(endpoints[4].position, buffer, size);
 			endpoints[4].position = endpoints[4].position + size;
 			endpoints[4].remain = endpoints[4].remain - size;
 			if (endpoints[4].remain == 0)
 			{
+#ifdef VERBOSE_MSG
 				printf("\n\r");
+#endif
 				// extract packets
 				int numpk = jvs.buffer_in[1];
 				int p = 2;
@@ -1011,6 +1022,8 @@ int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, UINT8 *buffe
 					// use data of this packet
 					jvs.master->send_packet(dest, len, jvs.buffer_in + p);
 					// generate response
+					if (dest == 0xff)
+						dest = 0;
 					int recv = jvs.master->received_packet(jvs.buffer_out + jvs.buffer_out_used + 5);
 					// update buffer_out
 					if (recv > 0)
@@ -1021,7 +1034,7 @@ int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, UINT8 *buffe
 						jvs.buffer_out[jvs.buffer_out_used + 5 + recv] = chk & 255;
 						jvs.buffer_out_packets++;
 						// jvs node address
-						jvs.buffer_out[jvs.buffer_out_used] = jvs.buffer_out[jvs.buffer_out_used + 5];
+						jvs.buffer_out[jvs.buffer_out_used] = (UINT8)dest;
 						// dummy
 						jvs.buffer_out[jvs.buffer_out_used + 1] = 0;
 						// length following
@@ -1085,9 +1098,11 @@ void ohci_hlean2131sc_device::initialize(running_machine &machine, ohci_usb_cont
 
 int ohci_hlean2131sc_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
 {
+//#ifdef VERBOSE_MSG
+	printf("Control request to an2131sc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
+//#endif
 	if (endpoint != 0)
 		return -1;
-	printf("Control request to an2131sc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
 	for (int n = 0; n < setup->wLength; n++)
 		endpoints[endpoint].buffer[n] = 0xa0 ^ n;
 	endpoints[endpoint].position = endpoints[endpoint].buffer;
