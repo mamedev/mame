@@ -682,4 +682,4 @@ GAME( 1983, theglob3, suprglob, epos,   suprglob, driver_device, 0,       ROT270
 GAME( 1984, igmo,     0,        epos,   igmo, driver_device,     0,       ROT270, "Epos Corporation", "IGMO", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, dealer,   0,        dealer, dealer, epos_state,   dealer,   ROT270, "Epos Corporation", "The Dealer", MACHINE_WRONG_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, revenger, 0,        dealer, dealer, epos_state,   dealer,   ROT270, "Epos Corporation", "Revenger", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, beastf,   0,        dealer, beastf, epos_state,   dealer,   ROT270, "Epos Corporation", "Beaste Feastie", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, beastf,   suprglob, dealer, beastf, epos_state,   dealer,   ROT270, "Epos Corporation", "Beaste Feastie", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
