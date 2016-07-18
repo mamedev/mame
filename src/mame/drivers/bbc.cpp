@@ -752,6 +752,19 @@ static INPUT_PORTS_START(bbcm)
 	PORT_INCLUDE(bbc_joy)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(ltmpbp)
+	PORT_INCLUDE(bbc_keyboard)
+	PORT_INCLUDE(bbc_dipswitch)
+	PORT_INCLUDE(bbcbp_links)
+	PORT_INCLUDE(bbc_joy)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(ltmpm)
+	PORT_INCLUDE(bbc_keyboard)
+	PORT_INCLUDE(bbc_keypad)
+	PORT_INCLUDE(bbc_joy)
+INPUT_PORTS_END
+
 
 INTERRUPT_GEN_MEMBER(bbc_state::bbcb_vsync)
 {
@@ -1498,6 +1511,26 @@ static MACHINE_CONFIG_DERIVED(pro128s, bbcmc)
 MACHINE_CONFIG_END
 
 
+/***************************************************************************
+
+    LTM Portables
+
+****************************************************************************/
+
+/* Both LTM machines used a 9" Hantarex MT3000 green monitor */
+
+static MACHINE_CONFIG_DERIVED(ltmpbp, bbcbp)
+	/* basic machine hardware */
+	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, ltmpbp)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED(ltmpm, bbcm)
+	/* basic machine hardware */
+	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, ltmpm)
+MACHINE_CONFIG_END
+
+
 /* the BBC came with 4 rom sockets on the motherboard as shown in the model A driver */
 /* you could get a number of rom upgrade boards that took this up to 16 roms as in the */
 /* model B driver */
@@ -2157,6 +2190,11 @@ ROM_START(pro128s)
 	//  ROM_LOAD("mos510o.epr", 0x00, 0x80, CRC(d8458039) SHA1(72c056d493e74ceca41f48936012b012b496a226))
 ROM_END
 
+
+#define rom_ltmpbp rom_bbcbp
+#define rom_ltmpm rom_bbcm
+
+
 /*     YEAR  NAME      PARENT   COMPAT MACHINE   INPUT   CLASS        INIT     COMPANY            FULLNAME                         FLAGS */
 COMP ( 1981, bbcb,     0,       bbca,  bbcb,     bbcb,   bbc_state,   bbc,     "Acorn",           "BBC Micro Model B w/8271 FDC",  MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1981, bbca,     bbcb,    0,     bbca,     bbca,   bbc_state,   bbc,     "Acorn",           "BBC Micro Model A",             MACHINE_IMPERFECT_GRAPHICS)
@@ -2171,6 +2209,7 @@ COMP ( 1985, bbcbp128, bbcbp,   0,     bbcbp128, bbcbp,  bbc_state,   bbc,     "
 COMP ( 1985, abc110,   bbcbp,   0,     abc110,   abc,    bbc_state,   bbc,     "Acorn",           "ABC 110",                       MACHINE_NOT_WORKING)
 COMP ( 1985, acw443,   bbcbp,   0,     acw443,   abc,    bbc_state,   bbc,     "Acorn",           "ABC 210/Cambridge Workstation", MACHINE_NOT_WORKING)
 COMP ( 1985, abc310,   bbcbp,   0,     abc310,   abc,    bbc_state,   bbc,     "Acorn",           "ABC 310",                       MACHINE_NOT_WORKING)
+COMP ( 1985, ltmpbp,   bbcbp,   0,     ltmpbp,   ltmpbp, bbc_state,   bbc,     "Lawrie T&M Ltd.", "LTM Portable (B+)",             MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1985, reutapm,  bbcbp,   0,     reutapm,  bbcb,   bbc_state,   bbc,     "Acorn",           "Reuters APM",                   MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
 COMP ( 1986, bbcm,     0,       bbcb,  bbcm,     bbcm,   bbc_state,   bbc,     "Acorn",           "BBC Master 128",                MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1986, bbcmt,    bbcm,    0,     bbcmt,    bbcm,   bbc_state,   bbc,     "Acorn",           "BBC Master Turbo",              MACHINE_NOT_WORKING)
@@ -2178,6 +2217,7 @@ COMP ( 1986, bbcmaiv,  bbcm,    0,     bbcmaiv,  bbcm,   bbc_state,   bbc,     "
 COMP ( 1986, bbcmet,   bbcm,    0,     bbcmet,   bbcm,   bbc_state,   bbc,     "Acorn",           "BBC Master ET",                 MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1986, bbcm512,  bbcm,    0,     bbcm512,  bbcm,   bbc_state,   bbc,     "Acorn",           "BBC Master 512",                MACHINE_NOT_WORKING)
 COMP ( 1986, bbcmarm,  bbcm,    0,     bbcmarm,  bbcm,   bbc_state,   bbc,     "Acorn",           "ARM Evaluation System",         MACHINE_NOT_WORKING)
+COMP ( 1986, ltmpm,    bbcm,    0,     ltmpm,    ltmpm,  bbc_state,   bbc,     "Lawrie T&M Ltd.", "LTM Portable (Master)",         MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1986, bbcmc,    0,       bbcm,  bbcmc,    bbcm,   bbc_state,   bbc,     "Acorn",           "BBC Master Compact",            MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1986, bbcmc_ar, bbcmc,   0,     bbcmc,    bbcm,   bbc_state,   bbc,     "Acorn",           "BBC Master Compact (Arabic)",   MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1987, pro128s,  bbcmc,   0,     pro128s,  bbcm,   bbc_state,   bbc,     "Olivetti",        "Prodest PC 128S",               MACHINE_IMPERFECT_GRAPHICS)

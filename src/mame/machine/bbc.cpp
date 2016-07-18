@@ -1793,7 +1793,7 @@ MACHINE_RESET_MEMBER(bbc_state, torch)
 {
 	MACHINE_RESET_CALL_MEMBER(bbcb);
 
-	m_monitortype = 0;
+	m_monitortype = monitor_type_t::COLOUR;
 	m_Speech      = 1;
 	m_SWRAMtype   = 0;
 }
@@ -1869,4 +1869,23 @@ MACHINE_START_MEMBER(bbc_state, bbcmc)
 MACHINE_RESET_MEMBER(bbc_state, bbcmc)
 {
 	MACHINE_RESET_CALL_MEMBER(bbcm);
+}
+
+
+MACHINE_RESET_MEMBER(bbc_state, ltmpbp)
+{
+	MACHINE_RESET_CALL_MEMBER(bbcbp);
+
+	m_monitortype = monitor_type_t::GREEN;
+	m_Speech      = 1;
+	m_SWRAMtype   = 0;
+}
+
+MACHINE_RESET_MEMBER(bbc_state, ltmpm)
+{
+	MACHINE_RESET_CALL_MEMBER(bbcm);
+
+	m_monitortype = monitor_type_t::GREEN;
+	m_Speech      = 0;
+	m_SWRAMtype   = 0;
 }
