@@ -855,7 +855,7 @@ Notes:
 #include "sound/ymf271.h"
 #include "sound/ymz280b.h"
 #include "machine/seibuspi.h"
-#include "machine/spisprit.h"
+#include "video/seibu_crtc.h"
 #include "includes/seibuspi.h"
 
 // default values written to CRTC (note: SYS386F does not have this chip)
@@ -969,10 +969,7 @@ WRITE32_MEMBER(seibuspi_state::ejsakura_input_select_w)
 
 
 static ADDRESS_MAP_START( base_map, AS_PROGRAM, 32, seibuspi_state )
-	AM_RANGE(0x00000414, 0x00000417) AM_WRITENOP // bg gfx decryption key, see machine/seibuspi.c
-	AM_RANGE(0x00000418, 0x0000041b) AM_READWRITE(spi_layer_bank_r, spi_layer_bank_w)
-	AM_RANGE(0x0000041c, 0x0000041f) AM_WRITE(spi_layer_enable_w) // seibu crtc
-	AM_RANGE(0x00000420, 0x0000042b) AM_RAM AM_SHARE("scrollram") // seibu crtc
+	AM_RANGE(0x00000400, 0x0000043f) AM_DEVREADWRITE16("crtc", seibu_crtc_device, read, write, 0xffffffff)
 	AM_RANGE(0x00000480, 0x00000483) AM_WRITE(tilemap_dma_start_w)
 	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
 	AM_RANGE(0x00000490, 0x00000493) AM_WRITE(video_dma_length_w)
@@ -988,6 +985,7 @@ static ADDRESS_MAP_START( base_map, AS_PROGRAM, 32, seibuspi_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sei252_map, AS_PROGRAM, 32, seibuspi_state )
+	//AM_RANGE(0x00000500, 0x0000057f) AM_DEVREADWRITE16("obj", sei252_device, read_xor, write_xor, 0xffffffff)
 	AM_RANGE(0x0000050c, 0x0000050f) AM_WRITE16(sprite_dma_start_w, 0xffff0000)
 	AM_RANGE(0x00000524, 0x00000527) AM_WRITENOP // SEI252 sprite decryption key, see machine/spisprit.c
 	AM_RANGE(0x00000528, 0x0000052b) AM_WRITENOP // SEI252 sprite decryption unknown
@@ -997,6 +995,7 @@ static ADDRESS_MAP_START( sei252_map, AS_PROGRAM, 32, seibuspi_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rise_map, AS_PROGRAM, 32, seibuspi_state )
+	//AM_RANGE(0x00000500, 0x0000057f) AM_DEVREADWRITE16("obj", seibu_encrypted_sprite_device, read, write, 0xffffffff)
 	AM_RANGE(0x0000054c, 0x0000054f) AM_WRITENOP // RISE10/11 sprite decryption key, see machine/seibuspi.c
 	AM_RANGE(0x00000560, 0x00000563) AM_WRITE16(sprite_dma_start_w, 0xffff0000)
 ADDRESS_MAP_END
@@ -1809,25 +1808,9 @@ void seibuspi_state::init_spi_common()
 
 void seibuspi_state::init_sei252()
 {
-	seibuspi_text_decrypt(memregion("gfx1")->base());
-	seibuspi_bg_decrypt(memregion("gfx2")->base(), memregion("gfx2")->bytes());
+	text_decrypt(memregion("gfx1")->base());
+	bg_decrypt(memregion("gfx2")->base(), memregion("gfx2")->bytes());
 	seibuspi_sprite_decrypt(memregion("gfx3")->base(), 0x400000);
-	init_spi_common();
-}
-
-void seibuspi_state::init_rise10()
-{
-	seibuspi_rise10_text_decrypt(memregion("gfx1")->base());
-	seibuspi_rise10_bg_decrypt(memregion("gfx2")->base(), memregion("gfx2")->bytes());
-	seibuspi_rise10_sprite_decrypt(memregion("gfx3")->base(), 0x600000);
-	init_spi_common();
-}
-
-void seibuspi_state::init_rise11()
-{
-	seibuspi_rise11_text_decrypt(memregion("gfx1")->base());
-	seibuspi_rise11_bg_decrypt(memregion("gfx2")->base(), memregion("gfx2")->bytes());
-	seibuspi_rise11_sprite_decrypt_rfjet(memregion("gfx3")->base(), 0x800000);
 	init_spi_common();
 }
 
@@ -1885,6 +1868,12 @@ static MACHINE_CONFIG_START( spi, seibuspi_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spi)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 6144)
+
+	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
+	MCFG_SEIBU_CRTC_DECRYPT_KEY_CB(WRITE16(seibuspi_state, tile_decrypt_key_w))
+	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(seibuspi_state, spi_layer_enable_w))
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(seibuspi_state, spi_layer_bank_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(seibuspi_state, scroll_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1995,6 +1984,12 @@ static MACHINE_CONFIG_START( sys386i, seibuspi_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spi)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 6144)
+
+	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
+	MCFG_SEIBU_CRTC_DECRYPT_KEY_CB(WRITE16(seibuspi_state, tile_decrypt_key_w))
+	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(seibuspi_state, spi_layer_enable_w))
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(seibuspi_state, spi_layer_bank_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(seibuspi_state, scroll_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2109,13 +2104,21 @@ DRIVER_INIT_MEMBER(seibuspi_state,rdft)
 DRIVER_INIT_MEMBER(seibuspi_state,rdft2)
 {
 	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00282ac, 0x00282af, read32_delegate(FUNC(seibuspi_state::rf2_speedup_r),this));
-	init_rise10();
+
+	rdft2_text_decrypt(memregion("gfx1")->base());
+	rdft2_bg_decrypt(memregion("gfx2")->base(), memregion("gfx2")->bytes());
+	seibuspi_rise10_sprite_decrypt(memregion("gfx3")->base(), 0x600000);
+	init_spi_common();
 }
 
 DRIVER_INIT_MEMBER(seibuspi_state,rfjet)
 {
 	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002894c, 0x002894f, read32_delegate(FUNC(seibuspi_state::rfjet_speedup_r),this));
-	init_rise11();
+
+	rfjet_text_decrypt(memregion("gfx1")->base());
+	rfjet_bg_decrypt(memregion("gfx2")->base(), memregion("gfx2")->bytes());
+	seibuspi_rise11_sprite_decrypt_rfjet(memregion("gfx3")->base(), 0x800000);
+	init_spi_common();
 }
 
 
