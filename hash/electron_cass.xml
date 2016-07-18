@@ -14,7 +14,7 @@
 
 <!-- This list was compiled from the archive at http://www.stairwaytohell.com/. Additional titles will be added as they are made available at http://stardot.org.uk/ forum. -->
 
-<softwarelist name="electron_cass" description="Electron cassettes">
+<softwarelist name="electron_cass" description="Acorn Electron cassettes">
 
 	<!-- Games -->
 
@@ -911,9 +911,10 @@
 	</software>
 
 	<software name="birdstri">
-		<description>Birdstrike</description>
-		<year>198?</year>
+		<description>Bird Strike</description>
+		<year>1984</year>
 		<publisher>Firebird</publisher>
+		<info name="author" value="Andrew Frigaard" />
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="6385">
 				<rom name="t-bird.uef" size="6385" crc="8035ad27" sha1="5045567cab5e62231c93dd2c3365c9ad3928027b" offset="0"/>
@@ -1572,7 +1573,7 @@
 	</software>
 
 	<software name="9cardbd1">
-		<description>9 Classic Card and Board Games Vol.1</description>
+		<description>9 Classic Card and Board Games No.1</description>
 		<year>198?</year>
 		<publisher>Database</publisher>
 		<part name="cass" interface="electron_cass">
@@ -1583,7 +1584,7 @@
 	</software>
 
 	<software name="9cardbd2">
-		<description>9 Classic Card and Board Games Vol.2</description>
+		<description>9 Classic Card and Board Games No.2</description>
 		<year>1986</year>
 		<publisher>Database</publisher>
 		<part name="cass" interface="electron_cass">
@@ -6056,7 +6057,7 @@
 
 	<software name="nightwld">
 		<description>Nightworld</description>
-		<year>1986</year>
+		<year>1985</year>
 		<publisher>Alligata</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="13845">
@@ -10285,7 +10286,7 @@
 
 	<software name="xorproc">
 		<description>XOR: Procyon's Mazes</description>
-		<year>1987</year>
+		<year>2007</year>
 		<publisher>Logotron</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="20519">
