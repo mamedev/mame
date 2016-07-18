@@ -172,7 +172,7 @@ bool windows_osd_interface::window_init()
 				error = renderer_gdi::init(machine());
 				break;
 			case VIDEO_MODE_BGFX:
-				renderer_bgfx::init(machine());
+				error = renderer_bgfx::init(machine());
 				break;
 #if (USE_OPENGL)
 			case VIDEO_MODE_OPENGL:
