@@ -51,7 +51,6 @@ public:
 		virtual bool is_creatable() const override { return false; }
 		virtual bool must_be_loaded() const override { return false; }
 		virtual bool is_reset_on_load() const override { return true; }
-		virtual const option_guide *create_option_guide() const override { return nullptr; }
 		virtual const char *image_interface() const override { return "hp9845b_rom"; }
 		virtual const char *file_extensions() const override { return "bin"; }
 

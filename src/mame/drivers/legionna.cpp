@@ -189,7 +189,7 @@ static ADDRESS_MAP_START( legionna_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100470, 0x100471) AM_WRITENOP // toggles 0x2000 / 0x0000, tile bank on some games
-	AM_RANGE(0x100600, 0x10063f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
+	AM_RANGE(0x100600, 0x10064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
 	AM_RANGE(0x100700, 0x10071f) AM_READWRITE(sound_comms_r,sound_comms_w)
 	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
@@ -233,7 +233,7 @@ static ADDRESS_MAP_START( godzilla_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100470, 0x100471) AM_WRITE(denjinmk_setgfxbank)
-	AM_RANGE(0x100600, 0x10063f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
+	AM_RANGE(0x100600, 0x10064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
 	AM_RANGE(0x100700, 0x10071f) AM_READWRITE(sound_comms_r,sound_comms_w)
 	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
@@ -260,7 +260,7 @@ static ADDRESS_MAP_START( denjinmk_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100470, 0x100471) AM_WRITE(denjinmk_setgfxbank)
-	AM_RANGE(0x100600, 0x10063f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
+	AM_RANGE(0x100600, 0x10064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
 	AM_RANGE(0x100700, 0x10071f) AM_READWRITE(denjinmk_sound_comms_r,sound_comms_w)
 	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
@@ -286,7 +286,7 @@ static ADDRESS_MAP_START( grainbow_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100480, 0x100487) AM_WRITE(grainbow_layer_config_w) // probably a COP feature
-	AM_RANGE(0x100600, 0x10063f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
+	AM_RANGE(0x100600, 0x10064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
 	AM_RANGE(0x100700, 0x10071f) AM_READWRITE(sound_comms_r,sound_comms_w)
 	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
@@ -310,7 +310,7 @@ static ADDRESS_MAP_START( cupsoc_mem, AS_PROGRAM, 16, legionna_state )
 	AM_IMPORT_FROM( legionna_cop_mem )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	AM_RANGE(0x100600, 0x10063f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
+	AM_RANGE(0x100600, 0x10064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
 	AM_RANGE(0x100700, 0x10071f) AM_READWRITE(sound_comms_r,sound_comms_w)
 	AM_RANGE(0x100740, 0x100741) AM_READ_PORT("DSW1")
@@ -337,8 +337,7 @@ static ADDRESS_MAP_START( cupsocs_mem, AS_PROGRAM, 16, legionna_state )
 	AM_IMPORT_FROM( legionna_cop_mem )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	AM_RANGE(0x100600, 0x10060f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)//?
-	AM_RANGE(0x100640, 0x10067f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
+	AM_RANGE(0x100600, 0x10067f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read_xor, write_xor)
 	AM_RANGE(0x100680, 0x100681) AM_WRITENOP // irq ack?
 	AM_RANGE(0x100700, 0x100701) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100704, 0x100705) AM_READ_PORT("PLAYERS12")

@@ -932,10 +932,8 @@ static ADDRESS_MAP_START( raiden2_cop_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x005b2, 0x005b3) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_dist_r)
 	AM_RANGE(0x005b4, 0x005b5) AM_DEVREAD("raiden2cop", raiden2cop_device, cop_angle_r)
 
-	/* I think all this block is part of the video chip */
-	AM_RANGE(0x00600, 0x0064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
-//  AM_RANGE(0x0061c, 0x0061d) AM_WRITE(tilemap_enable_w)
-//  AM_RANGE(0x00620, 0x0062b) AM_WRITE(tile_scroll_w)
+	AM_RANGE(0x00600, 0x0063f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
+	//AM_RANGE(0x00640, 0x006bf) AM_DEVREADWRITE("obj", seibu_encrypted_sprite_device, read, write)
 	AM_RANGE(0x006a0, 0x006a3) AM_WRITE(sprcpt_val_1_w)
 	AM_RANGE(0x006a4, 0x006a7) AM_WRITE(sprcpt_data_3_w)
 	AM_RANGE(0x006a8, 0x006ab) AM_WRITE(sprcpt_data_4_w)
@@ -996,7 +994,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( raidendx_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x00470, 0x00471) AM_READWRITE(cop_tile_bank_2_r,raidendx_cop_bank_2_w)
 	AM_RANGE(0x004d0, 0x004d7) AM_RAM //???
-	AM_RANGE(0x00600, 0x0064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read_alt, write_alt)
+	AM_RANGE(0x00600, 0x0063f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read_alt, write_alt)
 //  AM_RANGE(0x006ca, 0x006cb) AM_WRITENOP
 	AM_IMPORT_FROM( raiden2_mem )
 ADDRESS_MAP_END
