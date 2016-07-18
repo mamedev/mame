@@ -184,11 +184,11 @@ void menu_file_manager::handle()
 				floppy_image_device *floppy_device = dynamic_cast<floppy_image_device *>(selected_device);
 				if (floppy_device != nullptr)
 				{
-					menu::stack_push<menu_control_floppy_image>(ui(), container(), floppy_device);
+					menu::stack_push<menu_control_floppy_image>(ui(), container(), *floppy_device);
 				}
 				else
 				{
-					menu::stack_push<menu_control_device_image>(ui(), container(), selected_device);
+					menu::stack_push<menu_control_device_image>(ui(), container(), *selected_device);
 				}
 				// reset the existing menu
 				reset(reset_options::REMEMBER_POSITION);

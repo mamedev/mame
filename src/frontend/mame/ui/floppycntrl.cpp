@@ -20,9 +20,9 @@ namespace ui {
     IMPLEMENTATION
 ***************************************************************************/
 
-menu_control_floppy_image::menu_control_floppy_image(mame_ui_manager &mui, render_container &container, device_image_interface *_image) : menu_control_device_image(mui, container, _image)
+menu_control_floppy_image::menu_control_floppy_image(mame_ui_manager &mui, render_container &container, device_image_interface &image) : menu_control_device_image(mui, container, image)
 {
-	floppy_image_device *fd = static_cast<floppy_image_device *>(image);
+	floppy_image_device *fd = static_cast<floppy_image_device *>(&m_image);
 	const floppy_image_format_t *fif_list = fd->get_formats();
 	int fcnt = 0;
 	for(const floppy_image_format_t *i = fif_list; i; i = i->next)
@@ -40,7 +40,7 @@ menu_control_floppy_image::~menu_control_floppy_image()
 
 void menu_control_floppy_image::do_load_create()
 {
-	floppy_image_device *fd = static_cast<floppy_image_device *>(image);
+	floppy_image_device *fd = static_cast<floppy_image_device *>(&m_image);
 	if(input_filename.compare("")==0) {
 		int err = fd->create(output_filename.c_str(), nullptr, nullptr);
 		if (err != 0) {
@@ -66,17 +66,17 @@ void menu_control_floppy_image::hook_load(std::string filename, bool softlist)
 	if (softlist)
 	{
 		machine().popmessage("When loaded from software list, the disk is Read-only.\n");
-		image->load(filename.c_str());
+		m_image.load(filename.c_str());
 		stack_pop();
 		return;
 	}
 
 	input_filename = filename;
-	input_format = static_cast<floppy_image_device *>(image)->identify(filename);
+	input_format = static_cast<floppy_image_device &>(m_image).identify(filename);
 
 	if (!input_format)
 	{
-		machine().popmessage("Error: %s\n", image->error());
+		machine().popmessage("Error: %s\n", m_image.error());
 		stack_pop();
 		return;
 	}
@@ -93,15 +93,15 @@ void menu_control_floppy_image::hook_load(std::string filename, bool softlist)
 		else
 			can_in_place = false;
 	}
-	submenu_result.rw = menu_select_rw::result::INVALID;
-	menu::stack_push<menu_select_rw>(ui(), container(), can_in_place, submenu_result.rw);
-	state = SELECT_RW;
+	m_submenu_result.rw = menu_select_rw::result::INVALID;
+	menu::stack_push<menu_select_rw>(ui(), container(), can_in_place, m_submenu_result.rw);
+	m_state = SELECT_RW;
 }
 
 void menu_control_floppy_image::handle()
 {
-	floppy_image_device *fd = static_cast<floppy_image_device *>(image);
-	switch (state) {
+	floppy_image_device *fd = static_cast<floppy_image_device *>(&m_image);
+	switch (m_state) {
 	case DO_CREATE: {
 		floppy_image_format_t *fif_list = fd->get_formats();
 			int ext_match;
@@ -119,27 +119,27 @@ void menu_control_floppy_image::handle()
 			if (!i->extension_matches(m_current_file.c_str()))
 				format_array[total_usable++] = i;
 		}
-		submenu_result.i = -1;
-		menu::stack_push<menu_select_format>(ui(), container(), format_array, ext_match, total_usable, &submenu_result.i);
+		m_submenu_result.i = -1;
+		menu::stack_push<menu_select_format>(ui(), container(), format_array, ext_match, total_usable, &m_submenu_result.i);
 
-		state = SELECT_FORMAT;
+		m_state = SELECT_FORMAT;
 		break;
 	}
 
 	case SELECT_FORMAT:
-		if(submenu_result.i == -1) {
-			state = START_FILE;
+		if(m_submenu_result.i == -1) {
+			m_state = START_FILE;
 			handle();
 		} else {
 			output_filename = util::zippath_combine(m_current_directory.c_str(), m_current_file.c_str());
-			output_format = format_array[submenu_result.i];
+			output_format = format_array[m_submenu_result.i];
 			do_load_create();
 			stack_pop();
 		}
 		break;
 
 	case SELECT_RW:
-		switch(submenu_result.rw) {
+		switch(m_submenu_result.rw) {
 		case menu_select_rw::result::READONLY:
 			do_load_create();
 			stack_pop();
@@ -157,12 +157,12 @@ void menu_control_floppy_image::handle()
 			break;
 
 		case menu_select_rw::result::WRITE_OTHER:
-			menu::stack_push<menu_file_create>(ui(), container(), image, m_current_directory, m_current_file, create_ok);
-			state = CHECK_CREATE;
+			menu::stack_push<menu_file_create>(ui(), container(), &m_image, m_current_directory, m_current_file, m_create_ok);
+			m_state = CHECK_CREATE;
 			break;
 
 		case menu_select_rw::result::INVALID:
-			state = START_FILE;
+			m_state = START_FILE;
 			break;
 		}
 		break;

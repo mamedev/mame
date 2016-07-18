@@ -20,7 +20,7 @@ namespace ui {
 class menu_control_floppy_image : public menu_control_device_image
 {
 public:
-	menu_control_floppy_image(mame_ui_manager &ui, render_container &container, device_image_interface *image);
+	menu_control_floppy_image(mame_ui_manager &ui, render_container &container, device_image_interface &image);
 	virtual ~menu_control_floppy_image() override;
 
 private:
