@@ -91,6 +91,7 @@ public:
 	static UINT32 ui_handler(render_container &container, mame_ui_manager &mui);
 
 	// Used by sliders
+	void move_selection(int delta, UINT32 flags = 0);
 	void validate_selection(int scandir);
 
 	void do_handle();
@@ -235,6 +236,7 @@ protected:
 	virtual void handle_events(UINT32 flags, event &ev);
 	virtual void handle_keys(UINT32 flags, int &iptkey);
 	virtual bool custom_mouse_down() { return false; }
+	virtual void selection_changed() { }
 
 	// test if search is active
 	virtual bool menu_has_search_active() { return false; }

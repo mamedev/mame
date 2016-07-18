@@ -921,29 +921,11 @@ void menu::handle_events(UINT32 flags, event &ev)
 				{
 					if (local_menu_event.zdelta > 0)
 					{
-						if ((flags & FLAG_UI_DATS) != 0)
-						{
-							top_line -= local_menu_event.num_lines;
-							return;
-						}
-						is_first_selected() ? selected = top_line = item.size() - 1 : selected -= local_menu_event.num_lines;
-						validate_selection(-1);
-						top_line -= (selected <= top_line && top_line != 0);
-						if (selected <= top_line && m_visible_items != m_visible_lines)
-							top_line -= local_menu_event.num_lines;
+						move_selection(-local_menu_event.num_lines, flags);
 					}
 					else
 					{
-						if ((flags & FLAG_UI_DATS))
-						{
-							top_line += local_menu_event.num_lines;
-							return;
-						}
-						is_last_selected() ? selected = top_line = 0 : selected += local_menu_event.num_lines;
-						validate_selection(1);
-						top_line += (selected >= top_line + m_visible_items + (top_line != 0));
-						if (selected >= (top_line + m_visible_items + (top_line != 0)))
-							top_line += local_menu_event.num_lines;
+						move_selection(+local_menu_event.num_lines, flags);
 					}
 				}
 				break;
@@ -1018,54 +1000,19 @@ void menu::handle_keys(UINT32 flags, int &iptkey)
 
 	// up backs up by one item
 	if (exclusive_input_pressed(iptkey, IPT_UI_UP, 6))
-	{
-		if ((item[0].flags & FLAG_UI_DATS))
-		{
-			top_line--;
-			return;
-		}
-		is_first_selected() ? selected = top_line = item.size() - 1 : --selected;
-		validate_selection(-1);
-		top_line -= (selected <= top_line && top_line != 0);
-		if (selected <= top_line && m_visible_items != m_visible_lines)
-			top_line--;
-	}
+		move_selection(-1);
 
 	// down advances by one item
 	if (exclusive_input_pressed(iptkey, IPT_UI_DOWN, 6))
-	{
-		if ((item[0].flags & FLAG_UI_DATS))
-		{
-			top_line++;
-			return;
-		}
-		is_last_selected() ? selected = top_line = 0 : ++selected;
-		validate_selection(1);
-		top_line += (selected >= top_line + m_visible_items + (top_line != 0));
-		if (selected >= (top_line + m_visible_items + (top_line != 0)))
-			top_line++;
-	}
+		move_selection(+1);
 
 	// page up backs up by m_visible_items
 	if (exclusive_input_pressed(iptkey, IPT_UI_PAGE_UP, 6))
-	{
-		selected -= m_visible_items;
-		top_line -= m_visible_items - (last_item_visible() ? 1 : 0);
-		if (selected < 0)
-			selected = 0;
-		validate_selection(1);
-	}
+		move_selection(-m_visible_items);
 
 	// page down advances by m_visible_items
 	if (exclusive_input_pressed(iptkey, IPT_UI_PAGE_DOWN, 6))
-	{
-		selected += m_visible_lines - 2 + (selected == 0);
-		top_line += m_visible_lines - 2;
-
-		if (selected > item.size() - 1)
-			selected = item.size() - 1;
-		validate_selection(-1);
-	}
+		move_selection(+m_visible_items);
 
 	// home goes to the start
 	if (exclusive_input_pressed(iptkey, IPT_UI_HOME, 0))
@@ -1104,6 +1051,43 @@ void menu::handle_keys(UINT32 flags, int &iptkey)
 			if (exclusive_input_pressed(iptkey, code, 0))
 				break;
 		}
+	}
+}
+
+
+//-------------------------------------------------
+//  move_selection - moves the selection by a
+//	delta and performs required housekeeping
+//-------------------------------------------------
+
+void menu::move_selection(int delta, UINT32 flags)
+{
+	// there is probably a better way to do this
+	if ((flags & FLAG_UI_DATS) != 0)
+	{
+		top_line += delta;
+		return;
+	}
+
+	if (delta < 0)
+	{
+		is_first_selected() ? selected = top_line = item.size() - 1 : selected += delta;
+		validate_selection(-1);
+		top_line -= (selected <= top_line && top_line != 0);
+		if (selected <= top_line && m_visible_items != m_visible_lines)
+			top_line += delta;
+
+		selection_changed();
+	}
+	else if (delta > 0)
+	{
+		is_last_selected() ? selected = top_line = 0 : selected += delta;
+		validate_selection(1);
+		top_line += (selected >= top_line + m_visible_items + (top_line != 0));
+		if (selected >= (top_line + m_visible_items + (top_line != 0)))
+			top_line += delta;
+
+		selection_changed();
 	}
 }
 
