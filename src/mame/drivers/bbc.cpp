@@ -657,28 +657,66 @@ static INPUT_PORTS_START(bbc_joy)
 INPUT_PORTS_END
 
 
+INPUT_CHANGED_MEMBER(bbc_state::monitor_changed)
+{
+	m_monitortype = read_safe(ioport("BBCCONFIG"), 0) &0x03;
+}
+
+
+INPUT_CHANGED_MEMBER(bbc_state::speech_changed)
+{
+	// Switchable during runtime as some games (Hyper Sports, Space Fighter) are not compatible with Speech
+	m_Speech = read_safe(ioport("BBCCONFIG"), 0) & 0x04;
+}
+
+
 static INPUT_PORTS_START(bbc_config)
-PORT_START("BBCCONFIG")
+	PORT_START("BBCCONFIG")
+	PORT_CONFNAME( 0x03, 0x00, "Monitor") PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_state, monitor_changed, 0)
+	PORT_CONFSETTING(    0x00, "Colour")
+	PORT_CONFSETTING(    0x01, "B&W")
+	PORT_CONFSETTING(    0x02, "Green")
+	PORT_CONFSETTING(    0x03, "Amber")
+INPUT_PORTS_END
 
-PORT_CONFNAME( 0x01, 0x00, "Speech Upgrade" )
-PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 
-PORT_CONFNAME( 0x18, 0x00, "Sideways RAM Type" )
-PORT_CONFSETTING(    0x00, DEF_STR( None ) )
-PORT_CONFSETTING(    0x08, "Solidisk 128K (fe62)" )
-PORT_CONFSETTING(    0x10, "Acorn 64K (fe30)" )
-PORT_CONFSETTING(    0x18, "Acorn 128K (fe30)" )
-//  PORT_CONFSETTING(    0x20, "ATPL Sidewise 16K" )
+static INPUT_PORTS_START(bbcb_config)
+	PORT_START("BBCCONFIG")
+	PORT_CONFNAME( 0x03, 0x00, "Monitor" ) PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_state, monitor_changed, 0)
+	PORT_CONFSETTING(    0x00, "Colour")
+	PORT_CONFSETTING(    0x01, "B&W")
+	PORT_CONFSETTING(    0x02, "Green")
+	PORT_CONFSETTING(    0x03, "Amber")
+	PORT_CONFNAME( 0x04, 0x04, "Speech Fitted" ) PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_state, speech_changed, 0)
+	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
+	PORT_CONFSETTING(    0x04, DEF_STR( Yes ) )
+	PORT_CONFNAME( 0x18, 0x00, "Sideways RAM Board")
+	PORT_CONFSETTING(    0x00, DEF_STR( None ) )
+	PORT_CONFSETTING(    0x08, "Solidisk 128K (fe62)" )
+	PORT_CONFSETTING(    0x10, "Acorn 64K (fe30)" )
+	PORT_CONFSETTING(    0x18, "Acorn 128K (fe30)" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(bbcbp_config)
+	PORT_START("BBCCONFIG")
+	PORT_CONFNAME( 0x03, 0x00, "Monitor") PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_state, monitor_changed, 0)
+	PORT_CONFSETTING(    0x00, "Colour")
+	PORT_CONFSETTING(    0x01, "B&W")
+	PORT_CONFSETTING(    0x02, "Green")
+	PORT_CONFSETTING(    0x03, "Amber")
+	PORT_CONFNAME( 0x04, 0x04, "Speech Fitted") PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_state, speech_changed, 0)
+	PORT_CONFSETTING(    0x00, DEF_STR(No))
+	PORT_CONFSETTING(    0x04, DEF_STR(Yes))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(bbca)
+	PORT_INCLUDE(bbc_config)
 	PORT_INCLUDE(bbc_keyboard)
 	PORT_INCLUDE(bbc_dipswitch)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(bbcb)
-	PORT_INCLUDE(bbc_config)
+	PORT_INCLUDE(bbcb_config)
 	PORT_INCLUDE(bbc_keyboard)
 	PORT_INCLUDE(bbc_dipswitch)
 	PORT_INCLUDE(bbcb_links)
@@ -686,7 +724,7 @@ static INPUT_PORTS_START(bbcb)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(bbcbp)
-	PORT_INCLUDE(bbc_config)
+	PORT_INCLUDE(bbcbp_config)
 	PORT_INCLUDE(bbc_keyboard)
 	PORT_INCLUDE(bbc_dipswitch)
 	PORT_INCLUDE(bbcbp_links)
@@ -708,6 +746,7 @@ static INPUT_PORTS_START(abc)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(bbcm)
+	PORT_INCLUDE(bbc_config)
 	PORT_INCLUDE(bbc_keyboard)
 	PORT_INCLUDE(bbc_keypad)
 	PORT_INCLUDE(bbc_joy)
@@ -828,11 +867,11 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(12)
 	MCFG_MC6845_UPDATE_ROW_CB(bbc_state, crtc_update_row)
-	//MCFG_MC6845_OUT_DE_CB(WRITELINE(bbc_state, bbc_de_changed))
-	//MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(bbc_state, bbc_hsync))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(bbc_state, bbc_vsync))
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(bbc_state, bbc_de_changed))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(bbc_state, bbc_hsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(bbc_state, bbc_vsync_changed))
 
-	MCFG_VIDEO_START_OVERRIDE(bbc_state, bbca)
+	MCFG_VIDEO_START_OVERRIDE(bbc_state, bbc)
 
 	MCFG_DEFAULT_LAYOUT(layout_bbc)
 
@@ -884,7 +923,6 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcb)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcb)
-	MCFG_VIDEO_START_OVERRIDE(bbc_state, bbcb)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -995,12 +1033,6 @@ static MACHINE_CONFIG_DERIVED( bbcbp, bbcb1770 )
 
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcbp)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcbp)
-	MCFG_VIDEO_START_OVERRIDE(bbc_state, bbcbp)
-
-	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
 
@@ -1011,12 +1043,6 @@ static MACHINE_CONFIG_DERIVED( bbcbp128, bbcb1770 )
 
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcbp)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcbp)
-	MCFG_VIDEO_START_OVERRIDE(bbc_state, bbcbp)
-
-	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
 
@@ -1029,7 +1055,6 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( torchf, bbcb )
 	/* basic machine hardware */
-	MCFG_MACHINE_START_OVERRIDE(bbc_state, torch)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, torch)
 
 	/* Add Torch Z80 Communicator co-processor */
@@ -1206,7 +1231,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	MCFG_RAM_DEFAULT_SIZE("32K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcm)
@@ -1233,9 +1258,11 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(12)
 	MCFG_MC6845_UPDATE_ROW_CB(bbc_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(bbc_state, bbc_vsync))
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(bbc_state, bbc_de_changed))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(bbc_state, bbc_hsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(bbc_state, bbc_vsync_changed))
 
-	MCFG_VIDEO_START_OVERRIDE(bbc_state, bbcm)
+	MCFG_VIDEO_START_OVERRIDE(bbc_state, bbc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
