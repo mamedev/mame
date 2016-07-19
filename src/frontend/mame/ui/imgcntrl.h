@@ -55,7 +55,6 @@ protected:
 	// methods
 	virtual void hook_load(std::string filename, bool softlist);
 	virtual void handle() override;
-	virtual void populate() override;
 
 private:
 	// instance variables
@@ -66,6 +65,7 @@ private:
 	std::string						m_software_info_name;
 
 	// methods
+	virtual void populate() override;
 	void test_create(bool &can_create, bool &need_confirm);
 	void load_software_part();
 };
