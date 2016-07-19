@@ -56,8 +56,7 @@ public:
 		m_vram(*this, "vram"),
 		m_fontram(*this, "fontram"),
 		m_uart0(*this, UART0_TAG),
-		m_uart1(*this, UART1_TAG),
-		m_keybc(*this, "keybc")
+		m_uart1(*this, UART1_TAG)
 	{
 	}
 
@@ -65,8 +64,7 @@ public:
 	required_shared_ptr<UINT16> m_vram;
 	required_shared_ptr<UINT16> m_fontram;
 	required_device<ns16450_device> m_uart0, m_uart1;
-	required_device<at_keyboard_controller_device> m_keybc;
-		
+			
 	virtual void machine_reset() override;
 	
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -76,18 +74,21 @@ public:
 	DECLARE_READ16_MEMBER(keyb_r);
 	DECLARE_WRITE16_MEMBER(keyb_w);
 	
-	WRITE_LINE_MEMBER(keybc_irq);
 	WRITE_LINE_MEMBER(uart0_irq);
 	WRITE_LINE_MEMBER(uart1_irq);
 
-private:
-	UINT16 tvi1111_regs[0xff/2];
-};
+	DECLARE_WRITE_LINE_MEMBER(keyboard_clock_w);
+	DECLARE_WRITE_LINE_MEMBER(keyboard_data_w);
 
-WRITE_LINE_MEMBER(tv990_state::keybc_irq)
-{
-	m_maincpu->set_input_line(M68K_IRQ_2, state);
-}
+private:
+	UINT16 tvi1111_regs[0x100/2];
+	
+	bool m_kclk;
+	UINT8 m_kdata;
+	UINT8 m_scancode;
+	int m_kbit;
+	int m_idstage;
+};
 
 WRITE_LINE_MEMBER(tv990_state::uart0_irq)
 {
@@ -112,7 +113,7 @@ READ16_MEMBER(tv990_state::tvi1111_r)
 WRITE16_MEMBER(tv990_state::tvi1111_w)
 {
 #if 0
-	//if ((offset != 0x50) && (offset != 0x68) && (offset != 0x1d))
+	//if ((offset != 0x50) && (offset != 0x68) && (offset != 0x1d) && (offset != 0x1e) && (offset != 0x17) && (offset != 0x1c))
 	{
 		if (mem_mask == 0x00ff)
 		{
@@ -129,6 +130,11 @@ WRITE16_MEMBER(tv990_state::tvi1111_w)
 	}
 #endif
 	COMBINE_DATA(&tvi1111_regs[offset]);
+	
+	if (offset == 0x1d)
+	{
+		tvi1111_regs[offset] |= 4;
+	}
 }
 
 UINT32 tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -145,13 +151,14 @@ UINT32 tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	
 	for (y = 0; y < 50; y++)
 	{
-		if (y == 49)
+		// this isn't exactly right.
+		if (tvi1111_regs[y+0x50] != 0)
 		{
-			curchar = &vram[14000/2];
+			curchar = &vram[tvi1111_regs[y+0x50]];
 		}
 		else
 		{
-			curchar = &vram[80 * y];
+			curchar = &vram[(y * 144)+1];
 		}
 		
 		for (x = 0; x < 80; x++)
@@ -210,32 +217,103 @@ UINT32 tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	return 0;
 }
 
+// AT keyboard interface - done in an AMI ASIC
+WRITE_LINE_MEMBER(tv990_state::keyboard_clock_w)
+{
+//  printf("KCLK: %d\n", state ? 1 : 0);
+
+	if (m_scancode == 0x55) return;
+
+	// rising edge?
+	if ((state == ASSERT_LINE) && (!m_kclk))
+	{
+		if (m_kbit >= 1 && m_kbit <= 8)
+		{
+			m_scancode >>= 1;
+			m_scancode |= m_kdata;
+		}
+
+		// stop bit?
+		if (m_kbit == 9)
+		{
+	        //printf("scancode %02x\n", m_scancode);
+			m_kbit = 0;
+			m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
+	// irq here
+		}
+		else
+		{
+			m_kbit++;
+		}
+	}
+
+	m_kclk = (state == ASSERT_LINE) ? true : false;
+}
+
+WRITE_LINE_MEMBER(tv990_state::keyboard_data_w)
+{
+//  printf("KDATA: %d\n", state ? 1 : 0);
+	m_kdata = (state == ASSERT_LINE) ? 0x80 : 0x00;
+}
+
 // 2ac = test
 READ16_MEMBER(tv990_state::keyb_r)
 {
-	UINT8 rv = 0;
-	
 	if (offset == 0)
 	{
-		rv = m_keybc->data_r(space, 0);
+		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
+		//printf("reading m_scancode = %02x\n", m_scancode);
+		
+		switch (m_idstage)
+		{
+			case 1:
+				m_idstage++;
+				return 0xfa;
+				
+			case 2:
+				m_idstage++;
+				return 0xab;
+				
+			case 3:
+				m_idstage = 0;
+				return 0x83;
+		
+			default:
+				break;
+		}
+		
+		
+		return m_scancode;
 	}
 	else
 	{
-		rv = m_keybc->status_r(space, 0);
+		return 0;		
 	}
-	
-	return rv;
 }
 
 WRITE16_MEMBER(tv990_state::keyb_w)
 {
 	if (offset == 0)
 	{
-		m_keybc->data_w(space, 0, data);
+		//printf("%02x to keyboard\n", data);
+		m_scancode = 0xfa;	// pretend keyboard responded "ACK"
+		
+		if (data == 0xf2)	// get PS/2 ID
+		{
+			m_idstage = 1;
+		}
 	}
 	else
 	{
-		m_keybc->command_w(space, 0, data);
+		//printf("AT command %02x\n", data);
+		if (data == 0xaa)
+		{
+			m_scancode = 0x55;
+		}
+		else if (data == 0xab)
+		{
+			m_scancode = 0;
+		}
 	}
 }
 
@@ -257,11 +335,17 @@ INPUT_PORTS_END
 
 void tv990_state::machine_reset()
 {
+	m_kclk = true;
+	m_kbit = 0;
+	m_scancode = 0;
+	m_idstage = 0;
+	
+	memset(tvi1111_regs, 0, sizeof(tvi1111_regs));
 }
 
 static MACHINE_CONFIG_START( tv990, tv990_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)	// real speed unclear, this is as fast as you can go without outrunning the AT keyboard controller, but real 990 uses an HLE reproduction
+	MCFG_CPU_ADD("maincpu", M68000, 14967500)	// verified (59.86992/4)
 	MCFG_CPU_PROGRAM_MAP(tv990_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tv990_state, irq6_line_hold)
 	
@@ -289,15 +373,10 @@ static MACHINE_CONFIG_START( tv990, tv990_state )
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(UART1_TAG, ns16450_device, dcd_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(UART1_TAG, ns16450_device, cts_w))
 	
-	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL_12MHz)
-	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_CLOCK_CB(DEVWRITELINE("pc_kbdc", pc_kbdc_device, clock_write_from_mb))
-	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_DATA_CB(DEVWRITELINE("pc_kbdc", pc_kbdc_device, data_write_from_mb))
-	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(WRITELINE(tv990_state, keybc_irq))
-
 	MCFG_DEVICE_ADD("pc_kbdc", PC_KBDC, 0)
-	MCFG_PC_KBDC_OUT_CLOCK_CB(DEVWRITELINE("keybc", at_keyboard_controller_device, keyboard_clock_w))
-	MCFG_PC_KBDC_OUT_DATA_CB(DEVWRITELINE("keybc", at_keyboard_controller_device, keyboard_data_w))
-	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
+	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(tv990_state, keyboard_clock_w))
+	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE(tv990_state, keyboard_data_w))
+	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
 MACHINE_CONFIG_END
 
 /* ROM definition */
