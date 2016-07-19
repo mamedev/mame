@@ -81,7 +81,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(keyboard_data_w);
 
 private:
-	UINT16 tvi1111_regs[0x100/2];
+	UINT16 tvi1111_regs[(0x100/2)+2];
 	
 	bool m_kclk;
 	UINT8 m_kdata;
