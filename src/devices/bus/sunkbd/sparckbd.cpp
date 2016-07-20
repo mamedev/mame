@@ -367,8 +367,8 @@ void sparc_keyboard_device::device_reset()
 	m_beeper_state = 0;
 
 	// configure device_serial_interface
-	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	set_rate(1'200);
+	set_data_frame(START_BIT_COUNT, DATA_BIT_COUNT, PARITY, STOP_BITS);
+	set_rate(BAUD);
 	receive_register_reset();
 	transmit_register_reset();
 
@@ -444,8 +444,6 @@ void sparc_keyboard_device::rcv_complete()
 	switch (m_rx_state)
 	{
 	case RX_LED:
-		printf("SPARC keyboard: LED data: %02x\n", code);
-		fflush(stdout);
 		machine().output().set_led_value(LED_NUM, BIT(code, 0));
 		machine().output().set_led_value(LED_COMPOSE, BIT(code, 1));
 		machine().output().set_led_value(LED_SCROLL, BIT(code, 2));
@@ -458,43 +456,28 @@ void sparc_keyboard_device::rcv_complete()
 	case RX_IDLE:
 		switch (code)
 		{
-		// Reset
-		case 0x01U:
-			printf("SPARC keyboard: reset\n");
-			fflush(stdout);
+		case COMMAND_RESET:
 			device_reset();
 			break;
 
-		// Bell on
-		case 0x02U:
-			printf("SPARC keyboard: bell on\n");
-			fflush(stdout);
+		case COMMAND_BELL_ON:
 			m_beeper_state |= UINT8(BEEPER_BELL);
 			m_beeper->set_state(m_beeper_state ? 1 : 0);
 			m_rx_state = RX_IDLE;
 			break;
 
-		// Bell off
-		case 0x03U:
-			printf("SPARC keyboard: bell off\n");
-			fflush(stdout);
+		case COMMAND_BELL_OFF:
 			m_beeper_state &= ~UINT8(BEEPER_BELL);
 			m_beeper->set_state(m_beeper_state ? 1 : 0);
 			m_rx_state = RX_IDLE;
 			break;
 
-		// Click on
-		case 0x0aU:
-			printf("SPARC keyboard: keyclick on\n");
-			fflush(stdout);
+		case COMMAND_CLICK_ON:
 			m_keyclick = 1;
 			m_rx_state = RX_IDLE;
 			break;
 
-		// Click off
-		case 0x0bU:
-			printf("SPARC keyboard: keyclick off\n");
-			fflush(stdout);
+		case COMMAND_CLICK_OFF:
 			m_keyclick = 0;
 			m_click_timer->reset();
 			m_beeper_state &= ~UINT8(BEEPER_CLICK);
@@ -502,17 +485,12 @@ void sparc_keyboard_device::rcv_complete()
 			m_rx_state = RX_IDLE;
 			break;
 
-		// LED command
-		case 0x0eU:
-			printf("SPARC keyboard: LED command\n");
-			fflush(stdout);
+		case COMMAND_LED:
 			m_rx_state = RX_LED;
 			break;
 
-		// Layout command
-		case 0x0fU:
-			printf("SPARC keyboard: layout command\n");
-			fflush(stdout);
+		case COMMAND_LAYOUT:
+			send_byte(0xfeU);
 			send_byte(UINT8(m_dips->read() & 0x3fU));
 			m_rx_state = RX_IDLE;
 			break;

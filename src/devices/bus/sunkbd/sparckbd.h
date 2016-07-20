@@ -56,6 +56,16 @@ private:
 		RX_LED
 	};
 
+	enum : UINT8 {
+		COMMAND_RESET = 0x01U,
+		COMMAND_BELL_ON = 0x02U,
+		COMMAND_BELL_OFF = 0x03U,
+		COMMAND_CLICK_ON = 0x0aU,
+		COMMAND_CLICK_OFF = 0x0bU,
+		COMMAND_LED = 0x0eU,
+		COMMAND_LAYOUT = 0x0fU
+	};
+
 	void scan_row();
 	void send_byte(UINT8 code);
 
