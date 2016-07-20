@@ -102,15 +102,12 @@ const device_type SOFTWARE_LIST = &device_creator<software_list_device>;
 //  software_part - constructor
 //-------------------------------------------------
 
-software_part::software_part(software_info &info, const char *name, const char *interface)
+software_part::software_part(software_info &info, const std::string &name, const std::string &interface)
 	: m_next(nullptr),
 		m_info(info),
 		m_name(name),
 		m_interface(interface)
 {
-	// ensure strings we are passed are in the string pool
-	assert(info.list().string_pool_contains(name));
-	assert(info.list().string_pool_contains(interface));
 }
 
 
@@ -190,7 +187,7 @@ software_compatibility software_part::is_compatible(const software_list_device &
 bool software_part::matches_interface(const char *interface_list) const
 {
 	// if we have no interface, then we match by default
-	if (m_interface == nullptr)
+	if (m_interface.empty())
 		return true;
 
 	// copy the comma-delimited interface list and ensure it ends with a final comma
@@ -239,7 +236,7 @@ device_image_interface *software_part::find_mountable_image(const machine_config
 //  software_info - constructor
 //-------------------------------------------------
 
-software_info::software_info(software_list_device &list, const char *name, const char *parent, const char *supported)
+software_info::software_info(software_list_device &list, const std::string &name, const std::string &parent, const char *supported)
 	: m_next(nullptr),
 		m_list(list),
 		m_supported(SOFTWARE_SUPPORTED_YES),
@@ -249,10 +246,6 @@ software_info::software_info(software_list_device &list, const char *name, const
 		m_year(nullptr),
 		m_publisher(nullptr)
 {
-	// ensure strings we are passed are in the string pool
-	assert(list.string_pool_contains(name));
-	assert(list.string_pool_contains(parent));
-
 	// handle the supported flag if provided
 	if (supported != nullptr)
 	{
@@ -426,7 +419,6 @@ void software_list_device::release()
 	m_description = nullptr;
 	m_errors.clear();
 	m_infolist.reset();
-	m_stringpool.reset();
 }
 
 
@@ -801,10 +793,16 @@ void softlist_parser::add_rom_entry(const char *name, const char *hashdata, UINT
 			if (elem._name != nullptr && strcmp(elem._name, name) == 0)
 				parse_error("Duplicated dataarea %s in software %s", name, infoname());
 
+	// get our own copy of these strings (ideally rom_entry would use std::string)
+	m_current_part->m_romdata_strings.emplace_back(name);
+	name = m_current_part->m_romdata_strings.back().c_str();
+	m_current_part->m_romdata_strings.emplace_back(hashdata);
+	hashdata = m_current_part->m_romdata_strings.back().c_str();
+
 	// create the new entry and append it
 	rom_entry entry;
-	entry._name = m_list.add_string(name);
-	entry._hashdata = m_list.add_string(hashdata);
+	entry._name = name;
+	entry._hashdata = hashdata;
 	entry._offset = offset;
 	entry._length = length;
 	entry._flags = flags;
@@ -924,7 +922,7 @@ void softlist_parser::parse_root_start(const char *tagname, const char **attribu
 		parse_attributes(attributes, ARRAY_LENGTH(attrnames), attrnames, attrvalues);
 
 		if (attrvalues[1] != nullptr)
-			m_list.m_description = m_list.add_string(attrvalues[1]);
+			m_list.m_description = attrvalues[1];
 	}
 	else
 		unknown_tag(tagname);
@@ -946,7 +944,7 @@ void softlist_parser::parse_main_start(const char *tagname, const char **attribu
 		parse_attributes(attributes, ARRAY_LENGTH(attrnames), attrnames, attrvalues);
 
 		if (attrvalues[0] != nullptr)
-			m_current_info = &m_list.m_infolist.append(*global_alloc(software_info(m_list, m_list.add_string(attrvalues[0]), m_list.add_string(attrvalues[1]), attrvalues[2])));
+			m_current_info = &m_list.m_infolist.append(*global_alloc(software_info(m_list, attrvalues[0], attrvalues[1], attrvalues[2])));
 		else
 			parse_error("No name defined for item");
 	}
@@ -989,7 +987,7 @@ void softlist_parser::parse_soft_start(const char *tagname, const char **attribu
 		parse_attributes(attributes, ARRAY_LENGTH(attrnames), attrnames, attrvalues);
 
 		if (attrvalues[0] != nullptr && attrvalues[1] != nullptr)
-			m_current_info->m_other_info.append(*global_alloc(feature_list_item(m_list.add_string(attrvalues[0]), m_list.add_string(attrvalues[1]))));
+			m_current_info->m_other_info.append(*global_alloc(feature_list_item(attrvalues[0], attrvalues[1])));
 		else
 			parse_error("Incomplete other_info definition");
 	}
@@ -1002,7 +1000,7 @@ void softlist_parser::parse_soft_start(const char *tagname, const char **attribu
 		parse_attributes(attributes, ARRAY_LENGTH(attrnames), attrnames, attrvalues);
 
 		if (attrvalues[0] != nullptr && attrvalues[1] != nullptr)
-			m_current_info->m_shared_info.append(*global_alloc(feature_list_item(m_list.add_string(attrvalues[0]), m_list.add_string(attrvalues[1]))));
+			m_current_info->m_shared_info.append(*global_alloc(feature_list_item(attrvalues[0], attrvalues[1])));
 		else
 			parse_error("Incomplete sharedfeat definition");
 	}
@@ -1015,7 +1013,7 @@ void softlist_parser::parse_soft_start(const char *tagname, const char **attribu
 		parse_attributes(attributes, ARRAY_LENGTH(attrnames), attrnames, attrvalues);
 
 		if (attrvalues[0] != nullptr && attrvalues[1] != nullptr && strcmp(attrvalues[0], "") != 0 && strcmp(attrvalues[1], "") != 0)
-			m_current_part = &m_current_info->m_partdata.append(*global_alloc(software_part(*m_current_info, m_list.add_string(attrvalues[0]), m_list.add_string(attrvalues[1]))));
+			m_current_part = &m_current_info->m_partdata.append(*global_alloc(software_part(*m_current_info, attrvalues[0], attrvalues[1])));
 		else
 			parse_error("Incomplete part definition");
 	}
@@ -1102,7 +1100,7 @@ void softlist_parser::parse_part_start(const char *tagname, const char **attribu
 		parse_attributes(attributes, ARRAY_LENGTH(attrnames), attrnames, attrvalues);
 
 		if (attrvalues[0] != nullptr)
-			m_current_part->m_featurelist.append(*global_alloc(feature_list_item(m_list.add_string(attrvalues[0]), m_list.add_string(attrvalues[1]))));
+			m_current_part->m_featurelist.append(*global_alloc(feature_list_item(attrvalues[0], attrvalues[1])));
 		else
 			parse_error("Incomplete feature definition");
 	}
@@ -1247,15 +1245,15 @@ void softlist_parser::parse_soft_end(const char *tagname)
 
 	// <description>
 	if (strcmp(tagname, "description") == 0)
-		m_current_info->m_longname = m_list.add_string(m_data_accum.c_str());
+		m_current_info->m_longname = m_data_accum;
 
 	// <year>
 	else if (strcmp(tagname, "year") == 0)
-		m_current_info->m_year = m_list.add_string(m_data_accum.c_str());
+		m_current_info->m_year = m_data_accum;
 
 	// <publisher>
 	else if (strcmp(tagname, "publisher") == 0)
-		m_current_info->m_publisher = m_list.add_string(m_data_accum.c_str());
+		m_current_info->m_publisher = m_data_accum;
 
 	// </part>
 	else if (strcmp(tagname, "part") == 0)
