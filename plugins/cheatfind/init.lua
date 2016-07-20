@@ -345,7 +345,7 @@ function cheatfind.startplugin()
 				local c = { "Default", "Custom" }
 				local m = { "Cheat Name", c[name], 0 }
 				menu_lim(name, 1, #c, m)
-				f = function(event)
+				local function f(event)
 					local r
 					name, r = incdec(event, name, 1, #c)
 					if (event == "select" or event == "comment") and name == 1 then
@@ -369,7 +369,7 @@ function cheatfind.startplugin()
 			end
 			menu[#menu + 1] = function()
 				local m = { "Save", "", 0 }
-				local f = function(event)
+				local function f(event)
 					if event == "select" then
 						local desc
 						local written = false
@@ -652,99 +652,99 @@ function cheatfind.startplugin()
 				else
 					bitwidth = " %02x"
 				end
+
+				local function match_exec(match)
+					local dev = devtable[devcur]
+					local cheat = { desc = string.format("Test cheat at addr %08X", match.addr), script = {} }
+					local wid = formtable[width]:sub(2, 2):lower()
+					local widchar
+					local form
+					if wid == "h" then
+						wid = "u16"
+						form = "%08x %04x"
+						widchar = "w"
+					elseif wid == "l" then
+						wid = "u32"
+						form = "%08x %08x"
+						widchart = "d"
+					elseif wid == "j" then
+						wid = "u64"
+						form = "%08x %016x"
+						widchar = "q"
+					else
+						wid = "u8"
+						form = "%08x %02x"
+						widchar = "b"
+					end
+
+
+					if dev.space.shortname then
+						cheat.ram = { ram = dev.tag }
+						cheat.script.run = "ram:write(" .. match.addr .. "," .. match.newval .. ")"
+					else
+						cheat.space = { cpu = { tag = dev.tag, type = "program" } }
+						cheat.script.run = "cpu:write_" .. wid .. "(" .. match.addr .. "," .. match.newval .. ", true)"
+					end
+					if match.mode == 1 then
+						if not _G.ce then
+							manager:machine():popmessage("Cheat engine not available")
+						else
+							_G.ce.inject(cheat)
+						end
+					elseif match.mode == 2 then
+						cheat_save = {}
+						menu = 1
+						menu_player = 1
+						menu_type = 1
+						local setname = emu.romname()
+						if emu.softname() ~= "" then
+							for name, image in pairs(manager:machine().images) do
+								if image:exists() and image:software_list_name() ~= "" then
+									setname = image:software_list_name() .. "/" .. emu.softname()
+								end
+							end
+						end
+						-- lfs.env_replace is defined in boot.lua
+						cheat_save.path = lfs.env_replace(manager:machine():options().entries.cheatpath:value()):match("([^;]+)")
+						cheat_save.filename = string.format("%s/%s", cheat_save.path, setname)
+						cheat_save.name = cheat.desc
+						local json = require("json")
+						cheat.desc = "%s"
+						cheat_save.json = json.stringify({[1] = cheat}, {indent = true})
+						cheat_save.xml = string.format("<mamecheat version=1>\n<cheat desc=\"%%s\">\n<script state=\"run\">\n<action>%s.pp%s@%X=%X</action>\n</script>\n</cheat>\n</mamecheat>", dev.tag:sub(2), widchar, match.addr, match.newval)
+						cheat_save.simple = string.format("%s,%s,%X,%s,%X,%%s\n", setname, dev.tag, match.addr, widchar, match.newval)
+						manager:machine():popmessage("Default name is " .. cheat_save.name)
+						return true
+					else
+						local func = "return space:read"
+						local env = { space = devtable[devcur].space }
+						if not dev.space.shortname then
+							func = func .. "_" .. wid
+						end
+						func = func .. "(" .. match.addr .. ")"
+						watches[#watches + 1] = { addr = match.addr, func = load(func, func, "t", env), format = form }
+						return true
+					end
+					return false
+				end
+
 				for num2, match in mpairs(matchsel, matches[#matches], matchpg * 100) do
 					if num2 > 100 then
 						break
 					end
 					menu[#menu + 1] = function()
-						local m = { string.format("%08x" .. bitwidth .. bitwidth, match.addr, match.oldval, 
-					                                  match.newval), "", 0 }
 						if not match.mode then
 							match.mode = 1
 						end
-						if match.mode == 1 then
-							m[2] = "Test"
-						elseif match.mode == 2 then
-							m[2] = "Write"
-						else
-							m[2] = "Watch"
-						end
-						menu_lim(match.mode, 1, 3, m)
+						local modes = { "Test", "Write", "Watch" }
+						local m = { string.format("%08x" .. bitwidth .. bitwidth, match.addr, match.oldval, 
+					                                  match.newval), modes[match.mode], 0 }
+						menu_lim(match.mode, 1, #modes, m)
 						local function f(event)
 							local r
 							match.mode, r = incdec(event, match.mode, 1, 3)
 							if event == "select" then
-								local dev = devtable[devcur]
-								local cheat = { desc = string.format("Test cheat at addr %08X", match.addr), script = {} }
-								local wid = formtable[width]:sub(2, 2):lower()
-								local widchar
-								local form
-								if wid == "h" then
-									wid = "u16"
-									form = "%08x %04x"
-									widchar = "w"
-								elseif wid == "l" then
-									wid = "u32"
-									form = "%08x %08x"
-									widchart = "d"
-								elseif wid == "j" then
-									wid = "u64"
-									form = "%08x %016x"
-									widchar = "q"
-								else
-									wid = "u8"
-									form = "%08x %02x"
-									widchar = "b"
-								end
-
-
-								if dev.space.shortname then
-									cheat.ram = { ram = dev.tag }
-									cheat.script.run = "ram:write(" .. match.addr .. "," .. match.newval .. ")"
-								else
-									cheat.space = { cpu = { tag = dev.tag, type = "program" } }
-									cheat.script.run = "cpu:write_" .. wid .. "(" .. match.addr .. "," .. match.newval .. ", true)"
-								end
-								if match.mode == 1 then
-									if not _G.ce then
-										manager:machine():popmessage("Cheat engine not available")
-									else
-										_G.ce.inject(cheat)
-									end
-								elseif match.mode == 2 then
-									cheat_save = {}
-									menu = 1
-									menu_player = 1
-									menu_type = 1
-									local setname = emu.romname()
-									if emu.softname() ~= "" then
-										for name, image in pairs(manager:machine().images) do
-											if image:exists() and image:software_list_name() ~= "" then
-												setname = image:software_list_name() .. "/" .. emu.softname()
-											end
-										end
-									end
-									-- lfs.env_replace is defined in boot.lua
-									cheat_save.path = lfs.env_replace(manager:machine():options().entries.cheatpath:value()):match("([^;]+)")
-									cheat_save.filename = string.format("%s/%s", cheat_save.path, setname)
-									cheat_save.name = cheat.desc
-									local json = require("json")
-									cheat.desc = "%s"
-									cheat_save.json = json.stringify({[1] = cheat}, {indent = true})
-									cheat_save.xml = string.format("<mamecheat version=1>\n<cheat desc=\"%%s\">\n<script state=\"run\">\n<action>%s.pp%s@%X=%X</action>\n</script>\n</cheat>\n</mamecheat>", dev.tag:sub(2), widchar, match.addr, match.newval)
-									cheat_save.simple = string.format("%s,%s,%X,%s,%X,%%s\n", setname, dev.tag, match.addr, widchar, match.newval)
-									manager:machine():popmessage("Default name is " .. cheat_save.name)
-									r = true
-								else
-									local func = "return space:read"
-									local env = { space = devtable[devcur].space }
-									if not dev.space.shortname then
-										func = func .. "_" .. wid
-									end
-									func = func .. "(" .. match.addr .. ")"
-									watches[#watches + 1] = { addr = match.addr, func = load(func, func, "t", env), format = form }
-									r = true
-								end
+								r = match_exec(match)
 							end
 							return r
 						end
