@@ -1662,8 +1662,6 @@ if (BUSES["RS232"]~=null) then
 		MAME_DIR .. "src/devices/bus/rs232/pty.h",
 		MAME_DIR .. "src/devices/bus/rs232/ser_mouse.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/ser_mouse.h",
-		MAME_DIR .. "src/devices/bus/rs232/sparckbd.cpp",
-		MAME_DIR .. "src/devices/bus/rs232/sparckbd.h",
 		MAME_DIR .. "src/devices/bus/rs232/terminal.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/terminal.h",
 		MAME_DIR .. "src/devices/bus/rs232/xvd701.cpp",
@@ -2572,6 +2570,20 @@ if (BUSES["ZORRO"]~=null) then
 		MAME_DIR .. "src/devices/bus/amiga/zorro/action_replay.h",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/buddha.cpp",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/buddha.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/sunkbd/sunkbd.h,BUSES["SUNKBD"] = true
+---------------------------------------------------
+
+if (BUSES["SUNKBD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/sunkbd/sparckbd.cpp",
+		MAME_DIR .. "src/devices/bus/sunkbd/sparckbd.h",
+		MAME_DIR .. "src/devices/bus/sunkbd/sunkbd.cpp",
+		MAME_DIR .. "src/devices/bus/sunkbd/sunkbd.h",
 	}
 end
 

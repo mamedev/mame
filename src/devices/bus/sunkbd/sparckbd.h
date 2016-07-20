@@ -1,15 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
-#ifndef MAME_DEVICES_RS232_SPARCKBD_H
-#define MAME_DEVICES_RS232_SPARCKBD_H
+#ifndef MAME_DEVICES_SUNKBD_SPARCKBD_H
+#define MAME_DEVICES_SUNKBD_SPARCKBD_H
 
 #pragma once
 
-#include "rs232.h"
+#include "sunkbd.h"
 #include "sound/beep.h"
 
 
-class sparc_keyboard_device : public device_t, public device_serial_interface, public device_rs232_port_interface
+class sparc_keyboard_device : public device_t, public device_serial_interface, public device_sun_keyboard_port_interface
 {
 public:
 	sparc_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, UINT32 clock);
@@ -35,7 +35,7 @@ private:
 	// device_serial_interface uses 10'000 range
 	enum {
 		SCAN_TIMER_ID = 20'000,
-		TX_DELAY_TIMER_ID
+		CLICK_TIMER_ID
 	};
 
 	// TODO: ensure these don't clash with diagnostic LEDs on host computer
@@ -56,11 +56,21 @@ private:
 		RX_LED
 	};
 
+	enum : UINT8 {
+		COMMAND_RESET = 0x01U,
+		COMMAND_BELL_ON = 0x02U,
+		COMMAND_BELL_OFF = 0x03U,
+		COMMAND_CLICK_ON = 0x0aU,
+		COMMAND_CLICK_OFF = 0x0bU,
+		COMMAND_LED = 0x0eU,
+		COMMAND_LAYOUT = 0x0fU
+	};
+
 	void scan_row();
 	void send_byte(UINT8 code);
 
 	emu_timer                       *m_scan_timer;
-	emu_timer                       *m_tx_delay_timer;
+	emu_timer                       *m_click_timer;
 	required_ioport                 m_dips;
 	required_ioport                 m_key_inputs[8];
 	required_device<beep_device>    m_beeper;
@@ -74,9 +84,10 @@ private:
 
 	UINT8   m_rx_state;
 
+	UINT8   m_keyclick;
 	UINT8   m_beeper_state;
 };
 
 extern const device_type SPARC_KEYBOARD;
 
-#endif // MAME_DEVICES_RS232_SPARCKBD_H
+#endif // MAME_DEVICES_SUNKBD_SPARCKBD_H
