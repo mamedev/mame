@@ -192,7 +192,7 @@ void menu_control_device_image::handle()
 
 	case START_OTHER_PART:
 		m_submenu_result.swparts = menu_software_parts::result::INVALID;
-		menu::stack_push<menu_software_parts>(ui(), container(), m_swi, m_swp->interface(), &m_swp, true, m_submenu_result.swparts);
+		menu::stack_push<menu_software_parts>(ui(), container(), m_swi, m_swp->interface().c_str(), &m_swp, true, m_submenu_result.swparts);
 		m_state = SELECT_OTHER_PART;
 		break;
 

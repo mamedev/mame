@@ -89,8 +89,8 @@ public:
 
 	// getters
 	feature_list_item *next() const { return m_next; }
-	const char *name() const { return m_name.c_str(); }
-	const char *value() const { return m_value.c_str(); }
+	const std::string &name() const { return m_name; }
+	const std::string &value() const { return m_value; }
 
 private:
 	// internal state
@@ -115,8 +115,8 @@ public:
 	// getters
 	software_part *next() const { return m_next; }
 	software_info &info() const { return m_info; }
-	const char *name() const { return m_name.c_str(); }
-	const char *interface() const { return m_interface.c_str(); }
+	const std::string &name() const { return m_name; }
+	const std::string &interface() const { return m_interface; }
 	const simple_list<feature_list_item> &featurelist() const { return m_featurelist; }
 	const rom_entry *romdata(unsigned int index = 0) const { return (index < m_romdata.size()) ? &m_romdata[index] : nullptr; }
 
@@ -153,11 +153,11 @@ public:
 	// getters
 	software_info *next() const { return m_next; }
 	software_list_device &list() const { return m_list; }
-	const char *shortname() const { return m_shortname.c_str(); }
-	const char *longname() const { return m_longname.c_str(); }
-	const char *parentname() const { return m_parentname.c_str(); }
-	const char *year() const { return m_year.c_str(); }
-	const char *publisher() const { return m_publisher.c_str(); }
+	const std::string &shortname() const { return m_shortname; }
+	const std::string &longname() const { return m_longname; }
+	const std::string &parentname() const { return m_parentname; }
+	const std::string &year() const { return m_year; }
+	const std::string &publisher() const { return m_publisher; }
 	const simple_list<feature_list_item> &other_info() const { return m_other_info; }
 	const simple_list<feature_list_item> &shared_info() const { return m_shared_info; }
 	UINT32 supported() const { return m_supported; }
@@ -217,6 +217,9 @@ public:
 	void find_approx_matches(const char *name, int matches, const software_info **list, const char *interface);
 	void release();
 
+	// string pool helpers
+	const char *add_string(const char *string) { return m_stringpool.add(string); }
+
 	// static helpers
 	static software_list_device *find_by_name(const machine_config &mconfig, const char *name);
 	static void display_matches(const machine_config &config, const char *interface, const char *name);
@@ -241,6 +244,7 @@ protected:
 	std::string                 m_description;
 	std::string                 m_errors;
 	simple_list<software_info>  m_infolist;
+	const_string_pool           m_stringpool;
 };
 
 

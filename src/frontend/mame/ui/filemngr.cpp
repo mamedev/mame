@@ -81,7 +81,7 @@ void menu_file_manager::fill_image_line(device_image_interface *img, std::string
 		if (img->part_entry() != nullptr)
 		{
 			const software_part *tmp = img->part_entry();
-			if (tmp->name() != nullptr)
+			if (!tmp->name().empty())
 			{
 				filename.append(" (");
 				filename.append(tmp->name());

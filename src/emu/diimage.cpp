@@ -867,8 +867,7 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 				while (swinfo != nullptr)
 				{
 					locationtag.append(swinfo->shortname()).append(breakstr);
-					const char *parentname = swinfo->parentname();
-					swinfo = (parentname != nullptr) ? swlist.find(parentname) : nullptr;
+					swinfo = !swinfo->parentname().empty() ? swlist.find(swinfo->parentname().c_str()) : nullptr;
 				}
 				// strip the final '%'
 				locationtag.erase(locationtag.length() - 1, 1);
@@ -1008,7 +1007,7 @@ bool device_image_interface::load_internal(const char *path, bool is_create, int
 		if ( m_software_info_ptr )
 		{
 			// sanitize
-			if (m_software_info_ptr->longname() == nullptr || m_software_info_ptr->publisher() == nullptr || m_software_info_ptr->year() == nullptr)
+			if (m_software_info_ptr->longname().empty() || m_software_info_ptr->publisher().empty() || m_software_info_ptr->year().empty())
 				fatalerror("Each entry in an XML list must have all of the following fields: description, publisher, year!\n");
 
 			// store
@@ -1352,7 +1351,7 @@ bool device_image_interface::load_software_part(const char *path, const software
 
 	// Load the software part
 	software_list_device &swlist = swpart->info().list();
-	bool result = call_softlist_load(swlist, swpart->info().shortname(), swpart->romdata());
+	bool result = call_softlist_load(swlist, swpart->info().shortname().c_str(), swpart->romdata());
 
 	// Tell the world which part we actually loaded
 	std::string full_sw_name = string_format("%s:%s:%s", swlist.list_name(), swpart->info().shortname(), swpart->name());
