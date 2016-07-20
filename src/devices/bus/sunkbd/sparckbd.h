@@ -1,15 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
-#ifndef MAME_DEVICES_RS232_SPARCKBD_H
-#define MAME_DEVICES_RS232_SPARCKBD_H
+#ifndef MAME_DEVICES_SUNKBD_SPARCKBD_H
+#define MAME_DEVICES_SUNKBD_SPARCKBD_H
 
 #pragma once
 
-#include "rs232.h"
+#include "sunkbd.h"
 #include "sound/beep.h"
 
 
-class sparc_keyboard_device : public device_t, public device_serial_interface, public device_rs232_port_interface
+class sparc_keyboard_device : public device_t, public device_serial_interface, public device_sun_keyboard_port_interface
 {
 public:
 	sparc_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, UINT32 clock);
@@ -80,4 +80,4 @@ private:
 
 extern const device_type SPARC_KEYBOARD;
 
-#endif // MAME_DEVICES_RS232_SPARCKBD_H
+#endif // MAME_DEVICES_SUNKBD_SPARCKBD_H

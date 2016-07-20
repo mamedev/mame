@@ -417,7 +417,7 @@
 #include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "bus/rs232/rs232.h"
-#include "bus/rs232/sparckbd.h"
+#include "bus/sunkbd/sunkbd.h"
 #include "machine/timekpr.h"
 #include "machine/upd765.h"
 #include "formats/pc_dsk.h"
@@ -485,11 +485,6 @@ const sparc_disassembler::asi_desc_map::value_type sun4c_asi_desc[] = {
 	{ 0x0d, { nullptr, "Flush Cache (Page)"     } },
 	{ 0x0e, { nullptr, "Flush Cache (Context)"  } }
 };
-
-// TODO: put this somewhere common when sun4m, sun4d, sun4u, etc. are split out
-SLOT_INTERFACE_START(keyboard_devices)
-	SLOT_INTERFACE("keyboard", SPARC_KEYBOARD)
-SLOT_INTERFACE_END
 }
 
 enum
@@ -1609,10 +1604,10 @@ static MACHINE_CONFIG_START( sun4, sun4_state )
 	// Keyboard/mouse
 	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
 	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(sun4_state, scc1_int))
-	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(KEYBOARD_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD(KEYBOARD_TAG, keyboard_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC1_TAG, z80scc_device, rxa_w))
+	MCFG_SUNKBD_PORT_ADD(KEYBOARD_TAG, default_sun_keyboard_devices, "sparckbd")
+	MCFG_SUNKBD_RXD_HANDLER(DEVWRITELINE(SCC1_TAG, z80scc_device, rxa_w))
 
 	// RS232 serial ports
 	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
@@ -1663,10 +1658,10 @@ static MACHINE_CONFIG_START( sun4c, sun4_state )
 	// Keyboard/mouse
 	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
 	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(sun4_state, scc1_int))
-	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(KEYBOARD_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD(KEYBOARD_TAG, keyboard_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC1_TAG, z80scc_device, rxa_w))
+	MCFG_SUNKBD_PORT_ADD(KEYBOARD_TAG, default_sun_keyboard_devices, "sparckbd")
+	MCFG_SUNKBD_RXD_HANDLER(DEVWRITELINE(SCC1_TAG, z80scc_device, rxa_w))
 
 	// RS232 serial ports
 	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)

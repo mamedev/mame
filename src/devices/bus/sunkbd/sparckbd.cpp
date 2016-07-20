@@ -296,7 +296,7 @@ sparc_keyboard_device::sparc_keyboard_device(
 		char const *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_serial_interface(mconfig, *this)
-	, device_rs232_port_interface(mconfig, *this)
+	, device_sun_keyboard_port_interface(mconfig, *this)
 	, m_scan_timer(nullptr)
 	, m_click_timer(nullptr)
 	, m_dips(*this, "DIP")
@@ -372,12 +372,8 @@ void sparc_keyboard_device::device_reset()
 	receive_register_reset();
 	transmit_register_reset();
 
-	// set device_rs232_port_interface lines - note that only RxD is physically present
+	// set device_sun_keyboard_port_interface lines
 	output_rxd(1);
-	output_dcd(0);
-	output_dsr(0);
-	output_ri(0);
-	output_cts(0);
 
 	// send reset response
 	send_byte(0xffU);
