@@ -6,9 +6,8 @@
 
 
 /*
-    TODO: implement keyclick
     TODO: determine default keyclick state on real keyboard
-    TODO: use 1,200 Baud properly once we work out what's going on with the SCC
+    TODO: scancodes for extra key on international layout
 
     HLE SPARC serial keyboard compatible with Sun Type 4/5/6
 
@@ -16,7 +15,7 @@
     0000 0001               reset (keyboard responds with self test pass/fail)
     0000 0010               bell on (480us period)
     0000 0011               bell off
-    0000 1010               enable keyclick (5us duration 480us period on make)
+    0000 1010               enable keyclick (5ms duration 480us period on make)
     0000 1011               disable keyclick
     0000 1110  ---- lscn    LED (1 = on, l = caps lock, s = scroll lock, c = compose, n = num lock)
     0000 1111               layout request (keyboard responds with layout response)
@@ -299,7 +298,7 @@ sparc_keyboard_device::sparc_keyboard_device(
 	, device_serial_interface(mconfig, *this)
 	, device_rs232_port_interface(mconfig, *this)
 	, m_scan_timer(nullptr)
-	, m_tx_delay_timer(nullptr)
+	, m_click_timer(nullptr)
 	, m_dips(*this, "DIP")
 	, m_key_inputs{
 			{ *this, "ROW0" }, { *this, "ROW1" },
@@ -314,6 +313,7 @@ sparc_keyboard_device::sparc_keyboard_device(
 	, m_tail(0)
 	, m_empty(0)
 	, m_rx_state(RX_IDLE)
+	, m_keyclick(0)
 	, m_beeper_state(0)
 {
 }
@@ -340,7 +340,7 @@ void sparc_keyboard_device::device_start()
 	device_serial_interface::register_save_state(machine().save(), this);
 
 	m_scan_timer = timer_alloc(SCAN_TIMER_ID);
-	m_tx_delay_timer = timer_alloc(TX_DELAY_TIMER_ID);
+	m_click_timer = timer_alloc(CLICK_TIMER_ID);
 
 	save_item(NAME(m_current_keys));
 	save_item(NAME(m_next_row));
@@ -349,6 +349,7 @@ void sparc_keyboard_device::device_start()
 	save_item(NAME(m_tail));
 	save_item(NAME(m_empty));
 	save_item(NAME(m_rx_state));
+	save_item(NAME(m_keyclick));
 	save_item(NAME(m_beeper_state));
 }
 
@@ -362,11 +363,12 @@ void sparc_keyboard_device::device_reset()
 	m_head = m_tail = 0;
 	m_empty = 1;
 	m_rx_state = RX_IDLE;
+	m_keyclick = 0;
 	m_beeper_state = 0;
 
 	// configure device_serial_interface
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	set_rate(1200); 
+	set_rate(1'200);
 	receive_register_reset();
 	transmit_register_reset();
 
@@ -391,7 +393,7 @@ void sparc_keyboard_device::device_reset()
 
 	// kick the scan timer
 	m_scan_timer->adjust(attotime::from_hz(1'200), 0, attotime::from_hz(1'200));
-	m_tx_delay_timer->reset();
+	m_click_timer->reset();
 }
 
 
@@ -403,20 +405,9 @@ void sparc_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, i
 		scan_row();
 		break;
 
-	case TX_DELAY_TIMER_ID:
-		assert(is_transmit_register_empty());
-		assert(!m_empty || (m_head == m_tail));
-		assert(m_head < ARRAY_LENGTH(m_fifo));
-		assert(m_tail < ARRAY_LENGTH(m_fifo));
-
-		if (!m_empty)
-		{
-			printf("SPARC keyboard: send queued: %02x\n", m_fifo[m_head]);
-			fflush(stdout);
-			transmit_register_setup(m_fifo[m_head]);
-			m_head = (m_head + 1) & 0x0fU;
-			m_empty = (m_head == m_tail) ? 1 : 0;
-		}
+	case CLICK_TIMER_ID:
+		m_beeper_state &= ~UINT8(BEEPER_CLICK);
+		m_beeper->set_state(m_beeper_state ? 1 : 0);
 		break;
 
 	default:
@@ -433,7 +424,18 @@ void sparc_keyboard_device::tra_callback()
 
 void sparc_keyboard_device::tra_complete()
 {
-	m_tx_delay_timer->reset(attotime::from_hz(1'200 / 10));
+	assert(!m_empty || (m_head == m_tail));
+	assert(m_head < ARRAY_LENGTH(m_fifo));
+	assert(m_tail < ARRAY_LENGTH(m_fifo));
+
+	if (!m_empty)
+	{
+		printf("SPARC keyboard: send queued: %02x\n", m_fifo[m_head]);
+		fflush(stdout);
+		transmit_register_setup(m_fifo[m_head]);
+		m_head = (m_head + 1) & 0x0fU;
+		m_empty = (m_head == m_tail) ? 1 : 0;
+	}
 }
 
 
@@ -489,7 +491,7 @@ void sparc_keyboard_device::rcv_complete()
 		case 0x0aU:
 			printf("SPARC keyboard: keyclick on\n");
 			fflush(stdout);
-			logerror("Keyclick on");
+			m_keyclick = 1;
 			m_rx_state = RX_IDLE;
 			break;
 
@@ -497,7 +499,10 @@ void sparc_keyboard_device::rcv_complete()
 		case 0x0bU:
 			printf("SPARC keyboard: keyclick off\n");
 			fflush(stdout);
-			logerror("Keyclick off");
+			m_keyclick = 0;
+			m_click_timer->reset();
+			m_beeper_state &= ~UINT8(BEEPER_CLICK);
+			m_beeper->set_state(m_beeper_state ? 1 : 0);
 			m_rx_state = RX_IDLE;
 			break;
 
@@ -531,7 +536,7 @@ void sparc_keyboard_device::scan_row()
 
 	UINT16 const row(m_key_inputs[m_next_row]->read());
 	UINT16 &current(m_current_keys[m_next_row]);
-	bool keyup(false);
+	bool keydown(false), keyup(false);
 
 	for (UINT8 bit = 0; (bit < 16) && (m_empty || (m_head != m_tail)); ++bit)
 	{
@@ -539,10 +544,18 @@ void sparc_keyboard_device::scan_row()
 		if ((row ^ current) & mask)
 		{
 			UINT8 const make_break((row & mask) ? 0x00U : 0x80U);
+			keydown = keydown || !bool(make_break);
 			keyup = keyup || bool(make_break);
 			current = (current & ~mask) | (row & mask);
 			send_byte(make_break | (m_next_row << 4) | bit);
 		}
+	}
+
+	if (keydown && m_keyclick)
+	{
+		m_beeper_state |= UINT8(BEEPER_CLICK);
+		m_beeper->set_state(m_beeper_state ? 1 : 0);
+		m_click_timer->reset(attotime::from_msec(5));
 	}
 
 	if (keyup)
@@ -567,7 +580,7 @@ void sparc_keyboard_device::send_byte(UINT8 code)
 	assert(m_head < ARRAY_LENGTH(m_fifo));
 	assert(m_tail < ARRAY_LENGTH(m_fifo));
 
-	if (m_empty && is_transmit_register_empty() && (m_tx_delay_timer->remaining() == attotime::never))
+	if (m_empty && is_transmit_register_empty())
 	{
 		printf("SPARC keyboard: send immediately: %02x\n", code);
 		fflush(stdout);
