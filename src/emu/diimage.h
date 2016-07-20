@@ -266,8 +266,8 @@ protected:
 	void image_checkhash();
 	void update_names(const device_type device_type = nullptr, const char *inst = nullptr, const char *brief = nullptr);
 
-	software_part *find_software_item(const char *path, bool restrict_to_interface) const;
-	bool load_software_part(const char *path, software_part *&swpart);
+	const software_part *find_software_item(const char *path, bool restrict_to_interface) const;
+	bool load_software_part(const char *path, const software_part *&swpart);
 	std::string software_get_default_slot(const char *default_card_slot) const;
 
 	// derived class overrides
@@ -293,8 +293,8 @@ protected:
 
 	/* Software information */
 	std::string m_full_software_name;
-	software_info *m_software_info_ptr;
-	software_part *m_software_part_ptr;
+	const software_info *m_software_info_ptr;
+	const software_part *m_software_part_ptr;
 	std::string m_software_list_name;
 
 	/* info read from the hash file/software list */

@@ -520,7 +520,7 @@ int cli_frontend::execute(int argc, char **argv)
 			bool compatible = false;
 			for (software_list_device &swlistdev : iter)
 			{
-				software_info *swinfo = swlistdev.find(m_options.software_name());
+				const software_info *swinfo = swlistdev.find(m_options.software_name());
 				if (swinfo != nullptr)
 				{
 					// loop through all parts

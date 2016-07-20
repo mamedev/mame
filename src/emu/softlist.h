@@ -118,7 +118,7 @@ public:
 	const char *name() const { return m_name; }
 	const char *interface() const { return m_interface; }
 	const simple_list<feature_list_item> &featurelist() const { return m_featurelist; }
-	rom_entry *romdata(unsigned int index = 0) { return (index < m_romdata.size()) ? &m_romdata[index] : nullptr; }
+	const rom_entry *romdata(unsigned int index = 0) const { return (index < m_romdata.size()) ? &m_romdata[index] : nullptr; }
 
 	// helpers
 	software_compatibility is_compatible(const software_list_device &swlist) const;
@@ -161,10 +161,10 @@ public:
 	const simple_list<feature_list_item> &shared_info() const { return m_shared_info; }
 	UINT32 supported() const { return m_supported; }
 	const simple_list<software_part> &parts() const { return m_partdata; }
-	software_part *first_part() const { return m_partdata.first(); }
+	const software_part *first_part() const { return m_partdata.first(); }
 
 	// additional operations
-	software_part *find_part(const char *partname, const char *interface = nullptr);
+	const software_part *find_part(const char *partname, const char *interface = nullptr) const;
 	bool has_multiple_parts(const char *interface) const;
 
 private:
@@ -212,8 +212,8 @@ public:
 	const simple_list<software_info> &get_info() { if (!m_parsed) parse(); return m_infolist; }
 
 	// operations
-	software_info *find(const char *look_for, software_info *prev = nullptr);
-	void find_approx_matches(const char *name, int matches, software_info **list, const char *interface);
+	const software_info *find(const char *look_for, const software_info *prev = nullptr);
+	void find_approx_matches(const char *name, int matches, const software_info **list, const char *interface);
 	void release();
 
 	// string pool helpers

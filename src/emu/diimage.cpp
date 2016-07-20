@@ -850,7 +850,7 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 				UINT32 crc = 0;
 				bool has_crc = hash_collection(ROM_GETHASHDATA(romp)).crc(crc);
 
-				software_info *swinfo = swlist.find(swname);
+				const software_info *swinfo = swlist.find(swname);
 				if (swinfo == nullptr)
 					return false;
 
@@ -1281,7 +1281,7 @@ void device_image_interface::software_name_split(const char *swlist_swname, std:
 }
 
 
-software_part *device_image_interface::find_software_item(const char *path, bool restrict_to_interface) const
+const software_part *device_image_interface::find_software_item(const char *path, bool restrict_to_interface) const
 {
 	// split full software name into software list name and short software name
 	std::string swlist_name, swinfo_name, swpart_name;
@@ -1297,10 +1297,10 @@ software_part *device_image_interface::find_software_item(const char *path, bool
 	{
 		if (swlist_name.compare(swlistdev.list_name())==0 || !(swlist_name.length() > 0))
 		{
-			software_info *info = swlistdev.find(swinfo_name.c_str());
+			const software_info *info = swlistdev.find(swinfo_name.c_str());
 			if (info != nullptr)
 			{
-				software_part *part = info->find_part(swpart_name.c_str(), interface);
+				const software_part *part = info->find_part(swpart_name.c_str(), interface);
 				if (part != nullptr)
 					return part;
 			}
@@ -1312,10 +1312,10 @@ software_part *device_image_interface::find_software_item(const char *path, bool
 			// gameboy:sml) which is not handled properly by software_name_split
 			// since the function cannot distinguish between this and the case
 			// path = swinfo_name:swpart_name
-			software_info *info = swlistdev.find(swpart_name.c_str());
+			const software_info *info = swlistdev.find(swpart_name.c_str());
 			if (info != nullptr)
 			{
-				software_part *part = info->find_part(nullptr, interface);
+				const software_part *part = info->find_part(nullptr, interface);
 				if (part != nullptr)
 					return part;
 			}
@@ -1340,7 +1340,7 @@ software_part *device_image_interface::find_software_item(const char *path, bool
 //  sw_info and sw_part are also set.
 //-------------------------------------------------
 
-bool device_image_interface::load_software_part(const char *path, software_part *&swpart)
+bool device_image_interface::load_software_part(const char *path, const software_part *&swpart)
 {
 	// if no match has been found, we suggest similar shortnames
 	swpart = find_software_item(path, true);
@@ -1376,7 +1376,7 @@ bool device_image_interface::load_software_part(const char *path, software_part 
 	const char *requirement = swpart->feature("requirement");
 	if (requirement != nullptr)
 	{
-		software_part *req_swpart = find_software_item(requirement, false);
+		const software_part *req_swpart = find_software_item(requirement, false);
 		if (req_swpart != nullptr)
 		{
 			device_image_interface *req_image = req_swpart->find_mountable_image(device().mconfig());
@@ -1401,7 +1401,7 @@ std::string device_image_interface::software_get_default_slot(const char *defaul
 	if (*path != '\0')
 	{
 		result.assign(default_card_slot);
-		software_part *swpart = find_software_item(path, true);
+		const software_part *swpart = find_software_item(path, true);
 		if (swpart != nullptr)
 		{
 			const char *slot = swpart->feature("slot");

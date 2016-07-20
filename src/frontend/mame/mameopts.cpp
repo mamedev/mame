@@ -376,8 +376,8 @@ void mame_options::set_system_name(emu_options &options, const char *name)
 		// look up the software part
 		machine_config config(*cursystem, options);
 		software_list_device *swlist = software_list_device::find_by_name(config, sw_list.c_str());
-		software_info *swinfo = swlist != nullptr ? swlist->find(sw_name.c_str()) : nullptr;
-		software_part *swpart = swinfo != nullptr ? swinfo->find_part(sw_part.c_str()) : nullptr;
+		const software_info *swinfo = swlist != nullptr ? swlist->find(sw_name.c_str()) : nullptr;
+		const software_part *swpart = swinfo != nullptr ? swinfo->find_part(sw_part.c_str()) : nullptr;
 
 		// then add the options
 		if (new_system)

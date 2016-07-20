@@ -149,7 +149,7 @@ media_auditor::summary media_auditor::audit_device(device_t &device, const char 
 //-------------------------------------------------
 //  audit_software
 //-------------------------------------------------
-media_auditor::summary media_auditor::audit_software(const char *list_name, software_info *swinfo, const char *validation)
+media_auditor::summary media_auditor::audit_software(const char *list_name, const software_info *swinfo, const char *validation)
 {
 	// start fresh
 	m_record_list.clear();
