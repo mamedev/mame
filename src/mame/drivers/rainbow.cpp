@@ -8,12 +8,21 @@ Keyboard fix by Cracyc (June 2016), Baud rate generator by Shattered (July 2016)
 Portions (2013 - 2016) by Karl-Ludwig Deisenhofer (Floppy, ClikClok RTC, NVRAM, DIPs, hard disk).
 
 To unlock floppy drives A-D compile with WORKAROUND_RAINBOW_B (prevents a side effect of ERROR 13).
-Single sided 5.25" images with 80 tracks, 10 sectors (400K) were tested (*.IMD / *.IMG / *.TD0=TeleDisk).
-A 720K -DOS formatted- 3.5" image may be attached to the 4th drive (requires IMPDRV3.SYS / gives E: or F:).
-UNTESTED FORMATS: DOS 180K, 360 K disks, VT180 disks (note that VT disks are read only).
+
+Native single sided 5.25" images with 80 tracks, 10 sectors are well tested (*.IMD / *.TD0=TeleDisk / *.IMG with 400 K).
+IMG files of DOS 180K, 360 K and VT180 disks are largely untested (note that VT disks must be mounted "read only").
+
+To read a 40 track, PC-DOS formatted 5.25" image (*.TD0 preferred) mounted on drive slot 3 add:
+DEVICE=A:\idrive5.sys
+
+To access a 80 track, PC-DOS formatted 3.5" image (720K, IMG preferred) mounted on drive slot 4 add:
+DEVICE=A:\impdrv3.sys D:
+NOTE: content will be accessible via letter E: or F: (NOT D:).  No luck with Impdrv5, Impdrv5F, Impdrv5T...
+
+PLEASE USE THE RIGHT SLOT - AND ALWAYS SAVE YOUR DATA BEFORE MOUNTING FOREIGN DISK FORMATS!
 
 You * should * also reassign SETUP (away from F3, where it sits on a LK201).
-DATA LOSS IMMINENT: when in partial emulation mode, F3 performs a hard reset!
+DATA LOSS POSSIBLE: when in partial emulation mode, F3 performs a hard reset!
 
 STATE AS OF JULY 2016
 ---------------------
@@ -49,7 +58,7 @@ CURRENTY UNEMULATED
 
 (b1) LOOPBACK circuit not emulated, NMI from RAM card also unemulated (NMI vector 02).
 The former is used in startup tests, the latter seems less relevant (must use menu self test "S"
- or memory diagnostic test; last one crashes when reaching higher RAM regions BTW).
+ or memory diagnostic test.	TODO: mem.test causes a CPU crash when reaching higher RAM regions.
 
 (b2) system interaction tests HALT Z80 CPU at location $0211 (forever). Boot the RX50 diag.disk
  to see what happens (key 3 - individual tests, then 12 - system interaction). Uses LOOPBACK too?
@@ -231,14 +240,16 @@ W16 pulls J2 printer port pin 1 to GND when set (chassis to logical GND).
 W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 ****************************************************************************/
 
+#define RTC_BASE 0xFC000
 // Do not pretend to emulate newer RAM board; stick with the old one:
-// (affects presence detect via 'system_parameter_r' only) 
+// (only affects presence bit in 'system_parameter_r') 
 #define OLD_RAM_BOARD_PRESENT
 
 #ifdef		ASSUME_MODEL_A_HARDWARE
 // Define standard and maximum RAM sizes (A model):
 #define MOTHERBOARD_RAM 0x0ffff  // 64 K base RAM  (100-A)
 #define END_OF_RAM 0xcffff // Very last byte (theretical; on 100-A) DO NOT CHANGE.
+
 #else
 
 // DEC-100-B probes until a 'flaky' area is found (BOOT ROM around F400:0E04).
@@ -250,11 +261,7 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 
 // Suitable Solutions ClikClok (one of the more compatible battery backed real time clocks)
 #define RTC_ENABLED
-// DESCRIPTION: plugs into NVRAM chip socket on a 100-A (unemulated yet)
-// and into one of the EPROM sockets on the 100-B (there is a socket on the ClikClok for the NVRAM / EPROM).
-// DRIVERS: 'rbclik.zip' DOS and CP/M binaries plus source from DEC employee; Reads & displays times. Y2K READY.
-// + 'newclk.arc' (Suitable Solutions; sets time and date; uses FE000 and up). 2 digit year here.
-// TODO: obtain hardware / check address decoders. Access logic _here_ is derived from Vincent Esser's source!
+
 #endif
 
 // ----------------------------------------------------------------------------------------------
@@ -414,12 +421,6 @@ public:
 	DECLARE_READ8_MEMBER(rtc_enable);
 	DECLARE_READ8_MEMBER(rtc_r);
 
-	DECLARE_READ8_MEMBER(rtc_reset2);
-	DECLARE_READ8_MEMBER(rtc_enable2);
-	DECLARE_READ8_MEMBER(rtc_r2);
-
-	DECLARE_READ8_MEMBER(rtc_w);
-
 	DECLARE_WRITE_LINE_MEMBER(mpsc_irq);
 	DECLARE_WRITE8_MEMBER(comm_bitrate_w);
 	DECLARE_WRITE8_MEMBER(printer_bitrate_w);
@@ -555,8 +556,8 @@ FLOPPY_FORMATS_END
 static SLOT_INTERFACE_START(rainbow_floppies)
 SLOT_INTERFACE("525qd0", FLOPPY_525_QD) // QD means 80 tracks with DD data rate (single or double sided).
 SLOT_INTERFACE("525qd1", FLOPPY_525_QD)
-SLOT_INTERFACE("525qd2", FLOPPY_525_QD)
-SLOT_INTERFACE("35dd", FLOPPY_35_DD) // 3rd party drive. RX50 controller is fixed to double density
+SLOT_INTERFACE("525dd", FLOPPY_525_DD) // mimic a 5.25" PC (40 track) drive. Requires IDrive5.SYS.  
+SLOT_INTERFACE("35dd", FLOPPY_35_DD) // mimic 3.5" PC drive (720K, double density). Use Impdrv3.SYS.
 SLOT_INTERFACE_END
 
 void rainbow_state::machine_start()
@@ -863,27 +864,8 @@ void rainbow_state::machine_reset()
 #ifdef RTC_ENABLED
 // *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-B' ***************************************
 // No address space needed ( -> IRQs must be disabled to block ROM accesses during reads ).
-	#define RTC_RESET 0xFC104 // read $FC104 or mirror $FE104
-	program.install_read_handler(RTC_RESET, RTC_RESET, read8_delegate(FUNC(rainbow_state::rtc_reset), this));
-	program.install_read_handler(RTC_RESET + 0x2000, RTC_RESET + 0x2000, read8_delegate(FUNC(rainbow_state::rtc_reset2), this));
-
-	// A magic pattern enables reads or writes (-> RTC_WRITE_DATA_0 / RTC_WRITE_DATA_1)
-	// 64 bits read from two alternating addresses (see DS1315.C)
-	#define RTC_PATTERN_0 0xFC100 // MIRROR: FE100
-	#define RTC_PATTERN_1 0xFC101 // MIRROR: FE101
-	program.install_read_handler(RTC_PATTERN_0, RTC_PATTERN_1, read8_delegate(FUNC(rainbow_state::rtc_enable), this));
-	program.install_read_handler(RTC_PATTERN_0 + 0x2000, RTC_PATTERN_1 + 0x2000, read8_delegate(FUNC(rainbow_state::rtc_enable2), this));
-
-	// * Read actual time/date from ClikClok *
-	#define RTC_READ_DATA 0xFC004 // Single byte - delivers one bit (if RTC enabled). MIRROR: FE004
-	program.install_read_handler(RTC_READ_DATA, RTC_READ_DATA, read8_delegate(FUNC(rainbow_state::rtc_r), this));
-	program.install_read_handler(RTC_READ_DATA + 0x2000, RTC_READ_DATA + 0x2000, read8_delegate(FUNC(rainbow_state::rtc_r2), this));
-
-	// * Secretly transmit data to RTC (set time / date) *  Works only if magic pattern enabled RTC. Look ma, no writes!
-	#define RTC_WRITE_DATA_0 0xFE000
-	#define RTC_WRITE_DATA_1 0xFE001
-	program.install_read_handler(RTC_WRITE_DATA_0, RTC_WRITE_DATA_1, read8_delegate(FUNC(rainbow_state::rtc_w), this));
-	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-B' ***************************************
+	program.install_read_handler(RTC_BASE, RTC_BASE + 0x2104, read8_delegate(FUNC(rainbow_state::rtc_r), this));	
+// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-B' ***************************************
 #endif
 
 	m_rtc->chip_reset();     // * Reset RTC to a defined state *
@@ -1143,70 +1125,57 @@ WRITE8_MEMBER(rainbow_state::share_z80_w)
 
 
 // ------------------------ClikClok (for model B; DS1315)  ---------------------------------
-#define RTC_RESET_MACRO  m_rtc->chip_reset(); \
-							UINT8 *rom = memregion("maincpu")->base();
+// DESCRIPTION: version for 100-A plugs into NVRAM chip socket (unemulated yet)
+//   On a 100-B, it occupies one of the EPROM sockets. There is a socket on the ClikClok for the NVRAM / EPROM.
 
-#define RTC_ENABLE_MACRO				\
-	if (m_inp11->read() == 0x01)			\
-	{	if (offset & 1)				\
-			m_rtc->read_1(space, 0);	\
-		else					\
-			m_rtc->read_0(space, 0);  }	\
-	UINT8 *rom = memregion("maincpu")->base();
-
-#define RTC_READ_MACRO \
-	if (m_rtc->chip_enable() && (m_inp11->read() == 0x01))	\
-		return (m_rtc->read_data(space, 0) & 0x01);	\
-	UINT8 *rom = memregion("maincpu")->base();
-
-// *********** RTC RESET **************
-READ8_MEMBER(rainbow_state::rtc_reset)
-{
-	RTC_RESET_MACRO
-	return rom[RTC_RESET];
-}
-
-READ8_MEMBER(rainbow_state::rtc_reset2)
-{
-	RTC_RESET_MACRO
-	return rom[RTC_RESET + 0x2000];
-}
-
-// *********** RTC ENABLE **************
-READ8_MEMBER(rainbow_state::rtc_enable)
-{
-	RTC_ENABLE_MACRO
-	return rom[RTC_PATTERN_0 + offset];
-}
-
-READ8_MEMBER(rainbow_state::rtc_enable2)
-{
-	RTC_ENABLE_MACRO
-	return rom[RTC_PATTERN_0 + offset + 0x2000];
-}
-
-// ** READ single bit from RTC (or ROM) **
+// DRIVERS: (a) DOS and CP/M binaries plus source from DEC employee (rbclik); Reads & displays times. Y2K READY!
+// (b) Suitable Solutions ClikClok distribution disk; Uses $FE000 and up. 2 digit year. Needed to set time & date.
+//      
+// TODO: obtain hardware / check address decoders. 
+// RTC accesses here were derived from Vincent Esser's published source. 
 READ8_MEMBER(rainbow_state::rtc_r)
 {
-	RTC_READ_MACRO
-	return rom[RTC_READ_DATA];
-}
+	if((m_inp11->read() == 0x01)) // if enabled...
+	{
+		switch (offset)
+		{
+			// Transfer data to DS1315 (data = offset):
+			case 0x0000:  // RTC_WRITE_DATA_0 0xFC000 
+			case 0x2000:  // RTC_WRITE_DATA_0 0xFE000 (MIRROR)
 
-READ8_MEMBER(rainbow_state::rtc_r2)
-{
-	RTC_READ_MACRO
-	return rom[RTC_READ_DATA + 0x2000];
-}
+			case 0x0001:  // RTC_WRITE_DATA_1 0xFC001 
+			case 0x2001:  // RTC_WRITE_DATA_1 0xFE001 (MIRROR)
+				m_rtc->write_data(space, offset & 0x01); 
+				break;
 
-// Transfer data to DS1315 (read operation; data in offset):
-// (always return ROM char to prevent potential IRQ issues)
-READ8_MEMBER(rainbow_state::rtc_w)
-{
-	if (m_rtc->chip_enable() && (m_inp11->read() == 0x01))
-		m_rtc->write_data(space, offset & 0x01);
+			// Read actual time/date from ClikClok:
+			case 0x0004:  // 0xFC004
+			case 0x2004:  // 0xFE004 (MIRROR)
+				if (m_rtc->chip_enable())  
+					return (m_rtc->read_data(space, 0) & 0x01);         
+
+		        // (RTC ACTIVATION) READ MAGIC PATTERN 0
+			case 0x0100:  // 0xFC100 
+			case 0x2100:  // 0xFE100 (MIRROR)
+				m_rtc->read_0(space, 0);     
+				break;
+
+			// (RTC ACTIVATION) READ MAGIC PATTERN 1 
+			case 0x0101:  // 0xFC101 
+			case 0x2101:  // 0xFE101 (MIRROR)
+				m_rtc->read_1(space, 0);     	
+				break;
+
+			// RESET
+			case 0x0104:  // 0xFC104 
+			case 0x2104:  // 0xFE104 (MIRROR)
+				m_rtc->chip_reset();
+				break;
+		}
+	}
 
 	UINT8 *rom = memregion("maincpu")->base();
-	return rom[RTC_WRITE_DATA_0 + offset];
+	return rom[RTC_BASE + offset]; 	// Return ROM to prevent crashes 
 }
 // ------------------------/ ClikClok (for model B; DS1315)  ---------------------------------
 
@@ -2391,7 +2360,7 @@ MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(WRITELINE(rainbow_state, clear_vide
 MCFG_FD1793_ADD(FD1793_TAG, XTAL_24_0734MHz / 24) // no separate 1 Mhz quartz
 MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":0", rainbow_floppies, "525qd0", rainbow_state::floppy_formats)
 MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":1", rainbow_floppies, "525qd1", rainbow_state::floppy_formats)
-MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":2", rainbow_floppies, "525qd2", rainbow_state::floppy_formats)
+MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":2", rainbow_floppies, "525dd", rainbow_state::floppy_formats)
 MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":3", rainbow_floppies, "35dd", rainbow_state::floppy_formats)
 MCFG_SOFTWARE_LIST_ADD("flop_list", "rainbow")
 
