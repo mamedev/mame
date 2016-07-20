@@ -82,10 +82,15 @@ class feature_list_item
 
 public:
 	// construction/destruction
+	feature_list_item(std::string &&name, std::string &&value)
+		: m_next(nullptr),
+			m_name(std::move(name)),
+			m_value(std::move(value)) { }
+
 	feature_list_item(const std::string &name, const std::string &value)
 		: m_next(nullptr),
-			m_name(name),
-			m_value(value) { }
+		m_name(name),
+		m_value(value) { }
 
 	// getters
 	feature_list_item *next() const { return m_next; }
@@ -110,7 +115,7 @@ class software_part
 
 public:
 	// construction/destruction
-	software_part(software_info &info, const std::string &name, const std::string &interface);
+	software_part(software_info &info, std::string &&name, std::string &&interface);
 
 	// getters
 	software_part *next() const { return m_next; }
@@ -123,7 +128,7 @@ public:
 	// helpers
 	software_compatibility is_compatible(const software_list_device &swlist) const;
 	bool matches_interface(const char *interface) const;
-	const char *feature(const char *feature_name) const;
+	const char *feature(const std::string &feature_name) const;
 	device_image_interface *find_mountable_image(const machine_config &mconfig) const;
 
 private:
@@ -148,7 +153,7 @@ class software_info
 
 public:
 	// construction/destruction
-	software_info(software_list_device &list, const std::string &name, const std::string &parent, const char *supported);
+	software_info(software_list_device &list, std::string &&name, std::string &&parent, const char *supported);
 
 	// getters
 	software_info *next() const { return m_next; }

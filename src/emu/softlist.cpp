@@ -102,11 +102,11 @@ const device_type SOFTWARE_LIST = &device_creator<software_list_device>;
 //  software_part - constructor
 //-------------------------------------------------
 
-software_part::software_part(software_info &info, const std::string &name, const std::string &interface)
+software_part::software_part(software_info &info, std::string &&name, std::string &&interface)
 	: m_next(nullptr),
 		m_info(info),
-		m_name(name),
-		m_interface(interface)
+		m_name(std::move(name)),
+		m_interface(std::move(interface))
 {
 }
 
@@ -116,13 +116,11 @@ software_part::software_part(software_info &info, const std::string &name, const
 //  feature, if specified
 //-------------------------------------------------
 
-const char *software_part::feature(const char *feature_name) const
+const char *software_part::feature(const std::string &feature_name) const
 {
-	assert(feature_name != nullptr);
-
 	// scan the feature list for an entry matching feature_name and return the value
 	for (const feature_list_item &feature : m_featurelist)
-		if (strcmp(feature.name().c_str(), feature_name) == 0)
+		if (feature.name() == feature_name)
 			return feature.value().c_str();
 	return nullptr;
 
@@ -236,12 +234,12 @@ device_image_interface *software_part::find_mountable_image(const machine_config
 //  software_info - constructor
 //-------------------------------------------------
 
-software_info::software_info(software_list_device &list, const std::string &name, const std::string &parent, const char *supported)
+software_info::software_info(software_list_device &list, std::string &&name, std::string &&parent, const char *supported)
 	: m_next(nullptr),
 		m_list(list),
 		m_supported(SOFTWARE_SUPPORTED_YES),
-		m_shortname(name),
-		m_parentname(parent)
+		m_shortname(std::move(name)),
+		m_parentname(std::move(parent))
 {
 	// handle the supported flag if provided
 	if (supported != nullptr)
@@ -937,7 +935,7 @@ void softlist_parser::parse_main_start(const char *tagname, const char **attribu
 		auto attrvalues = parse_attributes(attributes, ARRAY_LENGTH(attrnames), attrnames);
 
 		if (!attrvalues[0].empty())
-			m_current_info = &m_list.m_infolist.append(*global_alloc(software_info(m_list, attrvalues[0], attrvalues[1], attrvalues[2].c_str())));
+			m_current_info = &m_list.m_infolist.append(*global_alloc(software_info(m_list, std::move(attrvalues[0]), std::move(attrvalues[1]), attrvalues[2].c_str())));
 		else
 			parse_error("No name defined for item");
 	}
@@ -979,7 +977,7 @@ void softlist_parser::parse_soft_start(const char *tagname, const char **attribu
 		auto attrvalues = parse_attributes(attributes, ARRAY_LENGTH(attrnames), attrnames);
 
 		if (!attrvalues[0].empty() && !attrvalues[1].empty())
-			m_current_info->m_other_info.append(*global_alloc(feature_list_item(attrvalues[0], attrvalues[1])));
+			m_current_info->m_other_info.append(*global_alloc(feature_list_item(std::move(attrvalues[0]), std::move(attrvalues[1]))));
 		else
 			parse_error("Incomplete other_info definition");
 	}
@@ -991,7 +989,7 @@ void softlist_parser::parse_soft_start(const char *tagname, const char **attribu
 		auto attrvalues = parse_attributes(attributes, ARRAY_LENGTH(attrnames), attrnames);
 
 		if (!attrvalues[0].empty() && !attrvalues[1].empty())
-			m_current_info->m_shared_info.append(*global_alloc(feature_list_item(attrvalues[0], attrvalues[1])));
+			m_current_info->m_shared_info.append(*global_alloc(feature_list_item(std::move(attrvalues[0]), std::move(attrvalues[1]))));
 		else
 			parse_error("Incomplete sharedfeat definition");
 	}
@@ -1003,7 +1001,7 @@ void softlist_parser::parse_soft_start(const char *tagname, const char **attribu
 		auto attrvalues = parse_attributes(attributes, ARRAY_LENGTH(attrnames), attrnames);
 
 		if (!attrvalues[0].empty() && !attrvalues[1].empty())
-			m_current_part = &m_current_info->m_partdata.append(*global_alloc(software_part(*m_current_info, attrvalues[0], attrvalues[1])));
+			m_current_part = &m_current_info->m_partdata.append(*global_alloc(software_part(*m_current_info, std::move(attrvalues[0]), std::move(attrvalues[1]))));
 		else
 			parse_error("Incomplete part definition");
 	}
@@ -1087,7 +1085,7 @@ void softlist_parser::parse_part_start(const char *tagname, const char **attribu
 		auto attrvalues = parse_attributes(attributes, ARRAY_LENGTH(attrnames), attrnames);
 
 		if (!attrvalues[0].empty())
-			m_current_part->m_featurelist.append(*global_alloc(feature_list_item(attrvalues[0], attrvalues[1])));
+			m_current_part->m_featurelist.append(*global_alloc(feature_list_item(std::move(attrvalues[0]), std::move(attrvalues[1]))));
 		else
 			parse_error("Incomplete feature definition");
 	}
@@ -1120,45 +1118,42 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 		static const char *attrnames[] = { "name", "size", "crc", "sha1", "offset", "value", "status", "loadflag" };
 		auto attrvalues = parse_attributes(attributes, ARRAY_LENGTH(attrnames), attrnames);
 
-		const char *name = attrvalues[0].c_str();
-		const char *sizestr = attrvalues[1].c_str();
-		const char *crc = attrvalues[2].c_str();
-		const char *sha1 = attrvalues[3].c_str();
-		const char *offsetstr = attrvalues[4].c_str();
-		const char *value = attrvalues[5].c_str();
-		const char *status = attrvalues[6].c_str();
-		const char *loadflag = attrvalues[7].c_str();
-		if (sizestr != nullptr && offsetstr != nullptr)
+		const std::string &name = attrvalues[0];
+		const std::string &sizestr = attrvalues[1];
+		const std::string &crc = attrvalues[2];
+		const std::string &sha1 = attrvalues[3];
+		const std::string &offsetstr = attrvalues[4];
+		const std::string &value = attrvalues[5];
+		const std::string &status = attrvalues[6];
+		const std::string &loadflag = attrvalues[7];
+		if (!sizestr.empty() && !offsetstr.empty())
 		{
-			UINT32 length = strtol(sizestr, nullptr, 0);
-			UINT32 offset = strtol(offsetstr, nullptr, 0);
+			UINT32 length = strtol(sizestr.c_str(), nullptr, 0);
+			UINT32 offset = strtol(offsetstr.c_str(), nullptr, 0);
 
-			if (loadflag != nullptr && strcmp(loadflag, "reload") == 0)
+			if (loadflag == "reload")
 				add_rom_entry(nullptr, nullptr, offset, length, ROMENTRYTYPE_RELOAD | ROM_INHERITFLAGS);
-			else if (loadflag != nullptr && strcmp(loadflag, "reload_plain") == 0)
+			else if (loadflag == "reload_plain")
 				add_rom_entry(nullptr, nullptr, offset, length, ROMENTRYTYPE_RELOAD);
-			else if (loadflag != nullptr && strcmp(loadflag, "continue") == 0)
+			else if (loadflag == "continue")
 				add_rom_entry(nullptr, nullptr, offset, length, ROMENTRYTYPE_CONTINUE | ROM_INHERITFLAGS);
-			else if (loadflag != nullptr && strcmp(loadflag, "fill") == 0)
+			else if (loadflag == "fill")
+				add_rom_entry(nullptr, (const char *)(FPTR)(strtol(value.c_str(), nullptr, 0) & 0xff), offset, length, ROMENTRYTYPE_FILL);
+			else if (!name.empty())
 			{
-				auto fill_string = string_format("%02X", strtol(value, nullptr, 0) & 0xff);
-				add_rom_entry(nullptr, fill_string.c_str(), offset, length, ROMENTRYTYPE_FILL);
-			}
-			else if (name != nullptr)
-			{
-				bool baddump = (status != nullptr && strcmp(status, "baddump") == 0);
-				bool nodump = (status != nullptr && strcmp(status, "nodump") == 0);
+				bool baddump = (status == "baddump");
+				bool nodump = (status == "nodump");
 
 				std::string hashdata;
 				if (nodump)
 				{
 					hashdata = string_format("%s", NO_DUMP);
-					if (crc != nullptr && sha1 != nullptr)
+					if (!crc.empty() && !sha1.empty())
 						parse_error("No need for hash definition");
 				}
 				else
 				{
-					if (crc != nullptr && sha1 != nullptr)
+					if (!crc.empty() && !sha1.empty())
 						hashdata = string_format("%c%s%c%s%s", hash_collection::HASH_CRC, crc, hash_collection::HASH_SHA1, sha1, (baddump ? BAD_DUMP : ""));
 					else
 						parse_error("Incomplete rom hash definition");
@@ -1166,25 +1161,25 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 
 				// Handle loadflag attribute
 				int romflags = 0;
-				if (loadflag != nullptr && strcmp(loadflag, "load16_word_swap") == 0)
+				if (loadflag == "load16_word_swap")
 					romflags = ROM_GROUPWORD | ROM_REVERSE;
-				else if (loadflag != nullptr && strcmp(loadflag, "load16_byte") == 0)
+				else if (loadflag == "load16_byte")
 					romflags = ROM_SKIP(1);
-				else if (loadflag != nullptr && strcmp(loadflag, "load32_word_swap") == 0)
+				else if (loadflag == "load32_word_swap")
 					romflags = ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2);
-				else if (loadflag != nullptr && strcmp(loadflag, "load32_word") == 0)
+				else if (loadflag == "load32_word")
 					romflags = ROM_GROUPWORD | ROM_SKIP(2);
-				else if (loadflag != nullptr && strcmp(loadflag, "load32_byte") == 0)
+				else if (loadflag == "load32_byte")
 					romflags = ROM_SKIP(3);
 
-				add_rom_entry(name, hashdata.c_str(), offset, length, ROMENTRYTYPE_ROM | romflags);
+				add_rom_entry(name.c_str(), hashdata.c_str(), offset, length, ROMENTRYTYPE_ROM | romflags);
 			}
 			else
 				parse_error("Rom name missing");
 		}
-		else if (sizestr != nullptr && loadflag != nullptr && strcmp(loadflag, "ignore") == 0)
+		else if (!sizestr.empty() && !loadflag.empty() && loadflag == "ignore")
 		{
-			UINT32 length = strtol(sizestr, nullptr, 0);
+			UINT32 length = strtol(sizestr.c_str(), nullptr, 0);
 			add_rom_entry(nullptr, nullptr, 0, length, ROMENTRYTYPE_IGNORE | ROM_INHERITFLAGS);
 		}
 		else
