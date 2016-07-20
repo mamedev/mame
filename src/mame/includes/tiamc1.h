@@ -40,8 +40,6 @@ public:
 	DECLARE_WRITE8_MEMBER(tiamc1_palette_w);
 	DECLARE_WRITE8_MEMBER(kot_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(kot_videoram_w);
-	DECLARE_WRITE_LINE_MEMBER(pit8253_0_w);
-	DECLARE_WRITE_LINE_MEMBER(pit8253_1_w);
 	DECLARE_WRITE_LINE_MEMBER(pit8253_2_w);
 
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
@@ -57,10 +55,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 private:
-	bool pi8253_line_0;
-	bool pi8253_line_1;
-	bool pi8253_line_2;
-	void update_speaker();
 	optional_device<speaker_sound_device> m_speaker;
 };
 

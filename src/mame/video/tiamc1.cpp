@@ -38,8 +38,11 @@ WRITE8_MEMBER(tiamc1_state::tiamc1_videoram_w)
 
 WRITE8_MEMBER(tiamc1_state::kot_videoram_w)
 {
-	m_tileram[offset] = data;
-	m_bg_tilemap1->mark_tile_dirty(offset);
+	if ((m_layers_ctrl & 1) == 0)
+	{
+		m_tileram[offset] = data;
+		m_bg_tilemap1->mark_tile_dirty(offset);
+	}
 }
 
 WRITE8_MEMBER(tiamc1_state::tiamc1_bankswitch_w)
@@ -53,8 +56,7 @@ WRITE8_MEMBER(tiamc1_state::tiamc1_bankswitch_w)
 WRITE8_MEMBER(tiamc1_state::kot_bankswitch_w)
 {
 	m_gfxdecode->gfx(0)->set_source(m_charram + (data >> 1) * 0x100);
-
-	m_layers_ctrl = data;	// bit 0 -  video enable/disable, unemulated
+	m_layers_ctrl = data;
 }
 
 WRITE8_MEMBER(tiamc1_state::tiamc1_sprite_x_w)

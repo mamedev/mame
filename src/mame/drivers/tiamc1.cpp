@@ -114,10 +114,11 @@
      - Check sprites priorities on the real hardware
      - Check vertical background scrolling on the real hardware
      - What charset control is used for?
+	 - Kot Rybolov viewable area size likely controlled by pit8253 timers 0 and 1, used in test mode only
 
 */
 
-#define MASTER_CLOCK    XTAL_16MHz
+#define MASTER_CLOCK    15750000
 #define CPU_CLOCK       MASTER_CLOCK / 9
 #define SND_CLOCK       MASTER_CLOCK / 9
 
@@ -138,25 +139,9 @@ WRITE8_MEMBER(tiamc1_state::tiamc1_control_w)
 	machine().bookkeeping().coin_counter_w(0, data & 0x04);
 }
 
-void tiamc1_state::update_speaker()
-{
-	int level = (!(pi8253_line_0 || pi8253_line_1) || pi8253_line_2) ? 1 : 0;	// logic is guess
-	m_speaker->level_w(level);
-}
-WRITE_LINE_MEMBER(tiamc1_state::pit8253_0_w)
-{
-	pi8253_line_0 = state;
-	update_speaker();
-}
-WRITE_LINE_MEMBER(tiamc1_state::pit8253_1_w)
-{
-	pi8253_line_1 = state;
-	update_speaker();
-}
 WRITE_LINE_MEMBER(tiamc1_state::pit8253_2_w)
 {
-	pi8253_line_2 = state;
-	update_speaker();
+	m_speaker->level_w(state);
 }
 
 
@@ -198,7 +183,7 @@ static ADDRESS_MAP_START( kotrybolov_io_map, AS_IO, 8, tiamc1_state )
 	AM_RANGE(0xe0, 0xef) AM_WRITE(tiamc1_palette_w)		// color ram
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(tiamc1_bg_vshift_w)	// background V scroll
 	AM_RANGE(0xf4, 0xf4) AM_WRITE(tiamc1_bg_hshift_w)	// background H scroll
-	AM_RANGE(0xf8, 0xf8) AM_WRITE(kot_bankswitch_w)		// character rom offset, msb video on/off
+	AM_RANGE(0xf8, 0xf8) AM_WRITE(kot_bankswitch_w)		// character rom offset
 	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
 	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("kr580vv55a", i8255_device, read, write)    /* input ports + coin counters & lockout */
 ADDRESS_MAP_END
@@ -238,7 +223,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gorodki )
 	PORT_START("IN0")
-	PORT_BIT( 0xff, 152, IPT_PADDLE ) PORT_MINMAX(96, 208) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0xff, 152, IPT_AD_STICK_X) PORT_MINMAX(96, 208) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -334,7 +319,7 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( tiamc1, tiamc1_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, CPU_CLOCK)    /* guess? */
+	MCFG_CPU_ADD("maincpu", I8080, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(tiamc1_map)
 	MCFG_CPU_IO_MAP(tiamc1_io_map)
 
@@ -362,7 +347,7 @@ static MACHINE_CONFIG_START( tiamc1, tiamc1_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("2x8253", TIAMC1, SND_CLOCK)  /* guess? */
+	MCFG_SOUND_ADD("2x8253", TIAMC1, SND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -383,9 +368,7 @@ static MACHINE_CONFIG_DERIVED(kot, tiamc1)
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(SND_CLOCK)				// guess
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(tiamc1_state, pit8253_0_w))
 	MCFG_PIT8253_CLK1(SND_CLOCK)				// guess
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(tiamc1_state, pit8253_1_w))
 	MCFG_PIT8253_CLK2(SND_CLOCK)				// guess
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(tiamc1_state, pit8253_2_w))
 MACHINE_CONFIG_END
@@ -492,10 +475,10 @@ ROM_END
   ROM-based tile generator, sinle bank tile map RAM, single i8253
 
   Specs:
-  1x KR580VM80A (Russian: КР580ВМ80А. Soviet clone of i8080).
-  1x KR580VV55A (Russian: КР580ВВ55A. Soviet clone of i8255).
-  1x KR580VI53 (soviet clone of i8253).
-  1x КR580ВК28 (Russian: KP580VK28. Soviet clone of i8228: bus controllers/drivers).
+  1x KR580VM80A (Russian: KP580BM80A. Soviet clone of i8080).
+  1x KR580VV55A (Russian: KP580BB55A. Soviet clone of i8255).
+  1x KR580VI53 (soviet clone of i8253) unlike original TIA-MC1 hardware only timer 2 used for sound generation
+  1x KR580VK28 (Russian: KP580BK28. Soviet clone of i8228: bus controllers/drivers).
 
   1x K174YH7 (soviet clone of TBA810, 7W audio amplifier).
 
