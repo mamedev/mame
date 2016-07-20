@@ -366,7 +366,7 @@ void sparc_keyboard_device::device_reset()
 
 	// configure device_serial_interface
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	set_rate(9'600); // FIXME: should be 1'200 but the z80scc Baud rate generator is broken
+	set_rate(1200); 
 	receive_register_reset();
 	transmit_register_reset();
 
