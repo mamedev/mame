@@ -269,7 +269,7 @@ software_info::software_info(software_list_device &list, const char *name, const
 //  optional interface match
 //-------------------------------------------------
 
-software_part *software_info::find_part(const char *partname, const char *interface)
+const software_part *software_info::find_part(const char *partname, const char *interface) const
 {
 	// if neither partname nor interface supplied, then we just return the first entry
 	if (partname != nullptr && strlen(partname)==0) partname = nullptr;
@@ -278,7 +278,7 @@ software_part *software_info::find_part(const char *partname, const char *interf
 		return m_partdata.first();
 
 	// look for the part by name and match against the interface if provided
-	for (software_part &part : m_partdata)
+	for (const software_part &part : m_partdata)
 		if (partname != nullptr && strcmp(partname, part.name()) == 0)
 		{
 			if (interface == nullptr || part.matches_interface(interface))
@@ -369,7 +369,7 @@ void software_list_device::device_start()
 //  and optional interface
 //-------------------------------------------------
 
-void software_list_device::find_approx_matches(const char *name, int matches, software_info **list, const char *interface)
+void software_list_device::find_approx_matches(const char *name, int matches, const software_info **list, const char *interface)
 {
 	// if no name, return
 	if (name == nullptr || name[0] == 0)
@@ -384,9 +384,9 @@ void software_list_device::find_approx_matches(const char *name, int matches, so
 	}
 
 	// iterate over our info (will cause a parse if needed)
-	for (software_info &swinfo : get_info())
+	for (const software_info &swinfo : get_info())
 	{
-		software_part *part = swinfo.first_part();
+		const software_part *part = swinfo.first_part();
 		if ((interface == nullptr || part->matches_interface(interface)) && part->is_compatible(*this) == SOFTWARE_IS_COMPATIBLE)
 		{
 			// pick the best match between driver name and description
@@ -463,7 +463,7 @@ void software_list_device::display_matches(const machine_config &config, const c
 	for (software_list_device &swlistdev : deviter)
 	{
 		// get the top 16 approximate matches for the selected device interface (i.e. only carts for cartslot, etc.)
-		software_info *matches[16] = { nullptr };
+		const software_info *matches[16] = { nullptr };
 		swlistdev.find_approx_matches(name, ARRAY_LENGTH(matches), matches, interface);
 
 		// if we found some, print them
@@ -492,7 +492,7 @@ void software_list_device::display_matches(const machine_config &config, const c
 //  from an intermediate point
 //-------------------------------------------------
 
-software_info *software_list_device::find(const char *look_for, software_info *prev)
+const software_info *software_list_device::find(const char *look_for, const software_info *prev)
 {
 	// nullptr search returns nothing
 	if (look_for == nullptr)
@@ -636,7 +636,7 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 			}
 
 			// make sure the parent exists
-			software_info *swinfo2 = find(swinfo.parentname());
+			const software_info *swinfo2 = find(swinfo.parentname());
 
 			if (swinfo2 == nullptr)
 				osd_printf_error("%s: parent '%s' software for '%s' not found\n", filename(), swinfo.parentname(), swinfo.shortname());
