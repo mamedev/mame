@@ -159,7 +159,7 @@ media_auditor::summary media_auditor::audit_software(const char *list_name, cons
 
 	std::string combinedpath(util::string_format("%s;%s%s%s", swinfo->shortname(), list_name, PATH_SEPARATOR, swinfo->shortname()));
 	std::string locationtag(util::string_format("%s%%%s%%", list_name, swinfo->shortname()));
-	if (swinfo->parentname() != nullptr)
+	if (!swinfo->parentname().empty())
 	{
 		locationtag.append(swinfo->parentname());
 		combinedpath.append(util::string_format(";%s;%s%s%s", swinfo->parentname(), list_name, PATH_SEPARATOR, swinfo->parentname()));

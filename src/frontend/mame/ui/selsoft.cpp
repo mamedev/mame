@@ -552,23 +552,23 @@ void menu_select_software::build_software_list()
 				if (instance_name == nullptr || type_name == nullptr)
 					continue;
 
-				tmpmatches.shortname = strensure(swinfo.shortname());
-				tmpmatches.longname = strensure(swinfo.longname());
-				tmpmatches.parentname = strensure(swinfo.parentname());
-				tmpmatches.year = strensure(swinfo.year());
-				tmpmatches.publisher = strensure(swinfo.publisher());
+				tmpmatches.shortname = swinfo.shortname();
+				tmpmatches.longname = swinfo.longname();
+				tmpmatches.parentname = swinfo.parentname();
+				tmpmatches.year = swinfo.year();
+				tmpmatches.publisher = swinfo.publisher();
 				tmpmatches.supported = swinfo.supported();
-				tmpmatches.part = strensure(part->name());
+				tmpmatches.part = part->name();
 				tmpmatches.driver = m_driver;
 				tmpmatches.listname = strensure(swlist.list_name());
-				tmpmatches.interface = strensure(part->interface());
+				tmpmatches.interface = part->interface();
 				tmpmatches.startempty = 0;
 				tmpmatches.parentlongname.clear();
 				tmpmatches.usage.clear();
 				tmpmatches.available = false;
 
 				for (feature_list_item &flist : swinfo.other_info())
-					if (!strcmp(flist.name(), "usage"))
+					if (!strcmp(flist.name().c_str(), "usage"))
 						tmpmatches.usage = flist.value();
 
 				m_swinfo.push_back(tmpmatches);

@@ -82,21 +82,26 @@ class feature_list_item
 
 public:
 	// construction/destruction
-	feature_list_item(const char *name = nullptr, const char *value = nullptr)
+	feature_list_item(std::string &&name, std::string &&value)
 		: m_next(nullptr),
-			m_name(name),
-			m_value(value) { }
+			m_name(std::move(name)),
+			m_value(std::move(value)) { }
+
+	feature_list_item(const std::string &name, const std::string &value)
+		: m_next(nullptr),
+		m_name(name),
+		m_value(value) { }
 
 	// getters
 	feature_list_item *next() const { return m_next; }
-	const char *name() const { return m_name; }
-	const char *value() const { return m_value; }
+	const std::string &name() const { return m_name; }
+	const std::string &value() const { return m_value; }
 
 private:
 	// internal state
 	feature_list_item * m_next;
-	const char *        m_name;
-	const char *        m_value;
+	std::string         m_name;
+	std::string         m_value;
 };
 
 
@@ -110,30 +115,31 @@ class software_part
 
 public:
 	// construction/destruction
-	software_part(software_info &info, const char *name = nullptr, const char *interface = nullptr);
+	software_part(software_info &info, std::string &&name, std::string &&interface);
 
 	// getters
 	software_part *next() const { return m_next; }
 	software_info &info() const { return m_info; }
-	const char *name() const { return m_name; }
-	const char *interface() const { return m_interface; }
+	const std::string &name() const { return m_name; }
+	const std::string &interface() const { return m_interface; }
 	const simple_list<feature_list_item> &featurelist() const { return m_featurelist; }
 	const rom_entry *romdata(unsigned int index = 0) const { return (index < m_romdata.size()) ? &m_romdata[index] : nullptr; }
 
 	// helpers
 	software_compatibility is_compatible(const software_list_device &swlist) const;
 	bool matches_interface(const char *interface) const;
-	const char *feature(const char *feature_name) const;
+	const char *feature(const std::string &feature_name) const;
 	device_image_interface *find_mountable_image(const machine_config &mconfig) const;
 
 private:
 	// internal state
-	software_part *     m_next;
-	software_info &     m_info;
-	const char *        m_name;
-	const char *        m_interface;
-	simple_list<feature_list_item> m_featurelist;
-	std::vector<rom_entry>   m_romdata;
+	software_part *					m_next;
+	software_info &					m_info;
+	std::string						m_name;
+	std::string						m_interface;
+	simple_list<feature_list_item>	m_featurelist;
+	std::vector<rom_entry>			m_romdata;
+	std::vector<std::string>		m_romdata_strings;
 };
 
 
@@ -147,16 +153,16 @@ class software_info
 
 public:
 	// construction/destruction
-	software_info(software_list_device &list, const char *name, const char *parent, const char *supported);
+	software_info(software_list_device &list, std::string &&name, std::string &&parent, const char *supported);
 
 	// getters
 	software_info *next() const { return m_next; }
 	software_list_device &list() const { return m_list; }
-	const char *shortname() const { return m_shortname; }
-	const char *longname() const { return m_longname; }
-	const char *parentname() const { return m_parentname; }
-	const char *year() const { return m_year; }
-	const char *publisher() const { return m_publisher; }
+	const std::string &shortname() const { return m_shortname; }
+	const std::string &longname() const { return m_longname; }
+	const std::string &parentname() const { return m_parentname; }
+	const std::string &year() const { return m_year; }
+	const std::string &publisher() const { return m_publisher; }
 	const simple_list<feature_list_item> &other_info() const { return m_other_info; }
 	const simple_list<feature_list_item> &shared_info() const { return m_shared_info; }
 	UINT32 supported() const { return m_supported; }
@@ -172,11 +178,11 @@ private:
 	software_info *         m_next;
 	software_list_device &  m_list;
 	UINT32                  m_supported;
-	const char *            m_shortname;
-	const char *            m_longname;
-	const char *            m_parentname;
-	const char *            m_year;           // Copyright year on title screen, actual release dates can be tracked in external resources
-	const char *            m_publisher;
+	std::string             m_shortname;
+	std::string             m_longname;
+	std::string             m_parentname;
+	std::string             m_year;           // Copyright year on title screen, actual release dates can be tracked in external resources
+	std::string             m_publisher;
 	simple_list<feature_list_item> m_other_info;   // Here we store info like developer, serial #, etc. which belong to the software entry as a whole
 	simple_list<feature_list_item> m_shared_info;  // Here we store info like TV standard compatibility, or add-on requirements, etc. which get inherited
 												// by each part of this software entry (after loading these are stored in partdata->featurelist)
@@ -206,7 +212,7 @@ public:
 	const char *filename() { return m_file.filename(); }
 
 	// getters that may trigger a parse
-	const char *description() { if (!m_parsed) parse(); return m_description; }
+	const char *description() { if (!m_parsed) parse(); return m_description.c_str(); }
 	bool valid() { if (!m_parsed) parse(); return m_infolist.count() > 0; }
 	const char *errors_string() { if (!m_parsed) parse(); return m_errors.c_str(); }
 	const simple_list<software_info> &get_info() { if (!m_parsed) parse(); return m_infolist; }
@@ -218,7 +224,6 @@ public:
 
 	// string pool helpers
 	const char *add_string(const char *string) { return m_stringpool.add(string); }
-	bool string_pool_contains(const char *string) { return m_stringpool.contains(string); }
 
 	// static helpers
 	static software_list_device *find_by_name(const machine_config &mconfig, const char *name);
@@ -241,7 +246,7 @@ protected:
 	// internal state
 	bool                        m_parsed;
 	emu_file                    m_file;
-	const char *                m_description;
+	std::string                 m_description;
 	std::string                 m_errors;
 	simple_list<software_info>  m_infolist;
 	const_string_pool           m_stringpool;

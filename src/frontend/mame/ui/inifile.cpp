@@ -194,20 +194,20 @@ void favorite_manager::add_favorite_game()
 			auto swinfo = image.software_entry();
 			auto part = image.part_entry();
 			ui_software_info tmpmatches;
-			tmpmatches.shortname = strensure(swinfo->shortname());
+			tmpmatches.shortname = swinfo->shortname();
 			tmpmatches.longname = strensure(image.longname());
-			tmpmatches.parentname = strensure(swinfo->parentname());
+			tmpmatches.parentname = swinfo->parentname();
 			tmpmatches.year = strensure(image.year());
 			tmpmatches.publisher = strensure(image.manufacturer());
 			tmpmatches.supported = image.supported();
-			tmpmatches.part = strensure(part->name());
+			tmpmatches.part = part->name();
 			tmpmatches.driver = &machine().system();
 			tmpmatches.listname = strensure(image.software_list_name());
-			tmpmatches.interface = strensure(part->interface());
+			tmpmatches.interface = part->interface();
 			tmpmatches.instance = strensure(image.instance_name());
 			tmpmatches.startempty = 0;
 			tmpmatches.parentlongname.clear();
-			if (swinfo->parentname())
+			if (!swinfo->parentname().empty())
 			{
 				auto swlist = software_list_device::find_by_name(machine().config(), image.software_list_name());
 				for (software_info &c_swinfo : swlist->get_info())
@@ -223,7 +223,7 @@ void favorite_manager::add_favorite_game()
 
 			tmpmatches.usage.clear();
 			for (feature_list_item &flist : swinfo->other_info())
-				if (!strcmp(flist.name(), "usage"))
+				if (!strcmp(flist.name().c_str(), "usage"))
 					tmpmatches.usage = flist.value();
 
 			tmpmatches.devicetype = strensure(image.image_type_name());
