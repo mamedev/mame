@@ -402,8 +402,8 @@ void software_list_device::find_approx_matches(const char *name, int matches, co
 	// iterate over our info (will cause a parse if needed)
 	for (const software_info &swinfo : get_info())
 	{
-		const software_part *part = &swinfo.parts().front();
-		if ((interface == nullptr || part->matches_interface(interface)) && part->is_compatible(*this) == SOFTWARE_IS_COMPATIBLE)
+		const software_part &part = swinfo.parts().front();
+		if ((interface == nullptr || part.matches_interface(interface)) && part.is_compatible(*this) == SOFTWARE_IS_COMPATIBLE)
 		{
 			// pick the best match between driver name and description
 			int longpenalty = driver_list::penalty_compare(name, swinfo.longname().c_str());

@@ -212,7 +212,7 @@ public:
 
 	// getters that may trigger a parse
 	const char *description() { if (!m_parsed) parse(); return m_description.c_str(); }
-	bool valid() { if (!m_parsed) parse(); return m_infolist.size() > 0; }
+	bool valid() { if (!m_parsed) parse(); return !m_infolist.empty(); }
 	const char *errors_string() { if (!m_parsed) parse(); return m_errors.c_str(); }
 	const std::list<software_info> &get_info() { if (!m_parsed) parse(); return m_infolist; }
 
