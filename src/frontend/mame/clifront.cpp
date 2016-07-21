@@ -372,8 +372,8 @@ int media_identifier::find_by_hash(const hash_collection &hashes, int length)
 		{
 			if (listnames.insert(swlistdev.list_name()).second)
 			{
-				for (software_info &swinfo : swlistdev.get_info())
-					for (software_part &part : swinfo.parts())
+				for (const software_info &swinfo : swlistdev.get_info())
+					for (const software_part &part : swinfo.parts())
 						for (const rom_entry *region = part.romdata(); region != nullptr; region = rom_next_region(region))
 							for (const rom_entry *rom = rom_first_file(region); rom != nullptr; rom = rom_next_file(rom))
 							{
@@ -524,7 +524,7 @@ int cli_frontend::execute(int argc, char **argv)
 				if (swinfo != nullptr)
 				{
 					// loop through all parts
-					for (software_part &swpart : swinfo->parts())
+					for (const software_part &swpart : swinfo->parts())
 					{
 						// only load compatible software this way
 						if (swpart.is_compatible(swlistdev) == SOFTWARE_IS_COMPATIBLE)
@@ -1388,7 +1388,7 @@ void cli_frontend::verifysamples(const char *gamename)
 void cli_frontend::output_single_softlist(FILE *out, software_list_device &swlistdev)
 {
 	fprintf(out, "\t<softwarelist name=\"%s\" description=\"%s\">\n", swlistdev.list_name(), xml_normalize_string(swlistdev.description()));
-	for (software_info &swinfo : swlistdev.get_info())
+	for (const software_info &swinfo : swlistdev.get_info())
 	{
 		fprintf(out, "\t\t<software name=\"%s\"", swinfo.shortname().c_str());
 		if (!swinfo.parentname().empty())
@@ -1402,10 +1402,10 @@ void cli_frontend::output_single_softlist(FILE *out, software_list_device &swlis
 		fprintf(out, "\t\t\t<year>%s</year>\n", xml_normalize_string(swinfo.year().c_str()));
 		fprintf(out, "\t\t\t<publisher>%s</publisher>\n", xml_normalize_string(swinfo.publisher().c_str()));
 
-		for (feature_list_item &flist : swinfo.other_info())
+		for (const feature_list_item &flist : swinfo.other_info())
 			fprintf( out, "\t\t\t<info name=\"%s\" value=\"%s\"/>\n", flist.name().c_str(), xml_normalize_string( flist.value().c_str()) );
 
-		for (software_part &part : swinfo.parts())
+		for (const software_part &part : swinfo.parts())
 		{
 			fprintf(out, "\t\t\t<part name=\"%s\"", part.name().c_str());
 			if (!part.interface().empty())
@@ -1413,7 +1413,7 @@ void cli_frontend::output_single_softlist(FILE *out, software_list_device &swlis
 
 			fprintf(out, ">\n");
 
-			for (feature_list_item &flist : part.featurelist())
+			for (const feature_list_item &flist : part.featurelist())
 				fprintf(out, "\t\t\t\t<feature name=\"%s\" value=\"%s\" />\n", flist.name().c_str(), xml_normalize_string(flist.value().c_str()));
 
 			/* TODO: display rom region information */
@@ -1574,7 +1574,7 @@ void cli_frontend::verifysoftware(const char *gamename)
 					if (!swlistdev.get_info().empty())
 					{
 						nrlists++;
-						for (software_info &swinfo : swlistdev.get_info())
+						for (const software_info &swinfo : swlistdev.get_info())
 						{
 							media_auditor::summary summary = auditor.audit_software(swlistdev.list_name(), &swinfo, AUDIT_VALIDATE_FAST);
 
@@ -1667,7 +1667,7 @@ void cli_frontend::verifysoftlist(const char *gamename)
 					matched++;
 
 					// Get the actual software list contents
-					for (software_info &swinfo : swlistdev.get_info())
+					for (const software_info &swinfo : swlistdev.get_info())
 					{
 						media_auditor::summary summary = auditor.audit_software(swlistdev.list_name(), &swinfo, AUDIT_VALIDATE_FAST);
 

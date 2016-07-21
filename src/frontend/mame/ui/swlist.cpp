@@ -364,7 +364,7 @@ void menu_software::populate()
 			{
 				bool found = false;
 				for (const software_info &swinfo : swlistdev.get_info())
-					if (swinfo.first_part()->matches_interface(m_interface))
+					if (swinfo.parts().front().matches_interface(m_interface))
 						found = true;
 				if (found)
 					item_append(swlistdev.description(), "", 0, (void *)&swlistdev);
@@ -377,7 +377,7 @@ void menu_software::populate()
 			{
 				bool found = false;
 				for (const software_info &swinfo : swlistdev.get_info())
-					if (swinfo.first_part()->matches_interface(m_interface))
+					if (swinfo.parts().front().matches_interface(m_interface))
 						found = true;
 				if (found)
 				{
