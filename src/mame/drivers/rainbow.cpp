@@ -246,22 +246,18 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 #define OLD_RAM_BOARD_PRESENT
 
 #ifdef		ASSUME_MODEL_A_HARDWARE
-// Define standard and maximum RAM sizes (A model):
-#define MOTHERBOARD_RAM 0x0ffff  // 64 K base RAM  (100-A)
-#define END_OF_RAM 0xcffff // Very last byte (theretical; on 100-A) DO NOT CHANGE.
-
+	// Define standard and maximum RAM sizes (A model):
+	#define MOTHERBOARD_RAM 0x0ffff  // 64 K base RAM  (100-A)
+	#define END_OF_RAM 0xcffff // Very last byte (theretical; on 100-A) DO NOT CHANGE.
 #else
+	// DEC-100-B probes until a 'flaky' area is found (BOOT ROM around F400:0E04).
+	// It is no longer possible to key in the RAM size from within the 100-B BIOS.
+	#define MOTHERBOARD_RAM 0x1ffff  // 128 K base RAM (100-B)
+	#define END_OF_RAM 0xdffff // very last byte (100-B theoretical max.) DO NOT CHANGE.
 
-// DEC-100-B probes until a 'flaky' area is found (BOOT ROM around F400:0E04).
-// It is no longer possible to key in the RAM size from within the 100-B BIOS.
-#define MOTHERBOARD_RAM 0x1ffff  // 128 K base RAM (100-B)
-#define END_OF_RAM 0xdffff // very last byte (100-B theoretical max.) DO NOT CHANGE.
+	#define WORKAROUND_RAINBOW_B // work around DRIVE ERROR (tested on 100-B ROM only)
 
-#define WORKAROUND_RAINBOW_B // work around DRIVE ERROR (tested on 100-B ROM only)
-
-// Suitable Solutions ClikClok (one of the more compatible battery backed real time clocks)
-#define RTC_ENABLED
-
+	#define RTC_ENABLED
 #endif
 
 // ----------------------------------------------------------------------------------------------
