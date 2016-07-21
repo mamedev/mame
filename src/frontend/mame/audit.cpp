@@ -170,7 +170,7 @@ media_auditor::summary media_auditor::audit_software(const char *list_name, cons
 	std::size_t required = 0;
 
 	// now iterate over software parts
-	for (software_part &part : swinfo->parts())
+	for (const software_part &part : swinfo->parts())
 		audit_regions(part.romdata(), locationtag.c_str(), found, required);
 
 	if ((found == 0) && (required > 0))

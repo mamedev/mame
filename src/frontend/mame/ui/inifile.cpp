@@ -210,7 +210,7 @@ void favorite_manager::add_favorite_game()
 			if (!swinfo->parentname().empty())
 			{
 				auto swlist = software_list_device::find_by_name(machine().config(), image.software_list_name());
-				for (software_info &c_swinfo : swlist->get_info())
+				for (const software_info &c_swinfo : swlist->get_info())
 				{
 					std::string c_parent(c_swinfo.parentname());
 					if (!c_parent.empty() && c_parent == swinfo->shortname())
@@ -222,7 +222,7 @@ void favorite_manager::add_favorite_game()
 			}
 
 			tmpmatches.usage.clear();
-			for (feature_list_item &flist : swinfo->other_info())
+			for (const feature_list_item &flist : swinfo->other_info())
 				if (!strcmp(flist.name().c_str(), "usage"))
 					tmpmatches.usage = flist.value();
 

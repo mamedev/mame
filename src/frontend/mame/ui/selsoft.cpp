@@ -527,7 +527,7 @@ void menu_select_software::build_software_list()
 		m_filter.swlist.description.push_back(swlist.description());
 		for (const software_info &swinfo : swlist.get_info())
 		{
-			const software_part *part = swinfo.first_part();
+			const software_part *part = &swinfo.parts().front();
 			if (part->is_compatible(swlist) == SOFTWARE_IS_COMPATIBLE)
 			{
 				const char *instance_name = nullptr;
@@ -567,7 +567,7 @@ void menu_select_software::build_software_list()
 				tmpmatches.usage.clear();
 				tmpmatches.available = false;
 
-				for (feature_list_item &flist : swinfo.other_info())
+				for (const feature_list_item &flist : swinfo.other_info())
 					if (!strcmp(flist.name().c_str(), "usage"))
 						tmpmatches.usage = flist.value();
 

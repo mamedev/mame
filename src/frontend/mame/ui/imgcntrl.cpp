@@ -220,7 +220,7 @@ void menu_control_device_image::handle()
 		}
 		else
 		{
-			m_swp = m_swi->first_part();
+			m_swp = &m_swi->parts().front();
 			load_software_part();
 		}
 		break;
