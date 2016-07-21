@@ -250,7 +250,7 @@ void z80scc_device::device_start()
 
 	// state saving
 	save_item(NAME(m_int_state));
-
+	save_item(NAME(m_wr0_ptrbits));
 	LOG((" - SCC variant %02x\n", m_variant));
 }
 
@@ -508,7 +508,7 @@ void z80scc_device::trigger_interrupt(int index, int state)
 	// trigger interrupt
 	m_int_state[priority] |= Z80_DAISY_INT;
 
-	// Based on the fact that prio levels are aligned with the bitorder of rr3 we can do this...
+	// Based on the fact that prio levels are aligned with the bitorder of rr3 we can do this... TODO: field needs blanking?
 	m_chanA->m_rr3 |= (prio_level << (index == CHANNEL_A ? 3 : 0 ));
 
 	// check for interrupt
@@ -680,6 +680,7 @@ z80scc_channel::z80scc_channel(const machine_config &mconfig, const char *tag, d
 #else
 		m_brg_rate(0),
 #endif
+		m_delayed_tx_brg_change(0),
 		m_brg_const(1),
 		m_rx_error(0),
 		m_rx_clock(0),
@@ -930,6 +931,12 @@ void z80scc_channel::tra_callback()
 
 void z80scc_channel::tra_complete()
 {
+	if ( m_delayed_tx_brg_change == 1)
+	{
+		m_delayed_tx_brg_change = 0;
+		set_tra_rate(m_brg_rate);
+		LOG(("Delayed setup - Baud Rate Generator: %d mode: %dx\n", m_brg_rate, get_clock_mode() ));
+	}
 	if ((m_wr5 & WR5_TX_ENABLE) && !(m_wr5 & WR5_SEND_BREAK) && !(m_rr0 & RR0_TX_BUFFER_EMPTY))
 	{
 		LOG((LLFORMAT " %s() \"%s \"Channel %c Transmit Data Byte '%02x' m_wr5:%02x\n", machine().firstcpu->total_cycles(), FUNCNAME, m_owner->tag(), 'A' + m_index, m_tx_data, m_wr5));
@@ -1339,12 +1346,13 @@ UINT8 z80scc_channel::control_read()
 	int reg = m_uart->m_wr0_ptrbits; //m_wr0;
 	int regmask = (WR0_REGISTER_MASK | (m_uart->m_wr0_ptrbits & WR0_POINT_HIGH));
 
-	//  LOG(("%s(%02x) reg %02x, regmask %02x, WR0 %02x\n", FUNCNAME, data, reg, regmask, m_wr0));
+	LOGR(("%s(%02x) reg %02x, regmask %02x, WR0 %02x\n", FUNCNAME, data, reg, regmask, m_wr0));
 	m_uart->m_wr0_ptrbits = 0;
 	reg &= regmask;
 
 	if (reg != 0)
 	{
+		LOG(("%s(%02x) reg %02x, regmask %02x, WR0 %02x\n", FUNCNAME, data, reg, regmask, m_wr0));
 		// mask out register index
 		m_wr0 &= ~regmask;
 	}
@@ -1488,6 +1496,7 @@ void z80scc_channel::do_sccreg_wr0(UINT8 data)
 
 	if ( m_uart->m_variant & SET_Z85X3X)
 	{
+		m_uart->m_wr0_ptrbits &= ~WR0_REGISTER_MASK;
 		m_uart->m_wr0_ptrbits |= (m_wr0 & (WR0_REGISTER_MASK));
 	}
 	else if ( m_uart->m_variant & SET_Z80X30) // TODO: Implement adress decoding for Z80X30 using the shift logic described below
@@ -1865,20 +1874,15 @@ void z80scc_channel::do_sccreg_wr14(UINT8 data)
 	if ( !(m_wr14 & WR14_BRG_ENABLE) && (data & WR14_BRG_ENABLE) ) // baud rate generator beeing enabled?
 	{
 		LOG(("\"%s\": %c : %s Mics Control Bits Baudrate generator enabled with ", m_owner->tag(), 'A' + m_index, FUNCNAME));
-		m_brg_const = 2 + (m_wr13 << 8 | m_wr12);
 		if (data & WR14_BRG_SOURCE) // Do we use the PCLK as baudrate source
 		{
-			int rate = m_owner->clock() / (m_brg_const == 0 ? 1 : m_brg_const);
-			LOG(("PCLK as source, rate (%d) = PCLK (%d) / (%d)\n", rate, m_owner->clock(), m_brg_const));
+			LOG(("   - PCLK as source\n"));
 
 #if LOCAL_BRG
 			baudtimer->adjust(attotime::from_hz(rate), TIMER_ID_BAUD, attotime::from_hz(rate)); // Start the baudrate generator
 #if START_BIT_HUNT
 			m_rcv_mode = RCV_SEEKING;
 #endif
-#else
-			m_brg_rate = rate / (2 * get_clock_mode());
-			update_serial();
 #endif
 		}
 		else
@@ -1893,11 +1897,11 @@ void z80scc_channel::do_sccreg_wr14(UINT8 data)
 		m_brg_counter = 0;
 #else
 		m_brg_rate = 1; /* Signal update_serial() to disable BRG */
-		update_serial();
 #endif
 	}
 	// TODO: Add info on the other bits of this register
 	m_wr14 = data;
+	update_serial();
 }
 
 /* WR15 is the External/Status Source Control register. If the External/Status interrupts are enabled
@@ -1958,7 +1962,7 @@ void z80scc_channel::control_write(UINT8 data)
 	/* TODO. Sort out 80X30 & other SCC variants limitations in register access */
 	switch (reg)
 	{
-	case REG_WR0_COMMAND_REGPT:		do_sccreg_wr0(data); ;break;
+	case REG_WR0_COMMAND_REGPT:		do_sccreg_wr0(data); break;
 	case REG_WR1_INT_DMA_ENABLE:	do_sccreg_wr1(data); m_uart->check_interrupts(); break;
 	case REG_WR2_INT_VECTOR:		do_sccreg_wr2(data); break;
 	case REG_WR3_RX_CONTROL:		do_sccreg_wr3(data); break;
@@ -2418,12 +2422,29 @@ void z80scc_channel::update_serial()
 		LOG(("   - Transmit clock: %d mode: %d rate: %d/%xh\n", m_rxc, clocks, m_rxc / clocks, m_rxc / clocks));
 	}
 
-	if (m_brg_rate != 0)
+	if (m_brg_rate != 0 || m_wr14 & WR14_BRG_ENABLE)
 	{
-		if (m_brg_rate == 1) m_brg_rate = 0; // BRG beeing disabled
+		if (m_brg_rate == 1) 
+		{
+			m_brg_rate = 0; // BRG beeing disabled
+		}
+		else // or enabled 
+		{
+			m_brg_const = 2 + (m_wr13 << 8 | m_wr12);
+			int rate = m_owner->clock() / (m_brg_const == 0 ? 1 : m_brg_const);
+			m_brg_rate = rate / (2 * get_clock_mode());
+			LOG(("   - Source bit rate (%d) = PCLK (%d) / (%d)\n", rate, m_owner->clock(), m_brg_const));
+		}
 		set_rcv_rate(m_brg_rate);
-		set_tra_rate(m_brg_rate);
-		LOG(("   - Baud Rate Generator: %d mode: %dx\n", m_brg_rate, get_clock_mode() ));
+		if (is_transmit_register_empty())
+		{
+			set_tra_rate(m_brg_rate);
+			LOG(("   - Baud Rate Generator: %d mode: %dx\n", m_brg_rate, get_clock_mode() ));
+		}
+		else
+		{
+			m_delayed_tx_brg_change = 1;
+		}
 	}
 }
 
