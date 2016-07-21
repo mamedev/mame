@@ -56,6 +56,7 @@ private:
 
 	// internal helpers
 	template <typename T> std::vector<std::string> parse_attributes(const char **attributes, const T &attrlist);
+	bool parse_name_and_value(const char **attributes, std::string &name, std::string &value);
 	void add_rom_entry(const char *name, const char *hashdata, UINT32 offset, UINT32 length, UINT32 flags);
 
 	// expat callbacks
@@ -645,7 +646,7 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 			osd_printf_error("%s: %s is a duplicate description (%s)\n", filename(), swinfo.longname().c_str(), swinfo.shortname().c_str());
 
 		bool is_clone = false;
-		if (swinfo.parentname().empty())
+		if (!swinfo.parentname().empty())
 		{
 			is_clone = true;
 			if (swinfo.parentname() == swinfo.shortname())
@@ -659,7 +660,7 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 
 			if (swinfo2 == nullptr)
 				osd_printf_error("%s: parent '%s' software for '%s' not found\n", filename(), swinfo.parentname().c_str(), swinfo.shortname().c_str());
-			else if (swinfo2->parentname().empty())
+			else if (!swinfo2->parentname().empty())
 				osd_printf_error("%s: %s is a clone of a clone\n", filename(), swinfo.shortname().c_str());
 		}
 
@@ -804,6 +805,40 @@ std::vector<std::string> softlist_parser::parse_attributes(const char **attribut
 	}
 
 	return outlist;
+}
+
+
+//-------------------------------------------------
+//  parse_name_and_value - helper to parse "name"
+//  and "value" attribute pairs (allowing the
+//  latter to be defined as an empty string)
+//-------------------------------------------------
+
+bool softlist_parser::parse_name_and_value(const char **attributes, std::string &name, std::string &value)
+{
+	bool found_value = false;
+
+	// iterate over attribute/value pairs
+	for( ; attributes[0]; attributes += 2)
+	{
+		// if found, set the corresponding output entry to the value
+		if (strcmp(attributes[0], "name") == 0)
+		{
+			name = attributes[1];
+		}
+
+		else if (strcmp(attributes[0], "value") == 0)
+		{
+			value = attributes[1];
+			found_value = true;
+		}
+
+		// if not found, report an unknown attribute
+		else
+			unknown_attribute(attributes[0]);
+	}
+
+	return !name.empty() && found_value;
 }
 
 
@@ -1011,11 +1046,10 @@ void softlist_parser::parse_soft_start(const char *tagname, const char **attribu
 	// <info name='' value=''>
 	else if (strcmp(tagname, "info") == 0)
 	{
-		static const char *attrnames[] = { "name", "value" };
-		auto attrvalues = parse_attributes(attributes, attrnames);
+		std::string infoname, infovalue;
 
-		if (!attrvalues[0].empty() && !attrvalues[1].empty())
-			m_current_info->m_other_info.emplace_back(std::move(attrvalues[0]), std::move(attrvalues[1]));
+		if (parse_name_and_value(attributes, infoname, infovalue))
+			m_current_info->m_other_info.emplace_back(std::move(infoname), std::move(infovalue));
 		else
 			parse_error("Incomplete other_info definition");
 	}
@@ -1023,11 +1057,10 @@ void softlist_parser::parse_soft_start(const char *tagname, const char **attribu
 	// <sharedfeat name='' value=''>
 	else if (strcmp(tagname, "sharedfeat") == 0)
 	{
-		static const char *attrnames[] = { "name", "value" };
-		auto attrvalues = parse_attributes(attributes, attrnames);
+		std::string featname, featvalue;
 
-		if (!attrvalues[0].empty() && !attrvalues[1].empty())
-			m_current_info->m_shared_info.emplace_back(std::move(attrvalues[0]), std::move(attrvalues[1]));
+		if (parse_name_and_value(attributes, featname, featvalue))
+			m_current_info->m_shared_info.emplace_back(std::move(featname), std::move(featvalue));
 		else
 			parse_error("Incomplete sharedfeat definition");
 	}
@@ -1122,11 +1155,10 @@ void softlist_parser::parse_part_start(const char *tagname, const char **attribu
 	// <feature name='' value=''>
 	else if (strcmp(tagname, "feature") == 0)
 	{
-		static const char *attrnames[] = { "name", "value" };
-		auto attrvalues = parse_attributes(attributes, attrnames);
+		std::string featname, featvalue;
 
-		if (!attrvalues[0].empty())
-			m_current_part->m_featurelist.emplace_back(std::move(attrvalues[0]), std::move(attrvalues[1]));
+		if (parse_name_and_value(attributes, featname, featvalue))
+			m_current_part->m_featurelist.emplace_back(std::move(featname), std::move(featvalue));
 		else
 			parse_error("Incomplete feature definition");
 	}
