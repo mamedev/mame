@@ -127,6 +127,18 @@ const rom_entry *e01_device::device_rom_region() const
 
 
 //-------------------------------------------------
+//  MC146818_INTERFACE( rtc_intf )
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(e01_device::rtc_irq_w)
+{
+	m_rtc_irq = state;
+
+	update_interrupts();
+}
+
+
+//-------------------------------------------------
 //  mc6854_interface adlc_intf
 //-------------------------------------------------
 
@@ -140,6 +152,13 @@ WRITE_LINE_MEMBER( e01_device::adlc_irq_w )
 WRITE_LINE_MEMBER( e01_device::econet_data_w )
 {
 	m_econet->data_w(this, state);
+}
+
+WRITE_LINE_MEMBER(e01_device::via_irq_w)
+{
+	m_via_irq = state;
+
+	update_interrupts();
 }
 
 WRITE_LINE_MEMBER( e01_device::clk_en_w )
@@ -225,12 +244,12 @@ static MACHINE_CONFIG_FRAGMENT( e01 )
 	MCFG_CPU_PROGRAM_MAP(e01_mem)
 
 	MCFG_MC146818_ADD(HD146818_TAG, XTAL_32_768kHz)
-	MCFG_MC146818_IRQ_HANDLER(INPUTLINE(R65C102_TAG, M6502_IRQ_LINE))
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE(e01_device, rtc_irq_w))
 
 	// devices
-	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, XTAL_8MHz/4)
+	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, XTAL_8MHz / 4)
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(R65C102_TAG, M6502_IRQ_LINE))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(e01_device, via_irq_w))
 
 	MCFG_DEVICE_ADD(MC6854_TAG, MC6854, 0)
 	MCFG_MC6854_OUT_IRQ_CB(WRITELINE(e01_device, adlc_irq_w))
@@ -317,7 +336,7 @@ ioport_constructor e01_device::device_input_ports() const
 
 inline void e01_device::update_interrupts()
 {
-	int irq = (m_hdc_ie & m_hdc_irq) ? ASSERT_LINE : CLEAR_LINE;
+	int irq = (m_via_irq || (m_hdc_ie & m_hdc_irq) || m_rtc_irq) ? ASSERT_LINE : CLEAR_LINE;
 	int nmi = (m_fdc_irq || m_fdc_drq || (m_adlc_ie & m_adlc_irq)) ? ASSERT_LINE : CLEAR_LINE;
 
 	m_maincpu->set_input_line(M6502_IRQ_LINE, irq);
@@ -376,6 +395,8 @@ e01_device::e01_device(const machine_config &mconfig, const char *tag, device_t 
 		m_centronics(*this, CENTRONICS_TAG),
 		m_adlc_ie(0),
 		m_hdc_ie(0),
+		m_rtc_irq(CLEAR_LINE),
+		m_via_irq(CLEAR_LINE),
 		m_hdc_irq(CLEAR_LINE),
 		m_fdc_irq(CLEAR_LINE),
 		m_fdc_drq(CLEAR_LINE),
@@ -404,6 +425,8 @@ e01_device::e01_device(const machine_config &mconfig, device_type type, const ch
 		m_centronics(*this, CENTRONICS_TAG),
 		m_adlc_ie(0),
 		m_hdc_ie(0),
+		m_rtc_irq(CLEAR_LINE),
+		m_via_irq(CLEAR_LINE),
 		m_hdc_irq(CLEAR_LINE),
 		m_fdc_irq(CLEAR_LINE),
 		m_fdc_drq(CLEAR_LINE),
@@ -425,6 +448,8 @@ void e01_device::device_start()
 	// register for state saving
 	save_item(NAME(m_adlc_ie));
 	save_item(NAME(m_hdc_ie));
+	save_item(NAME(m_rtc_irq));
+	save_item(NAME(m_via_irq));
 	save_item(NAME(m_hdc_irq));
 	save_item(NAME(m_fdc_drq));
 	save_item(NAME(m_adlc_irq));
