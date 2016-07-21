@@ -855,7 +855,7 @@ Notes:
 #include "sound/ymf271.h"
 #include "sound/ymz280b.h"
 #include "machine/seibuspi.h"
-#include "machine/spisprit.h"
+#include "video/seibu_crtc.h"
 #include "includes/seibuspi.h"
 
 // default values written to CRTC (note: SYS386F does not have this chip)
@@ -969,10 +969,7 @@ WRITE32_MEMBER(seibuspi_state::ejsakura_input_select_w)
 
 
 static ADDRESS_MAP_START( base_map, AS_PROGRAM, 32, seibuspi_state )
-	AM_RANGE(0x00000414, 0x00000417) AM_WRITENOP // bg gfx decryption key, see machine/seibuspi.c
-	AM_RANGE(0x00000418, 0x0000041b) AM_READWRITE(spi_layer_bank_r, spi_layer_bank_w)
-	AM_RANGE(0x0000041c, 0x0000041f) AM_WRITE(spi_layer_enable_w) // seibu crtc
-	AM_RANGE(0x00000420, 0x0000042b) AM_RAM AM_SHARE("scrollram") // seibu crtc
+	AM_RANGE(0x00000400, 0x0000043f) AM_DEVREADWRITE16("crtc", seibu_crtc_device, read, write, 0xffffffff)
 	AM_RANGE(0x00000480, 0x00000483) AM_WRITE(tilemap_dma_start_w)
 	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
 	AM_RANGE(0x00000490, 0x00000493) AM_WRITE(video_dma_length_w)
@@ -988,6 +985,7 @@ static ADDRESS_MAP_START( base_map, AS_PROGRAM, 32, seibuspi_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sei252_map, AS_PROGRAM, 32, seibuspi_state )
+	//AM_RANGE(0x00000500, 0x0000057f) AM_DEVREADWRITE16("obj", sei252_device, read_xor, write_xor, 0xffffffff)
 	AM_RANGE(0x0000050c, 0x0000050f) AM_WRITE16(sprite_dma_start_w, 0xffff0000)
 	AM_RANGE(0x00000524, 0x00000527) AM_WRITENOP // SEI252 sprite decryption key, see machine/spisprit.c
 	AM_RANGE(0x00000528, 0x0000052b) AM_WRITENOP // SEI252 sprite decryption unknown
@@ -997,6 +995,7 @@ static ADDRESS_MAP_START( sei252_map, AS_PROGRAM, 32, seibuspi_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rise_map, AS_PROGRAM, 32, seibuspi_state )
+	//AM_RANGE(0x00000500, 0x0000057f) AM_DEVREADWRITE16("obj", seibu_encrypted_sprite_device, read, write, 0xffffffff)
 	AM_RANGE(0x0000054c, 0x0000054f) AM_WRITENOP // RISE10/11 sprite decryption key, see machine/seibuspi.c
 	AM_RANGE(0x00000560, 0x00000563) AM_WRITE16(sprite_dma_start_w, 0xffff0000)
 ADDRESS_MAP_END
@@ -1809,25 +1808,9 @@ void seibuspi_state::init_spi_common()
 
 void seibuspi_state::init_sei252()
 {
-	seibuspi_text_decrypt(memregion("gfx1")->base());
-	seibuspi_bg_decrypt(memregion("gfx2")->base(), memregion("gfx2")->bytes());
+	text_decrypt(memregion("gfx1")->base());
+	bg_decrypt(memregion("gfx2")->base(), memregion("gfx2")->bytes());
 	seibuspi_sprite_decrypt(memregion("gfx3")->base(), 0x400000);
-	init_spi_common();
-}
-
-void seibuspi_state::init_rise10()
-{
-	seibuspi_rise10_text_decrypt(memregion("gfx1")->base());
-	seibuspi_rise10_bg_decrypt(memregion("gfx2")->base(), memregion("gfx2")->bytes());
-	seibuspi_rise10_sprite_decrypt(memregion("gfx3")->base(), 0x600000);
-	init_spi_common();
-}
-
-void seibuspi_state::init_rise11()
-{
-	seibuspi_rise11_text_decrypt(memregion("gfx1")->base());
-	seibuspi_rise11_bg_decrypt(memregion("gfx2")->base(), memregion("gfx2")->bytes());
-	seibuspi_rise11_sprite_decrypt_rfjet(memregion("gfx3")->base(), 0x800000);
 	init_spi_common();
 }
 
@@ -1885,6 +1868,12 @@ static MACHINE_CONFIG_START( spi, seibuspi_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spi)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 6144)
+
+	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
+	MCFG_SEIBU_CRTC_DECRYPT_KEY_CB(WRITE16(seibuspi_state, tile_decrypt_key_w))
+	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(seibuspi_state, spi_layer_enable_w))
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(seibuspi_state, spi_layer_bank_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(seibuspi_state, scroll_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1995,6 +1984,12 @@ static MACHINE_CONFIG_START( sys386i, seibuspi_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spi)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 6144)
+
+	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
+	MCFG_SEIBU_CRTC_DECRYPT_KEY_CB(WRITE16(seibuspi_state, tile_decrypt_key_w))
+	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(seibuspi_state, spi_layer_enable_w))
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(seibuspi_state, spi_layer_bank_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(seibuspi_state, scroll_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2109,13 +2104,21 @@ DRIVER_INIT_MEMBER(seibuspi_state,rdft)
 DRIVER_INIT_MEMBER(seibuspi_state,rdft2)
 {
 	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00282ac, 0x00282af, read32_delegate(FUNC(seibuspi_state::rf2_speedup_r),this));
-	init_rise10();
+
+	rdft2_text_decrypt(memregion("gfx1")->base());
+	rdft2_bg_decrypt(memregion("gfx2")->base(), memregion("gfx2")->bytes());
+	seibuspi_rise10_sprite_decrypt(memregion("gfx3")->base(), 0x600000);
+	init_spi_common();
 }
 
 DRIVER_INIT_MEMBER(seibuspi_state,rfjet)
 {
 	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002894c, 0x002894f, read32_delegate(FUNC(seibuspi_state::rfjet_speedup_r),this));
-	init_rise11();
+
+	rfjet_text_decrypt(memregion("gfx1")->base());
+	rfjet_bg_decrypt(memregion("gfx2")->base(), memregion("gfx2")->bytes());
+	seibuspi_rise11_sprite_decrypt_rfjet(memregion("gfx3")->base(), 0x800000);
+	init_spi_common();
 }
 
 
@@ -3318,6 +3321,42 @@ ROM_START( rdft2ja ) /* SPI Cart, Japan */
 	ROM_LOAD("flash0_blank_region01.u1053", 0x000000, 0x100000, CRC(7ae7ab76) SHA1(a2b196f470bf64af94002fc4e2640fadad00418f) )
 ROM_END
 
+ROM_START( rdft2jb ) /* SPI Cart, Japan */
+	ROM_REGION32_LE( 0x200000, "maincpu", 0 ) /* i386 program */
+	ROM_LOAD32_BYTE("prg0.rom", 0x000000, 0x80000, CRC(fc42cab8) SHA1(2e33fc8d77fdc4ee58e93fc191d12f2fe9cc3c65) )
+	ROM_LOAD32_BYTE("prg1.rom", 0x000001, 0x80000, CRC(a0f09dc5) SHA1(e8ad20be1f04752b0884571384d4490813ed82d9) )
+	ROM_LOAD32_BYTE("prg2.rom", 0x000002, 0x80000, CRC(368580e0) SHA1(184036a0cbddbf79b62e388b93cb93b885faee88) )
+	ROM_LOAD32_BYTE("prg3.rom", 0x000003, 0x80000, CRC(7ad45c01) SHA1(d782057658dd000c1cf0a4726a6ed821e6f2be67) )
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
+	ROM_REGION( 0x30000, "gfx1", ROMREGION_ERASEFF ) /* text layer roms */
+	ROM_LOAD24_BYTE("rf2_5.bin", 0x000001, 0x10000, CRC(377cac2f) SHA1(f7c9323d79b77f6c8c02ba2c6cdca127d6e5cb5c) )
+	ROM_LOAD24_BYTE("rf2_6.bin", 0x000000, 0x10000, CRC(42bd5372) SHA1(c38df85b25070db9640eac541f71c0511bab0c98) )
+	ROM_LOAD24_BYTE("rf2_7.bin", 0x000002, 0x10000, CRC(1efaac7e) SHA1(8252af56dcb7a6306dc3422070176778e3c511c2) )
+
+	ROM_REGION( 0xc00000, "gfx2", ROMREGION_ERASEFF ) /* background layer roms */
+	ROM_LOAD24_WORD("bg-1d.u0535", 0x000000, 0x400000, CRC(6143f576) SHA1(c034923d0663d9ef24357a03098b8cb81dbab9f8) )
+	ROM_LOAD24_BYTE("bg-1p.u0537", 0x000002, 0x200000, CRC(55e64ef7) SHA1(aae991268948d07342ee8ba1b3761bd180aab8ec) )
+	ROM_LOAD24_WORD("bg-2d.u0536", 0x600000, 0x400000, CRC(c607a444) SHA1(dc1aa96a42e9394ca6036359670a4ec6f830c96d) )
+	ROM_LOAD24_BYTE("bg-2p.u0538", 0x600002, 0x200000, CRC(f0830248) SHA1(6075df96b49e70d2243fef691e096119e7a4d044) )
+
+	ROM_REGION( 0x1200000, "gfx3", 0 ) /* sprites */
+	ROM_LOAD("obj3.u0434",  0x0000000, 0x400000, CRC(e08f42dc) SHA1(5188d71d4355eaf43ea8893b4cfc4fe80cc24f41) )
+	ROM_LOAD("obj3b.u0433", 0x0400000, 0x200000, CRC(1b6a523c) SHA1(99a420dbc8e22e7832ccda7cec9fa661a2a2687a) )
+	ROM_LOAD("obj2.u0431",  0x0600000, 0x400000, CRC(7aeadd8e) SHA1(47103c0579240c5b1add4d0b164eaf76f5fa97f0) )
+	ROM_LOAD("obj2b.u0432", 0x0a00000, 0x200000, CRC(5d790a5d) SHA1(1ed5d4ad4c9a7e505ce35dcc90d184c26ce891dc) )
+	ROM_LOAD("obj1.u0429",  0x0c00000, 0x400000, CRC(c2c50f02) SHA1(b81397b5800c6d49f58b7ac7ff6eac56da3c5257) )
+	ROM_LOAD("obj1b.u0430", 0x1000000, 0x200000, CRC(5259321f) SHA1(3c70c1147e49f81371d0f60f7108d9718d56faf4) )
+
+	ROM_REGION32_LE( 0xa00000, "sound01", ROMREGION_ERASE00 ) /* sound roms */
+	ROM_LOAD32_WORD("pcm.u0217",    0x000000, 0x100000, CRC(2edc30b5) SHA1(c25d690d633657fc3687636b9070f36bd305ae06) )
+	ROM_CONTINUE(                   0x400000, 0x100000 )
+	ROM_LOAD32_BYTE("sound1.u0222", 0x800000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region01.u1053", 0x000000, 0x100000, CRC(7ae7ab76) SHA1(a2b196f470bf64af94002fc4e2640fadad00418f) )
+ROM_END
 
 ROM_START( rdft2it ) /* SPI Cart, Italy */
 	ROM_REGION32_LE( 0x200000, "maincpu", 0 ) /* i386 program */
@@ -3935,7 +3974,8 @@ GAME( 1997, rdft2a,     rdft2,    rdft2,   spi_2button, seibuspi_state, rdft2,  
 GAME( 1997, rdft2ja,    rdft2,    rdft2,   spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Japan set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, rdft2aa,    rdft2,    rdft2,   spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu (Dream Island license)",  "Raiden Fighters 2 - Operation Hell Dive (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, rdft2it,    rdft2,    rdft2,   spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-// these 2 are both unique
+// these are unique
+GAME( 1997, rdft2jb,    rdft2,    rdft2,   spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Japan set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, rdft2t,     rdft2,    rdft2,   spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Taiwan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, rdft2u,     rdft2,    rdft2,   spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters 2 - Operation Hell Dive (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 

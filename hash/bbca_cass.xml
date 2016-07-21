@@ -435,6 +435,17 @@
 		</part>
 	</software>
 
+	<software name="filer">
+		<description>Filer</description>
+		<year>1982</year>
+		<publisher>Micro Power</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="7092">
+				<rom name="filer-bbcb(micropower).uef" size="7092" crc="2833bfc6" sha1="88561cf141b8cefff00f290def6ed98b67e839b2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Educational -->
 
 	<software name="peekoc">
@@ -461,6 +472,17 @@
 		</part>
 	</software>
 
+	<software name="jnrmath">
+		<description>Junior Maths Pack</description>
+		<year>1982</year>
+		<publisher>Micro Power</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="5641">
+				<rom name="juniormathspack(micropower).uef" size="5641" crc="d3395b2d" sha1="313973307a473a961b6ac04efffe7f17f951d767" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="missigns">
 		<description>Missing Signs</description>
 		<year>1983</year>
@@ -469,6 +491,17 @@
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7977">
 				<rom name="missingsigns(1983)(acornsoft)(e09).uef" size="7977" crc="7da85f67" sha1="ebc8116fa980c0d268918a3aa333f772de0a7cb9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="physic">
+		<description>Physics</description>
+		<year>198?</year>
+		<publisher>Micro Power</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="3111">
+				<rom name="physics(micropower).uef" size="3111" crc="36c7ac0e" sha1="794354c9763654c7477b2bb0d5fe5bea35cea179" offset="0" />
 			</dataarea>
 		</part>
 	</software>

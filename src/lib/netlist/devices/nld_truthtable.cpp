@@ -32,11 +32,11 @@ namespace netlist
 		typename nld_truthtable_t<m_NI, m_NO>::truthtable_t m_ttbl;
 	};
 
-	static const uint_least64_t all_set = ~((uint_least64_t) 0);
+	static const uint_least64_t all_set = ~(static_cast<uint_least64_t>(0));
 
 unsigned truthtable_desc_t::count_bits(uint_least64_t v)
 {
-	uint_least64_t ret = 0;
+	unsigned ret = 0;
 	for (; v != 0; v = v >> 1)
 	{
 		ret += (v & 1);
@@ -124,8 +124,8 @@ void truthtable_desc_t::help(unsigned cur, plib::pstring_vector_t list,
 		uint_least64_t state, uint_least64_t val, std::vector<uint_least8_t> &timing_index)
 {
 	pstring elem = list[cur].trim();
-	int start = 0;
-	int end = 0;
+	uint_least64_t start = 0;
+	uint_least64_t end = 0;
 
 	if (elem.equals("0"))
 	{
@@ -144,7 +144,7 @@ void truthtable_desc_t::help(unsigned cur, plib::pstring_vector_t list,
 	}
 	else
 		nl_assert_always(false, "unknown input value (not 0, 1, or X)");
-	for (int i = start; i <= end; i++)
+	for (uint_least64_t i = start; i <= end; i++)
 	{
 		const uint_least64_t nstate = state | (i << cur);
 
@@ -205,8 +205,8 @@ void truthtable_desc_t::setup(const plib::pstring_vector_t &truthtable, uint_lea
 				val = val | (1 << j);
 			else
 				nl_assert_always(outs.equals("0"), "Unknown value (not 0 or 1");
-			netlist_time t = netlist_time::from_nsec(times[j].trim().as_long());
-			int k=0;
+			netlist_time t = netlist_time::from_nsec(static_cast<unsigned long>(times[j].trim().as_long()));
+			uint_least8_t k=0;
 			while (m_timing_nt[k] != netlist_time::zero() && m_timing_nt[k] != t)
 				k++;
 			m_timing_nt[k] = t;
@@ -228,7 +228,7 @@ void truthtable_desc_t::setup(const plib::pstring_vector_t &truthtable, uint_lea
 	{
 		if (ign[i] == all_set)
 		{
-			int tign;
+			uint_least64_t tign;
 			if ((0))
 			{
 				tign = get_ignored_simple(i);

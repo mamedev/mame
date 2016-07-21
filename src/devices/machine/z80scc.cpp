@@ -79,16 +79,18 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 // printf("TAG %lld %s%s Data:%d\n", machine().firstcpu->total_cycles(), __PRETTY_FUNCTION__, m_owner->tag(), data);
 
 #define VERBOSE 0
-
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#define LOGPRINT(x) do { if (VERBOSE) logerror x; } while (0) 
+#define LOG(x) LOGPRINT(x)
 #define LOGR(x)
+#define LOGSETUP(x) LOGPRINT(x)
+#define LOGRCV(x) LOGPRINT(x)
 #if VERBOSE == 2
 #define logerror printf
 #endif
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
-#define LLFORMAT "%I64%"
+#define LLFORMAT "%I64d"
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
 #define LLFORMAT "%lld"
@@ -981,6 +983,7 @@ void z80scc_channel::rcv_callback()
 {
 	if (m_wr3 & WR3_RX_ENABLE)
 	{
+		LOG((LLFORMAT " %s() \"%s \"Channel %c receive data bit %d m_wr3:%02x\n", machine().firstcpu->total_cycles(), FUNCNAME, m_owner->tag(), 'A' + m_index, m_rxd, m_wr3));
 		receive_register_update_bit(m_rxd);
 	}
 #if 1
@@ -1785,6 +1788,7 @@ void z80scc_channel::do_sccreg_wr12(UINT8 data)
 {
 	// TODO: Check if BRG enabled already and restart timer with new value in case advice above is not followed by ROM
 	m_wr12 = data;
+	update_serial();
 	LOG(("\"%s\": %c : %s  %02x Low byte of Time Constant for Baudrate generator\n", m_owner->tag(), 'A' + m_index, FUNCNAME, data));
 }
 
@@ -1793,6 +1797,7 @@ void z80scc_channel::do_sccreg_wr13(UINT8 data)
 {
 	// TODO: Check if BRG enabled already and restart timer with new value in case advice above is not followed by ROM
 	m_wr13 = data;
+	update_serial();
 	LOG(("\"%s\": %c : %s  %02x  High byte of Time Constant for Baudrate generator\n", m_owner->tag(), 'A' + m_index, FUNCNAME, data));
 }
 
@@ -1859,7 +1864,7 @@ void z80scc_channel::do_sccreg_wr14(UINT8 data)
 	/* Based on baudrate code from 8530scc.cpp */
 	if ( !(m_wr14 & WR14_BRG_ENABLE) && (data & WR14_BRG_ENABLE) ) // baud rate generator beeing enabled?
 	{
-		LOG(("\"%s\": %c : %s Mics Control Bits Baudrate generator enabled with \n", m_owner->tag(), 'A' + m_index, FUNCNAME));
+		LOG(("\"%s\": %c : %s Mics Control Bits Baudrate generator enabled with ", m_owner->tag(), 'A' + m_index, FUNCNAME));
 		m_brg_const = 2 + (m_wr13 << 8 | m_wr12);
 		if (data & WR14_BRG_SOURCE) // Do we use the PCLK as baudrate source
 		{
@@ -1948,6 +1953,7 @@ void z80scc_channel::control_write(UINT8 data)
 	}
 
 	//LOG(("\n%s(%02x) reg %02x, regmask %02x\n", FUNCNAME, data, reg, regmask));
+	LOGSETUP((" * %s %c Reg %02x <- %02x  \n", m_owner->tag(), 'A' + m_index, reg, data));
 
 	/* TODO. Sort out 80X30 & other SCC variants limitations in register access */
 	switch (reg)
@@ -2117,7 +2123,7 @@ void z80scc_channel::receive_data(UINT8 data)
 	{
 		// receive overrun error detected
 		m_rx_error_fifo[m_rx_fifo_wp] |= RR1_RX_OVERRUN_ERROR; // = m_rx_error;
-		logerror("Receive_data() Error %02x\n", m_rr1 & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR));
+		logerror("Receive_data() Error %02x\n", m_rx_error_fifo[m_rx_fifo_wp] & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR));
 	}
 	else
 	{
@@ -2453,6 +2459,7 @@ WRITE_LINE_MEMBER(z80scc_channel::write_rx)
 	}
 #endif
 
+	LOGRCV(("%s(%d)\n", FUNCNAME, state));
 	m_rxd = state;
 	//only use rx_w when self-clocked
 	if(m_rxc != 0 || m_brg_rate != 0)

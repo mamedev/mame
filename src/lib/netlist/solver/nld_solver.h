@@ -75,7 +75,7 @@ NETLIB_OBJECT(solver)
 	void post_start();
 	void stop() override;
 
-	inline nl_double gmin() { return m_gmin.Value(); }
+	inline nl_double gmin() { return m_gmin(); }
 
 	void create_solver_code(plib::postream &strm);
 
@@ -111,7 +111,7 @@ private:
 	solver_parameters_t m_params;
 
 	template <int m_N, int storage_N>
-	std::unique_ptr<matrix_solver_t> create_solver(int size, bool use_specific);
+	std::unique_ptr<matrix_solver_t> create_solver(unsigned size, bool use_specific);
 };
 
 	} //namespace devices

@@ -189,6 +189,14 @@
 
 #define AVI_INDEX_2FIELD        0x01
 
+ /**
+ * @def AVI_INTEGRAL_MULTIPLE
+ *
+ * @brief   Ensures the integral multiple of the video dimension, because most video players are not capable to playback a video stream with a lower multiple.
+ */
+
+#define AVI_INTEGRAL_MULTIPLE   4
+
 /* HuffYUV definitions */
 
 /**
@@ -288,12 +296,22 @@ public:
 
 	void initialize_video(avi_file::movie_info const &info)
 	{
+		std::uint32_t width = info.video_width;
+		std::uint32_t height = info.video_height;
+
+		std::uint32_t integal_multiple = std::uint32_t(AVI_INTEGRAL_MULTIPLE);
+		if (integal_multiple > 1)
+		{
+			width = width - (width % integal_multiple);
+			height = height - (height % integal_multiple);
+		}
+
 		m_type = STREAMTYPE_VIDS;
 		m_format = info.video_format;
 		m_rate = info.video_timescale;
 		m_scale = info.video_sampletime;
-		m_width = info.video_width;
-		m_height = info.video_height;
+		m_width = width;
+		m_height = height;
 		m_depth = info.video_depth;
 	}
 

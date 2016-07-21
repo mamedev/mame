@@ -57,7 +57,8 @@ public:
 		m_p3_knob(*this, "P3_KNOB"),
 		m_p4_knob(*this, "P4_KNOB"),
 		m_trackball(*this, trackball_inputs),
-		m_joystick(*this, joystick_inputs)
+		m_joystick(*this, joystick_inputs),
+		m_interrupt_scanline(0xff)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

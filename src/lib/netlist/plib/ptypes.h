@@ -58,15 +58,14 @@ namespace plib
 		bool set_from_string (const pstring &s) { \
 			static const char *strings = # __VA_ARGS__; \
 			int f = from_string_int(strings, s.cstr()); \
-			if (f>=0) { m_v = (e) f; return true; } else { return false; } \
+			if (f>=0) { m_v = static_cast<e>(f); return true; } else { return false; } \
 		} \
 		operator e() const {return m_v;} \
-		int as_int() const {return (int) m_v;} \
 		bool operator==(const ename &rhs) const {return m_v == rhs.m_v;} \
-		bool operator==(const e &rhs) const {return m_v == (int) rhs;} \
+		bool operator==(const e &rhs) const {return m_v == rhs;} \
 		const pstring name() const { \
 			static const char *strings = # __VA_ARGS__; \
-			return nthstr((int) m_v, strings); \
+			return nthstr(static_cast<int>(m_v), strings); \
 		} \
 		private: e m_v; };
 

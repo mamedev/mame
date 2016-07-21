@@ -388,7 +388,7 @@ void sdl_osd_interface::extract_video_config()
 	video_config.syncrefresh   = options().sync_refresh();
 	if (!video_config.waitvsync && video_config.syncrefresh)
 	{
-		osd_printf_warning("-syncrefresh specified without -waitsync. Reverting to -nosyncrefresh\n");
+		osd_printf_warning("-syncrefresh specified without -waitvsync. Reverting to -nosyncrefresh\n");
 		video_config.syncrefresh = 0;
 	}
 

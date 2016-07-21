@@ -417,6 +417,7 @@
 #include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "bus/rs232/rs232.h"
+#include "bus/sunkbd/sunkbd.h"
 #include "machine/timekpr.h"
 #include "machine/upd765.h"
 #include "formats/pc_dsk.h"
@@ -431,6 +432,7 @@
 #define TIMEKEEPER_TAG  "timekpr"
 #define SCC1_TAG        "scc1"
 #define SCC2_TAG        "scc2"
+#define KEYBOARD_TAG    "keyboard"
 #define RS232A_TAG      "rs232a"
 #define RS232B_TAG      "rs232b"
 #define FDC_TAG			"fdc"
@@ -534,6 +536,9 @@ public:
 	DECLARE_READ8_MEMBER( fdc_r );
 	DECLARE_WRITE8_MEMBER( fdc_w );
 
+	DECLARE_WRITE_LINE_MEMBER( scc1_int );
+	DECLARE_WRITE_LINE_MEMBER( scc2_int );
+
 	DECLARE_DRIVER_INIT(sun4);
 	DECLARE_DRIVER_INIT(sun4c);
 	DECLARE_DRIVER_INIT(ss2);
@@ -555,7 +560,7 @@ protected:
 	UINT32 *m_rom_ptr;
 	UINT32 m_context;
 	UINT8 m_system_enable;
-	UINT32 m_buserror[4];
+	UINT32 m_buserr[4];
 	UINT32 m_counter[4];
 
 private:
@@ -563,10 +568,12 @@ private:
 	UINT8 m_segmap[16][4096];
 	UINT32 m_pagemap[16384];
 	UINT32 m_cachetags[0x4000];
+	UINT32 m_cachedata[0x4000];
 	UINT32 m_ram_size, m_ram_size_words;
 	UINT8 m_ctx_mask;	// SS2 is sun4c but has 16 contexts; most have 8
 	UINT8 m_pmeg_mask;	// SS2 is sun4c but has 16384 PTEs; most have 8192
 	UINT8 m_irq_reg;	// IRQ control
+	UINT8 m_scc1_int, m_scc2_int;
 	UINT8 m_diag;
 	int m_arch;
 
@@ -610,6 +617,7 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 {
 	UINT8 asi = m_maincpu->get_asi();
 	int page;
+	UINT32 retval = 0;
 
 	// make debugger fetches emulate supervisor program for best compatibility with boot PROM execution
 	if (space.debugger_access()) asi = 9;
@@ -633,16 +641,19 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 				return m_system_enable<<24;
 
 			case 6: // bus error register
-				//printf("sun4c: read buserror, PC=%x (mask %08x)\n", m_maincpu->pc(), mem_mask);
-				return 0;
+				printf("sun4c: read buserror, PC=%x (mask %08x)\n", m_maincpu->pc(), mem_mask);
+				m_maincpu->set_input_line(SPARC_MAE, CLEAR_LINE);
+				retval = m_buserr[offset & 0xf];
+				m_buserr[offset & 0xf] = 0;	// clear on reading
+				return retval;
 
 			case 8: // (d-)cache tags
 				//logerror("sun4: read dcache tags @ %x, PC = %x\n", offset, m_maincpu->pc());
-				return m_cachetags[offset&0xfff];
+				return m_cachetags[(offset>>3)&0x3fff];
 
 			case 9: // (d-)cache data
-				logerror("sun4c: read dcache data @ %x, PC = %x\n", offset, m_maincpu->pc());
-				return 0xffffffff;
+				//logerror("sun4c: read dcache data @ %x, PC = %x\n", offset, m_maincpu->pc());
+				return m_cachedata[offset&0x3fff];
 
 			case 0xf:	// UART bypass
 				//printf("read UART bypass @ %x mask %08x\n", offset<<2, mem_mask);
@@ -725,8 +736,8 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 			{
 			printf("sun4c: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
 			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
-			//m_buserror[0] = 0x88;	// read, invalid PTE
-			//m_buserror[1] = offset<<2;
+			//m_buserr[0] = 0x88;	// read, invalid PTE
+			//m_buserr[1] = offset<<2;
 			}
 			return 0;
 		}
@@ -763,15 +774,27 @@ WRITE32_MEMBER( sun4_state::sun4c_mmu_w )
 			case 4: // system enable reg
 				m_system_enable = data>>24;
 				//printf("%08x to system enable, mask %08x\n", data, mem_mask);
+				if (m_system_enable & ENA_RESET)
+				{
+					m_system_enable = 0;
+					m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+					m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+				}
+				return;
+				
+			case 6: // bus error
+				printf("%08x to bus error @ %x, mask %08x\n", data, offset, mem_mask);
+				m_buserr[offset & 0xf] = data;
 				return;
 
 			case 8: // cache tags
 				//logerror("sun4: %08x to cache tags @ %x, PC = %x\n", data, offset, m_maincpu->pc());
-				m_cachetags[offset&0xfff] = data;
+				m_cachetags[(offset>>3)&0x3fff] = data & 0x03f8fffc;
 				return;
 
 			case 9: // cache data
-				logerror("sun4c: %08x to cache data @ %x, PC = %x\n", data, offset, m_maincpu->pc());
+				//logerror("sun4c: %08x to cache data @ %x, PC = %x\n", data, offset, m_maincpu->pc());
+				m_cachedata[offset&0x3fff] = data;
 				return;
 
 			case 0xf:	// UART bypass
@@ -819,12 +842,22 @@ WRITE32_MEMBER( sun4_state::sun4c_mmu_w )
 
 		if (m_pagemap[entry] & PM_VALID)
 		{
-			m_pagemap[entry] |= PM_ACCESSED;
+			if ((!(m_pagemap[entry] & PM_WRITEMASK)) ||
+			((m_pagemap[entry] & PM_SYSMASK) && !(asi & 1)))
+			{
+				printf("sun4c: write protect MMU error (PC=%x)\n", m_maincpu->pc());
+				m_buserr[0] = 0x8040;	// write, protection error
+				m_buserr[1] = offset<<2;
+				m_maincpu->set_input_line(SPARC_MAE, ASSERT_LINE);
+				return;
+			}
+
+			m_pagemap[entry] |= (PM_ACCESSED | PM_MODIFIED);
 
 			UINT32 tmp = (m_pagemap[entry] & 0xffff) << 10;
 			tmp |= (offset & 0x3ff);
 
-			//printf("sun4: write translated vaddr %08x to phys %08x type %d, PTE %08x, PC=%x\n", offset<<2, tmp<<2, (m_pagemap[entry]>>26) & 3, m_pagemap[entry], m_maincpu->pc());
+			//printf("sun4: write translated vaddr %08x to phys %08x type %d, PTE %08x, ASI %d, PC=%x\n", offset<<2, tmp<<2, (m_pagemap[entry]>>26) & 3, m_pagemap[entry], asi, m_maincpu->pc());
 
 			switch ((m_pagemap[entry] >> 26) & 3)
 			{
@@ -845,8 +878,8 @@ WRITE32_MEMBER( sun4_state::sun4c_mmu_w )
 		{
 			printf("sun4c: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
 			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
-			//m_buserror[0] = 0x8;	// invalid PTE
-			//m_buserror[1] = offset<<2;
+			//m_buserr[0] = 0x8;	// invalid PTE
+			//m_buserr[1] = offset<<2;
 			return;
 		}
 		break;
@@ -979,8 +1012,8 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 			{
 			printf("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
 			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
-			//m_buserror[0] = 0x88;	// read, invalid PTE
-			//m_buserror[1] = offset<<2;
+			//m_buserr2qor[0] = 0x88;	// read, invalid PTE
+			//m_buserr[1] = offset<<2;
 			}
 			return 0;
 		}
@@ -1017,6 +1050,12 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 			case 4: // system enable reg
 				m_system_enable = data>>24;
 				//printf("%08x to system enable, mask %08x\n", data, mem_mask);
+				if (m_system_enable & ENA_RESET)
+				{
+					m_system_enable = 0;
+					m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+					m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+				}
 				return;
 
 			case 7:	// diag reg
@@ -1209,6 +1248,7 @@ void sun4_state::machine_reset()
 	m_context = 0;
 	m_system_enable = 0;
 	m_irq_reg = 0;
+	m_scc1_int = m_scc2_int = 0;
 	memset(m_counter, 0, sizeof(m_counter));
 }
 
@@ -1321,7 +1361,6 @@ static ADDRESS_MAP_START(type1space_map, AS_PROGRAM, 32, sun4_state)
 	AM_RANGE(0x03000000, 0x0300000f) AM_READWRITE(timer_r, timer_w) AM_MIRROR(0xfffff0)
 	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE8(irq_r, irq_w, 0xffffffff)
 	AM_RANGE(0x06000000, 0x0607ffff) AM_ROM AM_REGION("user1", 0)
-//	AM_RANGE(0x07200000, 0x07200007) AM_DEVICE8(FDC_TAG, n82077aa_device, map, 0xffffffff)
 	AM_RANGE(0x07200000, 0x07200003) AM_READWRITE8(fdc_r, fdc_w, 0xffffffff)
 	AM_RANGE(0x08000000, 0x08000003) AM_READ(ss1_sl0_id)	// slot 0 contains SCSI/DMA/Ethernet
 	AM_RANGE(0x0e000000, 0x0e000003) AM_READ(ss1_sl3_id)	// slot 3 contains video board
@@ -1382,6 +1421,24 @@ WRITE8_MEMBER( sun4_state::irq_w )
 	//printf("%02x to IRQ\n", data);
 
 	m_irq_reg = data;
+
+	m_maincpu->set_input_line(SPARC_IRQ12, ((m_scc1_int || m_scc2_int) && (m_irq_reg & 0x01)) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER( sun4_state::scc1_int )
+{
+	printf("scc1 int: %d\n", state);
+	m_scc1_int = state;
+
+	m_maincpu->set_input_line(SPARC_IRQ12, ((m_scc1_int || m_scc2_int) && (m_irq_reg & 0x01)) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER( sun4_state::scc2_int )
+{
+	printf("scc2 int: %d\n", state);
+	m_scc2_int = state;
+
+	m_maincpu->set_input_line(SPARC_IRQ12, ((m_scc1_int || m_scc2_int) && (m_irq_reg & 0x01)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void sun4_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -1555,8 +1612,17 @@ static MACHINE_CONFIG_START( sun4, sun4_state )
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(32)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
 
+	// Keyboard/mouse
 	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(sun4_state, scc1_int))
+	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
+
+	MCFG_SUNKBD_PORT_ADD(KEYBOARD_TAG, default_sun_keyboard_devices, "sparckbd")
+	MCFG_SUNKBD_RXD_HANDLER(DEVWRITELINE(SCC1_TAG, z80scc_device, rxa_w))
+
+	// RS232 serial ports
 	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(sun4_state, scc2_int))
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
 
@@ -1610,8 +1676,17 @@ static MACHINE_CONFIG_START( sun4c, sun4_state )
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(32)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
 
+	// Keyboard/mouse
 	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(sun4_state, scc1_int))
+	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
+
+	MCFG_SUNKBD_PORT_ADD(KEYBOARD_TAG, default_sun_keyboard_devices, "sparckbd")
+	MCFG_SUNKBD_RXD_HANDLER(DEVWRITELINE(SCC1_TAG, z80scc_device, rxa_w))
+
+	// RS232 serial ports
 	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(sun4_state, scc2_int))
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
 
@@ -1794,6 +1869,59 @@ ROM_START( sun4_65 )
 ROM_END
 
 // SPARCstation 2 (Sun 4/75)
+/* SCC init 1 for the keyboard
+ *----------------------------
+ * :scc1 A Reg 09 <- c0 Master Interrupt Control - Device reset  c0 A&B: RTS=1 DTR=1 INT=0
+ * :scc1 int: 0
+ * :scc1 A Reg 04 <- 46 Setting up asynchronous frame format and clock, Parity Enable=0, Even Parity, Stop Bits 1, Clock Mode 16X                                     * :scc1 A Reg 03 <- c0 Setting up the receiver, Receiver Enable 0, Auto Enables 0, Receiver Bits/Character 8
+ * :scc1 A Reg 05 <- e2 Setting up the transmitter, Transmitter Enable 0, Transmitter Bits/Character 8, Send Break 0, RTS=1 DTR=1
+ * :scc1 A Reg 09 <- 02 Master Interrupt Control - No reset  02 A&B: RTS=1 DTR=1 INT=0
+ * :scc1 A Reg 0b <- 55 Clock Mode Control 55 Clock type TTL level on RTxC pin, RCV CLK=BRG, TRA CLK=BRG, TRxC pin is Output, TRxC CLK=TRA CLK - not_implemented
+ * :scc1 A Reg 0c <- 7e Low byte of Time Constant for Baudrate generator
+ * :scc1 A Reg 0d <- 00 High byte of Time Constant for Baudrate generator
+ * :scc1 A Reg 0e <- 82 Misc Control Bits Baudrate Generator Input DPLL Command - not implemented
+ * :scc1 A Reg 03 <- c1 Setting up the receiver, Receiver Enable 1, Auto Enables 0, Receiver Bits/Character 8
+ * :scc1 A Reg 05 <- ea Setting up the transmitter, Transmitter Enable 1, Transmitter Bits/Character 8, Send Break 0, RTS=1, DTR=1
+ * :scc1 A Reg 0e <- 83 Misc Control Bits DPLL SRC=BRG Command - not implemented, BRG enabled SRC=PCLK, BRG SRC bps=38400=PCLK 4915200/128, BRG OUT 1200=38400/16
+ * :scc1 A Reg 00 <- 10 Reset External/Status Interrupt
+ * :scc1 A Reg 00 <- 10 Reset External/Status Interrupt
+
+ * SCC init 2 for the keyboard
+ * -------------------------------
+ * :scc1 A Reg 09 <- c0 Master Interrupt Control - Device reset  c0 A&B: RTS=1 DTR=1 INT=0
+scc1 int: 0
+ * :scc1 A Reg 04 <- 46 Setting up asynchronous frame format and clock, Parity Enable=0, Even Parity, Stop Bits 1, Clock Mode 16X
+ * :scc1 A Reg 03 <- c0 Setting up the receiver, Receiver Enable 0, Auto Enables 0, Receiver Bits/Character 8
+ * :scc1 A Reg 05 <- e2 Setting up the transmitter, Transmitter Enable 0, Transmitter Bits/Character 8, Send Break 0, RTS=1 DTR=1
+ * :scc1 A Reg 09 <- 02 Master Interrupt Control - No reset  02 A&B: RTS=1 DTR=1 INT=0
+ * :scc1 A Reg 0b <- 55 Clock Mode Control 55 Clock type TTL level on RTxC pin, RCV CLK=BRG, TRA CLK=BRG, TRxC pin is Output, TRxC CLK=TRA CLK - not_implemented
+ * :scc1 A Reg 0c <- 7e Low byte of Time Constant for Baudrate generator
+ * :scc1 A Reg 0d <- 00 High byte of Time Constant for Baudrate generator
+ * :scc1 A Reg 0e <- 82 Misc Control Bits Baudrate Generator Input DPLL Command - not implemented
+ * :scc1 A Reg 03 <- c1 Setting up the receiver, Receiver Enable 1, Auto Enables 0, Receiver Bits/Character 8
+ * :scc1 A Reg 05 <- ea Setting up the transmitter, Transmitter Enable 1, Transmitter Bits/Character 8, Send Break 0, RTS=1, DTR=1
+ * :scc1 A Reg 0e <- 83 Misc Control Bits DPLL SRC=BRG Command - not implemented, BRG enabled SRC=PCLK, BRG SRC bps=38400=PCLK 4915200/128, BRG OUT 1200=38400/16
+ * :scc1 A Reg 00 <- 10 Reset External/Status Interrupt
+ * :scc1 A Reg 00 <- 10 Reset External/Status Interrupt
+
+ * SCC init 3 for the keyboard - tricky one that reprogramms the baudrate constant as the last step.
+ * -------------------------------------------------------------------------------------------------
+ * :scc1 A Reg 09 <- 02 Master Interrupt Control - No Reset, No vector
+ * :scc1 A Reg 04 <- 44 Setting up asynchronous frame format and clock, Parity Enable=0, Even Odd, Stop Bits 1, Clock Mode 16X
+ * :scc1 A Reg 03 <- c0 Setting up the receiver, Receiver Enable 0, Auto Enables 0, Receiver Bits/Character 8
+ * :scc1 A Reg 05 <- 60 Setting up the transmitter, Transmitter Enable 0, Transmitter Bits/Character 8, Send Break 0, RTS=0 DTR=0
+ * :scc1 A Reg 0e <- 82 Misc Control Bits Baudrate Generator Input DPLL Command - not implemented
+ * :scc1 A Reg 0b <- 55 Clock Mode Control 55 Clock type TTL level on RTxC pin, RCV CLK=BRG, TRA CLK=BRG, TRxC pin is Output, TRxC CLK=TRA CLK - not_implemented
+ * :scc1 A Reg 0c <- 0e Low byte of Time Constant for Baudrate generator  -> 9600 baud
+ * :scc1 A Reg 0d <- 00 High byte of Time Constant for Baudrate generator
+ * :scc1 A Reg 03 <- c1 Setting up the receiver, Receiver Enable 1, Auto Enables 0, Receiver Bits/Character 8
+ * :scc1 A Reg 05 <- 68 Setting up the transmitter, Transmitter Enable 1, Transmitter Bits/Character 8, Send Break 0, RTS=0, DTR=0
+ * :scc1 A Reg 0e <- 83 Misc Control Bits DPLL SRC=BRG Command - not implemented, BRG enabled SRC=PCLK, BRG SRC bps=307200=PCLK 4915200/16, BRG OUT 9600=307200/16
+ * :scc1 A Reg 00 <- 10 Reset External/Status Interrupt
+ * :scc1 A Reg 00 <- 10 Reset External/Status Interrupt
+ * :scc1 A Reg 0c <- 7e Low byte of Time Constant for Baudrate generator -> 1200 baud
+
+*/
 ROM_START( sun4_75 )
 	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "ss2-29.rom", 0x0000, 0x40000, CRC(d04132b3) SHA1(ef26afafa2800b8e2e5e994b3a76ca17ce1314b1))

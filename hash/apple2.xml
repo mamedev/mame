@@ -571,7 +571,7 @@
 
 	<software name="aklabeth">
 		<description>Akalabeth - World of Doom</description>
-		<year>19??</year>
+		<year>1979</year>
 		<publisher>California Pacific Computer</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -629,7 +629,7 @@
 
 	<software name="alien">
 		<description>Alien</description>
-		<year>19??</year>
+		<year>1982</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1932,7 +1932,7 @@
 
 	<software name="bbcstlwf">
 		<description>Beyond Beyond Castle Wolfenstein</description>
-		<year>19??</year>
+		<year>1984</year>
 		<publisher>Mindscape</publisher>
 
 		<part name="flop11" interface="floppy_5_25">
@@ -2110,7 +2110,7 @@
 
 	<software name="betedugv">
 		<description>La Bete du Gevaudan (crack)</description>
-		<year>19??</year>
+		<year>1985</year>
 		<publisher>Cil</publisher>
 
 		<part name="flop11" interface="floppy_5_25">
@@ -2168,7 +2168,7 @@
 
 	<software name="bilestod">
 		<description>The Bilestoad (crack)</description>
-		<year>19??</year>
+		<year>1982</year>
 		<publisher>Mangrove Earthshoe</publisher>
 
 		<part name="flop11" interface="floppy_5_25">
@@ -3614,7 +3614,7 @@
 	<software name="cmpairna">
 		<description>Computer Air Combat - New Aircraft</description>
 		<year>198?</year>
-		<publisher>Strategic Simluations, Inc.</publisher>
+		<publisher>Strategic Simulations, Inc.</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -3626,7 +3626,7 @@
 	<software name="cmpambsh">
 		<description>Computer Ambush</description>
 		<year>1982</year>
-		<publisher>Strategic Simluations, Inc.</publisher>
+		<publisher>Strategic Simulations, Inc.</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -3638,7 +3638,7 @@
 	<software name="cmpbaseb">
 		<description>Computer Baseball</description>
 		<year>1981</year>
-		<publisher>Strategic Simluations, Inc.</publisher>
+		<publisher>Strategic Simulations, Inc.</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -3650,7 +3650,7 @@
 	<software name="cmpbsmrk">
 		<description>Computer Bismarck</description>
 		<year>1980</year>
-		<publisher>Strategic Simluations, Inc.</publisher>
+		<publisher>Strategic Simulations, Inc.</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -3662,7 +3662,7 @@
 	<software name="cmpcnfl">
 		<description>Computer Conflict</description>
 		<year>1980</year>
-		<publisher>Strategic Simluations, Inc.</publisher>
+		<publisher>Strategic Simulations, Inc.</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -3674,7 +3674,7 @@
 	<software name="cmpnapol">
 		<description>Computer Napoleonics</description>
 		<year>1980</year>
-		<publisher>Strategic Simluations, Inc.</publisher>
+		<publisher>Strategic Simulations, Inc.</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -3686,7 +3686,7 @@
 	<software name="cmpqb">
 		<description>Computer Quarterback</description>
 		<year>1981</year>
-		<publisher>Strategic Simluations, Inc.</publisher>
+		<publisher>Strategic Simulations, Inc.</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">

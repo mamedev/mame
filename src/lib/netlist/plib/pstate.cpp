@@ -19,7 +19,7 @@ state_manager_t::~state_manager_t()
 
 
 
-void state_manager_t::save_state_ptr(const void *owner, const pstring &stname, const datatype_t dt, const int count, void *ptr)
+void state_manager_t::save_state_ptr(const void *owner, const pstring &stname, const datatype_t dt, const std::size_t count, void *ptr)
 {
 	auto p = plib::make_unique<entry_t>(stname, dt, owner, count, ptr);
 	m_save.push_back(std::move(p));

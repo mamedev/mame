@@ -149,7 +149,7 @@ media_auditor::summary media_auditor::audit_device(device_t &device, const char 
 //-------------------------------------------------
 //  audit_software
 //-------------------------------------------------
-media_auditor::summary media_auditor::audit_software(const char *list_name, software_info *swinfo, const char *validation)
+media_auditor::summary media_auditor::audit_software(const char *list_name, const software_info *swinfo, const char *validation)
 {
 	// start fresh
 	m_record_list.clear();
@@ -159,7 +159,7 @@ media_auditor::summary media_auditor::audit_software(const char *list_name, soft
 
 	std::string combinedpath(util::string_format("%s;%s%s%s", swinfo->shortname(), list_name, PATH_SEPARATOR, swinfo->shortname()));
 	std::string locationtag(util::string_format("%s%%%s%%", list_name, swinfo->shortname()));
-	if (swinfo->parentname() != nullptr)
+	if (!swinfo->parentname().empty())
 	{
 		locationtag.append(swinfo->parentname());
 		combinedpath.append(util::string_format(";%s;%s%s%s", swinfo->parentname(), list_name, PATH_SEPARATOR, swinfo->parentname()));
@@ -170,7 +170,7 @@ media_auditor::summary media_auditor::audit_software(const char *list_name, soft
 	std::size_t required = 0;
 
 	// now iterate over software parts
-	for (software_part &part : swinfo->parts())
+	for (const software_part &part : swinfo->parts())
 		audit_regions(part.romdata(), locationtag.c_str(), found, required);
 
 	if ((found == 0) && (required > 0))

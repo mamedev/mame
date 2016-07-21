@@ -103,22 +103,22 @@ namespace netlist
 		if (m_reset)
 		{
 			m_state ^= 1;
-			OUTLOGIC(m_Q, m_state, out_delay);
+			m_Q.push(m_state, out_delay);
 		}
 	}
 
 	NETLIB_UPDATE(7493)
 	{
-		const netlist_sig_t r = INPLOGIC(m_R1) & INPLOGIC(m_R2);
+		const netlist_sig_t r = m_R1() & m_R2();
 
 		if (r)
 		{
 			A.m_I.inactivate();
 			B.m_I.inactivate();
-			OUTLOGIC(A.m_Q, 0, NLTIME_FROM_NS(40));
-			OUTLOGIC(B.m_Q, 0, NLTIME_FROM_NS(40));
-			OUTLOGIC(C.m_Q, 0, NLTIME_FROM_NS(40));
-			OUTLOGIC(D.m_Q, 0, NLTIME_FROM_NS(40));
+			A.m_Q.push(0, NLTIME_FROM_NS(40));
+			B.m_Q.push(0, NLTIME_FROM_NS(40));
+			C.m_Q.push(0, NLTIME_FROM_NS(40));
+			D.m_Q.push(0, NLTIME_FROM_NS(40));
 			A.m_reset = B.m_reset = C.m_reset = D.m_reset = 0;
 			A.m_state = B.m_state = C.m_state = D.m_state = 0;
 		}

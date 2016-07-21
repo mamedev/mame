@@ -525,10 +525,10 @@ void menu_select_software::build_software_list()
 	{
 		m_filter.swlist.name.push_back(swlist.list_name());
 		m_filter.swlist.description.push_back(swlist.description());
-		for (software_info &swinfo : swlist.get_info())
+		for (const software_info &swinfo : swlist.get_info())
 		{
-			software_part *part = swinfo.first_part();
-			if (part->is_compatible(swlist) == SOFTWARE_IS_COMPATIBLE)
+			const software_part &part = swinfo.parts().front();
+			if (part.is_compatible(swlist) == SOFTWARE_IS_COMPATIBLE)
 			{
 				const char *instance_name = nullptr;
 				const char *type_name = nullptr;
@@ -536,7 +536,7 @@ void menu_select_software::build_software_list()
 				for (device_image_interface &image : image_interface_iterator(config.root_device()))
 				{
 					const char *interface = image.image_interface();
-					if (interface != nullptr && part->matches_interface(interface))
+					if (interface != nullptr && part.matches_interface(interface))
 					{
 						instance_name = image.instance_name();
 						if (instance_name != nullptr)
@@ -552,23 +552,23 @@ void menu_select_software::build_software_list()
 				if (instance_name == nullptr || type_name == nullptr)
 					continue;
 
-				tmpmatches.shortname = strensure(swinfo.shortname());
-				tmpmatches.longname = strensure(swinfo.longname());
-				tmpmatches.parentname = strensure(swinfo.parentname());
-				tmpmatches.year = strensure(swinfo.year());
-				tmpmatches.publisher = strensure(swinfo.publisher());
+				tmpmatches.shortname = swinfo.shortname();
+				tmpmatches.longname = swinfo.longname();
+				tmpmatches.parentname = swinfo.parentname();
+				tmpmatches.year = swinfo.year();
+				tmpmatches.publisher = swinfo.publisher();
 				tmpmatches.supported = swinfo.supported();
-				tmpmatches.part = strensure(part->name());
+				tmpmatches.part = part.name();
 				tmpmatches.driver = m_driver;
 				tmpmatches.listname = strensure(swlist.list_name());
-				tmpmatches.interface = strensure(part->interface());
+				tmpmatches.interface = part.interface();
 				tmpmatches.startempty = 0;
 				tmpmatches.parentlongname.clear();
 				tmpmatches.usage.clear();
 				tmpmatches.available = false;
 
-				for (feature_list_item &flist : swinfo.other_info())
-					if (!strcmp(flist.name(), "usage"))
+				for (const feature_list_item &flist : swinfo.other_info())
+					if (!strcmp(flist.name().c_str(), "usage"))
 						tmpmatches.usage = flist.value();
 
 				m_swinfo.push_back(tmpmatches);
@@ -687,7 +687,7 @@ void menu_select_software::inkey_select(const event *menu_event)
 		media_auditor auditor(drivlist);
 		drivlist.next();
 		software_list_device *swlist = software_list_device::find_by_name(drivlist.config(), ui_swinfo->listname.c_str());
-		software_info *swinfo = swlist->find(ui_swinfo->shortname.c_str());
+		const software_info *swinfo = swlist->find(ui_swinfo->shortname.c_str());
 
 		media_auditor::summary summary = auditor.audit_software(swlist->list_name(), swinfo, AUDIT_VALIDATE_FAST);
 
@@ -1572,7 +1572,7 @@ void bios_selection::handle()
 					driver_enumerator drivlist(machine().options(), *ui_swinfo->driver);
 					drivlist.next();
 					software_list_device *swlist = software_list_device::find_by_name(drivlist.config(), ui_swinfo->listname.c_str());
-					software_info *swinfo = swlist->find(ui_swinfo->shortname.c_str());
+					const software_info *swinfo = swlist->find(ui_swinfo->shortname.c_str());
 					if (!ui().options().skip_parts_menu() && swinfo->has_multiple_parts(ui_swinfo->interface.c_str()))
 					{
 						s_parts parts;

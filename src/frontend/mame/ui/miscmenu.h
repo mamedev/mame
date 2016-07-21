@@ -69,6 +69,9 @@ private:
 		CROSSHAIR_ITEM_AUTO_TIME
 	};
 
+	// FIXME: use std::string instead of fixed-length arrays
+	constexpr static int CROSSHAIR_PIC_NAME_LENGTH = 12;
+
 	/* internal crosshair menu item data */
 	struct crosshair_item_data
 	{

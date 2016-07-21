@@ -65,6 +65,7 @@ public:
 	virtual void save() override;
 	virtual void record() override;
 	virtual void toggle_fsfx() override;
+	virtual void add_audio_to_recording(const INT16 *buffer, int samples_this_frame) override;
 	virtual std::vector<ui::menu_item> get_slider_list() override;
 	virtual void set_sliders_dirty() override;
 

@@ -138,8 +138,8 @@ bool setup_t::device_exists(const pstring name) const
 
 void setup_t::register_model(const pstring &model_in)
 {
-	int pos = model_in.find(" ");
-	if (pos < 0)
+	auto pos = model_in.find(" ");
+	if (pos == model_in.end())
 		log().fatal("Unable to parse model: {1}", model_in);
 	pstring model = model_in.left(pos).trim().ucase();
 	pstring def = model_in.substr(pos + 1).trim();
@@ -165,15 +165,15 @@ void setup_t::register_dippins_arr(const pstring &terms)
 	plib::pstring_vector_t list(terms,", ");
 	if (list.size() == 0 || (list.size() % 2) == 1)
 		log().fatal("You must pass an equal number of pins to DIPPINS");
-	unsigned n = list.size();
-	for (unsigned i = 0; i < n / 2; i++)
+	std::size_t n = list.size();
+	for (std::size_t i = 0; i < n / 2; i++)
 	{
 		register_alias(plib::pfmt("{1}")(i+1), list[i * 2]);
 		register_alias(plib::pfmt("{1}")(n-i), list[i * 2 + 1]);
 	}
 }
 
-pstring setup_t::objtype_as_str(device_object_t &in) const
+pstring setup_t::objtype_as_str(detail::device_object_t &in) const
 {
 	switch (in.type())
 	{
@@ -187,7 +187,7 @@ pstring setup_t::objtype_as_str(device_object_t &in) const
 			return "PARAM";
 	}
 	// FIXME: noreturn
-	log().fatal("Unknown object type {1}\n", (unsigned) in.type());
+	log().fatal("Unknown object type {1}\n", static_cast<unsigned>(in.type()));
 	return "Error";
 }
 
@@ -214,7 +214,7 @@ void setup_t::register_and_set_param(pstring name, param_t &param)
 				double vald = 0;
 				if (sscanf(val.cstr(), "%lf", &vald) != 1)
 					log().fatal("Invalid number conversion {1} : {2}\n", name, val);
-				static_cast<param_int_t &>(param).initial((int) vald);
+				static_cast<param_int_t &>(param).initial(static_cast<int>(vald));
 			}
 			break;
 			case param_t::STRING:
@@ -224,14 +224,14 @@ void setup_t::register_and_set_param(pstring name, param_t &param)
 			}
 			break;
 			//default:
-			//	log().fatal("Parameter is not supported {1} : {2}\n", name, val);
+			//  log().fatal("Parameter is not supported {1} : {2}\n", name, val);
 		}
 	}
 	if (!m_params.insert({param.name(), param_ref_t(param.name(), param.device(), param)}).second)
 		log().fatal("Error adding parameter {1} to parameter list\n", name);
 }
 
-void setup_t::register_term(core_terminal_t &term)
+void setup_t::register_term(detail::core_terminal_t &term)
 {
 	if (!m_terminals.insert({term.name(), &term}).second)
 		log().fatal("Error adding {1} {2} to terminal list\n", objtype_as_str(term), term.name());
@@ -351,7 +351,7 @@ const pstring setup_t::resolve_alias(const pstring &name) const
 	return ret;
 }
 
-core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool required)
+detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool required)
 {
 	const pstring &tname = resolve_alias(terminal_in);
 	auto ret = m_terminals.find(tname);
@@ -362,7 +362,7 @@ core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool require
 		ret = m_terminals.find(tname + ".Q");
 	}
 
-	core_terminal_t *term = (ret == m_terminals.end() ? nullptr : ret->second);
+	detail::core_terminal_t *term = (ret == m_terminals.end() ? nullptr : ret->second);
 
 	if (term == nullptr && required)
 		log().fatal("terminal {1}({2}) not found!\n", terminal_in, tname);
@@ -371,12 +371,13 @@ core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool require
 	return term;
 }
 
-core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, device_object_t::type_t atype, bool required)
+detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in,
+		detail::device_object_t::type_t atype, bool required)
 {
 	const pstring &tname = resolve_alias(terminal_in);
 	auto ret = m_terminals.find(tname);
 	/* look for default */
-	if (ret == m_terminals.end() && atype == device_object_t::OUTPUT)
+	if (ret == m_terminals.end() && atype == detail::device_object_t::OUTPUT)
 	{
 		/* look for ".Q" std output */
 		ret = m_terminals.find(tname + ".Q");
@@ -384,7 +385,7 @@ core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, device_objec
 	if (ret == m_terminals.end() && required)
 		log().fatal("terminal {1}({2}) not found!\n", terminal_in, tname);
 
-	core_terminal_t *term = (ret == m_terminals.end() ? nullptr : ret->second);
+	detail::core_terminal_t *term = (ret == m_terminals.end() ? nullptr : ret->second);
 
 	if (term != nullptr && term->type() != atype)
 	{
@@ -413,7 +414,7 @@ param_t *setup_t::find_param(const pstring &param_in, bool required) const
 }
 
 // FIXME avoid dynamic cast here
-devices::nld_base_proxy *setup_t::get_d_a_proxy(core_terminal_t &out)
+devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
 {
 	nl_assert(out.is_logic());
 
@@ -450,7 +451,7 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(core_terminal_t &out)
 	return proxy;
 }
 
-void setup_t::connect_input_output(core_terminal_t &in, core_terminal_t &out)
+void setup_t::connect_input_output(detail::core_terminal_t &in, detail::core_terminal_t &out)
 {
 	if (out.is_analog() && in.is_logic())
 	{
@@ -483,7 +484,7 @@ void setup_t::connect_input_output(core_terminal_t &in, core_terminal_t &out)
 }
 
 
-void setup_t::connect_terminal_input(terminal_t &term, core_terminal_t &inp)
+void setup_t::connect_terminal_input(terminal_t &term, detail::core_terminal_t &inp)
 {
 	if (inp.is_analog())
 	{
@@ -514,7 +515,7 @@ void setup_t::connect_terminal_input(terminal_t &term, core_terminal_t &inp)
 	}
 }
 
-void setup_t::connect_terminal_output(terminal_t &in, core_terminal_t &out)
+void setup_t::connect_terminal_output(terminal_t &in, detail::core_terminal_t &out)
 {
 	if (out.is_analog())
 	{
@@ -538,7 +539,7 @@ void setup_t::connect_terminal_output(terminal_t &in, core_terminal_t &out)
 	}
 }
 
-void setup_t::connect_terminals(core_terminal_t &t1, core_terminal_t &t2)
+void setup_t::connect_terminals(detail::core_terminal_t &t1, detail::core_terminal_t &t2)
 {
 	if (t1.has_net() && t2.has_net())
 	{
@@ -566,7 +567,7 @@ void setup_t::connect_terminals(core_terminal_t &t1, core_terminal_t &t2)
 	}
 }
 
-static core_terminal_t &resolve_proxy(core_terminal_t &term)
+static detail::core_terminal_t &resolve_proxy(detail::core_terminal_t &term)
 {
 	if (term.is_logic())
 	{
@@ -577,7 +578,7 @@ static core_terminal_t &resolve_proxy(core_terminal_t &term)
 	return term;
 }
 
-bool setup_t::connect_input_input(core_terminal_t &t1, core_terminal_t &t2)
+bool setup_t::connect_input_input(detail::core_terminal_t &t1, detail::core_terminal_t &t2)
 {
 	bool ret = false;
 	if (t1.has_net())
@@ -588,7 +589,7 @@ bool setup_t::connect_input_input(core_terminal_t &t1, core_terminal_t &t2)
 		{
 			for (auto & t : t1.net().m_core_terms)
 			{
-				if (t->is_type(core_terminal_t::TERMINAL))
+				if (t->is_type(detail::core_terminal_t::TERMINAL))
 					ret = connect(t2, *t);
 				if (ret)
 					break;
@@ -603,7 +604,7 @@ bool setup_t::connect_input_input(core_terminal_t &t1, core_terminal_t &t2)
 		{
 			for (auto & t : t2.net().m_core_terms)
 			{
-				if (t->is_type(core_terminal_t::TERMINAL))
+				if (t->is_type(detail::core_terminal_t::TERMINAL))
 					ret = connect(t1, *t);
 				if (ret)
 					break;
@@ -615,46 +616,46 @@ bool setup_t::connect_input_input(core_terminal_t &t1, core_terminal_t &t2)
 
 
 
-bool setup_t::connect(core_terminal_t &t1_in, core_terminal_t &t2_in)
+bool setup_t::connect(detail::core_terminal_t &t1_in, detail::core_terminal_t &t2_in)
 {
 	log().debug("Connecting {1} to {2}\n", t1_in.name(), t2_in.name());
-	core_terminal_t &t1 = resolve_proxy(t1_in);
-	core_terminal_t &t2 = resolve_proxy(t2_in);
+	detail::core_terminal_t &t1 = resolve_proxy(t1_in);
+	detail::core_terminal_t &t2 = resolve_proxy(t2_in);
 	bool ret = true;
 
-	if (t1.is_type(core_terminal_t::OUTPUT) && t2.is_type(core_terminal_t::INPUT))
+	if (t1.is_type(detail::core_terminal_t::OUTPUT) && t2.is_type(detail::core_terminal_t::INPUT))
 	{
 		if (t2.has_net() && t2.net().isRailNet())
 			log().fatal("Input {1} already connected\n", t2.name());
 		connect_input_output(t2, t1);
 	}
-	else if (t1.is_type(core_terminal_t::INPUT) && t2.is_type(core_terminal_t::OUTPUT))
+	else if (t1.is_type(detail::core_terminal_t::INPUT) && t2.is_type(detail::core_terminal_t::OUTPUT))
 	{
 		if (t1.has_net()  && t1.net().isRailNet())
 			log().fatal("Input {1} already connected\n", t1.name());
 		connect_input_output(t1, t2);
 	}
-	else if (t1.is_type(core_terminal_t::OUTPUT) && t2.is_type(core_terminal_t::TERMINAL))
+	else if (t1.is_type(detail::core_terminal_t::OUTPUT) && t2.is_type(detail::core_terminal_t::TERMINAL))
 	{
 		connect_terminal_output(dynamic_cast<terminal_t &>(t2), t1);
 	}
-	else if (t1.is_type(core_terminal_t::TERMINAL) && t2.is_type(core_terminal_t::OUTPUT))
+	else if (t1.is_type(detail::core_terminal_t::TERMINAL) && t2.is_type(detail::core_terminal_t::OUTPUT))
 	{
 		connect_terminal_output(dynamic_cast<terminal_t &>(t1), t2);
 	}
-	else if (t1.is_type(core_terminal_t::INPUT) && t2.is_type(core_terminal_t::TERMINAL))
+	else if (t1.is_type(detail::core_terminal_t::INPUT) && t2.is_type(detail::core_terminal_t::TERMINAL))
 	{
 		connect_terminal_input(dynamic_cast<terminal_t &>(t2), t1);
 	}
-	else if (t1.is_type(core_terminal_t::TERMINAL) && t2.is_type(core_terminal_t::INPUT))
+	else if (t1.is_type(detail::core_terminal_t::TERMINAL) && t2.is_type(detail::core_terminal_t::INPUT))
 	{
 		connect_terminal_input(dynamic_cast<terminal_t &>(t1), t2);
 	}
-	else if (t1.is_type(core_terminal_t::TERMINAL) && t2.is_type(core_terminal_t::TERMINAL))
+	else if (t1.is_type(detail::core_terminal_t::TERMINAL) && t2.is_type(detail::core_terminal_t::TERMINAL))
 	{
 		connect_terminals(dynamic_cast<terminal_t &>(t1), dynamic_cast<terminal_t &>(t2));
 	}
-	else if (t1.is_type(core_terminal_t::INPUT) && t2.is_type(core_terminal_t::INPUT))
+	else if (t1.is_type(detail::core_terminal_t::INPUT) && t2.is_type(detail::core_terminal_t::INPUT))
 	{
 		ret = connect_input_input(t1, t2);
 	}
@@ -682,8 +683,8 @@ void setup_t::resolve_inputs()
 		{
 			const pstring t1s = li->first;
 			const pstring t2s = li->second;
-			core_terminal_t *t1 = find_terminal(t1s);
-			core_terminal_t *t2 = find_terminal(t2s);
+			detail::core_terminal_t *t1 = find_terminal(t1s);
+			detail::core_terminal_t *t2 = find_terminal(t2s);
 
 			if (connect(*t1, *t2))
 				li = m_links.erase(li);
@@ -720,7 +721,7 @@ void setup_t::resolve_inputs()
 	log().verbose("looking for terminals not connected ...");
 	for (auto & i : m_terminals)
 	{
-		core_terminal_t *term = i.second;
+		detail::core_terminal_t *term = i.second;
 		if (!term->has_net() && dynamic_cast< devices::NETLIB_NAME(dummy_input) *>(&term->device()) != nullptr)
 			log().warning("Found dummy terminal {1} without connections", term->name());
 		else if (!term->has_net())
@@ -777,61 +778,7 @@ void setup_t::start_devices()
 		}
 	}
 
-	/* make sure the solver and parameters are started first! */
-
-	for (auto & e : m_device_factory)
-	{
-		if ( factory().is_class<devices::NETLIB_NAME(mainclock)>(e.second)
-				|| factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
-				|| factory().is_class<devices::NETLIB_NAME(gnd)>(e.second)
-				|| factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
-		{
-			auto dev = plib::owned_ptr<device_t>(e.second->Create(netlist(), e.first));
-			netlist().register_dev(std::move(dev));
-		}
-	}
-
-	log().debug("Searching for mainclock and solver ...\n");
-
-	netlist().m_mainclock = netlist().get_single_device<devices::NETLIB_NAME(mainclock)>("mainclock");
-	netlist().m_solver = netlist().get_single_device<devices::NETLIB_NAME(solver)>("solver");
-	netlist().m_gnd = netlist().get_single_device<devices::NETLIB_NAME(gnd)>("gnd");
-	netlist().m_params = netlist().get_single_device<devices::NETLIB_NAME(netlistparams)>("parameter");
-
-	/* create devices */
-
-	for (auto & e : m_device_factory)
-	{
-		if ( !factory().is_class<devices::NETLIB_NAME(mainclock)>(e.second)
-				&& !factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
-				&& !factory().is_class<devices::NETLIB_NAME(gnd)>(e.second)
-				&& !factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
-		{
-			auto dev = plib::owned_ptr<device_t>(e.second->Create(netlist(), e.first));
-			netlist().register_dev(std::move(dev));
-		}
-	}
-
-	bool use_deactivate = (netlist().m_params->m_use_deactivate.Value() ? true : false);
-
-	for (auto &d : netlist().m_devices)
-	{
-		if (use_deactivate)
-		{
-			auto p = m_param_values.find(d->name() + ".HINT_NO_DEACTIVATE");
-			if (p != m_param_values.end())
-			{
-				//FIXME: Error checking
-				auto v = p->second.as_long();
-				d->set_hint_deactivate(!v);
-			}
-		}
-		else
-			d->set_hint_deactivate(false);
-	}
-
 	netlist().start();
-
 }
 
 plib::plog_base<NL_DEBUG> &setup_t::log()
@@ -901,13 +848,13 @@ static pstring model_string(model_map_t &map)
 void setup_t::model_parse(const pstring &model_in, model_map_t &map)
 {
 	pstring model = model_in;
-	int pos = 0;
+	pstring::iterator pos(nullptr);
 	pstring key;
 
 	while (true)
 	{
 		pos = model.find("(");
-		if (pos >= 0) break;
+		if (pos != model.end()) break;
 
 		key = model.ucase();
 		auto i = m_models.find(key);
@@ -931,13 +878,14 @@ void setup_t::model_parse(const pstring &model_in, model_map_t &map)
 	pstring remainder=model.substr(pos+1).trim();
 	if (!remainder.endsWith(")"))
 		log().fatal("Model error {1}\n", model);
-	remainder = remainder.left(remainder.len() - 1);
+	// FIMXE: Not optimal
+	remainder = remainder.left(remainder.begin() + (remainder.len() - 1));
 
 	plib::pstring_vector_t pairs(remainder," ", true);
 	for (pstring &pe : pairs)
 	{
-		int pose = pe.find("=");
-		if (pose < 0)
+		auto pose = pe.find("=");
+		if (pose == pe.end())
 			log().fatal("Model error on pair {1}\n", model);
 		map[pe.left(pose).ucase()] = pe.substr(pose+1);
 	}
@@ -962,8 +910,8 @@ nl_double setup_t::model_value(model_map_t &map, const pstring &entity)
 	pstring tmp = model_value_str(map, entity);
 
 	nl_double factor = NL_FCONST(1.0);
-	pstring numfac = tmp.right(1);
-	switch (numfac.code_at(0))
+	auto p = tmp.begin() + (tmp.len() - 1);
+	switch (*p)
 	{
 		case 'M': factor = 1e6; break;
 		case 'k': factor = 1e3; break;
@@ -974,11 +922,11 @@ nl_double setup_t::model_value(model_map_t &map, const pstring &entity)
 		case 'f': factor = 1e-15; break;
 		case 'a': factor = 1e-18; break;
 		default:
-			if (numfac < "0" || numfac > "9")
-				nl_exception(plib::pfmt("Unknown number factor <{1}> in: {2}")(numfac)(entity));
+			if (*p < '0' || *p > '9')
+				nl_exception(plib::pfmt("Unknown number factor in: {1}")(entity));
 	}
 	if (factor != NL_FCONST(1.0))
-		tmp = tmp.left(tmp.len() - 1);
+		tmp = tmp.left(tmp.begin() + (tmp.len() - 1));
 	return tmp.as_double() * factor;
 }
 
@@ -1013,7 +961,7 @@ bool setup_t::parse_stream(plib::pistream &istrm, const pstring &name)
 void setup_t::register_define(pstring defstr)
 {
 	auto p = defstr.find("=");
-	if (p>0)
+	if (p != defstr.end())
 		register_define(defstr.left(p), defstr.substr(p+1));
 	else
 		register_define(defstr, "1");

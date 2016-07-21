@@ -22,25 +22,17 @@ class pasopia_state : public driver_device
 {
 public:
 	pasopia_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_ppi0(*this, "ppi8255_0"),
-		m_ppi1(*this, "ppi8255_1"),
-		m_ppi2(*this, "ppi8255_2"),
-		m_ctc(*this, "z80ctc"),
-		m_pio(*this, "z80pio"),
-		m_crtc(*this, "crtc"),
-		m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ppi0(*this, "ppi8255_0")
+		, m_ppi1(*this, "ppi8255_1")
+		, m_ppi2(*this, "ppi8255_2")
+		, m_ctc(*this, "z80ctc")
+		, m_pio(*this, "z80pio")
+		, m_crtc(*this, "crtc")
+		, m_palette(*this, "palette")
+		, m_keyboard(*this, "KEY")
 	{ }
-
-	required_device<cpu_device> m_maincpu;
-	required_device<i8255_device> m_ppi0;
-	required_device<i8255_device> m_ppi1;
-	required_device<i8255_device> m_ppi2;
-	required_device<z80ctc_device> m_ctc;
-	required_device<z80pio_device> m_pio;
-	required_device<mc6845_device> m_crtc;
-	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE8_MEMBER(pasopia_ctrl_w);
 	DECLARE_WRITE8_MEMBER(vram_addr_lo_w);
@@ -50,11 +42,13 @@ public:
 	DECLARE_WRITE8_MEMBER(vram_addr_hi_w);
 	DECLARE_WRITE8_MEMBER(screen_mode_w);
 	DECLARE_READ8_MEMBER(rombank_r);
-	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_READ8_MEMBER(keyb_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
+	DECLARE_DRIVER_INIT(pasopia);
+	TIMER_CALLBACK_MEMBER(pio_timer);
 
+private:
 	UINT8 m_hblank;
 	UINT16 m_vram_addr;
 	UINT8 m_vram_latch;
@@ -64,15 +58,23 @@ public:
 	bool m_video_wl;
 	bool m_ram_bank;
 	UINT8 *m_p_vram;
-	DECLARE_DRIVER_INIT(pasopia);
-	TIMER_CALLBACK_MEMBER(pio_timer);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<i8255_device> m_ppi0;
+	required_device<i8255_device> m_ppi1;
+	required_device<i8255_device> m_ppi2;
+	required_device<z80ctc_device> m_ctc;
+	required_device<z80pio_device> m_pio;
+	required_device<mc6845_device> m_crtc;
+	required_device<palette_device> m_palette;
+	required_ioport_array<12> m_keyboard;
 };
 
 // needed to scan the keyboard, as the pio emulation doesn't do it.
-TIMER_CALLBACK_MEMBER(pasopia_state::pio_timer)
+TIMER_CALLBACK_MEMBER( pasopia_state::pio_timer )
 {
 	m_pio->port_b_write(keyb_r(generic_space(),0,0xff));
 }
@@ -93,8 +95,8 @@ MC6845_UPDATE_ROW( pasopia_state::crtc_update_row )
 	{
 		UINT8 inv=0;
 		if (x == cursor_x) inv=0xff;
-		mem = (ma + x) & 0xfff;
-		chr = m_p_vram[mem];
+		mem = ma + x;
+		chr = m_p_vram[mem & 0x7ff];
 
 		/* get pattern of pixels for that character scanline */
 		gfx = m_p_chargen[(chr<<3) | ra] ^ inv;
@@ -214,28 +216,17 @@ READ8_MEMBER( pasopia_state::rombank_r )
 	return (m_ram_bank) ? 4 : 0;
 }
 
-READ8_MEMBER( pasopia_state::mux_r )
-{
-	return m_mux_data;
-}
-
 READ8_MEMBER( pasopia_state::keyb_r )
 {
-	const char *const keynames[3][4] = { { "KEY0", "KEY1", "KEY2", "KEY3" },
-											{ "KEY4", "KEY5", "KEY6", "KEY7" },
-											{ "KEY8", "KEY9", "KEYA", "KEYB" } };
-	int i,j;
-	UINT8 res;
-
-	res = 0;
+	UINT8 i,j,res = 0;
 	for(j=0;j<3;j++)
 	{
-		if(m_mux_data & 0x10 << j)
+		if BIT(m_mux_data, 4+j)
 		{
 			for(i=0;i<4;i++)
 			{
-				if(m_mux_data & 1 << i)
-					res |= ioport(keynames[j][i])->read();
+				if BIT(m_mux_data, i)
+					res |= m_keyboard[j*4+i]->read();
 			}
 		}
 	}
@@ -279,11 +270,11 @@ DRIVER_INIT_MEMBER(pasopia_state,pasopia)
 We preset all banks here, so that bankswitching will incur no speed penalty.
 0000 indicates ROMs, 10000 indicates RAM.
 */
-	UINT8 *p_ram = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 2, &p_ram[0x00000], 0x10000);
-	membank("bank2")->configure_entry(0, &p_ram[0x10000]);
+	UINT8 *ram = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 2, &ram[0x00000], 0x10000);
+	membank("bank2")->configure_entry(0, &ram[0x10000]);
 
-	machine().scheduler().timer_pulse(attotime::from_hz(500), timer_expired_delegate(FUNC(pasopia_state::pio_timer),this));
+	machine().scheduler().timer_pulse(attotime::from_hz(50), timer_expired_delegate(FUNC(pasopia_state::pio_timer),this));
 }
 
 static MACHINE_CONFIG_START( pasopia, pasopia_state )
@@ -330,7 +321,6 @@ static MACHINE_CONFIG_START( pasopia, pasopia_state )
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_4MHz)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(pasopia_state, mux_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(pasopia_state, mux_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8(pasopia_state, keyb_r))
 MACHINE_CONFIG_END

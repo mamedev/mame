@@ -191,7 +191,6 @@ PCB photos show only a 3MHz XTAL.
 
 ******************************************************************************
 
-
 Sensory Chess Challenger "9" (SC9)
 2 versions were available, the newer version was 2MHz and included the Budapest program.
 ---------------------------------
@@ -200,7 +199,7 @@ Sensory Chess Challenger "9" (SC9)
 36-pin edge connector, assume same as SC12
 4KB RAM(TMM2016P), 2*8KB ROM(HN48364P)
 R6502-13, 1.4MHz from resonator
-PCB label 510-1045C01 2-1-82
+PCB label 510-1046C01 2-1-82
 
 I/O is via TTL, not further documented here
 
@@ -819,6 +818,11 @@ static ADDRESS_MAP_START( sc9_map, AS_PROGRAM, 8, fidel6502_state )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( sc9b_map, AS_PROGRAM, 8, fidel6502_state )
+	AM_RANGE(0xa000, 0xa007) AM_MIRROR(0x1ff8) AM_READ(sc12_input_r)
+	AM_IMPORT_FROM( sc9_map )
+ADDRESS_MAP_END
+
 
 // SC12/6086
 
@@ -1231,9 +1235,11 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( rsc, fidel6502_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 2000000) // approximation, source unknown
+	MCFG_CPU_ADD("maincpu", M6502, 1800000) // measured approx 1.81MHz
 	MCFG_CPU_PROGRAM_MAP(rsc_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidelz80base_state, irq0_line_hold, 600) // 555 timer, guessed
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(546)) // from 555 timer, measured
+	MCFG_TIMER_START_DELAY(attotime::from_hz(546) - attotime::from_usec(38)) // active for 38us
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(546))
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0) // MOS 6520
 	MCFG_PIA_READPA_HANDLER(READ8(fidel6502_state, csc_pia1_pa_r))
@@ -1336,7 +1342,9 @@ static MACHINE_CONFIG_START( sc9, fidel6502_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1400000) // from ceramic resonator "681 JSA", measured
 	MCFG_CPU_PROGRAM_MAP(sc9_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidelz80base_state, irq0_line_hold, 600) // 555 timer, guessed
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(602)) // from 555 timer, measured
+	MCFG_TIMER_START_DELAY(attotime::from_hz(602) - attotime::from_usec(42)) // active for 42us
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(602))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_sc9)
@@ -1351,6 +1359,13 @@ static MACHINE_CONFIG_START( sc9, fidel6502_state )
 	MCFG_GENERIC_EXTENSIONS("bin,dat")
 	MCFG_GENERIC_LOAD(fidelz80base_state, scc_cartridge)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( sc9b, sc9 )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(sc9b_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sc12, fidel6502_state )
@@ -1549,6 +1564,12 @@ ROM_START( fscc9 )
 	ROM_LOAD("b31", 0xe000, 0x2000, CRC(cbaf97d7) SHA1(7ed8e68bb74713d9e2ff1d9c037012320b7bfcbf) ) // "
 ROM_END
 
+ROM_START( fscc9b ) // this one came from an overclocked board, let's assume the roms were unmodified
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("b30", 0xc000, 0x2000, CRC(65288753) SHA1(651f5ca5969ddd72a20cbebdec2de83c4bf10650) )
+	ROM_LOAD("b31", 0xe000, 0x2000, CRC(238b092f) SHA1(7ddffc6dba822aee9d8ad6815b23024ed5cdfd26) )
+ROM_END
+
 
 ROM_START( fscc12 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1593,7 +1614,8 @@ CONS( 1983, super9ccsp, super9cc, 0,      su9,      su9g,     driver_device, 0, 
 CONS( 1983, super9ccg,  super9cc, 0,      su9,      su9g,     driver_device, 0, "Fidelity Electronics", "Super 9 Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1983, super9ccfr, super9cc, 0,      su9,      su9g,     driver_device, 0, "Fidelity Electronics", "Super 9 Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1982, fscc9,      0,        0,      sc9,      sc12,     driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, fscc9,      0,        0,      sc9,      sc12,     driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 9 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, fscc9b,     fscc9,    0,      sc9b,     sc12,     driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 9 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1984, fscc12,     0,        0,      sc12,     sc12,     driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1987, fexcel,     0,        0,      fexcel,   fexcel,   driver_device, 0, "Fidelity Electronics", "Excellence (model 6080/6093)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

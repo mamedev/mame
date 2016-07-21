@@ -245,6 +245,11 @@ function cheatfind.startplugin()
 	local watches = {}
 	local menu_func
 
+	local cheat_save
+	local name = 1
+	local name_player = 1
+	local name_type = 1
+
 	local function start()
 		devtable = {}
 		devsel = 1
@@ -294,6 +299,19 @@ function cheatfind.startplugin()
 	local function menu_populate()
 		local menu = {}
 
+		local function menu_prepare()
+			local menu_list = {}
+			menu_func = {}
+			for num, func in ipairs(menu) do
+				local item, f = func()
+				if item then
+					menu_list[#menu_list + 1] = item
+					menu_func[#menu_list] = f
+				end
+			end
+			return menu_list
+		end
+
 		local function menu_lim(val, min, max, menuitem)
 			if min == max then
 				menuitem[3] = 0
@@ -318,7 +336,90 @@ function cheatfind.startplugin()
 			return val, ret
 		end
 
-	
+		if cheat_save then
+			local cplayer = { "All", "P1", "P2", "P3", "P4" }
+			local ctype = { "Infinite Credits", "Infinite Time", "Infinite Lives", "Infinite Energy", "Infinite Ammo", "Infinite Bombs", "Invincibility" }
+			menu[#menu + 1] = function() return { "Save Cheat", "", "off" }, nil end
+			menu[#menu + 1] = function() return { "---", "", "off" }, nil end
+			menu[#menu + 1] = function()
+				local c = { "Default", "Custom" }
+				local m = { "Cheat Name", c[name], 0 }
+				menu_lim(name, 1, #c, m)
+				local function f(event)
+					local r
+					name, r = incdec(event, name, 1, #c)
+					if (event == "select" or event == "comment") and name == 1 then
+						manager:machine():popmessage("Default name is " .. cheat_save.name)
+					end
+					return r
+				end
+				return m, f
+			end
+			if name == 2 then
+				menu[#menu + 1] = function()
+					local m = { "Player", cplayer[name_player], 0 }
+					menu_lim(name_player, 1, #cplayer, m)
+					return m, function(event) local r name_player, r = incdec(event, name_player, 1, #cplayer) return r end
+				end
+				menu[#menu + 1] = function()
+					local m = { "Type", ctype[name_type], 0 }
+					menu_lim(name_type, 1, #ctype, m)
+					return m, function(event) local r name_type, r = incdec(event, name_type, 1, #ctype) return r end
+				end
+			end
+			menu[#menu + 1] = function()
+				local m = { "Save", "", 0 }
+				local function f(event)
+					if event == "select" then
+						local desc
+						local written = false
+						if name == 2 then
+							if cplayer[name_player] == "All" then
+								desc = ctype[name_type]
+							else
+								desc = cplayer[name_player] .. " " .. ctype[name_type]
+							end
+						else
+							desc = cheat_save.name
+						end
+						local filename = cheat_save.filename .. "_" .. desc
+						local file = io.open(filename .. ".json", "w")
+						if file then
+							file:write(string.format(cheat_save.json, desc))
+							file:close()
+							if not devtable[devcur].space.shortname then -- no xml or simple for ram_device cheat
+								file = io.open(filename .. ".xml", "w")
+								file:write(string.format(cheat_save.xml, desc))
+								file:close()
+								file = io.open(cheat_save.path .. "/cheat.simple", "a")
+								file:write(string.format(cheat_save.simple, desc))
+								file:close()
+								manager:machine():popmessage("Cheat written to " .. cheat_save.filename .. " and added to cheat.simple")
+							end
+							written = true
+						elseif not devtable[devcur].space.shortname then
+							file = io.open(cheat_save.path .. "/cheat.simple", "a")
+							if file then
+								file:write(string.format(cheat_save.simple, desc))
+								file:close()
+								manager:machine():popmessage("Cheat added to cheat.simple")
+								written = true
+							end
+						end
+						if not written then
+							manager:machine():popmessage("Unable to write file\nCheck cheatpath dir exists")
+						end
+						cheat_save = nil
+						return true
+					end
+					return false
+				end
+				return m, f
+			end
+			menu[#menu + 1] = function() return { "Cancel", "", 0 }, function(event) if event == "select" then cheat_save = nil return true end end end
+			return menu_prepare()
+		end
+
 		menu[#menu + 1] = function()
 			local m = { "CPU or RAM", devtable[devsel].tag, 0 }
 			menu_lim(devsel, 1, #devtable, m)
@@ -551,104 +652,99 @@ function cheatfind.startplugin()
 				else
 					bitwidth = " %02x"
 				end
+
+				local function match_exec(match)
+					local dev = devtable[devcur]
+					local cheat = { desc = string.format("Test cheat at addr %08X", match.addr), script = {} }
+					local wid = formtable[width]:sub(2, 2):lower()
+					local widchar
+					local form
+					if wid == "h" then
+						wid = "u16"
+						form = "%08x %04x"
+						widchar = "w"
+					elseif wid == "l" then
+						wid = "u32"
+						form = "%08x %08x"
+						widchart = "d"
+					elseif wid == "j" then
+						wid = "u64"
+						form = "%08x %016x"
+						widchar = "q"
+					else
+						wid = "u8"
+						form = "%08x %02x"
+						widchar = "b"
+					end
+
+
+					if dev.space.shortname then
+						cheat.ram = { ram = dev.tag }
+						cheat.script.run = "ram:write(" .. match.addr .. "," .. match.newval .. ")"
+					else
+						cheat.space = { cpu = { tag = dev.tag, type = "program" } }
+						cheat.script.run = "cpu:write_" .. wid .. "(" .. match.addr .. "," .. match.newval .. ", true)"
+					end
+					if match.mode == 1 then
+						if not _G.ce then
+							manager:machine():popmessage("Cheat engine not available")
+						else
+							_G.ce.inject(cheat)
+						end
+					elseif match.mode == 2 then
+						cheat_save = {}
+						menu = 1
+						menu_player = 1
+						menu_type = 1
+						local setname = emu.romname()
+						if emu.softname() ~= "" then
+							for name, image in pairs(manager:machine().images) do
+								if image:exists() and image:software_list_name() ~= "" then
+									setname = image:software_list_name() .. "/" .. emu.softname()
+								end
+							end
+						end
+						-- lfs.env_replace is defined in boot.lua
+						cheat_save.path = lfs.env_replace(manager:machine():options().entries.cheatpath:value()):match("([^;]+)")
+						cheat_save.filename = string.format("%s/%s", cheat_save.path, setname)
+						cheat_save.name = cheat.desc
+						local json = require("json")
+						cheat.desc = "%s"
+						cheat_save.json = json.stringify({[1] = cheat}, {indent = true})
+						cheat_save.xml = string.format("<mamecheat version=1>\n<cheat desc=\"%%s\">\n<script state=\"run\">\n<action>%s.pp%s@%X=%X</action>\n</script>\n</cheat>\n</mamecheat>", dev.tag:sub(2), widchar, match.addr, match.newval)
+						cheat_save.simple = string.format("%s,%s,%X,%s,%X,%%s\n", setname, dev.tag, match.addr, widchar, match.newval)
+						manager:machine():popmessage("Default name is " .. cheat_save.name)
+						return true
+					else
+						local func = "return space:read"
+						local env = { space = devtable[devcur].space }
+						if not dev.space.shortname then
+							func = func .. "_" .. wid
+						end
+						func = func .. "(" .. match.addr .. ")"
+						watches[#watches + 1] = { addr = match.addr, func = load(func, func, "t", env), format = form }
+						return true
+					end
+					return false
+				end
+
 				for num2, match in mpairs(matchsel, matches[#matches], matchpg * 100) do
 					if num2 > 100 then
 						break
 					end
 					menu[#menu + 1] = function()
-						local m = { string.format("%08x" .. bitwidth .. bitwidth, match.addr, match.oldval, 
-					                                  match.newval), "", 0 }
 						if not match.mode then
 							match.mode = 1
 						end
-						if match.mode == 1 then
-							m[2] = "Test"
-						elseif match.mode == 2 then
-							m[2] = "Write"
-						else
-							m[2] = "Watch"
-						end
-						menu_lim(match.mode, 1, 3, m)
+						local modes = { "Test", "Write", "Watch" }
+						local m = { string.format("%08x" .. bitwidth .. bitwidth, match.addr, match.oldval, 
+					                                  match.newval), modes[match.mode], 0 }
+						menu_lim(match.mode, 1, #modes, m)
 						local function f(event)
 							local r
 							match.mode, r = incdec(event, match.mode, 1, 3)
 							if event == "select" then
-								local dev = devtable[devcur]
-								local cheat = { desc = string.format("Test cheat at addr %08X", match.addr), script = {} }
-								local wid = formtable[width]:sub(2, 2):lower()
-								local xmlcheat
-								local form
-								if wid == "h" then
-									wid = "u16"
-									form = "%08x %04x"
-									xmlcheat = "w"
-								elseif wid == "l" then
-									wid = "u32"
-									form = "%08x %08x"
-									xmlcheat = "d"
-								elseif wid == "j" then
-									wid = "u64"
-									form = "%08x %016x"
-									xmlcheat = "q"
-								else
-									wid = "u8"
-									form = "%08x %02x"
-									xmlcheat = "b"
-								end
-
-
-								if dev.space.shortname then
-									cheat.ram = { ram = dev.tag }
-									cheat.script.run = "ram:write(" .. match.addr .. "," .. match.newval .. ")"
-								else
-									cheat.space = { cpu = { tag = dev.tag, type = "program" } }
-									cheat.script.run = "cpu:write_" .. wid .. "(" .. match.addr .. "," .. match.newval .. ", true)"
-								end
-								if match.mode == 1 then
-									if not _G.ce then
-										manager:machine():popmessage("Cheat engine not available")
-									else
-										_G.ce.inject(cheat)
-									end
-								elseif match.mode == 2 then
-									-- lfs.env_replace is defined in boot.lua
-									local setname = emu.romname()
-									if emu.softname() ~= "" then
-										for name, image in pairs(manager:machine().images) do
-											if image:exists() and image:software_list_name() ~= "" then
-												setname = image:software_list_name() .. "/" .. emu.softname()
-											end
-										end
-									end
-									local cheatpath = lfs.env_replace(manager:machine():options().entries.cheatpath:value()):match("([^;]+)")
-									local filename = string.format("%s/%s_%08X_cheat", cheatpath, setname, match.addr)
-									local json = require("json")
-									local file = io.open(filename .. ".json", "w")
-									if file then
-										file:write(json.stringify({[1] = cheat}, {indent = true}))
-										file:close()
-										if not dev.space.shortname then -- no xml or simple for ram_device cheat
-											file = io.open(filename .. ".xml", "w")
-											file:write(string.format("<mamecheat version=1>\n<cheat desc=\"%s\">\n<script state=\"run\">\n<action>%s.pp%s@%X=%X</action>\n</script>\n</cheat>\n</mamecheat>", cheat.desc, dev.tag:sub(2), xmlcheat, match.addr, match.newval))
-											file:close()
-											file = io.open(cheatpath .. "/cheat.simple", "a")
-											file:write(string.format("%s,%s,%X,%s,%X,%s\n", setname, dev.tag, match.addr, xmlcheat, match.newval, cheat.desc))
-											file:close()
-										end
-										manager:machine():popmessage("Cheat written to " .. filename)
-									else
-										manager:machine():popmessage("Unable to write file\nCheck cheatpath dir exists")
-									end
-								else
-									local func = "return space:read"
-									local env = { space = devtable[devcur].space }
-									if not dev.space.shortname then
-										func = func .. "_" .. wid
-									end
-									func = func .. "(" .. match.addr .. ")"
-									watches[#watches + 1] = { addr = match.addr, func = load(func, func, "t", env), format = form }
-									r = true
-								end
+								r = match_exec(match)
 							end
 							return r
 						end
@@ -679,16 +775,7 @@ function cheatfind.startplugin()
 				end
 			end
 		end
-		local menu_list = {}
-		menu_func = {}
-		for num, func in ipairs(menu) do
-			local item, f = func()
-			if item then
-				menu_list[#menu_list + 1] = item
-				menu_func[#menu_list] = f
-			end
-		end
-		return menu_list
+		return menu_prepare()
 	end
 
 	local function menu_callback(index, event)
