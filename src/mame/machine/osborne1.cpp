@@ -221,13 +221,13 @@ WRITE8_MEMBER( osborne1_state::video_pia_port_b_w )
 
 	if (BIT(data, 6))
 	{
-		m_fdc->set_floppy(m_floppy0);
-		m_floppy0->mon_w(0);
+		m_fdc->set_floppy(m_floppy0->get_device());
+		m_floppy0->get_device()->mon_w(0);
 	}
 	else if (BIT(data, 7))
 	{
-		m_fdc->set_floppy(m_floppy1);
-		m_floppy1->mon_w(0);
+		m_fdc->set_floppy(m_floppy1->get_device());
+		m_floppy1->get_device()->mon_w(0);
 	}
 	else
 	{
