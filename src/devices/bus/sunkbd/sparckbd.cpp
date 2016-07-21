@@ -6,8 +6,8 @@
 
 
 /*
-    TODO: determine default keyclick state on real keyboard
     TODO: scancodes for extra key on international layout
+    TODO: self test pass sequence for Type 3 keyboard
 
     HLE SPARC serial keyboard compatible with Sun Type 4/5/6
 
@@ -26,7 +26,48 @@
     0111 1111               all keys up
     1111 1110  00dd dddd    layout response (DIP switches 3 to 8 from MSB to LSB)
     1111 1111  0000 0100    reset response (self test pass, always followed by all keys up or key make)
-    0111 1110  0000 0001    self test fal
+    0111 1110  0000 0001    self test fail
+
+
+    Type 3 layout:
+
+    01  03    05  06    08      0a      0c      0e      10    11  12  2b    15  16  17
+    19  1a    1d  1e  1f  20  21  22  23  24  25  26  27  28  29  58  2a    2d  2e  2f
+    31  33    35    36  37  38  39  3a  3b  3c  3d  3e  3f  40  41    42    44  45  46
+    48  49    4c     4d  4e  4f  50  51  52  53  54  55  56  57       59    5b  5c  5d
+    5f  61    63       64  65  66  67  68  69  6a  6b  6c  6d    6e   6f    70  71  72
+              77     78                  79                   7a      13
+
+    no LEDs
+    top row function keys are F1-F9 and backspace
+    delete key is above return
+    meta keys labelled "Left" and "Right"
+    linefeed key to the right of right shift (removed for Type 5)
+    single control key (still the case on later Sun keyboards)
+    "Alternate" key at bottom right of main area (moved to left for Type 4)
+    left group of function keys labelled L1-L10
+    right group of function keys labelled R1-R15
+    cursor up/down/left/right on R8/R10/R12/R14
+
+
+    Type 4 layout:
+
+    01  03    05  06  08  0a  0c  0e  10  11  12  07  09  0b  58      42    15  16  17  62
+    19  1a    1d  1e  1f  20  21  22  23  24  25  26  27  28  29      2b    2d  2e  2f  47
+    31  33    35    36  37  38  39  3a  3b  3c  3d  3e  3f  40  41          44  45  46
+    48  49    4c     4d  4e  4f  50  51  52  53  54  55  56  57  2a   59    5b  5c  5d  7d
+    5f  61    63       64  65  66  67  68  69  6a  6b  6c  6d   6e    6f    70  71  72
+      76      77  13  78                  79                  7a  43  0d      5e    32  5a
+
+    double-height return key, backspace above return
+    top row F1-F12, backslash and delete
+    dedicated labels for left function group with "Help" key added at bottom
+    meta keys labelled with diamonds, "Alt" on left, "Alt Graph" on right
+    "tenkey" keypad layout mostly re-using codes from R1-R15 on Type 3
+    top row of keypad is Pause, PrSc, Scroll Lock/Break, Num Lock
+    2d is = key on keypad (removed for Type 5 and scancode reused for mute)
+    introduces the "Compose" key
+    Caps Lock/Compose/Scroll Lock/Num Lock LEDs above keypad
 
 
     Type 5 US PC layout:
@@ -37,7 +78,8 @@
     19  1a    35    36  37  38  39  3a  3b  3c  3d  3e  3f  40  41    58    42  4a  7b    44  45  46
     31  33    77     4d  4e  4f  50  51  52  53  54  55  56  57       59                  5b  5c  5d  7d
     48  49    63       64  65  66  67  68  69  6a  6b  6c  6d         6e        14        70  71  72
-    5f  61    4c     78   13                79                0d  43  7a    18  1b  1c      5e    32  5a
+    5f  61    4c     13   78                79                7a  43  0d    18  1b  1c      5e    32  5a
+
 
     Type 5 US UNIX layout:
 
@@ -47,10 +89,9 @@
     19  1a    35    36  37  38  39  3a  3b  3c  3d  3e  3f  40  41    2b    42  4a  7b    44  45  46
     31  33    4c     4d  4e  4f  50  51  52  53  54  55  56  57       59                  5b  5c  5d  7d
     48  49    63       64  65  66  67  68  69  6a  6b  6c  6d         6e        14        70  71  72
-    5f  61    77     78   13                79                0d  43  7a    18  1b  1c      5e    32  5a
+    5f  61    77     13   78                79                7a  43  0d    18  1b  1c      5e    32  5a
 
     xx is a blank key
-    6f is assigned to linefeed, which is present on Type 4 keyboards, but absent on Type 5
 */
 
 namespace {
