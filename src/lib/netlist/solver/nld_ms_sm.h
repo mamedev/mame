@@ -55,7 +55,7 @@ class matrix_solver_sm_t: public matrix_solver_t
 public:
 
 	matrix_solver_sm_t(netlist_t &anetlist, const pstring &name,
-			const solver_parameters_t *params, const int size);
+			const solver_parameters_t *params, const unsigned size);
 
 	virtual ~matrix_solver_sm_t();
 
@@ -63,8 +63,8 @@ public:
 	virtual void reset() override { matrix_solver_t::reset(); }
 
 protected:
-	virtual int vsolve_non_dynamic(const bool newton_raphson) override;
-	int solve_non_dynamic(const bool newton_raphson);
+	virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;
+	unsigned solve_non_dynamic(const bool newton_raphson);
 
 	inline unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
 
@@ -155,19 +155,19 @@ void matrix_solver_sm_t<m_N, storage_N>::LE_invert()
 		/* FIXME: Singular matrix? */
 		const nl_double f = 1.0 / W(i,i);
 		const auto * RESTRICT const p = m_terms[i]->m_nzrd.data();
-		const unsigned e = m_terms[i]->m_nzrd.size();
+		const std::size_t e = m_terms[i]->m_nzrd.size();
 
 		/* Eliminate column i from row j */
 
 		const auto * RESTRICT const pb = m_terms[i]->m_nzbd.data();
-		const unsigned eb = m_terms[i]->m_nzbd.size();
-		for (unsigned jb = 0; jb < eb; jb++)
+		const std::size_t eb = m_terms[i]->m_nzbd.size();
+		for (std::size_t jb = 0; jb < eb; jb++)
 		{
 			const unsigned j = pb[jb];
 			const nl_double f1 = - W(j,i) * f;
 			if (f1 != 0.0)
 			{
-				for (unsigned k = 0; k < e; k++)
+				for (std::size_t k = 0; k < e; k++)
 					W(j,p[k]) += W(i,p[k]) * f1;
 				for (unsigned k = 0; k <= i; k ++)
 					Ainv(j,k) += Ainv(i,k) * f1;
@@ -175,11 +175,11 @@ void matrix_solver_sm_t<m_N, storage_N>::LE_invert()
 		}
 	}
 	/* up */
-	for (int i = kN - 1; i >= 0; i--)
+	for (unsigned i = kN; i-- > 0; )
 	{
 		/* FIXME: Singular matrix? */
 		const nl_double f = 1.0 / W(i,i);
-		for (int j = i - 1; j>=0; j--)
+		for (unsigned j = i; j-- > 0; )
 		{
 			const nl_double f1 = - W(j,i) * f;
 			if (f1 != 0.0)
@@ -219,7 +219,7 @@ void matrix_solver_sm_t<m_N, storage_N>::LE_compute_x(
 
 
 template <unsigned m_N, unsigned storage_N>
-int matrix_solver_sm_t<m_N, storage_N>::solve_non_dynamic(const bool newton_raphson)
+unsigned matrix_solver_sm_t<m_N, storage_N>::solve_non_dynamic(const bool newton_raphson)
 {
 	static const bool incremental = true;
 	static unsigned cnt = 0;
@@ -309,7 +309,7 @@ int matrix_solver_sm_t<m_N, storage_N>::solve_non_dynamic(const bool newton_raph
 }
 
 template <unsigned m_N, unsigned storage_N>
-inline int matrix_solver_sm_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
+inline unsigned matrix_solver_sm_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	build_LE_A<matrix_solver_sm_t>();
 	build_LE_RHS<matrix_solver_sm_t>();
@@ -323,7 +323,7 @@ inline int matrix_solver_sm_t<m_N, storage_N>::vsolve_non_dynamic(const bool new
 
 template <unsigned m_N, unsigned storage_N>
 matrix_solver_sm_t<m_N, storage_N>::matrix_solver_sm_t(netlist_t &anetlist, const pstring &name,
-		const solver_parameters_t *params, const int size)
+		const solver_parameters_t *params, const unsigned size)
 : matrix_solver_t(anetlist, name, NOSORT, params)
 , m_dim(size)
 {

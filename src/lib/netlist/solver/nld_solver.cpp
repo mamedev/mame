@@ -127,9 +127,9 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 
 		net->set_solver(this);
 
-		for (core_terminal_t *p : net->m_core_terms)
+		for (auto &p : net->m_core_terms)
 		{
-			log().debug("{1} {2} {3}\n", p->name(), net->name(), (int) net->isRailNet());
+			log().debug("{1} {2} {3}\n", p->name(), net->name(), net->isRailNet());
 			switch (p->type())
 			{
 				case terminal_t::TERMINAL:
@@ -187,12 +187,12 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 
 void matrix_solver_t::setup_matrix()
 {
-	const unsigned iN = m_nets.size();
+	const std::size_t iN = m_nets.size();
 
-	for (unsigned k = 0; k < iN; k++)
+	for (std::size_t k = 0; k < iN; k++)
 	{
 		m_terms[k]->m_railstart = m_terms[k]->count();
-		for (unsigned i = 0; i < m_rails_temp[k]->count(); i++)
+		for (std::size_t i = 0; i < m_rails_temp[k]->count(); i++)
 			this->m_terms[k]->add(m_rails_temp[k]->terms()[i], m_rails_temp[k]->net_other()[i], false);
 
 		m_rails_temp[k]->clear(); // no longer needed
@@ -231,7 +231,7 @@ void matrix_solver_t::setup_matrix()
 		for (unsigned k = 0; k < iN - 1; k++)
 			for (unsigned i = k+1; i < iN; i++)
 			{
-				if (((int) m_terms[k]->m_railstart - (int) m_terms[i]->m_railstart) * sort_order < 0)
+				if ((static_cast<int>(m_terms[k]->m_railstart) - static_cast<int>(m_terms[i]->m_railstart)) * sort_order < 0)
 				{
 					std::swap(m_terms[i], m_terms[k]);
 					std::swap(m_nets[i], m_nets[k]);
@@ -257,8 +257,8 @@ void matrix_solver_t::setup_matrix()
 		t->m_nz.clear();
 
 		for (unsigned i = 0; i < t->m_railstart; i++)
-			if (!plib::container::contains(t->m_nz, other[i]))
-				t->m_nz.push_back(other[i]);
+			if (!plib::container::contains(t->m_nz, static_cast<unsigned>(other[i])))
+				t->m_nz.push_back(static_cast<unsigned>(other[i]));
 
 		t->m_nz.push_back(k);     // add diagonal
 
@@ -291,8 +291,8 @@ void matrix_solver_t::setup_matrix()
 		}
 
 		for (unsigned i = 0; i < t->m_railstart; i++)
-			if (!plib::container::contains(t->m_nzrd, other[i]) && other[i] >= (int) (k + 1))
-				t->m_nzrd.push_back(other[i]);
+			if (!plib::container::contains(t->m_nzrd, static_cast<unsigned>(other[i])) && other[i] >= static_cast<int>(k + 1))
+				t->m_nzrd.push_back(static_cast<unsigned>(other[i]));
 
 		/* and sort */
 		std::sort(t->m_nzrd.begin(), t->m_nzrd.end());
@@ -369,15 +369,15 @@ void matrix_solver_t::setup_matrix()
 void matrix_solver_t::update_inputs()
 {
 	// avoid recursive calls. Inputs are updated outside this call
-	for (std::size_t i=0; i<m_inps.size(); i++)
-		m_inps[i]->set_Q(m_inps[i]->m_proxied_net->Q_Analog());
+	for (auto &inp : m_inps)
+		inp->push(inp->m_proxied_net->Q_Analog());
 }
 
 void matrix_solver_t::update_dynamic()
 {
 	/* update all non-linear devices  */
-	for (std::size_t i=0; i < m_dynamic_devices.size(); i++)
-		m_dynamic_devices[i]->update_terminals();
+	for (auto &dyn : m_dynamic_devices)
+		dyn->update_terminals();
 }
 
 void matrix_solver_t::reset()
@@ -419,8 +419,8 @@ void matrix_solver_t::solve_base()
 	m_stat_vsolver_calls++;
 	if (has_dynamic_devices())
 	{
-		int this_resched;
-		int newton_loops = 0;
+		unsigned this_resched;
+		unsigned newton_loops = 0;
 		do
 		{
 			update_dynamic();
@@ -465,15 +465,15 @@ const netlist_time matrix_solver_t::solve()
 	return next_time_step;
 }
 
-int matrix_solver_t::get_net_idx(net_t *net)
+int matrix_solver_t::get_net_idx(detail::net_t *net)
 {
 	for (std::size_t k = 0; k < m_nets.size(); k++)
 		if (m_nets[k] == net)
-			return k;
+			return static_cast<int>(k);
 	return -1;
 }
 
-void matrix_solver_t::add_term(int k, terminal_t *term)
+void matrix_solver_t::add_term(std::size_t k, terminal_t *term)
 {
 	if (term->m_otherterm->net().isRailNet())
 	{
@@ -505,7 +505,7 @@ netlist_time matrix_solver_t::compute_next_timestep(const double cur_ts)
 		 * FIXME: We should extend the logic to use either all nets or
 		 *        only output nets.
 		 */
-		for (unsigned k = 0, iN=m_terms.size(); k < iN; k++)
+		for (std::size_t k = 0, iN=m_terms.size(); k < iN; k++)
 		{
 			analog_net_t *n = m_nets[k];
 			terms_t *t = m_terms[k];
@@ -550,27 +550,22 @@ void matrix_solver_t::log_stats()
 		log().verbose("       ==> {1} nets", this->m_nets.size()); //, (*(*groups[i].first())->m_core_terms.first())->name());
 		log().verbose("       has {1} elements", this->has_dynamic_devices() ? "dynamic" : "no dynamic");
 		log().verbose("       has {1} elements", this->has_timestep_devices() ? "timestep" : "no timestep");
-		log().verbose("       {1:6.3} average newton raphson loops", (double) this->m_stat_newton_raphson / (double) this->m_stat_vsolver_calls);
-		log().verbose("       {1:10} invocations ({2:6} Hz)  {3:10} gs fails ({4:6.2} %) {5:6.3} average",
+		log().verbose("       {1:6.3} average newton raphson loops",
+					static_cast<double>(this->m_stat_newton_raphson) / static_cast<double>(this->m_stat_vsolver_calls));
+		log().verbose("       {1:10} invocations ({2:6.0} Hz)  {3:10} gs fails ({4:6.2} %) {5:6.3} average",
 				this->m_stat_calculations(),
-				this->m_stat_calculations() * 10 / (int) (this->netlist().time().as_double() * 10.0),
+				static_cast<double>(this->m_stat_calculations()) / this->netlist().time().as_double(),
 				this->m_iterative_fail(),
-				100.0 * (double) this->m_iterative_fail() / (double) this->m_stat_calculations(),
-				(double) this->m_iterative_total() / (double) this->m_stat_calculations());
+				100.0 * static_cast<double>(this->m_iterative_fail())
+					/ static_cast<double>(this->m_stat_calculations()),
+				static_cast<double>(this->m_iterative_total()) / static_cast<double>(this->m_stat_calculations()));
 	}
 }
-
-
-
-
-
 
 
 // ----------------------------------------------------------------------------------------
 // solver
 // ----------------------------------------------------------------------------------------
-
-
 
 NETLIB_RESET(solver)
 {
@@ -596,7 +591,7 @@ NETLIB_UPDATE(solver)
 
 #if HAS_OPENMP && USE_OPENMP
 	const std::size_t t_cnt = m_mat_solvers.size();
-	if (m_parallel.Value())
+	if (m_parallel())
 	{
 		omp_set_num_threads(3);
 		//omp_set_dynamic(0);
@@ -634,7 +629,7 @@ NETLIB_UPDATE(solver)
 }
 
 template <int m_N, int storage_N>
-std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(int size, const bool use_specific)
+std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(unsigned size, const bool use_specific)
 {
 	pstring solvername = plib::pfmt("Solver_{1}")(m_mat_solvers.size());
 	if (use_specific && m_N == 1)
@@ -643,48 +638,48 @@ std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(int size, co
 		return plib::make_unique<matrix_solver_direct2_t>(netlist(), solvername, &m_params);
 	else
 	{
-		if (size >= m_gs_threshold)
+		if (static_cast<int>(size) >= m_gs_threshold())
 		{
-			if (pstring("SOR_MAT").equals(m_iterative_solver))
+			if (pstring("SOR_MAT").equals(m_iterative_solver()))
 			{
 				typedef matrix_solver_SOR_mat_t<m_N,storage_N> solver_sor_mat;
 				return plib::make_unique<solver_sor_mat>(netlist(), solvername, &m_params, size);
 			}
-			else if (pstring("MAT_CR").equals(m_iterative_solver))
+			else if (pstring("MAT_CR").equals(m_iterative_solver()))
 			{
 				typedef matrix_solver_GCR_t<m_N,storage_N> solver_mat;
 				return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
 			}
-			else if (pstring("MAT").equals(m_iterative_solver))
+			else if (pstring("MAT").equals(m_iterative_solver()))
 			{
 				typedef matrix_solver_direct_t<m_N,storage_N> solver_mat;
 				return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
 			}
-			else if (pstring("SM").equals(m_iterative_solver))
+			else if (pstring("SM").equals(m_iterative_solver()))
 			{
 				/* Sherman-Morrison Formula */
 				typedef matrix_solver_sm_t<m_N,storage_N> solver_mat;
 				return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
 			}
-			else if (pstring("W").equals(m_iterative_solver))
+			else if (pstring("W").equals(m_iterative_solver()))
 			{
 				/* Woodbury Formula */
 				typedef matrix_solver_w_t<m_N,storage_N> solver_mat;
 				return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
 			}
-			else if (pstring("SOR").equals(m_iterative_solver))
+			else if (pstring("SOR").equals(m_iterative_solver()))
 			{
 				typedef matrix_solver_SOR_t<m_N,storage_N> solver_GS;
 				return plib::make_unique<solver_GS>(netlist(), solvername, &m_params, size);
 			}
-			else if (pstring("GMRES").equals(m_iterative_solver))
+			else if (pstring("GMRES").equals(m_iterative_solver()))
 			{
 				typedef matrix_solver_GMRES_t<m_N,storage_N> solver_GMRES;
 				return plib::make_unique<solver_GMRES>(netlist(), solvername, &m_params, size);
 			}
 			else
 			{
-				netlist().log().fatal("Unknown solver type: {1}\n", m_iterative_solver.Value());
+				netlist().log().fatal("Unknown solver type: {1}\n", m_iterative_solver());
 				return nullptr;
 			}
 		}
@@ -701,17 +696,18 @@ void NETLIB_NAME(solver)::post_start()
 	std::vector<analog_net_t::list_t> groups;
 	const bool use_specific = true;
 
-	m_params.m_pivot = m_pivot.Value();
-	m_params.m_accuracy = m_accuracy.Value();
-	m_params.m_gs_loops = m_gs_loops.Value();
-	m_params.m_nr_loops = m_nr_loops.Value();
-	m_params.m_nt_sync_delay = netlist_time::from_double(m_sync_delay.Value());
-	m_params.m_lte = m_lte.Value();
-	m_params.m_sor = m_sor.Value();
+	m_params.m_pivot = m_pivot();
+	m_params.m_accuracy = m_accuracy();
+	/* FIXME: Throw when negative */
+	m_params.m_gs_loops = static_cast<unsigned>(m_gs_loops());
+	m_params.m_nr_loops = static_cast<unsigned>(m_nr_loops());
+	m_params.m_nt_sync_delay = netlist_time::from_double(m_sync_delay());
+	m_params.m_lte = m_lte();
+	m_params.m_sor = m_sor();
 
-	m_params.m_min_timestep = m_min_timestep.Value();
-	m_params.m_dynamic = (m_dynamic.Value() == 1 ? true : false);
-	m_params.m_max_timestep = netlist_time::from_hz(m_freq.Value()).as_double();
+	m_params.m_min_timestep = m_min_timestep();
+	m_params.m_dynamic = (m_dynamic() == 1 ? true : false);
+	m_params.m_max_timestep = netlist_time::from_double(1.0 / m_freq()).as_double();
 
 	if (m_params.m_dynamic)
 	{
@@ -727,9 +723,9 @@ void NETLIB_NAME(solver)::post_start()
 	// Override log statistics
 	pstring p = plib::util::environment("NL_STATS");
 	if (p != "")
-		m_params.m_log_stats = (bool) p.as_long();
+		m_params.m_log_stats = p.as_long();
 	else
-		m_params.m_log_stats = (bool) m_log_stats.Value();
+		m_params.m_log_stats = m_log_stats();
 
 	netlist().log().verbose("Scanning net groups ...");
 	// determine net groups
@@ -754,7 +750,7 @@ void NETLIB_NAME(solver)::post_start()
 	for (auto & grp : groups)
 	{
 		std::unique_ptr<matrix_solver_t> ms;
-		std::size_t net_count = grp.size();
+		unsigned net_count = static_cast<unsigned>(grp.size());
 
 		switch (net_count)
 		{
@@ -806,7 +802,7 @@ void NETLIB_NAME(solver)::post_start()
 				break;
 #endif
 			default:
-				netlist().log().warning("No specific solver found for netlist of size {1}", (unsigned) net_count);
+				netlist().log().warning("No specific solver found for netlist of size {1}", net_count);
 				if (net_count <= 16)
 				{
 					ms = create_solver<0,16>(net_count, use_specific);
@@ -841,10 +837,10 @@ void NETLIB_NAME(solver)::post_start()
 		netlist().log().verbose("       ==> {2} nets", grp.size());
 		netlist().log().verbose("       has {1} elements", ms->has_dynamic_devices() ? "dynamic" : "no dynamic");
 		netlist().log().verbose("       has {1} elements", ms->has_timestep_devices() ? "timestep" : "no timestep");
-		for (net_t *n : grp)
+		for (auto &n : grp)
 		{
 			netlist().log().verbose("Net {1}", n->name());
-			for (const core_terminal_t *pcore : n->m_core_terms)
+			for (const auto &pcore : n->m_core_terms)
 			{
 				netlist().log().verbose("   {1}", pcore->name());
 			}

@@ -79,16 +79,17 @@
 // FIXME: avoid compile fails
 // #warning "Do not include rescap.h in a netlist environment"
 #endif
-
-#define RES_R(res) ((double)(res))
-#define RES_K(res) ((double)(res) * 1e3)
-#define RES_M(res) ((double)(res) * 1e6)
-#define CAP_U(cap) ((double)(cap) * 1e-6)
-#define CAP_N(cap) ((double)(cap) * 1e-9)
-#define CAP_P(cap) ((double)(cap) * 1e-12)
-#define IND_U(ind) ((double)(ind) * 1e-6)
-#define IND_N(ind) ((double)(ind) * 1e-9)
-#define IND_P(ind) ((double)(ind) * 1e-12)
+#ifndef RES_R
+#define RES_R(res) (static_cast<double>(res))
+#define RES_K(res) (static_cast<double>(res) * 1e3)
+#define RES_M(res) (static_cast<double>(res) * 1e6)
+#define CAP_U(cap) (static_cast<double>(cap) * 1e-6)
+#define CAP_N(cap) (static_cast<double>(cap) * 1e-9)
+#define CAP_P(cap) (static_cast<double>(cap) * 1e-12)
+#define IND_U(ind) (static_cast<double>(ind) * 1e-6)
+#define IND_N(ind) (static_cast<double>(ind) * 1e-9)
+#define IND_P(ind) (static_cast<double>(ind) * 1e-12)
+#endif
 
 // -----------------------------------------------------------------------------
 // Implementation
@@ -196,8 +197,8 @@ protected:
 	NETLIB_UPDATE_PARAMI()
 	{
 		update_dev();
-		if (m_R.Value() > 1e-9)
-			set_R(m_R.Value());
+		if (m_R() > 1e-9)
+			set_R(m_R());
 		else
 			set_R(1e-9);
 	}
@@ -284,7 +285,7 @@ public:
 	NETLIB_TIMESTEP()
 	{
 		/* Gpar should support convergence */
-		const nl_double G = m_C.Value() / step +  m_GParallel;
+		const nl_double G = m_C() / step +  m_GParallel;
 		const nl_double I = -G * deltaV();
 		set(G, 0.0, I);
 	}

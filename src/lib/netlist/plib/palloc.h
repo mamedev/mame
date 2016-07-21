@@ -17,7 +17,6 @@
 #include "pstring.h"
 
 namespace plib {
-
 //============================================================
 //  exception base
 //============================================================
@@ -204,7 +203,7 @@ private:
 		char *data;
 	};
 
-	int new_block();
+	size_t new_block();
 
 	struct info
 	{
@@ -213,14 +212,14 @@ private:
 	};
 
 public:
-	mempool(int min_alloc, int min_align);
+	mempool(size_t min_alloc, size_t min_align);
 	~mempool();
 
 	void *alloc(size_t size);
 	void free(void *ptr);
 
-	int m_min_alloc;
-	int m_min_align;
+	size_t m_min_alloc;
+	size_t m_min_align;
 
 	std::vector<block> m_blocks;
 };

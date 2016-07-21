@@ -160,11 +160,11 @@ namespace netlist
 		if (!m_enableq)
 		{
 			m_out = m_out ^ 1;
-			OUTLOGIC(m_Y, m_out, m_inc);
+			m_Y.push(m_out, m_inc);
 		}
 		else
 		{
-			OUTLOGIC(m_Y, 1, m_inc);
+			m_Y.push(1, m_inc);
 		}
 	}
 
@@ -174,8 +174,8 @@ namespace netlist
 			// recompute
 			nl_double  freq;
 			nl_double  v_freq_2, v_freq_3, v_freq_4;
-			nl_double  v_freq = INPANALOG(m_FC);
-			nl_double  v_rng = INPANALOG(m_RNG);
+			nl_double  v_freq = m_FC();
+			nl_double  v_rng = m_RNG();
 
 			/* coefficients */
 			const nl_double k1 = 1.9904769024796283E+03;
@@ -207,27 +207,27 @@ namespace netlist
 			freq += k9 * v_rng * v_freq_3;
 			freq += k10 * v_rng * v_freq_4;
 
-			freq *= NL_FCONST(0.1e-6) / m_CAP;
+			freq *= NL_FCONST(0.1e-6) / m_CAP();
 
 			// FIXME: we need a possibility to remove entries from queue ...
 			//        or an exact model ...
-			m_clock.m_inc = netlist_time::from_double(0.5 / (double) freq);
+			m_clock.m_inc = netlist_time::from_double(0.5 / freq);
 			//m_clock.update();
 
 			//NL_VERBOSE_OUT(("{1} {2} {3} {4}\n", name(), v_freq, v_rng, freq));
 		}
 
-		if (!m_clock.m_enableq && INPLOGIC(m_ENQ))
+		if (!m_clock.m_enableq && m_ENQ())
 		{
 			m_clock.m_enableq = 1;
 			m_clock.m_out = m_clock.m_out ^ 1;
-			OUTLOGIC(m_clock.m_Y, m_clock.m_out, netlist_time::from_nsec(1));
+			m_clock.m_Y.push(m_clock.m_out, netlist_time::from_nsec(1));
 		}
-		else if (m_clock.m_enableq && !INPLOGIC(m_ENQ))
+		else if (m_clock.m_enableq && !m_ENQ())
 		{
 			m_clock.m_enableq = 0;
 			m_clock.m_out = m_clock.m_out ^ 1;
-			OUTLOGIC(m_clock.m_Y, m_clock.m_out, netlist_time::from_nsec(1));
+			m_clock.m_Y.push(m_clock.m_out, netlist_time::from_nsec(1));
 		}
 	}
 

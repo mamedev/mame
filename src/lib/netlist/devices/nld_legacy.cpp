@@ -56,7 +56,7 @@ namespace netlist
 		param_int_t m_L_to_H;
 		param_int_t m_H_to_L;
 
-		state_var_u8 m_last;
+		state_var<netlist_sig_t> m_last;
 	};
 
 	NETLIB_RESET(nicRSFF)
@@ -67,15 +67,15 @@ namespace netlist
 
 	NETLIB_UPDATE(nicRSFF)
 	{
-		if (!INPLOGIC(m_S))
+		if (!m_S())
 		{
-			OUTLOGIC(m_Q,  1, NLTIME_FROM_NS(20));
-			OUTLOGIC(m_QQ, 0, NLTIME_FROM_NS(20));
+			m_Q.push(1, NLTIME_FROM_NS(20));
+			m_QQ.push(0, NLTIME_FROM_NS(20));
 		}
-		else if (!INPLOGIC(m_R))
+		else if (!m_R())
 		{
-			OUTLOGIC(m_Q,  0, NLTIME_FROM_NS(20));
-			OUTLOGIC(m_QQ, 1, NLTIME_FROM_NS(20));
+			m_Q.push(0, NLTIME_FROM_NS(20));
+			m_QQ.push(1, NLTIME_FROM_NS(20));
 		}
 	}
 
@@ -86,16 +86,16 @@ namespace netlist
 
 	NETLIB_UPDATE(nicDelay)
 	{
-		netlist_sig_t nval = INPLOGIC(m_I);
+		netlist_sig_t nval = m_I();
 		if (nval && !m_last)
 		{
 			// L_to_H
-			OUTLOGIC(m_Q,  1, NLTIME_FROM_NS(m_L_to_H.Value()));
+			m_Q.push(1, NLTIME_FROM_NS(static_cast<unsigned>(m_L_to_H())));
 		}
 		else if (!nval && m_last)
 		{
 			// H_to_L
-			OUTLOGIC(m_Q,  0, NLTIME_FROM_NS(m_H_to_L.Value()));
+			m_Q.push(0, NLTIME_FROM_NS(static_cast<unsigned>(m_H_to_L())));
 		}
 		m_last = nval;
 	}

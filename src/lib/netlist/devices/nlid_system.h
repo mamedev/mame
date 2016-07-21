@@ -49,7 +49,7 @@ namespace netlist
 		, m_Q(*this, "Q")
 		, m_freq(*this, "FREQ", 7159000.0 * 5)
 		{
-			m_inc = netlist_time::from_hz(m_freq.Value()*2);
+			m_inc = netlist_time::from_double(1.0 / (m_freq()*2.0));
 		}
 
 		NETLIB_RESETI()
@@ -59,7 +59,7 @@ namespace netlist
 
 		NETLIB_UPDATE_PARAMI()
 		{
-			m_inc = netlist_time::from_hz(m_freq.Value()*2);
+			m_inc = netlist_time::from_double(1.0 / (m_freq()*2.0));
 		}
 
 		NETLIB_UPDATEI()
@@ -90,7 +90,7 @@ namespace netlist
 		, m_Q(*this, "Q")
 		, m_freq(*this, "FREQ", 7159000.0 * 5.0)
 		{
-			m_inc = netlist_time::from_hz(m_freq.Value()*2);
+			m_inc = netlist_time::from_double(1.0 / (m_freq()*2.0));
 
 			connect_late(m_feedback, m_Q);
 		}
@@ -121,20 +121,20 @@ namespace netlist
 		, m_cnt(*this, "m_cnt", 0)
 		, m_off(*this, "m_off", netlist_time::zero())
 		{
-			m_inc[0] = netlist_time::from_hz(m_freq.Value()*2);
+			m_inc[0] = netlist_time::from_double(1.0 / (m_freq()*2.0));
 
 			connect_late(m_feedback, m_Q);
 			{
-				netlist_time base = netlist_time::from_hz(m_freq.Value()*2);
-				plib::pstring_vector_t pat(m_pattern.Value(),",");
-				m_off = netlist_time::from_double(m_offset.Value());
+				netlist_time base = netlist_time::from_double(1.0 / (m_freq()*2.0));
+				plib::pstring_vector_t pat(m_pattern(),",");
+				m_off = netlist_time::from_double(m_offset());
 
-				int pati[256];
+				unsigned long pati[256];
 				m_size = pat.size();
-				int total = 0;
+				unsigned long total = 0;
 				for (unsigned i=0; i<m_size; i++)
 				{
-					pati[i] = pat[i].as_long();
+					pati[i] = static_cast<unsigned long>(pat[i].as_long());
 					total += pati[i];
 				}
 				netlist_time ttotal = netlist_time::zero();
@@ -160,7 +160,7 @@ namespace netlist
 		netlist_time m_inc[32];
 		state_var<unsigned> m_cnt;
 		state_var<netlist_time> m_off;
-		unsigned m_size;
+		std::size_t m_size;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -175,7 +175,7 @@ namespace netlist
 		/* make sure we get the family first */
 		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
 		{
-			set_logic_family(netlist().setup().family_from_model(m_FAMILY.Value()));
+			set_logic_family(netlist().setup().family_from_model(m_FAMILY()));
 		}
 
 		NETLIB_UPDATE_AFTER_PARAM_CHANGE()
@@ -220,7 +220,7 @@ namespace netlist
 		}
 		NETLIB_UPDATEI()
 		{
-			OUTANALOG(m_Q, 0.0);
+			m_Q.push(0.0);
 		}
 		NETLIB_RESETI() { }
 	protected:
@@ -276,13 +276,13 @@ namespace netlist
 
 		NETLIB_RESETI()
 		{
-			m_RIN.set(1.0 / m_p_RIN.Value(),0,0);
-			m_ROUT.set(1.0 / m_p_ROUT.Value(),0,0);
+			m_RIN.set(1.0 / m_p_RIN(),0,0);
+			m_ROUT.set(1.0 / m_p_ROUT(),0,0);
 		}
 
 		NETLIB_UPDATEI()
 		{
-			OUTANALOG(m_Q, INPANALOG(m_I));
+			m_Q.push(m_I());
 		}
 
 	private:
@@ -309,10 +309,10 @@ namespace netlist
 		, m_func(*this, "FUNC", "")
 		, m_Q(*this, "Q")
 		{
-			for (int i=0; i < m_N; i++)
+			for (int i=0; i < m_N(); i++)
 				m_I.push_back(plib::make_unique<analog_input_t>(*this, plib::pfmt("A{1}")(i)));
 
-			plib::pstring_vector_t cmds(m_func.Value(), " ");
+			plib::pstring_vector_t cmds(m_func(), " ");
 			m_precompiled.clear();
 
 			for (std::size_t i=0; i < cmds.size(); i++)
@@ -338,7 +338,7 @@ namespace netlist
 					rc.m_cmd = PUSH_CONST;
 					rc.m_param = cmd.as_double(&err);
 					if (err)
-						netlist().log().fatal("nld_function: unknown/misformatted token <{1}> in <{2}>", cmd, m_func.Value());
+						netlist().log().fatal("nld_function: unknown/misformatted token <{1}> in <{2}>", cmd, m_func());
 				}
 				m_precompiled.push_back(rc);
 			}
@@ -404,13 +404,13 @@ namespace netlist
 		NETLIB_RESETI()
 		{
 			m_last_state = 0;
-			m_R.set_R(m_ROFF.Value());
+			m_R.set_R(m_ROFF());
 		}
 		//NETLIB_UPDATE_PARAMI();
 		NETLIB_UPDATEI();
 
 	private:
-		state_var_u8 m_last_state;
+		state_var<netlist_sig_t> m_last_state;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -420,7 +420,8 @@ namespace netlist
 	NETLIB_OBJECT(base_proxy)
 	{
 	public:
-		nld_base_proxy(netlist_t &anetlist, const pstring &name, logic_t *inout_proxied, core_terminal_t *proxy_inout)
+		nld_base_proxy(netlist_t &anetlist, const pstring &name,
+				logic_t *inout_proxied, detail::core_terminal_t *proxy_inout)
 				: device_t(anetlist, name)
 		{
 			m_logic_family = inout_proxied->logic_family();
@@ -431,7 +432,7 @@ namespace netlist
 		virtual ~nld_base_proxy() {}
 
 		logic_t &term_proxied() const { return *m_term_proxied; }
-		core_terminal_t &proxy_term() const { return *m_proxy_term; }
+		detail::core_terminal_t &proxy_term() const { return *m_proxy_term; }
 
 	protected:
 
@@ -443,7 +444,7 @@ namespace netlist
 	private:
 		const logic_family_desc_t *m_logic_family;
 		logic_t *m_term_proxied;
-		core_terminal_t *m_proxy_term;
+		detail::core_terminal_t *m_proxy_term;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -472,9 +473,9 @@ namespace netlist
 		NETLIB_UPDATEI()
 		{
 			if (m_I.Q_Analog() > logic_family().m_high_thresh_V)
-				OUTLOGIC(m_Q, 1, NLTIME_FROM_NS(1));
+				m_Q.push(1, NLTIME_FROM_NS(1));
 			else if (m_I.Q_Analog() < logic_family().m_low_thresh_V)
-				OUTLOGIC(m_Q, 0, NLTIME_FROM_NS(1));
+				m_Q.push(0, NLTIME_FROM_NS(1));
 			else
 			{
 				// do nothing
@@ -495,7 +496,8 @@ namespace netlist
 		virtual logic_input_t &in() { return m_I; }
 
 	protected:
-		nld_base_d_to_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *out_proxied, core_terminal_t &proxy_out)
+		nld_base_d_to_a_proxy(netlist_t &anetlist, const pstring &name,
+				logic_output_t *out_proxied, detail::core_terminal_t &proxy_out)
 		: nld_base_proxy(anetlist, name, out_proxied, &proxy_out)
 		, m_I(*this, "I")
 		{

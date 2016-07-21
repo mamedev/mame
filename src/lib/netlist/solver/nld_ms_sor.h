@@ -26,7 +26,7 @@ class matrix_solver_SOR_t: public matrix_solver_direct_t<m_N, storage_N>
 {
 public:
 
-	matrix_solver_SOR_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, int size)
+	matrix_solver_SOR_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, const unsigned size)
 		: matrix_solver_direct_t<m_N, storage_N>(anetlist, name, matrix_solver_t::ASCENDING, params, size)
 		, m_lp_fact(*this, "m_lp_fact", 0)
 		{
@@ -35,7 +35,7 @@ public:
 	virtual ~matrix_solver_SOR_t() {}
 
 	virtual void vsetup(analog_net_t::list_t &nets) override;
-	virtual int vsolve_non_dynamic(const bool newton_raphson) override;
+	virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 
 private:
 	state_var<nl_double> m_lp_fact;
@@ -53,11 +53,11 @@ void matrix_solver_SOR_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 }
 
 template <unsigned m_N, unsigned storage_N>
-int matrix_solver_SOR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
+unsigned matrix_solver_SOR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	const unsigned iN = this->N();
 	bool resched = false;
-	int  resched_cnt = 0;
+	unsigned resched_cnt = 0;
 
 	/* ideally, we could get an estimate for the spectral radius of
 	 * Inv(D - L) * U
@@ -80,7 +80,7 @@ int matrix_solver_SOR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_ra
 		nl_double gabs_t = 0.0;
 		nl_double RHS_t = 0.0;
 
-		const unsigned term_count = this->m_terms[k]->count();
+		const std::size_t term_count = this->m_terms[k]->count();
 		const nl_double * const RESTRICT gt = this->m_terms[k]->gt();
 		const nl_double * const RESTRICT go = this->m_terms[k]->go();
 		const nl_double * const RESTRICT Idr = this->m_terms[k]->Idr();
@@ -88,20 +88,20 @@ int matrix_solver_SOR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_ra
 
 		new_V[k] = this->m_nets[k]->m_cur_Analog;
 
-		for (unsigned i = 0; i < term_count; i++)
+		for (std::size_t i = 0; i < term_count; i++)
 		{
 			gtot_t = gtot_t + gt[i];
 			RHS_t = RHS_t + Idr[i];
 		}
 
-		for (unsigned i = this->m_terms[k]->m_railstart; i < term_count; i++)
+		for (std::size_t i = this->m_terms[k]->m_railstart; i < term_count; i++)
 			RHS_t = RHS_t  + go[i] * *other_cur_analog[i];
 
 		RHS[k] = RHS_t;
 
 		if (USE_GABS)
 		{
-			for (unsigned i = 0; i < term_count; i++)
+			for (std::size_t i = 0; i < term_count; i++)
 				gabs_t = gabs_t + std::abs(go[i]);
 
 			gabs_t *= NL_FCONST(0.5); // derived by try and error
@@ -138,11 +138,11 @@ int matrix_solver_SOR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_ra
 		for (unsigned k = 0; k < iN; k++)
 		{
 			const int * RESTRICT net_other = this->m_terms[k]->net_other();
-			const unsigned railstart = this->m_terms[k]->m_railstart;
+			const std::size_t railstart = this->m_terms[k]->m_railstart;
 			const nl_double * RESTRICT go = this->m_terms[k]->go();
 
 			nl_double Idrive = 0.0;
-			for (unsigned i = 0; i < railstart; i++)
+			for (std::size_t i = 0; i < railstart; i++)
 				Idrive = Idrive + go[i] * new_V[net_other[i]];
 
 			const nl_double new_val = new_V[k] * one_m_w[k] + (Idrive + RHS[k]) * w[k];

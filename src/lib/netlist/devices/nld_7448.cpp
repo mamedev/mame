@@ -37,7 +37,7 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	public:
-		void update_outputs(uint_fast8_t v);
+		void update_outputs(unsigned v);
 		static const uint_fast8_t tab7448[16][7];
 
 		logic_input_t m_A;
@@ -136,18 +136,18 @@ namespace netlist
 
 	NETLIB_UPDATE(7448)
 	{
-		if (!INPLOGIC(m_BIQ) || (INPLOGIC(m_BIQ) && !INPLOGIC(m_LTQ)))
+		if (!m_BIQ() || (m_BIQ() && !m_LTQ()))
 		{
 			m_A.inactivate();
 			m_B.inactivate();
 			m_C.inactivate();
 			m_D.inactivate();
 			m_RBIQ.inactivate();
-			if (INPLOGIC(m_BIQ) && !INPLOGIC(m_LTQ))
+			if (m_BIQ() && !m_LTQ())
 			{
 				update_outputs(8);
 			}
-			else if (!INPLOGIC(m_BIQ))
+			else if (!m_BIQ())
 			{
 				update_outputs(15);
 			}
@@ -157,10 +157,10 @@ namespace netlist
 			m_C.activate();
 			m_B.activate();
 			m_A.activate();
-			uint_fast8_t v;
+			unsigned v;
 
-			v = (INPLOGIC(m_A) << 0) | (INPLOGIC(m_B) << 1) | (INPLOGIC(m_C) << 2) | (INPLOGIC(m_D) << 3);
-			if ((!INPLOGIC(m_RBIQ) && (v==0)))
+			v = (m_A() << 0) | (m_B() << 1) | (m_C() << 2) | (m_D() << 3);
+			if ((!m_RBIQ() && (v==0)))
 					v = 15;
 			update_outputs(v);
 		}
@@ -176,15 +176,15 @@ namespace netlist
 		m_RBIQ.inactivate();
 	}
 
-	NETLIB_FUNC_VOID(7448, update_outputs, (uint_fast8_t v))
+	NETLIB_FUNC_VOID(7448, update_outputs, (unsigned v))
 	{
 		nl_assert(v<16);
 		if (v != m_state)
 		{
 			// max transfer time is 100 NS */
 
-			for (int i=0; i<7; i++)
-				OUTLOGIC(m_Q[i], tab7448[v][i], NLTIME_FROM_NS(100));
+			for (std::size_t i=0; i<7; i++)
+				m_Q[i].push(tab7448[v][i], NLTIME_FROM_NS(100));
 			m_state = v;
 		}
 	}

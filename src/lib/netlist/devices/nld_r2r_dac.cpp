@@ -40,9 +40,10 @@ namespace netlist
 	{
 		update_dev();
 
-		nl_double V = m_VIN.Value() / (nl_double) (1 << m_num.Value()) * (nl_double) m_val.Value();
+		double V = m_VIN() / static_cast<double>(1 << m_num())
+				* static_cast<double>(m_val());
 
-		this->set(1.0 / m_R.Value(), V, 0.0);
+		this->set(1.0 / m_R(), V, 0.0);
 	}
 
 	NETLIB_DEVICE_IMPL(r2r_dac)
