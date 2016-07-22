@@ -137,6 +137,13 @@ class device_image_interface : public device_interface
 public:
 	typedef std::vector<std::unique_ptr<image_device_format>> formatlist_type;
 
+	enum class softlist_type
+	{
+		NONE,
+		ROM,
+		SOFTWARE
+	};
+
 	// construction/destruction
 	device_image_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_image_interface();
@@ -148,7 +155,6 @@ public:
 	virtual void device_compute_hash(hash_collection &hashes, const void *data, size_t length, const char *types) const;
 
 	virtual bool call_load() { return FALSE; }
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) { return FALSE; }
 	virtual bool call_create(int format_type, util::option_resolution *format_options) { return FALSE; }
 	virtual void call_unload() { }
 	virtual std::string call_display() { return std::string(); }
@@ -247,6 +253,9 @@ public:
 	bool user_loadable() const { return m_user_loadable; }
 
 protected:
+	virtual softlist_type get_softlist_type() const { return softlist_type::NONE; }
+	virtual void loaded_through_softlist() { }
+
 	bool load_internal(const char *path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load);
 	void determine_open_plan(int is_create, UINT32 *open_plan);
 	image_error_t load_image_by_path(UINT32 open_flags, const char *path);
@@ -326,6 +335,9 @@ protected:
 	bool m_user_loadable;
 
 	bool m_is_loading;
+
+private:
+	bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry);
 };
 
 // iterator

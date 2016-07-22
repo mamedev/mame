@@ -1327,6 +1327,38 @@ const software_part *device_image_interface::find_software_item(const char *path
 
 
 //-------------------------------------------------
+//	call_softlist_load
+//-------------------------------------------------
+
+bool device_image_interface::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
+{
+	bool result = false;
+	switch (get_softlist_type())
+	{
+	case softlist_type::ROM:
+		device().machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
+		result = true;
+		break;
+
+	case softlist_type::SOFTWARE:
+		result = load_software(swlist, swname, start_entry);
+		break;
+
+	case softlist_type::NONE:
+	default:
+		result = false;
+		break;		
+	}
+
+	// this is a hook that seems to only be used by TI99
+	if (result)
+		loaded_through_softlist();
+
+	return result;
+}
+
+
+//-------------------------------------------------
 //  load_software_part
 //
 //  Load a software part for a device. The part to

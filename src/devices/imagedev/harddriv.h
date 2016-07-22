@@ -35,7 +35,7 @@ public:
 	virtual bool call_load() override;
 	virtual bool call_create(int create_format, util::option_resolution *create_args) override;
 	virtual void call_unload() override;
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override { machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry ); return TRUE; }
+	virtual softlist_type get_softlist_type() const override { return softlist_type::ROM; }
 
 	virtual iodevice_t image_type() const override { return IO_HARDDISK; }
 

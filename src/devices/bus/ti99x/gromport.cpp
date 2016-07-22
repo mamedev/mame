@@ -1417,13 +1417,11 @@ void ti99_cartridge_device::set_slot(int i)
 	m_slot = i;
 }
 
-bool ti99_cartridge_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
+void ti99_cartridge_device::loaded_through_softlist()
 {
-	if (TRACE_CONFIG) logerror("swlist = %s, swname = %s\n", swlist.list_name(), swname);
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
+	// TI99 cartridge seems to be the only reason we need loaded_through_softlist()... why?
 	m_softlist = true;
 	m_rpk = nullptr;
-	return true;
 }
 
 READ8Z_MEMBER(ti99_cartridge_device::readz)

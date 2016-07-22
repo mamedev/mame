@@ -83,7 +83,7 @@ public:
 	virtual bool call_load() override;
 	virtual void call_unload() override;
 	virtual bool call_create(int format_type, util::option_resolution *format_options) override;
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override { return load_software(swlist, swname, start_entry); }
+	virtual softlist_type get_softlist_type() const override { return softlist_type::SOFTWARE; }
 	virtual const char *image_interface() const override = 0;
 	virtual iodevice_t image_type() const override { return IO_FLOPPY; }
 
