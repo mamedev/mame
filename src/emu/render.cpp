@@ -458,6 +458,8 @@ void render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &t
 	// are we scaler-free? if so, just return the source bitmap
 	if (m_scaler == nullptr || (m_bitmap != nullptr && swidth == dwidth && sheight == dheight))
 	{
+		if (m_bitmap == nullptr) return;
+
 		// add a reference and set up the source bitmap
 		primlist.add_reference(m_bitmap);
 		texinfo.base = m_bitmap->raw_pixptr(m_sbounds.min_y, m_sbounds.min_x);
@@ -2355,7 +2357,7 @@ bool render_target::remove_clear_extent(const render_bounds &bounds)
 		INT32 *linelast;
 
 		// first entry of each line should always be negative
-		assert(ext[0] < 0.0f);
+		if (!(ext[0] < 0.0f)) goto abort;
 		y0 = y1;
 		y1 = y0 - ext[0];
 
@@ -2487,7 +2489,11 @@ void render_target::add_clear_extents(render_primitive_list &list)
 		INT32 x0, x1 = 0;
 
 		// first entry should always be negative
-		assert(ext[0] < 0);
+		if (!(ext[0] < 0))
+		{
+			list.m_primlist.prepend_list(clearlist);
+			return;
+		}
 		y0 = y1;
 		y1 = y0 - ext[0];
 
@@ -2744,6 +2750,7 @@ float render_manager::ui_aspect(render_container *rc)
 	if (aspect > 1.5f)
 		aspect = 1.5f;
 
+	if (isinf(aspect)) aspect = 1.0f;
 	return aspect;
 }
 
