@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
-#ifndef MAME_DEVICES_SUNKBD_SPARCKBD_H
-#define MAME_DEVICES_SUNKBD_SPARCKBD_H
+#ifndef MAME_DEVICES_SUNKBD_HLEKBD_H
+#define MAME_DEVICES_SUNKBD_HLEKBD_H
 
 #pragma once
 
@@ -183,4 +183,4 @@ private:
 
 } } // namespace bus::sunkbd
 
-#endif // MAME_DEVICES_SUNKBD_SPARCKBD_H
+#endif // MAME_DEVICES_SUNKBD_HLEKBD_H
