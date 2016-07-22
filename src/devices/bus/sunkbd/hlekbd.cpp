@@ -709,6 +709,12 @@ void hle_device_base::device_reset()
 	// set device_sun_keyboard_port_interface lines
 	output_rxd(1);
 
+	// start with keyboard LEDs off
+	machine().output().set_led_value(LED_NUM, 0);
+	machine().output().set_led_value(LED_COMPOSE, 0);
+	machine().output().set_led_value(LED_SCROLL, 0);
+	machine().output().set_led_value(LED_CAPS, 0);
+
 	// send reset response
 	send_byte(0xffU);
 	send_byte(ident_byte());
