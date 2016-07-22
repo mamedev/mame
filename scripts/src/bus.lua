@@ -2580,8 +2580,8 @@ end
 
 if (BUSES["SUNKBD"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/bus/sunkbd/sparckbd.cpp",
-		MAME_DIR .. "src/devices/bus/sunkbd/sparckbd.h",
+		MAME_DIR .. "src/devices/bus/sunkbd/hlekbd.cpp",
+		MAME_DIR .. "src/devices/bus/sunkbd/hlekbd.h",
 		MAME_DIR .. "src/devices/bus/sunkbd/sunkbd.cpp",
 		MAME_DIR .. "src/devices/bus/sunkbd/sunkbd.h",
 	}
