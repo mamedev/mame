@@ -38,8 +38,8 @@ public:
 		m_fdc(*this, "mb8877"),
 		m_ram(*this, RAM_TAG),
 		m_ieee(*this, IEEE488_TAG),
-		m_floppy0(*this, "mb8877:0:525ssdd"),
-		m_floppy1(*this, "mb8877:1:525ssdd"),
+		m_floppy0(*this, "mb8877:0"),
+		m_floppy1(*this, "mb8877:1"),
 		m_keyb_row0(*this, "ROW0"),
 		m_keyb_row1(*this, "ROW1"),
 		m_keyb_row2(*this, "ROW2"),
@@ -95,8 +95,8 @@ public:
 	required_device<mb8877_t>               m_fdc;
 	required_device<ram_device>             m_ram;
 	required_device<ieee488_device>         m_ieee;
-	required_device<floppy_image_device>    m_floppy0;
-	required_device<floppy_image_device>    m_floppy1;
+	required_device<floppy_connector>       m_floppy0;
+	required_device<floppy_connector>       m_floppy1;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

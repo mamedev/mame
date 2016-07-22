@@ -24,7 +24,9 @@
 
 void bbc_state::check_interrupts()
 {
-	m_maincpu->set_input_line(M6502_IRQ_LINE, m_via_system_irq || m_via_user_irq || m_acia_irq || m_ACCCON_IRR);
+	int irq = (m_via_system_irq || m_via_user_irq || m_acia_irq || m_ACCCON_IRR) ? ASSERT_LINE : CLEAR_LINE;
+
+	m_maincpu->set_input_line(M6502_IRQ_LINE, irq);
 }
 
 /*************************
@@ -1341,6 +1343,14 @@ WRITE_LINE_MEMBER( bbc_state::bbc_txd_w )
 	{
 		m_txd = state;
 	}
+}
+
+
+WRITE_LINE_MEMBER( bbc_state::bbcb_acia6850_irq_w )
+{
+	m_acia_irq = state;
+
+	check_interrupts();
 }
 
 

@@ -1971,7 +1971,7 @@ static MACHINE_CONFIG_START( sun4, sun4_state )
 	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(sun4_state, scc1_int))
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
 
-	MCFG_SUNKBD_PORT_ADD(KEYBOARD_TAG, default_sun_keyboard_devices, "sparckbd")
+	MCFG_SUNKBD_PORT_ADD(KEYBOARD_TAG, default_sun_keyboard_devices, "type4hle")
 	MCFG_SUNKBD_RXD_HANDLER(DEVWRITELINE(SCC1_TAG, z80scc_device, rxa_w))
 
 	// RS232 serial ports
@@ -2036,7 +2036,7 @@ static MACHINE_CONFIG_START( sun4c, sun4_state )
 	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(sun4_state, scc1_int))
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
 
-	MCFG_SUNKBD_PORT_ADD(KEYBOARD_TAG, default_sun_keyboard_devices, "sparckbd")
+	MCFG_SUNKBD_PORT_ADD(KEYBOARD_TAG, default_sun_keyboard_devices, "type5hle")
 	MCFG_SUNKBD_RXD_HANDLER(DEVWRITELINE(SCC1_TAG, z80scc_device, rxa_w))
 
 	// RS232 serial ports

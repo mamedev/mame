@@ -164,6 +164,7 @@ public:
 	TIMER_CALLBACK_MEMBER(bbc_tape_timer_cb);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	DECLARE_WRITE_LINE_MEMBER(bbcb_acia6850_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(adlc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(econet_clk_w);
 	DECLARE_WRITE8_MEMBER(bbcb_via_system_write_porta);
 	DECLARE_WRITE8_MEMBER(bbcb_via_system_write_portb);
@@ -336,9 +337,12 @@ public: // HACK FOR MC6845
 	int m_MC146818_CE;      // 6522 port b bit 6
 
 	int m_via_system_porta;
+
+	// interrupt state
 	int m_via_system_irq;
 	int m_via_user_irq;
 	int m_acia_irq;
+	int m_adlc_irq;
 
 	int m_column;           // this is a counter in the keyboard circuit
 
