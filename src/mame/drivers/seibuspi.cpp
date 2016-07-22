@@ -945,21 +945,15 @@ READ8_MEMBER(seibuspi_state::sb_coin_r)
 
 READ32_MEMBER(seibuspi_state::ejsakura_keyboard_r)
 {
-	switch (m_ejsakura_input_port)
-	{
-		case 0x01:
-			return m_key[0]->read();
-		case 0x02:
-			return m_key[1]->read();
-		case 0x04:
-			return m_key[2]->read();
-		case 0x08:
-			return m_key[3]->read();
-		case 0x10:
-			return m_key[4]->read();
-		default:
-			return m_special->read();
-	}
+	// coins/eeprom data
+	UINT32 ret = m_special->read();
+	
+	// multiplexed inputs
+	for (int i = 0; i < 5; i++)
+		if (m_ejsakura_input_port >> i & 1)
+			ret &= m_key[i]->read();
+	
+	return ret;
 }
 
 WRITE32_MEMBER(seibuspi_state::ejsakura_input_select_w)
@@ -3976,9 +3970,6 @@ GAME( 1997, rdft2it,    rdft2,    rdft2,   spi_2button, seibuspi_state, rdft2,  
 GAME( 1997, rdft2jb,    rdft2,    rdft2,   spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Japan set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, rdft2t,     rdft2,    rdft2,   spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Taiwan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, rdft2u,     rdft2,    rdft2,   spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters 2 - Operation Hell Dive (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-
-
-
 
 GAME( 1998, rfjet,      0,        rdft2,   spi_2button, seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters Jet (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, rfjetu,     rfjet,    rdft2,   spi_2button, seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters Jet (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
