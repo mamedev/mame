@@ -413,7 +413,7 @@ void amstrad_state::amstrad_vh_update_mode()
 			break;
 
 		case 3:     /* Mode 3: 160x200, 4 colours */
-			m_gate_array.mode_lookup = m_mode0_lookup;
+			m_gate_array.mode_lookup = m_mode1_lookup;
 			m_gate_array.max_colour_ticks = 4;
 			m_gate_array.ticks_increment = 1;
 			break;
@@ -475,7 +475,7 @@ void amstrad_state::amstrad_vh_update_mode()
 				break;
 
 			case 3:     /* Mode 3: 160x200, 4 colours */
-				m_gate_array.mode_lookup = m_mode0_lookup;
+				m_gate_array.mode_lookup = m_mode1_lookup;
 				m_gate_array.max_colour_ticks = 4;
 				m_gate_array.ticks_increment = 1;
 				break;
