@@ -1815,12 +1815,14 @@ ROM_START( sun4_400 )
 ROM_END
 
 // SPARCstation IPC (Sun 4/40)
+/* SCC init 1 for the keyboard is identical to Sun 4/75 init 3 */
 ROM_START( sun4_40 )
 	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "4.40_v2.9.rom", 0x0000, 0x40000, CRC(532fc20d) SHA1(d86d9e958017b3fecdf510d728a3e46a0ce3281d))
 ROM_END
 
 // SPARCstation IPX (Sun 4/50)
+/* SCC init 1-2 for the keyboard is identical to Sun 4/75 init 1-2 */
 ROM_START( sun4_50 )
 	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v29", "V2.9")
@@ -1830,12 +1832,31 @@ ROM_START( sun4_50 )
 ROM_END
 
 // SPARCstation SLC (Sun 4/20)
+/* SCC init 1 for the keyboard
+ * :scc1 A Reg 09 <- 02 Master Interrupt Control - No Reset, No vector
+ * :scc1 A Reg 04 <- 46 Setting up asynchronous frame format and clock, Parity Enable=0, Even Parity, Stop Bits 1, Clock Mode 16X
+ * :scc1 A Reg 03 <- c0 Setting up the receiver, Receiver Enable 0, Auto Enables 0, Receiver Bits/Character 8
+ * :scc1 A Reg 05 <- e2 Setting up the transmitter, Transmitter Enable 0, Transmitter Bits/Character 8, Send Break 0, RTS=1 DTR=1
+ * :scc1 A Reg 0e <- 82 Misc Control Bits Baudrate Generator Input DPLL Command - not implemented
+ * :scc1 A Reg 0b <- 55 Clock Mode Control 55 Clock type TTL level on RTxC pin, RCV CLK=BRG, TRA CLK=BRG, TRxC pin is Output, TRxC CLK=TRA CLK - not_implemented
+ * :scc1 A Reg 0c <- 0e Low byte of Time Constant for Baudrate generator  -> 9600 baud
+ * :scc1 A Reg 0d <- 00 High byte of Time Constant for Baudrate generator
+ * :scc1 A Reg 03 <- c1 Setting up the receiver, Receiver Enable 1, Auto Enables 0, Receiver Bits/Character 8
+ * :scc1 A Reg 05 <- ea Setting up the transmitter, Transmitter Enable 1, Transmitter Bits/Character 8, Send Break 0, RTS=1, DTR=1
+ * :scc1 A Reg 0e <- 83 Misc Control Bits DPLL SRC=BRG Command - not implemented, BRG enabled SRC=PCLK, BRG SRC bps=38400=PCLK 4915200/128, BRG OUT 1200=38400/16
+ * :scc1 A Reg 00 <- 10 Reset External/Status Interrupt
+ * :scc1 A Reg 00 <- 01 Null command, register resetted by read of WR0
+ * :scc1 A Reg 0c <- 0e Low byte of Time Constant for Baudrate generator  -> 9600 baud
+ * :scc1 A Reg 00 <- 01 Null command, register resetted by read of WR0
+ * :scc1 A Reg 0f <- c0 External/Status Control Bits, DCD Interrupt=1, Status FIFO enable=1, Zero detect interrupt:1 WR7 Prime enable:1 - not implemented
+*/
 ROM_START( sun4_20 )
 	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "520-2748-04.rom", 0x0000, 0x20000, CRC(e85b3fd8) SHA1(4cbc088f589375e2d5983f481f7d4261a408702e))
 ROM_END
 
 // SPARCstation 1 (Sun 4/60)
+/* SCC init 1 for the keyboard is identical to Sun 4/75 init 3 */
 ROM_START( sun4_60 )
 	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "ss1v29.rom", 0x0000, 0x20000, CRC(e3f103a9) SHA1(5e95835f1090ea94859bd005757f0e7b5e86181b))
@@ -1864,25 +1885,9 @@ ROM_END
  * :scc1 A Reg 0e <- 83 Misc Control Bits DPLL SRC=BRG Command - not implemented, BRG enabled SRC=PCLK, BRG SRC bps=38400=PCLK 4915200/128, BRG OUT 1200=38400/16
  * :scc1 A Reg 00 <- 10 Reset External/Status Interrupt
  * :scc1 A Reg 00 <- 10 Reset External/Status Interrupt
-
- * SCC init 2 for the keyboard
- * -------------------------------
- * :scc1 A Reg 09 <- c0 Master Interrupt Control - Device reset  c0 A&B: RTS=1 DTR=1 INT=0
-scc1 int: 0
- * :scc1 A Reg 04 <- 46 Setting up asynchronous frame format and clock, Parity Enable=0, Even Parity, Stop Bits 1, Clock Mode 16X
- * :scc1 A Reg 03 <- c0 Setting up the receiver, Receiver Enable 0, Auto Enables 0, Receiver Bits/Character 8
- * :scc1 A Reg 05 <- e2 Setting up the transmitter, Transmitter Enable 0, Transmitter Bits/Character 8, Send Break 0, RTS=1 DTR=1
- * :scc1 A Reg 09 <- 02 Master Interrupt Control - No reset  02 A&B: RTS=1 DTR=1 INT=0
- * :scc1 A Reg 0b <- 55 Clock Mode Control 55 Clock type TTL level on RTxC pin, RCV CLK=BRG, TRA CLK=BRG, TRxC pin is Output, TRxC CLK=TRA CLK - not_implemented
- * :scc1 A Reg 0c <- 7e Low byte of Time Constant for Baudrate generator
- * :scc1 A Reg 0d <- 00 High byte of Time Constant for Baudrate generator
- * :scc1 A Reg 0e <- 82 Misc Control Bits Baudrate Generator Input DPLL Command - not implemented
- * :scc1 A Reg 03 <- c1 Setting up the receiver, Receiver Enable 1, Auto Enables 0, Receiver Bits/Character 8
- * :scc1 A Reg 05 <- ea Setting up the transmitter, Transmitter Enable 1, Transmitter Bits/Character 8, Send Break 0, RTS=1, DTR=1
- * :scc1 A Reg 0e <- 83 Misc Control Bits DPLL SRC=BRG Command - not implemented, BRG enabled SRC=PCLK, BRG SRC bps=38400=PCLK 4915200/128, BRG OUT 1200=38400/16
- * :scc1 A Reg 00 <- 10 Reset External/Status Interrupt
- * :scc1 A Reg 00 <- 10 Reset External/Status Interrupt
-
+ *
+ * SCC init 2 for the keyboard - is Identical to init 1
+ * 
  * SCC init 3 for the keyboard - tricky one that reprogramms the baudrate constant as the last step.
  * -------------------------------------------------------------------------------------------------
  * :scc1 A Reg 09 <- 02 Master Interrupt Control - No Reset, No vector
@@ -1899,7 +1904,6 @@ scc1 int: 0
  * :scc1 A Reg 00 <- 10 Reset External/Status Interrupt
  * :scc1 A Reg 00 <- 10 Reset External/Status Interrupt
  * :scc1 A Reg 0c <- 7e Low byte of Time Constant for Baudrate generator -> 1200 baud
-
 */
 ROM_START( sun4_75 )
 	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
