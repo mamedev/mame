@@ -28,7 +28,9 @@ public:
 		m_oki1(*this, "oki1"),
 		m_oki2(*this, "oki2"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_key(*this, "KEY"),
+		m_special(*this, "SPECIAL")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -44,6 +46,9 @@ public:
 	optional_device<okim6295_device> m_oki2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	optional_ioport_array<5> m_key;
+	optional_ioport m_special;
 
 	int m_z80_prg_transfer_pos;
 	int m_z80_lastbank;
