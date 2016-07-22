@@ -546,7 +546,7 @@ TIMER_CALLBACK_MEMBER(opwolf_state::opwolf_timer_callback)
 		m_cchip_ram[0x1a] = 0;
 		m_cchip_ram[0x7a] = 1; // Signal command complete
 
-		logerror("Signal level command complete\n");
+		//logerror("Signal level command complete\n");
 	}
 
 	m_current_cmd = 0;
@@ -867,7 +867,7 @@ TIMER_CALLBACK_MEMBER(opwolf_state::cchip_timer)
 		// starts the 'WARNING' sequences for the boss.
 		else if (m_cchip_ram[0x1b] == 0x2)
 		{
-			if (m_triggeredLevel2==0)
+			if (m_triggeredLevel2==0 && m_cchip_ram[0x5f]==0) // Don't write unless 68K is ready (0 at 0x5f)
 			{
 				m_cchip_ram[0x5f] = 4; // 0xBE at 68K side
 				m_triggeredLevel2=1;
@@ -879,6 +879,7 @@ TIMER_CALLBACK_MEMBER(opwolf_state::cchip_timer)
 			{
 				// Signal end of level
 				m_cchip_ram[0x32] = 1;
+				m_cchip_ram[0x5d] = 0; // acknowledge 68K command
 			}
 		}
 		else if (m_cchip_ram[0x1b] == 0x4)
@@ -886,10 +887,11 @@ TIMER_CALLBACK_MEMBER(opwolf_state::cchip_timer)
 			m_cchip_ram[0x32] = 1;
 
 			// When level 4 (powder magazine) is complete the c-chip triggers an explosion animation.
-			if (m_triggeredLevel4==0)
+			if (m_triggeredLevel4==0 && m_cchip_ram[0x5f]==0) // Don't write unless 68K is ready (0 at 0x5f))
+			{	
 				m_cchip_ram[0x5f]=10;
-
-			m_triggeredLevel4=1;
+				m_triggeredLevel4=1;
+			}
 		}
 		else
 		{
@@ -905,21 +907,21 @@ TIMER_CALLBACK_MEMBER(opwolf_state::cchip_timer)
 	if (m_cchip_ram[0x1c] == 0 && m_cchip_ram[0x1d] == 0)
 	{
 		// Compare code at 0x96DC in prototype with 0xC3A2 in protected version
-		if (m_cchip_ram[0x1b] == 0x1 && m_triggeredLevel1b==0)
+		if (m_cchip_ram[0x1b] == 0x1 && m_triggeredLevel1b==0 && m_cchip_ram[0x5f]==0) // Don't write unless 68K is ready (0 at 0x5f))
 		{
 			m_cchip_ram[0x5f]=7;
 			m_triggeredLevel1b=1;
 		}
 
 		// Compare code at 0x96BC in prototype with 0xC3B2 in protected version
-		if (m_cchip_ram[0x1b] == 0x3 && m_triggeredLevel3b==0)
+		if (m_cchip_ram[0x1b] == 0x3 && m_triggeredLevel3b==0 && m_cchip_ram[0x5f]==0) // Don't write unless 68K is ready (0 at 0x5f))
 		{
 			m_cchip_ram[0x5f]=8;
 			m_triggeredLevel3b=1;
 		}
 
 		// Compare code at 0x96BC in prototype with 0xC3C8 in protected version
-		if ((m_cchip_ram[0x1b] != 0x1 && m_cchip_ram[0x1b] != 0x3) && m_triggeredLevel13b==0)
+		if ((m_cchip_ram[0x1b] != 0x1 && m_cchip_ram[0x1b] != 0x3) && m_triggeredLevel13b==0 && m_cchip_ram[0x5f]==0) // Don't write unless 68K is ready (0 at 0x5f))
 		{
 			m_cchip_ram[0x5f]=9;
 			m_triggeredLevel13b=1;
@@ -934,14 +936,15 @@ TIMER_CALLBACK_MEMBER(opwolf_state::cchip_timer)
 	if (m_cchip_ram[0x1b] == 0x2)
 	{
 		// (Note:  it's correct that 25 decimal is represented as 0x25 in hex here).
-		if (((m_cchip_ram[0x1d]<<8) + m_cchip_ram[0x1c])<0x25 && m_triggeredLevel2b==1 && m_triggeredLevel2c==0)
+		int numMen=(m_cchip_ram[0x1d]<<8) + m_cchip_ram[0x1c];
+		if (numMen<0x25 && m_triggeredLevel2b==1 && m_triggeredLevel2c==0 && m_cchip_ram[0x5f]==0) // Don't write unless 68K is ready (0 at 0x5f))
 		{
 			m_cchip_ram[0x5f]=6;
 			m_triggeredLevel2c=1;
 		}
 
 		// (Note:  it's correct that 45 decimal is represented as 0x45 in hex here).
-		if (((m_cchip_ram[0x1d]<<8) + m_cchip_ram[0x1c])<0x45 && m_triggeredLevel2b==0)
+		if (numMen<0x45 && m_triggeredLevel2b==0 && m_cchip_ram[0x5f]==0) // Don't write unless 68K is ready (0 at 0x5f))
 		{
 			m_cchip_ram[0x5f]=5;
 			m_triggeredLevel2b=1;
@@ -1032,7 +1035,7 @@ TIMER_CALLBACK_MEMBER(opwolf_state::cchip_timer)
 
 	//-------------------------------------------------------------------------------------------------
 	// Start of level 7 - should trigger '1' in level thread table (compare 0xC164 in protected to 0x9468 in unprotected)
-	if (m_cchip_ram[0x1b] == 0x7 && m_triggeredLevel7==0)
+	if (m_cchip_ram[0x1b] == 0x7 && m_triggeredLevel7==0 && m_cchip_ram[0x5f]==0) // Don't write unless 68K is ready (0 at 0x5f))
 	{
 		m_triggeredLevel7 = 1;
 		m_cchip_ram[0x5f] = 1;
@@ -1041,7 +1044,7 @@ TIMER_CALLBACK_MEMBER(opwolf_state::cchip_timer)
 	//-------------------------------------------------------------------------------------------------
 	// Start of level 8 - should trigger '2' in level thread table (compare 0xC18E in protected to 0x9358 in unprotected)
 	// This controls the 'zoom in helicopters' enemy
-	if (m_cchip_ram[0x1b] == 0x8 && m_triggeredLevel8==0)
+	if (m_cchip_ram[0x1b] == 0x8 && m_triggeredLevel8==0 && m_cchip_ram[0x5f]==0) // Don't write unless 68K is ready (0 at 0x5f))
 	{
 		m_triggeredLevel8 = 1;
 		m_cchip_ram[0x5f] = 2;
@@ -1050,7 +1053,7 @@ TIMER_CALLBACK_MEMBER(opwolf_state::cchip_timer)
 	//-------------------------------------------------------------------------------------------------
 	// Start of level 9 - should trigger '3' in level thread table (compare 0xC1B0 in protected to 0x9500 in unprotected)
 	// This controls the 'zoom in helicopters' enemy
-	if (m_cchip_ram[0x1b] == 0x9 && m_triggeredLevel9==0)
+	if (m_cchip_ram[0x1b] == 0x9 && m_triggeredLevel9==0 && m_cchip_ram[0x5f]==0) // Don't write unless 68K is ready (0 at 0x5f))
 	{
 		m_triggeredLevel9 = 1;
 		m_cchip_ram[0x5f] = 3;
