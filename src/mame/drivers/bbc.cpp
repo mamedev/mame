@@ -810,6 +810,15 @@ static SLOT_INTERFACE_START( bbc_floppies_35 )
 	SLOT_INTERFACE("qd",   FLOPPY_35_DD)
 SLOT_INTERFACE_END
 
+
+WRITE_LINE_MEMBER(bbc_state::adlc_irq_w)
+{
+	m_adlc_irq = state;
+
+	bbc_update_nmi();
+}
+
+
 WRITE_LINE_MEMBER(bbc_state::econet_clk_w)
 {
 	m_adlc->rxc_w(state);
@@ -906,7 +915,7 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(bbc_state, bbc_txd_w))
 	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(bbc_state, bbc_rts_w))
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_acia6850_irq_w))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(bbc_state, write_rxd_serial))
@@ -922,7 +931,7 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_system_read_portb))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(bbc_state, bbcb_via_system_write_porta))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_system_write_portb))
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_system_irq_w))
 
 	/* EPROM sockets */
 	MCFG_FRAGMENT_ADD(bbc_eprom_sockets)
@@ -954,7 +963,7 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_user_write_portb))
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_user_irq_w))
 
 	/* adc */
 	MCFG_DEVICE_ADD("upd7002", UPD7002, 0)
@@ -968,7 +977,7 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 
 	/* fdc */
 	MCFG_DEVICE_ADD("i8271", I8271, 0)
-	MCFG_I8271_IRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_I8271_IRQ_CALLBACK(WRITELINE(bbc_state, fdc_intrq_w))
 	MCFG_I8271_HDL_CALLBACK(WRITELINE(bbc_state, motor_w))
 	MCFG_I8271_OPT_CALLBACK(WRITELINE(bbc_state, side_w))
 	MCFG_FLOPPY_DRIVE_ADD("i8271:0", bbc_floppies_525, "qd", bbc_state::floppy_formats_bbc)
@@ -979,7 +988,7 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	/* econet */
 	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
 	MCFG_MC6854_OUT_TXD_CB(DEVWRITELINE(ECONET_TAG, econet_device, data_w))
-	MCFG_MC6854_OUT_IRQ_CB(INPUTLINE("maincpu", M6502_NMI_LINE))
+	MCFG_MC6854_OUT_IRQ_CB(WRITELINE(bbc_state, adlc_irq_w))
 	MCFG_ECONET_ADD()
 	MCFG_ECONET_CLK_CALLBACK(WRITELINE(bbc_state, econet_clk_w))
 	MCFG_ECONET_DATA_CALLBACK(DEVWRITELINE("mc6854", mc6854_device, set_rx))
@@ -1296,7 +1305,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 	MCFG_CASSETTE_INTERFACE("bbc_cass")
 
-	// 2 x EPROM sockets (32K) in BBC-Master
+	// 2 x cartridge sockets in BBC-Master
 	MCFG_GENERIC_SOCKET_ADD("exp_rom1", generic_plain_slot, "bbcm_cart")
 	MCFG_GENERIC_LOAD(bbc_state, bbcm_exp1_load)
 
@@ -1319,7 +1328,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(bbc_state, bbc_txd_w))
 	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(bbc_state, bbc_rts_w))
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_acia6850_irq_w))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(bbc_state, write_rxd_serial))
@@ -1340,7 +1349,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_system_read_portb))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(bbc_state, bbcb_via_system_write_porta))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_system_write_portb))
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_system_irq_w))
 
 	/* user via */
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL_16MHz / 16)
@@ -1348,7 +1357,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_user_write_portb))
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_user_irq_w))
 
 	/* fdc */
 	MCFG_WD1770_ADD("wd1770", XTAL_16MHz / 2)
@@ -1363,7 +1372,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	/* econet */
 	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
 	MCFG_MC6854_OUT_TXD_CB(DEVWRITELINE(ECONET_TAG, econet_device, data_w))
-	MCFG_MC6854_OUT_IRQ_CB(INPUTLINE("maincpu", M6502_NMI_LINE))
+	MCFG_MC6854_OUT_IRQ_CB(WRITELINE(bbc_state, adlc_irq_w))
 	MCFG_ECONET_ADD()
 	MCFG_ECONET_CLK_CALLBACK(WRITELINE(bbc_state, econet_clk_w))
 	MCFG_ECONET_DATA_CALLBACK(DEVWRITELINE("mc6854", mc6854_device, set_rx))
