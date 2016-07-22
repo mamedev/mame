@@ -419,6 +419,10 @@
 #include "bus/rs232/rs232.h"
 #include "bus/sunkbd/sunkbd.h"
 #include "machine/timekpr.h"
+#include "machine/nscsi_bus.h"
+#include "machine/nscsi_cd.h"
+#include "machine/nscsi_hd.h"
+#include "machine/ncr5390.h"
 #include "machine/upd765.h"
 #include "formats/pc_dsk.h"
 #include "formats/mfi_dsk.h"
@@ -444,13 +448,41 @@
 #define ENA_DIAG		(0x01)
 
 // page table entry constants
-#define PM_VALID	(0x80000000)	// page is valid
-#define PM_WRITEMASK (0x40000000)	// writable?
-#define PM_SYSMASK	(0x20000000)	// system use only?
-#define PM_CACHE	(0x10000000)	// cachable?
-#define PM_TYPEMASK (0x0c000000)	// type mask
-#define PM_ACCESSED (0x02000000)	// accessed flag
-#define PM_MODIFIED (0x01000000)	// modified flag
+#define PM_VALID		(0x80000000)	// page is valid
+#define PM_WRITEMASK	(0x40000000)	// writable?
+#define PM_SYSMASK		(0x20000000)	// system use only?
+#define PM_CACHE		(0x10000000)	// cachable?
+#define PM_TYPEMASK		(0x0c000000)	// type mask
+#define PM_ACCESSED		(0x02000000)	// accessed flag
+#define PM_MODIFIED		(0x01000000)	// modified flag
+
+#define PAGE_SIZE		(0x00000400)
+
+// DMA controller constants
+#define DMA_DEV_ID		(0x80000000)
+#define DMA_L			(0x00008000)	// use ILACC
+#define DMA_TC			(0x00004000)	// terminal count
+#define DMA_EN_CNT		(0x00002000)	// enable count
+#define DMA_BYTE_ADDR	(0x00001800)	// next byte number to be accessed
+#define DMA_BYTE_ADDR_SHIFT	(11)
+#define DMA_REQ_PEND	(0x00000400)	// request pending
+#define DMA_EN_DMA		(0x00000200)	// enable DMA
+#define DMA_WRITE		(0x00000100)	// DMA device->mem if 1, otherwise mem->device
+#define DMA_RESET		(0x00000080)	// DMA hardware reset
+#define DMA_DRAIN		(0x00000040)	// force remaining pack bytes to memory
+#define DMA_FLUSH		(0x00000020)	// force PACK_CNT and ERR_PEND to 0
+#define DMA_INT_EN		(0x00000010)	// interrupt enable
+#define DMA_PACK_CNT	(0x0000000c)	// number of bytes in pack register
+#define DMA_PACK_CNT_SHIFT	(2)
+#define DMA_ERR_PEND	(0x00000002)	// error pending, set when memory exception occurs
+#define DMA_INT_PEND	(0x00000001)	// interrupt pending, set when TC=1
+#define DMA_READ_ONLY	(DMA_TC | DMA_BYTE_ADDR | DMA_REQ_PEND | DMA_PACK_CNT | DMA_ERR_PEND | DMA_INT_PEND)
+#define DMA_WRITE_ONLY	(DMA_FLUSH)
+#define DMA_READ_WRITE	(DMA_EN_CNT | DMA_EN_DMA | DMA_WRITE | DMA_RESET | DMA_INT_EN)
+#define DMA_CTRL		(0)
+#define DMA_ADDR		(1)
+#define DMA_BYTE_COUNT	(2)
+#define DMA_XTAL		(XTAL_25MHz)
 
 namespace
 {
@@ -500,9 +532,12 @@ public:
 	sun4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_timekpr(*this, TIMEKEEPER_TAG)
 		, m_scc1(*this, SCC1_TAG)
 		, m_scc2(*this, SCC2_TAG)
 		, m_fdc(*this, FDC_TAG)
+		, m_scsibus(*this, "scsibus")
+		, m_scsi(*this, "scsibus:7:ncr5390")
 		, m_type0space(*this, "type0")
 		, m_type1space(*this, "type1")
 		, m_ram(*this, RAM_TAG)
@@ -519,6 +554,8 @@ public:
 
 	static const device_timer_id TIMER_0 = 0;
 	static const device_timer_id TIMER_1 = 1;
+	static const device_timer_id TIMER_DMA = 2;
+	static const device_timer_id TIMER_RESET = 3;
 
 	DECLARE_READ32_MEMBER( sun4_mmu_r );
 	DECLARE_WRITE32_MEMBER( sun4_mmu_w );
@@ -534,6 +571,11 @@ public:
 	DECLARE_WRITE8_MEMBER( irq_w );
 	DECLARE_READ8_MEMBER( fdc_r );
 	DECLARE_WRITE8_MEMBER( fdc_w );
+	DECLARE_READ32_MEMBER( dma_r );
+	DECLARE_WRITE32_MEMBER( dma_w );
+
+	DECLARE_WRITE_LINE_MEMBER( scsi_irq );
+	DECLARE_WRITE_LINE_MEMBER( scsi_drq );
 
 	DECLARE_WRITE_LINE_MEMBER( scc1_int );
 	DECLARE_WRITE_LINE_MEMBER( scc2_int );
@@ -548,9 +590,16 @@ public:
 
 protected:
 	required_device<mb86901_device> m_maincpu;
+
+	required_device<mk48t12_device> m_timekpr;
+
 	required_device<z80scc_device> m_scc1;
 	required_device<z80scc_device> m_scc2;
+
 	required_device<n82077aa_device> m_fdc;
+	required_device<nscsi_bus_device> m_scsibus;
+	required_device<ncr5390_device> m_scsi;
+
 	optional_device<address_map_bank_device> m_type0space, m_type1space;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
@@ -561,6 +610,9 @@ protected:
 	UINT8 m_system_enable;
 	UINT32 m_buserr[4];
 	UINT32 m_counter[4];
+	UINT32 m_dma[4];
+	int m_scsi_irq;
+	int m_scsi_drq;
 
 private:
 	UINT32 *m_ram_ptr;
@@ -577,8 +629,21 @@ private:
 	int m_arch;
 
 	emu_timer *m_c0_timer, *m_c1_timer;
+	emu_timer *m_dma_timer;
+	emu_timer *m_reset_timer;
+
+	UINT32 read_insn_data(UINT8 asi, address_space &space, UINT32 offset, UINT32 mem_mask);
+	void write_insn_data(UINT8 asi, address_space &space, UINT32 offset, UINT32 data, UINT32 mem_mask);
+	UINT32 read_insn_data_4c(UINT8 asi, address_space &space, UINT32 offset, UINT32 mem_mask);
+	void write_insn_data_4c(UINT8 asi, address_space &space, UINT32 offset, UINT32 data, UINT32 mem_mask);
+
+	void dma_set_int_pend(int state);
+	void dma_update_irq();
+	void dma_tick();
+	void dma_setup_timer(bool continuing);
 
 	void start_timer(int num);
+
 	void l2p_command(int ref, int params, const char **param);
 	void fcodes_command(int ref, int params, const char **param);
 };
@@ -611,6 +676,102 @@ UINT32 sun4_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 	return 0;
 }
+
+UINT32 sun4_state::read_insn_data_4c(UINT8 asi, address_space &space, UINT32 offset, UINT32 mem_mask)
+{
+	// it's translation time
+	UINT8 pmeg = m_segmap[m_context & m_ctx_mask][(offset >> 16) & 0xfff] & m_pmeg_mask;
+	UINT32 entry = (pmeg << 6) + ((offset >> 10) & 0x3f);
+
+	if (m_pagemap[entry] & PM_VALID)
+	{
+		m_pagemap[entry] |= PM_ACCESSED;
+
+		UINT32 tmp = (m_pagemap[entry] & 0xffff) << 10;
+		tmp |= (offset & 0x3ff);
+
+		//printf("sun4: read translated vaddr %08x to phys %08x type %d, PTE %08x, PC=%x\n", offset<<2, tmp<<2, (m_pagemap[entry]>>26) & 3, m_pagemap[entry], m_maincpu->pc());
+
+		switch ((m_pagemap[entry] >> 26) & 3)
+		{
+		case 0:	// type 0 space
+			return m_type0space->read32(space, tmp, mem_mask);
+
+		case 1: // type 1 space
+			// magic EPROM bypass
+			if ((tmp >= (0x6000000>>2)) && (tmp <= (0x6ffffff>>2)))
+			{
+				return m_rom_ptr[offset & 0x1ffff];
+			}
+			//printf("Read type 1 @ VA %08x, phys %08x\n", offset<<2, tmp<<2);
+			return m_type1space->read32(space, tmp, mem_mask);
+
+		default:
+			printf("sun4c: access to memory type not defined in sun4c\n");
+			return 0;
+		}
+	}
+	else
+	{
+		if (!space.debugger_access())
+		{
+			printf("sun4c: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
+			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
+			//m_buserr[0] = 0x88;	// read, invalid PTE
+			//m_buserr[1] = offset<<2;
+		}
+		return 0;
+	}
+}
+
+void sun4_state::write_insn_data_4c(UINT8 asi, address_space &space, UINT32 offset, UINT32 data, UINT32 mem_mask)
+{
+	// it's translation time
+	UINT8 pmeg = m_segmap[m_context & m_ctx_mask][(offset >> 16) & 0xfff] & m_pmeg_mask;
+	UINT32 entry = (pmeg << 6) + ((offset >> 10) & 0x3f);
+
+	if (m_pagemap[entry] & PM_VALID)
+	{
+		if ((!(m_pagemap[entry] & PM_WRITEMASK)) || ((m_pagemap[entry] & PM_SYSMASK) && !(asi & 1)))
+		{
+			printf("sun4c: write protect MMU error (PC=%x)\n", m_maincpu->pc());
+			m_buserr[0] = 0x8040;	// write, protection error
+			m_buserr[1] = offset<<2;
+			m_maincpu->set_input_line(SPARC_MAE, ASSERT_LINE);
+			return;
+		}
+
+		m_pagemap[entry] |= (PM_ACCESSED | PM_MODIFIED);
+
+		UINT32 tmp = (m_pagemap[entry] & 0xffff) << 10;
+		tmp |= (offset & 0x3ff);
+
+		//printf("sun4: write translated vaddr %08x to phys %08x type %d, PTE %08x, ASI %d, PC=%x\n", offset<<2, tmp<<2, (m_pagemap[entry]>>26) & 3, m_pagemap[entry], asi, m_maincpu->pc());
+
+		switch ((m_pagemap[entry] >> 26) & 3)
+		{
+		case 0:	// type 0
+			m_type0space->write32(space, tmp, data, mem_mask);
+			return;
+
+		case 1: // type 1
+			//printf("write device space @ %x\n", tmp<<1);
+			m_type1space->write32(space, tmp, data, mem_mask);
+			return;
+		default:
+			printf("sun4c: access to memory type not defined\n");
+			return;
+		}
+	}
+	else
+	{
+		printf("sun4c: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
+		//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
+		//m_buserr[0] = 0x8;	// invalid PTE
+		//m_buserr[1] = offset<<2;
+	}
+}
+
 
 READ32_MEMBER( sun4_state::sun4c_mmu_r )
 {
@@ -690,58 +851,12 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 		page += (offset >> 10) & 0x3f;
 		//printf("sun4: read page map @ %x (entry %d, seg %d, PMEG %d, mem_mask %08x, PC=%x)\n", offset << 2, page, (offset >> 16) & 0xfff, m_segmap[m_context & m_ctx_mask][(offset >> 16) & 0xfff] & m_pmeg_mask, mem_mask, m_maincpu->pc());
 		return m_pagemap[page];
-		break;
 
 	case 8:
 	case 9:
 	case 10:
 	case 11:
-		{
-		// it's translation time
-		UINT8 pmeg = m_segmap[m_context & m_ctx_mask][(offset >> 16) & 0xfff] & m_pmeg_mask;
-		UINT32 entry = (pmeg << 6) + ((offset >> 10) & 0x3f);
-
-		if (m_pagemap[entry] & PM_VALID)
-		{
-			m_pagemap[entry] |= PM_ACCESSED;
-
-			UINT32 tmp = (m_pagemap[entry] & 0xffff) << 10;
-			tmp |= (offset & 0x3ff);
-
-			//printf("sun4: read translated vaddr %08x to phys %08x type %d, PTE %08x, PC=%x\n", offset<<2, tmp<<2, (m_pagemap[entry]>>26) & 3, m_pagemap[entry], m_maincpu->pc());
-
-			switch ((m_pagemap[entry] >> 26) & 3)
-			{
-			case 0:	// type 0 space
-				return m_type0space->read32(space, tmp, mem_mask);
-
-			case 1: // type 1 space
-				// magic EPROM bypass
-				if ((tmp >= (0x6000000>>2)) && (tmp <= (0x6ffffff>>2)))
-				{
-					return m_rom_ptr[offset & 0x1ffff];
-				}
-				//printf("Read type 1 @ VA %08x, phys %08x\n", offset<<2, tmp<<2);
-				return m_type1space->read32(space, tmp, mem_mask);
-
-			default:
-				printf("sun4c: access to memory type not defined in sun4c\n");
-				return 0;
-			}
-		}
-		else
-		{
-			if (!space.debugger_access())
-			{
-			printf("sun4c: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
-			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
-			//m_buserr[0] = 0x88;	// read, invalid PTE
-			//m_buserr[1] = offset<<2;
-			}
-			return 0;
-		}
-		}
-		break;
+		return read_insn_data_4c(asi, space, offset, mem_mask);
 
 	default:
 		if (!space.debugger_access()) printf("sun4c: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
@@ -772,6 +887,13 @@ WRITE32_MEMBER( sun4_state::sun4c_mmu_w )
 
 			case 4: // system enable reg
 				m_system_enable = data>>24;
+
+				if (m_system_enable & ENA_RESET)
+				{
+					m_reset_timer->adjust(attotime::from_usec(1));
+					m_maincpu->set_input_line(SPARC_RESET, ASSERT_LINE);
+					printf("Asserting reset line\n");
+				}
 				//printf("%08x to system enable, mask %08x\n", data, mem_mask);
 				if (m_system_enable & ENA_RESET)
 				{
@@ -780,7 +902,7 @@ WRITE32_MEMBER( sun4_state::sun4c_mmu_w )
 					m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 				}
 				return;
-				
+
 			case 6: // bus error
 				printf("%08x to bus error @ %x, mask %08x\n", data, offset, mem_mask);
 				m_buserr[offset & 0xf] = data;
@@ -831,57 +953,13 @@ WRITE32_MEMBER( sun4_state::sun4c_mmu_w )
 		COMBINE_DATA(&m_pagemap[page]);
 		m_pagemap[page] &= 0xff00ffff;	// these 8 bits are cleared when written and tested as such
 		return;
+
 	case 8:
 	case 9:
 	case 10:
 	case 11:
-		// it's translation time
-		UINT8 pmeg = m_segmap[m_context & m_ctx_mask][(offset >> 16) & 0xfff] & m_pmeg_mask;
-		UINT32 entry = (pmeg << 6) + ((offset >> 10) & 0x3f);
-
-		if (m_pagemap[entry] & PM_VALID)
-		{
-			if ((!(m_pagemap[entry] & PM_WRITEMASK)) ||
-			((m_pagemap[entry] & PM_SYSMASK) && !(asi & 1)))
-			{
-				printf("sun4c: write protect MMU error (PC=%x)\n", m_maincpu->pc());
-				m_buserr[0] = 0x8040;	// write, protection error
-				m_buserr[1] = offset<<2;
-				m_maincpu->set_input_line(SPARC_MAE, ASSERT_LINE);
-				return;
-			}
-
-			m_pagemap[entry] |= (PM_ACCESSED | PM_MODIFIED);
-
-			UINT32 tmp = (m_pagemap[entry] & 0xffff) << 10;
-			tmp |= (offset & 0x3ff);
-
-			//printf("sun4: write translated vaddr %08x to phys %08x type %d, PTE %08x, ASI %d, PC=%x\n", offset<<2, tmp<<2, (m_pagemap[entry]>>26) & 3, m_pagemap[entry], asi, m_maincpu->pc());
-
-			switch ((m_pagemap[entry] >> 26) & 3)
-			{
-			case 0:	// type 0
-				m_type0space->write32(space, tmp, data, mem_mask);
-				return;
-
-			case 1: // type 1
-				//printf("write device space @ %x\n", tmp<<1);
-				m_type1space->write32(space, tmp, data, mem_mask);
-				return;
-			default:
-				printf("sun4c: access to memory type not defined\n");
-				return;
-			}
-		}
-		else
-		{
-			printf("sun4c: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
-			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
-			//m_buserr[0] = 0x8;	// invalid PTE
-			//m_buserr[1] = offset<<2;
-			return;
-		}
-		break;
+		write_insn_data_4c(asi, space, offset, data, mem_mask);
+		return;
 
 	}
 
@@ -889,6 +967,93 @@ WRITE32_MEMBER( sun4_state::sun4c_mmu_w )
 }
 
 // -----------------------------------------------------------------
+
+UINT32 sun4_state::read_insn_data(UINT8 asi, address_space &space, UINT32 offset, UINT32 mem_mask)
+{
+	// it's translation time
+	UINT8 pmeg = m_segmap[m_context][(offset >> 16) & 0xfff];
+	UINT32 entry = (pmeg << 5) + ((offset >> 11) & 0x1f);
+
+	if (m_pagemap[entry] & PM_VALID)
+	{
+		m_pagemap[entry] |= PM_ACCESSED;
+
+		UINT32 tmp = (m_pagemap[entry] & 0x7ffff) << 11;
+		tmp |= (offset & 0x7ff);
+
+		//printf("sun4: read translated vaddr %08x to phys %08x type %d, PTE %08x, PC=%x\n", offset<<2, tmp<<2, (m_pagemap[entry]>>26) & 3, m_pagemap[entry], m_maincpu->pc());
+
+		switch ((m_pagemap[entry] >> 26) & 3)
+		{
+		case 0:	// type 0 space
+			return m_type0space->read32(space, tmp, mem_mask);
+
+		case 1: // type 1 space
+			// magic EPROM bypass
+			if ((tmp >= (0x6000000>>2)) && (tmp <= (0x6ffffff>>2)))
+			{
+				return m_rom_ptr[offset & 0x1ffff];
+			}
+			//printf("Read type 1 @ VA %08x, phys %08x\n", offset<<2, tmp<<2);
+			return m_type1space->read32(space, tmp, mem_mask);
+
+		default:
+			printf("sun4: access to unhandled memory type\n");
+			return 0;
+		}
+	}
+	else
+	{
+		if (!space.debugger_access())
+		{
+			printf("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
+			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
+			//m_buserr[0] = 0x88;	// read, invalid PTE
+			//m_buserr[1] = offset<<2;
+		}
+		return 0;
+	}
+}
+
+void sun4_state::write_insn_data(UINT8 asi, address_space &space, UINT32 offset, UINT32 data, UINT32 mem_mask)
+{
+	// it's translation time
+	UINT8 pmeg = m_segmap[m_context][(offset >> 16) & 0xfff];
+	UINT32 entry = (pmeg << 5) + ((offset >> 11) & 0x1f);
+
+	if (m_pagemap[entry] & PM_VALID)
+	{
+		m_pagemap[entry] |= PM_ACCESSED;
+
+		UINT32 tmp = (m_pagemap[entry] & 0x7ffff) << 11;
+		tmp |= (offset & 0x7ff);
+
+		//printf("sun4: write translated vaddr %08x to phys %08x type %d, PTE %08x, PC=%x\n", offset<<2, tmp<<2, (m_pagemap[entry]>>26) & 3, m_pagemap[entry], m_maincpu->pc());
+
+		switch ((m_pagemap[entry] >> 26) & 3)
+		{
+		case 0:	// type 0
+			m_type0space->write32(space, tmp, data, mem_mask);
+			return;
+
+		case 1: // type 1
+			//printf("write device space @ %x\n", tmp<<1);
+			m_type1space->write32(space, tmp, data, mem_mask);
+			return;
+
+		default:
+			printf("sun4: access to memory type not defined in sun4c\n");
+			return;
+		}
+	}
+	else
+	{
+		printf("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
+		//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
+		//m_buserr[0] = 0x8;	// invalid PTE
+		//m_buserr[1] = offset<<2;
+	}
+}
 
 READ32_MEMBER( sun4_state::sun4_mmu_r )
 {
@@ -972,52 +1137,7 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 	case 9:
 	case 10:
 	case 11:
-		{
-		// it's translation time
-		UINT8 pmeg = m_segmap[m_context][(offset >> 16) & 0xfff];
-		UINT32 entry = (pmeg << 5) + ((offset >> 11) & 0x1f);
-
-		if (m_pagemap[entry] & PM_VALID)
-		{
-			m_pagemap[entry] |= PM_ACCESSED;
-
-			UINT32 tmp = (m_pagemap[entry] & 0x7ffff) << 11;
-			tmp |= (offset & 0x7ff);
-
-			//printf("sun4: read translated vaddr %08x to phys %08x type %d, PTE %08x, PC=%x\n", offset<<2, tmp<<2, (m_pagemap[entry]>>26) & 3, m_pagemap[entry], m_maincpu->pc());
-
-			switch ((m_pagemap[entry] >> 26) & 3)
-			{
-			case 0:	// type 0 space
-				return m_type0space->read32(space, tmp, mem_mask);
-
-			case 1: // type 1 space
-				// magic EPROM bypass
-				if ((tmp >= (0x6000000>>2)) && (tmp <= (0x6ffffff>>2)))
-				{
-					return m_rom_ptr[offset & 0x1ffff];
-				}
-				//printf("Read type 1 @ VA %08x, phys %08x\n", offset<<2, tmp<<2);
-				return m_type1space->read32(space, tmp, mem_mask);
-
-			default:
-				printf("sun4: access to unhandled memory type\n");
-				return 0;
-			}
-		}
-		else
-		{
-			if (!space.debugger_access())
-			{
-			printf("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
-			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
-			//m_buserr2qor[0] = 0x88;	// read, invalid PTE
-			//m_buserr[1] = offset<<2;
-			}
-			return 0;
-		}
-		}
-		break;
+		return read_insn_data(asi, space, offset, mem_mask);
 
 	default:
 		if (!space.debugger_access()) printf("sun4: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
@@ -1048,6 +1168,12 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 
 			case 4: // system enable reg
 				m_system_enable = data>>24;
+
+				if (m_system_enable & ENA_RESET)
+				{
+					m_reset_timer->adjust(attotime::from_usec(1));
+					m_maincpu->set_input_line(SPARC_RESET, ASSERT_LINE);
+				}
 				//printf("%08x to system enable, mask %08x\n", data, mem_mask);
 				if (m_system_enable & ENA_RESET)
 				{
@@ -1128,42 +1254,7 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 	case 9:
 	case 10:
 	case 11:
-		// it's translation time
-		UINT8 pmeg = m_segmap[m_context][(offset >> 16) & 0xfff];
-		UINT32 entry = (pmeg << 5) + ((offset >> 11) & 0x1f);
-
-		if (m_pagemap[entry] & PM_VALID)
-		{
-			m_pagemap[entry] |= PM_ACCESSED;
-
-			UINT32 tmp = (m_pagemap[entry] & 0x7ffff) << 11;
-			tmp |= (offset & 0x7ff);
-
-			//printf("sun4: write translated vaddr %08x to phys %08x type %d, PTE %08x, PC=%x\n", offset<<2, tmp<<2, (m_pagemap[entry]>>26) & 3, m_pagemap[entry], m_maincpu->pc());
-
-			switch ((m_pagemap[entry] >> 26) & 3)
-			{
-			case 0:	// type 0
-				m_type0space->write32(space, tmp, data, mem_mask);
-				return;
-
-			case 1: // type 1
-				//printf("write device space @ %x\n", tmp<<1);
-				m_type1space->write32(space, tmp, data, mem_mask);
-				return;
-			default:
-				printf("sun4: access to memory type not defined in sun4c\n");
-				return;
-			}
-		}
-		else
-		{
-			printf("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
-			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
-			//m_buserror[0] = 0x8;	// invalid PTE
-			//m_buserror[1] = offset<<2;
-			return;
-		}
+		write_insn_data(asi, space, offset, data, mem_mask);
 		break;
 
 	}
@@ -1248,7 +1339,28 @@ void sun4_state::machine_reset()
 	m_system_enable = 0;
 	m_irq_reg = 0;
 	m_scc1_int = m_scc2_int = 0;
+	m_scsi_irq = 0;
+	m_scsi_drq = 0;
+
+	for (UINT32 i = 0; i < (0x7f8 - 0x7d7); i++)
+	{
+		m_timekpr->write(m_maincpu->space(AS_PROGRAM), 0x7d7 + i, 0);
+	}
+
+	m_timekpr->write(m_maincpu->space(AS_PROGRAM), 0x7d9, 0x12);
+	m_timekpr->write(m_maincpu->space(AS_PROGRAM), 0x7e4, 0x34);
+	m_timekpr->write(m_maincpu->space(AS_PROGRAM), 0x7e5, 0x56);
+	m_timekpr->write(m_maincpu->space(AS_PROGRAM), 0x7e6, 0x78);
+
+	m_timekpr->write(m_maincpu->space(AS_PROGRAM), 0x7da, 0x11);
+	m_timekpr->write(m_maincpu->space(AS_PROGRAM), 0x7db, 0x22);
+	m_timekpr->write(m_maincpu->space(AS_PROGRAM), 0x7dc, 0x33);
+	m_timekpr->write(m_maincpu->space(AS_PROGRAM), 0x7dd, 0x44);
+	m_timekpr->write(m_maincpu->space(AS_PROGRAM), 0x7de, 0x55);
+	m_timekpr->write(m_maincpu->space(AS_PROGRAM), 0x7df, 0x66);
+
 	memset(m_counter, 0, sizeof(m_counter));
+	memset(m_dma, 0, sizeof(m_dma));
 }
 
 void sun4_state::machine_start()
@@ -1272,6 +1384,14 @@ void sun4_state::machine_start()
 	m_c1_timer = timer_alloc(TIMER_1);
 	m_c0_timer->adjust(attotime::never);
 	m_c1_timer->adjust(attotime::never);
+
+	// allocate timer for system reset
+	m_reset_timer = timer_alloc(TIMER_RESET);
+	m_reset_timer->adjust(attotime::never);
+
+	// allocate timer for DMA controller
+	m_dma_timer = timer_alloc(TIMER_DMA);
+	m_dma_timer->adjust(attotime::never);
 }
 
 READ32_MEMBER( sun4_state::ram_r )
@@ -1362,6 +1482,8 @@ static ADDRESS_MAP_START(type1space_map, AS_PROGRAM, 32, sun4_state)
 	AM_RANGE(0x06000000, 0x0607ffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x07200000, 0x07200003) AM_READWRITE8(fdc_r, fdc_w, 0xffffffff)
 	AM_RANGE(0x08000000, 0x08000003) AM_READ(ss1_sl0_id)	// slot 0 contains SCSI/DMA/Ethernet
+	AM_RANGE(0x08400000, 0x0840000f) AM_READWRITE(dma_r, dma_w)
+	AM_RANGE(0x08800000, 0x0880001f) AM_DEVICE8("scsibus:7:ncr5390", ncr5390_device, map, 0xff0000)
 	AM_RANGE(0x0e000000, 0x0e000003) AM_READ(ss1_sl3_id)	// slot 3 contains video board
 	AM_RANGE(0x0e800000, 0x0e8fffff) AM_RAM AM_SHARE("bw2_vram")
 ADDRESS_MAP_END
@@ -1453,7 +1575,7 @@ void sun4_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 			if ((m_irq_reg & 0x21) == 0x21)
 			{
 				m_maincpu->set_input_line(SPARC_IRQ10, ASSERT_LINE);
-				printf("Taking INT10\n");
+				//printf("Taking INT10\n");
 			}
 			break;
 
@@ -1469,6 +1591,16 @@ void sun4_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 				//printf("Taking INT14\n");
 			}
 			break;
+
+		case TIMER_DMA:
+			dma_tick();
+			break;
+
+		case TIMER_RESET:
+			m_reset_timer->adjust(attotime::never);
+			m_maincpu->set_input_line(SPARC_RESET, CLEAR_LINE);
+			printf("Clearing reset line\n");
+			break;
 	}
 }
 
@@ -1479,11 +1611,11 @@ READ32_MEMBER( sun4_state::timer_r )
 	// reading limt 0
 	if (offset == 0)
 	{
-		printf("Read timer counter 0 (%08x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
+		//printf("Read timer counter 0 (%08x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
 	}
 	if (offset == 1)
 	{
-		printf("Read timer limit 0 (%08x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
+		//printf("Read timer limit 0 (%08x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
 		m_counter[0] &= ~0x80000000;
 		m_counter[1] &= ~0x80000000;
 		m_maincpu->set_input_line(SPARC_IRQ10, CLEAR_LINE);
@@ -1491,7 +1623,7 @@ READ32_MEMBER( sun4_state::timer_r )
 
 	if (offset == 2)
 	{
-		printf("Read timer counter 1 (%08x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
+		//printf("Read timer counter 1 (%08x) @ %x, mask %08x\n", ret, m_maincpu->pc(), mem_mask);
 	}
 	if (offset == 3)
 	{
@@ -1505,9 +1637,7 @@ READ32_MEMBER( sun4_state::timer_r )
 
 void sun4_state::start_timer(int num)
 {
-	int shift = (num == 0 ? 10 : 20);
-	int mask = (num == 0 ? 0x1fffff : 0x7ff);
-	int period = (m_counter[num * 2 + 1] >> shift) & mask;
+	int period = (m_counter[num * 2 + 1] >> 10) & 0x1fffff;
 	if (period == 0)
 		period = 0x200000;
 
@@ -1552,6 +1682,246 @@ WRITE32_MEMBER( sun4_state::timer_w )
 	}
 }
 
+void sun4_state::dma_set_int_pend(int state)
+{
+	if (!state)
+	{
+		m_dma[DMA_CTRL] &= ~DMA_INT_PEND;
+	}
+	else
+	{
+		m_dma[DMA_CTRL] |= DMA_INT_PEND;
+	}
+
+	dma_update_irq();
+}
+
+void sun4_state:: dma_update_irq()
+{
+	int irq_or_err_pending = (m_dma[DMA_CTRL] & (DMA_INT_PEND | DMA_ERR_PEND)) ? 1 : 0;
+	int irq_enabled = (m_dma[DMA_CTRL] & DMA_INT_EN) ? 1 : 0;
+	if (irq_or_err_pending && irq_enabled)
+	{
+		m_maincpu->set_input_line(SPARC_IRQ3, ASSERT_LINE);
+	}
+	else
+	{
+		m_maincpu->set_input_line(SPARC_IRQ3, CLEAR_LINE);
+	}
+}
+
+void sun4_state::dma_tick()
+{
+	UINT32 transfer_size = (m_dma[DMA_BYTE_COUNT] > PAGE_SIZE ? PAGE_SIZE : m_dma[DMA_BYTE_COUNT]);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+
+	if (m_dma[DMA_CTRL] & DMA_WRITE)
+	{
+		UINT32 data = 0;
+		UINT32 byte_cnt = 3;
+		UINT32 mem_mask = 0;
+		while (transfer_size > 0)
+		{
+			UINT8 value = m_scsi->dma_r();
+			data |= value << (byte_cnt * 8);
+			mem_mask |= 0xff << (byte_cnt * 8);
+			transfer_size--;
+
+			if (byte_cnt == 0)
+			{
+				if (m_arch == ARCH_SUN4C)
+				{
+					write_insn_data_4c(11, space, m_dma[DMA_ADDR] >> 2, data, mem_mask);
+				}
+				else
+				{
+					write_insn_data(11, space, m_dma[DMA_ADDR] >> 2, data, mem_mask);
+				}
+				m_dma[DMA_ADDR] += 4;
+				m_dma[DMA_BYTE_COUNT] -= 4;
+
+				byte_cnt = 3;
+				data = 0;
+				mem_mask = 0;
+			}
+			else
+			{
+				byte_cnt--;
+			}
+		}
+
+		if (byte_cnt != 0)
+		{
+			if (m_arch == ARCH_SUN4C)
+			{
+				write_insn_data_4c(11, space, m_dma[DMA_ADDR] >> 2, data, mem_mask);
+			}
+			else
+			{
+				write_insn_data(11, space, m_dma[DMA_ADDR] >> 2, data, mem_mask);
+			}
+
+			m_dma[DMA_ADDR] += byte_cnt;
+			m_dma[DMA_BYTE_COUNT] -= byte_cnt;
+		}
+	}
+	else
+	{
+		UINT32 byte_cnt = 3;
+		UINT32 mem_mask = 0;
+		while (transfer_size > 0)
+		{
+			mem_mask |= 0xff << (byte_cnt * 8);
+			transfer_size--;
+
+			if (byte_cnt == 0)
+			{
+				UINT32 data = 0;
+				if (m_arch == ARCH_SUN4C)
+				{
+					data = read_insn_data_4c(11, space, m_dma[DMA_ADDR] >> 2, mem_mask);
+				}
+				else
+				{
+					data = read_insn_data(11, space, m_dma[DMA_ADDR] >> 2, mem_mask);
+				}
+
+				for (int i = 24; i >= 0; i -= 8)
+				{
+					m_scsi->dma_w((data >> i) & 0xff);
+					m_dma[DMA_BYTE_COUNT]--;
+				}
+
+				byte_cnt = 3;
+				mem_mask = 0;
+			}
+			else
+			{
+				byte_cnt--;
+			}
+		}
+
+		if (byte_cnt != 0)
+		{
+			byte_cnt++;
+			UINT32 data = 0;
+			if (m_arch == ARCH_SUN4C)
+			{
+				data = read_insn_data_4c(11, space, m_dma[DMA_ADDR] >> 2, mem_mask);
+			}
+			else
+			{
+				data = read_insn_data(11, space, m_dma[DMA_ADDR] >> 2, mem_mask);
+			}
+
+			UINT32 initial_cnt = byte_cnt;
+			for (int i = 0; i < 4 - initial_cnt; i++)
+			{
+				UINT8 byte_val = (data >> (byte_cnt * 8)) & 0xff;
+				m_scsi->dma_w(byte_val);
+
+				m_dma[DMA_BYTE_COUNT]--;
+				byte_cnt--;
+			}
+		}
+	}
+
+	if (m_dma[DMA_BYTE_COUNT] == 0)
+	{
+		m_dma[DMA_CTRL] |= DMA_TC;
+		dma_set_int_pend(1);
+		m_dma_timer->adjust(attotime::never);
+	}
+	else
+	{
+		dma_setup_timer(true);
+	}
+}
+
+void sun4_state::dma_setup_timer(bool continuing)
+{
+	const UINT32 remaining_bytes = m_dma[DMA_BYTE_COUNT];
+	const UINT64 latency = (continuing ? 0 : 40);
+	const UINT64 transfer_size = (remaining_bytes < PAGE_SIZE ? remaining_bytes : PAGE_SIZE);
+	const UINT64 transfer_duration = ((transfer_size + 15) / 16) * 8; // 16 byte groupings, 8 clock cycles per group
+	const UINT64 total_ticks = latency + transfer_duration;
+
+	m_dma_timer->adjust(attotime::from_ticks(total_ticks, DMA_XTAL));
+
+	if (!continuing)
+	{
+		m_dma[DMA_CTRL] &= DMA_TC;
+	}
+}
+
+READ32_MEMBER( sun4_state::dma_r )
+{
+	return m_dma[offset];
+}
+
+WRITE32_MEMBER( sun4_state::dma_w )
+{
+	switch (offset)
+	{
+		case DMA_CTRL:
+		{
+			// clear write-only bits
+			UINT32 old_ctrl = m_dma[DMA_CTRL];
+
+			m_dma[DMA_CTRL] &= (DMA_READ_ONLY | DMA_READ_WRITE);
+
+			m_dma[DMA_CTRL] |= (data & (DMA_WRITE_ONLY | DMA_READ_WRITE));
+
+			if (data & DMA_FLUSH)
+			{
+				m_dma[DMA_CTRL] &= ~DMA_PACK_CNT;
+				m_dma[DMA_CTRL] &= ~DMA_ERR_PEND;
+				m_dma[DMA_CTRL] &= ~DMA_TC;
+
+				if (!m_scsi_irq)
+				{
+					dma_set_int_pend(0);
+				}
+			}
+
+			if (data & DMA_EN_DMA && !(old_ctrl & DMA_EN_DMA))
+			{
+				dma_setup_timer(false);
+			}
+			break;
+		}
+
+		case DMA_ADDR:
+		case DMA_BYTE_COUNT:
+			m_dma[offset] = data;
+			break;
+
+		default:
+			break;
+	}
+}
+
+WRITE_LINE_MEMBER( sun4_state::scsi_irq )
+{
+	if (!(m_dma[DMA_CTRL] & DMA_TC))
+	{
+		dma_set_int_pend(state);
+	}
+	m_scsi_irq = state;
+}
+
+WRITE_LINE_MEMBER( sun4_state::scsi_drq )
+{
+	if (state)
+	{
+		if (m_dma[DMA_CTRL] & DMA_EN_DMA)
+		{
+			dma_setup_timer(false);
+		}
+	}
+	m_scsi_drq = state;
+}
+
 // indicate 4/60 SCSI/DMA/Ethernet card exists
 READ32_MEMBER( sun4_state::ss1_sl0_id )
 {
@@ -1572,6 +1942,18 @@ static SLOT_INTERFACE_START( sun_floppies )
 	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
 SLOT_INTERFACE_END
 
+static SLOT_INTERFACE_START( sun_scsi_devices )
+	SLOT_INTERFACE("cdrom", NSCSI_CDROM)
+	SLOT_INTERFACE("harddisk", NSCSI_HARDDISK)
+	SLOT_INTERFACE_INTERNAL("ncr5390", NCR5390)
+SLOT_INTERFACE_END
+
+static MACHINE_CONFIG_FRAGMENT( ncr5390 )
+	MCFG_DEVICE_CLOCK(10000000)
+	MCFG_NCR5390_IRQ_HANDLER(DEVWRITELINE(":", sun4_state, scsi_irq))
+	MCFG_NCR5390_DRQ_HANDLER(DEVWRITELINE(":", sun4_state, scsi_drq))
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( sun4, sun4_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MB86901, 16670000)
@@ -1582,7 +1964,7 @@ static MACHINE_CONFIG_START( sun4, sun4_state )
 	MCFG_RAM_DEFAULT_SIZE("16M")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 
-	MCFG_M48T02_ADD(TIMEKEEPER_TAG)
+	MCFG_MK48T12_ADD(TIMEKEEPER_TAG)
 
 	MCFG_N82077AA_ADD(FDC_TAG, n82077aa_device::MODE_PS2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sun_floppies, "35hd", sun4_state::floppy_formats)
@@ -1624,6 +2006,17 @@ static MACHINE_CONFIG_START( sun4, sun4_state )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxb_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
+
+	MCFG_NSCSI_BUS_ADD("scsibus")
+	MCFG_NSCSI_ADD("scsibus:0", sun_scsi_devices, "harddisk", false)
+	MCFG_NSCSI_ADD("scsibus:1", sun_scsi_devices, "cdrom", false)
+	MCFG_NSCSI_ADD("scsibus:2", sun_scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:3", sun_scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:4", sun_scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:5", sun_scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:6", sun_scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:7", sun_scsi_devices, "ncr5390", true)
+	MCFG_DEVICE_CARD_MACHINE_CONFIG("ncr5390", ncr5390)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sun4c, sun4_state )
@@ -1636,7 +2029,7 @@ static MACHINE_CONFIG_START( sun4c, sun4_state )
 	MCFG_RAM_DEFAULT_SIZE("16M")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 
-	MCFG_M48T02_ADD(TIMEKEEPER_TAG)
+	MCFG_MK48T12_ADD(TIMEKEEPER_TAG)
 
 	MCFG_N82077AA_ADD(FDC_TAG, n82077aa_device::MODE_PS2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sun_floppies, "35hd", sun4_state::floppy_formats)
@@ -1678,6 +2071,17 @@ static MACHINE_CONFIG_START( sun4c, sun4_state )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxb_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
+
+	MCFG_NSCSI_BUS_ADD("scsibus")
+	MCFG_NSCSI_ADD("scsibus:0", sun_scsi_devices, "harddisk", false)
+	MCFG_NSCSI_ADD("scsibus:1", sun_scsi_devices, "cdrom", false)
+	MCFG_NSCSI_ADD("scsibus:2", sun_scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:3", sun_scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:4", sun_scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:5", sun_scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:6", sun_scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:7", sun_scsi_devices, "ncr5390", true)
+	MCFG_DEVICE_CARD_MACHINE_CONFIG("ncr5390", ncr5390)
 
 	MCFG_SCREEN_ADD("bwtwo", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(sun4_state, bw2_update)
