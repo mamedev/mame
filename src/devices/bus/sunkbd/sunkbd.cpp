@@ -90,7 +90,8 @@ device_sun_keyboard_port_interface::~device_sun_keyboard_port_interface()
 #include "hlekbd.h"
 
 SLOT_INTERFACE_START( default_sun_keyboard_devices )
-	SLOT_INTERFACE("type3hle", SUN_TYPE3_HLE_KEYBOARD)
-	SLOT_INTERFACE("type4hle", SUN_TYPE4_HLE_KEYBOARD)
-	SLOT_INTERFACE("type5hle", SUN_TYPE5_HLE_KEYBOARD)
+	SLOT_INTERFACE("type3hle",   SUN_TYPE3_HLE_KEYBOARD)
+	SLOT_INTERFACE("type4hle",   SUN_TYPE4_HLE_KEYBOARD)
+	SLOT_INTERFACE("type5hle",   SUN_TYPE5_HLE_KEYBOARD)
+	SLOT_INTERFACE("type5ukhle", SUN_TYPE5_UK_HLE_KEYBOARD)
 SLOT_INTERFACE_END

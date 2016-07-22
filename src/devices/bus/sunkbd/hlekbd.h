@@ -12,6 +12,7 @@
 extern device_type const SUN_TYPE3_HLE_KEYBOARD;
 extern device_type const SUN_TYPE4_HLE_KEYBOARD;
 extern device_type const SUN_TYPE5_HLE_KEYBOARD;
+extern device_type const SUN_TYPE5_UK_HLE_KEYBOARD;
 
 
 namespace bus { namespace sunkbd {
@@ -167,6 +168,30 @@ public:
 			device_t *owner,
 			UINT32 clock);
 	hle_type5_device(
+			machine_config const &mconfig,
+			device_type type, char const *name,
+			char const *tag,
+			device_t *owner,
+			UINT32 clock,
+			char const *shortname,
+			char const *source);
+
+	virtual ioport_constructor device_input_ports() const override;
+
+private:
+	virtual UINT8 ident_byte() override;
+};
+
+
+class hle_type5_uk_device : public hle_device_base
+{
+public:
+	hle_type5_uk_device(
+			machine_config const &mconfig,
+			char const *tag,
+			device_t *owner,
+			UINT32 clock);
+	hle_type5_uk_device(
 			machine_config const &mconfig,
 			device_type type, char const *name,
 			char const *tag,
