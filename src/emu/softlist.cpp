@@ -519,13 +519,20 @@ const software_info *software_list_device::find(const char *look_for)
 	bool iswild = strchr(look_for, '*') != nullptr || strchr(look_for, '?');
 
 	// find a match (will cause a parse if needed when calling get_info)
-	for (const software_info &info : get_info())
-	{
-		if ((iswild && core_strwildcmp(look_for, info.shortname().c_str()) == 0) || core_stricmp(look_for, info.shortname().c_str()) == 0)
-			return &info;
-	}
+	const auto &info_list = get_info();
+	auto iter = std::find_if(
+		info_list.begin(),
+		info_list.end(),
+		[&](const software_info &info)
+		{
+			const char *shortname = info.shortname().c_str();
+			return (iswild && core_strwildcmp(look_for, shortname) == 0)
+				|| core_stricmp(look_for, shortname) == 0;
+		});
 
-	return nullptr;
+	return iter != info_list.end()
+		? &*iter
+		: nullptr;
 }
 
 
