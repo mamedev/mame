@@ -12,7 +12,8 @@
 extern device_type const SUN_TYPE3_HLE_KEYBOARD;
 extern device_type const SUN_TYPE4_HLE_KEYBOARD;
 extern device_type const SUN_TYPE5_HLE_KEYBOARD;
-extern device_type const SUN_TYPE5_UK_HLE_KEYBOARD;
+extern device_type const SUN_TYPE5_GB_HLE_KEYBOARD;
+extern device_type const SUN_TYPE5_SE_HLE_KEYBOARD;
 
 
 namespace bus { namespace sunkbd {
@@ -25,11 +26,6 @@ public:
 
 protected:
 	// constructor/destructor
-	hle_device_base(
-			machine_config const &mconfig,
-			char const *tag,
-			device_t *owner,
-			UINT32 clock);
 	hle_device_base(
 			machine_config const &mconfig,
 			device_type type, char const *name,
@@ -111,6 +107,16 @@ private:
 };
 
 
+class hle_type4_device_base : public hle_device_base
+{
+protected:
+	using hle_device_base::hle_device_base;
+
+private:
+	virtual UINT8 ident_byte() override;
+};
+
+
 class hle_type3_device : public hle_device_base
 {
 public:
@@ -119,14 +125,6 @@ public:
 			char const *tag,
 			device_t *owner,
 			UINT32 clock);
-	hle_type3_device(
-			machine_config const &mconfig,
-			device_type type, char const *name,
-			char const *tag,
-			device_t *owner,
-			UINT32 clock,
-			char const *shortname,
-			char const *source);
 
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -135,7 +133,7 @@ private:
 };
 
 
-class hle_type4_device : public hle_device_base
+class hle_type4_device : public hle_type4_device_base
 {
 public:
 	hle_type4_device(
@@ -143,23 +141,12 @@ public:
 			char const *tag,
 			device_t *owner,
 			UINT32 clock);
-	hle_type4_device(
-			machine_config const &mconfig,
-			device_type type, char const *name,
-			char const *tag,
-			device_t *owner,
-			UINT32 clock,
-			char const *shortname,
-			char const *source);
 
 	virtual ioport_constructor device_input_ports() const override;
-
-private:
-	virtual UINT8 ident_byte() override;
 };
 
 
-class hle_type5_device : public hle_device_base
+class hle_type5_device : public hle_type4_device_base
 {
 public:
 	hle_type5_device(
@@ -167,43 +154,34 @@ public:
 			char const *tag,
 			device_t *owner,
 			UINT32 clock);
-	hle_type5_device(
-			machine_config const &mconfig,
-			device_type type, char const *name,
-			char const *tag,
-			device_t *owner,
-			UINT32 clock,
-			char const *shortname,
-			char const *source);
 
 	virtual ioport_constructor device_input_ports() const override;
-
-private:
-	virtual UINT8 ident_byte() override;
 };
 
 
-class hle_type5_uk_device : public hle_device_base
+class hle_type5_gb_device : public hle_type4_device_base
 {
 public:
-	hle_type5_uk_device(
+	hle_type5_gb_device(
 			machine_config const &mconfig,
 			char const *tag,
 			device_t *owner,
 			UINT32 clock);
-	hle_type5_uk_device(
-			machine_config const &mconfig,
-			device_type type, char const *name,
-			char const *tag,
-			device_t *owner,
-			UINT32 clock,
-			char const *shortname,
-			char const *source);
 
 	virtual ioport_constructor device_input_ports() const override;
+};
 
-private:
-	virtual UINT8 ident_byte() override;
+
+class hle_type5_se_device : public hle_type4_device_base
+{
+public:
+	hle_type5_se_device(
+			machine_config const &mconfig,
+			char const *tag,
+			device_t *owner,
+			UINT32 clock);
+
+	virtual ioport_constructor device_input_ports() const override;
 };
 
 } } // namespace bus::sunkbd

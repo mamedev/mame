@@ -7,7 +7,9 @@
 
 /*
     TODO: other international layouts
+    TODO: localised labels on Solaris group for Swedish layout
     TODO: suppress LED command processing for Type 3 keyboard
+    TODO: work out what actually happens with DIPs on Type 3 keyboard
 
     HLE SPARC serial keyboard compatible with Sun Type 3/4/5/6
 
@@ -92,6 +94,22 @@
     5f  61    77     13   78                79                7a  43  0d    18  1b  1c      5e    32  5a
 
     xx is a blank key
+    backspace immediately above return
+    backslash and backtick/tilde at top right of main area
+    control on home row, caps lock at bottom left corner of main area
+
+
+    Type 5 International layout:
+
+      76      1d      05  06  08  0a    0c  0e  10  11    12  07  09  0b    16  17  15    2d  02  04  30
+
+    01  03    2a  1e  1f  20  21  22  23  24  25  26  27  28  29      2b    2c  34  60    62  2e  2f  47
+    19  1a    35    36  37  38  39  3a  3b  3c  3d  3e  3f  40  41          42  4a  7b    44  45  46
+    31  33    77     4d  4e  4f  50  51  52  53  54  55  56  57  58   59                  5b  5c  5d  7d
+    48  49    63   7c  64  65  66  67  68  69  6a  6b  6c  6d         6e        14        70  71  72
+    5f  61    4c     13   78                79                7a  43  0d    18  1b  1c      5e    32  5a
+
+    double-height return key, 58 (US backslash) moved to home row, 7c added on left of bottom row
 */
 
 
@@ -102,7 +120,8 @@
 device_type const SUN_TYPE3_HLE_KEYBOARD    = &device_creator<bus::sunkbd::hle_type3_device>;
 device_type const SUN_TYPE4_HLE_KEYBOARD    = &device_creator<bus::sunkbd::hle_type4_device>;
 device_type const SUN_TYPE5_HLE_KEYBOARD    = &device_creator<bus::sunkbd::hle_type5_device>;
-device_type const SUN_TYPE5_UK_HLE_KEYBOARD = &device_creator<bus::sunkbd::hle_type5_uk_device>;
+device_type const SUN_TYPE5_GB_HLE_KEYBOARD = &device_creator<bus::sunkbd::hle_type5_gb_device>;
+device_type const SUN_TYPE5_SE_HLE_KEYBOARD = &device_creator<bus::sunkbd::hle_type5_se_device>;
 
 
 
@@ -114,7 +133,7 @@ namespace {
 
 #define TYPE5_DIPS(dflt)                                                    \
 		PORT_START("DIP")                                                   \
-        PORT_DIPNAME( 0x1f, dflt, "Layout") PORT_DIPLOCATION("S:5,4,3,2,1") \
+		PORT_DIPNAME( 0x1f, dflt, "Layout") PORT_DIPLOCATION("S:5,4,3,2,1") \
 		/* 0x00 */                                                          \
 		PORT_DIPSETTING(    0x01, "U.S.A. (US5.kt)"                      )  \
 		PORT_DIPSETTING(    0x02, "U.S.A./UNIX (US_UNIX5.kt)"            )  \
@@ -297,7 +316,7 @@ INPUT_PORTS_START( basic )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( basic_uk )
+INPUT_PORTS_START( basic_gb )
 	PORT_INCLUDE( basic )
 
 	PORT_MODIFY("ROW1")
@@ -313,6 +332,43 @@ INPUT_PORTS_START( basic_uk )
 
 	PORT_MODIFY("ROW7")
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('\\') PORT_CHAR('|')
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START( basic_se )
+	PORT_INCLUDE( basic )
+
+	PORT_MODIFY("ROW1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_2)          PORT_CHAR('2') PORT_CHAR('"') PORT_CHAR('@')
+
+	PORT_MODIFY("ROW2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_3)          PORT_CHAR('3') PORT_CHAR('#') PORT_CHAR(0x00a3U)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_4)          PORT_CHAR('4') PORT_CHAR(0x00a4U) PORT_CHAR('$')
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_6)          PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_7)          PORT_CHAR('7') PORT_CHAR('/') PORT_CHAR('{')
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_8)          PORT_CHAR('8') PORT_CHAR('(') PORT_CHAR('[')
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR(')') PORT_CHAR(']')
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_0)          PORT_CHAR('0') PORT_CHAR('=') PORT_CHAR('}')
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('+') PORT_CHAR('?') PORT_CHAR('\\')
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR(0x00b4U) PORT_CHAR('`')
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_TILDE)      PORT_CHAR(0x00a7U) PORT_CHAR(0x00bdU)
+
+	PORT_MODIFY("ROW4")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(0x00e5U) PORT_CHAR(0x00c5U)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(0x00a8U) PORT_CHAR('^') PORT_CHAR('~')
+
+	PORT_MODIFY("ROW5")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_COLON)      PORT_CHAR(0x00f6U) PORT_CHAR(0x00d6U)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(0x00e4U) PORT_CHAR(0x00c4U)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR('\'') PORT_CHAR('*') PORT_CHAR('`')
+
+	PORT_MODIFY("ROW6")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',') PORT_CHAR(';')
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR(':')
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('-') PORT_CHAR('_')
+
+	PORT_MODIFY("ROW7")
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('<') PORT_CHAR('>') PORT_CHAR('|')
 INPUT_PORTS_END
 
 
@@ -406,7 +462,7 @@ INPUT_PORTS_START( enhanced_function )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F10")          PORT_CODE(KEYCODE_F10)        PORT_CHAR(UCHAR_MAMEKEY(F10))
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F11")          PORT_CODE(KEYCODE_F11)        PORT_CHAR(UCHAR_MAMEKEY(F11))
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F12")          PORT_CODE(KEYCODE_F12)        PORT_CHAR(UCHAR_MAMEKEY(F12))
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Alt Graph")    PORT_CODE(KEYCODE_RALT)       PORT_CHAR(UCHAR_MAMEKEY(RALT))
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Alt Graph")    PORT_CODE(KEYCODE_RALT)       PORT_CHAR(UCHAR_SHIFT_2)
 
 	PORT_MODIFY("ROW1")
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Alt")          PORT_CODE(KEYCODE_LALT)       PORT_CHAR(UCHAR_MAMEKEY(LALT))
@@ -504,7 +560,6 @@ INPUT_PORTS_START( hle_type3_device )
 	PORT_MODIFY("ROW6")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Line Feed")                                  PORT_CHAR(10)
 
-	// TODO: work out what actually happens with DIPs on Type 3 keyboard
 	PORT_START("DIP")
 	PORT_BIT( 0xff, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
@@ -593,10 +648,17 @@ INPUT_PORTS_START( hle_type5_device )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( hle_type5_uk_device )
-	PORT_INCLUDE(basic_uk )
+INPUT_PORTS_START( hle_type5_gb_device )
+	PORT_INCLUDE(basic_gb)
 	PORT_INCLUDE(type5_ext)
 	TYPE5_DIPS(0x0e)
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START( hle_type5_se_device )
+	PORT_INCLUDE(basic_se)
+	PORT_INCLUDE(type5_ext)
+	TYPE5_DIPS(0x0b)
 INPUT_PORTS_END
 
 
@@ -693,7 +755,7 @@ WRITE_LINE_MEMBER( hle_device_base::input_txd )
 /*--------------------------------------------------
     hle_device_base::device_start
     perform expensive initialisations, allocate
-	resources, register for save state
+    resources, register for save state
 --------------------------------------------------*/
 
 void hle_device_base::device_start()
@@ -718,7 +780,7 @@ void hle_device_base::device_start()
 /*--------------------------------------------------
     hle_device_base::device_reset
     perform startup tasks, also used for host
-	requested reset
+    requested reset
 --------------------------------------------------*/
 
 void hle_device_base::device_reset()
@@ -793,7 +855,7 @@ void hle_device_base::device_timer(emu_timer &timer, device_timer_id id, int par
 /*--------------------------------------------------
     hle_device_base::tra_callback
     send output of serial transmit shift register
-	to host
+    to host
 --------------------------------------------------*/
 
 void hle_device_base::tra_callback()
@@ -896,7 +958,7 @@ void hle_device_base::rcv_complete()
 /*--------------------------------------------------
     hle_device_base::scan_row
     scan the next row in the keyboard matrix and
-	send update to host
+    send update to host
 --------------------------------------------------*/
 
 void hle_device_base::scan_row()
@@ -980,6 +1042,23 @@ void hle_device_base::send_byte(UINT8 code)
 
 
 /***************************************************************************
+    BASE TYPE 4/5/6 HLE KEYBOARD DEVICE
+***************************************************************************/
+
+/*--------------------------------------------------
+    hle_type4_device_base::ident_byte
+    return identification byte for self test pass
+    response
+--------------------------------------------------*/
+
+UINT8 hle_type4_device_base::ident_byte()
+{
+	return (m_dips->read() & 0x80U) ? 0x03U : 0x04U;
+}
+
+
+
+/***************************************************************************
     TYPE 3 HLE KEYBOARD DEVICE
 ***************************************************************************/
 
@@ -993,7 +1072,8 @@ hle_type3_device::hle_type3_device(
 		char const *tag,
 		device_t *owner,
 		UINT32 clock)
-	: hle_type3_device(mconfig,
+	: hle_device_base(
+			mconfig,
 			SUN_TYPE3_HLE_KEYBOARD,
 			"Sun Type 3 Keyboard (HLE)",
 			tag,
@@ -1001,25 +1081,6 @@ hle_type3_device::hle_type3_device(
 			clock,
 			"type3_hle_kbd",
 			__FILE__)
-{
-}
-
-
-/*--------------------------------------------------
-    hle_type3_device::hle_type3_device
-    designated device constructor
---------------------------------------------------*/
-
-hle_type3_device::hle_type3_device(
-		machine_config const &mconfig,
-		device_type type,
-		char const *name,
-		char const *tag,
-		device_t *owner,
-		UINT32 clock,
-		char const *shortname,
-		char const *source)
-	: hle_device_base(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
@@ -1037,8 +1098,8 @@ ioport_constructor hle_type3_device::device_input_ports() const
 
 /*--------------------------------------------------
     hle_type3_device::ident_byte
-	return identification byte for self test pass
-	response
+    return identification byte for self test pass
+    response
 --------------------------------------------------*/
 
 UINT8 hle_type3_device::ident_byte()
@@ -1062,7 +1123,8 @@ hle_type4_device::hle_type4_device(
 		char const *tag,
 		device_t *owner,
 		UINT32 clock)
-	: hle_type4_device(mconfig,
+	: hle_type4_device_base(
+			mconfig,
 			SUN_TYPE4_HLE_KEYBOARD,
 			"Sun Type 4 Keyboard (HLE)",
 			tag,
@@ -1075,25 +1137,6 @@ hle_type4_device::hle_type4_device(
 
 
 /*--------------------------------------------------
-    hle_type4_device::hle_type4_device
-    designated device constructor
---------------------------------------------------*/
-
-hle_type4_device::hle_type4_device(
-		machine_config const &mconfig,
-		device_type type,
-		char const *name,
-		char const *tag,
-		device_t *owner,
-		UINT32 clock,
-		char const *shortname,
-		char const *source)
-	: hle_device_base(mconfig, type, name, tag, owner, clock, shortname, source)
-{
-}
-
-
-/*--------------------------------------------------
     hle_type4_device::device_input_ports
     get input ports for this device
 --------------------------------------------------*/
@@ -1101,18 +1144,6 @@ hle_type4_device::hle_type4_device(
 ioport_constructor hle_type4_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(hle_type4_device);
-}
-
-
-/*--------------------------------------------------
-    hle_type4_device::ident_byte
-	return identification byte for self test pass
-	response
---------------------------------------------------*/
-
-UINT8 hle_type4_device::ident_byte()
-{
-	return (m_dips->read() & 0x80U) ? 0x03U : 0x04U;
 }
 
 
@@ -1131,33 +1162,15 @@ hle_type5_device::hle_type5_device(
 		char const *tag,
 		device_t *owner,
 		UINT32 clock)
-	: hle_type5_device(mconfig,
+	: hle_type4_device_base(
+			mconfig,
 			SUN_TYPE5_HLE_KEYBOARD,
-			"Sun Type 5 US Keyboard (HLE)",
+			"Sun Type 5 Keyboard (U.S.A. - HLE)",
 			tag,
 			owner,
 			clock,
 			"type5_hle_kbd",
 			__FILE__)
-{
-}
-
-
-/*--------------------------------------------------
-    hle_type5_device::hle_type5_device
-    designated device constructor
---------------------------------------------------*/
-
-hle_type5_device::hle_type5_device(
-		machine_config const &mconfig,
-		device_type type,
-		char const *name,
-		char const *tag,
-		device_t *owner,
-		UINT32 clock,
-		char const *shortname,
-		char const *source)
-	: hle_device_base(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
@@ -1173,36 +1186,25 @@ ioport_constructor hle_type5_device::device_input_ports() const
 }
 
 
-/*--------------------------------------------------
-    hle_type5_device::ident_byte
-	return identification byte for self test pass
-	response
---------------------------------------------------*/
-
-UINT8 hle_type5_device::ident_byte()
-{
-	return 0x04U;
-}
-
-
 
 /***************************************************************************
     TYPE 5 UK HLE KEYBOARD DEVICE
 ***************************************************************************/
 
 /*--------------------------------------------------
-    hle_type5_uk_device::hle_type5_uk_device
+    hle_type5_gb_device::hle_type5_gb_device
     abbreviated constructor
 --------------------------------------------------*/
 
-hle_type5_uk_device::hle_type5_uk_device(
+hle_type5_gb_device::hle_type5_gb_device(
 		machine_config const &mconfig,
 		char const *tag,
 		device_t *owner,
 		UINT32 clock)
-	: hle_type5_uk_device(mconfig,
+	: hle_type4_device_base(
+			mconfig,
 			SUN_TYPE5_HLE_KEYBOARD,
-			"Sun Type 5 UK Keyboard (HLE)",
+			"Sun Type 5 Keyboard (Great Britain - HLE)",
 			tag,
 			owner,
 			clock,
@@ -1213,44 +1215,52 @@ hle_type5_uk_device::hle_type5_uk_device(
 
 
 /*--------------------------------------------------
-    hle_type5_uk_device::hle_type5_uk_device
-    designated device constructor
---------------------------------------------------*/
-
-hle_type5_uk_device::hle_type5_uk_device(
-		machine_config const &mconfig,
-		device_type type,
-		char const *name,
-		char const *tag,
-		device_t *owner,
-		UINT32 clock,
-		char const *shortname,
-		char const *source)
-	: hle_device_base(mconfig, type, name, tag, owner, clock, shortname, source)
-{
-}
-
-
-/*--------------------------------------------------
-    hle_type5_uk_device::device_input_ports
+    hle_type5_gb_device::device_input_ports
     get input ports for this device
 --------------------------------------------------*/
 
-ioport_constructor hle_type5_uk_device::device_input_ports() const
+ioport_constructor hle_type5_gb_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME(hle_type5_uk_device);
+	return INPUT_PORTS_NAME(hle_type5_gb_device);
+}
+
+
+
+/***************************************************************************
+    TYPE 5 SWEDISH HLE KEYBOARD DEVICE
+***************************************************************************/
+
+/*--------------------------------------------------
+    hle_type5_se_device::hle_type5_se_device
+    abbreviated constructor
+--------------------------------------------------*/
+
+hle_type5_se_device::hle_type5_se_device(
+		machine_config const &mconfig,
+		char const *tag,
+		device_t *owner,
+		UINT32 clock)
+	: hle_type4_device_base(
+			mconfig,
+			SUN_TYPE5_HLE_KEYBOARD,
+			"Sun Type 5 Keyboard (Sweden - HLE)",
+			tag,
+			owner,
+			clock,
+			"type5_hle_kbd",
+			__FILE__)
+{
 }
 
 
 /*--------------------------------------------------
-    hle_type5_uk_device::ident_byte
-	return identification byte for self test pass
-	response
+    hle_type5_se_device::device_input_ports
+    get input ports for this device
 --------------------------------------------------*/
 
-UINT8 hle_type5_uk_device::ident_byte()
+ioport_constructor hle_type5_se_device::device_input_ports() const
 {
-	return 0x04U;
+	return INPUT_PORTS_NAME(hle_type5_se_device);
 }
 
 } } // namespace bus::sunkbd
