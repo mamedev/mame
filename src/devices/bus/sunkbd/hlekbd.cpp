@@ -19,7 +19,7 @@
     0000 0011               bell off
     0000 1010               enable keyclick (5ms duration 480us period on make)
     0000 1011               disable keyclick
-    0000 1110  ---- lscn    LED (1 = on, l = caps lock, s = scroll lock, c = compose, n = num lock)
+    0000 1110  ---k lscn    LED (1 = on, k = kana, l = caps lock, s = scroll lock, c = compose, n = num lock)
     0000 1111               layout request (keyboard responds with layout response)
 
     message from keyboad to host:
@@ -110,6 +110,23 @@
     5f  61    4c     13   78                79                7a  43  0d    18  1b  1c      5e    32  5a
 
     double-height return key, 58 (US backslash) moved to home row, 7c added on left of bottom row
+
+
+    Type 5 Japanese layout:
+
+      76      1d      05  06  08  0a    0c  0e  10  11    12  07  09  0b    16  17  15    2d  02  04  30
+
+    01  03    2a  1e  1f  20  21  22  23  24  25  26  27  28  29      2b    2c  34  60    62  2e  2f  47
+    19  1a    35    36  37  38  39  3a  3b  3c  3d  3e  3f  40  41          42  4a  7b    44  45  46
+    31  33    77     4d  4e  4f  50  51  52  53  54  55  56  57  58   59                  5b  5c  5d  7d
+    48  49    63       64  65  66  67  68  69  6a  6b  6c  6d  6f     6e        14        70  71  72
+    5f  61    4c  13  78   73           79           74   75  7a  43  0d    18  1b  1c      5e    32  5a
+
+    double-height return key
+    yen/pipe replaces backtick/tilde at top left corner of main area
+    linefeed scancode repurposed for backslash/underscore
+    kana replaces alt graph (with LED window)
+    extra kakutei, henkan and nihongo on-off keys
 */
 
 
@@ -122,6 +139,7 @@ device_type const SUN_TYPE4_HLE_KEYBOARD    = &device_creator<bus::sunkbd::hle_t
 device_type const SUN_TYPE5_HLE_KEYBOARD    = &device_creator<bus::sunkbd::hle_type5_device>;
 device_type const SUN_TYPE5_GB_HLE_KEYBOARD = &device_creator<bus::sunkbd::hle_type5_gb_device>;
 device_type const SUN_TYPE5_SE_HLE_KEYBOARD = &device_creator<bus::sunkbd::hle_type5_se_device>;
+device_type const SUN_TYPE5_JP_HLE_KEYBOARD = &device_creator<bus::sunkbd::hle_type5_jp_device>;
 
 
 
@@ -369,6 +387,41 @@ INPUT_PORTS_START( basic_se )
 
 	PORT_MODIFY("ROW7")
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('<') PORT_CHAR('>') PORT_CHAR('|')
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START( basic_jp )
+	PORT_INCLUDE( basic )
+
+	PORT_MODIFY("ROW1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_2)          PORT_CHAR('2') PORT_CHAR('"')
+
+	PORT_MODIFY("ROW2")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_6)          PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_7)          PORT_CHAR('7') PORT_CHAR('\'')
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_8)          PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_0)          PORT_CHAR('0')
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-') PORT_CHAR('=')
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('^') PORT_CHAR('~')
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_TILDE)      PORT_CHAR(0x00a5U) PORT_CHAR('|')
+
+	PORT_MODIFY("ROW4")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('@') PORT_CHAR('`')
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('[') PORT_CHAR('{')
+
+	PORT_MODIFY("ROW5")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR('+')
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(':') PORT_CHAR('*')
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR(']') PORT_CHAR('}')
+
+	PORT_MODIFY("ROW6")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('\\') PORT_CHAR('_')
+
+	PORT_MODIFY("ROW7")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Kakutei")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Henkan")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Nihongo On-Off") PORT_CODE(KEYCODE_MENU)
 INPUT_PORTS_END
 
 
@@ -662,6 +715,16 @@ INPUT_PORTS_START( hle_type5_se_device )
 INPUT_PORTS_END
 
 
+INPUT_PORTS_START( hle_type5_jp_device )
+	PORT_INCLUDE(basic_jp)
+	PORT_INCLUDE(type5_ext)
+	TYPE5_DIPS(0x11)
+
+	PORT_MODIFY("ROW0")
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Kana")         PORT_CODE(KEYCODE_RALT)
+INPUT_PORTS_END
+
+
 
 /***************************************************************************
     MACHINE CONFIGURATION FRAGMENTS
@@ -809,6 +872,7 @@ void hle_device_base::device_reset()
 	machine().output().set_led_value(LED_COMPOSE, 0);
 	machine().output().set_led_value(LED_SCROLL, 0);
 	machine().output().set_led_value(LED_CAPS, 0);
+	machine().output().set_led_value(LED_KANA, 0);
 
 	// send reset response
 	send_byte(0xffU);
@@ -900,6 +964,7 @@ void hle_device_base::rcv_complete()
 		machine().output().set_led_value(LED_COMPOSE, BIT(code, 1));
 		machine().output().set_led_value(LED_SCROLL, BIT(code, 2));
 		machine().output().set_led_value(LED_CAPS, BIT(code, 3));
+		machine().output().set_led_value(LED_KANA, BIT(code, 4));
 		m_rx_state = RX_IDLE;
 		break;
 
@@ -1208,7 +1273,7 @@ hle_type5_gb_device::hle_type5_gb_device(
 			tag,
 			owner,
 			clock,
-			"type5_hle_kbd",
+			"type5_gb_hle_kbd",
 			__FILE__)
 {
 }
@@ -1247,7 +1312,7 @@ hle_type5_se_device::hle_type5_se_device(
 			tag,
 			owner,
 			clock,
-			"type5_hle_kbd",
+			"type5_se_hle_kbd",
 			__FILE__)
 {
 }
@@ -1261,6 +1326,45 @@ hle_type5_se_device::hle_type5_se_device(
 ioport_constructor hle_type5_se_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(hle_type5_se_device);
+}
+
+
+
+/***************************************************************************
+    TYPE 5 JAPANESE HLE KEYBOARD DEVICE
+***************************************************************************/
+
+/*--------------------------------------------------
+    hle_type5_jp_device::hle_type5_jp_device
+    abbreviated constructor
+--------------------------------------------------*/
+
+hle_type5_jp_device::hle_type5_jp_device(
+		machine_config const &mconfig,
+		char const *tag,
+		device_t *owner,
+		UINT32 clock)
+	: hle_type4_device_base(
+			mconfig,
+			SUN_TYPE5_HLE_KEYBOARD,
+			"Sun Type 5 Keyboard (Japan - HLE)",
+			tag,
+			owner,
+			clock,
+			"type5_jp_hle_kbd",
+			__FILE__)
+{
+}
+
+
+/*--------------------------------------------------
+    hle_type5_jp_device::device_input_ports
+    get input ports for this device
+--------------------------------------------------*/
+
+ioport_constructor hle_type5_jp_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(hle_type5_jp_device);
 }
 
 } } // namespace bus::sunkbd
