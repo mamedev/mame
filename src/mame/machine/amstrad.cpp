@@ -1996,6 +1996,16 @@ void amstrad_state::amstrad_plus_seqcheck(int data)
 			m_asic.enabled = 1;
 		}
 	}
+	else
+	{
+		// last byte of ASIC sequence can be any value
+		if(m_asic.seqptr == 14)
+		{
+			m_asic.seqptr++;
+			logerror("SYS: ASIC unlocked\n");
+			m_asic.enabled = 1;
+		}
+	}
 	m_prev_data = data;
 }
 
