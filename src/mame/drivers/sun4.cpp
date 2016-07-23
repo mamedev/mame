@@ -1342,23 +1342,6 @@ void sun4_state::machine_reset()
 	m_scsi_irq = 0;
 	m_scsi_drq = 0;
 
-	for (UINT32 i = 0; i < (0x7f8 - 0x7d7); i++)
-	{
-		m_timekpr->write(m_maincpu->space(AS_PROGRAM), 0x7d7 + i, 0);
-	}
-
-	m_timekpr->write(m_maincpu->space(AS_PROGRAM), 0x7d9, 0x12);
-	m_timekpr->write(m_maincpu->space(AS_PROGRAM), 0x7e4, 0x34);
-	m_timekpr->write(m_maincpu->space(AS_PROGRAM), 0x7e5, 0x56);
-	m_timekpr->write(m_maincpu->space(AS_PROGRAM), 0x7e6, 0x78);
-
-	m_timekpr->write(m_maincpu->space(AS_PROGRAM), 0x7da, 0x11);
-	m_timekpr->write(m_maincpu->space(AS_PROGRAM), 0x7db, 0x22);
-	m_timekpr->write(m_maincpu->space(AS_PROGRAM), 0x7dc, 0x33);
-	m_timekpr->write(m_maincpu->space(AS_PROGRAM), 0x7dd, 0x44);
-	m_timekpr->write(m_maincpu->space(AS_PROGRAM), 0x7de, 0x55);
-	m_timekpr->write(m_maincpu->space(AS_PROGRAM), 0x7df, 0x66);
-
 	memset(m_counter, 0, sizeof(m_counter));
 	memset(m_dma, 0, sizeof(m_dma));
 }
@@ -2291,7 +2274,7 @@ ROM_END
  * :scc1 A Reg 00 <- 10 Reset External/Status Interrupt
  *
  * SCC init 2 for the keyboard - is Identical to init 1
- * 
+ *
  * SCC init 3 for the keyboard - tricky one that reprogramms the baudrate constant as the last step.
  * -------------------------------------------------------------------------------------------------
  * :scc1 A Reg 09 <- 02 Master Interrupt Control - No Reset, No vector
