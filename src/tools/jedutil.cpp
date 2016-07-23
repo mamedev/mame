@@ -88,6 +88,8 @@
         PAL20R6     = QP24 QF2560
         PAL20R8     = QP24 QF2560
 
+        PAL20RA10   = QP24 QF3210
+
         PAL20X4     = QP24 QF1600
         PAL20X8     = QP24 QF1600
         PAL20X10    = QP24 QF1600
@@ -281,6 +283,7 @@ static void print_pal20l10_product_terms(const pal_data* pal, const jed_data* je
 static void print_pal20r4_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_pal20r6_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_pal20r8_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_pal20ra10_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_pal20x4_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_pal20x8_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_pal20x10_product_terms(const pal_data* pal, const jed_data* jed);
@@ -342,6 +345,7 @@ static void config_pal20l10_pins(const pal_data* pal, const jed_data* jed);
 static void config_pal20r4_pins(const pal_data* pal, const jed_data* jed);
 static void config_pal20r6_pins(const pal_data* pal, const jed_data* jed);
 static void config_pal20r8_pins(const pal_data* pal, const jed_data* jed);
+static void config_pal20ra10_pins(const pal_data* pal, const jed_data* jed);
 static void config_pal20x4_pins(const pal_data* pal, const jed_data* jed);
 static void config_pal20x8_pins(const pal_data* pal, const jed_data* jed);
 static void config_pal20x10_pins(const pal_data* pal, const jed_data* jed);
@@ -607,6 +611,18 @@ static pin_fuse_rows pal20r8pinfuserows[] = {
 	{20, NO_OUTPUT_ENABLE_FUSE_ROW, 640, 920},   /* Registered Output */
 	{21, NO_OUTPUT_ENABLE_FUSE_ROW, 320, 600},   /* Registered Output */
 	{22, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 280}};    /* Registered Output */
+
+static pin_fuse_rows pal20ra10pinfuserows[] = {
+    { 14, 0, 0, 0 },  /* Registered Output */
+    { 15, 0, 0, 0 },  /* Registered Output */
+    { 16, 0, 0, 0 },  /* Registered Output */
+    { 17, 0, 0, 0 },  /* Registered Output */
+    { 18, 0, 0, 0 },  /* Registered Output */
+    { 19, 0, 0, 0 },  /* Registered Output */
+    { 20, 0, 0, 0 },  /* Registered Output */
+    { 21, 0, 0, 0 },  /* Registered Output */
+    { 22, 0, 0, 0 },  /* Registered Output */
+    { 23, 0, 0, 0 }}; /* Registered Output */
 
 static pin_fuse_rows pal20x4pinfuserows[] = {
 	{14, 1440, 1480, 1560},
@@ -1335,6 +1351,28 @@ static pin_fuse_columns pal20r8pinfusecolumns[] = {
 	{21, 11, 10},
 	{22, 7, 6},
 	{23, 3, 2}};
+
+static pin_fuse_columns pal20ra10pinfusecolumns[] = {
+    {2, 1, 0},
+    {3, 5, 4},
+    {4, 9, 8},
+    {5, 13, 12},
+    {6, 17, 16},
+    {7, 21, 20},
+    {8, 25, 24},
+    {9, 29, 28},
+    {10, 33, 32},
+    {11, 37, 36},
+    {14, 39, 38},
+    {15, 35, 34},
+    {16, 31, 30},
+    {17, 27, 26},
+    {18, 23, 22},
+    {19, 19, 18},
+    {20, 15, 14},
+    {21, 11, 10},
+    {22, 7, 6},
+    {23, 3, 2}};
 
 static pin_fuse_columns pal20x4pinfusecolumns[] = {
 	{2, 1, 0},
@@ -2068,7 +2106,14 @@ static pal_data paldata[] = {
 		config_pal20r8_pins,
 		nullptr,
 		nullptr},
-	{"PAL20X4", 1600,
+    {"PAL20RA10", 3210,
+        pal20ra10pinfuserows, ARRAY_LENGTH(pal20ra10pinfuserows),
+        pal20ra10pinfusecolumns, ARRAY_LENGTH(pal20ra10pinfusecolumns),
+        print_pal20ra10_product_terms,
+        config_pal20ra10_pins,
+        nullptr,
+        nullptr },
+    {"PAL20X4", 1600,
 		pal20x4pinfuserows, ARRAY_LENGTH(pal20x4pinfuserows),
 		pal20x4pinfusecolumns, ARRAY_LENGTH(pal20x4pinfusecolumns),
 		print_pal20x4_product_terms,
@@ -3552,6 +3597,18 @@ static void print_pal20r6_product_terms(const pal_data* pal, const jed_data* jed
 static void print_pal20r8_product_terms(const pal_data* pal, const jed_data* jed)
 {
 	print_product_terms(pal, jed);
+}
+
+
+
+/*-------------------------------------------------
+print_pal20ra10_product_terms - prints the product
+terms for a PAL20RA10
+-------------------------------------------------*/
+
+static void print_pal20ra10_product_terms(const pal_data* pal, const jed_data* jed)
+{
+    print_product_terms(pal, jed);
 }
 
 
@@ -5615,6 +5672,32 @@ static void config_pal20r8_pins(const pal_data* pal, const jed_data* jed)
 
 	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
 	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
+}
+
+
+
+/*-------------------------------------------------
+config_pal20ra10_pins - configures the pins for
+a PAL20RA10
+-------------------------------------------------*/
+
+static void config_pal20ra10_pins(const pal_data* pal, const jed_data* jed)
+{
+    static UINT16 input_pins[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 };
+    static pin_output_config output_pins[] = {
+        {14, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
+        {15, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
+        {16, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
+        {17, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
+        {18, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
+        {19, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
+        {20, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
+        {21, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
+        {22, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
+        {23, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED}};
+
+    set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+    set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 

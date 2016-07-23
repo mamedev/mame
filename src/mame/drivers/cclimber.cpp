@@ -2335,6 +2335,13 @@ ROM_START( swimmerb )
 	ROM_LOAD( "18s030.12c",   0x0200, 0x020, CRC(3b2deb3a) SHA1(bb7b5c662454f5b355cc59cbdf8879e4664bed1d) )
 ROM_END
 
+/*
+	Guzzler
+
+    CPU/Sound Board: B102-403
+    Video Board:     102-401
+*/
+
 ROM_START( guzzler )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "guzz-01.bin",  0x0000, 0x2000, CRC(58aaa1e9) SHA1(4ea9c85670a0d71483ac79564093043762a24b2c) )
@@ -2362,6 +2369,14 @@ ROM_START( guzzler )
 	ROM_LOAD( "guzzler.001",  0x0200, 0x020, CRC(69089495) SHA1(96b067b22be14536bac748f8d61e5587a8a04e92) )
 ROM_END
 
+/*
+	Guzzler (Swimmer Conversion)
+
+    CPU/Sound Board:   B102-403
+    Video Board:       102-401
+    CPU Daughterboard: C102-405
+*/
+
 ROM_START( guzzlers ) /* Swimmer Conversion, 1k vs 2k romsize in maincpu */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "guzz1.l9",  0x0000, 0x1000, CRC(48f751ee) SHA1(a8ff19d150d382a43ad705fe2a470450e317aac3) )
@@ -2388,9 +2403,12 @@ ROM_START( guzzlers ) /* Swimmer Conversion, 1k vs 2k romsize in maincpu */
 	ROM_LOAD( "guzz-09.bin",  0x2000, 0x1000, CRC(18927579) SHA1(414676193ef1f6ce79a4cba73e4d017312f766f4) ) // 9.C4
 
 	ROM_REGION( 0x0220, "proms", 0 )
-	ROM_LOAD( "guzzler.003",  0x0000, 0x100, CRC(f86930c1) SHA1(58efc8cbef05e1612d12e2f0babddf15571d42bb) ) // B.B13
-	ROM_LOAD( "guzzler.002",  0x0100, 0x100, CRC(b566ea9e) SHA1(345078af6a339fbe6cd966046acd9d04c8926b5c) ) // A.A13
-	ROM_LOAD( "c.c12",        0x0200, 0x020, CRC(51cd9980) SHA1(9c4858a01c9b03ff8c87ba9f11049e0c1af5d519) )
+	ROM_LOAD( "guzzler.003",  0x0000, 0x0100, CRC(f86930c1) SHA1(58efc8cbef05e1612d12e2f0babddf15571d42bb) ) // B.B13
+	ROM_LOAD( "guzzler.002",  0x0100, 0x0100, CRC(b566ea9e) SHA1(345078af6a339fbe6cd966046acd9d04c8926b5c) ) // A.A13
+	ROM_LOAD( "c.c12",        0x0200, 0x0020, CRC(51cd9980) SHA1(9c4858a01c9b03ff8c87ba9f11049e0c1af5d519) )
+
+	ROM_REGION( 0x0104, "cpu_pal", 0) /* C102-405 */
+	ROM_LOAD( "tk01.bin",     0x0000, 0x0104, CRC(af082b3c) SHA1(94ee780945255ebfc2a0848a40289fbc4c7e7d7c) ) // appears to be PAL16L8
 ROM_END
 
 ROM_START( yamato )
