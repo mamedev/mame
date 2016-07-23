@@ -91,7 +91,7 @@ public:
 	const char *filename() const { return m_filename.c_str(); }
 	const char *fullpath() const { return m_fullpath.c_str(); }
 	UINT32 openflags() const { return m_openflags; }
-	hash_collection &hashes(const char *types);
+	util::hash_collection &hashes(const char *types);
 	bool restrict_to_mediapath() const { return m_restrict_to_mediapath; }
 	bool part_of_mediapath(std::string path);
 
@@ -155,7 +155,7 @@ private:
 	path_iterator   m_mediapaths;                   // media-path iterator
 	UINT32          m_crc;                          // file's CRC
 	UINT32          m_openflags;                    // flags we used for the open
-	hash_collection m_hashes;                       // collection of hashes
+	util::hash_collection m_hashes;                       // collection of hashes
 
 	std::unique_ptr<util::archive_file> m_zipfile;  // ZIP file pointer
 	dynamic_buffer  m_zipdata;                      // ZIP file data

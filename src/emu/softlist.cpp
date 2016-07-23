@@ -738,7 +738,7 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 				if (data->_hashdata != nullptr)
 				{
 					// make sure the hash is valid
-					hash_collection hashes;
+					util::hash_collection hashes;
 					if (!hashes.from_internal_string(data->_hashdata))
 						osd_printf_error("%s: %s has rom '%s' with an invalid hash string '%s'\n", filename(), swinfo.shortname().c_str(), data->_name, data->_hashdata);
 				}
@@ -1272,7 +1272,7 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 				else
 				{
 					if (!crc.empty() && !sha1.empty())
-						hashdata = string_format("%c%s%c%s%s", hash_collection::HASH_CRC, crc, hash_collection::HASH_SHA1, sha1, (baddump ? BAD_DUMP : ""));
+						hashdata = string_format("%c%s%c%s%s", util::hash_collection::HASH_CRC, crc, util::hash_collection::HASH_SHA1, sha1, (baddump ? BAD_DUMP : ""));
 					else
 						parse_error("Incomplete rom hash definition");
 				}
@@ -1319,7 +1319,7 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 			const bool baddump = (status == "baddump");
 			const bool nodump = (status == "nodump" );
 			const bool writeable = (writeablestr == "yes");
-			std::string hashdata = string_format("%c%s%s", hash_collection::HASH_SHA1, sha1, (nodump ? NO_DUMP : (baddump ? BAD_DUMP : "")));
+			std::string hashdata = string_format("%c%s%s", util::hash_collection::HASH_SHA1, sha1, (nodump ? NO_DUMP : (baddump ? BAD_DUMP : "")));
 
 			add_rom_entry(name.c_str(), hashdata.c_str(), 0, 0, ROMENTRYTYPE_ROM | (writeable ? DISK_READWRITE : DISK_READONLY));
 		}

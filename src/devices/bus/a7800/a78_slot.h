@@ -75,7 +75,7 @@ protected:
 };
 
 
-void a78_partialhash(hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
+void a78_partialhash(util::hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
 
 
 // ======================> a78_cart_slot_device

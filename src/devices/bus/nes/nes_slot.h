@@ -326,7 +326,7 @@ protected:
 	std::vector<UINT16> m_prg_bank_map;
 };
 
-void nes_partialhash(hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
+void nes_partialhash(util::hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
 
 // ======================> nes_cart_slot_device
 

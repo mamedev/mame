@@ -2599,11 +2599,11 @@ std::unique_ptr<rpk_socket> rpk_reader::load_rom_resource(util::archive_file &zi
 	sha1 = xml_get_attribute_string(rom_resource_node, "sha1", nullptr);
 	if (sha1 != nullptr)
 	{
-		hash_collection actual_hashes;
-		actual_hashes.compute((const UINT8 *)contents, length, hash_collection::HASH_TYPES_CRC_SHA1);
+		util::hash_collection actual_hashes;
+		actual_hashes.compute((const UINT8 *)contents, length, util::hash_collection::HASH_TYPES_CRC_SHA1);
 
-		hash_collection expected_hashes;
-		expected_hashes.add_from_string(hash_collection::HASH_SHA1, sha1, strlen(sha1));
+		util::hash_collection expected_hashes;
+		expected_hashes.add_from_string(util::hash_collection::HASH_SHA1, sha1, strlen(sha1));
 
 		if (actual_hashes != expected_hashes) throw rpk_exception(RPK_INVALID_FILE_REF, "SHA1 check failed");
 	}

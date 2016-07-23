@@ -56,6 +56,8 @@ project "utils"
 		MAME_DIR .. "src/lib/util/flac.h",
 		MAME_DIR .. "src/lib/util/harddisk.cpp",
 		MAME_DIR .. "src/lib/util/harddisk.h",
+		MAME_DIR .. "src/lib/util/hash.cpp",
+		MAME_DIR .. "src/lib/util/hash.h",
 		MAME_DIR .. "src/lib/util/hashing.cpp",
 		MAME_DIR .. "src/lib/util/hashing.h",
 		MAME_DIR .. "src/lib/util/huffman.cpp",

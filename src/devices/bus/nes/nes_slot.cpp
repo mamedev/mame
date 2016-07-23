@@ -1034,7 +1034,7 @@ WRITE8_MEMBER(nes_cart_slot_device::write_ex)
 //  device_image_partialhash_func
 //-------------------------------------------------
 
-void nes_partialhash(hash_collection &dest, const unsigned char *data,
+void nes_partialhash(util::hash_collection &dest, const unsigned char *data,
 						unsigned long length, const char *functions)
 {
 	if (length <= 16)

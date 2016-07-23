@@ -687,8 +687,8 @@ void menu_select_game::build_available_list()
 				for (; !ROMENTRY_ISEND(rom) && noroms == true; ++rom)
 					if (ROMENTRY_ISFILE(rom))
 					{
-						hash_collection hashes(ROM_GETHASHDATA(rom));
-						if (!hashes.flag(hash_collection::FLAG_NO_DUMP) && !ROM_ISOPTIONAL(rom))
+						util::hash_collection hashes(ROM_GETHASHDATA(rom));
+						if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP) && !ROM_ISOPTIONAL(rom))
 							noroms = false;
 					}
 
@@ -711,8 +711,8 @@ void menu_select_game::build_available_list()
 							{
 								if (ROMENTRY_ISFILE(rom))
 								{
-									hash_collection hashes(ROM_GETHASHDATA(rom));
-									if (hashes.flag(hash_collection::FLAG_NO_DUMP) || ROM_ISOPTIONAL(rom))
+									util::hash_collection hashes(ROM_GETHASHDATA(rom));
+									if (hashes.flag(util::hash_collection::FLAG_NO_DUMP) || ROM_ISOPTIONAL(rom))
 										continue;
 
 									UINT64 lenght = ROM_GETLENGTH(rom);
@@ -721,8 +721,8 @@ void menu_select_game::build_available_list()
 									{
 										if (ROMENTRY_ISFILE(parentrom) && ROM_GETLENGTH(parentrom) == lenght)
 										{
-											hash_collection parenthashes(ROM_GETHASHDATA(parentrom));
-											if (parenthashes.flag(hash_collection::FLAG_NO_DUMP) || ROM_ISOPTIONAL(parentrom))
+											util::hash_collection parenthashes(ROM_GETHASHDATA(parentrom));
+											if (parenthashes.flag(util::hash_collection::FLAG_NO_DUMP) || ROM_ISOPTIONAL(parentrom))
 												continue;
 
 											if (hashes == parenthashes)

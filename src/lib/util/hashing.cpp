@@ -14,6 +14,7 @@
 #include <sstream>
 
 
+namespace util {
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
@@ -291,3 +292,5 @@ void crc16_creator::append(const void *data, UINT32 length)
 		crc = (crc << 8) ^ s_table[(crc >> 8) ^ *src++];
 	m_accum.m_raw = crc;
 }
+
+} // namespace util
