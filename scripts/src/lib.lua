@@ -81,6 +81,8 @@ project "utils"
 		MAME_DIR .. "src/lib/util/pool.h",
 		MAME_DIR .. "src/lib/util/sha1.cpp",
 		MAME_DIR .. "src/lib/util/sha1.h",
+		MAME_DIR .. "src/lib/util/softlist.cpp",
+		MAME_DIR .. "src/lib/util/softlist.h",
 		MAME_DIR .. "src/lib/util/strformat.h",
 		MAME_DIR .. "src/lib/util/timeconv.cpp",
 		MAME_DIR .. "src/lib/util/timeconv.h",
