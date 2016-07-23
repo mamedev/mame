@@ -36,8 +36,11 @@
 //**************************************************************************
 //  CONSTANTS & DEFINES
 //**************************************************************************
-#if defined(_MSC_VER)
+/* MINGW has adopted the MSVC formatting for 64-bit ints as of gcc 4.4 */
+#if defined(WIN32)
 #define I64FMT   "I64"
+#elif !defined(__APPLE__) && defined(__LP64__)
+#define I64FMT   "l"
 #else
 #define I64FMT   "ll"
 #endif
@@ -1735,7 +1738,7 @@ static void do_create_hd(parameters_t &params)
 		auto size_str = params.find(OPTION_SIZE);
 		if (size_str != params.end())
 		{
-			if (sscanf(size_str->second->c_str(), "%" I64FMT "d", &filesize) != 1)
+			if (sscanf(size_str->second->c_str(), "%" I64FMT"d", &filesize) != 1)
 				report_error(1, "Invalid size string");
 		}
 	}
