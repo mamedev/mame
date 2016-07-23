@@ -5,7 +5,7 @@
     CHD compression frontend
 
 ****************************************************************************/
-
+#include <stdio.h> // must be here otherwise issues with I64FMT in MINGW
 #include <assert.h>
 
 #include "osdcore.h"
