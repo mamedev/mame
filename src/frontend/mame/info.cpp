@@ -1561,7 +1561,7 @@ void info_xml_creator::output_software_list()
 {
 	for (const software_list_device &swlist : software_list_device_iterator(m_drivlist.config().root_device()))
 	{
-		fprintf(m_output, "\t\t<softwarelist name=\"%s\" ", swlist.list_name());
+		fprintf(m_output, "\t\t<softwarelist name=\"%s\" ", swlist.list_name().c_str());
 		fprintf(m_output, "status=\"%s\" ", (swlist.list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM) ? "original" : "compatible");
 		if (swlist.filter())
 			fprintf(m_output, "filter=\"%s\" ", swlist.filter());

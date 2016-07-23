@@ -23,7 +23,7 @@ int mame_options::m_device_options = 0;
 //  options for the configured system
 //-------------------------------------------------
 
-bool mame_options::add_slot_options(emu_options &options, const software_part *swpart)
+bool mame_options::add_slot_options(emu_options &options, const util::software_part *swpart)
 {
 	// look up the system configured by name; if no match, do nothing
 	const game_driver *cursystem = system(options);
@@ -75,7 +75,7 @@ bool mame_options::add_slot_options(emu_options &options, const software_part *s
 //  depending of image mounted
 //-------------------------------------------------
 
-void mame_options::update_slot_options(emu_options &options, const software_part *swpart)
+void mame_options::update_slot_options(emu_options &options, const util::software_part *swpart)
 {
 	// look up the system configured by name; if no match, do nothing
 	const game_driver *cursystem = system(options);
@@ -184,7 +184,7 @@ void mame_options::remove_device_options(emu_options &options)
 //  and update slot and image devices
 //-------------------------------------------------
 
-bool mame_options::parse_slot_devices(emu_options &options, int argc, char *argv[], std::string &error_string, const char *name, const char *value, const software_part *swpart)
+bool mame_options::parse_slot_devices(emu_options &options, int argc, char *argv[], std::string &error_string, const char *name, const char *value, const util::software_part *swpart)
 {
 	// an initial parse to capture the initial set of values
 	bool result;
@@ -375,9 +375,9 @@ void mame_options::set_system_name(emu_options &options, const char *name)
 
 		// look up the software part
 		machine_config config(*cursystem, options);
-		software_list_device *swlist = software_list_device::find_by_name(config, sw_list.c_str());
-		const software_info *swinfo = swlist != nullptr ? swlist->find(sw_name.c_str()) : nullptr;
-		const software_part *swpart = swinfo != nullptr ? swinfo->find_part(sw_part.c_str()) : nullptr;
+		software_list_device *swlist = software_list_device::find_by_name(config, sw_list);
+		const util::software_info *swinfo = swlist != nullptr ? swlist->find(sw_name.c_str()) : nullptr;
+		const util::software_part *swpart = swinfo != nullptr ? swinfo->find_part(sw_part.c_str()) : nullptr;
 
 		// then add the options
 		if (new_system)

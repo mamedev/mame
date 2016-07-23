@@ -29,22 +29,22 @@ public:
 		ENTRY
 	};
 
-	menu_software_parts(mame_ui_manager &mui, render_container &container, const software_info *info, const char *interface, const software_part **part, bool other_opt, result &result);
+	menu_software_parts(mame_ui_manager &mui, render_container &container, const util::software_info *info, const char *interface, const util::software_part **part, bool other_opt, result &result);
 	virtual ~menu_software_parts() override;
 
 private:
 	struct software_part_menu_entry {
 		result type;
-		const software_part *part;
+		const util::software_part *part;
 	};
 
 	virtual void populate() override;
 	virtual void handle() override;
 
 	// variables
-	const software_info *   m_info;
+	const util::software_info *   m_info;
 	const char *            m_interface;
-	const software_part **  m_selected_part;
+	const util::software_part **  m_selected_part;
 	bool                    m_other_opt;
 	result &                m_result;
 };
@@ -83,7 +83,7 @@ private:
 
 	// functions
 	int compare_entries(const entry_info &e1, const entry_info &e2, bool shortname);
-	void append_software_entry(const software_info &swinfo);
+	void append_software_entry(const util::software_info &swinfo);
 };
 
 

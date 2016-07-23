@@ -33,7 +33,7 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-menu_software_parts::menu_software_parts(mame_ui_manager &mui, render_container &container, const software_info *info, const char *interface, const software_part **part, bool other_opt, result &result)
+menu_software_parts::menu_software_parts(mame_ui_manager &mui, render_container &container, const util::software_info *info, const char *interface, const util::software_part **part, bool other_opt, result &result)
 	: menu(mui, container),
 		m_result(result)
 {
@@ -78,7 +78,7 @@ void menu_software_parts::populate()
 		item_append(_("[software list]"), "", 0, entry3);
 	}
 
-	for (const software_part &swpart : m_info->parts())
+	for (const  util::software_part &swpart : m_info->parts())
 	{
 		if (swpart.matches_interface(m_interface))
 		{
@@ -165,15 +165,15 @@ int menu_software_list::compare_entries(const entry_info &e1, const entry_info &
 //  append_software_entry - populate a specific list
 //-------------------------------------------------
 
-void menu_software_list::append_software_entry(const software_info &swinfo)
+void menu_software_list::append_software_entry(const util::software_info &swinfo)
 {
 	entry_info entry;
 	bool entry_updated = false;
 
 	// check if at least one of the parts has the correct interface and add a menu entry only in this case
-	for (const software_part &swpart : swinfo.parts())
+	for (const util::software_part &swpart : swinfo.parts())
 	{
-		if (swpart.matches_interface(m_interface) && swpart.is_compatible(*m_swlist) == SOFTWARE_IS_COMPATIBLE)
+		if (swpart.matches_interface(m_interface) && m_swlist->is_compatible(swpart) == SOFTWARE_IS_COMPATIBLE)
 		{
 			entry_updated = true;
 			entry.short_name.assign(swinfo.shortname());
@@ -202,7 +202,7 @@ void menu_software_list::append_software_entry(const software_info &swinfo)
 void menu_software_list::populate()
 {
 	// build up the list of entries for the menu
-	for (const software_info &swinfo : m_swlist->get_info())
+	for (const util::software_info &swinfo : m_swlist->get_info())
 		append_software_entry(swinfo);
 
 	// add an entry to change ordering
@@ -363,7 +363,7 @@ void menu_software::populate()
 			if (!swlistdev.get_info().empty() && m_interface != nullptr)
 			{
 				bool found = false;
-				for (const software_info &swinfo : swlistdev.get_info())
+				for (const util::software_info &swinfo : swlistdev.get_info())
 					if (swinfo.parts().front().matches_interface(m_interface))
 						found = true;
 				if (found)
@@ -376,7 +376,7 @@ void menu_software::populate()
 			if (!swlistdev.get_info().empty() && m_interface != nullptr)
 			{
 				bool found = false;
-				for (const software_info &swinfo : swlistdev.get_info())
+				for (const util::software_info &swinfo : swlistdev.get_info())
 					if (swinfo.parts().front().matches_interface(m_interface))
 						found = true;
 				if (found)
