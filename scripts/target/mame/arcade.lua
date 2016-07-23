@@ -647,6 +647,7 @@ BUSES["SMS_CTRL"] = true
 BUSES["SMS_EXP"] = true
 --BUSES["SNES"] = true
 --BUSES["SPC1000"] = true
+BUSES["SUNKBD"] = true
 --BUSES["TI99PEB"] = true
 --BUSES["TVC"] = true
 --BUSES["VBOY"] = true
