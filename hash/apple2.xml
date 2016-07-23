@@ -571,7 +571,7 @@
 
 	<software name="aklabeth">
 		<description>Akalabeth - World of Doom</description>
-		<year>19??</year>
+		<year>1979</year>
 		<publisher>California Pacific Computer</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -629,7 +629,7 @@
 
 	<software name="alien">
 		<description>Alien</description>
-		<year>19??</year>
+		<year>1982</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1932,7 +1932,7 @@
 
 	<software name="bbcstlwf">
 		<description>Beyond Beyond Castle Wolfenstein</description>
-		<year>19??</year>
+		<year>1984</year>
 		<publisher>Mindscape</publisher>
 
 		<part name="flop11" interface="floppy_5_25">
@@ -2110,7 +2110,7 @@
 
 	<software name="betedugv">
 		<description>La Bete du Gevaudan (crack)</description>
-		<year>19??</year>
+		<year>1985</year>
 		<publisher>Cil</publisher>
 
 		<part name="flop11" interface="floppy_5_25">
@@ -2168,7 +2168,7 @@
 
 	<software name="bilestod">
 		<description>The Bilestoad (crack)</description>
-		<year>19??</year>
+		<year>1982</year>
 		<publisher>Mangrove Earthshoe</publisher>
 
 		<part name="flop11" interface="floppy_5_25">

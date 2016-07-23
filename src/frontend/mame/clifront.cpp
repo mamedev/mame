@@ -129,7 +129,7 @@ public:
 	void identify(const char *name);
 	void identify_file(const char *name);
 	void identify_data(const char *name, const UINT8 *data, int length);
-	int find_by_hash(const hash_collection &hashes, int length);
+	int find_by_hash(const util::hash_collection &hashes, int length);
 
 private:
 	// internal state
@@ -260,8 +260,8 @@ void media_identifier::identify_file(const char *name)
 		}
 
 		// otherwise, get the hash collection for this CHD
-		hash_collection hashes;
-		if (chd.sha1() != sha1_t::null)
+		util::hash_collection hashes;
+		if (chd.sha1() != util::sha1_t::null)
 			hashes.add_sha1(chd.sha1());
 
 		// determine whether this file exists
@@ -309,8 +309,8 @@ void media_identifier::identify_data(const char *name, const UINT8 *data, int le
 	}
 
 	// compute the hash of the data
-	hash_collection hashes;
-	hashes.compute(data, length, hash_collection::HASH_TYPES_CRC_SHA1);
+	util::hash_collection hashes;
+	hashes.compute(data, length, util::hash_collection::HASH_TYPES_CRC_SHA1);
 
 	// output the name
 	m_total++;
@@ -334,7 +334,7 @@ void media_identifier::identify_data(const char *name, const UINT8 *data, int le
 //  of drivers by hash
 //-------------------------------------------------
 
-int media_identifier::find_by_hash(const hash_collection &hashes, int length)
+int media_identifier::find_by_hash(const util::hash_collection &hashes, int length)
 {
 	int found = 0;
 	std::unordered_set<std::string> listnames;
@@ -352,10 +352,10 @@ int media_identifier::find_by_hash(const hash_collection &hashes, int length)
 				for (const rom_entry *region = rom_first_region(device); region != nullptr; region = rom_next_region(region))
 					for (const rom_entry *rom = rom_first_file(region); rom != nullptr; rom = rom_next_file(rom))
 					{
-						hash_collection romhashes(ROM_GETHASHDATA(rom));
-						if (!romhashes.flag(hash_collection::FLAG_NO_DUMP) && hashes == romhashes)
+						util::hash_collection romhashes(ROM_GETHASHDATA(rom));
+						if (!romhashes.flag(util::hash_collection::FLAG_NO_DUMP) && hashes == romhashes)
 						{
-							bool baddump = romhashes.flag(hash_collection::FLAG_BAD_DUMP);
+							bool baddump = romhashes.flag(util::hash_collection::FLAG_BAD_DUMP);
 
 							// output information about the match
 							if (found)
@@ -372,20 +372,20 @@ int media_identifier::find_by_hash(const hash_collection &hashes, int length)
 		{
 			if (listnames.insert(swlistdev.list_name()).second)
 			{
-				for (software_info &swinfo : swlistdev.get_info())
-					for (software_part &part : swinfo.parts())
+				for (const software_info &swinfo : swlistdev.get_info())
+					for (const software_part &part : swinfo.parts())
 						for (const rom_entry *region = part.romdata(); region != nullptr; region = rom_next_region(region))
 							for (const rom_entry *rom = rom_first_file(region); rom != nullptr; rom = rom_next_file(rom))
 							{
-								hash_collection romhashes(ROM_GETHASHDATA(rom));
+								util::hash_collection romhashes(ROM_GETHASHDATA(rom));
 								if (hashes == romhashes)
 								{
-									bool baddump = romhashes.flag(hash_collection::FLAG_BAD_DUMP);
+									bool baddump = romhashes.flag(util::hash_collection::FLAG_BAD_DUMP);
 
 									// output information about the match
 									if (found)
 										osd_printf_info("                    ");
-									osd_printf_info("= %s%-20s  %s:%s %s\n", baddump ? "(BAD) " : "", ROM_GETNAME(rom), swlistdev.list_name(), swinfo.shortname(), swinfo.longname());
+									osd_printf_info("= %s%-20s  %s:%s %s\n", baddump ? "(BAD) " : "", ROM_GETNAME(rom), swlistdev.list_name(), swinfo.shortname().c_str(), swinfo.longname().c_str());
 									found++;
 								}
 							}
@@ -520,11 +520,11 @@ int cli_frontend::execute(int argc, char **argv)
 			bool compatible = false;
 			for (software_list_device &swlistdev : iter)
 			{
-				software_info *swinfo = swlistdev.find(m_options.software_name());
+				const software_info *swinfo = swlistdev.find(m_options.software_name());
 				if (swinfo != nullptr)
 				{
 					// loop through all parts
-					for (software_part &swpart : swinfo->parts())
+					for (const software_part &swpart : swinfo->parts())
 					{
 						// only load compatible software this way
 						if (swpart.is_compatible(swlistdev) == SOFTWARE_IS_COMPATIBLE)
@@ -821,7 +821,7 @@ void cli_frontend::listcrc(const char *gamename)
 				{
 					// if we have a CRC, display it
 					UINT32 crc;
-					if (hash_collection(ROM_GETHASHDATA(rom)).crc(crc))
+					if (util::hash_collection(ROM_GETHASHDATA(rom)).crc(crc))
 						osd_printf_info("%08x %-16s \t %-8s \t %s\n", crc, ROM_GETNAME(rom), device.shortname(), device.name());
 				}
 	}
@@ -872,10 +872,10 @@ void cli_frontend::listroms(const char *gamename)
 						osd_printf_info("       ");
 
 					// output the hash data
-					hash_collection hashes(ROM_GETHASHDATA(rom));
-					if (!hashes.flag(hash_collection::FLAG_NO_DUMP))
+					util::hash_collection hashes(ROM_GETHASHDATA(rom));
+					if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP))
 					{
-						if (hashes.flag(hash_collection::FLAG_BAD_DUMP))
+						if (hashes.flag(util::hash_collection::FLAG_BAD_DUMP))
 							osd_printf_info(" BAD");
 						osd_printf_info(" %s", hashes.macro_string().c_str());
 					}
@@ -1388,33 +1388,33 @@ void cli_frontend::verifysamples(const char *gamename)
 void cli_frontend::output_single_softlist(FILE *out, software_list_device &swlistdev)
 {
 	fprintf(out, "\t<softwarelist name=\"%s\" description=\"%s\">\n", swlistdev.list_name(), xml_normalize_string(swlistdev.description()));
-	for (software_info &swinfo : swlistdev.get_info())
+	for (const software_info &swinfo : swlistdev.get_info())
 	{
-		fprintf(out, "\t\t<software name=\"%s\"", swinfo.shortname());
-		if (swinfo.parentname() != nullptr)
-			fprintf(out, " cloneof=\"%s\"", swinfo.parentname());
+		fprintf(out, "\t\t<software name=\"%s\"", swinfo.shortname().c_str());
+		if (!swinfo.parentname().empty())
+			fprintf(out, " cloneof=\"%s\"", swinfo.parentname().c_str());
 		if (swinfo.supported() == SOFTWARE_SUPPORTED_PARTIAL)
 			fprintf(out, " supported=\"partial\"");
 		if (swinfo.supported() == SOFTWARE_SUPPORTED_NO)
 			fprintf(out, " supported=\"no\"");
 		fprintf(out, ">\n" );
-		fprintf(out, "\t\t\t<description>%s</description>\n", xml_normalize_string(swinfo.longname()));
-		fprintf(out, "\t\t\t<year>%s</year>\n", xml_normalize_string(swinfo.year()));
-		fprintf(out, "\t\t\t<publisher>%s</publisher>\n", xml_normalize_string(swinfo.publisher()));
+		fprintf(out, "\t\t\t<description>%s</description>\n", xml_normalize_string(swinfo.longname().c_str()));
+		fprintf(out, "\t\t\t<year>%s</year>\n", xml_normalize_string(swinfo.year().c_str()));
+		fprintf(out, "\t\t\t<publisher>%s</publisher>\n", xml_normalize_string(swinfo.publisher().c_str()));
 
-		for (feature_list_item &flist : swinfo.other_info())
-			fprintf( out, "\t\t\t<info name=\"%s\" value=\"%s\"/>\n", flist.name(), xml_normalize_string( flist.value() ) );
+		for (const feature_list_item &flist : swinfo.other_info())
+			fprintf( out, "\t\t\t<info name=\"%s\" value=\"%s\"/>\n", flist.name().c_str(), xml_normalize_string( flist.value().c_str()) );
 
-		for (software_part &part : swinfo.parts())
+		for (const software_part &part : swinfo.parts())
 		{
-			fprintf(out, "\t\t\t<part name=\"%s\"", part.name());
-			if (part.interface() != nullptr)
-				fprintf(out, " interface=\"%s\"", part.interface());
+			fprintf(out, "\t\t\t<part name=\"%s\"", part.name().c_str());
+			if (!part.interface().empty())
+				fprintf(out, " interface=\"%s\"", part.interface().c_str());
 
 			fprintf(out, ">\n");
 
-			for (feature_list_item &flist : part.featurelist())
-				fprintf(out, "\t\t\t\t<feature name=\"%s\" value=\"%s\" />\n", flist.name(), xml_normalize_string(flist.value()));
+			for (const feature_list_item &flist : part.featurelist())
+				fprintf(out, "\t\t\t\t<feature name=\"%s\" value=\"%s\" />\n", flist.name().c_str(), xml_normalize_string(flist.value().c_str()));
 
 			/* TODO: display rom region information */
 			for (const rom_entry *region = part.romdata(); region; region = rom_next_region(region))
@@ -1436,8 +1436,8 @@ void cli_frontend::output_single_softlist(FILE *out, software_list_device &swlis
 							fprintf( out, "\t\t\t\t\t<disk name=\"%s\"", xml_normalize_string(ROM_GETNAME(rom)) );
 
 						/* dump checksum information only if there is a known dump */
-						hash_collection hashes(ROM_GETHASHDATA(rom));
-						if ( !hashes.flag(hash_collection::FLAG_NO_DUMP) )
+						util::hash_collection hashes(ROM_GETHASHDATA(rom));
+						if ( !hashes.flag(util::hash_collection::FLAG_NO_DUMP) )
 							fprintf( out, " %s", hashes.attribute_string().c_str() );
 						else
 							fprintf( out, " status=\"nodump\"" );
@@ -1574,7 +1574,7 @@ void cli_frontend::verifysoftware(const char *gamename)
 					if (!swlistdev.get_info().empty())
 					{
 						nrlists++;
-						for (software_info &swinfo : swlistdev.get_info())
+						for (const software_info &swinfo : swlistdev.get_info())
 						{
 							media_auditor::summary summary = auditor.audit_software(swlistdev.list_name(), &swinfo, AUDIT_VALIDATE_FAST);
 
@@ -1667,7 +1667,7 @@ void cli_frontend::verifysoftlist(const char *gamename)
 					matched++;
 
 					// Get the actual software list contents
-					for (software_info &swinfo : swlistdev.get_info())
+					for (const software_info &swinfo : swlistdev.get_info())
 					{
 						media_auditor::summary summary = auditor.audit_software(swlistdev.list_name(), &swinfo, AUDIT_VALIDATE_FAST);
 

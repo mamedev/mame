@@ -63,10 +63,10 @@ namespace netlist
 		{
 			switch (m_size)
 			{
-				case 1: ((uint_least8_t *) m_data)[pos] = val; break;
-				case 2: ((uint_least16_t *) m_data)[pos] = val; break;
-				case 4: ((uint_least32_t *) m_data)[pos] = val; break;
-				case 8: ((uint_least64_t *) m_data)[pos] = val; break;
+				case 1: static_cast<uint_least8_t  *>(m_data)[pos] = static_cast<uint_least8_t>(val); break;
+				case 2: static_cast<uint_least16_t *>(m_data)[pos] = static_cast<uint_least16_t>(val); break;
+				case 4: static_cast<uint_least32_t *>(m_data)[pos] = static_cast<uint_least32_t>(val); break;
+				case 8: static_cast<uint_least64_t *>(m_data)[pos] = static_cast<uint_least64_t>(val); break;
 				default: { }
 			}
 		}
@@ -75,10 +75,10 @@ namespace netlist
 		{
 			switch (m_size)
 			{
-				case 1: return ((uint_least8_t *) m_data)[pos]; break;
-				case 2: return ((uint_least16_t *) m_data)[pos]; break;
-				case 4: return ((uint_least32_t *) m_data)[pos]; break;
-				case 8: return ((uint_least64_t *) m_data)[pos]; break;
+				case 1: return static_cast<uint_least8_t  *>(m_data)[pos]; break;
+				case 2: return static_cast<uint_least16_t *>(m_data)[pos]; break;
+				case 4: return static_cast<uint_least32_t *>(m_data)[pos]; break;
+				case 8: return static_cast<uint_least64_t *>(m_data)[pos]; break;
 				default:
 					return 0; //should never happen
 			}
@@ -88,10 +88,10 @@ namespace netlist
 		{
 			switch (m_size)
 			{
-				case 1: return ((uint_least8_t) val); break;
-				case 2: return ((uint_least16_t) val); break;
-				case 4: return ((uint_least32_t) val); break;
-				case 8: return ((uint_least64_t) val); break;
+				case 1: return static_cast<uint_least8_t >(val); break;
+				case 2: return static_cast<uint_least16_t>(val); break;
+				case 4: return static_cast<uint_least32_t>(val); break;
+				case 8: return static_cast<uint_least64_t>(val); break;
 				default:
 					return 0; //should never happen
 			}
@@ -103,7 +103,7 @@ namespace netlist
 
 	struct truthtable_desc_t
 	{
-		truthtable_desc_t(int NO, int NI, bool *initialized,
+		truthtable_desc_t(unsigned NO, unsigned NI, bool *initialized,
 				packed_int outs, uint_least8_t *timing, netlist_time *timing_nt)
 		: m_NO(NO), m_NI(NI),  m_initialized(initialized),
 			m_outs(outs), m_timing(timing), m_timing_nt(timing_nt),
@@ -140,7 +140,7 @@ namespace netlist
 	NETLIB_OBJECT(truthtable_t)
 	{
 	private:
-		family_setter_t m_fam;
+		detail::family_setter_t m_fam;
 	public:
 
 		static constexpr int m_num_bits = m_NI;
@@ -217,8 +217,8 @@ namespace netlist
 			for (std::size_t i=0; i < m_NO; i++)
 			{
 				pstring tmp = "_" + out[i];
-				const int idx = plib::container::indexof(inout, tmp);
-				if (idx>=0)
+				const std::size_t idx = plib::container::indexof(inout, tmp);
+				if (idx != plib::container::npos)
 				{
 					connect_late(m_Q[i], m_I[idx]);
 					// disable ignore for this inputs altogether.
@@ -309,7 +309,7 @@ namespace netlist
 					for (std::size_t i = 0; i < m_NI; i++)
 					{
 						m_I[i].activate();
-						state |= (INPLOGIC(m_I[i]) << i);
+						state |= (m_I[i]() << i);
 						mt = std::max(this->m_I[i].net().time(), mt);
 					}
 				else
@@ -317,7 +317,7 @@ namespace netlist
 					{
 						if ((ign & 1))
 							m_I[i].activate();
-						state |= (INPLOGIC(m_I[i]) << i);
+						state |= (m_I[i]() << i);
 					}
 			}
 			else
@@ -325,12 +325,12 @@ namespace netlist
 				if (!doOUT)
 					for (std::size_t i = 0; i < m_NI; i++)
 					{
-						state |= (INPLOGIC(m_I[i]) << i);
+						state |= (m_I[i]() << i);
 						mt = std::max(this->m_I[i].net().time(), mt);
 					}
 				else
 					for (std::size_t i = 0; i < m_NI; i++)
-						state |= (INPLOGIC(m_I[i]) << i);
+						state |= (m_I[i]() << i);
 			}
 			auto nstate = state;
 
@@ -344,7 +344,7 @@ namespace netlist
 			if (doOUT)
 			{
 				for (std::size_t i = 0; i < m_NO; i++)
-					OUTLOGIC(m_Q[i], (out >> i) & 1, m_ttp->m_timing_nt[m_ttp->m_timing[timebase + i]]);
+					m_Q[i].push((out >> i) & 1, m_ttp->m_timing_nt[m_ttp->m_timing[timebase + i]]);
 			}
 			else
 				for (std::size_t i = 0; i < m_NO; i++)

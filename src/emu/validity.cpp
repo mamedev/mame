@@ -1477,7 +1477,7 @@ void validity_checker::validate_roms()
 				total_files++;
 
 				// make sure the hash is valid
-				hash_collection hashes;
+				util::hash_collection hashes;
 				if (!hashes.from_internal_string(ROM_GETHASHDATA(romp)))
 					osd_printf_error("ROM '%s' has an invalid hash string '%s'\n", last_name, ROM_GETHASHDATA(romp));
 			}

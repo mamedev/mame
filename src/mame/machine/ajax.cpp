@@ -16,7 +16,7 @@
 
 #include "includes/ajax.h"
 
-/*  ajax_bankswitch_w:
+/*  bankswitch_w:
     Handled by the LS273 Octal +ve edge trigger D-type Flip-flop with Reset at H11:
 
     Bit Description
@@ -33,7 +33,7 @@
     (*) The Coin Counters are handled by the Konami Custom 051550
 */
 
-WRITE8_MEMBER(ajax_state::ajax_bankswitch_w)
+WRITE8_MEMBER(ajax_state::bankswitch_w)
 {
 	int bank = 0;
 
@@ -50,10 +50,10 @@ WRITE8_MEMBER(ajax_state::ajax_bankswitch_w)
 
 	/* bank # (ROMS N11 and N12) */
 	bank += (data & 0x07);
-	membank("bank2")->set_entry(bank);
+	membank("mainbank")->set_entry(bank);
 }
 
-/*  ajax_lamps_w:
+/*  lamps_w:
     Handled by the LS273 Octal +ve edge trigger D-type Flip-flop with Reset at B9:
 
     Bit Description
@@ -77,7 +77,7 @@ WRITE8_MEMBER(ajax_state::ajax_bankswitch_w)
         LS393       C20         Dual -ve edge trigger 4-bit Binary Ripple Counter with Resets
 */
 
-WRITE8_MEMBER(ajax_state::ajax_lamps_w)
+WRITE8_MEMBER(ajax_state::lamps_w)
 {
 	output().set_led_value(1, data & 0x02);  /* super weapon lamp */
 	output().set_led_value(2, data & 0x04);  /* power up lamps */
@@ -106,7 +106,7 @@ WRITE8_MEMBER(ajax_state::ajax_lamps_w)
     0x01c0  (r) MIO2            Enables DIPSW #3 reading
 */
 
-READ8_MEMBER(ajax_state::ajax_ls138_f10_r)
+READ8_MEMBER(ajax_state::ls138_f10_r)
 {
 	int data = 0, index;
 	static const char *const portnames[] = { "SYSTEM", "P1", "DSW1", "DSW2" };
@@ -134,7 +134,7 @@ READ8_MEMBER(ajax_state::ajax_ls138_f10_r)
 	return data;
 }
 
-WRITE8_MEMBER(ajax_state::ajax_ls138_f10_w)
+WRITE8_MEMBER(ajax_state::ls138_f10_w)
 {
 	switch ((offset & 0x01c0) >> 6)
 	{
@@ -153,10 +153,10 @@ WRITE8_MEMBER(ajax_state::ajax_ls138_f10_w)
 			m_soundlatch->write(space, offset, data);
 			break;
 		case 0x03:  /* Bankswitch + coin counters + priority*/
-			ajax_bankswitch_w(space, 0, data);
+			bankswitch_w(space, 0, data);
 			break;
 		case 0x05:  /* Lamps + Joystick vibration + Control panel quaking */
-			ajax_lamps_w(space, 0, data);
+			lamps_w(space, 0, data);
 			break;
 
 		default:
@@ -164,7 +164,7 @@ WRITE8_MEMBER(ajax_state::ajax_ls138_f10_w)
 	}
 }
 
-/*  ajax_bankswitch_w_2:
+/*  bankswitch_w_2:
     Handled by the LS273 Octal +ve edge trigger D-type Flip-flop with Reset at K14:
 
     Bit Description
@@ -179,7 +179,7 @@ WRITE8_MEMBER(ajax_state::ajax_ls138_f10_w)
     0   SRB0    /
 */
 
-WRITE8_MEMBER(ajax_state::ajax_bankswitch_2_w)
+WRITE8_MEMBER(ajax_state::bankswitch_2_w)
 {
 	/* enable char ROM reading through the video RAM */
 	m_k052109->set_rmrd_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
@@ -191,7 +191,7 @@ WRITE8_MEMBER(ajax_state::ajax_bankswitch_2_w)
 	m_firq_enable = data & 0x10;
 
 	/* bank # (ROMS G16 and I16) */
-	membank("bank1")->set_entry(data & 0x0f);
+	membank("subbank")->set_entry(data & 0x0f);
 }
 
 void ajax_state::machine_start()
@@ -199,11 +199,9 @@ void ajax_state::machine_start()
 	UINT8 *MAIN = memregion("maincpu")->base();
 	UINT8 *SUB  = memregion("sub")->base();
 
-	membank("bank1")->configure_entries(0,  9,  &SUB[0x10000], 0x2000);
-	membank("bank2")->configure_entries(0, 12, &MAIN[0x10000], 0x2000);
-
-	membank("bank1")->set_entry(0);
-	membank("bank2")->set_entry(0);
+	membank("mainbank")->configure_entries(0, 4, &MAIN[0x00000], 0x2000);
+	membank("mainbank")->configure_entries(4, 8, &MAIN[0x10000], 0x2000);
+	membank("subbank")->configure_entries(0,  9,  &SUB[0x00000], 0x2000);
 
 	save_item(NAME(m_priority));
 	save_item(NAME(m_firq_enable));

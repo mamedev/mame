@@ -572,6 +572,7 @@ MACHINES["PCI9050"] = true
 MACHINES["GENPC"] = true
 MACHINES["GEN_LATCH"] = true
 MACHINES["WATCHDOG"] = true
+MACHINES["INPUT_MERGER"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -647,6 +648,7 @@ BUSES["SMS_CTRL"] = true
 BUSES["SMS_EXP"] = true
 --BUSES["SNES"] = true
 --BUSES["SPC1000"] = true
+BUSES["SUNKBD"] = true
 --BUSES["TI99PEB"] = true
 --BUSES["TVC"] = true
 --BUSES["VBOY"] = true
@@ -3279,8 +3281,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/r2dx_v33.cpp",
 	MAME_DIR .. "src/mame/drivers/seibuspi.cpp",
 	MAME_DIR .. "src/mame/includes/seibuspi.h",
-	MAME_DIR .. "src/mame/machine/seibuspi.cpp",
-	MAME_DIR .. "src/mame/machine/seibuspi.h",
 	MAME_DIR .. "src/mame/video/seibuspi.cpp",
 	MAME_DIR .. "src/mame/drivers/sengokmj.cpp",
 	MAME_DIR .. "src/mame/drivers/stfight.cpp",
@@ -3295,8 +3295,8 @@ files {
 	MAME_DIR .. "src/mame/video/wiz.cpp",
 	MAME_DIR .. "src/mame/machine/seicop.cpp",
 	MAME_DIR .. "src/mame/machine/seicop.h",
-	MAME_DIR .. "src/mame/machine/spisprit.cpp",
-	MAME_DIR .. "src/mame/machine/spisprit.h",
+	MAME_DIR .. "src/mame/machine/seibuspi.cpp",
+	MAME_DIR .. "src/mame/machine/seibuspi.h",
 	MAME_DIR .. "src/mame/audio/seibu.cpp",
 	MAME_DIR .. "src/mame/audio/seibu.h",
 	MAME_DIR .. "src/mame/video/seibu_crtc.cpp",

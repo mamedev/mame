@@ -567,8 +567,8 @@ void info_xml_creator::output_rom(device_t &device)
 					continue;
 
 				// if we have a valid ROM and we are a clone, see if we can find the parent ROM
-				hash_collection hashes(ROM_GETHASHDATA(rom));
-				if (!hashes.flag(hash_collection::FLAG_NO_DUMP))
+				util::hash_collection hashes(ROM_GETHASHDATA(rom));
+				if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP))
 					merge_name = get_merge_name(hashes);
 				if (&device != &m_drivlist.config().root_device())
 					merge_name = nullptr;
@@ -604,7 +604,7 @@ void info_xml_creator::output_rom(device_t &device)
 					util::stream_format(output, " size=\"%d\"", rom_file_size(rom));
 
 				// dump checksum information only if there is a known dump
-				if (!hashes.flag(hash_collection::FLAG_NO_DUMP))
+				if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP))
 				{
 					// iterate over hash function types and print m_output their values
 					output << " " << hashes.attribute_string();
@@ -1603,7 +1603,7 @@ void info_xml_creator::output_ramoptions()
 //  parent set
 //-------------------------------------------------
 
-const char *info_xml_creator::get_merge_name(const hash_collection &romhashes)
+const char *info_xml_creator::get_merge_name(const util::hash_collection &romhashes)
 {
 	// walk the parent chain
 	const char *merge_name = nullptr;
@@ -1614,8 +1614,8 @@ const char *info_xml_creator::get_merge_name(const hash_collection &romhashes)
 		for (const rom_entry *pregion = rom_first_region(*device); pregion != nullptr; pregion = rom_next_region(pregion))
 			for (const rom_entry *prom = rom_first_file(pregion); prom != nullptr; prom = rom_next_file(prom))
 			{
-				hash_collection phashes(ROM_GETHASHDATA(prom));
-				if (!phashes.flag(hash_collection::FLAG_NO_DUMP) && romhashes == phashes)
+				util::hash_collection phashes(ROM_GETHASHDATA(prom));
+				if (!phashes.flag(util::hash_collection::FLAG_NO_DUMP) && romhashes == phashes)
 				{
 					// stop when we find a match
 					merge_name = ROM_GETNAME(prom);

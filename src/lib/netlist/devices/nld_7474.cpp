@@ -95,8 +95,8 @@ namespace netlist
 	{
 		// 0: High-to-low 40 ns, 1: Low-to-high 25 ns
 		const netlist_time delay[2] = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
-		OUTLOGIC(m_Q, stateQ, delay[stateQ]);
-		OUTLOGIC(m_QQ, stateQQ, delay[stateQQ]);
+		m_Q.push(stateQ, delay[stateQ]);
+		m_QQ.push(stateQQ, delay[stateQQ]);
 	}
 
 	NETLIB_UPDATE(7474sub)
@@ -110,19 +110,19 @@ namespace netlist
 
 	NETLIB_UPDATE(7474)
 	{
-		if (INPLOGIC(m_PREQ) && INPLOGIC(m_CLRQ))
+		if (m_PREQ() && m_CLRQ())
 		{
 			m_D.activate();
-			sub.m_nextD = INPLOGIC(m_D);
+			sub.m_nextD = m_D();
 			sub.m_CLK.activate_lh();
 		}
-		else if (!INPLOGIC(m_PREQ))
+		else if (!m_PREQ())
 		{
 			sub.newstate(1, 0);
 			sub.m_CLK.inactivate();
 			m_D.inactivate();
 		}
-		else if (!INPLOGIC(m_CLRQ))
+		else if (!m_CLRQ())
 		{
 			sub.newstate(0, 1);
 			sub.m_CLK.inactivate();

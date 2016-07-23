@@ -16,7 +16,7 @@ null_modem_device::null_modem_device(const machine_config &mconfig, const char *
 	m_input_count(0),
 	m_input_index(0),
 	m_timer_poll(nullptr),
-	m_rts(ASSERT_LINE)
+	m_rts(0)
 {
 }
 
@@ -70,7 +70,7 @@ WRITE_LINE_MEMBER(null_modem_device::update_serial)
 	output_dsr(0);
 	output_cts(0);
 
-	m_rts = ASSERT_LINE;
+	m_rts = 0;
 }
 
 void null_modem_device::device_reset()
@@ -102,7 +102,7 @@ void null_modem_device::queue()
 			m_input_count = m_stream->input(m_input_buffer, sizeof(m_input_buffer));
 		}
 
-		if (m_input_count != 0 && m_rts == ASSERT_LINE)
+		if (m_input_count != 0 && m_rts == 0)
 		{
 			transmit_register_setup(m_input_buffer[m_input_index++]);
 

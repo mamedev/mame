@@ -235,6 +235,12 @@ int renderer_bgfx::create()
 	m_screen_effect[2] = m_effects->effect("screen_multiply");
 	m_screen_effect[3] = m_effects->effect("screen_add");
 
+	if (   m_gui_effect[0] == nullptr ||    m_gui_effect[1] == nullptr ||    m_gui_effect[2] == nullptr ||    m_gui_effect[3] == nullptr ||
+		m_screen_effect[0] == nullptr || m_screen_effect[1] == nullptr || m_screen_effect[2] == nullptr || m_screen_effect[3] == nullptr)
+	{
+		fatalerror("BGFX: Unable to load required shaders. Please check and reinstall the %s folder\n", m_options.bgfx_path());
+	}
+
 	m_chains = new chain_manager(win->machine(), m_options, *m_textures, *m_targets, *m_effects, win->m_index, *this);
 	m_sliders_dirty = true;
 
@@ -256,9 +262,16 @@ int renderer_bgfx::create()
 void renderer_bgfx::record()
 {
 	auto win = assert_window();
-	if (m_avi_writer == nullptr || win->m_index > 0)
+	if (win->m_index > 0)
 	{
 		return;
+	}
+
+	if (m_avi_writer == nullptr)
+	{
+		m_avi_writer = new avi_write(win->machine(), m_width[0], m_height[0]);
+		m_avi_data = new uint8_t[m_width[0] * m_height[0] * 4];
+		m_avi_bitmap.allocate(m_width[0], m_height[0]);
 	}
 
 	if (m_avi_writer->recording())
@@ -274,6 +287,20 @@ void renderer_bgfx::record()
 		m_avi_target = m_targets->create_target("avibuffer", bgfx::TextureFormat::RGBA8, m_width[0], m_height[0], TARGET_STYLE_CUSTOM, false, true, 1, 0);
 		m_avi_texture = bgfx::createTexture2D(m_width[0], m_height[0], 1, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_BLIT_DST | BGFX_TEXTURE_READ_BACK);
 	}
+}
+
+bool renderer_bgfx::init(running_machine &machine)
+{
+	const char *bgfx_path = downcast<osd_options &>(machine.options()).bgfx_path();
+	
+	osd::directory::ptr directory = osd::directory::open(bgfx_path);
+	if (directory == nullptr)
+	{
+		osd_printf_verbose("Unable to find the %s folder. Please reinstall it to use the BGFX renderer\n", bgfx_path);
+		return true;
+	}
+	
+	return false;
 }
 
 void renderer_bgfx::exit()
@@ -674,26 +701,19 @@ int renderer_bgfx::draw(int update)
 {
 	auto win = assert_window();
 	int window_index = win->m_index;
-	if (window_index == 0)
-	{
-		s_current_view = 0;
-		if (m_avi_writer == nullptr)
-		{
-			uint32_t width = win->get_size().width();
-			uint32_t height = win->get_size().height();
-			m_avi_writer = new avi_write(win->machine(), width, height);
-			m_avi_data = new uint8_t[width * height * 4];
-			m_avi_bitmap.allocate(width, height);
-		}
-	}
 
 	m_seen_views.clear();
 	m_ui_view = -1;
 
-	// Set view 0 default viewport.
 	osd_dim wdim = win->get_size();
 	m_width[window_index] = wdim.width();
 	m_height[window_index] = wdim.height();
+
+	// Set view 0 default viewport.
+	if (window_index == 0)
+	{
+		s_current_view = 0;
+	}
 
 	win->m_primlist->acquire_lock();
 	s_current_view += m_chains->handle_screen_chains(s_current_view, win->m_primlist->first(), *win.get());
@@ -787,11 +807,16 @@ void renderer_bgfx::update_recording()
 	bgfx::blit(s_current_view > 0 ? s_current_view - 1 : 0, m_avi_texture, 0, 0, m_avi_target->target());
 	bgfx::readTexture(m_avi_texture, m_avi_data);
 
-	UINT32* start = &m_avi_bitmap.pix32(0);
-	// loop over Y
-	for (int i = 0; i < m_width[0] * m_height[0] * 4; i += 4)
+	int i = 0;
+	for (int y = 0; y < m_avi_bitmap.height(); y++)
 	{
-		*start++ = 0xff000000 | (m_avi_data[i + 0] << 16) | (m_avi_data[i + 1] << 8) | m_avi_data[i + 2];
+		UINT32 *dst = &m_avi_bitmap.pix32(y);
+
+		for (int x = 0; x < m_avi_bitmap.width(); x++)
+		{
+			*dst++ = 0xff000000 | (m_avi_data[i + 0] << 16) | (m_avi_data[i + 1] << 8) | m_avi_data[i + 2];
+			i += 4;
+		}
 	}
 
 	m_avi_writer->video_frame(m_avi_bitmap);

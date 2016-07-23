@@ -108,7 +108,8 @@ protected:
 	// Image handling: implementation of methods which are abstract in the parent
 	bool call_load() override;
 	void call_unload() override;
-	bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override;
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
+	virtual void loaded_through_softlist() override;
 
 	void prepare_cartridge();
 

@@ -29,6 +29,11 @@
 #include "sound/tms5220.h"
 #include "imagedev/cassette.h"
 
+#include "bus/bbc/analogue/analogue.h"
+#include "bus/bbc/1mhzbus/1mhzbus.h"
+#include "bus/bbc/tube/tube.h"
+#include "bus/bbc/userport/userport.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
@@ -41,6 +46,14 @@ enum machine_type_t
 	BPLUS,
 	MASTER,
 	COMPACT
+};
+
+enum monitor_type_t
+{
+	COLOUR = 0,
+	BLACKWHITE = 1,
+	GREEN = 2,
+	AMBER = 3
 };
 
 class bbc_state : public driver_device
@@ -129,28 +142,21 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER(bbcm_direct_handler);
 
 	DECLARE_DRIVER_INIT(bbc);
+	DECLARE_VIDEO_START(bbc);
 
 	DECLARE_MACHINE_START(bbca);
 	DECLARE_MACHINE_RESET(bbca);
-	DECLARE_VIDEO_START(bbca);
-
 	DECLARE_MACHINE_START(bbcb);
 	DECLARE_MACHINE_RESET(bbcb);
-	DECLARE_VIDEO_START(bbcb);
-
-	DECLARE_MACHINE_START(torch);
 	DECLARE_MACHINE_RESET(torch);
-
 	DECLARE_MACHINE_START(bbcbp);
 	DECLARE_MACHINE_RESET(bbcbp);
-	DECLARE_VIDEO_START(bbcbp);
-
 	DECLARE_MACHINE_START(bbcm);
 	DECLARE_MACHINE_RESET(bbcm);
-	DECLARE_VIDEO_START(bbcm);
-
 	DECLARE_MACHINE_START(bbcmc);
 	DECLARE_MACHINE_RESET(bbcmc);
+	DECLARE_MACHINE_RESET(ltmpbp);
+	DECLARE_MACHINE_RESET(ltmpm);
 
 	DECLARE_PALETTE_INIT(bbc);
 	INTERRUPT_GEN_MEMBER(bbcb_vsync);
@@ -158,6 +164,7 @@ public:
 	TIMER_CALLBACK_MEMBER(bbc_tape_timer_cb);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	DECLARE_WRITE_LINE_MEMBER(bbcb_acia6850_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(adlc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(econet_clk_w);
 	DECLARE_WRITE8_MEMBER(bbcb_via_system_write_porta);
 	DECLARE_WRITE8_MEMBER(bbcb_via_system_write_portb);
@@ -167,7 +174,11 @@ public:
 	DECLARE_READ8_MEMBER(bbcb_via_user_read_portb);
 	DECLARE_WRITE8_MEMBER(bbcb_via_user_write_portb);
 	DECLARE_WRITE_LINE_MEMBER(bbcb_via_user_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(bbc_vsync);
+	DECLARE_WRITE_LINE_MEMBER(bbc_hsync_changed);
+	DECLARE_WRITE_LINE_MEMBER(bbc_vsync_changed);
+	DECLARE_WRITE_LINE_MEMBER(bbc_de_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(speech_changed);
 	void update_acia_rxd();
 	void update_acia_dcd();
 	void update_acia_cts();
@@ -176,7 +187,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_rxd_serial);
 	DECLARE_WRITE_LINE_MEMBER(write_dcd_serial);
 	DECLARE_WRITE_LINE_MEMBER(write_cts_serial);
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(motor_w);
@@ -243,8 +254,9 @@ public: // HACK FOR MC6845
 	machine_type_t m_machinetype;
 
 	bool m_os01;            // flag indicating whether OS 0.1 is being used
-	int m_SWRAMtype;        // this stores the DIP switch setting for the SWRAM type being used
-	int m_Speech;           // this stores the CONF setting for Speech enabled/disabled
+	int m_monitortype;      // monitor type (colour, green, amber)
+	int m_SWRAMtype;        // this stores the setting for the SWRAM type being used
+	int m_Speech;           // this stores the setting for Speech enabled/disabled
 
 	int m_ACCCON_IRR;       // IRQ inputs
 
@@ -325,9 +337,12 @@ public: // HACK FOR MC6845
 	int m_MC146818_CE;      // 6522 port b bit 6
 
 	int m_via_system_porta;
+
+	// interrupt state
 	int m_via_system_irq;
 	int m_via_user_irq;
 	int m_acia_irq;
+	int m_adlc_irq;
 
 	int m_column;           // this is a counter in the keyboard circuit
 
@@ -390,8 +405,9 @@ public: // HACK FOR MC6845
 	bitmap_ind16 *m_BBC_bitmap;
 	int m_y_screen_pos;
 	unsigned char m_pixel_bits[256];
-	int m_BBC_HSync;
-	int m_BBC_VSync;
+	int m_hsync;
+	int m_vsync;
+	int m_display_enable;
 
 	int m_Teletext_Latch;
 	int m_VideoULA_CR;
@@ -415,8 +431,9 @@ public: // HACK FOR MC6845
 	int m_videoULA_palette1[16];
 	int *m_videoULA_palette_lookup;
 
+	rgb_t out_rgb(rgb_t entry);
+
 	void bbc_setvideoshadow(int vdusel);
-	void common_init(int memorySize);
 	void set_pixel_lookup();
 	int vdudriverset();
 	int bbcm_vdudriverset();

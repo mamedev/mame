@@ -7,8 +7,6 @@
 
     Gordon Jefferyes
     mess_bbc@romvault.com
-    Nigel Barnes
-    ngbarnes@hotmail.com
 
 ******************************************************************************/
 
@@ -18,7 +16,6 @@
 #include "sound/tms5220.h"
 #include "machine/6522via.h"
 #include "machine/wd_fdc.h"
-#include "imagedev/flopdrv.h"
 #include "includes/bbc.h"
 #include "machine/mc146818.h"
 #include "bus/centronics/ctronics.h"
@@ -27,7 +24,9 @@
 
 void bbc_state::check_interrupts()
 {
-	m_maincpu->set_input_line(M6502_IRQ_LINE, m_via_system_irq || m_via_user_irq || m_acia_irq || m_ACCCON_IRR);
+	int irq = (m_via_system_irq || m_via_user_irq || m_acia_irq || m_ACCCON_IRR) ? ASSERT_LINE : CLEAR_LINE;
+
+	m_maincpu->set_input_line(M6502_IRQ_LINE, irq);
 }
 
 /*************************
@@ -74,7 +73,7 @@ WRITE8_MEMBER(bbc_state::bbc_memoryb3_w)
 0: none
 1: 128K (bank 8 to 15) Solidisc sideways ram userport bank latch
 2: 64K (banks 4 to 7) for Acorn sideways ram FE30 bank latch
-3: 128K (banks 8 to 15) for Acown sideways ram FE30 bank latch
+3: 128K (banks 8 to 15) for Acorn sideways ram FE30 bank latch
 */
 static const unsigned short bbc_SWRAMtype1[16]={0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1};
 static const unsigned short bbc_SWRAMtype2[16]={0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0};
@@ -1347,6 +1346,14 @@ WRITE_LINE_MEMBER( bbc_state::bbc_txd_w )
 }
 
 
+WRITE_LINE_MEMBER( bbc_state::bbcb_acia6850_irq_w )
+{
+	m_acia_irq = state;
+
+	check_interrupts();
+}
+
+
 void bbc_state::BBC_Cassette_motor(unsigned char status)
 {
 	if (status)
@@ -1427,7 +1434,7 @@ WRITE_LINE_MEMBER(bbc_state::write_acia_clock)
 WRITE_LINE_MEMBER(bbc_state::motor_w)
 {
 	for (int i=0; i != 2; i++) {
-		char devname[1];
+		char devname[8];
 		sprintf(devname, "%d", i);
 		floppy_connector *con = m_i8271->subdevice<floppy_connector>(devname);
 		if (con) {
@@ -1439,7 +1446,7 @@ WRITE_LINE_MEMBER(bbc_state::motor_w)
 WRITE_LINE_MEMBER(bbc_state::side_w)
 {
 	for (int i=0; i != 2; i++) {
-		char devname[1];
+		char devname[8];
 		sprintf(devname, "%d", i);
 		floppy_connector *con = m_i8271->subdevice<floppy_connector>(devname);
 		if (con) {
@@ -1595,6 +1602,7 @@ int bbc_state::bbc_load_rom(device_image_interface &image, generic_slot_device *
 {
 	UINT32 size = slot->common_get_size("rom");
 
+	// socket accepts 8K and 16K ROM only
 	if (size != 0x2000 && size != 0x4000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported ROM size");
@@ -1733,11 +1741,16 @@ void bbc_state::bbcm_setup_banks(memory_bank *membank, int banks, UINT32 shift, 
 MACHINE_START_MEMBER(bbc_state, bbca)
 {
 	m_machinetype = MODELA;
+
 	bbc_setup_banks(m_bank4, 4, 0, 0x4000);
 }
 
 MACHINE_RESET_MEMBER(bbc_state, bbca)
 {
+	m_monitortype = read_safe(ioport("BBCCONFIG"), 0) & 0x03;
+	m_Speech      = read_safe(ioport("BBCCONFIG"), 0) & 0x04;
+	m_SWRAMtype   = read_safe(ioport("BBCCONFIG"), 0) & 0x18;
+
 	UINT8 *RAM = m_region_maincpu->base();
 
 	m_bank1->set_base(RAM);
@@ -1769,9 +1782,12 @@ MACHINE_START_MEMBER(bbc_state, bbcb)
 
 MACHINE_RESET_MEMBER(bbc_state, bbcb)
 {
+	m_monitortype = read_safe(ioport("BBCCONFIG"), 0) & 0x03;
+	m_Speech      = read_safe(ioport("BBCCONFIG"), 1) & 0x04;
+	m_SWRAMtype   = read_safe(ioport("BBCCONFIG"), 0) & 0x18;
+
 	UINT8 *RAM = m_region_maincpu->base();
-	m_Speech    = (ioport("BBCCONFIG")->read() >> 0) & 0x01;
-	m_SWRAMtype = (ioport("BBCCONFIG")->read() >> 3) & 0x03;
+
 	m_bank1->set_base(RAM);
 	m_bank3->set_base(RAM + 0x4000);
 	m_memorySize=32;
@@ -1782,27 +1798,14 @@ MACHINE_RESET_MEMBER(bbc_state, bbcb)
 	bbcb_IC32_initialise(this);
 }
 
-
-MACHINE_START_MEMBER(bbc_state, torch)
-{
-	m_machinetype = MODELB;
-	m_mc6850_clock = 0;
-	bbc_setup_banks(m_bank4, 16, 0, 0x4000);
-}
 
 MACHINE_RESET_MEMBER(bbc_state, torch)
 {
-	UINT8 *RAM = m_region_maincpu->base();
-	m_Speech    = 1;
-	m_SWRAMtype = 0;
-	m_bank1->set_base(RAM);
-	m_bank3->set_base(RAM + 0x4000);
-	m_memorySize=32;
+	MACHINE_RESET_CALL_MEMBER(bbcb);
 
-	m_bank4->set_entry(0);
-	m_bank7->set_base(m_region_os->base());  /* bank 7 points at the OS rom  from c000 to ffff */
-
-	bbcb_IC32_initialise(this);
+	m_monitortype = monitor_type_t::COLOUR;
+	m_Speech      = 1;
+	m_SWRAMtype   = 0;
 }
 
 
@@ -1820,7 +1823,10 @@ MACHINE_START_MEMBER(bbc_state, bbcbp)
 
 MACHINE_RESET_MEMBER(bbc_state, bbcbp)
 {
-	m_Speech = 1;
+	m_monitortype = read_safe(ioport("BBCCONFIG"), 0) & 0x03;
+	m_Speech      = read_safe(ioport("BBCCONFIG"), 1) & 0x04;
+	m_SWRAMtype   = 0;
+
 	m_bank1->set_base(m_region_maincpu->base());
 	m_bank2->set_base(m_region_maincpu->base() + 0x3000);  /* bank 2 screen/shadow ram     from 3000 to 7fff */
 	m_bank4->set_entry(0);
@@ -1849,6 +1855,10 @@ MACHINE_START_MEMBER(bbc_state, bbcm)
 
 MACHINE_RESET_MEMBER(bbc_state, bbcm)
 {
+	m_monitortype = read_safe(ioport("BBCCONFIG"), 0) & 0x03;
+	m_Speech      = 0;
+	m_SWRAMtype   = 0;
+
 	m_bank1->set_base(m_region_maincpu->base());           /* bank 1 regular lower ram     from 0000 to 2fff */
 	m_bank2->set_base(m_region_maincpu->base() + 0x3000);  /* bank 2 screen/shadow ram     from 3000 to 7fff */
 	m_bank4->set_entry(0);
@@ -1869,4 +1879,23 @@ MACHINE_START_MEMBER(bbc_state, bbcmc)
 MACHINE_RESET_MEMBER(bbc_state, bbcmc)
 {
 	MACHINE_RESET_CALL_MEMBER(bbcm);
+}
+
+
+MACHINE_RESET_MEMBER(bbc_state, ltmpbp)
+{
+	MACHINE_RESET_CALL_MEMBER(bbcbp);
+
+	m_monitortype = monitor_type_t::GREEN;
+	m_Speech      = 1;
+	m_SWRAMtype   = 0;
+}
+
+MACHINE_RESET_MEMBER(bbc_state, ltmpm)
+{
+	MACHINE_RESET_CALL_MEMBER(bbcm);
+
+	m_monitortype = monitor_type_t::GREEN;
+	m_Speech      = 0;
+	m_SWRAMtype   = 0;
 }

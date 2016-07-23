@@ -65,7 +65,6 @@ static MACHINE_CONFIG_START( at586, at586_state )
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa3", pc_isa16_cards, nullptr, false)
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa4", pc_isa16_cards, nullptr, false)
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa5", pc_isa16_cards, nullptr, false)
-	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	MCFG_FRAGMENT_ADD( at_softlists )
 MACHINE_CONFIG_END
@@ -91,7 +90,6 @@ static MACHINE_CONFIG_START( at586x3, at586_state )
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa3", pc_isa16_cards, nullptr, false)
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa4", pc_isa16_cards, nullptr, false)
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa5", pc_isa16_cards, nullptr, false)
-	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	MCFG_FRAGMENT_ADD( at_softlists )
 MACHINE_CONFIG_END

@@ -880,16 +880,6 @@ void base_sns_cart_slot_device::setup_nvram()
 
 
 
-/*-------------------------------------------------
- call softlist load
- -------------------------------------------------*/
-
-bool base_sns_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry );
-	return TRUE;
-}
-
 void base_sns_cart_slot_device::get_cart_type_addon(UINT8 *ROM, UINT32 len, int &type, int &addon)
 {
 	// First, look if the cart is HiROM or LoROM (and set snes_cart accordingly)

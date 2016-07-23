@@ -63,7 +63,7 @@ public:
 	void write_sample(int sample)
 	{
 		m_data.len += m_fmt.block_align;
-		short ps = sample; /* 16 bit sample, FIXME: Endianess? */
+		short ps = static_cast<short>(sample); /* 16 bit sample, FIXME: Endianess? */
 		m_f.write(&ps, sizeof(ps));
 	}
 
@@ -77,14 +77,14 @@ private:
 
 	struct riff_format_t
 	{
-		char        signature[4];
-		unsigned    fmt_length;
-		short       format_tag;
-		short       channels;
-		unsigned    sample_rate;
-		unsigned    bytes_per_second;
-		short       block_align;
-		short       bits_sample;
+		char                signature[4];
+		unsigned            fmt_length;
+		short               format_tag;
+		unsigned short      channels;
+		unsigned            sample_rate;
+		unsigned            bytes_per_second;
+		unsigned short      block_align;
+		unsigned short      bits_sample;
 	};
 
 	struct riff_data_t
@@ -129,7 +129,7 @@ static void convert(nlwav_options_t &opts)
 
 	plib::pifilestream fin(opts.opt_inp());
 
-	double dt = 1.0 / (double) wo.sample_rate();
+	double dt = 1.0 / static_cast<double>(wo.sample_rate());
 	double ct = dt;
 	//double mean = 2.4;
 	double amp = opts.opt_amp();
@@ -160,12 +160,12 @@ static void convert(nlwav_options_t &opts)
 				minsam = std::min(minsam, outsam);
 				n++;
 				//mean = means / (double) n;
-				mean += 5.0 / (double) wo.sample_rate() * (outsam - mean);
+				mean += 5.0 / static_cast<double>(wo.sample_rate()) * (outsam - mean);
 			}
 			outsam = (outsam - mean) * amp;
 			outsam = std::max(-32000.0, outsam);
 			outsam = std::min(32000.0, outsam);
-			wo.write_sample((int) outsam);
+			wo.write_sample(static_cast<int>(outsam));
 			outsam = 0.0;
 			lt = ct;
 			ct += dt;
@@ -195,7 +195,7 @@ static void convert(nlwav_options_t &opts)
 #endif
 	}
 	pout("Mean (low freq filter): {}\n", mean);
-	pout("Mean (static):          {}\n", means / (double) n);
+	pout("Mean (static):          {}\n", means / static_cast<double>(n));
 	pout("Amp + {}\n", 32000.0 / (maxsam- mean));
 	pout("Amp - {}\n", -32000.0 / (minsam- mean));
 }

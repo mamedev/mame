@@ -32,10 +32,9 @@ namespace netlist
 		logic_input_t m_C;
 		logic_input_t m_D;
 
-		uint_fast8_t read_ABCD() const
+		unsigned read_ABCD() const
 		{
-			//return (INPLOGIC_PASSIVE(m_D) << 3) | (INPLOGIC_PASSIVE(m_C) << 2) | (INPLOGIC_PASSIVE(m_B) << 1) | (INPLOGIC_PASSIVE(m_A) << 0);
-			return (INPLOGIC(m_D) << 3) | (INPLOGIC(m_C) << 2) | (INPLOGIC(m_B) << 1) | (INPLOGIC(m_A) << 0);
+			return (m_D() << 3) | (m_C() << 2) | (m_B() << 1) | (m_A() << 0);
 		}
 	};
 
@@ -70,7 +69,7 @@ namespace netlist
 		logic_input_t m_CU;
 		logic_input_t m_CD;
 
-		state_var<int> m_cnt;
+		state_var<unsigned> m_cnt;
 		state_var<unsigned> m_last_CU;
 		state_var<unsigned> m_last_CD;
 
@@ -119,25 +118,25 @@ namespace netlist
 
 	NETLIB_UPDATE(74192)
 	{
-		int tCarry = 1;
-		int tBorrow = 1;
-		if (INPLOGIC(m_CLEAR))
+		netlist_sig_t tCarry = 1;
+		netlist_sig_t tBorrow = 1;
+		if (m_CLEAR())
 		{
 			m_cnt = 0;
 		}
-		else if (!INPLOGIC(m_LOADQ))
+		else if (!m_LOADQ())
 		{
 			m_cnt = m_ABCD.read_ABCD();
 		}
 		else
 		{
-			if (INPLOGIC(m_CD) && !m_last_CU && INPLOGIC(m_CU))
+			if (m_CD() && !m_last_CU && m_CU())
 			{
 				m_cnt++;
 				if (m_cnt > MAXCNT)
 					m_cnt = 0;
 			}
-			if (INPLOGIC(m_CU) && !m_last_CD && INPLOGIC(m_CD))
+			if (m_CU() && !m_last_CD && m_CD())
 			{
 				if (m_cnt > 0)
 					m_cnt--;
@@ -146,20 +145,20 @@ namespace netlist
 			}
 		}
 
-		if (!INPLOGIC(m_CU) && (m_cnt == MAXCNT))
+		if (!m_CU() && (m_cnt == MAXCNT))
 			tCarry = 0;
 
-		if (!INPLOGIC(m_CD) && (m_cnt == 0))
+		if (!m_CD() && (m_cnt == 0))
 			tBorrow = 0;
 
-		m_last_CD = INPLOGIC(m_CD);
-		m_last_CU = INPLOGIC(m_CU);
+		m_last_CD = m_CD();
+		m_last_CU = m_CU();
 
-		for (int i=0; i<4; i++)
-			OUTLOGIC(m_Q[i], (m_cnt >> i) & 1, delay[i]);
+		for (std::size_t i=0; i<4; i++)
+			m_Q[i].push((m_cnt >> i) & 1, delay[i]);
 
-		OUTLOGIC(m_BORROWQ, tBorrow, NLTIME_FROM_NS(20)); //FIXME
-		OUTLOGIC(m_CARRYQ, tCarry, NLTIME_FROM_NS(20)); //FIXME
+		m_BORROWQ.push(tBorrow, NLTIME_FROM_NS(20)); //FIXME
+		m_CARRYQ.push(tCarry, NLTIME_FROM_NS(20)); //FIXME
 	}
 
 	NETLIB_DEVICE_IMPL(74192)

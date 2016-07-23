@@ -54,7 +54,7 @@ private:
 	void output_one_device(device_t &device, const char *devtag);
 	void output_devices();
 
-	const char *get_merge_name(const hash_collection &romhashes);
+	const char *get_merge_name(const util::hash_collection &romhashes);
 
 	// internal state
 	FILE *                  m_output;

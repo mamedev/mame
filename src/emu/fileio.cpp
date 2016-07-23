@@ -197,7 +197,7 @@ emu_file::operator util::core_file &()
 //  hash - returns the hash for a file
 //-------------------------------------------------
 
-hash_collection &emu_file::hashes(const char *types)
+util::hash_collection &emu_file::hashes(const char *types)
 {
 	// determine the hashes we already have
 	std::string already_have = m_hashes.hash_types();

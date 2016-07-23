@@ -36,7 +36,7 @@ public:
 		opt_help(*this,     "h", "help",                    "display help and exit"),
 		opt_grp2(*this,     "Options for run and static commands",   "These options apply to run and static commands."),
 		opt_name(*this,     "n", "name",        "",         "the netlist in file specified by ""-f"" option to run; default is first one"),
-		opt_grp3(*this,     "Options for run command",		"These options are only used by the run command."),
+		opt_grp3(*this,     "Options for run command",      "These options are only used by the run command."),
 		opt_ttr (*this,     "t", "time_to_run", 1.0,        "time to run the emulation (seconds)"),
 		opt_logs(*this,     "l", "log" ,                    "define terminal to log. This option may be specified repeatedly."),
 		opt_inp(*this,      "i", "input",       "",         "input file to process (default is none)"),
@@ -196,10 +196,10 @@ struct input_t
 				static_cast<netlist::param_double_t*>(m_param)->setTo(m_value);
 				break;
 			case netlist::param_t::INTEGER:
-				static_cast<netlist::param_int_t*>(m_param)->setTo((int)m_value);
+				static_cast<netlist::param_int_t*>(m_param)->setTo(static_cast<int>(m_value));
 				break;
 			case netlist::param_t::LOGIC:
-				static_cast<netlist::param_logic_t*>(m_param)->setTo((int) m_value);
+				static_cast<netlist::param_logic_t*>(m_param)->setTo(static_cast<bool>(m_value));
 				break;
 		}
 	}
@@ -335,7 +335,7 @@ static void listdevices(tool_options_t &opts)
 			if (t.second->name().startsWith(d->name()))
 			{
 				pstring tn(t.second->name().substr(d->name().len()+1));
-				if (tn.find(".")<0)
+				if (tn.find(".") == tn.end())
 					terms.push_back(tn);
 			}
 		}
@@ -345,7 +345,7 @@ static void listdevices(tool_options_t &opts)
 			if (t.first.startsWith(d->name()))
 			{
 				pstring tn(t.first.substr(d->name().len()+1));
-				if (tn.find(".")<0)
+				if (tn.find(".") == tn.end())
 				{
 					terms.push_back(tn);
 					pstring resolved = nt.setup().resolve_alias(t.first);

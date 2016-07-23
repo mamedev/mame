@@ -1,154 +1,8 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nlbase.h
+/*!
  *
- *  A mixed signal circuit simulation
- *
- *  D: Device
- *  O: Rail output (output)
- *  I: Infinite impedance input (input)
- *  T: Terminal (finite impedance)
- *
- *  +---+     +---+     +---+     +---+     +---+
- *  |   |     |   |     |   |     |   |     |   |
- *  | D |     | D |     | D |     | D |     | D |
- *  |   |     |   |     |   |     |   |     |   |
- *  +-O-+     +-I-+     +-I-+     +-T-+     +-T-+
- *    |         |         |         |         |
- *  +-+---------+---------+---------+---------+-+
- *  | rail net                                  |
- *  +-------------------------------------------+
- *
- *  A rail net is a net which is driven by exactly one output with an
- *  (idealized) internal resistance of zero.
- *  Ideally, it can deliver infinite current.
- *
- *  A infinite resistance input does not source or sink current.
- *
- *  Terminals source or sink finite (but never zero) current.
- *
- *  The system differentiates between analog and logic input and outputs and
- *  analog terminals. Analog and logic devices can not be connected to the
- *  same net. Instead, proxy devices are inserted automatically:
- *
- *  +---+     +---+
- *  |   |     |   |
- *  | D1|     | D2|
- *  | A |     | L |
- *  +-O-+     +-I-+
- *    |         |
- *  +-+---------+---+
- *  | rail net      |
- *  +---------------+
- *
- *  is converted into
- *              +----------+
- *              |          |
- *  +---+     +-+-+        |   +---+
- *  |   |     | L |  A-L   |   |   |
- *  | D1|     | D | Proxy  |   | D2|
- *  | A |     | A |        |   |   |
- *  +-O-+     +-I-+        |   +-I-+
- *    |         |          |     |
- *  +-+---------+--+     +-+-----+-------+
- *  | rail net (A) |     | rail net (L)  |
- *  +--------------|     +---------------+
- *
- *  This works both analog to logic as well as logic to analog.
- *
- *  The above is an advanced implementation of the existing discrete
- *  subsystem in MAME. Instead of relying on a fixed time-step, analog devices
- *  could either connect to fixed time-step clock or use an internal clock
- *  to update them. This would however introduce macro devices for RC, diodes
- *  and transistors again.
- *
- *  ============================================================================
- *
- *  Instead, the following approach in case of a pure terminal/input network
- *  is taken:
- *
- *  +---+     +---+     +---+     +---+     +---+
- *  |   |     |   |     |   |     |   |     |   |
- *  | D |     | D |     | D |     | D |     | D |
- *  |   |     |   |     |   |     |   |     |   |
- *  +-T-+     +-I-+     +-I-+     +-T-+     +-T-+
- *    |         |         |         |         |
- *   '+'        |         |        '-'       '-'
- *  +-+---------+---------+---------+---------+-+
- *  | Calculated net                            |
- *  +-------------------------------------------+
- *
- *  SPICE uses the following basic two terminal device:
- *
- *       (k)
- *  +-----T-----+
- *  |     |     |
- *  |  +--+--+  |
- *  |  |     |  |
- *  |  R     |  |
- *  |  R     |  |
- *  |  R     I  |
- *  |  |     I  |  Device n
- *  |  V+    I  |
- *  |  V     |  |
- *  |  V-    |  |
- *  |  |     |  |
- *  |  +--+--+  |
- *  |     |     |
- *  +-----T-----+
- *       (l)
- *
- *  This is a resistance in series to a voltage source and paralleled by a
- *  current source. This is suitable to model voltage sources, current sources,
- *  resistors, capacitors, inductances and diodes.
- *
- *  I(n,l) = - I(n,k) = ( V(k) - V - V(l) ) * (1/R(n)) + I(n)
- *
- *  Now, the sum of all currents for a given net must be 0:
- *
- *  Sum(n,I(n,l)) = 0 = sum(n, ( V(k) - V(n) - V(l) ) * (1/R(n)) + I(n) )
- *
- *  With G(n) = 1 / R(n) and sum(n, G(n)) = Gtot and k=k(n)
- *
- *  0 = - V(l) * Gtot + sum(n, (V(k(n)) - V(n)) * G(n) + I(n))
- *
- *  and with l=l(n) and fixed k
- *
- *  0 =  -V(k) * Gtot + sum(n, ( V(l(n) + V(n) ) * G(n) - I(n))
- *
- *  These equations represent a linear Matrix equation (with more math).
- *
- *  In the end the solution of the analog subsystem boils down to
- *
- *  (G - D) * V = I
- *
- *  with G being the conductance matrix, D a diagonal matrix with the total
- *  conductance on the diagonal elements, V the net voltage vector and I the
- *  current vector.
- *
- *  By using solely two terminal devices, we can simplify the whole calculation
- *  significantly. A BJT now is a four terminal device with two terminals being
- *  connected internally.
- *
- *  The system is solved using an iterative approach:
- *
- *  G * V - D * V = I
- *
- *  assuming V=Vn=Vo
- *
- *  Vn = D-1 * (I - G * Vo)
- *
- *  Each terminal thus has three properties:
- *
- *  a) Resistance
- *  b) Voltage source
- *  c) Current source/sink
- *
- *  Going forward, the approach can be extended e.g. to use a linear
- *  equation solver.
- *
- *  The formal representation of the circuit will stay the same, thus scales.
+ * \file nl_base.h
  *
  */
 
@@ -171,45 +25,92 @@
 // Type definitions
 // ----------------------------------------------------------------------------------------
 
+/*! netlist_sig_t is the type used for logic signals. */
 using netlist_sig_t = std::uint_least32_t;
 
-	//============================================================
-	//  MACROS / New Syntax
-	//============================================================
+//============================================================
+//  MACROS / New Syntax
+//============================================================
 
+/*! Construct a netlist device name */
 #define NETLIB_NAME(chip) nld_ ## chip
 
 #define NETLIB_OBJECT_DERIVED(name, pclass)                                   \
 class NETLIB_NAME(name) : public NETLIB_NAME(pclass)
 
+/*! Start a netlist device class.
+ *  Used to start defining a netlist device class.
+ *  The simplest device without inputs or outputs would look like this:
+ *
+ *      NETLIB_OBJECT(base_dummy)
+ *      {
+ *      public:
+ *          NETLIB_CONSTRUCTOR(base_dummy) { }
+ *      };
+ *
+ *  Also refer to #NETLIB_CONSTRUCTOR.
+ */
 #define NETLIB_OBJECT(name)                                                    \
 class NETLIB_NAME(name) : public device_t
 
 #define NETLIB_CONSTRUCTOR_DERIVED(cname, pclass)                              \
-	private: family_setter_t m_famsetter;                                       \
+	private: detail::family_setter_t m_famsetter;                              \
 	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring name) \
 	: NETLIB_NAME(pclass)(owner, name)
 
-#define NETLIB_CONSTRUCTOR(cname)                                               \
-	private: family_setter_t m_famsetter;                                       \
+/*! Used to define the constructor of a netlist device.
+ *  Use this to define the constructor of a netlist device. Please refer to
+ *  #NETLIB_OBJECT for an example.
+ */
+#define NETLIB_CONSTRUCTOR(cname)                                              \
+	private: detail::family_setter_t m_famsetter;                              \
 	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring name) \
 		: device_t(owner, name)
 
+	/*! Used to define the destructor of a netlist device.
+	*  The use of a destructor for netlist device should normally not be necessary.
+	*/
 #define NETLIB_DESTRUCTOR(name) public: virtual ~NETLIB_NAME(name)()
 
-#define NETLIB_CONSTRUCTOR_EX(cname, ...)                                       \
-	private: family_setter_t m_famsetter;                                       \
+	/*! Define an extended constructor and add further parameters to it.
+	*  The macro allows to add further parameters to a device constructor. This is
+	*  normally used for sub-devices and system devices only.
+	*/
+#define NETLIB_CONSTRUCTOR_EX(cname, ...)                                      \
+	private: detail::family_setter_t m_famsetter;                              \
 	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring name, __VA_ARGS__) \
 		: device_t(owner, name)
 
-#define NETLIB_DYNAMIC()                                                        \
+	/*! Add this to a device definition to mark the device as dynamic.
+	*  If this is added to device definition the device is treated as an analog
+	*  dynamic device, i.e. #NETLIB_UPDATE_TERMINALSI is called on a each step
+	*  of the Newton-Raphson step of solving the linear equations.
+	*/
+#define NETLIB_DYNAMIC()                                                       \
 	public: virtual bool is_dynamic() const override { return true; }
 
-#define NETLIB_TIMESTEP()                                                       \
+	/*! Add this to a device definition to mark the device as a time-stepping device
+	*  and add code.
+	*  If this is added to device definition the device is treated as an analog
+	*  time-stepping device. Currently, only the capacitor device uses this. An other
+	*  example would be an inductor device.
+	*
+	*  Example:
+	*
+	*   NETLIB_TIMESTEP()
+	*       {
+	*           // Gpar should support convergence
+	*           const nl_double G = m_C.Value() / step +  m_GParallel;
+	*           const nl_double I = -G * deltaV();
+	*           set(G, 0.0, I);
+	*       }
+	*
+	*/
+#define NETLIB_TIMESTEP()                                                      \
 	public: virtual bool is_timestep() const override { return true; } \
 	public: virtual void step_time(const nl_double step) override
 
-#define NETLIB_UPDATE_AFTER_PARAM_CHANGE()                                      \
+#define NETLIB_UPDATE_AFTER_PARAM_CHANGE()                                     \
 	public: virtual bool needs_update_after_param_change() const override { return true; }
 
 #define NETLIB_FAMILY(family) , m_famsetter(*this, family)
@@ -266,14 +167,33 @@ namespace netlist
 		class NETLIB_NAME(base_d_to_a_proxy);
 	}
 
+	namespace detail {
+		class object_t;
+		class device_object_t;
+		struct netlist_ref;
+		class core_terminal_t;
+		struct family_setter_t;
+		class queue_t;
+		class net_t;
+	}
+
 	//============================================================
 	//  Exceptions
 	//============================================================
 
+	/*! Generic netlist expection.
+	 *  The exception is used in all events which are considered fatal.
+	 */
 	class nl_exception : public plib::pexception
 	{
 	public:
-		explicit nl_exception(const pstring text) : plib::pexception(text) { }
+		/*! Constructor.
+		 *  Allows a descriptive text to be assed to the exception
+		 */
+		explicit nl_exception(const pstring text //!< text to be passed
+				)
+		: plib::pexception(text) { }
+		/*! Copy constructor. */
 		nl_exception(const nl_exception &e) : plib::pexception(e) { }
 		virtual ~nl_exception() noexcept {}
 	};
@@ -287,16 +207,15 @@ namespace netlist
 	class core_device_t;
 	class device_t;
 
-	// -----------------------------------------------------------------------------
-	// model_map_t
-	// -----------------------------------------------------------------------------
-
+	/*! Type of the model map used.
+	 *  This is used to hold all #Models in an unordered map
+	 */
 	using model_map_t = std::unordered_map<pstring, pstring>;
 
-	// -----------------------------------------------------------------------------
-	// logic_family_t
-	// -----------------------------------------------------------------------------
-
+	/*! Logic families descriptors are used create proxy devices.
+	 *  The logic family describe the analog capabilities of logic devices,
+	 *  inputs and outputs.
+	 */
 	class logic_family_desc_t
 	{
 	public:
@@ -305,14 +224,25 @@ namespace netlist
 		virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name,
 				logic_output_t *proxied) const = 0;
 
-		nl_double m_low_thresh_V;
-		nl_double m_high_thresh_V;
-		nl_double m_low_V;
-		nl_double m_high_V;
-		nl_double m_R_low;
-		nl_double m_R_high;
+		nl_double m_low_thresh_V;   //!< low input threshhold. If the input voltage is below this value, a "0" input is signalled
+		nl_double m_high_thresh_V;  //!< high input threshhold. If the input voltage is above this value, a "0" input is signalled
+		nl_double m_low_V;          //!< low output voltage. This voltage is output if the ouput is "0"
+		nl_double m_high_V;         //!< high output voltage. This voltage is output if the ouput is "1"
+		nl_double m_R_low;          //!< low output resistance. Value of series resistor used for low output
+		nl_double m_R_high;         //!< high output resistance. Value of series resistor used for high output
 	};
 
+	/*! Base class for devices, terminals, outputs and inputs which support
+	 *  logic families.
+	 *  This class is a storage container to store the logic family for a
+	 *  netlist object. You will not directly use it. Please refer to
+	 *  #NETLIB_FAMILY to learn how to define a logic family for a device.
+	 *
+	 * All terminals inherit the family description from the device
+	 * The default is the ttl family, but any device can override the family.
+	 * For individual terminals, the family can be overwritten as well.
+	 *
+	 */
 	class logic_family_t
 	{
 	public:
@@ -327,43 +257,58 @@ namespace netlist
 		const logic_family_desc_t *m_logic_family;
 	};
 
-	/* Terminals inherit the family description from the device
-	 * The default is the ttl family, but any device can override the family.
-	 * For individual terminals, these can be overwritten as well.
+	const logic_family_desc_t *family_TTL();        //*!< logic family for TTL devices.
+	const logic_family_desc_t *family_CD4XXX();     //*!< logic family for CD4XXX CMOS devices.
+
+	/*! A persistent variable template.
+	 *  Use the state_var template to define a variable whose value is saved.
+	 *  Within a device definition use
 	 *
-	 * Only devices of type GENERIC should have a family description entry
+	 *      NETLIB_OBJECT(abc)
+	 *      {
+	 *          NETLIB_CONSTRUCTOR(abc)
+	 *          , m_var(*this, "myvar", 0)
+	 *          ...
+	 *          state_var<unsigned> m_var;
+	 *      }
 	 */
-
-
-	const logic_family_desc_t *family_TTL();
-	const logic_family_desc_t *family_CD4XXX();
-
-
-	// -----------------------------------------------------------------------------
-	// State variables - use to preserve state
-	// -----------------------------------------------------------------------------
 
 	template <typename T>
 	struct state_var
 	{
 	public:
 		template <typename O>
-		state_var(O &owner, const pstring name, const T &value);
+		//! Constructor.
+		state_var(O &owner,             //!< owner must have a netlist() method.
+				const pstring name,     //!< identifier/name for this state variable
+				const T &value          //!< Initial value after construction
+				);
+		//! Copy Constructor.
 		state_var(const state_var &rhs) NOEXCEPT = default;
+		//! Move Constructor.
 		state_var(state_var &&rhs) NOEXCEPT = default;
+		//! Assignment operator to assign value of a state var.
 		state_var &operator=(state_var rhs) { std::swap(rhs.m_value, this->m_value); return *this; }
+		//! Assignment operator to assign value of type T.
 		state_var &operator=(const T rhs) { m_value = rhs; return *this; }
+		//! Return value of state variable.
 		operator T & () { return m_value; }
+		//! Return value of state variable.
 		T & operator()() { return m_value; }
+		//! Return const value of state variable.
 		operator const T & () const { return m_value; }
+		//! Return const value of state variable.
 		const T & operator()() const { return m_value; }
-
 		T * ptr() { return &m_value; }
 		const T * ptr() const { return &m_value; }
 	private:
 		T m_value;
 	};
 
+	/*! A persistent array template.
+	 *  Use this state_var template to define an array whose contents are saved.
+	 *  Please refer to \ref state_var.
+	 */
 	template <typename T, std::size_t N>
 	struct state_var<T[N]>
 	{
@@ -383,42 +328,55 @@ namespace netlist
 	// State variables - predefined and c++11 non-optioanl
 	// -----------------------------------------------------------------------------
 
+	/*! predefined state variable type for uint_fast8_t */
 	using state_var_u8 = state_var<std::uint_fast8_t>;
+	/*! predefined state variable type for int_fast8_t */
 	using state_var_s8 = state_var<std::int_fast8_t>;
 
+	/*! predefined state variable type for uint_fast32_t */
 	using state_var_u32 = state_var<std::uint_fast32_t>;
+	/*! predefined state variable type for int_fast32_t */
 	using state_var_s32 = state_var<std::int_fast32_t>;
 
 	// -----------------------------------------------------------------------------
 	// object_t
 	// -----------------------------------------------------------------------------
 
-
-	class object_t
+	/*! The base class for netlist devices, terminals and parameters.
+	 *
+	 *  This class serves as the base class for all device, terminal and
+	 *  objects. It provides new and delete operators to supported e.g. pooled
+	 *  memory allocation to enhance locality. Please refer to \ref USE_MEMPOOL as
+	 *  well.
+	 */
+	class detail::object_t
 	{
 		P_PREVENT_COPYING(object_t)
 	public:
 
-		object_t(const pstring &aname);
+		/*! Constructor.
+		 *
+		 *  Every class derived from the object_t class must have a name.
+		 */
+		object_t(const pstring &aname /*!< string containing name of the object */);
 		~object_t();
 
+		/*! return name of the object
+		 *
+		 *  \returns name of the object.
+		 */
 		const pstring &name() const;
 
-		//netlist_t & m_netlist;
-		//netlist_t & netlist() { return m_netlist; }
-		//const netlist_t & netlist() const { return m_netlist; }
-
-	private:
-		pstring m_name;
-
-	public:
 		void * operator new (size_t size, void *ptr) { return ptr; }
 		void operator delete (void *ptr, void *) {  }
 		void * operator new (size_t size);
 		void operator delete (void * mem);
+
+	private:
+		pstring m_name;
 	};
 
-	struct netlist_ref
+	struct detail::netlist_ref
 	{
 		netlist_ref(netlist_t &nl) : m_netlist(nl) { }
 
@@ -434,28 +392,53 @@ namespace netlist
 	// device_object_t
 	// -----------------------------------------------------------------------------
 
-	class device_object_t : public object_t
+	/*! Base class for all objects being owned by a device.
+	 *
+	 * Serves as the base class of all objects being owned by a device.
+	 *
+	 */
+	class detail::device_object_t : public detail::object_t
 	{
 		P_PREVENT_COPYING(device_object_t)
 	public:
+		/*! Enum specifying the type of object */
 		enum type_t {
-			TERMINAL = 0,
-			INPUT    = 1,
-			OUTPUT   = 2,
-			PARAM    = 3,
+			TERMINAL = 0, /*!< object is an analog terminal */
+			INPUT    = 1, /*!< object is an input */
+			OUTPUT   = 2, /*!< object is an output */
+			PARAM    = 3, /*!< object is a parameter */
 		};
 
-		device_object_t(core_device_t &dev, const pstring &aname, const type_t atype);
+		/*! Constructor.
+		 *
+		 * \param dev  device owning the object.
+		 * \param name string holding the name of the device
+		 * \param type type   of this object.
+		 */
+		device_object_t(core_device_t &dev, const pstring &name, const type_t type);
+		/*! returns reference to owning device.
+		 * \returns reference to owning device.
+		 */
 		core_device_t &device() const { return m_device; }
 
+		/*! The object type.
+		 * \returns type of the object
+		 */
 		type_t type() const { return m_type; }
-		bool is_type(const type_t atype) const { return (m_type == atype); }
+		/*! Checks if object is of specified type.
+		 * \param type type to check object against.
+		 * \returns true if object is of specified type else false.
+		 */
+		bool is_type(const type_t type) const { return (m_type == type); }
 
+		/*! The netlist owning the owner of this object.
+		 * \returns reference to netlist object.
+		 */
 		netlist_t &netlist();
 
 	private:
 		core_device_t & m_device;
-		const type_t m_type;
+		const type_t    m_type;
 	};
 
 
@@ -463,7 +446,7 @@ namespace netlist
 	// core_terminal_t
 	// -----------------------------------------------------------------------------
 
-	class core_terminal_t : public device_object_t, public plib::linkedlist_t<core_terminal_t>::element_t
+	class detail::core_terminal_t : public device_object_t, public plib::linkedlist_t<core_terminal_t>::element_t
 	{
 		P_PREVENT_COPYING(core_terminal_t)
 	public:
@@ -513,7 +496,7 @@ namespace netlist
 	// analog_t
 	// -----------------------------------------------------------------------------
 
-	class analog_t : public core_terminal_t
+	class analog_t : public detail::core_terminal_t
 	{
 	public:
 
@@ -537,7 +520,7 @@ namespace netlist
 
 		terminal_t(core_device_t &dev, const pstring &aname);
 
-		terminal_t *m_otherterm;
+		nl_double operator ()() const;
 
 		void set(const nl_double G)
 		{
@@ -570,6 +553,8 @@ namespace netlist
 			m_Idr1 = Idr;
 		}
 
+		terminal_t *m_otherterm;
+
 	private:
 		void set_ptr(nl_double *ptr, const nl_double val)
 		{
@@ -590,7 +575,7 @@ namespace netlist
 	// logic_t
 	// -----------------------------------------------------------------------------
 
-	class logic_t : public core_terminal_t, public logic_family_t
+	class logic_t : public detail::core_terminal_t, public logic_family_t
 	{
 	public:
 		logic_t(core_device_t &dev, const pstring &aname, const type_t atype)
@@ -623,6 +608,12 @@ namespace netlist
 
 		netlist_sig_t Q() const;
 
+		netlist_sig_t operator()() const
+		{
+			nl_assert(state() != STATE_INP_PASSIVE);
+			return Q();
+		}
+
 		void inactivate();
 		void activate();
 		void activate_hl();
@@ -634,11 +625,27 @@ namespace netlist
 	// analog_input_t
 	// -----------------------------------------------------------------------------
 
+	/*! terminal providing analog input voltage.
+	 *
+	 * This terminal class provides a voltage measurement. The conductance against
+	 * ground is infinite.
+	 */
 	class analog_input_t : public analog_t
 	{
 	public:
-		analog_input_t(core_device_t &dev, const pstring &aname);
+		/*! Constructor */
+		analog_input_t(core_device_t &dev, /*!< owning device */
+				const pstring &aname       /*!< name of terminal */
+		);
 
+		/*! returns voltage at terminal.
+		 *  \returns voltage at terminal.
+		 */
+		nl_double operator()() const { return Q_Analog(); }
+
+		/*! returns voltage at terminal.
+		 *  \returns voltage at terminal.
+		 */
 		nl_double Q_Analog() const;
 
 	};
@@ -647,7 +654,9 @@ namespace netlist
 	// net_t
 	// -----------------------------------------------------------------------------
 
-	class net_t : public object_t, public netlist_ref
+	class detail::net_t :
+			public detail::object_t,
+			public detail::netlist_ref
 	{
 		P_PREVENT_COPYING(net_t)
 	public:
@@ -707,12 +716,12 @@ namespace netlist
 
 	};
 
-	class logic_net_t : public net_t
+	class logic_net_t : public detail::net_t
 	{
 		P_PREVENT_COPYING(logic_net_t)
 	public:
 
-		logic_net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
+		logic_net_t(netlist_t &nl, const pstring &aname, detail::core_terminal_t *mr = nullptr);
 		virtual ~logic_net_t() { }
 
 		netlist_sig_t Q() const { return m_cur_Q; }
@@ -748,14 +757,14 @@ namespace netlist
 
 	};
 
-	class analog_net_t : public net_t
+	class analog_net_t : public detail::net_t
 	{
 		P_PREVENT_COPYING(analog_net_t)
 	public:
 
 		using list_t =  std::vector<analog_net_t *>;
 
-		analog_net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
+		analog_net_t(netlist_t &nl, const pstring &aname, detail::core_terminal_t *mr = nullptr);
 
 		virtual ~analog_net_t() { }
 
@@ -786,7 +795,7 @@ namespace netlist
 
 		void initial(const netlist_sig_t val);
 
-		void set_Q(const netlist_sig_t newQ, const netlist_time delay) NOEXCEPT
+		void push(const netlist_sig_t newQ, const netlist_time delay) NOEXCEPT
 		{
 			m_my_net.set_Q(newQ, delay); // take the shortcut
 		}
@@ -799,13 +808,13 @@ namespace netlist
 	{
 		P_PREVENT_COPYING(analog_output_t)
 	public:
-
 		analog_output_t(core_device_t &dev, const pstring &aname);
 
+		void push(const nl_double val) { set_Q(val); }
 		void initial(const nl_double val);
-		void set_Q(const nl_double newQ);
 
 	private:
+		void set_Q(const nl_double newQ);
 		analog_net_t m_my_net;
 	};
 
@@ -813,7 +822,7 @@ namespace netlist
 	// param_t
 	// -----------------------------------------------------------------------------
 
-	class param_t : public device_object_t
+	class param_t : public detail::device_object_t
 	{
 		P_PREVENT_COPYING(param_t)
 	public:
@@ -842,13 +851,13 @@ namespace netlist
 	public:
 		param_template_t(device_t &device, const pstring name, const C val);
 
-		operator const C() const { return Value(); }
+			const C operator()() const { return Value(); }
 
 		void setTo(const C &param);
 		void initial(const C &val) { m_param = val; }
-		C Value() const { return m_param;   }
 
 	protected:
+		C Value() const { return m_param;   }
 		virtual void changed() { }
 		C m_param;
 	private:
@@ -883,7 +892,10 @@ namespace netlist
 	// core_device_t
 	// -----------------------------------------------------------------------------
 
-	class core_device_t : public object_t, public logic_family_t, public netlist_ref
+	class core_device_t :
+			public detail::object_t,
+			public logic_family_t,
+			public detail::netlist_ref
 	{
 		P_PREVENT_COPYING(core_device_t)
 	public:
@@ -928,18 +940,6 @@ namespace netlist
 		}
 		void do_reset() { reset(); }
 		void set_hint_deactivate(bool v) { m_hint_deactivate = v; }
-
-		netlist_sig_t INPLOGIC_PASSIVE(logic_input_t &inp);
-		netlist_sig_t INPLOGIC(const logic_input_t &inp) const
-		{
-			nl_assert(inp.state() != logic_t::STATE_INP_PASSIVE);
-			return inp.Q();
-		}
-
-		void OUTLOGIC(logic_output_t &out, const netlist_sig_t val, const netlist_time delay) NOEXCEPT;
-		nl_double INPANALOG(const analog_input_t &inp) const { return inp.Q_Analog(); }
-		nl_double TERMANALOG(const terminal_t &term) const { return term.net().Q_Analog(); }
-		void OUTANALOG(analog_output_t &out, const nl_double val) { out.set_Q(val); }
 
 		/* stats */
 		nperftime_t  m_stat_total_time;
@@ -1001,12 +1001,12 @@ namespace netlist
 		}
 #endif
 
-		void register_subalias(const pstring &name, core_terminal_t &term);
+		void register_subalias(const pstring &name, detail::core_terminal_t &term);
 		void register_subalias(const pstring &name, const pstring &aliased);
 
 		void connect_late(const pstring &t1, const pstring &t2);
-		void connect_late(core_terminal_t &t1, core_terminal_t &t2);
-		void connect_post_start(core_terminal_t &t1, core_terminal_t &t2);
+		void connect_late(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
+		void connect_post_start(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
 	protected:
 
 		NETLIB_UPDATEI() { }
@@ -1019,7 +1019,7 @@ namespace netlist
 	// family_setter_t
 	// -----------------------------------------------------------------------------
 
-	struct family_setter_t
+	struct detail::family_setter_t
 	{
 		family_setter_t() { }
 		family_setter_t(core_device_t &dev, const char *desc);
@@ -1040,10 +1040,11 @@ namespace netlist
 	// queue_t
 	// -----------------------------------------------------------------------------
 
-	class queue_t : public timed_queue<net_t *, netlist_time>,
-					public object_t,
-					public netlist_ref,
-					public plib::state_manager_t::callback_t
+	class detail::queue_t :
+			public timed_queue<net_t *, netlist_time>,
+			public detail::object_t,
+			public detail::netlist_ref,
+			public plib::state_manager_t::callback_t
 	{
 	public:
 		explicit queue_t(netlist_t &nl);
@@ -1056,7 +1057,7 @@ namespace netlist
 
 	private:
 		struct names_t { char m_buf[64]; };
-		int m_qsize;
+		std::size_t m_qsize;
 		std::vector<netlist_time::internal_type> m_times;
 		std::vector<names_t> m_names;
 	};
@@ -1068,7 +1069,6 @@ namespace netlist
 
 	class netlist_t : public plib::plog_dispatch_intf
 	{
-		friend class setup_t;
 		P_PREVENT_COPYING(netlist_t)
 	public:
 
@@ -1080,15 +1080,15 @@ namespace netlist
 		void start();
 		void stop();
 
-		const queue_t &queue() const { return m_queue; }
-		queue_t &queue() { return m_queue; }
+		const detail::queue_t &queue() const { return m_queue; }
+		detail::queue_t &queue() { return m_queue; }
 		const netlist_time time() const { return m_time; }
 		devices::NETLIB_NAME(solver) *solver() const { return m_solver; }
 		devices::NETLIB_NAME(gnd) *gnd() const { return m_gnd; }
 		nl_double gmin() const;
 
-		void push_to_queue(net_t &out, const netlist_time attime) NOEXCEPT;
-		void remove_from_queue(net_t &out);
+		void push_to_queue(detail::net_t &out, const netlist_time attime) NOEXCEPT;
+		void remove_from_queue(detail::net_t &out);
 
 		void process_queue(const netlist_time &delta);
 		void abort_current_queue_slice() { m_queue.retime(m_time, nullptr); }
@@ -1098,10 +1098,9 @@ namespace netlist
 		void set_setup(setup_t *asetup) { m_setup = asetup;  }
 		setup_t &setup() { return *m_setup; }
 
-
 		void register_dev(plib::owned_ptr<device_t> dev);
 
-		net_t *find_net(const pstring &name);
+		detail::net_t *find_net(const pstring &name);
 
 		template<class device_class>
 		std::vector<device_class *> get_device_list()
@@ -1143,7 +1142,7 @@ namespace netlist
 		{
 			this->state().save_item(static_cast<void *>(&owner), state, pstring(owner.name()) + "." + stname);
 		}
-		template<typename O, typename C> void save(O &owner, C *state, const pstring &stname, const int count)
+		template<typename O, typename C> void save(O &owner, C *state, const pstring &stname, const std::size_t count)
 		{
 			this->state().save_state_ptr(static_cast<void *>(&owner), pstring(owner.name()) + "." + stname, plib::state_manager_t::datatype_f<C>::f(), count, state);
 		}
@@ -1154,21 +1153,18 @@ namespace netlist
 
 		void print_stats() const;
 
-		std::vector<plib::owned_ptr<core_device_t>> m_devices;
-
+		std::vector<plib::owned_ptr<core_device_t>>                           m_devices;
 		/* sole use is to manage lifetime of net objects */
-		std::vector<plib::owned_ptr<net_t>> m_nets;
-
+		std::vector<plib::owned_ptr<detail::net_t>>                           m_nets;
 		/* sole use is to manage lifetime of family objects */
 		std::vector<std::pair<pstring, std::unique_ptr<logic_family_desc_t>>> m_family_cache;
 
 	private:
-		plib::state_manager_t       m_state;
+		plib::state_manager_t               m_state;
 		/* mostly rw */
-		netlist_time                m_time;
-		queue_t                     m_queue;
+		netlist_time                        m_time;
+		detail::queue_t                     m_queue;
 
-		nperftime_t                 m_stat_mainloop;
 		/* mostly ro */
 
 		devices::NETLIB_NAME(mainclock) *    m_mainclock;
@@ -1176,15 +1172,16 @@ namespace netlist
 		devices::NETLIB_NAME(gnd) *          m_gnd;
 		devices::NETLIB_NAME(netlistparams) *m_params;
 
-		pstring m_name;
-		setup_t *m_setup;
-		plib::plog_base<NL_DEBUG> m_log;
-		plib::dynlib *m_lib;                 // external lib needs to be loaded as long as netlist exists
+		pstring                             m_name;
+		setup_t *                           m_setup;
+		plib::plog_base<NL_DEBUG>           m_log;
+		plib::dynlib *                      m_lib; // external lib needs to be loaded as long as netlist exists
 
 		// performance
-		nperfcount_t m_perf_out_processed;
-		nperfcount_t m_perf_inp_processed;
-		nperfcount_t m_perf_inp_active;
+		nperftime_t     m_stat_mainloop;
+		nperfcount_t    m_perf_out_processed;
+		nperfcount_t    m_perf_inp_processed;
+		nperfcount_t    m_perf_inp_active;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1223,22 +1220,22 @@ namespace netlist
 		}
 	}
 
-	inline bool core_terminal_t::is_logic() const
+	inline bool detail::core_terminal_t::is_logic() const
 	{
 		return dynamic_cast<const logic_t *>(this) != nullptr;
 	}
 
-	inline bool core_terminal_t::is_analog() const
+	inline bool detail::core_terminal_t::is_analog() const
 	{
 		return dynamic_cast<const analog_t *>(this) != nullptr;
 	}
 
-	inline bool net_t::is_logic() const
+	inline bool detail::net_t::is_logic() const
 	{
 		return dynamic_cast<const logic_net_t *>(this) != nullptr;
 	}
 
-	inline bool net_t::is_analog() const
+	inline bool detail::net_t::is_analog() const
 	{
 		return dynamic_cast<const analog_net_t *>(this) != nullptr;
 	}
@@ -1279,7 +1276,7 @@ namespace netlist
 		}
 	}
 
-	inline void net_t::push_to_queue(const netlist_time delay) NOEXCEPT
+	inline void detail::net_t::push_to_queue(const netlist_time delay) NOEXCEPT
 	{
 		if (!is_queued() && (num_cons() != 0))
 		{
@@ -1292,7 +1289,7 @@ namespace netlist
 		}
 	}
 
-	inline void net_t::reschedule_in_queue(const netlist_time delay) NOEXCEPT
+	inline void detail::net_t::reschedule_in_queue(const netlist_time delay) NOEXCEPT
 	{
 		if (is_queued())
 			netlist().remove_from_queue(*this);
@@ -1314,6 +1311,8 @@ namespace netlist
 	{
 		return static_cast<analog_net_t &>(core_terminal_t::net());
 	}
+
+	inline nl_double terminal_t::operator ()() const { return net().Q_Analog(); }
 
 	inline logic_net_t & logic_t::net()
 	{
@@ -1345,19 +1344,14 @@ namespace netlist
 		}
 	}
 
-	inline void netlist_t::push_to_queue(net_t &out, const netlist_time attime) NOEXCEPT
+	inline void netlist_t::push_to_queue(detail::net_t &out, const netlist_time attime) NOEXCEPT
 	{
 		m_queue.push(attime, &out);
 	}
 
-	inline void netlist_t::remove_from_queue(net_t &out)
+	inline void netlist_t::remove_from_queue(detail::net_t &out)
 	{
 		m_queue.remove(&out);
-	}
-
-	inline void core_device_t::OUTLOGIC(logic_output_t &out, const netlist_sig_t val, const netlist_time delay) NOEXCEPT
-	{
-		out.set_Q(val, delay);
 	}
 
 	template <typename T>
@@ -1376,7 +1370,7 @@ namespace netlist
 			m_value[i] = value;
 	}
 
-	inline netlist_t &device_object_t::netlist()
+	inline netlist_t &detail::device_object_t::netlist()
 	{
 		return m_device.netlist();
 	}

@@ -5,7 +5,7 @@
     CHD compression frontend
 
 ****************************************************************************/
-
+#include <stdio.h> // must be here otherwise issues with I64FMT in MINGW
 #include <assert.h>
 
 #include "osdcore.h"
@@ -1399,15 +1399,15 @@ static void do_info(parameters_t &params)
 		printf("Ratio:        %.1f%%\n", 100.0 * double(static_cast<util::core_file &>(input_chd).size()) / double(input_chd.logical_bytes()));
 
 	// add SHA1 output
-	sha1_t overall = input_chd.sha1();
-	if (overall != sha1_t::null)
+	util::sha1_t overall = input_chd.sha1();
+	if (overall != util::sha1_t::null)
 	{
 		printf("SHA1:         %s\n", overall.as_string().c_str());
 		if (input_chd.version() >= 4)
 			printf("Data SHA1:    %s\n", input_chd.raw_sha1().as_string().c_str());
 	}
-	sha1_t parent = input_chd.parent_sha1();
-	if (parent != sha1_t::null)
+	util::sha1_t parent = input_chd.parent_sha1();
+	if (parent != util::sha1_t::null)
 		printf("Parent SHA1:  %s\n", parent.as_string().c_str());
 
 	// print out metadata
@@ -1530,15 +1530,15 @@ static void do_verify(parameters_t &params)
 	// only makes sense for compressed CHDs with valid SHA1's
 	if (!input_chd.compressed())
 		report_error(0, "No verification to be done; CHD is uncompressed");
-	sha1_t raw_sha1 = (input_chd.version() <= 3) ? input_chd.sha1() : input_chd.raw_sha1();
-	if (raw_sha1 == sha1_t::null)
+	util::sha1_t raw_sha1 = (input_chd.version() <= 3) ? input_chd.sha1() : input_chd.raw_sha1();
+	if (raw_sha1 == util::sha1_t::null)
 		report_error(0, "No verification to be done; CHD has no checksum");
 
 	// create an array to read into
 	dynamic_buffer buffer((TEMP_BUFFER_SIZE / input_chd.hunk_bytes()) * input_chd.hunk_bytes());
 
 	// read all the data and build up an SHA-1
-	sha1_creator rawsha1;
+	util::sha1_creator rawsha1;
 	for (UINT64 offset = 0; offset < input_chd.logical_bytes(); )
 	{
 		progress(false, "Verifying, %.1f%% complete... \r", 100.0 * double(offset) / double(input_chd.logical_bytes()));
@@ -1553,7 +1553,7 @@ static void do_verify(parameters_t &params)
 		rawsha1.append(&buffer[0], bytes_to_read);
 		offset += bytes_to_read;
 	}
-	sha1_t computed_sha1 = rawsha1.finish();
+	util::sha1_t computed_sha1 = rawsha1.finish();
 
 	// finish up
 	if (raw_sha1 != computed_sha1)
@@ -1575,7 +1575,7 @@ static void do_verify(parameters_t &params)
 		// now include the metadata for >= v4
 		if (input_chd.version() >= 4)
 		{
-			sha1_t computed_overall_sha1 = input_chd.compute_overall_sha1(computed_sha1);
+			util::sha1_t computed_overall_sha1 = input_chd.compute_overall_sha1(computed_sha1);
 			if (input_chd.sha1() == computed_overall_sha1)
 				printf("Overall SHA1 verification successful!\n");
 			else

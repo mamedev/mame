@@ -157,7 +157,7 @@ public:
 	NETLIB_CONSTRUCTOR_DERIVED(CCCS, VCCS)
 	, m_gfac(1.0)
 	{
-		m_gfac = NL_FCONST(1.0) / m_RI.Value();
+		m_gfac = NL_FCONST(1.0) / m_RI();
 	}
 
 protected:

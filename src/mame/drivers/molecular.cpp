@@ -165,7 +165,7 @@ READ8_MEMBER( molecula_state::sio_r)
 WRITE8_MEMBER( molecula_state::sio_w)
 {
 	if(offset == 0)
-		printf("%c",data);
+		printf("%c\n",data);
 }
 
 static ADDRESS_MAP_START( molecula_file_map, AS_PROGRAM, 8, molecula_state )

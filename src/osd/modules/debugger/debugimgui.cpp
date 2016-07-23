@@ -1177,7 +1177,7 @@ void debug_imgui::wait_for_debugger(device_t &device, bool firststop)
 
 void debug_imgui::debugger_update()
 {
-	if ((m_machine != nullptr) && (!m_machine->debugger().cpu().is_stopped()) && (m_machine->phase() == MACHINE_PHASE_RUNNING) && !m_hide)
+	if (m_machine && (m_machine->phase() == MACHINE_PHASE_RUNNING) && !m_machine->debugger().cpu().is_stopped() && !m_hide)
 	{
 		UINT32 width = m_machine->render().ui_target().width();
 		UINT32 height = m_machine->render().ui_target().height();

@@ -112,8 +112,9 @@ device_rs232_port_interface::~device_rs232_port_interface()
 #include "loopback.h"
 #include "null_modem.h"
 #include "printer.h"
-#include "terminal.h"
 #include "pty.h"
+#include "sun_kbd.h"
+#include "terminal.h"
 
 SLOT_INTERFACE_START( default_rs232_devices )
 	SLOT_INTERFACE("keyboard", SERIAL_KEYBOARD)
@@ -121,5 +122,6 @@ SLOT_INTERFACE_START( default_rs232_devices )
 	SLOT_INTERFACE("null_modem", NULL_MODEM)
 	SLOT_INTERFACE("printer", SERIAL_PRINTER)
 	SLOT_INTERFACE("terminal", SERIAL_TERMINAL)
-		SLOT_INTERFACE("pty", PSEUDO_TERMINAL)
+	SLOT_INTERFACE("pty", PSEUDO_TERMINAL)
+	SLOT_INTERFACE("sunkbd", SUN_KBD_ADAPTOR)
 SLOT_INTERFACE_END

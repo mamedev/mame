@@ -158,7 +158,10 @@ void acia6850_device::device_start()
 	save_item(NAME(m_rx_parity));
 	save_item(NAME(m_rx_counter));
 	save_item(NAME(m_rx_irq_enable));
+}
 
+void acia6850_device::device_reset()
+{
 	output_txd(1);
 	output_rts(1);
 	output_irq(1);

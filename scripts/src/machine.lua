@@ -2914,3 +2914,14 @@ if (MACHINES["SCNXX562"]~=null) then
 		MAME_DIR .. "src/devices/machine/scnxx562.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/input_merger.h,MACHINES["INPUT_MERGER"] = true
+---------------------------------------------------
+if (MACHINES["INPUT_MERGER"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/input_merger.cpp",
+		MAME_DIR .. "src/devices/machine/input_merger.h",
+	}
+end

@@ -2550,6 +2550,8 @@ bbcmc                           // 1986 BBC Master Compact
 bbcmc_ar                        // 1986 BBC Master Compact (Arabic)
 bbcmet                          // 1986 BBC Master ET
 bbcmt                           // 1986 BBC Master Turbo
+ltmpbp                          // 1985 LTM Portable (B+)
+ltmpm                           // 1986 LTM Portable (Master)
 pro128s                         // 1987 Olivetti Prodest PC 128S
 reutapm                         // 1985 Reuters APM Board
 torchf                          // 1982 Torch CF240
@@ -10715,7 +10717,8 @@ bouldashj                       // (c) 1990 Data East Corporation (Japan)
 drgninja                        // EG (c) 1988 Data East Corporation (Japan)
 drgninjab                       // bootleg
 drgninjab2                      // bootleg
-ffantasy                        // EV (c) 1989 Data East Corporation (Japan)
+ffantasy                        // EX (c) 1989 Data East Corporation (World)
+ffantasyj                       // EV (c) 1989 Data East Corporation (Japan)
 ffantasya                       // EV (c) 1989 Data East Corporation (Japan)
 ffantasybl                      // bootleg
 hbarrel                         // (c) 1987 Data East USA (US)
@@ -11741,6 +11744,7 @@ avenger                         // (c) 1975 Electra
 
 @source:electron.cpp
 electron                        // 1983 Acorn Electron
+btm2105                         // 1985 BT Merlin M2105
 
 @source:elekscmp.cpp
 elekscmp                        //
@@ -12130,6 +12134,7 @@ feasgla                         // EAS: Elite A/S Challenger (Glasgow program, E
 fexcel                          //
 fexcelv                         //
 fscc9                           //
+fscc9b                          //
 fscc12                          //
 reversic                        //
 super9cc                        // SU9: Super 9 Sensory Chess Challenger (English)
@@ -27787,7 +27792,8 @@ truckk                          // 2000.06 Truck Kyousoukyoku (Metro)
 assault                         // (c) 1988
 assaultj                        // (c) 1988 (Japan)
 assaultp                        // (c) 1988 (Japan)
-bubbletr                        // (c) 1992
+bubbletr                        // (c) 1992 (World)
+bubbletrj                       // (c) 1992 (Japan)
 burnforc                        // (c) 1989 (Japan, new version)
 burnforco                       // (c) 1989 (Japan, old version)
 cosmogng                        // (c) 1991 (US)
@@ -32612,6 +32618,7 @@ rdft2aa                         // (c) 1997 Seibu Kaihatsu (Dream Island license
 rdft2it                         // (c) 1997 Seibu Kaihatsu
 rdft2j                          // (c) 1997 Seibu Kaihatsu
 rdft2ja                         // (c) 1997 Seibu Kaihatsu
+rdft2jb                         // (c) 1997 Seibu Kaihatsu
 rdft2t                          // (c) 1997 Seibu Kaihatsu
 rdft2u                          // (c) 1997 Seibu Kaihatsu (Fabtek license)
 rdft2us                         // (c) 1997 Seibu Kaihatsu (Fabtek license)
@@ -35117,6 +35124,8 @@ bilyard                         // (c) 1988 Terminal
 konek                           // (c) 1988 Terminal
 koroleva                        // (c) 1988 Terminal
 sosterm                         // (c) 1988 Terminal
+gorodki                         // (c) 1988 Terminal
+kot                             // (c) 1988 Terminal
 
 @source:ticalc1x.cpp
 dataman                         //
@@ -35717,6 +35726,9 @@ tutor                           // 1983? Tomy Tutor
 
 @source:tv950.cpp
 tv950                           //
+
+@source:tv990.cpp
+tv990							// 1992? Televideo
 
 @source:tvc.cpp
 tvc64                           //

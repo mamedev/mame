@@ -54,8 +54,12 @@ void epos_state::get_pens( pen_t *pens )
 	}
 }
 
+WRITE8_MEMBER(epos_state::flip_screen_w)
+{
+	flip_screen_set(BIT(data, 7));
+}
 
-WRITE8_MEMBER(epos_state::epos_port_1_w)
+WRITE8_MEMBER(epos_state::port_1_w)
 {
 	/* D0 - start light #1
 	   D1 - start light #2
@@ -73,7 +77,7 @@ WRITE8_MEMBER(epos_state::epos_port_1_w)
 }
 
 
-UINT32 epos_state::screen_update_epos(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 epos_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	pen_t pens[0x20];
 	offs_t offs;
@@ -86,6 +90,12 @@ UINT32 epos_state::screen_update_epos(screen_device &screen, bitmap_rgb32 &bitma
 
 		int x = (offs % 136) * 2;
 		int y = (offs / 136);
+		
+		if (flip_screen())
+		{
+			x = 270 - x; // wrong
+			y = 240 - y; // wrong
+		}
 
 		bitmap.pix32(y, x + 0) = pens[(m_palette << 4) | (data & 0x0f)];
 		bitmap.pix32(y, x + 1) = pens[(m_palette << 4) | (data >> 4)];

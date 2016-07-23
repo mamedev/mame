@@ -152,16 +152,11 @@
  * ----------------------------------------------------------
  *
  *  TODO:
- *  - Dump the ROMs (DONE)
- *  - Setup a working address map (DONE)
- *  - Fix terminal for HBUG (DONE)
  *  - Add VME bus driver
  *  - Add DMA/MMU devices
  *  - Add CIO port
  *  - ADD SCSI controller device
  *  - dump PALs and describe descrete logic
- *  - Setup BAUD generation correctly, (eg find that x32 divider)
- *     it is a multilayer PCB so very hard to trace.
  *  - Add LED:s
  *  - Add Jumpers and strap areas
  *  - Find and Boot Heurikon Unix from a SCSI device
@@ -183,9 +178,15 @@
 #define logerror printf
 #endif
 
+#ifdef _MSC_VER
+#define FUNCNAME __func__
+#else
+#define FUNCNAME __PRETTY_FUNCTION__
+#endif
+
 #define BAUDGEN_CLOCK XTAL_19_6608MHz /* Raltron */
-// TODO: figure out the correct divider circuit
-#define SCC_CLOCK (BAUDGEN_CLOCK / 5) /* Giving 9600 but not the 4.9152MHz the documentation says... */
+#define SCC_CLOCK (BAUDGEN_CLOCK / 4) /* through a 74LS393 counter */
+
 class hk68v10_state : public driver_device
 {
 public:
@@ -240,9 +241,9 @@ INPUT_PORTS_END
 /* Start it up */
 void hk68v10_state::machine_start ()
 {
-		LOG (("%d %s\n", m_maincpu->total_cycles(), __func__));
+	LOG(("%s\n", FUNCNAME));
 
-		/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
+	/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
 	m_sysrom = (UINT16*)(memregion ("maincpu")->base () + 0x0fc0000);
 }
 
@@ -254,11 +255,11 @@ void hk68v10_state::machine_start ()
 */
 void hk68v10_state::machine_reset ()
 {
-		LOG (("%d %s\n", m_maincpu->total_cycles(), __func__));
+	LOG(("%s\n", FUNCNAME));
 
-		/* Reset pointer to bootvector in ROM for bootvector handler bootvect_r */
-		if (m_sysrom == &m_sysram[0]) /* Condition needed because memory map is not setup first time */
-			m_sysrom = (UINT16*)(memregion ("maincpu")->base () + 0x0fc0000);
+	/* Reset pointer to bootvector in ROM for bootvector handler bootvect_r */
+	if (m_sysrom == &m_sysram[0]) /* Condition needed because memory map is not setup first time */
+		m_sysrom = (UINT16*)(memregion ("maincpu")->base () + 0x0fc0000);
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0xfc0000 to 0x0 at reset*/
@@ -269,35 +270,35 @@ void hk68v10_state::machine_reset ()
   FC002E: move.l  #$0, $4.l # There is for sure some hardware mapping going in here
 */
 READ16_MEMBER (hk68v10_state::bootvect_r){
-		//LOG (("bootvect_r %s\n", m_sysrom != &m_sysram[0] ? "as reset" : "as swapped"));
-		return m_sysrom[offset];
+	LOG(("%s %s\n", FUNCNAME, m_sysrom != &m_sysram[0] ? "as reset" : "as swapped"));
+	return m_sysrom[offset];
 }
 
 WRITE16_MEMBER (hk68v10_state::bootvect_w){
-		LOG (("bootvect_w offset %08x, mask %08x, data %04x\n", offset, mem_mask, data));
-		m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
-		m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
-		m_sysrom = &m_sysram[0]; // redirect all upcomming accesses to masking RAM until reset.
+	LOG (("%s offset %08x, mask %08x, data %04x\n", FUNCNAME, offset, mem_mask, data));
+	m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
+	m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
+	m_sysrom = &m_sysram[0]; // redirect all upcomming accesses to masking RAM until reset.
 }
 
 #if 0
 /* Dummy VME access methods until the VME bus device is ready for use */
 READ16_MEMBER (hk68v10_state::vme_a24_r){
-		LOG (("vme_a24_r\n"));
-		return (UINT16) 0;
+	LOG(("%s\n", FUNCNAME));
+	return (UINT16) 0;
 }
 
 WRITE16_MEMBER (hk68v10_state::vme_a24_w){
-		LOG (("vme_a24_w\n"));
+	LOG(("%s\n", FUNCNAME));
 }
 
 READ16_MEMBER (hk68v10_state::vme_a16_r){
-		LOG (("vme_16_r\n"));
-		return (UINT16) 0;
+	LOG(("%s\n", FUNCNAME));
+	return (UINT16) 0;
 }
 
 WRITE16_MEMBER (hk68v10_state::vme_a16_w){
-		LOG (("vme_a16_w\n"));
+	LOG(("%s\n", FUNCNAME));
 }
 #endif
 
@@ -365,16 +366,19 @@ ROM_LOAD16_BYTE ("hk68kv10U12.bin", 0xFC0000, 0x2000, CRC (f2d688e9) SHA1 (e6869
  *  'bsf'      Boot from floppy (SCSI)
  *
  * Setup sequence channel B
- *  00
- *  04 4C - x16 clock, 2 stop bits, no parity
- *  05 EA -
- *  03 E1 - 8 bit, receiver enable, auto enable on
- *  09 00 - no reset
- *  01 00
- *  0B 56
- *  0C 0B - low baudrate divider
- *  0D 00 - hi baudrate divider
- *  0E 03 - Baud Rate Generator enabled, PCLK is source
+ * :scc B Reg 04 <- 4c x16 clock, 2 stop bits, no parity
+ * :scc B Reg 05 <- ea Setting up the transmitter, Transmitter Enable 1, Transmitter Bits/Character 8, Send Break 0, RTS=1, DTR=1
+ * :scc B Reg 03 <- e1 Setting up the receiver, Receiver Enable 1, Auto Enables 1, Receiver Bits/Character 8
+ * :scc B Reg 09 <- 00 Master Interrupt Control - No reset  02 A&B: RTS=1 DTR=1 INT=0 Vector generated
+ * :scc B Reg 01 <- 00 Ext INT:0 Tx INT:0 Parity SC:0 Wait/Ready Enable:0 as Wait on Transmit, Rx INT:0 
+ * :scc B Reg 0b <- 56 Clock Mode Control 55 Clock type TTL level on RTxC pin, RCV CLK=BRG, TRA CLK=BRG, TRxC pin is Output, TRxC CLK=BRG - not_implemented
+ * :scc B Reg 0c <- 0b Low byte of Time Constant for Baudrate generator -> 38400 baud
+ * :scc B Reg 0d <- 00 High byte of Time Constant for Baudrate generator
+ * :scc B Reg 0e <- 03 Misc Control Bits DPLL NULL Command, BRG enabled SRC=PCLK, BRG SRC bps=307200=PCLK 4915200/16, BRG OUT 9600=307200/16(32)
+ *  Repeated for :scc A 
+ * :scc B Reg 0c <- 0e Low byte of Time Constant for Baudrate generator -> 9600 baud
+ * :scc B Reg 0d <- 00 High byte of Time Constant for Baudrate generator
+ *  Repeated for :scc A 
  */
 ROM_END
 

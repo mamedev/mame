@@ -168,7 +168,7 @@ iodevice_t device_image_interface::device_typeid(const char *name)
     using this device's partial hash if appropriate
 -------------------------------------------------*/
 
-void device_image_interface::device_compute_hash(hash_collection &hashes, const void *data, size_t length, const char *types) const
+void device_image_interface::device_compute_hash(util::hash_collection &hashes, const void *data, size_t length, const char *types) const
 {
 	/* retrieve the partial hash func */
 	device_image_partialhash_func partialhash = get_partial_hash();
@@ -464,8 +464,8 @@ bool device_image_interface::load_software_region(const char *tag, optional_shar
 // to be loaded
 // ****************************************************************************
 
-void device_image_interface::run_hash(void (*partialhash)(hash_collection &, const unsigned char *, unsigned long, const char *),
-	hash_collection &hashes, const char *types)
+void device_image_interface::run_hash(void (*partialhash)(util::hash_collection &, const unsigned char *, unsigned long, const char *),
+	util::hash_collection &hashes, const char *types)
 {
 	UINT32 size;
 	dynamic_buffer buf;
@@ -511,7 +511,7 @@ void device_image_interface::image_checkhash()
 		// retrieve the partial hash func
 		partialhash = get_partial_hash();
 
-		run_hash(partialhash, m_hash, hash_collection::HASH_TYPES_ALL);
+		run_hash(partialhash, m_hash, util::hash_collection::HASH_TYPES_ALL);
 	}
 	return;
 }
@@ -778,7 +778,7 @@ void device_image_interface::determine_open_plan(int is_create, UINT32 *open_pla
 //	correct checksums for a given software item
 //-------------------------------------------------
 
-static void dump_wrong_and_correct_checksums(const hash_collection &hashes, const hash_collection &acthashes)
+static void dump_wrong_and_correct_checksums(const util::hash_collection &hashes, const util::hash_collection &acthashes)
 {
 	osd_printf_error("    EXPECTED: %s\n", hashes.macro_string().c_str());
 	osd_printf_error("       FOUND: %s\n", acthashes.macro_string().c_str());
@@ -790,7 +790,7 @@ static void dump_wrong_and_correct_checksums(const hash_collection &hashes, cons
 //	and hash signatures of a file
 //-------------------------------------------------
 
-static int verify_length_and_hash(emu_file *file, const char *name, UINT32 explength, const hash_collection &hashes)
+static int verify_length_and_hash(emu_file *file, const char *name, UINT32 explength, const util::hash_collection &hashes)
 {
 	int retVal = 0;
 	if (file==nullptr) return 0;
@@ -804,8 +804,8 @@ static int verify_length_and_hash(emu_file *file, const char *name, UINT32 exple
 	}
 
 	// If there is no good dump known, write it
-	hash_collection &acthashes = file->hashes(hashes.hash_types().c_str());
-	if (hashes.flag(hash_collection::FLAG_NO_DUMP))
+	util::hash_collection &acthashes = file->hashes(hashes.hash_types().c_str());
+	if (hashes.flag(util::hash_collection::FLAG_NO_DUMP))
 	{
 		osd_printf_error("%s NO GOOD DUMP KNOWN\n", name);
 	}
@@ -818,7 +818,7 @@ static int verify_length_and_hash(emu_file *file, const char *name, UINT32 exple
 		retVal++;
 	}
 	// If it matches, but it is actually a bad dump, write it
-	else if (hashes.flag(hash_collection::FLAG_BAD_DUMP))
+	else if (hashes.flag(util::hash_collection::FLAG_BAD_DUMP))
 	{
 		osd_printf_error("%s NEEDS REDUMP\n",name);
 	}
@@ -848,9 +848,9 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 				osd_file::error filerr = osd_file::error::NOT_FOUND;
 
 				UINT32 crc = 0;
-				bool has_crc = hash_collection(ROM_GETHASHDATA(romp)).crc(crc);
+				bool has_crc = util::hash_collection(ROM_GETHASHDATA(romp)).crc(crc);
 
-				software_info *swinfo = swlist.find(swname);
+				const software_info *swinfo = swlist.find(swname);
 				if (swinfo == nullptr)
 					return false;
 
@@ -867,8 +867,7 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 				while (swinfo != nullptr)
 				{
 					locationtag.append(swinfo->shortname()).append(breakstr);
-					const char *parentname = swinfo->parentname();
-					swinfo = (parentname != nullptr) ? swlist.find(parentname) : nullptr;
+					swinfo = !swinfo->parentname().empty() ? swlist.find(swinfo->parentname().c_str()) : nullptr;
 				}
 				// strip the final '%'
 				locationtag.erase(locationtag.length() - 1, 1);
@@ -912,7 +911,7 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 				if ((m_mame_file == nullptr) && (tag5.c_str() != nullptr))
 					m_mame_file = common_process_file(device().machine().options(), tag5.c_str(), has_crc, crc, romp, filerr);
 
-				warningcount += verify_length_and_hash(m_mame_file.get(),ROM_GETNAME(romp),ROM_GETLENGTH(romp),hash_collection(ROM_GETHASHDATA(romp)));
+				warningcount += verify_length_and_hash(m_mame_file.get(),ROM_GETNAME(romp),ROM_GETLENGTH(romp), util::hash_collection(ROM_GETHASHDATA(romp)));
 
 				if (filerr == osd_file::error::NONE)
 					filerr = util::core_file::open_proxy(*m_mame_file, m_file);
@@ -1008,7 +1007,7 @@ bool device_image_interface::load_internal(const char *path, bool is_create, int
 		if ( m_software_info_ptr )
 		{
 			// sanitize
-			if (m_software_info_ptr->longname() == nullptr || m_software_info_ptr->publisher() == nullptr || m_software_info_ptr->year() == nullptr)
+			if (m_software_info_ptr->longname().empty() || m_software_info_ptr->publisher().empty() || m_software_info_ptr->year().empty())
 				fatalerror("Each entry in an XML list must have all of the following fields: description, publisher, year!\n");
 
 			// store
@@ -1281,7 +1280,7 @@ void device_image_interface::software_name_split(const char *swlist_swname, std:
 }
 
 
-software_part *device_image_interface::find_software_item(const char *path, bool restrict_to_interface) const
+const software_part *device_image_interface::find_software_item(const char *path, bool restrict_to_interface) const
 {
 	// split full software name into software list name and short software name
 	std::string swlist_name, swinfo_name, swpart_name;
@@ -1297,10 +1296,10 @@ software_part *device_image_interface::find_software_item(const char *path, bool
 	{
 		if (swlist_name.compare(swlistdev.list_name())==0 || !(swlist_name.length() > 0))
 		{
-			software_info *info = swlistdev.find(swinfo_name.c_str());
+			const software_info *info = swlistdev.find(swinfo_name.c_str());
 			if (info != nullptr)
 			{
-				software_part *part = info->find_part(swpart_name.c_str(), interface);
+				const software_part *part = info->find_part(swpart_name.c_str(), interface);
 				if (part != nullptr)
 					return part;
 			}
@@ -1312,10 +1311,10 @@ software_part *device_image_interface::find_software_item(const char *path, bool
 			// gameboy:sml) which is not handled properly by software_name_split
 			// since the function cannot distinguish between this and the case
 			// path = swinfo_name:swpart_name
-			software_info *info = swlistdev.find(swpart_name.c_str());
+			const software_info *info = swlistdev.find(swpart_name.c_str());
 			if (info != nullptr)
 			{
-				software_part *part = info->find_part(nullptr, interface);
+				const software_part *part = info->find_part(nullptr, interface);
 				if (part != nullptr)
 					return part;
 			}
@@ -1324,6 +1323,23 @@ software_part *device_image_interface::find_software_item(const char *path, bool
 
 	// if explicitly specified and not found, just error here
 	return nullptr;
+}
+
+
+//-------------------------------------------------
+//	call_softlist_load
+//-------------------------------------------------
+
+bool device_image_interface::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
+{
+	const software_list_loader &loader = get_software_list_loader();
+	bool result = loader.load_software(*this, swlist, swname, start_entry);
+
+	// this is a hook that seems to only be used by TI99
+	if (result)
+		loaded_through_softlist();
+
+	return result;
 }
 
 
@@ -1340,7 +1356,7 @@ software_part *device_image_interface::find_software_item(const char *path, bool
 //  sw_info and sw_part are also set.
 //-------------------------------------------------
 
-bool device_image_interface::load_software_part(const char *path, software_part *&swpart)
+bool device_image_interface::load_software_part(const char *path, const software_part *&swpart)
 {
 	// if no match has been found, we suggest similar shortnames
 	swpart = find_software_item(path, true);
@@ -1352,7 +1368,7 @@ bool device_image_interface::load_software_part(const char *path, software_part 
 
 	// Load the software part
 	software_list_device &swlist = swpart->info().list();
-	bool result = call_softlist_load(swlist, swpart->info().shortname(), swpart->romdata());
+	bool result = call_softlist_load(swlist, swpart->info().shortname().c_str(), swpart->romdata());
 
 	// Tell the world which part we actually loaded
 	std::string full_sw_name = string_format("%s:%s:%s", swlist.list_name(), swpart->info().shortname(), swpart->name());
@@ -1376,7 +1392,7 @@ bool device_image_interface::load_software_part(const char *path, software_part 
 	const char *requirement = swpart->feature("requirement");
 	if (requirement != nullptr)
 	{
-		software_part *req_swpart = find_software_item(requirement, false);
+		const software_part *req_swpart = find_software_item(requirement, false);
 		if (req_swpart != nullptr)
 		{
 			device_image_interface *req_image = req_swpart->find_mountable_image(device().mconfig());
@@ -1401,7 +1417,7 @@ std::string device_image_interface::software_get_default_slot(const char *defaul
 	if (*path != '\0')
 	{
 		result.assign(default_card_slot);
-		software_part *swpart = find_software_item(path, true);
+		const software_part *swpart = find_software_item(path, true);
 		if (swpart != nullptr)
 		{
 			const char *slot = swpart->feature("slot");

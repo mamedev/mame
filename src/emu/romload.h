@@ -310,8 +310,8 @@ private:
 	void count_roms();
 	void fill_random(UINT8 *base, UINT32 length);
 	void handle_missing_file(const rom_entry *romp, std::string tried_file_names, chd_error chderr);
-	void dump_wrong_and_correct_checksums(const hash_collection &hashes, const hash_collection &acthashes);
-	void verify_length_and_hash(const char *name, UINT32 explength, const hash_collection &hashes);
+	void dump_wrong_and_correct_checksums(const util::hash_collection &hashes, const util::hash_collection &acthashes);
+	void verify_length_and_hash(const char *name, UINT32 explength, const util::hash_collection &hashes);
 	void display_loading_rom_message(const char *name, bool from_list);
 	void display_rom_load_results(bool from_list);
 	void region_post_process(const char *rgntag, bool invert);

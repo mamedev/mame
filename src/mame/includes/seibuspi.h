@@ -19,7 +19,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_mainram(*this, "mainram"),
-		m_scrollram(*this, "scrollram"),
 		m_z80_rom(*this, "audiocpu"),
 		m_eeprom(*this, "eeprom"),
 		m_soundflash1(*this, "soundflash1"),
@@ -29,13 +28,14 @@ public:
 		m_oki1(*this, "oki1"),
 		m_oki2(*this, "oki2"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_key(*this, "KEY"),
+		m_special(*this, "SPECIAL")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	required_shared_ptr<UINT32> m_mainram;
-	optional_shared_ptr<UINT32> m_scrollram;
 	optional_memory_region m_z80_rom;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<intel_e28f008sa_device> m_soundflash1;
@@ -47,6 +47,9 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
+	optional_ioport_array<5> m_key;
+	optional_ioport m_special;
+
 	int m_z80_prg_transfer_pos;
 	int m_z80_lastbank;
 	UINT8 m_sb_coin_latch;
@@ -57,9 +60,10 @@ public:
 	tilemap_t *m_fore_layer;
 	UINT32 m_video_dma_length;
 	UINT32 m_video_dma_address;
-	UINT32 m_layer_enable;
-	UINT32 m_layer_bank;
+	UINT16 m_layer_enable;
+	UINT16 m_layer_bank;
 	UINT8 m_rf2_layer_bank;
+	UINT16 m_scrollram[6];
 	int m_rowscroll_enable;
 	int m_midl_layer_offset;
 	int m_fore_layer_offset;
@@ -78,10 +82,11 @@ public:
 	UINT8 m_alpha_table[0x2000];
 	int m_sprite_bpp;
 
-	DECLARE_READ32_MEMBER(spi_layer_bank_r);
-	DECLARE_WRITE32_MEMBER(spi_layer_bank_w);
-	DECLARE_WRITE32_MEMBER(spi_layer_enable_w);
+	DECLARE_WRITE16_MEMBER(tile_decrypt_key_w);
+	DECLARE_WRITE16_MEMBER(spi_layer_bank_w);
+	DECLARE_WRITE16_MEMBER(spi_layer_enable_w);
 	DECLARE_WRITE8_MEMBER(rf2_layer_bank_w);
+	DECLARE_WRITE16_MEMBER(scroll_w);
 	DECLARE_WRITE32_MEMBER(tilemap_dma_start_w);
 	DECLARE_WRITE32_MEMBER(palette_dma_start_w);
 	DECLARE_WRITE16_MEMBER(sprite_dma_start_w);
@@ -140,8 +145,6 @@ public:
 	void register_video_state();
 	void init_spi_common();
 	void init_sei252();
-	void init_rise10();
-	void init_rise11();
 	DECLARE_DRIVER_INIT(batlball);
 	DECLARE_DRIVER_INIT(senkyu);
 	DECLARE_DRIVER_INIT(viprp1);
@@ -152,4 +155,13 @@ public:
 	DECLARE_DRIVER_INIT(rdft2);
 	DECLARE_DRIVER_INIT(ejanhs);
 	DECLARE_DRIVER_INIT(sys386f);
+
+	void text_decrypt(UINT8 *rom);
+	void bg_decrypt(UINT8 *rom, int size);
+
+	void rdft2_text_decrypt(UINT8 *rom);
+	void rdft2_bg_decrypt(UINT8 *rom, int size);
+
+	void rfjet_text_decrypt(UINT8 *rom);
+	void rfjet_bg_decrypt(UINT8 *rom, int size);
 };
