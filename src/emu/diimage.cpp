@@ -168,7 +168,7 @@ iodevice_t device_image_interface::device_typeid(const char *name)
     using this device's partial hash if appropriate
 -------------------------------------------------*/
 
-void device_image_interface::device_compute_hash(hash_collection &hashes, const void *data, size_t length, const char *types) const
+void device_image_interface::device_compute_hash(util::hash_collection &hashes, const void *data, size_t length, const char *types) const
 {
 	/* retrieve the partial hash func */
 	device_image_partialhash_func partialhash = get_partial_hash();
@@ -464,8 +464,8 @@ bool device_image_interface::load_software_region(const char *tag, optional_shar
 // to be loaded
 // ****************************************************************************
 
-void device_image_interface::run_hash(void (*partialhash)(hash_collection &, const unsigned char *, unsigned long, const char *),
-	hash_collection &hashes, const char *types)
+void device_image_interface::run_hash(void (*partialhash)(util::hash_collection &, const unsigned char *, unsigned long, const char *),
+	util::hash_collection &hashes, const char *types)
 {
 	UINT32 size;
 	dynamic_buffer buf;
@@ -511,7 +511,7 @@ void device_image_interface::image_checkhash()
 		// retrieve the partial hash func
 		partialhash = get_partial_hash();
 
-		run_hash(partialhash, m_hash, hash_collection::HASH_TYPES_ALL);
+		run_hash(partialhash, m_hash, util::hash_collection::HASH_TYPES_ALL);
 	}
 	return;
 }
@@ -778,7 +778,7 @@ void device_image_interface::determine_open_plan(int is_create, UINT32 *open_pla
 //	correct checksums for a given software item
 //-------------------------------------------------
 
-static void dump_wrong_and_correct_checksums(const hash_collection &hashes, const hash_collection &acthashes)
+static void dump_wrong_and_correct_checksums(const util::hash_collection &hashes, const util::hash_collection &acthashes)
 {
 	osd_printf_error("    EXPECTED: %s\n", hashes.macro_string().c_str());
 	osd_printf_error("       FOUND: %s\n", acthashes.macro_string().c_str());
@@ -790,7 +790,7 @@ static void dump_wrong_and_correct_checksums(const hash_collection &hashes, cons
 //	and hash signatures of a file
 //-------------------------------------------------
 
-static int verify_length_and_hash(emu_file *file, const char *name, UINT32 explength, const hash_collection &hashes)
+static int verify_length_and_hash(emu_file *file, const char *name, UINT32 explength, const util::hash_collection &hashes)
 {
 	int retVal = 0;
 	if (file==nullptr) return 0;
@@ -804,8 +804,8 @@ static int verify_length_and_hash(emu_file *file, const char *name, UINT32 exple
 	}
 
 	// If there is no good dump known, write it
-	hash_collection &acthashes = file->hashes(hashes.hash_types().c_str());
-	if (hashes.flag(hash_collection::FLAG_NO_DUMP))
+	util::hash_collection &acthashes = file->hashes(hashes.hash_types().c_str());
+	if (hashes.flag(util::hash_collection::FLAG_NO_DUMP))
 	{
 		osd_printf_error("%s NO GOOD DUMP KNOWN\n", name);
 	}
@@ -818,7 +818,7 @@ static int verify_length_and_hash(emu_file *file, const char *name, UINT32 exple
 		retVal++;
 	}
 	// If it matches, but it is actually a bad dump, write it
-	else if (hashes.flag(hash_collection::FLAG_BAD_DUMP))
+	else if (hashes.flag(util::hash_collection::FLAG_BAD_DUMP))
 	{
 		osd_printf_error("%s NEEDS REDUMP\n",name);
 	}
@@ -848,7 +848,7 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 				osd_file::error filerr = osd_file::error::NOT_FOUND;
 
 				UINT32 crc = 0;
-				bool has_crc = hash_collection(ROM_GETHASHDATA(romp)).crc(crc);
+				bool has_crc = util::hash_collection(ROM_GETHASHDATA(romp)).crc(crc);
 
 				const software_info *swinfo = swlist.find(swname);
 				if (swinfo == nullptr)
@@ -911,7 +911,7 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 				if ((m_mame_file == nullptr) && (tag5.c_str() != nullptr))
 					m_mame_file = common_process_file(device().machine().options(), tag5.c_str(), has_crc, crc, romp, filerr);
 
-				warningcount += verify_length_and_hash(m_mame_file.get(),ROM_GETNAME(romp),ROM_GETLENGTH(romp),hash_collection(ROM_GETHASHDATA(romp)));
+				warningcount += verify_length_and_hash(m_mame_file.get(),ROM_GETNAME(romp),ROM_GETLENGTH(romp), util::hash_collection(ROM_GETHASHDATA(romp)));
 
 				if (filerr == osd_file::error::NONE)
 					filerr = util::core_file::open_proxy(*m_mame_file, m_file);

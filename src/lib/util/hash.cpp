@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    hash.c
+    hash.cpp
 
     Function to handle hash functions (checksums)
 
@@ -10,11 +10,12 @@
 
 ***************************************************************************/
 
-#include "emu.h"
+#include "hash.h"
 #include "hashing.h"
 #include <ctype.h>
 
 
+namespace util {
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -418,3 +419,5 @@ void hash_collection::copyfrom(const hash_collection &src)
 	// don't copy creators
 	m_creator = nullptr;
 }
+
+} // namespace util

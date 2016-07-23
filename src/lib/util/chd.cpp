@@ -115,7 +115,7 @@ struct chd_file::metadata_entry
 struct chd_file::metadata_hash
 {
 	UINT8                   tag[4];         // tag of the metadata in big-endian
-	sha1_t                  sha1;           // hash data
+	util::sha1_t            sha1;           // hash data
 };
 
 
@@ -159,9 +159,9 @@ inline void chd_file::be_write(UINT8 *base, UINT64 value, int numbytes)
 //  stream in bigendian order
 //-------------------------------------------------
 
-inline sha1_t chd_file::be_read_sha1(const UINT8 *base)
+inline util::sha1_t chd_file::be_read_sha1(const UINT8 *base)
 {
-	sha1_t result;
+	util::sha1_t result;
 	memcpy(&result.m_raw[0], base, sizeof(result.m_raw));
 	return result;
 }
@@ -172,7 +172,7 @@ inline sha1_t chd_file::be_read_sha1(const UINT8 *base)
 //  stream in bigendian order
 //-------------------------------------------------
 
-inline void chd_file::be_write_sha1(UINT8 *base, sha1_t value)
+inline void chd_file::be_write_sha1(UINT8 *base, util::sha1_t value)
 {
 	memcpy(base, &value.m_raw[0], sizeof(value.m_raw));
 }
@@ -311,7 +311,7 @@ chd_file::~chd_file()
 }
 
 /**
- * @fn  sha1_t chd_file::sha1()
+ * @fn  util::sha1_t chd_file::sha1()
  *
  * @brief   -------------------------------------------------
  *            sha1 - return our SHA1 value
@@ -320,24 +320,24 @@ chd_file::~chd_file()
  * @return  A sha1_t.
  */
 
-sha1_t chd_file::sha1()
+util::sha1_t chd_file::sha1()
 {
 	try
 	{
 		// read the big-endian version
-		UINT8 rawbuf[sizeof(sha1_t)];
+		UINT8 rawbuf[sizeof(util::sha1_t)];
 		file_read(m_sha1_offset, rawbuf, sizeof(rawbuf));
 		return be_read_sha1(rawbuf);
 	}
 	catch (chd_error &)
 	{
 		// on failure, return nullptr
-		return sha1_t::null;
+		return util::sha1_t::null;
 	}
 }
 
 /**
- * @fn  sha1_t chd_file::raw_sha1()
+ * @fn  util::sha1_t chd_file::raw_sha1()
  *
  * @brief   -------------------------------------------------
  *            raw_sha1 - return our raw SHA1 value
@@ -349,7 +349,7 @@ sha1_t chd_file::sha1()
  * @return  A sha1_t.
  */
 
-sha1_t chd_file::raw_sha1()
+util::sha1_t chd_file::raw_sha1()
 {
 	try
 	{
@@ -358,19 +358,19 @@ sha1_t chd_file::raw_sha1()
 			throw CHDERR_UNSUPPORTED_VERSION;
 
 		// read the big-endian version
-		UINT8 rawbuf[sizeof(sha1_t)];
+		UINT8 rawbuf[sizeof(util::sha1_t)];
 		file_read(m_rawsha1_offset, rawbuf, sizeof(rawbuf));
 		return be_read_sha1(rawbuf);
 	}
 	catch (chd_error &)
 	{
 		// on failure, return nullptr
-		return sha1_t::null;
+		return util::sha1_t::null;
 	}
 }
 
 /**
- * @fn  sha1_t chd_file::parent_sha1()
+ * @fn  util::sha1_t chd_file::parent_sha1()
  *
  * @brief   -------------------------------------------------
  *            parent_sha1 - return our parent's SHA1 value
@@ -382,7 +382,7 @@ sha1_t chd_file::raw_sha1()
  * @return  A sha1_t.
  */
 
-sha1_t chd_file::parent_sha1()
+util::sha1_t chd_file::parent_sha1()
 {
 	try
 	{
@@ -391,14 +391,14 @@ sha1_t chd_file::parent_sha1()
 			throw CHDERR_UNSUPPORTED_VERSION;
 
 		// read the big-endian version
-		UINT8 rawbuf[sizeof(sha1_t)];
+		UINT8 rawbuf[sizeof(util::sha1_t)];
 		file_read(m_parentsha1_offset, rawbuf, sizeof(rawbuf));
 		return be_read_sha1(rawbuf);
 	}
 	catch (chd_error &)
 	{
 		// on failure, return nullptr
-		return sha1_t::null;
+		return util::sha1_t::null;
 	}
 }
 
@@ -523,10 +523,10 @@ chd_error chd_file::hunk_info(UINT32 hunknum, chd_codec_type &compressor, UINT32
  * @param   rawdata The rawdata.
  */
 
-void chd_file::set_raw_sha1(sha1_t rawdata)
+void chd_file::set_raw_sha1(util::sha1_t rawdata)
 {
 	// create a big-endian version
-	UINT8 rawbuf[sizeof(sha1_t)];
+	UINT8 rawbuf[sizeof(util::sha1_t)];
 	be_write_sha1(rawbuf, rawdata);
 
 	// write to the header
@@ -551,14 +551,14 @@ void chd_file::set_raw_sha1(sha1_t rawdata)
  * @param   parent  The parent.
  */
 
-void chd_file::set_parent_sha1(sha1_t parent)
+void chd_file::set_parent_sha1(util::sha1_t parent)
 {
 	// if no file, fail
 	if (m_file == nullptr)
 		throw CHDERR_INVALID_FILE;
 
 	// create a big-endian version
-	UINT8 rawbuf[sizeof(sha1_t)];
+	UINT8 rawbuf[sizeof(util::sha1_t)];
 	be_write_sha1(rawbuf, parent);
 
 	// write to the header
@@ -902,13 +902,13 @@ chd_error chd_file::read_hunk(UINT32 hunknum, void *buffer)
 						blocklen = be_read(&rawmap[12], 2) + (rawmap[14] << 16);
 						file_read(blockoffs, &m_compressed[0], blocklen);
 						m_decompressor[0]->decompress(&m_compressed[0], blocklen, dest, m_hunkbytes);
-						if (!(rawmap[15] & V34_MAP_ENTRY_FLAG_NO_CRC) && dest != nullptr && crc32_creator::simple(dest, m_hunkbytes) != blockcrc)
+						if (!(rawmap[15] & V34_MAP_ENTRY_FLAG_NO_CRC) && dest != nullptr && util::crc32_creator::simple(dest, m_hunkbytes) != blockcrc)
 							throw CHDERR_DECOMPRESSION_ERROR;
 						return CHDERR_NONE;
 
 					case V34_MAP_ENTRY_TYPE_UNCOMPRESSED:
 						file_read(blockoffs, dest, m_hunkbytes);
-						if (!(rawmap[15] & V34_MAP_ENTRY_FLAG_NO_CRC) && crc32_creator::simple(dest, m_hunkbytes) != blockcrc)
+						if (!(rawmap[15] & V34_MAP_ENTRY_FLAG_NO_CRC) && util::crc32_creator::simple(dest, m_hunkbytes) != blockcrc)
 							throw CHDERR_DECOMPRESSION_ERROR;
 						return CHDERR_NONE;
 
@@ -916,7 +916,7 @@ chd_error chd_file::read_hunk(UINT32 hunknum, void *buffer)
 						be_write(dest, blockoffs, 8);
 						for (UINT32 bytes = 8; bytes < m_hunkbytes; bytes++)
 							dest[bytes] = dest[bytes - 8];
-						if (!(rawmap[15] & V34_MAP_ENTRY_FLAG_NO_CRC) && crc32_creator::simple(dest, m_hunkbytes) != blockcrc)
+						if (!(rawmap[15] & V34_MAP_ENTRY_FLAG_NO_CRC) && util::crc32_creator::simple(dest, m_hunkbytes) != blockcrc)
 							throw CHDERR_DECOMPRESSION_ERROR;
 						return CHDERR_NONE;
 
@@ -961,15 +961,15 @@ chd_error chd_file::read_hunk(UINT32 hunknum, void *buffer)
 					case COMPRESSION_TYPE_3:
 						file_read(blockoffs, &m_compressed[0], blocklen);
 						m_decompressor[rawmap[0]]->decompress(&m_compressed[0], blocklen, dest, m_hunkbytes);
-						if (!m_decompressor[rawmap[0]]->lossy() && dest != nullptr && crc16_creator::simple(dest, m_hunkbytes) != blockcrc)
+						if (!m_decompressor[rawmap[0]]->lossy() && dest != nullptr && util::crc16_creator::simple(dest, m_hunkbytes) != blockcrc)
 							throw CHDERR_DECOMPRESSION_ERROR;
-						if (m_decompressor[rawmap[0]]->lossy() && crc16_creator::simple(&m_compressed[0], blocklen) != blockcrc)
+						if (m_decompressor[rawmap[0]]->lossy() && util::crc16_creator::simple(&m_compressed[0], blocklen) != blockcrc)
 							throw CHDERR_DECOMPRESSION_ERROR;
 						return CHDERR_NONE;
 
 					case COMPRESSION_NONE:
 						file_read(blockoffs, dest, m_hunkbytes);
-						if (crc16_creator::simple(dest, m_hunkbytes) != blockcrc)
+						if (util::crc16_creator::simple(dest, m_hunkbytes) != blockcrc)
 							throw CHDERR_DECOMPRESSION_ERROR;
 						return CHDERR_NONE;
 
@@ -1558,7 +1558,7 @@ chd_error chd_file::clone_all_metadata(chd_file &source)
 }
 
 /**
- * @fn  sha1_t chd_file::compute_overall_sha1(sha1_t rawsha1)
+ * @fn  util::sha1_t chd_file::compute_overall_sha1(sha1_t rawsha1)
  *
  * @brief   -------------------------------------------------
  *            compute_overall_sha1 - iterate through the metadata and compute the overall hash of
@@ -1570,7 +1570,7 @@ chd_error chd_file::clone_all_metadata(chd_file &source)
  * @return  The calculated overall sha 1.
  */
 
-sha1_t chd_file::compute_overall_sha1(sha1_t rawsha1)
+util::sha1_t chd_file::compute_overall_sha1(util::sha1_t rawsha1)
 {
 	// only works for v4 and above
 	if (m_version < 4)
@@ -1593,7 +1593,7 @@ sha1_t chd_file::compute_overall_sha1(sha1_t rawsha1)
 		// create an entry for this metadata and add it
 		metadata_hash hashentry;
 		be_write(hashentry.tag, metaentry.metatag, 4);
-		hashentry.sha1 = sha1_creator::simple(&filedata[0], metaentry.length);
+		hashentry.sha1 = util::sha1_creator::simple(&filedata[0], metaentry.length);
 		hasharray.push_back(hashentry);
 	}
 
@@ -1602,7 +1602,7 @@ sha1_t chd_file::compute_overall_sha1(sha1_t rawsha1)
 		qsort(&hasharray[0], hasharray.size(), sizeof(hasharray[0]), metadata_hash_compare);
 
 	// read the raw data hash from our header and start a new SHA1 with that data
-	sha1_creator overall_sha1;
+	util::sha1_creator overall_sha1;
 	overall_sha1.append(&rawsha1, sizeof(rawsha1));
 	if (!hasharray.empty())
 		overall_sha1.append(&hasharray[0], hasharray.size() * sizeof(hasharray[0]));
@@ -1750,7 +1750,7 @@ UINT32 chd_file::guess_unitbytes()
  * @param [in,out]  parentsha1  The first parentsha.
  */
 
-void chd_file::parse_v3_header(UINT8 *rawheader, sha1_t &parentsha1)
+void chd_file::parse_v3_header(UINT8 *rawheader, util::sha1_t &parentsha1)
 {
 	// verify header length
 	if (be_read(&rawheader[8], 4) != V3_HEADER_SIZE)
@@ -1813,7 +1813,7 @@ void chd_file::parse_v3_header(UINT8 *rawheader, sha1_t &parentsha1)
  * @param [in,out]  parentsha1  The first parentsha.
  */
 
-void chd_file::parse_v4_header(UINT8 *rawheader, sha1_t &parentsha1)
+void chd_file::parse_v4_header(UINT8 *rawheader, util::sha1_t &parentsha1)
 {
 	// verify header length
 	if (be_read(&rawheader[8], 4) != V4_HEADER_SIZE)
@@ -1873,7 +1873,7 @@ void chd_file::parse_v4_header(UINT8 *rawheader, sha1_t &parentsha1)
  * @param [in,out]  parentsha1  The first parentsha.
  */
 
-void chd_file::parse_v5_header(UINT8 *rawheader, sha1_t &parentsha1)
+void chd_file::parse_v5_header(UINT8 *rawheader, util::sha1_t &parentsha1)
 {
 	// verify header length
 	if (be_read(&rawheader[8], 4) != V5_HEADER_SIZE)
@@ -1928,7 +1928,7 @@ chd_error chd_file::compress_v5_map()
 	try
 	{
 		// first get a CRC-16 of the original rawmap
-		crc16_t mapcrc = crc16_creator::simple(&m_rawmap[0], m_hunkcount * 12);
+		util::crc16_t mapcrc = util::crc16_creator::simple(&m_rawmap[0], m_hunkcount * 12);
 
 		// create a buffer to hold the RLE data
 		dynamic_buffer compression_rle(m_hunkcount);
@@ -2244,7 +2244,7 @@ void chd_file::decompress_v5_map()
 	}
 
 	// verify the final CRC
-	if (crc16_creator::simple(&m_rawmap[0], m_hunkcount * 12) != mapcrc)
+	if (util::crc16_creator::simple(&m_rawmap[0], m_hunkcount * 12) != mapcrc)
 		throw CHDERR_DECOMPRESSION_ERROR;
 }
 
@@ -2310,15 +2310,15 @@ chd_error chd_file::create_common()
 		be_write(&rawheader[48], m_metaoffset, 8);
 		be_write(&rawheader[56], m_hunkbytes, 4);
 		be_write(&rawheader[60], m_unitbytes, 4);
-		be_write_sha1(&rawheader[64], sha1_t::null);
-		be_write_sha1(&rawheader[84], sha1_t::null);
-		be_write_sha1(&rawheader[104], (m_parent != nullptr) ? m_parent->sha1() : sha1_t::null);
+		be_write_sha1(&rawheader[64], util::sha1_t::null);
+		be_write_sha1(&rawheader[84], util::sha1_t::null);
+		be_write_sha1(&rawheader[104], (m_parent != nullptr) ? m_parent->sha1() : util::sha1_t::null);
 
 		// write the resulting header
 		file_write(0, rawheader, sizeof(rawheader));
 
 		// parse it back out to set up fields appropriately
-		sha1_t parentsha1;
+		util::sha1_t parentsha1;
 		parse_v5_header(rawheader, parentsha1);
 
 		// writes are obviously permitted; reads only if uncompressed
@@ -2403,7 +2403,7 @@ chd_error chd_file::open_common(bool writeable)
 			throw CHDERR_UNSUPPORTED_VERSION;
 
 		// read the header if we support it
-		sha1_t parentsha1 = sha1_t::null;
+		util::sha1_t parentsha1 = util::sha1_t::null;
 		switch (m_version)
 		{
 			case 3:     parse_v3_header(rawheader, parentsha1); break;
@@ -2416,7 +2416,7 @@ chd_error chd_file::open_common(bool writeable)
 			throw CHDERR_FILE_NOT_WRITEABLE;
 
 		// make sure we have a parent if we need one (and don't if we don't)
-		if (parentsha1 != sha1_t::null)
+		if (parentsha1 != util::sha1_t::null)
 		{
 			if (m_parent == nullptr)
 				m_parent_missing = true;
@@ -2535,7 +2535,7 @@ void chd_file::verify_proper_compression_append(UINT32 hunknum)
  * @param   crc16       The CRC 16.
  */
 
-void chd_file::hunk_write_compressed(UINT32 hunknum, INT8 compression, const UINT8 *compressed, UINT32 complength, crc16_t crc16)
+void chd_file::hunk_write_compressed(UINT32 hunknum, INT8 compression, const UINT8 *compressed, UINT32 complength, util::crc16_t crc16)
 {
 	// verify that we are appending properly to a compressed file
 	verify_proper_compression_append(hunknum);
@@ -2711,10 +2711,10 @@ void chd_file::metadata_update_hash()
 		return;
 
 	// compute the new overall hash
-	sha1_t fullsha1 = compute_overall_sha1(raw_sha1());
+	util::sha1_t fullsha1 = compute_overall_sha1(raw_sha1());
 
 	// create a big-endian version
-	UINT8 rawbuf[sizeof(sha1_t)];
+	UINT8 rawbuf[sizeof(util::sha1_t)];
 	be_write_sha1(&rawbuf[0], fullsha1);
 
 	// write to the header
@@ -3033,8 +3033,8 @@ void chd_file_compressor::async_walk_parent(work_item &item)
 		units = 1;
 	for (UINT32 unit = 0; unit < units; unit++)
 	{
-		item.m_hash[unit].m_crc16 = crc16_creator::simple(item.m_data + unit * unit_bytes(), hunk_bytes());
-		item.m_hash[unit].m_sha1 = sha1_creator::simple(item.m_data + unit * unit_bytes(), hunk_bytes());
+		item.m_hash[unit].m_crc16 = util::crc16_creator::simple(item.m_data + unit * unit_bytes(), hunk_bytes());
+		item.m_hash[unit].m_sha1 = util::sha1_creator::simple(item.m_data + unit * unit_bytes(), hunk_bytes());
 	}
 	item.m_status = WS_COMPLETE;
 }
@@ -3075,8 +3075,8 @@ void chd_file_compressor::async_compress_hunk(work_item &item, int threadid)
 	item.m_codecs = m_codecs[threadid];
 
 	// compute CRC-16 and SHA-1 hashes
-	item.m_hash[0].m_crc16 = crc16_creator::simple(item.m_data, hunk_bytes());
-	item.m_hash[0].m_sha1 = sha1_creator::simple(item.m_data, hunk_bytes());
+	item.m_hash[0].m_crc16 = util::crc16_creator::simple(item.m_data, hunk_bytes());
+	item.m_hash[0].m_sha1 = util::sha1_creator::simple(item.m_data, hunk_bytes());
 
 	// find the best compression scheme, unless we already have a self or parent match
 	// (note we may miss a self match from blocks not yet added, but this just results in extra work)
@@ -3254,7 +3254,7 @@ void chd_file_compressor::hashmap::reset()
  * @return  An UINT64.
  */
 
-UINT64 chd_file_compressor::hashmap::find(crc16_t crc16, sha1_t sha1)
+UINT64 chd_file_compressor::hashmap::find(util::crc16_t crc16, util::sha1_t sha1)
 {
 	// look up the entry in the map
 	for (entry_t *entry = m_map[crc16]; entry != nullptr; entry = entry->m_next)
@@ -3275,7 +3275,7 @@ UINT64 chd_file_compressor::hashmap::find(crc16_t crc16, sha1_t sha1)
  * @param   sha1    The first sha.
  */
 
-void chd_file_compressor::hashmap::add(UINT64 itemnum, crc16_t crc16, sha1_t sha1)
+void chd_file_compressor::hashmap::add(UINT64 itemnum, util::crc16_t crc16, util::sha1_t sha1)
 {
 	// add to the appropriate map
 	if (m_block_list->m_nextalloc == ARRAY_LENGTH(m_block_list->m_array))

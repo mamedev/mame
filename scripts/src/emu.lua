@@ -118,8 +118,6 @@ files {
 	MAME_DIR .. "src/emu/emupal.h",
 	MAME_DIR .. "src/emu/fileio.cpp",
 	MAME_DIR .. "src/emu/fileio.h",
-	MAME_DIR .. "src/emu/hash.cpp",
-	MAME_DIR .. "src/emu/hash.h",
 	MAME_DIR .. "src/emu/image.cpp",
 	MAME_DIR .. "src/emu/image.h",
 	MAME_DIR .. "src/emu/input.cpp",

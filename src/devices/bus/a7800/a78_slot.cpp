@@ -22,7 +22,7 @@
     even if not all carts use all of them (in particular no cart type
     seems to use access to the ranges $0500 to $0fff and $2800 to $2fff)
 
-
+	
  ***********************************************************************************************************/
 
 
@@ -473,7 +473,7 @@ bool a78_cart_slot_device::call_load()
 }
 
 
-void a78_partialhash(hash_collection &dest, const unsigned char *data,
+void a78_partialhash(util::hash_collection &dest, const unsigned char *data,
 						unsigned long length, const char *functions)
 {
 	if (length <= 128)

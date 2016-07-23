@@ -104,7 +104,7 @@ class software_info;
 typedef delegate<int (device_image_interface &)> device_image_load_delegate;
 typedef delegate<void (device_image_interface &)> device_image_func_delegate;
 // legacy
-typedef void (*device_image_partialhash_func)(hash_collection &, const unsigned char *, unsigned long, const char *);
+typedef void (*device_image_partialhash_func)(util::hash_collection &, const unsigned char *, unsigned long, const char *);
 
 //**************************************************************************
 //  MACROS
@@ -147,7 +147,7 @@ public:
 	static const char *device_brieftypename(iodevice_t type);
 	static iodevice_t device_typeid(const char *name);
 
-	virtual void device_compute_hash(hash_collection &hashes, const void *data, size_t length, const char *types) const;
+	virtual void device_compute_hash(util::hash_collection &hashes, const void *data, size_t length, const char *types) const;
 
 	virtual bool call_load() { return FALSE; }
 	virtual bool call_create(int format_type, util::option_resolution *format_options) { return FALSE; }
@@ -215,7 +215,7 @@ public:
 	bool load_software_region(const char *tag, optional_shared_ptr<UINT8> &ptr);
 
 	UINT32 crc();
-	hash_collection& hash() { return m_hash; }
+	util::hash_collection& hash() { return m_hash; }
 
 	void battery_load(void *buffer, int length, int fill);
 	void battery_load(void *buffer, int length, void *def_buffer);
@@ -266,7 +266,7 @@ protected:
 	void setup_working_directory();
 	bool try_change_working_directory(const char *subdir);
 
-	void run_hash(void (*partialhash)(hash_collection &, const unsigned char *, unsigned long, const char *), hash_collection &hashes, const char *types);
+	void run_hash(void (*partialhash)(util::hash_collection &, const unsigned char *, unsigned long, const char *), util::hash_collection &hashes, const char *types);
 	void image_checkhash();
 	void update_names(const device_type device_type = nullptr, const char *inst = nullptr, const char *brief = nullptr);
 
@@ -317,7 +317,7 @@ protected:
 	int m_create_format;
 	util::option_resolution *m_create_args;
 
-	hash_collection m_hash;
+	util::hash_collection m_hash;
 
 	std::string m_brief_instance_name;
 	std::string m_instance_name;
