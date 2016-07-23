@@ -56,7 +56,8 @@ public:
 		m_vram(*this, "vram"),
 		m_fontram(*this, "fontram"),
 		m_uart0(*this, UART0_TAG),
-		m_uart1(*this, UART1_TAG)
+		m_uart1(*this, UART1_TAG),
+		m_screen(*this, "screen")
 	{
 	}
 
@@ -64,8 +65,11 @@ public:
 	required_shared_ptr<UINT16> m_vram;
 	required_shared_ptr<UINT16> m_fontram;
 	required_device<ns16450_device> m_uart0, m_uart1;
+	required_device<screen_device> m_screen;
 			
 	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	
@@ -79,7 +83,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(keyboard_clock_w);
 	DECLARE_WRITE_LINE_MEMBER(keyboard_data_w);
-
+	INTERRUPT_GEN_MEMBER(vblank);
 private:
 	UINT16 tvi1111_regs[(0x100/2)+2];
 	
@@ -88,7 +92,27 @@ private:
 	UINT8 m_scancode;
 	int m_kbit;
 	int m_idstage;
+	emu_timer *m_rowtimer;
 };
+
+INTERRUPT_GEN_MEMBER(tv990_state::vblank)
+{
+	m_rowtimer->adjust(m_screen->time_until_pos(16));
+	m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
+	tvi1111_regs[0x1d] |= 4;
+}
+
+void tv990_state::machine_start()
+{
+	m_rowtimer = timer_alloc();
+}
+
+void tv990_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	m_rowtimer->adjust(m_screen->time_until_pos(m_screen->vpos() + 16));
+	m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
+	m_screen->update_now();
+}
 
 WRITE_LINE_MEMBER(tv990_state::uart0_irq)
 {
@@ -105,6 +129,10 @@ READ16_MEMBER(tv990_state::tvi1111_r)
 	if (offset == (0x32/2))
 	{
 		tvi1111_regs[offset] |= 8;	// loop at 109ca wants this set
+	}
+	else if(offset == 0x1d)
+	{
+		m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 	}
 
 	return tvi1111_regs[offset];
@@ -130,11 +158,6 @@ WRITE16_MEMBER(tv990_state::tvi1111_w)
 	}
 #endif
 	COMBINE_DATA(&tvi1111_regs[offset]);
-	
-	if (offset == 0x1d)
-	{
-		tvi1111_regs[offset] |= 4;
-	}
 }
 
 UINT32 tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -148,22 +171,25 @@ UINT32 tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	UINT8 *fontram = (UINT8 *)m_fontram.target();
 	UINT16 *curchar;
 	UINT8 *fontptr;
+	int miny = cliprect.min_y / 16;
+	int maxy = cliprect.max_y / 16;
+	int minx = cliprect.min_x / 16;
+	int maxx = cliprect.max_x / 16;
 	
-	for (y = 0; y < 50; y++)
+	for (y = miny; y <= maxy; y++)
 	{
 		// this isn't exactly right.
-		if (tvi1111_regs[y+0x50] != 0)
+		int i;
+		for(i = 0x50; i < 0x68; i++)
 		{
-			curchar = &vram[tvi1111_regs[y+0x50]];
+			if(tvi1111_regs[i] != 0x1ad5)
+				break;
 		}
-		else
+		curchar = &vram[tvi1111_regs[i]];
+
+		for (x = minx; x <= maxx; x++)
 		{
-			curchar = &vram[(y * 144)+1];
-		}
-		
-		for (x = 0; x < 80; x++)
-		{
-			fontptr = (UINT8 *)&fontram[((curchar[x]>>8) & 0xff) * 64];
+			fontptr = (UINT8 *)&fontram[(((curchar[x]>>8) & 0xff) + (curchar[x] & 0x40 ? 256 : 0)) * 64];
 	
 			for (int chary = 0; chary < 16; chary++)
 			{
@@ -171,7 +197,12 @@ UINT32 tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			
 				pixels = *fontptr++;
 				pixels2 = *fontptr++;
-					
+				if((curchar[x] & 0x8) && (chary == 15))
+				{
+					pixels = 0xff;
+					pixels2 = 0xff;
+				}
+
 				if (curchar[x] & 0x4)	// inverse video?
 				{
 					*scanline++ = invpalette[(pixels>>7)&1];
@@ -339,6 +370,7 @@ void tv990_state::machine_reset()
 	m_kbit = 0;
 	m_scancode = 0;
 	m_idstage = 0;
+	m_rowtimer->adjust(m_screen->time_until_pos(0));
 	
 	memset(tvi1111_regs, 0, sizeof(tvi1111_regs));
 }
@@ -347,7 +379,7 @@ static MACHINE_CONFIG_START( tv990, tv990_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14967500)	// verified (59.86992/4)
 	MCFG_CPU_PROGRAM_MAP(tv990_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tv990_state, irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tv990_state, vblank)
 	
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(tv990_state, screen_update)
