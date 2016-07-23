@@ -2357,7 +2357,7 @@ bool render_target::remove_clear_extent(const render_bounds &bounds)
 		INT32 *linelast;
 
 		// first entry of each line should always be negative
-		if (!(ext[0] < 0.0f)) goto abort;
+		assert(ext[0] < 0.0f);
 		y0 = y1;
 		y1 = y0 - ext[0];
 
@@ -2489,11 +2489,7 @@ void render_target::add_clear_extents(render_primitive_list &list)
 		INT32 x0, x1 = 0;
 
 		// first entry should always be negative
-		if (!(ext[0] < 0))
-		{
-			list.m_primlist.prepend_list(clearlist);
-			return;
-		}
+		assert(ext[0] < 0);
 		y0 = y1;
 		y1 = y0 - ext[0];
 
@@ -2750,7 +2746,6 @@ float render_manager::ui_aspect(render_container *rc)
 	if (aspect > 1.5f)
 		aspect = 1.5f;
 
-	if (isinf(aspect)) aspect = 1.0f;
 	return aspect;
 }
 
