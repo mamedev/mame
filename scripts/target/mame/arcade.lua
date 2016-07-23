@@ -572,6 +572,7 @@ MACHINES["PCI9050"] = true
 MACHINES["GENPC"] = true
 MACHINES["GEN_LATCH"] = true
 MACHINES["WATCHDOG"] = true
+MACHINES["INPUT_MERGER"] = true
 
 --------------------------------------------------
 -- specify available bus cores
