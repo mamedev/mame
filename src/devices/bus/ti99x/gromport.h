@@ -108,7 +108,7 @@ protected:
 	// Image handling: implementation of methods which are abstract in the parent
 	bool call_load() override;
 	void call_unload() override;
-	virtual softlist_type get_softlist_type() const override { return softlist_type::ROM; }
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 	virtual void loaded_through_softlist() override;
 
 	void prepare_cartridge();

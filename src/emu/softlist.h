@@ -73,6 +73,59 @@ enum software_compatibility
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+struct rom_entry;
+class software_info;
+class device_image_interface;
+class software_list_device;
+
+// ======================> software_list_loader
+
+class software_list_loader
+{
+public:
+	virtual bool load_software(device_image_interface &device, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const = 0;
+};
+
+
+// ======================> false_software_list_loader
+
+class false_software_list_loader : public software_list_loader
+{
+public:
+	virtual bool load_software(device_image_interface &device, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
+	static const software_list_loader &instance() { return s_instance; }
+
+private:
+	static false_software_list_loader s_instance;
+};
+
+
+// ======================> rom_software_list_loader
+
+class rom_software_list_loader : public software_list_loader
+{
+public:
+	virtual bool load_software(device_image_interface &device, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
+	static const software_list_loader &instance() { return s_instance; }
+
+private:
+	static rom_software_list_loader s_instance;
+};
+
+
+// ======================> image_software_list_loader
+
+class image_software_list_loader : public software_list_loader
+{
+public:
+	virtual bool load_software(device_image_interface &device, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
+	static const software_list_loader &instance() { return s_instance; }
+
+private:
+	static image_software_list_loader s_instance;
+};
+
+
 // ======================> feature_list_item
 
 // an item in a list of name/value pairs

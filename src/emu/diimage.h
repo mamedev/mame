@@ -21,6 +21,8 @@
 #include <string>
 #include <vector>
 
+#include "softlist.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -137,13 +139,6 @@ class device_image_interface : public device_interface
 public:
 	typedef std::vector<std::unique_ptr<image_device_format>> formatlist_type;
 
-	enum class softlist_type
-	{
-		NONE,
-		ROM,
-		SOFTWARE
-	};
-
 	// construction/destruction
 	device_image_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_image_interface();
@@ -253,7 +248,7 @@ public:
 	bool user_loadable() const { return m_user_loadable; }
 
 protected:
-	virtual softlist_type get_softlist_type() const { return softlist_type::NONE; }
+	virtual const software_list_loader &get_software_list_loader() const { return false_software_list_loader::instance(); }
 	virtual void loaded_through_softlist() { }
 
 	bool load_internal(const char *path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load);

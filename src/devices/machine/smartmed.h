@@ -216,7 +216,7 @@ public:
 
 	virtual bool call_load() override;
 	virtual void call_unload() override;
-	virtual softlist_type get_softlist_type() const override { return softlist_type::SOFTWARE; }
+	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
 protected:
 	// device-level overrides

@@ -159,7 +159,7 @@ public:
 	// image-level overrides
 	virtual bool call_load() override;
 	virtual void call_unload() override;
-	virtual softlist_type get_softlist_type() const override { return softlist_type::ROM; }
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	void get_cart_type_addon(UINT8 *ROM, UINT32 len, int &type, int &addon);
 	UINT32 snes_skip_header(UINT8 *ROM, UINT32 snes_rom_size);

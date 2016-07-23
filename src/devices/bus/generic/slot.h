@@ -114,7 +114,7 @@ public:
 	// image-level overrides
 	virtual bool call_load() override;
 	virtual void call_unload() override;
-	virtual softlist_type get_softlist_type() const override { return softlist_type::ROM; }
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	UINT32 common_get_size(const char *region);
 	void common_load_rom(UINT8 *ROM, UINT32 len, const char *region);

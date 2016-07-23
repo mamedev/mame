@@ -91,7 +91,45 @@ private:
 
 // device type definition
 const device_type SOFTWARE_LIST = &device_creator<software_list_device>;
+false_software_list_loader false_software_list_loader::s_instance;
+rom_software_list_loader rom_software_list_loader::s_instance;
+image_software_list_loader image_software_list_loader::s_instance;
 
+
+
+//**************************************************************************
+//  SOFTWARE LIST LOADER
+//**************************************************************************
+
+//-------------------------------------------------
+//  false_software_list_loader::load_software
+//-------------------------------------------------
+
+bool false_software_list_loader::load_software(device_image_interface &device, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const
+{
+	return false;
+}
+
+
+//-------------------------------------------------
+//  rom_software_list_loader::load_software
+//-------------------------------------------------
+
+bool rom_software_list_loader::load_software(device_image_interface &device, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const
+{
+	swlist.machine().rom_load().load_software_part_region(device, swlist, swname, start_entry);
+	return true;
+}
+
+
+//-------------------------------------------------
+//  image_software_list_loader::load_software
+//-------------------------------------------------
+
+bool image_software_list_loader::load_software(device_image_interface &device, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const
+{
+	return device.load_software(swlist, swname, start_entry);
+}
 
 
 //**************************************************************************

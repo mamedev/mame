@@ -59,7 +59,7 @@ public:
 	virtual bool call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 	virtual std::string call_display() override;
-	virtual softlist_type get_softlist_type() const override { return softlist_type::SOFTWARE; }
+	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
 	virtual iodevice_t image_type() const override { return IO_CASSETTE; }
 

@@ -100,7 +100,7 @@ public:
 	template<class _Object> static devcb_base &set_out_idx_func(device_t &device, _Object object) { return downcast<legacy_floppy_image_device &>(device).m_out_idx_func.set_callback(object); }
 
 	virtual bool call_load() override;
-	virtual softlist_type get_softlist_type() const override { return softlist_type::SOFTWARE; }
+	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 	virtual bool call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 
