@@ -489,7 +489,7 @@ ROM_END
   or just some differences against the i8255. Needs more research.
 
   KR580VI53/i8253 timers usage:
-  0 - used to blank part of display in horisontal direction, apparently it's CLK0 is PIXEL_CLOCK/4, GATE0 is HBlank, OUT0 - blank video
+  0 - used to blank part of display in horizontal direction, apparently it's CLK0 is PIXEL_CLOCK/4, GATE0 is HBlank, OUT0 - blank video
   1 - used to blank part of display in vertical direction, apparently it's CLK1 is HBlank or OUT0, GATE1 is VBlank, OUT1 - blank video
   2 - sound generation
  */
