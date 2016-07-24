@@ -10685,6 +10685,13 @@ pitnruna:
 @:maincpu,program,8981,1,27,27
 
 
+;@s:playch10.cpp
+
+;it won't reload the high score unless you reset twice
+pc_smb:
+@:cart,program,7df,4,0,0,ff
+
+
 ;@s:playmark.cpp
 
 wbeachvl:
