@@ -14652,10 +14652,16 @@ ROM_END
 
   Custom Hardware Notes:
 
+  To initialize the game the first time, enter BOOKS/STATS/SETUP (Key 0),
+  and advance through the menus with RESET key (key R). When finish press
+  again BOOKS/STATS/SETUP (Key 0) to exit the setup mode.
+
+  ---
+
   GFX Bank 1 (chars and BG graphics) is colors-accurate.
   GFX Bank 2 needs some work...
 
-  Seems that there is an extra layer for the bonus graphics.
+  There is a window that should show the bonus graphics.
   This graphic is taken from Bank 2, and is the "representative"
   for the chosen gfx set.
 
