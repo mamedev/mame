@@ -616,6 +616,18 @@ C1066 - ??
 		</part>
 	</software>
 
+	<software name="hothero" supported="no">
+		<description>Hot Hero</description>
+		<year>199?</year>
+		<publisher>Unknown</publisher>
+		<info name="serial" value="C1065" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="c1-065.bin" size="524288" crc="1ed9d0a3" sha1="568f87864c0ed6117fe34e3f79e56c01e911e482" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="robinhoo" supported="no">
 		<description>Robin Hood</description>
 		<year>1994</year>
