@@ -649,8 +649,7 @@ chd_error chdcd_parse_iso(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 	memset(&outtoc, 0, sizeof(outtoc));
 	outinfo.reset();
 
-	fseek(infile, 0, SEEK_END);
-	long size = ftell(infile);
+	UINT64 size = get_file_size(tocfname);
 	fclose(infile);
 
 
