@@ -6411,11 +6411,11 @@ ROM_START( intrgirl )
 	ROM_LOAD( "ka-4.rom2", 0x40000, 0x40000, CRC(ad90d3a1) SHA1(d955620fdd4aacc96e59e9f94da85568cce47843) )
 	ROM_LOAD( "ka-5.rom3", 0x80000, 0x40000, CRC(2ed30171) SHA1(883d9e96df4f234652b01599e065f7f1985d1748) )
 
-	// this aren't on PCB (borrowed from Dragon Punch) and are currently here only because, if uncommented, will show the game running, although with bad colors.
+	// there aren't PROMs on the PCB, but these are currently here because they will show the game running, although with bad colors.
 	// to be removed once the real source of the palette is identified (maybe the CY7C381-0JC FPGA?)
-	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 ) // Color PROMs
-	//ROM_LOAD( "n82s147n.u13", 0x000, 0x200, BAD_DUMP CRC(29b6415b) SHA1(8085ff3265cda2d564da3dff609eb05ff02fae49) )
-	//ROM_LOAD( "n82s147n.u12", 0x200, 0x200, BAD_DUMP CRC(324fa9cf) SHA1(a03e23d9a9687dec4c23a8e41254a3f4b70c7e25) )
+	ROM_REGION( 0x400, "proms", 0 ) // Color PROMs
+	ROM_LOAD( "fake_prom_1", 0x000, 0x200, NO_DUMP )
+	ROM_LOAD( "fake_prom_2", 0x200, 0x200, NO_DUMP )
 ROM_END
 
 // Decrypted by yong
