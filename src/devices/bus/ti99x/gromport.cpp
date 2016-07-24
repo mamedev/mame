@@ -1173,7 +1173,6 @@ static const pcb_type sw_pcbdefs[] =
 ti99_cartridge_device::ti99_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 :   bus8z_device(mconfig, TI99CART, "TI-99 cartridge", tag, owner, clock, "cartridge", __FILE__),
 	device_image_interface(mconfig, *this),
-	m_softlist(false),
 	m_pcbtype(0),
 	m_slot(0),
 	m_pcb(nullptr),
@@ -1201,13 +1200,13 @@ void ti99_cartridge_device::prepare_cartridge()
 
 	for (int i=0; i < 5; i++) m_pcb->m_grom[i] = nullptr;
 
-	m_pcb->m_grom_size = m_softlist? get_software_region_length("grom") : m_rpk->get_resource_length("grom_socket");
+	m_pcb->m_grom_size = loaded_through_softlist() ? get_software_region_length("grom") : m_rpk->get_resource_length("grom_socket");
 	if (TRACE_CONFIG) logerror("grom_socket.size=0x%04x\n", m_pcb->m_grom_size);
 
 	if (m_pcb->m_grom_size > 0)
 	{
 		regg = memregion(CARTGROM_TAG);
-		grom_ptr = m_softlist? get_software_region("grom") : m_rpk->get_contents_of_socket("grom_socket");
+		grom_ptr = loaded_through_softlist() ? get_software_region("grom") : m_rpk->get_contents_of_socket("grom_socket");
 		memcpy(regg->base(), grom_ptr, m_pcb->m_grom_size);
 		m_pcb->m_grom_ptr = regg->base();   // for gromemu
 		m_pcb->m_grom_address = 0;          // for gromemu
@@ -1220,19 +1219,19 @@ void ti99_cartridge_device::prepare_cartridge()
 		if (m_pcb->m_grom_size > 0x8000) m_pcb->set_grom_pointer(4, subdevice(GROM7_TAG));
 	}
 
-	m_pcb->m_rom_size = m_softlist? get_software_region_length("rom") : m_rpk->get_resource_length("rom_socket");
+	m_pcb->m_rom_size = loaded_through_softlist() ? get_software_region_length("rom") : m_rpk->get_resource_length("rom_socket");
 	if (m_pcb->m_rom_size > 0)
 	{
 		if (TRACE_CONFIG) logerror("rom size=0x%04x\n", m_pcb->m_rom_size);
 		regr = memregion(CARTROM_TAG);
-		rom_ptr = m_softlist? get_software_region("rom") : m_rpk->get_contents_of_socket("rom_socket");
+		rom_ptr = loaded_through_softlist() ? get_software_region("rom") : m_rpk->get_contents_of_socket("rom_socket");
 		memcpy(regr->base(), rom_ptr, m_pcb->m_rom_size);
 		// Set both pointers to the same region for now
 		m_pcb->m_rom_ptr = regr->base();
 	}
 
 	// Softlist uses only one ROM area, no second socket
-	if (!m_softlist)
+	if (!loaded_through_softlist())
 	{
 		rom2_length = m_rpk->get_resource_length("rom2_socket");
 		if (rom2_length > 0)
@@ -1246,7 +1245,7 @@ void ti99_cartridge_device::prepare_cartridge()
 	}
 
 	// (NV)RAM cartridges
-	if (m_softlist)
+	if (loaded_through_softlist())
 	{
 		// Do we have NVRAM?
 		if (get_software_region("nvram")!=nullptr)
@@ -1300,7 +1299,7 @@ bool ti99_cartridge_device::call_load()
 	// return true = error
 	if (TRACE_CHANGE) logerror("Loading %s in slot %s\n", m_basename.c_str());
 
-	if (m_softlist)
+	if (loaded_through_softlist())
 	{
 		if (TRACE_CONFIG) logerror("Using softlists\n");
 		int i = 0;
@@ -1315,6 +1314,7 @@ bool ti99_cartridge_device::call_load()
 			i++;
 		} while (sw_pcbdefs[i].id != 0);
 		if (TRACE_CONFIG) logerror("Cartridge type is %s (%d)\n", pcb, m_pcbtype);
+		m_rpk = nullptr;
 	}
 	else
 	{
@@ -1417,13 +1417,6 @@ void ti99_cartridge_device::set_slot(int i)
 	m_slot = i;
 }
 
-void ti99_cartridge_device::loaded_through_softlist()
-{
-	// TI99 cartridge seems to be the only reason we need loaded_through_softlist()... why?
-	m_softlist = true;
-	m_rpk = nullptr;
-}
-
 READ8Z_MEMBER(ti99_cartridge_device::readz)
 {
 	if (m_pcb != nullptr)
@@ -1476,7 +1469,6 @@ WRITE_LINE_MEMBER(ti99_cartridge_device::gclock_in)
 void ti99_cartridge_device::device_config_complete()
 {
 	update_names();
-	m_softlist = false;
 	m_connector = static_cast<ti99_cartridge_connector_device*>(owner());
 }
 
