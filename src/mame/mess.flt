@@ -144,6 +144,7 @@ didact.cpp
 digel804.cpp
 dim68k.cpp
 dm7000.cpp
+dmax8000.cpp
 dms5000.cpp
 dms86.cpp
 dmv.cpp
