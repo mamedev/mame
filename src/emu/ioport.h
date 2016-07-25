@@ -1265,7 +1265,7 @@ struct ioport_field_live
 // ======================> ioport_list
 
 // class that holds a list of I/O ports
-class ioport_list : public std::unordered_map<std::string, std::unique_ptr<ioport_port>>
+class ioport_list : public std::map<std::string, std::unique_ptr<ioport_port>>
 {
 	DISABLE_COPYING(ioport_list);
 
