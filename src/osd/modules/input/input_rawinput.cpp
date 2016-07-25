@@ -507,10 +507,9 @@ protected:
 		std::wstring name = rawinput_device_improve_name(tname.get());
 
 		// convert name to utf8
-		auto osd_deleter = [](void *ptr) { osd_free(ptr); };
-		auto utf8_name = std::unique_ptr<char, decltype(osd_deleter)>(utf8_from_wstring(name.c_str()), osd_deleter);
+		std::string utf8_name = utf8_from_wstring(name.c_str());
 
-		devinfo = devicelist()->create_device<TDevice>(machine, utf8_name.get(), *this);
+		devinfo = devicelist()->create_device<TDevice>(machine, utf8_name.c_str(), *this);
 
 		// Add the handle
 		devinfo->set_handle(rawinputdevice->hDevice);
@@ -609,16 +608,14 @@ protected:
 		{
 			input_item_id itemid = table.map_di_scancode_to_itemid(keynum);
 			TCHAR keyname[100];
-			char *name;
 
 			// generate the name
 			if (GetKeyNameText(((keynum & 0x7f) << 16) | ((keynum & 0x80) << 17), keyname, ARRAY_LENGTH(keyname)) == 0)
 				_sntprintf(keyname, ARRAY_LENGTH(keyname), TEXT("Scan%03d"), keynum);
-			name = utf8_from_tstring(keyname);
+			std::string name = utf8_from_tstring(keyname);
 
 			// add the item to the device
-			devinfo->device()->add_item(name, itemid, generic_button_get_state<std::uint8_t>, &devinfo->keyboard.state[keynum]);
-			osd_free(name);
+			devinfo->device()->add_item(name.c_str(), itemid, generic_button_get_state<std::uint8_t>, &devinfo->keyboard.state[keynum]);
 		}
 	}
 };

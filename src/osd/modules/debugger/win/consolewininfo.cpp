@@ -43,12 +43,8 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 			m_devices_menu = CreatePopupMenu();
 			for (device_image_interface &img : iter)
 			{
-				TCHAR *tc_buf = tstring_from_utf8(string_format("%s : %s", img.device().name(), img.exists() ? img.filename() : "[no image]").c_str());
-				if (tc_buf != nullptr)
-				{
-					AppendMenu(m_devices_menu, MF_ENABLED, 0, tc_buf);
-					osd_free(tc_buf);
-				}
+				auto tc_buf = tstring_from_utf8(string_format("%s : %s", img.device().name(), img.exists() ? img.filename() : "[no image]").c_str());
+				AppendMenu(m_devices_menu, MF_ENABLED, 0, tc_buf.c_str());
 			}
 			AppendMenu(GetMenu(window()), MF_ENABLED | MF_POPUP, (UINT_PTR)m_devices_menu, TEXT("Images"));
 		}
@@ -195,12 +191,8 @@ void consolewin_info::update_menu()
 				AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CASSETTE_FASTFORWARD, TEXT("Fast Forward"));
 			}
 
-			TCHAR *tc_buf = tstring_from_utf8(string_format("%s :%s", img.device().name(), img.exists() ? img.filename() : "[empty slot]").c_str());
-			if (tc_buf != nullptr)
-			{
-				ModifyMenu(m_devices_menu, cnt, MF_BYPOSITION | MF_POPUP, (UINT_PTR)devicesubmenu, tc_buf);
-				osd_free(tc_buf);
-			}
+			auto tc_buf = tstring_from_utf8(string_format("%s :%s", img.device().name(), img.exists() ? img.filename() : "[empty slot]").c_str());
+			ModifyMenu(m_devices_menu, cnt, MF_BYPOSITION | MF_POPUP, (UINT_PTR)devicesubmenu, tc_buf.c_str());
 
 			cnt++;
 		}
@@ -223,9 +215,9 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 				{
 					std::string filter;
 					build_generic_filter(img, false, filter);
-					LPTSTR t_filter = tstring_from_utf8(filter.c_str());
-					if (t_filter)
 					{
+						auto t_filter = tstring_from_utf8(filter.c_str());
+
 						// convert a pipe-char delimited string into a NUL delimited string
 						for (int i = 0; t_filter[i] != '\0'; i++)
 						{
@@ -242,7 +234,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 						ofn.lpstrFile = selectedFilename;
 						ofn.lpstrFile[0] = '\0';
 						ofn.nMaxFile = MAX_PATH;
-						ofn.lpstrFilter = t_filter;
+						ofn.lpstrFilter = t_filter.c_str();
 						ofn.nFilterIndex = 1;
 						ofn.lpstrFileTitle = nullptr;
 						ofn.nMaxFileTitle = 0;
@@ -251,14 +243,9 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 
 						if (GetOpenFileName(&ofn))
 						{
-							char *utf8_buf = utf8_from_tstring(selectedFilename);
-							if (utf8_buf != nullptr)
-							{
-								img->load(utf8_buf);
-								osd_free(utf8_buf);
-							}
+							auto utf8_buf = utf8_from_tstring(selectedFilename);
+							img->load(utf8_buf.c_str());
 						}
-						osd_free(t_filter);
 					}
 				}
 				return true;
@@ -266,9 +253,8 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 				{
 					std::string filter;
 					build_generic_filter(img, true, filter);
-					LPTSTR t_filter = tstring_from_utf8(filter.c_str());
-					if (t_filter)
 					{
+						auto t_filter = tstring_from_utf8(filter.c_str());
 						// convert a pipe-char delimited string into a NUL delimited string
 						for (int i = 0; t_filter[i] != '\0'; i++)
 						{
@@ -285,7 +271,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 						ofn.lpstrFile = selectedFilename;
 						ofn.lpstrFile[0] = '\0';
 						ofn.nMaxFile = MAX_PATH;
-						ofn.lpstrFilter = t_filter;
+						ofn.lpstrFilter = t_filter.c_str();
 						ofn.nFilterIndex = 1;
 						ofn.lpstrFileTitle = nullptr;
 						ofn.nMaxFileTitle = 0;
@@ -294,14 +280,9 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 
 						if (GetSaveFileName(&ofn))
 						{
-							char *utf8_buf = utf8_from_tstring(selectedFilename);
-							if (utf8_buf != nullptr)
-							{
-								img->create(utf8_buf, img->device_get_indexed_creatable_format(0), nullptr);
-								osd_free(utf8_buf);
-							}
+							auto utf8_buf = utf8_from_tstring(selectedFilename);
+							img->create(utf8_buf.c_str(), img->device_get_indexed_creatable_format(0), nullptr);
 						}
-						osd_free(t_filter);
 					}
 				}
 				return true;

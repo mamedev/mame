@@ -14,6 +14,8 @@
 #include <windows.h>
 #include <tchar.h>
 #include <stdlib.h>
+#include <vector>
+#include <string>
 
 #include "strconv.h"
 
@@ -27,29 +29,19 @@ extern int utf8_main(int argc, char *argv[]);
 #ifdef UNICODE
 extern "C" int _tmain(int argc, TCHAR **argv)
 {
-	int i, rc;
-	char **utf8_argv;
+	int i;
+	std::vector<std::string> argv_vectors(argc);
+	char **utf8_argv = (char **) alloca(argc * sizeof(char *));
 
-	/* convert arguments to UTF-8 */
-	utf8_argv = (char **) malloc(argc * sizeof(*argv));
-	if (utf8_argv == nullptr)
-		return 999;
+	// convert arguments to UTF-8
 	for (i = 0; i < argc; i++)
 	{
-		utf8_argv[i] = utf8_from_tstring(argv[i]);
-		if (utf8_argv[i] == nullptr)
-			return 999;
+		argv_vectors[i] = utf8_from_tstring(argv[i]);
+		utf8_argv[i] = (char *) argv_vectors[i].c_str();
 	}
 
-	/* run utf8_main */
-	rc = utf8_main(argc, utf8_argv);
-
-	/* free arguments */
-	for (i = 0; i < argc; i++)
-		osd_free(utf8_argv[i]);
-	free(utf8_argv);
-
-	return rc;
+	// run utf8_main
+	return utf8_main(argc, utf8_argv);
 }
 #endif
 

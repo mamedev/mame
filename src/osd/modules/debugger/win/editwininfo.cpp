@@ -79,12 +79,8 @@ void editwin_info::set_editwnd_bounds(RECT const &bounds)
 
 void editwin_info::set_editwnd_text(char const *text)
 {
-	TCHAR *tc_buffer = tstring_from_utf8(text);
-	if (tc_buffer != nullptr)
-	{
-		SendMessage(m_editwnd, WM_SETTEXT, (WPARAM)0, (LPARAM)tc_buffer);
-		osd_free(tc_buffer);
-	}
+	auto tc_buffer = tstring_from_utf8(text);
+	SendMessage(m_editwnd, WM_SETTEXT, (WPARAM)0, (LPARAM)tc_buffer.c_str());
 }
 
 
@@ -190,11 +186,9 @@ LRESULT editwin_info::edit_proc(UINT message, WPARAM wparam, LPARAM lparam)
 						m_last_history = m_history_count - 1;
 
 						// process
-						char *utf8_buffer = utf8_from_tstring(buffer);
-						if (utf8_buffer != nullptr)
 						{
-							process_string(utf8_buffer);
-							osd_free(utf8_buffer);
+							auto utf8_buffer = utf8_from_tstring(buffer);
+							process_string(utf8_buffer.c_str());
 						}
 						break;
 					}

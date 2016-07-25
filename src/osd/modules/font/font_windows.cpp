@@ -85,10 +85,9 @@ bool osd_font_windows::open(std::string const &font_path, std::string const &_na
 	logfont.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
 
 	// copy in the face name
-	TCHAR *face = tstring_from_utf8(name.c_str());
-	_tcsncpy(logfont.lfFaceName, face, sizeof(logfont.lfFaceName) / sizeof(TCHAR));
+	std::basic_string<TCHAR> face = tstring_from_utf8(name.c_str());
+	_tcsncpy(logfont.lfFaceName, face.c_str(), sizeof(logfont.lfFaceName) / sizeof(TCHAR));
 	logfont.lfFaceName[sizeof(logfont.lfFaceName) / sizeof(TCHAR)-1] = 0;
-	osd_free(face);
 
 	// create the font
 	height = logfont.lfHeight;
@@ -111,9 +110,8 @@ bool osd_font_windows::open(std::string const &font_path, std::string const &_na
 	}
 
 	// if it doesn't match our request, fail
-	char *utf = utf8_from_tstring(&realname[0]);
-	int result = core_stricmp(utf, name.c_str());
-	osd_free(utf);
+	std::string utf = utf8_from_tstring(&realname[0]);
+	int result = core_stricmp(utf.c_str(), name.c_str());
 
 	// if we didn't match, nuke our font and fall back
 	if (result != 0)
@@ -301,9 +299,8 @@ private:
 	static int CALLBACK font_family_callback(LOGFONT const *lpelfe, TEXTMETRIC const *lpntme, DWORD FontType, LPARAM lParam)
 	{
 		auto &result = *reinterpret_cast<std::vector<std::pair<std::string, std::string> > *>(lParam);
-		char *face = utf8_from_tstring(lpelfe->lfFaceName);
-		if ((*face != '@') && (result.empty() || (result.back().first != face))) result.emplace_back(face, face);
-		osd_free(face);
+		std::string face = utf8_from_tstring(lpelfe->lfFaceName);
+		if ((face[0] != '@') && (result.empty() || (result.back().first != face))) result.emplace_back(face, face);
 		return TRUE;
 	}
 };

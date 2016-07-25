@@ -251,7 +251,7 @@ void osd_break_into_debugger(const char *message)
 //  get_clipboard_text_by_format
 //============================================================
 
-static char *get_clipboard_text_by_format(UINT format, char *(*convert)(LPCVOID data))
+static char *get_clipboard_text_by_format(UINT format, std::string (*convert)(LPCVOID data))
 {
 	char *result = nullptr;
 	HANDLE data_handle;
@@ -272,7 +272,12 @@ static char *get_clipboard_text_by_format(UINT format, char *(*convert)(LPCVOID 
 				if (data != nullptr)
 				{
 					// invoke the convert
-					result = (*convert)(data);
+					std::string s = (*convert)(data);
+
+					// copy the string
+					result = (char *) osd_malloc(s.size() + 1);
+					if (result != nullptr)
+						memcpy(result, s.data(), s.size() * sizeof(*result));
 
 					// unlock the data
 					GlobalUnlock(data_handle);
@@ -290,7 +295,7 @@ static char *get_clipboard_text_by_format(UINT format, char *(*convert)(LPCVOID 
 //  convert_wide
 //============================================================
 
-static char *convert_wide(LPCVOID data)
+static std::string convert_wide(LPCVOID data)
 {
 	return utf8_from_wstring((LPCWSTR) data);
 }
@@ -299,7 +304,7 @@ static char *convert_wide(LPCVOID data)
 //  convert_ansi
 //============================================================
 
-static char *convert_ansi(LPCVOID data)
+static std::string convert_ansi(LPCVOID data)
 {
 	return utf8_from_astring((LPCSTR) data);
 }
@@ -362,13 +367,8 @@ protected:
 
 		for (auto const &library : m_libraries)
 		{
-			TCHAR *tempstr = tstring_from_utf8(library.c_str());
-			if (!tempstr)
-				return nullptr;
-
-			HMODULE module = load_library(tempstr);
-
-			osd_free(tempstr);
+			auto tempstr = tstring_from_utf8(library.c_str());
+			HMODULE module = load_library(tempstr.c_str());
 
 			if (module != nullptr)
 			{

@@ -184,14 +184,7 @@ osd_file::error osd_file::open(std::string const &orig_path, UINT32 openflags, p
 		return win_open_ptty(path, openflags, file, filesize);
 
 	// convert path to TCHAR
-	TCHAR *t_path = tstring_from_utf8(path.c_str());
-	osd_disposer<TCHAR> t_path_disposer(t_path);
-	if (!t_path)
-		return error::OUT_OF_MEMORY;
-
-	// convert the path into something Windows compatible
-	for (TCHAR *src = t_path; *src != 0; src++)
-		*src = /* ('/' == *src) ? '\\' : */ *src;
+	auto t_path = tstring_from_utf8(path.c_str());
 
 	// select the file open modes
 	DWORD disposition, access, sharemode;
@@ -213,25 +206,25 @@ osd_file::error osd_file::open(std::string const &orig_path, UINT32 openflags, p
 	}
 
 	// attempt to open the file
-	HANDLE h = CreateFile(t_path, access, sharemode, nullptr, disposition, 0, nullptr);
+	HANDLE h = CreateFile(t_path.c_str(), access, sharemode, nullptr, disposition, 0, nullptr);
 	if (INVALID_HANDLE_VALUE == h)
 	{
 		DWORD err = GetLastError();
 		// create the path if necessary
 		if ((ERROR_PATH_NOT_FOUND == err) && (openflags & OPEN_FLAG_CREATE) && (openflags & OPEN_FLAG_CREATE_PATHS))
 		{
-			TCHAR *pathsep = _tcsrchr(t_path, '\\');
+			TCHAR *pathsep = _tcsrchr(&t_path[0], '\\');
 			if (pathsep != nullptr)
 			{
 				// create the path up to the file
 				*pathsep = 0;
-				err = create_path_recursive(t_path);
+				err = create_path_recursive(&t_path[0]);
 				*pathsep = '\\';
 
 				// attempt to reopen the file
 				if (err == NO_ERROR)
 				{
-					h = CreateFile(t_path, access, sharemode, nullptr, disposition, 0, nullptr);
+					h = CreateFile(t_path.c_str(), access, sharemode, nullptr, disposition, 0, nullptr);
 					err = GetLastError();
 				}
 			}
@@ -287,15 +280,12 @@ osd_file::error osd_file::openpty(ptr &file, std::string &name)
 
 osd_file::error osd_file::remove(std::string const &filename)
 {
-	TCHAR *tempstr = tstring_from_utf8(filename.c_str());
-	if (!tempstr)
-		return error::OUT_OF_MEMORY;
+	auto tempstr = tstring_from_utf8(filename.c_str());
 
 	error filerr = error::NONE;
-	if (!DeleteFile(tempstr))
+	if (!DeleteFile(tempstr.c_str()))
 		filerr = win_error_to_file_error(GetLastError());
 
-	osd_free(tempstr);
 	return filerr;
 }
 
@@ -309,7 +299,6 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 {
 	DISK_GEOMETRY dg;
 	DWORD bytesRead;
-	TCHAR *t_filename;
 	HANDLE file;
 	int result;
 
@@ -318,11 +307,8 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 		return FALSE;
 
 	// do a create file on the drive
-	t_filename = tstring_from_utf8(filename);
-	if (t_filename == nullptr)
-		return FALSE;
-	file = CreateFile(t_filename, GENERIC_READ, FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, FILE_FLAG_NO_BUFFERING, nullptr);
-	osd_free(t_filename);
+	auto t_filename = tstring_from_utf8(filename);
+	file = CreateFile(t_filename.c_str(), GENERIC_READ, FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, FILE_FLAG_NO_BUFFERING, nullptr);
 	if (file == INVALID_HANDLE_VALUE)
 		return FALSE;
 
@@ -358,9 +344,7 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 std::unique_ptr<osd::directory::entry> osd_stat(const std::string &path)
 {
 	// convert the path to TCHARs
-	std::unique_ptr<TCHAR, void (*)(void *)> const t_path(tstring_from_utf8(path.c_str()), &osd_free);
-	if (!t_path)
-		return nullptr;
+	auto t_path = tstring_from_utf8(path.c_str());
 
 	// is this path a root directory (e.g. - C:)?
 	WIN32_FIND_DATA find_data;
@@ -368,13 +352,13 @@ std::unique_ptr<osd::directory::entry> osd_stat(const std::string &path)
 	if (isalpha(path[0]) && (path[1] == ':') && (path[2] == '\0'))
 	{
 		// need to do special logic for root directories
-		if (!GetFileAttributesEx(t_path.get(), GetFileExInfoStandard, &find_data.dwFileAttributes))
+		if (!GetFileAttributesEx(t_path.c_str(), GetFileExInfoStandard, &find_data.dwFileAttributes))
 			find_data.dwFileAttributes = INVALID_FILE_ATTRIBUTES;
 	}
 	else
 	{
 		// attempt to find the first file
-		HANDLE find = FindFirstFileEx(t_path.get(), FindExInfoStandard, &find_data, FindExSearchNameMatch, nullptr, 0);
+		HANDLE find = FindFirstFileEx(t_path.c_str(), FindExInfoStandard, &find_data, FindExSearchNameMatch, nullptr, 0);
 		if (find == INVALID_HANDLE_VALUE)
 			return nullptr;
 		FindClose(find);
@@ -404,23 +388,15 @@ std::unique_ptr<osd::directory::entry> osd_stat(const std::string &path)
 osd_file::error osd_get_full_path(std::string &dst, std::string const &path)
 {
 	// convert the path to TCHARs
-	TCHAR *t_path = tstring_from_utf8(path.c_str());
-	osd_disposer<TCHAR> t_path_disposer(t_path);
-	if (!t_path)
-		return osd_file::error::OUT_OF_MEMORY;
+	auto t_path = tstring_from_utf8(path.c_str());
 
 	// cannonicalize the path
 	TCHAR buffer[MAX_PATH];
-	if (!GetFullPathName(t_path, ARRAY_LENGTH(buffer), buffer, nullptr))
+	if (!GetFullPathName(t_path.c_str(), ARRAY_LENGTH(buffer), buffer, nullptr))
 		return win_error_to_file_error(GetLastError());
 
 	// convert the result back to UTF-8
-	char *result = utf8_from_tstring(buffer);
-	osd_disposer<char> result_disposer(result);
-	if (!result)
-		return osd_file::error::OUT_OF_MEMORY;
-
-	dst = result;
+	utf8_from_tstring(dst, buffer);
 	return osd_file::error::NONE;
 }
 
@@ -432,14 +408,8 @@ osd_file::error osd_get_full_path(std::string &dst, std::string const &path)
 
 bool osd_is_absolute_path(std::string const &path)
 {
-	bool result = false;
-	TCHAR *t_path = tstring_from_utf8(path.c_str());
-	if (t_path != nullptr)
-	{
-		result = !PathIsRelative(t_path);
-		osd_free(t_path);
-	}
-	return result;
+	auto t_path = tstring_from_utf8(path.c_str());
+	return !PathIsRelative(t_path.c_str());
 }
 
 
