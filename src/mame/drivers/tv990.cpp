@@ -170,15 +170,20 @@ UINT32 tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	for (y = miny; y <= maxy; y++)
 	{
 		// this isn't exactly right.
-		int i, minx, maxx;
-		for(i = 0; i < 8; i++)
+		int i;
+		for(i = 7; i >= 0; i--)
 		{
-			if(tvi1111_regs[i + 0x50] == 0x1ad5)
+			if(!BIT(tvi1111_regs[0x1f], i))
+				continue;
+
+			int starty = tvi1111_regs[i + 0x40] >> 8;
+			int endy = tvi1111_regs[i + 0x40] & 0xff;
+			if((y < starty) || (y >= endy))
 				continue;
 
 			curchar = &vram[tvi1111_regs[i + 0x50]];
-			minx = tvi1111_regs[i + 0x30] >> 8;
-			maxx = tvi1111_regs[i + 0x30] & 0xff;
+			int minx = tvi1111_regs[i + 0x30] >> 8;
+			int maxx = tvi1111_regs[i + 0x30] & 0xff;
 
 			if(maxx > 80)
 				maxx = 80;
