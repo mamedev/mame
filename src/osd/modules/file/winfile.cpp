@@ -116,17 +116,6 @@ private:
 };
 
 
-template <typename T>
-class osd_disposer
-{
-public:
-	osd_disposer(T *&ptr) : m_ptr(ptr) { }
-	~osd_disposer() { if (m_ptr) osd_free(m_ptr); }
-private:
-	T *&m_ptr;
-};
-
-
 
 //============================================================
 //  INLINE FUNCTIONS
@@ -186,6 +175,11 @@ osd_file::error osd_file::open(std::string const &orig_path, UINT32 openflags, p
 	// convert path to TCHAR
 	auto t_path = tstring_from_utf8(path.c_str());
 
+	// convert the path into something Windows compatible (the actual interesting part appears
+	// to have been commented out???)
+	for (auto iter = t_path.begin(); iter != t_path.end(); iter++)
+		*iter = /* ('/' == *iter) ? '\\' : */ *iter;
+
 	// select the file open modes
 	DWORD disposition, access, sharemode;
 	if (openflags & OPEN_FLAG_WRITE)
@@ -213,13 +207,16 @@ osd_file::error osd_file::open(std::string const &orig_path, UINT32 openflags, p
 		// create the path if necessary
 		if ((ERROR_PATH_NOT_FOUND == err) && (openflags & OPEN_FLAG_CREATE) && (openflags & OPEN_FLAG_CREATE_PATHS))
 		{
-			TCHAR *pathsep = _tcsrchr(&t_path[0], '\\');
-			if (pathsep != nullptr)
+			// the code below assumes these are the same
+			assert(std::string::npos == std::wstring::npos);
+
+			auto pathsep = t_path.rfind('\\');
+			if (pathsep != std::string::npos)
 			{
 				// create the path up to the file
-				*pathsep = 0;
+				t_path[pathsep] = 0;
 				err = create_path_recursive(&t_path[0]);
-				*pathsep = '\\';
+				t_path[pathsep] = '\\';
 
 				// attempt to reopen the file
 				if (err == NO_ERROR)

@@ -277,7 +277,7 @@ static char *get_clipboard_text_by_format(UINT format, std::string (*convert)(LP
 					// copy the string
 					result = (char *) osd_malloc(s.size() + 1);
 					if (result != nullptr)
-						memcpy(result, s.data(), s.size() * sizeof(*result));
+						memcpy(result, s.data(), (s.size() + 1) * sizeof(*result));
 
 					// unlock the data
 					GlobalUnlock(data_handle);
