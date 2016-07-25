@@ -42,6 +42,7 @@ private:
 	required_ioport m_rs232_databits;
 	required_ioport m_rs232_parity;
 	required_ioport m_rs232_stopbits;
+	required_ioport m_flow;
 
 	UINT8 m_input_buffer[1000];
 	UINT32 m_input_count;
