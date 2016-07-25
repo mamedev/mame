@@ -260,29 +260,18 @@ public:
 			return std::string(defstring);
 		}
 
-		auto osd_free_deleter = [](char *p) { osd_free(p); };
-
 		// convert the name to utf8
-		auto namestring = std::unique_ptr<char, decltype(osd_free_deleter)>(utf8_from_tstring(instance.tszName), osd_free_deleter);
+		std::string namestring = utf8_from_tstring(instance.tszName);
 
 		// if no suffix, return as-is
 		if (suffix == nullptr)
-		{
-			return std::string(namestring.get());
-		}
-
-		// otherwise, allocate space to add the suffix
-		auto combined = std::make_unique<char[]>(strlen(namestring.get()) + 1 + _tcslen(suffix) + 1);
+			return namestring;
 
 		// convert the suffix to utf8
-		auto suffix_utf8 = std::unique_ptr<char, decltype(osd_free_deleter)>(utf8_from_tstring(suffix), osd_free_deleter);
+		std::string suffix_utf8 = utf8_from_tstring(suffix);
 
 		// Concat the name and suffix
-		strcpy(combined.get(), namestring.get());
-		strcat(combined.get(), " ");
-		strcat(combined.get(), suffix_utf8.get());
-
-		return std::string(combined.get());
+		return namestring + " " + suffix_utf8;
 	}
 
 protected:

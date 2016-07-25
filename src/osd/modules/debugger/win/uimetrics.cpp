@@ -27,10 +27,9 @@ ui_metrics::ui_metrics(osd_options const &options) :
 		char const *const face = options.debugger_font();
 
 		// create a standard font
-		TCHAR *t_face = tstring_from_utf8((!*face || !strcmp(OSDOPTVAL_AUTO, face)) ? "Lucida Console" : face);
+		auto t_face = tstring_from_utf8((!*face || !strcmp(OSDOPTVAL_AUTO, face)) ? "Lucida Console" : face);
 		m_debug_font = CreateFont(-MulDiv((size <= 0) ? 9 : size, GetDeviceCaps(temp_dc, LOGPIXELSY), 72), 0, 0, 0, FW_MEDIUM, FALSE, FALSE, FALSE,
-					ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH, t_face);
-		osd_free(t_face);
+					ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH, t_face.c_str());
 
 		if (m_debug_font == nullptr)
 			fatalerror("Unable to create debugger font\n");

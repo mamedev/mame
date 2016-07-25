@@ -268,9 +268,8 @@ HWND debugview_info::create_source_combobox(HWND parent, LONG_PTR userdata)
 		int const length = strlen(source->name());
 		if (length > maxlength)
 			maxlength = length;
-		TCHAR *t_name = tstring_from_utf8(source->name());
-		SendMessage(result, CB_ADDSTRING, 0, (LPARAM)t_name);
-		osd_free(t_name);
+		auto t_name = tstring_from_utf8(source->name());
+		SendMessage(result, CB_ADDSTRING, 0, (LPARAM)t_name.c_str());
 	}
 	if (cursource != nullptr)
 	{
