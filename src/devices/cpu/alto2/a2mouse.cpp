@@ -8,8 +8,6 @@
 #include "alto2cpu.h"
 #include "a2roms.h"
 
-#define MOUSE_DIRTY_HACK    0
-
 enum {
 	MX1     = (1<<0),       //!< MX1 signal is bit 0 (latch bit 1)
 	LMX1    = (1<<1),
@@ -117,8 +115,8 @@ UINT16 alto2_cpu_device::mouse_read()
 
 	switch (m_mouse.phase) {
 	case 0:
-		m_mouse.latch |= MOVEX(m_mouse.dx - m_mouse.x);
-		m_mouse.latch |= MOVEY(m_mouse.dy - m_mouse.y);
+		m_mouse.latch ^= MOVEX(m_mouse.dx - m_mouse.x);
+		m_mouse.latch ^= MOVEY(m_mouse.dy - m_mouse.y);
 		break;
 	case 1:
 		m_mouse.latch |= MACTIVE;
@@ -129,8 +127,8 @@ UINT16 alto2_cpu_device::mouse_read()
 		m_mouse.latch ^= MOVEX(m_mouse.dx - m_mouse.x);
 		m_mouse.latch ^= MOVEY(m_mouse.dy - m_mouse.y);
 		break;
-	default:
-		m_mouse.latch &= ~MACTIVE;
+	case 3:
+		m_mouse.latch |= MACTIVE;
 		m_mouse.x -= SIGN(m_mouse.x - m_mouse.dx);
 		m_mouse.y -= SIGN(m_mouse.y - m_mouse.dy);
 	}
@@ -151,14 +149,6 @@ INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_x )
 	INT32 x = m_mouse.dx + newval - oldval;
 	x = x < 0 ? 0 : x > 605 ? 605 : x;
 	m_mouse.dx = x;
-#if MOUSE_DIRTY_HACK
-	/* XXX: dirty, dirty, hack */
-#if USE_HAMMING_CHECK
-	m_mem.ram[0424/2] = hamming_code(1, 0424 / 2, (m_mouse.dx << 16) | m_mouse.dy);
-#else
-	m_mem.ram[0424/2] = (m_mouse.dx << 16) | m_mouse.dy;
-#endif
-#endif
 }
 
 /**
@@ -174,14 +164,6 @@ INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_y )
 	INT32 y = m_mouse.dy + newval - oldval;
 	y = y < 0 ? 0 : y > 807 ? 807 : y;
 	m_mouse.dy = y;
-#if MOUSE_DIRTY_HACK
-	/* XXX: dirty, dirty, hack */
-#if USE_HAMMING_CHECK
-	m_mem.ram[0424/2] = hamming_code(1, 0424 / 2, (m_mouse.dx << 16) | m_mouse.dy);
-#else
-	m_mem.ram[0424/2] = (m_mouse.dx << 16) | m_mouse.dy;
-#endif
-#endif
 }
 
 /**

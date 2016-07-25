@@ -8,11 +8,14 @@ A down-grade of the Seibu SPI Hardware with SH-2 as main cpu.
 
 driver by Angelo Salese & Nicola Salmoria
 
+The input routines are very convoluted in comparison to previous Seibu games,
+looping over a complex control structure. Could these be derived from the
+"Touch Panel System" DVD mahjong games Seibu released under the CATS label?
+
 TODO:
-- Determine what buttons 5-7 actually do
 - Layout including lamps
-- Add hopper, etc.
-- Figure out remaining DIPs
+- Hook up a ticket dispenser and solve the "HOPPER ERROR" issue
+- Do button 5 or remaining DIPs actually do anything outside service mode?
 
 ============================================================================
 
@@ -222,11 +225,12 @@ static GFXDECODE_START( feversoc )
 GFXDECODE_END
 
 static INPUT_PORTS_START( feversoc )
+	// The "ANALIZE" input shown in test mode does not exist on this hardware.
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_NAME("Key In (Service)")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper") PORT_TOGGLE PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
@@ -248,9 +252,9 @@ static INPUT_PORTS_START( feversoc )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop 2 (BTN2)")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop 3 (BTN3)")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Bet (BTN4)")
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("BTN5") // ?
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("BTN6") // ?
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_HALF ) PORT_NAME("BTN7") // ?
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Unknown (BTN5)") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Key Out (BTN6)")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Coin Out (BTN7)")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Reset")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END

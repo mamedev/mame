@@ -14652,11 +14652,17 @@ ROM_END
 
   Custom Hardware Notes:
 
+  To initialize the game the first time, enter BOOKS/STATS/SETUP (Key 0),
+  and advance through the menus with RESET key (key R). When finish press
+  again BOOKS/STATS/SETUP (Key 0) to exit the setup mode.
+
+  ---
+
   GFX Bank 1 (chars and BG graphics) is colors-accurate.
   GFX Bank 2 needs some work...
 
-  Seems that there is an extra layer for the bonus graphics.
-  This graphic is taken from Bank 2, and is the "representative"
+  There is a window that should shows the bonus graphics.
+  This graphic icon is taken from Bank 2, and is the "representative"
   for the chosen gfx set.
 
   Code writes the bonus graphics at 9A80-9A89, and the "reel scroll"
@@ -14670,6 +14676,11 @@ ROM_END
 
   ...and written 0x10 at B0C0-B0FF.
 
+
+  The taiwanese hardware needs better decoded reels graphics ROMs,
+  The chars/text graphics are properly decodes, but texts strings
+  look bad in the game.
+  
 *******************************************************************************************/
 
 /*
@@ -15552,6 +15563,15 @@ DRIVER_INIT_MEMBER(wingco_state, flaming7)
 	{
 		src2[i] = BITSWAP8(src2[i], 3, 4, 2, 5, 1, 6, 0, 7);    // OK
 	}
+
+/*  Patch to bypass the iButton electronic serial number check.
+
+    5D79: jumps to $5D83 for the demo game.
+	      just patched to jump to $5D80 (jmp $6115)
+		  where the check is succesfull.
+*/
+	UINT8 *ROM = memregion("maincpu")->base();
+	ROM[0x5d7a] = 0x05;
 }
 
 /*
@@ -15563,6 +15583,15 @@ DRIVER_INIT_MEMBER(wingco_state, flaming7)
 */
 DRIVER_INIT_MEMBER(wingco_state, flam7_tw)
 {
+/*  Patch to bypass the iButton electronic serial number check.
+
+    60B2: After last compare, code jumps to $60BC for the demo game.
+	      Just patched to jump to $60B9 (jmp $644E) where the check
+		  is succesfull.
+*/
+	UINT8 *ROM = memregion("maincpu")->base();
+	ROM[0x60b3] = 0x05;
+
 }
 
 
@@ -15663,11 +15692,11 @@ GAMEL( 1993, bingownga, bingowng, bingownga,bingownga,driver_device,  0,        
 
 // --- Flaming 7's hardware (W-4 derivative) ---
 GAME(  199?, fl7_3121,  0,        flam7_w4, flam7_w4, driver_device,  0,         ROT0, "Cyberdyne Systems", "Flaming 7 (W4 Hardware, Red, White & Blue 7's + Hollywood Nights)",          0 )
-GAME(  199?, fl7_50,    0,        flaming7, flaming7, wingco_state,   flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 50 Bonus)",              MACHINE_NOT_WORKING )
-GAME(  199?, fl7_500,   fl7_50,   flaming7, flaming7, wingco_state,   flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 500 Bonus)",             MACHINE_NOT_WORKING )
-GAME(  199?, fl7_2000,  fl7_50,   flaming7, flaming7, wingco_state,   flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 2000 Bonus)",            MACHINE_NOT_WORKING )
-GAME(  199?, fl7_2k16,  fl7_50,   flaming7, flaming7, wingco_state,   flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Egyptian Gold, 2000 Bonus)",   MACHINE_NOT_WORKING )
-GAME(  199?, fl7_tw,    fl7_50,   flam7_tw, flaming7, wingco_state,   flam7_tw,  ROT0, "Cyberdyne Systems", "Flaming 7 (Taiwanese Hardware, unknown version)",          MACHINE_NOT_WORKING )  // needs proper gfx roms decryption.
+GAME(  199?, fl7_50,    0,        flaming7, flaming7, wingco_state,   flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 50 Bonus)",              MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
+GAME(  199?, fl7_500,   fl7_50,   flaming7, flaming7, wingco_state,   flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 500 Bonus)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
+GAME(  199?, fl7_2000,  fl7_50,   flaming7, flaming7, wingco_state,   flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 2000 Bonus)",            MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
+GAME(  199?, fl7_2k16,  fl7_50,   flaming7, flaming7, wingco_state,   flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Egyptian Gold, 2000 Bonus)",   MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
+GAME(  199?, fl7_tw,    fl7_50,   flam7_tw, flaming7, wingco_state,   flam7_tw,  ROT0, "Cyberdyne Systems", "Flaming 7 (Taiwanese Hardware, unknown version)",          MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )  // needs proper reels gfx roms decryption.
 
 
 // --- Wing W-8 hardware ---

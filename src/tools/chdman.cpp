@@ -361,7 +361,7 @@ public:
 		for (int tracknum = 0; tracknum < m_toc.numtrks; tracknum++)
 		{
 			const cdrom_track_info &trackinfo = m_toc.tracks[tracknum];
-			UINT64 endoffs = startoffs + (trackinfo.frames + trackinfo.extraframes) * CD_FRAME_SIZE;
+			UINT64 endoffs = startoffs + (UINT64)(trackinfo.frames + trackinfo.extraframes) * CD_FRAME_SIZE;
 			if (offset >= startoffs && offset < endoffs)
 			{
 				// if we don't already have this file open, open it now
@@ -375,10 +375,10 @@ public:
 				}
 
 				// iterate over frames
-				UINT32 bytesperframe = trackinfo.datasize + trackinfo.subsize;
+				UINT64 bytesperframe = trackinfo.datasize + trackinfo.subsize;
 				UINT64 src_track_start = m_info.track[tracknum].offset;
-				UINT64 src_track_end = src_track_start + bytesperframe * trackinfo.frames;
-				UINT64 pad_track_start = src_track_end - (m_toc.tracks[tracknum].padframes * bytesperframe);
+				UINT64 src_track_end = src_track_start + bytesperframe * (UINT64)trackinfo.frames;
+				UINT64 pad_track_start = src_track_end - ((UINT64)m_toc.tracks[tracknum].padframes * bytesperframe);
 				while (length_remaining != 0 && offset < endoffs)
 				{
 					// determine start of current frame

@@ -109,7 +109,6 @@ protected:
 	bool call_load() override;
 	void call_unload() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
-	virtual void loaded_through_softlist() override;
 
 	void prepare_cartridge();
 
@@ -125,7 +124,6 @@ protected:
 
 private:
 	bool    m_readrom;
-	bool    m_softlist;
 	int     m_pcbtype;
 	int     m_slot;
 	int     get_index_from_tagname();

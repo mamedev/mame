@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 //============================================================
 //
-//  strconv.c - Win32 string conversion
+//  strconv.cpp - Win32 string conversion
 //
 //============================================================
 
@@ -19,23 +19,28 @@
 //  astring_from_utf8
 //============================================================
 
-CHAR *astring_from_utf8(const char *utf8string)
+std::string &astring_from_utf8(std::string &dst, const char *s)
 {
-	WCHAR *wstring;
-	int char_count;
-	CHAR *result;
-
 	// convert MAME string (UTF-8) to UTF-16
-	char_count = MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, nullptr, 0);
-	wstring = (WCHAR *)alloca(char_count * sizeof(*wstring));
-	MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, wstring, char_count);
+	std::basic_string<WCHAR> wstring = wstring_from_utf8(s);
 
 	// convert UTF-16 to "ANSI code page" string
-	char_count = WideCharToMultiByte(CP_ACP, 0, wstring, -1, nullptr, 0, nullptr, nullptr);
-	result = (CHAR *)osd_malloc_array(char_count * sizeof(*result));
-	if (result != nullptr)
-		WideCharToMultiByte(CP_ACP, 0, wstring, -1, result, char_count, nullptr, nullptr);
+	int char_count = WideCharToMultiByte(CP_ACP, 0, wstring.c_str(), wstring.size(), nullptr, 0, nullptr, nullptr);
+	dst.resize(char_count);
+	WideCharToMultiByte(CP_ACP, 0, wstring.c_str(), wstring.size(), &dst[0], char_count, nullptr, nullptr);
 
+	return dst;
+}
+
+
+//============================================================
+//  astring_from_utf8
+//============================================================
+
+std::string astring_from_utf8(const char *s)
+{
+	std::string result;
+	astring_from_utf8(result, s);
 	return result;
 }
 
@@ -44,23 +49,26 @@ CHAR *astring_from_utf8(const char *utf8string)
 //  utf8_from_astring
 //============================================================
 
-char *utf8_from_astring(const CHAR *astring)
+std::string &utf8_from_astring(std::string &dst, const CHAR *s)
 {
-	WCHAR *wstring;
-	int char_count;
-	CHAR *result;
-
 	// convert "ANSI code page" string to UTF-16
-	char_count = MultiByteToWideChar(CP_ACP, 0, astring, -1, nullptr, 0);
-	wstring = (WCHAR *)alloca(char_count * sizeof(*wstring));
-	MultiByteToWideChar(CP_ACP, 0, astring, -1, wstring, char_count);
+	int char_count = MultiByteToWideChar(CP_ACP, 0, s, -1, nullptr, 0);
+	std::wstring wstring(char_count - 1, 0);
+	MultiByteToWideChar(CP_ACP, 0, s, -1, &wstring[0], char_count - 1);
 
 	// convert UTF-16 to MAME string (UTF-8)
-	char_count = WideCharToMultiByte(CP_UTF8, 0, wstring, -1, nullptr, 0, nullptr, nullptr);
-	result = (CHAR *)osd_malloc_array(char_count * sizeof(*result));
-	if (result != nullptr)
-		WideCharToMultiByte(CP_UTF8, 0, wstring, -1, result, char_count, nullptr, nullptr);
+	return utf8_from_wstring(dst, wstring.c_str());
+}
 
+
+//============================================================
+//  utf8_from_astring
+//============================================================
+
+std::string utf8_from_astring(const CHAR *s)
+{
+	std::string result;
+	utf8_from_astring(result, s);
 	return result;
 }
 
@@ -69,17 +77,25 @@ char *utf8_from_astring(const CHAR *astring)
 //  wstring_from_utf8
 //============================================================
 
-WCHAR *wstring_from_utf8(const char *utf8string)
+std::wstring &wstring_from_utf8(std::wstring &dst, const char *s)
 {
-	int char_count;
-	WCHAR *result;
-
 	// convert MAME string (UTF-8) to UTF-16
-	char_count = MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, nullptr, 0);
-	result = (WCHAR *)osd_malloc_array(char_count * sizeof(*result));
-	if (result != nullptr)
-		MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, result, char_count);
+	int char_count = MultiByteToWideChar(CP_UTF8, 0, s, -1, nullptr, 0);
+	dst.resize(char_count - 1);
+	MultiByteToWideChar(CP_UTF8, 0, s, -1, &dst[0], char_count - 1);
 
+	return dst;
+}
+
+
+//============================================================
+//  wstring_from_utf8
+//============================================================
+
+std::wstring wstring_from_utf8(const char *s)
+{
+	std::wstring result;
+	wstring_from_utf8(result, s);
 	return result;
 }
 
@@ -88,19 +104,28 @@ WCHAR *wstring_from_utf8(const char *utf8string)
 //  utf8_from_wstring
 //============================================================
 
-char *utf8_from_wstring(const WCHAR *wstring)
+std::string &utf8_from_wstring(std::string &dst, const WCHAR *s)
 {
-	int char_count;
-	char *result;
-
 	// convert UTF-16 to MAME string (UTF-8)
-	char_count = WideCharToMultiByte(CP_UTF8, 0, wstring, -1, nullptr, 0, nullptr, nullptr);
-	result = (char *)osd_malloc_array(char_count * sizeof(*result));
-	if (result != nullptr)
-		WideCharToMultiByte(CP_UTF8, 0, wstring, -1, result, char_count, nullptr, nullptr);
+	int char_count = WideCharToMultiByte(CP_UTF8, 0, s, -1, nullptr, 0, nullptr, nullptr);
+	dst.resize(char_count - 1);
+	WideCharToMultiByte(CP_UTF8, 0, s, -1, &dst[0], char_count - 1, nullptr, nullptr);
 
+	return dst;
+}
+
+
+//============================================================
+//  utf8_from_wstring
+//============================================================
+
+std::string utf8_from_wstring(const WCHAR *s)
+{
+	std::string result;
+	utf8_from_wstring(result, s);
 	return result;
 }
+
 
 //============================================================
 //  osd_uchar_from_osdchar

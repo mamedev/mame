@@ -62,15 +62,15 @@
 #define PUT_KCOM_SENDADR(kcom,val)      X_WRBITS(kcom,16,5,5,val)           //!< put send address flag into controller command (hardware command register)
 
 #if defined(ALTO2_FAKE_STATUS_H) && (ALTO2_FAKE_STATUS_H > 0)
-#define STATUS_DP0  48
-#define STATUS_DP1  78
+#define STATUS_DP0  28
+#define STATUS_DP1  58
 #define STATUS_RGATE    0, "%c"
 #define STATUS_WGATE    1, "%c"
 #define STATUS_KWRC     2, "%c"
-#define STATUS_CYL      4, "C%-3d"
+#define STATUS_CYL      4, "C%03d"
 #define STATUS_HEAD     9, "H%d"
-#define STATUS_SECT     12, "S%-2d"
-#define STATUS_PAGE     16, "[%-4d]"
+#define STATUS_SECT     12, "S%02d"
+#define STATUS_PAGE     16, "[%04d]"
 #define FAKE_STATUS(_unit,_which,...) do { \
 	int x = (_unit) ? STATUS_DP1 : STATUS_DP0; \
 	fake_status_printf(x + _which, __VA_ARGS__); \

@@ -6378,6 +6378,45 @@ ROM_START( shpeng )
 	ROM_LOAD_OPTIONAL( "1.17g", 0x200, 0x200, CRC(324fa9cf) SHA1(a03e23d9a9687dec4c23a8e41254a3f4b70c7e25) )
 ROM_END
 
+/*
+Intergirl by Barko
+
+1x 	GM68A45S 		uj11 	CRT Controller (CRTC)
+1x 	Z8400ADSD-Z80ACPU 		ug8 	8-bit Microprocessor - main
+1x 	GL324 		u14 	Quad Operational Amplifier - sound
+1x 	YM2203C 		uj5 	FM Operator Type-N (OPM) - sound
+1x 	YM3014B 		u13 	D/A Converter (DAC) - sound
+1x 	oscillator 	22.1184MHz 	xt1 	
+
+ROMs
+2x 	TMS27C512 	1,2 	dumped
+3x 	TMS27C020 	3,4,5 	dumped
+
+RAMs
+1x 	GM76C88AL-15 	ug1
+6x 	KM424C64P-10 	uf13,uf13a,uf14,uf15,uf16,uf17
+
+PLDs
+1x 	PAL16L8ACN 	ug6 	read protected
+1x 	CY7C381-0JC 		read protected 
+*/
+
+ROM_START( intrgirl )
+	ROM_REGION( 0x90000, "maincpu", 0 ) // Z80 Code
+	ROM_LOAD( "ka-1.ug3", 0x00000, 0x10000, CRC(07b36540) SHA1(1679438a153a7449256c826c4f10443e739c0825) )
+	ROM_LOAD( "ka-2.ug5", 0x28000, 0x10000, CRC(9f2fc058) SHA1(0be90d44ca7cac7040dfa53ba36f6bc3d504fb01) )
+
+	ROM_REGION( 0xc0000, "gfx1", 0 )    // blitter data
+	ROM_LOAD( "ka-3.rom1", 0x00000, 0x40000, CRC(57fd8b34) SHA1(b7fa977bb79a0e831bc86be635398950dd717b47) )
+	ROM_LOAD( "ka-4.rom2", 0x40000, 0x40000, CRC(ad90d3a1) SHA1(d955620fdd4aacc96e59e9f94da85568cce47843) )
+	ROM_LOAD( "ka-5.rom3", 0x80000, 0x40000, CRC(2ed30171) SHA1(883d9e96df4f234652b01599e065f7f1985d1748) )
+
+	// there aren't PROMs on the PCB, but these are currently here because they will show the game running, although with bad colors.
+	// to be removed once the real source of the palette is identified (maybe the CY7C381-0JC FPGA?)
+	ROM_REGION( 0x400, "proms", 0 ) // Color PROMs
+	ROM_LOAD( "fake_prom_1", 0x000, 0x200, NO_DUMP )
+	ROM_LOAD( "fake_prom_2", 0x200, 0x200, NO_DUMP )
+ROM_END
 
 // Decrypted by yong
 DRIVER_INIT_MEMBER(dynax_state,mjelct3)
@@ -7451,4 +7490,5 @@ GAME( 1991, ougonpaib,ougonpai, tenkai,   tenkai,   driver_device, 0,        ROT
 GAME( 1994, mjreach,  0,        tenkai,   mjreach,  dynax_state,   mjreach,  ROT0,   "bootleg / Dynax",          "Mahjong Reach (bootleg)",                                       MACHINE_SUPPORTS_SAVE )
 GAME( 1994, cdracula, 0,        cdracula, cdracula, driver_device, 0,        ROT0,   "Yun Sung (Escape license)","Castle Of Dracula",                                             MACHINE_SUPPORTS_SAVE ) // not a dynax board
 GAME( 1995, shpeng,   0,        sprtmtch, drgpunch, driver_device, 0,        ROT0,   "WSAC Systems?",            "Sea Hunter Penguin",                                            MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // not a dynax board. proms?
+GAME( 1995, intrgirl, 0,        sprtmtch, drgpunch, driver_device, 0,        ROT0,   "Barko",                    "Intergirl",                                                     MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // not a dynax board. proms?
 GAME( 1996, majrjhdx, 0,        majrjhdx, tenkai,   driver_device, 0,        ROT0,   "Dynax",                    "Mahjong Raijinhai DX",                                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

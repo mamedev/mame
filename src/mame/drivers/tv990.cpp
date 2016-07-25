@@ -37,10 +37,8 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/ins8250.h"
-#include "machine/at_keybc.h"
+#include "machine/8042kbdc.h"
 #include "bus/rs232/rs232.h"
-#include "bus/pc_kbd/pc_kbdc.h"
-#include "bus/pc_kbd/keyboards.h"
 
 #define UART0_TAG		"ns16450_0"
 #define UART1_TAG		"ns16450_1"
@@ -56,7 +54,9 @@ public:
 		m_vram(*this, "vram"),
 		m_fontram(*this, "fontram"),
 		m_uart0(*this, UART0_TAG),
-		m_uart1(*this, UART1_TAG)
+		m_uart1(*this, UART1_TAG),
+		m_screen(*this, "screen"),
+		m_kbdc(*this, "pc_kbdc")
 	{
 	}
 
@@ -64,31 +64,47 @@ public:
 	required_shared_ptr<UINT16> m_vram;
 	required_shared_ptr<UINT16> m_fontram;
 	required_device<ns16450_device> m_uart0, m_uart1;
-			
+	required_device<screen_device> m_screen;
+	required_device<kbdc8042_device> m_kbdc;
+
 	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	
 	DECLARE_READ16_MEMBER(tvi1111_r);
 	DECLARE_WRITE16_MEMBER(tvi1111_w);
-	DECLARE_READ16_MEMBER(keyb_r);
-	DECLARE_WRITE16_MEMBER(keyb_w);
+	DECLARE_READ8_MEMBER(kbdc_r);
+	DECLARE_WRITE8_MEMBER(kbdc_w);
 	
 	WRITE_LINE_MEMBER(uart0_irq);
 	WRITE_LINE_MEMBER(uart1_irq);
 
-	DECLARE_WRITE_LINE_MEMBER(keyboard_clock_w);
-	DECLARE_WRITE_LINE_MEMBER(keyboard_data_w);
-
+	INTERRUPT_GEN_MEMBER(vblank);
 private:
 	UINT16 tvi1111_regs[(0x100/2)+2];
-	
-	bool m_kclk;
-	UINT8 m_kdata;
-	UINT8 m_scancode;
-	int m_kbit;
-	int m_idstage;
+	emu_timer *m_rowtimer;
 };
+
+INTERRUPT_GEN_MEMBER(tv990_state::vblank)
+{
+	m_rowtimer->adjust(m_screen->time_until_pos(16));
+	m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
+	tvi1111_regs[0x1d] |= 4;
+}
+
+void tv990_state::machine_start()
+{
+	m_rowtimer = timer_alloc();
+}
+
+void tv990_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	m_rowtimer->adjust(m_screen->time_until_pos(m_screen->vpos() + 16));
+	m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
+	m_screen->update_now();
+}
 
 WRITE_LINE_MEMBER(tv990_state::uart0_irq)
 {
@@ -105,6 +121,10 @@ READ16_MEMBER(tv990_state::tvi1111_r)
 	if (offset == (0x32/2))
 	{
 		tvi1111_regs[offset] |= 8;	// loop at 109ca wants this set
+	}
+	else if(offset == 0x1d)
+	{
+		m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 	}
 
 	return tvi1111_regs[offset];
@@ -130,11 +150,6 @@ WRITE16_MEMBER(tv990_state::tvi1111_w)
 	}
 #endif
 	COMBINE_DATA(&tvi1111_regs[offset]);
-	
-	if (offset == 0x1d)
-	{
-		tvi1111_regs[offset] |= 4;
-	}
 }
 
 UINT32 tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -148,173 +163,108 @@ UINT32 tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	UINT8 *fontram = (UINT8 *)m_fontram.target();
 	UINT16 *curchar;
 	UINT8 *fontptr;
-	
-	for (y = 0; y < 50; y++)
+	int miny = cliprect.min_y / 16;
+	int maxy = cliprect.max_y / 16;
+	bitmap.fill(0, cliprect);
+
+	for (y = miny; y <= maxy; y++)
 	{
 		// this isn't exactly right.
-		if (tvi1111_regs[y+0x50] != 0)
+		int i;
+		for(i = 7; i >= 0; i--)
 		{
-			curchar = &vram[tvi1111_regs[y+0x50]];
-		}
-		else
-		{
-			curchar = &vram[(y * 144)+1];
-		}
-		
-		for (x = 0; x < 80; x++)
-		{
-			fontptr = (UINT8 *)&fontram[((curchar[x]>>8) & 0xff) * 64];
-	
-			for (int chary = 0; chary < 16; chary++)
+			if(!BIT(tvi1111_regs[0x1f], i))
+				continue;
+
+			int starty = tvi1111_regs[i + 0x40] >> 8;
+			int endy = tvi1111_regs[i + 0x40] & 0xff;
+			if((y < starty) || (y >= endy))
+				continue;
+
+			curchar = &vram[tvi1111_regs[i + 0x50]];
+			int minx = tvi1111_regs[i + 0x30] >> 8;
+			int maxx = tvi1111_regs[i + 0x30] & 0xff;
+
+			if(maxx > 80)
+				maxx = 80;
+			for (x = minx; x < maxx; x++)
 			{
-				scanline = &bitmap.pix32((y*16)+chary, (x*16));
-			
-				pixels = *fontptr++;
-				pixels2 = *fontptr++;
-					
-				if (curchar[x] & 0x4)	// inverse video?
+				UINT8 chr = curchar[x - minx] >> 8;
+				UINT8 attr = curchar[x - minx] & 0xff;
+				fontptr = (UINT8 *)&fontram[(chr + (attr & 0x40 ? 256 : 0)) * 64];
+
+				for (int chary = 0; chary < 16; chary++)
 				{
-					*scanline++ = invpalette[(pixels>>7)&1];
-					*scanline++ = invpalette[(pixels2>>7)&1];
-					*scanline++ = invpalette[(pixels>>6)&1];
-					*scanline++ = invpalette[(pixels2>>6)&1];
-					*scanline++ = invpalette[(pixels>>5)&1];
-					*scanline++ = invpalette[(pixels2>>5)&1];
-					*scanline++ = invpalette[(pixels>>4)&1];
-					*scanline++ = invpalette[(pixels2>>4)&1];
-					*scanline++ = invpalette[(pixels>>3)&1];
-					*scanline++ = invpalette[(pixels2>>3)&1];
-					*scanline++ = invpalette[(pixels>>2)&1];
-					*scanline++ = invpalette[(pixels2>>2)&1];
-					*scanline++ = invpalette[(pixels>>1)&1];
-					*scanline++ = invpalette[(pixels2>>1)&1];
-					*scanline++ = invpalette[(pixels&1)];
-					*scanline++ = invpalette[(pixels2&1)];
+					scanline = &bitmap.pix32((y*16)+chary, (x*16));
+
+					pixels = *fontptr++;
+					pixels2 = *fontptr++;
+					if((attr & 0x8) && (chary == 15))
+					{
+						pixels = 0xff;
+						pixels2 = 0xff;
+					}
+
+					if (attr & 0x4)	// inverse video?
+					{
+						*scanline++ = invpalette[(pixels>>7)&1];
+						*scanline++ = invpalette[(pixels2>>7)&1];
+						*scanline++ = invpalette[(pixels>>6)&1];
+						*scanline++ = invpalette[(pixels2>>6)&1];
+						*scanline++ = invpalette[(pixels>>5)&1];
+						*scanline++ = invpalette[(pixels2>>5)&1];
+						*scanline++ = invpalette[(pixels>>4)&1];
+						*scanline++ = invpalette[(pixels2>>4)&1];
+						*scanline++ = invpalette[(pixels>>3)&1];
+						*scanline++ = invpalette[(pixels2>>3)&1];
+						*scanline++ = invpalette[(pixels>>2)&1];
+						*scanline++ = invpalette[(pixels2>>2)&1];
+						*scanline++ = invpalette[(pixels>>1)&1];
+						*scanline++ = invpalette[(pixels2>>1)&1];
+						*scanline++ = invpalette[(pixels&1)];
+						*scanline++ = invpalette[(pixels2&1)];
+					}
+					else
+					{
+						*scanline++ = palette[(pixels>>7)&1];
+						*scanline++ = palette[(pixels2>>7)&1];
+						*scanline++ = palette[(pixels>>6)&1];
+						*scanline++ = palette[(pixels2>>6)&1];
+						*scanline++ = palette[(pixels>>5)&1];
+						*scanline++ = palette[(pixels2>>5)&1];
+						*scanline++ = palette[(pixels>>4)&1];
+						*scanline++ = palette[(pixels2>>4)&1];
+						*scanline++ = palette[(pixels>>3)&1];
+						*scanline++ = palette[(pixels2>>3)&1];
+						*scanline++ = palette[(pixels>>2)&1];
+						*scanline++ = palette[(pixels2>>2)&1];
+						*scanline++ = palette[(pixels>>1)&1];
+						*scanline++ = palette[(pixels2>>1)&1];
+						*scanline++ = palette[(pixels&1)];
+						*scanline++ = palette[(pixels2&1)];
+					}
 				}
-				else
-				{
-					*scanline++ = palette[(pixels>>7)&1];
-					*scanline++ = palette[(pixels2>>7)&1];
-					*scanline++ = palette[(pixels>>6)&1];
-					*scanline++ = palette[(pixels2>>6)&1];
-					*scanline++ = palette[(pixels>>5)&1];
-					*scanline++ = palette[(pixels2>>5)&1];
-					*scanline++ = palette[(pixels>>4)&1];
-					*scanline++ = palette[(pixels2>>4)&1];
-					*scanline++ = palette[(pixels>>3)&1];
-					*scanline++ = palette[(pixels2>>3)&1];
-					*scanline++ = palette[(pixels>>2)&1];
-					*scanline++ = palette[(pixels2>>2)&1];
-					*scanline++ = palette[(pixels>>1)&1];
-					*scanline++ = palette[(pixels2>>1)&1];
-					*scanline++ = palette[(pixels&1)];
-					*scanline++ = palette[(pixels2&1)];
-				}
-			}	
+			}
 		}
 	}
 
 	return 0;
 }
 
-// AT keyboard interface - done in an AMI ASIC
-WRITE_LINE_MEMBER(tv990_state::keyboard_clock_w)
+READ8_MEMBER(tv990_state::kbdc_r)
 {
-//  printf("KCLK: %d\n", state ? 1 : 0);
-
-	if (m_scancode == 0x55) return;
-
-	// rising edge?
-	if ((state == ASSERT_LINE) && (!m_kclk))
-	{
-		if (m_kbit >= 1 && m_kbit <= 8)
-		{
-			m_scancode >>= 1;
-			m_scancode |= m_kdata;
-		}
-
-		// stop bit?
-		if (m_kbit == 9)
-		{
-	        //printf("scancode %02x\n", m_scancode);
-			m_kbit = 0;
-			m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
-	// irq here
-		}
-		else
-		{
-			m_kbit++;
-		}
-	}
-
-	m_kclk = (state == ASSERT_LINE) ? true : false;
-}
-
-WRITE_LINE_MEMBER(tv990_state::keyboard_data_w)
-{
-//  printf("KDATA: %d\n", state ? 1 : 0);
-	m_kdata = (state == ASSERT_LINE) ? 0x80 : 0x00;
-}
-
-// 2ac = test
-READ16_MEMBER(tv990_state::keyb_r)
-{
-	if (offset == 0)
-	{
-		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
-		//printf("reading m_scancode = %02x\n", m_scancode);
-		
-		switch (m_idstage)
-		{
-			case 1:
-				m_idstage++;
-				return 0xfa;
-				
-			case 2:
-				m_idstage++;
-				return 0xab;
-				
-			case 3:
-				m_idstage = 0;
-				return 0x83;
-		
-			default:
-				break;
-		}
-		
-		
-		return m_scancode;
-	}
+	if(offset)
+		return m_kbdc->data_r(space, 4);
 	else
-	{
-		return 0;		
-	}
+		return m_kbdc->data_r(space, 0);
 }
 
-WRITE16_MEMBER(tv990_state::keyb_w)
+WRITE8_MEMBER(tv990_state::kbdc_w)
 {
-	if (offset == 0)
-	{
-		//printf("%02x to keyboard\n", data);
-		m_scancode = 0xfa;	// pretend keyboard responded "ACK"
-		
-		if (data == 0xf2)	// get PS/2 ID
-		{
-			m_idstage = 1;
-		}
-	}
+	if(offset)
+		m_kbdc->data_w(space, 4, data);
 	else
-	{
-		//printf("AT command %02x\n", data);
-		if (data == 0xaa)
-		{
-			m_scancode = 0x55;
-		}
-		else if (data == 0xab)
-		{
-			m_scancode = 0;
-		}
-	}
+		m_kbdc->data_w(space, 0, data);
 }
 
 static ADDRESS_MAP_START(tv990_mem, AS_PROGRAM, 16, tv990_state)
@@ -324,21 +274,18 @@ static ADDRESS_MAP_START(tv990_mem, AS_PROGRAM, 16, tv990_state)
 	AM_RANGE(0x090000, 0x0900ff) AM_READWRITE(tvi1111_r, tvi1111_w)
 	AM_RANGE(0x0a0000, 0x0a000f) AM_DEVREADWRITE8(UART0_TAG, ns16450_device, ins8250_r, ins8250_w, 0x00ff)
 	AM_RANGE(0x0a0010, 0x0a001f) AM_DEVREADWRITE8(UART1_TAG, ns16450_device, ins8250_r, ins8250_w, 0x00ff)
-	AM_RANGE(0x0b0000, 0x0b0003) AM_READWRITE(keyb_r, keyb_w)
+	AM_RANGE(0x0b0000, 0x0b0003) AM_READWRITE8(kbdc_r, kbdc_w, 0x00ff)
 	AM_RANGE(0x0c0000, 0x0c7fff) AM_RAM	// work RAM
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( tv990 )
+	PORT_INCLUDE( at_keyboard )
 INPUT_PORTS_END
-
 
 void tv990_state::machine_reset()
 {
-	m_kclk = true;
-	m_kbit = 0;
-	m_scancode = 0;
-	m_idstage = 0;
+	m_rowtimer->adjust(m_screen->time_until_pos(0));
 	
 	memset(tvi1111_regs, 0, sizeof(tvi1111_regs));
 }
@@ -347,7 +294,7 @@ static MACHINE_CONFIG_START( tv990, tv990_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14967500)	// verified (59.86992/4)
 	MCFG_CPU_PROGRAM_MAP(tv990_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tv990_state, irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tv990_state, vblank)
 	
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(tv990_state, screen_update)
@@ -373,10 +320,9 @@ static MACHINE_CONFIG_START( tv990, tv990_state )
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(UART1_TAG, ns16450_device, dcd_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(UART1_TAG, ns16450_device, cts_w))
 	
-	MCFG_DEVICE_ADD("pc_kbdc", PC_KBDC, 0)
-	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(tv990_state, keyboard_clock_w))
-	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE(tv990_state, keyboard_data_w))
-	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
+	MCFG_DEVICE_ADD("pc_kbdc", KBDC8042, 0)
+	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_AT386)
+	MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(INPUTLINE("maincpu", M68K_IRQ_2))
 MACHINE_CONFIG_END
 
 /* ROM definition */

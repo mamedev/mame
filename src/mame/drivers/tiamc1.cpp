@@ -410,6 +410,12 @@ ROM_START( sosterm )
 	ROM_LOAD( "02.5a", 0x04000, 0x2000, CRC(9506cf9b) SHA1(3e54593d4452b956509877d9b6b26aa3e3a90beb) )
 	ROM_LOAD( "03.6a", 0x06000, 0x2000, CRC(5a0c14e1) SHA1(3eebe2c3ce114b87723fa6571623ee065a0b5646) )
 
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "prom100.e10", 0x0000, 0x100, NO_DUMP ) /* i/o ports map 256x8 */
+	ROM_LOAD( "prom101.a01", 0x0100, 0x100, NO_DUMP ) /* video sync 256x8 */
+	ROM_LOAD( "prom102.b03", 0x0200, 0x080, NO_DUMP ) /* sprites rom index 256x4 */
+	ROM_LOAD( "prom102.b06", 0x0280, 0x080, NO_DUMP ) /* buffer optimization logic 256x4 */
+	ROM_LOAD( "prom102.b05", 0x0300, 0x100, NO_DUMP ) /* sprites rom index 256x8 */
 ROM_END
 
 ROM_START( koroleva )
@@ -428,6 +434,12 @@ ROM_START( koroleva )
 	ROM_LOAD( "02.5a", 0x04000, 0x2000, CRC(97770b0f) SHA1(cf4605e31f8c57a76bfda6a7ea329058da8b8c9c) )
 	ROM_LOAD( "03.6a", 0x06000, 0x2000, CRC(9b0a686a) SHA1(f02910db9f862ec017bb3834c58e96e780fb6322) )
 
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "prom100.e10", 0x0000, 0x100, NO_DUMP ) /* i/o ports map 256x8 */
+	ROM_LOAD( "prom101.a01", 0x0100, 0x100, NO_DUMP ) /* video sync 256x8 */
+	ROM_LOAD( "prom102.b03", 0x0200, 0x080, NO_DUMP ) /* sprites rom index 256x4 */
+	ROM_LOAD( "prom102.b06", 0x0280, 0x080, NO_DUMP ) /* buffer optimization logic 256x4 */
+	ROM_LOAD( "prom102.b05", 0x0300, 0x100, NO_DUMP ) /* sprites rom index 256x8 */
 ROM_END
 
 // this game ROM board have only one 2KB main CPU RAM IC populated
@@ -446,6 +458,13 @@ ROM_START( bilyard )
 	ROM_LOAD( "01.3a", 0x02000, 0x2000, CRC(daddbbb5) SHA1(1460aebcbb57180e05930845703ff6325d85702a) )
 	ROM_LOAD( "02.5a", 0x04000, 0x2000, CRC(3d744d33) SHA1(f1375098e81986715d0497b09df0c6622bd75b9a) )
 	ROM_LOAD( "03.6a", 0x06000, 0x2000, CRC(8bfc0b15) SHA1(221efdce516274d3b1d9009d11dc9ed6cd67ef12) )
+
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "prom100.e10", 0x0000, 0x100, NO_DUMP ) /* i/o ports map 256x8 */
+	ROM_LOAD( "prom101.a01", 0x0100, 0x100, NO_DUMP ) /* video sync 256x8 */
+	ROM_LOAD( "prom102.b03", 0x0200, 0x080, NO_DUMP ) /* sprites rom index 256x4 */
+	ROM_LOAD( "prom102.b06", 0x0280, 0x080, NO_DUMP ) /* buffer optimization logic 256x4 */
+	ROM_LOAD( "prom102.b05", 0x0300, 0x100, NO_DUMP ) /* sprites rom index 256x8 */
 ROM_END
 
 // this game ROM board have only one 2KB main CPU RAM IC populated
@@ -465,6 +484,12 @@ ROM_START( gorodki )
 	ROM_LOAD( "68.5a", 0x04000, 0x2000, CRC(0d64708d) SHA1(6a84b4293f0e983424ef361ab3ebf62ab5f8b21c) )
 	ROM_LOAD( "69.6a", 0x06000, 0x2000, CRC(57c8ae81) SHA1(c73bbfaa53195a19599dd2bbc3948c819597b035) )
 
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "prom100.e10", 0x0000, 0x100, NO_DUMP ) /* i/o ports map 256x8 */
+	ROM_LOAD( "prom101.a01", 0x0100, 0x100, NO_DUMP ) /* video sync 256x8 */
+	ROM_LOAD( "prom102.b03", 0x0200, 0x080, NO_DUMP ) /* sprites rom index 256x4 */
+	ROM_LOAD( "prom102.b06", 0x0280, 0x080, NO_DUMP ) /* buffer optimization logic 256x4 */
+	ROM_LOAD( "prom102.b05", 0x0300, 0x100, NO_DUMP ) /* sprites rom index 256x8 */
 ROM_END
 
 /*
@@ -489,10 +514,11 @@ ROM_END
   or just some differences against the i8255. Needs more research.
 
   KR580VI53/i8253 timers usage:
-  0 - used to blank part of display in horisontal direction, apparently it's CLK0 is PIXEL_CLOCK/4, GATE0 is HBlank, OUT0 - blank video
+  0 - used to blank part of display in horizontal direction, apparently it's CLK0 is PIXEL_CLOCK/4, GATE0 is HBlank, OUT0 - blank video
   1 - used to blank part of display in vertical direction, apparently it's CLK1 is HBlank or OUT0, GATE1 is VBlank, OUT1 - blank video
   2 - sound generation
- */
+
+*/
 ROM_START( kot )
 	ROM_REGION( 0xc000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD( "854.6", 0x00000, 0x2000, CRC(44e5e8fc) SHA1(dafbace689f3834d5c6e952a2f6188fb190845e4) )
