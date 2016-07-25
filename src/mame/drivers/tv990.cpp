@@ -39,6 +39,7 @@
 #include "machine/ins8250.h"
 #include "machine/8042kbdc.h"
 #include "bus/rs232/rs232.h"
+#include "machine/nvram.h"
 
 #define UART0_TAG		"ns16450_0"
 #define UART1_TAG		"ns16450_1"
@@ -85,11 +86,12 @@ public:
 private:
 	UINT16 tvi1111_regs[(0x100/2)+2];
 	emu_timer *m_rowtimer;
+	int m_rowh, m_width, m_height;
 };
 
 INTERRUPT_GEN_MEMBER(tv990_state::vblank)
 {
-	m_rowtimer->adjust(m_screen->time_until_pos(16));
+	m_rowtimer->adjust(m_screen->time_until_pos(m_rowh));
 	m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
 	tvi1111_regs[0x1d] |= 4;
 }
@@ -101,7 +103,7 @@ void tv990_state::machine_start()
 
 void tv990_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_rowtimer->adjust(m_screen->time_until_pos(m_screen->vpos() + 16));
+	m_rowtimer->adjust(m_screen->time_until_pos(m_screen->vpos() + m_rowh));
 	m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
 	m_screen->update_now();
 }
@@ -150,6 +152,15 @@ WRITE16_MEMBER(tv990_state::tvi1111_w)
 	}
 #endif
 	COMBINE_DATA(&tvi1111_regs[offset]);
+	if((offset == 0x1c) || (offset == 0x10) || (offset == 0x9) || (offset == 0xa))
+	{
+		m_width = BIT(tvi1111_regs[0x1c], 11) ? 132 : 80;
+		m_rowh = (tvi1111_regs[0x10] & 0xff) + 1;
+		if(!m_rowh)
+			m_rowh = 16;
+		m_height = (tvi1111_regs[0xa] - tvi1111_regs[0x9]) / m_rowh;
+		m_screen->set_visible_area(0, m_width * 16 - 1, 0, m_height * m_rowh - 1);
+	}
 }
 
 UINT32 tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -163,13 +174,12 @@ UINT32 tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	UINT8 *fontram = (UINT8 *)m_fontram.target();
 	UINT16 *curchar;
 	UINT8 *fontptr;
-	int miny = cliprect.min_y / 16;
-	int maxy = cliprect.max_y / 16;
+	int miny = cliprect.min_y / m_rowh;
+	int maxy = cliprect.max_y / m_rowh;
 	bitmap.fill(0, cliprect);
 
 	for (y = miny; y <= maxy; y++)
 	{
-		// this isn't exactly right.
 		int i;
 		for(i = 7; i >= 0; i--)
 		{
@@ -185,21 +195,21 @@ UINT32 tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			int minx = tvi1111_regs[i + 0x30] >> 8;
 			int maxx = tvi1111_regs[i + 0x30] & 0xff;
 
-			if(maxx > 80)
-				maxx = 80;
+			if(maxx > m_width)
+				maxx = m_width;
 			for (x = minx; x < maxx; x++)
 			{
 				UINT8 chr = curchar[x - minx] >> 8;
 				UINT8 attr = curchar[x - minx] & 0xff;
 				fontptr = (UINT8 *)&fontram[(chr + (attr & 0x40 ? 256 : 0)) * 64];
 
-				for (int chary = 0; chary < 16; chary++)
+				for (int chary = 0; chary < m_rowh; chary++)
 				{
-					scanline = &bitmap.pix32((y*16)+chary, (x*16));
+					scanline = &bitmap.pix32((y*m_rowh)+chary, (x*16));
 
 					pixels = *fontptr++;
 					pixels2 = *fontptr++;
-					if((attr & 0x8) && (chary == 15))
+					if((attr & 0x8) && (chary == m_rowh - 1))
 					{
 						pixels = 0xff;
 						pixels2 = 0xff;
@@ -275,7 +285,7 @@ static ADDRESS_MAP_START(tv990_mem, AS_PROGRAM, 16, tv990_state)
 	AM_RANGE(0x0a0000, 0x0a000f) AM_DEVREADWRITE8(UART0_TAG, ns16450_device, ins8250_r, ins8250_w, 0x00ff)
 	AM_RANGE(0x0a0010, 0x0a001f) AM_DEVREADWRITE8(UART1_TAG, ns16450_device, ins8250_r, ins8250_w, 0x00ff)
 	AM_RANGE(0x0b0000, 0x0b0003) AM_READWRITE8(kbdc_r, kbdc_w, 0x00ff)
-	AM_RANGE(0x0c0000, 0x0c7fff) AM_RAM	// work RAM
+	AM_RANGE(0x0c0000, 0x0c7fff) AM_RAM	AM_SHARE("nvram")// work RAM
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -288,6 +298,9 @@ void tv990_state::machine_reset()
 	m_rowtimer->adjust(m_screen->time_until_pos(0));
 	
 	memset(tvi1111_regs, 0, sizeof(tvi1111_regs));
+	m_rowh = 16;
+	m_width = 80;
+	m_height = 50;
 }
 
 static MACHINE_CONFIG_START( tv990, tv990_state )
@@ -323,6 +336,8 @@ static MACHINE_CONFIG_START( tv990, tv990_state )
 	MCFG_DEVICE_ADD("pc_kbdc", KBDC8042, 0)
 	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_AT386)
 	MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(INPUTLINE("maincpu", M68K_IRQ_2))
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 /* ROM definition */
