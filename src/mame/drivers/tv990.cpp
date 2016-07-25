@@ -57,7 +57,8 @@ public:
 		m_uart0(*this, UART0_TAG),
 		m_uart1(*this, UART1_TAG),
 		m_screen(*this, "screen"),
-		m_kbdc(*this, "pc_kbdc")
+		m_kbdc(*this, "pc_kbdc"),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -67,6 +68,7 @@ public:
 	required_device<ns16450_device> m_uart0, m_uart1;
 	required_device<screen_device> m_screen;
 	required_device<kbdc8042_device> m_kbdc;
+	required_device<palette_device> m_palette;
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -83,6 +85,7 @@ public:
 	WRITE_LINE_MEMBER(uart1_irq);
 
 	INTERRUPT_GEN_MEMBER(vblank);
+	DECLARE_INPUT_CHANGED_MEMBER(color);
 private:
 	UINT16 tvi1111_regs[(0x100/2)+2];
 	emu_timer *m_rowtimer;
@@ -168,14 +171,13 @@ UINT32 tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	UINT32 *scanline;
 	int x, y;
 	UINT8 pixels, pixels2;
-	static const UINT32 palette[2] = { 0, 0xffffff };
-	static const UINT32 invpalette[2] = { 0xffffff, 0 };
 	UINT16 *vram = (UINT16 *)m_vram.target();
 	UINT8 *fontram = (UINT8 *)m_fontram.target();
 	UINT16 *curchar;
 	UINT8 *fontptr;
 	int miny = cliprect.min_y / m_rowh;
 	int maxy = cliprect.max_y / m_rowh;
+
 	bitmap.fill(0, cliprect);
 
 	for (y = miny; y <= maxy; y++)
@@ -197,11 +199,42 @@ UINT32 tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 			if(maxx > m_width)
 				maxx = m_width;
+
 			for (x = minx; x < maxx; x++)
 			{
 				UINT8 chr = curchar[x - minx] >> 8;
 				UINT8 attr = curchar[x - minx] & 0xff;
+				if((attr & 2) && (m_screen->frame_number() & 32)) // blink rate?
+					continue;
+
 				fontptr = (UINT8 *)&fontram[(chr + (attr & 0x40 ? 256 : 0)) * 64];
+
+				UINT32 palette[2];
+
+				int cursor_pos = tvi1111_regs[0x16] + 133;
+				if(BIT(tvi1111_regs[0x1b], 0) && (x == (cursor_pos % 134)) && (y == (cursor_pos / 134)))
+				{
+					UINT8 attrchg;
+					if(tvi1111_regs[0x15] & 0xff00) // what does this really mean? it looks like a mask but that doesn't work in 8line char mode
+						attrchg = 8;
+					else
+						attrchg = 4;
+					if(!BIT(tvi1111_regs[0x1b], 1))
+						attr ^= attrchg;
+					else if(m_screen->frame_number() & 32)
+						attr ^= attrchg;
+				}
+
+				if (attr & 0x4)	// inverse video?
+				{
+					palette[1] = m_palette->pen(0);
+					palette[0] = (attr & 0x10) ? m_palette->pen(1) : m_palette->pen(2);
+				}
+				else
+				{
+					palette[0] = m_palette->pen(0);
+					palette[1] = (attr & 0x10) ? m_palette->pen(1) : m_palette->pen(2);
+				}
 
 				for (int chary = 0; chary < m_rowh; chary++)
 				{
@@ -215,44 +248,22 @@ UINT32 tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 						pixels2 = 0xff;
 					}
 
-					if (attr & 0x4)	// inverse video?
-					{
-						*scanline++ = invpalette[(pixels>>7)&1];
-						*scanline++ = invpalette[(pixels2>>7)&1];
-						*scanline++ = invpalette[(pixels>>6)&1];
-						*scanline++ = invpalette[(pixels2>>6)&1];
-						*scanline++ = invpalette[(pixels>>5)&1];
-						*scanline++ = invpalette[(pixels2>>5)&1];
-						*scanline++ = invpalette[(pixels>>4)&1];
-						*scanline++ = invpalette[(pixels2>>4)&1];
-						*scanline++ = invpalette[(pixels>>3)&1];
-						*scanline++ = invpalette[(pixels2>>3)&1];
-						*scanline++ = invpalette[(pixels>>2)&1];
-						*scanline++ = invpalette[(pixels2>>2)&1];
-						*scanline++ = invpalette[(pixels>>1)&1];
-						*scanline++ = invpalette[(pixels2>>1)&1];
-						*scanline++ = invpalette[(pixels&1)];
-						*scanline++ = invpalette[(pixels2&1)];
-					}
-					else
-					{
-						*scanline++ = palette[(pixels>>7)&1];
-						*scanline++ = palette[(pixels2>>7)&1];
-						*scanline++ = palette[(pixels>>6)&1];
-						*scanline++ = palette[(pixels2>>6)&1];
-						*scanline++ = palette[(pixels>>5)&1];
-						*scanline++ = palette[(pixels2>>5)&1];
-						*scanline++ = palette[(pixels>>4)&1];
-						*scanline++ = palette[(pixels2>>4)&1];
-						*scanline++ = palette[(pixels>>3)&1];
-						*scanline++ = palette[(pixels2>>3)&1];
-						*scanline++ = palette[(pixels>>2)&1];
-						*scanline++ = palette[(pixels2>>2)&1];
-						*scanline++ = palette[(pixels>>1)&1];
-						*scanline++ = palette[(pixels2>>1)&1];
-						*scanline++ = palette[(pixels&1)];
-						*scanline++ = palette[(pixels2&1)];
-					}
+					*scanline++ = palette[(pixels>>7)&1];
+					*scanline++ = palette[(pixels2>>7)&1];
+					*scanline++ = palette[(pixels>>6)&1];
+					*scanline++ = palette[(pixels2>>6)&1];
+					*scanline++ = palette[(pixels>>5)&1];
+					*scanline++ = palette[(pixels2>>5)&1];
+					*scanline++ = palette[(pixels>>4)&1];
+					*scanline++ = palette[(pixels2>>4)&1];
+					*scanline++ = palette[(pixels>>3)&1];
+					*scanline++ = palette[(pixels2>>3)&1];
+					*scanline++ = palette[(pixels>>2)&1];
+					*scanline++ = palette[(pixels2>>2)&1];
+					*scanline++ = palette[(pixels>>1)&1];
+					*scanline++ = palette[(pixels2>>1)&1];
+					*scanline++ = palette[(pixels&1)];
+					*scanline++ = palette[(pixels2&1)];
 				}
 			}
 		}
@@ -291,7 +302,34 @@ ADDRESS_MAP_END
 /* Input ports */
 static INPUT_PORTS_START( tv990 )
 	PORT_INCLUDE( at_keyboard )
+	PORT_START("Screen")
+	PORT_CONFNAME( 0x30, 0x00, "Color")
+	PORT_CONFSETTING(    0x00, "Green") PORT_CHANGED_MEMBER(DEVICE_SELF, tv990_state, color, nullptr)
+	PORT_CONFSETTING(    0x10, "Amber") PORT_CHANGED_MEMBER(DEVICE_SELF, tv990_state, color, nullptr)
+	PORT_CONFSETTING(    0x20, "White") PORT_CHANGED_MEMBER(DEVICE_SELF, tv990_state, color, nullptr)
 INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(tv990_state::color)
+{
+	rgb_t color;
+	if(newval == oldval)
+		return;
+
+	switch(newval)
+	{
+		case 0:
+		default:
+			color = rgb_t::green;
+			break;
+		case 1:
+			color = rgb_t::amber;
+			break;
+		case 2:
+			color = rgb_t::white;
+			break;
+	}
+	m_screen->static_set_color(m_screen, color);
+}
 
 void tv990_state::machine_reset()
 {
@@ -309,12 +347,13 @@ static MACHINE_CONFIG_START( tv990, tv990_state )
 	MCFG_CPU_PROGRAM_MAP(tv990_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tv990_state, vblank)
 	
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
 	MCFG_SCREEN_UPDATE_DRIVER(tv990_state, screen_update)
 	MCFG_SCREEN_SIZE(132*16, 50*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, (80*16)-1, 0, (50*16)-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	
+	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+
 	MCFG_DEVICE_ADD( UART0_TAG, NS16450, XTAL_1_8432MHz )
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_INT_CB(WRITELINE(tv990_state, uart0_irq))
@@ -348,4 +387,4 @@ ROM_START( tv990 )
 ROM_END
 
 /* Driver */
-COMP( 1992, tv990, 0, 0, tv990, tv990, driver_device, 0, "TeleVideo", "TeleVideo 990", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1992, tv990, 0, 0, tv990, tv990, driver_device, 0, "TeleVideo", "TeleVideo 990", MACHINE_NO_SOUND)
