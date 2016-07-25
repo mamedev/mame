@@ -207,11 +207,8 @@ osd_file::error osd_file::open(std::string const &orig_path, UINT32 openflags, p
 		// create the path if necessary
 		if ((ERROR_PATH_NOT_FOUND == err) && (openflags & OPEN_FLAG_CREATE) && (openflags & OPEN_FLAG_CREATE_PATHS))
 		{
-			// the code below assumes these are the same
-			assert(std::string::npos == std::wstring::npos);
-
 			auto pathsep = t_path.rfind('\\');
-			if (pathsep != std::string::npos)
+			if (pathsep != decltype(t_path)::npos)
 			{
 				// create the path up to the file
 				t_path[pathsep] = 0;

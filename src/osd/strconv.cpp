@@ -25,9 +25,9 @@ std::string &astring_from_utf8(std::string &dst, const char *s)
 	std::basic_string<WCHAR> wstring = wstring_from_utf8(s);
 
 	// convert UTF-16 to "ANSI code page" string
-	int char_count = WideCharToMultiByte(CP_ACP, 0, wstring.c_str(), wstring.size() + 1, nullptr, 0, nullptr, nullptr);
-	dst.resize(char_count - 1);
-	WideCharToMultiByte(CP_ACP, 0, wstring.c_str(), wstring.size() + 1, &dst[0], char_count - 1, nullptr, nullptr);
+	int char_count = WideCharToMultiByte(CP_ACP, 0, wstring.c_str(), wstring.size(), nullptr, 0, nullptr, nullptr);
+	dst.resize(char_count);
+	WideCharToMultiByte(CP_ACP, 0, wstring.c_str(), wstring.size(), &dst[0], char_count, nullptr, nullptr);
 
 	return dst;
 }
