@@ -173,6 +173,7 @@ UINT32 tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	UINT8 *fontptr;
 	int miny = cliprect.min_y / 16;
 	int maxy = cliprect.max_y / 16;
+	bitmap.fill(0, cliprect);
 
 	for (y = miny; y <= maxy; y++)
 	{
@@ -187,9 +188,9 @@ UINT32 tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			minx = tvi1111_regs[i + 0x30] >> 8;
 			maxx = tvi1111_regs[i + 0x30] & 0xff;
 
-			if(maxx > 79)
-				maxx = 79;
-			for (x = minx; x <= maxx; x++)
+			if(maxx > 80)
+				maxx = 80;
+			for (x = minx; x < maxx; x++)
 			{
 				UINT8 chr = curchar[x - minx] >> 8;
 				UINT8 attr = curchar[x - minx] & 0xff;
