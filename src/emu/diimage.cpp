@@ -94,7 +94,6 @@ device_image_interface::device_image_interface(const machine_config &mconfig, de
 		m_readonly(false),
 		m_created(false),
 		m_init_phase(false),
-		m_from_swlist(false),
 		m_create_format(0),
 		m_create_args(nullptr),
 		m_user_loadable(TRUE),
@@ -940,7 +939,6 @@ bool device_image_interface::load_internal(const char *path, bool is_create, int
 	UINT32 open_plan[4];
 	int i;
 	bool softload = FALSE;
-	m_from_swlist = FALSE;
 
 	// if the path contains no period, we are using softlists, so we won't create an image
 	std::string pathstr(path);
@@ -983,8 +981,6 @@ bool device_image_interface::load_internal(const char *path, bool is_create, int
 				if (read_only && !strcmp(read_only, "true")) {
 					make_readonly();
 				}
-
-				m_from_swlist = TRUE;
 			}
 		}
 
@@ -1327,23 +1323,6 @@ const software_part *device_image_interface::find_software_item(const char *path
 
 
 //-------------------------------------------------
-//	call_softlist_load
-//-------------------------------------------------
-
-bool device_image_interface::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	const software_list_loader &loader = get_software_list_loader();
-	bool result = loader.load_software(*this, swlist, swname, start_entry);
-
-	// this is a hook that seems to only be used by TI99
-	if (result)
-		loaded_through_softlist();
-
-	return result;
-}
-
-
-//-------------------------------------------------
 //  load_software_part
 //
 //  Load a software part for a device. The part to
@@ -1368,10 +1347,15 @@ bool device_image_interface::load_software_part(const char *path, const software
 
 	// Load the software part
 	software_list_device &swlist = swpart->info().list();
-	bool result = call_softlist_load(swlist, swpart->info().shortname().c_str(), swpart->romdata());
+	const char *swname = swpart->info().shortname().c_str();
+	const rom_entry *start_entry = swpart->romdata();
+	const software_list_loader &loader = get_software_list_loader();
+	bool result = loader.load_software(*this, swlist, swname, start_entry);
 
+#ifdef UNUSED_VARIABLE
 	// Tell the world which part we actually loaded
 	std::string full_sw_name = string_format("%s:%s:%s", swlist.list_name(), swpart->info().shortname(), swpart->name());
+#endif
 
 	// check compatibility
 	switch (swpart->is_compatible(swlist))
