@@ -933,6 +933,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 				}
 				outtoc.tracks[trknum].subtype = CD_SUB_NONE;
 				outtoc.tracks[trknum].subsize = 0;
+				outtoc.tracks[trknum].pgsub = CD_SUB_NONE;
 				outtoc.tracks[trknum].pregap = 0;
 				outtoc.tracks[trknum].padframes = 0;
 				outinfo.track[trknum].idx0offs = -1;
@@ -1284,6 +1285,7 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 				outtoc.tracks[trknum].datasize = 0;
 				outtoc.tracks[trknum].subtype = CD_SUB_NONE;
 				outtoc.tracks[trknum].subsize = 0;
+				outtoc.tracks[trknum].pgsub = CD_SUB_NONE;
 				outtoc.tracks[trknum].padframes = 0;
 
 				cdrom_convert_type_string_to_track_info(token, &outtoc.tracks[trknum]);
