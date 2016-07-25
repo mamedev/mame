@@ -173,75 +173,80 @@ UINT32 tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	UINT8 *fontptr;
 	int miny = cliprect.min_y / 16;
 	int maxy = cliprect.max_y / 16;
-	int minx = cliprect.min_x / 16;
-	int maxx = cliprect.max_x / 16;
-	
+
 	for (y = miny; y <= maxy; y++)
 	{
 		// this isn't exactly right.
-		int i;
-		for(i = 0x50; i < 0x68; i++)
+		int i, minx, maxx;
+		for(i = 0; i < 8; i++)
 		{
-			if(tvi1111_regs[i] != 0x1ad5)
-				break;
-		}
-		curchar = &vram[tvi1111_regs[i]];
+			if(tvi1111_regs[i + 0x50] == 0x1ad5)
+				continue;
 
-		for (x = minx; x <= maxx; x++)
-		{
-			fontptr = (UINT8 *)&fontram[(((curchar[x]>>8) & 0xff) + (curchar[x] & 0x40 ? 256 : 0)) * 64];
-	
-			for (int chary = 0; chary < 16; chary++)
+			curchar = &vram[tvi1111_regs[i + 0x50]];
+			minx = tvi1111_regs[i + 0x30] >> 8;
+			maxx = tvi1111_regs[i + 0x30] & 0xff;
+
+			if(maxx > 79)
+				maxx = 79;
+			for (x = minx; x <= maxx; x++)
 			{
-				scanline = &bitmap.pix32((y*16)+chary, (x*16));
-			
-				pixels = *fontptr++;
-				pixels2 = *fontptr++;
-				if((curchar[x] & 0x8) && (chary == 15))
-				{
-					pixels = 0xff;
-					pixels2 = 0xff;
-				}
+				UINT8 chr = curchar[x - minx] >> 8;
+				UINT8 attr = curchar[x - minx] & 0xff;
+				fontptr = (UINT8 *)&fontram[(chr + (attr & 0x40 ? 256 : 0)) * 64];
 
-				if (curchar[x] & 0x4)	// inverse video?
+				for (int chary = 0; chary < 16; chary++)
 				{
-					*scanline++ = invpalette[(pixels>>7)&1];
-					*scanline++ = invpalette[(pixels2>>7)&1];
-					*scanline++ = invpalette[(pixels>>6)&1];
-					*scanline++ = invpalette[(pixels2>>6)&1];
-					*scanline++ = invpalette[(pixels>>5)&1];
-					*scanline++ = invpalette[(pixels2>>5)&1];
-					*scanline++ = invpalette[(pixels>>4)&1];
-					*scanline++ = invpalette[(pixels2>>4)&1];
-					*scanline++ = invpalette[(pixels>>3)&1];
-					*scanline++ = invpalette[(pixels2>>3)&1];
-					*scanline++ = invpalette[(pixels>>2)&1];
-					*scanline++ = invpalette[(pixels2>>2)&1];
-					*scanline++ = invpalette[(pixels>>1)&1];
-					*scanline++ = invpalette[(pixels2>>1)&1];
-					*scanline++ = invpalette[(pixels&1)];
-					*scanline++ = invpalette[(pixels2&1)];
+					scanline = &bitmap.pix32((y*16)+chary, (x*16));
+
+					pixels = *fontptr++;
+					pixels2 = *fontptr++;
+					if((attr & 0x8) && (chary == 15))
+					{
+						pixels = 0xff;
+						pixels2 = 0xff;
+					}
+
+					if (attr & 0x4)	// inverse video?
+					{
+						*scanline++ = invpalette[(pixels>>7)&1];
+						*scanline++ = invpalette[(pixels2>>7)&1];
+						*scanline++ = invpalette[(pixels>>6)&1];
+						*scanline++ = invpalette[(pixels2>>6)&1];
+						*scanline++ = invpalette[(pixels>>5)&1];
+						*scanline++ = invpalette[(pixels2>>5)&1];
+						*scanline++ = invpalette[(pixels>>4)&1];
+						*scanline++ = invpalette[(pixels2>>4)&1];
+						*scanline++ = invpalette[(pixels>>3)&1];
+						*scanline++ = invpalette[(pixels2>>3)&1];
+						*scanline++ = invpalette[(pixels>>2)&1];
+						*scanline++ = invpalette[(pixels2>>2)&1];
+						*scanline++ = invpalette[(pixels>>1)&1];
+						*scanline++ = invpalette[(pixels2>>1)&1];
+						*scanline++ = invpalette[(pixels&1)];
+						*scanline++ = invpalette[(pixels2&1)];
+					}
+					else
+					{
+						*scanline++ = palette[(pixels>>7)&1];
+						*scanline++ = palette[(pixels2>>7)&1];
+						*scanline++ = palette[(pixels>>6)&1];
+						*scanline++ = palette[(pixels2>>6)&1];
+						*scanline++ = palette[(pixels>>5)&1];
+						*scanline++ = palette[(pixels2>>5)&1];
+						*scanline++ = palette[(pixels>>4)&1];
+						*scanline++ = palette[(pixels2>>4)&1];
+						*scanline++ = palette[(pixels>>3)&1];
+						*scanline++ = palette[(pixels2>>3)&1];
+						*scanline++ = palette[(pixels>>2)&1];
+						*scanline++ = palette[(pixels2>>2)&1];
+						*scanline++ = palette[(pixels>>1)&1];
+						*scanline++ = palette[(pixels2>>1)&1];
+						*scanline++ = palette[(pixels&1)];
+						*scanline++ = palette[(pixels2&1)];
+					}
 				}
-				else
-				{
-					*scanline++ = palette[(pixels>>7)&1];
-					*scanline++ = palette[(pixels2>>7)&1];
-					*scanline++ = palette[(pixels>>6)&1];
-					*scanline++ = palette[(pixels2>>6)&1];
-					*scanline++ = palette[(pixels>>5)&1];
-					*scanline++ = palette[(pixels2>>5)&1];
-					*scanline++ = palette[(pixels>>4)&1];
-					*scanline++ = palette[(pixels2>>4)&1];
-					*scanline++ = palette[(pixels>>3)&1];
-					*scanline++ = palette[(pixels2>>3)&1];
-					*scanline++ = palette[(pixels>>2)&1];
-					*scanline++ = palette[(pixels2>>2)&1];
-					*scanline++ = palette[(pixels>>1)&1];
-					*scanline++ = palette[(pixels2>>1)&1];
-					*scanline++ = palette[(pixels&1)];
-					*scanline++ = palette[(pixels2&1)];
-				}
-			}	
+			}
 		}
 	}
 
