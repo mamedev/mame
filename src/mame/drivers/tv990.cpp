@@ -40,6 +40,7 @@
 #include "machine/8042kbdc.h"
 #include "bus/rs232/rs232.h"
 #include "machine/nvram.h"
+#include "sound/beep.h"
 
 #define UART0_TAG		"ns16450_0"
 #define UART1_TAG		"ns16450_1"
@@ -58,7 +59,8 @@ public:
 		m_uart1(*this, UART1_TAG),
 		m_screen(*this, "screen"),
 		m_kbdc(*this, "pc_kbdc"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_beep(*this, "beep")
 	{
 	}
 
@@ -69,6 +71,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<kbdc8042_device> m_kbdc;
 	required_device<palette_device> m_palette;
+	required_device<beep_device> m_beep;
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -164,6 +167,8 @@ WRITE16_MEMBER(tv990_state::tvi1111_w)
 		m_height = (tvi1111_regs[0xa] - tvi1111_regs[0x9]) / m_rowh;
 		m_screen->set_visible_area(0, m_width * 16 - 1, 0, m_height * m_rowh - 1);
 	}
+	if(offset == 0x17)
+		m_beep->set_state(tvi1111_regs[0x17] & 4 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 UINT32 tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -377,6 +382,10 @@ static MACHINE_CONFIG_START( tv990, tv990_state )
 	MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(INPUTLINE("maincpu", M68K_IRQ_2))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beep", BEEP, 1000); //whats the freq?
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -387,4 +396,4 @@ ROM_START( tv990 )
 ROM_END
 
 /* Driver */
-COMP( 1992, tv990, 0, 0, tv990, tv990, driver_device, 0, "TeleVideo", "TeleVideo 990", MACHINE_NO_SOUND)
+COMP( 1992, tv990, 0, 0, tv990, tv990, driver_device, 0, "TeleVideo", "TeleVideo 990", 0)
