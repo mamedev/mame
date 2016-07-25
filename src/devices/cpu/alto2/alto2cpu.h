@@ -50,8 +50,7 @@ enum {
 
 #define ALTO2_FAKE_STATUS_H     12          //!< number of extra scanlines to display some status info
 
-#define USE_PRIO_F9318          0           //!< define to 1 to use the F9318 priority encoder code
-#define USE_ALU_74181           1           //!< define to 1 to use the SN74181 ALU code
+#define USE_PRIO_F9318          0           //!< define to 1 to use the F9318 priority encoder code (broken)
 #define USE_BITCLK_TIMER        0           //!< define to 1 to use a very high rate timer for the disk bit clock
 #define USE_HAMMING_CHECK       1           //!< define to 1 to use the Hamming code and Parity check in a2mem
 
@@ -924,10 +923,8 @@ private:
 	void f2_late_bus();                             //!< F2 func: branch on bus bits BUS[6-15]
 	void f2_late_alucy();                           //!< F2 func: branch on latched ALU carry
 	void f2_late_load_md();                         //!< F2 func: load memory data
-
-#if USE_ALU_74181
 	UINT32 alu_74181(UINT32 a, UINT32 b, UINT8 smc);
-#endif
+
 	void rdram();                                   //!< read the microcode ROM/RAM halfword
 	void wrtram();                                  //!< write the microcode RAM from M register and ALU
 
