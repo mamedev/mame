@@ -6,7 +6,7 @@
     - Seibu Cup Soccer (bootleg)
 
   Notice that only the bare minimum is supported, which is what the bootleg device actually 
-  do.
+  provides. Unlike the original device and many other Seibu customs, it has no DMA.
   Apparently it's an Actel PL84c FPGA programmed to be a Seibu COP clone. 
   The internal operations are actually loaded via the ROMs, we use the original algorithm 
   for the trigger until we find the proper hookup.

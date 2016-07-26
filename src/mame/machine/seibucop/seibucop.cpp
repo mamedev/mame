@@ -70,6 +70,7 @@
 013F66: 1140 003D                  move.b  D0, ($3d,A0)         // move angle value to [0x3d]
 013F6A: 4E75                       rts
 	Zero Team
+	- Some faulty collision detection, e.g. crate in front of aquarium in stage 1
 	- Bird Boss jumps to wrong direction
 	  the sequence called is: 
 	  write to reg 4 then execute 0xfc84 and 0xf790, finally reads the distance.
