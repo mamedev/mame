@@ -100,7 +100,6 @@ public:
 	int m_jpeg_x;
 	int m_jpeg_y;
 	int m_tmp_counter;
-	int m_clr_offset;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -121,14 +120,32 @@ public:
 	DECLARE_WRITE16_MEMBER(io_data_w);
 	DECLARE_WRITE16_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(oki_setbank);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(obj_irq_cb);
+
+	virtual void machine_start() override;
 	virtual void video_start() override;
-	UINT32 screen_update_sliver(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void plot_pixel_rgb(int x, int y, UINT32 r, UINT32 g, UINT32 b);
 	void plot_pixel_pal(int x, int y, int addr);
 	void blit_gfx();
 	void render_jpeg();
+
+	void postload();
 };
+
+void sliver_state::machine_start()
+{
+	membank("okibank")->configure_entries(0, 4, memregion("oki")->base() + 0x20000, 0x20000);
+	
+	save_item(NAME(m_io_offset));
+	save_item(NAME(m_io_reg));
+	save_item(NAME(m_fifo));
+	save_item(NAME(m_fptr));
+	save_item(NAME(m_tempbuf));
+	save_item(NAME(m_tmp_counter));
+}
 
 void sliver_state::plot_pixel_rgb(int x, int y, UINT32 r, UINT32 g, UINT32 b)
 {
@@ -355,9 +372,8 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(sliver_state::oki_setbank)
 {
-	UINT8 *sound = memregion("oki")->base();
 	int bank=(data^0xff)&3; //xor or not ?
-	memcpy(sound+0x20000, sound+0x100000+0x20000*bank, 0x20000);
+	membank("okibank")->set_entry(bank);
 }
 
 static ADDRESS_MAP_START( soundmem_prg, AS_PROGRAM, 8, sliver_state )
@@ -371,13 +387,30 @@ static ADDRESS_MAP_START( soundmem_io, AS_IO, 8, sliver_state )
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(oki_setbank )
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( oki_map, AS_0, 8, sliver_state )
+	AM_RANGE(0x00000, 0x1ffff) AM_ROM
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
+ADDRESS_MAP_END
+
 void sliver_state::video_start()
 {
 	m_screen->register_screen_bitmap(m_bitmap_bg);
 	m_screen->register_screen_bitmap(m_bitmap_fg);
+
+	save_item(NAME(m_jpeg1));
+	save_item(NAME(m_jpeg2));
+	save_item(NAME(m_jpeg_x));
+	save_item(NAME(m_jpeg_y));
+	
+	machine().save().register_postload(save_prepost_delegate(FUNC(sliver_state::postload), this));
 }
 
-UINT32 sliver_state::screen_update_sliver(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void sliver_state::postload()
+{
+	render_jpeg();
+}
+
+UINT32 sliver_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap      (bitmap, m_bitmap_bg, 0, 0, 0, 0, cliprect);
 	copybitmap_trans(bitmap, m_bitmap_fg, 0, 0, 0, 0, cliprect, 0);
@@ -481,7 +514,7 @@ static MACHINE_CONFIG_START( sliver, sliver_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 384-1-16, 0*8, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sliver_state, screen_update_sliver)
+	MCFG_SCREEN_UPDATE_DRIVER(sliver_state, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
@@ -492,6 +525,7 @@ static MACHINE_CONFIG_START( sliver, sliver_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
 MACHINE_CONFIG_END
@@ -504,9 +538,9 @@ ROM_START( sliver )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 8031 */
 	ROM_LOAD( "ka-1.bin", 0x000000, 0x10000, CRC(56e616a2) SHA1(f8952aba62ae0410e300d99e95dc8b752543af1e) )
 
-	ROM_REGION( 0x180000, "oki", 0 ) /* Samples */
-	ROM_LOAD( "ka-2.bin", 0x000000, 0x20000, CRC(3df96eb0) SHA1(ec3dfc29da08f6525a1c708839f83094a6784f72) )
-	ROM_LOAD( "ka-3.bin", 0x100000, 0x80000, CRC(33ee929c) SHA1(a652ad68c547248ef5fa1ed8006b7ac7aef76383) )
+	ROM_REGION( 0xa0000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "ka-2.bin", 0x00000, 0x20000, CRC(3df96eb0) SHA1(ec3dfc29da08f6525a1c708839f83094a6784f72) )
+	ROM_LOAD( "ka-3.bin", 0x20000, 0x80000, CRC(33ee929c) SHA1(a652ad68c547248ef5fa1ed8006b7ac7aef76383) )
 
 	ROM_REGION( 0x200000, "user1", 0 ) /* Graphics (not tiles) */
 	ROM_LOAD16_BYTE( "ka-8.bin", 0x000000, 0x80000, CRC(dbfd7489) SHA1(4a7b07d041dce04a8d8d6688698164f988baefc9) )
@@ -528,9 +562,9 @@ ROM_START( slivera )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 8031 */
 	ROM_LOAD( "ka-1.bin", 0x000000, 0x10000, CRC(56e616a2) SHA1(f8952aba62ae0410e300d99e95dc8b752543af1e) )
 
-	ROM_REGION( 0x180000, "oki", 0 ) /* Samples */
-	ROM_LOAD( "ka-2.bin", 0x000000, 0x20000, CRC(3df96eb0) SHA1(ec3dfc29da08f6525a1c708839f83094a6784f72) )
-	ROM_LOAD( "ka-3.bin", 0x100000, 0x80000, CRC(33ee929c) SHA1(a652ad68c547248ef5fa1ed8006b7ac7aef76383) )
+	ROM_REGION( 0xa0000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "ka-2.bin", 0x00000, 0x20000, CRC(3df96eb0) SHA1(ec3dfc29da08f6525a1c708839f83094a6784f72) )
+	ROM_LOAD( "ka-3.bin", 0x20000, 0x80000, CRC(33ee929c) SHA1(a652ad68c547248ef5fa1ed8006b7ac7aef76383) )
 
 	ROM_REGION( 0x200000, "user1", 0 ) /* Graphics (not tiles) */
 	ROM_LOAD16_BYTE( "ka-8.bin", 0x000000, 0x80000, CRC(dbfd7489) SHA1(4a7b07d041dce04a8d8d6688698164f988baefc9) )
@@ -545,5 +579,5 @@ ROM_START( slivera )
 ROM_END
 
 
-GAME( 1996, sliver,  0,        sliver, sliver, driver_device, 0, ROT0,  "Hollow Corp", "Sliver (set 1)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, slivera, sliver,   sliver, sliver, driver_device, 0, ROT0,  "Hollow Corp", "Sliver (set 2)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, sliver,  0,        sliver, sliver, driver_device, 0, ROT0,  "Hollow Corp", "Sliver (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, slivera, sliver,   sliver, sliver, driver_device, 0, ROT0,  "Hollow Corp", "Sliver (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
