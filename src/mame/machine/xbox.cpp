@@ -1048,11 +1048,10 @@ WRITE8_MEMBER(xbox_base_state::superiors232_write)
 
 READ32_MEMBER(xbox_base_state::ohci_usb_r)
 {
-	if (usb_hack_enabled)
-		if (offset == 0) /* hacks needed until usb (and jvs) is implemented */
-		{
-			hack_usb();
-		}
+	if (offset == 0) /* hacks needed until usb (and jvs) is implemented */
+	{
+		hack_usb();
+	}
 	return ohci_usb->read(space, offset, mem_mask);
 }
 
