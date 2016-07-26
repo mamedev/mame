@@ -235,7 +235,7 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 			}
 			else
 			{
-				if (m_regs.lsr & 0x20)
+				if ((m_regs.lsr & 0x20) && (data & COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY))
 					trigger_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
 				m_regs.ier = data;
 				update_interrupt();
