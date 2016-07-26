@@ -239,8 +239,8 @@ WRITE8_MEMBER(vt240_state::duart_w)
 
 WRITE8_MEMBER(vt240_state::duartout_w)
 {
-	m_host->write_rts(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
-	m_host->write_dtr(BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE);
+	m_host->write_rts(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
+	m_host->write_dtr(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(15, BIT(data, 4) ? CLEAR_LINE : ASSERT_LINE);
 	m_maincpu->set_input_line(14, BIT(data, 5) ? CLEAR_LINE : ASSERT_LINE);
 	m_maincpu->set_input_line(11, BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE);
