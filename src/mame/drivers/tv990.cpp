@@ -1,15 +1,17 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont
+// copyright-holders:R. Belmont, Carl
 /***************************************************************************
 
-  TeleVideo 990 terminal
+  TeleVideo 990/995 terminal
   
-  Preliminary driver by R. Belmont
+  Driver by Carl and R. Belmont
+  Thanks to Al Kossow.
   
   H/W:
   68000-P16 CPU (clock unknown, above 10 MHz it outruns the AT keyboard controller)
-  16C452 dual 16450 (PC/AT standard) UART + PC-compatible Centronics
-  AMI MEGA-KBD-H-Q PS/2 keyboard interface
+  16C452 dual 16450 (PC/AT standard) UART + PC-compatible Centronics (integrated into
+         ASIC on 995)
+  AMI MEGA-KBD-H-Q PS/2 keyboard interface on 990, PS/2 8042 on 995
   Televideo ASIC marked "134446-00 TVI1111-0 427"
   3x AS7C256 (32K x 8 SRAM)
   
@@ -24,13 +26,6 @@
                       optional status bar
   Modes include TeleVideo 990, 950, and 955, Wyse WY-60, WY-150/120/50+/50, ANSI, 
                       DEC VT320/220, VT100/52, SCO Console, and PC TERM.
-
-  ASIC registers:
-  0x01 = possibly width (80 written at startup)
-  0x09 = possibly height (50 written at startup; 49 + the status bar)
-  0x16 = cursor X position
-  
-  Status bar is out of the way of used VRAM at offset 0x36b0.  
 
 ****************************************************************************/
 
@@ -105,6 +100,11 @@ INTERRUPT_GEN_MEMBER(tv990_state::vblank)
 void tv990_state::machine_start()
 {
 	m_rowtimer = timer_alloc();
+	
+	save_item(NAME(tvi1111_regs));
+	save_item(NAME(m_rowh));
+	save_item(NAME(m_width));
+	save_item(NAME(m_height));
 }
 
 void tv990_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -294,8 +294,8 @@ WRITE8_MEMBER(tv990_state::kbdc_w)
 }
 
 static ADDRESS_MAP_START(tv990_mem, AS_PROGRAM, 16, tv990_state)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x060000, 0x063fff) AM_RAM	AM_SHARE("vram") // character/attribute RAM
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x060000, 0x06ffff) AM_RAM	AM_SHARE("vram") // character/attribute RAM
 	AM_RANGE(0X080000, 0X087fff) AM_RAM	AM_SHARE("fontram") // font RAM
 	AM_RANGE(0x090000, 0x0900ff) AM_READWRITE(tvi1111_r, tvi1111_w)
 	AM_RANGE(0x0a0000, 0x0a000f) AM_DEVREADWRITE8(UART0_TAG, ns16450_device, ins8250_r, ins8250_w, 0x00ff)
@@ -394,10 +394,17 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( tv990 )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "180003-89_u3.bin", 0x000000, 0x010000, CRC(0465fc55) SHA1(b8874ce54bf2bf4f77664194d2f23c0e4e6ccbe9) ) 
 	ROM_LOAD16_BYTE( "180003-90_u4.bin", 0x000001, 0x010000, CRC(fad7d77d) SHA1(f1114a4a07c8b4ffa0323a2e7ce03d82a386f7d3) ) 
 ROM_END
 
+ROM_START( tv995 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "995-65_u3.bin", 0x000000, 0x020000, CRC(2d71b6fe) SHA1(a2a3406c19308eb9232db319ea8f151949b2ac74) ) 
+	ROM_LOAD16_BYTE( "995-65_u4.bin", 0x000001, 0x020000, CRC(dc002af2) SHA1(9608e7a729c5ac0fc58f673eaf441d2f4f591ec6) ) 
+ROM_END
+
 /* Driver */
 COMP( 1992, tv990, 0, 0, tv990, tv990, driver_device, 0, "TeleVideo", "TeleVideo 990", 0)
+COMP( 1994, tv995, 0, 0, tv990, tv990, driver_device, 0, "TeleVideo", "TeleVideo 995-65", 0)
