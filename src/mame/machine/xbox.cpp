@@ -20,7 +20,6 @@
 
 #define LOG_PCI
 //#define LOG_AUDIO
-#define USB_HACK_ENABLED
 
 void xbox_base_state::dump_string_command(int ref, int params, const char **param)
 {
@@ -1049,19 +1048,18 @@ WRITE8_MEMBER(xbox_base_state::superiors232_write)
 
 READ32_MEMBER(xbox_base_state::ohci_usb_r)
 {
-#ifdef USB_HACK_ENABLED
-	if (offset == 0) { /* hacks needed until usb (and jvs) is implemented */
-		hack_usb();
-	}
-#endif
+	if (usb_hack_enabled)
+		if (offset == 0) /* hacks needed until usb (and jvs) is implemented */
+		{
+			hack_usb();
+		}
 	return ohci_usb->read(space, offset, mem_mask);
 }
 
 WRITE32_MEMBER(xbox_base_state::ohci_usb_w)
 {
-#ifndef USB_HACK_ENABLED
-	ohci_usb->write(space, offset, mem_mask);
-#endif
+	if (!usb_hack_enabled)
+		ohci_usb->write(space, offset, data, mem_mask);
 }
 
 READ32_MEMBER(xbox_base_state::ohci_usb2_r)
@@ -1077,11 +1075,8 @@ ADDRESS_MAP_START(xbox_base_map, AS_PROGRAM, 32, xbox_base_state)
 	AM_RANGE(0x00000000, 0x07ffffff) AM_RAM AM_SHARE("nv2a_share") // 128 megabytes
 	AM_RANGE(0xf0000000, 0xf7ffffff) AM_RAM AM_SHARE("nv2a_share") // 3d accelerator wants this
 	AM_RANGE(0xfd000000, 0xfdffffff) AM_RAM AM_READWRITE(geforce_r, geforce_w)
-#ifdef USB_HACK_ENABLED
 	AM_RANGE(0xfed00000, 0xfed003ff) AM_READWRITE(ohci_usb_r, ohci_usb_w)
-#else
-	AM_RANGE(0xfed00000, 0xfed00fff) AM_DEVREADWRITE("ohci_usb", ohci_usb_controller, read, write)
-#endif
+	//AM_RANGE(0xfed00000, 0xfed00fff) AM_DEVREADWRITE("ohci_usb", ohci_usb_controller, read, write)
 	AM_RANGE(0xfed08000, 0xfed08fff) AM_READWRITE(ohci_usb2_r, ohci_usb2_w)
 	AM_RANGE(0xfe800000, 0xfe87ffff) AM_READWRITE(audio_apu_r, audio_apu_w)
 	AM_RANGE(0xfec00000, 0xfec00fff) AM_READWRITE(audio_ac93_r, audio_ac93_w)
