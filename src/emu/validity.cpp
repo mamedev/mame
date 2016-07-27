@@ -270,6 +270,10 @@ void validity_checker::validate_end()
 
 void validity_checker::validate_one(const game_driver &driver)
 {
+	// help verbose validation detect configuration-related crashes
+	if (m_print_verbose)
+		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Validating driver %s (%s)...\n", driver.name, core_filename_extract_base(driver.source_file).c_str());
+
 	// set the current driver
 	m_current_driver = &driver;
 	m_current_config = nullptr;
@@ -303,7 +307,9 @@ void validity_checker::validate_one(const game_driver &driver)
 	// if we had warnings or errors, output
 	if (m_errors > start_errors || m_warnings > start_warnings || !m_verbose_text.empty())
 	{
-		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Driver %s (file %s): %d errors, %d warnings\n", driver.name, core_filename_extract_base(driver.source_file).c_str(), m_errors - start_errors, m_warnings - start_warnings);
+		if (!m_print_verbose)
+			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Driver %s (file %s): ", driver.name, core_filename_extract_base(driver.source_file).c_str());
+		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "%d errors, %d warnings\n", m_errors - start_errors, m_warnings - start_warnings);
 		if (m_errors > start_errors)
 			output_indented_errors(m_error_text, "Errors");
 		if (m_warnings > start_warnings)
