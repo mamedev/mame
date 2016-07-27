@@ -58,19 +58,11 @@ protected:
 
 private:
 	// instance variables
-<<<<<<< HEAD
-	bool							m_create_confirmed;
-	const util::software_info *		m_swi;
-	const util::software_part *		m_swp;
-	class software_list_device *	m_sld;
-	std::string						m_software_info_name;
-=======
 	bool                            m_create_confirmed;
-	const software_info *           m_swi;
-	const software_part *           m_swp;
+	const util::software_info *           m_swi;
+	const util::software_part *           m_swp;
 	class software_list_device *    m_sld;
 	std::string                     m_software_info_name;
->>>>>>> master
 
 	// methods
 	virtual void populate() override;
