@@ -89,9 +89,24 @@ WRITE8_MEMBER(tiamc1_state::tiamc1_bg_hshift_w)
 	m_bg_hshift = data;
 }
 
+WRITE8_MEMBER(tiamc1_state::tiamc1_bg_bplctrl_w)
+{
+	m_bg_bplctrl = data;
+	update_bg_palette();
+}
+
 WRITE8_MEMBER(tiamc1_state::tiamc1_palette_w)
 {
+	m_paletteram[offset] = data;
 	m_palette->set_pen_color(offset, m_palette_ptr[data]);
+	update_bg_palette();
+}
+
+void tiamc1_state::update_bg_palette()
+{
+	UINT8 bplmask = ((m_bg_bplctrl >> 0) & 1) | ((m_bg_bplctrl >> 1) & 2) | ((m_bg_bplctrl >> 2) & 4) | ((m_bg_bplctrl >> 3) & 8);
+	for (int i = 0; i < 16; i++)
+		m_palette->set_pen_color(i + 16, m_palette_ptr[m_paletteram[i | bplmask]]);
 }
 
 PALETTE_INIT_MEMBER(tiamc1_state, tiamc1)
@@ -139,7 +154,7 @@ TILE_GET_INFO_MEMBER(tiamc1_state::get_bg2_tile_info)
 
 void tiamc1_state::video_start()
 {
-	m_videoram = make_unique_clear<UINT8[]>(0x3040);
+	m_videoram = make_unique_clear<UINT8[]>(0x3050);
 
 		m_charram = m_videoram.get() + 0x0800;     /* Ram is banked */
 		m_tileram = m_videoram.get() + 0x0000;
@@ -148,8 +163,9 @@ void tiamc1_state::video_start()
 	m_spriteram_x = m_videoram.get() + 0x3010;
 	m_spriteram_n = m_videoram.get() + 0x3020;
 	m_spriteram_a = m_videoram.get() + 0x3030;
+	m_paletteram  = m_videoram.get() + 0x3040;
 
-	save_pointer(NAME(m_videoram.get()), 0x3040);
+	save_pointer(NAME(m_videoram.get()), 0x3050);
 
 	m_bg_tilemap1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tiamc1_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
@@ -158,9 +174,12 @@ void tiamc1_state::video_start()
 			8, 8, 32, 32);
 	m_bg_tilemap1->set_scrolldx(4, 4);
 	m_bg_tilemap2->set_scrolldx(4, 4);
+	m_bg_tilemap1->set_palette_offset(16);
+	m_bg_tilemap2->set_palette_offset(16);
 
 	m_bg_vshift = 0;
 	m_bg_hshift = 0;
+	m_bg_bplctrl = 0;
 
 	save_item(NAME(m_layers_ctrl));
 	save_item(NAME(m_bg_vshift));
@@ -173,14 +192,15 @@ VIDEO_START_MEMBER(tiamc1_state, kot)
 {
 	m_charram = memregion("gfx2")->base();
 
-	m_videoram    = make_unique_clear<UINT8[]>(0x440);
+	m_videoram    = make_unique_clear<UINT8[]>(0x450);
 	m_tileram     = m_videoram.get() + 0x000;
 	m_spriteram_y = m_videoram.get() + 0x400;
 	m_spriteram_x = m_videoram.get() + 0x410;
 	m_spriteram_n = m_videoram.get() + 0x420;
 	m_spriteram_a = m_videoram.get() + 0x430;
+	m_paletteram  = m_videoram.get() + 0x440;
 
-	save_pointer(NAME(m_videoram.get()), 0x440);
+	save_pointer(NAME(m_videoram.get()), 0x450);
 
 	m_bg_tilemap1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tiamc1_state::get_bg1_tile_info), this), TILEMAP_SCAN_ROWS,
 		8, 8, 32, 32);
