@@ -1283,11 +1283,14 @@ int dynax_state::debug_viewer(bitmap_ind16 &bitmap, const rectangle &cliprect )
 		if (machine().input().code_pressed_once(KEYCODE_R))   { r = (r + 1) & 0x7;    i = size / 8 * r; }
 		if (machine().input().code_pressed(KEYCODE_M) | machine().input().code_pressed_once(KEYCODE_K))
 		{
-			while (i < size && RAM[i]) i++;     while (i < size && !RAM[i]) i++;
+			while (i < size && RAM[i]) i++;
+			while (i < size && !RAM[i]) i++;
 		}
 		if (machine().input().code_pressed(KEYCODE_N) | machine().input().code_pressed_once(KEYCODE_J))
 		{
-			if (i >= 2) i -= 2; while (i > 0 && RAM[i]) i--;    i++;
+			if (i >= 2) i -= 2; 
+			while (i > 0 && RAM[i]) i--;
+			i++;
 		}
 
 		m_blit_palettes = (c & 0xf) * 0x111;
