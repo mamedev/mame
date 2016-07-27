@@ -21,7 +21,7 @@
       * Kotigoroshko
       * Ostrov Drakona
       * Ostrov Sokrovisch
-      * Perehvatchik
+      * Perekhvatchik
       * Zvezdnyj Rycar'
 
  ***************************************************************
