@@ -832,7 +832,7 @@ void alto2_cpu_device::device_start()
 	m_madr_a91 = prom_load(machine(), &pl_madr_a91, memregion("madr_a91")->base());
 
 #if DEBUG_ALU_A10_PROM
-    // dump ALU a10 PROM after loading
+	// dump ALU a10 PROM after loading
 	for (UINT8 i = 0; i < 32; i++) {
 		UINT8 a = m_alu_a10[i];
 		printf("%03o: S3-S0:%u%u%u%u M:%u CI:%u T:%u ?:%u\n",

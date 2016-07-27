@@ -48,12 +48,12 @@ public:
 	{
 		HRESULT result;
 
-		m_avi_writer = std::make_unique<avi_write>(machine, width, height);				
+		m_avi_writer = std::make_unique<avi_write>(machine, width, height);
 
 		m_frame.allocate(width, height);
 		if (!m_frame.valid())
 			return;
-	
+
 		result = d3d->get_device()->CreateTexture(width, height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &m_sys_texture, nullptr);
 		if (FAILED(result))
 		{
@@ -69,7 +69,7 @@ public:
 			return;
 		}
 		m_vid_texture->GetSurfaceLevel(0, &m_vid_surface);
-		
+
 		m_initialized = true;
 	}
 

@@ -258,7 +258,7 @@ private:
 	void LEGACY_execute_d104(int offset, UINT16 data);
 	void LEGACY_execute_6980(int offset, UINT16 data);
 	void LEGACY_execute_c480(int offset, UINT16 data);
-	
+
 	void cop_collision_update_hitbox(UINT16 data, int slot, UINT32 hitadr);
 	void bcd_update();
 

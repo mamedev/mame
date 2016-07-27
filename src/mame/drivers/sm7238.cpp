@@ -2,19 +2,19 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-	SM 7238 (aka T3300) color/mono text terminal, compatible with DEC VT 240.
-	Graphics option adds Tek 401x and DEC ReGIS support on a 512x250 bitmap.
+    SM 7238 (aka T3300) color/mono text terminal, compatible with DEC VT 240.
+    Graphics option adds Tek 401x and DEC ReGIS support on a 512x250 bitmap.
 
-	Technical manual and schematics: http://doc.pdp-11.org.ru/Terminals/CM7238/
+    Technical manual and schematics: http://doc.pdp-11.org.ru/Terminals/CM7238/
 
     To do:
-	- handle more text_control_w bits
-	- more character attributes incl. double width and height, color
-	- 80/132 columns switching on the fly, reverse video
+    - handle more text_control_w bits
+    - more character attributes incl. double width and height, color
+    - 80/132 columns switching on the fly, reverse video
     - smooth scroll
-	- graphics option
-	- run vblank from timer output?
-	- document hardware and ROM variants, verify if pixel stretching is done
+    - graphics option
+    - run vblank from timer output?
+    - document hardware and ROM variants, verify if pixel stretching is done
 
 ****************************************************************************/
 
@@ -29,7 +29,7 @@
 #include "machine/km035.h"
 #include "machine/nvram.h"
 
-#define KSM_COLUMNS	80	// or 132
+#define KSM_COLUMNS 80  // or 132
 
 #define KSM_TOTAL_HORZ KSM_COLUMNS*10
 #define KSM_DISP_HORZ  KSM_COLUMNS*8
@@ -133,7 +133,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sm7238_io, AS_IO, 8, sm7238_state )
 	ADDRESS_MAP_UNMAP_HIGH
-//	AM_RANGE (0x40, 0x4f) AM_RAM // LUT
+//  AM_RANGE (0x40, 0x4f) AM_RAM // LUT
 	AM_RANGE (0xa0, 0xa0) AM_DEVREADWRITE("i8251line", i8251_device, data_r, data_w)
 	AM_RANGE (0xa1, 0xa1) AM_DEVREADWRITE("i8251line", i8251_device, status_r, control_w)
 	AM_RANGE (0xa4, 0xa4) AM_DEVREADWRITE("i8251kbd", i8251_device, data_r, data_w)
@@ -177,7 +177,7 @@ WRITE8_MEMBER(sm7238_state::text_control_w)
 
 	if (BIT((data ^ m_video.control), 0)) {
 		m_video.stride = BIT(data, 0) ? 80 : 132;
-//		recompute_parameters();
+//      recompute_parameters();
 	}
 
 	m_video.control = data;
@@ -295,7 +295,7 @@ void sm7238_state::recompute_parameters()
 	int horiz_pix_total = m_video.stride * 8;
 
 	visarea.set(0, horiz_pix_total - 1, 0, KSM_DISP_VERT - 1);
-	machine().first_screen()->configure(horiz_pix_total, KSM_DISP_VERT, visarea, 
+	machine().first_screen()->configure(horiz_pix_total, KSM_DISP_VERT, visarea,
 		HZ_TO_ATTOSECONDS((m_video.stride == 80) ? 60 : 57.1 ));
 }
 

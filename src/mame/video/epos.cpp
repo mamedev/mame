@@ -90,7 +90,7 @@ UINT32 epos_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 
 		int x = (offs % 136) * 2;
 		int y = (offs / 136);
-		
+
 		if (flip_screen())
 		{
 			x = 270 - x; // wrong

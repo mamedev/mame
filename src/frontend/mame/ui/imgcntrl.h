@@ -46,11 +46,11 @@ protected:
 	} m_submenu_result;
 
 	// instance variables - made protected so they can be shared with floppycntrl.cpp
-	int								m_state;
-	device_image_interface &		m_image;
-	std::string						m_current_directory;
-	std::string						m_current_file;
-	bool							m_create_ok;
+	int                             m_state;
+	device_image_interface &        m_image;
+	std::string                     m_current_directory;
+	std::string                     m_current_file;
+	bool                            m_create_ok;
 
 	// methods
 	virtual void hook_load(std::string filename, bool softlist);
@@ -58,11 +58,11 @@ protected:
 
 private:
 	// instance variables
-	bool							m_create_confirmed;
-	const software_info *			m_swi;
-	const software_part *			m_swp;
-	class software_list_device *	m_sld;
-	std::string						m_software_info_name;
+	bool                            m_create_confirmed;
+	const software_info *           m_swi;
+	const software_part *           m_swp;
+	class software_list_device *    m_sld;
+	std::string                     m_software_info_name;
 
 	// methods
 	virtual void populate() override;

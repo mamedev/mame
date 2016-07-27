@@ -127,7 +127,7 @@ public:
 	bool is_reset_on_load() const override       { return false; }
 	const char *image_interface() const override { return ""; }
 	const char *file_extensions() const override { return ""; }
-	
+
 protected:
 	virtual void    device_start(void) override;
 	bool    call_load() override;

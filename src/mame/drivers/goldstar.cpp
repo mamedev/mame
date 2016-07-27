@@ -14680,7 +14680,7 @@ ROM_END
   The taiwanese hardware needs better decoded reels graphics ROMs,
   The chars/text graphics are properly decodes, but texts strings
   look bad in the game.
-  
+
 *******************************************************************************************/
 
 /*
@@ -15567,8 +15567,8 @@ DRIVER_INIT_MEMBER(wingco_state, flaming7)
 /*  Patch to bypass the iButton electronic serial number check.
 
     5D79: jumps to $5D83 for the demo game.
-	      just patched to jump to $5D80 (jmp $6115)
-		  where the check is succesfull.
+          just patched to jump to $5D80 (jmp $6115)
+          where the check is succesfull.
 */
 	UINT8 *ROM = memregion("maincpu")->base();
 	ROM[0x5d7a] = 0x05;
@@ -15586,8 +15586,8 @@ DRIVER_INIT_MEMBER(wingco_state, flam7_tw)
 /*  Patch to bypass the iButton electronic serial number check.
 
     60B2: After last compare, code jumps to $60BC for the demo game.
-	      Just patched to jump to $60B9 (jmp $644E) where the check
-		  is succesfull.
+          Just patched to jump to $60B9 (jmp $644E) where the check
+          is succesfull.
 */
 	UINT8 *ROM = memregion("maincpu")->base();
 	ROM[0x60b3] = 0x05;

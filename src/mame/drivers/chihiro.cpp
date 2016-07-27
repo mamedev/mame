@@ -720,7 +720,7 @@ static const struct {
 } hacks[3] = {  { "chihiro",  false, { { 0x6a79f/*3f79f*/, 0x01 }, { 0x6a7a0/*3f7a0*/, 0x00 }, { 0x6b575/*40575*/, 0x00 }, { 0x6b576/*40576*/, 0x00 }, { 0x6b5af/*405af*/, 0x75 }, { 0x6b78a/*4078a*/, 0x75 }, { 0x6b7ca/*407ca*/, 0x00 }, { 0x6b7b8/*407b8*/, 0x00 }, { 0x8f5b2, 0x75 }, { 0x79a9e/*2ea9e*/, 0x74 }, { 0x79b80/*2eb80*/, 0xeb }, { 0x79b97/*2eb97*/, 0x74 }, { 0, 0 } } },
 				{ "outr2",    true,  { { 0x12e4cf, 0x01 }, { 0x12e4d0, 0x00 }, { 0x4793e, 0x01 }, { 0x4793f, 0x00 }, { 0x47aa3, 0x01 }, { 0x47aa4, 0x00 }, { 0x14f2b6, 0x84 }, { 0x14f2d1, 0x75 }, { 0x8732f, 0x7d }, { 0x87384, 0x7d }, { 0x87388, 0xeb }, { 0, 0 } } },
 				{ "crtaxihr", false, { { 0x14ada5/*11fda5*/, 0x90 },{ 0x14ada6/*11fda6*/, 0x90 }, { 0, 0 } } },
-			 };
+				};
 
 void chihiro_state::hack_usb()
 {
@@ -899,7 +899,7 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 		// setup->wIndex = number of bytes to write
 		// data will be transferred from the host using endpoint 2 (OUT)
 		endpoints[endpoint].buffer[0] = 0;
-	} 
+	}
 	else if (setup->bRequest == 0x1f)
 	{
 		// this command is used to write data to external memory (with respect to the internal 8051 cpu)
@@ -907,7 +907,7 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 		// setup->wIndex = number of bytes to write
 		// data will be transferred from the host using endpoint 3 (OUT)
 		endpoints[endpoint].buffer[0] = 0;
-	} 
+	}
 	else if (setup->bRequest == 0x20)
 	{
 		// this command is used to send a set of jvs packets, each to a different node
@@ -942,7 +942,7 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 	}
 	else if (setup->bRequest == 0x30)
 	{
-		// this command first disables external interrupt 0 if the lower 8 bits of setup->wValue are 0 
+		// this command first disables external interrupt 0 if the lower 8 bits of setup->wValue are 0
 		// or enables it if those bits, seen as a signed 8 bit value, represent a number greater than 0
 		// then it will return in byte 4 of the data stage the value 0 if external interrupt 0 has been disabled or value 1 if it has been enabled
 		// and in byte 5 the value of an 8 bit counter that is incremented at every external interrupt 0

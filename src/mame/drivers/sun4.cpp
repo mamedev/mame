@@ -383,28 +383,28 @@
         20/06/2016 Much less skeletony.
 
         // sun4:  16 contexts, 4096 segments, each PMEG is 32 PTEs, each PTE is 8K
-		// VA lower 13 bits in page, next 5 bits select PTE in PMEG, next 12 bits select PMEG, top 2 must be 00 or 11.
+        // VA lower 13 bits in page, next 5 bits select PTE in PMEG, next 12 bits select PMEG, top 2 must be 00 or 11.
 
         4/60 ROM notes:
 
         ffe809fc: call to print "Sizing Memory" to the UART
- 		ffe80a70: call to "Setting up RAM for monitor" that goes wrong
- 		ffe80210: testing memory
- 		ffe80274: loop that goes wobbly and fails
- 		ffe80dc4: switch off boot mode, MMU maps ROM to copy in RAM from here on
- 		ffe82000: start of FORTH (?) interpreter once decompressed
+        ffe80a70: call to "Setting up RAM for monitor" that goes wrong
+        ffe80210: testing memory
+        ffe80274: loop that goes wobbly and fails
+        ffe80dc4: switch off boot mode, MMU maps ROM to copy in RAM from here on
+        ffe82000: start of FORTH (?) interpreter once decompressed
                   text in decompressed area claims to be FORTH-83 FCode, but the opcodes
                   do not match the documented OpenFirmware FCode ones at all.
 
-    	4/3xx ROM notes:
-		sun4: CPU LEDs to 00 (PC=ffe92398) => ........
-		sun4: CPU LEDs to 01 (PC=ffe92450) => *.......
-		sun4: CPU LEDs to 02 (PC=ffe9246c) => .*......
-		sun4: CPU LEDs to 03 (PC=ffe9aa54) => **......
-		sun4: CPU LEDs to 04 (PC=ffe9aa54) => ..*.....
-		sun4: CPU LEDs to 05 (PC=ffe9aa54) => *.*.....
-		sun4: CPU LEDs to 06 (PC=ffe9aa54) => .**.....
-		sun4: CPU LEDs to 07 (PC=ffe9aa54) => ***.....
+        4/3xx ROM notes:
+        sun4: CPU LEDs to 00 (PC=ffe92398) => ........
+        sun4: CPU LEDs to 01 (PC=ffe92450) => *.......
+        sun4: CPU LEDs to 02 (PC=ffe9246c) => .*......
+        sun4: CPU LEDs to 03 (PC=ffe9aa54) => **......
+        sun4: CPU LEDs to 04 (PC=ffe9aa54) => ..*.....
+        sun4: CPU LEDs to 05 (PC=ffe9aa54) => *.*.....
+        sun4: CPU LEDs to 06 (PC=ffe9aa54) => .**.....
+        sun4: CPU LEDs to 07 (PC=ffe9aa54) => ***.....
 
 
 ****************************************************************************/
@@ -431,7 +431,7 @@
 #include "debug/debugcmd.h"
 #include "debugger.h"
 
-#define SUN4_LOG_FCODES	(0)
+#define SUN4_LOG_FCODES (0)
 
 #define TIMEKEEPER_TAG  "timekpr"
 #define SCC1_TAG        "scc1"
@@ -439,56 +439,56 @@
 #define KEYBOARD_TAG    "keyboard"
 #define RS232A_TAG      "rs232a"
 #define RS232B_TAG      "rs232b"
-#define FDC_TAG			"fdc"
+#define FDC_TAG         "fdc"
 
-#define ENA_NOTBOOT		(0x80)
-#define ENA_SDVMA		(0x20)
-#define ENA_CACHE		(0x10)
-#define ENA_RESET		(0x04)
-#define ENA_DIAG		(0x01)
+#define ENA_NOTBOOT     (0x80)
+#define ENA_SDVMA       (0x20)
+#define ENA_CACHE       (0x10)
+#define ENA_RESET       (0x04)
+#define ENA_DIAG        (0x01)
 
 // page table entry constants
-#define PM_VALID		(0x80000000)	// page is valid
-#define PM_WRITEMASK	(0x40000000)	// writable?
-#define PM_SYSMASK		(0x20000000)	// system use only?
-#define PM_CACHE		(0x10000000)	// cachable?
-#define PM_TYPEMASK		(0x0c000000)	// type mask
-#define PM_ACCESSED		(0x02000000)	// accessed flag
-#define PM_MODIFIED		(0x01000000)	// modified flag
+#define PM_VALID        (0x80000000)    // page is valid
+#define PM_WRITEMASK    (0x40000000)    // writable?
+#define PM_SYSMASK      (0x20000000)    // system use only?
+#define PM_CACHE        (0x10000000)    // cachable?
+#define PM_TYPEMASK     (0x0c000000)    // type mask
+#define PM_ACCESSED     (0x02000000)    // accessed flag
+#define PM_MODIFIED     (0x01000000)    // modified flag
 
-#define PAGE_SIZE		(0x00000400)
+#define PAGE_SIZE       (0x00000400)
 
 // DMA controller constants
-#define DMA_DEV_ID		(0x80000000)
-#define DMA_L			(0x00008000)	// use ILACC
-#define DMA_TC			(0x00004000)	// terminal count
-#define DMA_EN_CNT		(0x00002000)	// enable count
-#define DMA_BYTE_ADDR	(0x00001800)	// next byte number to be accessed
-#define DMA_BYTE_ADDR_SHIFT	(11)
-#define DMA_REQ_PEND	(0x00000400)	// request pending
-#define DMA_EN_DMA		(0x00000200)	// enable DMA
-#define DMA_WRITE		(0x00000100)	// DMA device->mem if 1, otherwise mem->device
-#define DMA_RESET		(0x00000080)	// DMA hardware reset
-#define DMA_DRAIN		(0x00000040)	// force remaining pack bytes to memory
-#define DMA_FLUSH		(0x00000020)	// force PACK_CNT and ERR_PEND to 0
-#define DMA_INT_EN		(0x00000010)	// interrupt enable
-#define DMA_PACK_CNT	(0x0000000c)	// number of bytes in pack register
-#define DMA_PACK_CNT_SHIFT	(2)
-#define DMA_ERR_PEND	(0x00000002)	// error pending, set when memory exception occurs
-#define DMA_INT_PEND	(0x00000001)	// interrupt pending, set when TC=1
-#define DMA_READ_ONLY	(DMA_TC | DMA_BYTE_ADDR | DMA_REQ_PEND | DMA_PACK_CNT | DMA_ERR_PEND | DMA_INT_PEND)
-#define DMA_WRITE_ONLY	(DMA_FLUSH)
-#define DMA_READ_WRITE	(DMA_EN_CNT | DMA_EN_DMA | DMA_WRITE | DMA_RESET | DMA_INT_EN)
-#define DMA_CTRL		(0)
-#define DMA_ADDR		(1)
-#define DMA_BYTE_COUNT	(2)
-#define DMA_XTAL		(XTAL_25MHz)
+#define DMA_DEV_ID      (0x80000000)
+#define DMA_L           (0x00008000)    // use ILACC
+#define DMA_TC          (0x00004000)    // terminal count
+#define DMA_EN_CNT      (0x00002000)    // enable count
+#define DMA_BYTE_ADDR   (0x00001800)    // next byte number to be accessed
+#define DMA_BYTE_ADDR_SHIFT (11)
+#define DMA_REQ_PEND    (0x00000400)    // request pending
+#define DMA_EN_DMA      (0x00000200)    // enable DMA
+#define DMA_WRITE       (0x00000100)    // DMA device->mem if 1, otherwise mem->device
+#define DMA_RESET       (0x00000080)    // DMA hardware reset
+#define DMA_DRAIN       (0x00000040)    // force remaining pack bytes to memory
+#define DMA_FLUSH       (0x00000020)    // force PACK_CNT and ERR_PEND to 0
+#define DMA_INT_EN      (0x00000010)    // interrupt enable
+#define DMA_PACK_CNT    (0x0000000c)    // number of bytes in pack register
+#define DMA_PACK_CNT_SHIFT  (2)
+#define DMA_ERR_PEND    (0x00000002)    // error pending, set when memory exception occurs
+#define DMA_INT_PEND    (0x00000001)    // interrupt pending, set when TC=1
+#define DMA_READ_ONLY   (DMA_TC | DMA_BYTE_ADDR | DMA_REQ_PEND | DMA_PACK_CNT | DMA_ERR_PEND | DMA_INT_PEND)
+#define DMA_WRITE_ONLY  (DMA_FLUSH)
+#define DMA_READ_WRITE  (DMA_EN_CNT | DMA_EN_DMA | DMA_WRITE | DMA_RESET | DMA_INT_EN)
+#define DMA_CTRL        (0)
+#define DMA_ADDR        (1)
+#define DMA_BYTE_COUNT  (2)
+#define DMA_XTAL        (XTAL_25MHz)
 
 namespace
 {
 const sparc_disassembler::asi_desc_map::value_type sun4_asi_desc[] = {
-													 { 0x10, { nullptr, "Flush I-Cache (Segment)" } },
-													 { 0x11, { nullptr, "Flush I-Cache (Page)"    } },
+														{ 0x10, { nullptr, "Flush I-Cache (Segment)" } },
+														{ 0x11, { nullptr, "Flush I-Cache (Page)"    } },
 	{ 0x02, { nullptr, "System Space"           } }, { 0x12, { nullptr, "Flush I-Cache (Context)" } },
 	{ 0x03, { nullptr, "Segment Map"            } }, { 0x13, { nullptr, "Flush I-Cache (User)"    } },
 	{ 0x04, { nullptr, "Page Map"               } }, { 0x14, { nullptr, "Flush D-Cache (Segment)" } },
@@ -621,9 +621,9 @@ private:
 	UINT32 m_cachetags[0x4000];
 	UINT32 m_cachedata[0x4000];
 	UINT32 m_ram_size, m_ram_size_words;
-	UINT8 m_ctx_mask;	// SS2 is sun4c but has 16 contexts; most have 8
-	UINT8 m_pmeg_mask;	// SS2 is sun4c but has 16384 PTEs; most have 8192
-	UINT8 m_irq_reg;	// IRQ control
+	UINT8 m_ctx_mask;   // SS2 is sun4c but has 16 contexts; most have 8
+	UINT8 m_pmeg_mask;  // SS2 is sun4c but has 16384 PTEs; most have 8192
+	UINT8 m_irq_reg;    // IRQ control
 	UINT8 m_scc1_int, m_scc2_int;
 	UINT8 m_diag;
 	int m_arch;
@@ -694,7 +694,7 @@ UINT32 sun4_state::read_insn_data_4c(UINT8 asi, address_space &space, UINT32 off
 
 		switch ((m_pagemap[entry] >> 26) & 3)
 		{
-		case 0:	// type 0 space
+		case 0: // type 0 space
 			return m_type0space->read32(space, tmp, mem_mask);
 
 		case 1: // type 1 space
@@ -717,7 +717,7 @@ UINT32 sun4_state::read_insn_data_4c(UINT8 asi, address_space &space, UINT32 off
 		{
 			printf("sun4c: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
 			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
-			//m_buserr[0] = 0x88;	// read, invalid PTE
+			//m_buserr[0] = 0x88;   // read, invalid PTE
 			//m_buserr[1] = offset<<2;
 		}
 		return 0;
@@ -735,7 +735,7 @@ void sun4_state::write_insn_data_4c(UINT8 asi, address_space &space, UINT32 offs
 		if ((!(m_pagemap[entry] & PM_WRITEMASK)) || ((m_pagemap[entry] & PM_SYSMASK) && !(asi & 1)))
 		{
 			printf("sun4c: write protect MMU error (PC=%x)\n", m_maincpu->pc());
-			m_buserr[0] = 0x8040;	// write, protection error
+			m_buserr[0] = 0x8040;   // write, protection error
 			m_buserr[1] = offset<<2;
 			m_maincpu->set_input_line(SPARC_MAE, ASSERT_LINE);
 			return;
@@ -750,7 +750,7 @@ void sun4_state::write_insn_data_4c(UINT8 asi, address_space &space, UINT32 offs
 
 		switch ((m_pagemap[entry] >> 26) & 3)
 		{
-		case 0:	// type 0
+		case 0: // type 0
 			m_type0space->write32(space, tmp, data, mem_mask);
 			return;
 
@@ -767,7 +767,7 @@ void sun4_state::write_insn_data_4c(UINT8 asi, address_space &space, UINT32 offs
 	{
 		printf("sun4c: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
 		//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
-		//m_buserr[0] = 0x8;	// invalid PTE
+		//m_buserr[0] = 0x8;    // invalid PTE
 		//m_buserr[1] = offset<<2;
 	}
 }
@@ -790,7 +790,7 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 
 	switch (asi)
 	{
-	case 2:	// system space
+	case 2: // system space
 		switch (offset >> 26)
 		{
 			case 3: // context reg
@@ -804,7 +804,7 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 				printf("sun4c: read buserror, PC=%x (mask %08x)\n", m_maincpu->pc(), mem_mask);
 				m_maincpu->set_input_line(SPARC_MAE, CLEAR_LINE);
 				retval = m_buserr[offset & 0xf];
-				m_buserr[offset & 0xf] = 0;	// clear on reading
+				m_buserr[offset & 0xf] = 0; // clear on reading
 				return retval;
 
 			case 8: // (d-)cache tags
@@ -815,7 +815,7 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 				//logerror("sun4c: read dcache data @ %x, PC = %x\n", offset, m_maincpu->pc());
 				return m_cachedata[offset&0x3fff];
 
-			case 0xf:	// UART bypass
+			case 0xf:   // UART bypass
 				//printf("read UART bypass @ %x mask %08x\n", offset<<2, mem_mask);
 				switch (offset & 3)
 				{
@@ -830,7 +830,7 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 				return 0;
 		}
 		break;
-	case 3:	// segment map
+	case 3: // segment map
 		//printf("sun4: read segment map @ %x (ctx %d entry %d, mem_mask %08x, PC=%x)\n", offset << 2, m_context & m_ctx_mask, (offset>>16) & 0xfff, mem_mask, m_maincpu->pc());
 		if (mem_mask == 0xffff0000)
 		{
@@ -842,7 +842,7 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 		}
 		else
 		{
-		//	printf("sun4: read segment map w/unk mask %08x\n", mem_mask);
+		//  printf("sun4: read segment map w/unk mask %08x\n", mem_mask);
 		}
 		return 0x0;
 
@@ -918,7 +918,7 @@ WRITE32_MEMBER( sun4_state::sun4c_mmu_w )
 				m_cachedata[offset&0x3fff] = data;
 				return;
 
-			case 0xf:	// UART bypass
+			case 0xf:   // UART bypass
 				//printf("%08x to UART bypass @ %x, mask %08x\n", data, offset<<2, mem_mask);
 				switch (offset & 3)
 				{
@@ -942,16 +942,16 @@ WRITE32_MEMBER( sun4_state::sun4c_mmu_w )
 			else logerror("sun4c: writing segment map with unknown mask %08x, PC=%x\n", mem_mask, m_maincpu->pc());
 
 			//printf("sun4: %08x to segment map @ %x (ctx %d entry %d, mem_mask %08x, PC=%x)\n", segdata, offset << 2, m_context, (offset>>16) & 0xfff, mem_mask, m_maincpu->pc());
-			m_segmap[m_context & m_ctx_mask][(offset>>16) & 0xfff] = segdata;	// only 7 bits of the segment are necessary
+			m_segmap[m_context & m_ctx_mask][(offset>>16) & 0xfff] = segdata;   // only 7 bits of the segment are necessary
 		}
 		return;
 
 	case 4: // page map
-		page = (m_segmap[m_context & m_ctx_mask][(offset >> 16) & 0xfff] & m_pmeg_mask) << 6;	// get the PMEG
-		page += (offset >> 10) & 0x3f;	// add the offset
+		page = (m_segmap[m_context & m_ctx_mask][(offset >> 16) & 0xfff] & m_pmeg_mask) << 6;   // get the PMEG
+		page += (offset >> 10) & 0x3f;  // add the offset
 		//printf("sun4: %08x to page map @ %x (entry %d, mem_mask %08x, PC=%x)\n", data, offset << 2, page, mem_mask, m_maincpu->pc());
 		COMBINE_DATA(&m_pagemap[page]);
-		m_pagemap[page] &= 0xff00ffff;	// these 8 bits are cleared when written and tested as such
+		m_pagemap[page] &= 0xff00ffff;  // these 8 bits are cleared when written and tested as such
 		return;
 
 	case 8:
@@ -985,7 +985,7 @@ UINT32 sun4_state::read_insn_data(UINT8 asi, address_space &space, UINT32 offset
 
 		switch ((m_pagemap[entry] >> 26) & 3)
 		{
-		case 0:	// type 0 space
+		case 0: // type 0 space
 			return m_type0space->read32(space, tmp, mem_mask);
 
 		case 1: // type 1 space
@@ -1008,7 +1008,7 @@ UINT32 sun4_state::read_insn_data(UINT8 asi, address_space &space, UINT32 offset
 		{
 			printf("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
 			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
-			//m_buserr[0] = 0x88;	// read, invalid PTE
+			//m_buserr[0] = 0x88;   // read, invalid PTE
 			//m_buserr[1] = offset<<2;
 		}
 		return 0;
@@ -1032,7 +1032,7 @@ void sun4_state::write_insn_data(UINT8 asi, address_space &space, UINT32 offset,
 
 		switch ((m_pagemap[entry] >> 26) & 3)
 		{
-		case 0:	// type 0
+		case 0: // type 0
 			m_type0space->write32(space, tmp, data, mem_mask);
 			return;
 
@@ -1050,7 +1050,7 @@ void sun4_state::write_insn_data(UINT8 asi, address_space &space, UINT32 offset,
 	{
 		printf("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
 		//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
-		//m_buserr[0] = 0x8;	// invalid PTE
+		//m_buserr[0] = 0x8;    // invalid PTE
 		//m_buserr[1] = offset<<2;
 	}
 }
@@ -1071,7 +1071,7 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 
 	switch (asi)
 	{
-	case 2:	// system space
+	case 2: // system space
 		switch (offset >> 26)
 		{
 			case 3: // context reg
@@ -1093,7 +1093,7 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 				logerror("sun4: read dcache data @ %x, PC = %x\n", offset, m_maincpu->pc());
 				return 0xffffffff;
 
-			case 0xf:	// UART bypass
+			case 0xf:   // UART bypass
 				//printf("read UART bypass @ %x mask %08x (PC=%x)\n", offset<<2, mem_mask, m_maincpu->pc());
 				switch (offset & 3)
 				{
@@ -1108,7 +1108,7 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 				return 0;
 		}
 		break;
-	case 3:	// segment map
+	case 3: // segment map
 		//printf("sun4: read segment map @ %x (ctx %d entry %d, mem_mask %08x, PC=%x)\n", offset << 2, m_context & m_ctx_mask, (offset>>16) & 0xfff, mem_mask, m_maincpu->pc());
 		if (mem_mask == 0xffff0000)
 		{
@@ -1120,7 +1120,7 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 		}
 		else
 		{
-		//	printf("sun4: read segment map w/unk mask %08x\n", mem_mask);
+		//  printf("sun4: read segment map w/unk mask %08x\n", mem_mask);
 		}
 		return 0x0;
 
@@ -1130,7 +1130,7 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 		//printf("sun4: read page map @ %x (entry %d, seg %d, PMEG %d, mem_mask %08x, PC=%x)\n", offset << 2, page, (offset >> 16) & 0xfff, m_segmap[m_context & m_ctx_mask][(offset >> 16) & 0xfff] & m_pmeg_mask, mem_mask, m_maincpu->pc());
 		return m_pagemap[page];
 
-	case 6:	// region map used in 4/4xx, I don't know anything about this
+	case 6: // region map used in 4/4xx, I don't know anything about this
 		return 0;
 
 	case 8:
@@ -1183,7 +1183,7 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 				}
 				return;
 
-			case 7:	// diag reg
+			case 7: // diag reg
 				m_diag = data >> 24;
 				#if 1
 				printf("sun4: CPU LEDs to %02x (PC=%x) => ", ((data>>24) & 0xff) ^ 0xff, m_maincpu->pc());
@@ -1211,7 +1211,7 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 				logerror("sun4: %08x to cache data @ %x, PC = %x\n", data, offset, m_maincpu->pc());
 				return;
 
-			case 0xf:	// UART bypass
+			case 0xf:   // UART bypass
 				//printf("%08x to UART bypass @ %x, mask %08x\n", data, offset<<2, mem_mask);
 				switch (offset & 3)
 				{
@@ -1240,11 +1240,11 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 		return;
 
 	case 4: // page map
-		page = (m_segmap[m_context][(offset >> 16) & 0xfff]) << 5;	// get the PMEG
-		page += (offset >> 11) & 0x1f;	// add the offset
+		page = (m_segmap[m_context][(offset >> 16) & 0xfff]) << 5;  // get the PMEG
+		page += (offset >> 11) & 0x1f;  // add the offset
 		//printf("sun4: %08x to page map @ %x (entry %d, mem_mask %08x, PC=%x)\n", data, offset << 2, page, mem_mask, m_maincpu->pc());
 		COMBINE_DATA(&m_pagemap[page]);
-		m_pagemap[page] &= 0xff07ffff;	// these bits are cleared when written and tested as such
+		m_pagemap[page] &= 0xff07ffff;  // these bits are cleared when written and tested as such
 		return;
 
 	case 6: // region map, used in 4/4xx
@@ -1464,10 +1464,10 @@ static ADDRESS_MAP_START(type1space_map, AS_PROGRAM, 32, sun4_state)
 	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE8(irq_r, irq_w, 0xffffffff)
 	AM_RANGE(0x06000000, 0x0607ffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x07200000, 0x07200003) AM_READWRITE8(fdc_r, fdc_w, 0xffffffff)
-	AM_RANGE(0x08000000, 0x08000003) AM_READ(ss1_sl0_id)	// slot 0 contains SCSI/DMA/Ethernet
+	AM_RANGE(0x08000000, 0x08000003) AM_READ(ss1_sl0_id)    // slot 0 contains SCSI/DMA/Ethernet
 	AM_RANGE(0x08400000, 0x0840000f) AM_READWRITE(dma_r, dma_w)
 	AM_RANGE(0x08800000, 0x0880001f) AM_DEVICE8("scsibus:7:ncr5390", ncr5390_device, map, 0xff0000)
-	AM_RANGE(0x0e000000, 0x0e000003) AM_READ(ss1_sl3_id)	// slot 3 contains video board
+	AM_RANGE(0x0e000000, 0x0e000003) AM_READ(ss1_sl3_id)    // slot 3 contains video board
 	AM_RANGE(0x0e800000, 0x0e8fffff) AM_RAM AM_SHARE("bw2_vram")
 ADDRESS_MAP_END
 
@@ -2350,7 +2350,7 @@ COMP( 1991, sun4_50,   sun4_300,0,       sun4c,      sun4, sun4_state,     ss2, 
 COMP( 199?, sun4_20,   sun4_300,0,       sun4c,      sun4, sun4_state,     sun4c,  "Sun Microsystems", "SPARCstation SLC (Sun 4/20)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 COMP( 1989, sun4_60,   sun4_300,0,       sun4c,      sun4, sun4_state,     sun4c,  "Sun Microsystems", "SPARCstation 1 (Sun 4/60)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 COMP( 1990, sun4_65,   sun4_300,0,       sun4c,      sun4, sun4_state,     sun4c,  "Sun Microsystems", "SPARCstation 1+ (Sun 4/65)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1990, sun4_75,   sun4_300,0,       sun4c,      sun4, sun4_state,     ss2,	   "Sun Microsystems", "SPARCstation 2 (Sun 4/75)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1990, sun4_75,   sun4_300,0,       sun4c,      sun4, sun4_state,     ss2,    "Sun Microsystems", "SPARCstation 2 (Sun 4/75)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 
 // sun4m (using the SPARC "reference MMU", probably will go to a separate driver)
 COMP( 1992, sun_s10,   sun4_300,0,       sun4c,      sun4, sun4_state,     sun4c,  "Sun Microsystems", "SPARCstation 10 (Sun S10)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -34,7 +34,7 @@ public:
 		m_videobank0(*this, "videobank0"),
 		m_videobank1(*this, "videobank1") { }
 
-		
+
 	/* video-related */
 	int        m_layer_colorbase[3];
 	int        m_sprite_colorbase;

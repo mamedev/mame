@@ -300,7 +300,7 @@ GFXDECODE_END
 void ohmygod_state::machine_start()
 {
 	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x20000);
-	
+
 	save_item(NAME(m_spritebank));
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));

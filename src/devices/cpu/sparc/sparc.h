@@ -11,8 +11,8 @@
 
 #include "sparcdasm.h"
 
-#define SPARCV8			(0)
-#define LOG_FCODES		(0)
+#define SPARCV8         (0)
+#define LOG_FCODES      (0)
 
 #if LOG_FCODES
 #include <map>

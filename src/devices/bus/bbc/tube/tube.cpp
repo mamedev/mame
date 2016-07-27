@@ -96,13 +96,13 @@ void bbc_tube_slot_device::device_reset()
 
 
 SLOT_INTERFACE_START( bbc_tube_ext_devices )
-//	SLOT_INTERFACE("6502copro",  BBC_6502_COPRO)     /* Acorn ANC01 6502 2nd processor */
-//	SLOT_INTERFACE("z80copro",   BBC_Z80_COPRO)      /* Acorn ANC04 Z80 2nd processor */
-//	SLOT_INTERFACE("32016copro", BBC_32016_COPRO)    /* Acorn ANC05 32016 2nd processor */
-//	SLOT_INTERFACE("cambcopro",  BBC_CAMB_COPRO)     /* Acorn ANC06 Cambridge Co-Processor */
-//	SLOT_INTERFACE("armcopro",   BBC_ARM_COPRO)      /* Acorn ANC13 ARM Evaluation System */
-//	SLOT_INTERFACE("unicopro",   BBC_UNIVERSAL)      /* Acorn ANC21 Universal 2nd Processor Unit */
-//	SLOT_INTERFACE("a500copro",  BBC_A500_COPRO)     /* Acorn A500 2nd Processor */
+//  SLOT_INTERFACE("6502copro",  BBC_6502_COPRO)     /* Acorn ANC01 6502 2nd processor */
+//  SLOT_INTERFACE("z80copro",   BBC_Z80_COPRO)      /* Acorn ANC04 Z80 2nd processor */
+//  SLOT_INTERFACE("32016copro", BBC_32016_COPRO)    /* Acorn ANC05 32016 2nd processor */
+//  SLOT_INTERFACE("cambcopro",  BBC_CAMB_COPRO)     /* Acorn ANC06 Cambridge Co-Processor */
+//  SLOT_INTERFACE("armcopro",   BBC_ARM_COPRO)      /* Acorn ANC13 ARM Evaluation System */
+//  SLOT_INTERFACE("unicopro",   BBC_UNIVERSAL)      /* Acorn ANC21 Universal 2nd Processor Unit */
+//  SLOT_INTERFACE("a500copro",  BBC_A500_COPRO)     /* Acorn A500 2nd Processor */
 SLOT_INTERFACE_END
 
 
@@ -118,8 +118,8 @@ SLOT_INTERFACE_END
 
 
 SLOT_INTERFACE_START( bbc_tube_int_devices )
-//	SLOT_INTERFACE("65c102copro", BBC_65C102_COPRO)  /* Acorn ADC06 6502 co-processor */
-//	SLOT_INTERFACE("80186copro",  BBC_80186_COPRO)   /* Acorn ADC08 80186 co-processor */
-//	SLOT_INTERFACE("80286copro",  BBC_80286_COPRO)   /* Acorn ADC08 80286 co-processor */
-//	SLOT_INTERFACE("arm7copro",   BBC_ARM7_COPRO)    /* Sprow ARM7 co-processor */
+//  SLOT_INTERFACE("65c102copro", BBC_65C102_COPRO)  /* Acorn ADC06 6502 co-processor */
+//  SLOT_INTERFACE("80186copro",  BBC_80186_COPRO)   /* Acorn ADC08 80186 co-processor */
+//  SLOT_INTERFACE("80286copro",  BBC_80286_COPRO)   /* Acorn ADC08 80286 co-processor */
+//  SLOT_INTERFACE("arm7copro",   BBC_ARM7_COPRO)    /* Sprow ARM7 co-processor */
 SLOT_INTERFACE_END

@@ -184,12 +184,12 @@ public:
 
 private:
 	// internal state
-	software_part *					m_next;
-	software_info &					m_info;
-	std::string						m_name;
-	std::string						m_interface;
-	std::list<feature_list_item>	m_featurelist;
-	std::vector<rom_entry>			m_romdata;
+	software_part *                 m_next;
+	software_info &                 m_info;
+	std::string                     m_name;
+	std::string                     m_interface;
+	std::list<feature_list_item>    m_featurelist;
+	std::vector<rom_entry>          m_romdata;
 };
 
 
@@ -300,7 +300,7 @@ protected:
 	emu_file                    m_file;
 	std::string                 m_description;
 	std::string                 m_errors;
-	std::list<software_info>	m_infolist;
+	std::list<software_info>    m_infolist;
 	const_string_pool           m_stringpool;
 };
 

@@ -27,10 +27,10 @@
       between the two palettes.  This effect is not emulated, but since both
       halfs of the palette are identical, this is not an issue.  See $039c.
       The other games have a different color test, not using the busy loop.
-	 
-	- Find out how Beastie Feastie's 2nd player inputs work.
-	
-	- Fix flip screen support for The Dealer and Beastie Feastie.
+
+    - Find out how Beastie Feastie's 2nd player inputs work.
+
+    - Fix flip screen support for The Dealer and Beastie Feastie.
 
 ***************************************************************************/
 
@@ -355,7 +355,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( beastf )
 	PORT_INCLUDE(dealer)
-	
+
 	PORT_MODIFY("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY

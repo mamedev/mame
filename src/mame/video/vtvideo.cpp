@@ -238,16 +238,16 @@ WRITE8_MEMBER(vt100_video_device::dc012_w)
 	// - see 3.1.3.9.5 DC012 Programming Information (PC-100 spec)
 	if ((offset & 0x100) ) // MHFU is disabled by writing a value to port 010C.
 	{
-//		if (MHFU_FLAG == true)
-//						printf("MHFU  *** DISABLED *** \n");
+//      if (MHFU_FLAG == true)
+//                      printf("MHFU  *** DISABLED *** \n");
 		MHFU_FLAG = false;
 	}
 	else
 	{
-//		if (MHFU_FLAG == false)
-//			printf("MHFU  ___ENABLED___ %05x \n", space.device().safe_pc());
+//      if (MHFU_FLAG == false)
+//          printf("MHFU  ___ENABLED___ %05x \n", space.device().safe_pc());
 		MHFU_FLAG = true;
-		MHFU_counter = 0;  
+		MHFU_counter = 0;
 	}
 
 	if (!(data & 0x08))
@@ -279,10 +279,10 @@ WRITE8_MEMBER(vt100_video_device::dc012_w)
 			// PDF: reverse field ON
 			m_reverse_field = 0;
 			break;
-		case 0x0b: 			
-			// PDF: reverse field OFF 
-			// SETUP: dark screen selected 
-			m_reverse_field = 1; 
+		case 0x0b:
+			// PDF: reverse field OFF
+			// SETUP: dark screen selected
+			m_reverse_field = 1;
 			break;
 
 			//  Writing a 11XX bit combination clears the blink-flip flop (valid for 0x0C - 0x0F):
@@ -845,10 +845,10 @@ int rainbow_video_device::MHFU(int ASK)
 {
 	switch (ASK)
 	{
-	case MHFU_IS_ENABLED:		// "true": RETURN BOOLEAN (MHFU disabled or enabled?)
+	case MHFU_IS_ENABLED:       // "true": RETURN BOOLEAN (MHFU disabled or enabled?)
 		return MHFU_FLAG;
 
-	case MHFU_COUNT:		// -1: increment IF ENABLED, return counter value (=> Rainbow.c)
+	case MHFU_COUNT:        // -1: increment IF ENABLED, return counter value (=> Rainbow.c)
 		if (MHFU_FLAG == true)
 			if (MHFU_counter < 254)
 				MHFU_counter++;
@@ -856,17 +856,17 @@ int rainbow_video_device::MHFU(int ASK)
 	case MHFU_VALUE:
 		return MHFU_counter;
 
-	case MHFU_RESET:		// -250 : RESET counter (NOTHING ELSE!)
+	case MHFU_RESET:        // -250 : RESET counter (NOTHING ELSE!)
 		MHFU_counter = 0;
 		return MHFU_FLAG;
 
-	case MHFU_RESET_and_ENABLE:	// -100 : RESET and ENABLE MHFU counter
+	case MHFU_RESET_and_ENABLE: // -100 : RESET and ENABLE MHFU counter
 		MHFU_counter = 0;
 		MHFU_FLAG = true;
 
 		return -100;
 
-	case MHFU_RESET_and_DISABLE:	// -200 : RESET and DISABLE MHFU
+	case MHFU_RESET_and_DISABLE:    // -200 : RESET and DISABLE MHFU
 		MHFU_counter = 0;
 		MHFU_FLAG = false;
 

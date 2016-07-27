@@ -138,7 +138,7 @@ public:
 void sliver_state::machine_start()
 {
 	membank("okibank")->configure_entries(0, 4, memregion("oki")->base() + 0x20000, 0x20000);
-	
+
 	save_item(NAME(m_io_offset));
 	save_item(NAME(m_io_reg));
 	save_item(NAME(m_fifo));
@@ -401,7 +401,7 @@ void sliver_state::video_start()
 	save_item(NAME(m_jpeg2));
 	save_item(NAME(m_jpeg_x));
 	save_item(NAME(m_jpeg_y));
-	
+
 	machine().save().register_postload(save_prepost_delegate(FUNC(sliver_state::postload), this));
 }
 

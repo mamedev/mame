@@ -64,8 +64,8 @@ void input_merger_device::device_start()
 //  input_merger_active_high_device - constructor
 //-------------------------------------------------
 
-input_merger_active_high_device::input_merger_active_high_device(machine_config const &mconfig, char const *tag, device_t *owner,	UINT32 clock)
-	: input_merger_device(mconfig,	INPUT_MERGER_ACTIVE_HIGH, "Input Merger (Active High)", tag, owner, clock, "input_merger_hi", __FILE__)
+input_merger_active_high_device::input_merger_active_high_device(machine_config const &mconfig, char const *tag, device_t *owner,   UINT32 clock)
+	: input_merger_device(mconfig,  INPUT_MERGER_ACTIVE_HIGH, "Input Merger (Active High)", tag, owner, clock, "input_merger_hi", __FILE__)
 {
 }
 
@@ -97,8 +97,8 @@ void input_merger_active_high_device::update_state()
 //  input_merger_active_low_device - constructor
 //-------------------------------------------------
 
-input_merger_active_low_device::input_merger_active_low_device(machine_config const &mconfig, char const *tag, device_t *owner,	UINT32 clock)
-	: input_merger_device(mconfig,	INPUT_MERGER_ACTIVE_LOW, "Input Merger (Active Low)", tag, owner, clock, "input_merger_lo", __FILE__)
+input_merger_active_low_device::input_merger_active_low_device(machine_config const &mconfig, char const *tag, device_t *owner, UINT32 clock)
+	: input_merger_device(mconfig,  INPUT_MERGER_ACTIVE_LOW, "Input Merger (Active Low)", tag, owner, clock, "input_merger_lo", __FILE__)
 {
 }
 

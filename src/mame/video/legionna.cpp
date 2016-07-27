@@ -13,8 +13,8 @@
     - MBK
     - OBJ 3
     - LBK
-	TODO: Anything else doesn't match this scheme (most notably Denjin Makai), 
-	      guess it's selectable by PROM, CRTC or COP ...
+    TODO: Anything else doesn't match this scheme (most notably Denjin Makai),
+          guess it's selectable by PROM, CRTC or COP ...
 
 ***************************************************************************/
 
@@ -224,13 +224,13 @@ void legionna_state::common_video_allocate_ptr()
 	m_scrollram16 = std::make_unique<UINT16[]>(0x60/2);
 	m_sprite_xoffs = 0;
 	m_sprite_yoffs = 0;
-	
+
 	save_pointer(NAME(m_back_data.get()), 0x800/2);
 	save_pointer(NAME(m_fore_data.get()), 0x800/2);
 	save_pointer(NAME(m_mid_data.get()), 0x800/2);
 	save_pointer(NAME(m_textram.get()), 0x1000/2);
 	save_pointer(NAME(m_scrollram16.get()), 0x60/2);
-	
+
 	save_item(NAME(m_back_gfx_bank));
 	save_item(NAME(m_mid_gfx_bank));
 	save_item(NAME(m_fore_gfx_bank));
@@ -258,7 +258,7 @@ void legionna_state::common_video_start()
 VIDEO_START_MEMBER(legionna_state,legionna)
 {
 	common_video_start();
-	
+
 	m_sprite_pri_mask[0] = 0x0000;
 	m_sprite_pri_mask[1] = 0xfff0;
 	m_sprite_pri_mask[2] = 0xfffc;
@@ -282,7 +282,7 @@ VIDEO_START_MEMBER(legionna_state,godzilla)
 
 	m_has_extended_banking = 1;
 	m_has_extended_priority = 0;
-	
+
 	m_sprite_pri_mask[0] = 0xfff0;
 	m_sprite_pri_mask[1] = 0xfffc;
 	m_sprite_pri_mask[2] = 0xfffe;
@@ -293,7 +293,7 @@ VIDEO_START_MEMBER(legionna_state,godzilla)
 VIDEO_START_MEMBER(legionna_state,denjinmk)
 {
 	common_video_allocate_ptr();
-	
+
 	m_background_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_midground_layer =  &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info_denji),this), TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_foreground_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_fore_tile_info_denji),this),TILEMAP_SCAN_ROWS,16,16,32,32);
@@ -301,13 +301,13 @@ VIDEO_START_MEMBER(legionna_state,denjinmk)
 
 	m_has_extended_banking = 1;
 	m_has_extended_priority = 0;
-	
+
 	m_sprite_pri_mask[0] = 0xfff0; // normal sprites
 	m_sprite_pri_mask[1] = 0xfffc; // luna park horse rides
 	m_sprite_pri_mask[2] = 0xfffe; // door at the end of sewers part in level 1
 	m_sprite_pri_mask[3] = 0x0000; // briefing guy in pre-stage and portraits before a boss fight
-	
-//	m_background_layer->set_transparent_pen(15);
+
+//  m_background_layer->set_transparent_pen(15);
 	m_midground_layer->set_transparent_pen(15);
 	m_foreground_layer->set_transparent_pen(15);
 	m_text_layer->set_transparent_pen(7);//?
@@ -420,21 +420,21 @@ void legionna_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 			pri_mask = m_sprite_pri_mask[cur_pri];
 			#if 0
 			static UINT8 pri_test;
-			
+
 			if(machine().input().code_pressed_once(KEYCODE_A))
 				pri_test++;
-				
+
 			if(machine().input().code_pressed_once(KEYCODE_A))
 				pri_test--;
 
 			pri_test&=3;
 			popmessage("%02x",pri_test);
-			
+
 			// quick and dirty priority tester
 			if(cur_pri == pri_test)
 			{
 				static UINT16 test = 0xffff;
-				
+
 				if(machine().input().code_pressed_once(KEYCODE_Q))
 					test^=1;
 
@@ -457,7 +457,7 @@ void legionna_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 					test^=0x40;
 
 				if(machine().input().code_pressed_once(KEYCODE_I))
-					test^=0x80;				
+					test^=0x80;
 
 				pri_mask = 0xffff & test;
 				data = (data & 0xffc0) | (machine().rand() & 0x3f);
@@ -592,7 +592,7 @@ UINT32 legionna_state::screen_update_heatbrl(screen_device &screen, bitmap_ind16
 	/* Setup the tilemaps */
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->black_pen(), cliprect);    /* wrong color? */
-	
+
 	// TODO: priority order is different than anything else?
 	if (!(m_layer_disable&0x0004)) m_foreground_layer->draw(screen, bitmap, cliprect, 0, 0);
 	if (!(m_layer_disable&0x0002)) m_midground_layer->draw(screen, bitmap, cliprect, 0, 1);

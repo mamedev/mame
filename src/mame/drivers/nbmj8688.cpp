@@ -2210,7 +2210,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ojousan )
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SWA:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SWA:1,2,3")
 	PORT_DIPSETTING(    0x07, "1 (Easy)" )
 	PORT_DIPSETTING(    0x06, "2" )
 	PORT_DIPSETTING(    0x05, "3" )
@@ -2219,10 +2219,10 @@ static INPUT_PORTS_START( ojousan )
 	PORT_DIPSETTING(    0x02, "6" )
 	PORT_DIPSETTING(    0x01, "7" )
 	PORT_DIPSETTING(    0x00, "8 (Hard)" )
-	PORT_DIPNAME( 0x08, 0x00, "RENCHAN after TENPAIed RYUKYOKU" )	PORT_DIPLOCATION("SWA:4")
+	PORT_DIPNAME( 0x08, 0x00, "RENCHAN after TENPAIed RYUKYOKU" )   PORT_DIPLOCATION("SWA:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Character Display Test" )		PORT_DIPLOCATION("SWA:5")
+	PORT_DIPNAME( 0x10, 0x10, "Character Display Test" )        PORT_DIPLOCATION("SWA:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SWA:6" )
@@ -3029,7 +3029,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( swinggal, ojousan )
 
-        MCFG_CPU_MODIFY("maincpu")
+		MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(secolove_map)
 	MCFG_CPU_IO_MAP(iemoto_io_map)
 MACHINE_CONFIG_END
@@ -3560,23 +3560,23 @@ ROM_START( ojousanm )
 ROM_END
 
 ROM_START( swinggal )
-        ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
-        ROM_LOAD( "1.4G",    0x00000, 0x08000, CRC(e0e94bb9) SHA1(f514993614376c2175e906eab2776567e0c32f67) )
-        ROM_LOAD( "2.3G",    0x08000, 0x08000, CRC(577d786e) SHA1(e47e78d8607be0e41c2b220eb367f67e5e19c481) )
+		ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
+		ROM_LOAD( "1.4G",    0x00000, 0x08000, CRC(e0e94bb9) SHA1(f514993614376c2175e906eab2776567e0c32f67) )
+		ROM_LOAD( "2.3G",    0x08000, 0x08000, CRC(577d786e) SHA1(e47e78d8607be0e41c2b220eb367f67e5e19c481) )
 
-        ROM_REGION( 0x30000, "voice", 0 ) /* voice */
-        ROM_LOAD( "3I", 0x00000, 0x10000, CRC(b15ac0c4) SHA1(88c7a0be533465fc9c6833e52bcb1729c2307d06) )
-        ROM_LOAD( "2I", 0x10000, 0x10000, CRC(ff44d460) SHA1(cd070b6b48cfafa67e9fe778a2a31e623caa3ddd) )
-        ROM_LOAD( "1I", 0x20000, 0x10000, CRC(05294295) SHA1(bb2114dccc94545664c10a9e32ebd87eed59865c) )
+		ROM_REGION( 0x30000, "voice", 0 ) /* voice */
+		ROM_LOAD( "3I", 0x00000, 0x10000, CRC(b15ac0c4) SHA1(88c7a0be533465fc9c6833e52bcb1729c2307d06) )
+		ROM_LOAD( "2I", 0x10000, 0x10000, CRC(ff44d460) SHA1(cd070b6b48cfafa67e9fe778a2a31e623caa3ddd) )
+		ROM_LOAD( "1I", 0x20000, 0x10000, CRC(05294295) SHA1(bb2114dccc94545664c10a9e32ebd87eed59865c) )
 
-        ROM_REGION( 0x1c0000, "gfx1", 0 ) /* gfx */
-        /* 000000-0fffff empty */
-        ROM_LOAD( "3.5A",    0x100000, 0x20000, CRC(c1f49332) SHA1(35e4db593ab54b0ab6734a377cc2ed1c8670314c) )
-        ROM_LOAD( "4.6A",    0x120000, 0x20000, CRC(f9bac001) SHA1(3aa707c75c27b968303bb8bc007e5da872a807f5) )
-        ROM_LOAD( "5.7A",    0x140000, 0x20000, CRC(d9ec3418) SHA1(0d29d800a821b6806dc6b9d5a7aaa0939346ddc4) )
-        ROM_LOAD( "6.8A",    0x160000, 0x20000, CRC(5a966741) SHA1(c122ada315f09b0851947e9efd67e0a11663cf66) )
-        ROM_LOAD( "7.9A",    0x180000, 0x20000, CRC(93abe5c5) SHA1(d71da2ded70726af0aa1ee751fbab758326447ab) )
-        ROM_LOAD( "8.10A",   0x1a0000, 0x20000, CRC(010d353d) SHA1(5ea7fd6f26f6ad484bb6e07e66e8c25d178ac037) )
+		ROM_REGION( 0x1c0000, "gfx1", 0 ) /* gfx */
+		/* 000000-0fffff empty */
+		ROM_LOAD( "3.5A",    0x100000, 0x20000, CRC(c1f49332) SHA1(35e4db593ab54b0ab6734a377cc2ed1c8670314c) )
+		ROM_LOAD( "4.6A",    0x120000, 0x20000, CRC(f9bac001) SHA1(3aa707c75c27b968303bb8bc007e5da872a807f5) )
+		ROM_LOAD( "5.7A",    0x140000, 0x20000, CRC(d9ec3418) SHA1(0d29d800a821b6806dc6b9d5a7aaa0939346ddc4) )
+		ROM_LOAD( "6.8A",    0x160000, 0x20000, CRC(5a966741) SHA1(c122ada315f09b0851947e9efd67e0a11663cf66) )
+		ROM_LOAD( "7.9A",    0x180000, 0x20000, CRC(93abe5c5) SHA1(d71da2ded70726af0aa1ee751fbab758326447ab) )
+		ROM_LOAD( "8.10A",   0x1a0000, 0x20000, CRC(010d353d) SHA1(5ea7fd6f26f6ad484bb6e07e66e8c25d178ac037) )
 ROM_END
 
 ROM_START( bijokkog )
@@ -4060,7 +4060,7 @@ GAME( 1987, iemotom,  iemoto,   iemotom,         iemotom,  driver_device,  0,   
 GAME( 1987, ryuuha,   iemoto,   ryuuha,          ryuuha,   driver_device,  0,        ROT0, "Central Denshi", "Ryuuha [BET] (Japan 871027)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ojousan,  0,        ojousan,         ojousan,  driver_device,  0,        ROT0, "Nichibutsu",     "Ojousan (Japan 871204)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ojousanm, ojousan,  ojousanm,        ojousanm, driver_device,  0,        ROT0, "Nichibutsu",     "Ojousan [BET] (Japan 870108)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, swinggal, 0,	swinggal,	 ryuuha,   driver_device,  0,	     ROT0, "Digital Denshi", "Swing Gal [BET] (Japan 871221)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, swinggal, 0,    swinggal,    ryuuha,   driver_device,  0,        ROT0, "Digital Denshi", "Swing Gal [BET] (Japan 871221)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, korinai,  0,        korinai,         korinai,  driver_device,  0,        ROT0, "Nichibutsu",     "Mahjong-zukino Korinai Menmen (Japan 880425)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, korinaim, korinai,  korinaim,        korinaim, driver_device,  0,        ROT0, "Nichibutsu",     "Mahjong-zukino Korinai Menmen [BET] (Japan 880920)", MACHINE_SUPPORTS_SAVE )
 

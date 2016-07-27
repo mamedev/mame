@@ -79,7 +79,7 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 // printf("TAG %lld %s%s Data:%d\n", machine().firstcpu->total_cycles(), __PRETTY_FUNCTION__, m_owner->tag(), data);
 
 #define VERBOSE 0
-#define LOGPRINT(x) do { if (VERBOSE) logerror x; } while (0) 
+#define LOGPRINT(x) do { if (VERBOSE) logerror x; } while (0)
 #define LOG(x) LOGPRINT(x)
 #define LOGR(x)
 #define LOGSETUP(x) LOGPRINT(x)
@@ -1602,7 +1602,7 @@ void z80scc_channel::do_sccreg_wr4(UINT8 data)
 	if (data == m_wr4)
 	{
 		logerror("- supressing reinit of Tx as write to wr4 is identical to previous value\n");
-	} 
+	}
 	else
 	{
 		m_wr4 = data;
@@ -1622,7 +1622,7 @@ void z80scc_channel::do_sccreg_wr5(UINT8 data)
 	if (data == m_wr5)
 	{
 		logerror("- supressing reinit of Tx as write to wr5 is identical to previous value\n");
-	} 
+	}
 	else
 	{
 		m_wr5 = data;
@@ -1962,22 +1962,22 @@ void z80scc_channel::control_write(UINT8 data)
 	/* TODO. Sort out 80X30 & other SCC variants limitations in register access */
 	switch (reg)
 	{
-	case REG_WR0_COMMAND_REGPT:		do_sccreg_wr0(data); break;
-	case REG_WR1_INT_DMA_ENABLE:	do_sccreg_wr1(data); m_uart->check_interrupts(); break;
-	case REG_WR2_INT_VECTOR:		do_sccreg_wr2(data); break;
-	case REG_WR3_RX_CONTROL:		do_sccreg_wr3(data); break;
-	case REG_WR4_RX_TX_MODES:		do_sccreg_wr4(data); break;
-	case REG_WR5_TX_CONTROL:		do_sccreg_wr5(data); break;
-	case REG_WR6_SYNC_OR_SDLC_A:	do_sccreg_wr6(data); break;
-	case REG_WR7_SYNC_OR_SDLC_F:	do_sccreg_wr7(data); break;
-	case REG_WR8_TRANSMIT_DATA:		do_sccreg_wr8(data); break;
-	case REG_WR9_MASTER_INT_CTRL:	do_sccreg_wr9(data); break;
-	case REG_WR10_MSC_RX_TX_CTRL:	do_sccreg_wr10(data); break;
-	case REG_WR11_CLOCK_MODES:		do_sccreg_wr11(data); break;
-	case REG_WR12_LO_BAUD_GEN:		do_sccreg_wr12(data); break;
-	case REG_WR13_HI_BAUD_GEN:		do_sccreg_wr13(data); break;
-	case REG_WR14_MISC_CTRL:		do_sccreg_wr14(data); break;
-	case REG_WR15_EXT_ST_INT_CTRL:	do_sccreg_wr15(data); break;
+	case REG_WR0_COMMAND_REGPT:     do_sccreg_wr0(data); break;
+	case REG_WR1_INT_DMA_ENABLE:    do_sccreg_wr1(data); m_uart->check_interrupts(); break;
+	case REG_WR2_INT_VECTOR:        do_sccreg_wr2(data); break;
+	case REG_WR3_RX_CONTROL:        do_sccreg_wr3(data); break;
+	case REG_WR4_RX_TX_MODES:       do_sccreg_wr4(data); break;
+	case REG_WR5_TX_CONTROL:        do_sccreg_wr5(data); break;
+	case REG_WR6_SYNC_OR_SDLC_A:    do_sccreg_wr6(data); break;
+	case REG_WR7_SYNC_OR_SDLC_F:    do_sccreg_wr7(data); break;
+	case REG_WR8_TRANSMIT_DATA:     do_sccreg_wr8(data); break;
+	case REG_WR9_MASTER_INT_CTRL:   do_sccreg_wr9(data); break;
+	case REG_WR10_MSC_RX_TX_CTRL:   do_sccreg_wr10(data); break;
+	case REG_WR11_CLOCK_MODES:      do_sccreg_wr11(data); break;
+	case REG_WR12_LO_BAUD_GEN:      do_sccreg_wr12(data); break;
+	case REG_WR13_HI_BAUD_GEN:      do_sccreg_wr13(data); break;
+	case REG_WR14_MISC_CTRL:        do_sccreg_wr14(data); break;
+	case REG_WR15_EXT_ST_INT_CTRL:  do_sccreg_wr15(data); break;
 	default:
 		logerror("\"%s\": %c : Unsupported WRx register:%02x\n", m_owner->tag(), 'A' + m_index, reg);
 	}
@@ -2361,14 +2361,14 @@ WRITE_LINE_MEMBER( z80scc_channel::txc_w )
 }
 
 //--------------------------------------------------------------------------------------------------------
-//  safe_transmit_register_reset -  wait for the transmitter shift register to be 
-//	 emptied before apply the new value of wr5 and/or wr4. In the case of a Tx FIFO 
+//  safe_transmit_register_reset -  wait for the transmitter shift register to be
+//   emptied before apply the new value of wr5 and/or wr4. In the case of a Tx FIFO
 //   the change will occur before next character is started. From the specification:
 //
 //   "The character length may be changed on the fly, but the desired length must be selected before the
 //   character is loaded into the Transmit Shift register from the transmit data FIFO. The easiest way to
 //   ensure this is to write to WR5 to change the character length before writing the data to the transmit
-//   buffer." 
+//   buffer."
 //
 //  Right now we only detect the problem and log an error
 //---------------------------------------------------------------------------------------------------------
@@ -2424,11 +2424,11 @@ void z80scc_channel::update_serial()
 
 	if (m_brg_rate != 0 || m_wr14 & WR14_BRG_ENABLE)
 	{
-		if (m_brg_rate == 1) 
+		if (m_brg_rate == 1)
 		{
 			m_brg_rate = 0; // BRG beeing disabled
 		}
-		else // or enabled 
+		else // or enabled
 		{
 			m_brg_const = 2 + (m_wr13 << 8 | m_wr12);
 			int rate = m_owner->clock() / (m_brg_const == 0 ? 1 : m_brg_const);

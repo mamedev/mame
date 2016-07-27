@@ -19,13 +19,12 @@
 
 
 namespace util {
-
 /***************************************************************************
-	option_resolution
+    option_resolution
 ***************************************************************************/
 
 // -------------------------------------------------
-//	entry::int_value
+//  entry::int_value
 // -------------------------------------------------
 
 int option_resolution::entry::int_value() const
@@ -35,7 +34,7 @@ int option_resolution::entry::int_value() const
 
 
 // -------------------------------------------------
-//	entry::set_int_value
+//  entry::set_int_value
 // -------------------------------------------------
 
 void option_resolution::entry::set_int_value(int i)
@@ -45,7 +44,7 @@ void option_resolution::entry::set_int_value(int i)
 
 
 // -------------------------------------------------
-//	resolve_single_param
+//  resolve_single_param
 // -------------------------------------------------
 
 option_resolution::error option_resolution::resolve_single_param(const char *specification, option_resolution::entry *param_value,
@@ -181,7 +180,7 @@ option_resolution::error option_resolution::resolve_single_param(const char *spe
 
 
 // -------------------------------------------------
-//	lookup_in_specification
+//  lookup_in_specification
 // -------------------------------------------------
 
 const char *option_resolution::lookup_in_specification(const char *specification, const option_guide *option)
@@ -193,7 +192,7 @@ const char *option_resolution::lookup_in_specification(const char *specification
 
 
 // -------------------------------------------------
-//	ctor
+//  ctor
 // -------------------------------------------------
 
 option_resolution::option_resolution(const option_guide *guide, const char *specification)
@@ -204,14 +203,14 @@ option_resolution::option_resolution(const option_guide *guide, const char *spec
 
 	assert(guide);
 
-	// first count the number of options specified in the guide 
+	// first count the number of options specified in the guide
 	option_count = count_options(guide, specification);
 
 	// set up the entries list
 	m_specification = specification;
 	m_entries.resize(option_count);
 
-	// initialize each of the entries 
+	// initialize each of the entries
 	opt = 0;
 	guide_entry = guide;
 	while(guide_entry->option_type != OPTIONTYPE_END)
@@ -239,7 +238,7 @@ option_resolution::option_resolution(const option_guide *guide, const char *spec
 
 
 // -------------------------------------------------
-//	dtor
+//  dtor
 // -------------------------------------------------
 
 option_resolution::~option_resolution()
@@ -248,7 +247,7 @@ option_resolution::~option_resolution()
 
 
 // -------------------------------------------------
-//	add_param
+//  add_param
 // -------------------------------------------------
 
 option_resolution::error option_resolution::add_param(const char *param, const std::string &value)
@@ -325,7 +324,7 @@ option_resolution::error option_resolution::add_param(const char *param, const s
 
 
 // -------------------------------------------------
-//	finish
+//  finish
 // -------------------------------------------------
 
 option_resolution::error option_resolution::finish()
@@ -364,7 +363,7 @@ option_resolution::error option_resolution::finish()
 
 
 // -------------------------------------------------
-//	lookup_entry
+//  lookup_entry
 // -------------------------------------------------
 
 const option_resolution::entry *option_resolution::lookup_entry(int option_char) const
@@ -389,7 +388,7 @@ const option_resolution::entry *option_resolution::lookup_entry(int option_char)
 
 
 // -------------------------------------------------
-//	lookup_int
+//  lookup_int
 // -------------------------------------------------
 
 int option_resolution::lookup_int(int option_char) const
@@ -400,7 +399,7 @@ int option_resolution::lookup_int(int option_char) const
 
 
 // -------------------------------------------------
-//	lookup_string
+//  lookup_string
 // -------------------------------------------------
 
 const char *option_resolution::lookup_string(int option_char) const
@@ -411,7 +410,7 @@ const char *option_resolution::lookup_string(int option_char) const
 
 
 // -------------------------------------------------
-//	find_option
+//  find_option
 // -------------------------------------------------
 
 const option_guide *option_resolution::find_option(int option_char) const
@@ -422,7 +421,7 @@ const option_guide *option_resolution::find_option(int option_char) const
 
 
 // -------------------------------------------------
-//	index_option
+//  index_option
 // -------------------------------------------------
 
 const option_guide *option_resolution::index_option(int indx) const
@@ -434,7 +433,7 @@ const option_guide *option_resolution::index_option(int indx) const
 
 
 // -------------------------------------------------
-//	count_options
+//  count_options
 // -------------------------------------------------
 
 size_t option_resolution::count_options(const option_guide *guide, const char *specification)
@@ -463,7 +462,7 @@ size_t option_resolution::count_options(const option_guide *guide, const char *s
 
 
 // -------------------------------------------------
-//	list_ranges
+//  list_ranges
 // -------------------------------------------------
 
 option_resolution::error option_resolution::list_ranges(const char *specification, int option_char, range *range, size_t range_count)
@@ -485,7 +484,7 @@ option_resolution::error option_resolution::list_ranges(const char *specificatio
 
 
 // -------------------------------------------------
-//	get_default
+//  get_default
 // -------------------------------------------------
 
 option_resolution::error option_resolution::get_default(const char *specification, int option_char, int *val)
@@ -509,7 +508,7 @@ option_resolution::error option_resolution::get_default(const char *specificatio
 
 
 // -------------------------------------------------
-//	list_ranges
+//  list_ranges
 // -------------------------------------------------
 
 option_resolution::error option_resolution::is_valid_value(const char *specification, int option_char, int val)
@@ -532,7 +531,7 @@ option_resolution::error option_resolution::is_valid_value(const char *specifica
 
 
 // -------------------------------------------------
-//	contains
+//  contains
 // -------------------------------------------------
 
 bool option_resolution::contains(const char *specification, int option_char)
@@ -542,22 +541,22 @@ bool option_resolution::contains(const char *specification, int option_char)
 
 
 // -------------------------------------------------
-//	error_string
+//  error_string
 // -------------------------------------------------
 
 const char *option_resolution::error_string(option_resolution::error err)
 {
 	switch (err)
 	{
-	case error::SUCCESS:				return "The operation completed successfully";
-	case error::OUTOFMEMORY:			return "Out of memory";
-	case error::PARAMOUTOFRANGE:		return "Parameter out of range";
-	case error::PARAMNOTSPECIFIED:		return "Parameter not specified";
-	case error::PARAMNOTFOUND:			return "Unknown parameter";
-	case error::PARAMALREADYSPECIFIED:	return "Parameter specified multiple times";
-	case error::BADPARAM:				return "Invalid parameter";
-	case error::SYNTAX:					return "Syntax error";
-	case error::INTERNAL:				return "Internal error";
+	case error::SUCCESS:                return "The operation completed successfully";
+	case error::OUTOFMEMORY:            return "Out of memory";
+	case error::PARAMOUTOFRANGE:        return "Parameter out of range";
+	case error::PARAMNOTSPECIFIED:      return "Parameter not specified";
+	case error::PARAMNOTFOUND:          return "Unknown parameter";
+	case error::PARAMALREADYSPECIFIED:  return "Parameter specified multiple times";
+	case error::BADPARAM:               return "Invalid parameter";
+	case error::SYNTAX:                 return "Syntax error";
+	case error::INTERNAL:               return "Internal error";
 	}
 	return nullptr;
 }
