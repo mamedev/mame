@@ -502,7 +502,7 @@ C1066 - ??
 		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1049" />
 		<part name="cart" interface="gamate_cart">
-			<dataarea name="rom" size="131072">
+			<dataarea name="rom" size="65536">
 				<rom name="c1-049.bin" size="65536" crc="aa2e0d32" sha1="1b3082be0698c12c8fc978db6a0c63c8958c33f8" offset="0" />
 			</dataarea>
 		</part>
@@ -610,7 +610,7 @@ C1066 - ??
 		<publisher>Unknown</publisher>
 		<info name="serial" value="C1063" />
 		<part name="cart" interface="gamate_cart">
-			<dataarea name="rom" size="524288">
+			<dataarea name="rom" size="262144">
 				<rom name="c1-063.bin" size="262144" crc="93d5f365" sha1="91b9b9060b76d2012d5cbc6523839f67caa37aaf" offset="0" />
 			</dataarea>
 		</part>
