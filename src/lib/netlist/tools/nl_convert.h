@@ -23,7 +23,7 @@ class nl_convert_base_t
 {
 public:
 
-	nl_convert_base_t() : out(m_buf) {}
+	nl_convert_base_t() : out(m_buf), m_numberchars("0123456789-+e.") {}
 	virtual ~nl_convert_base_t()
 	{
 		m_nets.clear();
@@ -136,6 +136,7 @@ private:
 	std::unordered_map<pstring, std::unique_ptr<pin_alias_t>> m_pins;
 
 	static unit_t m_units[];
+	pstring m_numberchars;
 
 };
 

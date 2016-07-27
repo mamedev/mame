@@ -60,7 +60,7 @@ void hp_optrom_slot_device::device_config_complete()
 bool hp_optrom_slot_device::call_load()
 {
 		logerror("hp_optrom: call_load\n");
-		if (m_cart == nullptr || !m_from_swlist) {
+		if (m_cart == nullptr || !loaded_through_softlist()) {
 				logerror("hp_optrom: must be loaded from sw list\n");
 				return IMAGE_INIT_FAIL;
 		}
@@ -124,13 +124,6 @@ void hp_optrom_slot_device::call_unload()
 				m_base_addr = 0;
 				m_end_addr = 0;
 		}
-}
-
-bool hp_optrom_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-		logerror("hp_optrom: call_softlist_load\n");
-		machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
-		return TRUE;
 }
 
 std::string hp_optrom_slot_device::get_default_card_software()

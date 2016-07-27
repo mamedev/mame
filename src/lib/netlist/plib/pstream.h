@@ -27,7 +27,7 @@ public:
 
 	using pos_type = std::size_t;
 
-	static constexpr pos_type SEEK_EOF = (pos_type) -1;
+	static constexpr pos_type SEEK_EOF = static_cast<pos_type>(-1);
 
 	explicit pstream(const unsigned flags) : m_flags(flags)
 	{
@@ -92,14 +92,14 @@ public:
 		return (read(&b, 1) == 1);
 	}
 
-	unsigned read(void *buf, const unsigned n)
+	pos_type read(void *buf, const unsigned n)
 	{
 		return vread(buf, n);
 	}
 
 protected:
 	/* read up to n bytes from stream */
-	virtual unsigned vread(void *buf, const unsigned n) = 0;
+	virtual pos_type vread(void *buf, const pos_type n) = 0;
 
 private:
 	pstringbuffer m_linebuf;
@@ -135,7 +135,7 @@ public:
 		write(&c, 1);
 	}
 
-	void write(const void *buf, const unsigned n)
+	void write(const void *buf, const pos_type n)
 	{
 		vwrite(buf, n);
 	}
@@ -144,7 +144,7 @@ public:
 
 protected:
 	/* write n bytes to stream */
-	virtual void vwrite(const void *buf, const unsigned n) = 0;
+	virtual void vwrite(const void *buf, const pos_type n) = 0;
 
 private:
 };
@@ -162,11 +162,11 @@ public:
 	virtual ~pomemstream();
 
 	char *memory() const { return m_mem; }
-	unsigned size() const { return m_size; }
+	pos_type size() const { return m_size; }
 
 protected:
 	/* write n bytes to stream */
-	virtual void vwrite(const void *buf, const unsigned n) override;
+	virtual void vwrite(const void *buf, const pos_type) override;
 	virtual void vseek(const pos_type n) override;
 	virtual pos_type vtell() override;
 
@@ -190,7 +190,7 @@ public:
 
 protected:
 	/* write n bytes to stream */
-	virtual void vwrite(const void *buf, const unsigned n) override
+	virtual void vwrite(const void *buf, const pos_type n) override
 	{
 		m_buf.cat(buf, n);
 	}
@@ -216,7 +216,7 @@ public:
 protected:
 	pofilestream(void *file, const pstring name, const bool do_close);
 	/* write n bytes to stream */
-	virtual void vwrite(const void *buf, const unsigned n) override;
+	virtual void vwrite(const void *buf, const pos_type n) override;
 	virtual void vseek(const pos_type n) override;
 	virtual pos_type vtell() override;
 
@@ -267,7 +267,7 @@ protected:
 	pifilestream(void *file, const pstring name, const bool do_close);
 
 	/* read up to n bytes from stream */
-	virtual unsigned vread(void *buf, const unsigned n) override;
+	virtual pos_type vread(void *buf, const pos_type n) override;
 	virtual void vseek(const pos_type n) override;
 	virtual pos_type vtell() override;
 
@@ -307,14 +307,14 @@ public:
 
 protected:
 	/* read up to n bytes from stream */
-	virtual unsigned vread(void *buf, const unsigned n) override;
+	virtual pos_type vread(void *buf, const pos_type n) override;
 	virtual void vseek(const pos_type n) override;
 	virtual pos_type vtell() override;
 
 private:
 	pos_type m_pos;
 	pos_type m_len;
-	char *m_mem;
+	const char *m_mem;
 };
 
 // -----------------------------------------------------------------------------

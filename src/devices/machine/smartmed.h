@@ -216,7 +216,7 @@ public:
 
 	virtual bool call_load() override;
 	virtual void call_unload() override;
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override { return load_software(swlist, swname, start_entry); }
+	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
 protected:
 	// device-level overrides

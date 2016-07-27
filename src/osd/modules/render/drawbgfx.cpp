@@ -235,6 +235,12 @@ int renderer_bgfx::create()
 	m_screen_effect[2] = m_effects->effect("screen_multiply");
 	m_screen_effect[3] = m_effects->effect("screen_add");
 
+	if (   m_gui_effect[0] == nullptr ||    m_gui_effect[1] == nullptr ||    m_gui_effect[2] == nullptr ||    m_gui_effect[3] == nullptr ||
+		m_screen_effect[0] == nullptr || m_screen_effect[1] == nullptr || m_screen_effect[2] == nullptr || m_screen_effect[3] == nullptr)
+	{
+		fatalerror("BGFX: Unable to load required shaders. Please check and reinstall the %s folder\n", m_options.bgfx_path());
+	}
+
 	m_chains = new chain_manager(win->machine(), m_options, *m_textures, *m_targets, *m_effects, win->m_index, *this);
 	m_sliders_dirty = true;
 
@@ -281,6 +287,20 @@ void renderer_bgfx::record()
 		m_avi_target = m_targets->create_target("avibuffer", bgfx::TextureFormat::RGBA8, m_width[0], m_height[0], TARGET_STYLE_CUSTOM, false, true, 1, 0);
 		m_avi_texture = bgfx::createTexture2D(m_width[0], m_height[0], 1, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_BLIT_DST | BGFX_TEXTURE_READ_BACK);
 	}
+}
+
+bool renderer_bgfx::init(running_machine &machine)
+{
+	const char *bgfx_path = downcast<osd_options &>(machine.options()).bgfx_path();
+
+	osd::directory::ptr directory = osd::directory::open(bgfx_path);
+	if (directory == nullptr)
+	{
+		osd_printf_verbose("Unable to find the %s folder. Please reinstall it to use the BGFX renderer\n", bgfx_path);
+		return true;
+	}
+
+	return false;
 }
 
 void renderer_bgfx::exit()

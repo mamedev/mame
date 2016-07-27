@@ -198,13 +198,6 @@ void msx_slot_cartridge_device::call_unload()
 }
 
 
-bool msx_slot_cartridge_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
-	return true;
-}
-
-
 WRITE_LINE_MEMBER(msx_slot_cartridge_device::irq_out)
 {
 	m_irq_handler(state);

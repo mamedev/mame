@@ -956,6 +956,7 @@
 		<description>The Sentinel</description>
 		<year>1986</year>
 		<publisher>Firebird</publisher>
+		<info name="author" value="Geoff Crammond" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="78834">
 				<rom name="073 the sentinel.fsd" size="78834" crc="ca2e8436" sha1="54fc3d458c86f571f43214e760408fccc190bc1a" offset="0" />
@@ -1341,6 +1342,7 @@
 		<description>Cholo</description>
 		<year>1986</year>
 		<publisher>Firebird</publisher>
+		<info name="author" value="Solid Image" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="105072">
 				<rom name="135 cholo.fsd" size="105072" crc="8f23bd24" sha1="464bec1cf14d34f902d783e62f7ea4789458cee8" offset="0" />
@@ -3887,7 +3889,7 @@
 
 	<software name="mathsnap">
 		<description>Maths Snap</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="105077">
@@ -3920,7 +3922,7 @@
 
 	<software name="wbuild">
 		<description>Word Builder</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="105079">
@@ -4069,7 +4071,7 @@
 
 	<software name="magice">
 		<description>Magic E</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="107122">
@@ -4080,7 +4082,7 @@
 
 	<software name="storysta">
 		<description>Story Starts</description>
-		<year>198?</year>
+		<year>1986</year>
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="1 The House on the Hill"/>
@@ -4272,7 +4274,7 @@
 
 	<software name="anialpha">
 		<description>The Animated Alphabet</description>
-		<year>198?</year>
+		<year>1988</year>
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side 0"/>
@@ -4366,7 +4368,7 @@
 
 	<software name="typesett">
 		<description>Typesetter!</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Startup Disk"/>

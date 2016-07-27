@@ -50,7 +50,7 @@ ROM_END
 //-------------------------------------------------
 
 //static ADDRESS_MAP_START( m2105_mem, AS_IO, 8, electron_m2105_device )
-//	AM_RANGE(0x30000, 0x3ffff) AM_MIRROR(0x4000) AM_ROM AM_REGION("m2105_rom", 0)
+//  AM_RANGE(0x30000, 0x3ffff) AM_MIRROR(0x4000) AM_ROM AM_REGION("m2105_rom", 0)
 //ADDRESS_MAP_END
 
 
@@ -127,7 +127,7 @@ const rom_entry *electron_m2105_device::device_rom_region() const
 //-------------------------------------------------
 
 electron_m2105_device::electron_m2105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ELECTRON_M2105, "BT Merlin M2105", tag, owner, clock, "electron_m2105", __FILE__),
+	: device_t(mconfig, ELECTRON_M2105, "Acorn M2105 Expansion", tag, owner, clock, "electron_m2105", __FILE__),
 		device_electron_expansion_interface(mconfig, *this),
 		m_exp_rom(*this, "exp_rom"),
 		m_via6522_0(*this, "via6522_0"),

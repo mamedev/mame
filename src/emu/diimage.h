@@ -21,6 +21,8 @@
 #include <string>
 #include <vector>
 
+#include "softlist.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -86,10 +88,10 @@ public:
 	const std::string &optspec() const { return m_optspec; }
 
 private:
-	std::string					m_name;
-	std::string					m_description;
-	std::vector<std::string>	m_extensions;
-	std::string					m_optspec;
+	std::string                 m_name;
+	std::string                 m_description;
+	std::vector<std::string>    m_extensions;
+	std::string                 m_optspec;
 };
 
 
@@ -102,7 +104,7 @@ class software_info;
 typedef delegate<int (device_image_interface &)> device_image_load_delegate;
 typedef delegate<void (device_image_interface &)> device_image_func_delegate;
 // legacy
-typedef void (*device_image_partialhash_func)(hash_collection &, const unsigned char *, unsigned long, const char *);
+typedef void (*device_image_partialhash_func)(util::hash_collection &, const unsigned char *, unsigned long, const char *);
 
 //**************************************************************************
 //  MACROS
@@ -145,10 +147,9 @@ public:
 	static const char *device_brieftypename(iodevice_t type);
 	static iodevice_t device_typeid(const char *name);
 
-	virtual void device_compute_hash(hash_collection &hashes, const void *data, size_t length, const char *types) const;
+	virtual void device_compute_hash(util::hash_collection &hashes, const void *data, size_t length, const char *types) const;
 
 	virtual bool call_load() { return FALSE; }
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) { return FALSE; }
 	virtual bool call_create(int format_type, util::option_resolution *format_options) { return FALSE; }
 	virtual void call_unload() { }
 	virtual std::string call_display() { return std::string(); }
@@ -204,6 +205,7 @@ public:
 	const software_info *software_entry() const { return m_software_info_ptr; }
 	const software_part *part_entry() const { return m_software_part_ptr; }
 	const char *software_list_name() const { return m_software_list_name.c_str(); }
+	bool loaded_through_softlist() const { return m_software_info_ptr != nullptr; }
 
 	void set_working_directory(const char *working_directory) { m_working_directory = working_directory; }
 	const char * working_directory();
@@ -214,7 +216,7 @@ public:
 	bool load_software_region(const char *tag, optional_shared_ptr<UINT8> &ptr);
 
 	UINT32 crc();
-	hash_collection& hash() { return m_hash; }
+	util::hash_collection& hash() { return m_hash; }
 
 	void battery_load(void *buffer, int length, int fill);
 	void battery_load(void *buffer, int length, void *def_buffer);
@@ -247,6 +249,8 @@ public:
 	bool user_loadable() const { return m_user_loadable; }
 
 protected:
+	virtual const software_list_loader &get_software_list_loader() const { return false_software_list_loader::instance(); }
+
 	bool load_internal(const char *path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load);
 	void determine_open_plan(int is_create, UINT32 *open_plan);
 	image_error_t load_image_by_path(UINT32 open_flags, const char *path);
@@ -262,12 +266,12 @@ protected:
 	void setup_working_directory();
 	bool try_change_working_directory(const char *subdir);
 
-	void run_hash(void (*partialhash)(hash_collection &, const unsigned char *, unsigned long, const char *), hash_collection &hashes, const char *types);
+	void run_hash(void (*partialhash)(util::hash_collection &, const unsigned char *, unsigned long, const char *), util::hash_collection &hashes, const char *types);
 	void image_checkhash();
 	void update_names(const device_type device_type = nullptr, const char *inst = nullptr, const char *brief = nullptr);
 
-	software_part *find_software_item(const char *path, bool restrict_to_interface) const;
-	bool load_software_part(const char *path, software_part *&swpart);
+	const software_part *find_software_item(const char *path, bool restrict_to_interface) const;
+	bool load_software_part(const char *path, const software_part *&swpart);
 	std::string software_get_default_slot(const char *default_card_slot) const;
 
 	// derived class overrides
@@ -293,8 +297,8 @@ protected:
 
 	/* Software information */
 	std::string m_full_software_name;
-	software_info *m_software_info_ptr;
-	software_part *m_software_part_ptr;
+	const software_info *m_software_info_ptr;
+	const software_part *m_software_part_ptr;
 	std::string m_software_list_name;
 
 	/* info read from the hash file/software list */
@@ -307,13 +311,12 @@ protected:
 	bool m_readonly;
 	bool m_created;
 	bool m_init_phase;
-	bool m_from_swlist;
 
 	/* special - used when creating */
 	int m_create_format;
 	util::option_resolution *m_create_args;
 
-	hash_collection m_hash;
+	util::hash_collection m_hash;
 
 	std::string m_brief_instance_name;
 	std::string m_instance_name;

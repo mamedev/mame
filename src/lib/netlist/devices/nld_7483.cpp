@@ -88,19 +88,19 @@ namespace netlist
 
 	NETLIB_UPDATE(7483)
 	{
-		uint_fast8_t a = (INPLOGIC(m_A1) << 0) | (INPLOGIC(m_A2) << 1) | (INPLOGIC(m_A3) << 2) | (INPLOGIC(m_A4) << 3);
-		uint_fast8_t b = (INPLOGIC(m_B1) << 0) | (INPLOGIC(m_B2) << 1) | (INPLOGIC(m_B3) << 2) | (INPLOGIC(m_B4) << 3);
+		netlist_sig_t a = (m_A1() << 0) | (m_A2() << 1) | (m_A3() << 2) | (m_A4() << 3);
+		netlist_sig_t b = (m_B1() << 0) | (m_B2() << 1) | (m_B3() << 2) | (m_B4() << 3);
 
-		uint_fast8_t r = a + b + INPLOGIC(m_C0);
+		unsigned r = a + b + m_C0();
 
 		if (r != m_lastr)
 		{
 			m_lastr = r;
-			OUTLOGIC(m_S1, (r >> 0) & 1, NLTIME_FROM_NS(23));
-			OUTLOGIC(m_S2, (r >> 1) & 1, NLTIME_FROM_NS(23));
-			OUTLOGIC(m_S3, (r >> 2) & 1, NLTIME_FROM_NS(23));
-			OUTLOGIC(m_S4, (r >> 3) & 1, NLTIME_FROM_NS(23));
-			OUTLOGIC(m_C4, (r >> 4) & 1, NLTIME_FROM_NS(23));
+			m_S1.push((r >> 0) & 1, NLTIME_FROM_NS(23));
+			m_S2.push((r >> 1) & 1, NLTIME_FROM_NS(23));
+			m_S3.push((r >> 2) & 1, NLTIME_FROM_NS(23));
+			m_S4.push((r >> 3) & 1, NLTIME_FROM_NS(23));
+			m_C4.push((r >> 4) & 1, NLTIME_FROM_NS(23));
 		}
 	}
 

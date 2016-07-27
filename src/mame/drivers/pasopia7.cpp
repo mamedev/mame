@@ -7,6 +7,9 @@
     preliminary driver by Angelo Salese
 
     TODO:
+    - fix problems with keyboard
+      - can't type the same character more than once
+      - shift key doesn't work
     - floppy support (but floppy images are unobtainable at current time)
     - cassette device;
     - beeper
@@ -33,33 +36,21 @@ class pasopia7_state : public driver_device
 {
 public:
 	pasopia7_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_ppi0(*this, "ppi8255_0"),
-	m_ppi1(*this, "ppi8255_1"),
-	m_ppi2(*this, "ppi8255_2"),
-	m_ctc(*this, "z80ctc"),
-	m_pio(*this, "z80pio"),
-	m_crtc(*this, "crtc"),
-	m_fdc(*this, "fdc"),
-	m_floppy(*this, "fdc:0:525hd"),
-	m_sn1(*this, "sn1"),
-	m_sn2(*this, "sn2"),
-	m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ppi0(*this, "ppi8255_0")
+		, m_ppi1(*this, "ppi8255_1")
+		, m_ppi2(*this, "ppi8255_2")
+		, m_ctc(*this, "z80ctc")
+		, m_pio(*this, "z80pio")
+		, m_crtc(*this, "crtc")
+		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:0:525hd")
+		, m_sn1(*this, "sn1")
+		, m_sn2(*this, "sn2")
+		, m_palette(*this, "palette")
+		, m_keyboard(*this, "KEY")
 	{ }
-
-	required_device<cpu_device> m_maincpu;
-	required_device<i8255_device> m_ppi0;
-	required_device<i8255_device> m_ppi1;
-	required_device<i8255_device> m_ppi2;
-	required_device<z80ctc_device> m_ctc;
-	required_device<z80pio_device> m_pio;
-	required_device<mc6845_device> m_crtc;
-	required_device<upd765a_device> m_fdc;
-	required_device<floppy_image_device> m_floppy;
-	required_device<sn76489a_device> m_sn1;
-	required_device<sn76489a_device> m_sn2;
-	required_device<palette_device> m_palette;
 
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
@@ -72,7 +63,6 @@ public:
 	DECLARE_WRITE8_MEMBER(pasopia7_io_w);
 	DECLARE_READ8_MEMBER(pasopia7_fdc_r);
 	DECLARE_WRITE8_MEMBER(pasopia7_fdc_w);
-	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_READ8_MEMBER(keyb_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_READ8_MEMBER(crtc_portb_r);
@@ -86,6 +76,14 @@ public:
 	DECLARE_WRITE8_MEMBER(nmi_reg_w);
 	DECLARE_READ8_MEMBER(nmi_porta_r);
 	DECLARE_READ8_MEMBER(nmi_portb_r);
+	TIMER_CALLBACK_MEMBER(pio_timer);
+	DECLARE_DRIVER_INIT(p7_lcd);
+	DECLARE_DRIVER_INIT(p7_raster);
+	DECLARE_VIDEO_START(pasopia7);
+	DECLARE_PALETTE_INIT(p7_lcd);
+	UINT32 screen_update_pasopia7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
 	UINT8 m_vram_sel;
 	UINT8 m_mio_sel;
 	std::unique_ptr<UINT8[]> m_p7_pal;
@@ -111,25 +109,32 @@ public:
 	int m_addr_latch;
 	void pasopia_nmi_trap();
 	UINT8 m_mux_data;
-	DECLARE_DRIVER_INIT(p7_lcd);
-	DECLARE_DRIVER_INIT(p7_raster);
 	virtual void machine_reset() override;
-	DECLARE_VIDEO_START(pasopia7);
-	DECLARE_PALETTE_INIT(p7_lcd);
-	UINT32 screen_update_pasopia7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	void fdc_irq(bool state);
-	TIMER_CALLBACK_MEMBER(pio_timer);
 	void draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width);
 	void draw_tv_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width);
 	void draw_mixed_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<i8255_device> m_ppi0;
+	required_device<i8255_device> m_ppi1;
+	required_device<i8255_device> m_ppi2;
+	required_device<z80ctc_device> m_ctc;
+	required_device<z80pio_device> m_pio;
+	required_device<mc6845_device> m_crtc;
+	required_device<upd765a_device> m_fdc;
+	required_device<floppy_image_device> m_floppy;
+	required_device<sn76489a_device> m_sn1;
+	required_device<sn76489a_device> m_sn2;
+	required_device<palette_device> m_palette;
+	required_ioport_array<12> m_keyboard;
 };
 
 #define VDP_CLOCK XTAL_3_579545MHz/4
 #define LCD_CLOCK VDP_CLOCK/10
 
 // needed to scan the keyboard, as the pio emulation doesn't do it.
-TIMER_CALLBACK_MEMBER(pasopia7_state::pio_timer)
+TIMER_CALLBACK_MEMBER( pasopia7_state::pio_timer )
 {
 	m_pio->port_b_write(keyb_r(generic_space(),0,0xff));
 }
@@ -728,28 +733,17 @@ static GFXDECODE_START( pasopia7 )
 	GFXDECODE_ENTRY( "kanji",  0x00000, p7_chars_16x16,  0, 0x10 )
 GFXDECODE_END
 
-READ8_MEMBER( pasopia7_state::mux_r )
-{
-	return m_mux_data;
-}
-
 READ8_MEMBER( pasopia7_state::keyb_r )
 {
-	const char *const keynames[3][4] = { { "KEY0", "KEY1", "KEY2", "KEY3" },
-											{ "KEY4", "KEY5", "KEY6", "KEY7" },
-											{ "KEY8", "KEY9", "KEYA", "KEYB" } };
-	int i,j;
-	UINT8 res;
-
-	res = 0;
+	UINT8 i,j,res = 0;
 	for(j=0;j<3;j++)
 	{
-		if(m_mux_data & 0x10 << j)
+		if BIT(m_mux_data, 4+j)
 		{
 			for(i=0;i<4;i++)
 			{
-				if(m_mux_data & 1 << i)
-					res |= ioport(keynames[j][i])->read();
+				if BIT(m_mux_data, i)
+					res |= m_keyboard[j*4+i]->read();
 			}
 		}
 	}
@@ -934,7 +928,6 @@ static MACHINE_CONFIG_START( p7_base, pasopia7_state )
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_4MHz)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(pasopia7_state, mux_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(pasopia7_state, mux_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8(pasopia7_state, keyb_r))
 
@@ -1050,13 +1043,13 @@ ROM_END
 DRIVER_INIT_MEMBER(pasopia7_state,p7_raster)
 {
 	m_screen_type = 1;
-	machine().scheduler().timer_pulse(attotime::from_hz(500), timer_expired_delegate(FUNC(pasopia7_state::pio_timer),this));
+	machine().scheduler().timer_pulse(attotime::from_hz(50), timer_expired_delegate(FUNC(pasopia7_state::pio_timer),this));
 }
 
 DRIVER_INIT_MEMBER(pasopia7_state,p7_lcd)
 {
 	m_screen_type = 0;
-	machine().scheduler().timer_pulse(attotime::from_hz(500), timer_expired_delegate(FUNC(pasopia7_state::pio_timer),this));
+	machine().scheduler().timer_pulse(attotime::from_hz(50), timer_expired_delegate(FUNC(pasopia7_state::pio_timer),this));
 }
 
 

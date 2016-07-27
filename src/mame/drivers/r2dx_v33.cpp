@@ -389,10 +389,9 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00434, 0x00435) AM_READ(r2dx_sin_r)
 	AM_RANGE(0x00436, 0x00437) AM_READ(r2dx_cos_r)
 
-	AM_RANGE(0x00600, 0x0064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
-//  AM_RANGE(0x00650, 0x0068f) AM_RAM //???
-
-	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // maybe a watchdog?
+	AM_RANGE(0x00600, 0x0063f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
+	//AM_RANGE(0x00640, 0x006bf) AM_DEVREADWRITE("obj", seibu_encrypted_sprite_device, read, write)
+	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // sprite buffering
 	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w) // could be encryption key uploads just like raiden2.c ?
 	AM_RANGE(0x006b2, 0x006b3) AM_WRITE(mcu_prog_w2)
 //  AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
@@ -458,9 +457,9 @@ static ADDRESS_MAP_START( nzeroteam_base_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00434, 0x00435) AM_READ(r2dx_sin_r)
 	AM_RANGE(0x00436, 0x00437) AM_READ(r2dx_cos_r)
 
-	AM_RANGE(0x00600, 0x0064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
-
-	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // synch for the MCU?
+	AM_RANGE(0x00600, 0x0063f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
+	//AM_RANGE(0x00640, 0x006bf) AM_DEVREADWRITE("obj", seibu_encrypted_sprite_device, read, write)
+	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // sprite buffering
 	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w)
 	AM_RANGE(0x006b2, 0x006b3) AM_WRITE(mcu_prog_w2)
 //  AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP

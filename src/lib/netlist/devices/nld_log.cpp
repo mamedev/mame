@@ -28,7 +28,7 @@ namespace netlist
 		NETLIB_UPDATEI()
 		{
 			/* use pstring::sprintf, it is a LOT faster */
-			m_strm->writeline(plib::pfmt("{1} {2}").e(netlist().time().as_double(),".9").e((nl_double) INPANALOG(m_I)));
+			m_strm->writeline(plib::pfmt("{1} {2}").e(netlist().time().as_double(),".9").e(static_cast<double>(m_I())));
 		}
 
 		NETLIB_RESETI() { }
@@ -46,7 +46,7 @@ namespace netlist
 
 		NETLIB_UPDATEI()
 		{
-			m_strm->writeline(plib::pfmt("{1} {2}").e(netlist().time().as_double(),".9").e((nl_double) (INPANALOG(m_I) - INPANALOG(m_I2))));
+			m_strm->writeline(plib::pfmt("{1} {2}").e(netlist().time().as_double(),".9").e(static_cast<double>(m_I() - m_I2())));
 		}
 
 		NETLIB_RESETI() { }
@@ -79,7 +79,7 @@ namespace netlist
 
 	NETLIB_UPDATE(wav)
 	{
-		fprintf(m_file, "%e %e\n", netlist().time().as_double(), INPANALOG(m_I));
+		fprintf(m_file, "%e %e\n", netlist().time().as_double(), m_I());
 	}
 
 	NETLIB_NAME(log)::~NETLIB_NAME(wav)()

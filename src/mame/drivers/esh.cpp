@@ -150,8 +150,8 @@ WRITE8_MEMBER(esh_state::misc_write)
 {
 	/* Bit 0 unknown */
 
-//	if (data & 0x02)
-//		logerror("BEEP!\n");
+//  if (data & 0x02)
+//      logerror("BEEP!\n");
 	m_beep->set_state(BIT(data, 1)); // polarity unknown
 	/* Bit 2 unknown */
 	m_ld_video_visible = bool(!((data & 0x08) >> 3));

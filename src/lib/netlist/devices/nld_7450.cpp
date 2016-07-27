@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+	// license:GPL-2.0+
 // copyright-holders:Couriersud
 /*
  * nld_7450.c
@@ -67,8 +67,8 @@ namespace netlist
 		m_B.activate();
 		m_C.activate();
 		m_D.activate();
-		uint_fast8_t t1 = INPLOGIC(m_A) & INPLOGIC(m_B);
-		uint_fast8_t t2 = INPLOGIC(m_C) & INPLOGIC(m_D);
+		unsigned t1 = m_A() & m_B();
+		unsigned t2 = m_C() & m_D();
 
 		const netlist_time times[2] = { NLTIME_FROM_NS(22), NLTIME_FROM_NS(15) };
 
@@ -91,7 +91,7 @@ namespace netlist
 				m_D.inactivate();
 			}
 		}
-		OUTLOGIC(m_Q, res, times[1 - res]);// ? 22000 : 15000);
+		m_Q.push(res, times[1 - res]);// ? 22000 : 15000);
 	}
 
 	NETLIB_DEVICE_IMPL(7450)

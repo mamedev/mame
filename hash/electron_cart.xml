@@ -3,12 +3,7 @@
 
 <!-- Acorn Electron ROM Cartridges -->
 
-<!-- This list contains all known cartridges for the Acorn Electron. The Plus 1 expansion unit is required to add the two cartridge slots. -->
-
-<!-- Loading Instructions:
-
-      Hold down the SHIFT key and SPACEbar and press and release the BREAK key.
--->
+<!-- This list contains all known cartridges for the Acorn Electron. The Acorn Plus 1 expansion unit is required to add the two cartridge slots. -->
 
 <softwarelist name="electron_cart" description="Acorn Electron cartridges">
 

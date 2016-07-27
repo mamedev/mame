@@ -19,11 +19,11 @@
 // Macros
 // ----------------------------------------------------------------------------------------
 
-#define OPAMP(name, model)                                                   \
-		NET_REGISTER_DEV(OPAMP, name)                                         \
+#define OPAMP(name, model)                                                     \
+		NET_REGISTER_DEV(OPAMP, name)                                          \
 		NETDEV_PARAMI(name, MODEL, model)
 
-#define LM3900(name)                                                          \
+#define LM3900(name)                                                           \
 	SUBMODEL(opamp_lm3900, name)
 
 // ----------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ NETLIB_OBJECT(OPAMP)
 	, m_VL(*this, "VL")
 	, m_VREF(*this, "VREF")
 	{
-		m_type = m_model.model_value("TYPE");
+		m_type = static_cast<int>(m_model.model_value("TYPE"));
 
 		if (m_type == 1)
 		{
@@ -117,7 +117,7 @@ private:
 	analog_output_t m_VREF;
 
 	/* state */
-	unsigned m_type;
+	int m_type;
 };
 
 	} //namespace devices

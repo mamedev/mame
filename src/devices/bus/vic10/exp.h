@@ -120,7 +120,7 @@ protected:
 
 	// image-level overrides
 	virtual bool call_load() override;
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override;
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
 

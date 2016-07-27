@@ -37,8 +37,8 @@ private:
 	required_ioport m_rs232_parity;
 	required_ioport m_rs232_stopbits;
 
-	UINT8 m_curr_key;
-	bool m_key_valid;
+	UINT8 m_fifo[16];
+	UINT8 m_head, m_tail, m_empty;
 };
 
 extern const device_type SERIAL_TERMINAL;

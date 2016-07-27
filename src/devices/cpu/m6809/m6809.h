@@ -141,14 +141,14 @@ protected:
 	union M6809Q
 	{
 		#ifdef LSB_FIRST
-			union 
+			union
 			{
 				struct { UINT8 f, e, b, a; };
 				struct { UINT16 w, d; };
 			} r;
 			struct { PAIR16 w, d; } p;
 		#else
-			union 
+			union
 			{
 				struct { UINT8 a, b, e, f; };
 				struct { UINT16 d, w; };

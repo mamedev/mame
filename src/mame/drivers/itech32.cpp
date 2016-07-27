@@ -443,7 +443,7 @@ WRITE16_MEMBER(itech32_state::int1_ack_w)
 void itech32_state::machine_start()
 {
 	membank("soundbank")->configure_entries(0, 256, memregion("soundcpu")->base() + 0x10000, 0x4000);
-	
+
 	save_item(NAME(m_vint_state));
 	save_item(NAME(m_xint_state));
 	save_item(NAME(m_qint_state));

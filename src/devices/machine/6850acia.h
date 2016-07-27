@@ -51,6 +51,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	virtual void update_irq();
 	int calculate_txirq();

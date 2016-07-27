@@ -1471,7 +1471,7 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 	MCFG_LEGACY_SCSI_PORT("scsi")
 	MCFG_NCR5380_IRQ_CB(WRITELINE(mac_state, mac_scsi_irq))
 
-	MCFG_DEVICE_ADD("pdss", NUBUS, 0)
+	MCFG_DEVICE_ADD("pds", NUBUS, 0)
 	MCFG_NUBUS_CPU("maincpu")
 	MCFG_NUBUS_OUT_IRQ9_CB(WRITELINE(mac_state, nubus_irq_9_w))
 	MCFG_NUBUS_OUT_IRQA_CB(WRITELINE(mac_state, nubus_irq_a_w))

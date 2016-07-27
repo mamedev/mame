@@ -152,9 +152,9 @@ void parser_t::net_truthtable_start()
 {
 	pstring name = get_identifier();
 	require_token(m_tok_comma);
-	unsigned ni = get_number_long();
+	long ni = get_number_long();
 	require_token(m_tok_comma);
-	unsigned no = get_number_long();
+	long no = get_number_long();
 	require_token(m_tok_comma);
 	pstring def_param = get_string();
 	require_token(m_tok_param_right);
@@ -162,8 +162,8 @@ void parser_t::net_truthtable_start()
 	netlist::tt_desc desc;
 	desc.classname = name;
 	desc.name = name;
-	desc.ni = ni;
-	desc.no = no;
+	desc.ni = static_cast<unsigned long>(ni);
+	desc.no = static_cast<unsigned long>(no);
 	desc.def_param = "+" + def_param;
 	desc.family = "";
 
@@ -317,8 +317,8 @@ void parser_t::dippins()
 	}
 	if ((pins.size() % 2) == 1)
 		error("You must pass an equal number of pins to DIPPINS");
-	unsigned n = pins.size();
-	for (unsigned i = 0; i < n / 2; i++)
+	std::size_t n = pins.size();
+	for (std::size_t i = 0; i < n / 2; i++)
 	{
 		m_setup.register_alias(plib::pfmt("{1}")(i+1), pins[i*2]);
 		m_setup.register_alias(plib::pfmt("{1}")(n-i), pins[i*2 + 1]);

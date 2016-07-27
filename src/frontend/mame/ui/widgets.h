@@ -2,9 +2,9 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /***************************************************************************
 
-	ui/widgets.h
+    ui/widgets.h
 
-	Internal MAME widgets for the user interface.
+    Internal MAME widgets for the user interface.
 
 ***************************************************************************/
 

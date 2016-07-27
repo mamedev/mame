@@ -189,11 +189,11 @@
 
 #define AVI_INDEX_2FIELD        0x01
 
- /**
- * @def AVI_INTEGRAL_MULTIPLE
- *
- * @brief   Ensures the integral multiple of the video dimension, because most video players are not capable to playback a video stream with a lower multiple.
- */
+	/**
+	* @def AVI_INTEGRAL_MULTIPLE
+	*
+	* @brief   Ensures the integral multiple of the video dimension, because most video players are not capable to playback a video stream with a lower multiple.
+	*/
 
 #define AVI_INTEGRAL_MULTIPLE   4
 

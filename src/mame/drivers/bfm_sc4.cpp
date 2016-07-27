@@ -326,7 +326,7 @@ WRITE8_MEMBER(bfm_sc45_state::mux_output2_w)
 		UINT16 short_data;
 		UINT8 byte_data_first_segment;
 		UINT8 byte_data_second_segment;
-		for (int digit = 0; digit < 32; digit += 2) 
+		for (int digit = 0; digit < 32; digit += 2)
 		{
 			short_data = (m_segment_34_cache[digit + 1] << 8) | m_segment_34_cache[digit];
 			byte_data_first_segment = (short_data >> 1) & 15;

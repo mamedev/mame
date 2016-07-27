@@ -230,7 +230,7 @@ inline int CAPACITOR_tc_lh(const double c, const double r)
 	NET_C(GND, name ## _C.2)
 #else
 // fast, might work
-#define	CHIP_CAPACITOR(name, pdesc) \
+#define CHIP_CAPACITOR(name, pdesc) \
 	RES(name ## _C, RES_K(1000)) \
 	ALIAS(name.1, name ## _C.1 ) \
 	ALIAS(name.2, name ## _C.1) \

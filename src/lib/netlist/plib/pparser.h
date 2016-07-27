@@ -25,7 +25,7 @@ public:
 	virtual ~ptokenizer() {}
 
 	explicit ptokenizer(pistream &strm)
-	: m_strm(strm), m_lineno(0), m_px(0), m_string('"')
+	: m_strm(strm), m_lineno(0), m_cur_line(""), m_px(m_cur_line.begin()), m_unget(0), m_string('"')
 	{}
 
 	enum token_type
@@ -42,32 +42,29 @@ public:
 	struct token_id_t
 	{
 	public:
-		token_id_t() : m_id(-2) {}
-		token_id_t(const int id) : m_id(id) {}
-		int id() const { return m_id; }
+
+		static const std::size_t npos = static_cast<std::size_t>(-1);
+
+		token_id_t() : m_id(npos) {}
+		token_id_t(const std::size_t id) : m_id(id) {}
+		std::size_t id() const { return m_id; }
 	private:
-		int m_id;
+		std::size_t m_id;
 	};
 
 	struct token_t
 	{
 		token_t(token_type type)
+		: m_type(type), m_id(), m_token("")
 		{
-			m_type = type;
-			m_id = token_id_t(-1);
-			m_token ="";
 		}
 		token_t(token_type type, const pstring &str)
+		: m_type(type), m_id(), m_token(str)
 		{
-			m_type = type;
-			m_id = token_id_t(-1);
-			m_token = str;
 		}
 		token_t(const token_id_t id, const pstring &str)
+		: m_type(TOKEN), m_id(id), m_token(str)
 		{
-			m_type = TOKEN;
-			m_id = id;
-			m_token = str;
 		}
 
 		bool is(const token_id_t &tok_id) const { return m_id.id() == tok_id.id(); }
@@ -101,13 +98,14 @@ public:
 
 	token_id_t register_token(pstring token)
 	{
-		m_tokens.push_back(token);
-		return token_id_t(m_tokens.size() - 1);
+		token_id_t ret(m_tokens.size());
+		m_tokens.emplace(token, ret);
+		return ret;
 	}
 
 	void set_identifier_chars(pstring s) { m_identifier_chars = s; }
 	void set_number_chars(pstring st, pstring rem) { m_number_chars_start = st; m_number_chars = rem; }
-	void set_string_char(char c) { m_string = c; }
+	void set_string_char(pstring::code_t c) { m_string = c; }
 	void set_whitespace(pstring s) { m_whitespace = s; }
 	void set_comment(pstring start, pstring end, pstring line)
 	{
@@ -126,7 +124,7 @@ private:
 	void skipeol();
 
 	pstring::code_t getc();
-	void ungetc();
+	void ungetc(pstring::code_t c);
 
 	bool eof() { return m_strm.eof(); }
 
@@ -134,14 +132,15 @@ private:
 
 	int m_lineno;
 	pstring m_cur_line;
-	unsigned m_px;
+	pstring::iterator m_px;
+	pstring::code_t m_unget;
 
 	/* tokenizer stuff follows ... */
 
 	pstring m_identifier_chars;
 	pstring m_number_chars;
 	pstring m_number_chars_start;
-	std::vector<pstring> m_tokens;
+	std::unordered_map<pstring, token_id_t> m_tokens;
 	pstring m_whitespace;
 	pstring::code_t  m_string;
 

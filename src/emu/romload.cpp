@@ -380,7 +380,7 @@ void rom_load_manager::handle_missing_file(const rom_entry *romp, std::string tr
 	}
 
 	/* no good dumps are okay */
-	else if (hash_collection(ROM_GETHASHDATA(romp)).flag(hash_collection::FLAG_NO_DUMP))
+	else if (util::hash_collection(ROM_GETHASHDATA(romp)).flag(util::hash_collection::FLAG_NO_DUMP))
 	{
 		if (!is_chd_error)
 			m_errorstring.append(string_format("%s NOT FOUND (NO GOOD DUMP KNOWN)%s\n", name, tried_file_names));
@@ -403,7 +403,7 @@ void rom_load_manager::handle_missing_file(const rom_entry *romp, std::string tr
     correct checksums for a given ROM
 -------------------------------------------------*/
 
-void rom_load_manager::dump_wrong_and_correct_checksums(const hash_collection &hashes, const hash_collection &acthashes)
+void rom_load_manager::dump_wrong_and_correct_checksums(const util::hash_collection &hashes, const util::hash_collection &acthashes)
 {
 	m_errorstring.append(string_format("    EXPECTED: %s\n", hashes.macro_string().c_str()));
 	m_errorstring.append(string_format("       FOUND: %s\n", acthashes.macro_string().c_str()));
@@ -415,7 +415,7 @@ void rom_load_manager::dump_wrong_and_correct_checksums(const hash_collection &h
     and hash signatures of a file
 -------------------------------------------------*/
 
-void rom_load_manager::verify_length_and_hash(const char *name, UINT32 explength, const hash_collection &hashes)
+void rom_load_manager::verify_length_and_hash(const char *name, UINT32 explength, const util::hash_collection &hashes)
 {
 	/* we've already complained if there is no file */
 	if (m_file == nullptr)
@@ -430,8 +430,8 @@ void rom_load_manager::verify_length_and_hash(const char *name, UINT32 explength
 	}
 
 	/* If there is no good dump known, write it */
-	hash_collection &acthashes = m_file->hashes(hashes.hash_types().c_str());
-	if (hashes.flag(hash_collection::FLAG_NO_DUMP))
+	util::hash_collection &acthashes = m_file->hashes(hashes.hash_types().c_str());
+	if (hashes.flag(util::hash_collection::FLAG_NO_DUMP))
 	{
 		m_errorstring.append(string_format("%s NO GOOD DUMP KNOWN\n", name));
 		m_knownbad++;
@@ -445,7 +445,7 @@ void rom_load_manager::verify_length_and_hash(const char *name, UINT32 explength
 		m_warnings++;
 	}
 	/* If it matches, but it is actually a bad dump, write it */
-	else if (hashes.flag(hash_collection::FLAG_BAD_DUMP))
+	else if (hashes.flag(util::hash_collection::FLAG_BAD_DUMP))
 	{
 		m_errorstring.append(string_format("%s ROM NEEDS REDUMP\n", name));
 		m_knownbad++;
@@ -557,7 +557,7 @@ int rom_load_manager::open_rom_file(const char *regiontag, const rom_entry *romp
 
 	/* extract CRC to use for searching */
 	UINT32 crc = 0;
-	bool has_crc = hash_collection(ROM_GETHASHDATA(romp)).crc(crc);
+	bool has_crc = util::hash_collection(ROM_GETHASHDATA(romp)).crc(crc);
 
 	/* attempt reading up the chain through the parents. It automatically also
 	 attempts any kind of load by checksum supported by the archives. */
@@ -928,7 +928,7 @@ void rom_load_manager::process_rom_entries(const char *regiontag, const rom_entr
 				if (baserom)
 				{
 					LOG(("Verifying length (%X) and checksums\n", explength));
-					verify_length_and_hash(ROM_GETNAME(baserom), explength, hash_collection(ROM_GETHASHDATA(baserom)));
+					verify_length_and_hash(ROM_GETNAME(baserom), explength, util::hash_collection(ROM_GETHASHDATA(baserom)));
 					LOG(("Verify finished\n"));
 				}
 
@@ -1064,7 +1064,7 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 
 	/* otherwise, look at our parents for a CHD with an identical checksum */
 	/* and try to open that */
-	hash_collection romphashes(ROM_GETHASHDATA(romp));
+	util::hash_collection romphashes(ROM_GETHASHDATA(romp));
 	for (int drv = driver_list::find(*gamedrv); drv != -1; drv = driver_list::clone(drv))
 	{
 		machine_config config(driver_list::driver(drv), options);
@@ -1075,7 +1075,7 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 
 						/* look for a differing name but with the same hash data */
 						if (strcmp(ROM_GETNAME(romp), ROM_GETNAME(rom)) != 0 &&
-							romphashes == hash_collection(ROM_GETHASHDATA(rom)))
+							romphashes == util::hash_collection(ROM_GETHASHDATA(rom)))
 						{
 							/* attempt to open the properly named file, scanning up through parent directories */
 							filerr = osd_file::error::NOT_FOUND;
@@ -1161,7 +1161,7 @@ void rom_load_manager::process_disk_entries(const char *regiontag, const rom_ent
 		{
 			auto chd = std::make_unique<open_chd>(regiontag);
 
-			hash_collection hashes(ROM_GETHASHDATA(romp));
+			util::hash_collection hashes(ROM_GETHASHDATA(romp));
 			chd_error err;
 
 			/* make the filename of the source */
@@ -1178,7 +1178,7 @@ void rom_load_manager::process_disk_entries(const char *regiontag, const rom_ent
 			}
 
 			/* get the header and extract the SHA1 */
-			hash_collection acthashes;
+			util::hash_collection acthashes;
 			acthashes.add_sha1(chd->orig_chd().sha1());
 
 			/* verify the hash */
@@ -1188,7 +1188,7 @@ void rom_load_manager::process_disk_entries(const char *regiontag, const rom_ent
 				dump_wrong_and_correct_checksums(hashes, acthashes);
 				m_warnings++;
 			}
-			else if (hashes.flag(hash_collection::FLAG_BAD_DUMP))
+			else if (hashes.flag(util::hash_collection::FLAG_BAD_DUMP))
 			{
 				m_errorstring.append(string_format("%s CHD NEEDS REDUMP\n", filename));
 				m_knownbad++;
@@ -1275,7 +1275,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 	m_romstotalsize = 0;
 	m_romsloadedsize = 0;
 
-	software_info *swinfo = swlist.find(swname);
+	const software_info *swinfo = swlist.find(swname);
 	if (swinfo != nullptr)
 	{
 		UINT32 supported = swinfo->supported();
@@ -1299,8 +1299,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 		while (swinfo != nullptr)
 		{
 			locationtag.append(swinfo->shortname()).append(breakstr);
-			const char *parentname = swinfo->parentname();
-			swinfo = (parentname != nullptr) ? swlist.find(parentname) : nullptr;
+			swinfo = !swinfo->parentname().empty() ? swlist.find(swinfo->parentname().c_str()) : nullptr;
 		}
 		// strip the final '%'
 		locationtag.erase(locationtag.length() - 1, 1);

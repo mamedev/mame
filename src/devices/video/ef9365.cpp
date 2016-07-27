@@ -123,7 +123,7 @@ const char * commands_names[]=
 
 // devices
 const device_type EF9365 = &device_creator<ef9365_device>;
-	
+
 ROM_START( ef9365 )
 	ROM_REGION( 0x1E0, "ef9365", 0 )
 	ROM_LOAD( "charset_ef9365.rom", 0x0000, 0x01E0, CRC(8d3053be) SHA1(0f9a64d217a0f7f04ee0720d49c5b680ad0ae359) )

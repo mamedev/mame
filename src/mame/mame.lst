@@ -2550,6 +2550,8 @@ bbcmc                           // 1986 BBC Master Compact
 bbcmc_ar                        // 1986 BBC Master Compact (Arabic)
 bbcmet                          // 1986 BBC Master ET
 bbcmt                           // 1986 BBC Master Turbo
+ltmpbp                          // 1985 LTM Portable (B+)
+ltmpm                           // 1986 LTM Portable (Master)
 pro128s                         // 1987 Olivetti Prodest PC 128S
 reutapm                         // 1985 Reuters APM Board
 torchf                          // 1982 Torch CF240
@@ -10715,7 +10717,8 @@ bouldashj                       // (c) 1990 Data East Corporation (Japan)
 drgninja                        // EG (c) 1988 Data East Corporation (Japan)
 drgninjab                       // bootleg
 drgninjab2                      // bootleg
-ffantasy                        // EV (c) 1989 Data East Corporation (Japan)
+ffantasy                        // EX (c) 1989 Data East Corporation (World)
+ffantasyj                       // EV (c) 1989 Data East Corporation (Japan)
 ffantasya                       // EV (c) 1989 Data East Corporation (Japan)
 ffantasybl                      // bootleg
 hbarrel                         // (c) 1987 Data East USA (US)
@@ -11036,6 +11039,9 @@ dm500                           //
 dm5620                          //
 dm7000                          //
 
+@source:dmax8000.cpp
+dmax8000                        //
+
 @source:dmndrby.cpp
 dmndrby                         // G4001 'DD' (c) 1986
 dmndrbya                        // G4001 'DD' (c) 1986
@@ -11219,6 +11225,7 @@ ougonpai                        // "62" (c) 1991 Dynax
 ougonpaib                       // "62" (c) 1991 bootleg
 quiztvqq                        // "64" Quiz TV Gassyuukoku Q&Q 1992 Dynax
 shpeng                          // (c) 1995 WSAC Systems
+intrgirl                        // (c) 1995 Barko
 sprtmtch                        // "31" (c) 1989 Dynax + Fabtek license
 tenkai                          // (c) 1991 Dynax
 tenkai2b                        // (c) 1991 bootleg
@@ -12131,6 +12138,7 @@ feasgla                         // EAS: Elite A/S Challenger (Glasgow program, E
 fexcel                          //
 fexcelv                         //
 fscc9                           //
+fscc9b                          //
 fscc12                          //
 reversic                        //
 super9cc                        // SU9: Super 9 Sensory Chess Challenger (English)
@@ -27788,7 +27796,8 @@ truckk                          // 2000.06 Truck Kyousoukyoku (Metro)
 assault                         // (c) 1988
 assaultj                        // (c) 1988 (Japan)
 assaultp                        // (c) 1988 (Japan)
-bubbletr                        // (c) 1992
+bubbletr                        // (c) 1992 (World)
+bubbletrj                       // (c) 1992 (Japan)
 burnforc                        // (c) 1989 (Japan, new version)
 burnforco                       // (c) 1989 (Japan, old version)
 cosmogng                        // (c) 1991 (US)
@@ -28260,7 +28269,7 @@ ryuuha                          // (c) 1987
 secolove                        // (c) 1986
 seiha                           // (c) 1987
 seiham                          // (c) 1987
-swinggal			// (c) 1987 Digital Denshi
+swinggal            // (c) 1987 Digital Denshi
 vipclub                         // (c) 1988 Daiichi Denshi
 
 @source:nbmj8891.cpp
@@ -29048,9 +29057,10 @@ uk101                           //
 othello                         // (c) 1984 Success.
 
 @source:othunder.cpp
-othunder                        // B67 (c) 1988 Taito Corporation Japan (World)
+othunder                        // B67 (c) 1988 Taito Corporation Japan (World, rev 1)
 othunderj                       // B67 (c) 1988 Taito Corporation (Japan)
-othunderu                       // B67 (c) 1988 Taito America Corporation (US)
+othundero                       // B67 (c) 1988 Taito Corporation Japan (World)
+othunderu                       // B67 (c) 1988 Taito America Corporation (US, rev 1)
 othunderuo                      // B67 (c) 1988 Taito America Corporation (US)
 
 @source:overdriv.cpp
@@ -33277,6 +33287,9 @@ spielbud                        // (c) 1985 ADP
 @source:sm1800.cpp
 sm1800                          //
 
+@source:sm7238.cpp
+sm7238                          //
+
 @source:smc777.cpp
 smc777                          //
 
@@ -34046,13 +34059,13 @@ sun3_460                        //
 sun_s10                         //
 sun_s20                         //
 sun4_20                         //
-sun4_110						//
+sun4_110                        //
 sun4_300                        //
-sun4_400						//
+sun4_400                        //
 sun4_40                         //
 sun4_50                         //
 sun4_60                         //
-sun4_65							//
+sun4_65                         //
 sun4_75                         //
 
 @source:suna16.cpp
@@ -35721,6 +35734,10 @@ tutor                           // 1983? Tomy Tutor
 
 @source:tv950.cpp
 tv950                           //
+
+@source:tv990.cpp
+tv990                           // 1992? TeleVideo
+tv995                           // 1994 TeleVideo
 
 @source:tvc.cpp
 tvc64                           //

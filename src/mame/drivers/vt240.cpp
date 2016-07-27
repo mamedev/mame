@@ -123,7 +123,7 @@ WRITE_LINE_MEMBER(vt240_state::write_keyboard_clock)
 
 WRITE_LINE_MEMBER(vt240_state::lben_w)
 {
-	m_lb = state ? true : false;
+	m_lb = state ? false : true;
 }
 
 WRITE_LINE_MEMBER(vt240_state::t11_reset_w)

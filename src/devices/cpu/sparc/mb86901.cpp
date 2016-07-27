@@ -641,6 +641,10 @@ void mb86901_device::execute_set_input(int inputnum, int state)
 		case SPARC_MAE:
 			m_mae = (state != 0) ? 1 : 0;
 			break;
+
+		case SPARC_RESET:
+			m_bp_reset_in = (state != 0) ? 1 : 0;
+			break;
 	}
 }
 
@@ -691,9 +695,9 @@ void mb86901_device::execute_add(UINT32 op)
 		PSR |= (BIT31(result)) ? PSR_N_MASK : 0;
 		PSR |= (result == 0) ? PSR_Z_MASK : 0;
 		PSR |= ((BIT31(rs1) && BIT31(operand2) && !BIT31(result)) ||
-		       (!BIT31(rs1) && !BIT31(operand2) && BIT31(result))) ? PSR_V_MASK : 0;
+				(!BIT31(rs1) && !BIT31(operand2) && BIT31(result))) ? PSR_V_MASK : 0;
 		PSR |= ((BIT31(rs1) && BIT31(operand2)) ||
-			   (!BIT31(result) && (BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
+				(!BIT31(result) && (BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
 	}
 }
 
@@ -736,8 +740,8 @@ void mb86901_device::execute_taddcc(UINT32 op)
 	UINT32 result = rs1 + operand2;
 
 	bool temp_v = (BIT31(rs1) && BIT31(operand2) && !BIT31(result)) ||
-	              (!BIT31(rs1) && !BIT31(operand2) && BIT31(result)) ||
-	              ((rs1 & 3) != 0 || (operand2 & 3) != 0) ? true : false;
+					(!BIT31(rs1) && !BIT31(operand2) && BIT31(result)) ||
+					((rs1 & 3) != 0 || (operand2 & 3) != 0) ? true : false;
 
 	if (TADDCCTV && temp_v)
 	{
@@ -751,7 +755,7 @@ void mb86901_device::execute_taddcc(UINT32 op)
 		PSR |= (result == 0) ? PSR_Z_MASK : 0;
 		PSR |= temp_v ? PSR_V_MASK : 0;
 		PSR |= ((BIT31(rs1) && BIT31(operand2)) ||
-		       (!BIT31(result) && (BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
+				(!BIT31(result) && (BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
 
 		if (RD != 0)
 			RDREG = result;
@@ -806,9 +810,9 @@ void mb86901_device::execute_sub(UINT32 op)
 		PSR |= (BIT31(result)) ? PSR_N_MASK : 0;
 		PSR |= (result == 0) ? PSR_Z_MASK : 0;
 		PSR |= ((BIT31(rs1) && !BIT31(operand2) && !BIT31(result)) ||
-		       (!BIT31(rs1) && BIT31(operand2) && BIT31(result))) ? PSR_V_MASK : 0;
+				(!BIT31(rs1) && BIT31(operand2) && BIT31(result))) ? PSR_V_MASK : 0;
 		PSR |= ((!BIT31(rs1) && BIT31(operand2)) ||
-		       (BIT31(result) && (!BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
+				(BIT31(result) && (!BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
 	}
 }
 
@@ -852,8 +856,8 @@ void mb86901_device::execute_tsubcc(UINT32 op)
 	UINT32 result = rs1 - operand2;
 
 	bool temp_v = (BIT31(rs1) && !BIT31(operand2) && !BIT31(result)) ||
-	              (!BIT31(rs1) && BIT31(operand2) && BIT31(result)) ||
-	              ((rs1 & 3) != 0 || (operand2 & 3) != 0) ? true : false;
+					(!BIT31(rs1) && BIT31(operand2) && BIT31(result)) ||
+					((rs1 & 3) != 0 || (operand2 & 3) != 0) ? true : false;
 
 	if (TSUBCCTV && temp_v)
 	{
@@ -867,7 +871,7 @@ void mb86901_device::execute_tsubcc(UINT32 op)
 		PSR |= (result == 0) ? PSR_Z_MASK : 0;
 		PSR |= temp_v ? PSR_V_MASK : 0;
 		PSR |= ((!BIT31(rs1) && BIT31(operand2)) ||
-		       (BIT31(result) && (!BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
+				(BIT31(result) && (!BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
 
 		if (RD != 0)
 			RDREG = result;
@@ -2558,7 +2562,6 @@ void mb86901_device::select_trap()
 
 	if (m_reset_trap)
 	{
-		m_reset_trap = 0;
 		m_trap = 0;
 		return;
 	}
@@ -2958,7 +2961,9 @@ void mb86901_device::execute_step()
 	if (m_bp_reset_in)
 	{
 		m_execute_mode = 0;
+		m_error_mode = 0;
 		m_reset_mode = 1;
+		printf("Entering reset mode\n");
 		return;
 	}
 	else if ((PSR & PSR_ET_MASK) && (m_bp_irl == 15 || m_bp_irl > ((PSR & PSR_PIL_MASK) >> PSR_PIL_SHIFT)))
@@ -3045,6 +3050,7 @@ void mb86901_device::reset_step()
 		m_execute_mode = 1;
 		m_trap = 1;
 		m_reset_trap = 1;
+		printf("m_bp_reset_in is false, resetting\n");
 	}
 }
 

@@ -13,10 +13,11 @@ null_modem_device::null_modem_device(const machine_config &mconfig, const char *
 	m_rs232_databits(*this, "RS232_DATABITS"),
 	m_rs232_parity(*this, "RS232_PARITY"),
 	m_rs232_stopbits(*this, "RS232_STOPBITS"),
+	m_flow(*this, "FLOW_CONTROL"),
 	m_input_count(0),
 	m_input_index(0),
 	m_timer_poll(nullptr),
-	m_rts(ASSERT_LINE)
+	m_rts(0)
 {
 }
 
@@ -36,6 +37,10 @@ static INPUT_PORTS_START(null_modem)
 	MCFG_RS232_DATABITS("RS232_DATABITS", RS232_DATABITS_8, "Data Bits", null_modem_device, update_serial)
 	MCFG_RS232_PARITY("RS232_PARITY", RS232_PARITY_NONE, "Parity", null_modem_device, update_serial)
 	MCFG_RS232_STOPBITS("RS232_STOPBITS", RS232_STOPBITS_1, "Stop Bits", null_modem_device, update_serial)
+	PORT_START("FLOW_CONTROL")
+	PORT_CONFNAME(0x01, 0x00, "Flow Control")
+	PORT_CONFSETTING(0x00, "Off")
+	PORT_CONFSETTING(0x01, "On")
 INPUT_PORTS_END
 
 ioport_constructor null_modem_device::device_input_ports() const
@@ -70,7 +75,7 @@ WRITE_LINE_MEMBER(null_modem_device::update_serial)
 	output_dsr(0);
 	output_cts(0);
 
-	m_rts = ASSERT_LINE;
+	m_rts = 0;
 }
 
 void null_modem_device::device_reset()
@@ -102,7 +107,7 @@ void null_modem_device::queue()
 			m_input_count = m_stream->input(m_input_buffer, sizeof(m_input_buffer));
 		}
 
-		if (m_input_count != 0 && m_rts == ASSERT_LINE)
+		if (m_input_count != 0 && (m_rts == 0 || !m_flow->read()))
 		{
 			transmit_register_setup(m_input_buffer[m_input_index++]);
 

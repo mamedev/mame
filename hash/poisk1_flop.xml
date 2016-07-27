@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="poisk1_flop" description="Poisk-1 disk images">
+
+	<software name="ots14">
+		<description>One Track System 1.4 (alternate OS)</description>
+		<year>1991</year>
+		<publisher>MMV</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="694040">
+				<rom name="one-track-system.imd" size="694040" sha1="962e15ec0501d1bd249d05984efd9e9871fa2ce9" crc="62d4ef70" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sound">
+		<description>Software for B623 sound card</description>
+		<year>1991</year>
+		<publisher>Electronmash ???</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="690901">
+				<rom name="sound.imd" size="690901" sha1="6ab8ae313b0801c2ddf3a1429b75cb9fe8f7bf55" crc="539747fa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

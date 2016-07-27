@@ -10,6 +10,7 @@
         - M48T37
         - M48T58
         - MK48T08
+        - MK48T12
 
 ***************************************************************************/
 
@@ -23,6 +24,7 @@ const device_type M48T35 = &device_creator<m48t35_device>;
 const device_type M48T37 = &device_creator<m48t37_device>;
 const device_type M48T58 = &device_creator<m48t58_device>;
 const device_type MK48T08 = &device_creator<mk48t08_device>;
+const device_type MK48T12 = &device_creator<mk48t12_device>;
 
 
 /***************************************************************************
@@ -200,6 +202,20 @@ mk48t08_device::mk48t08_device(const machine_config &mconfig, const char *tag, d
 	m_offset_year = 0x1fff;
 	m_offset_century = 0x1ff1;
 	m_offset_flags = 0x1ff0;
+}
+
+mk48t12_device::mk48t12_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: timekeeper_device(mconfig, MK48T12, "MK48T12 Timekeeper", tag, owner, clock, "m48t12", __FILE__, 0x2000)
+{
+	m_offset_control = 0x7f8;
+	m_offset_seconds = 0x7f9;
+	m_offset_minutes = 0x7fa;
+	m_offset_hours = 0x7fb;
+	m_offset_day = 0x7fc;
+	m_offset_date = 0x7fd;
+	m_offset_month = 0x7fe;
+	m_offset_year = 0x7ff;
+	m_offset_century = -1;
 }
 
 
