@@ -96,7 +96,7 @@ UINT8 bbc_userport_device::read_portb()
 
 
 SLOT_INTERFACE_START( bbc_userport_devices )
-//	SLOT_INTERFACE("amxmouse",  BBC_AMXMOUSE)       /* AMX Mouse */
-//	SLOT_INTERFACE("tracker",   BBC_TRACKER)         /* Acorn Tracker Ball */
-//	SLOT_INTERFACE("music4000", BBC_MUSIC4000)       /* Hybrid Music 4000 Keyboard */
+//  SLOT_INTERFACE("amxmouse",  BBC_AMXMOUSE)       /* AMX Mouse */
+//  SLOT_INTERFACE("tracker",   BBC_TRACKER)         /* Acorn Tracker Ball */
+//  SLOT_INTERFACE("music4000", BBC_MUSIC4000)       /* Hybrid Music 4000 Keyboard */
 SLOT_INTERFACE_END

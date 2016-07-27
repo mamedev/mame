@@ -12,8 +12,8 @@
       * Konek-Gorbunok (Little Humpbacked Horse)
       * Snezhnaja Koroleva (Snow Queen)
       * S.O.S.
-	  * Gorodki
-	  * Kot-Rybolov
+      * Gorodki
+      * Kot-Rybolov
 
   Other games known to exist on this hardware (interchangeable by the ROM swap):
       * Avtogonki
@@ -114,7 +114,7 @@
      - Check sprites priorities on the real hardware
      - Check vertical background scrolling on the real hardware
      - What charset control is used for?
-	 - Kot Rybolov viewable area size likely controlled by pit8253 timers 0 and 1, used in test mode only
+     - Kot Rybolov viewable area size likely controlled by pit8253 timers 0 and 1, used in test mode only
 
 */
 
@@ -177,14 +177,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kotrybolov_io_map, AS_IO, 8, tiamc1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x0f) AM_WRITE(tiamc1_sprite_y_w)	// sprites Y
-	AM_RANGE(0x10, 0x1f) AM_WRITE(tiamc1_sprite_x_w)	// sprites X
-	AM_RANGE(0x20, 0x2f) AM_WRITE(tiamc1_sprite_n_w)	// sprites #
-	AM_RANGE(0x30, 0x3f) AM_WRITE(tiamc1_sprite_a_w)	// sprites attributes
-	AM_RANGE(0xe0, 0xef) AM_WRITE(tiamc1_palette_w)		// color ram
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(tiamc1_bg_vshift_w)	// background V scroll
-	AM_RANGE(0xf4, 0xf4) AM_WRITE(tiamc1_bg_hshift_w)	// background H scroll
-	AM_RANGE(0xf8, 0xf8) AM_WRITE(kot_bankswitch_w)		// character rom offset
+	AM_RANGE(0x00, 0x0f) AM_WRITE(tiamc1_sprite_y_w)    // sprites Y
+	AM_RANGE(0x10, 0x1f) AM_WRITE(tiamc1_sprite_x_w)    // sprites X
+	AM_RANGE(0x20, 0x2f) AM_WRITE(tiamc1_sprite_n_w)    // sprites #
+	AM_RANGE(0x30, 0x3f) AM_WRITE(tiamc1_sprite_a_w)    // sprites attributes
+	AM_RANGE(0xe0, 0xef) AM_WRITE(tiamc1_palette_w)     // color ram
+	AM_RANGE(0xf0, 0xf0) AM_WRITE(tiamc1_bg_vshift_w)   // background V scroll
+	AM_RANGE(0xf4, 0xf4) AM_WRITE(tiamc1_bg_hshift_w)   // background H scroll
+	AM_RANGE(0xf8, 0xf8) AM_WRITE(kot_bankswitch_w)     // character rom offset
 	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
 	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("kr580vv55a", i8255_device, read, write)    /* input ports + coin counters & lockout */
 ADDRESS_MAP_END
@@ -269,7 +269,7 @@ static INPUT_PORTS_START( kot )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* RAZR ??? */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) // Punch / Right
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // Kick / Left 
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // Kick / Left
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
@@ -332,7 +332,7 @@ static MACHINE_CONFIG_START( tiamc1, tiamc1_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 336, 0, 256, 312, 0, 256)		// pixel clock and htotal comes from docs/schematics, the rest is guess (determined by undumped PROM)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 336, 0, 256, 312, 0, 256)       // pixel clock and htotal comes from docs/schematics, the rest is guess (determined by undumped PROM)
 	MCFG_SCREEN_UPDATE_DRIVER(tiamc1_state, screen_update_tiamc1)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -364,7 +364,7 @@ static MACHINE_CONFIG_DERIVED(kot, tiamc1)
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(PIXEL_CLOCK / 4)
-	MCFG_PIT8253_CLK2(SND_CLOCK)				// guess
+	MCFG_PIT8253_CLK2(SND_CLOCK)                // guess
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(tiamc1_state, pit8253_2_w))
 MACHINE_CONFIG_END
 
@@ -526,13 +526,13 @@ ROM_START( kot )
 	ROM_LOAD( "856.8", 0x04000, 0x2000, CRC(9180c98f) SHA1(4085180b9e9772e965c487e7b02d88fcae973e87) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
-	ROM_LOAD( "850.5", 0x00000, 0x2000, CRC(5dc3a102) SHA1(e97d219f7004291438b991435b7fe5d5be01d468) )	// sprite gfx
+	ROM_LOAD( "850.5", 0x00000, 0x2000, CRC(5dc3a102) SHA1(e97d219f7004291438b991435b7fe5d5be01d468) )  // sprite gfx
 	ROM_LOAD( "851.6", 0x02000, 0x2000, CRC(7db239a0) SHA1(af5772afff9009f63e2ab95c1cb00e047f3ed7e4) )
 	ROM_LOAD( "852.7", 0x04000, 0x2000, CRC(c7700f88) SHA1(1a20cc60b083259070e4f1687b09a31fc763d47e) )
 	ROM_LOAD( "853.8", 0x06000, 0x2000, CRC(b94bf1af) SHA1(da403c51fd78f99b82304c67f2197078f4ea0bf5) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "846.1", 0x00000, 0x2000, CRC(42447f4a) SHA1(bd35f2f5e468f9191680bf2c1800e09bb9ae1691) )	// tile gfx
+	ROM_LOAD( "846.1", 0x00000, 0x2000, CRC(42447f4a) SHA1(bd35f2f5e468f9191680bf2c1800e09bb9ae1691) )  // tile gfx
 	ROM_LOAD( "847.2", 0x02000, 0x2000, CRC(99ada5e8) SHA1(9425a515105ec9e9989aae736645b270e39420be) )
 	ROM_LOAD( "848.3", 0x04000, 0x2000, CRC(a124cff4) SHA1(d1d8e6f725a6f30058d52cdbe80b598149cd6052) )
 	ROM_LOAD( "849.4", 0x06000, 0x2000, CRC(5d27fda6) SHA1(f1afb39c7422caaa5eff53388f1b7241dd7c1cd7) )

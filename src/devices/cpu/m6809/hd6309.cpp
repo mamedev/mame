@@ -26,11 +26,11 @@
                             machine must be twos complement
 
     History:
- 
-July 2016 ErikGav: 
+
+July 2016 ErikGav:
     Unify with 6809 pairs and quads (A+B=D, E+F=W, D+W=Q)
     Initialize V register to $FFFF at startup
- 
+
 March 2013 NPW:
     Rewrite of 6809/6309/Konami CPU; attempted to make cycle exact.
 
@@ -795,4 +795,3 @@ void hd6309_device::execute_run()
 		execute_one();
 	} while(m_icount > 0);
 }
-

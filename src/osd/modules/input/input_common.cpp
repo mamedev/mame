@@ -87,7 +87,7 @@ key_trans_entry keyboard_trans_table::s_default_table[] =
 	KEY_TRANS_ENTRY1(TILDE,        GRAVE,        BACKQUOTE,    GRAVE,          VK_OEM_3,       '`'),
 	KEY_TRANS_ENTRY1(LSHIFT,       LSHIFT,       LSHIFT,       LSHIFT,         VK_LSHIFT,      0),
 	KEY_TRANS_ENTRY1(BACKSLASH,    BACKSLASH,    BACKSLASH,    BACKSLASH,      VK_OEM_5,       '\\'),
-//	KEY_TRANS_ENTRY1(BACKSLASH2,   NONUSHASH,    UNKNOWN,      OEM_102,        VK_OEM_102,     '<'),
+//  KEY_TRANS_ENTRY1(BACKSLASH2,   NONUSHASH,    UNKNOWN,      OEM_102,        VK_OEM_102,     '<'),
 // This is the additional key that ISO keyboards have over ANSI ones, located between left shift and Y.
 	KEY_TRANS_ENTRY1(BACKSLASH2,   NONUSBACKSLASH, UNKNOWN,    OEM_102,        VK_OEM_102,     '<'),
 	KEY_TRANS_ENTRY1(Z,            Z,            z,            Z,              'Z',            'Z'),

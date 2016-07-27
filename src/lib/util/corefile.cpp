@@ -1302,7 +1302,7 @@ bool core_filename_ends_with(const std::string &filename, const std::string &ext
 
 	// first if the extension is bigger than the name, we definitely don't match
 	bool matches = namelen >= extlen;
-	
+
 	// work backwards checking for a match
 	while (matches && extlen > 0 && namelen > 0)
 	{

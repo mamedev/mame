@@ -285,7 +285,7 @@ void debug_view_state::view_update()
 				}
 			}
 		}
-	
+
 		// fill the rest with blanks
 		while (visible && (col < m_visible.x))
 		{

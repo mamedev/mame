@@ -32,9 +32,7 @@ class xbox_state : public xbox_base_state
 {
 public:
 	xbox_state(const machine_config &mconfig, device_type type, const char *tag) :
-		xbox_base_state(mconfig, type, tag),
-		usbhack_index(-1),
-		usbhack_counter(0)
+		xbox_base_state(mconfig, type, tag)
 	{ }
 
 protected:
@@ -44,13 +42,10 @@ protected:
 	virtual void video_start() override;
 
 	virtual void hack_eeprom() override;
-	virtual void hack_usb() override;
 
 	struct chihiro_devices {
 		bus_master_ide_controller_device    *ide;
 	} xbox_devs;
-	int usbhack_index;
-	int usbhack_counter;
 };
 
 void xbox_state::video_start()
@@ -133,26 +128,19 @@ void xbox_state::hack_eeprom()
 	m_maincpu->space(0).write_byte(0x375f0, m_maincpu->space(0).read_byte(0x375f0) & 0xfe); // internal hub not used
 }
 
-void xbox_state::hack_usb()
-{
-	// not needed
-}
-
 void xbox_state::machine_start()
 {
 	ohci_game_controller_device *usb_device;
 
 	xbox_base_state::machine_start();
 	xbox_devs.ide = machine().device<bus_master_ide_controller_device>("ide");
-	usbhack_index = -1;
-	usbhack_counter = 0;
 	usb_device = machine().device<ohci_game_controller_device>("ohci_gamepad");
 	if (usb_device != nullptr) {
 		usb_device->initialize(machine(), ohci_usb);
 		ohci_usb->usb_ohci_plug(3, usb_device); // connect to root hub port 3, chihiro needs to use 1 and 2
 	}
 	// savestates
-	save_item(NAME(usbhack_counter));
+	//save_item(NAME(item));
 }
 
 void xbox_state::machine_reset()
@@ -210,7 +198,10 @@ ROM_START( xbox )
 
 	ROM_REGION( 0x100000, "bios", 0)
 	ROM_LOAD( "4134_1024k.bin", 0x000000, 0x100000, CRC(49d8055a) SHA1(d46cef771a63dc8024fe36d7ab5b959087ac999f) )
+	ROM_COPY( "mcpx", 1, 0x3fe00, 0x1ff)
 	ROM_COPY( "mcpx", 1, 0x7fe00, 0x1ff)
+	ROM_COPY( "mcpx", 1, 0xbfe00, 0x1ff)
+	ROM_COPY( "mcpx", 1, 0xffe00, 0x1ff)
 
 
 	ROM_REGION( 0x1000000, "tbp", 0 ) // To Be Processed, of course

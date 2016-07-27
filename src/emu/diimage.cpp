@@ -56,7 +56,7 @@ const image_device_type_info device_image_interface::m_device_info_array[] =
 //-------------------------------------------------
 
 image_device_format::image_device_format(const std::string &name, const std::string &description, const std::string &extensions, const std::string &optspec)
-	: m_name(name), m_description(description),	m_optspec(optspec)
+	: m_name(name), m_description(description), m_optspec(optspec)
 {
 	std::regex comma_regex("\\,");
 	std::copy(
@@ -180,7 +180,7 @@ void device_image_interface::device_compute_hash(util::hash_collection &hashes, 
 }
 
 //-------------------------------------------------
-//	set_image_filename - specifies the filename of
+//  set_image_filename - specifies the filename of
 //  an image
 //-------------------------------------------------
 
@@ -221,7 +221,7 @@ image_error_t device_image_interface::set_image_filename(const char *filename)
 ****************************************************************************/
 
 //-------------------------------------------------
-//	device_get_named_creatable_format -
+//  device_get_named_creatable_format -
 //  accesses a specific image format available for
 //  image creation by name
 //-------------------------------------------------
@@ -240,8 +240,8 @@ const image_device_format *device_image_interface::device_get_named_creatable_fo
 ****************************************************************************/
 
 //-------------------------------------------------
-//	image_clear_error - clear out any specified
-//	error
+//  image_clear_error - clear out any specified
+//  error
 //-------------------------------------------------
 
 void device_image_interface::clear_error()
@@ -256,8 +256,8 @@ void device_image_interface::clear_error()
 
 
 //-------------------------------------------------
-//	error - returns the error text for an image
-//	error
+//  error - returns the error text for an image
+//  error
 //-------------------------------------------------
 
 static const char *const messages[] =
@@ -280,7 +280,7 @@ const char *device_image_interface::error()
 
 
 //-------------------------------------------------
-//	seterror - specifies an error on an image
+//  seterror - specifies an error on an image
 //-------------------------------------------------
 
 void device_image_interface::seterror(image_error_t err, const char *message)
@@ -296,8 +296,8 @@ void device_image_interface::seterror(image_error_t err, const char *message)
 
 
 //-------------------------------------------------
-//	message - used to display a message while
-//	loading
+//  message - used to display a message while
+//  loading
 //-------------------------------------------------
 
 void device_image_interface::message(const char *format, ...)
@@ -322,9 +322,9 @@ void device_image_interface::message(const char *format, ...)
 ***************************************************************************/
 
 //-------------------------------------------------
-//	try_change_working_directory - tries to change
-//	the working directory, but only if the directory
-//	actually exists
+//  try_change_working_directory - tries to change
+//  the working directory, but only if the directory
+//  actually exists
 //-------------------------------------------------
 
 bool device_image_interface::try_change_working_directory(const char *subdir)
@@ -357,8 +357,8 @@ bool device_image_interface::try_change_working_directory(const char *subdir)
 
 
 //-------------------------------------------------
-//	setup_working_directory - sets up the working
-//	directory according to a few defaults
+//  setup_working_directory - sets up the working
+//  directory according to a few defaults
 //-------------------------------------------------
 
 void device_image_interface::setup_working_directory()
@@ -396,7 +396,7 @@ const char * device_image_interface::working_directory()
 
 
 //-------------------------------------------------
-//	get_software_region
+//  get_software_region
 //-------------------------------------------------
 
 UINT8 *device_image_interface::get_software_region(const char *tag)
@@ -413,7 +413,7 @@ UINT8 *device_image_interface::get_software_region(const char *tag)
 
 
 //-------------------------------------------------
-//	image_get_software_region_length
+//  image_get_software_region_length
 //-------------------------------------------------
 
 UINT32 device_image_interface::get_software_region_length(const char *tag)
@@ -428,7 +428,7 @@ UINT32 device_image_interface::get_software_region_length(const char *tag)
 
 
 //-------------------------------------------------
-//	image_get_feature
+//  image_get_feature
 //-------------------------------------------------
 
 const char *device_image_interface::get_feature(const char *feature_name)
@@ -534,10 +534,10 @@ UINT32 device_image_interface::crc()
 
 
 //-------------------------------------------------
-//	battery_load - retrieves the battery
-//	backed RAM for an image. The file name is
-//	created from the machine driver name and the
-//	image name.
+//  battery_load - retrieves the battery
+//  backed RAM for an image. The file name is
+//  created from the machine driver name and the
+//  image name.
 //-------------------------------------------------
 
 void device_image_interface::battery_load(void *buffer, int length, int fill)
@@ -579,10 +579,10 @@ void device_image_interface::battery_load(void *buffer, int length, void *def_bu
 
 
 //-------------------------------------------------
-//	battery_save - stores the battery
-//	backed RAM for an image. The file name is
-//	created from the machine driver name and the
-//	image name.
+//  battery_save - stores the battery
+//  backed RAM for an image. The file name is
+//  created from the machine driver name and the
+//  image name.
 //-------------------------------------------------
 
 void device_image_interface::battery_save(const void *buffer, int length)
@@ -631,8 +631,8 @@ bool device_image_interface::uses_file_extension(const char *file_extension) con
 // ***************************************************************************
 
 //-------------------------------------------------
-//	is_loaded - quick check to determine whether an
-//	image is loaded
+//  is_loaded - quick check to determine whether an
+//  image is loaded
 //-------------------------------------------------
 
 bool device_image_interface::is_loaded()
@@ -642,8 +642,8 @@ bool device_image_interface::is_loaded()
 
 
 //-------------------------------------------------
-//	load_image_by_path - loads an image with a
-//	specific path
+//  load_image_by_path - loads an image with a
+//  specific path
 //-------------------------------------------------
 
 image_error_t device_image_interface::load_image_by_path(UINT32 open_flags, const char *path)
@@ -750,8 +750,8 @@ int device_image_interface::reopen_for_write(const char *path)
 
 
 //-------------------------------------------------
-//	determine_open_plan - determines which open
-//	flags to use, and in what order
+//  determine_open_plan - determines which open
+//  flags to use, and in what order
 //-------------------------------------------------
 
 void device_image_interface::determine_open_plan(int is_create, UINT32 *open_plan)
@@ -772,9 +772,9 @@ void device_image_interface::determine_open_plan(int is_create, UINT32 *open_pla
 
 
 //-------------------------------------------------
-//	dump_wrong_and_correct_checksums - dump an
-//	error message containing the wrong and the
-//	correct checksums for a given software item
+//  dump_wrong_and_correct_checksums - dump an
+//  error message containing the wrong and the
+//  correct checksums for a given software item
 //-------------------------------------------------
 
 static void dump_wrong_and_correct_checksums(const util::hash_collection &hashes, const util::hash_collection &acthashes)
@@ -785,8 +785,8 @@ static void dump_wrong_and_correct_checksums(const util::hash_collection &hashes
 
 
 //-------------------------------------------------
-//	verify_length_and_hash - verify the length
-//	and hash signatures of a file
+//  verify_length_and_hash - verify the length
+//  and hash signatures of a file
 //-------------------------------------------------
 
 static int verify_length_and_hash(emu_file *file, const char *name, UINT32 explength, const util::hash_collection &hashes)
@@ -826,7 +826,7 @@ static int verify_length_and_hash(emu_file *file, const char *name, UINT32 exple
 
 
 //-------------------------------------------------
-//	load_software - software image loading
+//  load_software - software image loading
 //-------------------------------------------------
 
 bool device_image_interface::load_software(software_list_device &swlist, const char *swname, const rom_entry *start)
@@ -931,7 +931,7 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 
 
 //-------------------------------------------------
-//	load_internal - core image loading
+//  load_internal - core image loading
 //-------------------------------------------------
 
 bool device_image_interface::load_internal(const char *path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load)
@@ -1069,7 +1069,7 @@ done:
 
 
 //-------------------------------------------------
-//	load - load an image into MAME
+//  load - load an image into MAME
 //-------------------------------------------------
 
 bool device_image_interface::load(const char *path)
@@ -1079,7 +1079,7 @@ bool device_image_interface::load(const char *path)
 
 
 //-------------------------------------------------
-//	open_image_file - opening plain image file
+//  open_image_file - opening plain image file
 //-------------------------------------------------
 
 bool device_image_interface::open_image_file(emu_options &options)
@@ -1098,8 +1098,8 @@ bool device_image_interface::open_image_file(emu_options &options)
 
 
 //-------------------------------------------------
-//	image_finish_load - special call - only use
-//	from core
+//  image_finish_load - special call - only use
+//  from core
 //-------------------------------------------------
 
 bool device_image_interface::finish_load()
@@ -1139,7 +1139,7 @@ bool device_image_interface::finish_load()
 
 
 //-------------------------------------------------
-//	create - create a image
+//  create - create a image
 //-------------------------------------------------
 
 bool device_image_interface::create(const char *path, const image_device_format *create_format, util::option_resolution *create_args)
@@ -1159,8 +1159,8 @@ bool device_image_interface::create(const char *path, const image_device_format 
 
 
 //-------------------------------------------------
-//	clear - clear all internal data pertaining
-//	to an image
+//  clear - clear all internal data pertaining
+//  to an image
 //-------------------------------------------------
 
 void device_image_interface::clear()
@@ -1187,7 +1187,7 @@ void device_image_interface::clear()
 
 
 //-------------------------------------------------
-//	unload - main call to unload an image
+//  unload - main call to unload an image
 //-------------------------------------------------
 
 void device_image_interface::unload()
@@ -1202,7 +1202,7 @@ void device_image_interface::unload()
 
 
 //-------------------------------------------------
-//	update_names - update brief and instance names
+//  update_names - update brief and instance names
 //-------------------------------------------------
 
 void device_image_interface::update_names(const device_type device_type, const char *inst, const char *brief)

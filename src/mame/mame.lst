@@ -28269,7 +28269,7 @@ ryuuha                          // (c) 1987
 secolove                        // (c) 1986
 seiha                           // (c) 1987
 seiham                          // (c) 1987
-swinggal			// (c) 1987 Digital Denshi
+swinggal            // (c) 1987 Digital Denshi
 vipclub                         // (c) 1988 Daiichi Denshi
 
 @source:nbmj8891.cpp
@@ -34059,13 +34059,13 @@ sun3_460                        //
 sun_s10                         //
 sun_s20                         //
 sun4_20                         //
-sun4_110						//
+sun4_110                        //
 sun4_300                        //
-sun4_400						//
+sun4_400                        //
 sun4_40                         //
 sun4_50                         //
 sun4_60                         //
-sun4_65							//
+sun4_65                         //
 sun4_75                         //
 
 @source:suna16.cpp
@@ -35736,7 +35736,8 @@ tutor                           // 1983? Tomy Tutor
 tv950                           //
 
 @source:tv990.cpp
-tv990							// 1992? Televideo
+tv990                           // 1992? TeleVideo
+tv995                           // 1994 TeleVideo
 
 @source:tvc.cpp
 tvc64                           //

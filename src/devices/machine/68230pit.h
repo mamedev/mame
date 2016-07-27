@@ -174,23 +174,23 @@ class pit68230_device :  public device_t//, public device_execute_interface
 protected:
 
 	enum {
-		REG_TCR_ENABLE 			= 0x01,
-		REG_TCR_CC_MASK			= 0x06,
-		REG_TCR_CC_PC2_CLK_PSC	= 0x00,
-		REG_TCR_CC_TEN_CLK_PSC	= 0x02,
-		REG_TCR_CC_TIN_PSC		= 0x04,
-		REG_TCR_CC_TIN_RAW		= 0x06,
-		REG_TCR_ZR				= 0x08,
-		REG_TCR_ZD				= 0x10,
-		REG_TCR_TOUT_TIACK_MASK	= 0xe0, // 1 1 1
-		REG_TCR_PC3_PC7			= 0x00, // 0 0 0
-		REG_TCR_PC3_PC7_DC		= 0x20, // 0 0 1
-		REG_TCR_TOUT_PC7_SQ		= 0x40, // 0 1 0
-		REG_TCR_TOUT_PC7_SQ_DC	= 0x60, // 0 1 1
-		REG_TCR_TOUT_TIACK		= 0x80, // 1 0 0
-		REG_TCR_TOUT_TIACK_INT	= 0xa0, // 1 0 1
-		REG_TCR_TOUT_PC7		= 0xc0, // 1 1 0
-		REG_TCR_TOUT_PC7_INT	= 0xe0, // 1 1 1
+		REG_TCR_ENABLE          = 0x01,
+		REG_TCR_CC_MASK         = 0x06,
+		REG_TCR_CC_PC2_CLK_PSC  = 0x00,
+		REG_TCR_CC_TEN_CLK_PSC  = 0x02,
+		REG_TCR_CC_TIN_PSC      = 0x04,
+		REG_TCR_CC_TIN_RAW      = 0x06,
+		REG_TCR_ZR              = 0x08,
+		REG_TCR_ZD              = 0x10,
+		REG_TCR_TOUT_TIACK_MASK = 0xe0, // 1 1 1
+		REG_TCR_PC3_PC7         = 0x00, // 0 0 0
+		REG_TCR_PC3_PC7_DC      = 0x20, // 0 0 1
+		REG_TCR_TOUT_PC7_SQ     = 0x40, // 0 1 0
+		REG_TCR_TOUT_PC7_SQ_DC  = 0x60, // 0 1 1
+		REG_TCR_TOUT_TIACK      = 0x80, // 1 0 0
+		REG_TCR_TOUT_TIACK_INT  = 0xa0, // 1 0 1
+		REG_TCR_TOUT_PC7        = 0xc0, // 1 1 0
+		REG_TCR_TOUT_PC7_INT    = 0xe0, // 1 1 1
 	};
 
 	// device-level overrides
@@ -217,18 +217,18 @@ protected:
 	UINT8 m_paddr;          // Port A Data Direction register
 	UINT8 m_pbddr;          // Port B Data Direction register
 	UINT8 m_pcddr;          // Port C Data Direction register
-	UINT8 m_pivr;           // Ports Interrupt vector 
+	UINT8 m_pivr;           // Ports Interrupt vector
 	UINT8 m_pacr;           // Port A Control register
 	UINT8 m_pbcr;           // Port B Control register
 	UINT8 m_padr;           // Port A Data register
 	UINT8 m_pbdr;           // Port B Data register
 	UINT8 m_pcdr;           // Port C Data register
 	UINT8 m_psr;            // Port Status Register
-	UINT8 m_tcr;		// Timer Control Register
-	UINT8 m_tivr;		// Timer Interrupt Vector register
-	int m_cpr;			// Counter Preload Registers (3 x 8 = 24 bits) 
-	int   m_cntr;		// - The 24 bit Counter 
-	UINT8 m_tsr;		// Timer Status Register
+	UINT8 m_tcr;        // Timer Control Register
+	UINT8 m_tivr;       // Timer Interrupt Vector register
+	int m_cpr;          // Counter Preload Registers (3 x 8 = 24 bits)
+	int   m_cntr;       // - The 24 bit Counter
+	UINT8 m_tsr;        // Timer Status Register
 
 	// Timers
 	emu_timer *pit_timer;

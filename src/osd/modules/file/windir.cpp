@@ -48,7 +48,7 @@ private:
 	bool                m_is_first;               // true if this is the first entry
 	entry               m_entry;                  // current entry's data
 	WIN32_FIND_DATA     m_data;                   // current raw data
-	std::string			m_name;					  // converted name of directory
+	std::string         m_name;                   // converted name of directory
 };
 
 //============================================================

@@ -2612,33 +2612,33 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjdialq2 )
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x04, 0x00, "PINFU with TSUMO" )	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x00, "PINFU with TSUMO" )  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x38, 0x20, DEF_STR( Difficulty ) ) 	PORT_DIPLOCATION("SW1:4,5,6")
-        PORT_DIPSETTING(    0x38, "1 (Easy)" )
-        PORT_DIPSETTING(    0x30, "2" )
-        PORT_DIPSETTING(    0x28, "3" )
-        PORT_DIPSETTING(    0x20, "4" )
-        PORT_DIPSETTING(    0x18, "5" )
-        PORT_DIPSETTING(    0x10, "6" )
-        PORT_DIPSETTING(    0x08, "7" )
-        PORT_DIPSETTING(    0x00, "8 (Hard)" )
+	PORT_DIPNAME( 0x38, 0x20, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:4,5,6")
+		PORT_DIPSETTING(    0x38, "1 (Easy)" )
+		PORT_DIPSETTING(    0x30, "2" )
+		PORT_DIPSETTING(    0x28, "3" )
+		PORT_DIPSETTING(    0x20, "4" )
+		PORT_DIPSETTING(    0x18, "5" )
+		PORT_DIPSETTING(    0x10, "6" )
+		PORT_DIPSETTING(    0x08, "7" )
+		PORT_DIPSETTING(    0x00, "8 (Hard)" )
 
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x07, "Time Setting" )		PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, "Time Setting" )      PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(    0x07, "08:30" )
 	PORT_DIPSETTING(    0x06, "09:00" )
 	PORT_DIPSETTING(    0x05, "09:30" )
@@ -2647,19 +2647,19 @@ static INPUT_PORTS_START( mjdialq2 )
 	PORT_DIPSETTING(    0x02, "11:00" )
 	PORT_DIPSETTING(    0x01, "11:30" )
 	PORT_DIPSETTING(    0x00, "12:00" )
-	PORT_DIPNAME( 0x08, 0x00, "Time Service" )	PORT_DIPLOCATION("SW2:4") // "secret moves" happen at certain time stamps
+	PORT_DIPNAME( 0x08, 0x00, "Time Service" )  PORT_DIPLOCATION("SW2:4") // "secret moves" happen at certain time stamps
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "TEL Display" )		PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x10, 0x10, "TEL Display" )       PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x20, 0x20, "GAL mode" )			PORT_DIPLOCATION("SW2:6") // unknown what this does
+	PORT_DIPNAME( 0x20, 0x20, "GAL mode" )          PORT_DIPLOCATION("SW2:6") // unknown what this does
 	PORT_DIPSETTING(    0x20, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x40, 0x40, "Select Special Item" ) 	PORT_DIPLOCATION("SW2:7")/* Allows to select which one of the nine special items you want. */
+	PORT_DIPNAME( 0x40, 0x40, "Select Special Item" )   PORT_DIPLOCATION("SW2:7")/* Allows to select which one of the nine special items you want. */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Debug" )			PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x80, "Debug" )         PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -6381,24 +6381,24 @@ ROM_END
 /*
 Intergirl by Barko
 
-1x 	GM68A45S 		uj11 	CRT Controller (CRTC)
-1x 	Z8400ADSD-Z80ACPU 		ug8 	8-bit Microprocessor - main
-1x 	GL324 		u14 	Quad Operational Amplifier - sound
-1x 	YM2203C 		uj5 	FM Operator Type-N (OPM) - sound
-1x 	YM3014B 		u13 	D/A Converter (DAC) - sound
-1x 	oscillator 	22.1184MHz 	xt1 	
+1x  GM68A45S        uj11    CRT Controller (CRTC)
+1x  Z8400ADSD-Z80ACPU       ug8     8-bit Microprocessor - main
+1x  GL324       u14     Quad Operational Amplifier - sound
+1x  YM2203C         uj5     FM Operator Type-N (OPM) - sound
+1x  YM3014B         u13     D/A Converter (DAC) - sound
+1x  oscillator  22.1184MHz  xt1
 
 ROMs
-2x 	TMS27C512 	1,2 	dumped
-3x 	TMS27C020 	3,4,5 	dumped
+2x  TMS27C512   1,2     dumped
+3x  TMS27C020   3,4,5   dumped
 
 RAMs
-1x 	GM76C88AL-15 	ug1
-6x 	KM424C64P-10 	uf13,uf13a,uf14,uf15,uf16,uf17
+1x  GM76C88AL-15    ug1
+6x  KM424C64P-10    uf13,uf13a,uf14,uf15,uf16,uf17
 
 PLDs
-1x 	PAL16L8ACN 	ug6 	read protected
-1x 	CY7C381-0JC 		read protected 
+1x  PAL16L8ACN  ug6     read protected
+1x  CY7C381-0JC         read protected
 */
 
 ROM_START( intrgirl )
@@ -6411,11 +6411,12 @@ ROM_START( intrgirl )
 	ROM_LOAD( "ka-4.rom2", 0x40000, 0x40000, CRC(ad90d3a1) SHA1(d955620fdd4aacc96e59e9f94da85568cce47843) )
 	ROM_LOAD( "ka-5.rom3", 0x80000, 0x40000, CRC(2ed30171) SHA1(883d9e96df4f234652b01599e065f7f1985d1748) )
 
-	// there aren't PROMs on the PCB, but these are currently here because they will show the game running, although with bad colors.
-	// to be removed once the real source of the palette is identified (maybe the CY7C381-0JC FPGA?)
 	ROM_REGION( 0x400, "proms", 0 ) // Color PROMs
-	ROM_LOAD( "fake_prom_1", 0x000, 0x200, NO_DUMP )
-	ROM_LOAD( "fake_prom_2", 0x200, 0x200, NO_DUMP )
+	ROM_LOAD( "n82s147n.uk15", 0x000, 0x200, NO_DUMP )
+	ROM_LOAD( "n82s147n.uk16", 0x200, 0x200, NO_DUMP )
+
+	ROM_REGION( 0x104, "pals", ROMREGION_ERASE00 )
+	ROM_LOAD( "pal16l8acn.ug6", 0x000, 0x104, NO_DUMP ) //read protected
 ROM_END
 
 // Decrypted by yong

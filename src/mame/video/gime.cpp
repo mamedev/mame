@@ -240,7 +240,7 @@ inline gime_base_device::pixel_t gime_base_device::get_composite_color(int color
 		0xfd8ef1, 0xef8eff, 0xd895ff, 0xb9a1ff, 0x86c4ff, 0x78d4f2, 0x71e2b6, 0xffffff,
 	};
 
-    // composite output with phase inverted
+	// composite output with phase inverted
 	static pixel_t composite_palette_180[64] = {
 		0x000000, 0x5a0e5a, 0x4f0c4f, 0x360f40, 0x0d213c, 0x003334, 0x004141, 0x004943,
 		0x005409, 0x005600, 0x114c00, 0x263700, 0x392500, 0x491d00, 0x4f0f3e, 0x590e59,
@@ -897,7 +897,7 @@ inline void gime_base_device::write_gime_register(offs_t offset, UINT8 data)
 			//        Bits 0-2 LPR Lines per row
 			if (xorval & 0x20)
 			{
-				// on phase invert re-load the alternate composite palette                
+				// on phase invert re-load the alternate composite palette
 				m_composite_phase_invert = (data & 0x20);
 				update_composite_palette();
 			}

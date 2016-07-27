@@ -292,14 +292,14 @@ void renderer_bgfx::record()
 bool renderer_bgfx::init(running_machine &machine)
 {
 	const char *bgfx_path = downcast<osd_options &>(machine.options()).bgfx_path();
-	
+
 	osd::directory::ptr directory = osd::directory::open(bgfx_path);
 	if (directory == nullptr)
 	{
 		osd_printf_verbose("Unable to find the %s folder. Please reinstall it to use the BGFX renderer\n", bgfx_path);
 		return true;
 	}
-	
+
 	return false;
 }
 

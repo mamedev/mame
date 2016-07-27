@@ -88,10 +88,10 @@ public:
 	const std::string &optspec() const { return m_optspec; }
 
 private:
-	std::string					m_name;
-	std::string					m_description;
-	std::vector<std::string>	m_extensions;
-	std::string					m_optspec;
+	std::string                 m_name;
+	std::string                 m_description;
+	std::vector<std::string>    m_extensions;
+	std::string                 m_optspec;
 };
 
 

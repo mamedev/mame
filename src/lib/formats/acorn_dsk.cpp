@@ -506,7 +506,7 @@ int acorn_dos_format::find_size(io_generic *io, UINT32 form_factor)
 					if (cat[0] == 0xfd) return i;
 					break;
 			}
-			
+
 		}
 	}
 	LOG_FORMATS("dos: no match\n");

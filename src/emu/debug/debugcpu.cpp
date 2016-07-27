@@ -1050,13 +1050,18 @@ UINT64 debugger_cpu::expression_read_memory(void *param, const char *name, expre
 		case EXPSPACE_SPACE3_LOGICAL:
 		{
 			device_t *device = nullptr;
+			device_memory_interface *memory;
+
 			if (name != nullptr)
 				device = expression_get_device(name);
-			if (device == nullptr)
-				device = m_machine.debugger().cpu().get_visible_cpu();
-			if (device->memory().has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
+			if (device == nullptr || !device->interface(memory))
 			{
-				address_space &space = device->memory().space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
+				device = m_machine.debugger().cpu().get_visible_cpu();
+				memory = &device->memory();
+			}
+			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
+			{
+				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
 				return read_memory(space, space.address_to_byte(address), size, true);
 			}
 			break;
@@ -1068,13 +1073,18 @@ UINT64 debugger_cpu::expression_read_memory(void *param, const char *name, expre
 		case EXPSPACE_SPACE3_PHYSICAL:
 		{
 			device_t *device = nullptr;
+			device_memory_interface *memory;
+
 			if (name != nullptr)
 				device = expression_get_device(name);
-			if (device == nullptr)
-				device = m_machine.debugger().cpu().get_visible_cpu();
-			if (device->memory().has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL)))
+			if (device == nullptr || !device->interface(memory))
 			{
-				address_space &space = device->memory().space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
+				device = m_machine.debugger().cpu().get_visible_cpu();
+				memory = &device->memory();
+			}
+			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL)))
+			{
+				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
 				return read_memory(space, space.address_to_byte(address), size, false);
 			}
 			break;
@@ -1084,11 +1094,16 @@ UINT64 debugger_cpu::expression_read_memory(void *param, const char *name, expre
 		case EXPSPACE_RAMWRITE:
 		{
 			device_t *device = nullptr;
+			device_memory_interface *memory;
+
 			if (name != nullptr)
 				device = expression_get_device(name);
-			if (device == nullptr)
+			if (device == nullptr || !device->interface(memory))
+			{
 				device = m_machine.debugger().cpu().get_visible_cpu();
-			return expression_read_program_direct(device->memory().space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size);
+				memory = &device->memory();
+			}
+			return expression_read_program_direct(memory->space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size);
 			break;
 		}
 
@@ -1215,6 +1230,7 @@ UINT64 debugger_cpu::expression_read_memory_region(const char *rgntag, offs_t ad
 void debugger_cpu::expression_write_memory(void *param, const char *name, expression_space spacenum, UINT32 address, int size, UINT64 data)
 {
 	device_t *device = nullptr;
+	device_memory_interface *memory;
 
 	switch (spacenum)
 	{
@@ -1224,11 +1240,14 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 		case EXPSPACE_SPACE3_LOGICAL:
 			if (name != nullptr)
 				device = expression_get_device(name);
-			if (device == nullptr)
-				device = m_machine.debugger().cpu().get_visible_cpu();
-			if (device->memory().has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
+			if (device == nullptr || !device->interface(memory))
 			{
-				address_space &space = device->memory().space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
+				device = m_machine.debugger().cpu().get_visible_cpu();
+				memory = &device->memory();
+			}
+			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
+			{
+				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
 				write_memory(space, space.address_to_byte(address), data, size, true);
 			}
 			break;
@@ -1239,11 +1258,14 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 		case EXPSPACE_SPACE3_PHYSICAL:
 			if (name != nullptr)
 				device = expression_get_device(name);
-			if (device == nullptr)
-				device = m_machine.debugger().cpu().get_visible_cpu();
-			if (device->memory().has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL)))
+			if (device == nullptr || !device->interface(memory))
 			{
-				address_space &space = device->memory().space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
+				device = m_machine.debugger().cpu().get_visible_cpu();
+				memory = &device->memory();
+			}
+			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL)))
+			{
+				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
 				write_memory(space, space.address_to_byte(address), data, size, false);
 			}
 			break;
@@ -1252,9 +1274,12 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 		case EXPSPACE_RAMWRITE:
 			if (name != nullptr)
 				device = expression_get_device(name);
-			if (device == nullptr)
+			if (device == nullptr || !device->interface(memory))
+			{
 				device = m_machine.debugger().cpu().get_visible_cpu();
-			expression_write_program_direct(device->memory().space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size, data);
+				memory = &device->memory();
+			}
+			expression_write_program_direct(memory->space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size, data);
 			break;
 
 		case EXPSPACE_REGION:
@@ -1393,6 +1418,7 @@ void debugger_cpu::expression_write_memory_region(const char *rgntag, offs_t add
 expression_error::error_code debugger_cpu::expression_validate(void *param, const char *name, expression_space space)
 {
 	device_t *device = nullptr;
+	device_memory_interface *memory;
 
 	switch (space)
 	{
@@ -1403,12 +1429,12 @@ expression_error::error_code debugger_cpu::expression_validate(void *param, cons
 		if (name)
 		{
 			device = expression_get_device(name);
-			if (!device)
+			if (device == nullptr)
 				return expression_error::INVALID_MEMORY_NAME;
 		}
 		if (!device)
 			device = m_machine.debugger().cpu().get_visible_cpu();
-		if (!device->memory().has_space(AS_PROGRAM + (space - EXPSPACE_PROGRAM_LOGICAL)))
+		if (!device->interface(memory) || !memory->has_space(AS_PROGRAM + (space - EXPSPACE_PROGRAM_LOGICAL)))
 			return expression_error::NO_SUCH_MEMORY_SPACE;
 		break;
 
@@ -1419,12 +1445,12 @@ expression_error::error_code debugger_cpu::expression_validate(void *param, cons
 		if (name)
 		{
 			device = expression_get_device(name);
-			if (!device)
+			if (device == nullptr)
 				return expression_error::INVALID_MEMORY_NAME;
 		}
 		if (!device)
 			device = m_machine.debugger().cpu().get_visible_cpu();
-		if (!device->memory().has_space(AS_PROGRAM + (space - EXPSPACE_PROGRAM_PHYSICAL)))
+		if (!device->interface(memory) || !memory->has_space(AS_PROGRAM + (space - EXPSPACE_PROGRAM_PHYSICAL)))
 			return expression_error::NO_SUCH_MEMORY_SPACE;
 		break;
 
@@ -1433,12 +1459,12 @@ expression_error::error_code debugger_cpu::expression_validate(void *param, cons
 		if (name)
 		{
 			device = expression_get_device(name);
-			if (!device)
+			if (device == nullptr || !device->interface(memory))
 				return expression_error::INVALID_MEMORY_NAME;
 		}
 		if (!device)
 			device = m_machine.debugger().cpu().get_visible_cpu();
-		if (!device->memory().has_space(AS_PROGRAM))
+		if (!device->interface(memory) || !memory->has_space(AS_PROGRAM))
 			return expression_error::NO_SUCH_MEMORY_SPACE;
 		break;
 

@@ -350,7 +350,7 @@ private:
 		FILE &              m_file;                     // tracing file for this CPU
 		std::string         m_action;                   // action to perform during a trace
 		offs_t              m_history[TRACE_LOOPS];     // history of recent PCs
-		bool				m_detect_loops;				// whether or not we should detect loops
+		bool                m_detect_loops;             // whether or not we should detect loops
 		int                 m_loops;                    // number of instructions in a loop
 		int                 m_nextdex;                  // next index
 		bool                m_trace_over;               // true if we're tracing over

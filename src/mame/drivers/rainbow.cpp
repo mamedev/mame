@@ -36,11 +36,11 @@ NVRAM files from -A and -B machines are not interchangeable. If problems arise, 
 CPM 2.1 / DOS2.11 / DOS 3.x and UCSD systems (fort_sys, pas_sys) + diag disks boot.
 It is possible to boot DOS 3.10 from floppy A: and later use a hard disk attached to E:.
 
-NB.: a single hard disk (5 - 67 MB, 512 byte sectors) may be attached before startup. It should remain there 
+NB.: a single hard disk (5 - 67 MB, 512 byte sectors) may be attached before startup. It should remain there
 until shutdown. "Hot swapping" wasn't possible on the original system (our GUI just doesn't forbid it).
 
 To create a RD50/ST506 compatible image (153 cylinders, 4 heads, 16 sectors, standard 512 byte sectors) enter
->chdman64 createhd - c none - chs 153, 4, 16 - ss 512 - o RD50_ST506.chd 
+>chdman64 createhd - c none - chs 153, 4, 16 - ss 512 - o RD50_ST506.chd
 NOTE: use -c none parameter for no compression. No more than 8 heads or 1024 cylinders.
 
 Some BUGS remain: BIOS autoboot doesnt work at all. It is not possible to boot from a properly formatted
@@ -58,7 +58,7 @@ CURRENTY UNEMULATED
 
 (b1) LOOPBACK circuit not emulated, NMI from RAM card also unemulated (NMI vector 02).
 The former is used in startup tests, the latter seems less relevant (must use menu self test "S"
- or memory diagnostic test.	TODO: mem.test causes a CPU crash when reaching higher RAM regions.
+ or memory diagnostic test. TODO: mem.test causes a CPU crash when reaching higher RAM regions.
 
 (b2) system interaction tests HALT Z80 CPU at location $0211 (forever). Boot the RX50 diag.disk
  to see what happens (key 3 - individual tests, then 12 - system interaction). Uses LOOPBACK too?
@@ -84,7 +84,7 @@ SH10 BDL REQ (L)  -> Pin 1 (A0) BUNDLE OPTION wishes to use shared memory
 
 HARDWARE UPGRADES WORTH EMULATING (should be implemented as SLOT DEVICES):
 * Color graphics option (uses NEC upd7220 GDC).         REFERENCE: Programmer's Reference: AA-AE36A-TV.
-Either 240 X 380 x 16 or 240 x 800 x 4 colors (out of 4096). 8 x 64 K video RAM. 
+Either 240 X 380 x 16 or 240 x 800 x 4 colors (out of 4096). 8 x 64 K video RAM.
 On a 100-A, pallette limited to 4 shades (LSB 2 bits; applies to medium resolution mode 240 X 380 pixels only).
 Graphics output independent from monochrome output. Single and dual monitor configurations possible.
 
@@ -242,10 +242,10 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 
 #define RTC_BASE 0xFC000
 // Do not pretend to emulate newer RAM board; stick with the old one:
-// (only affects presence bit in 'system_parameter_r') 
+// (only affects presence bit in 'system_parameter_r')
 #define OLD_RAM_BOARD_PRESENT
 
-#ifdef		ASSUME_MODEL_A_HARDWARE
+#ifdef      ASSUME_MODEL_A_HARDWARE
 	// Define standard and maximum RAM sizes (A model):
 	#define MOTHERBOARD_RAM 0x0ffff  // 64 K base RAM  (100-A)
 	#define END_OF_RAM 0xcffff // Very last byte (theretical; on 100-A) DO NOT CHANGE.
@@ -268,8 +268,8 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 // DEC says that MHFU is also re-enabled 'automatically after STI' (when under BIOS control?)
 
 // Schematics show "VERT FREQ INT" (= DC012 output, pin 2) and MHFU ENBL L are evaluated,
-//	as well as the power good signal from the PSU (AC_OK). MS_TO_POWER_GOOD is a guess:
-#define MS_TO_POWER_GOOD 350 
+//  as well as the power good signal from the PSU (AC_OK). MS_TO_POWER_GOOD is a guess:
+#define MS_TO_POWER_GOOD 350
 // Reset duration of 108 ms from documentation -
 #define RESET_DURATION_MS 108
 
@@ -290,13 +290,13 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 
 #include "machine/wd_fdc.h"
 #include "formats/rx50_dsk.h"
-#include "formats/pc_dsk.h" // PC Formats 
+#include "formats/pc_dsk.h" // PC Formats
 #include "imagedev/flopdrv.h"
 
 #include "imagedev/harddriv.h"
 #include "machine/wd2010.h"
 
-#include "machine/z80dart.h" 
+#include "machine/z80dart.h"
 #include "bus/rs232/rs232.h"
 #include "imagedev/bitbngr.h"
 #include "machine/com8116.h"
@@ -422,7 +422,7 @@ public:
 	DECLARE_WRITE8_MEMBER(printer_bitrate_w);
 	DECLARE_WRITE_LINE_MEMBER( com8116_a_fr_w );
 	DECLARE_WRITE_LINE_MEMBER( com8116_a_ft_w );
-	 
+
 	UINT32 screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	IRQ_CALLBACK_MEMBER(irq_callback);
@@ -485,7 +485,7 @@ private:
 	void lower_8088_irq(int ref);
 
 	void update_mpsc_irq();
-	int	m_mpsc_irq;
+	int m_mpsc_irq;
 	void update_8088_irqs();
 
 	void update_bundle_irq(); // RD51 or COMM.OPTION!
@@ -552,7 +552,7 @@ FLOPPY_FORMATS_END
 static SLOT_INTERFACE_START(rainbow_floppies)
 SLOT_INTERFACE("525qd0", FLOPPY_525_QD) // QD means 80 tracks with DD data rate (single or double sided).
 SLOT_INTERFACE("525qd1", FLOPPY_525_QD)
-SLOT_INTERFACE("525dd", FLOPPY_525_DD) // mimic a 5.25" PC (40 track) drive. Requires IDrive5.SYS.  
+SLOT_INTERFACE("525dd", FLOPPY_525_DD) // mimic a 5.25" PC (40 track) drive. Requires IDrive5.SYS.
 SLOT_INTERFACE("35dd", FLOPPY_35_DD) // mimic 3.5" PC drive (720K, double density). Use Impdrv3.SYS.
 SLOT_INTERFACE_END
 
@@ -560,8 +560,8 @@ void rainbow_state::machine_start()
 {
 	m_POWER_GOOD = false; // Simulate AC_OK signal from power supply.
 	cmd_timer = timer_alloc(0);
-	cmd_timer->adjust(attotime::from_msec(MS_TO_POWER_GOOD)); 
-	
+	cmd_timer->adjust(attotime::from_msec(MS_TO_POWER_GOOD));
+
 	MOTOR_DISABLE_counter = 2; // soon resets drv.LEDs
 
 	m_SCREEN_BLANK = false;
@@ -585,7 +585,7 @@ void rainbow_state::machine_start()
 		rom[0xf4000 + 0x0303] = 0x00; // disable CRC check
 		rom[0xf4000 + 0x135e] = 0x00; // FLOPPY / RX-50 WORKAROUND: in case of Z80 RESPONSE FAILURE ($80 bit set in AL), do not block floppy access.
 
-        rom[0xf4000 + 0x198F] = 0xeb; // cond.JMP to uncond.JMP (disables error message 60...)
+		rom[0xf4000 + 0x198F] = 0xeb; // cond.JMP to uncond.JMP (disables error message 60...)
 	}
 #endif
 }
@@ -719,7 +719,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(rainbowz80_io, AS_IO, 8, rainbow_state)
 ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_GLOBAL_MASK(0xff) 
+ADDRESS_MAP_GLOBAL_MASK(0xff)
 AM_RANGE(0x00, 0x00) AM_READWRITE(z80_latch_r, z80_latch_w)
 AM_RANGE(0x20, 0x20) AM_READWRITE(z80_generalstat_r, z80_diskdiag_read_w) // read to port 0x20 used by MS-DOS 2.x diskette loader.
 AM_RANGE(0x21, 0x21) AM_READWRITE(z80_generalstat_r, z80_diskdiag_write_w)
@@ -836,31 +836,31 @@ void rainbow_state::machine_reset()
 		printf("\nWARNING: 896 K is not a valid memory configuration on Rainbow 100 A!\n");
 	}
 
-//	check = (unmap_start >> 16)-1;  // guess.
-//	NVRAM_LOCATION = nv[0xed084];   // location not verified yet. DMT RAM check tests offset $84 !
+//  check = (unmap_start >> 16)-1;  // guess.
+//  NVRAM_LOCATION = nv[0xed084];   // location not verified yet. DMT RAM check tests offset $84 !
 #else
 	printf("\n*** RAINBOW B MODEL ASSUMED (128 - 896 K RAM)\n");
 	if (unmap_start < 0x20000)
 	{
-		unmap_start = 0x20000; // 128 K minimum 
+		unmap_start = 0x20000; // 128 K minimum
 		printf("\nWARNING: 64 K is not a valid memory size on Rainbow 100-B!\n");
 	}
 
 	check = (unmap_start >> 16) - 2;
-	NVRAM_LOCATION = nv[0xed0db];  
+	NVRAM_LOCATION = nv[0xed0db];
 #endif
 	if (check != NVRAM_LOCATION)
 		printf("\nNOTE: RAM configuration does not match NVRAM.\nUNMAP_START = %05x   NVRAM VALUE = %02x   SHOULD BE: %02x\n", unmap_start, NVRAM_LOCATION, check);
 
 	if(END_OF_RAM > unmap_start)
 		program.unmap_readwrite(unmap_start, END_OF_RAM);
-	
-	m_crtc->MHFU(MHFU_RESET_and_DISABLE);  
+
+	m_crtc->MHFU(MHFU_RESET_and_DISABLE);
 
 #ifdef RTC_ENABLED
 // *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-B' ***************************************
 // No address space needed ( -> IRQs must be disabled to block ROM accesses during reads ).
-	program.install_read_handler(RTC_BASE, RTC_BASE + 0x2104, read8_delegate(FUNC(rainbow_state::rtc_r), this));	
+	program.install_read_handler(RTC_BASE, RTC_BASE + 0x2104, read8_delegate(FUNC(rainbow_state::rtc_r), this));
 // *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-B' ***************************************
 #endif
 
@@ -908,7 +908,7 @@ void rainbow_state::machine_reset()
 	m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	m_z80_halted = true;
 
-	m_zflip = true; // ZRESET high on startup 
+	m_zflip = true; // ZRESET high on startup
 	m_diagnostic = 0;   // DIAGNOSTIC_R/W registers (shouldn't it be 1?)
 
 	INTZ80 = false;
@@ -1022,7 +1022,7 @@ void rainbow_state::update_mpsc_irq()
 	else
 		raise_8088_irq(IRQ_COMM_PTR_INTR_L);
 
-	m_mpsc->m1_r(); // interrupt acknowledge 
+	m_mpsc->m1_r(); // interrupt acknowledge
 }
 
 WRITE_LINE_MEMBER(rainbow_state::mpsc_irq)
@@ -1031,18 +1031,18 @@ WRITE_LINE_MEMBER(rainbow_state::mpsc_irq)
 	update_mpsc_irq();
 }
 
-// PORT 0x0e : Printer bit rates 
+// PORT 0x0e : Printer bit rates
 WRITE8_MEMBER(rainbow_state::printer_bitrate_w)
-{   
+{
 	printf("\nPRINTER bitrate = %02x HEX\n",data & 7);
 
 	// "bit 3 controls the communications port clock (RxC,TxC). External clock when 1, internal when 0"
-	printf(" - CLOCK BIT: %02x", data & 8); 
+	printf(" - CLOCK BIT: %02x", data & 8);
 }
 
 // PORT 0x06 : Communication bit rates (see page 21 of PC 100 SPEC)
 WRITE8_MEMBER(rainbow_state::comm_bitrate_w)
-{   
+{
 	m_dbrg->str_w(data & 0x0f);  // PDF is wrong, low nibble is RECEIVE clock (verified in SETUP).
 	printf("\nRECEIVE bitrate = %02x HEX\n",data & 0x0f);
 
@@ -1126,9 +1126,9 @@ WRITE8_MEMBER(rainbow_state::share_z80_w)
 
 // DRIVERS: (a) DOS and CP/M binaries plus source from DEC employee (rbclik); Reads & displays times. Y2K READY!
 // (b) Suitable Solutions ClikClok distribution disk; Uses $FE000 and up. 2 digit year. Needed to set time & date.
-//      
-// TODO: obtain hardware / check address decoders. 
-// RTC accesses here were derived from Vincent Esser's published source. 
+//
+// TODO: obtain hardware / check address decoders.
+// RTC accesses here were derived from Vincent Esser's published source.
 READ8_MEMBER(rainbow_state::rtc_r)
 {
 	if((m_inp11->read() == 0x01)) // if enabled...
@@ -1136,34 +1136,34 @@ READ8_MEMBER(rainbow_state::rtc_r)
 		switch (offset)
 		{
 			// Transfer data to DS1315 (data = offset):
-			case 0x0000:  // RTC_WRITE_DATA_0 0xFC000 
+			case 0x0000:  // RTC_WRITE_DATA_0 0xFC000
 			case 0x2000:  // RTC_WRITE_DATA_0 0xFE000 (MIRROR)
 
-			case 0x0001:  // RTC_WRITE_DATA_1 0xFC001 
+			case 0x0001:  // RTC_WRITE_DATA_1 0xFC001
 			case 0x2001:  // RTC_WRITE_DATA_1 0xFE001 (MIRROR)
-				m_rtc->write_data(space, offset & 0x01); 
+				m_rtc->write_data(space, offset & 0x01);
 				break;
 
 			// Read actual time/date from ClikClok:
 			case 0x0004:  // 0xFC004
 			case 0x2004:  // 0xFE004 (MIRROR)
-				if (m_rtc->chip_enable())  
-					return (m_rtc->read_data(space, 0) & 0x01);         
+				if (m_rtc->chip_enable())
+					return (m_rtc->read_data(space, 0) & 0x01);
 
-		        // (RTC ACTIVATION) READ MAGIC PATTERN 0
-			case 0x0100:  // 0xFC100 
+				// (RTC ACTIVATION) READ MAGIC PATTERN 0
+			case 0x0100:  // 0xFC100
 			case 0x2100:  // 0xFE100 (MIRROR)
-				m_rtc->read_0(space, 0);     
+				m_rtc->read_0(space, 0);
 				break;
 
-			// (RTC ACTIVATION) READ MAGIC PATTERN 1 
-			case 0x0101:  // 0xFC101 
+			// (RTC ACTIVATION) READ MAGIC PATTERN 1
+			case 0x0101:  // 0xFC101
 			case 0x2101:  // 0xFE101 (MIRROR)
-				m_rtc->read_1(space, 0);     	
+				m_rtc->read_1(space, 0);
 				break;
 
 			// RESET
-			case 0x0104:  // 0xFC104 
+			case 0x0104:  // 0xFC104
 			case 0x2104:  // 0xFE104 (MIRROR)
 				m_rtc->chip_reset();
 				break;
@@ -1171,7 +1171,7 @@ READ8_MEMBER(rainbow_state::rtc_r)
 	}
 
 	UINT8 *rom = memregion("maincpu")->base();
-	return rom[RTC_BASE + offset]; 	// Return ROM to prevent crashes 
+	return rom[RTC_BASE + offset];  // Return ROM to prevent crashes
 }
 // ------------------------/ ClikClok (for model B; DS1315)  ---------------------------------
 
@@ -1185,8 +1185,8 @@ static const int SECTOR_SIZES[4] = { 256, 512, 1024, 128 };
 
 void rainbow_state::hdc_reset()
 {
-//	logerror(">> HARD DISC CONTROLLER RESET <<\n");
-	m_hdc->reset(); 
+//  logerror(">> HARD DISC CONTROLLER RESET <<\n");
+	m_hdc->reset();
 
 	m_bdl_irq = 0;
 	update_bundle_irq(); // reset INTRQ
@@ -1260,7 +1260,7 @@ static UINT32 get_and_print_lbasector(device_t *device, hard_disk_info *info, UI
 	lbasector *= info->sectors;   // LBA : ( x 16 )
 	lbasector += (sector_number - 1); // + (sector number - 1)
 
-//	device->logerror(" CYLINDER %u - HEAD %u - SECTOR NUMBER %u (LBA-SECTOR %u) ", cylinder, head, sector_number, lbasector);
+//  device->logerror(" CYLINDER %u - HEAD %u - SECTOR NUMBER %u (LBA-SECTOR %u) ", cylinder, head, sector_number, lbasector);
 	return lbasector;
 }
 
@@ -1279,7 +1279,7 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_read_sector)
 		{
 			read_status = 2;
 
-//			logerror("\nTRYING TO READ");
+//          logerror("\nTRYING TO READ");
 			output().set_value("led1", 0);
 
 			int hi = (m_hdc->read(generic_space(), 0x05)) & 0x07;
@@ -1310,7 +1310,7 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_read_sector)
 						if (hard_disk_read(local_hard_disk, lbasector, m_hdc_buffer)) // accepts LBA sector (UINT32) !
 						{
 							read_status = 0;
-//							logerror("...success!\n");
+//                          logerror("...success!\n");
 						}
 					}
 				}
@@ -1401,7 +1401,7 @@ int rainbow_state::do_write_sector()
 		if ((info = hard_disk_get_info(local_hard_disk)))
 		{
 			feedback = 10;
-//			logerror("\n* TRYING TO WRITE * ");
+//          logerror("\n* TRYING TO WRITE * ");
 			output().set_value("led1", 1); // OFF
 
 			UINT8 SDH = (m_hdc->read(generic_space(), 0x06));
@@ -1483,7 +1483,7 @@ READ8_MEMBER(rainbow_state::hd_status_68_r)
 
 	int my_offset = 0x07;
 	int stat = m_hdc->read(space, my_offset);
-//	logerror("(x68) WD1010 register %04x (STATUS) read, result : %04x\n", my_offset, stat);
+//  logerror("(x68) WD1010 register %04x (STATUS) read, result : %04x\n", my_offset, stat);
 
 	// NOTE: SEEK COMPLETE IS CURRENTLY HARD WIRED / NOT FULLY EMULATED -
 	// Bit 4 : SEEK COMPLETE: This status bit indicates that the disk drive positioned the R/W heads over the desired track on the disk surface.
@@ -1546,7 +1546,7 @@ WRITE8_MEMBER(rainbow_state::hd_status_68_w)
 	//                 1 : see  @ 088D after 'READ_SECTOR_OK'
 	if (data & 0x01)
 	{
-//		logerror(">> HARD DISC * SET BUFFER READY * <<\n");
+//      logerror(">> HARD DISC * SET BUFFER READY * <<\n");
 
 		output().set_value("led1", 0);  // 1 = OFF (One of the CPU LEDs as DRIVE LED) = HARD DISK ACTIVITY =
 		MOTOR_DISABLE_counter = 20;
@@ -1585,7 +1585,7 @@ positioned over cylinder 0 (the data track furthest away from the spindle).
 READ8_MEMBER(rainbow_state::hd_status_69_r)
 {
 	int HS = m_hdc->read(space, 0x06) & (1 + 2 + 4); // SDH bits 0-2 = HEAD #
-//	logerror("(x69 READ) %i = HEAD SELECT WD1010\n", HS);
+//  logerror("(x69 READ) %i = HEAD SELECT WD1010\n", HS);
 
 	UINT8 data = (HS << 1);
 
@@ -1594,7 +1594,7 @@ READ8_MEMBER(rainbow_state::hd_status_69_r)
 	int DRV = ((m_hdc->read(space, 0x06) >> 3) & 0x01);  // 0x03 gives error R6 with DIAG.DISK
 	if (DRV == 0)
 	{
-//		logerror("(x69 READ) %i = _DRIVE # 0_ SELECT! \n", DRV);
+//      logerror("(x69 READ) %i = _DRIVE # 0_ SELECT! \n", DRV);
 		data |= 1;
 	}
 
@@ -1607,7 +1607,7 @@ READ8_MEMBER(rainbow_state::hd_status_69_r)
 	if (m_hdc_drive_ready)
 		data |= 64;
 
-	m_hdc_track0 = false; 	// Fake TRACK 0 signal  (normally FROM DRIVE)
+	m_hdc_track0 = false;   // Fake TRACK 0 signal  (normally FROM DRIVE)
 
 	int stat1 = m_hdc->read(space, 0x04); // CYL LO
 	int stat2 = m_hdc->read(space, 0x05); // CYL HI
@@ -1617,7 +1617,7 @@ READ8_MEMBER(rainbow_state::hd_status_69_r)
 	if (m_hdc_track0)
 	{
 		data |= 128;
-//		logerror("(x69 READ) TRACK 00 detected\n");
+//      logerror("(x69 READ) TRACK 00 detected\n");
 	}
 
 	return data;
@@ -1672,7 +1672,7 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_bdrq)
 {
 	static int old_state;
 
-//	logerror("BDRQ - BUFFER DATA REQUEST OBTAINED: %u\n", state);
+//  logerror("BDRQ - BUFFER DATA REQUEST OBTAINED: %u\n", state);
 	if ((state == 1) && (old_state == 0))
 	{
 		hdc_buffer_counter_reset();
@@ -1725,35 +1725,35 @@ READ8_MEMBER(rainbow_state::system_parameter_r)
 	return  (((m_inp5->read() == 1) ? 0 : 1) |
 		((m_inp6->read() == 1) ? 0 : 2) |
 		((m_inp7->read() == 1) ? 0 : 4) |
-#ifdef		OLD_RAM_BOARD_PRESENT
-		((m_inp8->read() > MOTHERBOARD_RAM) ? 0 : 8) | 
+#ifdef      OLD_RAM_BOARD_PRESENT
+		((m_inp8->read() > MOTHERBOARD_RAM) ? 0 : 8) |
 #else
 		8  |
 #endif
-        16 | 32 | 64 | 128  // to be verified.
+		16 | 32 | 64 | 128  // to be verified.
 			);
 }
 
-//	[02] COMMUNICATIONS STATUS REGISTER - PAGE 154 (**** READ **** )
-//	Used to read status of SERIAL port, IRQ line of each CPU, and MHFU logic enable signal.
+//  [02] COMMUNICATIONS STATUS REGISTER - PAGE 154 (**** READ **** )
+//  Used to read status of SERIAL port, IRQ line of each CPU, and MHFU logic enable signal.
 
 // ******* TODO: 5 status bits * MISSING * ********************************************************
 // 0 COMM RI   (reflects status of RI line at COMM port)
 // 1 COMM SI / SCF(reflects status of speed indicator line or
-//	               the secondary receive line signal detect at COMM port)
+//                 the secondary receive line signal detect at COMM port)
 // 2 COMM DSR  (reflects status of DSR at COMM)
 // 3 COMM CTS  (reflects status of CTS at COMM)
 // 4 COMM RLSD (receive line signal detect at COMM)
 READ8_MEMBER(rainbow_state::comm_control_r)
 {
-	bool is_mhfu_enabled = false; 
-	if (m_POWER_GOOD)				 
-	   is_mhfu_enabled = m_crtc->MHFU(MHFU_IS_ENABLED);
+	bool is_mhfu_enabled = false;
+	if (m_POWER_GOOD)
+		is_mhfu_enabled = m_crtc->MHFU(MHFU_IS_ENABLED);
 
-	return	(
- 			(is_mhfu_enabled ? 0x00 : 0x20) |	// (L) status of MHFU flag => bit pos.5
-			((INT88) ? 0x00 : 0x40) |			// (L)
-			((INTZ80) ? 0x00 : 0x80)			// (L)
+	return  (
+			(is_mhfu_enabled ? 0x00 : 0x20) |   // (L) status of MHFU flag => bit pos.5
+			((INT88) ? 0x00 : 0x40) |           // (L)
+			((INTZ80) ? 0x00 : 0x80)            // (L)
 			);
 }
 
@@ -1763,7 +1763,7 @@ READ8_MEMBER(rainbow_state::comm_control_r)
 // 0 COMM SPD SEL H (controls speed select line of COMM port)
 // 1 COMM SRTS H     (controls secondary request to send line of COMM)
 // 2 COMM DTR L      (controls terminal ready line of COMM)
-// 3 COMM RTS	     (controls request to send line of COMM)
+// 3 COMM RTS        (controls request to send line of COMM)
 WRITE8_MEMBER(rainbow_state::comm_control_w)
 {
 	printf("%02x to COMM.CONTROL REGISTER ", data);
@@ -1894,7 +1894,7 @@ READ8_MEMBER(rainbow_state::z80_generalstat_r)
 			if (!m_floppy->ready_r()) // weird (see wd_fdc)
 				fdc_ready = 1;
 
-			if ((fdc_ready) && (m_floppy->wpt_r() != 1) && m_POWER_GOOD) 
+			if ((fdc_ready) && (m_floppy->wpt_r() != 1) && m_POWER_GOOD)
 				fdc_write_gate = 1; // * FAKE * WRITE GATE !
 
 									// "valid only when drive is selected" !
@@ -1922,7 +1922,7 @@ READ8_MEMBER(rainbow_state::z80_generalstat_r)
 READ8_MEMBER(rainbow_state::z80_diskstatus_r)
 {
 	int track = 0;
-	int data = m_z80_diskcontrol & (255 - 0x80 - 0x40 - 0x20 - 4); 
+	int data = m_z80_diskcontrol & (255 - 0x80 - 0x40 - 0x20 - 4);
 
 	// D7: DRQ: reflects status of DATA REQUEST signal from FDC.
 	// '1' indicates that FDC has read data OR requires new write data.
@@ -1938,7 +1938,7 @@ READ8_MEMBER(rainbow_state::z80_diskstatus_r)
 	// D5: SIDE 0 * HIGH ACTIVE *: status of side select signal at J2 + J3 of RX50 controller.
 	//              For 1 sided drives, this bit will always read low (0).
 	if (m_floppy)
-		data |= m_floppy->ss_r() ? 0x20 : 0x00; 
+		data |= m_floppy->ss_r() ? 0x20 : 0x00;
 
 	// *LOW ACTIVE *
 	// D4: MOTOR 1 ON L: 0 = indicates MOTOR 1 ON bit is set in drive control reg.
@@ -1955,7 +1955,7 @@ READ8_MEMBER(rainbow_state::z80_diskstatus_r)
 
 	// D2: TG43 * LOW ACTIVE * :  0 = INDICATES TRACK > 43 SIGNAL FROM FDC TO DISK DRIVE.
 	// (asserted when writing data to tracks 44 through 79)
-	data |= (track > 43) ? 0x00 : 0x04;  // ! LOW ACTIVE ! 
+	data |= (track > 43) ? 0x00 : 0x04;  // ! LOW ACTIVE !
 
 	// D1: DS1 H: reflect status of bits 0 and 1 from disk.control reg.
 	// D0: DS0 H: "
@@ -2090,14 +2090,14 @@ READ8_MEMBER(rainbow_state::read_video_ram_r)
 
 // CPU acknowledge of VBL IRQ resets counter
 IRQ_CALLBACK_MEMBER(rainbow_state::irq_callback)
-{   
-	int intnum = -1; 	
+{
+	int intnum = -1;
 	for (int i = IRQ_8088_VBL; i >= 0; i--)
 	{
 			if (m_irq_mask & (1 << i))
 			{
-				if (i == IRQ_8088_VBL)  // If VBL IRQ acknowledged... 
-					m_crtc->MHFU(MHFU_RESET); // ...reset counter (also: DC012_W) 
+				if (i == IRQ_8088_VBL)  // If VBL IRQ acknowledged...
+					m_crtc->MHFU(MHFU_RESET); // ...reset counter (also: DC012_W)
 
 				intnum = vectors[i] | m_irq_high;
 				break;
@@ -2111,7 +2111,7 @@ INTERRUPT_GEN_MEMBER(rainbow_state::vblank_irq)
 	raise_8088_irq(IRQ_8088_VBL);
 	m_crtc->notify_vblank(true);
 
-	if (m_POWER_GOOD && m_crtc->MHFU(MHFU_IS_ENABLED)) // If enabled... 
+	if (m_POWER_GOOD && m_crtc->MHFU(MHFU_IS_ENABLED)) // If enabled...
 	{
 		if (m_crtc->MHFU(MHFU_VALUE) > 7) // + more than (7 * 16.666) msecs gone (108 ms would be by the book)
 		{
@@ -2130,7 +2130,7 @@ WRITE_LINE_MEMBER(rainbow_state::clear_video_interrupt)
 	m_crtc->notify_vblank(false);
 }
 
-// Reflects bits from 'diagnostic_w' (1:1), except test jumpers 
+// Reflects bits from 'diagnostic_w' (1:1), except test jumpers
 READ8_MEMBER(rainbow_state::diagnostic_r) // 8088 (port 0A READ). Fig.4-29 + table 4-15
 {
 	return ((m_diagnostic & (0xf1)) |
@@ -2144,7 +2144,7 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 {
 	//    printf("%02x to diag port (PC=%x)\n", data, space.device().safe_pc());
 	m_SCREEN_BLANK = (data & 2) ? false : true;
-	 
+
 	// ZRESET from 8088 to Z80 - - HIGH at powerup!
 	if (!(data & 1))
 	{
@@ -2173,15 +2173,15 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 		m_fdc->reset(); // See formatter description p.197 or 5-13
 	}
 
-	if (data & 0x04) // GRF_VID_SEL 
+	if (data & 0x04) // GRF_VID_SEL
 		printf("\n*** UNEMULATED GRAPHICS [on GRAPHICS OPTION]. (bit 2 in diagnostic_w) = %i  (0 = system module; else graphics option) ",data & 4);
 
 	// BIT 3: PARITY TEST (1 = enables parity test on memory option board).
-	//		  FIXME: parity test = NMI? When should NMI fire? Whole bank tested?  
+	//        FIXME: parity test = NMI? When should NMI fire? Whole bank tested?
 	if (data & 0x08)
 		printf("\n*** UNEMULATED PARITY TEST [on RAM EXTENSION] - (bit 3 in diagnostic_w) ");
-	//		m_i8088->set_input_line_and_vector(INPUT_LINE_NMI, ASSERT_LINE, 0x02);
-	
+	//      m_i8088->set_input_line_and_vector(INPUT_LINE_NMI, ASSERT_LINE, 0x02);
+
 	// MISSING BITS (* not vital for normal operation, see diag.disk) -
 	// * BIT 4: DIAG LOOPBACK (0 at power-up; 1 directs RX50 and DC12 output to printer port)
 	// * BIT 5: PORT LOOPBACK (1 enables loopback for COMM, PRINTER, KEYBOARD ports)
@@ -2277,7 +2277,7 @@ WRITE_LINE_MEMBER(rainbow_state::write_keyboard_clock)
 TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::motor_tick)
 {
 	if (m_POWER_GOOD)
-		m_crtc->MHFU(MHFU_COUNT); // // Increment IF ENABLED and POWER_GOOD, return count   
+		m_crtc->MHFU(MHFU_COUNT); // // Increment IF ENABLED and POWER_GOOD, return count
 
 	m_hdc_index_latch = true; // HDC drive index signal (not working ?)
 
@@ -2298,7 +2298,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::motor_tick)
 // on 100-B, DTR from the keyboard 8051 controls bit 7 of IRQ vectors
 WRITE_LINE_MEMBER(rainbow_state::irq_hi_w)
 {
-#ifdef		ASSUME_MODEL_A_HARDWARE
+#ifdef      ASSUME_MODEL_A_HARDWARE
 	m_irq_high = 0;
 #else
 	m_irq_high = (state == ASSERT_LINE) ? 0x80 : 0;
@@ -2316,7 +2316,7 @@ static const gfx_layout rainbow_charlayout =
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 15 * 8, 0 * 8, 1 * 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8, 8 * 8 },
-	8 * 16		/* every char takes 16 bytes */
+	8 * 16      /* every char takes 16 bytes */
 };
 
 static GFXDECODE_START(rainbow)
@@ -2386,28 +2386,28 @@ MCFG_HARDDISK_ADD("harddisk1")
 
 MCFG_DS1315_ADD("rtc") // DS1315 (ClikClok for DEC-100 B)   * OPTIONAL *
 
-MCFG_DEVICE_ADD("com8116", COM8116, XTAL_5_0688MHz)  	// Baud rate generator
+MCFG_DEVICE_ADD("com8116", COM8116, XTAL_5_0688MHz)     // Baud rate generator
 MCFG_COM8116_FR_HANDLER(WRITELINE(rainbow_state, com8116_a_fr_w))
 MCFG_COM8116_FT_HANDLER(WRITELINE(rainbow_state, com8116_a_ft_w))
 
-MCFG_UPD7201_ADD("upd7201", XTAL_2_5MHz, 0, 0, 0, 0)	// 2.5 Mhz from schematics
+MCFG_UPD7201_ADD("upd7201", XTAL_2_5MHz, 0, 0, 0, 0)    // 2.5 Mhz from schematics
 MCFG_Z80DART_OUT_INT_CB(WRITELINE(rainbow_state, mpsc_irq))
 
-MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_txd)) 
-MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_dtr)) 
+MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_txd))
+MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_dtr))
 MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_rts))
 
-MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_txd)) 
-MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_dtr)) 
+MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_txd))
+MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_dtr))
 MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_rts))
 
 MCFG_RS232_PORT_ADD("rs232_a", default_rs232_devices, nullptr)
-MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd7201", upd7201_device, rxa_w))  
-MCFG_RS232_CTS_HANDLER(DEVWRITELINE("upd7201", upd7201_device, ctsa_w)) 
-MCFG_RS232_DCD_HANDLER(DEVWRITELINE("upd7201", upd7201_device, dcda_w)) 
+MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd7201", upd7201_device, rxa_w))
+MCFG_RS232_CTS_HANDLER(DEVWRITELINE("upd7201", upd7201_device, ctsa_w))
+MCFG_RS232_DCD_HANDLER(DEVWRITELINE("upd7201", upd7201_device, dcda_w))
 
 MCFG_RS232_PORT_ADD("rs232_b", default_rs232_devices, nullptr)
-MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd7201", upd7201_device, rxb_w)) 
+MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd7201", upd7201_device, rxb_w))
 MCFG_RS232_CTS_HANDLER(DEVWRITELINE("upd7201", upd7201_device, ctsb_w))
 MCFG_RS232_DCD_HANDLER(DEVWRITELINE("upd7201", upd7201_device, dcdb_w))
 

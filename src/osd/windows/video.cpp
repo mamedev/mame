@@ -145,7 +145,7 @@ std::shared_ptr<osd_monitor_info> win_monitor_info::monitor_from_handle(HMONITOR
 	for (auto monitor : osd_monitor_info::list)
 		if (*((HMONITOR*)monitor->oshandle()) == hmonitor)
 			return monitor;
-	
+
 	return nullptr;
 }
 
