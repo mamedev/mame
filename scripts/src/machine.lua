@@ -18,6 +18,7 @@ files {
 	MAME_DIR .. "src/devices/machine/clock.h",
 	MAME_DIR .. "src/devices/machine/keyboard.cpp",
 	MAME_DIR .. "src/devices/machine/keyboard.h",
+	MAME_DIR .. "src/devices/machine/keyboard.ipp",
 	MAME_DIR .. "src/devices/machine/laserdsc.cpp",
 	MAME_DIR .. "src/devices/machine/laserdsc.h",
 	MAME_DIR .. "src/devices/machine/latch.cpp",

@@ -849,14 +849,14 @@ void hle_device_base::device_start()
 void hle_device_base::device_reset()
 {
 	// initialise state
-	std::fill(std::begin(m_current_keys), std::end(m_current_keys), 0x0000U);
-	m_next_row = 0;
-	std::fill(std::begin(m_fifo), std::end(m_fifo), 0);
-	m_head = m_tail = 0;
-	m_empty = 1;
+	std::fill(std::begin(m_current_keys), std::end(m_current_keys), UINT16(0x0000U));
+	m_next_row = 0U;
+	std::fill(std::begin(m_fifo), std::end(m_fifo), UINT8(0x00U));
+	m_head = m_tail = 0U;
+	m_empty = 1U;
 	m_rx_state = RX_IDLE;
-	m_keyclick = 0;
-	m_beeper_state = 0;
+	m_keyclick = 0U;
+	m_beeper_state = 0x00U;
 
 	// configure device_serial_interface
 	set_data_frame(START_BIT_COUNT, DATA_BIT_COUNT, PARITY, STOP_BITS);

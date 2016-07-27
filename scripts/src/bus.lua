@@ -1657,6 +1657,7 @@ if (BUSES["RS232"]~=null) then
 		MAME_DIR .. "src/devices/bus/rs232/printer.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/printer.h",
 		MAME_DIR .. "src/devices/bus/rs232/rs232.cpp",
+		MAME_DIR .. "src/devices/bus/rs232/rs232.ipp",
 		MAME_DIR .. "src/devices/bus/rs232/rs232.h",
 		MAME_DIR .. "src/devices/bus/rs232/pty.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/pty.h",
