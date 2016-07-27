@@ -439,6 +439,11 @@ const char_info charinfo[] =
 	{ UCHAR_MAMEKEY(F13),       "F13",          nullptr },     // F13 function key
 	{ UCHAR_MAMEKEY(F14),       "F14",          nullptr },     // F14 function key
 	{ UCHAR_MAMEKEY(F15),       "F15",          nullptr },     // F15 function key
+	{ UCHAR_MAMEKEY(F16),       "F16",          nullptr },     // F16 function key
+	{ UCHAR_MAMEKEY(F17),       "F17",          nullptr },     // F17 function key
+	{ UCHAR_MAMEKEY(F18),       "F18",          nullptr },     // F18 function key
+	{ UCHAR_MAMEKEY(F19),       "F19",          nullptr },     // F19 function key
+	{ UCHAR_MAMEKEY(F20),       "F20",          nullptr },     // F20 function key
 	{ UCHAR_MAMEKEY(ESC),       "Esc",          "\033" },   // Esc key
 	{ UCHAR_MAMEKEY(INSERT),    "Insert",       nullptr },     // Insert key
 	{ UCHAR_MAMEKEY(DEL),       "Delete",       "\010" },   // Delete key
