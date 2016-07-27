@@ -198,7 +198,10 @@ ROM_START( xbox )
 
 	ROM_REGION( 0x100000, "bios", 0)
 	ROM_LOAD( "4134_1024k.bin", 0x000000, 0x100000, CRC(49d8055a) SHA1(d46cef771a63dc8024fe36d7ab5b959087ac999f) )
+	ROM_COPY( "mcpx", 1, 0x3fe00, 0x1ff)
 	ROM_COPY( "mcpx", 1, 0x7fe00, 0x1ff)
+	ROM_COPY( "mcpx", 1, 0xbfe00, 0x1ff)
+	ROM_COPY( "mcpx", 1, 0xffe00, 0x1ff)
 
 
 	ROM_REGION( 0x1000000, "tbp", 0 ) // To Be Processed, of course
