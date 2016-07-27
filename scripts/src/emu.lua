@@ -161,6 +161,8 @@ files {
 	MAME_DIR .. "src/emu/sound.h",
 	MAME_DIR .. "src/emu/speaker.cpp",
 	MAME_DIR .. "src/emu/speaker.h",
+	MAME_DIR .. "src/emu/swinfo.cpp",
+	MAME_DIR .. "src/emu/swinfo.h",
 	MAME_DIR .. "src/emu/tilemap.cpp",
 	MAME_DIR .. "src/emu/tilemap.h",
 	MAME_DIR .. "src/emu/timer.cpp",

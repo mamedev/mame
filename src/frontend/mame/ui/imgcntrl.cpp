@@ -21,6 +21,7 @@
 #include "drivenum.h"
 #include "emuopts.h"
 #include "softlist.h"
+#include "swinfo.h"
 #include "zippath.h"
 
 

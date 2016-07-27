@@ -15,6 +15,7 @@
 #include "drivenum.h"
 #include "sound/samples.h"
 #include "softlist.h"
+#include "swinfo.h"
 
 //**************************************************************************
 //  CORE FUNCTIONS

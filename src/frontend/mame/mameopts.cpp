@@ -12,6 +12,7 @@
 #include "mameopts.h"
 #include "drivenum.h"
 #include "softlist.h"
+#include "swinfo.h"
 
 #include <ctype.h>
 

@@ -18,6 +18,7 @@
 #include "mame.h"
 #include "rendfont.h"
 #include "softlist.h"
+#include "swinfo.h"
 #include "uiinput.h"
 
 #include <cmath>

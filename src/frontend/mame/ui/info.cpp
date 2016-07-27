@@ -13,7 +13,7 @@
 #include "ui/info.h"
 #include "ui/ui.h"
 
-#include "softlist.h"
+#include "swinfo.h"
 
 namespace ui {
 /*-------------------------------------------------

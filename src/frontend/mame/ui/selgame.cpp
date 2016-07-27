@@ -32,6 +32,7 @@
 #include "rendfont.h"
 #include "rendutil.h"
 #include "softlist.h"
+#include "swinfo.h"
 #include "uiinput.h"
 
 extern const char UI_VERSION_TAG[];
@@ -815,14 +816,14 @@ void menu_select_game::inkey_select(const event *menu_event)
 		// if everything looks good, schedule the new driver
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
-			if ((driver->flags & MACHINE_TYPE_ARCADE) == 0)
+			for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config().root_device()))
 			{
-				for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config().root_device()))
-					if (!swlistdev.get_info().empty())
-					{
-						menu::stack_push<menu_select_software>(ui(), container(), driver);
-						return;
-					}
+				swlistdev.parse();
+				if (swlistdev.parsed().valid())
+				{
+					menu::stack_push<menu_select_software>(ui(), container(), driver);
+					return;
+				}
 			}
 
 			s_bios biosname;

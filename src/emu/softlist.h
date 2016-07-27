@@ -11,29 +11,16 @@
 #ifndef __SOFTLIST_H_
 #define __SOFTLIST_H_
 
-#include "cstrpool.h"
-
 
 
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
 
-#define SOFTWARE_SUPPORTED_YES      0
-#define SOFTWARE_SUPPORTED_PARTIAL  1
-#define SOFTWARE_SUPPORTED_NO       2
-
 enum softlist_type
 {
 	SOFTWARE_LIST_ORIGINAL_SYSTEM,
 	SOFTWARE_LIST_COMPATIBLE_SYSTEM
-};
-
-enum software_compatibility
-{
-	SOFTWARE_IS_COMPATIBLE,
-	SOFTWARE_IS_INCOMPATIBLE,
-	SOFTWARE_NOT_COMPATIBLE
 };
 
 
@@ -73,182 +60,15 @@ enum software_compatibility
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-struct rom_entry;
 class software_info;
-class device_image_interface;
-class software_list_device;
-
-// ======================> software_list_loader
-
-class software_list_loader
-{
-public:
-	virtual bool load_software(device_image_interface &device, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const = 0;
-};
-
-
-// ======================> false_software_list_loader
-
-class false_software_list_loader : public software_list_loader
-{
-public:
-	virtual bool load_software(device_image_interface &device, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
-	static const software_list_loader &instance() { return s_instance; }
-
-private:
-	static false_software_list_loader s_instance;
-};
-
-
-// ======================> rom_software_list_loader
-
-class rom_software_list_loader : public software_list_loader
-{
-public:
-	virtual bool load_software(device_image_interface &device, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
-	static const software_list_loader &instance() { return s_instance; }
-
-private:
-	static rom_software_list_loader s_instance;
-};
-
-
-// ======================> image_software_list_loader
-
-class image_software_list_loader : public software_list_loader
-{
-public:
-	virtual bool load_software(device_image_interface &device, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
-	static const software_list_loader &instance() { return s_instance; }
-
-private:
-	static image_software_list_loader s_instance;
-};
-
-
-// ======================> feature_list_item
-
-// an item in a list of name/value pairs
-class feature_list_item
-{
-public:
-	// construction/destruction
-	feature_list_item(std::string &&name, std::string &&value);
-	feature_list_item(const std::string &name, const std::string &value);
-	feature_list_item(feature_list_item const &) = delete;
-	feature_list_item(feature_list_item &&) = delete;
-	feature_list_item& operator=(feature_list_item const &) = delete;
-	feature_list_item& operator=(feature_list_item &&) = delete;
-
-	// getters
-	feature_list_item *next() const { return m_next; }
-	const std::string &name() const { return m_name; }
-	const std::string &value() const { return m_value; }
-
-private:
-	// internal state
-	feature_list_item * m_next;
-	std::string         m_name;
-	std::string         m_value;
-};
-
-
-// ======================> software_part
-
-// a single part of a software item
-class software_part
-{
-	friend class softlist_parser;
-
-public:
-	// construction/destruction
-	software_part(software_info &info, std::string &&name, std::string &&interface);
-	software_part(software_part const &) = delete;
-	software_part(software_part &&) = delete;
-	software_part& operator=(software_part const &) = delete;
-	software_part& operator=(software_part &&) = delete;
-
-	// getters
-	software_part *next() const { return m_next; }
-	software_info &info() const { return m_info; }
-	const std::string &name() const { return m_name; }
-	const std::string &interface() const { return m_interface; }
-	const std::list<feature_list_item> &featurelist() const { return m_featurelist; }
-	const rom_entry *romdata(unsigned int index = 0) const { return (index < m_romdata.size()) ? &m_romdata[index] : nullptr; }
-
-	// helpers
-	software_compatibility is_compatible(const software_list_device &swlist) const;
-	bool matches_interface(const char *interface) const;
-	const char *feature(const std::string &feature_name) const;
-	device_image_interface *find_mountable_image(const machine_config &mconfig) const;
-
-private:
-	// internal state
-	software_part *                 m_next;
-	software_info &                 m_info;
-	std::string                     m_name;
-	std::string                     m_interface;
-	std::list<feature_list_item>    m_featurelist;
-	std::vector<rom_entry>          m_romdata;
-};
-
-
-// ======================> software_info
-
-// a single software item
-class software_info
-{
-	friend class softlist_parser;
-
-public:
-	// construction/destruction
-	software_info(software_list_device &list, std::string &&name, std::string &&parent, const char *supported);
-	software_info(software_info const &) = delete;
-	software_info(software_info &&) = delete;
-	software_info& operator=(software_info const &) = delete;
-	software_info& operator=(software_info &&) = delete;
-
-	// getters
-	software_info *next() const { return m_next; }
-	software_list_device &list() const { return m_list; }
-	const std::string &shortname() const { return m_shortname; }
-	const std::string &longname() const { return m_longname; }
-	const std::string &parentname() const { return m_parentname; }
-	const std::string &year() const { return m_year; }
-	const std::string &publisher() const { return m_publisher; }
-	const std::list<feature_list_item> &other_info() const { return m_other_info; }
-	const std::list<feature_list_item> &shared_info() const { return m_shared_info; }
-	UINT32 supported() const { return m_supported; }
-	const std::list<software_part> &parts() const { return m_partdata; }
-
-	// additional operations
-	const software_part *find_part(const char *partname, const char *interface = nullptr) const;
-	bool has_multiple_parts(const char *interface) const;
-
-private:
-	// internal state
-	software_info *         m_next;
-	software_list_device &  m_list;
-	UINT32                  m_supported;
-	std::string             m_shortname;
-	std::string             m_longname;
-	std::string             m_parentname;
-	std::string             m_year;           // Copyright year on title screen, actual release dates can be tracked in external resources
-	std::string             m_publisher;
-	std::list<feature_list_item> m_other_info;   // Here we store info like developer, serial #, etc. which belong to the software entry as a whole
-	std::list<feature_list_item> m_shared_info;  // Here we store info like TV standard compatibility, or add-on requirements, etc. which get inherited
-												// by each part of this software entry (after loading these are stored in partdata->featurelist)
-	std::list<software_part> m_partdata;
-};
+class parsed_software_list;
 
 
 // ======================> software_list_device
 
-// device representing a software list
+// device holding a software list
 class software_list_device : public device_t
 {
-	friend class softlist_parser;
-
 public:
 	// construction/destruction
 	software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -261,31 +81,20 @@ public:
 	const char *list_name() const { return m_list_name.c_str(); }
 	softlist_type list_type() const { return m_list_type; }
 	const char *filter() const { return m_filter; }
-	const char *filename() { return m_file.filename(); }
-
-	// getters that may trigger a parse
-	const char *description() { if (!m_parsed) parse(); return m_description.c_str(); }
-	bool valid() { if (!m_parsed) parse(); return !m_infolist.empty(); }
-	const char *errors_string() { if (!m_parsed) parse(); return m_errors.c_str(); }
-	const std::list<software_info> &get_info() { if (!m_parsed) parse(); return m_infolist; }
+	bool is_parsed() const { return m_parsed != nullptr; }
+	const parsed_software_list &parsed() const { assert(m_parsed != nullptr); return *m_parsed; }
 
 	// operations
 	const software_info *find(const char *look_for);
 	void find_approx_matches(const char *name, int matches, const software_info **list, const char *interface);
+	void parse();
 	void release();
-
-	// string pool helpers
-	const char *add_string(const char *string) { return m_stringpool.add(string); }
 
 	// static helpers
 	static software_list_device *find_by_name(const machine_config &mconfig, const char *name);
 	static void display_matches(const machine_config &config, const char *interface, const char *name);
 
 protected:
-	// internal helpers
-	void parse();
-	void internal_validity_check(validity_checker &valid) ATTR_COLD;
-
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_validity_check(validity_checker &valid) const override ATTR_COLD;
@@ -296,12 +105,7 @@ protected:
 	const char *                m_filter;
 
 	// internal state
-	bool                        m_parsed;
-	emu_file                    m_file;
-	std::string                 m_description;
-	std::string                 m_errors;
-	std::list<software_info>    m_infolist;
-	const_string_pool           m_stringpool;
+	std::unique_ptr<parsed_software_list> m_parsed;
 };
 
 

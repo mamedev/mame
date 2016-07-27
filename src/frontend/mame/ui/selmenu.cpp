@@ -27,7 +27,7 @@
 #include "drivenum.h"
 #include "emuopts.h"
 #include "rendutil.h"
-#include "softlist.h"
+#include "swinfo.h"
 #include "uiinput.h"
 
 #include <algorithm>

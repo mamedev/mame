@@ -19,7 +19,7 @@
 #include "ui/miscmenu.h"
 #include "ui/imgcntrl.h"
 #include "ui/floppycntrl.h"
-#include "softlist.h"
+#include "swinfo.h"
 
 
 namespace ui {
