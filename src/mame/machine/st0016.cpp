@@ -719,7 +719,7 @@ UINT32 st0016_cpu_device::update(screen_device &screen, bitmap_ind16 &bitmap, co
 			fprintf(p,"%.4x - %.4x - ",h,h>>3);
 			for(j=0;j<8;j++)
 				fprintf(p,"%.2x ",st0016_spriteram[h+j]);
-				fprintf(p,"\n");
+			fprintf(p,"\n");
 		}
 		fclose(p);
 	}
