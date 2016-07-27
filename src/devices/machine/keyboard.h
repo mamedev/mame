@@ -61,6 +61,8 @@ protected:
 	virtual void key_break(UINT8 row, UINT8 column);
 	virtual void will_scan_row(UINT8 row);
 
+	bool are_all_keys_up();
+
 private:
 	// device_serial_interface uses 10'000 range
 	enum {

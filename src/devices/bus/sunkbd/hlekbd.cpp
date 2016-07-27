@@ -2,7 +2,7 @@
 // copyright-holders:Vas Crabb
 #include "hlekbd.h"
 
-#include <numeric>
+#include "machine/keyboard.ipp"
 
 
 /*
@@ -761,24 +761,18 @@ hle_device_base::hle_device_base(
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_serial_interface(mconfig, *this)
 	, device_sun_keyboard_port_interface(mconfig, *this)
+	, device_matrix_keyboard_interface(mconfig, *this, "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7")
 	, m_dips(*this, "DIP")
-	, m_key_inputs{
-			{ *this, "ROW0" }, { *this, "ROW1" },
-			{ *this, "ROW2" }, { *this, "ROW3" },
-			{ *this, "ROW4" }, { *this, "ROW5" },
-			{ *this, "ROW6" }, { *this, "ROW7" } }
-	, m_scan_timer(nullptr)
 	, m_click_timer(nullptr)
 	, m_beeper(*this, "beeper")
-	, m_current_keys{ 0, 0, 0, 0, 0, 0, 0, 0 }
-	, m_next_row(0)
 	, m_fifo{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
-	, m_head(0)
-	, m_tail(0)
-	, m_empty(0)
+	, m_head(0U)
+	, m_tail(0U)
+	, m_empty(0U)
+	, m_make_count(0U)
 	, m_rx_state(RX_IDLE)
-	, m_keyclick(0)
-	, m_beeper_state(0)
+	, m_keyclick(0U)
+	, m_beeper_state(0U)
 {
 }
 
@@ -825,15 +819,13 @@ void hle_device_base::device_start()
 {
 	device_serial_interface::register_save_state(machine().save(), this);
 
-	m_scan_timer = timer_alloc(SCAN_TIMER_ID);
 	m_click_timer = timer_alloc(CLICK_TIMER_ID);
 
-	save_item(NAME(m_current_keys));
-	save_item(NAME(m_next_row));
 	save_item(NAME(m_fifo));
 	save_item(NAME(m_head));
 	save_item(NAME(m_tail));
 	save_item(NAME(m_empty));
+	save_item(NAME(m_make_count));
 	save_item(NAME(m_rx_state));
 	save_item(NAME(m_keyclick));
 	save_item(NAME(m_beeper_state));
@@ -849,11 +841,10 @@ void hle_device_base::device_start()
 void hle_device_base::device_reset()
 {
 	// initialise state
-	std::fill(std::begin(m_current_keys), std::end(m_current_keys), UINT16(0x0000U));
-	m_next_row = 0U;
 	std::fill(std::begin(m_fifo), std::end(m_fifo), UINT8(0x00U));
 	m_head = m_tail = 0U;
 	m_empty = 1U;
+	m_make_count = 0U;
 	m_rx_state = RX_IDLE;
 	m_keyclick = 0U;
 	m_beeper_state = 0x00U;
@@ -874,21 +865,18 @@ void hle_device_base::device_reset()
 	machine().output().set_led_value(LED_CAPS, 0);
 	machine().output().set_led_value(LED_KANA, 0);
 
+	// no beep
+	m_click_timer->reset();
+
+	// kick the base
+	reset_key_state();
+	start_processing(attotime::from_hz(1'200));
+
 	// send reset response
 	send_byte(0xffU);
 	send_byte(ident_byte());
-	UINT16 const acc(
-			std::accumulate(
-				std::begin(m_key_inputs),
-				std::end(m_key_inputs),
-				UINT16(0),
-				[] (UINT16 a, auto const &b) { return a | b->read(); }));
-	if (!acc)
+	if (are_all_keys_up())
 		send_byte(0x7fU);
-
-	// kick the scan timer
-	m_scan_timer->adjust(attotime::from_hz(1'200), 0, attotime::from_hz(1'200));
-	m_click_timer->reset();
 }
 
 
@@ -901,16 +889,13 @@ void hle_device_base::device_timer(emu_timer &timer, device_timer_id id, int par
 {
 	switch (id)
 	{
-	case SCAN_TIMER_ID:
-		scan_row();
-		break;
-
 	case CLICK_TIMER_ID:
 		m_beeper_state &= ~UINT8(BEEPER_CLICK);
 		m_beeper->set_state(m_beeper_state ? 1 : 0);
 		break;
 
 	default:
+		device_matrix_keyboard_interface::device_timer(timer, id, param, ptr);
 		device_serial_interface::device_timer(timer, id, param, ptr);
 	}
 }
@@ -942,6 +927,8 @@ void hle_device_base::tra_complete()
 	if (!m_empty)
 	{
 		transmit_register_setup(m_fifo[m_head]);
+		if (m_head == m_tail)
+			start_processing(attotime::from_hz(1'200));
 		m_head = (m_head + 1) & 0x0fU;
 		m_empty = (m_head == m_tail) ? 1 : 0;
 	}
@@ -990,12 +977,12 @@ void hle_device_base::rcv_complete()
 			break;
 
 		case COMMAND_CLICK_ON:
-			m_keyclick = 1;
+			m_keyclick = 1U;
 			m_rx_state = RX_IDLE;
 			break;
 
 		case COMMAND_CLICK_OFF:
-			m_keyclick = 0;
+			m_keyclick = 0U;
 			m_click_timer->reset();
 			m_beeper_state &= ~UINT8(BEEPER_CLICK);
 			m_beeper->set_state(m_beeper_state ? 1 : 0);
@@ -1021,59 +1008,48 @@ void hle_device_base::rcv_complete()
 
 
 /*--------------------------------------------------
-    hle_device_base::scan_row
-    scan the next row in the keyboard matrix and
-    send update to host
+    hle_device_base::key_make
+    handle a key being pressed
 --------------------------------------------------*/
 
-void hle_device_base::scan_row()
+void hle_device_base::key_make(UINT8 row, UINT8 column)
 {
-	// ensure we aren't in a stupid state
-	assert(m_next_row < ARRAY_LENGTH(m_key_inputs));
-	assert(m_next_row < ARRAY_LENGTH(m_current_keys));
+	// we should have stopped processing if we filled the FIFO
+	assert(m_empty || (m_head != m_tail));
 
-	// get last read state and new state of row
-	UINT16 const row(m_key_inputs[m_next_row]->read());
-	UINT16 &current(m_current_keys[m_next_row]);
-	bool keydown(false), keyup(false);
-
-	// while the buffer isn't full, look for changed keys in this row
-	for (UINT8 bit = 0; (bit < 16) && (m_empty || (m_head != m_tail)); ++bit)
-	{
-		UINT16 const mask(UINT16(1) << bit);
-		if ((row ^ current) & mask)
-		{
-			UINT8 const make_break((row & mask) ? 0x00U : 0x80U);
-			keydown = keydown || !bool(make_break);
-			keyup = keyup || bool(make_break);
-			current = (current & ~mask) | (row & mask);
-			send_byte(make_break | (m_next_row << 4) | bit);
-		}
-	}
-
-	// if a key was pressed and keyclick is enabled, turn on the beeper
-	if (keydown && m_keyclick)
+	// send the make code, click if desired
+	send_byte((row << 4) | column);
+	if (m_keyclick)
 	{
 		m_beeper_state |= UINT8(BEEPER_CLICK);
 		m_beeper->set_state(m_beeper_state ? 1 : 0);
 		m_click_timer->reset(attotime::from_msec(5));
 	}
 
-	// if a key was released and no keys are down, send all keys up code
-	if (keyup)
-	{
-		UINT16 const acc(
-				std::accumulate(
-					std::begin(m_current_keys),
-					std::end(m_current_keys),
-					UINT16(0),
-					[] (UINT16 a, UINT16 b) { return a | b; }));
-		if (!acc)
-			send_byte(0x7fU);
-	}
+	// count keys
+	++m_make_count;
+	assert(m_make_count);
+}
 
-	// advance to the next row
-	m_next_row = (m_next_row + 1) & 0x07U;
+
+/*--------------------------------------------------
+    hle_device_base::key_break
+    handle a key being released
+--------------------------------------------------*/
+
+void hle_device_base::key_break(UINT8 row, UINT8 column)
+{
+	// we should have stopped processing if we filled the FIFO
+	assert(m_empty || (m_head != m_tail));
+	assert(m_make_count);
+
+	// send the break code, and the idle code if no other keysa are down
+	send_byte(0x80U | (row << 4) | column);
+	if (!--m_make_count)
+		send_byte(0x7fU);
+
+	// check our counting
+	assert(are_all_keys_up() == !bool(m_make_count));
 }
 
 
@@ -1097,6 +1073,8 @@ void hle_device_base::send_byte(UINT8 code)
 		m_fifo[m_tail] = code;
 		m_tail = (m_tail + 1) & 0x0fU;
 		m_empty = 0;
+		if (m_head == m_tail)
+			stop_processing();
 	}
 	else
 	{

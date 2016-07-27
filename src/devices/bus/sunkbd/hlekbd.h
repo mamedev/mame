@@ -6,6 +6,7 @@
 #pragma once
 
 #include "sunkbd.h"
+#include "machine/keyboard.h"
 #include "sound/beep.h"
 
 
@@ -18,7 +19,11 @@ extern device_type const SUN_TYPE5_JP_HLE_KEYBOARD;
 
 
 namespace bus { namespace sunkbd {
-class hle_device_base : public device_t, public device_serial_interface, public device_sun_keyboard_port_interface
+class hle_device_base
+	: public device_t
+	, public device_serial_interface
+	, public device_sun_keyboard_port_interface
+	, protected device_matrix_keyboard_interface<8U>
 {
 public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -47,14 +52,17 @@ protected:
 	virtual void tra_complete() override;
 	virtual void rcv_complete() override;
 
+	// device_matrix_keyboard_interface overrides
+	virtual void key_make(UINT8 row, UINT8 column) override;
+	virtual void key_break(UINT8 row, UINT8 column) override;
+
 	required_ioport m_dips;
-	required_ioport m_key_inputs[8];
 
 private:
 	// device_serial_interface uses 10'000 range
+	// device_matrix_keyboard_interface uses 20'000 range
 	enum {
-		SCAN_TIMER_ID = 20'000,
-		CLICK_TIMER_ID
+		CLICK_TIMER_ID = 30'000
 	};
 
 	// TODO: ensure these don't clash with diagnostic LEDs on host computer
@@ -91,17 +99,14 @@ private:
 	void scan_row();
 	void send_byte(UINT8 code);
 
-	emu_timer                       *m_scan_timer;
 	emu_timer                       *m_click_timer;
 	required_device<beep_device>    m_beeper;
-
-	UINT16  m_current_keys[8];
-	UINT8   m_next_row;
 
 	UINT8   m_fifo[16];
 	UINT8   m_head, m_tail;
 	UINT8   m_empty;
 
+	UINT8   m_make_count;
 	UINT8   m_rx_state;
 
 	UINT8   m_keyclick;

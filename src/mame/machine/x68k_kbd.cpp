@@ -74,14 +74,14 @@ void x68k_keyboard_device::received_byte(UINT8 data)
 
 	if ((data & 0xf0) == 0x60)  // Key delay time
 	{
-		m_delay = data & 0x0f;
-		logerror("KB: Keypress delay time is now %ims\n", ((data & 0x0f) * 100) + 200);
+		m_delay = ((data & 0x0f) * 100) + 200;
+		logerror("KB: Keypress delay time is now %ims\n", m_delay);
 	}
 
 	if ((data & 0xf0) == 0x70)  // Key repeat rate
 	{
-		m_repeat = data & 0x0f;
-		logerror("KB: Keypress repeat rate is now %ims\n", (((data & 0x0f)^2) * 5) + 30);
+		m_repeat = (((data & 0x0f)^2) * 5) + 30;
+		logerror("KB: Keypress repeat rate is now %ims\n", m_repeat);
 	}
 }
 

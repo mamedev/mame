@@ -7,6 +7,9 @@
 
 #include "keyboard.h"
 
+#include <numeric>
+
+
 template <UINT8 ROW_COUNT>
 template <typename... T>
 device_matrix_keyboard_interface<ROW_COUNT>::device_matrix_keyboard_interface(machine_config const &mconfig, device_t &device, T &&... tags)
@@ -155,6 +158,17 @@ void device_matrix_keyboard_interface<ROW_COUNT>::key_break(UINT8 row, UINT8 col
 template <UINT8 ROW_COUNT>
 void device_matrix_keyboard_interface<ROW_COUNT>::will_scan_row(UINT8 row)
 {
+}
+
+
+template <UINT8 ROW_COUNT>
+bool device_matrix_keyboard_interface<ROW_COUNT>::are_all_keys_up()
+{
+	return 0U == std::accumulate(
+			std::begin(m_key_rows),
+			std::end(m_key_rows),
+			ioport_value(0),
+			[] (ioport_value a, auto const &b) { return a | b->read(); });
 }
 
 #endif // MAME_DEVICES_MACHINE_KEYBOARD_IPP
