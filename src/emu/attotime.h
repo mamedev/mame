@@ -120,7 +120,7 @@ public:
 	/** @return the seconds portion. */
 	constexpr seconds_t seconds() const { return m_seconds; }
 
-	static constexpr attotime from_double(double _time);
+	static attotime from_double(double _time);
 	static attotime from_ticks(UINT64 ticks, UINT32 frequency);
 	/** Create an attotime from a integer count of seconds @seconds */
 	static constexpr attotime from_seconds(INT32 seconds) { return attotime(seconds, 0); }
@@ -376,7 +376,7 @@ inline attotime attotime::from_ticks(UINT64 ticks, UINT32 frequency)
 }
 
 /** Create an attotime from floating point count of seconds @p _time */
-inline constexpr attotime attotime::from_double(double _time)
+inline attotime attotime::from_double(double _time)
 {
 	seconds_t secs = floor(_time);
 	_time -= double(secs);
