@@ -9368,6 +9368,12 @@ vcop3                           // 2003.02.26 Virtua Cop 3 (Rev A)
 wangmid                         // 2004.07 Wangan Midnight Maximum Tune (export) (Rev B)
 wangmid2                        // 2005.10 Wangan Midnight Maximum Tune 2 (Export) (Rev A)
 wangmid2j                       // 2005.04 Wangan Midnight Maximum Tune 2 (Japan)
+questofd                        // 2004.09 Quest of D (CDV-10005C)
+gundcb79                        // 2005.10 Mobile Suit Gundam 0079 Card Builder (CDV-10010)
+gundcb79a                       // 2006.10 Mobile Suit Gundam 0079 Card Builder Ver.2.02 (CDV-10024B)
+gundcb83                        // 2007.01 Mobile Suit Gundam 0083 Card Builder (CDV-10030)
+gundcb83a                       // 2007.01 Mobile Suit Gundam 0083 Card Builder Check Disk (CDV-10031)
+gundcb83b                       // 2008.08 Mobile Suit Gundam 0083 Card Builder Ver.2.10 (CDV-10037B)
 
 @source:chinagat.cpp
 chinagat                        // TA-0023 (c) 1988 Taito + Romstar license (US)
