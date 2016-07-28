@@ -190,6 +190,7 @@ void altos5_state::machine_reset()
 	m_port09 = 0;
 	m_ipl = 1;
 	setup_banks(2);
+	m_floppy = nullptr;
 	m_maincpu->reset();
 }
 
