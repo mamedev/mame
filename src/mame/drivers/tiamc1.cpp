@@ -22,7 +22,7 @@
       * Ostrov Drakona
       * Ostrov Sokrovisch
       * Perekhvatchik
-      * Zvezdnyj Rycar'
+      * Zvezdnyi Rytsar'
 
  ***************************************************************
 
