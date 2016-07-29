@@ -788,7 +788,6 @@ VIDEO_START_MEMBER(md_base_state,megadriv)
 
 MACHINE_START_MEMBER(md_base_state,megadriv)
 {
-	m_io_reset = ioport("RESET");
 	m_io_pad_3b[0] = ioport("PAD1");
 	m_io_pad_3b[1] = ioport("PAD2");
 	m_io_pad_3b[2] = ioport("IN0");
