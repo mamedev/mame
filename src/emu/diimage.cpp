@@ -350,7 +350,7 @@ bool device_image_interface::try_change_working_directory(const char *subdir)
 
 	// did we successfully identify the directory?
 	if (success)
-		m_working_directory = util::zippath_combine(m_working_directory.c_str(), subdir);
+		m_working_directory = util::zippath_combine(m_working_directory, subdir);
 
 	return success;
 }
@@ -652,7 +652,7 @@ image_error_t device_image_interface::load_image_by_path(UINT32 open_flags, cons
 	std::string revised_path;
 
 	// attempt to read the file
-	auto const filerr = util::zippath_fopen(path.c_str(), open_flags, m_file, revised_path);
+	auto const filerr = util::zippath_fopen(path, open_flags, m_file, revised_path);
 
 	// did the open succeed?
 	switch(filerr)

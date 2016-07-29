@@ -111,9 +111,9 @@ int is_path_separator(char c)
  * @param [in,out]  endpos      If non-null, the endpos.
  */
 
-static void parse_parent_path(const char *path, int *beginpos, int *endpos)
+static void parse_parent_path(const std::string &path, int *beginpos, int *endpos)
 {
-	int length = strlen(path);
+	auto length = path.length();
 	int pos;
 
 	/* skip over trailing path separators */
@@ -140,13 +140,13 @@ static void parse_parent_path(const char *path, int *beginpos, int *endpos)
 //  zippath_parent - retrieves the parent directory
 // -------------------------------------------------
 
-std::string &zippath_parent(std::string &dst, const char *path)
+std::string &zippath_parent(std::string &dst, const std::string &path)
 {
 	int pos;
 	parse_parent_path(path, &pos, nullptr);
 
 	if (pos >= 0)
-		dst.assign(path, pos + 1);
+		dst = path.substr(0, pos + 1);
 	else
 		dst.clear();
 	return dst;
@@ -158,7 +158,7 @@ std::string &zippath_parent(std::string &dst, const char *path)
 //  zippath_parent - retrieves the parent directory
 // -------------------------------------------------
 
-std::string zippath_parent(const char *path)
+std::string zippath_parent(const std::string &path)
 {
 	std::string result;
 	zippath_parent(result, path);
@@ -173,7 +173,7 @@ std::string zippath_parent(const char *path)
 // -------------------------------------------------
 
 /**
- * @fn  std::string &zippath_parent_basename(std::string &dst, const char *path)
+ * @fn  std::string &zippath_parent_basename(std::string &dst, const std::string &path)
  *
  * @brief   Zippath parent basename.
  *
@@ -183,11 +183,11 @@ std::string zippath_parent(const char *path)
  * @return  A std::string&amp;
  */
 
-std::string &zippath_parent_basename(std::string &dst, const char *path)
+std::string &zippath_parent_basename(std::string &dst, const std::string &path)
 {
 	int beginpos, endpos;
 	parse_parent_path(path, &beginpos, &endpos);
-	dst.copy((char*)(path + beginpos + 1), endpos - beginpos);
+	dst.copy((char*)(path.c_str() + beginpos + 1), endpos - beginpos);
 	return dst;
 }
 
@@ -198,7 +198,7 @@ std::string &zippath_parent_basename(std::string &dst, const char *path)
 //  directory basename
 // -------------------------------------------------
 
-std::string zippath_parent_basename(const char *path)
+std::string zippath_parent_basename(const std::string &path)
 {
 	std::string result;
 	zippath_parent_basename(result, path);
@@ -223,13 +223,13 @@ std::string zippath_parent_basename(const char *path)
  * @return  A std::string&amp;
  */
 
-std::string &zippath_combine(std::string &dst, const char *path1, const char *path2)
+std::string &zippath_combine(std::string &dst, const std::string &path1, const std::string &path2)
 {
-	if (!strcmp(path2, "."))
+	if (path2 == ".")
 	{
 		dst.assign(path1);
 	}
-	else if (!strcmp(path2, ".."))
+	else if (path2 == "..")
 	{
 		dst = zippath_parent(path1);
 	}
@@ -237,7 +237,7 @@ std::string &zippath_combine(std::string &dst, const char *path1, const char *pa
 	{
 		dst.assign(path2);
 	}
-	else if ((path1[0] != '\0') && !is_path_separator(path1[strlen(path1) - 1]))
+	else if ((path1[0] != '\0') && !is_path_separator(path1[path1.length() - 1]))
 	{
 		dst.assign(path1).append(PATH_SEPARATOR).append(path2);
 	}
@@ -254,7 +254,7 @@ std::string &zippath_combine(std::string &dst, const char *path1, const char *pa
 //  zippath_combine - combines two paths
 // -------------------------------------------------
 
-std::string zippath_combine(const char *path1, const char *path2)
+std::string zippath_combine(const std::string &path1, const std::string &path2)
 {
 	std::string result;
 	zippath_combine(result, path1, path2);
@@ -363,7 +363,7 @@ done:
 // -------------------------------------------------
 
 /**
- * @fn  osd_file::error zippath_fopen(const char *filename, UINT32 openflags, util::core_file::ptr &file, std::string &revised_path)
+ * @fn  osd_file::error zippath_fopen(const std::string &filename, UINT32 openflags, util::core_file::ptr &file, std::string &revised_path)
  *
  * @brief   Zippath fopen.
  *
@@ -375,7 +375,7 @@ done:
  * @return  A osd_file::error.
  */
 
-osd_file::error zippath_fopen(const char *filename, UINT32 openflags, util::core_file::ptr &file, std::string &revised_path)
+osd_file::error zippath_fopen(const std::string &filename, UINT32 openflags, util::core_file::ptr &file, std::string &revised_path)
 {
 	osd_file::error filerr = osd_file::error::NOT_FOUND;
 	archive_file::error ziperr;
@@ -441,7 +441,7 @@ osd_file::error zippath_fopen(const char *filename, UINT32 openflags, util::core
 		if (filerr != osd_file::error::NONE)
 		{
 			/* go up a directory */
-			auto temp = zippath_parent(mainpath.c_str());
+			auto temp = zippath_parent(mainpath);
 
 			/* append to the sub path */
 			if (subpath.length() > 0)
@@ -753,7 +753,7 @@ static osd_file::error zippath_resolve(const char *path, osd::directory::entry::
 			// if we have not found the file or directory, go up
 			current_entry_type = osd::directory::entry::entry_type::NONE;
 			went_up = true;
-			apath = zippath_parent(apath.c_str());
+			apath = zippath_parent(apath);
 		}
 	}
 	while ((current_entry_type == osd::directory::entry::entry_type::NONE) && !is_root(apath.c_str()));
@@ -797,7 +797,7 @@ static osd_file::error zippath_resolve(const char *path, osd::directory::entry::
 // -------------------------------------------------
 
 /**
- * @fn  osd_file::error zippath_opendir(const char *path, zippath_directory **directory)
+ * @fn  osd_file::error zippath_opendir(const std::string &path, zippath_directory **directory)
  *
  * @brief   Zippath opendir.
  *
@@ -807,7 +807,7 @@ static osd_file::error zippath_resolve(const char *path, osd::directory::entry::
  * @return  A osd_file::error.
  */
 
-osd_file::error zippath_opendir(const char *path, zippath_directory **directory)
+osd_file::error zippath_opendir(const std::string &path, zippath_directory **directory)
 {
 	osd_file::error err;
 
@@ -824,7 +824,7 @@ osd_file::error zippath_opendir(const char *path, zippath_directory **directory)
 	}
 	/* resolve the path */
 	osd::directory::entry::entry_type entry_type;
-	err = zippath_resolve(path, entry_type, result->zipfile, result->zipprefix);
+	err = zippath_resolve(path.c_str(), entry_type, result->zipfile, result->zipprefix);
 	if (err != osd_file::error::NONE)
 		goto done;
 
@@ -847,7 +847,7 @@ osd_file::error zippath_opendir(const char *path, zippath_directory **directory)
 		}
 
 		/* is this path the root? if so, pretend we've already returned the parent */
-		if (is_root(path))
+		if (is_root(path.c_str()))
 			result->returned_parent = true;
 	}
 
