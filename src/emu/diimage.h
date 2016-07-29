@@ -166,7 +166,7 @@ public:
 	virtual const option_guide *create_option_guide() const { return nullptr; }
 
 	const image_device_format *device_get_indexed_creatable_format(int index) const { if (index < m_formatlist.size()) return m_formatlist.at(index).get(); else return nullptr;  }
-	const image_device_format *device_get_named_creatable_format(const char *format_name);
+	const image_device_format *device_get_named_creatable_format(const std::string &format_name);
 	const option_guide *device_get_creation_option_guide() const { return create_option_guide(); }
 
 	const char *error();
@@ -251,13 +251,13 @@ public:
 protected:
 	virtual const software_list_loader &get_software_list_loader() const { return false_software_list_loader::instance(); }
 
-	bool load_internal(const char *path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load);
+	bool load_internal(const std::string &path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load);
 	void determine_open_plan(int is_create, UINT32 *open_plan);
-	image_error_t load_image_by_path(UINT32 open_flags, const char *path);
+	image_error_t load_image_by_path(UINT32 open_flags, const std::string &path);
 	void clear();
 	bool is_loaded();
 
-	image_error_t set_image_filename(const char *filename);
+	image_error_t set_image_filename(const std::string &filename);
 
 	void clear_error();
 

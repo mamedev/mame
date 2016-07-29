@@ -96,8 +96,8 @@ device_image_interface::device_image_interface(const machine_config &mconfig, de
 		m_init_phase(false),
 		m_create_format(0),
 		m_create_args(nullptr),
-		m_user_loadable(TRUE),
-		m_is_loading(FALSE)
+		m_user_loadable(true),
+		m_is_loading(false)
 {
 }
 
@@ -184,10 +184,10 @@ void device_image_interface::device_compute_hash(util::hash_collection &hashes, 
 //  an image
 //-------------------------------------------------
 
-image_error_t device_image_interface::set_image_filename(const char *filename)
+image_error_t device_image_interface::set_image_filename(const std::string &filename)
 {
 	m_image_name = filename;
-	util::zippath_parent(m_working_directory, filename);
+	util::zippath_parent(m_working_directory, filename.c_str());
 	m_basename.assign(m_image_name);
 
 	int loc1 = m_image_name.find_last_of('\\');
@@ -226,10 +226,10 @@ image_error_t device_image_interface::set_image_filename(const char *filename)
 //  image creation by name
 //-------------------------------------------------
 
-const image_device_format *device_image_interface::device_get_named_creatable_format(const char *format_name)
+const image_device_format *device_image_interface::device_get_named_creatable_format(const std::string &format_name)
 {
 	for (auto &format : m_formatlist)
-		if (strcmp(format->name().c_str(), format_name) == 0)
+		if (format->name() == format_name)
 			return format.get();
 	return nullptr;
 }
@@ -605,7 +605,7 @@ void device_image_interface::battery_save(const void *buffer, int length)
 
 bool device_image_interface::uses_file_extension(const char *file_extension) const
 {
-	bool result = FALSE;
+	bool result = false;
 
 	if (file_extension[0] == '.')
 		file_extension++;
@@ -617,7 +617,7 @@ bool device_image_interface::uses_file_extension(const char *file_extension) con
 	{
 		if (!core_stricmp(ext, file_extension))
 		{
-			result = TRUE;
+			result = true;
 			break;
 		}
 		ext = strtok (nullptr, ",");
@@ -646,13 +646,13 @@ bool device_image_interface::is_loaded()
 //  specific path
 //-------------------------------------------------
 
-image_error_t device_image_interface::load_image_by_path(UINT32 open_flags, const char *path)
+image_error_t device_image_interface::load_image_by_path(UINT32 open_flags, const std::string &path)
 {
 	image_error_t err;
 	std::string revised_path;
 
 	// attempt to read the file
-	auto const filerr = util::zippath_fopen(path, open_flags, m_file, revised_path);
+	auto const filerr = util::zippath_fopen(path.c_str(), open_flags, m_file, revised_path);
 
 	// did the open succeed?
 	switch(filerr)
@@ -691,7 +691,7 @@ image_error_t device_image_interface::load_image_by_path(UINT32 open_flags, cons
 
 	// if successful, set the file name
 	if (filerr == osd_file::error::NONE)
-		set_image_filename(revised_path.c_str());
+		set_image_filename(revised_path);
 
 	return err;
 }
@@ -833,7 +833,7 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 {
 	std::string locationtag, breakstr("%");
 	const rom_entry *region;
-	bool retVal = FALSE;
+	bool retVal = false;
 	int warningcount = 0;
 	for (region = start; region != nullptr; region = rom_next_region(region))
 	{
@@ -915,7 +915,7 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 				if (filerr == osd_file::error::NONE)
 					filerr = util::core_file::open_proxy(*m_mame_file, m_file);
 				if (filerr == osd_file::error::NONE)
-					retVal = TRUE;
+					retVal = true;
 
 				break; // load first item for start
 			}
@@ -934,15 +934,14 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 //  load_internal - core image loading
 //-------------------------------------------------
 
-bool device_image_interface::load_internal(const char *path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load)
+bool device_image_interface::load_internal(const std::string &path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load)
 {
 	UINT32 open_plan[4];
 	int i;
-	bool softload = FALSE;
+	bool softload = false;
 
 	// if the path contains no period, we are using softlists, so we won't create an image
-	std::string pathstr(path);
-	bool filename_has_period = (pathstr.find_last_of('.') != -1) ? TRUE : FALSE;
+	bool filename_has_period = (path.find_last_of('.') != -1);
 
 	// first unload the image
 	unload();
@@ -951,7 +950,7 @@ bool device_image_interface::load_internal(const char *path, bool is_create, int
 	clear_error();
 
 	// we are now loading
-	m_is_loading = TRUE;
+	m_is_loading = true;
 
 	// record the filename
 	m_err = set_image_filename(path);
@@ -964,7 +963,7 @@ bool device_image_interface::load_internal(const char *path, bool is_create, int
 		// Check if there's a software list defined for this device and use that if we're not creating an image
 		if (!filename_has_period && !just_load)
 		{
-			softload = load_software_part(path, m_software_part_ptr);
+			softload = load_software_part(path.c_str(), m_software_part_ptr);
 			if (softload)
 			{
 				m_software_info_ptr = &m_software_part_ptr->info();
@@ -974,7 +973,7 @@ bool device_image_interface::load_internal(const char *path, bool is_create, int
 				// if we had launched from softlist with a specified part, e.g. "shortname:part"
 				// we would have recorded the wrong name, so record it again based on software_info
 				if (m_software_info_ptr && !m_full_software_name.empty())
-					m_err = set_image_filename(m_full_software_name.c_str());
+					m_err = set_image_filename(m_full_software_name);
 
 				// check if image should be read-only
 				const char *read_only = get_feature("read_only");
@@ -1025,7 +1024,7 @@ bool device_image_interface::load_internal(const char *path, bool is_create, int
 	m_create_format = create_format;
 	m_create_args = create_args;
 
-	if (m_init_phase==FALSE) {
+	if (m_init_phase==false) {
 		m_err = (image_error_t)finish_load();
 		if (m_err)
 			goto done;
@@ -1043,7 +1042,7 @@ done:
 			if (device().machine().phase() == MACHINE_PHASE_RUNNING)
 				device().popmessage("Error: Unable to %s image '%s': %s", is_create ? "create" : "load", path, error());
 			else
-				osd_printf_error("Error: Unable to %s image '%s': %s\n", is_create ? "create" : "load", path, error());
+				osd_printf_error("Error: Unable to %s image '%s': %s\n", is_create ? "create" : "load", path.c_str(), error());
 		}
 		clear();
 	}
@@ -1058,7 +1057,7 @@ done:
 				if (device().machine().phase() == MACHINE_PHASE_RUNNING)
 					device().popmessage("Image '%s' was successfully %s.", path, is_create ? "created" : "loaded");
 				else
-					osd_printf_info("Image '%s' was successfully %s.\n", path, is_create ? "created" : "loaded");
+					osd_printf_info("Image '%s' was successfully %s.\n", path.c_str(), is_create ? "created" : "loaded");
 			}
 		}
 	}
@@ -1073,7 +1072,7 @@ done:
 
 bool device_image_interface::load(const char *path)
 {
-	return load_internal(path, FALSE, 0, nullptr, FALSE);
+	return load_internal(path, false, 0, nullptr, false);
 }
 
 
@@ -1087,7 +1086,7 @@ bool device_image_interface::open_image_file(emu_options &options)
 	if (*path != 0)
 	{
 		set_init_phase();
-		if (load_internal(path, FALSE, 0, nullptr, TRUE)==IMAGE_INIT_PASS)
+		if (load_internal(path, false, 0, nullptr, true)==IMAGE_INIT_PASS)
 		{
 			if (software_entry()==nullptr) return true;
 		}
@@ -1129,10 +1128,10 @@ bool device_image_interface::finish_load()
 			}
 		}
 	}
-	m_is_loading = FALSE;
+	m_is_loading = false;
 	m_create_format = 0;
 	m_create_args = nullptr;
-	m_init_phase = FALSE;
+	m_init_phase = false;
 	return err;
 }
 
@@ -1153,7 +1152,7 @@ bool device_image_interface::create(const char *path, const image_device_format 
 		}
 		cnt++;
 	}
-	return load_internal(path, TRUE, format_index, create_args, FALSE);
+	return load_internal(path, true, format_index, create_args, false);
 }
 
 
