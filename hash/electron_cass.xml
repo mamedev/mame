@@ -1353,7 +1353,7 @@
 		</part>
 	</software>
 
-	<software name="cskullord">
+	<software name="cskullrd">
 		<description>Castle of the Skull Lord</description>
 		<year>1984</year>
 		<publisher>Samurai</publisher>
@@ -1814,13 +1814,13 @@
 		<description>Count with Oliver</description>
 		<year>1985</year>
 		<publisher>Mirrorsoft</publisher>
-		<part name="cass" interface="electron_cass">
+		<part name="cass1" interface="electron_cass">
 			<feature name="part_id" value="Lollipops"/>
 			<dataarea name="cass" size="7814">
 				<rom name="cwo-lollipops_be.uef" size="7814" crc="9e494015" sha1="09feec7f7032257f335f019c254043fc83da2954" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="cass" interface="electron_cass">
+		<part name="cass2" interface="electron_cass">
 			<feature name="part_id" value="Toyshop"/>
 			<dataarea name="cass" size="7051">
 				<rom name="cwo-toyshop_be.uef" size="7051" crc="c2b70beb" sha1="712c3bd3f7bc5b3e59cec18190ac5f631c45f049" offset="0"/>
@@ -3863,7 +3863,7 @@
 		</part>
 	</software>
 
-	<software name="frnk2000au">
+	<software name="fstein2k">
 		<description>Frankenstein 2000 (Audiogenic)</description>
 		<year>198?</year>
 		<publisher>Audiogenic</publisher>
@@ -4288,13 +4288,13 @@
 		<description>Graphito</description>
 		<year>1984</year>
 		<publisher>Addison-Wesley</publisher>
-		<part name="cass" interface="electron_cass">
+		<part name="cass1" interface="electron_cass">
 			<feature name="part_id" value="Side One"/>
 			<dataarea name="cass" size="22943">
 				<rom name="graphitosideone_be.uef" size="22943" crc="8dc66cc7" sha1="b9de070e071fe222491cb3eabf0db76c03bd600e" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="cass" interface="electron_cass">
+		<part name="cass2" interface="electron_cass">
 			<feature name="part_id" value="Side Two"/>
 			<dataarea name="cass" size="24492">
 				<rom name="graphitosidetwo_be.uef" size="24492" crc="5116e227" sha1="2ecfee4a61320800087f02f278fff63b45826b6a" offset="0"/>
@@ -4412,7 +4412,7 @@
 		</part>
 	</software>
 
-	<software name="hareraisp">
+	<software name="harerais">
 		<description>Hareraiser (Prelude)</description>
 		<year>198?</year>
 		<publisher>Haresoft</publisher>
@@ -4840,13 +4840,13 @@
 		<description>In Search of Atahaulpa</description>
 		<year>198?</year>
 		<publisher>Lee</publisher>
-		<part name="cass" interface="electron_cass">
+		<part name="cass1" interface="electron_cass">
 			<feature name="part_id" value="Part 1"/>
 			<dataarea name="cass" size="12851">
 				<rom name="insearchofatahaulpa-pt1_be.uef" size="12851" crc="83783735" sha1="d3a1f6516a0a5be24825e7019f11d89b0c83d8f5" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="cass" interface="electron_cass">
+		<part name="cass2" interface="electron_cass">
 			<feature name="part_id" value="Part 2"/>
 			<dataarea name="cass" size="11759">
 				<rom name="insearchofatahaulpa-pt2_be.uef" size="11759" crc="2474f012" sha1="f552732e68d4b8cb790ef9bffb71ec7654d401c0" offset="0"/>
@@ -5218,18 +5218,18 @@
 		</part>
 	</software>
 
-	<software name="crgraphsg">
+	<software name="cgraphsg">
 		<description>Kreative Graphiken (Ger)</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GLX01" />
-		<part name="cass" interface="electron_cass">
+		<part name="cass1" interface="electron_cass">
 			<feature name="part_id" value="Side 1"/>
 			<dataarea name="cass" size="3687">
 				<rom name="creativegraphics-side1-german_e.uef" size="3687" crc="d684b248" sha1="84fcf16855813eec08c7c5b7290d2bbb247c93f8" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="cass" interface="electron_cass">
+		<part name="cass2" interface="electron_cass">
 			<feature name="part_id" value="Side 2"/>
 			<dataarea name="cass" size="7486">
 				<rom name="creativegraphics-side2-german_e.uef" size="7486" crc="203b2441" sha1="cca3c0cccdf7940025301cb48e5bbd85027136f7" offset="0"/>
@@ -5362,7 +5362,7 @@
 		</part>
 	</software>
 
-	<software name="look_sharp">
+	<software name="lookshrp">
 		<description>Look Sharp!</description>
 		<year>1985</year>
 		<publisher>Mirrorsoft</publisher>
@@ -5440,19 +5440,19 @@
 		<description>Magnetic Moon</description>
 		<year>1987</year>
 		<publisher>Elk Adventure Club</publisher>
-		<part name="cass" interface="electron_cass">
+		<part name="cass1" interface="electron_cass">
 			<feature name="part_id" value="Part 1"/>
 			<dataarea name="cass" size="12224">
 				<rom name="magneticmoon-pt1_be.uef" size="12224" crc="07a7a715" sha1="c0076c62477efd5ba34b11d00fcc6cf814edf37e" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="cass" interface="electron_cass">
+		<part name="cass2" interface="electron_cass">
 			<feature name="part_id" value="Part 2"/>
 			<dataarea name="cass" size="10367">
 				<rom name="magneticmoon-pt2_be.uef" size="10367" crc="1d9bf270" sha1="3e5ba399d5d2dc7edcb7f43cd9a3d111800dd40d" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="cass" interface="electron_cass">
+		<part name="cass3" interface="electron_cass">
 			<feature name="part_id" value="Part 3"/>
 			<dataarea name="cass" size="10471">
 				<rom name="magneticmoon-pt3_be.uef" size="10471" crc="bfc74912" sha1="9a383a100997b3dcc7eab19b07ef3f93c1017177" offset="0"/>
@@ -5471,7 +5471,7 @@
 		</part>
 	</software>
 
-	<software name="maniacmow">
+	<software name="maniacmo">
 		<description>Maniac Mower</description>
 		<year>198?</year>
 		<publisher>Kansas</publisher>
@@ -5934,7 +5934,7 @@
 		</part>
 	</software>
 
-	<software name="moonraidpias">
+	<software name="mraidpia">
 		<description>Moon Raider (Play It Again Sam 5)</description>
 		<year>1989</year>
 		<publisher>Superior Software/Acornsoft</publisher>
@@ -6445,7 +6445,7 @@
 		</part>
 	</software>
 
-	<software name="pipemania">
+	<software name="pipemani">
 		<description>Pipe Mania</description>
 		<year>1989</year>
 		<publisher>Empire</publisher>
@@ -8730,13 +8730,13 @@
 		<description>Test Match</description>
 		<year>1983</year>
 		<publisher>CRL</publisher>
-		<part name="cass" interface="electron_cass">
+		<part name="cass1" interface="electron_cass">
 			<feature name="part_id" value="Side 1"/>
 			<dataarea name="cass" size="10182">
 				<rom name="testmatch-side1_e.uef" size="10182" crc="b366843a" sha1="bf5fb8767ea6f77fc84ab720d4a50527fa211eb2" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="cass" interface="electron_cass">
+		<part name="cass2" interface="electron_cass">
 			<feature name="part_id" value="Side 2"/>
 			<dataarea name="cass" size="10560">
 				<rom name="testmatch-side2_e.uef" size="10560" crc="027bd6a8" sha1="7388f12afa8bff8d4464f6312ac64d7c5ad4ac2c" offset="0"/>
@@ -8781,13 +8781,13 @@
 		<description>The Adventure Creator</description>
 		<year>1986</year>
 		<publisher>Incentive</publisher>
-		<part name="cass" interface="electron_cass">
+		<part name="cass1" interface="electron_cass">
 			<feature name="part_id" value="Side 1"/>
 			<dataarea name="cass" size="11147">
 				<rom name="adventurecreator-side1_be.uef" size="11147" crc="ba879f45" sha1="ebe76a4867abe84694710c2524f7886d2ebae4fd" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="cass" interface="electron_cass">
+		<part name="cass2" interface="electron_cass">
 			<feature name="part_id" value="Side 2"/>
 			<dataarea name="cass" size="6335">
 				<rom name="adventurecreator-side2_be.uef" size="6335" crc="e6ae14f8" sha1="d17790b4f51ae0439016897148c6a0c9f5c47c60" offset="0"/>
@@ -8799,13 +8799,13 @@
 		<description>The Art Studio</description>
 		<year>1989</year>
 		<publisher>Impact</publisher>
-		<part name="cass" interface="electron_cass">
+		<part name="cass1" interface="electron_cass">
 			<feature name="part_id" value="Side 1 MODE4"/>
 			<dataarea name="cass" size="12647">
 				<rom name="theartstudio-side1mode4_be.uef" size="12647" crc="df5049f8" sha1="cb37bd80c626f88e2de6d3b05838606ecff7ca5f" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="cass" interface="electron_cass">
+		<part name="cass2" interface="electron_cass">
 			<feature name="part_id" value="Side 2 MODE5"/>
 			<dataarea name="cass" size="13064">
 				<rom name="theartstudio-side2mode5_be.uef" size="13064" crc="22ab434f" sha1="a2e8a9373ca60f576d16e795e82e3e8eacd62595" offset="0"/>
@@ -9673,19 +9673,19 @@
 		<description>Triple Decker 8</description>
 		<year>198?</year>
 		<publisher>Alternative</publisher>
-		<part name="cass" interface="electron_cass">
+		<part name="cass1" interface="electron_cass">
 			<feature name="part_id" value="Fruit Worm"/>
 			<dataarea name="cass1" size="5785">
 				<rom name="td8-fruitworm_e.uef" size="5785" crc="1a78cd86" sha1="6dda88bc98a7a8a1a5b9cec194b0b2815e644c65" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="cass" interface="electron_cass">
+		<part name="cass2" interface="electron_cass">
 			<feature name="part_id" value="Grebit"/>
 			<dataarea name="cass2" size="6664">
 				<rom name="td8-grebit_e.uef" size="6664" crc="d584cdf0" sha1="a5e2177d1380079b9b31b69da3daff9475be68f5" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="cass" interface="electron_cass">
+		<part name="cass3" interface="electron_cass">
 			<feature name="part_id" value="Mr Freeze"/>
 			<dataarea name="cass3" size="5484">
 				<rom name="td8-mrfreeze_e.uef" size="5484" crc="4b4994e8" sha1="8bf14738dbeef8ac91191706649d80e54d2b4f12" offset="0"/>
@@ -10372,7 +10372,7 @@
 		</part>
 	</software>
 
-	<software name="zeichenbr">
+	<software name="zeichenb">
 		<description>Zeichenbrett (Ger)</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
