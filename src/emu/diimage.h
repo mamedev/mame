@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 //**************************************************************************
@@ -97,8 +97,6 @@ private:
 
 class device_image_interface;
 struct feature_list;
-class software_part;
-class software_info;
 
 // device image interface function types
 typedef delegate<int (device_image_interface &)> device_image_load_delegate;
@@ -202,8 +200,8 @@ public:
 	const char* year() const { return m_year.c_str(); }
 	UINT32 supported() const { return m_supported; }
 
-	const software_info *software_entry() const { return m_software_info_ptr; }
-	const software_part *part_entry() const { return m_software_part_ptr; }
+	const util::software_info *software_entry() const { return m_software_info_ptr; }
+	const util::software_part *part_entry() const { return m_software_part_ptr; }
 	const char *software_list_name() const { return m_software_list_name.c_str(); }
 	bool loaded_through_softlist() const { return m_software_info_ptr != nullptr; }
 
@@ -270,8 +268,7 @@ protected:
 	void image_checkhash();
 	void update_names(const device_type device_type = nullptr, const char *inst = nullptr, const char *brief = nullptr);
 
-	const software_part *find_software_item(const char *path, bool restrict_to_interface) const;
-	bool load_software_part(const char *path, const software_part *&swpart);
+	bool load_software_part(const char *path, const util::software_part *&swpart, std::string *list_name = nullptr);
 	std::string software_get_default_slot(const char *default_card_slot) const;
 
 	// derived class overrides
@@ -297,8 +294,8 @@ protected:
 
 	/* Software information */
 	std::string m_full_software_name;
-	const software_info *m_software_info_ptr;
-	const software_part *m_software_part_ptr;
+	const util::software_info *m_software_info_ptr;
+	const util::software_part *m_software_part_ptr;
 	std::string m_software_list_name;
 
 	/* info read from the hash file/software list */
@@ -329,6 +326,9 @@ protected:
 	bool m_user_loadable;
 
 	bool m_is_loading;
+
+private:
+	const util::software_part *find_software_item(const char *path, bool restrict_to_interface, software_list_device **device = nullptr) const;
 };
 
 // iterator

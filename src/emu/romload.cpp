@@ -1275,7 +1275,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 	m_romstotalsize = 0;
 	m_romsloadedsize = 0;
 
-	const software_info *swinfo = swlist.find(swname);
+	const util::software_info *swinfo = swlist.find(swname);
 	if (swinfo != nullptr)
 	{
 		UINT32 supported = swinfo->supported();

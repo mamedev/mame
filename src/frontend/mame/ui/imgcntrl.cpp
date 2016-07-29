@@ -137,7 +137,7 @@ void menu_control_device_image::load_software_part()
 	driver_enumerator drivlist(machine().options(), machine().options().system_name());
 	drivlist.next();
 	media_auditor auditor(drivlist);
-	media_auditor::summary summary = auditor.audit_software(m_sld->list_name(), (software_info *)m_swi, AUDIT_VALIDATE_FAST);
+	media_auditor::summary summary = auditor.audit_software(*m_sld, (util::software_info *)m_swi, AUDIT_VALIDATE_FAST);
 	// if everything looks good, load software
 	if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		hook_load(temp_name, true);

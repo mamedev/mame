@@ -149,7 +149,7 @@ media_auditor::summary media_auditor::audit_device(device_t &device, const char 
 //-------------------------------------------------
 //  audit_software
 //-------------------------------------------------
-media_auditor::summary media_auditor::audit_software(const char *list_name, const software_info *swinfo, const char *validation)
+media_auditor::summary media_auditor::audit_software(software_list_device &swlist, const util::software_info *swinfo, const char *validation)
 {
 	// start fresh
 	m_record_list.clear();
@@ -157,12 +157,12 @@ media_auditor::summary media_auditor::audit_software(const char *list_name, cons
 	// store validation for later
 	m_validation = validation;
 
-	std::string combinedpath(util::string_format("%s;%s%s%s", swinfo->shortname(), list_name, PATH_SEPARATOR, swinfo->shortname()));
-	std::string locationtag(util::string_format("%s%%%s%%", list_name, swinfo->shortname()));
+	std::string combinedpath(util::string_format("%s;%s%s%s", swinfo->shortname(), swlist.list_name(), PATH_SEPARATOR, swinfo->shortname()));
+	std::string locationtag(util::string_format("%s%%%s%%", swlist.list_name(), swinfo->shortname()));
 	if (!swinfo->parentname().empty())
 	{
 		locationtag.append(swinfo->parentname());
-		combinedpath.append(util::string_format(";%s;%s%s%s", swinfo->parentname(), list_name, PATH_SEPARATOR, swinfo->parentname()));
+		combinedpath.append(util::string_format(";%s;%s%s%s", swinfo->parentname(), swlist.list_name(), PATH_SEPARATOR, swinfo->parentname()));
 	}
 	m_searchpath = combinedpath.c_str();
 
@@ -170,8 +170,11 @@ media_auditor::summary media_auditor::audit_software(const char *list_name, cons
 	std::size_t required = 0;
 
 	// now iterate over software parts
-	for (const software_part &part : swinfo->parts())
-		audit_regions(part.romdata(), locationtag.c_str(), found, required);
+	for (const util::software_part &part : swinfo->parts())
+	{
+		auto romdata = swlist.romdata(part);
+		audit_regions(romdata.data(), locationtag.c_str(), found, required);
+	}
 
 	if ((found == 0) && (required > 0))
 	{
@@ -180,7 +183,7 @@ media_auditor::summary media_auditor::audit_software(const char *list_name, cons
 	}
 
 	// return a summary
-	return summarize(list_name);
+	return summarize(swlist.list_name().c_str());
 }
 
 

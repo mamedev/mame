@@ -210,7 +210,7 @@ void favorite_manager::add_favorite_game()
 			if (!swinfo->parentname().empty())
 			{
 				auto swlist = software_list_device::find_by_name(machine().config(), image.software_list_name());
-				for (const software_info &c_swinfo : swlist->get_info())
+				for (const util::software_info &c_swinfo : swlist->get_info())
 				{
 					std::string c_parent(c_swinfo.parentname());
 					if (!c_parent.empty() && c_parent == swinfo->shortname())
@@ -222,7 +222,7 @@ void favorite_manager::add_favorite_game()
 			}
 
 			tmpmatches.usage.clear();
-			for (const feature_list_item &flist : swinfo->other_info())
+			for (const util::feature_list_item &flist : swinfo->other_info())
 				if (!strcmp(flist.name().c_str(), "usage"))
 					tmpmatches.usage = flist.value();
 
@@ -271,7 +271,7 @@ bool favorite_manager::isgame_favorite()
 
 	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 	{
-		const software_info *swinfo = image.software_entry();
+		const util::software_info *swinfo = image.software_entry();
 		if (image.exists() && swinfo != nullptr)
 		{
 			image_loaded = true;

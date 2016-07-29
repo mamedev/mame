@@ -525,10 +525,10 @@ void menu_select_software::build_software_list()
 	{
 		m_filter.swlist.name.push_back(swlist.list_name());
 		m_filter.swlist.description.push_back(swlist.description());
-		for (const software_info &swinfo : swlist.get_info())
+		for (const util::software_info &swinfo : swlist.get_info())
 		{
-			const software_part &part = swinfo.parts().front();
-			if (part.is_compatible(swlist) == SOFTWARE_IS_COMPATIBLE)
+			const util::software_part &part = swinfo.parts().front();
+			if (swlist.is_compatible(part) == SOFTWARE_IS_COMPATIBLE)
 			{
 				const char *instance_name = nullptr;
 				const char *type_name = nullptr;
@@ -560,14 +560,14 @@ void menu_select_software::build_software_list()
 				tmpmatches.supported = swinfo.supported();
 				tmpmatches.part = part.name();
 				tmpmatches.driver = m_driver;
-				tmpmatches.listname = strensure(swlist.list_name());
+				tmpmatches.listname = swlist.list_name();
 				tmpmatches.interface = part.interface();
 				tmpmatches.startempty = 0;
 				tmpmatches.parentlongname.clear();
 				tmpmatches.usage.clear();
 				tmpmatches.available = false;
 
-				for (const feature_list_item &flist : swinfo.other_info())
+				for (const util::feature_list_item &flist : swinfo.other_info())
 					if (!strcmp(flist.name().c_str(), "usage"))
 						tmpmatches.usage = flist.value();
 
@@ -686,10 +686,10 @@ void menu_select_software::inkey_select(const event *menu_event)
 		driver_enumerator drivlist(machine().options(), *ui_swinfo->driver);
 		media_auditor auditor(drivlist);
 		drivlist.next();
-		software_list_device *swlist = software_list_device::find_by_name(drivlist.config(), ui_swinfo->listname.c_str());
-		const software_info *swinfo = swlist->find(ui_swinfo->shortname.c_str());
+		software_list_device *swlist = software_list_device::find_by_name(drivlist.config(), ui_swinfo->listname);
+		const util::software_info *swinfo = swlist->find(ui_swinfo->shortname.c_str());
 
-		media_auditor::summary summary = auditor.audit_software(swlist->list_name(), swinfo, AUDIT_VALIDATE_FAST);
+		media_auditor::summary summary = auditor.audit_software(*swlist, swinfo, AUDIT_VALIDATE_FAST);
 
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
@@ -702,7 +702,7 @@ void menu_select_software::inkey_select(const event *menu_event)
 			else if (!mopt.skip_parts_menu() && swinfo->has_multiple_parts(ui_swinfo->interface.c_str()))
 			{
 				s_parts parts;
-				for (const software_part &swpart : swinfo->parts())
+				for (const util::software_part &swpart : swinfo->parts())
 				{
 					if (swpart.matches_interface(ui_swinfo->interface.c_str()))
 					{
@@ -1571,12 +1571,12 @@ void bios_selection::handle()
 					machine().options().set_value(OPTION_BIOS, elem.second, OPTION_PRIORITY_CMDLINE, error);
 					driver_enumerator drivlist(machine().options(), *ui_swinfo->driver);
 					drivlist.next();
-					software_list_device *swlist = software_list_device::find_by_name(drivlist.config(), ui_swinfo->listname.c_str());
-					const software_info *swinfo = swlist->find(ui_swinfo->shortname.c_str());
+					software_list_device *swlist = software_list_device::find_by_name(drivlist.config(), ui_swinfo->listname);
+					const util::software_info *swinfo = swlist->find(ui_swinfo->shortname.c_str());
 					if (!ui().options().skip_parts_menu() && swinfo->has_multiple_parts(ui_swinfo->interface.c_str()))
 					{
 						s_parts parts;
-						for (const software_part &swpart : swinfo->parts())
+						for (const util::software_part &swpart : swinfo->parts())
 						{
 							if (swpart.matches_interface(ui_swinfo->interface.c_str()))
 							{

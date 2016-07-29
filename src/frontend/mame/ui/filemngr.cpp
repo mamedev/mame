@@ -80,7 +80,7 @@ void menu_file_manager::fill_image_line(device_image_interface *img, std::string
 		// if the image has been loaded through softlist, also show the loaded part
 		if (img->part_entry() != nullptr)
 		{
-			const software_part *tmp = img->part_entry();
+			const util::software_part *tmp = img->part_entry();
 			if (!tmp->name().empty())
 			{
 				filename.append(" (");
