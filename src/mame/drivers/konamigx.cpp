@@ -961,7 +961,7 @@ WRITE32_MEMBER(konamigx_state::type4_prot_w)
 				}
 				else
 				{
-					printf("GXT4: unknown protection command %x (PC=%x)\n", m_last_prot_op, space.device().safe_pc());
+					//printf("GXT4: unknown protection command %x (PC=%x)\n", m_last_prot_op, space.device().safe_pc());
 				}
 
 				if (m_gx_wrport1_1 & 0x10)
