@@ -158,12 +158,12 @@ end
 
 if (BUSES["APRICOT_EXPANSION"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/bus/apricot/expansion.cpp",
-		MAME_DIR .. "src/devices/bus/apricot/expansion.h",
-		MAME_DIR .. "src/devices/bus/apricot/cards.cpp",
-		MAME_DIR .. "src/devices/bus/apricot/cards.h",
-		MAME_DIR .. "src/devices/bus/apricot/ram.cpp",
-		MAME_DIR .. "src/devices/bus/apricot/ram.h",
+		MAME_DIR .. "src/devices/bus/apricot/expansion/expansion.cpp",
+		MAME_DIR .. "src/devices/bus/apricot/expansion/expansion.h",
+		MAME_DIR .. "src/devices/bus/apricot/expansion/cards.cpp",
+		MAME_DIR .. "src/devices/bus/apricot/expansion/cards.h",
+		MAME_DIR .. "src/devices/bus/apricot/expansion/ram.cpp",
+		MAME_DIR .. "src/devices/bus/apricot/expansion/ram.h",
 	}
 end
 

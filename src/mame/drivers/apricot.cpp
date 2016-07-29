@@ -24,7 +24,7 @@
 #include "formats/apridisk.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
-#include "bus/apricot/expansion.h"
+#include "bus/apricot/expansion/expansion.h"
 
 
 //**************************************************************************
