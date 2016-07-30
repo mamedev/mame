@@ -102,7 +102,7 @@ int is_path_separator(char c)
 // -------------------------------------------------
 
 /**
- * @fn  static void parse_parent_path(const char *path, int *beginpos, int *endpos)
+ * @fn  static void parse_parent_path(const std::string &path, std::string::size_type *beginpos, std::string::size_type *endpos)
  *
  * @brief   Parse parent path.
  *
@@ -111,9 +111,9 @@ int is_path_separator(char c)
  * @param [in,out]  endpos      If non-null, the endpos.
  */
 
-static void parse_parent_path(const std::string &path, int *beginpos, int *endpos)
+static void parse_parent_path(const std::string &path, std::string::size_type *beginpos, std::string::size_type *endpos)
 {
-	auto length = path.length();
+	std::string::size_type length = path.length();
 	int pos;
 
 	/* skip over trailing path separators */
@@ -142,7 +142,7 @@ static void parse_parent_path(const std::string &path, int *beginpos, int *endpo
 
 std::string &zippath_parent(std::string &dst, const std::string &path)
 {
-	int pos;
+	std::string::size_type pos;
 	parse_parent_path(path, &pos, nullptr);
 
 	if (pos >= 0)
@@ -185,7 +185,7 @@ std::string zippath_parent(const std::string &path)
 
 std::string &zippath_parent_basename(std::string &dst, const std::string &path)
 {
-	int beginpos, endpos;
+	std::string::size_type beginpos, endpos;
 	parse_parent_path(path, &beginpos, &endpos);
 	dst.copy((char*)(path.c_str() + beginpos + 1), endpos - beginpos);
 	return dst;
@@ -237,7 +237,7 @@ std::string &zippath_combine(std::string &dst, const std::string &path1, const s
 	{
 		dst.assign(path2);
 	}
-	else if ((path1[0] != '\0') && !is_path_separator(path1[path1.length() - 1]))
+	else if (!path1.empty() && !is_path_separator(*path1.rbegin()))
 	{
 		dst.assign(path1).append(PATH_SEPARATOR).append(path2);
 	}
