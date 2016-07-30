@@ -184,17 +184,18 @@ void device_image_interface::device_compute_hash(util::hash_collection &hashes, 
 //  an image
 //-------------------------------------------------
 
-image_error_t device_image_interface::set_image_filename(const std::string &filename)
+void device_image_interface::set_image_filename(const std::string &filename)
 {
 	m_image_name = filename;
-	util::zippath_parent(m_working_directory, filename.c_str());
+	util::zippath_parent(m_working_directory, filename);
 	m_basename.assign(m_image_name);
 
 	int loc1 = m_image_name.find_last_of('\\');
 	int loc2 = m_image_name.find_last_of('/');
 	int loc3 = m_image_name.find_last_of(':');
 	int loc = MAX(loc1, MAX(loc2, loc3));
-	if (loc != -1) {
+	if (loc != -1)
+	{
 		if (loc == loc3)
 		{
 			// temp workaround for softlists now that m_image_name contains the part name too (e.g. list:gamename:cart)
@@ -208,12 +209,11 @@ image_error_t device_image_interface::set_image_filename(const std::string &file
 	m_basename_noext = m_basename;
 	m_filetype = "";
 	loc = m_basename_noext.find_last_of('.');
-	if (loc != -1) {
+	if (loc != -1)
+	{
 		m_basename_noext = m_basename_noext.substr(0, loc);
 		m_filetype = m_basename.substr(loc + 1);
 	}
-
-	return IMAGE_ERROR_SUCCESS;
 }
 
 /****************************************************************************
@@ -642,110 +642,89 @@ bool device_image_interface::is_loaded()
 
 
 //-------------------------------------------------
+//  image_error_from_file_error - converts an image
+//	error to a file error
+//-------------------------------------------------
+
+image_error_t device_image_interface::image_error_from_file_error(osd_file::error filerr)
+{
+	image_error_t err;
+	switch (filerr)
+	{
+	case osd_file::error::NONE:
+		err = IMAGE_ERROR_SUCCESS;
+		break;
+
+	case osd_file::error::NOT_FOUND:
+	case osd_file::error::ACCESS_DENIED:
+		// file not found (or otherwise cannot open)
+		err = IMAGE_ERROR_FILENOTFOUND;
+		break;
+
+	case osd_file::error::OUT_OF_MEMORY:
+		// out of memory
+		err = IMAGE_ERROR_OUTOFMEMORY;
+		break;
+
+	case osd_file::error::ALREADY_OPEN:
+		// this shouldn't happen
+		err = IMAGE_ERROR_ALREADYOPEN;
+		break;
+
+	case osd_file::error::FAILURE:
+	case osd_file::error::TOO_MANY_FILES:
+	case osd_file::error::INVALID_DATA:
+	default:
+		// other errors
+		err = IMAGE_ERROR_INTERNAL;
+		break;
+	}
+	return err;
+}
+
+
+//-------------------------------------------------
 //  load_image_by_path - loads an image with a
 //  specific path
 //-------------------------------------------------
 
 image_error_t device_image_interface::load_image_by_path(UINT32 open_flags, const std::string &path)
 {
-	image_error_t err;
 	std::string revised_path;
 
 	// attempt to read the file
 	auto const filerr = util::zippath_fopen(path, open_flags, m_file, revised_path);
+	if (filerr != osd_file::error::NONE)
+		return image_error_from_file_error(filerr);
 
-	// did the open succeed?
-	switch(filerr)
-	{
-		case osd_file::error::NONE:
-			// success!
-			m_readonly = (open_flags & OPEN_FLAG_WRITE) ? 0 : 1;
-			m_created = (open_flags & OPEN_FLAG_CREATE) ? 1 : 0;
-			err = IMAGE_ERROR_SUCCESS;
-			break;
-
-		case osd_file::error::NOT_FOUND:
-		case osd_file::error::ACCESS_DENIED:
-			// file not found (or otherwise cannot open); continue
-			err = IMAGE_ERROR_FILENOTFOUND;
-			break;
-
-		case osd_file::error::OUT_OF_MEMORY:
-			// out of memory
-			err = IMAGE_ERROR_OUTOFMEMORY;
-			break;
-
-		case osd_file::error::ALREADY_OPEN:
-			// this shouldn't happen
-			err = IMAGE_ERROR_ALREADYOPEN;
-			break;
-
-		case osd_file::error::FAILURE:
-		case osd_file::error::TOO_MANY_FILES:
-		case osd_file::error::INVALID_DATA:
-		default:
-			// other errors
-			err = IMAGE_ERROR_INTERNAL;
-			break;
-	}
-
-	// if successful, set the file name
-	if (filerr == osd_file::error::NONE)
-		set_image_filename(revised_path);
-
-	return err;
+	m_readonly = (open_flags & OPEN_FLAG_WRITE) ? 0 : 1;
+	m_created = (open_flags & OPEN_FLAG_CREATE) ? 1 : 0;
+	set_image_filename(revised_path);
+	return IMAGE_ERROR_SUCCESS;
 }
+
+
+//-------------------------------------------------
+//  reopen_for_write
+//-------------------------------------------------
 
 int device_image_interface::reopen_for_write(const char *path)
 {
 	m_file.reset();
 
-	image_error_t err;
 	std::string revised_path;
 
 	// attempt to open the file for writing
 	auto const filerr = util::zippath_fopen(path, OPEN_FLAG_READ|OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, m_file, revised_path);
+	if (filerr != osd_file::error::NONE)
+		return image_error_from_file_error(filerr);
 
-	// did the open succeed?
-	switch(filerr)
-	{
-		case osd_file::error::NONE:
-			// success!
-			m_readonly = 0;
-			m_created = 1;
-			err = IMAGE_ERROR_SUCCESS;
-			break;
+	// success!
+	m_readonly = 0;
+	m_created = 1;
+	set_image_filename(revised_path);
 
-		case osd_file::error::NOT_FOUND:
-		case osd_file::error::ACCESS_DENIED:
-			// file not found (or otherwise cannot open); continue
-			err = IMAGE_ERROR_FILENOTFOUND;
-			break;
-
-		case osd_file::error::OUT_OF_MEMORY:
-			// out of memory
-			err = IMAGE_ERROR_OUTOFMEMORY;
-			break;
-
-		case osd_file::error::ALREADY_OPEN:
-			// this shouldn't happen
-			err = IMAGE_ERROR_ALREADYOPEN;
-			break;
-
-		case osd_file::error::FAILURE:
-		case osd_file::error::TOO_MANY_FILES:
-		case osd_file::error::INVALID_DATA:
-		default:
-			// other errors
-			err = IMAGE_ERROR_INTERNAL;
-			break;
-	}
-
-	// if successful, set the file name
-	if (filerr == osd_file::error::NONE)
-		set_image_filename(revised_path.c_str());
-
-	return err;
+	return IMAGE_ERROR_SUCCESS;
 }
 
 
@@ -953,10 +932,7 @@ bool device_image_interface::load_internal(const std::string &path, bool is_crea
 	m_is_loading = true;
 
 	// record the filename
-	m_err = set_image_filename(path);
-
-	if (m_err)
-		goto done;
+	set_image_filename(path);
 
 	if (core_opens_image_file())
 	{
@@ -973,7 +949,7 @@ bool device_image_interface::load_internal(const std::string &path, bool is_crea
 				// if we had launched from softlist with a specified part, e.g. "shortname:part"
 				// we would have recorded the wrong name, so record it again based on software_info
 				if (m_software_info_ptr && !m_full_software_name.empty())
-					m_err = set_image_filename(m_full_software_name);
+					set_image_filename(m_full_software_name);
 
 				// check if image should be read-only
 				const char *read_only = get_feature("read_only");

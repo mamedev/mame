@@ -61,7 +61,7 @@ menu_control_device_image::menu_control_device_image(mame_ui_manager &mui, rende
 		if (m_image.exists())
 		{
 			m_current_file.assign(m_image.filename());
-			util::zippath_parent(m_current_directory, m_current_file.c_str());
+			util::zippath_parent(m_current_directory, m_current_file);
 		}
 		else
 		{

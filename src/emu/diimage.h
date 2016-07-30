@@ -257,7 +257,7 @@ protected:
 	void clear();
 	bool is_loaded();
 
-	image_error_t set_image_filename(const std::string &filename);
+	void set_image_filename(const std::string &filename);
 
 	void clear_error();
 
@@ -280,11 +280,11 @@ protected:
 	static const image_device_type_info *find_device_type(iodevice_t type);
 	static const image_device_type_info m_device_info_array[];
 
-	/* error related info */
+	// error related info
 	image_error_t m_err;
 	std::string m_err_message;
 
-	/* variables that are only non-zero when an image is mounted */
+	// variables that are only non-zero when an image is mounted
 	util::core_file::ptr m_file;
 	std::unique_ptr<emu_file> m_mame_file;
 	std::string m_image_name;
@@ -292,27 +292,27 @@ protected:
 	std::string m_basename_noext;
 	std::string m_filetype;
 
-	/* working directory; persists across mounts */
+	// working directory; persists across mounts
 	std::string m_working_directory;
 
-	/* Software information */
+	// Software information
 	std::string m_full_software_name;
 	const software_info *m_software_info_ptr;
 	const software_part *m_software_part_ptr;
 	std::string m_software_list_name;
 
-	/* info read from the hash file/software list */
+	// info read from the hash file/software list
 	std::string m_longname;
 	std::string m_manufacturer;
 	std::string m_year;
 	UINT32  m_supported;
 
-	/* flags */
+	// flags
 	bool m_readonly;
 	bool m_created;
 	bool m_init_phase;
 
-	/* special - used when creating */
+	// special - used when creating
 	int m_create_format;
 	util::option_resolution *m_create_args;
 
@@ -321,14 +321,17 @@ protected:
 	std::string m_brief_instance_name;
 	std::string m_instance_name;
 
-	/* creation info */
+	// creation info
 	formatlist_type m_formatlist;
 
-	/* in the case of arcade cabinet with fixed carts inserted,
-	 we want to disable command line cart loading... */
+	// in the case of arcade cabinet with fixed carts inserted,
+	// we want to disable command line cart loading...
 	bool m_user_loadable;
 
 	bool m_is_loading;
+
+private:
+	static image_error_t image_error_from_file_error(osd_file::error filerr);
 };
 
 // iterator
