@@ -1079,7 +1079,7 @@ bool device_image_interface::finish_load()
 	{
 		image_checkhash();
 
-		if (has_been_created())
+		if (m_created)
 		{
 			err = call_create(m_create_format, m_create_args);
 			if (err)

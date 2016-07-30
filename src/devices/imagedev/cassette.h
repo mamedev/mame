@@ -95,6 +95,7 @@ protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
+
 private:
 	cassette_image  *m_cassette;
 	cassette_state  m_state;
@@ -109,6 +110,8 @@ private:
 	const struct CassetteOptions    *m_create_opts;
 	cassette_state                  m_default_state;
 	const char *                    m_interface;
+
+	bool internal_load(bool is_create);
 };
 
 // device type definition
