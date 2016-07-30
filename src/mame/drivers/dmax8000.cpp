@@ -57,8 +57,8 @@ public:
 	DECLARE_WRITE8_MEMBER(port14_w);
 	DECLARE_WRITE8_MEMBER(port40_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
-	WRITE_LINE_MEMBER(fdc_drq_w);
-	WRITE_LINE_MEMBER(clock_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -148,7 +148,7 @@ DRIVER_INIT_MEMBER( dmax8000_state, dmax8000 )
 }
 
 // Baud rate generator. All inputs are 2MHz.
-DECLARE_WRITE_LINE_MEMBER( dmax8000_state::clock_w )
+WRITE_LINE_MEMBER( dmax8000_state::clock_w )
 {
 	m_ctc->trg0(state);
 	m_ctc->trg1(state);

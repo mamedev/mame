@@ -49,7 +49,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port00_w);
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
-	WRITE_LINE_MEMBER(clock_w);
+	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -121,7 +121,7 @@ static const z80_daisy_config daisy_chain_intf[] =
 };
 
 // Baud rate generator. All inputs are 2MHz.
-DECLARE_WRITE_LINE_MEMBER( ampro_state::clock_w )
+WRITE_LINE_MEMBER( ampro_state::clock_w )
 {
 	m_ctc->trg0(state);
 	m_ctc->trg1(state);

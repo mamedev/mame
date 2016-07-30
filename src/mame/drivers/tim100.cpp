@@ -36,9 +36,9 @@ public:
 		, m_uart18(*this, "uart_u18")
 		{ }
 
-	WRITE_LINE_MEMBER(drq_w);
-	WRITE_LINE_MEMBER(irq_w);
-	WRITE_LINE_MEMBER(clock_w);
+	DECLARE_WRITE_LINE_MEMBER(drq_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	DECLARE_WRITE_LINE_MEMBER(clock_w);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 
 private:
@@ -158,7 +158,7 @@ WRITE_LINE_MEMBER( tim100_state::irq_w )
 		m_maincpu->set_input_line(I8085_RST65_LINE, CLEAR_LINE);
 }
 
-DECLARE_WRITE_LINE_MEMBER( tim100_state::clock_w )
+WRITE_LINE_MEMBER( tim100_state::clock_w )
 {
 	m_uart17->write_txc(state);
 	m_uart17->write_rxc(state);

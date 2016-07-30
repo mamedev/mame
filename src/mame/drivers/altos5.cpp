@@ -50,7 +50,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
-	WRITE_LINE_MEMBER(clock_w);
+	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
 private:
 	UINT8 m_port08;
@@ -243,7 +243,7 @@ WRITE_LINE_MEMBER( altos5_state::busreq_w )
 }
 
 // baud rate generator and RTC. All inputs are 2MHz.
-DECLARE_WRITE_LINE_MEMBER( altos5_state::clock_w )
+WRITE_LINE_MEMBER( altos5_state::clock_w )
 {
 	m_ctc->trg0(state);
 	m_ctc->trg1(state);
