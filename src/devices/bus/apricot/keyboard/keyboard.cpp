@@ -14,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type APRICOT_KEYBOARD_INTERFACE = &device_creator<apricot_keyboard_device>;
+const device_type APRICOT_KEYBOARD_INTERFACE = &device_creator<apricot_keyboard_bus_device>;
 
 
 //**************************************************************************
@@ -22,10 +22,10 @@ const device_type APRICOT_KEYBOARD_INTERFACE = &device_creator<apricot_keyboard_
 //**************************************************************************
 
 //-------------------------------------------------
-//  apricot_keyboard_device - constructor
+//  apricot_keyboard_bus_device - constructor
 //-------------------------------------------------
 
-apricot_keyboard_device::apricot_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+apricot_keyboard_bus_device::apricot_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, APRICOT_KEYBOARD_INTERFACE, "Apricot Keyboard Interface", tag, owner, clock, "apricot_kbd", __FILE__),
 	device_slot_interface(mconfig, *this),
 	m_kbd(nullptr),
@@ -34,10 +34,10 @@ apricot_keyboard_device::apricot_keyboard_device(const machine_config &mconfig, 
 }
 
 //-------------------------------------------------
-//  apricot_keyboard_device - destructor
+//  apricot_keyboard_bus_device - destructor
 //-------------------------------------------------
 
-apricot_keyboard_device::~apricot_keyboard_device()
+apricot_keyboard_bus_device::~apricot_keyboard_bus_device()
 {
 }
 
@@ -45,7 +45,7 @@ apricot_keyboard_device::~apricot_keyboard_device()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void apricot_keyboard_device::device_start()
+void apricot_keyboard_bus_device::device_start()
 {
 	// get connected keyboard
 	m_kbd = dynamic_cast<device_apricot_keyboard_interface *>(get_card_device());
@@ -58,7 +58,7 @@ void apricot_keyboard_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void apricot_keyboard_device::device_reset()
+void apricot_keyboard_bus_device::device_reset()
 {
 }
 
@@ -66,7 +66,7 @@ void apricot_keyboard_device::device_reset()
 //  host to module interface
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( apricot_keyboard_device::out_w )
+WRITE_LINE_MEMBER( apricot_keyboard_bus_device::out_w )
 {
 		if (m_kbd)
 			m_kbd->out_w(state);
@@ -84,7 +84,7 @@ WRITE_LINE_MEMBER( apricot_keyboard_device::out_w )
 device_apricot_keyboard_interface::device_apricot_keyboard_interface(const machine_config &mconfig, device_t &device) :
 	device_slot_card_interface(mconfig, device)
 {
-	m_host = dynamic_cast<apricot_keyboard_device *>(device.owner());
+	m_host = dynamic_cast<apricot_keyboard_bus_device *>(device.owner());
 }
 
 //-------------------------------------------------
