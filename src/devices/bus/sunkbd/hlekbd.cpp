@@ -759,16 +759,12 @@ hle_device_base::hle_device_base(
 		char const *shortname,
 		char const *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
-	, device_serial_interface(mconfig, *this)
+	, device_buffered_serial_interface(mconfig, *this)
 	, device_sun_keyboard_port_interface(mconfig, *this)
 	, device_matrix_keyboard_interface(mconfig, *this, "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7")
 	, m_dips(*this, "DIP")
 	, m_click_timer(nullptr)
 	, m_beeper(*this, "beeper")
-	, m_fifo{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
-	, m_head(0U)
-	, m_tail(0U)
-	, m_empty(0U)
 	, m_make_count(0U)
 	, m_rx_state(RX_IDLE)
 	, m_keyclick(0U)
@@ -805,7 +801,7 @@ machine_config_constructor hle_device_base::device_mconfig_additions() const
 
 WRITE_LINE_MEMBER( hle_device_base::input_txd )
 {
-	device_serial_interface::rx_w(state);
+	device_buffered_serial_interface::rx_w(state);
 }
 
 
@@ -817,14 +813,10 @@ WRITE_LINE_MEMBER( hle_device_base::input_txd )
 
 void hle_device_base::device_start()
 {
-	device_serial_interface::register_save_state(machine().save(), this);
+	device_buffered_serial_interface::register_save_state(machine().save(), this);
 
 	m_click_timer = timer_alloc(CLICK_TIMER_ID);
 
-	save_item(NAME(m_fifo));
-	save_item(NAME(m_head));
-	save_item(NAME(m_tail));
-	save_item(NAME(m_empty));
 	save_item(NAME(m_make_count));
 	save_item(NAME(m_rx_state));
 	save_item(NAME(m_keyclick));
@@ -841,15 +833,13 @@ void hle_device_base::device_start()
 void hle_device_base::device_reset()
 {
 	// initialise state
-	std::fill(std::begin(m_fifo), std::end(m_fifo), UINT8(0x00U));
-	m_head = m_tail = 0U;
-	m_empty = 1U;
+	clear_fifo();
 	m_make_count = 0U;
 	m_rx_state = RX_IDLE;
 	m_keyclick = 0U;
 	m_beeper_state = 0x00U;
 
-	// configure device_serial_interface
+	// configure device_buffered_serial_interface
 	set_data_frame(START_BIT_COUNT, DATA_BIT_COUNT, PARITY, STOP_BITS);
 	set_rate(BAUD);
 	receive_register_reset();
@@ -873,10 +863,10 @@ void hle_device_base::device_reset()
 	start_processing(attotime::from_hz(1'200));
 
 	// send reset response
-	send_byte(0xffU);
-	send_byte(ident_byte());
+	transmit_byte(0xffU);
+	transmit_byte(ident_byte());
 	if (are_all_keys_up())
-		send_byte(0x7fU);
+		transmit_byte(0x7fU);
 }
 
 
@@ -896,7 +886,7 @@ void hle_device_base::device_timer(emu_timer &timer, device_timer_id id, int par
 
 	default:
 		device_matrix_keyboard_interface::device_timer(timer, id, param, ptr);
-		device_serial_interface::device_timer(timer, id, param, ptr);
+		device_buffered_serial_interface::device_timer(timer, id, param, ptr);
 	}
 }
 
@@ -920,45 +910,94 @@ void hle_device_base::tra_callback()
 
 void hle_device_base::tra_complete()
 {
-	assert(!m_empty || (m_head == m_tail));
-	assert(m_head < ARRAY_LENGTH(m_fifo));
-	assert(m_tail < ARRAY_LENGTH(m_fifo));
+	if (fifo_full())
+		start_processing(attotime::from_hz(1'200));
 
-	if (!m_empty)
-	{
-		transmit_register_setup(m_fifo[m_head]);
-		if (m_head == m_tail)
-			start_processing(attotime::from_hz(1'200));
-		m_head = (m_head + 1) & 0x0fU;
-		m_empty = (m_head == m_tail) ? 1 : 0;
-	}
+	device_buffered_serial_interface::tra_complete();
 }
 
 
 /*--------------------------------------------------
-    hle_device_base::rcv_complete
+    hle_device_base::key_make
+    handle a key being pressed
+--------------------------------------------------*/
+
+void hle_device_base::key_make(UINT8 row, UINT8 column)
+{
+	// we should have stopped processing if we filled the FIFO
+	assert(!fifo_full());
+
+	// send the make code, click if desired
+	transmit_byte((row << 4) | column);
+	if (m_keyclick)
+	{
+		m_beeper_state |= UINT8(BEEPER_CLICK);
+		m_beeper->set_state(m_beeper_state ? 1 : 0);
+		m_click_timer->reset(attotime::from_msec(5));
+	}
+
+	// count keys
+	++m_make_count;
+	assert(m_make_count);
+}
+
+
+/*--------------------------------------------------
+    hle_device_base::key_break
+    handle a key being released
+--------------------------------------------------*/
+
+void hle_device_base::key_break(UINT8 row, UINT8 column)
+{
+	// we should have stopped processing if we filled the FIFO
+	assert(!fifo_full());
+	assert(m_make_count);
+
+	// send the break code, and the idle code if no other keysa are down
+	transmit_byte(0x80U | (row << 4) | column);
+	if (!--m_make_count)
+		transmit_byte(0x7fU);
+
+	// check our counting
+	assert(are_all_keys_up() == !bool(m_make_count));
+}
+
+
+/*--------------------------------------------------
+    hle_device_base::transmit_byte
+    send a byte or queue it to send later
+--------------------------------------------------*/
+
+void hle_device_base::transmit_byte(UINT8 byte)
+{
+	device_buffered_serial_interface::transmit_byte(byte);
+	if (fifo_full())
+		stop_processing();
+}
+
+
+/*--------------------------------------------------
+    hle_device_base::received_byte
     handle received byte frame
 --------------------------------------------------*/
 
-void hle_device_base::rcv_complete()
+void hle_device_base::received_byte(UINT8 byte)
 {
-	receive_register_extract();
-	UINT8 const code(get_received_char());
 	switch (m_rx_state)
 	{
 	case RX_LED:
-		machine().output().set_led_value(LED_NUM, BIT(code, 0));
-		machine().output().set_led_value(LED_COMPOSE, BIT(code, 1));
-		machine().output().set_led_value(LED_SCROLL, BIT(code, 2));
-		machine().output().set_led_value(LED_CAPS, BIT(code, 3));
-		machine().output().set_led_value(LED_KANA, BIT(code, 4));
+		machine().output().set_led_value(LED_NUM, BIT(byte, 0));
+		machine().output().set_led_value(LED_COMPOSE, BIT(byte, 1));
+		machine().output().set_led_value(LED_SCROLL, BIT(byte, 2));
+		machine().output().set_led_value(LED_CAPS, BIT(byte, 3));
+		machine().output().set_led_value(LED_KANA, BIT(byte, 4));
 		m_rx_state = RX_IDLE;
 		break;
 
 	default:
 		assert(m_rx_state == RX_IDLE);
 	case RX_IDLE:
-		switch (code)
+		switch (byte)
 		{
 		case COMMAND_RESET:
 			device_reset();
@@ -994,91 +1033,15 @@ void hle_device_base::rcv_complete()
 			break;
 
 		case COMMAND_LAYOUT:
-			send_byte(0xfeU);
-			send_byte(UINT8(m_dips->read() & 0x3fU));
+			transmit_byte(0xfeU);
+			transmit_byte(UINT8(m_dips->read() & 0x3fU));
 			m_rx_state = RX_IDLE;
 			break;
 
 		default:
-			logerror("Unknown command: 0x%02x", code);
+			logerror("Unknown command: 0x%02x", byte);
 			m_rx_state = RX_IDLE;
 		}
-	}
-}
-
-
-/*--------------------------------------------------
-    hle_device_base::key_make
-    handle a key being pressed
---------------------------------------------------*/
-
-void hle_device_base::key_make(UINT8 row, UINT8 column)
-{
-	// we should have stopped processing if we filled the FIFO
-	assert(m_empty || (m_head != m_tail));
-
-	// send the make code, click if desired
-	send_byte((row << 4) | column);
-	if (m_keyclick)
-	{
-		m_beeper_state |= UINT8(BEEPER_CLICK);
-		m_beeper->set_state(m_beeper_state ? 1 : 0);
-		m_click_timer->reset(attotime::from_msec(5));
-	}
-
-	// count keys
-	++m_make_count;
-	assert(m_make_count);
-}
-
-
-/*--------------------------------------------------
-    hle_device_base::key_break
-    handle a key being released
---------------------------------------------------*/
-
-void hle_device_base::key_break(UINT8 row, UINT8 column)
-{
-	// we should have stopped processing if we filled the FIFO
-	assert(m_empty || (m_head != m_tail));
-	assert(m_make_count);
-
-	// send the break code, and the idle code if no other keysa are down
-	send_byte(0x80U | (row << 4) | column);
-	if (!--m_make_count)
-		send_byte(0x7fU);
-
-	// check our counting
-	assert(are_all_keys_up() == !bool(m_make_count));
-}
-
-
-/*--------------------------------------------------
-    hle_device_base::send_byte
-    send a byte or queue it to send later
---------------------------------------------------*/
-
-void hle_device_base::send_byte(UINT8 code)
-{
-	assert(!m_empty || (m_head == m_tail));
-	assert(m_head < ARRAY_LENGTH(m_fifo));
-	assert(m_tail < ARRAY_LENGTH(m_fifo));
-
-	if (m_empty && is_transmit_register_empty())
-	{
-		transmit_register_setup(code);
-	}
-	else if (m_empty || (m_head != m_tail))
-	{
-		m_fifo[m_tail] = code;
-		m_tail = (m_tail + 1) & 0x0fU;
-		m_empty = 0;
-		if (m_head == m_tail)
-			stop_processing();
-	}
-	else
-	{
-		logerror("FIFO overrun (code = 0x%02x)", code);
 	}
 }
 

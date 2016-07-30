@@ -4,7 +4,7 @@
 
 serial_terminal_device::serial_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: generic_terminal_device(mconfig, SERIAL_TERMINAL, "Serial Terminal", tag, owner, clock, "serial_terminal", __FILE__)
-	, device_serial_interface(mconfig, *this)
+	, device_buffered_serial_interface(mconfig, *this)
 	, device_rs232_port_interface(mconfig, *this)
 	, m_rs232_txbaud(*this, "RS232_TXBAUD")
 	, m_rs232_rxbaud(*this, "RS232_RXBAUD")
@@ -12,10 +12,6 @@ serial_terminal_device::serial_terminal_device(const machine_config &mconfig, co
 	, m_rs232_databits(*this, "RS232_DATABITS")
 	, m_rs232_parity(*this, "RS232_PARITY")
 	, m_rs232_stopbits(*this, "RS232_STOPBITS")
-	, m_fifo{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
-	, m_head(0)
-	, m_tail(0)
-	, m_empty(0)
 {
 }
 
@@ -38,19 +34,12 @@ ioport_constructor serial_terminal_device::device_input_ports() const
 void serial_terminal_device::device_start()
 {
 	generic_terminal_device::device_start();
-	device_serial_interface::register_save_state(machine().save(), this);
-
-	save_item(NAME(m_fifo));
-	save_item(NAME(m_head));
-	save_item(NAME(m_tail));
-	save_item(NAME(m_empty));
+	device_buffered_serial_interface::register_save_state(machine().save(), this);
 }
 
 WRITE_LINE_MEMBER(serial_terminal_device::update_serial)
 {
-	std::fill(std::begin(m_fifo), std::end(m_fifo), 0U);
-	m_head = m_tail = 0;
-	m_empty = 1;
+	clear_fifo();
 
 	int const startbits = convert_startbits(m_rs232_startbits->read());
 	int const databits = convert_databits(m_rs232_databits->read());
@@ -85,29 +74,12 @@ void serial_terminal_device::device_reset()
 void serial_terminal_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	generic_terminal_device::device_timer(timer, id, param, ptr);
-	device_serial_interface::device_timer(timer, id, param, ptr);
+	device_buffered_serial_interface::device_timer(timer, id, param, ptr);
 }
 
 void serial_terminal_device::send_key(UINT8 code)
 {
-	assert(!m_empty || (m_head == m_tail));
-	assert(m_head < ARRAY_LENGTH(m_fifo));
-	assert(m_tail < ARRAY_LENGTH(m_fifo));
-
-	if (m_empty && is_transmit_register_empty())
-	{
-		transmit_register_setup(code);
-	}
-	else if (m_empty || (m_head != m_tail))
-	{
-		m_fifo[m_tail] = code;
-		m_tail = (m_tail + 1) & 0x0fU;
-		m_empty = 0;
-	}
-	else
-	{
-		logerror("FIFO overrun (code = 0x%02x)", code);
-	}
+	transmit_byte(code);
 }
 
 void serial_terminal_device::tra_callback()
@@ -115,24 +87,9 @@ void serial_terminal_device::tra_callback()
 	output_rxd(transmit_register_get_data_bit());
 }
 
-void serial_terminal_device::tra_complete()
+void serial_terminal_device::received_byte(UINT8 byte)
 {
-	assert(!m_empty || (m_head == m_tail));
-	assert(m_head < ARRAY_LENGTH(m_fifo));
-	assert(m_tail < ARRAY_LENGTH(m_fifo));
-
-	if (!m_empty)
-	{
-		transmit_register_setup(m_fifo[m_head]);
-		m_head = (m_head + 1) & 0x0fU;
-		m_empty = (m_head == m_tail) ? 1 : 0;
-	}
-}
-
-void serial_terminal_device::rcv_complete()
-{
-	receive_register_extract();
-	term_write(get_received_char());
+	term_write(byte);
 }
 
 const device_type SERIAL_TERMINAL = &device_creator<serial_terminal_device>;

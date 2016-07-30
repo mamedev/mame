@@ -3,7 +3,6 @@
 
 #include "machine/m20_kbd.h"
 
-#include "bus/rs232/rs232.ipp"
 #include "machine/keyboard.ipp"
 
 
