@@ -153,7 +153,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/apricot/expansion.h,BUSES["APRICOT_EXPANSION"] = true
+--@src/devices/bus/apricot/expansion/expansion.h,BUSES["APRICOT_EXPANSION"] = true
 ---------------------------------------------------
 
 if (BUSES["APRICOT_EXPANSION"]~=null) then
@@ -164,6 +164,21 @@ if (BUSES["APRICOT_EXPANSION"]~=null) then
 		MAME_DIR .. "src/devices/bus/apricot/expansion/cards.h",
 		MAME_DIR .. "src/devices/bus/apricot/expansion/ram.cpp",
 		MAME_DIR .. "src/devices/bus/apricot/expansion/ram.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/apricot/keyboard/keyboard.h,BUSES["APRICOT_KEYBOARD"] = true
+---------------------------------------------------
+
+if (BUSES["APRICOT_KEYBOARD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/apricot/keyboard/keyboard.cpp",
+		MAME_DIR .. "src/devices/bus/apricot/keyboard/keyboard.h",
+		MAME_DIR .. "src/devices/bus/apricot/keyboard/hle.cpp",
+		MAME_DIR .. "src/devices/bus/apricot/keyboard/hle.h",
 	}
 end
 

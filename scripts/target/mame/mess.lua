@@ -602,6 +602,7 @@ BUSES["ADAM"] = true
 BUSES["ADAMNET"] = true
 BUSES["APF"] = true
 BUSES["APRICOT_EXPANSION"] = true
+BUSES["APRICOT_KEYBOARD"] = true
 BUSES["ARCADIA"] = true
 BUSES["ASTROCADE"] = true
 BUSES["BBC_ANALOGUE"] = true
@@ -1133,8 +1134,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/apricotp.cpp",
 	MAME_DIR .. "src/mame/machine/apricotkb.cpp",
 	MAME_DIR .. "src/mame/machine/apricotkb.h",
-	MAME_DIR .. "src/mame/machine/apricotkb_hle.cpp",
-	MAME_DIR .. "src/mame/machine/apricotkb_hle.h",
 	MAME_DIR .. "src/mame/drivers/victor9k.cpp",
 	MAME_DIR .. "src/mame/includes/victor9k.h",
 	MAME_DIR .. "src/mame/machine/victor9kb.cpp",
