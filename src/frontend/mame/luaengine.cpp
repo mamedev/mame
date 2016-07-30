@@ -2006,7 +2006,8 @@ void lua_engine::menu_populate(std::string &menu, std::vector<menu_item> &menu_l
 	{
 		if(lua_istable(m_lua_state, -1))
 		{
-			menu_item item;
+			menu_list.emplace_back();
+			menu_item &item = menu_list.back();
 			lua_rawgeti(m_lua_state, -1, 1);
 			item.text = lua_tostring(m_lua_state, -1);
 			lua_pop(m_lua_state, 1);
@@ -2016,7 +2017,6 @@ void lua_engine::menu_populate(std::string &menu, std::vector<menu_item> &menu_l
 			lua_rawgeti(m_lua_state, -1, 3);
 			item.flags = lua_tostring(m_lua_state, -1);
 			lua_pop(m_lua_state, 1);
-			menu_list.push_back(item);
 		}
 		lua_pop(m_lua_state, 1);
 	}
