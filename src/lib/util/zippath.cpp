@@ -114,22 +114,22 @@ int is_path_separator(char c)
 static void parse_parent_path(const std::string &path, std::string::size_type *beginpos, std::string::size_type *endpos)
 {
 	std::string::size_type length = path.length();
-	int pos;
+	std::string::size_type pos;
 
-	/* skip over trailing path separators */
+	// skip over trailing path separators
 	pos = length - 1;
-	while((pos > 0) && is_path_separator(path[pos]))
+	while ((pos > 0) && is_path_separator(path[pos]))
 		pos--;
 
-	/* return endpos */
+	// return endpos
 	if (endpos != nullptr)
 		*endpos = pos;
 
-	/* now skip until we find a path separator */
-	while((pos >= 0) && !is_path_separator(path[pos]))
-		pos--;
+	// now skip until we find a path separator
+	while ((pos != std::string::npos) && !is_path_separator(path[pos]))
+		pos = (pos > 0) ? pos - 1 : std::string::npos;
 
-	/* return beginpos */
+	// return beginpos
 	if (beginpos != nullptr)
 		*beginpos = pos;
 }
@@ -145,7 +145,7 @@ std::string &zippath_parent(std::string &dst, const std::string &path)
 	std::string::size_type pos;
 	parse_parent_path(path, &pos, nullptr);
 
-	if (pos >= 0)
+	if (pos != std::string::npos)
 		dst = path.substr(0, pos + 1);
 	else
 		dst.clear();
