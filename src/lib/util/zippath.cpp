@@ -117,8 +117,8 @@ static void parse_parent_path(const std::string &path, std::string::size_type *b
 	std::string::size_type pos;
 
 	// skip over trailing path separators
-	pos = length - 1;
-	while ((pos > 0) && is_path_separator(path[pos]))
+	pos = length ? (length - 1) : std::string::npos;
+	while ((pos > 0) && (pos != std::string::npos) && is_path_separator(path[pos]))
 		pos--;
 
 	// return endpos
