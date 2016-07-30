@@ -229,7 +229,12 @@ public:
 	bool uses_file_extension(const char *file_extension) const;
 	const formatlist_type &formatlist() const { return m_formatlist; }
 
+	// loads an image file
 	bool load(const char *path);
+
+	// loads a softlist item by name
+	bool load_software(const std::string &softlist_name);
+
 	bool open_image_file(emu_options &options);
 	bool finish_load();
 	void unload();
@@ -332,6 +337,7 @@ protected:
 
 private:
 	static image_error_t image_error_from_file_error(osd_file::error filerr);
+	bool schedule_postload_hard_reset_if_needed();
 };
 
 // iterator
