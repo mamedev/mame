@@ -69,7 +69,7 @@ menu_control_device_image::menu_control_device_image(mame_ui_manager &mui, rende
 		}
 
 		// check to see if the path exists; if not clear it
-		if (util::zippath_opendir(m_current_directory.c_str(), nullptr) != osd_file::error::NONE)
+		if (util::zippath_opendir(m_current_directory, nullptr) != osd_file::error::NONE)
 			m_current_directory.clear();
 	}
 }
@@ -91,7 +91,7 @@ menu_control_device_image::~menu_control_device_image()
 void menu_control_device_image::test_create(bool &can_create, bool &need_confirm)
 {
 	// assemble the full path
-	auto path = util::zippath_combine(m_current_directory.c_str(), m_current_file.c_str());
+	auto path = util::zippath_combine(m_current_directory, m_current_file);
 
 	// does a file or a directory exist at the path
 	auto entry = osd_stat(path.c_str());
