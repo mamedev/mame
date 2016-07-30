@@ -190,13 +190,20 @@ void device_image_interface::set_image_filename(const std::string &filename)
 	util::zippath_parent(m_working_directory, filename);
 	m_basename.assign(m_image_name);
 
-	int loc1 = m_image_name.find_last_of('\\');
-	int loc2 = m_image_name.find_last_of('/');
-	int loc3 = m_image_name.find_last_of(':');
-	int loc = MAX(loc1, MAX(loc2, loc3));
-	if (loc != -1)
+	// find the last "path separator"
+	auto iter = std::find_if(
+		m_image_name.rbegin(),
+		m_image_name.rend(),
+		[](char c) { return (c == '\\') || (c == '/') || (c == ':'); });
+
+	// get the position
+	std::string::size_type loc = (iter != m_image_name.rend())
+		? (&*iter - &m_image_name[0])
+		: std::string::npos;
+
+	if (loc != std::string::npos)
 	{
-		if (loc == loc3)
+		if (*iter == ':')
 		{
 			// temp workaround for softlists now that m_image_name contains the part name too (e.g. list:gamename:cart)
 			m_basename = m_basename.substr(0, loc);
@@ -209,7 +216,7 @@ void device_image_interface::set_image_filename(const std::string &filename)
 	m_basename_noext = m_basename;
 	m_filetype = "";
 	loc = m_basename_noext.find_last_of('.');
-	if (loc != -1)
+	if (loc != std::string::npos)
 	{
 		m_basename_noext = m_basename_noext.substr(0, loc);
 		m_filetype = m_basename.substr(loc + 1);
@@ -648,38 +655,31 @@ bool device_image_interface::is_loaded()
 
 image_error_t device_image_interface::image_error_from_file_error(osd_file::error filerr)
 {
-	image_error_t err;
 	switch (filerr)
 	{
 	case osd_file::error::NONE:
-		err = IMAGE_ERROR_SUCCESS;
-		break;
+		return IMAGE_ERROR_SUCCESS;
 
 	case osd_file::error::NOT_FOUND:
 	case osd_file::error::ACCESS_DENIED:
 		// file not found (or otherwise cannot open)
-		err = IMAGE_ERROR_FILENOTFOUND;
-		break;
+		return IMAGE_ERROR_FILENOTFOUND;
 
 	case osd_file::error::OUT_OF_MEMORY:
 		// out of memory
-		err = IMAGE_ERROR_OUTOFMEMORY;
-		break;
+		return IMAGE_ERROR_OUTOFMEMORY;
 
 	case osd_file::error::ALREADY_OPEN:
 		// this shouldn't happen
-		err = IMAGE_ERROR_ALREADYOPEN;
-		break;
+		return IMAGE_ERROR_ALREADYOPEN;
 
 	case osd_file::error::FAILURE:
 	case osd_file::error::TOO_MANY_FILES:
 	case osd_file::error::INVALID_DATA:
 	default:
 		// other errors
-		err = IMAGE_ERROR_INTERNAL;
-		break;
+		return IMAGE_ERROR_INTERNAL;
 	}
-	return err;
 }
 
 
