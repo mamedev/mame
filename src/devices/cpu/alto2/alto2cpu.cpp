@@ -207,6 +207,7 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	memset(m_sysclka1, 0x00, sizeof(m_sysclka1));
 	memset(m_sysclkb0, 0x00, sizeof(m_sysclkb0));
 	memset(m_sysclkb1, 0x00, sizeof(m_sysclkb1));
+	m_speaker = 0;
 }
 
 alto2_cpu_device::~alto2_cpu_device()
@@ -238,6 +239,16 @@ void alto2_cpu_device::set_diablo(int unit, diablo_hd_device* ptr)
 {
 	logerror("%s: unit=%d diablo_hd_device=%p\n", __FUNCTION__, unit, (void *) ptr);
 	m_drive[unit] = ptr;
+}
+
+//-------------------------------------------------
+// driver interface to set speaker_sound_device
+//-------------------------------------------------
+
+void alto2_cpu_device::set_speaker(speaker_sound_device* speaker)
+{
+	logerror("%s: speaker_sound_device=%p\n", __FUNCTION__, speaker);
+	m_speaker = speaker;
 }
 
 //-------------------------------------------------

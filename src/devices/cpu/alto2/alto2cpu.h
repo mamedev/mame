@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "debugger.h"
+#include "sound/speaker.h"
 #include "machine/diablo_hd.h"
 
 /**
@@ -191,6 +192,9 @@ public:
 	//! driver interface to set diablo_hd_device
 	void set_diablo(int unit, diablo_hd_device* ptr);
 
+	//! driver interface to set a speaker sound device
+	void set_speaker(speaker_sound_device* speaker);
+
 	//! call in for the next sector callback
 	void next_sector(int unit);
 
@@ -275,6 +279,8 @@ private:
 	DECLARE_WRITE16_MEMBER( ioram_w );
 
 	int m_icount;
+
+	speaker_sound_device* m_speaker;
 
 	typedef void (alto2_cpu_device::*a2func)();
 
@@ -558,8 +564,8 @@ private:
 	UINT8 m_d_bs;                                   //!< decoded BS[0-2] bus source
 	UINT8 m_d_f1;                                   //!< decoded F1[0-3] function
 	UINT8 m_d_f2;                                   //!< decoded F2[0-3] function
-	UINT8 m_d_loadt;                                    //!< decoded LOADT flag
-	UINT8 m_d_loadl;                                    //!< decoded LOADL flag
+	UINT8 m_d_loadt;                                //!< decoded LOADT flag
+	UINT8 m_d_loadl;                                //!< decoded LOADL flag
 	UINT16 m_next;                                  //!< current micro instruction's next
 	UINT16 m_next2;                                 //!< next micro instruction's next
 	UINT16 m_r[ALTO2_REGS];                         //!< R register file
