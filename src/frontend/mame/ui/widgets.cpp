@@ -2,9 +2,9 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /*********************************************************************
 
-	ui/widgets.cpp
+    ui/widgets.cpp
 
-	Internal MAME widgets for the user interface.
+    Internal MAME widgets for the user interface.
 
 *********************************************************************/
 
@@ -15,7 +15,7 @@
 
 namespace ui {
 /***************************************************************************
-	WIDGETS
+    WIDGETS
 ***************************************************************************/
 
 //-------------------------------------------------

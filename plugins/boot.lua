@@ -22,7 +22,7 @@ function lfs.env_replace(str)
 end
 local dir = lfs.env_replace(manager:options().entries.pluginspath:value())
 
-package.path = package.path .. ";" .. dir .. "/?.lua;" .. dir .. "/?/init.lua"
+package.path = dir .. "/?.lua;" .. dir .. "/?/init.lua"
 
 local json = require('json')
 local function readAll(file)

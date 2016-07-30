@@ -79,11 +79,10 @@ public:
 		HRESULT result;
 
 		// convert instance name to utf8
-		auto osd_deleter = [](void *ptr) { osd_free(ptr); };
-		auto utf8_instance_name = std::unique_ptr<char, decltype(osd_deleter)>(utf8_from_tstring(instance->tszInstanceName), osd_deleter);
+		std::string utf8_instance_name = utf8_from_tstring(instance->tszInstanceName);
 
 		// allocate memory for the device object
-		TDevice* devinfo = module.devicelist()->create_device<TDevice>(machine, utf8_instance_name.get(), module);
+		TDevice* devinfo = module.devicelist()->create_device<TDevice>(machine, utf8_instance_name.c_str(), module);
 
 		// attempt to create a device
 		result = m_dinput->CreateDevice(instance->guidInstance, devinfo->dinput.device.GetAddressOf(), nullptr);

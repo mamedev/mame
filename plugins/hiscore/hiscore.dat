@@ -40,6 +40,7 @@
 ;@s:1943.cpp
 
 1943:
+1943mii:
 1943u:
 @:maincpu,program,e600,60,00,00
 @:maincpu,program,e110,8,00,00
@@ -209,6 +210,7 @@ invasionrza:
 searthin:
 searthina:
 sicv:
+sicv1:
 sinvemag:
 sinvzen:
 sisv:
@@ -2923,13 +2925,16 @@ sf2v004:
 strider:
 striderj:
 striderua:
+strideruc:
 @:maincpu,program,ff89aa,78,ff,20
 @:maincpu,program,ff0ca4,04,00,00
 
 
 ;varthr1:******varth - operation thunderstorm (world 920612)
 varth:
+varthb:
 varthj:
+varthjr:
 varthr1:
 varthu:
 @:maincpu,program,fff9ea,50,00,01
@@ -4373,6 +4378,13 @@ discoboyp:
 @:maincpu,program,f800,80,00,2e
 
 
+;@s:divebomb.cpp
+
+divebomb:
+@:fgcpu,program,e0fa,4c,00,53
+@:fgcpu,program,e040,4,00,00
+
+
 ;@s:diverboy.cpp
 
 ;********(diver boy)
@@ -4787,6 +4799,13 @@ theglob3:
 @:maincpu,program,7a5f,3c,00,00
 @:maincpu,program,7ab1,1,01,01
 @:maincpu,program,7ab7,1,80,80
+
+
+;beastf:******beastie feastie
+beastf:
+@:maincpu,program,4c46,3c,4d,00
+@:maincpu,program,4c8a,1,01,01
+@:maincpu,program,4cb0,1,15,15
 
 
 ;@s:eprom.cpp
@@ -5581,6 +5600,21 @@ galaxiac:
 
 ;@s:galaxian.cpp
 
+anteatergg:
+@:maincpu,program,40ef,3c,00,20
+
+
+pacmanblb:
+@:maincpu,program,4688,3,00,00
+@:maincpu,program,5180,1,40,40
+@:maincpu,program,51a0,1,40,40
+@:maincpu,program,51c0,1,40,40
+@:maincpu,program,51e0,1,40,40
+@:maincpu,program,5200,1,40,40
+@:maincpu,program,5220,1,40,40
+@:maincpu,program,466f,1,03,03
+
+
 ;spctbird:******space thunderbird
 spctbird:
 @:maincpu,program,8042,54,00,24
@@ -5964,6 +5998,7 @@ galaxbsf2:
 galaxian:
 galaxiana:
 galaxianbl:
+galaxianbl2:
 galaxiani:
 galaxianm:
 galaxianmo:
@@ -6189,6 +6224,7 @@ ninjemak:
 dangar:
 dangara:
 dangarb:
+dangarj:
 @:maincpu,program,e209,82,00,20
 @:maincpu,program,e394,3,00,00
 
@@ -6769,6 +6805,10 @@ junofrstg:
 
 ;@s:kaneko16.cpp
 
+wingforc:
+@:maincpu,program,30d7e7,13f,00,35
+
+
 ;(Blaze On) (by tamphax)
 blazeon:
 @:maincpu,program,304fb0,77,00,0d
@@ -6942,6 +6982,13 @@ bcrusher:
 kncljoe:
 kncljoea:
 @:maincpu,program,f01a,2d,00,43
+
+
+;@s:konamigq.cpp
+
+;******Crypt Killer (konamigq.c) (by GreatStone)
+cryptklr:
+@:maincpu,program,237dc0,50,40,00
 
 
 ;@s:konamigx.cpp
@@ -7313,6 +7360,10 @@ lsasquad:
 
 
 ;@s:lwings.cpp
+
+fball:
+@:maincpu,program,d840,69,00,48
+
 
 lwings:
 lwings2:
@@ -8152,6 +8203,7 @@ kazan:
 
 ;edfu:******E.D.F. : Earth Defense Force (North America)
 edf:
+edfa:
 edfbl:
 edfu:
 @:maincpu,program,64c17,107,01,00
@@ -8263,6 +8315,12 @@ yachtmn:
 metlclsh:
 @:maincpu,program,802f,8c,47,40
 @:maincpu,program,800a,3,30,05
+
+
+;@s:metlfrzr.cpp
+
+metlfrzr:
+@:maincpu,program,d822,a0,00,37
 
 
 ;@s:metro.cpp
@@ -8418,6 +8476,7 @@ knightb:
 kicknrun:
 kicknrunu:
 mexico86:
+mexico86a:
 @:maincpu,program,ee18,2d,17,49
 
 
@@ -8859,6 +8918,7 @@ mtlchampu1:
 ;metamrphj:******Metamorphic Force (ver jaa)
 ;metamrphu:******Metamorphic Force (ver uaa)
 metamrph:
+metamrpha:
 metamrphj:
 metamrphu:
 @:maincpu,program,203240,35,00,5a
@@ -10295,13 +10355,6 @@ theglobp:
 @:maincpu,program,4cb9,1,15,15
 
 
-;beastf:******beastie feastie
-beastf:
-@:maincpu,program,4c46,3c,4d,00
-@:maincpu,program,4c8a,1,01,01
-@:maincpu,program,4cb0,1,15,15
-
-
 ;(lizard wizard) (by GeoMan)
 lizwiz:
 @:maincpu,program,4daf,3c,4d,01
@@ -10611,7 +10664,9 @@ genix:
 
 ;pirates (by GeoMan) - 10th score not saved, driver
 pirates:
-@:maincpu,program,10a544,80,4e,00
+piratesb:
+@:maincpu,program,10a544,76,4e,10
+@:maincpu,program,10a5b0,1,4e,4e
 
 
 ;@s:pitnrun.cpp
@@ -10628,6 +10683,13 @@ pitnruna:
 @:maincpu,program,89c1,1,00,00
 @:maincpu,program,89a1,1,00,00
 @:maincpu,program,8981,1,27,27
+
+
+;@s:playch10.cpp
+
+;it won't reload the high score unless you reset twice
+pc_smb:
+@:cart,program,7df,4,0,0,ff
 
 
 ;@s:playmark.cpp
@@ -11480,6 +11542,8 @@ mrkougb2:
 800fath:
 bomber:
 knockout:
+knockoutb:
+knockoutc:
 mariner:
 scramb2:
 scramblb:
@@ -11932,24 +11996,6 @@ sonicbom:
 @:maincpu,program,ffc100,9e,20,20
 
 
-;altbeastj3:******altered beast (japan, fd1094 317-0068)
-;altbeast4:******altered beast (set 4, mc-8123b 317-0066)
-;altbeast5:******altered beast (set 5, 8751 317-0076)
-;altbeastj:******altered beast (set 6, japan, 8751 317-0077)
-;altbeastj1:******altered beast (set 1, japan, fd1094 317-0065)
-altbeast:
-altbeast2:
-altbeast4:
-altbeast5:
-altbeast6:
-altbeastbl:
-altbeastj:
-altbeastj1:
-altbeastj3:
-@:maincpu,program,fffc00,74,00,33
-@:maincpu,program,fff010,4,00,00
-
-
 ;******dunk shot (fd1089 317-0022)
 dunkshot:
 dunkshota:
@@ -11990,6 +12036,11 @@ defense:
 sdi:
 sdib:
 sdibl:
+sdibl2:
+sdibl3:
+sdibl4:
+sdibl5:
+sdibl6:
 @:maincpu,program,fff800,320,00,20
 @:maincpu,program,fffb88,4,00,00
 @:maincpu,program,fffbca,3,4b,5a
@@ -13083,6 +13134,11 @@ ikarinc:
 @:maincpu,program,fc5f,3,00,00
 
 
+ikariram:
+@:maincpu,program,ff0b,50,00,4f
+@:maincpu,program,fc5f,3,00,00
+
+
 ;******Alpha Mission
 alphamis:
 @:maincpu,program,d83b,82,00,20
@@ -14159,6 +14215,25 @@ wboyu:
 
 ;@s:system16.cpp
 
+;altbeastj3:******altered beast (japan, fd1094 317-0068)
+;altbeast4:******altered beast (set 4, mc-8123b 317-0066)
+;altbeast5:******altered beast (set 5, 8751 317-0076)
+;altbeastj:******altered beast (set 6, japan, 8751 317-0077)
+;altbeastj1:******altered beast (set 1, japan, fd1094 317-0065)
+altbeast:
+altbeast2:
+altbeast4:
+altbeast5:
+altbeast6:
+altbeastbl:
+altbeastj:
+altbeastj1:
+altbeastj3:
+mutantwarr:
+@:maincpu,program,fffc00,74,00,33
+@:maincpu,program,fff010,4,00,00
+
+
 tetrisbl:
 @:maincpu,program,ffe800,64,45,08
 
@@ -15012,6 +15087,20 @@ tankbust:
 @:maincpu,program,f602,50,00,10
 
 
+;@s:taotaido.cpp
+
+taotaido3:
+@:maincpu,program,fe91d4,4e,01,02
+
+
+taotaidoa:
+@:maincpu,program,fe9340,4e,01,02
+
+
+taotaido:
+@:maincpu,program,fe91e4,4e,14,02
+
+
 ;@s:tbowl.cpp
 
 ;*******tecmo bowl (world? & japan)	
@@ -15409,6 +15498,10 @@ tmntua:
 @:maincpu,program,63500,f3,03,41
 
 
+tmht24pe:
+@:maincpu,program,107600,f3,03,41
+
+
 blswhstl:
 blswhstla:
 detatwin:
@@ -15597,6 +15690,12 @@ outzoneh:
 @:maincpu,program,2401de,18,00,00
 @:maincpu,program,240503,4f,3f,3f
 @:maincpu,program,240372,a,00,00
+
+
+outzonecv:
+@:maincpu,program,801de,18,00,00
+@:maincpu,program,80503,4f,3f,3f
+@:maincpu,program,80372,a,00,00
 
 
 ;*note* top score does not display
@@ -16039,6 +16138,8 @@ tunhuntc:
 turbo:
 turboa:
 turbob:
+turbobl:
+turbod:
 @:maincpu,program,e400,1e,94,94
 @:maincpu,program,f310,1e,00,00
 @:maincpu,program,f292,d,0f,f0

@@ -91,6 +91,6 @@ void bbc_analogue_slot_device::device_reset()
 
 
 SLOT_INTERFACE_START( bbc_analogue_devices )
-//	SLOT_INTERFACE("joystick",  BBC_JOYSTICKS)        /* Acorn ANH01 BBC Micro Joysticks */
-//	SLOT_INTERFACE("quinkey",   BBC_QUINKEY)          /* Microwriter Quinkey */
+//  SLOT_INTERFACE("joystick",  BBC_JOYSTICKS)        /* Acorn ANH01 BBC Micro Joysticks */
+//  SLOT_INTERFACE("quinkey",   BBC_QUINKEY)          /* Microwriter Quinkey */
 SLOT_INTERFACE_END

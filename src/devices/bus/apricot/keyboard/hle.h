@@ -8,20 +8,11 @@
 
 #pragma once
 
-#ifndef __APRICOTKB_HLE__
-#define __APRICOTKB_HLE__
+#ifndef __APRICOT_KEYBOARD_HLE_H__
+#define __APRICOT_KEYBOARD_HLE_H__
 
 #include "emu.h"
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_APRICOT_KEYBOARD_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, APRICOT_KEYBOARD_HLE, 0)
-
-#define MCFG_APRICOT_KEYBOARD_TXD_HANDLER(_write) \
-	devcb = &apricot_keyboard_hle_device::set_txd_handler(*device, DEVCB_##_write);
+#include "keyboard.h"
 
 
 //**************************************************************************
@@ -30,17 +21,16 @@
 
 // ======================> apricot_keyboard_hle_device
 
-class apricot_keyboard_hle_device : public device_t, public device_serial_interface
+class apricot_keyboard_hle_device : public device_t, public device_apricot_keyboard_interface, public device_serial_interface
 {
 public:
 	// construction/destruction
 	apricot_keyboard_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb_base &set_txd_handler(device_t &device, _Object object)
-		{ return downcast<apricot_keyboard_hle_device &>(device).m_txd_handler.set_callback(object); }
-
-	DECLARE_WRITE_LINE_MEMBER(rxd_w);
 	DECLARE_INPUT_CHANGED_MEMBER(key_callback);
+
+	// from host
+	virtual void out_w(int state) override;
 
 protected:
 	// device_t overrides
@@ -57,8 +47,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	devcb_write_line m_txd_handler;
-
 	int m_rxd;
 
 	UINT8 m_data_in;
@@ -70,4 +58,4 @@ private:
 extern const device_type APRICOT_KEYBOARD_HLE;
 
 
-#endif // __APRICOTKB_HLE__
+#endif // __APRICOT_KEYBOARD_HLE_H__

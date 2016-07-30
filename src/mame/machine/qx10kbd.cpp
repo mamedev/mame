@@ -1,105 +1,82 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-// TODO: dump 8049 mcu; key repeat
+// TODO: dump 8049 mcu; key repeat; LEDs
 
 #include "machine/qx10kbd.h"
 
-qx10_keyboard_device::qx10_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
-	serial_keyboard_device(mconfig, QX10_KEYBOARD, "QX10 Keyboard", tag, owner, 0, "qx10_keyboard", __FILE__),
-	m_io_kbd8(*this, "TERM_LINE8"),
-	m_io_kbd9(*this, "TERM_LINE9"),
-	m_io_kbda(*this, "TERM_LINEA"),
-	m_io_kbdb(*this, "TERM_LINEB"),
-	m_io_kbdd(*this, "TERM_LINED"),
-	m_io_kbde(*this, "TERM_LINEE"),
-	m_io_kbdf(*this, "TERM_LINEF")
+#include "machine/keyboard.ipp"
+
+
+qx10_keyboard_device::qx10_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock)
+	: buffered_rs232_device(mconfig, QX10_KEYBOARD, "QX10 Keyboard", tag, owner, 0, "qx10_keyboard", __FILE__)
+	, device_matrix_keyboard_interface(mconfig, *this, "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE", "LINEF")
 {
 }
 
-void qx10_keyboard_device::write(UINT8 data)
+
+void qx10_keyboard_device::device_reset()
 {
-	switch(data & 0xe0)
+	buffered_rs232_device::device_reset();
+
+	reset_key_state();
+	clear_fifo();
+
+	set_data_frame(1, 8, PARITY_EVEN, STOP_BITS_1);
+	set_rate(1'200);
+	receive_register_reset();
+	transmit_register_reset();
+
+	output_dcd(0);
+	output_dsr(0);
+	output_cts(0);
+	output_rxd(1);
+
+	start_processing(attotime::from_hz(2'400));
+}
+
+
+void qx10_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	device_matrix_keyboard_interface::device_timer(timer, id, param, ptr);
+	buffered_rs232_device::device_timer(timer, id, param, ptr);
+}
+
+
+void qx10_keyboard_device::key_make(UINT8 row, UINT8 column)
+{
+	transmit_byte((column << 4) | row);
+}
+
+
+void qx10_keyboard_device::received_byte(UINT8 data)
+{
+	switch (data & 0xe0)
 	{
-		default:
-			break;
-		case 0x00: // set repeat start
-			break;
-		case 0x20: // set repeat interval
-			break;
-		case 0x40: // set LED
-			break;
-		case 0x60: // get LED
-			send_key(0);
-			break;
-		case 0x80: // get SW
-			break;
-		case 0xa0: // set repeat
-			break;
-		case 0xc0: // enable keyboard
-			break;
-		case 0xe0:
-			if(!(data & 1))
-				send_key(0);
-			break;
+	case 0x00: // set repeat start
+		break;
+	case 0x20: // set repeat interval
+		break;
+	case 0x40: // set LED
+		break;
+	case 0x60: // get LED
+		transmit_byte(0);
+		break;
+	case 0x80: // get SW
+		break;
+	case 0xa0: // set repeat
+		break;
+	case 0xc0: // enable keyboard
+		break;
+	case 0xe0:
+		if (!(data & 1))
+			transmit_byte(0);
+		break;
 	}
-	return;
 }
 
-UINT8 qx10_keyboard_device::keyboard_handler(UINT8 last_code, UINT8 *scan_line)
-{
-	int i = *scan_line, j;
-	UINT8 code = 0;
-
-	if (i == 0) code = m_io_kbd0->read();
-	else
-	if (i == 1) code = m_io_kbd1->read();
-	else
-	if (i == 2) code = m_io_kbd2->read();
-	else
-	if (i == 3) code = m_io_kbd3->read();
-	else
-	if (i == 4) code = m_io_kbd4->read();
-	else
-	if (i == 5) code = m_io_kbd5->read();
-	else
-	if (i == 6) code = m_io_kbd6->read();
-	else
-	if (i == 7) code = m_io_kbd7->read();
-	else
-	if (i == 8) code = m_io_kbd8->read();
-	else
-	if (i == 9) code = m_io_kbd9->read();
-	else
-	if (i == 10) code = m_io_kbda->read();
-	else
-	if (i == 11) code = m_io_kbdb->read();
-	else
-	if (i == 12) code = m_io_kbdc->read();
-	else
-	if (i == 13) code = m_io_kbdd->read();
-	else
-	if (i == 14) code = m_io_kbde->read();
-	else
-	if (i == 15) code = m_io_kbdf->read();
-
-	*scan_line = (*scan_line + 1) % 16;
-
-	if(m_state[i] == code)
-		return 0;
-
-	m_state[i] = code;
-
-	if(!code)
-		return 0;
-
-	for(j = 0; j < 8; j++)
-		if((code >> j) == 1) break;
-
-	return (j << 4) + i;
-}
 
 static INPUT_PORTS_START( qx10_keyboard )
-	PORT_START("TERM_LINE0")
+	PORT_START("LINE0")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_UNUSED)
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_UNUSED)
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("RSHIFT")
@@ -109,7 +86,7 @@ static INPUT_PORTS_START( qx10_keyboard )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("GRPH SHIFT")
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("LCTRL") PORT_CODE(KEYCODE_LCONTROL)
 
-	PORT_START("TERM_LINE1")
+	PORT_START("LINE1")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F4/UNDO") PORT_CODE(KEYCODE_F4)
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_UNUSED)
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_UNUSED)
@@ -119,7 +96,7 @@ static INPUT_PORTS_START( qx10_keyboard )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CHAR('2')
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F3/COPY DISK") PORT_CODE(KEYCODE_F3)
 
-	PORT_START("TERM_LINE2")
+	PORT_START("LINE2")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F5/(H1)") PORT_CODE(KEYCODE_F5)
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_UNUSED)
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_UNUSED)
@@ -129,7 +106,7 @@ static INPUT_PORTS_START( qx10_keyboard )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F2/HELP") PORT_CODE(KEYCODE_F2)
 
-	PORT_START("TERM_LINE3")
+	PORT_START("LINE3")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F6/STORE") PORT_CODE(KEYCODE_F6)
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_UNUSED)
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_UNUSED)
@@ -139,7 +116,7 @@ static INPUT_PORTS_START( qx10_keyboard )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4) PORT_CHAR('4')
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F1/STOP") PORT_CODE(KEYCODE_F1)
 
-	PORT_START("TERM_LINE4")
+	PORT_START("LINE4")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F7/RETRIEVE") PORT_CODE(KEYCODE_F7)
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_UNUSED)
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_UNUSED)
@@ -149,7 +126,7 @@ static INPUT_PORTS_START( qx10_keyboard )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5) PORT_CHAR('5')
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("MAR SEL")
 
-	PORT_START("TERM_LINE5")
+	PORT_START("LINE5")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F8/PRINT") PORT_CODE(KEYCODE_F8)
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("ENTER (PAD)") PORT_CODE(KEYCODE_ENTER_PAD)
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("3 (PAD)") PORT_CODE(KEYCODE_3_PAD) PORT_CHAR('3')
@@ -159,7 +136,7 @@ static INPUT_PORTS_START( qx10_keyboard )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CHAR('6')
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("ESC/^") PORT_CODE(KEYCODE_ESC)
 
-	PORT_START("TERM_LINE6")
+	PORT_START("LINE6")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F9/INDEX") PORT_CODE(KEYCODE_F9)
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(". (PAD)") PORT_CODE(KEYCODE_DEL_PAD)
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("2 (PAD)") PORT_CODE(KEYCODE_2_PAD) PORT_CHAR('2')
@@ -169,7 +146,7 @@ static INPUT_PORTS_START( qx10_keyboard )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CHAR('7')
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
 
-	PORT_START("TERM_LINE7")
+	PORT_START("LINE7")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F10/MAIL") PORT_CODE(KEYCODE_F10)
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("0 (PAD)") PORT_CODE(KEYCODE_0_PAD) PORT_CHAR('0')
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("1 (PAD)") PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('1')
@@ -179,7 +156,7 @@ static INPUT_PORTS_START( qx10_keyboard )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("TAB") PORT_CODE(KEYCODE_TAB)
 
-	PORT_START("TERM_LINE8")
+	PORT_START("LINE8")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("(H2)")
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("= (PAD)")
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("+ (PAD)") PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR('+')
@@ -189,7 +166,7 @@ static INPUT_PORTS_START( qx10_keyboard )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("TAB SET")
 
-	PORT_START("TERM_LINE9")
+	PORT_START("LINE9")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("BREAK/MENU")
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("6 (PAD)") PORT_CODE(KEYCODE_6_PAD) PORT_CHAR('6')
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("9 (PAD)") PORT_CODE(KEYCODE_9_PAD) PORT_CHAR('9')
@@ -199,7 +176,7 @@ static INPUT_PORTS_START( qx10_keyboard )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_UNUSED)
 
-	PORT_START("TERM_LINEA")
+	PORT_START("LINEA")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PAUSE/CALC")
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("5 (PAD)") PORT_CODE(KEYCODE_5_PAD) PORT_CHAR('5')
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("8 (PAD)") PORT_CODE(KEYCODE_8_PAD) PORT_CHAR('8')
@@ -209,7 +186,7 @@ static INPUT_PORTS_START( qx10_keyboard )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("-")
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_UNUSED)
 
-	PORT_START("TERM_LINEB")
+	PORT_START("LINEB")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("SCRN DUMP/SCHED")
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("4 (PAD)") PORT_CODE(KEYCODE_4_PAD) PORT_CHAR('4')
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("7 (PAD)") PORT_CODE(KEYCODE_7_PAD) PORT_CHAR('7')
@@ -219,7 +196,7 @@ static INPUT_PORTS_START( qx10_keyboard )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("=")
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_UNUSED)
 
-	PORT_START("TERM_LINEC")
+	PORT_START("LINEC")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("HELP/DRAW")
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("(H5)")
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("- (PAD)") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR('-')
@@ -229,7 +206,7 @@ static INPUT_PORTS_START( qx10_keyboard )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("\\") PORT_CODE(KEYCODE_BACKSLASH)
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_UNUSED)
 
-	PORT_START("TERM_LINED")
+	PORT_START("LINED")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("(H3)")
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("MF4/(H4)")
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("* (PAD)") PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR('*')
@@ -239,7 +216,7 @@ static INPUT_PORTS_START( qx10_keyboard )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("BACKSPACE") PORT_CODE(KEYCODE_BACKSPACE)
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_UNUSED)
 
-	PORT_START("TERM_LINEE")
+	PORT_START("LINEE")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("BOLD")
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("MF3/STYLE")
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("/ (PAD)") PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHAR('/')
@@ -249,7 +226,7 @@ static INPUT_PORTS_START( qx10_keyboard )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("D-7")
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_UNUSED)
 
-	PORT_START("TERM_LINEF")
+	PORT_START("LINEF")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("MF1/ITALIC")
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("MF2/SIZE")
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("`/DEC TAB") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('`')
@@ -258,26 +235,6 @@ static INPUT_PORTS_START( qx10_keyboard )
 	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("DEL/WORD") PORT_CODE(KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(DEL))
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CLS/LINE")
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_UNUSED)
-
-	PORT_START("RS232_TXBAUD")
-	PORT_CONFNAME(0xff, RS232_BAUD_1200, "TX Baud") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, serial_keyboard_device, update_serial)
-	PORT_CONFSETTING( RS232_BAUD_1200, "1200")
-
-	PORT_START("RS232_STARTBITS")
-	PORT_CONFNAME(0xff, RS232_STARTBITS_1, "Start Bits") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, serial_keyboard_device, update_serial)
-	PORT_CONFSETTING( RS232_STARTBITS_1, "1")
-
-	PORT_START("RS232_DATABITS")
-	PORT_CONFNAME(0xff, RS232_DATABITS_8, "Data Bits") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, serial_keyboard_device, update_serial)
-	PORT_CONFSETTING( RS232_DATABITS_8, "8")
-
-	PORT_START("RS232_PARITY")
-	PORT_CONFNAME(0xff, RS232_PARITY_EVEN, "Parity") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, serial_keyboard_device, update_serial)
-	PORT_CONFSETTING( RS232_PARITY_EVEN, "Even")
-
-	PORT_START("RS232_STOPBITS")
-	PORT_CONFNAME(0xff, RS232_STOPBITS_1, "Stop Bits") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, serial_keyboard_device, update_serial)
-	PORT_CONFSETTING( RS232_STOPBITS_1, "1")
 INPUT_PORTS_END
 
 ioport_constructor qx10_keyboard_device::device_input_ports() const
@@ -285,17 +242,5 @@ ioport_constructor qx10_keyboard_device::device_input_ports() const
 	return INPUT_PORTS_NAME(qx10_keyboard);
 }
 
-void qx10_keyboard_device::device_start()
-{
-	serial_keyboard_device::device_start();
-	memset(m_state, '\0', sizeof(m_state));
-	set_rcv_rate(1200);
-}
-
-void qx10_keyboard_device::rcv_complete()
-{
-	receive_register_extract();
-	write(get_received_char());
-}
 
 const device_type QX10_KEYBOARD = &device_creator<qx10_keyboard_device>;

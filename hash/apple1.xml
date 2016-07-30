@@ -12,7 +12,7 @@ A1T001X is verified, all other need verification
 		<description>Apple I Basic</description>
 		<year>1976</year>
 		<publisher>apple computer inc</publisher>
-            <!-- P/N A1T001X-->
+			<!-- P/N A1T001X-->
 		<info name="usage" value="Load at E000.EFFFR, enter at E000R" />
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="6644780">
@@ -98,7 +98,7 @@ A1T001X is verified, all other need verification
 		<description>Dis-Assembler</description>
 		<year>1976</year>
 		<publisher>apple computer inc</publisher>
-		            <!-- P/N A1T008X-->
+					<!-- P/N A1T008X-->
 		<info name="usage" value="Load at 800.09FFR, enter at 0800R" />
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="1393604">
@@ -123,7 +123,7 @@ A1T001X is verified, all other need verification
 		<description>Lunar Lander</description>
 		<year>1976</year>
 		<publisher>apple computer inc</publisher>
-                <!-- P/N A1T003X-->
+				<!-- P/N A1T003X-->
 		<info name="usage" value="Load at 300.0A00R, enter at 0300R" />
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="3350056">
@@ -136,7 +136,7 @@ A1T001X is verified, all other need verification
 		<description>Mastermind</description>
 		<year>1976</year>
 		<publisher>apple computer inc</publisher>
-		            <!-- P/N A1T002X-->
+					<!-- P/N A1T002X-->
 		<info name="usage" value="Load at 300.03FFR, enter at 0300R" />
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="1196032">
@@ -211,7 +211,7 @@ A1T001X is verified, all other need verification
 		<description>Blackjack</description>
 		<year>1976</year>
 		<publisher>apple computer inc</publisher>
-                    <!-- P/N A1T004X-->
+					<!-- P/N A1T004X-->
 		<info name="usage" value="First load BASIC, then load at 4A.00FFR800.0FFFR, enter at E2B3R" />
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="5751412">
@@ -320,7 +320,7 @@ A1T001X is verified, all other need verification
 		<description>Hamurabi</description>
 		<year>1976</year>
 		<publisher>apple computer inc</publisher>
-		            <!-- P/N A1T005X-->
+					<!-- P/N A1T005X-->
 		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="6953140">

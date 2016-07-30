@@ -228,7 +228,7 @@ public:
 		m_kaneko_spr(*this, "kan_spr"),
 		m_spriteram(*this, "spriteram")
 	{ }
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;

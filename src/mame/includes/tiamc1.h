@@ -22,9 +22,11 @@ public:
 	UINT8 *m_spriteram_y;
 	UINT8 *m_spriteram_a;
 	UINT8 *m_spriteram_n;
+	UINT8 *m_paletteram;
 	UINT8 m_layers_ctrl;
 	UINT8 m_bg_vshift;
 	UINT8 m_bg_hshift;
+	UINT8 m_bg_bplctrl;
 	tilemap_t *m_bg_tilemap1;
 	tilemap_t *m_bg_tilemap2;
 	std::unique_ptr<rgb_t[]> m_palette_ptr;
@@ -37,6 +39,7 @@ public:
 	DECLARE_WRITE8_MEMBER(tiamc1_sprite_n_w);
 	DECLARE_WRITE8_MEMBER(tiamc1_bg_vshift_w);
 	DECLARE_WRITE8_MEMBER(tiamc1_bg_hshift_w);
+	DECLARE_WRITE8_MEMBER(tiamc1_bg_bplctrl_w);
 	DECLARE_WRITE8_MEMBER(tiamc1_palette_w);
 	DECLARE_WRITE8_MEMBER(kot_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(kot_videoram_w);
@@ -56,6 +59,7 @@ public:
 	required_device<palette_device> m_palette;
 private:
 	optional_device<speaker_sound_device> m_speaker;
+	void update_bg_palette();
 };
 
 

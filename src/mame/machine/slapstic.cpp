@@ -182,7 +182,6 @@
 
 
 #include "includes/slapstic.h"
-#include "validity.h"
 
 
 extern const device_type SLAPSTIC = &device_creator<atari_slapstic_device>;

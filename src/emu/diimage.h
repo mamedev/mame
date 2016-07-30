@@ -88,10 +88,10 @@ public:
 	const std::string &optspec() const { return m_optspec; }
 
 private:
-	std::string					m_name;
-	std::string					m_description;
-	std::vector<std::string>	m_extensions;
-	std::string					m_optspec;
+	std::string                 m_name;
+	std::string                 m_description;
+	std::vector<std::string>    m_extensions;
+	std::string                 m_optspec;
 };
 
 
@@ -166,7 +166,7 @@ public:
 	virtual const option_guide *create_option_guide() const { return nullptr; }
 
 	const image_device_format *device_get_indexed_creatable_format(int index) const { if (index < m_formatlist.size()) return m_formatlist.at(index).get(); else return nullptr;  }
-	const image_device_format *device_get_named_creatable_format(const char *format_name);
+	const image_device_format *device_get_named_creatable_format(const std::string &format_name);
 	const option_guide *device_get_creation_option_guide() const { return create_option_guide(); }
 
 	const char *error();
@@ -205,6 +205,7 @@ public:
 	const software_info *software_entry() const { return m_software_info_ptr; }
 	const software_part *part_entry() const { return m_software_part_ptr; }
 	const char *software_list_name() const { return m_software_list_name.c_str(); }
+	bool loaded_through_softlist() const { return m_software_info_ptr != nullptr; }
 
 	void set_working_directory(const char *working_directory) { m_working_directory = working_directory; }
 	const char * working_directory();
@@ -249,15 +250,14 @@ public:
 
 protected:
 	virtual const software_list_loader &get_software_list_loader() const { return false_software_list_loader::instance(); }
-	virtual void loaded_through_softlist() { }
 
-	bool load_internal(const char *path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load);
+	bool load_internal(const std::string &path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load);
 	void determine_open_plan(int is_create, UINT32 *open_plan);
-	image_error_t load_image_by_path(UINT32 open_flags, const char *path);
+	image_error_t load_image_by_path(UINT32 open_flags, const std::string &path);
 	void clear();
 	bool is_loaded();
 
-	image_error_t set_image_filename(const char *filename);
+	void set_image_filename(const std::string &filename);
 
 	void clear_error();
 
@@ -280,11 +280,11 @@ protected:
 	static const image_device_type_info *find_device_type(iodevice_t type);
 	static const image_device_type_info m_device_info_array[];
 
-	/* error related info */
+	// error related info
 	image_error_t m_err;
 	std::string m_err_message;
 
-	/* variables that are only non-zero when an image is mounted */
+	// variables that are only non-zero when an image is mounted
 	util::core_file::ptr m_file;
 	std::unique_ptr<emu_file> m_mame_file;
 	std::string m_image_name;
@@ -292,28 +292,27 @@ protected:
 	std::string m_basename_noext;
 	std::string m_filetype;
 
-	/* working directory; persists across mounts */
+	// working directory; persists across mounts
 	std::string m_working_directory;
 
-	/* Software information */
+	// Software information
 	std::string m_full_software_name;
 	const software_info *m_software_info_ptr;
 	const software_part *m_software_part_ptr;
 	std::string m_software_list_name;
 
-	/* info read from the hash file/software list */
+	// info read from the hash file/software list
 	std::string m_longname;
 	std::string m_manufacturer;
 	std::string m_year;
 	UINT32  m_supported;
 
-	/* flags */
+	// flags
 	bool m_readonly;
 	bool m_created;
 	bool m_init_phase;
-	bool m_from_swlist;
 
-	/* special - used when creating */
+	// special - used when creating
 	int m_create_format;
 	util::option_resolution *m_create_args;
 
@@ -322,17 +321,17 @@ protected:
 	std::string m_brief_instance_name;
 	std::string m_instance_name;
 
-	/* creation info */
+	// creation info
 	formatlist_type m_formatlist;
 
-	/* in the case of arcade cabinet with fixed carts inserted,
-	 we want to disable command line cart loading... */
+	// in the case of arcade cabinet with fixed carts inserted,
+	// we want to disable command line cart loading...
 	bool m_user_loadable;
 
 	bool m_is_loading;
 
 private:
-	bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry);
+	static image_error_t image_error_from_file_error(osd_file::error filerr);
 };
 
 // iterator

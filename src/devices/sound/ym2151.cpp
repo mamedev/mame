@@ -1103,7 +1103,7 @@ void ym2151_device::chan_calc(unsigned int chan)
 	env = volume_calc(op+3);    /* C2 */
 	if (env < ENV_QUIET)
 		chanout[chan]    += op_calc(op+3, env, c2);
-	//	if(chan==3) printf("%d\n", chanout[chan]);
+	//  if(chan==3) printf("%d\n", chanout[chan]);
 
 	/* M1 */
 	op->mem_value = mem;

@@ -5862,11 +5862,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( turpins, turtles )
 
 	// the ROMs came from a blister, so there aren't PCB infos available. Chip types and clocks are guessed.
-	
+
 	/* alternate memory map */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(turpins_map)
-	
+
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(turpins_sound_map)
 MACHINE_CONFIG_END

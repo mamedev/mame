@@ -424,7 +424,7 @@ static INPUT_PORTS_START( untoucha )
 	PORT_DIPNAME( 0x40, 0x40, "Speech" )                   PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x20, 0x20, "Unknown (Aumit?)" )         PORT_DIPLOCATION("SW2:3")  
+	PORT_DIPNAME( 0x20, 0x20, "Unknown (Aumit?)" )         PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )             /* DIPSW sheet says 'AUMIT CUT WHEN ON' */
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )              /* Maybe it is Audit, but where/what?   */
 	PORT_DIPNAME( 0x10, 0x10, "Auto Hold" )                PORT_DIPLOCATION("SW2:4")

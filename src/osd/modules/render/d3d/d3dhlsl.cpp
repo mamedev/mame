@@ -48,12 +48,12 @@ public:
 	{
 		HRESULT result;
 
-		m_avi_writer = std::make_unique<avi_write>(machine, width, height);				
+		m_avi_writer = std::make_unique<avi_write>(machine, width, height);
 
 		m_frame.allocate(width, height);
 		if (!m_frame.valid())
 			return;
-	
+
 		result = d3d->get_device()->CreateTexture(width, height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &m_sys_texture, nullptr);
 		if (FAILED(result))
 		{
@@ -69,7 +69,7 @@ public:
 			return;
 		}
 		m_vid_texture->GetSurfaceLevel(0, &m_vid_surface);
-		
+
 		m_initialized = true;
 	}
 
@@ -2569,9 +2569,9 @@ effect::effect(shaders *shadersys, IDirect3DDevice9 *dev, const char *name, cons
 
 	char name_cstr[1024];
 	sprintf(name_cstr, "%s\\%s", path, name);
-	TCHAR *effect_name = tstring_from_utf8(name_cstr);
+	auto effect_name = tstring_from_utf8(name_cstr);
 
-	HRESULT hr = (*shadersys->d3dx_create_effect_from_file_ptr)(dev, effect_name, nullptr, nullptr, 0, nullptr, &m_effect, &buffer_errors);
+	HRESULT hr = (*shadersys->d3dx_create_effect_from_file_ptr)(dev, effect_name.c_str(), nullptr, nullptr, 0, nullptr, &m_effect, &buffer_errors);
 	if (FAILED(hr))
 	{
 		if (buffer_errors != nullptr)
@@ -2588,8 +2588,6 @@ effect::effect(shaders *shadersys, IDirect3DDevice9 *dev, const char *name, cons
 	{
 		m_valid = true;
 	}
-
-	osd_free(effect_name);
 }
 
 effect::~effect()

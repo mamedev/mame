@@ -157,7 +157,7 @@ namespace bx
 		{
 #if BX_PLATFORM_OSX || BX_PLATFORM_IOS
 			pthread_setname_np(_name);
-#elif (BX_CRT_GLIBC >= 21200)
+#elif (BX_CRT_GLIBC >= 21200) && ! BX_PLATFORM_HURD
 			pthread_setname_np(m_handle, _name);
 #elif BX_PLATFORM_LINUX
 			prctl(PR_SET_NAME,_name, 0, 0, 0);

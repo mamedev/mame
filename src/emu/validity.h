@@ -51,7 +51,7 @@ public:
 	int region_length(const char *tag) { return m_region_map.find(tag)->second; }
 
 	// generic registry of already-checked stuff
-	bool already_checked(const char *string) { return m_already_checked.insert(string).second; }
+	bool already_checked(const char *string) { return !m_already_checked.insert(string).second; }
 
 	// osd_output interface
 

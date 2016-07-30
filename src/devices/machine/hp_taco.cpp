@@ -183,8 +183,8 @@ enum {
 #define SHORT_GAP_LENGTH        ((tape_pos_t)(0.066 * ONE_INCH_POS))    // Minimum length of short gaps: 0.066" ([1], pg 8-10)
 #define LONG_GAP_LENGTH ((tape_pos_t)(1.5 * ONE_INCH_POS))      // Minimum length of long gaps: 1.5" ([1], pg 8-10)
 #define NULL_TAPE_POS   ((tape_pos_t)-1)        // Special value for invalid/unknown tape position
-#define PREAMBLE_TIMEOUT	((tape_pos_t)(2.6 * ONE_INCH_POS))	// Min. length of gap making preamble search time out (totally made up)
-#define DATA_TIMEOUT	((tape_pos_t)(0.066 * ONE_INCH_POS))	// Min. length of gap that will cause data reading to time out (totally made up)
+#define PREAMBLE_TIMEOUT    ((tape_pos_t)(2.6 * ONE_INCH_POS))  // Min. length of gap making preamble search time out (totally made up)
+#define DATA_TIMEOUT    ((tape_pos_t)(0.066 * ONE_INCH_POS))    // Min. length of gap that will cause data reading to time out (totally made up)
 #define FILE_MAGIC      0x4f434154      // Magic value at start of image file: "TACO"
 
 // Parts of command register

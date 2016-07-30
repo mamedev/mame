@@ -1,9 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
-#ifndef __TERMINAL_H__
-#define __TERMINAL_H__
+#ifndef MAME_DEVICES_TERMINAL_H
+#define MAME_DEVICES_TERMINAL_H
 
 #include "machine/keyboard.h"
+#include "sound/beep.h"
 
 #define TERMINAL_SCREEN_TAG "terminal_screen"
 
@@ -37,16 +38,22 @@ public:
 
 	virtual ioport_constructor device_input_ports() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
+
 protected:
-	optional_device<palette_device> m_palette;
-	required_ioport m_io_term_conf;
+	enum { BELL_TIMER_ID = 20'000 };
 
 	virtual void term_write(UINT8 data);
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void send_key(UINT8 code) { m_keyboard_cb((offs_t)0, code); }
-	UINT8 m_buffer[TERMINAL_WIDTH*50]; // make big enough for teleprinter
+
+	optional_device<palette_device> m_palette;
+	required_ioport m_io_term_conf;
+
+	UINT8 m_buffer[TERMINAL_WIDTH * 50]; // make big enough for teleprinter
 	UINT8 m_x_pos;
+
 private:
 	void scroll_line();
 	void write_char(UINT8 data);
@@ -55,9 +62,11 @@ private:
 	UINT8 m_framecnt;
 	UINT8 m_y_pos;
 
+	emu_timer *m_bell_timer;
+	required_device<beep_device> m_beeper;
 	devcb_write8 m_keyboard_cb;
 };
 
 extern const device_type GENERIC_TERMINAL;
 
-#endif /* __TERMINAL_H__ */
+#endif /* MAME_DEVICES_TERMINAL_H */

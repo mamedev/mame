@@ -34,28 +34,28 @@ class zippath_directory;
 // ----- path operations -----
 
 // retrieves the parent directory
-std::string &zippath_parent(std::string &dst, const char *path);
-std::string zippath_parent(const char *path);
+std::string &zippath_parent(std::string &dst, const std::string &path);
+std::string zippath_parent(const std::string &path);
 
 // retrieves the parent directory basename
-std::string &zippath_parent_basename(std::string &dst, const char *path);
-std::string zippath_parent_basename(const char *path);
+std::string &zippath_parent_basename(std::string &dst, const std::string &path);
+std::string zippath_parent_basename(const std::string &path);
 
 // combines two paths
-std::string &zippath_combine(std::string &dst, const char *path1, const char *path2);
-std::string zippath_combine(const char *path1, const char *path2);
+std::string &zippath_combine(std::string &dst, const std::string &path1, const std::string &path2);
+std::string zippath_combine(const std::string &path1, const std::string &path2);
 
 
 // ----- file operations -----
 
 // opens a zip path file
-osd_file::error zippath_fopen(const char *filename, UINT32 openflags, util::core_file::ptr &file, std::string &revised_path);
+osd_file::error zippath_fopen(const std::string &filename, UINT32 openflags, util::core_file::ptr &file, std::string &revised_path);
 
 
 // ----- directory operations ----- */
 
 // opens a directory
-osd_file::error zippath_opendir(const char *path, zippath_directory **directory);
+osd_file::error zippath_opendir(const std::string &path, zippath_directory **directory);
 
 // closes a directory
 void zippath_closedir(zippath_directory *directory);

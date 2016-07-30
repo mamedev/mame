@@ -95,11 +95,11 @@
     Bootleg doesn't support service switch
     If you die after round 6 then the bootleg fails to reset the difficulty
       for the next game.
-	The bootleg does not contain data for the 3 mini-levels ('Enemy has located you'),
-	  instead it prevents them running by writing 0 to location 70 in the shared memory.
-	The bootleg does not play the special powder magazine (level 4) animation.
-	The bootleg does not vertically scroll the screen when all men killed in level 5
-	The bootleg does not update the enemy spawn tables at various points.
+    The bootleg does not contain data for the 3 mini-levels ('Enemy has located you'),
+      instead it prevents them running by writing 0 to location 70 in the shared memory.
+    The bootleg does not play the special powder magazine (level 4) animation.
+    The bootleg does not vertically scroll the screen when all men killed in level 5
+    The bootleg does not update the enemy spawn tables at various points.
 
   Notes by bmcphail@vcmame.net
 
@@ -645,11 +645,11 @@ WRITE16_MEMBER(opwolf_state::opwolf_cchip_data_w)
 {
 	//int logValue=1;
 	//if (offset==0x1c && offset==0x1d && offset==0x1e && offset==0x1f && offset==0x20) // Enemies, tanks, choppers, boats
-	//	logValue=0;
+	//  logValue=0;
 	//if (offset==0x50 && offset==0x51 && offset==0x52 && offset==0x53) // Coins
-	//	logValue=0;
+	//  logValue=0;
 	//if (logValue)
-	//	logerror("%08x:  opwolf 68K writes c-chip %02x at %04x/%04x (bank %04x)\n", space.device().safe_pc(), data & 0xff, offset*2, offset, m_current_bank);
+	//  logerror("%08x:  opwolf 68K writes c-chip %02x at %04x/%04x (bank %04x)\n", space.device().safe_pc(), data & 0xff, offset*2, offset, m_current_bank);
 
 	m_cchip_ram[(m_current_bank * 0x400) + offset] = data & 0xff;
 
@@ -756,13 +756,13 @@ READ16_MEMBER(opwolf_state::opwolf_cchip_data_r)
 
 	//int logValue=1;
 	//if (offset==0x1c || offset==0x1d || offset==0x1e || offset==0x1f || offset==0x20) // Enemies, tanks, choppers, boats
-	//	logValue=0;
+	//  logValue=0;
 	//if (offset==0x50 || offset==0x51 || offset==0x52 || offset==0x53) // Coins
-	//	logValue=0;
+	//  logValue=0;
 	//if (space.device().safe_pc()==0xc18 && space.device().safe_pc()!=0xc2e && space.device().safe_pc()!=0xc9e)
-	//	logValue=0;
+	//  logValue=0;
 	//if (logValue)
-	//	logerror("%08x:  opwolf 68K reads c-chip at %04x/%04x (bank %04x)\n", space.device().safe_pc(), offset*2, offset, m_current_bank);
+	//  logerror("%08x:  opwolf 68K reads c-chip at %04x/%04x (bank %04x)\n", space.device().safe_pc(), offset*2, offset, m_current_bank);
 
 	return m_cchip_ram[(m_current_bank * 0x400) + offset];
 }
@@ -782,7 +782,7 @@ TIMER_CALLBACK_MEMBER(opwolf_state::cchip_timer)
 	// Dev Cheat -  kill all enemeies
 	//if ((ioport("IN1")->read()&0x10)!=0x10)
 	//{
-	//	m_cchip_ram[0x1c] = m_cchip_ram[0x1d] = m_cchip_ram[0x1e] = m_cchip_ram[0x1f] = m_cchip_ram[0x20] = 0;
+	//  m_cchip_ram[0x1c] = m_cchip_ram[0x1d] = m_cchip_ram[0x1e] = m_cchip_ram[0x1f] = m_cchip_ram[0x20] = 0;
 	//}
 
 	// Coin slots
@@ -888,7 +888,7 @@ TIMER_CALLBACK_MEMBER(opwolf_state::cchip_timer)
 
 			// When level 4 (powder magazine) is complete the c-chip triggers an explosion animation.
 			if (m_triggeredLevel4==0 && m_cchip_ram[0x5f]==0) // Don't write unless 68K is ready (0 at 0x5f))
-			{	
+			{
 				m_cchip_ram[0x5f]=10;
 				m_triggeredLevel4=1;
 			}

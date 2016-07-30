@@ -294,30 +294,30 @@ int osd_uchar_from_osdchar(unicode_char *uchar, const char *osdchar, size_t coun
 
 
 /*-----------------------------------------------------------------------------
-	osd_is_valid_filename_char: is the given character legal for filenames?
+    osd_is_valid_filename_char: is the given character legal for filenames?
 
-	Parameters:
+    Parameters:
 
-		uchar - the character to check
+        uchar - the character to check
 
-	Return value:
+    Return value:
 
-		Whether this character is legal in a filename
+        Whether this character is legal in a filename
 -----------------------------------------------------------------------------*/
 
 bool osd_is_valid_filename_char(unicode_char uchar);
 
 
 /*-----------------------------------------------------------------------------
-	osd_is_valid_filepath_char: is the given character legal for paths?
+    osd_is_valid_filepath_char: is the given character legal for paths?
 
-	Parameters:
+    Parameters:
 
-		uchar - the character to check
+        uchar - the character to check
 
-	Return value:
+    Return value:
 
-		Whether this character is legal in a file path
+        Whether this character is legal in a file path
 -----------------------------------------------------------------------------*/
 
 bool osd_is_valid_filepath_char(unicode_char uchar);

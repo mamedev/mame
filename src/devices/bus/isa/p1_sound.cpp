@@ -4,7 +4,7 @@
 
     Poisk-1 sound card.  DAC, ADC, MIDI in/out and 6 music channels.
 
-	Memory-mapped, uses IRQ3 and IRQ7, no DMA.
+    Memory-mapped, uses IRQ3 and IRQ7, no DMA.
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -36,7 +36,7 @@ static MACHINE_CONFIG_FRAGMENT( p1_sound )
 
 	MCFG_DEVICE_ADD("d14", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_12_5MHz/10)
-//	sampler at 10 KHz
+//  sampler at 10 KHz
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(p1_sound_device, sampler_sync))
 	MCFG_PIT8253_CLK1(XTAL_12_5MHz/10)
 	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("midi", i8251_device, write_txc))
@@ -45,19 +45,19 @@ static MACHINE_CONFIG_FRAGMENT( p1_sound )
 
 	MCFG_DEVICE_ADD("d16", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_12_5MHz/10)
-//	MCFG_PIT8253_OUT0_HANDLER(XXX)
+//  MCFG_PIT8253_OUT0_HANDLER(XXX)
 	MCFG_PIT8253_CLK1(XTAL_12_5MHz/10)
-//	MCFG_PIT8253_OUT1_HANDLER(XXX)
+//  MCFG_PIT8253_OUT1_HANDLER(XXX)
 	MCFG_PIT8253_CLK2(XTAL_12_5MHz/10)
-//	MCFG_PIT8253_OUT2_HANDLER(XXX)
+//  MCFG_PIT8253_OUT2_HANDLER(XXX)
 
 	MCFG_DEVICE_ADD("d17", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_12_5MHz/10)
-//	MCFG_PIT8253_OUT0_HANDLER(XXX)
+//  MCFG_PIT8253_OUT0_HANDLER(XXX)
 	MCFG_PIT8253_CLK1(XTAL_12_5MHz/10)
-//	MCFG_PIT8253_OUT1_HANDLER(XXX)
+//  MCFG_PIT8253_OUT1_HANDLER(XXX)
 	MCFG_PIT8253_CLK2(XTAL_12_5MHz/10)
-//	MCFG_PIT8253_OUT2_HANDLER(XXX)
+//  MCFG_PIT8253_OUT2_HANDLER(XXX)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_DAC_ADD("dac")
@@ -135,7 +135,7 @@ READ8_MEMBER( p1_sound_device::adc_r )
 
 WRITE8_MEMBER( p1_sound_device::dac_w )
 {
-//	logerror("DAC write: %02x <- %02x\n", offset>>1, data);
+//  logerror("DAC write: %02x <- %02x\n", offset>>1, data);
 	m_dac_data[offset>>1] = data;
 	m_isa->irq7_w(CLEAR_LINE);
 }

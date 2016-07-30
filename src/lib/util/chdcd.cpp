@@ -649,8 +649,7 @@ chd_error chdcd_parse_iso(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 	memset(&outtoc, 0, sizeof(outtoc));
 	outinfo.reset();
 
-	fseek(infile, 0, SEEK_END);
-	long size = ftell(infile);
+	UINT64 size = get_file_size(tocfname);
 	fclose(infile);
 
 
@@ -934,6 +933,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 				}
 				outtoc.tracks[trknum].subtype = CD_SUB_NONE;
 				outtoc.tracks[trknum].subsize = 0;
+				outtoc.tracks[trknum].pgsub = CD_SUB_NONE;
 				outtoc.tracks[trknum].pregap = 0;
 				outtoc.tracks[trknum].padframes = 0;
 				outinfo.track[trknum].idx0offs = -1;
@@ -1285,6 +1285,7 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 				outtoc.tracks[trknum].datasize = 0;
 				outtoc.tracks[trknum].subtype = CD_SUB_NONE;
 				outtoc.tracks[trknum].subsize = 0;
+				outtoc.tracks[trknum].pgsub = CD_SUB_NONE;
 				outtoc.tracks[trknum].padframes = 0;
 
 				cdrom_convert_type_string_to_track_info(token, &outtoc.tracks[trknum]);

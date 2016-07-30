@@ -1551,13 +1551,13 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 		m_cache->set_snapx_driver(nullptr);
 
 		if (ui_globals::default_image)
-			(software->startempty == 0) ? ui_globals::curimage_view = SNAPSHOT_VIEW : ui_globals::curimage_view = CABINETS_VIEW;
+			ui_globals::curimage_view = (software->startempty == 0) ? SNAPSHOT_VIEW : CABINETS_VIEW;
 
 		// arts title and searchpath
 		std::string const searchstr = arts_render_common(origx1, origy1, origx2, origy2);
 
 		// loads the image if necessary
-		if (m_cache->snapx_software_is(software) || !snapx_valid() || ui_globals::switch_image)
+		if (!m_cache->snapx_software_is(software) || !snapx_valid() || ui_globals::switch_image)
 		{
 			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
 			bitmap_argb32 *tmp_bitmap;
@@ -1630,7 +1630,7 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 		m_cache->set_snapx_software(nullptr);
 
 		if (ui_globals::default_image)
-			((driver->flags & MACHINE_TYPE_ARCADE) == 0) ? ui_globals::curimage_view = CABINETS_VIEW : ui_globals::curimage_view = SNAPSHOT_VIEW;
+			ui_globals::curimage_view = ((driver->flags & MACHINE_TYPE_ARCADE) == 0) ? CABINETS_VIEW : SNAPSHOT_VIEW;
 
 		std::string const searchstr = arts_render_common(origx1, origy1, origx2, origy2);
 

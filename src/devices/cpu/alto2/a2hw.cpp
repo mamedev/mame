@@ -311,6 +311,7 @@ WRITE16_MEMBER( alto2_cpu_device::utilout_w )
 
 	// FIXME: write printer data
 	// printer_write();
+	m_speaker->level_w(data ? 1 : 0);
 }
 
 /**

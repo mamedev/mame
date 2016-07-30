@@ -44,7 +44,7 @@
 
 ***************************************************************************/
 
-#include "apricotkb_hle.h"
+#include "hle.h"
 
 
 //**************************************************************************
@@ -190,8 +190,8 @@ ioport_constructor apricot_keyboard_hle_device::device_input_ports() const
 
 apricot_keyboard_hle_device::apricot_keyboard_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, APRICOT_KEYBOARD_HLE, "Apricot Keyboard (HLE)", tag, owner, clock, "apricotkb_hle", __FILE__),
+	device_apricot_keyboard_interface(mconfig, *this),
 	device_serial_interface(mconfig, *this),
-	m_txd_handler(*this),
 	m_rxd(1),
 	m_data_in(0),
 	m_data_out(0)
@@ -204,8 +204,6 @@ apricot_keyboard_hle_device::apricot_keyboard_hle_device(const machine_config &m
 
 void apricot_keyboard_hle_device::device_start()
 {
-	// resolve callbacks
-	m_txd_handler.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -233,7 +231,7 @@ void apricot_keyboard_hle_device::device_timer(emu_timer &timer, device_timer_id
 
 void apricot_keyboard_hle_device::tra_callback()
 {
-	m_txd_handler(transmit_register_get_data_bit());
+	m_host->in_w(transmit_register_get_data_bit());
 }
 
 void apricot_keyboard_hle_device::tra_complete()
@@ -260,7 +258,7 @@ void apricot_keyboard_hle_device::rcv_complete()
 //      transmit_register_setup(0xfb);
 }
 
-WRITE_LINE_MEMBER( apricot_keyboard_hle_device::rxd_w )
+void apricot_keyboard_hle_device::out_w(int state)
 {
 	m_rxd = state;
 	device_serial_interface::rx_w(m_rxd);

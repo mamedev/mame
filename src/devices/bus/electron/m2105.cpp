@@ -50,7 +50,7 @@ ROM_END
 //-------------------------------------------------
 
 //static ADDRESS_MAP_START( m2105_mem, AS_IO, 8, electron_m2105_device )
-//	AM_RANGE(0x30000, 0x3ffff) AM_MIRROR(0x4000) AM_ROM AM_REGION("m2105_rom", 0)
+//  AM_RANGE(0x30000, 0x3ffff) AM_MIRROR(0x4000) AM_ROM AM_REGION("m2105_rom", 0)
 //ADDRESS_MAP_END
 
 

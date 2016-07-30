@@ -695,9 +695,9 @@ void mb86901_device::execute_add(UINT32 op)
 		PSR |= (BIT31(result)) ? PSR_N_MASK : 0;
 		PSR |= (result == 0) ? PSR_Z_MASK : 0;
 		PSR |= ((BIT31(rs1) && BIT31(operand2) && !BIT31(result)) ||
-		       (!BIT31(rs1) && !BIT31(operand2) && BIT31(result))) ? PSR_V_MASK : 0;
+				(!BIT31(rs1) && !BIT31(operand2) && BIT31(result))) ? PSR_V_MASK : 0;
 		PSR |= ((BIT31(rs1) && BIT31(operand2)) ||
-			   (!BIT31(result) && (BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
+				(!BIT31(result) && (BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
 	}
 }
 
@@ -740,8 +740,8 @@ void mb86901_device::execute_taddcc(UINT32 op)
 	UINT32 result = rs1 + operand2;
 
 	bool temp_v = (BIT31(rs1) && BIT31(operand2) && !BIT31(result)) ||
-	              (!BIT31(rs1) && !BIT31(operand2) && BIT31(result)) ||
-	              ((rs1 & 3) != 0 || (operand2 & 3) != 0) ? true : false;
+					(!BIT31(rs1) && !BIT31(operand2) && BIT31(result)) ||
+					((rs1 & 3) != 0 || (operand2 & 3) != 0) ? true : false;
 
 	if (TADDCCTV && temp_v)
 	{
@@ -755,7 +755,7 @@ void mb86901_device::execute_taddcc(UINT32 op)
 		PSR |= (result == 0) ? PSR_Z_MASK : 0;
 		PSR |= temp_v ? PSR_V_MASK : 0;
 		PSR |= ((BIT31(rs1) && BIT31(operand2)) ||
-		       (!BIT31(result) && (BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
+				(!BIT31(result) && (BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
 
 		if (RD != 0)
 			RDREG = result;
@@ -810,9 +810,9 @@ void mb86901_device::execute_sub(UINT32 op)
 		PSR |= (BIT31(result)) ? PSR_N_MASK : 0;
 		PSR |= (result == 0) ? PSR_Z_MASK : 0;
 		PSR |= ((BIT31(rs1) && !BIT31(operand2) && !BIT31(result)) ||
-		       (!BIT31(rs1) && BIT31(operand2) && BIT31(result))) ? PSR_V_MASK : 0;
+				(!BIT31(rs1) && BIT31(operand2) && BIT31(result))) ? PSR_V_MASK : 0;
 		PSR |= ((!BIT31(rs1) && BIT31(operand2)) ||
-		       (BIT31(result) && (!BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
+				(BIT31(result) && (!BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
 	}
 }
 
@@ -856,8 +856,8 @@ void mb86901_device::execute_tsubcc(UINT32 op)
 	UINT32 result = rs1 - operand2;
 
 	bool temp_v = (BIT31(rs1) && !BIT31(operand2) && !BIT31(result)) ||
-	              (!BIT31(rs1) && BIT31(operand2) && BIT31(result)) ||
-	              ((rs1 & 3) != 0 || (operand2 & 3) != 0) ? true : false;
+					(!BIT31(rs1) && BIT31(operand2) && BIT31(result)) ||
+					((rs1 & 3) != 0 || (operand2 & 3) != 0) ? true : false;
 
 	if (TSUBCCTV && temp_v)
 	{
@@ -871,7 +871,7 @@ void mb86901_device::execute_tsubcc(UINT32 op)
 		PSR |= (result == 0) ? PSR_Z_MASK : 0;
 		PSR |= temp_v ? PSR_V_MASK : 0;
 		PSR |= ((!BIT31(rs1) && BIT31(operand2)) ||
-		       (BIT31(result) && (!BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
+				(BIT31(result) && (!BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
 
 		if (RD != 0)
 			RDREG = result;

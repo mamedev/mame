@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "debugger.h"
+#include "sound/speaker.h"
 #include "machine/diablo_hd.h"
 
 /**
@@ -50,8 +51,7 @@ enum {
 
 #define ALTO2_FAKE_STATUS_H     12          //!< number of extra scanlines to display some status info
 
-#define USE_PRIO_F9318          0           //!< define to 1 to use the F9318 priority encoder code
-#define USE_ALU_74181           1           //!< define to 1 to use the SN74181 ALU code
+#define USE_PRIO_F9318          0           //!< define to 1 to use the F9318 priority encoder code (broken)
 #define USE_BITCLK_TIMER        0           //!< define to 1 to use a very high rate timer for the disk bit clock
 #define USE_HAMMING_CHECK       1           //!< define to 1 to use the Hamming code and Parity check in a2mem
 
@@ -192,6 +192,9 @@ public:
 	//! driver interface to set diablo_hd_device
 	void set_diablo(int unit, diablo_hd_device* ptr);
 
+	//! driver interface to set a speaker sound device
+	void set_speaker(speaker_sound_device* speaker);
+
 	//! call in for the next sector callback
 	void next_sector(int unit);
 
@@ -276,6 +279,8 @@ private:
 	DECLARE_WRITE16_MEMBER( ioram_w );
 
 	int m_icount;
+
+	speaker_sound_device* m_speaker;
 
 	typedef void (alto2_cpu_device::*a2func)();
 
@@ -559,8 +564,8 @@ private:
 	UINT8 m_d_bs;                                   //!< decoded BS[0-2] bus source
 	UINT8 m_d_f1;                                   //!< decoded F1[0-3] function
 	UINT8 m_d_f2;                                   //!< decoded F2[0-3] function
-	UINT8 m_d_loadt;                                    //!< decoded LOADT flag
-	UINT8 m_d_loadl;                                    //!< decoded LOADL flag
+	UINT8 m_d_loadt;                                //!< decoded LOADT flag
+	UINT8 m_d_loadl;                                //!< decoded LOADL flag
 	UINT16 m_next;                                  //!< current micro instruction's next
 	UINT16 m_next2;                                 //!< next micro instruction's next
 	UINT16 m_r[ALTO2_REGS];                         //!< R register file
@@ -924,10 +929,8 @@ private:
 	void f2_late_bus();                             //!< F2 func: branch on bus bits BUS[6-15]
 	void f2_late_alucy();                           //!< F2 func: branch on latched ALU carry
 	void f2_late_load_md();                         //!< F2 func: load memory data
-
-#if USE_ALU_74181
 	UINT32 alu_74181(UINT32 a, UINT32 b, UINT8 smc);
-#endif
+
 	void rdram();                                   //!< read the microcode ROM/RAM halfword
 	void wrtram();                                  //!< write the microcode RAM from M register and ALU
 

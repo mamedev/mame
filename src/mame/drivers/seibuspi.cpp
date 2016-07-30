@@ -947,12 +947,12 @@ READ32_MEMBER(seibuspi_state::ejsakura_keyboard_r)
 {
 	// coins/eeprom data
 	UINT32 ret = m_special->read();
-	
+
 	// multiplexed inputs
 	for (int i = 0; i < 5; i++)
 		if (m_ejsakura_input_port >> i & 1)
 			ret &= m_key[i]->read();
-	
+
 	return ret;
 }
 

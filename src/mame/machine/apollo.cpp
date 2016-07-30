@@ -1220,15 +1220,15 @@ MACHINE_START_MEMBER(apollo_state,apollo)
 		// fake mc146818 interrupts (DN3000 only)
 		m_dn3000_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apollo_state::apollo_rtc_timer),this));
 	}
+	
+	m_dma_channel = -1;
+	m_cur_eop = false;
 }
 
 MACHINE_RESET_MEMBER(apollo_state,apollo)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 year = apollo_rtc_r(space, 9);
-
-	m_dma_channel = -1;
-	m_cur_eop = false;
 
 	MLOG1(("machine_reset_apollo"));
 

@@ -2101,7 +2101,7 @@ void mcs51_cpu_device::device_start()
 
 	/* ensure these pointers are set before get_info is called */
 	update_ptrs();
-	
+
 	m_serial_rx_cb.resolve_safe(0);
 	m_serial_tx_cb.resolve_safe();
 

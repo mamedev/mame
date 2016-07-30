@@ -21,10 +21,10 @@
                             machine must be twos complement
 
     History:
- 
-July 2016 ErikGav: 
-    Unify with 6309 pairs and quads (A+B=D, E+F=W, D+W=Q) 
- 
+
+July 2016 ErikGav:
+    Unify with 6309 pairs and quads (A+B=D, E+F=W, D+W=Q)
+
 March 2013 NPW:
     Rewrite of 6809/6309/Konami CPU; attempted to make cycle exact.
 
@@ -147,7 +147,7 @@ void m6809_base_device::device_start()
 	state_add(M6809_CC,        "CC",        m_cc).mask(0xff);
 	state_add(M6809_DP,        "DP",        m_dp).mask(0xff);
 
-	if (is_6809()) 
+	if (is_6809())
 	{
 		state_add(M6809_A,     "A",         m_q.r.a).mask(0xff);
 		state_add(M6809_B,     "B",         m_q.r.b).mask(0xff);

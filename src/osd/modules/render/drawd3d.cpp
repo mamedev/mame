@@ -330,7 +330,7 @@ void renderer_d3d9::set_blendmode(int blendmode)
 			blendop = D3DBLENDOP_ADD;
 			blendsrc = D3DBLEND_SRCALPHA;
 			blenddst = D3DBLEND_ONE;
-            break;
+			break;
 	}
 
 	// adjust the bits that changed
@@ -479,7 +479,7 @@ texture_info *d3d_texture_manager::find_texinfo(const render_texinfo *texinfo, U
 		UINT32 prim_page = (UINT32)texinfo->osddata & 1;
 		if (test_screen != prim_screen || test_page != prim_page)
 			continue;
-		
+
 		if ((*it)->get_hash() == hash &&
 			(*it)->get_texinfo().base == texinfo->base &&
 			(*it)->get_texinfo().width == texinfo->width &&

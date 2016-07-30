@@ -9368,6 +9368,12 @@ vcop3                           // 2003.02.26 Virtua Cop 3 (Rev A)
 wangmid                         // 2004.07 Wangan Midnight Maximum Tune (export) (Rev B)
 wangmid2                        // 2005.10 Wangan Midnight Maximum Tune 2 (Export) (Rev A)
 wangmid2j                       // 2005.04 Wangan Midnight Maximum Tune 2 (Japan)
+questofd                        // 2004.09 Quest of D (CDV-10005C)
+gundcb79                        // 2005.10 Mobile Suit Gundam 0079 Card Builder (CDV-10010)
+gundcb79a                       // 2006.10 Mobile Suit Gundam 0079 Card Builder Ver.2.02 (CDV-10024B)
+gundcb83                        // 2007.01 Mobile Suit Gundam 0083 Card Builder (CDV-10030)
+gundcb83a                       // 2007.01 Mobile Suit Gundam 0083 Card Builder Check Disk (CDV-10031)
+gundcb83b                       // 2008.08 Mobile Suit Gundam 0083 Card Builder Ver.2.10 (CDV-10037B)
 
 @source:chinagat.cpp
 chinagat                        // TA-0023 (c) 1988 Taito + Romstar license (US)
@@ -11039,6 +11045,9 @@ dm500                           //
 dm5620                          //
 dm7000                          //
 
+@source:dmax8000.cpp
+dmax8000                        //
+
 @source:dmndrby.cpp
 dmndrby                         // G4001 'DD' (c) 1986
 dmndrbya                        // G4001 'DD' (c) 1986
@@ -11222,6 +11231,7 @@ ougonpai                        // "62" (c) 1991 Dynax
 ougonpaib                       // "62" (c) 1991 bootleg
 quiztvqq                        // "64" Quiz TV Gassyuukoku Q&Q 1992 Dynax
 shpeng                          // (c) 1995 WSAC Systems
+intrgirl                        // (c) 1995 Barko
 sprtmtch                        // "31" (c) 1989 Dynax + Fabtek license
 tenkai                          // (c) 1991 Dynax
 tenkai2b                        // (c) 1991 bootleg
@@ -28265,7 +28275,7 @@ ryuuha                          // (c) 1987
 secolove                        // (c) 1986
 seiha                           // (c) 1987
 seiham                          // (c) 1987
-swinggal			// (c) 1987 Digital Denshi
+swinggal            // (c) 1987 Digital Denshi
 vipclub                         // (c) 1988 Daiichi Denshi
 
 @source:nbmj8891.cpp
@@ -29053,9 +29063,10 @@ uk101                           //
 othello                         // (c) 1984 Success.
 
 @source:othunder.cpp
-othunder                        // B67 (c) 1988 Taito Corporation Japan (World)
+othunder                        // B67 (c) 1988 Taito Corporation Japan (World, rev 1)
 othunderj                       // B67 (c) 1988 Taito Corporation (Japan)
-othunderu                       // B67 (c) 1988 Taito America Corporation (US)
+othundero                       // B67 (c) 1988 Taito Corporation Japan (World)
+othunderu                       // B67 (c) 1988 Taito America Corporation (US, rev 1)
 othunderuo                      // B67 (c) 1988 Taito America Corporation (US)
 
 @source:overdriv.cpp
@@ -33282,6 +33293,9 @@ spielbud                        // (c) 1985 ADP
 @source:sm1800.cpp
 sm1800                          //
 
+@source:sm7238.cpp
+sm7238                          //
+
 @source:smc777.cpp
 smc777                          //
 
@@ -34051,13 +34065,13 @@ sun3_460                        //
 sun_s10                         //
 sun_s20                         //
 sun4_20                         //
-sun4_110						//
+sun4_110                        //
 sun4_300                        //
-sun4_400						//
+sun4_400                        //
 sun4_40                         //
 sun4_50                         //
 sun4_60                         //
-sun4_65							//
+sun4_65                         //
 sun4_75                         //
 
 @source:suna16.cpp
@@ -35728,7 +35742,8 @@ tutor                           // 1983? Tomy Tutor
 tv950                           //
 
 @source:tv990.cpp
-tv990							// 1992? Televideo
+tv990                           // 1992? TeleVideo
+tv995                           // 1994 TeleVideo
 
 @source:tvc.cpp
 tvc64                           //

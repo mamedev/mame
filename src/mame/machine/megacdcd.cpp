@@ -88,6 +88,7 @@ void lc89510_temp_device::device_start()
 
 void lc89510_temp_device::device_reset()
 {
+	m_cdda->stop_audio();
 }
 
 

@@ -1113,7 +1113,7 @@ chd_error rom_load_manager::open_disk_diff(emu_options &options, const rom_entry
 	/* try to open the diff */
 	LOG(("Opening differencing image file: %s\n", fname.c_str()));
 	emu_file diff_file(options.diff_directory(), OPEN_FLAG_READ | OPEN_FLAG_WRITE);
-	osd_file::error filerr = diff_file.open(fname.c_str());
+	osd_file::error filerr = diff_file.open(fname);
 	if (filerr == osd_file::error::NONE)
 	{
 		std::string fullpath(diff_file.fullpath());
@@ -1126,7 +1126,7 @@ chd_error rom_load_manager::open_disk_diff(emu_options &options, const rom_entry
 	/* didn't work; try creating it instead */
 	LOG(("Creating differencing image: %s\n", fname.c_str()));
 	diff_file.set_openflags(OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	filerr = diff_file.open(fname.c_str());
+	filerr = diff_file.open(fname);
 	if (filerr == osd_file::error::NONE)
 	{
 		std::string fullpath(diff_file.fullpath());

@@ -144,6 +144,7 @@ didact.cpp
 digel804.cpp
 dim68k.cpp
 dm7000.cpp
+dmax8000.cpp
 dms5000.cpp
 dms86.cpp
 dmv.cpp
@@ -531,6 +532,7 @@ sitcom.cpp
 slc1.cpp
 slicer.cpp
 sm1800.cpp
+sm7238.cpp
 smc777.cpp
 sms.cpp
 snes.cpp

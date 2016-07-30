@@ -228,7 +228,7 @@ menu_file_selector::file_selector_entry *menu_file_selector::append_dirent_entry
 	}
 
 	// determine the full path
-	buffer = util::zippath_combine(m_current_directory.c_str(), dirent->name);
+	buffer = util::zippath_combine(m_current_directory, dirent->name);
 
 	// create the file selector entry
 	entry = &append_entry(
@@ -296,10 +296,9 @@ void menu_file_selector::populate()
 	const file_selector_entry *selected_entry = nullptr;
 	int i;
 	const char *volume_name;
-	const char *path = m_current_directory.c_str();
 
 	// open the directory
-	err = util::zippath_opendir(path, &directory);
+	err = util::zippath_opendir(m_current_directory, &directory);
 
 	// clear out the menu entries
 	m_entrylist.clear();
@@ -409,7 +408,7 @@ void menu_file_selector::handle()
 			case SELECTOR_ENTRY_TYPE_DRIVE:
 			case SELECTOR_ENTRY_TYPE_DIRECTORY:
 				// drive/directory - first check the path
-				err = util::zippath_opendir(entry->fullpath.c_str(), nullptr);
+				err = util::zippath_opendir(entry->fullpath, nullptr);
 				if (err != osd_file::error::NONE)
 				{
 					// this path is problematic; present the user with an error and bail

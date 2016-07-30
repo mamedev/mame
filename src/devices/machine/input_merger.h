@@ -2,7 +2,7 @@
 // copyright-holders:Dirk Best
 /***************************************************************************
 
-	Input Merger
+    Input Merger
 
     Used to connect multiple lines to a single device input while
     keeping it pulled high or low

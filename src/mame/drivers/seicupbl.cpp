@@ -2,15 +2,15 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-	Seibu Cup Soccer bootlegs
+    Seibu Cup Soccer bootlegs
 
-	Splitted since it definitely doesn't use neither real COP nor CRTC
-	
-	
-	TODO:
-	- tilemap chip drawings might be merged between this and other 
-      Seibu implementations.	
-	
+    Splitted since it definitely doesn't use neither real COP nor CRTC
+
+
+    TODO:
+    - tilemap chip drawings might be merged between this and other
+      Seibu implementations.
+
 ***************************************************************************/
 
 
@@ -55,9 +55,9 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	tilemap_t *m_sc_layer[4];
-	
+
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(okim_rombank_w);
@@ -70,14 +70,14 @@ public:
 	TILE_GET_INFO_MEMBER(get_sc1_tileinfo);
 	TILE_GET_INFO_MEMBER(get_sc2_tileinfo);
 	TILE_GET_INFO_MEMBER(get_sc3_tileinfo);
-	
+
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
-	
+
 private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 };
@@ -281,7 +281,7 @@ UINT32 seicupbl_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 		m_sc_layer[i]->set_scrollx(0, m_vregs[i*2+0] - 0x1f0);
 		m_sc_layer[i]->set_scrolly(0, m_vregs[i*2+1]);
 	}
-	
+
 	/*if (!(m_layer_disable&0x0001)) */m_sc_layer[0]->draw(screen, bitmap, cliprect, 0, 0);
 	/*if (!(m_layer_disable&0x0002)) */m_sc_layer[1]->draw(screen, bitmap, cliprect, 0, 1);
 	/*if (!(m_layer_disable&0x0004)) */m_sc_layer[2]->draw(screen, bitmap, cliprect, 0, 2);
@@ -323,7 +323,7 @@ WRITE16_MEMBER(seicupbl_state::vram_sc3_w)
 }
 
 static ADDRESS_MAP_START( cupsocbl_mem, AS_PROGRAM, 16, seicupbl_state )
-//	AM_IMPORT_FROM( legionna_cop_mem )
+//  AM_IMPORT_FROM( legionna_cop_mem )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100400, 0x1005ff) AM_DEVREADWRITE("seibucop_boot", seibu_cop_bootleg_device, copdxbl_0_r,copdxbl_0_w) AM_SHARE("cop_mcu_ram")
 	AM_RANGE(0x100660, 0x10066f) AM_RAM AM_SHARE("vregs")
@@ -570,7 +570,7 @@ static MACHINE_CONFIG_START( cupsocbl, seicupbl_state )
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-//	MCFG_VIDEO_START_OVERRIDE(seicupbl_state,cupsoc)
+//  MCFG_VIDEO_START_OVERRIDE(seicupbl_state,cupsoc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -363,7 +363,7 @@ floppy_image_format_t *floppy_image_device::identify(std::string filename)
 	util::core_file::ptr fd;
 	std::string revised_path;
 
-	osd_file::error err = util::zippath_fopen(filename.c_str(), OPEN_FLAG_READ, fd, revised_path);
+	osd_file::error err = util::zippath_fopen(filename, OPEN_FLAG_READ, fd, revised_path);
 	if(err != osd_file::error::NONE) {
 		seterror(IMAGE_ERROR_INVALIDIMAGE, "Unable to open the image file");
 		return nullptr;

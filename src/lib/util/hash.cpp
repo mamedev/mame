@@ -279,6 +279,8 @@ std::string hash_collection::attribute_string() const
 
 bool hash_collection::from_internal_string(const char *string)
 {
+	assert(string != nullptr);
+
 	// start fresh
 	reset();
 

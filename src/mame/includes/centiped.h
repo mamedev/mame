@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/eepromser.h"
+#include "sound/ay8910.h"
 
 class centiped_state : public driver_device
 {
@@ -22,13 +23,21 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_aysnd(*this, "aysnd") { }
 
 	optional_shared_ptr<UINT8> m_rambase;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_paletteram;
 	optional_shared_ptr<UINT8> m_bullsdrt_tiles_bankram;
+
+	required_device<cpu_device> m_maincpu;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	optional_device<ay8910_device> m_aysnd;
 
 	UINT8 m_oldpos[4];
 	UINT8 m_sign[4];
@@ -94,9 +103,4 @@ public:
 	void init_common();
 	void milliped_set_color(offs_t offset, UINT8 data);
 	inline int read_trackball(int idx, int switch_port);
-	required_device<cpu_device> m_maincpu;
-	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 };
