@@ -196,26 +196,21 @@ void device_image_interface::set_image_filename(const std::string &filename)
 		m_image_name.rend(),
 		[](char c) { return (c == '\\') || (c == '/') || (c == ':'); });
 
-	// get the position
-	std::string::size_type loc = (iter != m_image_name.rend())
-		? (&*iter - &m_image_name[0])
-		: std::string::npos;
-
-	if (loc != std::string::npos)
+	if (iter != m_image_name.rend())
 	{
 		if (*iter == ':')
 		{
 			// temp workaround for softlists now that m_image_name contains the part name too (e.g. list:gamename:cart)
-			m_basename = m_basename.substr(0, loc);
+			m_basename.assign(m_image_name.begin(), std::next(iter).base());
 			int tmploc = m_basename.find_last_of(':');
-			m_basename = m_basename.substr(tmploc + 1, loc - tmploc);
+			m_basename = m_basename.substr(tmploc + 1);
 		}
 		else
-			m_basename = m_basename.substr(loc + 1);
+			m_basename.assign(iter.base(), m_image_name.end());
 	}
 	m_basename_noext = m_basename;
 	m_filetype = "";
-	loc = m_basename_noext.find_last_of('.');
+	auto loc = m_basename_noext.find_last_of('.');
 	if (loc != std::string::npos)
 	{
 		m_basename_noext = m_basename_noext.substr(0, loc);
