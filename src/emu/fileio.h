@@ -101,14 +101,14 @@ public:
 	void set_restrict_to_mediapath(bool rtmp = true) { m_restrict_to_mediapath = rtmp; }
 
 	// open/close
-	osd_file::error open(const char *name);
-	osd_file::error open(const char *name1, const char *name2);
-	osd_file::error open(const char *name1, const char *name2, const char *name3);
-	osd_file::error open(const char *name1, const char *name2, const char *name3, const char *name4);
-	osd_file::error open(const char *name, UINT32 crc);
-	osd_file::error open(const char *name1, const char *name2, UINT32 crc);
-	osd_file::error open(const char *name1, const char *name2, const char *name3, UINT32 crc);
-	osd_file::error open(const char *name1, const char *name2, const char *name3, const char *name4, UINT32 crc);
+	osd_file::error open(const std::string &name);
+	osd_file::error open(const std::string &name1, const std::string &name2);
+	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3);
+	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3, const std::string &name4);
+	osd_file::error open(const std::string &name, UINT32 crc);
+	osd_file::error open(const std::string &name1, const std::string &name2, UINT32 crc);
+	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3, UINT32 crc);
+	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3, const std::string &name4, UINT32 crc);
 	osd_file::error open_next();
 	osd_file::error open_ram(const void *data, UINT32 length);
 	void close();

@@ -550,7 +550,7 @@ void device_image_interface::battery_load(void *buffer, int length, int fill)
 
 	/* try to open the battery file and read it in, if possible */
 	emu_file file(device().machine().options().nvram_directory(), OPEN_FLAG_READ);
-	filerr = file.open(fname.c_str());
+	filerr = file.open(fname);
 	if (filerr == osd_file::error::NONE)
 		bytes_read = file.read(buffer, length);
 
@@ -568,7 +568,7 @@ void device_image_interface::battery_load(void *buffer, int length, void *def_bu
 
 	// try to open the battery file and read it in, if possible
 	emu_file file(device().machine().options().nvram_directory(), OPEN_FLAG_READ);
-	filerr = file.open(fname.c_str());
+	filerr = file.open(fname);
 	if (filerr == osd_file::error::NONE)
 		bytes_read = file.read(buffer, length);
 
@@ -592,7 +592,7 @@ void device_image_interface::battery_save(const void *buffer, int length)
 
 	// try to open the battery file and write it out, if possible
 	emu_file file(device().machine().options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	osd_file::error filerr = file.open(fname.c_str());
+	osd_file::error filerr = file.open(fname);
 	if (filerr == osd_file::error::NONE)
 		file.write(buffer, length);
 }
