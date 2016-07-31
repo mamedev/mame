@@ -112,7 +112,6 @@ void atari_fdc_device::atari_load_proc(device_image_interface &image, bool is_cr
 {
 	int id = floppy_get_drive(image);
 	int size, i;
-	const char *ext;
 
 	m_drv[id].image = std::make_unique<UINT8[]>(MAXSIZE);
 	if (!m_drv[id].image)
@@ -144,34 +143,29 @@ void atari_fdc_device::atari_load_proc(device_image_interface &image, bool is_cr
 	/* re allocate the buffer; we don't want to be too lazy ;) */
 	//m_drv[id].image = (UINT8*)image.image_realloc(m_drv[id].image, size);
 
-	ext = image.filetype();
-
-	// hack alert, this means we can only load ATR via the softlist at the moment, image.filetype reutrns nullptr :/
-	if (image.software_entry() != nullptr) ext="ATR";
-
 	/* no extension: assume XFD format (no header) */
-	if (!ext)
+	if (image.filetype() == "")
 	{
 		m_drv[id].type = FORMAT_XFD;
 		m_drv[id].header_skip = 0;
 	}
 	else
 	/* XFD extension */
-	if( toupper(ext[0])=='X' && toupper(ext[1])=='F' && toupper(ext[2])=='D' )
+	if( image.filetype() == "xfd" )
 	{
 		m_drv[id].type = FORMAT_XFD;
 		m_drv[id].header_skip = 0;
 	}
 	else
 	/* ATR extension */
-	if( toupper(ext[0])=='A' && toupper(ext[1])=='T' && toupper(ext[2])=='R' )
+	if( image.filetype() == "atr" )
 	{
 		m_drv[id].type = FORMAT_ATR;
 		m_drv[id].header_skip = 16;
 	}
 	else
 	/* DSK extension */
-	if( toupper(ext[0])=='D' && toupper(ext[1])=='S' && toupper(ext[2])=='K' )
+	if( image.filetype() == "dsk" )
 	{
 		m_drv[id].type = FORMAT_DSK;
 		m_drv[id].header_skip = sizeof(atari_dsk_format);

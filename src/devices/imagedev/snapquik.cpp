@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods, Miodrag Milanovic
 /*********************************************************************
 
-    snapquik.h
+    snapquik.cpp
 
     Snapshots and quickloads
 
@@ -66,7 +66,7 @@ void snapshot_image_device::device_config_complete()
 TIMER_CALLBACK_MEMBER(snapshot_image_device::process_snapshot_or_quickload)
 {
 	/* invoke the load */
-	m_load(*this, filetype(), length());
+	m_load(*this, filetype().c_str(), length());
 }
 
 //-------------------------------------------------

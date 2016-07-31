@@ -422,7 +422,6 @@ int legacy_floppy_image_device::internal_floppy_device_load(bool is_create, int 
 	floperr_t err;
 	const struct FloppyFormat *floppy_options;
 	int floppy_flags, i;
-	const char *extension;
 
 	device_image_interface *image = nullptr;
 	interface(image);   /* figure out the floppy options */
@@ -440,8 +439,7 @@ int legacy_floppy_image_device::internal_floppy_device_load(bool is_create, int 
 	{
 		/* opening an image */
 		floppy_flags = !is_readonly() ? FLOPPY_FLAGS_READWRITE : FLOPPY_FLAGS_READONLY;
-		extension = filetype();
-		err = floppy_open_choices((void *) image, &image_ioprocs, extension, floppy_options, floppy_flags, &m_floppy);
+		err = floppy_open_choices((void *) image, &image_ioprocs, filetype().c_str(), floppy_options, floppy_flags, &m_floppy);
 		if (err)
 			goto error;
 	}

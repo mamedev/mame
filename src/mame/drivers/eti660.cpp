@@ -286,7 +286,7 @@ QUICKLOAD_LOAD_MEMBER( eti660_state, eti660 )
 				space.write_byte(i + quick_addr, quick_data[i]);
 
 		/* display a message about the loaded quickload */
-		if (strcmp(image.filetype(), "bin") == 0)
+		if (image.filetype() == "bin")
 			image.message(" Quickload: size=%04X : start=%04X : end=%04X : Press 6 to start",quick_length,quick_addr,quick_addr+quick_length);
 		else
 			image.message(" Quickload: size=%04X : start=%04X : end=%04X : Press 8 to start",quick_length,quick_addr,quick_addr+quick_length);

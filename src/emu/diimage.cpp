@@ -209,14 +209,13 @@ void device_image_interface::set_image_filename(const std::string &filename)
 			m_basename.assign(iter.base(), m_image_name.end());
 	}
 	m_basename_noext = m_basename;
-	m_filetype = "";
 	auto loc = m_basename_noext.find_last_of('.');
 	if (loc != std::string::npos)
-	{
 		m_basename_noext = m_basename_noext.substr(0, loc);
-		m_filetype = m_basename.substr(loc + 1);
-	}
+
+	m_filetype = core_filename_extract_extension(m_basename, true, true);
 }
+
 
 /****************************************************************************
     CREATION FORMATS
@@ -1002,6 +1001,12 @@ bool device_image_interface::load_internal(const std::string &path, bool is_crea
 			m_manufacturer = m_software_info_ptr->publisher();
 			m_year = m_software_info_ptr->year();
 			//m_playable = m_software_info_ptr->supported();
+
+			// set file type
+			std::string filename = (m_mame_file != nullptr) && (m_mame_file->filename() != nullptr)
+				? m_mame_file->filename()
+				: "";
+			m_filetype = core_filename_extract_extension(filename, true, true);
 		}
 
 		// did we fail to find the file?

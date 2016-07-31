@@ -535,7 +535,7 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 
 	if (image.software_entry() == nullptr)
 	{
-		if (!strcmp(image.filetype(), "st2"))
+		if (image.filetype() == "st2")
 		{
 			UINT8 header[0x100];
 			UINT8 catalogue[10], title[32], pages[64];

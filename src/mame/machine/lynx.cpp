@@ -2069,8 +2069,7 @@ DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
 	if (image.software_entry() == nullptr)
 	{
 		// check for lnx header
-		const char *filetype = image.filetype();
-		if (!core_stricmp(filetype, "lnx"))
+		if (image.filetype() == "lnx")
 		{
 			// 64 byte header
 			// LYNX
@@ -2101,10 +2100,9 @@ DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
 	// set-up granularity
 	if (image.software_entry() == nullptr)
 	{
-		const char *filetype = image.filetype();
-		if (!core_stricmp(filetype, "lnx"))     // from header
+		if (image.filetype() == "lnx")     // from header
 			m_granularity = gran;
-		else if (!core_stricmp(filetype, "lyx"))
+		else if (image.filetype() == "lyx")
 		{
 			/* 2008-10 FP: FIXME: .lyx file don't have an header, hence they miss "lynx_granularity"
 			(see above). What if bank 0 has to be loaded elsewhere? And what about bank 1?

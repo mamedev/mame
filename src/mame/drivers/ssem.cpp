@@ -549,7 +549,7 @@ QUICKLOAD_LOAD_MEMBER(ssem_state, ssem_store)
 			token_buf[4] = '\0';
 			sscanf(token_buf, "%04u", &line);
 
-			if (!core_stricmp(image.filetype(), "snp"))
+			if (image.filetype() == "snp")
 			{
 				UINT32 word = 0;
 
@@ -565,7 +565,7 @@ QUICKLOAD_LOAD_MEMBER(ssem_state, ssem_store)
 				space.write_byte((line << 2) + 2, (word >>  8) & 0x000000ff);
 				space.write_byte((line << 2) + 3, (word >>  0) & 0x000000ff);
 			}
-			else if (!core_stricmp(image.filetype(), "asm"))
+			else if (image.filetype() == "asm")
 			{
 				char op_buf[4] = { 0 };
 				INT32 value = 0;

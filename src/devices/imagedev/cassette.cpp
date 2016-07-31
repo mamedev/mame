@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods, Miodrag Milanovic
 /*********************************************************************
 
-    cassette.c
+    cassette.cpp
 
     Interface to the cassette image abstraction code
 
@@ -264,7 +264,6 @@ bool cassette_image_device::internal_load(bool is_create)
 {
 	casserr_t err;
 	int cassette_flags;
-	const char *extension;
 	int is_writable;
 	device_image_interface *image = nullptr;
 	interface(image);
@@ -284,18 +283,7 @@ bool cassette_image_device::internal_load(bool is_create)
 			is_writable = !is_readonly();
 			cassette_flags = is_writable ? (CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT) : CASSETTE_FLAG_READONLY;
 			std::string fname;
-			if (software_entry()==nullptr) {
-				extension = filetype();
-			} else {
-				fname = m_mame_file->filename();
-				int loc = fname.find_last_of('.');
-				if (loc!=-1) {
-					extension = fname.substr(loc + 1,fname.length()-loc).c_str();
-				} else {
-					extension = "";
-				}
-			}
-			err = cassette_open_choices((void *)image, &image_ioprocs, extension, m_formats, cassette_flags, &m_cassette);
+			err = cassette_open_choices((void *)image, &image_ioprocs, filetype().c_str(), m_formats, cassette_flags, &m_cassette);
 
 			/* this is kind of a hack */
 			if (err && is_writable)

@@ -177,7 +177,7 @@ public:
 	const char *filename() const { if (m_image_name.empty()) return nullptr; else return m_image_name.c_str(); }
 	const char *basename() const { if (m_basename.empty()) return nullptr; else return m_basename.c_str(); }
 	const char *basename_noext()  const { if (m_basename_noext.empty()) return nullptr; else return m_basename_noext.c_str(); }
-	const char *filetype() const { if (m_filetype.empty()) return nullptr; else return m_filetype.c_str(); }
+	const std::string &filetype() const { return m_filetype; }
 	bool is_open() const { return bool(m_file); }
 	util::core_file &image_core_file() const { return *m_file; }
 	UINT64 length() { check_for_file(); return m_file->size(); }
