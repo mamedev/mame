@@ -332,7 +332,7 @@ legacy_poly_manager *poly_alloc(running_machine &machine, int max_polys, size_t 
 
 	/* allocate triangle work units */
 	poly->unit_size = (flags & POLYFLAG_ALLOW_QUADS) ? sizeof(quad_work_unit) : sizeof(tri_work_unit);
-	poly->unit_count = std::min(poly->polygon_count * UNITS_PER_POLY, UINT32(65535));
+	poly->unit_count = std::min(poly->polygon_count * UNITS_PER_POLY, 65535U);
 	poly->unit_next = 0;
 	poly->unit = (work_unit **)allocate_array(machine, &poly->unit_size, poly->unit_count);
 

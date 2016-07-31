@@ -349,7 +349,7 @@ void isa8_cga_device::device_start()
 	set_isa_device();
 	m_vram.resize(m_vram_size);
 	m_isa->install_device(0x3d0, 0x3df, read8_delegate( FUNC(isa8_cga_device::io_read), this ), write8_delegate( FUNC(isa8_cga_device::io_write), this ) );
-	m_isa->install_bank(0xb8000, 0xb8000 + std::min(size_t(0x8000),m_vram_size) - 1, "bank_cga", &m_vram[0]);
+	m_isa->install_bank(0xb8000, 0xb8000 + std::min<UINT32>(0x8000,m_vram_size) - 1, "bank_cga", &m_vram[0]);
 	if(m_vram_size == 0x4000)
 		m_isa->install_bank(0xbc000, 0xbffff, "bank_cga", &m_vram[0]);
 
@@ -1821,7 +1821,7 @@ WRITE8_MEMBER( isa8_ec1841_0002_device::io_write )
 										read8_delegate( FUNC(isa8_ec1841_0002_device::char_ram_read), this),
 										write8_delegate(FUNC(isa8_ec1841_0002_device::char_ram_write), this) );
 		} else {
-			m_isa->install_bank(0xb8000, 0xb8000 + std::min(size_t(0x8000),m_vram_size) - 1, "bank_cga", &m_vram[0]);
+			m_isa->install_bank(0xb8000, 0xb8000 + std::min<UINT32>(0x8000,m_vram_size) - 1, "bank_cga", &m_vram[0]);
 			if(m_vram_size == 0x4000)
 				m_isa->install_bank(0xbc000, 0xbffff, "bank_cga", &m_vram[0]);
 		}

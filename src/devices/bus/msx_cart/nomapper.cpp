@@ -81,7 +81,7 @@ void msx_cart_nomapper::initialize_cartridge()
 			break;
 	}
 
-	m_end_address = std::min(m_start_address + size, UINT32(0x10000));
+	m_end_address = std::min<UINT32>(m_start_address + size, 0x10000);
 }
 
 READ8_MEMBER(msx_cart_nomapper::read_cart)

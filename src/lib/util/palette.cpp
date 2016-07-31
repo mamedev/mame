@@ -514,8 +514,8 @@ void palette_t::normalize_range(UINT32 start, UINT32 end, int lum_min, int lum_m
 	{
 		rgb_t rgb = m_entry_color[index];
 		UINT32 y = 299 * rgb.r() + 587 * rgb.g() + 114 * rgb.b();
-		ymin = std::min(ymin, INT32(y));
-		ymax = std::max(ymax, INT32(y));
+		ymin = std::min<INT32>(ymin, y);
+		ymax = std::max<INT32>(ymax, y);
 	}
 
 	// determine target minimum/maximum

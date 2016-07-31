@@ -154,10 +154,10 @@ void iq151_minigraf_device::plotter_update(UINT8 control)
 	m_pen = BIT(control, 7);
 
 	// clamp within range
-	m_posx = std::max(m_posx, INT16(0));
-	m_posx = std::min(m_posx, INT16(PAPER_MAX_X));
-	m_posy = std::max(m_posy, INT16(0));
-	m_posy = std::min(m_posy, INT16(PAPER_MAX_Y));
+	m_posx = std::max<INT16>(m_posx, 0);
+	m_posx = std::min<INT16>(m_posx, PAPER_MAX_X);
+	m_posy = std::max<INT16>(m_posy, 0);
+	m_posy = std::min<INT16>(m_posy, PAPER_MAX_Y);
 
 	// if pen is down draws a point
 	if (m_pen)

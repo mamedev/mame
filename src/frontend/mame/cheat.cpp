@@ -1359,7 +1359,7 @@ void cheat_manager::frame_update()
 	// set up for accumulating output
 	m_lastline = 0;
 	m_numlines = floor(1.0f / mame_machine_manager::instance()->ui().get_line_height());
-	m_numlines = std::min(size_t(m_numlines), m_output.size());
+	m_numlines = std::min<UINT8>(m_numlines, m_output.size());
 	for (auto & elem : m_output)
 		elem.clear();
 

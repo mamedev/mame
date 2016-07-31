@@ -67,7 +67,7 @@ debug_view_memory_source::debug_view_memory_source(const char *name, memory_regi
 		m_length(region.bytes()),
 		m_offsetxor(ENDIAN_VALUE_NE_NNE(region.endianness(), 0, region.bytewidth() - 1)),
 		m_endianness(region.endianness()),
-		m_prefsize(std::min(region.bytewidth(), UINT8(8)))
+		m_prefsize(std::min<UINT8>(region.bytewidth(), 8))
 {
 }
 
@@ -556,7 +556,7 @@ void debug_view_memory::recompute()
 			m_bytes_per_chunk *= 2;
 			m_chunks_per_row /= 2;
 		}
-		m_chunks_per_row = std::max(UINT32(1), m_chunks_per_row);
+		m_chunks_per_row = std::max(1U, m_chunks_per_row);
 	}
 
 	// recompute the byte offset based on the most recent expression result

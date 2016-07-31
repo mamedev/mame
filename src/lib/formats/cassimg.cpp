@@ -779,7 +779,7 @@ casserr_t cassette_read_modulated_data(cassette_image *cassette, int channel, do
 	}
 	else
 	{
-		buffer_length = std::min(length, UINT64(100000));
+		buffer_length = std::min<UINT64>(length, 100000);
 		alloc_buffer = (UINT8*)malloc(buffer_length);
 		if (!alloc_buffer)
 		{
