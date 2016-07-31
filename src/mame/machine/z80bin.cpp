@@ -51,9 +51,9 @@ int z80bin_load_file(device_image_interface *image, address_space &space, const 
 		return IMAGE_INIT_FAIL;
 	}
 
-	exec_addr[0] = LITTLE_ENDIANIZE_INT16(args[0]);
-	start_addr[0] = LITTLE_ENDIANIZE_INT16(args[1]);
-	end_addr[0] = LITTLE_ENDIANIZE_INT16(args[2]);
+	exec_addr[0] = little_endianize_int16(args[0]);
+	start_addr[0] = little_endianize_int16(args[1]);
+	end_addr[0] = little_endianize_int16(args[2]);
 
 	size = (end_addr[0] - start_addr[0] + 1) & 0xffff;
 

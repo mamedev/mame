@@ -149,19 +149,19 @@ constexpr UINT64 flipendian_int64_partial32(UINT64 val) { return ((flipendian_in
 constexpr UINT64 flipendian_int64(UINT64 val) { return (flipendian_int64_partial32(val) << 32) | (flipendian_int64_partial32(val) >> 32); }
 
 #ifdef LSB_FIRST
-constexpr UINT16 BIG_ENDIANIZE_INT16(UINT16 x) { return flipendian_int16(x); }
-constexpr UINT32 BIG_ENDIANIZE_INT32(UINT32 x) { return flipendian_int32(x); }
-constexpr UINT64 BIG_ENDIANIZE_INT64(UINT64 x) { return flipendian_int64(x); }
-#define LITTLE_ENDIANIZE_INT16(x)   (x)
-#define LITTLE_ENDIANIZE_INT32(x)   (x)
-#define LITTLE_ENDIANIZE_INT64(x)   (x)
+constexpr UINT16 big_endianize_int16(UINT16 x) { return flipendian_int16(x); }
+constexpr UINT32 big_endianize_int32(UINT32 x) { return flipendian_int32(x); }
+constexpr UINT64 big_endianize_int64(UINT64 x) { return flipendian_int64(x); }
+constexpr UINT16 little_endianize_int16(UINT16 x) { return x; }
+constexpr UINT32 little_endianize_int32(UINT32 x) { return x; }
+constexpr UINT64 little_endianize_int64(UINT64 x) { return x; }
 #else
-#define BIG_ENDIANIZE_INT16(x)      (x)
-#define BIG_ENDIANIZE_INT32(x)      (x)
-#define BIG_ENDIANIZE_INT64(x)      (x)
-constexpr UINT16 LITTLE_ENDIANIZE_INT16(UINT16 x) { return flipendian_int16(x); }
-constexpr UINT32 LITTLE_ENDIANIZE_INT32(UINT32 x) { return flipendian_int32(x); }
-constexpr UINT64 LITTLE_ENDIANIZE_INT64(UINT64 x) { return flipendian_int64(x); }
+constexpr UINT16 big_endianize_int16(UINT16 x) { return x; }
+constexpr UINT32 big_endianize_int32(UINT32 x) { return x; }
+constexpr UINT64 big_endianize_int64(UINT64 x) { return x; }
+constexpr UINT16 little_endianize_int16(UINT16 x) { return flipendian_int16(x); }
+constexpr UINT32 little_endianize_int32(UINT32 x) { return flipendian_int32(x); }
+constexpr UINT64 little_endianize_int64(UINT64 x) { return flipendian_int64(x); }
 #endif /* LSB_FIRST */
 
 #ifdef _MSC_VER

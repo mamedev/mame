@@ -194,7 +194,7 @@ static const char *regnames[0x40] =
 CPU_DISASSEMBLE(arc)
 {
 	UINT32 op = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
-	op = BIG_ENDIANIZE_INT32(op);
+	op = big_endianize_int32(op);
 
 	output = buffer;
 

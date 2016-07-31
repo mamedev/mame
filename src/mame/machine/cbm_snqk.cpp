@@ -66,7 +66,7 @@ int general_cbm_loadsnap( device_image_interface &image, const char *file_type, 
 	}
 
 	image.fread( &address, 2);
-	address = LITTLE_ENDIANIZE_INT16(address);
+	address = little_endianize_int16(address);
 	if (!core_stricmp(file_type, "t64"))
 		address = 2049;
 	snapshot_size -= 2;

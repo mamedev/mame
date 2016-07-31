@@ -578,7 +578,7 @@ static imgtoolerr_t fat_partition_create(imgtool_image *image, UINT64 first_bloc
 	first_fat_entries = ((UINT64) media_descriptor) | 0xFFFFFF00;
 	first_fat_entries &= (((UINT64) 1) << fat_bits) - 1;
 	first_fat_entries |= ((((UINT64) 1) << fat_bits) - 1) << fat_bits;
-	first_fat_entries = LITTLE_ENDIANIZE_INT64(first_fat_entries);
+	first_fat_entries = little_endianize_int64(first_fat_entries);
 
 	for (i = 0; i < fat_count; i++)
 	{
@@ -698,7 +698,7 @@ static UINT32 fat_get_fat_entry(imgtool_partition *partition, const UINT8 *fat_t
 			* disk_info->sectors_per_fat) + (bit_index / 8), sizeof(entry));
 
 		/* we've extracted the bytes; we now need to normalize it */
-		entry = LITTLE_ENDIANIZE_INT64(entry);
+		entry = little_endianize_int64(entry);
 		entry >>= bit_index % 8;
 		entry &= bit_mask;
 
@@ -735,10 +735,10 @@ static void fat_set_fat_entry(imgtool_partition *partition, UINT8 *fat_table, UI
 		memcpy(&entry, fat_table + (i * FAT_SECLEN
 			* disk_info->sectors_per_fat) + (bit_index / 8), sizeof(entry));
 
-		entry = LITTLE_ENDIANIZE_INT64(entry);
+		entry = little_endianize_int64(entry);
 		entry &= (~((UINT64) 0xFFFFFFFF >> (32 - disk_info->fat_bits)) << (bit_index % 8)) | ((1 << (bit_index % 8)) - 1);
 		entry |= ((UINT64) value) << (bit_index % 8);
-		entry = LITTLE_ENDIANIZE_INT64(entry);
+		entry = little_endianize_int64(entry);
 
 		memcpy(fat_table + (i * FAT_SECLEN
 			* disk_info->sectors_per_fat) + (bit_index / 8), &entry, sizeof(entry));
@@ -1166,7 +1166,7 @@ static void prepend_lfn_bytes(utf16_char *lfn_buf, size_t lfn_buflen, size_t *lf
 	{
 		/* read the character */
 		memcpy(&w, &entry[offset + i * 2], 2);
-		w = LITTLE_ENDIANIZE_INT16(w);
+		w = little_endianize_int16(w);
 
 		/* append to buffer */
 		lfn_buf[i] = (w != 0xFFFF) ? w : 0;

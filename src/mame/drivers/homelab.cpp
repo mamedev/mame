@@ -698,8 +698,8 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 		return IMAGE_INIT_FAIL;
 	}
 
-	quick_addr = LITTLE_ENDIANIZE_INT16(args[0]);
-	quick_length = LITTLE_ENDIANIZE_INT16(args[1]);
+	quick_addr = little_endianize_int16(args[0]);
+	quick_length = little_endianize_int16(args[1]);
 	quick_end = quick_addr+quick_length-1;
 
 	if (quick_end > 0x7fff)

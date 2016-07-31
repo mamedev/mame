@@ -463,12 +463,12 @@ int core_text_file::getc()
 
 		case text_file_type::UTF32BE:
 			if (read(&uchar, sizeof(uchar)) == sizeof(uchar))
-				uchar = BIG_ENDIANIZE_INT32(uchar);
+				uchar = big_endianize_int32(uchar);
 			break;
 
 		case text_file_type::UTF32LE:
 			if (read(&uchar, sizeof(uchar)) == sizeof(uchar))
-				uchar = LITTLE_ENDIANIZE_INT32(uchar);
+				uchar = little_endianize_int32(uchar);
 			break;
 		}
 

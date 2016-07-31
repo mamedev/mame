@@ -3302,11 +3302,11 @@ _Type ioport_manager::playback_read(_Type &result)
 
 	// return the appropriate value
 	else if (sizeof(result) == 8)
-		result = LITTLE_ENDIANIZE_INT64(result);
+		result = little_endianize_int64(result);
 	else if (sizeof(result) == 4)
-		result = LITTLE_ENDIANIZE_INT32(result);
+		result = little_endianize_int32(result);
 	else if (sizeof(result) == 2)
-		result = LITTLE_ENDIANIZE_INT16(result);
+		result = little_endianize_int16(result);
 	return result;
 }
 

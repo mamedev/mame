@@ -1760,7 +1760,7 @@ avi_file::error avi_file_impl::read_sound_samples(int channel, std::uint32_t fir
 			base += stream->channels() * (firstsample - chunkbase) + offset;
 			for (sampnum = 0; sampnum < samples_this_chunk; sampnum++)
 			{
-				*output++ = LITTLE_ENDIANIZE_INT16(*base);
+				*output++ = little_endianize_int16(*base);
 				base += stream->channels();
 			}
 		}
@@ -1939,7 +1939,7 @@ avi_file::error avi_file_impl::append_sound_samples(int channel, const std::int1
 	{
 		std::int16_t data = *samples++;
 		samples += sampleskip;
-		data = LITTLE_ENDIANIZE_INT16(data);
+		data = little_endianize_int16(data);
 		m_soundbuf[sampoffset++ * m_info.audio_channels + channel] = data;
 	}
 	m_soundbuf_chansamples[channel] = sampoffset;
