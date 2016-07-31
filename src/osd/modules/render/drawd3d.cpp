@@ -21,7 +21,7 @@
 #include "modules/render/d3d/d3dhlsl.h"
 #undef min
 #undef max
-#include <algorithm>
+#include <utility>
 
 //============================================================
 //  TYPE DEFINITIONS

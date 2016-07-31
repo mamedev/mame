@@ -11,7 +11,7 @@
 #endif
 #undef min
 #undef max
-#include <algorithm>
+#include <utility>
 // MAMEOS headers
 #include "strconv.h"
 

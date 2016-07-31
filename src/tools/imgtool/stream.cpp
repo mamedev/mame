@@ -373,7 +373,7 @@ UINT64 stream_transfer(imgtool_stream *dest, imgtool_stream *source, UINT64 sz)
 	UINT64 readsz;
 	char buf[1024];
 
-	while(sz && (readsz = stream_read(source, buf, std::min(sz, sizeof(buf)))))
+	while(sz && (readsz = stream_read(source, buf, std::min(sz, UINT64(sizeof(buf))))))
 	{
 		stream_write(dest, buf, readsz);
 		sz -= readsz;

@@ -36,7 +36,7 @@
 #include "winmain.h"
 #include "window.h"
 #endif
-#include <algorithm>
+#include <utility>
 
 //============================================================
 //  DEBUGGING

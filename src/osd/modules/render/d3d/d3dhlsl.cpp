@@ -27,7 +27,7 @@
 #include "../frontend/mame/ui/slider.h"
 #undef min
 #undef max
-#include <algorithm>
+#include <utility>
 
 //============================================================
 //  PROTOTYPES

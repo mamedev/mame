@@ -20,7 +20,7 @@
 #include <string>
 #undef min
 #undef max
-#include <algorithm>
+#include <utility>
 
 
 //============================================================

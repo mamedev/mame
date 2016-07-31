@@ -29,7 +29,7 @@
 #include <thread>
 #include <queue>
 #include <chrono>
-#include <algorithm>
+#include <utility>
 
 // MAME headers
 #include "emu.h"
