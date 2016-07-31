@@ -707,7 +707,7 @@ public:
 		float modelview[4][4];
 		float modelview_inverse[4][4];
 		float projection[4][4];
-		float traslate[4];
+		float translate[4];
 		float scale[4];
 	} matrix;
 	struct {
