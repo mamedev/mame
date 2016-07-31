@@ -273,6 +273,9 @@ protected:
 	bool load_software_part(const char *path, const software_part *&swpart);
 	std::string software_get_default_slot(const char *default_card_slot) const;
 
+	void add_format(std::unique_ptr<image_device_format> &&format);
+	void add_format(std::string &&name, std::string &&description, std::string &&extensions, std::string &&optspec);
+
 	// derived class overrides
 
 	// configuration
@@ -320,9 +323,6 @@ protected:
 	std::string m_brief_instance_name;
 	std::string m_instance_name;
 
-	// creation info
-	formatlist_type m_formatlist;
-
 	// in the case of arcade cabinet with fixed carts inserted,
 	// we want to disable command line cart loading...
 	bool m_user_loadable;
@@ -331,6 +331,9 @@ protected:
 
 private:
 	static image_error_t image_error_from_file_error(osd_file::error filerr);
+
+	// creation info
+	formatlist_type m_formatlist;
 };
 
 // iterator

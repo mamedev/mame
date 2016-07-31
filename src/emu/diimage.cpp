@@ -237,6 +237,27 @@ const image_device_format *device_image_interface::device_get_named_creatable_fo
 }
 
 
+//-------------------------------------------------
+//  add_format
+//-------------------------------------------------
+
+void device_image_interface::add_format(std::unique_ptr<image_device_format> &&format)
+{
+	m_formatlist.push_back(std::move(format));
+}
+
+
+//-------------------------------------------------
+//  add_format
+//-------------------------------------------------
+
+void device_image_interface::add_format(std::string &&name, std::string &&description, std::string &&extensions, std::string &&optspec)
+{
+	auto format = std::make_unique<image_device_format>(std::move(name), std::move(description), std::move(extensions), std::move(optspec));
+	add_format(std::move(format));
+}
+
+
 /****************************************************************************
     ERROR HANDLING
 ****************************************************************************/
