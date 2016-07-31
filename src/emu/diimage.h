@@ -147,8 +147,8 @@ public:
 
 	virtual void device_compute_hash(util::hash_collection &hashes, const void *data, size_t length, const char *types) const;
 
-	virtual bool call_load() { return false; }
-	virtual bool call_create(int format_type, util::option_resolution *format_options) { return false; }
+	virtual bool call_load() { return IMAGE_INIT_PASS; }
+	virtual bool call_create(int format_type, util::option_resolution *format_options) { return IMAGE_INIT_PASS; }
 	virtual void call_unload() { }
 	virtual std::string call_display() { return std::string(); }
 	virtual device_image_partialhash_func get_partial_hash() const { return nullptr; }

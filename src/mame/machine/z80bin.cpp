@@ -8,7 +8,7 @@
     memory
 -------------------------------------------------*/
 
-int z80bin_load_file(device_image_interface *image, address_space &space, const char *file_type, UINT16 *exec_addr, UINT16 *start_addr, UINT16 *end_addr )
+bool z80bin_load_file(device_image_interface *image, address_space &space, const char *file_type, UINT16 *exec_addr, UINT16 *start_addr, UINT16 *end_addr )
 {
 	int ch;
 	UINT16 args[3];

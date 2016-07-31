@@ -1017,7 +1017,7 @@ bool device_image_interface::load_internal(const std::string &path, bool is_crea
 	m_create_args = create_args;
 
 	if (m_init_phase==false) {
-		m_err = (image_error_t)finish_load();
+		m_err = (finish_load()==IMAGE_INIT_PASS) ? IMAGE_ERROR_SUCCESS : IMAGE_ERROR_INTERNAL;
 		if (m_err)
 			goto done;
 	}
@@ -1103,7 +1103,7 @@ bool device_image_interface::finish_load()
 		if (m_created)
 		{
 			err = call_create(m_create_format, m_create_args);
-			if (err)
+			if (err == IMAGE_INIT_FAIL)
 			{
 				if (!m_err)
 					m_err = IMAGE_ERROR_UNSPECIFIED;
@@ -1113,7 +1113,7 @@ bool device_image_interface::finish_load()
 		{
 			// using device load
 			err = call_load();
-			if (err)
+			if (err == IMAGE_INIT_FAIL)
 			{
 				if (!m_err)
 					m_err = IMAGE_ERROR_UNSPECIFIED;
