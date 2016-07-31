@@ -469,7 +469,7 @@ public:
 				UINT32 samples = (UINT64(m_info.rate) * UINT64(effframe + 1) * UINT64(1000000) + m_info.fps_times_1million - 1) / UINT64(m_info.fps_times_1million) - first_sample;
 
 				// loop over channels and read the samples
-				int channels = std::min(m_info.channels, UINT32(ARRAY_LENGTH(m_audio)));
+				int channels = unsigned((std::min<std::size_t>)(m_info.channels, ARRAY_LENGTH(m_audio)));
 				EQUIVALENT_ARRAY(m_audio, INT16 *) samplesptr;
 				for (int chnum = 0; chnum < channels; chnum++)
 				{
@@ -509,7 +509,7 @@ public:
 				// copy to the destination
 				UINT64 start_offset = UINT64(framenum) * UINT64(m_info.bytes_per_frame);
 				UINT64 end_offset = start_offset + m_info.bytes_per_frame;
-				UINT32 bytes_to_copy = std::min(length_remaining, UINT32(end_offset - offset));
+				UINT32 bytes_to_copy = (std::min<UINT64>)(length_remaining, end_offset - offset);
 				memcpy(dest, &m_rawdata[offset - start_offset], bytes_to_copy);
 
 				// advance
@@ -1544,7 +1544,7 @@ static void do_verify(parameters_t &params)
 		progress(false, "Verifying, %.1f%% complete... \r", 100.0 * double(offset) / double(input_chd.logical_bytes()));
 
 		// determine how much to read
-		UINT32 bytes_to_read = std::min(UINT32(buffer.size()), UINT32(input_chd.logical_bytes() - offset));
+		UINT32 bytes_to_read = (std::min<UINT64>)(buffer.size(), input_chd.logical_bytes() - offset);
 		chd_error err = input_chd.read_bytes(offset, &buffer[0], bytes_to_read);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error reading CHD file (%s): %s", params.find(OPTION_INPUT)->second->c_str(), chd_file::error_string(err));
@@ -2284,7 +2284,7 @@ static void do_extract_raw(parameters_t &params)
 			progress(false, "Extracting, %.1f%% complete... \r", 100.0 * double(offset - input_start) / double(input_end - input_start));
 
 			// determine how much to read
-			UINT32 bytes_to_read = std::min(UINT32(buffer.size()), UINT32(input_end - offset));
+			UINT32 bytes_to_read = (std::min<UINT64>)(buffer.size(), input_end - offset);
 			chd_error err = input_chd.read_bytes(offset, &buffer[0], bytes_to_read);
 			if (err != CHDERR_NONE)
 				report_error(1, "Error reading CHD file (%s): %s", params.find(OPTION_INPUT)->second->c_str(), chd_file::error_string(err));
