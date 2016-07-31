@@ -1225,8 +1225,8 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 			// first compute scale factors to fit the screen
 			float xscale = (float)target_width / src_width;
 			float yscale = (float)target_height / src_height;
-			float maxxscale = std::max(double(1.0f), m_int_overscan? render_round_nearest(xscale) : floor(xscale));
-			float maxyscale = std::max(double(1.0f), m_int_overscan? render_round_nearest(yscale) : floor(yscale));
+			float maxxscale = std::max(float(1.0f), float(m_int_overscan? render_round_nearest(xscale) : floor(xscale)));
+			float maxyscale = std::max(float(1.0f), float(m_int_overscan? render_round_nearest(yscale) : floor(yscale)));
 
 			// now apply desired scale mode and aspect correction
 			if (m_keepaspect && target_aspect > src_aspect) xscale *= src_aspect / target_aspect * (maxyscale / yscale);
