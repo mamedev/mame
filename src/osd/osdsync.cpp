@@ -23,7 +23,7 @@
 #include <vector>
 #undef min
 #undef max
-#include <utility>
+#include <algorithm>
 // MAME headers
 #include "osdcore.h"
 #include "osdsync.h"
