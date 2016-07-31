@@ -19,6 +19,8 @@
 #include <xinput.h>
 
 #undef interface
+#undef min
+#undef max
 
 // MAME headers
 #include "emu.h"

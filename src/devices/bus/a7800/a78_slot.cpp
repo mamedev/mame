@@ -378,7 +378,7 @@ bool a78_cart_slot_device::call_load()
 			char head[128];
 			fread(head, 128);
 
-			if (verify_header((char *)head) == IMAGE_VERIFY_FAIL)
+			if (!verify_header((char *)head))
 				return IMAGE_INIT_FAIL;
 
 			len = (head[49] << 24) | (head[50] << 16) | (head[51] << 8) | head[52];
@@ -499,18 +499,18 @@ void a78_cart_slot_device::call_unload()
  has an admissible header
  -------------------------------------------------*/
 
-int a78_cart_slot_device::verify_header(char *header)
+bool a78_cart_slot_device::verify_header(char *header)
 {
 	const char *magic = "ATARI7800";
 
 	if (strncmp(magic, header + 1, 9))
 	{
 		logerror("Not a valid A7800 image\n");
-		return IMAGE_VERIFY_FAIL;
+		return false;
 	}
 
 	logerror("returning ID_OK\n");
-	return IMAGE_VERIFY_PASS;
+	return true;
 }
 
 

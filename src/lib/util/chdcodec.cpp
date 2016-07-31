@@ -1292,7 +1292,7 @@ UINT32 chd_flac_compressor::compress(const UINT8 *src, UINT32 srclen, UINT8 *des
 	UINT32 complen_le = m_encoder.finish();
 
 	// pick the best one and add a byte
-	UINT32 complen = MIN(complen_le, complen_be);
+	UINT32 complen = std::min(complen_le, complen_be);
 	if (complen + 1 >= hunkbytes())
 		throw CHDERR_COMPRESSION_ERROR;
 

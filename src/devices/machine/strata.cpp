@@ -94,7 +94,7 @@ void strataflash_device::nvram_read(emu_file &file)
 	for (i = 0; i < FEEPROM_SIZE; i += 2)
 	{
 	    UINT16 *ptr = (UINT16 *) (&m_flashmemory[i]);
-	    *ptr = LITTLE_ENDIANIZE_INT16(*ptr);
+	    *ptr = little_endianize_int16(*ptr);
 	}
 
 	// protection registers
@@ -103,7 +103,7 @@ void strataflash_device::nvram_read(emu_file &file)
 	for (i = 0; i < PROT_REGS_SIZE; i += 2)
 	{
 	    UINT16 *ptr = (UINT16 *) (&m_prot_regs[i]);
-	    *ptr = LITTLE_ENDIANIZE_INT16(*ptr);
+	    *ptr = little_endianize_int16(*ptr);
 	}
 
 	// block lock flags
@@ -142,28 +142,28 @@ void strataflash_device::nvram_write(emu_file &file)
 	for (i = 0; i < FEEPROM_SIZE; i += 2)
 	{
 	    UINT16 *ptr = (UINT16 *) (&m_flashmemory[i]);
-	    *ptr = LITTLE_ENDIANIZE_INT16(*ptr);
+	    *ptr = little_endianize_int16(*ptr);
 	}
 	if (file->write(m_flashmemory, FEEPROM_SIZE) != FEEPROM_SIZE)
 	    return 1;
 	for (i = 0; i < FEEPROM_SIZE; i += 2)
 	{
 	    UINT16 *ptr = (UINT16 *) (&m_flashmemory[i]);
-	    *ptr = LITTLE_ENDIANIZE_INT16(*ptr);
+	    *ptr = little_endianize_int16(*ptr);
 	}
 
 	// protection registers
 	for (i = 0; i < PROT_REGS_SIZE; i += 2)
 	{
 	    UINT16 *ptr = (UINT16 *) (&m_prot_regs[i]);
-	    *ptr = LITTLE_ENDIANIZE_INT16(*ptr);
+	    *ptr = little_endianize_int16(*ptr);
 	}
 	if (file->write(m_prot_regs, PROT_REGS_SIZE) != PROT_REGS_SIZE)
 	    return 1;
 	for (i = 0; i < PROT_REGS_SIZE; i += 2)
 	{
 	    UINT16 *ptr = (UINT16 *) (&m_prot_regs[i]);
-	    *ptr = LITTLE_ENDIANIZE_INT16(*ptr);
+	    *ptr = little_endianize_int16(*ptr);
 	}
 
 	// block lock flags

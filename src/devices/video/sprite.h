@@ -140,8 +140,8 @@ public:
 		// if the cliprect exceeds our current bitmap dimensions, expand
 		if (cliprect.right() >= m_bitmap.width() || cliprect.bottom() >= m_bitmap.height())
 		{
-			int new_width = MAX(cliprect.right() + 1, m_bitmap.width());
-			int new_height = MAX(cliprect.bottom() + 1, m_bitmap.height());
+			int new_width = std::max(cliprect.right() + 1, m_bitmap.width());
+			int new_height = std::max(cliprect.bottom() + 1, m_bitmap.height());
 			m_bitmap.resize(new_width, new_height, BITMAP_SLOP, BITMAP_SLOP);
 			m_dirty.resize(new_width, new_height);
 		}

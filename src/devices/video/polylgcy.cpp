@@ -320,7 +320,7 @@ legacy_poly_manager *poly_alloc(running_machine &machine, int max_polys, size_t 
 
 	/* allocate polygons */
 	poly->polygon_size = sizeof(polygon_info);
-	poly->polygon_count = MAX(max_polys, 1);
+	poly->polygon_count = std::max(max_polys, 1);
 	poly->polygon_next = 0;
 	poly->polygon = (polygon_info **)allocate_array(machine, &poly->polygon_size, poly->polygon_count);
 
@@ -332,7 +332,7 @@ legacy_poly_manager *poly_alloc(running_machine &machine, int max_polys, size_t 
 
 	/* allocate triangle work units */
 	poly->unit_size = (flags & POLYFLAG_ALLOW_QUADS) ? sizeof(quad_work_unit) : sizeof(tri_work_unit);
-	poly->unit_count = MIN(poly->polygon_count * UNITS_PER_POLY, 65535);
+	poly->unit_count = std::min(poly->polygon_count * UNITS_PER_POLY, 65535U);
 	poly->unit_next = 0;
 	poly->unit = (work_unit **)allocate_array(machine, &poly->unit_size, poly->unit_count);
 
@@ -501,8 +501,8 @@ UINT32 poly_render_triangle(legacy_poly_manager *poly, void *dest, const rectang
 	/* clip coordinates */
 	v1yclip = v1y;
 	v3yclip = v3y + ((poly->flags & POLYFLAG_INCLUDE_BOTTOM_EDGE) ? 1 : 0);
-	v1yclip = MAX(v1yclip, cliprect.min_y);
-	v3yclip = MIN(v3yclip, cliprect.max_y + 1);
+	v1yclip = std::max(v1yclip, cliprect.min_y);
+	v3yclip = std::min(v3yclip, cliprect.max_y + 1);
 	if (v3yclip - v1yclip <= 0)
 		return 0;
 
@@ -540,7 +540,7 @@ UINT32 poly_render_triangle(legacy_poly_manager *poly, void *dest, const rectang
 
 		/* fill in the work unit basics */
 		unit->shared.polygon = polygon;
-		unit->shared.count_next = MIN(v3yclip - curscan, scaninc);
+		unit->shared.count_next = std::min(v3yclip - curscan, scaninc);
 		unit->shared.scanline = curscan;
 		unit->shared.previtem = poly->unit_bucket[bucketnum];
 		poly->unit_bucket[bucketnum] = unit_index;
@@ -671,8 +671,8 @@ UINT32 poly_render_triangle_custom(legacy_poly_manager *poly, void *dest, const 
 	UINT32 startunit;
 
 	/* clip coordinates */
-	v1yclip = MAX(startscanline, cliprect.min_y);
-	v3yclip = MIN(startscanline + numscanlines, cliprect.max_y + 1);
+	v1yclip = std::max(startscanline, cliprect.min_y);
+	v3yclip = std::min(startscanline + numscanlines, cliprect.max_y + 1);
 	if (v3yclip - v1yclip <= 0)
 		return 0;
 
@@ -701,7 +701,7 @@ UINT32 poly_render_triangle_custom(legacy_poly_manager *poly, void *dest, const 
 
 		/* fill in the work unit basics */
 		unit->shared.polygon = polygon;
-		unit->shared.count_next = MIN(v3yclip - curscan, scaninc);
+		unit->shared.count_next = std::min(v3yclip - curscan, scaninc);
 		unit->shared.scanline = curscan;
 		unit->shared.previtem = poly->unit_bucket[bucketnum];
 		poly->unit_bucket[bucketnum] = unit_index;
@@ -801,8 +801,8 @@ UINT32 poly_render_quad(legacy_poly_manager *poly, void *dest, const rectangle &
 	/* clip coordinates */
 	minyclip = miny;
 	maxyclip = maxy + ((poly->flags & POLYFLAG_INCLUDE_BOTTOM_EDGE) ? 1 : 0);
-	minyclip = MAX(minyclip, cliprect.min_y);
-	maxyclip = MIN(maxyclip, cliprect.max_y + 1);
+	minyclip = std::max(minyclip, cliprect.min_y);
+	maxyclip = std::min(maxyclip, cliprect.max_y + 1);
 	if (maxyclip - minyclip <= 0)
 		return 0;
 
@@ -892,7 +892,7 @@ UINT32 poly_render_quad(legacy_poly_manager *poly, void *dest, const rectangle &
 
 		/* fill in the work unit basics */
 		unit->shared.polygon = polygon;
-		unit->shared.count_next = MIN(maxyclip - curscan, scaninc);
+		unit->shared.count_next = std::min(maxyclip - curscan, scaninc);
 		unit->shared.scanline = curscan;
 		unit->shared.previtem = poly->unit_bucket[bucketnum];
 		poly->unit_bucket[bucketnum] = unit_index;
@@ -985,7 +985,7 @@ UINT32 poly_render_quad_fan(legacy_poly_manager *poly, void *dest, const rectang
 
 	/* iterate over vertices */
 	for (vertnum = 2; vertnum < numverts; vertnum += 2)
-		pixels += poly_render_quad(poly, dest, cliprect, callback, paramcount, &v[0], &v[vertnum - 1], &v[vertnum], &v[MIN(vertnum + 1, numverts - 1)]);
+		pixels += poly_render_quad(poly, dest, cliprect, callback, paramcount, &v[0], &v[vertnum - 1], &v[vertnum], &v[std::min(vertnum + 1, numverts - 1)]);
 	return pixels;
 }
 
@@ -1033,8 +1033,8 @@ UINT32 poly_render_polygon(legacy_poly_manager *poly, void *dest, const rectangl
 	/* clip coordinates */
 	minyclip = miny;
 	maxyclip = maxy + ((poly->flags & POLYFLAG_INCLUDE_BOTTOM_EDGE) ? 1 : 0);
-	minyclip = MAX(minyclip, cliprect.min_y);
-	maxyclip = MIN(maxyclip, cliprect.max_y + 1);
+	minyclip = std::max(minyclip, cliprect.min_y);
+	maxyclip = std::min(maxyclip, cliprect.max_y + 1);
 	if (maxyclip - minyclip <= 0)
 		return 0;
 
@@ -1124,7 +1124,7 @@ UINT32 poly_render_polygon(legacy_poly_manager *poly, void *dest, const rectangl
 
 		/* fill in the work unit basics */
 		unit->shared.polygon = polygon;
-		unit->shared.count_next = MIN(maxyclip - curscan, scaninc);
+		unit->shared.count_next = std::min(maxyclip - curscan, scaninc);
 		unit->shared.scanline = curscan;
 		unit->shared.previtem = poly->unit_bucket[bucketnum];
 		poly->unit_bucket[bucketnum] = unit_index;

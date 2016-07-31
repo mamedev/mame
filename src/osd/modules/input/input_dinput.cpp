@@ -22,7 +22,10 @@
 #undef WINNT
 #include <dinput.h>
 #undef interface
+#undef min
+#undef max
 
+#include <utility>
 #include <mutex>
 #include <thread>
 
@@ -387,8 +390,8 @@ public:
 		}
 
 		// cap the number of axes and buttons based on the format
-		devinfo->dinput.caps.dwAxes = MIN(devinfo->dinput.caps.dwAxes, 3);
-		devinfo->dinput.caps.dwButtons = MIN(devinfo->dinput.caps.dwButtons, (devinfo->dinput.format == &c_dfDIMouse) ? 4 : 8);
+		devinfo->dinput.caps.dwAxes = std::min(devinfo->dinput.caps.dwAxes, DWORD(3));
+		devinfo->dinput.caps.dwButtons = std::min(devinfo->dinput.caps.dwButtons, DWORD((devinfo->dinput.format == &c_dfDIMouse) ? 4 : 8));
 
 		// populate the axes
 		for (axisnum = 0; axisnum < devinfo->dinput.caps.dwAxes; axisnum++)
@@ -479,9 +482,9 @@ int dinput_joystick_device::configure()
 		osd_printf_warning("DirectInput: Unable to reset saturation for joystick %d (%s)\n", devindex, name());
 
 	// cap the number of axes, POVs, and buttons based on the format
-	dinput.caps.dwAxes = MIN(dinput.caps.dwAxes, 8);
-	dinput.caps.dwPOVs = MIN(dinput.caps.dwPOVs, 4);
-	dinput.caps.dwButtons = MIN(dinput.caps.dwButtons, 128);
+	dinput.caps.dwAxes = std::min(dinput.caps.dwAxes, DWORD(8));
+	dinput.caps.dwPOVs = std::min(dinput.caps.dwPOVs, DWORD(4));
+	dinput.caps.dwButtons = std::min(dinput.caps.dwButtons, DWORD(128));
 
 	// populate the axes
 	for (axisnum = axiscount = 0; axiscount < dinput.caps.dwAxes && axisnum < 8; axisnum++)

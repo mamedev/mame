@@ -182,6 +182,7 @@ private:
 	void set_data_timeout(bool long_timeout);
 		void cmd_fsm(void);
 		void start_cmd_exec(UINT16 new_cmd_reg);
+		bool internal_load(bool is_create);
 };
 
 // device type definition

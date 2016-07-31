@@ -212,14 +212,14 @@ CPU_DISASSEMBLE( z8 );
 CPU_DISASSEMBLE( z80 );
 CPU_DISASSEMBLE( z8000 );
 
-CPU_DISASSEMBLE( sparcv7 )      { static sparc_disassembler dasm(nullptr, 7);                             return dasm.dasm(buffer, pc, BIG_ENDIANIZE_INT32(*reinterpret_cast<const UINT32 *>(oprom))); }
-CPU_DISASSEMBLE( sparcv8 )      { static sparc_disassembler dasm(nullptr, 8);                             return dasm.dasm(buffer, pc, BIG_ENDIANIZE_INT32(*reinterpret_cast<const UINT32 *>(oprom))); }
-CPU_DISASSEMBLE( sparcv9 )      { static sparc_disassembler dasm(nullptr, 9);                             return dasm.dasm(buffer, pc, BIG_ENDIANIZE_INT32(*reinterpret_cast<const UINT32 *>(oprom))); }
-CPU_DISASSEMBLE( sparcv9vis1 )  { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_1);  return dasm.dasm(buffer, pc, BIG_ENDIANIZE_INT32(*reinterpret_cast<const UINT32 *>(oprom))); }
-CPU_DISASSEMBLE( sparcv9vis2 )  { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_2);  return dasm.dasm(buffer, pc, BIG_ENDIANIZE_INT32(*reinterpret_cast<const UINT32 *>(oprom))); }
-CPU_DISASSEMBLE( sparcv9vis2p ) { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_2p); return dasm.dasm(buffer, pc, BIG_ENDIANIZE_INT32(*reinterpret_cast<const UINT32 *>(oprom))); }
-CPU_DISASSEMBLE( sparcv9vis3 )  { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_3);  return dasm.dasm(buffer, pc, BIG_ENDIANIZE_INT32(*reinterpret_cast<const UINT32 *>(oprom))); }
-CPU_DISASSEMBLE( sparcv9vis3b ) { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_3b); return dasm.dasm(buffer, pc, BIG_ENDIANIZE_INT32(*reinterpret_cast<const UINT32 *>(oprom))); }
+CPU_DISASSEMBLE( sparcv7 )      { static sparc_disassembler dasm(nullptr, 7);                             return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const UINT32 *>(oprom))); }
+CPU_DISASSEMBLE( sparcv8 )      { static sparc_disassembler dasm(nullptr, 8);                             return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const UINT32 *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9 )      { static sparc_disassembler dasm(nullptr, 9);                             return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const UINT32 *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9vis1 )  { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_1);  return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const UINT32 *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9vis2 )  { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_2);  return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const UINT32 *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9vis2p ) { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_2p); return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const UINT32 *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9vis3 )  { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_3);  return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const UINT32 *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9vis3b ) { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_3b); return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const UINT32 *>(oprom))); }
 
 
 static const dasm_table_entry dasm_table[] =

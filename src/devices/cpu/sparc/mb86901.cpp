@@ -550,7 +550,7 @@ UINT32 mb86901_device::disasm_max_opcode_bytes() const
 offs_t mb86901_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
 	UINT32 op = *reinterpret_cast<const UINT32 *>(oprom);
-	return m_dasm.dasm(buffer, pc, BIG_ENDIANIZE_INT32(op));
+	return m_dasm.dasm(buffer, pc, big_endianize_int32(op));
 }
 
 

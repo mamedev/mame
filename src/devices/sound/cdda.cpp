@@ -189,8 +189,8 @@ void cdda_device::get_audio_data(stream_sample_t *bufL, stream_sample_t *bufR, U
 		for (i = 0; i < samples; i++)
 		{
 			/* CD-DA data on the disc is big-endian */
-			*bufL++ = (INT16) BIG_ENDIANIZE_INT16( audio_cache[ m_audio_bptr ] ); m_audio_bptr++;
-			*bufR++ = (INT16) BIG_ENDIANIZE_INT16( audio_cache[ m_audio_bptr ] ); m_audio_bptr++;
+			*bufL++ = (INT16) big_endianize_int16( audio_cache[ m_audio_bptr ] ); m_audio_bptr++;
+			*bufR++ = (INT16) big_endianize_int16( audio_cache[ m_audio_bptr ] ); m_audio_bptr++;
 		}
 
 		samples_wanted -= samples;

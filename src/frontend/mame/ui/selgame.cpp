@@ -1214,7 +1214,7 @@ void menu_select_game::populate_search()
 		// pick the best match between driver name and description
 		int curpenalty = fuzzy_substring(m_search, m_displaylist[index]->description);
 		int tmp = fuzzy_substring(m_search, m_displaylist[index]->name);
-		curpenalty = MIN(curpenalty, tmp);
+		curpenalty = std::min(curpenalty, tmp);
 
 		// insert into the sorted table of matches
 		for (int matchnum = VISIBLE_GAMES_IN_SEARCH - 1; matchnum >= 0; --matchnum)

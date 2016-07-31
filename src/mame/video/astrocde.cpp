@@ -99,12 +99,12 @@ PALETTE_INIT_MEMBER(astrocde_state, astrocde)
 			b = (by + y) * 255;
 
 			/* clamp and store */
-			r = MAX(r, 0);
-			r = MIN(r, 255);
-			g = MAX(g, 0);
-			g = MIN(g, 255);
-			b = MAX(b, 0);
-			b = MIN(b, 255);
+			r = std::max(r, 0);
+			r = std::min(r, 255);
+			g = std::max(g, 0);
+			g = std::min(g, 255);
+			b = std::max(b, 0);
+			b = std::min(b, 255);
 			palette.set_pen_color(color * 16 + luma, rgb_t(r, g, b));
 		}
 	}

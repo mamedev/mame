@@ -55,7 +55,7 @@
 
 	// adjust sizes to make it fit nicely
 	expressionFrame = [expressionField frame];
-	expressionFrame.size.height = MAX(expressionFrame.size.height, [subviewButton frame].size.height);
+	expressionFrame.size.height = std::max(expressionFrame.size.height, [subviewButton frame].size.height);
 	expressionFrame.size.width = (contentBounds.size.width - expressionFrame.size.height) / 2;
 	[expressionField setFrame:expressionFrame];
 	expressionFrame.origin.x = expressionFrame.size.width;

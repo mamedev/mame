@@ -213,15 +213,15 @@ static const char *sega8_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-int sega8_cart_slot_device::verify_cart( UINT8 *magic, int size )
+bool sega8_cart_slot_device::verify_cart( UINT8 *magic, int size )
 {
-	int retval = IMAGE_VERIFY_FAIL;
+	int retval = false;
 
 	// Verify the file is a valid image - check $7ff0 for "TMR SEGA"
 	if (size >= 0x8000)
 	{
 		if (!strncmp((char*)&magic[0x7ff0], "TMR SEGA", 8))
-			retval = IMAGE_VERIFY_PASS;
+			retval = true;
 	}
 
 	return retval;
@@ -368,7 +368,7 @@ bool sega8_cart_slot_device::call_load()
 			memcpy(ROM, get_software_region("rom"), get_software_region_length("rom"));
 
 		/* check the image */
-		if (verify_cart(ROM, len) == IMAGE_VERIFY_FAIL)
+		if (!verify_cart(ROM, len))
 			logerror("Warning loading image: verify_cart failed\n");
 
 		if (software_entry() != nullptr)

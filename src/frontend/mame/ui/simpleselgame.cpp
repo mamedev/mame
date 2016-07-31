@@ -300,7 +300,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	ui().draw_text_full(container(), tempbuf[0].c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 						mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
-	maxwidth = MAX(width, origx2 - origx1);
+	maxwidth = std::max(width, origx2 - origx1);
 
 	// compute our bounds
 	x1 = 0.5f - 0.5f * maxwidth;
@@ -390,7 +390,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 		ui().draw_text_full(container(), tempbuf[line].c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 							mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 		width += 2 * UI_BOX_LR_BORDER;
-		maxwidth = MAX(maxwidth, width);
+		maxwidth = std::max(maxwidth, width);
 	}
 
 	// compute our bounds

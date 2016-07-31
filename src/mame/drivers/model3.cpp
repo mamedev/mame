@@ -908,7 +908,7 @@ WRITE64_MEMBER(model3_state::mpc105_addr_w)
 {
 	if (ACCESSING_BITS_32_63)
 	{
-		UINT32 d = FLIPENDIAN_INT32((UINT32)(data >> 32));
+		UINT32 d = flipendian_int32((UINT32)(data >> 32));
 		m_mpc105_addr = data >> 32;
 
 		m_pci_bus = (d >> 16) & 0xff;
@@ -921,22 +921,22 @@ WRITE64_MEMBER(model3_state::mpc105_addr_w)
 READ64_MEMBER(model3_state::mpc105_data_r)
 {
 	if(m_pci_device == 0) {
-		return ((UINT64)(FLIPENDIAN_INT32(m_mpc105_regs[(m_pci_reg/2)+1])) << 32) |
-				((UINT64)(FLIPENDIAN_INT32(m_mpc105_regs[(m_pci_reg/2)+0])));
+		return ((UINT64)(flipendian_int32(m_mpc105_regs[(m_pci_reg/2)+1])) << 32) |
+				((UINT64)(flipendian_int32(m_mpc105_regs[(m_pci_reg/2)+0])));
 	}
-	return FLIPENDIAN_INT32(pci_device_get_reg());
+	return flipendian_int32(pci_device_get_reg());
 }
 
 WRITE64_MEMBER(model3_state::mpc105_data_w)
 {
 	if(m_pci_device == 0) {
-		m_mpc105_regs[(m_pci_reg/2)+1] = FLIPENDIAN_INT32((UINT32)(data >> 32));
-		m_mpc105_regs[(m_pci_reg/2)+0] = FLIPENDIAN_INT32((UINT32)(data));
+		m_mpc105_regs[(m_pci_reg/2)+1] = flipendian_int32((UINT32)(data >> 32));
+		m_mpc105_regs[(m_pci_reg/2)+0] = flipendian_int32((UINT32)(data));
 		return;
 	}
 	if (ACCESSING_BITS_0_31)
 	{
-		pci_device_set_reg(FLIPENDIAN_INT32((UINT32)data));
+		pci_device_set_reg(flipendian_int32((UINT32)data));
 	}
 }
 
@@ -985,7 +985,7 @@ WRITE64_MEMBER(model3_state::mpc106_addr_w)
 {
 	if (ACCESSING_BITS_32_63)
 	{
-		UINT32 d = FLIPENDIAN_INT32((UINT32)(data >> 32));
+		UINT32 d = flipendian_int32((UINT32)(data >> 32));
 
 		if (((d >> 8) & 0xffffff) == 0x800000)
 		{
@@ -1006,29 +1006,29 @@ WRITE64_MEMBER(model3_state::mpc106_addr_w)
 READ64_MEMBER(model3_state::mpc106_data_r)
 {
 	if(m_pci_device == 0) {
-		return ((UINT64)(FLIPENDIAN_INT32(m_mpc106_regs[(m_pci_reg/2)+1])) << 32) |
-				((UINT64)(FLIPENDIAN_INT32(m_mpc106_regs[(m_pci_reg/2)+0])));
+		return ((UINT64)(flipendian_int32(m_mpc106_regs[(m_pci_reg/2)+1])) << 32) |
+				((UINT64)(flipendian_int32(m_mpc106_regs[(m_pci_reg/2)+0])));
 	}
 	if (ACCESSING_BITS_32_63)
 	{
-		return (UINT64)(FLIPENDIAN_INT32(pci_device_get_reg())) << 32;
+		return (UINT64)(flipendian_int32(pci_device_get_reg())) << 32;
 	}
 	else
 	{
-		return (UINT64)(FLIPENDIAN_INT32(pci_device_get_reg()));
+		return (UINT64)(flipendian_int32(pci_device_get_reg()));
 	}
 }
 
 WRITE64_MEMBER(model3_state::mpc106_data_w)
 {
 	if(m_pci_device == 0) {
-		m_mpc106_regs[(m_pci_reg/2)+1] = FLIPENDIAN_INT32((UINT32)(data >> 32));
-		m_mpc106_regs[(m_pci_reg/2)+0] = FLIPENDIAN_INT32((UINT32)(data));
+		m_mpc106_regs[(m_pci_reg/2)+1] = flipendian_int32((UINT32)(data >> 32));
+		m_mpc106_regs[(m_pci_reg/2)+0] = flipendian_int32((UINT32)(data));
 		return;
 	}
 	if (ACCESSING_BITS_0_31)
 	{
-		pci_device_set_reg(FLIPENDIAN_INT32((UINT32)data));
+		pci_device_set_reg(flipendian_int32((UINT32)data));
 	}
 }
 
@@ -1132,7 +1132,7 @@ LSI53C810_FETCH_CB(model3_state::scsi_fetch)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT32 result = space.read_dword(dsp);
-	return FLIPENDIAN_INT32(result);
+	return flipendian_int32(result);
 }
 
 LSI53C810_IRQ_CB(model3_state::scsi_irq_callback)
@@ -1167,18 +1167,18 @@ WRITE64_MEMBER(model3_state::real3d_dma_w)
 	{
 		case 0:
 			if(ACCESSING_BITS_32_63) {      /* DMA source address */
-				m_dma_source = FLIPENDIAN_INT32((UINT32)(data >> 32));
+				m_dma_source = flipendian_int32((UINT32)(data >> 32));
 				return;
 			}
 			if(ACCESSING_BITS_0_31) {       /* DMA destination address */
-				m_dma_dest = FLIPENDIAN_INT32((UINT32)(data));
+				m_dma_dest = flipendian_int32((UINT32)(data));
 				return;
 			}
 			break;
 		case 1:
 			if(ACCESSING_BITS_32_63)        /* DMA length */
 			{
-				int length = FLIPENDIAN_INT32((UINT32)(data >> 32)) * 4;
+				int length = flipendian_int32((UINT32)(data >> 32)) * 4;
 				if (m_dma_endian & 0x80)
 				{
 					real3d_dma_callback(m_dma_source, m_dma_dest, length, 0);
@@ -1207,9 +1207,9 @@ WRITE64_MEMBER(model3_state::real3d_dma_w)
 			break;
 		case 2:
 			if(ACCESSING_BITS_32_63) {      /* DMA command */
-				UINT32 cmd = FLIPENDIAN_INT32((UINT32)(data >> 32));
+				UINT32 cmd = flipendian_int32((UINT32)(data >> 32));
 				if(cmd & 0x20000000) {
-					m_dma_data = FLIPENDIAN_INT32(m_real3d_device_id);  /* (PCI Vendor & Device ID) */
+					m_dma_data = flipendian_int32(m_real3d_device_id);  /* (PCI Vendor & Device ID) */
 				}
 				else if(cmd & 0x80000000) {
 					m_dma_status ^= 0xffffffff;

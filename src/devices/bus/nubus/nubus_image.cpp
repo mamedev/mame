@@ -22,8 +22,8 @@
 static UINT32 ni_htonl(UINT32 x) { return x; }
 static UINT32 ni_ntohl(UINT32 x) { return x; }
 #else
-static UINT32 ni_htonl(UINT32 x) { return FLIPENDIAN_INT32(x); }
-static UINT32 ni_ntohl(UINT32 x) { return FLIPENDIAN_INT32(x); }
+static UINT32 ni_htonl(UINT32 x) { return flipendian_int32(x); }
+static UINT32 ni_ntohl(UINT32 x) { return flipendian_int32(x); }
 #endif
 
 

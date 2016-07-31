@@ -307,7 +307,7 @@ TIMER_CALLBACK_MEMBER( mc68681_device::duart_timer_callback )
 			update_interrupts();
 		}
 
-		int count = MAX(CTR.w.l, 1);
+		int count = std::max(CTR.w.l, UINT16(1));
 		duart68681_start_ct(count);
 	}
 	else
@@ -400,7 +400,7 @@ READ8_MEMBER( mc68681_device::read )
 				half_period = 0;
 			}
 
-			int count = MAX(CTR.w.l, 1);
+			int count = std::max(CTR.w.l, UINT16(1));
 			duart68681_start_ct(count);
 			break;
 		}
@@ -449,7 +449,7 @@ WRITE8_MEMBER( mc68681_device::write )
 				if (data & 0x40)
 				{
 					// Entering timer mode
-					UINT16 count = MAX(CTR.w.l, 1);
+					UINT16 count = std::max(CTR.w.l, UINT16(1));
 					half_period = 0;
 
 					duart68681_start_ct(count);

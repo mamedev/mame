@@ -159,7 +159,7 @@ void naomi_m2_board::board_get_buffer(UINT8 *&base, UINT32 &limit)
 		} else {
 			UINT32 offset4mb = (rom_cur_address & 0x103FFFFF) | ((rom_cur_address & 0x07C00000) << 1);
 			base = m_region->base() + offset4mb;
-			limit = MIN(m_region->bytes() - offset4mb, 0x00400000 - (offset4mb & 0x003FFFFF));
+			limit = std::min(m_region->bytes() - offset4mb, 0x00400000 - (offset4mb & 0x003FFFFF));
 		}
 	}
 }

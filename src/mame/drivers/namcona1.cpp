@@ -570,7 +570,7 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(namcona1_state::na1mcu_shared_r)
 {
-	UINT16 data = FLIPENDIAN_INT16(m_workram[offset]);
+	UINT16 data = flipendian_int16(m_workram[offset]);
 
 #if 0
 	if (offset >= 0x70000/2)
@@ -583,8 +583,8 @@ READ16_MEMBER(namcona1_state::na1mcu_shared_r)
 
 WRITE16_MEMBER(namcona1_state::na1mcu_shared_w)
 {
-	mem_mask = FLIPENDIAN_INT16(mem_mask);
-	data = FLIPENDIAN_INT16(data);
+	mem_mask = flipendian_int16(mem_mask);
+	data = flipendian_int16(data);
 
 	COMBINE_DATA(&m_workram[offset]);
 }

@@ -20,6 +20,7 @@
 #include "bus/rs232/rs232.h"
 #include "machine/wd_fdc.h"
 #include "machine/msm5832.h"
+#include "machine/clock.h"
 
 
 /***********************************************************
@@ -78,9 +79,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sio1_rdyb_w);
 	DECLARE_WRITE_LINE_MEMBER(sio2_rdya_w);
 	DECLARE_WRITE_LINE_MEMBER(sio2_rdyb_w);
+	DECLARE_WRITE_LINE_MEMBER(clock_w);
 	DECLARE_MACHINE_RESET(aussiebyte);
 	DECLARE_DRIVER_INIT(aussiebyte);
-	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);

@@ -522,23 +522,23 @@ void microtan_state::machine_reset()
 	output().set_led_value(1, (m_keyrows[3] & 0x80) ? 0 : 1);
 }
 
-int microtan_state::microtan_verify_snapshot(UINT8 *data, int size)
+bool microtan_state::microtan_verify_snapshot(UINT8 *data, int size)
 {
 	if (size == 8263)
 	{
 		logerror("microtan_snapshot_id: magic size %d found\n", size);
-		return IMAGE_VERIFY_PASS;
+		return true;
 	}
 	else
 	{
 		if (4 + data[2] + 256 * data[3] + 1 + 16 + 16 + 16 + 1 + 1 + 16 + 16 + 64 + 7 == size)
 		{
 			logerror("microtan_snapshot_id: header RAM size + structures matches filesize %d\n", size);
-			return IMAGE_VERIFY_PASS;
+			return true;
 		}
 	}
 
-	return IMAGE_VERIFY_FAIL;
+	return false;
 }
 
 int microtan_state::parse_intel_hex(UINT8 *snapshot_buff, char *src)
@@ -827,7 +827,7 @@ SNAPSHOT_LOAD_MEMBER( microtan_state, microtan )
 	if (!snapshot_buff)
 		return IMAGE_INIT_FAIL;
 
-	if (microtan_verify_snapshot(snapshot_buff, snapshot_size)==IMAGE_VERIFY_FAIL)
+	if (!microtan_verify_snapshot(snapshot_buff, snapshot_size))
 		return IMAGE_INIT_FAIL;
 
 	microtan_snapshot_copy(snapshot_buff, snapshot_size);

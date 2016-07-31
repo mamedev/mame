@@ -73,10 +73,10 @@ void cassette_image_device::device_config_complete()
 bool cassette_image_device::is_motor_on()
 {
 	if ((m_state & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED)
-		return FALSE;
+		return false;
 	if ((m_state & CASSETTE_MASK_MOTOR) != CASSETTE_MOTOR_ENABLED)
-		return FALSE;
-	return TRUE;
+		return false;
+	return true;
 }
 
 
@@ -157,8 +157,8 @@ void cassette_image_device::output(double value)
 	{
 		update();
 
-		value = MIN(value, 1.0);
-		value = MAX(value, -1.0);
+		value = std::min(value, 1.0);
+		value = std::max(value, -1.0);
 
 		m_value = (INT32) (value * 0x7FFFFFFF);
 	}
@@ -252,10 +252,15 @@ void cassette_image_device::device_start()
 
 bool cassette_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
-	return call_load();
+	return internal_load(true);
 }
 
 bool cassette_image_device::call_load()
+{
+	return internal_load(false);
+}
+
+bool cassette_image_device::internal_load(bool is_create)
 {
 	casserr_t err;
 	int cassette_flags;
@@ -264,7 +269,7 @@ bool cassette_image_device::call_load()
 	device_image_interface *image = nullptr;
 	interface(image);
 
-	if ((has_been_created()) || (length() == 0))
+	if (is_create || (length() == 0))
 	{
 		/* creating an image */
 		err = cassette_create((void *)image, &image_ioprocs, &wavfile_format, m_create_opts, CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT, &m_cassette);

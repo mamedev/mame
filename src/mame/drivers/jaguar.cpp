@@ -1984,7 +1984,7 @@ int jaguar_state::quickload(device_image_interface &image, const char *file_type
 	offs_t quickload_begin = 0x4000, start = quickload_begin, skip = 0;
 
 	memset(m_shared_ram, 0, 0x200000);
-	quickload_size = MIN(quickload_size, 0x200000 - quickload_begin);
+	quickload_size = std::min(quickload_size, int(0x200000 - quickload_begin));
 
 	image.fread( &memregion("maincpu")->base()[quickload_begin], quickload_size);
 

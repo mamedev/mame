@@ -128,7 +128,7 @@ private:
 	device_a78_cart_interface*       m_cart;
 	int m_type;
 
-	int verify_header(char *header);
+	bool verify_header(char *header);
 	int validate_header(int head, bool log);
 	void internal_header_logging(UINT8 *header, UINT32 len);
 };

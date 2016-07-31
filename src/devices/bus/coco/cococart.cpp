@@ -337,7 +337,7 @@ bool cococart_slot_device::call_load()
 		}
 		while(read_length < 0x8000)
 		{
-			offs_t len = MIN(read_length, 0x8000 - read_length);
+			offs_t len = std::min(read_length, 0x8000 - read_length);
 			memcpy(m_cart->get_cart_base() + read_length, m_cart->get_cart_base(), len);
 			read_length += len;
 		}

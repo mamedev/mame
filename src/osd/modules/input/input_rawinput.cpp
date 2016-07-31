@@ -16,6 +16,8 @@
 #include <windows.h>
 #include <tchar.h>
 #undef interface
+#undef min
+#undef max
 
 #include <mutex>
 #include <functional>
@@ -521,7 +523,7 @@ protected:
 	{
 		// Only handle raw input data
 		if (!input_enabled() || eventid != INPUT_EVENT_RAWINPUT)
-			return FALSE;
+			return false;
 
 		HRAWINPUT rawinputdevice = *static_cast<HRAWINPUT*>(eventdata);
 
@@ -533,11 +535,11 @@ protected:
 
 		// ignore if not enabled
 		if (!input_enabled())
-			return FALSE;
+			return false;
 
 		// determine the size of databuffer we need
 		if ((*get_rawinput_data)(rawinputdevice, RID_INPUT, nullptr, &size, sizeof(RAWINPUTHEADER)) != 0)
-			return FALSE;
+			return false;
 
 		// if necessary, allocate a temporary buffer and fetch the data
 		if (size > sizeof(small_buffer))
@@ -545,7 +547,7 @@ protected:
 			larger_buffer = std::make_unique<BYTE[]>(size);
 			data = larger_buffer.get();
 			if (data == nullptr)
-				return FALSE;
+				return false;
 		}
 
 		// fetch the data and process the appropriate message types
@@ -565,7 +567,7 @@ protected:
 					if (input->header.hDevice == devinfo->device_handle())
 					{
 						devinfo->queue_events(input, 1);
-						result = TRUE;
+						result = true;
 					}
 				}
 			}

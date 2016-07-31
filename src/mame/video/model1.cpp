@@ -479,10 +479,10 @@ void model1_state::draw_quads(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	int save_x2 = view->x2;
 	int save_y1 = view->y1;
 	int save_y2 = view->y2;
-	view->x1 = MAX(view->x1, cliprect.min_x);
-	view->x2 = MIN(view->x2, cliprect.max_x);
-	view->y1 = MAX(view->y1, cliprect.min_y);
-	view->y2 = MIN(view->y2, cliprect.max_y);
+	view->x1 = std::max(view->x1, cliprect.min_x);
+	view->x2 = std::min(view->x2, cliprect.max_x);
+	view->y1 = std::max(view->y1, cliprect.min_y);
+	view->y2 = std::min(view->y2, cliprect.max_y);
 
 	for (int i = 0; i < count; i++)
 	{
@@ -943,8 +943,8 @@ void model1_state::push_object(UINT32 tex_adr, UINT32 poly_adr, UINT32 size) {
 
 			float dif = glm::dot(vn, m_view->light);
 			float spec = compute_specular(vn, m_view->light, dif, lightmode);
-			float ln = m_view->lightparams[lightmode].a + m_view->lightparams[lightmode].d * MAX(0.0f, dif) + spec;
-			int lumval = 255.0f * MIN(1.0f, ln);
+			float ln = m_view->lightparams[lightmode].a + m_view->lightparams[lightmode].d * std::max(0.0f, dif) + spec;
+			int lumval = 255.0f * std::min(1.0f, ln);
 			int color = m_paletteram16[0x1000 | (m_tgp_ram[tex_adr - 0x40000] & 0x3ff)];
 			int r = (color >> 0x0) & 0x1f;
 			int g = (color >> 0x5) & 0x1f;

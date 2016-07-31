@@ -1620,7 +1620,7 @@ void cli_frontend::getsoftlist(const char *gamename)
 {
 	FILE *out = stdout;
 	std::unordered_set<std::string> list_map;
-	bool isfirst = TRUE;
+	bool isfirst = true;
 
 	driver_enumerator drivlist(m_options);
 	while (drivlist.next())
@@ -1629,7 +1629,7 @@ void cli_frontend::getsoftlist(const char *gamename)
 			if (core_strwildcmp(gamename, swlistdev.list_name()) == 0 && list_map.insert(swlistdev.list_name()).second)
 				if (!swlistdev.get_info().empty())
 				{
-					if (isfirst) { fprintf( out, SOFTLIST_XML_BEGIN); isfirst = FALSE; }
+					if (isfirst) { fprintf( out, SOFTLIST_XML_BEGIN); isfirst = false; }
 					output_single_softlist(out, swlistdev);
 				}
 	}

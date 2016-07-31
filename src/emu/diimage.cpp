@@ -228,6 +228,27 @@ const image_device_format *device_image_interface::device_get_named_creatable_fo
 }
 
 
+//-------------------------------------------------
+//  add_format
+//-------------------------------------------------
+
+void device_image_interface::add_format(std::unique_ptr<image_device_format> &&format)
+{
+	m_formatlist.push_back(std::move(format));
+}
+
+
+//-------------------------------------------------
+//  add_format
+//-------------------------------------------------
+
+void device_image_interface::add_format(std::string &&name, std::string &&description, std::string &&extensions, std::string &&optspec)
+{
+	auto format = std::make_unique<image_device_format>(std::move(name), std::move(description), std::move(extensions), std::move(optspec));
+	add_format(std::move(format));
+}
+
+
 /****************************************************************************
     ERROR HANDLING
 ****************************************************************************/
@@ -946,7 +967,7 @@ bool device_image_interface::load_internal(const std::string &path, bool is_crea
 	m_create_args = create_args;
 
 	if (m_init_phase==false) {
-		m_err = (image_error_t)finish_load();
+		m_err = (finish_load()==IMAGE_INIT_PASS) ? IMAGE_ERROR_SUCCESS : IMAGE_ERROR_INTERNAL;
 		if (m_err)
 			goto done;
 	}
@@ -1109,10 +1130,10 @@ bool device_image_interface::finish_load()
 	{
 		image_checkhash();
 
-		if (has_been_created())
+		if (m_created)
 		{
 			err = call_create(m_create_format, m_create_args);
-			if (err)
+			if (err == IMAGE_INIT_FAIL)
 			{
 				if (!m_err)
 					m_err = IMAGE_ERROR_UNSPECIFIED;
@@ -1122,7 +1143,7 @@ bool device_image_interface::finish_load()
 		{
 			// using device load
 			err = call_load();
-			if (err)
+			if (err == IMAGE_INIT_FAIL)
 			{
 				if (!m_err)
 					m_err = IMAGE_ERROR_UNSPECIFIED;

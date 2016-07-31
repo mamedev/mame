@@ -399,7 +399,7 @@ UINT32 maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_ind1
 				bmpptr = (UINT8*)objptr;
 
 				// 4bpp
-				for (x = xpos; x < MIN(xbound, xpos + width * 8); ++x)
+				for (x = xpos; x < std::min(xbound, int(xpos + width * 8)); ++x)
 				{
 					if (x >= 0)
 					{

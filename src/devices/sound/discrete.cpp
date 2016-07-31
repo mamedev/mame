@@ -235,7 +235,7 @@ void *discrete_task::task_callback(void *param, int threadid)
 
 bool discrete_task::process(void)
 {
-	int samples = MIN(m_samples, MAX_SAMPLES_PER_TASK_SLICE);
+	int samples = std::min(int(m_samples), MAX_SAMPLES_PER_TASK_SLICE);
 
 	/* check dependencies */
 	for_each(input_buffer *, sn, &source_list)
