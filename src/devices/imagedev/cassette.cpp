@@ -73,10 +73,10 @@ void cassette_image_device::device_config_complete()
 bool cassette_image_device::is_motor_on()
 {
 	if ((m_state & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED)
-		return FALSE;
+		return false;
 	if ((m_state & CASSETTE_MASK_MOTOR) != CASSETTE_MOTOR_ENABLED)
-		return FALSE;
-	return TRUE;
+		return false;
+	return true;
 }
 
 

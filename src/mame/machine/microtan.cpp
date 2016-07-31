@@ -522,7 +522,7 @@ void microtan_state::machine_reset()
 	output().set_led_value(1, (m_keyrows[3] & 0x80) ? 0 : 1);
 }
 
-int microtan_state::microtan_verify_snapshot(UINT8 *data, int size)
+bool microtan_state::microtan_verify_snapshot(UINT8 *data, int size)
 {
 	if (size == 8263)
 	{

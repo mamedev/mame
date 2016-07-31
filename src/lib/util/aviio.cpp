@@ -1945,7 +1945,7 @@ avi_file::error avi_file_impl::append_sound_samples(int channel, const std::int1
 	m_soundbuf_chansamples[channel] = sampoffset;
 
 	/* flush any full sound chunks to disk */
-	return soundbuf_flush(TRUE);
+	return soundbuf_flush(true);
 }
 
 

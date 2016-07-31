@@ -854,7 +854,7 @@ try_again:
 			D3DRTYPE_TEXTURE, m_screen_format);
 		if (FAILED(result) && m_texture_manager->is_dynamic_supported())
 		{
-			m_texture_manager->set_dynamic_supported(FALSE);
+			m_texture_manager->set_dynamic_supported(false);
 			goto try_again;
 		}
 		if (FAILED(result))

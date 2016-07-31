@@ -281,7 +281,7 @@ void lviv_state::dump_registers()
 	logerror("HL   = %04x\n", (unsigned) m_maincpu->state_int(I8085_HL));
 }
 
-int lviv_state::lviv_verify_snapshot (UINT8 * data, UINT32 size)
+bool lviv_state::lviv_verify_snapshot (UINT8 * data, UINT32 size)
 {
 	const char* tag = "LVOV/DUMP/2.0/";
 

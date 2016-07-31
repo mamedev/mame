@@ -718,7 +718,7 @@ bool input_seq::is_valid() const
 			// non-switch items can't have a NOT
 			input_item_class itemclass = code.item_class();
 			if (itemclass != ITEM_CLASS_SWITCH && lastcode == not_code)
-				return FALSE;
+				return false;
 
 			// absolute/relative items must all be the same class
 			if ((lastclass == ITEM_CLASS_ABSOLUTE && itemclass != ITEM_CLASS_ABSOLUTE) ||

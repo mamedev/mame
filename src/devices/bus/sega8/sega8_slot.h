@@ -117,7 +117,7 @@ public:
 
 	void setup_ram();
 	void internal_header_logging(UINT8 *ROM, UINT32 len, UINT32 nvram_len);
-	int verify_cart(UINT8 *magic, int size);
+	bool verify_cart(UINT8 *magic, int size);
 	void set_lphaser_xoffset(UINT8 *rom, int size);
 
 	void save_ram() { if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }

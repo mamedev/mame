@@ -499,7 +499,7 @@ void a78_cart_slot_device::call_unload()
  has an admissible header
  -------------------------------------------------*/
 
-int a78_cart_slot_device::verify_header(char *header)
+bool a78_cart_slot_device::verify_header(char *header)
 {
 	const char *magic = "ATARI7800";
 

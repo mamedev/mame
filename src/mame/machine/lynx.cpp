@@ -2030,7 +2030,7 @@ void lynx_state::machine_start()
 
 ****************************************/
 
-int lynx_state::lynx_verify_cart (char *header, int kind)
+bool lynx_state::lynx_verify_cart (char *header, int kind)
 {
 	if (kind)
 	{

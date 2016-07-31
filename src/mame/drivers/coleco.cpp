@@ -352,7 +352,7 @@ void coleco_state::machine_reset()
 	m_last_nmi_state = 0;
 }
 
-//static int coleco_cart_verify(const UINT8 *cartdata, size_t size)
+//static bool coleco_cart_verify(const UINT8 *cartdata, size_t size)
 //{
 //  int retval = IMAGE_VERIFY_FAIL;
 //

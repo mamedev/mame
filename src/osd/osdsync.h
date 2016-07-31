@@ -91,7 +91,7 @@ public:
 					{
 						if (!m_signalled)
 						{
-							return FALSE;
+							return false;
 						}
 						else
 							break;

@@ -213,7 +213,7 @@ static const char *sega8_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-int sega8_cart_slot_device::verify_cart( UINT8 *magic, int size )
+bool sega8_cart_slot_device::verify_cart( UINT8 *magic, int size )
 {
 	int retval = IMAGE_VERIFY_FAIL;
 
