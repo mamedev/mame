@@ -112,8 +112,6 @@ typedef void (*device_image_partialhash_func)(util::hash_collection &, const uns
 
 #define IMAGE_INIT_PASS     false
 #define IMAGE_INIT_FAIL     true
-#define IMAGE_VERIFY_PASS   false
-#define IMAGE_VERIFY_FAIL   true
 
 #define DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)           device_image_load_##_name
 #define DEVICE_IMAGE_LOAD_NAME(_class,_name)           _class::DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)
