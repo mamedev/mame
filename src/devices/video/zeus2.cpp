@@ -1311,8 +1311,8 @@ void zeus2_renderer::zeus2_draw_quad(const UINT32 *databuffer, UINT32 texdata, i
 
 		clipvert[i].p[0] *= 65536.0f * 16.0f;
 
-		maxx = MAX(maxx, clipvert[i].x);
-		maxy = MAX(maxy, clipvert[i].y);
+		maxx = std::max(maxx, clipvert[i].x);
+		maxy = std::max(maxy, clipvert[i].y);
 		if (logextra & logit)
 			m_state->logerror("\t\t\tTranslated=(%f,%f)\n", (double)clipvert[i].x, (double)clipvert[i].y);
 	}

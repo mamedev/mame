@@ -22,6 +22,9 @@
 
 #include <memory>
 #include <vector>
+#undef min
+#undef max
+#include <algorithm>
 
 #include "modules/lib/osdlib.h"
 
@@ -709,7 +712,7 @@ int CLIB_DECL sampling_profiler::compare_address(const void *item1, const void *
 {
 	const FPTR *entry1 = reinterpret_cast<const FPTR *>(item1);
 	const FPTR *entry2 = reinterpret_cast<const FPTR *>(item2);
-	int mincount = MIN(entry1[0], entry2[0]);
+	int mincount = std::min(entry1[0], entry2[0]);
 
 	// sort in order of: bucket, caller, caller's caller, etc.
 	for (int index = 1; index <= mincount; index++)

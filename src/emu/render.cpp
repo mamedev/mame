@@ -1225,14 +1225,14 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 			// first compute scale factors to fit the screen
 			float xscale = (float)target_width / src_width;
 			float yscale = (float)target_height / src_height;
-			float maxxscale = MAX(1, m_int_overscan? render_round_nearest(xscale) : floor(xscale));
-			float maxyscale = MAX(1, m_int_overscan? render_round_nearest(yscale) : floor(yscale));
+			float maxxscale = std::max(1.0f, m_int_overscan? render_round_nearest(xscale) : floor(xscale));
+			float maxyscale = std::max(1.0f, m_int_overscan? render_round_nearest(yscale) : floor(yscale));
 
 			// now apply desired scale mode and aspect correction
 			if (m_keepaspect && target_aspect > src_aspect) xscale *= src_aspect / target_aspect * (maxyscale / yscale);
 			if (m_keepaspect && target_aspect < src_aspect) yscale *= target_aspect / src_aspect * (maxxscale / xscale);
-			if (x_is_integer) xscale = MIN(maxxscale, MAX(1, render_round_nearest(xscale)));
-			if (y_is_integer) yscale = MIN(maxyscale, MAX(1, render_round_nearest(yscale)));
+			if (x_is_integer) xscale = std::min(maxxscale, std::max(1.0f, render_round_nearest(xscale)));
+			if (y_is_integer) yscale = std::min(maxyscale, std::max(1.0f, render_round_nearest(yscale)));
 
 			// check if we have user defined scale factors, if so use them instead
 			xscale = m_int_scale_x? m_int_scale_x : xscale;
@@ -1301,8 +1301,8 @@ void render_target::compute_minimum_size(INT32 &minwidth, INT32 &minheight)
 				}
 
 				// pick the greater
-				maxxscale = MAX(xscale, maxxscale);
-				maxyscale = MAX(yscale, maxyscale);
+				maxxscale = std::max(xscale, maxxscale);
+				maxyscale = std::max(yscale, maxyscale);
 				screens_considered++;
 			}
 
@@ -1864,7 +1864,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 				prim->flags |= PRIMFLAG_TYPE_LINE;
 
 				// scale the width by the minimum of X/Y scale factors
-				prim->width = curitem.width() * MIN(container_xform.xscale, container_xform.yscale);
+				prim->width = curitem.width() * std::min(container_xform.xscale, container_xform.yscale);
 				prim->flags |= curitem.flags();
 
 				// clip the primitive
@@ -1895,8 +1895,8 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 					// based on the swap values, get the scaled final texture
 					int width = (finalorient & ORIENTATION_SWAP_XY) ? (prim->bounds.y1 - prim->bounds.y0) : (prim->bounds.x1 - prim->bounds.x0);
 					int height = (finalorient & ORIENTATION_SWAP_XY) ? (prim->bounds.x1 - prim->bounds.x0) : (prim->bounds.y1 - prim->bounds.y0);
-					width = MIN(width, m_maxtexwidth);
-					height = MIN(height, m_maxtexheight);
+					width = std::min(width, m_maxtexwidth);
+					height = std::min(height, m_maxtexheight);
 
 					curitem.texture()->get_scaled(width, height, prim->texture, list, curitem.flags());
 
@@ -2052,8 +2052,8 @@ void render_target::add_element_primitives(render_primitive_list &list, const ob
 		set_render_bounds_wh(&prim->bounds, render_round_nearest(xform.xoffs), render_round_nearest(xform.yoffs), (float) width, (float) height);
 		if (xform.orientation & ORIENTATION_SWAP_XY)
 			ISWAP(width, height);
-		width = MIN(width, m_maxtexwidth);
-		height = MIN(height, m_maxtexheight);
+		width = std::min(width, m_maxtexwidth);
+		height = std::min(height, m_maxtexheight);
 
 		// get the scaled texture and append it
 
@@ -2655,7 +2655,7 @@ float render_manager::max_update_rate() const
 			if (minimum == 0)
 				minimum = target.max_update_rate();
 			else
-				minimum = MIN(target.max_update_rate(), minimum);
+				minimum = std::min(target.max_update_rate(), minimum);
 		}
 
 	return minimum;

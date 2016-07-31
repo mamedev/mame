@@ -38,7 +38,7 @@ DRIVER_INIT_MEMBER(cybiko_state,cybikoxt)
 
 QUICKLOAD_LOAD_MEMBER( cybiko_state, cybiko )
 {
-	image.fread(m_flash1->get_ptr(), MIN(image.length(), 0x84000));
+	image.fread(m_flash1->get_ptr(), std::min(image.length(), UINT64(0x84000)));
 
 	return IMAGE_INIT_PASS;
 }
@@ -46,7 +46,7 @@ QUICKLOAD_LOAD_MEMBER( cybiko_state, cybiko )
 QUICKLOAD_LOAD_MEMBER( cybiko_state, cybikoxt )
 {
 	address_space &dest = m_maincpu->space(AS_PROGRAM);
-	UINT32 size = MIN(image.length(), RAMDISK_SIZE);
+	UINT32 size = std::min(image.length(), UINT64(RAMDISK_SIZE));
 
 	dynamic_buffer buffer(size);
 	image.fread(&buffer[0], size);

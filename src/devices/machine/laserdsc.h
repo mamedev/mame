@@ -278,7 +278,7 @@ private:
 	void init_disc();
 	void init_video();
 	void init_audio();
-	void add_and_clamp_track(INT32 delta) { m_curtrack += delta; m_curtrack = MAX(m_curtrack, 1); m_curtrack = MIN(m_curtrack, m_maxtrack - 1); }
+	void add_and_clamp_track(INT32 delta) { m_curtrack += delta; m_curtrack = std::max(m_curtrack, 1); m_curtrack = std::min(m_curtrack, INT32(m_maxtrack) - 1); }
 	void fillbitmap_yuy16(bitmap_yuy16 &bitmap, UINT8 yval, UINT8 cr, UINT8 cb);
 	void update_slider_pos();
 	void vblank_state_changed(screen_device &screen, bool vblank_state);

@@ -2148,7 +2148,7 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 			unicode_char ch = field.keyboard_code(which);
 			if (ch == 0)
 				break;
-			name.append(string_format("%-*s ", MAX(SPACE_COUNT - 1, 0), field.manager().natkeyboard().key_name(ch)));
+			name.append(string_format("%-*s ", std::max(SPACE_COUNT - 1, 0), field.manager().natkeyboard().key_name(ch)));
 		}
 
 		// trim extra spaces
@@ -4330,7 +4330,7 @@ void analog_field::frame_update(running_machine &machine)
 				rawvalue = apply_scale(rawvalue - INPUT_ABSOLUTE_MIN, m_positionalscale) * INPUT_RELATIVE_PER_PIXEL + m_minimum;
 
 				// clamp the high value so it does not roll over
-				rawvalue = MIN(rawvalue, m_maximum);
+				rawvalue = std::min(rawvalue, m_maximum);
 				m_accum = apply_inverse_sensitivity(rawvalue);
 			}
 			else

@@ -1493,7 +1493,7 @@ void sms_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &
 
 	/* Plot positions relative to visarea minimum values */
 	const int plot_min_x = cliprect.min_x - visarea.min_x;
-	const int plot_max_x = MIN(cliprect.max_x - visarea.min_x, 159); // avoid m_line_buffer overflow.
+	const int plot_max_x = std::min(cliprect.max_x - visarea.min_x, 159); // avoid m_line_buffer overflow.
 	const int plot_min_y = cliprect.min_y - visarea.min_y;
 	const int plot_max_y = cliprect.max_y - visarea.min_y;
 
@@ -1521,7 +1521,7 @@ void sms_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &
 
 	for (int plot_y_group = plot_y_first_group; plot_y_group <= plot_max_y; plot_y_group += 2)
 	{
-		const int y_max_i = MIN(1, plot_max_y - plot_y_group);
+		const int y_max_i = std::min(1, plot_max_y - plot_y_group);
 
 		for (int y_i = y_min_i; y_i <= y_max_i; y_i++)
 		{
@@ -1530,7 +1530,7 @@ void sms_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &
 			const int sms_max_y2 = sms_y + y_i + 2;
 
 			/* Process lines, but skip those already processed before */
-			for (sms_y2 = MAX(sms_min_y2, sms_y2); sms_y2 <= sms_max_y2; sms_y2++)
+			for (sms_y2 = std::max(sms_min_y2, sms_y2); sms_y2 <= sms_max_y2; sms_y2++)
 			{
 				int *combineline_buffer =  m_line_buffer.get() + (sms_y2 & 0x03) * 160;
 
@@ -1544,7 +1544,7 @@ void sms_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &
 					/* Do horizontal scaling */
 					for (int plot_x_group = plot_x_first_group; plot_x_group <= plot_max_x; plot_x_group += 2)
 					{
-						const int x_max_i = MIN(1, plot_max_x - plot_x_group);
+						const int x_max_i = std::min(1, plot_max_x - plot_x_group);
 
 						for (int x_i = x_min_i; x_i <= x_max_i; x_i++)
 						{

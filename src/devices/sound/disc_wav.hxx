@@ -1579,13 +1579,13 @@ DISCRETE_STEP(dss_inverter_osc)
 			vG2 = this->tf(vG3);
 			break;
 		case IS_TYPE4:
-			vI  = MIN(I_ENABLE(), vI + 0.7);
+			vI  = std::min(I_ENABLE(), vI + 0.7);
 			vG1 = 0;
 			vG3 = this->tf(vI);
 			vG2 = this->tf(vG3);
 			break;
 		case IS_TYPE5:
-			vI  = MAX(I_ENABLE(), vI - 0.7);
+			vI  = std::max(I_ENABLE(), vI - 0.7);
 			vG1 = 0;
 			vG3 = this->tf(vI);
 			vG2 = this->tf(vG3);

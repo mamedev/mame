@@ -18,6 +18,9 @@
 #include <mutex>
 #include <queue>
 #include <string>
+#undef min
+#undef max
+#include <algorithm>
 
 
 //============================================================
@@ -614,14 +617,14 @@ inline static INT32 normalize_absolute_axis(INT32 raw, INT32 rawmin, INT32 rawma
 	if (raw >= center)
 	{
 		INT32 result = (INT64)(raw - center) * (INT64)INPUT_ABSOLUTE_MAX / (INT64)(rawmax - center);
-		return MIN(result, INPUT_ABSOLUTE_MAX);
+		return std::min(result, INPUT_ABSOLUTE_MAX);
 	}
 
 	// below center
 	else
 	{
 		INT32 result = -((INT64)(center - raw) * (INT64)-INPUT_ABSOLUTE_MIN / (INT64)(center - rawmin));
-		return MAX(result, INPUT_ABSOLUTE_MIN);
+		return std::max(result, INPUT_ABSOLUTE_MIN);
 	}
 }
 

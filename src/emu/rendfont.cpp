@@ -482,8 +482,8 @@ bool render_font::load_cached_bdf(const char *filename)
 	m_rawdata.resize(m_rawsize + 1);
 
 	// read the first chunk
-	UINT32 bytes = file.read(&m_rawdata[0], MIN(CACHED_BDF_HASH_SIZE, m_rawsize));
-	if (bytes != MIN(CACHED_BDF_HASH_SIZE, m_rawsize))
+	UINT32 bytes = file.read(&m_rawdata[0], std::min(CACHED_BDF_HASH_SIZE, m_rawsize));
+	if (bytes != std::min(CACHED_BDF_HASH_SIZE, m_rawsize))
 		return false;
 
 	// has the chunk

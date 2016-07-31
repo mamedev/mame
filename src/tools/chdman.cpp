@@ -268,7 +268,7 @@ public:
 		: m_toc(nullptr),
 			m_file(file),
 			m_offset(offset),
-			m_maxoffset(MIN(maxoffset, file.logical_bytes())) { }
+			m_maxoffset(std::min(maxoffset, file.logical_bytes())) { }
 
 	// read interface
 	virtual UINT32 read_data(void *dest, UINT64 offset, UINT32 length)
@@ -469,7 +469,7 @@ public:
 				UINT32 samples = (UINT64(m_info.rate) * UINT64(effframe + 1) * UINT64(1000000) + m_info.fps_times_1million - 1) / UINT64(m_info.fps_times_1million) - first_sample;
 
 				// loop over channels and read the samples
-				int channels = MIN(m_info.channels, ARRAY_LENGTH(m_audio));
+				int channels = std::min(m_info.channels, UINT32(ARRAY_LENGTH(m_audio)));
 				EQUIVALENT_ARRAY(m_audio, INT16 *) samplesptr;
 				for (int chnum = 0; chnum < channels; chnum++)
 				{
@@ -509,7 +509,7 @@ public:
 				// copy to the destination
 				UINT64 start_offset = UINT64(framenum) * UINT64(m_info.bytes_per_frame);
 				UINT64 end_offset = start_offset + m_info.bytes_per_frame;
-				UINT32 bytes_to_copy = MIN(length_remaining, end_offset - offset);
+				UINT32 bytes_to_copy = std::min(length_remaining, UINT32(end_offset - offset));
 				memcpy(dest, &m_rawdata[offset - start_offset], bytes_to_copy);
 
 				// advance
@@ -1449,7 +1449,7 @@ static void do_info(parameters_t &params)
 		UINT32 count = buffer.size();
 		// limit output to 60 characters of metadata if not verbose
 		if (!verbose)
-			count = MIN(60, count);
+			count = std::min(60U, count);
 		for (int chnum = 0; chnum < count; chnum++)
 			printf("%c", isprint(UINT8(buffer[chnum])) ? buffer[chnum] : '.');
 		printf("\n");
@@ -1544,7 +1544,7 @@ static void do_verify(parameters_t &params)
 		progress(false, "Verifying, %.1f%% complete... \r", 100.0 * double(offset) / double(input_chd.logical_bytes()));
 
 		// determine how much to read
-		UINT32 bytes_to_read = MIN((UINT32)buffer.size(), input_chd.logical_bytes() - offset);
+		UINT32 bytes_to_read = std::min(UINT32(buffer.size()), UINT32(input_chd.logical_bytes() - offset));
 		chd_error err = input_chd.read_bytes(offset, &buffer[0], bytes_to_read);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error reading CHD file (%s): %s", params.find(OPTION_INPUT)->second->c_str(), chd_file::error_string(err));
@@ -1721,7 +1721,7 @@ static void do_create_hd(parameters_t &params)
 	}
 
 	// process hunk size (needs to know sector_size)
-	UINT32 hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : MAX((4096 / sector_size) * sector_size, sector_size);
+	UINT32 hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : std::max((4096 / sector_size) * sector_size, sector_size);
 	parse_hunk_size(params, sector_size, hunk_size);
 
 	// process input start/end (needs to know hunk_size)
@@ -2284,7 +2284,7 @@ static void do_extract_raw(parameters_t &params)
 			progress(false, "Extracting, %.1f%% complete... \r", 100.0 * double(offset - input_start) / double(input_end - input_start));
 
 			// determine how much to read
-			UINT32 bytes_to_read = MIN((UINT32)buffer.size(), input_end - offset);
+			UINT32 bytes_to_read = std::min(UINT32(buffer.size()), UINT32(input_end - offset));
 			chd_error err = input_chd.read_bytes(offset, &buffer[0], bytes_to_read);
 			if (err != CHDERR_NONE)
 				report_error(1, "Error reading CHD file (%s): %s", params.find(OPTION_INPUT)->second->c_str(), chd_file::error_string(err));
@@ -2609,7 +2609,7 @@ static void do_extract_ld(parameters_t &params)
 		avconfig.actsamples = &actsamples;
 		for (int chnum = 0; chnum < ARRAY_LENGTH(audio_data); chnum++)
 		{
-			audio_data[chnum].resize(MAX(1,max_samples_per_frame));
+			audio_data[chnum].resize(std::max(1U,max_samples_per_frame));
 			avconfig.audio[chnum] = &audio_data[chnum][0];
 		}
 

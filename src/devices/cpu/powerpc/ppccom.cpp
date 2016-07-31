@@ -409,7 +409,7 @@ inline void ppc_device::set_timebase(UINT64 newtb)
 inline UINT32 ppc_device::get_decrementer()
 {
 	INT64 cycles_until_zero = m_dec_zero_cycles - total_cycles();
-	cycles_until_zero = MAX(cycles_until_zero, 0);
+	cycles_until_zero = std::max(cycles_until_zero, INT64(0));
 
 	if (!m_tb_divisor)
 	{

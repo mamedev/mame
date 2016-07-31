@@ -447,7 +447,7 @@ void software_list_device::find_approx_matches(const char *name, int matches, co
 			// pick the best match between driver name and description
 			int longpenalty = driver_list::penalty_compare(name, swinfo.longname().c_str());
 			int shortpenalty = driver_list::penalty_compare(name, swinfo.shortname().c_str());
-			int curpenalty = MIN(longpenalty, shortpenalty);
+			int curpenalty = std::min(longpenalty, shortpenalty);
 
 			// insert into the sorted table of matches
 			for (int matchnum = matches - 1; matchnum >= 0; matchnum--)

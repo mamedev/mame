@@ -1611,7 +1611,7 @@ static imgtoolerr_t prodos_read_file_tree(imgtool_image *image, UINT32 *filesize
 	else
 	{
 		/* this is a leaf block */
-		bytes_to_write = MIN(*filesize, sizeof(buffer));
+		bytes_to_write = std::min(size_t(*filesize), sizeof(buffer));
 		stream_write(destf, buffer, bytes_to_write);
 		*filesize -= bytes_to_write;
 	}
@@ -1662,7 +1662,7 @@ static imgtoolerr_t prodos_write_file_tree(imgtool_image *image, UINT32 *filesiz
 	else
 	{
 		/* this is a leaf block */
-		bytes_to_read = MIN(*filesize, sizeof(buffer));
+		bytes_to_read = std::min(size_t(*filesize), sizeof(buffer));
 		stream_read(sourcef, buffer, bytes_to_read);
 		*filesize -= bytes_to_read;
 

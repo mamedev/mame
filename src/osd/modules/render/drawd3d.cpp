@@ -19,7 +19,9 @@
 #include "window.h"
 #include "drawd3d.h"
 #include "modules/render/d3d/d3dhlsl.h"
-
+#undef min
+#undef max
+#include <algorithm>
 
 //============================================================
 //  TYPE DEFINITIONS
@@ -1993,7 +1995,7 @@ texture_info::texture_info(d3d_texture_manager *manager, const render_texinfo* t
 		D3DFORMAT format;
 		DWORD usage = m_texture_manager->is_dynamic_supported() ? D3DUSAGE_DYNAMIC : 0;
 		D3DPOOL pool = m_texture_manager->is_dynamic_supported() ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
-		int maxdim = MAX(m_renderer->get_presentation()->BackBufferWidth, m_renderer->get_presentation()->BackBufferHeight);
+		int maxdim = std::max(m_renderer->get_presentation()->BackBufferWidth, m_renderer->get_presentation()->BackBufferHeight);
 
 		// pick the format
 		if (PRIMFLAG_GET_TEXFORMAT(flags) == TEXFORMAT_YUY16)

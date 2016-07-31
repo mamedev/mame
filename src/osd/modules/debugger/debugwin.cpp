@@ -20,6 +20,8 @@
 #include "win/memorywininfo.h"
 #include "win/pointswininfo.h"
 #include "win/uimetrics.h"
+#undef min
+#undef max
 
 #include "emu.h"
 #include "debugger.h"

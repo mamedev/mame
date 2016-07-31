@@ -16,6 +16,8 @@
 #include <windows.h>
 #include <tchar.h>
 #undef interface
+#undef min
+#undef max
 
 #include <mutex>
 #include <functional>

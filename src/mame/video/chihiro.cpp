@@ -3851,18 +3851,18 @@ float nv2a_renderer::combiner_map_input_function(int code, float value)
 
 	switch (code) {
 	case 0:
-		return MAX(0.0f, value);
+		return std::max(0.0f, value);
 	case 1:
-		t = MAX(value, 0.0f);
-		return 1.0f - MIN(t, 1.0f);
+		t = std::max(value, 0.0f);
+		return 1.0f - std::min(t, 1.0f);
 	case 2:
-		return 2.0f * MAX(0.0f, value) - 1.0f;
+		return 2.0f * std::max(0.0f, value) - 1.0f;
 	case 3:
-		return -2.0f * MAX(0.0f, value) + 1.0f;
+		return -2.0f * std::max(0.0f, value) + 1.0f;
 	case 4:
-		return MAX(0.0f, value) - 0.5f;
+		return std::max(0.0f, value) - 0.5f;
 	case 5:
-		return -MAX(0.0f, value) + 0.5f;
+		return -std::max(0.0f, value) + 0.5f;
 	case 6:
 		return value;
 	case 7:
@@ -3880,37 +3880,37 @@ void nv2a_renderer::combiner_map_input_function3(int code, float *data)
 
 	switch (code) {
 	case 0:
-		data[0] = MAX(0.0f, data[0]);
-		data[1] = MAX(0.0f, data[1]);
-		data[2] = MAX(0.0f, data[2]);
+		data[0] = std::max(0.0f, data[0]);
+		data[1] = std::max(0.0f, data[1]);
+		data[2] = std::max(0.0f, data[2]);
 		break;
 	case 1:
-		t = MAX(data[0], 0.0f);
-		data[0] = 1.0f - MIN(t, 1.0f);
-		t = MAX(data[1], 0.0f);
-		data[1] = 1.0f - MIN(t, 1.0f);
-		t = MAX(data[2], 0.0f);
-		data[2] = 1.0f - MIN(t, 1.0f);
+		t = std::max(data[0], 0.0f);
+		data[0] = 1.0f - std::min(t, 1.0f);
+		t = std::max(data[1], 0.0f);
+		data[1] = 1.0f - std::min(t, 1.0f);
+		t = std::max(data[2], 0.0f);
+		data[2] = 1.0f - std::min(t, 1.0f);
 		break;
 	case 2:
-		data[0] = 2.0f * MAX(0.0f, data[0]) - 1.0f;
-		data[1] = 2.0f * MAX(0.0f, data[1]) - 1.0f;
-		data[2] = 2.0f * MAX(0.0f, data[2]) - 1.0f;
+		data[0] = 2.0f * std::max(0.0f, data[0]) - 1.0f;
+		data[1] = 2.0f * std::max(0.0f, data[1]) - 1.0f;
+		data[2] = 2.0f * std::max(0.0f, data[2]) - 1.0f;
 		break;
 	case 3:
-		data[0] = -2.0f * MAX(0.0f, data[0]) + 1.0f;
-		data[1] = -2.0f * MAX(0.0f, data[1]) + 1.0f;
-		data[2] = -2.0f * MAX(0.0f, data[2]) + 1.0f;
+		data[0] = -2.0f * std::max(0.0f, data[0]) + 1.0f;
+		data[1] = -2.0f * std::max(0.0f, data[1]) + 1.0f;
+		data[2] = -2.0f * std::max(0.0f, data[2]) + 1.0f;
 		break;
 	case 4:
-		data[0] = MAX(0.0f, data[0]) - 0.5f;
-		data[1] = MAX(0.0f, data[1]) - 0.5f;
-		data[2] = MAX(0.0f, data[2]) - 0.5f;
+		data[0] = std::max(0.0f, data[0]) - 0.5f;
+		data[1] = std::max(0.0f, data[1]) - 0.5f;
+		data[2] = std::max(0.0f, data[2]) - 0.5f;
 		break;
 	case 5:
-		data[0] = -MAX(0.0f, data[0]) + 0.5f;
-		data[1] = -MAX(0.0f, data[1]) + 0.5f;
-		data[2] = -MAX(0.0f, data[2]) + 0.5f;
+		data[0] = -std::max(0.0f, data[0]) + 0.5f;
+		data[1] = -std::max(0.0f, data[1]) + 0.5f;
+		data[2] = -std::max(0.0f, data[2]) + 0.5f;
 		break;
 	case 6:
 		return;
@@ -4088,13 +4088,13 @@ void nv2a_renderer::combiner_map_final_input()
 	combiner.variable_EF[1] = combiner.variable_E[1] * combiner.variable_F[1];
 	combiner.variable_EF[2] = combiner.variable_E[2] * combiner.variable_F[2];
 	// sumclamp
-	combiner.variable_sumclamp[0] = MAX(0, combiner.register_spare0[0]) + MAX(0, combiner.register_secondarycolor[0]);
-	combiner.variable_sumclamp[1] = MAX(0, combiner.register_spare0[1]) + MAX(0, combiner.register_secondarycolor[1]);
-	combiner.variable_sumclamp[2] = MAX(0, combiner.register_spare0[2]) + MAX(0, combiner.register_secondarycolor[2]);
+	combiner.variable_sumclamp[0] = std::max(0.0f, combiner.register_spare0[0]) + std::max(0.0f, combiner.register_secondarycolor[0]);
+	combiner.variable_sumclamp[1] = std::max(0.0f, combiner.register_spare0[1]) + std::max(0.0f, combiner.register_secondarycolor[1]);
+	combiner.variable_sumclamp[2] = std::max(0.0f, combiner.register_spare0[2]) + std::max(0.0f, combiner.register_secondarycolor[2]);
 	if (combiner.final.color_sum_clamp != 0) {
-		combiner.variable_sumclamp[0] = MIN(combiner.variable_sumclamp[0], 1.0f);
-		combiner.variable_sumclamp[1] = MIN(combiner.variable_sumclamp[1], 1.0f);
-		combiner.variable_sumclamp[2] = MIN(combiner.variable_sumclamp[2], 1.0f);
+		combiner.variable_sumclamp[0] = std::min(combiner.variable_sumclamp[0], 1.0f);
+		combiner.variable_sumclamp[1] = std::min(combiner.variable_sumclamp[1], 1.0f);
+		combiner.variable_sumclamp[2] = std::min(combiner.variable_sumclamp[2], 1.0f);
 	}
 	// A
 	pv = combiner_map_input_select3(combiner.final.mapin_rgbA_input);
@@ -4142,9 +4142,9 @@ void nv2a_renderer::combiner_final_output()
 	combiner.output[0] = combiner.variable_A[0] * combiner.variable_B[0] + (1.0f - combiner.variable_A[0])*combiner.variable_C[0] + combiner.variable_D[0];
 	combiner.output[1] = combiner.variable_A[1] * combiner.variable_B[1] + (1.0f - combiner.variable_A[1])*combiner.variable_C[1] + combiner.variable_D[1];
 	combiner.output[2] = combiner.variable_A[2] * combiner.variable_B[2] + (1.0f - combiner.variable_A[2])*combiner.variable_C[2] + combiner.variable_D[2];
-	combiner.output[0] = MIN(combiner.output[0], 1.0f);
-	combiner.output[1] = MIN(combiner.output[1], 1.0f);
-	combiner.output[2] = MIN(combiner.output[2], 1.0f);
+	combiner.output[0] = std::min(combiner.output[0], 1.0f);
+	combiner.output[1] = std::min(combiner.output[1], 1.0f);
+	combiner.output[2] = std::min(combiner.output[2], 1.0f);
 	// a
 	combiner.output[3] = combiner_map_input_function(combiner.final.mapin_aG_mapping, combiner.variable_G);
 }
@@ -4225,26 +4225,26 @@ void nv2a_renderer::combiner_compute_rgb_outputs(int stage_number)
 		m = 0;
 		combiner_function_AB(combiner.function_RGBop1);
 	}
-	combiner.function_RGBop1[0] = MAX(MIN((combiner.function_RGBop1[0] + biasrgb) * scalergb, 1.0f), -1.0f);
-	combiner.function_RGBop1[1] = MAX(MIN((combiner.function_RGBop1[1] + biasrgb) * scalergb, 1.0f), -1.0f);
-	combiner.function_RGBop1[2] = MAX(MIN((combiner.function_RGBop1[2] + biasrgb) * scalergb, 1.0f), -1.0f);
+	combiner.function_RGBop1[0] = std::max(std::min((combiner.function_RGBop1[0] + biasrgb) * scalergb, 1.0f), -1.0f);
+	combiner.function_RGBop1[1] = std::max(std::min((combiner.function_RGBop1[1] + biasrgb) * scalergb, 1.0f), -1.0f);
+	combiner.function_RGBop1[2] = std::max(std::min((combiner.function_RGBop1[2] + biasrgb) * scalergb, 1.0f), -1.0f);
 	if (combiner.stage[n].mapout_rgbCD_dotproduct) {
 		m = m | 1;
 		combiner_function_CdotD(combiner.function_RGBop2);
 	}
 	else
 		combiner_function_CD(combiner.function_RGBop2);
-	combiner.function_RGBop2[0] = MAX(MIN((combiner.function_RGBop2[0] + biasrgb) * scalergb, 1.0f), -1.0f);
-	combiner.function_RGBop2[1] = MAX(MIN((combiner.function_RGBop2[1] + biasrgb) * scalergb, 1.0f), -1.0f);
-	combiner.function_RGBop2[2] = MAX(MIN((combiner.function_RGBop2[2] + biasrgb) * scalergb, 1.0f), -1.0f);
+	combiner.function_RGBop2[0] = std::max(std::min((combiner.function_RGBop2[0] + biasrgb) * scalergb, 1.0f), -1.0f);
+	combiner.function_RGBop2[1] = std::max(std::min((combiner.function_RGBop2[1] + biasrgb) * scalergb, 1.0f), -1.0f);
+	combiner.function_RGBop2[2] = std::max(std::min((combiner.function_RGBop2[2] + biasrgb) * scalergb, 1.0f), -1.0f);
 	if (m == 0) {
 		if (combiner.stage[n].mapout_rgb_muxsum)
 			combiner_function_ABmuxCD(combiner.function_RGBop3);
 		else
 			combiner_function_ABsumCD(combiner.function_RGBop3);
-		combiner.function_RGBop3[0] = MAX(MIN((combiner.function_RGBop3[0] + biasrgb) * scalergb, 1.0f), -1.0f);
-		combiner.function_RGBop3[1] = MAX(MIN((combiner.function_RGBop3[1] + biasrgb) * scalergb, 1.0f), -1.0f);
-		combiner.function_RGBop3[2] = MAX(MIN((combiner.function_RGBop3[2] + biasrgb) * scalergb, 1.0f), -1.0f);
+		combiner.function_RGBop3[0] = std::max(std::min((combiner.function_RGBop3[0] + biasrgb) * scalergb, 1.0f), -1.0f);
+		combiner.function_RGBop3[1] = std::max(std::min((combiner.function_RGBop3[1] + biasrgb) * scalergb, 1.0f), -1.0f);
+		combiner.function_RGBop3[2] = std::max(std::min((combiner.function_RGBop3[2] + biasrgb) * scalergb, 1.0f), -1.0f);
 	}
 }
 
@@ -4273,9 +4273,9 @@ void nv2a_renderer::combiner_compute_a_outputs(int stage_number)
 		break;
 	}
 	combiner.function_Aop1 = combiner.variable_A[3] * combiner.variable_B[3];
-	combiner.function_Aop1 = MAX(MIN((combiner.function_Aop1 + biasa) * scalea, 1.0f), -1.0f);
+	combiner.function_Aop1 = std::max(std::min((combiner.function_Aop1 + biasa) * scalea, 1.0f), -1.0f);
 	combiner.function_Aop2 = combiner.variable_C[3] * combiner.variable_D[3];
-	combiner.function_Aop2 = MAX(MIN((combiner.function_Aop2 + biasa) * scalea, 1.0f), -1.0f);
+	combiner.function_Aop2 = std::max(std::min((combiner.function_Aop2 + biasa) * scalea, 1.0f), -1.0f);
 	if (combiner.stage[n].mapout_a_muxsum) {
 		if (combiner.register_spare0[3] >= 0.5f)
 			combiner.function_Aop3 = combiner.variable_A[3] * combiner.variable_B[3];
@@ -4284,7 +4284,7 @@ void nv2a_renderer::combiner_compute_a_outputs(int stage_number)
 	}
 	else
 		combiner.function_Aop3 = combiner.variable_A[3] * combiner.variable_B[3] + combiner.variable_C[3] * combiner.variable_D[3];
-	combiner.function_Aop3 = MAX(MIN((combiner.function_Aop3 + biasa) * scalea, 1.0f), -1.0f);
+	combiner.function_Aop3 = std::max(std::min((combiner.function_Aop3 + biasa) * scalea, 1.0f), -1.0f);
 }
 
 void nv2a_renderer::vblank_callback(screen_device &screen, bool state)

@@ -350,7 +350,7 @@ int stream_seek(imgtool_stream *s, INT64 pos, int where)
 	if (pos < 0)
 		s->position = 0;
 	else
-		s->position = MIN(size, pos);
+		s->position = std::min(size, UINT64(pos));
 
 	if (s->position < pos)
 		stream_fill(s, '\0', pos - s->position);
@@ -373,7 +373,7 @@ UINT64 stream_transfer(imgtool_stream *dest, imgtool_stream *source, UINT64 sz)
 	UINT64 readsz;
 	char buf[1024];
 
-	while(sz && (readsz = stream_read(source, buf, MIN(sz, sizeof(buf)))))
+	while(sz && (readsz = stream_read(source, buf, std::min(sz, sizeof(buf)))))
 	{
 		stream_write(dest, buf, readsz);
 		sz -= readsz;
@@ -444,12 +444,12 @@ UINT64 stream_fill(imgtool_stream *f, unsigned char b, UINT64 sz)
 	char buf[1024];
 
 	outsz = 0;
-	memset(buf, b, MIN(sz, sizeof(buf)));
+	memset(buf, b, std::min(sz, sizeof(buf)));
 
 	while(sz)
 	{
-		outsz += stream_write(f, buf, MIN(sz, sizeof(buf)));
-		sz -= MIN(sz, sizeof(buf));
+		outsz += stream_write(f, buf, std::min(sz, sizeof(buf)));
+		sz -= std::min(sz, sizeof(buf));
 	}
 	return outsz;
 }

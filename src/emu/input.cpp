@@ -863,7 +863,7 @@ input_item_id input_device::add_item(const char *name, input_item_id itemid, ite
 	}
 
 	// assign the new slot and update the maximum
-	m_maxitem = MAX(m_maxitem, itemid);
+	m_maxitem = std::max(m_maxitem, itemid);
 	return itemid;
 }
 
@@ -986,7 +986,7 @@ input_device *input_class::add_device(int devindex, const char *name, void *inte
 	m_device[devindex] = std::make_unique<input_device>(*this, devindex, name, internal);
 
 	// update the maximum index found
-	m_maxindex = MAX(m_maxindex, devindex);
+	m_maxindex = std::max(m_maxindex, devindex);
 
 	osd_printf_verbose("Input: Adding %s #%d: %s\n", (*devclass_string_table)[m_devclass], devindex, name);
 	return m_device[devindex].get();
@@ -2363,8 +2363,8 @@ INT32 input_device_absolute_item::read_as_absolute(input_item_modifier modifier)
 
 	// positive/negative: scale to full axis
 	if (modifier == ITEM_MODIFIER_POS)
-		result = MAX(result, 0) * 2 + INPUT_ABSOLUTE_MIN;
+		result = std::max(result, 0) * 2 + INPUT_ABSOLUTE_MIN;
 	if (modifier == ITEM_MODIFIER_NEG)
-		result = MAX(-result, 0) * 2 + INPUT_ABSOLUTE_MIN;
+		result = std::max(-result, 0) * 2 + INPUT_ABSOLUTE_MIN;
 	return result;
 }

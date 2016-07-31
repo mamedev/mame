@@ -150,7 +150,7 @@ void mac_state::mac_install_memory(offs_t memory_begin, offs_t memory_end,
 	address_space& space = m_maincpu->space(AS_PROGRAM);
 	offs_t memory_mirror;
 
-	memory_size = MIN(memory_size, (memory_end + 1 - memory_begin));
+	memory_size = std::min(memory_size, (memory_end + 1 - memory_begin));
 	memory_mirror = (memory_end - memory_begin) & ~(memory_size - 1);
 
 	if (!is_rom)

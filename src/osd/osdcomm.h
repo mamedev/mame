@@ -111,15 +111,6 @@ using unicode_char = std::uint32_t;
     FUNDAMENTAL MACROS
 ***************************************************************************/
 
-/* Standard MIN/MAX macros */
-#ifndef MIN
-#define MIN(x,y)            ((x) < (y) ? (x) : (y))
-#endif
-#ifndef MAX
-#define MAX(x,y)            ((x) > (y) ? (x) : (y))
-#endif
-
-
 /* U64 and S64 are used to wrap long integer constants. */
 #if defined(__GNUC__) || defined(_MSC_VER)
 #define U64(val) val##ULL
@@ -131,9 +122,20 @@ using unicode_char = std::uint32_t;
 
 
 /* Concatenate/extract 32-bit halves of 64-bit values */
-#define CONCAT_64(hi,lo)    (((UINT64)(hi) << 32) | (UINT32)(lo))
-#define EXTRACT_64HI(val)   ((UINT32)((val) >> 32))
-#define EXTRACT_64LO(val)   ((UINT32)(val))
+inline UINT64 concat_64(UINT32 hi, UINT32 lo) 
+{
+    return (UINT64(hi) << 32) | UINT32(lo);
+}
+
+inline UINT32 extract_64hi(UINT64 val) 
+{
+    return UINT32(val >> 32);
+}
+
+inline UINT32 extract_64lo(UINT64 val) 
+{
+    return UINT32(val);
+}
 
 // Highly useful template for compile-time knowledge of an array size
 template <typename T, size_t N> constexpr inline size_t ARRAY_LENGTH(T (&)[N]) { return N;}
@@ -147,27 +149,29 @@ template <typename T, typename U, std::size_t N> struct equivalent_array<T, U[N]
 template <typename T, typename U> using equivalent_array_t = typename equivalent_array<T, U>::type;
 #define EQUIVALENT_ARRAY(a, T) equivalent_array_t<T, std::remove_reference_t<decltype(a)> >
 
-
 /* Macros for normalizing data into big or little endian formats */
-#define FLIPENDIAN_INT16(x) (((((UINT16) (x)) >> 8) | ((x) << 8)) & 0xffff)
-#define FLIPENDIAN_INT32(x) ((((UINT32) (x)) << 24) | (((UINT32) (x)) >> 24) | \
-	(( ((UINT32) (x)) & 0x0000ff00) << 8) | (( ((UINT32) (x)) & 0x00ff0000) >> 8))
-#define FLIPENDIAN_INT64(x) \
-	(                                               \
-		(((((UINT64) (x)) >> 56) & ((UINT64) 0xFF)) <<  0)  |   \
-		(((((UINT64) (x)) >> 48) & ((UINT64) 0xFF)) <<  8)  |   \
-		(((((UINT64) (x)) >> 40) & ((UINT64) 0xFF)) << 16)  |   \
-		(((((UINT64) (x)) >> 32) & ((UINT64) 0xFF)) << 24)  |   \
-		(((((UINT64) (x)) >> 24) & ((UINT64) 0xFF)) << 32)  |   \
-		(((((UINT64) (x)) >> 16) & ((UINT64) 0xFF)) << 40)  |   \
-		(((((UINT64) (x)) >>  8) & ((UINT64) 0xFF)) << 48)  |   \
-		(((((UINT64) (x)) >>  0) & ((UINT64) 0xFF)) << 56)      \
-	)
+inline UINT16 flipendian_int16( UINT16 val ) 
+{
+    return (val << 8) | (val >> 8 );
+}
+
+inline UINT32 flipendian_int32( UINT32 val )
+{
+    val = ((val << 8) & 0xFF00FF00 ) | ((val >> 8) & 0xFF00FF ); 
+    return (val << 16) | (val >> 16);
+}
+
+inline UINT64 flipendian_int64( UINT64 val )
+{
+    val = ((val << 8) & U64(0xFF00FF00FF00FF00) ) | ((val >> 8) & U64(0x00FF00FF00FF00FF) );
+    val = ((val << 16) & U64(0xFFFF0000FFFF0000) ) | ((val >> 16) & U64(0x0000FFFF0000FFFF) );
+    return (val << 32) | (val >> 32);
+}	
 
 #ifdef LSB_FIRST
-#define BIG_ENDIANIZE_INT16(x)      (FLIPENDIAN_INT16(x))
-#define BIG_ENDIANIZE_INT32(x)      (FLIPENDIAN_INT32(x))
-#define BIG_ENDIANIZE_INT64(x)      (FLIPENDIAN_INT64(x))
+#define BIG_ENDIANIZE_INT16(x)      (flipendian_int16(x))
+#define BIG_ENDIANIZE_INT32(x)      (flipendian_int32(x))
+#define BIG_ENDIANIZE_INT64(x)      (flipendian_int64(x))
 #define LITTLE_ENDIANIZE_INT16(x)   (x)
 #define LITTLE_ENDIANIZE_INT32(x)   (x)
 #define LITTLE_ENDIANIZE_INT64(x)   (x)
@@ -175,9 +179,9 @@ template <typename T, typename U> using equivalent_array_t = typename equivalent
 #define BIG_ENDIANIZE_INT16(x)      (x)
 #define BIG_ENDIANIZE_INT32(x)      (x)
 #define BIG_ENDIANIZE_INT64(x)      (x)
-#define LITTLE_ENDIANIZE_INT16(x)   (FLIPENDIAN_INT16(x))
-#define LITTLE_ENDIANIZE_INT32(x)   (FLIPENDIAN_INT32(x))
-#define LITTLE_ENDIANIZE_INT64(x)   (FLIPENDIAN_INT64(x))
+#define LITTLE_ENDIANIZE_INT16(x)   (flipendian_int16(x))
+#define LITTLE_ENDIANIZE_INT32(x)   (flipendian_int32(x))
+#define LITTLE_ENDIANIZE_INT64(x)   (flipendian_int64(x))
 #endif /* LSB_FIRST */
 
 #ifdef _MSC_VER

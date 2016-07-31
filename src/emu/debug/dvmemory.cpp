@@ -67,7 +67,7 @@ debug_view_memory_source::debug_view_memory_source(const char *name, memory_regi
 		m_length(region.bytes()),
 		m_offsetxor(ENDIAN_VALUE_NE_NNE(region.endianness(), 0, region.bytewidth() - 1)),
 		m_endianness(region.endianness()),
-		m_prefsize(MIN(region.bytewidth(), 8))
+		m_prefsize(std::min(region.bytewidth(), UINT8(8)))
 {
 }
 
@@ -79,7 +79,7 @@ debug_view_memory_source::debug_view_memory_source(const char *name, void *base,
 		m_length(element_size * num_elements),
 		m_offsetxor(0),
 		m_endianness(ENDIANNESS_NATIVE),
-		m_prefsize(MIN(element_size, 8))
+		m_prefsize(std::min(element_size, 8))
 {
 }
 
@@ -556,7 +556,7 @@ void debug_view_memory::recompute()
 			m_bytes_per_chunk *= 2;
 			m_chunks_per_row /= 2;
 		}
-		m_chunks_per_row = MAX(1, m_chunks_per_row);
+		m_chunks_per_row = std::max(UINT32(1), m_chunks_per_row);
 	}
 
 	// recompute the byte offset based on the most recent expression result
@@ -612,8 +612,8 @@ bool debug_view_memory::needs_recompute()
 	{
 		recompute = true;
 		m_topleft.y = (m_expression.value() - m_byte_offset) / m_bytes_per_row;
-		m_topleft.y = MAX(m_topleft.y, 0);
-		m_topleft.y = MIN(m_topleft.y, m_total.y - 1);
+		m_topleft.y = std::max(m_topleft.y, 0);
+		m_topleft.y = std::min(m_topleft.y, m_total.y - 1);
 
 		const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
 		offs_t resultbyte;
@@ -720,8 +720,8 @@ void debug_view_memory::set_cursor_pos(cursor_pos pos)
 	}
 
 	// clamp to the window bounds
-	m_cursor.x = MIN(m_cursor.x, m_total.x);
-	m_cursor.y = MIN(m_cursor.y, m_total.y);
+	m_cursor.x = std::min(m_cursor.x, m_total.x);
+	m_cursor.y = std::min(m_cursor.y, m_total.y);
 
 	// scroll if out of range
 	adjust_visible_x_for_cursor();

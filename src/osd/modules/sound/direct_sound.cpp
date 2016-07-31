@@ -20,6 +20,8 @@
 #undef WINNT
 #include <dsound.h>
 #undef interface
+#undef min
+#undef max
 
 // MAME headers
 #include "emu.h"
@@ -34,6 +36,7 @@
 #include "winmain.h"
 #include "window.h"
 #endif
+#include <algorithm>
 
 //============================================================
 //  DEBUGGING
@@ -163,7 +166,7 @@ private:
 
 			assert(m_bytes1);
 			assert((m_locked1 + m_locked2) >= bytes);
-			memcpy(m_bytes1, data, MIN(m_locked1, bytes));
+			memcpy(m_bytes1, data, std::min(m_locked1, bytes));
 			if (m_locked1 < bytes)
 			{
 				assert(m_bytes2);
@@ -359,7 +362,7 @@ void sound_direct_sound::update_audio_stream(
 void sound_direct_sound::set_mastervolume(int attenuation)
 {
 	// clamp the attenuation to 0-32 range
-	attenuation = MAX(MIN(attenuation, 0), -32);
+	attenuation = std::max(std::min(attenuation, 0), -32);
 
 	// set the master volume
 	if (m_stream_buffer)
@@ -429,7 +432,7 @@ HRESULT sound_direct_sound::dsound_init()
 
 		// compute the buffer size based on the output sample rate
 		DWORD stream_buffer_size = stream_format.nSamplesPerSec * stream_format.nBlockAlign * m_audio_latency / 10;
-		stream_buffer_size = MAX(1024, (stream_buffer_size / 1024) * 1024);
+		stream_buffer_size = std::max(DWORD(1024), (stream_buffer_size / 1024) * 1024);
 
 		LOG(("stream_buffer_size = %u\n", (unsigned)stream_buffer_size));
 

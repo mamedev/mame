@@ -341,16 +341,16 @@ NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryD
 
 	// limit the size to the minimum size
 	NSSize const minimum = [window minSize];
-	windowFrame.size.width = MAX(windowFrame.size.width, minimum.width);
-	windowFrame.size.height = MAX(windowFrame.size.height, minimum.height);
+	windowFrame.size.width = std::max(windowFrame.size.width, minimum.width);
+	windowFrame.size.height = std::max(windowFrame.size.height, minimum.height);
 
 	// limit the size to the main screen size
 	NSRect const available = [[NSScreen mainScreen] visibleFrame];
-	windowFrame.size.width = MIN(windowFrame.size.width, available.size.width);
-	windowFrame.size.height = MIN(windowFrame.size.height, available.size.height);
+	windowFrame.size.width = std::min(windowFrame.size.width, available.size.width);
+	windowFrame.size.height = std::min(windowFrame.size.height, available.size.height);
 
 	// arbitrary additional height limit
-	windowFrame.size.height = MIN(windowFrame.size.height, 320);
+	windowFrame.size.height = std::min(windowFrame.size.height, 320);
 
 	// place it in the bottom right corner and apply
 	windowFrame.origin.x = available.origin.x + available.size.width - windowFrame.size.width;

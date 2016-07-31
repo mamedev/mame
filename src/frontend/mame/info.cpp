@@ -273,7 +273,7 @@ void info_xml_creator::output_one()
 						}
 						else
 						{
-							nplayers = MAX(nplayers, field.player() + 1);
+							nplayers = std::max(nplayers, field.player() + 1);
 							field.set_player(field.player() + player_offset);
 						}
 					}
@@ -1091,7 +1091,7 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 						control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 						control_info[field.player() * CTRL_COUNT + ctrl_type].analog = FALSE;
 					}
-					control_info[field.player() * CTRL_COUNT + ctrl_type].maxbuttons = MAX(control_info[field.player() * CTRL_COUNT + ctrl_type].maxbuttons, field.type() - IPT_BUTTON1 + 1);
+					control_info[field.player() * CTRL_COUNT + ctrl_type].maxbuttons = std::max(control_info[field.player() * CTRL_COUNT + ctrl_type].maxbuttons, field.type() - IPT_BUTTON1 + 1);
 					control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
 					if (!field.optional())
 						control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
@@ -1110,7 +1110,7 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 				case IPT_COIN10:
 				case IPT_COIN11:
 				case IPT_COIN12:
-					ncoin = MAX(ncoin, field.type() - IPT_COIN1 + 1);
+					ncoin = std::max(ncoin, field.type() - IPT_COIN1 + 1);
 					break;
 
 				// track presence of keypads and keyboards
@@ -1202,7 +1202,7 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 			{
 				control_info[i * CTRL_COUNT + j].nbuttons += control_info[i * CTRL_COUNT].nbuttons;
 				control_info[i * CTRL_COUNT + j].reqbuttons += control_info[i * CTRL_COUNT].reqbuttons;
-				control_info[i * CTRL_COUNT + j].maxbuttons = MAX(control_info[i * CTRL_COUNT + j].maxbuttons, control_info[i * CTRL_COUNT].maxbuttons);
+				control_info[i * CTRL_COUNT + j].maxbuttons = std::max(control_info[i * CTRL_COUNT + j].maxbuttons, control_info[i * CTRL_COUNT].maxbuttons);
 
 				memset(&control_info[i * CTRL_COUNT], 0, sizeof(control_info[0]));
 				fix_done = TRUE;

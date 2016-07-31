@@ -148,7 +148,7 @@ void menu_sound_options::custom_render(void *selectedref, float top, float botto
 	ui().draw_text_full(container(), _("Sound Options"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 									mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
-	float maxwidth = MAX(origx2 - origx1, width);
+	float maxwidth = std::max(origx2 - origx1, width);
 
 	// compute our bounds
 	float x1 = 0.5f - 0.5f * maxwidth;

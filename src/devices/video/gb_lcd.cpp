@@ -658,7 +658,7 @@ void gb_lcd_device::update_scanline()
 
 		if (cycles_to_go < 160)
 		{
-			m_end_x = MIN(160 - cycles_to_go, 160);
+			m_end_x = std::min(int(160 - cycles_to_go), 160);
 			/* Draw empty pixels when the background is disabled */
 			if (!(LCDCONT & 0x01))
 			{
@@ -1000,7 +1000,7 @@ void sgb_lcd_device::update_scanline()
 		}
 		if (cycles_to_go < 160)
 		{
-			m_end_x = MIN(160 - cycles_to_go,160);
+			m_end_x = std::min(int(160 - cycles_to_go),160);
 
 			/* if background or screen disabled clear line */
 			if (!(LCDCONT & 0x01))
@@ -1267,7 +1267,7 @@ void cgb_lcd_device::update_scanline()
 
 		if (cycles_to_go < 160)
 		{
-			m_end_x = MIN(160 - cycles_to_go, 160);
+			m_end_x = std::min(int(160 - cycles_to_go), 160);
 			/* Draw empty line when the background is disabled */
 			if (!(LCDCONT & 0x01))
 			{

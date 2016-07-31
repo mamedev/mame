@@ -157,8 +157,8 @@ void cassette_image_device::output(double value)
 	{
 		update();
 
-		value = MIN(value, 1.0);
-		value = MAX(value, -1.0);
+		value = std::min(value, 1.0);
+		value = std::max(value, -1.0);
 
 		m_value = (INT32) (value * 0x7FFFFFFF);
 	}

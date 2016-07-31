@@ -1085,11 +1085,11 @@ WRITE8_MEMBER( tia_video_device::HMP0_w )
 		return;
 
 	/* Check if HMOVE cycles are still being applied */
-	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < MIN( HMOVE_started + 6 + motclkP0 * 4, 7 ) ) {
+	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < std::min( HMOVE_started + 6 + motclkP0 * 4, 7 ) ) {
 		int new_motclkP0 = ( data ^ 0x80 ) >> 4;
 
 		/* Check if new horizontal move can still be applied normally */
-		if ( new_motclkP0 > motclkP0 || curr_x <= MIN( HMOVE_started + 6 + new_motclkP0 * 4, 7 ) ) {
+		if ( new_motclkP0 > motclkP0 || curr_x <= std::min( HMOVE_started + 6 + new_motclkP0 * 4, 7 ) ) {
 			horzP0 -= ( new_motclkP0 - motclkP0 );
 			motclkP0 = new_motclkP0;
 		} else {
@@ -1117,11 +1117,11 @@ WRITE8_MEMBER( tia_video_device::HMP1_w )
 		return;
 
 	/* Check if HMOVE cycles are still being applied */
-	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < MIN( HMOVE_started + 6 + motclkP1 * 4, 7 ) ) {
+	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < std::min( HMOVE_started + 6 + motclkP1 * 4, 7 ) ) {
 		int new_motclkP1 = ( data ^ 0x80 ) >> 4;
 
 		/* Check if new horizontal move can still be applied normally */
-		if ( new_motclkP1 > motclkP1 || curr_x <= MIN( HMOVE_started + 6 + new_motclkP1 * 4, 7 ) ) {
+		if ( new_motclkP1 > motclkP1 || curr_x <= std::min( HMOVE_started + 6 + new_motclkP1 * 4, 7 ) ) {
 			horzP1 -= ( new_motclkP1 - motclkP1 );
 			motclkP1 = new_motclkP1;
 		} else {
@@ -1149,11 +1149,11 @@ WRITE8_MEMBER( tia_video_device::HMM0_w )
 		return;
 
 	/* Check if HMOVE cycles are still being applied */
-	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < MIN( HMOVE_started + 6 + motclkM0 * 4, 7 ) ) {
+	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < std::min( HMOVE_started + 6 + motclkM0 * 4, 7 ) ) {
 		int new_motclkM0 = ( data ^ 0x80 ) >> 4;
 
 		/* Check if new horizontal move can still be applied normally */
-		if ( new_motclkM0 > motclkM0 || curr_x <= MIN( HMOVE_started + 6 + new_motclkM0 * 4, 7 ) ) {
+		if ( new_motclkM0 > motclkM0 || curr_x <= std::min( HMOVE_started + 6 + new_motclkM0 * 4, 7 ) ) {
 			horzM0 -= ( new_motclkM0 - motclkM0 );
 			motclkM0 = new_motclkM0;
 		} else {
@@ -1180,11 +1180,11 @@ WRITE8_MEMBER( tia_video_device::HMM1_w )
 		return;
 
 	/* Check if HMOVE cycles are still being applied */
-	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < MIN( HMOVE_started + 6 + motclkM1 * 4, 7 ) ) {
+	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < std::min( HMOVE_started + 6 + motclkM1 * 4, 7 ) ) {
 		int new_motclkM1 = ( data ^ 0x80 ) >> 4;
 
 		/* Check if new horizontal move can still be applied normally */
-		if ( new_motclkM1 > motclkM1 || curr_x <= MIN( HMOVE_started + 6 + new_motclkM1 * 4, 7 ) ) {
+		if ( new_motclkM1 > motclkM1 || curr_x <= std::min( HMOVE_started + 6 + new_motclkM1 * 4, 7 ) ) {
 			horzM1 -= ( new_motclkM1 - motclkM1 );
 			motclkM1 = new_motclkM1;
 		} else {
@@ -1211,11 +1211,11 @@ WRITE8_MEMBER( tia_video_device::HMBL_w )
 		return;
 
 	/* Check if HMOVE cycles are still being applied */
-	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < MIN( HMOVE_started + 6 + motclkBL * 4, 7 ) ) {
+	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < std::min( HMOVE_started + 6 + motclkBL * 4, 7 ) ) {
 		int new_motclkBL = ( data ^ 0x80 ) >> 4;
 
 		/* Check if new horizontal move can still be applied normally */
-		if ( new_motclkBL > motclkBL || curr_x <= MIN( HMOVE_started + 6 + new_motclkBL * 4, 7 ) ) {
+		if ( new_motclkBL > motclkBL || curr_x <= std::min( HMOVE_started + 6 + new_motclkBL * 4, 7 ) ) {
 			horzBL -= ( new_motclkBL - motclkBL );
 			motclkBL = new_motclkBL;
 		} else {
@@ -1543,7 +1543,7 @@ WRITE8_MEMBER( tia_video_device::CXCLR_w )
 
 
 #define RESXX_APPLY_ACTIVE_HMOVE(HORZ,MOTION,MOTCLK)                                    \
-	if ( curr_x < MIN( HMOVE_started + 6 + 16 * 4, 7 ) ) {                              \
+	if ( curr_x < std::min( HMOVE_started + 6 + 16 * 4, 7 ) ) {                              \
 		int decrements_passed = ( curr_x - ( HMOVE_started + 4 ) ) / 4;                 \
 		HORZ += 8;                                                                      \
 		if ( ( MOTCLK - decrements_passed ) > 0 ) {                                     \

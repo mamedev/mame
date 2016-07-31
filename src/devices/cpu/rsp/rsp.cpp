@@ -615,7 +615,7 @@ void rsp_device::execute_run()
 
 	if( m_sr & ( RSP_STATUS_HALT | RSP_STATUS_BROKE ) )
 	{
-		m_rsp_state->icount = MIN(m_rsp_state->icount, 0);
+		m_rsp_state->icount = std::min(m_rsp_state->icount, 0);
 	}
 
 	while (m_rsp_state->icount > 0)
@@ -651,7 +651,7 @@ void rsp_device::execute_run()
 					case 0x0d:  /* BREAK */
 					{
 						m_sp_set_status_func(0, 0x3, 0xffffffff);
-						m_rsp_state->icount = MIN(m_rsp_state->icount, 1);
+						m_rsp_state->icount = std::min(m_rsp_state->icount, 1);
 						break;
 					}
 					case 0x20:  /* ADD */       if (RDREG) RDVAL = (INT32)(RSVAL + RTVAL); break;
@@ -783,7 +783,7 @@ void rsp_device::execute_run()
 
 		if( m_sr & ( RSP_STATUS_HALT | RSP_STATUS_BROKE ) )
 		{
-			m_rsp_state->icount = MIN(m_rsp_state->icount, 0);
+			m_rsp_state->icount = std::min(m_rsp_state->icount, 0);
 		}
 		/*m_cop2->dump(op);
 		if (((op >> 26) & 0x3f) == 0x3a)

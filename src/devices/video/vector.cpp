@@ -104,10 +104,10 @@ void vector_device::add_point(int x, int y, rgb_t color, int intensity)
 {
 	point *newpoint;
 
-	intensity = MAX(0, MIN(255, intensity));
+	intensity = std::max(0, std::min(255, intensity));
 
-	m_min_intensity = intensity > 0 ? MIN(m_min_intensity, intensity) : m_min_intensity;
-	m_max_intensity = intensity > 0 ? MAX(m_max_intensity, intensity) : m_max_intensity;
+	m_min_intensity = intensity > 0 ? std::min(m_min_intensity, intensity) : m_min_intensity;
+	m_max_intensity = intensity > 0 ? std::max(m_max_intensity, intensity) : m_max_intensity;
 
 	if (vector_options::s_flicker && (intensity > 0))
 	{
@@ -115,7 +115,7 @@ void vector_device::add_point(int x, int y, rgb_t color, int intensity)
 
 		intensity -= (int)(intensity * random * vector_options::s_flicker);
 
-		intensity = MAX(0, MIN(255, intensity));
+		intensity = std::max(0, std::min(255, intensity));
 	}
 
 	newpoint = &m_vector_list[m_vector_index];

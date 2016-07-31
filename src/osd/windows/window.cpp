@@ -51,8 +51,8 @@ using namespace Windows::UI::Core;
 #define MAKE_DI_SCAN(scan, isextended) (scan & 0x7f) | (isextended ? 0x80 : 0x00)
 #define WINOSD(machine) downcast<windows_osd_interface*>(&machine.osd())
 
-// min(x, y) macro interferes with chrono time_point::min()
 #undef min
+#undef max
 
 //============================================================
 //  PARAMETERS
@@ -1464,12 +1464,12 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	m_target->compute_minimum_size(minwidth, minheight);
 
 	// clamp against the absolute minimum
-	propwidth = MAX(propwidth, MIN_WINDOW_DIM);
-	propheight = MAX(propheight, MIN_WINDOW_DIM);
+	propwidth = std::max(propwidth, MIN_WINDOW_DIM);
+	propheight = std::max(propheight, MIN_WINDOW_DIM);
 
 	// clamp against the minimum width and height
-	propwidth = MAX(propwidth, minwidth);
-	propheight = MAX(propheight, minheight);
+	propwidth = std::max(propwidth, minwidth);
+	propheight = std::max(propheight, minheight);
 
 	// clamp against the maximum (fit on one screen for full screen mode)
 	if (fullscreen())
@@ -1484,14 +1484,14 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 
 		// further clamp to the maximum width/height in the window
 		if (m_win_config.width != 0)
-			maxwidth = MIN(maxwidth, m_win_config.width + extrawidth);
+			maxwidth = std::min(maxwidth, m_win_config.width + extrawidth);
 		if (m_win_config.height != 0)
-			maxheight = MIN(maxheight, m_win_config.height + extraheight);
+			maxheight = std::min(maxheight, m_win_config.height + extraheight);
 	}
 
 	// clamp to the maximum
-	propwidth = MIN(propwidth, maxwidth);
-	propheight = MIN(propheight, maxheight);
+	propwidth = std::min(propwidth, maxwidth);
+	propheight = std::min(propheight, maxheight);
 
 	// compute the visible area based on the proposed rectangle
 	m_target->compute_visible_area(propwidth, propheight, pixel_aspect, m_target->orientation(), viswidth, visheight);

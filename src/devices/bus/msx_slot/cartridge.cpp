@@ -260,7 +260,7 @@ int msx_slot_cartridge_device::get_cart_type(UINT8 *rom, UINT32 length)
 		}
 	}
 
-	if (MAX (kon4, kon5) > MAX (asc8, asc16) )
+	if (std::max(kon4, kon5) > std::max(asc8, asc16))
 	{
 		return (kon5 > kon4) ? KONAMI_SCC : KONAMI;
 	}

@@ -199,7 +199,7 @@ UINT32 rom_file_size(const rom_entry *romp)
 			curlength += ROM_GETLENGTH(romp++);
 
 		/* track the maximum length */
-		maxlength = MAX(maxlength, curlength);
+		maxlength = std::max(maxlength, curlength);
 	}
 	while (ROMENTRY_ISRELOAD(romp));
 
@@ -715,7 +715,7 @@ int rom_load_manager::read_rom_data(const rom_entry *parent_region, const rom_en
 		return rom_fread(base, numbytes, parent_region);
 
 	/* use a temporary buffer for complex loads */
-	tempbufsize = MIN(TEMPBUFFER_MAX_SIZE, numbytes);
+	tempbufsize = std::min(TEMPBUFFER_MAX_SIZE, numbytes);
 	dynamic_buffer tempbuf(tempbufsize);
 
 	/* chunky reads for complex loads */

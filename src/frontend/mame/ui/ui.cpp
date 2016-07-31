@@ -2280,7 +2280,7 @@ INT32 mame_ui_manager::slider_flicker(running_machine &machine, void *arg, int i
 INT32 mame_ui_manager::slider_beam_width_min(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
 {
 	if (newval != SLIDER_NOCHANGE)
-		vector_options::s_beam_width_min = MIN((float)newval * 0.01f, vector_options::s_beam_width_max);
+		vector_options::s_beam_width_min = std::min((float)newval * 0.01f, vector_options::s_beam_width_max);
 	if (str != nullptr)
 		*str = string_format(_("%1$1.2f"), vector_options::s_beam_width_min);
 	return floor(vector_options::s_beam_width_min * 100.0f + 0.5f);
@@ -2295,7 +2295,7 @@ INT32 mame_ui_manager::slider_beam_width_min(running_machine &machine, void *arg
 INT32 mame_ui_manager::slider_beam_width_max(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
 {
 	if (newval != SLIDER_NOCHANGE)
-		vector_options::s_beam_width_max = MAX((float)newval * 0.01f, vector_options::s_beam_width_min);
+		vector_options::s_beam_width_max = std::max((float)newval * 0.01f, vector_options::s_beam_width_min);
 	if (str != nullptr)
 		*str = string_format(_("%1$1.2f"), vector_options::s_beam_width_max);
 	return floor(vector_options::s_beam_width_max * 100.0f + 0.5f);

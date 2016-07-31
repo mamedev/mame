@@ -208,18 +208,18 @@ WRITE32_MEMBER( pci_bus_device::write )
 READ64_MEMBER(pci_bus_device::read_64be)
 {
 	UINT64 result = 0;
-	mem_mask = FLIPENDIAN_INT64(mem_mask);
+	mem_mask = flipendian_int64(mem_mask);
 	if (ACCESSING_BITS_0_31)
 		result |= (UINT64)read(space, offset * 2 + 0, mem_mask >> 0) << 0;
 	if (ACCESSING_BITS_32_63)
 		result |= (UINT64)read(space, offset * 2 + 1, mem_mask >> 32) << 32;
-	return FLIPENDIAN_INT64(result);
+	return flipendian_int64(result);
 }
 
 WRITE64_MEMBER(pci_bus_device::write_64be)
 {
-	data = FLIPENDIAN_INT64(data);
-	mem_mask = FLIPENDIAN_INT64(mem_mask);
+	data = flipendian_int64(data);
+	mem_mask = flipendian_int64(mem_mask);
 	if (ACCESSING_BITS_0_31)
 		write(space, offset * 2 + 0, data >> 0, mem_mask >> 0);
 	if (ACCESSING_BITS_32_63)

@@ -484,7 +484,7 @@ class tilemap_t
 	static const logical_index INVALID_LOGICAL_INDEX = (logical_index)~0;
 
 	// maximum index in each array
-	static const int MAX_PEN_TO_FLAGS = 256;
+	static const pen_t MAX_PEN_TO_FLAGS = 256;
 
 protected:
 	// tilemap_manager controlls our allocations

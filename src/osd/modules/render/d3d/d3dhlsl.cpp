@@ -25,7 +25,9 @@
 #include "strconv.h"
 #include "d3dhlsl.h"
 #include "../frontend/mame/ui/slider.h"
-
+#undef min
+#undef max
+#include <algorithm>
 
 //============================================================
 //  PROTOTYPES
@@ -1047,9 +1049,9 @@ rgb_t shaders::apply_color_convolution(rgb_t color)
 	b = chroma[2] * saturation + luma;
 
 	return rgb_t(
-		MAX(0, MIN(255, static_cast<int>(r * 255.0f))),
-		MAX(0, MIN(255, static_cast<int>(g * 255.0f))),
-		MAX(0, MIN(255, static_cast<int>(b * 255.0f))));
+		std::max(0, std::min(255, static_cast<int>(r * 255.0f))),
+		std::max(0, std::min(255, static_cast<int>(g * 255.0f))),
+		std::max(0, std::min(255, static_cast<int>(b * 255.0f))));
 }
 
 int shaders::color_convolution_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
