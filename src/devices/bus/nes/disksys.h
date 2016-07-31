@@ -33,7 +33,7 @@ public:
 	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
 	virtual void pcb_reset() override;
 
-	static void load_proc(device_image_interface &image);
+	static void load_proc(device_image_interface &image, bool is_created);
 	static void unload_proc(device_image_interface &image);
 
 private:

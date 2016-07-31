@@ -127,7 +127,7 @@ public:
 	void floppy_drive_format_sector(int side, int sector_index,int c,int h, int r, int n, int filler);
 	void floppy_drive_read_sector_data(int side, int index1, void *ptr, int length);
 	void floppy_drive_write_sector_data(int side, int index1, const void *ptr,int length, int ddam);
-	void floppy_install_load_proc(void (*proc)(device_image_interface &image));
+	void floppy_install_load_proc(void (*proc)(device_image_interface &image, bool is_created));
 	void floppy_install_unload_proc(void (*proc)(device_image_interface &image));
 	void floppy_drive_set_index_pulse_callback(void (*callback)(device_t *controller,device_t *image, int state));
 	int floppy_drive_get_current_track();
@@ -162,7 +162,7 @@ private:
 	TIMER_CALLBACK_MEMBER(floppy_drive_index_callback);
 	void floppy_drive_init();
 	void floppy_drive_index_func();
-	int internal_floppy_device_load(int create_format, util::option_resolution *create_args);
+	int internal_floppy_device_load(bool is_create, int create_format, util::option_resolution *create_args);
 	TIMER_CALLBACK_MEMBER( set_wpt );
 
 protected:
@@ -215,7 +215,7 @@ protected:
 
 	floppy_image_legacy *m_floppy;
 	int m_track;
-	void (*m_load_proc)(device_image_interface &image);
+	void (*m_load_proc)(device_image_interface &image, bool is_created);
 	void (*m_unload_proc)(device_image_interface &image);
 	int m_floppy_drive_type;
 

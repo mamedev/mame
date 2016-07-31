@@ -18,7 +18,7 @@ public:
 	DECLARE_READ8_MEMBER( serin_r );
 	DECLARE_WRITE8_MEMBER( serout_w );
 	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
-	void atari_load_proc(device_image_interface &image);
+	void atari_load_proc(device_image_interface &image, bool is_created);
 
 protected:
 	// device-level overrides

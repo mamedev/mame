@@ -102,13 +102,13 @@ static const xfd_format xfd_formats[] =
  *****************************************************************************/
 
 #define MAXSIZE 5760 * 256 + 80
-static void _atari_load_proc(device_image_interface &image)
+static void _atari_load_proc(device_image_interface &image, bool is_created)
 {
 	atari_fdc_device *atarifdc = static_cast<atari_fdc_device *>(image.device().owner());
-	atarifdc->atari_load_proc(image);
+	atarifdc->atari_load_proc(image, is_created);
 }
 
-void atari_fdc_device::atari_load_proc(device_image_interface &image)
+void atari_fdc_device::atari_load_proc(device_image_interface &image, bool is_created)
 {
 	int id = floppy_get_drive(image);
 	int size, i;
@@ -121,7 +121,7 @@ void atari_fdc_device::atari_load_proc(device_image_interface &image)
 	/* tell whether the image is writable */
 	m_drv[id].mode = !image.is_readonly();
 	/* set up image if it has been created */
-	if (image.has_been_created())
+	if (is_created)
 	{
 		int sector;
 		char buff[256];

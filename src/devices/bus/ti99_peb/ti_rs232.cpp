@@ -231,7 +231,7 @@ bool ti_pio_attached_device::call_load()
 	ti_rs232_pio_device* card = static_cast<ti_rs232_pio_device*>(owner());
 
 	// tell whether the image is readable
-	card->m_pio_readable = !has_been_created();
+	card->m_pio_readable = true;
 	// tell whether the image is writable
 	card->m_pio_writable = !is_readonly();
 
