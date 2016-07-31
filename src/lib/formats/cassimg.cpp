@@ -791,7 +791,7 @@ casserr_t cassette_read_modulated_data(cassette_image *cassette, int channel, do
 
 	while(length > 0)
 	{
-		this_length = std::min(size_t(length), buffer_length);
+		this_length = (std::min<UINT64>)(length, buffer_length);
 		cassette_image_read(cassette, buffer, offset, this_length);
 
 		err = cassette_put_modulated_data(cassette, channel, time_index, buffer, this_length, modulation, &delta);

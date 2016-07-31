@@ -242,7 +242,7 @@ inline UINT64 chd_file::file_append(const void *source, UINT32 length, UINT32 al
 			delta = alignment - delta;
 			while (delta != 0)
 			{
-				UINT32 bytes_to_write = std::min(UINT32(sizeof(buffer)), delta);
+				UINT32 bytes_to_write = (std::min<std::size_t>)(sizeof(buffer), delta);
 				UINT32 count = m_file->write(buffer, bytes_to_write);
 				if (count != bytes_to_write)
 					throw CHDERR_WRITE_ERROR;
@@ -1980,7 +1980,7 @@ chd_error chd_file::compress_v5_map()
 
 			// track maximum compressed length
 			else //if (curcomp >= COMPRESSION_TYPE_0 && curcomp <= COMPRESSION_TYPE_3)
-				max_complen = std::max(max_complen, UINT32(be_read(&m_rawmap[hunknum * 12 + 1], 3))); // TODO: check types
+				max_complen = std::max(max_complen, UINT32(be_read(&m_rawmap[hunknum * 12 + 1], 3)));
 
 			// track repeats
 			if (curcomp == lastcomp)
@@ -2333,7 +2333,7 @@ chd_error chd_file::create_common()
 			UINT64 offset = m_mapoffset;
 			while (mapsize != 0)
 			{
-				UINT32 bytes_to_write = std::min(mapsize, UINT32(sizeof(buffer)));
+				UINT32 bytes_to_write = (std::min<size_t>)(mapsize, sizeof(buffer));
 				file_write(offset, buffer, bytes_to_write);
 				offset += bytes_to_write;
 				mapsize -= bytes_to_write;

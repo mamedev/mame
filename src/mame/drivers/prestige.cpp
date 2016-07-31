@@ -253,8 +253,8 @@ READ8_MEMBER( prestige_state::mouse_r )
 			break;
 	}
 
-	data = std::min(data, INT16(+127));
-	data = std::min(data, INT16(-127));
+	data = (std::min)(data, INT16(+127));
+	data = (std::max)(data, INT16(-127));
 
 	return 0x80 + data;
 }

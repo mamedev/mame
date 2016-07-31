@@ -986,9 +986,9 @@ laserdisc_device::frame_data &laserdisc_device::current_frame()
 void laserdisc_device::read_track_data()
 {
 	// compute the chdhunk number we are going to read
-	UINT32 chdtrack = m_curtrack - 1 - VIRTUAL_LEAD_IN_TRACKS;
-	chdtrack = std::max(chdtrack, UINT32(0));
-	chdtrack = std::min(chdtrack, m_chdtracks - 1);
+	INT32 chdtrack = m_curtrack - 1 - VIRTUAL_LEAD_IN_TRACKS;
+	chdtrack = (std::max<INT32>)(chdtrack, 0);
+	chdtrack = (std::min<UINT32>)(chdtrack, m_chdtracks - 1);
 	UINT32 readhunk = chdtrack * 2 + m_fieldnum;
 
 	// cheat and look up the metadata we are about to retrieve

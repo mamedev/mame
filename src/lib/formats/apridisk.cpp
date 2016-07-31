@@ -74,9 +74,9 @@ bool apridisk_format::load(io_generic *io, UINT32 form_factor, floppy_image *ima
 			UINT8 sector = pick_integer_le(&sector_header, 13, 1);
 			UINT8 track = (UINT8) pick_integer_le(&sector_header, 14, 2);
 
-			track_count = std::max(track_count, int(track));
-			head_count = std::max(head_count, int(head));
-			sector_count = std::max(sector_count, int(sector));
+			track_count = std::max(track_count, int(unsigned(track)));
+			head_count = std::max(head_count, int(unsigned(head)));
+			sector_count = std::max(sector_count, int(unsigned(sector)));
 
 			// build sector info
 			sectors[track][head][sector - 1].head = head;

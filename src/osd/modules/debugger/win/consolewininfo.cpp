@@ -65,8 +65,8 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 		set_maxwidth(bounds.right - bounds.left);
 
 		// position the window at the bottom-right
-		int const bestwidth = std::min(int(maxwidth()), int(work_bounds.right - work_bounds.left));
-		int const bestheight = std::min(500, int(work_bounds.bottom - work_bounds.top));
+		int const bestwidth = (std::min<UINT32>)(maxwidth(), work_bounds.right - work_bounds.left);
+		int const bestheight = (std::min<UINT32>)(500, work_bounds.bottom - work_bounds.top);
 		SetWindowPos(window(), HWND_TOP,
 					work_bounds.right - bestwidth, work_bounds.bottom - bestheight,
 					bestwidth, bestheight,

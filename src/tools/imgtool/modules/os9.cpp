@@ -275,7 +275,7 @@ static imgtoolerr_t os9_decode_file_header(imgtool_image *image,
 
 	/* read all sector map entries */
 	max_entries = (disk_info->sector_size - 16) / 5;
-	max_entries = std::min(max_entries, int(ARRAY_LENGTH(info->sector_map) - 1));
+	max_entries = (std::min<std::size_t>)(max_entries, ARRAY_LENGTH(info->sector_map) - 1);
 	for (i = 0; i < max_entries; i++)
 	{
 		lsn = pick_integer_be(header, 16 + (i * 5) + 0, 3);
@@ -461,7 +461,7 @@ static imgtoolerr_t os9_set_file_size(imgtool_image *image,
 	/* do we have to write the sector map? */
 	if (sector_map_length >= 0)
 	{
-		for (i = 0; i < std::min(sector_map_length + 1, int(ARRAY_LENGTH(file_info->sector_map))); i++)
+		for (i = 0; i < (std::min<std::size_t>)(sector_map_length + 1, ARRAY_LENGTH(file_info->sector_map)); i++)
 		{
 			place_integer_be(header, 16 + (i * 5) + 0, 3, file_info->sector_map[i].lsn);
 			place_integer_be(header, 16 + (i * 5) + 3, 2, file_info->sector_map[i].count);
@@ -1055,7 +1055,7 @@ static imgtoolerr_t os9_diskimage_writefile(imgtool_partition *partition, const 
 
 	while(sz > 0)
 	{
-		write_size = std::min(size_t(sz), size_t(disk_info->sector_size));
+		write_size = (std::min<UINT64>)(sz, disk_info->sector_size);
 
 		stream_read(sourcef, &buf[0], write_size);
 

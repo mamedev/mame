@@ -1957,7 +1957,7 @@ static imgtoolerr_t fat_partition_writefile(imgtool_partition *partition, const 
 
 	while(bytes_left > 0)
 	{
-		len = std::min(bytes_left, UINT32(sizeof(buffer)));
+		len = (std::min<size_t>)(bytes_left, sizeof(buffer));
 		stream_read(sourcef, buffer, len);
 
 		err = fat_write_file(partition, &file, buffer, len, NULL);
