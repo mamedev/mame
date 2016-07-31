@@ -267,17 +267,18 @@ static MACHINE_CONFIG_START( mc1502, mc1502_state )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(mc1502_state, mc1502_kppi_portc_w))
 
 	MCFG_DEVICE_ADD( "upd8251", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("irps", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("irps", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("irps", rs232_port_device, write_rts))
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 	/* XXX RxD data are accessible via PPI port C, bit 7 */
 	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir7_w)) /* default handler does nothing */
 	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir7_w))
 	MCFG_I8251_SYNDET_HANDLER(WRITELINE(mc1502_state, mc1502_i8251_syndet))
 
-	MCFG_RS232_PORT_ADD("irps", default_rs232_devices, nullptr)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd8251", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("upd8251", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("upd8251", i8251_device, write_cts))
 
 	MCFG_DEVICE_ADD("isa", ISA8, 0)
 	MCFG_ISA8_CPU(":maincpu")
