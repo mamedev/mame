@@ -444,12 +444,12 @@ UINT64 stream_fill(imgtool_stream *f, unsigned char b, UINT64 sz)
 	char buf[1024];
 
 	outsz = 0;
-	memset(buf, b, std::min(sz, UINT64(sizeof(buf))));
+	memset(buf, b, (std::min<UINT64>)(sz, sizeof(buf)));
 
-	while(sz)
+	while (sz)
 	{
-		outsz += stream_write(f, buf, std::min(sz, UINT64(sizeof(buf))));
-		sz -= std::min(sz, UINT64(sizeof(buf)));
+		outsz += stream_write(f, buf, (std::min<UINT64>)(sz, sizeof(buf)));
+		sz -= (std::min<UINT64>)(sz, sizeof(buf));
 	}
 	return outsz;
 }

@@ -44,7 +44,7 @@
 													 borderType:[logScroll borderType]];
 
 		// this thing starts with no content, so its prefered height may be very small
-		desired.height = std::max((int)desired.height, 240);
+		desired.height = std::max(desired.height, CGFloat(240));
 		[self cascadeWindowWithDesiredSize:desired forView:logScroll];
 	}
 

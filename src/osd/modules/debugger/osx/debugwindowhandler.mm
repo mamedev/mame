@@ -350,7 +350,7 @@ NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryD
 	windowFrame.size.height = std::min(windowFrame.size.height, available.size.height);
 
 	// arbitrary additional height limit
-	windowFrame.size.height = std::min((int)windowFrame.size.height, 320);
+	windowFrame.size.height = std::min(windowFrame.size.height, CGFloat(320));
 
 	// place it in the bottom right corner and apply
 	windowFrame.origin.x = available.origin.x + available.size.width - windowFrame.size.width;
