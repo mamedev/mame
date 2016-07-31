@@ -825,7 +825,7 @@ void legacy_floppy_image_device::device_config_complete()
 		// only add if creatable
 		if (floppy_options[i].param_guidelines) {
 			// allocate a new format and append it to the list
-			m_formatlist.push_back(std::make_unique<image_device_format>(floppy_options[i].name, floppy_options[i].description, floppy_options[i].extensions, floppy_options[i].param_guidelines));
+			add_format(floppy_options[i].name, floppy_options[i].description, floppy_options[i].extensions, floppy_options[i].param_guidelines);
 		}
 		image_specify_extension( m_extension_list, 256, floppy_options[i].extensions );
 	}
