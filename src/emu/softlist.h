@@ -73,7 +73,7 @@ enum software_compatibility
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-struct rom_entry;
+class rom_entry;
 class software_info;
 class device_image_interface;
 class software_list_device;
