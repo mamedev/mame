@@ -132,6 +132,10 @@ public:
 		, m_offset(offset)
 		, m_length(length)
 		, m_flags(flags) {}
+	rom_entry(rom_entry const &) = default;
+	rom_entry(rom_entry &&) = default;
+	rom_entry &operator=(rom_entry const &) = default;
+	rom_entry &operator=(rom_entry &&) = default;
 
 	// accessors
 	const std::string &name() const { return m_name; }
@@ -139,7 +143,7 @@ public:
 	UINT32 offset() const { return m_offset; }
 	UINT32 length() const { return m_length; }
 	UINT32 flags() const { return m_flags; }
-	UINT32 &flags() { return m_flags; }
+	void set_flags(UINT32 flags) { m_flags = flags; }
 
 private:
 	std::string		m_name;

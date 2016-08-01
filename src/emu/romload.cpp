@@ -914,7 +914,7 @@ void rom_load_manager::process_rom_entries(const char *regiontag, const rom_entr
 					if (!ROM_INHERITSFLAGS(&modified_romp))
 						lastflags = modified_romp.flags();
 					else
-						modified_romp.flags() = (modified_romp.flags() & ~ROM_INHERITEDFLAGS) | lastflags;
+						modified_romp.set_flags((modified_romp.flags() & ~ROM_INHERITEDFLAGS) | lastflags);
 
 					explength += ROM_GETLENGTH(&modified_romp);
 
