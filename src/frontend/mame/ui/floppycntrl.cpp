@@ -66,7 +66,7 @@ void menu_control_floppy_image::hook_load(std::string filename, bool softlist)
 	if (softlist)
 	{
 		machine().popmessage("When loaded from software list, the disk is Read-only.\n");
-		m_image.load(filename.c_str());
+		m_image.load_software(filename);
 		stack_pop();
 		return;
 	}
