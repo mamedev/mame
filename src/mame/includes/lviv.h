@@ -57,7 +57,7 @@ public:
 	void lviv_update_memory ();
 	void lviv_setup_snapshot (UINT8 * data);
 	void dump_registers();
-	bool lviv_verify_snapshot (UINT8 * data, UINT32 size);
+	image_verify_result lviv_verify_snapshot(UINT8 * data, UINT32 size);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( lviv );
 	DECLARE_INPUT_CHANGED_MEMBER(lviv_reset);
 };

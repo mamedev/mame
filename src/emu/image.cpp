@@ -56,12 +56,12 @@ image_manager::image_manager(running_machine &machine)
 			bool is_softlist_part = std::regex_match(image_name, s_softlist_regex);
 
 			// try to load this image
-			bool result = is_softlist_part
+			image_init_result result = is_softlist_part
 				? image.load_software(image_name)
 				: image.load(image_name.c_str());
 
 			// did the image load fail?
-			if (result)
+			if (result != image_init_result::PASS)
 			{
 				// retrieve image error message
 				std::string image_err = std::string(image.error());
@@ -234,10 +234,10 @@ void image_manager::postdevice_init()
 	/* make sure that any required devices have been allocated */
 	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 	{
-		int result = image.finish_load();
+		image_init_result result = image.finish_load();
 
 		/* did the image load fail? */
-		if (result)
+		if (result != image_init_result::PASS)
 		{
 			/* retrieve image error message */
 			std::string image_err = std::string(image.error());

@@ -76,32 +76,32 @@ READ8_MEMBER(nes_ntb_slot_device::read)
 }
 
 
-bool nes_ntb_slot_device::call_load()
+image_init_result nes_ntb_slot_device::call_load()
 {
 	if (m_cart)
 	{
 		UINT8 *ROM = m_cart->get_cart_base();
 
 		if (!ROM)
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 
 		if (software_entry() == nullptr)
 		{
 			if (length() != 0x4000)
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 
 			fread(&ROM, 0x4000);
 		}
 		else
 		{
 			if (get_software_region_length("rom") != 0x4000)
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 
 			memcpy(ROM, get_software_region("rom"), 0x4000);
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

@@ -24,7 +24,7 @@
  * 0x001c data */
 
 
-int general_cbm_loadsnap( device_image_interface &image, const char *file_type, int snapshot_size,
+image_init_result general_cbm_loadsnap( device_image_interface &image, const char *file_type, int snapshot_size,
 	address_space &space, offs_t offset, void (*cbm_sethiaddress)(address_space &space, UINT16 hiaddress) )
 {
 	char buffer[7];
@@ -81,10 +81,10 @@ int general_cbm_loadsnap( device_image_interface &image, const char *file_type, 
 		space.write_byte(address + i + offset, data[i]);
 
 	cbm_sethiaddress(space, address + snapshot_size);
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 
 error:
-	return IMAGE_INIT_FAIL;
+	return image_init_result::FAIL;
 }
 
 void cbm_quick_sethiaddress( address_space &space, UINT16 hiaddress )

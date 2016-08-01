@@ -2030,14 +2030,14 @@ void lynx_state::machine_start()
 
 ****************************************/
 
-bool lynx_state::lynx_verify_cart (char *header, int kind)
+image_verify_result lynx_state::lynx_verify_cart(char *header, int kind)
 {
 	if (kind)
 	{
 		if (strncmp("BS93", &header[6], 4))
 		{
 			logerror("This is not a valid Lynx image\n");
-			return false;
+			return image_verify_result::FAIL;
 		}
 	}
 	else
@@ -2051,11 +2051,11 @@ bool lynx_state::lynx_verify_cart (char *header, int kind)
 			}
 			else
 				logerror("This is not a valid Lynx image\n");
-			return false;
+			return image_verify_result::FAIL;
 		}
 	}
 
-	return true;
+	return image_verify_result::PASS;
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
@@ -2081,8 +2081,8 @@ DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
 			image.fread(header, 0x40);
 
 			// Check the image
-			if (!lynx_verify_cart((char*)header, LYNX_CART))
-				return IMAGE_INIT_FAIL;
+			if (lynx_verify_cart((char*)header, LYNX_CART) != image_verify_result::PASS)
+				return image_init_result::FAIL;
 
 			/* 2008-10 FP: According to Handy source these should be page_size_bank0. Are we using
 			 it correctly in MESS? Moreover, the next two values should be page_size_bank1. We should
@@ -2138,5 +2138,5 @@ DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
 
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }

@@ -195,7 +195,8 @@ WRITE8_MEMBER( cd2650_state::kbd_put )
 
 QUICKLOAD_LOAD_MEMBER( cd2650_state, cd2650 )
 {
-	int i, result = IMAGE_INIT_FAIL;
+	int i;
+	image_init_result result = image_init_result::FAIL;
 
 	int quick_length = image.length();
 	if (quick_length < 0x1500)
@@ -253,7 +254,7 @@ QUICKLOAD_LOAD_MEMBER( cd2650_state, cd2650 )
 				// Start the quickload
 				m_maincpu->set_state_int(S2650_PC, exec_addr);
 
-				result = IMAGE_INIT_PASS;
+				result = image_init_result::PASS;
 			}
 		}
 	}

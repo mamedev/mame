@@ -1979,7 +1979,7 @@ QUICKLOAD_LOAD_MEMBER( jaguar_state, jaguar )
 	return quickload(image, file_type, quickload_size);
 }
 
-int jaguar_state::quickload(device_image_interface &image, const char *file_type, int quickload_size)
+image_init_result jaguar_state::quickload(device_image_interface &image, const char *file_type, int quickload_size)
 {
 	offs_t quickload_begin = 0x4000, start = quickload_begin, skip = 0;
 
@@ -2044,7 +2044,7 @@ int jaguar_state::quickload(device_image_interface &image, const char *file_type
 	/* Transfer control to image */
 	m_maincpu->set_pc(quickload_begin);
 	m_shared_ram[1]=quickload_begin;
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void jaguar_state::cart_start()
@@ -2089,7 +2089,7 @@ DEVICE_IMAGE_LOAD_MEMBER( jaguar_state, jaguar_cart )
 
 	/* Transfer control to the bios */
 	m_maincpu->set_pc(m_rom_base[1]);
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /*************************************

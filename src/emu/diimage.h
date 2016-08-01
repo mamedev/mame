@@ -100,8 +100,11 @@ struct feature_list;
 class software_part;
 class software_info;
 
+enum class image_init_result { PASS, FAIL };
+enum class image_verify_result { PASS, FAIL };
+
 // device image interface function types
-typedef delegate<bool (device_image_interface &)> device_image_load_delegate;
+typedef delegate<image_init_result (device_image_interface &)> device_image_load_delegate;
 typedef delegate<void (device_image_interface &)> device_image_func_delegate;
 // legacy
 typedef void (*device_image_partialhash_func)(util::hash_collection &, const unsigned char *, unsigned long, const char *);
@@ -110,13 +113,10 @@ typedef void (*device_image_partialhash_func)(util::hash_collection &, const uns
 //  MACROS
 //**************************************************************************
 
-#define IMAGE_INIT_PASS     false
-#define IMAGE_INIT_FAIL     true
-
 #define DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)           device_image_load_##_name
 #define DEVICE_IMAGE_LOAD_NAME(_class,_name)           _class::DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)
-#define DECLARE_DEVICE_IMAGE_LOAD_MEMBER(_name)        bool DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)(device_image_interface &image)
-#define DEVICE_IMAGE_LOAD_MEMBER(_class,_name)         bool DEVICE_IMAGE_LOAD_NAME(_class,_name)(device_image_interface &image)
+#define DECLARE_DEVICE_IMAGE_LOAD_MEMBER(_name)        image_init_result DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)(device_image_interface &image)
+#define DEVICE_IMAGE_LOAD_MEMBER(_class,_name)         image_init_result DEVICE_IMAGE_LOAD_NAME(_class,_name)(device_image_interface &image)
 #define DEVICE_IMAGE_LOAD_DELEGATE(_class,_name)       device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_name),#_class "::device_image_load_" #_name, downcast<_class *>(device->owner()))
 
 #define DEVICE_IMAGE_UNLOAD_MEMBER_NAME(_name)          device_image_unload_##_name
@@ -147,8 +147,8 @@ public:
 
 	virtual void device_compute_hash(util::hash_collection &hashes, const void *data, size_t length, const char *types) const;
 
-	virtual bool call_load() { return IMAGE_INIT_PASS; }
-	virtual bool call_create(int format_type, util::option_resolution *format_options) { return IMAGE_INIT_PASS; }
+	virtual image_init_result call_load() { return image_init_result::PASS; }
+	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) { return image_init_result::PASS; }
 	virtual void call_unload() { }
 	virtual std::string call_display() { return std::string(); }
 	virtual device_image_partialhash_func get_partial_hash() const { return nullptr; }
@@ -228,15 +228,15 @@ public:
 	const formatlist_type &formatlist() const { return m_formatlist; }
 
 	// loads an image file
-	bool load(const char *path);
+	image_init_result load(const char *path);
 
 	// loads a softlist item by name
-	bool load_software(const std::string &softlist_name);
+	image_init_result load_software(const std::string &softlist_name);
 
 	bool open_image_file(emu_options &options);
-	bool finish_load();
+	image_init_result finish_load();
 	void unload();
-	bool create(const char *path, const image_device_format *create_format, util::option_resolution *create_args);
+	image_init_result create(const char *path, const image_device_format *create_format, util::option_resolution *create_args);
 	bool load_software(software_list_device &swlist, const char *swname, const rom_entry *entry);
 	int reopen_for_write(const char *path);
 
@@ -254,7 +254,7 @@ public:
 protected:
 	virtual const software_list_loader &get_software_list_loader() const { return false_software_list_loader::instance(); }
 
-	bool load_internal(const std::string &path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load);
+	image_init_result load_internal(const std::string &path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load);
 	void determine_open_plan(int is_create, UINT32 *open_plan);
 	image_error_t load_image_by_path(UINT32 open_flags, const std::string &path);
 	void clear();

@@ -57,7 +57,7 @@ public:
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
-	int floppy_load(floppy_image_device *dev);
+	image_init_result floppy_load(floppy_image_device *dev);
 	void floppy_unload(floppy_image_device *dev);
 
 	UINT8 m_dma0pg;
@@ -157,10 +157,10 @@ WRITE8_MEMBER(peoplepc_state::memory_write_byte)
 	prog_space.write_byte(offset | (m_dma0pg << 16), data);
 }
 
-int peoplepc_state::floppy_load(floppy_image_device *dev)
+image_init_result peoplepc_state::floppy_load(floppy_image_device *dev)
 {
 	dev->mon_w(0);
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void peoplepc_state::floppy_unload(floppy_image_device *dev)

@@ -145,7 +145,7 @@ void sat_cart_slot_device::device_config_complete()
  -------------------------------------------------*/
 
 
-bool sat_cart_slot_device::call_load()
+image_init_result sat_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -187,10 +187,10 @@ bool sat_cart_slot_device::call_load()
 			if (get_software_region("dram1"))
 				m_cart->dram1_alloc(get_software_region_length("dram1"));
 		}
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

@@ -99,9 +99,9 @@ public:
 	static void static_set_floppy_config(device_t &device, const floppy_interface *config) { downcast<legacy_floppy_image_device &>(device).m_config = config; }
 	template<class _Object> static devcb_base &set_out_idx_func(device_t &device, _Object object) { return downcast<legacy_floppy_image_device &>(device).m_out_idx_func.set_callback(object); }
 
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
-	virtual bool call_create(int format_type, util::option_resolution *format_options) override;
+	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 
 	virtual iodevice_t image_type() const override { return IO_FLOPPY; }
@@ -162,7 +162,7 @@ private:
 	TIMER_CALLBACK_MEMBER(floppy_drive_index_callback);
 	void floppy_drive_init();
 	void floppy_drive_index_func();
-	int internal_floppy_device_load(bool is_create, int create_format, util::option_resolution *create_args);
+	image_init_result internal_floppy_device_load(bool is_create, int create_format, util::option_resolution *create_args);
 	TIMER_CALLBACK_MEMBER( set_wpt );
 
 protected:

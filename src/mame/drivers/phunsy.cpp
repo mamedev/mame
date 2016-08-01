@@ -283,7 +283,7 @@ QUICKLOAD_LOAD_MEMBER( phunsy_state, phunsy )
 	UINT16 i;
 	UINT16 quick_addr = 0x1800;
 	dynamic_buffer quick_data;
-	int result = IMAGE_INIT_FAIL;
+	image_init_result result = image_init_result::FAIL;
 	int quick_length = image.length();
 	if (quick_length > 0x4000)
 	{
@@ -310,7 +310,7 @@ QUICKLOAD_LOAD_MEMBER( phunsy_state, phunsy )
 		m_maincpu->set_state_int(S2650_R3, 0x83);
 		m_maincpu->set_state_int(S2650_PC, exec_addr);
 
-		result = IMAGE_INIT_PASS;
+		result = image_init_result::PASS;
 	}
 
 	return result;

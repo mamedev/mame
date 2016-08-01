@@ -76,7 +76,8 @@ bool cassette_image_device::is_motor_on()
 		return false;
 	if ((m_state & CASSETTE_MASK_MOTOR) != CASSETTE_MOTOR_ENABLED)
 		return false;
-	return true;
+	else
+		return true;
 }
 
 
@@ -250,17 +251,17 @@ void cassette_image_device::device_start()
 	m_value = 0;
 }
 
-bool cassette_image_device::call_create(int format_type, util::option_resolution *format_options)
+image_init_result cassette_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	return internal_load(true);
 }
 
-bool cassette_image_device::call_load()
+image_init_result cassette_image_device::call_load()
 {
 	return internal_load(false);
 }
 
-bool cassette_image_device::internal_load(bool is_create)
+image_init_result cassette_image_device::internal_load(bool is_create)
 {
 	casserr_t err;
 	int cassette_flags;
@@ -307,7 +308,7 @@ bool cassette_image_device::internal_load(bool is_create)
 	m_speed = 1;
 	m_direction = 1;
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 
 error:
 	image_error_t imgerr = IMAGE_ERROR_UNSPECIFIED;
@@ -330,7 +331,7 @@ error:
 			break;
 	}
 	image->seterror(imgerr, "" );
-	return IMAGE_INIT_FAIL;
+	return image_init_result::FAIL;
 }
 
 

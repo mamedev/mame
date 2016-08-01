@@ -82,11 +82,11 @@ void snapshot_image_device::device_start()
 /*-------------------------------------------------
     call_load
 -------------------------------------------------*/
-bool snapshot_image_device::call_load()
+image_init_result snapshot_image_device::call_load()
 {
 	/* adjust the timer */
 	m_timer->adjust(attotime(m_delay_seconds, m_delay_attoseconds),0);
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 // device type definition

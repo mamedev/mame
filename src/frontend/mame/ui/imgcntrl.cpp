@@ -325,8 +325,8 @@ void menu_control_device_image::handle()
 
 	case DO_CREATE: {
 		auto path = util::zippath_combine(m_current_directory.c_str(), m_current_file.c_str());
-		int err = m_image.create(path.c_str(), nullptr, nullptr);
-		if (err != 0)
+		image_init_result err = m_image.create(path.c_str(), nullptr, nullptr);
+		if (err != image_init_result::PASS)
 			machine().popmessage("Error: %s", m_image.error());
 		stack_pop();
 		break;

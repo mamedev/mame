@@ -86,7 +86,7 @@ public:
 	virtual bool is_reset_on_load() const override { return 1; }
 	virtual const char *file_extensions() const override { return "apc"; }
 
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
@@ -107,7 +107,7 @@ apexc_cylinder_image_device::apexc_cylinder_image_device(const machine_config &m
 /*
     Open cylinder image and read RAM
 */
-bool apexc_cylinder_image_device::call_load()
+image_init_result apexc_cylinder_image_device::call_load()
 {
 	/* load RAM contents */
 	m_writable = !is_readonly();
@@ -122,7 +122,7 @@ bool apexc_cylinder_image_device::call_load()
 	}
 #endif
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /*

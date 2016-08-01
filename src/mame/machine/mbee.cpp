@@ -637,7 +637,7 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 			if (image.fread(&data, 1) != 1)
 			{
 				image.message("Unexpected EOF");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 
 			if ((j < m_size) || (j > 0xefff))
@@ -645,7 +645,7 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 			else
 			{
 				image.message("Not enough memory in this microbee");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 		}
 
@@ -667,7 +667,7 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 			if (image.fread(&data, 1) != 1)
 			{
 				image.message("Unexpected EOF");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 
 			if ((j < m_size) || (j > 0xefff))
@@ -675,7 +675,7 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 			else
 			{
 				image.message("Not enough memory in this microbee");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 		}
 
@@ -691,7 +691,7 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 			if (image.fread(&data, 1) != 1)
 			{
 				image.message("Unexpected EOF");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 
 			if ((j < m_size) || (j > 0xefff))
@@ -699,14 +699,14 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 			else
 			{
 				image.message("Not enough memory in this microbee");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 		}
 
 		if (sw) m_maincpu->set_pc(0x900);
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -721,8 +721,8 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee_z80bin )
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* load the binary into memory */
-	if (z80bin_load_file(&image, space, file_type, &execute_address, &start_addr, &end_addr) == IMAGE_INIT_FAIL)
-		return IMAGE_INIT_FAIL;
+	if (z80bin_load_file(&image, space, file_type, &execute_address, &start_addr, &end_addr) != image_init_result::PASS)
+		return image_init_result::FAIL;
 
 	/* is this file executable? */
 	if (execute_address != 0xffff)
@@ -743,5 +743,5 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee_z80bin )
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }

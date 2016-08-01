@@ -55,8 +55,8 @@ public:
 	static void static_set_interface(device_t &device, const char *_interface) { downcast<cassette_image_device &>(device).m_interface = _interface; }
 
 	// image-level overrides
-	virtual bool call_load() override;
-	virtual bool call_create(int format_type, util::option_resolution *format_options) override;
+	virtual image_init_result call_load() override;
+	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 	virtual std::string call_display() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
@@ -111,7 +111,7 @@ private:
 	cassette_state                  m_default_state;
 	const char *                    m_interface;
 
-	bool internal_load(bool is_create);
+	image_init_result internal_load(bool is_create);
 };
 
 // device type definition

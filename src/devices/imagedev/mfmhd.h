@@ -88,7 +88,7 @@ public:
 	// Head select
 	void            headsel_w(int head) { m_current_head = head & 0x0f; }
 
-	bool            call_load() override;
+	image_init_result            call_load() override;
 	void            call_unload() override;
 
 	// Tells us the time when the track ends (next index pulse). Needed by the controller.

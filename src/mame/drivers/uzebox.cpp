@@ -260,7 +260,7 @@ DEVICE_IMAGE_LOAD_MEMBER(uzebox_state, uzebox_cart)
 	else
 		memcpy(m_cart->get_rom_base(), image.get_software_region("rom"), size);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

@@ -116,7 +116,7 @@ void z88cart_slot_device::device_timer(emu_timer &timer, device_timer_id id, int
     call load
 -------------------------------------------------*/
 
-bool z88cart_slot_device::call_load()
+image_init_result z88cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -137,7 +137,7 @@ bool z88cart_slot_device::call_load()
 			}
 		}
 		else
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 	}
 
 	// open the flap
@@ -146,7 +146,7 @@ bool z88cart_slot_device::call_load()
 	// setup the timer for close the flap
 	m_flp_timer->adjust(CLOSE_FLAP_TIME);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

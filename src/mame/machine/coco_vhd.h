@@ -27,7 +27,7 @@ public:
 	virtual ~coco_vhd_image_device();
 
 	// image-level overrides
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 
 	virtual iodevice_t image_type() const override { return IO_HARDDISK; }
 

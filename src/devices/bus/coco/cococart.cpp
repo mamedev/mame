@@ -321,7 +321,7 @@ void cococart_slot_device::set_cart_base_update(cococart_base_update_delegate up
 //  call_load
 //-------------------------------------------------
 
-bool cococart_slot_device::call_load()
+image_init_result cococart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -342,7 +342,7 @@ bool cococart_slot_device::call_load()
 			read_length += len;
 		}
 	}
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

@@ -86,7 +86,7 @@ void adam_expansion_slot_device::device_reset()
 //  call_load -
 //-------------------------------------------------
 
-bool adam_expansion_slot_device::call_load()
+image_init_result adam_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
@@ -104,7 +104,7 @@ bool adam_expansion_slot_device::call_load()
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

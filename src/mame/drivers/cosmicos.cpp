@@ -495,7 +495,7 @@ QUICKLOAD_LOAD_MEMBER( cosmicos_state, cosmicos )
 	/* load image to RAM */
 	image.fread(ptr, size);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /* Machine Driver */

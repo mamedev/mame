@@ -57,24 +57,24 @@ void hp_optrom_slot_device::device_config_complete()
 		update_names(HP_OPTROM_SLOT , "optional_rom" , "optrom");
 }
 
-bool hp_optrom_slot_device::call_load()
+image_init_result hp_optrom_slot_device::call_load()
 {
 		logerror("hp_optrom: call_load\n");
 		if (m_cart == nullptr || !loaded_through_softlist()) {
 				logerror("hp_optrom: must be loaded from sw list\n");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 		}
 
 		const char *base_feature = get_feature("base");
 		if (base_feature == nullptr) {
 				logerror("hp_optrom: no 'base' feature\n");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 		}
 
 		offs_t base_addr;
 		if (base_feature[ 0 ] != '0' || base_feature[ 1 ] != 'x' || sscanf(&base_feature[ 2 ] , "%x" , &base_addr) != 1) {
 				logerror("hp_optrom: can't parse 'base' feature\n");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 		}
 
 		// Valid BSC values for ROMs on LPU drawer: 0x07 0x0b .... 0x3b
@@ -84,14 +84,14 @@ bool hp_optrom_slot_device::call_load()
 		// Base address must be multiple of 0x1000
 		if ((base_addr & ~0x3f7000UL) != 0 || ((base_addr & 0x30000) != 0x10000 && (base_addr & 0x30000) != 0x30000) || base_addr < 0x70000) {
 				logerror("hp_optrom: illegal base address (%x)\n" , base_addr);
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 		}
 
 		auto length = get_software_region_length("rom") / 2;
 
 		if (length < 0x1000 || length > 0x8000 || (length & 0xfff) != 0 || ((base_addr & 0x7000) + length) > 0x8000) {
 				logerror("hp_optrom: illegal region length (%x)\n" , length);
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 		}
 
 		offs_t end_addr = base_addr + length - 1;
@@ -110,7 +110,7 @@ bool hp_optrom_slot_device::call_load()
 		m_base_addr = base_addr;
 		m_end_addr = end_addr;
 
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 }
 
 void hp_optrom_slot_device::call_unload()

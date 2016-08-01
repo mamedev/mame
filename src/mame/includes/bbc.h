@@ -199,13 +199,13 @@ public:
 	void bbc_setup_banks(memory_bank *membank, int banks, UINT32 shift, UINT32 size);
 	void bbcm_setup_banks(memory_bank *membank, int banks, UINT32 shift, UINT32 size);
 
-	int bbc_load_rom(device_image_interface &image, generic_slot_device *slot);
+	image_init_result bbc_load_rom(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp1_load) { return bbc_load_rom(image, m_exp1); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp2_load) { return bbc_load_rom(image, m_exp2); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp3_load) { return bbc_load_rom(image, m_exp3); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp4_load) { return bbc_load_rom(image, m_exp4); }
 
-	int bbcm_load_cart(device_image_interface &image, generic_slot_device *slot);
+	image_init_result bbcm_load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(bbcm_exp1_load) { return bbcm_load_cart(image, m_exp1); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(bbcm_exp2_load) { return bbcm_load_cart(image, m_exp2); }
 

@@ -40,7 +40,7 @@ QUICKLOAD_LOAD_MEMBER( cybiko_state, cybiko )
 {
 	image.fread(m_flash1->get_ptr(), std::min(image.length(), UINT64(0x84000)));
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 QUICKLOAD_LOAD_MEMBER( cybiko_state, cybikoxt )
@@ -53,7 +53,7 @@ QUICKLOAD_LOAD_MEMBER( cybiko_state, cybikoxt )
 	for (int byte = 0; byte < size; byte++)
 		dest.write_byte(0x400000 + byte, buffer[byte]);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 ///////////////////

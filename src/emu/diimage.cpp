@@ -919,7 +919,7 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 //  load_internal - core image loading
 //-------------------------------------------------
 
-bool device_image_interface::load_internal(const std::string &path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load)
+image_init_result device_image_interface::load_internal(const std::string &path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load)
 {
 	UINT32 open_plan[4];
 	int i;
@@ -966,7 +966,7 @@ bool device_image_interface::load_internal(const std::string &path, bool is_crea
 	m_create_args = create_args;
 
 	if (m_init_phase==false) {
-		m_err = (finish_load()==IMAGE_INIT_PASS) ? IMAGE_ERROR_SUCCESS : IMAGE_ERROR_INTERNAL;
+		m_err = (finish_load() == image_init_result::PASS) ? IMAGE_ERROR_SUCCESS : IMAGE_ERROR_INTERNAL;
 		if (m_err)
 			goto done;
 	}
@@ -974,8 +974,8 @@ bool device_image_interface::load_internal(const std::string &path, bool is_crea
 
 done:
 	if (just_load) {
-		if(m_err) clear();
-		return m_err ? IMAGE_INIT_FAIL : IMAGE_INIT_PASS;
+		if (m_err) clear();
+		return m_err ? image_init_result::FAIL : image_init_result::PASS;
 	}
 	if (m_err!=0) {
 		if (!m_init_phase)
@@ -1000,7 +1000,7 @@ done:
 			}
 		}
 	}
-	return m_err ? IMAGE_INIT_FAIL : IMAGE_INIT_PASS;
+	return m_err ? image_init_result::FAIL : image_init_result::PASS;
 }
 
 
@@ -1021,7 +1021,7 @@ bool device_image_interface::schedule_postload_hard_reset_if_needed()
 //  load - load an image into MAME
 //-------------------------------------------------
 
-bool device_image_interface::load(const char *path)
+image_init_result device_image_interface::load(const char *path)
 {
 	return load_internal(path, false, 0, nullptr, false);
 }
@@ -1031,7 +1031,7 @@ bool device_image_interface::load(const char *path)
 //  load_software - loads a softlist item by name
 //-------------------------------------------------
 
-bool device_image_interface::load_software(const std::string &softlist_name)
+image_init_result device_image_interface::load_software(const std::string &softlist_name)
 {
 	// Prepare to load
 	unload();
@@ -1043,7 +1043,7 @@ bool device_image_interface::load_software(const std::string &softlist_name)
 	if (!softload)
 	{
 		m_is_loading = false;
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	// set up softlist stuff
@@ -1084,8 +1084,8 @@ bool device_image_interface::load_software(const std::string &softlist_name)
 	}
 
 	// call finish_load if necessary
-	if (m_init_phase == false && finish_load())
-		return IMAGE_INIT_FAIL;
+	if (m_init_phase == false && (finish_load() != image_init_result::PASS))
+		return image_init_result::FAIL;
 
 	// do we need to reset the CPU? only schedule it if load is successful
 	if (!schedule_postload_hard_reset_if_needed())
@@ -1099,7 +1099,7 @@ bool device_image_interface::load_software(const std::string &softlist_name)
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -1113,7 +1113,7 @@ bool device_image_interface::open_image_file(emu_options &options)
 	if (*path != 0)
 	{
 		set_init_phase();
-		if (load_internal(path, false, 0, nullptr, true)==IMAGE_INIT_PASS)
+		if (load_internal(path, false, 0, nullptr, true) == image_init_result::PASS)
 		{
 			if (software_entry()==nullptr) return true;
 		}
@@ -1127,9 +1127,9 @@ bool device_image_interface::open_image_file(emu_options &options)
 //  from core
 //-------------------------------------------------
 
-bool device_image_interface::finish_load()
+image_init_result device_image_interface::finish_load()
 {
-	bool err = IMAGE_INIT_PASS;
+	image_init_result err = image_init_result::PASS;
 
 	if (m_is_loading)
 	{
@@ -1138,7 +1138,7 @@ bool device_image_interface::finish_load()
 		if (m_created)
 		{
 			err = call_create(m_create_format, m_create_args);
-			if (err == IMAGE_INIT_FAIL)
+			if (err != image_init_result::PASS)
 			{
 				if (!m_err)
 					m_err = IMAGE_ERROR_UNSPECIFIED;
@@ -1148,7 +1148,7 @@ bool device_image_interface::finish_load()
 		{
 			// using device load
 			err = call_load();
-			if (err == IMAGE_INIT_FAIL)
+			if (err != image_init_result::PASS)
 			{
 				if (!m_err)
 					m_err = IMAGE_ERROR_UNSPECIFIED;
@@ -1167,7 +1167,7 @@ bool device_image_interface::finish_load()
 //  create - create a image
 //-------------------------------------------------
 
-bool device_image_interface::create(const char *path, const image_device_format *create_format, util::option_resolution *create_args)
+image_init_result device_image_interface::create(const char *path, const image_device_format *create_format, util::option_resolution *create_args)
 {
 	int format_index = 0;
 	int cnt = 0;

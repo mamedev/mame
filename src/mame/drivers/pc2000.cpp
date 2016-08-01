@@ -821,7 +821,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pc2000_state, pc2000_cart )
 	m_cart->rom_alloc(0x40000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 static MACHINE_CONFIG_START( pc2000, pc2000_state )

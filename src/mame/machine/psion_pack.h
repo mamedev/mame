@@ -25,9 +25,9 @@ public:
 	virtual ~datapack_device();
 
 	// image-level overrides
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual bool call_create(int format_type, util::option_resolution *create_args) override;
+	virtual image_init_result call_create(int format_type, util::option_resolution *create_args) override;
 	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
 	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }

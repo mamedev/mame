@@ -8,7 +8,7 @@
     memory
 -------------------------------------------------*/
 
-bool z80bin_load_file(device_image_interface *image, address_space &space, const char *file_type, UINT16 *exec_addr, UINT16 *start_addr, UINT16 *end_addr )
+image_init_result z80bin_load_file(device_image_interface *image, address_space &space, const char *file_type, UINT16 *exec_addr, UINT16 *start_addr, UINT16 *end_addr )
 {
 	int ch;
 	UINT16 args[3];
@@ -25,7 +25,7 @@ bool z80bin_load_file(device_image_interface *image, address_space &space, const
 		{
 			image->seterror(IMAGE_ERROR_INVALIDIMAGE, "Unexpected EOF while getting file name");
 			image->message(" Unexpected EOF while getting file name");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		if (ch != '\0')
@@ -34,7 +34,7 @@ bool z80bin_load_file(device_image_interface *image, address_space &space, const
 			{
 				image->seterror(IMAGE_ERROR_INVALIDIMAGE, "File name too long");
 				image->message(" File name too long");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 
 			pgmname[i] = ch;    /* build program name */
@@ -48,7 +48,7 @@ bool z80bin_load_file(device_image_interface *image, address_space &space, const
 	{
 		image->seterror(IMAGE_ERROR_INVALIDIMAGE, "Unexpected EOF while getting file size");
 		image->message(" Unexpected EOF while getting file size");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	exec_addr[0] = little_endianize_int16(args[0]);
@@ -68,10 +68,10 @@ bool z80bin_load_file(device_image_interface *image, address_space &space, const
 			snprintf(message, ARRAY_LENGTH(message), "%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
 			image->seterror(IMAGE_ERROR_INVALIDIMAGE, message);
 			image->message("%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 		space.write_byte(j, data);
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }

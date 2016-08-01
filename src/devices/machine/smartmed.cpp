@@ -130,7 +130,7 @@ void nand_device::device_start()
 /*
     Load a SmartMedia image
 */
-bool smartmedia_image_device::smartmedia_format_1()
+image_init_result smartmedia_image_device::smartmedia_format_1()
 {
 	SM_disk_image_header custom_header;
 	int bytes_read;
@@ -138,12 +138,12 @@ bool smartmedia_image_device::smartmedia_format_1()
 	bytes_read = fread(&custom_header, sizeof(custom_header));
 	if (bytes_read != sizeof(custom_header))
 	{
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	if (custom_header.version > 1)
 	{
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	m_page_data_size = get_UINT32BE(custom_header.page_data_size);
@@ -186,7 +186,7 @@ bool smartmedia_image_device::smartmedia_format_1()
 	m_image_format = 1;
 	#endif
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 int smartmedia_image_device::detect_geometry( UINT8 id1, UINT8 id2)
@@ -224,7 +224,7 @@ int smartmedia_image_device::detect_geometry( UINT8 id1, UINT8 id2)
 	return result;
 }
 
-bool smartmedia_image_device::smartmedia_format_2()
+image_init_result smartmedia_image_device::smartmedia_format_2()
 {
 	disk_image_format_2_header custom_header;
 	int bytes_read, i, j;
@@ -232,17 +232,17 @@ bool smartmedia_image_device::smartmedia_format_2()
 	bytes_read = fread(&custom_header, sizeof(custom_header));
 	if (bytes_read != sizeof(custom_header))
 	{
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	if ((custom_header.data1[0] != 0xEC) && (custom_header.data1[0] != 0x98))
 	{
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	if (!detect_geometry(custom_header.data1[0], custom_header.data1[1]))
 	{
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	m_data_ptr = auto_alloc_array(machine(), UINT8, m_page_total_size*m_num_pages);
@@ -276,17 +276,17 @@ bool smartmedia_image_device::smartmedia_format_2()
 	m_image_format = 2;
 	#endif
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
-bool smartmedia_image_device::call_load()
+image_init_result smartmedia_image_device::call_load()
 {
-	int result;
+	image_init_result result;
 	UINT64 position;
 	// try format 1
 	position = ftell();
 	result = smartmedia_format_1();
-	if (result != IMAGE_INIT_PASS)
+	if (result != image_init_result::PASS)
 	{
 			// try format 2
 			fseek( position, SEEK_SET);

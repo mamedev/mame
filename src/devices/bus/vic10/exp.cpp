@@ -109,7 +109,7 @@ void vic10_expansion_slot_device::device_reset()
 //  call_load -
 //-------------------------------------------------
 
-bool vic10_expansion_slot_device::call_load()
+image_init_result vic10_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
@@ -162,7 +162,7 @@ bool vic10_expansion_slot_device::call_load()
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

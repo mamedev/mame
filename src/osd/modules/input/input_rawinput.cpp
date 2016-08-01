@@ -530,7 +530,6 @@ protected:
 		BYTE small_buffer[4096];
 		std::unique_ptr<BYTE[]> larger_buffer;
 		LPBYTE data = small_buffer;
-		BOOL result;
 		UINT size;
 
 		// ignore if not enabled
@@ -551,7 +550,7 @@ protected:
 		}
 
 		// fetch the data and process the appropriate message types
-		result = (*get_rawinput_data)(static_cast<HRAWINPUT>(rawinputdevice), RID_INPUT, data, &size, sizeof(RAWINPUTHEADER));
+		bool result = (*get_rawinput_data)(static_cast<HRAWINPUT>(rawinputdevice), RID_INPUT, data, &size, sizeof(RAWINPUTHEADER));
 		if (result)
 		{
 			std::lock_guard<std::mutex> scope_lock(m_module_lock);

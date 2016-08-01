@@ -967,7 +967,7 @@ READ16_MEMBER(apollo_ni::read)
 /*-------------------------------------------------
  DEVICE_IMAGE_LOAD( rom )
  -------------------------------------------------*/
-bool apollo_ni::call_load()
+image_init_result apollo_ni::call_load()
 {
 	CLOG1(("apollo_ni::call_load: %s", filename()));
 
@@ -990,17 +990,17 @@ bool apollo_ni::call_load()
 		{
 			m_node_id = (((data[2] << 8) | data[4]) << 8) | (data[6]);
 			CLOG1(("apollo_ni::call_load: node ID is %x", m_node_id));
-			return IMAGE_INIT_PASS;
+			return image_init_result::PASS;
 		}
 	}
-	return IMAGE_INIT_FAIL;
+	return image_init_result::FAIL;
 }
 
 /*-------------------------------------------------
  DEVICE_IMAGE_CREATE( rom )
  -------------------------------------------------*/
 
-bool apollo_ni::call_create(int format_type, util::option_resolution *format_options)
+image_init_result apollo_ni::call_create(int format_type, util::option_resolution *format_options)
 {
 	CLOG1(("apollo_ni::call_create:"));
 
@@ -1027,10 +1027,10 @@ bool apollo_ni::call_create(int format_type, util::option_resolution *format_opt
 			fwrite(data, sizeof(data));
 			CLOG(("apollo_ni::call_create: created %s with node ID %x", filename(), node_id));
 			set_node_id(node_id);
-			return IMAGE_INIT_PASS;
+			return image_init_result::PASS;
 		}
 	}
-	return IMAGE_INIT_FAIL;
+	return image_init_result::FAIL;
 }
 
 /*-------------------------------------------------

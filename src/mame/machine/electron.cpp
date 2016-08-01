@@ -413,12 +413,12 @@ DEVICE_IMAGE_LOAD_MEMBER( electron_state, electron_cart )
 		if (filesize != 16384)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size: Only size 16384 is supported");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		m_cart->rom_alloc(filesize, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 		image.fread(m_cart->get_rom_base(), filesize);
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 	else
 	{
@@ -428,13 +428,13 @@ DEVICE_IMAGE_LOAD_MEMBER( electron_state, electron_cart )
 		if (upsize != 16384 && upsize != 0)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size for uprom");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		if (losize != 16384 && losize != 0)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size for lorom");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		m_cart->rom_alloc(upsize + losize, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
@@ -445,6 +445,6 @@ DEVICE_IMAGE_LOAD_MEMBER( electron_state, electron_cart )
 		if (losize)
 			memcpy(m_cart->get_rom_base() + upsize, image.get_software_region("lorom"), losize);
 
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 }

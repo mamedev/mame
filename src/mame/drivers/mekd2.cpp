@@ -312,7 +312,7 @@ QUICKLOAD_LOAD_MEMBER( mekd2_state, mekd2_quik )
 	if (memcmp(buff, magic, sizeof (buff)))
 	{
 		logerror("mekd2 rom load: magic '%s' not found\n", magic);
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 	image.fread(&addr, 2);
 	addr = little_endianize_int16(addr);
@@ -323,7 +323,7 @@ QUICKLOAD_LOAD_MEMBER( mekd2_state, mekd2_quik )
 	while (size-- > 0)
 		image.fread(&RAM[addr++], 1);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::mekd2_c)

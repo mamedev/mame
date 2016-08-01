@@ -3266,7 +3266,7 @@ SNAPSHOT_LOAD_MEMBER( amstrad_state,amstrad)
 
 	/* get file size */
 	if (snapshot_size < 8)
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 
 	snapshot.resize(snapshot_size);
 
@@ -3275,11 +3275,11 @@ SNAPSHOT_LOAD_MEMBER( amstrad_state,amstrad)
 
 	if (memcmp(&snapshot[0], "MV - SNA", 8))
 	{
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	amstrad_handle_snapshot(&snapshot[0]);
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -3322,7 +3322,7 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 		if (size % 0x4000)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Attempt to load a raw binary with some block smaller than 16kB in size");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 		else
 			image.fread(m_cart->get_rom_base(), size);
@@ -3353,7 +3353,7 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 		if (strncmp((char*)(header + 8), "AMS!", 4) != 0)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Not an Amstrad CPC cartridge image (despite RIFF header)");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		bytes_to_read = header[4] + (header[5] << 8) + (header[6] << 16)+ (header[7] << 24);
@@ -3405,5 +3405,5 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }

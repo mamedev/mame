@@ -369,8 +369,8 @@ public:
 	DECLARE_READ16_MEMBER(read);
 
 	// image-level overrides
-	virtual bool call_load() override;
-	virtual bool call_create(int format_type, util::option_resolution *format_options) override;
+	virtual image_init_result call_load() override;
+	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 
 	void set_node_id_from_disk();

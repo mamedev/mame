@@ -146,7 +146,7 @@ static const char *arcadia_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-bool arcadia_cart_slot_device::call_load()
+image_init_result arcadia_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -207,10 +207,10 @@ bool arcadia_cart_slot_device::call_load()
 
 		//printf("Type: %s\n", arcadia_get_slot(m_type));
 
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

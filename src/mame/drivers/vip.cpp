@@ -682,7 +682,7 @@ QUICKLOAD_LOAD_MEMBER( vip_state, vip )
 
 	if ((size + chip8_size) > m_ram->size())
 	{
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	if (chip8_size > 0)
@@ -694,7 +694,7 @@ QUICKLOAD_LOAD_MEMBER( vip_state, vip )
 	/* load image to RAM */
 	image.fread(ram + chip8_size, size);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

@@ -266,7 +266,7 @@ DEVICE_IMAGE_LOAD_MEMBER( leapster_state, leapster_cart )
 	m_cart->rom_alloc(size, GENERIC_ROM32_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void leapster_state::machine_start()

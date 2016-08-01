@@ -159,11 +159,11 @@ QUICKLOAD_LOAD_MEMBER( lynx_state, lynx )
 	int i;
 
 	if (image.fread( header, sizeof(header)) != sizeof(header))
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 
 	/* Check the image */
-	if (!lynx_verify_cart((char*)header, LYNX_QUICKLOAD))
-		return IMAGE_INIT_FAIL;
+	if (lynx_verify_cart((char*)header, LYNX_QUICKLOAD) != image_verify_result::PASS)
+		return image_init_result::FAIL;
 
 	start = header[3] | (header[2]<<8); //! big endian format in file format for little endian cpu
 	length = header[5] | (header[4]<<8);
@@ -173,7 +173,7 @@ QUICKLOAD_LOAD_MEMBER( lynx_state, lynx )
 
 	if (image.fread( &data[0], length) != length)
 	{
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	for (i = 0; i < length; i++)
@@ -186,7 +186,7 @@ QUICKLOAD_LOAD_MEMBER( lynx_state, lynx )
 
 	m_maincpu->set_pc(start);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /***************************************************************************

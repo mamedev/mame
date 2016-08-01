@@ -113,7 +113,7 @@ void c64_expansion_slot_device::device_reset()
 //  call_load -
 //-------------------------------------------------
 
-bool c64_expansion_slot_device::call_load()
+image_init_result c64_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
@@ -197,7 +197,7 @@ bool c64_expansion_slot_device::call_load()
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

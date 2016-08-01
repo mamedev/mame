@@ -101,7 +101,7 @@ void cbm2_expansion_slot_device::device_reset()
 //  call_load -
 //-------------------------------------------------
 
-bool cbm2_expansion_slot_device::call_load()
+image_init_result cbm2_expansion_slot_device::call_load()
 {
 	size_t size;
 
@@ -135,7 +135,7 @@ bool cbm2_expansion_slot_device::call_load()
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

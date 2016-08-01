@@ -443,7 +443,7 @@ public:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
@@ -480,14 +480,14 @@ void tm990_189_rs232_image_device::device_timer(emu_timer &timer, device_timer_i
 	}
 }
 
-bool tm990_189_rs232_image_device::call_load()
+image_init_result tm990_189_rs232_image_device::call_load()
 {
 	tm990189_state *state = machine().driver_data<tm990189_state>();
 	tms9902_device* tms9902 = static_cast<tms9902_device*>(machine().device("tms9902"));
 	tms9902->rcv_dsr(ASSERT_LINE);
 	state->m_rs232_input_timer = timer_alloc();
 	state->m_rs232_input_timer->adjust(attotime::zero, 0, attotime::from_msec(10));
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

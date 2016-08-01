@@ -31,7 +31,7 @@ public:
 	INTERRUPT_GEN_MEMBER(n64_reset_poll);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(n64_cart);
 	void mempak_format(UINT8* pak);
-	int disk_load(device_image_interface &image);
+	image_init_result disk_load(device_image_interface &image);
 	void disk_unload(device_image_interface &image);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( n64dd );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( n64dd );
@@ -364,7 +364,7 @@ DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state,n64_cart)
 		mempak_format(periphs->m_save_data.mempak[1]);
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 MACHINE_START_MEMBER(n64_mess_state,n64dd)
@@ -396,12 +396,12 @@ DEVICE_IMAGE_UNLOAD_MEMBER(n64_mess_state,n64dd)
 	disk_unload(image);
 }
 
-int n64_mess_state::disk_load(device_image_interface &image)
+image_init_result n64_mess_state::disk_load(device_image_interface &image)
 {
 	image.fseek(0, SEEK_SET);
 	image.fread(memregion("disk")->base(), image.length());
 	machine().device<n64_periphs>("rcp")->disk_present = true;
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void n64_mess_state::disk_unload(device_image_interface &image)

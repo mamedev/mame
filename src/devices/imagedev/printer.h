@@ -30,8 +30,8 @@ public:
 	template<class _Object> static devcb_base &set_online_callback(device_t &device, _Object object) { return downcast<printer_image_device &>(device).m_online_cb.set_callback(object); }
 
 	// image-level overrides
-	virtual bool call_load() override;
-	virtual bool call_create(int format_type, util::option_resolution *format_options) override;
+	virtual image_init_result call_load() override;
+	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 
 	// image device

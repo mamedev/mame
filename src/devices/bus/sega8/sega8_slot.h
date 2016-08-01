@@ -108,7 +108,7 @@ public:
 	virtual void device_config_complete() override { update_names(SEGA8_CART_SLOT, "cartridge", "cart"); }
 
 	// image-level overrides
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
@@ -117,7 +117,7 @@ public:
 
 	void setup_ram();
 	void internal_header_logging(UINT8 *ROM, UINT32 len, UINT32 nvram_len);
-	bool verify_cart(UINT8 *magic, int size);
+	image_verify_result verify_cart(UINT8 *magic, int size);
 	void set_lphaser_xoffset(UINT8 *rom, int size);
 
 	void save_ram() { if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }

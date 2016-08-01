@@ -42,17 +42,17 @@ void menu_control_floppy_image::do_load_create()
 {
 	floppy_image_device *fd = static_cast<floppy_image_device *>(&m_image);
 	if(input_filename.compare("")==0) {
-		int err = fd->create(output_filename.c_str(), nullptr, nullptr);
-		if (err != 0) {
+		image_init_result err = fd->create(output_filename.c_str(), nullptr, nullptr);
+		if (err != image_init_result::PASS) {
 			machine().popmessage("Error: %s", fd->error());
 			return;
 		}
 		fd->setup_write(output_format);
 	} else {
-		int err = fd->load(input_filename.c_str());
-		if (!err && output_filename.compare("") != 0)
-			err = fd->reopen_for_write(output_filename.c_str());
-		if(err != 0) {
+		image_init_result err = fd->load(input_filename.c_str());
+		if ((err == image_init_result::PASS) && (output_filename.compare("") != 0))
+			err = fd->reopen_for_write(output_filename.c_str()) ? image_init_result::FAIL : image_init_result::PASS;
+		if (err != image_init_result::PASS) {
 			machine().popmessage("Error: %s", fd->error());
 			return;
 		}

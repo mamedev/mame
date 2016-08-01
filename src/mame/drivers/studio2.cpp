@@ -544,7 +544,7 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 			if (image.length() <= 0x100)
 			{
 				image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid ROM file");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 
 			image.fread(&header, 0x100);
@@ -553,7 +553,7 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 			if (strncmp((const char *)header, "RCA2", 4))
 			{
 				image.seterror(IMAGE_ERROR_UNSPECIFIED, "Not an .ST2 file");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 
 			blocks = header[4];
@@ -583,7 +583,7 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 			if (size > 0x400)
 			{
 				image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 			else
 				image.fread(m_cart->get_rom_base(), size);
@@ -603,7 +603,7 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 			memcpy(m_cart->get_rom_base() + 0xa00, image.get_software_region("rom_e00"), image.get_software_region_length("rom_e00"));
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

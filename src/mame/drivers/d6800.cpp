@@ -346,7 +346,7 @@ QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
 	int quick_length;
 	dynamic_buffer quick_data;
 	int read_;
-	int result = IMAGE_INIT_FAIL;
+	image_init_result result = image_init_result::FAIL;
 
 	quick_length = image.length();
 	quick_data.resize(quick_length);
@@ -371,7 +371,7 @@ QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
 		else
 			m_maincpu->set_pc(exec_addr);
 
-		result = IMAGE_INIT_PASS;
+		result = image_init_result::PASS;
 	}
 
 	return result;

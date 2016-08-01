@@ -342,7 +342,7 @@ static const char *a78_get_slot(int type)
 	return "a78_rom";
 }
 
-bool a78_cart_slot_device::call_load()
+image_init_result a78_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -378,8 +378,8 @@ bool a78_cart_slot_device::call_load()
 			char head[128];
 			fread(head, 128);
 
-			if (!verify_header((char *)head))
-				return IMAGE_INIT_FAIL;
+			if (verify_header((char *)head) != image_verify_result::PASS)
+				return image_init_result::FAIL;
 
 			len = (head[49] << 24) | (head[50] << 16) | (head[51] << 8) | head[52];
 			if (len + 128 > length())
@@ -469,7 +469,7 @@ bool a78_cart_slot_device::call_load()
 
 		//printf("Type: %s\n", a78_get_slot(m_type));
 	}
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -499,18 +499,18 @@ void a78_cart_slot_device::call_unload()
  has an admissible header
  -------------------------------------------------*/
 
-bool a78_cart_slot_device::verify_header(char *header)
+image_verify_result a78_cart_slot_device::verify_header(char *header)
 {
 	const char *magic = "ATARI7800";
 
 	if (strncmp(magic, header + 1, 9))
 	{
 		logerror("Not a valid A7800 image\n");
-		return false;
+		return image_verify_result::FAIL;
 	}
 
 	logerror("returning ID_OK\n");
-	return true;
+	return image_verify_result::PASS;
 }
 
 

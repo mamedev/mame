@@ -32,8 +32,8 @@ public:
 	static void static_set_interface(device_t &device, const char *_interface) { downcast<harddisk_image_device &>(device).m_interface = _interface; }
 
 	// image-level overrides
-	virtual bool call_load() override;
-	virtual bool call_create(int create_format, util::option_resolution *create_args) override;
+	virtual image_init_result call_load() override;
+	virtual image_init_result call_create(int create_format, util::option_resolution *create_args) override;
 	virtual void call_unload() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
@@ -60,7 +60,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_stop() override;
 
-	int internal_load_hd();
+	image_init_result internal_load_hd();
 
 	chd_file        *m_chd;
 	chd_file        m_origchd;              /* handle to the original CHD */

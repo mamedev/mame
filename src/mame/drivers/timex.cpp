@@ -612,12 +612,12 @@ DEVICE_IMAGE_LOAD_MEMBER( spectrum_state, timex_cart )
 		if (size % 0x2000 != 9)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "File corrupted");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 		if (image.software_entry() != nullptr)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Loading from softlist is not supported yet");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		m_dock->rom_alloc(0x10000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
@@ -632,7 +632,7 @@ DEVICE_IMAGE_LOAD_MEMBER( spectrum_state, timex_cart )
 		if (chunks_in_file * 0x2000 + 0x09 != size)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "File corrupted");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		switch (header[0])
@@ -656,7 +656,7 @@ DEVICE_IMAGE_LOAD_MEMBER( spectrum_state, timex_cart )
 
 			default:
 				image.seterror(IMAGE_ERROR_UNSPECIFIED, "Cart type not supported");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 		}
 
 		logerror ("Cart loaded [Chunks %02x]\n", m_ram_chunks);
@@ -667,7 +667,7 @@ DEVICE_IMAGE_LOAD_MEMBER( spectrum_state, timex_cart )
 		memcpy(m_dock->get_rom_base(), image.get_software_region("rom"), size);
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

@@ -302,7 +302,7 @@ SNAPSHOT_LOAD_MEMBER( sorcerer_state,sorcerer)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Snapshot must be 65564 bytes");
 		image.message("Snapshot must be 65564 bytes");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	/* get the header */
@@ -335,7 +335,7 @@ SNAPSHOT_LOAD_MEMBER( sorcerer_state,sorcerer)
 	m_maincpu->set_state_int(Z80_IM, header[25]);
 	m_maincpu->set_pc(header[26] | (header[27] << 8));
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void sorcerer_state::machine_start()
@@ -423,8 +423,8 @@ QUICKLOAD_LOAD_MEMBER( sorcerer_state, sorcerer )
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* load the binary into memory */
-	if (z80bin_load_file(&image, space, file_type, &execute_address, &start_address, &end_address) == IMAGE_INIT_FAIL)
-		return IMAGE_INIT_FAIL;
+	if (z80bin_load_file(&image, space, file_type, &execute_address, &start_address, &end_address) != image_init_result::PASS)
+		return image_init_result::FAIL;
 
 	/* is this file executable? */
 	if (execute_address != 0xffff)
@@ -433,7 +433,7 @@ QUICKLOAD_LOAD_MEMBER( sorcerer_state, sorcerer )
 		autorun = m_iop_config->read() & 1;
 
 		if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (space.read_byte(0xdffa) != 0xc3))
-			return IMAGE_INIT_FAIL;     /* can't run a program if the cartridge isn't in */
+			return image_init_result::FAIL;     /* can't run a program if the cartridge isn't in */
 
 		/* Since Exidy Basic is by Microsoft, it needs some preprocessing before it can be run.
 		1. A start address of 01D5 indicates a basic program which needs its pointers fixed up.
@@ -476,5 +476,5 @@ QUICKLOAD_LOAD_MEMBER( sorcerer_state, sorcerer )
 
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }

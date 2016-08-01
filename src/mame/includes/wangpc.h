@@ -168,9 +168,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq );
 
-	int on_disk0_load(floppy_image_device *image);
+	image_init_result on_disk0_load(floppy_image_device *image);
 	void on_disk0_unload(floppy_image_device *image);
-	int on_disk1_load(floppy_image_device *image);
+	image_init_result on_disk1_load(floppy_image_device *image);
 	void on_disk1_unload(floppy_image_device *image);
 
 	UINT8 m_dma_page[4];

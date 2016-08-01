@@ -664,7 +664,7 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
 		image.message(" Cannot read the file");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	image.fseek(0x100, SEEK_SET);
@@ -673,7 +673,7 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
 		image.message(" Invalid header");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	while((ch = image.fgetc()))
@@ -682,7 +682,7 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 		{
 			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File name too long");
 			image.message(" File name too long");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		pgmname[i] = ch;    /* build program name */
@@ -695,7 +695,7 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Unexpected EOF while getting file size");
 		image.message(" Unexpected EOF while getting file size");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	quick_addr = little_endianize_int16(args[0]);
@@ -706,7 +706,7 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too large");
 		image.message(" File too large");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	/* display a message about the loaded quickload */
@@ -721,12 +721,12 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 			snprintf(message, ARRAY_LENGTH(message), "%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
 			image.seterror(IMAGE_ERROR_INVALIDIMAGE, message);
 			image.message("%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 		space.write_byte(j, ch);
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /* Machine driver */

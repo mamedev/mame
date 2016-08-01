@@ -90,10 +90,10 @@ void microdrive_image_device::device_start()
 	m_comms_out = 0;
 }
 
-bool microdrive_image_device::call_load()
+image_init_result microdrive_image_device::call_load()
 {
 	if (length() != MDV_IMAGE_LENGTH)
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 
 	for (int i = 0; i < MDV_IMAGE_LENGTH / 2; i++)
 	{
@@ -104,7 +104,7 @@ bool microdrive_image_device::call_load()
 	m_bit_offset = 0;
 	m_byte_offset = 0;
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void microdrive_image_device::call_unload()

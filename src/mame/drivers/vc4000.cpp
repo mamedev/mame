@@ -402,7 +402,7 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 	int quick_length;
 	dynamic_buffer quick_data;
 	int read_;
-	int result = IMAGE_INIT_FAIL;
+	image_init_result result = image_init_result::FAIL;
 
 	quick_length = image.length();
 	quick_data.resize(quick_length);
@@ -450,7 +450,7 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 
 						// Start the quickload
 						m_maincpu->set_state_int(S2650_PC, exec_addr);
-						result = IMAGE_INIT_PASS;
+						result = image_init_result::PASS;
 					}
 			}
 		}
@@ -508,7 +508,7 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 
 								// Start the quickload
 								m_maincpu->set_state_int(S2650_PC, exec_addr);
-								result = IMAGE_INIT_PASS;
+								result = image_init_result::PASS;
 							}
 				}
 			}

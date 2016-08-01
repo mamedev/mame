@@ -322,12 +322,12 @@ static const char *md_get_slot(int type)
  -------------------------------------------------*/
 
 
-bool base_md_cart_slot_device::call_load()
+image_init_result base_md_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
 		m_type = SEGA_STD;
-		int res;
+		image_init_result res;
 
 		// STEP 1: load the file image and keep a copy for later banking
 		// STEP 2: identify the cart type
@@ -339,7 +339,7 @@ bool base_md_cart_slot_device::call_load()
 
 		//printf("cart type: %d\n", m_type);
 
-		if (res == IMAGE_INIT_PASS)
+		if (res == image_init_result::PASS)
 		{
 			//speed-up rom access from SVP add-on, if present
 			if (m_type == SEGA_SVP)
@@ -360,11 +360,11 @@ bool base_md_cart_slot_device::call_load()
 		return res;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
-int base_md_cart_slot_device::load_list()
+image_init_result base_md_cart_slot_device::load_list()
 {
 	UINT16 *ROM;
 	UINT32 length = get_software_region_length("rom");
@@ -390,7 +390,7 @@ int base_md_cart_slot_device::load_list()
 	if (m_type != SSF2 && m_type != PSOLAR && m_type != CM_2IN1)
 		m_cart->rom_map_setup(length);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -466,7 +466,7 @@ static int genesis_is_SMD(unsigned char *buf, unsigned int len)
  *  softlist
  *************************************/
 
-int base_md_cart_slot_device::load_nonlist()
+image_init_result base_md_cart_slot_device::load_nonlist()
 {
 	unsigned char *ROM;
 	bool is_smd, is_md;
@@ -546,7 +546,7 @@ int base_md_cart_slot_device::load_nonlist()
 	}
 #endif
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /*-------------------------------------------------

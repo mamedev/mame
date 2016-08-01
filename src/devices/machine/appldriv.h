@@ -29,7 +29,7 @@ public:
 	// construction/destruction
 	apple525_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 	void set_params(int dividend, int divisor) { m_dividend = dividend; m_divisor = divisor;}
 

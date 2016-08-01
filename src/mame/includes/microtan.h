@@ -88,9 +88,9 @@ public:
 	UINT8 read_dsw();
 	void microtan_set_irq_line();
 	void store_key(int key);
-	bool microtan_verify_snapshot(UINT8 *data, int size);
-	int parse_intel_hex(UINT8 *snapshot_buff, char *src);
-	int parse_zillion_hex(UINT8 *snapshot_buff, char *src);
+	image_verify_result microtan_verify_snapshot(UINT8 *data, int size);
+	image_init_result parse_intel_hex(UINT8 *snapshot_buff, char *src);
+	image_init_result parse_zillion_hex(UINT8 *snapshot_buff, char *src);
 	void microtan_set_cpu_regs(const UINT8 *snapshot_buff, int base);
 	void microtan_snapshot_copy(UINT8 *snapshot_buff, int snapshot_size);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( microtan );
