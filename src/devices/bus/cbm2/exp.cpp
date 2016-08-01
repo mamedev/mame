@@ -111,17 +111,17 @@ bool cbm2_expansion_slot_device::call_load()
 		{
 			size = length();
 
-			if (!core_stricmp(filetype(), "20"))
+			if (is_filetype("20"))
 			{
 				m_card->m_bank1.allocate(size);
 				fread(m_card->m_bank1, size);
 			}
-			else if (!core_stricmp(filetype(), "40"))
+			else if (is_filetype("40"))
 			{
 				m_card->m_bank2.allocate(size);
 				fread(m_card->m_bank2, size);
 			}
-			else if (!core_stricmp(filetype(), "60"))
+			else if (is_filetype("60"))
 			{
 				m_card->m_bank3.allocate(size);
 				fread(m_card->m_bank3, size);

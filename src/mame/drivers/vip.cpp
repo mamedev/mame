@@ -667,13 +667,13 @@ QUICKLOAD_LOAD_MEMBER( vip_state, vip )
 	int chip8_size = 0;
 	int size = image.length();
 
-	if (strcmp(image.filetype(), "c8") == 0)
+	if (image.is_filetype("c8"))
 	{
 		/* CHIP-8 program */
 		chip8_ptr = m_chip8->base();
 		chip8_size = m_chip8->bytes();
 	}
-	else if (strcmp(image.filename(), "c8x") == 0)
+	else if (image.is_filetype("c8x"))
 	{
 		/* CHIP-8X program */
 		chip8_ptr = m_chip8x->base();

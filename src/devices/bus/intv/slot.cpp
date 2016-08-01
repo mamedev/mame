@@ -247,10 +247,9 @@ int intv_cart_slot_device::load_fullpath()
 	UINT8 low_byte;
 
 	UINT8 *ROM;
-	const char *file_type = filetype();
 
 	/* if it is in .rom format, we enter here */
-	if (!core_stricmp (file_type, "rom"))
+	if (is_filetype("rom"))
 	{
 		// header
 		fread(&temp, 1);

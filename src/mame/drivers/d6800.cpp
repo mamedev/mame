@@ -366,7 +366,7 @@ QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
 		image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length,quick_addr,quick_addr+quick_length,exec_addr);
 
 		// Start the quickload
-		if (strcmp(image.filetype(), "bin") == 0)
+		if (image.is_filetype("bin"))
 			m_maincpu->set_pc(quick_addr);
 		else
 			m_maincpu->set_pc(exec_addr);
