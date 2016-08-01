@@ -209,7 +209,7 @@ std::string c64_expansion_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
-		if (filetype() == "crt")
+		if (is_filetype("crt"))
 			return cbm_crt_get_card(*m_file);
 
 		clear();
