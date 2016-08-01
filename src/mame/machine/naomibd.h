@@ -6,16 +6,16 @@
 #include "machine/naomig1.h"
 #include "machine/x76f100.h"
 
-#define MCFG_NAOMI_BOARD_ADD(_tag, type, _eeprom_tag, _actel_tag, _irq_cb)    \
+#define MCFG_NAOMI_BOARD_ADD(_tag, type, _eeprom_tag, _irq_cb)    \
 	MCFG_NAOMI_G1_ADD(_tag, type, _irq_cb)                        \
-	naomi_board::static_set_eeprom_tag(*device, _eeprom_tag, _actel_tag);
+	naomi_board::static_set_eeprom_tag(*device, _eeprom_tag);
 
 class naomi_board : public naomi_g1_device
 {
 public:
 	naomi_board(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	static void static_set_eeprom_tag(device_t &device, const char *_eeprom_tag, const char *_actel_tag);
+	static void static_set_eeprom_tag(device_t &device, const char *_eeprom_tag);
 
 	// Can be patched in the underlying class
 	virtual DECLARE_ADDRESS_MAP(submap, 16);
@@ -49,7 +49,6 @@ protected:
 	virtual void board_write(offs_t offset, UINT16 data);
 
 	UINT32 rom_offset;
-	const char *rombdid_tag;
 private:
 	UINT32 dma_offset, dma_cur_offset;
 	UINT16 dma_count;

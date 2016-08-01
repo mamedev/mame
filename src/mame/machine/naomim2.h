@@ -7,8 +7,8 @@
 #include "315-5881_crypt.h"
 
 
-#define MCFG_NAOMI_M2_BOARD_ADD(_tag, _eeprom_tag, _actel_tag, _irq_cb) \
-	MCFG_NAOMI_BOARD_ADD(_tag, NAOMI_M2_BOARD, _eeprom_tag, _actel_tag, _irq_cb)
+#define MCFG_NAOMI_M2_BOARD_ADD(_tag, _eeprom_tag, _irq_cb) \
+	MCFG_NAOMI_BOARD_ADD(_tag, NAOMI_M2_BOARD, _eeprom_tag, _irq_cb)
 
 class naomi_m2_board : public naomi_board
 {

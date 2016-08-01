@@ -68,14 +68,12 @@ naomi_board::naomi_board(const machine_config &mconfig, device_type type, const 
 	: naomi_g1_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 	eeprom_tag = nullptr;
-	rombdid_tag = nullptr;
 }
 
-void naomi_board::static_set_eeprom_tag(device_t &device, const char *_eeprom_tag, const char *_actel_tag)
+void naomi_board::static_set_eeprom_tag(device_t &device, const char *_eeprom_tag)
 {
 	naomi_board &dev = downcast<naomi_board &>(device);
 	dev.eeprom_tag = _eeprom_tag;
-	dev.rombdid_tag = _actel_tag;
 }
 
 
