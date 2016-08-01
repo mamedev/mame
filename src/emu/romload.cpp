@@ -164,7 +164,7 @@ std::string rom_region_name(const device_t &device, const rom_entry *romp)
 
 std::string rom_parameter_name(const device_t &device, const rom_entry *romp)
 {
-	return device.subtag(romp->_name);
+	return device.subtag(romp->name().c_str());
 }
 
 
@@ -175,7 +175,7 @@ std::string rom_parameter_name(const device_t &device, const rom_entry *romp)
 
 std::string rom_parameter_value(const rom_entry *romp)
 {
-	return std::string(romp->_hashdata);
+	return romp->hashdata();
 }
 
 
@@ -832,7 +832,7 @@ void rom_load_manager::copy_rom_data(const rom_entry *romp)
 	UINT8 *base = m_region->base() + ROM_GETOFFSET(romp);
 	const char *srcrgntag = ROM_GETNAME(romp);
 	UINT32 numbytes = ROM_GETLENGTH(romp);
-	UINT32 srcoffs = (FPTR)ROM_GETHASHDATA(romp);  /* srcoffset in place of hashdata */
+	UINT32 srcoffs = (UINT32) strtol(ROM_GETHASHDATA(romp), nullptr, 0);  /* srcoffset in place of hashdata */
 
 	/* make sure we copy within the region space */
 	if (ROM_GETOFFSET(romp) + numbytes > m_region->bytes())
@@ -912,9 +912,9 @@ void rom_load_manager::process_rom_entries(const char *regiontag, const rom_entr
 
 					/* handle flag inheritance */
 					if (!ROM_INHERITSFLAGS(&modified_romp))
-						lastflags = modified_romp._flags;
+						lastflags = modified_romp.flags();
 					else
-						modified_romp._flags = (modified_romp._flags & ~ROM_INHERITEDFLAGS) | lastflags;
+						modified_romp.set_flags((modified_romp.flags() & ~ROM_INHERITEDFLAGS) | lastflags);
 
 					explength += ROM_GETLENGTH(&modified_romp);
 
@@ -1113,7 +1113,7 @@ chd_error rom_load_manager::open_disk_diff(emu_options &options, const rom_entry
 	/* try to open the diff */
 	LOG(("Opening differencing image file: %s\n", fname.c_str()));
 	emu_file diff_file(options.diff_directory(), OPEN_FLAG_READ | OPEN_FLAG_WRITE);
-	osd_file::error filerr = diff_file.open(fname);
+	osd_file::error filerr = diff_file.open(fname.c_str());
 	if (filerr == osd_file::error::NONE)
 	{
 		std::string fullpath(diff_file.fullpath());
@@ -1126,7 +1126,7 @@ chd_error rom_load_manager::open_disk_diff(emu_options &options, const rom_entry
 	/* didn't work; try creating it instead */
 	LOG(("Creating differencing image: %s\n", fname.c_str()));
 	diff_file.set_openflags(OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	filerr = diff_file.open(fname);
+	filerr = diff_file.open(fname.c_str());
 	if (filerr == osd_file::error::NONE)
 	{
 		std::string fullpath(diff_file.fullpath());
