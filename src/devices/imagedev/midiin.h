@@ -42,7 +42,7 @@ public:
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *file_extensions() const override { return "mid"; }
-	virtual bool core_opens_image_file() const override { return FALSE; }
+	virtual bool core_opens_image_file() const override { return false; }
 
 protected:
 	// device-level overrides

@@ -143,7 +143,7 @@ protected:
 std::string core_filename_extract_base(const std::string &name, bool strip_extension = false);
 
 // extracts the file extension from a filename
-std::string core_filename_extract_extension(const std::string &filename, bool strip_period = false, bool normalize_to_lowercase = false);
+std::string core_filename_extract_extension(const std::string &filename, bool strip_period = false);
 
 // true if the given filename ends with a particular extension
 bool core_filename_ends_with(const std::string &filename, const std::string &extension);

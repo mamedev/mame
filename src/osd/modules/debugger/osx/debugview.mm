@@ -583,7 +583,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	if (wholeLineScroll)
 	{
 		CGFloat const clamp = [self bounds].size.height - fontHeight - proposedVisibleRect.size.height;
-		proposedVisibleRect.origin.y = std::min((int)proposedVisibleRect.origin.y, std::max((int)clamp, 0));
+		proposedVisibleRect.origin.y = std::min(proposedVisibleRect.origin.y, std::max(clamp, CGFloat(0)));
 		proposedVisibleRect.origin.y -= fmod(proposedVisibleRect.origin.y, fontHeight);
 	}
 	return proposedVisibleRect;
@@ -668,7 +668,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 											  inTextContainer:textContainer];
 		if (start == 0)
 			box.origin.x = 0;
-		box.size.width = std::max((int)([self bounds].size.width - box.origin.x), 0);
+		box.size.width = std::max([self bounds].size.width - box.origin.x, CGFloat(0));
 		[[self backgroundForAttribute:attr] set];
 		[NSBezierPath fillRect:NSMakeRect(box.origin.x,
 										  row * fontHeight,

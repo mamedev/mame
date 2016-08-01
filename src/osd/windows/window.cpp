@@ -406,7 +406,7 @@ void winwindow_process_events_periodic(running_machine &machine)
 	// update once every 1/8th of a second
 	if (currticks - last_event_check < std::chrono::milliseconds(1000 / 8))
 		return;
-	winwindow_process_events(machine, TRUE, FALSE);
+	winwindow_process_events(machine, TRUE, false);
 }
 
 
@@ -415,13 +415,13 @@ void winwindow_process_events_periodic(running_machine &machine)
 //  is_mame_window
 //============================================================
 
-static BOOL is_mame_window(HWND hwnd)
+static bool is_mame_window(HWND hwnd)
 {
 	for (auto window : osd_common_t::s_window_list)
 		if (window->platform_window<HWND>() == hwnd)
-			return TRUE;
+			return true;
 
-	return FALSE;
+	return false;
 }
 
 inline static BOOL handle_mouse_button(windows_osd_interface *osd, int button, int down, int x, int y)

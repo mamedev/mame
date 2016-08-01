@@ -119,7 +119,7 @@ bool vic10_expansion_slot_device::call_load()
 		{
 			size = length();
 
-			if (filetype() == "80")
+			if (is_filetype("80"))
 			{
 				fread(m_card->m_lorom, 0x2000);
 
@@ -128,11 +128,11 @@ bool vic10_expansion_slot_device::call_load()
 					fread(m_card->m_uprom, 0x2000);
 				}
 			}
-			else if (filetype() == "e0")
+			else if (is_filetype("e0"))
 			{
 				fread(m_card->m_uprom, size);
 			}
-			else if (filetype() == "crt")
+			else if (is_filetype("crt"))
 			{
 				size_t roml_size = 0;
 				size_t romh_size = 0;
@@ -174,7 +174,7 @@ std::string vic10_expansion_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
-		if (filetype() == "crt")
+		if (is_filetype("crt"))
 			return cbm_crt_get_card(*m_file);
 
 		clear();

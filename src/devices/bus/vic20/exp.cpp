@@ -113,13 +113,13 @@ bool vic20_expansion_slot_device::call_load()
 	{
 		if (software_entry() == nullptr)
 		{
-			if (filetype() == "20") fread(m_card->m_blk1, 0x2000);
-			else if (filetype() == "40") fread(m_card->m_blk2, 0x2000);
-			else if (filetype() == "60") fread(m_card->m_blk3, 0x2000);
-			else if (filetype() == "70") fread(m_card->m_blk3, 0x2000, 0x1000);
-			else if (filetype() == "a0") fread(m_card->m_blk5, 0x2000);
-			else if (filetype() == "b0") fread(m_card->m_blk5, 0x2000, 0x1000);
-			else if (filetype() == "crt")
+			if (is_filetype("20")) fread(m_card->m_blk1, 0x2000);
+			else if (is_filetype("40")) fread(m_card->m_blk2, 0x2000);
+			else if (is_filetype("60")) fread(m_card->m_blk3, 0x2000);
+			else if (is_filetype("70")) fread(m_card->m_blk3, 0x2000, 0x1000);
+			else if (is_filetype("a0")) fread(m_card->m_blk5, 0x2000);
+			else if (is_filetype("b0")) fread(m_card->m_blk5, 0x2000, 0x1000);
+			else if (is_filetype("crt"))
 			{
 				// read the header
 				UINT8 header[2];

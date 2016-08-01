@@ -144,28 +144,28 @@ void atari_fdc_device::atari_load_proc(device_image_interface &image, bool is_cr
 	//m_drv[id].image = (UINT8*)image.image_realloc(m_drv[id].image, size);
 
 	/* no extension: assume XFD format (no header) */
-	if (image.filetype() == "")
+	if (image.is_filetype(""))
 	{
 		m_drv[id].type = FORMAT_XFD;
 		m_drv[id].header_skip = 0;
 	}
 	else
 	/* XFD extension */
-	if( image.filetype() == "xfd" )
+	if( image.is_filetype("xfd") )
 	{
 		m_drv[id].type = FORMAT_XFD;
 		m_drv[id].header_skip = 0;
 	}
 	else
 	/* ATR extension */
-	if( image.filetype() == "atr" )
+	if( image.is_filetype("atr") )
 	{
 		m_drv[id].type = FORMAT_ATR;
 		m_drv[id].header_skip = 16;
 	}
 	else
 	/* DSK extension */
-	if( image.filetype() == "dsk" )
+	if( image.is_filetype("dsk") )
 	{
 		m_drv[id].type = FORMAT_DSK;
 		m_drv[id].header_skip = sizeof(atari_dsk_format);

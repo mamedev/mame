@@ -2030,14 +2030,14 @@ void lynx_state::machine_start()
 
 ****************************************/
 
-int lynx_state::lynx_verify_cart (char *header, int kind)
+bool lynx_state::lynx_verify_cart (char *header, int kind)
 {
 	if (kind)
 	{
 		if (strncmp("BS93", &header[6], 4))
 		{
 			logerror("This is not a valid Lynx image\n");
-			return IMAGE_VERIFY_FAIL;
+			return false;
 		}
 	}
 	else
@@ -2051,11 +2051,11 @@ int lynx_state::lynx_verify_cart (char *header, int kind)
 			}
 			else
 				logerror("This is not a valid Lynx image\n");
-			return IMAGE_VERIFY_FAIL;
+			return false;
 		}
 	}
 
-	return IMAGE_VERIFY_PASS;
+	return true;
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
@@ -2069,7 +2069,7 @@ DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
 	if (image.software_entry() == nullptr)
 	{
 		// check for lnx header
-		if (image.filetype() == "lnx")
+		if (image.is_filetype("lnx"))
 		{
 			// 64 byte header
 			// LYNX
@@ -2081,7 +2081,7 @@ DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
 			image.fread(header, 0x40);
 
 			// Check the image
-			if (lynx_verify_cart((char*)header, LYNX_CART) == IMAGE_VERIFY_FAIL)
+			if (!lynx_verify_cart((char*)header, LYNX_CART))
 				return IMAGE_INIT_FAIL;
 
 			/* 2008-10 FP: According to Handy source these should be page_size_bank0. Are we using
@@ -2100,9 +2100,9 @@ DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
 	// set-up granularity
 	if (image.software_entry() == nullptr)
 	{
-		if (image.filetype() == "lnx")     // from header
+		if (image.is_filetype("lnx"))     // from header
 			m_granularity = gran;
-		else if (image.filetype() == "lyx")
+		else if (image.is_filetype("lyx"))
 		{
 			/* 2008-10 FP: FIXME: .lyx file don't have an header, hence they miss "lynx_granularity"
 			(see above). What if bank 0 has to be loaded elsewhere? And what about bank 1?

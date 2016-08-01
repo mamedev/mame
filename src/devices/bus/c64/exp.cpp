@@ -123,7 +123,7 @@ bool c64_expansion_slot_device::call_load()
 		{
 			size = length();
 
-			if (filetype() == "80")
+			if (is_filetype("80"))
 			{
 				fread(m_card->m_roml, size);
 				m_card->m_exrom = (0);
@@ -133,20 +133,20 @@ bool c64_expansion_slot_device::call_load()
 					m_card->m_game = 0;
 				}
 			}
-			else if (filetype() == "a0")
+			else if (is_filetype("a0"))
 			{
 				fread(m_card->m_romh, 0x2000);
 
 				m_card->m_exrom = 0;
 				m_card->m_game = 0;
 			}
-			else if (filetype() == "e0")
+			else if (is_filetype("e0"))
 			{
 				fread(m_card->m_romh, 0x2000);
 
 				m_card->m_game = 0;
 			}
-			else if (filetype() == "crt")
+			else if (is_filetype("crt"))
 			{
 				size_t roml_size = 0;
 				size_t romh_size = 0;

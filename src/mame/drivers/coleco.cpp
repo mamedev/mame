@@ -352,15 +352,15 @@ void coleco_state::machine_reset()
 	m_last_nmi_state = 0;
 }
 
-//static int coleco_cart_verify(const UINT8 *cartdata, size_t size)
+//static bool coleco_cart_verify(const UINT8 *cartdata, size_t size)
 //{
-//  int retval = IMAGE_VERIFY_FAIL;
+//  int retval = false;
 //
 //  /* Verify the file is in Colecovision format */
 //  if ((cartdata[0] == 0xAA) && (cartdata[1] == 0x55)) /* Production Cartridge */
-//      retval = IMAGE_VERIFY_PASS;
+//      retval = true;
 //  if ((cartdata[0] == 0x55) && (cartdata[1] == 0xAA)) /* "Test" Cartridge. Some games use this method to skip ColecoVision title screen and delay */
-//      retval = IMAGE_VERIFY_PASS;
+//      retval = true;
 //
 //  return retval;
 //}

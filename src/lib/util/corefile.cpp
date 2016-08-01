@@ -1294,14 +1294,12 @@ std::string core_filename_extract_base(const std::string &name, bool strip_exten
 // core_filename_extract_extension
 // -------------------------------------------------
 
-std::string core_filename_extract_extension(const std::string &filename, bool strip_period, bool normalize_to_lowercase)
+std::string core_filename_extract_extension(const std::string &filename, bool strip_period)
 {
 	auto loc = filename.find_last_of('.');
 	std::string result = loc != std::string::npos
 		? filename.substr(loc + (strip_period ? 1 : 0))
 		: "";
-	if (normalize_to_lowercase)
-		std::transform(result.begin(), result.end(), result.begin(), ::tolower);
 	return result;
 }
 

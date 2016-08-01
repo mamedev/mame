@@ -249,7 +249,7 @@ int intv_cart_slot_device::load_fullpath()
 	UINT8 *ROM;
 
 	/* if it is in .rom format, we enter here */
-	if (filetype() == "rom")
+	if (is_filetype("rom"))
 	{
 		// header
 		fread(&temp, 1);

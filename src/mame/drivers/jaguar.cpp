@@ -2018,11 +2018,11 @@ int jaguar_state::quickload(device_image_interface &image, const char *file_type
 		skip = 96;
 
 	else    /* ABS binary */
-	if (image.filetype() == "abs")
+	if (image.is_filetype("abs"))
 		start = 0xc000;
 
 	else    /* JAG binary */
-	if (image.filetype() == "jag")
+	if (image.is_filetype("jag"))
 		start = 0x5000;
 
 
@@ -2063,7 +2063,7 @@ DEVICE_IMAGE_LOAD_MEMBER( jaguar_state, jaguar_cart )
 		size = image.length();
 
 		/* .rom files load & run at 802000 */
-		if (image.filetype() == "rom")
+		if (image.is_filetype("rom"))
 		{
 			load_offset = 0x2000;             // fix load address
 			m_cart_base[0x101] = 0x802000;    // fix exec address

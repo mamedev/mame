@@ -1143,14 +1143,14 @@ bool screen_device::update_partial(int scanline)
 		if (machine().video().skip_this_frame())
 		{
 			LOG_PARTIAL_UPDATES(("skipped due to frameskipping\n"));
-			return FALSE;
+			return false;
 		}
 
 		// skip if this screen is not visible anywhere
 		if (!machine().render().is_live(*this))
 		{
 			LOG_PARTIAL_UPDATES(("skipped because screen not live\n"));
-			return FALSE;
+			return false;
 		}
 	}
 

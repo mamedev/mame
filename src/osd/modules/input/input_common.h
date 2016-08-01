@@ -464,10 +464,10 @@ class input_module_base : public input_module
 public:
 	input_module_base(const char *type, const char* name)
 		: input_module(type, name),
-		m_input_enabled(FALSE),
-		m_mouse_enabled(FALSE),
-		m_lightgun_enabled(FALSE),
-		m_input_paused(FALSE),
+		m_input_enabled(false),
+		m_mouse_enabled(false),
+		m_lightgun_enabled(false),
+		m_input_paused(false),
 		m_options(nullptr)
 	{
 	}

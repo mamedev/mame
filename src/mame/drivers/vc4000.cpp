@@ -414,7 +414,7 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 	}
 	else
 	{
-		if (image.filetype() == "tvc")
+		if (image.is_filetype("tvc"))
 		{
 			if (quick_data[0] != 2)
 			{
@@ -455,7 +455,7 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 			}
 		}
 		else
-			if (image.filetype() == "pgm")
+			if (image.is_filetype("pgm"))
 			{
 				if (quick_data[0] != 0)
 				{

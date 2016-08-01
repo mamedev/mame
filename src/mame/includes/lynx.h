@@ -181,7 +181,7 @@ public:
 	void lynx_timer_count_down(int which);
 	UINT32 lynx_time_factor(int val);
 	void lynx_uart_reset();
-	int lynx_verify_cart (char *header, int kind);
+	bool lynx_verify_cart (char *header, int kind);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( lynx );
 
 protected:

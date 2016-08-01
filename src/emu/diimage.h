@@ -101,7 +101,7 @@ class software_part;
 class software_info;
 
 // device image interface function types
-typedef delegate<int (device_image_interface &)> device_image_load_delegate;
+typedef delegate<bool (device_image_interface &)> device_image_load_delegate;
 typedef delegate<void (device_image_interface &)> device_image_func_delegate;
 // legacy
 typedef void (*device_image_partialhash_func)(util::hash_collection &, const unsigned char *, unsigned long, const char *);
@@ -110,15 +110,13 @@ typedef void (*device_image_partialhash_func)(util::hash_collection &, const uns
 //  MACROS
 //**************************************************************************
 
-#define IMAGE_INIT_PASS     FALSE
-#define IMAGE_INIT_FAIL     TRUE
-#define IMAGE_VERIFY_PASS   FALSE
-#define IMAGE_VERIFY_FAIL   TRUE
+#define IMAGE_INIT_PASS     false
+#define IMAGE_INIT_FAIL     true
 
 #define DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)           device_image_load_##_name
 #define DEVICE_IMAGE_LOAD_NAME(_class,_name)           _class::DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)
-#define DECLARE_DEVICE_IMAGE_LOAD_MEMBER(_name)        int DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)(device_image_interface &image)
-#define DEVICE_IMAGE_LOAD_MEMBER(_class,_name)         int DEVICE_IMAGE_LOAD_NAME(_class,_name)(device_image_interface &image)
+#define DECLARE_DEVICE_IMAGE_LOAD_MEMBER(_name)        bool DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)(device_image_interface &image)
+#define DEVICE_IMAGE_LOAD_MEMBER(_class,_name)         bool DEVICE_IMAGE_LOAD_NAME(_class,_name)(device_image_interface &image)
 #define DEVICE_IMAGE_LOAD_DELEGATE(_class,_name)       device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_name),#_class "::device_image_load_" #_name, downcast<_class *>(device->owner()))
 
 #define DEVICE_IMAGE_UNLOAD_MEMBER_NAME(_name)          device_image_unload_##_name
@@ -149,12 +147,12 @@ public:
 
 	virtual void device_compute_hash(util::hash_collection &hashes, const void *data, size_t length, const char *types) const;
 
-	virtual bool call_load() { return FALSE; }
-	virtual bool call_create(int format_type, util::option_resolution *format_options) { return FALSE; }
+	virtual bool call_load() { return IMAGE_INIT_PASS; }
+	virtual bool call_create(int format_type, util::option_resolution *format_options) { return IMAGE_INIT_PASS; }
 	virtual void call_unload() { }
 	virtual std::string call_display() { return std::string(); }
 	virtual device_image_partialhash_func get_partial_hash() const { return nullptr; }
-	virtual bool core_opens_image_file() const { return TRUE; }
+	virtual bool core_opens_image_file() const { return true; }
 	virtual iodevice_t image_type()  const = 0;
 	virtual bool is_readable()  const = 0;
 	virtual bool is_writeable() const = 0;
@@ -178,6 +176,7 @@ public:
 	const char *basename() const { if (m_basename.empty()) return nullptr; else return m_basename.c_str(); }
 	const char *basename_noext()  const { if (m_basename_noext.empty()) return nullptr; else return m_basename_noext.c_str(); }
 	const std::string &filetype() const { return m_filetype; }
+	bool is_filetype(const std::string &candidate_filetype) { return !core_stricmp(filetype().c_str(), candidate_filetype.c_str()); }
 	bool is_open() const { return bool(m_file); }
 	util::core_file &image_core_file() const { return *m_file; }
 	UINT64 length() { check_for_file(); return m_file->size(); }
@@ -194,7 +193,7 @@ public:
 	int image_feof() { check_for_file(); return m_file->eof(); }
 	void *ptr() {check_for_file(); return const_cast<void *>(m_file->buffer()); }
 	// configuration access
-	void set_init_phase() { m_init_phase = TRUE; }
+	void set_init_phase() { m_init_phase = true; }
 
 	const char* longname() const { return m_longname.c_str(); }
 	const char* manufacturer() const { return m_manufacturer.c_str(); }
@@ -228,7 +227,12 @@ public:
 	bool uses_file_extension(const char *file_extension) const;
 	const formatlist_type &formatlist() const { return m_formatlist; }
 
+	// loads an image file
 	bool load(const char *path);
+
+	// loads a softlist item by name
+	bool load_software(const std::string &softlist_name);
+
 	bool open_image_file(emu_options &options);
 	bool finish_load();
 	void unload();
@@ -294,14 +298,21 @@ protected:
 	std::string m_basename_noext;
 	std::string m_filetype;
 
-	// working directory; persists across mounts
-	std::string m_working_directory;
-
 	// Software information
 	std::string m_full_software_name;
 	const software_info *m_software_info_ptr;
 	const software_part *m_software_part_ptr;
 	std::string m_software_list_name;
+
+private:
+	static image_error_t image_error_from_file_error(osd_file::error filerr);
+	bool schedule_postload_hard_reset_if_needed();
+
+	// creation info
+	formatlist_type m_formatlist;
+
+	// working directory; persists across mounts
+	std::string m_working_directory;
 
 	// info read from the hash file/software list
 	std::string m_longname;
@@ -328,12 +339,6 @@ protected:
 	bool m_user_loadable;
 
 	bool m_is_loading;
-
-private:
-	static image_error_t image_error_from_file_error(osd_file::error filerr);
-
-	// creation info
-	formatlist_type m_formatlist;
 };
 
 // iterator

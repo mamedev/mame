@@ -197,23 +197,14 @@ void device_image_interface::set_image_filename(const std::string &filename)
 		[](char c) { return (c == '\\') || (c == '/') || (c == ':'); });
 
 	if (iter != m_image_name.rend())
-	{
-		if (*iter == ':')
-		{
-			// temp workaround for softlists now that m_image_name contains the part name too (e.g. list:gamename:cart)
-			m_basename.assign(m_image_name.begin(), std::next(iter).base());
-			int tmploc = m_basename.find_last_of(':');
-			m_basename = m_basename.substr(tmploc + 1);
-		}
-		else
-			m_basename.assign(iter.base(), m_image_name.end());
-	}
+		m_basename.assign(iter.base(), m_image_name.end());
+
 	m_basename_noext = m_basename;
 	auto loc = m_basename_noext.find_last_of('.');
 	if (loc != std::string::npos)
 		m_basename_noext = m_basename_noext.substr(0, loc);
 
-	m_filetype = core_filename_extract_extension(m_basename, true, true);
+	m_filetype = core_filename_extract_extension(m_basename, true);
 }
 
 
@@ -932,10 +923,6 @@ bool device_image_interface::load_internal(const std::string &path, bool is_crea
 {
 	UINT32 open_plan[4];
 	int i;
-	bool softload = false;
-
-	// if the path contains no period, we are using softlists, so we won't create an image
-	bool filename_has_period = (path.find_last_of('.') != -1);
 
 	// first unload the image
 	unload();
@@ -951,30 +938,7 @@ bool device_image_interface::load_internal(const std::string &path, bool is_crea
 
 	if (core_opens_image_file())
 	{
-		// Check if there's a software list defined for this device and use that if we're not creating an image
-		if (!filename_has_period && !just_load)
-		{
-			softload = load_software_part(path.c_str(), m_software_part_ptr);
-			if (softload)
-			{
-				m_software_info_ptr = &m_software_part_ptr->info();
-				m_software_list_name.assign(m_software_info_ptr->list().list_name());
-				m_full_software_name.assign(m_software_part_ptr->info().shortname());
-
-				// if we had launched from softlist with a specified part, e.g. "shortname:part"
-				// we would have recorded the wrong name, so record it again based on software_info
-				if (m_software_info_ptr && !m_full_software_name.empty())
-					set_image_filename(m_full_software_name);
-
-				// check if image should be read-only
-				const char *read_only = get_feature("read_only");
-				if (read_only && !strcmp(read_only, "true")) {
-					make_readonly();
-				}
-			}
-		}
-
-		if (is_create || filename_has_period)
+		if (is_create)
 		{
 			// determine open plan
 			determine_open_plan(is_create, open_plan);
@@ -989,28 +953,8 @@ bool device_image_interface::load_internal(const std::string &path, bool is_crea
 			}
 		}
 
-		// Copy some image information when we have been loaded through a software list
-		if ( m_software_info_ptr )
-		{
-			// sanitize
-			if (m_software_info_ptr->longname().empty() || m_software_info_ptr->publisher().empty() || m_software_info_ptr->year().empty())
-				fatalerror("Each entry in an XML list must have all of the following fields: description, publisher, year!\n");
-
-			// store
-			m_longname = m_software_info_ptr->longname();
-			m_manufacturer = m_software_info_ptr->publisher();
-			m_year = m_software_info_ptr->year();
-			//m_playable = m_software_info_ptr->supported();
-
-			// set file type
-			std::string filename = (m_mame_file != nullptr) && (m_mame_file->filename() != nullptr)
-				? m_mame_file->filename()
-				: "";
-			m_filetype = core_filename_extract_extension(filename, true, true);
-		}
-
 		// did we fail to find the file?
-		if (!is_loaded() && !softload)
+		if (!is_loaded())
 		{
 			m_err = IMAGE_ERROR_FILENOTFOUND;
 			goto done;
@@ -1022,7 +966,7 @@ bool device_image_interface::load_internal(const std::string &path, bool is_crea
 	m_create_args = create_args;
 
 	if (m_init_phase==false) {
-		m_err = (image_error_t)finish_load();
+		m_err = (finish_load()==IMAGE_INIT_PASS) ? IMAGE_ERROR_SUCCESS : IMAGE_ERROR_INTERNAL;
 		if (m_err)
 			goto done;
 	}
@@ -1044,10 +988,8 @@ done:
 		clear();
 	}
 	else {
-		/* do we need to reset the CPU? only schedule it if load/create is successful */
-		if (device().machine().time() > attotime::zero && is_reset_on_load())
-			device().machine().schedule_hard_reset();
-		else
+		// do we need to reset the CPU? only schedule it if load/create is successful
+		if (!schedule_postload_hard_reset_if_needed())
 		{
 			if (!m_init_phase)
 			{
@@ -1062,6 +1004,18 @@ done:
 }
 
 
+//-------------------------------------------------
+//  schedule_postload_hard_reset_if_needed
+//-------------------------------------------------
+
+bool device_image_interface::schedule_postload_hard_reset_if_needed()
+{
+	bool postload_hard_reset_needed = device().machine().time() > attotime::zero && is_reset_on_load();
+	if (postload_hard_reset_needed)
+		device().machine().schedule_hard_reset();
+	return postload_hard_reset_needed;
+}
+
 
 //-------------------------------------------------
 //  load - load an image into MAME
@@ -1070,6 +1024,82 @@ done:
 bool device_image_interface::load(const char *path)
 {
 	return load_internal(path, false, 0, nullptr, false);
+}
+
+
+//-------------------------------------------------
+//  load_software - loads a softlist item by name
+//-------------------------------------------------
+
+bool device_image_interface::load_software(const std::string &softlist_name)
+{
+	// Prepare to load
+	unload();
+	clear_error();
+	m_is_loading = true;
+
+	// Check if there's a software list defined for this device and use that if we're not creating an image
+	bool softload = load_software_part(softlist_name.c_str(), m_software_part_ptr);
+	if (!softload)
+	{
+		m_is_loading = false;
+		return IMAGE_INIT_FAIL;
+	}
+
+	// set up softlist stuff
+	m_software_info_ptr = &m_software_part_ptr->info();
+	m_software_list_name.assign(m_software_info_ptr->list().list_name());
+	m_full_software_name.assign(m_software_part_ptr->info().shortname());
+
+	// specify image name with softlist-derived names
+	m_image_name = m_full_software_name;
+	m_basename = m_full_software_name;
+	m_basename_noext = m_full_software_name;
+	m_filetype = "";
+
+	// check if image should be read-only
+	const char *read_only = get_feature("read_only");
+	if (read_only && !strcmp(read_only, "true"))
+	{
+		make_readonly();
+
+		// Copy some image information when we have been loaded through a software list
+		if (m_software_info_ptr)
+		{
+			// sanitize
+			if (m_software_info_ptr->longname().empty() || m_software_info_ptr->publisher().empty() || m_software_info_ptr->year().empty())
+				fatalerror("Each entry in an XML list must have all of the following fields: description, publisher, year!\n");
+
+			// store
+			m_longname = m_software_info_ptr->longname();
+			m_manufacturer = m_software_info_ptr->publisher();
+			m_year = m_software_info_ptr->year();
+
+			// set file type
+			std::string filename = (m_mame_file != nullptr) && (m_mame_file->filename() != nullptr)
+				? m_mame_file->filename()
+				: "";
+			m_filetype = core_filename_extract_extension(filename, true);
+		}
+	}
+
+	// call finish_load if necessary
+	if (m_init_phase == false && finish_load())
+		return IMAGE_INIT_FAIL;
+
+	// do we need to reset the CPU? only schedule it if load is successful
+	if (!schedule_postload_hard_reset_if_needed())
+	{
+		if (!m_init_phase)
+		{
+			if (device().machine().phase() == MACHINE_PHASE_RUNNING)
+				device().popmessage("Image '%s' was successfully loaded.", softlist_name);
+			else
+				osd_printf_info("Image '%s' was successfully loaded.\n", softlist_name.c_str());
+		}
+	}
+
+	return IMAGE_INIT_PASS;
 }
 
 
@@ -1108,7 +1138,7 @@ bool device_image_interface::finish_load()
 		if (m_created)
 		{
 			err = call_create(m_create_format, m_create_args);
-			if (err)
+			if (err == IMAGE_INIT_FAIL)
 			{
 				if (!m_err)
 					m_err = IMAGE_ERROR_UNSPECIFIED;
@@ -1118,7 +1148,7 @@ bool device_image_interface::finish_load()
 		{
 			// using device load
 			err = call_load();
-			if (err)
+			if (err == IMAGE_INIT_FAIL)
 			{
 				if (!m_err)
 					m_err = IMAGE_ERROR_UNSPECIFIED;
@@ -1166,6 +1196,8 @@ void device_image_interface::clear()
 	m_image_name.clear();
 	m_readonly = false;
 	m_created = false;
+	m_create_format = 0;
+	m_create_args = nullptr;
 
 	m_longname.clear();
 	m_manufacturer.clear();

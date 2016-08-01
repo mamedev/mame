@@ -81,7 +81,7 @@ private:
 		EFFECT_COUNT_MAX = 10
 	};
 
-	UINT32 clamped_latency() const { return std::max(std::min(UINT32(m_audio_latency), UINT32(LATENCY_MAX)), UINT32(LATENCY_MIN)); }
+	UINT32 clamped_latency() const { return unsigned(std::max(std::min(m_audio_latency, int(LATENCY_MAX)), int(LATENCY_MIN))); }
 	UINT32 buffer_avail() const { return ((m_writepos >= m_playpos) ? m_buffer_size : 0) + m_playpos - m_writepos; }
 	UINT32 buffer_used() const { return ((m_playpos > m_writepos) ? m_buffer_size : 0) + m_writepos - m_playpos; }
 
@@ -228,7 +228,7 @@ int sound_coreaudio::init(const osd_options &options)
 
 	// Allocate buffer
 	m_headroom = m_sample_bytes * (clamped_latency() * sample_rate() / 40);
-	m_buffer_size = m_sample_bytes * std::max(UINT32(sample_rate() * (clamped_latency() + 3) / 40), 256U);
+	m_buffer_size = m_sample_bytes * std::max<UINT32>(sample_rate() * (clamped_latency() + 3) / 40, 256U);
 	m_buffer = global_alloc_array_clear<INT8>(m_buffer_size);
 	if (!m_buffer)
 	{
