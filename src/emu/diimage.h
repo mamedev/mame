@@ -228,7 +228,7 @@ public:
 	const formatlist_type &formatlist() const { return m_formatlist; }
 
 	// loads an image file
-	image_init_result load(const char *path);
+	image_init_result load(const std::string &path);
 
 	// loads a softlist item by name
 	image_init_result load_software(const std::string &softlist_name);

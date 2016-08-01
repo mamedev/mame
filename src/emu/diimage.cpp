@@ -1018,7 +1018,7 @@ bool device_image_interface::schedule_postload_hard_reset_if_needed()
 //  load - load an image into MAME
 //-------------------------------------------------
 
-image_init_result device_image_interface::load(const char *path)
+image_init_result device_image_interface::load(const std::string &path)
 {
 	return load_internal(path, false, 0, nullptr, false);
 }
