@@ -167,15 +167,8 @@ ADDRESS_MAP_END
 
 aw_rom_board::aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: naomi_g1_device(mconfig, AW_ROM_BOARD, "Sammy Atomiswave ROM Board", tag, owner, clock, "aw_rom_board", __FILE__),
-		m_region(*this, DEVICE_SELF),
-		m_keyregion(*this)
+		m_region(*this, DEVICE_SELF)
 {
-}
-
-void aw_rom_board::static_set_keyregion(device_t &device, const char *keyregion)
-{
-	aw_rom_board &dev = downcast<aw_rom_board &>(device);
-	dev.m_keyregion.set_tag(keyregion);
 }
 
 
@@ -255,22 +248,18 @@ UINT16 aw_rom_board::decrypt(UINT16 cipherText, UINT32 address, const UINT32 key
 	return ((b3<<13)|(b2<<9)|(b1<<5)|b0)^(key&0xffff);
 }
 
-void aw_rom_board::set_key()
-{
-	if (!m_keyregion.found())
-		return;
-
-	if (m_keyregion->bytes() != 4)
-		throw emu_fatalerror("AW-ROM-BOARD: key region %s has incorrect size (%d, expected 4)\n", m_keyregion.finder_tag(), m_keyregion->bytes());
-
-	const UINT8 *krp = m_keyregion->base();
-	rombd_key = (krp[0] << 24) | (krp[1] << 16) | (krp[2] << 8) | krp[3];
-}
-
 void aw_rom_board::device_start()
 {
 	naomi_g1_device::device_start();
-	set_key();
+
+	std::string skey = parameter("key");
+	if (!skey.empty())
+		rombd_key = strtoll(skey.c_str(), nullptr, 16);
+	else
+	{
+		logerror("%s: Warning: key not provided\n", tag());
+		rombd_key = 0;
+	}
 
 	mpr_offset = decrypt16(0x58/2) | (decrypt16(0x5a/2) << 16);
 

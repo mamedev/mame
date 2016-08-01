@@ -5,16 +5,13 @@
 
 #include "naomig1.h"
 
-#define MCFG_AW_ROM_BOARD_ADD(_tag, _keyregion, _irq_cb)  \
-	MCFG_NAOMI_G1_ADD(_tag, AW_ROM_BOARD, _irq_cb)        \
-	aw_rom_board::static_set_keyregion(*device, "^" _keyregion);
+#define MCFG_AW_ROM_BOARD_ADD(_tag, _irq_cb)  \
+	MCFG_NAOMI_G1_ADD(_tag, AW_ROM_BOARD, _irq_cb)
 
 class aw_rom_board : public naomi_g1_device
 {
 public:
 	aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	static void static_set_keyregion(device_t &device, const char *keyregion);
 
 	DECLARE_ADDRESS_MAP(submap, 16);
 
@@ -38,7 +35,6 @@ private:
 	enum { EPR, MPR_RECORD, MPR_FILE };
 
 	required_memory_region m_region;
-	optional_memory_region m_keyregion;
 	UINT32 rombd_key;
 	UINT32 mpr_offset, mpr_bank;
 	UINT32 epr_offset, mpr_file_offset;
@@ -59,7 +55,6 @@ private:
 	static UINT16 decrypt(UINT16 cipherText, UINT32 address, const UINT32 key);
 	UINT16 decrypt16(UINT32 address) { return decrypt(m_region->u16(address), address, rombd_key); }
 
-	void set_key();
 	void recalc_dma_offset(int mode);
 };
 
