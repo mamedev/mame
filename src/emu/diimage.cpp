@@ -938,19 +938,16 @@ image_init_result device_image_interface::load_internal(const std::string &path,
 
 	if (core_opens_image_file())
 	{
-		if (is_create)
-		{
-			// determine open plan
-			determine_open_plan(is_create, open_plan);
+		// determine open plan
+		determine_open_plan(is_create, open_plan);
 
-			// attempt to open the file in various ways
-			for (i = 0; !m_file && open_plan[i]; i++)
-			{
-				// open the file
-				m_err = load_image_by_path(open_plan[i], path);
-				if (m_err && (m_err != IMAGE_ERROR_FILENOTFOUND))
-					goto done;
-			}
+		// attempt to open the file in various ways
+		for (i = 0; !m_file && open_plan[i]; i++)
+		{
+			// open the file
+			m_err = load_image_by_path(open_plan[i], path);
+			if (m_err && (m_err != IMAGE_ERROR_FILENOTFOUND))
+				goto done;
 		}
 
 		// did we fail to find the file?
