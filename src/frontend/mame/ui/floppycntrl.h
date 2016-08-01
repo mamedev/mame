@@ -33,7 +33,7 @@ private:
 	virtual void handle() override;
 
 	void do_load_create();
-	virtual void hook_load(std::string filename, bool softlist) override;
+	virtual void hook_load(const std::string &filename, bool softlist) override;
 };
 
 } // namespace ui

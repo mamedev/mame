@@ -49,7 +49,7 @@ void menu_control_floppy_image::do_load_create()
 		}
 		fd->setup_write(output_format);
 	} else {
-		image_init_result err = fd->load(input_filename.c_str());
+		image_init_result err = fd->load(input_filename);
 		if ((err == image_init_result::PASS) && (output_filename.compare("") != 0))
 			err = fd->reopen_for_write(output_filename.c_str()) ? image_init_result::FAIL : image_init_result::PASS;
 		if (err != image_init_result::PASS) {
@@ -61,7 +61,7 @@ void menu_control_floppy_image::do_load_create()
 	}
 }
 
-void menu_control_floppy_image::hook_load(std::string filename, bool softlist)
+void menu_control_floppy_image::hook_load(const std::string &filename, bool softlist)
 {
 	if (softlist)
 	{
