@@ -121,7 +121,8 @@ enum
 class machine_config;
 class emu_options;
 class chd_file;
-class software_list_device;
+class software_part;
+class device_image_interface;
 
 struct rom_entry
 {
@@ -303,7 +304,7 @@ public:
 	/* set a pointer to the CHD file associated with the given region */
 	int set_disk_handle(const char *region, const char *fullpath);
 
-	void load_software_part_region(device_t &device, software_list_device &swlist, const char *swname, const rom_entry *start_region);
+	void load_software_part_region(device_t &device, const char *list_name, const software_part &swpart);
 
 private:
 	void determine_bios_rom(device_t &device, const char *specbios);
@@ -346,6 +347,41 @@ private:
 
 	std::string     m_errorstring;        /* error string */
 	std::string     m_softwarningstring;  /* software warning string */
+};
+
+
+// ======================> software_list_loader
+
+class software_list_loader
+{
+public:
+	virtual bool load_software(device_image_interface &device, const char *list_name, const software_part &swpart) const = 0;
+};
+
+
+// ======================> rom_software_list_loader
+
+class rom_software_list_loader : public software_list_loader
+{
+public:
+	virtual bool load_software(device_image_interface &device, const char *list_name, const software_part &swpart) const override;
+	static const software_list_loader &instance() { return s_instance; }
+
+private:
+	static rom_software_list_loader s_instance;
+};
+
+
+// ======================> image_software_list_loader
+
+class image_software_list_loader : public software_list_loader
+{
+public:
+	virtual bool load_software(device_image_interface &device, const char *list_name, const software_part &swpart) const override;
+	static const software_list_loader &instance() { return s_instance; }
+
+private:
+	static image_software_list_loader s_instance;
 };
 
 

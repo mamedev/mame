@@ -21466,7 +21466,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19961220"/>
 		<info name="alt_title" value="ウルトラマン 光の巨人伝説"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<sharedfeat name="requirement" value="sat_cart -ultraman"/>
+		<sharedfeat name="requirement" value="sat_cart:ultraman"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="ultraman (j) (t-13308g)" sha1="1232eee5dc6c2c031a4b3ce34862086f24684dff" />
@@ -31846,7 +31846,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81088-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
-		<sharedfeat name="requirement" value="sat_cart -kof95"/>
+		<sharedfeat name="requirement" value="sat_cart:kof95"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="the king of fighters 95 (euro)" sha1="cdc783b083ab52c104be71259b6e654cbdd7ccca"/>

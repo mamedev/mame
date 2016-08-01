@@ -25,6 +25,7 @@
 #include "rendfont.h"
 #include "rendutil.h"
 #include "softlist.h"
+#include "swinfo.h"
 #include "uiinput.h"
 
 
@@ -523,12 +524,13 @@ void menu_select_software::build_software_list()
 	// iterate thru all software lists
 	for (software_list_device &swlist : software_list_device_iterator(config.root_device()))
 	{
+		swlist.parse();
 		m_filter.swlist.name.push_back(swlist.list_name());
-		m_filter.swlist.description.push_back(swlist.description());
-		for (const software_info &swinfo : swlist.get_info())
+		m_filter.swlist.description.push_back(swlist.parsed().description());
+		for (const software_info &swinfo : swlist.parsed().get_info())
 		{
 			const software_part &part = swinfo.parts().front();
-			if (part.is_compatible(swlist) == SOFTWARE_IS_COMPATIBLE)
+			if (part.is_compatible(swlist.filter()) == SOFTWARE_IS_COMPATIBLE)
 			{
 				const char *instance_name = nullptr;
 				const char *type_name = nullptr;

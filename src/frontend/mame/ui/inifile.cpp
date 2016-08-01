@@ -12,6 +12,7 @@
 #include "ui/moptions.h"
 #include "ui/inifile.h"
 #include "softlist.h"
+#include "swinfo.h"
 #include "drivenum.h"
 
 //-------------------------------------------------
@@ -210,7 +211,8 @@ void favorite_manager::add_favorite_game()
 			if (!swinfo->parentname().empty())
 			{
 				auto swlist = software_list_device::find_by_name(machine().config(), image.software_list_name());
-				for (const software_info &c_swinfo : swlist->get_info())
+				swlist->parse();
+				for (const software_info &c_swinfo : swlist->parsed().get_info())
 				{
 					std::string c_parent(c_swinfo.parentname());
 					if (!c_parent.empty() && c_parent == swinfo->shortname())

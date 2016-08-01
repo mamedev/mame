@@ -15,6 +15,7 @@
 #include "ui/uimain.h"
 #include "zippath.h"
 #include "softlist.h"
+#include "swinfo.h"
 #include "formats/ioprocs.h"
 
 #include <regex>
@@ -45,6 +46,18 @@ const image_device_type_info device_image_interface::m_device_info_array[] =
 		{ IO_MIDIIN,    "midiin",       "min"  }, /* 16 */
 		{ IO_MIDIOUT,   "midiout",      "mout" }  /* 17 */
 	};
+
+class false_software_list_loader : public software_list_loader
+{
+public:
+	virtual bool load_software(device_image_interface &device, const char *list_name, const software_part &swpart) const override { return false; }
+	static const software_list_loader &instance() { return s_instance; }
+
+private:
+	static false_software_list_loader s_instance;
+};
+
+false_software_list_loader false_software_list_loader::s_instance;
 
 
 //**************************************************************************
@@ -90,6 +103,7 @@ device_image_interface::device_image_interface(const machine_config &mconfig, de
 		m_mame_file(),
 		m_software_info_ptr(nullptr),
 		m_software_part_ptr(nullptr),
+		m_software_list_device(nullptr),
 		m_supported(0),
 		m_readonly(false),
 		m_created(false),
@@ -469,6 +483,27 @@ bool device_image_interface::load_software_region(const char *tag, optional_shar
 }
 
 
+//-------------------------------------------------
+//  software_list_name - get the name of the loaded
+//  software list device
+//-------------------------------------------------
+
+const char *device_image_interface::software_list_name() const
+{
+	return (m_software_list_device == nullptr) ? "" : m_software_list_device->list_name();
+}
+
+
+//-------------------------------------------------
+//  get_software_list_loader
+//-------------------------------------------------
+
+const software_list_loader &device_image_interface::get_software_list_loader() const
+{
+	return false_software_list_loader::instance();
+}
+
+
 // ****************************************************************************
 // Hash info loading
 //
@@ -814,13 +849,14 @@ static int verify_length_and_hash(emu_file *file, const char *name, UINT32 exple
 //  load_software - software image loading
 //-------------------------------------------------
 
-bool device_image_interface::load_software(software_list_device &swlist, const char *swname, const rom_entry *start)
+bool device_image_interface::load_software(const char *list_name, const software_part &swpart)
 {
 	std::string locationtag, breakstr("%");
-	const rom_entry *region;
 	bool retVal = false;
 	int warningcount = 0;
-	for (region = start; region != nullptr; region = rom_next_region(region))
+	const char *swname = swpart.info().shortname().c_str();
+
+	for (const rom_entry *region = swpart.romdata(); region != nullptr; region = rom_next_region(region))
 	{
 		// loop until we hit the end of this region
 		const rom_entry *romp = region + 1;
@@ -834,15 +870,13 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 				UINT32 crc = 0;
 				bool has_crc = util::hash_collection(ROM_GETHASHDATA(romp)).crc(crc);
 
-				const software_info *swinfo = swlist.find(swname);
-				if (swinfo == nullptr)
-					return false;
+				const software_info *swinfo = &swpart.info();
 
 				UINT32 supported = swinfo->supported();
 				if (supported == SOFTWARE_SUPPORTED_PARTIAL)
-					osd_printf_error("WARNING: support for software %s (in list %s) is only partial\n", swname, swlist.list_name());
+					osd_printf_error("WARNING: support for software %s (in list %s) is only partial\n", swname, list_name);
 				if (supported == SOFTWARE_SUPPORTED_NO)
-					osd_printf_error("WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name());
+					osd_printf_error("WARNING: support for software %s (in list %s) is only preliminary\n", swname, list_name);
 
 				// attempt reading up the chain through the parents and create a locationtag std::string in the format
 				// " swlist % clonename % parentname "
@@ -851,7 +885,7 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 				while (swinfo != nullptr)
 				{
 					locationtag.append(swinfo->shortname()).append(breakstr);
-					swinfo = !swinfo->parentname().empty() ? swlist.find(swinfo->parentname().c_str()) : nullptr;
+					swinfo = !swinfo->parentname().empty() ? swinfo->list().find(swinfo->parentname().c_str()) : nullptr;
 				}
 				// strip the final '%'
 				locationtag.erase(locationtag.length() - 1, 1);
@@ -869,12 +903,18 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 				}
 
 				// prepare locations where we have to load from: list/parentname & list/clonename
-				std::string tag1(swlist.list_name());
-				tag1.append(PATH_SEPARATOR);
-				tag2.assign(tag1.append(tag4));
-				tag1.assign(swlist.list_name());
-				tag1.append(PATH_SEPARATOR);
-				tag3.assign(tag1.append(tag5));
+				std::string tag1(list_name);
+				if (!tag1.empty())
+				{
+					tag1.append(PATH_SEPARATOR);
+					tag2.assign(tag1.append(tag4));
+				}
+				tag1.assign(list_name);
+				if (!tag1.empty())
+				{
+					tag1.append(PATH_SEPARATOR);
+					tag3.assign(tag1.append(tag5));
+				}
 
 				if (tag5.find_first_of('%') != -1)
 					fatalerror("We do not support clones of clones!\n");
@@ -883,16 +923,16 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 				// - if we are not using lists, we have regiontag only;
 				// - if we are using lists, we have: list/clonename, list/parentname, clonename, parentname
 				// try to load from list/setname
-				if ((m_mame_file == nullptr) && (tag2.c_str() != nullptr))
+				if ((m_mame_file == nullptr) && !tag2.empty())
 					m_mame_file = common_process_file(device().machine().options(), tag2.c_str(), has_crc, crc, romp, filerr);
 				// try to load from list/parentname
-				if ((m_mame_file == nullptr) && (tag3.c_str() != nullptr))
+				if ((m_mame_file == nullptr) && !tag3.empty())
 					m_mame_file = common_process_file(device().machine().options(), tag3.c_str(), has_crc, crc, romp, filerr);
 				// try to load from setname
-				if ((m_mame_file == nullptr) && (tag4.c_str() != nullptr))
+				if ((m_mame_file == nullptr) && !tag4.empty())
 					m_mame_file = common_process_file(device().machine().options(), tag4.c_str(), has_crc, crc, romp, filerr);
 				// try to load from parentname
-				if ((m_mame_file == nullptr) && (tag5.c_str() != nullptr))
+				if ((m_mame_file == nullptr) && !tag5.empty())
 					m_mame_file = common_process_file(device().machine().options(), tag5.c_str(), has_crc, crc, romp, filerr);
 
 				warningcount += verify_length_and_hash(m_mame_file.get(),ROM_GETNAME(romp),ROM_GETLENGTH(romp), util::hash_collection(ROM_GETHASHDATA(romp)));
@@ -1048,7 +1088,6 @@ bool device_image_interface::load_software(const std::string &softlist_name)
 
 	// set up softlist stuff
 	m_software_info_ptr = &m_software_part_ptr->info();
-	m_software_list_name.assign(m_software_info_ptr->list().list_name());
 	m_full_software_name.assign(m_software_part_ptr->info().shortname());
 
 	// specify image name with softlist-derived names
@@ -1209,7 +1248,8 @@ void device_image_interface::clear()
 	m_full_software_name.clear();
 	m_software_info_ptr = nullptr;
 	m_software_part_ptr = nullptr;
-	m_software_list_name.clear();
+	m_software_list_device = nullptr;
+	m_software_list_special = nullptr;
 }
 
 
@@ -1256,6 +1296,9 @@ void device_image_interface::update_names(const device_type device_type, const c
 		m_brief_instance_name = brief_name;
 	}
 }
+
+
+
 
 //-------------------------------------------------
 //  software_name_split - helper that splits a
@@ -1304,16 +1347,14 @@ void device_image_interface::software_name_split(const char *swlist_swname, std:
 }
 
 
-const software_part *device_image_interface::find_software_item(const char *path, bool restrict_to_interface) const
+const software_part *device_image_interface::find_software_item(const char *path)
 {
 	// split full software name into software list name and short software name
 	std::string swlist_name, swinfo_name, swpart_name;
 	software_name_split(path, swlist_name, swinfo_name, swpart_name);
 
 	// determine interface
-	const char *interface = nullptr;
-	if (restrict_to_interface)
-		interface = image_interface();
+	const char *interface = image_interface();
 
 	// find the software list if explicitly specified
 	for (software_list_device &swlistdev : software_list_device_iterator(device().mconfig().root_device()))
@@ -1325,7 +1366,10 @@ const software_part *device_image_interface::find_software_item(const char *path
 			{
 				const software_part *part = info->find_part(swpart_name.c_str(), interface);
 				if (part != nullptr)
+				{
+					m_software_list_device = &swlistdev;
 					return part;
+				}
 			}
 		}
 
@@ -1339,6 +1383,30 @@ const software_part *device_image_interface::find_software_item(const char *path
 			if (info != nullptr)
 			{
 				const software_part *part = info->find_part(nullptr, interface);
+				if (part != nullptr)
+				{
+					m_software_list_device = &swlistdev;
+					return part;
+				}
+			}
+		}
+	}
+
+	// software list devices have been exhausted
+	m_software_list_device = nullptr;
+
+	// if no software list specified or found, try looking for one provided with the software image
+	if (swlist_name.empty())
+	{
+		// look for NAME/software.xml
+		std::string custom_list_name = swinfo_name + PATH_SEPARATOR + "software";
+		m_software_list_special = std::make_unique<parsed_software_list>(device().mconfig().options().media_path(), custom_list_name.c_str(), false);
+		if (m_software_list_special->valid())
+		{
+			const software_info *info = m_software_list_special->find(swinfo_name.c_str());
+			if (info != nullptr)
+			{
+				const software_part *part = info->find_part(swpart_name.c_str(), interface);
 				if (part != nullptr)
 					return part;
 			}
@@ -1365,55 +1433,89 @@ const software_part *device_image_interface::find_software_item(const char *path
 
 bool device_image_interface::load_software_part(const char *path, const software_part *&swpart)
 {
+	swpart = find_software_item(path);
+	if (m_software_list_special != nullptr && *m_software_list_special->errors_string() != '\0')
+		osd_printf_error("%s: Errors parsing software list:\n%s", m_software_list_special->filename(), m_software_list_special->errors_string());
+
 	// if no match has been found, we suggest similar shortnames
-	swpart = find_software_item(path, true);
 	if (swpart == nullptr)
 	{
-		software_list_device::display_matches(device().machine().config(), image_interface(), path);
+		if (m_software_list_special != nullptr)
+		{
+			if (m_software_list_special->valid())
+				osd_printf_error("%s contains no software info for %s\n", m_software_list_special->filename(), path);
+			m_software_list_special = nullptr;
+		}
+		software_list_device::display_matches(device().mconfig(), image_interface(), path);
 		return false;
 	}
 
 	// Load the software part
-	software_list_device &swlist = swpart->info().list();
-	const char *swname = swpart->info().shortname().c_str();
-	const rom_entry *start_entry = swpart->romdata();
 	const software_list_loader &loader = get_software_list_loader();
-	bool result = loader.load_software(*this, swlist, swname, start_entry);
+	bool result = loader.load_software(*this, software_list_name(), *swpart);
 
 #ifdef UNUSED_VARIABLE
 	// Tell the world which part we actually loaded
-	std::string full_sw_name = string_format("%s:%s:%s", swlist.list_name(), swpart->info().shortname(), swpart->name());
+	std::string full_sw_name = string_format("%s:%s:%s", software_list_name(), swpart->info().shortname(), swpart->name());
 #endif
 
 	// check compatibility
-	switch (swpart->is_compatible(swlist))
+	if (m_software_list_device != nullptr)
 	{
-		case SOFTWARE_IS_COMPATIBLE:
-			break;
+		switch (swpart->is_compatible(m_software_list_device->filter()))
+		{
+			case SOFTWARE_IS_COMPATIBLE:
+				break;
 
-		case SOFTWARE_IS_INCOMPATIBLE:
-			swlist.popmessage("WARNING! the set %s might not work on this system due to incompatible filter(s) '%s'\n", swpart->info().shortname(), swlist.filter());
-			break;
+			case SOFTWARE_IS_INCOMPATIBLE:
+				m_software_list_device->popmessage("WARNING! the set %s might not work on this system due to incompatible filter(s) '%s'\n", swpart->info().shortname(), m_software_list_device->filter());
+				break;
 
-		case SOFTWARE_NOT_COMPATIBLE:
-			swlist.popmessage("WARNING! the set %s might not work on this system due to missing filter(s) '%s'\n", swpart->info().shortname(), swlist.filter());
-			break;
+			case SOFTWARE_NOT_COMPATIBLE:
+				m_software_list_device->popmessage("WARNING! the set %s might not work on this system due to missing filter(s) '%s'\n", swpart->info().shortname(), m_software_list_device->filter());
+				break;
+		}
 	}
 
 	// check requirements and load those images
 	const char *requirement = swpart->feature("requirement");
 	if (requirement != nullptr)
 	{
-		const software_part *req_swpart = find_software_item(requirement, false);
-		if (req_swpart != nullptr)
+		// split full software name into software list name and short software name
+		std::string req_swlist_name, req_swinfo_name, other_name;
+		software_name_split(requirement, req_swlist_name, req_swinfo_name, other_name);
+
+		// always swlist:swname rather than swname:swpart
+		if (req_swlist_name.empty() && !other_name.empty())
 		{
-			device_image_interface *req_image = req_swpart->find_mountable_image(device().mconfig());
+			req_swlist_name = std::move(req_swinfo_name);
+			req_swinfo_name = std::move(other_name);
+		}
+
+		// if software list is not named, it defaults to the same list
+		const software_info *req_swinfo = nullptr;
+		if (req_swlist_name.empty())
+			req_swinfo = swpart->info().list().find(req_swinfo_name.c_str());
+		else
+		{
+			software_list_device *req_swlist = software_list_device::find_by_name(device().mconfig(), req_swlist_name.c_str());
+			if (req_swlist != nullptr)
+				req_swinfo = req_swlist->find(req_swinfo_name.c_str());
+		}
+
+		if (req_swinfo != nullptr)
+		{
+			// always load the first part
+			const software_part &req_swpart = req_swinfo->parts().front();
+			device_image_interface *req_image = req_swpart.find_mountable_image(device().mconfig());
 			if (req_image != nullptr)
 			{
 				req_image->set_init_phase();
 				req_image->load(requirement);
 			}
 		}
+		else
+			osd_printf_error("Required software %s not found in list\n", requirement);
 	}
 	return result;
 }
@@ -1422,14 +1524,14 @@ bool device_image_interface::load_software_part(const char *path, const software
 //  software_get_default_slot
 //-------------------------------------------------
 
-std::string device_image_interface::software_get_default_slot(const char *default_card_slot) const
+std::string device_image_interface::software_get_default_slot(const char *default_card_slot)
 {
 	const char *path = device().mconfig().options().value(instance_name());
 	std::string result;
 	if (*path != '\0')
 	{
 		result.assign(default_card_slot);
-		const software_part *swpart = find_software_item(path, true);
+		const software_part *swpart = find_software_item(path);
 		if (swpart != nullptr)
 		{
 			const char *slot = swpart->feature("slot");
@@ -1437,6 +1539,7 @@ std::string device_image_interface::software_get_default_slot(const char *defaul
 				result.assign(slot);
 		}
 	}
+	m_software_list_special = nullptr;
 	return result;
 }
 

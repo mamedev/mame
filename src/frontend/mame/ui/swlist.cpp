@@ -14,6 +14,7 @@
 #include "ui/swlist.h"
 
 #include "softlist.h"
+#include "swinfo.h"
 
 
 namespace ui {
@@ -173,7 +174,7 @@ void menu_software_list::append_software_entry(const software_info &swinfo)
 	// check if at least one of the parts has the correct interface and add a menu entry only in this case
 	for (const software_part &swpart : swinfo.parts())
 	{
-		if (swpart.matches_interface(m_interface) && swpart.is_compatible(*m_swlist) == SOFTWARE_IS_COMPATIBLE)
+		if (swpart.matches_interface(m_interface) && swpart.is_compatible(m_swlist->filter()) == SOFTWARE_IS_COMPATIBLE)
 		{
 			entry_updated = true;
 			entry.short_name.assign(swinfo.shortname());
@@ -202,7 +203,8 @@ void menu_software_list::append_software_entry(const software_info &swinfo)
 void menu_software_list::populate()
 {
 	// build up the list of entries for the menu
-	for (const software_info &swinfo : m_swlist->get_info())
+	m_swlist->parse();
+	for (const software_info &swinfo : m_swlist->parsed().get_info())
 		append_software_entry(swinfo);
 
 	// add an entry to change ordering
@@ -360,33 +362,39 @@ void menu_software::populate()
 	software_list_device_iterator iter(machine().config().root_device());
 	for (software_list_device &swlistdev : iter)
 		if (swlistdev.list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM)
-			if (!swlistdev.get_info().empty() && m_interface != nullptr)
+		{
+			swlistdev.parse();
+			if (swlistdev.parsed().valid() && m_interface != nullptr)
 			{
 				bool found = false;
-				for (const software_info &swinfo : swlistdev.get_info())
+				for (const software_info &swinfo : swlistdev.parsed().get_info())
 					if (swinfo.parts().front().matches_interface(m_interface))
 						found = true;
 				if (found)
-					item_append(swlistdev.description(), "", 0, (void *)&swlistdev);
+					item_append(swlistdev.parsed().description(), "", 0, (void *)&swlistdev);
 			}
+		}
 
 	// add compatible software lists for this system
 	for (software_list_device &swlistdev : iter)
 		if (swlistdev.list_type() == SOFTWARE_LIST_COMPATIBLE_SYSTEM)
-			if (!swlistdev.get_info().empty() && m_interface != nullptr)
+		{
+			swlistdev.parse();
+			if (swlistdev.parsed().valid() && m_interface != nullptr)
 			{
 				bool found = false;
-				for (const software_info &swinfo : swlistdev.get_info())
+				for (const software_info &swinfo : swlistdev.parsed().get_info())
 					if (swinfo.parts().front().matches_interface(m_interface))
 						found = true;
 				if (found)
 				{
 					if (!have_compatible)
 						item_append(_("[compatible lists]"), "", FLAG_DISABLE, nullptr);
-					item_append(swlistdev.description(), "", 0, (void *)&swlistdev);
+					item_append(swlistdev.parsed().description(), "", 0, (void *)&swlistdev);
 				}
 				have_compatible = true;
 			}
+		}
 }
 
 

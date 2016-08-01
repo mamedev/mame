@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "drivenum.h"
-#include "softlist.h"
+#include "swinfo.h"
 #include "ui/uimain.h"
 
 
@@ -1262,11 +1262,11 @@ void rom_load_manager::normalize_flags_for_device(running_machine &machine, cons
     more general process_region_list.
 -------------------------------------------------*/
 
-void rom_load_manager::load_software_part_region(device_t &device, software_list_device &swlist, const char *swname, const rom_entry *start_region)
+void rom_load_manager::load_software_part_region(device_t &device, const char *list_name, const software_part &swpart)
 {
-	std::string locationtag(swlist.list_name()), breakstr("%");
 	const rom_entry *region;
 	std::string regiontag;
+	const char *swname = swpart.info().shortname().c_str();
 
 	m_errorstring.clear();
 	m_softwarningstring.clear();
@@ -1275,39 +1275,37 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 	m_romstotalsize = 0;
 	m_romsloadedsize = 0;
 
-	const software_info *swinfo = swlist.find(swname);
-	if (swinfo != nullptr)
+	UINT32 supported = swpart.info().supported();
+	if (supported == SOFTWARE_SUPPORTED_PARTIAL)
 	{
-		UINT32 supported = swinfo->supported();
-		if (supported == SOFTWARE_SUPPORTED_PARTIAL)
-		{
-			m_errorstring.append(string_format("WARNING: support for software %s (in list %s) is only partial\n", swname, swlist.list_name()));
-			m_softwarningstring.append(string_format("Support for software %s (in list %s) is only partial\n", swname, swlist.list_name()));
-		}
-		if (supported == SOFTWARE_SUPPORTED_NO)
-		{
-			m_errorstring.append(string_format("WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name()));
-			m_softwarningstring.append(string_format("Support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name()));
-		}
+		m_errorstring.append(string_format("WARNING: support for software %s (in list %s) is only partial\n", swname, list_name));
+		m_softwarningstring.append(string_format("Support for software %s (in list %s) is only partial\n", swname, list_name));
+	}
+	if (supported == SOFTWARE_SUPPORTED_NO)
+	{
+		m_errorstring.append(string_format("WARNING: support for software %s (in list %s) is only preliminary\n", swname, list_name));
+		m_softwarningstring.append(string_format("Support for software %s (in list %s) is only preliminary\n", swname, list_name));
+	}
 
-		// attempt reading up the chain through the parents and create a locationtag std::string in the format
-		// " swlist % clonename % parentname "
-		// open_rom_file contains the code to split the elements and to create paths to load from
-
+	// attempt reading up the chain through the parents and create a locationtag std::string in the format
+	// " swlist % clonename % parentname "
+	// open_rom_file contains the code to split the elements and to create paths to load from
+	std::string locationtag(list_name), breakstr("%");
+	if (!locationtag.empty())
 		locationtag.append(breakstr);
 
-		while (swinfo != nullptr)
-		{
-			locationtag.append(swinfo->shortname()).append(breakstr);
-			swinfo = !swinfo->parentname().empty() ? swlist.find(swinfo->parentname().c_str()) : nullptr;
-		}
-		// strip the final '%'
-		locationtag.erase(locationtag.length() - 1, 1);
+	const software_info *swinfo = &swpart.info();
+	while (swinfo != nullptr)
+	{
+		locationtag.append(swinfo->shortname()).append(breakstr);
+		swinfo = !swinfo->parentname().empty() ? swinfo->list().find(swinfo->parentname().c_str()) : nullptr;
 	}
+	// strip the final '%'
+	locationtag.erase(locationtag.length() - 1, 1);
 
 
 	/* loop until we hit the end */
-	for (region = start_region; region != nullptr; region = rom_next_region(region))
+	for (region = swpart.romdata(); region != nullptr; region = rom_next_region(region))
 	{
 		UINT32 regionlength = ROMREGION_GETLENGTH(region);
 
@@ -1363,7 +1361,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 	}
 
 	/* now go back and post-process all the regions */
-	for (region = start_region; region != nullptr; region = rom_next_region(region))
+	for (region = swpart.romdata(); region != nullptr; region = rom_next_region(region))
 	{
 		regiontag = device.subtag(ROMREGION_GETTAG(region));
 		region_post_process(regiontag.c_str(), ROMREGION_ISINVERTED(region));
@@ -1484,4 +1482,32 @@ rom_load_manager::rom_load_manager(running_machine &machine)
 
 	/* display the results and exit */
 	display_rom_load_results(false);
+}
+
+
+//**************************************************************************
+//  SOFTWARE LIST LOADING
+//**************************************************************************
+
+rom_software_list_loader rom_software_list_loader::s_instance;
+image_software_list_loader image_software_list_loader::s_instance;
+
+//-------------------------------------------------
+//  rom_software_list_loader::load_software
+//-------------------------------------------------
+
+bool rom_software_list_loader::load_software(device_image_interface &device, const char *list_name, const software_part &swpart) const
+{
+	device.device().machine().rom_load().load_software_part_region(device, list_name, swpart);
+	return true;
+}
+
+
+//-------------------------------------------------
+//  image_software_list_loader::load_software
+//-------------------------------------------------
+
+bool image_software_list_loader::load_software(device_image_interface &device, const char *list_name, const software_part &swpart) const
+{
+	return device.load_software(list_name, swpart);
 }

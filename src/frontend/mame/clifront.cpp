@@ -26,6 +26,7 @@
 
 #include "osdepend.h"
 #include "softlist.h"
+#include "swinfo.h"
 
 #include "ui/moptions.h"
 #include "language.h"
@@ -372,7 +373,8 @@ int media_identifier::find_by_hash(const util::hash_collection &hashes, int leng
 		{
 			if (listnames.insert(swlistdev.list_name()).second)
 			{
-				for (const software_info &swinfo : swlistdev.get_info())
+				swlistdev.parse();
+				for (const software_info &swinfo : swlistdev.parsed().get_info())
 					for (const software_part &part : swinfo.parts())
 						for (const rom_entry *region = part.romdata(); region != nullptr; region = rom_next_region(region))
 							for (const rom_entry *rom = rom_first_file(region); rom != nullptr; rom = rom_next_file(rom))
@@ -527,7 +529,7 @@ int cli_frontend::execute(int argc, char **argv)
 					for (const software_part &swpart : swinfo->parts())
 					{
 						// only load compatible software this way
-						if (swpart.is_compatible(swlistdev) == SOFTWARE_IS_COMPATIBLE)
+						if (swpart.is_compatible(swlistdev.filter()) == SOFTWARE_IS_COMPATIBLE)
 						{
 							device_image_interface *image = swpart.find_mountable_image(config);
 							if (image != nullptr)
@@ -1387,8 +1389,9 @@ void cli_frontend::verifysamples(const char *gamename)
 
 void cli_frontend::output_single_softlist(FILE *out, software_list_device &swlistdev)
 {
-	fprintf(out, "\t<softwarelist name=\"%s\" description=\"%s\">\n", swlistdev.list_name(), xml_normalize_string(swlistdev.description()));
-	for (const software_info &swinfo : swlistdev.get_info())
+	swlistdev.parse();
+	fprintf(out, "\t<softwarelist name=\"%s\" description=\"%s\">\n", swlistdev.list_name(), xml_normalize_string(swlistdev.parsed().description()));
+	for (const software_info &swinfo : swlistdev.parsed().get_info())
 	{
 		fprintf(out, "\t\t<software name=\"%s\"", swinfo.shortname().c_str());
 		if (!swinfo.parentname().empty())
@@ -1524,11 +1527,14 @@ void cli_frontend::listsoftware(const char *gamename)
 	{
 		for (software_list_device &swlistdev : software_list_device_iterator(drivlist.config().root_device()))
 			if (list_map.insert(swlistdev.list_name()).second)
-				if (!swlistdev.get_info().empty())
+			{
+				swlistdev.parse();
+				if (swlistdev.parsed().valid())
 				{
 					if (isfirst) { fprintf(out, SOFTLIST_XML_BEGIN); isfirst = false; }
 					output_single_softlist(out, swlistdev);
 				}
+			}
 	}
 
 	if (!isfirst)
@@ -1571,10 +1577,11 @@ void cli_frontend::verifysoftware(const char *gamename)
 			{
 				if (list_map.insert(swlistdev.list_name()).second)
 				{
-					if (!swlistdev.get_info().empty())
+					swlistdev.parse();
+					if (swlistdev.parsed().valid())
 					{
 						nrlists++;
-						for (const software_info &swinfo : swlistdev.get_info())
+						for (const software_info &swinfo : swlistdev.parsed().get_info())
 						{
 							media_auditor::summary summary = auditor.audit_software(swlistdev.list_name(), &swinfo, AUDIT_VALIDATE_FAST);
 
@@ -1627,11 +1634,14 @@ void cli_frontend::getsoftlist(const char *gamename)
 	{
 		for (software_list_device &swlistdev : software_list_device_iterator(drivlist.config().root_device()))
 			if (core_strwildcmp(gamename, swlistdev.list_name()) == 0 && list_map.insert(swlistdev.list_name()).second)
-				if (!swlistdev.get_info().empty())
+			{
+				swlistdev.parse();
+				if (swlistdev.parsed().valid())
 				{
 					if (isfirst) { fprintf( out, SOFTLIST_XML_BEGIN); isfirst = false; }
 					output_single_softlist(out, swlistdev);
 				}
+			}
 	}
 
 	if (!isfirst)
@@ -1662,12 +1672,13 @@ void cli_frontend::verifysoftlist(const char *gamename)
 		{
 			if (core_strwildcmp(gamename, swlistdev.list_name()) == 0 && list_map.insert(swlistdev.list_name()).second)
 			{
-				if (!swlistdev.get_info().empty())
+				swlistdev.parse();
+				if (swlistdev.parsed().valid())
 				{
 					matched++;
 
 					// Get the actual software list contents
-					for (const software_info &swinfo : swlistdev.get_info())
+					for (const software_info &swinfo : swlistdev.parsed().get_info())
 					{
 						media_auditor::summary summary = auditor.audit_software(swlistdev.list_name(), &swinfo, AUDIT_VALIDATE_FAST);
 

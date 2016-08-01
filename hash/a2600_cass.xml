@@ -24,7 +24,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Arcadia Corporation</publisher>
 		<info name="serial" value="AR-4101"/>
 		<info name="developer" value="Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="communist mutants from space (1982) (arcadia corporation).a26" size="8448" crc="d64ec816" sha1="9a113bacc576d1d1f80a26622359c49df97b16bc" offset="0" />
@@ -38,7 +38,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Arcadia Corporation</publisher>
 		<info name="serial" value="AR-4101"/>
 		<info name="developer" value="Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="communist mutants from space (preview) (1982) (arcadia corporation).a26" size="8448" crc="ca6bb788" sha1="ad18885ed38516c3e136293ae565c113f299d223" offset="0" />
@@ -52,7 +52,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4101"/>
 		<info name="developer" value="Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="communist mutants from space (1982) (starpath corporation) (pal).a26" size="8448" crc="e8c4dc94" sha1="9ab6e90c2a41684f46592b8e2b71fd19e540b055" offset="0" />
@@ -66,7 +66,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4101"/>
 		<info name="developer" value="Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="communist mutants from space (preview) (1982) (starpath corporation) (pal).a26" size="8448" crc="d1a5b3bb" sha1="b0483e5de99833d630433281953a670dd72a0df4" offset="0" />
@@ -80,7 +80,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4100"/>
 		<info name="developer" value="Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass1" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="dragonstomper (1 of 3) (1982) (starpath corporation).a26" size="8448" crc="ff942c31" sha1="9283e892dca1ad463443d347c99826bd623e0fdc" offset="0" />
@@ -104,7 +104,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4100"/>
 		<info name="developer" value="Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="dragonstomper (preview) (1982) (starpath corporation).a26" size="8448" crc="c483f940" sha1="aa63009fb7dc4ece8cda3078d37f4e93b326c4df" offset="0" />
@@ -118,7 +118,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4100"/>
 		<info name="developer" value="Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass1" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="dragonstomper (1 of 3) (1982) (starpath corporation) (pal).a26" size="8448" crc="87e14ffb" sha1="0f4bed960092061a5e3a8a118118793b16b902b4" offset="0" />
@@ -142,7 +142,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4100"/>
 		<info name="developer" value="Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="dragonstomper (preview) (1982) (starpath corporation) (pal).a26" size="8448" crc="d610fd7e" sha1="7a893558f01e21b4708622cbc4b4db30c849acc6" offset="0" />
@@ -156,7 +156,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4200"/>
 		<info name="developer" value="Dennis Caswell"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass1" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="escape from the mindmaster (1 of 4) (1982) (starpath corporation).a26" size="8448" crc="20817f5d" sha1="aa7179ed05d6afb6ec8bcd06c589d4b137ec1bd6" offset="0" />
@@ -185,7 +185,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4200"/>
 		<info name="developer" value="Dennis Caswell"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="escape from the mindmaster (preview) (1982) (starpath corporation).a26" size="8448" crc="5a1deb25" sha1="7a32131911eb04957facc87b4333308b44e02c02" offset="0" />
@@ -199,7 +199,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4200"/>
 		<info name="developer" value="Dennis Caswell"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass1" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="escape from the mindmaster (1 of 4) (1982) (starpath corporation) (pal).a26" size="8448" crc="191c532a" sha1="e870fbbc07213b1cc552872f3115f33c1f5b351c" offset="0" />
@@ -228,7 +228,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4200"/>
 		<info name="developer" value="Dennis Caswell"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="escape from the mindmaster (preview) (1982) (starpath corporation) (pal).a26" size="8448" crc="cd4bc0e0" sha1="65c7016bc60b7035645cdf1cb50bb396fce60aa0" offset="0" />
@@ -241,7 +241,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<year>1982</year>
 		<publisher>Arcadia Corporation</publisher>
 		<info name="developer" value="Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="excalibur (1982) (arcadia corporation) (prototype).a26" size="8448" crc="73007594" sha1="eaea4c24280cf11e11d62bbbe5c0c74448f497e8" offset="0" />
@@ -254,7 +254,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<year>1982</year>
 		<publisher>Arcadia Corporation</publisher>
 		<info name="developer" value="Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="excalibur (1982) (arcadia corporation) (prototype) [a].a26" size="8448" crc="24885ec2" sha1="c6a8bb97d1891a45d9d5b6b799a3602ed7c83ef1" offset="0" />
@@ -267,7 +267,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<year>1982</year>
 		<publisher>Arcadia Corporation</publisher>
 		<info name="developer" value="Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="excalibur version 36 (1982) (arcadia corporation) (prototype).a26" size="8448" crc="2a51cc8d" sha1="9b89ba2b1481468994c6c93600053500912213f3" offset="0" />
@@ -280,7 +280,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<year>1982</year>
 		<publisher>Arcadia Corporation</publisher>
 		<info name="developer" value="Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="excalibur version 39 (1982) (arcadia corporation) (prototype).a26" size="8448" crc="ba92957e" sha1="9d515c70bb2498b44fd46f129f10be03b73c937c" offset="0" />
@@ -294,7 +294,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Arcadia Corporation</publisher>
 		<info name="serial" value="AR-4300"/>
 		<info name="developer" value="Scott Nelson"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="fireball (1982) (arcadia corporation).a26" size="8448" crc="b32ae162" sha1="9fa9ed2622d29636f175b8745892dde48a871fd1" offset="0" />
@@ -308,7 +308,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Arcadia Corporation</publisher>
 		<info name="serial" value="AR-4300"/>
 		<info name="developer" value="Scott Nelson"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="fireball (preview) (1982) (arcadia corporation).a26" size="8448" crc="962c498f" sha1="20322ad5eb2ad1c11b454d99126ce3b185351e99" offset="0" />
@@ -322,7 +322,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4300"/>
 		<info name="developer" value="Scott Nelson"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="fireball (1982) (starpath corporation) (pal).a26" size="8448" crc="1a382f65" sha1="f936c2ebc26c025e4904ae8d01be5f3e66249adb" offset="0" />
@@ -336,7 +336,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4300"/>
 		<info name="developer" value="Scott Nelson"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="fireball (preview) (1982) (starpath corporation) (pal).a26" size="8448" crc="138ccbd1" sha1="f7133999d072ac0560c5a9a4ec46fdd94b52dde6" offset="0" />
@@ -349,7 +349,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<year>1982</year>
 		<publisher>Arcadia Corporation</publisher>
 		<info name="developer" value="Scott Nelson"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="fireball (1982) (arcadia corporation) (prototype).a26" size="8448" crc="10e4971e" sha1="fd9ba06548a16067f1a3ab1ef48e3f32d6199191" offset="0" />
@@ -363,7 +363,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4103"/>
 		<info name="developer" value="Kevin Norman"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="killer satellites (1983) (starpath corporation).a26" size="8448" crc="bdd932dc" sha1="64125e796f96aa472bb2191367c6501c657712d9" offset="0" />
@@ -377,7 +377,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4103"/>
 		<info name="developer" value="Kevin Norman"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="killer satellites (1983) (starpath corporation) (pal).a26" size="8448" crc="0b60d857" sha1="7ab5597ca336d3eebd21a7ad82989af366f2dcd3" offset="0" />
@@ -391,7 +391,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4103"/>
 		<info name="developer" value="Kevin Norman"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="killer satellites (1983) (starpath corporation) (prototype).a26" size="8448" crc="c989064c" sha1="dd0a82dac03298a8ce945c4b612cf8944927f5e8" offset="0" />
@@ -404,7 +404,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<year>1982</year>
 		<publisher>Arcadia Corporation</publisher>
 		<info name="developer" value="Dennis Caswell"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="labyrinth (escape from the mindmaster beta) (1982) (arcadia corporation).a26" size="8448" crc="30ebc4a2" sha1="3ce35421bfa26c69eaced246909956a7e484f1fd" offset="0" />
@@ -417,7 +417,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<year>1982</year>
 		<publisher>Arcadia Corporation</publisher>
 		<info name="developer" value="Dennis Caswell"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="labyrinth (escape from the mindmaster beta) (1982) (arcadia corporation) [a].a26" size="8448" crc="9dc34fb0" sha1="1df4b18ce0187eea5b4d3dd7d150f552d97a08fa" offset="0" />
@@ -430,7 +430,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<year>1982</year>
 		<publisher>Arcadia Corporation</publisher>
 		<info name="developer" value="Steve Hales &amp; Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="meteoroids (suicide mission beta) (1982) (arcadia corporation).a26" size="8448" crc="40d6bbb2" sha1="11c3bd2b9327987e83b34e65e1bbee5fd62e6f60" offset="0" />
@@ -444,7 +444,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4105"/>
 		<info name="developer" value="Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="official frogger, the (1983) (starpath corporation).a26" size="8448" crc="1228e48c" sha1="f84c15579d22f2536e94f1679642b9dc73b6f2fe" offset="0" />
@@ -458,7 +458,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4105"/>
 		<info name="developer" value="Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="official frogger, the (preview) (1983) (starpath corporation).a26" size="8448" crc="5f0181f9" sha1="2edb64be1bb6f4215f520ec2f487b19f29724b8d" offset="0" />
@@ -472,7 +472,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4105"/>
 		<info name="developer" value="Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="official frogger, the (1983) (starpath corporation) (pal).a26" size="8448" crc="e374b94b" sha1="2295b1eb5d30698e0a3a49e959f2a65ae60b4154" offset="0" />
@@ -486,7 +486,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4302"/>
 		<info name="developer" value="Dennis Caswell"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass1" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="party mix (1 of 3) (1983) (starpath corporation).a26" size="8448" crc="4724f396" sha1="1b1bcc35bd1120ded54318e63bce05d9c8603a82" offset="0" />
@@ -510,7 +510,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4302"/>
 		<info name="developer" value="Dennis Caswell"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="party mix (preview) (1983) (starpath corporation).a26" size="8448" crc="fb3fe9b1" sha1="035bad1d6142dbe932eb2f2a4e34bbb64692fa9f" offset="0" />
@@ -524,7 +524,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4302"/>
 		<info name="developer" value="Dennis Caswell"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass1" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="party mix (1 of 3) (1983) (starpath corporation) (pal).a26" size="8448" crc="d20d4821" sha1="b92aaae1f94f9c2d9957dfaf1941b7f12c5c7679" offset="0" />
@@ -548,7 +548,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4302"/>
 		<info name="developer" value="Dennis Caswell"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="party mix (preview) (1983) (starpath corporation) (pal).a26" size="8448" crc="57536159" sha1="55e51e131235123d2ab9f8a0209bcb16a7734622" offset="0" />
@@ -562,7 +562,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Arcadia Corporation</publisher>
 		<info name="serial" value="AR-4000"/>
 		<info name="developer" value="Dennis Caswell"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="phaser patrol (1982) (arcadia corporation).a26" size="8448" crc="eaf31bd7" sha1="21c255e489d126475c3744cdd0d6e8a8e618e3eb" offset="0" />
@@ -576,7 +576,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4000"/>
 		<info name="developer" value="Dennis Caswell"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="phaser patrol (1982) (starpath corporation) (pal).a26" size="8448" crc="15550fed" sha1="9734cde5019fad40aef45fe5271f245995027009" offset="0" />
@@ -590,7 +590,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Arcadia Corporation</publisher>
 		<info name="serial" value="AR-4000"/>
 		<info name="developer" value="Dennis Caswell"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="phaser patrol (1982) (arcadia corporation) (prototype).a26" size="8448" crc="4fd200db" sha1="1ff4e3101275555ff014d981ff7f9006c93942ee" offset="0" />
@@ -604,7 +604,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Arcadia Corporation</publisher>
 		<info name="serial" value="AR-4000"/>
 		<info name="developer" value="Dennis Caswell"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="phaser patrol (1982) (arcadia corporation) (prototype) [a].a26" size="8448" crc="61a05bf2" sha1="abfd85e6973ab55d12f039cb0a4f4df8a62c0330" offset="0" />
@@ -618,7 +618,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4104"/>
 		<info name="developer" value="Brian McGhie"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="rabbit transit (1983) (starpath corporation).a26" size="8448" crc="517e5561" sha1="81654cbd6a7262ce0f1abc385ed9adc323a9b6a6" offset="0" />
@@ -632,7 +632,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4104"/>
 		<info name="developer" value="Brian McGhie"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="rabbit transit (preview) (1983) (starpath corporation).a26" size="8448" crc="ba955bb1" sha1="2271944cd9284b499a590cf9fca938560a741990" offset="0" />
@@ -646,7 +646,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4104"/>
 		<info name="developer" value="Brian McGhie"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="rabbit transit (1983) (starpath corporation) (pal).a26" size="8448" crc="ea7f9afd" sha1="a55851ead48c5033a45fb3f1672341146e5b47d9" offset="0" />
@@ -660,7 +660,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Arcadia Corporation</publisher>
 		<info name="serial" value="AR-4102"/>
 		<info name="developer" value="Steve Hales &amp; Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="suicide mission (1982) (arcadia corporation).a26" size="8448" crc="b92c49e3" sha1="d3919b4dbeedfabfba30126d351eab509b0c1536" offset="0" />
@@ -674,7 +674,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Arcadia Corporation</publisher>
 		<info name="serial" value="AR-4102"/>
 		<info name="developer" value="Steve Hales &amp; Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="suicide mission (preview) (1982) (arcadia corporation).a26" size="8448" crc="4705b9c4" sha1="35061334cd1d26345e2459dfd663d240759eb5f4" offset="0" />
@@ -688,7 +688,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4102"/>
 		<info name="developer" value="Steve Hales &amp; Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="suicide mission (1982) (starpath corporation) (pal).a26" size="8448" crc="3b2a9c8a" sha1="3b6d664440442f5f1d0220ef01d967a6004bbbdd" offset="0" />
@@ -702,7 +702,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4102"/>
 		<info name="developer" value="Steve Hales &amp; Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="suicide mission (preview) (1982) (starpath corporation) (pal).a26" size="8448" crc="67e4a405" sha1="c15c986f92bd068ec844c9cc3da73ff410ec002a" offset="0" />
@@ -715,7 +715,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<year>1982</year>
 		<publisher>Arcadia Corporation</publisher>
 		<info name="developer" value="Steve Hales &amp; Stephen Harland Landrum"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="suicide mission (1982) (arcadia corporation) (prototype).a26" size="8448" crc="54efd148" sha1="c3a79f8dbd4af3628ff91fa0f99f995a8756f4fa" offset="0" />
@@ -729,7 +729,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4401"/>
 		<info name="developer" value="Steve Mundry &amp; Scott Nelson"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass1" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="survival island (1 of 3) (1983) (starpath corporation).a26" size="8448" crc="ea4f2765" sha1="cba1c7d15cc3c7b6164652866f958297de9d7eef" offset="0" />
@@ -753,7 +753,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4401"/>
 		<info name="developer" value="Steve Mundry &amp; Scott Nelson"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass1" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="survival island (1 of 3) (1983) (starpath corporation) (pal).a26" size="8448" crc="2ee59279" sha1="b1344b694ed1408ef50a6c9b1fe162c5b850cd1e" offset="0" />
@@ -776,7 +776,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<year>1983</year>
 		<publisher>Starpath Corporation</publisher>
 		<info name="developer" value="Scott Nelson"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass1" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="sweat! - the decathlon game (1 of 3) (1983) (starpath corporation) (prototype).a26" size="8448" crc="32297adf" sha1="709a413f7d83176c5e6a6a753308752aecd16923" offset="0" />
@@ -800,7 +800,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4201"/>
 		<info name="developer" value="Stephen Harland Landrum &amp; Jon Leupp"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="sword of saros (1983) (starpath corporation).a26" size="8448" crc="d96a3632" sha1="45ab6ae206f86524e31815a736a90287cca94b70" offset="0" />
@@ -814,7 +814,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4201"/>
 		<info name="developer" value="Stephen Harland Landrum &amp; Jon Leupp"/>
-		<sharedfeat name="requirement" value="scharger"/>
+		<sharedfeat name="requirement" value="a2600:scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
 				<rom name="sword of saros (1983) (starpath corporation) (pal).a26" size="8448" crc="670ff870" sha1="f81877de942e4c424db201e80cee3af38e3c105d" offset="0" />
