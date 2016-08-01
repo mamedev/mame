@@ -20,13 +20,7 @@ naomi_m1_board::naomi_m1_board(const machine_config &mconfig, const char *tag, d
 
 READ16_MEMBER(naomi_m1_board::actel_id_r)
 {
-	if (rombdid_tag && owner()->memregion(rombdid_tag) != nullptr)
-	{
-		const UINT8 *bdid = owner()->memregion(rombdid_tag)->base();
-		return bdid[0] | (bdid[1] << 8);
-	}
-
-	return 0x0000;
+	return actel_id;
 }
 
 void naomi_m1_board::device_start()
@@ -40,6 +34,15 @@ void naomi_m1_board::device_start()
 	{
 		logerror("%s: Warning: key not provided\n", tag());
 		key = 0;
+	}
+
+	std::string sid = parameter("id");
+	if (!sid.empty())
+		actel_id = strtoll(sid.c_str(), nullptr, 16);
+	else
+	{
+		logerror("%s: Warning: Actel ID not provided\n", tag());
+		actel_id = 0;
 	}
 
 	buffer = std::make_unique<UINT8[]>(BUFFER_SIZE);

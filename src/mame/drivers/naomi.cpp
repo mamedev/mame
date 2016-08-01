@@ -2688,7 +2688,7 @@ MACHINE_CONFIG_END
  */
 
 static MACHINE_CONFIG_DERIVED( naomi, naomi_base )
-	MCFG_NAOMI_ROM_BOARD_ADD("rom_board", "naomibd_eeprom", "boardid", WRITE8(dc_state, g1_irq))
+	MCFG_NAOMI_ROM_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 /*
@@ -2704,7 +2704,7 @@ MACHINE_CONFIG_END
  */
 
 static MACHINE_CONFIG_DERIVED( naomim1, naomi_base )
-	MCFG_NAOMI_M1_BOARD_ADD("rom_board", "naomibd_eeprom", "boardid", WRITE8(dc_state, g1_irq))
+	MCFG_NAOMI_M1_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 /*
@@ -2712,7 +2712,7 @@ MACHINE_CONFIG_END
  */
 
 static MACHINE_CONFIG_DERIVED( naomim2, naomi_base )
-	MCFG_NAOMI_M2_BOARD_ADD("rom_board", "naomibd_eeprom", "boardid", WRITE8(dc_state, g1_irq))
+	MCFG_NAOMI_M2_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 /*
@@ -2720,7 +2720,7 @@ MACHINE_CONFIG_END
  */
 
 static MACHINE_CONFIG_DERIVED( naomim4, naomi_base )
-	MCFG_NAOMI_M4_BOARD_ADD("rom_board", "pic_readout", "naomibd_eeprom", "boardid", WRITE8(dc_state, g1_irq))
+	MCFG_NAOMI_M4_BOARD_ADD("rom_board", "pic_readout", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 /*
@@ -5880,7 +5880,7 @@ ROM_START( mushi2eo )
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0437-com.ic3", 0, 0x800, BAD_DUMP CRC(b6e4f61a) SHA1(b5cae574170afa3889e01517f1c4429e207042b9) )
 
-	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x02))
+	ROM_PARAMETER( ":rom_board:id", "5502" )
 ROM_END
 
 ROM_START( mushik2e )
@@ -5895,7 +5895,7 @@ ROM_START( mushik2e )
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0437-com.ic3", 0, 0x800, BAD_DUMP CRC(b6e4f61a) SHA1(b5cae574170afa3889e01517f1c4429e207042b9) )
 
-	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x82))
+	ROM_PARAMETER( ":rom_board:id", "5582" )
 ROM_END
 
 ROM_START( zunou )
@@ -5909,7 +5909,7 @@ ROM_START( zunou )
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0435-jpn.ic3", 0, 0x800, BAD_DUMP CRC(b553d900) SHA1(ed1c3c2053f2c0e98cb5c4d99f93143a66c29e5c) )
 
-	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x02))
+	ROM_PARAMETER( ":rom_board:id", "5502" )
 ROM_END
 
 ROM_START( sl2007 )
@@ -5925,7 +5925,7 @@ ROM_START( sl2007 )
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-5129-jpn.ic3", 0, 0x800, CRC(432ba30f) SHA1(4935a16d1075430799269ac7ac990066d44d815b) )
 
-	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x04))
+	ROM_PARAMETER( ":rom_board:id", "5504" )
 ROM_END
 
 ROM_START( asndynmt )
@@ -5941,7 +5941,7 @@ ROM_START( asndynmt )
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0495-com.ic3", 0, 0x800, CRC(c229a59b) SHA1(497dcc1e4e52eb044a8b709edbd00126cef212b1) )
 
-	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x04))
+	ROM_PARAMETER( ":rom_board:id", "5504" )
 ROM_END
 
 ROM_START( illvelo )
@@ -5957,7 +5957,7 @@ ROM_START( illvelo )
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-5131-jpn.ic3", 0, 0x800, CRC(af4b38f2) SHA1(9b82f16a258854d7d618d60f9a610f7d47d67a78) )
 
-	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x04))
+	ROM_PARAMETER( ":rom_board:id", "5504" )
 ROM_END
 
 ROM_START( mamonoro )
@@ -5973,7 +5973,7 @@ ROM_START( mamonoro )
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-5132-jpn.ic3", 0, 0x800, CRC(d56e70a1) SHA1(fda1a2989f0fa3b0edeb292cdd4537d9b86af6f2) )
 
-	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x04))
+	ROM_PARAMETER( ":rom_board:id", "5504" )
 ROM_END
 
 ROM_START( mbaao )
@@ -5991,7 +5991,7 @@ ROM_START( mbaao )
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-5133-jpn.ic3", 0, 0x800, CRC(0f16d180) SHA1(9d4ae15aa54752cdbd8e279388b7f3ae20777172) )
 
-	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x06))
+	ROM_PARAMETER( ":rom_board:id", "5506" )
 ROM_END
 
 ROM_START( mbaa )
@@ -6010,7 +6010,7 @@ ROM_START( mbaa )
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-5133-jpn.ic3", 0, 0x800, CRC(0f16d180) SHA1(9d4ae15aa54752cdbd8e279388b7f3ae20777172) )
 
-	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x86))
+	ROM_PARAMETER( ":rom_board:id", "5586" )
 ROM_END
 
 ROM_START( radirgyn )
@@ -6025,7 +6025,7 @@ ROM_START( radirgyn )
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-5138-jpn.ic3", 0, 0x800, CRC(93b7a03d) SHA1(7af7c8d436f61e57b9d5957431c6fc745442f74f) )
 
-	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x04))
+	ROM_PARAMETER( ":rom_board:id", "5504" )
 ROM_END
 
 ROM_START( ausfache )
@@ -6040,7 +6040,7 @@ ROM_START( ausfache )
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-05130-jpn.ic3", 0, 0x800, CRC(eccdcd59) SHA1(9f374e0b37f18591c92c38c83c9310f2db0abf9c) )
 
-	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x04))
+	ROM_PARAMETER( ":rom_board:id", "5504" )
 ROM_END
 
 ROM_START( manicpnc )
@@ -6060,7 +6060,7 @@ ROM_START( manicpnc )
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0461-com.ic3", 0, 0x800, BAD_DUMP CRC(c9282cdd) SHA1(23933e489d763515428e2714cc6e7676df1d5323) )
 
-	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x05))
+	ROM_PARAMETER( ":rom_board:id", "5505" )
 ROM_END
 
 ROM_START( pokasuka )
@@ -6080,7 +6080,7 @@ ROM_START( pokasuka )
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0461-com.ic3", 0, 0x800, BAD_DUMP CRC(c9282cdd) SHA1(23933e489d763515428e2714cc6e7676df1d5323) )
 
-	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x05))
+	ROM_PARAMETER( ":rom_board:id", "5505" )
 ROM_END
 
 ROM_START( rhytngk )
@@ -6096,7 +6096,7 @@ ROM_START( rhytngk )
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0503-jpn.ic3", 0, 0x800, CRC(6eb0976b) SHA1(d5d0fc09a0c0e3a8f2703c450f05f5082317fbe4) )
 
-	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x04))
+	ROM_PARAMETER( ":rom_board:id", "5504" )
 ROM_END
 
 // this is satellite unit of the main game, server/control and lagre screen units required and need to be dumped
@@ -6111,7 +6111,7 @@ ROM_START( starhrpr )
 	// PIC not populated
 	ROM_REGION( 0x800, "pic_readout", ROMREGION_ERASE00 )
 
-	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x02))
+	ROM_PARAMETER( ":rom_board:id", "5502" )
 ROM_END
 
 /*
@@ -9594,12 +9594,12 @@ ROM_END
 /* 0026 */ GAME( 2000, totd,     naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "The Typing of the Dead (Rev A)", GAME_FLAGS )
 /* 0027 */ GAME( 2000, smarinef, naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Sega Marine Fishing", GAME_FLAGS )
 /* 0028 */ GAME( 2000, vonot,    naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Virtual On Oratorio Tangram M.S.B.S. ver5.66 2000 Edition", GAME_FLAGS )
-/* 0030 */ GAME( 2000, qmegamis, naomi,    naomim1, naomi,   naomi_state, qmegamis,ROT0, "Sega", "Quiz Ah Megamisama", GAME_FLAGS )
+/* 0030 */ GAME( 2000, qmegamis, naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Quiz Ah Megamisama", GAME_FLAGS )
 /* 0035 */ GAME( 2000, sstrkfgt, naomi,    naomim2, sstrkfgt,naomi_state, naomi,   ROT0, "Sega", "Sega Strike Fighter (Rev A, set 1)", GAME_FLAGS )
 /* 0035 */ GAME( 2000, sstrkfgta,sstrkfgt, naomim2, sstrkfgt,naomi_state, naomi,   ROT0, "Sega", "Sega Strike Fighter (Rev A, set 2)", GAME_FLAGS )
 /* 0036 */ GAME( 2000, 18wheels, 18wheelr, naomim2, 18wheelr,naomi_state, naomi,   ROT0, "Sega", "18 Wheeler (standard)", GAME_FLAGS )
 /* 0037 */ GAME( 2000, 18wheelu, 18wheelr, naomim2, 18wheelr,naomi_state, naomi,   ROT0, "Sega", "18 Wheeler (upright)", GAME_FLAGS )
-/* 0039 */ GAME( 2000, gram2000, naomi,    naomim1, naomi,   naomi_state, gram2000,ROT0, "Sega", "Giant Gram 2000", GAME_FLAGS )
+/* 0039 */ GAME( 2000, gram2000, naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Giant Gram 2000", GAME_FLAGS )
 /* 0040 */ GAME( 2000, wwfroyal, naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "WWF Royal Rumble", GAME_FLAGS )
 /* 0041 */ GAME( 2000, slasho,   naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Slashout", GAME_FLAGS )
 // 0042 Ferrari F355 Challenge 2 (twin) - identical to 834-????? listed above.
@@ -9629,7 +9629,7 @@ ROM_END
 /* 0128 */ GAME( 2003, shootpl,  naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Shootout Pool The Medal / Shootout Pool Prize (Rev A)", GAME_FLAGS )
 /* 0130 */ GAME( 2002, hopper,   naomi,    naomi,   naomi,   naomi_state, naomi,   ROT0, "Sega", "SWP Hopper Board", GAME_FLAGS )
 /* 0136 */ GAME( 2004, shootplm, naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Shootout Pool The Medal Ver. B / Shootout Pool Prize Ver. B", GAME_FLAGS )
-/* 0140 */ GAME( 2004, kick4csh, naomi,    naomim1, naomi,   naomi_state, kick4csh,ROT0, "Sega", "Kick '4' Cash", GAME_FLAGS )
+/* 0140 */ GAME( 2004, kick4csh, naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Kick '4' Cash", GAME_FLAGS )
 /* 0150 */ GAME( 2003, mtkob2,   naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetle 2K3 2nd", GAME_FLAGS )
 /* 0158 */ GAME( 2005, mushi2k5, naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetle 2K5 1st", GAME_FLAGS )
 /* 0164 */ GAME( 2005, mushi2eo, mushik2e, naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "MushiKing II - The King Of Beetle II ENG (Ver. 1.001)", GAME_FLAGS )
@@ -9655,7 +9655,7 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 /* 0080 */ GAME( 2002, vf4cart,  naomi2,  naomi2m2, naomi, naomi_state, naomi2,   ROT0, "Sega", "Virtua Fighter 4 (Cartridge)", GAME_FLAGS )
 /* 0087 */ GAME( 2002, kingrt66, naomi2,  naomi2m2, naomi, naomi_state, naomi2,   ROT0, "Sega", "The King of Route 66 (Rev A)", GAME_FLAGS )
 /* 0095 */ GAME( 2002, soulsurf, naomi2,  naomi2m2, naomi, naomi_state, naomi2,   ROT0, "Sega", "Soul Surfer (Rev A)", GAME_FLAGS )
-/* 0106 */ GAME( 2002, vf4evoct, naomi2,  naomi2m1, naomi, naomi_state, vf4evoct, ROT0, "Sega", "Virtua Fighter 4 Evolution (Cartridge)", GAME_FLAGS )
+/* 0106 */ GAME( 2002, vf4evoct, naomi2,  naomi2m1, naomi, naomi_state, naomi2,   ROT0, "Sega", "Virtua Fighter 4 Evolution (Cartridge)", GAME_FLAGS )
 /* 0129 */ GAME( 2003, clubkprz, naomi2,  naomi2m1, naomi, naomi_state, naomi2,   ROT0, "Sega", "Club Kart Prize", GAME_FLAGS )
 /* Note: the game's full name is exactly "Club Kart Prize Ver. B".  The "Ver. B" does not denote a new revision of Club Kart Prize; the different 840- number confirms this. */
 /* 0137 */ GAME( 2004, clubkpzb, naomi2,  naomi2m1, naomi, naomi_state, naomi2,   ROT0, "Sega", "Club Kart Prize Ver. B", GAME_FLAGS )
@@ -9670,8 +9670,8 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 /* 0004 */ GAME( 1999, shangril, naomi, naomim2, naomi_mp,naomi_state,naomi_mp,ROT0,  "Marvelous Ent.",  "Dengen Tenshi Taisen Janshi Shangri-la (Build 0728)", GAME_FLAGS ) // version taken from service mode
 /* 0005 */ GAME( 1999, spawn,    naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Todd Mc Farlane / Capcom","Spawn In the Demon's Hand (Rev B)", GAME_FLAGS )
 /* 0006 */ GAME( 1999, puyoda,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Compile",         "Puyo Puyo Da!", GAME_FLAGS )
-/* 0007-01 */     GAME(2000, mvsc2u, mvsc2, naomim2, naomi,   naomi_state, mvsc2,  ROT0,  "Capcom / Marvel", "Marvel Vs. Capcom 2 New Age of Heroes (USA) (Rev A)", GAME_FLAGS)
-/* 0007-02 -03 */ GAME(2000, mvsc2,  naomi, naomim1, naomi,   naomi_state, mvsc2,  ROT0,  "Capcom / Marvel", "Marvel Vs. Capcom 2 New Age of Heroes (Export, Korea) (Rev A)", GAME_FLAGS)
+/* 0007-01 */     GAME(2000, mvsc2u, mvsc2, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom / Marvel", "Marvel Vs. Capcom 2 New Age of Heroes (USA) (Rev A)", GAME_FLAGS)
+/* 0007-02 -03 */ GAME(2000, mvsc2,  naomi, naomim1, naomi,   naomi_state, naomi,  ROT0,  "Capcom / Marvel", "Marvel Vs. Capcom 2 New Age of Heroes (Export, Korea) (Rev A)", GAME_FLAGS)
 /* 0008 */ GAME( 2000, pstone2,  naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom",          "Power Stone 2", GAME_FLAGS )
 /* 0011 */ GAME( 2000, capsnk,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000 (Rev C)", GAME_FLAGS )
 /* 0011 */ GAME( 2000, capsnka,  capsnk,naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000 (Rev A)", GAME_FLAGS )

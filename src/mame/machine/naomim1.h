@@ -5,8 +5,8 @@
 
 #include "naomibd.h"
 
-#define MCFG_NAOMI_M1_BOARD_ADD(_tag, _eeprom_tag, _actel_tag, _irq_cb) \
-	MCFG_NAOMI_BOARD_ADD(_tag, NAOMI_M1_BOARD, _eeprom_tag, _actel_tag, _irq_cb)
+#define MCFG_NAOMI_M1_BOARD_ADD(_tag, _eeprom_tag, _irq_cb) \
+	MCFG_NAOMI_BOARD_ADD(_tag, NAOMI_M1_BOARD, _eeprom_tag, _irq_cb)
 
 class naomi_m1_board : public naomi_board
 {
@@ -28,6 +28,7 @@ protected:
 private:
 	enum { BUFFER_SIZE = 32768 };
 	UINT32 key;
+	UINT16 actel_id;
 
 	std::unique_ptr<UINT8[]> buffer;
 	UINT8 dict[111], hist[2];
