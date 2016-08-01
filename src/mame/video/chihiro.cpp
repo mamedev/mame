@@ -2366,6 +2366,7 @@ void nv2a_renderer::convert_vertices_poly(vertex_nv *source, nv2avertex_t *desti
 	// should use either the vertex program or transformation matrices
 	if (vertex_pipeline == 4) {
 		// transformation matrices
+		// this part needs more testing
 		for (m = 0; m < count; m++) {
 			for (int i = 0; i < 4; i++) {
 				t[i] = 0;
@@ -2382,7 +2383,7 @@ void nv2a_renderer::convert_vertices_poly(vertex_nv *source, nv2avertex_t *desti
 			    v[i] *= matrix.scale[i];
 			}
 			for (int i = 0; i < 3; i++) {
-			    v[i] += matrix.traslate[i];
+			    v[i] += matrix.translate[i];
 			}*/
 			destination[m].w = v[3];
 			destination[m].x = (v[0] / v[3])*supersample_factor_x; // source[m].attribute[0].fv[0];
@@ -2681,7 +2682,7 @@ UINT32 nv2a_renderer::render_triangle_clipping(const rectangle &cliprect, render
 	vi[2] = &_v3;
 	for (int n=0;n < 3;n++)
 	{
-		// remove traslate
+		// remove translate
 		vi[n]->x = vi[n]->x - translatex;
 		vi[n]->y = vi[n]->y - translatey;
 		vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] = vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] - translatez;
@@ -2733,7 +2734,7 @@ UINT32 nv2a_renderer::render_triangle_clipping(const rectangle &cliprect, render
 		vo[n].x = vo[n].x * scalex;
 		vo[n].y = vo[n].y * scaley;
 		vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] = vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] * scalez;
-		// apply traslate
+		// apply translate
 		vo[n].x = vo[n].x + translatex;
 		vo[n].y = vo[n].y + translatey;
 		vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] = vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] + translatez;
@@ -3503,15 +3504,15 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		*(UINT32 *)(&matrix.projection[maddress >> 2][maddress & 3]) = data;
 		countlen--;
 	}
-	// viewport traslate
+	// viewport translate
 	if ((maddress >= 0x0a20) && (maddress < 0x0a30)) {
 		maddress = (maddress - 0x0a20) / 4;
-		*(UINT32 *)(&matrix.traslate[maddress]) = data;
+		*(UINT32 *)(&matrix.translate[maddress]) = data;
 		// set corresponding vertex shader constant too
 		vertexprogram.exec.c_constant[59].iv[maddress] = data; // constant -37
 #ifdef LOG_NV2A
 		if (maddress == 3)
-			machine().logerror("viewport traslate = {%f %f %f %f}\n", matrix.traslate[0], matrix.traslate[1], matrix.traslate[2], matrix.traslate[3]);
+			machine().logerror("viewport translate = {%f %f %f %f}\n", matrix.translate[0], matrix.translate[1], matrix.translate[2], matrix.translate[3]);
 #endif
 		countlen--;
 	}
@@ -3588,7 +3589,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 #ifdef LOG_NV2A
 			if ((vertexprogram.upload_parameter_index == 58) || (vertexprogram.upload_parameter_index == 59))
 				machine().logerror("vp constant %d (%s) = {%f %f %f %f}\n", vertexprogram.upload_parameter_index,
-					vertexprogram.upload_parameter_index == 58 ? "viewport scale" : "viewport traslate",
+					vertexprogram.upload_parameter_index == 58 ? "viewport scale" : "viewport translate",
 					vertexprogram.exec.c_constant[vertexprogram.upload_parameter_index].fv[0],
 					vertexprogram.exec.c_constant[vertexprogram.upload_parameter_index].fv[1],
 					vertexprogram.exec.c_constant[vertexprogram.upload_parameter_index].fv[2],
@@ -4655,6 +4656,7 @@ WRITE32_MEMBER(nv2a_renderer::geforce_w)
 			if (((*dmaput == 0x048cf000) && (*dmaget == 0x07f4d000)) || // only for outr2
 				((*dmaput == 0x045cd000) && (*dmaget == 0x07f4d000)) || // only for scg06nt
 				((*dmaput == 0x0494c000) && (*dmaget == 0x07f4d000)) || // only for wangmid
+				((*dmaput == 0x05acd000) && (*dmaget == 0x07f4d000)) || // only for ghostsqu
 				((*dmaput == 0x07dca000) && (*dmaget == 0x07f4d000))) // only for crtaxihr
 			{
 				*dmaget = *dmaput;

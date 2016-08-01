@@ -297,14 +297,21 @@ protected:
 	std::string m_basename_noext;
 	std::string m_filetype;
 
-	// working directory; persists across mounts
-	std::string m_working_directory;
-
 	// Software information
 	std::string m_full_software_name;
 	const software_info *m_software_info_ptr;
 	const software_part *m_software_part_ptr;
 	std::string m_software_list_name;
+
+private:
+	static image_error_t image_error_from_file_error(osd_file::error filerr);
+	bool schedule_postload_hard_reset_if_needed();
+
+	// creation info
+	formatlist_type m_formatlist;
+
+	// working directory; persists across mounts
+	std::string m_working_directory;
 
 	// info read from the hash file/software list
 	std::string m_longname;
@@ -331,13 +338,6 @@ protected:
 	bool m_user_loadable;
 
 	bool m_is_loading;
-
-private:
-	static image_error_t image_error_from_file_error(osd_file::error filerr);
-	bool schedule_postload_hard_reset_if_needed();
-
-	// creation info
-	formatlist_type m_formatlist;
 };
 
 // iterator

@@ -189,6 +189,15 @@ ioport_constructor apricot_keyboard_hle_device::device_input_ports() const
 	return INPUT_PORTS_NAME( keyboard );
 }
 
+static MACHINE_CONFIG_FRAGMENT( keyboard_components )
+	MCFG_MSM5832_ADD("rtc", XTAL_32_768kHz)
+MACHINE_CONFIG_END
+
+machine_config_constructor apricot_keyboard_hle_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( keyboard_components );
+}
+
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -202,7 +211,9 @@ apricot_keyboard_hle_device::apricot_keyboard_hle_device(const machine_config &m
 	device_t(mconfig, APRICOT_KEYBOARD_HLE, "Apricot Keyboard (HLE)", tag, owner, clock, "apricotkb_hle", __FILE__),
 	device_apricot_keyboard_interface(mconfig, *this),
 	device_buffered_serial_interface(mconfig, *this),
-	device_matrix_keyboard_interface(mconfig, *this, "row_0", "row_1", "row_2", "row_3", "row_4", "row_5", "row_6", "row_7", "row_8", "row_9", "row_a", "row_b", "row_c")
+	device_matrix_keyboard_interface(mconfig, *this, "row_0", "row_1", "row_2", "row_3", "row_4", "row_5", "row_6", "row_7", "row_8", "row_9", "row_a", "row_b", "row_c"),
+	m_rtc(*this, "rtc"),
+	m_rtc_index(0)
 {
 }
 
@@ -234,19 +245,72 @@ void apricot_keyboard_hle_device::device_reset()
 	start_processing(attotime::from_hz(7800));
 }
 
+//-------------------------------------------------
+//  tra_callback - send bit to host
+//-------------------------------------------------
+
 void apricot_keyboard_hle_device::tra_callback()
 {
 	m_host->in_w(transmit_register_get_data_bit());
 }
 
-void apricot_keyboard_hle_device::tra_complete()
-{
-	device_buffered_serial_interface::tra_complete();
-}
+//-------------------------------------------------
+//  received_byte - handle received byte
+//-------------------------------------------------
 
 void apricot_keyboard_hle_device::received_byte(UINT8 byte)
 {
-	logerror("received command: %02x\n", byte);
+	if ((byte & 0xf0) == 0xf0)
+	{
+		// rtc data
+		if (m_rtc_index >= 0)
+		{
+			m_rtc->address_w(m_rtc_index--);
+			m_rtc->data_w(machine().driver_data()->generic_space(), 0, byte);
+		}
+	}
+	else
+	{
+		switch (byte)
+		{
+		case CMD_REQ_TIME_AND_DATE:
+			logerror("System requests current time\n");
+
+			// remove pending keys just in case
+			clear_fifo();
+
+			// send time prefix
+			transmit_byte(0xed);
+
+			// make rtc chip ready
+			m_rtc->cs_w(1);
+			m_rtc->read_w(1);
+
+			// send bcd encoded date and time to system
+			for (int i = 12; i >= 0; i--)
+			{
+				m_rtc->address_w(i);
+				transmit_byte(0xf0 | m_rtc->data_r(machine().driver_data()->generic_space(), 0));
+			}
+
+			break;
+
+		case CMD_SET_TIME_AND_DATE:
+			logerror("System requests to set time\n");
+
+			// we start with the year
+			m_rtc_index = 12;
+
+			// make rtc chip ready
+			m_rtc->cs_w(1);
+			m_rtc->write_w(1);
+
+			break;
+
+		default:
+			logerror("Unhandled command: %02x\n", byte);
+		}
+	}
 }
 
 //-------------------------------------------------
@@ -269,18 +333,13 @@ void apricot_keyboard_hle_device::key_break(UINT8 row, UINT8 column)
 	transmit_byte(0x80 | (row << 3) | column);
 }
 
+//-------------------------------------------------
+//  out_w - receive bit from host
+//-------------------------------------------------
+
 void apricot_keyboard_hle_device::out_w(int state)
 {
 	device_buffered_serial_interface::rx_w(state);
-}
-
-//-------------------------------------------------
-//  transmit_byte - send a byte or queue it
-//-------------------------------------------------
-
-void apricot_keyboard_hle_device::transmit_byte(UINT8 byte)
-{
-	device_buffered_serial_interface::transmit_byte(byte);
 }
 
 //-------------------------------------------------

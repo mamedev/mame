@@ -710,6 +710,7 @@ void chihiro_state::hack_eeprom()
 	m_maincpu->space(0).write_byte(0x3b767, 0xc3);
 }
 
+#define HACK_ITEMS 4
 static const struct {
 	const char *game_name;
 	const bool disable_usb;
@@ -717,10 +718,11 @@ static const struct {
 		UINT32 address;
 		UINT8 write_byte;
 	} modify[16];
-} hacks[3] = {  { "chihiro",  false, { { 0x6a79f/*3f79f*/, 0x01 }, { 0x6a7a0/*3f7a0*/, 0x00 }, { 0x6b575/*40575*/, 0x00 }, { 0x6b576/*40576*/, 0x00 }, { 0x6b5af/*405af*/, 0x75 }, { 0x6b78a/*4078a*/, 0x75 }, { 0x6b7ca/*407ca*/, 0x00 }, { 0x6b7b8/*407b8*/, 0x00 }, { 0x8f5b2, 0x75 }, { 0x79a9e/*2ea9e*/, 0x74 }, { 0x79b80/*2eb80*/, 0xeb }, { 0x79b97/*2eb97*/, 0x74 }, { 0, 0 } } },
-				{ "outr2",    true,  { { 0x12e4cf, 0x01 }, { 0x12e4d0, 0x00 }, { 0x4793e, 0x01 }, { 0x4793f, 0x00 }, { 0x47aa3, 0x01 }, { 0x47aa4, 0x00 }, { 0x14f2b6, 0x84 }, { 0x14f2d1, 0x75 }, { 0x8732f, 0x7d }, { 0x87384, 0x7d }, { 0x87388, 0xeb }, { 0, 0 } } },
-				{ "crtaxihr", false, { { 0x14ada5/*11fda5*/, 0x90 },{ 0x14ada6/*11fda6*/, 0x90 }, { 0, 0 } } },
-				};
+} hacks[HACK_ITEMS] = { { "chihiro",  false, { { 0x6a79f/*3f79f*/, 0x01 }, { 0x6a7a0/*3f7a0*/, 0x00 }, { 0x6b575/*40575*/, 0x00 }, { 0x6b576/*40576*/, 0x00 }, { 0x6b5af/*405af*/, 0x75 }, { 0x6b78a/*4078a*/, 0x75 }, { 0x6b7ca/*407ca*/, 0x00 }, { 0x6b7b8/*407b8*/, 0x00 }, { 0x8f5b2, 0x75 }, { 0x79a9e/*2ea9e*/, 0x74 }, { 0x79b80/*2eb80*/, 0xeb }, { 0x79b97/*2eb97*/, 0x74 }, { 0, 0 } } },
+					    { "outr2",    true,  { { 0x12e4cf, 0x01 }, { 0x12e4d0, 0x00 }, { 0x4793e, 0x01 }, { 0x4793f, 0x00 }, { 0x47aa3, 0x01 }, { 0x47aa4, 0x00 }, { 0x14f2b6, 0x84 }, { 0x14f2d1, 0x75 }, { 0x8732f, 0x7d }, { 0x87384, 0x7d }, { 0x87388, 0xeb }, { 0, 0 } } },
+						{ "crtaxihr", false, { { 0x14ada5/*11fda5*/, 0x90 },{ 0x14ada6/*11fda6*/, 0x90 }, { 0, 0 } } },
+						{ "ghostsqu", false, { { 0x78833/*4d833*/, 0x90 },{ 0x78834/*4d834*/, 0x90 }, { 0, 0 } } },
+};
 
 void chihiro_state::hack_usb()
 {
@@ -1569,7 +1571,7 @@ void chihiro_state::machine_start()
 		machine().debugger().console().register_command("chihiro", CMDFLAG_NONE, 0, 1, 4, std::bind(&chihiro_state::debug_commands, this, _1, _2, _3));
 	}
 	usbhack_index = -1;
-	for (int a = 1; a < 3; a++)
+	for (int a = 1; a < HACK_ITEMS; a++)
 		if (strcmp(machine().basename(), hacks[a].game_name) == 0) {
 			usbhack_index = a;
 			if (hacks[a].disable_usb == true)
