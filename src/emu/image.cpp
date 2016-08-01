@@ -58,7 +58,7 @@ image_manager::image_manager(running_machine &machine)
 			// try to load this image
 			image_init_result result = is_softlist_part
 				? image.load_software(image_name)
-				: image.load(image_name.c_str());
+				: image.load(image_name);
 
 			// did the image load fail?
 			if (result != image_init_result::PASS)
