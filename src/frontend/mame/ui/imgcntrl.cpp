@@ -153,10 +153,10 @@ void menu_control_device_image::load_software_part()
 //  hook_load
 //-------------------------------------------------
 
-void menu_control_device_image::hook_load(std::string name, bool softlist)
+void menu_control_device_image::hook_load(const std::string &name, bool softlist)
 {
 	if (m_image.is_reset_on_load()) m_image.set_init_phase();
-	m_image.load(name.c_str());
+	m_image.load(name);
 	stack_pop();
 }
 
