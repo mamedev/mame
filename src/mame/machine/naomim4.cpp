@@ -63,6 +63,15 @@ void naomi_m4_board::device_start()
 {
 	naomi_board::device_start();
 
+	std::string sid = parameter("id");
+	if (!sid.empty())
+		m4id = strtoll(sid.c_str(), nullptr, 16);
+	else
+	{
+		logerror("%s: Warning: M4 ID not provided\n", tag());
+		m4id = 0x5504;
+	}
+
 	subkey1 = (m_key_data[0x5e2] << 8) | m_key_data[0x5e0];
 	subkey2 = (m_key_data[0x5e6] << 8) | m_key_data[0x5e4];
 
@@ -132,13 +141,7 @@ void naomi_m4_board::board_get_buffer(UINT8 *&base, UINT32 &limit)
 	static UINT8 retzero[2] = { 0, 0 };
 
 	if (cfi_mode) {
-		int fpr_num = 0;
-
-		if (rombdid_tag && owner()->memregion(rombdid_tag) != nullptr)
-		{
-			fpr_num = *owner()->memregion(rombdid_tag)->base() & 0x7f;
-
-		}
+		int fpr_num = m4id & 0x7f;
 
 		if (((rom_cur_address >> 26) & 0x07) < fpr_num) {
 			base = &cfidata[rom_cur_address & 0xffff];
@@ -215,15 +218,7 @@ void naomi_m4_board::enc_fill()
 
 READ16_MEMBER(naomi_m4_board::m4_id_r)
 {
-	UINT16 epr_flag = 0;
-
-	if (rombdid_tag != nullptr && owner()->memregion(rombdid_tag) != nullptr)
-	{
-		epr_flag = *owner()->memregion(rombdid_tag)->base() & 0x80;
-
-	}
-
-	return 0x5500 | epr_flag;
+	return m4id & 0xff80;
 }
 
 void naomi_m4_board::board_write(offs_t offset, UINT16 data)

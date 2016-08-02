@@ -67,12 +67,7 @@ class naomi_state : public dc_state
 	DECLARE_DRIVER_INIT(naomigd_mp);
 	DECLARE_DRIVER_INIT(sfz3ugd);
 	DECLARE_DRIVER_INIT(hotd2);
-	DECLARE_DRIVER_INIT(qmegamis);
-	DECLARE_DRIVER_INIT(gram2000);
-	DECLARE_DRIVER_INIT(kick4csh);
-	DECLARE_DRIVER_INIT(vf4evoct);
 	DECLARE_DRIVER_INIT(naomi_mp);
-	DECLARE_DRIVER_INIT(mvsc2);
 
 	DECLARE_READ64_MEMBER( naomi_arm_r );
 	DECLARE_WRITE64_MEMBER( naomi_arm_w );
@@ -90,8 +85,6 @@ class naomi_state : public dc_state
 	DECLARE_INPUT_CHANGED_MEMBER(naomi_mp_w);
 
 	inline int decode_reg32_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift);
-
-	UINT16 actel_id;
 
 	UINT8 aw_ctrl_type;
 
