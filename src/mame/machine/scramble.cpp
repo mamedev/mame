@@ -258,7 +258,7 @@ DRIVER_INIT_MEMBER(scramble_state,cavelon)
 
 	m_maincpu->space(AS_PROGRAM).nop_write(0x2000, 0x2000);  /* ??? */
 	m_maincpu->space(AS_PROGRAM).nop_write(0x3800, 0x3801);  /* looks suspicously like
-                                                               an AY8910, but not sure */
+	                                                           an AY8910, but not sure */
 	save_item(NAME(m_cavelon_bank));
 }
 

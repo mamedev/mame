@@ -90,8 +90,8 @@ public:
 	UINT8      m_color_ram[0x400];
 	UINT8      m_palette_ram[0x10];
 	UINT8      m_character_ram[3 * 0x800];  /* only half is used, but
-                                               by allocating twice the amount,
-                                               we can use the same gfx_layout */
+	                                           by allocating twice the amount,
+	                                           we can use the same gfx_layout */
 	DECLARE_READ_LINE_MEMBER(speech_rom_read_bit);
 	DECLARE_WRITE_LINE_MEMBER(write_s2650_flag);
 	DECLARE_WRITE_LINE_MEMBER(cvs_slave_cpu_interrupt);

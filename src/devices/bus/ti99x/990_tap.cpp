@@ -72,7 +72,7 @@ enum
 static const UINT16 w_mask[8] =
 {
 	0x000f,     /* Controllers should prevent overwriting of w0 status bits, and I know
-                that some controllers do so. */
+	            that some controllers do so. */
 	0xffff,
 	0xffff,
 	0xffff,

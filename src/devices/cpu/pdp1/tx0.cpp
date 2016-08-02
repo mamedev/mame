@@ -465,7 +465,7 @@ void tx0_64kw_device::execute_instruction_64kw()
 			{
 				PC = MAR & ADDRESS_MASK_64KW;
 				m_cycle = 0;    /* instruction only takes one cycle if branch
-                                    is taken */
+				                    is taken */
 			}
 			break;
 
@@ -596,18 +596,18 @@ void tx0_64kw_device::execute_instruction_64kw()
 
 			if (MAR & 0000010)
 			{   /* (1.7) CRY = Partial add the 18 digits of the AC to the
-                    corresponding 18 digits of the carry.
+			        corresponding 18 digits of the carry.
 
-                    To determine what the 18 digits of the carry are, use the
-                    following rule:
+			        To determine what the 18 digits of the carry are, use the
+			        following rule:
 
-                    "Grouping the AC and MBR digits into pairs and proceeding from
-                    right to left, assign the carry digit of the next pair to a one
-                    if in the present pair MBR = 1 and AC = 0 or if in the present
-                    pair AC = 1 and carry 1.
+			        "Grouping the AC and MBR digits into pairs and proceeding from
+			        right to left, assign the carry digit of the next pair to a one
+			        if in the present pair MBR = 1 and AC = 0 or if in the present
+			        pair AC = 1 and carry 1.
 
-                    (Note: the 0th digit pair determines the 17th pair's carry
-                    digit)" */
+			        (Note: the 0th digit pair determines the 17th pair's carry
+			        digit)" */
 				AC ^= MBR;
 
 				AC = AC + MBR;
@@ -666,7 +666,7 @@ void tx0_8kw_device::execute_instruction_8kw()
 			{
 				PC = MAR & 0017777;
 				m_cycle = 0;    /* instruction only takes one cycle if branch
-                                    is taken */
+				                    is taken */
 			}
 			break;
 
@@ -675,7 +675,7 @@ void tx0_8kw_device::execute_instruction_8kw()
 			{
 				PC = MAR & 0017777;
 				m_cycle = 0;    /* instruction only takes one cycle if branch
-                                    is taken */
+				                    is taken */
 			}
 			break;
 
@@ -683,7 +683,7 @@ void tx0_8kw_device::execute_instruction_8kw()
 			XR = PC;
 			PC = MAR & 0017777;
 			m_cycle = 0;    /* instruction only takes one cycle if branch
-                                is taken */
+			                    is taken */
 			break;
 
 		case 19:    /* Transfer and IndeX */
@@ -695,7 +695,7 @@ void tx0_8kw_device::execute_instruction_8kw()
 					XR--;
 				PC = MAR & 0017777;
 				m_cycle = 0;    /* instruction only takes one cycle if branch
-                                    is taken */
+				                    is taken */
 			}
 			break;
 
@@ -704,7 +704,7 @@ void tx0_8kw_device::execute_instruction_8kw()
 		case 20:    /* TRAnsfer */
 			PC = MAR & 0017777;
 			m_cycle = 0;    /* instruction only takes one cycle if branch
-                                is taken */
+			                    is taken */
 			break;
 
 		case 22:    /* Transfer on external LeVel */
@@ -712,7 +712,7 @@ void tx0_8kw_device::execute_instruction_8kw()
 			{
 			    PC = MAR & 0017777;
 			    m_cycle = 0;*/  /* instruction only takes one cycle if branch
-                                    is taken */
+				                    is taken */
 			/*}*/
 			break;
 
@@ -915,8 +915,8 @@ void tx0_8kw_device::execute_instruction_8kw()
 			{   /* Normal operate class instruction */
 				if (((IR & 001) == 00) && ((MAR & 017000) == 003000))
 				{   /* (1.1) PEN = set ac bit 0 from light PEN ff, and ac bit 1 from
-                        light gun ff.  (ffs contain one if pen or gun saw displayed
-                        point.)  Then clear both light pen and light gun ffs */
+				        light gun ff.  (ffs contain one if pen or gun saw displayed
+				        point.)  Then clear both light pen and light gun ffs */
 					/*AC = (AC & 0177777) |?...;*/
 					/*... = 0;*/
 				}
@@ -985,12 +985,12 @@ void tx0_8kw_device::execute_instruction_8kw()
 					switch (MAR & 0000300)
 					{
 					case 0000000:   /* (1.6) CYR = CYcle ac contents Right one binary
-                                        position (AC(17) -> AC(0)) */
+					                    position (AC(17) -> AC(0)) */
 						AC = (AC >> 1) | ((AC & 1) << 17);
 						break;
 
 					case 0000200:   /* (1.6) CYcle ac contents Right one binary
-                                        position (AC(0) unchanged) */
+					                    position (AC(0) unchanged) */
 						AC = (AC >> 1) | (AC & 0400000);
 						break;
 
@@ -1007,7 +1007,7 @@ void tx0_8kw_device::execute_instruction_8kw()
 
 				if (MAR & 0000010)
 				{   /* (1.7?) CRY = Partial ADd the 18 digits of the AC to the
-                        corresponding 18 digits of the carry. */
+				        corresponding 18 digits of the carry. */
 					AC ^= MBR;
 
 					AC = AC + MBR;

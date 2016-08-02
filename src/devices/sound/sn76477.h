@@ -172,8 +172,8 @@ public:
 
 	/* these functions take a capacitor value in Farads or the voltage on it in Volts */
 	#define SN76477_EXTERNAL_VOLTAGE_DISCONNECT   (-1.0)    /* indicates that the voltage is internally computed,
-                                                               can be used in all the functions that take a
-                                                               voltage on a capacitor */
+	                                                           can be used in all the functions that take a
+	                                                           voltage on a capacitor */
 	void one_shot_cap_w(double data);
 	void one_shot_cap_voltage_w(double data);
 	void slf_cap_w(double data);

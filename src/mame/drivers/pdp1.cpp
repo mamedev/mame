@@ -452,7 +452,7 @@ enum
 static pdp1_reset_param_t pdp1_reset_param =
 {
 	{   /* external iot handlers.  NULL means that the iot is unimplemented, unless there are
-        parentheses around the iot name, in which case the iot is internal to the cpu core. */
+	    parentheses around the iot name, in which case the iot is internal to the cpu core. */
 		/* I put a ? when the source is the handbook, since a) I have used the maintenance manual
 		as the primary source (as it goes more into details) b) the handbook and the maintenance
 		manual occasionnally contradict each other. */
@@ -1821,8 +1821,8 @@ INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
 		{
 			m_maincpu->set_state_int(PDP1_RUN, (UINT64)0);
 			m_maincpu->set_state_int(PDP1_RIM, (UINT64)0);  /* bug : we stop after reading an even-numbered word
-                                            (i.e. data), whereas a real pdp-1 stops after reading
-                                            an odd-numbered word (i.e. dio instruciton) */
+			                                (i.e. data), whereas a real pdp-1 stops after reading
+			                                an odd-numbered word (i.e. dio instruciton) */
 		}
 		if (control_transitions & pdp1_continue)
 		{

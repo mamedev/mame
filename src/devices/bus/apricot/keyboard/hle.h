@@ -24,7 +24,7 @@
 // ======================> apricot_keyboard_hle_device
 
 class apricot_keyboard_hle_device : public device_t,
-                                    public device_apricot_keyboard_interface,
+									public device_apricot_keyboard_interface,
 									public device_buffered_serial_interface<16>,
 									protected device_matrix_keyboard_interface<13>
 {

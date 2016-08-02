@@ -158,7 +158,7 @@ static INPUT_PORTS_START( alto2 )
 	PORT_START("mousey")    // Mouse - Y AXIS
 	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_motion_y, nullptr )
 
-	PORT_START("utilout")	// Speaker connected to UTILOUT
+	PORT_START("utilout")   // Speaker connected to UTILOUT
 	PORT_BIT( 0xff, 0x00, IPT_PORT ) PORT_WRITE_LINE_DEVICE_MEMBER(":speaker", speaker_sound_device, level_w)
 
 	PORT_START("CONFIG")    /* Memory switch on AIM board */

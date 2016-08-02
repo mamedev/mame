@@ -20,7 +20,7 @@
 00 - 0105 ( 00) (  105) :  (180, 2e0, 0a0, 000, 000, 000, 000, 000)  6     fffb   (zeroteamsr)
 */
 void raiden2cop_device::execute_0205(int offset, UINT16 data)
-{	
+{
 	int ppos =        m_host_space->read_dword(cop_regs[0] + 0x04 + offset * 4);
 	int npos = ppos + m_host_space->read_dword(cop_regs[0] + 0x10 + offset * 4);
 	int delta = (npos >> 16) - (ppos >> 16);
@@ -44,7 +44,7 @@ void raiden2cop_device::execute_0904(int offset, UINT16 data)
 #if LOG_Move0905
 	printf("cmd %04x: %08x %08x [%08x]\n",data, m_host_space->read_dword(cop_regs[0] + 16 + offset * 4),m_host_space->read_dword(cop_regs[0] + 0x28 + offset * 4),cop_regs[0]);
 #endif
-	
+
 	if (data&0x0001)
 		m_host_space->write_dword(cop_regs[0] + 16 + offset * 4, m_host_space->read_dword(cop_regs[0] + 16 + offset * 4) + m_host_space->read_dword(cop_regs[0] + 0x28 + offset * 4));
 	else /* X Se Dae and Zero Team uses this variant */
@@ -72,19 +72,19 @@ void raiden2cop_device::LEGACY_execute_130e_cupsoc(int offset, UINT16 data)
 {
 	int dy = m_host_space->read_dword(cop_regs[1] + 4) - m_host_space->read_dword(cop_regs[0] + 4);
 	int dx = m_host_space->read_dword(cop_regs[1] + 8) - m_host_space->read_dword(cop_regs[0] + 8);
-	
+
 	cop_status = 7;
 
 	if (!dx) {
 		cop_status |= 0x8000;
 		cop_angle = 0;
 	}
-	else 
+	else
 	{
 		cop_angle = (int)(atan(double(dy) / double(dx)) * 128.0 / M_PI);
 		if (dx < 0)
 			cop_angle += 0x80;
-		
+
 		cop_angle &= 0xff;
 	}
 
@@ -163,7 +163,7 @@ void raiden2cop_device::execute_338e(int offset, UINT16 data)
 		cop_angle = (int)(atan(double(dx) / double(dy)) * 128 / M_PI);
 		if (dy < 0)
 			cop_angle += 0x80;
-		
+
 		cop_angle &= 0xff;
 	}
 
@@ -200,7 +200,7 @@ void raiden2cop_device::execute_3b30(int offset, UINT16 data)
 #if LOG_Phytagoras
 	printf("cmd %04x: dx = %d dy = %d dist = %08x \n",data,dx >> 16,dy >> 16,cop_dist);
 #endif
-	
+
 	if (data & 0x0080)
 		cop_write_word(cop_regs[0] + (data & 0x200 ? 0x3a : 0x38), cop_dist);
 }
@@ -229,11 +229,11 @@ void raiden2cop_device::execute_42c2(int offset, UINT16 data)
 
 #if LOG_Division
 	printf("res = %04x dist %04x\n",(cop_dist << (5 - cop_scale)) / div,cop_dist);
-	
-//	if(div & 0x8000)
-//		machine().debugger().debug_break();
+
+//  if(div & 0x8000)
+//      machine().debugger().debug_break();
 #endif
-	
+
 	cop_write_word(cop_regs[0] + (0x38), (cop_dist << (5 - cop_scale)) / div);
 }
 
@@ -312,7 +312,7 @@ void raiden2cop_device::execute_6200(int offset, UINT16 data)
 	}
 
 	cop_write_word(cop_regs[primary_reg], flags);
-	
+
 	if (!m_host_endian)
 		cop_write_byte(cop_regs[primary_reg] + primary_offset, angle);
 	else // angle is a byte, but grainbow (cave mid-boss) is only happy with write-word, could be more endian weirdness, or it always writes a word?
@@ -592,11 +592,11 @@ void raiden2cop_device::LEGACY_execute_dde5(int offset, UINT16 data)
 */
 // controls GK position, aligned to the ball position
 void raiden2cop_device::LEGACY_execute_e30e(int offset, UINT16 data)
-{	
+{
 	int dy = m_host_space->read_dword(cop_regs[2] + 4) - m_host_space->read_dword(cop_regs[0] + 4);
 	int dx = m_host_space->read_dword(cop_regs[2] + 8) - m_host_space->read_dword(cop_regs[0] + 8);
 
-	
+
 	cop_status = 7;
 	if (!dx)
 	{
@@ -610,7 +610,7 @@ void raiden2cop_device::LEGACY_execute_e30e(int offset, UINT16 data)
 
 		cop_angle &= 0xff;
 	}
-	
+
 #if LOG_Phytagoras
 	printf("cmd %04x: dx = %d dy = %d angle = %02x %04x\n",data,dx,dy,cop_angle);
 #endif

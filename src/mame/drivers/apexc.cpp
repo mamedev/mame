@@ -23,8 +23,8 @@ public:
 		m_screen(*this, "screen")  { }
 
 	UINT32 m_panel_data_reg;    /* value of a data register on the control panel which can
-                                be edited - the existence of this register is a personnal
-                                guess */
+	                            be edited - the existence of this register is a personnal
+	                            guess */
 
 	std::unique_ptr<bitmap_ind16> m_bitmap;
 

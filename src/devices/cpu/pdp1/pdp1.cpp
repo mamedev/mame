@@ -834,7 +834,7 @@ void pdp1_device::execute_run()
 					}
 					else if ((IR == DIO) || (IR == DAC))    /* dio or dac instruction ? */
 					{   /* there is a discrepancy: the pdp1 handbook tells that only dio should be used,
-                        but the lisp tape uses the dac instruction instead */
+					    but the lisp tape uses the dac instruction instead */
 						/* Yet maintenance manual p. 6-25 states clearly that the data is located
 						in IO and transfered to MB, so DAC is likely to be a mistake. */
 						m_rim_step = 2;
@@ -1122,9 +1122,9 @@ void pdp1_device::execute_instruction()
 		}
 	case SUB:       /* Subtract */
 		{   /* maintenance manual 7-14 seems to imply that substract does not test for -0.
-              The sim 2.3 source says so explicitely, though they do not give a reference.
-              It sounds a bit weird, but the reason is probably that doing so would
-              require additionnal logic that does not exist. */
+		      The sim 2.3 source says so explicitely, though they do not give a reference.
+		      It sounds a bit weird, but the reason is probably that doing so would
+		      require additionnal logic that does not exist. */
 			/* overflow is set if the 2 operands have the same sign and the final result has another */
 			int ov2;    /* 1 if the operands have the same sign*/
 

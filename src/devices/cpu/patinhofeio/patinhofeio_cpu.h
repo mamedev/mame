@@ -76,14 +76,14 @@ protected:
 	/* processor registers */
 	unsigned char m_acc; /* accumulator (8 bits) */
 	unsigned int m_pc;   /* program counter (12 bits)
-                          * Actual register name is CI, which
-                          * stands for "Contador de Instrucao"
-                          * or "instructions counter".
-                          */
+	                      * Actual register name is CI, which
+	                      * stands for "Contador de Instrucao"
+	                      * or "instructions counter".
+	                      */
 	unsigned int m_rc; /* RC = "Registrador de Chaves" (Keys Register)
-                        * It represents the 12 bits of input data
-                        * from toggle switches in the computer panel
-                        */
+	                    * It represents the 12 bits of input data
+	                    * from toggle switches in the computer panel
+	                    */
 	unsigned char m_idx; /* IDX = Index Register */
 	unsigned char m_ext; /* EXT = Accumulator Extension Register */
 

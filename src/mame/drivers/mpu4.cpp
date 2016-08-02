@@ -531,7 +531,7 @@ WRITE8_MEMBER(mpu4_state::bankset_w)
 WRITE8_MEMBER(mpu4_state::ic2_o1_callback)
 {
 	m_6840ptm->set_c2(data);    /* copy output value to IC2 c2
-    this output is the clock for timer2 */
+	this output is the clock for timer2 */
 	/* 1200Hz System interrupt timer */
 }
 
@@ -1022,14 +1022,14 @@ READ8_MEMBER(mpu4_state::pia_ic5_portb_r)
 {
 	if (m_hopper == HOPPER_NONDUART_B)
 	{/*
-        if (hopper1_active)
-        {
-            m_aux2_input |= 0x08;
-        }
-        else
-        {
-            m_aux2_input &= ~0x08;
-        }*/
+	    if (hopper1_active)
+	    {
+	        m_aux2_input |= 0x08;
+	    }
+	    else
+	    {
+	        m_aux2_input &= ~0x08;
+	    }*/
 	}
 
 	LOG(("%s: IC5 PIA Read of Port B (coin input AUX2)\n",machine().describe_context()));

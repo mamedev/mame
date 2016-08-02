@@ -94,10 +94,10 @@ READ16_MEMBER( huc6202_device::next_pixel )
 					break;
 
 				case 2:     /* Back - BG0 + SP1 => BG0 - Front
-                                      BG0 + BG1 => BG0
-                                      BG1 + SP0 => BG1
-                                      SP0 + SP1 => SP0
-                            */
+				                      BG0 + BG1 => BG0
+				                      BG1 + SP0 => BG1
+				                      SP0 + SP1 => SP0
+				            */
 					if ( data_1 > huc6270_device::HUC6270_SPRITE )
 					{
 						if ( data_0 > huc6270_device::HUC6270_SPRITE )

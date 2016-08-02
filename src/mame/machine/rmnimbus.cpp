@@ -93,13 +93,13 @@ chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
 
 /* 8031/8051 Peripheral controller */
 
-#define IPC_OUT_ADDR        0X01
-#define IPC_OUT_READ_PEND   0X02
-#define IPC_OUT_BYTE_AVAIL  0X04
+#define IPC_OUT_ADDR        0x01
+#define IPC_OUT_READ_PEND   0x02
+#define IPC_OUT_BYTE_AVAIL  0x04
 
-#define IPC_IN_ADDR         0X01
-#define IPC_IN_BYTE_AVAIL   0X02
-#define IPC_IN_READ_PEND    0X04
+#define IPC_IN_ADDR         0x01
+#define IPC_IN_BYTE_AVAIL   0x02
+#define IPC_IN_READ_PEND    0x04
 
 /* IO unit */
 

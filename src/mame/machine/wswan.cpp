@@ -310,34 +310,34 @@ WRITE8_MEMBER( wswan_state::port_w )
 	switch (offset)
 	{
 		case 0x40:  /* DMA source address (low)
-                     Bit 0-7 - DMA source address bit 0-7
-                     */
+		             Bit 0-7 - DMA source address bit 0-7
+		             */
 		case 0x41:  /* DMA source address (high)
-                     Bit 0-7 - DMA source address bit 8-15
-                     */
+		             Bit 0-7 - DMA source address bit 8-15
+		             */
 		case 0x42:  /* DMA source bank
-                     Bit 0-7 - DMA source bank number
-                     */
+		             Bit 0-7 - DMA source bank number
+		             */
 		case 0x43:  /* DMA destination bank
-                     Bit 0-7 - DMA destination bank number
-                     */
+		             Bit 0-7 - DMA destination bank number
+		             */
 		case 0x44:  /* DMA destination address (low)
-                     Bit 0-7 - DMA destination address bit 0-7
-                     */
+		             Bit 0-7 - DMA destination address bit 0-7
+		             */
 		case 0x45:  /* DMA destination address (high)
-                     Bit 0-7 - DMA destination address bit 8-15
-                     */
+		             Bit 0-7 - DMA destination address bit 8-15
+		             */
 		case 0x46:  /* Size of copied data (low)
-                     Bit 0-7 - DMA size bit 0-7
-                     */
+		             Bit 0-7 - DMA size bit 0-7
+		             */
 		case 0x47:  /* Size of copied data (high)
-                     Bit 0-7 - DMA size bit 8-15
-                     */
+		             Bit 0-7 - DMA size bit 8-15
+		             */
 			break;
 		case 0x48:  /* DMA control
-                     Bit 0-6 - Unknown
-                     Bit 7   - DMA stop/start
-                     */
+		             Bit 0-6 - Unknown
+		             Bit 7   - DMA stop/start
+		             */
 			if (data & 0x80)
 			{
 				UINT32 src, dst;
@@ -365,167 +365,167 @@ WRITE8_MEMBER( wswan_state::port_w )
 			}
 			break;
 		case 0x4a:  /* Sound DMA source address (low)
-                     Bit 0-7 - Sound DMA source address bit 0-7
-                     */
+		             Bit 0-7 - Sound DMA source address bit 0-7
+		             */
 			m_sound_dma.source = (m_sound_dma.source & 0x0fff00) | data;
 			break;
 		case 0x4b:  /* Sound DMA source address (high)
-                     Bit 0-7 - Sound DMA source address bit 8-15
-                     */
+		             Bit 0-7 - Sound DMA source address bit 8-15
+		             */
 			m_sound_dma.source = (m_sound_dma.source & 0x0f00ff) | (data << 8);
 			break;
 		case 0x4c:  /* Sound DMA source memory segment
-                     Bit 0-3 - Sound DMA source address segment
-                     Bit 4-7 - Unknown
-                     */
+		             Bit 0-3 - Sound DMA source address segment
+		             Bit 4-7 - Unknown
+		             */
 			m_sound_dma.source = (m_sound_dma.source & 0xffff) | ((data & 0x0f) << 16);
 			break;
 		case 0x4d:  /* Unknown */
 			break;
 		case 0x4e:  /* Sound DMA transfer size (low)
-                     Bit 0-7 - Sound DMA transfer size bit 0-7
-                     */
+		             Bit 0-7 - Sound DMA transfer size bit 0-7
+		             */
 			m_sound_dma.size = (m_sound_dma.size & 0xff00) | data;
 			break;
 		case 0x4f:  /* Sound DMA transfer size (high)
-                     Bit 0-7 - Sound DMA transfer size bit 8-15
-                     */
+		             Bit 0-7 - Sound DMA transfer size bit 8-15
+		             */
 			m_sound_dma.size = (m_sound_dma.size & 0xff) | (data << 8);
 			break;
 		case 0x50:  /* Unknown */
 		case 0x51:  /* Unknown */
 			break;
 		case 0x52:  /* Sound DMA start/stop
-                     Bit 0-6 - Unknown
-                     Bit 7   - Sound DMA stop/start
-                     */
+		             Bit 0-6 - Unknown
+		             Bit 7   - Sound DMA stop/start
+		             */
 			m_sound_dma.enable = data;
 			break;
 		case 0x60:
 			m_vdp->reg_w(space, offset, data);
 			break;
 		case 0x80:  /* Audio 1 freq (lo)
-                     Bit 0-7 - Audio channel 1 frequency bit 0-7
-                     */
+		             Bit 0-7 - Audio channel 1 frequency bit 0-7
+		             */
 		case 0x81:  /* Audio 1 freq (hi)
-                     Bit 0-7 - Audio channel 1 frequency bit 8-15
-                     */
+		             Bit 0-7 - Audio channel 1 frequency bit 8-15
+		             */
 		case 0x82:  /* Audio 2 freq (lo)
-                     Bit 0-7 - Audio channel 2 frequency bit 0-7
-                     */
+		             Bit 0-7 - Audio channel 2 frequency bit 0-7
+		             */
 		case 0x83:  /* Audio 2 freq (hi)
-                     Bit 0-7 - Audio channel 2 frequency bit 8-15
-                     */
+		             Bit 0-7 - Audio channel 2 frequency bit 8-15
+		             */
 		case 0x84:  /* Audio 3 freq (lo)
-                     Bit 0-7 - Audio channel 3 frequency bit 0-7
-                     */
+		             Bit 0-7 - Audio channel 3 frequency bit 0-7
+		             */
 		case 0x85:  /* Audio 3 freq (hi)
-                     Bit 0-7 - Audio channel 3 frequency bit 8-15
-                     */
+		             Bit 0-7 - Audio channel 3 frequency bit 8-15
+		             */
 		case 0x86:  /* Audio 4 freq (lo)
-                     Bit 0-7 - Audio channel 4 frequency bit 0-7
-                     */
+		             Bit 0-7 - Audio channel 4 frequency bit 0-7
+		             */
 		case 0x87:  /* Audio 4 freq (hi)
-                     Bit 0-7 - Audio channel 4 frequency bit 8-15
-                     */
+		             Bit 0-7 - Audio channel 4 frequency bit 8-15
+		             */
 		case 0x88:  /* Audio 1 volume
-                     Bit 0-3 - Right volume audio channel 1
-                     Bit 4-7 - Left volume audio channel 1
-                     */
+		             Bit 0-3 - Right volume audio channel 1
+		             Bit 4-7 - Left volume audio channel 1
+		             */
 		case 0x89:  /* Audio 2 volume
-                     Bit 0-3 - Right volume audio channel 2
-                     Bit 4-7 - Left volume audio channel 2
-                     */
+		             Bit 0-3 - Right volume audio channel 2
+		             Bit 4-7 - Left volume audio channel 2
+		             */
 		case 0x8a:  /* Audio 3 volume
-                     Bit 0-3 - Right volume audio channel 3
-                     Bit 4-7 - Left volume audio channel 3
-                     */
+		             Bit 0-3 - Right volume audio channel 3
+		             Bit 4-7 - Left volume audio channel 3
+		             */
 		case 0x8b:  /* Audio 4 volume
-                     Bit 0-3 - Right volume audio channel 4
-                     Bit 4-7 - Left volume audio channel 4
-                     */
+		             Bit 0-3 - Right volume audio channel 4
+		             Bit 4-7 - Left volume audio channel 4
+		             */
 		case 0x8c:  /* Sweep step
-                     Bit 0-7 - Sweep step
-                     */
+		             Bit 0-7 - Sweep step
+		             */
 		case 0x8d:  /* Sweep time
-                     Bit 0-7 - Sweep time
-                     */
+		             Bit 0-7 - Sweep time
+		             */
 		case 0x8e:  /* Noise control
-                     Bit 0-2 - Noise generator type
-                     Bit 3   - Reset
-                     Bit 4   - Enable
-                     Bit 5-7 - Unknown
-                     */
+		             Bit 0-2 - Noise generator type
+		             Bit 3   - Reset
+		             Bit 4   - Enable
+		             Bit 5-7 - Unknown
+		             */
 		case 0x8f:  /* Sample location
-                     Bit 0-7 - Sample address location 0 00xxxxxx xx000000
-                     */
+		             Bit 0-7 - Sample address location 0 00xxxxxx xx000000
+		             */
 		case 0x90:  /* Audio control
-                     Bit 0   - Audio 1 enable
-                     Bit 1   - Audio 2 enable
-                     Bit 2   - Audio 3 enable
-                     Bit 3   - Audio 4 enable
-                     Bit 4   - Unknown
-                     Bit 5   - Audio 2 voice mode enable
-                     Bit 6   - Audio 3 sweep mode enable
-                     Bit 7   - Audio 4 noise mode enable
-                     */
+		             Bit 0   - Audio 1 enable
+		             Bit 1   - Audio 2 enable
+		             Bit 2   - Audio 3 enable
+		             Bit 3   - Audio 4 enable
+		             Bit 4   - Unknown
+		             Bit 5   - Audio 2 voice mode enable
+		             Bit 6   - Audio 3 sweep mode enable
+		             Bit 7   - Audio 4 noise mode enable
+		             */
 		case 0x91:  /* Audio output
-                     Bit 0   - Mono select
-                     Bit 1-2 - Output volume
-                     Bit 3   - External stereo
-                     Bit 4-6 - Unknown
-                     Bit 7   - External speaker (Read-only, set by hardware)
-                     */
+		             Bit 0   - Mono select
+		             Bit 1-2 - Output volume
+		             Bit 3   - External stereo
+		             Bit 4-6 - Unknown
+		             Bit 7   - External speaker (Read-only, set by hardware)
+		             */
 		case 0x92:  /* Noise counter shift register (lo)
-                     Bit 0-7 - Noise counter shift register bit 0-7
-                     */
+		             Bit 0-7 - Noise counter shift register bit 0-7
+		             */
 		case 0x93:  /* Noise counter shift register (hi)
-                     Bit 0-6 - Noise counter shift register bit 8-14
-                     bit 7   - Unknown
-                     */
+		             Bit 0-6 - Noise counter shift register bit 8-14
+		             bit 7   - Unknown
+		             */
 		case 0x94:  /* Master volume
-                     Bit 0-3 - Master volume
-                     Bit 4-7 - Unknown
-                     */
+		             Bit 0-3 - Master volume
+		             Bit 4-7 - Unknown
+		             */
 			m_sound->port_w(space, offset, data);
 			break;
 		case 0xa0:  /* Hardware type - this is probably read only
-                     Bit 0   - Enable cartridge slot and/or disable bios
-                     Bit 1   - Hardware type: 0 = WS, 1 = WSC
-                     Bit 2-7 - Unknown
-                     */
+		             Bit 0   - Enable cartridge slot and/or disable bios
+		             Bit 1   - Hardware type: 0 = WS, 1 = WSC
+		             Bit 2-7 - Unknown
+		             */
 			if ((data & 0x01) && !m_bios_disabled)
 				m_bios_disabled = 1;
 			break;
 
 		case 0xb0:  /* Interrupt base vector
-                     Bit 0-7 - Interrupt base vector
-                     */
+		             Bit 0-7 - Interrupt base vector
+		             */
 			break;
 		case 0xb1:  /* Communication byte
-                     Bit 0-7 - Communication byte
-                     */
+		             Bit 0-7 - Communication byte
+		             */
 			break;
 		case 0xb2:  /* Interrupt enable
-                     Bit 0   - Serial transmit interrupt enable
-                     Bit 1   - Key press interrupt enable
-                     Bit 2   - RTC alarm interrupt enable
-                     Bit 3   - Serial receive interrupt enable
-                     Bit 4   - Drawing line detection interrupt enable
-                     Bit 5   - VBlank timer interrupt enable
-                     Bit 6   - VBlank interrupt enable
-                     Bit 7   - HBlank timer interrupt enable
-                     */
+		             Bit 0   - Serial transmit interrupt enable
+		             Bit 1   - Key press interrupt enable
+		             Bit 2   - RTC alarm interrupt enable
+		             Bit 3   - Serial receive interrupt enable
+		             Bit 4   - Drawing line detection interrupt enable
+		             Bit 5   - VBlank timer interrupt enable
+		             Bit 6   - VBlank interrupt enable
+		             Bit 7   - HBlank timer interrupt enable
+		             */
 			break;
 		case 0xb3:  /* serial communication control
-                     Bit 0   - Receive complete
-                     Bit 1   - Error
-                     Bit 2   - Send complete
-                     Bit 3-4 - Unknown
-                     Bit 5   - Send data interrupt generation
-                     Bit 6   - Connection speed: 0 = 9600 bps, 1 = 38400 bps
-                     bit 7   - Receive data interrupt generation
-                     */
+		             Bit 0   - Receive complete
+		             Bit 1   - Error
+		             Bit 2   - Send complete
+		             Bit 3-4 - Unknown
+		             Bit 5   - Send data interrupt generation
+		             Bit 6   - Connection speed: 0 = 9600 bps, 1 = 38400 bps
+		             bit 7   - Receive data interrupt generation
+		             */
 			//          data |= 0x02;
 			m_ws_portram[0xb1] = 0xff;
 			if (data & 0x80)
@@ -539,13 +539,13 @@ WRITE8_MEMBER( wswan_state::port_w )
 			}
 			break;
 		case 0xb5:  /* Read controls
-                     Bit 0-3 - Current state of input lines (read-only)
-                     Bit 4-6 - Select line of inputs to read
-                     001 - Read Y cursors
-                     010 - Read X cursors
-                     100 - Read START,A,B buttons
-                     Bit 7   - Unknown
-                     */
+		             Bit 0-3 - Current state of input lines (read-only)
+		             Bit 4-6 - Select line of inputs to read
+		             001 - Read Y cursors
+		             010 - Read X cursors
+		             100 - Read START,A,B buttons
+		             Bit 7   - Unknown
+		             */
 			data = data & 0xf0;
 			switch (data)
 		{
@@ -579,43 +579,43 @@ WRITE8_MEMBER( wswan_state::port_w )
 		}
 			break;
 		case 0xb6:  /* Interrupt acknowledge
-                     Bit 0   - Serial transmit interrupt acknowledge
-                     Bit 1   - Key press interrupt acknowledge
-                     Bit 2   - RTC alarm interrupt acknowledge
-                     Bit 3   - Serial receive interrupt acknowledge
-                     Bit 4   - Drawing line detection interrupt acknowledge
-                     Bit 5   - VBlank timer interrupt acknowledge
-                     Bit 6   - VBlank interrupt acknowledge
-                     Bit 7   - HBlank timer interrupt acknowledge
-                     */
+		             Bit 0   - Serial transmit interrupt acknowledge
+		             Bit 1   - Key press interrupt acknowledge
+		             Bit 2   - RTC alarm interrupt acknowledge
+		             Bit 3   - Serial receive interrupt acknowledge
+		             Bit 4   - Drawing line detection interrupt acknowledge
+		             Bit 5   - VBlank timer interrupt acknowledge
+		             Bit 6   - VBlank interrupt acknowledge
+		             Bit 7   - HBlank timer interrupt acknowledge
+		             */
 			clear_irq_line(data);
 			data = m_ws_portram[0xb6];
 			break;
 		case 0xba:  /* Internal EEPROM data (low)
-                     Bit 0-7 - Internal EEPROM data transfer bit 0-7
-                     */
+		             Bit 0-7 - Internal EEPROM data transfer bit 0-7
+		             */
 		case 0xbb:  /* Internal EEPROM data (high)
-                     Bit 0-7 - Internal EEPROM data transfer bit 8-15
-                     */
+		             Bit 0-7 - Internal EEPROM data transfer bit 8-15
+		             */
 			break;
 		case 0xbc:  /* Internal EEPROM address (low)
-                     Bit 0-7 - Internal EEPROM address bit 1-8
-                     */
+		             Bit 0-7 - Internal EEPROM address bit 1-8
+		             */
 		case 0xbd:  /* Internal EEPROM address (high)
-                     Bit 0   - Internal EEPROM address bit 9(?)
-                     Bit 1-7 - Unknown
-                     Only 1KByte internal EEPROM??
-                     */
+		             Bit 0   - Internal EEPROM address bit 9(?)
+		             Bit 1-7 - Unknown
+		             Only 1KByte internal EEPROM??
+		             */
 			break;
 		case 0xbe:  /* Internal EEPROM command
-                     Bit 0   - Read complete (read only)
-                     Bit 1   - Write complete (read only)
-                     Bit 2-3 - Unknown
-                     Bit 4   - Read
-                     Bit 5   - Write
-                     Bit 6   - Protect
-                     Bit 7   - Initialize
-                     */
+		             Bit 0   - Read complete (read only)
+		             Bit 1   - Write complete (read only)
+		             Bit 2-3 - Unknown
+		             Bit 4   - Read
+		             Bit 5   - Write
+		             Bit 6   - Protect
+		             Bit 7   - Initialize
+		             */
 			if (data & 0x20)
 			{
 				UINT16 addr = ( ( ( m_ws_portram[0xbd] << 8 ) | m_ws_portram[0xbc] ) << 1 ) & 0x1FF;

@@ -40,7 +40,7 @@ TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_A)
 
 	if ((attr == 0x0d) && (!ctrl_0) && (!ctrl_2))
 		bank = 0;   /*  this allows the game to print text
-                    in all banks selected by the k007121 */
+		            in all banks selected by the k007121 */
 
 	SET_TILE_INFO_MEMBER(0,
 			code + 256*bank,

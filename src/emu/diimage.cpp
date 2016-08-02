@@ -656,7 +656,7 @@ bool device_image_interface::is_loaded()
 
 //-------------------------------------------------
 //  image_error_from_file_error - converts an image
-//	error to a file error
+//  error to a file error
 //-------------------------------------------------
 
 image_error_t device_image_interface::image_error_from_file_error(osd_file::error filerr)

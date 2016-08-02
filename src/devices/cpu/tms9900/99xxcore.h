@@ -466,7 +466,7 @@ struct tms99xx_state
 	int icount;
 
 	UINT8 IDLE;       /* nonzero if processor is IDLE - i.e waiting for interrupt while writing
-                        special data on CRU bus */
+	                    special data on CRU bus */
 
 #if HAS_MAPPING
 	UINT8 mapping_on;           /* set by a CRU write */
