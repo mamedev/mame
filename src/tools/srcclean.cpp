@@ -1222,7 +1222,7 @@ void cpp_cleaner::process_numeric(unicode_char ch)
 			if (is_octal_digit(ch))
 				m_radix = 8U;
 			else if (is_decimal_digit(ch))
-				throw std::runtime_error(util::string_format("invalid octal literal on line %1$u", m_input_line));
+				m_parse_state = parse_state::DEFAULT; // this should be an invalid octal literal, but it's probably just an argument to the SHA1 macro
 			else
 				m_parse_state = parse_state::DEFAULT;
 		}
@@ -1245,13 +1245,13 @@ void cpp_cleaner::process_numeric(unicode_char ch)
 				if (!is_decimal_digit(ch))
 					m_parse_state = parse_state::DEFAULT;
 				else if (!is_binary_digit(ch))
-					throw std::runtime_error(util::string_format("invalid binary literal on line %1$u", m_input_line));
+					m_parse_state = parse_state::DEFAULT; // this should be an invalid binary literal, but it's probably just an argument to the SHA1 macro
 				break;
 			case 8U:
 				if (!is_decimal_digit(ch))
 					m_parse_state = parse_state::DEFAULT;
 				else if (!is_octal_digit(ch))
-					throw std::runtime_error(util::string_format("invalid octal literal on line %1$u", m_input_line));
+					m_parse_state = parse_state::DEFAULT; // this should be an invalid octal literal, but it's probably just an argument to the SHA1 macro
 				break;
 			case 10U:
 				if (!is_decimal_digit(ch))
