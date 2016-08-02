@@ -113,6 +113,9 @@ private:
 	static constexpr unicode_char SUPPLEMENTARY_FIRST   = 0x0001'0000U;
 	static constexpr unicode_char SUPPLEMENTARY_LAST    = 0x0010'ffffU;
 
+	static constexpr unicode_char CODE_LENGTH_THRESHOLDS[6]{
+			0x0000'0000U, 0x0000'0080U, 0x0000'0800U, 0x0001'0000U, 0x0020'0000U, 0x0400'0000 };
+
 	typedef std::function<void (char)> output_function;
 
 	virtual void process_characters(unicode_char const *begin, unicode_char const *end) = 0;
@@ -164,6 +167,7 @@ private:
 	bool            m_stream_start      = true;
 	std::size_t     m_position          = 0U;
 	unicode_char    m_surrogate         = 0U;
+	unsigned        m_code_length       = 0U;
 	unsigned        m_required_bytes    = 0U;
 	unicode_char    m_newline_lead      = 0U;
 
@@ -187,6 +191,8 @@ private:
 	std::uint64_t   m_spaces_combined       = 0U;
 	bool            m_final_newline         = false;
 };
+
+constexpr unicode_char cleaner_base::CODE_LENGTH_THRESHOLDS[6];
 
 
 /*--------------------------------------------------
@@ -571,6 +577,11 @@ void cleaner_base::output_utf8(unicode_char ch)
 void cleaner_base::commit_character(unicode_char ch)
 {
 	assert(ARRAY_LENGTH(m_buffer) > m_position);
+	assert(1U <= m_code_length);
+	assert(6U >= m_code_length);
+
+	if (CODE_LENGTH_THRESHOLDS[m_code_length - 1] > ch)
+		++m_overlong;
 
 	if (m_stream_start)
 	{
@@ -687,11 +698,10 @@ void cleaner_base::handle_lead_byte(std::uint8_t byte)
 			((byte & 0xf8U) == 0xf0U) ? 3U :
 			((byte & 0xf0U) == 0xe0U) ? 2U :
 			((byte & 0xe0U) == 0xc0U) ? 1U : 0U;
+	m_code_length = m_required_bytes + 1U;
 	if (m_required_bytes)
 	{
 		m_buffer[m_position] = ((unicode_char(1U) << (6U - m_required_bytes)) - 1) & unicode_char(byte);
-		if (!m_buffer[m_position])
-			++m_overlong;
 	}
 	else if ((byte & 0xc0U) == 0x80U)
 	{
