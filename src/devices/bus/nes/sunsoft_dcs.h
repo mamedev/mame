@@ -4,6 +4,7 @@
 #define __NES_SUNSOFT_DCS_H
 
 #include "sunsoft.h"
+#include "softlist_dev.h"
 
 
 //-----------------------------------------------

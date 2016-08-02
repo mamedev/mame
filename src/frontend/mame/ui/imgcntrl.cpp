@@ -20,7 +20,7 @@
 #include "audit.h"
 #include "drivenum.h"
 #include "emuopts.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "zippath.h"
 
 

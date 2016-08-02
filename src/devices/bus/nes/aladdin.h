@@ -4,6 +4,7 @@
 #define __NES_ALADDIN_H
 
 #include "nxrom.h"
+#include "softlist_dev.h"
 
 
 //----------------------------------

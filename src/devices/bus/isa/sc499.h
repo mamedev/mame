@@ -15,6 +15,8 @@
 
 #include "emu.h"
 #include "bus/isa/isa.h"
+#include "softlist_dev.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS

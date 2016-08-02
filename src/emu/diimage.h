@@ -21,8 +21,6 @@
 #include <string>
 #include <vector>
 
-#include "softlist.h"
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -31,6 +29,7 @@
 extern struct io_procs image_ioprocs;
 
 class software_list;
+class software_list_loader;
 
 enum iodevice_t
 {
@@ -252,7 +251,7 @@ public:
 	bool user_loadable() const { return m_user_loadable; }
 
 protected:
-	virtual const software_list_loader &get_software_list_loader() const { return false_software_list_loader::instance(); }
+	virtual const software_list_loader &get_software_list_loader() const;
 
 	image_init_result load_internal(const std::string &path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load);
 	void determine_open_plan(int is_create, UINT32 *open_plan);
@@ -273,8 +272,8 @@ protected:
 	void image_checkhash();
 	void update_names(const device_type device_type = nullptr, const char *inst = nullptr, const char *brief = nullptr);
 
-	const software_part *find_software_item(const char *path, bool restrict_to_interface) const;
-	bool load_software_part(const char *path, const software_part *&swpart);
+	const software_part *find_software_item(const char *path, bool restrict_to_interface, software_list_device **device = nullptr) const;
+	bool load_software_part(const char *path, const software_part *&swpart, std::string *list_name = nullptr);
 	std::string software_get_default_slot(const char *default_card_slot) const;
 
 	void add_format(std::unique_ptr<image_device_format> &&format);

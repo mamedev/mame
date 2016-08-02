@@ -12,6 +12,8 @@
 #include "emu.h"
 #include "ti99defs.h"
 #include "machine/tmc0430.h"
+#include "softlist_dev.h"
+
 
 extern const device_type GROMPORT;
 

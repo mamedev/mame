@@ -37,8 +37,8 @@
 #define __VIC10_EXPANSION_SLOT__
 
 #include "emu.h"
+#include "softlist_dev.h"
 #include "formats/cbm_crt.h"
-
 
 
 //**************************************************************************

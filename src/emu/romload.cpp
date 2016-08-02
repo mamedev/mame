@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria,Paul Priest,Aaron Giles
 /*********************************************************************
 
-    romload.c
+    romload.cpp
 
     ROM loading functions.
 *********************************************************************/
@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "drivenum.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "ui/uimain.h"
 
 

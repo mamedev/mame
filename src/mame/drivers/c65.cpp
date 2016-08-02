@@ -21,7 +21,7 @@ Note:
 #include "emu.h"
 #include "cpu/m6502/m4510.h"
 #include "machine/mos6526.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 #define MAIN_CLOCK XTAL_3_5MHz
 
