@@ -128,21 +128,21 @@ int uchar_from_utf16(unicode_char *uchar, const utf16_char *utf16char, size_t co
 
 	// validate parameters
 	if (utf16char == nullptr || count == 0)
-		return 0;
-
-	// handle the two-byte case
+	{
+		rc = 0;
+	}
 	if (utf16char[0] >= 0xd800 && utf16char[0] <= 0xdbff)
 	{
+		// handle the two-byte case
 		if (count > 1 && utf16char[1] >= 0xdc00 && utf16char[1] <= 0xdfff)
 		{
 			*uchar = 0x10000 + ((utf16char[0] & 0x3ff) * 0x400) + (utf16char[1] & 0x3ff);
 			rc = 2;
 		}
 	}
-
-	// handle the one-byte case
 	else if (utf16char[0] < 0xdc00 || utf16char[0] > 0xdfff)
 	{
+		// handle the one-byte case
 		*uchar = utf16char[0];
 		rc = 1;
 	}
@@ -272,26 +272,28 @@ int utf16_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar)
 	if (!uchar_isvalid(uchar))
 		return -1;
 
-	// single word case
 	if (uchar < 0x10000)
 	{
+		// single word case
 		if (count < 1)
 			return -1;
 		utf16string[0] = (utf16_char) uchar;
 		rc = 1;
 	}
-
-	// double word case
 	else if (uchar < 0x100000)
 	{
+		// double word case
 		if (count < 2)
 			return -1;
+		uchar -= 0x10000;
 		utf16string[0] = ((uchar >> 10) & 0x03ff) | 0xd800;
 		utf16string[1] = ((uchar >>  0) & 0x03ff) | 0xdc00;
 		rc = 2;
 	}
 	else
+	{
 		return -1;
+	}
 	return rc;
 }
 
