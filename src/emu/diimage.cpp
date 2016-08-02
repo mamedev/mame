@@ -340,18 +340,18 @@ void device_image_interface::message(const char *format, ...)
 //  actually exists
 //-------------------------------------------------
 
-bool device_image_interface::try_change_working_directory(const char *subdir)
+bool device_image_interface::try_change_working_directory(const std::string &subdir)
 {
 	const osd::directory::entry *entry;
 	bool success = false;
 	bool done = false;
 
-	auto directory = osd::directory::open(m_working_directory.c_str());
+	auto directory = osd::directory::open(m_working_directory);
 	if (directory)
 	{
 		while (!done && (entry = directory->read()) != nullptr)
 		{
-			if (!core_stricmp(subdir, entry->name))
+			if (!core_stricmp(subdir.c_str(), entry->name))
 			{
 				done = true;
 				success = entry->type == osd::directory::entry::entry_type::DIR;
@@ -714,7 +714,7 @@ image_error_t device_image_interface::load_image_by_path(UINT32 open_flags, cons
 //  reopen_for_write
 //-------------------------------------------------
 
-int device_image_interface::reopen_for_write(const char *path)
+int device_image_interface::reopen_for_write(const std::string &path)
 {
 	m_file.reset();
 
@@ -1164,7 +1164,7 @@ image_init_result device_image_interface::finish_load()
 //  create - create a image
 //-------------------------------------------------
 
-image_init_result device_image_interface::create(const char *path, const image_device_format *create_format, util::option_resolution *create_args)
+image_init_result device_image_interface::create(const std::string &path, const image_device_format *create_format, util::option_resolution *create_args)
 {
 	int format_index = 0;
 	int cnt = 0;
