@@ -333,7 +333,7 @@ UINT32 vt100_state::screen_update_vt100(screen_device &screen, bitmap_ind16 &bit
 //Interrupts
 // in latch A3 - keyboard
 //          A4 - receiver
-//          A5 - vertical fequency
+//          A5 - vertical frequency
 //          all other set to 1
 IRQ_CALLBACK_MEMBER(vt100_state::vt100_irq_callback)
 {
