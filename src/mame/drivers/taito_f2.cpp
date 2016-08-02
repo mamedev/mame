@@ -4266,7 +4266,7 @@ ROM_START( qtorimon )   /* Quiz Torimonochou */
 	ROM_LOAD16_BYTE( "c41-04.bin",  0x00000, 0x20000, CRC(0fbf5223) SHA1(2aa8b3dd20ae922a3ff880db7b46e2bbb708698d) )
 	ROM_LOAD16_BYTE( "c41-05.bin",  0x00001, 0x20000, CRC(174bd5db) SHA1(f7a4b2ac91b3bcd886e2a1e1d0415a95f14c9de7) )
 	ROM_LOAD16_BYTE( "mask-51.bin", 0x40000, 0x20000, CRC(12e14aca) SHA1(8f7dc54f68984c82420abf96436743c0654a71ea) ) /* char defs, read by cpu */
-	ROM_LOAD16_BYTE( "mask-52.bin", 0x40001, 0X20000, CRC(b3ef66f3) SHA1(4766a1ed9b4adcc2f0d2857633ce95194eb80694) ) /* char defs, read by cpu */
+	ROM_LOAD16_BYTE( "mask-52.bin", 0x40001, 0x20000, CRC(b3ef66f3) SHA1(4766a1ed9b4adcc2f0d2857633ce95194eb80694) ) /* char defs, read by cpu */
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
 	/* empty! */
@@ -4362,7 +4362,7 @@ ROM_START( quizhq ) /* Quiz HQ */
 	ROM_LOAD16_BYTE( "c53-05.bin",  0x00000, 0x20000, CRC(c798fc20) SHA1(4467dde3620102f87cffb2f81f71d856c0df12f8) )
 	ROM_LOAD16_BYTE( "c53-01.bin",  0x00001, 0x20000, CRC(bf44c93e) SHA1(6fd871f50da4a668767b3096660689905663f697) )
 	ROM_LOAD16_BYTE( "c53-52.bin",  0x80000, 0x20000, CRC(12e14aca) SHA1(8f7dc54f68984c82420abf96436743c0654a71ea) ) /* char defs, read by cpu */
-	ROM_LOAD16_BYTE( "c53-51.bin",  0x80001, 0X20000, CRC(b3ef66f3) SHA1(4766a1ed9b4adcc2f0d2857633ce95194eb80694) ) /* char defs, read by cpu */
+	ROM_LOAD16_BYTE( "c53-51.bin",  0x80001, 0x20000, CRC(b3ef66f3) SHA1(4766a1ed9b4adcc2f0d2857633ce95194eb80694) ) /* char defs, read by cpu */
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
 	/* empty */

@@ -59,21 +59,21 @@ WRITE16_MEMBER(cbuster_state::twocrude_control_w)
 
 	case 4: /* Protection, maybe this is a PAL on the board?
 
-            80046 is level number
-            stop at stage and enter.
-            see also 8216..
+	        80046 is level number
+	        stop at stage and enter.
+	        see also 8216..
 
-                9a 00 = pf4 over pf3 (normal) (level 0)
-                9a f1 =  (level 1 - water), pf3 over ALL sprites + pf4
-                9a 80 = pf3 over pf4 (Level 2 - copter)
-                9a 40 = pf3 over ALL sprites + pf4 (snow) level 3
-                9a c0 = doesn't matter?
-                9a ff = pf 3 over pf4
+	            9a 00 = pf4 over pf3 (normal) (level 0)
+	            9a f1 =  (level 1 - water), pf3 over ALL sprites + pf4
+	            9a 80 = pf3 over pf4 (Level 2 - copter)
+	            9a 40 = pf3 over ALL sprites + pf4 (snow) level 3
+	            9a c0 = doesn't matter?
+	            9a ff = pf 3 over pf4
 
-            I can't find a priority register, I assume it's tied to the
-            protection?!
+	        I can't find a priority register, I assume it's tied to the
+	        protection?!
 
-        */
+	    */
 		if ((data & 0xffff) == 0x9a00) m_prot = 0;
 		if ((data & 0xffff) == 0xaa)   m_prot = 0x74;
 		if ((data & 0xffff) == 0x0200) m_prot = 0x63 << 8;

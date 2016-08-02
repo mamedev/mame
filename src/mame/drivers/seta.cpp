@@ -7918,7 +7918,7 @@ static MACHINE_CONFIG_START( calibr50, seta_state )
 	MCFG_CPU_ADD("sub", M65C02, XTAL_16MHz/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(calibr50_sub_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(seta_state, irq0_line_hold, 4*60)  /* IRQ: 4/frame
-                               NMI: when the 68k writes the sound latch */
+	                           NMI: when the 68k writes the sound latch */
 
 	MCFG_MACHINE_RESET_OVERRIDE(seta_state,calibr50)
 
@@ -9018,7 +9018,7 @@ static MACHINE_CONFIG_START( kiwame, seta_state )
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(kiwame_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq1_line_hold)/* lev 1-7 are the same. WARNING:
-                                   the interrupt table is written to. */
+	                               the interrupt table is written to. */
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
