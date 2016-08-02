@@ -112,9 +112,9 @@
 		</bezel>
 
 <!--
-		<bezel element="e_background">
-			<bounds   left="0" right="800" top="550" bottom="600" />
-		</bezel>
+        <bezel element="e_background">
+            <bounds   left="0" right="800" top="550" bottom="600" />
+        </bezel>
 -->
 		<screen index="0">
 			<bounds x="0" y="0" width="800" height="550" />

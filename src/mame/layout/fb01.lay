@@ -75,20 +75,20 @@
 	</element>
 
 <!--
-	System   Inst      Data Entry   Data Entry
-	Setup   Select    -1/No        +1/Yes
+    System   Inst      Data Entry   Data Entry
+    Setup   Select    -1/No        +1/Yes
 
-	Inst     Inst      Voice        Voice
-	Assign   Function  Function     Select
+    Inst     Inst      Voice        Voice
+    Assign   Function  Function     Select
 
 -->
 
 <!--
-	<element name="" defstate="0">
-		<text string="" state="0"
-		<text string="" state="1">
-		</text>
-	</element>
+    <element name="" defstate="0">
+        <text string="" state="0"
+        <text string="" state="1">
+        </text>
+    </element>
 -->
 
 	<view name="View">
