@@ -140,9 +140,7 @@ public:
 		m_rom_ptr(*this, "init"),
 		m_basic_ptr(*this, "fbasic"),
 		m_kanji(*this, "kanji1"),
-		m_key1(*this, "key1"),
-		m_key2(*this, "key2"),
-		m_key3(*this, "key3"),
+		m_kb_ports(*this, {"key1", "key2", "key3"}),
 		m_keymod(*this, "key_modifiers"),
 		m_joy1(*this, "joy1"),
 		m_joy2(*this, "joy2"),
@@ -379,9 +377,7 @@ protected:
 	int m_centronics_perror;
 
 	optional_memory_region m_kanji;
-	required_ioport m_key1;
-	required_ioport m_key2;
-	required_ioport m_key3;
+	required_ioport_array<3> m_kb_ports;
 	required_ioport m_keymod;
 	required_ioport m_joy1;
 	required_ioport m_joy2;

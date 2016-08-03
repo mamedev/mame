@@ -517,12 +517,12 @@ WRITE16_MEMBER(wgp_state::rotate_port_w)
 READ16_MEMBER(wgp_state::wgp_adinput_r)
 {
 	int steer = 0x40;
-	int fake = m_fake ? m_fake->read() : 0;
+	int fake = m_fake.read_safe(0);
 
 	if (!(fake & 0x10)) /* Analogue steer (the real control method) */
 	{
 		/* Reduce span to 0x80 */
-		steer = ((m_steer ? m_steer->read() : 0) * 0x80) / 0x100;
+		steer = (m_steer.read_safe(0) * 0x80) / 0x100;
 	}
 	else    /* Digital steer */
 	{
@@ -567,7 +567,7 @@ READ16_MEMBER(wgp_state::wgp_adinput_r)
 		}
 
 		case 0x05:
-			return m_unknown ? m_unknown->read() : 0;   /* unknown */
+			return m_unknown.read_safe(0);   /* unknown */
 	}
 
 logerror("CPU #0 PC %06x: warning - read unmapped a/d input offset %06x\n",space.device().safe_pc(),offset);

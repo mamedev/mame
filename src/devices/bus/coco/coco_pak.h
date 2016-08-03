@@ -36,6 +36,8 @@ protected:
 		// internal state
 		device_image_interface *m_cart;
 		cococart_slot_device *m_owner;
+
+		optional_ioport m_autostart;
 };
 
 

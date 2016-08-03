@@ -309,12 +309,14 @@ class cd32_state : public amiga_state
 public:
 	cd32_state(const machine_config &mconfig, device_type type, const char *tag) :
 	amiga_state(mconfig, type, tag),
-	m_p1_port(*this, "p1_cd32_buttons"),
-	m_p2_port(*this, "p2_cd32_buttons"),
+	m_player_ports(*this, {"p1_cd32_buttons", "p2_cd32_buttons"}),
 	m_cdda(*this, "cdda")
 	{ }
 
 	DECLARE_WRITE8_MEMBER( akiko_cia_0_port_a_write );
+
+	void handle_joystick_cia(UINT8 pra, UINT8 dra);
+	UINT16 handle_joystick_potgor(UINT16 potgor);
 
 	DECLARE_CUSTOM_INPUT_MEMBER( cd32_input );
 	DECLARE_CUSTOM_INPUT_MEMBER( cd32_sel_mirror_input );
@@ -322,8 +324,7 @@ public:
 	DECLARE_DRIVER_INIT( pal );
 	DECLARE_DRIVER_INIT( ntsc );
 
-	required_ioport m_p1_port;
-	required_ioport m_p2_port;
+	required_ioport_array<2> m_player_ports;
 
 	int m_oldstate[2];
 	int m_cd32_shifter[2];
@@ -849,40 +850,33 @@ void cd32_state::potgo_w(UINT16 data)
 	}
 }
 
-static void handle_cd32_joystick_cia(running_machine &machine, UINT8 pra, UINT8 dra)
+void cd32_state::handle_joystick_cia(UINT8 pra, UINT8 dra)
 {
-	cd32_state *state = machine.driver_data<cd32_state>();
-	int i;
-
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		UINT8 but = 0x40 << i;
 		UINT16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
 		UINT16 p5dat = 0x0100 << (i * 4); /* data P5 */
 
-		if (!(state->m_potgo_value & p5dir) || !(state->m_potgo_value & p5dat))
+		if (!(m_potgo_value & p5dir) || !(m_potgo_value & p5dat))
 		{
-			if ((dra & but) && (pra & but) != state->m_oldstate[i])
+			if ((dra & but) && (pra & but) != m_oldstate[i])
 			{
 				if (!(pra & but))
 				{
-					state->m_cd32_shifter[i]--;
-					if (state->m_cd32_shifter[i] < 0)
-						state->m_cd32_shifter[i] = 0;
+					m_cd32_shifter[i]--;
+					if (m_cd32_shifter[i] < 0)
+						m_cd32_shifter[i] = 0;
 				}
 			}
 		}
-		state->m_oldstate[i] = pra & but;
+		m_oldstate[i] = pra & but;
 	}
 }
 
-static UINT16 handle_joystick_potgor(running_machine &machine, UINT16 potgor)
+UINT16 cd32_state::handle_joystick_potgor(UINT16 potgor)
 {
-	cd32_state *state = machine.driver_data<cd32_state>();
-	ioport_port * player_portname[] = { state->m_p1_port, state->m_p2_port };
-	int i;
-
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		UINT16 p9dir = 0x0800 << (i * 4); /* output enable P9 */
 		UINT16 p9dat = 0x0400 << (i * 4); /* data P9 */
@@ -891,16 +885,16 @@ static UINT16 handle_joystick_potgor(running_machine &machine, UINT16 potgor)
 
 		/* p5 is floating in input-mode */
 		potgor &= ~p5dat;
-		potgor |= state->m_potgo_value & p5dat;
-		if (!(state->m_potgo_value & p9dir))
+		potgor |= m_potgo_value & p5dat;
+		if (!(m_potgo_value & p9dir))
 			potgor |= p9dat;
 		/* P5 output and 1 -> shift register is kept reset (Blue button) */
-		if ((state->m_potgo_value & p5dir) && (state->m_potgo_value & p5dat))
-			state->m_cd32_shifter[i] = 8;
+		if ((m_potgo_value & p5dir) && (m_potgo_value & p5dat))
+			m_cd32_shifter[i] = 8;
 		/* shift at 1 == return one, >1 = return button states */
-		if (state->m_cd32_shifter[i] == 0)
+		if (m_cd32_shifter[i] == 0)
 			potgor &= ~p9dat; /* shift at zero == return zero */
-		if (state->m_cd32_shifter[i] >= 2 && ((player_portname[i])->read() & (1 << (state->m_cd32_shifter[i] - 2))))
+		if (m_cd32_shifter[i] >= 2 && ((m_player_ports[i])->read() & (1 << (m_cd32_shifter[i] - 2))))
 			potgor &= ~p9dat;
 	}
 	return potgor;
@@ -908,13 +902,12 @@ static UINT16 handle_joystick_potgor(running_machine &machine, UINT16 potgor)
 
 CUSTOM_INPUT_MEMBER( cd32_state::cd32_input )
 {
-	return handle_joystick_potgor(machine(), m_potgo_value) >> 8;
+	return handle_joystick_potgor(m_potgo_value) >> 8;
 }
 
 CUSTOM_INPUT_MEMBER( cd32_state::cd32_sel_mirror_input )
 {
-	ioport_port* ports[2]= { m_p1_port, m_p2_port };
-	UINT8 bits = ports[(int)(FPTR)param]->read();
+	UINT8 bits = m_player_ports[(int)(FPTR)param]->read();
 	return (bits & 0x20)>>5;
 }
 
@@ -926,7 +919,7 @@ WRITE8_MEMBER( cd32_state::akiko_cia_0_port_a_write )
 	// bit 1, power led
 	output().set_led_value(0, BIT(data, 1) ? 0 : 1);
 
-	handle_cd32_joystick_cia(machine(), data, m_cia_0->read(space, 2));
+	handle_joystick_cia(data, m_cia_0->read(space, 2));
 }
 
 

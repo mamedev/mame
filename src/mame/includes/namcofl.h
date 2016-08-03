@@ -26,11 +26,25 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_mcu(*this,"mcu"),
 		m_c116(*this,"c116"),
+		m_in0(*this, "IN0"),
+		m_in1(*this, "IN1"),
+		m_in2(*this, "IN2"),
+		m_misc(*this, "MISC"),
+		m_accel(*this, "ACCEL"),
+		m_brake(*this, "BRAKE"),
+		m_wheel(*this, "WHEEL"),
 		m_shareram(*this, "shareram") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
 	required_device<namco_c116_device> m_c116;
+	required_ioport m_in0;
+	required_ioport m_in1;
+	required_ioport m_in2;
+	required_ioport m_misc;
+	optional_ioport m_accel;
+	optional_ioport m_brake;
+	optional_ioport m_wheel;
 	emu_timer *m_raster_interrupt_timer;
 	std::unique_ptr<UINT32[]> m_workram;
 	required_shared_ptr<UINT16> m_shareram;

@@ -28,11 +28,7 @@ public:
 		m_i8155(*this, "i8155"),
 		m_i8155_cp3(*this, "i8155_cp3"),
 		m_cassette(*this, "cassette"),
-		m_io_line0(*this, "LINE0"),
-		m_io_line1(*this, "LINE1"),
-		m_io_line2(*this, "LINE2"),
-		m_io_line3(*this, "LINE3"),
-		m_io_line4(*this, "LINE4"),
+		m_io_lines(*this, {"LINE0", "LINE1", "LINE2", "LINE3", "LINE4"}),
 		m_io_config(*this, "CONFIG")
 	{ }
 
@@ -40,11 +36,7 @@ public:
 	required_device<i8155_device> m_i8155;
 	required_device<i8155_device> m_i8155_cp3;
 	required_device<cassette_image_device> m_cassette;
-	required_ioport m_io_line0;
-	required_ioport m_io_line1;
-	required_ioport m_io_line2;
-	required_ioport m_io_line3;
-	required_ioport m_io_line4;
+	required_ioport_array<5> m_io_lines;
 	required_ioport m_io_config;
 
 	virtual void machine_reset() override;
@@ -99,12 +91,11 @@ READ8_MEMBER(cp1_state::port2_r)
 	// ---x ----   I8155 CE
 	// ---- xxxx   keyboard input
 
-	ioport_port* portnames[] = { m_io_line0, m_io_line1, m_io_line2, m_io_line3, m_io_line4 };
 	UINT8 data = 0;
 
 	for(int i=0; i<5; i++)
 		if (!(m_matrix & (1<<i)))
-			data |= portnames[i]->read();
+			data |= m_io_lines[i]->read();
 
 	return (data & 0x0f) | (m_port2 & 0xf0);
 }

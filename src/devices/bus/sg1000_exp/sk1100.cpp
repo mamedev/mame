@@ -104,6 +104,9 @@ static INPUT_PORTS_START( sk1100_keys )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	PORT_START("PA7")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED ) // keyboard disabled
+
 	PORT_START("PB0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
 	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -134,6 +137,9 @@ static INPUT_PORTS_START( sk1100_keys )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("GRAPH") PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_MAMEKEY(LALT))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+
+	PORT_START("PB7")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED ) // keyboard disabled
 INPUT_PORTS_END
 
 
@@ -185,20 +191,8 @@ sega_sk1100_device::sega_sk1100_device(const machine_config &mconfig, const char
 	device_sg1000_expansion_slot_interface(mconfig, *this),
 	m_cassette(*this, "cassette"),
 	m_ppi(*this, UPD9255_0_TAG),
-	m_pa0(*this, "PA0"),
-	m_pa1(*this, "PA1"),
-	m_pa2(*this, "PA2"),
-	m_pa3(*this, "PA3"),
-	m_pa4(*this, "PA4"),
-	m_pa5(*this, "PA5"),
-	m_pa6(*this, "PA6"),
-	m_pb0(*this, "PB0"),
-	m_pb1(*this, "PB1"),
-	m_pb2(*this, "PB2"),
-	m_pb3(*this, "PB3"),
-	m_pb4(*this, "PB4"),
-	m_pb5(*this, "PB5"),
-	m_pb6(*this, "PB6"),
+	m_pa(*this, {"PA0", "PA1", "PA2", "PA3", "PA4", "PA5", "PA6", "PA7"}),
+	m_pb(*this, {"PB0", "PB1", "PB2", "PB3", "PB4", "PB5", "PB6", "PB7"}),
 	m_keylatch(0)
 {
 }
@@ -210,24 +204,6 @@ sega_sk1100_device::sega_sk1100_device(const machine_config &mconfig, const char
 
 void sega_sk1100_device::device_start()
 {
-	// find keyboard rows
-	m_key_row[0] = m_pa0;
-	m_key_row[1] = m_pa1;
-	m_key_row[2] = m_pa2;
-	m_key_row[3] = m_pa3;
-	m_key_row[4] = m_pa4;
-	m_key_row[5] = m_pa5;
-	m_key_row[6] = m_pa6;
-	m_key_row[7] = nullptr; // keyboard disabled
-	m_key_row[8] = m_pb0;
-	m_key_row[9] = m_pb1;
-	m_key_row[10] = m_pb2;
-	m_key_row[11] = m_pb3;
-	m_key_row[12] = m_pb4;
-	m_key_row[13] = m_pb5;
-	m_key_row[14] = m_pb6;
-	m_key_row[15] = nullptr; // keyboard disabled
-
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
 }
@@ -278,7 +254,7 @@ READ8_MEMBER( sega_sk1100_device::ppi_pa_r )
 	    PA7     Keyboard input
 	*/
 
-	return m_key_row[m_keylatch]->read();
+	return m_pa[m_keylatch]->read();
 }
 
 READ8_MEMBER( sega_sk1100_device::ppi_pb_r )
@@ -297,7 +273,7 @@ READ8_MEMBER( sega_sk1100_device::ppi_pb_r )
 	*/
 
 	/* keyboard */
-	UINT8 data = m_key_row[m_keylatch + 8]->read();
+	UINT8 data = m_pb[m_keylatch]->read();
 
 	/* cartridge contact */
 	data |= 0x10;

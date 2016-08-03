@@ -55,21 +55,7 @@ public:
 		m_region_chargen(*this, "chargen"),
 		m_region_ipl(*this, "ipl"),
 		m_region_wram(*this, "wram"),
-		m_io_key0(*this, "KEY0"),
-		m_io_key1(*this, "KEY1"),
-		m_io_key2(*this, "KEY2"),
-		m_io_key3(*this, "KEY3"),
-		m_io_key4(*this, "KEY4"),
-		m_io_key5(*this, "KEY5"),
-		m_io_key6(*this, "KEY6"),
-		m_io_key7(*this, "KEY7"),
-		m_io_key8(*this, "KEY8"),
-		m_io_key9(*this, "KEY9"),
-		m_io_keya(*this, "KEYA"),
-		m_io_keyb(*this, "KEYB"),
-		m_io_keyc(*this, "KEYC"),
-		m_io_keyd(*this, "KEYD"),
-		m_io_unused(*this, "UNUSED"),
+		m_io_keys(*this, {"KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8", "KEY9", "KEYA", "KEYB", "KEYC", "KEYD", "UNUSED", "UNUSED"}),
 		m_io_config(*this, "CONFIG"),
 		m_palette(*this, "palette")  { }
 
@@ -141,21 +127,7 @@ protected:
 	required_memory_region m_region_chargen;
 	required_memory_region m_region_ipl;
 	required_memory_region m_region_wram;
-	required_ioport m_io_key0;
-	required_ioport m_io_key1;
-	required_ioport m_io_key2;
-	required_ioport m_io_key3;
-	required_ioport m_io_key4;
-	required_ioport m_io_key5;
-	required_ioport m_io_key6;
-	required_ioport m_io_key7;
-	required_ioport m_io_key8;
-	required_ioport m_io_key9;
-	required_ioport m_io_keya;
-	required_ioport m_io_keyb;
-	required_ioport m_io_keyc;
-	required_ioport m_io_keyd;
-	required_ioport m_io_unused;
+	required_ioport_array<16> m_io_keys;
 	required_ioport m_io_config;
 	required_device<palette_device> m_palette;
 };
@@ -760,23 +732,18 @@ WRITE8_MEMBER(mz2000_state::mz2000_pio1_porta_w)
 
 READ8_MEMBER(mz2000_state::mz2000_pio1_portb_r)
 {
-	ioport_port* keynames[] = { m_io_key0, m_io_key1, m_io_key2, m_io_key3,
-								m_io_key4, m_io_key5, m_io_key6, m_io_key7,
-								m_io_key8, m_io_key9, m_io_keya, m_io_keyb,
-								m_io_keyc, m_io_keyd, m_io_unused, m_io_unused };
-
 	if(((m_key_mux & 0x10) == 0x00) || ((m_key_mux & 0x0f) == 0x0f)) //status read
 	{
 		int res,i;
 
 		res = 0xff;
 		for(i=0;i<0xe;i++)
-			res &= keynames[i]->read();
+			res &= m_io_keys[i]->read();
 
 		return res;
 	}
 
-	return keynames[m_key_mux & 0xf]->read();
+	return m_io_keys[m_key_mux & 0xf]->read();
 }
 
 READ8_MEMBER(mz2000_state::mz2000_pio1_porta_r)

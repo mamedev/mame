@@ -262,7 +262,7 @@ TIMER_CALLBACK_MEMBER( amiga_state::scanline_callback )
 		m_cia_0->tod_w(0);
 	}
 
-	if (m_potgo_port)
+	if (m_potgo_port.found())
 	{
 		// pot counters (start counting at 7 (ntsc) or 8 (pal))
 		if (BIT(CUSTOM_REG(REG_POTGO), 0) && (scanline /2 ) > 7)
@@ -380,33 +380,23 @@ TIMER_CALLBACK_MEMBER( amiga_state::amiga_irq_proc )
 
 UINT16 amiga_state::joy0dat_r()
 {
-	if (m_input_device == nullptr)
-		return m_joy0dat_port ? m_joy0dat_port->read() : 0xffff;
-
-	if (m_input_device->read() & 0x10)
-		return m_joy0dat_port ? m_joy0dat_port->read() : 0xffff;
+	if (!m_input_device.found() || (m_input_device->read() & 0x10))
+		return m_joy0dat_port.read_safe(0xffff);
 	else
-		return ((m_p1_mouse_y ? m_p1_mouse_y->read() : 0xff) << 8) | (m_p1_mouse_x? m_p1_mouse_x->read() : 0xff);
+		return (m_p1_mouse_y.read_safe(0xff) << 8) | m_p1_mouse_x.read_safe(0xff);
 }
 
 UINT16 amiga_state::joy1dat_r()
 {
-	if (m_input_device == nullptr)
-		return m_joy1dat_port ? m_joy1dat_port->read() : 0xffff;
-
-	if (m_input_device->read() & 0x20)
-		return m_joy1dat_port ? m_joy1dat_port->read() : 0xffff;
+	if (!m_input_device.found() || m_input_device->read() & 0x20)
+		return m_joy1dat_port.read_safe(0xffff);
 	else
-		return ((m_p2_mouse_y ? m_p2_mouse_y->read() : 0xff) << 8) | (m_p2_mouse_x ? m_p2_mouse_x->read() : 0xff);
+		return (m_p2_mouse_y.read_safe(0xff) << 8) | m_p2_mouse_x.read_safe(0xff);
 }
 
 CUSTOM_INPUT_MEMBER( amiga_state::amiga_joystick_convert )
 {
-	ioport_port *ports[2] = { m_p1joy_port, m_p2joy_port };
-	UINT8 bits = 0xff;
-
-	if (ports[(int)(FPTR)param])
-		bits = ports[(int)(FPTR)param]->read();
+	UINT8 bits = m_joy_ports[(int)(FPTR)param].read_safe(0xff);
 
 	int up = (bits >> 0) & 1;
 	int down = (bits >> 1) & 1;
@@ -1186,21 +1176,18 @@ READ16_MEMBER( amiga_state::custom_chip_r )
 			return CUSTOM_REG(REG_SERDATR);
 
 		case REG_JOY0DAT:
-			if (m_joy0dat_port)
+			if (m_joy0dat_port.found())
 				return joy0dat_r();
 
 		case REG_JOY1DAT:
-			if (m_joy1dat_port)
+			if (m_joy1dat_port.found())
 				return joy1dat_r();
 
 		case REG_POTGOR:
-			if (m_potgo_port)
-				return m_potgo_port->read();
-			else
-				return 0x5500;
+			return m_potgo_port.read_safe(0x5500);
 
 		case REG_POT0DAT:
-			if (m_pot0dat_port)
+			if (m_pot0dat_port.found())
 			{
 				return m_pot0dat_port->read();
 			}
@@ -1215,7 +1202,7 @@ READ16_MEMBER( amiga_state::custom_chip_r )
 			}
 
 		case REG_POT1DAT:
-			if (m_pot1dat_port)
+			if (m_pot1dat_port.found())
 			{
 				return m_pot1dat_port->read();
 			}

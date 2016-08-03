@@ -1484,7 +1484,7 @@ WRITE32_MEMBER( vegas_state::analog_port_w )
 {
 	if (data < 8 || data > 15)
 		logerror("%08X:Unexpected analog port select = %08X\n", safe_pc(), data);
-	m_pending_analog_read = m_io_analog[data & 7] ? m_io_analog[data & 7]->read() : 0;
+	m_pending_analog_read = m_io_analog[data & 7].read_safe(0);
 }
 
 

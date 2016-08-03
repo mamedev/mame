@@ -265,7 +265,7 @@ READ8_MEMBER(astrocde_state::spacezap_io_r)
 {
 	machine().bookkeeping().coin_counter_w(0, (offset >> 8) & 1);
 	machine().bookkeeping().coin_counter_w(1, (offset >> 9) & 1);
-	return m_p3handle ? m_p3handle->read() : 0xff;
+	return m_p3handle.read_safe(0xff);
 }
 
 

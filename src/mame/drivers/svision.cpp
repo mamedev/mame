@@ -29,7 +29,7 @@ TIMER_CALLBACK_MEMBER(svision_state::svision_pet_timer)
 	switch (m_pet.state)
 	{
 		case 0:
-			if ( m_joy2 )
+			if (m_joy2.found())
 			{
 				m_pet.input = m_joy2->read();
 			}

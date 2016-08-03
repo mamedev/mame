@@ -490,51 +490,51 @@ READ8_MEMBER(astrocde_state::astrocade_data_chip_register_r)
 			break;
 
 		case 0x10:  /* player 1 handle */
-			result = m_p1handle? m_p1handle->read() : 0xff;
+			result = m_p1handle.read_safe(0xff);
 			break;
 
 		case 0x11:  /* player 2 handle */
-			result = m_p2handle? m_p2handle->read() : 0xff;
+			result = m_p2handle.read_safe(0xff);
 			break;
 
 		case 0x12:  /* player 3 handle */
-			result = m_p3handle? m_p3handle->read() : 0xff;
+			result = m_p3handle.read_safe(0xff);
 			break;
 
 		case 0x13:  /* player 4 handle */
-			result = m_p4handle? m_p4handle->read() : 0xff;
+			result = m_p4handle.read_safe(0xff);
 			break;
 
 		case 0x14:  /* keypad column 0 */
-			result = m_keypad0 ? m_keypad0->read() : 0xff;
+			result = m_keypad0.read_safe(0xff);
 			break;
 
 		case 0x15:  /* keypad column 1 */
-			result = m_keypad1 ? m_keypad1->read() : 0xff;
+			result = m_keypad1.read_safe(0xff);
 			break;
 
 		case 0x16:  /* keypad column 2 */
-			result = m_keypad2 ? m_keypad2->read() : 0xff;
+			result = m_keypad2.read_safe(0xff);
 			break;
 
 		case 0x17:  /* keypad column 3 */
-			result = m_keypad3 ? m_keypad3->read() : 0xff;
+			result = m_keypad3.read_safe(0xff);
 			break;
 
 		case 0x1c:  /* player 1 knob */
-			result = m_p1_knob ? m_p1_knob->read() : 0xff;
+			result = m_p1_knob.read_safe(0xff);
 			break;
 
 		case 0x1d:  /* player 2 knob */
-			result = m_p2_knob ? m_p2_knob->read() : 0xff;
+			result = m_p2_knob.read_safe(0xff);
 			break;
 
 		case 0x1e:  /* player 3 knob */
-			result = m_p3_knob ? m_p3_knob->read() : 0xff;
+			result = m_p3_knob.read_safe(0xff);
 			break;
 
 		case 0x1f:  /* player 4 knob */
-			result = m_p4_knob ? m_p4_knob->read() : 0xff;
+			result = m_p4_knob.read_safe(0xff);
 			break;
 	}
 

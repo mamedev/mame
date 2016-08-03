@@ -278,24 +278,6 @@ static const z80_daisy_config amu880_daisy_chain[] =
 
 void amu880_state::machine_start()
 {
-	// find keyboard rows
-	m_key_row[0] = m_y0;
-	m_key_row[1] = m_y1;
-	m_key_row[2] = m_y2;
-	m_key_row[3] = m_y3;
-	m_key_row[4] = m_y4;
-	m_key_row[5] = m_y5;
-	m_key_row[6] = m_y6;
-	m_key_row[7] = m_y7;
-	m_key_row[8] = m_y8;
-	m_key_row[9] = m_y9;
-	m_key_row[10] = m_y10;
-	m_key_row[11] = m_y11;
-	m_key_row[12] = m_y12;
-	m_key_row[13] = m_y13;
-	m_key_row[14] = m_y14;
-	m_key_row[15] = m_y15;
-
 	/* register for state saving */
 	save_item(NAME(m_key_d6));
 	save_item(NAME(m_key_d7));

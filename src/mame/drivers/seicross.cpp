@@ -79,7 +79,7 @@ void seicross_state::machine_reset()
 
 READ8_MEMBER(seicross_state::portB_r)
 {
-	return (m_portb & 0x9f) | (read_safe(ioport("DEBUG"), 0) & 0x60);
+	return (m_portb & 0x9f) | (m_debug_port.read_safe(0) & 0x60);
 }
 
 WRITE8_MEMBER(seicross_state::portB_w)

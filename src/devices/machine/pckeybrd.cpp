@@ -528,39 +528,39 @@ UINT32 pc_keyboard_device::readport(int port)
 	switch(port)
 	{
 		case 0:
-			if(m_ioport_0)
+			if (m_ioport_0.found())
 				result = m_ioport_0->read();
 			break;
 		case 1:
-			if(m_ioport_1)
+			if (m_ioport_1.found())
 				result = m_ioport_1->read();
 			break;
 		case 2:
-			if(m_ioport_2)
+			if (m_ioport_2.found())
 				result = m_ioport_2->read();
 			break;
 		case 3:
-			if(m_ioport_3)
+			if (m_ioport_3.found())
 				result = m_ioport_3->read();
 			break;
 		case 4:
-			if(m_ioport_4)
+			if (m_ioport_4.found())
 				result = m_ioport_4->read();
 			break;
 		case 5:
-			if(m_ioport_5)
+			if (m_ioport_5.found())
 				result = m_ioport_5->read();
 			break;
 		case 6:
-			if(m_ioport_6)
+			if (m_ioport_6.found())
 				result = m_ioport_6->read();
 			break;
 		case 7:
-			if(m_ioport_7)
+			if (m_ioport_7.found())
 				result = m_ioport_7->read();
 			break;
 	}
-	return result;
+	return 0;
 }
 
 void pc_keyboard_device::polling(void)

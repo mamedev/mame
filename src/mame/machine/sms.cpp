@@ -252,7 +252,7 @@ WRITE_LINE_MEMBER(sms_state::sms_pause_callback)
 
 WRITE_LINE_MEMBER(sms_state::sms_csync_callback)
 {
-	if ( m_port_rapid )
+	if (m_port_rapid.found())
 	{
 		UINT8 rapid_previous_mode = m_rapid_mode;
 
@@ -345,7 +345,7 @@ READ8_MEMBER(sms_state::sms_input_port_dc_r)
 		m_port_dc_reg &= ~0x20 | ((m_io_ctrl_reg & 0x10) << 1);
 	}
 
-	if ( m_port_rapid )
+	if (m_port_rapid.found())
 	{
 		// Check if Rapid Fire is enabled for Button 1
 		if (m_rapid_mode & 0x01)
@@ -391,7 +391,7 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 	}
 
 	// Reset Button
-	if ( m_port_reset )
+	if (m_port_reset.found())
 	{
 		m_port_dd_reg &= ~0x10 | (m_port_reset->read() & 0x01) << 4;
 	}
@@ -440,7 +440,7 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 		}
 	}
 
-	if ( m_port_rapid )
+	if (m_port_rapid.found())
 	{
 		// Check if Rapid Fire is enabled for Button 1
 		if (m_rapid_mode & 0x04)
@@ -1054,7 +1054,7 @@ MACHINE_START_MEMBER(sms_state,sms)
 		save_item(NAME(m_smsj_audio_control));
 	}
 
-	if (m_port_rapid)
+	if (m_port_rapid.found())
 	{
 		save_item(NAME(m_csync_counter));
 		save_item(NAME(m_rapid_mode));
@@ -1111,7 +1111,7 @@ MACHINE_RESET_MEMBER(sms_state,sms)
 		m_smsj_audio_control = 0x00;
 	}
 
-	if (m_port_rapid)
+	if (m_port_rapid.found())
 	{
 		m_csync_counter = 0;
 		m_rapid_mode = 0x00;

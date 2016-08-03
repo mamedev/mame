@@ -40,7 +40,7 @@ public:
 		m_i8251(*this, "i8251"),
 		m_i8255(*this, "ppi8255"),
 		m_centronics(*this, "centronics"),
-		m_io_line8(*this, "LINE8"),
+		m_io_ports(*this, {"LINE7", "LINE6", "LINE5", "LINE4", "LINE3", "LINE2", "LINE1", "LINE0", "LINE8"}),
 		m_io_line9(*this, "LINE9"),
 		m_io_network_id(*this, "NETWORK ID")
 	{
@@ -68,7 +68,7 @@ protected:
 	required_device<i8251_device> m_i8251;
 	required_device<i8255_device> m_i8255;
 	required_device<centronics_device> m_centronics;
-	required_ioport m_io_line8;
+	required_ioport_array<9> m_io_ports;
 	required_ioport m_io_line9;
 	required_ioport m_io_network_id;
 
@@ -234,7 +234,6 @@ READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 		int mask = 0x8000;
 		int data = 0xff;
 		int i;
-		ioport_port *io_ports[9] = { m_io_line7, m_io_line6, m_io_line5, m_io_line4, m_io_line3, m_io_line2, m_io_line1, m_io_line0, m_io_line8 };
 
 		if ( !m_NR )
 		{
@@ -242,7 +241,7 @@ READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 			{
 				if (!(offset & mask))
 				{
-					data &= io_ports[i]->read();
+					data &= m_io_ports[i]->read();
 				}
 			}
 

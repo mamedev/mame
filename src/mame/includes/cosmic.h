@@ -20,6 +20,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
+		m_in_ports(*this, {"IN0", "IN1", "IN2"}),
+		m_dsw(*this, "DSW"),
 		m_maincpu(*this, "maincpu"),
 		m_samples(*this, "samples"),
 		m_dac(*this, "dac"),
@@ -47,6 +49,8 @@ public:
 	/* misc */
 	UINT32         m_pixel_clock;
 	int            m_ic_state;   // for 9980
+	optional_ioport_array<4> m_in_ports;
+	optional_ioport m_dsw;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

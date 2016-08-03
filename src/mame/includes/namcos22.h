@@ -199,7 +199,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_adc_ports(*this, "ADC")
+		m_adc_ports(*this, "ADC"),
+		m_p1(*this, "P1"),
+		m_p2(*this, "P2"),
+		m_mcup5a(*this, "MCUP5A"),
+		m_mcup5b(*this, "MCUP5B")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -229,7 +233,10 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_ioport_array<8> m_adc_ports;
-
+	optional_ioport m_p1;
+	optional_ioport m_p2;
+	optional_ioport m_mcup5a;
+	optional_ioport m_mcup5b;
 
 	UINT8 m_syscontrol[0x20];
 	bool m_dsp_irq_enabled;
