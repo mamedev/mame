@@ -77,7 +77,7 @@ private:
 	software_list_device *          m_swlist; // currently selected list
 	const char *                    m_interface;
 	std::string &                   m_result;
-	std::vector<entry_info>         m_entrylist;
+	std::list<entry_info>           m_entrylist;
 	char                            m_filename_buffer[1024];
 	bool                            m_ordered_by_shortname;
 
