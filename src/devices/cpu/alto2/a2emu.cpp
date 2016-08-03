@@ -365,7 +365,7 @@ void alto2_cpu_device::f2_late_busodd()
 void alto2_cpu_device::f2_late_magic()
 {
 	int XC;
-	switch (m_d_f1) {
+	switch (f1()) {
 	case f1_l_lsh_1:    // <-L MLSH 1
 		XC = (m_t >> 15) & 1;
 		m_shifter = (m_l << 1) | XC;
@@ -441,7 +441,7 @@ void alto2_cpu_device::f2_late_load_dns()
 	UINT8 DSKIP;
 	UINT8 SHZERO;
 
-	switch (m_d_f1) {
+	switch (f1()) {
 	case f1_l_rsh_1:    // <-L RSH 1
 		NEWCARRY = m_l & 1;
 		m_shifter = ((m_l >> 1) | (XC << 15)) & 0177777;

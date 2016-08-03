@@ -135,13 +135,6 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_mpc(0),
 	m_mir(0),
 	m_rsel(0),
-	m_d_rsel(0),
-	m_d_aluf(0),
-	m_d_bs(0),
-	m_d_f1(0),
-	m_d_f2(0),
-	m_d_loadt(0),
-	m_d_loadl(0),
 	m_next(0),
 	m_next2(0),
 	m_bus(0),
@@ -1293,42 +1286,42 @@ void alto2_cpu_device::watch_write(UINT32 addr, UINT32 data)
 void alto2_cpu_device::fn_bs_bad_0()
 {
 	fatal(9,"fatal: bad early bus source pointer for task %s, mpc:%05o bs:%s\n",
-		task_name(m_task), m_mpc, bs_name(m_d_bs));
+		task_name(m_task), m_mpc, bs_name(bs()));
 }
 
 /** @brief fatal exit on unitialized latching phase BUS source */
 void alto2_cpu_device::fn_bs_bad_1()
 {
 	fatal(9,"fatal: bad late bus source pointer for task %s, mpc:%05o bs: %s\n",
-		task_name(m_task), m_mpc, bs_name(m_d_bs));
+		task_name(m_task), m_mpc, bs_name(bs()));
 }
 
 /** @brief fatal exit on unitialized dynamic phase F1 function */
 void alto2_cpu_device::fn_f1_bad_0()
 {
 	fatal(9,"fatal: bad early f1 function pointer for task %s, mpc:%05o f1: %s\n",
-		task_name(m_task), m_mpc, f1_name(m_d_f1));
+		task_name(m_task), m_mpc, f1_name(f1()));
 }
 
 /** @brief fatal exit on unitialized latching phase F1 function */
 void alto2_cpu_device::fn_f1_bad_1()
 {
 	fatal(9,"fatal: bad late f1 function pointer for task %s, mpc:%05o f1: %s\n",
-		task_name(m_task), m_mpc, f1_name(m_d_f1));
+		task_name(m_task), m_mpc, f1_name(f1()));
 }
 
 /** @brief fatal exit on unitialized dynamic phase F2 function */
 void alto2_cpu_device::fn_f2_bad_0()
 {
 	fatal(9,"fatal: bad early f2 function pointer for task %s, mpc:%05o f2: %s\n",
-		task_name(m_task), m_mpc, f2_name(m_d_f2));
+		task_name(m_task), m_mpc, f2_name(f2()));
 }
 
 /** @brief fatal exit on unitialized latching phase F2 function */
 void alto2_cpu_device::fn_f2_bad_1()
 {
 	fatal(9,"fatal: bad late f2 function pointer for task %s, mpc:%05o f2: %s\n",
-			task_name(m_task), m_mpc, f2_name(m_d_f2));
+			task_name(m_task), m_mpc, f2_name(f2()));
 }
 
 #if ALTO2_DEBUG
@@ -1463,7 +1456,7 @@ void alto2_cpu_device::bs_early_load_r()
  */
 void alto2_cpu_device::bs_late_load_r()
 {
-	if (m_d_f2 != f2_emu_load_dns) {
+	if (f2() != f2_emu_load_dns) {
 		m_r[m_rsel] = m_shifter;
 		LOG((this,LOG_CPU,2,"    R%02o<-; %s = SHIFTER (%#o)\n", m_rsel, r_name(m_rsel), m_shifter));
 	}
@@ -1513,7 +1506,7 @@ void alto2_cpu_device::f1_late_load_mar()
 {
 	UINT8 bank = m_bank_reg[m_task];
 	UINT32 msb;
-	if (m_d_f2 == f2_load_md) {
+	if (f2() == f2_load_md) {
 		msb = GET_BANK_EXTENDED(bank) << 16;
 		LOG((this,LOG_CPU,7, "   XMAR %#o\n", msb | m_alu));
 	} else {
@@ -1892,7 +1885,7 @@ void alto2_cpu_device::f2_late_load_md()
 #if ALTO2_DEBUG
 	UINT16 mar = m_mem.mar;
 #endif
-	if (m_d_f1 == f1_load_mar) {
+	if (f1() == f1_load_mar) {
 		/* part of an XMAR */
 		LOG((this,LOG_CPU,2, "   XMAR %#o (%#o)\n", mar, m_bus));
 	} else {
@@ -2291,24 +2284,17 @@ void alto2_cpu_device::execute_run()
 		m_mpc = m_next;             // next instruction's micro program counter
 		m_mir = RD_UCODE(m_mpc);    // fetch the micro code
 
-		// extract the bit fields
-		m_d_rsel = m_rsel = X_RDBITS(m_mir, 32, DRSEL0, DRSEL4);
-		m_d_aluf = X_RDBITS(m_mir, 32, DALUF0, DALUF3);
-		m_d_bs = X_RDBITS(m_mir, 32, DBS0, DBS2);
-		m_d_f1 = X_RDBITS(m_mir, 32, DF1_0, DF1_3);
-		m_d_f2 = X_RDBITS(m_mir, 32, DF2_0, DF2_3);
-		m_d_loadt = X_BIT(m_mir, 32, DLOADT);
-		m_d_loadl = X_BIT(m_mir, 32, DLOADL);
+		m_rsel = rsel();
 
 		debugger_instruction_hook(this, m_mpc);
 		m_cycle++;
 
 
-		if (m_d_f1 == f1_load_mar && check_mem_load_mar_stall(m_rsel)) {
+		if (f1() == f1_load_mar && check_mem_load_mar_stall(m_rsel)) {
 			LOG((this,LOG_CPU,3, "   MAR<- stall\n"));
 			continue;
 		}
-		if (m_d_f2 == f2_load_md && check_mem_write_stall()) {
+		if (f2() == f2_load_md && check_mem_write_stall()) {
 			LOG((this,LOG_CPU,3, "   MD<- stall\n"));
 			continue;
 		}
@@ -2317,17 +2303,17 @@ void alto2_cpu_device::execute_run()
 		 * or f2 == f2_const. These functions use the MIR BS field to
 		 * provide a part of the address to the constant ROM instead.
 		 */
-		do_bs = !(m_d_f1 == f1_const || m_d_f2 == f2_const);
-		if (do_bs && m_d_bs == bs_read_md && check_mem_read_stall()) {
+		do_bs = !(f1() == f1_const || f2() == f2_const);
+		if (do_bs && bs() == bs_read_md && check_mem_read_stall()) {
 			LOG((this,LOG_CPU,3, "   <-MD stall\n"));
 			continue;
 		}
 		// now read the next instruction field from the MIR and modify it
-		m_next = X_RDBITS(m_mir, 32, NEXT0, NEXT9) | m_next2;
+		m_next = next() | m_next2;
 		// prefetch the next instruction's next field as next2
 		m_next2 = X_RDBITS(RD_UCODE(m_next), 32, NEXT0, NEXT9) | (m_next2 & ~ALTO2_UCODE_PAGE_MASK);
 		LOG((this,LOG_CPU,2,"%s-%04o: %011o r:%02o aluf:%02o bs:%02o f1:%02o f2:%02o t:%o l:%o next:%05o next2:%05o\n",
-			task_name(m_task), m_mpc, m_mir, m_rsel, m_d_aluf, m_d_bs, m_d_f1, m_d_f2, m_d_loadt, m_d_loadl, m_next, m_next2));
+			task_name(m_task), m_mpc, m_mir, m_rsel, aluf(), bs(), f1(), f2(), loadt(), loadl(), m_next, m_next2));
 
 		// BUS is all ones at the start of each cycle
 		m_bus = 0177777;
@@ -2336,8 +2322,8 @@ void alto2_cpu_device::execute_run()
 			rdram();
 
 		// The constant memory is gated to the bus by F1 == f1_const, F2 == f2_const, or BS >= 4
-		if (!do_bs || m_d_bs >= bs_task_4) {
-			UINT32 addr = 8 * m_rsel + m_d_bs;
+		if (!do_bs || bs() >= bs_task_4) {
+			UINT32 addr = 8 * m_rsel + bs();
 			// FIXME: is the format of m_const_data endian safe?
 			UINT16 data = m_const_data[2*addr] | (m_const_data[2*addr+1] << 8);
 			m_bus &= data;
@@ -2349,14 +2335,14 @@ void alto2_cpu_device::execute_run()
 		 * because the emulator task F2 acsource or acdest may
 		 * change the m_rsel
 		 */
-		((*this).*m_f2[0][m_task][m_d_f2])();
+		((*this).*m_f2[0][m_task][f2()])();
 
 		// early BS function can be done now
 		if (do_bs)
-			((*this).*m_bs[0][m_task][m_d_bs])();
+			((*this).*m_bs[0][m_task][bs()])();
 
 		// early F1 function
-		((*this).*m_f1[0][m_task][m_d_f1])();
+		((*this).*m_f1[0][m_task][f1()])();
 
 		/**
 		 * The ALU a10 PROM address lines are
@@ -2367,7 +2353,7 @@ void alto2_cpu_device::execute_run()
 		 *
 		 * B1 and B3-B7 are inverted on loading the PROM
 		 */
-		UINT8 a10 = m_alu_a10[(m_emu.skip << 4) | m_d_aluf];
+		UINT8 a10 = m_alu_a10[(m_emu.skip << 4) | aluf()];
 		UINT32 alu = alu_74181(m_bus, m_t, a10);
 		m_aluc0 = (alu >> 16) & 1;
 		flags = a10 & (TSELECT | ALUM);
@@ -2381,17 +2367,17 @@ void alto2_cpu_device::execute_run()
 		m_shifter = m_l;
 
 		// late F1 function call now
-		((*this).*m_f1[1][m_task][m_d_f1])();
+		((*this).*m_f1[1][m_task][f1()])();
 
 		// late F2 function call now
-		((*this).*m_f2[1][m_task][m_d_f2])();
+		((*this).*m_f2[1][m_task][f2()])();
 
 		// late BS function call now, if no constant was put on the bus
 		if (do_bs)
-			((*this).*m_bs[1][m_task][m_d_bs])();
+			((*this).*m_bs[1][m_task][bs()])();
 
 		// update T register, if LOADT is set
-		if (m_d_loadt) {
+		if (loadt()) {
 			m_cram_addr = m_alu;    // latch CRAM address
 			if (flags & TSELECT) {
 				m_t = m_alu;        // T source is ALU
@@ -2403,7 +2389,7 @@ void alto2_cpu_device::execute_run()
 		}
 
 		// update L register and LALUC0 if LOADL is set
-		if (m_d_loadl) {
+		if (loadl()) {
 			m_l = m_alu;            // load L from ALU
 			if (flags & ALUM) {
 				m_laluc0 = 0;       // logic operation - put 0 into latched carry
