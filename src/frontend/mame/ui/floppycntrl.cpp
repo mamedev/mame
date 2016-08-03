@@ -61,16 +61,8 @@ void menu_control_floppy_image::do_load_create()
 	}
 }
 
-void menu_control_floppy_image::hook_load(const std::string &filename, bool softlist)
+void menu_control_floppy_image::hook_load(const std::string &filename)
 {
-	if (softlist)
-	{
-		machine().popmessage("When loaded from software list, the disk is Read-only.\n");
-		m_image.load_software(filename);
-		stack_pop();
-		return;
-	}
-
 	input_filename = filename;
 	input_format = static_cast<floppy_image_device &>(m_image).identify(filename);
 

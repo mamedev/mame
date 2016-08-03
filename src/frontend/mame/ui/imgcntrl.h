@@ -53,7 +53,7 @@ protected:
 	bool                            m_create_ok;
 
 	// methods
-	virtual void hook_load(const std::string &filename, bool softlist);
+	virtual void hook_load(const std::string &filename);
 	virtual void handle() override;
 
 private:
