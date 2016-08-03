@@ -16,7 +16,7 @@
  * 67: A=1 B=0 C=0 D=1
  * 75: A=0 B=0 C=0 D=0
  *
- * The value is 150
+ * The value is 2+4+16+128 = 150
  */
 #define ALTO2_DISPLAY_HLC_START (2+4+16+128)
 
@@ -192,11 +192,9 @@ struct {
 	UINT32 curxpos;                         //!< helper: first cursor word in scanline
 	UINT16 cursor0;                         //!< helper: shifted cursor data for left word
 	UINT16 cursor1;                         //!< helper: shifted cursor data for right word
-	std::unique_ptr<UINT16[]> raw_bitmap;   //!< array of words of the raw bitmap that is displayed
+	std::unique_ptr<UINT16[]> framebuf;     //!< array of words of the raw bitmap that is displayed
 	UINT8 *patterns;                        //!< array of 65536 patterns (16 bytes) with 1 byte per pixel
-	UINT8 **scanline;                       //!< array of scanlines with 1 byte per pixel
 	std::unique_ptr<bitmap_ind16> bitmap;   //!< MAME bitmap with 16 bit indices
-	bool odd_frame;                         //!< true, if odd frame is drawn
 }   m_dsp;
 
 /**
@@ -285,9 +283,9 @@ enum {
 	disp_a66_VBLANK_EVEN    = (1 << 3)      //!< Q4 (010) is VBLANK for the even field (with H1024=0)
 };
 
-void update_bitmap_word(UINT16* bitmap, int x, int y, UINT16 word); //!< update a word in the screen bitmap
+void update_framebuf_word(UINT16* framebuf, int x, int y, UINT16 word);
 void unload_word();                 //!< unload the next word from the display FIFO and shift it to the screen
-void display_state_machine();       //!< function called by the CPU to enter the next display state
+void display_state_machine();       //!< function called by the CPU execution loop to enter the next display state
 
 void f2_late_evenfield(void);       //!< branch on the evenfield flip-flop
 

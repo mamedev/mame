@@ -155,10 +155,10 @@ static const prom_load_t pl_displ_a63 =
  * Address lines are driven by H[1] to H[128] of the horz. line counters.
  * PROM is enabled when H[256] and H[512] are both 0.
  *
- * Q1 is VSYNC for the odd field (with H1024=0)
- * Q2 is VSYNC for the even field (with H1024=1)
- * Q3 is VBLANK for the odd field (with H1024=0)
- * Q4 is VBLANK for the even field (with H1024=1)
+ * Q1 is VSYNC for the odd field (with H1024=1)
+ * Q2 is VSYNC for the even field (with H1024=0)
+ * Q3 is VBLANK for the odd field (with H1024=1)
+ * Q4 is VBLANK for the even field (with H1024=0)
  * </PRE>
  */
 
@@ -242,8 +242,8 @@ static const UINT16 double_bits[256] = {
 //!< helper to extract A3-A0 from a PROM a63 value
 #define A63_NEXT(n) ((n >> 2) & 017)
 
-//! update the internal bitmap to a byte array
-void alto2_cpu_device::update_bitmap_word(UINT16* bitmap, int x, int y, UINT16 word)
+//! update the internal frame buffer and draw the scanline segment if changed
+void alto2_cpu_device::update_framebuf_word(UINT16* framebuf, int x, int y, UINT16 word)
 {
 	// mixing with the cursor
 	if (x == m_dsp.curxpos + 0)
@@ -251,11 +251,10 @@ void alto2_cpu_device::update_bitmap_word(UINT16* bitmap, int x, int y, UINT16 w
 	if (x == m_dsp.curxpos + 1)
 		word ^= m_dsp.cursor1;
 	// no change?
-	if (word == bitmap[x])
+	if (word == framebuf[x])
 		return;
-	bitmap[x] = word;
-	UINT8* pix = m_dsp.scanline[y] + x * 16;
-	memcpy(pix, m_dsp.patterns + 16 * word, 16);
+	framebuf[x] = word;
+	draw_scanline8(*m_dsp.bitmap, x * 16, y, 16, m_dsp.patterns + 16 * word, nullptr);
 }
 
 /**
@@ -271,7 +270,7 @@ void alto2_cpu_device::unload_word()
 		m_unload_time = -1;
 		return;
 	}
-	UINT16* bitmap = m_dsp.raw_bitmap.get()  + y * ALTO2_DISPLAY_SCANLINE_WORDS;
+	UINT16* framebuf = m_dsp.framebuf.get()  + y * ALTO2_DISPLAY_SCANLINE_WORDS;
 	UINT16 word = m_dsp.inverse;
 	UINT8 a38 = m_disp_a38[m_dsp.ra * 16 + m_dsp.wa];
 	if (FIFO_MBEMPTY(a38))
@@ -290,18 +289,18 @@ void alto2_cpu_device::unload_word()
 	{
 		UINT16 word1 = double_bits[word / 256];
 		UINT16 word2 = double_bits[word % 256];
-		update_bitmap_word(bitmap, x, y, word1);
+		update_framebuf_word(framebuf, x, y, word1);
 		x++;
 		if (x < ALTO2_DISPLAY_VISIBLE_WORDS)
 		{
-			update_bitmap_word(bitmap, x, y, word2);
+			update_framebuf_word(framebuf, x, y, word2);
 			x++;
 		}
 		m_unload_time += ALTO2_DISPLAY_BITTIME(32);
 	}
 	else
 	{
-		update_bitmap_word(bitmap, x, y, word);
+		update_framebuf_word(framebuf, x, y, word);
 		x++;
 		m_unload_time += ALTO2_DISPLAY_BITTIME(16);
 	}
@@ -325,26 +324,26 @@ void alto2_cpu_device::display_state_machine()
 		LOG((this,LOG_DISPL,2," HLC=%d", m_dsp.hlc));
 	}
 
-	UINT8 a63 = m_disp_a63[m_dsp.state];
+	const UINT8 a63 = m_disp_a63[m_dsp.state];
 	if (A63_HLCGATE(a63))
 	{
 		// count horizontal line counters and wrap
 		m_dsp.hlc += 1;
-		if (m_dsp.hlc > ALTO2_DISPLAY_HLC_END)
+		if (m_dsp.hlc == ALTO2_DISPLAY_HLC_END)
 			m_dsp.hlc = ALTO2_DISPLAY_HLC_START;
 		// wake up the memory refresh task _twice_ on each scanline
 		m_task_wakeup |= 1 << task_mrt;
 	}
 	// PROM a66 is disabled, if any of HLC256 or HLC512 are high
-	UINT8 a66 = (HLC256 || HLC512) ? 017 : m_disp_a66[m_dsp.hlc & 0377];
+	const UINT8 a66 = (HLC256 | HLC512) ? 017 : m_disp_a66[m_dsp.hlc & 0377];
 
 	// next address from PROM a63, use A4 from HLC1
-	UINT8 next = ((HLC1 ^ 1) << 4) | A63_NEXT(a63);
+	const UINT8 next = ((HLC1 ^ 1) << 4) | A63_NEXT(a63);
 
 	if (A66_VBLANK(a66))
 	{
 		// Rising edge of VBLANK: remember HLC[1-10] where the VBLANK starts
-		m_dsp.vblank = m_dsp.hlc & ~02000;
+		m_dsp.vblank = m_dsp.hlc & ~(1 << 10);
 
 		LOG((this,LOG_DISPL,1, " VBLANK"));
 
@@ -357,7 +356,6 @@ void alto2_cpu_device::display_state_machine()
 			 * at the beginning of vertical retrace.
 			 */
 			m_task_wakeup |= 1 << task_dvt;
-			// TODO: upade odd or even field of the internal bitmap now?
 		}
 	}
 	else
@@ -480,9 +478,9 @@ void alto2_cpu_device::f2_late_evenfield()
 /**
  * @brief initialize the display context to useful values
  *
- * Zap the display context to all 0s.
- * Allocate a bitmap array to save blitting to the screen when
- * there is no change in the data words.
+ * Zap the display context.
+ * Allocate a framebuf array to save updating the bitmap when
+ * there is no change in the data word.
  */
 void alto2_cpu_device::init_disp()
 {
@@ -514,16 +512,13 @@ void alto2_cpu_device::init_disp()
 
 	m_dsp.hlc = ALTO2_DISPLAY_HLC_START;
 
-	m_dsp.raw_bitmap = std::make_unique<UINT16[]>(ALTO2_DISPLAY_HEIGHT * ALTO2_DISPLAY_SCANLINE_WORDS);
+	m_dsp.framebuf = std::make_unique<UINT16[]>(ALTO2_DISPLAY_HEIGHT * ALTO2_DISPLAY_SCANLINE_WORDS);
 	m_dsp.patterns = auto_alloc_array(machine(), UINT8, 65536 * 16);
 	for (int y = 0; y < 65536; y++) {
 		UINT8* dst = m_dsp.patterns + y * 16;
 		for (int x = 0; x < 16; x++)
-			*dst++ = (y >> (15 - x)) & 1;
+			*dst++ = (~y >> (15 - x)) & 1;
 	}
-	m_dsp.scanline = auto_alloc_array(machine(), UINT8*, ALTO2_DISPLAY_HEIGHT);
-	for (int y = 0; y < ALTO2_DISPLAY_HEIGHT; y++)
-		m_dsp.scanline[y] = auto_alloc_array(machine(), UINT8, ALTO2_DISPLAY_TOTAL_WIDTH);
 
 	m_dsp.bitmap = std::make_unique<bitmap_ind16>(ALTO2_DISPLAY_WIDTH, ALTO2_DISPLAY_HEIGHT);
 	m_dsp.state = 0;
@@ -555,26 +550,17 @@ void alto2_cpu_device::reset_disp()
 	m_dsp.curxpos = 0;
 	m_dsp.cursor0 = 0;
 	m_dsp.cursor1 = 0;
-	memset(m_dsp.raw_bitmap.get(), 0, sizeof(UINT16) * ALTO2_DISPLAY_HEIGHT * ALTO2_DISPLAY_SCANLINE_WORDS);
-	for (int y = 0; y < ALTO2_DISPLAY_HEIGHT; y++)
-		memset(m_dsp.scanline[y], 0, sizeof(UINT8) * ALTO2_DISPLAY_TOTAL_WIDTH);
-	m_dsp.odd_frame = false;
+	memset(m_dsp.framebuf.get(), 1, sizeof(UINT16) * ALTO2_DISPLAY_HEIGHT * ALTO2_DISPLAY_SCANLINE_WORDS);
 }
 
 /* Video update */
 UINT32 alto2_cpu_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pen_t palette_bw[2];
-	palette_bw[0] = screen.palette().white_pen();
-	palette_bw[1] = screen.palette().black_pen();
-	for (int y = m_dsp.odd_frame ? 1 : 0; y < ALTO2_DISPLAY_HEIGHT; y += 2)
-		draw_scanline8(*m_dsp.bitmap, 0, y, ALTO2_DISPLAY_WIDTH, m_dsp.scanline[y], palette_bw);
 	copybitmap(bitmap, *m_dsp.bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
 void alto2_cpu_device::screen_eof(screen_device &screen, bool state)
 {
-	if (state)
-		m_dsp.odd_frame = !m_dsp.odd_frame;
+	// FIXME: do we need this in some way?
 }
