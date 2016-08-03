@@ -104,6 +104,9 @@ private:
 	required_device<ay8910_device> m_ay0;
 	required_device<ay8910_device> m_ay1;
 
+	// I/O ports
+	optional_ioport_array<5> m_ports;
+
 	// internal state
 	UINT8 m_data[4];
 	UINT8 m_status;

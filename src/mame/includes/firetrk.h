@@ -52,7 +52,12 @@ public:
 		m_drone_rot(*this, "drone_rot"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_bit_0(*this, "BIT_0"),
+		m_bit_6(*this, "BIT_6"),
+		m_bit_7(*this, "BIT_7"),
+		m_dips(*this, "DIP"),
+		m_steer(*this, "STEER")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -70,6 +75,12 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+
+	optional_ioport m_bit_0;
+	optional_ioport m_bit_6;
+	optional_ioport m_bit_7;
+	required_ioport_array<2> m_dips;
+	optional_ioport_array<2> m_steer;
 
 	UINT8 m_in_service_mode;
 	UINT32 m_dial[2];

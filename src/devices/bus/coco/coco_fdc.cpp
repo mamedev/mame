@@ -116,7 +116,7 @@ SLOT_INTERFACE_END
 
 coco_rtc_type_t coco_fdc_device::real_time_clock()
 {
-	coco_rtc_type_t result = coco_rtc_type_t(read_safe(machine().root_device().ioport("real_time_clock"), RTC_NONE));
+	coco_rtc_type_t result = coco_rtc_type_t(m_rtc.read_safe(RTC_NONE));
 
 	/* check to make sure we don't have any invalid values */
 	if (((result == RTC_DISTO) && (m_disto_msm6242 == nullptr))
@@ -183,7 +183,8 @@ coco_fdc_device::coco_fdc_device(const machine_config &mconfig, device_type type
 		m_wd17xx(*this, WD_TAG),
 		m_wd2797(*this, WD2797_TAG),
 		m_ds1315(*this, CLOUD9_TAG),
-		m_disto_msm6242(*this, DISTO_TAG), m_msm6242_rtc_address(0)
+		m_disto_msm6242(*this, DISTO_TAG), m_msm6242_rtc_address(0),
+		m_rtc(*this, ":real_time_clock")
 {
 }
 
@@ -193,8 +194,9 @@ coco_fdc_device::coco_fdc_device(const machine_config &mconfig, const char *tag,
 		m_wd17xx(*this, WD_TAG),
 		m_wd2797(*this, WD2797_TAG),
 		m_ds1315(*this, CLOUD9_TAG),
-		m_disto_msm6242(*this, DISTO_TAG), m_msm6242_rtc_address(0)
-	{
+		m_disto_msm6242(*this, DISTO_TAG), m_msm6242_rtc_address(0),
+		m_rtc(*this, ":real_time_clock")
+{
 }
 
 //-------------------------------------------------

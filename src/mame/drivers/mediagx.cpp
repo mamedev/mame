@@ -95,7 +95,8 @@ public:
 		m_vram(*this, "vram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_ports(*this, "IN") { }
 
 	required_device<ide_controller_32_device> m_ide;
 	required_shared_ptr<UINT32> m_main_ram;
@@ -107,6 +108,7 @@ public:
 	required_device<palette_device> m_palette;
 	UINT8 m_pal[768];
 
+	optional_ioport_array<9> m_ports;   // but parallel_pointer takes values 0 -> 23
 
 	UINT32 m_disp_ctrl_reg[256/4];
 	int m_frame_width;
@@ -515,25 +517,24 @@ WRITE8_MEMBER(mediagx_state::io20_w)
 READ32_MEMBER(mediagx_state::parallel_port_r)
 {
 	UINT32 r = 0;
-	//static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7", "IN8" }; // but parallel_pointer takes values 0 -> 23
 
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 nibble = m_parallel_latched;//(read_safe(ioport(m_portnames[m_parallel_pointer / 3]), 0) >> (4 * (m_parallel_pointer % 3))) & 15;
+		UINT8 nibble = m_parallel_latched;
 		r |= ((~nibble & 0x08) << 12) | ((nibble & 0x07) << 11);
 		logerror("%08X:parallel_port_r()\n", space.device().safe_pc());
 #if 0
 		if (m_controls_data == 0x18)
 		{
-			r |= ioport("IN0")->read() << 8;
+			r |= m_ports[0]->read() << 8;
 		}
 		else if (m_controls_data == 0x60)
 		{
-			r |= ioport("IN1")->read() << 8;
+			r |= m_ports[1]->read() << 8;
 		}
 		else if (m_controls_data == 0xff || m_controls_data == 0x50)
 		{
-			r |= ioport("IN2")->read() << 8;
+			r |= m_ports[2]->read() << 8;
 		}
 
 		//r |= m_control_read << 8;
@@ -549,8 +550,6 @@ READ32_MEMBER(mediagx_state::parallel_port_r)
 
 WRITE32_MEMBER(mediagx_state::parallel_port_w)
 {
-	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7", "IN8" };   // but parallel_pointer takes values 0 -> 23
-
 	COMBINE_DATA( &m_parport );
 
 	if (ACCESSING_BITS_0_7)
@@ -572,7 +571,7 @@ WRITE32_MEMBER(mediagx_state::parallel_port_w)
 
 		logerror("%08X:", space.device().safe_pc());
 
-		m_parallel_latched = (read_safe(ioport(portnames[m_parallel_pointer / 3]), 0) >> (4 * (m_parallel_pointer % 3))) & 15;
+		m_parallel_latched = (m_ports[m_parallel_pointer / 3].read_safe(0) >> (4 * (m_parallel_pointer % 3))) & 15;
 		//parallel_pointer++;
 		//logerror("[%02X] Advance pointer to %d\n", data, parallel_pointer);
 		switch (data & 0xfc)
@@ -789,7 +788,7 @@ static GFXDECODE_START( CGA )
 GFXDECODE_END
 
 static INPUT_PORTS_START(mediagx)
-	PORT_START("IN0")
+	PORT_START("IN.0")
 	PORT_SERVICE_NO_TOGGLE( 0x001, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_SERVICE2 )
@@ -803,42 +802,42 @@ static INPUT_PORTS_START(mediagx)
 	PORT_BIT( 0x400, IP_ACTIVE_HIGH, IPT_START3 )
 	PORT_BIT( 0x800, IP_ACTIVE_HIGH, IPT_START4 )
 
-	PORT_START("IN1")
+	PORT_START("IN.1")
 	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_BUTTON3 )
 
-	PORT_START("IN2")
+	PORT_START("IN.2")
 	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_BUTTON4 )
 	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_BUTTON5 )
 	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_BUTTON6 )
 
-	PORT_START("IN3")
+	PORT_START("IN.3")
 	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_BUTTON7 )
 	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_BUTTON8 )
 	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_BUTTON9 )
 
-	PORT_START("IN4")
+	PORT_START("IN.4")
 	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
 
-	PORT_START("IN5")
+	PORT_START("IN.5")
 	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(3)
 
-	PORT_START("IN6")
+	PORT_START("IN.6")
 	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 
-	PORT_START("IN7")
+	PORT_START("IN.7")
 	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 
-	PORT_START("IN8")
+	PORT_START("IN.8")
 	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
 	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
 	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3)

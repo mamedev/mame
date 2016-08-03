@@ -150,7 +150,7 @@ UINT32 amiga_state::amiga_gethvpos()
 {
 	amiga_state *state = this;
 	UINT32 hvpos = (m_last_scanline << 8) | (m_screen->hpos() >> 2);
-	UINT32 latchedpos = m_hvpos ? m_hvpos->read() : 0;
+	UINT32 latchedpos = m_hvpos.read_safe(0);
 
 	/* if there's no latched position, or if we are in the active display area */
 	/* but before the latching point, return the live HV position */

@@ -13,6 +13,7 @@ public:
 	jackal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoctrl(*this, "videoctrl"),
+		m_dials(*this, "DIAL"),
 		m_mastercpu(*this, "master"),
 		m_slavecpu(*this, "slave"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -29,6 +30,7 @@ public:
 	int      m_irq_enable;
 	UINT8    *m_rambank;
 	UINT8    *m_spritebank;
+	optional_ioport_array<2> m_dials;
 
 	/* devices */
 	required_device<cpu_device> m_mastercpu;

@@ -520,7 +520,7 @@ WRITE32_MEMBER(model2_state::videoctl_w)
 
 CUSTOM_INPUT_MEMBER(model2_state::_1c00000_r)
 {
-	UINT32 ret = ioport("IN0")->read();
+	UINT32 ret = m_in0->read();
 
 	if(m_ctrlmode == 0)
 	{
@@ -538,8 +538,7 @@ CUSTOM_INPUT_MEMBER(model2_state::_1c0001c_r)
 	UINT32 iptval = 0x00ff;
 	if(m_analog_channel < 4)
 	{
-		static const char *const ports[] = { "ANA0", "ANA1", "ANA2", "ANA3" };
-		iptval = read_safe(ioport(ports[m_analog_channel]), 0);
+		iptval = m_analog_ports[m_analog_channel].read_safe(0);
 		++m_analog_channel;
 	}
 	return iptval;
@@ -557,7 +556,7 @@ CUSTOM_INPUT_MEMBER(model2_state::_1c0001c_r)
 /* Used specifically by Sega Rally, others might be different */
 CUSTOM_INPUT_MEMBER(model2_state::srallyc_gearbox_r)
 {
-	UINT8 res = read_safe(ioport("GEARS"), 0);
+	UINT8 res = m_gears.read_safe(0);
 	int i;
 	const UINT8 gearvalue[5] = { 0, 2, 1, 6, 5 };
 
@@ -1054,21 +1053,20 @@ WRITE32_MEMBER(model2_state::geo_w)
 
 READ32_MEMBER(model2_state::hotd_lightgun_r)
 {
-	static const char *const ports[] = { "P1_Y", "P1_X", "P2_Y", "P2_X" };
 	UINT16 res = 0xffff;
 
 	if(m_lightgun_mux < 8)
-		res = (read_safe(ioport(ports[m_lightgun_mux >> 1]), 0) >> ((m_lightgun_mux & 1)*8)) & 0xff;
+		res = (m_analog_ports[m_lightgun_mux >> 1].read_safe(0) >> ((m_lightgun_mux & 1)*8)) & 0xff;
 	else
 	{
 		UINT16 p1x,p1y,p2x,p2y;
 
 		res = 0xfffc;
 
-		p1x = read_safe(ioport("P1_X"), 0);
-		p1y = read_safe(ioport("P1_Y"), 0);
-		p2x = read_safe(ioport("P2_X"), 0);
-		p2y = read_safe(ioport("P2_Y"), 0);
+		p1x = m_analog_ports[1].read_safe(0);
+		p1y = m_analog_ports[0].read_safe(0);
+		p2x = m_analog_ports[3].read_safe(0);
+		p2y = m_analog_ports[2].read_safe(0);
 
 		/* TODO: might be better, supposedly user has to calibrate guns in order to make these settings to work ... */
 		if(p1x <= 0x28 || p1x >= 0x3e0 || p1y <= 0x40 || p1y >= 0x3c0)
@@ -1479,10 +1477,9 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(model2_state::virtuacop_lightgun_r)
 {
-	static const char *const ports[] = { "P1_Y", "P1_X", "P2_Y", "P2_X" };
 	UINT8 res;
 
-	res = (read_safe(ioport(ports[offset >> 1]), 0) >> ((offset & 1)*8)) & 0xff;
+	res = (m_analog_ports[offset >> 1].read_safe(0) >> ((offset & 1)*8)) & 0xff;
 
 	return res;
 }
@@ -1493,10 +1490,10 @@ READ8_MEMBER(model2_state::virtuacop_lightgun_offscreen_r)
 	UINT16 special_res = 0xfffc;
 	UINT16 p1x,p1y,p2x,p2y;
 
-	p1x = read_safe(ioport("P1_X"), 0);
-	p1y = read_safe(ioport("P1_Y"), 0);
-	p2x = read_safe(ioport("P2_X"), 0);
-	p2y = read_safe(ioport("P2_Y"), 0);
+	p1x = m_analog_ports[1].read_safe(0);
+	p1y = m_analog_ports[0].read_safe(0);
+	p2x = m_analog_ports[3].read_safe(0);
+	p2y = m_analog_ports[2].read_safe(0);
 
 	/* TODO: might be better, supposedly user has to calibrate guns in order to make these settings to work ... */
 	if(p1x <= 0x28 || p1x >= 0x3e0 || p1y <= 0x40 || p1y >= 0x3c0)
@@ -1801,17 +1798,17 @@ static INPUT_PORTS_START( vcop )
 	PORT_START("IN2")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED ) // <- one bit here enables "debug mode"
 
-	PORT_START("P1_X")
-	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX( 0, 0x3ff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(1)
-
-	PORT_START("P1_Y")
+	PORT_START("ANA.0")
 	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX( 0, 0x3ff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(1)
 
-	PORT_START("P2_X")
-	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX( 0, 0x3ff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(2)
+	PORT_START("ANA.1")
+	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX( 0, 0x3ff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(1)
 
-	PORT_START("P2_Y")
+	PORT_START("ANA.2")
 	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX( 0, 0x3ff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(2)
+
+	PORT_START("ANA.3")
+	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX( 0, 0x3ff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( daytona )
@@ -1917,13 +1914,13 @@ static INPUT_PORTS_START( manxtt )
 	PORT_START("IN4")
 	PORT_BIT(0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("ANA0")  // throttle
+	PORT_START("ANA.0")  // throttle
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("ANA1")  // brake
+	PORT_START("ANA.1")  // brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("ANA2")  // bank
+	PORT_START("ANA.2")  // bank
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1) PORT_REVERSE
 INPUT_PORTS_END
 
@@ -1985,13 +1982,13 @@ static INPUT_PORTS_START( srallyc )
 	PORT_BIT(0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 
-	PORT_START("ANA0")  // steer
+	PORT_START("ANA.0")  // steer
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("ANA1")  // accel
+	PORT_START("ANA.1")  // accel
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("ANA2")  // brake
+	PORT_START("ANA.2")  // brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
@@ -2044,17 +2041,17 @@ static INPUT_PORTS_START( vcop2 )
 	PORT_START("IN4")
 	PORT_BIT(0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("P1_X")
-	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX( 0, 0x3ff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(1)
-
-	PORT_START("P1_Y")
+	PORT_START("ANA.0")
 	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX( 0, 0x3ff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(1)
 
-	PORT_START("P2_X")
-	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX( 0, 0x3ff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(2)
+	PORT_START("ANA.1")
+	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX( 0, 0x3ff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(1)
 
-	PORT_START("P2_Y")
+	PORT_START("ANA.2")
 	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX( 0, 0x3ff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(2)
+
+	PORT_START("ANA.3")
+	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX( 0, 0x3ff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(2)
 
 INPUT_PORTS_END
 
@@ -2112,16 +2109,16 @@ static INPUT_PORTS_START( rchase2 )
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,rchase2_devices_r, nullptr)
 
 	/* FIXME: don't know yet if min max values are really correct, we'll see ... */
-	PORT_START("ANA0")
+	PORT_START("ANA.0")
 	PORT_BIT( 0x00ff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0x80,0x7f) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(2)
 
-	PORT_START("ANA1")
+	PORT_START("ANA.1")
 	PORT_BIT( 0x00ff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0x80,0x7f) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
 
-	PORT_START("ANA2")
+	PORT_START("ANA.2")
 	PORT_BIT( 0x00ff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(2)
 
-	PORT_START("ANA3")
+	PORT_START("ANA.3")
 	PORT_BIT( 0x00ff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
 INPUT_PORTS_END
 

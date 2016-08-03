@@ -115,7 +115,7 @@ POKEY_KEYBOARD_CB_MEMBER(atari_common_state::a800_keyboard)
 		return ret;
 
 	/* decode regular key */
-	ipt = m_keyboard[k543210 >> 3] ? m_keyboard[k543210 >> 3]->read() : 0;
+	ipt = m_keyboard[k543210 >> 3].read_safe(0);
 
 	if (ipt & (1 << (k543210 & 0x07)))
 		ret |= 0x01;
@@ -184,7 +184,7 @@ POKEY_KEYBOARD_CB_MEMBER(atari_common_state::a5200_keypads)
 	if (k543210 == 0)
 		return ret;
 
-	ipt = m_keypad[k543210 >> 2] ? m_keypad[k543210 >> 2]->read() : 0;
+	ipt = m_keypad[k543210 >> 2].read_safe(0);
 
 	if (ipt & (1 << (k543210 & 0x03)))
 		ret |= 0x01;

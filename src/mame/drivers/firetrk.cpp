@@ -155,8 +155,8 @@ void firetrk_state::machine_reset()
 
 READ8_MEMBER(firetrk_state::firetrk_dip_r)
 {
-	UINT8 val0 = ioport("DIP_0")->read();
-	UINT8 val1 = ioport("DIP_1")->read();
+	UINT8 val0 = m_dips[0]->read();
+	UINT8 val1 = m_dips[1]->read();
 
 	if (val1 & (1 << (2 * offset + 0))) val0 |= 1;
 	if (val1 & (1 << (2 * offset + 1))) val0 |= 2;
@@ -167,8 +167,8 @@ READ8_MEMBER(firetrk_state::firetrk_dip_r)
 
 READ8_MEMBER(firetrk_state::montecar_dip_r)
 {
-	UINT8 val0 = ioport("DIP_0")->read();
-	UINT8 val1 = ioport("DIP_1")->read();
+	UINT8 val0 = m_dips[0]->read();
+	UINT8 val1 = m_dips[1]->read();
 
 	if (val1 & (1 << (3 - offset))) val0 |= 1;
 	if (val1 & (1 << (7 - offset))) val0 |= 2;
@@ -230,7 +230,7 @@ READ8_MEMBER(firetrk_state::firetrk_input_r)
 	/* update steering wheels */
 	for (i = 0; i < 2; i++)
 	{
-		UINT32 const new_dial = read_safe(ioport(i ? "STEER_2" : "STEER_1"), 0);
+		UINT32 const new_dial = m_steer[i].read_safe(0);
 		INT32 const delta = new_dial - m_dial[i];
 
 		if (delta != 0)
@@ -242,9 +242,9 @@ READ8_MEMBER(firetrk_state::firetrk_input_r)
 		}
 	}
 
-	return ((read_safe(ioport("BIT_0"), 0) & (1 << offset)) ? 0x01 : 0) |
-			((read_safe(ioport("BIT_6"), 0) & (1 << offset)) ? 0x40 : 0) |
-			((read_safe(ioport("BIT_7"), 0) & (1 << offset)) ? 0x80 : 0);
+	return ((m_bit_0.read_safe(0) & (1 << offset)) ? 0x01 : 0) |
+			((m_bit_6.read_safe(0) & (1 << offset)) ? 0x40 : 0) |
+			((m_bit_7.read_safe(0) & (1 << offset)) ? 0x80 : 0);
 }
 
 
@@ -374,13 +374,13 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( firetrk )
-	PORT_START("STEER_1")
+	PORT_START("STEER.0")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("STEER_2")
+	PORT_START("STEER.1")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START("DIP_0")
+	PORT_START("DIP.0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) /* other DIPs connect here */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) /* other DIPs connect here */
 	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Coinage ))
@@ -395,7 +395,7 @@ static INPUT_PORTS_START( firetrk )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
 
-	PORT_START("DIP_1")
+	PORT_START("DIP.1")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Language ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( French ) )
@@ -455,14 +455,14 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( superbug )
-	PORT_START("STEER_1")
+	PORT_START("STEER.0")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 
-	PORT_START("DIP_0")
+	PORT_START("DIP.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) /* other DIPs connect here */
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) /* other DIPs connect here */
 
-	PORT_START("DIP_1")
+	PORT_START("DIP.1")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage ))
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ))
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ))
@@ -516,10 +516,10 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( montecar )
-	PORT_START("STEER_1")
+	PORT_START("STEER.0")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("DIP_0")
+	PORT_START("DIP.0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) /* other DIPs connect here */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) /* other DIPs connect here */
 	PORT_DIPNAME( 0x0c, 0x0c, "Coin 3 Multiplier" )
@@ -534,7 +534,7 @@ static INPUT_PORTS_START( montecar )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
 
-	PORT_START("DIP_1")
+	PORT_START("DIP.1")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage ))
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ))
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ))

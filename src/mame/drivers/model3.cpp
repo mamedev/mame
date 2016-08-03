@@ -1431,8 +1431,7 @@ READ64_MEMBER(model3_state::model3_ctrl_r)
 		case 7:
 			if (ACCESSING_BITS_24_31)       /* ADC Data read */
 			{
-				static const char *const adcnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
-				const UINT8 adc_data = read_safe(ioport(adcnames[m_adc_channel]), 0);
+				const UINT8 adc_data = m_adc_ports[m_adc_channel].read_safe(0);
 				m_adc_channel++;
 				m_adc_channel &= 0x7;
 				return (UINT64)adc_data << 24;
@@ -1922,13 +1921,13 @@ static INPUT_PORTS_START( scud )
 	PORT_START("DSW")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
 
-	PORT_START("AN0")   // steering
+	PORT_START("AN.0")   // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN1")   // accelerator
+	PORT_START("AN.1")   // accelerator
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN2")   // brake
+	PORT_START("AN.2")   // brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
@@ -1946,22 +1945,22 @@ static INPUT_PORTS_START( bass )
 	PORT_START("DSW")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
 
-	PORT_START("AN0")       /* Rod Y */
+	PORT_START("AN.0")       /* Rod Y */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN1")       /* Rod X */
+	PORT_START("AN.1")       /* Rod X */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN2")
+	PORT_START("AN.2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("AN3")       /* Reel */
+	PORT_START("AN.3")       /* Reel */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN4")       /* Stick Y */
+	PORT_START("AN.4")       /* Stick Y */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE_V ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN5")       /* Stick X */
+	PORT_START("AN.5")       /* Stick X */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
@@ -1981,16 +1980,16 @@ static INPUT_PORTS_START( harley )
 	PORT_START("DSW")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
 
-	PORT_START("AN0")   // steering
+	PORT_START("AN.0")   // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN1")   // accelerator
+	PORT_START("AN.1")   // accelerator
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN2")   // front brake
+	PORT_START("AN.2")   // front brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN3")   // back brake
+	PORT_START("AN.3")   // back brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL3 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
@@ -2013,13 +2012,13 @@ static INPUT_PORTS_START( daytona2 )
 	PORT_START("DSW")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
 
-	PORT_START("AN0")   // steering
+	PORT_START("AN.0")   // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN1")   // accelerator
+	PORT_START("AN.1")   // accelerator
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN2")   // brake
+	PORT_START("AN.2")   // brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
@@ -2037,10 +2036,10 @@ static INPUT_PORTS_START( swtrilgy )
 	PORT_START("DSW")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
 
-	PORT_START("AN0")       /* Analog Stick Y */
+	PORT_START("AN.0")       /* Analog Stick Y */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
 
-	PORT_START("AN1")       /* Analog Stick X */
+	PORT_START("AN.1")       /* Analog Stick X */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
 
 INPUT_PORTS_END
@@ -2060,13 +2059,13 @@ static INPUT_PORTS_START( eca )
 	PORT_START("DSW")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
 
-	PORT_START("AN0")   // steering
+	PORT_START("AN.0")   // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN1")   // accelerator
+	PORT_START("AN.1")   // accelerator
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN2")   // brake
+	PORT_START("AN.2")   // brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
@@ -2097,10 +2096,10 @@ static INPUT_PORTS_START( skichamp )
 	PORT_START("DSW")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
 
-	PORT_START("AN0")   // inclining
+	PORT_START("AN.0")   // inclining
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN1")   // swing
+	PORT_START("AN.1")   // swing
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
 INPUT_PORTS_END

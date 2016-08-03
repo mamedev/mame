@@ -545,6 +545,11 @@ segas32_state::segas32_state(const machine_config &mconfig, const char *tag, dev
 		m_system32_videoram(*this,"videoram", 0),
 		m_system32_spriteram(*this,"spriteram", 0),
 		m_system32_paletteram(*this,"paletteram", 0) ,
+		m_ports_a(*this, io_ports_a),
+		m_ports_b(*this, io_ports_b),
+		m_analog_ports(*this, "ANALOG"),
+		m_extra_ports(*this, "EXTRA"),
+		m_track_ports(*this, track_ports),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_multipcm(*this, "sega"),
@@ -803,13 +808,11 @@ INTERRUPT_GEN_MEMBER(segas32_state::start_of_vblank_int)
  *
  *************************************/
 
+IOPORT_ARRAY_MEMBER(segas32_state::io_ports_a) { "P1_A", "P2_A", "PORTC_A", "PORTD_A", "SERVICE12_A", "SERVICE34_A", "PORTG_A", "PORTH_A" };
+IOPORT_ARRAY_MEMBER(segas32_state::io_ports_b) { "P1_B", "P2_B", "PORTC_B", "PORTD_B", "SERVICE12_B", "SERVICE34_B", "PORTG_B", "PORTH_B" };
+
 UINT16 segas32_state::common_io_chip_r(address_space &space, int which, offs_t offset, UINT16 mem_mask)
 {
-	static const char *const portnames[2][8] =
-			{
-				{ "P1_A", "P2_A", "PORTC_A", "PORTD_A", "SERVICE12_A", "SERVICE34_A", "PORTG_A", "PORTH_A" },
-				{ "P1_B", "P2_B", "PORTC_B", "PORTD_B", "SERVICE12_B", "SERVICE34_B", "PORTG_B", "PORTH_B" },
-			};
 	offset &= 0x1f/2;
 
 	switch (offset)
@@ -828,7 +831,7 @@ UINT16 segas32_state::common_io_chip_r(address_space &space, int which, offs_t o
 				return m_misc_io_data[which][offset];
 
 			/* otherwise, return an input port */
-			return read_safe(ioport(portnames[which][offset]), 0xffff);
+			return (which ? m_ports_b : m_ports_a)[offset].read_safe(0xffff);
 
 		/* 'SEGA' protection */
 		case 0x10/2:
@@ -1090,14 +1093,13 @@ READ16_MEMBER(segas32_state::analog_custom_io_r)
 
 WRITE16_MEMBER(segas32_state::analog_custom_io_w)
 {
-	static const char *const names[] = { "ANALOG1", "ANALOG2", "ANALOG3", "ANALOG4" };
 	switch (offset)
 	{
 		case 0x10/2:
 		case 0x12/2:
 		case 0x14/2:
 		case 0x16/2:
-			m_analog_value[offset & 3] = read_safe(ioport(names[offset & 3]), 0);
+			m_analog_value[offset & 3] = m_analog_ports[offset & 3].read_safe(0);
 			return;
 	}
 	logerror("%06X:unknown analog_custom_io_w(%X) = %04X & %04X\n", space.device().safe_pc(), offset*2, data, mem_mask);
@@ -1106,14 +1108,13 @@ WRITE16_MEMBER(segas32_state::analog_custom_io_w)
 
 READ16_MEMBER(segas32_state::extra_custom_io_r)
 {
-	static const char *const names[] = { "EXTRA1", "EXTRA2", "EXTRA3", "EXTRA4" };
 	switch (offset)
 	{
 		case 0x20/2:
 		case 0x22/2:
 		case 0x24/2:
 		case 0x26/2:
-			return read_safe(ioport(names[offset & 3]), 0xffff);
+			return m_extra_ports[offset & 3].read_safe(0xffff);
 	}
 
 	logerror("%06X:unknown extra_custom_io_r(%X) & %04X\n", space.device().safe_pc(), offset*2, mem_mask);
@@ -1123,14 +1124,13 @@ READ16_MEMBER(segas32_state::extra_custom_io_r)
 
 WRITE16_MEMBER(segas32_state::orunners_custom_io_w)
 {
-	static const char *const names[] = { "ANALOG1", "ANALOG2", "ANALOG3", "ANALOG4", "ANALOG5", "ANALOG6", "ANALOG7", "ANALOG8" };
 	switch (offset)
 	{
 		case 0x10/2:
 		case 0x12/2:
 		case 0x14/2:
 		case 0x16/2:
-			m_analog_value[offset & 3] = read_safe(ioport(names[m_analog_bank * 4 + (offset & 3)]), 0);
+			m_analog_value[offset & 3] = m_analog_ports[m_analog_bank * 4 + (offset & 3)].read_safe(0);
 			return;
 
 		case 0x20/2:
@@ -1141,10 +1141,10 @@ WRITE16_MEMBER(segas32_state::orunners_custom_io_w)
 }
 
 
+IOPORT_ARRAY_MEMBER(segas32_state::track_ports) { "TRACKX1", "TRACKY1", "TRACKX2", "TRACKY2", "TRACKX3", "TRACKY3" };
+
 READ16_MEMBER(segas32_state::sonic_custom_io_r)
 {
-	static const char *const names[] = { "TRACKX1", "TRACKY1", "TRACKX2", "TRACKY2", "TRACKX3", "TRACKY3" };
-
 	switch (offset)
 	{
 		case 0x00/2:
@@ -1153,7 +1153,7 @@ READ16_MEMBER(segas32_state::sonic_custom_io_r)
 		case 0x0c/2:
 		case 0x10/2:
 		case 0x14/2:
-			return (UINT8)(ioport(names[offset/2])->read() - m_sonic_last[offset/2]);
+			return (UINT8)(m_track_ports[offset/2]->read() - m_sonic_last[offset/2]);
 	}
 
 	logerror("%06X:unknown sonic_custom_io_r(%X) & %04X\n", space.device().safe_pc(), offset*2, mem_mask);
@@ -1163,15 +1163,13 @@ READ16_MEMBER(segas32_state::sonic_custom_io_r)
 
 WRITE16_MEMBER(segas32_state::sonic_custom_io_w)
 {
-	static const char *const names[] = { "TRACKX1", "TRACKY1", "TRACKX2", "TRACKY2", "TRACKX3", "TRACKY3" };
-
 	switch (offset)
 	{
 		case 0x00/2:
 		case 0x08/2:
 		case 0x10/2:
-			m_sonic_last[offset/2 + 0] = ioport(names[offset/2 + 0])->read();
-			m_sonic_last[offset/2 + 1] = ioport(names[offset/2 + 1])->read();
+			m_sonic_last[offset/2 + 0] = m_track_ports[offset/2 + 0]->read();
+			m_sonic_last[offset/2 + 1] = m_track_ports[offset/2 + 1]->read();
 			return;
 	}
 
@@ -1659,13 +1657,13 @@ static INPUT_PORTS_START( arescue )
 	PORT_MODIFY("mainpcb:SERVICE34_A")
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:ANALOG1")
+	PORT_START("mainpcb:ANALOG.0")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START("mainpcb:ANALOG2")
+	PORT_START("mainpcb:ANALOG.1")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
-	PORT_START("mainpcb:ANALOG3")
+	PORT_START("mainpcb:ANALOG.2")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
 	PORT_INCLUDE( system32_generic_slave )
@@ -1684,13 +1682,13 @@ static INPUT_PORTS_START( arescue )
 	PORT_MODIFY("slavepcb:SERVICE34_A")
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("slavepcb:ANALOG1")
+	PORT_START("slavepcb:ANALOG.0")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_REVERSE  PORT_PLAYER(2)
 
-	PORT_START("slavepcb:ANALOG2")
+	PORT_START("slavepcb:ANALOG.1")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)  PORT_PLAYER(2)
 
-	PORT_START("slavepcb:ANALOG3")
+	PORT_START("slavepcb:ANALOG.2")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)  PORT_PLAYER(2)
 
 INPUT_PORTS_END
@@ -1711,16 +1709,16 @@ static INPUT_PORTS_START( alien3 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:ANALOG1")
+	PORT_START("mainpcb:ANALOG.0")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5)
 
-	PORT_START("mainpcb:ANALOG2")
+	PORT_START("mainpcb:ANALOG.1")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5)
 
-	PORT_START("mainpcb:ANALOG3")
+	PORT_START("mainpcb:ANALOG.2")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_PLAYER(2)
 
-	PORT_START("mainpcb:ANALOG4")
+	PORT_START("mainpcb:ANALOG.3")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -1734,7 +1732,7 @@ static INPUT_PORTS_START( arabfgt )
 	PORT_MODIFY("mainpcb:P2_A")
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:EXTRA1")
+	PORT_START("mainpcb:EXTRA.0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1743,7 +1741,7 @@ static INPUT_PORTS_START( arabfgt )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
 
-	PORT_START("mainpcb:EXTRA2")
+	PORT_START("mainpcb:EXTRA.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1752,7 +1750,7 @@ static INPUT_PORTS_START( arabfgt )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
 
-	PORT_START("mainpcb:EXTRA3")
+	PORT_START("mainpcb:EXTRA.2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START4 )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1765,7 +1763,7 @@ static INPUT_PORTS_START( arabfgtu )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )
 
-	PORT_MODIFY("mainpcb:EXTRA3")
+	PORT_MODIFY("mainpcb:EXTRA.2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
 INPUT_PORTS_END
@@ -1780,7 +1778,7 @@ static INPUT_PORTS_START( brival )
 	PORT_MODIFY("mainpcb:P2_A")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:EXTRA2")
+	PORT_START("mainpcb:EXTRA.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
@@ -1805,7 +1803,7 @@ static INPUT_PORTS_START( darkedge )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 
-	PORT_START("mainpcb:EXTRA2")
+	PORT_START("mainpcb:EXTRA.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
@@ -1852,13 +1850,13 @@ static INPUT_PORTS_START( f1en )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:ANALOG1")
+	PORT_START("mainpcb:ANALOG.0")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("mainpcb:Steering Wheel")
 
-	PORT_START("mainpcb:ANALOG2")
+	PORT_START("mainpcb:ANALOG.1")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL  ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("mainpcb:Gas Pedal")
 
-	PORT_START("mainpcb:ANALOG3")
+	PORT_START("mainpcb:ANALOG.2")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("mainpcb:Brake Pedal")
 
 	PORT_INCLUDE( system32_generic_slave )
@@ -1890,13 +1888,13 @@ static INPUT_PORTS_START( f1en )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("slavepcb:ANALOG1")
+	PORT_START("slavepcb:ANALOG.0")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("slavepcb:Steering Wheel")  PORT_PLAYER(2)
 
-	PORT_START("slavepcb:ANALOG2")
+	PORT_START("slavepcb:ANALOG.1")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL  ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("slavepcb:Gas Pedal")  PORT_PLAYER(2)
 
-	PORT_START("slavepcb:ANALOG3")
+	PORT_START("slavepcb:ANALOG.2")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("slavepcb:Brake Pedal")  PORT_PLAYER(2)
 
 INPUT_PORTS_END
@@ -1941,13 +1939,13 @@ static INPUT_PORTS_START( f1lap )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("mainpcb:ANALOG1")
+	PORT_START("mainpcb:ANALOG.0")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(20) PORT_NAME("mainpcb:Steering Wheel")
 
-	PORT_START("mainpcb:ANALOG2")
+	PORT_START("mainpcb:ANALOG.1")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL  ) PORT_SENSITIVITY(50) PORT_KEYDELTA(20) PORT_NAME("mainpcb:Gas Pedal")
 
-	PORT_START("mainpcb:ANALOG3")
+	PORT_START("mainpcb:ANALOG.2")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(50) PORT_KEYDELTA(20) PORT_NAME("mainpcb:Brake Pedal")
 INPUT_PORTS_END
 
@@ -1955,7 +1953,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ga2 )
 	PORT_INCLUDE( system32_generic )
 
-	PORT_START("mainpcb:EXTRA1")
+	PORT_START("mainpcb:EXTRA.0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
@@ -1965,7 +1963,7 @@ static INPUT_PORTS_START( ga2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
 
-	PORT_START("mainpcb:EXTRA2")
+	PORT_START("mainpcb:EXTRA.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
@@ -1975,7 +1973,7 @@ static INPUT_PORTS_START( ga2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
 
-	PORT_START("mainpcb:EXTRA3")
+	PORT_START("mainpcb:EXTRA.2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START4 )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1988,7 +1986,7 @@ static INPUT_PORTS_START( ga2u )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )
 
-	PORT_MODIFY("mainpcb:EXTRA3")
+	PORT_MODIFY("mainpcb:EXTRA.2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
 INPUT_PORTS_END
@@ -2047,7 +2045,7 @@ static INPUT_PORTS_START( harddunk )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START5 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("mainpcb:EXTRA1")
+	PORT_START("mainpcb:EXTRA.0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
@@ -2057,7 +2055,7 @@ static INPUT_PORTS_START( harddunk )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
 
-	PORT_START("mainpcb:EXTRA2")
+	PORT_START("mainpcb:EXTRA.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(6)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(6)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(6)
@@ -2067,7 +2065,7 @@ static INPUT_PORTS_START( harddunk )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(6)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(6)
 
-	PORT_START("mainpcb:EXTRA3")
+	PORT_START("mainpcb:EXTRA.2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START6 )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2094,16 +2092,16 @@ static INPUT_PORTS_START( jpark )
 	PORT_MODIFY("mainpcb:P2_A")
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:ANALOG1")
+	PORT_START("mainpcb:ANALOG.0")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5)
 
-	PORT_START("mainpcb:ANALOG2")
+	PORT_START("mainpcb:ANALOG.1")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5)
 
-	PORT_START("mainpcb:ANALOG3")
+	PORT_START("mainpcb:ANALOG.2")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_PLAYER(2)
 
-	PORT_START("mainpcb:ANALOG4")
+	PORT_START("mainpcb:ANALOG.3")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -2133,22 +2131,22 @@ static INPUT_PORTS_START( orunners )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)                             /* >> */
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("mainpcb:ANALOG1")
+	PORT_START("mainpcb:ANALOG.0")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("mainpcb:ANALOG2")
+	PORT_START("mainpcb:ANALOG.1")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("mainpcb:ANALOG3")
+	PORT_START("mainpcb:ANALOG.2")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("mainpcb:ANALOG4")
+	PORT_START("mainpcb:ANALOG.3")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START("mainpcb:ANALOG7")
+	PORT_START("mainpcb:ANALOG.6")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START("mainpcb:ANALOG8")
+	PORT_START("mainpcb:ANALOG.7")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -2184,13 +2182,13 @@ static INPUT_PORTS_START( radm )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:ANALOG1")
+	PORT_START("mainpcb:ANALOG.0")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
-	PORT_START("mainpcb:ANALOG2")
+	PORT_START("mainpcb:ANALOG.1")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
-	PORT_START("mainpcb:ANALOG3")
+	PORT_START("mainpcb:ANALOG.2")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
@@ -2224,13 +2222,13 @@ static INPUT_PORTS_START( radr )
 	PORT_DIPSETTING(    0x00, "Automatic" )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:ANALOG1")
+	PORT_START("mainpcb:ANALOG.0")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
-	PORT_START("mainpcb:ANALOG2")
+	PORT_START("mainpcb:ANALOG.1")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
-	PORT_START("mainpcb:ANALOG3")
+	PORT_START("mainpcb:ANALOG.2")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
@@ -2255,16 +2253,16 @@ static INPUT_PORTS_START( scross )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:ANALOG1")
+	PORT_START("mainpcb:ANALOG.0")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START("mainpcb:ANALOG2")
+	PORT_START("mainpcb:ANALOG.1")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("mainpcb:ANALOG3")
+	PORT_START("mainpcb:ANALOG.2")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
 
-	PORT_START("mainpcb:ANALOG4")
+	PORT_START("mainpcb:ANALOG.3")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -2298,13 +2296,13 @@ static INPUT_PORTS_START( slipstrm )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:ANALOG1")
+	PORT_START("mainpcb:ANALOG.0")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
-	PORT_START("mainpcb:ANALOG2")
+	PORT_START("mainpcb:ANALOG.1")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
-	PORT_START("mainpcb:ANALOG3")
+	PORT_START("mainpcb:ANALOG.2")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
@@ -2353,7 +2351,7 @@ static INPUT_PORTS_START( spidman )
 	PORT_MODIFY("mainpcb:P2_A")
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:EXTRA1")
+	PORT_START("mainpcb:EXTRA.0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2362,7 +2360,7 @@ static INPUT_PORTS_START( spidman )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
 
-	PORT_START("mainpcb:EXTRA2")
+	PORT_START("mainpcb:EXTRA.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2371,7 +2369,7 @@ static INPUT_PORTS_START( spidman )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
 
-	PORT_START("mainpcb:EXTRA3")
+	PORT_START("mainpcb:EXTRA.2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START4 )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2385,7 +2383,7 @@ static INPUT_PORTS_START( spidmanu )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )
 
-	PORT_MODIFY("mainpcb:EXTRA3")
+	PORT_MODIFY("mainpcb:EXTRA.2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
 INPUT_PORTS_END

@@ -504,12 +504,16 @@ protected:
 
 private:
 	int m_coin_counter[2];
+	optional_ioport m_test_port;
+	optional_ioport_array<2> m_player_ports;
 };
 
 const device_type COBRA_JVS = &device_creator<cobra_jvs>;
 
 cobra_jvs::cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: jvs_device(mconfig, COBRA_JVS, "JVS (COBRA)", tag, owner, clock, "cobra_jvs", __FILE__)
+	: jvs_device(mconfig, COBRA_JVS, "JVS (COBRA)", tag, owner, clock, "cobra_jvs", __FILE__),
+		m_test_port(*this, ":TEST"),
+		m_player_ports(*this, ":PLAYER_INPUT")
 {
 	m_coin_counter[0] = 0;
 	m_coin_counter[1] = 0;
@@ -551,13 +555,11 @@ bool cobra_jvs::switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_switc
 	if (count_players > 2 || bytes_per_switch > 2)
 		return false;
 
-	static const char* player_ports[2] = { ":P1", ":P2" };
-
-	*buf++ = read_safe(ioport(":TEST"), 0);
+	*buf++ = m_test_port.read_safe(0);
 
 	for (int i=0; i < count_players; i++)
 	{
-		UINT32 pval = read_safe(ioport(player_ports[i]), 0);
+		UINT32 pval = m_player_ports[i].read_safe(0);
 		for (int j=0; j < bytes_per_switch; j++)
 		{
 			*buf++ = (UINT8)(pval >> ((1-j) * 8));
@@ -3160,7 +3162,7 @@ INPUT_PORTS_START( cobra )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("P1")
+	PORT_START("PLAYER_INPUT.0")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("P1 Service") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -3178,7 +3180,7 @@ INPUT_PORTS_START( cobra )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
 
-	PORT_START("P2")
+	PORT_START("PLAYER_INPUT.1")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("P2 Service") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)

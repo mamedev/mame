@@ -59,6 +59,7 @@ public:
 		m_scsp1(*this, "scsp1"),
 		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
+		m_adc_ports(*this, "ADC"),
 		m_work_ram(*this, "work_ram"),
 		m_paletteram64(*this, "paletteram64"),
 		m_dsbz80(*this, DSBZ80_TAG),
@@ -77,6 +78,8 @@ public:
 	required_device<scsp_device> m_scsp1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<screen_device> m_screen;
+
+	optional_ioport_array<8> m_adc_ports;
 
 	required_shared_ptr<UINT64> m_work_ram;
 	required_shared_ptr<UINT64> m_paletteram64;

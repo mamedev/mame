@@ -224,14 +224,13 @@ READ8_MEMBER(djmain_state::inp2_r)
 READ32_MEMBER(djmain_state::turntable_r)
 {
 	UINT32 result = 0;
-	static const char *const ttnames[] = { "TT1", "TT2" };
 
 	if (ACCESSING_BITS_8_15)
 	{
 		UINT8 pos;
 		int delta;
 
-		pos = read_safe(ioport(ttnames[m_turntable_select]), 0);
+		pos = m_turntable[m_turntable_select].read_safe(0);
 		delta = pos - m_turntable_last_pos[m_turntable_select];
 		if (delta < -128)
 			delta += 256;
@@ -465,9 +464,9 @@ static INPUT_PORTS_START( beatmania_btn ) // and turntables
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("UNK2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("TT1")       /* turn table 1P */
+	PORT_START("TT.0")       /* turn table 1P */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_PLAYER(1)
-	PORT_START("TT2")       /* turn table 2P */
+	PORT_START("TT.1")       /* turn table 2P */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -1034,9 +1033,9 @@ static INPUT_PORTS_START( popnmusic_btn )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("UNK2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	//PORT_START("TT1")     /* turn table 1P */
+	//PORT_START("TT.0")     /* turn table 1P */
 	//PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_PLAYER(1)
-	//PORT_START("TT2")     /* turn table 2P */
+	//PORT_START("TT.1")     /* turn table 2P */
 	//PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -1225,9 +1224,9 @@ static INPUT_PORTS_START( popnstage )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("UNK2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	//PORT_START("TT1")     /* turn table 1P */
+	//PORT_START("TT.0")     /* turn table 1P */
 	//PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_PLAYER(1)
-	//PORT_START("TT2")     /* turn table 2P */
+	//PORT_START("TT.1")     /* turn table 2P */
 	//PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_PLAYER(2)
 
 	PORT_START("DSW1")

@@ -177,10 +177,7 @@ READ16_MEMBER( segahang_state::hangon_io_r )
 			return m_i8255_2->read(space, offset & 3);
 
 		case 0x3020/2: // ADC0804 data output
-		{
-			static const char *const adcports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
-			return read_safe(ioport(adcports[m_adc_select]), 0);
-		}
+			return m_adc_ports[m_adc_select].read_safe(0);
 	}
 
 	//logerror("%06X:hangon_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
@@ -238,10 +235,7 @@ READ16_MEMBER( segahang_state::sharrier_io_r )
 			return m_i8255_2->read(space, offset & 3);
 
 		case 0x0030/2: // ADC0804 data output
-		{
-			static const char *const adcports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
-			return read_safe(ioport(adcports[m_adc_select]), 0);
-		}
+			return m_adc_ports[m_adc_select].read_safe(0);
 	}
 
 	//logerror("%06X:sharrier_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
@@ -391,7 +385,7 @@ void segahang_state::sharrier_i8751_sim()
 	m_workram[0x0f0/2] = 0;
 
 	// read I/O ports
-	m_workram[0x492/2] = (ioport("ADC0")->read() << 8) | ioport("ADC1")->read();
+	m_workram[0x492/2] = (m_adc_ports[0]->read() << 8) | m_adc_ports[1]->read();
 }
 
 
@@ -590,13 +584,13 @@ static INPUT_PORTS_START( hangon )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 
-	PORT_START("ADC0")  // steering
+	PORT_START("ADC.0")  // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_START("ADC1")  // gas pedal
+	PORT_START("ADC.1")  // gas pedal
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 
-	PORT_START("ADC2")  // brake
+	PORT_START("ADC.2")  // brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 INPUT_PORTS_END
 
@@ -632,13 +626,13 @@ static INPUT_PORTS_START( shangupb )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START("ADC0")  // steering
+	PORT_START("ADC.0")  // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_START("ADC1")  // gas pedal
+	PORT_START("ADC.1")  // gas pedal
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 
-	PORT_START("ADC2")  // brake
+	PORT_START("ADC.2")  // brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 INPUT_PORTS_END
 
@@ -684,10 +678,10 @@ static INPUT_PORTS_START( sharrier )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START("ADC0")  // X axis
+	PORT_START("ADC.0")  // X axis
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_START("ADC1")  // Y axis
+	PORT_START("ADC.1")  // Y axis
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 INPUT_PORTS_END
 
@@ -722,16 +716,16 @@ static INPUT_PORTS_START( enduror )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("ADC0")  // gas pedal
+	PORT_START("ADC.0")  // gas pedal
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 
-	PORT_START("ADC1")  // brake
+	PORT_START("ADC.1")  // brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 
-	PORT_START("ADC2")  // bank up/down
+	PORT_START("ADC.2")  // bank up/down
 	PORT_BIT( 0xff, 0x20, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 
-	PORT_START("ADC3")  // steering
+	PORT_START("ADC.3")  // steering
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 INPUT_PORTS_END
 

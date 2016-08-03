@@ -111,6 +111,7 @@ public:
 
 	// make reference use transparent as well
 	operator _DeviceClass &() { assert(object_finder_base<_DeviceClass>::m_target != nullptr); return *object_finder_base<_DeviceClass>::m_target; }
+	_DeviceClass &operator*() { assert(object_finder_base<_DeviceClass>::m_target != nullptr); return *object_finder_base<_DeviceClass>::m_target; }
 
 	// finder
 	virtual bool findit(bool isvalidation = false) override
@@ -155,6 +156,7 @@ public:
 
 	// make reference use transparent as well
 	operator memory_region &() const { assert(object_finder_base<memory_region>::m_target != nullptr); return *object_finder_base<memory_region>::m_target; }
+	memory_region &operator*() const { assert(object_finder_base<memory_region>::m_target != nullptr); return *object_finder_base<memory_region>::m_target; }
 
 	// finder
 	virtual bool findit(bool isvalidation = false) override
@@ -193,6 +195,7 @@ public:
 
 	// make reference use transparent as well
 	operator memory_bank &() const { assert(object_finder_base<memory_bank>::m_target != nullptr); return *object_finder_base<memory_bank>::m_target; }
+	memory_bank &operator*() const { assert(object_finder_base<memory_bank>::m_target != nullptr); return *object_finder_base<memory_bank>::m_target; }
 
 	// finder
 	virtual bool findit(bool isvalidation = false) override
@@ -231,9 +234,10 @@ public:
 
 	// make reference use transparent as well
 	operator ioport_port &() const { assert(object_finder_base<ioport_port>::m_target != nullptr); return *object_finder_base<ioport_port>::m_target; }
+	ioport_port &operator*() const { assert(object_finder_base<ioport_port>::m_target != nullptr); return *object_finder_base<ioport_port>::m_target; }
 
-	// allow dereference even when target is nullptr so read_safe() can be used
-	ioport_port *operator->() const override { return object_finder_base<ioport_port>::m_target; }
+	// read if found, or else return a default value
+	ioport_value read_safe(ioport_value defval) { return m_target != nullptr ? m_target->read() : defval; }
 
 	// finder
 	virtual bool findit(bool isvalidation = false) override

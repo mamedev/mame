@@ -278,6 +278,11 @@ protected:
 
 private:
 	devcb_read16  m_openbus_cb;
+	optional_ioport m_options;
+	optional_ioport m_debug1;
+	optional_ioport m_debug2;
+	optional_ioport m_debug3;
+	optional_ioport m_debug4;
 };
 
 

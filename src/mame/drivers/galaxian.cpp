@@ -687,7 +687,7 @@ INTERRUPT_GEN_MEMBER(galaxian_state::fakechange_interrupt_gen)
 {
 	interrupt_gen(device);
 
-	if (read_safe(ioport("FAKE_SELECT"), 0x00))
+	if (m_fake_select.read_safe(0x00))
 	{
 		m_tenspot_current_game++;
 		m_tenspot_current_game%=10;
@@ -2973,7 +2973,7 @@ static INPUT_PORTS_START( tenspot )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	// yes, the board has 10 banks of dipswitches...
-	PORT_START("IN2_GAME0")
+	PORT_START("IN2_GAME.0")
 	PORT_DIPNAME( 0x01, 0x01, "Survivor DSW0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2999,7 +2999,7 @@ static INPUT_PORTS_START( tenspot )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN2_GAME1")
+	PORT_START("IN2_GAME.1")
 	PORT_DIPNAME( 0x01, 0x01, "Moon Cresta DSW0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3011,7 +3011,7 @@ static INPUT_PORTS_START( tenspot )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
-	PORT_START("IN2_GAME2")
+	PORT_START("IN2_GAME.2")
 	PORT_DIPNAME( 0x01, 0x01, "Space Cruiser DSW0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3023,7 +3023,7 @@ static INPUT_PORTS_START( tenspot )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
-	PORT_START("IN2_GAME3")
+	PORT_START("IN2_GAME.3")
 	PORT_DIPNAME( 0x01, 0x01, "Mission Rescue DSW0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3035,7 +3035,7 @@ static INPUT_PORTS_START( tenspot )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
-	PORT_START("IN2_GAME4")
+	PORT_START("IN2_GAME.4")
 	PORT_DIPNAME( 0x01, 0x01, "Uniwars DSW0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3047,7 +3047,7 @@ static INPUT_PORTS_START( tenspot )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
-	PORT_START("IN2_GAME5")
+	PORT_START("IN2_GAME.5")
 	PORT_DIPNAME( 0x01, 0x01, "Batman Pt.2 DSW0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3059,7 +3059,7 @@ static INPUT_PORTS_START( tenspot )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
-	PORT_START("IN2_GAME6")
+	PORT_START("IN2_GAME.6")
 	PORT_DIPNAME( 0x01, 0x01, "Defend UFO DSW0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3071,7 +3071,7 @@ static INPUT_PORTS_START( tenspot )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
-	PORT_START("IN2_GAME7")
+	PORT_START("IN2_GAME.7")
 	PORT_DIPNAME( 0x01, 0x01, "King and Balloon DSW0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3083,7 +3083,7 @@ static INPUT_PORTS_START( tenspot )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
-	PORT_START("IN2_GAME8")
+	PORT_START("IN2_GAME.8")
 	PORT_DIPNAME( 0x01, 0x01, "Omega DSW0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3095,7 +3095,7 @@ static INPUT_PORTS_START( tenspot )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
-	PORT_START("IN2_GAME9")
+	PORT_START("IN2_GAME.9")
 	PORT_DIPNAME( 0x01, 0x01, "Battle of Atlantis DSW0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -6589,9 +6589,10 @@ DRIVER_INIT_MEMBER(galaxian_state,pacmanbl)
 
 READ8_MEMBER(galaxian_state::tenspot_dsw_read)
 {
-	char tmp[64];
-	sprintf(tmp,"IN2_GAME%d", m_tenspot_current_game);
-	return read_safe(ioport(tmp), 0x00);
+	if (m_tenspot_current_game >= 0 && m_tenspot_current_game < 10)
+		return m_tenspot_game_dsw[m_tenspot_current_game]->read();
+	else
+		return 0x00;
 }
 
 

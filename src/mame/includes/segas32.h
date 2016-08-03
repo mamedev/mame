@@ -25,6 +25,15 @@ public:
 	required_shared_ptr<UINT16> m_system32_spriteram;
 	optional_shared_ptr_array<UINT16, 2> m_system32_paletteram;
 
+	optional_ioport_array<8> m_ports_a;
+	optional_ioport_array<8> m_ports_b;
+	DECLARE_IOPORT_ARRAY(io_ports_a);
+	DECLARE_IOPORT_ARRAY(io_ports_b);
+	optional_ioport_array<8> m_analog_ports;
+	optional_ioport_array<4> m_extra_ports;
+	optional_ioport_array<6> m_track_ports;
+	DECLARE_IOPORT_ARRAY(track_ports);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<multipcm_device> m_multipcm;

@@ -228,7 +228,11 @@ CUSTOM_INPUT_MEMBER(naomi_state::naomi_mp_r)
 	for (int i = 0x80; i >= 0x08; i >>= 1)
 	{
 		if (m_mp_mux & i)
-			retval |= read_safe(ioport(tagptr), 0);
+		{
+			ioport_port *port = ioport(tagptr);
+			if (port != nullptr)
+				retval |= port->read();
+		}
 		tagptr += strlen(tagptr) + 1;
 	}
 	return retval;

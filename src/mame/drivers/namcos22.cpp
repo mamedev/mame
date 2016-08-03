@@ -1686,7 +1686,7 @@ READ16_MEMBER(namcos22_state::namcos22_portbit_r)
 
 WRITE16_MEMBER(namcos22_state::namcos22_portbit_w)
 {
-	m_portbits[offset] = read_safe(ioport((offset == 0) ? "P1" : "P2"), 0xffff);
+	m_portbits[offset] = ((offset == 0) ? m_p1 : m_p2).read_safe(0xffff);
 }
 
 READ16_MEMBER(namcos22_state::namcos22_dipswitch_r)
@@ -2760,9 +2760,9 @@ WRITE8_MEMBER(namcos22_state::mcu_port5_w)
 READ8_MEMBER(namcos22_state::mcu_port5_r)
 {
 	if (m_p4 & 8)
-		return read_safe(ioport("MCUP5A"), 0xff);
+		return m_mcup5a.read_safe(0xff);
 	else
-		return read_safe(ioport("MCUP5B"), 0xff);
+		return m_mcup5b.read_safe(0xff);
 }
 
 WRITE8_MEMBER(namcos22_state::mcu_port6_w)
@@ -2787,7 +2787,7 @@ READ8_MEMBER(namcos22_state::mcu_port7_r)
 
 READ8_MEMBER(namcos22_state::namcos22s_mcu_adc_r)
 {
-	UINT16 adc = read_safe(m_adc_ports[offset >> 1 & 7], 0) << 2;
+	UINT16 adc = m_adc_ports[offset >> 1 & 7].read_safe(0) << 2;
 	return (offset & 1) ? adc >> 8 : adc;
 }
 

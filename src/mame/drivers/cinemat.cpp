@@ -151,7 +151,7 @@ READ8_MEMBER(cinemat_state::joystick_read)
 	else
 	{
 		int const xval = INT16(m_maincpu->state_int(CCPU_X) << 4) >> 4;
-		return (read_safe(ioport(m_mux_select ? "ANALOGX" : "ANALOGY"), 0) - xval) < 0x800;
+		return ((m_mux_select ? m_analog_x : m_analog_y).read_safe(0) - xval) < 0x800;
 	}
 }
 

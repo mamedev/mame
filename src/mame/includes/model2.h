@@ -42,7 +42,10 @@ public:
 		m_palette(*this, "palette"),
 		m_scsp(*this, "scsp"),
 		m_cryptdevice(*this, "315_5881"),
-		m_0229crypt(*this, "317_0229")
+		m_0229crypt(*this, "317_0229"),
+		m_in0(*this, "IN0"),
+		m_gears(*this, "GEARS"),
+		m_analog_ports(*this, "ANA")
 
 		{ }
 
@@ -72,6 +75,10 @@ public:
 	optional_device<scsp_device> m_scsp;
 	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
 	optional_device<sega_315_5838_comp_device> m_0229crypt;
+
+	required_ioport m_in0;
+	optional_ioport m_gears;
+	optional_ioport_array<4> m_analog_ports;
 
 	UINT32 m_intreq;
 	UINT32 m_intena;
