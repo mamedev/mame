@@ -78,7 +78,7 @@ private:
 	const char *                    m_interface;
 	std::string &                   m_result;
 	std::list<entry_info>           m_entrylist;
-	char                            m_filename_buffer[1024];
+	std::string                     m_filename_buffer;
 	bool                            m_ordered_by_shortname;
 
 	// functions
