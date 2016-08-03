@@ -710,7 +710,7 @@ void chihiro_state::hack_eeprom()
 	m_maincpu->space(0).write_byte(0x3b767, 0xc3);
 }
 
-#define HACK_ITEMS 4
+#define HACK_ITEMS 5
 static const struct {
 	const char *game_name;
 	const bool disable_usb;
@@ -722,6 +722,7 @@ static const struct {
 						{ "outr2",    true,  { { 0x12e4cf, 0x01 }, { 0x12e4d0, 0x00 }, { 0x4793e, 0x01 }, { 0x4793f, 0x00 }, { 0x47aa3, 0x01 }, { 0x47aa4, 0x00 }, { 0x14f2b6, 0x84 }, { 0x14f2d1, 0x75 }, { 0x8732f, 0x7d }, { 0x87384, 0x7d }, { 0x87388, 0xeb }, { 0, 0 } } },
 						{ "crtaxihr", false, { { 0x14ada5/*11fda5*/, 0x90 },{ 0x14ada6/*11fda6*/, 0x90 }, { 0, 0 } } },
 						{ "ghostsqu", false, { { 0x78833/*4d833*/, 0x90 },{ 0x78834/*4d834*/, 0x90 }, { 0, 0 } } },
+						{ "vcop3",    false, { { 0x61a23/*36a23*/, 0x90 },{ 0x61a24/*36a24*/, 0x90 }, { 0, 0 } } },
 };
 
 void chihiro_state::hack_usb()
