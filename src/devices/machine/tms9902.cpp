@@ -135,7 +135,7 @@ void tms9902_device::rcv_cts(line_state state)
 	else
 	{
 		m_DSCH = false;
-		if (TRACE_LINES) logerror("no change in CTS line, no interrupt.");
+		if (TRACE_LINES) logerror("no change in CTS line, no interrupt.\n");
 	}
 }
 
@@ -165,7 +165,7 @@ void tms9902_device::rcv_dsr(line_state state)
 	else
 	{
 		m_DSCH = false;
-		if (TRACE_LINES) logerror("no change in DSR line, no interrupt.");
+		if (TRACE_LINES) logerror("no change in DSR line, no interrupt.\n");
 	}
 }
 
@@ -188,7 +188,7 @@ void tms9902_device::rcv_data(UINT8 data)
 		// Receive buffer was empty
 		m_RBRL = true;
 		m_ROVER = false;
-		if (TRACE_BUFFER) logerror("Receive buffer loaded with byte %02x\n", data);
+		if (TRACE_BUFFER) logerror("Receive buffer loaded with byte %02x; RIENB=%d\n", data, m_RIENB);
 		field_interrupts();
 	}
 	else
@@ -387,7 +387,7 @@ void tms9902_device::transmit_line_state()
 	// The 9902 only outputs RTS and BRK
 	if (TRACE_SETTING) logerror("transmitting line state (only RTS) = %02x\n", (m_RTSout)? 1:0);
 	m_last_config_value = (m_RTSout)? RTS : 0;
-	m_ctrl_cb((offs_t)LINES, RTS);
+	m_ctrl_cb((offs_t)(LINES | RTS), RTS);
 }
 
 void tms9902_device::set_rts(line_state state)
@@ -422,7 +422,6 @@ void tms9902_device::initiate_transmit()
 			set_rts(CLEAR_LINE);
 		else
 		{
-			if (TRACE_BUFFER) logerror("transferring XBR to XSR; XSRE=false, XBRE=true\n");
 			m_XSR = m_XBR;
 			m_XSRE = false;
 			m_XBRE = true;
@@ -502,10 +501,11 @@ READ8_MEMBER( tms9902_device::cruread )
 		break;
 
 	case 0: // Bits 7-0
+		if (TRACE_CRU) logerror("Reading received byte = %02x\n", m_RBR);
 		answer = m_RBR;
 		break;
 	}
-	if (TRACE_CRU) logerror("Reading flag bits %d - %d = %02x\n", ((offset+1)*8-1), offset*8, answer);
+	if (TRACE_CRU && TRACE_DETAIL) logerror("Reading flag bits %d - %d = %02x\n", ((offset+1)*8-1), offset*8, answer);
 	return answer;
 }
 
@@ -560,7 +560,7 @@ void tms9902_device::reset_uart()
 
 	m_DSCH = false;
 	m_TIMELP = false;
-	m_CTSin = false;
+//  m_CTSin = false;   // not a good idea - this is the latch of an incoming line
 
 	m_TMR = 0;
 	m_STOPB = 0;
@@ -585,7 +585,7 @@ WRITE8_MEMBER( tms9902_device::cruwrite )
 	data &= 1;  /* clear extra bits */
 
 	offset &= 0x1F;
-	if (TRACE_CRU) logerror("Setting bit %d = %02x\n", offset, data);
+	if (TRACE_CRU && TRACE_DETAIL) logerror("Setting bit %d = %02x\n", offset, data);
 
 	if (offset <= 10)
 	{
@@ -777,7 +777,7 @@ WRITE8_MEMBER( tms9902_device::cruwrite )
 			// (the only way to clear the flag!)
 			m_RIENB = (data!=0);
 			m_RBRL = false;
-			if (TRACE_CRU) logerror("set RBRL=0, set RIENB=%d\n", data);
+			if (TRACE_CRU) logerror("Set RBRL=0, set RIENB=%d\n", data);
 			field_interrupts();
 			return;
 		case 19:
@@ -828,6 +828,9 @@ void tms9902_device::device_stop()
 
 void tms9902_device::device_reset()
 {
+	// This must be true because we may have missed a CTS* assertion
+	// on startup, and the whole implementation relies on pushing
+	m_CTSin = true;
 	reset_uart();
 }
 
