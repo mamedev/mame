@@ -12,6 +12,10 @@
 #include "rendfont.h"
 #include "render.h"
 
+#include <cstddef>
+#include <cstring>
+
+
 namespace ui {
 /***************************************************************************
 INLINE FUNCTIONS
@@ -111,10 +115,10 @@ text_layout::~text_layout()
 
 void text_layout::add_text(const char *text, const char_style &style)
 {
-	int position = 0;
-	int text_length = strlen(text);
+	std::size_t position = 0;
+	std::size_t const text_length = std::strlen(text);
 
-	while(position < text_length)
+	while (position < text_length)
 	{
 		// adding a character - we might change the width
 		invalidate_calculated_actual_width();
@@ -124,16 +128,15 @@ void text_layout::add_text(const char *text, const char_style &style)
 		{
 			// get the current character
 			unicode_char schar;
-			int scharcount;
-			scharcount = uchar_from_utf8(&schar, &text[position], text_length - position);
-			if (scharcount == -1)
+			int const scharcount = uchar_from_utf8(&schar, &text[position], text_length - position);
+			if (scharcount < 0)
 				break;
 
 			// if the line starts with a tab character, center it regardless
 			text_justify line_justify = justify();
 			if (schar == '\t')
 			{
-				position += scharcount;
+				position += unsigned(scharcount);
 				line_justify = text_layout::CENTER;
 			}
 
@@ -142,12 +145,11 @@ void text_layout::add_text(const char *text, const char_style &style)
 		}
 
 		// get the current character
-		int scharcount;
 		unicode_char ch;
-		scharcount = uchar_from_utf8(&ch, &text[position], text_length - position);
+		int const scharcount = uchar_from_utf8(&ch, &text[position], text_length - position);
 		if (scharcount < 0)
 			break;
-		position += scharcount;
+		position += unsigned(scharcount);
 
 		// set up source information
 		source_info source = { 0, };
