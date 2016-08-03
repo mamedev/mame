@@ -78,7 +78,7 @@ bool path_iterator::next(std::string &buffer, const char *name)
 file_enumerator::file_enumerator(const char *searchpath)
 	: m_iterator(searchpath),
 		m_curdir(nullptr)/*,
-        m_buflen(0)*/
+		m_buflen(0)*/
 {
 }
 

@@ -22,7 +22,7 @@
 //  STATIC VARIABLES
 //**************************************************************************
 
-static std::regex s_softlist_regex("\\w+\\:\\w+\\:\\w+");
+static std::regex s_potenial_softlist_regex("\\w+(\\:\\w+\\:\\w+)?");
 
 
 //**************************************************************************
@@ -47,18 +47,19 @@ image_manager::image_manager(running_machine &machine)
 		const char *image_name_ptr = machine.options().value(image.instance_name());
 		if ((image_name_ptr != nullptr) && (image_name_ptr[0] != '\0'))
 		{
+			image_init_result result = image_init_result::FAIL;
 			std::string image_name(image_name_ptr);
 
 			// mark init state
 			image.set_init_phase();
 
-			// is this image really a softlist part?
-			bool is_softlist_part = std::regex_match(image_name, s_softlist_regex);
+			// try as a softlist
+			if (std::regex_match(image_name, s_potenial_softlist_regex))
+				result = image.load_software(image_name);
 
-			// try to load this image
-			image_init_result result = is_softlist_part
-				? image.load_software(image_name)
-				: image.load(image_name.c_str());
+			// failing that, try as an image
+			if (result != image_init_result::PASS)
+				result = image.load(image_name);
 
 			// did the image load fail?
 			if (result != image_init_result::PASS)

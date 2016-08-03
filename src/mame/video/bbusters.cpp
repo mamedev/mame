@@ -122,19 +122,19 @@ inline const UINT8 *bbusters_state::get_source_ptr(gfx_element *gfx, UINT32 spri
 		break;
 
 	case 1: /* 32 x 32 block
-                0 1
-                2 3
-            */
+	            0 1
+	            2 3
+	        */
 		ADJUST_4x4;
 		break;
 
 	case 2: /* 64 by 64 block
-                0  1    4  5
-                2  3    6  7
+	            0  1    4  5
+	            2  3    6  7
 
-                8  9    12 13
-                10 11   14 15
-            */
+	            8  9    12 13
+	            10 11   14 15
+	        */
 		ADJUST_4x4;
 		ADJUST_8x8;
 		break;

@@ -228,7 +228,7 @@ public:
 	const formatlist_type &formatlist() const { return m_formatlist; }
 
 	// loads an image file
-	image_init_result load(const char *path);
+	image_init_result load(const std::string &path);
 
 	// loads a softlist item by name
 	image_init_result load_software(const std::string &softlist_name);
@@ -236,9 +236,9 @@ public:
 	bool open_image_file(emu_options &options);
 	image_init_result finish_load();
 	void unload();
-	image_init_result create(const char *path, const image_device_format *create_format, util::option_resolution *create_args);
+	image_init_result create(const std::string &path, const image_device_format *create_format, util::option_resolution *create_args);
 	bool load_software(software_list_device &swlist, const char *swname, const rom_entry *entry);
-	int reopen_for_write(const char *path);
+	int reopen_for_write(const std::string &path);
 
 	static void software_name_split(const char *swlist_swname, std::string &swlist_name, std::string &swname, std::string &swpart);
 	static void static_set_user_loadable(device_t &device, bool user_loadable) {
@@ -267,7 +267,7 @@ protected:
 	void check_for_file() const { assert_always(m_file, "Illegal operation on unmounted image"); }
 
 	void setup_working_directory();
-	bool try_change_working_directory(const char *subdir);
+	bool try_change_working_directory(const std::string &subdir);
 
 	void run_hash(void (*partialhash)(util::hash_collection &, const unsigned char *, unsigned long, const char *), util::hash_collection &hashes, const char *types);
 	void image_checkhash();

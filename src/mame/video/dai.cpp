@@ -71,30 +71,30 @@ UINT32 dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap,
 	UINT16 current_video_memory_address = dai_video_memory_start;
 
 	UINT8 mode;         /* mode byte of line
-                       bits 0-3 - line repeat count
-                       bits 4-5 - resolution control
-                       bits 6-7 - display mode control */
+	                   bits 0-3 - line repeat count
+	                   bits 4-5 - resolution control
+	                   bits 6-7 - display mode control */
 	UINT8 colour;           /* colour byte of line
-                       bits 0-3 - one of 16 colours
-                       bits 4-5 - colour register for update
-                       bit  6   - if unset force 'unit colour mode'
-                       bit  7   - enable coulor change
-                                  if unset bits 0-5 are ignored */
+	                   bits 0-3 - one of 16 colours
+	                   bits 4-5 - colour register for update
+	                   bit  6   - if unset force 'unit colour mode'
+	                   bit  7   - enable coulor change
+	                              if unset bits 0-5 are ignored */
 	UINT8 line_repeat_count;    /* number of horizontalraster scans
-                       for which same data will be displayed
-                       0000 - 2 lines
-                       each additional repeat adds 2 scans */
+	                   for which same data will be displayed
+	                   0000 - 2 lines
+	                   each additional repeat adds 2 scans */
 	UINT8 horizontal_resolution;    /* number of blobs per line
-                       00 - 88 (low resolution graphics)
-                       01 - 176 (medium resolution graphics)
-                       10 - 352 (high resolution graphics)
-                       11 - 528 (text with 66 chars per line) */
+	                   00 - 88 (low resolution graphics)
+	                   01 - 176 (medium resolution graphics)
+	                   10 - 352 (high resolution graphics)
+	                   11 - 528 (text with 66 chars per line) */
 	UINT8 display_mode;     /* determine how data will be used
-                       to generate the picture
-                       00 - four colour graphics
-                       01 - four colour characters
-                       10 - sixteen colour graphics
-                       11 - sixteen colour characters */
+	                   to generate the picture
+	                   00 - four colour graphics
+	                   01 - four colour characters
+	                   10 - sixteen colour graphics
+	                   11 - sixteen colour characters */
 	UINT8 unit_mode;
 
 	UINT8 current_data_1, current_data_2;

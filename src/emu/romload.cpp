@@ -804,22 +804,25 @@ void rom_load_manager::fill_rom_data(const rom_entry *romp)
 	int skip = ROM_GETSKIPCOUNT(romp);
 	UINT8 *base = m_region->base() + ROM_GETOFFSET(romp);
 
-	/* make sure we fill within the region space */
+	// make sure we fill within the region space
 	if (ROM_GETOFFSET(romp) + numbytes > m_region->bytes())
 		fatalerror("Error in RomModule definition: FILL out of memory region space\n");
 
-	/* make sure the length was valid */
+	// make sure the length was valid
 	if (numbytes == 0)
 		fatalerror("Error in RomModule definition: FILL has an invalid length\n");
 
-	/* fill the data (filling value is stored in place of the hashdata) */
+	// for fill bytes, the byte that gets filled is the first byte of the hashdata string
+	UINT8 fill_byte = (UINT8)atoi(ROM_GETHASHDATA(romp));
+
+	// fill the data (filling value is stored in place of the hashdata)
 	if(skip != 0)
 	{
 		for (int i = 0; i < numbytes; i+= skip + 1)
-			base[i] = (FPTR)ROM_GETHASHDATA(romp) & 0xff;
+			base[i] = fill_byte;
 	}
 	else
-		memset(base, (FPTR)ROM_GETHASHDATA(romp) & 0xff, numbytes);
+		memset(base, fill_byte, numbytes);
 }
 
 

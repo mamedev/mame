@@ -11,7 +11,7 @@ void mb86901_device::log_fcodes()
 {
 	if (PC != 0xffef0000 && PC != m_ss1_next_entry_point)
 		return;
-	
+
 	if (PC == 0xffef0000)
 	{
 		UINT32 opcode = read_sized_word(11, REG(5), 2);
@@ -31,7 +31,7 @@ void mb86901_device::log_fcodes()
 		}
 		//else if (opcode == 0x0cb8)
 		//{
-		//	m_log_fcodes = false;
+		//  m_log_fcodes = false;
 		//}
 		UINT32 handler_base = opcode << 2;
 		handler_base += REG(2); // l1 = r2 + opcode << 2
@@ -64,7 +64,7 @@ void mb86901_device::indent()
 	if (program_depth < 15)
 		return;
 	program_depth -= 15;
-	
+
 	for (int i = 0; i < program_depth; i++)
 	{
 		printf("    ");
@@ -76,7 +76,7 @@ void mb86901_device::disassemble_ss1_fcode(UINT32 r5, UINT32 opcode, UINT32 hand
 	std::string opdesc = m_ss1_fcode_table[opcode];
 	if (opdesc.length() == 0)
 		opdesc = "[unknown]";
-	
+
 	indent(); printf("\n");
 	indent(); printf("Stacks before this forth code:\n");
 	indent(); printf("Data                    Return\n");
@@ -130,7 +130,7 @@ void mb86901_device::disassemble_ss1_fcode(UINT32 r5, UINT32 opcode, UINT32 hand
 	while (m_ss1_fcode_table[base_op].length() == 0)
 		base_op--;
 	UINT32 dist = (exact_op - base_op) * 4;
-	
+
 	if (entry_point == 0xffe87964)
 	{
 		indent(); printf("Opcode at %08x (%04x + %x): %04x, entry is at %08x // %s ; call %08x\n", r5, base_op, dist, opcode, entry_point, opdesc.c_str(), handler_base + 2);

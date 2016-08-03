@@ -1,8 +1,10 @@
 *~
 .*.sw?
 *.mo
+*.orig
 *.pyc
 *.pyo
+*.rej
 .DS_Store
 
 /*

@@ -306,7 +306,7 @@ READ8_MEMBER( rex6000_state::touchscreen_r )
 	switch (offset)
 	{
 		case 0x08:
-			return ((ioport("INPUT")->read() & 0x40) ? 0x20 : 0x00) | 0X10;
+			return ((ioport("INPUT")->read() & 0x40) ? 0x20 : 0x00) | 0x10;
 		case 0x09:
 			if (m_touchscreen[4] & 0x80)
 				return (battery>>0) & 0xff;

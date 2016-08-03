@@ -1,7 +1,7 @@
 @rem ----------------------------------------------------
 @rem MAME Testing script
 @rem (Windows only at the moment, sorry!)
-@rem 
+@rem
 @rem Initial setup of the script:
 @rem
 @rem    1. Create a fresh directory mametest/
@@ -25,7 +25,7 @@
 @rem    1. Concatenate the summary files together:
 @rem         copy summary*.log summary-final.log
 @rem    1. Open a command prompt to mametest.
-@rem    2. Make sure you have run tests for at least two 
+@rem    2. Make sure you have run tests for at least two
 @rem        versions (mametest/ver1 and mametest/ver2)
 @rem    3. Create an output directory (mametest/report)
 @rem    4. Run "regrep report ver1\summary-final.log ver2\summary-final.log"
@@ -48,10 +48,10 @@ if not exist mame.exe (
 )
 
 @rem ----------------------------------------------------
-@rem By default we generate our own list; however, a list 
-@rem can be specified by an alternate parameter. If a 
-@rem parameter is given, we leave the existing log and 
-@rem snap directories intact; otherwise, we delete them 
+@rem By default we generate our own list; however, a list
+@rem can be specified by an alternate parameter. If a
+@rem parameter is given, we leave the existing log and
+@rem snap directories intact; otherwise, we delete them
 @rem and start fresh.
 @rem ----------------------------------------------------
 
@@ -128,14 +128,14 @@ goto :eof
 
 
 @rem ----------------------------------------------------
-@rem Iterate over drivers in the log, extracting the 
+@rem Iterate over drivers in the log, extracting the
 @rem source filename as well, and passing both to runone.
 @rem ----------------------------------------------------
 
 :sublaunch
 set CPU=0
 for /f "tokens=1-5 delims=/ " %%i in (%LIST%) do (
-set /a CPU="(!CPU! + 1) %% %NUMBER_OF_PROCESSORS%" 
+set /a CPU="(!CPU! + 1) %% %NUMBER_OF_PROCESSORS%"
 if not "!CPU!"=="%2" (
 @rem do nothing
 ) else if not "%%m"=="" (

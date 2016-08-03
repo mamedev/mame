@@ -2,9 +2,9 @@
 // copyright-holders:Nicola Salmoria,Aaron Giles
 /*********************************************************************
 
-	romentry.h
+    romentry.h
 
-	ROM loading functions.
+    ROM loading functions.
 
 *********************************************************************/
 
@@ -146,11 +146,11 @@ public:
 	void set_flags(UINT32 flags) { m_flags = flags; }
 
 private:
-	std::string		m_name;
-	std::string		m_hashdata;
-	UINT32			m_offset;
-	UINT32			m_length;
-	UINT32			m_flags;
+	std::string     m_name;
+	std::string     m_hashdata;
+	UINT32          m_offset;
+	UINT32          m_length;
+	UINT32          m_flags;
 };
 
 

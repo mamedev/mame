@@ -1006,7 +1006,7 @@ Ring & Ball (?)
 Came from a dead board, silkscreen ring&ball/a by microhard
 
 u87 & u111 program
-u51 
+u51
 u53 empty socket might be missing
 u130 sound (z80)
 
@@ -1018,13 +1018,13 @@ ROM_START( ringball )
 	ROM_REGION( 0x080000, "maincpu", 0 )    /* 68000 code + gfx */
 	// TODO: encrypted, there's a device with scratched part between 68k and roms. u87 looks to have standard 68k vectors with scrambled bits.
 	ROM_LOAD( "u87.bin",      0x000000, 0x040000, CRC(f8f21cfd) SHA1(c258689fc79195945db21663d2df0a33a4412618) )
-    ROM_LOAD( "u111.bin",     0x040000, 0x040000, CRC(11e246b0) SHA1(b056bcaa52ab2898f470a29b0a5c2f3594e2522b) ) // actually "u101"?
+	ROM_LOAD( "u111.bin",     0x040000, 0x040000, CRC(11e246b0) SHA1(b056bcaa52ab2898f470a29b0a5c2f3594e2522b) ) // actually "u101"?
 
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* Z80 code + sound data */
 	ROM_LOAD( "u130.bin",     0x000000, 0x080000, CRC(892202ea) SHA1(10b5933b136a6595f739510d380d12c4cefd9f09) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-    ROM_LOAD( "u51.bin",      0x000000, 0x080000, CRC(32c01844) SHA1(ad461c47cd270414c442325751eca0d6c1ea9e2d) )
+	ROM_LOAD( "u51.bin",      0x000000, 0x080000, CRC(32c01844) SHA1(ad461c47cd270414c442325751eca0d6c1ea9e2d) )
 	ROM_LOAD( "u53.bin",      0x080000, 0x080000, NO_DUMP ) // empty on this PCB, GFXs doesn't seem enough for a complete game?
 ROM_END
 

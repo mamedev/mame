@@ -567,7 +567,7 @@ void vdt911_device::check_keyboard()
 	}
 	else
 	{   /* we are using a Western keyboard, or a katakana/Arabic keyboard in
-        romaji/Latin mode */
+	    romaji/Latin mode */
 		m_foreign_mode = false;
 
 		if (key_buf[3] & 0x0040)

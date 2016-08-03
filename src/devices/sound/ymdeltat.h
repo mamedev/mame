@@ -43,12 +43,12 @@ struct YM_DELTAT  {     /* AT: rearranged and tigntened structure */
 	UINT8   portstate;      /* port status          */
 	UINT8   control2;       /* control reg: SAMPLE, DA/AD, RAM TYPE (x8bit / x1bit), ROM/RAM */
 	UINT8   portshift;      /* address bits shift-left:
-                            ** 8 for YM2610,
-                            ** 5 for Y8950 and YM2608 */
+	                        ** 8 for YM2610,
+	                        ** 5 for Y8950 and YM2608 */
 
 	UINT8   DRAMportshift;  /* address bits shift-right:
-                            ** 0 for ROM and x8bit DRAMs,
-                            ** 3 for x1 DRAMs */
+	                        ** 0 for ROM and x8bit DRAMs,
+	                        ** 3 for x1 DRAMs */
 
 	UINT8   memread;        /* needed for reading/writing external memory */
 

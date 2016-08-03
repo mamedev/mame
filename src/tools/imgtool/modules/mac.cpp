@@ -233,20 +233,20 @@ struct mac_FInfo
 struct mac_FXInfo
 {
 	UINT16BE iconID;        /* System 7: An ID number for the file???s icon; the
-                                numbers that identify icons are assigned by the
-                                Finder */
+	                            numbers that identify icons are assigned by the
+	                            Finder */
 							/* System 8: Reserved (set to 0) */
 	UINT16BE reserved[3];   /* Reserved (set to 0) */
 	UINT8    script;        /* System 7: if high-bit is set, the script code
-                                for displaying the file name; ignored otherwise */
+	                            for displaying the file name; ignored otherwise */
 							/* System 8: Extended flags MSB(?) */
 	UINT8    XFlags;        /* Extended flags */
 	UINT16BE comment;       /* System 7: Comment ID if high-bit is clear */
 							/* System 8: Reserved (set to 0) */
 	UINT32BE putAway;       /* Put away folder ID (i.e. if the user moves the
-                                file onto the desktop, the directory ID of the
-                                folder from which the user moves the file is
-                                saved here) */
+	                            file onto the desktop, the directory ID of the
+	                            folder from which the user moves the file is
+	                            saved here) */
 };
 
 /*
@@ -261,7 +261,7 @@ struct mac_DInfo
 								clear, the Finder will place the item
 								automatically */
 	UINT16BE view;          /* System 7: The manner in which folders are
-                                displayed */
+	                            displayed */
 							/* System 8: reserved (set to 0) */
 };
 
@@ -274,15 +274,15 @@ struct mac_DXInfo
 	UINT32BE openChain;     /* System 7: chain of directory IDs for open folders */
 							/* System 8: reserved (set to 0) */
 	UINT8    script;        /* System 7: if high-bit is set, the script code
-                                for displaying the folder name; ignored otherwise */
+	                            for displaying the folder name; ignored otherwise */
 							/* System 8: Extended flags MSB(?) */
 	UINT8    XFlags;        /* Extended flags */
 	UINT16BE comment;       /* System 7: Comment ID if high-bit is clear */
 							/* System 8: Reserved (set to 0) */
 	UINT32BE putAway;       /* Put away folder ID (i.e. if the user moves the
-                                folder onto the desktop, the directory ID of
-                                the folder from which the user moves it is
-                                saved here) */
+	                            folder onto the desktop, the directory ID of
+	                            the folder from which the user moves it is
+	                            saved here) */
 };
 
 /*
@@ -306,9 +306,9 @@ enum
 											/* resource */
 										/* Otherwise, set to 0. */
 	fif_hasBeenInited       = 0x0100,   /* System 6: The Finder has recorded information from
-                                            the file???s bundle resource into the desktop
-                                            database and given the file or folder a
-                                            position on the desktop. */
+	                                        the file???s bundle resource into the desktop
+	                                        database and given the file or folder a
+	                                        position on the desktop. */
 										/* System 7? 8?: Clear if the file contains desktop database */
 											/* resources ('BNDL', 'FREF', 'open', 'kind'...) */
 											/* that have not been added yet. Set only by the Finder */
@@ -921,7 +921,7 @@ struct mfs_mdb
 	UINT16BE nmAlBlks;      /* number of allocation blocks in volume (0x0187) */
 	UINT32BE alBlkSiz;      /* size (in bytes) of allocation blocks (0x00000400) */
 	UINT32BE clpSiz;        /* default clump size - number of bytes to allocate
-                                when a file grows (0x00002000) */
+	                            when a file grows (0x00002000) */
 	UINT16BE alBlSt;        /* first allocation block in volume (0x0010) */
 
 	UINT32BE nxtFNum;       /* next unused file number */
@@ -930,18 +930,18 @@ struct mfs_mdb
 	mac_str27 VN;           /* volume name */
 
 	UINT8    ABlink[512-64];/* Link array for file ABs.  Array of nmAlBlks
-                            12-bit-long entries, indexed by AB address.  If an
-                            AB belongs to no file, the entry is 0; if an AB is
-                            the last in any file, the entry is 1; if an AB
-                            belongs to a file and is not the last one, the
-                            entry is the AB address of the next file AB plus 1.
-                            Note that the array extends on as many consecutive
-                            disk blocks as needed (usually the MDB block plus
-                            the next one).  Incidentally, this array is not
-                            saved in the secondary MDB: presumably, the idea
-                            was that the disk utility could rely on the tag
-                            data to rebuild the link array if it should ever
-                            be corrupted. */
+	                        12-bit-long entries, indexed by AB address.  If an
+	                        AB belongs to no file, the entry is 0; if an AB is
+	                        the last in any file, the entry is 1; if an AB
+	                        belongs to a file and is not the last one, the
+	                        entry is the AB address of the next file AB plus 1.
+	                        Note that the array extends on as many consecutive
+	                        disk blocks as needed (usually the MDB block plus
+	                        the next one).  Incidentally, this array is not
+	                        saved in the secondary MDB: presumably, the idea
+	                        was that the disk utility could rely on the tag
+	                        data to rebuild the link array if it should ever
+	                        be corrupted. */
 };
 
 /*
@@ -962,7 +962,7 @@ struct hfs_mdb
 	UINT16BE nmAlBlks;      /* number of allocation blocks in volume */
 	UINT32BE alBlkSiz;      /* size (in bytes) of allocation blocks */
 	UINT32BE clpSiz;        /* default clump size - number of bytes to allocate
-                                when a file grows */
+	                            when a file grows */
 	UINT16BE alBlSt;        /* first allocation block in volume (0x0010) */
 	UINT32BE nxtCNID;       /* next unused catalog node ID */
 	UINT16BE freeABs;       /* number of unused allocation blocks */
@@ -1463,7 +1463,7 @@ struct mfs_dir_entry
 								with reading the directory, the remnants will
 								be read from next block */
 	UINT8    flVersNum;         /* version number (usually 0x00, but I don't
-                                    have the IM volume that describes it) */
+	                                have the IM volume that describes it) */
 	mac_FInfo flFinderInfo;     /* information used by the Finder */
 
 	UINT32BE fileID;            /* file ID */
@@ -1512,16 +1512,16 @@ struct mfs_FOBJ
 		struct
 		{
 			UINT16BE item_count;    /* number of items (folders and files) in
-                                        this folder */
+			                            this folder */
 			UINT32BE item_descs[1]; /* this variable-length array has
-                                        item_count entries - meaning of entry is unknown */
+			                            item_count entries - meaning of entry is unknown */
 		} v1;
 		struct
 		{
 			UINT16BE zerofill;      /* always 0? */
 			UINT16BE unknown0;      /* always 0??? */
 			UINT16BE item_count;    /* number of items (folders and files) in
-                                        this folder */
+			                            this folder */
 			UINT8 unknown1[20];     /* ??? */
 			UINT8 name[1];          /* variable-length macintosh string */
 		} v2;
@@ -2660,7 +2660,7 @@ static imgtoolerr_t mfs_file_setABeof(struct mac_fileref *fileref, UINT32 newABe
 			AB_link = mfs_get_ABlink(fileref->l2_img, AB_address);
 			if ((AB_link == 0) || (AB_link >= fileref->l2_img->numABs+2))
 			{   /* 0 -> empty block: there is no way an empty block could make
-                it into the link chain!!! */
+			    it into the link chain!!! */
 				if (MDB_dirty)
 				{   /* update MDB (freeABs field) and ABLink array */
 					err = mfs_update_mdb(fileref->l2_img);
@@ -3322,8 +3322,8 @@ static imgtoolerr_t hfs_cat_search(struct mac_l2_imgref *l2_img, UINT32 parID, c
 
 	/* generate search key */
 	search_key.keyLen = search_key.resrv1 = 0;  /* these fields do not matter
-                                                to the compare function, so we
-                                                don't fill them */
+	                                            to the compare function, so we
+	                                            don't fill them */
 	set_UINT32BE(&search_key.parID, parID);
 	mac_strcpy(search_key.cName, cName);
 
@@ -3650,8 +3650,8 @@ struct BTNodeHeader
 	UINT32BE bLink;         /* (index of) previous node at this level */
 	UINT8    kind;          /* kind of node (leaf, index, header, map) */
 	UINT8    height;        /* zero for header, map; 1 for leaf, 2 through
-                                treeDepth for index (child is one LESS than
-                                parent, whatever IM says) */
+	                            treeDepth for index (child is one LESS than
+	                            parent, whatever IM says) */
 	UINT16BE numRecords;    /* number of records in this node */
 	UINT16BE reserved;      /* reserved; set to zero */
 };
@@ -3662,14 +3662,14 @@ struct BTNodeHeader
 enum
 {
 	btnk_leafNode   = 0xff, /* leaf nodes hold the actual user data records
-                                with keys and data */
+	                            with keys and data */
 	btnk_indexNode  = 0,    /* root and branch node that enable to efficiently
-                                search the leaf nodes for a specific key value */
+	                            search the leaf nodes for a specific key value */
 	btnk_headerNode = 1,    /* unique node with b-tree information, pointer to
-                                root node and start of the node allocation
-                                bitmap */
+	                            root node and start of the node allocation
+	                            bitmap */
 	btnk_mapNode    = 2     /* map nodes are created when the node allocation
-                                bitmap outgrows the header node */
+	                            bitmap outgrows the header node */
 };
 
 /*
@@ -3685,14 +3685,14 @@ struct BTHeaderRecord
 	UINT32BE lastLeafNode;  /* node number of last leaf node */
 	UINT16BE nodeSize;      /* size of a node, in bytes */
 	UINT16BE maxKeyLength;  /* maximum length of data (index + leaf) record keys;
-                                length of all index record keys if
-                                btha_variableIndexKeysMask attribute flag is not set */
+	                            length of all index record keys if
+	                            btha_variableIndexKeysMask attribute flag is not set */
 	UINT32BE totalNodes;    /* total number of nodes in tree */
 	UINT32BE freeNodes;     /* number of unused (free) nodes in tree */
 
 	UINT16BE reserved1;     /* unused */
 	UINT32BE clumpSize;     /* used in some HFS implementations? (reserved in
-                                early HFS implementations, and in HFS Plus) */
+	                            early HFS implementations, and in HFS Plus) */
 	UINT8    btreeType;     /* reserved - set to 0 */
 	UINT8    reserved2;     /* reserved */
 	UINT32BE attributes;    /* persistent attributes about the tree */
@@ -4253,7 +4253,7 @@ static imgtoolerr_t BT_check(mac_BTref *BTref, int is_extent)
 					extentEOL = TRUE;
 				else
 				{   /* this key concerns the extent B-tree: update maxExtentAB
-                    and maxExtentNode */
+				    and maxExtentNode */
 					/* extract record data ptr */
 					err = BT_get_keyed_record_data(BTref, rec1, rec1_len, &rec1_data, &rec1_data_len);
 					if (err)
@@ -4579,7 +4579,7 @@ static imgtoolerr_t BT_search_leaf_rec(mac_BTref *BTref, const void *search_key,
 
 		if (! last_rec)
 		{   /* all keys are greater than the search key: the search key is
-            nowhere in the tree */
+		    nowhere in the tree */
 			if (search_exact_match)
 				return IMGTOOLERR_FILENOTFOUND;
 
@@ -4709,7 +4709,7 @@ static imgtoolerr_t BT_leaf_rec_enumerator_read(BT_leaf_rec_enumerator *enumerat
 	enumerator->cur_rec++;
 	if (enumerator->cur_rec >= node_numRecords)
 	{   /* iterate to next node if last record (not required, but will improve
-        performance on next iteration) */
+	    performance on next iteration) */
 		enumerator->cur_node = get_UINT32BE(((BTNodeHeader *) enumerator->BTref->node_buf)->fLink);
 		enumerator->cur_rec = 0;
 	}
@@ -4905,9 +4905,9 @@ struct rsrc_ref_entry
 struct mac_resfileref
 {
 	mac_fileref fileref;    /* open resource fork ref (you may open resources
-                                files in data fork, too, if you ever need to,
-                                but Classic MacOS never does such a thing
-                                (MacOS X often does so, though)) */
+	                            files in data fork, too, if you ever need to,
+	                            but Classic MacOS never does such a thing
+	                            (MacOS X often does so, though)) */
 	UINT32 data_offs;       /* Offset from beginning of resource file to resource data */
 	UINT32 map_offs;        /* Offset from beginning of resource file to resource data */
 

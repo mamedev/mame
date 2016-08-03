@@ -904,7 +904,7 @@ void tx0_state::magtape_callback()
 
 			if ((mar & 03) != 1)
 			{   /* unimplemented device: remain in unselected state and set rwc
-                flag? */
+			    flag? */
 				m_maincpu->set_state_int(TX0_PF, m_maincpu->state_int(TX0_PF) | PF_RWC);
 			}
 			else

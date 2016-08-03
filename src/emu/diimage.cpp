@@ -340,18 +340,18 @@ void device_image_interface::message(const char *format, ...)
 //  actually exists
 //-------------------------------------------------
 
-bool device_image_interface::try_change_working_directory(const char *subdir)
+bool device_image_interface::try_change_working_directory(const std::string &subdir)
 {
 	const osd::directory::entry *entry;
 	bool success = false;
 	bool done = false;
 
-	auto directory = osd::directory::open(m_working_directory.c_str());
+	auto directory = osd::directory::open(m_working_directory);
 	if (directory)
 	{
 		while (!done && (entry = directory->read()) != nullptr)
 		{
-			if (!core_stricmp(subdir, entry->name))
+			if (!core_stricmp(subdir.c_str(), entry->name))
 			{
 				done = true;
 				success = entry->type == osd::directory::entry::entry_type::DIR;
@@ -656,7 +656,7 @@ bool device_image_interface::is_loaded()
 
 //-------------------------------------------------
 //  image_error_from_file_error - converts an image
-//	error to a file error
+//  error to a file error
 //-------------------------------------------------
 
 image_error_t device_image_interface::image_error_from_file_error(osd_file::error filerr)
@@ -714,7 +714,7 @@ image_error_t device_image_interface::load_image_by_path(UINT32 open_flags, cons
 //  reopen_for_write
 //-------------------------------------------------
 
-int device_image_interface::reopen_for_write(const char *path)
+int device_image_interface::reopen_for_write(const std::string &path)
 {
 	m_file.reset();
 
@@ -1018,7 +1018,7 @@ bool device_image_interface::schedule_postload_hard_reset_if_needed()
 //  load - load an image into MAME
 //-------------------------------------------------
 
-image_init_result device_image_interface::load(const char *path)
+image_init_result device_image_interface::load(const std::string &path)
 {
 	return load_internal(path, false, 0, nullptr, false);
 }
@@ -1164,7 +1164,7 @@ image_init_result device_image_interface::finish_load()
 //  create - create a image
 //-------------------------------------------------
 
-image_init_result device_image_interface::create(const char *path, const image_device_format *create_format, util::option_resolution *create_args)
+image_init_result device_image_interface::create(const std::string &path, const image_device_format *create_format, util::option_resolution *create_args)
 {
 	int format_index = 0;
 	int cnt = 0;
@@ -1369,6 +1369,10 @@ bool device_image_interface::load_software_part(const char *path, const software
 		software_list_device::display_matches(device().machine().config(), image_interface(), path);
 		return false;
 	}
+
+	// I'm not sure what m_init_phase is all about; but for now I'm preserving this behavior
+	if (is_reset_on_load())
+		set_init_phase();
 
 	// Load the software part
 	software_list_device &swlist = swpart->info().list();

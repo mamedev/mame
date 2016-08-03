@@ -536,14 +536,14 @@ void apexc_cpu_device::execute()
 			the 5 bits must be cleared initially, an OR kind of makes sense */
 			m_r |= papertape_read() << 27;
 			delay2 = 32;    /* no idea whether this should be counted as an absolute delay
-                            or as a value in delay2 */
+			                or as a value in delay2 */
 			break;
 
 		case 4:
 			/* P */
 			papertape_punch((m_r >> 27) & 0x1f);
 			delay2 = 32;    /* no idea whether this should be counted as an absolute delay
-                            or as a value in delay2 */
+			                or as a value in delay2 */
 			break;
 
 		case 6:
@@ -723,7 +723,7 @@ void apexc_cpu_device::execute()
 			/* S(x) */
 			m_working_store = (x >> 5) & 0xf;   /* or is it (x >> 6)? */
 			DELAY(32);  /* no idea what the value is...  All I know is that it takes much
-                        more time than track switching (which takes 6 cycles) */
+			            more time than track switching (which takes 6 cycles) */
 			break;
 		}
 		if (vector)
@@ -835,7 +835,7 @@ void apexc_cpu_device::device_reset()
 	/* next two lines are just the product of my bold fantasy */
 	m_cr = 0;               /* first instruction executed will be a stop */
 	m_running = TRUE;       /* this causes the CPU to load the instruction at 0/0,
-                               which enables easy booting (just press run on the panel) */
+	                           which enables easy booting (just press run on the panel) */
 	m_a = 0;
 	m_r = 0;
 	m_pc = 0;
