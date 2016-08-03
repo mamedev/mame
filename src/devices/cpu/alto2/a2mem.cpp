@@ -585,14 +585,22 @@ READ16_MEMBER( alto2_cpu_device::mecr_r )
 	return data;
 }
 
-//! read i/o space RAM
+/**
+ * @brief Read i/o space RAM.
+ * Note: This is for debugger access. Regular memory access is
+ * only through load_mar, read_mem and write_mem.
+ */
 READ16_MEMBER ( alto2_cpu_device::ioram_r )
 {
 	offs_t dw_addr = offset / 2;
 	return static_cast<UINT16>(offset & 1 ? GET_ODD(m_mem.ram[dw_addr]) : GET_EVEN(m_mem.ram[dw_addr]));
 }
 
-//! write i/o space RAM
+/**
+ * @brief Write i/o space RAM.
+ * Note: This is for debugger access. Regular memory access is
+ * only through load_mar, read_mem and write_mem.
+ */
 WRITE16_MEMBER( alto2_cpu_device::ioram_w )
 {
 	offs_t dw_addr = offset / 2;
@@ -603,7 +611,7 @@ WRITE16_MEMBER( alto2_cpu_device::ioram_w )
 }
 
 /**
- * @brief load the memory address register with some value
+ * @brief Load the memory address register with some value.
  *
  * @param rsel selected register (to detect refresh cycles)
  * @param addr memory address
@@ -636,26 +644,31 @@ void alto2_cpu_device::load_mar(UINT8 rsel, UINT32 addr)
 }
 
 /**
- * @brief read memory or memory mapped I/O from the address in mar to md
+ * @brief Read RAM or memory mapped I/O from the address in MAR to MD.
+ *
+ * Since the Alto II has a latch for the memory dword,
+ * reading it after cycle +4 is very well possible.
+ * We simply return the most recent m_mem.md in this case.
+ *
+ * This fixes calculator.run and ti55.run, probably others,
+ * which were making the mouse cursor displaying weird things.
+ *
+ * Thanks go to LCM and ContrAlto source for the hint!
  *
  * @result returns value from memory (RAM or MMIO)
  */
 UINT16 alto2_cpu_device::read_mem()
 {
-	UINT32 base_addr;
-
 	if (ALTO2_MEM_NONE == m_mem.access) {
 		LOG((this,LOG_MEM,0,"    fatal: mem read with no preceding address\n"));
 		return 0177777;
 	}
 
-	if (cycle() > m_mem.cycle + 4) {
-		LOG((this,LOG_MEM,0,"    fatal: mem read (MAR %#o) too late (+%lld cyc)\n", m_mem.mar, cycle() - m_mem.cycle));
-		m_mem.access = ALTO2_MEM_NONE;
-		return 0177777;
+	if ((m_mem.access & ALTO2_MEM_LATCHED) && cycle() > m_mem.cycle + 4) {
+		return m_mem.md;
 	}
 
-	base_addr = m_mem.mar & 0177777;
+	const UINT32 base_addr = m_mem.mar & 0177777;
 	if (base_addr >= ALTO2_IO_PAGE_BASE && m_mem.mar < ALTO2_RAM_SIZE) {
 		m_mem.md = m_iomem->read_word(m_iomem->address_to_byte(base_addr));
 		LOG((this,LOG_MEM,6,"    MD = MMIO[%#o] (%#o)\n", base_addr, m_mem.md));
@@ -678,11 +691,12 @@ UINT16 alto2_cpu_device::read_mem()
 #endif
 
 	if (m_mem.access & ALTO2_MEM_ODD) {
-		// after reading the odd word, reset the access flag
-		m_mem.access = ALTO2_MEM_NONE;
+		// after reading the odd word, set the access flag to LATCHED
+		m_mem.access = ALTO2_MEM_LATCHED;
 	} else {
-		// after reading the even word word, toggle access flag (and address) to the odd word
-		m_mem.mar ^= ALTO2_MEM_ODD;
+		// after reading the even word word,
+		// toggle access flag (and address) to the odd word
+		m_mem.mar ^= 1;
 		m_mem.access ^= ALTO2_MEM_ODD;
 		// extend the read succeeds window by one cycle
 		m_mem.cycle++;
@@ -691,7 +705,7 @@ UINT16 alto2_cpu_device::read_mem()
 }
 
 /**
- * @brief write memory or memory mapped I/O from md to the address in mar
+ * @brief Write RAM or memory mapped I/O from MD to the address in MAR.
  *
  * @param data data to write to RAM or MMIO
  */
@@ -706,6 +720,8 @@ void alto2_cpu_device::write_mem(UINT16 data)
 	}
 
 	if (cycle() > m_mem.cycle + 4) {
+		// FIXME: what really happens if a write occurs too late?
+		// Need to revisit the schematics to tell for sure.
 		LOG((this,LOG_MEM,0,"    fatal: mem write (MAR %#o, data %#o) too late (+%lld cyc)\n", m_mem.mar, data, cycle() - m_mem.cycle));
 		m_mem.access = ALTO2_MEM_NONE;
 		return;
@@ -745,7 +761,7 @@ void alto2_cpu_device::write_mem(UINT16 data)
 }
 
 /**
- * @brief debugger interface to read memory
+ * @brief Debugger interface to read memory.
  *
  * @param addr address to read
  * @return memory contents at address (16 bits)
@@ -765,7 +781,7 @@ UINT16 alto2_cpu_device::debug_read_mem(UINT32 addr)
 }
 
 /**
- * @brief debugger interface to write memory
+ * @brief Debugger interface to write memory.
  *
  * @param addr address to write
  * @param data data to write (16 bits used)
@@ -785,12 +801,10 @@ void alto2_cpu_device::debug_write_mem(UINT32 addr, UINT16 data)
 }
 
 /**
- * @brief initialize the memory system
+ * @brief Initialize the memory system.
  *
- * Zeroes the memory context, including RAM and installs dummy
- * handlers for the memory mapped I/O area.
- * Sets handlers for access to the memory error address, status,
- * and control registers at 0177024 to 0177026.
+ * Zeroes the RAM and registers the memory registers
+ * for state saving.
  */
 void alto2_cpu_device::init_memory()
 {
@@ -819,6 +833,7 @@ void alto2_cpu_device::reset_memory()
 	if (m_mem.hpb) {
 		m_mem.hpb = nullptr;
 	}
+
 	// allocate 64K or 128K words of main memory
 	ioport_port* config = ioport(":CONFIG");
 	m_mem.size = ALTO2_RAM_SIZE;
