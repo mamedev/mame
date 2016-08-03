@@ -295,8 +295,5 @@ void init_disp();                   //!< initialize the display context
 void exit_disp();                   //!< deinitialize the display context
 void reset_disp();                  //!< reset the display context
 
-void fake_status_putch(int x, UINT8 ch);
-void fake_status_printf(int x, const char* format, ...);
-
 #endif  // _A2DISP_H_
 #endif  // ALTO2_DEFINE_CONSTANTS

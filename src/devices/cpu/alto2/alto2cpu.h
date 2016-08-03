@@ -49,11 +49,8 @@ enum {
 #define ALTO2_CRAM_CONFIG       2           //!< use default CROM/CRAM configuration 2
 #endif
 
-#define ALTO2_FAKE_STATUS_H     12          //!< number of extra scanlines to display some status info
-
 #define USE_PRIO_F9318          0           //!< define to 1 to use the F9318 priority encoder code (broken)
 #define USE_BITCLK_TIMER        0           //!< define to 1 to use a very high rate timer for the disk bit clock
-#define USE_HAMMING_CHECK       1           //!< define to 1 to use the Hamming code and Parity check in a2mem
 
 #define ALTO2_TASKS             16          //!< 16 task slots
 #define ALTO2_REGS              32          //!< 32 16-bit words in the R register file

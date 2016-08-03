@@ -108,8 +108,8 @@ DECLARE_WRITE16_MEMBER( mesr_w );       //!< memory error status register write 
 DECLARE_READ16_MEMBER ( mecr_r );       //!< memory error control register read
 DECLARE_WRITE16_MEMBER( mecr_w );       //!< memory error control register write
 
-//! Read or write a memory double-word and caluclate its Hamming code.
-UINT32 hamming_code(int write, UINT32 dw_addr, UINT32 dw_data);
+//! Read or write a memory double-word and caluclate or compare its Hamming code.
+UINT32 hamming_code(bool write, UINT32 dw_addr, UINT32 dw_data);
 
 //! Load the memory address register with some value.
 void load_mar(UINT8 rsel, UINT32 addr);

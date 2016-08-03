@@ -386,5 +386,11 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-F2_%02o ", f2);
 		break;
 	}
+
+	// Simplify output based on text
+	// ALUF(BUS) is a no-op if followed by BUS<-
+	while (NULL != (dst = strstr(buffer, "ALUF(BUS) BUS<-")))
+		strcpy(dst, dst + 15);
+
 	return result;
 }
