@@ -1370,6 +1370,10 @@ bool device_image_interface::load_software_part(const char *path, const software
 		return false;
 	}
 
+	// I'm not sure what m_init_phase is all about; but for now I'm preserving this behavior
+	if (is_reset_on_load())
+		set_init_phase();
+
 	// Load the software part
 	software_list_device &swlist = swpart->info().list();
 	const char *swname = swpart->info().shortname().c_str();
