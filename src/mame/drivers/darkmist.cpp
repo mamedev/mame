@@ -214,9 +214,10 @@ static const gfx_layout tilelayout =
 
 
 static GFXDECODE_START( darkmist )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 16*4 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 16*4 )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,  0, 16*4 )
+	GFXDECODE_ENTRY( "tx_gfx", 0, charlayout,  0, 16*4 )
+	GFXDECODE_ENTRY( "bg_gfx", 0, tilelayout,  0, 16*4 )
+	GFXDECODE_ENTRY( "fg_gfx", 0, tilelayout,  0, 16*4 )
+	GFXDECODE_ENTRY( "spr_gfx", 0, tilelayout,  0, 16*4 )
 GFXDECODE_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(darkmist_state::scanline)
@@ -276,48 +277,75 @@ ROM_START( darkmist )
 	ROM_REGION( 0x8000, "t5182_z80", 0 ) /* Toshiba T5182 external ROM */
 	ROM_LOAD( "dm_17.rom", 0x0000, 0x8000, CRC(7723dcae) SHA1(a0c69e7a7b6fd74f7ed6b9c6419aed94aabcd4b0) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "tx_gfx", 0 )
 	ROM_LOAD( "dm_13.rom", 0x00000, 0x02000, CRC(38bb38d9) SHA1(d751990166dd3d503c5de7667679b96210061cd1) )
 	ROM_LOAD( "dm_14.rom", 0x02000, 0x02000, CRC(ac5a31f3) SHA1(79083390671062be2eab93cc875a0f86d709a963) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "dm_05.rom", 0x10000, 0x10000, CRC(ca79a738) SHA1(66a76ea0d8ecc44f6cc77102303df74f40bf6118) )
-	ROM_LOAD( "dm_01.rom", 0x00000, 0x10000, CRC(652aee6b) SHA1(f4150784f7bd7be83a0041e4c52540aa564062ba) )
-	ROM_LOAD( "dm_06.rom", 0x30000, 0x10000, CRC(9629ed2c) SHA1(453f6a0b12efdadd7fcbe03ad37afb0afa6be051) )
-	ROM_LOAD( "dm_02.rom", 0x20000, 0x10000, CRC(e2dd15aa) SHA1(1f3a6a1e1afabfe9dc47549ef13ae7696302ae88) )
+	ROM_REGION( 0x20000, "fg_gfx", 0 )
+	ROM_LOAD( "dm_05.rom", 0x00000, 0x10000, CRC(ca79a738) SHA1(66a76ea0d8ecc44f6cc77102303df74f40bf6118) )
+	ROM_LOAD( "dm_06.rom", 0x10000, 0x10000, CRC(9629ed2c) SHA1(453f6a0b12efdadd7fcbe03ad37afb0afa6be051) )
 
-	ROM_REGION( 0x40000, "gfx3", 0)
+	ROM_REGION( 0x20000, "bg_gfx", 0 )
+	ROM_LOAD( "dm_01.rom", 0x00000, 0x10000, CRC(652aee6b) SHA1(f4150784f7bd7be83a0041e4c52540aa564062ba) )
+	ROM_LOAD( "dm_02.rom", 0x10000, 0x10000, CRC(e2dd15aa) SHA1(1f3a6a1e1afabfe9dc47549ef13ae7696302ae88) )
+
+	ROM_REGION( 0x40000, "spr_gfx", 0)
 	ROM_LOAD( "dm_09.rom", 0x00000, 0x10000, CRC(52154b50) SHA1(5ee1a4bcf0752a057b9993b0069d744c35cf55f4) )
 	ROM_LOAD( "dm_11.rom", 0x10000, 0x08000, CRC(3118e2f9) SHA1(dfd946ea1310851f97d31ce58d8280f2d92b0f59) )
 	ROM_LOAD( "dm_10.rom", 0x20000, 0x10000, CRC(34fd52b5) SHA1(c4ee464ed79ec91f993b0f894572c0288f0ad1d4) )
 	ROM_LOAD( "dm_12.rom", 0x30000, 0x08000, CRC(cc4b9839) SHA1(b7e95513d2e06929fed5005caf3bf8c3fba0b597) )
 
-	ROM_REGION( 0x8000, "user1", 0 )
+	ROM_REGION( 0x10000, "bg_map", 0 )
 	/* BG layer map ( 512x64 )*/
-	ROM_LOAD( "dm_03.rom", 0x00000, 0x08000, CRC(60b40c2a) SHA1(c046273b15dab95ea4851c26ce941e580fa1b6ec) )
+	ROM_LOAD16_BYTE( "dm_03.rom", 0x00000, 0x08000, CRC(60b40c2a) SHA1(c046273b15dab95ea4851c26ce941e580fa1b6ec) )
+	ROM_LOAD16_BYTE( "dm_04.rom", 0x00001, 0x08000, CRC(d47b8cd9) SHA1(86eb7a5d8ea63c0c91f455b1b8322cc7b9c4a968) )
 
-	ROM_REGION( 0x8000, "user2", 0 )
-	/* BG layer attr ( 512x64 ) */
-	ROM_LOAD( "dm_04.rom", 0x00000, 0x08000, CRC(d47b8cd9) SHA1(86eb7a5d8ea63c0c91f455b1b8322cc7b9c4a968) )
-
-	ROM_REGION( 0x04000, "user3", 0 )
+	ROM_REGION( 0x08000, "fg_map", 0 )
 	/* FG layer map ( 64x256 ) */
-	ROM_LOAD( "dm_07.rom", 0x00000, 0x04000, CRC(889b1277) SHA1(78405110b9cf1ab988c0cbfdb668498dadb41229) )
+	ROM_LOAD16_BYTE( "dm_07.rom", 0x00000, 0x04000, CRC(889b1277) SHA1(78405110b9cf1ab988c0cbfdb668498dadb41229) )
+	ROM_LOAD16_BYTE( "dm_08.rom", 0x00001, 0x04000, CRC(f76f6f46) SHA1(ce1c67dc8976106b24fee8d3a0b9e5deb016a327) )
 
-	ROM_REGION( 0x04000, "user4", 0 )
-	/* FG layer attr ( 64x256 ) */
-	ROM_LOAD( "dm_08.rom", 0x00000, 0x04000, CRC(f76f6f46) SHA1(ce1c67dc8976106b24fee8d3a0b9e5deb016a327) )
-
-	ROM_REGION( 0x0600, "proms", 0 )
-	/* color lookup tables */
+	ROM_REGION( 0x0100, "bg_clut", 0 )
 	ROM_LOAD( "63s281n.m7",  0x0000, 0x0100, CRC(897ef49f) SHA1(e40c0fb0a68aa91ceaee86e774a428819a4794bb) )
-	ROM_LOAD( "63s281n.d7",  0x0100, 0x0100, CRC(a9975a96) SHA1(3a34569fc68ac15f91e1e90d4e273f844b315091) )
-	ROM_LOAD( "63s281n.f11", 0x0200, 0x0100, CRC(8096b206) SHA1(257004aa3501121d058afa6f64b1129303246758) )
-	ROM_LOAD( "63s281n.j15", 0x0300, 0x0100, CRC(2ea780a4) SHA1(0f8d6791114705e9982f9035f291d2a305b47f0a) )
-	/* unknown */
-	ROM_LOAD( "63s281n.l1",  0x0400, 0x0100, CRC(208d17ca) SHA1(a77d56337bcac8d9a7bc3411239dfb3045e069ec) )
-	ROM_LOAD( "82s129.d11",  0x0500, 0x0100, CRC(866eab0e) SHA1(398ffe2b82b6e2235746fd987d5f5995d7dc8687) )
+	ROM_REGION( 0x0100, "fg_clut", 0 )
+	ROM_LOAD( "63s281n.d7",  0x0000, 0x0100, CRC(a9975a96) SHA1(3a34569fc68ac15f91e1e90d4e273f844b315091) )
+	ROM_REGION( 0x0100, "spr_clut", 0 )
+	ROM_LOAD( "63s281n.f11", 0x0000, 0x0100, CRC(8096b206) SHA1(257004aa3501121d058afa6f64b1129303246758) )
+	ROM_REGION( 0x0100, "tx_clut", 0 )
+	ROM_LOAD( "63s281n.j15", 0x0000, 0x0100, CRC(2ea780a4) SHA1(0f8d6791114705e9982f9035f291d2a305b47f0a) )
+
+
+	ROM_REGION( 0x0200, "proms", 0 ) // unknown PROMs
+	ROM_LOAD( "63s281n.l1",  0x0000, 0x0100, CRC(208d17ca) SHA1(a77d56337bcac8d9a7bc3411239dfb3045e069ec) )
+	ROM_LOAD( "82s129.d11",  0x0100, 0x0100, CRC(866eab0e) SHA1(398ffe2b82b6e2235746fd987d5f5995d7dc8687) )
 ROM_END
+
+
+
+
+void darkmist_state::decrypt_fgbgtiles(UINT8* rom, int size)
+{
+	dynamic_buffer buf(0x40000);
+	/* data lines */
+	for (int i = 0;i < size/2;i++)
+	{
+		int w1;
+
+		w1 = (rom[i + 0*size/2] << 8) + rom[i + 1*size/2];
+
+		w1 = BITSWAP16(w1, 9,14,7,2, 6,8,3,15,  10,13,5,12,  0,11,4,1);
+
+		buf[i + 0*size/2] = w1 >> 8;
+		buf[i + 1*size/2] = w1 & 0xff;
+	}
+
+	/* address lines */
+	for (int i = 0;i < size;i++)
+	{
+		rom[i] = buf[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13, 5,4,3,2, 12,11,10,9,8, 1,0, 7,6)];
+	}
+}
+
 
 
 void darkmist_state::decrypt_gfx()
@@ -327,8 +355,8 @@ void darkmist_state::decrypt_gfx()
 	int size;
 	int i;
 
-	rom = memregion("gfx1")->base();
-	size = memregion("gfx1")->bytes();
+	rom = memregion("tx_gfx")->base();
+	size = memregion("tx_gfx")->bytes();
 
 	/* data lines */
 	for (i = 0;i < size/2;i++)
@@ -349,32 +377,12 @@ void darkmist_state::decrypt_gfx()
 		rom[i] = buf[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12, 3,2,1, 11,10,9,8, 0, 7,6,5,4)];
 	}
 
-
-	rom = memregion("gfx2")->base();
-	size = memregion("gfx2")->bytes();
-
-	/* data lines */
-	for (i = 0;i < size/2;i++)
-	{
-		int w1;
-
-		w1 = (rom[i + 0*size/2] << 8) + rom[i + 1*size/2];
-
-		w1 = BITSWAP16(w1, 9,14,7,2, 6,8,3,15,  10,13,5,12,  0,11,4,1);
-
-		buf[i + 0*size/2] = w1 >> 8;
-		buf[i + 1*size/2] = w1 & 0xff;
-	}
-
-	/* address lines */
-	for (i = 0;i < size;i++)
-	{
-		rom[i] = buf[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13, 5,4,3,2, 12,11,10,9,8, 1,0, 7,6)];
-	}
+	decrypt_fgbgtiles(memregion("bg_gfx")->base(), memregion("bg_gfx")->bytes());
+	decrypt_fgbgtiles(memregion("fg_gfx")->base(), memregion("fg_gfx")->bytes());
 
 
-	rom = memregion("gfx3")->base();
-	size = memregion("gfx3")->bytes();
+	rom = memregion("spr_gfx")->base();
+	size = memregion("spr_gfx")->bytes();
 
 	/* data lines */
 	for (i = 0;i < size/2;i++)
@@ -441,38 +449,24 @@ DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 	membank("bank1")->set_base(&ROM[0x010000]);
 
 	/* adr line swaps */
-	ROM = memregion("user1")->base();
-	len = memregion("user1")->bytes();
+	ROM = memregion("bg_map")->base();
+	len = memregion("bg_map")->bytes();
 	memcpy( &buffer[0], ROM, len );
 
 	for(i=0;i<len;i++)
 	{
-		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,6,5,4,3,2,14,13,12,11,8,7,1,0,10,9)];
+		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,7,6,5,4,3,15,14,13,12,9,8,2,1,11,10, 0)];
 	}
 
-	ROM = memregion("user2")->base();
-	len = memregion("user2")->bytes();
+
+	ROM = memregion("fg_map")->base();
+	len = memregion("fg_map")->bytes();
 	memcpy( &buffer[0], ROM, len );
 	for(i=0;i<len;i++)
 	{
-		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,6,5,4,3,2,14,13,12,11,8,7,1,0,10,9)];
+		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15 ,6,5,4,3,12,11,10,9,14,13,2,1,8,7 ,0  )];
 	}
 
-	ROM = memregion("user3")->base();
-	len = memregion("user3")->bytes();
-	memcpy( &buffer[0], ROM, len );
-	for(i=0;i<len;i++)
-	{
-		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14 ,5,4,3,2,11,10,9,8,13,12,1,0,7,6)];
-	}
-
-	ROM = memregion("user4")->base();
-	len = memregion("user4")->bytes();
-	memcpy( &buffer[0], ROM, len );
-	for(i=0;i<len;i++)
-	{
-		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14 ,5,4,3,2,11,10,9,8,13,12,1,0,7,6)];
-	}
 }
 
 GAME( 1986, darkmist, 0, darkmist, darkmist, darkmist_state, darkmist, ROT270, "Taito Corporation", "The Lost Castle In Darkmist", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

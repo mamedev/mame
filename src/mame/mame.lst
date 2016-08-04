@@ -10288,7 +10288,7 @@ trivrus                         // 2009 AGT. Trivia R Us
 
 @source:cshooter.cpp
 airraid                         // (c) 1987 Seibu Kaihatsu
-cshootere                       // (c) 1987 JKH (bootleg)
+cshooter                        // (c) 1987 JKH (bootleg)
 
 @source:csplayh5.cpp
 bikiniko                        // (c) 1999
@@ -33864,7 +33864,7 @@ st_ohla                         //
 st_vulkn                        //
 
 @source:stfight.cpp
-cshooter                        // (c) 1987 Taito
+cshootert                       // (c) 1987 Taito
 empcity                         // (c) 1986 Seibu Kaihatsu (bootleg?)
 empcityi                        // (c) 1986 Seibu Kaihatsu (Eurobed license)
 empcityj                        // (c) 1986 Taito Corporation (Japan)

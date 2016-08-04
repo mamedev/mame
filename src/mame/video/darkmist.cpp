@@ -17,8 +17,9 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_bgtile_info)
 {
 	int code,attr,pal;
 
-	code=memregion("user1")->base()[tile_index]; /* TTTTTTTT */
-	attr=memregion("user2")->base()[tile_index]; /* -PPP--TT - FIXED BITS (0xxx00xx) */
+	code=memregion("bg_map")->base()[tile_index*2]; /* TTTTTTTT */
+	attr=memregion("bg_map")->base()[(tile_index*2)+1]; /* -PPP--TT - FIXED BITS (0xxx00xx) */
+	
 	code+=(attr&3)<<8;
 	pal=(attr>>4);
 
@@ -32,17 +33,15 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_fgtile_info)
 {
 	int code,attr,pal;
 
-	code=memregion("user3")->base()[tile_index]; /* TTTTTTTT */
-	attr=memregion("user4")->base()[tile_index]; /* -PPP--TT - FIXED BITS (0xxx00xx) */
-	pal=attr>>4;
+	code = memregion("fg_map")->base()[tile_index*2]; /* TTTTTTTT */ 
+	attr = memregion("fg_map")->base()[(tile_index*2)+1]; /* -PPP--TT - FIXED BITS (0xxx00xx) */
 
 	code+=(attr&3)<<8;
-
-	code+=0x400;
+	pal=attr>>4;
 
 	pal+=16;
 
-	SET_TILE_INFO_MEMBER(1,
+	SET_TILE_INFO_MEMBER(2,
 		code,
 		pal,
 		0);
@@ -68,19 +67,31 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_txttile_info)
 
 PALETTE_INIT_MEMBER(darkmist_state, darkmist)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const UINT8 *bg_clut = memregion("bg_clut")->base();
+	const UINT8 *fg_clut = memregion("fg_clut")->base();
+	const UINT8 *spr_clut = memregion("spr_clut")->base();
+	const UINT8 *tx_clut = memregion("tx_clut")->base();
 
 	palette.set_indirect_color(0x100, rgb_t::black);
 
 	for (int i = 0; i < 0x400; i++)
 	{
 		int ctabentry;
+		UINT8 clut = 0;
 
-		if (color_prom[i] & 0x40)
+		switch (i & 0x300)
+		{
+			case 0x000:  clut = bg_clut[i&0xff]; break;
+			case 0x100:  clut = fg_clut[i&0xff]; break;
+			case 0x200:  clut = spr_clut[i&0xff]; break;
+			case 0x300:  clut = tx_clut[i&0xff]; break;
+		}
+
+		if (clut & 0x40) // 0x40 indicates non-transparent
 			ctabentry = 0x100;
 		else
 		{
-			ctabentry = (color_prom[i] & 0x3f);
+			ctabentry = (clut & 0x3f);
 
 			switch (i & 0x300)
 			{
@@ -156,7 +167,7 @@ UINT32 darkmist_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 			palette+=32;
 
 
-				m_gfxdecode->gfx(2)->transpen(
+				m_gfxdecode->gfx(3)->transpen(
 				bitmap,cliprect,
 				tile,
 				palette,
