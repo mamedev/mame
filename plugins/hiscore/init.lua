@@ -22,8 +22,8 @@ end
 
 function hiscore.startplugin()
 
-	local hiscoredata_path = hiscore_plugin_path .. "/hiscore.dat";
-	local hiscore_path = hiscore_plugin_path .. "/hi";
+	local hiscoredata_path = "hiscore.dat";
+	local hiscore_path = "hi";
     	local config_path = manager:options().entries.inipath:value():match("[^;]+") .. "/hiscore.ini";
 	config_path = config_path:gsub("%$(%w+)", os.getenv);
 	
@@ -87,6 +87,9 @@ function hiscore.startplugin()
 	local function read_hiscore_dat ()
 	  local file = io.open( hiscoredata_path, "r" );
 	  local rm_match;
+	  if not file then
+		file = io.open( hiscore_plugin_path .. "/hiscore.dat", "r" );
+	  end
 	  if emu.softname() ~= "" then
 		rm_match = '^' .. emu.romname() .. ',' .. emu.softname() .. ':';
 	  else
