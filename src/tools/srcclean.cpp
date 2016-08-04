@@ -768,7 +768,11 @@ void cleaner_base::handle_codepoint(unicode_char cp)
 class text_cleaner : public cleaner_base
 {
 public:
-	using cleaner_base::cleaner_base;
+	template <typename OutputIt>
+	text_cleaner(OutputIt &&output, newline newline_mode, unsigned tab_width)
+		: cleaner_base(std::forward<OutputIt>(output), newline_mode, tab_width)
+	{
+	}
 
 private:
 	virtual void process_characters(unicode_char const *begin, unicode_char const *end) override
