@@ -144,17 +144,20 @@ DRIVER_INIT_MEMBER( ec184x_state, ec1841 )
 	if (m_memory.boards > 4)
 		m_memory.boards = 4;
 
+	program.install_read_bank(0,  EC1841_MEMBOARD_SIZE-1, "bank10");
+	program.install_write_bank(0, EC1841_MEMBOARD_SIZE-1, "bank20");
+
+	membank( "bank10" )->set_base( m_ram->pointer() );
+	membank( "bank20" )->set_base( m_ram->pointer() );
+
 	// 640K configuration is special -- 512K board mapped at 0 + 128K board mapped at 512K
 	// XXX verify this was actually the case
 	if (m_ram->size() == 640*1024) {
-		program.install_read_bank(0,  m_ram->size()-1, "bank10");
-		program.install_write_bank(0, m_ram->size()-1, "bank20");
-	} else {
-		program.install_read_bank(0,  EC1841_MEMBOARD_SIZE-1, "bank10");
-		program.install_write_bank(0, EC1841_MEMBOARD_SIZE-1, "bank20");
+		program.install_read_bank(EC1841_MEMBOARD_SIZE,  m_ram->size()-1, "bank11");
+		program.install_write_bank(EC1841_MEMBOARD_SIZE, m_ram->size()-1, "bank21");
+		membank( "bank11" )->set_base( m_ram->pointer() + EC1841_MEMBOARD_SIZE );
+		membank( "bank21" )->set_base( m_ram->pointer() + EC1841_MEMBOARD_SIZE );
 	}
-	membank( "bank10" )->set_base( m_ram->pointer() );
-	membank( "bank20" )->set_base( m_ram->pointer() );
 }
 
 MACHINE_RESET_MEMBER( ec184x_state, ec1841 )
