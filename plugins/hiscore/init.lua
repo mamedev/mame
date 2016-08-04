@@ -22,8 +22,8 @@ end
 
 function hiscore.startplugin()
 
-	local hiscoredata_path = "hiscore.dat";
-	local hiscore_path = "hi";
+	local hiscoredata_path = hiscore_plugin_path .. "/hiscore.dat";
+	local hiscore_path = hiscore_plugin_path .. "/hi";
 
 	local current_checksum = 0;
 	local default_checksum = 0;
@@ -65,9 +65,6 @@ function hiscore.startplugin()
 	local function read_hiscore_dat ()
 	  local file = io.open( hiscoredata_path, "r" );
 	  local rm_match;
-	  if not file then
-		file = io.open( hiscore_plugin_path .. "/hiscore.dat", "r" );
-	  end
 	  if emu.softname() ~= "" then
 		rm_match = '^' .. emu.romname() .. ',' .. emu.softname() .. ':';
 	  else
