@@ -3129,7 +3129,7 @@ WRITE16_MEMBER(namcos23_state::iob_p6_w)
 
 READ16_MEMBER(namcos23_state::iob_analog_r)
 {
-	return read_safe(m_adc_ports[offset], 0);
+	return m_adc_ports[offset].read_safe(0);
 }
 
 

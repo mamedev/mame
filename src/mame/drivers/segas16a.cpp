@@ -917,19 +917,18 @@ READ16_MEMBER( segas16a_state::sdi_custom_io_r )
 
 READ16_MEMBER( segas16a_state::sjryuko_custom_io_r )
 {
-	static const char *const portname[] = { "MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5" };
 	switch (offset & (0x3000/2))
 	{
 		case 0x1000/2:
 			switch (offset & 3)
 			{
 				case 1:
-					if (read_safe(ioport(portname[m_mj_input_num]), 0xff) != 0xff)
+					if (m_mj_inputs[m_mj_input_num].read_safe(0xff) != 0xff)
 						return 0xff & ~(1 << m_mj_input_num);
 					return 0xff;
 
 				case 2:
-					return read_safe(ioport(portname[m_mj_input_num]), 0xff);
+					return m_mj_inputs[m_mj_input_num].read_safe(0xff);
 			}
 			break;
 	}
@@ -1702,7 +1701,7 @@ static INPUT_PORTS_START( sjryuko )
 	//"SW2:7" unused
 	//"SW2:8" unused
 
-	PORT_START("MJ0")
+	PORT_START("MJ.0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_B )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_C )
@@ -1710,21 +1709,21 @@ static INPUT_PORTS_START( sjryuko )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("MJ1")
+	PORT_START("MJ.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_E )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_G )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("MJ2")
+	PORT_START("MJ.2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_I )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_J )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_L )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("MJ3")
+	PORT_START("MJ.3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_M )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_N )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
@@ -1732,12 +1731,12 @@ static INPUT_PORTS_START( sjryuko )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("MJ4")
+	PORT_START("MJ.4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("MJ5")
+	PORT_START("MJ.5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_RON )

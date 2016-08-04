@@ -16,7 +16,8 @@ public:
 		m_k055555(*this, "k055555"),
 		m_ata(*this, "ata"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_turntable(*this, "TT")
 	{
 	}
 
@@ -75,4 +76,5 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	K056832_CB_MEMBER(tile_callback);
+	optional_ioport_array<2> m_turntable;
 };

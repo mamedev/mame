@@ -1325,8 +1325,6 @@ private:
 	std::unique_ptr<ioport_port_live> m_live;      // live state of port (nullptr if not live)
 };
 
-inline ioport_value read_safe(ioport_port *port, ioport_value defval) { return (port == nullptr) ? defval : port->read(); }
-
 
 
 // ======================> analog_field

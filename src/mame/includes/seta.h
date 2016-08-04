@@ -41,6 +41,20 @@ public:
 		m_x1(*this, "x1snd"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
+		m_dsw(*this, "DSW"),
+		m_rot1(*this, "ROT1"),
+		m_rot2(*this, "ROT2"),
+		m_p1(*this, "P1"),
+		m_p2(*this, "P2"),
+		m_coins(*this, "COINS"),
+		m_extra_port(*this, "EXTRA"),
+		m_track1_x(*this, "TRACK1_X"),
+		m_track1_y(*this, "TRACK1_Y"),
+		m_track2_x(*this, "TRACK2_X"),
+		m_track2_y(*this, "TRACK2_Y"),
+		m_dsw1(*this, "DSW1"),
+		m_dsw2_3(*this, "DSW2_3"),
+		m_bet(*this, "BET"),
 		m_sharedram(*this,"sharedram"),
 		m_workram(*this,"workram"),
 		m_vregs(*this,"vregs"),
@@ -63,6 +77,21 @@ public:
 	optional_device<x1_010_device> m_x1;
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<generic_latch_8_device> m_soundlatch2;
+
+	optional_ioport m_dsw;
+	optional_ioport m_rot1;
+	optional_ioport m_rot2;
+	optional_ioport m_p1;
+	optional_ioport m_p2;
+	optional_ioport m_coins;
+	optional_ioport m_extra_port;
+	optional_ioport m_track1_x;
+	optional_ioport m_track1_y;
+	optional_ioport m_track2_x;
+	optional_ioport m_track2_y;
+	optional_ioport m_dsw1;
+	optional_ioport m_dsw2_3;
+	optional_ioport_array<5> m_bet;
 
 	optional_shared_ptr<UINT8> m_sharedram;
 	optional_shared_ptr<UINT16> m_workram;

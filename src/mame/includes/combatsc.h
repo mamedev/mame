@@ -24,7 +24,8 @@ public:
 		m_msm5205(*this, "msm5205"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch"),
+		m_track_ports(*this, tracknames) { }
 
 	/* memory pointers */
 	UINT8 *    m_videoram;
@@ -62,6 +63,9 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+
+	optional_ioport_array<4> m_track_ports;
+	DECLARE_IOPORT_ARRAY(tracknames);
 
 	DECLARE_WRITE8_MEMBER(combatsc_vreg_w);
 	DECLARE_WRITE8_MEMBER(combatscb_sh_irqtrigger_w);

@@ -27,7 +27,9 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_sn(*this, "snsnd"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_gunx(*this, "GUNX"),
+		m_guny(*this, "GUNY")
 	{ }
 
 	/* devices/memory pointers */
@@ -41,6 +43,8 @@ public:
 	optional_device<palette_device> m_palette;
 
 	/* misc game specific */
+	optional_ioport m_gunx;
+	optional_ioport m_guny;
 	UINT8 m_color_map;
 	UINT8 m_screen_red;
 	UINT8 m_fleet_step;

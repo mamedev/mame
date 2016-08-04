@@ -430,10 +430,10 @@ WRITE16_MEMBER(gaelco3d_state::analog_port_latch_w)
 	{
 		if (!(data & 0xff))
 		{
-			m_analog_ports[0] = read_safe(ioport("ANALOG0"), 0);
-			m_analog_ports[1] = read_safe(ioport("ANALOG1"), 0);
-			m_analog_ports[2] = read_safe(ioport("ANALOG2"), 0);
-			m_analog_ports[3] = read_safe(ioport("ANALOG3"), 0);
+			m_analog_ports[0] = m_analog[0].read_safe(0);
+			m_analog_ports[1] = m_analog[1].read_safe(0);
+			m_analog_ports[2] = m_analog[2].read_safe(0);
+			m_analog_ports[3] = m_analog[3].read_safe(0);
 		}
 	}
 	else
@@ -862,10 +862,10 @@ static INPUT_PORTS_START( speedup )
 	PORT_SERVICE_NO_TOGGLE( 0x0200, IP_ACTIVE_LOW )     // verified
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("ANALOG0")
+	PORT_START("ANALOG.0")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(25)
 
-	PORT_START("ANALOG1")
+	PORT_START("ANALOG.1")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 INPUT_PORTS_END
 
@@ -899,7 +899,7 @@ static INPUT_PORTS_START( surfplnt )
 	PORT_START("IN3")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("ANALOG0")
+	PORT_START("ANALOG.0")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(25)
 INPUT_PORTS_END
 
@@ -937,7 +937,7 @@ static INPUT_PORTS_START( radikalb )
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("ANALOG0")
+	PORT_START("ANALOG.0")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(25)
 INPUT_PORTS_END
 

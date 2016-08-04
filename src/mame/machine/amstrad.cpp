@@ -2731,11 +2731,11 @@ READ8_MEMBER(amstrad_state::amstrad_psg_porta_read)
 				}
 				if(m_io_ctrltype && (m_io_ctrltype->read() == 2) && (m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F) == 9)
 				{
-					return (m_io_kbrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F] ? m_io_kbrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F]->read() & 0x80 : 0) | 0x7f;
+					return (m_io_kbrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F].read_safe(0) & 0x80) | 0x7f;
 				}
 			}
 
-			return m_io_kbrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F] ? m_io_kbrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F]->read() : 0;
+			return m_io_kbrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F].read_safe(0);
 		}
 		return 0xFF;
 	}
@@ -2776,8 +2776,8 @@ IRQ_CALLBACK_MEMBER(amstrad_state::amstrad_cpu_acknowledge_int)
 				UINT8 data_x, data_y;
 
 				m_amx_mouse_data = 0x0f;
-				data_x = m_io_mouse1 ? m_io_mouse1->read() : 0;
-				data_y = m_io_mouse2 ? m_io_mouse2->read() : 0;
+				data_x = m_io_mouse1.read_safe(0);
+				data_y = m_io_mouse2.read_safe(0);
 
 				if(data_x > prev_x)
 					m_amx_mouse_data &= ~0x08;
@@ -2787,11 +2787,11 @@ IRQ_CALLBACK_MEMBER(amstrad_state::amstrad_cpu_acknowledge_int)
 					m_amx_mouse_data &= ~0x02;
 				if(data_y < prev_y)
 					m_amx_mouse_data &= ~0x01;
-				m_amx_mouse_data |= ((m_io_mouse3 ? m_io_mouse3->read() : 0) << 4);
+				m_amx_mouse_data |= (m_io_mouse3.read_safe(0) << 4);
 				prev_x = data_x;
 				prev_y = data_y;
 
-				m_amx_mouse_data |= ((m_io_kbrow[9] ? m_io_kbrow[9]->read() : 0) & 0x80);  // DEL key
+				m_amx_mouse_data |= (m_io_kbrow[9].read_safe(0) & 0x80);  // DEL key
 			}
 		}
 	return 0xFF;

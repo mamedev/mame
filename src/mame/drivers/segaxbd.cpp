@@ -293,7 +293,9 @@ segaxbd_state::segaxbd_state(const machine_config &mconfig, const char *tag, dev
 			m_gprider_hack(false),
 			m_palette_entries(0),
 			m_screen(*this, "screen"),
-			m_palette(*this, "palette")
+			m_palette(*this, "palette"),
+			m_adc_ports(*this, "ADC"),
+			m_mux_ports(*this, "MUX")
 {
 	memset(m_adc_reverse, 0, sizeof(m_adc_reverse));
 	memset(m_iochip_regs, 0, sizeof(m_iochip_regs));
@@ -462,11 +464,9 @@ void segaxbd_state::sound_data_w(UINT8 data)
 
 READ16_MEMBER( segaxbd_state::adc_r )
 {
-	static const char *const ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6", "ADC7" };
-
 	// on the write, latch the selected input port and stash the value
 	int which = (m_iochip_regs[0][2] >> 2) & 7;
-	int value = read_safe(ioport(ports[which]), 0x0010);
+	int value = m_adc_ports[which].read_safe(0x0010);
 
 	// reverse some port values
 	if (m_adc_reverse[which])
@@ -926,8 +926,7 @@ void segaxbd_state::smgp_iochip0_motor_w(UINT8 data)
 
 UINT8 segaxbd_state::lastsurv_iochip1_port_r(UINT8 data)
 {
-	static const char * const port_names[] = { "MUX0", "MUX1", "MUX2", "MUX3" };
-	return read_safe(ioport(port_names[m_lastsurv_mux]), 0xff);
+	return m_mux_ports[m_lastsurv_mux].read_safe(0xff);
 }
 
 
@@ -1312,19 +1311,19 @@ static INPUT_PORTS_START( aburner )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START("mainpcb:ADC0")  // stick X
+	PORT_START("mainpcb:ADC.0")  // stick X
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 
-	PORT_START("mainpcb:ADC1")  // stick Y
+	PORT_START("mainpcb:ADC.1")  // stick Y
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x40,0xc0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_START("mainpcb:ADC2")  // throttle
+	PORT_START("mainpcb:ADC.2")  // throttle
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_SENSITIVITY(100) PORT_KEYDELTA(79)
 
-	PORT_START("mainpcb:ADC3")  // motor Y
+	PORT_START("mainpcb:ADC.3")  // motor Y
 	PORT_BIT( 0xff, (0xb0+0x50)/2, IPT_SPECIAL )
 
-	PORT_START("mainpcb:ADC4")  // motor X
+	PORT_START("mainpcb:ADC.4")  // motor X
 	PORT_BIT( 0xff, (0xb0+0x50)/2, IPT_SPECIAL )
 INPUT_PORTS_END
 
@@ -1392,13 +1391,13 @@ static INPUT_PORTS_START( thndrbld )
 	//  On the "Standing" cabinet, the joystick Y axis is reversed.
 	//  On the "Mini Upright" cabinet, the inputs conform to After Burner II:
 	//  the X axis is (un-)reversed, and the throttle and Y axis switch places
-	PORT_START("mainpcb:ADC0")  // stick X
+	PORT_START("mainpcb:ADC.0")  // stick X
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_START("mainpcb:ADC1")  // "slottle"
+	PORT_START("mainpcb:ADC.1")  // "slottle"
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_SENSITIVITY(100) PORT_KEYDELTA(79)
 
-	PORT_START("mainpcb:ADC2")  // stick Y
+	PORT_START("mainpcb:ADC.2")  // stick Y
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 INPUT_PORTS_END
 
@@ -1449,27 +1448,27 @@ static INPUT_PORTS_START( lastsurv )
 	PORT_MODIFY("mainpcb:IO1PORTA")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )
 
-	PORT_START("mainpcb:MUX0")
+	PORT_START("mainpcb:MUX.0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0xf0, 0xf0 ^ 0x40, IPT_POSITIONAL ) PORT_PLAYER(2) PORT_POSITIONS(8) PORT_REMAP_TABLE(lastsurv_position_table) PORT_WRAPS PORT_SENSITIVITY(1) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_CODE_DEC(KEYCODE_Q) PORT_CODE_INC(KEYCODE_W)
 
-	PORT_START("mainpcb:MUX1")
+	PORT_START("mainpcb:MUX.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0xf0, 0xf0 ^ 0x40, IPT_POSITIONAL ) PORT_PLAYER(1) PORT_POSITIONS(8) PORT_REMAP_TABLE(lastsurv_position_table) PORT_WRAPS PORT_SENSITIVITY(1) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
 
-	PORT_START("mainpcb:MUX2")
+	PORT_START("mainpcb:MUX.2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("mainpcb:MUX3")
+	PORT_START("mainpcb:MUX.3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("mainpcb:IO1PORTD")
@@ -1539,16 +1538,16 @@ static INPUT_PORTS_START( loffire )
 	PORT_DIPSETTING(    0x80, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, "Twin" )
 
-	PORT_START("mainpcb:ADC0")
+	PORT_START("mainpcb:ADC.0")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(5)
 
-	PORT_START("mainpcb:ADC1")
+	PORT_START("mainpcb:ADC.1")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(5)
 
-	PORT_START("mainpcb:ADC2")
+	PORT_START("mainpcb:ADC.2")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_PLAYER(2)
 
-	PORT_START("mainpcb:ADC3")
+	PORT_START("mainpcb:ADC.3")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -1581,13 +1580,13 @@ static INPUT_PORTS_START( rachero )
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
 
-	PORT_START("mainpcb:ADC0")  // steering
+	PORT_START("mainpcb:ADC.0")  // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_START("mainpcb:ADC1")  // gas pedal
+	PORT_START("mainpcb:ADC.1")  // gas pedal
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 
-	PORT_START("mainpcb:ADC2")  // brake
+	PORT_START("mainpcb:ADC.2")  // brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 INPUT_PORTS_END
 
@@ -1624,13 +1623,13 @@ static INPUT_PORTS_START( smgp )
 	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )
 //  PORT_DIPSETTING(    0x00, "Deluxe" )
 
-	PORT_START("mainpcb:ADC0")  // steering
+	PORT_START("mainpcb:ADC.0")  // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x38,0xc8) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 
-	PORT_START("mainpcb:ADC1")  // gas pedal
+	PORT_START("mainpcb:ADC.1")  // gas pedal
 	PORT_BIT( 0xff, 0x38, IPT_PEDAL ) PORT_MINMAX(0x38,0xb8) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 
-	PORT_START("mainpcb:ADC2")  // brake
+	PORT_START("mainpcb:ADC.2")  // brake
 	PORT_BIT( 0xff, 0x28, IPT_PEDAL2 ) PORT_MINMAX(0x28,0xa8) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 INPUT_PORTS_END
 
@@ -1662,10 +1661,10 @@ static INPUT_PORTS_START( abcop )
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START("mainpcb:ADC0")  // steering
+	PORT_START("mainpcb:ADC.0")  // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_START("mainpcb:ADC1")  // accelerator
+	PORT_START("mainpcb:ADC.1")  // accelerator
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 INPUT_PORTS_END
 
@@ -1715,13 +1714,13 @@ static INPUT_PORTS_START( gprider )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START("mainpcb:ADC0")  // steering
+	PORT_START("mainpcb:ADC.0")  // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 
-	PORT_START("mainpcb:ADC1")  // gas pedal
+	PORT_START("mainpcb:ADC.1")  // gas pedal
 	PORT_BIT( 0xff, 0x10, IPT_PEDAL ) PORT_MINMAX(0x10,0xef) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_REVERSE
 
-	PORT_START("mainpcb:ADC2")  // brake
+	PORT_START("mainpcb:ADC.2")  // brake
 	PORT_BIT( 0xff, 0x10, IPT_PEDAL2 ) PORT_MINMAX(0x10,0xef) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_REVERSE
 INPUT_PORTS_END
 
@@ -1772,13 +1771,13 @@ static INPUT_PORTS_START( gprider_double )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START("subpcb:ADC0")  // steering
+	PORT_START("subpcb:ADC.0")  // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_PLAYER(2)
 
-	PORT_START("subpcb:ADC1")  // gas pedal
+	PORT_START("subpcb:ADC.1")  // gas pedal
 	PORT_BIT( 0xff, 0x10, IPT_PEDAL ) PORT_MINMAX(0x10,0xef) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_REVERSE PORT_PLAYER(2)
 
-	PORT_START("subpcb:ADC2")  // brake
+	PORT_START("subpcb:ADC.2")  // brake
 	PORT_BIT( 0xff, 0x10, IPT_PEDAL2 ) PORT_MINMAX(0x10,0xef) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_REVERSE PORT_PLAYER(2)
 
 INPUT_PORTS_END

@@ -87,7 +87,7 @@ Address          Dir Data     Description
 
 READ8_MEMBER(jackal_state::jackalr_rotary_r)
 {
-	return (1 << read_safe(ioport(offset ? "DIAL1" : "DIAL0"), 0x00)) ^ 0xff;
+	return (1 << m_dials[offset].read_safe(0x00)) ^ 0xff;
 }
 
 WRITE8_MEMBER(jackal_state::jackal_flipscreen_w)
@@ -245,10 +245,10 @@ static INPUT_PORTS_START( jackalr )
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DIAL0") // player 1 8-way rotary control - converted in jackalr_rotary_r()
+	PORT_START("DIAL.0") // player 1 8-way rotary control - converted in jackalr_rotary_r()
 	PORT_BIT( 0xff, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(8) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_FULL_TURN_COUNT(8)
 
-	PORT_START("DIAL1") // player 2 8-way rotary control - converted in jackalr_rotary_r()
+	PORT_START("DIAL.1") // player 2 8-way rotary control - converted in jackalr_rotary_r()
 	PORT_BIT( 0xff, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(8) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_FULL_TURN_COUNT(8)
 INPUT_PORTS_END
 

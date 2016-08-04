@@ -324,12 +324,12 @@ READ8_MEMBER(cosmic_state::cosmica_pixel_clock_r)
 READ8_MEMBER(cosmic_state::cosmicg_port_0_r)
 {
 	/* The top four address lines from the CRTC are bits 0-3 */
-	return (ioport("IN0")->read() & 0xf0) | ((m_screen->vpos() & 0xf0) >> 4);
+	return (m_in_ports[0]->read() & 0xf0) | ((m_screen->vpos() & 0xf0) >> 4);
 }
 
 READ8_MEMBER(cosmic_state::magspot_coinage_dip_r)
 {
-	return (read_safe(ioport("DSW"), 0) & (1 << (7 - offset))) ? 0 : 1;
+	return (m_dsw.read_safe(0) & (1 << (7 - offset))) ? 0 : 1;
 }
 
 
@@ -337,8 +337,8 @@ READ8_MEMBER(cosmic_state::magspot_coinage_dip_r)
 
 READ8_MEMBER(cosmic_state::nomnlnd_port_0_1_r)
 {
-	int control = ioport(offset ? "IN1" : "IN0")->read();
-	int fire = ioport("IN3")->read();
+	int control = m_in_ports[offset]->read();
+	int fire = m_in_ports[3]->read();
 
 	/* If firing - stop tank */
 	if ((fire & 0xc0) == 0) return 0xff;
@@ -396,7 +396,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cosmicg_io_map, AS_IO, 8, cosmic_state )
 	AM_RANGE(0x00, 0x00) AM_READ(cosmicg_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN.1")
 	AM_RANGE(0x00, 0x15) AM_WRITE(cosmicg_output_w)
 	AM_RANGE(0x16, 0x17) AM_WRITE(cosmic_color_register_w)
 ADDRESS_MAP_END
@@ -409,10 +409,10 @@ static ADDRESS_MAP_START( magspot_map, AS_PROGRAM, 8, cosmic_state )
 	AM_RANGE(0x4800, 0x4800) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0x480c, 0x480d) AM_WRITE(cosmic_color_register_w)
 	AM_RANGE(0x480f, 0x480f) AM_WRITE(flip_screen_w)
-	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("IN0")
-	AM_RANGE(0x5001, 0x5001) AM_READ_PORT("IN1")
-	AM_RANGE(0x5002, 0x5002) AM_READ_PORT("IN2")
-	AM_RANGE(0x5003, 0x5003) AM_READ_PORT("IN3")
+	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("IN.0")
+	AM_RANGE(0x5001, 0x5001) AM_READ_PORT("IN.1")
+	AM_RANGE(0x5002, 0x5002) AM_READ_PORT("IN.2")
+	AM_RANGE(0x5003, 0x5003) AM_READ_PORT("IN.3")
 	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
@@ -540,14 +540,14 @@ INPUT_CHANGED_MEMBER(cosmic_state::cosmicg_coin_inserted)
 }
 
 static INPUT_PORTS_START( cosmicg )
-	PORT_START("IN0")   /* 4-7 */
+	PORT_START("IN.0")   /* 4-7 */
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_SPECIAL )    /* pixel clock */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 
-	PORT_START("IN1")   /* 8-15 */
+	PORT_START("IN.1")   /* 8-15 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_2WAY PORT_COCKTAIL
@@ -564,7 +564,7 @@ static INPUT_PORTS_START( cosmicg )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x80, "5" )
 
-	PORT_START("IN2")   /* Hard wired settings */
+	PORT_START("IN.2")   /* Hard wired settings */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cosmic_state,cosmicg_coin_inserted, 0)
 
 	/* This dip switch is not read by the program at any time   */
@@ -592,7 +592,7 @@ INPUT_CHANGED_MEMBER(cosmic_state::coin_inserted_nmi)
 }
 
 static INPUT_PORTS_START( magspot )
-	PORT_START("IN0")
+	PORT_START("IN.0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x1c, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -603,14 +603,14 @@ static INPUT_PORTS_START( magspot )
 	PORT_DIPSETTING(    0xc0, "15000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 
-	PORT_START("IN1")
+	PORT_START("IN.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x1c, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN2")
+	PORT_START("IN.2")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SWA:5,6")
 	PORT_DIPSETTING(    0x01, "2000" )
 	PORT_DIPSETTING(    0x02, "3000" )
@@ -689,21 +689,21 @@ static INPUT_PORTS_START( magspot )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( devzone )
-	PORT_START("IN0")
+	PORT_START("IN.0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x1c, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN1")
+	PORT_START("IN.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x1c, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN2")
+	PORT_START("IN.2")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SWA:5,6")
 	PORT_DIPSETTING(    0x01, "4000" )
 	PORT_DIPSETTING(    0x02, "6000" )
@@ -775,7 +775,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( devzone2 )
 	PORT_INCLUDE( devzone )
 
-	PORT_MODIFY("IN2")
+	PORT_MODIFY("IN.2")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SWA:5,6")
 	PORT_DIPSETTING(    0x01, "2000" )
 	PORT_DIPSETTING(    0x02, "3000" )
@@ -785,21 +785,21 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( nomnlnd )
-	PORT_START("IN0")   /* Controls - Remapped for game */
+	PORT_START("IN.0")   /* Controls - Remapped for game */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x55, IP_ACTIVE_LOW, IPT_SPECIAL )    /* diagonals */
 
-	PORT_START("IN1")
+	PORT_START("IN.1")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x55, IP_ACTIVE_LOW, IPT_SPECIAL )    /* diagonals */
 
-	PORT_START("IN2")
+	PORT_START("IN.2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW:5,6")
 	PORT_DIPSETTING(    0x01, "2000" )
 	PORT_DIPSETTING(    0x02, "3000" )
@@ -835,7 +835,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( nomnlndg )
 	PORT_INCLUDE( nomnlnd )
 
-	PORT_MODIFY("IN2")
+	PORT_MODIFY("IN.2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW:5,6")
 	PORT_DIPSETTING(    0x01, "3000" )
 	PORT_DIPSETTING(    0x02, "5000" )

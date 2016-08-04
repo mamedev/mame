@@ -55,6 +55,8 @@ public:
 			m_screen(*this, "screen"),
 			m_palette(*this, "palette"),
 			m_soundlatch(*this, "soundlatch"),
+			m_fake_select(*this, "FAKE_SELECT"),
+			m_tenspot_game_dsw(*this, "IN2_GAME"),
 			m_spriteram(*this, "spriteram"),
 			m_videoram(*this, "videoram"),
 			m_decrypted_opcodes(*this, "decrypted_opcodes") { }
@@ -75,6 +77,9 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch;
+
+	optional_ioport m_fake_select;
+	optional_ioport_array<10> m_tenspot_game_dsw;
 
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;

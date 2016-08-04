@@ -135,14 +135,13 @@ READ32_MEMBER(midvunit_state::midvunit_adc_r)
 
 WRITE32_MEMBER(midvunit_state::midvunit_adc_w)
 {
-	static const char *const adcnames[] = { "WHEEL", "ACCEL", "BRAKE" };
-
 	if (!(m_control_data & 0x20))
 	{
 		int which = (data >> m_adc_shift) - 4;
 		if (which < 0 || which > 2)
 			logerror("adc_w: unexpected which = %02X\n", which + 4);
-		m_adc_data = read_safe(ioport(adcnames[which]), 0);
+		else
+			m_adc_data = m_adc_ports[which].read_safe(0);
 		timer_set(attotime::from_msec(1), TIMER_ADC_READY);
 	}
 	else
@@ -643,13 +642,13 @@ static INPUT_PORTS_START( crusnusa )
 	PORT_DIPSETTING(      0x1800, "Spain-4" )
 	PORT_DIPSETTING(      0x0e00, "Netherland-1" )
 
-	PORT_START("WHEEL")     /* wheel */
+	PORT_START("ADC.0")     /* wheel */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START("ACCEL")     /* gas pedal */
+	PORT_START("ADC.1")     /* gas pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START("BRAKE")     /* brake pedal */
+	PORT_START("ADC.2")     /* brake pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 INPUT_PORTS_END
 
@@ -773,13 +772,13 @@ static INPUT_PORTS_START( crusnwld )
 	PORT_DIPSETTING(      0x1800, "Spain-4" )
 	PORT_DIPSETTING(      0x0e00, "Netherland-1" )
 
-	PORT_START("WHEEL")     /* wheel */
+	PORT_START("ADC.0")     /* wheel */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START("ACCEL")     /* gas pedal */
+	PORT_START("ADC.1")     /* gas pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START("BRAKE")     /* brake pedal */
+	PORT_START("ADC.2")     /* brake pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 INPUT_PORTS_END
 
@@ -869,13 +868,13 @@ static INPUT_PORTS_START( offroadc )
 	PORT_DIPSETTING(      0x7000, "Denmark 1" )
 	PORT_DIPSETTING(      0x6800, "Hungary 1" )
 
-	PORT_START("WHEEL")     /* wheel */
+	PORT_START("ADC.0")     /* wheel */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START("ACCEL")     /* gas pedal */
+	PORT_START("ADC.1")     /* gas pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START("BRAKE")     /* brake pedal */
+	PORT_START("ADC.2")     /* brake pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 INPUT_PORTS_END
 

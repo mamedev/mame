@@ -43,13 +43,16 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_vram(*this, "vram"),
 		m_heartbeat(*this, "heartbeat"),
-		m_dac(*this, "dac")
+		m_dac(*this, "dac"),
+		m_switches(*this, "C")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_vram;
 	required_device<timer_device> m_heartbeat;
 	required_device<dac_device> m_dac;
+
+	optional_ioport_array<4> m_switches;
 
 	UINT8 m_status;
 	UINT8 m_common;
@@ -231,10 +234,10 @@ READ8_MEMBER(meyc8088_state::meyc8088_input_r)
 	UINT8 ret = 0xff;
 
 	// multiplexed switch inputs
-	if (~m_common & 1) ret &= read_safe(ioport("C0"), 0); // bit switches
-	if (~m_common & 2) ret &= read_safe(ioport("C1"), 0); // control switches
-	if (~m_common & 4) ret &= read_safe(ioport("C2"), 0); // light switches
-	if (~m_common & 8) ret &= read_safe(ioport("C3"), 0); // light switches
+	if (~m_common & 1) ret &= m_switches[0].read_safe(0); // bit switches
+	if (~m_common & 2) ret &= m_switches[1].read_safe(0); // control switches
+	if (~m_common & 4) ret &= m_switches[2].read_safe(0); // light switches
+	if (~m_common & 8) ret &= m_switches[3].read_safe(0); // light switches
 
 	return ret;
 }
@@ -297,7 +300,7 @@ static INPUT_PORTS_START( gldarrow )
 	PORT_BIT( 0x78, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // hopper coin switch?
 
-	PORT_START("C0")
+	PORT_START("C.0")
 	PORT_DIPNAME( 0x03, 0x00, "Payout Percentage" )     PORT_DIPLOCATION("BSW:1,2")
 	PORT_DIPSETTING(    0x03, "85%")
 	PORT_DIPSETTING(    0x02, "88%")
@@ -320,7 +323,7 @@ static INPUT_PORTS_START( gldarrow )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_HIGH, "BSW:8" )
 
-	PORT_START("C1")
+	PORT_START("C.1")
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Meter Reset")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Meter Read")
@@ -328,7 +331,7 @@ static INPUT_PORTS_START( gldarrow )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("C2")
+	PORT_START("C.2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )
@@ -336,7 +339,7 @@ static INPUT_PORTS_START( gldarrow )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("C3")
+	PORT_START("C.3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 

@@ -38,6 +38,7 @@ public:
 			m_workram(*this, "workram"),
 			m_sharrier_video(false),
 			m_adc_select(0),
+			m_adc_ports(*this, "ADC"),
 			m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
@@ -109,6 +110,7 @@ protected:
 
 	// internal state
 	UINT8                   m_adc_select;
+	optional_ioport_array<4> m_adc_ports;
 	bool                    m_shadow;
 	optional_shared_ptr<UINT16> m_decrypted_opcodes;
 };

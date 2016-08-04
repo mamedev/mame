@@ -380,24 +380,18 @@ TIMER_CALLBACK_MEMBER( amiga_state::amiga_irq_proc )
 
 UINT16 amiga_state::joy0dat_r()
 {
-	if (m_input_device == nullptr)
-		return m_joy0dat_port ? m_joy0dat_port->read() : 0xffff;
-
-	if (m_input_device->read() & 0x10)
-		return m_joy0dat_port ? m_joy0dat_port->read() : 0xffff;
+	if (!m_input_device.found() || (m_input_device->read() & 0x10))
+		return m_joy0dat_port.read_safe(0xffff);
 	else
-		return ((m_p1_mouse_y ? m_p1_mouse_y->read() : 0xff) << 8) | (m_p1_mouse_x? m_p1_mouse_x->read() : 0xff);
+		return (m_p1_mouse_y.read_safe(0xff) << 8) | m_p1_mouse_x.read_safe(0xff);
 }
 
 UINT16 amiga_state::joy1dat_r()
 {
-	if (m_input_device == nullptr)
-		return m_joy1dat_port ? m_joy1dat_port->read() : 0xffff;
-
-	if (m_input_device->read() & 0x20)
-		return m_joy1dat_port ? m_joy1dat_port->read() : 0xffff;
+	if (!m_input_device.found() || m_input_device->read() & 0x20)
+		return m_joy1dat_port.read_safe(0xffff);
 	else
-		return ((m_p2_mouse_y ? m_p2_mouse_y->read() : 0xff) << 8) | (m_p2_mouse_x ? m_p2_mouse_x->read() : 0xff);
+		return (m_p2_mouse_y.read_safe(0xff) << 8) | m_p2_mouse_x.read_safe(0xff);
 }
 
 CUSTOM_INPUT_MEMBER( amiga_state::amiga_joystick_convert )
@@ -1194,10 +1188,7 @@ READ16_MEMBER( amiga_state::custom_chip_r )
 				return joy1dat_r();
 
 		case REG_POTGOR:
-			if (m_potgo_port)
-				return m_potgo_port->read();
-			else
-				return 0x5500;
+			return m_potgo_port.read_safe(0x5500);
 
 		case REG_POT0DAT:
 			if (m_pot0dat_port)

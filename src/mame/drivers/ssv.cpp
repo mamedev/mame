@@ -722,11 +722,7 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(ssv_state::sxyreact_ballswitch_r)
 {
-	if ( m_io_service )
-	{
-		return m_io_service->read();
-	}
-	return 0;
+	return m_io_service.read_safe(0);
 }
 
 READ16_MEMBER(ssv_state::sxyreact_dial_r)
@@ -740,7 +736,7 @@ WRITE16_MEMBER(ssv_state::sxyreact_dial_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		if (data & 0x20)
-			m_sxyreact_serial = ( m_io_paddle ? m_io_paddle->read() : 0 ) & 0xff;
+			m_sxyreact_serial = m_io_paddle.read_safe(0) & 0xff;
 
 		if ( (m_sxyreact_dial & 0x40) && !(data & 0x40) )   // $40 -> $00
 			m_sxyreact_serial <<= 1;                        // shift 1 bit

@@ -32,11 +32,10 @@ todo:
 READ8_MEMBER(gomoku_state::input_port_r)
 {
 	int i, res;
-	static const char *const portnames[] = { "IN0", "IN1", "DSW", "UNUSED0", "UNUSED1", "UNUSED2", "UNUSED3", "UNUSED4" };
 
 	res = 0;
 	for (i = 0; i < 8; i++)
-		res |= ((read_safe(ioport(portnames[i]), 0xff) >> offset) & 1) << i;
+		res |= ((m_inputs[i].read_safe(0xff) >> offset) & 1) << i;
 
 	return res;
 }
@@ -60,7 +59,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( gomoku )
-	PORT_START("IN0")
+	PORT_START("IN.0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
@@ -70,7 +69,7 @@ static INPUT_PORTS_START( gomoku )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
 
-	PORT_START("IN1")
+	PORT_START("IN.1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
@@ -82,7 +81,7 @@ static INPUT_PORTS_START( gomoku )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN2 )
 
-	PORT_START("DSW")
+	PORT_START("IN.2")
 	PORT_SERVICE( 0x01, IP_ACTIVE_HIGH )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Lives ))  PORT_DIPLOCATION("SW1:2,3")
 	PORT_DIPSETTING(    0x00, "2" )

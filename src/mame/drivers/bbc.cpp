@@ -659,14 +659,14 @@ INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(bbc_state::monitor_changed)
 {
-	m_monitortype = read_safe(ioport("BBCCONFIG"), 0) &0x03;
+	m_monitortype = m_bbcconfig.read_safe(0) &0x03;
 }
 
 
 INPUT_CHANGED_MEMBER(bbc_state::speech_changed)
 {
 	// Switchable during runtime as some games (Hyper Sports, Space Fighter) are not compatible with Speech
-	m_Speech = read_safe(ioport("BBCCONFIG"), 0) & 0x04;
+	m_Speech = m_bbcconfig.read_safe(0) & 0x04;
 }
 
 

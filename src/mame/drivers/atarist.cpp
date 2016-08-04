@@ -566,7 +566,7 @@ READ8_MEMBER( st_state::ikbd_port2_r )
 
 	*/
 
-	UINT8 data = m_joy1 ? m_joy1->read() & 0x06 : 0x06;
+	UINT8 data = m_joy1.read_safe(0x06) & 0x06;
 
 	// serial receive
 	data |= m_ikbd_tx << 3;
@@ -653,7 +653,7 @@ READ8_MEMBER( st_state::ikbd_port4_r )
 
 	if (m_ikbd_joy) return 0xff;
 
-	UINT8 data = m_joy0 ? m_joy0->read() : 0xff;
+	UINT8 data = m_joy0.read_safe(0xff);
 
 	if ((m_config->read() & 0x01) == 0)
 	{

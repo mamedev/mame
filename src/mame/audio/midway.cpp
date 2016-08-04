@@ -53,6 +53,7 @@ midway_ssio_device::midway_ssio_device(const machine_config &mconfig, const char
 		m_cpu(*this, "cpu"),
 		m_ay0(*this, "ay0"),
 		m_ay1(*this, "ay1"),
+		m_ports(*this, "IP"),
 		m_status(0),
 		m_14024_count(0),
 		m_mute(0)
@@ -113,8 +114,7 @@ WRITE_LINE_MEMBER(midway_ssio_device::reset_write)
 
 READ8_MEMBER(midway_ssio_device::ioport_read)
 {
-	static const char *const port[] = { "IP0", "IP1", "IP2", "IP3", "IP4" };
-	UINT8 result = read_safe(ioport(port[offset]), 0xff);
+	UINT8 result = m_ports[offset].read_safe(0xff);
 	if (!m_custom_input[offset].isnull())
 		result = (result & ~m_custom_input_mask[offset]) |
 					(m_custom_input[offset](space, offset, 0xff) & m_custom_input_mask[offset]);

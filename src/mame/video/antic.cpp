@@ -1391,7 +1391,7 @@ void antic_device::render(address_space &space, int param1, int param2, int para
  ************************************************************************/
 UINT32 antic_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT32 new_tv_artifacts = m_artifacts ? m_artifacts->read() : 0;
+	UINT32 new_tv_artifacts = m_artifacts.read_safe(0);
 	copybitmap(bitmap, *m_bitmap, 0, 0, 0, 0, cliprect);
 
 	if (m_tv_artifacts != new_tv_artifacts)
@@ -2084,7 +2084,7 @@ void antic_device::generic_interrupt(int button_count)
 	if( m_scanline == VBL_START )
 	{
 		/* specify buttons relevant to this Atari variant */
-		m_gtia->button_interrupt(button_count, m_djoy_b ? m_djoy_b->read() : 0);
+		m_gtia->button_interrupt(button_count, m_djoy_b.read_safe(0));
 
 		/* do nothing new for the rest of the frame */
 		m_modelines = m_screen->height() - VBL_START;

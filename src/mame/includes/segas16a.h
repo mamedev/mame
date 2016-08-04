@@ -50,7 +50,8 @@ public:
 			m_last_buttons1(0),
 			m_last_buttons2(0),
 			m_read_port(0),
-			m_mj_input_num(0)
+			m_mj_input_num(0),
+			m_mj_inputs(*this, "MJ")
 	{ }
 
 	// PPI read/write callbacks
@@ -160,4 +161,5 @@ protected:
 	UINT8                   m_last_buttons2;
 	UINT8                   m_read_port;
 	UINT8                   m_mj_input_num;
+	optional_ioport_array<6> m_mj_inputs;
 };
