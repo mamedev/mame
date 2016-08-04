@@ -5,7 +5,6 @@
 -- high-score saving with hiscore.dat infom just as older
 -- builds did in the past.
 -- 
-require('lfs')
 local exports = {}
 exports.name = "hiscore"
 exports.version = "1.0.0"
@@ -24,8 +23,7 @@ function hiscore.startplugin()
 
 	local hiscoredata_path = "hiscore.dat";
 	local hiscore_path = "hi";
-    	local config_path = manager:options().entries.inipath:value():match("[^;]+") .. "/hiscore.ini";
-	config_path = config_path:gsub("%$(%w+)", os.getenv);
+	local config_path = lfs.env_replace(manager:options().entries.inipath:value():match("[^;]+") .. "/hiscore.ini");
 	
 	local current_checksum = 0;
 	local default_checksum = 0;
@@ -47,7 +45,7 @@ function hiscore.startplugin()
 		local _conf = {}
 		for line in io.lines(config_path) do
 		  token, value = string.match(line, '([^ ]+) ([^ ]+)');
-		  _conf[token] = value:gsub("%$(%w+)", os.getenv);
+		  _conf[token] = lfs.env_replace(value);
 		end
 		hiscore_path = _conf["hi_path"];
 		-- hiscoredata_path = _conf["dat_path"]; -- don't know if I should do it, but wathever
