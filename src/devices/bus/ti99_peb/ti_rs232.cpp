@@ -483,42 +483,45 @@ void ti_rs232_pio_device::transmit_data(int uartind, UINT8 value)
 }
 
 /*
-    Map the DCE-like wiring to a DTE-like wiring (and vice versa), V1
+    Map the DCE-like wiring to a DTE-like wiring and vice versa (mapping==0)
+    No handshake
 
-       Emulated      PC serial
-       TI RS232      interface
-     XOUT  2 -----------( 3) ---> TXD
-      RIN  3 -----------( 2) <--- RXD
-       nc  4 -----------( 5) <--- CTS  (cable)
-      CRU  5 -|       |-( 8) <--- DCD
-  DSR+CTS 20 -----------( 6) <--- DSR
-     +12V  6 -----------(20) ---> DTR
-      RTS  8 -----------( 4) ---> RTS
+       Emulated           PC serial
+       TI RS232           interface
+     XOUT  2 TXD ----->-----( 3) ---> TXD
+      RIN  3 RXD -----<-----( 2) <--- RXD
+      CRU  5 CTS -|       |-( 8) <--- DCD  (cable)
+     +12V  6 DSR ----->-----(20) ---> DTR
+      RTS  8 DCD ----->-----( 4) ---> RTS
+  DSR+CTS 20 DTR -----<-----( 6) <--- DSR
+                          |-( 5) <--- CTS
 
+    Alternative mapping: (mapping==1)
+    RTS/CTS handshake
 
-      Alternative mapping for the PORT terminal emulator: (V2)
+       Emulated           PC serial
+       TI RS232           interface
+     XOUT  2 TXD ----->-----( 3) ---> TXD
+      RIN  3 RXD -----<-----( 2) <--- RXD
+      CRU  5 CTS ----->-----( 4) ---> RTS
+      +12V 6 DSR -|       |-( 6) <--- DSR
+      RTS  8 DCD ----->-----(20) ---> DTR
+  DSR+CTS 20 DTR -----<-----( 8) <--- DCD
+                          |-( 5) <--- CTS
 
-       Emulated      PC serial
-       TI RS232      interface
-     XOUT  2 -----------( 3) ---> TXD
-      RIN  3 -----------( 2) <--- RXD
-  DSR+CTS 20 -----------( 5) <--- CTS  (cable)
-      RTS  8 -----------(20) ---> DTR
-      CRU  5 -----------( 4) ---> RTS
-      +12V 6 -|       |-( 6) <--- DSR
-        nc 4 -----------( 8) <--- DCD
+    Yet another mapping: (mapping==2)
+    CRU-based handshake
 
-      Yet another mapping for the PORT terminal emulator: (V3)
+       Emulated           PC serial
+       TI RS232           interface
+     XOUT  2 TXD ----->-----( 3) ---> TXD
+      RIN  3 RXD -----<-----( 2) <--- RXD
+      CRU  5 CTS ----->-----(20) ---> DTR
+      +12V 6 DSR -|       |-( 6) <--- DSR
+      RTS  8 DCD ----->-----( 4) ---> RTS
+  DSR+CTS 20 DTR -----<-----( 5) <--- CTS  (cable)
+                          |-( 8) <--- DCD
 
-       Emulated      PC serial
-       TI RS232      interface
-     XOUT  2 -----------( 3) ---> TXD
-      RIN  3 -----------( 2) <--- RXD
-  DSR+CTS 20 -----------( 5) <--- CTS  (cable)
-      CRU  5 -----------(20) ---> DTR
-      RTS  8 -----------( 4) ---> RTS
-      +12V 6 -|       |-( 6) <--- DSR
-        nc 4 -----------( 8) <--- DCD
 */
 UINT8 ti_rs232_pio_device::map_lines_out(int uartind, UINT8 value)
 {
@@ -628,8 +631,7 @@ UINT8 ti_rs232_pio_device::map_lines_in(int uartind, UINT8 value)
 	{
 		if (mapping==1)
 		{
-			// V2 (PORT application)
-			if (value & CTS)
+			if (value & DCD)
 			{
 				ret |= DTR;
 				if (TRACE_MAP) logerror("(RS232/%d) Setting DTR line\n", uartind+1);
@@ -638,9 +640,9 @@ UINT8 ti_rs232_pio_device::map_lines_in(int uartind, UINT8 value)
 			{
 				if (TRACE_MAP) logerror("(RS232/%d) Cannot map DSR line, ignoring\n", uartind+1);
 			}
-			if (value & DCD)
+			if (value & CTS)
 			{
-				if (TRACE_MAP) logerror("(RS232/%d) Cannot map DCD line, ignoring\n", uartind+1);
+				if (TRACE_MAP) logerror("(RS232/%d) Cannot map CTS line, ignoring\n", uartind+1);
 			}
 		}
 		else
