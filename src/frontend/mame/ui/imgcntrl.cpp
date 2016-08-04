@@ -51,7 +51,7 @@ menu_control_device_image::menu_control_device_image(mame_ui_manager &mui, rende
 	if (m_swi != nullptr)
 	{
 		m_state = START_OTHER_PART;
-		m_current_directory.assign(m_image.working_directory());
+		m_current_directory = m_image.working_directory();
 	}
 	else
 	{
@@ -65,7 +65,7 @@ menu_control_device_image::menu_control_device_image(mame_ui_manager &mui, rende
 		}
 		else
 		{
-			m_current_directory.assign(m_image.working_directory());
+			m_current_directory = m_image.working_directory();
 		}
 
 		// check to see if the path exists; if not clear it

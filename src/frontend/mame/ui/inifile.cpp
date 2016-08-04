@@ -195,10 +195,10 @@ void favorite_manager::add_favorite_game()
 			auto part = image.part_entry();
 			ui_software_info tmpmatches;
 			tmpmatches.shortname = swinfo->shortname();
-			tmpmatches.longname = strensure(image.longname());
+			tmpmatches.longname = image.longname();
 			tmpmatches.parentname = swinfo->parentname();
-			tmpmatches.year = strensure(image.year());
-			tmpmatches.publisher = strensure(image.manufacturer());
+			tmpmatches.year = image.year();
+			tmpmatches.publisher = image.manufacturer();
 			tmpmatches.supported = image.supported();
 			tmpmatches.part = part->name();
 			tmpmatches.driver = &machine().system();

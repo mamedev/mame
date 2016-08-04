@@ -195,9 +195,9 @@ public:
 	// configuration access
 	void set_init_phase() { m_init_phase = true; }
 
-	const char* longname() const { return m_longname.c_str(); }
-	const char* manufacturer() const { return m_manufacturer.c_str(); }
-	const char* year() const { return m_year.c_str(); }
+	const std::string &longname() const { return m_longname; }
+	const std::string &manufacturer() const { return m_manufacturer; }
+	const std::string &year() const { return m_year; }
 	UINT32 supported() const { return m_supported; }
 
 	const software_info *software_entry() const { return m_software_info_ptr; }
@@ -206,7 +206,7 @@ public:
 	bool loaded_through_softlist() const { return m_software_info_ptr != nullptr; }
 
 	void set_working_directory(const char *working_directory) { m_working_directory = working_directory; }
-	const char * working_directory();
+	const std::string &working_directory();
 
 	UINT8 *get_software_region(const char *tag);
 	UINT32 get_software_region_length(const char *tag);
