@@ -105,4 +105,5 @@ public:
 	void cclimber_decode(const UINT8 convtable[8][16]);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	INTERRUPT_GEN_MEMBER(bagmanf_vblank_irq);
 };
