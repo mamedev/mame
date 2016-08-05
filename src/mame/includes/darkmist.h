@@ -47,6 +47,7 @@ public:
 	DECLARE_PALETTE_INIT(darkmist);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void decrypt_fgbgtiles(UINT8* rgn, int size);
 	void decrypt_gfx();
 	void decrypt_snd();
 

@@ -3241,7 +3241,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/cabal.cpp",
 	MAME_DIR .. "src/mame/includes/cabal.h",
 	MAME_DIR .. "src/mame/video/cabal.cpp",
-	MAME_DIR .. "src/mame/drivers/cshooter.cpp",
+	MAME_DIR .. "src/mame/drivers/airraid.cpp",
 	MAME_DIR .. "src/mame/drivers/dcon.cpp",
 	MAME_DIR .. "src/mame/includes/dcon.h",
 	MAME_DIR .. "src/mame/video/dcon.cpp",

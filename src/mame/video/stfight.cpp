@@ -34,35 +34,41 @@
 
 PALETTE_INIT_MEMBER(stfight_state, stfight)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	UINT8 *color_prom = memregion("tx_clut")->base();
 	int i;
 
-	/* text uses colors 0xc0-0xcf */
-	for (i = 0; i < 0x40; i++)
+	/* text uses colors 0xc0-0xff */
+	for (i = 0; i < 0x100; i++)
 	{
-		UINT8 ctabentry = (color_prom[i] & 0x0f) | 0xc0;
+		UINT8 ctabentry = (color_prom[i] & 0x3f) | 0xc0;
 		palette.set_pen_indirect(i, ctabentry);
 	}
+
+	color_prom = memregion("fg_clut")->base();
 
 	/* fg uses colors 0x40-0x7f */
-	for (i = 0x40; i < 0x140; i++)
+	for (i = 0x00; i < 0x100; i++)
 	{
-		UINT8 ctabentry = (color_prom[i + 0x1c0] & 0x0f) | ((color_prom[i + 0x0c0] & 0x03) << 4) | 0x40;
-		palette.set_pen_indirect(i, ctabentry);
+		UINT8 ctabentry = (color_prom[i] & 0x3f) | 0x40;
+		palette.set_pen_indirect(i+0x100, ctabentry);
 	}
+
+	color_prom = memregion("bg_clut")->base();
 
 	/* bg uses colors 0-0x3f */
-	for (i = 0x140; i < 0x240; i++)
+	for (i = 0x000; i < 0x100; i++)
 	{
-		UINT8 ctabentry = (color_prom[i + 0x2c0] & 0x0f) | ((color_prom[i + 0x1c0] & 0x03) << 4);
-		palette.set_pen_indirect(i, ctabentry);
+		UINT8 ctabentry = (color_prom[i] & 0x3f);
+		palette.set_pen_indirect(i+0x200, ctabentry);
 	}
 
-	/* bg uses colors 0x80-0xbf */
-	for (i = 0x240; i < 0x340; i++)
+	color_prom = memregion("spr_clut")->base();
+
+	/* spr uses colors 0x80-0xbf */
+	for (i = 0x000; i < 0x100; i++)
 	{
-		UINT8 ctabentry = (color_prom[i + 0x3c0] & 0x0f) | ((color_prom[i + 0x2c0] & 0x03) << 4) | 0x80;
-		palette.set_pen_indirect(i, ctabentry);
+		UINT8 ctabentry = (color_prom[i] & 0x3f) | 0x80;
+		palette.set_pen_indirect(i+0x300, ctabentry);
 	}
 }
 
@@ -82,7 +88,7 @@ TILEMAP_MAPPER_MEMBER(stfight_state::fg_scan)
 
 TILE_GET_INFO_MEMBER(stfight_state::get_fg_tile_info)
 {
-	UINT8   *fgMap = memregion("gfx5")->base();
+	UINT8   *fgMap = memregion("fg_map")->base();
 	int attr,tile_base;
 
 	attr = fgMap[0x8000+tile_index];
@@ -104,7 +110,7 @@ TILEMAP_MAPPER_MEMBER(stfight_state::bg_scan)
 
 TILE_GET_INFO_MEMBER(stfight_state::get_bg_tile_info)
 {
-	UINT8   *bgMap = memregion("gfx6")->base();
+	UINT8   *bgMap = memregion("bg_map")->base();
 	int attr,tile_bank,tile_base;
 
 	attr = bgMap[0x8000+tile_index];
