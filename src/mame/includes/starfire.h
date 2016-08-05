@@ -29,12 +29,14 @@ public:
 		m_starfire_colorram(*this, "colorram"),
 		m_starfire_videoram(*this, "videoram"),
 		m_samples(*this, "samples"),
+		m_nmi(*this, "NMI"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen") { }
 
 	required_shared_ptr<UINT8> m_starfire_colorram;
 	required_shared_ptr<UINT8> m_starfire_videoram;
 	optional_device<samples_device> m_samples;
+	optional_ioport m_nmi;
 
 	UINT8 m_prev_sound;
 	UINT8 m_fireone_select;

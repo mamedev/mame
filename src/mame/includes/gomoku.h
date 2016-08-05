@@ -9,6 +9,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_bgram(*this, "bgram"),
+		m_inputs(*this, {"IN0", "IN1", "DSW", "UNUSED0", "UNUSED1", "UNUSED2", "UNUSED3", "UNUSED4"}),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen") { }
@@ -20,6 +21,7 @@ public:
 	int m_bg_dispsw;
 	tilemap_t *m_fg_tilemap;
 	bitmap_ind16 m_bg_bitmap;
+	optional_ioport_array<8> m_inputs;
 	DECLARE_READ8_MEMBER(input_port_r);
 	DECLARE_WRITE8_MEMBER(gomoku_videoram_w);
 	DECLARE_WRITE8_MEMBER(gomoku_colorram_w);

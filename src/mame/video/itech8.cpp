@@ -436,7 +436,7 @@ READ8_MEMBER(itech8_state::blitter_r)
 
 	/* a read from offsets 12-15 return input port values */
 	if (offset >= 12 && offset <= 15)
-		result = m_an[offset - 12] ? m_an[offset - 12]->read() : 0;
+		result = m_an[offset - 12].read_safe(0);
 
 	return result;
 }

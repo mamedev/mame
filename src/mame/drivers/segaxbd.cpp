@@ -293,7 +293,9 @@ segaxbd_state::segaxbd_state(const machine_config &mconfig, const char *tag, dev
 			m_gprider_hack(false),
 			m_palette_entries(0),
 			m_screen(*this, "screen"),
-			m_palette(*this, "palette")
+			m_palette(*this, "palette"),
+			m_adc_ports(*this, {"ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6", "ADC7"}),
+			m_mux_ports(*this, {"MUX0", "MUX1", "MUX2", "MUX3"})
 {
 	memset(m_adc_reverse, 0, sizeof(m_adc_reverse));
 	memset(m_iochip_regs, 0, sizeof(m_iochip_regs));
@@ -462,11 +464,9 @@ void segaxbd_state::sound_data_w(UINT8 data)
 
 READ16_MEMBER( segaxbd_state::adc_r )
 {
-	static const char *const ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6", "ADC7" };
-
 	// on the write, latch the selected input port and stash the value
 	int which = (m_iochip_regs[0][2] >> 2) & 7;
-	int value = read_safe(ioport(ports[which]), 0x0010);
+	int value = m_adc_ports[which].read_safe(0x0010);
 
 	// reverse some port values
 	if (m_adc_reverse[which])
@@ -926,8 +926,7 @@ void segaxbd_state::smgp_iochip0_motor_w(UINT8 data)
 
 UINT8 segaxbd_state::lastsurv_iochip1_port_r(UINT8 data)
 {
-	static const char * const port_names[] = { "MUX0", "MUX1", "MUX2", "MUX3" };
-	return read_safe(ioport(port_names[m_lastsurv_mux]), 0xff);
+	return m_mux_ports[m_lastsurv_mux].read_safe(0xff);
 }
 
 

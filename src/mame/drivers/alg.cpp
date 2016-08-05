@@ -87,8 +87,8 @@ int alg_state::get_lightgun_pos(int player, int *x, int *y)
 {
 	const rectangle &visarea = m_screen->visible_area();
 
-	int xpos = (player == 0) ? m_gun1x->read() : (m_gun2x ? m_gun2x->read() : 0xffffffff);
-	int ypos = (player == 0) ? m_gun1y->read() : (m_gun2y ? m_gun2y->read() : 0xffffffff);
+	int xpos = (player == 0) ? m_gun1x->read() : m_gun2x.read_safe(0xffffffff);
+	int ypos = (player == 0) ? m_gun1y->read() : m_gun2y.read_safe(0xffffffff);
 
 	if (xpos == -1 || ypos == -1)
 		return FALSE;

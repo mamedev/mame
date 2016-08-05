@@ -224,14 +224,13 @@ READ8_MEMBER(djmain_state::inp2_r)
 READ32_MEMBER(djmain_state::turntable_r)
 {
 	UINT32 result = 0;
-	static const char *const ttnames[] = { "TT1", "TT2" };
 
 	if (ACCESSING_BITS_8_15)
 	{
 		UINT8 pos;
 		int delta;
 
-		pos = read_safe(ioport(ttnames[m_turntable_select]), 0);
+		pos = m_turntable[m_turntable_select].read_safe(0);
 		delta = pos - m_turntable_last_pos[m_turntable_select];
 		if (delta < -128)
 			delta += 256;

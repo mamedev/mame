@@ -131,12 +131,7 @@ public:
 		, m_io_dsw(*this, "DSW")
 		, m_io_mouse0(*this, "MOUSE0")
 		, m_io_mouse1(*this, "MOUSE1")
-		, m_io_key0(*this, "KEY0")
-		, m_io_key1(*this, "KEY1")
-		, m_io_key2(*this, "KEY2")
-		, m_io_key3(*this, "KEY3")
-		, m_io_key4(*this, "KEY4")
-		, m_io_key5(*this, "KEY5")
+		, m_io_key(*this, {"KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5"})
 		, m_psg_b(0)
 		, m_rtc_latch(0)
 		, m_kanji_latch(0)
@@ -228,12 +223,7 @@ private:
 	required_ioport m_io_dsw;
 	required_ioport m_io_mouse0;
 	required_ioport m_io_mouse1;
-	required_ioport m_io_key0;
-	required_ioport m_io_key1;
-	required_ioport m_io_key2;
-	required_ioport m_io_key3;
-	required_ioport m_io_key4;
-	required_ioport m_io_key5;
+	required_ioport_array<6> m_io_key;
 
 	/* PSG */
 	int m_psg_b;

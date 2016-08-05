@@ -1066,7 +1066,7 @@ DRIVER_INIT_MEMBER(md_base_state, megadrie)
 
 void md_base_state::screen_eof_megadriv(screen_device &screen, bool state)
 {
-	if (m_io_reset && m_io_reset->read() & 0x01)
+	if (m_io_reset.read_safe(0) & 0x01)
 		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 
 	// rising edge

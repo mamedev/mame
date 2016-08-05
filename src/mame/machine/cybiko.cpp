@@ -103,7 +103,7 @@ int cybiko_state::cybiko_key_r( offs_t offset, int mem_mask)
 	UINT16 data = 0xFFFF;
 	for (UINT8 i = 0; i < 15; i++)
 	{
-		if (m_input[i] && !BIT(offset, i))
+		if (m_input[i].found() && !BIT(offset, i))
 			data &= ~m_input[i]->read();
 	}
 	if (data != 0xFFFF)

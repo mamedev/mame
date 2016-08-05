@@ -1583,12 +1583,12 @@ READ16_MEMBER(seta_state::seta_dsw_r)
 
 READ8_MEMBER(seta_state::dsw1_r)
 {
-	return (ioport("DSW")->read() >> 8) & 0xff;
+	return (m_dsw->read() >> 8) & 0xff;
 }
 
 READ8_MEMBER(seta_state::dsw2_r)
 {
-	return (ioport("DSW")->read() >> 0) & 0xff;
+	return (m_dsw->read() >> 0) & 0xff;
 }
 
 
@@ -1683,15 +1683,15 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(seta_state::calibr50_ip_r)
 {
-	int dir1 = ioport("ROT1")->read();  // analog port
-	int dir2 = ioport("ROT2")->read();  // analog port
+	int dir1 = m_rot[0]->read();  // analog port
+	int dir2 = m_rot[1]->read();  // analog port
 
 	switch (offset)
 	{
-		case 0x00/2:    return ioport("P1")->read();    // p1
-		case 0x02/2:    return ioport("P2")->read();    // p2
+		case 0x00/2:    return m_p1->read();        // p1
+		case 0x02/2:    return m_p2->read();        // p2
 
-		case 0x08/2:    return ioport("COINS")->read(); // Coins
+		case 0x08/2:    return m_coins->read();     // Coins
 
 		case 0x10/2:    return (dir1 & 0xff);       // lower 8 bits of p1 rotation
 		case 0x12/2:    return (dir1 >> 8);         // upper 4 bits of p1 rotation
@@ -1746,10 +1746,10 @@ READ16_MEMBER(seta_state::usclssic_dsw_r)
 {
 	switch (offset)
 	{
-		case 0/2:   return (ioport("DSW")->read() >>  8) & 0xf;
-		case 2/2:   return (ioport("DSW")->read() >> 12) & 0xf;
-		case 4/2:   return (ioport("DSW")->read() >>  0) & 0xf;
-		case 6/2:   return (ioport("DSW")->read() >>  4) & 0xf;
+		case 0/2:   return (m_dsw->read() >>  8) & 0xf;
+		case 2/2:   return (m_dsw->read() >> 12) & 0xf;
+		case 4/2:   return (m_dsw->read() >>  0) & 0xf;
+		case 6/2:   return (m_dsw->read() >>  4) & 0xf;
 	}
 	return 0;
 }
@@ -1963,7 +1963,7 @@ WRITE16_MEMBER(seta_state::zombraid_gun_w)
 
 READ16_MEMBER(seta_state::extra_r)
 {
-	return read_safe(ioport("EXTRA"), 0xff);
+	return m_extra_port.read_safe(0xff);
 }
 
 static ADDRESS_MAP_START( wrofaero_map, AS_PROGRAM, 16, seta_state )
@@ -2137,7 +2137,7 @@ READ16_MEMBER(seta_state::keroppi_protection_init_r)
 
 READ16_MEMBER(seta_state::keroppi_coin_r)
 {
-	UINT16 result = ioport("COINS")->read();
+	UINT16 result = m_coins->read();
 
 	if (m_keroppi_prize_hop == 2)
 	{
@@ -2548,10 +2548,10 @@ ADDRESS_MAP_END
 READ16_MEMBER(seta_state::krzybowl_input_r)
 {
 	// analog ports
-	int dir1x = ioport("TRACK1_X")->read() & 0xfff;
-	int dir1y = ioport("TRACK1_Y")->read() & 0xfff;
-	int dir2x = ioport("TRACK2_X")->read() & 0xfff;
-	int dir2y = ioport("TRACK2_Y")->read() & 0xfff;
+	int dir1x = m_track1_x->read() & 0xfff;
+	int dir1y = m_track1_y->read() & 0xfff;
+	int dir2x = m_track2_x->read() & 0xfff;
+	int dir2y = m_track2_y->read() & 0xfff;
 
 	switch (offset)
 	{
@@ -2724,7 +2724,7 @@ READ16_MEMBER(seta_state::kiwame_input_r)
 	{
 		case 0x00/2:    return ioport(keynames[i])->read();
 		case 0x02/2:    return 0xffff;
-		case 0x04/2:    return ioport("COINS")->read();
+		case 0x04/2:    return m_coins->read();
 //      case 0x06/2:
 		case 0x08/2:    return 0xffff;
 
@@ -2991,20 +2991,20 @@ ADDRESS_MAP_END
 READ16_MEMBER(seta_state::inttoote_dsw_r)
 {
 	int shift = offset * 4;
-	return  ((((ioport("DSW1")->read() >> shift)       & 0xf)) << 0) |
-			((((ioport("DSW2_3")->read() >> shift)     & 0xf)) << 4) |
-			((((ioport("DSW2_3")->read() >> (shift+8)) & 0xf)) << 8) ;
+	return  ((((m_dsw1->read() >> shift)       & 0xf)) << 0) |
+			((((m_dsw2_3->read() >> shift)     & 0xf)) << 4) |
+			((((m_dsw2_3->read() >> (shift+8)) & 0xf)) << 8) ;
 }
 
 READ16_MEMBER(seta_state::inttoote_key_r)
 {
 	switch( *m_inttoote_key_select )
 	{
-		case 0x08:  return ioport("BET0")->read();
-		case 0x10:  return ioport("BET1")->read();
-		case 0x20:  return ioport("BET2")->read();
-		case 0x40:  return ioport("BET3")->read();
-		case 0x80:  return ioport("BET4")->read();
+		case 0x08:  return m_bet[0]->read();
+		case 0x10:  return m_bet[1]->read();
+		case 0x20:  return m_bet[2]->read();
+		case 0x40:  return m_bet[3]->read();
+		case 0x80:  return m_bet[4]->read();
 	}
 
 	logerror("%06X: unknown read, select = %04x\n",space.device().safe_pc(), *m_inttoote_key_select);
@@ -3055,11 +3055,11 @@ READ16_MEMBER(seta_state::jockeyc_mux_r)
 {
 	switch( m_jockeyc_key_select )
 	{
-		case 0x08:  return ioport("BET0")->read();
-		case 0x10:  return ioport("BET1")->read();
-		case 0x20:  return ioport("BET2")->read();
-		case 0x40:  return ioport("BET3")->read();
-		case 0x80:  return ioport("BET4")->read();
+		case 0x08:  return m_bet[0]->read();
+		case 0x10:  return m_bet[1]->read();
+		case 0x20:  return m_bet[2]->read();
+		case 0x40:  return m_bet[3]->read();
+		case 0x80:  return m_bet[4]->read();
 	}
 
 	return 0xffff;

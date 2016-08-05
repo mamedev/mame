@@ -95,10 +95,7 @@ class towns_state : public driver_device
 			m_nvram(*this, "nvram"),
 			m_nvram16(*this, "nvram16"),
 			m_ctrltype(*this, "ctrltype"),
-			m_key1(*this, "key1"),
-			m_key2(*this, "key2"),
-			m_key3(*this, "key3"),
-			m_key4(*this, "key4"),
+			m_kb_ports(*this, {"key1", "key2", "key3", "key4"}),
 			m_joy1(*this, "joy1"),
 			m_joy2(*this, "joy2"),
 			m_joy1_ex(*this, "joy1_ex"),
@@ -283,10 +280,7 @@ class towns_state : public driver_device
 	UINT8 towns_cdrom_read_byte_software();
 
 	required_ioport m_ctrltype;
-	required_ioport m_key1;
-	required_ioport m_key2;
-	required_ioport m_key3;
-	required_ioport m_key4;
+	required_ioport_array<4> m_kb_ports;
 	required_ioport m_joy1;
 	required_ioport m_joy2;
 	required_ioport m_joy1_ex;

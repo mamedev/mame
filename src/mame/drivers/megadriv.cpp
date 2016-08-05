@@ -356,7 +356,7 @@ MACHINE_RESET_MEMBER(md_cons_state, ms_megadriv)
 // same as screen_eof_megadriv but with addition of 32x and SegaCD/MegaCD pieces
 void md_cons_state::screen_eof_console(screen_device &screen, bool state)
 {
-	if (m_io_reset && (m_io_reset->read() & 0x01))
+	if (m_io_reset.read_safe(0) & 0x01)
 		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 
 	// rising edge

@@ -36,14 +36,7 @@ public:
 			m_page_ram(*this, "page_ram"),
 			m_color_ram(*this, "color_ram"),
 			m_run(*this, "RUN"),
-			m_y0(*this, "Y0"),
-			m_y1(*this, "Y1"),
-			m_y2(*this, "Y2"),
-			m_y3(*this, "Y3"),
-			m_y4(*this, "Y4"),
-			m_y5(*this, "Y5"),
-			m_y6(*this, "Y6"),
-			m_y7(*this, "Y7")
+			m_key_row(*this, {"Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7"})
 	{ }
 
 	required_device<cosmac_device> m_maincpu;
@@ -55,14 +48,7 @@ public:
 	required_shared_ptr<UINT8> m_page_ram;
 	optional_shared_ptr<UINT8> m_color_ram;
 	required_ioport m_run;
-	required_ioport m_y0;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
+	required_ioport_array<8> m_key_row;
 
 	virtual void machine_start() override;
 
@@ -86,7 +72,6 @@ public:
 	int m_blink;                // cursor blink
 
 	// keyboard state
-	ioport_port* m_key_row[8];
 	int m_keylatch;             // key latch
 
 	TIMER_DEVICE_CALLBACK_MEMBER(blink_tick);

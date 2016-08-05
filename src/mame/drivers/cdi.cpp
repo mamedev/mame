@@ -143,35 +143,35 @@ INPUT_CHANGED_MEMBER(cdi_state::mcu_input)
 	switch((FPTR)param)
 	{
 		case 0x39:
-			if(m_input1 && m_input1->read() & 0x01) send = true;
+			if (m_input1.read_safe(0) & 0x01) send = true;
 			break;
 		case 0x37:
-			if(m_input1 && m_input1->read() & 0x02) send = true;
+			if (m_input1.read_safe(0) & 0x02) send = true;
 			break;
 		case 0x31:
-			if(m_input1 && m_input1->read() & 0x04) send = true;
+			if (m_input1.read_safe(0) & 0x04) send = true;
 			break;
 		case 0x32:
-			if(m_input1 && m_input1->read() & 0x08) send = true;
+			if (m_input1.read_safe(0) & 0x08) send = true;
 			break;
 		case 0x33:
-			if(m_input1 && m_input1->read() & 0x10) send = true;
+			if (m_input1.read_safe(0) & 0x10) send = true;
 			break;
 
 		case 0x30:
-			if(m_input2 && m_input2->read() & 0x01) send = true;
+			if (m_input2.read_safe(0) & 0x01) send = true;
 			break;
 		case 0x38:
-			if(m_input2 && m_input2->read() & 0x02) send = true;
+			if (m_input2.read_safe(0) & 0x02) send = true;
 			break;
 		case 0x34:
-			if(m_input2 && m_input2->read() & 0x04) send = true;
+			if (m_input2.read_safe(0) & 0x04) send = true;
 			break;
 		case 0x35:
-			if(m_input2 && m_input2->read() & 0x08) send = true;
+			if (m_input2.read_safe(0) & 0x08) send = true;
 			break;
 		case 0x36:
-			if(m_input2 && m_input2->read() & 0x10) send = true;
+			if (m_input2.read_safe(0) & 0x10) send = true;
 			break;
 	}
 

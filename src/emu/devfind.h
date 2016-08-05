@@ -80,11 +80,6 @@ public:
 		: finder_base(base, tag),
 			m_target(nullptr) { }
 
-	// operators to make use transparent
-	operator _ObjectClass *() const { return m_target; }
-
-	virtual _ObjectClass *operator->() const { assert(m_target != nullptr); return m_target; }
-
 	// getters for explicit fetching
 	_ObjectClass *target() const { return m_target; }
 	bool found() const { return m_target != nullptr; }
@@ -108,6 +103,10 @@ public:
 	// construction/destruction
 	device_finder(device_t &base, const char *tag = FINDER_DUMMY_TAG)
 		: object_finder_base<_DeviceClass>(base, tag) { }
+
+	// operators to make pointer use transparent
+	operator _DeviceClass *() const { return object_finder_base<_DeviceClass>::m_target; }
+	virtual _DeviceClass *operator->() const { assert(object_finder_base<_DeviceClass>::m_target != nullptr); return object_finder_base<_DeviceClass>::m_target; }
 
 	// make reference use transparent as well
 	operator _DeviceClass &() { assert(object_finder_base<_DeviceClass>::m_target != nullptr); return *object_finder_base<_DeviceClass>::m_target; }
@@ -153,6 +152,10 @@ public:
 	memory_region_finder(device_t &base, const char *tag = FINDER_DUMMY_TAG)
 		: object_finder_base<memory_region>(base, tag) { }
 
+	// operators to make pointer use transparent
+	operator memory_region *() const { return m_target; }
+	virtual memory_region *operator->() const { assert(m_target != nullptr); return m_target; }
+
 	// make reference use transparent as well
 	operator memory_region &() const { assert(object_finder_base<memory_region>::m_target != nullptr); return *object_finder_base<memory_region>::m_target; }
 
@@ -190,6 +193,10 @@ public:
 	// construction/destruction
 	memory_bank_finder(device_t &base, const char *tag = FINDER_DUMMY_TAG)
 		: object_finder_base<memory_bank>(base, tag) { }
+
+	// operators to make pointer use transparent
+	operator memory_bank *() const { return m_target; }
+	virtual memory_bank *operator->() const { assert(m_target != nullptr); return m_target; }
 
 	// make reference use transparent as well
 	operator memory_bank &() const { assert(object_finder_base<memory_bank>::m_target != nullptr); return *object_finder_base<memory_bank>::m_target; }
@@ -229,11 +236,12 @@ public:
 	ioport_finder(device_t &base, const char *tag = FINDER_DUMMY_TAG)
 		: object_finder_base<ioport_port>(base, tag) { }
 
-	// make reference use transparent as well
-	operator ioport_port &() const { assert(object_finder_base<ioport_port>::m_target != nullptr); return *object_finder_base<ioport_port>::m_target; }
+	// operators to make use transparent
+	ioport_port &operator*() const { assert(m_target != nullptr); return *m_target; }
+	virtual ioport_port *operator->() const { assert(m_target != nullptr); return m_target; }
 
-	// allow dereference even when target is nullptr so read_safe() can be used
-	ioport_port *operator->() const override { return object_finder_base<ioport_port>::m_target; }
+	// read if found, or else return a default value
+	ioport_value read_safe(ioport_value defval) { return m_target != nullptr ? m_target->read() : defval; }
 
 	// finder
 	virtual bool findit(bool isvalidation = false) override
@@ -284,6 +292,16 @@ public:
 			m_array[index] = std::make_unique<ioport_finder_type>(base, tags[index]);
 	}
 
+	ioport_array_finder(device_t &base, std::initializer_list<const char *> taglist)
+	{
+		assert(taglist.size() <= _Count);
+		int index = 0;
+		for (const char *tag : taglist)
+			m_array[index++] = std::make_unique<ioport_finder_type>(base, tag);
+		while (index < _Count)
+			m_array[index++] = std::make_unique<ioport_finder_type>(base, FINDER_DUMMY_TAG);
+	}
+
 	// array accessors
 	const ioport_finder_type &operator[](int index) const { assert(index < _Count); return *m_array[index]; }
 	ioport_finder_type &operator[](int index) { assert(index < _Count); return *m_array[index]; }
@@ -301,6 +319,7 @@ class optional_ioport_array: public ioport_array_finder<_Count, false>
 public:
 	optional_ioport_array(device_t &base, const char *basetag) : ioport_array_finder<_Count, false>(base, basetag) { }
 	optional_ioport_array(device_t &base, const char * const *tags) : ioport_array_finder<_Count, false>(base, tags) { }
+	optional_ioport_array(device_t &base, std::initializer_list<const char *> taglist) : ioport_array_finder<_Count, false>(base, taglist) { }
 };
 
 // required ioport array finder
@@ -310,6 +329,7 @@ class required_ioport_array: public ioport_array_finder<_Count, true>
 public:
 	required_ioport_array(device_t &base, const char *basetag) : ioport_array_finder<_Count, true>(base, basetag) { }
 	required_ioport_array(device_t &base, const char * const *tags) : ioport_array_finder<_Count, true>(base, tags) { }
+	required_ioport_array(device_t &base, std::initializer_list<const char *> taglist) : ioport_array_finder<_Count, true>(base, taglist) { }
 };
 
 
@@ -329,6 +349,7 @@ public:
 			m_length(length) { }
 
 	// operators to make use transparent
+	operator _PointerType *() const { return this->m_target; }
 	_PointerType operator[](int index) const { assert(index < m_length); return this->m_target[index]; }
 	_PointerType &operator[](int index) { assert(index < m_length); return this->m_target[index]; }
 
@@ -387,6 +408,7 @@ public:
 			m_width(width) { }
 
 	// operators to make use transparent
+	operator _PointerType *() const { return this->m_target; }
 	_PointerType operator[](int index) const { return this->m_target[index]; }
 	_PointerType &operator[](int index) { return this->m_target[index]; }
 

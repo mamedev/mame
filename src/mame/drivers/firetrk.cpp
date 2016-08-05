@@ -155,8 +155,8 @@ void firetrk_state::machine_reset()
 
 READ8_MEMBER(firetrk_state::firetrk_dip_r)
 {
-	UINT8 val0 = ioport("DIP_0")->read();
-	UINT8 val1 = ioport("DIP_1")->read();
+	UINT8 val0 = m_dips[0]->read();
+	UINT8 val1 = m_dips[1]->read();
 
 	if (val1 & (1 << (2 * offset + 0))) val0 |= 1;
 	if (val1 & (1 << (2 * offset + 1))) val0 |= 2;
@@ -167,8 +167,8 @@ READ8_MEMBER(firetrk_state::firetrk_dip_r)
 
 READ8_MEMBER(firetrk_state::montecar_dip_r)
 {
-	UINT8 val0 = ioport("DIP_0")->read();
-	UINT8 val1 = ioport("DIP_1")->read();
+	UINT8 val0 = m_dips[0]->read();
+	UINT8 val1 = m_dips[1]->read();
 
 	if (val1 & (1 << (3 - offset))) val0 |= 1;
 	if (val1 & (1 << (7 - offset))) val0 |= 2;
@@ -230,7 +230,7 @@ READ8_MEMBER(firetrk_state::firetrk_input_r)
 	/* update steering wheels */
 	for (i = 0; i < 2; i++)
 	{
-		UINT32 const new_dial = read_safe(ioport(i ? "STEER_2" : "STEER_1"), 0);
+		UINT32 const new_dial = m_steer[i].read_safe(0);
 		INT32 const delta = new_dial - m_dial[i];
 
 		if (delta != 0)
@@ -242,9 +242,9 @@ READ8_MEMBER(firetrk_state::firetrk_input_r)
 		}
 	}
 
-	return ((read_safe(ioport("BIT_0"), 0) & (1 << offset)) ? 0x01 : 0) |
-			((read_safe(ioport("BIT_6"), 0) & (1 << offset)) ? 0x40 : 0) |
-			((read_safe(ioport("BIT_7"), 0) & (1 << offset)) ? 0x80 : 0);
+	return ((m_bit_0.read_safe(0) & (1 << offset)) ? 0x01 : 0) |
+			((m_bit_6.read_safe(0) & (1 << offset)) ? 0x40 : 0) |
+			((m_bit_7.read_safe(0) & (1 << offset)) ? 0x80 : 0);
 }
 
 

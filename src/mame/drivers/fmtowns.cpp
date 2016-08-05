@@ -661,21 +661,21 @@ void towns_state::kb_sendcode(UINT8 scancode, int release)
 		case 0:  // key press
 			m_towns_kb_output = 0x80;
 			m_towns_kb_extend = scancode & 0x7f;
-			if(m_key3->read() & 0x00080000)
+			if (m_kb_ports[2]->read() & 0x00080000)
 				m_towns_kb_output |= 0x04;
-			if(m_key3->read() & 0x00040000)
+			if (m_kb_ports[2]->read() & 0x00040000)
 				m_towns_kb_output |= 0x08;
-			if(m_key3->read() & 0x06400000)
+			if (m_kb_ports[2]->read() & 0x06400000)
 				m_towns_kb_output |= 0x20;
 			break;
 		case 1:  // key release
 			m_towns_kb_output = 0x90;
 			m_towns_kb_extend = scancode & 0x7f;
-			if(m_key3->read() & 0x00080000)
+			if (m_kb_ports[2]->read() & 0x00080000)
 				m_towns_kb_output |= 0x04;
-			if(m_key3->read() & 0x00040000)
+			if (m_kb_ports[2]->read() & 0x00040000)
 				m_towns_kb_output |= 0x08;
-			if(m_key3->read() & 0x06400000)
+			if (m_kb_ports[2]->read() & 0x06400000)
 				m_towns_kb_output |= 0x20;
 			break;
 		case 2:  // extended byte
@@ -694,7 +694,6 @@ void towns_state::kb_sendcode(UINT8 scancode, int release)
 
 void towns_state::poll_keyboard()
 {
-	ioport_port* kb_ports[4] = { m_key1, m_key2, m_key3, m_key4 };
 	int port,bit;
 	UINT8 scan;
 	UINT32 portval;
@@ -702,7 +701,7 @@ void towns_state::poll_keyboard()
 	scan = 0;
 	for(port=0;port<4;port++)
 	{
-		portval = kb_ports[port]->read();
+		portval = m_kb_ports[port]->read();
 		for(bit=0;bit<32;bit++)
 		{
 			if(((portval & (1<<bit))) != ((m_kb_prev[port] & (1<<bit))))

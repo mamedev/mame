@@ -538,7 +538,6 @@ int mac_state::scan_keyboard()
 	int i, j;
 	int keybuf = 0;
 	int keycode;
-	ioport_port *ports[7] = { m_key0, m_key1, m_key2, m_key3, m_key4, m_key5, m_key6 };
 
 	if (m_keycode_buf_index)
 	{
@@ -547,7 +546,7 @@ int mac_state::scan_keyboard()
 
 	for (i=0; i<7; i++)
 	{
-		keybuf = ports[i]->read();
+		keybuf = m_keys[i]->read();
 
 		if (keybuf != m_key_matrix[i])
 		{
