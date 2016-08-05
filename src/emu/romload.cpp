@@ -813,7 +813,7 @@ void rom_load_manager::fill_rom_data(const rom_entry *romp)
 		fatalerror("Error in RomModule definition: FILL has an invalid length\n");
 
 	// for fill bytes, the byte that gets filled is the first byte of the hashdata string
-	UINT8 fill_byte = (UINT8)atoi(ROM_GETHASHDATA(romp));
+	UINT8 fill_byte = (UINT8)strtol(ROM_GETHASHDATA(romp), nullptr, 0);
 
 	// fill the data (filling value is stored in place of the hashdata)
 	if(skip != 0)
