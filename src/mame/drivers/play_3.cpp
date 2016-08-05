@@ -178,7 +178,7 @@ static MACHINE_CONFIG_START( play_3, play_3_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(play_3_state, clock_w))
 
 	MCFG_DEVICE_ADD("xpoint", CLOCK, 60) // crossing-point detector
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("4013b", ttl7474_device, clock_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(play_3_state, clock2_w))
 
 	// This is actually a 4013 chip (has 2 RS flipflops)
 	MCFG_DEVICE_ADD("4013a", TTL7474, 0)
