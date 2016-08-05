@@ -15,14 +15,12 @@
 
     TODO:
 
-    - clock is running too fast
     - create chargen ROM from tech manual
     - memory error interrupt vector
     - i/o port 8051
     - screen contrast
     - system tick frequency selection (1 or 128 Hz)
     - speaker
-    - credit card memory (A:/B:)
 
 */
 
@@ -38,6 +36,8 @@
 #include "sound/speaker.h"
 #include "video/hd61830.h"
 
+#define LOG 0
+
 #define M80C88A_TAG     "u1"
 #define HD61830_TAG     "hd61830"
 #define TIMER_TICK_TAG  "tick"
@@ -51,6 +51,7 @@ public:
 		m_maincpu(*this, M80C88A_TAG),
 		m_lcdc(*this, HD61830_TAG),
 		m_speaker(*this, "speaker"),
+		m_card(*this, "cardslot"),
 		m_exp(*this, PORTFOLIO_EXPANSION_SLOT_TAG),
 		m_timer_tick(*this, TIMER_TICK_TAG),
 		m_rom(*this, M80C88A_TAG),
@@ -71,6 +72,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<hd61830_device> m_lcdc;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<generic_slot_device> m_card;
 	required_device<portfolio_expansion_slot_t> m_exp;
 	required_device<timer_device> m_timer_tick;
 	required_region_ptr<UINT8> m_rom;
@@ -100,6 +102,16 @@ public:
 		INT_EXTERNAL
 	};
 
+	enum
+	{
+		ROM_APP,
+		CCM_A,
+		CCM_B,
+		ROM_EXT
+	};
+
+	DECLARE_READ8_MEMBER( rom_b_r );
+
 	DECLARE_READ8_MEMBER( irq_status_r );
 	DECLARE_READ8_MEMBER( keyboard_r );
 	DECLARE_READ8_MEMBER( battery_r );
@@ -124,6 +136,8 @@ public:
 	/* keyboard state */
 	UINT8 m_keylatch;
 
+	int m_rom_b;
+
 	/* video state */
 	required_shared_ptr<UINT8> m_contrast;
 
@@ -134,7 +148,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(counter_tick);
 	DECLARE_READ8_MEMBER(hd61830_rd_r);
 	IRQ_CALLBACK_MEMBER(portfolio_int_ack);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( portfolio_cart );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( portfolio_card );
 	required_device<ram_device> m_ram;
 };
 
@@ -173,6 +187,8 @@ void portfolio_state::trigger_interrupt(int level)
 	// set interrupt pending bit
 	m_ip |= 1 << level;
 
+	//logerror("%s IP set %01x : %u\n", machine().time().as_string(), m_ip, level);
+
 	check_interrupt();
 }
 
@@ -194,7 +210,8 @@ READ8_MEMBER( portfolio_state::irq_status_r )
 WRITE8_MEMBER( portfolio_state::irq_mask_w )
 {
 	m_ie = data;
-	//logerror("IE %02x\n", data);
+
+	if (LOG) logerror("IE %02x\n", data);
 
 	check_interrupt();
 }
@@ -223,6 +240,8 @@ IRQ_CALLBACK_MEMBER(portfolio_state::portfolio_int_ack)
 			break;
 		}
 	}
+
+	//logerror("IP ack %01x\n", m_ip);
 
 	check_interrupt();
 
@@ -275,7 +294,7 @@ void portfolio_state::scan_keyboard()
 	else
 	{
 		// key released
-		if (m_keylatch != 0xff)
+		if (!(m_keylatch & 0x80))
 		{
 			m_keylatch |= 0x80;
 
@@ -333,7 +352,7 @@ WRITE8_MEMBER( portfolio_state::speaker_w )
 
 	m_speaker->level_w(!BIT(data, 7));
 
-	//logerror("SPEAKER %02x\n", data);
+	if (LOG) logerror("SPEAKER %02x\n", data);
 }
 
 
@@ -363,7 +382,7 @@ WRITE8_MEMBER( portfolio_state::power_w )
 
 	*/
 
-	//logerror("POWER %02x\n", data);
+	if (LOG) logerror("POWER %02x\n", data);
 }
 
 
@@ -406,7 +425,15 @@ READ8_MEMBER( portfolio_state::battery_r )
 
 WRITE8_MEMBER( portfolio_state::unknown_w )
 {
-	//logerror("UNKNOWN %02x\n", data);
+	if (LOG) logerror("UNKNOWN %02x\n", data);
+
+	switch (data & 0x0f)
+	{
+	case 3: m_rom_b = CCM_A; break;
+	case 7: m_rom_b = CCM_B; break;
+	case 0: m_rom_b = ROM_APP; break;
+	case 2: m_rom_b = ROM_EXT; break;
+	}
 }
 
 
@@ -421,7 +448,7 @@ WRITE8_MEMBER( portfolio_state::unknown_w )
 
 TIMER_DEVICE_CALLBACK_MEMBER(portfolio_state::system_tick)
 {
-	trigger_interrupt(INT_TICK);
+	//trigger_interrupt(INT_TICK);
 }
 
 
@@ -432,6 +459,40 @@ TIMER_DEVICE_CALLBACK_MEMBER(portfolio_state::system_tick)
 TIMER_DEVICE_CALLBACK_MEMBER(portfolio_state::counter_tick)
 {
 	m_counter++;
+}
+
+
+//-------------------------------------------------
+//  rom_b_r -
+//-------------------------------------------------
+
+READ8_MEMBER( portfolio_state::rom_b_r )
+{
+	UINT8 data = 0;
+
+	switch (m_rom_b)
+	{
+	case ROM_APP:
+		data = m_rom[offset];
+		break;
+
+	case CCM_A:
+		if (m_card->exists())
+		{
+			data = m_card->read_rom(space, offset);
+		}
+		break;
+
+	case CCM_B:
+		// TODO this is wired thru the expansion slot
+		break;
+
+	case ROM_EXT:
+		// TODO ???
+		break;
+	}
+
+	return data;
 }
 
 
@@ -450,7 +511,7 @@ READ8_MEMBER( portfolio_state::counter_r )
 		break;
 
 	case 1:
-		data = m_counter >> 1;
+		data = m_counter >> 8;
 		break;
 	}
 
@@ -490,7 +551,7 @@ static ADDRESS_MAP_START( portfolio_mem, AS_PROGRAM, 8, portfolio_state )
 	AM_RANGE(0x00000, 0x1efff) AM_RAM AM_SHARE("nvram1")
 	AM_RANGE(0x1f000, 0x9efff) AM_RAM // expansion
 	AM_RANGE(0xb0000, 0xb0fff) AM_MIRROR(0xf000) AM_RAM AM_SHARE("nvram2") // video RAM
-	AM_RANGE(0xc0000, 0xdffff) AM_ROM AM_REGION(M80C88A_TAG, 0) // or credit card memory
+	AM_RANGE(0xc0000, 0xdffff) AM_READ(rom_b_r)
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION(M80C88A_TAG, 0x20000)
 ADDRESS_MAP_END
 
@@ -679,12 +740,17 @@ WRITE_LINE_MEMBER( portfolio_state::eint_w )
 //**************************************************************************
 
 //-------------------------------------------------
-//  DEVICE_IMAGE_LOAD( portfolio_cart )
+//  DEVICE_IMAGE_LOAD( portfolio_card )
 //-------------------------------------------------
 
-DEVICE_IMAGE_LOAD_MEMBER( portfolio_state, portfolio_cart )
+DEVICE_IMAGE_LOAD_MEMBER( portfolio_state, portfolio_card )
 {
-	return image_init_result::FAIL;
+	UINT32 size = m_card->common_get_size("rom");
+
+	m_card->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_BIG);
+	m_card->common_load_rom(m_card->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
 }
 
 
@@ -788,8 +854,9 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", portfolio_state, keyboard_tick, attotime::from_usec(2500))
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "portfolio_cart")
-	MCFG_GENERIC_LOAD(portfolio_state, portfolio_cart)
+	MCFG_GENERIC_CARTSLOT_ADD("cardslot", generic_plain_slot, "pofo_card")
+	MCFG_GENERIC_EXTENSIONS("rom,bin")
+	MCFG_GENERIC_LOAD(portfolio_state, portfolio_card)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "pofo")
