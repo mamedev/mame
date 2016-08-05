@@ -35385,11 +35385,12 @@ kageki                          // B35 (c) 1988 Taito America Corporation + Roms
 kagekih                         // B35 (c) 1992 (hack)
 kagekij                         // B35 (c) 1988 Taito Corporation (Japan)
 plumppop                        // A98 (c) 1987 Taito Corporation (Japan)
-tnzs                            // B53 (c) 1988 Taito Corporation Japan (World) (new logo)
-tnzsj                           // B53 (c) 1988 Taito Corporation (Japan) (new logo)
-tnzsjo                          // B53 (c) 1988 Taito Corporation (Japan) (new logo)
-tnzso                           // B53 (c) 1988 Taito Corporation Japan (World) (old logo)
-tnzsop                          // B53?(c) 1988 Taito Corporation Japan (World) (old logo)
+tnzs                            // B53 (c) 1988 Taito Corporation Japan (World) (new pcb)
+tnzsj                           // B53 (c) 1988 Taito Corporation (Japan) (new pcb)
+tnzsjo                          // B53 (c) 1988 Taito Corporation (Japan) (old pcb)
+tnzsuo                          // B53 (c) 1988 Taito America Corporation (US) (old pcb)
+tnzso                           // B53 (c) 1988 Taito Corporation Japan (World) (old pcb)
+tnzsop                          // B53?(c) 1988 Taito Corporation Japan (World?) (old pcb, prototype)
 
 @source:toaplan1.cpp
 demonwld                        // TP-O16 (c) 1990 Toaplan (+ Taito license when set to Japan)
