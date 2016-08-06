@@ -145,14 +145,14 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-int aim65_state::load_cart(device_image_interface &image, generic_slot_device *slot, const char *slot_tag)
+image_init_result aim65_state::load_cart(device_image_interface &image, generic_slot_device *slot, const char *slot_tag)
 {
 	UINT32 size = slot->common_get_size(slot_tag);
 
 	if (size > 0x1000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	if (image.software_entry() != nullptr && image.get_software_region(slot_tag) == nullptr)
@@ -161,13 +161,13 @@ int aim65_state::load_cart(device_image_interface &image, generic_slot_device *s
 				"Attempted to load file with wrong extension\nSocket '%s' only accepts files with '.%s' extension",
 				slot_tag, slot_tag);
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, errmsg.c_str());
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	slot->common_load_rom(slot->get_rom_base(), size, slot_tag);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

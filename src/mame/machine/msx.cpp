@@ -361,12 +361,11 @@ READ8_MEMBER( msx_state::msx_ppi_port_b_r )
 {
 	UINT8 result = 0xff;
 	int row, data;
-	ioport_port *keynames[] = { m_io_key0, m_io_key1, m_io_key2, m_io_key3, m_io_key4, m_io_key5 };
 
 	row = m_keylatch;
 	if (row <= 10)
 	{
-		data = keynames[row / 2]->read();
+		data = m_io_key[row / 2]->read();
 
 		if (BIT(row, 0))
 			data >>= 8;
@@ -386,7 +385,7 @@ void msx_state::install_slot_pages(device_t &owner, UINT8 prim, UINT8 sec, UINT8
 	msx_state &msx = downcast<msx_state &>(owner);
 	msx_internal_slot_interface *internal_slot = dynamic_cast<msx_internal_slot_interface *>(device);
 
-	for ( int i = page; i < MIN(page + numpages, 4); i++ )
+	for ( int i = page; i < std::min(page + numpages, 4); i++ )
 	{
 		msx.m_all_slots[prim][sec][i] = internal_slot;
 	}

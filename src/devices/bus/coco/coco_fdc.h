@@ -76,6 +76,7 @@ protected:
 		optional_device<msm6242_device> m_disto_msm6242;        /* 6242 RTC on Disto interface */
 
 		offs_t m_msm6242_rtc_address;
+		optional_ioport m_rtc;
 };
 
 

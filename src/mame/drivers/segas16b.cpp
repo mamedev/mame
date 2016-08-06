@@ -1590,14 +1590,30 @@ READ16_MEMBER( segas16b_state::hwchamp_custom_io_r )
 
 WRITE16_MEMBER( segas16b_state::hwchamp_custom_io_w )
 {
-	static const char *const portname[4] = { "MONITOR", "LEFT", "RIGHT", "DUMMY" };
 	switch (offset & (0x3000/2))
 	{
 		case 0x3000/2:
 			switch (offset & 0x30/2)
 			{
 				case 0x20/2:
-					m_hwc_input_value = read_safe(ioport(portname[offset & 3]), 0xff);
+					switch (offset & 3)
+					{
+						case 0:
+							m_hwc_input_value = m_hwc_monitor->read();
+							break;
+
+						case 1:
+							m_hwc_input_value = m_hwc_left->read();
+							break;
+
+						case 2:
+							m_hwc_input_value = m_hwc_right->read();
+							break;
+
+						default:
+							m_hwc_input_value = 0xff;
+							break;
+					}
 					break;
 
 				case 0x30/2:
@@ -1668,20 +1684,18 @@ READ16_MEMBER( segas16b_state::sdi_custom_io_r )
 
 READ16_MEMBER( segas16b_state::sjryuko_custom_io_r )
 {
-	static const char *const portname[] = { "MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5" };
-
 	switch (offset & (0x3000/2))
 	{
 		case 0x1000/2:
 			switch (offset & 3)
 			{
 				case 1:
-					if (read_safe(ioport(portname[m_mj_input_num]), 0xff) != 0xff)
+					if (m_mj_inputs[m_mj_input_num].read_safe(0xff) != 0xff)
 						return 0xff & ~(1 << m_mj_input_num);
 					return 0xff;
 
 				case 2:
-					return read_safe(ioport(portname[m_mj_input_num]), 0xff);
+					return m_mj_inputs[m_mj_input_num].read_safe(0xff);
 			}
 			break;
 	}

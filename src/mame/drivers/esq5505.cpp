@@ -273,15 +273,15 @@ void esq5505_state::machine_start()
 	// tell the pump about the OTIS & ESP chips
 	m_pump->set_otis(m_otis);
 	m_pump->set_esp(m_esp);
+
+	m_rom = (UINT16 *)(void *)memregion("osrom")->base();
+	m_ram = (UINT16 *)(void *)memshare("osram")->ptr();
 }
 
 void esq5505_state::machine_reset()
 {
 	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
 	floppy_image_device *floppy = con ? con->get_device() : nullptr;
-
-	m_rom = (UINT16 *)(void *)memregion("osrom")->base();
-	m_ram = (UINT16 *)(void *)memshare("osram")->ptr();
 
 	// Default analog values:
 	m_analog_values[0] = 0x7fff; // pitch mod: start in the center

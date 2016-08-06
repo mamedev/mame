@@ -112,7 +112,7 @@ void videobrain_expansion_slot_device::device_start()
 //  call_load -
 //-------------------------------------------------
 
-bool videobrain_expansion_slot_device::call_load()
+image_init_result videobrain_expansion_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -134,7 +134,7 @@ bool videobrain_expansion_slot_device::call_load()
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

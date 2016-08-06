@@ -670,7 +670,7 @@ int compute_res_net(int inputs, int channel, const res_net_info &di)
 
 	rTotal = 1.0 / rTotal;
 	v *= rTotal;
-	v = MAX(minout, v - cut);
+	v = std::max(minout, v - cut);
 
 	switch (di.options & RES_NET_MONITOR_MASK)
 	{
@@ -679,8 +679,8 @@ int compute_res_net(int inputs, int channel, const res_net_info &di)
 			break;
 		case RES_NET_MONITOR_SANYO_EZV20:
 			v = vcc - v;
-			v = MAX(0, v-0.7);
-			v = MIN(v, vcc - 2 * 0.7);
+			v = std::max(double(0), v-0.7);
+			v = std::min(v, vcc - 2 * 0.7);
 			v = v / (vcc-1.4);
 			v = v * vcc;
 			break;

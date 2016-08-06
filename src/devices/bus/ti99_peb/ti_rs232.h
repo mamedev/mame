@@ -130,7 +130,7 @@ public:
 
 protected:
 	virtual void    device_start(void) override;
-	bool    call_load() override;
+	image_init_result    call_load() override;
 	void    call_unload() override;
 	virtual void    device_config_complete() override;
 
@@ -157,7 +157,7 @@ public:
 
 protected:
 	virtual void    device_start(void) override;
-	bool    call_load() override;
+	image_init_result    call_load() override;
 	void    call_unload() override;
 	virtual void    device_config_complete() override;
 };

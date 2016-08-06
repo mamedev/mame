@@ -242,7 +242,7 @@ void floppy_image_device::set_formats(const floppy_format_type *formats)
 		else
 			fif_list->append(fif);
 
-		m_formatlist.push_back(std::make_unique<image_device_format>(fif->name(), fif->description(), fif->extensions(), ""));
+		add_format(fif->name(), fif->description(), fif->extensions(), "");
 
 		image_specify_extension( extension_list, 256, fif->extensions() );
 	}
@@ -363,7 +363,7 @@ floppy_image_format_t *floppy_image_device::identify(std::string filename)
 	util::core_file::ptr fd;
 	std::string revised_path;
 
-	osd_file::error err = util::zippath_fopen(filename.c_str(), OPEN_FLAG_READ, fd, revised_path);
+	osd_file::error err = util::zippath_fopen(filename, OPEN_FLAG_READ, fd, revised_path);
 	if(err != osd_file::error::NONE) {
 		seterror(IMAGE_ERROR_INVALIDIMAGE, "Unable to open the image file");
 		return nullptr;
@@ -387,7 +387,7 @@ floppy_image_format_t *floppy_image_device::identify(std::string filename)
 	return best_format;
 }
 
-bool floppy_image_device::call_load()
+image_init_result floppy_image_device::call_load()
 {
 	io_generic io;
 
@@ -408,7 +408,7 @@ bool floppy_image_device::call_load()
 	if(!best_format)
 	{
 		seterror(IMAGE_ERROR_INVALIDIMAGE, "Unable to identify the image format");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	image = global_alloc(floppy_image(tracks, sides, form_factor));
@@ -417,7 +417,7 @@ bool floppy_image_device::call_load()
 		seterror(IMAGE_ERROR_UNSUPPORTED, "Incompatible image format or corrupted data");
 		global_free(image);
 		image = nullptr;
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 	output_format = is_readonly() ? nullptr : best_format;
 
@@ -444,7 +444,7 @@ bool floppy_image_device::call_load()
 	} else if(!mon)
 		ready_counter = 2;
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void floppy_image_device::call_unload()
@@ -479,7 +479,7 @@ void floppy_image_device::call_unload()
 	}
 }
 
-bool floppy_image_device::call_create(int format_type, util::option_resolution *format_options)
+image_init_result floppy_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	image = global_alloc(floppy_image(tracks, sides, form_factor));
 	output_format = nullptr;
@@ -502,10 +502,10 @@ bool floppy_image_device::call_create(int format_type, util::option_resolution *
 	if (output_format == nullptr)
 	{
 		seterror(IMAGE_ERROR_INVALIDIMAGE, "Unable to identify the image format");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /* motor on, active low */

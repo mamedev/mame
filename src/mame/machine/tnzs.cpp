@@ -84,8 +84,7 @@ READ8_MEMBER(tnzs_state::arknoid2_sh_f000_r)
 {
 //  logerror("PC %04x: read input %04x\n", space.device().safe_pc(), 0xf000 + offset);
 
-	ioport_port *port = (offset / 2) ? m_an2 : m_an1;
-	int val = port ? port->read() : 0;
+	int val = ((offset / 2) ? m_an2 : m_an1).read_safe(0);
 
 	if (offset & 1)
 		return ((val >> 8) & 0xff);

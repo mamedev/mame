@@ -42,17 +42,17 @@ void menu_control_floppy_image::do_load_create()
 {
 	floppy_image_device *fd = static_cast<floppy_image_device *>(&m_image);
 	if(input_filename.compare("")==0) {
-		int err = fd->create(output_filename.c_str(), nullptr, nullptr);
-		if (err != 0) {
+		image_init_result err = fd->create(output_filename, nullptr, nullptr);
+		if (err != image_init_result::PASS) {
 			machine().popmessage("Error: %s", fd->error());
 			return;
 		}
 		fd->setup_write(output_format);
 	} else {
-		int err = fd->load(input_filename.c_str());
-		if (!err && output_filename.compare("") != 0)
-			err = fd->reopen_for_write(output_filename.c_str());
-		if(err != 0) {
+		image_init_result err = fd->load(input_filename);
+		if ((err == image_init_result::PASS) && (output_filename.compare("") != 0))
+			err = fd->reopen_for_write(output_filename) ? image_init_result::FAIL : image_init_result::PASS;
+		if (err != image_init_result::PASS) {
 			machine().popmessage("Error: %s", fd->error());
 			return;
 		}
@@ -61,16 +61,8 @@ void menu_control_floppy_image::do_load_create()
 	}
 }
 
-void menu_control_floppy_image::hook_load(std::string filename, bool softlist)
+void menu_control_floppy_image::hook_load(const std::string &filename)
 {
-	if (softlist)
-	{
-		machine().popmessage("When loaded from software list, the disk is Read-only.\n");
-		m_image.load(filename.c_str());
-		stack_pop();
-		return;
-	}
-
 	input_filename = filename;
 	input_format = static_cast<floppy_image_device &>(m_image).identify(filename);
 
@@ -87,7 +79,7 @@ void menu_control_floppy_image::hook_load(std::string filename, bool softlist)
 		std::string tmp_path;
 		util::core_file::ptr tmp_file;
 		// attempt to open the file for writing but *without* create
-		filerr = util::zippath_fopen(filename.c_str(), OPEN_FLAG_READ | OPEN_FLAG_WRITE, tmp_file, tmp_path);
+		filerr = util::zippath_fopen(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE, tmp_file, tmp_path);
 		if(filerr == osd_file::error::NONE)
 			tmp_file.reset();
 		else
@@ -131,7 +123,7 @@ void menu_control_floppy_image::handle()
 			m_state = START_FILE;
 			handle();
 		} else {
-			output_filename = util::zippath_combine(m_current_directory.c_str(), m_current_file.c_str());
+			output_filename = util::zippath_combine(m_current_directory, m_current_file);
 			output_format = format_array[m_submenu_result.i];
 			do_load_create();
 			stack_pop();

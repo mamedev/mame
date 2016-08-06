@@ -105,7 +105,7 @@ void rom_image_device::device_start()
 /*-------------------------------------------------
     DEVICE_IMAGE_LOAD( rom )
 -------------------------------------------------*/
-bool rom_image_device::call_load()
+image_init_result rom_image_device::call_load()
 {
 	device_image_interface* image = this;
 	UINT64 size = image->length();
@@ -121,7 +121,7 @@ bool rom_image_device::call_load()
 		image->fread(m_base.get(),16384);
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

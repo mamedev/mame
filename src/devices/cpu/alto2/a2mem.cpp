@@ -201,11 +201,11 @@
  *
  * chip A      B      C      D      E      F      G      H      I     even    odd
  * ---------------------------------------------------------------------------------
- * a75: WD01   WD04   WD08   WD11   WD15   WD19   WD23   WD26   WD30  ---     HC(0)A
- * a76: WD00   WD03   WD06   WD10   WD13   WD17   WD21   WD25   WD28  HC(0B1) ---
- * a86: WD02   WD05   WD09   WD12   WD16   WD20   WD24   WD27   WD31  HC(1)A  ---
- * a64: WD01   WD02   WD03   WD07   WD08   WD09   WD10   WD14   WD15  ---     HC(2)A
- * a85: WD16   WD17   WD22   WD23   WD24   WD25   WD29   WD30   WD31  HC(2)B  ---
+ * A75: WD01   WD04   WD08   WD11   WD15   WD19   WD23   WD26   WD30  ---     HC(0)A
+ * A76: WD00   WD03   WD06   WD10   WD13   WD17   WD21   WD25   WD28  HC(0B1) ---
+ * A86: WD02   WD05   WD09   WD12   WD16   WD20   WD24   WD27   WD31  HC(1)A  ---
+ * A64: WD01   WD02   WD03   WD07   WD08   WD09   WD10   WD14   WD15  ---     HC(2)A
+ * A85: WD16   WD17   WD22   WD23   WD24   WD25   WD29   WD30   WD31  HC(2)B  ---
  *
  * H(0)   ^ HC(0)A  ^ HC(0B1) -> HC(0)
  * H(1)   ^ HC(1)A  ^ HC(0B1) -> HC(1)
@@ -214,10 +214,10 @@
  *
  * chip A      B      C      D      E      F      G      H      I     even    odd
  * ---------------------------------------------------------------------------------
- * a66: WD04   WD05   WD06   WD07   WD08   WD09   WD10   H(3)   0     ---     HC(3)A
- * a84: WD18   WD19   WD20   WD21   WD22   WD23   WD24   WD25   0     HC(3/4) HCPA
- * a63: WD11   WD12   WD13   WD14   WD15   WD16   WD17   H(4)   0     ---     HC(4)A
- * a87: WD26   WD27   WD28   WD29   WD30   WD31   H(5)   0      0     HC(5)   HCPB
+ * A66: WD04   WD05   WD06   WD07   WD08   WD09   WD10   H(3)   0     ---     HC(3)A
+ * A84: WD18   WD19   WD20   WD21   WD22   WD23   WD24   WD25   0     HC(3/4) HCPA
+ * A63: WD11   WD12   WD13   WD14   WD15   WD16   WD17   H(4)   0     ---     HC(4)A
+ * A87: WD26   WD27   WD28   WD29   WD30   WD31   H(5)   0      0     HC(5)   HCPB
  *
  * HC(3)A ^ HC(3/4) -> HC(3)
  * HC(4)A ^ HC(3/4) -> HC(4)
@@ -226,53 +226,52 @@
  *
  * chip A      B      C      D      E      F      G      H      I     even    odd
  * ---------------------------------------------------------------------------------
- * a54: HC(3)A HC(4)A HCPA   HCPB   H(0/2) XX01   WD02   WD03   RP    PERR    ---
- * a65: WD00   WD01   WD02   WD04   WD05   WD07   WD10   WD11   WD12  ---     PCA
- * a74: WD14   WD17   WD18   WD21   WD23   WD24   WD26   WD27   WD29  PCB     ---
+ * A54: HC(3)A HC(4)A HCPA   HCPB   H(0/2) XX01   WD02   WD03   RP    PERR    ---
+ * A65: WD00   WD01   WD02   WD04   WD05   WD07   WD10   WD11   WD12  ---     PCA
+ * A74: WD14   WD17   WD18   WD21   WD23   WD24   WD26   WD27   WD29  PCB     ---
  *
  * PCA ^ PCB -> PC
+ * </PRE>
  *
  * Whoa ;-)
- * </PRE>
  */
-#if USE_HAMMING_CHECK
 
 #define WD(x) (1ul<<(31-x))
 
-/* a75: WD01   WD04   WD08   WD11   WD15   WD19   WD23   WD26   WD30 ---     HC(0)A */
+//! Data double word mask for chip A75.
 #define A75 (WD( 1)|WD( 4)|WD( 8)|WD(11)|WD(15)|WD(19)|WD(23)|WD(26)|WD(30))
 
-/* a76: WD00   WD03   WD06   WD10   WD13   WD17   WD21   WD25   WD29 HC(0B1) ---    */
+//! Data double word mask for chip A76.
 #define A76 (WD( 0)|WD( 3)|WD( 6)|WD(10)|WD(13)|WD(17)|WD(21)|WD(25)|WD(28))
 
-/* a86: WD02   WD05   WD09   WD12   WD16   WD20   WD24   WD27   WD31 HC(1)A  ---    */
+//! Data double word mask for chip A86.
 #define A86 (WD( 2)|WD( 5)|WD( 9)|WD(12)|WD(16)|WD(20)|WD(24)|WD(27)|WD(31))
 
-/* a64: WD01   WD02   WD03   WD07   WD08   WD09   WD10   WD14   WD15 ---     HC(2)A */
+//! Data double word mask for chip A64.
 #define A64 (WD( 1)|WD( 2)|WD( 3)|WD( 7)|WD( 8)|WD( 9)|WD(10)|WD(14)|WD(15))
 
-/* a85: WD16   WD17   WD22   WD23   WD24   WD25   WD29   WD30   WD31 HC(2)B  ---    */
+//! Data double word mask for chip A85.
 #define A85 (WD(16)|WD(17)|WD(22)|WD(23)|WD(24)|WD(25)|WD(29)|WD(30)|WD(31))
 
-/* a66: WD04   WD05   WD06   WD07   WD08   WD09   WD10   H(3)   0    ---     HC(3)A */
+//! Data double word mask for chip A66.
 #define A66 (WD( 4)|WD( 5)|WD( 6)|WD( 7)|WD( 8)|WD( 9)|WD(10))
 
-/* a84: WD18   WD19   WD20   WD21   WD22   WD23   WD24   WD25   0    HC(3/4) HCPA   */
+//! Data double word mask for chip A84.
 #define A84 (WD(18)|WD(19)|WD(20)|WD(21)|WD(22)|WD(23)|WD(24)|WD(25))
 
-/* a63: WD11   WD12   WD13   WD14   WD15   WD16   WD17   H(4)   0    ---     HC(4)A */
+//! Data double word mask for chip A63.
 #define A63 (WD(11)|WD(12)|WD(13)|WD(14)|WD(15)|WD(16)|WD(17))
 
-/* a87: WD26   WD27   WD28   WD29   WD30   WD31   H(5)   0      0    HC(5)   HCPB   */
+//! Data double word mask for chip A87.
 #define A87 (WD(26)|WD(27)|WD(28)|WD(29)|WD(30)|WD(31))
 
-/* a54: HC(3)A HC(4)A HCPA   HCPB   H(0/2) XX01   WD02   WD03   P    PERR    ---    */
+//! Data double word mask for chip A54.
 #define A54 (WD( 2)|WD( 3))
 
-/* a65: WD00   WD01   WD02   WD04   WD05   WD07   WD10   WD11   WD12 ---     PCA    */
+//! Data double word mask for chip A65.
 #define A65 (WD( 0)|WD( 1)|WD( 2)|WD( 4)|WD( 5)|WD( 7)|WD(10)|WD(11)|WD(12))
 
-/* a74: WD14   WD17   WD18   WD21   WD23   WD24   WD26   WD27   WD29 PCB     ---    */
+//! Data double word mask for chip A74.
 #define A74 (WD(14)|WD(17)|WD(18)|WD(21)|WD(23)|WD(24)|WD(26)|WD(27)|WD(29))
 
 #define H0(hpb) X_BIT(hpb,8,0)      //!< get Hamming code bit 0 from hpb data (really bit 32)
@@ -283,23 +282,29 @@
 #define H5(hpb) X_BIT(hpb,8,5)      //!< get Hamming code bit 5 from hpb data (really bit 37)
 #define RH(hpb) X_RDBITS(hpb,8,0,5) //!< get Hamming code from hpb data (bits 32 to 37)
 #define RP(hpb) X_BIT(hpb,8,6)      //!< get parity bit from hpb data (really bit 38)
+#define	RU(hpb) X_BIT(hpb,8,7)		//!< get unused bit from hpb data (really bit 39) [unused]
 
-/** @brief return even parity of a (masked) 32 bit value */
+/**
+ * @brief Return even parity of a (masked) 32 bit value.
+ * @param val 32 bits
+ * @return 1 for even parity, 0 for odd parity
+ */
 static __inline UINT8 parity_even(UINT32 val)
 {
-		val -= ((val >> 1) & 0x55555555);
-		val = (((val >> 2) & 0x33333333) + (val & 0x33333333));
-		val = (((val >> 4) + val) & 0x0f0f0f0f);
-		val += (val >> 8);
-		val += (val >> 16);
-		return (val & 1);
+	val -= ((val >> 1) & 0x55555555);
+	val = (((val >> 2) & 0x33333333) + (val & 0x33333333));
+	val = (((val >> 4) + val) & 0x0f0f0f0f);
+	val += (val >> 8);
+	val += (val >> 16);
+	// val now has number of 1 bits
+	return val & 1;
 }
 
-/** @brief return odd parity of a (masked) 32 bit value */
+/** @brief Return odd parity of a (masked) 32 bit value. */
 #define parity_odd(val) (parity_even(val)^1)
 
 /**
- * @brief lookup table to convert a Hamming syndrome into a bit number to correct
+ * @brief Lookup table to convert a Hamming syndrome into a bit number to correct.
  */
 static const int hamming_lut[64] = {
 	-1, -1, -1,  0, -1,  1,  2,  3, /* A69: HR(5):0 HR(4):0 HR(3):0 */
@@ -313,100 +318,88 @@ static const int hamming_lut[64] = {
 };
 
 /**
- * @brief read or write a memory double-word and caluclate its Hamming code
+ * @brief Caluclate a Hamming code after reading or before writing a memory double-word.
  *
- * Hamming code generation according to the schematics described above.
+ * Hamming code generation is according to the schematics described above.
+ * 
  * It's certainly overkill to do this on a modern PC, but I think we'll
- * need it for perfect emulation anyways (Hamming code hardware checking).
+ * need it for perfect emulation anyways, e.g. Hamming code hardware checking.
  *
- * @param write non-zero if this is a memory write (don't check for error)
+ * @param write true, if this is a memory write (don't check for error)
  * @param dw_addr the double-word address
- * @param dw_data the double-word data to write
- * @return dw_data
+ * @param dw_data the double-word data
+ * @return dw_data, possibly with 1 bit error corrected
  */
-UINT32 alto2_cpu_device::hamming_code(int write, UINT32 dw_addr, UINT32 dw_data)
+UINT32 alto2_cpu_device::hamming_code(bool write, UINT32 dw_addr, UINT32 dw_data)
 {
-	UINT8 hpb = write ? 0 : m_mem.hpb[dw_addr];
-	UINT8 hc_0_a;
-	UINT8 hc_0b1;
-	UINT8 hc_1_a;
-	UINT8 hc_2_a;
-	UINT8 hc_2_b;
-	UINT8 hc_0;
-	UINT8 hc_1;
-	UINT8 hc_2;
-	UINT8 h_0_2;
-	UINT8 hc_3_a;
-	UINT8 hc_3_4;
-	UINT8 hcpa;
-	UINT8 hc_4_a;
-	UINT8 hc_3;
-	UINT8 hc_4;
-	UINT8 hc_5;
-	UINT8 hcpb;
-	UINT8 perr;
-	UINT8 pca;
-	UINT8 pcb;
-	UINT8 pc;
-	int syndrome;
+	const UINT8 hpb = write ? 0 : m_mem.hpb[dw_addr];
 
 	/* a75: WD01   WD04   WD08   WD11   WD15   WD19   WD23   WD26   WD30 ---     HC(0)A */
-	hc_0_a = parity_odd (dw_data & A75);
-	/* a76: WD00   WD03   WD06   WD10   WD13   WD17   WD21   WD25   WD29 HC(0B1) ---    */
-	hc_0b1 = parity_even(dw_data & A76);
-	/* a86: WD02   WD05   WD09   WD12   WD16   WD20   WD24   WD27   WD31 HC(1)A  ---    */
-	hc_1_a = parity_even(dw_data & A86);
-	/* a64: WD01   WD02   WD03   WD07   WD08   WD09   WD10   WD14   WD15 ---     HC(2)A */
-	hc_2_a = parity_odd (dw_data & A64);
-	/* a85: WD16   WD17   WD22   WD23   WD24   WD25   WD29   WD30   WD31 HC(2)B  ---    */
-	hc_2_b = parity_even(dw_data & A85);
+	const UINT8 hc_0_a = parity_odd (dw_data & A75);
 
-	hc_0  = H0(hpb) ^ hc_0_a ^ hc_0b1;
-	hc_1  = H1(hpb) ^ hc_1_a ^ hc_0b1;
-	hc_2  = hc_2_a ^ hc_2_b ^ H2(hpb);
-	h_0_2 = H0(hpb) ^ H1(hpb) ^ H2(hpb);
+	/* a76: WD00   WD03   WD06   WD10   WD13   WD17   WD21   WD25   WD29 HC(0B1) ---    */
+	const UINT8 hc_0b1 = parity_even(dw_data & A76);
+
+	/* a86: WD02   WD05   WD09   WD12   WD16   WD20   WD24   WD27   WD31 HC(1)A  ---    */
+	const UINT8 hc_1_a = parity_even(dw_data & A86);
+
+	/* a64: WD01   WD02   WD03   WD07   WD08   WD09   WD10   WD14   WD15 ---     HC(2)A */
+	const UINT8 hc_2_a = parity_odd (dw_data & A64);
+
+	/* a85: WD16   WD17   WD22   WD23   WD24   WD25   WD29   WD30   WD31 HC(2)B  ---    */
+	const UINT8 hc_2_b = parity_even(dw_data & A85);
+
+	const UINT8 hc_0  = H0(hpb) ^ hc_0_a ^ hc_0b1;
+	const UINT8 hc_1  = H1(hpb) ^ hc_1_a ^ hc_0b1;
+	const UINT8 hc_2  = hc_2_a ^ hc_2_b ^ H2(hpb);
+	const UINT8 h_0_2 = H0(hpb) ^ H1(hpb) ^ H2(hpb);
 
 	/* a66: WD04   WD05   WD06   WD07   WD08   WD09   WD10   H(3)   0    ---     HC(3)A */
-	hc_3_a = parity_odd ((dw_data & A66) ^ H3(hpb));
+	const UINT8 hc_3_a = parity_odd ((dw_data & A66) ^ H3(hpb));
+
 	/* a84: WD18   WD19   WD20   WD21   WD22   WD23   WD24   WD25   0    HC(3/4) HCPA   */
-	hcpa   = parity_odd (dw_data & A84);
-	hc_3_4 = hcpa ^ 1;
+	const UINT8 hcpa   = parity_odd (dw_data & A84);
+	const UINT8 hc_3_4 = hcpa ^ 1;
+
 	/* a63: WD11   WD12   WD13   WD14   WD15   WD16   WD17   H(4)   0    ---     HC(4)A */
-	hc_4_a = parity_odd ((dw_data & A63) ^ H4(hpb));
+	const UINT8 hc_4_a = parity_odd ((dw_data & A63) ^ H4(hpb));
 
 	/* a87: WD26   WD27   WD28   WD29   WD30   WD31   H(5)   0      0    HC(5)   HCPB   */
-	hcpb   = parity_odd ((dw_data & A87) ^ H5(hpb));
-	hc_3   = hc_3_a ^ hc_3_4;
-	hc_4   = hc_4_a ^ hc_3_4;
-	hc_5   = hcpb ^ 1;
+	const UINT8 hcpb   = parity_odd ((dw_data & A87) ^ H5(hpb));
+	const UINT8 hc_3   = hc_3_a ^ hc_3_4;
+	const UINT8 hc_4   = hc_4_a ^ hc_3_4;
+	const UINT8 hc_5   = hcpb ^ 1;
 
-	syndrome = (hc_0<<5)|(hc_1<<4)|(hc_2<<3)|(hc_3<<2)|(hc_4<<1)|(hc_5);
+	const UINT8 syndrome = 32*hc_0 + 16*hc_1 + 8*hc_2 + 4*hc_3 + 2*hc_4 + hc_5;
 
-	/*
+
+	/* a54: HC(3)A HC(4)A HCPA   HCPB   H(0/2) XX01   WD02   WD03   P    PERR    ---
+	 * 
 	 * Note: Here I XOR all the non dw_data inputs into bit 0,
 	 * which has the same effect as spreading them over some bits
 	 * and then counting them... I hope ;-)
 	 */
-	/* a54: HC(3)A HC(4)A HCPA   HCPB   H(0/2) XX01   WD02   WD03   P    PERR    ---    */
-	perr = parity_even(
+	const UINT8 perr = parity_even(
 				hc_3_a ^
 				hc_4_a ^
 				hcpa ^
 				hcpb ^
 				h_0_2 ^
-				(X_RDBITS(dw_data,32,0,0) ^ X_RDBITS(dw_data,32,1,1)) ^
+				X_RDBITS(dw_data,32,0,0) ^
+				X_RDBITS(dw_data,32,1,1) ^
 				(dw_data & A54) ^
 				RP(hpb) ^
 				1);
 
 	/* a65: WD00   WD01   WD02   WD04   WD05   WD07   WD10   WD11   WD12 ---     PCA    */
-	pca = parity_odd (dw_data & A65);
+	const UINT8 pca = parity_odd (dw_data & A65);
+
 	/* a74: WD14   WD17   WD18   WD21   WD23   WD24   WD26   WD27   WD29 PCB     ---    */
-	pcb = parity_even(dw_data & A74);
-	pc = pca ^ pcb;
+	const UINT8 pcb = parity_even(dw_data & A74);
+	const UINT8 pc = pca ^ pcb;
 
 	if (write) {
-		/* update the hamming code and parity bit store */
+		/* Update the hamming code and parity bit store */
 		m_mem.hpb[dw_addr] = (syndrome << 2) | (pc << 1);
 		return dw_data;
 
@@ -429,11 +422,11 @@ UINT32 alto2_cpu_device::hamming_code(int write, UINT32 dw_addr, UINT32 dw_data)
 	 *  output  signal
 	 *  -------------------------
 	 *  8   ERROR
+	 * </PRE>
 	 *
-	 * Remembering De Morgan this can be simplified:
+	 * Using De Morgan this can be simplified:
 	 * ERROR is 0, whenever all of PERR and HC(0) to HC(5) are 0.
 	 * Or the other way round: any of perr or syndrome non-zero means ERROR=1.
-	 * </PRE>
 	 */
 	if (perr || syndrome) {
 		/* latch data on the first error */
@@ -478,7 +471,6 @@ UINT32 alto2_cpu_device::hamming_code(int write, UINT32 dw_addr, UINT32 dw_data)
 	}
 	return dw_data;
 }
-#endif  /* USE_HAMMING_CHECK */
 
 /**
  * @brief memory error address register read
@@ -522,11 +514,7 @@ READ16_MEMBER( alto2_cpu_device::mesr_r )
 		LOG((this,LOG_MEM,6,"        Hamming code read    : %#o\n", GET_MESR_HAMMING(data)));
 		LOG((this,LOG_MEM,6,"        Parity error         : %o\n", GET_MESR_PERR(data)));
 		LOG((this,LOG_MEM,6,"        Memory parity bit    : %o\n", GET_MESR_PARITY(data)));
-#if USE_HAMMING_CHECK
 		LOG((this,LOG_MEM,6,"        Hamming syndrome     : %#o (bit #%d)\n", GET_MESR_SYNDROME(data), hamming_lut[GET_MESR_SYNDROME(data)]));
-#else
-		LOG((this,LOG_MEM,6,"        Hamming syndrome     : %#o\n", GET_MESR_SYNDROME(data)));
-#endif
 		LOG((this,LOG_MEM,6,"        Memory bank          : %#o\n", GET_MESR_BANK(data)));
 	}
 	return data;
@@ -536,10 +524,10 @@ WRITE16_MEMBER( alto2_cpu_device::mesr_w )
 {
 	if (!space.debugger_access()) {
 		LOG((this,LOG_MEM,2,"    MESR write %07o (clear MESR; was %07o)\n", data, m_mem.mesr));
+		m_mem.mesr = 0;     // set all bits to 0
+		m_mem.error = 0;    // reset the error flag
+		m_task_wakeup &= ~(1 << task_part); // clear the task wakeup for the parity error task
 	}
-	m_mem.mesr = 0;     // set all bits to 0
-	m_mem.error = 0;    // reset the error flag
-	m_task_wakeup &= ~(1 << task_part); // clear the task wakeup for the parity error task
 }
 
 /**
@@ -566,6 +554,7 @@ WRITE16_MEMBER( alto2_cpu_device::mesr_w )
 WRITE16_MEMBER( alto2_cpu_device::mecr_w )
 {
 	m_mem.mecr = data ^ 0177777;
+	// clear spare bits
 	X_WRBITS(m_mem.mecr,16, 0, 3,0);
 	X_WRBITS(m_mem.mecr,16,15,15,0);
 	if (!space.debugger_access()) {
@@ -584,7 +573,7 @@ WRITE16_MEMBER( alto2_cpu_device::mecr_w )
 READ16_MEMBER( alto2_cpu_device::mecr_r )
 {
 	UINT16 data = m_mem.mecr ^ 0177777;
-	/* set all spare bits */
+	// all spare bits are set
 	if (!space.debugger_access()) {
 		LOG((this,LOG_MEM,2,"    MECR read %07o\n", data));
 		LOG((this,LOG_MEM,6,"        Test Hamming code    : %#o\n", GET_MECR_TEST_CODE(data)));
@@ -596,25 +585,33 @@ READ16_MEMBER( alto2_cpu_device::mecr_r )
 	return data;
 }
 
-//! read i/o space RAM
+/**
+ * @brief Read i/o space RAM.
+ * Note: This is for debugger access. Regular memory access is
+ * only through load_mar, read_mem and write_mem.
+ */
 READ16_MEMBER ( alto2_cpu_device::ioram_r )
 {
-	offs_t dword_addr = offset / 2;
-	return static_cast<UINT16>(offset & 1 ? GET_ODD(m_mem.ram[dword_addr]) : GET_EVEN(m_mem.ram[dword_addr]));
-}
-
-//! write i/o space RAM
-WRITE16_MEMBER( alto2_cpu_device::ioram_w )
-{
-	offs_t dword_addr = offset / 2;
-	if (offset & 1)
-		PUT_ODD(m_mem.ram[dword_addr], data);
-	else
-		PUT_EVEN(m_mem.ram[dword_addr], data);
+	offs_t dw_addr = offset / 2;
+	return static_cast<UINT16>(offset & 1 ? GET_ODD(m_mem.ram[dw_addr]) : GET_EVEN(m_mem.ram[dw_addr]));
 }
 
 /**
- * @brief load the memory address register with some value
+ * @brief Write i/o space RAM.
+ * Note: This is for debugger access. Regular memory access is
+ * only through load_mar, read_mem and write_mem.
+ */
+WRITE16_MEMBER( alto2_cpu_device::ioram_w )
+{
+	offs_t dw_addr = offset / 2;
+	if (offset & 1)
+		PUT_ODD(m_mem.ram[dw_addr], data);
+	else
+		PUT_EVEN(m_mem.ram[dw_addr], data);
+}
+
+/**
+ * @brief Load the memory address register with some value.
  *
  * @param rsel selected register (to detect refresh cycles)
  * @param addr memory address
@@ -627,7 +624,7 @@ void alto2_cpu_device::load_mar(UINT8 rsel, UINT32 addr)
 		 * currently we don't do anything special
 		 */
 		LOG((this,LOG_MEM,5, "   MAR<-; refresh cycle @ %#o\n", addr));
-		m_mem.mar = addr;
+		m_mem.mar = addr & ~3;
 		m_mem.access = ALTO2_MEM_REFRESH;
 		m_mem.cycle = cycle();
 		return;
@@ -639,8 +636,7 @@ void alto2_cpu_device::load_mar(UINT8 rsel, UINT32 addr)
 		m_mem.access = ALTO2_MEM_RAM;
 		// fetch the memory double-word to the read/write latches
 		m_mem.rmdd = m_mem.wmdd = m_mem.ram[m_mem.mar/2];
-		// keep track of the current CPU cycle
-		m_mem.cycle = cycle();
+		m_mem.cycle = cycle();	// keep track of the current CPU cycle
 	} else {
 		m_mem.access = ALTO2_MEM_INVALID;
 		m_mem.rmdd = m_mem.wmdd = ~0;
@@ -648,26 +644,31 @@ void alto2_cpu_device::load_mar(UINT8 rsel, UINT32 addr)
 }
 
 /**
- * @brief read memory or memory mapped I/O from the address in mar to md
+ * @brief Read RAM or memory mapped I/O from the address in MAR to MD.
+ *
+ * Since the Alto II has a latch for the memory dword,
+ * reading it after cycle +4 is very well possible.
+ * We simply return the most recent m_mem.md in this case.
+ *
+ * This fixes calculator.run and ti55.run, probably others,
+ * which were making the mouse cursor displaying weird things.
+ *
+ * Thanks go to LCM and ContrAlto source for the hint!
  *
  * @result returns value from memory (RAM or MMIO)
  */
 UINT16 alto2_cpu_device::read_mem()
 {
-	UINT32 base_addr;
-
 	if (ALTO2_MEM_NONE == m_mem.access) {
 		LOG((this,LOG_MEM,0,"    fatal: mem read with no preceding address\n"));
 		return 0177777;
 	}
 
-	if (cycle() > m_mem.cycle + 4) {
-		LOG((this,LOG_MEM,0,"    fatal: mem read (MAR %#o) too late (+%lld cyc)\n", m_mem.mar, cycle() - m_mem.cycle));
-		m_mem.access = ALTO2_MEM_NONE;
-		return 0177777;
+	if ((m_mem.access & ALTO2_MEM_LATCHED) && cycle() > m_mem.cycle + 4) {
+		return m_mem.md;
 	}
 
-	base_addr = m_mem.mar & 0177777;
+	const UINT32 base_addr = m_mem.mar & 0177777;
 	if (base_addr >= ALTO2_IO_PAGE_BASE && m_mem.mar < ALTO2_RAM_SIZE) {
 		m_mem.md = m_iomem->read_word(m_iomem->address_to_byte(base_addr));
 		LOG((this,LOG_MEM,6,"    MD = MMIO[%#o] (%#o)\n", base_addr, m_mem.md));
@@ -678,11 +679,10 @@ UINT16 alto2_cpu_device::read_mem()
 		return m_mem.md;
 	}
 
-#if USE_HAMMING_CHECK
-	/* check for errors on the first access */
+	/* check for errors on the first access (even address) */
 	if (!(m_mem.access & ALTO2_MEM_ODD))
-		m_mem.rmdd = hamming_code(0, m_mem.mar/2, m_mem.rmdd);
-#endif
+		m_mem.rmdd = hamming_code(false, m_mem.mar/2, m_mem.rmdd);
+
 	m_mem.md = (m_mem.mar & ALTO2_MEM_ODD) ? GET_ODD(m_mem.rmdd) : GET_EVEN(m_mem.rmdd);
 	LOG((this,LOG_MEM,6,"    MD = RAM[%#o] (%#o)\n", m_mem.mar, m_mem.md));
 
@@ -691,11 +691,12 @@ UINT16 alto2_cpu_device::read_mem()
 #endif
 
 	if (m_mem.access & ALTO2_MEM_ODD) {
-		// after reading the odd word, reset the access flag
-		m_mem.access = ALTO2_MEM_NONE;
+		// after reading the odd word, set the access flag to LATCHED
+		m_mem.access = ALTO2_MEM_LATCHED;
 	} else {
-		// after reading the even word word, toggle access flag (and address) to the odd word
-		m_mem.mar ^= ALTO2_MEM_ODD;
+		// after reading the even word word,
+		// toggle access flag (and address) to the odd word
+		m_mem.mar ^= 1;
 		m_mem.access ^= ALTO2_MEM_ODD;
 		// extend the read succeeds window by one cycle
 		m_mem.cycle++;
@@ -704,7 +705,7 @@ UINT16 alto2_cpu_device::read_mem()
 }
 
 /**
- * @brief write memory or memory mapped I/O from md to the address in mar
+ * @brief Write RAM or memory mapped I/O from MD to the address in MAR.
  *
  * @param data data to write to RAM or MMIO
  */
@@ -719,6 +720,8 @@ void alto2_cpu_device::write_mem(UINT16 data)
 	}
 
 	if (cycle() > m_mem.cycle + 4) {
+		// FIXME: what really happens if a write occurs too late?
+		// Need to revisit the schematics to tell for sure.
 		LOG((this,LOG_MEM,0,"    fatal: mem write (MAR %#o, data %#o) too late (+%lld cyc)\n", m_mem.mar, data, cycle() - m_mem.cycle));
 		m_mem.access = ALTO2_MEM_NONE;
 		return;
@@ -741,72 +744,67 @@ void alto2_cpu_device::write_mem(UINT16 data)
 	else
 		PUT_EVEN(m_mem.wmdd, m_mem.md);
 
-#if USE_HAMMING_CHECK
 	if (m_mem.access & ALTO2_MEM_RAM)
-		m_mem.ram[m_mem.mar/2] = hamming_code(1, m_mem.mar/2, m_mem.wmdd);
-#else
-	if (m_mem.access & ALTO2_MEM_RAM)
-		m_mem.ram[m_mem.mar/2] = m_mem.wmdd;
-#endif
+		m_mem.ram[m_mem.mar/2] = hamming_code(true, m_mem.mar/2, m_mem.wmdd);
 
 #if ALTO2_DEBUG
 	watch_write(m_mem.mar, m_mem.md);
 #endif
+
 	// Toggle the odd/even word access flag
 	// NB: don't reset mem.access to permit double word exchange
-	m_mem.mar ^= ALTO2_MEM_ODD;
+	m_mem.mar ^= 1;
 	m_mem.access ^= ALTO2_MEM_ODD;
+
 	// extend the write succeeds window by one cycle
 	m_mem.cycle++;
 }
 
 /**
- * @brief debugger interface to read memory
+ * @brief Debugger interface to read memory.
  *
  * @param addr address to read
  * @return memory contents at address (16 bits)
  */
 UINT16 alto2_cpu_device::debug_read_mem(UINT32 addr)
 {
-	space(AS_2).set_debugger_access(true);
 	int base_addr = addr & 0177777;
 	int data;
-	if (base_addr >= ALTO2_IO_PAGE_BASE && addr < ALTO2_RAM_SIZE) {
+	if (addr >= ALTO2_IO_PAGE_BASE && addr < ALTO2_RAM_SIZE) {
+		space(AS_2).set_debugger_access(true);
 		data = m_iomem->read_word(m_iomem->address_to_byte(base_addr));
+		space(AS_2).set_debugger_access(false);
 	} else {
 		data = (addr & ALTO2_MEM_ODD) ? GET_ODD(m_mem.ram[addr/2]) : GET_EVEN(m_mem.ram[addr/2]);
 	}
-	space(AS_2).set_debugger_access(false);
 	return data;
 }
 
 /**
- * @brief debugger interface to write memory
+ * @brief Debugger interface to write memory.
  *
  * @param addr address to write
  * @param data data to write (16 bits used)
  */
 void alto2_cpu_device::debug_write_mem(UINT32 addr, UINT16 data)
 {
-	space(AS_2).set_debugger_access(true);
 	int base_addr = addr & 0177777;
-	if (base_addr >= ALTO2_IO_PAGE_BASE && addr < ALTO2_RAM_SIZE) {
+	if (addr >= ALTO2_IO_PAGE_BASE && addr < ALTO2_RAM_SIZE) {
+		space(AS_2).set_debugger_access(true);
 		m_iomem->write_word(m_iomem->address_to_byte(base_addr), data);
+		space(AS_2).set_debugger_access(false);
 	} else if (addr & ALTO2_MEM_ODD) {
 		PUT_ODD(m_mem.ram[addr/2], data);
 	} else {
 		PUT_EVEN(m_mem.ram[addr/2], data);
 	}
-	space(AS_2).set_debugger_access(false);
 }
 
 /**
- * @brief initialize the memory system
+ * @brief Initialize the memory system.
  *
- * Zeroes the memory context, including RAM and installs dummy
- * handlers for the memory mapped I/O area.
- * Sets handlers for access to the memory error address, status,
- * and control registers at 0177024 to 0177026.
+ * Zeroes the RAM and registers the memory registers
+ * for state saving.
  */
 void alto2_cpu_device::init_memory()
 {
@@ -824,15 +822,7 @@ void alto2_cpu_device::init_memory()
 
 void alto2_cpu_device::exit_memory()
 {
-	// no need for this since it free on exit by itself
-	// if (m_mem.ram) {
-		// auto_free(machine(), m_mem.ram);
-		// m_mem.ram = 0;
-	// }
-	// if (m_mem.hpb) {
-		// auto_free(machine(), m_mem.hpb);
-		// m_mem.hpb = 0;
-	// }
+	// nothing to do
 }
 
 void alto2_cpu_device::reset_memory()
@@ -843,25 +833,22 @@ void alto2_cpu_device::reset_memory()
 	if (m_mem.hpb) {
 		m_mem.hpb = nullptr;
 	}
+
 	// allocate 64K or 128K words of main memory
 	ioport_port* config = ioport(":CONFIG");
+	m_mem.size = ALTO2_RAM_SIZE;
 	// config should be valid, unless the driver doesn't define it
-	if (config)
-		m_mem.size = config->read() & 1 ? ALTO2_RAM_SIZE : 2 * ALTO2_RAM_SIZE;
-	else
-		m_mem.size = ALTO2_RAM_SIZE;
+	if (config && 0 == config->read())
+		m_mem.size *= 2;
 	logerror("Main memory %u KiB\n", static_cast<UINT32>(sizeof(UINT16) * m_mem.size / 1024));
 
 	m_mem.ram = make_unique_clear<UINT32[]>(sizeof(UINT16) * m_mem.size);
-	m_mem.hpb = make_unique_clear<UINT8[]>( sizeof(UINT16) * m_mem.size);
+	m_mem.hpb = make_unique_clear<UINT8[]> (sizeof(UINT16) * m_mem.size);
 
-#if USE_HAMMING_CHECK
-	// Initialize the hamming codes and parity bit
-	for (UINT32 addr = 0; addr < ALTO2_IO_PAGE_BASE; addr++) {
-		hamming_code(1, addr, 0);
-		hamming_code(1, 0200000 + addr, 0);
-	}
-#endif
+	// Initialize the hamming codes and parity bits
+	for (UINT32 addr = 0; addr < m_mem.size; addr++)
+		hamming_code(true, addr, 0);
+
 	m_mem.mar = 0;
 	m_mem.rmdd = 0;
 	m_mem.wmdd = 0;

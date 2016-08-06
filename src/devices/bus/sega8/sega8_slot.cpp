@@ -213,15 +213,15 @@ static const char *sega8_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-int sega8_cart_slot_device::verify_cart( UINT8 *magic, int size )
+image_verify_result sega8_cart_slot_device::verify_cart( UINT8 *magic, int size )
 {
-	int retval = IMAGE_VERIFY_FAIL;
+	image_verify_result retval(image_verify_result::FAIL);
 
 	// Verify the file is a valid image - check $7ff0 for "TMR SEGA"
 	if (size >= 0x8000)
 	{
 		if (!strncmp((char*)&magic[0x7ff0], "TMR SEGA", 8))
-			retval = IMAGE_VERIFY_PASS;
+			retval = image_verify_result::PASS;
 	}
 
 	return retval;
@@ -331,7 +331,7 @@ void sega8_cart_slot_device::setup_ram()
 	}
 }
 
-bool sega8_cart_slot_device::call_load()
+image_init_result sega8_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -342,7 +342,7 @@ bool sega8_cart_slot_device::call_load()
 		if (m_is_card && len > 0x8000)
 		{
 			seterror(IMAGE_ERROR_UNSPECIFIED, "Attempted loading a card larger than 32KB");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		// check for header
@@ -368,7 +368,7 @@ bool sega8_cart_slot_device::call_load()
 			memcpy(ROM, get_software_region("rom"), get_software_region_length("rom"));
 
 		/* check the image */
-		if (verify_cart(ROM, len) == IMAGE_VERIFY_FAIL)
+		if (verify_cart(ROM, len) != image_verify_result::PASS)
 			logerror("Warning loading image: verify_cart failed\n");
 
 		if (software_entry() != nullptr)
@@ -397,10 +397,10 @@ bool sega8_cart_slot_device::call_load()
 
 		internal_header_logging(ROM + offset, len, m_cart->get_ram_size());
 
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

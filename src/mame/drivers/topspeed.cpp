@@ -189,7 +189,7 @@ READ8_MEMBER(topspeed_state::input_bypass_r)
 {
 	// Read port number
 	UINT8 port = m_tc0220ioc->port_r(space, 0);
-	UINT16 steer = 0xff80 + read_safe(ioport("STEER"), 0);
+	UINT16 steer = 0xff80 + m_steer.read_safe(0);
 
 	switch (port)
 	{
@@ -207,8 +207,8 @@ READ8_MEMBER(topspeed_state::input_bypass_r)
 CUSTOM_INPUT_MEMBER(topspeed_state::pedal_r)
 {
 	static const UINT8 retval[8] = { 0,1,3,2,6,7,5,4 };
-	const char *tag = (const char *)param;
-	return retval[read_safe(ioport(tag), 0) & 7];
+	ioport_port *port = ioport((const char *)param);
+	return retval[port != nullptr ? port->read() & 7 : 0];
 }
 
 READ16_MEMBER(topspeed_state::motor_r)
@@ -391,7 +391,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpub_map, AS_PROGRAM, 16, topspeed_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x400000, 0X40ffff) AM_RAM AM_SHARE("sharedram")
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x880000, 0x880001) AM_READ8(input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0220ioc", tc0220ioc_device, portreg_w, 0x00ff)
 	AM_RANGE(0x880002, 0x880003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
 	AM_RANGE(0x900000, 0x9003ff) AM_READWRITE(motor_r, motor_w)

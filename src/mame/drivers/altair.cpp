@@ -81,12 +81,12 @@ QUICKLOAD_LOAD_MEMBER( altair_state,altair)
 	int read_;
 	quick_length = image.length();
 	if (quick_length >= 0xfd00)
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	read_ = image.fread(m_ram, quick_length);
 	if (read_ != quick_length)
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 WRITE_LINE_MEMBER(altair_state::write_acia_clock)

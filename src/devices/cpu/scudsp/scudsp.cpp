@@ -451,8 +451,8 @@ void scudsp_cpu_device::scudsp_operation(UINT32 opcode)
 			SET_V(((m_pl.si) ^ (m_acl.si)) & ((m_pl.si) ^ (i3)) & 0x80000000);
 			break;
 		case 0x6:   /* AD2 */
-			i1 = CONCAT_64((INT32)m_ph.si,m_pl.si);
-			i2 = CONCAT_64((INT32)m_ach.si,m_acl.si);
+			i1 = concat_64((INT32)m_ph.si,m_pl.si);
+			i2 = concat_64((INT32)m_ach.si,m_acl.si);
 			m_alu = i1 + i2;
 			SET_Z((m_alu & S64(0xffffffffffff)) == 0);
 			SET_S((m_alu & S64(0x800000000000)) > 0);

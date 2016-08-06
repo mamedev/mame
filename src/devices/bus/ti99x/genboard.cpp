@@ -203,6 +203,7 @@
 #define TRACE_CLOCK 0
 #define TRACE_LINES 0
 #define TRACE_SETTING 1
+#define TRACE_VIDEOWS 0
 #define TRACE_PFM 0
 
 geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -395,7 +396,7 @@ void geneve_mapper_device::set_cartridge_writable(int base, bool write)
 
 void geneve_mapper_device::set_video_waitstates(bool wait)
 {
-	if (TRACE_SETTING) logerror("%s: Setting video waitstates = %d\n", tag(), wait);
+	if (TRACE_VIDEOWS) logerror("%s: Setting video waitstates = %d\n", tag(), wait);
 	m_video_waitstates = wait;
 }
 

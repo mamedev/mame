@@ -57,6 +57,7 @@ public:
 			m_midvplus_misc(*this, "midvplus_misc"),
 			m_videoram(*this, "videoram", 32),
 			m_textureram(*this, "textureram") ,
+		m_adc_ports(*this, {"WHEEL", "ACCEL", "BRAKE"}),
 		m_maincpu(*this, "maincpu"),
 		m_watchdog(*this, "watchdog"),
 		m_screen(*this, "screen"),
@@ -74,6 +75,8 @@ public:
 	optional_shared_ptr<UINT32> m_midvplus_misc;
 	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT32> m_textureram;
+
+	optional_ioport_array<3> m_adc_ports;
 
 	UINT8 m_cmos_protected;
 	UINT16 m_control_data;

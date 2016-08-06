@@ -153,13 +153,13 @@ void alto2_cpu_device::bs_early_read_sreg()
 {
 	UINT16 r;
 
-	if (m_d_rsel) {
+	if (rsel()) {
 		UINT8 bank = m_s_reg_bank[m_task];
-		r = m_s[bank][m_d_rsel];
-		LOG((this,LOG_RAM,2,"    <-S%02o; bus &= S[%o][%02o] (%#o)\n", m_d_rsel, bank, m_d_rsel, r));
+		r = m_s[bank][rsel()];
+		LOG((this,LOG_RAM,2,"    <-S%02o; bus &= S[%o][%02o] (%#o)\n", rsel(), bank, rsel(), r));
 	} else {
 		r = m_m;
-		LOG((this,LOG_RAM,2,"    <-S%02o; bus &= M (%#o)\n", m_d_rsel, r));
+		LOG((this,LOG_RAM,2,"    <-S%02o; bus &= M (%#o)\n", rsel(), r));
 	}
 	m_bus &= r;
 }
@@ -170,7 +170,7 @@ void alto2_cpu_device::bs_early_read_sreg()
 void alto2_cpu_device::bs_early_load_sreg()
 {
 	int r = 0;  /* ??? */
-	LOG((this,LOG_RAM,2,"    S%02o<- BUS &= garbage (%#o)\n", m_d_rsel, r));
+	LOG((this,LOG_RAM,2,"    S%02o<- BUS &= garbage (%#o)\n", rsel(), r));
 	m_bus &= r;
 }
 
@@ -180,8 +180,8 @@ void alto2_cpu_device::bs_early_load_sreg()
 void alto2_cpu_device::bs_late_load_sreg()
 {
 	UINT8 bank = m_s_reg_bank[m_task];
-	m_s[bank][m_d_rsel] = m_m;
-	LOG((this,LOG_RAM,2,"    S%02o<- S[%o][%02o] := %#o\n", m_d_rsel, bank, m_d_rsel, m_m));
+	m_s[bank][rsel()] = m_m;
+	LOG((this,LOG_RAM,2,"    S%02o<- S[%o][%02o] := %#o\n", rsel(), bank, rsel(), m_m));
 }
 
 /**

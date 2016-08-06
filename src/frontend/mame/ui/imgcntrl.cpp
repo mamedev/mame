@@ -61,7 +61,7 @@ menu_control_device_image::menu_control_device_image(mame_ui_manager &mui, rende
 		if (m_image.exists())
 		{
 			m_current_file.assign(m_image.filename());
-			util::zippath_parent(m_current_directory, m_current_file.c_str());
+			util::zippath_parent(m_current_directory, m_current_file);
 		}
 		else
 		{
@@ -69,7 +69,7 @@ menu_control_device_image::menu_control_device_image(mame_ui_manager &mui, rende
 		}
 
 		// check to see if the path exists; if not clear it
-		if (util::zippath_opendir(m_current_directory.c_str(), nullptr) != osd_file::error::NONE)
+		if (util::zippath_opendir(m_current_directory, nullptr) != osd_file::error::NONE)
 			m_current_directory.clear();
 	}
 }
@@ -91,7 +91,7 @@ menu_control_device_image::~menu_control_device_image()
 void menu_control_device_image::test_create(bool &can_create, bool &need_confirm)
 {
 	// assemble the full path
-	auto path = util::zippath_combine(m_current_directory.c_str(), m_current_file.c_str());
+	auto path = util::zippath_combine(m_current_directory, m_current_file);
 
 	// does a file or a directory exist at the path
 	auto entry = osd_stat(path.c_str());
@@ -140,7 +140,10 @@ void menu_control_device_image::load_software_part()
 	media_auditor::summary summary = auditor.audit_software(m_sld->list_name(), (software_info *)m_swi, AUDIT_VALIDATE_FAST);
 	// if everything looks good, load software
 	if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
-		hook_load(temp_name, true);
+	{
+		m_image.load_software(temp_name);
+		stack_pop();
+	}
 	else
 	{
 		machine().popmessage(_("The software selected is missing one or more required ROM or CHD images. Please select a different one."));
@@ -153,10 +156,10 @@ void menu_control_device_image::load_software_part()
 //  hook_load
 //-------------------------------------------------
 
-void menu_control_device_image::hook_load(std::string name, bool softlist)
+void menu_control_device_image::hook_load(const std::string &name)
 {
 	if (m_image.is_reset_on_load()) m_image.set_init_phase();
-	m_image.load(name.c_str());
+	m_image.load(name);
 	stack_pop();
 }
 
@@ -276,7 +279,7 @@ void menu_control_device_image::handle()
 			break;
 
 		case menu_file_selector::result::FILE:
-			hook_load(m_current_file, false);
+			hook_load(m_current_file);
 			break;
 
 		case menu_file_selector::result::CREATE:
@@ -324,9 +327,9 @@ void menu_control_device_image::handle()
 		break;
 
 	case DO_CREATE: {
-		auto path = util::zippath_combine(m_current_directory.c_str(), m_current_file.c_str());
-		int err = m_image.create(path.c_str(), nullptr, nullptr);
-		if (err != 0)
+		auto path = util::zippath_combine(m_current_directory, m_current_file);
+		image_init_result err = m_image.create(path, nullptr, nullptr);
+		if (err != image_init_result::PASS)
 			machine().popmessage("Error: %s", m_image.error());
 		stack_pop();
 		break;

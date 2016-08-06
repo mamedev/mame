@@ -104,7 +104,7 @@ READ8_MEMBER( zapcomp_state::keyboard_r )
 	for (int i=0; i<16; i++)
 		if (hex_keys & (1 << i))
 			retval |= (0x80 | i); /* provide the key index in bits 3-0
-                                     as well as turning on the strobe bit */
+			                         as well as turning on the strobe bit */
 
 	return retval;
 }

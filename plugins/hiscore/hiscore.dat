@@ -3947,6 +3947,10 @@ deadang:
 
 ;@s:dec0.cpp
 
+ffantasyj:
+@:maincpu,program,ffbe00,50,08,01
+
+
 hbarrelw:
 @:maincpu,program,ffbe78,58,00,26
 
@@ -4763,6 +4767,12 @@ candy:
 
 ;@s:epos.cpp
 
+;beastf:******beastie feastie (fixed)
+beastf:
+@:maincpu,program,7010,f0,00,00
+@:maincpu,program,798a,1,fc,fc
+
+
 ;suprglob:******super glob *
 suprglob:
 @:maincpu,program,7c20,3c,00,00
@@ -4799,13 +4809,6 @@ theglob3:
 @:maincpu,program,7a5f,3c,00,00
 @:maincpu,program,7ab1,1,01,01
 @:maincpu,program,7ab7,1,80,80
-
-
-;beastf:******beastie feastie
-beastf:
-@:maincpu,program,4c46,3c,4d,00
-@:maincpu,program,4c8a,1,01,01
-@:maincpu,program,4cb0,1,15,15
 
 
 ;@s:eprom.cpp
@@ -9246,6 +9249,14 @@ aquarush:
 
 ;@s:namcos2.cpp
 
+bubbletr:
+@:maincpu,program,106970,278,01,01
+
+
+bubbletrj:
+@:maincpu,program,10698c,278,01,01
+
+
 ;(phelios (japan))
 phelios:
 pheliosj:
@@ -10041,11 +10052,9 @@ opwolfu:
 
 ;(operation thunderbolt)
 ;othunderj:******Operation Thunderbolt (Japan)
-;othunderuo:******Operation Thunderbolt (us,older)
 othunder:
 othunderj:
 othunderu:
-othunderuo:
 @:maincpu,program,839ca,438,4e,00
 @:maincpu,program,83dd9,1,01,01
 
@@ -12368,6 +12377,10 @@ glocu:
 
 
 ;@s:seibuspi.cpp
+
+rdft2jb:
+@:maincpu,program,285dc,1ab,01,2e
+
 
 ;rfjet:******raiden fighters jet (all versions fixed)
 rfjet:

@@ -242,7 +242,7 @@ enum
 {
 	GEN_TIMER = 1,
 	COM_TIMER /*,
-    LIVE_TIMER */
+	LIVE_TIMER */
 };
 
 /*

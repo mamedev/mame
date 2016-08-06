@@ -393,15 +393,15 @@ READ32_MEMBER(deco32_state::irq_controller_r)
 
 	case 3: /* Irq controller
 
-        Bit 0:  1 = Vblank active
-        Bit 1:  ? (Hblank active?  Captain America raster IRQ waits for this to go low)
-        Bit 2:
-        Bit 3:
-        Bit 4:  VBL Irq
-        Bit 5:  Raster IRQ
-        Bit 6:  Lightgun IRQ (on Lock N Load only)
-        Bit 7:
-        */
+	    Bit 0:  1 = Vblank active
+	    Bit 1:  ? (Hblank active?  Captain America raster IRQ waits for this to go low)
+	    Bit 2:
+	    Bit 3:
+	    Bit 4:  VBL Irq
+	    Bit 5:  Raster IRQ
+	    Bit 6:  Lightgun IRQ (on Lock N Load only)
+	    Bit 7:
+	    */
 
 		/* ZV03082007 - video_screen_get_vblank() doesn't work for Captain America, as it expects
 		   that this bit is NOT set in rows 0-7. */

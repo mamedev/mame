@@ -788,7 +788,6 @@ VIDEO_START_MEMBER(md_base_state,megadriv)
 
 MACHINE_START_MEMBER(md_base_state,megadriv)
 {
-	m_io_reset = ioport("RESET");
 	m_io_pad_3b[0] = ioport("PAD1");
 	m_io_pad_3b[1] = ioport("PAD2");
 	m_io_pad_3b[2] = ioport("IN0");
@@ -1067,7 +1066,7 @@ DRIVER_INIT_MEMBER(md_base_state, megadrie)
 
 void md_base_state::screen_eof_megadriv(screen_device &screen, bool state)
 {
-	if (m_io_reset && m_io_reset->read() & 0x01)
+	if (m_io_reset.read_safe(0) & 0x01)
 		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 
 	// rising edge

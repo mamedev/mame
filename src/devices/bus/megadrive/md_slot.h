@@ -151,7 +151,7 @@ public:
 	virtual void device_config_complete() override;
 
 	// image-level overrides
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
@@ -167,8 +167,8 @@ public:
 
 	int get_type() { return m_type; }
 
-	int load_list();
-	int load_nonlist();
+	image_init_result load_list();
+	image_init_result load_nonlist();
 	int get_cart_type(UINT8 *ROM, UINT32 len);
 
 	void setup_custom_mappers();

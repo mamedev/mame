@@ -303,6 +303,30 @@ static ADDRESS_MAP_START( megasys1B_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READWRITE(ip_select_r,ip_select_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( megasys1B_edfbl_map, AS_PROGRAM, 16, megasys1_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
+	AM_RANGE(0xe00002, 0x0e0003) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xe00004, 0x0e0005) AM_READ_PORT("P1")
+	AM_RANGE(0xe00006, 0x0e0007) AM_READ_PORT("P2")
+	AM_RANGE(0xe00008, 0x0e0009) AM_READ_PORT("DSW1")
+	AM_RANGE(0xe0000a, 0x0e000b) AM_READ_PORT("DSW2")
+	AM_IMPORT_FROM(megasys1B_map)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( megasys1B_monkelf_map, AS_PROGRAM, 16, megasys1_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x044000, 0x0443ff) AM_WRITE(megasys1_vregs_monkelf_w)
+	AM_RANGE(0xe00002, 0x0e0003) AM_READ_PORT("P1")
+	AM_RANGE(0xe00004, 0x0e0005) AM_READ_PORT("P2")
+	AM_RANGE(0xe00006, 0x0e0007) AM_READ_PORT("DSW1")
+	AM_RANGE(0xe00008, 0x0e0009) AM_READ_PORT("DSW2")
+	AM_RANGE(0xe0000a, 0x0e000b) AM_READ_PORT("SYSTEM")
+	AM_IMPORT_FROM(megasys1B_map)
+ADDRESS_MAP_END
+
+
+
 
 /***************************************************************************
                             [ Main CPU - System C ]
@@ -1626,11 +1650,16 @@ static MACHINE_CONFIG_DERIVED( system_B, system_A )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_DERIVED( system_B_monkelf, system_B )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(megasys1B_monkelf_map)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( system_Bbl, megasys1_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_B_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(megasys1B_map)
+	MCFG_CPU_PROGRAM_MAP(megasys1B_edfbl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", megasys1_state, megasys1B_scanline, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1)
@@ -4250,30 +4279,6 @@ DRIVER_INIT_MEMBER(megasys1_state,edfp)
 	phantasm_rom_decode(machine(), "maincpu");
 }
 
-READ16_MEMBER(megasys1_state::edfbl_input_r)
-{
-	ioport_port *in_names[] = { m_io_system, m_io_p1, m_io_p2, m_io_dsw1, m_io_dsw2 };
-	UINT16 res;
-
-	res = 0;
-
-	switch(offset)
-	{
-		case 0x02/2:
-		case 0x04/2:
-		case 0x06/2:
-		case 0x08/2:
-		case 0x0a/2: res = in_names[offset-1]->read(); break;
-	}
-
-	return res;
-}
-
-DRIVER_INIT_MEMBER(megasys1_state,edfbl)
-{
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xe0000, 0xe000f, read16_delegate(FUNC(megasys1_state::edfbl_input_r),this));
-}
-
 DRIVER_INIT_MEMBER(megasys1_state,hayaosi1)
 {
 	m_ip_select_values[0] = 0x51;
@@ -4473,33 +4478,11 @@ DRIVER_INIT_MEMBER(megasys1_state,stdragonb)
 	stdragona_gfx_unmangle("gfx4");
 }
 
-READ16_MEMBER(megasys1_state::monkelf_input_r)
-{
-	ioport_port *in_names[] = { m_io_p1, m_io_p2, m_io_dsw1, m_io_dsw2, m_io_system };
-	UINT16 res;
-
-	res = 0xffff;
-
-	switch(offset)
-	{
-		case 0x02/2:
-		case 0x04/2:
-		case 0x06/2:
-		case 0x08/2:
-		case 0x0a/2: res = in_names[offset-1]->read(); break;
-	}
-
-	return res;
-}
-
 DRIVER_INIT_MEMBER(megasys1_state,monkelf)
 {
 	DRIVER_INIT_CALL(avspirit);
 
 	m_rom_maincpu[0x00744/2] = 0x4e71; // weird check, 0xe000e R is a port-based trap?
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xe0000, 0xe000f, read16_delegate(FUNC(megasys1_state::monkelf_input_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x44000, 0x443ff, write16_delegate(FUNC(megasys1_state::megasys1_vregs_monkelf_w),this));
 
 	// convert bootleg priority format to standard
 	{
@@ -4552,11 +4535,11 @@ GAME( 1992, soldamj,  soldam,   system_A,          soldam,   megasys1_state, sol
 
 // Type B
 GAME( 1991, avspirit, 0,        system_B,          avspirit, megasys1_state, avspirit, ROT0,   "Jaleco", "Avenging Spirit", 0 )
-GAME( 1990, monkelf,  avspirit, system_B,          avspirit, megasys1_state, monkelf,  ROT0,   "bootleg","Monky Elf (Korean bootleg of Avenging Spirit)", 0 )
+GAME( 1990, monkelf,  avspirit, system_B_monkelf,  avspirit, megasys1_state, monkelf,  ROT0,   "bootleg","Monky Elf (Korean bootleg of Avenging Spirit)", 0 )
 GAME( 1991, edf,      0,        system_B,          edf,      megasys1_state, edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 1)", 0 )
 GAME( 1991, edfa,     edf,      system_B,          edf,      megasys1_state, edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 2)", 0 )
 GAME( 1991, edfu,     edf,      system_B,          edf,      megasys1_state, edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (North America)", 0 )
-GAME( 1991, edfbl,    edf,      system_Bbl,        edf,      megasys1_state, edfbl,    ROT0,   "bootleg","E.D.F. : Earth Defense Force (bootleg)", MACHINE_NO_SOUND )
+GAME( 1991, edfbl,    edf,      system_Bbl,        edf,      driver_device,  0,        ROT0,   "bootleg","E.D.F. : Earth Defense Force (bootleg)", MACHINE_NO_SOUND )
 GAME( 1993, hayaosi1, 0,        system_B_hayaosi1, hayaosi1, megasys1_state, hayaosi1, ROT0,   "Jaleco", "Hayaoshi Quiz Ouza Ketteisen - The King Of Quiz", MACHINE_IMPERFECT_GRAPHICS )
 
 // Type C

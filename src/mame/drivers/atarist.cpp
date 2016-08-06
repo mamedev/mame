@@ -566,7 +566,7 @@ READ8_MEMBER( st_state::ikbd_port2_r )
 
 	*/
 
-	UINT8 data = m_joy1 ? m_joy1->read() & 0x06 : 0x06;
+	UINT8 data = m_joy1.read_safe(0x06) & 0x06;
 
 	// serial receive
 	data |= m_ikbd_tx << 3;
@@ -653,7 +653,7 @@ READ8_MEMBER( st_state::ikbd_port4_r )
 
 	if (m_ikbd_joy) return 0xff;
 
-	UINT8 data = m_joy0 ? m_joy0->read() : 0xff;
+	UINT8 data = m_joy0.read_safe(0xff);
 
 	if ((m_config->read() & 0x01) == 0)
 	{
@@ -1941,7 +1941,8 @@ void st_state::machine_start()
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
 
 	// allocate timers
-	if(m_mousex) {
+	if (m_mousex.found())
+	{
 		m_mouse_timer = timer_alloc(TIMER_MOUSE_TICK);
 		m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(500));
 	}

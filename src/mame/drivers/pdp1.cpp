@@ -452,7 +452,7 @@ enum
 static pdp1_reset_param_t pdp1_reset_param =
 {
 	{   /* external iot handlers.  NULL means that the iot is unimplemented, unless there are
-        parentheses around the iot name, in which case the iot is internal to the cpu core. */
+	    parentheses around the iot name, in which case the iot is internal to the cpu core. */
 		/* I put a ? when the source is the handbook, since a) I have used the maintenance manual
 		as the primary source (as it goes more into details) b) the handbook and the maintenance
 		manual occasionnally contradict each other. */
@@ -679,7 +679,7 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *file_extensions() const override { return "tap,rim"; }
 
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
@@ -712,7 +712,7 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *file_extensions() const override { return "tap,rim"; }
 
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
@@ -746,7 +746,7 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *file_extensions() const override { return "typ"; }
 
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
@@ -779,7 +779,7 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *file_extensions() const override { return "drm"; }
 
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
@@ -798,7 +798,7 @@ pdp1_cylinder_image_device::pdp1_cylinder_image_device(const machine_config &mco
 /*
     Open a perforated tape image
 */
-bool pdp1_readtape_image_device::call_load()
+image_init_result pdp1_readtape_image_device::call_load()
 {
 	pdp1_state *state = machine().driver_data<pdp1_state>();
 
@@ -825,7 +825,7 @@ bool pdp1_readtape_image_device::call_load()
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void pdp1_readtape_image_device::call_unload()
@@ -1032,14 +1032,14 @@ static void iot_rrb(device_t *device, int op2, int nac, int mb, int *io, int ac)
 }
 
 
-bool pdp1_punchtape_image_device::call_load()
+image_init_result pdp1_punchtape_image_device::call_load()
 {
 	pdp1_state *state = machine().driver_data<pdp1_state>();
 
 	/* punch unit */
 	state->m_tape_puncher.fd = this;
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void pdp1_punchtape_image_device::call_unload()
@@ -1143,7 +1143,7 @@ static void iot_ppb(device_t *device, int op2, int nac, int mb, int *io, int ac)
 /*
     Open a file for typewriter output
 */
-bool pdp1_printer_image_device::call_load()
+image_init_result pdp1_printer_image_device::call_load()
 {
 	pdp1_state *state = machine().driver_data<pdp1_state>();
 	/* open file */
@@ -1151,7 +1151,7 @@ bool pdp1_printer_image_device::call_load()
 
 	state->m_io_status |= io_st_tyo;
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void pdp1_printer_image_device::call_unload()
@@ -1479,13 +1479,13 @@ void pdp1_state::parallel_drum_init(pdp1_state *state)
 /*
     Open a file for drum
 */
-bool pdp1_cylinder_image_device::call_load()
+image_init_result pdp1_cylinder_image_device::call_load()
 {
 	pdp1_state *state = machine().driver_data<pdp1_state>();
 	/* open file */
 	state->m_parallel_drum.fd = this;
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void pdp1_cylinder_image_device::call_unload()
@@ -1821,8 +1821,8 @@ INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
 		{
 			m_maincpu->set_state_int(PDP1_RUN, (UINT64)0);
 			m_maincpu->set_state_int(PDP1_RIM, (UINT64)0);  /* bug : we stop after reading an even-numbered word
-                                            (i.e. data), whereas a real pdp-1 stops after reading
-                                            an odd-numbered word (i.e. dio instruciton) */
+			                                (i.e. data), whereas a real pdp-1 stops after reading
+			                                an odd-numbered word (i.e. dio instruciton) */
 		}
 		if (control_transitions & pdp1_continue)
 		{

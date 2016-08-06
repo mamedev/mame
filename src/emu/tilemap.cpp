@@ -475,7 +475,7 @@ void tilemap_t::map_pens_to_layer(int group, pen_t pen, pen_t mask, UINT8 layerm
 	pen_t stop = start | ~mask;
 
 	// clamp to the number of entries actually there
-	stop = MIN(stop, MAX_PEN_TO_FLAGS - 1);
+	stop = std::min(stop, MAX_PEN_TO_FLAGS - 1);
 
 	// iterate and set
 	UINT8 *array = m_pen_to_flags + group * MAX_PEN_TO_FLAGS;
@@ -635,12 +635,12 @@ void tilemap_t::mappings_create()
 	int max_logical_index = m_rows * m_cols;
 
 	// compute the maximum memory index
-	int max_memory_index = 0;
+	tilemap_memory_index max_memory_index = 0;
 	for (UINT32 row = 0; row < m_rows; row++)
 		for (UINT32 col = 0; col < m_cols; col++)
 		{
 			tilemap_memory_index memindex = memory_index(col, row);
-			max_memory_index = MAX(max_memory_index, memindex);
+			max_memory_index = std::max(max_memory_index, memindex);
 		}
 	max_memory_index++;
 
@@ -974,8 +974,8 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 		int scrolly = effective_colscroll(0, height);
 		for (int ypos = scrolly - m_height; ypos <= original_cliprect.max_y; ypos += m_height)
 		{
-			int const firstrow = MAX((original_cliprect.min_y - ypos) / rowheight, 0);
-			int const lastrow =  MIN((original_cliprect.max_y - ypos) / rowheight, m_scrollrows - 1);
+			int const firstrow = std::max((original_cliprect.min_y - ypos) / rowheight, 0);
+			int const lastrow = std::min((original_cliprect.max_y - ypos) / rowheight, INT32(m_scrollrows) - 1);
 
 			// iterate over rows in the tilemap
 			int nextrow;
@@ -1112,10 +1112,10 @@ void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const b
 {
 	// clip destination coordinates to the tilemap
 	// note that x2/y2 are exclusive, not inclusive
-	int x1 = MAX(xpos, blit.cliprect.min_x);
-	int x2 = MIN(xpos + (int)m_width, blit.cliprect.max_x + 1);
-	int y1 = MAX(ypos, blit.cliprect.min_y);
-	int y2 = MIN(ypos + (int)m_height, blit.cliprect.max_y + 1);
+	int x1 = std::max(xpos, blit.cliprect.min_x);
+	int x2 = std::min(xpos + (int)m_width, blit.cliprect.max_x + 1);
+	int y1 = std::max(ypos, blit.cliprect.min_y);
+	int y2 = std::min(ypos + (int)m_height, blit.cliprect.max_y + 1);
 
 	// if totally clipped, stop here
 	if (x1 >= x2 || y1 >= y2)
@@ -1149,7 +1149,7 @@ void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const b
 	// set up row counter
 	int y = y1;
 	int nexty = m_tileheight * (y1 / m_tileheight) + m_tileheight;
-	nexty = MIN(nexty, y2);
+	nexty = std::min(nexty, y2);
 
 	// loop over tilemap rows
 	for (;;)
@@ -1192,8 +1192,8 @@ void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const b
 
 			// compute the end of this run, in pixels
 			x_end = column * m_tilewidth;
-			x_end = MAX(x_end, x1);
-			x_end = MIN(x_end, x2);
+			x_end = std::max(x_end, x1);
+			x_end = std::min(x_end, x2);
 
 			// if we're rendering something, compute the pointers
 			const rgb_t *clut = m_palette->palette()->entry_list_adjusted();
@@ -1264,7 +1264,7 @@ void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const b
 		// increment the Y counter
 		y = nexty;
 		nexty += m_tileheight;
-		nexty = MIN(nexty, y2);
+		nexty = std::min(nexty, y2);
 	}
 }
 

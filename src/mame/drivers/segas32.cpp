@@ -545,6 +545,11 @@ segas32_state::segas32_state(const machine_config &mconfig, const char *tag, dev
 		m_system32_videoram(*this,"videoram", 0),
 		m_system32_spriteram(*this,"spriteram", 0),
 		m_system32_paletteram(*this,"paletteram", 0) ,
+		m_ports_a(*this, {"P1_A", "P2_A", "PORTC_A", "PORTD_A", "SERVICE12_A", "SERVICE34_A", "PORTG_A", "PORTH_A"}),
+		m_ports_b(*this, {"P1_B", "P2_B", "PORTC_B", "PORTD_B", "SERVICE12_B", "SERVICE34_B", "PORTG_B", "PORTH_B"}),
+		m_analog_ports(*this, {"ANALOG1", "ANALOG2", "ANALOG3", "ANALOG4", "ANALOG5", "ANALOG6", "ANALOG7", "ANALOG8"}),
+		m_extra_ports(*this, {"EXTRA1", "EXTRA2", "EXTRA3", "EXTRA4"}),
+		m_track_ports(*this, {"TRACKX1", "TRACKY1", "TRACKX2", "TRACKY2", "TRACKX3", "TRACKY3"}),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_multipcm(*this, "sega"),
@@ -805,11 +810,6 @@ INTERRUPT_GEN_MEMBER(segas32_state::start_of_vblank_int)
 
 UINT16 segas32_state::common_io_chip_r(address_space &space, int which, offs_t offset, UINT16 mem_mask)
 {
-	static const char *const portnames[2][8] =
-			{
-				{ "P1_A", "P2_A", "PORTC_A", "PORTD_A", "SERVICE12_A", "SERVICE34_A", "PORTG_A", "PORTH_A" },
-				{ "P1_B", "P2_B", "PORTC_B", "PORTD_B", "SERVICE12_B", "SERVICE34_B", "PORTG_B", "PORTH_B" },
-			};
 	offset &= 0x1f/2;
 
 	switch (offset)
@@ -828,7 +828,7 @@ UINT16 segas32_state::common_io_chip_r(address_space &space, int which, offs_t o
 				return m_misc_io_data[which][offset];
 
 			/* otherwise, return an input port */
-			return read_safe(ioport(portnames[which][offset]), 0xffff);
+			return (which ? m_ports_b : m_ports_a)[offset].read_safe(0xffff);
 
 		/* 'SEGA' protection */
 		case 0x10/2:
@@ -1090,14 +1090,13 @@ READ16_MEMBER(segas32_state::analog_custom_io_r)
 
 WRITE16_MEMBER(segas32_state::analog_custom_io_w)
 {
-	static const char *const names[] = { "ANALOG1", "ANALOG2", "ANALOG3", "ANALOG4" };
 	switch (offset)
 	{
 		case 0x10/2:
 		case 0x12/2:
 		case 0x14/2:
 		case 0x16/2:
-			m_analog_value[offset & 3] = read_safe(ioport(names[offset & 3]), 0);
+			m_analog_value[offset & 3] = m_analog_ports[offset & 3].read_safe(0);
 			return;
 	}
 	logerror("%06X:unknown analog_custom_io_w(%X) = %04X & %04X\n", space.device().safe_pc(), offset*2, data, mem_mask);
@@ -1106,14 +1105,13 @@ WRITE16_MEMBER(segas32_state::analog_custom_io_w)
 
 READ16_MEMBER(segas32_state::extra_custom_io_r)
 {
-	static const char *const names[] = { "EXTRA1", "EXTRA2", "EXTRA3", "EXTRA4" };
 	switch (offset)
 	{
 		case 0x20/2:
 		case 0x22/2:
 		case 0x24/2:
 		case 0x26/2:
-			return read_safe(ioport(names[offset & 3]), 0xffff);
+			return m_extra_ports[offset & 3].read_safe(0xffff);
 	}
 
 	logerror("%06X:unknown extra_custom_io_r(%X) & %04X\n", space.device().safe_pc(), offset*2, mem_mask);
@@ -1123,14 +1121,13 @@ READ16_MEMBER(segas32_state::extra_custom_io_r)
 
 WRITE16_MEMBER(segas32_state::orunners_custom_io_w)
 {
-	static const char *const names[] = { "ANALOG1", "ANALOG2", "ANALOG3", "ANALOG4", "ANALOG5", "ANALOG6", "ANALOG7", "ANALOG8" };
 	switch (offset)
 	{
 		case 0x10/2:
 		case 0x12/2:
 		case 0x14/2:
 		case 0x16/2:
-			m_analog_value[offset & 3] = read_safe(ioport(names[m_analog_bank * 4 + (offset & 3)]), 0);
+			m_analog_value[offset & 3] = m_analog_ports[m_analog_bank * 4 + (offset & 3)].read_safe(0);
 			return;
 
 		case 0x20/2:
@@ -1143,8 +1140,6 @@ WRITE16_MEMBER(segas32_state::orunners_custom_io_w)
 
 READ16_MEMBER(segas32_state::sonic_custom_io_r)
 {
-	static const char *const names[] = { "TRACKX1", "TRACKY1", "TRACKX2", "TRACKY2", "TRACKX3", "TRACKY3" };
-
 	switch (offset)
 	{
 		case 0x00/2:
@@ -1153,7 +1148,7 @@ READ16_MEMBER(segas32_state::sonic_custom_io_r)
 		case 0x0c/2:
 		case 0x10/2:
 		case 0x14/2:
-			return (UINT8)(ioport(names[offset/2])->read() - m_sonic_last[offset/2]);
+			return (UINT8)(m_track_ports[offset/2]->read() - m_sonic_last[offset/2]);
 	}
 
 	logerror("%06X:unknown sonic_custom_io_r(%X) & %04X\n", space.device().safe_pc(), offset*2, mem_mask);
@@ -1163,15 +1158,13 @@ READ16_MEMBER(segas32_state::sonic_custom_io_r)
 
 WRITE16_MEMBER(segas32_state::sonic_custom_io_w)
 {
-	static const char *const names[] = { "TRACKX1", "TRACKY1", "TRACKX2", "TRACKY2", "TRACKX3", "TRACKY3" };
-
 	switch (offset)
 	{
 		case 0x00/2:
 		case 0x08/2:
 		case 0x10/2:
-			m_sonic_last[offset/2 + 0] = ioport(names[offset/2 + 0])->read();
-			m_sonic_last[offset/2 + 1] = ioport(names[offset/2 + 1])->read();
+			m_sonic_last[offset/2 + 0] = m_track_ports[offset/2 + 0]->read();
+			m_sonic_last[offset/2 + 1] = m_track_ports[offset/2 + 1]->read();
 			return;
 	}
 

@@ -113,7 +113,7 @@ void c64_expansion_slot_device::device_reset()
 //  call_load -
 //-------------------------------------------------
 
-bool c64_expansion_slot_device::call_load()
+image_init_result c64_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
@@ -123,7 +123,7 @@ bool c64_expansion_slot_device::call_load()
 		{
 			size = length();
 
-			if (!core_stricmp(filetype(), "80"))
+			if (is_filetype("80"))
 			{
 				fread(m_card->m_roml, size);
 				m_card->m_exrom = (0);
@@ -133,20 +133,20 @@ bool c64_expansion_slot_device::call_load()
 					m_card->m_game = 0;
 				}
 			}
-			else if (!core_stricmp(filetype(), "a0"))
+			else if (is_filetype("a0"))
 			{
 				fread(m_card->m_romh, 0x2000);
 
 				m_card->m_exrom = 0;
 				m_card->m_game = 0;
 			}
-			else if (!core_stricmp(filetype(), "e0"))
+			else if (is_filetype("e0"))
 			{
 				fread(m_card->m_romh, 0x2000);
 
 				m_card->m_game = 0;
 			}
-			else if (!core_stricmp(filetype(), "crt"))
+			else if (is_filetype("crt"))
 			{
 				size_t roml_size = 0;
 				size_t romh_size = 0;
@@ -197,7 +197,7 @@ bool c64_expansion_slot_device::call_load()
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -209,7 +209,7 @@ std::string c64_expansion_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
-		if (!core_stricmp(filetype(), "crt"))
+		if (is_filetype("crt"))
 			return cbm_crt_get_card(*m_file);
 
 		clear();

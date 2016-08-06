@@ -4,7 +4,6 @@
 
 #include "machine/qx10kbd.h"
 
-#include "bus/rs232/rs232.ipp"
 #include "machine/keyboard.ipp"
 
 

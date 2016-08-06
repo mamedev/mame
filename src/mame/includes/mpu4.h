@@ -105,12 +105,7 @@ public:
 			m_pia6(*this, "pia_ic6"),
 			m_pia7(*this, "pia_ic7"),
 			m_pia8(*this, "pia_ic8"),
-			m_orange1_port(*this, "ORANGE1"),
-			m_orange2_port(*this, "ORANGE2"),
-			m_black1_port(*this, "BLACK1"),
-			m_black2_port(*this, "BLACK2"),
-			m_dil1_port(*this, "DIL1"),
-			m_dil2_port(*this, "DIL2"),
+			m_port_mux(*this, {"ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "ORANGE1", "ORANGE2", "DIL1", "DIL2"}),
 			m_aux1_port(*this, "AUX1"),
 			m_aux2_port(*this, "AUX2"),
 			m_bank1(*this, "bank1"),
@@ -250,12 +245,7 @@ protected:
 	optional_device<pia6821_device> m_pia6;
 	optional_device<pia6821_device> m_pia7;
 	optional_device<pia6821_device> m_pia8;
-	required_ioport m_orange1_port;
-	required_ioport m_orange2_port;
-	required_ioport m_black1_port;
-	required_ioport m_black2_port;
-	required_ioport m_dil1_port;
-	required_ioport m_dil2_port;
+	required_ioport_array<8> m_port_mux;
 	required_ioport m_aux1_port;
 	required_ioport m_aux2_port;
 	optional_memory_bank m_bank1;

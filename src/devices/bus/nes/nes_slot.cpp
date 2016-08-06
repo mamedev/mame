@@ -829,7 +829,7 @@ void nes_cart_slot_device::pcb_reset()
 #include "nes_ines.hxx"
 
 
-bool nes_cart_slot_device::call_load()
+image_init_result nes_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -846,7 +846,7 @@ bool nes_cart_slot_device::call_load()
 				if (length() <= 0x10)
 				{
 					logerror("%s only contains the iNES header and no data.\n", filename());
-					return IMAGE_INIT_FAIL;
+					return image_init_result::FAIL;
 				}
 
 				call_load_ines();
@@ -856,7 +856,7 @@ bool nes_cart_slot_device::call_load()
 				if (length() <= 0x20)
 				{
 					logerror("%s only contains the UNIF header and no data.\n", filename());
-					return IMAGE_INIT_FAIL;
+					return image_init_result::FAIL;
 				}
 
 				call_load_unif();
@@ -864,14 +864,14 @@ bool nes_cart_slot_device::call_load()
 			else
 			{
 				logerror("%s is NOT a file in either iNES or UNIF format.\n", filename());
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 		}
 		else
 			call_load_pcb();
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

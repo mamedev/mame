@@ -933,11 +933,11 @@ static floperr_t apple35_diskcopy_headerdecode(floppy_image_legacy *floppy, UINT
 
 	floppy_image_read(floppy, &header, 0, sizeof(header));
 
-	header.data_size = BIG_ENDIANIZE_INT32(header.data_size);
-	header.tag_size = BIG_ENDIANIZE_INT32(header.tag_size);
-	header.data_checksum = BIG_ENDIANIZE_INT32(header.data_checksum);
-	header.tag_checksum = BIG_ENDIANIZE_INT32(header.tag_checksum);
-	header.magic = BIG_ENDIANIZE_INT16(header.magic);
+	header.data_size = big_endianize_int32(header.data_size);
+	header.tag_size = big_endianize_int32(header.tag_size);
+	header.data_checksum = big_endianize_int32(header.data_checksum);
+	header.tag_checksum = big_endianize_int32(header.tag_checksum);
+	header.magic = big_endianize_int16(header.magic);
 
 	if (header.disk_name[0] >= sizeof(header.disk_name))
 		return FLOPPY_ERROR_INVALIDIMAGE;
@@ -1001,10 +1001,10 @@ static FLOPPY_CONSTRUCT(apple35_diskcopy_construct)
 		tag_size = 80*sides*10*12;
 
 		memset(&header, 0, sizeof(header));
-		header.data_size = BIG_ENDIANIZE_INT32(data_size);
-		header.tag_size = BIG_ENDIANIZE_INT32(tag_size);
+		header.data_size = big_endianize_int32(data_size);
+		header.tag_size = big_endianize_int32(tag_size);
 		header.disk_format = (sides > 1) ? 1 : 0;
-		header.magic = BIG_ENDIANIZE_INT16(0x100);
+		header.magic = big_endianize_int16(0x100);
 
 		floppy_image_write(floppy, &header, 0, sizeof(header));
 		floppy_image_write_filler(floppy, 0, sizeof(header), data_size + tag_size);
@@ -1077,17 +1077,17 @@ static floperr_t apple35_2img_decode(floppy_image_legacy *floppy, UINT32 *image_
 		return FLOPPY_ERROR_INVALIDIMAGE;
 	}
 
-	header.header_length    = LITTLE_ENDIANIZE_INT16(header.header_length);
-	header.version          = LITTLE_ENDIANIZE_INT16(header.version);
-	header.image_format     = LITTLE_ENDIANIZE_INT32(header.image_format);
-	header.flags            = LITTLE_ENDIANIZE_INT32(header.flags);
-	header.block_count      = LITTLE_ENDIANIZE_INT32(header.block_count);
-	header.data_offset      = LITTLE_ENDIANIZE_INT32(header.data_offset);
-	header.data_length      = LITTLE_ENDIANIZE_INT32(header.data_length);
-	header.comment_offset   = LITTLE_ENDIANIZE_INT32(header.comment_offset);
-	header.comment_length   = LITTLE_ENDIANIZE_INT32(header.comment_length);
-	header.creator_offset   = LITTLE_ENDIANIZE_INT32(header.creator_offset);
-	header.creator_length   = LITTLE_ENDIANIZE_INT32(header.creator_length);
+	header.header_length    = little_endianize_int16(header.header_length);
+	header.version          = little_endianize_int16(header.version);
+	header.image_format     = little_endianize_int32(header.image_format);
+	header.flags            = little_endianize_int32(header.flags);
+	header.block_count      = little_endianize_int32(header.block_count);
+	header.data_offset      = little_endianize_int32(header.data_offset);
+	header.data_length      = little_endianize_int32(header.data_length);
+	header.comment_offset   = little_endianize_int32(header.comment_offset);
+	header.comment_length   = little_endianize_int32(header.comment_length);
+	header.creator_offset   = little_endianize_int32(header.creator_offset);
+	header.creator_length   = little_endianize_int32(header.creator_length);
 
 	// at least some images "in the wild" (e.g. TOSEC Minor Set 1) have big-endian data sizes
 	// even though that's against the .2mg spec
@@ -1145,10 +1145,10 @@ static FLOPPY_CONSTRUCT(apple35_2img_construct)
 		data_size = 80*sides*10*512;
 
 		memset(&header, 0, sizeof(header));
-		header.header_length    = LITTLE_ENDIANIZE_INT16(sizeof(header));
-		header.block_count      = LITTLE_ENDIANIZE_INT32(80*sides*10);
-		header.data_offset      = LITTLE_ENDIANIZE_INT32(data_offset);
-		header.data_length      = LITTLE_ENDIANIZE_INT32(data_size);
+		header.header_length    = little_endianize_int16(sizeof(header));
+		header.block_count      = little_endianize_int32(80*sides*10);
+		header.data_offset      = little_endianize_int32(data_offset);
+		header.data_length      = little_endianize_int32(data_size);
 
 		floppy_image_write(floppy, &header, 0, sizeof(header));
 		floppy_image_write_filler(floppy, 0, sizeof(header), data_size);

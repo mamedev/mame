@@ -80,7 +80,7 @@ void printer_image_device::output(UINT8 data)
     DEVICE_IMAGE_CREATE( printer )
 -------------------------------------------------*/
 
-bool printer_image_device::call_create(int format_type, util::option_resolution *format_options)
+image_init_result printer_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	return call_load();
 }
@@ -88,14 +88,14 @@ bool printer_image_device::call_create(int format_type, util::option_resolution 
 /*-------------------------------------------------
     DEVICE_IMAGE_LOAD( printer )
 -------------------------------------------------*/
-bool printer_image_device::call_load()
+image_init_result printer_image_device::call_load()
 {
 	/* send notify that the printer is now online */
 	if (!m_online_cb.isnull())
 		m_online_cb(TRUE);
 
 	/* we don't need to do anything special */
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

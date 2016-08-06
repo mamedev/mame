@@ -86,7 +86,7 @@ public:
 
 	void dl1416_update(dl1416_device *device, int index);
 
-	int load_cart(device_image_interface &image, generic_slot_device *slot, const char *slot_tag);
+	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, const char *slot_tag);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z24_load) { return load_cart(image, m_z24, "z24"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z25_load) { return load_cart(image, m_z25, "z25"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z26_load) { return load_cart(image, m_z26, "z26"); }

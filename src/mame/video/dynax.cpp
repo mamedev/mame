@@ -1288,7 +1288,7 @@ int dynax_state::debug_viewer(bitmap_ind16 &bitmap, const rectangle &cliprect )
 		}
 		if (machine().input().code_pressed(KEYCODE_N) | machine().input().code_pressed_once(KEYCODE_J))
 		{
-			if (i >= 2) i -= 2; 
+			if (i >= 2) i -= 2;
 			while (i > 0 && RAM[i]) i--;
 			i++;
 		}

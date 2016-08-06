@@ -268,12 +268,12 @@ void info_xml_creator::output_one()
 					{
 						if (field.type() == IPT_KEYBOARD)
 						{
-							if (!new_kbd) new_kbd = TRUE;
+							if (!new_kbd) new_kbd = true;
 							field.set_player(field.player() + kbd_offset);
 						}
 						else
 						{
-							nplayers = MAX(nplayers, field.player() + 1);
+							nplayers = std::max(nplayers, field.player() + 1);
 							field.set_player(field.player() + player_offset);
 						}
 					}
@@ -355,11 +355,11 @@ void info_xml_creator::output_one()
 
 void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 {
-	bool has_speaker = FALSE, has_input = FALSE;
+	bool has_speaker = false, has_input = false;
 	// check if the device adds speakers to the system
 	sound_interface_iterator snditer(device);
 	if (snditer.first() != nullptr)
-		has_speaker = TRUE;
+		has_speaker = true;
 	// generate input list
 	ioport_list portlist;
 	std::string errors;
@@ -370,7 +370,7 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 		for (ioport_field &field : port.second->fields())
 			if (field.type() >= IPT_START1 && field.type() < IPT_UI_FIRST)
 			{
-				has_input = TRUE;
+				has_input = true;
 				break;
 			}
 
@@ -894,7 +894,7 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 	for (auto &port : portlist)
 	{
 		int ctrl_type = CTRL_DIGITAL_BUTTONS;
-		bool ctrl_analog = FALSE;
+		bool ctrl_analog = false;
 		for (ioport_field &field : port.second->fields())
 		{
 			// track the highest player number
@@ -996,75 +996,75 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 				case IPT_AD_STICK_X:
 				case IPT_AD_STICK_Y:
 				case IPT_AD_STICK_Z:
-					ctrl_analog = TRUE;
+					ctrl_analog = true;
 					ctrl_type = CTRL_ANALOG_JOYSTICK;
 					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "stick";
 					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-					control_info[field.player() * CTRL_COUNT + ctrl_type].analog = TRUE;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
 					break;
 
 				case IPT_PADDLE:
 				case IPT_PADDLE_V:
-					ctrl_analog = TRUE;
+					ctrl_analog = true;
 					ctrl_type = CTRL_ANALOG_PADDLE;
 					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "paddle";
 					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-					control_info[field.player() * CTRL_COUNT + ctrl_type].analog = TRUE;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
 					break;
 
 				case IPT_PEDAL:
 				case IPT_PEDAL2:
 				case IPT_PEDAL3:
-					ctrl_analog = TRUE;
+					ctrl_analog = true;
 					ctrl_type = CTRL_ANALOG_PEDAL;
 					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "pedal";
 					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-					control_info[field.player() * CTRL_COUNT + ctrl_type].analog = TRUE;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
 					break;
 
 				case IPT_LIGHTGUN_X:
 				case IPT_LIGHTGUN_Y:
-					ctrl_analog = TRUE;
+					ctrl_analog = true;
 					ctrl_type = CTRL_ANALOG_LIGHTGUN;
 					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "lightgun";
 					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-					control_info[field.player() * CTRL_COUNT + ctrl_type].analog = TRUE;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
 					break;
 
 				case IPT_POSITIONAL:
 				case IPT_POSITIONAL_V:
-					ctrl_analog = TRUE;
+					ctrl_analog = true;
 					ctrl_type = CTRL_ANALOG_POSITIONAL;
 					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "positional";
 					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-					control_info[field.player() * CTRL_COUNT + ctrl_type].analog = TRUE;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
 					break;
 
 				case IPT_DIAL:
 				case IPT_DIAL_V:
-					ctrl_analog = TRUE;
+					ctrl_analog = true;
 					ctrl_type = CTRL_ANALOG_DIAL;
 					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "dial";
 					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-					control_info[field.player() * CTRL_COUNT + ctrl_type].analog = TRUE;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
 					break;
 
 				case IPT_TRACKBALL_X:
 				case IPT_TRACKBALL_Y:
-					ctrl_analog = TRUE;
+					ctrl_analog = true;
 					ctrl_type = CTRL_ANALOG_TRACKBALL;
 					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "trackball";
 					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-					control_info[field.player() * CTRL_COUNT + ctrl_type].analog = TRUE;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
 					break;
 
 				case IPT_MOUSE_X:
 				case IPT_MOUSE_Y:
-					ctrl_analog = TRUE;
+					ctrl_analog = true;
 					ctrl_type = CTRL_ANALOG_MOUSE;
 					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "mouse";
 					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-					control_info[field.player() * CTRL_COUNT + ctrl_type].analog = TRUE;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
 					break;
 
 				// map buttons
@@ -1084,14 +1084,14 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 				case IPT_BUTTON14:
 				case IPT_BUTTON15:
 				case IPT_BUTTON16:
-					ctrl_analog = FALSE;
+					ctrl_analog = false;
 					if (control_info[field.player() * CTRL_COUNT + ctrl_type].type == nullptr)
 					{
 						control_info[field.player() * CTRL_COUNT + ctrl_type].type = "only_buttons";
 						control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-						control_info[field.player() * CTRL_COUNT + ctrl_type].analog = FALSE;
+						control_info[field.player() * CTRL_COUNT + ctrl_type].analog = false;
 					}
-					control_info[field.player() * CTRL_COUNT + ctrl_type].maxbuttons = MAX(control_info[field.player() * CTRL_COUNT + ctrl_type].maxbuttons, field.type() - IPT_BUTTON1 + 1);
+					control_info[field.player() * CTRL_COUNT + ctrl_type].maxbuttons = std::max(control_info[field.player() * CTRL_COUNT + ctrl_type].maxbuttons, field.type() - IPT_BUTTON1 + 1);
 					control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
 					if (!field.optional())
 						control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
@@ -1110,7 +1110,7 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 				case IPT_COIN10:
 				case IPT_COIN11:
 				case IPT_COIN12:
-					ncoin = MAX(ncoin, field.type() - IPT_COIN1 + 1);
+					ncoin = std::max(ncoin, field.type() - IPT_COIN1 + 1);
 					break;
 
 				// track presence of keypads and keyboards
@@ -1184,7 +1184,7 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 				if (field.delta() != 0)
 					control_info[field.player() * CTRL_COUNT + ctrl_type].keydelta = field.delta();
 				if (field.analog_reverse() != 0)
-					control_info[field.player() * CTRL_COUNT + ctrl_type].reverse = TRUE;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].reverse = true;
 			}
 		}
 	}
@@ -1196,16 +1196,16 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 	// for lightguns) and therefore we really need this separate loop.
 	for (int i = 0; i < CTRL_PCOUNT; i++)
 	{
-		bool fix_done = FALSE;
+		bool fix_done = false;
 		for (int j = 1; j < CTRL_COUNT; j++)
 			if (control_info[i * CTRL_COUNT].type != nullptr && control_info[i * CTRL_COUNT + j].type != nullptr && !fix_done)
 			{
 				control_info[i * CTRL_COUNT + j].nbuttons += control_info[i * CTRL_COUNT].nbuttons;
 				control_info[i * CTRL_COUNT + j].reqbuttons += control_info[i * CTRL_COUNT].reqbuttons;
-				control_info[i * CTRL_COUNT + j].maxbuttons = MAX(control_info[i * CTRL_COUNT + j].maxbuttons, control_info[i * CTRL_COUNT].maxbuttons);
+				control_info[i * CTRL_COUNT + j].maxbuttons = std::max(control_info[i * CTRL_COUNT + j].maxbuttons, control_info[i * CTRL_COUNT].maxbuttons);
 
 				memset(&control_info[i * CTRL_COUNT], 0, sizeof(control_info[0]));
-				fix_done = TRUE;
+				fix_done = true;
 			}
 	}
 

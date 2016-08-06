@@ -1033,7 +1033,7 @@ void menu_select_software::find_matches(const char *str, int count)
 		// pick the best match between driver name and description
 		int curpenalty = fuzzy_substring(str, m_displaylist[index]->longname);
 		int tmp = fuzzy_substring(str, m_displaylist[index]->shortname);
-		curpenalty = MIN(curpenalty, tmp);
+		curpenalty = std::min(curpenalty, tmp);
 
 		// insert into the sorted table of matches
 		for (int matchnum = count - 1; matchnum >= 0; --matchnum)
@@ -1315,7 +1315,7 @@ void menu_select_software::infos_render(float origx1, float origy1, float origx2
 			ui().draw_text_full(container(), elem.c_str(), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER, ui::text_layout::NEVER,
 					mame_ui_manager::NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, nullptr);
 			txt_lenght += 0.01f;
-			title_size = MAX(txt_lenght, title_size);
+			title_size = std::max(txt_lenght, title_size);
 		}
 
 		rgb_t fgcolor = UI_TEXT_COLOR;
@@ -1476,7 +1476,7 @@ void software_parts::custom_render(void *selectedref, float top, float bottom, f
 	ui().draw_text_full(container(), _("Software part selection:"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 									mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
-	float maxwidth = MAX(origx2 - origx1, width);
+	float maxwidth = std::max(origx2 - origx1, width);
 
 	// compute our bounds
 	float x1 = 0.5f - 0.5f * maxwidth;
@@ -1617,7 +1617,7 @@ void bios_selection::custom_render(void *selectedref, float top, float bottom, f
 	ui().draw_text_full(container(), _("Bios selection:"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 									mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
-	float maxwidth = MAX(origx2 - origx1, width);
+	float maxwidth = std::max(origx2 - origx1, width);
 
 	// compute our bounds
 	float x1 = 0.5f - 0.5f * maxwidth;

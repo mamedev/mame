@@ -863,7 +863,7 @@ void alto2_cpu_device::update_sysclk(int sysclk)
 	 * Q'   OCMD'
 	 */
 	s0 = m_eth.ff_35a;
-	s1 = (m_d_f1 == f1_emu_startf && sysclk) ? JKFF_CLK : JKFF_0;
+	s1 = (f1() == f1_emu_startf && sysclk) ? JKFF_CLK : JKFF_0;
 	if (X_BIT(m_bus,16,15))
 		s1 |= JKFF_J;
 	s1 |= JKFF_K;
@@ -885,7 +885,7 @@ void alto2_cpu_device::update_sysclk(int sysclk)
 	 * Q'   ICMD'
 	 */
 	s0 = m_eth.ff_35b;
-	s1 = (m_d_f1 == f1_emu_startf && sysclk) ? JKFF_CLK : JKFF_0;
+	s1 = (f1() == f1_emu_startf && sysclk) ? JKFF_CLK : JKFF_0;
 	if (X_BIT(m_bus,16,14))
 		s1 |= JKFF_J;
 	s1 |= JKFF_K;
@@ -905,7 +905,7 @@ void alto2_cpu_device::update_sysclk(int sysclk)
 	 */
 	s0 = m_eth.ff_10a;
 	s1 = sysclk ? JKFF_CLK : JKFF_0;
-	if (m_d_f2 != f2_ether_eisfct)
+	if (f2() != f2_ether_eisfct)
 		s1 |= JKFF_K;
 	s1 |= JKFF_C;
 	m_eth.ff_10a = update_jkff(s0, s1, "10a IBUSY    ");
@@ -931,15 +931,15 @@ void alto2_cpu_device::update_sysclk(int sysclk)
 	UINT8 RR;
 	UINT8 WLL0;
 	if (m_eth.ff_10a & JKFF_Q) {
-		WLLOAD = ~(sysclk & (m_d_f2 == f2_ether_eodfct)) & 1;
+		WLLOAD = ~(sysclk & (f2() == f2_ether_eodfct)) & 1;
 		RDCNT0 = m_eth.ff_52b & JKFF_Q ? 1 : 0;
 		RR     = m_eth.ff_52b & JKFF_Q0 ? 1 : 0;
-		WLL0   = ~(sysclk & (m_d_f2 == f2_ether_eodfct)) & 1;
+		WLL0   = ~(sysclk & (f2() == f2_ether_eodfct)) & 1;
 	} else {
 		// ISRFULL
 		WLLOAD = (m_eth.serin >> 1) & 1;
-		RDCNT0 = ~(sysclk & (m_d_bs == bs_ether_eidfct)) & 1;
-		RR     = m_d_bs == bs_ether_eidfct || m_d_f1 == f1_ether_eilfct;
+		RDCNT0 = ~(sysclk & (bs() == bs_ether_eidfct)) & 1;
+		RR     = bs() == bs_ether_eidfct || f1() == f1_ether_eilfct;
 		WLL0   = m_eth.ff_77b & JKFF_Q0 ? 1 : 0;
 	}
 	// TODO: use the signals
@@ -960,7 +960,7 @@ void alto2_cpu_device::update_sysclk(int sysclk)
 	 */
 	s0 = m_eth.ff_10b;
 	s1 = sysclk ? JKFF_CLK : JKFF_0;
-	if (m_d_f2 != f2_ether_eosfct)
+	if (f2() != f2_ether_eosfct)
 		s1 |= JKFF_K;
 	m_eth.ff_10b = update_jkff(s0, s1, "10b OBUSY    ");
 

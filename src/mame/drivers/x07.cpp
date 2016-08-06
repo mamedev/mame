@@ -1059,7 +1059,7 @@ DEVICE_IMAGE_LOAD_MEMBER( x07_state, x07_card )
 		if (strcmp(card_type, "xp140"))
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported card type");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 	}
 
@@ -1068,7 +1068,7 @@ DEVICE_IMAGE_LOAD_MEMBER( x07_state, x07_card )
 
 	m_card->ram_alloc(0x1000);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 PALETTE_INIT_MEMBER(x07_state, x07)

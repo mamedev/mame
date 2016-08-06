@@ -2940,7 +2940,7 @@ void debugger_commands::execute_mount(int ref, int params, const char **param)
 	{
 		if (strcmp(img.brief_instance_name(),param[0]) == 0)
 		{
-			if (img.load(param[1])==IMAGE_INIT_FAIL)
+			if (img.load(param[1]) != image_init_result::PASS)
 				m_console.printf("Unable to mount file %s on %s\n",param[1],param[0]);
 			else
 				m_console.printf("File %s mounted on %s\n",param[1],param[0]);

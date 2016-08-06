@@ -2,7 +2,6 @@
 // copyright-holders:Barry Rodewald,Vas Crabb
 #include "machine/x68k_kbd.h"
 
-#include "bus/rs232/rs232.ipp"
 #include "machine/keyboard.ipp"
 
 

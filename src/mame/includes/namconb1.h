@@ -34,6 +34,15 @@ public:
 		m_mcu(*this, "mcu"),
 		m_c116(*this, "c116"),
 		m_eeprom(*this, "eeprom"),
+		m_p1(*this, "P1"),
+		m_p2(*this, "P2"),
+		m_p3(*this, "P3"),
+		m_p4(*this, "P4"),
+		m_misc(*this, "MISC"),
+		m_light0_x(*this, "LIGHT0_X"),
+		m_light0_y(*this, "LIGHT0_Y"),
+		m_light1_x(*this, "LIGHT1_X"),
+		m_light1_y(*this, "LIGHT1_Y"),
 		m_spritebank32(*this, "spritebank32"),
 		m_tilebank32(*this, "tilebank32"),
 		m_namconb_shareram(*this, "namconb_share") { }
@@ -42,6 +51,15 @@ public:
 	required_device<cpu_device> m_mcu;
 	required_device<namco_c116_device> m_c116;
 	required_device<eeprom_parallel_28xx_device> m_eeprom;
+	required_ioport m_p1;
+	required_ioport m_p2;
+	optional_ioport m_p3;
+	optional_ioport m_p4;
+	required_ioport m_misc;
+	optional_ioport m_light0_x;
+	optional_ioport m_light0_y;
+	optional_ioport m_light1_x;
+	optional_ioport m_light1_y;
 	required_shared_ptr<UINT32> m_spritebank32;
 	optional_shared_ptr<UINT32> m_tilebank32;
 	required_shared_ptr<UINT16> m_namconb_shareram;

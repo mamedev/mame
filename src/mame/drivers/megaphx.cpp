@@ -314,7 +314,7 @@ WRITE8_MEMBER(megaphx_state::port_c_w)
 
 				if (m_pic_data == 0xfe) // get software version??
 				{
-					m_pic_result = (ioport("PIC1")->read()) | (0XFF << 8);
+					m_pic_result = (ioport("PIC1")->read()) | (0xFF << 8);
 				}
 				else if (m_pic_data == 0x82) // dsw1
 				{

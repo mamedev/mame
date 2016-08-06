@@ -2,7 +2,7 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-    microbee.c
+    microbee.cpp
 
     machine driver
     Originally written by Juergen Buchmueller, Jan 2000
@@ -627,7 +627,7 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 	UINT16 i, j;
 	UINT8 data, sw = m_io_config->read() & 1;   /* reading the config switch: 1 = autorun */
 
-	if (!core_stricmp(image.filetype(), "mwb"))
+	if (image.is_filetype("mwb"))
 	{
 		/* mwb files - standard basic files */
 		for (i = 0; i < quickload_size; i++)
@@ -637,7 +637,7 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 			if (image.fread(&data, 1) != 1)
 			{
 				image.message("Unexpected EOF");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 
 			if ((j < m_size) || (j > 0xefff))
@@ -645,7 +645,7 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 			else
 			{
 				image.message("Not enough memory in this microbee");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 		}
 
@@ -657,7 +657,7 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 		else
 			space.write_word(0xa2,0x8517);
 	}
-	else if (!core_stricmp(image.filetype(), "com"))
+	else if (image.is_filetype("com"))
 	{
 		/* com files - most com files are just machine-language games with a wrapper and don't need cp/m to be present */
 		for (i = 0; i < quickload_size; i++)
@@ -667,7 +667,7 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 			if (image.fread(&data, 1) != 1)
 			{
 				image.message("Unexpected EOF");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 
 			if ((j < m_size) || (j > 0xefff))
@@ -675,13 +675,13 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 			else
 			{
 				image.message("Not enough memory in this microbee");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 		}
 
 		if (sw) m_maincpu->set_pc(0x100);
 	}
-	else if (!core_stricmp(image.filetype(), "bee"))
+	else if (image.is_filetype("bee"))
 	{
 		/* bee files - machine-language games that start at 0900 */
 		for (i = 0; i < quickload_size; i++)
@@ -691,7 +691,7 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 			if (image.fread(&data, 1) != 1)
 			{
 				image.message("Unexpected EOF");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 
 			if ((j < m_size) || (j > 0xefff))
@@ -699,14 +699,14 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 			else
 			{
 				image.message("Not enough memory in this microbee");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 		}
 
 		if (sw) m_maincpu->set_pc(0x900);
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -721,8 +721,8 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee_z80bin )
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* load the binary into memory */
-	if (z80bin_load_file(&image, space, file_type, &execute_address, &start_addr, &end_addr) == IMAGE_INIT_FAIL)
-		return IMAGE_INIT_FAIL;
+	if (z80bin_load_file(&image, space, file_type, &execute_address, &start_addr, &end_addr) != image_init_result::PASS)
+		return image_init_result::FAIL;
 
 	/* is this file executable? */
 	if (execute_address != 0xffff)
@@ -743,5 +743,5 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee_z80bin )
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }

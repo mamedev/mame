@@ -110,13 +110,12 @@
 
 UINT8 sc4_state::read_input_matrix(int row)
 {
-	ioport_port* portnames[16] = { m_io1, m_io2, m_io3, m_io4, m_io5, m_io6, m_io7, m_io8, m_io9, m_io10, m_io11, m_io12 };
 	UINT8 value;
 
 	if (row<4)
-		value = (read_safe(portnames[row], 0x00) & 0x1f) + ((read_safe(portnames[row+8], 0x00) & 0x07) << 5);
+		value = (m_io_ports[row].read_safe(0x00) & 0x1f) + ((m_io_ports[row+8].read_safe(0x00) & 0x07) << 5);
 	else
-		value = (read_safe(portnames[row], 0x00) & 0x1f) + ((read_safe(portnames[row+4], 0x00) & 0x18) << 2);
+		value = (m_io_ports[row].read_safe(0x00) & 0x1f) + ((m_io_ports[row+4].read_safe(0x00) & 0x18) << 2);
 
 	return value;
 }

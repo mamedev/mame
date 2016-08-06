@@ -19,8 +19,9 @@ enum {
 	ALTO2_MEM_NONE,
 	ALTO2_MEM_ODD       = (1 << 0),
 	ALTO2_MEM_RAM       = (1 << 1),
-	ALTO2_MEM_REFRESH   = (1 << 2),
-	ALTO2_MEM_INVALID   = (1 << 3)
+	ALTO2_MEM_LATCHED   = (1 << 2),
+	ALTO2_MEM_REFRESH   = (1 << 3),
+	ALTO2_MEM_INVALID   = (1 << 4)
 };
 
 struct {
@@ -30,7 +31,7 @@ struct {
 	UINT32 mar;                         //!< memory address register
 	UINT32 rmdd;                        //!< read memory data double-word
 	UINT32 wmdd;                        //!< write memory data double-word
-	UINT16 md;                          //!< memory data register
+	UINT32 md;                          //!< memory data register
 	UINT64 cycle;                       //!< cycle when the memory address register was loaded
 
 	/**
@@ -43,8 +44,8 @@ struct {
 	int access;
 	bool error;                         //!< non-zero after a memory error was detected
 	UINT32 mear;                        //!< memory error address register
-	UINT16 mesr;                        //!< memory error status register
-	UINT16 mecr;                        //!< memory error control register
+	UINT32 mesr;                        //!< memory error status register
+	UINT32 mecr;                        //!< memory error control register
 }   m_mem;
 
 /**
@@ -108,8 +109,8 @@ DECLARE_WRITE16_MEMBER( mesr_w );       //!< memory error status register write 
 DECLARE_READ16_MEMBER ( mecr_r );       //!< memory error control register read
 DECLARE_WRITE16_MEMBER( mecr_w );       //!< memory error control register write
 
-//! Read or write a memory double-word and caluclate its Hamming code.
-UINT32 hamming_code(int write, UINT32 dw_addr, UINT32 dw_data);
+//! Read or write a memory double-word and caluclate or compare its Hamming code.
+UINT32 hamming_code(bool write, UINT32 dw_addr, UINT32 dw_data);
 
 //! Load the memory address register with some value.
 void load_mar(UINT8 rsel, UINT32 addr);

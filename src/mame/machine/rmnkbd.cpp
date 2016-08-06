@@ -2,7 +2,6 @@
 // copyright-holders:Carl,Vas Crabb
 #include "machine/rmnkbd.h"
 
-#include "bus/rs232/rs232.ipp"
 #include "machine/keyboard.ipp"
 
 

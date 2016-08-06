@@ -164,7 +164,7 @@ std::string rom_region_name(const device_t &device, const rom_entry *romp)
 
 std::string rom_parameter_name(const device_t &device, const rom_entry *romp)
 {
-	return device.subtag(romp->_name);
+	return device.subtag(romp->name().c_str());
 }
 
 
@@ -175,7 +175,7 @@ std::string rom_parameter_name(const device_t &device, const rom_entry *romp)
 
 std::string rom_parameter_value(const rom_entry *romp)
 {
-	return std::string(romp->_hashdata);
+	return romp->hashdata();
 }
 
 
@@ -199,7 +199,7 @@ UINT32 rom_file_size(const rom_entry *romp)
 			curlength += ROM_GETLENGTH(romp++);
 
 		/* track the maximum length */
-		maxlength = MAX(maxlength, curlength);
+		maxlength = std::max(maxlength, curlength);
 	}
 	while (ROMENTRY_ISRELOAD(romp));
 
@@ -576,13 +576,13 @@ int rom_load_manager::open_rom_file(const char *regiontag, const rom_entry *romp
 		// is actually a concatenation of: listname + setname + parentname
 		// separated by '%' (parentname being present only for clones)
 		std::string tag1(regiontag), tag2, tag3, tag4, tag5;
-		bool is_list = FALSE;
-		bool has_parent = FALSE;
+		bool is_list = false;
+		bool has_parent = false;
 
 		int separator1 = tag1.find_first_of('%');
 		if (separator1 != -1)
 		{
-			is_list = TRUE;
+			is_list = true;
 
 			// we are loading through softlists, split the listname from the regiontag
 			tag4.assign(tag1.substr(separator1 + 1, tag1.length() - separator1 + 1));
@@ -593,7 +593,7 @@ int rom_load_manager::open_rom_file(const char *regiontag, const rom_entry *romp
 			int separator2 = tag4.find_first_of('%');
 			if (separator2 != -1)
 			{
-				has_parent = TRUE;
+				has_parent = true;
 
 				// we are loading a clone through softlists, split the setname from the parentname
 				tag5.assign(tag4.substr(separator2 + 1, tag4.length() - separator2 + 1));
@@ -715,7 +715,7 @@ int rom_load_manager::read_rom_data(const rom_entry *parent_region, const rom_en
 		return rom_fread(base, numbytes, parent_region);
 
 	/* use a temporary buffer for complex loads */
-	tempbufsize = MIN(TEMPBUFFER_MAX_SIZE, numbytes);
+	tempbufsize = std::min(TEMPBUFFER_MAX_SIZE, numbytes);
 	dynamic_buffer tempbuf(tempbufsize);
 
 	/* chunky reads for complex loads */
@@ -804,22 +804,25 @@ void rom_load_manager::fill_rom_data(const rom_entry *romp)
 	int skip = ROM_GETSKIPCOUNT(romp);
 	UINT8 *base = m_region->base() + ROM_GETOFFSET(romp);
 
-	/* make sure we fill within the region space */
+	// make sure we fill within the region space
 	if (ROM_GETOFFSET(romp) + numbytes > m_region->bytes())
 		fatalerror("Error in RomModule definition: FILL out of memory region space\n");
 
-	/* make sure the length was valid */
+	// make sure the length was valid
 	if (numbytes == 0)
 		fatalerror("Error in RomModule definition: FILL has an invalid length\n");
 
-	/* fill the data (filling value is stored in place of the hashdata) */
+	// for fill bytes, the byte that gets filled is the first byte of the hashdata string
+	UINT8 fill_byte = (UINT8)strtol(ROM_GETHASHDATA(romp), nullptr, 0);
+
+	// fill the data (filling value is stored in place of the hashdata)
 	if(skip != 0)
 	{
 		for (int i = 0; i < numbytes; i+= skip + 1)
-			base[i] = (FPTR)ROM_GETHASHDATA(romp) & 0xff;
+			base[i] = fill_byte;
 	}
 	else
-		memset(base, (FPTR)ROM_GETHASHDATA(romp) & 0xff, numbytes);
+		memset(base, fill_byte, numbytes);
 }
 
 
@@ -832,7 +835,7 @@ void rom_load_manager::copy_rom_data(const rom_entry *romp)
 	UINT8 *base = m_region->base() + ROM_GETOFFSET(romp);
 	const char *srcrgntag = ROM_GETNAME(romp);
 	UINT32 numbytes = ROM_GETLENGTH(romp);
-	UINT32 srcoffs = (FPTR)ROM_GETHASHDATA(romp);  /* srcoffset in place of hashdata */
+	UINT32 srcoffs = (UINT32) strtol(ROM_GETHASHDATA(romp), nullptr, 0);  /* srcoffset in place of hashdata */
 
 	/* make sure we copy within the region space */
 	if (ROM_GETOFFSET(romp) + numbytes > m_region->bytes())
@@ -912,9 +915,9 @@ void rom_load_manager::process_rom_entries(const char *regiontag, const rom_entr
 
 					/* handle flag inheritance */
 					if (!ROM_INHERITSFLAGS(&modified_romp))
-						lastflags = modified_romp._flags;
+						lastflags = modified_romp.flags();
 					else
-						modified_romp._flags = (modified_romp._flags & ~ROM_INHERITEDFLAGS) | lastflags;
+						modified_romp.set_flags((modified_romp.flags() & ~ROM_INHERITEDFLAGS) | lastflags);
 
 					explength += ROM_GETLENGTH(&modified_romp);
 
@@ -983,13 +986,13 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 		// is actually a concatenation of: listname + setname + parentname
 		// separated by '%' (parentname being present only for clones)
 		std::string tag1(locationtag), tag2, tag3, tag4, tag5;
-		bool is_list = FALSE;
-		bool has_parent = FALSE;
+		bool is_list = false;
+		bool has_parent = false;
 
 		int separator1 = tag1.find_first_of('%');
 		if (separator1 != -1)
 		{
-			is_list = TRUE;
+			is_list = true;
 
 			// we are loading through softlists, split the listname from the regiontag
 			tag4.assign(tag1.substr(separator1 + 1, tag1.length() - separator1 + 1));
@@ -1000,7 +1003,7 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 			int separator2 = tag4.find_first_of('%');
 			if (separator2 != -1)
 			{
-				has_parent = TRUE;
+				has_parent = true;
 
 				// we are loading a clone through softlists, split the setname from the parentname
 				tag5.assign(tag4.substr(separator2 + 1, tag4.length() - separator2 + 1));
@@ -1357,7 +1360,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 
 		/* now process the entries in the region */
 		if (ROMREGION_ISROMDATA(region))
-			process_rom_entries(locationtag.c_str(), region, region + 1, &device, TRUE);
+			process_rom_entries(locationtag.c_str(), region, region + 1, &device, true);
 		else if (ROMREGION_ISDISKDATA(region))
 			process_disk_entries(regiontag.c_str(), region, region + 1, locationtag.c_str());
 	}
@@ -1370,7 +1373,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 	}
 
 	/* display the results and exit */
-	display_rom_load_results(TRUE);
+	display_rom_load_results(true);
 }
 
 
@@ -1422,7 +1425,7 @@ void rom_load_manager::process_region_list()
 #endif
 
 				/* now process the entries in the region */
-				process_rom_entries(device.shortname(), region, region + 1, &device, FALSE);
+				process_rom_entries(device.shortname(), region, region + 1, &device, false);
 			}
 			else if (ROMREGION_ISDISKDATA(region))
 				process_disk_entries(regiontag.c_str(), region, region + 1, nullptr);
@@ -1483,5 +1486,5 @@ rom_load_manager::rom_load_manager(running_machine &machine)
 	process_region_list();
 
 	/* display the results and exit */
-	display_rom_load_results(FALSE);
+	display_rom_load_results(false);
 }

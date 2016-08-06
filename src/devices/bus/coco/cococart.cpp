@@ -321,7 +321,7 @@ void cococart_slot_device::set_cart_base_update(cococart_base_update_delegate up
 //  call_load
 //-------------------------------------------------
 
-bool cococart_slot_device::call_load()
+image_init_result cococart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -337,12 +337,12 @@ bool cococart_slot_device::call_load()
 		}
 		while(read_length < 0x8000)
 		{
-			offs_t len = MIN(read_length, 0x8000 - read_length);
+			offs_t len = std::min(read_length, 0x8000 - read_length);
 			memcpy(m_cart->get_cart_base() + read_length, m_cart->get_cart_base(), len);
 			read_length += len;
 		}
 	}
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

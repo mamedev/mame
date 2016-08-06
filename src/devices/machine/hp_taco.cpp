@@ -1678,31 +1678,35 @@ void hp_taco_device::start_cmd_exec(UINT16 new_cmd_reg)
 		}
 }
 
-bool hp_taco_device::call_load()
+image_init_result hp_taco_device::internal_load(bool is_create)
 {
-		LOG(("call_load %d\n" , has_been_created()));
-
 		device_reset();
 
-		if (has_been_created()) {
+		if (is_create) {
 				clear_tape();
 				save_tape();
 		} else if (!load_tape()) {
 				seterror(IMAGE_ERROR_INVALIDIMAGE , "Wrong format");
 				set_tape_present(false);
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 		}
 
 		m_image_dirty = false;
 
 		set_tape_present(true);
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
-bool hp_taco_device::call_create(int format_type, util::option_resolution *format_options)
+image_init_result hp_taco_device::call_load()
 {
-		LOG(("call_create %d\n" , has_been_created()));
-		return call_load();
+	LOG(("call_load\n"));
+	return internal_load(false);
+}
+
+image_init_result hp_taco_device::call_create(int format_type, util::option_resolution *format_options)
+{
+	LOG(("call_create\n"));
+	return internal_load(true);
 }
 
 void hp_taco_device::call_unload()

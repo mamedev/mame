@@ -200,10 +200,11 @@ bool osd_font_windows::get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT
 		memset(bits, 0, rowbytes * bmheight);
 
 		// now draw the character
-		WCHAR tempchar = chnum;
+		utf16_char tempchar[UTF16_CHAR_MAX];
+		UINT const count = INT(utf16_from_uchar(tempchar, ARRAY_LENGTH(tempchar), chnum));
 		SetTextColor(dummyDC, RGB(0xff, 0xff, 0xff));
 		SetBkColor(dummyDC, RGB(0x00, 0x00, 0x00));
-		ExtTextOutW(dummyDC, 50 + abc.abcA, 50, ETO_OPAQUE, nullptr, &tempchar, 1, nullptr);
+		ExtTextOutW(dummyDC, 50 + abc.abcA, 50, ETO_OPAQUE, nullptr, reinterpret_cast<LPCWSTR>(tempchar), count, nullptr);
 
 		// characters are expected to be full-height
 		rectangle actbounds;

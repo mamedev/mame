@@ -1489,7 +1489,7 @@ struct ti99_lvl2_imgref_dsk
 	UINT16 totphysrecs;             /* total number of aphysrecs (extracted from vib record in aphysrec 0) */
 	ti99_catalog catalogs[4];       /* catalog of root directory and up to 3 subdirectories */
 	UINT16 fdir_aphysrec[4];        /* fdir aphysrec address for root directory
-                                        and up to 3 subdirectories */
+	                                    and up to 3 subdirectories */
 };
 
 enum win_vib_t
@@ -1513,11 +1513,11 @@ struct ti99_lvl2_imgref
 	ti99_lvl1_imgref l1_img;/* image format, imgtool image handle, image geometry */
 	ti99_AUformat AUformat; /* AU format */
 	int data_offset;        /* In order to reduce seek times when searching the
-                                disk for a given file name, fdr (and ddr, and
-                                fdir) records are preferentially allocated in
-                                AUs n to data_offset, whereas data records are
-                                preferentially allocated in AUs starting at
-                                data_offset. */
+	                            disk for a given file name, fdr (and ddr, and
+	                            fdir) records are preferentially allocated in
+	                            AUs n to data_offset, whereas data records are
+	                            preferentially allocated in AUs starting at
+	                            data_offset. */
 							/* With the DSK disk structure, n is always 2 (if 1
 							    physrec per AU) or 1 (if 2 physrecs per AU or
 							    more), and data_offset is arbitrarily chosen as
@@ -2620,7 +2620,7 @@ static int win_alloc_file_physrecs(ti99_lvl2_fileref_win *win_file, int nb_alloc
 	}
 	if ((get_UINT16BE(win_file->curfdr.clusters[0][0]) == 0) && (get_UINT16BE(win_file->curfdr.prevsibFDR_AU) != 0))
 	{   /* this is annoying: we have found a sibling FDR filled with 0s: rewind
-        to last non-empty sibling if applicable */
+	    to last non-empty sibling if applicable */
 		errorcode = win_goto_prev_sibFDR(win_file);
 		if (errorcode)
 			return errorcode;
@@ -4282,7 +4282,7 @@ static imgtoolerr_t dsk_image_nextenum(imgtool_directory *enumeration, imgtool_d
 
 			/* recurse subdirectory */
 			iter->listing_subdirs = 0;  /* no need to list subdirs as only the
-                                        root dir has subdirs in DSK format */
+			                            root dir has subdirs in DSK format */
 			iter->level = 1;
 			iter->cur_catalog = &iter->image->dsk.catalogs[iter->index[0]+1];
 			iter->index[iter->level] = 0;

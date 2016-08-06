@@ -760,7 +760,7 @@ static imgtoolerr_t bml3_diskimage_writefile(imgtool_partition *partition, const
 		gptr = &granule_map[g];
 
 
-		i = MIN(read_sz, granule_bytes);
+		i = std::min(read_sz, UINT64(granule_bytes));
 		if (i > 0) {
 			err = transfer_to_granule(img, g, i, sourcef);
 			if (err)

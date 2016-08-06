@@ -81,7 +81,7 @@ CPU_DISASSEMBLE( cquestsnd )
 		"       ",
 	};
 
-	UINT64 inst = BIG_ENDIANIZE_INT64(*(UINT64 *)oprom);
+	UINT64 inst = big_endianize_int64(*(UINT64 *)oprom);
 	UINT32 inslow = inst & 0xffffffff;
 	UINT32 inshig = inst >> 32;
 
@@ -185,7 +185,7 @@ CPU_DISASSEMBLE( cquestrot )
 		"???   "
 	};
 
-	UINT64 inst = BIG_ENDIANIZE_INT64(*(UINT64 *)oprom);
+	UINT64 inst = big_endianize_int64(*(UINT64 *)oprom);
 	UINT32 inslow = inst & 0xffffffff;
 	UINT32 inshig = inst >> 32;
 
@@ -271,7 +271,7 @@ CPU_DISASSEMBLE( cquestlin )
 		"BRES  ",
 	};
 
-	UINT64 inst = BIG_ENDIANIZE_INT64(*(UINT64 *)oprom);
+	UINT64 inst = big_endianize_int64(*(UINT64 *)oprom);
 	UINT32 inslow = inst & 0xffffffff;
 	UINT32 inshig = inst >> 32;
 

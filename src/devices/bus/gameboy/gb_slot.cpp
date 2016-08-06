@@ -258,7 +258,7 @@ static const char *gb_get_slot(int type)
  -------------------------------------------------*/
 
 
-bool base_gb_cart_slot_device::call_load()
+image_init_result base_gb_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -281,7 +281,7 @@ bool base_gb_cart_slot_device::call_load()
 			if ((len == 0) || ((len % 0x4000) != 0))
 			{
 				seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid rom file size\n");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 		}
 
@@ -403,13 +403,13 @@ bool base_gb_cart_slot_device::call_load()
 			strncmp((const char*)(ROM + 0x134), "DONKEYKONGLAND 3", 16) == 0)
 			m_sgb_hack = 1;
 
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
-bool megaduck_cart_slot_device::call_load()
+image_init_result megaduck_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -425,10 +425,10 @@ bool megaduck_cart_slot_device::call_load()
 		// setup rom bank map based on real length, not header value
 		m_cart->rom_map_setup(len);
 
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

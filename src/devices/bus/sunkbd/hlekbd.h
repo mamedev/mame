@@ -21,7 +21,7 @@ extern device_type const SUN_TYPE5_JP_HLE_KEYBOARD;
 namespace bus { namespace sunkbd {
 class hle_device_base
 	: public device_t
-	, public device_serial_interface
+	, public device_buffered_serial_interface<16U>
 	, public device_sun_keyboard_port_interface
 	, protected device_matrix_keyboard_interface<8U>
 {
@@ -47,14 +47,16 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	// device_serial_interface overrides
+	// device_buffered_serial_interface overrides
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
-	virtual void rcv_complete() override;
 
 	// device_matrix_keyboard_interface overrides
 	virtual void key_make(UINT8 row, UINT8 column) override;
 	virtual void key_break(UINT8 row, UINT8 column) override;
+
+	// customised transmit_byte method
+	void transmit_byte(UINT8 byte);
 
 	required_ioport m_dips;
 
@@ -94,17 +96,13 @@ private:
 		COMMAND_LAYOUT = 0x0fU
 	};
 
-	virtual UINT8 ident_byte() = 0;
+	// device_buffered_serial_interface overrides
+	virtual void received_byte(UINT8 byte) override;
 
-	void scan_row();
-	void send_byte(UINT8 code);
+	virtual UINT8 ident_byte() = 0;
 
 	emu_timer                       *m_click_timer;
 	required_device<beep_device>    m_beeper;
-
-	UINT8   m_fifo[16];
-	UINT8   m_head, m_tail;
-	UINT8   m_empty;
 
 	UINT8   m_make_count;
 	UINT8   m_rx_state;

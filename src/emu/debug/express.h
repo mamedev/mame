@@ -296,7 +296,7 @@ private:
 		// setters
 		parse_token &set_offset(int offset) { m_offset = offset; return *this; }
 		parse_token &set_offset(const parse_token &src) { m_offset = src.m_offset; return *this; }
-		parse_token &set_offset(const parse_token &src1, const parse_token &src2) { m_offset = MIN(src1.m_offset, src2.m_offset); return *this; }
+		parse_token &set_offset(const parse_token &src1, const parse_token &src2) { m_offset = std::min(src1.m_offset, src2.m_offset); return *this; }
 		parse_token &configure_number(UINT64 value) { m_type = NUMBER; m_value = value; return *this; }
 		parse_token &configure_string(const char *string) { m_type = STRING; m_string = string; return *this; }
 		parse_token &configure_memory(UINT32 address, parse_token &memoryat) { m_type = MEMORY; m_value = address; m_flags = memoryat.m_flags; m_string = memoryat.m_string; return *this; }

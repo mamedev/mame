@@ -1288,7 +1288,6 @@ void fm7_state::key_press(UINT16 scancode)
 
 void fm7_state::fm7_keyboard_poll_scan()
 {
-	ioport_port* portnames[3] = { m_key1, m_key2, m_key3 };
 	int bit = 0;
 	int x,y;
 	UINT32 keys;
@@ -1297,7 +1296,7 @@ void fm7_state::fm7_keyboard_poll_scan()
 
 	for(x=0;x<3;x++)
 	{
-		keys = portnames[x]->read();
+		keys = m_kb_ports[x]->read();
 
 		for(y=0;y<32;y++)  // loop through each bit in the port
 		{
@@ -1333,14 +1332,13 @@ void fm7_state::fm7_keyboard_poll_scan()
 
 TIMER_CALLBACK_MEMBER(fm7_state::fm7_keyboard_poll)
 {
-	ioport_port* portnames[3] = { m_key1, m_key2, m_key3 };
 	int x,y;
 	int bit = 0;
 	int mod = 0;
 	UINT32 keys;
 	UINT32 modifiers = m_keymod->read();
 
-	if(m_key3->read() & 0x40000)
+	if (m_kb_ports[2]->read() & 0x40000)
 	{
 		m_break_flag = 1;
 		m_maincpu->set_input_line(M6809_FIRQ_LINE,ASSERT_LINE);
@@ -1369,7 +1367,7 @@ TIMER_CALLBACK_MEMBER(fm7_state::fm7_keyboard_poll)
 
 	for(x=0;x<3;x++)
 	{
-		keys = portnames[x]->read();
+		keys = m_kb_ports[x]->read();
 
 		for(y=0;y<32;y++)  // loop through each bit in the port
 		{

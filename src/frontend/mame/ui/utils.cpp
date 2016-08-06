@@ -137,7 +137,7 @@ int fuzzy_substring(std::string s_needle, std::string s_haystack)
 		for (int j = 0; j < s_haystack.size(); ++j)
 		{
 			int cost = (s_needle[i] == s_haystack[j]) ? 0 : 1;
-			row2[j + 1] = MIN(row1[j + 1] + 1, MIN(row2[j] + 1, row1[j] + cost));
+			row2[j + 1] = std::min(row1[j + 1] + 1, std::min(row2[j] + 1, row1[j] + cost));
 		}
 
 		int *tmp = row1;

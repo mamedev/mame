@@ -671,7 +671,7 @@ float menu_select_launch::draw_icon(int linenum, void *selectedref, float x0, fl
 			if (ratioW < 1 || ratioH < 1)
 			{
 				// smaller ratio will ensure that the image fits in the view
-				float ratio = MIN(ratioW, ratioH);
+				float ratio = std::min(ratioW, ratioH);
 				dest_xPixel = tmp->width() * ratio;
 				dest_yPixel = tmp->height() * ratio;
 			}
@@ -1488,7 +1488,7 @@ float menu_select_launch::draw_right_box_title(float x1, float y1, float x2, flo
 	{
 		auto textlen = ui().get_string_width(elem.c_str()) + 0.01f;
 		float tmp_size = (textlen > midl) ? (midl / textlen) : 1.0f;
-		text_size = MIN(text_size, tmp_size);
+		text_size = std::min(text_size, tmp_size);
 	}
 
 	for (int cells = RP_FIRST; cells <= RP_LAST; ++cells)
@@ -1551,13 +1551,13 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 		m_cache->set_snapx_driver(nullptr);
 
 		if (ui_globals::default_image)
-			(software->startempty == 0) ? ui_globals::curimage_view = SNAPSHOT_VIEW : ui_globals::curimage_view = CABINETS_VIEW;
+			ui_globals::curimage_view = (software->startempty == 0) ? SNAPSHOT_VIEW : CABINETS_VIEW;
 
 		// arts title and searchpath
 		std::string const searchstr = arts_render_common(origx1, origy1, origx2, origy2);
 
 		// loads the image if necessary
-		if (m_cache->snapx_software_is(software) || !snapx_valid() || ui_globals::switch_image)
+		if (!m_cache->snapx_software_is(software) || !snapx_valid() || ui_globals::switch_image)
 		{
 			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
 			bitmap_argb32 *tmp_bitmap;
@@ -1630,7 +1630,7 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 		m_cache->set_snapx_software(nullptr);
 
 		if (ui_globals::default_image)
-			((driver->flags & MACHINE_TYPE_ARCADE) == 0) ? ui_globals::curimage_view = CABINETS_VIEW : ui_globals::curimage_view = SNAPSHOT_VIEW;
+			ui_globals::curimage_view = ((driver->flags & MACHINE_TYPE_ARCADE) == 0) ? CABINETS_VIEW : SNAPSHOT_VIEW;
 
 		std::string const searchstr = arts_render_common(origx1, origy1, origx2, origy2);
 
@@ -1798,7 +1798,7 @@ void menu_select_launch::arts_render_images(bitmap_argb32 *tmp_bitmap, float ori
 			// smaller ratio will ensure that the image fits in the view
 			dest_yPixel = tmp_bitmap->width() * 0.75f;
 			ratioH = (float)panel_height_pixel / dest_yPixel;
-			float ratio = MIN(ratioW, ratioH);
+			float ratio = std::min(ratioW, ratioH);
 			dest_xPixel = tmp_bitmap->width() * ratio;
 			dest_yPixel *= ratio;
 		}
@@ -1806,7 +1806,7 @@ void menu_select_launch::arts_render_images(bitmap_argb32 *tmp_bitmap, float ori
 		else if (ratioW < 1 || ratioH < 1 || (ui().options().enlarge_snaps() && !no_available))
 		{
 			// smaller ratio will ensure that the image fits in the view
-			float ratio = MIN(ratioW, ratioH);
+			float ratio = std::min(ratioW, ratioH);
 			dest_xPixel = tmp_bitmap->width() * ratio;
 			dest_yPixel = tmp_bitmap->height() * ratio;
 		}

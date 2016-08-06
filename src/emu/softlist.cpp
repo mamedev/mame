@@ -57,7 +57,7 @@ private:
 	// internal helpers
 	template <typename T> std::vector<std::string> parse_attributes(const char **attributes, const T &attrlist);
 	bool parse_name_and_value(const char **attributes, std::string &name, std::string &value);
-	void add_rom_entry(const char *name, const char *hashdata, UINT32 offset, UINT32 length, UINT32 flags);
+	void add_rom_entry(std::string &&name, std::string &&hashdata, UINT32 offset, UINT32 length, UINT32 flags);
 
 	// expat callbacks
 	static void start_handler(void *data, const char *tagname, const char **attributes);
@@ -447,7 +447,7 @@ void software_list_device::find_approx_matches(const char *name, int matches, co
 			// pick the best match between driver name and description
 			int longpenalty = driver_list::penalty_compare(name, swinfo.longname().c_str());
 			int shortpenalty = driver_list::penalty_compare(name, swinfo.shortname().c_str());
-			int curpenalty = MIN(longpenalty, shortpenalty);
+			int curpenalty = std::min(longpenalty, shortpenalty);
 
 			// insert into the sorted table of matches
 			for (int matchnum = matches - 1; matchnum >= 0; matchnum--)
@@ -733,15 +733,6 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 
 			if (!part_names.insert(std::make_pair(part.name(), &swinfo)).second)
 				osd_printf_error("%s: %s has a part (%s) whose name is duplicate\n", filename(), swinfo.shortname().c_str(), part.name().c_str());
-
-			for (const rom_entry *data = part.romdata(); data->_name != nullptr; data++)
-				if (data->_hashdata != nullptr)
-				{
-					// make sure the hash is valid
-					util::hash_collection hashes;
-					if (!hashes.from_internal_string(data->_hashdata))
-						osd_printf_error("%s: %s has rom '%s' with an invalid hash string '%s'\n", filename(), swinfo.shortname().c_str(), data->_name, data->_hashdata);
-				}
 		}
 	}
 
@@ -892,7 +883,7 @@ bool softlist_parser::parse_name_and_value(const char **attributes, std::string 
 //  current part's list
 //-------------------------------------------------
 
-void softlist_parser::add_rom_entry(const char *name, const char *hashdata, UINT32 offset, UINT32 length, UINT32 flags)
+void softlist_parser::add_rom_entry(std::string &&name, std::string &&hashdata, UINT32 offset, UINT32 length, UINT32 flags)
 {
 	// get the current part
 	if (m_current_part == nullptr)
@@ -902,20 +893,18 @@ void softlist_parser::add_rom_entry(const char *name, const char *hashdata, UINT
 	}
 
 	// make sure we don't add duplicate regions
-	if (name != nullptr && (flags & ROMENTRY_TYPEMASK) == ROMENTRYTYPE_REGION)
+	if (!name.empty() && (flags & ROMENTRY_TYPEMASK) == ROMENTRYTYPE_REGION)
 		for (auto &elem : m_current_part->m_romdata)
-			if (elem._name != nullptr && strcmp(elem._name, name) == 0)
+			if (!elem.name().empty() && elem.name() == name)
 				parse_error("Duplicated dataarea %s in software %s", name, infoname());
 
 	// create the new entry and append it
-	rom_entry entry;
-	entry._name = m_list.add_string(name);
-	entry._hashdata = m_list.add_string(hashdata);
-	entry._offset = offset;
-	entry._length = length;
-	entry._flags = flags;
-
-	m_current_part->m_romdata.push_back(entry);
+	m_current_part->m_romdata.emplace_back(
+		std::move(name),
+		std::move(hashdata),
+		offset,
+		length,
+		flags);
 }
 
 
@@ -1147,7 +1136,7 @@ void softlist_parser::parse_part_start(const char *tagname, const char **attribu
 	if (strcmp(tagname, "dataarea") == 0)
 	{
 		static const char *attrnames[] = { "name", "size", "width", "endianness" };
-		const auto attrvalues = parse_attributes(attributes, attrnames);
+		auto attrvalues = parse_attributes(attributes, attrnames);
 
 		if (!attrvalues[0].empty() && !attrvalues[1].empty())
 		{
@@ -1179,7 +1168,7 @@ void softlist_parser::parse_part_start(const char *tagname, const char **attribu
 					parse_error("Invalid dataarea endianness");
 			}
 
-			add_rom_entry(attrvalues[0].c_str(), nullptr, 0, strtol(attrvalues[1].c_str(), nullptr, 0), regionflags);
+			add_rom_entry(std::move(attrvalues[0]), "", 0, strtol(attrvalues[1].c_str(), nullptr, 0), regionflags);
 		}
 		else
 			parse_error("Incomplete dataarea definition");
@@ -1189,10 +1178,10 @@ void softlist_parser::parse_part_start(const char *tagname, const char **attribu
 	else if (strcmp(tagname, "diskarea") == 0)
 	{
 		static const char *attrnames[] = { "name" };
-		const auto attrvalues = parse_attributes(attributes, attrnames);
+		auto attrvalues = parse_attributes(attributes, attrnames);
 
 		if (!attrvalues[0].empty())
-			add_rom_entry(attrvalues[0].c_str(), nullptr, 0, 1, ROMENTRYTYPE_REGION | ROMREGION_DATATYPEDISK);
+			add_rom_entry(std::move(attrvalues[0]), "", 0, 1, ROMENTRYTYPE_REGION | ROMREGION_DATATYPEDISK);
 		else
 			parse_error("Incomplete diskarea definition");
 	}
@@ -1234,14 +1223,14 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 	if (strcmp(tagname, "rom") == 0)
 	{
 		static const char *attrnames[] = { "name", "size", "crc", "sha1", "offset", "value", "status", "loadflag" };
-		const auto attrvalues = parse_attributes(attributes, attrnames);
+		auto attrvalues = parse_attributes(attributes, attrnames);
 
-		const std::string &name = attrvalues[0];
+		std::string &name = attrvalues[0];
 		const std::string &sizestr = attrvalues[1];
 		const std::string &crc = attrvalues[2];
 		const std::string &sha1 = attrvalues[3];
 		const std::string &offsetstr = attrvalues[4];
-		const std::string &value = attrvalues[5];
+		std::string &value = attrvalues[5];
 		const std::string &status = attrvalues[6];
 		const std::string &loadflag = attrvalues[7];
 		if (!sizestr.empty() && !offsetstr.empty())
@@ -1250,13 +1239,13 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 			UINT32 offset = strtol(offsetstr.c_str(), nullptr, 0);
 
 			if (loadflag == "reload")
-				add_rom_entry(nullptr, nullptr, offset, length, ROMENTRYTYPE_RELOAD | ROM_INHERITFLAGS);
+				add_rom_entry("", "", offset, length, ROMENTRYTYPE_RELOAD | ROM_INHERITFLAGS);
 			else if (loadflag == "reload_plain")
-				add_rom_entry(nullptr, nullptr, offset, length, ROMENTRYTYPE_RELOAD);
+				add_rom_entry("", "", offset, length, ROMENTRYTYPE_RELOAD);
 			else if (loadflag == "continue")
-				add_rom_entry(nullptr, nullptr, offset, length, ROMENTRYTYPE_CONTINUE | ROM_INHERITFLAGS);
+				add_rom_entry("", "", offset, length, ROMENTRYTYPE_CONTINUE | ROM_INHERITFLAGS);
 			else if (loadflag == "fill")
-				add_rom_entry(nullptr, (const char *)(FPTR)(strtol(value.c_str(), nullptr, 0) & 0xff), offset, length, ROMENTRYTYPE_FILL);
+				add_rom_entry("", std::move(value), offset, length, ROMENTRYTYPE_FILL);
 			else if (!name.empty())
 			{
 				bool baddump = (status == "baddump");
@@ -1290,7 +1279,7 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 				else if (loadflag == "load32_byte")
 					romflags = ROM_SKIP(3);
 
-				add_rom_entry(name.c_str(), hashdata.c_str(), offset, length, ROMENTRYTYPE_ROM | romflags);
+				add_rom_entry(std::move(name), std::move(hashdata), offset, length, ROMENTRYTYPE_ROM | romflags);
 			}
 			else
 				parse_error("Rom name missing");
@@ -1298,7 +1287,7 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 		else if (!sizestr.empty() && !loadflag.empty() && loadflag == "ignore")
 		{
 			UINT32 length = strtol(sizestr.c_str(), nullptr, 0);
-			add_rom_entry(nullptr, nullptr, 0, length, ROMENTRYTYPE_IGNORE | ROM_INHERITFLAGS);
+			add_rom_entry("", "", 0, length, ROMENTRYTYPE_IGNORE | ROM_INHERITFLAGS);
 		}
 		else
 			parse_error("Incomplete rom definition");
@@ -1308,9 +1297,9 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 	else if (strcmp(tagname, "disk") == 0)
 	{
 		static const char *attrnames[] = { "name", "sha1", "status", "writeable" };
-		const auto attrvalues = parse_attributes(attributes, attrnames);
+		auto attrvalues = parse_attributes(attributes, attrnames);
 
-		const std::string &name = attrvalues[0];
+		std::string &name = attrvalues[0];
 		const std::string &sha1 = attrvalues[1];
 		const std::string &status = attrvalues[2];
 		const std::string &writeablestr = attrvalues[3];
@@ -1321,7 +1310,7 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 			const bool writeable = (writeablestr == "yes");
 			std::string hashdata = string_format("%c%s%s", util::hash_collection::HASH_SHA1, sha1, (nodump ? NO_DUMP : (baddump ? BAD_DUMP : "")));
 
-			add_rom_entry(name.c_str(), hashdata.c_str(), 0, 0, ROMENTRYTYPE_ROM | (writeable ? DISK_READWRITE : DISK_READONLY));
+			add_rom_entry(std::move(name), std::move(hashdata), 0, 0, ROMENTRYTYPE_ROM | (writeable ? DISK_READWRITE : DISK_READONLY));
 		}
 		else if (status.empty() || (status == "nodump")) // a no_dump chd is not an incomplete entry
 			parse_error("Incomplete disk definition");
@@ -1366,7 +1355,7 @@ void softlist_parser::parse_soft_end(const char *tagname)
 
 		// was any dataarea/rom information encountered? if so, add a terminator
 		if (m_current_part->romdata() != nullptr)
-			add_rom_entry(nullptr, nullptr, 0, 0, ROMENTRYTYPE_END);
+			add_rom_entry("", "", 0, 0, ROMENTRYTYPE_END);
 
 		// get the info; if present, copy shared data (we assume name/value strings live
 		// in the string pool and don't need to be reallocated)

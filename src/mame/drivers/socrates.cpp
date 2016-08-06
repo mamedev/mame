@@ -1000,22 +1000,22 @@ static ADDRESS_MAP_START(z80_io, AS_IO, 8, socrates_state )
 	AM_RANGE(0x00, 0x00) AM_READWRITE(socrates_rom_bank_r, socrates_rom_bank_w) AM_MIRROR(0x7) /* rom bank select - RW - 8 bits */
 	AM_RANGE(0x08, 0x08) AM_READWRITE(socrates_ram_bank_r, socrates_ram_bank_w) AM_MIRROR(0x7) /* ram banks select - RW - 4 low bits; Format: 0b****HHLL where LL controls whether window 0 points at ram area: 0b00: 0x0000-0x3fff; 0b01: 0x4000-0x7fff; 0b10: 0x8000-0xbfff; 0b11: 0xc000-0xffff. HH controls the same thing for window 1 */
 	AM_RANGE(0x10, 0x17) AM_READWRITE(read_f3, socrates_sound_w) AM_MIRROR (0x8) /* sound section:
-    0x10 - W - frequency control for channel 1 (louder channel) - 01=high pitch, ff=low; time between 1->0/0->1 transitions = (XTAL_21_4772MHz/(512+256) / (freq_reg+1)) (note that this is double the actual frequency since each full low and high squarewave pulse is two transitions)
-    0x11 - W - frequency control for channel 2 (softer channel) - 01=high pitch, ff=low; same equation as above
-    0x12 - W - 0b***EVVVV enable, volume control for channel 1
-    0x13 - W - 0b***EVVVV enable, volume control for channel 2
-    0x14-0x17 - 0bE??????? enable, unknown for channel 3; produces well defined dmc waves when bit 7 is set, and one or two other bits
-    This may be some sort of debug register for serial-dmc banging out some internal rom from the asic, maybe color data?
-    No writes to ram seem to change the waveforms produced, in my limited testing.
-    0x80 produces about a very very quiet 1/8 duty cycle wave at 60hz or so
-    0xC0 produces a DMC wave read from an unknown address at around 342hz
-    0x
-    */
+	0x10 - W - frequency control for channel 1 (louder channel) - 01=high pitch, ff=low; time between 1->0/0->1 transitions = (XTAL_21_4772MHz/(512+256) / (freq_reg+1)) (note that this is double the actual frequency since each full low and high squarewave pulse is two transitions)
+	0x11 - W - frequency control for channel 2 (softer channel) - 01=high pitch, ff=low; same equation as above
+	0x12 - W - 0b***EVVVV enable, volume control for channel 1
+	0x13 - W - 0b***EVVVV enable, volume control for channel 2
+	0x14-0x17 - 0bE??????? enable, unknown for channel 3; produces well defined dmc waves when bit 7 is set, and one or two other bits
+	This may be some sort of debug register for serial-dmc banging out some internal rom from the asic, maybe color data?
+	No writes to ram seem to change the waveforms produced, in my limited testing.
+	0x80 produces about a very very quiet 1/8 duty cycle wave at 60hz or so
+	0xC0 produces a DMC wave read from an unknown address at around 342hz
+	0x
+	*/
 	AM_RANGE(0x20, 0x21) AM_READWRITE(read_f3, socrates_scroll_w) AM_MIRROR (0xe) /* graphics section:
-    0x20 - W - lsb offset of screen display
-    0x21 - W - msb offset of screen display
-    resulting screen line is one of 512 total offsets on 128-byte boundaries in the whole 64k ram
-    */
+	0x20 - W - lsb offset of screen display
+	0x21 - W - msb offset of screen display
+	resulting screen line is one of 512 total offsets on 128-byte boundaries in the whole 64k ram
+	*/
 	AM_RANGE(0x30, 0x30) AM_READWRITE(read_f3, kbmcu_strobe) AM_MIRROR (0xf) /* resets the keyboard IR decoder MCU */
 	AM_RANGE(0x40, 0x40) AM_READWRITE(status_and_speech, speech_command ) AM_MIRROR(0xf) /* reads status register for vblank/hblank/speech, also reads and writes speech module */
 	AM_RANGE(0x50, 0x50) AM_READWRITE(socrates_keyboard_low_r, socrates_keyboard_clear) AM_MIRROR(0xE) /* Keyboard keycode low, latched on keypress, can be unlatched by writing anything here */

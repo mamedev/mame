@@ -22,8 +22,8 @@
 static UINT32 ni_htonl(UINT32 x) { return x; }
 static UINT32 ni_ntohl(UINT32 x) { return x; }
 #else
-static UINT32 ni_htonl(UINT32 x) { return FLIPENDIAN_INT32(x); }
-static UINT32 ni_ntohl(UINT32 x) { return FLIPENDIAN_INT32(x); }
+static UINT32 ni_htonl(UINT32 x) { return flipendian_int32(x); }
+static UINT32 ni_ntohl(UINT32 x) { return flipendian_int32(x); }
 #endif
 
 
@@ -46,7 +46,7 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *file_extensions() const override { return "img"; }
 
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 
 	protected:
@@ -92,7 +92,7 @@ void messimg_disk_image_device::device_start()
 	}
 }
 
-bool messimg_disk_image_device::call_load()
+image_init_result messimg_disk_image_device::call_load()
 {
 	fseek(0, SEEK_END);
 	m_size = (UINT32)ftell();
@@ -100,7 +100,7 @@ bool messimg_disk_image_device::call_load()
 	{
 		printf("Mac image too large: must be 256MB or less!\n");
 		m_size = 0;
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	m_data = make_unique_clear<UINT8[]>(m_size);
@@ -108,7 +108,7 @@ bool messimg_disk_image_device::call_load()
 	fread(m_data.get(), m_size);
 	m_ejected = false;
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void messimg_disk_image_device::call_unload()

@@ -231,7 +231,7 @@ private:
 			file(path.c_str(), openflags) {}
 
 		int l_emu_file_read(lua_State *L);
-		osd_file::error open(const char *name) {return file.open(name);}
+		osd_file::error open(const std::string &name) {return file.open(name);}
 		osd_file::error open_next() {return file.open_next();}
 		int seek(INT64 offset, int whence) {return file.seek(offset, whence);}
 		UINT64 size() {return file.size();}

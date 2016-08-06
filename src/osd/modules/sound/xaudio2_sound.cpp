@@ -20,13 +20,16 @@
 // XAudio2 include
 #include <xaudio2.h>
 
+#undef interface
+#undef min
+#undef max
+
 // stdlib includes
 #include <mutex>
 #include <thread>
 #include <queue>
 #include <chrono>
-
-#undef interface
+#include <utility>
 
 // MAME headers
 #include "emu.h"
@@ -397,7 +400,7 @@ void sound_xaudio2::update_audio_stream(
 
 	while (bytes_left > 0)
 	{
-		UINT32 chunk = MIN(m_buffer_size, bytes_left);
+		UINT32 chunk = std::min(UINT32(m_buffer_size), bytes_left);
 
 		// Roll the buffer if needed
 		if (m_writepos + chunk >= m_buffer_size)
@@ -429,7 +432,7 @@ void sound_xaudio2::set_mastervolume(int attenuation)
 	HRESULT result;
 
 	// clamp the attenuation to 0-32 range
-	attenuation = MAX(MIN(attenuation, 0), -32);
+	attenuation = std::max(std::min(attenuation, 0), -32);
 
 	// Ranges from 1.0 to XAUDIO2_MAX_VOLUME_LEVEL indicate additional gain
 	// Ranges from 0 to 1.0 indicate a reduced volume level
@@ -498,7 +501,7 @@ void sound_xaudio2::create_buffers(const WAVEFORMATEX &format)
 	m_buffer_count = (audio_latency_in_seconds * 1000.0f) / SUBMIT_FREQUENCY_TARGET_MS;
 
 	// Now record the size of the individual buffers
-	m_buffer_size = MAX(1024, total_buffer_size / m_buffer_count);
+	m_buffer_size = std::max(DWORD(1024), total_buffer_size / m_buffer_count);
 
 	// Make the buffer a multiple of the format size bytes (rounding up)
 	UINT32 remainder = m_buffer_size % format.nBlockAlign;

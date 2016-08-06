@@ -268,13 +268,12 @@ READ8_MEMBER(combatsc_state::trackball_r)
 	if (offset == 0)
 	{
 		int i, dir[4];
-		static const char *const tracknames[] = { "TRACK0_Y", "TRACK0_X", "TRACK1_Y", "TRACK1_X" };
 
 		for (i = 0; i < 4; i++)
 		{
 			UINT8 curr;
 
-			curr = read_safe(ioport(tracknames[i]), 0xff);
+			curr = m_track_ports[i].read_safe(0xff);
 
 			dir[i] = curr - m_pos[i];
 			m_sign[i] = dir[i] & 0x80;

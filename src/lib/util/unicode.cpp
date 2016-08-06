@@ -128,21 +128,21 @@ int uchar_from_utf16(unicode_char *uchar, const utf16_char *utf16char, size_t co
 
 	// validate parameters
 	if (utf16char == nullptr || count == 0)
-		return 0;
-
-	// handle the two-byte case
+	{
+		rc = 0;
+	}
 	if (utf16char[0] >= 0xd800 && utf16char[0] <= 0xdbff)
 	{
+		// handle the two-byte case
 		if (count > 1 && utf16char[1] >= 0xdc00 && utf16char[1] <= 0xdfff)
 		{
 			*uchar = 0x10000 + ((utf16char[0] & 0x3ff) * 0x400) + (utf16char[1] & 0x3ff);
 			rc = 2;
 		}
 	}
-
-	// handle the one-byte case
 	else if (utf16char[0] < 0xdc00 || utf16char[0] > 0xdfff)
 	{
+		// handle the one-byte case
 		*uchar = utf16char[0];
 		rc = 1;
 	}
@@ -161,9 +161,9 @@ int uchar_from_utf16f(unicode_char *uchar, const utf16_char *utf16char, size_t c
 {
 	utf16_char buf[2] = {0};
 	if (count > 0)
-		buf[0] = FLIPENDIAN_INT16(utf16char[0]);
+		buf[0] = flipendian_int16(utf16char[0]);
 	if (count > 1)
-		buf[1] = FLIPENDIAN_INT16(utf16char[1]);
+		buf[1] = flipendian_int16(utf16char[1]);
 	return uchar_from_utf16(uchar, buf, count);
 }
 
@@ -272,26 +272,28 @@ int utf16_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar)
 	if (!uchar_isvalid(uchar))
 		return -1;
 
-	// single word case
 	if (uchar < 0x10000)
 	{
+		// single word case
 		if (count < 1)
 			return -1;
 		utf16string[0] = (utf16_char) uchar;
 		rc = 1;
 	}
-
-	// double word case
 	else if (uchar < 0x100000)
 	{
+		// double word case
 		if (count < 2)
 			return -1;
+		uchar -= 0x10000;
 		utf16string[0] = ((uchar >> 10) & 0x03ff) | 0xd800;
 		utf16string[1] = ((uchar >>  0) & 0x03ff) | 0xdc00;
 		rc = 2;
 	}
 	else
+	{
 		return -1;
+	}
 	return rc;
 }
 
@@ -309,9 +311,9 @@ int utf16f_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar)
 	rc = utf16_from_uchar(buf, count, uchar);
 
 	if (rc >= 1)
-		utf16string[0] = FLIPENDIAN_INT16(buf[0]);
+		utf16string[0] = flipendian_int16(buf[0]);
 	if (rc >= 2)
-		utf16string[1] = FLIPENDIAN_INT16(buf[1]);
+		utf16string[1] = flipendian_int16(buf[1]);
 	return rc;
 }
 

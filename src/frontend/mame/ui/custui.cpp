@@ -167,7 +167,7 @@ void menu_custom_ui::custom_render(void *selectedref, float top, float bottom, f
 	ui().draw_text_full(container(), _("Custom UI Settings"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 									mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
-	float maxwidth = MAX(origx2 - origx1, width);
+	float maxwidth = std::max(origx2 - origx1, width);
 
 	// compute our bounds
 	float x1 = 0.5f - 0.5f * maxwidth;
@@ -383,7 +383,7 @@ void menu_font_ui::custom_render(void *selectedref, float top, float bottom, flo
 	ui().draw_text_full(container(), topbuf.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 									mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
-	float maxwidth = MAX(origx2 - origx1, width);
+	float maxwidth = std::max(origx2 - origx1, width);
 
 	// compute our bounds
 	float x1 = 0.5f - 0.5f * maxwidth;
@@ -410,7 +410,7 @@ void menu_font_ui::custom_render(void *selectedref, float top, float bottom, flo
 		ui().draw_text_full(container(), topbuf.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::LEFT, ui::text_layout::NEVER,
 										mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr, m_info_size);
 		width += 2 * UI_BOX_LR_BORDER;
-		maxwidth = MAX(origx2 - origx1, width);
+		maxwidth = std::max(origx2 - origx1, width);
 
 		// compute our bounds
 		x1 = 0.5f - 0.5f * maxwidth;
@@ -541,7 +541,7 @@ void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, f
 	ui().draw_text_full(container(), topbuf.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
 									mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
-	maxwidth = MAX(maxwidth, width);
+	maxwidth = std::max(maxwidth, width);
 
 	// compute our bounds
 	float x1 = 0.5f - 0.5f * maxwidth;
@@ -569,7 +569,7 @@ void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, f
 	ui().draw_text_full(container(), topbuf.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
 									mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
-	maxwidth = MAX(maxwidth, width);
+	maxwidth = std::max(maxwidth, width);
 
 	// compute our bounds
 	x1 = 0.5f - 0.5f * maxwidth;
@@ -609,7 +609,7 @@ void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, f
 		ui().draw_text_full(container(), elem.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
 										mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 		width += 2 * UI_BOX_LR_BORDER;
-		maxwidth = MAX(maxwidth, width);
+		maxwidth = std::max(maxwidth, width);
 	}
 
 	// compute our bounds for header
@@ -882,7 +882,7 @@ void menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, floa
 	ui().draw_text_full(container(), topbuf.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
 									mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
-	maxwidth = MAX(maxwidth, width);
+	maxwidth = std::max(maxwidth, width);
 
 	// compute our bounds
 	float x1 = 0.5f - 0.5f * maxwidth;
@@ -907,7 +907,7 @@ void menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, floa
 	ui().draw_text_full(container(), sampletxt.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
 									mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
-	maxwidth = MAX(maxwidth, width);
+	maxwidth = std::max(maxwidth, width);
 
 	// compute our bounds
 	x1 -= UI_BOX_LR_BORDER;

@@ -1598,7 +1598,7 @@ WRITE8_MEMBER(bbc_state::bbcm_wd1772l_write)
    BBC B Rom loading functions
 ***************************************/
 
-int bbc_state::bbc_load_rom(device_image_interface &image, generic_slot_device *slot)
+image_init_result bbc_state::bbc_load_rom(device_image_interface &image, generic_slot_device *slot)
 {
 	UINT32 size = slot->common_get_size("rom");
 
@@ -1606,20 +1606,20 @@ int bbc_state::bbc_load_rom(device_image_interface &image, generic_slot_device *
 	if (size != 0x2000 && size != 0x4000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported ROM size");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	slot->common_load_rom(slot->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /**************************************
    BBC Master Rom loading functions
 ***************************************/
 
-int bbc_state::bbcm_load_cart(device_image_interface &image, generic_slot_device *slot)
+image_init_result bbc_state::bbcm_load_cart(device_image_interface &image, generic_slot_device *slot)
 {
 	if (image.software_entry() == nullptr)
 	{
@@ -1628,12 +1628,12 @@ int bbc_state::bbcm_load_cart(device_image_interface &image, generic_slot_device
 		if (filesize != 0x8000)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		slot->rom_alloc(filesize, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 		image.fread(slot->get_rom_base(), filesize);
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 	else
 	{
@@ -1643,7 +1643,7 @@ int bbc_state::bbcm_load_cart(device_image_interface &image, generic_slot_device
 		if (size_lo + size_hi != 0x8000)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		slot->rom_alloc(size_lo + size_hi, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
@@ -1651,7 +1651,7 @@ int bbc_state::bbcm_load_cart(device_image_interface &image, generic_slot_device
 		memcpy(slot->get_rom_base() + size_hi, image.get_software_region("lorom"), size_lo);
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -1747,9 +1747,9 @@ MACHINE_START_MEMBER(bbc_state, bbca)
 
 MACHINE_RESET_MEMBER(bbc_state, bbca)
 {
-	m_monitortype = read_safe(ioport("BBCCONFIG"), 0) & 0x03;
-	m_Speech      = read_safe(ioport("BBCCONFIG"), 0) & 0x04;
-	m_SWRAMtype   = read_safe(ioport("BBCCONFIG"), 0) & 0x18;
+	m_monitortype = m_bbcconfig.read_safe(0) & 0x03;
+	m_Speech      = m_bbcconfig.read_safe(0) & 0x04;
+	m_SWRAMtype   = m_bbcconfig.read_safe(0) & 0x18;
 
 	UINT8 *RAM = m_region_maincpu->base();
 
@@ -1782,9 +1782,9 @@ MACHINE_START_MEMBER(bbc_state, bbcb)
 
 MACHINE_RESET_MEMBER(bbc_state, bbcb)
 {
-	m_monitortype = read_safe(ioport("BBCCONFIG"), 0) & 0x03;
-	m_Speech      = read_safe(ioport("BBCCONFIG"), 1) & 0x04;
-	m_SWRAMtype   = read_safe(ioport("BBCCONFIG"), 0) & 0x18;
+	m_monitortype = m_bbcconfig.read_safe(0) & 0x03;
+	m_Speech      = m_bbcconfig.read_safe(1) & 0x04;
+	m_SWRAMtype   = m_bbcconfig.read_safe(0) & 0x18;
 
 	UINT8 *RAM = m_region_maincpu->base();
 
@@ -1823,8 +1823,8 @@ MACHINE_START_MEMBER(bbc_state, bbcbp)
 
 MACHINE_RESET_MEMBER(bbc_state, bbcbp)
 {
-	m_monitortype = read_safe(ioport("BBCCONFIG"), 0) & 0x03;
-	m_Speech      = read_safe(ioport("BBCCONFIG"), 1) & 0x04;
+	m_monitortype = m_bbcconfig.read_safe(0) & 0x03;
+	m_Speech      = m_bbcconfig.read_safe(1) & 0x04;
 	m_SWRAMtype   = 0;
 
 	m_bank1->set_base(m_region_maincpu->base());
@@ -1855,7 +1855,7 @@ MACHINE_START_MEMBER(bbc_state, bbcm)
 
 MACHINE_RESET_MEMBER(bbc_state, bbcm)
 {
-	m_monitortype = read_safe(ioport("BBCCONFIG"), 0) & 0x03;
+	m_monitortype = m_bbcconfig.read_safe(0) & 0x03;
 	m_Speech      = 0;
 	m_SWRAMtype   = 0;
 

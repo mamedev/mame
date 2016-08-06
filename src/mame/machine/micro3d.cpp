@@ -467,16 +467,16 @@ WRITE32_MEMBER(micro3d_state::micro3d_mac2_w)
 
 READ16_MEMBER(micro3d_state::micro3d_encoder_h_r)
 {
-	UINT16 x_encoder = m_joystick_x ? m_joystick_x->read() : 0;
-	UINT16 y_encoder = m_joystick_y ? m_joystick_y->read() : 0;
+	UINT16 x_encoder = m_joystick_x.read_safe(0);
+	UINT16 y_encoder = m_joystick_y.read_safe(0);
 
 	return (y_encoder & 0xf00) | ((x_encoder & 0xf00) >> 8);
 }
 
 READ16_MEMBER(micro3d_state::micro3d_encoder_l_r)
 {
-	UINT16 x_encoder = m_joystick_x ? m_joystick_x->read() : 0;
-	UINT16 y_encoder = m_joystick_y ? m_joystick_y->read() : 0;
+	UINT16 x_encoder = m_joystick_x.read_safe(0);
+	UINT16 y_encoder = m_joystick_y.read_safe(0);
 
 	return ((y_encoder & 0xff) << 8) | (x_encoder & 0xff);
 }
@@ -485,7 +485,7 @@ TIMER_CALLBACK_MEMBER(micro3d_state::adc_done_callback)
 {
 	switch (param)
 	{
-		case 0: m_adc_val = m_throttle ? m_throttle->read() : 0;
+		case 0: m_adc_val = m_throttle.read_safe(0);
 				break;
 		case 1: m_adc_val = (UINT8)((255.0/100.0) * m_volume->read() + 0.5);
 				break;

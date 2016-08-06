@@ -456,12 +456,6 @@ void cosmicos_state::machine_start()
 	/* initialize LED display */
 	m_led->rbi_w(1);
 
-	// find keyboard rows
-	m_key_row[0] = m_y1;
-	m_key_row[1] = m_y2;
-	m_key_row[2] = m_y3;
-	m_key_row[3] = m_y4;
-
 	/* register for state saving */
 	save_item(NAME(m_wait));
 	save_item(NAME(m_clear));
@@ -495,7 +489,7 @@ QUICKLOAD_LOAD_MEMBER( cosmicos_state, cosmicos )
 	/* load image to RAM */
 	image.fread(ptr, size);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /* Machine Driver */

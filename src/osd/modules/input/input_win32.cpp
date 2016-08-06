@@ -15,6 +15,8 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #undef interface
+#undef min
+#undef max
 
 // MAME headers
 #include "emu.h"
@@ -93,7 +95,7 @@ public:
 	bool handle_input_event(input_event eventid, void *eventdata) override
 	{
 		if (!input_enabled())
-			return FALSE;
+			return false;
 
 		KeyPressEventArgs *args;
 
@@ -105,10 +107,10 @@ public:
 				for (int i = 0; i < devicelist()->size(); i++)
 					downcast<win32_keyboard_device*>(devicelist()->at(i))->queue_events(args, 1);
 
-				return TRUE;
+				return true;
 
 			default:
-				return FALSE;
+				return false;
 		}
 	}
 };
@@ -229,13 +231,13 @@ public:
 	bool handle_input_event(input_event eventid, void *eventdata) override
 	{
 		if (!input_enabled() || !mouse_enabled() || eventid != INPUT_EVENT_MOUSE_BUTTON)
-			return FALSE;
+			return false;
 
 		auto args = static_cast<MouseButtonEventArgs*>(eventdata);
 		for (int i = 0; i < devicelist()->size(); i++)
 			downcast<win32_mouse_device*>(devicelist()->at(i))->queue_events(args, 1);
 
-		return TRUE;
+		return true;
 	}
 };
 

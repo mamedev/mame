@@ -995,8 +995,8 @@ ADC12138_IPT_CONVERT_CB(hornet_state::adc12138_input_callback)
 	int value = 0;
 	switch (input)
 	{
-		case 0: value = (m_analog1) ? m_analog1->read() : 0; break;
-		case 1: value = (m_analog2) ? m_analog2->read() : 0; break;
+		case 0: value = m_analog1.read_safe(0); break;
+		case 1: value = m_analog2.read_safe(0); break;
 	}
 
 	return (double)(value) / 2047.0;

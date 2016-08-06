@@ -135,18 +135,18 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 		height = width = 0;
 		{
 			/* determine the maximal width */
-			maxwidth = MAX(bitmap1.width(), bitmap2.width());
+			maxwidth = std::max(bitmap1.width(), bitmap2.width());
 			width = bitmap1.width() + BITMAP_SPACE + maxwidth + BITMAP_SPACE + maxwidth;
 
 			/* add to the height */
-			height += MAX(bitmap1.height(), bitmap2.height());
+			height += std::max(bitmap1.height(), bitmap2.height());
 		}
 
 		/* allocate the final bitmap */
 		finalbitmap.allocate(width, height);
 
 		/* now copy and compare each set of bitmaps */
-		int curheight = MAX(bitmap1.height(), bitmap2.height());
+		int curheight = std::max(bitmap1.height(), bitmap2.height());
 		/* iterate over rows in these bitmaps */
 		for (y = 0; y < curheight; y++)
 		{

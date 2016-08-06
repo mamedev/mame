@@ -16,10 +16,19 @@ enum {
 	f2_dvt_evenfield    = f2_task_10            //!< f2 10: load even field
 };
 
-void f1_early_dvt_block();                      //!< F1 func: disable the display word task
-void activate_dvt();                            //!< called by the CPU when the display vertical task becomes active
-void init_dvt(int task = task_dvt);             //!< initialize the display vertical task
-void exit_dvt();                                //!< deinitialize the display vertical task
-void reset_dvt();                               //!< reset the display vertical task
+//! F1 func: Disable the display word task.
+void f1_early_dvt_block();
+
+//! Called by the CPU when the display vertical task becomes active.
+void activate_dvt();
+
+//! Initialize the display vertical task.
+void init_dvt(int task = task_dvt);
+
+//! Deinitialize the display vertical task.
+void exit_dvt();
+
+//! Reset the display vertical task.
+void reset_dvt();
 #endif  // _A2DVT_H_
 #endif  // ALTO2_DEFINE_CONSTANTS

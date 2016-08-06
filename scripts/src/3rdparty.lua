@@ -735,8 +735,16 @@ end
 
 	configuration { }
 
+	local version = str_to_version(_OPTIONS["gcc_version"])
+	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "gcc") then
+		if version >= 60000 then
+			buildoptions_cpp {
+				"-Wno-misleading-indentation",
+			}
+		end		
+	end
+	
 	if _OPTIONS["targetos"]=="windows" then
-		local version = str_to_version(_OPTIONS["gcc_version"])
 		if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
 			buildoptions {
 				"-Wno-unknown-attributes",
@@ -747,7 +755,6 @@ end
 	end
 
 	if _OPTIONS["targetos"]=="macosx" then
-		local version = str_to_version(_OPTIONS["gcc_version"])
 		if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
 			buildoptions {
 				"-Wno-switch",

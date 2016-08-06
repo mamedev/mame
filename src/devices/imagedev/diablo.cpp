@@ -56,7 +56,7 @@ diablo_image_device::~diablo_image_device()
 
 void diablo_image_device::device_config_complete()
 {
-	m_formatlist.push_back(std::make_unique<image_device_format>("chd", "CHD Hard drive", "chd,dsk", dsk_option_spec));
+	add_format("chd", "CHD Hard drive", "chd,dsk", dsk_option_spec);
 
 	// set brief and instance name
 	update_names();
@@ -93,9 +93,9 @@ void diablo_image_device::device_stop()
 		hard_disk_close(m_hard_disk_handle);
 }
 
-bool diablo_image_device::call_load()
+image_init_result diablo_image_device::call_load()
 {
-	int our_result;
+	image_init_result our_result;
 
 	our_result = internal_load_dsk();
 	/* Check if there is an image_load callback defined */
@@ -108,7 +108,7 @@ bool diablo_image_device::call_load()
 
 }
 
-bool diablo_image_device::call_create(int create_format, util::option_resolution *create_args)
+image_init_result diablo_image_device::call_create(int create_format, util::option_resolution *create_args)
 {
 	int err;
 	UINT32 sectorsize, hunksize;
@@ -139,7 +139,7 @@ bool diablo_image_device::call_create(int create_format, util::option_resolution
 	return internal_load_dsk();
 
 error:
-	return IMAGE_INIT_FAIL;
+	return image_init_result::FAIL;
 }
 
 void diablo_image_device::call_unload()
@@ -204,7 +204,7 @@ static chd_error open_disk_diff(emu_options &options, const char *name, chd_file
 	return CHDERR_FILE_NOT_FOUND;
 }
 
-int diablo_image_device::internal_load_dsk()
+image_init_result diablo_image_device::internal_load_dsk()
 {
 	chd_error err = CHDERR_NONE;
 
@@ -244,7 +244,7 @@ int diablo_image_device::internal_load_dsk()
 		/* open the hard disk file */
 		m_hard_disk_handle = hard_disk_open(m_chd);
 		if (m_hard_disk_handle != nullptr)
-			return IMAGE_INIT_PASS;
+			return image_init_result::PASS;
 	}
 
 	/* if we had an error, close out the CHD */
@@ -253,7 +253,7 @@ int diablo_image_device::internal_load_dsk()
 	m_chd = nullptr;
 	seterror(IMAGE_ERROR_UNSPECIFIED, chd_file::error_string(err));
 
-	return IMAGE_INIT_FAIL;
+	return image_init_result::FAIL;
 }
 
 /*************************************

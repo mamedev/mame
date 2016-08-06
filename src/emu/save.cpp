@@ -298,7 +298,7 @@ save_error save_manager::write_file(emu_file &file)
 	header[9] = NATIVE_ENDIAN_VALUE_LE_BE(0, SS_MSB_FIRST);
 	strncpy((char *)&header[0x0a], machine().system().name, 0x1c - 0x0a);
 	UINT32 sig = signature();
-	*(UINT32 *)&header[0x1c] = LITTLE_ENDIANIZE_INT32(sig);
+	*(UINT32 *)&header[0x1c] = little_endianize_int32(sig);
 
 	// write the header and turn on compression for the rest of the file
 	file.compress(FCOMPRESS_NONE);
@@ -337,8 +337,8 @@ UINT32 save_manager::signature() const
 
 		// add the type and size to the CRC
 		UINT32 temp[2];
-		temp[0] = LITTLE_ENDIANIZE_INT32(entry->m_typecount);
-		temp[1] = LITTLE_ENDIANIZE_INT32(entry->m_typesize);
+		temp[0] = little_endianize_int32(entry->m_typecount);
+		temp[1] = little_endianize_int32(entry->m_typesize);
 		crc = core_crc32(crc, (UINT8 *)&temp[0], sizeof(temp));
 	}
 	return crc;
@@ -393,10 +393,10 @@ save_error save_manager::validate_header(const UINT8 *header, const char *gamena
 	if (signature != 0)
 	{
 		UINT32 rawsig = *(UINT32 *)&header[0x1c];
-		if (signature != LITTLE_ENDIANIZE_INT32(rawsig))
+		if (signature != little_endianize_int32(rawsig))
 		{
 			if (errormsg != nullptr)
-				(*errormsg)("%sIncompatible save file (signature %08x, expected %08x)", error_prefix, LITTLE_ENDIANIZE_INT32(rawsig), signature);
+				(*errormsg)("%sIncompatible save file (signature %08x, expected %08x)", error_prefix, little_endianize_int32(rawsig), signature);
 			return STATERR_INVALID_HEADER;
 		}
 	}
@@ -449,19 +449,19 @@ void state_entry::flip_data()
 		case 2:
 			data16 = (UINT16 *)m_data;
 			for (count = 0; count < m_typecount; count++)
-				data16[count] = FLIPENDIAN_INT16(data16[count]);
+				data16[count] = flipendian_int16(data16[count]);
 			break;
 
 		case 4:
 			data32 = (UINT32 *)m_data;
 			for (count = 0; count < m_typecount; count++)
-				data32[count] = FLIPENDIAN_INT32(data32[count]);
+				data32[count] = flipendian_int32(data32[count]);
 			break;
 
 		case 8:
 			data64 = (UINT64 *)m_data;
 			for (count = 0; count < m_typecount; count++)
-				data64[count] = FLIPENDIAN_INT64(data64[count]);
+				data64[count] = flipendian_int64(data64[count]);
 			break;
 	}
 }

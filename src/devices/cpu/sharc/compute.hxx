@@ -295,7 +295,7 @@ void adsp21062_device::compute_dec(int rn, int rx)
 /* Rn = MIN(Rx, Ry) */
 void adsp21062_device::compute_min(int rn, int rx, int ry)
 {
-	UINT32 r = MIN((INT32)REG(rx), (INT32)REG(ry));
+	UINT32 r = std::min((INT32)REG(rx), (INT32)REG(ry));
 
 	CLEAR_ALU_FLAGS();
 	SET_FLAG_AN(r);
@@ -309,7 +309,7 @@ void adsp21062_device::compute_min(int rn, int rx, int ry)
 /* Rn = MAX(Rx, Ry) */
 void adsp21062_device::compute_max(int rn, int rx, int ry)
 {
-	UINT32 r = MAX((INT32)REG(rx), (INT32)REG(ry));
+	UINT32 r = std::max((INT32)REG(rx), (INT32)REG(ry));
 
 	CLEAR_ALU_FLAGS();
 	SET_FLAG_AN(r);
@@ -699,7 +699,7 @@ void adsp21062_device::compute_fmax(int rn, int rx, int ry)
 {
 	SHARC_REG r_alu;
 
-	r_alu.f = MAX(FREG(rx), FREG(ry));
+	r_alu.f = std::max(FREG(rx), FREG(ry));
 
 	CLEAR_ALU_FLAGS();
 	m_core->astat |= (r_alu.f < 0.0f) ? AN : 0;
@@ -720,7 +720,7 @@ void adsp21062_device::compute_fmin(int rn, int rx, int ry)
 {
 	SHARC_REG r_alu;
 
-	r_alu.f = MIN(FREG(rx), FREG(ry));
+	r_alu.f = std::min(FREG(rx), FREG(ry));
 
 	CLEAR_ALU_FLAGS();
 	m_core->astat |= (r_alu.f < 0.0f) ? AN : 0;
@@ -1309,7 +1309,7 @@ void adsp21062_device::compute_fmul_fmax(int fm, int fxm, int fym, int fa, int f
 	SHARC_REG r_mul, r_alu;
 	r_mul.f = FREG(fxm) * FREG(fym);
 
-	r_alu.f = MAX(FREG(fxa), FREG(fya));
+	r_alu.f = std::max(FREG(fxa), FREG(fya));
 
 	CLEAR_MULTIPLIER_FLAGS();
 	SET_FLAG_MN(r_mul.r);
@@ -1339,7 +1339,7 @@ void adsp21062_device::compute_fmul_fmin(int fm, int fxm, int fym, int fa, int f
 	SHARC_REG r_mul, r_alu;
 	r_mul.f = FREG(fxm) * FREG(fym);
 
-	r_alu.f = MIN(FREG(fxa), FREG(fya));
+	r_alu.f = std::min(FREG(fxa), FREG(fya));
 
 	CLEAR_MULTIPLIER_FLAGS();
 	SET_FLAG_MN(r_mul.r);

@@ -15,7 +15,6 @@
 #define BX_COMPILER_CLANG_ANALYZER  0
 #define BX_COMPILER_GCC             0
 #define BX_COMPILER_MSVC            0
-#define BX_COMPILER_MSVC_COMPATIBLE (BX_CRT_MSVC)
 
 // Endianess
 #define BX_CPU_ENDIAN_BIG    0

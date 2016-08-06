@@ -19,13 +19,6 @@
 #include "pointer.h"
 #include <cmath> // abs, floor
 
-#ifdef __clang__
-RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(weak-vtables)
-RAPIDJSON_DIAG_OFF(exit-time-destructors)
-RAPIDJSON_DIAG_OFF(c++98-compat-pedantic)
-#endif
-
 #if !defined(RAPIDJSON_SCHEMA_USE_INTERNALREGEX)
 #define RAPIDJSON_SCHEMA_USE_INTERNALREGEX 1
 #else
@@ -58,18 +51,20 @@ RAPIDJSON_DIAG_OFF(c++98-compat-pedantic)
 #include "stringbuffer.h"
 #endif
 
-#if defined(__GNUC__)
 RAPIDJSON_DIAG_PUSH
+
+#if defined(__GNUC__)
 RAPIDJSON_DIAG_OFF(effc++)
 #endif
 
 #ifdef __clang__
-RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(weak-vtables)
+RAPIDJSON_DIAG_OFF(exit-time-destructors)
+RAPIDJSON_DIAG_OFF(c++98-compat-pedantic)
 RAPIDJSON_DIAG_OFF(variadic-macros)
 #endif
 
 #ifdef _MSC_VER
-RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(4512) // assignment operator could not be generated
 #endif
 
@@ -413,9 +408,11 @@ public:
                 }
             }
 
-        AssignIfExist(allOf_, *schemaDocument, p, value, GetAllOfString(), document);
-        AssignIfExist(anyOf_, *schemaDocument, p, value, GetAnyOfString(), document);
-        AssignIfExist(oneOf_, *schemaDocument, p, value, GetOneOfString(), document);
+        if (schemaDocument) {
+            AssignIfExist(allOf_, *schemaDocument, p, value, GetAllOfString(), document);
+            AssignIfExist(anyOf_, *schemaDocument, p, value, GetAnyOfString(), document);
+            AssignIfExist(oneOf_, *schemaDocument, p, value, GetOneOfString(), document);
+        }
 
         if (const ValueType* v = GetMember(value, GetNotString())) {
             schemaDocument->CreateSchema(&not_, p.Append(GetNotString(), allocator_), *v, document);
@@ -578,7 +575,9 @@ public:
     }
 
     ~Schema() {
-        allocator_->Free(enum_);
+        if (allocator_) {
+            allocator_->Free(enum_);
+        }
         if (properties_) {
             for (SizeType i = 0; i < propertyCount_; i++)
                 properties_[i].~Property();
@@ -1339,7 +1338,7 @@ public:
         \param remoteProvider An optional remote schema document provider for resolving remote reference. Can be null.
         \param allocator An optional allocator instance for allocating memory. Can be null.
     */
-    GenericSchemaDocument(const ValueType& document, IRemoteSchemaDocumentProviderType* remoteProvider = 0, Allocator* allocator = 0) RAPIDJSON_NOEXCEPT : 
+    explicit GenericSchemaDocument(const ValueType& document, IRemoteSchemaDocumentProviderType* remoteProvider = 0, Allocator* allocator = 0) :
         remoteProvider_(remoteProvider),
         allocator_(allocator),
         ownAllocator_(),
@@ -2002,17 +2001,6 @@ private:
 };
 
 RAPIDJSON_NAMESPACE_END
-
-#if defined(__GNUC__)
 RAPIDJSON_DIAG_POP
-#endif
-
-#ifdef __clang__
-RAPIDJSON_DIAG_POP
-#endif
-
-#ifdef _MSC_VER
-RAPIDJSON_DIAG_POP
-#endif
 
 #endif // RAPIDJSON_SCHEMA_H_

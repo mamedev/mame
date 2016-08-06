@@ -148,7 +148,7 @@ static const char *vectrex_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-bool vectrex_cart_slot_device::call_load()
+image_init_result vectrex_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -158,7 +158,7 @@ bool vectrex_cart_slot_device::call_load()
 		if (size > 0x10000)
 		{
 			seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		m_cart->rom_alloc((size < 0x1000) ? 0x1000 : size, tag());
@@ -173,7 +173,7 @@ bool vectrex_cart_slot_device::call_load()
 		if (memcmp(ROM, "g GCE", 5))
 		{
 			seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid image");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		// determine type
@@ -195,10 +195,10 @@ bool vectrex_cart_slot_device::call_load()
 		if (!memcmp(ROM + 0x11, "3D MINE STORM", 13))
 			m_vec3d = VEC3D_MINEST;
 
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

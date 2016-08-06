@@ -475,9 +475,9 @@ void debugview_info::update()
 
 	// if we hid the scrollbars, make sure we reset the top/left corners
 	if (topleft.y + visiblesize.y > totalsize.y)
-		topleft.y = MAX(totalsize.y - visiblesize.y, 0);
+		topleft.y = std::max(totalsize.y - visiblesize.y, 0);
 	if (topleft.x + visiblesize.x > totalsize.x)
-		topleft.x = MAX(totalsize.x - visiblesize.x, 0);
+		topleft.x = std::max(totalsize.x - visiblesize.x, 0);
 
 	// fill out the scroll info struct for the vertical scrollbar
 	scrollinfo.cbSize = sizeof(scrollinfo);

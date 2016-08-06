@@ -66,7 +66,7 @@ ADDRESS_MAP_END
 static MACHINE_CONFIG_START( os214, os214_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83002, XTAL_16MHz) /* X1 xtal value is correct,
-                                                       but there can be some clock divider perhaps ? */
+	                                                   but there can be some clock divider perhaps ? */
 	MCFG_CPU_PROGRAM_MAP(os214_prg_map)
 	MCFG_CPU_IO_MAP(os214_io_map)
 MACHINE_CONFIG_END

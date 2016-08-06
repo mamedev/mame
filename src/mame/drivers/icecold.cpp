@@ -310,10 +310,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(icecold_state::icecold_motors_timer)
 			m_ball_gate_sw = 0;
 
 		// motors are keep in range 0-100
-		m_lmotor = MIN(m_lmotor, 100);
-		m_lmotor = MAX(m_lmotor, 0);
-		m_rmotor = MIN(m_rmotor, 100);
-		m_rmotor = MAX(m_rmotor, 0);
+		m_lmotor = std::min(m_lmotor, 100);
+		m_lmotor = std::max(m_lmotor, 0);
+		m_rmotor = std::min(m_rmotor, 100);
+		m_rmotor = std::max(m_rmotor, 0);
 
 		if (lmotor_dir != 0 || rmotor_dir != 0)
 		{

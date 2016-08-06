@@ -103,13 +103,16 @@ void ddDrawCircle(const void* _normal, const void* _center, float _radius, float
 void ddDrawCircle(Axis::Enum _axis, float _x, float _y, float _z, float _radius, float _weight = 0.0f);
 
 ///
-void ddDrawCone(const void* _from, const void* _to, float _radius, float _weight = 0.0f);
+void ddDrawCone(const void* _from, const void* _to, float _radius);
 
 ///
-void ddDrawCylinder(const void* _from, const void* _to, float _radius, float _weight = 0.0f);
+void ddDrawCylinder(const void* _from, const void* _to, float _radius, bool _capsule = false);
 
 ///
-void ddDrawAxis(float _x, float _y, float _z, float _len = 1.0f, Axis::Enum _highlight = Axis::Count);
+void ddDrawCapsule(const void* _from, const void* _to, float _radius);
+
+///
+void ddDrawAxis(float _x, float _y, float _z, float _len = 1.0f, Axis::Enum _highlight = Axis::Count, float _thickness = 0.0f);
 
 ///
 void ddDrawGrid(const void* _normal, const void* _center, uint32_t _size = 20, float _step = 1.0f);

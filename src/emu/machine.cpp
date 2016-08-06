@@ -496,7 +496,7 @@ std::string running_machine::get_statename(const char *option) const
 			int end;
 
 			if ((end1 != -1) && (end2 != -1))
-				end = MIN(end1, end2);
+				end = std::min(end1, end2);
 			else if (end1 != -1)
 				end = end1;
 			else if (end2 != -1)

@@ -463,12 +463,12 @@ int core_text_file::getc()
 
 		case text_file_type::UTF32BE:
 			if (read(&uchar, sizeof(uchar)) == sizeof(uchar))
-				uchar = BIG_ENDIANIZE_INT32(uchar);
+				uchar = big_endianize_int32(uchar);
 			break;
 
 		case text_file_type::UTF32LE:
 			if (read(&uchar, sizeof(uchar)) == sizeof(uchar))
-				uchar = LITTLE_ENDIANIZE_INT32(uchar);
+				uchar = little_endianize_int32(uchar);
 			break;
 		}
 
@@ -1266,11 +1266,11 @@ core_file::core_file()
     FILENAME UTILITIES
 ***************************************************************************/
 
-/*-------------------------------------------------
-    core_filename_extract_base - extract the base
-    name from a filename; note that this makes
-    assumptions about path separators
--------------------------------------------------*/
+// -------------------------------------------------
+// core_filename_extract_base - extract the base
+// name from a filename; note that this makes
+// assumptions about path separators
+// -------------------------------------------------
 
 std::string core_filename_extract_base(const std::string &name, bool strip_extension)
 {
@@ -1290,10 +1290,24 @@ std::string core_filename_extract_base(const std::string &name, bool strip_exten
 }
 
 
-/*-------------------------------------------------
-    core_filename_ends_with - does the given
-    filename end with the specified extension?
--------------------------------------------------*/
+// -------------------------------------------------
+// core_filename_extract_extension
+// -------------------------------------------------
+
+std::string core_filename_extract_extension(const std::string &filename, bool strip_period)
+{
+	auto loc = filename.find_last_of('.');
+	std::string result = loc != std::string::npos
+		? filename.substr(loc + (strip_period ? 1 : 0))
+		: "";
+	return result;
+}
+
+
+// -------------------------------------------------
+// core_filename_ends_with - does the given
+// filename end with the specified extension?
+// -------------------------------------------------
 
 bool core_filename_ends_with(const std::string &filename, const std::string &extension)
 {

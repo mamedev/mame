@@ -57,7 +57,7 @@ public:
 		, m_uart(*this, "uart")
 	{ }
 
-	WRITE_LINE_MEMBER(clock_w);
+	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
 private:
 	virtual void machine_reset() override;
@@ -96,7 +96,7 @@ void konin_state::machine_reset()
 {
 }
 
-DECLARE_WRITE_LINE_MEMBER( konin_state::clock_w )
+WRITE_LINE_MEMBER( konin_state::clock_w )
 {
 	m_uart->write_txc(state);
 	m_uart->write_rxc(state);

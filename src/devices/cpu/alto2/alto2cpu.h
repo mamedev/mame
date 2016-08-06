@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "debugger.h"
+#include "sound/speaker.h"
 #include "machine/diablo_hd.h"
 
 /**
@@ -48,11 +49,7 @@ enum {
 #define ALTO2_CRAM_CONFIG       2           //!< use default CROM/CRAM configuration 2
 #endif
 
-#define ALTO2_FAKE_STATUS_H     12          //!< number of extra scanlines to display some status info
-
 #define USE_PRIO_F9318          0           //!< define to 1 to use the F9318 priority encoder code (broken)
-#define USE_BITCLK_TIMER        0           //!< define to 1 to use a very high rate timer for the disk bit clock
-#define USE_HAMMING_CHECK       1           //!< define to 1 to use the Hamming code and Parity check in a2mem
 
 #define ALTO2_TASKS             16          //!< 16 task slots
 #define ALTO2_REGS              32          //!< 32 16-bit words in the R register file
@@ -191,6 +188,9 @@ public:
 	//! driver interface to set diablo_hd_device
 	void set_diablo(int unit, diablo_hd_device* ptr);
 
+	//! driver interface to set a speaker sound device
+	void set_speaker(speaker_sound_device* speaker);
+
 	//! call in for the next sector callback
 	void next_sector(int unit);
 
@@ -275,6 +275,8 @@ private:
 	DECLARE_WRITE16_MEMBER( ioram_w );
 
 	int m_icount;
+
+	speaker_sound_device* m_speaker;
 
 	typedef void (alto2_cpu_device::*a2func)();
 
@@ -546,6 +548,15 @@ private:
 	UINT16 m_mpc;                                   //!< micro program counter
 	UINT32 m_mir;                                   //!< micro instruction register
 
+	inline UINT32 rsel() const { return X_RDBITS(m_mir, 32, DRSEL0, DRSEL4); }
+	inline UINT32 aluf() const { return X_RDBITS(m_mir, 32, DALUF0, DALUF3); }
+	inline UINT32 bs() const { return X_RDBITS(m_mir, 32, DBS0, DBS2); }
+	inline UINT32 f1() const { return X_RDBITS(m_mir, 32, DF1_0, DF1_3); }
+	inline UINT32 f2() const { return X_RDBITS(m_mir, 32, DF2_0, DF2_3); }
+	inline UINT32 loadt() const { return X_BIT(m_mir, 32, DLOADT); }
+	inline UINT32 loadl() const { return X_BIT(m_mir, 32, DLOADL); }
+	inline UINT32 next() const { return X_RDBITS(m_mir, 32, NEXT0, NEXT9); }
+
 	/**
 	 * \brief current micro instruction's register selection
 	 * The emulator F2s ACSOURCE and ACDEST modify this.
@@ -553,13 +564,6 @@ private:
 	 * even when the emulator modifies this.
 	 */
 	UINT8 m_rsel;
-	UINT8 m_d_rsel;                                 //!< decoded RSEL[0-4]
-	UINT8 m_d_aluf;                                 //!< decoded ALUF[0-3] function
-	UINT8 m_d_bs;                                   //!< decoded BS[0-2] bus source
-	UINT8 m_d_f1;                                   //!< decoded F1[0-3] function
-	UINT8 m_d_f2;                                   //!< decoded F2[0-3] function
-	UINT8 m_d_loadt;                                    //!< decoded LOADT flag
-	UINT8 m_d_loadl;                                    //!< decoded LOADL flag
 	UINT16 m_next;                                  //!< current micro instruction's next
 	UINT16 m_next2;                                 //!< next micro instruction's next
 	UINT16 m_r[ALTO2_REGS];                         //!< R register file
@@ -587,10 +591,8 @@ private:
 	int m_dsp_time;                                 //!< display_state_machine() time accu
 	int m_unload_time;                              //!< unload word time accu
 	int m_unload_word;                              //!< unload word number
-#if (USE_BITCLK_TIMER == 0)
 	int m_bitclk_time;                              //!< bitclk call time accu
-	int m_bitclk_index;                             //!< bitclk index (bit number)
-#endif
+	int m_bitclk_index;                             //!< bitclk index (bit number in sector)
 
 	static const char *task_name(int task);         //!< human readable task names
 	static const char *r_name(UINT8 reg);           //!< human readable register names

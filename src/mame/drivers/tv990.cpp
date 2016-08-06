@@ -34,6 +34,7 @@
 #include "machine/ins8250.h"
 #include "machine/8042kbdc.h"
 #include "bus/rs232/rs232.h"
+#include "machine/pc_lpt.h"
 #include "machine/nvram.h"
 #include "sound/beep.h"
 
@@ -41,6 +42,7 @@
 #define UART1_TAG       "ns16450_1"
 #define RS232A_TAG      "rs232a"
 #define RS232B_TAG      "rs232b"
+#define LPT_TAG         "lpt"
 
 class tv990_state : public driver_device
 {
@@ -71,6 +73,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_post_load() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -79,8 +82,9 @@ public:
 	DECLARE_READ8_MEMBER(kbdc_r);
 	DECLARE_WRITE8_MEMBER(kbdc_w);
 
-	WRITE_LINE_MEMBER(uart0_irq);
-	WRITE_LINE_MEMBER(uart1_irq);
+	DECLARE_WRITE_LINE_MEMBER(uart0_irq);
+	DECLARE_WRITE_LINE_MEMBER(uart1_irq);
+	DECLARE_WRITE_LINE_MEMBER(lpt_irq);
 
 	INTERRUPT_GEN_MEMBER(vblank);
 	DECLARE_INPUT_CHANGED_MEMBER(color);
@@ -122,6 +126,11 @@ WRITE_LINE_MEMBER(tv990_state::uart0_irq)
 WRITE_LINE_MEMBER(tv990_state::uart1_irq)
 {
 	m_maincpu->set_input_line(M68K_IRQ_4, state);
+}
+
+WRITE_LINE_MEMBER(tv990_state::lpt_irq)
+{
+	m_maincpu->set_input_line(M68K_IRQ_3, state);
 }
 
 READ16_MEMBER(tv990_state::tvi1111_r)
@@ -296,10 +305,11 @@ WRITE8_MEMBER(tv990_state::kbdc_w)
 static ADDRESS_MAP_START(tv990_mem, AS_PROGRAM, 16, tv990_state)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x060000, 0x06ffff) AM_RAM AM_SHARE("vram") // character/attribute RAM
-	AM_RANGE(0X080000, 0X087fff) AM_RAM AM_SHARE("fontram") // font RAM
+	AM_RANGE(0x080000, 0x087fff) AM_RAM AM_SHARE("fontram") // font RAM
 	AM_RANGE(0x090000, 0x0900ff) AM_READWRITE(tvi1111_r, tvi1111_w)
 	AM_RANGE(0x0a0000, 0x0a000f) AM_DEVREADWRITE8(UART0_TAG, ns16450_device, ins8250_r, ins8250_w, 0x00ff)
 	AM_RANGE(0x0a0010, 0x0a001f) AM_DEVREADWRITE8(UART1_TAG, ns16450_device, ins8250_r, ins8250_w, 0x00ff)
+	AM_RANGE(0x0a0028, 0x0a002d) AM_DEVREADWRITE8(LPT_TAG, pc_lpt_device, read, write, 0x00ff)
 	AM_RANGE(0x0b0000, 0x0b0003) AM_READWRITE8(kbdc_r, kbdc_w, 0x00ff)
 	AM_RANGE(0x0c0000, 0x0c7fff) AM_RAM AM_SHARE("nvram")// work RAM
 ADDRESS_MAP_END
@@ -346,6 +356,11 @@ void tv990_state::machine_reset()
 	m_height = 50;
 }
 
+void tv990_state::device_post_load()
+{
+	m_screen->set_visible_area(0, m_width * 16 - 1, 0, m_height * m_rowh - 1);
+}
+
 static MACHINE_CONFIG_START( tv990, tv990_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14967500)   // verified (59.86992/4)
@@ -370,6 +385,9 @@ static MACHINE_CONFIG_START( tv990, tv990_state )
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_rts))
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_INT_CB(WRITELINE(tv990_state, uart1_irq))
+
+	MCFG_DEVICE_ADD(LPT_TAG, PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(tv990_state, lpt_irq))
 
 	MCFG_RS232_PORT_ADD(RS232A_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(UART0_TAG, ns16450_device, rx_w))
@@ -406,5 +424,5 @@ ROM_START( tv995 )
 ROM_END
 
 /* Driver */
-COMP( 1992, tv990, 0, 0, tv990, tv990, driver_device, 0, "TeleVideo", "TeleVideo 990", 0)
-COMP( 1994, tv995, 0, 0, tv990, tv990, driver_device, 0, "TeleVideo", "TeleVideo 995-65", 0)
+COMP( 1992, tv990, 0, 0, tv990, tv990, driver_device, 0, "TeleVideo", "TeleVideo 990", MACHINE_SUPPORTS_SAVE)
+COMP( 1994, tv995, 0, 0, tv990, tv990, driver_device, 0, "TeleVideo", "TeleVideo 995-65", MACHINE_SUPPORTS_SAVE)

@@ -613,14 +613,14 @@ static void gfxset_handler(mame_ui_manager &mui, render_container &container, ui
 	info.columns[set] = xcells;
 
 	// worst case, we need a pixel scale of 1
-	pixelscale = MAX(1, pixelscale);
+	pixelscale = std::max(1, pixelscale);
 
 	// in the Y direction, we just display as many as we can
 	ycells = cellboxheight / (pixelscale * cellypix);
 
 	// now determine the actual cellbox size
-	cellboxwidth = MIN(cellboxwidth, xcells * pixelscale * cellxpix);
-	cellboxheight = MIN(cellboxheight, ycells * pixelscale * cellypix);
+	cellboxwidth = std::min(cellboxwidth, xcells * pixelscale * cellxpix);
+	cellboxheight = std::min(cellboxheight, ycells * pixelscale * cellypix);
 
 	// compute the size of a single cell at this pixel scale factor, as well as the aspect ratio
 	cellwidth = (cellboxwidth / (float)xcells) / (float)targwidth;
@@ -998,12 +998,12 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 	{
 		for (maxxscale = 1; mapwidth * (maxxscale + 1) < mapboxwidth; maxxscale++) { }
 		for (maxyscale = 1; mapheight * (maxyscale + 1) < mapboxheight; maxyscale++) { }
-		pixelscale = MIN(maxxscale, maxyscale);
+		pixelscale = std::min(maxxscale, maxyscale);
 	}
 
 	// recompute the final box size
-	mapboxwidth = MIN(mapboxwidth, mapwidth * pixelscale);
-	mapboxheight = MIN(mapboxheight, mapheight * pixelscale);
+	mapboxwidth = std::min(mapboxwidth, int(mapwidth * pixelscale));
+	mapboxheight = std::min(mapboxheight, int(mapheight * pixelscale));
 
 	// recompute the bounds, centered within the existing bounds
 	mapboxbounds.x0 += 0.5f * ((mapboxbounds.x1 - mapboxbounds.x0) - (float)mapboxwidth / (float)targwidth);

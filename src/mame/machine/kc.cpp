@@ -38,7 +38,7 @@ QUICKLOAD_LOAD_MEMBER( kc_state,kc)
 	UINT64 size = image.length();
 
 	if (size == 0)
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 
 	dynamic_buffer data(size);
 	image.fread( &data[0], size);
@@ -67,7 +67,7 @@ QUICKLOAD_LOAD_MEMBER( kc_state,kc)
 
 	logerror("Snapshot loaded at: 0x%04x-0x%04x, execution address: 0x%04x\n", addr, addr + datasize - 1, execution_address);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

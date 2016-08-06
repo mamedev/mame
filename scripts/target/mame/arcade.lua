@@ -431,6 +431,7 @@ MACHINES["LDPR8210"] = true
 MACHINES["LDSTUB"] = true
 MACHINES["LDV1000"] = true
 MACHINES["LDP1000"] = true
+MACHINES["LDP1450"] = true
 MACHINES["LDVP931"] = true
 --MACHINES["LH5810"] = true
 MACHINES["LINFLASH"] = true
@@ -750,8 +751,8 @@ function linkProjects_mame_arcade(_target, _subtarget)
 		"sony",
 		"stern",
 		"subsino",
-		"sun",
 		"suna",
+		"sunelect",
 		"sure",
 		"taito",
 		"tatsumi",
@@ -3240,7 +3241,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/cabal.cpp",
 	MAME_DIR .. "src/mame/includes/cabal.h",
 	MAME_DIR .. "src/mame/video/cabal.cpp",
-	MAME_DIR .. "src/mame/drivers/cshooter.cpp",
+	MAME_DIR .. "src/mame/drivers/airraid.cpp",
 	MAME_DIR .. "src/mame/drivers/dcon.cpp",
 	MAME_DIR .. "src/mame/includes/dcon.h",
 	MAME_DIR .. "src/mame/video/dcon.cpp",
@@ -3430,7 +3431,22 @@ files {
 	MAME_DIR .. "src/mame/machine/subsino.h",
 }
 
-createMAMEProjects(_target, _subtarget, "sun")
+createMAMEProjects(_target, _subtarget, "suna")
+files {
+	MAME_DIR .. "src/mame/drivers/go2000.cpp",
+	MAME_DIR .. "src/mame/drivers/goindol.cpp",
+	MAME_DIR .. "src/mame/includes/goindol.h",
+	MAME_DIR .. "src/mame/video/goindol.cpp",
+	MAME_DIR .. "src/mame/drivers/suna8.cpp",
+	MAME_DIR .. "src/mame/includes/suna8.h",
+	MAME_DIR .. "src/mame/audio/suna8.cpp",
+	MAME_DIR .. "src/mame/video/suna8.cpp",
+	MAME_DIR .. "src/mame/drivers/suna16.cpp",
+	MAME_DIR .. "src/mame/includes/suna16.h",
+	MAME_DIR .. "src/mame/video/suna16.cpp",
+}
+
+createMAMEProjects(_target, _subtarget, "sunelect")
 files {
 	MAME_DIR .. "src/mame/drivers/arabian.cpp",
 	MAME_DIR .. "src/mame/includes/arabian.h",
@@ -3456,21 +3472,6 @@ files {
 	MAME_DIR .. "src/mame/includes/strnskil.h",
 	MAME_DIR .. "src/mame/video/strnskil.cpp",
 	MAME_DIR .. "src/mame/drivers/tonton.cpp",
-}
-
-createMAMEProjects(_target, _subtarget, "suna")
-files {
-	MAME_DIR .. "src/mame/drivers/go2000.cpp",
-	MAME_DIR .. "src/mame/drivers/goindol.cpp",
-	MAME_DIR .. "src/mame/includes/goindol.h",
-	MAME_DIR .. "src/mame/video/goindol.cpp",
-	MAME_DIR .. "src/mame/drivers/suna8.cpp",
-	MAME_DIR .. "src/mame/includes/suna8.h",
-	MAME_DIR .. "src/mame/audio/suna8.cpp",
-	MAME_DIR .. "src/mame/video/suna8.cpp",
-	MAME_DIR .. "src/mame/drivers/suna16.cpp",
-	MAME_DIR .. "src/mame/includes/suna16.h",
-	MAME_DIR .. "src/mame/video/suna16.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "sure")

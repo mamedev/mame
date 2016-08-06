@@ -405,20 +405,20 @@ WRITE8_MEMBER(ws_rom_eeprom_device::write_io)
 	switch (offset)
 	{
 		case 0x06:  /* EEPROM address lower bits port/EEPROM address and command port
-                     1KBit EEPROM:
-                     Bit 0-5 - EEPROM address bit 1-6
-                     Bit 6-7 - Command
-                     00 - Extended command address bit 4-5:
-                     00 - Write disable
-                     01 - Write all
-                     10 - Erase all
-                     11 - Write enable
-                     01 - Write
-                     10 - Read
-                     11 - Erase
-                     16KBit EEPROM:
-                     Bit 0-7 - EEPROM address bit 1-8
-                     */
+		             1KBit EEPROM:
+		             Bit 0-5 - EEPROM address bit 1-6
+		             Bit 6-7 - Command
+		             00 - Extended command address bit 4-5:
+		             00 - Write disable
+		             01 - Write all
+		             10 - Erase all
+		             11 - Write enable
+		             01 - Write
+		             10 - Read
+		             11 - Erase
+		             16KBit EEPROM:
+		             Bit 0-7 - EEPROM address bit 1-8
+		             */
 			switch (m_eeprom_mode)
 			{
 				case EEPROM_1K:
@@ -440,23 +440,23 @@ WRITE8_MEMBER(ws_rom_eeprom_device::write_io)
 			break;
 
 		case 0x07:  /* EEPROM higher bits/command bits port
-                     1KBit EEPROM:
-                     Bit 0   - Start
-                     Bit 1-7 - Unknown
-                     16KBit EEPROM:
-                     Bit 0-1 - EEPROM address bit 9-10
-                     Bit 2-3 - Command
-                     00 - Extended command address bit 0-1:
-                     00 - Write disable
-                     01 - Write all
-                     10 - Erase all
-                     11 - Write enable
-                     01 - Write
-                     10 - Read
-                     11 - Erase
-                     Bit 4   - Start
-                     Bit 5-7 - Unknown
-                     */
+		             1KBit EEPROM:
+		             Bit 0   - Start
+		             Bit 1-7 - Unknown
+		             16KBit EEPROM:
+		             Bit 0-1 - EEPROM address bit 9-10
+		             Bit 2-3 - Command
+		             00 - Extended command address bit 0-1:
+		             00 - Write disable
+		             01 - Write all
+		             10 - Erase all
+		             11 - Write enable
+		             01 - Write
+		             10 - Read
+		             11 - Erase
+		             Bit 4   - Start
+		             Bit 5-7 - Unknown
+		             */
 			switch (m_eeprom_mode)
 			{
 				case EEPROM_1K:
@@ -486,14 +486,14 @@ WRITE8_MEMBER(ws_rom_eeprom_device::write_io)
 			break;
 
 		case 0x08:  /* EEPROM command
-                     Bit 0   - Read complete (read only)
-                     Bit 1   - Write complete (read only)
-                     Bit 2-3 - Unknown
-                     Bit 4   - Read
-                     Bit 5   - Write
-                     Bit 6   - Protect
-                     Bit 7   - Initialize
-                     */
+		             Bit 0   - Read complete (read only)
+		             Bit 1   - Write complete (read only)
+		             Bit 2-3 - Unknown
+		             Bit 4   - Read
+		             Bit 5   - Write
+		             Bit 6   - Protect
+		             Bit 7   - Initialize
+		             */
 			if (data & 0x80)    // Initialize
 				logerror("Unsupported EEPROM command 'Initialize'\n");
 
