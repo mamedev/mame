@@ -65,7 +65,7 @@ mempool::~mempool()
 	{
 		if (b.m_num_alloc != 0)
 		{
-			fprintf(stderr, "Found block with %d dangling allocations\n", (int) b.m_num_alloc);
+			fprintf(stderr, "Found block with %d dangling allocations\n", static_cast<int>(b.m_num_alloc));
 		}
 		delete b.data;
 	}

@@ -28,6 +28,7 @@ CC = g++-5
 LD = @g++-5
 MD = @mkdir
 RM = @rm
+DOXYGEN = @doxygen
 
 TARGETS = nltool nlwav
 
@@ -160,13 +161,16 @@ depend: .depend
 # Special targets
 #-------------------------------------------------
 
-.PHONY: clang
+.PHONY: clang doc
 clang: 
 	$(MAKE) CC=clang++ LD=clang++ CEXTRAFLAGS="-Weverything -Werror -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-cast-align -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-exit-time-destructors -Wno-format-nonliteral -Wno-weak-template-vtables"
 
 # 
 # FIX:  -Wno-weak-vtables -Wno-missing-variable-declarations -Wno-conversion -Wno-exit-time-destructors 
 # 
+
+doc:
+	$(DOXYGEN) doxygen.conf
 
 #-------------------------------------------------
 # generic rules
