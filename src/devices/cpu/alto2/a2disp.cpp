@@ -10,10 +10,10 @@
 
 /**
  * @brief PROM a38 contains the STOPWAKE' and MBEMBPTY' signals for the FIFO
- * <PRE>
  * The inputs to a38 are the UNLOAD counter RA[0-3] and the DDR<- counter
  * WA[0-3], and the designer decided to reverse the address lines :-)
  *
+ * <PRE>
  *  a38  counter
  *  -------------
  *   A0  RA[0]
@@ -50,10 +50,10 @@ static const prom_load_t pl_displ_a38 =
 };
 
 //! PROM a38 bit O1 is STOPWAKE' (stop DWT if bit is zero)
-#define FIFO_STOPWAKE(a38) (0 == (a38 & disp_a38_STOPWAKE) ? true : false)
+#define FIFO_STOPWAKE(a38) ((a38 & disp_a38_STOPWAKE) ? false : true)
 
 //! PROM a38 bit O3 is MBEMPTY' (FIFO is empty if bit is zero)
-#define FIFO_MBEMPTY(a38) (0 == (a38 & disp_a38_MBEMPTY) ? true : false)
+#define FIFO_MBEMPTY(a38) ((a38 & disp_a38_MBEMPTY) ? false : true)
 
 /**
  * @brief emulation of PROM a63 in the display schematics page 8
@@ -224,17 +224,17 @@ static const UINT16 double_bits[256] = {
 	0xffc0,0xffc3,0xffcc,0xffcf,0xfff0,0xfff3,0xfffc,0xffff
 };
 
-#define HLC1    ((m_dsp.hlc >>  0) & 1)     //!< horizontal line counter bit 0 (mid of the scanline)
-#define HLC2    ((m_dsp.hlc >>  1) & 1)     //!< horizontal line counter bit 1
-#define HLC4    ((m_dsp.hlc >>  2) & 1)     //!< horizontal line counter bit 2
-#define HLC8    ((m_dsp.hlc >>  3) & 1)     //!< horizontal line counter bit 3
-#define HLC16   ((m_dsp.hlc >>  4) & 1)     //!< horizontal line counter bit 4
-#define HLC32   ((m_dsp.hlc >>  5) & 1)     //!< horizontal line counter bit 5
-#define HLC64   ((m_dsp.hlc >>  6) & 1)     //!< horizontal line counter bit 6
-#define HLC128  ((m_dsp.hlc >>  7) & 1)     //!< horizontal line counter bit 7
-#define HLC256  ((m_dsp.hlc >>  8) & 1)     //!< horizontal line counter bit 8
-#define HLC512  ((m_dsp.hlc >>  9) & 1)     //!< horizontal line counter bit 9
-#define HLC1024 ((m_dsp.hlc >> 10) & 1)     //!< horizontal line counter bit 10 (odd/even field)
+#define HLC1    X_BIT(m_dsp.hlc,16,15)    //!< horizontal line counter bit 0 (mid of the scanline)
+#define HLC2    X_BIT(m_dsp.hlc,16,14)    //!< horizontal line counter bit 1
+#define HLC4    X_BIT(m_dsp.hlc,16,13)    //!< horizontal line counter bit 2
+#define HLC8    X_BIT(m_dsp.hlc,16,12)    //!< horizontal line counter bit 3
+#define HLC16   X_BIT(m_dsp.hlc,16,11)    //!< horizontal line counter bit 4
+#define HLC32   X_BIT(m_dsp.hlc,16,10)    //!< horizontal line counter bit 5
+#define HLC64   X_BIT(m_dsp.hlc,16, 9)    //!< horizontal line counter bit 6
+#define HLC128  X_BIT(m_dsp.hlc,16, 8)    //!< horizontal line counter bit 7
+#define HLC256  X_BIT(m_dsp.hlc,16, 7)    //!< horizontal line counter bit 8
+#define HLC512  X_BIT(m_dsp.hlc,16, 6)    //!< horizontal line counter bit 9
+#define HLC1024 X_BIT(m_dsp.hlc,16, 5)    //!< horizontal line counter bit 10 (odd/even field
 
 #define GET_SETMODE_SPEEDY(mode) X_RDBITS(mode,16,0,0)  //!< get the pixel clock speed from a SETMODE<- bus value
 #define GET_SETMODE_INVERSE(mode) X_RDBITS(mode,16,1,1) //!< get the inverse video flag from a SETMODE<- bus value
@@ -287,12 +287,12 @@ void alto2_cpu_device::unload_word()
 
 	if (m_dsp.halfclock)
 	{
-		UINT16 word1 = double_bits[word / 256];
-		UINT16 word2 = double_bits[word % 256];
+		const UINT16 word1 = double_bits[word / 256];
 		update_framebuf_word(framebuf, x, y, word1);
 		x++;
 		if (x < ALTO2_DISPLAY_VISIBLE_WORDS)
 		{
+			const UINT16 word2 = double_bits[word % 256];
 			update_framebuf_word(framebuf, x, y, word2);
 			x++;
 		}
@@ -329,7 +329,7 @@ void alto2_cpu_device::display_state_machine()
 	{
 		// count horizontal line counters and wrap
 		m_dsp.hlc += 1;
-		if (m_dsp.hlc == ALTO2_DISPLAY_HLC_END)
+		if (m_dsp.hlc > ALTO2_DISPLAY_HLC_END)
 			m_dsp.hlc = ALTO2_DISPLAY_HLC_START;
 		// wake up the memory refresh task _twice_ on each scanline
 		m_task_wakeup |= 1 << task_mrt;

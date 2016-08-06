@@ -2,13 +2,13 @@
 // copyright-holders:Juergen Buchmueller
 /*****************************************************************************
  *
- *   Xerox AltoII display block
+ *   Xerox AltoII display emulation
  *
  *****************************************************************************/
 #ifdef  ALTO2_DEFINE_CONSTANTS
 
 /**
- * @brief start value for the horizontal line counter
+ * @brief Start value for the horizontal line counter.
  *
  * This value is loaded into the three 4 bit counters (type 9316)
  * with numbers 65, 67, and 75.
@@ -21,12 +21,14 @@
 #define ALTO2_DISPLAY_HLC_START (2+4+16+128)
 
 /**
- * @brief end value for the horizontal line counter
+ * @brief End value for the horizontal line counter.
  *
  * This is decoded by H30, an 8 input NAND gate.
  * The value is 1899; horz. line count range 150...1899 = 1750.
+ * So there are 1750 / 2 = 875 total scanlines.
  *
- * There are 1750 / 2 = 875 total scanlines.
+ * Note: The horizontal line counts 150 ... 1023 for the even field,
+ * and 1024 ... 1899 for the odd field.
  */
 #define ALTO2_DISPLAY_HLC_END (1+2+8+32+64+256+512+1024)
 
@@ -37,7 +39,7 @@
  * scanlines to the monitor. The frame rate is 60Hz, which is actually the rate
  * of the half-frames. The rate for full frames is thus 30Hz.
  */
-#define ALTO2_DISPLAY_TOTAL_HEIGHT ((ALTO2_DISPLAY_HLC_END + 1 - ALTO2_DISPLAY_HLC_START) / 2)
+#define ALTO2_DISPLAY_TOTAL_HEIGHT ((ALTO2_DISPLAY_HLC_END - ALTO2_DISPLAY_HLC_START) / 2)
 
 /**
  * @brief display total width, including horizontal blanking
@@ -68,18 +70,37 @@
  */
 #define ALTO2_DISPLAY_TOTAL_WIDTH 768
 
+//! The display fifo has 16 words.
+#define ALTO2_DISPLAY_FIFO 16
 
-#define ALTO2_DISPLAY_FIFO 16                                                       //!< the display fifo has 16 words
-#define ALTO2_DISPLAY_SCANLINE_WORDS (ALTO2_DISPLAY_TOTAL_WIDTH/16)                 //!< words per scanline
-#define ALTO2_DISPLAY_HEIGHT 808                                                    //!< number of visible scanlines per frame; 808 really, but there are some empty lines?
-#define ALTO2_DISPLAY_WIDTH 606                                                     //!< visible width of the display; 38 x 16 bit words - 2 pixels
-#define ALTO2_DISPLAY_VISIBLE_WORDS ((ALTO2_DISPLAY_WIDTH+15)/16)                   //!< visible words per scanline
-#define ALTO2_DISPLAY_BITCLOCK 20160000ll                                           //!< display bit clock in Hertz (20.16MHz)
-#define ALTO2_DISPLAY_BITTIME(n) (U64(1000000000000)*(n)/ALTO2_DISPLAY_BITCLOCK)    //!< display bit time in pico seconds (~= 49.6031ns)
-#define ALTO2_DISPLAY_SCANLINE_TIME ALTO2_DISPLAY_BITTIME(ALTO2_DISPLAY_TOTAL_WIDTH)//!< time for a scanline in pico seconds (768 * 49.6031ns ~= 38095.1808ns)
-#define ALTO2_DISPLAY_VISIBLE_TIME ALTO2_DISPLAY_BITTIME(ALTO2_DISPLAY_WIDTH)       //!< time of the visible part of a scanline in pico seconds (606 * 49.6031ns ~= 30059.4786ns)
-#define ALTO2_DISPLAY_WORD_TIME ALTO2_DISPLAY_BITTIME(16)                           //!< time for a word in pico seconds (16 pixels * 49.6031ns ~= 793.6496ns)
-#define ALTO2_DISPLAY_VBLANK_TIME ((ALTO2_DISPLAY_TOTAL_HEIGHT-ALTO2_DISPLAY_HEIGHT)*HZ_TO_ATTOSECONDS(26250)/2)
+//! Words per scanline.
+#define ALTO2_DISPLAY_SCANLINE_WORDS (ALTO2_DISPLAY_TOTAL_WIDTH/16)
+
+//! Number of visible scanlines per frame; 808 really, but there are some empty lines?
+#define ALTO2_DISPLAY_HEIGHT 808
+
+//! Visible width of the display; 38 x 16 bit words - 2 pixels.
+#define ALTO2_DISPLAY_WIDTH 606
+
+//! Visible words per scanline.
+#define ALTO2_DISPLAY_VISIBLE_WORDS ((ALTO2_DISPLAY_WIDTH+15)/16)
+
+//! Display bit clock in Hertz (20.16MHz).
+#define ALTO2_DISPLAY_BITCLOCK 20160000ll
+
+//! Display bit time in pico seconds (~= 49.6031ns).
+#define ALTO2_DISPLAY_BITTIME(n) (U64(1000000000000)*(n)/ALTO2_DISPLAY_BITCLOCK)
+
+//! Time for a scanline in pico seconds (768 * 49.6031ns ~= 38095.1808ns).
+#define ALTO2_DISPLAY_SCANLINE_TIME ALTO2_DISPLAY_BITTIME(ALTO2_DISPLAY_TOTAL_WIDTH)
+
+//!< Time of the visible part of a scanline in pico seconds (606 * 49.6031ns ~= 30059.4786ns).
+#define ALTO2_DISPLAY_VISIBLE_TIME ALTO2_DISPLAY_BITTIME(ALTO2_DISPLAY_WIDTH)
+
+//!< Time for a word in pico seconds (16 pixels * 49.6031ns ~= 793.6496ns).
+#define ALTO2_DISPLAY_WORD_TIME ALTO2_DISPLAY_BITTIME(16)
+
+#define ALTO2_DISPLAY_VBLANK_TIME ((ALTO2_DISPLAY_TOTAL_HEIGHT-ALTO2_DISPLAY_HEIGHT)*HZ_TO_ATTOSECONDS(26250))
 
 #else   // ALTO2_DEFINE_CONSTANTS
 /**
@@ -172,26 +193,26 @@
 #ifndef _A2DISP_H_
 #define _A2DISP_H_
 struct {
-	UINT16 state;                           //!< current state of the display_state_machine()
-	UINT16 hlc;                             //!< horizontal line counter
-	UINT16 setmode;                         //!< value written by last SETMODE<-
-	UINT16 inverse;                         //!< set to 0xffff if line is inverse, 0x0000 otherwise
-	bool halfclock;                         //!< set 0 for normal pixel clock, 1 for half pixel clock
+	UINT32 state;                           //!< current state of the display_state_machine()
+	UINT32 hlc;                             //!< horizontal line counter
+	UINT32 setmode;                         //!< value written by last SETMODE<-
+	UINT32 inverse;                         //!< set to 0xffff if line is inverse, 0x0000 otherwise
+	bool halfclock;                         //!< false for normal pixel clock, true for half pixel clock
 	UINT16 fifo[ALTO2_DISPLAY_FIFO];        //!< display word fifo
-	UINT8 wa;                               //!< fifo input pointer (write address; 4-bit)
-	UINT8 ra;                               //!< fifo output pointer (read address; 4-bit)
-	UINT8 a63;                              //!< most recent value read from the PROM a63
-	UINT8 a66;                              //!< most recent value read from the PROM a66
-	bool dht_blocks;                        //!< set non-zero, if the DHT executed BLOCK
-	bool dwt_blocks;                        //!< set non-zero, if the DWT executed BLOCK
-	bool curt_blocks;                       //!< set non-zero, if the CURT executed BLOCK
-	bool curt_wakeup;                       //!< set non-zero, if CURT wakeups are generated
-	UINT16 vblank;                          //!< most recent HLC with VBLANK still high (11-bit)
-	UINT16 xpreg;                           //!< cursor cursor x position register (10-bit)
-	UINT16 csr;                             //!< cursor shift register (16-bit)
+	UINT32 wa;                              //!< fifo input pointer (write address; 4-bit)
+	UINT32 ra;                              //!< fifo output pointer (read address; 4-bit)
+	UINT32 a63;                             //!< most recent value read from the PROM a63
+	UINT32 a66;                             //!< most recent value read from the PROM a66
+	bool dht_blocks;                        //!< set true, if the DHT executed BLOCK
+	bool dwt_blocks;                        //!< set true, if the DWT executed BLOCK
+	bool curt_blocks;                       //!< set true, if the CURT executed BLOCK
+	bool curt_wakeup;                       //!< set true, if CURT wakeups are generated
+	UINT32 vblank;                          //!< most recent HLC with VBLANK still high (11-bit)
+	UINT32 xpreg;                           //!< cursor cursor x position register (10-bit)
+	UINT32 csr;                             //!< cursor shift register (16-bit)
 	UINT32 curxpos;                         //!< helper: first cursor word in scanline
-	UINT16 cursor0;                         //!< helper: shifted cursor data for left word
-	UINT16 cursor1;                         //!< helper: shifted cursor data for right word
+	UINT32 cursor0;                         //!< helper: shifted cursor data for left word
+	UINT32 cursor1;                         //!< helper: shifted cursor data for right word
 	std::unique_ptr<UINT16[]> framebuf;     //!< array of words of the raw bitmap that is displayed
 	UINT8 *patterns;                        //!< array of 65536 patterns (16 bytes) with 1 byte per pixel
 	std::unique_ptr<bitmap_ind16> bitmap;   //!< MAME bitmap with 16 bit indices

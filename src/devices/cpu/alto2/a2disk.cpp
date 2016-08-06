@@ -1620,14 +1620,6 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 		kwd_timing(clk, bit, 0);
 	}
 
-#if USE_BITCLK_TIMER
-	/* more bits to clock? */
-	if (++arg < dhd->bits_per_sector()) {
-		m_dsk.bitclk_timer->adjust(dhd->bit_time(), arg);
-	} else {
-		m_dsk.bitclk_timer->reset();
-	}
-#else
 	if (++arg < dhd->bits_per_sector()) {
 		m_bitclk_time += m_dsk.bitclk_time[m_dsk.drive];
 		m_bitclk_index = arg;
@@ -1635,7 +1627,6 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 		// stop the bitclock timer
 		m_bitclk_time = -1;
 	}
-#endif
 }
 
 /**
@@ -1649,16 +1640,11 @@ void alto2_cpu_device::next_sector(int unit)
 	LOG((this,LOG_DISK,0,"%s dhd=%p\n", __FUNCTION__, dhd));
 	// get bit time in pico seconds
 	m_dsk.bitclk_time[unit] = static_cast<int>(dhd->bit_time().as_attoseconds() / 1000000);
-#if USE_BITCLK_TIMER
-	LOG((this,LOG_DISK,0,"   unit #%d stop bitclk\n", unit));
-	m_dsk.bitclk_timer->enable(false);
-#else
 	if (m_bitclk_time >= 0) {
 		LOG((this,LOG_DISK,0,"   unit #%d stop bitclk\n", unit));
 		m_bitclk_time = -1;
 		m_bitclk_index = -1;
 	}
-#endif
 
 	/* KSTAT[0-3] update the current sector in the kstat field */
 	PUT_KSTAT_SECTOR(m_dsk.kstat, dhd->get_sector());
@@ -1669,12 +1655,6 @@ void alto2_cpu_device::next_sector(int unit)
 
 	LOG((this,LOG_DISK,1,"   unit #%d sector %d start\n", unit, GET_KSTAT_SECTOR(m_dsk.kstat)));
 
-#if USE_BITCLK_TIMER
-	// HACK: no command, no bit clock
-	if (debug_read_mem(0521))
-		/* start a timer chain for the bit clock */
-		disk_bitclk(0, 0);
-#else
 	// TODO: verify current sector == requested sector and only then run the bitclk?
 	// HACK: no command, no bit clock
 	if (debug_read_mem(0521))
@@ -1683,7 +1663,6 @@ void alto2_cpu_device::next_sector(int unit)
 		m_bitclk_time = 0;
 		m_bitclk_index = 0;
 	}
-#endif
 }
 
 /**
@@ -1769,10 +1748,6 @@ void alto2_cpu_device::init_disk()
 
 	m_dsk.kcom = 066000;
 
-#if USE_BITCLK_TIMER
-	m_dsk.bitclk_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_bitclk),this));
-#endif
-
 	m_dsk.strobon_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_strobon),this));
 	m_dsk.strobon_timer->reset();
 
@@ -1821,12 +1796,8 @@ void alto2_cpu_device::reset_disk()
 	m_dsk.strobe = 0;
 	m_dsk.strobon_timer->reset();
 	m_dsk.bitclk = 0;
-#if USE_BITCLK_TIMER
-	m_dsk.bitclk_timer->reset();
-#else
 	m_dsk.bitclk_time[0] = static_cast<int>(attotime::from_nsec(300).as_attoseconds() / 1000000);
 	m_dsk.bitclk_time[1] = static_cast<int>(attotime::from_nsec(300).as_attoseconds() / 1000000);
-#endif
 	m_dsk.datin = 0;
 	m_dsk.bitcount = 0;
 	m_dsk.seclate = 0;

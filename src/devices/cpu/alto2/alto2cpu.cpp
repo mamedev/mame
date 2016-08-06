@@ -876,10 +876,8 @@ void alto2_cpu_device::device_start()
 	save_item(NAME(m_dsp_time));
 	save_item(NAME(m_unload_time));
 	save_item(NAME(m_unload_word));
-#if (USE_BITCLK_TIMER == 0)
 	save_item(NAME(m_bitclk_time));
 	save_item(NAME(m_bitclk_index));
-#endif
 	save_item(NAME(m_mouse.x));
 	save_item(NAME(m_mouse.y));
 	save_item(NAME(m_mouse.dx));
@@ -1458,6 +1456,8 @@ void alto2_cpu_device::bs_late_load_r()
 {
 	if (f2() != f2_emu_load_dns) {
 		m_r[m_rsel] = m_shifter;
+		if (m_rsel == 037)
+			m_r[m_rsel] &= ~3;
 		LOG((this,LOG_CPU,2,"    R%02o<-; %s = SHIFTER (%#o)\n", m_rsel, r_name(m_rsel), m_shifter));
 	}
 }
@@ -2279,8 +2279,6 @@ void alto2_cpu_device::execute_run()
 	m_next2 = m_task_next2[m_task];
 
 	do {
-		int do_bs, flags;
-
 		m_mpc = m_next;             // next instruction's micro program counter
 		m_mir = RD_UCODE(m_mpc);    // fetch the micro code
 
@@ -2303,13 +2301,15 @@ void alto2_cpu_device::execute_run()
 		 * or f2 == f2_const. These functions use the MIR BS field to
 		 * provide a part of the address to the constant ROM instead.
 		 */
-		do_bs = !(f1() == f1_const || f2() == f2_const);
+		bool do_bs = f1() != f1_const && f2() != f2_const;
 		if (do_bs && bs() == bs_read_md && check_mem_read_stall()) {
 			LOG((this,LOG_CPU,3, "   <-MD stall\n"));
 			continue;
 		}
+
 		// now read the next instruction field from the MIR and modify it
 		m_next = next() | m_next2;
+
 		// prefetch the next instruction's next field as next2
 		m_next2 = X_RDBITS(RD_UCODE(m_next), 32, NEXT0, NEXT9) | (m_next2 & ~ALTO2_UCODE_PAGE_MASK);
 		LOG((this,LOG_CPU,2,"%s-%04o: %011o r:%02o aluf:%02o bs:%02o f1:%02o f2:%02o t:%o l:%o next:%05o next2:%05o\n",
@@ -2323,9 +2323,9 @@ void alto2_cpu_device::execute_run()
 
 		// The constant memory is gated to the bus by F1 == f1_const, F2 == f2_const, or BS >= 4
 		if (!do_bs || bs() >= bs_task_4) {
-			UINT32 addr = 8 * m_rsel + bs();
+			const UINT32 addr = 8 * m_rsel + bs();
 			// FIXME: is the format of m_const_data endian safe?
-			UINT16 data = m_const_data[2*addr] | (m_const_data[2*addr+1] << 8);
+			const UINT16 data = m_const_data[2*addr] | (m_const_data[2*addr+1] << 8);
 			m_bus &= data;
 			LOG((this,LOG_CPU,2,"    %#o; BUS &= %#o CONST[%03o]\n", m_bus, data, addr));
 		}
@@ -2353,10 +2353,10 @@ void alto2_cpu_device::execute_run()
 		 *
 		 * B1 and B3-B7 are inverted on loading the PROM
 		 */
-		UINT8 a10 = m_alu_a10[(m_emu.skip << 4) | aluf()];
-		UINT32 alu = alu_74181(m_bus, m_t, a10);
+		const UINT8 a10 = m_alu_a10[(m_emu.skip << 4) | aluf()];
+		const UINT32 alu = alu_74181(m_bus, m_t, a10);
+		const int flags = a10 & (TSELECT | ALUM);
 		m_aluc0 = (alu >> 16) & 1;
-		flags = a10 & (TSELECT | ALUM);
 		m_alu = static_cast<UINT16>(alu);
 
 		// WRTRAM must happen now before L is changed
@@ -2426,17 +2426,18 @@ void alto2_cpu_device::execute_run()
 			}
 		}
 
-		/**
-		 * Subtract the microcycle time from the display time accu.
-		 * If it underflows, call the display state machine and add
-		 * the time for 32(!) pixel clocks to the accu.
-		 * This is very close to every seventh CPU cycle (really?)
-		 */
 		if (m_dsp_time >= 0) {
+			/**
+			 * Subtract the microcycle time from the display time accu.
+			 * If it underflows, call the display state machine and add
+			 * the time for 32(!) pixel clocks to the accu.
+			 * This is very close to every seventh CPU cycle
+			 */
 			m_dsp_time -= ALTO2_UCYCLE;
 			if (m_dsp_time < 0)
 				display_state_machine();
 		}
+
 		if (m_unload_time >= 0) {
 			/**
 			 * Subtract the microcycle time from the unload time accu.
@@ -2448,9 +2449,9 @@ void alto2_cpu_device::execute_run()
 			if (m_unload_time < 0)
 				unload_word();
 		}
-#if (USE_BITCLK_TIMER == 0)
+		
 		if (m_bitclk_time >= 0) {
-			/*
+			/**
 			 * Subtract the microcycle time from the bitclk time accu.
 			 * If it underflows, call the disk bitclk function which adds
 			 * the time for one bit as clocks to the accu, or ends
@@ -2459,7 +2460,6 @@ void alto2_cpu_device::execute_run()
 			m_bitclk_time -= ALTO2_UCYCLE;
 			disk_bitclk(nullptr, m_bitclk_index);
 		}
-#endif
 	} while (m_icount-- > 0);
 
 	/* save this task's mpc and address modifier */
@@ -2566,7 +2566,5 @@ void alto2_cpu_device::soft_reset()
 
 	m_dsp_time = 0;                 // reset the display state machine timing accu
 	m_unload_time = 0;              // reset the word unload timing accu
-#if (USE_BITCLK_TIMER == 0)
 	m_bitclk_time = 0;              // reset the bitclk timing accu
-#endif
 }

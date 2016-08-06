@@ -50,7 +50,6 @@ enum {
 #endif
 
 #define USE_PRIO_F9318          0           //!< define to 1 to use the F9318 priority encoder code (broken)
-#define USE_BITCLK_TIMER        0           //!< define to 1 to use a very high rate timer for the disk bit clock
 
 #define ALTO2_TASKS             16          //!< 16 task slots
 #define ALTO2_REGS              32          //!< 32 16-bit words in the R register file
@@ -592,10 +591,8 @@ private:
 	int m_dsp_time;                                 //!< display_state_machine() time accu
 	int m_unload_time;                              //!< unload word time accu
 	int m_unload_word;                              //!< unload word number
-#if (USE_BITCLK_TIMER == 0)
 	int m_bitclk_time;                              //!< bitclk call time accu
-	int m_bitclk_index;                             //!< bitclk index (bit number)
-#endif
+	int m_bitclk_index;                             //!< bitclk index (bit number in sector)
 
 	static const char *task_name(int task);         //!< human readable task names
 	static const char *r_name(UINT8 reg);           //!< human readable register names

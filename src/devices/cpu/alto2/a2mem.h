@@ -31,7 +31,7 @@ struct {
 	UINT32 mar;                         //!< memory address register
 	UINT32 rmdd;                        //!< read memory data double-word
 	UINT32 wmdd;                        //!< write memory data double-word
-	UINT16 md;                          //!< memory data register
+	UINT32 md;                          //!< memory data register
 	UINT64 cycle;                       //!< cycle when the memory address register was loaded
 
 	/**
@@ -44,8 +44,8 @@ struct {
 	int access;
 	bool error;                         //!< non-zero after a memory error was detected
 	UINT32 mear;                        //!< memory error address register
-	UINT16 mesr;                        //!< memory error status register
-	UINT16 mecr;                        //!< memory error control register
+	UINT32 mesr;                        //!< memory error status register
+	UINT32 mecr;                        //!< memory error control register
 }   m_mem;
 
 /**

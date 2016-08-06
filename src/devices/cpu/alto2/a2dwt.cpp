@@ -7,6 +7,37 @@
  *****************************************************************************/
 #include "alto2cpu.h"
 
+/*
+ * Copied from ALTOCODE24.MU
+ *
+ *	;Display Word Task
+ *	
+ *	DWT:	T← DWA;
+ *		T←-3+T+1;
+ *		L← AECL+T,BUS=0,TASK;	AECL CONTAINS NWRDS AT THIS TIME
+ *		AECL←L, :DWTZ;
+ *	
+ *	DWTY:	BLOCK;
+ *		TASK, :DWTF;
+ *	
+ *	DWTZ:	L←HTAB-1, BUS=0,TASK;
+ *		HTAB←L, :DOTAB;
+ *
+ *	DOTAB:	DDR←0, :DWTZ;
+ *	NOTAB:	MAR←T←DWA;
+ *		L←AECL-T-1;
+ *		ALUCY, L←2+T;
+ *		DWA←L, :XNOMORE;
+ *
+ *	DOMORE:	DDR←MD, TASK;
+ *		DDR←MD, :NOTAB;
+ *
+ *	XNOMORE:DDR← MD, BLOCK;
+ *		DDR← MD, TASK;
+ *
+ *	DWTF:	:DWT;
+ */
+
 //! PROM a38 bit O1 is STOPWAKE' (stop DWT if bit is zero)
 #define FIFO_STOPWAKE(a38) (0 == (a38 & disp_a38_STOPWAKE) ? true : false)
 
