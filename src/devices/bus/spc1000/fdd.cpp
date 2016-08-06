@@ -114,7 +114,7 @@ ROM_END
 //  device_rom_region
 //-------------------------------------------------
 
-const rom_entry *spc1000_fdd_exp_device::device_rom_region() const
+const tiny_rom_entry *spc1000_fdd_exp_device::device_rom_region() const
 {
 	return ROM_NAME( spc1000_fdd );
 }

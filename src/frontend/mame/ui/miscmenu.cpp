@@ -838,14 +838,16 @@ void menu_machine_configure::setup_bios()
 	if (m_drv->rom == nullptr)
 		return;
 
+	auto entries = rom_build_entries(m_drv->rom);
+
 	std::string specbios(m_opts.bios());
 	std::string default_name;
-	for (const rom_entry *rom = m_drv->rom; !ROMENTRY_ISEND(rom); ++rom)
+	for (const rom_entry *rom = entries.data(); !ROMENTRY_ISEND(rom); ++rom)
 		if (ROMENTRY_ISDEFAULT_BIOS(rom))
 			default_name = ROM_GETNAME(rom);
 
 	std::size_t bios_count = 0;
-	for (const rom_entry *rom = m_drv->rom; !ROMENTRY_ISEND(rom); ++rom)
+	for (const rom_entry *rom = entries.data(); !ROMENTRY_ISEND(rom); ++rom)
 	{
 		if (ROMENTRY_ISSYSTEM_BIOS(rom))
 		{

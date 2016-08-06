@@ -493,7 +493,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_reset() override;
 
 	void screenrefresh();

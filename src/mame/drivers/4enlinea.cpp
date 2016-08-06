@@ -249,7 +249,7 @@ public:
 	DECLARE_READ8_MEMBER( _4enlinea_io_read );
 	DECLARE_WRITE8_MEMBER( _4enlinea_mode_control_w );
 	virtual void device_start() override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 const rom_entry *isa8_cga_4enlinea_device::device_rom_region() const

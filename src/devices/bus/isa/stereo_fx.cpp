@@ -122,7 +122,7 @@ static MACHINE_CONFIG_FRAGMENT( stereo_fx )
 	MCFG_PC_JOY_ADD("pc_joy")
 MACHINE_CONFIG_END
 
-const rom_entry *stereo_fx_device::device_rom_region() const
+const tiny_rom_entry *stereo_fx_device::device_rom_region() const
 {
 	return ROM_NAME( stereo_fx );
 }

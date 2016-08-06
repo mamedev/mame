@@ -62,7 +62,7 @@ class a2bus_videoterm_device : public a2bus_videx80_device
 public:
 	a2bus_videoterm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 class a2bus_ap16_device : public a2bus_videx80_device
@@ -70,7 +70,7 @@ class a2bus_ap16_device : public a2bus_videx80_device
 public:
 	a2bus_ap16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	virtual UINT8 read_cnxx(address_space &space, UINT8 offset) override;
 };
@@ -81,7 +81,7 @@ class a2bus_ap16alt_device : public a2bus_videx80_device
 public:
 	a2bus_ap16alt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	virtual UINT8 read_cnxx(address_space &space, UINT8 offset) override;
 };
@@ -91,7 +91,7 @@ class a2bus_vtc1_device : public a2bus_videx80_device
 public:
 	a2bus_vtc1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 class a2bus_vtc2_device : public a2bus_videx80_device
@@ -99,7 +99,7 @@ class a2bus_vtc2_device : public a2bus_videx80_device
 public:
 	a2bus_vtc2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 class a2bus_aevm80_device : public a2bus_videx80_device
@@ -107,7 +107,7 @@ class a2bus_aevm80_device : public a2bus_videx80_device
 public:
 	a2bus_aevm80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 // device type definition

@@ -173,7 +173,7 @@ static MACHINE_CONFIG_FRAGMENT( aha1542 )
 	MCFG_CPU_PROGRAM_MAP( z84c0010_mem )
 MACHINE_CONFIG_END
 
-const rom_entry *aha1542_device::device_rom_region() const
+const tiny_rom_entry *aha1542_device::device_rom_region() const
 {
 	return ROM_NAME( aha1542 );
 }

@@ -57,7 +57,7 @@ machine_config_constructor isa16_svga_s3_device::device_mconfig_additions() cons
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa16_svga_s3_device::device_rom_region() const
+const tiny_rom_entry *isa16_svga_s3_device::device_rom_region() const
 {
 	return ROM_NAME( s3_764 );
 }
@@ -169,7 +169,7 @@ machine_config_constructor isa16_s3virge_device::device_mconfig_additions() cons
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa16_s3virge_device::device_rom_region() const
+const tiny_rom_entry *isa16_s3virge_device::device_rom_region() const
 {
 	return ROM_NAME( s3virge );
 }
@@ -256,7 +256,7 @@ machine_config_constructor isa16_s3virgedx_device::device_mconfig_additions() co
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa16_s3virgedx_device::device_rom_region() const
+const tiny_rom_entry *isa16_s3virgedx_device::device_rom_region() const
 {
 	return ROM_NAME( s3virgedx );
 }
@@ -344,7 +344,7 @@ machine_config_constructor isa16_stealth3d2kpro_device::device_mconfig_additions
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa16_stealth3d2kpro_device::device_rom_region() const
+const tiny_rom_entry *isa16_stealth3d2kpro_device::device_rom_region() const
 {
 	return ROM_NAME( stealth3d2kpro );
 }

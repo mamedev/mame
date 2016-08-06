@@ -133,7 +133,7 @@ void nes_ntb_rom_device::device_start()
 	m_rom = (UINT8*)memregion("ntbrom")->base();
 }
 
-const rom_entry *nes_ntb_rom_device::device_rom_region() const
+const tiny_rom_entry *nes_ntb_rom_device::device_rom_region() const
 {
 	return ROM_NAME( ntb_rom );
 }

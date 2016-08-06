@@ -439,7 +439,7 @@ ioport_constructor pc_kbd_keytronic_pc3270_at_device::device_input_ports() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *pc_kbd_keytronic_pc3270_device::device_rom_region() const
+const tiny_rom_entry *pc_kbd_keytronic_pc3270_device::device_rom_region() const
 {
 	return ROM_NAME( keytronic_pc3270 );
 }

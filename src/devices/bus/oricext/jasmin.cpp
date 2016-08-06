@@ -74,7 +74,7 @@ void jasmin_device::device_reset()
 	fdc->set_floppy(nullptr);
 }
 
-const rom_entry *jasmin_device::device_rom_region() const
+const tiny_rom_entry *jasmin_device::device_rom_region() const
 {
 	return ROM_NAME( jasmin );
 }

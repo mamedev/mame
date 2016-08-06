@@ -52,7 +52,7 @@ machine_config_constructor nubus_m2hires_device::device_mconfig_additions() cons
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *nubus_m2hires_device::device_rom_region() const
+const tiny_rom_entry *nubus_m2hires_device::device_rom_region() const
 {
 	return ROM_NAME( m2hires );
 }

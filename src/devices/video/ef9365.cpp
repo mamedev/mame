@@ -134,7 +134,7 @@ ROM_END
 //  internal ROM region
 //-------------------------------------------------
 
-const rom_entry *ef9365_device::device_rom_region() const
+const tiny_rom_entry *ef9365_device::device_rom_region() const
 {
 	return ROM_NAME( ef9365 );
 }

@@ -92,7 +92,7 @@ public:
 	nes_ntb_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual UINT8* get_cart_base();
 
 protected:

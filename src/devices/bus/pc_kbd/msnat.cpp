@@ -297,7 +297,7 @@ ioport_constructor pc_kbd_microsoft_natural_device::device_input_ports() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *pc_kbd_microsoft_natural_device::device_rom_region() const
+const tiny_rom_entry *pc_kbd_microsoft_natural_device::device_rom_region() const
 {
 	return ROM_NAME( microsoft_natural );
 }

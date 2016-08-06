@@ -115,17 +115,29 @@ enum
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+// ======================> tiny_rom_entry
+
+struct tiny_rom_entry
+{
+	const char *name;
+	const char *hashdata;
+	UINT32 offset;
+	UINT32 length;
+	UINT32 flags;
+};
+
+
 // ======================> rom_entry
 
 class rom_entry
 {
 public:
-	rom_entry(const char *name, const char *hashdata, UINT32 offset, UINT32 length, UINT32 flags)
-		: m_name(name != nullptr ? name : "")
-		, m_hashdata(hashdata != nullptr ? hashdata : "")
-		, m_offset(offset)
-		, m_length(length)
-		, m_flags(flags) {}
+	rom_entry(const tiny_rom_entry &ent)
+		: m_name(ent.name != nullptr ? ent.name : "")
+		, m_hashdata(ent.hashdata != nullptr ? ent.hashdata : "")
+		, m_offset(ent.offset)
+		, m_length(ent.length)
+		, m_flags(ent.flags) {}
 	rom_entry(std::string &&name, std::string &&hashdata, UINT32 offset, UINT32 length, UINT32 flags)
 		: m_name(std::move(name))
 		, m_hashdata(std::move(hashdata))

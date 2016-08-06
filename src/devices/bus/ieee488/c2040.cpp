@@ -96,7 +96,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c2040_t::device_rom_region() const
+const tiny_rom_entry *c2040_t::device_rom_region() const
 {
 	return ROM_NAME( c2040 );
 }
@@ -123,7 +123,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c3040_t::device_rom_region() const
+const tiny_rom_entry *c3040_t::device_rom_region() const
 {
 	return ROM_NAME( c3040 );
 }
@@ -158,7 +158,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c4040_t::device_rom_region() const
+const tiny_rom_entry *c4040_t::device_rom_region() const
 {
 	return ROM_NAME( c4040 );
 }

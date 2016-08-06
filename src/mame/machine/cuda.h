@@ -109,7 +109,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	required_device<cpu_device> m_maincpu;
 

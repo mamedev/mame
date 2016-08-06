@@ -192,7 +192,7 @@ machine_config_constructor kc_d004_device::device_mconfig_additions() const
 //  device_rom_region
 //-------------------------------------------------
 
-const rom_entry *kc_d004_device::device_rom_region() const
+const tiny_rom_entry *kc_d004_device::device_rom_region() const
 {
 	return ROM_NAME( kc_d004 );
 }
@@ -402,7 +402,7 @@ machine_config_constructor kc_d004_gide_device::device_mconfig_additions() const
 //  device_rom_region
 //-------------------------------------------------
 
-const rom_entry *kc_d004_gide_device::device_rom_region() const
+const tiny_rom_entry *kc_d004_gide_device::device_rom_region() const
 {
 	return ROM_NAME( kc_d004_gide );
 }

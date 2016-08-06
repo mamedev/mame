@@ -32,7 +32,7 @@ public:
 	DECLARE_WRITE8_MEMBER( relay_w );
 
 protected:
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

@@ -119,42 +119,42 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *saa5050_device::device_rom_region() const
+const tiny_rom_entry *saa5050_device::device_rom_region() const
 {
 	return ROM_NAME( saa5050 );
 }
 
-const rom_entry *saa5051_device::device_rom_region() const
+const tiny_rom_entry *saa5051_device::device_rom_region() const
 {
 	return ROM_NAME( saa5051 );
 }
 
-const rom_entry *saa5052_device::device_rom_region() const
+const tiny_rom_entry *saa5052_device::device_rom_region() const
 {
 	return ROM_NAME( saa5052 );
 }
 
-const rom_entry *saa5053_device::device_rom_region() const
+const tiny_rom_entry *saa5053_device::device_rom_region() const
 {
 	return ROM_NAME( saa5053 );
 }
 
-const rom_entry *saa5054_device::device_rom_region() const
+const tiny_rom_entry *saa5054_device::device_rom_region() const
 {
 	return ROM_NAME( saa5054 );
 }
 
-const rom_entry *saa5055_device::device_rom_region() const
+const tiny_rom_entry *saa5055_device::device_rom_region() const
 {
 	return ROM_NAME( saa5055 );
 }
 
-const rom_entry *saa5056_device::device_rom_region() const
+const tiny_rom_entry *saa5056_device::device_rom_region() const
 {
 	return ROM_NAME( saa5056 );
 }
 
-const rom_entry *saa5057_device::device_rom_region() const
+const tiny_rom_entry *saa5057_device::device_rom_region() const
 {
 	return ROM_NAME( saa5057 );
 }

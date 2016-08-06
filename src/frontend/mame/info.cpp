@@ -515,14 +515,16 @@ void info_xml_creator::output_bios()
 	if (m_drivlist.driver().rom == nullptr)
 		return;
 
+	auto rom_entries = rom_build_entries(m_drivlist.driver().rom);
+
 	// first determine the default BIOS name
 	std::string defaultname;
-	for (const rom_entry *rom = m_drivlist.driver().rom; !ROMENTRY_ISEND(rom); rom++)
+	for (const rom_entry *rom = rom_entries.data(); !ROMENTRY_ISEND(rom); rom++)
 		if (ROMENTRY_ISDEFAULT_BIOS(rom))
 			defaultname = ROM_GETNAME(rom);
 
 	// iterate over ROM entries and look for BIOSes
-	for (const rom_entry *rom = m_drivlist.driver().rom; !ROMENTRY_ISEND(rom); rom++)
+	for (const rom_entry *rom = rom_entries.data(); !ROMENTRY_ISEND(rom); rom++)
 		if (ROMENTRY_ISSYSTEM_BIOS(rom))
 		{
 			// output extracted name and descriptions
@@ -577,7 +579,8 @@ void info_xml_creator::output_rom(device_t &device)
 				if (!is_disk && is_bios)
 				{
 					// scan backwards through the ROM entries
-					for (const rom_entry *brom = rom - 1; brom != m_drivlist.driver().rom; brom--)
+					auto entries = rom_build_entries(m_drivlist.driver().rom);
+					for (const rom_entry *brom = entries.data(); !ROMENTRY_ISEND(rom); rom++)
 						if (ROMENTRY_ISSYSTEM_BIOS(brom))
 						{
 							strcpy(bios_name, ROM_GETNAME(brom));

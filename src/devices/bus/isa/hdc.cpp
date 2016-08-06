@@ -896,7 +896,7 @@ machine_config_constructor isa8_hdc_ec1841_device::device_mconfig_additions() co
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa8_hdc_device::device_rom_region() const
+const tiny_rom_entry *isa8_hdc_device::device_rom_region() const
 {
 	return ROM_NAME( hdc );
 }

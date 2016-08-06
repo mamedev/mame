@@ -697,7 +697,7 @@ ioport_constructor snug_bwg_device::device_input_ports() const
 	return INPUT_PORTS_NAME( bwg_fdc );
 }
 
-const rom_entry *snug_bwg_device::device_rom_region() const
+const tiny_rom_entry *snug_bwg_device::device_rom_region() const
 {
 	return ROM_NAME( bwg_fdc );
 }

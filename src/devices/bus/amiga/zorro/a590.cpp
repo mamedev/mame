@@ -177,7 +177,7 @@ ROM_START( dmac_hdc )
 	ROM_LOAD("390333-03.u5", 0x000, 0x104, CRC(dc4a8d9b) SHA1(761a1318106e49057f95258699076ec1079967ad))
 ROM_END
 
-const rom_entry *dmac_hdc_device::device_rom_region() const
+const tiny_rom_entry *dmac_hdc_device::device_rom_region() const
 {
 	return ROM_NAME( dmac_hdc );
 }

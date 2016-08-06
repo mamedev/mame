@@ -52,7 +52,7 @@ ROM_START( ar_mk1 )
 	ROMX_LOAD("ar1_v150.bin", 0x0000, 0x10000, BAD_DUMP CRC(f82c4258) SHA1(843b433b2c56640e045d5fdc854dc6b1a4964e7c), ROM_BIOS(2))
 ROM_END
 
-const rom_entry *action_replay_mk1_device::device_rom_region() const
+const tiny_rom_entry *action_replay_mk1_device::device_rom_region() const
 {
 	return ROM_NAME( ar_mk1 );
 }
@@ -68,7 +68,7 @@ ROM_START( ar_mk2 )
 	ROMX_LOAD("ar2_v214.bin", 0x0000, 0x20000, BAD_DUMP CRC(1bb3d0a8) SHA1(14b1f5a69efb6f4e2331970e6ca0f33c0f04ac91), ROM_BIOS(3))
 ROM_END
 
-const rom_entry *action_replay_mk2_device::device_rom_region() const
+const tiny_rom_entry *action_replay_mk2_device::device_rom_region() const
 {
 	return ROM_NAME( ar_mk2 );
 }
@@ -83,7 +83,7 @@ ROM_START( ar_mk3 )
 	ROMX_LOAD("ar3_v314.bin", 0x0000, 0x40000, BAD_DUMP CRC(009f7768) SHA1(0439d6ccc2a0e5c2e83fcf2389dc4d4a440a4c62), ROM_BIOS(2))
 ROM_END
 
-const rom_entry *action_replay_mk3_device::device_rom_region() const
+const tiny_rom_entry *action_replay_mk3_device::device_rom_region() const
 {
 	return ROM_NAME( ar_mk3 );
 }

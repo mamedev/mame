@@ -101,7 +101,7 @@ public:
 	// construction/destruction
 	isa8_cga_filetto_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 const device_type ISA8_CGA_FILETTO = &device_creator<isa8_cga_filetto_device>;
@@ -135,7 +135,7 @@ public:
 
 	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 	virtual void device_start() override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	DECLARE_READ8_MEMBER(bg_bank_r);
 	DECLARE_WRITE8_MEMBER(bg_bank_w);

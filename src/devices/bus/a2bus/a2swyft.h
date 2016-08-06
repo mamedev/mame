@@ -27,7 +27,7 @@ public:
 	a2bus_swyft_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	a2bus_swyft_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:
 	virtual void device_start() override;

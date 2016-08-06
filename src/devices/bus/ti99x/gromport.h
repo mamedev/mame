@@ -103,7 +103,7 @@ protected:
 	virtual void device_start() override { };
 	virtual void device_config_complete() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry* device_rom_region() const override;
+	virtual const tiny_rom_entry* device_rom_region() const override;
 
 	// Image handling: implementation of methods which are abstract in the parent
 	image_init_result call_load() override;
@@ -261,7 +261,7 @@ protected:
 	virtual void device_reset() override;
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry* device_rom_region() const override;
+	virtual const tiny_rom_entry* device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
 	// device_nvram_interface

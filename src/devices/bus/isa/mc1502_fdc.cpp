@@ -68,7 +68,7 @@ machine_config_constructor mc1502_fdc_device::device_mconfig_additions() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *mc1502_fdc_device::device_rom_region() const
+const tiny_rom_entry *mc1502_fdc_device::device_rom_region() const
 {
 	return ROM_NAME( mc1502_fdc );
 }

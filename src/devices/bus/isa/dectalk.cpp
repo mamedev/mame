@@ -159,7 +159,7 @@ ROM_START( dectalk_isa )
 	ROM_LOAD("spc_034c__2-1-92.tms320p15nl.d3.bin", 0x0000, 0x2000, CRC(d8b1201e) SHA1(4b873a5e882205fcac79a27562054b5c4d1a117c))
 ROM_END
 
-const rom_entry* dectalk_isa_device::device_rom_region() const
+const tiny_rom_entry* dectalk_isa_device::device_rom_region() const
 {
 	return ROM_NAME( dectalk_isa );
 }

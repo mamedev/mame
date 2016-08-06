@@ -1488,3 +1488,30 @@ rom_load_manager::rom_load_manager(running_machine &machine)
 	/* display the results and exit */
 	display_rom_load_results(false);
 }
+
+
+// -------------------------------------------------
+// rom_build_entries - builds a rom_entry vector
+// from a tiny_rom_entry array
+// -------------------------------------------------
+
+std::vector<rom_entry> rom_build_entries(const tiny_rom_entry *tinyentries)
+{
+	std::vector<rom_entry> result;
+
+	if (tinyentries != nullptr)
+	{
+		int i = 0;
+		do
+		{
+			result.emplace_back(tinyentries[i]);
+		} while ((tinyentries[i++].flags & ROMENTRY_TYPEMASK) != ROMENTRYTYPE_END);
+	}
+	else
+	{
+		const tiny_rom_entry end_entry = { nullptr, nullptr, 0, 0, ROMENTRYTYPE_END };
+		result.emplace_back(end_entry);
+	}
+	return result;
+}
+
