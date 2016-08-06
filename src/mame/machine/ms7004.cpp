@@ -79,7 +79,7 @@ machine_config_constructor ms7004_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( ms7004 );
 }
 
-const rom_entry *ms7004_device::device_rom_region() const
+const tiny_rom_entry *ms7004_device::device_rom_region() const
 {
 	return ROM_NAME( ms7004 );
 }

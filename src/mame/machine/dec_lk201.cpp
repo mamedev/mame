@@ -226,7 +226,7 @@ machine_config_constructor lk201_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( lk201 );
 }
 
-const rom_entry *lk201_device::device_rom_region() const
+const tiny_rom_entry *lk201_device::device_rom_region() const
 {
 	return ROM_NAME( lk201 );
 }

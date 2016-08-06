@@ -78,27 +78,27 @@ namco_c76_device::namco_c76_device(const machine_config &mconfig, const char *ta
 {
 }
 
-const rom_entry *namco_c69_device::device_rom_region() const
+const tiny_rom_entry *namco_c69_device::device_rom_region() const
 {
 	return ROM_NAME(c69);
 }
 
-const rom_entry *namco_c70_device::device_rom_region() const
+const tiny_rom_entry *namco_c70_device::device_rom_region() const
 {
 	return ROM_NAME(c70);
 }
 
-const rom_entry *namco_c74_device::device_rom_region() const
+const tiny_rom_entry *namco_c74_device::device_rom_region() const
 {
 	return ROM_NAME(c74);
 }
 
-const rom_entry *namco_c75_device::device_rom_region() const
+const tiny_rom_entry *namco_c75_device::device_rom_region() const
 {
 	return ROM_NAME(c75);
 }
 
-const rom_entry *namco_c76_device::device_rom_region() const
+const tiny_rom_entry *namco_c76_device::device_rom_region() const
 {
 	return ROM_NAME(c76);
 }

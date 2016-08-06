@@ -252,7 +252,7 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
-const rom_entry *isa8_cga_4enlinea_device::device_rom_region() const
+const tiny_rom_entry *isa8_cga_4enlinea_device::device_rom_region() const
 {
 	return nullptr;
 }

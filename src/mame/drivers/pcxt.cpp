@@ -120,7 +120,7 @@ ROM_START( filetto_cga )
 	ROM_LOAD("u67.bin", 0x0000, 0x2000, CRC(09710122) SHA1(de84bdd9245df287bbd3bb808f0c3531d13a3545) )
 ROM_END
 
-const rom_entry *isa8_cga_filetto_device::device_rom_region() const
+const tiny_rom_entry *isa8_cga_filetto_device::device_rom_region() const
 {
 	return ROM_NAME( filetto_cga );
 }
@@ -228,7 +228,7 @@ ROM_START( tetriskr_cga )
 	ROM_LOAD( "b-9.u43", 0x70000, 0x10000, CRC(4ea22349) SHA1(14dfd3dbd51f8bd6f3290293b8ea1c165e8cf7fd))
 ROM_END
 
-const rom_entry *isa8_cga_tetriskr_device::device_rom_region() const
+const tiny_rom_entry *isa8_cga_tetriskr_device::device_rom_region() const
 {
 	return ROM_NAME( tetriskr_cga );
 }
