@@ -1644,7 +1644,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4)
 
 
 	// debug helpers to find strings used for inputs and where the buttons map
-	bfm_sc45_layout_helper(machine());
+//	bfm_sc45_layout_helper(machine());
 
 }
 
