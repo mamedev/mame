@@ -560,7 +560,7 @@ UINT32 pc_keyboard_device::readport(int port)
 				result = m_ioport_7->read();
 			break;
 	}
-	return 0;
+	return result;
 }
 
 void pc_keyboard_device::polling(void)
