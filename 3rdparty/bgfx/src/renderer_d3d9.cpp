@@ -628,7 +628,7 @@ namespace bgfx { namespace d3d9
 
 			for (uint32_t ii = 0; ii < TextureFormat::Count; ++ii)
 			{
-				uint8_t support = 0;
+				uint16_t support = BGFX_CAPS_FORMAT_TEXTURE_NONE;
 
 				support |= SUCCEEDED(m_d3d9->CheckDeviceFormat(m_adapter
 					, m_deviceType
@@ -701,6 +701,14 @@ namespace bgfx { namespace d3d9
 					, D3DMULTISAMPLE_2_SAMPLES
 					, NULL
 					) ) ? BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA : BGFX_CAPS_FORMAT_TEXTURE_NONE;
+
+				support |= SUCCEEDED(m_d3d9->CheckDeviceFormat(m_adapter
+					, m_deviceType
+					, adapterFormat
+					, isDepth(TextureFormat::Enum(ii) ) ? D3DUSAGE_DEPTHSTENCIL : D3DUSAGE_RENDERTARGET
+					, D3DRTYPE_TEXTURE
+					, s_textureFormat[ii].m_fmt
+					) ) ? BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN : BGFX_CAPS_FORMAT_TEXTURE_NONE;
 
 				g_caps.formats[ii] = support;
 			}
@@ -1011,7 +1019,7 @@ namespace bgfx { namespace d3d9
 			DX_CHECK(texture.m_texture2d->UnlockRect(0) );
 		}
 
-		void resizeTexture(TextureHandle _handle, uint16_t _width, uint16_t _height) BX_OVERRIDE
+		void resizeTexture(TextureHandle _handle, uint16_t _width, uint16_t _height, uint8_t _numMips) BX_OVERRIDE
 		{
 			TextureD3D9& texture = m_textures[_handle.idx];
 
@@ -1027,13 +1035,13 @@ namespace bgfx { namespace d3d9
 			tc.m_height  = _height;
 			tc.m_sides   = 0;
 			tc.m_depth   = 0;
-			tc.m_numMips = 1;
+			tc.m_numMips = _numMips;
 			tc.m_format  = TextureFormat::Enum(texture.m_requestedFormat);
 			tc.m_cubeMap = false;
 			tc.m_mem     = NULL;
 			bx::write(&writer, tc);
 
-			texture.destroy();
+			texture.destroy(true);
 			texture.create(mem, texture.m_flags, 0);
 
 			release(mem);
@@ -1340,8 +1348,7 @@ namespace bgfx { namespace d3d9
 		void setFrameBuffer(FrameBufferHandle _fbh, bool _msaa = true)
 		{
 			if (isValid(m_fbh)
-			&&  m_fbh.idx != _fbh.idx
-			&&  m_rtMsaa)
+			&&  m_fbh.idx != _fbh.idx)
 			{
 				FrameBufferD3D9& frameBuffer = m_frameBuffers[m_fbh.idx];
 				frameBuffer.resolve();
@@ -2495,7 +2502,10 @@ namespace bgfx { namespace d3d9
 		}
 		else if (renderTarget || blit)
 		{
-			usage = D3DUSAGE_RENDERTARGET;
+			usage = 0
+				| D3DUSAGE_RENDERTARGET
+				| (1 < _numMips ? D3DUSAGE_AUTOGENMIPMAP : 0)
+				;
 		}
 
 		IDirect3DDevice9* device = s_renderD3D9->m_device;
@@ -3092,7 +3102,7 @@ namespace bgfx { namespace d3d9
 	void TextureD3D9::resolve() const
 	{
 		if (NULL != m_surface
-		&&  NULL != m_texture2d)
+		&&  NULL != m_ptr)
 		{
 			IDirect3DSurface9* surface = getSurface();
 			DX_CHECK(s_renderD3D9->m_device->StretchRect(m_surface
@@ -3102,6 +3112,11 @@ namespace bgfx { namespace d3d9
 				, D3DTEXF_LINEAR
 				) );
 			DX_RELEASE(surface, 1);
+
+			if (1 < m_numMips)
+			{
+				m_ptr->GenerateMipSubLevels();
+			}
 		}
 	}
 
@@ -4188,12 +4203,14 @@ namespace bgfx { namespace d3d9
 		{
 			m_gpuTimer.end();
 
-			while (m_gpuTimer.get() )
+			do
 			{
 				double toGpuMs = 1000.0 / double(m_gpuTimer.m_frequency);
 				elapsedGpuMs   = m_gpuTimer.m_elapsed * toGpuMs;
 				maxGpuElapsed  = elapsedGpuMs > maxGpuElapsed ? elapsedGpuMs : maxGpuElapsed;
 			}
+			while (m_gpuTimer.get() );
+
 			maxGpuLatency = bx::uint32_imax(maxGpuLatency, m_gpuTimer.m_control.available()-1);
 		}
 

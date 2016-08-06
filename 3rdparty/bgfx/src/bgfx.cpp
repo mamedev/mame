@@ -383,28 +383,38 @@ namespace bgfx
 
 	void fatal(Fatal::Enum _code, const char* _format, ...)
 	{
-		char temp[8192];
-
 		va_list argList;
 		va_start(argList, _format);
-		char* out = temp;
-		int32_t len = bx::vsnprintf(out, sizeof(temp), _format, argList);
-		if ( (int32_t)sizeof(temp) < len)
-		{
-			out = (char*)alloca(len+1);
-			len = bx::vsnprintf(out, len, _format, argList);
-		}
-		out[len] = '\0';
-		va_end(argList);
 
-		g_callback->fatal(_code, out);
+		if (BX_UNLIKELY(NULL == g_callback) )
+		{
+			dbgPrintfVargs(_format, argList);
+			abort();
+		}
+		else
+		{
+			char temp[8192];
+			char* out = temp;
+			int32_t len = bx::vsnprintf(out, sizeof(temp), _format, argList);
+			if ( (int32_t)sizeof(temp) < len)
+			{
+				out = (char*)alloca(len+1);
+				len = bx::vsnprintf(out, len, _format, argList);
+			}
+			out[len] = '\0';
+
+			g_callback->fatal(_code, out);
+		}
+
+		va_end(argList);
 	}
 
 	void trace(const char* _filePath, uint16_t _line, const char* _format, ...)
 	{
 		va_list argList;
 		va_start(argList, _format);
-		if (NULL == g_callback)
+
+		if (BX_UNLIKELY(NULL == g_callback) )
 		{
 			dbgPrintfVargs(_format, argList);
 		}
@@ -412,6 +422,7 @@ namespace bgfx
 		{
 			g_callback->traceVargs(_filePath, _line, _format, argList);
 		}
+
 		va_end(argList);
 	}
 
@@ -1118,25 +1129,26 @@ namespace bgfx
 		}
 
 		BX_TRACE("Supported texture formats:");
-		BX_TRACE("\t +---------------   2D: x = supported / * = emulated");
-		BX_TRACE("\t |+--------------   2D: sRGB format");
-		BX_TRACE("\t ||+-------------   3D: x = supported / * = emulated");
-		BX_TRACE("\t |||+------------   3D: sRGB format");
-		BX_TRACE("\t ||||+----------- Cube: x = supported / * = emulated");
-		BX_TRACE("\t |||||+---------- Cube: sRGB format");
-		BX_TRACE("\t ||||||+--------- vertex format");
-		BX_TRACE("\t |||||||+-------- image");
-		BX_TRACE("\t ||||||||+------- framebuffer");
-		BX_TRACE("\t |||||||||+------ MSAA framebuffer");
-		BX_TRACE("\t ||||||||||+----- MSAA texture");
-		BX_TRACE("\t |||||||||||  +-- name");
+		BX_TRACE("\t +----------------   2D: x = supported / * = emulated");
+		BX_TRACE("\t |+---------------   2D: sRGB format");
+		BX_TRACE("\t ||+--------------   3D: x = supported / * = emulated");
+		BX_TRACE("\t |||+-------------   3D: sRGB format");
+		BX_TRACE("\t ||||+------------ Cube: x = supported / * = emulated");
+		BX_TRACE("\t |||||+----------- Cube: sRGB format");
+		BX_TRACE("\t ||||||+---------- vertex format");
+		BX_TRACE("\t |||||||+--------- image");
+		BX_TRACE("\t ||||||||+-------- framebuffer");
+		BX_TRACE("\t |||||||||+------- MSAA framebuffer");
+		BX_TRACE("\t ||||||||||+------ MSAA texture");
+		BX_TRACE("\t |||||||||||+----- Auto-generated mips");
+		BX_TRACE("\t ||||||||||||  +-- name");
 		for (uint32_t ii = 0; ii < TextureFormat::Count; ++ii)
 		{
 			if (TextureFormat::Unknown != ii
 			&&  TextureFormat::UnknownDepth != ii)
 			{
 				uint16_t flags = g_caps.formats[ii];
-				BX_TRACE("\t[%c%c%c%c%c%c%c%c%c%c%c] %s"
+				BX_TRACE("\t[%c%c%c%c%c%c%c%c%c%c%c%c] %s"
 					, flags&BGFX_CAPS_FORMAT_TEXTURE_2D               ? 'x' : flags&BGFX_CAPS_FORMAT_TEXTURE_2D_EMULATED ? '*' : ' '
 					, flags&BGFX_CAPS_FORMAT_TEXTURE_2D_SRGB          ? 'l' : ' '
 					, flags&BGFX_CAPS_FORMAT_TEXTURE_3D               ? 'x' : flags&BGFX_CAPS_FORMAT_TEXTURE_3D_EMULATED ? '*' : ' '
@@ -1148,6 +1160,7 @@ namespace bgfx
 					, flags&BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER      ? 'f' : ' '
 					, flags&BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA ? '+' : ' '
 					, flags&BGFX_CAPS_FORMAT_TEXTURE_MSAA             ? 'm' : ' '
+					, flags&BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN      ? 'M' : ' '
 					, getName(TextureFormat::Enum(ii) )
 					);
 				BX_UNUSED(flags);
@@ -2236,7 +2249,10 @@ namespace bgfx
 					uint16_t height;
 					_cmdbuf.read(height);
 
-					m_renderCtx->resizeTexture(handle, width, height);
+					uint8_t numMips;
+					_cmdbuf.read(numMips);
+
+					m_renderCtx->resizeTexture(handle, width, height, numMips);
 				}
 				break;
 
@@ -2363,6 +2379,11 @@ namespace bgfx
 		return topologyConvert(_conversion, _dst, _dstSize, _indices, _numIndices, _index32, g_allocator);
 	}
 
+	void topologySortTriList(TopologySort::Enum _sort, void* _dst, uint32_t _dstSize, const float _dir[3], const float _pos[3], const void* _vertices, uint32_t _stride, const void* _indices, uint32_t _numIndices, bool _index32)
+	{
+		topologySortTriList(_sort, _dst, _dstSize, _dir, _pos, _vertices, _stride, _indices, _numIndices, _index32, g_allocator);
+	}
+
 	uint8_t getSupportedRenderers(RendererType::Enum _enum[RendererType::Count])
 	{
 		uint8_t num = 0;
@@ -2393,27 +2414,20 @@ namespace bgfx
 	{
 		if (NULL != s_ctx)
 		{
-			BX_CHECK(false, "bgfx is already initialized.");
+			BX_TRACE("bgfx is already initialized.");
 			return false;
 		}
 
-		if (!BX_ENABLED(BX_PLATFORM_EMSCRIPTEN || BX_PLATFORM_NACL)
-		&&  NULL == g_platformData.ndt
-		&&  NULL == g_platformData.nwh
-		&&  NULL == g_platformData.context
-		&&  NULL == g_platformData.backBuffer
-		&&  NULL == g_platformData.backBufferDS)
+		struct ErrorState
 		{
-			BX_CHECK(false, "bgfx platform data like window handle or backbuffer must be set.");
-			return false;
-		}
+			enum Enum
+			{
+				Default,
+				ContextAllocated,
+			};
+		};
 
-		memset(&g_caps, 0, sizeof(g_caps) );
-		g_caps.maxViews     = BGFX_CONFIG_MAX_VIEWS;
-		g_caps.maxDrawCalls = BGFX_CONFIG_MAX_DRAW_CALLS;
-		g_caps.maxFBAttachments = 1;
-		g_caps.vendorId = _vendorId;
-		g_caps.deviceId = _deviceId;
+		ErrorState::Enum errorState = ErrorState::Default;
 
 		if (NULL != _allocator)
 		{
@@ -2436,16 +2450,45 @@ namespace bgfx
 				s_callbackStub = BX_NEW(g_allocator, CallbackStub);
 		}
 
+		if (!BX_ENABLED(BX_PLATFORM_EMSCRIPTEN || BX_PLATFORM_NACL)
+		&&  NULL == g_platformData.ndt
+		&&  NULL == g_platformData.nwh
+		&&  NULL == g_platformData.context
+		&&  NULL == g_platformData.backBuffer
+		&&  NULL == g_platformData.backBufferDS)
+		{
+			BX_TRACE("bgfx platform data like window handle or backbuffer must be set.");
+			goto error;
+		}
+
+		memset(&g_caps, 0, sizeof(g_caps) );
+		g_caps.maxViews     = BGFX_CONFIG_MAX_VIEWS;
+		g_caps.maxDrawCalls = BGFX_CONFIG_MAX_DRAW_CALLS;
+		g_caps.maxFBAttachments = 1;
+		g_caps.vendorId = _vendorId;
+		g_caps.deviceId = _deviceId;
+
 		BX_TRACE("Init...");
 
-		s_ctx = BX_ALIGNED_NEW(g_allocator, Context, 16);
-		if (!s_ctx->init(_type) )
-		{
-			BX_TRACE("Init failed.");
+		errorState = ErrorState::ContextAllocated;
 
+		s_ctx = BX_ALIGNED_NEW(g_allocator, Context, 16);
+		if (s_ctx->init(_type) )
+		{
+			BX_TRACE("Init complete.");
+			return true;
+		}
+
+error:
+		BX_TRACE("Init failed.");
+
+		switch (errorState)
+		{
+		case ErrorState::ContextAllocated:
 			BX_ALIGNED_DELETE(g_allocator, s_ctx, 16);
 			s_ctx = NULL;
 
+		case ErrorState::Default:
 			if (NULL != s_callbackStub)
 			{
 				BX_DELETE(g_allocator, s_callbackStub);
@@ -2462,11 +2505,10 @@ namespace bgfx
 			s_threadIndex = 0;
 			g_callback    = NULL;
 			g_allocator   = NULL;
-			return false;
+			break;
 		}
 
-		BX_TRACE("Init complete.");
-		return true;
+		return false;
 	}
 
 	void shutdown()
@@ -2920,7 +2962,14 @@ namespace bgfx
 			, getName(_format)
 			);
 
-		_numMips = uint8_t(bx::uint32_max(1, _numMips) );
+		if (BackbufferRatio::Count != _ratio)
+		{
+			_width  = uint16_t(s_ctx->m_resolution.m_width);
+			_height = uint16_t(s_ctx->m_resolution.m_height);
+			getTextureSizeFromRatio(_ratio, _width, _height);
+		}
+
+		_numMips = calcNumMips(_numMips, _width, _height);
 
 		if (BX_ENABLED(BGFX_CONFIG_DEBUG)
 		&&  NULL != _mem)
@@ -2932,13 +2981,6 @@ namespace bgfx
 				, ti.storageSize
 				, _mem->size
 				);
-		}
-
-		if (BackbufferRatio::Count != _ratio)
-		{
-			_width  = uint16_t(s_ctx->m_resolution.m_width);
-			_height = uint16_t(s_ctx->m_resolution.m_height);
-			getTextureSizeFromRatio(_ratio, _width, _height);
 		}
 
 		uint32_t size = sizeof(uint32_t)+sizeof(TextureCreate);
@@ -2983,7 +3025,7 @@ namespace bgfx
 			, getName(_format)
 			);
 
-		_numMips = uint8_t(bx::uint32_max(1, _numMips) );
+		_numMips = calcNumMips(_numMips, _width, _height, _depth);
 
 		if (BX_ENABLED(BGFX_CONFIG_DEBUG)
 		&&  NULL != _mem)
@@ -3026,7 +3068,7 @@ namespace bgfx
 			, getName(_format)
 			);
 
-		_numMips = uint8_t(bx::uint32_max(1, _numMips) );
+		_numMips = calcNumMips(_numMips, _size, _size);
 
 		if (BX_ENABLED(BGFX_CONFIG_DEBUG)
 		&&  NULL != _mem)
@@ -3815,6 +3857,11 @@ uint32_t bgfx_topology_convert(bgfx_topology_convert_t _conversion, void* _dst, 
 	return bgfx::topologyConvert(bgfx::TopologyConvert::Enum(_conversion), _dst, _dstSize, _indices, _numIndices, _index32);
 }
 
+void bgfx_topology_sort_tri_list(bgfx_topology_sort_t _sort, void* _dst, uint32_t _dstSize, const float _dir[3], const float _pos[3], const void* _vertices, uint32_t _stride, const void* _indices, uint32_t _numIndices, bool _index32)
+{
+	bgfx::topologySortTriList(bgfx::TopologySort::Enum(_sort), _dst, _dstSize, _dir, _pos, _vertices, _stride, _indices, _numIndices, _index32);
+}
+
 BGFX_C_API void bgfx_image_swizzle_bgra8(uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _src, void* _dst)
 {
 	bgfx::imageSwizzleBgra8(_width, _height, _pitch, _src, _dst);
@@ -4588,6 +4635,7 @@ BGFX_C_API bgfx_interface_vtbl_t* bgfx_get_interface(uint32_t _version)
 	BGFX_IMPORT_FUNC(vertex_convert) \
 	BGFX_IMPORT_FUNC(weld_vertices) \
 	BGFX_IMPORT_FUNC(topology_convert) \
+	BGFX_IMPORT_FUNC(topology_sort_tri_list) \
 	BGFX_IMPORT_FUNC(image_swizzle_bgra8) \
 	BGFX_IMPORT_FUNC(image_rgba8_downsample_2x2) \
 	BGFX_IMPORT_FUNC(get_supported_renderers) \

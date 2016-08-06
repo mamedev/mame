@@ -19,10 +19,10 @@
 
 #include <stdio.h>      // vsnprintf, sscanf, printf
 #if !defined(alloca)
-#if defined(_WIN32)
+#ifdef _WIN32
 #include <malloc.h>     // alloca
-#elif defined(__FreeBSD__) || defined(__DragonFly__)
-#include <stdlib.h>     // alloca
+#elif (defined(__FreeBSD__) || defined(FreeBSD_kernel) || defined(__DragonFly__)) && !defined(__GLIBC__)
+#include <stdlib.h>     // alloca. FreeBSD uses stdlib.h unless GLIBC
 #else
 #include <alloca.h>     // alloca
 #endif
@@ -199,7 +199,7 @@ void ImDrawList::UpdateClipRect()
 
     // Try to merge with previous command if it matches, else use current command
     ImDrawCmd* prev_cmd = CmdBuffer.Size > 1 ? curr_cmd - 1 : NULL;
-    if (prev_cmd && memcmp(&prev_cmd->ClipRect, &curr_clip_rect, sizeof(ImVec4)) == 0 && prev_cmd->TextureId == GetCurrentTextureId() && prev_cmd->UserCallback == NULL)
+    if (curr_cmd->ElemCount == 0 && prev_cmd && memcmp(&prev_cmd->ClipRect, &curr_clip_rect, sizeof(ImVec4)) == 0 && prev_cmd->TextureId == GetCurrentTextureId() && prev_cmd->UserCallback == NULL)
         CmdBuffer.pop_back();
     else
         curr_cmd->ClipRect = curr_clip_rect;
@@ -1649,6 +1649,17 @@ const ImWchar*  ImFontAtlas::GetGlyphRangesCyrillic()
         0x0400, 0x052F, // Cyrillic + Cyrillic Supplement
         0x2DE0, 0x2DFF, // Cyrillic Extended-A
         0xA640, 0xA69F, // Cyrillic Extended-B
+        0,
+    };
+    return &ranges[0];
+}
+
+const ImWchar*  ImFontAtlas::GetGlyphRangesThai()
+{
+    static const ImWchar ranges[] =
+    {
+        0x0020, 0x00FF, // Basic Latin
+        0x0E00, 0x0E7F, // Thai
         0,
     };
     return &ranges[0];
