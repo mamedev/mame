@@ -15,7 +15,6 @@
 #include <type_traits>
 #include <cmath>
 
-#include "palloc.h"
 #include "pstring.h"
 
 namespace plib {

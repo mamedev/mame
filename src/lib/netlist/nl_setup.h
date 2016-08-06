@@ -14,7 +14,6 @@
 #include <vector>
 
 #include "plib/pstring.h"
-#include "plib/palloc.h"
 #include "plib/pfmtlog.h"
 #include "plib/pstream.h"
 #include "plib/putil.h"

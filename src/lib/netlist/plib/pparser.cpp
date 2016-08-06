@@ -8,6 +8,7 @@
 #include <cstdarg>
 
 #include "pparser.h"
+#include "plib/palloc.h"
 
 namespace plib {
 // ----------------------------------------------------------------------------------------

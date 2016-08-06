@@ -17,6 +17,7 @@
 
 #include "nl_lists.h"
 #include "nl_time.h"
+#include "plib/palloc.h"
 #include "plib/pdynlib.h"
 #include "plib/pstate.h"
 #include "plib/pfmtlog.h"
@@ -694,8 +695,6 @@ namespace netlist
 
 		void rebuild_list();     /* rebuild m_list after a load */
 
-		void move_connections(net_t *new_net);
-
 		std::vector<core_terminal_t *> m_core_terms; // save post-start m_list ...
 
 	protected:
@@ -707,6 +706,8 @@ namespace netlist
 		state_var_u8             m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
 
 	private:
+		void move_connections(net_t *new_net);
+
 		plib::linkedlist_t<core_terminal_t> m_list_active;
 		core_terminal_t * m_railterminal;
 
@@ -750,7 +751,7 @@ namespace netlist
 		/* internal state support
 		 * FIXME: get rid of this and implement export/import in MAME
 		 */
-			netlist_sig_t &Q_state_ptr() { return m_cur_Q; }
+		netlist_sig_t &Q_state_ptr() { return m_cur_Q; }
 
 	protected:
 	private:
@@ -772,11 +773,8 @@ namespace netlist
 		nl_double &Q_Analog_state_ptr() { return m_cur_Analog; }
 
 		//FIXME: needed by current solver code
-		devices::matrix_solver_t *solver() { return m_solver; }
+		devices::matrix_solver_t *solver() const { return m_solver; }
 		void set_solver(devices::matrix_solver_t *solver) { m_solver = solver; }
-
-		bool already_processed(std::vector<list_t> &groups);
-		void process_net(std::vector<list_t> &groups);
 
 	private:
 		devices::matrix_solver_t *m_solver;

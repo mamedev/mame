@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <cmath>
 #include "nl_convert.h"
+#include "plib/palloc.h"
 
 
 /*-------------------------------------------------

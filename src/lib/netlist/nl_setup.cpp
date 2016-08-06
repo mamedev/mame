@@ -678,8 +678,8 @@ void setup_t::resolve_inputs()
 	int tries = 100;
 	while (m_links.size() > 0 && tries >  0) // FIXME: convert into constant
 	{
-		auto li = m_links.begin();
-		while (li != m_links.end())
+
+		for (auto li = m_links.begin(); li != m_links.end(); )
 		{
 			const pstring t1s = li->first;
 			const pstring t2s = li->second;
@@ -703,18 +703,20 @@ void setup_t::resolve_inputs()
 
 	log().verbose("deleting empty nets ...");
 
-	// delete empty nets ... and save m_list ...
+	// delete empty nets
 
-	for (auto net = netlist().m_nets.begin(); net != netlist().m_nets.end();)
-	{
-		if (net->get()->num_cons() == 0)
-		{
-			log().verbose("Deleting net {1} ...", net->get()->name());
-			net = netlist().m_nets.erase(net);
-		}
-		else
-			++net;
-	}
+	netlist().m_nets.erase(
+			std::remove_if(netlist().m_nets.begin(), netlist().m_nets.end(),
+					[](plib::owned_ptr<detail::net_t> &x)
+					{
+						if (x->num_cons() == 0)
+						{
+							x->netlist().log().verbose("Deleting net {1} ...", x->name());
+							return true;
+						}
+						else
+							return false;
+					}), netlist().m_nets.end());
 
 	pstring errstr("");
 

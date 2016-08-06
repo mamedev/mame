@@ -803,37 +803,6 @@ analog_net_t::analog_net_t(netlist_t &nl, const pstring &aname, detail::core_ter
 {
 }
 
-bool analog_net_t::already_processed(std::vector<list_t> &groups)
-{
-	if (isRailNet())
-		return true;
-	for (auto & grp : groups)
-	{
-		if (plib::container::contains(grp, this))
-			return true;
-	}
-	return false;
-}
-
-void analog_net_t::process_net(std::vector<list_t> &groups)
-{
-	if (num_cons() == 0)
-		return;
-	/* add the net */
-	groups.back().push_back(this);
-	for (auto &p : m_core_terms)
-	{
-		if (p->is_type(terminal_t::TERMINAL))
-		{
-			terminal_t *pt = static_cast<terminal_t *>(p);
-			analog_net_t *other_net = &pt->m_otherterm->net();
-			if (!other_net->already_processed(groups))
-				other_net->process_net(groups);
-		}
-	}
-}
-
-
 // ----------------------------------------------------------------------------------------
 // core_terminal_t
 // ----------------------------------------------------------------------------------------
