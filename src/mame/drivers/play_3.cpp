@@ -15,9 +15,8 @@ Status:
 ***********************************************************************************/
 
 
-#include "emu.h"
+#include "machine/genpin.h"
 #include "cpu/cosmac/cosmac.h"
-#include "machine/nvram.h"
 #include "machine/clock.h"
 #include "machine/7474.h"
 
@@ -188,6 +187,9 @@ static MACHINE_CONFIG_START( play_3, play_3_state )
 	MCFG_DEVICE_ADD("4013b", TTL7474, 0)
 	MCFG_7474_OUTPUT_CB(DEVWRITELINE("maincpu", cosmac_device, ef2_w))
 	MCFG_7474_COMP_OUTPUT_CB(DEVWRITELINE("maincpu", cosmac_device, int_w)) MCFG_DEVCB_INVERT // int is reversed in mame
+
+	/* Sound */
+	MCFG_FRAGMENT_ADD( genpin_audio )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
@@ -198,7 +200,7 @@ ROM_START(megaaton)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("cpumegat.bin", 0x0000, 0x2000, CRC(7e7a4ede) SHA1(3194b367cbbf6e0cb2629cd5d82ddee6fe36985a))
 
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("smogot.bin", 0x0000, 0x2000, CRC(fefc3ab2) SHA1(e748d9b443a69fcdd587f22c87d41818b6c0e436))
 	ROM_LOAD("smegat.bin", 0x2000, 0x1000, CRC(910ab7fe) SHA1(0ddfd15c9c25f43b8fcfc4e11bc8ea180f6bd761))
 ROM_END
@@ -208,7 +210,7 @@ ROM_START(megaatona)
 	ROM_LOAD("mega_u12.bin", 0x0000, 0x1000, CRC(65761b02) SHA1(dd9586eaf70698ef7a80ce1be293322f64829aea))
 	ROM_LOAD("mega_u11.bin", 0x1000, 0x1000, CRC(513f3683) SHA1(0f080a33426df1ffdb14e9b2e6382304e201e335))
 
-	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("smogot.bin", 0x0000, 0x2000, CRC(fefc3ab2) SHA1(e748d9b443a69fcdd587f22c87d41818b6c0e436))
 	ROM_LOAD("smegat.bin", 0x2000, 0x1000, CRC(910ab7fe) SHA1(0ddfd15c9c25f43b8fcfc4e11bc8ea180f6bd761))
 ROM_END
