@@ -382,7 +382,7 @@ void matrix_solver_t::reset()
 	m_last_step = netlist_time::zero();
 }
 
-void matrix_solver_t::update() NOEXCEPT
+void matrix_solver_t::update() NL_NOEXCEPT
 {
 	const netlist_time new_timestep = solve();
 

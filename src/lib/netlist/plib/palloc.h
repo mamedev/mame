@@ -112,7 +112,7 @@ private:
 	owned_ptr()
 	: m_ptr(nullptr), m_is_owned(true) { }
 public:
-	owned_ptr(SC *p, bool owned)
+	owned_ptr(SC *p, bool owned) noexcept
 	: m_ptr(p), m_is_owned(owned)
 	{ }
 	owned_ptr(const owned_ptr &r) = delete;
@@ -130,7 +130,7 @@ public:
 		return *this;
 	}
 
-	owned_ptr(owned_ptr &&r)
+	owned_ptr(owned_ptr &&r) noexcept
 	{
 		m_is_owned = r.m_is_owned;
 		m_ptr = r.m_ptr;
@@ -139,7 +139,7 @@ public:
 	}
 
 	template<typename DC>
-	owned_ptr(owned_ptr<DC> &&r)
+	owned_ptr(owned_ptr<DC> &&r) noexcept
 	{
 		m_ptr = static_cast<SC *>(r.get());
 		m_is_owned = r.is_owned();

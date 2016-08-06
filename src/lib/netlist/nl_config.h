@@ -135,11 +135,6 @@ using nperfcount_t = plib::chrono::counter<false>;
 //  General
 //============================================================
 
-// this macro passes an item followed by a string version of itself as two consecutive parameters
-//#define NLNAME(x) x, #x
-
-#define NOEXCEPT noexcept
-
 // The following adds about 10% performance ...
 
 #if !defined(USE_OPENMP)

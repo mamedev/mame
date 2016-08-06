@@ -536,8 +536,9 @@ void core_device_t::set_delegate_pointer()
 
 void core_device_t::stop_dev()
 {
-#if (NL_KEEP_STATISTICS)
-#endif
+	//NOTE: stop_dev is not removed. It remains so it can be reactivated in case
+	//      we run into a situation were RAII and noexcept dtors force us to
+	//      to have a device stop() routine which may throw.
 	//stop();
 }
 
@@ -640,7 +641,7 @@ detail::net_t::~net_t()
 	netlist().state().remove_save_items(this);
 }
 
-void detail::net_t::inc_active(core_terminal_t &term)
+void detail::net_t::inc_active(core_terminal_t &term) NL_NOEXCEPT
 {
 	m_active++;
 	m_list_active.push_front(&term);
@@ -664,7 +665,7 @@ void detail::net_t::inc_active(core_terminal_t &term)
 	}
 }
 
-void detail::net_t::dec_active(core_terminal_t &term)
+void detail::net_t::dec_active(core_terminal_t &term) NL_NOEXCEPT
 {
 	--m_active;
 	nl_assert(m_active >= 0);
@@ -688,9 +689,8 @@ void detail::net_t::rebuild_list()
 	m_active = cnt;
 }
 
-void detail::net_t::update_devs()
+void detail::net_t::update_devs() NL_NOEXCEPT
 {
-	//assert(m_num_cons != 0);
 	nl_assert(this->isRailNet());
 
 	static const unsigned masks[4] =
@@ -748,40 +748,13 @@ void detail::net_t::register_con(detail::core_terminal_t &terminal)
 		m_active++;
 }
 
-void detail::net_t::move_connections(detail::net_t *dest_net)
+void detail::net_t::move_connections(detail::net_t &dest_net)
 {
 	for (auto &ct : m_core_terms)
-		dest_net->register_con(*ct);
+		dest_net.register_con(*ct);
 	m_core_terms.clear();
 	m_active = 0;
 }
-
-void detail::net_t::merge_net(detail::net_t *othernet)
-{
-	netlist().log().debug("merging nets ...\n");
-	if (othernet == nullptr)
-		return; // Nothing to do
-
-	if (othernet == this)
-	{
-		netlist().log().warning("Connecting {1} to itself. This may be right, though\n", this->name());
-		return; // Nothing to do
-	}
-
-	if (this->isRailNet() && othernet->isRailNet())
-		netlist().log().fatal("Trying to merge two rail nets: {1} and {2}\n", this->name(), othernet->name());
-
-	if (othernet->isRailNet())
-	{
-		netlist().log().debug("othernet is railnet\n");
-		othernet->merge_net(this);
-	}
-	else
-	{
-		othernet->move_connections(this);
-	}
-}
-
 
 // ----------------------------------------------------------------------------------------
 // logic_net_t
