@@ -4,6 +4,17 @@
  *** STREET FIGHT hardware ***  This has been adapted from the excellent
  *****************************  Psychic 5 description (by Roberto Ventura)
 
+
+ Notes:  Lower Board - CPU board        S-0086-002-B0  (both games)
+		 Top Board   - GFX board        S-0086-002A-A0 (Street Fight)
+		 Top Board   - GFX board        S-0087-807     (Cross Shooter)
+
+ for the single PCB version of Air Raid / Cross Shooter on the S-0087-011A-0 PCB,
+ see airraid.cpp
+
+
+---
+
 Street Fight (c) Seibu Kaihatsu (1986)
 
 
@@ -180,8 +191,6 @@ colors on screen.
 Each color component (RGB) depth is 4 bits, two bytes $100 apart are used
 for each color code (12 bits).
 
-format: unknown - probably RRRRGGGG - 0000BBBB
-
 I suspect that the colors are organized in sub-palettes, since the graphics
 layers are all 4 bits (16 colors) each. Each of the text/graphics layers
 have 'attribute' bytes associated with them that would define the palette
@@ -190,14 +199,16 @@ usage for each character/tile.
 The 16 colours at offset $C0 appear to be the text palette. This group of
 colours does not appear to change throughout the game, and the lower 192
 colours fade in/out independently of these 16 - consistent with observations
-of the real game. You'd think then that the palette would be reaonably
-easy to deduce from the text video ram attribute byte - go ahead and try! :P
-
-The mapping of graphics pixels to palette similarly escapes me, though I
-must admit I haven't exhausted all avenues of investigation just yet!
+of the real game.
 
 There is a related mystery with the transparency colour. For the most part
 colour 15 corresponds to the transparent colour, except in a few cases.
+(for some Seibu PCB types transparency is handled by bit 0x40 in the CLUT
+ PROMs, but not here, unless they've been dumped incorrectly)
+
+-----
+
+Notes below are for Street Fight video board only
 
 6) TILE-BASED LAYERS
 
@@ -232,7 +243,6 @@ conventional RAM. See the memory map for sprite data format.
  ****************************************************************************
 
 TODO:
-- palette is incorporated - fix!!!
 - handle transparency in text layer properly (how?)
 - second bank of sf02 is this used? (probably NOT)
 - stfight/empcity YM2203s should be clocked at 1.5MHz but this results in
@@ -254,8 +264,8 @@ TODO:
 static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, stfight_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                  /* sf02.bin */
-	AM_RANGE(0xc000, 0xc0ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")
-	AM_RANGE(0xc100, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xc000, 0xc0ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xc100, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("P1")
 	AM_RANGE(0xc201, 0xc201) AM_READ_PORT("P2")
 	AM_RANGE(0xc202, 0xc202) AM_READ_PORT("START")
@@ -267,25 +277,33 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, stfight_state )
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(stfight_coin_w)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(stfight_io_w)
 	AM_RANGE(0xc806, 0xc806) AM_WRITENOP                    /* TBD */
-	AM_RANGE(0xc807, 0xc807) AM_WRITE(stfight_sprite_bank_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(stfight_text_char_w) AM_SHARE("text_char_ram")
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(stfight_text_attr_w) AM_SHARE("text_attr_ram")
-	AM_RANGE(0xd800, 0xd808) AM_WRITE(stfight_vh_latch_w) AM_SHARE("vh_latch_ram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("sprite_ram")
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( stfight_cpu1_map, AS_PROGRAM, 8, stfight_state )
+	AM_RANGE(0xc807, 0xc807) AM_DEVWRITE("stfight_vid", stfight_video_device, stfight_sprite_bank_w)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_DEVWRITE("stfight_vid", stfight_video_device, stfight_text_char_w) AM_SHARE("txram")
+	AM_RANGE(0xd800, 0xd808) AM_RAM_DEVWRITE("stfight_vid", stfight_video_device, stfight_vh_latch_w) AM_SHARE("vregs")
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("sprite_ram")
+	AM_IMPORT_FROM(cpu1_map)
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, stfight_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
+
 static ADDRESS_MAP_START( cshooter_cpu1_map, AS_PROGRAM, 8, stfight_state )
 	AM_RANGE(0xc801, 0xc801) AM_WRITE(stfight_bank_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_text_w) AM_SHARE("tx_vram")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_DEVWRITE("airraid_vid", airraid_video_device, txram_w) AM_SHARE("txram")
+	AM_RANGE(0xd800, 0xd80f) AM_RAM_DEVWRITE("airraid_vid", airraid_video_device, vregs_w) AM_SHARE("vregs") // wrong?
 	AM_RANGE(0xe000, 0xfdff) AM_RAM
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("sprite_ram")
 	AM_IMPORT_FROM(cpu1_map)
 ADDRESS_MAP_END
+
+
 
 static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, stfight_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -433,115 +451,15 @@ static INPUT_PORTS_START( cshooter )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )
 INPUT_PORTS_END
 
-/* text-layer characters */
-static const gfx_layout charlayout =
-{
-	8,8,        /* 8*8 pixels */
-	512,        /* 512 characters */
-	2,          /* 2 bits per pixel */
-	{ 4, 0 },
-	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	8*16        /* every char takes 16 consecutive bytes */
-};
-
-static const gfx_layout cshooter_charlayout =
-{
-	8,8,        /* 8*8 characters */
-	RGN_FRAC(1,1),      /* 512 characters */
-	2,          /* 4 bits per pixel */
-	{ 0,4 },
-	{ 8,9,10,11,0,1,2,3 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	128*1
-};
 
 
-/* foreground tiles */
-static const gfx_layout fglayout =
-{
-	16,16,      /* 16*16 pixels */
-	1024,       /* 1024 tiles */
-	4,          /* 4 bits per pixel */
-	{ 64*1024*8+0, 64*1024*8+4, 0, 4 },
-	{      0,      1,       2,       3,
-			8,      9,      10,      11,
-		32*8+0, 32*8+1, 32*8+ 2, 32*8+ 3,
-		32*8+8, 32*8+9, 32*8+10, 32*8+11 },
-	{  0*8,  2*8,  4*8,  6*8,
-		8*8, 10*8, 12*8, 14*8,
-		16*8, 18*8, 20*8, 22*8,
-		24*8, 26*8, 28*8, 30*8 },
-	64*8        /* every char takes 64 consecutive bytes */
-};
 
-/*
- *      The background tiles are interleaved in banks of 2
- *      - so we need to create two separate layout structs
- *        to handle them properly with tilemaps
- */
-
-/* background tiles */
-static const gfx_layout bglayout =
-{
-	16,16,      /* 16*16 pixels */
-	512,        /* 512 tiles */
-	4,          /* 4 bits per pixel */
-	{ 64*1024*8+4, 64*1024*8+0, 4, 0 },
-	{      0,      1,       2,       3,
-			8,      9,      10,      11,
-		64*8+0, 64*8+1, 64*8+ 2, 64*8+ 3,
-		64*8+8, 64*8+9, 64*8+10, 64*8+11 },
-	{  0*8,  2*8,  4*8,  6*8,
-		8*8, 10*8, 12*8, 14*8,
-		16*8, 18*8, 20*8, 22*8,
-		24*8, 26*8, 28*8, 30*8 },
-	128*8       /* every tile takes 64/128 consecutive bytes */
-};
-
-/* sprites */
-static const gfx_layout spritelayout =
-{
-	16,16,      /* 16*16 pixels */
-	1024,       /* 1024 sprites */
-	4,          /* 4 bits per pixel */
-	{ 64*1024*8+0, 64*1024*8+4, 0, 4 },
-	{      0,      1,       2,       3,
-			8,      9,      10,      11,
-		32*8+0, 32*8+1, 32*8+ 2, 32*8+ 3,
-		32*8+8, 32*8+9, 32*8+10, 32*8+11 },
-	{  0*8,  2*8,  4*8,  6*8,
-		8*8, 10*8, 12*8, 14*8,
-		16*8, 18*8, 20*8, 22*8,
-		24*8, 26*8, 28*8, 30*8 },
-	64*8        /* every sprite takes 64 consecutive bytes */
-};
-
-
-static GFXDECODE_START( stfight )
-	GFXDECODE_ENTRY( "tx_gfx", 0x0000, charlayout,   0,                16 )
-	GFXDECODE_ENTRY( "fg_gfx", 0x0000, fglayout,     16*16,             16 )
-	GFXDECODE_ENTRY( "bg_gfx", 0x0000, bglayout,     16*16+16*16,       16 )
-	GFXDECODE_ENTRY( "bg_gfx", 0x0020, bglayout,     16*16+16*16,       16 )
-	GFXDECODE_ENTRY( "spr_gfx", 0x0000, spritelayout, 16*16+16*16+16*16, 16 )
-GFXDECODE_END
-
-static GFXDECODE_START( cshooter )
-	GFXDECODE_ENTRY( "tx_gfx", 0x0000, cshooter_charlayout,0,                16 )
-	GFXDECODE_ENTRY( "fg_gfx", 0x0000, fglayout,           16*16,             16 )
-	GFXDECODE_ENTRY( "bg_gfx", 0x0000, bglayout,           16*16+16*16,       16 )
-	GFXDECODE_ENTRY( "bg_gfx", 0x0020, bglayout,           16*16+16*16,       16 )
-	GFXDECODE_ENTRY( "spr_gfx", 0x0000, spritelayout,       16*16+16*16+16*16, 16 )
-GFXDECODE_END
-
-
-static MACHINE_CONFIG_START( stfight, stfight_state )
+static MACHINE_CONFIG_START( stfight_base, stfight_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", stfight_state,  stfight_vb_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("stfight_vid:screen", stfight_state,  stfight_vb_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
@@ -552,21 +470,8 @@ static MACHINE_CONFIG_START( stfight, stfight_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(stfight_state, screen_update_stfight)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_VIDEO_START_OVERRIDE(stfight_state,stfight)
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", stfight)
-	MCFG_PALETTE_ADD("palette", 16*16+16*16+16*16+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
+	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
-	MCFG_PALETTE_INIT_OWNER(stfight_state, stfight)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -590,30 +495,22 @@ static MACHINE_CONFIG_START( stfight, stfight_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( stfight, stfight_base )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(stfight_cpu1_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("stfight_vid:screen", stfight_state,  stfight_vb_interrupt)
 
-static MACHINE_CONFIG_DERIVED( cshooter, stfight )
-	MCFG_CPU_REPLACE("maincpu", Z80, XTAL_12MHz / 2)
+	MCFG_STFIGHT_VIDEO_ADD("stfight_vid")
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( cshooter, stfight_base )
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(cshooter_cpu1_map)
-	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_DECRYPTED_OPCODES)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", stfight_state,  stfight_vb_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("airraid_vid:screen", stfight_state,  stfight_vb_interrupt)
 
-	MCFG_CPU_REPLACE("audiocpu", Z80, XTAL_12MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(cpu2_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(stfight_state, irq0_line_hold, 120)
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(stfight_state, screen_update_cshooter)
-
-	MCFG_GFXDECODE_MODIFY("gfxdecode", cshooter)
-	MCFG_VIDEO_START_OVERRIDE(stfight_state,cshooter)
-
-	MCFG_SOUND_MODIFY("ym1")
-	MCFG_SOUND_CLOCK(XTAL_12MHz / 8)
-
-	MCFG_SOUND_MODIFY("ym2")
-	MCFG_SOUND_CLOCK(XTAL_12MHz / 8)
+	MCFG_AIRRAID_VIDEO_ADD("airraid_vid")
 MACHINE_CONFIG_END
 
 
@@ -635,47 +532,47 @@ ROM_START( empcity )
 	ROM_REGION( 0x0800, "mcu", 0 )
 	ROM_LOAD( "empcityu_68705.3j",  0x0000,  0x0800, CRC(182f7616) SHA1(38b4f23a559ae13f8ca1b974407a2a40fc52879f) )
 
-	ROM_REGION( 0x02000, "tx_gfx", 0 )    /* character data */
+	ROM_REGION( 0x02000, "stfight_vid:tx_gfx", 0 )    /* character data */
 	ROM_LOAD( "17.2N",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
 
-	ROM_REGION( 0x20000, "fg_gfx", 0 ) /* foreground tile pixel data */
+	ROM_REGION( 0x20000, "stfight_vid:fg_gfx", 0 ) /* foreground tile pixel data */
 	ROM_LOAD( "7.4C",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
 	ROM_LOAD( "8.5C",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
 	ROM_LOAD( "5.2C",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
 	ROM_LOAD( "6.3C",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
 
-	ROM_REGION( 0x20000, "bg_gfx", 0 )    /* background tile pixel data */
+	ROM_REGION( 0x20000, "stfight_vid:bg_gfx", 0 )    /* background tile pixel data */
 	ROM_LOAD( "13.4C",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
 	ROM_LOAD( "14.5J",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
 	ROM_LOAD( "11.2J",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
 	ROM_LOAD( "12.3J",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
 
-	ROM_REGION( 0x20000, "spr_gfx", 0 )    /* sprite data */
+	ROM_REGION( 0x20000, "stfight_vid:spr_gfx", 0 )    /* sprite data */
 	ROM_LOAD( "20.8W",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
 	ROM_LOAD( "21.9W",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
 	ROM_LOAD( "18.6W",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
 	ROM_LOAD( "19.7W",   0x08000, 0x8000, CRC(5170a057) SHA1(9222f9febc222fa0c2eead258ad77c857f6d40c8) )
 
-	ROM_REGION( 0x10000, "fg_map", 0 )    /* foreground map data */
+	ROM_REGION( 0x10000, "stfight_vid:fg_map", 0 )    /* foreground map data */
 	ROM_LOAD( "9.7C",   0x00000, 0x8000, CRC(8ceaf4fe) SHA1(5698f2ff44c109825b8d9d0b6dd2426624df668b) )
 	ROM_LOAD( "10.8C",   0x08000, 0x8000, CRC(5a1a227a) SHA1(24928ab218824ae1f5380398ceb90dcad525cc08) )
 
-	ROM_REGION( 0x10000, "bg_map", 0 )    /* background map data */
+	ROM_REGION( 0x10000, "stfight_vid:bg_map", 0 )    /* background map data */
 	ROM_LOAD( "15.7J",   0x00000, 0x8000, CRC(27a310bc) SHA1(dd30d72bc33b0bf7ddaf3ab730e028f51b20152a) )
 	ROM_LOAD( "16.8J",   0x08000, 0x8000, CRC(3d19ce18) SHA1(38f691a23c96ef672637965c1a13f6d1595f9d51) )
 
-	ROM_REGION( 0x0100, "tx_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:tx_clut", 0 )
 	ROM_LOAD( "82s129.006", 0x0000, 0x0100, CRC(f9424b5b) SHA1(e3bc23213406d35d54f1221f17f25d433df273a2) )  /* text lookup table */
 
-	ROM_REGION( 0x0100, "fg_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:fg_clut", 0 )
 	ROM_LOAD_NIB_HIGH( "82s129.002", 0x0000, 0x0100, CRC(c883d49b) SHA1(e84900ccf6f27e5043e43c0d85ea1e4eee7e52d3) )  /* fg lookup table */
 	ROM_LOAD_NIB_LOW(  "82s129.003", 0x0000, 0x0100, CRC(af81882a) SHA1(b1008c991bd8d1157b3479e465ab286c70418b58) )
 
-	ROM_REGION( 0x0100, "bg_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:bg_clut", 0 )
 	ROM_LOAD_NIB_HIGH( "82s129.004", 0x0000, 0x0100, CRC(1831ce7c) SHA1(57afbee9225f0efd63895a5f522e96dc87ca2616) )  /* bg lookup table */
 	ROM_LOAD_NIB_LOW(  "82s129.005", 0x0000, 0x0100, CRC(96cb6293) SHA1(1dcdeaa995e6ffa3753b742842c5ffe0f68ef8cd) )
 
-	ROM_REGION( 0x0100, "spr_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:spr_clut", 0 )
 	ROM_LOAD_NIB_HIGH( "82s129.052", 0x0000, 0x0100, CRC(3d915ffc) SHA1(921be6d5e5fc0fdee9c9f545c1c4a0c334e9844c) )  /* sprite lookup table */
 	ROM_LOAD_NIB_LOW(  "82s129.066", 0x0000, 0x0100, CRC(51e8832f) SHA1(ed8c00559e7a02bb8c11861d747c8c64c01b7437) )
 
@@ -697,47 +594,47 @@ ROM_START( empcityu )
 	ROM_REGION( 0x0800, "mcu", 0 )
 	ROM_LOAD( "empcityu_68705.3j",  0x0000,  0x0800, CRC(182f7616) SHA1(38b4f23a559ae13f8ca1b974407a2a40fc52879f) )
 
-	ROM_REGION( 0x02000, "tx_gfx", 0 )    /* character data */
+	ROM_REGION( 0x02000, "stfight_vid:tx_gfx", 0 )    /* character data */
 	ROM_LOAD( "vid.2p",   0x0000, 0x2000, CRC(15593793) SHA1(ac9ca8a0aa0ce3810f45aa41e74d4946ecced245) )
 
-	ROM_REGION( 0x20000, "fg_gfx", 0 ) /* foreground tile pixel data */
+	ROM_REGION( 0x20000, "stfight_vid:fg_gfx", 0 ) /* foreground tile pixel data */
 	ROM_LOAD( "7.4C",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
 	ROM_LOAD( "8.5C",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
 	ROM_LOAD( "5.2C",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
 	ROM_LOAD( "6.3C",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
 
-	ROM_REGION( 0x20000, "bg_gfx", 0 )    /* background tile pixel data */
+	ROM_REGION( 0x20000, "stfight_vid:bg_gfx", 0 )    /* background tile pixel data */
 	ROM_LOAD( "13.4C",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
 	ROM_LOAD( "14.5J",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
 	ROM_LOAD( "11.2J",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
 	ROM_LOAD( "12.3J",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
 
-	ROM_REGION( 0x20000, "spr_gfx", 0 )    /* sprite data */
+	ROM_REGION( 0x20000, "stfight_vid:spr_gfx", 0 )    /* sprite data */
 	ROM_LOAD( "20.8W",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
 	ROM_LOAD( "21.9W",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
 	ROM_LOAD( "18.6W",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
 	ROM_LOAD( "19.7W",   0x08000, 0x8000, CRC(5170a057) SHA1(9222f9febc222fa0c2eead258ad77c857f6d40c8) )
 
-	ROM_REGION( 0x10000, "fg_map", 0 )    /* foreground map data */
+	ROM_REGION( 0x10000, "stfight_vid:fg_map", 0 )    /* foreground map data */
 	ROM_LOAD( "9.7C",   0x00000, 0x8000, CRC(8ceaf4fe) SHA1(5698f2ff44c109825b8d9d0b6dd2426624df668b) )
 	ROM_LOAD( "10.8C",   0x08000, 0x8000, CRC(5a1a227a) SHA1(24928ab218824ae1f5380398ceb90dcad525cc08) )
 
-	ROM_REGION( 0x10000, "bg_map", 0 )    /* background map data */
+	ROM_REGION( 0x10000, "stfight_vid:bg_map", 0 )    /* background map data */
 	ROM_LOAD( "15.7J",   0x00000, 0x8000, CRC(27a310bc) SHA1(dd30d72bc33b0bf7ddaf3ab730e028f51b20152a) )
 	ROM_LOAD( "16.8J",   0x08000, 0x8000, CRC(3d19ce18) SHA1(38f691a23c96ef672637965c1a13f6d1595f9d51) )
 
-	ROM_REGION( 0x0100, "tx_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:tx_clut", 0 )
 	ROM_LOAD( "82s129.006", 0x0000, 0x0100, CRC(f9424b5b) SHA1(e3bc23213406d35d54f1221f17f25d433df273a2) )  /* text lookup table */
 
-	ROM_REGION( 0x0100, "fg_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:fg_clut", 0 )
 	ROM_LOAD_NIB_HIGH( "82s129.002", 0x0000, 0x0100, CRC(c883d49b) SHA1(e84900ccf6f27e5043e43c0d85ea1e4eee7e52d3) )  /* fg lookup table */
 	ROM_LOAD_NIB_LOW(  "82s129.003", 0x0000, 0x0100, CRC(af81882a) SHA1(b1008c991bd8d1157b3479e465ab286c70418b58) )
 
-	ROM_REGION( 0x0100, "bg_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:bg_clut", 0 )
 	ROM_LOAD_NIB_HIGH( "82s129.004", 0x0000, 0x0100, CRC(1831ce7c) SHA1(57afbee9225f0efd63895a5f522e96dc87ca2616) )  /* bg lookup table */
 	ROM_LOAD_NIB_LOW(  "82s129.005", 0x0000, 0x0100, CRC(96cb6293) SHA1(1dcdeaa995e6ffa3753b742842c5ffe0f68ef8cd) )
 
-	ROM_REGION( 0x0100, "spr_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:spr_clut", 0 )
 	ROM_LOAD_NIB_HIGH( "82s129.052", 0x0000, 0x0100, CRC(3d915ffc) SHA1(921be6d5e5fc0fdee9c9f545c1c4a0c334e9844c) )  /* sprite lookup table */
 	ROM_LOAD_NIB_LOW(  "82s129.066", 0x0000, 0x0100, CRC(51e8832f) SHA1(ed8c00559e7a02bb8c11861d747c8c64c01b7437) )
 
@@ -762,47 +659,47 @@ ROM_START( empcityj )
 	ROM_REGION( 0x0800, "mcu", 0 )
 	ROM_LOAD( "empcityj_68705.3j",  0x0000,  0x0800, BAD_DUMP CRC(19bdb0a9) SHA1(6baba9a46d64ae8349c7e9713419141f76a7af96) )
 
-	ROM_REGION( 0x02000, "tx_gfx", 0 )    /* character data */
+	ROM_REGION( 0x02000, "stfight_vid:tx_gfx", 0 )    /* character data */
 	ROM_LOAD( "17.2N",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
 
-	ROM_REGION( 0x20000, "fg_gfx", 0 ) /* foreground tile pixel data */
+	ROM_REGION( 0x20000, "stfight_vid:fg_gfx", 0 ) /* foreground tile pixel data */
 	ROM_LOAD( "7.4C",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
 	ROM_LOAD( "8.5C",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
 	ROM_LOAD( "5.2C",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
 	ROM_LOAD( "6.3C",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
 
-	ROM_REGION( 0x20000, "bg_gfx", 0 )    /* background tile pixel data */
+	ROM_REGION( 0x20000, "stfight_vid:bg_gfx", 0 )    /* background tile pixel data */
 	ROM_LOAD( "13.4C",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
 	ROM_LOAD( "14.5J",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
 	ROM_LOAD( "11.2J",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
 	ROM_LOAD( "12.3J",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
 
-	ROM_REGION( 0x20000, "spr_gfx", 0 )    /* sprite data */
+	ROM_REGION( 0x20000, "stfight_vid:spr_gfx", 0 )    /* sprite data */
 	ROM_LOAD( "20.8W",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
 	ROM_LOAD( "21.9W",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
 	ROM_LOAD( "18.6W",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
 	ROM_LOAD( "19.7W",   0x08000, 0x8000, CRC(5170a057) SHA1(9222f9febc222fa0c2eead258ad77c857f6d40c8) )
 
-	ROM_REGION( 0x10000, "fg_map", 0 )    /* foreground map data */
+	ROM_REGION( 0x10000, "stfight_vid:fg_map", 0 )    /* foreground map data */
 	ROM_LOAD( "9.7C",   0x00000, 0x8000, CRC(8ceaf4fe) SHA1(5698f2ff44c109825b8d9d0b6dd2426624df668b) )
 	ROM_LOAD( "10.8C",   0x08000, 0x8000, CRC(5a1a227a) SHA1(24928ab218824ae1f5380398ceb90dcad525cc08) )
 
-	ROM_REGION( 0x10000, "bg_map", 0 )    /* background map data */
+	ROM_REGION( 0x10000, "stfight_vid:bg_map", 0 )    /* background map data */
 	ROM_LOAD( "15.7J",   0x00000, 0x8000, CRC(27a310bc) SHA1(dd30d72bc33b0bf7ddaf3ab730e028f51b20152a) )
 	ROM_LOAD( "16.8J",   0x08000, 0x8000, CRC(3d19ce18) SHA1(38f691a23c96ef672637965c1a13f6d1595f9d51) )
 
-	ROM_REGION( 0x0100, "tx_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:tx_clut", 0 )
 	ROM_LOAD( "82s129.006", 0x0000, 0x0100, CRC(f9424b5b) SHA1(e3bc23213406d35d54f1221f17f25d433df273a2) )  /* text lookup table */
 
-	ROM_REGION( 0x0100, "fg_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:fg_clut", 0 )
 	ROM_LOAD_NIB_HIGH( "82s129.002", 0x0000, 0x0100, CRC(c883d49b) SHA1(e84900ccf6f27e5043e43c0d85ea1e4eee7e52d3) )  /* fg lookup table */
 	ROM_LOAD_NIB_LOW(  "82s129.003", 0x0000, 0x0100, CRC(af81882a) SHA1(b1008c991bd8d1157b3479e465ab286c70418b58) )
 
-	ROM_REGION( 0x0100, "bg_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:bg_clut", 0 )
 	ROM_LOAD_NIB_HIGH( "82s129.004", 0x0000, 0x0100, CRC(1831ce7c) SHA1(57afbee9225f0efd63895a5f522e96dc87ca2616) )  /* bg lookup table */
 	ROM_LOAD_NIB_LOW(  "82s129.005", 0x0000, 0x0100, CRC(96cb6293) SHA1(1dcdeaa995e6ffa3753b742842c5ffe0f68ef8cd) )
 
-	ROM_REGION( 0x0100, "spr_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:spr_clut", 0 )
 	ROM_LOAD_NIB_HIGH( "82s129.052", 0x0000, 0x0100, CRC(3d915ffc) SHA1(921be6d5e5fc0fdee9c9f545c1c4a0c334e9844c) )  /* sprite lookup table */
 	ROM_LOAD_NIB_LOW(  "82s129.066", 0x0000, 0x0100, CRC(51e8832f) SHA1(ed8c00559e7a02bb8c11861d747c8c64c01b7437) )
 
@@ -824,47 +721,47 @@ ROM_START( stfight )
 	ROM_REGION( 0x0800, "mcu", 0 )
 	ROM_LOAD( "stfight_68705.3j",  0x0000,  0x0800, BAD_DUMP  CRC(f4cc50d6) SHA1(2ff62a349b74fa965b5d19615e52b867c04988dc) )
 
-	ROM_REGION( 0x02000, "tx_gfx", 0 )    /* character data */
+	ROM_REGION( 0x02000, "stfight_vid:tx_gfx", 0 )    /* character data */
 	ROM_LOAD( "17.2N",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
 
-	ROM_REGION( 0x20000, "fg_gfx", 0 ) /* foreground tile pixel data */
+	ROM_REGION( 0x20000, "stfight_vid:fg_gfx", 0 ) /* foreground tile pixel data */
 	ROM_LOAD( "7.4C",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
 	ROM_LOAD( "8.5C",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
 	ROM_LOAD( "5.2C",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
 	ROM_LOAD( "6.3C",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
 
-	ROM_REGION( 0x20000, "bg_gfx", 0 )    /* background tile pixel data */
+	ROM_REGION( 0x20000, "stfight_vid:bg_gfx", 0 )    /* background tile pixel data */
 	ROM_LOAD( "13.4C",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
 	ROM_LOAD( "14.5J",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
 	ROM_LOAD( "11.2J",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
 	ROM_LOAD( "12.3J",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
 
-	ROM_REGION( 0x20000, "spr_gfx", 0 )    /* sprite data */
+	ROM_REGION( 0x20000, "stfight_vid:spr_gfx", 0 )    /* sprite data */
 	ROM_LOAD( "20.8W",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
 	ROM_LOAD( "21.9W",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
 	ROM_LOAD( "18.6W",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
 	ROM_LOAD( "19.7W",   0x08000, 0x8000, CRC(5170a057) SHA1(9222f9febc222fa0c2eead258ad77c857f6d40c8) )
 
-	ROM_REGION( 0x10000, "fg_map", 0 )    /* foreground map data */
+	ROM_REGION( 0x10000, "stfight_vid:fg_map", 0 )    /* foreground map data */
 	ROM_LOAD( "9.7C",   0x00000, 0x8000, CRC(8ceaf4fe) SHA1(5698f2ff44c109825b8d9d0b6dd2426624df668b) )
 	ROM_LOAD( "10.8C",   0x08000, 0x8000, CRC(5a1a227a) SHA1(24928ab218824ae1f5380398ceb90dcad525cc08) )
 
-	ROM_REGION( 0x10000, "bg_map", 0 )    /* background map data */
+	ROM_REGION( 0x10000, "stfight_vid:bg_map", 0 )    /* background map data */
 	ROM_LOAD( "15.7J",   0x00000, 0x8000, CRC(27a310bc) SHA1(dd30d72bc33b0bf7ddaf3ab730e028f51b20152a) )
 	ROM_LOAD( "16.8J",   0x08000, 0x8000, CRC(3d19ce18) SHA1(38f691a23c96ef672637965c1a13f6d1595f9d51) )
 
-	ROM_REGION( 0x0100, "tx_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:tx_clut", 0 )
 	ROM_LOAD( "82s129.006", 0x0000, 0x0100, CRC(f9424b5b) SHA1(e3bc23213406d35d54f1221f17f25d433df273a2) )  /* text lookup table */
 
-	ROM_REGION( 0x0100, "fg_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:fg_clut", 0 )
 	ROM_LOAD_NIB_HIGH( "82s129.002", 0x0000, 0x0100, CRC(c883d49b) SHA1(e84900ccf6f27e5043e43c0d85ea1e4eee7e52d3) )  /* fg lookup table */
 	ROM_LOAD_NIB_LOW(  "82s129.003", 0x0000, 0x0100, CRC(af81882a) SHA1(b1008c991bd8d1157b3479e465ab286c70418b58) )
 
-	ROM_REGION( 0x0100, "bg_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:bg_clut", 0 )
 	ROM_LOAD_NIB_HIGH( "82s129.004", 0x0000, 0x0100, CRC(1831ce7c) SHA1(57afbee9225f0efd63895a5f522e96dc87ca2616) )  /* bg lookup table */
 	ROM_LOAD_NIB_LOW(  "82s129.005", 0x0000, 0x0100, CRC(96cb6293) SHA1(1dcdeaa995e6ffa3753b742842c5ffe0f68ef8cd) )
 
-	ROM_REGION( 0x0100, "spr_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:spr_clut", 0 )
 	ROM_LOAD_NIB_HIGH( "82s129.052", 0x0000, 0x0100, CRC(3d915ffc) SHA1(921be6d5e5fc0fdee9c9f545c1c4a0c334e9844c) )  /* sprite lookup table */
 	ROM_LOAD_NIB_LOW(  "82s129.066", 0x0000, 0x0100, CRC(51e8832f) SHA1(ed8c00559e7a02bb8c11861d747c8c64c01b7437) )
 
@@ -888,47 +785,47 @@ ROM_START( stfighta )
 	ROM_REGION( 0x0800, "mcu", 0 )
 	ROM_LOAD( "stfight_68705.3j",  0x0000,  0x0800, BAD_DUMP CRC(f4cc50d6) SHA1(2ff62a349b74fa965b5d19615e52b867c04988dc) )
 
-	ROM_REGION( 0x02000, "tx_gfx", 0 )    /* character data */
+	ROM_REGION( 0x02000, "stfight_vid:tx_gfx", 0 )    /* character data */
 	ROM_LOAD( "17.2N",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
 
-	ROM_REGION( 0x20000, "fg_gfx", 0 ) /* foreground tile pixel data */
+	ROM_REGION( 0x20000, "stfight_vid:fg_gfx", 0 ) /* foreground tile pixel data */
 	ROM_LOAD( "7.4C",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
 	ROM_LOAD( "8.5C",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
 	ROM_LOAD( "5.2C",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
 	ROM_LOAD( "6.3C",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
 
-	ROM_REGION( 0x20000, "bg_gfx", 0 )    /* background tile pixel data */
+	ROM_REGION( 0x20000, "stfight_vid:bg_gfx", 0 )    /* background tile pixel data */
 	ROM_LOAD( "13.4C",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
 	ROM_LOAD( "14.5J",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
 	ROM_LOAD( "11.2J",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
 	ROM_LOAD( "12.3J",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
 
-	ROM_REGION( 0x20000, "spr_gfx", 0 )    /* sprite data */
+	ROM_REGION( 0x20000, "stfight_vid:spr_gfx", 0 )    /* sprite data */
 	ROM_LOAD( "20.8W",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
 	ROM_LOAD( "21.9W",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
 	ROM_LOAD( "18.6W",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
 	ROM_LOAD( "19.7W",   0x08000, 0x8000, CRC(5170a057) SHA1(9222f9febc222fa0c2eead258ad77c857f6d40c8) )
 
-	ROM_REGION( 0x10000, "fg_map", 0 )    /* foreground map data */
+	ROM_REGION( 0x10000, "stfight_vid:fg_map", 0 )    /* foreground map data */
 	ROM_LOAD( "9.7C",   0x00000, 0x8000, CRC(8ceaf4fe) SHA1(5698f2ff44c109825b8d9d0b6dd2426624df668b) )
 	ROM_LOAD( "10.8C",   0x08000, 0x8000, CRC(5a1a227a) SHA1(24928ab218824ae1f5380398ceb90dcad525cc08) )
 
-	ROM_REGION( 0x10000, "bg_map", 0 )    /* background map data */
+	ROM_REGION( 0x10000, "stfight_vid:bg_map", 0 )    /* background map data */
 	ROM_LOAD( "15.7J",   0x00000, 0x8000, CRC(27a310bc) SHA1(dd30d72bc33b0bf7ddaf3ab730e028f51b20152a) )
 	ROM_LOAD( "16.8J",   0x08000, 0x8000, CRC(3d19ce18) SHA1(38f691a23c96ef672637965c1a13f6d1595f9d51) )
 
-	ROM_REGION( 0x0100, "tx_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:tx_clut", 0 )
 	ROM_LOAD( "82s129.006", 0x0000, 0x0100, CRC(f9424b5b) SHA1(e3bc23213406d35d54f1221f17f25d433df273a2) )  /* text lookup table */
 
-	ROM_REGION( 0x0100, "fg_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:fg_clut", 0 )
 	ROM_LOAD_NIB_HIGH( "82s129.002", 0x0000, 0x0100, CRC(c883d49b) SHA1(e84900ccf6f27e5043e43c0d85ea1e4eee7e52d3) )  /* fg lookup table */
 	ROM_LOAD_NIB_LOW(  "82s129.003", 0x0000, 0x0100, CRC(af81882a) SHA1(b1008c991bd8d1157b3479e465ab286c70418b58) )
 
-	ROM_REGION( 0x0100, "bg_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:bg_clut", 0 )
 	ROM_LOAD_NIB_HIGH( "82s129.004", 0x0000, 0x0100, CRC(1831ce7c) SHA1(57afbee9225f0efd63895a5f522e96dc87ca2616) )  /* bg lookup table */
 	ROM_LOAD_NIB_LOW(  "82s129.005", 0x0000, 0x0100, CRC(96cb6293) SHA1(1dcdeaa995e6ffa3753b742842c5ffe0f68ef8cd) )
 
-	ROM_REGION( 0x0100, "spr_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:spr_clut", 0 )
 	ROM_LOAD_NIB_HIGH( "82s129.052", 0x0000, 0x0100, CRC(3d915ffc) SHA1(921be6d5e5fc0fdee9c9f545c1c4a0c334e9844c) )  /* sprite lookup table */
 	ROM_LOAD_NIB_LOW(  "82s129.066", 0x0000, 0x0100, CRC(51e8832f) SHA1(ed8c00559e7a02bb8c11861d747c8c64c01b7437) )
 
@@ -950,47 +847,47 @@ ROM_START( empcityi ) // very similar to above set
 	ROM_REGION( 0x0800, "mcu", 0 )
 	ROM_LOAD( "empcityi_68705.3j",  0x0000,  0x0800, BAD_DUMP CRC(b1817d44) SHA1(395aad763eb054514f658a14c12b92c1b90c02ce) )
 
-	ROM_REGION( 0x02000, "tx_gfx", 0 )    /* character data */
+	ROM_REGION( 0x02000, "stfight_vid:tx_gfx", 0 )    /* character data */
 	ROM_LOAD( "17.2N",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
 
-	ROM_REGION( 0x20000, "fg_gfx", 0 ) /* foreground tile pixel data */
+	ROM_REGION( 0x20000, "stfight_vid:fg_gfx", 0 ) /* foreground tile pixel data */
 	ROM_LOAD( "7.4C",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
 	ROM_LOAD( "8.5C",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
 	ROM_LOAD( "5.2C",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
 	ROM_LOAD( "6.3C",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
 
-	ROM_REGION( 0x20000, "bg_gfx", 0 )    /* background tile pixel data */
+	ROM_REGION( 0x20000, "stfight_vid:bg_gfx", 0 )    /* background tile pixel data */
 	ROM_LOAD( "13.4C",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
 	ROM_LOAD( "14.5J",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
 	ROM_LOAD( "11.2J",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
 	ROM_LOAD( "12.3J",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
 
-	ROM_REGION( 0x20000, "spr_gfx", 0 )    /* sprite data */
+	ROM_REGION( 0x20000, "stfight_vid:spr_gfx", 0 )    /* sprite data */
 	ROM_LOAD( "20.8W",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
 	ROM_LOAD( "21.9W",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
 	ROM_LOAD( "18.6W",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
 	ROM_LOAD( "19.7W",   0x08000, 0x8000, CRC(5170a057) SHA1(9222f9febc222fa0c2eead258ad77c857f6d40c8) )
 
-	ROM_REGION( 0x10000, "fg_map", 0 )    /* foreground map data */
+	ROM_REGION( 0x10000, "stfight_vid:fg_map", 0 )    /* foreground map data */
 	ROM_LOAD( "9.7C",   0x00000, 0x8000, CRC(8ceaf4fe) SHA1(5698f2ff44c109825b8d9d0b6dd2426624df668b) )
 	ROM_LOAD( "10.8C",   0x08000, 0x8000, CRC(5a1a227a) SHA1(24928ab218824ae1f5380398ceb90dcad525cc08) )
 
-	ROM_REGION( 0x10000, "bg_map", 0 )    /* background map data */
+	ROM_REGION( 0x10000, "stfight_vid:bg_map", 0 )    /* background map data */
 	ROM_LOAD( "15.7J",   0x00000, 0x8000, CRC(27a310bc) SHA1(dd30d72bc33b0bf7ddaf3ab730e028f51b20152a) )
 	ROM_LOAD( "16.8J",   0x08000, 0x8000, CRC(3d19ce18) SHA1(38f691a23c96ef672637965c1a13f6d1595f9d51) )
 
-	ROM_REGION( 0x0100, "tx_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:tx_clut", 0 )
 	ROM_LOAD( "82s129.006", 0x0000, 0x0100, CRC(f9424b5b) SHA1(e3bc23213406d35d54f1221f17f25d433df273a2) )  /* text lookup table */
 
-	ROM_REGION( 0x0100, "fg_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:fg_clut", 0 )
 	ROM_LOAD_NIB_HIGH( "82s129.002", 0x0000, 0x0100, CRC(c883d49b) SHA1(e84900ccf6f27e5043e43c0d85ea1e4eee7e52d3) )  /* fg lookup table */
 	ROM_LOAD_NIB_LOW(  "82s129.003", 0x0000, 0x0100, CRC(af81882a) SHA1(b1008c991bd8d1157b3479e465ab286c70418b58) )
 
-	ROM_REGION( 0x0100, "bg_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:bg_clut", 0 )
 	ROM_LOAD_NIB_HIGH( "82s129.004", 0x0000, 0x0100, CRC(1831ce7c) SHA1(57afbee9225f0efd63895a5f522e96dc87ca2616) )  /* bg lookup table */
 	ROM_LOAD_NIB_LOW(  "82s129.005", 0x0000, 0x0100, CRC(96cb6293) SHA1(1dcdeaa995e6ffa3753b742842c5ffe0f68ef8cd) )
 
-	ROM_REGION( 0x0100, "spr_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:spr_clut", 0 )
 	ROM_LOAD_NIB_HIGH( "82s129.052", 0x0000, 0x0100, CRC(3d915ffc) SHA1(921be6d5e5fc0fdee9c9f545c1c4a0c334e9844c) )  /* sprite lookup table */
 	ROM_LOAD_NIB_LOW(  "82s129.066", 0x0000, 0x0100, CRC(51e8832f) SHA1(ed8c00559e7a02bb8c11861d747c8c64c01b7437) )
 
@@ -1012,47 +909,47 @@ ROM_START( stfightgb )
 	ROM_REGION( 0x0800, "mcu", 0 )
 	ROM_LOAD( "stfightgb_68705.3J",  0x0000,  0x0800, BAD_DUMP  CRC(3b1b2660) SHA1(8d5d853a0861ff9cdea27eb3588586b441cc77b1) ) //hand-crafted, to be dumped
 
-	ROM_REGION( 0x02000, "tx_gfx", 0 )    /* character data */
+	ROM_REGION( 0x02000, "stfight_vid:tx_gfx", 0 )    /* character data */
 	ROM_LOAD( "17.2N",  0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
 
-	ROM_REGION( 0x20000, "fg_gfx", 0 ) /* foreground tile pixel data */
+	ROM_REGION( 0x20000, "stfight_vid:fg_gfx", 0 ) /* foreground tile pixel data */
 	ROM_LOAD( "7.4C",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
 	ROM_LOAD( "8.5C",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
 	ROM_LOAD( "5.2C",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
 	ROM_LOAD( "6.3C",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
 
-	ROM_REGION( 0x20000, "bg_gfx", 0 )    /* background tile pixel data */
+	ROM_REGION( 0x20000, "stfight_vid:bg_gfx", 0 )    /* background tile pixel data */
 	ROM_LOAD( "13.4C",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
 	ROM_LOAD( "14.5J",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
 	ROM_LOAD( "11.2J",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
 	ROM_LOAD( "12.3J",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
 
-	ROM_REGION( 0x20000, "spr_gfx", 0 )    /* sprite data */
+	ROM_REGION( 0x20000, "stfight_vid:spr_gfx", 0 )    /* sprite data */
 	ROM_LOAD( "20.8W",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
 	ROM_LOAD( "21.9W",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
 	ROM_LOAD( "18.6W",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
 	ROM_LOAD( "19.7W",   0x08000, 0x8000, CRC(5170a057) SHA1(9222f9febc222fa0c2eead258ad77c857f6d40c8) )
 
-	ROM_REGION( 0x10000, "fg_map", 0 )    /* foreground map data */
+	ROM_REGION( 0x10000, "stfight_vid:fg_map", 0 )    /* foreground map data */
 	ROM_LOAD( "9.7C",    0x00000, 0x8000, CRC(8ceaf4fe) SHA1(5698f2ff44c109825b8d9d0b6dd2426624df668b) )
 	ROM_LOAD( "10.8C",   0x08000, 0x8000, CRC(5a1a227a) SHA1(24928ab218824ae1f5380398ceb90dcad525cc08) )
 
-	ROM_REGION( 0x10000, "bg_map", 0 )    /* background map data */
+	ROM_REGION( 0x10000, "stfight_vid:bg_map", 0 )    /* background map data */
 	ROM_LOAD( "15.7J",   0x00000, 0x8000, CRC(27a310bc) SHA1(dd30d72bc33b0bf7ddaf3ab730e028f51b20152a) )
 	ROM_LOAD( "16.8J",   0x08000, 0x8000, CRC(3d19ce18) SHA1(38f691a23c96ef672637965c1a13f6d1595f9d51) )
 
-	ROM_REGION( 0x0100, "tx_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:tx_clut", 0 )
 	ROM_LOAD( "82s129.006", 0x0000, 0x0100, CRC(f9424b5b) SHA1(e3bc23213406d35d54f1221f17f25d433df273a2) )  /* text lookup table */
 
-	ROM_REGION( 0x0100, "fg_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:fg_clut", 0 )
 	ROM_LOAD_NIB_HIGH( "82s129.002", 0x0000, 0x0100, CRC(c883d49b) SHA1(e84900ccf6f27e5043e43c0d85ea1e4eee7e52d3) )  /* fg lookup table */
 	ROM_LOAD_NIB_LOW(  "82s129.003", 0x0000, 0x0100, CRC(af81882a) SHA1(b1008c991bd8d1157b3479e465ab286c70418b58) )
 
-	ROM_REGION( 0x0100, "bg_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:bg_clut", 0 )
 	ROM_LOAD_NIB_HIGH( "82s129.004", 0x0000, 0x0100, CRC(1831ce7c) SHA1(57afbee9225f0efd63895a5f522e96dc87ca2616) )  /* bg lookup table */
 	ROM_LOAD_NIB_LOW(  "82s129.005", 0x0000, 0x0100, CRC(96cb6293) SHA1(1dcdeaa995e6ffa3753b742842c5ffe0f68ef8cd) )
 
-	ROM_REGION( 0x0100, "spr_clut", 0 )
+	ROM_REGION( 0x0100, "stfight_vid:spr_clut", 0 )
 	ROM_LOAD_NIB_HIGH( "82s129.052", 0x0000, 0x0100, CRC(3d915ffc) SHA1(921be6d5e5fc0fdee9c9f545c1c4a0c334e9844c) )  /* sprite lookup table */
 	ROM_LOAD_NIB_LOW(  "82s129.066", 0x0000, 0x0100, CRC(51e8832f) SHA1(ed8c00559e7a02bb8c11861d747c8c64c01b7437) )
 
@@ -1082,13 +979,6 @@ LB 9S       82S129     1.BPR     0194   [ motion objects ]
 TB 4E       82S129     2.BPR     00DC   [ motion objects ]
 TB 16A      63S281     x         x      [     clut       ] NOTE: dumped much later
 LB 3J       68705
-
-
-Notes:   LB - CPU board        S-0086-002-0B
-         TB - GFX board        S-0087-807
-
-         The PCB looks like a prototype, due to the modifications
-         to the PCB. The game is probably licensed from Seibu.
 
          The 0/1/2 bipolar PROMs are not used for colour.
 
@@ -1128,44 +1018,47 @@ ROM_START( cshootert )
 	ROM_REGION( 0x0800, "mcu", 0 ) /* 2k for the microcontroller */
 	ROM_LOAD( "crshooter.3j", 0x0000, 0x0800, CRC(aae61ce7) SHA1(bb2b9887ec73a5b82604b9b64c533c2242d20d0f) )
 
-	ROM_REGION( 0x02000, "tx_gfx", 0 ) // TX Layer
-	ROM_LOAD( "r3.11a",  0x00000, 0x02000, CRC(67b50a47) SHA1(b1f4aefc9437edbeefba5371149cc08c0b55c741) )
-
-	ROM_REGION( 0x100, "tx_clut", 0 )
-	ROM_LOAD( "63s281.16a", 0x0000, 0x0100, CRC(0b8b914b) SHA1(8cf4910b846de79661cc187887171ed8ebfd6719) ) // clut
-
-	/* ### MODULE 1 ### Background generation / graphics  */
-	ROM_REGION( 0x40000, "bg_map", 0 )
-	ROM_LOAD16_BYTE( "bg_layouts_even",   0x00000, 0x20000, NO_DUMP )
-	ROM_LOAD16_BYTE( "bg_layouts_odd",    0x00001, 0x20000, NO_DUMP )
-	ROM_REGION( 0x40000, "bg_gfx", 0 )
-	ROM_LOAD16_BYTE( "bg_tiles_even",   0x00000, 0x20000, NO_DUMP )
-	ROM_LOAD16_BYTE( "bg_tiles_odd",    0x00001, 0x20000, NO_DUMP )
-	ROM_REGION( 0x100, "bg_clut", 0 )
-	ROM_LOAD( "bg_clut",   0x000, 0x100, NO_DUMP )
-
-	/* ### MODULE 2 ### Foreground generation / graphics  */
-	ROM_REGION( 0x40000, "fg_map", 0 )
-	ROM_LOAD16_BYTE( "fg_layouts_even",   0x00000, 0x20000, NO_DUMP )
-	ROM_LOAD16_BYTE( "fg_layouts_odd",    0x00001, 0x20000, NO_DUMP )
-	ROM_REGION( 0x40000, "fg_gfx", 0 )
-	ROM_LOAD16_BYTE( "fg_tiles_even",   0x00000, 0x20000, NO_DUMP )
-	ROM_LOAD16_BYTE( "fg_tiles_odd",    0x00001, 0x20000, NO_DUMP )
-	ROM_REGION( 0x100, "fg_clut", 0 )
-	ROM_LOAD( "fg_clut",   0x000, 0x100, NO_DUMP )
-
-	/* ### MODULE 3 ### Sprite graphics  */
-	ROM_REGION( 0x40000, "spr_gfx", 0 )
-	ROM_LOAD16_BYTE( "sprite_tiles_even",   0x00000, 0x20000, NO_DUMP )
-	ROM_LOAD16_BYTE( "sprite_tiles_odd",    0x00001, 0x20000, NO_DUMP )
-	ROM_REGION( 0x100, "spr_clut", 0 )
-	ROM_LOAD( "spr_clut",   0x000, 0x100, NO_DUMP )
-
 	ROM_REGION( 0x820, "proms", 0 )
 	ROM_LOAD( "82s129.9s",  0x0500, 0x0100, CRC(cf14ba30) SHA1(3284b6809075756b3c8e07d9705fc7eacb7556f1) ) // timing? (not used)
 	ROM_LOAD( "82s129.4e",  0x0600, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) ) // timing? (not used)
 	ROM_LOAD( "82s123.7a",  0x0800, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) ) // ? (not used)
+
+	// below are from the video board
+
+	ROM_REGION( 0x02000, "airraid_vid:tx_gfx", 0 ) // TX Layer
+	ROM_LOAD( "r3.11a",  0x00000, 0x02000, CRC(67b50a47) SHA1(b1f4aefc9437edbeefba5371149cc08c0b55c741) )
+
+	ROM_REGION( 0x100, "airraid_vid:tx_clut", 0 )
+	ROM_LOAD( "63s281.16a", 0x0000, 0x0100, CRC(0b8b914b) SHA1(8cf4910b846de79661cc187887171ed8ebfd6719) ) // clut
+
+	/* ### MODULE 1 ### Background generation / graphics  */
+	ROM_REGION( 0x40000, "airraid_vid:bg_map", 0 )
+	ROM_LOAD16_BYTE( "bg_layouts_even",   0x00000, 0x20000, NO_DUMP )
+	ROM_LOAD16_BYTE( "bg_layouts_odd",    0x00001, 0x20000, NO_DUMP )
+	ROM_REGION( 0x40000, "airraid_vid:bg_gfx", 0 )
+	ROM_LOAD16_BYTE( "bg_tiles_even",   0x00000, 0x20000, NO_DUMP )
+	ROM_LOAD16_BYTE( "bg_tiles_odd",    0x00001, 0x20000, NO_DUMP )
+	ROM_REGION( 0x100, "airraid_vid:bg_clut", 0 )
+	ROM_LOAD( "bg_clut",   0x000, 0x100, NO_DUMP )
+
+	/* ### MODULE 2 ### Foreground generation / graphics  */
+	ROM_REGION( 0x40000, "airraid_vid:fg_map", 0 )
+	ROM_LOAD16_BYTE( "fg_layouts_even",   0x00000, 0x20000, NO_DUMP )
+	ROM_LOAD16_BYTE( "fg_layouts_odd",    0x00001, 0x20000, NO_DUMP )
+	ROM_REGION( 0x40000, "airraid_vid:fg_gfx", 0 )
+	ROM_LOAD16_BYTE( "fg_tiles_even",   0x00000, 0x20000, NO_DUMP )
+	ROM_LOAD16_BYTE( "fg_tiles_odd",    0x00001, 0x20000, NO_DUMP )
+	ROM_REGION( 0x100, "airraid_vid:fg_clut", 0 )
+	ROM_LOAD( "fg_clut",   0x000, 0x100, NO_DUMP )
+
+	/* ### MODULE 3 ### Sprite graphics  */
+	ROM_REGION( 0x40000, "airraid_vid:spr_gfx", 0 )
+	ROM_LOAD16_BYTE( "sprite_tiles_even",   0x00000, 0x20000, NO_DUMP )
+	ROM_LOAD16_BYTE( "sprite_tiles_odd",    0x00001, 0x20000, NO_DUMP )
+	ROM_REGION( 0x100, "airraid_vid:spr_clut", 0 )
+	ROM_LOAD( "spr_clut",   0x000, 0x100, NO_DUMP )
 ROM_END
+
 
 // Note: Marked MACHINE_IMPERFECT_SOUND due to YM2203 clock issue
 GAME( 1986, empcity,  0,       stfight, stfight, stfight_state, empcity, ROT0,   "Seibu Kaihatsu",                           "Empire City: 1931 (bootleg?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
@@ -1176,5 +1069,5 @@ GAME( 1986, stfight,  empcity, stfight, stfight, stfight_state, stfight, ROT0,  
 GAME( 1986, stfighta, empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu",                           "Street Fight (bootleg?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, stfightgb,empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany - Benelux)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-/* Cross Shooter runs on a slightly modified PCB, with a different text tilemap and gfx blobs (see also airraid.c) */
+/* Cross Shooter uses the same base board, but different video board */
 GAME( 1987, cshootert,  airraid,      cshooter, cshooter, stfight_state, cshooter, ROT270, "Seibu Kaihatsu (Taito license)",           "Cross Shooter (2 PCB Stack)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
