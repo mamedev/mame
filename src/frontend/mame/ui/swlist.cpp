@@ -12,6 +12,7 @@
 
 #include "ui/ui.h"
 #include "ui/swlist.h"
+#include "ui/utils.h"
 
 #include "softlist.h"
 
@@ -28,6 +29,18 @@ namespace ui {
 /***************************************************************************
     SOFTWARE PARTS
 ***************************************************************************/
+
+//-------------------------------------------------
+//  is_valid_softlist_part_char - returns whether
+//	this character is a valid char for a softlist
+//	part
+//-------------------------------------------------
+
+static bool is_valid_softlist_part_char(unicode_char ch)
+{
+	return (ch == (char)ch) && isalnum(ch);
+}
+
 
 //-------------------------------------------------
 //  ctor
@@ -233,7 +246,7 @@ void menu_software_list::handle()
 			m_ordered_by_shortname = !m_ordered_by_shortname;
 
 			// reset the char buffer if we change ordering criterion
-			memset(m_filename_buffer, '\0', ARRAY_LENGTH(m_filename_buffer));
+			m_filename_buffer.clear();
 
 			// reload the menu with the new order
 			reset(reset_options::REMEMBER_REF);
@@ -248,33 +261,11 @@ void menu_software_list::handle()
 		}
 		else if (event->iptkey == IPT_SPECIAL)
 		{
-			auto const buflen = std::strlen(m_filename_buffer);
-			bool update_selected = false;
-
-			if ((event->unichar == 8) || (event->unichar == 0x7f))
+			if (input_character(m_filename_buffer, event->unichar, &is_valid_softlist_part_char))
 			{
-				// if it's a backspace and we can handle it, do so
-				if (0 < buflen)
-				{
-					*const_cast<char *>(utf8_previous_char(&m_filename_buffer[buflen])) = 0;
-					update_selected = true;
+				// display the popup
+				ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
 
-					ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
-				}
-			}
-			else if (event->is_char_printable())
-			{
-				// if it's any other key and we're not maxed out, update
-				if (event->append_char(m_filename_buffer, buflen))
-				{
-					update_selected = true;
-
-					ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
-				}
-			}
-
-			if (update_selected)
-			{
 				// identify the selected entry
 				entry_info const *const cur_selected = (FPTR(event->itemref) != 1)
 						? reinterpret_cast<entry_info const *>(get_selection_ref())
@@ -289,9 +280,9 @@ void menu_software_list::handle()
 						auto &compare_name = m_ordered_by_shortname ? entry.short_name : entry.long_name;
 
 						int match = 0;
-						for (int i = 0; i < ARRAY_LENGTH(m_filename_buffer); i++)
+						for (int i = 0; i < m_filename_buffer.length(); i++)
 						{
-							if (core_strnicmp(compare_name.c_str(), m_filename_buffer, i) == 0)
+							if (core_strnicmp(compare_name.c_str(), m_filename_buffer.c_str(), i) == 0)
 								match = i;
 						}
 
@@ -313,8 +304,7 @@ void menu_software_list::handle()
 		else if (event->iptkey == IPT_UI_CANCEL)
 		{
 			// reset the char buffer also in this case
-			if (m_filename_buffer[0] != '\0')
-				memset(m_filename_buffer, '\0', ARRAY_LENGTH(m_filename_buffer));
+			m_filename_buffer.clear();
 			m_result = m_filename_buffer;
 			stack_pop();
 		}

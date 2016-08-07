@@ -13,6 +13,8 @@
 #ifndef __UI_UTILS_H__
 #define __UI_UTILS_H__
 
+#include "unicode.h"
+
 #define MAX_CHAR_INFO            256
 #define MAX_CUST_FILTER          8
 
@@ -248,5 +250,38 @@ char* chartrimcarriage(char str[]);
 const char* strensure(const char* s);
 int getprecisionchr(const char* s);
 std::vector<std::string> tokenize(const std::string &text, char sep);
+
+
+//-------------------------------------------------
+//  input_character - inputs a typed character
+//  into a buffer
+//-------------------------------------------------
+
+template <typename F>
+bool input_character(std::string &buffer, unicode_char unichar, F &&filter)
+{
+	bool result = false;
+	auto buflen = buffer.size();
+
+	if ((unichar == 8) || (unichar == 0x7f))
+	{
+		// backspace
+		if (0 < buflen)
+		{
+			auto buffer_oldend = buffer.c_str() + buflen;
+			auto buffer_newend = utf8_previous_char(buffer_oldend);
+			buffer.resize(buffer_newend - buffer.c_str());
+			result = true;
+		}
+	}
+	else if ((unichar >= ' ') && (!filter || filter(unichar)))
+	{
+		// append this character
+		buffer += utf8_from_uchar(unichar);
+		result = true;
+	}
+	return result;
+}
+
 
 #endif /* __UI_UTILS_H__ */
