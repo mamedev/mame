@@ -145,7 +145,7 @@ void image_manager::config_save(config_type cfg_type, xml_data_node *parentnode)
 			if (node != nullptr)
 			{
 				xml_set_attribute(node, "instance", dev_instance);
-				xml_set_attribute(node, "directory", image.working_directory());
+				xml_set_attribute(node, "directory", image.working_directory().c_str());
 			}
 		}
 	}

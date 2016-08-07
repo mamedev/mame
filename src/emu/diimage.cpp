@@ -398,13 +398,13 @@ void device_image_interface::setup_working_directory()
 //  valid even if not mounted
 //-------------------------------------------------
 
-const char * device_image_interface::working_directory()
+const std::string &device_image_interface::working_directory()
 {
 	// check to see if we've never initialized the working directory
 	if (m_working_directory.empty())
 		setup_working_directory();
 
-	return m_working_directory.c_str();
+	return m_working_directory;
 }
 
 
