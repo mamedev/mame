@@ -448,8 +448,9 @@ ROM_START(apple2gs)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89)) /* need label/part number */
 
 	ROM_REGION(0x40000,"maincpu",0)
-	ROM_LOAD("341-0737", 0x00000, 0x20000, CRC(8d410067) SHA1(c0f4704233ead14cb8e1e8a68fbd7063c56afd27)) /* Needs verification; 341-0737: IIgs ROM03 FC-FD */
-	ROM_LOAD("341-0748", 0x20000, 0x20000, CRC(d4c50550) SHA1(2784cdd7ac7094b3e494409db3e72b4e6d2d9e81)) /* Needs verification; 341-0748: IIgs ROM03 FE-FF */
+	// The 341-0749 is known to also be matched with the 341-0728 MASK rom which holds the same data as the EPROM 341-0737 version.
+	ROM_LOAD("341-0737", 0x00000, 0x20000, CRC(8d410067) SHA1(c0f4704233ead14cb8e1e8a68fbd7063c56afd27) ) /* 341-0737: IIgs ROM03 FC-FD */
+	ROM_LOAD("341-0748", 0x20000, 0x20000, CRC(18190283) SHA1(c70576869deec92ca82c78438b1d5c686eac7480) ) /* 341-0748: IIgs ROM03 FE-FF */
 
 	ROM_REGION(0x20000, "es5503", ROMREGION_ERASE00)
 
@@ -494,7 +495,7 @@ ROM_START(apple2gsr3lp)
 	ROM_REGION(0x40000,"maincpu",0)
 	// The 341-0749 is known to also be matched with the 341-0728 MASK rom which holds the same data as the EPROM 341-0737 version.
 	ROM_LOAD("341-0737", 0x00000, 0x20000, CRC(8d410067) SHA1(c0f4704233ead14cb8e1e8a68fbd7063c56afd27) ) /* 341-0737: IIgs ROM03 FC-FD - 32 pin EPROM */
-	ROM_LOAD("341-0749", 0x20000, 0x20000, CRC(c6e9b4b4) SHA1(d754a3c3a26763c50bc9adfd0fcb9b71aef7999d) ) /* 341-0749: unknown ?post? ROM03 IIgs prototype? FE-FF - 32 pin EPROM */
+	ROM_LOAD("341-0749", 0x20000, 0x20000, BAD_DUMP CRC(c6e9b4b4) SHA1(d754a3c3a26763c50bc9adfd0fcb9b71aef7999d) ) /* 341-0749: unknown ?post? ROM03 IIgs prototype? FE-FF - 32 pin EPROM  - second half blank */
 
 	ROM_REGION(0x20000, "es5503", ROMREGION_ERASE00)
 
@@ -536,11 +537,6 @@ ROM_START(apple2gsr0)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
 
 	ROM_REGION(0x20000,"maincpu",0)
-	/* Should these roms really be split like this? according to the unofficial apple rom list, IIgs ROM00 was on one rom labeled 342-0077-A */
-//  ROM_LOAD("rom0a.bin", 0x0000,  0x8000, CRC(9cc78238) SHA1(0ea82e10720a01b68722ab7d9f66efec672a44d3))
-//  ROM_LOAD("rom0b.bin", 0x8000,  0x8000, CRC(8baf2a79) SHA1(91beeb11827932fe10475252d8036a63a2edbb1c))
-//  ROM_LOAD("rom0c.bin", 0x10000, 0x8000, CRC(94c32caa) SHA1(4806d50d676b06f5213b181693fc1585956b98bb))
-//  ROM_LOAD("rom0d.bin", 0x18000, 0x8000, CRC(200a15b8) SHA1(0c2890bb169ead63369738bbd5f33b869f24c42a))
 	ROM_LOAD("342-0077-a", 0x0000, 0x20000, CRC(dfbdd97b) SHA1(ff0c245dd0732ec4413a934fd80efc2defd8a8e3) ) /* 342-0077-A: IIgs ROM00 */
 
 	ROM_REGION(0x20000, "es5503", ROMREGION_ERASE00)
