@@ -641,7 +641,7 @@ detail::net_t::~net_t()
 	netlist().state().remove_save_items(this);
 }
 
-void detail::net_t::inc_active(core_terminal_t &term)
+void detail::net_t::inc_active(core_terminal_t &term) NL_NOEXCEPT
 {
 	m_active++;
 	m_list_active.push_front(&term);
@@ -665,7 +665,7 @@ void detail::net_t::inc_active(core_terminal_t &term)
 	}
 }
 
-void detail::net_t::dec_active(core_terminal_t &term)
+void detail::net_t::dec_active(core_terminal_t &term) NL_NOEXCEPT
 {
 	--m_active;
 	nl_assert(m_active >= 0);
@@ -689,7 +689,7 @@ void detail::net_t::rebuild_list()
 	m_active = cnt;
 }
 
-void detail::net_t::update_devs()
+void detail::net_t::update_devs() NL_NOEXCEPT
 {
 	nl_assert(this->isRailNet());
 
@@ -780,11 +780,12 @@ analog_net_t::analog_net_t(netlist_t &nl, const pstring &aname, detail::core_ter
 // core_terminal_t
 // ----------------------------------------------------------------------------------------
 
-detail::core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &aname, const type_t atype)
-: device_object_t(dev, dev.name() + "." + aname, atype)
+detail::core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &aname,
+		const type_t type, const state_e state)
+: device_object_t(dev, dev.name() + "." + aname, type)
 , plib::linkedlist_t<core_terminal_t>::element_t()
 , m_net(nullptr)
-, m_state(*this, "m_state", STATE_NONEX)
+, m_state(*this, "m_state", state)
 {
 }
 
@@ -812,7 +813,7 @@ void detail::core_terminal_t::set_net(net_t *anet)
 // ----------------------------------------------------------------------------------------
 
 terminal_t::terminal_t(core_device_t &dev, const pstring &aname)
-: analog_t(dev, aname, TERMINAL)
+: analog_t(dev, aname, TERMINAL, STATE_BIDIR)
 , m_otherterm(nullptr)
 , m_Idr1(*this, "m_Idr1", nullptr)
 , m_go1(*this, "m_go1", nullptr)
@@ -849,10 +850,9 @@ void terminal_t::schedule_after(const netlist_time &after)
 // ----------------------------------------------------------------------------------------
 
 logic_output_t::logic_output_t(core_device_t &dev, const pstring &aname)
-	: logic_t(dev, aname, OUTPUT)
+	: logic_t(dev, aname, OUTPUT, STATE_OUT)
 	, m_my_net(dev.netlist(), name() + ".net", this)
 {
-	set_state(STATE_OUT);
 	this->set_net(&m_my_net);
 	set_logic_family(dev.logic_family());
 	netlist().setup().register_term(*this);
@@ -868,9 +868,8 @@ void logic_output_t::initial(const netlist_sig_t val)
 // ----------------------------------------------------------------------------------------
 
 analog_input_t::analog_input_t(core_device_t &dev, const pstring &aname)
-: analog_t(dev, aname, INPUT)
+: analog_t(dev, aname, INPUT, STATE_INP_ACTIVE)
 {
-	set_state(STATE_INP_ACTIVE);
 	netlist().setup().register_term(*this);
 }
 
@@ -879,11 +878,10 @@ analog_input_t::analog_input_t(core_device_t &dev, const pstring &aname)
 // ----------------------------------------------------------------------------------------
 
 analog_output_t::analog_output_t(core_device_t &dev, const pstring &aname)
-	: analog_t(dev, aname, OUTPUT)
+	: analog_t(dev, aname, OUTPUT, STATE_OUT)
 	, m_my_net(dev.netlist(), name() + ".net", this)
 {
 	this->set_net(&m_my_net);
-	set_state(STATE_OUT);
 
 	net().m_cur_Analog = NL_FCONST(0.0);
 	netlist().setup().register_term(*this);
@@ -899,9 +897,8 @@ void analog_output_t::initial(const nl_double val)
 // -----------------------------------------------------------------------------
 
 logic_input_t::logic_input_t(core_device_t &dev, const pstring &aname)
-		: logic_t(dev, aname, INPUT)
+		: logic_t(dev, aname, INPUT, STATE_INP_ACTIVE)
 {
-	set_state(STATE_INP_ACTIVE);
 	set_logic_family(dev.logic_family());
 	netlist().setup().register_term(*this);
 }

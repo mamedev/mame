@@ -143,7 +143,7 @@ class NETLIB_NAME(name) : public device_t
 #define nl_assert(x)    do { if (1) if (!(x)) throw nl_exception(plib::pfmt("assert: {1}:{2}: {3}")(__FILE__)(__LINE__)(#x) ); } while (0)
 #define NL_NOEXCEPT
 #else
-#define nl_assert(x)    do { if (0) if (!(x)) throw nl_exception(plib::pfmt("assert: {1}:{2}: {3}")(__FILE__)(__LINE__)(#x) ); } while (0)
+#define nl_assert(x)    do { if (0) if (!(x)) { /*throw nl_exception(plib::pfmt("assert: {1}:{2}: {3}")(__FILE__)(__LINE__)(#x) ); */} } while (0)
 #define NL_NOEXCEPT		noexcept
 #endif
 #define nl_assert_always(x, msg)    do { if (!(x)) throw nl_exception(plib::pfmt("Fatal error: {1}\nCaused by assert: {2}:{3}: {4}")(msg)(__FILE__)(__LINE__)(#x)); } while (0)
@@ -214,8 +214,8 @@ namespace netlist
 	 */
 	using model_map_t = std::unordered_map<pstring, pstring>;
 
-	/*! Logic families descriptors are used create proxy devices.
-	 *  The logic family describe the analog capabilities of logic devices,
+	/*! Logic families descriptors are used to create proxy devices.
+	 *  The logic family describes the analog capabilities of logic devices,
 	 *  inputs and outputs.
 	 */
 	class logic_family_desc_t
@@ -448,6 +448,11 @@ namespace netlist
 	// core_terminal_t
 	// -----------------------------------------------------------------------------
 
+	/*! Base class for all terminals.
+	 *
+	 * All terminals are derived from this class.
+	 *
+	 */
 	class detail::core_terminal_t : public device_object_t, public plib::linkedlist_t<core_terminal_t>::element_t
 	{
 		P_PREVENT_COPYING(core_terminal_t)
@@ -455,18 +460,17 @@ namespace netlist
 
 		using list_t = std::vector<core_terminal_t *>;
 
-		/* needed here ... */
-
 		enum state_e {
 			STATE_INP_PASSIVE = 0,
 			STATE_INP_ACTIVE = 1,
 			STATE_INP_HL = 2,
 			STATE_INP_LH = 4,
 			STATE_OUT = 128,
-			STATE_NONEX = 256
+			STATE_BIDIR = 256
 		};
 
-		core_terminal_t(core_device_t &dev, const pstring &aname, const type_t atype);
+		core_terminal_t(core_device_t &dev, const pstring &aname,
+				const type_t type, const state_e state);
 		virtual ~core_terminal_t() { }
 
 		void set_net(net_t *anet);
@@ -481,11 +485,7 @@ namespace netlist
 
 		bool is_state(const state_e astate) const { return (m_state == astate); }
 		state_e state() const { return m_state; }
-		void set_state(const state_e astate)
-		{
-			nl_assert(astate != STATE_NONEX);
-			m_state = astate;
-		}
+		void set_state(const state_e astate) { m_state = astate; }
 
 		void reset();
 
@@ -502,8 +502,9 @@ namespace netlist
 	{
 	public:
 
-		analog_t(core_device_t &dev, const pstring &aname, const type_t atype)
-		: core_terminal_t(dev, aname, atype)
+		analog_t(core_device_t &dev, const pstring &aname, const type_t type,
+				const state_e state)
+		: core_terminal_t(dev, aname, type, state)
 		{
 		}
 
@@ -580,9 +581,11 @@ namespace netlist
 	class logic_t : public detail::core_terminal_t, public logic_family_t
 	{
 	public:
-		logic_t(core_device_t &dev, const pstring &aname, const type_t atype)
-			: core_terminal_t(dev, aname, atype), logic_family_t(),
-				m_proxy(nullptr)
+		logic_t(core_device_t &dev, const pstring &aname, const type_t type,
+				const state_e state)
+			: core_terminal_t(dev, aname, type, state)
+			, logic_family_t()
+			, m_proxy(nullptr)
 		{
 		}
 
@@ -610,7 +613,7 @@ namespace netlist
 
 		netlist_sig_t Q() const noexcept;
 
-		netlist_sig_t operator()() const
+		netlist_sig_t operator()() const NL_NOEXCEPT
 		{
 			nl_assert(state() != STATE_INP_PASSIVE);
 			return Q();
@@ -680,7 +683,7 @@ namespace netlist
 		void reschedule_in_queue(const netlist_time delay) noexcept;
 		bool is_queued() const { return m_in_queue == 1; }
 
-		void update_devs();
+		void update_devs() NL_NOEXCEPT;
 
 		const netlist_time time() const { return m_time; }
 		void set_time(const netlist_time ntime) { m_time = ntime; }
@@ -690,8 +693,8 @@ namespace netlist
 
 		std::size_t num_cons() const noexcept { return m_core_terms.size(); }
 
-		void inc_active(core_terminal_t &term);
-		void dec_active(core_terminal_t &term);
+		void inc_active(core_terminal_t &term) NL_NOEXCEPT;
+		void dec_active(core_terminal_t &term) NL_NOEXCEPT;
 
 		void rebuild_list();     /* rebuild m_list after a load */
 		void move_connections(net_t &dest_net);
