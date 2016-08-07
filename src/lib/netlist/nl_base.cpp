@@ -641,7 +641,7 @@ detail::net_t::~net_t()
 	netlist().state().remove_save_items(this);
 }
 
-void detail::net_t::inc_active(core_terminal_t &term) NL_NOEXCEPT
+void detail::net_t::inc_active(core_terminal_t &term)
 {
 	m_active++;
 	m_list_active.push_front(&term);
@@ -665,7 +665,7 @@ void detail::net_t::inc_active(core_terminal_t &term) NL_NOEXCEPT
 	}
 }
 
-void detail::net_t::dec_active(core_terminal_t &term) NL_NOEXCEPT
+void detail::net_t::dec_active(core_terminal_t &term)
 {
 	--m_active;
 	nl_assert(m_active >= 0);
@@ -689,7 +689,7 @@ void detail::net_t::rebuild_list()
 	m_active = cnt;
 }
 
-void detail::net_t::update_devs() NL_NOEXCEPT
+void detail::net_t::update_devs()
 {
 	nl_assert(this->isRailNet());
 

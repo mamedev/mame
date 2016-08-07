@@ -610,7 +610,7 @@ namespace netlist
 
 		netlist_sig_t Q() const noexcept;
 
-		netlist_sig_t operator()() const NL_NOEXCEPT
+		netlist_sig_t operator()() const
 		{
 			nl_assert(state() != STATE_INP_PASSIVE);
 			return Q();
@@ -680,7 +680,7 @@ namespace netlist
 		void reschedule_in_queue(const netlist_time delay) noexcept;
 		bool is_queued() const { return m_in_queue == 1; }
 
-		void update_devs() NL_NOEXCEPT;
+		void update_devs();
 
 		const netlist_time time() const { return m_time; }
 		void set_time(const netlist_time ntime) { m_time = ntime; }
@@ -690,8 +690,8 @@ namespace netlist
 
 		std::size_t num_cons() const noexcept { return m_core_terms.size(); }
 
-		void inc_active(core_terminal_t &term) NL_NOEXCEPT;
-		void dec_active(core_terminal_t &term) NL_NOEXCEPT;
+		void inc_active(core_terminal_t &term);
+		void dec_active(core_terminal_t &term);
 
 		void rebuild_list();     /* rebuild m_list after a load */
 		void move_connections(net_t &dest_net);
