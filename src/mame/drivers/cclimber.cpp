@@ -2605,6 +2605,19 @@ DRIVER_INIT_MEMBER(cclimber_state,dking)
 
 }
 
+DRIVER_INIT_MEMBER(cclimber_state,rpatrol)
+{
+	UINT8 *rom = memregion( "maincpu" )->base();
+
+	/* Bits are inverted */
+	for (int i = 0x0000; i < 0x5000; i++)
+	{
+		rom[i] = rom[i] ^ 0x79;
+		i++;
+		rom[i] = rom[i] ^ 0x5b;
+	}
+}
+
 
 GAME( 1980, cclimber,    0,        cclimberx, cclimber, cclimber_state, cclimber, ROT0,   "Nichibutsu", "Crazy Climber (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, cclimberj,   cclimber, cclimberx, cclimberj, cclimber_state,cclimberj,ROT0,   "Nichibutsu", "Crazy Climber (Japan)", MACHINE_SUPPORTS_SAVE )
@@ -2640,7 +2653,7 @@ GAME( 1981, ckongpt2b,   ckongpt2, cclimber, ckongb, cclimber_state,   ckongb,  
 // see bagman.cpp for parent
 GAME( 1981, bagmanf,     bagman,   bagmanf,  bagmanf, driver_device,    0,        ROT270, "bootleg", "Bagman (bootleg on Crazy Kong hardware)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, rpatrol,     0,        cclimber, rpatrol, driver_device,  0,        ROT0,   "Orca", "River Patrol (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // TODO: encrypted, suicide battery on PCB
+GAME( 1981, rpatrol,     0,        cclimber, rpatrol, cclimber_state,  rpatrol,  ROT0,   "Orca", "River Patrol (Japan)", MACHINE_SUPPORTS_SAVE)
 GAME( 1981, rpatrola,    rpatrol,  cclimber, rpatrol, driver_device,  0,        ROT0,   "bootleg", "River Patrol (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, rpatrolb,    rpatrol,  cclimber, rpatrol, driver_device,  0,        ROT0,   "bootleg", "River Patrol (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, silvland,    rpatrol,  cclimber, rpatrol, driver_device,  0,        ROT0,   "Falcon", "Silver Land", MACHINE_SUPPORTS_SAVE )
