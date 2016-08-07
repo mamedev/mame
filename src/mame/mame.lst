@@ -1223,7 +1223,6 @@ apple2gsr0                      // Sep 1986 Apple IIgs ROM00
 apple2gsr0p                     // June 19, 1986 Apple IIgs ROM00 prototype
 apple2gsr0p2                    // March 10, 1986 Apple IIgs ROM00 prototype
 apple2gsr1                      // Sep 1987 Apple IIgs ROM01
-apple2gsr3lp                    // ??? 1989 Apple IIgs ROM03 late? prototype
 apple2gsr3p                     // ??? 198? Apple IIgs ROM03 prototype
 
 @source:apple3.cpp
