@@ -99,17 +99,17 @@ bool has_multiple_bios(const game_driver *driver, s_bios &biosname)
 	auto entries = rom_build_entries(driver->rom);
 
 	std::string default_name;
-	for (const rom_entry *rom = entries.data(); !ROMENTRY_ISEND(rom); ++rom)
-		if (ROMENTRY_ISDEFAULT_BIOS(rom))
-			default_name = ROM_GETNAME(rom);
+	for (const rom_entry &rom : entries)
+		if (ROMENTRY_ISDEFAULT_BIOS(&rom))
+			default_name = ROM_GETNAME(&rom);
 
-	for (const rom_entry *rom = entries.data(); !ROMENTRY_ISEND(rom); ++rom)
+	for (const rom_entry &rom : entries)
 	{
-		if (ROMENTRY_ISSYSTEM_BIOS(rom))
+		if (ROMENTRY_ISSYSTEM_BIOS(&rom))
 		{
-			std::string name(ROM_GETHASHDATA(rom));
-			std::string bname(ROM_GETNAME(rom));
-			int bios_flags = ROM_GETBIOSFLAGS(rom);
+			std::string name(ROM_GETHASHDATA(&rom));
+			std::string bname(ROM_GETNAME(&rom));
+			int bios_flags = ROM_GETBIOSFLAGS(&rom);
 
 			if (bname == default_name)
 			{

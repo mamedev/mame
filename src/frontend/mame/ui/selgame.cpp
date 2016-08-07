@@ -1113,8 +1113,8 @@ void menu_select_game::build_list(const char *filter_text, int filter, bool bios
 			}
 			break;
 		case FILTER_CHD:
-			for (const rom_entry *rom = entries.data(); !ROMENTRY_ISEND(rom); ++rom)
-				if (ROMENTRY_ISREGION(rom) && ROMREGION_ISDISKDATA(rom))
+			for (const rom_entry &rom : entries)
+				if (ROMENTRY_ISREGION(&rom) && ROMREGION_ISDISKDATA(&rom))
 				{
 					m_displaylist.push_back(s_driver);
 					break;
@@ -1123,8 +1123,8 @@ void menu_select_game::build_list(const char *filter_text, int filter, bool bios
 		case FILTER_NOCHD:
 			{
 				bool found = false;
-				for (const rom_entry *rom = entries.data(); !ROMENTRY_ISEND(rom); ++rom)
-					if (ROMENTRY_ISREGION(rom) && ROMREGION_ISDISKDATA(rom))
+				for (const rom_entry &rom : entries)
+					if (ROMENTRY_ISREGION(&rom) && ROMREGION_ISDISKDATA(&rom))
 					{
 						found = true;
 						break;
@@ -1304,8 +1304,8 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 	util::stream_format(str, _("Screen Orientation: %1$s\n"), ((driver->flags & ORIENTATION_SWAP_XY) ? _("Vertical") : _("Horizontal")));
 	bool found = false;
 	auto entries = rom_build_entries(driver->rom);
-	for (const rom_entry *rom = entries.data(); !ROMENTRY_ISEND(rom); ++rom)
-		if (ROMENTRY_ISREGION(rom) && ROMREGION_ISDISKDATA(rom))
+	for (const rom_entry &rom : entries)
+		if (ROMENTRY_ISREGION(&rom) && ROMREGION_ISDISKDATA(&rom))
 		{
 			found = true;
 			break;
