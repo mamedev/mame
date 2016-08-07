@@ -580,7 +580,7 @@ void info_xml_creator::output_rom(device_t &device)
 				{
 					// scan backwards through the ROM entries
 					auto entries = rom_build_entries(m_drivlist.driver().rom);
-					for (const rom_entry *brom = entries.data(); !ROMENTRY_ISEND(rom); rom++)
+					for (const rom_entry *brom = entries.data(); !ROMENTRY_ISEND(brom); brom++)
 						if (ROMENTRY_ISSYSTEM_BIOS(brom))
 						{
 							strcpy(bios_name, ROM_GETNAME(brom));
