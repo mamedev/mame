@@ -448,7 +448,7 @@ ROM_START(apple2gs)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89)) /* need label/part number */
 
 	ROM_REGION(0x40000,"maincpu",0)
-	// The 341-0749 is known to also be matched with the 341-0728 MASK rom which holds the same data as the EPROM 341-0737 version.
+	// The 341-0748 is known to also be matched with the 341-0728 MASK rom which holds the same data as the EPROM 341-0737 version.
 	ROM_LOAD("341-0737", 0x00000, 0x20000, CRC(8d410067) SHA1(c0f4704233ead14cb8e1e8a68fbd7063c56afd27) ) /* 341-0737: IIgs ROM03 FC-FD */
 	ROM_LOAD("341-0748", 0x20000, 0x20000, CRC(18190283) SHA1(c70576869deec92ca82c78438b1d5c686eac7480) ) /* 341-0748: IIgs ROM03 FE-FF */
 
