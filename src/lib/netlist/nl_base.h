@@ -117,7 +117,7 @@ class NETLIB_NAME(name) : public device_t
 #define NETLIB_FAMILY(family) , m_famsetter(*this, family)
 
 #define NETLIB_UPDATE_TERMINALSI() public: virtual void update_terminals() override
-#define NETLIB_UPDATEI() protected: virtual void update() noexcept override
+#define NETLIB_UPDATEI() protected: virtual void update() NL_NOEXCEPT override
 #define NETLIB_UPDATE_PARAMI() public: virtual void update_param() override
 #define NETLIB_RESETI() protected: virtual void reset() override
 
@@ -901,14 +901,14 @@ namespace netlist
 
 		virtual ~core_device_t();
 
-		void update_dev() noexcept
+		void update_dev() NL_NOEXCEPT
 		{
 			m_stat_total_time.start();
 			do_update();
 			m_stat_total_time.stop();
 		}
 
-		void do_update() noexcept
+		void do_update() NL_NOEXCEPT
 		{
 			#if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
 				(this->*m_static_update)();
@@ -946,7 +946,7 @@ namespace netlist
 
 	protected:
 
-		virtual void update() noexcept { }
+		virtual void update() NL_NOEXCEPT { }
 		virtual void inc_active() noexcept {  }
 		virtual void dec_active() noexcept {  }
 		virtual void stop() { }
