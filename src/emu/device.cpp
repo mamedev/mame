@@ -924,14 +924,14 @@ void device_interface::interface_debug_setup()
 
 
 //-------------------------------------------------
-// rom_region
+// rom_region_vector
 //-------------------------------------------------
 
-const rom_entry *device_t::rom_region() const
+const std::vector<rom_entry> &device_t::rom_region_vector() const
 {
 	if (m_rom_entries.empty())
 	{
 		m_rom_entries = rom_build_entries(device_rom_region());
 	}
-	return m_rom_entries.data();
+	return m_rom_entries;
 }

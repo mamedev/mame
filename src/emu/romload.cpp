@@ -268,23 +268,22 @@ int rom_load_manager::set_disk_handle(const char *region, const char *fullpath)
 void rom_load_manager::determine_bios_rom(device_t &device, const char *specbios)
 {
 	const char *defaultname = nullptr;
-	const rom_entry *rom;
 	int default_no = 1;
 	int bios_count = 0;
 
 	device.set_system_bios(0);
 
 	/* first determine the default BIOS name */
-	for (rom = device.rom_region(); !ROMENTRY_ISEND(rom); rom++)
-		if (ROMENTRY_ISDEFAULT_BIOS(rom))
-			defaultname = ROM_GETNAME(rom);
+	for (const rom_entry &rom : device.rom_region_vector())
+		if (ROMENTRY_ISDEFAULT_BIOS(&rom))
+			defaultname = ROM_GETNAME(&rom);
 
 	/* look for a BIOS with a matching name */
-	for (rom = device.rom_region(); !ROMENTRY_ISEND(rom); rom++)
-		if (ROMENTRY_ISSYSTEM_BIOS(rom))
+	for (const rom_entry &rom : device.rom_region_vector())
+		if (ROMENTRY_ISSYSTEM_BIOS(&rom))
 		{
-			const char *biosname = ROM_GETNAME(rom);
-			int bios_flags = ROM_GETBIOSFLAGS(rom);
+			const char *biosname = ROM_GETNAME(&rom);
+			int bios_flags = ROM_GETBIOSFLAGS(&rom);
 			char bios_number[20];
 
 			/* Allow '-bios n' to still be used */

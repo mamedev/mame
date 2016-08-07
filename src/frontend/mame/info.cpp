@@ -519,19 +519,19 @@ void info_xml_creator::output_bios()
 
 	// first determine the default BIOS name
 	std::string defaultname;
-	for (const rom_entry *rom = rom_entries.data(); !ROMENTRY_ISEND(rom); rom++)
-		if (ROMENTRY_ISDEFAULT_BIOS(rom))
-			defaultname = ROM_GETNAME(rom);
+	for (const rom_entry &rom : rom_entries)
+		if (ROMENTRY_ISDEFAULT_BIOS(&rom))
+			defaultname = ROM_GETNAME(&rom);
 
 	// iterate over ROM entries and look for BIOSes
-	for (const rom_entry *rom = rom_entries.data(); !ROMENTRY_ISEND(rom); rom++)
-		if (ROMENTRY_ISSYSTEM_BIOS(rom))
+	for (const rom_entry &rom : rom_entries)
+		if (ROMENTRY_ISSYSTEM_BIOS(&rom))
 		{
 			// output extracted name and descriptions
 			fprintf(m_output, "\t\t<biosset");
-			fprintf(m_output, " name=\"%s\"", xml_normalize_string(ROM_GETNAME(rom)));
-			fprintf(m_output, " description=\"%s\"", xml_normalize_string(ROM_GETHASHDATA(rom)));
-			if (defaultname == ROM_GETNAME(rom))
+			fprintf(m_output, " name=\"%s\"", xml_normalize_string(ROM_GETNAME(&rom)));
+			fprintf(m_output, " description=\"%s\"", xml_normalize_string(ROM_GETHASHDATA(&rom)));
+			if (defaultname == ROM_GETNAME(&rom))
 				fprintf(m_output, " default=\"yes\"");
 			fprintf(m_output, "/>\n");
 		}
