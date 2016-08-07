@@ -58,12 +58,12 @@ machine_config_constructor nubus_mac8390_device::device_mconfig_additions() cons
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *nubus_mac8390_device::device_rom_region() const
+const tiny_rom_entry *nubus_mac8390_device::device_rom_region() const
 {
 	return ROM_NAME( asntm3nb );
 }
 
-const rom_entry *nubus_appleenet_device::device_rom_region() const
+const tiny_rom_entry *nubus_appleenet_device::device_rom_region() const
 {
 	return ROM_NAME( appleenet );
 }

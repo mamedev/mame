@@ -191,7 +191,7 @@ void nes_datach_rom_device::device_reset()
 	m_bank = 0;
 }
 
-const rom_entry *nes_datach_rom_device::device_rom_region() const
+const tiny_rom_entry *nes_datach_rom_device::device_rom_region() const
 {
 	return ROM_NAME( datach_rom );
 }

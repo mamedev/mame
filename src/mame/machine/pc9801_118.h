@@ -42,7 +42,7 @@ public:
 
 //  required_device<cpu_device>  m_maincpu;
 	required_device<ym2608_device>  m_opn3;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;

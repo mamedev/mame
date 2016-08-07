@@ -530,7 +530,7 @@ void device_t::device_validity_check(validity_checker &valid) const
 //  rom region description for this device
 //-------------------------------------------------
 
-const rom_entry *device_t::device_rom_region() const
+const tiny_rom_entry *device_t::device_rom_region() const
 {
 	// none by default
 	return nullptr;
@@ -920,4 +920,18 @@ void device_interface::interface_clock_changed()
 void device_interface::interface_debug_setup()
 {
 	// do nothing by default
+}
+
+
+//-------------------------------------------------
+// rom_region
+//-------------------------------------------------
+
+const rom_entry *device_t::rom_region() const
+{
+	if (m_rom_entries.empty())
+	{
+		m_rom_entries = rom_build_entries(device_rom_region());
+	}
+	return m_rom_entries.data();
 }

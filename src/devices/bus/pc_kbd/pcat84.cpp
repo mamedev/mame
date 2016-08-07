@@ -65,7 +65,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *ibm_pc_at_84_keyboard_device::device_rom_region() const
+const tiny_rom_entry *ibm_pc_at_84_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME( ibm_pc_at_84_keyboard );
 }
@@ -92,7 +92,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *ibm_3270pc_122_keyboard_device::device_rom_region() const
+const tiny_rom_entry *ibm_3270pc_122_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME( ibm_3270pc_122_keyboard );
 }

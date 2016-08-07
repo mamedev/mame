@@ -1126,7 +1126,7 @@ machine_config_constructor ti_rs232_pio_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( ti_rs232 );
 }
 
-const rom_entry *ti_rs232_pio_device::device_rom_region() const
+const tiny_rom_entry *ti_rs232_pio_device::device_rom_region() const
 {
 	return ROM_NAME( ti_rs232 );
 }

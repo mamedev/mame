@@ -17,7 +17,7 @@ class m24_z8000_device :  public device_t
 public:
 	m24_z8000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	template<class _Object> static devcb_base &set_halt_callback(device_t &device, _Object object) { return downcast<m24_z8000_device &>(device).m_halt_out.set_callback(object); }
 

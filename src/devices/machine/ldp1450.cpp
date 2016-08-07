@@ -93,7 +93,7 @@ void sony_ldp1450_device::device_reset()
 //  ROM region definitions
 //-------------------------------------------------
 
-const rom_entry *sony_ldp1450_device::device_rom_region() const
+const tiny_rom_entry *sony_ldp1450_device::device_rom_region() const
 {
 	return ROM_NAME(ldp1450);
 }

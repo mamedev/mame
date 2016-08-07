@@ -189,7 +189,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c1540_t::device_rom_region() const
+const tiny_rom_entry *c1540_t::device_rom_region() const
 {
 	return ROM_NAME( c1540 );
 }
@@ -233,7 +233,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c1541_t::device_rom_region() const
+const tiny_rom_entry *c1541_t::device_rom_region() const
 {
 	return ROM_NAME( c1541 );
 }
@@ -257,7 +257,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c1541c_t::device_rom_region() const
+const tiny_rom_entry *c1541c_t::device_rom_region() const
 {
 	return ROM_NAME( c1541c );
 }
@@ -283,7 +283,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c1541ii_t::device_rom_region() const
+const tiny_rom_entry *c1541ii_t::device_rom_region() const
 {
 	return ROM_NAME( c1541ii );
 }
@@ -311,7 +311,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *sx1541_t::device_rom_region() const
+const tiny_rom_entry *sx1541_t::device_rom_region() const
 {
 	return ROM_NAME( sx1541 );
 }
@@ -331,7 +331,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *fsd1_t::device_rom_region() const
+const tiny_rom_entry *fsd1_t::device_rom_region() const
 {
 	return ROM_NAME( fsd1 );
 }
@@ -359,7 +359,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *fsd2_t::device_rom_region() const
+const tiny_rom_entry *fsd2_t::device_rom_region() const
 {
 	return ROM_NAME( fsd2 );
 }
@@ -380,7 +380,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *csd1_t::device_rom_region() const
+const tiny_rom_entry *csd1_t::device_rom_region() const
 {
 	return ROM_NAME( csd1 );
 }
@@ -400,7 +400,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c1541_dolphin_dos_t::device_rom_region() const
+const tiny_rom_entry *c1541_dolphin_dos_t::device_rom_region() const
 {
 	return ROM_NAME( c1541dd );
 }
@@ -421,7 +421,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c1541_professional_dos_v1_t::device_rom_region() const
+const tiny_rom_entry *c1541_professional_dos_v1_t::device_rom_region() const
 {
 	return ROM_NAME( c1541pd );
 }
@@ -446,7 +446,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c1541_prologic_dos_classic_t::device_rom_region() const
+const tiny_rom_entry *c1541_prologic_dos_classic_t::device_rom_region() const
 {
 	return ROM_NAME( c1541pdc );
 }
@@ -470,7 +470,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *indus_gt_t::device_rom_region() const
+const tiny_rom_entry *indus_gt_t::device_rom_region() const
 {
 	return ROM_NAME( indusgt );
 }

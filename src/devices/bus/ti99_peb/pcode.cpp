@@ -352,7 +352,7 @@ machine_config_constructor ti_pcode_card_device::device_mconfig_additions() cons
 	return MACHINE_CONFIG_NAME( ti99_pcode );
 }
 
-const rom_entry *ti_pcode_card_device::device_rom_region() const
+const tiny_rom_entry *ti_pcode_card_device::device_rom_region() const
 {
 	return ROM_NAME( ti99_pcode );
 }

@@ -1068,7 +1068,7 @@ machine_config_constructor myarc_hfdc_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( ti99_hfdc );
 }
 
-const rom_entry *myarc_hfdc_device::device_rom_region() const
+const tiny_rom_entry *myarc_hfdc_device::device_rom_region() const
 {
 	return ROM_NAME( ti99_hfdc );
 }

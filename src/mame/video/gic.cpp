@@ -105,7 +105,7 @@ gic_device::gic_device(const machine_config &mconfig, device_type type, const ch
 {
 }
 
-const rom_entry *gic_device::device_rom_region() const
+const tiny_rom_entry *gic_device::device_rom_region() const
 {
 	//there is only one... how do I get rid of this?
 	return ROM_NAME( gic_font );

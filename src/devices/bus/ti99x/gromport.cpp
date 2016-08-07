@@ -1071,7 +1071,7 @@ ROM_START( gkracker_rom )
 	ROM_LOAD("gkracker.bin", 0x0000, 0x2000, CRC(86eaaf9f) SHA1(a3bd5257c63e190800921b52dbe3ffa91ad91113))
 ROM_END
 
-const rom_entry *gkracker_device::device_rom_region() const
+const tiny_rom_entry *gkracker_device::device_rom_region() const
 {
 	return ROM_NAME( gkracker_rom );
 }
@@ -1498,7 +1498,7 @@ ROM_START( cartridge_memory )
 	ROM_REGION(0x200000, CARTROM_TAG, ROMREGION_ERASE00)
 ROM_END
 
-const rom_entry *ti99_cartridge_device::device_rom_region() const
+const tiny_rom_entry *ti99_cartridge_device::device_rom_region() const
 {
 	return ROM_NAME( cartridge_memory );
 }

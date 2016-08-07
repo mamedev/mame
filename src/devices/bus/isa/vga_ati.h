@@ -33,7 +33,7 @@ public:
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;
-		virtual const rom_entry *device_rom_region() const override;
+		virtual const tiny_rom_entry *device_rom_region() const override;
 
 		DECLARE_READ8_MEMBER(input_port_0_r);
 protected:
@@ -55,7 +55,7 @@ public:
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;
-		virtual const rom_entry *device_rom_region() const override;
+		virtual const tiny_rom_entry *device_rom_region() const override;
 
 		DECLARE_READ8_MEMBER(input_port_0_r);
 protected:
@@ -76,7 +76,7 @@ public:
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;
-		virtual const rom_entry *device_rom_region() const override;
+		virtual const tiny_rom_entry *device_rom_region() const override;
 
 		DECLARE_READ8_MEMBER(input_port_0_r);
 protected:

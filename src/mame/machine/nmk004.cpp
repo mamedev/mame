@@ -124,7 +124,7 @@ machine_config_constructor nmk004_device::device_mconfig_additions() const
 //  device_rom_region - return a pointer to the
 //  the device's ROM definitions
 //-------------------------------------------------
-const rom_entry *nmk004_device::device_rom_region() const
+const tiny_rom_entry *nmk004_device::device_rom_region() const
 {
 	return ROM_NAME(nmk004 );
 }

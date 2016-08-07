@@ -420,7 +420,7 @@ static MACHINE_CONFIG_FRAGMENT( sb16 )
 	MCFG_PC_JOY_ADD("pc_joy")
 MACHINE_CONFIG_END
 
-const rom_entry *sb16_lle_device::device_rom_region() const
+const tiny_rom_entry *sb16_lle_device::device_rom_region() const
 {
 	return ROM_NAME( sb16 );
 }

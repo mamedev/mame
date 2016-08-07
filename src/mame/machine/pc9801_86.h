@@ -41,7 +41,7 @@ public:
 	DECLARE_READ8_MEMBER(pcm_r);
 	DECLARE_WRITE8_MEMBER(pcm_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;

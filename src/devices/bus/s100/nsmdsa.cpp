@@ -36,7 +36,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *s100_mds_a_device::device_rom_region() const
+const tiny_rom_entry *s100_mds_a_device::device_rom_region() const
 {
 	return ROM_NAME( mds_a );
 }

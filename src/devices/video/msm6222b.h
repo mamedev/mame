@@ -54,7 +54,7 @@ public:
 	msm6222b_01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 extern const device_type MSM6222B;

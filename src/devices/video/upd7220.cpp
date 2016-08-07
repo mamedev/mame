@@ -175,7 +175,7 @@ const address_space_config *upd7220_device::memory_space_config(address_spacenum
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *upd7220_device::device_rom_region() const
+const tiny_rom_entry *upd7220_device::device_rom_region() const
 {
 	return ROM_NAME( upd7220 );
 }

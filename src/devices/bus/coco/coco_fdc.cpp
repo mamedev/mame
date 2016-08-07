@@ -226,7 +226,7 @@ machine_config_constructor coco_fdc_device::device_mconfig_additions() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *coco_fdc_device::device_rom_region() const
+const tiny_rom_entry *coco_fdc_device::device_rom_region() const
 {
 	return ROM_NAME( coco_fdc );
 }
@@ -482,7 +482,7 @@ machine_config_constructor dragon_fdc_device::device_mconfig_additions() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *dragon_fdc_device::device_rom_region() const
+const tiny_rom_entry *dragon_fdc_device::device_rom_region() const
 {
 	return ROM_NAME( dragon_fdc );
 }
@@ -624,7 +624,7 @@ sdtandy_fdc_device::sdtandy_fdc_device(const machine_config &mconfig, const char
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *sdtandy_fdc_device::device_rom_region() const
+const tiny_rom_entry *sdtandy_fdc_device::device_rom_region() const
 {
 	return ROM_NAME( sdtandy_fdc );
 }
@@ -656,7 +656,7 @@ coco_fdc_v11_device::coco_fdc_v11_device(const machine_config &mconfig, const ch
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *coco_fdc_v11_device::device_rom_region() const
+const tiny_rom_entry *coco_fdc_v11_device::device_rom_region() const
 {
 	return ROM_NAME( coco_fdc_v11 );
 }
@@ -680,7 +680,7 @@ coco3_hdb1_device::coco3_hdb1_device(const machine_config &mconfig, const char *
 {
 }
 
-const rom_entry *coco3_hdb1_device::device_rom_region() const
+const tiny_rom_entry *coco3_hdb1_device::device_rom_region() const
 {
 	return ROM_NAME( coco3_hdb1 );
 }
@@ -709,7 +709,7 @@ cp400_fdc_device::cp400_fdc_device(const machine_config &mconfig, const char *ta
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *cp400_fdc_device::device_rom_region() const
+const tiny_rom_entry *cp400_fdc_device::device_rom_region() const
 {
 	return ROM_NAME( cp400_fdc );
 }

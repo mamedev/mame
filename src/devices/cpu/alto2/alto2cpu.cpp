@@ -347,7 +347,7 @@ ROM_START( alto2_cpu )
 	ROM_LOAD( "enet.a49",   00000, 00400, CRC(4d2dcdb2) SHA1(583327a7d70cd02702c941c0e43c1e9408ff7fd0) )
 ROM_END
 
-const rom_entry *alto2_cpu_device::device_rom_region() const
+const tiny_rom_entry *alto2_cpu_device::device_rom_region() const
 {
 	return ROM_NAME( alto2_cpu );
 }

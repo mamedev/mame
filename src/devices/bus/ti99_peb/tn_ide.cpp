@@ -371,7 +371,7 @@ machine_config_constructor nouspikel_ide_interface_device::device_mconfig_additi
 	return MACHINE_CONFIG_NAME( tn_ide );
 }
 
-const rom_entry *nouspikel_ide_interface_device::device_rom_region() const
+const tiny_rom_entry *nouspikel_ide_interface_device::device_rom_region() const
 {
 	return ROM_NAME( tn_ide );
 }

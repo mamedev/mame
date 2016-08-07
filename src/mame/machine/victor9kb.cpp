@@ -369,7 +369,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *victor_9000_keyboard_t::device_rom_region() const
+const tiny_rom_entry *victor_9000_keyboard_t::device_rom_region() const
 {
 	return ROM_NAME( victor9k_keyboard );
 }

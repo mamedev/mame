@@ -141,7 +141,7 @@ ROM_START( ie15_keyboard )
 	ROM_LOAD( "15bbb.rt5", 0x000, 0x200, CRC(e6a4226e) SHA1(0ee46f5be1b01fa917a6d483bb51463106ae441f) )
 ROM_END
 
-const rom_entry *ie15_keyboard_device::device_rom_region() const
+const tiny_rom_entry *ie15_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME( ie15_keyboard );
 }

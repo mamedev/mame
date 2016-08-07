@@ -233,7 +233,7 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	//! device (P)ROMs
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	//! device_state_interface overrides
 	void state_string_export(const device_state_entry &entry, std::string &str) const override;
 

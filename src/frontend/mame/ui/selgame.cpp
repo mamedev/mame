@@ -680,7 +680,8 @@ void menu_select_game::build_available_list()
 			auto driver = &driver_list::driver(x);
 			if (!m_included[x] && driver != &GAME_NAME(___empty))
 			{
-				const rom_entry *rom = driver->rom;
+				auto entries = rom_build_entries(driver->rom);
+				const rom_entry *rom = entries.data();
 				bool noroms = true;
 
 				// check NO-DUMP
@@ -699,8 +700,7 @@ void menu_select_game::build_available_list()
 					if (cx != -1 && m_included[cx])
 					{
 						auto drv = &driver_list::driver(cx);
-						auto parentrom = drv->rom;
-						if ((rom = driver->rom) == parentrom)
+						if (driver->rom == drv->rom)
 							noroms = true;
 
 						// check if clone < parent
@@ -717,7 +717,8 @@ void menu_select_game::build_available_list()
 
 									UINT64 lenght = ROM_GETLENGTH(rom);
 									auto found = false;
-									for (parentrom = drv->rom; !ROMENTRY_ISEND(parentrom) && found == false; ++parentrom)
+									auto parent_entries = rom_build_entries(drv->rom);
+									for (auto parentrom = parent_entries.data(); !ROMENTRY_ISEND(parentrom) && found == false; ++parentrom)
 									{
 										if (ROMENTRY_ISFILE(parentrom) && ROM_GETLENGTH(parentrom) == lenght)
 										{
@@ -1026,6 +1027,7 @@ void menu_select_game::build_list(const char *filter_text, int filter, bool bios
 
 	for (auto & s_driver : s_drivers)
 	{
+		auto entries = rom_build_entries(s_driver->rom);
 		if (!bioscheck && filter != FILTER_BIOS && (s_driver->flags & MACHINE_IS_BIOS_ROOT) != 0)
 			continue;
 
@@ -1111,7 +1113,7 @@ void menu_select_game::build_list(const char *filter_text, int filter, bool bios
 			}
 			break;
 		case FILTER_CHD:
-			for (const rom_entry *rom = s_driver->rom; !ROMENTRY_ISEND(rom); ++rom)
+			for (const rom_entry *rom = entries.data(); !ROMENTRY_ISEND(rom); ++rom)
 				if (ROMENTRY_ISREGION(rom) && ROMREGION_ISDISKDATA(rom))
 				{
 					m_displaylist.push_back(s_driver);
@@ -1121,7 +1123,7 @@ void menu_select_game::build_list(const char *filter_text, int filter, bool bios
 		case FILTER_NOCHD:
 			{
 				bool found = false;
-				for (const rom_entry *rom = s_driver->rom; !ROMENTRY_ISEND(rom); ++rom)
+				for (const rom_entry *rom = entries.data(); !ROMENTRY_ISEND(rom); ++rom)
 					if (ROMENTRY_ISREGION(rom) && ROMREGION_ISDISKDATA(rom))
 					{
 						found = true;
@@ -1301,7 +1303,8 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 	util::stream_format(str, _("Support Save: %1$s\n"), ((driver->flags & MACHINE_SUPPORTS_SAVE) ? _("Yes") : _("No")));
 	util::stream_format(str, _("Screen Orientation: %1$s\n"), ((driver->flags & ORIENTATION_SWAP_XY) ? _("Vertical") : _("Horizontal")));
 	bool found = false;
-	for (const rom_entry *rom = driver->rom; !ROMENTRY_ISEND(rom); ++rom)
+	auto entries = rom_build_entries(driver->rom);
+	for (const rom_entry *rom = entries.data(); !ROMENTRY_ISEND(rom); ++rom)
 		if (ROMENTRY_ISREGION(rom) && ROMREGION_ISDISKDATA(rom))
 		{
 			found = true;

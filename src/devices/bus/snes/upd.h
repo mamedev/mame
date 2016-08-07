@@ -131,7 +131,7 @@ public:
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 class sns_rom20_necdsp1b_legacy_device : public sns_rom20_necdsp_device
@@ -142,7 +142,7 @@ public:
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 class sns_rom20_necdsp2_legacy_device : public sns_rom20_necdsp_device
@@ -153,7 +153,7 @@ public:
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 class sns_rom20_necdsp3_legacy_device : public sns_rom20_necdsp_device
@@ -164,7 +164,7 @@ public:
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 class sns_rom20_necdsp4_legacy_device : public sns_rom20_necdsp_device
@@ -175,7 +175,7 @@ public:
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 class sns_rom21_necdsp1_legacy_device : public sns_rom21_necdsp_device
@@ -186,7 +186,7 @@ public:
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 class sns_rom_seta10dsp_legacy_device : public sns_rom_setadsp_device
@@ -197,7 +197,7 @@ public:
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 class sns_rom_seta11dsp_legacy_device : public sns_rom_setadsp_device
@@ -208,7 +208,7 @@ public:
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 extern const device_type SNS_LOROM_NECDSP1_LEG;

@@ -59,7 +59,7 @@ ROM_START( cgenie_fdc )
 	ROM_LOAD("cgdos.rom", 0x0000, 0x2000, CRC(2a96cf74) SHA1(6dcac110f87897e1ee7521aefbb3d77a14815893))
 ROM_END
 
-const rom_entry *cgenie_fdc_device::device_rom_region() const
+const tiny_rom_entry *cgenie_fdc_device::device_rom_region() const
 {
 	return ROM_NAME( cgenie_fdc );
 }
