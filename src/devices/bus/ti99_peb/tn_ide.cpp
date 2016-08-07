@@ -34,7 +34,7 @@
 
 #define CRU_BASE 0x1000
 
-#define BUFFER_TAG "ram"
+#define RAMREGION "ram"
 
 /* previously 0xff */
 #define PAGE_MASK 0x3f
@@ -52,8 +52,9 @@ enum
 nouspikel_ide_interface_device::nouspikel_ide_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ti_expansion_card_device(mconfig, TI99_IDE, "Nouspikel IDE interface card", tag, owner, clock, "ti99_ide", __FILE__), m_ata_irq(false),
 	m_cru_register(0), m_rtc(nullptr),
-	m_ata(*this, "ata"), m_clk_irq(false), m_sram_enable(false), m_sram_enable_dip(false), m_cur_page(0), m_tms9995_mode(false),
-	m_input_latch(0), m_output_latch(0), m_ram(nullptr)
+	m_ata(*this, "ata"), m_clk_irq(false), m_sram_enable(false),
+	m_sram_enable_dip(false), m_cur_page(0), m_tms9995_mode(false),
+	m_input_latch(0), m_output_latch(0), m_ram(*this, RAMREGION)
 {
 }
 
@@ -180,9 +181,9 @@ READ8Z_MEMBER(nouspikel_ide_interface_device::readz)
 		else
 		{   /* sram */
 			if ((m_cru_register & cru_reg_page_0) || (addr >= 0x1000))
-				reply = m_ram[addr+0x2000 * m_cur_page];
+				reply = m_ram->pointer()[addr+0x2000 * m_cur_page];
 			else
-				reply = m_ram[addr];
+				reply = m_ram->pointer()[addr];
 		}
 		*value = reply;
 	}
@@ -267,9 +268,9 @@ WRITE8_MEMBER(nouspikel_ide_interface_device::write)
 			if (! (m_cru_register & cru_reg_wp))
 			{
 				if ((m_cru_register & cru_reg_page_0) || (addr >= 0x1000))
-					m_ram[addr+0x2000 * m_cur_page] = data;
+					m_ram->pointer()[addr+0x2000 * m_cur_page] = data;
 				else
-					m_ram[addr] = data;
+					m_ram->pointer()[addr] = data;
 			}
 		}
 	}
@@ -304,8 +305,6 @@ WRITE_LINE_MEMBER(nouspikel_ide_interface_device::clock_interrupt_callback)
 void nouspikel_ide_interface_device::device_start()
 {
 	m_rtc = subdevice<rtc65271_device>("ide_rtc");
-
-	m_ram = memregion(BUFFER_TAG)->base();
 	m_sram_enable_dip = false; // TODO: what is this?
 }
 
@@ -338,12 +337,11 @@ MACHINE_CONFIG_FRAGMENT( tn_ide )
 	MCFG_RTC65271_INTERRUPT_CB(WRITELINE(nouspikel_ide_interface_device, clock_interrupt_callback))
 	MCFG_ATA_INTERFACE_ADD( "ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(nouspikel_ide_interface_device, ide_interrupt_callback))
-MACHINE_CONFIG_END
 
-ROM_START( tn_ide )
-	ROM_REGION(0x80000, BUFFER_TAG, 0)  /* RAM buffer 512 KiB */
-	ROM_FILL(0x0000, 0x80000, 0x00)
-ROM_END
+	MCFG_RAM_ADD(RAMREGION)
+	MCFG_RAM_DEFAULT_SIZE("512K")
+	MCFG_RAM_DEFAULT_VALUE(0)
+MACHINE_CONFIG_END
 
 INPUT_PORTS_START( tn_ide )
 	PORT_START( "CRUIDE" )
@@ -369,11 +367,6 @@ INPUT_PORTS_END
 machine_config_constructor nouspikel_ide_interface_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( tn_ide );
-}
-
-const tiny_rom_entry *nouspikel_ide_interface_device::device_rom_region() const
-{
-	return ROM_NAME( tn_ide );
 }
 
 ioport_constructor nouspikel_ide_interface_device::device_input_ports() const

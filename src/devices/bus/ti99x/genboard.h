@@ -21,6 +21,7 @@
 #include "machine/at29x.h"
 #include "bus/ti99_peb/peribox.h"
 #include "sound/sn76496.h"
+#include "machine/ram.h"
 
 extern const device_type GENEVE_MOUSE;
 extern const device_type GENEVE_KEYBOARD;
@@ -212,8 +213,8 @@ private:
 	v9938_device*           m_video;
 	peribox_device*          m_peribox;
 	UINT8*                  m_eprom;
-	UINT8*                  m_sram;
-	UINT8*                  m_dram;
+	required_device<ram_device> m_sram;
+	required_device<ram_device> m_dram;
 };
 
 #define MCFG_GENEVE_READY_HANDLER( _intcallb ) \

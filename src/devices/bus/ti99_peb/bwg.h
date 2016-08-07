@@ -17,6 +17,7 @@
 #include "imagedev/flopdrv.h"
 #include "machine/mm58274c.h"
 #include "machine/wd_fdc.h"
+#include "machine/ram.h"
 
 extern const device_type TI99_BWG;
 
@@ -119,7 +120,7 @@ private:
 	UINT8*          m_dsrrom;
 
 	// Buffer RAM
-	UINT8*          m_buffer_ram;
+	required_device<ram_device> m_buffer_ram;
 
 	// Link to the attached floppy drives
 	floppy_image_device*    m_floppy[4];
