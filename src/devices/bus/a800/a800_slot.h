@@ -3,6 +3,8 @@
 #ifndef __A800_SLOT_H
 #define __A800_SLOT_H
 
+#include "softlist_dev.h"
+
 
 /***************************************************************************
  TYPE DEFINITIONS

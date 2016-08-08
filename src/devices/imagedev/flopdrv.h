@@ -7,6 +7,7 @@
 #define __FLOPDRV_H__
 
 #include "formats/flopimg.h"
+#include "softlist_dev.h"
 
 #define FLOPPY_TYPE_REGULAR 0
 #define FLOPPY_TYPE_APPLE   1

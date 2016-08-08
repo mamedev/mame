@@ -11,6 +11,8 @@
 #ifndef __COCOCART_H__
 #define __COCOCART_H__
 
+#include "softlist_dev.h"
+
 
 /***************************************************************************
     CONSTANTS

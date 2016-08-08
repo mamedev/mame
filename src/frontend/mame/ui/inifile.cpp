@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "ui/moptions.h"
 #include "ui/inifile.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "drivenum.h"
 
 //-------------------------------------------------

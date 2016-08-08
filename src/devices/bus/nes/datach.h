@@ -4,6 +4,7 @@
 #define __NES_DATACH_H
 
 #include "bandai.h"
+#include "softlist_dev.h"
 #include "machine/i2cmem.h"
 #include "machine/bcreader.h"
 

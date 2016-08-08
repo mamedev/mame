@@ -13,6 +13,7 @@
 #ifndef __MICRODRV__
 #define __MICRODRV__
 
+#include "softlist_dev.h"
 
 
 //**************************************************************************

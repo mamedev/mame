@@ -8,6 +8,7 @@
 #define _IMAGEDEV_DIABLO_H_
 
 #include "harddisk.h"
+#include "softlist_dev.h"
 
 #define DIABLO_TAG(_id) "diablo"#_id
 

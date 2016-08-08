@@ -24,7 +24,7 @@
 #include "mame.h"
 #include "rendfont.h"
 #include "rendutil.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "uiinput.h"
 
 
@@ -530,7 +530,7 @@ void menu_select_software::build_software_list()
 		for (const software_info &swinfo : swlist.get_info())
 		{
 			const software_part &part = swinfo.parts().front();
-			if (part.is_compatible(swlist) == SOFTWARE_IS_COMPATIBLE)
+			if (swlist.is_compatible(part) == SOFTWARE_IS_COMPATIBLE)
 			{
 				const char *instance_name = nullptr;
 				const char *type_name = nullptr;
@@ -562,7 +562,7 @@ void menu_select_software::build_software_list()
 				tmpmatches.supported = swinfo.supported();
 				tmpmatches.part = part.name();
 				tmpmatches.driver = m_driver;
-				tmpmatches.listname = strensure(swlist.list_name());
+				tmpmatches.listname = swlist.list_name();
 				tmpmatches.interface = part.interface();
 				tmpmatches.startempty = 0;
 				tmpmatches.parentlongname.clear();

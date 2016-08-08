@@ -25,7 +25,7 @@
 #include "drivenum.h"
 
 #include "osdepend.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 #include "ui/moptions.h"
 #include "language.h"
@@ -374,7 +374,7 @@ int media_identifier::find_by_hash(const util::hash_collection &hashes, int leng
 			{
 				for (const software_info &swinfo : swlistdev.get_info())
 					for (const software_part &part : swinfo.parts())
-						for (const rom_entry *region = part.romdata(); region != nullptr; region = rom_next_region(region))
+						for (const rom_entry *region = part.romdata().data(); region != nullptr; region = rom_next_region(region))
 							for (const rom_entry *rom = rom_first_file(region); rom != nullptr; rom = rom_next_file(rom))
 							{
 								util::hash_collection romhashes(ROM_GETHASHDATA(rom));
@@ -385,7 +385,7 @@ int media_identifier::find_by_hash(const util::hash_collection &hashes, int leng
 									// output information about the match
 									if (found)
 										osd_printf_info("                    ");
-									osd_printf_info("= %s%-20s  %s:%s %s\n", baddump ? "(BAD) " : "", ROM_GETNAME(rom), swlistdev.list_name(), swinfo.shortname().c_str(), swinfo.longname().c_str());
+									osd_printf_info("= %s%-20s  %s:%s %s\n", baddump ? "(BAD) " : "", ROM_GETNAME(rom), swlistdev.list_name().c_str(), swinfo.shortname().c_str(), swinfo.longname().c_str());
 									found++;
 								}
 							}
@@ -527,9 +527,9 @@ int cli_frontend::execute(int argc, char **argv)
 					for (const software_part &swpart : swinfo->parts())
 					{
 						// only load compatible software this way
-						if (swpart.is_compatible(swlistdev) == SOFTWARE_IS_COMPATIBLE)
+						if (swlistdev.is_compatible(swpart) == SOFTWARE_IS_COMPATIBLE)
 						{
-							device_image_interface *image = swpart.find_mountable_image(config);
+							device_image_interface *image = software_list_device::find_mountable_image(config, swpart);
 							if (image != nullptr)
 							{
 								std::string val = string_format("%s:%s:%s", swlistdev.list_name(), m_options.software_name(), swpart.name());
@@ -1387,7 +1387,7 @@ void cli_frontend::verifysamples(const char *gamename)
 
 void cli_frontend::output_single_softlist(FILE *out, software_list_device &swlistdev)
 {
-	fprintf(out, "\t<softwarelist name=\"%s\" description=\"%s\">\n", swlistdev.list_name(), xml_normalize_string(swlistdev.description()));
+	fprintf(out, "\t<softwarelist name=\"%s\" description=\"%s\">\n", swlistdev.list_name().c_str(), xml_normalize_string(swlistdev.description()));
 	for (const software_info &swinfo : swlistdev.get_info())
 	{
 		fprintf(out, "\t\t<software name=\"%s\"", swinfo.shortname().c_str());
@@ -1417,7 +1417,7 @@ void cli_frontend::output_single_softlist(FILE *out, software_list_device &swlis
 				fprintf(out, "\t\t\t\t<feature name=\"%s\" value=\"%s\" />\n", flist.name().c_str(), xml_normalize_string(flist.value().c_str()));
 
 			/* TODO: display rom region information */
-			for (const rom_entry *region = part.romdata(); region; region = rom_next_region(region))
+			for (const rom_entry *region = part.romdata().data(); region; region = rom_next_region(region))
 			{
 				int is_disk = ROMREGION_ISDISKDATA(region);
 
@@ -1626,7 +1626,7 @@ void cli_frontend::getsoftlist(const char *gamename)
 	while (drivlist.next())
 	{
 		for (software_list_device &swlistdev : software_list_device_iterator(drivlist.config().root_device()))
-			if (core_strwildcmp(gamename, swlistdev.list_name()) == 0 && list_map.insert(swlistdev.list_name()).second)
+			if (core_strwildcmp(gamename, swlistdev.list_name().c_str()) == 0 && list_map.insert(swlistdev.list_name()).second)
 				if (!swlistdev.get_info().empty())
 				{
 					if (isfirst) { fprintf( out, SOFTLIST_XML_BEGIN); isfirst = false; }
@@ -1660,7 +1660,7 @@ void cli_frontend::verifysoftlist(const char *gamename)
 	{
 		for (software_list_device &swlistdev : software_list_device_iterator(drivlist.config().root_device()))
 		{
-			if (core_strwildcmp(gamename, swlistdev.list_name()) == 0 && list_map.insert(swlistdev.list_name()).second)
+			if (core_strwildcmp(gamename, swlistdev.list_name().c_str()) == 0 && list_map.insert(swlistdev.list_name()).second)
 			{
 				if (!swlistdev.get_info().empty())
 				{

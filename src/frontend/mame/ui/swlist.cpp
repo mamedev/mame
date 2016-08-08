@@ -14,7 +14,7 @@
 #include "ui/swlist.h"
 #include "ui/utils.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 namespace ui {
@@ -186,7 +186,7 @@ void menu_software_list::append_software_entry(const software_info &swinfo)
 	// check if at least one of the parts has the correct interface and add a menu entry only in this case
 	for (const software_part &swpart : swinfo.parts())
 	{
-		if (swpart.matches_interface(m_interface) && swpart.is_compatible(*m_swlist) == SOFTWARE_IS_COMPATIBLE)
+		if (swpart.matches_interface(m_interface) && m_swlist->is_compatible(swpart) == SOFTWARE_IS_COMPATIBLE)
 		{
 			entry_updated = true;
 			entry.short_name.assign(swinfo.shortname());

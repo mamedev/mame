@@ -31,7 +31,7 @@
 #include "mame.h"
 #include "rendfont.h"
 #include "rendutil.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "uiinput.h"
 
 extern const char UI_VERSION_TAG[];
