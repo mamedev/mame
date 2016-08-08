@@ -1321,23 +1321,6 @@ void alto2_cpu_device::init_ether(int task)
 	m_ether_a42 = prom_load(machine(), &pl_enet_a42, memregion("ether_a42")->base());
 	m_ether_a49 = prom_load(machine(), &pl_enet_a49, memregion("ether_a49")->base());
 
-	set_bs(task, bs_ether_eidfct,   &alto2_cpu_device::bs_early_eidfct, nullptr);
-
-	set_f1(task, f1_block,          &alto2_cpu_device::f1_early_eth_block, nullptr);
-	set_f1(task, f1_ether_eilfct,   &alto2_cpu_device::f1_early_eilfct, nullptr);
-	set_f1(task, f1_ether_epfct,    &alto2_cpu_device::f1_early_epfct, nullptr);
-	set_f1(task, f1_ether_ewfct,    nullptr, &alto2_cpu_device::f1_late_ewfct);
-
-	set_f2(task, f2_ether_eodfct,   nullptr, &alto2_cpu_device::f2_late_eodfct);
-	set_f2(task, f2_ether_eosfct,   nullptr, &alto2_cpu_device::f2_late_eosfct);
-	set_f2(task, f2_ether_erbfct,   nullptr, &alto2_cpu_device::f2_late_erbfct);
-	set_f2(task, f2_ether_eefct,    nullptr, &alto2_cpu_device::f2_late_eefct);
-	set_f2(task, f2_ether_ebfct,    nullptr, &alto2_cpu_device::f2_late_ebfct);
-	set_f2(task, f2_ether_ecbfct,   nullptr, &alto2_cpu_device::f2_late_ecbfct);
-	set_f2(task, f2_ether_eisfct,   nullptr, &alto2_cpu_device::f2_late_eisfct);
-
-	m_active_callback[task] = &alto2_cpu_device::activate_eth;
-
 	m_eth.rx_packet = std::make_unique<UINT16[]>(sizeof(UINT16)*ALTO2_ETHER_PACKET_SIZE);
 	m_eth.tx_packet = std::make_unique<UINT16[]>(sizeof(UINT16)*ALTO2_ETHER_PACKET_SIZE);
 

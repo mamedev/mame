@@ -42,14 +42,17 @@ enum {
 };
 
 #ifndef ALTO2_DEBUG
-#define ALTO2_DEBUG             1           //!< define to 1 to enable logerror() output
+//! Define to 1 to enable logerror() output.
+#define ALTO2_DEBUG             1
 #endif
 
 #ifndef ALTO2_CRAM_CONFIG
-#define ALTO2_CRAM_CONFIG       2           //!< use default CROM/CRAM configuration 2
+//! Use default CROM/CRAM configuration 2.
+#define ALTO2_CRAM_CONFIG       2
 #endif
 
-#define USE_PRIO_F9318          0           //!< define to 1 to use the F9318 priority encoder code (broken)
+//!< Define to 1 to use the F9318 priority encoder code (broken).
+#define USE_PRIO_F9318          0
 
 #define ALTO2_TASKS             16          //!< 16 task slots
 #define ALTO2_REGS              32          //!< 32 16-bit words in the R register file
@@ -61,7 +64,7 @@ enum {
 
 #define ALTO2_CONST_SIZE        256         //!< number words in the constant ROM
 
-//! inverted bits in the micro instruction 32 bit word
+//! Inverted bits in the micro instruction 32 bit word.
 #define ALTO2_UCODE_INVERTED    ((1 << 10) | (1 << 15) | (1 << 19))
 
 /********************************************************************************
@@ -277,8 +280,6 @@ private:
 	int m_icount;
 
 	speaker_sound_device* m_speaker;
-
-	typedef void (alto2_cpu_device::*a2func)();
 
 	//! task numbers
 	enum {
@@ -575,10 +576,9 @@ private:
 	UINT16 m_l;                                     //!< L register
 	UINT16 m_shifter;                               //!< shifter output
 	UINT16 m_laluc0;                                //!< the latched ALU carry output
-	UINT16 m_m;                                     //!< M register of RAM related tasks (MYL latch in the schematics)
+	UINT16 m_myl;                                     //!< M register of RAM related tasks (MYL latch in the schematics)
 	UINT16 m_cram_addr;                             //!< constant RAM address
 	UINT16 m_task_wakeup;                           //!< task wakeup: bit 1<<n set if task n requesting service
-	a2func m_active_callback[ALTO2_TASKS];          //!< task activation callbacks
 
 	UINT16 m_reset_mode;                            //!< reset mode register: bit 1<<n set if task n starts in ROM
 	bool m_rdram_flag;                              //!< set by rdram, action happens on next cycle
@@ -861,27 +861,6 @@ private:
 	//! no operating function to put in the m_bs, m_f1 and m_f2 slots
 	void noop() {}
 
-	//! per task bus source function pointers, early (0) and late (1)
-	a2func m_bs[2][ALTO2_TASKS][ALTO2_BUSSRC];
-	void set_bs(UINT8 task, UINT8 fn, a2func f0, a2func f1) {
-		m_bs[0][task][fn] = f0 ? f0 : &alto2_cpu_device::noop;
-		m_bs[1][task][fn] = f1 ? f1 : &alto2_cpu_device::noop;
-	}
-
-	//! per task f1 function pointers, early (0) and late (1)
-	a2func m_f1[2][ALTO2_TASKS][ALTO2_F1MAX];
-	void set_f1(UINT8 task, UINT8 fn, a2func f0, a2func f1) {
-		m_f1[0][task][fn] = f0 ? f0 : &alto2_cpu_device::noop;
-		m_f1[1][task][fn] = f1 ? f1 : &alto2_cpu_device::noop;
-	}
-
-	//! per task f2 function pointers, early (0) and late (1)
-	a2func m_f2[2][ALTO2_TASKS][ALTO2_F2MAX];
-	void set_f2(UINT8 task, UINT8 fn, a2func f0, a2func f1) {
-		m_f2[0][task][fn] = f0 ? f0 : &alto2_cpu_device::noop;
-		m_f2[1][task][fn] = f1 ? f1 : &alto2_cpu_device::noop;
-	}
-
 	bool m_ram_related[ALTO2_TASKS];                //!< set when task is RAM related
 
 	UINT64 m_cycle;                                 //!< number of cycles executed in the current slice
@@ -892,14 +871,14 @@ private:
 	void hard_reset();                              //!< reset the various registers
 	void soft_reset();                              //!< soft reset
 
-	void fn_bs_bad_0();                             //! bs dummy early function
-	void fn_bs_bad_1();                             //! bs dummy late function
+	void bs_early_bad();                            //! bs dummy early function
+	void bs_late_bad();                             //! bs dummy late function
 
-	void fn_f1_bad_0();                             //! f1 dummy early function
-	void fn_f1_bad_1();                             //! f1 dummy late function
+	void f1_early_bad();                            //! f1 dummy early function
+	void f1_late_bad();                             //! f1 dummy late function
 
-	void fn_f2_bad_0();                             //! f2 dummy early function
-	void fn_f2_bad_1();                             //! f2 dummy late function
+	void f2_early_bad();                            //! f2 dummy early function
+	void f2_late_bad();                             //! f2 dummy late function
 
 	DECLARE_READ16_MEMBER( noop_r );                //!< read open bus (0177777)
 	DECLARE_WRITE16_MEMBER( noop_w );               //!< write open bus
@@ -913,18 +892,21 @@ private:
 	void bs_early_read_md();                        //!< bus source: drive BUS from read memory data
 	void bs_early_mouse();                          //!< bus source: drive bus by mouse
 	void bs_early_disp();                           //!< bus source: drive bus by displacement (which?)
+
 	void f1_early_block();                          //!< F1 func: block active task
 	void f1_late_load_mar();                        //!< F1 func: load memory address register
 	void f1_early_task();                           //!< F1 func: task switch
 	void f1_late_l_lsh_1();                         //!< F1 func: SHIFTER = left shift L once
 	void f1_late_l_rsh_1();                         //!< F1 func: SHIFTER = right shift L once
 	void f1_late_l_lcy_8();                         //!< F1 func: SHIFTER = byte swap L
+
 	void f2_late_bus_eq_zero();                     //!< F2 func: branch on bus equals zero
 	void f2_late_shifter_lt_zero();                 //!< F2 func: branch on shifter less than zero
 	void f2_late_shifter_eq_zero();                 //!< F2 func: branch on shifter equals zero
 	void f2_late_bus();                             //!< F2 func: branch on bus bits BUS[6-15]
 	void f2_late_alucy();                           //!< F2 func: branch on latched ALU carry
 	void f2_late_load_md();                         //!< F2 func: load memory data
+
 	UINT32 alu_74181(UINT32 a, UINT32 b, UINT8 smc);
 
 	void rdram();                                   //!< read the microcode ROM/RAM halfword

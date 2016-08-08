@@ -144,7 +144,7 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_l(0),
 	m_shifter(0),
 	m_laluc0(0),
-	m_m(0),
+	m_myl(0),
 	m_cram_addr(0),
 	m_task_wakeup(0),
 	m_reset_mode(0xffff),
@@ -188,12 +188,8 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	memset(m_task_next2, 0x00, sizeof(m_task_next2));
 	memset(m_r, 0x00, sizeof(m_r));
 	memset(m_s, 0x00, sizeof(m_s));
-	memset(m_active_callback, 0x00, sizeof(m_active_callback));
 	memset(m_s_reg_bank, 0x00, sizeof(m_s_reg_bank));
 	memset(m_bank_reg, 0x00, sizeof(m_bank_reg));
-	memset(m_bs, 0x00, sizeof(m_bs));
-	memset(m_f1, 0x00, sizeof(m_f1));
-	memset(m_f2, 0x00, sizeof(m_f2));
 	memset(m_ram_related, 0x00, sizeof(m_ram_related));
 	memset(m_drive, 0x00, sizeof(m_drive));
 	memset(m_sysclka0, 0x00, sizeof(m_sysclka0));
@@ -863,7 +859,7 @@ void alto2_cpu_device::device_start()
 	save_item(NAME(m_l));
 	save_item(NAME(m_shifter));
 	save_item(NAME(m_laluc0));
-	save_item(NAME(m_m));
+	save_item(NAME(m_myl));
 	save_item(NAME(m_cram_addr));
 	save_item(NAME(m_task_wakeup));
 	save_item(NAME(m_reset_mode));
@@ -897,7 +893,7 @@ void alto2_cpu_device::device_start()
 	state_add( A2_L,       "L",       m_l).formatstr("%06O");
 	state_add( A2_SHIFTER, "SHIFTER", m_shifter).formatstr("%06O");
 	state_add( A2_LALUC0,  "LALUC0",  m_laluc0).mask(1);
-	state_add( A2_M,       "M",       m_m).formatstr("%06O");
+	state_add( A2_M,       "M",       m_myl).formatstr("%06O");
 	state_add_divider(-1);
 	state_add( A2_AC3,     "AC(3)",   m_r[000]).formatstr("%06O");
 	state_add( A2_AC2,     "AC(2)",   m_r[001]).formatstr("%06O");
@@ -1281,42 +1277,42 @@ void alto2_cpu_device::watch_write(UINT32 addr, UINT32 data)
 #endif
 
 /** @brief fatal exit on unitialized dynamic phase BUS source */
-void alto2_cpu_device::fn_bs_bad_0()
+void alto2_cpu_device::bs_early_bad()
 {
 	fatal(9,"fatal: bad early bus source pointer for task %s, mpc:%05o bs:%s\n",
 		task_name(m_task), m_mpc, bs_name(bs()));
 }
 
 /** @brief fatal exit on unitialized latching phase BUS source */
-void alto2_cpu_device::fn_bs_bad_1()
+void alto2_cpu_device::bs_late_bad()
 {
 	fatal(9,"fatal: bad late bus source pointer for task %s, mpc:%05o bs: %s\n",
 		task_name(m_task), m_mpc, bs_name(bs()));
 }
 
 /** @brief fatal exit on unitialized dynamic phase F1 function */
-void alto2_cpu_device::fn_f1_bad_0()
+void alto2_cpu_device::f1_early_bad()
 {
 	fatal(9,"fatal: bad early f1 function pointer for task %s, mpc:%05o f1: %s\n",
 		task_name(m_task), m_mpc, f1_name(f1()));
 }
 
 /** @brief fatal exit on unitialized latching phase F1 function */
-void alto2_cpu_device::fn_f1_bad_1()
+void alto2_cpu_device::f1_late_bad()
 {
 	fatal(9,"fatal: bad late f1 function pointer for task %s, mpc:%05o f1: %s\n",
 		task_name(m_task), m_mpc, f1_name(f1()));
 }
 
 /** @brief fatal exit on unitialized dynamic phase F2 function */
-void alto2_cpu_device::fn_f2_bad_0()
+void alto2_cpu_device::f2_early_bad()
 {
 	fatal(9,"fatal: bad early f2 function pointer for task %s, mpc:%05o f2: %s\n",
 		task_name(m_task), m_mpc, f2_name(f2()));
 }
 
 /** @brief fatal exit on unitialized latching phase F2 function */
-void alto2_cpu_device::fn_f2_bad_1()
+void alto2_cpu_device::f2_late_bad()
 {
 	fatal(9,"fatal: bad late f2 function pointer for task %s, mpc:%05o f2: %s\n",
 			task_name(m_task), m_mpc, f2_name(f2()));
@@ -2335,14 +2331,170 @@ void alto2_cpu_device::execute_run()
 		 * because the emulator task F2 acsource or acdest may
 		 * change the m_rsel
 		 */
-		((*this).*m_f2[0][m_task][f2()])();
+		switch (f2()) {
+		case f2_task_12:                        // f2 12 task specific
+			switch (m_task) {
+			case task_emu:                      // emulator task
+				f2_early_load_dns();
+				break;
+			}
+			break;
+		case f2_task_13:                        // f2 13 task specific
+			switch (m_task) {
+			case task_emu:                      // emulator task
+				f2_early_acdest();
+				break;
+			}
+			break;
+		case f2_task_16:                        // f2 16 task specific
+			switch (m_task) {
+			case task_emu:                      // emulator task
+				f2_early_acsource();
+				break;
+			}
+			break;
+		}
 
 		// early BS function can be done now
-		if (do_bs)
-			((*this).*m_bs[0][m_task][bs()])();
+		if (do_bs) {
+			switch (bs()) {
+			case bs_read_r:                     // BUS source is R register
+				bs_early_read_r();
+				break;
+			case bs_load_r:                     // load R register from BUS
+				bs_early_load_r();
+				break;
+			case bs_task_3:                     // BUS source is task specific
+				switch (m_task) {
+				case task_emu:                  // emulator task
+					bs_early_read_sreg();
+					break;
+				case task_ksec:                 // disk sector task
+				case task_kwd:                  // disk word task
+					bs_early_read_kstat();
+					break;
+				case task_ether:                // ethernet task
+					bs_early_eidfct();
+					break;
+				case task_mrt:                  // memory refresh task
+				case task_dwt:                  // display word task
+				case task_curt:                 // cursor task
+				case task_dht:                  // display horizontal task
+				case task_dvt:                  // display vertical task
+				case task_part:                 // parity task
+					break;
+				default:
+					bs_early_bad();
+				}
+				break;
+			case bs_task_4:                     // BUS source is task specific
+				switch (m_task) {
+				case task_emu:                  // emulator task
+					bs_early_load_sreg();
+					break;
+				case task_ksec:                 // disk sector task
+				case task_kwd:                  // disk word task
+					bs_early_read_kdata();
+					break;
+				case task_ether:                // ethernet task
+				case task_mrt:                  // memory refresh task
+				case task_dwt:                  // display word task
+				case task_curt:                 // cursor task
+				case task_dht:                  // display horizontal task
+				case task_dvt:                  // display vertical task
+				case task_part:                 // parity task
+					break;
+				default:
+					bs_early_bad();
+				}
+				break;
+			case bs_read_md:                    // BUS source is memory data
+				bs_early_read_md();
+				break;
+			case bs_mouse:                      // BUS source is mouse data
+				bs_early_mouse();
+				break;
+			case bs_disp:						// BUS source displacement (emulator task)
+				switch (m_task) {
+				case task_emu:                  // emulator task
+					bs_early_emu_disp();
+					break;
+				default:
+					bs_early_disp();
+				}
+				break;
+			}
+		}
 
 		// early F1 function
-		((*this).*m_f1[0][m_task][f1()])();
+		switch (f1()) {
+		case f1_task:                           // f1 02 task switch
+			f1_early_task();
+			break;
+		case f1_block:                          // f1 03 task block
+			switch (m_task) {
+			case task_emu:                      // emulator task
+				f1_early_emu_block();
+				break;
+			case task_ksec:                     // disk sector task
+				f1_early_ksec_block();
+				break;
+			case task_ether:                    // ethernet task
+				f1_early_eth_block();
+				break;
+			case task_mrt:                      // memory refresh task
+				f1_early_mrt_block();
+				break;
+			case task_dwt:                      // display word task
+				f1_early_dwt_block();
+				break;
+			case task_curt:                     // cursor task
+				f1_early_curt_block();
+				break;
+			case task_dht:                      // display horizontal task
+				f1_early_dht_block();
+				break;
+			case task_dvt:                      // display vertical task
+				f1_early_dvt_block();
+				break;
+			case task_part:                     // parity task
+				f1_early_block();
+				break;
+			case task_kwd:                      // disk word task
+				f1_early_kwd_block();
+				break;
+			}
+			break;
+
+		case f1_task_13:                        // f1 13 task specific
+			switch (m_task) {
+			case task_ether:                    // ethernet task
+				f1_early_eilfct();
+				break;
+			}
+			break;
+		case f1_task_14:                        // f1 14 task specific
+			switch (m_task) {
+			case task_ether:                    // ethernet task
+				f1_early_epfct();
+				break;
+			}
+			break;
+		case f1_task_16:                        // f1 16 task specific
+			switch (m_task) {
+			case task_emu:                      // emulator task
+				f1_early_rsnf();
+				break;
+			}
+			break;
+		case f1_task_17:                        // f1 17 task specific
+			switch (m_task) {
+			case task_emu:                      // emulator task
+				f1_early_startf();
+				break;
+			}
+			break;
+		}
 
 		/**
 		 * The ALU a10 PROM address lines are
@@ -2367,14 +2519,255 @@ void alto2_cpu_device::execute_run()
 		m_shifter = m_l;
 
 		// late F1 function call now
-		((*this).*m_f1[1][m_task][f1()])();
+		switch (f1()) {
+		case f1_load_mar:                       // f1 01 load memory address register
+			f1_late_load_mar();
+			break;
+		case f1_l_lsh_1:                        // f1 04 left shift L once
+			f1_late_l_lsh_1();
+			break;
+		case f1_l_rsh_1:                        // f1 05 right shift L once
+			f1_late_l_rsh_1();
+			break;
+		case f1_l_lcy_8:                        // f1 06 cycle L 8 times
+			f1_late_l_lcy_8();
+			break;
+
+		case f1_task_10:                        // f1 10 task specific
+			switch (m_task) {
+			case task_emu:                      // emulator task
+				f1_late_swmode();
+				break;
+			}
+			break;
+		case f1_task_11:                        // f1 11 task specific
+			switch (m_task) {
+			case task_emu:                      // emulator task
+				f1_late_wrtram();
+				break;
+			case task_ksec:                     // disk sector task
+			case task_kwd:                      // disk word task
+				f1_late_strobe();
+				break;
+			}
+			break;
+		case f1_task_12:                        // f1 12 task specific
+			switch (m_task) {
+			case task_emu:                      // emulator task
+				f1_late_rdram();
+				break;
+			case task_ksec:                     // disk sector task
+			case task_kwd:                      // disk word task
+				f1_late_load_kstat();
+				break;
+			}
+			break;
+		case f1_task_13:                        // f1 13 task specific
+			switch (m_task) {
+			case task_emu:                      // emulator task
+#if (ALTO2_UCODE_RAM_PAGES == 3)
+				f1_late_load_rmr();
+#else
+				f1_late_load_srb();
+#endif
+				break;
+			case task_ksec:                     // disk sector task
+			case task_kwd:                      // disk word task
+				f1_late_increcno();
+				break;
+			}
+			break;
+		case f1_task_14:                        // f1 14 task specific
+			switch (m_task) {
+			case task_ksec:                     // disk sector task
+			case task_kwd:                      // disk word task
+				f1_late_clrstat();
+				break;
+			}
+			break;
+		case f1_task_15:                        // f1 15 task specific
+			switch (m_task) {
+			case task_emu:                      // emulator task
+				f1_late_emu_load_esrb();
+				break;
+			case task_ksec:                     // disk sector task
+			case task_kwd:                      // disk word task
+				f1_late_load_kcom();
+				break;
+			case task_ether:                    // ethernet task
+				f1_late_ewfct();
+				break;
+			}
+			break;
+		case f1_task_16:                        // f1 16 task specific
+			switch (m_task) {
+			case task_ksec:                     // disk sector task
+			case task_kwd:                      // disk word task
+				f1_late_load_kadr();
+				break;
+			}
+			break;
+		case f1_task_17:                        // f1 17 task specific
+			switch (m_task) {
+			case task_ksec:                     // disk sector task
+			case task_kwd:                      // disk word task
+				f1_late_load_kdata();
+				break;
+			}
+			break;
+		}
 
 		// late F2 function call now
-		((*this).*m_f2[1][m_task][f2()])();
+		switch (f2()) {
+		case f2_bus_eq_zero:                    // f2 01 branch on bus equals 0
+			f2_late_bus_eq_zero();
+			break;
+		case f2_shifter_lt_zero:                // f2 02 branch on shifter less than 0
+			f2_late_shifter_lt_zero();
+			break;
+		case f2_shifter_eq_zero:                // f2 03 branch on shifter equals 0
+			f2_late_shifter_eq_zero();
+			break;
+		case f2_bus:                            // f2 04 branch on BUS[6-15]
+			f2_late_bus();
+			break;
+		case f2_alucy:                          // f2 05 branch on (latched) ALU carry
+			f2_late_alucy();
+			break;
+		case f2_load_md:                        // f2 06 load memory data
+			f2_late_load_md();
+			break;
+
+		case f2_task_10:                        // f2 10 task specific
+			switch (m_task) {
+			case task_emu:                      // emulator task
+				f2_late_busodd();
+				break;
+			case task_ksec:                     // disk sector task
+			case task_kwd:                      // disk word task
+				f2_late_init();
+				break;
+			case task_ether:                    // ethernet task
+				f2_late_eodfct();
+				break;
+			case task_dwt:                      // display word task
+				f2_late_dwt_load_ddr();
+				break;
+			case task_curt:                     // cursor task
+				f2_late_load_xpreg();
+				break;
+			case task_dht:                      // display horizontal task
+				f2_late_evenfield();
+				break;
+			case task_dvt:                      // display vertical task
+				f2_late_evenfield();
+				break;
+			}
+			break;
+		case f2_task_11:                        // f2 11 task specific
+			switch (m_task) {
+			case task_emu:                      // emulator task
+				f2_late_magic();
+				break;
+			case task_ksec:                     // disk sector task
+			case task_kwd:                      // disk word task
+				f2_late_rwc();
+				break;
+			case task_ether:                    // ethernet task
+				f2_late_eosfct();
+				break;
+			case task_curt:                     // cursor task
+				f2_late_load_csr();
+				break;
+			case task_dht:                      // display horizontal task
+				f2_late_dht_setmode();
+				break;
+			}
+			break;
+		case f2_task_12:                        // f2 12 task specific
+			switch (m_task) {
+			case task_emu:                      // emulator task
+				f2_late_load_dns();
+				break;
+			case task_ksec:                     // disk sector task
+			case task_kwd:                      // disk word task
+				f2_late_recno();
+				break;
+			case task_ether:                    // ethernet task
+				f2_late_erbfct();
+				break;
+			}
+			break;
+		case f2_task_13:                        // f2 13 task specific
+			switch (m_task) {
+			case task_ksec:                     // disk sector task
+			case task_kwd:                      // disk word task
+				f2_late_xfrdat();
+				break;
+			case task_ether:                    // ethernet task
+				f2_late_eefct();
+				break;
+			}
+			break;
+		case f2_task_14:                        // f2 14 task specific
+			switch (m_task) {
+			case task_emu:                      // emulator task
+				f2_late_load_ir();
+				break;
+			case task_ksec:                     // disk sector task
+			case task_kwd:                      // disk word task
+				f2_late_swrnrdy();
+				break;
+			case task_ether:                    // ethernet task
+				f2_late_ebfct();
+				break;
+			}
+			break;
+		case f2_task_15:                        // f2 15 task specific
+			switch (m_task) {
+			case task_emu:                      // emulator task
+				f2_late_idisp();
+				break;
+			case task_ksec:                     // disk sector task
+			case task_kwd:                      // disk word task
+				f2_late_nfer();
+				break;
+			case task_ether:                    // ethernet task
+				f2_late_ecbfct();
+				break;
+			}
+			break;
+		case f2_task_16:                        // f2 16 task specific
+			switch (m_task) {
+			case task_emu:                      // emulator task
+				f2_late_acsource();
+				break;
+			case task_ksec:                     // disk sector task
+			case task_kwd:                      // disk word task
+				f2_late_strobon();
+				break;
+			case task_ether:                    // ethernet task
+				f2_late_eisfct();
+				break;
+			}
+			break;
+		}
 
 		// late BS function call now, if no constant was put on the bus
-		if (do_bs)
-			((*this).*m_bs[1][m_task][bs()])();
+		if (do_bs) {
+			switch (bs()) {
+			case bs_load_r:                     // load R register from BUS
+				bs_late_load_r();
+				break;
+			case bs_task_4:                     // BUS source is task specific
+				switch (m_task) {
+				case task_emu:                  // emulator task
+					bs_late_load_sreg();
+					break;
+				}
+				break;
+			}
+		}
 
 		// update T register, if LOADT is set
 		if (loadt()) {
@@ -2400,7 +2793,7 @@ void alto2_cpu_device::execute_run()
 			}
 			// update M (MYL) register, if a RAM related task is active
 			if (m_ram_related[m_task]) {
-				m_m = m_alu;        // load M from ALU, if 'GOODTASK'
+				m_myl = m_alu;      // load M from ALU, if 'GOODTASK'
 				m_s[m_s_reg_bank[m_task]][0] = m_alu;   // also writes to S[bank][0], which can't be read
 				LOG((this,LOG_CPU,2, "   M<- ALU (%#o)\n", m_alu));
 			}
@@ -2422,7 +2815,34 @@ void alto2_cpu_device::execute_run()
 				m_next2 = m_task_next2[m_task]; // get address modifier after task switch (needed?)
 
 				// let the task know it becomes active now and (most probably) reset the wakeup
-				((*this).*m_active_callback[m_task])();
+				switch (m_task) {
+				case task_emu:       // emulator task
+					break;
+				case task_ksec:      // disk sector task
+					break;
+				case task_ether:     // ethernet task
+					activate_eth();
+					break;
+				case task_mrt:       // memory refresh task
+					activate_mrt();
+					break;
+				case task_dwt:       // display word task
+					break;
+				case task_curt:      // cursor task
+					activate_curt();
+					break;
+				case task_dht:       // display horizontal task
+					activate_dht();
+					break;
+				case task_dvt:       // display vertical task
+					activate_dvt();
+					break;
+				case task_part:      // parity task
+					activate_part();
+					break;
+				case task_kwd:       // disk word task
+					break;
+				}
 			}
 		}
 
@@ -2449,7 +2869,7 @@ void alto2_cpu_device::execute_run()
 			if (m_unload_time < 0)
 				unload_word();
 		}
-		
+
 		if (m_bitclk_time >= 0) {
 			/**
 			 * Subtract the microcycle time from the bitclk time accu.
@@ -2479,52 +2899,8 @@ void alto2_cpu_device::hard_reset()
 	for (int task = 0; task < ALTO2_TASKS; task++) {
 		// every task starts at mpc = task number, in either ROM0 or RAM0
 		m_task_mpc[task] = (m_ctl2k_u38[task] >> 4) ^ 017;
-		m_active_callback[task] = &alto2_cpu_device::noop;
 		if (0 == (m_reset_mode & (1 << task)))
 			m_task_mpc[task] |= ALTO2_UCODE_RAM_BASE;
-
-		set_bs(task, bs_read_r,         &alto2_cpu_device::bs_early_read_r, nullptr);
-		set_bs(task, bs_load_r,         &alto2_cpu_device::bs_early_load_r, &alto2_cpu_device::bs_late_load_r);
-		set_bs(task, bs_no_source,      nullptr, nullptr);
-		set_bs(task, bs_task_3,         &alto2_cpu_device::fn_bs_bad_0, &alto2_cpu_device::fn_bs_bad_1);    // task specific
-		set_bs(task, bs_task_4,         &alto2_cpu_device::fn_bs_bad_0, &alto2_cpu_device::fn_bs_bad_1);    // task specific
-		set_bs(task, bs_read_md,        &alto2_cpu_device::bs_early_read_md, nullptr);
-		set_bs(task, bs_mouse,          &alto2_cpu_device::bs_early_mouse, nullptr);
-		set_bs(task, bs_disp,           &alto2_cpu_device::bs_early_disp, nullptr);
-
-		set_f1(task, f1_nop,            nullptr, nullptr);
-		set_f1(task, f1_load_mar,       nullptr, &alto2_cpu_device::f1_late_load_mar);
-		set_f1(task, f1_task,           &alto2_cpu_device::f1_early_task, nullptr);
-		set_f1(task, f1_block,          &alto2_cpu_device::fn_f1_bad_0, &alto2_cpu_device::fn_f1_bad_1);    // not all tasks have the f1_block
-		set_f1(task, f1_l_lsh_1,        nullptr, &alto2_cpu_device::f1_late_l_lsh_1);
-		set_f1(task, f1_l_rsh_1,        nullptr, &alto2_cpu_device::f1_late_l_rsh_1);
-		set_f1(task, f1_l_lcy_8,        nullptr, &alto2_cpu_device::f1_late_l_lcy_8);
-		set_f1(task, f1_const,          nullptr, nullptr);
-		set_f1(task, f1_task_10,        &alto2_cpu_device::fn_f1_bad_0, &alto2_cpu_device::fn_f1_bad_1);    // f1_task_10 to f1_task_17 are task specific
-		set_f1(task, f1_task_11,        &alto2_cpu_device::fn_f1_bad_0, &alto2_cpu_device::fn_f1_bad_1);    // f1_task_10 to f1_task_17 are task specific
-		set_f1(task, f1_task_12,        &alto2_cpu_device::fn_f1_bad_0, &alto2_cpu_device::fn_f1_bad_1);    // f1_task_10 to f1_task_17 are task specific
-		set_f1(task, f1_task_13,        &alto2_cpu_device::fn_f1_bad_0, &alto2_cpu_device::fn_f1_bad_1);    // f1_task_10 to f1_task_17 are task specific
-		set_f1(task, f1_task_14,        &alto2_cpu_device::fn_f1_bad_0, &alto2_cpu_device::fn_f1_bad_1);    // f1_task_10 to f1_task_17 are task specific
-		set_f1(task, f1_task_15,        &alto2_cpu_device::fn_f1_bad_0, &alto2_cpu_device::fn_f1_bad_1);    // f1_task_10 to f1_task_17 are task specific
-		set_f1(task, f1_task_16,        &alto2_cpu_device::fn_f1_bad_0, &alto2_cpu_device::fn_f1_bad_1);    // f1_task_10 to f1_task_17 are task specific
-		set_f1(task, f1_task_17,        &alto2_cpu_device::fn_f1_bad_0, &alto2_cpu_device::fn_f1_bad_1);    // f1_task_10 to f1_task_17 are task specific
-
-		set_f2(task, f2_nop,            nullptr, nullptr);
-		set_f2(task, f2_bus_eq_zero,    nullptr, &alto2_cpu_device::f2_late_bus_eq_zero);
-		set_f2(task, f2_shifter_lt_zero,nullptr, &alto2_cpu_device::f2_late_shifter_lt_zero);
-		set_f2(task, f2_shifter_eq_zero,nullptr, &alto2_cpu_device::f2_late_shifter_eq_zero);
-		set_f2(task, f2_bus,            nullptr, &alto2_cpu_device::f2_late_bus);
-		set_f2(task, f2_alucy,          nullptr, &alto2_cpu_device::f2_late_alucy);
-		set_f2(task, f2_load_md,        nullptr, &alto2_cpu_device::f2_late_load_md);
-		set_f2(task, f2_const,          nullptr, nullptr);
-		set_f2(task, f2_task_10,        &alto2_cpu_device::fn_f2_bad_0, &alto2_cpu_device::fn_f2_bad_1);    // f2_task_10 to f2_task_17 are task specific
-		set_f2(task, f2_task_11,        &alto2_cpu_device::fn_f2_bad_0, &alto2_cpu_device::fn_f2_bad_1);    // f2_task_10 to f2_task_17 are task specific
-		set_f2(task, f2_task_12,        &alto2_cpu_device::fn_f2_bad_0, &alto2_cpu_device::fn_f2_bad_1);    // f2_task_10 to f2_task_17 are task specific
-		set_f2(task, f2_task_13,        &alto2_cpu_device::fn_f2_bad_0, &alto2_cpu_device::fn_f2_bad_1);    // f2_task_10 to f2_task_17 are task specific
-		set_f2(task, f2_task_14,        &alto2_cpu_device::fn_f2_bad_0, &alto2_cpu_device::fn_f2_bad_1);    // f2_task_10 to f2_task_17 are task specific
-		set_f2(task, f2_task_15,        &alto2_cpu_device::fn_f2_bad_0, &alto2_cpu_device::fn_f2_bad_1);    // f2_task_10 to f2_task_17 are task specific
-		set_f2(task, f2_task_16,        &alto2_cpu_device::fn_f2_bad_0, &alto2_cpu_device::fn_f2_bad_1);    // f2_task_10 to f2_task_17 are task specific
-		set_f2(task, f2_task_17,        &alto2_cpu_device::fn_f2_bad_0, &alto2_cpu_device::fn_f2_bad_1);    // f2_task_10 to f2_task_17 are task specific
 	}
 
 	init_memory();
@@ -2546,6 +2922,8 @@ void alto2_cpu_device::hard_reset()
 	init_kwd();
 
 	m_dsp_time = 0;                 // reset the display state timing
+	m_unload_time = 0;              // reset the word unload timing accu
+	m_bitclk_time = 0;              // reset the bitclk timing accu
 	m_task = task_emu;              // start with task 0 (emulator)
 	m_task_wakeup |= 1 << task_emu; // set wakeup flag
 }

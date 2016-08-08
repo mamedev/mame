@@ -117,21 +117,14 @@ void alto2_cpu_device::wrtram()
 {
 	UINT32 bank = GET_CRAM_BANKSEL(m_cram_addr);
 	UINT32 wordaddr = GET_CRAM_WORDADDR(m_cram_addr);
-	UINT32 value = ((m_m << 16) | m_alu) ^ ALTO2_UCODE_INVERTED;
+	UINT32 value = ((m_myl << 16) | m_alu) ^ ALTO2_UCODE_INVERTED;
 
 	UINT32 addr = bank * ALTO2_UCODE_PAGE_SIZE + wordaddr;  // write RAM 0,1,2
-	LOG((this,LOG_CPU,0,"    wrtram: RAM%d [%04o] upper:%06o lower:%06o", bank, wordaddr, m_m, m_alu));
+	LOG((this,LOG_CPU,0,"    wrtram: RAM%d [%04o] upper:%06o lower:%06o", bank, wordaddr, m_myl, m_alu));
 
 #if DEBUG_WRTRAM
-	char buff[128];
-	UINT8 oprom[4];
-	oprom[0] = m_m / 256;
-	oprom[1] = m_m % 256;
-	oprom[2] = m_m / 256;
-	oprom[3] = m_m % 256;
-	disasm_disassemble(buff, addr, oprom, oprom, 0);
-	printf("WR CRAM_BANKSEL=%d RAM%d [%04o] upper:%06o lower:%06o *** %s\n",
-			GET_CRAM_BANKSEL(m_cram_addr), bank, wordaddr, m_m, m_alu, buff);
+	printf("WR CRAM_BANKSEL=%d RAM%d [%04o] upper:%06o lower:%06o\n",
+			GET_CRAM_BANKSEL(m_cram_addr), bank, wordaddr, m_myl, m_alu);
 #endif
 
 	m_wrtram_flag = false;
@@ -158,7 +151,7 @@ void alto2_cpu_device::bs_early_read_sreg()
 		r = m_s[bank][rsel()];
 		LOG((this,LOG_RAM,2,"    <-S%02o; bus &= S[%o][%02o] (%#o)\n", rsel(), bank, rsel(), r));
 	} else {
-		r = m_m;
+		r = m_myl;
 		LOG((this,LOG_RAM,2,"    <-S%02o; bus &= M (%#o)\n", rsel(), r));
 	}
 	m_bus &= r;
@@ -180,8 +173,8 @@ void alto2_cpu_device::bs_early_load_sreg()
 void alto2_cpu_device::bs_late_load_sreg()
 {
 	UINT8 bank = m_s_reg_bank[m_task];
-	m_s[bank][rsel()] = m_m;
-	LOG((this,LOG_RAM,2,"    S%02o<- S[%o][%02o] := %#o\n", rsel(), bank, rsel(), m_m));
+	m_s[bank][rsel()] = m_myl;
+	LOG((this,LOG_RAM,2,"    S%02o<- S[%o][%02o] := %#o\n", rsel(), bank, rsel(), m_myl));
 }
 
 /**
@@ -410,18 +403,6 @@ void alto2_cpu_device::f1_late_load_srb()
 void alto2_cpu_device::init_ram(int task)
 {
 	m_ram_related[task] = true;
-
-	set_bs(task, bs_ram_read_slocation, &alto2_cpu_device::bs_early_read_sreg, nullptr);
-	set_bs(task, bs_ram_load_slocation, &alto2_cpu_device::bs_early_load_sreg, &alto2_cpu_device::bs_late_load_sreg);
-
-	set_f1(task, f1_ram_swmode,         nullptr, &alto2_cpu_device::f1_late_swmode);
-	set_f1(task, f1_ram_wrtram,         nullptr, &alto2_cpu_device::f1_late_wrtram);
-	set_f1(task, f1_ram_rdram,          nullptr, &alto2_cpu_device::f1_late_rdram);
-#if (ALTO2_UCODE_RAM_PAGES == 3)
-	set_f1(task, f1_ram_load_rmr,       0, &alto2_cpu_device::f1_late_load_rmr);
-#else   // ALTO2_UCODE_RAM_PAGES != 3
-	set_f1(task, f1_ram_load_srb,       nullptr, &alto2_cpu_device::f1_late_load_srb);
-#endif
 }
 
 void alto2_cpu_device::exit_ram()
@@ -433,6 +414,6 @@ void alto2_cpu_device::reset_ram()
 {
 	m_rdram_flag = false;
 	m_wrtram_flag = false;
-	m_m = 0;
+	m_myl = 0;
 	memset(m_s, 0, sizeof(m_s));
 }
