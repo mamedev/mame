@@ -28,8 +28,7 @@
 #include "rendlay.h"
 #include "softlist.h"
 #include "cpu/i86/i86.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+#include "bus/pofo/ccm.h"
 #include "bus/pofo/exp.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
@@ -51,7 +50,7 @@ public:
 		m_maincpu(*this, M80C88A_TAG),
 		m_lcdc(*this, HD61830_TAG),
 		m_speaker(*this, "speaker"),
-		m_card(*this, "cardslot"),
+		m_ccm(*this, PORTFOLIO_MEMORY_CARD_SLOT_A_TAG),
 		m_exp(*this, PORTFOLIO_EXPANSION_SLOT_TAG),
 		m_timer_tick(*this, TIMER_TICK_TAG),
 		m_rom(*this, M80C88A_TAG),
@@ -72,7 +71,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<hd61830_device> m_lcdc;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<generic_slot_device> m_card;
+	required_device<portfolio_memory_card_slot_t> m_ccm;
 	required_device<portfolio_expansion_slot_t> m_exp;
 	required_device<timer_device> m_timer_tick;
 	required_region_ptr<UINT8> m_rom;
@@ -111,6 +110,7 @@ public:
 	};
 
 	DECLARE_READ8_MEMBER( rom_b_r );
+	DECLARE_WRITE8_MEMBER( rom_b_w );
 
 	DECLARE_READ8_MEMBER( irq_status_r );
 	DECLARE_READ8_MEMBER( keyboard_r );
@@ -148,7 +148,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(counter_tick);
 	DECLARE_READ8_MEMBER(hd61830_rd_r);
 	IRQ_CALLBACK_MEMBER(portfolio_int_ack);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( portfolio_card );
 	required_device<ram_device> m_ram;
 };
 
@@ -477,10 +476,7 @@ READ8_MEMBER( portfolio_state::rom_b_r )
 		break;
 
 	case CCM_A:
-		if (m_card->exists())
-		{
-			data = m_card->read_rom(space, offset);
-		}
+		data = m_ccm->nrdi_r(space, offset & 0x1ffff);
 		break;
 
 	case CCM_B:
@@ -493,6 +489,21 @@ READ8_MEMBER( portfolio_state::rom_b_r )
 	}
 
 	return data;
+}
+
+
+//-------------------------------------------------
+//  rom_b_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( portfolio_state::rom_b_w )
+{
+	switch (m_rom_b)
+	{
+	case CCM_A:
+		m_ccm->nwri_w(space, offset & 0x1ffff, data);
+		break;
+	}
 }
 
 
@@ -551,7 +562,7 @@ static ADDRESS_MAP_START( portfolio_mem, AS_PROGRAM, 8, portfolio_state )
 	AM_RANGE(0x00000, 0x1efff) AM_RAM AM_SHARE("nvram1")
 	AM_RANGE(0x1f000, 0x9efff) AM_RAM // expansion
 	AM_RANGE(0xb0000, 0xb0fff) AM_MIRROR(0xf000) AM_RAM AM_SHARE("nvram2") // video RAM
-	AM_RANGE(0xc0000, 0xdffff) AM_READ(rom_b_r)
+	AM_RANGE(0xc0000, 0xdffff) AM_READWRITE(rom_b_r, rom_b_w)
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION(M80C88A_TAG, 0x20000)
 ADDRESS_MAP_END
 
@@ -735,25 +746,6 @@ WRITE_LINE_MEMBER( portfolio_state::eint_w )
 		trigger_interrupt(INT_EXTERNAL);
 }
 
-//**************************************************************************
-//  IMAGE LOADING
-//**************************************************************************
-
-//-------------------------------------------------
-//  DEVICE_IMAGE_LOAD( portfolio_card )
-//-------------------------------------------------
-
-DEVICE_IMAGE_LOAD_MEMBER( portfolio_state, portfolio_card )
-{
-	UINT32 size = m_card->common_get_size("rom");
-
-	m_card->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_BIG);
-	m_card->common_load_rom(m_card->get_rom_base(), size, "rom");
-
-	return image_init_result::PASS;
-}
-
-
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -841,6 +833,8 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
+	MCFG_PORTFOLIO_MEMORY_CARD_SLOT_ADD(PORTFOLIO_MEMORY_CARD_SLOT_A_TAG, portfolio_memory_cards, nullptr)
+
 	MCFG_PORTFOLIO_EXPANSION_SLOT_ADD(PORTFOLIO_EXPANSION_SLOT_TAG, XTAL_4_9152MHz, portfolio_expansion_cards, nullptr)
 	MCFG_PORTFOLIO_EXPANSION_SLOT_IINT_CALLBACK(WRITELINE(portfolio_state, iint_w))
 	MCFG_PORTFOLIO_EXPANSION_SLOT_EINT_CALLBACK(WRITELINE(portfolio_state, eint_w))
@@ -852,11 +846,6 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 
 	/* fake keyboard */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", portfolio_state, keyboard_tick, attotime::from_usec(2500))
-
-	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cardslot", generic_plain_slot, "pofo_card")
-	MCFG_GENERIC_EXTENSIONS("rom,bin")
-	MCFG_GENERIC_LOAD(portfolio_state, portfolio_card)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "pofo")
