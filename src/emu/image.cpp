@@ -209,23 +209,6 @@ void image_manager::options_extract()
 
 
 /*-------------------------------------------------
- image_mandatory_scan - search for devices which
- need an image to be loaded
- -------------------------------------------------*/
-
-std::string &image_manager::mandatory_scan(std::string &mandatory)
-{
-	mandatory.clear();
-	// make sure that any required image has a mounted file
-	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
-	{
-		if (image.filename() == nullptr && image.must_be_loaded())
-			mandatory.append("\"").append(image.instance_name()).append("\", ");
-	}
-	return mandatory;
-}
-
-/*-------------------------------------------------
     postdevice_init - initialize devices for a specific
     running_machine
 -------------------------------------------------*/

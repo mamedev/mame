@@ -2450,10 +2450,6 @@ ioport_manager::ioport_manager(running_machine &machine)
 		m_timecode_file(machine.options().input_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS),
 		m_timecode_count(0),
 		m_timecode_last_time(attotime::zero),
-		m_has_configs(false),
-		m_has_analog(false),
-		m_has_dips(false),
-		m_has_bioses(false),
 		m_autofire_toggle(false),
 		m_autofire_delay(3)                 // 1 seems too fast for a bunch of games
 {
@@ -2533,29 +2529,6 @@ time_t ioport_manager::initialize()
 	m_natkeyboard.initialize();
 	// register callbacks for when we load configurations
 	machine().configuration().config_register("input", config_saveload_delegate(FUNC(ioport_manager::load_config), this), config_saveload_delegate(FUNC(ioport_manager::save_config), this));
-
-	// calculate "has..." values
-	{
-		m_has_configs = false;
-		m_has_analog = false;
-		m_has_dips = false;
-		m_has_bioses = false;
-
-		// scan the input port array to see what options we need to enable
-		for (auto &port : m_portlist)
-			for (ioport_field &field : port.second->fields())
-			{
-				if (field.type() == IPT_DIPSWITCH)
-					m_has_dips = true;
-				if (field.type() == IPT_CONFIG)
-					m_has_configs = true;
-				if (field.is_analog())
-					m_has_analog = true;
-			}
-		for (device_t &device : device_iterator(machine().root_device()))
-			for (const rom_entry &rom : device.rom_region_vector())
-				if (ROMENTRY_ISSYSTEM_BIOS(&rom)) { m_has_bioses= true; break; }
-	}
 
 	// open playback and record files if specified
 	time_t basetime = playback_init();
