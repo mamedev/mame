@@ -143,6 +143,7 @@ enum ioport_type
 	IPT_SERVICE,
 	IPT_TILT,
 	IPT_INTERLOCK,
+	IPT_MEMORY_RESET,
 	IPT_VOLUME_UP,
 	IPT_VOLUME_DOWN,
 	IPT_START,              // use the numbered start button(s) for coin-ops
