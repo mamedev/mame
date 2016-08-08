@@ -579,8 +579,7 @@ void info_xml_creator::output_rom(device_t &device)
 				if (!is_disk && is_bios)
 				{
 					// scan backwards through the ROM entries
-					auto entries = rom_build_entries(m_drivlist.driver().rom);
-					for (const rom_entry *brom = entries.data(); !ROMENTRY_ISEND(brom); brom++)
+					for (const rom_entry *brom = rom - 1; brom != device.rom_region(); brom--)
 						if (ROMENTRY_ISSYSTEM_BIOS(brom))
 						{
 							strcpy(bios_name, ROM_GETNAME(brom));
