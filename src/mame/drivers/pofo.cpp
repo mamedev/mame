@@ -9,6 +9,9 @@
     http://www.best-electronics-ca.com/portfoli.htm
     http://www.atari-portfolio.co.uk/pfnews/pf9.txt
 
+	Command line for dual RAM expansion with A: File Manager ROM card and B: RAM card
+    ./mess64 pofo -exp ram -exp:ram:exp ram2 -cart1 fileman -exp:ram:ccmb ram
+
 */
 
 /*
