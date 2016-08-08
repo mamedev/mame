@@ -21,7 +21,7 @@ Year + Game                 Board
 ---------------------------------------
 
 Notes:
-- In service mode, press "analyzer" (0) and "test" (F1) to see a gfx test
+- In service mode, press "analyzer" (0) and "test" (F2) to see a gfx test
 
 - hnfubuki doesn't have a service mode dip, press "analyzer" instead
 
@@ -269,7 +269,9 @@ static INPUT_PORTS_START( hnayayoi )
 
 	PORT_START("DSW3")  /* DSW3 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )   // blitter busy flag
-	PORT_SERVICE( 0x02, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Service_Mode ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -292,7 +294,7 @@ static INPUT_PORTS_START( hnayayoi )
 	PORT_START("COIN")  /* COIN */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1) // there is also a dip switch
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) // there is also a dip switch
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )  PORT_NAME("Analizer")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // "Non Use" in service mode
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )  /* "Note" ("Paper Money") = 10 Credits */
@@ -382,7 +384,7 @@ static INPUT_PORTS_START( hnfubuki )
 	PORT_START("COIN")  /* COIN */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test ))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )  PORT_NAME("Analizer")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )  /* "Note" ("Paper Money") = 10 Credits */
@@ -446,7 +448,7 @@ static INPUT_PORTS_START( untoucha )
 	PORT_START("COIN")  /* COIN */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test ))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )  PORT_NAME("Analizer")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )  /* "Note" ("Paper Money") = 5 or 8 Credits */
