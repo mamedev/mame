@@ -641,6 +641,8 @@ GAME_CUSTOM( 199?, m4vivalv__5,    m4vivalv,   "vv_10_d_.3_3",                 0
 GAME_CUSTOM( 199?, m4vivalv__6,    m4vivalv,   "vv_10_k_.3_3",                 0x0000, 0x010000, CRC(70fc4c56) SHA1(02cbaadd3575ef0d9dc192aabbe39a735893a662), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 34)" )
 GAME_CUSTOM( 199?, m4vivalv__7,    m4vivalv,   "vv_10a__.3_3",                 0x0000, 0x010000, CRC(c908d65a) SHA1(5af180e697c22c27380e275d76708103e298cf41), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 35)" )
 GAME_CUSTOM( 199?, m4vivalv__8,    m4vivalv,   "vvi05___.3_3",                 0x0000, 0x010000, CRC(a5829d5c) SHA1(4cd1a2185579898db7be75f8c3f565043f0691b6), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 36)" )
+// "(C)1991 BARCREST" and "VLV 1.0"
+GAME_CUSTOM( 199?, m4vivalv__9,    m4vivalv,   "viva206",                      0x0000, 0x010000, CRC(76ab9a5d) SHA1(455699cbc05f744eafe58881a8fb120b24cfe5c8), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 37)" )
 
 
 GAME(199?, m4stc    ,0          ,mod4yam    ,mpu4               , mpu4_state,m4default          ,ROT0,   "Barcrest","unknown MPU4 'STC 0.1' (Barcrest) (MPU4)",GAME_FLAGS)
