@@ -1038,7 +1038,7 @@ image_init_result device_image_interface::load_software(const std::string &softl
 
 	// Check if there's a software list defined for this device and use that if we're not creating an image
 	std::string list_name;
-	bool softload = load_software_part(softlist_name.c_str(), m_software_part_ptr, &list_name);
+	bool softload = load_software_part(softlist_name, m_software_part_ptr, &list_name);
 	if (!softload)
 	{
 		m_is_loading = false;
@@ -1272,7 +1272,7 @@ void device_image_interface::update_names(const device_type device_type, const c
 //  case.
 //-------------------------------------------------
 
-void device_image_interface::software_name_split(const char *swlist_swname, std::string &swlist_name, std::string &swname, std::string &swpart)
+void device_image_interface::software_name_split(const std::string &swlist_swname, std::string &swlist_name, std::string &swname, std::string &swpart)
 {
 	// reset all output parameters
 	swlist_name.clear();
@@ -1280,26 +1280,26 @@ void device_image_interface::software_name_split(const char *swlist_swname, std:
 	swpart.clear();
 
 	// if no colon, this is the swname by itself
-	const char *split1 = strchr(swlist_swname, ':');
-	if (split1 == nullptr)
+	auto split1 = swlist_swname.find_first_of(':');
+	if (split1 == std::string::npos)
 	{
-		swname.assign(swlist_swname);
+		swname = swlist_swname;
 		return;
 	}
 
 	// if one colon, it is the swname and swpart alone
-	const char *split2 = strchr(split1 + 1, ':');
-	if (split2 == nullptr)
+	auto split2 = swlist_swname.find_first_of(':', split1 + 1);
+	if (split2 == std::string::npos)
 	{
-		swname.assign(swlist_swname, split1 - swlist_swname);
-		swpart.assign(split1 + 1);
+		swname = swlist_swname.substr(0, split1);
+		swpart = swlist_swname.substr(split1 + 1);
 		return;
 	}
 
 	// if two colons present, split into 3 parts
-	swlist_name.assign(swlist_swname, split1 - swlist_swname);
-	swname.assign(split1 + 1, split2 - (split1 + 1));
-	swpart.assign(split2 + 1);
+	swlist_name = swlist_swname.substr(0, split1);
+	swname = swlist_swname.substr(split1 + 1, split2 - (split1 + 1));
+	swpart = swlist_swname.substr(split2 + 1);
 }
 
 
@@ -1307,7 +1307,7 @@ void device_image_interface::software_name_split(const char *swlist_swname, std:
 //	find_software_item
 //-------------------------------------------------
 
-const software_part *device_image_interface::find_software_item(const char *path, bool restrict_to_interface, software_list_device **dev) const
+const software_part *device_image_interface::find_software_item(const std::string &path, bool restrict_to_interface, software_list_device **dev) const
 {
 	// split full software name into software list name and short software name
 	std::string swlist_name, swinfo_name, swpart_name;
@@ -1386,7 +1386,7 @@ const software_list_loader &device_image_interface::get_software_list_loader() c
 //  sw_info and sw_part are also set.
 //-------------------------------------------------
 
-bool device_image_interface::load_software_part(const char *path, const software_part *&swpart, std::string *list_name)
+bool device_image_interface::load_software_part(const std::string &path, const software_part *&swpart, std::string *list_name)
 {
 	// if no match has been found, we suggest similar shortnames
 	software_list_device *swlist;

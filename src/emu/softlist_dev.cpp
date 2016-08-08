@@ -128,10 +128,10 @@ void software_list_device::device_start()
 //  and optional interface
 //-------------------------------------------------
 
-void software_list_device::find_approx_matches(const char *name, int matches, const software_info **list, const char *interface)
+void software_list_device::find_approx_matches(const std::string &name, int matches, const software_info **list, const char *interface)
 {
 	// if no name, return
-	if (name == nullptr || name[0] == 0)
+	if (name.empty())
 		return;
 
 	// initialize everyone's states
@@ -149,8 +149,8 @@ void software_list_device::find_approx_matches(const char *name, int matches, co
 		if ((interface == nullptr || part.matches_interface(interface)) && is_compatible(part) == SOFTWARE_IS_COMPATIBLE)
 		{
 			// pick the best match between driver name and description
-			int longpenalty = driver_list::penalty_compare(name, swinfo.longname().c_str());
-			int shortpenalty = driver_list::penalty_compare(name, swinfo.shortname().c_str());
+			int longpenalty = driver_list::penalty_compare(name.c_str(), swinfo.longname().c_str());
+			int shortpenalty = driver_list::penalty_compare(name.c_str(), swinfo.shortname().c_str());
 			int curpenalty = std::min(longpenalty, shortpenalty);
 
 			// insert into the sorted table of matches
@@ -209,13 +209,13 @@ software_list_device *software_list_device::find_by_name(const machine_config &c
 //  name, across all software list devices
 //-------------------------------------------------
 
-void software_list_device::display_matches(const machine_config &config, const char *interface, const char *name)
+void software_list_device::display_matches(const machine_config &config, const char *interface, const std::string &name)
 {
 	// check if there is at least one software list
 	software_list_device_iterator deviter(config.root_device());
 	if (deviter.first() != nullptr)
 		osd_printf_error("\n\"%s\" approximately matches the following\n"
-			"supported software items (best match first):\n\n", name);
+			"supported software items (best match first):\n\n", name.c_str());
 
 	// iterate through lists
 	for (software_list_device &swlistdev : deviter)
