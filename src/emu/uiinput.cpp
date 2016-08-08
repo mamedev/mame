@@ -24,6 +24,55 @@ enum
 };
 
 
+/***************************************************************************
+    LOCAL VARIABLES
+***************************************************************************/
+
+// list of natural keyboard keys that are not associated with UI_EVENT_CHARs
+const input_item_id ui_input_manager::s_non_char_keys[] =
+{
+	ITEM_ID_ESC,
+	ITEM_ID_F1,
+	ITEM_ID_F2,
+	ITEM_ID_F3,
+	ITEM_ID_F4,
+	ITEM_ID_F5,
+	ITEM_ID_F6,
+	ITEM_ID_F7,
+	ITEM_ID_F8,
+	ITEM_ID_F9,
+	ITEM_ID_F10,
+	ITEM_ID_F11,
+	ITEM_ID_F12,
+	ITEM_ID_NUMLOCK,
+	ITEM_ID_0_PAD,
+	ITEM_ID_1_PAD,
+	ITEM_ID_2_PAD,
+	ITEM_ID_3_PAD,
+	ITEM_ID_4_PAD,
+	ITEM_ID_5_PAD,
+	ITEM_ID_6_PAD,
+	ITEM_ID_7_PAD,
+	ITEM_ID_8_PAD,
+	ITEM_ID_9_PAD,
+	ITEM_ID_DEL_PAD,
+	ITEM_ID_PLUS_PAD,
+	ITEM_ID_MINUS_PAD,
+	ITEM_ID_INSERT,
+	ITEM_ID_DEL,
+	ITEM_ID_HOME,
+	ITEM_ID_END,
+	ITEM_ID_PGUP,
+	ITEM_ID_PGDN,
+	ITEM_ID_UP,
+	ITEM_ID_DOWN,
+	ITEM_ID_LEFT,
+	ITEM_ID_RIGHT,
+	ITEM_ID_PAUSE,
+	ITEM_ID_CANCEL
+};
+
+
 //**************************************************************************
 //  UI INPUT MANAGER
 //**************************************************************************
@@ -43,6 +92,7 @@ ui_input_manager::ui_input_manager(running_machine &machine)
 	/* create the private data */
 	m_current_mouse_x = -1;
 	m_current_mouse_y = -1;
+	m_non_char_keys_down = std::make_unique<UINT8[]>((ARRAY_LENGTH(s_non_char_keys) + 7) / 8);
 
 	/* add a frame callback to poll inputs */
 	machine.add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(FUNC(ui_input_manager::frame_update), this));
@@ -420,4 +470,51 @@ void ui_input_manager::mark_all_as_pressed()
 {
 	for (int code = IPT_UI_FIRST + 1; code < IPT_UI_LAST; code++)
 		m_next_repeat[code] = osd_ticks();
+}
+
+
+//-------------------------------------------------
+//  process_natural_keyboard - processes any
+//  natural keyboard input
+//-------------------------------------------------
+
+void ui_input_manager::process_natural_keyboard()
+{
+	// loop while we have interesting events
+	ui_event event;
+	while (pop_event(&event))
+	{
+		// if this was a UI_EVENT_CHAR event, post it
+		if (event.event_type == UI_EVENT_CHAR)
+			machine().ioport().natkeyboard().post(event.ch);
+	}
+
+	// process natural keyboard keys that don't get UI_EVENT_CHARs
+	for (int i = 0; i < ARRAY_LENGTH(s_non_char_keys); i++)
+	{
+		// identify this keycode
+		input_item_id itemid = s_non_char_keys[i];
+		input_code code = machine().input().code_from_itemid(itemid);
+
+		// ...and determine if it is pressed
+		bool pressed = machine().input().code_pressed(code);
+
+		// figure out whey we are in the key_down map
+		UINT8 *key_down_ptr = &m_non_char_keys_down[i / 8];
+		UINT8 key_down_mask = 1 << (i % 8);
+
+		if (pressed && !(*key_down_ptr & key_down_mask))
+		{
+			// this key is now down
+			*key_down_ptr |= key_down_mask;
+
+			// post the key
+			machine().ioport().natkeyboard().post(UCHAR_MAMEKEY_BEGIN + code.item_id());
+		}
+		else if (!pressed && (*key_down_ptr & key_down_mask))
+		{
+			// this key is now up
+			*key_down_ptr &= ~key_down_mask;
+		}
+	}
 }

@@ -55,6 +55,8 @@ struct ui_event
 
 class ui_input_manager
 {
+	static const input_item_id s_non_char_keys[];
+
 public:
 	// construction/destruction
 	ui_input_manager(running_machine &machine);
@@ -97,6 +99,8 @@ public:
 
 	void mark_all_as_pressed();
 
+	void process_natural_keyboard();
+
 private:
 
 	// internal state
@@ -117,6 +121,8 @@ private:
 	ui_event                    m_events[EVENT_QUEUE_SIZE];
 	int                         m_events_start;
 	int                         m_events_end;
+
+	std::unique_ptr<UINT8[]>    m_non_char_keys_down;
 };
 
 #endif  /* __UIINPUT_H__ */

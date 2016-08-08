@@ -21,13 +21,13 @@
 #include "rendfont.h"
 #include "uiinput.h"
 #include "ui/ui.h"
+#include "ui/info.h"
 #include "ui/menu.h"
 #include "ui/mainmenu.h"
 #include "ui/filemngr.h"
 #include "ui/sliders.h"
 #include "ui/viewgfx.h"
 #include "imagedev/cassette.h"
-#include "image.h"
 
 
 /***************************************************************************
@@ -47,50 +47,6 @@ enum
 /***************************************************************************
     LOCAL VARIABLES
 ***************************************************************************/
-
-// list of natural keyboard keys that are not associated with UI_EVENT_CHARs
-static const input_item_id non_char_keys[] =
-{
-	ITEM_ID_ESC,
-	ITEM_ID_F1,
-	ITEM_ID_F2,
-	ITEM_ID_F3,
-	ITEM_ID_F4,
-	ITEM_ID_F5,
-	ITEM_ID_F6,
-	ITEM_ID_F7,
-	ITEM_ID_F8,
-	ITEM_ID_F9,
-	ITEM_ID_F10,
-	ITEM_ID_F11,
-	ITEM_ID_F12,
-	ITEM_ID_NUMLOCK,
-	ITEM_ID_0_PAD,
-	ITEM_ID_1_PAD,
-	ITEM_ID_2_PAD,
-	ITEM_ID_3_PAD,
-	ITEM_ID_4_PAD,
-	ITEM_ID_5_PAD,
-	ITEM_ID_6_PAD,
-	ITEM_ID_7_PAD,
-	ITEM_ID_8_PAD,
-	ITEM_ID_9_PAD,
-	ITEM_ID_DEL_PAD,
-	ITEM_ID_PLUS_PAD,
-	ITEM_ID_MINUS_PAD,
-	ITEM_ID_INSERT,
-	ITEM_ID_DEL,
-	ITEM_ID_HOME,
-	ITEM_ID_END,
-	ITEM_ID_PGUP,
-	ITEM_ID_PGDN,
-	ITEM_ID_UP,
-	ITEM_ID_DOWN,
-	ITEM_ID_LEFT,
-	ITEM_ID_RIGHT,
-	ITEM_ID_PAUSE,
-	ITEM_ID_CANCEL
-};
 
 static const char *s_color_list[] = {
 	OPTION_UI_BORDER_COLOR,
@@ -186,6 +142,10 @@ mame_ui_manager::mame_ui_manager(running_machine &machine)
 {
 }
 
+mame_ui_manager::~mame_ui_manager()
+{
+}
+
 void mame_ui_manager::init()
 {
 	load_ui_options();
@@ -199,7 +159,6 @@ void mame_ui_manager::init()
 	// more initialization
 	using namespace std::placeholders;
 	set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_messagebox, this, _1));
-	m_non_char_keys_down = std::make_unique<UINT8[]>((ARRAY_LENGTH(non_char_keys) + 7) / 8);
 	m_mouse_show = machine().system().flags & MACHINE_CLICKABLE_ARTWORK ? true : false;
 
 	// request a callback upon exiting
@@ -240,6 +199,8 @@ void mame_ui_manager::exit()
 
 void mame_ui_manager::initialize(running_machine &machine)
 {
+	m_machine_info = std::make_unique<ui::machine_info>(machine);
+
 	// initialize the on-screen display system
 	slider_list = slider_init(machine);
 	if (slider_list.size() > 0)
@@ -295,12 +256,15 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 	{
 		// default to standard colors
 		messagebox_backcolor = UI_BACKGROUND_COLOR;
+		messagebox_text.clear();
 
 		// pick the next state
 		switch (state)
 		{
 			case 0:
-				if (show_warnings && warnings_string(messagebox_text).length() > 0)
+				if (show_warnings)
+					messagebox_text = machine_info().warnings_string();
+				if (!messagebox_text.empty())
 				{
 					set_handler(ui_callback_type::MODAL, std::bind(&mame_ui_manager::handler_messagebox_anykey, this, _1));
 					if (machine().system().flags & (MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_KEYBOARD | MACHINE_NO_SOUND))
@@ -311,12 +275,16 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 				break;
 
 			case 1:
-				if (show_gameinfo && game_info_astring(messagebox_text).length() > 0)
+				if (show_gameinfo)
+					messagebox_text = machine_info().game_info_string();
+				if (!messagebox_text.empty())
 					set_handler(ui_callback_type::MODAL, std::bind(&mame_ui_manager::handler_messagebox_anykey, this, _1));
 				break;
 
 			case 2:
-				if (show_mandatory_fileman && machine().image().mandatory_scan(messagebox_text).length() > 0)
+				if (show_mandatory_fileman)
+					messagebox_text = machine_info().mandatory_images();
+				if (!messagebox_text.empty())
 				{
 					std::string warning;
 					warning.assign(_("This driver requires images to be loaded in the following device(s): ")).append(messagebox_text.substr(0, messagebox_text.length() - 2));
@@ -745,259 +713,6 @@ bool mame_ui_manager::is_menu_active(void)
 }
 
 
-/***************************************************************************
-    TEXT GENERATORS
-***************************************************************************/
-
-//-------------------------------------------------
-//  warnings_string - print the warning flags
-//  text to the given buffer
-//-------------------------------------------------
-
-std::string &mame_ui_manager::warnings_string(std::string &str)
-{
-#define WARNING_FLAGS ( MACHINE_NOT_WORKING | \
-						MACHINE_UNEMULATED_PROTECTION | \
-						MACHINE_MECHANICAL | \
-						MACHINE_WRONG_COLORS | \
-						MACHINE_IMPERFECT_COLORS | \
-						MACHINE_REQUIRES_ARTWORK | \
-						MACHINE_NO_SOUND |  \
-						MACHINE_IMPERFECT_SOUND |  \
-						MACHINE_IMPERFECT_GRAPHICS | \
-						MACHINE_IMPERFECT_KEYBOARD | \
-						MACHINE_NO_COCKTAIL| \
-						MACHINE_IS_INCOMPLETE| \
-						MACHINE_NO_SOUND_HW )
-
-	str.clear();
-
-	// if no warnings, nothing to return
-	if (machine().rom_load().warnings() == 0 && machine().rom_load().knownbad() == 0 && !(machine().system().flags & WARNING_FLAGS) && machine().rom_load().software_load_warnings_message().length() == 0)
-		return str;
-
-	// add a warning if any ROMs were loaded with warnings
-	if (machine().rom_load().warnings() > 0)
-	{
-		str.append(_("One or more ROMs/CHDs for this machine are incorrect. The machine may not run correctly.\n"));
-		if (machine().system().flags & WARNING_FLAGS)
-			str.append("\n");
-	}
-
-	if (machine().rom_load().software_load_warnings_message().length()>0) {
-		str.append(machine().rom_load().software_load_warnings_message());
-		if (machine().system().flags & WARNING_FLAGS)
-			str.append("\n");
-	}
-	// if we have at least one warning flag, print the general header
-	if ((machine().system().flags & WARNING_FLAGS) || machine().rom_load().knownbad() > 0)
-	{
-		str.append(_("There are known problems with this machine\n\n"));
-
-		// add a warning if any ROMs are flagged BAD_DUMP/NO_DUMP
-		if (machine().rom_load().knownbad() > 0) {
-			str.append(_("One or more ROMs/CHDs for this machine have not been correctly dumped.\n"));
-		}
-		// add one line per warning flag
-		if (machine().system().flags & MACHINE_IMPERFECT_KEYBOARD)
-			str.append(_("The keyboard emulation may not be 100% accurate.\n"));
-		if (machine().system().flags & MACHINE_IMPERFECT_COLORS)
-			str.append(_("The colors aren't 100% accurate.\n"));
-		if (machine().system().flags & MACHINE_WRONG_COLORS)
-			str.append(_("The colors are completely wrong.\n"));
-		if (machine().system().flags & MACHINE_IMPERFECT_GRAPHICS)
-			str.append(_("The video emulation isn't 100% accurate.\n"));
-		if (machine().system().flags & MACHINE_IMPERFECT_SOUND)
-			str.append(_("The sound emulation isn't 100% accurate.\n"));
-		if (machine().system().flags & MACHINE_NO_SOUND) {
-			str.append(_("The machine lacks sound.\n"));
-		}
-		if (machine().system().flags & MACHINE_NO_COCKTAIL)
-			str.append(_("Screen flipping in cocktail mode is not supported.\n"));
-
-		// check if external artwork is present before displaying this warning?
-		if (machine().system().flags & MACHINE_REQUIRES_ARTWORK) {
-			str.append(_("The machine requires external artwork files\n"));
-		}
-
-		if (machine().system().flags & MACHINE_IS_INCOMPLETE )
-		{
-			str.append(_("This machine was never completed. It may exhibit strange behavior or missing elements that are not bugs in the emulation.\n"));
-		}
-
-		if (machine().system().flags & MACHINE_NO_SOUND_HW )
-		{
-			str.append(_("This machine has no sound hardware, MAME will produce no sounds, this is expected behaviour.\n"));
-		}
-
-		// if there's a NOT WORKING, UNEMULATED PROTECTION or GAME MECHANICAL warning, make it stronger
-		if (machine().system().flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_MECHANICAL))
-		{
-			// add the strings for these warnings
-			if (machine().system().flags & MACHINE_UNEMULATED_PROTECTION) {
-				str.append(_("The machine has protection which isn't fully emulated.\n"));
-			}
-			if (machine().system().flags & MACHINE_NOT_WORKING) {
-				str.append(_("\nTHIS MACHINE DOESN'T WORK. The emulation for this machine is not yet complete. "
-						"There is nothing you can do to fix this problem except wait for the developers to improve the emulation.\n"));
-			}
-			if (machine().system().flags & MACHINE_MECHANICAL) {
-				str.append(_("\nCertain elements of this machine cannot be emulated as it requires actual physical interaction or consists of mechanical devices. "
-						"It is not possible to fully play this machine.\n"));
-			}
-
-			// find the parent of this driver
-			driver_enumerator drivlist(machine().options());
-			int maindrv = drivlist.find(machine().system());
-			int clone_of = drivlist.non_bios_clone(maindrv);
-			if (clone_of != -1)
-				maindrv = clone_of;
-
-			// scan the driver list for any working clones and add them
-			bool foundworking = false;
-			while (drivlist.next())
-				if (drivlist.current() == maindrv || drivlist.clone() == maindrv)
-					if ((drivlist.driver().flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_MECHANICAL)) == 0)
-					{
-						// this one works, add a header and display the name of the clone
-						if (!foundworking) {
-							str.append(_("\n\nThere are working clones of this machine: "));
-						}
-						else
-							str.append(", ");
-						str.append(drivlist.driver().name);
-						foundworking = true;
-					}
-
-			if (foundworking)
-				str.append("\n");
-		}
-	}
-
-	// add the 'press OK' string
-	str.append(_("\n\nPress any key to continue"));
-	return str;
-}
-
-
-//-------------------------------------------------
-//  game_info_std::string - populate an allocated
-//  string with the game info text
-//-------------------------------------------------
-
-std::string &mame_ui_manager::game_info_astring(std::string &str)
-{
-	std::ostringstream buf;
-
-	// print description, manufacturer, and CPU:
-	util::stream_format(buf, _("%1$s\n%2$s %3$s\nDriver: %4$s\n\nCPU:\n"),
-			machine().system().description,
-			machine().system().year,
-			machine().system().manufacturer,
-			core_filename_extract_base(machine().system().source_file));
-
-	// loop over all CPUs
-	execute_interface_iterator execiter(machine().root_device());
-	std::unordered_set<std::string> exectags;
-	for (device_execute_interface &exec : execiter)
-	{
-		if (!exectags.insert(exec.device().tag()).second)
-			continue;
-		// get cpu specific clock that takes internal multiplier/dividers into account
-		int clock = exec.device().clock();
-
-		// count how many identical CPUs we have
-		int count = 1;
-		const char *name = exec.device().name();
-		for (device_execute_interface &scan : execiter)
-		{
-			if (exec.device().type() == scan.device().type() && strcmp(name, scan.device().name()) == 0 && exec.device().clock() == scan.device().clock())
-				if (exectags.insert(scan.device().tag()).second)
-					count++;
-		}
-
-		// if more than one, prepend a #x in front of the CPU name
-		// display clock in kHz or MHz
-		util::stream_format(buf,
-				(count > 1) ? "%1$d" UTF8_MULTIPLY "%2$s %3$d.%4$0*5$d%6$s\n" : "%2$s %3$d.%4$0*5$d%6$s\n",
-				count,
-				name,
-				(clock >= 1000000) ? (clock / 1000000) : (clock / 1000),
-				(clock >= 1000000) ? (clock % 1000000) : (clock % 1000),
-				(clock >= 1000000) ? 6 : 3,
-				(clock >= 1000000) ? _("MHz") : _("kHz"));
-	}
-
-	// loop over all sound chips
-	sound_interface_iterator snditer(machine().root_device());
-	std::unordered_set<std::string> soundtags;
-	bool found_sound = false;
-	for (device_sound_interface &sound : snditer)
-	{
-		if (!soundtags.insert(sound.device().tag()).second)
-			continue;
-
-		// append the Sound: string
-		if (!found_sound)
-			buf << _("\nSound:\n");
-		found_sound = true;
-
-		// count how many identical sound chips we have
-		int count = 1;
-		for (device_sound_interface &scan : snditer)
-		{
-			if (sound.device().type() == scan.device().type() && sound.device().clock() == scan.device().clock())
-				if (soundtags.insert(scan.device().tag()).second)
-					count++;
-		}
-
-		// if more than one, prepend a #x in front of the CPU name
-		// display clock in kHz or MHz
-		int clock = sound.device().clock();
-		util::stream_format(buf,
-				(count > 1)
-					? ((clock != 0) ? "%1$d" UTF8_MULTIPLY "%2$s %3$d.%4$0*5$d%6$s\n" : "%1$d" UTF8_MULTIPLY "%2$s\n")
-					: ((clock != 0) ? "%2$s %3$d.%4$0*5$d%6$s\n" : "%2$s\n"),
-				count,
-				sound.device().name(),
-				(clock >= 1000000) ? (clock / 1000000) : (clock / 1000),
-				(clock >= 1000000) ? (clock % 1000000) : (clock % 1000),
-				(clock >= 1000000) ? 6 : 3,
-				(clock >= 1000000) ? _("MHz") : _("kHz"));
-	}
-
-	// display screen information
-	buf << _("\nVideo:\n");
-	screen_device_iterator scriter(machine().root_device());
-	int scrcount = scriter.count();
-	if (scrcount == 0)
-		buf << _("None\n");
-	else
-	{
-		for (screen_device &screen : scriter)
-		{
-			std::string detail;
-			if (screen.screen_type() == SCREEN_TYPE_VECTOR)
-				detail = _("Vector");
-			else
-			{
-				const rectangle &visarea = screen.visible_area();
-				detail = string_format("%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz",
-						visarea.width(), visarea.height(),
-						(machine().system().flags & ORIENTATION_SWAP_XY) ? "V" : "H",
-						ATTOSECONDS_TO_HZ(screen.frame_period().attoseconds()));
-			}
-
-			util::stream_format(buf,
-					(scrcount > 1) ? _("%1$s: %2$s\n") : _("%2$s\n"),
-					slider_get_screen_desc(screen), detail);
-		}
-	}
-
-	return str = buf.str();
-}
-
-
 
 /***************************************************************************
     UI HANDLERS
@@ -1040,59 +755,6 @@ UINT32 mame_ui_manager::handler_messagebox_anykey(render_container &container)
 		state = UI_HANDLER_CANCEL;
 
 	return state;
-}
-
-
-//-------------------------------------------------3
-//  process_natural_keyboard - processes any
-//  natural keyboard input
-//-------------------------------------------------
-
-void mame_ui_manager::process_natural_keyboard()
-{
-	ui_event event;
-	int i, pressed;
-	input_item_id itemid;
-	input_code code;
-	UINT8 *key_down_ptr;
-	UINT8 key_down_mask;
-
-	// loop while we have interesting events
-	while (machine().ui_input().pop_event(&event))
-	{
-		// if this was a UI_EVENT_CHAR event, post it
-		if (event.event_type == UI_EVENT_CHAR)
-			machine().ioport().natkeyboard().post(event.ch);
-	}
-
-	// process natural keyboard keys that don't get UI_EVENT_CHARs
-	for (i = 0; i < ARRAY_LENGTH(non_char_keys); i++)
-	{
-		// identify this keycode
-		itemid = non_char_keys[i];
-		code = machine().input().code_from_itemid(itemid);
-
-		// ...and determine if it is pressed
-		pressed = machine().input().code_pressed(code);
-
-		// figure out whey we are in the key_down map
-		key_down_ptr = &m_non_char_keys_down[i / 8];
-		key_down_mask = 1 << (i % 8);
-
-		if (pressed && !(*key_down_ptr & key_down_mask))
-		{
-			// this key is now down
-			*key_down_ptr |= key_down_mask;
-
-			// post the key
-			machine().ioport().natkeyboard().post(UCHAR_MAMEKEY_BEGIN + code.item_id());
-		}
-		else if (!pressed && (*key_down_ptr & key_down_mask))
-		{
-			// this key is now up
-			*key_down_ptr &= ~key_down_mask;
-		}
-	}
 }
 
 
@@ -1345,7 +1007,7 @@ UINT32 mame_ui_manager::handler_ingame(render_container &container)
 
 	// is the natural keyboard enabled?
 	if (use_natural_keyboard() && (machine().phase() == MACHINE_PHASE_RUNNING))
-		process_natural_keyboard();
+		machine().ui_input().process_natural_keyboard();
 
 	if (!ui_disabled)
 	{
@@ -1758,7 +1420,7 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 		int defxoffset = floor(screen.xoffset() * 1000.0f + 0.5f);
 		int defyoffset = floor(screen.yoffset() * 1000.0f + 0.5f);
 		void *param = (void *)&screen;
-		std::string screen_desc = slider_get_screen_desc(screen);
+		std::string screen_desc = machine_info().get_screen_desc(screen);
 
 		// add refresh rate tweaker
 		if (machine.options().cheat())
@@ -2316,19 +1978,6 @@ INT32 mame_ui_manager::slider_beam_intensity_weight(running_machine &machine, vo
 	return floor(vector_options::s_beam_intensity_weight * 1000.0f + 0.5f);
 }
 
-
-//-------------------------------------------------
-//  slider_get_screen_desc - returns the
-//  description for a given screen
-//-------------------------------------------------
-
-std::string mame_ui_manager::slider_get_screen_desc(screen_device &screen)
-{
-	if (screen_device_iterator(screen.machine().root_device()).count() > 1)
-		return string_format(_("Screen '%1$s'"), screen.tag());
-	else
-		return _("Screen");
-}
 
 //-------------------------------------------------
 //  slider_crossscale - crosshair scale slider

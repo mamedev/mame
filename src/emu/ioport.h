@@ -1474,12 +1474,6 @@ public:
 	bool safe_to_read() const { return m_safe_to_read; }
 	natural_keyboard &natkeyboard() { return m_natkeyboard; }
 
-	// has... getters
-	bool has_configs() const { return m_has_configs; }
-	bool has_analog() const { return m_has_analog; }
-	bool has_dips() const { return m_has_dips; }
-	bool has_bioses() const { return m_has_bioses; }
-
 	// type helpers
 	const simple_list<input_type_entry> &types() const { return m_typelist; }
 	bool type_pressed(ioport_type type, int player = 0);
@@ -1569,12 +1563,6 @@ private:
 	emu_file                m_timecode_file;        // timecode/frames playback file (nullptr if not recording)
 	int                     m_timecode_count;
 	attotime                m_timecode_last_time;
-
-	// has...
-	bool                    m_has_configs;
-	bool                    m_has_analog;
-	bool                    m_has_dips;
-	bool                    m_has_bioses;
 
 	// autofire
 	bool                    m_autofire_toggle;      // autofire toggle

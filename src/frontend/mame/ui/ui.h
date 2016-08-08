@@ -26,7 +26,7 @@
 
 namespace ui {
 class menu_item;
-
+class machine_info;
 } // namespace ui
 
 /***************************************************************************
@@ -152,6 +152,7 @@ public:
 
 	// construction/destruction
 	mame_ui_manager(running_machine &machine);
+	~mame_ui_manager();
 
 	void init();
 
@@ -159,6 +160,7 @@ public:
 	running_machine &machine() const { return m_machine; }
 	bool single_step() const { return m_single_step; }
 	ui_options &options() { return m_ui_options; }
+	ui::machine_info &machine_info() const { assert(m_machine_info != nullptr); return *m_machine_info; }
 
 	// setters
 	void set_single_step(bool single_step) { m_single_step = single_step; }
@@ -213,14 +215,10 @@ public:
 	void start_save_state();
 	void start_load_state();
 
-	// print the game info string into a buffer
-	std::string &game_info_astring(std::string &str);
-
 	// slider controls
 	std::vector<ui::menu_item>&  get_slider_list(void);
 
 	// other
-	void process_natural_keyboard();
 	ui::text_layout create_layout(render_container &container, float width = 1.0, ui::text_layout::text_justify justify = ui::text_layout::LEFT, ui::text_layout::word_wrapping wrap = ui::text_layout::WORD);
 
 	// word wrap
@@ -243,11 +241,12 @@ private:
 	osd_ticks_t             m_showfps_end;
 	bool                    m_show_profiler;
 	osd_ticks_t             m_popup_text_end;
-	std::unique_ptr<UINT8[]> m_non_char_keys_down;
 	render_texture *        m_mouse_arrow_texture;
 	bool                    m_mouse_show;
 	bool                    m_load_save_hold;
 	ui_options              m_ui_options;
+
+	std::unique_ptr<ui::machine_info> m_machine_info;
 
 	// static variables
 	static std::string      messagebox_text;
@@ -256,9 +255,6 @@ private:
 
 	static std::vector<ui::menu_item> slider_list;
 	static slider_state     *slider_current;
-
-	// text generators
-	std::string &warnings_string(std::string &buffer);
 
 	// UI handlers
 	UINT32 handler_messagebox(render_container &container);
