@@ -911,8 +911,8 @@ WRITE8_MEMBER( portfolio_state::contrast_w )
 
 PALETTE_INIT_MEMBER(portfolio_state, portfolio)
 {
-	palette.set_pen_color(0, rgb_t(138, 146, 148));
-	palette.set_pen_color(1, rgb_t(92, 83, 88));
+	palette.set_pen_color(0, rgb_t(142, 193, 172));
+	palette.set_pen_color(1, rgb_t(67, 71, 151));
 }
 
 
