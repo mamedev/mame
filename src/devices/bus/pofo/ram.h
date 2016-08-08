@@ -41,7 +41,7 @@ protected:
 	virtual void nvram_write(emu_file &file) override { if (m_nvram != nullptr) { file.write(m_nvram, m_nvram.bytes()); } }
 
 	// device_portfolio_memory_card_slot_interface overrides
-	bool cdet() override { return 0; }
+	virtual bool cdet() override { return 0; }
 
 	virtual UINT8 nrdi_r(address_space &space, offs_t offset) override;
 	virtual void nwri_w(address_space &space, offs_t offset, UINT8 data) override;

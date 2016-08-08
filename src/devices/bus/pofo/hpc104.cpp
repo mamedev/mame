@@ -11,6 +11,14 @@
 
 
 //**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+#define LOG 0
+
+
+
+//**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
@@ -157,23 +165,28 @@ UINT8 hpc104_t::nrdi_r(address_space &space, offs_t offset, UINT8 data, bool iom
 {
 	data = m_exp->nrdi_r(space, offset, data, iom, bcom, m_ncc1_out || ncc1);
 
-	if (!(!m_ncc1_out || ncc1))
+	if (!iom)
 	{
-		data = m_ccm->nrdi_r(space, offset & 0x1ffff);
-	}
+		if (!(!m_ncc1_out || ncc1))
+		{
+			if (LOG) logerror("%s %s CCM0 read %05x\n", machine().time().as_string(), machine().describe_context(), offset & 0x1ffff);
 
-	if (m_sw1)
-	{
-		if (offset >= 0x5f000 && offset < 0x9f000)
-		{
-			data = m_nvram[offset - 0x5f000];
+			data = m_ccm->nrdi_r(space, offset & 0x1ffff);
 		}
-	}
-	else
-	{
-		if (offset >= 0x1f000 && offset < 0x5f000)
+
+		if (m_sw1)
 		{
-			data = m_nvram[offset - 0x1f000] = data;
+			if (offset >= 0x5f000 && offset < 0x9f000)
+			{
+				data = m_nvram[offset - 0x5f000];
+			}
+		}
+		else
+		{
+			if (offset >= 0x1f000 && offset < 0x5f000)
+			{
+				data = m_nvram[offset - 0x1f000] = data;
+			}
 		}
 	}
 
@@ -189,31 +202,40 @@ void hpc104_t::nwri_w(address_space &space, offs_t offset, UINT8 data, bool iom,
 {
 	m_exp->nwri_w(space, offset, data, iom, bcom, m_ncc1_out || ncc1);
 
-	if (!bcom)
+	if (!iom)
 	{
-		if ((offset & 0x0f) == 0x0c)
+		if (!(!m_ncc1_out || ncc1))
 		{
-			m_ncc1_out = BIT(data, 0);
+			if (LOG) logerror("%s %s CCM1 write %05x:%02x\n", machine().time().as_string(), machine().describe_context(), offset & 0x1ffff, data);
+
+			m_ccm->nwri_w(space, offset & 0x1ffff, data);
 		}
-	}
 
-	if (!(!m_ncc1_out || ncc1))
-	{
-		m_ccm->nwri_w(space, offset & 0x1ffff, data);
-	}
-
-	if (m_sw1)
-	{
-		if (offset >= 0x5f000 && offset < 0x9f000)
+		if (m_sw1)
 		{
-			m_nvram[offset - 0x5f000] = data;
+			if (offset >= 0x5f000 && offset < 0x9f000)
+			{
+				m_nvram[offset - 0x5f000] = data;
+			}
+		}
+		else
+		{
+			if (offset >= 0x1f000 && offset < 0x5f000)
+			{
+				m_nvram[offset - 0x1f000] = data;	
+			}
 		}
 	}
 	else
 	{
-		if (offset >= 0x1f000 && offset < 0x5f000)
+		if (!bcom)
 		{
-			m_nvram[offset - 0x1f000] = data;	
+			if ((offset & 0x0f) == 0x0c)
+			{
+				m_ncc1_out = BIT(data, 0);
+
+				if (LOG) logerror("NCC1 out %u\n", machine().time().as_string(), machine().describe_context(), m_ncc1_out);
+			}
 		}
 	}
 }
