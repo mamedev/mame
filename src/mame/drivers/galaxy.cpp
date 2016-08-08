@@ -37,8 +37,8 @@ Galaksija driver by Krzysztof Strzecha and Miodrag Milanovic
 static ADDRESS_MAP_START (galaxyp_io, AS_IO, 8, galaxy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x01)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xbe, 0xbe) AM_DEVWRITE("ay8910", ay8910_device, address_w)
-	AM_RANGE(0xbf, 0xbf) AM_DEVWRITE("ay8910", ay8910_device, data_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay8910", ay8910_device, address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE("ay8910", ay8910_device, data_w)
 ADDRESS_MAP_END
 
 
