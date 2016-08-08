@@ -27,6 +27,7 @@ aeroboto.cpp
 aerofgt.cpp
 age_candy.cpp
 airbustr.cpp
+airraid.cpp
 ajax.cpp
 albazc.cpp
 albazg.cpp
@@ -251,7 +252,6 @@ crimfght.cpp
 crospang.cpp
 crshrace.cpp
 crystal.cpp
-cshooter.cpp
 csplayh5.cpp
 cswat.cpp
 cubeqst.cpp
