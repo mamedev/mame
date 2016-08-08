@@ -274,7 +274,7 @@ bool input_character(std::string &buffer, unicode_char unichar, F &&filter)
 			result = true;
 		}
 	}
-	else if ((unichar >= ' ') && (!filter || filter(unichar)))
+	else if ((unichar >= ' ') && filter(unichar))
 	{
 		// append this character
 		buffer += utf8_from_uchar(unichar);
