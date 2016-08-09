@@ -23,7 +23,6 @@ public:
 
 	void unload_all();
 	void postdevice_init();
-	std::string &mandatory_scan(std::string &mandatory);
 
 	// getters
 	running_machine &machine() const { return m_machine; }
