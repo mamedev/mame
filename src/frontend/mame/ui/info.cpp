@@ -61,22 +61,22 @@ machine_info::machine_info(running_machine &machine)
 
 std::string machine_info::warnings_string()
 {
-#define WARNING_FLAGS ( MACHINE_NOT_WORKING | \
-						MACHINE_UNEMULATED_PROTECTION | \
-						MACHINE_MECHANICAL | \
-						MACHINE_WRONG_COLORS | \
-						MACHINE_IMPERFECT_COLORS | \
-						MACHINE_REQUIRES_ARTWORK | \
-						MACHINE_NO_SOUND |  \
-						MACHINE_IMPERFECT_SOUND |  \
-						MACHINE_IMPERFECT_GRAPHICS | \
-						MACHINE_IMPERFECT_KEYBOARD | \
-						MACHINE_NO_COCKTAIL| \
-						MACHINE_IS_INCOMPLETE| \
-						MACHINE_NO_SOUND_HW )
+	constexpr UINT32 warning_flags = ( MACHINE_NOT_WORKING |
+						MACHINE_UNEMULATED_PROTECTION |
+						MACHINE_MECHANICAL |
+						MACHINE_WRONG_COLORS |
+						MACHINE_IMPERFECT_COLORS |
+						MACHINE_REQUIRES_ARTWORK |
+						MACHINE_NO_SOUND |
+						MACHINE_IMPERFECT_SOUND |
+						MACHINE_IMPERFECT_GRAPHICS |
+						MACHINE_IMPERFECT_KEYBOARD |
+						MACHINE_NO_COCKTAIL |
+						MACHINE_IS_INCOMPLETE |
+						MACHINE_NO_SOUND_HW );
 
 	// if no warnings, nothing to return
-	if (m_machine.rom_load().warnings() == 0 && m_machine.rom_load().knownbad() == 0 && !(m_machine.system().flags & WARNING_FLAGS) && m_machine.rom_load().software_load_warnings_message().length() == 0)
+	if (m_machine.rom_load().warnings() == 0 && m_machine.rom_load().knownbad() == 0 && !(m_machine.system().flags & warning_flags) && m_machine.rom_load().software_load_warnings_message().length() == 0)
 		return std::string();
 
 	std::ostringstream buf;
@@ -85,17 +85,17 @@ std::string machine_info::warnings_string()
 	if (m_machine.rom_load().warnings() > 0)
 	{
 		buf << _("One or more ROMs/CHDs for this machine are incorrect. The machine may not run correctly.\n");
-		if (m_machine.system().flags & WARNING_FLAGS)
+		if (m_machine.system().flags & warning_flags)
 			buf << "\n";
 	}
 
 	if (m_machine.rom_load().software_load_warnings_message().length()>0) {
 		buf << m_machine.rom_load().software_load_warnings_message();
-		if (m_machine.system().flags & WARNING_FLAGS)
+		if (m_machine.system().flags & warning_flags)
 			buf << "\n";
 	}
 	// if we have at least one warning flag, print the general header
-	if ((m_machine.system().flags & WARNING_FLAGS) || m_machine.rom_load().knownbad() > 0)
+	if ((m_machine.system().flags & warning_flags) || m_machine.rom_load().knownbad() > 0)
 	{
 		buf << _("There are known problems with this machine\n\n");
 
@@ -351,7 +351,7 @@ menu_game_info::~menu_game_info()
 void menu_game_info::populate()
 {
 	std::string tempstring = ui().machine_info().game_info_string();
-	item_append(tempstring, "", FLAG_MULTILINE, nullptr);
+	item_append(std::move(tempstring), "", FLAG_MULTILINE, nullptr);
 }
 
 void menu_game_info::handle()
