@@ -239,7 +239,7 @@ public:
 	bool load_software(software_list_device &swlist, const char *swname, const rom_entry *entry);
 	int reopen_for_write(const std::string &path);
 
-	static void software_name_split(const char *swlist_swname, std::string &swlist_name, std::string &swname, std::string &swpart);
+	static void software_name_split(const std::string &swlist_swname, std::string &swlist_name, std::string &swname, std::string &swpart);
 	static void static_set_user_loadable(device_t &device, bool user_loadable) {
 		device_image_interface *img;
 		if (!device.interface(img))
@@ -272,8 +272,8 @@ protected:
 	void image_checkhash();
 	void update_names(const device_type device_type = nullptr, const char *inst = nullptr, const char *brief = nullptr);
 
-	const software_part *find_software_item(const char *path, bool restrict_to_interface, software_list_device **device = nullptr) const;
-	bool load_software_part(const char *path, const software_part *&swpart, std::string *list_name = nullptr);
+	const software_part *find_software_item(const std::string &path, bool restrict_to_interface, software_list_device **device = nullptr) const;
+	bool load_software_part(const std::string &path, const software_part *&swpart, std::string *list_name = nullptr);
 	std::string software_get_default_slot(const char *default_card_slot) const;
 
 	void add_format(std::unique_ptr<image_device_format> &&format);

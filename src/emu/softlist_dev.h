@@ -152,13 +152,13 @@ public:
 
 	// operations
 	const software_info *find(const char *look_for);
-	void find_approx_matches(const char *name, int matches, const software_info **list, const char *interface);
+	void find_approx_matches(const std::string &name, int matches, const software_info **list, const char *interface);
 	void release();
 	software_compatibility is_compatible(const software_part &part) const;
 
 	// static helpers
 	static software_list_device *find_by_name(const machine_config &mconfig, const std::string &name);
-	static void display_matches(const machine_config &config, const char *interface, const char *name);
+	static void display_matches(const machine_config &config, const char *interface, const std::string &name);
 	static device_image_interface *find_mountable_image(const machine_config &mconfig, const software_part &part);
 
 protected:
