@@ -20,11 +20,15 @@
 
 	- cursor is missing
 	- where do CDET and NMD1 connect to ??
-    - create chargen ROM from tech manual
     - i/o port 8051
     - screen contrast
     - system tick frequency selection (1 or 128 Hz)
     - soft power off
+    - LCD board
+    	- HD61830A00
+    	- 5816 2Kx8 RAM
+    	- 27C256 32Kx8 EPROM
+    	- PCD3311T DTMF generator @ 3.578640MHz
 
 */
 
@@ -790,6 +794,16 @@ static ADDRESS_MAP_START( portfolio_io, AS_IO, 8, portfolio_state )
 ADDRESS_MAP_END
 
 
+//-------------------------------------------------
+//  ADDRESS_MAP( portfolio_lcdc )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( portfolio_lcdc, AS_0, 8, portfolio_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+ADDRESS_MAP_END
+
+
 
 //**************************************************************************
 //  INPUT PORTS
@@ -922,6 +936,7 @@ PALETTE_INIT_MEMBER(portfolio_state, portfolio)
 
 READ8_MEMBER( portfolio_state::hd61830_rd_r )
 {
+	// TODO with real ROM: offs_t address = ((offset & 0xff) << 4) | ((offset >> 12) & 0x0f);
 	UINT16 address = ((offset & 0xff) << 3) | ((offset >> 12) & 0x07);
 	UINT8 data = m_char_rom[address];
 
@@ -1020,6 +1035,7 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", portfolio)
 
 	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, XTAL_4_9152MHz/2/2)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, portfolio_lcdc)
 	MCFG_HD61830_RD_CALLBACK(READ8(portfolio_state, hd61830_rd_r))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
@@ -1069,7 +1085,7 @@ ROM_START( pofo )
 	ROMX_LOAD( "rom b.u4", 0x00000, 0x20000, BAD_DUMP CRC(c9852766) SHA1(c74430281bc717bd36fd9b5baec1cc0f4489fe82), ROM_BIOS(1) ) // dumped with debug.com
 	ROMX_LOAD( "rom a.u3", 0x20000, 0x20000, BAD_DUMP CRC(b8fb730d) SHA1(1b9d82b824cab830256d34912a643a7d048cd401), ROM_BIOS(1) ) // dumped with debug.com
 
-	ROM_REGION( 0x800, HD61830_TAG, 0 )
+	ROM_REGION( 0x8000, HD61830_TAG, 0 )
 	ROM_LOAD( "hd61830 external character generator", 0x000, 0x800, BAD_DUMP CRC(747a1db3) SHA1(a4b29678fdb43791a8ce4c1ec778f3231bb422c5) ) // typed in from manual
 ROM_END
 
