@@ -11,7 +11,13 @@
 
     Hardware revisions (XXX verify everything):
     - 7.102.076 -- has DIP switches, SRAM at 0x2000, model name "KSM"
-    - 7.102.228 -- no DIP switches, SRAM at 0x2100, model name "KSM-01"
+    - 7.102.228 -- no DIP switches, ?? SRAM at 0x2100, model name "KSM-01"
+
+	Two sets of dumps exist:
+	- one puts SRAM at 0x2000, which is where technical manual puts it, 
+	  but chargen has 1 missing pixel in 'G' character.
+	- another puts SRAM at 0x2100, but has no missing pixel.
+	Merge them for now into one (SRAM at 0x2000 and no missing pixel).
 
     Emulates a VT52 without copier (ESC Z response is ESC / M), with
     Hold Screen mode and Graphics character set (but it is unique and
@@ -49,7 +55,7 @@ ksm|DVK KSM,
     To do:
     - verify if pixel stretching is done by hw
     - verify details of hw revisions (memory map, DIP presence...)
-    - baud rate selection (missing feature in bitbanger)
+    - baud rate selection
 
 ****************************************************************************/
 
@@ -222,8 +228,7 @@ WRITE8_MEMBER(ksm_state::ksm_ppi_portc_w)
 
 WRITE_LINE_MEMBER(ksm_state::write_keyboard_clock)
 {
-//  KSM never sends data to keyboard
-//  m_i8251kbd->write_txc(state);
+	m_i8251kbd->write_txc(state);
 	m_i8251kbd->write_rxc(state);
 }
 
@@ -335,8 +340,7 @@ static MACHINE_CONFIG_START( ksm, ksm_state )
 	MCFG_CPU_IO_MAP(ksm_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("scantimer", ksm_state, scanline_callback, attotime::from_hz(50*28*11))
-	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL_15_4MHz/KSM_HORZ_START))
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ksm_state, scanline_callback, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
 	MCFG_SCREEN_UPDATE_DRIVER(ksm_state, screen_update)
@@ -383,27 +387,9 @@ static MACHINE_CONFIG_START( ksm, ksm_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(ksm_state, write_keyboard_clock))
 MACHINE_CONFIG_END
 
-
-/*
-    Assumes that SRAM is at 0x2000, which is where technical manual puts it.
-    Chargen has 1 missing pixel in 'G' character.
-*/
 ROM_START( dvk_ksm )
 	ROM_REGION(0x1000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD( "ksm_04_rom0_d32.bin", 0x0000, 0x0800, CRC(6ad62715) SHA1(20f8f95119bc7fc6e0f16c67864e339a86edb44d))
-	ROM_LOAD( "ksm_05_rom1_d33.bin", 0x0800, 0x0800, CRC(5b29bcd2) SHA1(1f4f82c2f88f1e8615ec02076559dc606497e654))
-
-	ROM_REGION(0x0800, "chargen", ROMREGION_ERASE00)
-	ROM_LOAD("ksm_03_cg_d31.bin", 0x0000, 0x0800, CRC(98853aa7) SHA1(09b8e1b5b10a00c0b0ae7e36ad1328113d31230a))
-ROM_END
-
-/*
-    Assumes that SRAM is at 0x2100, otherwise identical.
-    Chargen has no missing pixels in 'G' character.
-*/
-ROM_START( dvk_ksm01 )
-	ROM_REGION(0x1000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD( "ksm_04_rom0_d32.bin", 0x0000, 0x0800, CRC(5276dc9a) SHA1(dd41dfb4cb3f1cf22d96d95f1ff6a27fe4eb9a38))
 	ROM_LOAD( "ksm_05_rom1_d33.bin", 0x0800, 0x0800, CRC(5b29bcd2) SHA1(1f4f82c2f88f1e8615ec02076559dc606497e654))
 
 	ROM_REGION(0x0800, "chargen", ROMREGION_ERASE00)
@@ -414,4 +400,3 @@ ROM_END
 
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT                      COMPANY     FULLNAME       FLAGS */
 COMP( 1986, dvk_ksm,  0,      0,       ksm,       ksm,     driver_device,     0,     "USSR",     "DVK KSM",     0)
-COMP( 198?, dvk_ksm01,dvk_ksm,0,       ksm,       ksm,     driver_device,     0,     "USSR",     "DVK KSM-01",  0)

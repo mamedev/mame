@@ -22,6 +22,9 @@
 #define MCFG_MS7004_TX_HANDLER(_cb) \
 	devcb = &ms7004_device::set_tx_handler(*device, DEVCB_##_cb);
 
+#define MCFG_MS7004_RTS_HANDLER(_cb) \
+	devcb = &ms7004_device::set_rts_handler(*device, DEVCB_##_cb);
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -36,11 +39,14 @@ public:
 	ms7004_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_tx_handler(device_t &device, _Object wr) { return downcast<ms7004_device &>(device).m_tx_handler.set_callback(wr); }
+	template<class _Object> static devcb_base &set_rts_handler(device_t &device, _Object wr) { return downcast<ms7004_device &>(device).m_rts_handler.set_callback(wr); }
 
 	DECLARE_WRITE8_MEMBER( p1_w );
 	DECLARE_WRITE8_MEMBER( p2_w );
 	DECLARE_READ8_MEMBER( t1_r );
 	DECLARE_WRITE8_MEMBER( i8243_port_w );
+
+	DECLARE_WRITE_LINE_MEMBER( write_rxd );
 
 protected:
 	// device-level overrides
@@ -77,6 +83,7 @@ private:
 	UINT8 m_p2;
 
 	devcb_write_line m_tx_handler;
+	devcb_write_line m_rts_handler;
 };
 
 // device type definition
