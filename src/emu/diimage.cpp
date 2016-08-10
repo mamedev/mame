@@ -510,7 +510,7 @@ void device_image_interface::image_checkhash()
 
 	// only calculate CRC if it hasn't been calculated, and the open_mode is read only
 	UINT32 crcval;
-	if (!m_hash.crc(crcval) && m_readonly && !m_created)
+	if (!m_hash.crc(crcval) && is_readonly() && !m_created)
 	{
 		// do not cause a linear read of 600 megs please
 		// TODO: use SHA1 in the CHD header as the hash
@@ -1060,8 +1060,6 @@ image_init_result device_image_interface::load_software(const std::string &softl
 	const char *read_only = get_feature("read_only");
 	if (read_only && !strcmp(read_only, "true"))
 	{
-		make_readonly();
-
 		// Copy some image information when we have been loaded through a software list
 		if (m_software_info_ptr)
 		{

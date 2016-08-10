@@ -180,7 +180,6 @@ public:
 	util::core_file &image_core_file() const { return *m_file; }
 	UINT64 length() { check_for_file(); return m_file->size(); }
 	bool is_readonly() const { return m_readonly; }
-	void make_readonly() { m_readonly = true; }
 	UINT32 fread(void *buffer, UINT32 length) { check_for_file(); return m_file->read(buffer, length); }
 	UINT32 fread(optional_shared_ptr<UINT8> &ptr, UINT32 length) { ptr.allocate(length); return fread(ptr.target(), length); }
 	UINT32 fread(optional_shared_ptr<UINT8> &ptr, UINT32 length, offs_t offset) { ptr.allocate(length); return fread(ptr + offset, length - offset); }
