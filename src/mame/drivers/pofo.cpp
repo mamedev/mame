@@ -40,7 +40,7 @@
 #include "bus/pofo/exp.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
-#include "sound/speaker.h"
+#include "sound/pcd3311.h"
 #include "video/hd61830.h"
 
 
@@ -53,6 +53,7 @@
 
 #define M80C88A_TAG     "u1"
 #define HD61830_TAG     "hd61830"
+#define PCD3311T_TAG	"pcd3311t"
 #define TIMER_TICK_TAG  "tick"
 #define SCREEN_TAG      "screen"
 
@@ -71,7 +72,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, M80C88A_TAG),
 		m_lcdc(*this, HD61830_TAG),
-		m_speaker(*this, "speaker"),
+		m_dtmf(*this, PCD3311T_TAG),
 		m_ccm(*this, PORTFOLIO_MEMORY_CARD_SLOT_A_TAG),
 		m_exp(*this, PORTFOLIO_EXPANSION_SLOT_TAG),
 		m_timer_tick(*this, TIMER_TICK_TAG),
@@ -93,7 +94,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<hd61830_device> m_lcdc;
-	required_device<speaker_sound_device> m_speaker;
+	required_device<pcd3311_t> m_dtmf;
 	required_device<portfolio_memory_card_slot_t> m_ccm;
 	required_device<portfolio_expansion_slot_t> m_exp;
 	required_device<timer_device> m_timer_tick;
@@ -146,7 +147,7 @@ public:
 	DECLARE_READ8_MEMBER( counter_r );
 
 	DECLARE_WRITE8_MEMBER( irq_mask_w );
-	DECLARE_WRITE8_MEMBER( speaker_w );
+	DECLARE_WRITE8_MEMBER( dtmf_w );
 	DECLARE_WRITE8_MEMBER( power_w );
 	DECLARE_WRITE8_MEMBER( select_w );
 	DECLARE_WRITE8_MEMBER( counter_w );
@@ -356,33 +357,36 @@ READ8_MEMBER( portfolio_state::keyboard_r )
 
 
 //**************************************************************************
-//  INTERNAL SPEAKER
+//  SOUND
 //**************************************************************************
 
 //-------------------------------------------------
-//  speaker_w - internal speaker output
+//  dtmf_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( portfolio_state::speaker_w )
+WRITE8_MEMBER( portfolio_state::dtmf_w )
 {
 	/*
 
 	    bit     description
 
-	    0
-	    1
-	    2
-	    3
-	    4
-	    5
-	    6
-	    7       speaker level
+	    0		PCD3311T D0
+	    1		PCD3311T D1
+	    2		PCD3311T D2
+	    3		PCD3311T D3
+	    4		PCD3311T D4
+	    5		PCD3311T D5
+	    6		PCD3311T STROBE
+	    7       PCD3311T VDD,MODE,A0
 
 	*/
 
-	if (LOG) logerror("%s %s SPEAKER %02x\n", machine().time().as_string(), machine().describe_context(), data);
+	if (LOG) logerror("%s %s DTMF %02x\n", machine().time().as_string(), machine().describe_context(), data);
 
-	m_speaker->level_w(!BIT(data, 7));
+	m_dtmf->mode_w(!BIT(data, 7));
+	m_dtmf->a0_w(!BIT(data, 7));
+	m_dtmf->write(space, 0, data & 0x3f);
+	m_dtmf->strobe_w(BIT(data, 6));
 }
 
 
@@ -735,7 +739,7 @@ WRITE8_MEMBER( portfolio_state::io_w )
 			break;
 		
 		case 2:
-			speaker_w(space, 0, data);
+			dtmf_w(space, 0, data);
 			break;
 		
 		case 3:
@@ -1041,7 +1045,7 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD(PCD3311T_TAG, PCD3311, XTAL_3_57864MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
@@ -1096,4 +1100,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME        FLAGS
-COMP( 1989, pofo,   0,      0,      portfolio,  portfolio, driver_device,   0,  "Atari",    "Portfolio",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1989, pofo,   0,      0,      portfolio,  portfolio, driver_device,   0,  "Atari",    "Portfolio",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
