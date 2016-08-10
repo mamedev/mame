@@ -1321,10 +1321,10 @@ const software_part *device_image_interface::find_software_item(const std::strin
 	{
 		if (swlist_name.compare(swlistdev.list_name())==0 || !(swlist_name.length() > 0))
 		{
-			const software_info *info = swlistdev.find(swinfo_name.c_str());
+			const software_info *info = swlistdev.find(swinfo_name);
 			if (info != nullptr)
 			{
-				const software_part *part = info->find_part(swpart_name.c_str(), interface);
+				const software_part *part = info->find_part(swpart_name, interface);
 				if (part != nullptr)
 				{
 					if (dev != nullptr)
@@ -1340,10 +1340,10 @@ const software_part *device_image_interface::find_software_item(const std::strin
 			// gameboy:sml) which is not handled properly by software_name_split
 			// since the function cannot distinguish between this and the case
 			// path = swinfo_name:swpart_name
-			const software_info *info = swlistdev.find(swpart_name.c_str());
+			const software_info *info = swlistdev.find(swpart_name);
 			if (info != nullptr)
 			{
-				const software_part *part = info->find_part(nullptr, interface);
+				const software_part *part = info->find_part("", interface);
 				if (part != nullptr)
 				{
 					if (dev != nullptr)

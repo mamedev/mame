@@ -106,14 +106,13 @@ class software_info
 
 public:
 	// construction/destruction
-	software_info(std::string &&name, std::string &&parent, const char *supported);
+	software_info(std::string &&name, std::string &&parent, const std::string &supported);
 	software_info(software_info const &) = delete;
 	software_info(software_info &&) = delete;
 	software_info& operator=(software_info const &) = delete;
 	software_info& operator=(software_info &&) = delete;
 
 	// getters
-	software_info *next() const { return m_next; }
 	const std::string &shortname() const { return m_shortname; }
 	const std::string &longname() const { return m_longname; }
 	const std::string &parentname() const { return m_parentname; }
@@ -125,12 +124,11 @@ public:
 	const std::list<software_part> &parts() const { return m_partdata; }
 
 	// additional operations
-	const software_part *find_part(const char *partname, const char *interface = nullptr) const;
+	const software_part *find_part(const std::string &partname, const char *interface = nullptr) const;
 	bool has_multiple_parts(const char *interface) const;
 
 private:
 	// internal state
-	software_info *         m_next;
 	UINT32                  m_supported;
 	std::string             m_shortname;
 	std::string             m_longname;

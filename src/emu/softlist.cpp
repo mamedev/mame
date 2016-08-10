@@ -101,20 +101,16 @@ bool software_part::matches_interface(const char *interface_list) const
 //  software_info - constructor
 //-------------------------------------------------
 
-software_info::software_info(std::string &&name, std::string &&parent, const char *supported)
-	: m_next(nullptr),
-		m_supported(SOFTWARE_SUPPORTED_YES),
+software_info::software_info(std::string &&name, std::string &&parent, const std::string &supported)
+	: m_supported(SOFTWARE_SUPPORTED_YES),
 		m_shortname(std::move(name)),
 		m_parentname(std::move(parent))
 {
 	// handle the supported flag if provided
-	if (supported != nullptr)
-	{
-		if (strcmp(supported, "partial") == 0)
-			m_supported = SOFTWARE_SUPPORTED_PARTIAL;
-		else if (strcmp(supported, "no") == 0)
-			m_supported = SOFTWARE_SUPPORTED_NO;
-	}
+	if (supported == "partial")
+		m_supported = SOFTWARE_SUPPORTED_PARTIAL;
+	else if (supported == "no")
+		m_supported = SOFTWARE_SUPPORTED_NO;
 }
 
 
@@ -123,22 +119,20 @@ software_info::software_info(std::string &&name, std::string &&parent, const cha
 //  optional interface match
 //-------------------------------------------------
 
-const software_part *software_info::find_part(const char *partname, const char *interface) const
+const software_part *software_info::find_part(const std::string &partname, const char *interface) const
 {
 	// if neither partname nor interface supplied, then we just return the first entry
-	if (partname != nullptr && strlen(partname)==0) partname = nullptr;
-
-	if (partname == nullptr && interface == nullptr)
+	if (partname.empty() && interface == nullptr)
 		return &m_partdata.front();
 
 	// look for the part by name and match against the interface if provided
 	for (const software_part &part : m_partdata)
-		if (partname != nullptr && (partname == part.name()))
+		if (!partname.empty() && (partname == part.name()))
 		{
 			if (interface == nullptr || part.matches_interface(interface))
 				return &part;
 		}
-		else if (partname == nullptr && part.matches_interface(interface))
+		else if (partname.empty() && part.matches_interface(interface))
 				return &part;
 	return nullptr;
 }
