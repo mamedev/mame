@@ -34,6 +34,11 @@
 
     TODO:
 
+	- abcenix boot stuck in a loop @ 37cfa
+    - segment/page RAM addresses are not correctly decoded, "sas/format/format" can't find the SASI interface because of this
+        forcetask0 1 t0 0 t1 0 t2 0 t3 0
+        sega19 0 task 0
+        sega 000 segd 00 pga 008 pgd 4058 virtual 02c730 (should be 004730)
     - short/long reset (RSTBUT)
     - CIO
         - optimize timers!
@@ -482,7 +487,9 @@ static ADDRESS_MAP_START( mac_mem, AS_PROGRAM, 8, abc1600_state )
 	AM_RANGE(0x1ff500, 0x1ff500) AM_MIRROR(0xff) AM_DEVREADWRITE(Z8410AB1_2_TAG, z80dma_device, read, write)
 	AM_RANGE(0x1ff600, 0x1ff607) AM_MIRROR(0xf8) AM_READWRITE(scc_r, scc_w)
 	AM_RANGE(0x1ff700, 0x1ff707) AM_MIRROR(0xf8) AM_READWRITE(cio_r, cio_w)
-	AM_RANGE(0x1ff800, 0x1ffaff) AM_DEVICE(ABC1600_MOVER_TAG, abc1600_mover_device, io_map)
+	AM_RANGE(0x1ff800, 0x1ff8ff) AM_DEVICE(ABC1600_MOVER_TAG, abc1600_mover_device, iowr0_map)
+	AM_RANGE(0x1ff900, 0x1ff9ff) AM_DEVICE(ABC1600_MOVER_TAG, abc1600_mover_device, iowr1_map)
+	AM_RANGE(0x1ffa00, 0x1ffaff) AM_DEVICE(ABC1600_MOVER_TAG, abc1600_mover_device, iowr2_map)
 	AM_RANGE(0x1ffb00, 0x1ffb00) AM_MIRROR(0x7e) AM_WRITE(fw0_w)
 	AM_RANGE(0x1ffb01, 0x1ffb01) AM_MIRROR(0x7e) AM_WRITE(fw1_w)
 	AM_RANGE(0x1ffd00, 0x1ffd07) AM_MIRROR(0xf8) AM_DEVWRITE(ABC1600_MAC_TAG, abc1600_mac_device, dmamap_w)
@@ -892,7 +899,9 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_Z8536_PC_OUT_CALLBACK(WRITE8(abc1600_state, cio_pc_w))
 
 	MCFG_NMC9306_ADD(NMC9306_TAG)
+
 	MCFG_E0516_ADD(E050_C16PC_TAG, XTAL_32_768kHz)
+	
 	MCFG_FD1797_ADD(SAB1797_02P_TAG, XTAL_64MHz/64)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pb7_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(abc1600_state, fdc_drq_w))

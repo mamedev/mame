@@ -47,7 +47,9 @@ public:
 
 	virtual DECLARE_ADDRESS_MAP(vram_map, 8);
 	virtual DECLARE_ADDRESS_MAP(crtc_map, 8);
-	virtual DECLARE_ADDRESS_MAP(io_map, 8);
+	virtual DECLARE_ADDRESS_MAP(iowr0_map, 8);
+	virtual DECLARE_ADDRESS_MAP(iowr1_map, 8);
+	virtual DECLARE_ADDRESS_MAP(iowr2_map, 8);
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
