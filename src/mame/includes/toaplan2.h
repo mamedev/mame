@@ -12,6 +12,7 @@
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "machine/nmk112.h"
+#include "machine/ticket.h"
 #include "machine/upd4992.h"
 #include "video/gp9001.h"
 #include "sound/okim6295.h"
@@ -47,7 +48,8 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_soundlatch2(*this, "soundlatch2") { }
+		m_soundlatch2(*this, "soundlatch2"),
+		m_hopper(*this, "hopper") { }
 
 	optional_shared_ptr<UINT8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
 	optional_shared_ptr<UINT16> m_shared_ram16;     // Really 8 bit RAM connected to Z180
@@ -72,6 +74,7 @@ public:
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch; // batrider and bgaregga and batsugun
 	optional_device<generic_latch_8_device> m_soundlatch2;
+	optional_device<ticket_dispenser_device> m_hopper;
 
 	UINT16 m_mcu_data;
 	INT8 m_old_p1_paddle_h; /* For Ghox */
@@ -158,9 +161,8 @@ public:
 	void create_tx_tilemap(int dx = 0, int dx_flipped = 0);
 	void toaplan2_vblank_irq(int irq_line);
 
-	UINT8 m_pwrkick_hopper;
-	DECLARE_CUSTOM_INPUT_MEMBER(pwrkick_hopper_status_r);
 	DECLARE_WRITE8_MEMBER(pwrkick_coin_w);
+	DECLARE_WRITE8_MEMBER(pwrkick_coin_lockout_w);
 
 	DECLARE_WRITE_LINE_MEMBER(toaplan2_reset);
 protected:
