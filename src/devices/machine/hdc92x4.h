@@ -232,6 +232,9 @@ protected:
 	live_info m_live_state, m_checkpoint_state;
 	int m_last_live_state;
 
+	// Presets CRC.
+	void preset_crc(live_info& live, int value);
+
 	// Starts the live run
 	void live_start(int state);
 
@@ -433,13 +436,19 @@ protected:
 	UINT8 current_command();
 
 	// Step time (minus pulse width)
-	int step_time();
+	virtual int step_time() =0;
 
 	// Step pulse width
 	int pulse_width();
 
-	// Sector size as read from the track
-	int calc_sector_size();
+	// Sector size as read from the track or given by register A (PC-AT mode)
+	int sector_size();
+
+	// Returns the sector header length
+	int header_length();
+
+	// Returns the index of the register for the header field
+	int register_number(int slot);
 
 	// Is the currently selected drive a floppy drive?
 	bool using_floppy();
@@ -476,12 +485,18 @@ class hdc9224_device : public hdc92x4_device
 {
 public:
 	hdc9224_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	int step_time();
 };
 
 class hdc9234_device : public hdc92x4_device
 {
 public:
 	hdc9234_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	int step_time();
 };
 
 #endif
