@@ -258,7 +258,7 @@ const software_info *software_list_device::find(const std::string &look_for)
 	if (look_for.empty())
 		return nullptr;
 
-	bool iswild = look_for.find_first_of("*?") != std::string::npos;
+	const bool iswild = look_for.find_first_of("*?") != std::string::npos;
 
 	// find a match (will cause a parse if needed when calling get_info)
 	const auto &info_list = get_info();
