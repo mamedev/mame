@@ -8,9 +8,19 @@
 
 ***************************************************************************/
 
+#include <regex>
+
 #include "softlist.h"
 #include "hash.h"
 #include "expat.h"
+
+
+//**************************************************************************
+//  STATIC VARIABLES
+//**************************************************************************
+
+static std::regex s_potenial_softlist_regex("\\w+(\\:\\w+)*");
+
 
 //**************************************************************************
 //  FEATURE LIST ITEM
@@ -812,4 +822,66 @@ void softlist_parser::parse_soft_end(const char *tagname)
 				m_current_part->m_featurelist.emplace_back(item.name(), item.value());
 	}
 }
+
+
+//-------------------------------------------------
+//  software_name_parse - helper that splits a
+//  software_list:software:part string into
+//  separate software_list, software, and part
+//  strings.
+//
+//  str1:str2:str3  => swlist_name - str1, swname - str2, swpart - str3
+//  str1:str2       => swlist_name - nullptr, swname - str1, swpart - str2
+//  str1            => swlist_name - nullptr, swname - str1, swpart - nullptr
+//
+//  Notice however that we could also have been
+//  passed a string swlist_name:swname, and thus
+//  some special check has to be performed in this
+//  case.
+//-------------------------------------------------
+
+bool software_name_parse(const std::string &text, std::string *swlist_name, std::string *swname, std::string *swpart)
+{
+	// first, sanity check the arguments
+	if (!std::regex_match(text, s_potenial_softlist_regex))
+		return false;
+
+	// reset all output parameters (if specified of course)
+	if (swlist_name != nullptr)
+		swlist_name->clear();
+	if (swname != nullptr)
+		swname->clear();
+	if (swpart != nullptr)
+		swpart->clear();
+
+	// if no colon, this is the swname by itself
+	auto split1 = text.find_first_of(':');
+	if (split1 == std::string::npos)
+	{
+		if (swname != nullptr)
+			*swname = text;
+		return true;
+	}
+
+	// if one colon, it is the swname and swpart alone
+	auto split2 = text.find_first_of(':', split1 + 1);
+	if (split2 == std::string::npos)
+	{
+		if (swname != nullptr)
+			*swname = text.substr(0, split1);
+		if (swpart != nullptr)
+			*swpart = text.substr(split1 + 1);
+		return true;
+	}
+
+	// if two colons present, split into 3 parts
+	if (swlist_name != nullptr)
+		*swlist_name = text.substr(0, split1);
+	if (swname != nullptr)
+		*swname = text.substr(split1 + 1, split2 - (split1 + 1));
+	if (swpart != nullptr)
+		*swpart = text.substr(split2 + 1);
+	return true;
+}
+
 
