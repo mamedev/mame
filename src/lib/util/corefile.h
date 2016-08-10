@@ -125,6 +125,10 @@ public:
 	// flush file buffers
 	virtual osd_file::error flush() = 0;
 
+	// file access types
+	virtual bool read_access() const = 0;
+	virtual bool write_access() const = 0;
+
 
 protected:
 	core_file();

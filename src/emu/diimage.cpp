@@ -92,7 +92,6 @@ device_image_interface::device_image_interface(const machine_config &mconfig, de
 		m_software_info_ptr(nullptr),
 		m_software_part_ptr(nullptr),
 		m_supported(0),
-		m_readonly(false),
 		m_created(false),
 		m_init_phase(false),
 		m_create_format(0),
@@ -510,7 +509,7 @@ void device_image_interface::image_checkhash()
 
 	// only calculate CRC if it hasn't been calculated, and the open_mode is read only
 	UINT32 crcval;
-	if (!m_hash.crc(crcval) && m_readonly && !m_created)
+	if (!m_hash.crc(crcval) && is_readonly() && !m_created)
 	{
 		// do not cause a linear read of 600 megs please
 		// TODO: use SHA1 in the CHD header as the hash
@@ -704,7 +703,6 @@ image_error_t device_image_interface::load_image_by_path(UINT32 open_flags, cons
 	if (filerr != osd_file::error::NONE)
 		return image_error_from_file_error(filerr);
 
-	m_readonly = (open_flags & OPEN_FLAG_WRITE) ? 0 : 1;
 	m_created = (open_flags & OPEN_FLAG_CREATE) ? 1 : 0;
 	set_image_filename(revised_path);
 	return IMAGE_ERROR_SUCCESS;
@@ -727,7 +725,6 @@ int device_image_interface::reopen_for_write(const std::string &path)
 		return image_error_from_file_error(filerr);
 
 	// success!
-	m_readonly = 0;
 	m_created = 1;
 	set_image_filename(revised_path);
 
@@ -1060,8 +1057,6 @@ image_init_result device_image_interface::load_software(const std::string &softl
 	const char *read_only = get_feature("read_only");
 	if (read_only && !strcmp(read_only, "true"))
 	{
-		make_readonly();
-
 		// Copy some image information when we have been loaded through a software list
 		if (m_software_info_ptr)
 		{
@@ -1193,7 +1188,6 @@ void device_image_interface::clear()
 	m_file.reset();
 
 	m_image_name.clear();
-	m_readonly = false;
 	m_created = false;
 	m_create_format = 0;
 	m_create_args = nullptr;

@@ -162,6 +162,8 @@ public:
 	virtual osd_file::error truncate(std::uint64_t offset) override { return m_file.truncate(offset); }
 
 	virtual osd_file::error flush() override { return m_file.flush(); }
+	virtual bool read_access() const override { return m_file.read_access(); }
+	virtual bool write_access() const override { return m_file.write_access(); }
 
 private:
 	core_file &m_file;
@@ -197,8 +199,8 @@ protected:
 	{
 	}
 
-	bool read_access() const { return 0U != (m_openflags & OPEN_FLAG_READ); }
-	bool write_access() const { return 0U != (m_openflags & OPEN_FLAG_WRITE); }
+	virtual bool read_access() const override { return 0U != (m_openflags & OPEN_FLAG_READ); }
+	virtual bool write_access() const override { return 0U != (m_openflags & OPEN_FLAG_WRITE); }
 	bool no_bom() const { return 0U != (m_openflags & OPEN_FLAG_NO_BOM); }
 
 	bool has_putback() const { return m_back_char_head != m_back_char_tail; }
