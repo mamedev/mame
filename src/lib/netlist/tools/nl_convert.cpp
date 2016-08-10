@@ -8,9 +8,51 @@
 #include <algorithm>
 #include <cstdio>
 #include <cmath>
+#include <unordered_map>
 #include "nl_convert.h"
 #include "plib/palloc.h"
+#include "plib/putil.h"
 
+/* FIXME: temporarily defined here - should be in a file */
+/* FIXME: family logic in netlist is convoluted, create
+ *        define a model param on core device
+ */
+/* Format: external name,netlist device,model */
+static const char *s_lib_map =
+"SN74LS00D,   TTL_7400_DIP,  74LSXX\n"
+"SN74LS04D,   TTL_7404_DIP,  74LSXX\n"
+"SN74ALS08D,  TTL_7408_DIP,  74ALSXX\n"
+"SN74ALS10AD, TTL_7410_DIP,  74ALSXX\n"
+"SN74LS30N,   TTL_7430_DIP,  74LSXX\n"
+"SN74ALS74AD, TTL_7474_DIP,  74ALSXX\n"
+"SN74LS74AD,  TTL_7474_DIP,  74LSXX\n"
+"SN74LS86AD,  TTL_7486_DIP,  74LSXX\n"
+"SN74F153D,   TTL_74153_DIP, 74FXX\n"
+"SN74LS161AD, TTL_74161_DIP, 74LSXX\n"
+"SN74LS164D,  TTL_74164_DIP, 74LSXX\n"
+"DM74LS366AN, TTL_74366_DIP, 74LSXX\n"
+;
+
+struct lib_map_entry
+{
+	pstring dev;
+	pstring model;
+};
+
+using lib_map_t = std::unordered_map<pstring, lib_map_entry>;
+
+static lib_map_t read_lib_map(const pstring lm)
+{
+	plib::pistringstream istrm(lm);
+	lib_map_t m;
+	pstring line;
+	while (istrm.readline(line))
+	{
+		plib::pstring_vector_t split(line, ",");
+		m[split[0].trim()] = { split[1].trim(), split[2].trim() };
+	}
+	return m;
+}
 
 /*-------------------------------------------------
     convert - convert a spice netlist
@@ -173,8 +215,9 @@ nl_convert_base_t::unit_t nl_convert_base_t::m_units[] = {
 		{"M",   "CAP_M({1})", 1.0e-3 },
 		{"u",   "CAP_U({1})", 1.0e-6 }, /* eagle */
 		{"U",   "CAP_U({1})", 1.0e-6 },
-		{"??",   "CAP_U({1})", 1.0e-6    },
+		{"??",  "CAP_U({1})", 1.0e-6 }, /* FIXME */
 		{"N",   "CAP_N({1})", 1.0e-9 },
+		{"pF",  "CAP_P({1})", 1.0e-12},
 		{"P",   "CAP_P({1})", 1.0e-12},
 		{"F",   "{1}e-15",    1.0e-15},
 
@@ -443,6 +486,212 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 		else
 		{
 			out("Unexpected {}\n", token.str().cstr());
+			return;
+		}
+	}
+
+}
+
+/*		token_id_t m_tok_HFA;
+		token_id_t m_tok_APP;
+		token_id_t m_tok_TIM;
+		token_id_t m_tok_TYP;
+		token_id_t m_tok_ADDC;
+		token_id_t m_tok_ATTC;
+		token_id_t m_tok_NET;
+		token_id_t m_tok_TER;
+ *
+ */
+void nl_convert_rinf_t::convert(const pstring &contents)
+{
+	plib::pistringstream istrm(contents);
+	tokenizer tok(*this, istrm);
+	auto lm = read_lib_map(s_lib_map);
+
+	out("NETLIST_START(dummy)\n");
+	add_term("GND", "GND");
+	add_term("VCC", "VCC");
+	tokenizer::token_t token = tok.get_token();
+	while (true)
+	{
+		if (token.is_type(tokenizer::ENDOFFILE) || token.is(tok.m_tok_END))
+		{
+			dump_nl();
+			// FIXME: Parameter
+			out("NETLIST_END()\n");
+			return;
+		}
+		else if (token.is(tok.m_tok_HEA))
+		{
+			/* seems to be start token - ignore */
+			token = tok.get_token();
+		}
+		else if (token.is(tok.m_tok_APP))
+		{
+			/* version string */
+			pstring app = tok.get_string();
+			out("// APP: {}\n", app);
+			token = tok.get_token();
+		}
+		else if (token.is(tok.m_tok_TIM))
+		{
+			/* time */
+			out("// TIM:");
+			for (int i=0; i<6; i++)
+			{
+				long x = tok.get_number_long();
+				out(" {}", x);
+			}
+			out("\n");
+			token = tok.get_token();
+		}
+		else if (token.is(tok.m_tok_TYP))
+		{
+			pstring id(tok.get_identifier());
+			out("// TYP: {}\n", id);
+			token = tok.get_token();
+		}
+		else if (token.is(tok.m_tok_ADDC))
+		{
+			std::unordered_map<pstring, pstring> attr;
+			pstring id = tok.get_identifier();
+			pstring s1 = tok.get_string();
+			pstring s2 = tok.get_string();
+
+			token = tok.get_token();
+			while (token.is(tok.m_tok_ATTC))
+			{
+				pstring tid = tok.get_identifier();
+				if (tid != id)
+				{
+					out("Error: found {} expected {} in {}\n", tid, id, token.str());
+					return;
+				}
+				pstring at = tok.get_string();
+				pstring val = tok.get_string();
+				attr[at] = val;
+				token = tok.get_token();
+			}
+			pstring sim = attr["Simulation"];
+			pstring val = attr["Value"];
+			pstring com = attr["Comment"];
+			if (val == "")
+				val = com;
+
+			if (sim == "CAP")
+			{
+				add_device("CAP", id, get_sp_val(val));
+			}
+			else if (sim == "RESISTOR")
+			{
+				add_device("RES", id, get_sp_val(val));
+			}
+			else
+			{
+				pstring lib = attr["Library Reference"];
+				auto f = lm.find(lib);
+				if (f != lm.end())
+					add_device(f->second.dev, id);
+				else
+					add_device(lib, id);
+			}
+		}
+		else if (token.is(tok.m_tok_NET))
+		{
+			pstring dev = tok.get_identifier();
+			pstring pin = tok.get_identifier_or_number();
+			pstring net = tok.get_string();
+			add_term(net, dev + "." + pin);
+			token = tok.get_token();
+			if (token.is(tok.m_tok_TER))
+			{
+				token = tok.get_token();
+				while (token.is_type(plib::ptokenizer::IDENTIFIER))
+				{
+					pin = tok.get_identifier_or_number();
+					add_term(net, token.str() + "." + pin);
+					token = tok.get_token();
+				}
+			}
+		}
+#if 0
+			token = tok.get_token();
+			/* skip to semicolon */
+			do
+			{
+				token = tok.get_token();
+			} while (!token.is(tok.m_tok_SEMICOLON));
+			token = tok.get_token();
+			pstring sval = "";
+			if (token.is(tok.m_tok_VALUE))
+			{
+				pstring vname = tok.get_string();
+				sval = tok.get_string();
+				tok.require_token(tok.m_tok_SEMICOLON);
+				token = tok.get_token();
+			}
+			switch (name.code_at(0))
+			{
+				case 'Q':
+				{
+					add_device("QBJT", name, sval);
+				}
+					break;
+				case 'R':
+					{
+						double val = get_sp_val(sval);
+						add_device("RES", name, val);
+					}
+					break;
+				case 'C':
+					{
+						double val = get_sp_val(sval);
+						add_device("CAP", name, val);
+					}
+					break;
+				case 'P':
+					if (sval.ucase() == "HIGH")
+						add_device("TTL_INPUT", name, 1);
+					else if (sval.ucase() == "LOW")
+						add_device("TTL_INPUT", name, 0);
+					else
+						add_device("ANALOG_INPUT", name, sval.as_double());
+					add_pin_alias(name, "1", "Q");
+					break;
+				case 'D':
+					/* Pin 1 = Anode, Pin 2 = Cathode */
+					add_device("DIODE", name, sval);
+					add_pin_alias(name, "1", "A");
+					add_pin_alias(name, "2", "K");
+					break;
+				case 'U':
+				case 'X':
+				{
+					pstring tname = "TTL_" + sval + "_DIP";
+					add_device(tname, name);
+					break;
+				}
+				default:
+					tok.error("// IGNORED " + name);
+			}
+
+		}
+		else if (token.is(tok.m_tok_SIGNAL))
+		{
+			pstring netname = tok.get_string();
+			token = tok.get_token();
+			while (!token.is(tok.m_tok_SEMICOLON))
+			{
+				/* fixme: should check for string */
+				pstring devname = token.str();
+				pstring pin = tok.get_string();
+				add_term(netname, devname + "." + pin);
+				token = tok.get_token();                }
+		}
+#endif
+		else
+		{
+			out("Unexpected {}\n", token.str());
 			return;
 		}
 	}

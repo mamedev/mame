@@ -41,7 +41,7 @@ public:
 		opt_logs(*this,     "l", "log" ,                    "define terminal to log. This option may be specified repeatedly."),
 		opt_inp(*this,      "i", "input",       "",         "input file to process (default is none)"),
 		opt_grp4(*this,     "Options for convert command",  "These options are only used by the convert command."),
-		opt_type(*this,     "y", "type",        "spice",    "spice:eagle", "type of file to be converted: spice,eagle"),
+		opt_type(*this,     "y", "type",        "spice",    "spice:eagle:rinf", "type of file to be converted: spice,eagle,rinf"),
 
 		opt_ex1(*this,     "nltool -c run -t 3.5 -f nl_examples/cdelay.c -n cap_delay",
 				"Run netlist \"cap_delay\" from file nl_examples/cdelay.c for 3.5 seconds"),
@@ -465,9 +465,15 @@ int main(int argc, char *argv[])
 				c.convert(contents);
 				result = c.result();
 			}
-			else
+			else if (opts.opt_type().equals("eagle"))
 			{
 				nl_convert_eagle_t c;
+				c.convert(contents);
+				result = c.result();
+			}
+			else if (opts.opt_type().equals("rinf"))
+			{
+				nl_convert_rinf_t c;
 				c.convert(contents);
 				result = c.result();
 			}
