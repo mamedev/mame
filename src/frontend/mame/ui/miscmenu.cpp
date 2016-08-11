@@ -78,7 +78,7 @@ void menu_bios_selection::populate()
 	/* cycle through all devices for this system */
 	for (device_t &device : device_iterator(machine().root_device()))
 	{
-		if (device.rom_region())
+		if (device.rom_region() != nullptr && !ROMENTRY_ISEND(device.rom_region()))
 		{
 			const char *val = "default";
 			for (const rom_entry *rom = device.rom_region(); !ROMENTRY_ISEND(rom); rom++)
