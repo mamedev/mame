@@ -166,12 +166,13 @@ bool software_info::has_multiple_parts(const char *interface) const
 //  softlist_parser - constructor
 //-------------------------------------------------
 
-softlist_parser::softlist_parser(util::core_file &file, const std::string &filename, std::list<software_info> &infolist, std::ostringstream &errors)
+softlist_parser::softlist_parser(util::core_file &file, const std::string &filename, std::string &description, std::list<software_info> &infolist, std::ostringstream &errors)
 		: m_file(file),
 		m_filename(filename),
 		m_infolist(infolist),
 		m_errors(errors),
 		m_done(false),
+		m_description(description),
 		m_data_accum_expected(false),
 		m_current_info(nullptr),
 		m_current_part(nullptr),

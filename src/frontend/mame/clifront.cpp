@@ -1387,7 +1387,7 @@ void cli_frontend::verifysamples(const char *gamename)
 
 void cli_frontend::output_single_softlist(FILE *out, software_list_device &swlistdev)
 {
-	fprintf(out, "\t<softwarelist name=\"%s\" description=\"%s\">\n", swlistdev.list_name().c_str(), xml_normalize_string(swlistdev.description()));
+	fprintf(out, "\t<softwarelist name=\"%s\" description=\"%s\">\n", swlistdev.list_name().c_str(), xml_normalize_string(swlistdev.description().c_str()));
 	for (const software_info &swinfo : swlistdev.get_info())
 	{
 		fprintf(out, "\t\t<software name=\"%s\"", swinfo.shortname().c_str());
