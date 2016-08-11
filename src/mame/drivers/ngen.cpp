@@ -283,32 +283,32 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 	case 0x0d:
 	case 0x0e:
 	case 0x0f:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			m_dmac->write(space,offset,data & 0xff);
 		break;
 	case 0x80: // DMA page offset?
 	case 0x81:
 	case 0x82:
 	case 0x83:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			m_dma_offset[offset-0x80] = data & 0xff;
 		break;
 	case 0xc0:  // X-Bus modules reset
 		m_xbus_current = 0;
 		break;
 	case 0x10c:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			m_pic->write(space,0,data & 0xff);
 		break;
 	case 0x10d:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			m_pic->write(space,1,data & 0xff);
 		break;
 	case 0x110:
 	case 0x111:
 	case 0x112:
 	case 0x113:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			m_pit->write(space,offset-0x110,data & 0xff);
 		break;
 	case 0x141:
@@ -316,19 +316,19 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 		COMBINE_DATA(&m_periph141);
 		break;
 	case 0x144:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			m_crtc->address_w(space,0,data & 0xff);
 		break;
 	case 0x145:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			m_crtc->register_w(space,0,data & 0xff);
 		break;
 	case 0x146:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			m_viduart->data_w(space,0,data & 0xff);
 		break;
 	case 0x147:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			m_viduart->control_w(space,0,data & 0xff);
 		break;
 	case 0x1a0:  // serial?
@@ -360,7 +360,7 @@ READ16_MEMBER(ngen_state::peripheral_r)
 	case 0x0d:
 	case 0x0e:
 	case 0x0f:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			ret = m_dmac->read(space,offset);
 		logerror("DMA read offset %04x mask %04x returning %04x\n",offset,mem_mask,ret);
 		break;
@@ -368,42 +368,42 @@ READ16_MEMBER(ngen_state::peripheral_r)
 	case 0x81:
 	case 0x82:
 	case 0x83:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			ret = m_dma_offset[offset-0x80] & 0xff;
 		break;
 	case 0x10c:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			ret = m_pic->read(space,0);
 		break;
 	case 0x10d:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			ret = m_pic->read(space,1);
 		break;
 	case 0x110:
 	case 0x111:
 	case 0x112:
 	case 0x113:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			ret = m_pit->read(space,offset-0x110);
 		break;
 	case 0x141:
 		ret = m_periph141;
 		break;
 	case 0x144:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			ret = m_crtc->status_r(space,0);
 		break;
 	case 0x145:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			ret = m_crtc->register_r(space,0);
 		break;
 	case 0x146:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			ret = m_viduart->data_r(space,0);
 		break;
 	case 0x147:  // keyboard UART
 		// expects bit 0 to be set (UART transmit ready)
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			ret = m_viduart->status_r(space,0);
 		break;
 	case 0x1a0:  // I/O control register?
@@ -478,11 +478,11 @@ WRITE16_MEMBER(ngen_state::hfd_w)
 		case 0x00:
 		case 0x01:
 		case 0x02:
-			if(mem_mask & 0x00ff)
+			if(ACCESSING_BITS_0_7)
 				m_fdc->write(space,offset,data & 0xff);
 			break;
 		case 0x03:
-			if(mem_mask & 0x00ff)
+			if(ACCESSING_BITS_0_7)
 			{
 				m_fdc->write(space,offset,data & 0xff);
 				m_fdc_timer->write_clk0(1);
@@ -490,22 +490,22 @@ WRITE16_MEMBER(ngen_state::hfd_w)
 			}
 			break;
 		case 0x04:
-			if(mem_mask & 0x00ff)
+			if(ACCESSING_BITS_0_7)
 				fdc_control_w(space,0,data & 0xff);
 			break;
 		case 0x05:
-			if(mem_mask & 0x00ff)
+			if(ACCESSING_BITS_0_7)
 				hdc_control_w(space,0,data & 0xff);
 			break;
 		case 0x07:
-			if(mem_mask & 0x00ff)
+			if(ACCESSING_BITS_0_7)
 				disk_addr_ext(space,0,data & 0xff);
 			break;
 		case 0x08:
 		case 0x09:
 		case 0x0a:
 		case 0x0b:
-			if(mem_mask & 0x00ff)
+			if(ACCESSING_BITS_0_7)
 				m_fdc_timer->write(space,offset-0x08,data & 0xff);
 			break;
 		case 0x10:
@@ -516,7 +516,7 @@ WRITE16_MEMBER(ngen_state::hfd_w)
 		case 0x15:
 		case 0x16:
 		case 0x17:
-			if(mem_mask & 0x00ff)
+			if(ACCESSING_BITS_0_7)
 				m_hdc->write(space,offset-0x10,data & 0xff);
 			logerror("WD1010 register %i write %02x mask %04x\n",offset-0x10,data & 0xff,mem_mask);
 			break;
@@ -524,7 +524,7 @@ WRITE16_MEMBER(ngen_state::hfd_w)
 		case 0x19:
 		case 0x1a:
 		case 0x1b:
-			if(mem_mask & 0x00ff)
+			if(ACCESSING_BITS_0_7)
 				m_hdc_timer->write(space,offset-0x18,data & 0xff);
 			break;
 	}
@@ -539,11 +539,11 @@ READ16_MEMBER(ngen_state::hfd_r)
 		case 0x00:
 		case 0x01:
 		case 0x02:
-			if(mem_mask & 0x00ff)
+			if(ACCESSING_BITS_0_7)
 				ret = m_fdc->read(space,offset);
 			break;
 		case 0x03:
-			if(mem_mask & 0x00ff)
+			if(ACCESSING_BITS_0_7)
 			{
 				ret = m_fdc->read(space,offset);
 				m_fdc_timer->write_clk0(1);
@@ -554,7 +554,7 @@ READ16_MEMBER(ngen_state::hfd_r)
 		case 0x09:
 		case 0x0a:
 		case 0x0b:
-			if(mem_mask & 0x00ff)
+			if(ACCESSING_BITS_0_7)
 				ret = m_fdc_timer->read(space,offset-0x08);
 			break;
 		case 0x10:
@@ -565,7 +565,7 @@ READ16_MEMBER(ngen_state::hfd_r)
 		case 0x15:
 		case 0x16:
 		case 0x17:
-			if(mem_mask & 0x00ff)
+			if(ACCESSING_BITS_0_7)
 				ret = m_hdc->read(space,offset-0x10);
 			logerror("WD1010 register %i read, mask %04x\n",offset-0x10,mem_mask);
 			break;
@@ -573,7 +573,7 @@ READ16_MEMBER(ngen_state::hfd_r)
 		case 0x19:
 		case 0x1a:
 		case 0x1b:
-			if(mem_mask & 0x00ff)
+			if(ACCESSING_BITS_0_7)
 				ret = m_hdc_timer->read(space,offset-0x18);
 			break;
 	}
@@ -769,12 +769,12 @@ READ16_MEMBER( ngen_state::b38_keyboard_r )
 	switch(offset)
 	{
 	case 0:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			ret = m_viduart->data_r(space,0);
 		break;
 	case 1:  // keyboard UART
 		// expects bit 0 to be set (UART transmit ready)
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			ret = m_viduart->status_r(space,0);
 		break;
 	}
@@ -786,11 +786,11 @@ WRITE16_MEMBER( ngen_state::b38_keyboard_w )
 	switch(offset)
 	{
 	case 0:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			m_viduart->data_w(space,0,data & 0xff);
 		break;
 	case 1:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			m_viduart->control_w(space,0,data & 0xff);
 		break;
 	}
@@ -802,11 +802,11 @@ READ16_MEMBER( ngen_state::b38_crtc_r )
 	switch(offset)
 	{
 	case 0:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			ret = m_crtc->register_r(space,0);
 		break;
 	case 1:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			ret = m_viduart->data_r(space,0);
 		break;
 	}
@@ -818,11 +818,11 @@ WRITE16_MEMBER( ngen_state::b38_crtc_w )
 	switch(offset)
 	{
 	case 0:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			m_crtc->address_w(space,0,data & 0xff);
 		break;
 	case 1:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			m_crtc->register_w(space,0,data & 0xff);
 		break;
 	}

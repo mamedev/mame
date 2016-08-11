@@ -388,7 +388,7 @@ WRITE16_MEMBER( glass_state::mainram_w )
 	{
 //      printf("%06x write %06x - %04x %04x\n",  pc, (offset*2 + 0xfec000), data, mem_mask);
 		// several checks write here then expect it to appear mirrored, might be some kind of command + command ack
-		if (mem_mask & 0xff00) // sometimes mask 0xff00, but not in cases which poll for change
+		if (ACCESSING_BITS_8_15) // sometimes mask 0xff00, but not in cases which poll for change
 		{
 			mem_mask = 0x00ff;
 			data >>=8;

@@ -104,7 +104,7 @@ WRITE16_MEMBER(segas32_state::sonic_level_load_protection)
 {
 	UINT16 level;
 //Perform write
-	m_system32_workram[CLEARED_LEVELS / 2] = (data & mem_mask) | (m_system32_workram[CLEARED_LEVELS / 2] & ~mem_mask);
+	COMBINE_DATA(&m_system32_workram[CLEARED_LEVELS / 2]);
 
 //Refresh current level
 		if (m_system32_workram[CLEARED_LEVELS / 2] == 0)

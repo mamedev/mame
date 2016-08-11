@@ -1582,7 +1582,7 @@ READ32_MEMBER(namcos22_state::namcos22_dspram_r)
 
 WRITE32_MEMBER(namcos22_state::namcos22_dspram_w)
 {
-	if (mem_mask & 0x00ff0000)
+	if (ACCESSING_BITS_16_23)
 	{
 		// only d0-23 are connected
 		mem_mask |= 0xff000000;
