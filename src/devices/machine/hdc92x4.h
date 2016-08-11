@@ -487,7 +487,7 @@ public:
 	hdc9224_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	int step_time();
+	int step_time() override;
 };
 
 class hdc9234_device : public hdc92x4_device
@@ -496,7 +496,7 @@ public:
 	hdc9234_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	int step_time();
+	int step_time() override;
 };
 
 #endif
