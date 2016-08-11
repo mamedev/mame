@@ -1948,8 +1948,8 @@ OP(xycb,fe) { wm(m_ea, set(7, rm(m_ea)));        } /* SET  7,(XY+o)    */
 OP(xycb,ff) { A = set(7, rm(m_ea)); wm(m_ea, A); } /* SET  7,A=(XY+o)  */
 
 OP(illegal,1) {
-	logerror("Z80 '%s' ill. opcode $%02x $%02x\n",
-			tag(), m_decrypted_opcodes_direct->read_byte((PCD-1)&0xffff), m_decrypted_opcodes_direct->read_byte(PCD));
+	logerror("Z80 ill. opcode $%02x $%02x ($%04x)\n",
+			m_decrypted_opcodes_direct->read_byte((PCD-1)&0xffff), m_decrypted_opcodes_direct->read_byte(PCD), PCD-1);
 }
 
 /**********************************************************

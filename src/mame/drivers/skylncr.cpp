@@ -94,6 +94,20 @@
 
   Colors are wrong due to can't find a way to set the palette.
 
+  * Magical Butterfly
+
+  Some of the inputs are merged, and there is an extra output port that seems to handle lamps and
+  a rather simple form of protection that also involves one of the PPI1 input lines.
+
+  To enter the Service Mode or Bookkeeping Menu, hold down Stop Reel 2/Up and Take along with the
+  specific inputs.
+
+  * Butterfly Dream 97
+
+  The program code has trivial opcode encryption which has been broken. However, the inputs tend
+  to act out of control at many times. This may have to do with the large number of unknown reads
+  and writes to an I/O port at $66.
+
 ****************************************************************************************************
 
   TODO:
@@ -105,12 +119,14 @@
 
 
 #define MASTER_CLOCK        XTAL_12MHz  /* confirmed */
+#define HOPPER_PULSE        50 // guessed
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 
 #include <algorithm>
 
@@ -138,7 +154,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_generic_paletteram_8(*this, "paletteram"),
-		m_generic_paletteram2_8(*this, "paletteram2") { }
+		m_generic_paletteram2_8(*this, "paletteram2"),
+		m_hopper(*this, "hopper") { }
 
 	tilemap_t *m_tmap;
 	required_shared_ptr<UINT8> m_videoram;
@@ -181,6 +198,9 @@ public:
 	DECLARE_WRITE8_MEMBER(skylncr_coin_w);
 	DECLARE_READ8_MEMBER(ret_ff);
 	DECLARE_WRITE8_MEMBER(skylncr_nmi_enable_w);
+	DECLARE_WRITE8_MEMBER(mbutrfly_prot_w);
+	READ_LINE_MEMBER(mbutrfly_prot_r);
+	DECLARE_READ8_MEMBER(bdream97_opcode_r);
 	DECLARE_DRIVER_INIT(skylncr);
 	DECLARE_DRIVER_INIT(sonikfig);
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -196,6 +216,8 @@ public:
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<UINT8> m_generic_paletteram_8;
 	optional_shared_ptr<UINT8> m_generic_paletteram2_8;
+	required_device<ticket_dispenser_device> m_hopper;
+	bool m_mbutrfly_prot;
 };
 
 
@@ -427,6 +449,7 @@ WRITE8_MEMBER(skylncr_state::reelscroll4_w)
 WRITE8_MEMBER(skylncr_state::skylncr_coin_w)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	m_hopper->write(space, 0, (data & 0x20) ? 0x80 : 0);
 }
 
 READ8_MEMBER(skylncr_state::ret_ff)
@@ -444,6 +467,28 @@ READ8_MEMBER(skylncr_state::ret_00)
 WRITE8_MEMBER(skylncr_state::skylncr_nmi_enable_w)
 {
 	m_nmi_enable = data & 0x10;
+}
+
+WRITE8_MEMBER(skylncr_state::mbutrfly_prot_w)
+{
+	machine().output().set_lamp_value(1, BIT(data, 0)); // Slot Stop 2
+	machine().output().set_lamp_value(2, BIT(data, 1)); // Slot Stop 1
+	machine().output().set_lamp_value(3, BIT(data, 2)); // Take
+	machine().output().set_lamp_value(4, BIT(data, 3)); // Bet
+	machine().output().set_lamp_value(5, BIT(data, 4)); // Slot Stop 3
+	machine().output().set_lamp_value(6, BIT(data, 5)); // Start
+	machine().output().set_lamp_value(7, BIT(data, 6)); // Payout
+	m_mbutrfly_prot = BIT(data, 7);
+}
+
+READ_LINE_MEMBER(skylncr_state::mbutrfly_prot_r)
+{
+	return m_mbutrfly_prot;
+}
+
+READ8_MEMBER(skylncr_state::bdream97_opcode_r)
+{
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset) ^ 0x80;
 }
 
 
@@ -524,6 +569,18 @@ static ADDRESS_MAP_START( io_map_skylncr, AS_IO, 8, skylncr_state )
 	AM_RANGE(0x50, 0x51) AM_WRITE(skylncr_paletteram2_w )
 
 	AM_RANGE(0x70, 0x70) AM_WRITE(skylncr_nmi_enable_w )
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( io_map_mbutrfly, AS_IO, 8, skylncr_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x60, 0x60) AM_WRITE(mbutrfly_prot_w)
+	AM_IMPORT_FROM(io_map_skylncr)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( bdream97_opcode_map, AS_DECRYPTED_OPCODES, 8, skylncr_state )
+	AM_RANGE(0x0000, 0xffff) AM_READ(bdream97_opcode_r)
 ADDRESS_MAP_END
 
 
@@ -724,7 +781,7 @@ static INPUT_PORTS_START( skylncr )
 	PORT_START("IN2")   /* $01 (PPI0 port B) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW) PORT_NAME("Down/Low") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW) PORT_NAME("Down/Low")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1) PORT_NAME("Start")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
@@ -736,7 +793,7 @@ static INPUT_PORTS_START( skylncr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH) PORT_NAME("Up/High") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH) PORT_NAME("Up/High")
 
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -744,12 +801,12 @@ static INPUT_PORTS_START( skylncr )
 
 	PORT_START("IN4")   /* $12 (PPI1 port C) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )   /* Settings */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
 	PORT_START("DSW1")  /* $02 (PPI0 port C) */
@@ -853,6 +910,26 @@ static INPUT_PORTS_START( skylncr )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( mbutrfly )
+	PORT_INCLUDE(skylncr)
+
+	PORT_MODIFY("IN1")   // $00 (PPI0 port A)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_MODIFY("IN2")   // $01 (PPI0 port B)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP3) PORT_NAME("Stop Reel 3, Down/Low")
+
+	PORT_MODIFY("IN3")   // $11 (PPI1 port B)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP2) PORT_NAME("Stop Reel 2, Up/High")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SLOT_STOP1) PORT_NAME("Stop Reel 1, Double Up")
+
+	PORT_MODIFY("IN4")   // $12 (PPI1 port C)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, skylncr_state, mbutrfly_prot_r)
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( leader )
 	PORT_START("IN1")   /* $00 (PPI0 port A) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP2)
@@ -867,7 +944,7 @@ static INPUT_PORTS_START( leader )
 	PORT_START("IN2")   /* $01 (PPI0 port B) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET) PORT_NAME("Bet/Throttle")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW) PORT_NAME("Down/Low") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW) PORT_NAME("Down/Low")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1) PORT_NAME("Start")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
@@ -879,7 +956,7 @@ static INPUT_PORTS_START( leader )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH) PORT_NAME("Up/High") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH) PORT_NAME("Up/High")
 
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -887,12 +964,12 @@ static INPUT_PORTS_START( leader )
 
 	PORT_START("IN4")   /* $12 (PPI1 port C) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )   /* Settings */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
 	PORT_START("DSW1")  /* $02 (PPI0 port C) */
@@ -1009,7 +1086,7 @@ static INPUT_PORTS_START( neraidou )
 	PORT_START("IN2")   /* $01 (PPI0 port B) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET) PORT_NAME("Bet/Throttle")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW) PORT_NAME("Down/Low") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW) PORT_NAME("Down/Low")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1) PORT_NAME("Start")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
@@ -1021,7 +1098,7 @@ static INPUT_PORTS_START( neraidou )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH) PORT_NAME("Up/High") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH) PORT_NAME("Up/High")
 
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1029,12 +1106,12 @@ static INPUT_PORTS_START( neraidou )
 
 	PORT_START("IN4")   /* $12 (PPI1 port C) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )   /* Settings */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
 	PORT_START("DSW1")  /* $02 (PPI0 port C) */
@@ -1153,7 +1230,7 @@ static INPUT_PORTS_START( gallag50 )
 	PORT_START("IN2")   /* $01 (PPI0 port B) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET) PORT_NAME("Bet/Throttle")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW) PORT_NAME("Down/Low") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW) PORT_NAME("Down/Low")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1) PORT_NAME("Start")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
@@ -1165,7 +1242,7 @@ static INPUT_PORTS_START( gallag50 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH) PORT_NAME("Up/High") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH) PORT_NAME("Up/High")
 
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1173,12 +1250,12 @@ static INPUT_PORTS_START( gallag50 )
 
 	PORT_START("IN4")   /* $12 (PPI1 port C) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )   /* Settings */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
 	PORT_START("DSW1")  /* $02 (PPI0 port C) */
@@ -1297,7 +1374,7 @@ static INPUT_PORTS_START( sstar97 )
 	PORT_START("IN2")   /* $01 (PPI0 port B) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW) PORT_NAME("Low") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1) PORT_NAME("Start")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
@@ -1309,19 +1386,19 @@ static INPUT_PORTS_START( sstar97 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("High") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Take Score")
 
 	PORT_START("IN4")   /* $12 (PPI1 port C) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )   /* Settings */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
 	PORT_START("DSW1")  /* $02 (PPI0 port C) */
@@ -1597,6 +1674,8 @@ static MACHINE_CONFIG_START( skylncr, skylncr_state )
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN3"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN4"))
 
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1615,6 +1694,13 @@ static MACHINE_CONFIG_START( skylncr, skylncr_state )
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW3"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW4"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( mbutrfly, skylncr )
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(io_map_mbutrfly)
 MACHINE_CONFIG_END
 
 
@@ -1638,6 +1724,8 @@ static MACHINE_CONFIG_DERIVED( bdream97, skylncr )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(bdream97_opcode_map)
+
 	MCFG_GFXDECODE_MODIFY("gfxdecode", bdream97)
 MACHINE_CONFIG_END
 
@@ -1866,8 +1954,10 @@ ROM_END
   Game is encrypted and needs better decoded graphics.
 */
 ROM_START( bdream97 )
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "27c512_subboard.bin",    0x0000, 0x10000, CRC(b0056324) SHA1(8299198d5e7ed50967f380ba0fddff5a39eee857) )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c512_subboard.bin",    0x00000, 0x08000, CRC(b0056324) SHA1(8299198d5e7ed50967f380ba0fddff5a39eee857) )
+	ROM_CONTINUE( 0x0c000, 0x04000 )
+	ROM_CONTINUE( 0x08000, 0x04000 )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )    // All ROMs are 27010.
 	ROM_LOAD16_BYTE( "27c010.u20", 0x00000, 0x20000, CRC(df1fd438) SHA1(8da4d116e768a3c269a2031db6bf38a5b7707029) )
@@ -1965,11 +2055,11 @@ DRIVER_INIT_MEMBER(skylncr_state, sonikfig)
 /*    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT      ROT    COMPANY                 FULLNAME                                         FLAGS  */
 GAME( 1995, skylncr,  0,       skylncr,  skylncr,  skylncr_state,  skylncr,  ROT0, "Bordun International", "Sky Lancer (Bordun, version U450C)",             0 )
 GAME( 1995, butrfly,  0,       skylncr,  skylncr,  skylncr_state,  skylncr,  ROT0, "Bordun International", "Butterfly Video Game (version U350C)",           0 )
-GAME( 1999, mbutrfly, 0,       skylncr,  skylncr,  skylncr_state,  skylncr,  ROT0, "Bordun International", "Magical Butterfly (version U350C, encrypted)",   MACHINE_NOT_WORKING )
+GAME( 1999, mbutrfly, 0,       mbutrfly, mbutrfly, skylncr_state,  skylncr,  ROT0, "Bordun International", "Magical Butterfly (version U350C, protected)",   0 )
 GAME( 1995, madzoo,   0,       skylncr,  skylncr,  skylncr_state,  skylncr,  ROT0, "Bordun International", "Mad Zoo (version U450C)",                        0 )
 GAME( 1995, leader,   0,       skylncr,  leader,   skylncr_state,  skylncr,  ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                  0 )
 GAME( 199?, gallag50, 0,       skylncr,  gallag50, skylncr_state,  skylncr,  ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", 0 )
 GAME( 199?, neraidou, 0,       neraidou, neraidou, skylncr_state,  skylncr,  ROT0, "bootleg",              "Neraidoula (Fairy Butterfly)",                   0 )
 GAME( 199?, sstar97,  0,       sstar97,  sstar97,  skylncr_state,  skylncr,  ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   0 )
-GAME( 199?, bdream97, 0,       bdream97, skylncr,  skylncr_state,  skylncr,  ROT0, "bootleg",              "Butterfly Dream 97 / Hudie Meng 97",             MACHINE_NOT_WORKING )
+GAME( 1995, bdream97, 0,       bdream97, skylncr,  skylncr_state,  skylncr,  ROT0, "bootleg (KKK)",        "Butterfly Dream 97 / Hudie Meng 97",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 2000, sonikfig, 0,       skylncr,  sonikfig, skylncr_state,  sonikfig, ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
