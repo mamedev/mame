@@ -70,8 +70,8 @@ WRITE32_MEMBER ( stv_state::common_prot_w )
 	}
 	else if(offset == 2)
 	{
-		if (mem_mask&0xffff0000) m_cryptdevice->set_addr_low(data >> 16);
-		if (mem_mask&0x0000ffff) m_cryptdevice->set_addr_high(data&0xffff);
+		if (ACCESSING_BITS_16_31) m_cryptdevice->set_addr_low(data >> 16);
+		if (ACCESSING_BITS_0_15) m_cryptdevice->set_addr_high(data&0xffff);
 
 	}
 	else if(offset == 3)

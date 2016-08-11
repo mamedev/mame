@@ -205,12 +205,12 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 				if (addr < 0x0080)
 				{
 					UINT16 retvalue = 0x0000;
-					if (mem_mask&0xff00)
+					if (ACCESSING_BITS_8_15)
 					{
 						logerror("mem_mask&0xff00 unhandled\n");
 					}
 
-					if (mem_mask&0x00ff)
+					if (ACCESSING_BITS_0_7)
 					{
 						retvalue = read_input_matrix((addr & 0x00f0)>>4);
 					}
@@ -381,12 +381,12 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 
 				if (addr < 0x0200)
 				{
-					if (mem_mask&0xff00)
+					if (ACCESSING_BITS_8_15)
 					{
 						logerror("lamp write mem_mask&0xff00 unhandled\n");
 					}
 
-					if (mem_mask&0x00ff)
+					if (ACCESSING_BITS_0_7)
 					{   // lamps
 						mux_output_w(space, (addr & 0x01f0)>>4, data);
 					}
@@ -394,12 +394,12 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 				}
 				else if ((addr >= 0x1000) && (addr < 0x1200))
 				{
-					if (mem_mask&0xff00)
+					if (ACCESSING_BITS_8_15)
 					{
 						logerror("lamp write mem_mask&0xff00 unhandled\n");
 					}
 
-					if (mem_mask&0x00ff)
+					if (ACCESSING_BITS_0_7)
 					{   // lamps
 						mux_output2_w(space, (addr & 0x01f0)>>4, data);
 					}
