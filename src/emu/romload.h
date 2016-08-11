@@ -132,9 +132,9 @@ class software_list_device;
 /* ----- additional ROM-related macros ----- */
 #define ROM_CONTINUE(offset,length)                 { nullptr, nullptr, offset, length, ROMENTRYTYPE_CONTINUE | ROM_INHERITFLAGS },
 #define ROM_IGNORE(length)                          { nullptr, nullptr, 0,      length, ROMENTRYTYPE_IGNORE | ROM_INHERITFLAGS },
-#define ROM_FILL(offset,length,value)               { nullptr, #value, offset, length, ROMENTRYTYPE_FILL },
-#define ROMX_FILL(offset,length,value,flags)        { nullptr, #value, offset, length, ROMENTRYTYPE_FILL | flags },
-#define ROM_COPY(srctag,srcoffs,offset,length)      { srctag, #srcoffs, offset, length, ROMENTRYTYPE_COPY },
+#define ROM_FILL(offset,length,value)               { nullptr, (const char *)value, offset, length, ROMENTRYTYPE_FILL },
+#define ROMX_FILL(offset,length,value,flags)        { nullptr, (const char *)value, offset, length, ROMENTRYTYPE_FILL | flags },
+#define ROM_COPY(srctag,srcoffs,offset,length)      { srctag, (const char *)srcoffs, offset, length, ROMENTRYTYPE_COPY },
 
 
 /* ----- system BIOS macros ----- */
