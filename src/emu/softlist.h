@@ -148,7 +148,7 @@ class softlist_parser
 {
 public:
 	// construction (== execution)
-	softlist_parser(util::core_file &file, const std::string &filename, std::list<software_info> &infolist, std::ostringstream &errors);
+	softlist_parser(util::core_file &file, const std::string &filename, std::string &description, std::list<software_info> &infolist, std::ostringstream &errors);
 
 private:
 	enum parse_position
@@ -191,12 +191,12 @@ private:
 
 	// internal parsing state
 	util::core_file &					m_file;
-	const std::string &			m_filename;
+	std::string 						m_filename;
 	std::list<software_info> &	m_infolist;
 	std::ostringstream &		m_errors;
 	struct XML_ParserStruct *	m_parser;
 	bool						m_done;
-	std::string					m_description;
+	std::string &				m_description;
 	bool                    m_data_accum_expected;
 	std::string             m_data_accum;
 	software_info *         m_current_info;

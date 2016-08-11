@@ -229,9 +229,9 @@ void software_list_device::display_matches(const machine_config &config, const c
 		{
 			// different output depending on original system or compatible
 			if (swlistdev.list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM)
-				osd_printf_error("* Software list \"%s\" (%s) matches: \n", swlistdev.list_name().c_str(), swlistdev.description());
+				osd_printf_error("* Software list \"%s\" (%s) matches: \n", swlistdev.list_name().c_str(), swlistdev.description().c_str());
 			else
-				osd_printf_error("* Compatible software list \"%s\" (%s) matches: \n", swlistdev.list_name().c_str(), swlistdev.description());
+				osd_printf_error("* Compatible software list \"%s\" (%s) matches: \n", swlistdev.list_name().c_str(), swlistdev.description().c_str());
 
 			// print them out
 			for (auto &match : matches)
@@ -297,7 +297,7 @@ void software_list_device::parse()
 	{
 		// parse if no error
 		std::ostringstream errs;
-		softlist_parser parser(m_file, m_description, m_infolist, errs);
+		softlist_parser parser(m_file, m_file.filename(), m_description, m_infolist, errs);
 		m_file.close();
 		m_errors = errs.str();
 	}
