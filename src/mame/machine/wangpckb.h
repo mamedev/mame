@@ -34,23 +34,23 @@
 	MCFG_DEVICE_ADD(WANGPC_KEYBOARD_TAG, WANGPC_KEYBOARD, 0)
 
 #define MCFG_WANGPCKB_TXD_HANDLER(_devcb) \
-	devcb = &wangpc_keyboard_device::set_txd_handler(*device, DEVCB_##_devcb);
+	devcb = &wangpc_keyboard_t::set_txd_handler(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> wangpc_keyboard_device
+// ======================> wangpc_keyboard_t
 
-class wangpc_keyboard_device :  public device_t,
-								public device_serial_interface
+class wangpc_keyboard_t :  public device_t,
+						   public device_serial_interface
 {
 public:
 	// construction/destruction
-	wangpc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wangpc_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb_base &set_txd_handler(device_t &device, _Object object) { return downcast<wangpc_keyboard_device &>(device).m_txd_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_txd_handler(device_t &device, _Object object) { return downcast<wangpc_keyboard_t &>(device).m_txd_handler.set_callback(object); }
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -65,15 +65,20 @@ public:
 	DECLARE_WRITE8_MEMBER( kb_p2_w );
 	DECLARE_WRITE8_MEMBER( kb_p3_w );
 
-	DECLARE_READ8_MEMBER(mcs51_rx_callback);
-	DECLARE_WRITE8_MEMBER(mcs51_tx_callback);
+	DECLARE_READ8_MEMBER( mcs51_rx_callback );
+	DECLARE_WRITE8_MEMBER( mcs51_tx_callback );
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_serial_interface overrides
+	virtual void tra_callback() override;
+	virtual void tra_complete() override;
+	virtual void rcv_callback() override;
+	virtual void rcv_complete() override;
 
 private:
 	required_device<i8051_device> m_maincpu;
@@ -96,6 +101,7 @@ private:
 	devcb_write_line m_txd_handler;
 
 	UINT8 m_y;
+	int m_rxd;
 };
 
 
