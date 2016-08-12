@@ -387,7 +387,7 @@ const int victor9k_format::speed_zone[2][80] =
 
 const int victor9k_format::rpm[9] =
 {
-	252, 267, 283, 300, 320, 342, 368, 401, 417
+	252, 267, 283, 300, 321, 342, 368, 401, 417
 };
 
 bool victor9k_format::save(io_generic *io, floppy_image *image)
