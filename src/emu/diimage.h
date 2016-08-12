@@ -238,7 +238,6 @@ public:
 	bool load_software(software_list_device &swlist, const char *swname, const rom_entry *entry);
 	int reopen_for_write(const std::string &path);
 
-	static void software_name_split(const std::string &swlist_swname, std::string &swlist_name, std::string &swname, std::string &swpart);
 	static void static_set_user_loadable(device_t &device, bool user_loadable) {
 		device_image_interface *img;
 		if (!device.interface(img))

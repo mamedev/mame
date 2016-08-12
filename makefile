@@ -774,6 +774,7 @@ SCRIPTS = scripts/genie.lua \
 	scripts/src/video.lua \
 	scripts/src/bus.lua \
 	scripts/src/netlist.lua \
+	scripts/src/formats.lua \
 	scripts/toolchain.lua \
 	scripts/src/osd/modules.lua \
 	$(wildcard src/osd/$(OSD)/$(OSD).mak) \
