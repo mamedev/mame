@@ -50,6 +50,7 @@ public:
 	UINT8 status_r();
 	void set_ready();
 	UINT8 get_command() { return buffer[0]; }
+	int install_rom() { return (m_type != EC1841); }
 
 protected:
 	// device-level overrides
