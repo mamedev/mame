@@ -44,6 +44,8 @@
  *
  *  Naming conventions follow National Semiconductor datasheet
  *
+ *	TODO: DM74161 is compatible to DM9316 (both asynchronous clear)
+ *	      DM74163 has asynchronous clear (on L to H transition of clock)
  */
 
 #ifndef NLD_9316_H_
