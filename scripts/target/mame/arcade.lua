@@ -669,6 +669,16 @@ BUSES["VECTREX"] = true
 --BUSES["Z88"] = true
 --BUSES["ZORRO"] = true
 
+
+--------------------------------------------------
+-- specify used file formats
+--------------------------------------------------
+
+FORMATS["GUAB_DSK"] = true
+FORMATS["AMI_DSK"] = true
+FORMATS["SC3000_BIT"] = true
+FORMATS["WD177X_DSK"] = true
+
 --------------------------------------------------
 -- this is the list of driver libraries that
 -- comprise MAME plus mamedriv.o which contains

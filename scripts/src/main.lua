@@ -205,8 +205,12 @@ end
 	links {
 		"optional",
 		"emu",
+	}
+--if (STANDALONE~=true) then
+	links {
 		"formats",
 	}
+--end
 if #disasm_files > 0 then
 	links {
 		"dasm",
