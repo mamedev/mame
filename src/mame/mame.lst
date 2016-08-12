@@ -9496,6 +9496,9 @@ firebatl                        // (c) 1984 Taito
 @source:cm1800.cpp
 cm1800                          //
 
+@source:cmi.cpp
+cmi2x                           // Fairlight CMI IIx
+
 @source:cmmb.cpp
 cmmb162                         //
 

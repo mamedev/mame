@@ -768,6 +768,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"epson",
 		"exidy",
 		"fairch",
+		"fairlight",
 		"fidelity",
 		"force",
 		"fujitsu",
@@ -1729,6 +1730,11 @@ files {
 	MAME_DIR .. "src/mame/audio/channelf.cpp",
 	MAME_DIR .. "src/mame/audio/channelf.h",
 	MAME_DIR .. "src/mame/video/channelf.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "fairlight")
+files {
+	MAME_DIR .. "src/mame/drivers/cmi.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "fidelity")
