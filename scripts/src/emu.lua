@@ -30,7 +30,6 @@ includedirs {
 
 includedirs {
 	ext_includedir("expat"),
-	ext_includedir("lua"),
 	ext_includedir("zlib"),
 	ext_includedir("flac"),
 	ext_includedir("jpeg"),
@@ -150,6 +149,7 @@ files {
 	MAME_DIR .. "src/emu/romload.cpp",
 	MAME_DIR .. "src/emu/romload.h",
 	MAME_DIR .. "src/emu/romentry.h",
+	MAME_DIR .. "src/emu/romentry.cpp",
 	MAME_DIR .. "src/emu/save.cpp",
 	MAME_DIR .. "src/emu/save.h",
 	MAME_DIR .. "src/emu/schedule.cpp",

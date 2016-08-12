@@ -565,6 +565,8 @@ void victor_9000_fdc_t::update_stepper_motor(floppy_image_device *floppy, int st
 		floppy->stp_w(1);
 		floppy->stp_w(0);
 	}
+
+	floppy->set_rpm(victor9k_format::get_rpm(m_side, floppy->get_cyl()));
 }
 
 void victor_9000_fdc_t::update_spindle_motor(floppy_image_device *floppy, emu_timer *t_tach, bool start, bool stop, bool sel, UINT8 &da)
