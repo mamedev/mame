@@ -16,18 +16,15 @@ SRC = ..
 
 # LTO = -flto=4  -fuse-linker-plugin -flto-partition=balanced -Wodr
 
-#-Werror
-#CFLAGS =  $(LTO) -g -O3 -std=c++98 -Doverride="" -march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra -Wno-long-long -Wno-unused-parameter -Wno-unused-result -Wno-variadic-macros -I..
-#LDFLAGS = $(LTO) -g -O3 -std=c++98
-
-CFLAGS =  $(CEXTRAFLAGS) $(LTO) -g -O3 -std=c++11 -march=native -I.. -Wall -Wpedantic -Wsign-compare -Wextra -Wno-unused-parameter
-LDFLAGS = $(LTO) -g -O3 -std=c++11 
+CFLAGS =  $(LTO) -g -O3 -std=c++11 -march=native -I.. -Wall -Wpedantic -Wsign-compare -Wextra -Wno-unused-parameter $(CEXTRAFLAGS)
+LDFLAGS = $(LTO) -g -O3 -std=c++11 $(LDEXTRAFLAGS)
 LIBS = -lpthread -ldl
 
-CC = g++-5
-LD = @g++-5
+CC = g++
+LD = @g++
 MD = @mkdir
 RM = @rm
+DOXYGEN = @doxygen
 
 TARGETS = nltool nlwav
 
@@ -106,19 +103,20 @@ NLOBJS := \
 
 ALL_OBJS = $(OBJS) $(NLOBJ)/prg/nltool.o $(NLOBJ)/prg/nlwav.o
 SOURCES = $(patsubst $(OBJ)%, $(SRC)%, $(ALL_OBJS:.o=.cpp))
+MAKEFILE_TARGETS_WITHOUT_INCLUDE := clean doc clang mingw
 
 #-------------------------------------------------
 # all
 #-------------------------------------------------
 
-all:    maketree $(TARGETS)
+all:    maketree depend $(TARGETS)
 
 #-------------------------------------------------
 # clean
 #-------------------------------------------------
 
 clean:
-	$(RM) -rf $(OBJS) $(TARGETS) .depend
+	$(RM) -rf $(OBJS) $(TARGETS) $(OBJ)/prg/nltool.o $(OBJ)/prg/nlwav.o .depend
 
 #-------------------------------------------------
 # nltool
@@ -126,11 +124,11 @@ clean:
 
 nltool: $(OBJ)/prg/nltool.o $(OBJS)
 	@echo Linking $@...
-	@$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
+	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS) 
 
 nlwav: $(OBJ)/prg/nlwav.o $(OBJS)
 	@echo Linking $@...
-	@$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
+	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
 
 #-------------------------------------------------
 # directories
@@ -142,10 +140,34 @@ $(sort $(OBJDIRS)):
 maketree: $(sort $(OBJDIRS))
 
 #-------------------------------------------------
-# depends
+# Special targets
 #-------------------------------------------------
 
-depend: .depend
+.PHONY: clang mingw doc
+
+clang: 
+	$(MAKE) CC=clang++ LD=clang++ CEXTRAFLAGS="-Weverything -Werror -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-cast-align -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-exit-time-destructors -Wno-format-nonliteral -Wno-weak-template-vtables"
+
+# 
+# FIXME:  -Wno-weak-vtables -Wno-missing-variable-declarations -Wno-conversion -Wno-exit-time-destructors 
+# 
+
+mingw: 
+	$(MAKE) LDEXTRAFLAGS="-Wl,--subsystem,console" LIBS= MD=@mkdir.exe SHELL=sh.exe
+
+#
+# FIXME: Unicode
+#     CEXTRAFLAGS = -DUNICODE -D_UNICODE -municode
+#     LDEXTRAFLAGS = -municode
+#
+
+
+doc:
+	$(DOXYGEN) doxygen.conf
+
+#-------------------------------------------------
+# depends
+#-------------------------------------------------
 
 .depend: $(SOURCES)
 	@echo creating .depend
@@ -154,19 +176,12 @@ depend: .depend
 		$(CC) $(CFLAGS) -MM $$i -MT `echo $$i | sed -e 's/$(SRC)/$(OBJ)/' -e 's/.cpp/.o/' ` >>./.depend; \
 	done
 
+depend: .depend
+
+# Include only if the goal needs it
+ifeq ($(filter $(MAKECMDGOALS),$(MAKEFILE_TARGETS_WITHOUT_INCLUDE)),)
 -include .depend
-
-#-------------------------------------------------
-# Special targets
-#-------------------------------------------------
-
-.PHONY: clang
-clang: 
-	$(MAKE) CC=clang++ LD=clang++ CEXTRAFLAGS="-Weverything -Werror -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-cast-align -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-exit-time-destructors -Wno-format-nonliteral -Wno-weak-template-vtables"
-
-# 
-# FIX:  -Wno-weak-vtables -Wno-missing-variable-declarations -Wno-conversion -Wno-exit-time-destructors 
-# 
+endif
 
 #-------------------------------------------------
 # generic rules
@@ -188,5 +203,3 @@ $(OBJ)/%.a:
 	@echo Archiving $@...
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ $^
-
-

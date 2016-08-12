@@ -347,8 +347,8 @@ WRITE16_MEMBER(gambl186_state::upd_w)
 //  m_upd7759->reset_w(0);
 //  m_upd7759->reset_w(1);
 
-//  if (mem_mask&0x00ff) m_upd7759->port_w(space, 0, data & 0xff);
-//  if (mem_mask&0xff00) m_upd7759->port_w(space, 0, (data >> 8) & 0xff);
+//  if (ACCESSING_BITS_0_7) m_upd7759->port_w(space, 0, data & 0xff);
+//  if (ACCESSING_BITS_8_15) m_upd7759->port_w(space, 0, (data >> 8) & 0xff);
 	data = (data >> 8);
 	popmessage("sample index: %02x", data);
 

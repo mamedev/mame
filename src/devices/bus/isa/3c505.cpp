@@ -326,7 +326,7 @@ ioport_constructor threecom3c505_device::device_input_ports() const
 	return INPUT_PORTS_NAME( tc3c505_port );
 }
 
-const rom_entry *threecom3c505_device::device_rom_region() const
+const tiny_rom_entry *threecom3c505_device::device_rom_region() const
 {
 	return ROM_NAME( threecom3c505 );
 }

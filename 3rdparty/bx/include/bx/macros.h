@@ -63,7 +63,7 @@
 #if BX_COMPILER_GCC || BX_COMPILER_CLANG
 #	define BX_ALIGN_DECL(_align, _decl) _decl __attribute__( (aligned(_align) ) )
 #	define BX_ALLOW_UNUSED __attribute__( (unused) )
-#	define BX_FORCE_INLINE __extension__ static __inline __attribute__( (__always_inline__) )
+#	define BX_FORCE_INLINE inline __attribute__( (__always_inline__) )
 #	define BX_FUNCTION __PRETTY_FUNCTION__
 #	define BX_LIKELY(_x)   __builtin_expect(!!(_x), 1)
 #	define BX_UNLIKELY(_x) __builtin_expect(!!(_x), 0)
@@ -71,7 +71,7 @@
 #	define BX_NO_RETURN __attribute__( (noreturn) )
 #	define BX_NO_VTABLE
 #	define BX_OVERRIDE
-#	define BX_PRINTF_ARGS(_format, _args) __attribute__ ( (format(__printf__, _format, _args) ) )
+#	define BX_PRINTF_ARGS(_format, _args) __attribute__( (format(__printf__, _format, _args) ) )
 #	if BX_CLANG_HAS_FEATURE(cxx_thread_local)
 #		define BX_THREAD_LOCAL __thread
 #	endif // BX_COMPILER_CLANG
@@ -79,9 +79,9 @@
 #		define BX_THREAD_LOCAL __thread
 #	endif // BX_COMPILER_GCC
 #	define BX_ATTRIBUTE(_x) __attribute__( (_x) )
-#	if BX_COMPILER_MSVC_COMPATIBLE
+#	if BX_CRT_MSVC
 #		define __stdcall
-#	endif // BX_COMPILER_MSVC_COMPATIBLE
+#	endif // BX_CRT_MSVC
 #elif BX_COMPILER_MSVC
 #	define BX_ALIGN_DECL(_align, _decl) __declspec(align(_align) ) _decl
 #	define BX_ALLOW_UNUSED

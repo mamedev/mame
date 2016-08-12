@@ -236,13 +236,13 @@ WRITE32_MEMBER(polygonet_state::shared_ram_write)
 	}
 
 	/* write to the current dsp56k word */
-	if (mem_mask & 0xffff0000)
+	if (ACCESSING_BITS_16_31)
 	{
 		m_dsp56k_shared_ram_16[(offset<<1)] = (m_shared_ram[offset] & 0xffff0000) >> 16 ;
 	}
 
 	/* write to the next dsp56k word */
-	if (mem_mask & 0x0000ffff)
+	if (ACCESSING_BITS_0_15)
 	{
 		m_dsp56k_shared_ram_16[(offset<<1)+1] = (m_shared_ram[offset] & 0x0000ffff) ;
 	}

@@ -12,7 +12,7 @@ ROM_START( pcd_keyboard )
 ROM_END
 
 
-const rom_entry *pcd_keyboard_device::device_rom_region() const
+const tiny_rom_entry *pcd_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME( pcd_keyboard );
 }

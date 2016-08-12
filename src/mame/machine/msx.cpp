@@ -361,12 +361,11 @@ READ8_MEMBER( msx_state::msx_ppi_port_b_r )
 {
 	UINT8 result = 0xff;
 	int row, data;
-	ioport_port *keynames[] = { m_io_key0, m_io_key1, m_io_key2, m_io_key3, m_io_key4, m_io_key5 };
 
 	row = m_keylatch;
 	if (row <= 10)
 	{
-		data = keynames[row / 2]->read();
+		data = m_io_key[row / 2]->read();
 
 		if (BIT(row, 0))
 			data >>= 8;

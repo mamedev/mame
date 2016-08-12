@@ -110,13 +110,12 @@
 
 UINT8 sc4_state::read_input_matrix(int row)
 {
-	ioport_port* portnames[16] = { m_io1, m_io2, m_io3, m_io4, m_io5, m_io6, m_io7, m_io8, m_io9, m_io10, m_io11, m_io12 };
 	UINT8 value;
 
 	if (row<4)
-		value = (read_safe(portnames[row], 0x00) & 0x1f) + ((read_safe(portnames[row+8], 0x00) & 0x07) << 5);
+		value = (m_io_ports[row].read_safe(0x00) & 0x1f) + ((m_io_ports[row+8].read_safe(0x00) & 0x07) << 5);
 	else
-		value = (read_safe(portnames[row], 0x00) & 0x1f) + ((read_safe(portnames[row+4], 0x00) & 0x18) << 2);
+		value = (m_io_ports[row].read_safe(0x00) & 0x1f) + ((m_io_ports[row+4].read_safe(0x00) & 0x18) << 2);
 
 	return value;
 }
@@ -206,12 +205,12 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 				if (addr < 0x0080)
 				{
 					UINT16 retvalue = 0x0000;
-					if (mem_mask&0xff00)
+					if (ACCESSING_BITS_8_15)
 					{
 						logerror("mem_mask&0xff00 unhandled\n");
 					}
 
-					if (mem_mask&0x00ff)
+					if (ACCESSING_BITS_0_7)
 					{
 						retvalue = read_input_matrix((addr & 0x00f0)>>4);
 					}
@@ -382,12 +381,12 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 
 				if (addr < 0x0200)
 				{
-					if (mem_mask&0xff00)
+					if (ACCESSING_BITS_8_15)
 					{
 						logerror("lamp write mem_mask&0xff00 unhandled\n");
 					}
 
-					if (mem_mask&0x00ff)
+					if (ACCESSING_BITS_0_7)
 					{   // lamps
 						mux_output_w(space, (addr & 0x01f0)>>4, data);
 					}
@@ -395,12 +394,12 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 				}
 				else if ((addr >= 0x1000) && (addr < 0x1200))
 				{
-					if (mem_mask&0xff00)
+					if (ACCESSING_BITS_8_15)
 					{
 						logerror("lamp write mem_mask&0xff00 unhandled\n");
 					}
 
-					if (mem_mask&0x00ff)
+					if (ACCESSING_BITS_0_7)
 					{   // lamps
 						mux_output2_w(space, (addr & 0x01f0)>>4, data);
 					}
@@ -1645,7 +1644,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4)
 
 
 	// debug helpers to find strings used for inputs and where the buttons map
-	bfm_sc45_layout_helper(machine());
+//	bfm_sc45_layout_helper(machine());
 
 }
 

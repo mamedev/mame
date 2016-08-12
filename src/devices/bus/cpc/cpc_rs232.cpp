@@ -65,12 +65,12 @@ machine_config_constructor cpc_rs232_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( cpc_rs232 );
 }
 
-const rom_entry *cpc_rs232_device::device_rom_region() const
+const tiny_rom_entry *cpc_rs232_device::device_rom_region() const
 {
 	return ROM_NAME( cpc_rs232 );
 }
 
-const rom_entry *cpc_ams_rs232_device::device_rom_region() const
+const tiny_rom_entry *cpc_ams_rs232_device::device_rom_region() const
 {
 	return ROM_NAME( cpc_rs232_ams );
 }

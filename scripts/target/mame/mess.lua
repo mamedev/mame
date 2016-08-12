@@ -260,6 +260,8 @@ SOUNDS["ESQPUMP"] = true
 SOUNDS["VRC6"] = true
 SOUNDS["UPD1771"] = true
 SOUNDS["GB_SOUND"] = true
+SOUNDS["PCD3311"] = true
+
 --------------------------------------------------
 -- specify available video cores
 --------------------------------------------------

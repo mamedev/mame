@@ -208,22 +208,22 @@ machine_config_constructor dmv_k235_device::device_mconfig_additions() const
 //  device_rom_region
 //-------------------------------------------------
 
-const rom_entry *dmv_k230_device::device_rom_region() const
+const tiny_rom_entry *dmv_k230_device::device_rom_region() const
 {
 	return ROM_NAME( dmv_k230 );
 }
 
-const rom_entry *dmv_k231_device::device_rom_region() const
+const tiny_rom_entry *dmv_k231_device::device_rom_region() const
 {
 	return ROM_NAME( dmv_k231 );
 }
 
-const rom_entry *dmv_k234_device::device_rom_region() const
+const tiny_rom_entry *dmv_k234_device::device_rom_region() const
 {
 	return nullptr;
 }
 
-const rom_entry *dmv_k235_device::device_rom_region() const
+const tiny_rom_entry *dmv_k235_device::device_rom_region() const
 {
 	return ROM_NAME( dmv_k235 );
 }

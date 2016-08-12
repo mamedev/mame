@@ -39,7 +39,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *ibm_pc_83_keyboard_device::device_rom_region() const
+const tiny_rom_entry *ibm_pc_83_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME( ibm_pc_83_keyboard );
 }

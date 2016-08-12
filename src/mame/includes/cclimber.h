@@ -75,6 +75,7 @@ public:
 	DECLARE_DRIVER_INIT(cannonb2);
 	DECLARE_DRIVER_INIT(cannonb);
 	DECLARE_DRIVER_INIT(dking);
+	DECLARE_DRIVER_INIT(rpatrol);
 	DECLARE_MACHINE_RESET(cclimber);
 	DECLARE_VIDEO_START(cclimber);
 	DECLARE_PALETTE_INIT(cclimber);
@@ -105,4 +106,5 @@ public:
 	void cclimber_decode(const UINT8 convtable[8][16]);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	INTERRUPT_GEN_MEMBER(bagmanf_vblank_irq);
 };

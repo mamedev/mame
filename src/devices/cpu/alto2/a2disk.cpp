@@ -61,22 +61,6 @@
 #define GET_KCOM_SENDADR(kcom)          X_RDBITS(kcom,16,5,5)               //!< get send address flag from controller command (hardware command register)
 #define PUT_KCOM_SENDADR(kcom,val)      X_WRBITS(kcom,16,5,5,val)           //!< put send address flag into controller command (hardware command register)
 
-#if defined(ALTO2_FAKE_STATUS_H) && (ALTO2_FAKE_STATUS_H > 0)
-#define STATUS_DP0  28
-#define STATUS_DP1  58
-#define STATUS_RGATE    0, "%c"
-#define STATUS_WGATE    1, "%c"
-#define STATUS_KWRC     2, "%c"
-#define STATUS_CYL      4, "C%03d"
-#define STATUS_HEAD     9, "H%d"
-#define STATUS_SECT     12, "S%02d"
-#define STATUS_PAGE     16, "[%04d]"
-#define FAKE_STATUS(_unit,_which,...) do { \
-	int x = (_unit) ? STATUS_DP1 : STATUS_DP0; \
-	fake_status_printf(x + _which, __VA_ARGS__); \
-} while (0)
-#endif
-
 /** @brief completion codes (only for documentation, since this is microcode defined) */
 enum {
 	STATUS_COMPLETION_GOOD,
@@ -769,8 +753,6 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		dhd->set_egate(m_dsk.egate = 1);
 		dhd->set_wrgate(m_dsk.wrgate = 1);
 		dhd->set_rdgate(m_dsk.rdgate = 1);
-		FAKE_STATUS(m_dsk.drive, STATUS_WGATE, '-');
-		FAKE_STATUS(m_dsk.drive, STATUS_RGATE, '-');
 	} else {
 		if (m_dsk.krwc & RWC_WRITE) {
 			if (m_dsk.ok_to_run) {
@@ -789,7 +771,6 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 				// assert erase and write gates
 				dhd->set_egate(m_dsk.egate = 0);
 				dhd->set_wrgate(m_dsk.wrgate = 0);
-				FAKE_STATUS(m_dsk.drive, STATUS_WGATE, 'W');
 			}
 		} else {
 #if ALTO2_DEBUG
@@ -799,7 +780,6 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 #endif
 			// assert read gate
 			dhd->set_rdgate(m_dsk.rdgate = 0);
-			FAKE_STATUS(m_dsk.drive, STATUS_RGATE, 'R');
 		}
 	}
 
@@ -920,8 +900,6 @@ void alto2_cpu_device::disk_strobon(void* ptr, INT32 arg)
 	} else {
 		m_dsk.strobon_timer->reset();
 	}
-	FAKE_STATUS(unit, STATUS_CYL, dhd->get_cylinder());
-	FAKE_STATUS(unit, STATUS_HEAD, dhd->get_head());
 }
 
 /** @brief timer callback to change the READY monoflop 31a */
@@ -1182,7 +1160,6 @@ void alto2_cpu_device::f1_late_increcno()
 		break;
 	}
 	// TODO: show disk indicator
-	FAKE_STATUS(m_dsk.drive, STATUS_KWRC, "HPLD"[m_dsk.krecno]);
 }
 
 /**
@@ -1643,14 +1620,6 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 		kwd_timing(clk, bit, 0);
 	}
 
-#if USE_BITCLK_TIMER
-	/* more bits to clock? */
-	if (++arg < dhd->bits_per_sector()) {
-		m_dsk.bitclk_timer->adjust(dhd->bit_time(), arg);
-	} else {
-		m_dsk.bitclk_timer->reset();
-	}
-#else
 	if (++arg < dhd->bits_per_sector()) {
 		m_bitclk_time += m_dsk.bitclk_time[m_dsk.drive];
 		m_bitclk_index = arg;
@@ -1658,7 +1627,6 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 		// stop the bitclock timer
 		m_bitclk_time = -1;
 	}
-#endif
 }
 
 /**
@@ -1672,16 +1640,11 @@ void alto2_cpu_device::next_sector(int unit)
 	LOG((this,LOG_DISK,0,"%s dhd=%p\n", __FUNCTION__, dhd));
 	// get bit time in pico seconds
 	m_dsk.bitclk_time[unit] = static_cast<int>(dhd->bit_time().as_attoseconds() / 1000000);
-#if USE_BITCLK_TIMER
-	LOG((this,LOG_DISK,0,"   unit #%d stop bitclk\n", unit));
-	m_dsk.bitclk_timer->enable(false);
-#else
 	if (m_bitclk_time >= 0) {
 		LOG((this,LOG_DISK,0,"   unit #%d stop bitclk\n", unit));
 		m_bitclk_time = -1;
 		m_bitclk_index = -1;
 	}
-#endif
 
 	/* KSTAT[0-3] update the current sector in the kstat field */
 	PUT_KSTAT_SECTOR(m_dsk.kstat, dhd->get_sector());
@@ -1692,12 +1655,6 @@ void alto2_cpu_device::next_sector(int unit)
 
 	LOG((this,LOG_DISK,1,"   unit #%d sector %d start\n", unit, GET_KSTAT_SECTOR(m_dsk.kstat)));
 
-#if USE_BITCLK_TIMER
-	// HACK: no command, no bit clock
-	if (debug_read_mem(0521))
-		/* start a timer chain for the bit clock */
-		disk_bitclk(0, 0);
-#else
 	// TODO: verify current sector == requested sector and only then run the bitclk?
 	// HACK: no command, no bit clock
 	if (debug_read_mem(0521))
@@ -1706,14 +1663,6 @@ void alto2_cpu_device::next_sector(int unit)
 		m_bitclk_time = 0;
 		m_bitclk_index = 0;
 	}
-#endif
-#if defined(ALTO2_FAKE_STATUS_H) && (ALTO2_FAKE_STATUS_H > 0)
-	if (debug_read_mem(0521) && unit == GET_KADDR_DRIVE(debug_read_mem(0523)))
-	{
-		FAKE_STATUS(unit, STATUS_SECT, dhd->get_sector());
-		FAKE_STATUS(unit, STATUS_PAGE, dhd->get_page());
-	}
-#endif
 }
 
 /**
@@ -1799,10 +1748,6 @@ void alto2_cpu_device::init_disk()
 
 	m_dsk.kcom = 066000;
 
-#if USE_BITCLK_TIMER
-	m_dsk.bitclk_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_bitclk),this));
-#endif
-
 	m_dsk.strobon_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_strobon),this));
 	m_dsk.strobon_timer->reset();
 
@@ -1851,12 +1796,8 @@ void alto2_cpu_device::reset_disk()
 	m_dsk.strobe = 0;
 	m_dsk.strobon_timer->reset();
 	m_dsk.bitclk = 0;
-#if USE_BITCLK_TIMER
-	m_dsk.bitclk_timer->reset();
-#else
 	m_dsk.bitclk_time[0] = static_cast<int>(attotime::from_nsec(300).as_attoseconds() / 1000000);
 	m_dsk.bitclk_time[1] = static_cast<int>(attotime::from_nsec(300).as_attoseconds() / 1000000);
-#endif
 	m_dsk.datin = 0;
 	m_dsk.bitcount = 0;
 	m_dsk.seclate = 0;
@@ -1880,16 +1821,4 @@ void alto2_cpu_device::reset_disk()
 	m_dsk.ff_44b = JKFF_0;
 	m_dsk.ff_45a = JKFF_0;
 	m_dsk.ff_45b = JKFF_0;
-
-#if defined(ALTO2_FAKE_STATUS_H) && (ALTO2_FAKE_STATUS_H > 0)
-	for (int unit = 0; unit < 2; unit++) {
-		FAKE_STATUS(unit, STATUS_RGATE, '-');
-		FAKE_STATUS(unit, STATUS_WGATE, '-');
-		FAKE_STATUS(unit, STATUS_KWRC, '-');
-		FAKE_STATUS(unit, STATUS_CYL, 0);
-		FAKE_STATUS(unit, STATUS_HEAD, 0);
-		FAKE_STATUS(unit, STATUS_SECT, 0);
-		FAKE_STATUS(unit, STATUS_PAGE, 0);
-	}
-#endif
 }

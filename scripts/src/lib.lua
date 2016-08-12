@@ -48,8 +48,6 @@ project "utils"
 		MAME_DIR .. "src/lib/util/corestr.h",
 		MAME_DIR .. "src/lib/util/coreutil.cpp",
 		MAME_DIR .. "src/lib/util/coreutil.h",
-		MAME_DIR .. "src/lib/util/cstrpool.cpp",
-		MAME_DIR .. "src/lib/util/cstrpool.h",
 		MAME_DIR .. "src/lib/util/delegate.cpp",
 		MAME_DIR .. "src/lib/util/delegate.h",
 		MAME_DIR .. "src/lib/util/flac.cpp",

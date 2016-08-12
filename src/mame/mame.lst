@@ -1223,7 +1223,6 @@ apple2gsr0                      // Sep 1986 Apple IIgs ROM00
 apple2gsr0p                     // June 19, 1986 Apple IIgs ROM00 prototype
 apple2gsr0p2                    // March 10, 1986 Apple IIgs ROM00 prototype
 apple2gsr1                      // Sep 1987 Apple IIgs ROM01
-apple2gsr3lp                    // ??? 1989 Apple IIgs ROM03 late? prototype
 apple2gsr3p                     // ??? 198? Apple IIgs ROM03 prototype
 
 @source:apple3.cpp
@@ -9364,7 +9363,8 @@ ollie                           // 2004.03 Ollie King
 outr2                           // 2003.12 Outrun 2 (Rev A)
 outr2st                         // 2004.12 Outrun 2 Special Tours (Rev A)
 scg06nt                         // 2005.12 Sega Golf Club 2006: Next Tours (Rev A)
-vcop3                           // 2003.02.26 Virtua Cop 3 (Rev A)
+vcop3a                          // 2003.02.26 Virtua Cop 3 (Rev A)
+vcop3                           // 2003.05.21 Virtua Cop 3 (Rev B)
 wangmid                         // 2004.07 Wangan Midnight Maximum Tune (export) (Rev B)
 wangmid2                        // 2005.10 Wangan Midnight Maximum Tune 2 (Export) (Rev A)
 wangmid2j                       // 2005.04 Wangan Midnight Maximum Tune 2 (Japan)
@@ -10286,9 +10286,9 @@ psattack                        // 2004 Uniana
 topbladv                        // 2002 Sonokong. Top Blade V
 trivrus                         // 2009 AGT. Trivia R Us
 
-@source:cshooter.cpp
+@source:airraid.cpp
 airraid                         // (c) 1987 Seibu Kaihatsu
-cshootere                       // (c) 1987 JKH (bootleg)
+cshooter                        // (c) 1987 JKH (bootleg)
 
 @source:csplayh5.cpp
 bikiniko                        // (c) 1999
@@ -11179,7 +11179,6 @@ dvk_kcgd                        //
 
 @source:dvk_ksm.cpp
 dvk_ksm                         //
-dvk_ksm01                       //
 
 @source:dwarfd.cpp
 dwarfd                          // (c) 198? Electro-Sports
@@ -22679,6 +22678,7 @@ m4vivalv__5                     //
 m4vivalv__6                     //
 m4vivalv__7                     //
 m4vivalv__8                     //
+m4vivalv__9                     //
 m4vivalv__a                     //
 m4vivalv__b                     //
 m4vivalv__c                     //
@@ -25949,7 +25949,6 @@ m4vegast__s                     //
 m4vegast__t                     //
 m4vegast__u                     //
 m4vegast__v                     //
-m4vegast__w                     //
 m4vegast__x                     //
 m4vivaes                        // Viva Espana (Barcrest)
 m4vivaes__0                     //
@@ -25964,7 +25963,6 @@ m4vivaes__8                     //
 m4vivaes__9                     //
 m4vivaes__a                     //
 m4vivaes__aa                    //
-m4vivaes__ab                    //
 m4vivaes__ac                    //
 m4vivaes__ad                    //
 m4vivaes__ae                    //
@@ -25979,6 +25977,7 @@ m4vivaes__am                    //
 m4vivaes__an                    //
 m4vivaes__ao                    //
 m4vivaes__ap                    //
+m4vivaes__aq                    //
 m4vivaes__b                     //
 m4vivaes__c                     //
 m4vivaes__d                     //
@@ -27472,7 +27471,8 @@ gaiapols                        // GX123 (c) 1993 (Europe)
 gaiapolsj                       // GX123 (c) 1993 (Japan)
 gaiapolsu                       // GX123 (c) 1993 (US)
 metamrph                        // GX224 (c) 1993 (Europe)
-metamrpha                       // GX224 (c) 1993 (Europe) - Alternate
+metamrpha                       // GX224 (c) 1993 (Asia)
+metamrphe                       // GX224 (c) 1993 (Europe) - Alternate
 metamrphj                       // GX224 (c) 1993 (Japan)
 metamrphu                       // GX224 (c) 1993 (US)
 mmaulers                        // GX170 (c) 1993 (Europe)
@@ -33864,7 +33864,7 @@ st_ohla                         //
 st_vulkn                        //
 
 @source:stfight.cpp
-cshooter                        // (c) 1987 Taito
+cshootert                       // (c) 1987 Taito
 empcity                         // (c) 1986 Seibu Kaihatsu (bootleg?)
 empcityi                        // (c) 1986 Seibu Kaihatsu (Eurobed license)
 empcityj                        // (c) 1986 Taito Corporation (Japan)
@@ -35385,11 +35385,12 @@ kageki                          // B35 (c) 1988 Taito America Corporation + Roms
 kagekih                         // B35 (c) 1992 (hack)
 kagekij                         // B35 (c) 1988 Taito Corporation (Japan)
 plumppop                        // A98 (c) 1987 Taito Corporation (Japan)
-tnzs                            // B53 (c) 1988 Taito Corporation Japan (World) (new logo)
-tnzsj                           // B53 (c) 1988 Taito Corporation (Japan) (new logo)
-tnzsjo                          // B53 (c) 1988 Taito Corporation (Japan) (new logo)
-tnzso                           // B53 (c) 1988 Taito Corporation Japan (World) (old logo)
-tnzsop                          // B53?(c) 1988 Taito Corporation Japan (World) (old logo)
+tnzs                            // B53 (c) 1988 Taito Corporation Japan (World) (new pcb)
+tnzsj                           // B53 (c) 1988 Taito Corporation (Japan) (new pcb)
+tnzsjo                          // B53 (c) 1988 Taito Corporation (Japan) (old pcb)
+tnzsuo                          // B53 (c) 1988 Taito America Corporation (US) (old pcb)
+tnzso                           // B53 (c) 1988 Taito Corporation Japan (World) (old pcb)
+tnzsop                          // B53?(c) 1988 Taito Corporation Japan (World?) (old pcb, prototype)
 
 @source:toaplan1.cpp
 demonwld                        // TP-O16 (c) 1990 Toaplan (+ Taito license when set to Japan)
@@ -35577,7 +35578,7 @@ avalnc12                        // 2004.03 The Key Of Avalon 1.20 - Summon The N
 avalnc13                        // 2004.06.08 The Key Of Avalon 1.30 - Chaotic Sabbat (client) (Rev C)
 avalns12                        // 2004.03 The Key Of Avalon 1.20 - Summon The New Monsters (server) (Rev A)
 avalns13                        // 2004.06.08 The Key Of Avalon 1.30 - Chaotic Sabbat (server) (Rev C)
-avalon20                        // 2004.11.02 The Key Of Avalon 2 - Eutaxy Commandment (client) (Rev B)
+avalon20                        // 2004.11.02 The Key Of Avalon 2.0 - Eutaxy Commandment (client) (Rev B)
 avalonc                         // 2003.11 The Key Of Avalon: The Wizard Master (client) (Rev G)
 avalonce                        // 2003.08 The Key Of Avalon: The Wizard Master (client) (Rev E)
 avaloncf                        // 2003.09 The Key Of Avalon: The Wizard Master (client) (Rev F)
@@ -35585,6 +35586,8 @@ avalons                         // 2003.11 The Key Of Avalon: The Wizard Master 
 avalonsc                        // 2003.07 The Key Of Avalon: The Wizard Master (server) (Rev C)
 avalonse                        // 2003.08 The Key Of Avalon: The Wizard Master (server) (Rev E)
 avalonsf                        // 2003.09 The Key Of Avalon: The Wizard Master (server) (Rev F)
+avalns25                        // 2005.08 The Key Of Avalon 2.5 - War of the Key (server) (Rev B)
+avalnc25                        // 2005.08 The Key Of Avalon 2.5 - War of the Key (client) (Rev B)
 fzeroax                         // 2003.12 F-Zero AX (Rev E)
 fzeroaxc                        // 2003.06.11 F-Zero AX (Rev C)
 gekpurya                        // 2003.10 Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu (Rev C)

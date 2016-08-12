@@ -12,7 +12,6 @@
 
 #include "pconfig.h"
 #include "pstring.h"
-#include "palloc.h"
 #include "pfmtlog.h"
 
 namespace plib {

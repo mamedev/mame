@@ -75,7 +75,7 @@ at_keyboard_controller_device::at_keyboard_controller_device(const machine_confi
 //  internal ROM region
 //-------------------------------------------------
 
-const rom_entry *at_keyboard_controller_device::device_rom_region() const
+const tiny_rom_entry *at_keyboard_controller_device::device_rom_region() const
 {
 	return ROM_NAME(at_keybc);
 }

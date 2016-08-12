@@ -334,7 +334,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(napple2_state::apple2_interrupt)
 		m_video->m_sysconfig = m_sysconfig->read();
 
 		// check reset
-		if (m_resetdip) // if reset DIP is present, use it
+		if (m_resetdip.found()) // if reset DIP is present, use it
 		{
 			if (m_resetdip->read() & 1)
 			{       // CTRL-RESET

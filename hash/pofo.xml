@@ -7,7 +7,6 @@
     Utility-Card                HPC-701
     Finance-Card                HPC-702
     Science-Card                HPC-703
-    File Manager / Tutorial     HPC-704
     PowerBASIC                  HPC-705
     Instant Spell               HPC-709
     Hyperlist                   HPC-713
@@ -50,4 +49,18 @@
     Timekeeper
     TIMEPAC-5
 -->
+
+    <software name="fileman">
+        <description>File Manager/Tutorial</description>
+        <year>1990</year>
+        <publisher>Atari</publisher>
+        <info name="serial" value="HPC-704" />
+
+        <part name="card" interface="pofo_card">
+            <dataarea name="rom" size="0x20000">
+                <rom name="ca400702-001 rev. b" size="0x20000" crc="924ab9f5" sha1="9b0de07a28ce058fc125d4fd7ea65074440d8393" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
 </softwarelist>

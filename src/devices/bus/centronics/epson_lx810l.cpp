@@ -71,7 +71,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *epson_lx810l_t::device_rom_region() const
+const tiny_rom_entry *epson_lx810l_t::device_rom_region() const
 {
 	return ROM_NAME( lx810l );
 }
@@ -81,7 +81,7 @@ const rom_entry *epson_lx810l_t::device_rom_region() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *epson_ap2000_t::device_rom_region() const
+const tiny_rom_entry *epson_ap2000_t::device_rom_region() const
 {
 	return ROM_NAME( ap2000 );
 }

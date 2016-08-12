@@ -12,6 +12,7 @@
 #define HARDDRIV_H
 
 #include "harddisk.h"
+#include "softlist_dev.h"
 
 /***************************************************************************
     TYPE DEFINITIONS

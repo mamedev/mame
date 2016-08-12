@@ -26,7 +26,7 @@
 #include "cpu/m68000/m68000.h"
 #include "render.h"
 #include "includes/amiga.h"
-#include "machine/ldstub.h"
+#include "machine/ldp1450.h"
 #include "machine/nvram.h"
 #include "machine/amigafdc.h"
 
@@ -87,8 +87,8 @@ int alg_state::get_lightgun_pos(int player, int *x, int *y)
 {
 	const rectangle &visarea = m_screen->visible_area();
 
-	int xpos = (player == 0) ? m_gun1x->read() : (m_gun2x ? m_gun2x->read() : 0xffffffff);
-	int ypos = (player == 0) ? m_gun1y->read() : (m_gun2y ? m_gun2y->read() : 0xffffffff);
+	int xpos = (player == 0) ? m_gun1x->read() : m_gun2x.read_safe(0xffffffff);
+	int ypos = (player == 0) ? m_gun1y->read() : m_gun2y.read_safe(0xffffffff);
 
 	if (xpos == -1 || ypos == -1)
 		return FALSE;
@@ -306,7 +306,7 @@ static MACHINE_CONFIG_START( alg_r1, alg_state )
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(ntsc_video)
 
-	MCFG_LASERDISC_LDP1450_ADD("laserdisc")
+	MCFG_LASERDISC_LDP1450_ADD("laserdisc",9600)
 	MCFG_LASERDISC_SCREEN("screen")
 	MCFG_LASERDISC_OVERLAY_DRIVER(512*2, 262, amiga_state, screen_update_amiga)
 	MCFG_LASERDISC_OVERLAY_CLIP((129-8)*2, (449+8-1)*2, 44-8, 244+8-1)

@@ -1352,6 +1352,7 @@ if (SOUNDS["UPD1771"]~=null) then
 		MAME_DIR .. "src/devices/sound/upd1771.h",
 	}
 end
+
 ---------------------------------------------------
 -- GB_SOUND
 --@src/devices/sound/gb.h,SOUNDS["GB_SOUND"] = true
@@ -1361,5 +1362,17 @@ if (SOUNDS["GB_SOUND"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/gb.cpp",
 		MAME_DIR .. "src/devices/sound/gb.h",
+	}
+end
+
+---------------------------------------------------
+-- PCD3311
+--@src/devices/sound/gb.h,SOUNDS["PCD3311"] = true
+---------------------------------------------------
+
+if (SOUNDS["PCD3311"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/pcd3311.cpp",
+		MAME_DIR .. "src/devices/sound/pcd3311.h",
 	}
 end

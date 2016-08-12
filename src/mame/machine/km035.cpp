@@ -81,7 +81,7 @@ machine_config_constructor km035_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( km035 );
 }
 
-const rom_entry *km035_device::device_rom_region() const
+const tiny_rom_entry *km035_device::device_rom_region() const
 {
 	return ROM_NAME( km035 );
 }

@@ -28,6 +28,15 @@ void alto2_cpu_device::f2_late_load_xpreg()
 
 /**
  * @brief f2_load_csr late: load the cursor shift register from BUS[0-15]
+ */
+void alto2_cpu_device::f2_late_load_csr()
+{
+	m_dsp.csr = m_bus;
+	LOG((this,LOG_CURT, m_dsp.csr ? 2 : 9,"  CSR<- BUS (%#o)\n", m_dsp.csr));
+}
+
+/**
+ * @brief curt_activate: called by the CPU when the cursor task becomes active
  *
  * Shift CSR to xpreg % 16 position to make it easier to
  * to handle the word xor in unload_word().
@@ -42,15 +51,6 @@ void alto2_cpu_device::f2_late_load_xpreg()
  *    14        00000000000000xxxxxxxxxxxxxxxx00
  *    15        000000000000000xxxxxxxxxxxxxxxx0
  * </PRE>
- */
-void alto2_cpu_device::f2_late_load_csr()
-{
-	m_dsp.csr = m_bus;
-	LOG((this,LOG_CURT, m_dsp.csr ? 2 : 9,"  CSR<- BUS (%#o)\n", m_dsp.csr));
-}
-
-/**
- * @brief curt_activate: called by the CPU when the cursor task becomes active
  */
 void alto2_cpu_device::activate_curt()
 {
@@ -67,10 +67,6 @@ void alto2_cpu_device::activate_curt()
 /** @brief initialize the cursor task F1 and F2 functions */
 void alto2_cpu_device::init_curt(int task)
 {
-	set_f1(task, f1_block,              &alto2_cpu_device::f1_early_curt_block, nullptr);
-	set_f2(task, f2_curt_load_xpreg,    nullptr, &alto2_cpu_device::f2_late_load_xpreg);
-	set_f2(task, f2_curt_load_csr,      nullptr, &alto2_cpu_device::f2_late_load_csr);
-	m_active_callback[task] = &alto2_cpu_device::activate_curt;
 }
 
 void alto2_cpu_device::exit_curt()

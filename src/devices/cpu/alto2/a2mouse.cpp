@@ -120,8 +120,8 @@ UINT16 alto2_cpu_device::mouse_read()
 		break;
 	case 1:
 		m_mouse.latch |= MACTIVE;
-		m_mouse.x -= SIGN(m_mouse.x - m_mouse.dx);
-		m_mouse.y -= SIGN(m_mouse.y - m_mouse.dy);
+		m_mouse.x += SIGN(m_mouse.dx - m_mouse.x);
+		m_mouse.y += SIGN(m_mouse.dy - m_mouse.y);
 		break;
 	case 2:
 		m_mouse.latch ^= MOVEX(m_mouse.dx - m_mouse.x);
@@ -129,8 +129,8 @@ UINT16 alto2_cpu_device::mouse_read()
 		break;
 	case 3:
 		m_mouse.latch |= MACTIVE;
-		m_mouse.x -= SIGN(m_mouse.x - m_mouse.dx);
-		m_mouse.y -= SIGN(m_mouse.y - m_mouse.dy);
+		m_mouse.x += SIGN(m_mouse.dx - m_mouse.x);
+		m_mouse.y += SIGN(m_mouse.dy - m_mouse.y);
 	}
 	m_mouse.phase = (m_mouse.phase + 1) % 4;
 	return data;
@@ -145,10 +145,9 @@ UINT16 alto2_cpu_device::mouse_read()
  */
 INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_x )
 {
-	// set new destination (absolute) mouse x coordinate
-	INT32 x = m_mouse.dx + newval - oldval;
-	x = x < 0 ? 0 : x > 605 ? 605 : x;
-	m_mouse.dx = x;
+	INT16 ox = static_cast<INT16>(oldval);
+	INT16 nx = static_cast<INT16>(newval);
+	m_mouse.dx = std::min(std::max(0, m_mouse.dx + (nx - ox)), 639);
 }
 
 /**
@@ -160,10 +159,9 @@ INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_x )
  */
 INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_y )
 {
-	// set new destination (absolute) mouse y coordinate
-	INT32 y = m_mouse.dy + newval - oldval;
-	y = y < 0 ? 0 : y > 807 ? 807 : y;
-	m_mouse.dy = y;
+	INT16 oy = static_cast<INT16>(oldval);
+	INT16 ny = static_cast<INT16>(newval);
+	m_mouse.dy = std::min(std::max(0, m_mouse.dy + (ny - oy)), 824);
 }
 
 /**

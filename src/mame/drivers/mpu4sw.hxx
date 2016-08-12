@@ -506,13 +506,19 @@ GAME_CUSTOM( 199?, m4andyge_h4,        m4andyge,   "age20_101",                0
 // I think this is a mod2, but because it doesn't boot I haven't moved it to mpu4mod2sw.c yet
 
 // "(C)1991 BARCREST"  and "A6L 0.1"
-GAME_CUSTOM( 1991, m4addr,       0,      "a6ls.p1",                  0x0000, 0x010000, CRC(9f97f57b) SHA1(402d1518bb78fdc489b06c2aabc771e5ce151847), "Barcrest","Adders & Ladders (Barcrest) (MPU4) (A6L 0.1)" )
+GAME_CUSTOM( 1991, m4addr,       0,      "a6ls.p1",                  0x0000, 0x010000, CRC(9f97f57b) SHA1(402d1518bb78fdc489b06c2aabc771e5ce151847), "Barcrest","Adders & Ladders (Barcrest) (MPU4) (A6L 0.1, set 1)" )
+GAME_CUSTOM( 199?, m4addrc__d,   m4addr, "alddr20",                  0x0000, 0x010000, CRC(19cf4437) SHA1(b528823c476bebd1a9a6c720a4144294743693d2), "Barcrest","Adders & Ladders (Barcrest) (MPU4) (A6L 0.1, set 2)" ) // hack?
 GAME_CUSTOM( 1991, m4addr6ld,    m4addr, "a6ld.p1",                  0x0000, 0x010000, CRC(de555e12) SHA1(2233160f1c734c889c1c00dee202a928f18ad763), "Barcrest","Adders & Ladders (Barcrest) (MPU4) (A6L 0.1D)" )
 GAME_CUSTOM( 1991, m4addr6lc,    m4addr, "a6lc.p1",                  0x0000, 0x010000, CRC(1e75fe67) SHA1(4497b19d4c512c934d445b4acf607dc2dc080d44), "Barcrest","Adders & Ladders (Barcrest) (MPU4) (A6L 0.1C)" )
 GAME_CUSTOM( 1991, m4addr6lk,    m4addr, "a6lk.p1",                  0x0000, 0x010000, CRC(af5ae5c4) SHA1(20e40cf996c2c3b7b18ec104a374be1da193b94e), "Barcrest","Adders & Ladders (Barcrest) (MPU4) (A6L 0.1K)" )
 GAME_CUSTOM( 1991, m4addr6ly,    m4addr, "adders ladders 20p 6.bin", 0x0000, 0x010000, CRC(62abeb34) SHA1(8069e6fde0673fdbc124a1a172dc988bb3205ff6), "Barcrest","Adders & Ladders (Barcrest) (MPU4) (A6L 0.1Y)" )
 GAME_CUSTOM( 1991, m4addr6lyd,   m4addr, "a6ldy.p1",                 0x0000, 0x010000, CRC(82f060a5) SHA1(2e8474e6c17def07e35448b5bf8d453cce0f292c), "Barcrest","Adders & Ladders (Barcrest) (MPU4) (A6L 0.1YD)" )
 GAME_CUSTOM( 1991, m4addr6lybd,  m4addr, "a6lbdy.p1",                0x0000, 0x010000, CRC(28064099) SHA1(c916f73911974440d4c79ecb51b343aad78f115b), "Barcrest","Adders & Ladders (Barcrest) (MPU4) (A6L 0.1YBD)" )
+// "(C)1991 BARCREST" and "A6L 0.1" (but hack?)
+GAME_CUSTOM( 199?, m4addrc__b,   m4addr, "add20_101",                0x0000, 0x010000, CRC(361b7173) SHA1(dea2b1b0f5910e2fd3f45d220554f0e712dedada), "hack","Adders & Ladders (Barcrest) (MPU4) (A6L 0.1, hack, set 1)" )
+GAME_CUSTOM( 199?, m4addrc__k,   m4addr, "addl_20_.8",               0x0000, 0x010000, CRC(43c98f46) SHA1(0ca4a093b38fc04639e3f4bb742a8923b90d2ed1), "hack","Adders & Ladders (Barcrest) (MPU4) (A6L 0.1, hack, set 2)" )
+// "(C)1993  B.W.B." and "ADD 1.0"
+GAME_CUSTOM( 199?, m4addrc__l,   m4addr, "al10",                     0x0000, 0x010000, CRC(3c3c82b6) SHA1(cc5ffdd0837c9af31d5737a70430a01d1989cdcc), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0, 1993)" )
 // "(C)1994  B.W.B."  and "ADD 1.0" (actually version 10?)
 GAME_CUSTOM( 1994, m4addr10,     m4addr, "ad_05___.1o3",             0x0000, 0x010000, CRC(8d9e0f5d) SHA1(fecc844908876e161d0134ce3cc098e79e74e0b1), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0, set 1)" )
 GAME_CUSTOM( 1994, m4addr10d,    m4addr, "ad_05_d_.1o3",             0x0000, 0x010000, CRC(2d29040f) SHA1(ee2bdd5da1a7e4146419ffd8bad521a9c1b49aa2), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0D, set 1)" )
@@ -555,8 +561,44 @@ GAME_CUSTOM( 1994, m4addr4_a,    m4addr, "ad_10___.4a3",             0x0000, 0x0
 GAME_CUSTOM( 1994, m4addr4c_a,   m4addr, "adi10___.4a3",             0x0000, 0x010000, CRC(2d2aa3cc) SHA1(21a7690c3fb7d158f4b4e6da63663778246ac902), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 4.0C, set 2)" )
 GAME_CUSTOM( 1994, m4addr4c_b,   m4addr, "adi10___.4n3",             0x0000, 0x010000, CRC(af9aad00) SHA1(09729e73f27d9ac5d6ac7171191ed76aeaac3e3d), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 4.0C, set 3)" )
 // "BIG DIPPER"  and ADD 1.0
-GAME_CUSTOM( 1994, m4addr_h1,    m4addr, "5p4addersladders.bin",     0x0000, 0x010000, CRC(03fc43da) SHA1(cf2fdb0d1ad702331ba004fd39072484b05e2b97), "hack?","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0C, hack?, set 1)" )
-GAME_CUSTOM( 1994, m4addr_h2,    m4addr, "ad05.6c",                  0x0000, 0x010000, CRC(0940e4aa) SHA1(e8e7f7249a18386af990999a4c06f001db7003c5), "hack?","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0C, hack?, set 2)" )
+GAME_CUSTOM( 199?, m4addrc__h,   m4addr, "adders classic.bin",       0x0000, 0x010000, CRC(6bc1d2aa) SHA1(cf17e697ff0cfba999f6511f24051dbc3d0384ef), "hack","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0, hack)" )
+GAME_CUSTOM( 1994, m4addr_h1,    m4addr, "5p4addersladders.bin",     0x0000, 0x010000, CRC(03fc43da) SHA1(cf2fdb0d1ad702331ba004fd39072484b05e2b97), "hack","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0C, hack, set 1)" )
+GAME_CUSTOM( 1994, m4addr_h2,    m4addr, "ad05.6c",                  0x0000, 0x010000, CRC(0940e4aa) SHA1(e8e7f7249a18386af990999a4c06f001db7003c5), "hack","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0C, hack, set 2)" )
+GAME_CUSTOM( 199?, m4addrc,      m4addr, "add05_101",                0x0000, 0x010000, CRC(4b3fb104) SHA1(9dba619019a476ce317122a3553965b279c684ba), "hack","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0C, hack, set 3)" )
+GAME_CUSTOM( 199?, m4addrc__c,   m4addr, "add55",                    0x0000, 0x010000, CRC(48c5bc73) SHA1(18c9f70bad6141cca95b6bbcb4fc621e71f87700), "hack","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0C, hack, set 4)" )
+GAME_CUSTOM( 199?, m4addrc__m,   m4addr, "alad58c",                  0x0000, 0x010000, CRC(df9c46b8) SHA1(439ea1ce17aa89e19cedb78465b4388b72c8c5ed), "hack","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0C, hack, set 5)" )
+// "DADS  ARMY" and "ADD 1.0"
+GAME_CUSTOM( 199?, m4addrc__a,   m4addr, "add10_101",                0x0000, 0x010000, CRC(af8f8b4e) SHA1(712c33ed0f425dc10b79780b0cfce0ac5768e2d5), "hack","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0C, hack, set 6)" )
+GAME_CUSTOM( 199?, m4addrc__i,   m4addr, "addl_10_.4",               0x0000, 0x010000, CRC(c2d11126) SHA1(0eafe9dc30013ed5817ac303a4eea5ea82d62715), "hack","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0C, hack, set 7)" )
+GAME_CUSTOM( 199?, m4addrc__j,   m4addr, "addl_10_.8",               0x0000, 0x010000, CRC(9fc82c47) SHA1(0f56afc33f09fe22afc5ec74aeb496c32f9e623c), "hack","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0C, hack, set 8)" )
+// no copyright string and "NNU 5.0" (possibly a different game?)
+GAME_CUSTOM( 199?, m4addrc__e,   m4addr, "classic adders & ladders_alt",     0x0000, 0x010000, CRC(ac948903) SHA1(e07023efd7722a661a2bbf93c0a168af70ad6c20), "hack","Adders & Ladders (Bwb / Barcrest) (MPU4) (NNU 5.0, hack, set 1)" )
+GAME_CUSTOM( 199?, m4addrc__f,   m4addr, "classic adders & ladders_alt2",    0x0000, 0x010000, CRC(843ed53d) SHA1(b1dff249df37800744e3fc9c32be20a62bd130a1), "hack","Adders & Ladders (Bwb / Barcrest) (MPU4) (NNU 5.0, hack, set 2)" )
+GAME_CUSTOM( 199?, m4addrc__n,   m4addr, "nik56c",                           0x0000, 0x010000, CRC(05fa11d1) SHA1(01d3d0c504489f1513a0c3aa26e910c9604f5366), "hack","Adders & Ladders (Bwb / Barcrest) (MPU4) (NNU 5.0, hack, set 3)" )
+
+
+
+#define M4ADDRCC_EXTRA_ROMS \
+	ROM_REGION( 0x48, "fakechr", 0 ) \
+	ROM_LOAD( "aal.chr", 0x0000, 0x000048, CRC(bb48409f) SHA1(adefde520104b8c3815260ee136460ddf3e9e4b2) )
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4ADDRCC_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod2    ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
+
+// "(C)1991 BARCREST" and "ADC 1.1"
+GAME_CUSTOM( 199?, m4addrcc,       0,          "adcs.p1", 0x0000, 0x010000, CRC(7247de78) SHA1(e390b4e912d7bc8c1ca5e42bf2e2753d4c2b4d17), "Barcrest","Adders & Ladders Classic Club (Barcrest) (MPU4) (ADC 1.1)" )
+GAME_CUSTOM( 199?, m4addrcc__c,    m4addrcc,   "adcd.p1", 0x0000, 0x010000, CRC(47e41c9a) SHA1(546aaaa5765b3bc91eeb9bf5a979ed68a2e72da8), "Barcrest","Adders & Ladders Classic Club (Barcrest) (MPU4) (ADC 1.1D)" )
+GAME_CUSTOM( 199?, m4addrcc__a,    m4addrcc,   "adcf.p1", 0x0000, 0x010000, CRC(1dbbc990) SHA1(fb9439b43089e3135a719ab94b24dd65561d17cf), "Barcrest","Adders & Ladders Classic Club (Barcrest) (MPU4) (ADC 1.1F)" )
+GAME_CUSTOM( 199?, m4addrcc__b,    m4addrcc,   "adcl.p1", 0x0000, 0x010000, CRC(89299196) SHA1(9a92b250b47b11536f8708429d69c95111ecdb98), "Barcrest","Adders & Ladders Classic Club (Barcrest) (MPU4) (ADC 1.1L)" )
+// "(C)1991 BARCREST" and "ADC 0.5"
+GAME_CUSTOM( 199?, m4addrcc__d,    m4addrcc,   "adrscfm", 0x0000, 0x010000, CRC(6c95881a) SHA1(db658bd722c54fc84734105f1a9b0028b23179fb), "Barcrest","Adders & Ladders Classic Club (Barcrest) (MPU4) (ADC 0.5)" )
+
+
 
 
 #define M4DENMEN_EXTRA_ROMS \
@@ -674,55 +716,60 @@ GAME_CUSTOM( 199?, m4crmaze__s,    m4crmaze,   "cmaz58t",              0x0000, 0
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4jackpot8tkn , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4cashmn,       0,          "cma07s.p1",            0x0000, 0x020000, CRC(e9c1d9f2) SHA1(f2df4ae650ec2b62d15bbaa562d638476bf926e7), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4cashmn__a,    m4cashmn,   "camc2010",             0x0000, 0x020000, CRC(82e459ab) SHA1(62e1906007f6bba99e3e8badc3472070e8ae84f8), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4cashmn__b,    m4cashmn,   "cma07ad.p1",           0x0000, 0x020000, CRC(411889fd) SHA1(5855b584315867ecc5df6d37f4a664b8331ecde8), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4cashmn__c,    m4cashmn,   "cma07b.p1",            0x0000, 0x020000, CRC(ab889a33) SHA1(0f3ed0e4b8131585bcb4af47674fb1b65c37503d), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4cashmn__d,    m4cashmn,   "cma07bd.p1",           0x0000, 0x020000, CRC(cc022738) SHA1(5968d1b6db55008cbd3c83651214c61c28fd4c5c), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4cashmn__e,    m4cashmn,   "cma07c.p1",            0x0000, 0x020000, CRC(9cc22721) SHA1(ee4e9860641c8bf7db024a5bf9469265a6383e0a), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4cashmn__f,    m4cashmn,   "cma07d.p1",            0x0000, 0x020000, CRC(d6939145) SHA1(45b6f7f80c7a2f4377d9bf8e184fb791f4ed0a2d), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4cashmn__g,    m4cashmn,   "cma07dk.p1",           0x0000, 0x020000, CRC(86c58f6e) SHA1(fce50f86a641d27d0f5e5ecbac84822ccc9c177b), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4cashmn__h,    m4cashmn,   "cma07dr.p1",           0x0000, 0x020000, CRC(35ca345f) SHA1(ddbb926988028bef13ebaa949d3ee92599770003), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4cashmn__i,    m4cashmn,   "cma07dy.p1",           0x0000, 0x020000, CRC(0126af90) SHA1(0f303451fd8ca8c0cc50a31297f0d2729cfc2d7b), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4cashmn__j,    m4cashmn,   "cma07k.p1",            0x0000, 0x020000, CRC(e14f3265) SHA1(7b5dc581fe8679559356fdca9644985da7d299cb), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4cashmn__k,    m4cashmn,   "cma07r.p1",            0x0000, 0x020000, CRC(52408954) SHA1(623f840d94cc3cf2d2d648eb2be644d48350b169), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4cashmn__l,    m4cashmn,   "cma07y.p1",            0x0000, 0x020000, CRC(66ac129b) SHA1(97f8c0c1f46444d4a492bc3dd3689df038000640), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4cashmn__m,    m4cashmn,   "cma08ad.p1",           0x0000, 0x020000, CRC(fce2f785) SHA1(fc508e3d1036319894985600cb0142f13536078c), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4cashmn__n,    m4cashmn,   "cma08b.p1",            0x0000, 0x020000, CRC(df7526de) SHA1(71456496fc31ae11ffa7c543b6444adba735aeb9), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4cashmn__o,    m4cashmn,   "cma08bd.p1",           0x0000, 0x020000, CRC(71f85940) SHA1(439c54f35f4f6161a683d2c3d2bb6ce81b4190bf), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4cashmn__p,    m4cashmn,   "cma08c.p1",            0x0000, 0x020000, CRC(e83f9bcc) SHA1(e20297ba5238b59c3872776b01e6a89a51a7aea7), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4cashmn__q,    m4cashmn,   "cma08d.p1",            0x0000, 0x020000, CRC(a26e2da8) SHA1(928dfe399a7ae278dadd1e930bd370022f5113c4), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4cashmn__r,    m4cashmn,   "cma08dk.p1",           0x0000, 0x020000, CRC(3b3ff116) SHA1(f60f0f9d996398a0f1c5b7d2a411613c42149e65), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4cashmn__s,    m4cashmn,   "cma08dr.p1",           0x0000, 0x020000, CRC(88304a27) SHA1(9b86a49edca078dd68abab4c3e8655d3b4e79d47), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4cashmn__t,    m4cashmn,   "cma08dy.p1",           0x0000, 0x020000, CRC(bcdcd1e8) SHA1(a7a4ab2313198c3bc0536526bd83179fd9170e66), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4cashmn__u,    m4cashmn,   "cma08k.p1",            0x0000, 0x020000, CRC(95b28e88) SHA1(282a782900a0ddf60c66aa6a69e6871bb42c647a), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4cashmn__v,    m4cashmn,   "cma08r.p1",            0x0000, 0x020000, CRC(26bd35b9) SHA1(74d07da26932bf48fe4b79b39ff76956b0993f3b), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 23)" )
-GAME_CUSTOM( 199?, m4cashmn__w,    m4cashmn,   "cma08s.p1",            0x0000, 0x020000, CRC(d0154d3c) SHA1(773f211092c51fb4ca1ef6a5a0cbdb15f842aca8), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 24)" )
-GAME_CUSTOM( 199?, m4cashmn__x,    m4cashmn,   "cma08y.p1",            0x0000, 0x020000, CRC(1251ae76) SHA1(600ce195be615796b887bb56bebb6c4322709632), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 25)" )
-GAME_CUSTOM( 199?, m4cashmn__y,    m4cashmn,   "cmh06ad.p1",           0x0000, 0x020000, CRC(ea2f6866) SHA1(afae312a488d7d83576c17eb2627a84637d88f18), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 26)" )
-GAME_CUSTOM( 199?, m4cashmn__z,    m4cashmn,   "cmh06b.p1",            0x0000, 0x020000, CRC(2d4d9667) SHA1(896ed70962c8904646df7159c3717399d0ceb022), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 27)" )
-GAME_CUSTOM( 199?, m4cashmn__0,    m4cashmn,   "cmh06bd.p1",           0x0000, 0x020000, CRC(6735c6a3) SHA1(4bce480c57473a9b0787a87a462c76e146a10157), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 28)" )
-GAME_CUSTOM( 199?, m4cashmn__1,    m4cashmn,   "cmh06c.p1",            0x0000, 0x020000, CRC(1a072b75) SHA1(89d4aed011391b2f12b48c0344136d83175ff2f0), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 29)" )
-GAME_CUSTOM( 199?, m4cashmn__2,    m4cashmn,   "cmh06d.p1",            0x0000, 0x020000, CRC(50569d11) SHA1(bdf7e984766bbe90bafbf0b367690ca65a8612d2), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 30)" )
-GAME_CUSTOM( 199?, m4cashmn__3,    m4cashmn,   "cmh06dk.p1",           0x0000, 0x020000, CRC(2df26ef5) SHA1(c716b73396d0af1f69f5812bace06341d368859f), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 31)" )
-GAME_CUSTOM( 199?, m4cashmn__4,    m4cashmn,   "cmh06dr.p1",           0x0000, 0x020000, CRC(9efdd5c4) SHA1(b9e02fe91e766aff41ca19879ab29e53bdee537e), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 32)" )
-GAME_CUSTOM( 199?, m4cashmn__5,    m4cashmn,   "cmh06dy.p1",           0x0000, 0x020000, CRC(aa114e0b) SHA1(8bc9b94e488a98b8a8008f9a35b6c078cc5c8f3f), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 33)" )
-GAME_CUSTOM( 199?, m4cashmn__6,    m4cashmn,   "cmh06k.p1",            0x0000, 0x020000, CRC(678a3e31) SHA1(2351b5167eec2a0d23c9938014de6f6ee07f13ff), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 34)" )
-GAME_CUSTOM( 199?, m4cashmn__7,    m4cashmn,   "cmh06r.p1",            0x0000, 0x020000, CRC(d4858500) SHA1(489fd55ac6c93b94bfb9297fd71b5d74bf95a97f), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 35)" )
-GAME_CUSTOM( 199?, m4cashmn__8,    m4cashmn,   "cmh06s.p1",            0x0000, 0x020000, CRC(9d3b4260) SHA1(7c4740585d17be3da3a0ea6e7fc68f89538013fb), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 36)" )
-GAME_CUSTOM( 199?, m4cashmn__9,    m4cashmn,   "cmh06y.p1",            0x0000, 0x020000, CRC(e0691ecf) SHA1(978fa00736967dd09d48ce5c847698b39a058ab5), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 37)" )
-GAME_CUSTOM( 199?, m4cashmn__aa,   m4cashmn,   "cmh07ad.p1",           0x0000, 0x020000, CRC(4f354391) SHA1(687eccc312cd69f8bb70e35837f0b7ce74392936), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 38)" )
-GAME_CUSTOM( 199?, m4cashmn__ab,   m4cashmn,   "cmh07b.p1",            0x0000, 0x020000, CRC(27fb6e7b) SHA1(c1558e4a0e2c28a825c2c5bb4089143cf919b67c), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 39)" )
-GAME_CUSTOM( 199?, m4cashmn__ac,   m4cashmn,   "cmh07bd.p1",           0x0000, 0x020000, CRC(c22fed54) SHA1(5b6df1ed8518f9ba3e02b17c189c01ad1d0acbbb), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 40)" )
-GAME_CUSTOM( 199?, m4cashmn__ad,   m4cashmn,   "cmh07c.p1",            0x0000, 0x020000, CRC(10b1d369) SHA1(9933a2a7933df941ee93e16682e91dcc90abb627), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 41)" )
-GAME_CUSTOM( 199?, m4cashmn__ae,   m4cashmn,   "cmh07d.p1",            0x0000, 0x020000, CRC(5ae0650d) SHA1(da6917aa186daf59f35124c7cdc9d039d365c4c2), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 42)" )
-GAME_CUSTOM( 199?, m4cashmn__af,   m4cashmn,   "cmh07dk.p1",           0x0000, 0x020000, CRC(88e84502) SHA1(2ab86be51b3dde0b2cb05e3af5f43aad3d8a76df), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 43)" )
-GAME_CUSTOM( 199?, m4cashmn__ag,   m4cashmn,   "cmh07dr.p1",           0x0000, 0x020000, CRC(3be7fe33) SHA1(074243cdfd37ba36e18e00610f45473e46ddc728), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 44)" )
-GAME_CUSTOM( 199?, m4cashmn__ah,   m4cashmn,   "cmh07dy.p1",           0x0000, 0x020000, CRC(0f0b65fc) SHA1(68d775bb4af9595ac87c33c2663b272640eea69e), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 45)" )
-GAME_CUSTOM( 199?, m4cashmn__ai,   m4cashmn,   "cmh07k.p1",            0x0000, 0x020000, CRC(6d3cc62d) SHA1(85f76fd8513c20683d486de7a1509cadfb6ecaa9), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 46)" )
-GAME_CUSTOM( 199?, m4cashmn__aj,   m4cashmn,   "cmh07r.p1",            0x0000, 0x020000, CRC(de337d1c) SHA1(dd07727fb183833eced5c0c2dc284d571baacd25), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 47)" )
-GAME_CUSTOM( 199?, m4cashmn__ak,   m4cashmn,   "cmh07s.p1",            0x0000, 0x020000, CRC(0367f4cf) SHA1(8b24a9009ff17d517b34e078ebbdc17465df139d), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 48)" )
-GAME_CUSTOM( 199?, m4cashmn__al,   m4cashmn,   "cmh07y.p1",            0x0000, 0x020000, CRC(eadfe6d3) SHA1(80541aba612b8ebba7ab159c61e6492b9c06feda), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 49)" )
+// "(C)1993 BARCREST" and "CMA 0.7"
+GAME_CUSTOM( 199?, m4cashmn,       0,          "cma07s.p1",            0x0000, 0x020000, CRC(e9c1d9f2) SHA1(f2df4ae650ec2b62d15bbaa562d638476bf926e7), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMA 0.7)" )
+GAME_CUSTOM( 199?, m4cashmn__b,    m4cashmn,   "cma07ad.p1",           0x0000, 0x020000, CRC(411889fd) SHA1(5855b584315867ecc5df6d37f4a664b8331ecde8), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMA 0.7AD)" )
+GAME_CUSTOM( 199?, m4cashmn__c,    m4cashmn,   "cma07b.p1",            0x0000, 0x020000, CRC(ab889a33) SHA1(0f3ed0e4b8131585bcb4af47674fb1b65c37503d), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMA 0.7B)" )
+GAME_CUSTOM( 199?, m4cashmn__d,    m4cashmn,   "cma07bd.p1",           0x0000, 0x020000, CRC(cc022738) SHA1(5968d1b6db55008cbd3c83651214c61c28fd4c5c), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMA 0.7BD)" )
+GAME_CUSTOM( 199?, m4cashmn__e,    m4cashmn,   "cma07c.p1",            0x0000, 0x020000, CRC(9cc22721) SHA1(ee4e9860641c8bf7db024a5bf9469265a6383e0a), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMA 0.7C)" )
+GAME_CUSTOM( 199?, m4cashmn__f,    m4cashmn,   "cma07d.p1",            0x0000, 0x020000, CRC(d6939145) SHA1(45b6f7f80c7a2f4377d9bf8e184fb791f4ed0a2d), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMA 0.7D)" )
+GAME_CUSTOM( 199?, m4cashmn__g,    m4cashmn,   "cma07dk.p1",           0x0000, 0x020000, CRC(86c58f6e) SHA1(fce50f86a641d27d0f5e5ecbac84822ccc9c177b), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMA 0.7KD)" )
+GAME_CUSTOM( 199?, m4cashmn__h,    m4cashmn,   "cma07dr.p1",           0x0000, 0x020000, CRC(35ca345f) SHA1(ddbb926988028bef13ebaa949d3ee92599770003), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMA 0.7RD)" )
+GAME_CUSTOM( 199?, m4cashmn__i,    m4cashmn,   "cma07dy.p1",           0x0000, 0x020000, CRC(0126af90) SHA1(0f303451fd8ca8c0cc50a31297f0d2729cfc2d7b), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMA 0.7YD)" )
+GAME_CUSTOM( 199?, m4cashmn__j,    m4cashmn,   "cma07k.p1",            0x0000, 0x020000, CRC(e14f3265) SHA1(7b5dc581fe8679559356fdca9644985da7d299cb), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMA 0.7K)" )
+GAME_CUSTOM( 199?, m4cashmn__k,    m4cashmn,   "cma07r.p1",            0x0000, 0x020000, CRC(52408954) SHA1(623f840d94cc3cf2d2d648eb2be644d48350b169), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMA 0.7R)" )
+GAME_CUSTOM( 199?, m4cashmn__l,    m4cashmn,   "cma07y.p1",            0x0000, 0x020000, CRC(66ac129b) SHA1(97f8c0c1f46444d4a492bc3dd3689df038000640), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMA 0.7Y)" )
+// "(C)1993 BARCREST" and "CMA 0.8"
+GAME_CUSTOM( 199?, m4cashmn__m,    m4cashmn,   "cma08ad.p1",           0x0000, 0x020000, CRC(fce2f785) SHA1(fc508e3d1036319894985600cb0142f13536078c), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMA 0.8AD)" )
+GAME_CUSTOM( 199?, m4cashmn__n,    m4cashmn,   "cma08b.p1",            0x0000, 0x020000, CRC(df7526de) SHA1(71456496fc31ae11ffa7c543b6444adba735aeb9), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMA 0.8B)" )
+GAME_CUSTOM( 199?, m4cashmn__o,    m4cashmn,   "cma08bd.p1",           0x0000, 0x020000, CRC(71f85940) SHA1(439c54f35f4f6161a683d2c3d2bb6ce81b4190bf), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMA 0.8BD)" )
+GAME_CUSTOM( 199?, m4cashmn__p,    m4cashmn,   "cma08c.p1",            0x0000, 0x020000, CRC(e83f9bcc) SHA1(e20297ba5238b59c3872776b01e6a89a51a7aea7), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMA 0.8C)" )
+GAME_CUSTOM( 199?, m4cashmn__q,    m4cashmn,   "cma08d.p1",            0x0000, 0x020000, CRC(a26e2da8) SHA1(928dfe399a7ae278dadd1e930bd370022f5113c4), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMA 0.8D)" )
+GAME_CUSTOM( 199?, m4cashmn__r,    m4cashmn,   "cma08dk.p1",           0x0000, 0x020000, CRC(3b3ff116) SHA1(f60f0f9d996398a0f1c5b7d2a411613c42149e65), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMA 0.8KD)" )
+GAME_CUSTOM( 199?, m4cashmn__s,    m4cashmn,   "cma08dr.p1",           0x0000, 0x020000, CRC(88304a27) SHA1(9b86a49edca078dd68abab4c3e8655d3b4e79d47), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMA 0.8RD)" )
+GAME_CUSTOM( 199?, m4cashmn__t,    m4cashmn,   "cma08dy.p1",           0x0000, 0x020000, CRC(bcdcd1e8) SHA1(a7a4ab2313198c3bc0536526bd83179fd9170e66), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMA 0.8YD)" )
+GAME_CUSTOM( 199?, m4cashmn__u,    m4cashmn,   "cma08k.p1",            0x0000, 0x020000, CRC(95b28e88) SHA1(282a782900a0ddf60c66aa6a69e6871bb42c647a), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMA 0.8K)" )
+GAME_CUSTOM( 199?, m4cashmn__v,    m4cashmn,   "cma08r.p1",            0x0000, 0x020000, CRC(26bd35b9) SHA1(74d07da26932bf48fe4b79b39ff76956b0993f3b), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMA 0.8R)" )
+GAME_CUSTOM( 199?, m4cashmn__w,    m4cashmn,   "cma08s.p1",            0x0000, 0x020000, CRC(d0154d3c) SHA1(773f211092c51fb4ca1ef6a5a0cbdb15f842aca8), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMA 0.8)" )
+GAME_CUSTOM( 199?, m4cashmn__x,    m4cashmn,   "cma08y.p1",            0x0000, 0x020000, CRC(1251ae76) SHA1(600ce195be615796b887bb56bebb6c4322709632), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMA 0.8Y)" )
+// "(C)1993 BARCREST" and "CMH 0.6"
+GAME_CUSTOM( 199?, m4cashmn__y,    m4cashmn,   "cmh06ad.p1",           0x0000, 0x020000, CRC(ea2f6866) SHA1(afae312a488d7d83576c17eb2627a84637d88f18), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMH 0.6AD)" )
+GAME_CUSTOM( 199?, m4cashmn__z,    m4cashmn,   "cmh06b.p1",            0x0000, 0x020000, CRC(2d4d9667) SHA1(896ed70962c8904646df7159c3717399d0ceb022), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMH 0.6B)" )
+GAME_CUSTOM( 199?, m4cashmn__0,    m4cashmn,   "cmh06bd.p1",           0x0000, 0x020000, CRC(6735c6a3) SHA1(4bce480c57473a9b0787a87a462c76e146a10157), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMH 0.6BD)" )
+GAME_CUSTOM( 199?, m4cashmn__1,    m4cashmn,   "cmh06c.p1",            0x0000, 0x020000, CRC(1a072b75) SHA1(89d4aed011391b2f12b48c0344136d83175ff2f0), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMH 0.6C)" )
+GAME_CUSTOM( 199?, m4cashmn__2,    m4cashmn,   "cmh06d.p1",            0x0000, 0x020000, CRC(50569d11) SHA1(bdf7e984766bbe90bafbf0b367690ca65a8612d2), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMH 0.6D)" )
+GAME_CUSTOM( 199?, m4cashmn__3,    m4cashmn,   "cmh06dk.p1",           0x0000, 0x020000, CRC(2df26ef5) SHA1(c716b73396d0af1f69f5812bace06341d368859f), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMH 0.6KD)" )
+GAME_CUSTOM( 199?, m4cashmn__4,    m4cashmn,   "cmh06dr.p1",           0x0000, 0x020000, CRC(9efdd5c4) SHA1(b9e02fe91e766aff41ca19879ab29e53bdee537e), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMH 0.6RD)" )
+GAME_CUSTOM( 199?, m4cashmn__5,    m4cashmn,   "cmh06dy.p1",           0x0000, 0x020000, CRC(aa114e0b) SHA1(8bc9b94e488a98b8a8008f9a35b6c078cc5c8f3f), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMH 0.6YD)" )
+GAME_CUSTOM( 199?, m4cashmn__6,    m4cashmn,   "cmh06k.p1",            0x0000, 0x020000, CRC(678a3e31) SHA1(2351b5167eec2a0d23c9938014de6f6ee07f13ff), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMH 0.6K)" )
+GAME_CUSTOM( 199?, m4cashmn__7,    m4cashmn,   "cmh06r.p1",            0x0000, 0x020000, CRC(d4858500) SHA1(489fd55ac6c93b94bfb9297fd71b5d74bf95a97f), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMH 0.6R)" )
+GAME_CUSTOM( 199?, m4cashmn__8,    m4cashmn,   "cmh06s.p1",            0x0000, 0x020000, CRC(9d3b4260) SHA1(7c4740585d17be3da3a0ea6e7fc68f89538013fb), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMH 0.6)" )
+GAME_CUSTOM( 199?, m4cashmn__9,    m4cashmn,   "cmh06y.p1",            0x0000, 0x020000, CRC(e0691ecf) SHA1(978fa00736967dd09d48ce5c847698b39a058ab5), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMH 0.6Y)" )
+// "(C)1993 BARCREST" and "CMH 0.7"
+GAME_CUSTOM( 199?, m4cashmn__aa,   m4cashmn,   "cmh07ad.p1",           0x0000, 0x020000, CRC(4f354391) SHA1(687eccc312cd69f8bb70e35837f0b7ce74392936), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMH 0.7AD)" )
+GAME_CUSTOM( 199?, m4cashmn__ab,   m4cashmn,   "cmh07b.p1",            0x0000, 0x020000, CRC(27fb6e7b) SHA1(c1558e4a0e2c28a825c2c5bb4089143cf919b67c), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMH 0.7B)" )
+GAME_CUSTOM( 199?, m4cashmn__ac,   m4cashmn,   "cmh07bd.p1",           0x0000, 0x020000, CRC(c22fed54) SHA1(5b6df1ed8518f9ba3e02b17c189c01ad1d0acbbb), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMH 0.7BD)" )
+GAME_CUSTOM( 199?, m4cashmn__ad,   m4cashmn,   "cmh07c.p1",            0x0000, 0x020000, CRC(10b1d369) SHA1(9933a2a7933df941ee93e16682e91dcc90abb627), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMH 0.7C)" )
+GAME_CUSTOM( 199?, m4cashmn__ae,   m4cashmn,   "cmh07d.p1",            0x0000, 0x020000, CRC(5ae0650d) SHA1(da6917aa186daf59f35124c7cdc9d039d365c4c2), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMH 0.7D)" )
+GAME_CUSTOM( 199?, m4cashmn__af,   m4cashmn,   "cmh07dk.p1",           0x0000, 0x020000, CRC(88e84502) SHA1(2ab86be51b3dde0b2cb05e3af5f43aad3d8a76df), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMH 0.7KD)" )
+GAME_CUSTOM( 199?, m4cashmn__ag,   m4cashmn,   "cmh07dr.p1",           0x0000, 0x020000, CRC(3be7fe33) SHA1(074243cdfd37ba36e18e00610f45473e46ddc728), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMH 0.7RD)" )
+GAME_CUSTOM( 199?, m4cashmn__ah,   m4cashmn,   "cmh07dy.p1",           0x0000, 0x020000, CRC(0f0b65fc) SHA1(68d775bb4af9595ac87c33c2663b272640eea69e), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMH 0.7YD)" )
+GAME_CUSTOM( 199?, m4cashmn__ai,   m4cashmn,   "cmh07k.p1",            0x0000, 0x020000, CRC(6d3cc62d) SHA1(85f76fd8513c20683d486de7a1509cadfb6ecaa9), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMH 0.7K)" )
+GAME_CUSTOM( 199?, m4cashmn__aj,   m4cashmn,   "cmh07r.p1",            0x0000, 0x020000, CRC(de337d1c) SHA1(dd07727fb183833eced5c0c2dc284d571baacd25), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMH 0.7R)" )
+GAME_CUSTOM( 199?, m4cashmn__ak,   m4cashmn,   "cmh07s.p1",            0x0000, 0x020000, CRC(0367f4cf) SHA1(8b24a9009ff17d517b34e078ebbdc17465df139d), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMH 0.7)" )
+GAME_CUSTOM( 199?, m4cashmn__al,   m4cashmn,   "cmh07y.p1",            0x0000, 0x020000, CRC(eadfe6d3) SHA1(80541aba612b8ebba7ab159c61e6492b9c06feda), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMH 0.7Y)" )
+// "(C)1993 BARCREST" and "CMH 0.2"
+GAME_CUSTOM( 199?, m4cashmn__a,    m4cashmn,   "camc2010",             0x0000, 0x020000, CRC(82e459ab) SHA1(62e1906007f6bba99e3e8badc3472070e8ae84f8), "Barcrest","Cash Machine (Barcrest) (MPU4) (CMH 0.2)" )
 // "(C)1993 BARCREST"  and "CMH 0.6"
 GAME_CUSTOM( 199?, m4cashmn__za,   m4cashmn,   "cma15g",               0x0000, 0x020000, CRC(f30b3ef2) SHA1(c8fb4d883d12a477a703d8cb0842994675aaf879), "hack?","Cash Machine (Barcrest) (MPU4) (CMH 0.6Y, hack?)" )
 // no copyright string, and "CMA 0.7"
@@ -896,7 +943,18 @@ GAME_CUSTOM( 199?, m4toot__zb,   m4toot, "tot15t",       0x0000, 0x020000, CRC(1
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4eaw,     0,      "er4s.p1",                  0x0000, 0x010000, CRC(163fc987) SHA1(8e1768ed2fbddbd5e00652ff40614de3978c9567), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 1)" )
+// "(C)1991 BARCREST" and "ER4 0.2"
+GAME_CUSTOM( 199?, m4eaw,     0,      "er4s.p1",                  0x0000, 0x010000, CRC(163fc987) SHA1(8e1768ed2fbddbd5e00652ff40614de3978c9567), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (ER4 0.2)" )
+GAME_CUSTOM( 199?, m4eaw__av, m4eaw,  "er4ad.p1",                 0x0000, 0x010000, CRC(93fff89d) SHA1(3f90168efa5ecaf7707ef357616638a9d5ab746f), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 59)" )
+GAME_CUSTOM( 199?, m4eaw__aw, m4eaw,  "er4b.p1",                  0x0000, 0x010000, CRC(cb39fda7) SHA1(4a31d2ff53942a658992a5e13c2b617da5fb03ce), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 60)" )
+GAME_CUSTOM( 199?, m4eaw__ax, m4eaw,  "er4bd.p1",                 0x0000, 0x010000, CRC(a5e395d7) SHA1(3f134a2ce3788ac84a6de096306c651e6b2d6a4a), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 61)" )
+GAME_CUSTOM( 199?, m4eaw__ay, m4eaw,  "er4d.p1",                  0x0000, 0x010000, CRC(33612923) SHA1(1129ced207aaf46045f20a1ef1a37af8ec537bb0), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 62)" )
+GAME_CUSTOM( 199?, m4eaw__az, m4eaw,  "er4dk.p1",                 0x0000, 0x010000, CRC(df41d570) SHA1(4a2db04ee51bb811ac3aee5b2c3c1f1a2201f7ec), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 63)" )
+GAME_CUSTOM( 199?, m4eaw__a0, m4eaw,  "er4dy.p1",                 0x0000, 0x010000, CRC(7df882e6) SHA1(1246220a5ac8a4454a7f3a359a5a00319395095d), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 64)" )
+GAME_CUSTOM( 199?, m4eaw__a1, m4eaw,  "er4k.p1",                  0x0000, 0x010000, CRC(9803cc0d) SHA1(1516c3836919a7a2cc32711a9bf2d3bf3d6b82c0), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 65)" )
+GAME_CUSTOM( 199?, m4eaw__a2, m4eaw,  "er4y.p1",                  0x0000, 0x010000, CRC(d8dece2d) SHA1(8482092434e1e94e6648e402c8b518c2f0fcc28e), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 66)" )
+// "(C)1991 BARCREST" and "ER4 0.3" (startup is CET 0.3)
+GAME_CUSTOM( 199?, m4eaw__j,  m4eaw,  "cet03s.p1",                0x0000, 0x010000, CRC(bec3ea51) SHA1(740a73da105d8329dc9ceaa5e8c25b305124e2dd), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (CET0.3 / ER4 0.3)" )
 GAME_CUSTOM( 199?, m4eaw__a,  m4eaw,  "cet03ad.p1",               0x0000, 0x010000, CRC(33afe7a5) SHA1(5d3bdb74c6babd49e88915282ad81c184bd7aa68), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4eaw__b,  m4eaw,  "cet03b.p1",                0x0000, 0x010000, CRC(7674e2a5) SHA1(188e683eac91f64fe563b0f09f2b934e709c47fb), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4eaw__c,  m4eaw,  "cet03bd.p1",               0x0000, 0x010000, CRC(406843a2) SHA1(7d4bf6cd3c5be0f6df687b0ba97b3b88fd377170), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 4)" )
@@ -906,8 +964,9 @@ GAME_CUSTOM( 199?, m4eaw__f,  m4eaw,  "cet03dr.p1",               0x0000, 0x0100
 GAME_CUSTOM( 199?, m4eaw__g,  m4eaw,  "cet03dy.p1",               0x0000, 0x010000, CRC(fece4ac4) SHA1(badf4f94d565958fc9f42a443f53ec9624925ee1), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 8)" )
 GAME_CUSTOM( 199?, m4eaw__h,  m4eaw,  "cet03k.p1",                0x0000, 0x010000, CRC(f6531a43) SHA1(75ec5c8fc0012fee144daab7761f3717c17fa22d), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 9)" )
 GAME_CUSTOM( 199?, m4eaw__i,  m4eaw,  "cet03r.p1",                0x0000, 0x010000, CRC(fec4a6c0) SHA1(89fac7e4df77f526d0e357f1874b73be932548ce), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4eaw__j,  m4eaw,  "cet03s.p1",                0x0000, 0x010000, CRC(bec3ea51) SHA1(740a73da105d8329dc9ceaa5e8c25b305124e2dd), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 11)" )
 GAME_CUSTOM( 199?, m4eaw__k,  m4eaw,  "cet03y.p1",                0x0000, 0x010000, CRC(63af8e2e) SHA1(97b9dd02bf8a72ca0be7c1a9cb753fbd55644497), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 12)" )
+// "(C)1991 BARCREST" and "ER4 0.2" (startup is CEU 0.2)
+GAME_CUSTOM( 199?, m4eaw__u,  m4eaw,  "ceu02s.p1",                0x0000, 0x010000, CRC(d52099e6) SHA1(10f1acb948fa7c4b547f801ddb5e15111992ca91), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (CEU0.2 / ER4 0.2)" )
 GAME_CUSTOM( 199?, m4eaw__l,  m4eaw,  "ceu02ad.p1",               0x0000, 0x010000, CRC(5805182c) SHA1(c15ef2e05061fd89944b039f007d92bc4bdf66d5), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 13)" )
 GAME_CUSTOM( 199?, m4eaw__m,  m4eaw,  "ceu02b.p1",                0x0000, 0x010000, CRC(cbf62a02) SHA1(20fb16ac4602d4e386e5dc01e1b7e83c459f614d), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 14)" )
 GAME_CUSTOM( 199?, m4eaw__n,  m4eaw,  "ceu02bd.p1",               0x0000, 0x010000, CRC(6e197566) SHA1(16f44ca77bc02c7eb186c3684b4e837da0d73553), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 15)" )
@@ -917,8 +976,9 @@ GAME_CUSTOM( 199?, m4eaw__q,  m4eaw,  "ceu02dr.p1",               0x0000, 0x0100
 GAME_CUSTOM( 199?, m4eaw__r,  m4eaw,  "ceu02dy.p1",               0x0000, 0x010000, CRC(a345696d) SHA1(a189eb6a6a6a83fe0d490f4a7c8e9c4c52aa91f7), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 19)" )
 GAME_CUSTOM( 199?, m4eaw__s,  m4eaw,  "ceu02k.p1",                0x0000, 0x010000, CRC(0e0a1ba9) SHA1(e1ee2595a3fd4fe874f50dc027f6c931636aadcc), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 20)" )
 GAME_CUSTOM( 199?, m4eaw__t,  m4eaw,  "ceu02r.p1",                0x0000, 0x010000, CRC(1a882a6a) SHA1(c966be957e7a78c33a28afd79ba60c69a6de42b8), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4eaw__u,  m4eaw,  "ceu02s.p1",                0x0000, 0x010000, CRC(d52099e6) SHA1(10f1acb948fa7c4b547f801ddb5e15111992ca91), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 22)" )
 GAME_CUSTOM( 199?, m4eaw__v,  m4eaw,  "ceu02y.p1",                0x0000, 0x010000, CRC(87e30284) SHA1(4c598a33b73cfe6338c0f51408f2a6c1abfa978b), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 23)" )
+// "(C)1991 BARCREST" and "ER4 0.1" (startup is ENN 0.1)
+GAME_CUSTOM( 199?, m4eaw__6,  m4eaw,  "enn01s.p1",                0x0000, 0x010000, CRC(d0ba447d) SHA1(744d5448c5318287e58994b684e116ac1a236f05), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (ENN 0.1 / ER4 0.1)" )
 GAME_CUSTOM( 199?, m4eaw__w,  m4eaw,  "enn01ad.p1",               0x0000, 0x010000, CRC(913ba1d6) SHA1(1167ccce2f0b528ec8eba140b1f9c8358fa19f54), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 24)" )
 GAME_CUSTOM( 199?, m4eaw__x,  m4eaw,  "enn01b.p1",                0x0000, 0x010000, CRC(76cf750c) SHA1(7f3ede643c5b92d9e313c4450a0d4ef3bd9eefd3), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 25)" )
 GAME_CUSTOM( 199?, m4eaw__y,  m4eaw,  "enn01bd.p1",               0x0000, 0x010000, CRC(c6c29211) SHA1(a49759c4c00633405a338eeb89fcb00f7503990c), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 26)" )
@@ -929,8 +989,9 @@ GAME_CUSTOM( 199?, m4eaw__2,  m4eaw,  "enn01dr.p1",               0x0000, 0x0100
 GAME_CUSTOM( 199?, m4eaw__3,  m4eaw,  "enn01dy.p1",               0x0000, 0x010000, CRC(be3e5901) SHA1(ea3f366724135682da7cddad3c82e5f4c434f4a9), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 31)" )
 GAME_CUSTOM( 199?, m4eaw__4,  m4eaw,  "enn01k.p1",                0x0000, 0x010000, CRC(273d7b10) SHA1(5577355c918407e548266a16b225e8a4f58c921c), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 32)" )
 GAME_CUSTOM( 199?, m4eaw__5,  m4eaw,  "enn01r.p1",                0x0000, 0x010000, CRC(aee3f31e) SHA1(72676bc6b3bc287bf3bd3e7719848b40aa1b3627), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 33)" )
-GAME_CUSTOM( 199?, m4eaw__6,  m4eaw,  "enn01s.p1",                0x0000, 0x010000, CRC(d0ba447d) SHA1(744d5448c5318287e58994b684e116ac1a236f05), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 34)" )
 GAME_CUSTOM( 199?, m4eaw__7,  m4eaw,  "enn01y.p1",                0x0000, 0x010000, CRC(91a73867) SHA1(5197fcd5bf3dc036095b8291d7b23776995d84d1), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 35)" )
+// "(C)1991 BARCREST" and "ER4 0.1" (startup is EON 0.1)
+GAME_CUSTOM( 199?, m4eaw__ai, m4eaw,  "eon01s.p1",                0x0000, 0x010000, CRC(e2e9ce10) SHA1(41a08b17285d6591b4a5cb6b1b6cc40ee7d35f01), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (EON 0.1 / ER4 0.1)" )
 GAME_CUSTOM( 199?, m4eaw__8,  m4eaw,  "eon01ad.p1",               0x0000, 0x010000, CRC(998b0e8d) SHA1(f2d0c43073d76d662c3a997b1fd081016e4c7a7d), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 36)" )
 GAME_CUSTOM( 199?, m4eaw__9,  m4eaw,  "eon01b.p1",                0x0000, 0x010000, CRC(66f281db) SHA1(b9bd37c53ab7c8838ec87062c8b9da39779b9fa9), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 37)" )
 GAME_CUSTOM( 199?, m4eaw__aa, m4eaw,  "eon01bd.p1",               0x0000, 0x010000, CRC(66a378ca) SHA1(6639f36df67af8bdd381ad3e16e0adc78a4552f4), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 38)" )
@@ -941,8 +1002,9 @@ GAME_CUSTOM( 199?, m4eaw__ae, m4eaw,  "eon01dr.p1",               0x0000, 0x0100
 GAME_CUSTOM( 199?, m4eaw__af, m4eaw,  "eon01dy.p1",               0x0000, 0x010000, CRC(d5a39761) SHA1(9b69f9e45d87f53196e5d4fd595300beb573ff49), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 43)" )
 GAME_CUSTOM( 199?, m4eaw__ag, m4eaw,  "eon01k.p1",                0x0000, 0x010000, CRC(1d34dea7) SHA1(546db8247d0c78501fe4ec818d614e8f451b0076), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 44)" )
 GAME_CUSTOM( 199?, m4eaw__ah, m4eaw,  "eon01r.p1",                0x0000, 0x010000, CRC(7c70a508) SHA1(2c5835f36ef4c215ff9f6f6cc350f0916b397b7b), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 45)" )
-GAME_CUSTOM( 199?, m4eaw__ai, m4eaw,  "eon01s.p1",                0x0000, 0x010000, CRC(e2e9ce10) SHA1(41a08b17285d6591b4a5cb6b1b6cc40ee7d35f01), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 46)" )
 GAME_CUSTOM( 199?, m4eaw__aj, m4eaw,  "eon01y.p1",                0x0000, 0x010000, CRC(ddc4f7d1) SHA1(bbc21ba153541df1507e01d4a25a1a669c8eab62), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 47)" )
+// "(C)1991 BARCREST" and "ER2 0.1"
+GAME_CUSTOM( 199?, m4eaw__at, m4eaw,  "er2s.p1",                  0x0000, 0x010000, CRC(bfee8157) SHA1(3ce5a2ec16f06c753a054a9f645efbcd26f411ab), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (ER2 0.1)" )
 GAME_CUSTOM( 199?, m4eaw__ak, m4eaw,  "er2ad.p1",                 0x0000, 0x010000, CRC(4e5fcc8b) SHA1(8176ca01ad49f39e1337a085cf3a1fd33803c517), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 48)" )
 GAME_CUSTOM( 199?, m4eaw__al, m4eaw,  "er2b.p1",                  0x0000, 0x010000, CRC(999c6510) SHA1(bc70b88183df84ea0e18e1017ab9d74545ce7588), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 49)" )
 GAME_CUSTOM( 199?, m4eaw__am, m4eaw,  "er2bd.p1",                 0x0000, 0x010000, CRC(3f50573a) SHA1(46527b08d751372df09d61fd67054600b6e933f3), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 50)" )
@@ -952,24 +1014,18 @@ GAME_CUSTOM( 199?, m4eaw__ap, m4eaw,  "er2dr.p1",                 0x0000, 0x0100
 GAME_CUSTOM( 199?, m4eaw__aq, m4eaw,  "er2dy.p1",                 0x0000, 0x010000, CRC(f20c4b31) SHA1(744ce6065b3bea3a0c128a4848282cbca2bc8056), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 54)" )
 GAME_CUSTOM( 199?, m4eaw__ar, m4eaw,  "er2k.p1",                  0x0000, 0x010000, CRC(2c3661bb) SHA1(5f5a6b47dacdb2184d3ac9646da616283743fcbf), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 55)" )
 GAME_CUSTOM( 199?, m4eaw__as, m4eaw,  "er2r.p1",                  0x0000, 0x010000, CRC(cb636e43) SHA1(44df3adc1d5af4c1930596f34f41884e7731be62), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 56)" )
-GAME_CUSTOM( 199?, m4eaw__at, m4eaw,  "er2s.p1",                  0x0000, 0x010000, CRC(bfee8157) SHA1(3ce5a2ec16f06c753a054a9f645efbcd26f411ab), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 57)" )
 GAME_CUSTOM( 199?, m4eaw__au, m4eaw,  "er2y.p1",                  0x0000, 0x010000, CRC(91369b00) SHA1(7427fcf9e350bc9a3883577de5ee4a4ab5ff63b0), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 58)" )
-GAME_CUSTOM( 199?, m4eaw__av, m4eaw,  "er4ad.p1",                 0x0000, 0x010000, CRC(93fff89d) SHA1(3f90168efa5ecaf7707ef357616638a9d5ab746f), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 59)" )
-GAME_CUSTOM( 199?, m4eaw__aw, m4eaw,  "er4b.p1",                  0x0000, 0x010000, CRC(cb39fda7) SHA1(4a31d2ff53942a658992a5e13c2b617da5fb03ce), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 60)" )
-GAME_CUSTOM( 199?, m4eaw__ax, m4eaw,  "er4bd.p1",                 0x0000, 0x010000, CRC(a5e395d7) SHA1(3f134a2ce3788ac84a6de096306c651e6b2d6a4a), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 61)" )
-GAME_CUSTOM( 199?, m4eaw__ay, m4eaw,  "er4d.p1",                  0x0000, 0x010000, CRC(33612923) SHA1(1129ced207aaf46045f20a1ef1a37af8ec537bb0), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 62)" )
-GAME_CUSTOM( 199?, m4eaw__az, m4eaw,  "er4dk.p1",                 0x0000, 0x010000, CRC(df41d570) SHA1(4a2db04ee51bb811ac3aee5b2c3c1f1a2201f7ec), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 63)" )
-GAME_CUSTOM( 199?, m4eaw__a0, m4eaw,  "er4dy.p1",                 0x0000, 0x010000, CRC(7df882e6) SHA1(1246220a5ac8a4454a7f3a359a5a00319395095d), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 64)" )
-GAME_CUSTOM( 199?, m4eaw__a1, m4eaw,  "er4k.p1",                  0x0000, 0x010000, CRC(9803cc0d) SHA1(1516c3836919a7a2cc32711a9bf2d3bf3d6b82c0), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 65)" )
-GAME_CUSTOM( 199?, m4eaw__a2, m4eaw,  "er4y.p1",                  0x0000, 0x010000, CRC(d8dece2d) SHA1(8482092434e1e94e6648e402c8b518c2f0fcc28e), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 66)" )
+// "(C)1991 BARCREST" and "ER8 0.1"
+GAME_CUSTOM( 199?, m4eaw__a9, m4eaw,  "er8s.p1",                  0x0000, 0x010000, CRC(5d36bbc6) SHA1(4d0cd8e939f22d919671dc97c3d97bf6191e738f), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (ER8 0.1)" )
 GAME_CUSTOM( 199?, m4eaw__a3, m4eaw,  "er8ad.p1",                 0x0000, 0x010000, CRC(ba059e06) SHA1(f6bb9092c9d18bccde111f8e20e79b8b4e6d8593), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 67)" )
 GAME_CUSTOM( 199?, m4eaw__a4, m4eaw,  "er8b.p1",                  0x0000, 0x010000, CRC(27c7f954) SHA1(93305d1d4a5781de56f1e54801e25b29b6713ef0), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 68)" )
 GAME_CUSTOM( 199?, m4eaw__a5, m4eaw,  "er8c.p1",                  0x0000, 0x010000, CRC(cee94fb3) SHA1(01ec098016b6946c3fbf96b2071076316bbd5795), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 69)" )
 GAME_CUSTOM( 199?, m4eaw__a6, m4eaw,  "er8dk.p1",                 0x0000, 0x010000, CRC(789c5e1d) SHA1(5f5b686a770f4ab0cfa8e8ae21b3805ef6102516), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 70)" )
 GAME_CUSTOM( 199?, m4eaw__a7, m4eaw,  "er8dy.p1",                 0x0000, 0x010000, CRC(4adf568b) SHA1(dd21b547211566ad5cb018a0205d887b7f860bc9), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 71)" )
 GAME_CUSTOM( 199?, m4eaw__a8, m4eaw,  "er8k.p1",                  0x0000, 0x010000, CRC(c76140e4) SHA1(6c097fdd018eb594a84ceb7712a45201490ca370), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 72)" )
-GAME_CUSTOM( 199?, m4eaw__a9, m4eaw,  "er8s.p1",                  0x0000, 0x010000, CRC(5d36bbc6) SHA1(4d0cd8e939f22d919671dc97c3d97bf6191e738f), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 73)" )
 GAME_CUSTOM( 199?, m4eaw__ba, m4eaw,  "er8y.p1",                  0x0000, 0x010000, CRC(8a1aa409) SHA1(a7ae62e1038e52a111de3004e2160838e0d102d0), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 74)" )
+// "(C)1991 BARCREST" and "ERT 0.2"
+GAME_CUSTOM( 199?, m4eaw__bk, m4eaw,  "erts.p1",                  0x0000, 0x010000, CRC(185b47bb) SHA1(377cb42878572a3e94dd6be6fb106ecacb3c5059), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (ERT 0.2)" )
 GAME_CUSTOM( 199?, m4eaw__bb, m4eaw,  "ertad.p1",                 0x0000, 0x010000, CRC(75798f2d) SHA1(68939c187d841aa046a4f7dd8f39e8387969460c), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 75)" )
 GAME_CUSTOM( 199?, m4eaw__bc, m4eaw,  "ertb.p1",                  0x0000, 0x010000, CRC(c6407839) SHA1(79d73d79b389682586fdf7c9c25d8e2ea5943bb6), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 76)" )
 GAME_CUSTOM( 199?, m4eaw__bd, m4eaw,  "ertbd.p1",                 0x0000, 0x010000, CRC(4365e267) SHA1(b1853c3ddb707cb114e6bb2d780b142b80f099b6), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 77)" )
@@ -979,8 +1035,9 @@ GAME_CUSTOM( 199?, m4eaw__bg, m4eaw,  "ertdr.p1",                 0x0000, 0x0100
 GAME_CUSTOM( 199?, m4eaw__bh, m4eaw,  "ertdy.p1",                 0x0000, 0x010000, CRC(5a7c77fa) SHA1(37c212db131b682fd8d293a8cf8efad2e80a8a18), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 81)" )
 GAME_CUSTOM( 199?, m4eaw__bi, m4eaw,  "ertk.p1",                  0x0000, 0x010000, CRC(19959bd3) SHA1(617f7079b39b0ef41ebb0b5f89053d723a28824d), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 82)" )
 GAME_CUSTOM( 199?, m4eaw__bj, m4eaw,  "ertr.p1",                  0x0000, 0x010000, CRC(3264f04a) SHA1(88d1f6857f3a0acd89db1563fd5f24582b578765), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 83)" )
-GAME_CUSTOM( 199?, m4eaw__bk, m4eaw,  "erts.p1",                  0x0000, 0x010000, CRC(185b47bb) SHA1(377cb42878572a3e94dd6be6fb106ecacb3c5059), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 84)" )
 GAME_CUSTOM( 199?, m4eaw__bl, m4eaw,  "erty.p1",                  0x0000, 0x010000, CRC(38adc77e) SHA1(7a925e2aa946fdcf38df454ec733da1ce9bdc495), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 85)" )
+// "(C)1991 BARCREST" and "ER4 0.1" (startup is EUN 0.1)
+GAME_CUSTOM( 199?, m4eaw__bw, m4eaw,  "eun01s.p1",                0x0000, 0x010000, CRC(d0b49fc6) SHA1(4062d9763010d42666660e383e52818d572b61b9), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (EUN 0.1 / ER4 0.1)" )
 GAME_CUSTOM( 199?, m4eaw__bm, m4eaw,  "eun01ad.p1",               0x0000, 0x010000, CRC(0148eb57) SHA1(7ebf73402ffe68cfb045a906ed039407bd173b88), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 86)" )
 GAME_CUSTOM( 199?, m4eaw__bn, m4eaw,  "eun01b.p1",                0x0000, 0x010000, CRC(ad152cda) SHA1(ca5c72a54e14f8b44fddfbc5c38c4e149432f593), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 87)" )
 GAME_CUSTOM( 199?, m4eaw__bo, m4eaw,  "eun01bd.p1",               0x0000, 0x010000, CRC(6b0abd7c) SHA1(a6f74096bfffa082a441c094b5acadd5929ac36a), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 88)" )
@@ -991,9 +1048,9 @@ GAME_CUSTOM( 199?, m4eaw__bs, m4eaw,  "eun01dr.p1",               0x0000, 0x0100
 GAME_CUSTOM( 199?, m4eaw__bt, m4eaw,  "eun01dy.p1",               0x0000, 0x010000, CRC(93db5d3a) SHA1(ddd209b22ed396d3329b9522649db6dda64958b7), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 93)" )
 GAME_CUSTOM( 199?, m4eaw__bu, m4eaw,  "eun01k.p1",                0x0000, 0x010000, CRC(9fca43fd) SHA1(f7626f122dedb217002888971100d8a34910b48d), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 94)" )
 GAME_CUSTOM( 199?, m4eaw__bv, m4eaw,  "eun01r.p1",                0x0000, 0x010000, CRC(15b8eb9e) SHA1(e4babaf526e6dd45bb4b7f7441a08cfbec12c661), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 95)" )
-GAME_CUSTOM( 199?, m4eaw__bw, m4eaw,  "eun01s.p1",                0x0000, 0x010000, CRC(d0b49fc6) SHA1(4062d9763010d42666660e383e52818d572b61b9), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 96)" )
 GAME_CUSTOM( 199?, m4eaw__bx, m4eaw,  "eun01y.p1",                0x0000, 0x010000, CRC(88d3c370) SHA1(6c3839a9c89ae67f80ab932ec70ebaf1240de9bb), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 97)" )
 
+// bad dump? wrong size
 ROM_START( m4eaw__bz ) \
 	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "everyones a winner v2-5p", 0x8000, 0x008000, CRC(eb8f2fc5) SHA1(0d3614bd5ff561d17bef0d1e620f2f812b8fed5b))
@@ -1017,48 +1074,59 @@ GAME(199?, m4eaw__bz, m4eaw ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,"Bar
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4wta,     0,      "wta55",                                    0x0000, 0x010000, CRC(df3e66cd) SHA1(68e769816cb1a71dea8a3ccf4636414c45c01646), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4wta__b,  m4wta,  "windy.p1",                                 0x0000, 0x010000, CRC(d8b78c2d) SHA1(d8c2a2ac30a9b876acfbe99e3c540ba0e82cde33), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4wta__d,  m4wta,  "wins.p1",                                  0x0000, 0x010000, CRC(d79d1e5b) SHA1(722657423a605d6d272d61e4e00b4055ed05f98d), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4wta__e,  m4wta,  "winy.p1",                                  0x0000, 0x010000, CRC(5ff8ed08) SHA1(9567db64e8ebf25ecb22236598cc88a3106f0e36), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4wta__f,  m4wta,  "wn5ad.p1",                                 0x0000, 0x010000, CRC(0eb0845d) SHA1(57a2ca27672119e71af3b990cedcf52dd89e24cc), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4wta__g,  m4wta,  "wn5b.p1",                                  0x0000, 0x010000, CRC(82cefba2) SHA1(07753a5f0d455422f33495a6f050c8e16a92e087), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4wta__h,  m4wta,  "wn5bd.p1",                                 0x0000, 0x010000, CRC(19d25b26) SHA1(91459c87e95d9800c5f77fd0c7f72f8a1488dc37), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4wta__i,  m4wta,  "wn5d.p1",                                  0x0000, 0x010000, CRC(8a3d6bed) SHA1(a20f24cd5216976913c0405f54883d6080986867), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4wta__j,  m4wta,  "wn5dk.p1",                                 0x0000, 0x010000, CRC(1dfcb2bc) SHA1(b1a73a7758c3126f7b13156835c91a4900cbe6e0), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4wta__k,  m4wta,  "wn5dy.p1",                                 0x0000, 0x010000, CRC(d45e1db0) SHA1(2524c4b60a89ea0ca15cf999fbd1f8d9029dfbb6), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4wta__l,  m4wta,  "wn5k.p1",                                  0x0000, 0x010000, CRC(71c34cb4) SHA1(e1b96dd30d8ab680128d76886691d06fcd2d48c0), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4wta__m,  m4wta,  "wn5s.p1",                                  0x0000, 0x010000, CRC(f6e925c1) SHA1(963f06462c73300757aad2371df4ebe28afca521), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4wta__n,  m4wta,  "wn5y.p1",                                  0x0000, 0x010000, CRC(7155f8b5) SHA1(f55f88fd7b0144cb7b64640d529b179dd056f5ec), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4wta__o,  m4wta,  "wn8b.p1",                                  0x0000, 0x010000, CRC(7e84f99c) SHA1(bef41b3e7906bdaadfa5741e9ae40028f4fd360f), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4wta__p,  m4wta,  "wn8c.p1",                                  0x0000, 0x010000, CRC(471ba65a) SHA1(6ede860bcf323ee75dd7f75a51e5d1166ee72abc), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4wta__q,  m4wta,  "wn8d.p1",                                  0x0000, 0x010000, CRC(eb2bd01e) SHA1(df74f8eb8fa411bab20ab522fd7c511a1370fe90), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4wta__r,  m4wta,  "wn8dk.p1",                                 0x0000, 0x010000, CRC(ec20a0bc) SHA1(61b615165a6e77cd85e1fa6aeb955307ec48d1b6), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4wta__s,  m4wta,  "wn8dy.p1",                                 0x0000, 0x010000, CRC(d2a1513c) SHA1(e4d2ad88846cbb6b393d3615bf10e1dea01de219), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4wta__t,  m4wta,  "wn8k.p1",                                  0x0000, 0x010000, CRC(3e15c690) SHA1(2fc1cca91ac5cc9abeac112e4d60e8fd57b07b94), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4wta__u,  m4wta,  "wn8s.p1",                                  0x0000, 0x010000, CRC(5c5a0f31) SHA1(301e595141dd6eb9250d71e591780e15a7d36423), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4wta__v,  m4wta,  "wn8y.p1",                                  0x0000, 0x010000, CRC(993cee6a) SHA1(26b2d5d3aa3465f90fe74960f183b8580ea2fbb1), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 23)" )
-GAME_CUSTOM( 199?, m4wta__w,  m4wta,  "wnta2010",                                 0x0000, 0x010000, CRC(5b08faf8) SHA1(f4657041562044e17febfe77ad1f849545dcdaec), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 24)" )
-GAME_CUSTOM( 199?, m4wta__x,  m4wta,  "wntad.p1",                                 0x0000, 0x010000, CRC(8502766e) SHA1(2a47c8f8ce8711b30962c5e8ef9093bdd3543551), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 25)" )
-GAME_CUSTOM( 199?, m4wta__y,  m4wta,  "wntb.p1",                                  0x0000, 0x010000, CRC(1e3159f0) SHA1(ab9d0e9e6731b40c66c358d98c6481f31d9a0b0c), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 26)" )
-GAME_CUSTOM( 199?, m4wta__z,  m4wta,  "wntbd.p1",                                 0x0000, 0x010000, CRC(91cc8978) SHA1(570ad4092bb148106fb2600f1e22b6cb6f57002a), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 27)" )
-GAME_CUSTOM( 199?, m4wta__0,  m4wta,  "wntd.p1",                                  0x0000, 0x010000, CRC(ad68d804) SHA1(f301d0d267dd0020903f06b67ee6494b71258c68), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 28)" )
-GAME_CUSTOM( 199?, m4wta__1,  m4wta,  "wntdk.p1",                                 0x0000, 0x010000, CRC(3a6b65b8) SHA1(1da0448e53a45fa249c14b5655cd0dc957ebb646), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 29)" )
-GAME_CUSTOM( 199?, m4wta__2,  m4wta,  "wntdy.p1",                                 0x0000, 0x010000, CRC(2420634f) SHA1(5c6e891c34a6e2b3a6acb3856c1554145bb24d0d), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 30)" )
-GAME_CUSTOM( 199?, m4wta__3,  m4wta,  "wntk.p1",                                  0x0000, 0x010000, CRC(3d8d07c7) SHA1(4659e2459d956bbcf5ef2a605527317ccdafcccb), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 31)" )
-GAME_CUSTOM( 199?, m4wta__4,  m4wta,  "wnts.p1",                                  0x0000, 0x010000, CRC(3a9b0878) SHA1(85e86cca1a3a079746cd4401767ba1d9fc31a938), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 32)" )
-GAME_CUSTOM( 199?, m4wta__5,  m4wta,  "wnty.p1",                                  0x0000, 0x010000, CRC(edaa5ae7) SHA1(d24b9f37d75f13f16718374e48e6c003b0b3333f), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 33)" )
-GAME_CUSTOM( 199?, m4wta__6,  m4wta,  "wta20p10.bin",                             0x0000, 0x010000, CRC(c7f235b8) SHA1(a25f6f755140d70b0392985839b1729640cf5d5d), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 34)" )
-GAME_CUSTOM( 199?, m4wta__7,  m4wta,  "wta510l",                                  0x0000, 0x010000, CRC(9ce140ae) SHA1(01d53a5da0161ac4ecc861309f645d6eb47b4af5), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 35)" )
-GAME_CUSTOM( 199?, m4wta__8,  m4wta,  "wta58tl",                                  0x0000, 0x010000, CRC(7275e865) SHA1(d5550646a062609cfc052fab81c533ca69171875), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 36)" )
-GAME_CUSTOM( 199?, m4wta__9,  m4wta,  "wta_5p_4c.bin",                            0x0000, 0x010000, CRC(54c51976) SHA1(70cae1f931615b993ac6a9e7ce2e529ad6d27da8), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 37)" )
-GAME_CUSTOM( 199?, m4wta__aa, m4wta,  "wtall20a",                                 0x0000, 0x010000, CRC(b53c951e) SHA1(24f96d16852a4fbaf49fbdf29a26d15877f07b18), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 38)" )
-GAME_CUSTOM( 199?, m4wta__ab, m4wta,  "wt_05__4.1_1",                             0x0000, 0x010000, CRC(5e05485e) SHA1(062f16ca92518f746f5410a2b9b551542e1a68e3), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 39)" )
-GAME_CUSTOM( 199?, m4wta__ac, m4wta,  "wt_05__5.3_1",                             0x0000, 0x010000, CRC(8a289bbd) SHA1(8ae0858716ed6aa02f6b4f93fd367c7cee85d13a), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 40)" )
-GAME_CUSTOM( 199?, m4wta__ad, m4wta,  "wta5.10",                                  0x0000, 0x010000, CRC(c1ae8e9a) SHA1(66c0b200202386a10b96b7141517a52921266950), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 41)" )
-GAME_CUSTOM( 199?, m4wta__ae, m4wta,  "wta5.4",                                   0x0000, 0x010000, CRC(00c64637) SHA1(54214edb107b28852a1bd3e095787bf9241e4fe3), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 42)" )
-GAME_CUSTOM( 199?, m4wta__af, m4wta,  "wta5.5n",                                  0x0000, 0x010000, CRC(85eed9b5) SHA1(6a11ff6a031b788524d23018e3af44767176246a), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 43)" )
-GAME_CUSTOM( 199?, m4wta__ag, m4wta,  "wta5.8t",                                  0x0000, 0x010000, CRC(548122ab) SHA1(c611084e8a08d5556e458daf9cc721c0e5ba1948), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 44)" )
+// (C)1993 BARCREST and "WIN 0.6"
+GAME_CUSTOM( 199?, m4wta,     0,      "wins.p1",                                  0x0000, 0x010000, CRC(d79d1e5b) SHA1(722657423a605d6d272d61e4e00b4055ed05f98d), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WIN 0.6)" )
+GAME_CUSTOM( 199?, m4wta__b,  m4wta,  "windy.p1",                                 0x0000, 0x010000, CRC(d8b78c2d) SHA1(d8c2a2ac30a9b876acfbe99e3c540ba0e82cde33), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WIN 0.6YD)" )
+GAME_CUSTOM( 199?, m4wta__e,  m4wta,  "winy.p1",                                  0x0000, 0x010000, CRC(5ff8ed08) SHA1(9567db64e8ebf25ecb22236598cc88a3106f0e36), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WIN 0.6Y)" )
+GAME_CUSTOM( 199?, m4wta__aa, m4wta,  "wtall20a",                                 0x0000, 0x010000, CRC(b53c951e) SHA1(24f96d16852a4fbaf49fbdf29a26d15877f07b18), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WIN 0.6K)" )
+// (C)1993 BARCREST and "WN5 0.1"
+GAME_CUSTOM( 199?, m4wta__f,  m4wta,  "wn5ad.p1",                                 0x0000, 0x010000, CRC(0eb0845d) SHA1(57a2ca27672119e71af3b990cedcf52dd89e24cc), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WN5 0.1AD)" )
+GAME_CUSTOM( 199?, m4wta__g,  m4wta,  "wn5b.p1",                                  0x0000, 0x010000, CRC(82cefba2) SHA1(07753a5f0d455422f33495a6f050c8e16a92e087), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WN5 0.1B)" )
+GAME_CUSTOM( 199?, m4wta__h,  m4wta,  "wn5bd.p1",                                 0x0000, 0x010000, CRC(19d25b26) SHA1(91459c87e95d9800c5f77fd0c7f72f8a1488dc37), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WN5 0.1BD)" )
+GAME_CUSTOM( 199?, m4wta__i,  m4wta,  "wn5d.p1",                                  0x0000, 0x010000, CRC(8a3d6bed) SHA1(a20f24cd5216976913c0405f54883d6080986867), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WN5 0.1D)" )
+GAME_CUSTOM( 199?, m4wta__j,  m4wta,  "wn5dk.p1",                                 0x0000, 0x010000, CRC(1dfcb2bc) SHA1(b1a73a7758c3126f7b13156835c91a4900cbe6e0), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WN5 0.1KD)" )
+GAME_CUSTOM( 199?, m4wta__k,  m4wta,  "wn5dy.p1",                                 0x0000, 0x010000, CRC(d45e1db0) SHA1(2524c4b60a89ea0ca15cf999fbd1f8d9029dfbb6), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WN5 0.1YD)" )
+GAME_CUSTOM( 199?, m4wta__l,  m4wta,  "wn5k.p1",                                  0x0000, 0x010000, CRC(71c34cb4) SHA1(e1b96dd30d8ab680128d76886691d06fcd2d48c0), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WN5 0.1K)" )
+GAME_CUSTOM( 199?, m4wta__m,  m4wta,  "wn5s.p1",                                  0x0000, 0x010000, CRC(f6e925c1) SHA1(963f06462c73300757aad2371df4ebe28afca521), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WN5 0.1)" )
+GAME_CUSTOM( 199?, m4wta__n,  m4wta,  "wn5y.p1",                                  0x0000, 0x010000, CRC(7155f8b5) SHA1(f55f88fd7b0144cb7b64640d529b179dd056f5ec), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WN5 0.1Y)" )
+// (C)1993 BARCREST and "WN8 0.1"
+GAME_CUSTOM( 199?, m4wta__o,  m4wta,  "wn8b.p1",                                  0x0000, 0x010000, CRC(7e84f99c) SHA1(bef41b3e7906bdaadfa5741e9ae40028f4fd360f), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WN8 0.1B)" )
+GAME_CUSTOM( 199?, m4wta__p,  m4wta,  "wn8c.p1",                                  0x0000, 0x010000, CRC(471ba65a) SHA1(6ede860bcf323ee75dd7f75a51e5d1166ee72abc), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WN8 0.1C)" )
+GAME_CUSTOM( 199?, m4wta__q,  m4wta,  "wn8d.p1",                                  0x0000, 0x010000, CRC(eb2bd01e) SHA1(df74f8eb8fa411bab20ab522fd7c511a1370fe90), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WN8 0.1D)" )
+GAME_CUSTOM( 199?, m4wta__r,  m4wta,  "wn8dk.p1",                                 0x0000, 0x010000, CRC(ec20a0bc) SHA1(61b615165a6e77cd85e1fa6aeb955307ec48d1b6), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WN8 0.1KD)" )
+GAME_CUSTOM( 199?, m4wta__s,  m4wta,  "wn8dy.p1",                                 0x0000, 0x010000, CRC(d2a1513c) SHA1(e4d2ad88846cbb6b393d3615bf10e1dea01de219), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WN8 0.1YD)" )
+GAME_CUSTOM( 199?, m4wta__t,  m4wta,  "wn8k.p1",                                  0x0000, 0x010000, CRC(3e15c690) SHA1(2fc1cca91ac5cc9abeac112e4d60e8fd57b07b94), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WN8 0.1K)" )
+GAME_CUSTOM( 199?, m4wta__u,  m4wta,  "wn8s.p1",                                  0x0000, 0x010000, CRC(5c5a0f31) SHA1(301e595141dd6eb9250d71e591780e15a7d36423), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WN8 0.1)" )
+GAME_CUSTOM( 199?, m4wta__v,  m4wta,  "wn8y.p1",                                  0x0000, 0x010000, CRC(993cee6a) SHA1(26b2d5d3aa3465f90fe74960f183b8580ea2fbb1), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WN8 0.1Y)" )
+// "(C)1993 BARCREST" and "WNT 0.1" // bad char alarm, hack?
+GAME_CUSTOM( 199?, m4wta__w,  m4wta,  "wnta2010",                                 0x0000, 0x010000, CRC(5b08faf8) SHA1(f4657041562044e17febfe77ad1f849545dcdaec), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WNT 0.1, hack?)" )
+// "(C)1993 BARCREST" and "WNT 0.1"
+GAME_CUSTOM( 199?, m4wta__x,  m4wta,  "wntad.p1",                                 0x0000, 0x010000, CRC(8502766e) SHA1(2a47c8f8ce8711b30962c5e8ef9093bdd3543551), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WNT 0.1AD)" )
+GAME_CUSTOM( 199?, m4wta__y,  m4wta,  "wntb.p1",                                  0x0000, 0x010000, CRC(1e3159f0) SHA1(ab9d0e9e6731b40c66c358d98c6481f31d9a0b0c), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WNT 0.1B)" )
+GAME_CUSTOM( 199?, m4wta__z,  m4wta,  "wntbd.p1",                                 0x0000, 0x010000, CRC(91cc8978) SHA1(570ad4092bb148106fb2600f1e22b6cb6f57002a), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WNT 0.1BD)" )
+GAME_CUSTOM( 199?, m4wta__0,  m4wta,  "wntd.p1",                                  0x0000, 0x010000, CRC(ad68d804) SHA1(f301d0d267dd0020903f06b67ee6494b71258c68), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WNT 0.1D)" )
+GAME_CUSTOM( 199?, m4wta__1,  m4wta,  "wntdk.p1",                                 0x0000, 0x010000, CRC(3a6b65b8) SHA1(1da0448e53a45fa249c14b5655cd0dc957ebb646), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WNT 0.1KD)" )
+GAME_CUSTOM( 199?, m4wta__2,  m4wta,  "wntdy.p1",                                 0x0000, 0x010000, CRC(2420634f) SHA1(5c6e891c34a6e2b3a6acb3856c1554145bb24d0d), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WNT 0.1YD)" )
+GAME_CUSTOM( 199?, m4wta__3,  m4wta,  "wntk.p1",                                  0x0000, 0x010000, CRC(3d8d07c7) SHA1(4659e2459d956bbcf5ef2a605527317ccdafcccb), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WNT 0.1K)" )
+GAME_CUSTOM( 199?, m4wta__4,  m4wta,  "wnts.p1",                                  0x0000, 0x010000, CRC(3a9b0878) SHA1(85e86cca1a3a079746cd4401767ba1d9fc31a938), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WNT 0.1)" )
+GAME_CUSTOM( 199?, m4wta__5,  m4wta,  "wnty.p1",                                  0x0000, 0x010000, CRC(edaa5ae7) SHA1(d24b9f37d75f13f16718374e48e6c003b0b3333f), "Barcrest","Winner Takes All (Barcrest) (MPU4) (WNT 0.1Y)" )
+// "(C)1996  B.W.B." and "WNC 1.3" // bad char alarm
+GAME_CUSTOM( 199?, m4wta__7,  m4wta,  "wta510l",                                  0x0000, 0x010000, CRC(9ce140ae) SHA1(01d53a5da0161ac4ecc861309f645d6eb47b4af5), "Bwb / hack?","Winner Takes All (Barcrest) (MPU4) (WNC 1.3, set 1)" )
+GAME_CUSTOM( 199?, m4wta__ad, m4wta,  "wta5.10",                                  0x0000, 0x010000, CRC(c1ae8e9a) SHA1(66c0b200202386a10b96b7141517a52921266950), "Bwb / hack?","Winner Takes All (Barcrest) (MPU4) (WNC 1.3, set 2)" )
+// "(C)1996  B.W.B." and "WN8 2.2" // bad char alarm
+GAME_CUSTOM( 199?, m4wta__8,  m4wta,  "wta58tl",                                  0x0000, 0x010000, CRC(7275e865) SHA1(d5550646a062609cfc052fab81c533ca69171875), "Bwb / hack?","Winner Takes All (Barcrest) (MPU4) (WN8 2.2, set 1)" )
+GAME_CUSTOM( 199?, m4wta__ag, m4wta,  "wta5.8t",                                  0x0000, 0x010000, CRC(548122ab) SHA1(c611084e8a08d5556e458daf9cc721c0e5ba1948), "Bwb / hack?","Winner Takes All (Barcrest) (MPU4) (WN8 2.2, set 2)" )
+// "(C)1996  B.W.B." and "WN4 1.1"
+GAME_CUSTOM( 199?, m4wta__9,  m4wta,  "wta_5p_4c.bin",                            0x0000, 0x010000, CRC(54c51976) SHA1(70cae1f931615b993ac6a9e7ce2e529ad6d27da8), "Bwb / hack?","Winner Takes All (Barcrest) (MPU4) (WN4 1.1 K5)" )
+GAME_CUSTOM( 199?, m4wta__ab, m4wta,  "wt_05__4.1_1",                             0x0000, 0x010000, CRC(5e05485e) SHA1(062f16ca92518f746f5410a2b9b551542e1a68e3), "Bwb / hack?","Winner Takes All (Barcrest) (MPU4) (WN4 1.1 5)" )
+GAME_CUSTOM( 199?, m4wta__ae, m4wta,  "wta5.4",                                   0x0000, 0x010000, CRC(00c64637) SHA1(54214edb107b28852a1bd3e095787bf9241e4fe3), "Bwb / hack?","Winner Takes All (Barcrest) (MPU4) (WN4 1.1, hack?)" ) // bad char alarm
+// "(C)1996  B.W.B." and "WN5 3.0"
+GAME_CUSTOM( 199?, m4wta__ac, m4wta,  "wt_05__5.3_1",                             0x0000, 0x010000, CRC(8a289bbd) SHA1(8ae0858716ed6aa02f6b4f93fd367c7cee85d13a), "Bwb / hack?","Winner Takes All (Barcrest) (MPU4) (WN5 3.0 5)" )
+// "BILLY   WHIZZ" and "V1   0.1"
+GAME_CUSTOM( 199?, m4wta__6,  m4wta,  "wta20p10.bin",                             0x0000, 0x010000, CRC(c7f235b8) SHA1(a25f6f755140d70b0392985839b1729640cf5d5d), "hack","Winner Takes All (Barcrest) (MPU4) (V1 0.1, hack)" )
+// "197  COCO" and "WN4 1.1" (hack)
+GAME_CUSTOM( 199?, m4wta__d,  m4wta,  "wta55",                                    0x0000, 0x010000, CRC(df3e66cd) SHA1(68e769816cb1a71dea8a3ccf4636414c45c01646), "hack","Winner Takes All (Barcrest) (MPU4) (WN4 1.1, hack, set 1)" )
+GAME_CUSTOM( 199?, m4wta__af, m4wta,  "wta5.5n",                                  0x0000, 0x010000, CRC(85eed9b5) SHA1(6a11ff6a031b788524d23018e3af44767176246a), "hack","Winner Takes All (Barcrest) (MPU4) (WN4 1.1, hack, set 2)" )
 
 
 #define M4GOODTM_EXTRA_ROMS \
@@ -1152,7 +1220,7 @@ GAME_CUSTOM( 199?, m4goodtm__a6,   m4goodtm,   "gts10y.p1",    0x0000, 0x020000,
 	ROM_REGION( 0x48, "fakechr", 0 ) \
 	ROM_LOAD( "tri98.chr", 0x0000, 0x000048, CRC(8a4532a8) SHA1(c128fd513bbcba68a1c75a11e09a54ba1d23d6f4) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
-	ROM_LOAD( "jagsnd.p1", 0x080000, 0x080000, CRC(7488f7a7) SHA1(d581e9d6b5052ee8fee353a83e9d9031443d060a) )
+	ROM_LOAD( "jagsnd.p1", 0x000000, 0x080000, CRC(7488f7a7) SHA1(d581e9d6b5052ee8fee353a83e9d9031443d060a) )
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -1162,16 +1230,20 @@ GAME_CUSTOM( 199?, m4goodtm__a6,   m4goodtm,   "gts10y.p1",    0x0000, 0x020000,
 		M4JPGEM_EXTRA_ROMS \
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
-GAME_CUSTOM( 199?, m4jpgem,     0,          "cg4ad.p1",     0x0000, 0x010000, CRC(417c98c1) SHA1(2ce23e27742c418d5ebaa0f4f0597e29955ea57d), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 1)" )
+
+// sets below give a hopper sense error (casino / club sets?)
+// "(C)1991 BARCREST" and "CG4 0.7"
+GAME_CUSTOM( 199?, m4jpgem,     0,          "cg4s.p1",      0x0000, 0x010000, CRC(f25eba0b) SHA1(250189b7fb8aa82a8696c3a0099eb13ec74eeb10), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (CG4 0.7)" )
+GAME_CUSTOM( 199?, m4jpgem__g,  m4jpgem,    "cg4ad.p1",     0x0000, 0x010000, CRC(417c98c1) SHA1(2ce23e27742c418d5ebaa0f4f0597e29955ea57d), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (CG4 0.7AD)" )
 GAME_CUSTOM( 199?, m4jpgem__a,  m4jpgem,    "cg4b.p1",      0x0000, 0x010000, CRC(c57cca63) SHA1(80a440912362d55cac6bc77b6ff6d6672af378c6), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4jpgem__b,  m4jpgem,    "cg4bd.p1",     0x0000, 0x010000, CRC(7604ea50) SHA1(3d6eee763bd21119ab52a2388229da076caf78a4), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4jpgem__c,  m4jpgem,    "cg4d.p1",      0x0000, 0x010000, CRC(87ea1087) SHA1(47f7c17fa3611745c881669ff50559e4b4386fd9), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 4)" )
 GAME_CUSTOM( 199?, m4jpgem__d,  m4jpgem,    "cg4dk.p1",     0x0000, 0x010000, CRC(230284fb) SHA1(39ab2abdd8d3af4818e4e3738529f020055ba659), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 5)" )
 GAME_CUSTOM( 199?, m4jpgem__e,  m4jpgem,    "cg4dy.p1",     0x0000, 0x010000, CRC(7d02342d) SHA1(097c9c9dc84bd00f1ddd64b1f9564f0cf7a9023f), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 6)" )
 GAME_CUSTOM( 199?, m4jpgem__f,  m4jpgem,    "cg4k.p1",      0x0000, 0x010000, CRC(ba4ef5a8) SHA1(1673985aee634aa5c8129cc1239ce08fb9f5da2c), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4jpgem__g,  m4jpgem,    "cg4s.p1",      0x0000, 0x010000, CRC(f25eba0b) SHA1(250189b7fb8aa82a8696c3a0099eb13ec74eeb10), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 8)" )
 GAME_CUSTOM( 199?, m4jpgem__h,  m4jpgem,    "cg4y.p1",      0x0000, 0x010000, CRC(237098d3) SHA1(9f54ed0d9ce37f3b4e6dca136fe4a12ba79c89f9), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4jpgem__i,  m4jpgem,    "cgt03ad.p1",   0x0000, 0x010000, CRC(88842c4a) SHA1(c86987b44f04cf28a6f68300e4345f635455d4bf), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 10)" )
+// "(C)1991 BARCREST" and "CG4 0.3" (startup shows CGT 0.3)
+GAME_CUSTOM( 199?, m4jpgem__i,  m4jpgem,    "cgt03ad.p1",   0x0000, 0x010000, CRC(88842c4a) SHA1(c86987b44f04cf28a6f68300e4345f635455d4bf), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (CGT 0.3AD / CG4 0.3)" )
 GAME_CUSTOM( 199?, m4jpgem__j,  m4jpgem,    "cgt03b.p1",    0x0000, 0x010000, CRC(99634ce1) SHA1(9fe867b0619070f563fb72b4415e4a9263c808e7), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 11)" )
 GAME_CUSTOM( 199?, m4jpgem__k,  m4jpgem,    "cgt03bd.p1",   0x0000, 0x010000, CRC(be984100) SHA1(dfa7d97f02dc988b7743a1f57ab08c406f712559), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 12)" )
 GAME_CUSTOM( 199?, m4jpgem__l,  m4jpgem,    "cgt03d.p1",    0x0000, 0x010000, CRC(aba3a305) SHA1(9a0203f830a0a8c6013eb5824bd48373c589dcb5), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 13)" )
@@ -1182,8 +1254,11 @@ GAME_CUSTOM( 199?, m4jpgem__p,  m4jpgem,    "cgt03k.p1",    0x0000, 0x010000, CR
 GAME_CUSTOM( 199?, m4jpgem__q,  m4jpgem,    "cgt03r.p1",    0x0000, 0x010000, CRC(85dd3733) SHA1(10b8c4d147d4b534ce31394d5ba69806b83a297e), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 18)" )
 GAME_CUSTOM( 199?, m4jpgem__r,  m4jpgem,    "cgt03s.p1",    0x0000, 0x010000, CRC(b516cbcd) SHA1(c04d32818f9f8772b2a945cf40075ce7844b936e), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 19)" )
 GAME_CUSTOM( 199?, m4jpgem__s,  m4jpgem,    "cgt03y.p1",    0x0000, 0x010000, CRC(57937087) SHA1(489bcbe5598020c24357f4c7b4e9096bc6332aa3), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4jpgem__t,  m4jpgem,    "cgts.p1",      0x0000, 0x010000, CRC(2a6f4489) SHA1(e410dd49cca50b3c051815a1b4be4bf2dc55f1af), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4jpgem__u,  m4jpgem,    "cgu02ad.p1",   0x0000, 0x010000, CRC(eee268a6) SHA1(ebc0d1e14ff27c5497b7c4e90e6fafa58916c83b), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 22)" )
+// "(C)1991 BARCREST" and "CG4 0.1" (startup shows CGT 0.1)
+GAME_CUSTOM( 199?, m4jpgem__t,  m4jpgem,    "cgts.p1",      0x0000, 0x010000, CRC(2a6f4489) SHA1(e410dd49cca50b3c051815a1b4be4bf2dc55f1af), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (CGT 0.1 / CG4 0.1)" )
+// "(C)1991 BARCREST" and "CG4 0.2" (startup shows CGU 0.2)
+GAME_CUSTOM( 199?, m4jpgem__3,  m4jpgem,    "cgu02s.p1",    0x0000, 0x010000, CRC(1cff0517) SHA1(162651a1af6273ea49490d0809a30ee9b13c728e), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (CGU 0.2 / CG4 0.2)" )
+GAME_CUSTOM( 199?, m4jpgem__u,  m4jpgem,    "cgu02ad.p1",   0x0000, 0x010000, CRC(eee268a6) SHA1(ebc0d1e14ff27c5497b7c4e90e6fafa58916c83b), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (CGU 0.2AD / CG4 0.2)" )
 GAME_CUSTOM( 199?, m4jpgem__v,  m4jpgem,    "cgu02b.p1",    0x0000, 0x010000, CRC(7d05d069) SHA1(2a94b121528bf39939f5a8b36318c0073171997d), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 23)" )
 GAME_CUSTOM( 199?, m4jpgem__w,  m4jpgem,    "cgu02bd.p1",   0x0000, 0x010000, CRC(d8fe05ec) SHA1(7e2de5c6ece6779d09daf23f3ab4b61817fad103), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 24)" )
 GAME_CUSTOM( 199?, m4jpgem__x,  m4jpgem,    "cgu02d.p1",    0x0000, 0x010000, CRC(daaf1fe1) SHA1(f2606c454e191166d217c5f5c82e91794977384b), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 25)" )
@@ -1192,54 +1267,10 @@ GAME_CUSTOM( 199?, m4jpgem__z,  m4jpgem,    "cgu02dr.p1",   0x0000, 0x010000, CR
 GAME_CUSTOM( 199?, m4jpgem__0,  m4jpgem,    "cgu02dy.p1",   0x0000, 0x010000, CRC(5f1709d1) SHA1(36ae3cd57e5db956b8ef362043d5c63aea0da06a), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 28)" )
 GAME_CUSTOM( 199?, m4jpgem__1,  m4jpgem,    "cgu02k.p1",    0x0000, 0x010000, CRC(90058f14) SHA1(0e73410253e422ff2d4182b034624ab8dd996cb8), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 29)" )
 GAME_CUSTOM( 199?, m4jpgem__2,  m4jpgem,    "cgu02r.p1",    0x0000, 0x010000, CRC(8f1d071b) SHA1(caa05465a12ca7ab6df0dce458caefb40dad818a), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 30)" )
-GAME_CUSTOM( 199?, m4jpgem__3,  m4jpgem,    "cgu02s.p1",    0x0000, 0x010000, CRC(1cff0517) SHA1(162651a1af6273ea49490d0809a30ee9b13c728e), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 31)" )
 GAME_CUSTOM( 199?, m4jpgem__4,  m4jpgem,    "cgu02y.p1",    0x0000, 0x010000, CRC(a2468782) SHA1(5f9161cffc6d9ffe8c30c41434ab012c16a48dfd), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 32)" )
-GAME_CUSTOM( 199?, m4jpgem__5,  m4jpgem,    "jagb.p1",      0x0000, 0x010000, CRC(75b9a4b6) SHA1(ecade0921cd535ee7f1b67767fa7d5ab3cd45b2c), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 33)" )
-GAME_CUSTOM( 199?, m4jpgem__6,  m4jpgem,    "jagd.p1",      0x0000, 0x010000, CRC(c7546004) SHA1(31bdbd6b681a3a2b13f380f2807691c0b0fec83e), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 34)" )
-GAME_CUSTOM( 199?, m4jpgem__7,  m4jpgem,    "jagdk.p1",     0x0000, 0x010000, CRC(313f7a1f) SHA1(358a33878ca70f2bcdb1d5d79c39e357586ebe8b), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 35)" )
-GAME_CUSTOM( 199?, m4jpgem__8,  m4jpgem,    "jagdy.p1",     0x0000, 0x010000, CRC(d105a41e) SHA1(365e382683362c815461801753fb03e2f084de65), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 36)" )
-GAME_CUSTOM( 199?, m4jpgem__9,  m4jpgem,    "jags.p1",      0x0000, 0x010000, CRC(dd93f084) SHA1(5cb25b3beb6d7a7b83227a6bb8382cfbcc285887), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 37)" )
-GAME_CUSTOM( 199?, m4jpgem__aa, m4jpgem,    "jagy.p1",      0x0000, 0x010000, CRC(08d510ca) SHA1(b79c9fe8dc17152f3e8c601c27515beff1d67219), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 38)" )
-GAME_CUSTOM( 199?, m4jpgem__ab, m4jpgem,    "jg3ad.p1",     0x0000, 0x010000, CRC(501bb879) SHA1(a97519042b4a4ed03efbcad9f11f279184dec847), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 39)" )
-GAME_CUSTOM( 199?, m4jpgem__ac, m4jpgem,    "jg3b.p1",      0x0000, 0x010000, CRC(e568ae84) SHA1(9126f9b45633e7eb44626aa0ab40784c62870c8a), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 40)" )
-GAME_CUSTOM( 199?, m4jpgem__ad, m4jpgem,    "jg3bd.p1",     0x0000, 0x010000, CRC(435d5d28) SHA1(1ea48323f48edc20ce1c28e4e7080e0824e73d3c), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 41)" )
-GAME_CUSTOM( 199?, m4jpgem__ae, m4jpgem,    "jg3d.p1",      0x0000, 0x010000, CRC(774f9d41) SHA1(c99e9a46b1216f430007b5ebbf942899b5e691f9), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 42)" )
-GAME_CUSTOM( 199?, m4jpgem__af, m4jpgem,    "jg3dk.p1",     0x0000, 0x010000, CRC(c422e514) SHA1(172b25bf75a529b555e328cef77a3340609d818b), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 43)" )
-GAME_CUSTOM( 199?, m4jpgem__ag, m4jpgem,    "jg3dy.p1",     0x0000, 0x010000, CRC(5d1c886f) SHA1(b49ab97ba6cdc810e7baa520ffad25f54c0d8412), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 44)" )
-GAME_CUSTOM( 199?, m4jpgem__ah, m4jpgem,    "jg3k.p1",      0x0000, 0x010000, CRC(8e7985ae) SHA1(8c8de22aab2508b2317d5edde779d54ebe67ac92), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 45)" )
-GAME_CUSTOM( 199?, m4jpgem__ai, m4jpgem,    "jg3s.p1",      0x0000, 0x010000, CRC(91945adc) SHA1(d80321fc4c2e67461d69df2164e3e290caa905bc), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 46)" )
-GAME_CUSTOM( 199?, m4jpgem__aj, m4jpgem,    "jg3y.p1",      0x0000, 0x010000, CRC(bf96ad55) SHA1(48d828398f32c3ddfafeb84cfd777f8e668df1b3), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 47)" )
-GAME_CUSTOM( 199?, m4jpgem__ak, m4jpgem,    "jg8b.p1",      0x0000, 0x010000, CRC(f2e3d009) SHA1(90c85f9a300d157d560b08ccabfe79f826780d74), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 48)" )
-GAME_CUSTOM( 199?, m4jpgem__al, m4jpgem,    "jg8c.p1",      0x0000, 0x010000, CRC(cc24cf15) SHA1(0c4c28633f33c78570f5da17c64c2e90bf3d5cd0), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 49)" )
-GAME_CUSTOM( 199?, m4jpgem__am, m4jpgem,    "jg8d.p1",      0x0000, 0x010000, CRC(58eff94c) SHA1(9acde535ad808789233876dd8076c03a8d56a9e7), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 50)" )
-GAME_CUSTOM( 199?, m4jpgem__an, m4jpgem,    "jg8db.p1",     0x0000, 0x010000, CRC(3006a36a) SHA1(37297cae02c1fd5308ba9935537b35c565374a07), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 51)" )
-GAME_CUSTOM( 199?, m4jpgem__ao, m4jpgem,    "jg8dk.p1",     0x0000, 0x010000, CRC(199401d7) SHA1(33eef070e437386c7ad0d834b40353047f1a6a6f), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 52)" )
-GAME_CUSTOM( 199?, m4jpgem__ap, m4jpgem,    "jg8dy.p1",     0x0000, 0x010000, CRC(ead58bed) SHA1(cd0e151c843f5268edddb2f82555201deccac65a), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 53)" )
-GAME_CUSTOM( 199?, m4jpgem__aq, m4jpgem,    "jg8k.p1",      0x0000, 0x010000, CRC(f5b14363) SHA1(f0ace838cc0d0c262006bb514eff75903d92d679), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 54)" )
-GAME_CUSTOM( 199?, m4jpgem__ar, m4jpgem,    "jg8s.p1",      0x0000, 0x010000, CRC(8cdd650a) SHA1(c4cb87513f0d7986e158b3c5ab1f034c8ba933a9), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 55)" )
-GAME_CUSTOM( 199?, m4jpgem__as, m4jpgem,    "jgtad.p1",     0x0000, 0x010000, CRC(90e10b6c) SHA1(548c7537829ca9395cac460ccf76e0d566898e44), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 56)" )
-GAME_CUSTOM( 199?, m4jpgem__at, m4jpgem,    "jgtb.p1",      0x0000, 0x010000, CRC(5f343a43) SHA1(033824e93b1fcd2f7c5f27a573a728747ef7b21a), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 57)" )
-GAME_CUSTOM( 199?, m4jpgem__au, m4jpgem,    "jgtbd.p1",     0x0000, 0x010000, CRC(50ba2771) SHA1(f487ed2eeff0369e3fa718de68e3ba4912fd7576), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 58)" )
-GAME_CUSTOM( 199?, m4jpgem__av, m4jpgem,    "jgtd.p1",      0x0000, 0x010000, CRC(2625da4a) SHA1(b1f9d22a46bf20283c5735fce5768d9cef299f59), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 59)" )
-GAME_CUSTOM( 199?, m4jpgem__aw, m4jpgem,    "jgtdk.p1",     0x0000, 0x010000, CRC(94220901) SHA1(f62c9a59bb419e98f7de358f7fee072b08aab3f5), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 60)" )
-GAME_CUSTOM( 199?, m4jpgem__ax, m4jpgem,    "jgtdr.p1",     0x0000, 0x010000, CRC(5011d1e3) SHA1(85e5d28d26449a951704698a4419cd2c0f7dd9c4), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 61)" )
-GAME_CUSTOM( 199?, m4jpgem__ay, m4jpgem,    "jgtdy.p1",     0x0000, 0x010000, CRC(6397e38c) SHA1(ed0c165a5ab27524374c540fd9bdcfd41ce8096c), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 62)" )
-GAME_CUSTOM( 199?, m4jpgem__az, m4jpgem,    "jgtk.p1",      0x0000, 0x010000, CRC(cb30d644) SHA1(751fc5c7ae07e64c07a3e89e74ace09dd2b99a02), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 63)" )
-GAME_CUSTOM( 199?, m4jpgem__a0, m4jpgem,    "jgtr.p1",      0x0000, 0x010000, CRC(6224a93d) SHA1(6d36b64c2eaddf122a6a7e798b5efb44ec2e5b45), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 64)" )
-GAME_CUSTOM( 199?, m4jpgem__a1, m4jpgem,    "jgts.p1",      0x0000, 0x010000, CRC(0e3810a7) SHA1(cf840bd84eba65d9dec2d6821a48112b6f2f9bca), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 65)" )
-GAME_CUSTOM( 199?, m4jpgem__a2, m4jpgem,    "jgty.p1",      0x0000, 0x010000, CRC(84830d1f) SHA1(a4184a5bd08393c35f22bc05315377bff74f666c), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 66)" )
-GAME_CUSTOM( 199?, m4jpgem__a3, m4jpgem,    "jgu02ad.p1",   0x0000, 0x010000, CRC(ccec7d40) SHA1(75cc1a0dfda9592e35c24c030e04a768871a9e41), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 67)" )
-GAME_CUSTOM( 199?, m4jpgem__a4, m4jpgem,    "jgu02b.p1",    0x0000, 0x010000, CRC(daf0ebe3) SHA1(2e73f7b8171c0be7d06bf6da22e0395d5241b043), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 68)" )
-GAME_CUSTOM( 199?, m4jpgem__a5, m4jpgem,    "jgu02bd.p1",   0x0000, 0x010000, CRC(faf0100a) SHA1(c97b8eadfd473650ec497c7caa98e8efc59ecb6f), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 69)" )
-GAME_CUSTOM( 199?, m4jpgem__a6, m4jpgem,    "jgu02d.p1",    0x0000, 0x010000, CRC(b46e3f66) SHA1(1ede9d794effbc8cc9f097a06b7df4023d3d47ba), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 70)" )
-GAME_CUSTOM( 199?, m4jpgem__a7, m4jpgem,    "jgu02dk.p1",   0x0000, 0x010000, CRC(cdbf0041) SHA1(fb90d4f8112e169dab16f78fdea9d1b5306e05d6), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 71)" )
-GAME_CUSTOM( 199?, m4jpgem__a8, m4jpgem,    "jgu02dr.p1",   0x0000, 0x010000, CRC(41f1f723) SHA1(96623358e6dc450dbdc769d176703917f67e767a), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 72)" )
-GAME_CUSTOM( 199?, m4jpgem__a9, m4jpgem,    "jgu02dy.p1",   0x0000, 0x010000, CRC(2023388d) SHA1(c9f1abaa12c78ac61304966b46044b82ea2ea3ff), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 73)" )
-GAME_CUSTOM( 199?, m4jpgem__ba, m4jpgem,    "jgu02k.p1",    0x0000, 0x010000, CRC(615029e8) SHA1(aecba0fad8c74fef9a4d04e95df961432ac999b7), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 74)" )
-GAME_CUSTOM( 199?, m4jpgem__bb, m4jpgem,    "jgu02r.p1",    0x0000, 0x010000, CRC(4bc55daa) SHA1(996f23bd66a4ef6ad8f77a28dc6ee67d9a293248), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 75)" )
-GAME_CUSTOM( 199?, m4jpgem__bc, m4jpgem,    "jgu02s.p1",    0x0000, 0x010000, CRC(f8abd287) SHA1(906d2817f73ea21cf830b0bd9a1938d344cc0341), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 76)" )
-GAME_CUSTOM( 199?, m4jpgem__bd, m4jpgem,    "jgu02y.p1",    0x0000, 0x010000, CRC(9b4325a8) SHA1(3d7c54691ed4d596acacec97e452a66b324957db), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 77)" )
-GAME_CUSTOM( 199?, m4jpgem__be, m4jpgem,    "rrh01ad.p1",   0x0000, 0x010000, CRC(d4f21930) SHA1(cba034b42a3587c0e173bc06d80142d7e494c849), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 78)" )
+// "(C)1991 BARCREST" and "CG4 0.1" (startup shows RRH 0.1)
+GAME_CUSTOM( 199?, m4jpgem__bo, m4jpgem,    "rrh01s.p1",    0x0000, 0x010000, CRC(dea2f376) SHA1(92f43c75950553d9b76af8179192d106de95fc03), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (RRH 0.1 / CG4 0.1)" )
+GAME_CUSTOM( 199?, m4jpgem__be, m4jpgem,    "rrh01ad.p1",   0x0000, 0x010000, CRC(d4f21930) SHA1(cba034b42a3587c0e173bc06d80142d7e494c849), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (RRH 0.1AD / CG4 0.1)" )
 GAME_CUSTOM( 199?, m4jpgem__bf, m4jpgem,    "rrh01b.p1",    0x0000, 0x010000, CRC(c85f9099) SHA1(f3c8f79c2e0cc58024202564761f4935f5d241b1), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 79)" )
 GAME_CUSTOM( 199?, m4jpgem__bg, m4jpgem,    "rrh01bd.p1",   0x0000, 0x010000, CRC(e2ee747a) SHA1(7f6cb93e3cbe4a2dd97d1ad15d17fa4f2f0a4b12), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 80)" )
 GAME_CUSTOM( 199?, m4jpgem__bh, m4jpgem,    "rrh01c.p1",    0x0000, 0x010000, CRC(00dfced2) SHA1(c497cb9835dca0d67f5ec6b6b1321a7b92612c9a), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 81)" )
@@ -1249,8 +1280,58 @@ GAME_CUSTOM( 199?, m4jpgem__bk, m4jpgem,    "rrh01dr.p1",   0x0000, 0x010000, CR
 GAME_CUSTOM( 199?, m4jpgem__bl, m4jpgem,    "rrh01dy.p1",   0x0000, 0x010000, CRC(d89136fd) SHA1(40fd0978bc76d81bfb5dc2f1e4a0c1c95b7c4e00), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 85)" )
 GAME_CUSTOM( 199?, m4jpgem__bm, m4jpgem,    "rrh01k.p1",    0x0000, 0x010000, CRC(da4a08c9) SHA1(3a86c0a543a7192680663b465ddfd1fa338cfec5), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 86)" )
 GAME_CUSTOM( 199?, m4jpgem__bn, m4jpgem,    "rrh01r.p1",    0x0000, 0x010000, CRC(fb45c547) SHA1(8d9c35c47c0f03c9dc6727fc5f952d64e25336f7), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 87)" )
-GAME_CUSTOM( 199?, m4jpgem__bo, m4jpgem,    "rrh01s.p1",    0x0000, 0x010000, CRC(dea2f376) SHA1(92f43c75950553d9b76af8179192d106de95fc03), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 88)" )
 GAME_CUSTOM( 199?, m4jpgem__bp, m4jpgem,    "rrh01y.p1",    0x0000, 0x010000, CRC(27014453) SHA1(febc118fcb8f048806237b38958c02d02b9f2874), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 89)" )
+// sets below boot (regular arcade sets?)
+// "(C)1991 BARCREST" and "JAG 0.4"
+GAME_CUSTOM( 199?, m4jpgem__9,  m4jpgem,    "jags.p1",      0x0000, 0x010000, CRC(dd93f084) SHA1(5cb25b3beb6d7a7b83227a6bb8382cfbcc285887), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (JAG 0.4)" )
+GAME_CUSTOM( 199?, m4jpgem__5,  m4jpgem,    "jagb.p1",      0x0000, 0x010000, CRC(75b9a4b6) SHA1(ecade0921cd535ee7f1b67767fa7d5ab3cd45b2c), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (JAG 0.4B)" )
+GAME_CUSTOM( 199?, m4jpgem__6,  m4jpgem,    "jagd.p1",      0x0000, 0x010000, CRC(c7546004) SHA1(31bdbd6b681a3a2b13f380f2807691c0b0fec83e), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 34)" )
+GAME_CUSTOM( 199?, m4jpgem__7,  m4jpgem,    "jagdk.p1",     0x0000, 0x010000, CRC(313f7a1f) SHA1(358a33878ca70f2bcdb1d5d79c39e357586ebe8b), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 35)" )
+GAME_CUSTOM( 199?, m4jpgem__8,  m4jpgem,    "jagdy.p1",     0x0000, 0x010000, CRC(d105a41e) SHA1(365e382683362c815461801753fb03e2f084de65), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 36)" )
+GAME_CUSTOM( 199?, m4jpgem__aa, m4jpgem,    "jagy.p1",      0x0000, 0x010000, CRC(08d510ca) SHA1(b79c9fe8dc17152f3e8c601c27515beff1d67219), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 38)" )
+// "(C)1991 BARCREST" and "JG3 0.1"
+GAME_CUSTOM( 199?, m4jpgem__ai, m4jpgem,    "jg3s.p1",      0x0000, 0x010000, CRC(91945adc) SHA1(d80321fc4c2e67461d69df2164e3e290caa905bc), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (JG3 0.1)" )
+GAME_CUSTOM( 199?, m4jpgem__ab, m4jpgem,    "jg3ad.p1",     0x0000, 0x010000, CRC(501bb879) SHA1(a97519042b4a4ed03efbcad9f11f279184dec847), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (JG3 0.1AD)" )
+GAME_CUSTOM( 199?, m4jpgem__ac, m4jpgem,    "jg3b.p1",      0x0000, 0x010000, CRC(e568ae84) SHA1(9126f9b45633e7eb44626aa0ab40784c62870c8a), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 40)" )
+GAME_CUSTOM( 199?, m4jpgem__ad, m4jpgem,    "jg3bd.p1",     0x0000, 0x010000, CRC(435d5d28) SHA1(1ea48323f48edc20ce1c28e4e7080e0824e73d3c), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 41)" )
+GAME_CUSTOM( 199?, m4jpgem__ae, m4jpgem,    "jg3d.p1",      0x0000, 0x010000, CRC(774f9d41) SHA1(c99e9a46b1216f430007b5ebbf942899b5e691f9), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 42)" )
+GAME_CUSTOM( 199?, m4jpgem__af, m4jpgem,    "jg3dk.p1",     0x0000, 0x010000, CRC(c422e514) SHA1(172b25bf75a529b555e328cef77a3340609d818b), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 43)" )
+GAME_CUSTOM( 199?, m4jpgem__ag, m4jpgem,    "jg3dy.p1",     0x0000, 0x010000, CRC(5d1c886f) SHA1(b49ab97ba6cdc810e7baa520ffad25f54c0d8412), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 44)" )
+GAME_CUSTOM( 199?, m4jpgem__ah, m4jpgem,    "jg3k.p1",      0x0000, 0x010000, CRC(8e7985ae) SHA1(8c8de22aab2508b2317d5edde779d54ebe67ac92), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 45)" )
+GAME_CUSTOM( 199?, m4jpgem__aj, m4jpgem,    "jg3y.p1",      0x0000, 0x010000, CRC(bf96ad55) SHA1(48d828398f32c3ddfafeb84cfd777f8e668df1b3), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 47)" )
+// "(C)1991 BARCREST" and "JG8 0.1"
+GAME_CUSTOM( 199?, m4jpgem__ar, m4jpgem,    "jg8s.p1",      0x0000, 0x010000, CRC(8cdd650a) SHA1(c4cb87513f0d7986e158b3c5ab1f034c8ba933a9), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (JG8 0.1)" )
+GAME_CUSTOM( 199?, m4jpgem__ak, m4jpgem,    "jg8b.p1",      0x0000, 0x010000, CRC(f2e3d009) SHA1(90c85f9a300d157d560b08ccabfe79f826780d74), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (JG8 0.1B)" )
+GAME_CUSTOM( 199?, m4jpgem__al, m4jpgem,    "jg8c.p1",      0x0000, 0x010000, CRC(cc24cf15) SHA1(0c4c28633f33c78570f5da17c64c2e90bf3d5cd0), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 49)" )
+GAME_CUSTOM( 199?, m4jpgem__am, m4jpgem,    "jg8d.p1",      0x0000, 0x010000, CRC(58eff94c) SHA1(9acde535ad808789233876dd8076c03a8d56a9e7), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 50)" )
+GAME_CUSTOM( 199?, m4jpgem__an, m4jpgem,    "jg8db.p1",     0x0000, 0x010000, CRC(3006a36a) SHA1(37297cae02c1fd5308ba9935537b35c565374a07), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 51)" )
+GAME_CUSTOM( 199?, m4jpgem__ao, m4jpgem,    "jg8dk.p1",     0x0000, 0x010000, CRC(199401d7) SHA1(33eef070e437386c7ad0d834b40353047f1a6a6f), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 52)" )
+GAME_CUSTOM( 199?, m4jpgem__ap, m4jpgem,    "jg8dy.p1",     0x0000, 0x010000, CRC(ead58bed) SHA1(cd0e151c843f5268edddb2f82555201deccac65a), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 53)" )
+GAME_CUSTOM( 199?, m4jpgem__aq, m4jpgem,    "jg8k.p1",      0x0000, 0x010000, CRC(f5b14363) SHA1(f0ace838cc0d0c262006bb514eff75903d92d679), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 54)" )
+// "(C)1991 BARCREST" and "JGT 0.3"
+GAME_CUSTOM( 199?, m4jpgem__a1, m4jpgem,    "jgts.p1",      0x0000, 0x010000, CRC(0e3810a7) SHA1(cf840bd84eba65d9dec2d6821a48112b6f2f9bca), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (JGT 0.3)" )
+GAME_CUSTOM( 199?, m4jpgem__as, m4jpgem,    "jgtad.p1",     0x0000, 0x010000, CRC(90e10b6c) SHA1(548c7537829ca9395cac460ccf76e0d566898e44), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (JGT 0.3AD)" )
+GAME_CUSTOM( 199?, m4jpgem__at, m4jpgem,    "jgtb.p1",      0x0000, 0x010000, CRC(5f343a43) SHA1(033824e93b1fcd2f7c5f27a573a728747ef7b21a), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 57)" )
+GAME_CUSTOM( 199?, m4jpgem__au, m4jpgem,    "jgtbd.p1",     0x0000, 0x010000, CRC(50ba2771) SHA1(f487ed2eeff0369e3fa718de68e3ba4912fd7576), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 58)" )
+GAME_CUSTOM( 199?, m4jpgem__av, m4jpgem,    "jgtd.p1",      0x0000, 0x010000, CRC(2625da4a) SHA1(b1f9d22a46bf20283c5735fce5768d9cef299f59), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 59)" )
+GAME_CUSTOM( 199?, m4jpgem__aw, m4jpgem,    "jgtdk.p1",     0x0000, 0x010000, CRC(94220901) SHA1(f62c9a59bb419e98f7de358f7fee072b08aab3f5), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 60)" )
+GAME_CUSTOM( 199?, m4jpgem__ax, m4jpgem,    "jgtdr.p1",     0x0000, 0x010000, CRC(5011d1e3) SHA1(85e5d28d26449a951704698a4419cd2c0f7dd9c4), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 61)" )
+GAME_CUSTOM( 199?, m4jpgem__ay, m4jpgem,    "jgtdy.p1",     0x0000, 0x010000, CRC(6397e38c) SHA1(ed0c165a5ab27524374c540fd9bdcfd41ce8096c), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 62)" )
+GAME_CUSTOM( 199?, m4jpgem__az, m4jpgem,    "jgtk.p1",      0x0000, 0x010000, CRC(cb30d644) SHA1(751fc5c7ae07e64c07a3e89e74ace09dd2b99a02), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 63)" )
+GAME_CUSTOM( 199?, m4jpgem__a0, m4jpgem,    "jgtr.p1",      0x0000, 0x010000, CRC(6224a93d) SHA1(6d36b64c2eaddf122a6a7e798b5efb44ec2e5b45), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 64)" )
+GAME_CUSTOM( 199?, m4jpgem__a2, m4jpgem,    "jgty.p1",      0x0000, 0x010000, CRC(84830d1f) SHA1(a4184a5bd08393c35f22bc05315377bff74f666c), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 66)" )
+// "(C)1991 BARCREST" and "JGU 0.2"
+GAME_CUSTOM( 199?, m4jpgem__bc, m4jpgem,    "jgu02s.p1",    0x0000, 0x010000, CRC(f8abd287) SHA1(906d2817f73ea21cf830b0bd9a1938d344cc0341), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (JGU 0.2)" )
+GAME_CUSTOM( 199?, m4jpgem__a3, m4jpgem,    "jgu02ad.p1",   0x0000, 0x010000, CRC(ccec7d40) SHA1(75cc1a0dfda9592e35c24c030e04a768871a9e41), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (JGU 0.2AD)" )
+GAME_CUSTOM( 199?, m4jpgem__a4, m4jpgem,    "jgu02b.p1",    0x0000, 0x010000, CRC(daf0ebe3) SHA1(2e73f7b8171c0be7d06bf6da22e0395d5241b043), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 68)" )
+GAME_CUSTOM( 199?, m4jpgem__a5, m4jpgem,    "jgu02bd.p1",   0x0000, 0x010000, CRC(faf0100a) SHA1(c97b8eadfd473650ec497c7caa98e8efc59ecb6f), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 69)" )
+GAME_CUSTOM( 199?, m4jpgem__a6, m4jpgem,    "jgu02d.p1",    0x0000, 0x010000, CRC(b46e3f66) SHA1(1ede9d794effbc8cc9f097a06b7df4023d3d47ba), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 70)" )
+GAME_CUSTOM( 199?, m4jpgem__a7, m4jpgem,    "jgu02dk.p1",   0x0000, 0x010000, CRC(cdbf0041) SHA1(fb90d4f8112e169dab16f78fdea9d1b5306e05d6), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 71)" )
+GAME_CUSTOM( 199?, m4jpgem__a8, m4jpgem,    "jgu02dr.p1",   0x0000, 0x010000, CRC(41f1f723) SHA1(96623358e6dc450dbdc769d176703917f67e767a), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 72)" )
+GAME_CUSTOM( 199?, m4jpgem__a9, m4jpgem,    "jgu02dy.p1",   0x0000, 0x010000, CRC(2023388d) SHA1(c9f1abaa12c78ac61304966b46044b82ea2ea3ff), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 73)" )
+GAME_CUSTOM( 199?, m4jpgem__ba, m4jpgem,    "jgu02k.p1",    0x0000, 0x010000, CRC(615029e8) SHA1(aecba0fad8c74fef9a4d04e95df961432ac999b7), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 74)" )
+GAME_CUSTOM( 199?, m4jpgem__bb, m4jpgem,    "jgu02r.p1",    0x0000, 0x010000, CRC(4bc55daa) SHA1(996f23bd66a4ef6ad8f77a28dc6ee67d9a293248), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 75)" )
+GAME_CUSTOM( 199?, m4jpgem__bd, m4jpgem,    "jgu02y.p1",    0x0000, 0x010000, CRC(9b4325a8) SHA1(3d7c54691ed4d596acacec97e452a66b324957db), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 77)" )
 
 #define M4JPGEMC_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
@@ -1265,7 +1346,9 @@ GAME_CUSTOM( 199?, m4jpgem__bp, m4jpgem,    "rrh01y.p1",    0x0000, 0x010000, CR
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4jpgemc,       0,          "gtc01ad.p1",   0x0000, 0x010000, CRC(e4f61afd) SHA1(36e007275cce0565c50b150dba4c8df272cd4c2e), "Barcrest","Jackpot Gems Classic (Barcrest) (MPU4) (set 1)" )
+// "(C)1991 BARCREST" and "CG4 0.1" (startup shows GTC)
+GAME_CUSTOM( 199?, m4jpgemc,       0,          "gtc01s.p1",    0x0000, 0x010000, CRC(af33337b) SHA1(97d28e224b73baa9d6d7b0c309385f57b6dd5d9b), "Barcrest","Jackpot Gems Classic (Barcrest) (MPU4) (GTC 0.1 / CG4 0.1)" )
+GAME_CUSTOM( 199?, m4jpgemc__j,    m4jpgemc,   "gtc01ad.p1",   0x0000, 0x010000, CRC(e4f61afd) SHA1(36e007275cce0565c50b150dba4c8df272cd4c2e), "Barcrest","Jackpot Gems Classic (Barcrest) (MPU4) (GTC 0.1AD / CG4 0.1)" )
 GAME_CUSTOM( 199?, m4jpgemc__a,    m4jpgemc,   "gtc01b.p1",    0x0000, 0x010000, CRC(e4e27c71) SHA1(b46da3f00134d3a2f17ceb35529adb598c75ee4e), "Barcrest","Jackpot Gems Classic (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4jpgemc__b,    m4jpgemc,   "gtc01bd.p1",   0x0000, 0x010000, CRC(d2ea77b7) SHA1(4f66fa8d692f26ffa92ae3aff4f43257fc573e93), "Barcrest","Jackpot Gems Classic (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4jpgemc__c,    m4jpgemc,   "gtc01c.p1",    0x0000, 0x010000, CRC(21c4c4f7) SHA1(f8a2de8453c095db80ff19018a72b15b949bace9), "Barcrest","Jackpot Gems Classic (Barcrest) (MPU4) (set 4)" )
@@ -1275,9 +1358,10 @@ GAME_CUSTOM( 199?, m4jpgemc__f,    m4jpgemc,   "gtc01dr.p1",   0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4jpgemc__g,    m4jpgemc,   "gtc01dy.p1",   0x0000, 0x010000, CRC(713dec4a) SHA1(3cb1e3f5299a5145addaa677022e7d9a164072d9), "Barcrest","Jackpot Gems Classic (Barcrest) (MPU4) (set 8)" )
 GAME_CUSTOM( 199?, m4jpgemc__h,    m4jpgemc,   "gtc01k.p1",    0x0000, 0x010000, CRC(fb5102ec) SHA1(36c9c50c8266707542b00cfc55f57ec454401f70), "Barcrest","Jackpot Gems Classic (Barcrest) (MPU4) (set 9)" )
 GAME_CUSTOM( 199?, m4jpgemc__i,    m4jpgemc,   "gtc01r.p1",    0x0000, 0x010000, CRC(e311ca39) SHA1(602aee41400793f46f47ac9c8a9e6ce7f2d5f203), "Barcrest","Jackpot Gems Classic (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4jpgemc__j,    m4jpgemc,   "gtc01s.p1",    0x0000, 0x010000, CRC(af33337b) SHA1(97d28e224b73baa9d6d7b0c309385f57b6dd5d9b), "Barcrest","Jackpot Gems Classic (Barcrest) (MPU4) (set 11)" )
 GAME_CUSTOM( 199?, m4jpgemc__k,    m4jpgemc,   "gtc01y.p1",    0x0000, 0x010000, CRC(59e8557a) SHA1(8493b160427c21bbb2834c01b39f8a6a8b221bb3), "Barcrest","Jackpot Gems Classic (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4jpgemc__l,    m4jpgemc,   "hge01ad.p1",   0x0000, 0x010000, CRC(bb201074) SHA1(eb954d165c2d96f952439277d255e3ec3326ada3), "Barcrest","Jackpot Gems Classic (Barcrest) (MPU4) (set 13)" )
+// "(C)1991 BARCREST" and "CG4 0.1" (startup shows HGE)
+GAME_CUSTOM( 199?, m4jpgemc__v,    m4jpgemc,   "hge01s.p1",    0x0000, 0x010000, CRC(b79f8c42) SHA1(7d8b3352fbd9a80b86f5a8b22833d6f5c4b9854b), "Barcrest","Jackpot Gems Classic (Barcrest) (MPU4) (HGE 0.1 / CG4 0.1)" )
+GAME_CUSTOM( 199?, m4jpgemc__l,    m4jpgemc,   "hge01ad.p1",   0x0000, 0x010000, CRC(bb201074) SHA1(eb954d165c2d96f952439277d255e3ec3326ada3), "Barcrest","Jackpot Gems Classic (Barcrest) (MPU4) (HGE 0.1AD / CG4 0.1)" )
 GAME_CUSTOM( 199?, m4jpgemc__m,    m4jpgemc,   "hge01b.p1",    0x0000, 0x010000, CRC(d7ad2482) SHA1(ed90c4531608e66b14eb1079e85ea59573adf451), "Barcrest","Jackpot Gems Classic (Barcrest) (MPU4) (set 14)" )
 GAME_CUSTOM( 199?, m4jpgemc__n,    m4jpgemc,   "hge01bd.p1",   0x0000, 0x010000, CRC(3ea0f524) SHA1(1967e5ec14c41c4140c7c39b07085f740c2d1f01), "Barcrest","Jackpot Gems Classic (Barcrest) (MPU4) (set 15)" )
 GAME_CUSTOM( 199?, m4jpgemc__o,    m4jpgemc,   "hge01c.p1",    0x0000, 0x010000, CRC(498de7bf) SHA1(32dc31852fa69f7d2dd47bbcef695fcf5337f01f), "Barcrest","Jackpot Gems Classic (Barcrest) (MPU4) (set 16)" )
@@ -1287,7 +1371,6 @@ GAME_CUSTOM( 199?, m4jpgemc__r,    m4jpgemc,   "hge01dr.p1",   0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4jpgemc__s,    m4jpgemc,   "hge01dy.p1",   0x0000, 0x010000, CRC(18ca3ae3) SHA1(ebb434a060564d3a1bc51876257729650e2903a6), "Barcrest","Jackpot Gems Classic (Barcrest) (MPU4) (set 20)" )
 GAME_CUSTOM( 199?, m4jpgemc__t,    m4jpgemc,   "hge01k.p1",    0x0000, 0x010000, CRC(4161f733) SHA1(b551bb278666790f0c293c76d5c3fabf8f4d368e), "Barcrest","Jackpot Gems Classic (Barcrest) (MPU4) (set 21)" )
 GAME_CUSTOM( 199?, m4jpgemc__u,    m4jpgemc,   "hge01r.p1",    0x0000, 0x010000, CRC(6dc8dc70) SHA1(e96fc4284ece65f76d5e9bd06c4a002de65bf4da), "Barcrest","Jackpot Gems Classic (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4jpgemc__v,    m4jpgemc,   "hge01s.p1",    0x0000, 0x010000, CRC(b79f8c42) SHA1(7d8b3352fbd9a80b86f5a8b22833d6f5c4b9854b), "Barcrest","Jackpot Gems Classic (Barcrest) (MPU4) (set 23)" )
 GAME_CUSTOM( 199?, m4jpgemc__w,    m4jpgemc,   "hge01y.p1",    0x0000, 0x010000, CRC(a96db093) SHA1(17520306112cee6f082829811e1f8c432c6aa354), "Barcrest","Jackpot Gems Classic (Barcrest) (MPU4) (set 24)" )
 
 
@@ -1306,6 +1389,8 @@ GAME_CUSTOM( 199?, m4jpgemc__w,    m4jpgemc,   "hge01y.p1",    0x0000, 0x010000,
 		M4JOLGEM_EXTRA_ROMS \
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
+
+
 GAME_CUSTOM( 199?, m4jolgem,       0,          "gem07s.p1",    0x0000, 0x020000, CRC(945ad0d2) SHA1(d636bc41a4f887d24affc0f5b644c5d5351cf0df), "Barcrest","Jolly Gems (Barcrest) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4jolgem__a,    m4jolgem,   "gem05s",       0x0000, 0x020000, CRC(b7ceafc2) SHA1(b66d846da5ff20df912d31695eaef146dbbe759e), "Barcrest","Jolly Gems (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4jolgem__b,    m4jolgem,   "gem06ad.p1",   0x0000, 0x020000, CRC(a3270974) SHA1(59992779415ff20b8589843510099b77c9b157fd), "Barcrest","Jolly Gems (Barcrest) (MPU4) (set 3)" )
@@ -1377,17 +1462,8 @@ GAME_CUSTOM( 199?, m4jolgem__ap,   m4jolgem,   "jgs_xa_x.1_0", 0x0000, 0x020000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4hittop,   0,          "hi4s.p1",      0x0000, 0x010000, CRC(3a04ee7a) SHA1(d23e9da2c22f6983a855bc519597ea9cea84f2dd), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4hittop__a,    m4hittop,   "chuad.p1",     0x0000, 0x010000, CRC(01d3b86c) SHA1(27af0e76661495d5b91ee6a53507f9a5d4e5ab85), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4hittop__b,    m4hittop,   "chub.p1",      0x0000, 0x010000, CRC(17ff4ed4) SHA1(f193a00a46c82d4989af18055f9f69d93df79ec6), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4hittop__c,    m4hittop,   "chubd.p1",     0x0000, 0x010000, CRC(3e7a6b1b) SHA1(8939a0cac8578ff5e1d1ab2b3a64b3809793c44a), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4hittop__d,    m4hittop,   "chud.p1",      0x0000, 0x010000, CRC(26875ed3) SHA1(06dbf594e2c5202ee624f4202f634281a89a3870), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4hittop__e,    m4hittop,   "chudk.p1",     0x0000, 0x010000, CRC(10c1f6c3) SHA1(e6ff6ea40f35cfd9ed7643e69eca62775f20b3a2), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4hittop__f,    m4hittop,   "chudy.p1",     0x0000, 0x010000, CRC(65302d8c) SHA1(de340cc182212b576cae46669492d0d760d2f288), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4hittop__g,    m4hittop,   "chuk.p1",      0x0000, 0x010000, CRC(7f333a2c) SHA1(73719997c200ec5291ceaa12f8667979a731212e), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4hittop__h,    m4hittop,   "chur.p1",      0x0000, 0x010000, CRC(dbb89a00) SHA1(70b2f2c78011b8b470aa58153d524f920d553b28), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4hittop__i,    m4hittop,   "chus.p1",      0x0000, 0x010000, CRC(8a39816e) SHA1(3869f7ae0c9b681cfb07e2f6c1a94fc81fa13fe3), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4hittop__j,    m4hittop,   "chuy.p1",      0x0000, 0x010000, CRC(e0902d74) SHA1(a34db63f1354853ad5a1026e4402ccd2e564c7d7), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 11)" )
+// "(C)1991 BARCREST" and "HI4 0.3"
+GAME_CUSTOM( 199?, m4hittop,       0,          "hi4s.p1",      0x0000, 0x010000, CRC(3a04ee7a) SHA1(d23e9da2c22f6983a855bc519597ea9cea84f2dd), "Barcrest","Hit The Top (Barcrest) (MPU4) (HI4 0.3)" )
 GAME_CUSTOM( 199?, m4hittop__k,    m4hittop,   "hi4ad.p1",     0x0000, 0x010000, CRC(eeb958f3) SHA1(ee7f7615df2141ad5183288101949b74c4543de9), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 12)" )
 GAME_CUSTOM( 199?, m4hittop__l,    m4hittop,   "hi4b.p1",      0x0000, 0x010000, CRC(68af264b) SHA1(e7f75b5294cc7541f9397c492c171c79b7a21a36), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 13)" )
 GAME_CUSTOM( 199?, m4hittop__m,    m4hittop,   "hi4bd.p1",     0x0000, 0x010000, CRC(d72cd485) SHA1(d0d38cbb518c824d4a8107e1711f85120c39bc4c), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 14)" )
@@ -1396,7 +1472,20 @@ GAME_CUSTOM( 199?, m4hittop__o,    m4hittop,   "hi4dk.p1",     0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4hittop__p,    m4hittop,   "hi4dy.p1",     0x0000, 0x010000, CRC(b1ddf7fe) SHA1(a334619b5dfc7a44e9082cc37cb5187413adb29f), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 17)" )
 GAME_CUSTOM( 199?, m4hittop__q,    m4hittop,   "hi4k.p1",      0x0000, 0x010000, CRC(99cb8bc9) SHA1(106bf6e327643c49024f9422d6b87f5b157b452f), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 18)" )
 GAME_CUSTOM( 199?, m4hittop__r,    m4hittop,   "hi4y.p1",      0x0000, 0x010000, CRC(c60e01e6) SHA1(c4a7ea44c36c78401cab3ef87d7e02add0b48ab5), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4hittop__s,    m4hittop,   "hit04ad.p1",   0x0000, 0x010000, CRC(cc9d10fa) SHA1(b7ce14fecfd8142fa7127c23f152c749dae74701), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 20)" )
+// "(C)1991 BARCREST" and "CHU 0.1"
+GAME_CUSTOM( 199?, m4hittop__i,    m4hittop,   "chus.p1",      0x0000, 0x010000, CRC(8a39816e) SHA1(3869f7ae0c9b681cfb07e2f6c1a94fc81fa13fe3), "Barcrest","Hit The Top (Barcrest) (MPU4) (CHU 0.1)" )
+GAME_CUSTOM( 199?, m4hittop__a,    m4hittop,   "chuad.p1",     0x0000, 0x010000, CRC(01d3b86c) SHA1(27af0e76661495d5b91ee6a53507f9a5d4e5ab85), "Barcrest","Hit The Top (Barcrest) (MPU4) (CHU 0.1AD)" )
+GAME_CUSTOM( 199?, m4hittop__b,    m4hittop,   "chub.p1",      0x0000, 0x010000, CRC(17ff4ed4) SHA1(f193a00a46c82d4989af18055f9f69d93df79ec6), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4hittop__c,    m4hittop,   "chubd.p1",     0x0000, 0x010000, CRC(3e7a6b1b) SHA1(8939a0cac8578ff5e1d1ab2b3a64b3809793c44a), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4hittop__d,    m4hittop,   "chud.p1",      0x0000, 0x010000, CRC(26875ed3) SHA1(06dbf594e2c5202ee624f4202f634281a89a3870), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4hittop__e,    m4hittop,   "chudk.p1",     0x0000, 0x010000, CRC(10c1f6c3) SHA1(e6ff6ea40f35cfd9ed7643e69eca62775f20b3a2), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4hittop__f,    m4hittop,   "chudy.p1",     0x0000, 0x010000, CRC(65302d8c) SHA1(de340cc182212b576cae46669492d0d760d2f288), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4hittop__g,    m4hittop,   "chuk.p1",      0x0000, 0x010000, CRC(7f333a2c) SHA1(73719997c200ec5291ceaa12f8667979a731212e), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 8)" )
+GAME_CUSTOM( 199?, m4hittop__h,    m4hittop,   "chur.p1",      0x0000, 0x010000, CRC(dbb89a00) SHA1(70b2f2c78011b8b470aa58153d524f920d553b28), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 9)" )
+GAME_CUSTOM( 199?, m4hittop__j,    m4hittop,   "chuy.p1",      0x0000, 0x010000, CRC(e0902d74) SHA1(a34db63f1354853ad5a1026e4402ccd2e564c7d7), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 11)" )
+// "(C)1991 BARCREST" and "HIT 0.4"
+GAME_CUSTOM( 199?, m4hittop__1,    m4hittop,   "hit04s.p1",    0x0000, 0x010000, CRC(05376f9f) SHA1(e59bdd6541669b150bb68eb97ea316c3fe451778), "Barcrest","Hit The Top (Barcrest) (MPU4) (HIT 0.4)" )
+GAME_CUSTOM( 199?, m4hittop__s,    m4hittop,   "hit04ad.p1",   0x0000, 0x010000, CRC(cc9d10fa) SHA1(b7ce14fecfd8142fa7127c23f152c749dae74701), "Barcrest","Hit The Top (Barcrest) (MPU4) (HIT 0.4AD)" )
 GAME_CUSTOM( 199?, m4hittop__t,    m4hittop,   "hit04b.p1",    0x0000, 0x010000, CRC(da511063) SHA1(3f4fb8518cb2057ec4c2bb13fd3e61ee73bfa457), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 21)" )
 GAME_CUSTOM( 199?, m4hittop__u,    m4hittop,   "hit04bd.p1",   0x0000, 0x010000, CRC(40a84b97) SHA1(416f78c19e08f405a3b36f886f69e7b88e5aa90a), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 22)" )
 GAME_CUSTOM( 199?, m4hittop__v,    m4hittop,   "hit04d.p1",    0x0000, 0x010000, CRC(89607e84) SHA1(280209ca3030383547cc91eee2f71a810768353f), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 23)" )
@@ -1405,9 +1494,10 @@ GAME_CUSTOM( 199?, m4hittop__x,    m4hittop,   "hit04dr.p1",   0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4hittop__y,    m4hittop,   "hit04dy.p1",   0x0000, 0x010000, CRC(25f54881) SHA1(9f4ae52295df5810cbe6c18cae66877bec006a28), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 26)" )
 GAME_CUSTOM( 199?, m4hittop__z,    m4hittop,   "hit04k.p1",    0x0000, 0x010000, CRC(5ef3f78d) SHA1(e72727b3dc7793c36f182b3e7d363741254c0be7), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 27)" )
 GAME_CUSTOM( 199?, m4hittop__0,    m4hittop,   "hit04r.p1",    0x0000, 0x010000, CRC(d87a9f60) SHA1(614224b80afaa6e407f9b40b45b8aecdf999e13a), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 28)" )
-GAME_CUSTOM( 199?, m4hittop__1,    m4hittop,   "hit04s.p1",    0x0000, 0x010000, CRC(05376f9f) SHA1(e59bdd6541669b150bb68eb97ea316c3fe451778), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 29)" )
 GAME_CUSTOM( 199?, m4hittop__2,    m4hittop,   "hit04y.p1",    0x0000, 0x010000, CRC(c398df63) SHA1(5e93cb95da37b1593d030e99e97996252ad6cda1), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 30)" )
-GAME_CUSTOM( 199?, m4hittop__3,    m4hittop,   "ht201ad.p1",   0x0000, 0x010000, CRC(b0f3873b) SHA1(6e7d1b20dff4b81ebd171d6d92c95e46817bdf90), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 31)" )
+// "(C)1991 BARCREST" and "HT2 0.1"
+GAME_CUSTOM( 199?, m4hittop__ac,   m4hittop,   "ht201s.p1",    0x0000, 0x010000, CRC(37b20464) SHA1(e87b0a2023416fa7b63201e19850319723eb6c10), "Barcrest","Hit The Top (Barcrest) (MPU4) (HT2 0.1)" )
+GAME_CUSTOM( 199?, m4hittop__3,    m4hittop,   "ht201ad.p1",   0x0000, 0x010000, CRC(b0f3873b) SHA1(6e7d1b20dff4b81ebd171d6d92c95e46817bdf90), "Barcrest","Hit The Top (Barcrest) (MPU4) (HT2 0.1AD)" )
 GAME_CUSTOM( 199?, m4hittop__4,    m4hittop,   "ht201b.p1",    0x0000, 0x010000, CRC(9dbe41fc) SHA1(ce5ed2707ab63057a2f66a1098e3752acaa72dac), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 32)" )
 GAME_CUSTOM( 199?, m4hittop__5,    m4hittop,   "ht201bd.p1",   0x0000, 0x010000, CRC(be23c8b6) SHA1(0d4ab2d3c7ac063ec1ce10b2af28c8770d8bd818), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 33)" )
 GAME_CUSTOM( 199?, m4hittop__6,    m4hittop,   "ht201d.p1",    0x0000, 0x010000, CRC(25b9fcd7) SHA1(8bebbf0b621a704ed9811e67eab003f4ddebcde2), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 34)" )
@@ -1416,9 +1506,10 @@ GAME_CUSTOM( 199?, m4hittop__8,    m4hittop,   "ht201dr.p1",   0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4hittop__9,    m4hittop,   "ht201dy.p1",   0x0000, 0x010000, CRC(811cafc0) SHA1(e31ad353ee8ce4ea059d6a469baaa14357b738c9), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 37)" )
 GAME_CUSTOM( 199?, m4hittop__aa,   m4hittop,   "ht201k.p1",    0x0000, 0x010000, CRC(191ca612) SHA1(a2a80b64cc04aa590046413f1474340cd3a5b03a), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 38)" )
 GAME_CUSTOM( 199?, m4hittop__ab,   m4hittop,   "ht201r.p1",    0x0000, 0x010000, CRC(154643be) SHA1(280ae761c434bbed84317d85aef2ad4a78c61d1d), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 39)" )
-GAME_CUSTOM( 199?, m4hittop__ac,   m4hittop,   "ht201s.p1",    0x0000, 0x010000, CRC(37b20464) SHA1(e87b0a2023416fa7b63201e19850319723eb6c10), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 40)" )
 GAME_CUSTOM( 199?, m4hittop__ad,   m4hittop,   "ht201y.p1",    0x0000, 0x010000, CRC(84778efc) SHA1(bdc43973913d0e8be0e16ee89da01b1bcdc2da6f), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 41)" )
-GAME_CUSTOM( 199?, m4hittop__ae,   m4hittop,   "ht501ad.p1",   0x0000, 0x010000, CRC(7bf00848) SHA1(700d90218d0bd31860dc905c00d0afbf3a1e8704), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 42)" )
+// "(C)1991 BARCREST" and "HT5 0.1"
+GAME_CUSTOM( 199?, m4hittop__an,   m4hittop,   "ht501s.p1",    0x0000, 0x010000, CRC(ac440a2b) SHA1(f3f3d0c9c8dcb41509307c970f0776ebcfffdeb0), "Barcrest","Hit The Top (Barcrest) (MPU4) (HT5 0.1)" )
+GAME_CUSTOM( 199?, m4hittop__ae,   m4hittop,   "ht501ad.p1",   0x0000, 0x010000, CRC(7bf00848) SHA1(700d90218d0bd31860dc905c00d0afbf3a1e8704), "Barcrest","Hit The Top (Barcrest) (MPU4) (HT5 0.1AD)" )
 GAME_CUSTOM( 199?, m4hittop__af,   m4hittop,   "ht501b.p1",    0x0000, 0x010000, CRC(c06dd046) SHA1(a47c62fc299842e66694f34844b43a55d6f20c3d), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 43)" )
 GAME_CUSTOM( 199?, m4hittop__ag,   m4hittop,   "ht501bd.p1",   0x0000, 0x010000, CRC(d4a3843f) SHA1(cc66ebaa334bab86b9bcb1623316c31318e84d2a), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 44)" )
 GAME_CUSTOM( 199?, m4hittop__ah,   m4hittop,   "ht501d.p1",    0x0000, 0x010000, CRC(67d3c040) SHA1(beec134c53715544080327319b5d6231b625fbb4), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 45)" )
@@ -1427,16 +1518,16 @@ GAME_CUSTOM( 199?, m4hittop__aj,   m4hittop,   "ht501dr.p1",   0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4hittop__ak,   m4hittop,   "ht501dy.p1",   0x0000, 0x010000, CRC(756c7ae9) SHA1(42a731e472f073845b98d7fcc47fe70f57181ce6), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 48)" )
 GAME_CUSTOM( 199?, m4hittop__al,   m4hittop,   "ht501k.p1",    0x0000, 0x010000, CRC(93269e53) SHA1(7e40ac4e9f4b26755867353fdccadf0f976402b4), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 49)" )
 GAME_CUSTOM( 199?, m4hittop__am,   m4hittop,   "ht501r.p1",    0x0000, 0x010000, CRC(9aec0493) SHA1(6b0b7e5f4a988ff4d2bc123978adc09195eb4232), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 50)" )
-GAME_CUSTOM( 199?, m4hittop__an,   m4hittop,   "ht501s.p1",    0x0000, 0x010000, CRC(ac440a2b) SHA1(f3f3d0c9c8dcb41509307c970f0776ebcfffdeb0), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 51)" )
 GAME_CUSTOM( 199?, m4hittop__ao,   m4hittop,   "ht501y.p1",    0x0000, 0x010000, CRC(a7f8ece6) SHA1(f4472c040c9255eaef5b1109c3bec44f4978b600), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 52)" )
-GAME_CUSTOM( 199?, m4hittop__ap,   m4hittop,   "httad.p1",     0x0000, 0x010000, CRC(e5a3df45) SHA1(70bebb33cbe466c379f278347d0b47862b1d01a8), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 53)" )
+// "(C)1991 BARCREST" and "HTT 0.5"
+GAME_CUSTOM( 199?, m4hittop__aw,   m4hittop,   "htts.p1",      0x0000, 0x010000, CRC(6c794eb2) SHA1(347a7c74b1fd7631fbcd398bf5e7c36af088109e), "Barcrest","Hit The Top (Barcrest) (MPU4) (HTT 0.5)" )
+GAME_CUSTOM( 199?, m4hittop__ap,   m4hittop,   "httad.p1",     0x0000, 0x010000, CRC(e5a3df45) SHA1(70bebb33cbe466c379f278347d0b47862b1d01a8), "Barcrest","Hit The Top (Barcrest) (MPU4) (HTT 0.5AD)" )
 GAME_CUSTOM( 199?, m4hittop__aq,   m4hittop,   "httb.p1",      0x0000, 0x010000, CRC(5c921ff2) SHA1(a9184e4e3916c1ab92761d0e33b42cce4a58e7b1), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 54)" )
 GAME_CUSTOM( 199?, m4hittop__ar,   m4hittop,   "httbd.p1",     0x0000, 0x010000, CRC(9d19fac9) SHA1(17072ac5b49cd947bf397dfbe9b6b0bd269dd1b4), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 55)" )
 GAME_CUSTOM( 199?, m4hittop__as,   m4hittop,   "httd.p1",      0x0000, 0x010000, CRC(5e5bacb9) SHA1(d673010cdf2fb9352fc510409deade42b5508b29), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 56)" )
 GAME_CUSTOM( 199?, m4hittop__at,   m4hittop,   "httdk.p1",     0x0000, 0x010000, CRC(17b1db87) SHA1(196163f68c82c4600ecacee52ee8044739568fbf), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 57)" )
 GAME_CUSTOM( 199?, m4hittop__au,   m4hittop,   "httdy.p1",     0x0000, 0x010000, CRC(428af7bf) SHA1(954a512105d1a5998d4ffcbf21be0c9d9a65bbeb), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 58)" )
 GAME_CUSTOM( 199?, m4hittop__av,   m4hittop,   "httk.p1",      0x0000, 0x010000, CRC(581dd34a) SHA1(00cad1860f5edf056b8f9397ca46165593be4755), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 59)" )
-GAME_CUSTOM( 199?, m4hittop__aw,   m4hittop,   "htts.p1",      0x0000, 0x010000, CRC(6c794eb2) SHA1(347a7c74b1fd7631fbcd398bf5e7c36af088109e), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 60)" )
 GAME_CUSTOM( 199?, m4hittop__ax,   m4hittop,   "htty.p1",      0x0000, 0x010000, CRC(c9b402b2) SHA1(2165c1892fc1f0b9b0c39127f322f15c9e1912b1), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 61)" )
 
 
@@ -1454,9 +1545,22 @@ GAME_CUSTOM( 199?, m4hittop__ax,   m4hittop,   "htty.p1",      0x0000, 0x010000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4nnww,       0,      "nn5bd.p1",     0x0000, 0x010000, CRC(56cc9559) SHA1(53e109a579e422932dd25c52cf2beca51d3a53e3), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4nnww__a,    m4nnww, "cf301s",       0x0000, 0x010000, CRC(1d8abf59) SHA1(81e47797baddd777fbbb1b1e044df1bfe3d49cb2), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4nnww__b,    m4nnww, "cni01ad.p1",   0x0000, 0x010000, CRC(788e47b1) SHA1(6d07500a38b54e1a9038e35d82fdb4a0f22d23ba), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 3)" )
+// the rom codes, and startup message differ in several of these, I've put the startup display code first (which seems to match the rom label) followed by the code stored in the ROM header
+// I think the code in the header was just not updated properly.
+// "(C)1991 BARCREST" and "NN4 0.2"
+GAME_CUSTOM( 199?, m4nnww,       0,      "nn5s.p1",      0x0000, 0x010000, CRC(459e5663) SHA1(66ae821e5202d6d3ba05be44d0c1f26da60a3a32), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (NN5 0.2 / NN4 0.2)" )
+GAME_CUSTOM( 199?, m4nnww__aq,   m4nnww, "nn5bd.p1",     0x0000, 0x010000, CRC(56cc9559) SHA1(53e109a579e422932dd25c52cf2beca51d3a53e3), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (NN5 0.2BD / NN4 0.2)" )
+GAME_CUSTOM( 199?, m4nnww__ai,   m4nnww, "nn5ad.p1",     0x0000, 0x010000, CRC(22537184) SHA1(aef542a34e2b14a5db624e42d1cd2682de237b52), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 46)" )
+GAME_CUSTOM( 199?, m4nnww__aj,   m4nnww, "nn5b.p1",      0x0000, 0x010000, CRC(e2a99408) SHA1(a0868a38c290a84926089c60d1b5555706485bff), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 47)" )
+GAME_CUSTOM( 199?, m4nnww__ak,   m4nnww, "nn5d.p1",      0x0000, 0x010000, CRC(ef1a21b6) SHA1(ba763b06583af1273e384b878fbacc68f88714dc), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 48)" )
+GAME_CUSTOM( 199?, m4nnww__al,   m4nnww, "nn5dk.p1",     0x0000, 0x010000, CRC(74c48e28) SHA1(db6be2275b6122845c662dd5f12266b66e888221), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 49)" )
+GAME_CUSTOM( 199?, m4nnww__am,   m4nnww, "nn5dr.p1",     0x0000, 0x010000, CRC(f52c9f87) SHA1(e8b1037c9ed5d9452abccb6b07bae46b45c4705e), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 50)" )
+GAME_CUSTOM( 199?, m4nnww__an,   m4nnww, "nn5dy.p1",     0x0000, 0x010000, CRC(6847b769) SHA1(1b4d42774c72a3c7b40551c7181413ea1fca0b88), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 51)" )
+GAME_CUSTOM( 199?, m4nnww__ao,   m4nnww, "nn5k.p1",      0x0000, 0x010000, CRC(ceab49d9) SHA1(633e7bab6a30176dbcea2bd3e7bab0f7833409ba), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 52)" )
+GAME_CUSTOM( 199?, m4nnww__ap,   m4nnww, "nn5r.p1",      0x0000, 0x010000, CRC(144523cd) SHA1(d12586ccea659ecb75af944d87ddd480da917eaf), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 53)" )
+GAME_CUSTOM( 199?, m4nnww__ar,   m4nnww, "nn5y.p1",      0x0000, 0x010000, CRC(892e0b23) SHA1(ff3f550e20e71e868d52b60740f743a7d2d6c645), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 55)" )
+// "(C)1991 BARCREST" and "NN4 0.1" (startup CN1 0.1)
+GAME_CUSTOM( 199?, m4nnww__b,    m4nnww, "cni01ad.p1",   0x0000, 0x010000, CRC(788e47b1) SHA1(6d07500a38b54e1a9038e35d82fdb4a0f22d23ba), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (CN1 0.1 / NN4 0.1)" )
 GAME_CUSTOM( 199?, m4nnww__c,    m4nnww, "cni01b.p1",    0x0000, 0x010000, CRC(33512643) SHA1(865ed3b68fe3b737833734513b5045c5db97791e), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 4)" )
 GAME_CUSTOM( 199?, m4nnww__d,    m4nnww, "cni01bd.p1",   0x0000, 0x010000, CRC(8a00d73b) SHA1(702579ea1bc586aacd5cba889919f3e86ea05771), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 5)" )
 GAME_CUSTOM( 199?, m4nnww__e,    m4nnww, "cni01c.p1",    0x0000, 0x010000, CRC(b836ee44) SHA1(832914461492f120894ec7e63f6aa1ad00b89b41), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 6)" )
@@ -1468,7 +1572,8 @@ GAME_CUSTOM( 199?, m4nnww__j,    m4nnww, "cni01k.p1",    0x0000, 0x010000, CRC(f
 GAME_CUSTOM( 199?, m4nnww__k,    m4nnww, "cni01r.p1",    0x0000, 0x010000, CRC(c611b1eb) SHA1(524ee18da8a086d15277d9fb0ea383ee3d49d47a), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 12)" )
 GAME_CUSTOM( 199?, m4nnww__l,    m4nnww, "cni01s.p1",    0x0000, 0x010000, CRC(5ed6a396) SHA1(299767467b56d1aa93602f98cc387e7ff18bda9d), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 13)" )
 GAME_CUSTOM( 199?, m4nnww__m,    m4nnww, "cni01y.p1",    0x0000, 0x010000, CRC(d3612bf2) SHA1(40a8ff08a38c4411946a67f380891945d166d199), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4nnww__n,    m4nnww, "cnuad.p1",     0x0000, 0x010000, CRC(f4b28628) SHA1(7323525a44477e2a3f89562f6094ed7bb47a16cc), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 15)" )
+// "(C)1991 BARCREST" and "NN4 0.2" (startup CNU 0.2)
+GAME_CUSTOM( 199?, m4nnww__n,    m4nnww, "cnuad.p1",     0x0000, 0x010000, CRC(f4b28628) SHA1(7323525a44477e2a3f89562f6094ed7bb47a16cc), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (CNU 0.2AD / NN4 0.2)" )
 GAME_CUSTOM( 199?, m4nnww__o,    m4nnww, "cnub.p1",      0x0000, 0x010000, CRC(735260a3) SHA1(e08fff6314d7cb4e396107366fdc16dcbf7f5d67), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 16)" )
 GAME_CUSTOM( 199?, m4nnww__p,    m4nnww, "cnubd.p1",     0x0000, 0x010000, CRC(fbe1ee39) SHA1(21bdaa6f9af686b4e44958ee09a131d0e12c2c53), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 17)" )
 GAME_CUSTOM( 199?, m4nnww__q,    m4nnww, "cnud.p1",      0x0000, 0x010000, CRC(d3a0eff1) SHA1(2b18c3e14a43d072ae5702bc77fcac65dbd8305c), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 18)" )
@@ -1479,7 +1584,8 @@ GAME_CUSTOM( 199?, m4nnww__u,    m4nnww, "cnuk.p1",      0x0000, 0x010000, CRC(b
 GAME_CUSTOM( 199?, m4nnww__v,    m4nnww, "cnur.p1",      0x0000, 0x010000, CRC(729d89ea) SHA1(c98a89dd8f85dde7ab005bcb7eba1fcc31162e08), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 23)" )
 GAME_CUSTOM( 199?, m4nnww__w,    m4nnww, "cnus.p1",      0x0000, 0x010000, CRC(6afee8e1) SHA1(35464eef29a5a66b8efea890987ff120ca5b7409), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 24)" )
 GAME_CUSTOM( 199?, m4nnww__x,    m4nnww, "cnuy.p1",      0x0000, 0x010000, CRC(eff6a104) SHA1(021baf5fe88defca05627a85501622d86e846233), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 25)" )
-GAME_CUSTOM( 199?, m4nnww__y,    m4nnww, "nn3xad.p1",    0x0000, 0x010000, CRC(8ccfceb8) SHA1(762ab26826d3d2a4dd7999a71724389344e9dafb), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 26)" )
+// "(C)1991 BARCREST" and "NN3 0.1"
+GAME_CUSTOM( 199?, m4nnww__y,    m4nnww, "nn3xad.p1",    0x0000, 0x010000, CRC(8ccfceb8) SHA1(762ab26826d3d2a4dd7999a71724389344e9dafb), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (NN3 0.1XAD)" )
 GAME_CUSTOM( 199?, m4nnww__z,    m4nnww, "nn3xb.p1",     0x0000, 0x010000, CRC(9b0dd473) SHA1(9975dafea8c7d6ccfc9f826adb1a0d3d0ed9740a), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 27)" )
 GAME_CUSTOM( 199?, m4nnww__0,    m4nnww, "nn3xbd.p1",    0x0000, 0x010000, CRC(21bf4a89) SHA1(200c9ccc4bc2a93fcd0f68bb00ad4391bdeecda1), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 28)" )
 GAME_CUSTOM( 199?, m4nnww__1,    m4nnww, "nn3xd.p1",     0x0000, 0x010000, CRC(11e22c45) SHA1(6da31eea7b25612d99cc79f6f9579622f105c862), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 29)" )
@@ -1490,7 +1596,8 @@ GAME_CUSTOM( 199?, m4nnww__5,    m4nnww, "nn3xr.p1",     0x0000, 0x010000, CRC(6
 GAME_CUSTOM( 199?, m4nnww__6,    m4nnww, "nn3xrd.p1",    0x0000, 0x010000, CRC(0fd3f9b9) SHA1(99115b217cfc54b52469ffc77e7a7592907c53ea), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 34)" )
 GAME_CUSTOM( 199?, m4nnww__7,    m4nnww, "nn3xs.p1",     0x0000, 0x010000, CRC(13d02d21) SHA1(8e4dac8e60538884d3f3a92fc1bb9f41276be4c8), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 35)" )
 GAME_CUSTOM( 199?, m4nnww__8,    m4nnww, "nn3xy.p1",     0x0000, 0x010000, CRC(8a5d0f4b) SHA1(ef727e7ee8bb20d1b201927186a1a4f83e1e7497), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 36)" )
-GAME_CUSTOM( 199?, m4nnww__9,    m4nnww, "nn4ad.p1",     0x0000, 0x010000, CRC(827b832f) SHA1(4448ccb03282b9d39c6a00d02cea4d8ce2225b0e), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 37)" )
+// "(C)1991 BARCREST" and "NN4 0.2"
+GAME_CUSTOM( 199?, m4nnww__9,    m4nnww, "nn4ad.p1",     0x0000, 0x010000, CRC(827b832f) SHA1(4448ccb03282b9d39c6a00d02cea4d8ce2225b0e), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (NN4 0.2AD)" )
 GAME_CUSTOM( 199?, m4nnww__aa,   m4nnww, "nn4b.p1",      0x0000, 0x010000, CRC(65e16330) SHA1(cfd18693155b4b7c5692064a2f693eb198d02749), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 38)" )
 GAME_CUSTOM( 199?, m4nnww__ab,   m4nnww, "nn4bd.p1",     0x0000, 0x010000, CRC(b467ee65) SHA1(79030aa06ca8fd9c8becff62d56628939e9b5075), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 39)" )
 GAME_CUSTOM( 199?, m4nnww__ac,   m4nnww, "nn4d.p1",      0x0000, 0x010000, CRC(548dacb9) SHA1(55949910374fae419ba015b70780e3e9e269caa0), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 40)" )
@@ -1499,24 +1606,20 @@ GAME_CUSTOM( 199?, m4nnww__ae,   m4nnww, "nn4dy.p1",     0x0000, 0x010000, CRC(5
 GAME_CUSTOM( 199?, m4nnww__af,   m4nnww, "nn4k.p1",      0x0000, 0x010000, CRC(09a808c0) SHA1(c74c3acb2c1f52fd1e83003fb1a022f80f55e0b8), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 43)" )
 GAME_CUSTOM( 199?, m4nnww__ag,   m4nnww, "nn4s.p1",      0x0000, 0x010000, CRC(ec4f01ee) SHA1(443da7ed359a3e208417f7bca0dc52a09594a927), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 44)" )
 GAME_CUSTOM( 199?, m4nnww__ah,   m4nnww, "nn4y.p1",      0x0000, 0x010000, CRC(a1eff941) SHA1(369ec89b82f97c3d8266d41e5eb27be7770bdca4), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 45)" )
-GAME_CUSTOM( 199?, m4nnww__ai,   m4nnww, "nn5ad.p1",     0x0000, 0x010000, CRC(22537184) SHA1(aef542a34e2b14a5db624e42d1cd2682de237b52), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 46)" )
-GAME_CUSTOM( 199?, m4nnww__aj,   m4nnww, "nn5b.p1",      0x0000, 0x010000, CRC(e2a99408) SHA1(a0868a38c290a84926089c60d1b5555706485bff), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 47)" )
-GAME_CUSTOM( 199?, m4nnww__ak,   m4nnww, "nn5d.p1",      0x0000, 0x010000, CRC(ef1a21b6) SHA1(ba763b06583af1273e384b878fbacc68f88714dc), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 48)" )
-GAME_CUSTOM( 199?, m4nnww__al,   m4nnww, "nn5dk.p1",     0x0000, 0x010000, CRC(74c48e28) SHA1(db6be2275b6122845c662dd5f12266b66e888221), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 49)" )
-GAME_CUSTOM( 199?, m4nnww__am,   m4nnww, "nn5dr.p1",     0x0000, 0x010000, CRC(f52c9f87) SHA1(e8b1037c9ed5d9452abccb6b07bae46b45c4705e), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 50)" )
-GAME_CUSTOM( 199?, m4nnww__an,   m4nnww, "nn5dy.p1",     0x0000, 0x010000, CRC(6847b769) SHA1(1b4d42774c72a3c7b40551c7181413ea1fca0b88), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 51)" )
-GAME_CUSTOM( 199?, m4nnww__ao,   m4nnww, "nn5k.p1",      0x0000, 0x010000, CRC(ceab49d9) SHA1(633e7bab6a30176dbcea2bd3e7bab0f7833409ba), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 52)" )
-GAME_CUSTOM( 199?, m4nnww__ap,   m4nnww, "nn5r.p1",      0x0000, 0x010000, CRC(144523cd) SHA1(d12586ccea659ecb75af944d87ddd480da917eaf), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 53)" )
-GAME_CUSTOM( 199?, m4nnww__aq,   m4nnww, "nn5s.p1",      0x0000, 0x010000, CRC(459e5663) SHA1(66ae821e5202d6d3ba05be44d0c1f26da60a3a32), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 54)" )
-GAME_CUSTOM( 199?, m4nnww__ar,   m4nnww, "nn5y.p1",      0x0000, 0x010000, CRC(892e0b23) SHA1(ff3f550e20e71e868d52b60740f743a7d2d6c645), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 55)" )
-GAME_CUSTOM( 199?, m4nnww__as,   m4nnww, "nnu40x.bin",   0x0000, 0x010000, CRC(63e3d7df) SHA1(1a5a00185ec5150f5b05765f06297d7884540aaf), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 56)" )
+// "(C)1991 BARCREST" and "NNU 5.2"
 GAME_CUSTOM( 199?, m4nnww__at,   m4nnww, "nnus.p1",      0x0000, 0x010000, CRC(3e3a829e) SHA1(5aa3a56e007bad4dacdc3c993c87569e4250eecd), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 57)" )
 GAME_CUSTOM( 199?, m4nnww__au,   m4nnww, "nnux.p1",      0x0000, 0x010000, CRC(38806ebf) SHA1(a897a33e3260de1b284b01a65d1da7cbe05d51f8), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 58)" )
 GAME_CUSTOM( 199?, m4nnww__av,   m4nnww, "nnuxb.p1",     0x0000, 0x010000, CRC(c4dba8df) SHA1(0f8516cc9b2f0be9d1c936667974cd8116018dad), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 59)" )
 GAME_CUSTOM( 199?, m4nnww__aw,   m4nnww, "nnuxc.p1",     0x0000, 0x010000, CRC(797e0c4d) SHA1(211b0a804643731275d0075461f8d94985fde1db), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 60)" )
-GAME_CUSTOM( 199?, m4nnww__ax,   m4nnww, "nnwink.hex",   0x0000, 0x010000, CRC(f77bd6c4) SHA1(1631040fbfe3fc37c2cbd3145857c31d16b92bde), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 61)" )
-GAME_CUSTOM( 199?, m4nnww__ay,   m4nnww, "nnww2010",     0x0000, 0x010000, CRC(67b1c7b5) SHA1(495e25bc2051ab78e473cd0c36e0c1825c06db14), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 62)" )
-GAME_CUSTOM( 199?, m4nnww__az,   m4nnww, "wink2010",     0x0000, 0x010000, CRC(056a2ffa) SHA1(9da96d70ff850b6672ae7009253e179fa7159db4), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 63)" )
+// "(C)1991 BARCREST" and "NNU 4.0"
+GAME_CUSTOM( 199?, m4nnww__as,   m4nnww, "nnu40x.bin",   0x0000, 0x010000, CRC(63e3d7df) SHA1(1a5a00185ec5150f5b05765f06297d7884540aaf), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (NNU 4.0X)" )
+// "(C)1991 BARCREST" and "NN4 0.1" (startup CH3 0.1)
+GAME_CUSTOM( 199?, m4nnww__ax,   m4nnww, "nnwink.hex",   0x0000, 0x010000, CRC(f77bd6c4) SHA1(1631040fbfe3fc37c2cbd3145857c31d16b92bde), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (CH3 0.1B / NN4 0.1)" )
+// "(C)1991 BARCREST" and "NN4 0.1" (startup CF3 0.1)
+GAME_CUSTOM( 199?, m4nnww__a,    m4nnww, "cf301s",       0x0000, 0x010000, CRC(1d8abf59) SHA1(81e47797baddd777fbbb1b1e044df1bfe3d49cb2), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (CF3 0.1 / NN4 0.1)" )
+// no copyright string and "NNU 3.4"
+GAME_CUSTOM( 199?, m4nnww__ay,   m4nnww, "nnww2010",     0x0000, 0x010000, CRC(67b1c7b5) SHA1(495e25bc2051ab78e473cd0c36e0c1825c06db14), "hack","Nudge Nudge Wink Wink (Barcrest) (MPU4) (NNU 3.4, hack, set 1)" )
+GAME_CUSTOM( 199?, m4nnww__az,   m4nnww, "wink2010",     0x0000, 0x010000, CRC(056a2ffa) SHA1(9da96d70ff850b6672ae7009253e179fa7159db4), "hack","Nudge Nudge Wink Wink (Barcrest) (MPU4) (NNU 3.4, hack, set 2)" )
 
 
 #define M4RFYM_EXTRA_ROMS \
@@ -1534,17 +1637,26 @@ GAME_CUSTOM( 199?, m4nnww__az,   m4nnww, "wink2010",     0x0000, 0x010000, CRC(0
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4rfym,       0,      "rund.p1",      0x0000, 0x010000, CRC(2be2a66d) SHA1(a66d74ccf1783912673cfcb6c1ae7fbb6d70ca0e), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4rfym__a,    m4rfym, "ap1ad.p1",     0x0000, 0x010000, CRC(d1adbf80) SHA1(08801f38b8ba5034fd83b53b6cfff864104525b4), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 2)" )
+// "(C)1993 BARCREST" and "RUN 0.5"
+GAME_CUSTOM( 199?, m4rfym,       0,      "runs.p1",      0x0000, 0x010000, CRC(e20f5a06) SHA1(f0f71f8870db7003fce96f1dfe09804cf17c3ab3), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUN 0.5)" )
+GAME_CUSTOM( 199?, m4rfym__ar,   m4rfym, "rund.p1",      0x0000, 0x010000, CRC(2be2a66d) SHA1(a66d74ccf1783912673cfcb6c1ae7fbb6d70ca0e), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUN 0.5D)" )
+GAME_CUSTOM( 199?, m4rfym__ao,   m4rfym, "runc.p1",      0x0000, 0x010000, CRC(09f53ddf) SHA1(f46be95bfacac751102a5f4d4a0917a5e51a653e), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUN 0.5C)" )
+GAME_CUSTOM( 199?, m4rfym__ap,   m4rfym, "rundy.p1",     0x0000, 0x010000, CRC(a6f69a24) SHA1(8370287dcc890fcb7529d3d4c7a3c2e2e688f6a8), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUN 0.5YD)" )
+GAME_CUSTOM( 199?, m4rfym__aq,   m4rfym, "runk.p1",      0x0000, 0x010000, CRC(a2828b82) SHA1(0ae371a441df679fd9c699771ae9f58ce960d4a1), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUN 0.5K)" )
+GAME_CUSTOM( 199?, m4rfym__as,   m4rfym, "runy.p1",      0x0000, 0x010000, CRC(0e311ab4) SHA1(c98540c07e9cc23ec70ecfbcb2f4d66f2c716fc3), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUN 0.5Y)" )
+// "(C)1993 BARCREST" and "AP1 0.1"
+GAME_CUSTOM( 199?, m4rfym__h,    m4rfym, "ap1s.p1",      0x0000, 0x010000, CRC(7474509c) SHA1(c87e20f10806ec87fd33f97b43b8378d304f7d67), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP1 0.1)" )
+GAME_CUSTOM( 199?, m4rfym__a,    m4rfym, "ap1ad.p1",     0x0000, 0x010000, CRC(d1adbf80) SHA1(08801f38b8ba5034fd83b53b6cfff864104525b4), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP1 0.1AD)" )
 GAME_CUSTOM( 199?, m4rfym__b,    m4rfym, "ap1b.p1",      0x0000, 0x010000, CRC(4939f186) SHA1(389d46d603e75d3aaeeca990f4e1143c61f1565f), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4rfym__c,    m4rfym, "ap1bd.p1",     0x0000, 0x010000, CRC(08a33b2c) SHA1(ef38e9cd0c9bc8393530e36060c803d1250c46a6), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 4)" )
 GAME_CUSTOM( 199?, m4rfym__d,    m4rfym, "ap1d.p1",      0x0000, 0x010000, CRC(edef44fe) SHA1(4907804c1bebc1f13aa3eb9dad0e9189de8e9601), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 5)" )
 GAME_CUSTOM( 199?, m4rfym__e,    m4rfym, "ap1dk.p1",     0x0000, 0x010000, CRC(873a402c) SHA1(1315a4ad18544ca5d65526ea0f620cac528e4cad), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 6)" )
 GAME_CUSTOM( 199?, m4rfym__f,    m4rfym, "ap1dy.p1",     0x0000, 0x010000, CRC(e8436c00) SHA1(1c2f171e55c3519d63d6c4dd0d56df4e1daad6af), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 7)" )
 GAME_CUSTOM( 199?, m4rfym__g,    m4rfym, "ap1k.p1",      0x0000, 0x010000, CRC(9afeb1e7) SHA1(5fc5d73a2c976d227a0598fb1dd802c6336415d1), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4rfym__h,    m4rfym, "ap1s.p1",      0x0000, 0x010000, CRC(7474509c) SHA1(c87e20f10806ec87fd33f97b43b8378d304f7d67), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 9)" )
 GAME_CUSTOM( 199?, m4rfym__i,    m4rfym, "ap1y.p1",      0x0000, 0x010000, CRC(152bf7cb) SHA1(8dd8b621f9dac430c293b29ca03814fc21a148b9), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4rfym__j,    m4rfym, "ap502ad.p1",   0x0000, 0x010000, CRC(ab059e57) SHA1(45ba91989b0fd1a44628f696b78eae2a349e3e4a), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 11)" )
+// "(C)1993 BARCREST" and "AP5 0.2"
+GAME_CUSTOM( 199?, m4rfym__s,    m4rfym, "ap502s.p1",    0x0000, 0x010000, CRC(8502a09a) SHA1(e635552b7f0c7b2e142d7f4d0f1fd93edac6132d), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP5 0.2)" )
+GAME_CUSTOM( 199?, m4rfym__j,    m4rfym, "ap502ad.p1",   0x0000, 0x010000, CRC(ab059e57) SHA1(45ba91989b0fd1a44628f696b78eae2a349e3e4a), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP5 0.2AD)" )
 GAME_CUSTOM( 199?, m4rfym__k,    m4rfym, "ap502b.p1",    0x0000, 0x010000, CRC(9ed27a6e) SHA1(2d655305a178e4ebe43f3d429dfec5a2ef6b9873), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 12)" )
 GAME_CUSTOM( 199?, m4rfym__l,    m4rfym, "ap502bd.p1",   0x0000, 0x010000, CRC(48e83fcd) SHA1(3e2de0416722df5004f00baae2d3f6846ff596e5), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 13)" )
 GAME_CUSTOM( 199?, m4rfym__m,    m4rfym, "ap502d.p1",    0x0000, 0x010000, CRC(d0560301) SHA1(c35e97391c588f6567eeb253eb9de59bec9e1724), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 14)" )
@@ -1553,9 +1665,10 @@ GAME_CUSTOM( 199?, m4rfym__o,    m4rfym, "ap502dr.p1",   0x0000, 0x010000, CRC(1
 GAME_CUSTOM( 199?, m4rfym__p,    m4rfym, "ap502dy.p1",   0x0000, 0x010000, CRC(819019ec) SHA1(36d2093a7a592850533d4206e0c9dd28cdc17568), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 17)" )
 GAME_CUSTOM( 199?, m4rfym__q,    m4rfym, "ap502k.p1",    0x0000, 0x010000, CRC(5064a894) SHA1(3e67358fe5ed9bfac05f621d7e72e5be7aae67df), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 18)" )
 GAME_CUSTOM( 199?, m4rfym__r,    m4rfym, "ap502r.p1",    0x0000, 0x010000, CRC(2503c7da) SHA1(2478bab8b19ab68ff01be8fae2e86e47894b3d7c), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4rfym__s,    m4rfym, "ap502s.p1",    0x0000, 0x010000, CRC(8502a09a) SHA1(e635552b7f0c7b2e142d7f4d0f1fd93edac6132d), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 20)" )
 GAME_CUSTOM( 199?, m4rfym__t,    m4rfym, "ap502y.p1",    0x0000, 0x010000, CRC(b868ef34) SHA1(a773503afd2f59b71e0b9a7e202d3e7120ec88ff), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4rfym__u,    m4rfym, "aprad.p1",     0x0000, 0x010000, CRC(936f59ac) SHA1(325708d965d56a9a7482dbeaa089ca871d5c01b5), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 22)" )
+// "(C)1993 BARCREST" and "APR 0.1"
+GAME_CUSTOM( 199?, m4rfym__2,    m4rfym, "aprs.p1",      0x0000, 0x010000, CRC(a114a96a) SHA1(b0a9091cac86750329513a0927dd39b76995b2f2), "Barcrest","Run For Your Money (Barcrest) (MPU4) (APR 0.1)" )
+GAME_CUSTOM( 199?, m4rfym__u,    m4rfym, "aprad.p1",     0x0000, 0x010000, CRC(936f59ac) SHA1(325708d965d56a9a7482dbeaa089ca871d5c01b5), "Barcrest","Run For Your Money (Barcrest) (MPU4) (APR 0.1AD)" )
 GAME_CUSTOM( 199?, m4rfym__v,    m4rfym, "aprb.p1",      0x0000, 0x010000, CRC(72ad662a) SHA1(11f1695e05ecf34a58f8df3ffbc72ab2dd7d02c9), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 23)" )
 GAME_CUSTOM( 199?, m4rfym__w,    m4rfym, "aprbd.p1",     0x0000, 0x010000, CRC(13af990d) SHA1(604d2173e3d6d25252b30b5bf386b53470c35581), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 24)" )
 GAME_CUSTOM( 199?, m4rfym__x,    m4rfym, "aprc.p1",      0x0000, 0x010000, CRC(fd3ece9a) SHA1(e11d1d258a415865f7477cdfddcd47e9bdb1c9b5), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 25)" )
@@ -1563,47 +1676,48 @@ GAME_CUSTOM( 199?, m4rfym__y,    m4rfym, "aprd.p1",      0x0000, 0x010000, CRC(8
 GAME_CUSTOM( 199?, m4rfym__z,    m4rfym, "aprdk.p1",     0x0000, 0x010000, CRC(58a41fcd) SHA1(e8c92dfb5c9662c90d363b5b7a7e0a4b4894d4cb), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 27)" )
 GAME_CUSTOM( 199?, m4rfym__0,    m4rfym, "aprdy.p1",     0x0000, 0x010000, CRC(9496cfad) SHA1(cb24779db99d283f1df86864886f21ad333cb98b), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 28)" )
 GAME_CUSTOM( 199?, m4rfym__1,    m4rfym, "aprk.p1",      0x0000, 0x010000, CRC(7277ef07) SHA1(dc509d125f8d377d4b2cb011d32be5bdba1daa17), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 29)" )
-GAME_CUSTOM( 199?, m4rfym__2,    m4rfym, "aprs.p1",      0x0000, 0x010000, CRC(a114a96a) SHA1(b0a9091cac86750329513a0927dd39b76995b2f2), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 30)" )
 GAME_CUSTOM( 199?, m4rfym__3,    m4rfym, "apry.p1",      0x0000, 0x010000, CRC(bf2120bc) SHA1(473374a9510dd53e39b94bfcf1369e13647239e6), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 31)" )
-GAME_CUSTOM( 199?, m4rfym__4,    m4rfym, "rfym20",       0x0000, 0x010000, CRC(5e1d70e2) SHA1(2da1b8033a77d367c4b5c3d83a0e5def4e5e5d78), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 32)" )
-GAME_CUSTOM( 199?, m4rfym__5,    m4rfym, "rfym2010",     0x0000, 0x010000, CRC(ec440e7e) SHA1(21f8d4708b5d779dcefcc1e921a5efe17dd6f8c7), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 33)" )
-GAME_CUSTOM( 199?, m4rfym__6,    m4rfym, "rfym510l",     0x0000, 0x010000, CRC(24af47f3) SHA1(3d1ec9b013f3f7b497cfb62b42fbb2fa914b24b6), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 34)" )
-GAME_CUSTOM( 199?, m4rfym__7,    m4rfym, "rfym55",       0x0000, 0x010000, CRC(b7d638d8) SHA1(6064ceffd94ff149d8bcb117fd823de52030ac64), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 35)" )
-GAME_CUSTOM( 199?, m4rfym__8,    m4rfym, "ru5ad.p1",     0x0000, 0x010000, CRC(1c3e1f39) SHA1(a45cdaaa875e52cf5cd5adf986c98f4a22a14785), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 36)" )
+// "(C)1993 BARCREST" and "RU5 0.1"
+GAME_CUSTOM( 199?, m4rfym__af,   m4rfym, "ru5s.p1",      0x0000, 0x010000, CRC(41795ea3) SHA1(6bfb6da6c0f7e762d628ce8a9dcdcbc3c0326ca6), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU5 0.1)" )
+GAME_CUSTOM( 199?, m4rfym__8,    m4rfym, "ru5ad.p1",     0x0000, 0x010000, CRC(1c3e1f39) SHA1(a45cdaaa875e52cf5cd5adf986c98f4a22a14785), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU5 0.1AD)" )
 GAME_CUSTOM( 199?, m4rfym__9,    m4rfym, "ru5b.p1",      0x0000, 0x010000, CRC(41e44d37) SHA1(8eb409b96864fb0f7c3bf5c66a20a63c8cbc68af), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 37)" )
 GAME_CUSTOM( 199?, m4rfym__aa,   m4rfym, "ru5bd.p1",     0x0000, 0x010000, CRC(8d4db415) SHA1(b023a13f89b7e5c2f72fd213179f723621871faf), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 38)" )
 GAME_CUSTOM( 199?, m4rfym__ab,   m4rfym, "ru5d.p1",      0x0000, 0x010000, CRC(fcb70a63) SHA1(df81c3c26c066c1326b20b9e0dda2863ee9635a6), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 39)" )
 GAME_CUSTOM( 199?, m4rfym__ac,   m4rfym, "ru5dk.p1",     0x0000, 0x010000, CRC(b4d83863) SHA1(02aebf94773d0a9454119b4ad663b6d8475fc8d3), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 40)" )
 GAME_CUSTOM( 199?, m4rfym__ad,   m4rfym, "ru5dy.p1",     0x0000, 0x010000, CRC(66375af5) SHA1(0a6d10357c163e5e27e7436f8190070e36e3ef90), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 41)" )
 GAME_CUSTOM( 199?, m4rfym__ae,   m4rfym, "ru5k.p1",      0x0000, 0x010000, CRC(7871c141) SHA1(e1e9d2972c87d2835b1e5a62502160cb4abb7736), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 42)" )
-GAME_CUSTOM( 199?, m4rfym__af,   m4rfym, "ru5s.p1",      0x0000, 0x010000, CRC(41795ea3) SHA1(6bfb6da6c0f7e762d628ce8a9dcdcbc3c0326ca6), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 43)" )
 GAME_CUSTOM( 199?, m4rfym__ag,   m4rfym, "ru5y.p1",      0x0000, 0x010000, CRC(ee217541) SHA1(68474c2e430d95ded2856183b9a02be917d092d6), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 44)" )
-GAME_CUSTOM( 199?, m4rfym__ah,   m4rfym, "ru8c.p1",      0x0000, 0x010000, CRC(93290724) SHA1(37b17b08f77b308289d4392900576dc66a0377eb), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 45)" )
+// "(C)1993 BARCREST" and "RU8 0.1"
+GAME_CUSTOM( 199?, m4rfym__am,   m4rfym, "ru8s.p1",      0x0000, 0x010000, CRC(d6ce5891) SHA1(c130e7bf614c67767c9af6f38e3cd41ce63d11ef), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU8 0.1)" )
+GAME_CUSTOM( 199?, m4rfym__ah,   m4rfym, "ru8c.p1",      0x0000, 0x010000, CRC(93290724) SHA1(37b17b08f77b308289d4392900576dc66a0377eb), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU8 0.1C)" )
 GAME_CUSTOM( 199?, m4rfym__ai,   m4rfym, "ru8d.p1",      0x0000, 0x010000, CRC(3e7d6ebb) SHA1(a836a52aef9fe4a9021835e99109b7fefb4ead76), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 46)" )
 GAME_CUSTOM( 199?, m4rfym__aj,   m4rfym, "ru8dk.p1",     0x0000, 0x010000, CRC(b2983dc1) SHA1(412bf4a643c807371fa465fb5f9a85bc3e46623d), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 47)" )
 GAME_CUSTOM( 199?, m4rfym__ak,   m4rfym, "ru8dy.p1",     0x0000, 0x010000, CRC(7d06cdcc) SHA1(d68f6ee59eb7689df30412288db4e9ee6c4bf178), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 48)" )
 GAME_CUSTOM( 199?, m4rfym__al,   m4rfym, "ru8k.p1",      0x0000, 0x010000, CRC(42f6226e) SHA1(c4bac8efd9c17f96dd9d973e9f64c85ceeacb36b), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 49)" )
-GAME_CUSTOM( 199?, m4rfym__am,   m4rfym, "ru8s.p1",      0x0000, 0x010000, CRC(d6ce5891) SHA1(c130e7bf614c67767c9af6f38e3cd41ce63d11ef), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 50)" )
 GAME_CUSTOM( 199?, m4rfym__an,   m4rfym, "ru8y.p1",      0x0000, 0x010000, CRC(f1fc1e75) SHA1(f6f1008349505ee0c494fcdde27db2a15147b6cb), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 51)" )
-GAME_CUSTOM( 199?, m4rfym__ao,   m4rfym, "runc.p1",      0x0000, 0x010000, CRC(09f53ddf) SHA1(f46be95bfacac751102a5f4d4a0917a5e51a653e), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 52)" )
-GAME_CUSTOM( 199?, m4rfym__ap,   m4rfym, "rundy.p1",     0x0000, 0x010000, CRC(a6f69a24) SHA1(8370287dcc890fcb7529d3d4c7a3c2e2e688f6a8), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 53)" )
-GAME_CUSTOM( 199?, m4rfym__aq,   m4rfym, "runk.p1",      0x0000, 0x010000, CRC(a2828b82) SHA1(0ae371a441df679fd9c699771ae9f58ce960d4a1), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 54)" )
-GAME_CUSTOM( 199?, m4rfym__ar,   m4rfym, "runs.p1",      0x0000, 0x010000, CRC(e20f5a06) SHA1(f0f71f8870db7003fce96f1dfe09804cf17c3ab3), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 55)" )
-GAME_CUSTOM( 199?, m4rfym__as,   m4rfym, "runy.p1",      0x0000, 0x010000, CRC(0e311ab4) SHA1(c98540c07e9cc23ec70ecfbcb2f4d66f2c716fc3), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 56)" )
-GAME_CUSTOM( 199?, m4rfym__at,   m4rfym, "rutad.p1",     0x0000, 0x010000, CRC(f27090c9) SHA1(28b7bb8046f67a3f8b90069de845b0b791b57078), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 57)" )
+// "(C)1993 BARCREST" and "RUT 0.1"
+GAME_CUSTOM( 199?, m4rfym__a0,   m4rfym, "ruts.p1",      0x0000, 0x010000, CRC(efaf4e03) SHA1(da19d6e28a6727eb9afb69c23fd5685f0dbcc31a), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUT 0.1)" )
+GAME_CUSTOM( 199?, m4rfym__at,   m4rfym, "rutad.p1",     0x0000, 0x010000, CRC(f27090c9) SHA1(28b7bb8046f67a3f8b90069de845b0b791b57078), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUT 0.1AD)" )
 GAME_CUSTOM( 199?, m4rfym__au,   m4rfym, "rutb.p1",      0x0000, 0x010000, CRC(cb7a74bf) SHA1(24274c7e3b40642d698f5c3a9a10cfeb23faaf1b), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 58)" )
 GAME_CUSTOM( 199?, m4rfym__av,   m4rfym, "rutbd.p1",     0x0000, 0x010000, CRC(19aba8f2) SHA1(cb726130837149c25adb5d87718b72259cb63a63), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 59)" )
 GAME_CUSTOM( 199?, m4rfym__aw,   m4rfym, "rutd.p1",      0x0000, 0x010000, CRC(16a872bd) SHA1(47ad5eb9b473805e2eb86e0d4d9ef4b2e6e3c926), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 60)" )
 GAME_CUSTOM( 199?, m4rfym__ax,   m4rfym, "rutdk.p1",     0x0000, 0x010000, CRC(a8259673) SHA1(443081395ea0c1b0a07e6cd4b17670b3e01bb50f), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 61)" )
 GAME_CUSTOM( 199?, m4rfym__ay,   m4rfym, "rutdy.p1",     0x0000, 0x010000, CRC(6b799f68) SHA1(87482236f1116983e80a7f190710524d3809cd3a), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 62)" )
 GAME_CUSTOM( 199?, m4rfym__az,   m4rfym, "rutk.p1",      0x0000, 0x010000, CRC(20962e5e) SHA1(0be43050d403750b67c796a007b503e132014f4c), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 63)" )
-GAME_CUSTOM( 199?, m4rfym__a0,   m4rfym, "ruts.p1",      0x0000, 0x010000, CRC(efaf4e03) SHA1(da19d6e28a6727eb9afb69c23fd5685f0dbcc31a), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 64)" )
 GAME_CUSTOM( 199?, m4rfym__a1,   m4rfym, "ruty.p1",      0x0000, 0x010000, CRC(abb708c5) SHA1(6fe3b52a0ba484576fc83ed35aefeda01d275aec), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 65)" )
-GAME_CUSTOM( 199?, m4rfym__a2,   m4rfym, "rfym20.10",    0x0000, 0x010000, CRC(947d00d2) SHA1(2c99da689541de247e35ac39eadfe070ac3196b5), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 66)" )
-GAME_CUSTOM( 199?, m4rfym__a3,   m4rfym, "rfym5.10",     0x0000, 0x010000, CRC(c2ce2cc2) SHA1(d5633e01f669ee8772ed77befa90180c6aa0111c), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 67)" )
-GAME_CUSTOM( 199?, m4rfym__a4,   m4rfym, "rfym5.4",      0x0000, 0x010000, CRC(fe613006) SHA1(898b90893bfcb121575952c22c16570a27948bce), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 68)" )
-GAME_CUSTOM( 199?, m4rfym__a5,   m4rfym, "rfym5.8t",     0x0000, 0x010000, CRC(c600718a) SHA1(168fa558f1b5b91fb805d483f3f4351ac80f90ff), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 69)" )
-
+// "(C)1996  B.W.B." and "RUC 1.3" (hack?)
+GAME_CUSTOM( 199?, m4rfym__6,    m4rfym, "rfym510l",     0x0000, 0x010000, CRC(24af47f3) SHA1(3d1ec9b013f3f7b497cfb62b42fbb2fa914b24b6), "Bwb","Run For Your Money (Barcrest) (MPU4) (RUC 1.3, hack?, set 1)" )
+GAME_CUSTOM( 199?, m4rfym__a3,   m4rfym, "rfym5.10",     0x0000, 0x010000, CRC(c2ce2cc2) SHA1(d5633e01f669ee8772ed77befa90180c6aa0111c), "Bwb","Run For Your Money (Barcrest) (MPU4) (RUC 1.3, hack?, set 2)" )
+// "(C)1996  B.W.B." and "RU4 1.1" (hack?)
+GAME_CUSTOM( 199?, m4rfym__a4,   m4rfym, "rfym5.4",      0x0000, 0x010000, CRC(fe613006) SHA1(898b90893bfcb121575952c22c16570a27948bce), "Bwb","Run For Your Money (Barcrest) (MPU4) (RU4 1.1, hack?)" )
+// "(C)1996  B.W.B." and "RU8 1.2" (hack?)
+GAME_CUSTOM( 199?, m4rfym__a5,   m4rfym, "rfym5.8t",     0x0000, 0x010000, CRC(c600718a) SHA1(168fa558f1b5b91fb805d483f3f4351ac80f90ff), "Bwb","Run For Your Money (Barcrest) (MPU4) (RU8 1.2, hack?)" )
+// "BILL AND BEN" and "V1 8 0.1" (hack)
+GAME_CUSTOM( 199?, m4rfym__4,    m4rfym, "rfym20",       0x0000, 0x010000, CRC(5e1d70e2) SHA1(2da1b8033a77d367c4b5c3d83a0e5def4e5e5d78), "hack","Run For Your Money (Barcrest) (MPU4) (V1 8 0.1, hack, set 1)" )
+GAME_CUSTOM( 199?, m4rfym__5,    m4rfym, "rfym2010",     0x0000, 0x010000, CRC(ec440e7e) SHA1(21f8d4708b5d779dcefcc1e921a5efe17dd6f8c7), "hack","Run For Your Money (Barcrest) (MPU4) (V1 8 0.1, hack, set 2)" )
+GAME_CUSTOM( 199?, m4rfym__a2,   m4rfym, "rfym20.10",    0x0000, 0x010000, CRC(947d00d2) SHA1(2c99da689541de247e35ac39eadfe070ac3196b5), "hack","Run For Your Money (Barcrest) (MPU4) (V1 8 0.1, hack, set 3)" )
+// "1997  COCO" and "RU4 1.1" (hack)
+GAME_CUSTOM( 199?, m4rfym__7,    m4rfym, "rfym55",       0x0000, 0x010000, CRC(b7d638d8) SHA1(6064ceffd94ff149d8bcb117fd823de52030ac64), "hack","Run For Your Money (Barcrest) (MPU4) (RU4 1.1, hack)" )
 
 #define M4READY_EXTRA_ROMS \
 	ROM_REGION( 0x48, "fakechr", 0 ) \
@@ -1620,75 +1734,88 @@ GAME_CUSTOM( 199?, m4rfym__a5,   m4rfym, "rfym5.8t",     0x0000, 0x010000, CRC(c
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4ready,     0,          "rgob.p1",      0x0000, 0x010000, CRC(43ac7b73) SHA1(994d6256432543e1353521359f8faaea671a7bea), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4ready__a,  m4ready,    "cgo11ad.p1",   0x0000, 0x010000, CRC(9f8bbdaf) SHA1(210cdc9ce493edbf55d43a3127b10931e3ce2fee), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4ready__b,  m4ready,    "cgo11b.p1",    0x0000, 0x010000, CRC(2ea96acb) SHA1(ffcf1fcb2b769b29b53b00c9ce80af061cc21b9d), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4ready__c,  m4ready,    "cgo11bd.p1",   0x0000, 0x010000, CRC(4cabc589) SHA1(2b0b91f4ac6ebd18edb7a913b8079acc9f026e7d), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4ready__d,  m4ready,    "cgo11c.p1",    0x0000, 0x010000, CRC(76d36b80) SHA1(2699982fed3c2116ff0187d24059f59d3b6c1cae), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4ready__e,  m4ready,    "cgo11d.p1",    0x0000, 0x010000, CRC(63516954) SHA1(abefafe43e3386a5c916e55503bcb623d74840e1), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4ready__f,  m4ready,    "cgo11dk.p1",   0x0000, 0x010000, CRC(84f112ef) SHA1(85fa44c7b25aeb83fa2c199abafe099a8ae92bf8), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4ready__g,  m4ready,    "cgo11dr.p1",   0x0000, 0x010000, CRC(07d13cf6) SHA1(11685efebf9c7091191654fec1f2ac6ad3d05ce1), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4ready__h,  m4ready,    "cgo11dy.p1",   0x0000, 0x010000, CRC(13c5b934) SHA1(3212ba2534726c8fca9a70325acff3f6e85dd1f7), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4ready__i,  m4ready,    "cgo11k.p1",    0x0000, 0x010000, CRC(4f46e7f6) SHA1(9485edbcbb3a81b1a335a7c420aa676af8b14050), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4ready__j,  m4ready,    "cgo11r.p1",    0x0000, 0x010000, CRC(f44dd36f) SHA1(6623daaa237e97b9d63815393562fe8abdb8d732), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4ready__k,  m4ready,    "cgo11s.p1",    0x0000, 0x010000, CRC(a6b9ddd4) SHA1(b06d5d19b165b82c76b29f7925e0936aeccedb8c), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4ready__l,  m4ready,    "cgo11y.p1",    0x0000, 0x010000, CRC(d91653f6) SHA1(6445958cd07088fbf08c37a8b5540e3eb561d021), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4ready__m,  m4ready,    "drr02ad.p1",   0x0000, 0x010000, CRC(5acc5189) SHA1(abf66b90f4a64c3fb9ac4bf16f3bba2758f54482), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4ready__n,  m4ready,    "drr02b.p1",    0x0000, 0x010000, CRC(729e13c9) SHA1(dcefdd44592464616570101a5e05db31289fc66c), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4ready__o,  m4ready,    "drr02bd.p1",   0x0000, 0x010000, CRC(70c5b183) SHA1(b1431d0c2c48941d1ff6d6115c8d1ab026d71f63), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4ready__p,  m4ready,    "drr02c.p1",    0x0000, 0x010000, CRC(258acbf9) SHA1(ced9dbef9162ddadb4838ad430d50aa14574e97d), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4ready__q,  m4ready,    "drr02d.p1",    0x0000, 0x010000, CRC(60940b5a) SHA1(a4d293944e0e65f99dea9391d9d7e1066aa7b83d), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4ready__r,  m4ready,    "drr02dk.p1",   0x0000, 0x010000, CRC(0335775e) SHA1(4d943c3e522f5c42ddd2104c316f75eec90f494f), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4ready__s,  m4ready,    "drr02dr.p1",   0x0000, 0x010000, CRC(c05eef66) SHA1(ac5966ea0ff036d9c9179df6bc7aabd149f41d6c), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4ready__t,  m4ready,    "drr02dy.p1",   0x0000, 0x010000, CRC(6a700473) SHA1(4025a99aa9e87a80875d150e965650d339d2a143), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4ready__u,  m4ready,    "drr02k.p1",    0x0000, 0x010000, CRC(525e370e) SHA1(9849399643731beb31b7163b7eebd8774caf9289), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4ready__v,  m4ready,    "drr02r.p1",    0x0000, 0x010000, CRC(352613a0) SHA1(052e7770d55dd379d1bf3501e46d973bc4fc48d8), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 23)" )
-GAME_CUSTOM( 199?, m4ready__w,  m4ready,    "drr02s.p1",    0x0000, 0x010000, CRC(67b03b7f) SHA1(61e09db8b7622e6e094c4e585dbcfea724155829), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 24)" )
-GAME_CUSTOM( 199?, m4ready__x,  m4ready,    "drr02y.p1",    0x0000, 0x010000, CRC(009c7ece) SHA1(48463d7d0e521d51bad83ac5ddaaffabc68bf610), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 25)" )
-GAME_CUSTOM( 199?, m4ready__y,  m4ready,    "hjj.hex",      0x0000, 0x010000, CRC(48ab2375) SHA1(4d9360a89e97a6bb7bdb099940d73f425eadd63d), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 26)" )
-GAME_CUSTOM( 199?, m4ready__z,  m4ready,    "hjj02ad.p1",   0x0000, 0x010000, CRC(9f787e01) SHA1(d6cae1c1ae15b74285076e87c7fd8105f6a114ae), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 27)" )
-GAME_CUSTOM( 199?, m4ready__0,  m4ready,    "hjj02b.p1",    0x0000, 0x010000, CRC(778ec121) SHA1(98454562da1da56d57ce3e6279805207671d7337), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 28)" )
-GAME_CUSTOM( 199?, m4ready__1,  m4ready,    "hjj02bd.p1",   0x0000, 0x010000, CRC(7e8dbab0) SHA1(5b40536503b2d62792f874535367f5658acf8d2e), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 29)" )
-GAME_CUSTOM( 199?, m4ready__2,  m4ready,    "hjj02c.p1",    0x0000, 0x010000, CRC(fbb149fc) SHA1(6a8305a3ef4a1818a12dab3d380e79b7e642a904), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 30)" )
-GAME_CUSTOM( 199?, m4ready__3,  m4ready,    "hjj02d.p1",    0x0000, 0x010000, CRC(9e657e28) SHA1(3eaf9f8a0511f4533e9b47105d4417c71248fab2), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 31)" )
-GAME_CUSTOM( 199?, m4ready__4,  m4ready,    "hjj02dk.p1",   0x0000, 0x010000, CRC(2e1bab77) SHA1(76a2784bc183c6d79a845bb7306eae687ced82a0), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 32)" )
-GAME_CUSTOM( 199?, m4ready__5,  m4ready,    "hjj02dr.p1",   0x0000, 0x010000, CRC(9d26064f) SHA1(6596b3a671ab8e38b8357023f8994948ef1c1f0f), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 33)" )
-GAME_CUSTOM( 199?, m4ready__6,  m4ready,    "hjj02dy.p1",   0x0000, 0x010000, CRC(0ab388b6) SHA1(cc8f157a8a91e3fb8bd1fbdd35989d72c8684c50), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 34)" )
-GAME_CUSTOM( 199?, m4ready__7,  m4ready,    "hjj02k.p1",    0x0000, 0x010000, CRC(c224c58a) SHA1(5f9b5ff92e2f1b0438380d635b255ec8b4fc080f), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 35)" )
-GAME_CUSTOM( 199?, m4ready__8,  m4ready,    "hjj02r.p1",    0x0000, 0x010000, CRC(32fefefe) SHA1(f58e228a1496b0858903c2d850c8453835b6f24b), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 36)" )
-GAME_CUSTOM( 199?, m4ready__9,  m4ready,    "hjj02s.p1",    0x0000, 0x010000, CRC(39de9801) SHA1(c29e883c45ed6b272d65c7922b1871199a424244), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 37)" )
-GAME_CUSTOM( 199?, m4ready__aa, m4ready,    "hjj02y.p1",    0x0000, 0x010000, CRC(0178cc91) SHA1(d618ff2eb0a1992b88f3b5427ffc54d34bf8c124), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 38)" )
-GAME_CUSTOM( 199?, m4ready__ab, m4ready,    "ppl02ad.p1",   0x0000, 0x010000, CRC(d8b3be27) SHA1(95d1d979b439303817670fd686b5df324feb618f), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 39)" )
-GAME_CUSTOM( 199?, m4ready__ac, m4ready,    "ppl02b.p1",    0x0000, 0x010000, CRC(dbd56cf1) SHA1(968c1d09626e493c51d7637e19a7f092047b283f), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 40)" )
-GAME_CUSTOM( 199?, m4ready__ad, m4ready,    "ppl02bd.p1",   0x0000, 0x010000, CRC(eeafd36d) SHA1(68c314e937d24a59ca305facc409218c63bef24e), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 41)" )
-GAME_CUSTOM( 199?, m4ready__ae, m4ready,    "ppl02c.p1",    0x0000, 0x010000, CRC(ad6f5c6d) SHA1(91f3d7bad3cdb7014ff3caa1631e6567cb95f47e), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 42)" )
-GAME_CUSTOM( 199?, m4ready__af, m4ready,    "ppl02d.p1",    0x0000, 0x010000, CRC(041f0fd8) SHA1(8e32c88f7b0a541a9460926a2fec0318a7239279), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 43)" )
-GAME_CUSTOM( 199?, m4ready__ag, m4ready,    "ppl02dk.p1",   0x0000, 0x010000, CRC(632ecd46) SHA1(9e90279db99aa22923a79e309b053b35b70c9f8e), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 44)" )
-GAME_CUSTOM( 199?, m4ready__ah, m4ready,    "ppl02dy.p1",   0x0000, 0x010000, CRC(4fb07726) SHA1(f234018ea18511217d176023b489254cf5a5a15e), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 45)" )
-GAME_CUSTOM( 199?, m4ready__ai, m4ready,    "ppl02k.p1",    0x0000, 0x010000, CRC(7fcc03d7) SHA1(359743edec7ca54bd9a780f81ac25d314ada2d7e), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 46)" )
-GAME_CUSTOM( 199?, m4ready__aj, m4ready,    "ppl02r.p1",    0x0000, 0x010000, CRC(e35580e3) SHA1(397bd2ce068aa45f3c55a3ddd97ae3e09391a7da), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 47)" )
-GAME_CUSTOM( 199?, m4ready__ak, m4ready,    "ppl02s.p1",    0x0000, 0x010000, CRC(40c1d256) SHA1(abd55dcc06b49d54976743c610ad3de21278ac2d), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 48)" )
-GAME_CUSTOM( 199?, m4ready__al, m4ready,    "ppl02y.p1",    0x0000, 0x010000, CRC(7802f70c) SHA1(c96758c02bebff4b85436a93ae012c80c6cb2963), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 49)" )
-GAME_CUSTOM( 199?, m4ready__am, m4ready,    "rgoad.p1",     0x0000, 0x010000, CRC(d4ed739c) SHA1(6a7d5f63eaf59f08a8f870aba8523e2dc59d20cd), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 50)" )
-GAME_CUSTOM( 199?, m4ready__an, m4ready,    "rgobd.p1",     0x0000, 0x010000, CRC(0505340c) SHA1(e61b007dc50beb22bf3efa2c3cfab595880d3248), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 51)" )
-GAME_CUSTOM( 199?, m4ready__ao, m4ready,    "rgod.p1",      0x0000, 0x010000, CRC(f3898077) SHA1(4d2f32b4c3f01a0b54966dd0558dcadcf89fd229), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 52)" )
-GAME_CUSTOM( 199?, m4ready__ap, m4ready,    "rgodk.p1",     0x0000, 0x010000, CRC(9a9b61c7) SHA1(756ed419451d1e070809303467789e01949dea2b), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 53)" )
-GAME_CUSTOM( 199?, m4ready__aq, m4ready,    "rgody.p1",     0x0000, 0x010000, CRC(a0eef0f0) SHA1(781de603d19eab0ee771b10374f53c149432c877), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 54)" )
-GAME_CUSTOM( 199?, m4ready__ar, m4ready,    "rgok.p1",      0x0000, 0x010000, CRC(00413e8f) SHA1(580efbdf3ba092978648d83b6d21b5a4966d57e3), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 55)" )
-GAME_CUSTOM( 199?, m4ready__as, m4ready,    "rgos.p1",      0x0000, 0x010000, CRC(d00d3540) SHA1(0fd6a08477d05d1c129038c8de47de68a28c0a56), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 56)" )
-GAME_CUSTOM( 199?, m4ready__at, m4ready,    "rgoy.p1",      0x0000, 0x010000, CRC(cfdfce82) SHA1(68464381f658f08efb3f790eea1e7dd61086f936), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 57)" )
-GAME_CUSTOM( 199?, m4ready__au, m4ready,    "rgt10ad.p1",   0x0000, 0x010000, CRC(22f65e05) SHA1(d488e4c65059b3b7e8e88e39a05e0cc9eae2d836), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 58)" )
-GAME_CUSTOM( 199?, m4ready__av, m4ready,    "rgt10b.p1",    0x0000, 0x010000, CRC(5d86b45a) SHA1(a7553848a1e4304acaf72f9d293123ca2af629f0), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 59)" )
-GAME_CUSTOM( 199?, m4ready__aw, m4ready,    "rgt10bd.p1",   0x0000, 0x010000, CRC(6280594e) SHA1(d2b666aaac8ebe94bfab1c4404d0e42bd6c8b176), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 60)" )
-GAME_CUSTOM( 199?, m4ready__ax, m4ready,    "rgt10c.p1",    0x0000, 0x010000, CRC(91f28aa6) SHA1(42c21d11df3145a0919f7aef53a5621b2beca353), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 61)" )
-GAME_CUSTOM( 199?, m4ready__ay, m4ready,    "rgt10d.p1",    0x0000, 0x010000, CRC(abd4a67e) SHA1(183746cd2cd661587854a80ad5455074fcf143cc), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 62)" )
-GAME_CUSTOM( 199?, m4ready__az, m4ready,    "rgt10dk.p1",   0x0000, 0x010000, CRC(63ee9525) SHA1(e1fa5348672d05149e6ab26f31af047e38192f2c), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 63)" )
-GAME_CUSTOM( 199?, m4ready__a0, m4ready,    "rgt10dr.p1",   0x0000, 0x010000, CRC(481ffebc) SHA1(3608faa929b703d2e45ea37b4f7051d5bb37f073), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 64)" )
-GAME_CUSTOM( 199?, m4ready__a1, m4ready,    "rgt10dy.p1",   0x0000, 0x010000, CRC(fe2498e9) SHA1(bd81c775daf860c2484af88a8b11b75df00ccaaa), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 65)" )
-GAME_CUSTOM( 199?, m4ready__a2, m4ready,    "rgt10k.p1",    0x0000, 0x010000, CRC(78d6eff1) SHA1(d3172ffc9ef3a4f60680081d993e1487e4229625), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 66)" )
-GAME_CUSTOM( 199?, m4ready__a3, m4ready,    "rgt10r.p1",    0x0000, 0x010000, CRC(1992945e) SHA1(716b62ca8edc5523fd83355e650982b50b4f9458), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 67)" )
-GAME_CUSTOM( 199?, m4ready__a4, m4ready,    "rgt10s.p1",    0x0000, 0x010000, CRC(dd289204) SHA1(431f73cb45d248c672c50dc8fbc579209e41207d), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 68)" )
-GAME_CUSTOM( 199?, m4ready__a5, m4ready,    "rgt10y.p1",    0x0000, 0x010000, CRC(8dab3aca) SHA1(0fe8f87a17acd8df0b7b75b852b58eb1e273eb27), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 69)" )
+// "(C)1991 BARCREST" and "RGO 0.8"
+GAME_CUSTOM( 199?, m4ready,     0,          "rgos.p1",      0x0000, 0x010000, CRC(d00d3540) SHA1(0fd6a08477d05d1c129038c8de47de68a28c0a56), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (RGO 0.8)" )
+GAME_CUSTOM( 199?, m4ready__as, m4ready,    "rgob.p1",      0x0000, 0x010000, CRC(43ac7b73) SHA1(994d6256432543e1353521359f8faaea671a7bea), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (RGO 0.8B)" )
+GAME_CUSTOM( 199?, m4ready__ar, m4ready,    "rgok.p1",      0x0000, 0x010000, CRC(00413e8f) SHA1(580efbdf3ba092978648d83b6d21b5a4966d57e3), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (RGO 0.8K)" )
+GAME_CUSTOM( 199?, m4ready__at, m4ready,    "rgoy.p1",      0x0000, 0x010000, CRC(cfdfce82) SHA1(68464381f658f08efb3f790eea1e7dd61086f936), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (RGO 0.8Y)" )
+// datapak sets
+GAME_CUSTOM( 199?, m4ready__ao, m4ready,    "rgod.p1",      0x0000, 0x010000, CRC(f3898077) SHA1(4d2f32b4c3f01a0b54966dd0558dcadcf89fd229), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (RGO 0.8D)" )
+GAME_CUSTOM( 199?, m4ready__am, m4ready,    "rgoad.p1",     0x0000, 0x010000, CRC(d4ed739c) SHA1(6a7d5f63eaf59f08a8f870aba8523e2dc59d20cd), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (RGO 0.8AD)" )
+GAME_CUSTOM( 199?, m4ready__an, m4ready,    "rgobd.p1",     0x0000, 0x010000, CRC(0505340c) SHA1(e61b007dc50beb22bf3efa2c3cfab595880d3248), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (RGO 0.8BD)" )
+GAME_CUSTOM( 199?, m4ready__ap, m4ready,    "rgodk.p1",     0x0000, 0x010000, CRC(9a9b61c7) SHA1(756ed419451d1e070809303467789e01949dea2b), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (RGO 0.8KD)" )
+GAME_CUSTOM( 199?, m4ready__aq, m4ready,    "rgody.p1",     0x0000, 0x010000, CRC(a0eef0f0) SHA1(781de603d19eab0ee771b10374f53c149432c877), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (RGO 0.8YD)" )
+// "(C)1991 BARCREST" and "CGO 1.1"
+GAME_CUSTOM( 199?, m4ready__k,  m4ready,    "cgo11s.p1",    0x0000, 0x010000, CRC(a6b9ddd4) SHA1(b06d5d19b165b82c76b29f7925e0936aeccedb8c), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (CGO 1.1)" )
+GAME_CUSTOM( 199?, m4ready__b,  m4ready,    "cgo11b.p1",    0x0000, 0x010000, CRC(2ea96acb) SHA1(ffcf1fcb2b769b29b53b00c9ce80af061cc21b9d), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (CGO 1.1B)" )
+GAME_CUSTOM( 199?, m4ready__d,  m4ready,    "cgo11c.p1",    0x0000, 0x010000, CRC(76d36b80) SHA1(2699982fed3c2116ff0187d24059f59d3b6c1cae), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (CGO 1.1C)" )
+GAME_CUSTOM( 199?, m4ready__i,  m4ready,    "cgo11k.p1",    0x0000, 0x010000, CRC(4f46e7f6) SHA1(9485edbcbb3a81b1a335a7c420aa676af8b14050), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (CGO 1.1K)" )
+GAME_CUSTOM( 199?, m4ready__j,  m4ready,    "cgo11r.p1",    0x0000, 0x010000, CRC(f44dd36f) SHA1(6623daaa237e97b9d63815393562fe8abdb8d732), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (CGO 1.1R)" )
+GAME_CUSTOM( 199?, m4ready__l,  m4ready,    "cgo11y.p1",    0x0000, 0x010000, CRC(d91653f6) SHA1(6445958cd07088fbf08c37a8b5540e3eb561d021), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (CGO 1.1Y)" )
+// datapak sets
+GAME_CUSTOM( 199?, m4ready__e,  m4ready,    "cgo11d.p1",    0x0000, 0x010000, CRC(63516954) SHA1(abefafe43e3386a5c916e55503bcb623d74840e1), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (CGO 1.1D)" )
+GAME_CUSTOM( 199?, m4ready__a,  m4ready,    "cgo11ad.p1",   0x0000, 0x010000, CRC(9f8bbdaf) SHA1(210cdc9ce493edbf55d43a3127b10931e3ce2fee), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (CGO 1.1AD)" )
+GAME_CUSTOM( 199?, m4ready__c,  m4ready,    "cgo11bd.p1",   0x0000, 0x010000, CRC(4cabc589) SHA1(2b0b91f4ac6ebd18edb7a913b8079acc9f026e7d), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (CGO 1.1BD)" )
+GAME_CUSTOM( 199?, m4ready__f,  m4ready,    "cgo11dk.p1",   0x0000, 0x010000, CRC(84f112ef) SHA1(85fa44c7b25aeb83fa2c199abafe099a8ae92bf8), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (CGO 1.1KD)" )
+GAME_CUSTOM( 199?, m4ready__g,  m4ready,    "cgo11dr.p1",   0x0000, 0x010000, CRC(07d13cf6) SHA1(11685efebf9c7091191654fec1f2ac6ad3d05ce1), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (CGO 1.1RD)" )
+GAME_CUSTOM( 199?, m4ready__h,  m4ready,    "cgo11dy.p1",   0x0000, 0x010000, CRC(13c5b934) SHA1(3212ba2534726c8fca9a70325acff3f6e85dd1f7), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (CGO 1.1YD)" )
+// "(C)1991 BARCREST" and "DRR 0.2"
+GAME_CUSTOM( 199?, m4ready__w,  m4ready,    "drr02s.p1",    0x0000, 0x010000, CRC(67b03b7f) SHA1(61e09db8b7622e6e094c4e585dbcfea724155829), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (DRR 0.2)" )
+GAME_CUSTOM( 199?, m4ready__n,  m4ready,    "drr02b.p1",    0x0000, 0x010000, CRC(729e13c9) SHA1(dcefdd44592464616570101a5e05db31289fc66c), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (DRR 0.2B)" )
+GAME_CUSTOM( 199?, m4ready__p,  m4ready,    "drr02c.p1",    0x0000, 0x010000, CRC(258acbf9) SHA1(ced9dbef9162ddadb4838ad430d50aa14574e97d), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (DRR 0.2C)" )
+GAME_CUSTOM( 199?, m4ready__u,  m4ready,    "drr02k.p1",    0x0000, 0x010000, CRC(525e370e) SHA1(9849399643731beb31b7163b7eebd8774caf9289), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (DRR 0.2K)" )
+GAME_CUSTOM( 199?, m4ready__v,  m4ready,    "drr02r.p1",    0x0000, 0x010000, CRC(352613a0) SHA1(052e7770d55dd379d1bf3501e46d973bc4fc48d8), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (DRR 0.2R)" )
+GAME_CUSTOM( 199?, m4ready__x,  m4ready,    "drr02y.p1",    0x0000, 0x010000, CRC(009c7ece) SHA1(48463d7d0e521d51bad83ac5ddaaffabc68bf610), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (DRR 0.2Y)" )
+// datapak sets
+GAME_CUSTOM( 199?, m4ready__q,  m4ready,    "drr02d.p1",    0x0000, 0x010000, CRC(60940b5a) SHA1(a4d293944e0e65f99dea9391d9d7e1066aa7b83d), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (DRR 0.2D)" )
+GAME_CUSTOM( 199?, m4ready__m,  m4ready,    "drr02ad.p1",   0x0000, 0x010000, CRC(5acc5189) SHA1(abf66b90f4a64c3fb9ac4bf16f3bba2758f54482), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (DRR 0.2AD)" )
+GAME_CUSTOM( 199?, m4ready__o,  m4ready,    "drr02bd.p1",   0x0000, 0x010000, CRC(70c5b183) SHA1(b1431d0c2c48941d1ff6d6115c8d1ab026d71f63), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (DRR 0.2BD)" )
+GAME_CUSTOM( 199?, m4ready__r,  m4ready,    "drr02dk.p1",   0x0000, 0x010000, CRC(0335775e) SHA1(4d943c3e522f5c42ddd2104c316f75eec90f494f), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (DRR 0.2KD)" )
+GAME_CUSTOM( 199?, m4ready__s,  m4ready,    "drr02dr.p1",   0x0000, 0x010000, CRC(c05eef66) SHA1(ac5966ea0ff036d9c9179df6bc7aabd149f41d6c), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (DRR 0.2RD)" )
+GAME_CUSTOM( 199?, m4ready__t,  m4ready,    "drr02dy.p1",   0x0000, 0x010000, CRC(6a700473) SHA1(4025a99aa9e87a80875d150e965650d339d2a143), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (DRR 0.2YD)" )
+// "(C)1991 BARCREST" and "HJJ 0.1"
+GAME_CUSTOM( 199?, m4ready__y,  m4ready,    "hjj.hex",      0x0000, 0x010000, CRC(48ab2375) SHA1(4d9360a89e97a6bb7bdb099940d73f425eadd63d), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (HJJ 0.1)" )
+// "(C)1991 BARCREST" and "HJJ 0.2"
+GAME_CUSTOM( 199?, m4ready__9,  m4ready,    "hjj02s.p1",    0x0000, 0x010000, CRC(39de9801) SHA1(c29e883c45ed6b272d65c7922b1871199a424244), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (HJJ 0.2)" )
+GAME_CUSTOM( 199?, m4ready__0,  m4ready,    "hjj02b.p1",    0x0000, 0x010000, CRC(778ec121) SHA1(98454562da1da56d57ce3e6279805207671d7337), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (HJJ 0.2B)" )
+GAME_CUSTOM( 199?, m4ready__2,  m4ready,    "hjj02c.p1",    0x0000, 0x010000, CRC(fbb149fc) SHA1(6a8305a3ef4a1818a12dab3d380e79b7e642a904), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (HJJ 0.2C)" )
+GAME_CUSTOM( 199?, m4ready__7,  m4ready,    "hjj02k.p1",    0x0000, 0x010000, CRC(c224c58a) SHA1(5f9b5ff92e2f1b0438380d635b255ec8b4fc080f), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (HJJ 0.2K)" )
+GAME_CUSTOM( 199?, m4ready__8,  m4ready,    "hjj02r.p1",    0x0000, 0x010000, CRC(32fefefe) SHA1(f58e228a1496b0858903c2d850c8453835b6f24b), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (HJJ 0.2R)" )
+GAME_CUSTOM( 199?, m4ready__aa, m4ready,    "hjj02y.p1",    0x0000, 0x010000, CRC(0178cc91) SHA1(d618ff2eb0a1992b88f3b5427ffc54d34bf8c124), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (HJJ 0.2Y)" )
+// datapak sets
+GAME_CUSTOM( 199?, m4ready__3,  m4ready,    "hjj02d.p1",    0x0000, 0x010000, CRC(9e657e28) SHA1(3eaf9f8a0511f4533e9b47105d4417c71248fab2), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (HJJ 0.2D)" )
+GAME_CUSTOM( 199?, m4ready__z,  m4ready,    "hjj02ad.p1",   0x0000, 0x010000, CRC(9f787e01) SHA1(d6cae1c1ae15b74285076e87c7fd8105f6a114ae), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (HJJ 0.2AD)" )
+GAME_CUSTOM( 199?, m4ready__1,  m4ready,    "hjj02bd.p1",   0x0000, 0x010000, CRC(7e8dbab0) SHA1(5b40536503b2d62792f874535367f5658acf8d2e), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (HJJ 0.2BD)" )
+GAME_CUSTOM( 199?, m4ready__4,  m4ready,    "hjj02dk.p1",   0x0000, 0x010000, CRC(2e1bab77) SHA1(76a2784bc183c6d79a845bb7306eae687ced82a0), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (HJJ 0.2KD)" )
+GAME_CUSTOM( 199?, m4ready__5,  m4ready,    "hjj02dr.p1",   0x0000, 0x010000, CRC(9d26064f) SHA1(6596b3a671ab8e38b8357023f8994948ef1c1f0f), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (HJJ 0.2RD)" )
+GAME_CUSTOM( 199?, m4ready__6,  m4ready,    "hjj02dy.p1",   0x0000, 0x010000, CRC(0ab388b6) SHA1(cc8f157a8a91e3fb8bd1fbdd35989d72c8684c50), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (HJJ 0.2YD)" )
+// "(C)1991 BARCREST" and "PPL 0.2"
+GAME_CUSTOM( 199?, m4ready__ak, m4ready,    "ppl02s.p1",    0x0000, 0x010000, CRC(40c1d256) SHA1(abd55dcc06b49d54976743c610ad3de21278ac2d), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (PPL 0.2)" )
+GAME_CUSTOM( 199?, m4ready__ac, m4ready,    "ppl02b.p1",    0x0000, 0x010000, CRC(dbd56cf1) SHA1(968c1d09626e493c51d7637e19a7f092047b283f), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (PPL 0.2B)" )
+GAME_CUSTOM( 199?, m4ready__ae, m4ready,    "ppl02c.p1",    0x0000, 0x010000, CRC(ad6f5c6d) SHA1(91f3d7bad3cdb7014ff3caa1631e6567cb95f47e), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (PPL 0.2C)" )
+GAME_CUSTOM( 199?, m4ready__ai, m4ready,    "ppl02k.p1",    0x0000, 0x010000, CRC(7fcc03d7) SHA1(359743edec7ca54bd9a780f81ac25d314ada2d7e), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (PPL 0.2K)" )
+GAME_CUSTOM( 199?, m4ready__aj, m4ready,    "ppl02r.p1",    0x0000, 0x010000, CRC(e35580e3) SHA1(397bd2ce068aa45f3c55a3ddd97ae3e09391a7da), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (PPL 0.2R)" )
+GAME_CUSTOM( 199?, m4ready__al, m4ready,    "ppl02y.p1",    0x0000, 0x010000, CRC(7802f70c) SHA1(c96758c02bebff4b85436a93ae012c80c6cb2963), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (PPL 0.2Y)" )
+// datapak sets
+GAME_CUSTOM( 199?, m4ready__af, m4ready,    "ppl02d.p1",    0x0000, 0x010000, CRC(041f0fd8) SHA1(8e32c88f7b0a541a9460926a2fec0318a7239279), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (PPL 0.2D)" )
+GAME_CUSTOM( 199?, m4ready__ab, m4ready,    "ppl02ad.p1",   0x0000, 0x010000, CRC(d8b3be27) SHA1(95d1d979b439303817670fd686b5df324feb618f), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (PPL 0.2AD)" )
+GAME_CUSTOM( 199?, m4ready__ad, m4ready,    "ppl02bd.p1",   0x0000, 0x010000, CRC(eeafd36d) SHA1(68c314e937d24a59ca305facc409218c63bef24e), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (PPL 0.2BD)" )
+GAME_CUSTOM( 199?, m4ready__ag, m4ready,    "ppl02dk.p1",   0x0000, 0x010000, CRC(632ecd46) SHA1(9e90279db99aa22923a79e309b053b35b70c9f8e), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (PPL 0.2KD)" )
+GAME_CUSTOM( 199?, m4ready__ah, m4ready,    "ppl02dy.p1",   0x0000, 0x010000, CRC(4fb07726) SHA1(f234018ea18511217d176023b489254cf5a5a15e), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (PPL 0.2YD)" )
+// "(C)1991 BARCREST" and "RGT 1.0"
+GAME_CUSTOM( 199?, m4ready__a4, m4ready,    "rgt10s.p1",    0x0000, 0x010000, CRC(dd289204) SHA1(431f73cb45d248c672c50dc8fbc579209e41207d), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (RGT 1.0)" )
+GAME_CUSTOM( 199?, m4ready__av, m4ready,    "rgt10b.p1",    0x0000, 0x010000, CRC(5d86b45a) SHA1(a7553848a1e4304acaf72f9d293123ca2af629f0), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (RGT 1.0B)" )
+GAME_CUSTOM( 199?, m4ready__ax, m4ready,    "rgt10c.p1",    0x0000, 0x010000, CRC(91f28aa6) SHA1(42c21d11df3145a0919f7aef53a5621b2beca353), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (RGT 1.0C)" )
+GAME_CUSTOM( 199?, m4ready__a2, m4ready,    "rgt10k.p1",    0x0000, 0x010000, CRC(78d6eff1) SHA1(d3172ffc9ef3a4f60680081d993e1487e4229625), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (RGT 1.0K)" )
+GAME_CUSTOM( 199?, m4ready__a3, m4ready,    "rgt10r.p1",    0x0000, 0x010000, CRC(1992945e) SHA1(716b62ca8edc5523fd83355e650982b50b4f9458), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (RGT 1.0R)" )
+GAME_CUSTOM( 199?, m4ready__a5, m4ready,    "rgt10y.p1",    0x0000, 0x010000, CRC(8dab3aca) SHA1(0fe8f87a17acd8df0b7b75b852b58eb1e273eb27), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (RGT 1.0Y)" )
+// datapak sets
+GAME_CUSTOM( 199?, m4ready__ay, m4ready,    "rgt10d.p1",    0x0000, 0x010000, CRC(abd4a67e) SHA1(183746cd2cd661587854a80ad5455074fcf143cc), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (RGT 1.0D)" )
+GAME_CUSTOM( 199?, m4ready__au, m4ready,    "rgt10ad.p1",   0x0000, 0x010000, CRC(22f65e05) SHA1(d488e4c65059b3b7e8e88e39a05e0cc9eae2d836), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (RGT 1.0AD)" )
+GAME_CUSTOM( 199?, m4ready__aw, m4ready,    "rgt10bd.p1",   0x0000, 0x010000, CRC(6280594e) SHA1(d2b666aaac8ebe94bfab1c4404d0e42bd6c8b176), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (RGT 1.0BD)" )
+GAME_CUSTOM( 199?, m4ready__az, m4ready,    "rgt10dk.p1",   0x0000, 0x010000, CRC(63ee9525) SHA1(e1fa5348672d05149e6ab26f31af047e38192f2c), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (RGT 1.0KD)" )
+GAME_CUSTOM( 199?, m4ready__a0, m4ready,    "rgt10dr.p1",   0x0000, 0x010000, CRC(481ffebc) SHA1(3608faa929b703d2e45ea37b4f7051d5bb37f073), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (RGT 1.0RD)" )
+GAME_CUSTOM( 199?, m4ready__a1, m4ready,    "rgt10dy.p1",   0x0000, 0x010000, CRC(fe2498e9) SHA1(bd81c775daf860c2484af88a8b11b75df00ccaaa), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (RGT 1.0YD)" )
 
 
 #define M4MAG7S_EXTRA_ROMS \
@@ -1856,59 +1983,73 @@ GAME_CUSTOM( 199?, m4makmnt__as,   m4makmnt,   "ma_x6a_c.3_1", 0x0000, 0x010000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4vivaes,       0,          "5p5vivaespana6-0.bin", 0x0000, 0x010000, CRC(adf02a7b) SHA1(2c61e175b920a67098503eb4d80b07b828c9f91d), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4vivaes__a,    m4vivaes,   "ep8ad.p1",             0x0000, 0x010000, CRC(1591cc9b) SHA1(b7574b71955d7780f3f127670e458befad951383), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4vivaes__b,    m4vivaes,   "ep8b.p1",              0x0000, 0x010000, CRC(33b085b3) SHA1(5fc22ee8ae2d597392c82b09a830893bb04e1014), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4vivaes__c,    m4vivaes,   "ep8bd.p1",             0x0000, 0x010000, CRC(d1eedaac) SHA1(9773fbb9b15dbbe313d76b0746698fbc12e26dd2), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4vivaes__d,    m4vivaes,   "ep8c.p1",              0x0000, 0x010000, CRC(d2a8aaf5) SHA1(7aabe3e0522877700453068c30c74cbe2c058e9a), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4vivaes__e,    m4vivaes,   "ep8d.p1",              0x0000, 0x010000, CRC(06f87010) SHA1(636707d4077bee0ea2f221904fa0e187ea4a1e31), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4vivaes__f,    m4vivaes,   "ep8dk.p1",             0x0000, 0x010000, CRC(e87b56da) SHA1(f3de0ab0badc9bd14505822c63f110b9b2521d55), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4vivaes__g,    m4vivaes,   "ep8dy.p1",             0x0000, 0x010000, CRC(d20ec7ed) SHA1(dffd4fcaf360b2b9f4b7241fe80bb6ee983b6d57), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4vivaes__h,    m4vivaes,   "ep8k.p1",              0x0000, 0x010000, CRC(0a2509c5) SHA1(d0fd30953cbc36363a6d4941b4a0805f9663aebb), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4vivaes__i,    m4vivaes,   "ep8s.p1",              0x0000, 0x010000, CRC(51537f2d) SHA1(a837a525cd7da724f338c47e716be175c37070b0), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4vivaes__j,    m4vivaes,   "ep8y.p1",              0x0000, 0x010000, CRC(4cc454e4) SHA1(a08ec2a4a17600eba86300dcb6b150b1b5a7fc74), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4vivaes__k,    m4vivaes,   "espc.p1",              0x0000, 0x010000, CRC(9534d0d0) SHA1(8e4a1081821d472eb4d9aa01e38b6956a1388d28), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4vivaes__l,    m4vivaes,   "espd.p1",              0x0000, 0x010000, CRC(012fbc14) SHA1(5e4a1cd7989f804ac52c7cbf46d7f9c1d7200336), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4vivaes__m,    m4vivaes,   "espdy.p1",             0x0000, 0x010000, CRC(90efbb8e) SHA1(a7338c5d71719b86f524f35d7edd176f41383f15), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4vivaes__n,    m4vivaes,   "espk.p1",              0x0000, 0x010000, CRC(775a56d6) SHA1(b0e47b56315948a7162ae00c3f5197fbb7b81ec5), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4vivaes__o,    m4vivaes,   "esps.p1",              0x0000, 0x010000, CRC(0c83b014) SHA1(e7cc513b66534b4fec89170d7b739c99a1ba3831), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4vivaes__p,    m4vivaes,   "espy.p1",              0x0000, 0x010000, CRC(020aa8bb) SHA1(497dae13fe9f9eba624db907e9f4a5bef1584a64), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4vivaes__q,    m4vivaes,   "ve5ad.p1",             0x0000, 0x010000, CRC(c545d5f0) SHA1(6ad168d2c1f2da2fff85fe0e21a3191cba8f5838), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4vivaes__r,    m4vivaes,   "ve5b.p1",              0x0000, 0x010000, CRC(ed02fa94) SHA1(9980b2f78ea8f40715e77fd8fafe883739ac1165), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4vivaes__s,    m4vivaes,   "ve5bd.p1",             0x0000, 0x010000, CRC(fce73b5c) SHA1(35e635ade9b4a7a992c568e317190d12576f78c9), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4vivaes__t,    m4vivaes,   "ve5d.p1",              0x0000, 0x010000, CRC(e739556d) SHA1(0816aa256cf8ac253ff37999595e981e90874d39), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4vivaes__u,    m4vivaes,   "ve5dk.p1",             0x0000, 0x010000, CRC(64f174d0) SHA1(f51b28607715931a9d4c1c14fc71b4f8bb8e56fb), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4vivaes__v,    m4vivaes,   "ve5dy.p1",             0x0000, 0x010000, CRC(fe6339c6) SHA1(82f14d80e96b65eeea08f1029ffaebf2e505091e), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 23)" )
-GAME_CUSTOM( 199?, m4vivaes__w,    m4vivaes,   "ve5k.p1",              0x0000, 0x010000, CRC(05428018) SHA1(b6884a1bfd2cf8268258d3d9a8d2c482ba92e5af), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 24)" )
-GAME_CUSTOM( 199?, m4vivaes__x,    m4vivaes,   "ve5s.p1",              0x0000, 0x010000, CRC(65df6cf1) SHA1(26eadbad30b93df6dfd37f984be2dec77f1d6442), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 25)" )
-GAME_CUSTOM( 199?, m4vivaes__y,    m4vivaes,   "ve5y.p1",              0x0000, 0x010000, CRC(2fe06579) SHA1(9e11b371edd8fab78e9594ed864f8eb487112150), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 26)" )
-GAME_CUSTOM( 199?, m4vivaes__z,    m4vivaes,   "vesp05_11",            0x0000, 0x010000, CRC(32100a2e) SHA1(bb7324267708a0c0850fb77885df9868954d86cd), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 27)" )
-GAME_CUSTOM( 199?, m4vivaes__0,    m4vivaes,   "vesp10_11",            0x0000, 0x010000, CRC(2a1dfcb2) SHA1(7d4ef072c41779554a2b8046688957585821e356), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 28)" )
-GAME_CUSTOM( 199?, m4vivaes__1,    m4vivaes,   "vesp20_11",            0x0000, 0x010000, CRC(06233420) SHA1(06101dbe871617ae6ff098e070316ec98a15b704), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 29)" )
-GAME_CUSTOM( 199?, m4vivaes__2,    m4vivaes,   "vetad.p1",             0x0000, 0x010000, CRC(fb9564dc) SHA1(9782d04eaec7d9c19138abf4f2dd3daa6c745c2a), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 30)" )
-GAME_CUSTOM( 199?, m4vivaes__3,    m4vivaes,   "vetb.p1",              0x0000, 0x010000, CRC(2a8d7beb) SHA1(e503bdc388c2ab7551cc84dd9e45b85bd2420ef8), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 31)" )
-GAME_CUSTOM( 199?, m4vivaes__4,    m4vivaes,   "vetbd.p1",             0x0000, 0x010000, CRC(ebaffb7d) SHA1(b54a581927fc28ce14ab9efe6fe62e074831a42a), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 32)" )
-GAME_CUSTOM( 199?, m4vivaes__5,    m4vivaes,   "vetd.p1",              0x0000, 0x010000, CRC(365dff45) SHA1(6ce756f1d6133e05c46e8e7b7ad554f9f512b722), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 33)" )
-GAME_CUSTOM( 199?, m4vivaes__6,    m4vivaes,   "vetdk.p1",             0x0000, 0x010000, CRC(5fb1ba90) SHA1(57a7f225d7bd8ed78c2ebf5d363e06b7694efc5f), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 34)" )
-GAME_CUSTOM( 199?, m4vivaes__7,    m4vivaes,   "vetdy.p1",             0x0000, 0x010000, CRC(100261cb) SHA1(f834c5b848059673b9e9824854e6600dae6c4499), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 35)" )
-GAME_CUSTOM( 199?, m4vivaes__8,    m4vivaes,   "vetk.p1",              0x0000, 0x010000, CRC(db48f34b) SHA1(013d84b27c4ea6d7b538011c22a3cd573f1d12cc), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 36)" )
-GAME_CUSTOM( 199?, m4vivaes__9,    m4vivaes,   "vets.p1",              0x0000, 0x010000, CRC(d7e00f9d) SHA1(df2d85ff9eae7adf662b7d8a9c6f874ec8c07183), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 37)" )
-GAME_CUSTOM( 199?, m4vivaes__aa,   m4vivaes,   "vety.p1",              0x0000, 0x010000, CRC(ba3b19c7) SHA1(6e9ee238ec6a272ef16ebfba0dc49bc076e741de), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 38)" )
-GAME_CUSTOM( 199?, m4vivaes__ab,   m4vivaes,   "viva206",              0x0000, 0x010000, CRC(76ab9a5d) SHA1(455699cbc05f744eafe58881a8fb120b24cfe5c8), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 39)" )
-GAME_CUSTOM( 199?, m4vivaes__ac,   m4vivaes,   "ve_05a__.3_1",         0x0000, 0x010000, CRC(92e0e121) SHA1(f32c8f1c8008794283bd32f9440e0a580f77b5b3), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 40)" )
-GAME_CUSTOM( 199?, m4vivaes__ad,   m4vivaes,   "ve_10a__.5_1",         0x0000, 0x010000, CRC(afdc0a2f) SHA1(ab8fec2c48db07c0aba31930893fe7211b306468), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 41)" )
-GAME_CUSTOM( 199?, m4vivaes__ae,   m4vivaes,   "vei05___.4_1",         0x0000, 0x010000, CRC(687a511b) SHA1(362e1d5557b6b7d551c9b9c5ef70d7944b44a3ce), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 42)" )
-GAME_CUSTOM( 199?, m4vivaes__af,   m4vivaes,   "vei10___.4_1",         0x0000, 0x010000, CRC(b9e2471f) SHA1(3fa561466332ed14e233d97bf9170ec08a019bd0), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 43)" )
-GAME_CUSTOM( 199?, m4vivaes__ag,   m4vivaes,   "vesp5.8c",             0x0000, 0x010000, CRC(266d42cf) SHA1(b1e583652d6184db2a5f03cb7ae3f694627591c8), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 44)" )
-GAME_CUSTOM( 199?, m4vivaes__ah,   m4vivaes,   "vesp5.8t",             0x0000, 0x010000, CRC(bf8c9dfa) SHA1(69f28d3ce04efdb89db688dbc2341d19c27c5ba8), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 45)" )
-GAME_CUSTOM( 199?, m4vivaes__ai,   m4vivaes,   "vesp510l",             0x0000, 0x010000, CRC(15c33530) SHA1(888625c383e52825c06cbf1e7022cd8b02bf549c), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 46)" )
-GAME_CUSTOM( 199?, m4vivaes__aj,   m4vivaes,   "vesp55",               0x0000, 0x010000, CRC(9cc395ef) SHA1(d62cb55664246e3fada3d971ee317eef51739018), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 47)" )
-GAME_CUSTOM( 199?, m4vivaes__ak,   m4vivaes,   "vesp58c",              0x0000, 0x010000, CRC(d8cc868d) SHA1(0b9fa8b61998badbd870827e32af4937548b583e), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 48)" )
-GAME_CUSTOM( 199?, m4vivaes__al,   m4vivaes,   "vesp_10.4",            0x0000, 0x010000, CRC(95e95339) SHA1(59633b7c01da25237342bce7e989259bf723ba6f), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 49)" )
-GAME_CUSTOM( 199?, m4vivaes__am,   m4vivaes,   "vesp_10.8",            0x0000, 0x010000, CRC(8054766d) SHA1(8e7fd6f8cd74d2760e2923af32813ca93fbf98e6), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 50)" )
-GAME_CUSTOM( 199?, m4vivaes__an,   m4vivaes,   "vesp_20_.8",           0x0000, 0x010000, CRC(35f90f05) SHA1(0013ff32c809603efdad782306140bd7086be965), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 51)" )
-GAME_CUSTOM( 199?, m4vivaes__ao,   m4vivaes,   "vesp_5.4",             0x0000, 0x010000, CRC(3b6762ce) SHA1(9dc53dce453a7b124ea2b65a590aff6c7d05831f), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 52)" )
-GAME_CUSTOM( 199?, m4vivaes__ap,   m4vivaes,   "vesp_5.8",             0x0000, 0x010000, CRC(63abf642) SHA1(6b585147a771e4bd445b525aafc25293845f660b), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 53)" )
+// "(C)1993 BARCREST" and "EP8 0.1"
+GAME_CUSTOM( 199?, m4vivaes,       0,          "ep8s.p1",              0x0000, 0x010000, CRC(51537f2d) SHA1(a837a525cd7da724f338c47e716be175c37070b0), "Barcrest","Viva Espana (Barcrest) (MPU4) (EP8 0.1)" )
+GAME_CUSTOM( 199?, m4vivaes__a,    m4vivaes,   "ep8ad.p1",             0x0000, 0x010000, CRC(1591cc9b) SHA1(b7574b71955d7780f3f127670e458befad951383), "Barcrest","Viva Espana (Barcrest) (MPU4) (EP8 0.1AD)" )
+GAME_CUSTOM( 199?, m4vivaes__b,    m4vivaes,   "ep8b.p1",              0x0000, 0x010000, CRC(33b085b3) SHA1(5fc22ee8ae2d597392c82b09a830893bb04e1014), "Barcrest","Viva Espana (Barcrest) (MPU4) (EP8 0.1B)" )
+GAME_CUSTOM( 199?, m4vivaes__c,    m4vivaes,   "ep8bd.p1",             0x0000, 0x010000, CRC(d1eedaac) SHA1(9773fbb9b15dbbe313d76b0746698fbc12e26dd2), "Barcrest","Viva Espana (Barcrest) (MPU4) (EP8 0.1BD)" )
+GAME_CUSTOM( 199?, m4vivaes__d,    m4vivaes,   "ep8c.p1",              0x0000, 0x010000, CRC(d2a8aaf5) SHA1(7aabe3e0522877700453068c30c74cbe2c058e9a), "Barcrest","Viva Espana (Barcrest) (MPU4) (EP8 0.1C)" )
+GAME_CUSTOM( 199?, m4vivaes__e,    m4vivaes,   "ep8d.p1",              0x0000, 0x010000, CRC(06f87010) SHA1(636707d4077bee0ea2f221904fa0e187ea4a1e31), "Barcrest","Viva Espana (Barcrest) (MPU4) (EP8 0.1D)" )
+GAME_CUSTOM( 199?, m4vivaes__f,    m4vivaes,   "ep8dk.p1",             0x0000, 0x010000, CRC(e87b56da) SHA1(f3de0ab0badc9bd14505822c63f110b9b2521d55), "Barcrest","Viva Espana (Barcrest) (MPU4) (EP8 0.1KD)" )
+GAME_CUSTOM( 199?, m4vivaes__g,    m4vivaes,   "ep8dy.p1",             0x0000, 0x010000, CRC(d20ec7ed) SHA1(dffd4fcaf360b2b9f4b7241fe80bb6ee983b6d57), "Barcrest","Viva Espana (Barcrest) (MPU4) (EP8 0.1YD)" )
+GAME_CUSTOM( 199?, m4vivaes__h,    m4vivaes,   "ep8k.p1",              0x0000, 0x010000, CRC(0a2509c5) SHA1(d0fd30953cbc36363a6d4941b4a0805f9663aebb), "Barcrest","Viva Espana (Barcrest) (MPU4) (EP8 0.1K)" )
+GAME_CUSTOM( 199?, m4vivaes__i,    m4vivaes,   "ep8y.p1",              0x0000, 0x010000, CRC(4cc454e4) SHA1(a08ec2a4a17600eba86300dcb6b150b1b5a7fc74), "Barcrest","Viva Espana (Barcrest) (MPU4) (EP8 0.1Y)" )
+// "(C)1993 BARCREST" and "ESP 0.3"
+GAME_CUSTOM( 199?, m4vivaes__k,    m4vivaes,   "espc.p1",              0x0000, 0x010000, CRC(9534d0d0) SHA1(8e4a1081821d472eb4d9aa01e38b6956a1388d28), "Barcrest","Viva Espana (Barcrest) (MPU4) (ESP 0.3C)" )
+GAME_CUSTOM( 199?, m4vivaes__l,    m4vivaes,   "espd.p1",              0x0000, 0x010000, CRC(012fbc14) SHA1(5e4a1cd7989f804ac52c7cbf46d7f9c1d7200336), "Barcrest","Viva Espana (Barcrest) (MPU4) (ESP 0.3D)" )
+GAME_CUSTOM( 199?, m4vivaes__m,    m4vivaes,   "espdy.p1",             0x0000, 0x010000, CRC(90efbb8e) SHA1(a7338c5d71719b86f524f35d7edd176f41383f15), "Barcrest","Viva Espana (Barcrest) (MPU4) (ESP 0.3YD)" )
+GAME_CUSTOM( 199?, m4vivaes__n,    m4vivaes,   "espk.p1",              0x0000, 0x010000, CRC(775a56d6) SHA1(b0e47b56315948a7162ae00c3f5197fbb7b81ec5), "Barcrest","Viva Espana (Barcrest) (MPU4) (ESP 0.3K)" )
+GAME_CUSTOM( 199?, m4vivaes__o,    m4vivaes,   "esps.p1",              0x0000, 0x010000, CRC(0c83b014) SHA1(e7cc513b66534b4fec89170d7b739c99a1ba3831), "Barcrest","Viva Espana (Barcrest) (MPU4) (ESP 0.3)" )
+GAME_CUSTOM( 199?, m4vivaes__p,    m4vivaes,   "espy.p1",              0x0000, 0x010000, CRC(020aa8bb) SHA1(497dae13fe9f9eba624db907e9f4a5bef1584a64), "Barcrest","Viva Espana (Barcrest) (MPU4) (ESP 0.3Y)" )
+// "(C)1993 BARCREST" and "ESP 0.2"
+GAME_CUSTOM( 199?, m4vivaes__aq,   m4vivaes,   "vspa20st",             0x0000, 0x010000, CRC(267388eb) SHA1(2621724ebdd5031fc513692ff90989bf3b6115d1), "Barcrest","Viva Espana (Barcrest) (MPU4) (ESP 0.2)" )
+// "(C)1993 BARCREST" and "VE5 0.2"
+GAME_CUSTOM( 199?, m4vivaes__q,    m4vivaes,   "ve5ad.p1",             0x0000, 0x010000, CRC(c545d5f0) SHA1(6ad168d2c1f2da2fff85fe0e21a3191cba8f5838), "Barcrest","Viva Espana (Barcrest) (MPU4) (VE5 0.2AD)" )
+GAME_CUSTOM( 199?, m4vivaes__r,    m4vivaes,   "ve5b.p1",              0x0000, 0x010000, CRC(ed02fa94) SHA1(9980b2f78ea8f40715e77fd8fafe883739ac1165), "Barcrest","Viva Espana (Barcrest) (MPU4) (VE5 0.2B)" )
+GAME_CUSTOM( 199?, m4vivaes__s,    m4vivaes,   "ve5bd.p1",             0x0000, 0x010000, CRC(fce73b5c) SHA1(35e635ade9b4a7a992c568e317190d12576f78c9), "Barcrest","Viva Espana (Barcrest) (MPU4) (VE5 0.2BD)" )
+GAME_CUSTOM( 199?, m4vivaes__t,    m4vivaes,   "ve5d.p1",              0x0000, 0x010000, CRC(e739556d) SHA1(0816aa256cf8ac253ff37999595e981e90874d39), "Barcrest","Viva Espana (Barcrest) (MPU4) (VE5 0.2D)" )
+GAME_CUSTOM( 199?, m4vivaes__u,    m4vivaes,   "ve5dk.p1",             0x0000, 0x010000, CRC(64f174d0) SHA1(f51b28607715931a9d4c1c14fc71b4f8bb8e56fb), "Barcrest","Viva Espana (Barcrest) (MPU4) (VE5 0.2KD)" )
+GAME_CUSTOM( 199?, m4vivaes__v,    m4vivaes,   "ve5dy.p1",             0x0000, 0x010000, CRC(fe6339c6) SHA1(82f14d80e96b65eeea08f1029ffaebf2e505091e), "Barcrest","Viva Espana (Barcrest) (MPU4) (VE5 0.2YD)" )
+GAME_CUSTOM( 199?, m4vivaes__w,    m4vivaes,   "ve5k.p1",              0x0000, 0x010000, CRC(05428018) SHA1(b6884a1bfd2cf8268258d3d9a8d2c482ba92e5af), "Barcrest","Viva Espana (Barcrest) (MPU4) (VE5 0.2K)" )
+GAME_CUSTOM( 199?, m4vivaes__x,    m4vivaes,   "ve5s.p1",              0x0000, 0x010000, CRC(65df6cf1) SHA1(26eadbad30b93df6dfd37f984be2dec77f1d6442), "Barcrest","Viva Espana (Barcrest) (MPU4) (VE5 0.2)" )
+GAME_CUSTOM( 199?, m4vivaes__y,    m4vivaes,   "ve5y.p1",              0x0000, 0x010000, CRC(2fe06579) SHA1(9e11b371edd8fab78e9594ed864f8eb487112150), "Barcrest","Viva Espana (Barcrest) (MPU4) (VE5 0.2Y)" )
+// "(C)1993 BARCREST" and "VET 0.2"
+GAME_CUSTOM( 199?, m4vivaes__2,    m4vivaes,   "vetad.p1",             0x0000, 0x010000, CRC(fb9564dc) SHA1(9782d04eaec7d9c19138abf4f2dd3daa6c745c2a), "Barcrest","Viva Espana (Barcrest) (MPU4) (VET 0.2AD)" )
+GAME_CUSTOM( 199?, m4vivaes__3,    m4vivaes,   "vetb.p1",              0x0000, 0x010000, CRC(2a8d7beb) SHA1(e503bdc388c2ab7551cc84dd9e45b85bd2420ef8), "Barcrest","Viva Espana (Barcrest) (MPU4) (VET 0.2B)" )
+GAME_CUSTOM( 199?, m4vivaes__4,    m4vivaes,   "vetbd.p1",             0x0000, 0x010000, CRC(ebaffb7d) SHA1(b54a581927fc28ce14ab9efe6fe62e074831a42a), "Barcrest","Viva Espana (Barcrest) (MPU4) (VET 0.2BD)" )
+GAME_CUSTOM( 199?, m4vivaes__5,    m4vivaes,   "vetd.p1",              0x0000, 0x010000, CRC(365dff45) SHA1(6ce756f1d6133e05c46e8e7b7ad554f9f512b722), "Barcrest","Viva Espana (Barcrest) (MPU4) (VET 0.2D)" )
+GAME_CUSTOM( 199?, m4vivaes__6,    m4vivaes,   "vetdk.p1",             0x0000, 0x010000, CRC(5fb1ba90) SHA1(57a7f225d7bd8ed78c2ebf5d363e06b7694efc5f), "Barcrest","Viva Espana (Barcrest) (MPU4) (VET 0.2KD)" )
+GAME_CUSTOM( 199?, m4vivaes__7,    m4vivaes,   "vetdy.p1",             0x0000, 0x010000, CRC(100261cb) SHA1(f834c5b848059673b9e9824854e6600dae6c4499), "Barcrest","Viva Espana (Barcrest) (MPU4) (VET 0.2YD)" )
+GAME_CUSTOM( 199?, m4vivaes__8,    m4vivaes,   "vetk.p1",              0x0000, 0x010000, CRC(db48f34b) SHA1(013d84b27c4ea6d7b538011c22a3cd573f1d12cc), "Barcrest","Viva Espana (Barcrest) (MPU4) (VET 0.2K)" )
+GAME_CUSTOM( 199?, m4vivaes__9,    m4vivaes,   "vets.p1",              0x0000, 0x010000, CRC(d7e00f9d) SHA1(df2d85ff9eae7adf662b7d8a9c6f874ec8c07183), "Barcrest","Viva Espana (Barcrest) (MPU4) (VET 0.2)" )
+GAME_CUSTOM( 199?, m4vivaes__aa,   m4vivaes,   "vety.p1",              0x0000, 0x010000, CRC(ba3b19c7) SHA1(6e9ee238ec6a272ef16ebfba0dc49bc076e741de), "Barcrest","Viva Espana (Barcrest) (MPU4) (VET 0.2Y)" )
+// a lot of the Bwb sets just give characterizer alarm (different protection? hacks?) some boot, 2 boot without scrambled reels, so are probably hacked to not use the characterizer
+// "(C)1995  B.W.B." and "VE5 6.0"
+GAME_CUSTOM( 199?, m4vivaes__ai,   m4vivaes,   "vesp510l",             0x0000, 0x010000, CRC(15c33530) SHA1(888625c383e52825c06cbf1e7022cd8b02bf549c), "Bwb","Viva Espana (Barcrest) (MPU4) (VE5 6.0C, set 1)" )
+GAME_CUSTOM( 199?, m4vivaes__aj,   m4vivaes,   "vesp55",               0x0000, 0x010000, CRC(9cc395ef) SHA1(d62cb55664246e3fada3d971ee317eef51739018), "Bwb","Viva Espana (Barcrest) (MPU4) (VE5 6.0C, set 2)" )
+GAME_CUSTOM( 199?, m4vivaes__ag,   m4vivaes,   "vesp5.8c",             0x0000, 0x010000, CRC(266d42cf) SHA1(b1e583652d6184db2a5f03cb7ae3f694627591c8), "Bwb / hack?","Viva Espana (Barcrest) (MPU4) (VE5 6.0C, set 3)" )  // reels don't seem scrambled on this, hack / bootleg?
+GAME_CUSTOM( 199?, m4vivaes__ah,   m4vivaes,   "vesp5.8t",             0x0000, 0x010000, CRC(bf8c9dfa) SHA1(69f28d3ce04efdb89db688dbc2341d19c27c5ba8), "Bwb / hack?","Viva Espana (Barcrest) (MPU4) (VE5 6.0)" ) // reels don't seem scrambled on this, hack / bootleg?
+// "(C)1995  B.W.B." and "VE5 5.0"
+GAME_CUSTOM( 199?, m4vivaes__z,    m4vivaes,   "vesp05_11",            0x0000, 0x010000, CRC(32100a2e) SHA1(bb7324267708a0c0850fb77885df9868954d86cd), "Bwb","Viva Espana (Barcrest) (MPU4) (VE5 5.0, set 1)" )
+GAME_CUSTOM( 199?, m4vivaes__ao,   m4vivaes,   "vesp_5.4",             0x0000, 0x010000, CRC(3b6762ce) SHA1(9dc53dce453a7b124ea2b65a590aff6c7d05831f), "Bwb","Viva Espana (Barcrest) (MPU4) (VE5 5.0, set 2)" )
+GAME_CUSTOM( 199?, m4vivaes__ap,   m4vivaes,   "vesp_5.8",             0x0000, 0x010000, CRC(63abf642) SHA1(6b585147a771e4bd445b525aafc25293845f660b), "Bwb","Viva Espana (Barcrest) (MPU4) (VE5 5.0, set 3)" )
+// "(C)1995  B.W.B." and "VE105.0"
+GAME_CUSTOM( 199?, m4vivaes__am,   m4vivaes,   "vesp_10.8",            0x0000, 0x010000, CRC(8054766d) SHA1(8e7fd6f8cd74d2760e2923af32813ca93fbf98e6), "Bwb","Viva Espana (Barcrest) (MPU4) (VE105.0, set 1)" )
+GAME_CUSTOM( 199?, m4vivaes__al,   m4vivaes,   "vesp_10.4",            0x0000, 0x010000, CRC(95e95339) SHA1(59633b7c01da25237342bce7e989259bf723ba6f), "Bwb","Viva Espana (Barcrest) (MPU4) (VE105.0, set 2)" )
+GAME_CUSTOM( 199?, m4vivaes__0,    m4vivaes,   "vesp10_11",            0x0000, 0x010000, CRC(2a1dfcb2) SHA1(7d4ef072c41779554a2b8046688957585821e356), "Bwb","Viva Espana (Barcrest) (MPU4) (VE105.0, set 3)" )
+GAME_CUSTOM( 199?, m4vivaes__ad,   m4vivaes,   "ve_10a__.5_1",         0x0000, 0x010000, CRC(afdc0a2f) SHA1(ab8fec2c48db07c0aba31930893fe7211b306468), "Bwb","Viva Espana (Barcrest) (MPU4) (VE105.0, set 4)" ) // boots
+// "(C)1995  B.W.B." and "VE5 3.0"
+GAME_CUSTOM( 199?, m4vivaes__ac,   m4vivaes,   "ve_05a__.3_1",         0x0000, 0x010000, CRC(92e0e121) SHA1(f32c8f1c8008794283bd32f9440e0a580f77b5b3), "Bwb","Viva Espana (Barcrest) (MPU4) (VE5 3.0)" ) // boots
+// "(C)1995  B.W.B." and "VE5 4.0"
+GAME_CUSTOM( 199?, m4vivaes__ae,   m4vivaes,   "vei05___.4_1",         0x0000, 0x010000, CRC(687a511b) SHA1(362e1d5557b6b7d551c9b9c5ef70d7944b44a3ce), "Bwb","Viva Espana (Barcrest) (MPU4) (VE5 4.0C, set 1)" ) // boots
+GAME_CUSTOM( 199?, m4vivaes__ak,   m4vivaes,   "vesp58c",              0x0000, 0x010000, CRC(d8cc868d) SHA1(0b9fa8b61998badbd870827e32af4937548b583e), "Bwb","Viva Espana (Barcrest) (MPU4) (VE5 4.0C, set 2)" ) // boots
+// "(C)1995  B.W.B." and "VE104.0"
+GAME_CUSTOM( 199?, m4vivaes__af,   m4vivaes,   "vei10___.4_1",         0x0000, 0x010000, CRC(b9e2471f) SHA1(3fa561466332ed14e233d97bf9170ec08a019bd0), "Bwb","Viva Espana (Barcrest) (MPU4) (VE104.0)" ) // boots
+// no copyright string and "8V1  0.3"
+GAME_CUSTOM( 199?, m4vivaes__1,    m4vivaes,   "vesp20_11",            0x0000, 0x010000, CRC(06233420) SHA1(06101dbe871617ae6ff098e070316ec98a15b704), "hack", "Viva Espana (Barcrest) (MPU4) (8V1  0.3, hack, set 1)" )
+GAME_CUSTOM( 199?, m4vivaes__an,   m4vivaes,   "vesp_20_.8",           0x0000, 0x010000, CRC(35f90f05) SHA1(0013ff32c809603efdad782306140bd7086be965), "hack", "Viva Espana (Barcrest) (MPU4) (8V1  0.3, hack, set 2)" )
+// "(C)1997  CUCKOO" and "VE5 6.0" (hack)
+GAME_CUSTOM( 199?, m4vivaes__j,    m4vivaes,   "5p5vivaespana6-0.bin", 0x0000, 0x010000, CRC(adf02a7b) SHA1(2c61e175b920a67098503eb4d80b07b828c9f91d), "hack", "Viva Espana (Barcrest) (MPU4) (VE5 6.0, hack)" )
 
 
 #define M4POTBLK_EXTRA_ROMS \
@@ -2076,21 +2217,8 @@ GAME_CUSTOM( 199?, m4placbt__ao,   m4placbt,   "pyh06y.p1",    0x0000, 0x020000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4c9,       0,      "c9211.p1",     0x0000, 0x010000, CRC(44e5cc87) SHA1(36fca9493d36ee6988d02da1b4c575278c43748c), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4c9__a,    m4c9,   "c915.hex",     0x0000, 0x010000, CRC(dabfa3f3) SHA1(f507c78e61cba74e9b776bebaf0cc4fa40b6de95), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4c9__b,    m4c9,   "c9210dk.p1",   0x0000, 0x010000, CRC(169a3ce4) SHA1(74d5d533c145908d17bb3e6ac6fea6e3c826ef1e), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4c9__c,    m4c9,   "c9510ad.p1",   0x0000, 0x010000, CRC(e1a6a573) SHA1(d653d8dce8d8df4151e2fcd8b93964e326bfbe7f), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4c9__d,    m4c9,   "c9510b.p1",    0x0000, 0x010000, CRC(80c1d5bb) SHA1(5928f58f7963710e4ec9043aae4f656d98888e5b), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4c9__e,    m4c9,   "c9510bd.p1",   0x0000, 0x010000, CRC(0aadc7d5) SHA1(143d937ef7b17d86d2e41065bb8f851b548ac8a3), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4c9__f,    m4c9,   "c9510d.p1",    0x0000, 0x010000, CRC(e669989f) SHA1(a9ee5e1d309585f21882681a06f064f6ed03951f), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4c9__g,    m4c9,   "c9510dk.p1",   0x0000, 0x010000, CRC(43be243e) SHA1(3974051fe47a192c135eceb2a7966e6a41b01a3d), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4c9__h,    m4c9,   "c9510dr.p1",   0x0000, 0x010000, CRC(8edf7aa6) SHA1(ac15a8c1d0e24cc99452b560b68a664e16e8d82f), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4c9__i,    m4c9,   "c9510dy.p1",   0x0000, 0x010000, CRC(b0ffae04) SHA1(81921a45a06c38a5391ed3edec57da74b220a181), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4c9__j,    m4c9,   "c9510k.p1",    0x0000, 0x010000, CRC(665b330a) SHA1(75fe5fbe6f3b11a21092f6d18f7f50980c92febe), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4c9__k,    m4c9,   "c9510r.p1",    0x0000, 0x010000, CRC(a9f25224) SHA1(3fe4091b27a2d789a8c5d00cb4fc00289639588f), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4c9__l,    m4c9,   "c9510s.p1",    0x0000, 0x010000, CRC(dc70433e) SHA1(86f158909fea49baf4239821ccf092d8ef1027b7), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4c9__m,    m4c9,   "c9510y.p1",    0x0000, 0x010000, CRC(3a93bc6a) SHA1(2832b48b6391746dbcea3484715dd6a169c081af), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4c9__n,    m4c9,   "clnv.p1",      0x0000, 0x010000, CRC(486097d8) SHA1(33e9eab0fb1c750160a8cb2b75eca73145d6956e), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 15)" )
+// "(C)1991 BARCREST" and "C92 1.1"
+GAME_CUSTOM( 199?, m4c9,       0,      "c9211.p1",     0x0000, 0x010000, CRC(44e5cc87) SHA1(36fca9493d36ee6988d02da1b4c575278c43748c), "Barcrest","Cloud Nine (Barcrest) (MPU4) (C92 1.1)" )
 GAME_CUSTOM( 199?, m4c9__o,    m4c9,   "c9211ad.p1",   0x0000, 0x010000, CRC(dcabab11) SHA1(d73f33da37decfc403975a844916b49d527ee8f8), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 16)" )
 GAME_CUSTOM( 199?, m4c9__p,    m4c9,   "c9211b.p1",    0x0000, 0x010000, CRC(2f10f98b) SHA1(4add53d98f31f4a8bedb621906e91e92622d2c95), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 17)" )
 GAME_CUSTOM( 199?, m4c9__q,    m4c9,   "c9211bd.p1",   0x0000, 0x010000, CRC(6dc2add7) SHA1(26a2b9cd629132d7ba48c9ea3476c574006ad4af), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 18)" )
@@ -2102,18 +2230,8 @@ GAME_CUSTOM( 199?, m4c9__v,    m4c9,   "c9211dy.p1",   0x0000, 0x010000, CRC(a8a
 GAME_CUSTOM( 199?, m4c9__w,    m4c9,   "c9211k.p1",    0x0000, 0x010000, CRC(4f9b6b6d) SHA1(5722c0698c3915eb380b24468539dccad6978218), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 24)" )
 GAME_CUSTOM( 199?, m4c9__x,    m4c9,   "c9211r.p1",    0x0000, 0x010000, CRC(43f8b759) SHA1(cb0f731f1584e4d23602d276c085b31be6966bb1), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 25)" )
 GAME_CUSTOM( 199?, m4c9__y,    m4c9,   "c9211y.p1",    0x0000, 0x010000, CRC(de939fb7) SHA1(a305bdf247f498f86cd681fba7d0593a668067c7), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 26)" )
-GAME_CUSTOM( 199?, m4c9__z,    m4c9,   "ct202ad.p1",   0x0000, 0x010000, CRC(c8484dfd) SHA1(778fc30597b942fd75f5230ef3193b9f599abd03), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 27)" )
-GAME_CUSTOM( 199?, m4c9__0,    m4c9,   "ct202b.p1",    0x0000, 0x010000, CRC(b7c611aa) SHA1(d7d4e7d4d06e7198424206b8259ca66cc06062bb), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 28)" )
-GAME_CUSTOM( 199?, m4c9__1,    m4c9,   "ct202bd.p1",   0x0000, 0x010000, CRC(fe5420b7) SHA1(f443f1669b4f263b678526e2890671ad4e5848be), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 29)" )
-GAME_CUSTOM( 199?, m4c9__2,    m4c9,   "ct202c.p1",    0x0000, 0x010000, CRC(a0997fbb) SHA1(52d6172d6b737a65d24d6750847ccf2797eb54d4), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 30)" )
-GAME_CUSTOM( 199?, m4c9__3,    m4c9,   "ct202d.p1",    0x0000, 0x010000, CRC(5811f1a2) SHA1(87614b915aa697869739026bf45f53574123c6f2), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 31)" )
-GAME_CUSTOM( 199?, m4c9__4,    m4c9,   "ct202dk.p1",   0x0000, 0x010000, CRC(58857027) SHA1(bcb37032237c7542bfde915de815eb93b5def43e), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 32)" )
-GAME_CUSTOM( 199?, m4c9__5,    m4c9,   "ct202dr.p1",   0x0000, 0x010000, CRC(b2769912) SHA1(b3030c07a07774462e956201b5843e366df39c47), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 33)" )
-GAME_CUSTOM( 199?, m4c9__6,    m4c9,   "ct202dy.p1",   0x0000, 0x010000, CRC(47aa690b) SHA1(a3fd71dae7a94402641048b5e986f13347bc28ac), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 34)" )
-GAME_CUSTOM( 199?, m4c9__7,    m4c9,   "ct202k.p1",    0x0000, 0x010000, CRC(990cf3cd) SHA1(13d29f3111d193e8cca45d8319f8657066b2ac8a), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 35)" )
-GAME_CUSTOM( 199?, m4c9__8,    m4c9,   "ct202r.p1",    0x0000, 0x010000, CRC(0da3e958) SHA1(37760de8134e9298212ddebaebe79a08016da7e9), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 36)" )
-GAME_CUSTOM( 199?, m4c9__9,    m4c9,   "ct202s.p1",    0x0000, 0x010000, CRC(19214c6e) SHA1(93c8c40fd7b3a8873715e7bee88a09a995b44b28), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 37)" )
-GAME_CUSTOM( 199?, m4c9__aa,   m4c9,   "ct202y.p1",    0x0000, 0x010000, CRC(79362dcc) SHA1(80782ddb98f896101fa89f77ce76aa6f63391645), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 38)" )
+// "(C)1991 BARCREST" and "CT3 0.2"
+GAME_CUSTOM( 199?, m4c9__a,    m4c9,   "c915.hex",     0x0000, 0x010000, CRC(dabfa3f3) SHA1(f507c78e61cba74e9b776bebaf0cc4fa40b6de95), "Barcrest","Cloud Nine (Barcrest) (MPU4) (CT3 0.2)" )
 GAME_CUSTOM( 199?, m4c9__ab,   m4c9,   "ct302ad.p1",   0x0000, 0x010000, CRC(2f29a7e9) SHA1(059f73b6a9c2a1d8f9b8bbef9050c61c2d4f13bb), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 39)" )
 GAME_CUSTOM( 199?, m4c9__ac,   m4c9,   "ct302b.p1",    0x0000, 0x010000, CRC(1e677623) SHA1(c6ee2686f853626e390f28a611e8861cc8f935b0), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 40)" )
 GAME_CUSTOM( 199?, m4c9__ad,   m4c9,   "ct302bd.p1",   0x0000, 0x010000, CRC(70e60d8f) SHA1(139d92aa978df03af7b7913b6d4e56b211e9ddba), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 41)" )
@@ -2125,6 +2243,37 @@ GAME_CUSTOM( 199?, m4c9__ai,   m4c9,   "ct302dy.p1",   0x0000, 0x010000, CRC(8da
 GAME_CUSTOM( 199?, m4c9__aj,   m4c9,   "ct302k.p1",    0x0000, 0x010000, CRC(cfb85369) SHA1(c5726477aeea5a70e8eef74e57732fe85abea737), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 47)" )
 GAME_CUSTOM( 199?, m4c9__ak,   m4c9,   "ct302r.p1",    0x0000, 0x010000, CRC(10c64611) SHA1(d85df4ca0fc13ddab219a5602019e54471b83aaf), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 48)" )
 GAME_CUSTOM( 199?, m4c9__al,   m4c9,   "ct302y.p1",    0x0000, 0x010000, CRC(46514a44) SHA1(71e698c88488a67e94c322cb393f637c7e35d633), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 49)" )
+// "(C)1991 BARCREST" and "C92 1.0"
+GAME_CUSTOM( 199?, m4c9__b,    m4c9,   "c9210dk.p1",   0x0000, 0x010000, CRC(169a3ce4) SHA1(74d5d533c145908d17bb3e6ac6fea6e3c826ef1e), "Barcrest","Cloud Nine (Barcrest) (MPU4) (C92 1.0KD)" )
+// "(C)1991 BARCREST" and "C95 1.0"
+GAME_CUSTOM( 199?, m4c9__l,    m4c9,   "c9510s.p1",    0x0000, 0x010000, CRC(dc70433e) SHA1(86f158909fea49baf4239821ccf092d8ef1027b7), "Barcrest","Cloud Nine (Barcrest) (MPU4) (C95 1.0)" )
+GAME_CUSTOM( 199?, m4c9__c,    m4c9,   "c9510ad.p1",   0x0000, 0x010000, CRC(e1a6a573) SHA1(d653d8dce8d8df4151e2fcd8b93964e326bfbe7f), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4c9__d,    m4c9,   "c9510b.p1",    0x0000, 0x010000, CRC(80c1d5bb) SHA1(5928f58f7963710e4ec9043aae4f656d98888e5b), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4c9__e,    m4c9,   "c9510bd.p1",   0x0000, 0x010000, CRC(0aadc7d5) SHA1(143d937ef7b17d86d2e41065bb8f851b548ac8a3), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4c9__f,    m4c9,   "c9510d.p1",    0x0000, 0x010000, CRC(e669989f) SHA1(a9ee5e1d309585f21882681a06f064f6ed03951f), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4c9__g,    m4c9,   "c9510dk.p1",   0x0000, 0x010000, CRC(43be243e) SHA1(3974051fe47a192c135eceb2a7966e6a41b01a3d), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 8)" )
+GAME_CUSTOM( 199?, m4c9__h,    m4c9,   "c9510dr.p1",   0x0000, 0x010000, CRC(8edf7aa6) SHA1(ac15a8c1d0e24cc99452b560b68a664e16e8d82f), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 9)" )
+GAME_CUSTOM( 199?, m4c9__i,    m4c9,   "c9510dy.p1",   0x0000, 0x010000, CRC(b0ffae04) SHA1(81921a45a06c38a5391ed3edec57da74b220a181), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 10)" )
+GAME_CUSTOM( 199?, m4c9__j,    m4c9,   "c9510k.p1",    0x0000, 0x010000, CRC(665b330a) SHA1(75fe5fbe6f3b11a21092f6d18f7f50980c92febe), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 11)" )
+GAME_CUSTOM( 199?, m4c9__k,    m4c9,   "c9510r.p1",    0x0000, 0x010000, CRC(a9f25224) SHA1(3fe4091b27a2d789a8c5d00cb4fc00289639588f), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 12)" )
+GAME_CUSTOM( 199?, m4c9__m,    m4c9,   "c9510y.p1",    0x0000, 0x010000, CRC(3a93bc6a) SHA1(2832b48b6391746dbcea3484715dd6a169c081af), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 14)" )
+// "(C)1991 BARCREST" and "CLN 4.0"
+GAME_CUSTOM( 199?, m4c9__n,    m4c9,   "clnv.p1",      0x0000, 0x010000, CRC(486097d8) SHA1(33e9eab0fb1c750160a8cb2b75eca73145d6956e), "Barcrest","Cloud Nine (Barcrest) (MPU4) (CLN 4.0V)" )
+// "(C)1991 BARCREST" and "CT2 0.2"
+GAME_CUSTOM( 199?, m4c9__9,    m4c9,   "ct202s.p1",    0x0000, 0x010000, CRC(19214c6e) SHA1(93c8c40fd7b3a8873715e7bee88a09a995b44b28), "Barcrest","Cloud Nine (Barcrest) (MPU4) (CT2 0.2)" )
+GAME_CUSTOM( 199?, m4c9__z,    m4c9,   "ct202ad.p1",   0x0000, 0x010000, CRC(c8484dfd) SHA1(778fc30597b942fd75f5230ef3193b9f599abd03), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 27)" )
+GAME_CUSTOM( 199?, m4c9__0,    m4c9,   "ct202b.p1",    0x0000, 0x010000, CRC(b7c611aa) SHA1(d7d4e7d4d06e7198424206b8259ca66cc06062bb), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 28)" )
+GAME_CUSTOM( 199?, m4c9__1,    m4c9,   "ct202bd.p1",   0x0000, 0x010000, CRC(fe5420b7) SHA1(f443f1669b4f263b678526e2890671ad4e5848be), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 29)" )
+GAME_CUSTOM( 199?, m4c9__2,    m4c9,   "ct202c.p1",    0x0000, 0x010000, CRC(a0997fbb) SHA1(52d6172d6b737a65d24d6750847ccf2797eb54d4), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 30)" )
+GAME_CUSTOM( 199?, m4c9__3,    m4c9,   "ct202d.p1",    0x0000, 0x010000, CRC(5811f1a2) SHA1(87614b915aa697869739026bf45f53574123c6f2), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 31)" )
+GAME_CUSTOM( 199?, m4c9__4,    m4c9,   "ct202dk.p1",   0x0000, 0x010000, CRC(58857027) SHA1(bcb37032237c7542bfde915de815eb93b5def43e), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 32)" )
+GAME_CUSTOM( 199?, m4c9__5,    m4c9,   "ct202dr.p1",   0x0000, 0x010000, CRC(b2769912) SHA1(b3030c07a07774462e956201b5843e366df39c47), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 33)" )
+GAME_CUSTOM( 199?, m4c9__6,    m4c9,   "ct202dy.p1",   0x0000, 0x010000, CRC(47aa690b) SHA1(a3fd71dae7a94402641048b5e986f13347bc28ac), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 34)" )
+GAME_CUSTOM( 199?, m4c9__7,    m4c9,   "ct202k.p1",    0x0000, 0x010000, CRC(990cf3cd) SHA1(13d29f3111d193e8cca45d8319f8657066b2ac8a), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 35)" )
+GAME_CUSTOM( 199?, m4c9__8,    m4c9,   "ct202r.p1",    0x0000, 0x010000, CRC(0da3e958) SHA1(37760de8134e9298212ddebaebe79a08016da7e9), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 36)" )
+GAME_CUSTOM( 199?, m4c9__aa,   m4c9,   "ct202y.p1",    0x0000, 0x010000, CRC(79362dcc) SHA1(80782ddb98f896101fa89f77ce76aa6f63391645), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 38)" )
+// "(C)1991 BARCREST" and "CT5 0.2"
+GAME_CUSTOM( 199?, m4c9__aw,   m4c9,   "ct502s.p1",    0x0000, 0x010000, CRC(cb02b9e7) SHA1(786c64abd0b9c5dc23b1508a2527e87e385acfa9), "Barcrest","Cloud Nine (Barcrest) (MPU4) (CT5 0.2)" )
 GAME_CUSTOM( 199?, m4c9__am,   m4c9,   "ct502ad.p1",   0x0000, 0x010000, CRC(ff0ec7a7) SHA1(80ddc21a0df33aaa1c76ed5f57598494a1c36c5a), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 50)" )
 GAME_CUSTOM( 199?, m4c9__an,   m4c9,   "ct502b.p1",    0x0000, 0x010000, CRC(2585dc82) SHA1(10ee12ecc6dfc09f9f9993b2fce837b0989c19ee), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 51)" )
 GAME_CUSTOM( 199?, m4c9__ao,   m4c9,   "ct502bd.p1",   0x0000, 0x010000, CRC(0d80572d) SHA1(6dfb48438accef039e2de12962ad826eaa3caee4), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 52)" )
@@ -2135,14 +2284,15 @@ GAME_CUSTOM( 199?, m4c9__as,   m4c9,   "ct502dr.p1",   0x0000, 0x010000, CRC(0e8
 GAME_CUSTOM( 199?, m4c9__at,   m4c9,   "ct502dy.p1",   0x0000, 0x010000, CRC(54d27491) SHA1(ba4474f98474da828ebc7bf9db52ead05df0cdfc), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 57)" )
 GAME_CUSTOM( 199?, m4c9__au,   m4c9,   "ct502k.p1",    0x0000, 0x010000, CRC(f53ee613) SHA1(678f59b923054e6d91ea1bd91515b6522f192a8c), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 58)" )
 GAME_CUSTOM( 199?, m4c9__av,   m4c9,   "ct502r.p1",    0x0000, 0x010000, CRC(b678557d) SHA1(fbf3c367d40d2f914906eb7cd7e95713bfe7fc30), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 59)" )
-GAME_CUSTOM( 199?, m4c9__aw,   m4c9,   "ct502s.p1",    0x0000, 0x010000, CRC(cb02b9e7) SHA1(786c64abd0b9c5dc23b1508a2527e87e385acfa9), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 60)" )
 GAME_CUSTOM( 199?, m4c9__ax,   m4c9,   "ct502y.p1",    0x0000, 0x010000, CRC(f4cc4dc9) SHA1(d23757467830dfbdeed2a52a0c7e31276124d24d), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 61)" )
-GAME_CUSTOM( 199?, m4c9__ay,   m4c9,   "c9o02__1.1",   0x0000, 0x010000, CRC(109f7040) SHA1(3fe9da13d9746e1cdaf6dcd539e4af624d2cec71), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 62)" )
-GAME_CUSTOM( 199?, m4c9__az,   m4c9,   "c9o05__1.1",   0x0000, 0x010000, CRC(2c821aa8) SHA1(33fba7dea0f66e7b0251971864d5a2923f96f8cd), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 63)" )
-GAME_CUSTOM( 199?, m4c9__a0,   m4c9,   "c9o10__1.1",   0x0000, 0x010000, CRC(c5063185) SHA1(ca98038ccd85ebc370cacce8583ddbc1f759558d), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 64)" )
-GAME_CUSTOM( 199?, m4c9__a1,   m4c9,   "c9o10d_1.1",   0x0000, 0x010000, CRC(6b20b16d) SHA1(15079fc5f14f545c291d357a795e6b41ca1d5a47), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 65)" )
-GAME_CUSTOM( 199?, m4c9__a2,   m4c9,   "c9o20__1.1",   0x0000, 0x010000, CRC(e05fa532) SHA1(63d070416a4e6979302901bb33e20c994cb3723e), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 66)" )
-GAME_CUSTOM( 199?, m4c9__a3,   m4c9,   "c9o20d_1.1",   0x0000, 0x010000, CRC(047b2d83) SHA1(b83f8fe6477226ef3e75f406020ea4f8b3d55c32), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 67)" )
+// "(C)1993  B.W.B." and "SC9 5.0"
+GAME_CUSTOM( 199?, m4c9__a2,   m4c9,   "c9o20__1.1",   0x0000, 0x010000, CRC(e05fa532) SHA1(63d070416a4e6979302901bb33e20c994cb3723e), "Bwb","Cloud Nine (Barcrest) (MPU4) (SC9 5.0)" )
+GAME_CUSTOM( 199?, m4c9__a3,   m4c9,   "c9o20d_1.1",   0x0000, 0x010000, CRC(047b2d83) SHA1(b83f8fe6477226ef3e75f406020ea4f8b3d55c32), "Bwb","Cloud Nine (Barcrest) (MPU4) (SC9 5.0D)" )
+// no copyright string and "SC9 1.0" (hack or early Bwb set?)
+GAME_CUSTOM( 199?, m4c9__ay,   m4c9,   "c9o02__1.1",   0x0000, 0x010000, CRC(109f7040) SHA1(3fe9da13d9746e1cdaf6dcd539e4af624d2cec71), "hack?","Cloud Nine (Barcrest) (MPU4) (SC9 1.0, hack?, set 1)" )
+GAME_CUSTOM( 199?, m4c9__az,   m4c9,   "c9o05__1.1",   0x0000, 0x010000, CRC(2c821aa8) SHA1(33fba7dea0f66e7b0251971864d5a2923f96f8cd), "hack?","Cloud Nine (Barcrest) (MPU4) (SC9 1.0, hack?, set 2)" )
+GAME_CUSTOM( 199?, m4c9__a0,   m4c9,   "c9o10__1.1",   0x0000, 0x010000, CRC(c5063185) SHA1(ca98038ccd85ebc370cacce8583ddbc1f759558d), "hack?","Cloud Nine (Barcrest) (MPU4) (SC9 1.0, hack?, set 3)" )
+GAME_CUSTOM( 199?, m4c9__a1,   m4c9,   "c9o10d_1.1",   0x0000, 0x010000, CRC(6b20b16d) SHA1(15079fc5f14f545c291d357a795e6b41ca1d5a47), "hack?","Cloud Nine (Barcrest) (MPU4) (SC9 1.0, hack?, set 4)" )
 
 
 #define M4TUTFRT_EXTRA_ROMS \
@@ -2163,50 +2313,8 @@ GAME_CUSTOM( 199?, m4c9__a3,   m4c9,   "c9o20d_1.1",   0x0000, 0x010000, CRC(047
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4tutfrt,       0,          "tft04s.p1",            0x0000, 0x010000, CRC(c20c3589) SHA1(55d1bc5d5f4ae14acafb36bd640faaf4ffccc6eb), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4tutfrt__a,    m4tutfrt,   "ctuad.p1",             0x0000, 0x010000, CRC(0ec1661b) SHA1(162ddc30c341fd8eda8ce57a60edf06b4e39a24f), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4tutfrt__b,    m4tutfrt,   "ctub.p1",              0x0000, 0x010000, CRC(f4289621) SHA1(a4078552146c88c05845cbdcd551e4564840fea4), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4tutfrt__c,    m4tutfrt,   "ctubd.p1",             0x0000, 0x010000, CRC(38dd0b51) SHA1(04df9511f366cc575a1a06d3a5d60ec0245f64a7), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4tutfrt__d,    m4tutfrt,   "ctud.p1",              0x0000, 0x010000, CRC(6033fae5) SHA1(f5bdd1821344d4546eea8caa52d76e3bd509810e), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4tutfrt__e,    m4tutfrt,   "ctudk.p1",             0x0000, 0x010000, CRC(36dd1e41) SHA1(ad5ad7cae12634149d38e286e6873b81bda52871), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4tutfrt__f,    m4tutfrt,   "ctudy.p1",             0x0000, 0x010000, CRC(58c02db6) SHA1(faf85caeaa0678b5771d801cf3d9645d7767767c), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4tutfrt__g,    m4tutfrt,   "ctuk.p1",              0x0000, 0x010000, CRC(4c247447) SHA1(f5aebb4a75632c9a74dca1f3e9559399c89ac679), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4tutfrt__h,    m4tutfrt,   "ctur.p1",              0x0000, 0x010000, CRC(705a2b52) SHA1(40b0738146d073f93877a15f63830ff3e07814c1), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4tutfrt__i,    m4tutfrt,   "ctus.p1",              0x0000, 0x010000, CRC(1b282170) SHA1(e3082aed6e96587de56c5593d32d0129c47fe667), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4tutfrt__j,    m4tutfrt,   "ctuy.p1",              0x0000, 0x010000, CRC(ed3103bc) SHA1(eefb72728e026fad3dd031665510ee0aba23e14b), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4tutfrt__k,    m4tutfrt,   "f1u01ad.p1",           0x0000, 0x010000, CRC(7573d8cf) SHA1(fe1553ca8f588554fdd495dc2f048e50e00590bb), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4tutfrt__l,    m4tutfrt,   "f1u01b.p1",            0x0000, 0x010000, CRC(158d1a3a) SHA1(da80334e9982f778a908a6fe89a593863e7c763e), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4tutfrt__m,    m4tutfrt,   "f1u01bd.p1",           0x0000, 0x010000, CRC(9844e568) SHA1(a580176338cdeed5fb4d1744b537bde1f499293e), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4tutfrt__n,    m4tutfrt,   "f1u01c.p1",            0x0000, 0x010000, CRC(4709bd66) SHA1(c15f64767315ea0434a57b9e494a9e8090f1e05a), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4tutfrt__o,    m4tutfrt,   "f1u01d.p1",            0x0000, 0x010000, CRC(3a3c6745) SHA1(f270bccb4bdedb5cfaf0130da6e480dc31889682), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4tutfrt__p,    m4tutfrt,   "f1u01dk.p1",           0x0000, 0x010000, CRC(4fa79f23) SHA1(ce9a0815d96a94d564edf5a775af94ea10070ff5), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4tutfrt__q,    m4tutfrt,   "f1u01dr.p1",           0x0000, 0x010000, CRC(6fcc4d76) SHA1(27d8fdd5965ba565cb5b6113b7cba5e820650419), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4tutfrt__r,    m4tutfrt,   "f1u01dy.p1",           0x0000, 0x010000, CRC(cdd43fc2) SHA1(6f4da20de3040675592b4338a1d72654800c20eb), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4tutfrt__s,    m4tutfrt,   "f1u01k.p1",            0x0000, 0x010000, CRC(7e9c3110) SHA1(56ab6e5362ce8795c65d0cf11742e3ddb6d8b8a3), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4tutfrt__t,    m4tutfrt,   "f1u01r.p1",            0x0000, 0x010000, CRC(0e6b2132) SHA1(8757713677e2eb0400c69d3cdde6506662e0ef0b), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4tutfrt__u,    m4tutfrt,   "f1u01s.p1",            0x0000, 0x010000, CRC(d69668d2) SHA1(86ea656a3a4d4e6701c70b5e730ae8402cd70342), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4tutfrt__v,    m4tutfrt,   "f1u01y.p1",            0x0000, 0x010000, CRC(33e7d5fd) SHA1(96f53fbb228e98ce3a848b2c72bdb8876c9de160), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 23)" )
-GAME_CUSTOM( 199?, m4tutfrt__w,    m4tutfrt,   "f3u01ad.p1",           0x0000, 0x010000, CRC(acb1bfb3) SHA1(8aa22c45d98ecec324fa031b46689496f9a2842c), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 24)" )
-GAME_CUSTOM( 199?, m4tutfrt__x,    m4tutfrt,   "f3u01b.p1",            0x0000, 0x010000, CRC(a0d14e25) SHA1(16f2444334608702748a3b0b2556ac1a7760615a), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 25)" )
-GAME_CUSTOM( 199?, m4tutfrt__y,    m4tutfrt,   "f3u01bd.p1",           0x0000, 0x010000, CRC(9aadd2f9) SHA1(4dbff4f6fd4d02778733eb846a354177f0e204a5), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 26)" )
-GAME_CUSTOM( 199?, m4tutfrt__z,    m4tutfrt,   "f3u01c.p1",            0x0000, 0x010000, CRC(a3ad34d5) SHA1(e8c435f80b4fd3f7af16f341e107a85a33f1fe1c), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 27)" )
-GAME_CUSTOM( 199?, m4tutfrt__0,    m4tutfrt,   "f3u01d.p1",            0x0000, 0x010000, CRC(c6790301) SHA1(fb0b619e75e1227f4d293b613e80d8d653517eec), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 28)" )
-GAME_CUSTOM( 199?, m4tutfrt__1,    m4tutfrt,   "f3u01dk.p1",           0x0000, 0x010000, CRC(ee0554fe) SHA1(12cd26d6205fec35590fd23682c578f06466eb01), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 29)" )
-GAME_CUSTOM( 199?, m4tutfrt__2,    m4tutfrt,   "f3u01dr.p1",           0x0000, 0x010000, CRC(32d761eb) SHA1(aa1098629d2a1c98c606a71a7cf0ae97f381aebe), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 30)" )
-GAME_CUSTOM( 199?, m4tutfrt__3,    m4tutfrt,   "f3u01dy.p1",           0x0000, 0x010000, CRC(3ad66969) SHA1(4c79edc52095cfa1fae8215caaaaf434cd38199d), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 31)" )
-GAME_CUSTOM( 199?, m4tutfrt__4,    m4tutfrt,   "f3u01k.p1",            0x0000, 0x010000, CRC(2b6c0f0f) SHA1(64e50adc6656225c9cdaaee64ae59cafcd1623ee), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 32)" )
-GAME_CUSTOM( 199?, m4tutfrt__5,    m4tutfrt,   "f3u01r.p1",            0x0000, 0x010000, CRC(93cb1bfb) SHA1(e29439caed4a2f4512e50ff158427b61b5a9c4a9), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 33)" )
-GAME_CUSTOM( 199?, m4tutfrt__6,    m4tutfrt,   "f3u01s.p1",            0x0000, 0x010000, CRC(dce2e5be) SHA1(3c218cdb939d5b7cc650c820737ae3ac653435ce), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 34)" )
-GAME_CUSTOM( 199?, m4tutfrt__7,    m4tutfrt,   "f3u01y.p1",            0x0000, 0x010000, CRC(9aae0ca2) SHA1(83192225d886848ee0320973fb9dbd85cf9045b8), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 35)" )
-GAME_CUSTOM( 199?, m4tutfrt__8,    m4tutfrt,   "tf4ad.p1",             0x0000, 0x010000, CRC(6ddc90a9) SHA1(76dd22c5e65fc46360123e200016d11a8946d2f3), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 36)" )
-GAME_CUSTOM( 199?, m4tutfrt__9,    m4tutfrt,   "tf4b.p1",              0x0000, 0x010000, CRC(c3a70eac) SHA1(ea5a39e33af96e84ce0ea184850d5f580dbf19ce), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 37)" )
-GAME_CUSTOM( 199?, m4tutfrt__aa,   m4tutfrt,   "tf4bd.p1",             0x0000, 0x010000, CRC(54ae2498) SHA1(54a63a0de794eb2ce321f79b09a56485d9e77715), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 38)" )
-GAME_CUSTOM( 199?, m4tutfrt__ab,   m4tutfrt,   "tf4d.p1",              0x0000, 0x010000, CRC(d8ff9045) SHA1(ae7307212614c6f1b4e3d72d3a1ae68ca1d0b470), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 39)" )
-GAME_CUSTOM( 199?, m4tutfrt__ac,   m4tutfrt,   "tf4dk.p1",             0x0000, 0x010000, CRC(a2e3b67f) SHA1(dea9958caba08b5cdec6eec9e4c17038ecb0ca55), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 40)" )
-GAME_CUSTOM( 199?, m4tutfrt__ad,   m4tutfrt,   "tf4dy.p1",             0x0000, 0x010000, CRC(ff4f26c4) SHA1(21ef226bf92deeab15c9368d707bf75b7104e7c3), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 41)" )
-GAME_CUSTOM( 199?, m4tutfrt__ae,   m4tutfrt,   "tf4k.p1",              0x0000, 0x010000, CRC(1a4eb247) SHA1(f6b4c85dd8b155b672bd96ea7ee6630df773c6ca), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 42)" )
-GAME_CUSTOM( 199?, m4tutfrt__af,   m4tutfrt,   "tf4s.p1",              0x0000, 0x010000, CRC(2d298c58) SHA1(568c2babdb002da871df7a36d16e4f7810cac265), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 43)" )
-GAME_CUSTOM( 199?, m4tutfrt__ag,   m4tutfrt,   "tf4y.p1",              0x0000, 0x010000, CRC(06cd8b06) SHA1(92205e9edd42f80de67d5d6652de8ea80bc60af7), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 44)" )
+// "(C)1991 BARCREST" and "TF4 0.4" (TFT 0.4 on startup)
+GAME_CUSTOM( 199?, m4tutfrt,       0,          "tft04s.p1",            0x0000, 0x010000, CRC(c20c3589) SHA1(55d1bc5d5f4ae14acafb36bd640faaf4ffccc6eb), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 / TF4 0.4)" )
 GAME_CUSTOM( 199?, m4tutfrt__ai,   m4tutfrt,   "tft04ad.p1",           0x0000, 0x010000, CRC(2994aa14) SHA1(af0e618f24cdedd14e3a347701313360d9fc73d1), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 46)" )
 GAME_CUSTOM( 199?, m4tutfrt__aj,   m4tutfrt,   "tft04b.p1",            0x0000, 0x010000, CRC(e95eab06) SHA1(70e85e38493ac1fd30a79582bab45af5227d835a), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 47)" )
 GAME_CUSTOM( 199?, m4tutfrt__ak,   m4tutfrt,   "tft04bd.p1",           0x0000, 0x010000, CRC(060d3572) SHA1(e78b6248d3aef6cd08f4b30e0b00bd4cf254e630), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 48)" )
@@ -2218,19 +2326,70 @@ GAME_CUSTOM( 199?, m4tutfrt__ap,   m4tutfrt,   "tft04dy.p1",           0x0000, 0
 GAME_CUSTOM( 199?, m4tutfrt__aq,   m4tutfrt,   "tft04k.p1",            0x0000, 0x010000, CRC(ffbf53e1) SHA1(a003bb5d94b43d6ae9b45c599cccb0006bd8a89a), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 54)" )
 GAME_CUSTOM( 199?, m4tutfrt__ar,   m4tutfrt,   "tft04r.p1",            0x0000, 0x010000, CRC(cbf79555) SHA1(0aacb3f28984637919294a18f40858e8f46a18b3), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 55)" )
 GAME_CUSTOM( 199?, m4tutfrt__as,   m4tutfrt,   "tft04y.p1",            0x0000, 0x010000, CRC(569cbdbb) SHA1(8a978dfba876e5a2e12226f5fe55c29b5f079fad), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 56)" )
-GAME_CUSTOM( 199?, m4tutfrt__at,   m4tutfrt,   "tut25.bin",            0x0000, 0x010000, CRC(c98fb5bb) SHA1(1a3bc343a38b5978a919b454e9a2e806dce7a78a), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 57)" )
-GAME_CUSTOM( 199?, m4tutfrt__au,   m4tutfrt,   "tut25patched.bin",     0x0000, 0x010000, CRC(b4443cf5) SHA1(e79ec52730146f1591140555b814cbd20b5dfe78), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 58)" )
-GAME_CUSTOM( 199?, m4tutfrt__av,   m4tutfrt,   "tu_05___.1a3",         0x0000, 0x010000, CRC(97acc82d) SHA1(be53e60cb8a33b91a7f5556715ab4befe7170dd2), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 59)" )
-GAME_CUSTOM( 199?, m4tutfrt__aw,   m4tutfrt,   "tu_05_d_.1a3",         0x0000, 0x010000, CRC(33bb3018) SHA1(2c2f49c31919682ac03e61a665ce15d835e22467), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 60)" )
-GAME_CUSTOM( 199?, m4tutfrt__ax,   m4tutfrt,   "tu_10___.1a3",         0x0000, 0x010000, CRC(7878827f) SHA1(ac692ae50e63e632d45e7240c2520df83d2baaf5), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 61)" )
-GAME_CUSTOM( 199?, m4tutfrt__ay,   m4tutfrt,   "tu_20___.1a3",         0x0000, 0x010000, CRC(cada1c42) SHA1(6a4048da89a0bffeebfd21549c2d9812cc275bd5), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 62)" )
-GAME_CUSTOM( 199?, m4tutfrt__az,   m4tutfrt,   "tu_20_b_.1a3",         0x0000, 0x010000, CRC(a8f1bc11) SHA1(03596171540e6490133f374cca69f4fd0359952e), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 63)" )
-GAME_CUSTOM( 199?, m4tutfrt__a0,   m4tutfrt,   "tu_20_d_.1a3",         0x0000, 0x010000, CRC(6ecde477) SHA1(694296eb226c59069800d6936c9dee2623105db0), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 64)" )
-GAME_CUSTOM( 199?, m4tutfrt__a1,   m4tutfrt,   "tu_20_k_.1a3",         0x0000, 0x010000, CRC(0ce64424) SHA1(7415c9de9982aa7f15f71ef791cbd8ad5a9331d3), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 65)" )
-GAME_CUSTOM( 199?, m4tutfrt__a2,   m4tutfrt,   "tu_20bg_.1a3",         0x0000, 0x010000, CRC(31a6196d) SHA1(1113737dd3b209afda14ec273d923e2057ea7d99), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 66)" )
-GAME_CUSTOM( 199?, m4tutfrt__a3,   m4tutfrt,   "tuf20__1.0",           0x0000, 0x010000, CRC(ddadbcb6) SHA1(2d2934ec73d979de45d0998f8975361d33358dd3), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 67)" )
-GAME_CUSTOM( 199?, m4tutfrt__a4,   m4tutfrt,   "tuf20ad1.0",           0x0000, 0x010000, CRC(5a74ead3) SHA1(3216c8d0c67aaeb18f791a6e1f3f6e30145d6beb), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 68)" )
-GAME_CUSTOM( 199?, m4tutfrt__a5,   m4tutfrt,   "tui05___.1a3",         0x0000, 0x010000, CRC(42e3d400) SHA1(4cf914141dfc1f88704403b467176da77369da06), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 69)" )
+// "(C)1991 BARCREST" and "CTU 0.1"
+GAME_CUSTOM( 199?, m4tutfrt__i,    m4tutfrt,   "ctus.p1",              0x0000, 0x010000, CRC(1b282170) SHA1(e3082aed6e96587de56c5593d32d0129c47fe667), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (CTU 0.1)" )
+GAME_CUSTOM( 199?, m4tutfrt__a,    m4tutfrt,   "ctuad.p1",             0x0000, 0x010000, CRC(0ec1661b) SHA1(162ddc30c341fd8eda8ce57a60edf06b4e39a24f), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4tutfrt__b,    m4tutfrt,   "ctub.p1",              0x0000, 0x010000, CRC(f4289621) SHA1(a4078552146c88c05845cbdcd551e4564840fea4), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4tutfrt__c,    m4tutfrt,   "ctubd.p1",             0x0000, 0x010000, CRC(38dd0b51) SHA1(04df9511f366cc575a1a06d3a5d60ec0245f64a7), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4tutfrt__d,    m4tutfrt,   "ctud.p1",              0x0000, 0x010000, CRC(6033fae5) SHA1(f5bdd1821344d4546eea8caa52d76e3bd509810e), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4tutfrt__e,    m4tutfrt,   "ctudk.p1",             0x0000, 0x010000, CRC(36dd1e41) SHA1(ad5ad7cae12634149d38e286e6873b81bda52871), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4tutfrt__f,    m4tutfrt,   "ctudy.p1",             0x0000, 0x010000, CRC(58c02db6) SHA1(faf85caeaa0678b5771d801cf3d9645d7767767c), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4tutfrt__g,    m4tutfrt,   "ctuk.p1",              0x0000, 0x010000, CRC(4c247447) SHA1(f5aebb4a75632c9a74dca1f3e9559399c89ac679), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 8)" )
+GAME_CUSTOM( 199?, m4tutfrt__h,    m4tutfrt,   "ctur.p1",              0x0000, 0x010000, CRC(705a2b52) SHA1(40b0738146d073f93877a15f63830ff3e07814c1), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 9)" )
+GAME_CUSTOM( 199?, m4tutfrt__j,    m4tutfrt,   "ctuy.p1",              0x0000, 0x010000, CRC(ed3103bc) SHA1(eefb72728e026fad3dd031665510ee0aba23e14b), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 11)" )
+// "(C)1991 BARCREST" and "F1U 0.1"
+GAME_CUSTOM( 199?, m4tutfrt__u,    m4tutfrt,   "f1u01s.p1",            0x0000, 0x010000, CRC(d69668d2) SHA1(86ea656a3a4d4e6701c70b5e730ae8402cd70342), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F1U 0.1)" )
+GAME_CUSTOM( 199?, m4tutfrt__k,    m4tutfrt,   "f1u01ad.p1",           0x0000, 0x010000, CRC(7573d8cf) SHA1(fe1553ca8f588554fdd495dc2f048e50e00590bb), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 12)" )
+GAME_CUSTOM( 199?, m4tutfrt__l,    m4tutfrt,   "f1u01b.p1",            0x0000, 0x010000, CRC(158d1a3a) SHA1(da80334e9982f778a908a6fe89a593863e7c763e), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 13)" )
+GAME_CUSTOM( 199?, m4tutfrt__m,    m4tutfrt,   "f1u01bd.p1",           0x0000, 0x010000, CRC(9844e568) SHA1(a580176338cdeed5fb4d1744b537bde1f499293e), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 14)" )
+GAME_CUSTOM( 199?, m4tutfrt__n,    m4tutfrt,   "f1u01c.p1",            0x0000, 0x010000, CRC(4709bd66) SHA1(c15f64767315ea0434a57b9e494a9e8090f1e05a), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 15)" )
+GAME_CUSTOM( 199?, m4tutfrt__o,    m4tutfrt,   "f1u01d.p1",            0x0000, 0x010000, CRC(3a3c6745) SHA1(f270bccb4bdedb5cfaf0130da6e480dc31889682), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 16)" )
+GAME_CUSTOM( 199?, m4tutfrt__p,    m4tutfrt,   "f1u01dk.p1",           0x0000, 0x010000, CRC(4fa79f23) SHA1(ce9a0815d96a94d564edf5a775af94ea10070ff5), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 17)" )
+GAME_CUSTOM( 199?, m4tutfrt__q,    m4tutfrt,   "f1u01dr.p1",           0x0000, 0x010000, CRC(6fcc4d76) SHA1(27d8fdd5965ba565cb5b6113b7cba5e820650419), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 18)" )
+GAME_CUSTOM( 199?, m4tutfrt__r,    m4tutfrt,   "f1u01dy.p1",           0x0000, 0x010000, CRC(cdd43fc2) SHA1(6f4da20de3040675592b4338a1d72654800c20eb), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 19)" )
+GAME_CUSTOM( 199?, m4tutfrt__s,    m4tutfrt,   "f1u01k.p1",            0x0000, 0x010000, CRC(7e9c3110) SHA1(56ab6e5362ce8795c65d0cf11742e3ddb6d8b8a3), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 20)" )
+GAME_CUSTOM( 199?, m4tutfrt__t,    m4tutfrt,   "f1u01r.p1",            0x0000, 0x010000, CRC(0e6b2132) SHA1(8757713677e2eb0400c69d3cdde6506662e0ef0b), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 21)" )
+GAME_CUSTOM( 199?, m4tutfrt__v,    m4tutfrt,   "f1u01y.p1",            0x0000, 0x010000, CRC(33e7d5fd) SHA1(96f53fbb228e98ce3a848b2c72bdb8876c9de160), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 23)" )
+// "(C)1991 BARCREST" and "F3U 0.1"
+GAME_CUSTOM( 199?, m4tutfrt__6,    m4tutfrt,   "f3u01s.p1",            0x0000, 0x010000, CRC(dce2e5be) SHA1(3c218cdb939d5b7cc650c820737ae3ac653435ce), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F3U 0.1)" )
+GAME_CUSTOM( 199?, m4tutfrt__w,    m4tutfrt,   "f3u01ad.p1",           0x0000, 0x010000, CRC(acb1bfb3) SHA1(8aa22c45d98ecec324fa031b46689496f9a2842c), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 24)" )
+GAME_CUSTOM( 199?, m4tutfrt__x,    m4tutfrt,   "f3u01b.p1",            0x0000, 0x010000, CRC(a0d14e25) SHA1(16f2444334608702748a3b0b2556ac1a7760615a), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 25)" )
+GAME_CUSTOM( 199?, m4tutfrt__y,    m4tutfrt,   "f3u01bd.p1",           0x0000, 0x010000, CRC(9aadd2f9) SHA1(4dbff4f6fd4d02778733eb846a354177f0e204a5), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 26)" )
+GAME_CUSTOM( 199?, m4tutfrt__z,    m4tutfrt,   "f3u01c.p1",            0x0000, 0x010000, CRC(a3ad34d5) SHA1(e8c435f80b4fd3f7af16f341e107a85a33f1fe1c), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 27)" )
+GAME_CUSTOM( 199?, m4tutfrt__0,    m4tutfrt,   "f3u01d.p1",            0x0000, 0x010000, CRC(c6790301) SHA1(fb0b619e75e1227f4d293b613e80d8d653517eec), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 28)" )
+GAME_CUSTOM( 199?, m4tutfrt__1,    m4tutfrt,   "f3u01dk.p1",           0x0000, 0x010000, CRC(ee0554fe) SHA1(12cd26d6205fec35590fd23682c578f06466eb01), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 29)" )
+GAME_CUSTOM( 199?, m4tutfrt__2,    m4tutfrt,   "f3u01dr.p1",           0x0000, 0x010000, CRC(32d761eb) SHA1(aa1098629d2a1c98c606a71a7cf0ae97f381aebe), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 30)" )
+GAME_CUSTOM( 199?, m4tutfrt__3,    m4tutfrt,   "f3u01dy.p1",           0x0000, 0x010000, CRC(3ad66969) SHA1(4c79edc52095cfa1fae8215caaaaf434cd38199d), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 31)" )
+GAME_CUSTOM( 199?, m4tutfrt__4,    m4tutfrt,   "f3u01k.p1",            0x0000, 0x010000, CRC(2b6c0f0f) SHA1(64e50adc6656225c9cdaaee64ae59cafcd1623ee), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 32)" )
+GAME_CUSTOM( 199?, m4tutfrt__5,    m4tutfrt,   "f3u01r.p1",            0x0000, 0x010000, CRC(93cb1bfb) SHA1(e29439caed4a2f4512e50ff158427b61b5a9c4a9), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 33)" )
+GAME_CUSTOM( 199?, m4tutfrt__7,    m4tutfrt,   "f3u01y.p1",            0x0000, 0x010000, CRC(9aae0ca2) SHA1(83192225d886848ee0320973fb9dbd85cf9045b8), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 35)" )
+// "(C)1991 BARCREST" and "TF4 0.2"
+GAME_CUSTOM( 199?, m4tutfrt__af,   m4tutfrt,   "tf4s.p1",              0x0000, 0x010000, CRC(2d298c58) SHA1(568c2babdb002da871df7a36d16e4f7810cac265), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TF4 0.2)" )
+GAME_CUSTOM( 199?, m4tutfrt__8,    m4tutfrt,   "tf4ad.p1",             0x0000, 0x010000, CRC(6ddc90a9) SHA1(76dd22c5e65fc46360123e200016d11a8946d2f3), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 36)" )
+GAME_CUSTOM( 199?, m4tutfrt__9,    m4tutfrt,   "tf4b.p1",              0x0000, 0x010000, CRC(c3a70eac) SHA1(ea5a39e33af96e84ce0ea184850d5f580dbf19ce), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 37)" )
+GAME_CUSTOM( 199?, m4tutfrt__aa,   m4tutfrt,   "tf4bd.p1",             0x0000, 0x010000, CRC(54ae2498) SHA1(54a63a0de794eb2ce321f79b09a56485d9e77715), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 38)" )
+GAME_CUSTOM( 199?, m4tutfrt__ab,   m4tutfrt,   "tf4d.p1",              0x0000, 0x010000, CRC(d8ff9045) SHA1(ae7307212614c6f1b4e3d72d3a1ae68ca1d0b470), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 39)" )
+GAME_CUSTOM( 199?, m4tutfrt__ac,   m4tutfrt,   "tf4dk.p1",             0x0000, 0x010000, CRC(a2e3b67f) SHA1(dea9958caba08b5cdec6eec9e4c17038ecb0ca55), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 40)" )
+GAME_CUSTOM( 199?, m4tutfrt__ad,   m4tutfrt,   "tf4dy.p1",             0x0000, 0x010000, CRC(ff4f26c4) SHA1(21ef226bf92deeab15c9368d707bf75b7104e7c3), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 41)" )
+GAME_CUSTOM( 199?, m4tutfrt__ae,   m4tutfrt,   "tf4k.p1",              0x0000, 0x010000, CRC(1a4eb247) SHA1(f6b4c85dd8b155b672bd96ea7ee6630df773c6ca), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 42)" )
+GAME_CUSTOM( 199?, m4tutfrt__ag,   m4tutfrt,   "tf4y.p1",              0x0000, 0x010000, CRC(06cd8b06) SHA1(92205e9edd42f80de67d5d6652de8ea80bc60af7), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 44)" )
+// "I.G.T SUCKS" and "F2U 0.1"
+GAME_CUSTOM( 199?, m4tutfrt__at,   m4tutfrt,   "tut25.bin",            0x0000, 0x010000, CRC(c98fb5bb) SHA1(1a3bc343a38b5978a919b454e9a2e806dce7a78a), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1, hack, set 1)" )
+GAME_CUSTOM( 199?, m4tutfrt__au,   m4tutfrt,   "tut25patched.bin",     0x0000, 0x010000, CRC(b4443cf5) SHA1(e79ec52730146f1591140555b814cbd20b5dfe78), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1, hack, set 2)" )
+
+
+// I think these might be for a different game with the same name, maybe MPU4 Video.
+GAME_CUSTOM( 199?, m4tutfrt__av,   m4tutfrt,   "tu_05___.1a3",         0x0000, 0x010000, CRC(97acc82d) SHA1(be53e60cb8a33b91a7f5556715ab4befe7170dd2), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 1)" )
+GAME_CUSTOM( 199?, m4tutfrt__aw,   m4tutfrt,   "tu_05_d_.1a3",         0x0000, 0x010000, CRC(33bb3018) SHA1(2c2f49c31919682ac03e61a665ce15d835e22467), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4tutfrt__ax,   m4tutfrt,   "tu_10___.1a3",         0x0000, 0x010000, CRC(7878827f) SHA1(ac692ae50e63e632d45e7240c2520df83d2baaf5), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4tutfrt__ay,   m4tutfrt,   "tu_20___.1a3",         0x0000, 0x010000, CRC(cada1c42) SHA1(6a4048da89a0bffeebfd21549c2d9812cc275bd5), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4tutfrt__az,   m4tutfrt,   "tu_20_b_.1a3",         0x0000, 0x010000, CRC(a8f1bc11) SHA1(03596171540e6490133f374cca69f4fd0359952e), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4tutfrt__a0,   m4tutfrt,   "tu_20_d_.1a3",         0x0000, 0x010000, CRC(6ecde477) SHA1(694296eb226c59069800d6936c9dee2623105db0), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4tutfrt__a1,   m4tutfrt,   "tu_20_k_.1a3",         0x0000, 0x010000, CRC(0ce64424) SHA1(7415c9de9982aa7f15f71ef791cbd8ad5a9331d3), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4tutfrt__a2,   m4tutfrt,   "tu_20bg_.1a3",         0x0000, 0x010000, CRC(31a6196d) SHA1(1113737dd3b209afda14ec273d923e2057ea7d99), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 8)" )
+GAME_CUSTOM( 199?, m4tutfrt__a3,   m4tutfrt,   "tuf20__1.0",           0x0000, 0x010000, CRC(ddadbcb6) SHA1(2d2934ec73d979de45d0998f8975361d33358dd3), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 9)" )
+GAME_CUSTOM( 199?, m4tutfrt__a4,   m4tutfrt,   "tuf20ad1.0",           0x0000, 0x010000, CRC(5a74ead3) SHA1(3216c8d0c67aaeb18f791a6e1f3f6e30145d6beb), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 10)" )
+GAME_CUSTOM( 199?, m4tutfrt__a5,   m4tutfrt,   "tui05___.1a3",         0x0000, 0x010000, CRC(42e3d400) SHA1(4cf914141dfc1f88704403b467176da77369da06), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 11)" )
 
 
 #define M4CASHAT_EXTRA_ROMS \
@@ -2248,49 +2407,9 @@ GAME_CUSTOM( 199?, m4tutfrt__a5,   m4tutfrt,   "tui05___.1a3",         0x0000, 0
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4cashat,       0,          "csa12y.p1",        0x0000, 0x020000, CRC(0374584a) SHA1(446e1d122d5b38e4ee11d98a4235d7198d98b541), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4cashat__a,    m4cashat,   "caa22ad.p1",       0x0000, 0x020000, CRC(b6274874) SHA1(7c2dc0f3e8e7bb76f3b90300141b320fa0ca39ac), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4cashat__b,    m4cashat,   "caa22b.p1",        0x0000, 0x020000, CRC(e7f6f5e5) SHA1(fc16b50ae00525a3c84c0cbf7b418898cc5db1bc), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4cashat__c,    m4cashat,   "caa22bd.p1",       0x0000, 0x020000, CRC(581b2b6f) SHA1(55f910c7646d5e7d3be6ffd5b4ec0f04fb98b82e), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4cashat__d,    m4cashat,   "caa22d.p1",        0x0000, 0x020000, CRC(cc494044) SHA1(13ff215f41833aa133fe9d120792c834d1e0752b), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4cashat__e,    m4cashat,   "caa22dh.p1",       0x0000, 0x020000, CRC(18ae14fa) SHA1(20a8f197075ec153ac116b9a85e3591d9d4d045d), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4cashat__f,    m4cashat,   "caa22dk.p1",       0x0000, 0x020000, CRC(71fa4ee7) SHA1(ddf2cee47f93cc5794d64922658d5892993c8d2f), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4cashat__g,    m4cashat,   "caa22dr.p1",       0x0000, 0x020000, CRC(c2f5f5d6) SHA1(aebedb84ae388a1f0c558d36893d1341c1959594), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4cashat__h,    m4cashat,   "caa22dy.p1",       0x0000, 0x020000, CRC(3b3de6b1) SHA1(d72ce7851969466063c6d7952787691a7c44c9dd), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4cashat__i,    m4cashat,   "caa22h.p1",        0x0000, 0x020000, CRC(a743ca70) SHA1(e4b5ee02524873c2ccb66b4bfca39464c23eb43e), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4cashat__j,    m4cashat,   "caa22k.p1",        0x0000, 0x020000, CRC(ce17906d) SHA1(18a302132e683b00509982c09c6e3b00ae1201a0), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4cashat__k,    m4cashat,   "caa22r.p1",        0x0000, 0x020000, CRC(7d182b5c) SHA1(801d1b032e94cc45302a9f84ba7f9ce2b74f6449), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4cashat__l,    m4cashat,   "caa22s.p1",        0x0000, 0x020000, CRC(e7edf653) SHA1(f2bdf45cc18ad4b45b47d2b2b4641460fcdfa963), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4cashat__m,    m4cashat,   "caa22y.p1",        0x0000, 0x020000, CRC(84d0383b) SHA1(791666ce17fd65067df446a3320efd22bce23925), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4cashat__n,    m4cashat,   "caa23ad.p1",       0x0000, 0x020000, CRC(a8641c35) SHA1(18dad4634e27e4f0b791c331b9efcf5e1d56d3bb), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4cashat__o,    m4cashat,   "caa23b.p1",        0x0000, 0x020000, CRC(a867c129) SHA1(9b0b577938ae0500a8b80211710ed5c0b2a597fa), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4cashat__p,    m4cashat,   "caa23bd.p1",       0x0000, 0x020000, CRC(46587f2e) SHA1(b14ed6b810ba3039824a0d13c5b75fedd40803b3), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4cashat__q,    m4cashat,   "caa23d.p1",        0x0000, 0x020000, CRC(83d87488) SHA1(1e13a47de4837e42650c6a4a13a838eb68d0beae), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4cashat__r,    m4cashat,   "caa23dh.p1",       0x0000, 0x020000, CRC(06ed40bb) SHA1(68f2923c4ecd91231cc66a4be7c797d7b2a46ae0), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4cashat__s,    m4cashat,   "caa23dk.p1",       0x0000, 0x020000, CRC(6fb91aa6) SHA1(5966be8aa9d5348bbdcb85b21acceaabc3c02602), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4cashat__t,    m4cashat,   "caa23dr.p1",       0x0000, 0x020000, CRC(dcb6a197) SHA1(a18af78ba604b53a2af1e9b8dfdc6858964f631d), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4cashat__u,    m4cashat,   "caa23dy.p1",       0x0000, 0x020000, CRC(257eb2f0) SHA1(0a5f9743afb5dd7392425951580532ea5f8f17f1), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4cashat__v,    m4cashat,   "caa23h.p1",        0x0000, 0x020000, CRC(e8d2febc) SHA1(14fe5e1699fef74145f2f6fff61e75fe3e3a0b3b), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 23)" )
-GAME_CUSTOM( 199?, m4cashat__w,    m4cashat,   "caa23k.p1",        0x0000, 0x020000, CRC(8186a4a1) SHA1(0d8f59df0fb5a1044f6fb7d81f50f9c9b94add9b), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 24)" )
-GAME_CUSTOM( 199?, m4cashat__x,    m4cashat,   "caa23r.p1",        0x0000, 0x020000, CRC(32891f90) SHA1(c832c2610606bc5a3beeff8f85c31af496b14427), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 25)" )
-GAME_CUSTOM( 199?, m4cashat__y,    m4cashat,   "caa23s.p1",        0x0000, 0x020000, CRC(26a49cdd) SHA1(ee28a22eeb8c4e8ddf041122505f9846d6b6d7d6), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 26)" )
-GAME_CUSTOM( 199?, m4cashat__z,    m4cashat,   "caa23y.p1",        0x0000, 0x020000, CRC(cb410cf7) SHA1(31d34a766939a9b2a23be00c2ffd658d854b3ab4), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 27)" )
-GAME_CUSTOM( 199?, m4cashat__0,    m4cashat,   "casattack8.bin",   0x0000, 0x020000, CRC(e29ea247) SHA1(ad00ea3bfd2eab51b20fd786cb1ce84de0d98173), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 28)" )
-GAME_CUSTOM( 199?, m4cashat__1,    m4cashat,   "catt15g",          0x0000, 0x020000, CRC(3f7a8863) SHA1(df8ed393aeb3a5ec3fd5bdc01c9dbbb630e6d254), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 29)" )
-GAME_CUSTOM( 199?, m4cashat__2,    m4cashat,   "catt15t",          0x0000, 0x020000, CRC(c6760c3a) SHA1(b7f4a3af52faf7e430e5b4ec75e2dc97e3f07dc0), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 30)" )
-GAME_CUSTOM( 199?, m4cashat__3,    m4cashat,   "csa11ad.p1",       0x0000, 0x020000, CRC(7c1daa59) SHA1(9c0479094ba2f985803e58360b738b0baa2e410a), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 31)" )
-GAME_CUSTOM( 199?, m4cashat__4,    m4cashat,   "csa11b.p1",        0x0000, 0x020000, CRC(c740daba) SHA1(afa5bdf9f6aacb3a5126aa828e4d0d2518efe663), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 32)" )
-GAME_CUSTOM( 199?, m4cashat__5,    m4cashat,   "csa11bd.p1",       0x0000, 0x020000, CRC(55fccfd1) SHA1(b7c748573e5fb32a6be5e069e7f165a11c62b7d5), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 33)" )
-GAME_CUSTOM( 199?, m4cashat__6,    m4cashat,   "csa11d.p1",        0x0000, 0x020000, CRC(ecff6f1b) SHA1(3f37d8e20d5663e376c9dc5876a910a320edcf7d), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 34)" )
-GAME_CUSTOM( 199?, m4cashat__7,    m4cashat,   "csa11dh.p1",       0x0000, 0x020000, CRC(bbc0acca) SHA1(80d95505041fd4c869f9d835d0527070f2f582d9), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 35)" )
-GAME_CUSTOM( 199?, m4cashat__8,    m4cashat,   "csa11dk.p1",       0x0000, 0x020000, CRC(1549f044) SHA1(22bc130106a23d0e9c354b4aa97d7b7fd8776082), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 36)" )
-GAME_CUSTOM( 199?, m4cashat__9,    m4cashat,   "csa11dr.p1",       0x0000, 0x020000, CRC(cf121168) SHA1(aa52b528ac565684399dc58aeb56691457727035), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 37)" )
-GAME_CUSTOM( 199?, m4cashat__aa,   m4cashat,   "csa11dy.p1",       0x0000, 0x020000, CRC(36da020f) SHA1(ca202c7127450d905e4717776e1f1d32fa89279b), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 38)" )
-GAME_CUSTOM( 199?, m4cashat__ab,   m4cashat,   "csa11h.p1",        0x0000, 0x020000, CRC(297cb9a1) SHA1(63460eed75242fc7c27ee1fc9da28221e7bb21b1), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 39)" )
-GAME_CUSTOM( 199?, m4cashat__ac,   m4cashat,   "csa11k.p1",        0x0000, 0x020000, CRC(87f5e52f) SHA1(30b7f8c17198045bba30aaabbe74b3c1dc7d0320), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 40)" )
-GAME_CUSTOM( 199?, m4cashat__ad,   m4cashat,   "csa11r.p1",        0x0000, 0x020000, CRC(5dae0403) SHA1(6f2238f0fe0797bf0926044bb251fed6f97dbed6), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 41)" )
-GAME_CUSTOM( 199?, m4cashat__ae,   m4cashat,   "csa11s.p1",        0x0000, 0x020000, CRC(bef7a119) SHA1(88fc2003a7adda928e2e0fb78db32c7ffcbda924), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 42)" )
-GAME_CUSTOM( 199?, m4cashat__af,   m4cashat,   "csa11y.p1",        0x0000, 0x020000, CRC(a4661764) SHA1(740be82275358b8e3dcec5982b18a083d043d99d), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 43)" )
+// "(C)1993 BARCREST" and "CSA 1.2"
+GAME_CUSTOM( 199?, m4cashat,       0,          "csa12s.p1",        0x0000, 0x020000, CRC(61c8af36) SHA1(d81a4056b573194a8627a3618f805d379140ff6a), "Barcrest","Cash Attack (Barcrest) (MPU4) (CSA 1.2)" )
+GAME_CUSTOM( 199?, m4cashat__ar,   m4cashat,   "csa12y.p1",        0x0000, 0x020000, CRC(0374584a) SHA1(446e1d122d5b38e4ee11d98a4235d7198d98b541), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4cashat__ag,   m4cashat,   "csa12ad.p1",       0x0000, 0x020000, CRC(b15c5c64) SHA1(7a8c7b929ecaf0e14d9a5d6cdea303f5e3fc1dec), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 44)" )
 GAME_CUSTOM( 199?, m4cashat__ah,   m4cashat,   "csa12b.p1",        0x0000, 0x020000, CRC(60529594) SHA1(a5e70b55b8df6a94c963b970c3a4398b64b0286b), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 45)" )
 GAME_CUSTOM( 199?, m4cashat__ai,   m4cashat,   "csa12bd.p1",       0x0000, 0x020000, CRC(98bd39ec) SHA1(ebc5a2690f1453adae0f8faee0159a01df91dd6e), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 46)" )
@@ -2302,7 +2421,53 @@ GAME_CUSTOM( 199?, m4cashat__an,   m4cashat,   "csa12dy.p1",       0x0000, 0x020
 GAME_CUSTOM( 199?, m4cashat__ao,   m4cashat,   "csa12h.p1",        0x0000, 0x020000, CRC(8e6ef68f) SHA1(b6ac0993938bb065f02498a71628cf532085b347), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 52)" )
 GAME_CUSTOM( 199?, m4cashat__ap,   m4cashat,   "csa12k.p1",        0x0000, 0x020000, CRC(20e7aa01) SHA1(093786b0992c1d9ce5e2d2cfad1eaf1d8e6dc733), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 53)" )
 GAME_CUSTOM( 199?, m4cashat__aq,   m4cashat,   "csa12r.p1",        0x0000, 0x020000, CRC(fabc4b2d) SHA1(3710b7b4bf56e46c60a60fcae82342bf201e38dc), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 54)" )
-GAME_CUSTOM( 199?, m4cashat__ar,   m4cashat,   "csa12s.p1",        0x0000, 0x020000, CRC(61c8af36) SHA1(d81a4056b573194a8627a3618f805d379140ff6a), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 55)" )
+// "(C)1993 BARCREST" and "CSA 1.1"
+GAME_CUSTOM( 199?, m4cashat__ae,   m4cashat,   "csa11s.p1",        0x0000, 0x020000, CRC(bef7a119) SHA1(88fc2003a7adda928e2e0fb78db32c7ffcbda924), "Barcrest","Cash Attack (Barcrest) (MPU4) (CSA 1.1)" )
+GAME_CUSTOM( 199?, m4cashat__3,    m4cashat,   "csa11ad.p1",       0x0000, 0x020000, CRC(7c1daa59) SHA1(9c0479094ba2f985803e58360b738b0baa2e410a), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 31)" )
+GAME_CUSTOM( 199?, m4cashat__4,    m4cashat,   "csa11b.p1",        0x0000, 0x020000, CRC(c740daba) SHA1(afa5bdf9f6aacb3a5126aa828e4d0d2518efe663), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 32)" )
+GAME_CUSTOM( 199?, m4cashat__5,    m4cashat,   "csa11bd.p1",       0x0000, 0x020000, CRC(55fccfd1) SHA1(b7c748573e5fb32a6be5e069e7f165a11c62b7d5), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 33)" )
+GAME_CUSTOM( 199?, m4cashat__6,    m4cashat,   "csa11d.p1",        0x0000, 0x020000, CRC(ecff6f1b) SHA1(3f37d8e20d5663e376c9dc5876a910a320edcf7d), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 34)" )
+GAME_CUSTOM( 199?, m4cashat__7,    m4cashat,   "csa11dh.p1",       0x0000, 0x020000, CRC(bbc0acca) SHA1(80d95505041fd4c869f9d835d0527070f2f582d9), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 35)" )
+GAME_CUSTOM( 199?, m4cashat__8,    m4cashat,   "csa11dk.p1",       0x0000, 0x020000, CRC(1549f044) SHA1(22bc130106a23d0e9c354b4aa97d7b7fd8776082), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 36)" )
+GAME_CUSTOM( 199?, m4cashat__9,    m4cashat,   "csa11dr.p1",       0x0000, 0x020000, CRC(cf121168) SHA1(aa52b528ac565684399dc58aeb56691457727035), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 37)" )
+GAME_CUSTOM( 199?, m4cashat__aa,   m4cashat,   "csa11dy.p1",       0x0000, 0x020000, CRC(36da020f) SHA1(ca202c7127450d905e4717776e1f1d32fa89279b), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 38)" )
+GAME_CUSTOM( 199?, m4cashat__ab,   m4cashat,   "csa11h.p1",        0x0000, 0x020000, CRC(297cb9a1) SHA1(63460eed75242fc7c27ee1fc9da28221e7bb21b1), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 39)" )
+GAME_CUSTOM( 199?, m4cashat__ac,   m4cashat,   "csa11k.p1",        0x0000, 0x020000, CRC(87f5e52f) SHA1(30b7f8c17198045bba30aaabbe74b3c1dc7d0320), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 40)" )
+GAME_CUSTOM( 199?, m4cashat__ad,   m4cashat,   "csa11r.p1",        0x0000, 0x020000, CRC(5dae0403) SHA1(6f2238f0fe0797bf0926044bb251fed6f97dbed6), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 41)" )
+GAME_CUSTOM( 199?, m4cashat__af,   m4cashat,   "csa11y.p1",        0x0000, 0x020000, CRC(a4661764) SHA1(740be82275358b8e3dcec5982b18a083d043d99d), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 43)" )
+// "(C)1993 BARCREST" and "CAA 2.3"
+GAME_CUSTOM( 199?, m4cashat__y,    m4cashat,   "caa23s.p1",        0x0000, 0x020000, CRC(26a49cdd) SHA1(ee28a22eeb8c4e8ddf041122505f9846d6b6d7d6), "Barcrest","Cash Attack (Barcrest) (MPU4) (CAA 2.3)" )
+GAME_CUSTOM( 199?, m4cashat__n,    m4cashat,   "caa23ad.p1",       0x0000, 0x020000, CRC(a8641c35) SHA1(18dad4634e27e4f0b791c331b9efcf5e1d56d3bb), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 15)" )
+GAME_CUSTOM( 199?, m4cashat__o,    m4cashat,   "caa23b.p1",        0x0000, 0x020000, CRC(a867c129) SHA1(9b0b577938ae0500a8b80211710ed5c0b2a597fa), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 16)" )
+GAME_CUSTOM( 199?, m4cashat__p,    m4cashat,   "caa23bd.p1",       0x0000, 0x020000, CRC(46587f2e) SHA1(b14ed6b810ba3039824a0d13c5b75fedd40803b3), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 17)" )
+GAME_CUSTOM( 199?, m4cashat__q,    m4cashat,   "caa23d.p1",        0x0000, 0x020000, CRC(83d87488) SHA1(1e13a47de4837e42650c6a4a13a838eb68d0beae), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 18)" )
+GAME_CUSTOM( 199?, m4cashat__r,    m4cashat,   "caa23dh.p1",       0x0000, 0x020000, CRC(06ed40bb) SHA1(68f2923c4ecd91231cc66a4be7c797d7b2a46ae0), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 19)" )
+GAME_CUSTOM( 199?, m4cashat__s,    m4cashat,   "caa23dk.p1",       0x0000, 0x020000, CRC(6fb91aa6) SHA1(5966be8aa9d5348bbdcb85b21acceaabc3c02602), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 20)" )
+GAME_CUSTOM( 199?, m4cashat__t,    m4cashat,   "caa23dr.p1",       0x0000, 0x020000, CRC(dcb6a197) SHA1(a18af78ba604b53a2af1e9b8dfdc6858964f631d), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 21)" )
+GAME_CUSTOM( 199?, m4cashat__u,    m4cashat,   "caa23dy.p1",       0x0000, 0x020000, CRC(257eb2f0) SHA1(0a5f9743afb5dd7392425951580532ea5f8f17f1), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 22)" )
+GAME_CUSTOM( 199?, m4cashat__v,    m4cashat,   "caa23h.p1",        0x0000, 0x020000, CRC(e8d2febc) SHA1(14fe5e1699fef74145f2f6fff61e75fe3e3a0b3b), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 23)" )
+GAME_CUSTOM( 199?, m4cashat__w,    m4cashat,   "caa23k.p1",        0x0000, 0x020000, CRC(8186a4a1) SHA1(0d8f59df0fb5a1044f6fb7d81f50f9c9b94add9b), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 24)" )
+GAME_CUSTOM( 199?, m4cashat__x,    m4cashat,   "caa23r.p1",        0x0000, 0x020000, CRC(32891f90) SHA1(c832c2610606bc5a3beeff8f85c31af496b14427), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 25)" )
+GAME_CUSTOM( 199?, m4cashat__z,    m4cashat,   "caa23y.p1",        0x0000, 0x020000, CRC(cb410cf7) SHA1(31d34a766939a9b2a23be00c2ffd658d854b3ab4), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 27)" )
+// "(C)1993 BARCREST" and "CAA 2.2"
+GAME_CUSTOM( 199?, m4cashat__l,    m4cashat,   "caa22s.p1",        0x0000, 0x020000, CRC(e7edf653) SHA1(f2bdf45cc18ad4b45b47d2b2b4641460fcdfa963), "Barcrest","Cash Attack (Barcrest) (MPU4) (CAA 2.2)" )
+GAME_CUSTOM( 199?, m4cashat__a,    m4cashat,   "caa22ad.p1",       0x0000, 0x020000, CRC(b6274874) SHA1(7c2dc0f3e8e7bb76f3b90300141b320fa0ca39ac), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4cashat__b,    m4cashat,   "caa22b.p1",        0x0000, 0x020000, CRC(e7f6f5e5) SHA1(fc16b50ae00525a3c84c0cbf7b418898cc5db1bc), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4cashat__c,    m4cashat,   "caa22bd.p1",       0x0000, 0x020000, CRC(581b2b6f) SHA1(55f910c7646d5e7d3be6ffd5b4ec0f04fb98b82e), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4cashat__d,    m4cashat,   "caa22d.p1",        0x0000, 0x020000, CRC(cc494044) SHA1(13ff215f41833aa133fe9d120792c834d1e0752b), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4cashat__e,    m4cashat,   "caa22dh.p1",       0x0000, 0x020000, CRC(18ae14fa) SHA1(20a8f197075ec153ac116b9a85e3591d9d4d045d), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4cashat__f,    m4cashat,   "caa22dk.p1",       0x0000, 0x020000, CRC(71fa4ee7) SHA1(ddf2cee47f93cc5794d64922658d5892993c8d2f), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4cashat__g,    m4cashat,   "caa22dr.p1",       0x0000, 0x020000, CRC(c2f5f5d6) SHA1(aebedb84ae388a1f0c558d36893d1341c1959594), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 8)" )
+GAME_CUSTOM( 199?, m4cashat__h,    m4cashat,   "caa22dy.p1",       0x0000, 0x020000, CRC(3b3de6b1) SHA1(d72ce7851969466063c6d7952787691a7c44c9dd), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 9)" )
+GAME_CUSTOM( 199?, m4cashat__i,    m4cashat,   "caa22h.p1",        0x0000, 0x020000, CRC(a743ca70) SHA1(e4b5ee02524873c2ccb66b4bfca39464c23eb43e), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 10)" )
+GAME_CUSTOM( 199?, m4cashat__j,    m4cashat,   "caa22k.p1",        0x0000, 0x020000, CRC(ce17906d) SHA1(18a302132e683b00509982c09c6e3b00ae1201a0), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 11)" )
+GAME_CUSTOM( 199?, m4cashat__k,    m4cashat,   "caa22r.p1",        0x0000, 0x020000, CRC(7d182b5c) SHA1(801d1b032e94cc45302a9f84ba7f9ce2b74f6449), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 12)" )
+GAME_CUSTOM( 199?, m4cashat__m,    m4cashat,   "caa22y.p1",        0x0000, 0x020000, CRC(84d0383b) SHA1(791666ce17fd65067df446a3320efd22bce23925), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 14)" )
+// no copyright string and "CAA 2.3"
+GAME_CUSTOM( 199?, m4cashat__0,    m4cashat,   "casattack8.bin",   0x0000, 0x020000, CRC(e29ea247) SHA1(ad00ea3bfd2eab51b20fd786cb1ce84de0d98173), "hack","Cash Attack (Barcrest) (MPU4) (CAA 2.3, hack, set 1)" )
+GAME_CUSTOM( 199?, m4cashat__1,    m4cashat,   "catt15g",          0x0000, 0x020000, CRC(3f7a8863) SHA1(df8ed393aeb3a5ec3fd5bdc01c9dbbb630e6d254), "hack","Cash Attack (Barcrest) (MPU4) (CAA 2.3, hack, set 2)" )
+// no copyright string and "CSA 1.2"
+GAME_CUSTOM( 199?, m4cashat__2,    m4cashat,   "catt15t",          0x0000, 0x020000, CRC(c6760c3a) SHA1(b7f4a3af52faf7e430e5b4ec75e2dc97e3f07dc0), "hack","Cash Attack (Barcrest) (MPU4) (CSA 1.2, hack)" )
 
 
 #define M4RHR_EXTRA_ROMS \
@@ -2321,7 +2486,8 @@ GAME_CUSTOM( 199?, m4cashat__ar,   m4cashat,   "csa12s.p1",        0x0000, 0x020
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4rhr,     0,      "rhr15.hex",        0x0000, 0x010000, CRC(895ebbda) SHA1(f2117e743a30f3c9fc6af7fd7843bc333699db9d), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 1)" )
+// "(C)1991 BARCREST" and "CR4 0.9"
+GAME_CUSTOM( 199?, m4rhr,     0,      "cr4s.p1",          0x0000, 0x010000, CRC(836c3e49) SHA1(34dde2fd4fe82ab4a9e16dcf7915705f7b8a007f), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (CR4 0.9)" )
 GAME_CUSTOM( 199?, m4rhr__a,  m4rhr,  "cr4ad.p1",         0x0000, 0x010000, CRC(b99b3d14) SHA1(2ff68b33881e9b3c2db48c335ccbad783013084a), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4rhr__b,  m4rhr,  "cr4b.p1",          0x0000, 0x010000, CRC(ae2691b8) SHA1(360c5c3d94bf85cf5ead114dd570ea6c61082aa9), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4rhr__c,  m4rhr,  "cr4bd.p1",         0x0000, 0x010000, CRC(9ba444bf) SHA1(adebf23827a5ac5e3a6d56e3352e0d3f3dc809c0), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 4)" )
@@ -2329,8 +2495,11 @@ GAME_CUSTOM( 199?, m4rhr__d,  m4rhr,  "cr4d.p1",          0x0000, 0x010000, CRC(
 GAME_CUSTOM( 199?, m4rhr__e,  m4rhr,  "cr4dk.p1",         0x0000, 0x010000, CRC(200486b4) SHA1(3916e131801c44985668ccd57dc3e812268f9417), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 6)" )
 GAME_CUSTOM( 199?, m4rhr__f,  m4rhr,  "cr4dy.p1",         0x0000, 0x010000, CRC(5b5ebe79) SHA1(6c72271258e6b951f2d6c815cfef5032e23cf7bc), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 7)" )
 GAME_CUSTOM( 199?, m4rhr__g,  m4rhr,  "cr4k.p1",          0x0000, 0x010000, CRC(2cc956e8) SHA1(37fad3d3b9460763ba4d8f569ee71778f9907853), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4rhr__h,  m4rhr,  "cr4s.p1",          0x0000, 0x010000, CRC(836c3e49) SHA1(34dde2fd4fe82ab4a9e16dcf7915705f7b8a007f), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4rhr__i,  m4rhr,  "cr4y.p1",          0x0000, 0x010000, CRC(5a3588e8) SHA1(b25156f38fb67dc1f1e36a50af0a9b93882572d0), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 10)" )
+GAME_CUSTOM( 199?, m4rhr__h,  m4rhr,  "cr4y.p1",          0x0000, 0x010000, CRC(5a3588e8) SHA1(b25156f38fb67dc1f1e36a50af0a9b93882572d0), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 10)" )
+// "(C)1991 BARCREST" and "CR4 0.2" (HHN 0.2 on startup)
+GAME_CUSTOM( 199?, m4rhr__i,  m4rhr,  "rhr15.hex",        0x0000, 0x010000, CRC(895ebbda) SHA1(f2117e743a30f3c9fc6af7fd7843bc333699db9d), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (HHN 0.2KD / CR4 0.2)" )
+// "(C)1991 BARCREST" and "CR4 0.3" (CRT 0.3 on startup)
+GAME_CUSTOM( 199?, m4rhr__t,  m4rhr,  "crt03s.p1",        0x0000, 0x010000, CRC(2b4c24d2) SHA1(94b19b0e8090dbbde2c67d5949f19d4050972fb1), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (CRT 0.3 / CR4 0.3)" )
 GAME_CUSTOM( 199?, m4rhr__j,  m4rhr,  "crt03ad.p1",       0x0000, 0x010000, CRC(5b779273) SHA1(b9a278cc6b4af622af35f7d4fdacdca54c94a47f), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 11)" )
 GAME_CUSTOM( 199?, m4rhr__k,  m4rhr,  "crt03b.p1",        0x0000, 0x010000, CRC(da5b3fa3) SHA1(66c570a193665ae0df4542112547fa6f5f9b7b79), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 12)" )
 GAME_CUSTOM( 199?, m4rhr__l,  m4rhr,  "crt03bd.p1",       0x0000, 0x010000, CRC(6d6bff39) SHA1(08f4235bb2cadcc49c13991fe3e2c806c0be801d), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 13)" )
@@ -2341,8 +2510,9 @@ GAME_CUSTOM( 199?, m4rhr__p,  m4rhr,  "crt03dr.p1",       0x0000, 0x010000, CRC(
 GAME_CUSTOM( 199?, m4rhr__q,  m4rhr,  "crt03dy.p1",       0x0000, 0x010000, CRC(3439dc85) SHA1(092dcd36e2ea43ecf62cfc1bf1498ea7777213dc), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 18)" )
 GAME_CUSTOM( 199?, m4rhr__r,  m4rhr,  "crt03k.p1",        0x0000, 0x010000, CRC(0b841ae9) SHA1(5a78381122a3b718e3f212f30f76dc61e2e3ac5e), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 19)" )
 GAME_CUSTOM( 199?, m4rhr__s,  m4rhr,  "crt03r.p1",        0x0000, 0x010000, CRC(2a8bd767) SHA1(a9547ef37da9494bd4ffe5fbb68eca67fe63c3ba), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4rhr__t,  m4rhr,  "crt03s.p1",        0x0000, 0x010000, CRC(2b4c24d2) SHA1(94b19b0e8090dbbde2c67d5949f19d4050972fb1), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 21)" )
 GAME_CUSTOM( 199?, m4rhr__u,  m4rhr,  "crt03y.p1",        0x0000, 0x010000, CRC(40c3a105) SHA1(7ad988f71a3523ad2b19fa7d6cdf74d4328fb3e1), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 22)" )
+// "(C)1991 BARCREST" and "CRU 0.1"
+GAME_CUSTOM( 199?, m4rhr__2,  m4rhr,  "crus.p1",          0x0000, 0x010000, CRC(bf2ff034) SHA1(7ee7ef30da4283dbb2b1b040fdd3313cb2e1b7e5), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (CRU 0.1)" )
 GAME_CUSTOM( 199?, m4rhr__v,  m4rhr,  "cruad.p1",         0x0000, 0x010000, CRC(3a680f14) SHA1(cd3c2bf77b148ee4f4ce76b2c1bc142491117890), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 23)" )
 GAME_CUSTOM( 199?, m4rhr__w,  m4rhr,  "crub.p1",          0x0000, 0x010000, CRC(4cee9020) SHA1(b919ba28294c39b49e4fcfa54a75e852f9c873ed), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 24)" )
 GAME_CUSTOM( 199?, m4rhr__x,  m4rhr,  "crubd.p1",         0x0000, 0x010000, CRC(7184b193) SHA1(392cb5887ec988e3aa1cba2491885103da1e503a), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 25)" )
@@ -2350,20 +2520,20 @@ GAME_CUSTOM( 199?, m4rhr__y,  m4rhr,  "crud.p1",          0x0000, 0x010000, CRC(
 GAME_CUSTOM( 199?, m4rhr__z,  m4rhr,  "crudk.p1",         0x0000, 0x010000, CRC(73465d95) SHA1(3eddaee64a681727743b23fd0bec0285ed59a5ef), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 27)" )
 GAME_CUSTOM( 199?, m4rhr__0,  m4rhr,  "crudy.p1",         0x0000, 0x010000, CRC(e08696f9) SHA1(37c97bb22ae0d09657d7d589f76adfbe6fb642e0), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 28)" )
 GAME_CUSTOM( 199?, m4rhr__1,  m4rhr,  "cruk.p1",          0x0000, 0x010000, CRC(168627f0) SHA1(c6c21f8442ff88736d3fd25860d815beb5a6b845), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 29)" )
-GAME_CUSTOM( 199?, m4rhr__2,  m4rhr,  "crus.p1",          0x0000, 0x010000, CRC(bf2ff034) SHA1(7ee7ef30da4283dbb2b1b040fdd3313cb2e1b7e5), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 30)" )
 GAME_CUSTOM( 199?, m4rhr__3,  m4rhr,  "cruy.p1",          0x0000, 0x010000, CRC(edf1346b) SHA1(c250178991885a922f676424e70c637e11089efb), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 31)" )
-GAME_CUSTOM( 199?, m4rhr__4,  m4rhr,  "redhot8.bin",      0x0000, 0x010000, CRC(1dc62d7b) SHA1(640a5b29314a7dc67db271cce06c23c676d77eee), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 32)" )
-GAME_CUSTOM( 199?, m4rhr__5,  m4rhr,  "rhr03.r",          0x0000, 0x010000, CRC(98d81b1e) SHA1(17ab0dced53be9755aada7954aff2dc2a6973190), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 33)" )
-GAME_CUSTOM( 199?, m4rhr__6,  m4rhr,  "rhr10",            0x0000, 0x010000, CRC(2a18a033) SHA1(add907c5ab155c28142dcee57825059715afd80d), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 34)" )
-GAME_CUSTOM( 199?, m4rhr__7,  m4rhr,  "rhr2015",          0x0000, 0x010000, CRC(dbfd3b95) SHA1(4fc7ae32f7d76be3d3d07d627391884bd4d6de09), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 35)" )
-GAME_CUSTOM( 199?, m4rhr__8,  m4rhr,  "rhr2515",          0x0000, 0x010000, CRC(e4554c23) SHA1(6d977beb282fd638de3457e467e842ce79b5be7c), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 36)" )
-GAME_CUSTOM( 199?, m4rhr__9,  m4rhr,  "rhr2pprg.bin",     0x0000, 0x010000, CRC(f97047b2) SHA1(d3ed8c93e405f9e7448b3924ff9aa84223b76046), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 37)" )
+// "(C)1991 BARCREST" and "RH8 0.1"
+GAME_CUSTOM( 199?, m4rhr__4,  m4rhr,  "redhot8.bin",      0x0000, 0x010000, CRC(1dc62d7b) SHA1(640a5b29314a7dc67db271cce06c23c676d77eee), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (RH8 0.1K)" )
+GAME_CUSTOM( 1991, m4rhr__a4, m4rhr,  "rh8c.p1",          0x0000, 0x010000, CRC(e36d7ca0) SHA1(73970761c5c7004669b02ba9f3a299f36f2d00e9), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (RH8 0.1C)" )
+// "(C)1991 BARCREST" and "RHR 0.3"
+GAME_CUSTOM( 199?, m4rhr__af, m4rhr,  "rhrs.p1",          0x0000, 0x010000, CRC(a0e5d5b6) SHA1(c730e6319bbea6f035fb3e249991983783ef5743), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (RHR 0.3)" )
+GAME_CUSTOM( 199?, m4rhr__5,  m4rhr,  "rhr03.r",          0x0000, 0x010000, CRC(98d81b1e) SHA1(17ab0dced53be9755aada7954aff2dc2a6973190), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (RHR 0.3R)" )
 GAME_CUSTOM( 199?, m4rhr__aa, m4rhr,  "rhrb.p1",          0x0000, 0x010000, CRC(876fbe46) SHA1(1c7faf68ddef2ccbb8e3cd2cf5c709a7a4f4daef), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 38)" )
 GAME_CUSTOM( 199?, m4rhr__ab, m4rhr,  "rhrbd.p1",         0x0000, 0x010000, CRC(f0fa0c7b) SHA1(96bfce8ea54e392a36cb8d82a032438bff992f07), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 39)" )
 GAME_CUSTOM( 199?, m4rhr__ac, m4rhr,  "rhrc.p1",          0x0000, 0x010000, CRC(76a0e556) SHA1(1a9bae286ca40d8e72022645d006a219f113e31a), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 40)" )
 GAME_CUSTOM( 199?, m4rhr__ad, m4rhr,  "rhrd.p1",          0x0000, 0x010000, CRC(58a5dd6f) SHA1(3646b8cb3d49e8c530e321daad052f27cdf4bb3d), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 41)" )
 GAME_CUSTOM( 199?, m4rhr__ae, m4rhr,  "rhrk.p1",          0x0000, 0x010000, CRC(2212cebb) SHA1(224e7e243b17f3ca90a6daa529984e9a879ff266), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 42)" )
-GAME_CUSTOM( 199?, m4rhr__af, m4rhr,  "rhrs.p1",          0x0000, 0x010000, CRC(a0e5d5b6) SHA1(c730e6319bbea6f035fb3e249991983783ef5743), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 43)" )
+// "(C)1991 BARCREST" and "RHT 0.3"
+GAME_CUSTOM( 199?, m4rhr__ap, m4rhr,  "rhts.p1",          0x0000, 0x010000, CRC(fecb7076) SHA1(43086c6bfd878d0ca1ec8d45285d3e941a62ac8e), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (RHT 0.3)" )
 GAME_CUSTOM( 199?, m4rhr__ag, m4rhr,  "rhtad.p1",         0x0000, 0x010000, CRC(ae3a31a0) SHA1(7e1f05a21cf5b3d2aceba755136c567b5d6ecfcd), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 44)" )
 GAME_CUSTOM( 199?, m4rhr__ah, m4rhr,  "rhtb.p1",          0x0000, 0x010000, CRC(7ceb13c8) SHA1(f0f22149bd0fb12ef06c4c3ecba605df33f52c51), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 45)" )
 GAME_CUSTOM( 199?, m4rhr__ai, m4rhr,  "rhtbd.p1",         0x0000, 0x010000, CRC(e4b290fc) SHA1(bf16d06429d67936118264f6c4f1ae637753d5db), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 46)" )
@@ -2373,8 +2543,9 @@ GAME_CUSTOM( 199?, m4rhr__al, m4rhr,  "rhtdr.p1",         0x0000, 0x010000, CRC(
 GAME_CUSTOM( 199?, m4rhr__am, m4rhr,  "rhtdy.p1",         0x0000, 0x010000, CRC(42f5746d) SHA1(964bd8801b44de9ea45c43b290b1cd6284e97578), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 50)" )
 GAME_CUSTOM( 199?, m4rhr__an, m4rhr,  "rhtk.p1",          0x0000, 0x010000, CRC(c3bfb174) SHA1(2579bf17252988de17a1367546ae187420f95cc5), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 51)" )
 GAME_CUSTOM( 199?, m4rhr__ao, m4rhr,  "rhtr.p1",          0x0000, 0x010000, CRC(f53f4876) SHA1(feda495361d384c662554d445a95191a2c52a56a), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 52)" )
-GAME_CUSTOM( 199?, m4rhr__ap, m4rhr,  "rhts.p1",          0x0000, 0x010000, CRC(fecb7076) SHA1(43086c6bfd878d0ca1ec8d45285d3e941a62ac8e), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 53)" )
 GAME_CUSTOM( 199?, m4rhr__aq, m4rhr,  "rhty.p1",          0x0000, 0x010000, CRC(68546098) SHA1(57981c06efcb44915d8c2d4b6e1cba377c4a8590), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 54)" )
+// "(C)1991 BARCREST" and "RHU 0.2"
+GAME_CUSTOM( 199?, m4rhr__a0, m4rhr,  "rhus.p1",          0x0000, 0x010000, CRC(31e776fc) SHA1(e51799e9db5a08cbfb0b6c5466a0a085c3d91db4), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (RHU 0.2)" )
 GAME_CUSTOM( 199?, m4rhr__ar, m4rhr,  "rhuad.p1",         0x0000, 0x010000, CRC(2093126b) SHA1(942994793697cec730c461c87b24a1429e46cc02), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 55)" )
 GAME_CUSTOM( 199?, m4rhr__as, m4rhr,  "rhub.p1",          0x0000, 0x010000, CRC(2be41a3a) SHA1(a50c7b5b93a619e541be480646517e278da8e579), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 56)" )
 GAME_CUSTOM( 199?, m4rhr__at, m4rhr,  "rhubd.p1",         0x0000, 0x010000, CRC(168f7f21) SHA1(9c9e09673bdadd146883a06a8db3c0ee4b304eab), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 57)" )
@@ -2384,182 +2555,18 @@ GAME_CUSTOM( 199?, m4rhr__aw, m4rhr,  "rhudr.p1",         0x0000, 0x010000, CRC(
 GAME_CUSTOM( 199?, m4rhr__ax, m4rhr,  "rhudy.p1",         0x0000, 0x010000, CRC(692bf4eb) SHA1(136f36073f236b48442a20e06aa51a978135f1b3), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 61)" )
 GAME_CUSTOM( 199?, m4rhr__ay, m4rhr,  "rhuk.p1",          0x0000, 0x010000, CRC(9e4e1e91) SHA1(f671858c41dc0e55189e9a86fff1846938b5c2e5), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 62)" )
 GAME_CUSTOM( 199?, m4rhr__az, m4rhr,  "rhur.p1",          0x0000, 0x010000, CRC(6e9425e5) SHA1(1e2827f3469af15e8d390d9af839c7b474ea95a7), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 63)" )
-GAME_CUSTOM( 199?, m4rhr__a0, m4rhr,  "rhus.p1",          0x0000, 0x010000, CRC(31e776fc) SHA1(e51799e9db5a08cbfb0b6c5466a0a085c3d91db4), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 64)" )
 GAME_CUSTOM( 199?, m4rhr__a1, m4rhr,  "rhuy.p1",          0x0000, 0x010000, CRC(5d12178a) SHA1(18525828fac1931bb8e11f96b79db143ed533771), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 65)" )
-GAME_CUSTOM( 199?, m4rhr__a2, m4rhr,  "cr__x__x.5_0",     0x0000, 0x010000, CRC(278fe91e) SHA1(dcfed3a7796d1ee365e535115b66c7d6cbe0ab74), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 66)" )
-GAME_CUSTOM( 199?, m4rhr__a3, m4rhr,  "cr__x_dx.2_0",     0x0000, 0x010000, CRC(73fb120c) SHA1(4c0f39253dee9b528763a9cb609dec31e8529713), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 67)" )
-GAME_CUSTOM( 1991, m4rhr__a4, m4rhr,  "rh8c.p1",          0x0000, 0x010000, CRC(e36d7ca0) SHA1(73970761c5c7004669b02ba9f3a299f36f2d00e9), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (RH8 0.1C)" )
-
-
-#define M4UUAW_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
-	ROM_LOAD( "uuasnd.p1", 0x00000, 0x080000, CRC(be1a1131) SHA1(b7f50d8db6b7d134757e0746e7d9faf9fd3a2c7e) ) \
-	ROM_LOAD( "uuasnd.p2", 0x080000, 0x080000, CRC(c8492b3a) SHA1(d390e37f4a62869079bb38395a2e86a5ad24392f) )
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4UUAW_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
-
-
-GAME_CUSTOM( 199?, m4uuaw,       0,      "uua21h.p1",    0x0000, 0x020000, CRC(199e6dae) SHA1(ecd95ba2c2255afbaa8df96d625a8bfc97e4d3bc), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4uuaw__a,    m4uuaw, "upa15g",       0x0000, 0x020000, CRC(d20b8b92) SHA1(6fcddc781c204dfd34de2c4e4ce0ec35fb3ec4e0), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4uuaw__b,    m4uuaw, "upa15t",       0x0000, 0x020000, CRC(85e3e82a) SHA1(e90183fab082f159d76ea14da794d52ee6ab8200), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4uuaw__c,    m4uuaw, "ups21ad.p1",   0x0000, 0x020000, CRC(c19fa891) SHA1(c2772ec20a65ce999d901e8c873ec687113b18d4), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4uuaw__d,    m4uuaw, "ups21b.p1",    0x0000, 0x020000, CRC(01320407) SHA1(a3273c59733e42013c3448b2a5c7c575ec0182b9), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4uuaw__e,    m4uuaw, "ups21bd.p1",   0x0000, 0x020000, CRC(2fa3cb8a) SHA1(8df994ce93fc6f0df27a6ee73676d9ee73593091), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4uuaw__f,    m4uuaw, "ups21d.p1",    0x0000, 0x020000, CRC(2a8db1a6) SHA1(873ab3757920c9153c1542748a74b36ce5e190c2), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4uuaw__g,    m4uuaw, "ups21dh.p1",   0x0000, 0x020000, CRC(7bcfbb46) SHA1(b93dfa71e3ec0ea96eaf2db4cd382b0a2852a1ff), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4uuaw__h,    m4uuaw, "ups21dk.p1",   0x0000, 0x020000, CRC(0642ae02) SHA1(8898341f8dc4f4c8c45ce6d04a01bd919cb0548a), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4uuaw__i,    m4uuaw, "ups21dr.p1",   0x0000, 0x020000, CRC(b54d1533) SHA1(1f9220342dcab675b04895f69a7ca75579ba729f), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4uuaw__j,    m4uuaw, "ups21dy.p1",   0x0000, 0x020000, CRC(4c850654) SHA1(21f386060301adef646fe469c1fcfb002d3e3424), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4uuaw__k,    m4uuaw, "ups21h.p1",    0x0000, 0x020000, CRC(555e74cb) SHA1(14246b54839eb334576a119d7c87901f3b2f25ad), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4uuaw__l,    m4uuaw, "ups21k.p1",    0x0000, 0x020000, CRC(28d3618f) SHA1(186337119e4b663dadc129533ce8a913013390a9), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4uuaw__m,    m4uuaw, "ups21r.p1",    0x0000, 0x020000, CRC(9bdcdabe) SHA1(db0bb90705abec92a220a3dbe0ea69266d5e0558), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4uuaw__n,    m4uuaw, "ups21s.p1",    0x0000, 0x020000, CRC(c4a8a542) SHA1(61063d55c6017cf17d704df576cb62da5bd75820), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4uuaw__o,    m4uuaw, "ups21y.p1",    0x0000, 0x020000, CRC(6214c9d9) SHA1(d25fecc9798e342207d358a54efad1908c0e2247), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4uuaw__p,    m4uuaw, "ups22ad.p1",   0x0000, 0x020000, CRC(ee0f53a6) SHA1(eabe58efa82015eb2266a793853e8ade546d6da1), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4uuaw__q,    m4uuaw, "ups22b.p1",    0x0000, 0x020000, CRC(e7dbf5ae) SHA1(0fbbc3da1af8b60993a7f6082bd5e96da21cd0b8), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4uuaw__r,    m4uuaw, "ups22bd.p1",   0x0000, 0x020000, CRC(003330bd) SHA1(42ad6ddfd7639909151dcee5e40e82a23074fd59), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4uuaw__s,    m4uuaw, "ups22d.p1",    0x0000, 0x020000, CRC(cc64400f) SHA1(0ff7858c637fbb43a7cd1313bbf046177e4b7761), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4uuaw__t,    m4uuaw, "ups22dh.p1",   0x0000, 0x020000, CRC(545f4071) SHA1(3947499d78d31fb0b269a63a518790b503a97685), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4uuaw__u,    m4uuaw, "ups22dk.p1",   0x0000, 0x020000, CRC(29d25535) SHA1(7f053741d12cce467dd437ea998064e13d1ca52b), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4uuaw__v,    m4uuaw, "ups22dr.p1",   0x0000, 0x020000, CRC(9addee04) SHA1(45c15536c8846da825a994a667b6e46598c1642e), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 23)" )
-GAME_CUSTOM( 199?, m4uuaw__w,    m4uuaw, "ups22dy.p1",   0x0000, 0x020000, CRC(6315fd63) SHA1(9a5fcab51d4e94b96669149285dda28cd41020b8), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 24)" )
-GAME_CUSTOM( 199?, m4uuaw__x,    m4uuaw, "ups22h.p1",    0x0000, 0x020000, CRC(b3b78562) SHA1(3e75fa20156faa3d38c2b5ac824bffe47e72b7bc), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 25)" )
-GAME_CUSTOM( 199?, m4uuaw__y,    m4uuaw, "ups22k.p1",    0x0000, 0x020000, CRC(ce3a9026) SHA1(80977176c5bae809a564f4fc0e3d6370f91f829b), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 26)" )
-GAME_CUSTOM( 199?, m4uuaw__z,    m4uuaw, "ups22r.p1",    0x0000, 0x020000, CRC(7d352b17) SHA1(d2d1d016a587be318e9018eb1953e68fe83620df), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 27)" )
-GAME_CUSTOM( 199?, m4uuaw__0,    m4uuaw, "ups22s.p1",    0x0000, 0x020000, CRC(ac990aa9) SHA1(396c9eded9c18ab2bcb0f4066a890f6e239830f1), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 28)" )
-GAME_CUSTOM( 199?, m4uuaw__1,    m4uuaw, "ups22y.p1",    0x0000, 0x020000, CRC(84fd3870) SHA1(8d294ae1a92d1e99c4c3f17a2d77fe1d994b2c33), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 29)" )
-GAME_CUSTOM( 199?, m4uuaw__2,    m4uuaw, "uua21ad.p1",   0x0000, 0x020000, CRC(2a18c292) SHA1(5853cb069eb5caa23372e5dedd33868103125780), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 30)" )
-GAME_CUSTOM( 199?, m4uuaw__3,    m4uuaw, "uua21b.p1",    0x0000, 0x020000, CRC(d71cc3db) SHA1(7d783110341237769165a08fd86f597225f8d90c), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 31)" )
-GAME_CUSTOM( 199?, m4uuaw__4,    m4uuaw, "uua21bd.p1",   0x0000, 0x020000, CRC(f04323be) SHA1(194c996d4c8e2fed2bcb02e29423e68b53900a1f), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 32)" )
-GAME_CUSTOM( 199?, m4uuaw__5,    m4uuaw, "uua21d.p1",    0x0000, 0x020000, CRC(664da8c3) SHA1(c93b0b5e796fcde0850e2b3054f1db0417f4e9ed), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 33)" )
-GAME_CUSTOM( 199?, m4uuaw__6,    m4uuaw, "uua21dh.p1",   0x0000, 0x020000, CRC(3ec18dcb) SHA1(fb5fe8ba0b59a21401cf091f43ad9f2a4df3447c), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 34)" )
-GAME_CUSTOM( 199?, m4uuaw__7,    m4uuaw, "uua21dk.p1",   0x0000, 0x020000, CRC(84919e1c) SHA1(c7315a3d1985180ec5ae1f4e5c7f0c99c1e0bac4), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 35)" )
-GAME_CUSTOM( 199?, m4uuaw__8,    m4uuaw, "uua21dr.p1",   0x0000, 0x020000, CRC(434c988f) SHA1(eb6126048df5bc4ff98d9838a3bb6cf24a9ab895), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 36)" )
-GAME_CUSTOM( 199?, m4uuaw__9,    m4uuaw, "uua21dy.p1",   0x0000, 0x020000, CRC(098b30d9) SHA1(48daa77f3aafdcd52d7291cdda533e8a9428de0e), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 37)" )
-GAME_CUSTOM( 199?, m4uuaw__aa,   m4uuaw, "uua21k.p1",    0x0000, 0x020000, CRC(a3ce7e79) SHA1(8670d2cb7281ccabc15c5288a3e0dd99cfc1ae36), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 38)" )
-GAME_CUSTOM( 199?, m4uuaw__ab,   m4uuaw, "uua21r.p1",    0x0000, 0x020000, CRC(641378ea) SHA1(de0282af6a17c7fc16c7eca10e81ffb208675779), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 39)" )
-GAME_CUSTOM( 199?, m4uuaw__ac,   m4uuaw, "uua21s.p1",    0x0000, 0x020000, CRC(27c46fcc) SHA1(68a03fcce5d8155d6c0115d813c17217c4120375), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 40)" )
-GAME_CUSTOM( 199?, m4uuaw__ad,   m4uuaw, "uua21y.p1",    0x0000, 0x020000, CRC(2ed4d0bc) SHA1(ffb0585e729b389855d24015e1ef7582eab88d3e), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 41)" )
-GAME_CUSTOM( 199?, m4uuaw__ae,   m4uuaw, "uua22ad.p1",   0x0000, 0x020000, CRC(b2ace4d5) SHA1(da02abe111fea3fbfb9495e9b447139cd67a61e0), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 42)" )
-GAME_CUSTOM( 199?, m4uuaw__af,   m4uuaw, "uua22b.p1",    0x0000, 0x020000, CRC(71a6374a) SHA1(c14ed22fceb83b5ac72021322c9b8bb3d5afeffb), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 43)" )
-GAME_CUSTOM( 199?, m4uuaw__ag,   m4uuaw, "uua22bd.p1",   0x0000, 0x020000, CRC(68f705f9) SHA1(678ba97241f3dede96239265eed418d4717637a6), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 44)" )
-GAME_CUSTOM( 199?, m4uuaw__ah,   m4uuaw, "uua22d.p1",    0x0000, 0x020000, CRC(c0f75c52) SHA1(a4e1e496b0cbb24767f017fbe228fbb8ab2bb907), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 45)" )
-GAME_CUSTOM( 199?, m4uuaw__ai,   m4uuaw, "uua22dh.p1",   0x0000, 0x020000, CRC(a675ab8c) SHA1(37fb437b95f9ff50fe41ebce825e3dd1b361925e), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 46)" )
-GAME_CUSTOM( 199?, m4uuaw__aj,   m4uuaw, "uua22dk.p1",   0x0000, 0x020000, CRC(1c25b85b) SHA1(b42cdae2e2c00644376eb5f0c5b7567d3811b162), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 47)" )
-GAME_CUSTOM( 199?, m4uuaw__ak,   m4uuaw, "uua22dr.p1",   0x0000, 0x020000, CRC(dbf8bec8) SHA1(b3ac5ed5b8cbc0457e5dfadefcab563e3197b045), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 48)" )
-GAME_CUSTOM( 199?, m4uuaw__al,   m4uuaw, "uua22dy.p1",   0x0000, 0x020000, CRC(913f169e) SHA1(9f82f5d868a9be046ced838f8b53730140ed50b2), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 49)" )
-GAME_CUSTOM( 199?, m4uuaw__am,   m4uuaw, "uua22h.p1",    0x0000, 0x020000, CRC(bf24993f) SHA1(618d6d2f2b762d61eb58087a3597ffb709658631), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 50)" )
-GAME_CUSTOM( 199?, m4uuaw__an,   m4uuaw, "uua22k.p1",    0x0000, 0x020000, CRC(05748ae8) SHA1(d9aeee26c8471bb6ee58a4a838e5c9930da92725), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 51)" )
-GAME_CUSTOM( 199?, m4uuaw__ao,   m4uuaw, "uua22r.p1",    0x0000, 0x020000, CRC(c2a98c7b) SHA1(115f7c7a4b9eab5f3270f43a2db7a320dfc4e223), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 52)" )
-GAME_CUSTOM( 199?, m4uuaw__ap,   m4uuaw, "uua22s.p1",    0x0000, 0x020000, CRC(65f57c0c) SHA1(7b2526cdd1ec973a91bc7ade116e16e03b32596a), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 53)" )
-GAME_CUSTOM( 199?, m4uuaw__aq,   m4uuaw, "uua22y.p1",    0x0000, 0x020000, CRC(886e242d) SHA1(4b49b70fc2635fcf7b538b35b42a358cf4dd60b3), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 54)" )
-
-
-#define M4RICHFM_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
-	ROM_LOAD( "rfamouss1.hex", 0x000000, 0x080000, CRC(b237c8b8) SHA1(b2322d68fe57cca0ed49b01ae0d3a0e93a623eac) ) \
-	ROM_LOAD( "rfamouss2.hex", 0x080000, 0x080000, CRC(12c295d5) SHA1(0758354cfb5242b4ce3f5f25c3458d91f4b4a1ec) )
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4RICHFM_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
-
-GAME_CUSTOM( 199?, m4richfm,       0,          "rfts.p1",      0x0000, 0x010000, CRC(2a747164) SHA1(a4c8e160f09ebea4fca6dd32ff020d3f1a4f1a1c), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4richfm__a,    m4richfm,   "rafc.p1",      0x0000, 0x010000, CRC(d92f602f) SHA1(c93131138deb4018d499b9b45c07d4517c5072b7), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4richfm__b,    m4richfm,   "rafd.p1",      0x0000, 0x010000, CRC(b0e9f470) SHA1(cad080a5d7f24968524fe10f6c43b088f35d7364), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4richfm__c,    m4richfm,   "rafs.p1",      0x0000, 0x010000, CRC(f312b2e3) SHA1(8bf2cb7b73cfc320143d05d25e28c15fb4f26045), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4richfm__d,    m4richfm,   "rafy.p1",      0x0000, 0x010000, CRC(a8812d45) SHA1(c0b89833f87ed90eb3e9c3299fcea362d501ed90), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4richfm__e,    m4richfm,   "rchfam8",      0x0000, 0x004000, CRC(55f16698) SHA1(9853b17bbb81371192a564376be7b3074908dbca), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4richfm__f,    m4richfm,   "rf5ad.p1",     0x0000, 0x010000, CRC(cd280292) SHA1(605d89608e106979229a00701a2e5b578df50d60), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4richfm__g,    m4richfm,   "rf5b.p1",      0x0000, 0x010000, CRC(e1edf753) SHA1(677f0397ec57422241f4669be610cffd33a9b44a), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4richfm__h,    m4richfm,   "rf5bd.p1",     0x0000, 0x010000, CRC(2d698365) SHA1(7f91cee0d34550aba9ac0f4ee398df4de6fd6f7e), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4richfm__i,    m4richfm,   "rf5d.p1",      0x0000, 0x010000, CRC(034cab0b) SHA1(79eaeb84377dbb8e6bda1dd2ae29a1f79656b9e4), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4richfm__j,    m4richfm,   "rf5dk.p1",     0x0000, 0x010000, CRC(14fc0f13) SHA1(a2b294da18c3f5bc9c81eb3f3af5ab5ca58c9cad), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4richfm__k,    m4richfm,   "rf5dy.p1",     0x0000, 0x010000, CRC(a2664c64) SHA1(2256b6e0d6472faa901348cb5be849ad012f1d16), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4richfm__l,    m4richfm,   "rf5k.p1",      0x0000, 0x010000, CRC(d8787b25) SHA1(885ac7ddd3de4cb475539d02aefbf38fed7c1f2c), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4richfm__m,    m4richfm,   "rf5s.p1",      0x0000, 0x010000, CRC(8d1ed193) SHA1(a4ca973dac8a8fd550bf7e57a8cdc627c28da4b8), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4richfm__n,    m4richfm,   "rf5y.p1",      0x0000, 0x010000, CRC(ad288548) SHA1(a7222ab5bffe8e5e0844f8e6f13e09afe74b08a8), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4richfm__o,    m4richfm,   "rf8b.p1",      0x0000, 0x010000, CRC(105c24e1) SHA1(cb417976a74441bf2ca888198b57fed81d758c15), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4richfm__p,    m4richfm,   "rf8c.p1",      0x0000, 0x010000, CRC(8924a706) SHA1(abb1a1f6cdeb15884dfa63fc04882f794453d4ec), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4richfm__q,    m4richfm,   "rft20.10",     0x0000, 0x010000, CRC(41e6ef75) SHA1(d836fdea5a89b845687d2ff929365bd81737c760), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4richfm__r,    m4richfm,   "rftad.p1",     0x0000, 0x010000, CRC(8553386f) SHA1(ad834d52e51c7f375a370dc6d8586668921a9795), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4richfm__s,    m4richfm,   "rftb.p1",      0x0000, 0x010000, CRC(0189cc2f) SHA1(62ccc85c50c56aa2e0bcbb42b5c24d402f00d366), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4richfm__t,    m4richfm,   "rftbd.p1",     0x0000, 0x010000, CRC(08351e03) SHA1(d08d38d46793828b147ccde8121fbb9bf422cd60), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4richfm__u,    m4richfm,   "rftd.p1",      0x0000, 0x010000, CRC(689f02ed) SHA1(1a30aac5454b0c477a698e9c573fe313bc1fe858), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4richfm__v,    m4richfm,   "rftdk.p1",     0x0000, 0x010000, CRC(098b88f5) SHA1(4559b561380055c429a5b4741326f64ad89d8481), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 23)" )
-GAME_CUSTOM( 199?, m4richfm__w,    m4richfm,   "rftdy.p1",     0x0000, 0x010000, CRC(26b912f8) SHA1(1719d63b4a25293199b0729235beb5b93c484490), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 24)" )
-GAME_CUSTOM( 199?, m4richfm__x,    m4richfm,   "rftk.p1",      0x0000, 0x010000, CRC(6a48bd98) SHA1(2f17194869ca008f7a2eb622bd3725bc91950a17), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 25)" )
-GAME_CUSTOM( 199?, m4richfm__y,    m4richfm,   "rfty.p1",      0x0000, 0x010000, CRC(723fe46e) SHA1(51bb8aff358d527483eaf1b1e20606d94a937dc6), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 26)" )
-GAME_CUSTOM( 199?, m4richfm__z,    m4richfm,   "rich2010",     0x0000, 0x010000, CRC(baecbdbc) SHA1(5fffecf3c91e832d3cfc13dbf5e6b74fc3d6a146), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 27)" )
-GAME_CUSTOM( 199?, m4richfm__0,    m4richfm,   "r&f5.10",      0x0000, 0x010000, CRC(45d493d0) SHA1(9a549821a005fa65c2eb8b35c5f15659bd897519), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 28)" )
-GAME_CUSTOM( 199?, m4richfm__1,    m4richfm,   "r&f5.4",       0x0000, 0x010000, CRC(0441d833) SHA1(361910fd64bc7291f6200fe354c468d16e7d6c80), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 29)" )
-GAME_CUSTOM( 199?, m4richfm__2,    m4richfm,   "r&f5.8t",      0x0000, 0x010000, CRC(525e2520) SHA1(84b2ff86d6a54ebb3bcf0138930b2619a8733161), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 30)" )
-GAME_CUSTOM( 199?, m4richfm__3,    m4richfm,   "r&f55",        0x0000, 0x010000, CRC(6095a72b) SHA1(af25f7c2fb5241064ea995d35fe4fd2f242e3750), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 31)" )
-
-
-#define M4NNWWC_EXTRA_ROMS \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
-	/* missing, maybe the same as NNWW */
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4NNWWC_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
-GAME_CUSTOM( 199?, m4nnwwc,     0,          "cn302c.p1",        0x0000, 0x010000, CRC(fd9de050) SHA1(14c80deba1396aa5be0a1d02964ecd4b946f2ee8), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4nnwwc__a,  m4nnwwc,    "cf302ad.p1",       0x0000, 0x010000, CRC(6c6aa0cd) SHA1(5a58a19c35b0b195f3b4e7a21f57ca61d45ec1fb), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4nnwwc__b,  m4nnwwc,    "cf302b.p1",        0x0000, 0x010000, CRC(9ca07939) SHA1(6eb0a5675bb803a11c4c874dc0516d94c48194b7), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4nnwwc__c,  m4nnwwc,    "cf302bd.p1",       0x0000, 0x010000, CRC(8ba33b7d) SHA1(ebfb62a390de512dc1482cfb9ab64196cbcc5831), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4nnwwc__d,  m4nnwwc,    "cf302c.p1",        0x0000, 0x010000, CRC(26be2dc4) SHA1(157ca96ebd36f2fbfb501945d0351cc3be38f3b7), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4nnwwc__e,  m4nnwwc,    "cf302d.p1",        0x0000, 0x010000, CRC(b52d5b47) SHA1(1583963b0bac1288bd20ed0550ad793be0980b03), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4nnwwc__f,  m4nnwwc,    "cf302dk.p1",       0x0000, 0x010000, CRC(c3d4c74d) SHA1(9a34c1f2fabb20da17988f63c9190ec4dd0b65fb), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4nnwwc__g,  m4nnwwc,    "cf302dr.p1",       0x0000, 0x010000, CRC(0b25e6b9) SHA1(5fd42abbe985dbdcfe09da50673551330dd26175), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4nnwwc__h,  m4nnwwc,    "cf302dy.p1",       0x0000, 0x010000, CRC(420b47c1) SHA1(0cb1a843cec3ace21d806fe98212250201a72f12), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4nnwwc__i,  m4nnwwc,    "cf302k.p1",        0x0000, 0x010000, CRC(07ca4c45) SHA1(8f6ee3c17527b05a6652845019919d490cc00c64), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4nnwwc__j,  m4nnwwc,    "cf302r.p1",        0x0000, 0x010000, CRC(e09f43bd) SHA1(65dcdf8d223936c4415ddc3f734b83367d6b8db7), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4nnwwc__k,  m4nnwwc,    "cf302s.p1",        0x0000, 0x010000, CRC(7a3e8ead) SHA1(590dc78b98f9928d6fa87ef661234f88dccfdff8), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4nnwwc__l,  m4nnwwc,    "cf302y.p1",        0x0000, 0x010000, CRC(c1063a32) SHA1(e1c8fc463b1a1db87110f272a8727435f9d9b97a), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4nnwwc__m,  m4nnwwc,    "ch302ad.p1",       0x0000, 0x010000, CRC(20405f4e) SHA1(7f87c881f428f704c98b0f4be459980062ccd29a), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4nnwwc__n,  m4nnwwc,    "ch302b.p1",        0x0000, 0x010000, CRC(cf7543ac) SHA1(2fe810741bfc18f800ad8028724218557d93a830), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4nnwwc__o,  m4nnwwc,    "ch302bd.p1",       0x0000, 0x010000, CRC(4c3e5664) SHA1(87a1f2133cad624683dac89f1da85d70b018f846), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4nnwwc__p,  m4nnwwc,    "ch302c.p1",        0x0000, 0x010000, CRC(dcde4d0a) SHA1(d1535f8754d2c0f8183c2c9db97edafdcdfed82e), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4nnwwc__q,  m4nnwwc,    "ch302d.p1",        0x0000, 0x010000, CRC(e1a02108) SHA1(fa8271a1246a3ae1289bb314494743cfec31f4e2), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4nnwwc__r,  m4nnwwc,    "ch302dk.p1",       0x0000, 0x010000, CRC(a3f636af) SHA1(c3de325ef5baa3cccd4c9997e615e87521b9e537), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4nnwwc__s,  m4nnwwc,    "ch302dr.p1",       0x0000, 0x010000, CRC(0620b0c0) SHA1(31aabba5f5b096254908221f884b5088a5a6e883), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4nnwwc__t,  m4nnwwc,    "ch302dy.p1",       0x0000, 0x010000, CRC(9b4b982e) SHA1(c7c9c501eb1c936ffb8bc2fe1fe9258e92b1d548), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4nnwwc__u,  m4nnwwc,    "ch302k.p1",        0x0000, 0x010000, CRC(908d8b10) SHA1(a80a5ce1a83d05f1e68e66d14bacc424bc833aa7), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4nnwwc__v,  m4nnwwc,    "ch302r.p1",        0x0000, 0x010000, CRC(c31c4c28) SHA1(e94c7588211044dae7c5ac587e6232b0ace2fc7b), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 23)" )
-GAME_CUSTOM( 199?, m4nnwwc__w,  m4nnwwc,    "ch302s.p1",        0x0000, 0x010000, CRC(e7d0ceb2) SHA1(b75d58136b9e1e4bfde86730ef4e95bc98494813), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 24)" )
-GAME_CUSTOM( 199?, m4nnwwc__x,  m4nnwwc,    "ch302y.p1",        0x0000, 0x010000, CRC(5e7764c6) SHA1(05a61a57ac906cbea1d72fffd1c8ea707852b895), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 25)" )
-GAME_CUSTOM( 199?, m4nnwwc__y,  m4nnwwc,    "cn302ad.p1",       0x0000, 0x010000, CRC(7a6acd9b) SHA1(9a1f0ed19d66428c6b541ce1c8e169d9b4be3ef1), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 26)" )
-GAME_CUSTOM( 199?, m4nnwwc__z,  m4nnwwc,    "cn302b.p1",        0x0000, 0x010000, CRC(b69cb520) SHA1(7313f2740960ca86ecea8609fe8fd58d84a3248c), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 27)" )
-GAME_CUSTOM( 199?, m4nnwwc__0,  m4nnwwc,    "cn302bd.p1",       0x0000, 0x010000, CRC(ab828a0b) SHA1(53fa6dad9bdae1d46479596c98cf2c3f4454bb95), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 28)" )
-GAME_CUSTOM( 199?, m4nnwwc__1,  m4nnwwc,    "cn302d.p1",        0x0000, 0x010000, CRC(8c6ac365) SHA1(a32b104968aaa4da060072a241a4c54fbdf3c404), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 29)" )
-GAME_CUSTOM( 199?, m4nnwwc__2,  m4nnwwc,    "cn302dk.p1",       0x0000, 0x010000, CRC(24cbab96) SHA1(77fe3b21fc9470653bada31c700ce926d55ce82e), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 30)" )
-GAME_CUSTOM( 199?, m4nnwwc__3,  m4nnwwc,    "cn302dr.p1",       0x0000, 0x010000, CRC(09069f0e) SHA1(68b2a34644ee1fca3ce5191e2f25aa808b85fb09), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 31)" )
-GAME_CUSTOM( 199?, m4nnwwc__4,  m4nnwwc,    "cn302dy.p1",       0x0000, 0x010000, CRC(946db7e0) SHA1(fe29c1da478e3f1a53ad55c661ddcc7003679304), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 32)" )
-GAME_CUSTOM( 199?, m4nnwwc__5,  m4nnwwc,    "cn302k.p1",        0x0000, 0x010000, CRC(7a3202f1) SHA1(2dd5e8195120b1efc3eb51214cf054432fc50aed), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 33)" )
-GAME_CUSTOM( 199?, m4nnwwc__6,  m4nnwwc,    "cn302r.p1",        0x0000, 0x010000, CRC(e7cf9e1e) SHA1(66a1e54fc928c09d16f7ac1c002685eee841315f), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 34)" )
-GAME_CUSTOM( 199?, m4nnwwc__7,  m4nnwwc,    "cn302s.p1",        0x0000, 0x010000, CRC(87703a1a) SHA1(6582ffa42a61b60e92e456a794c4c219a9901a1c), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 35)" )
-GAME_CUSTOM( 199?, m4nnwwc__8,  m4nnwwc,    "cn302y.p1",        0x0000, 0x010000, CRC(7aa4b6f0) SHA1(2c185a9a7c8a4957fb5901305883661c41cb0cb4), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 36)" )
-GAME_CUSTOM( 199?, m4nnwwc__9,  m4nnwwc,    "cnc03s.p1",        0x0000, 0x010000, CRC(57a03b29) SHA1(52cc8eb3f02c4a812de06ceec0588ca930e07876), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 37)" )
-GAME_CUSTOM( 199?, m4nnwwc__aa, m4nnwwc,    "cl__x__x.2_0",     0x0000, 0x010000, CRC(c3de4791) SHA1(220d32b961b6710d508c0c7e6b2d8e4d292746f4), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 38)" )
-GAME_CUSTOM( 199?, m4nnwwc__ab, m4nnwwc,    "cl__x_dx.2_0",     0x0000, 0x010000, CRC(c79833f8) SHA1(b3519b55f6f2a4f081b69483ac0b8860aa8190d9), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 39)" )
-GAME_CUSTOM( 199?, m4nnwwc__ac, m4nnwwc,    "cl__xa_x.2_0",     0x0000, 0x010000, CRC(4c3021a1) SHA1(7e7258808dd1693adb956a5e6b076f925eb0a026), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 40)" )
-GAME_CUSTOM( 199?, m4nnwwc__ad, m4nnwwc,    "cl__xb_x.2_0",     0x0000, 0x010000, CRC(75a5add7) SHA1(6802ec81b4ebcde9ed014a0440fdc50211a8a350), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 41)" )
-
+// "(C)1998  B.W.B." and "SS2 1.0"
+GAME_CUSTOM( 199?, m4rhr__9,  m4rhr,  "rhr2pprg.bin",     0x0000, 0x010000, CRC(f97047b2) SHA1(d3ed8c93e405f9e7448b3924ff9aa84223b76046), "Bwb","Red Hot Roll (Barcrest) (MPU4) (SS2 1.0, hack?)" )
+// "(C)2000    BWB" and "RHR 5.0"
+GAME_CUSTOM( 199?, m4rhr__a2, m4rhr,  "cr__x__x.5_0",     0x0000, 0x010000, CRC(278fe91e) SHA1(dcfed3a7796d1ee365e535115b66c7d6cbe0ab74), "Bwb","Red Hot Roll (Barcrest) (MPU4) (RHR 5.0)" )
+// "(C)1998    BWB" and "RHR 2.0"
+GAME_CUSTOM( 199?, m4rhr__a3, m4rhr,  "cr__x_dx.2_0",     0x0000, 0x010000, CRC(73fb120c) SHA1(4c0f39253dee9b528763a9cb609dec31e8529713), "Bwb","Red Hot Roll (Barcrest) (MPU4) (RHR 2.0)" )
+// "RONNIE   BARKER" and "RH8 0.1"
+GAME_CUSTOM( 199?, m4rhr__6,  m4rhr,  "rhr10",            0x0000, 0x010000, CRC(2a18a033) SHA1(add907c5ab155c28142dcee57825059715afd80d), "hack","Red Hot Roll (Barcrest) (MPU4) (RH8 0.1, hack, set 1)" )
+GAME_CUSTOM( 199?, m4rhr__7,  m4rhr,  "rhr2015",          0x0000, 0x010000, CRC(dbfd3b95) SHA1(4fc7ae32f7d76be3d3d07d627391884bd4d6de09), "hack","Red Hot Roll (Barcrest) (MPU4) (RH8 0.1, hack, set 2)" )
+// no copyright and "RHT 0.3"
+GAME_CUSTOM( 199?, m4rhr__8,  m4rhr,  "rhr2515",          0x0000, 0x010000, CRC(e4554c23) SHA1(6d977beb282fd638de3457e467e842ce79b5be7c), "hack","Red Hot Roll (Barcrest) (MPU4) (RHT 0.3, hack)" )
 
 
 #define M4RHRC_EXTRA_ROMS \
@@ -2575,8 +2582,9 @@ GAME_CUSTOM( 199?, m4nnwwc__ad, m4nnwwc,    "cl__xb_x.2_0",     0x0000, 0x010000
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-
-GAME_CUSTOM( 199?, m4rhrc,       0,      "cld03ad.p1",       0x0000, 0x010000, CRC(821fde63) SHA1(61f77eeb01331e735cc8c736526d09371e6bdf56), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 1)" )
+// "(C)1991 BARCREST" and "CRU 0.3" (CLD 0.3 on startup)
+GAME_CUSTOM( 199?, m4rhrc,       0,      "cld03s.p1",        0x0000, 0x010000, CRC(03f8a6bf) SHA1(29ee59fd60d89fca0f236be8b4c12c885db032e7), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (CLD 0.3 / CRU 0.3)" )
+GAME_CUSTOM( 199?, m4rhrc__j,    m4rhrc, "cld03ad.p1",       0x0000, 0x010000, CRC(821fde63) SHA1(61f77eeb01331e735cc8c736526d09371e6bdf56), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4rhrc__a,    m4rhrc, "cld03b.p1",        0x0000, 0x010000, CRC(c67a2e82) SHA1(b76110c73d5bd0290fdd31d8300914f63a56c25e), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4rhrc__b,    m4rhrc, "cld03bd.p1",       0x0000, 0x010000, CRC(0995fd93) SHA1(c3cc84f78adc54f4698280bf7d0831bb54c3fc3f), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4rhrc__c,    m4rhrc, "cld03c.p1",        0x0000, 0x010000, CRC(6e7b319f) SHA1(3da4feb72cb9d4ee24a8e0568f8d9c80a71caf9b), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 4)" )
@@ -2586,8 +2594,9 @@ GAME_CUSTOM( 199?, m4rhrc__f,    m4rhrc, "cld03dr.p1",       0x0000, 0x010000, C
 GAME_CUSTOM( 199?, m4rhrc__g,    m4rhrc, "cld03dy.p1",       0x0000, 0x010000, CRC(ed519095) SHA1(ac174166bf2cc6ab81f9782f1be4a9fbe226f34d), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 8)" )
 GAME_CUSTOM( 199?, m4rhrc__h,    m4rhrc, "cld03k.p1",        0x0000, 0x010000, CRC(3bad05a9) SHA1(1b00ac52f6c87b5c79088b6fc3e6d00f57876ebc), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 9)" )
 GAME_CUSTOM( 199?, m4rhrc__i,    m4rhrc, "cld03r.p1",        0x0000, 0x010000, CRC(2de70bdc) SHA1(d8d0170ca71fde4c79d0b465d09d4bb31acf40cf), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4rhrc__j,    m4rhrc, "cld03s.p1",        0x0000, 0x010000, CRC(03f8a6bf) SHA1(29ee59fd60d89fca0f236be8b4c12c885db032e7), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 11)" )
 GAME_CUSTOM( 199?, m4rhrc__k,    m4rhrc, "cld03y.p1",        0x0000, 0x010000, CRC(b08c2332) SHA1(1cdf7fc0e95a50766df2d1cd51cb803b922c30c8), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 12)" )
+// "(C)1991 BARCREST" and "CR4 0.3" (HHN 0.3 on startup)
+GAME_CUSTOM( 199?, m4rhrc__v,    m4rhrc, "hhn03s.p1",        0x0000, 0x010000, CRC(b531ae78) SHA1(87d043541c23b88b8ec4067c67be77812095faaa), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (HHN 0.3 / CR4 0.3)" )
 GAME_CUSTOM( 199?, m4rhrc__l,    m4rhrc, "hhn03ad.p1",       0x0000, 0x010000, CRC(e7da568e) SHA1(00f9eecd06131bc5770a6ab650b3548f5b7a8c15), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 13)" )
 GAME_CUSTOM( 199?, m4rhrc__m,    m4rhrc, "hhn03b.p1",        0x0000, 0x010000, CRC(406e47cd) SHA1(193aed33ac62eb04d89cf63beb33e8e4e28e286e), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 14)" )
 GAME_CUSTOM( 199?, m4rhrc__n,    m4rhrc, "hhn03bd.p1",       0x0000, 0x010000, CRC(66aed369) SHA1(6c3151790292a277a1d44a1fceae985e52014749), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 15)" )
@@ -2598,8 +2607,9 @@ GAME_CUSTOM( 199?, m4rhrc__r,    m4rhrc, "hhn03dr.p1",       0x0000, 0x010000, C
 GAME_CUSTOM( 199?, m4rhrc__s,    m4rhrc, "hhn03dy.p1",       0x0000, 0x010000, CRC(15c8a1b5) SHA1(5a2f28f290fa087b5010f778d4ad8d6c63a3d13e), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 20)" )
 GAME_CUSTOM( 199?, m4rhrc__t,    m4rhrc, "hhn03k.p1",        0x0000, 0x010000, CRC(95450230) SHA1(3c1c239e84a89ef6acd44ac9c81d33021ac6b0e3), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 21)" )
 GAME_CUSTOM( 199?, m4rhrc__u,    m4rhrc, "hhn03r.p1",        0x0000, 0x010000, CRC(d96d6825) SHA1(89c3f5494d97326369f10c982842310592456874), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4rhrc__v,    m4rhrc, "hhn03s.p1",        0x0000, 0x010000, CRC(b531ae78) SHA1(87d043541c23b88b8ec4067c67be77812095faaa), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 23)" )
 GAME_CUSTOM( 199?, m4rhrc__w,    m4rhrc, "hhn03y.p1",        0x0000, 0x010000, CRC(440640cb) SHA1(de6b6edcdc99aaa0122ecd24a9a7437e6b44aad2), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 24)" )
+// "(C)1991 BARCREST" and "CR4 0.3" (RRD 0.3 on startup)
+GAME_CUSTOM( 199?, m4rhrc__7,    m4rhrc, "rrd03s.p1",        0x0000, 0x010000, CRC(e59b79dd) SHA1(32e515bdc861a4d548caedd56a1825c91a318a34), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (RRD 0.3 / CR4 0.3)" )
 GAME_CUSTOM( 199?, m4rhrc__x,    m4rhrc, "rrd03ad.p1",       0x0000, 0x010000, CRC(6f49d7d1) SHA1(2195a3ad4836e8ffd2e7e6a90e94319d5a5a0ce8), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 25)" )
 GAME_CUSTOM( 199?, m4rhrc__y,    m4rhrc, "rrd03b.p1",        0x0000, 0x010000, CRC(e8447a3d) SHA1(8bf5936782e0fbec25a8ef892b8df04b6543bc74), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 26)" )
 GAME_CUSTOM( 199?, m4rhrc__z,    m4rhrc, "rrd03bd.p1",       0x0000, 0x010000, CRC(52cf0357) SHA1(ab4668df6d5ad9614410aede7ad4e030283b78ca), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 27)" )
@@ -2610,9 +2620,203 @@ GAME_CUSTOM( 199?, m4rhrc__3,    m4rhrc, "rrd03dr.p1",       0x0000, 0x010000, C
 GAME_CUSTOM( 199?, m4rhrc__4,    m4rhrc, "rrd03dy.p1",       0x0000, 0x010000, CRC(b60b6e51) SHA1(eb6ed1de44d7c982ac8aa0621d4c1ed8e41db5de), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 32)" )
 GAME_CUSTOM( 199?, m4rhrc__5,    m4rhrc, "rrd03k.p1",        0x0000, 0x010000, CRC(31adc6d6) SHA1(ea68d0d13978bf6cfa7fb9aa1cf91ddfd6258a3a), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 33)" )
 GAME_CUSTOM( 199?, m4rhrc__6,    m4rhrc, "rrd03r.p1",        0x0000, 0x010000, CRC(11c61483) SHA1(66cd30096bca2f4356acaaa15179c00301c8bc3a), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 34)" )
-GAME_CUSTOM( 199?, m4rhrc__7,    m4rhrc, "rrd03s.p1",        0x0000, 0x010000, CRC(e59b79dd) SHA1(32e515bdc861a4d548caedd56a1825c91a318a34), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 35)" )
 GAME_CUSTOM( 199?, m4rhrc__8,    m4rhrc, "rrd03y.p1",        0x0000, 0x010000, CRC(66fff07a) SHA1(586279533d6d85abf7e97124c9c5342a6a1b0496), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 36)" )
-GAME_CUSTOM( 199?, m4rhrc__aa,   m4rhrc, "cr__x_dx.5_0",     0x0000, 0x010000, CRC(4bcf5c02) SHA1(603935880c87f86e7bc765c176266c1c08a6114f), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 38)" )
+// "(C)2000    BWB" and "RHR 5.0"
+GAME_CUSTOM( 199?, m4rhrc__aa,   m4rhrc, "cr__x_dx.5_0",     0x0000, 0x010000, CRC(4bcf5c02) SHA1(603935880c87f86e7bc765c176266c1c08a6114f), "Bwb","Red Hot Roll Classic (Barcrest) (MPU4) (RHR 5.0)" )
+
+
+
+#define M4UUAW_EXTRA_ROMS \
+	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_LOAD( "uuasnd.p1", 0x00000, 0x080000, CRC(be1a1131) SHA1(b7f50d8db6b7d134757e0746e7d9faf9fd3a2c7e) ) \
+	ROM_LOAD( "uuasnd.p2", 0x080000, 0x080000, CRC(c8492b3a) SHA1(d390e37f4a62869079bb38395a2e86a5ad24392f) )
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4UUAW_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
+
+// "(C)1993 BARCREST" and "UPS 2.1"
+GAME_CUSTOM( 199?, m4uuaw,       0,      "ups21s.p1",    0x0000, 0x020000, CRC(c4a8a542) SHA1(61063d55c6017cf17d704df576cb62da5bd75820), "Barcrest","Up Up and Away (Barcrest) (MPU4) (UPS 2.1)" )
+GAME_CUSTOM( 199?, m4uuaw__n,    m4uuaw, "uua21h.p1",    0x0000, 0x020000, CRC(199e6dae) SHA1(ecd95ba2c2255afbaa8df96d625a8bfc97e4d3bc), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 1)" )
+GAME_CUSTOM( 199?, m4uuaw__c,    m4uuaw, "ups21ad.p1",   0x0000, 0x020000, CRC(c19fa891) SHA1(c2772ec20a65ce999d901e8c873ec687113b18d4), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4uuaw__d,    m4uuaw, "ups21b.p1",    0x0000, 0x020000, CRC(01320407) SHA1(a3273c59733e42013c3448b2a5c7c575ec0182b9), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4uuaw__e,    m4uuaw, "ups21bd.p1",   0x0000, 0x020000, CRC(2fa3cb8a) SHA1(8df994ce93fc6f0df27a6ee73676d9ee73593091), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4uuaw__f,    m4uuaw, "ups21d.p1",    0x0000, 0x020000, CRC(2a8db1a6) SHA1(873ab3757920c9153c1542748a74b36ce5e190c2), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4uuaw__g,    m4uuaw, "ups21dh.p1",   0x0000, 0x020000, CRC(7bcfbb46) SHA1(b93dfa71e3ec0ea96eaf2db4cd382b0a2852a1ff), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 8)" )
+GAME_CUSTOM( 199?, m4uuaw__h,    m4uuaw, "ups21dk.p1",   0x0000, 0x020000, CRC(0642ae02) SHA1(8898341f8dc4f4c8c45ce6d04a01bd919cb0548a), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 9)" )
+GAME_CUSTOM( 199?, m4uuaw__i,    m4uuaw, "ups21dr.p1",   0x0000, 0x020000, CRC(b54d1533) SHA1(1f9220342dcab675b04895f69a7ca75579ba729f), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 10)" )
+GAME_CUSTOM( 199?, m4uuaw__j,    m4uuaw, "ups21dy.p1",   0x0000, 0x020000, CRC(4c850654) SHA1(21f386060301adef646fe469c1fcfb002d3e3424), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 11)" )
+GAME_CUSTOM( 199?, m4uuaw__k,    m4uuaw, "ups21h.p1",    0x0000, 0x020000, CRC(555e74cb) SHA1(14246b54839eb334576a119d7c87901f3b2f25ad), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 12)" )
+GAME_CUSTOM( 199?, m4uuaw__l,    m4uuaw, "ups21k.p1",    0x0000, 0x020000, CRC(28d3618f) SHA1(186337119e4b663dadc129533ce8a913013390a9), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 13)" )
+GAME_CUSTOM( 199?, m4uuaw__m,    m4uuaw, "ups21r.p1",    0x0000, 0x020000, CRC(9bdcdabe) SHA1(db0bb90705abec92a220a3dbe0ea69266d5e0558), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 14)" )
+GAME_CUSTOM( 199?, m4uuaw__o,    m4uuaw, "ups21y.p1",    0x0000, 0x020000, CRC(6214c9d9) SHA1(d25fecc9798e342207d358a54efad1908c0e2247), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 16)" )
+// "(C)1993 BARCREST" and "UPS 2.2"
+GAME_CUSTOM( 199?, m4uuaw__0,    m4uuaw, "ups22s.p1",    0x0000, 0x020000, CRC(ac990aa9) SHA1(396c9eded9c18ab2bcb0f4066a890f6e239830f1), "Barcrest","Up Up and Away (Barcrest) (MPU4) (UPS 2.2)" )
+GAME_CUSTOM( 199?, m4uuaw__p,    m4uuaw, "ups22ad.p1",   0x0000, 0x020000, CRC(ee0f53a6) SHA1(eabe58efa82015eb2266a793853e8ade546d6da1), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 17)" )
+GAME_CUSTOM( 199?, m4uuaw__q,    m4uuaw, "ups22b.p1",    0x0000, 0x020000, CRC(e7dbf5ae) SHA1(0fbbc3da1af8b60993a7f6082bd5e96da21cd0b8), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 18)" )
+GAME_CUSTOM( 199?, m4uuaw__r,    m4uuaw, "ups22bd.p1",   0x0000, 0x020000, CRC(003330bd) SHA1(42ad6ddfd7639909151dcee5e40e82a23074fd59), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 19)" )
+GAME_CUSTOM( 199?, m4uuaw__s,    m4uuaw, "ups22d.p1",    0x0000, 0x020000, CRC(cc64400f) SHA1(0ff7858c637fbb43a7cd1313bbf046177e4b7761), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 20)" )
+GAME_CUSTOM( 199?, m4uuaw__t,    m4uuaw, "ups22dh.p1",   0x0000, 0x020000, CRC(545f4071) SHA1(3947499d78d31fb0b269a63a518790b503a97685), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 21)" )
+GAME_CUSTOM( 199?, m4uuaw__u,    m4uuaw, "ups22dk.p1",   0x0000, 0x020000, CRC(29d25535) SHA1(7f053741d12cce467dd437ea998064e13d1ca52b), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 22)" )
+GAME_CUSTOM( 199?, m4uuaw__v,    m4uuaw, "ups22dr.p1",   0x0000, 0x020000, CRC(9addee04) SHA1(45c15536c8846da825a994a667b6e46598c1642e), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 23)" )
+GAME_CUSTOM( 199?, m4uuaw__w,    m4uuaw, "ups22dy.p1",   0x0000, 0x020000, CRC(6315fd63) SHA1(9a5fcab51d4e94b96669149285dda28cd41020b8), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 24)" )
+GAME_CUSTOM( 199?, m4uuaw__x,    m4uuaw, "ups22h.p1",    0x0000, 0x020000, CRC(b3b78562) SHA1(3e75fa20156faa3d38c2b5ac824bffe47e72b7bc), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 25)" )
+GAME_CUSTOM( 199?, m4uuaw__y,    m4uuaw, "ups22k.p1",    0x0000, 0x020000, CRC(ce3a9026) SHA1(80977176c5bae809a564f4fc0e3d6370f91f829b), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 26)" )
+GAME_CUSTOM( 199?, m4uuaw__z,    m4uuaw, "ups22r.p1",    0x0000, 0x020000, CRC(7d352b17) SHA1(d2d1d016a587be318e9018eb1953e68fe83620df), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 27)" )
+GAME_CUSTOM( 199?, m4uuaw__1,    m4uuaw, "ups22y.p1",    0x0000, 0x020000, CRC(84fd3870) SHA1(8d294ae1a92d1e99c4c3f17a2d77fe1d994b2c33), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 29)" )
+// "(C)1993 BARCREST" and "UUA 2.1"
+GAME_CUSTOM( 199?, m4uuaw__ac,   m4uuaw, "uua21s.p1",    0x0000, 0x020000, CRC(27c46fcc) SHA1(68a03fcce5d8155d6c0115d813c17217c4120375), "Barcrest","Up Up and Away (Barcrest) (MPU4) (UUA 2.1)" )
+GAME_CUSTOM( 199?, m4uuaw__2,    m4uuaw, "uua21ad.p1",   0x0000, 0x020000, CRC(2a18c292) SHA1(5853cb069eb5caa23372e5dedd33868103125780), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 30)" )
+GAME_CUSTOM( 199?, m4uuaw__3,    m4uuaw, "uua21b.p1",    0x0000, 0x020000, CRC(d71cc3db) SHA1(7d783110341237769165a08fd86f597225f8d90c), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 31)" )
+GAME_CUSTOM( 199?, m4uuaw__4,    m4uuaw, "uua21bd.p1",   0x0000, 0x020000, CRC(f04323be) SHA1(194c996d4c8e2fed2bcb02e29423e68b53900a1f), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 32)" )
+GAME_CUSTOM( 199?, m4uuaw__5,    m4uuaw, "uua21d.p1",    0x0000, 0x020000, CRC(664da8c3) SHA1(c93b0b5e796fcde0850e2b3054f1db0417f4e9ed), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 33)" )
+GAME_CUSTOM( 199?, m4uuaw__6,    m4uuaw, "uua21dh.p1",   0x0000, 0x020000, CRC(3ec18dcb) SHA1(fb5fe8ba0b59a21401cf091f43ad9f2a4df3447c), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 34)" )
+GAME_CUSTOM( 199?, m4uuaw__7,    m4uuaw, "uua21dk.p1",   0x0000, 0x020000, CRC(84919e1c) SHA1(c7315a3d1985180ec5ae1f4e5c7f0c99c1e0bac4), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 35)" )
+GAME_CUSTOM( 199?, m4uuaw__8,    m4uuaw, "uua21dr.p1",   0x0000, 0x020000, CRC(434c988f) SHA1(eb6126048df5bc4ff98d9838a3bb6cf24a9ab895), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 36)" )
+GAME_CUSTOM( 199?, m4uuaw__9,    m4uuaw, "uua21dy.p1",   0x0000, 0x020000, CRC(098b30d9) SHA1(48daa77f3aafdcd52d7291cdda533e8a9428de0e), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 37)" )
+GAME_CUSTOM( 199?, m4uuaw__aa,   m4uuaw, "uua21k.p1",    0x0000, 0x020000, CRC(a3ce7e79) SHA1(8670d2cb7281ccabc15c5288a3e0dd99cfc1ae36), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 38)" )
+GAME_CUSTOM( 199?, m4uuaw__ab,   m4uuaw, "uua21r.p1",    0x0000, 0x020000, CRC(641378ea) SHA1(de0282af6a17c7fc16c7eca10e81ffb208675779), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 39)" )
+GAME_CUSTOM( 199?, m4uuaw__ad,   m4uuaw, "uua21y.p1",    0x0000, 0x020000, CRC(2ed4d0bc) SHA1(ffb0585e729b389855d24015e1ef7582eab88d3e), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 41)" )
+// "(C)1993 BARCREST" and "UUA 2.2"
+GAME_CUSTOM( 199?, m4uuaw__ap,   m4uuaw, "uua22s.p1",    0x0000, 0x020000, CRC(65f57c0c) SHA1(7b2526cdd1ec973a91bc7ade116e16e03b32596a), "Barcrest","Up Up and Away (Barcrest) (MPU4) (UUA 2.2)" )
+GAME_CUSTOM( 199?, m4uuaw__ae,   m4uuaw, "uua22ad.p1",   0x0000, 0x020000, CRC(b2ace4d5) SHA1(da02abe111fea3fbfb9495e9b447139cd67a61e0), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 42)" )
+GAME_CUSTOM( 199?, m4uuaw__af,   m4uuaw, "uua22b.p1",    0x0000, 0x020000, CRC(71a6374a) SHA1(c14ed22fceb83b5ac72021322c9b8bb3d5afeffb), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 43)" )
+GAME_CUSTOM( 199?, m4uuaw__ag,   m4uuaw, "uua22bd.p1",   0x0000, 0x020000, CRC(68f705f9) SHA1(678ba97241f3dede96239265eed418d4717637a6), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 44)" )
+GAME_CUSTOM( 199?, m4uuaw__ah,   m4uuaw, "uua22d.p1",    0x0000, 0x020000, CRC(c0f75c52) SHA1(a4e1e496b0cbb24767f017fbe228fbb8ab2bb907), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 45)" )
+GAME_CUSTOM( 199?, m4uuaw__ai,   m4uuaw, "uua22dh.p1",   0x0000, 0x020000, CRC(a675ab8c) SHA1(37fb437b95f9ff50fe41ebce825e3dd1b361925e), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 46)" )
+GAME_CUSTOM( 199?, m4uuaw__aj,   m4uuaw, "uua22dk.p1",   0x0000, 0x020000, CRC(1c25b85b) SHA1(b42cdae2e2c00644376eb5f0c5b7567d3811b162), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 47)" )
+GAME_CUSTOM( 199?, m4uuaw__ak,   m4uuaw, "uua22dr.p1",   0x0000, 0x020000, CRC(dbf8bec8) SHA1(b3ac5ed5b8cbc0457e5dfadefcab563e3197b045), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 48)" )
+GAME_CUSTOM( 199?, m4uuaw__al,   m4uuaw, "uua22dy.p1",   0x0000, 0x020000, CRC(913f169e) SHA1(9f82f5d868a9be046ced838f8b53730140ed50b2), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 49)" )
+GAME_CUSTOM( 199?, m4uuaw__am,   m4uuaw, "uua22h.p1",    0x0000, 0x020000, CRC(bf24993f) SHA1(618d6d2f2b762d61eb58087a3597ffb709658631), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 50)" )
+GAME_CUSTOM( 199?, m4uuaw__an,   m4uuaw, "uua22k.p1",    0x0000, 0x020000, CRC(05748ae8) SHA1(d9aeee26c8471bb6ee58a4a838e5c9930da92725), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 51)" )
+GAME_CUSTOM( 199?, m4uuaw__ao,   m4uuaw, "uua22r.p1",    0x0000, 0x020000, CRC(c2a98c7b) SHA1(115f7c7a4b9eab5f3270f43a2db7a320dfc4e223), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 52)" )
+GAME_CUSTOM( 199?, m4uuaw__aq,   m4uuaw, "uua22y.p1",    0x0000, 0x020000, CRC(886e242d) SHA1(4b49b70fc2635fcf7b538b35b42a358cf4dd60b3), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 54)" )
+// no copyright string and "UUA 2.0"
+GAME_CUSTOM( 199?, m4uuaw__a,    m4uuaw, "upa15g",       0x0000, 0x020000, CRC(d20b8b92) SHA1(6fcddc781c204dfd34de2c4e4ce0ec35fb3ec4e0), "hack","Up Up and Away (Barcrest) (MPU4) (UUA 2.0, hack)" )
+// no copyright string and "UPS 2.0"
+GAME_CUSTOM( 199?, m4uuaw__b,    m4uuaw, "upa15t",       0x0000, 0x020000, CRC(85e3e82a) SHA1(e90183fab082f159d76ea14da794d52ee6ab8200), "hack","Up Up and Away (Barcrest) (MPU4) (UPS 2.0, hack)" )
+
+
+#define M4RICHFM_EXTRA_ROMS \
+	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_LOAD( "rfamouss1.hex", 0x000000, 0x080000, CRC(b237c8b8) SHA1(b2322d68fe57cca0ed49b01ae0d3a0e93a623eac) ) \
+	ROM_LOAD( "rfamouss2.hex", 0x080000, 0x080000, CRC(12c295d5) SHA1(0758354cfb5242b4ce3f5f25c3458d91f4b4a1ec) )
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4RICHFM_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
+
+// "(C)1993 BARCREST" and "RFT 0.2"
+GAME_CUSTOM( 199?, m4richfm,       0,          "rfts.p1",      0x0000, 0x010000, CRC(2a747164) SHA1(a4c8e160f09ebea4fca6dd32ff020d3f1a4f1a1c), "Barcrest","Rich & Famous (Barcrest) (MPU4) (RFT 0.2)" )
+GAME_CUSTOM( 199?, m4richfm__r,    m4richfm,   "rftad.p1",     0x0000, 0x010000, CRC(8553386f) SHA1(ad834d52e51c7f375a370dc6d8586668921a9795), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 19)" )
+GAME_CUSTOM( 199?, m4richfm__s,    m4richfm,   "rftb.p1",      0x0000, 0x010000, CRC(0189cc2f) SHA1(62ccc85c50c56aa2e0bcbb42b5c24d402f00d366), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 20)" )
+GAME_CUSTOM( 199?, m4richfm__t,    m4richfm,   "rftbd.p1",     0x0000, 0x010000, CRC(08351e03) SHA1(d08d38d46793828b147ccde8121fbb9bf422cd60), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 21)" )
+GAME_CUSTOM( 199?, m4richfm__u,    m4richfm,   "rftd.p1",      0x0000, 0x010000, CRC(689f02ed) SHA1(1a30aac5454b0c477a698e9c573fe313bc1fe858), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 22)" )
+GAME_CUSTOM( 199?, m4richfm__v,    m4richfm,   "rftdk.p1",     0x0000, 0x010000, CRC(098b88f5) SHA1(4559b561380055c429a5b4741326f64ad89d8481), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 23)" )
+GAME_CUSTOM( 199?, m4richfm__w,    m4richfm,   "rftdy.p1",     0x0000, 0x010000, CRC(26b912f8) SHA1(1719d63b4a25293199b0729235beb5b93c484490), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 24)" )
+GAME_CUSTOM( 199?, m4richfm__x,    m4richfm,   "rftk.p1",      0x0000, 0x010000, CRC(6a48bd98) SHA1(2f17194869ca008f7a2eb622bd3725bc91950a17), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 25)" )
+GAME_CUSTOM( 199?, m4richfm__y,    m4richfm,   "rfty.p1",      0x0000, 0x010000, CRC(723fe46e) SHA1(51bb8aff358d527483eaf1b1e20606d94a937dc6), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 26)" )
+// "(C)1993 BARCREST" and "RAF 0.3"
+GAME_CUSTOM( 199?, m4richfm__c,    m4richfm,   "rafs.p1",      0x0000, 0x010000, CRC(f312b2e3) SHA1(8bf2cb7b73cfc320143d05d25e28c15fb4f26045), "Barcrest","Rich & Famous (Barcrest) (MPU4) (RAF 0.3)" )
+GAME_CUSTOM( 199?, m4richfm__a,    m4richfm,   "rafc.p1",      0x0000, 0x010000, CRC(d92f602f) SHA1(c93131138deb4018d499b9b45c07d4517c5072b7), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4richfm__b,    m4richfm,   "rafd.p1",      0x0000, 0x010000, CRC(b0e9f470) SHA1(cad080a5d7f24968524fe10f6c43b088f35d7364), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4richfm__d,    m4richfm,   "rafy.p1",      0x0000, 0x010000, CRC(a8812d45) SHA1(c0b89833f87ed90eb3e9c3299fcea362d501ed90), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 5)" )
+// "(C)1993 BARCREST" and "RF5 0.2"
+GAME_CUSTOM( 199?, m4richfm__m,    m4richfm,   "rf5s.p1",      0x0000, 0x010000, CRC(8d1ed193) SHA1(a4ca973dac8a8fd550bf7e57a8cdc627c28da4b8), "Barcrest","Rich & Famous (Barcrest) (MPU4) (RF5 0.2)" )
+GAME_CUSTOM( 199?, m4richfm__f,    m4richfm,   "rf5ad.p1",     0x0000, 0x010000, CRC(cd280292) SHA1(605d89608e106979229a00701a2e5b578df50d60), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4richfm__g,    m4richfm,   "rf5b.p1",      0x0000, 0x010000, CRC(e1edf753) SHA1(677f0397ec57422241f4669be610cffd33a9b44a), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 8)" )
+GAME_CUSTOM( 199?, m4richfm__h,    m4richfm,   "rf5bd.p1",     0x0000, 0x010000, CRC(2d698365) SHA1(7f91cee0d34550aba9ac0f4ee398df4de6fd6f7e), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 9)" )
+GAME_CUSTOM( 199?, m4richfm__i,    m4richfm,   "rf5d.p1",      0x0000, 0x010000, CRC(034cab0b) SHA1(79eaeb84377dbb8e6bda1dd2ae29a1f79656b9e4), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 10)" )
+GAME_CUSTOM( 199?, m4richfm__j,    m4richfm,   "rf5dk.p1",     0x0000, 0x010000, CRC(14fc0f13) SHA1(a2b294da18c3f5bc9c81eb3f3af5ab5ca58c9cad), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 11)" )
+GAME_CUSTOM( 199?, m4richfm__k,    m4richfm,   "rf5dy.p1",     0x0000, 0x010000, CRC(a2664c64) SHA1(2256b6e0d6472faa901348cb5be849ad012f1d16), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 12)" )
+GAME_CUSTOM( 199?, m4richfm__l,    m4richfm,   "rf5k.p1",      0x0000, 0x010000, CRC(d8787b25) SHA1(885ac7ddd3de4cb475539d02aefbf38fed7c1f2c), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 13)" )
+GAME_CUSTOM( 199?, m4richfm__n,    m4richfm,   "rf5y.p1",      0x0000, 0x010000, CRC(ad288548) SHA1(a7222ab5bffe8e5e0844f8e6f13e09afe74b08a8), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 15)" )
+// "(C)1993 BARCREST" and "RF8 0.1"
+GAME_CUSTOM( 199?, m4richfm__o,    m4richfm,   "rf8b.p1",      0x0000, 0x010000, CRC(105c24e1) SHA1(cb417976a74441bf2ca888198b57fed81d758c15), "Barcrest","Rich & Famous (Barcrest) (MPU4) (RF8 0.1B)" )
+GAME_CUSTOM( 199?, m4richfm__p,    m4richfm,   "rf8c.p1",      0x0000, 0x010000, CRC(8924a706) SHA1(abb1a1f6cdeb15884dfa63fc04882f794453d4ec), "Barcrest","Rich & Famous (Barcrest) (MPU4) (RF8 0.1C)" )
+// "(C)1993 BARCREST" and "RFT 0.2" but hack
+GAME_CUSTOM( 199?, m4richfm__q,    m4richfm,   "rft20.10",     0x0000, 0x010000, CRC(41e6ef75) SHA1(d836fdea5a89b845687d2ff929365bd81737c760), "Barcrest","Rich & Famous (Barcrest) (MPU4) (RFT 0.2, hack, set 1)" )
+GAME_CUSTOM( 199?, m4richfm__z,    m4richfm,   "rich2010",     0x0000, 0x010000, CRC(baecbdbc) SHA1(5fffecf3c91e832d3cfc13dbf5e6b74fc3d6a146), "Barcrest","Rich & Famous (Barcrest) (MPU4) (RFT 0.2, hack, set 2)" )
+// "(C)1997  B.W.B." and "RFC 1.3"
+GAME_CUSTOM( 199?, m4richfm__0,    m4richfm,   "r&f5.10",      0x0000, 0x010000, CRC(45d493d0) SHA1(9a549821a005fa65c2eb8b35c5f15659bd897519), "Bwb","Rich & Famous (Barcrest) (MPU4) (RFC 1.3)" )
+// "(C)1997  B.W.B." and "RF4 1.1"
+GAME_CUSTOM( 199?, m4richfm__1,    m4richfm,   "r&f5.4",       0x0000, 0x010000, CRC(0441d833) SHA1(361910fd64bc7291f6200fe354c468d16e7d6c80), "Bwb","Rich & Famous (Barcrest) (MPU4) (RF4 1.1)" )
+// "(C)1997  B.W.B." and "RF8 1.2"
+GAME_CUSTOM( 199?, m4richfm__2,    m4richfm,   "r&f5.8t",      0x0000, 0x010000, CRC(525e2520) SHA1(84b2ff86d6a54ebb3bcf0138930b2619a8733161), "Bwb","Rich & Famous (Barcrest) (MPU4) (RF8 1.2)" )
+// "1997  COCO" and "RF4 1.1"
+GAME_CUSTOM( 199?, m4richfm__3,    m4richfm,   "r&f55",        0x0000, 0x010000, CRC(6095a72b) SHA1(af25f7c2fb5241064ea995d35fe4fd2f242e3750), "hack","Rich & Famous (Barcrest) (MPU4) (RF4 1.1, hack)" )
+// bad dump (most of the rom is missing) but doesn't seem a 100% match for a set we have a complete dump of
+GAME_CUSTOM( 199?, m4richfm__e,    m4richfm,   "rchfam8",      0x0000, 0x004000, CRC(55f16698) SHA1(9853b17bbb81371192a564376be7b3074908dbca), "Barcrest","Rich & Famous (Barcrest) (MPU4) (bad)" )
+
+#define M4NNWWC_EXTRA_ROMS \
+	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing, maybe the same as NNWW */
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4NNWWC_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
+
+
+/// "(C)1991 BARCREST" and "NN4 0.2" (CN3 0.2 on startup) 
+GAME_CUSTOM( 199?, m4nnwwc,     0,          "cn302s.p1",        0x0000, 0x010000, CRC(87703a1a) SHA1(6582ffa42a61b60e92e456a794c4c219a9901a1c), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CN3 0.2 / NN4 0.2)" )
+GAME_CUSTOM( 199?, m4nnwwc__7,  m4nnwwc,    "cn302c.p1",        0x0000, 0x010000, CRC(fd9de050) SHA1(14c80deba1396aa5be0a1d02964ecd4b946f2ee8), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 1)" )
+GAME_CUSTOM( 199?, m4nnwwc__y,  m4nnwwc,    "cn302ad.p1",       0x0000, 0x010000, CRC(7a6acd9b) SHA1(9a1f0ed19d66428c6b541ce1c8e169d9b4be3ef1), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 26)" )
+GAME_CUSTOM( 199?, m4nnwwc__z,  m4nnwwc,    "cn302b.p1",        0x0000, 0x010000, CRC(b69cb520) SHA1(7313f2740960ca86ecea8609fe8fd58d84a3248c), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 27)" )
+GAME_CUSTOM( 199?, m4nnwwc__0,  m4nnwwc,    "cn302bd.p1",       0x0000, 0x010000, CRC(ab828a0b) SHA1(53fa6dad9bdae1d46479596c98cf2c3f4454bb95), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 28)" )
+GAME_CUSTOM( 199?, m4nnwwc__1,  m4nnwwc,    "cn302d.p1",        0x0000, 0x010000, CRC(8c6ac365) SHA1(a32b104968aaa4da060072a241a4c54fbdf3c404), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 29)" )
+GAME_CUSTOM( 199?, m4nnwwc__2,  m4nnwwc,    "cn302dk.p1",       0x0000, 0x010000, CRC(24cbab96) SHA1(77fe3b21fc9470653bada31c700ce926d55ce82e), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 30)" )
+GAME_CUSTOM( 199?, m4nnwwc__3,  m4nnwwc,    "cn302dr.p1",       0x0000, 0x010000, CRC(09069f0e) SHA1(68b2a34644ee1fca3ce5191e2f25aa808b85fb09), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 31)" )
+GAME_CUSTOM( 199?, m4nnwwc__4,  m4nnwwc,    "cn302dy.p1",       0x0000, 0x010000, CRC(946db7e0) SHA1(fe29c1da478e3f1a53ad55c661ddcc7003679304), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 32)" )
+GAME_CUSTOM( 199?, m4nnwwc__5,  m4nnwwc,    "cn302k.p1",        0x0000, 0x010000, CRC(7a3202f1) SHA1(2dd5e8195120b1efc3eb51214cf054432fc50aed), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 33)" )
+GAME_CUSTOM( 199?, m4nnwwc__6,  m4nnwwc,    "cn302r.p1",        0x0000, 0x010000, CRC(e7cf9e1e) SHA1(66a1e54fc928c09d16f7ac1c002685eee841315f), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 34)" )
+GAME_CUSTOM( 199?, m4nnwwc__8,  m4nnwwc,    "cn302y.p1",        0x0000, 0x010000, CRC(7aa4b6f0) SHA1(2c185a9a7c8a4957fb5901305883661c41cb0cb4), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 36)" )
+/// "(C)1991 BARCREST" and "NN4 0.2" (CF3 0.2 on startup) 
+GAME_CUSTOM( 199?, m4nnwwc__k,  m4nnwwc,    "cf302s.p1",        0x0000, 0x010000, CRC(7a3e8ead) SHA1(590dc78b98f9928d6fa87ef661234f88dccfdff8), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CF3 0.2 / NN4 0.2)" )
+GAME_CUSTOM( 199?, m4nnwwc__a,  m4nnwwc,    "cf302ad.p1",       0x0000, 0x010000, CRC(6c6aa0cd) SHA1(5a58a19c35b0b195f3b4e7a21f57ca61d45ec1fb), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4nnwwc__b,  m4nnwwc,    "cf302b.p1",        0x0000, 0x010000, CRC(9ca07939) SHA1(6eb0a5675bb803a11c4c874dc0516d94c48194b7), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4nnwwc__c,  m4nnwwc,    "cf302bd.p1",       0x0000, 0x010000, CRC(8ba33b7d) SHA1(ebfb62a390de512dc1482cfb9ab64196cbcc5831), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4nnwwc__d,  m4nnwwc,    "cf302c.p1",        0x0000, 0x010000, CRC(26be2dc4) SHA1(157ca96ebd36f2fbfb501945d0351cc3be38f3b7), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4nnwwc__e,  m4nnwwc,    "cf302d.p1",        0x0000, 0x010000, CRC(b52d5b47) SHA1(1583963b0bac1288bd20ed0550ad793be0980b03), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4nnwwc__f,  m4nnwwc,    "cf302dk.p1",       0x0000, 0x010000, CRC(c3d4c74d) SHA1(9a34c1f2fabb20da17988f63c9190ec4dd0b65fb), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4nnwwc__g,  m4nnwwc,    "cf302dr.p1",       0x0000, 0x010000, CRC(0b25e6b9) SHA1(5fd42abbe985dbdcfe09da50673551330dd26175), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 8)" )
+GAME_CUSTOM( 199?, m4nnwwc__h,  m4nnwwc,    "cf302dy.p1",       0x0000, 0x010000, CRC(420b47c1) SHA1(0cb1a843cec3ace21d806fe98212250201a72f12), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 9)" )
+GAME_CUSTOM( 199?, m4nnwwc__i,  m4nnwwc,    "cf302k.p1",        0x0000, 0x010000, CRC(07ca4c45) SHA1(8f6ee3c17527b05a6652845019919d490cc00c64), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 10)" )
+GAME_CUSTOM( 199?, m4nnwwc__j,  m4nnwwc,    "cf302r.p1",        0x0000, 0x010000, CRC(e09f43bd) SHA1(65dcdf8d223936c4415ddc3f734b83367d6b8db7), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 11)" )
+GAME_CUSTOM( 199?, m4nnwwc__l,  m4nnwwc,    "cf302y.p1",        0x0000, 0x010000, CRC(c1063a32) SHA1(e1c8fc463b1a1db87110f272a8727435f9d9b97a), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 13)" )
+/// "(C)1991 BARCREST" and "NN4 0.2" (CH3 0.2 on startup) 
+GAME_CUSTOM( 199?, m4nnwwc__w,  m4nnwwc,    "ch302s.p1",        0x0000, 0x010000, CRC(e7d0ceb2) SHA1(b75d58136b9e1e4bfde86730ef4e95bc98494813), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CH3 0.2 / NN4 0.2)" )
+GAME_CUSTOM( 199?, m4nnwwc__m,  m4nnwwc,    "ch302ad.p1",       0x0000, 0x010000, CRC(20405f4e) SHA1(7f87c881f428f704c98b0f4be459980062ccd29a), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 14)" )
+GAME_CUSTOM( 199?, m4nnwwc__n,  m4nnwwc,    "ch302b.p1",        0x0000, 0x010000, CRC(cf7543ac) SHA1(2fe810741bfc18f800ad8028724218557d93a830), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 15)" )
+GAME_CUSTOM( 199?, m4nnwwc__o,  m4nnwwc,    "ch302bd.p1",       0x0000, 0x010000, CRC(4c3e5664) SHA1(87a1f2133cad624683dac89f1da85d70b018f846), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 16)" )
+GAME_CUSTOM( 199?, m4nnwwc__p,  m4nnwwc,    "ch302c.p1",        0x0000, 0x010000, CRC(dcde4d0a) SHA1(d1535f8754d2c0f8183c2c9db97edafdcdfed82e), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 17)" )
+GAME_CUSTOM( 199?, m4nnwwc__q,  m4nnwwc,    "ch302d.p1",        0x0000, 0x010000, CRC(e1a02108) SHA1(fa8271a1246a3ae1289bb314494743cfec31f4e2), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 18)" )
+GAME_CUSTOM( 199?, m4nnwwc__r,  m4nnwwc,    "ch302dk.p1",       0x0000, 0x010000, CRC(a3f636af) SHA1(c3de325ef5baa3cccd4c9997e615e87521b9e537), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 19)" )
+GAME_CUSTOM( 199?, m4nnwwc__s,  m4nnwwc,    "ch302dr.p1",       0x0000, 0x010000, CRC(0620b0c0) SHA1(31aabba5f5b096254908221f884b5088a5a6e883), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 20)" )
+GAME_CUSTOM( 199?, m4nnwwc__t,  m4nnwwc,    "ch302dy.p1",       0x0000, 0x010000, CRC(9b4b982e) SHA1(c7c9c501eb1c936ffb8bc2fe1fe9258e92b1d548), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 21)" )
+GAME_CUSTOM( 199?, m4nnwwc__u,  m4nnwwc,    "ch302k.p1",        0x0000, 0x010000, CRC(908d8b10) SHA1(a80a5ce1a83d05f1e68e66d14bacc424bc833aa7), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 22)" )
+GAME_CUSTOM( 199?, m4nnwwc__v,  m4nnwwc,    "ch302r.p1",        0x0000, 0x010000, CRC(c31c4c28) SHA1(e94c7588211044dae7c5ac587e6232b0ace2fc7b), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 23)" )
+GAME_CUSTOM( 199?, m4nnwwc__x,  m4nnwwc,    "ch302y.p1",        0x0000, 0x010000, CRC(5e7764c6) SHA1(05a61a57ac906cbea1d72fffd1c8ea707852b895), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 25)" )
+/// "(C)1991 BARCREST" and "NN4 0.1" (CN3 0.1 on startup) 
+GAME_CUSTOM( 199?, m4nnwwc__9,  m4nnwwc,    "cnc03s.p1",        0x0000, 0x010000, CRC(57a03b29) SHA1(52cc8eb3f02c4a812de06ceec0588ca930e07876), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CN3 0.1 / NN4 0.1)" )
+// "(C)2000    BWB" and "CNN 2.0"
+GAME_CUSTOM( 199?, m4nnwwc__aa, m4nnwwc,    "cl__x__x.2_0",     0x0000, 0x010000, CRC(c3de4791) SHA1(220d32b961b6710d508c0c7e6b2d8e4d292746f4), "Bwb","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CNN 2.0, set 1)" )
+GAME_CUSTOM( 199?, m4nnwwc__ab, m4nnwwc,    "cl__x_dx.2_0",     0x0000, 0x010000, CRC(c79833f8) SHA1(b3519b55f6f2a4f081b69483ac0b8860aa8190d9), "Bwb","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CNN 2.0, set 2)" )
+GAME_CUSTOM( 199?, m4nnwwc__ac, m4nnwwc,    "cl__xa_x.2_0",     0x0000, 0x010000, CRC(4c3021a1) SHA1(7e7258808dd1693adb956a5e6b076f925eb0a026), "Bwb","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CNN 2.0, set 3)" )
+GAME_CUSTOM( 199?, m4nnwwc__ad, m4nnwwc,    "cl__xb_x.2_0",     0x0000, 0x010000, CRC(75a5add7) SHA1(6802ec81b4ebcde9ed014a0440fdc50211a8a350), "Bwb","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CNN 2.0, set 4)" )
+
+
 
 #define M4VIZ_EXTRA_ROMS \
 	ROM_REGION( 0x48, "fakechr", 0 ) \
@@ -2629,32 +2833,36 @@ GAME_CUSTOM( 199?, m4rhrc__aa,   m4rhrc, "cr__x_dx.5_0",     0x0000, 0x010000, C
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-
-GAME_CUSTOM( 199?, m4viz,     0,      "viz208c",      0x0000, 0x010000, CRC(00a65029) SHA1(8dfb68d1a9f4cd00f239ed87a1d330ccb655c35b), "Barcrest","Viz (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4viz__a,  m4viz,  "viz20_101",    0x0000, 0x010000, CRC(0847b812) SHA1(6de9e9dad272932a22ebe457ac50da1126d931ea), "Barcrest","Viz (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4viz__b,  m4viz,  "viz20pv2",     0x0000, 0x010000, CRC(7e56ff95) SHA1(83679b64881adbe547b43255374de061859e17ef), "Barcrest","Viz (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4viz__c,  m4viz,  "viz58c",       0x0000, 0x010000, CRC(95b8918b) SHA1(4ad4ff9098e98c2076e7058493c181da705acb52), "Barcrest","Viz (Barcrest) (MPU4) (set 4)" )
+// "(C)1991 BARCREST" and "VIZ 0.6"
+GAME_CUSTOM( 199?, m4viz,     0,      "vizs.p1",      0x0000, 0x010000, CRC(86b487dc) SHA1(62215752e1da1ca923e6b9e410c8445577be34dd), "Barcrest","Viz (Barcrest) (MPU4) (VIZ 0.6)" )
 GAME_CUSTOM( 199?, m4viz__d,  m4viz,  "vizb.p1",      0x0000, 0x010000, CRC(afdc6306) SHA1(4d35703267b3742dd7008c00ec525689c56bf227), "Barcrest","Viz (Barcrest) (MPU4) (set 5)" )
 GAME_CUSTOM( 199?, m4viz__e,  m4viz,  "vizc.p1",      0x0000, 0x010000, CRC(876c30fc) SHA1(f126496e87d7e84ca39d2921bf9f2be0fa2c7586), "Barcrest","Viz (Barcrest) (MPU4) (set 6)" )
 GAME_CUSTOM( 199?, m4viz__f,  m4viz,  "vizd.p1",      0x0000, 0x010000, CRC(46bee8cd) SHA1(4094651fd8954ca2f5cfc2bba4fc51d865c86098), "Barcrest","Viz (Barcrest) (MPU4) (set 7)" )
 GAME_CUSTOM( 199?, m4viz__g,  m4viz,  "vizdk.p1",     0x0000, 0x010000, CRC(24476360) SHA1(b5141a40f8c1ed3b3fbaf43ae539ae2f1aedbcca), "Barcrest","Viz (Barcrest) (MPU4) (set 8)" )
 GAME_CUSTOM( 199?, m4viz__h,  m4viz,  "vizdy.p1",     0x0000, 0x010000, CRC(88807a1f) SHA1(dc1539a5e69b5f0b3f68ccf7360ff4f240f6b7c7), "Barcrest","Viz (Barcrest) (MPU4) (set 9)" )
 GAME_CUSTOM( 199?, m4viz__i,  m4viz,  "vizk.p1",      0x0000, 0x010000, CRC(6647f592) SHA1(2ce7222bd9e173480ddc901f84859ca3ad7aded1), "Barcrest","Viz (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4viz__j,  m4viz,  "vizs.p1",      0x0000, 0x010000, CRC(86b487dc) SHA1(62215752e1da1ca923e6b9e410c8445577be34dd), "Barcrest","Viz (Barcrest) (MPU4) (set 11)" )
 GAME_CUSTOM( 199?, m4viz__k,  m4viz,  "vizy.p1",      0x0000, 0x010000, CRC(0e12112d) SHA1(4a34832dd95246e80e616affe3eab3c8794ca769), "Barcrest","Viz (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4viz__l,  m4viz,  "vizzzvkn",     0x0000, 0x010000, CRC(cf5c41f5) SHA1(c9b7de0e73141833e5f8d23f0cb641b1c6094178), "Barcrest","Viz (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4viz__m,  m4viz,  "vi_05a__.1_1", 0x0000, 0x010000, CRC(56e0ea7a) SHA1(cbe979cdfceb2c1c7be5adaf8163b96bebbc4bb6), "Barcrest","Viz (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4viz__n,  m4viz,  "vi_05s__.1_1", 0x0000, 0x010000, CRC(c6896e33) SHA1(7db1a5e08f1a307aac0818424fab274cd8141474), "Barcrest","Viz (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4viz__o,  m4viz,  "vi_05sb_.1_1", 0x0000, 0x010000, CRC(12fecbdf) SHA1(c0137aac536ec17c3b2ffa405f8400308f759590), "Barcrest","Viz (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4viz__p,  m4viz,  "vi_05sd_.1_1", 0x0000, 0x010000, CRC(9241fd92) SHA1(f3e58273089ee9b828e431a043802d4ec3948a64), "Barcrest","Viz (Barcrest) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4viz__q,  m4viz,  "vi_10a__.1_1", 0x0000, 0x010000, CRC(e7c4e4d9) SHA1(9ac3bd60e6000e36cd2229284c48e009ea22cfdb), "Barcrest","Viz (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4viz__r,  m4viz,  "vi_10s__.1_1", 0x0000, 0x010000, CRC(039a4620) SHA1(097335ba8846c8c8b28bf85f836ba76d22bc763d), "Barcrest","Viz (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4viz__s,  m4viz,  "vi_10sb_.1_1", 0x0000, 0x010000, CRC(4b7e6686) SHA1(97985f1ecd3a8e77f07a91c5171810e6aff13f4c), "Barcrest","Viz (Barcrest) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4viz__t,  m4viz,  "vi_10sd_.1_1", 0x0000, 0x010000, CRC(84da6fca) SHA1(8a42855b161619a56435da52dd24e8e60fb56bd8), "Barcrest","Viz (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4viz__u,  m4viz,  "vii05___.1_1", 0x0000, 0x010000, CRC(22a10f78) SHA1(83411b77e5de441b0f5fa02f2b1dbc40755f41cb), "Barcrest","Viz (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4viz__v,  m4viz,  "vii10___.1_1", 0x0000, 0x010000, CRC(92e11e00) SHA1(2ebae74a39434269333ea0067163e9607926646d), "Barcrest","Viz (Barcrest) (MPU4) (set 23)" )
-GAME_CUSTOM( 199?, m4viz__w,  m4viz,  "viz_20_.8",    0x0000, 0x010000, CRC(b4fbc43b) SHA1(4cce5e3a0c32a402b81dfd16e66d12e98704c4d2), "Barcrest","Viz (Barcrest) (MPU4) (set 24)" )
-
+// "(C)1991 BARCREST" and "VIZ 0.3"
+GAME_CUSTOM( 199?, m4viz__l,  m4viz,  "vizzzvkn",     0x0000, 0x010000, CRC(cf5c41f5) SHA1(c9b7de0e73141833e5f8d23f0cb641b1c6094178), "Barcrest","Viz (Barcrest) (MPU4) (VIZ 0.3Y)" )
+// "(C)1991 BARCREST" and "VIZ 0.2"
+GAME_CUSTOM( 199?, m4viz__b,  m4viz,  "viz20pv2",     0x0000, 0x010000, CRC(7e56ff95) SHA1(83679b64881adbe547b43255374de061859e17ef), "Barcrest","Viz (Barcrest) (MPU4) (VIZ 0.2T)" )
+// Bwb sets
+GAME_CUSTOM( 199?, m4viz__m,  m4viz,  "vi_05a__.1_1", 0x0000, 0x010000, CRC(56e0ea7a) SHA1(cbe979cdfceb2c1c7be5adaf8163b96bebbc4bb6), "Bwb","Viz (Barcrest) (MPU4) (set 14)" )
+GAME_CUSTOM( 199?, m4viz__n,  m4viz,  "vi_05s__.1_1", 0x0000, 0x010000, CRC(c6896e33) SHA1(7db1a5e08f1a307aac0818424fab274cd8141474), "Bwb","Viz (Barcrest) (MPU4) (set 15)" )
+GAME_CUSTOM( 199?, m4viz__o,  m4viz,  "vi_05sb_.1_1", 0x0000, 0x010000, CRC(12fecbdf) SHA1(c0137aac536ec17c3b2ffa405f8400308f759590), "Bwb","Viz (Barcrest) (MPU4) (set 16)" )
+GAME_CUSTOM( 199?, m4viz__p,  m4viz,  "vi_05sd_.1_1", 0x0000, 0x010000, CRC(9241fd92) SHA1(f3e58273089ee9b828e431a043802d4ec3948a64), "Bwb","Viz (Barcrest) (MPU4) (set 17)" )
+GAME_CUSTOM( 199?, m4viz__q,  m4viz,  "vi_10a__.1_1", 0x0000, 0x010000, CRC(e7c4e4d9) SHA1(9ac3bd60e6000e36cd2229284c48e009ea22cfdb), "Bwb","Viz (Barcrest) (MPU4) (set 18)" )
+GAME_CUSTOM( 199?, m4viz__r,  m4viz,  "vi_10s__.1_1", 0x0000, 0x010000, CRC(039a4620) SHA1(097335ba8846c8c8b28bf85f836ba76d22bc763d), "Bwb","Viz (Barcrest) (MPU4) (set 19)" )
+GAME_CUSTOM( 199?, m4viz__s,  m4viz,  "vi_10sb_.1_1", 0x0000, 0x010000, CRC(4b7e6686) SHA1(97985f1ecd3a8e77f07a91c5171810e6aff13f4c), "Bwb","Viz (Barcrest) (MPU4) (set 20)" )
+GAME_CUSTOM( 199?, m4viz__t,  m4viz,  "vi_10sd_.1_1", 0x0000, 0x010000, CRC(84da6fca) SHA1(8a42855b161619a56435da52dd24e8e60fb56bd8), "Bwb","Viz (Barcrest) (MPU4) (set 21)" )
+GAME_CUSTOM( 199?, m4viz__u,  m4viz,  "vii05___.1_1", 0x0000, 0x010000, CRC(22a10f78) SHA1(83411b77e5de441b0f5fa02f2b1dbc40755f41cb), "Bwb","Viz (Barcrest) (MPU4) (set 22)" )
+GAME_CUSTOM( 199?, m4viz__v,  m4viz,  "vii10___.1_1", 0x0000, 0x010000, CRC(92e11e00) SHA1(2ebae74a39434269333ea0067163e9607926646d), "Bwb","Viz (Barcrest) (MPU4) (set 23)" )
+// no copyright string and "8V1 0.6"
+GAME_CUSTOM( 199?, m4viz__j,  m4viz,  "viz208c",      0x0000, 0x010000, CRC(00a65029) SHA1(8dfb68d1a9f4cd00f239ed87a1d330ccb655c35b), "hack","Viz (Barcrest) (MPU4) (8V1 0.6, hack, set 1)" )
+GAME_CUSTOM( 199?, m4viz__a,  m4viz,  "viz20_101",    0x0000, 0x010000, CRC(0847b812) SHA1(6de9e9dad272932a22ebe457ac50da1126d931ea), "hack","Viz (Barcrest) (MPU4) (8V1 0.6, hack, set 2)" )
+GAME_CUSTOM( 199?, m4viz__w,  m4viz,  "viz_20_.8",    0x0000, 0x010000, CRC(b4fbc43b) SHA1(4cce5e3a0c32a402b81dfd16e66d12e98704c4d2), "hack","Viz (Barcrest) (MPU4) (8V1 0.6, hack, set 3)" )
+// "RICK LUVS BRIAN" and "8V1 1.0"
+GAME_CUSTOM( 199?, m4viz__c,  m4viz,  "viz58c",       0x0000, 0x010000, CRC(95b8918b) SHA1(4ad4ff9098e98c2076e7058493c181da705acb52), "hack","Viz (Barcrest) (MPU4) (8V1 1.0, hack)" )
 
 
 #define M4TAKEPK_EXTRA_ROMS \
@@ -2673,7 +2881,9 @@ GAME_CUSTOM( 199?, m4viz__w,  m4viz,  "viz_20_.8",    0x0000, 0x010000, CRC(b4fb
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4takepk,       0,          "tapy.p1",      0x0000, 0x020000, CRC(f21f6dc8) SHA1(d421bee2564d3aaa389c35601adc23ad3fda5aa0), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 1)" )
+// "(C)1993 BARCREST" and "TAP 0.6"
+GAME_CUSTOM( 199?, m4takepk,       0,          "taps.p1",      0x0000, 0x020000, CRC(01956f25) SHA1(895cd30023b689b61d5ced0cf477f555faf786af), "Barcrest","Take Your Pick (Barcrest) (MPU4) (TAP 0.6)" )
+GAME_CUSTOM( 199?, m4takepk__j,    m4takepk,   "tapy.p1",      0x0000, 0x020000, CRC(f21f6dc8) SHA1(d421bee2564d3aaa389c35601adc23ad3fda5aa0), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4takepk__a,    m4takepk,   "tapad.p1",     0x0000, 0x020000, CRC(162448c4) SHA1(1f77d053fb5dfddeba1248e9e2a05536ab1bc66a), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4takepk__b,    m4takepk,   "tapb.p1",      0x0000, 0x020000, CRC(3f3be560) SHA1(a60d66c5de33747d19ae43bbc15da104cc3e7390), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4takepk__c,    m4takepk,   "tapbd.p1",     0x0000, 0x020000, CRC(9b3ee601) SHA1(95f11641d9e3ca0bcfa11a17fb0971b1e2598c7b), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 4)" )
@@ -2683,7 +2893,8 @@ GAME_CUSTOM( 199?, m4takepk__f,    m4takepk,   "tapdk.p1",     0x0000, 0x020000,
 GAME_CUSTOM( 199?, m4takepk__g,    m4takepk,   "tapdy.p1",     0x0000, 0x020000, CRC(561a6ea9) SHA1(736af1fed00a4df540b8f83da677583dee950b50), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 8)" )
 GAME_CUSTOM( 199?, m4takepk__h,    m4takepk,   "tapk.p1",      0x0000, 0x020000, CRC(75fc4d36) SHA1(18a0e33af69c32a69416612f639a7c8601010177), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 9)" )
 GAME_CUSTOM( 199?, m4takepk__i,    m4takepk,   "tapr.p1",      0x0000, 0x020000, CRC(c6f3f607) SHA1(cee0b59a45ebb50d51bc26b2b5c37fe7ed299bc7), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4takepk__j,    m4takepk,   "taps.p1",      0x0000, 0x020000, CRC(01956f25) SHA1(895cd30023b689b61d5ced0cf477f555faf786af), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 11)" )
+// "(C)1993 BARCREST" and "TPH 0.7"
+GAME_CUSTOM( 199?, m4takepk__r,    m4takepk,   "tphs.p1",      0x0000, 0x020000, CRC(e9231738) SHA1(066b1ffd02238783931452b7a1dff05c293a6abe), "Barcrest","Take Your Pick (Barcrest) (MPU4) (TPH 0.7)" )
 GAME_CUSTOM( 199?, m4takepk__k,    m4takepk,   "tphad.p1",     0x0000, 0x020000, CRC(51a2f147) SHA1(442d4adc92c6a9215c7655c2c4b955f974420a26), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 12)" )
 GAME_CUSTOM( 199?, m4takepk__l,    m4takepk,   "tphb.p1",      0x0000, 0x020000, CRC(391214a6) SHA1(21f6f29ff1a60b7a646d49bef2c29008f2dc501c), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 13)" )
 GAME_CUSTOM( 199?, m4takepk__m,    m4takepk,   "tphbd.p1",     0x0000, 0x020000, CRC(dcb85f82) SHA1(eb83c8d829d88e940c11f6d0d1c4607a4aa9cba2), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 14)" )
@@ -2691,17 +2902,23 @@ GAME_CUSTOM( 199?, m4takepk__n,    m4takepk,   "tphd.p1",      0x0000, 0x020000,
 GAME_CUSTOM( 199?, m4takepk__o,    m4takepk,   "tphdk.p1",     0x0000, 0x020000, CRC(967ff7d4) SHA1(403865583aabc9983b8c6fa4f0c06ba53696df3b), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 16)" )
 GAME_CUSTOM( 199?, m4takepk__p,    m4takepk,   "tphdy.p1",     0x0000, 0x020000, CRC(119cd72a) SHA1(326f5a548234ec5cd780f22c96b9151222684ed0), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 17)" )
 GAME_CUSTOM( 199?, m4takepk__q,    m4takepk,   "tphk.p1",      0x0000, 0x020000, CRC(73d5bcf0) SHA1(22c620c7d6fc8bc51bda4dd3ae5ec3e38056ce82), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4takepk__r,    m4takepk,   "tphs.p1",      0x0000, 0x020000, CRC(e9231738) SHA1(066b1ffd02238783931452b7a1dff05c293a6abe), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 19)" )
 GAME_CUSTOM( 199?, m4takepk__s,    m4takepk,   "tphy.p1",      0x0000, 0x020000, CRC(f4369c0e) SHA1(d8c1fc2ede48673a1e8efaf004e3d76b62594de1), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4takepk__t,    m4takepk,   "typ15f",       0x0000, 0x020000, CRC(65c44b06) SHA1(629e7ac4149c66fc1dc33a103e1a4ff5aaecdcfd), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4takepk__u,    m4takepk,   "typ15r",       0x0000, 0x020000, CRC(8138c70b) SHA1(aafc805a8a56cf1722ebe0f3eba0a47f15c9049a), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4takepk__v,    m4takepk,   "typ510",       0x0000, 0x010000, CRC(ebf0c71c) SHA1(6c759144aecce83f82ded8aae7c61ecec2d92fb3), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 23)" )
-GAME_CUSTOM( 199?, m4takepk__w,    m4takepk,   "typ510s",      0x0000, 0x010000, CRC(4cc6032d) SHA1(e6eaff56e39555393156aa2e56bf1c17e548bdc9), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 24)" )
-GAME_CUSTOM( 199?, m4takepk__x,    m4takepk,   "typ55",        0x0000, 0x010000, CRC(6837344f) SHA1(4d5c6ea005d0916f27a7f445b37ce9252549c61f), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 25)" )
-GAME_CUSTOM( 199?, m4takepk__y,    m4takepk,   "typ55s",       0x0000, 0x010000, CRC(05dc9b07) SHA1(9fc2c7575a704ca1252bb5c6a638e28b0324f2a6), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 26)" )
-GAME_CUSTOM( 199?, m4takepk__z,    m4takepk,   "typ58s",       0x0000, 0x010000, CRC(56e26a42) SHA1(7add260212d3fbc8b356b58e85df8cafbef151e3), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 27)" )
-GAME_CUSTOM( 199?, m4takepk__0,    m4takepk,   "typ58t",       0x0000, 0x010000, CRC(3fbbbbc8) SHA1(9f097cbce3710a51c19ef7961f91ee6e77fc843f), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 28)" )
-GAME_CUSTOM( 199?, m4takepk__1,    m4takepk,   "typ5p10p.bin", 0x0000, 0x010000, CRC(45ddeaf4) SHA1(6db822aac402cb6772718015420c14875e74b13d), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 29)" )
+// below sets are all smaller (Bwb sets / hacks of them?)
+// "(C)1997  B.W.B." and "TAC 2.3"
+GAME_CUSTOM( 199?, m4takepk__1,    m4takepk,   "typ5p10p.bin", 0x0000, 0x010000, CRC(45ddeaf4) SHA1(6db822aac402cb6772718015420c14875e74b13d), "Bwb","Take Your Pick (Barcrest) (MPU4) (TAC 2.3)" )
+// no copyright string and "TAC 2.3"
+GAME_CUSTOM( 199?, m4takepk__v,    m4takepk,   "typ510",       0x0000, 0x010000, CRC(ebf0c71c) SHA1(6c759144aecce83f82ded8aae7c61ecec2d92fb3), "hack","Take Your Pick (Barcrest) (MPU4) (TAC 2.3, hack, set 1)" )
+GAME_CUSTOM( 199?, m4takepk__w,    m4takepk,   "typ510s",      0x0000, 0x010000, CRC(4cc6032d) SHA1(e6eaff56e39555393156aa2e56bf1c17e548bdc9), "hack","Take Your Pick (Barcrest) (MPU4) (TAC 2.3, hack, set 2)" )
+// no copyright string and "TPH 0.7"
+GAME_CUSTOM( 199?, m4takepk__t,    m4takepk,   "typ15f",       0x0000, 0x020000, CRC(65c44b06) SHA1(629e7ac4149c66fc1dc33a103e1a4ff5aaecdcfd), "hack","Take Your Pick (Barcrest) (MPU4) (TPH 0.7, hack)" )
+// no copyright string and "MAM 0.3"
+GAME_CUSTOM( 199?, m4takepk__u,    m4takepk,   "typ15r",       0x0000, 0x020000, CRC(8138c70b) SHA1(aafc805a8a56cf1722ebe0f3eba0a47f15c9049a), "hack","Take Your Pick (Barcrest) (MPU4) (MAM 0.3, hack)" )
+// no copyright string and "TA4 2.1"
+GAME_CUSTOM( 199?, m4takepk__x,    m4takepk,   "typ55",        0x0000, 0x010000, CRC(6837344f) SHA1(4d5c6ea005d0916f27a7f445b37ce9252549c61f), "hack","Take Your Pick (Barcrest) (MPU4) (TA4 2.1, hack, set 1)" )
+GAME_CUSTOM( 199?, m4takepk__y,    m4takepk,   "typ55s",       0x0000, 0x010000, CRC(05dc9b07) SHA1(9fc2c7575a704ca1252bb5c6a638e28b0324f2a6), "hack","Take Your Pick (Barcrest) (MPU4) (TA4 2.1, hack, set 2)" )
+// no copyright string and "TA8 2.2"
+GAME_CUSTOM( 199?, m4takepk__z,    m4takepk,   "typ58s",       0x0000, 0x010000, CRC(56e26a42) SHA1(7add260212d3fbc8b356b58e85df8cafbef151e3), "hack","Take Your Pick (Barcrest) (MPU4) (TA8 2.2, hack, set 1)" )
+GAME_CUSTOM( 199?, m4takepk__0,    m4takepk,   "typ58t",       0x0000, 0x010000, CRC(3fbbbbc8) SHA1(9f097cbce3710a51c19ef7961f91ee6e77fc843f), "hack","Take Your Pick (Barcrest) (MPU4) (TA8 2.2, hack, set 2)" )
 
 
 #define M4OVERMN_EXTRA_ROMS \
@@ -2718,21 +2935,8 @@ GAME_CUSTOM( 199?, m4takepk__1,    m4takepk,   "typ5p10p.bin", 0x0000, 0x010000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4overmn,       0,          "otts.p1",  0x0000, 0x010000, CRC(6daf58a4) SHA1(e505a18b67dec54446e6d94a5d1c3bba13099619), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4overmn__a,    m4overmn,   "ot8b.p1",  0x0000, 0x010000, CRC(243c7f7c) SHA1(24b9d2cce1af75811d1e625ac8df5b58356776dc), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4overmn__b,    m4overmn,   "ot8c.p1",  0x0000, 0x010000, CRC(af5bb77b) SHA1(6a9eeb803fdaa03970b3a3a0738e804027aedd20), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4overmn__c,    m4overmn,   "ot8dk.p1", 0x0000, 0x010000, CRC(0798d12c) SHA1(068a676d4ccaf2964a3f6f6673199f8d62c45452), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4overmn__d,    m4overmn,   "ot8dy.p1", 0x0000, 0x010000, CRC(0904a38d) SHA1(0a0668ae384fe371abf2597ab66a56dd79a90c03), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4overmn__e,    m4overmn,   "ot8k.p1",  0x0000, 0x010000, CRC(8d83f697) SHA1(2fff475d44f1535c85988b195c3610201ece21ae), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4overmn__f,    m4overmn,   "ot8s.p1",  0x0000, 0x010000, CRC(db1bacdb) SHA1(fc2257eedec532094f3c229bcf215a0fde430d2b), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4overmn__g,    m4overmn,   "ot8y.p1",  0x0000, 0x010000, CRC(6e1508fb) SHA1(6a45a394e48f758456dc6cf17a5b134ca6887421), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4overmn__h,    m4overmn,   "otnb.p1",  0x0000, 0x010000, CRC(047aae70) SHA1(bf620b60f1107fff07a28944dec66fd71aab65c0), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4overmn__i,    m4overmn,   "otnc.p1",  0x0000, 0x010000, CRC(536e7640) SHA1(3a079bed9217c857efb8d435c7efacca69cfcabc), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4overmn__j,    m4overmn,   "otnd.p1",  0x0000, 0x010000, CRC(c6c15fc2) SHA1(99cb3fd2eaea636313085e0a6a9aff9c027cb187), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4overmn__k,    m4overmn,   "otndy.p1", 0x0000, 0x010000, CRC(6b22206e) SHA1(0714ddc445d530e1ff2055cd5e5d8b31704733d9), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4overmn__l,    m4overmn,   "otnk.p1",  0x0000, 0x010000, CRC(992cc40d) SHA1(6059ecaf91390e2a2ea80d3da5e44156273892ad), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4overmn__m,    m4overmn,   "otns.p1",  0x0000, 0x010000, CRC(7e03f295) SHA1(f874ddf8de8037aa251a8c3fb7c183e6dfb93dfa), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4overmn__n,    m4overmn,   "otny.p1",  0x0000, 0x010000, CRC(67cba8fa) SHA1(234cc5b4a0b60d33b2f4c00d082beee59236a126), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 15)" )
+// "(C)1991 BARCREST" and "OTT 0.2"
+GAME_CUSTOM( 199?, m4overmn,       0,          "otts.p1",  0x0000, 0x010000, CRC(6daf58a4) SHA1(e505a18b67dec54446e6d94a5d1c3bba13099619), "Barcrest","Over The Moon (Barcrest) (MPU4) (OTT 0.2)" )
 GAME_CUSTOM( 199?, m4overmn__o,    m4overmn,   "ottad.p1", 0x0000, 0x010000, CRC(682b01a3) SHA1(cb71fd56ad6d4fc67894bf86c54c49a7e45aae15), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 16)" )
 GAME_CUSTOM( 199?, m4overmn__p,    m4overmn,   "ottb.p1",  0x0000, 0x010000, CRC(541c2d54) SHA1(3b42e9dcb468cb9bbf2092a4e7eabeb172dc90d0), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 17)" )
 GAME_CUSTOM( 199?, m4overmn__q,    m4overmn,   "ottbd.p1", 0x0000, 0x010000, CRC(5e376ce9) SHA1(0628461395ebd233ca7b0513ea272ddd83c5accd), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 18)" )
@@ -2743,6 +2947,24 @@ GAME_CUSTOM( 199?, m4overmn__u,    m4overmn,   "ottdy.p1", 0x0000, 0x010000, CRC
 GAME_CUSTOM( 199?, m4overmn__v,    m4overmn,   "ottk.p1",  0x0000, 0x010000, CRC(68c984d3) SHA1(b1cf87630ab093629eaa8d199dfcfd6343d9c31d), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 23)" )
 GAME_CUSTOM( 199?, m4overmn__w,    m4overmn,   "ottr.p1",  0x0000, 0x010000, CRC(ceb322d1) SHA1(a62bd1f947fc15f1d42dae8e933d2fcb672bcce4), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 24)" )
 GAME_CUSTOM( 199?, m4overmn__x,    m4overmn,   "otty.p1",  0x0000, 0x010000, CRC(974af7ff) SHA1(e0aecb91c1fc476a9258d6d57ba5ca8f249141b0), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 25)" )
+// "(C)1991 BARCREST" and "OT8 0.1"
+GAME_CUSTOM( 199?, m4overmn__f,    m4overmn,   "ot8s.p1",  0x0000, 0x010000, CRC(db1bacdb) SHA1(fc2257eedec532094f3c229bcf215a0fde430d2b), "Barcrest","Over The Moon (Barcrest) (MPU4) (OT8 0.1)" )
+GAME_CUSTOM( 199?, m4overmn__a,    m4overmn,   "ot8b.p1",  0x0000, 0x010000, CRC(243c7f7c) SHA1(24b9d2cce1af75811d1e625ac8df5b58356776dc), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4overmn__b,    m4overmn,   "ot8c.p1",  0x0000, 0x010000, CRC(af5bb77b) SHA1(6a9eeb803fdaa03970b3a3a0738e804027aedd20), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4overmn__c,    m4overmn,   "ot8dk.p1", 0x0000, 0x010000, CRC(0798d12c) SHA1(068a676d4ccaf2964a3f6f6673199f8d62c45452), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4overmn__d,    m4overmn,   "ot8dy.p1", 0x0000, 0x010000, CRC(0904a38d) SHA1(0a0668ae384fe371abf2597ab66a56dd79a90c03), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4overmn__e,    m4overmn,   "ot8k.p1",  0x0000, 0x010000, CRC(8d83f697) SHA1(2fff475d44f1535c85988b195c3610201ece21ae), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4overmn__g,    m4overmn,   "ot8y.p1",  0x0000, 0x010000, CRC(6e1508fb) SHA1(6a45a394e48f758456dc6cf17a5b134ca6887421), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 8)" )
+// "(C)1991 BARCREST" and "OTN 0.5"
+GAME_CUSTOM( 199?, m4overmn__m,    m4overmn,   "otns.p1",  0x0000, 0x010000, CRC(7e03f295) SHA1(f874ddf8de8037aa251a8c3fb7c183e6dfb93dfa), "Barcrest","Over The Moon (Barcrest) (MPU4) (OTN 0.5)" )
+GAME_CUSTOM( 199?, m4overmn__h,    m4overmn,   "otnb.p1",  0x0000, 0x010000, CRC(047aae70) SHA1(bf620b60f1107fff07a28944dec66fd71aab65c0), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 9)" )
+GAME_CUSTOM( 199?, m4overmn__i,    m4overmn,   "otnc.p1",  0x0000, 0x010000, CRC(536e7640) SHA1(3a079bed9217c857efb8d435c7efacca69cfcabc), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 10)" )
+GAME_CUSTOM( 199?, m4overmn__j,    m4overmn,   "otnd.p1",  0x0000, 0x010000, CRC(c6c15fc2) SHA1(99cb3fd2eaea636313085e0a6a9aff9c027cb187), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 11)" )
+GAME_CUSTOM( 199?, m4overmn__k,    m4overmn,   "otndy.p1", 0x0000, 0x010000, CRC(6b22206e) SHA1(0714ddc445d530e1ff2055cd5e5d8b31704733d9), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 12)" )
+GAME_CUSTOM( 199?, m4overmn__l,    m4overmn,   "otnk.p1",  0x0000, 0x010000, CRC(992cc40d) SHA1(6059ecaf91390e2a2ea80d3da5e44156273892ad), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 13)" )
+GAME_CUSTOM( 199?, m4overmn__n,    m4overmn,   "otny.p1",  0x0000, 0x010000, CRC(67cba8fa) SHA1(234cc5b4a0b60d33b2f4c00d082beee59236a126), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 15)" )
+// "(C)1991 BARCREST" and "OTU 0.1"
+GAME_CUSTOM( 199?, m4overmn__7,    m4overmn,   "otus.p1",  0x0000, 0x010000, CRC(5f2b8d0b) SHA1(1e3ac59fa0b108549c265eeba027591bce5122f3), "Barcrest","Over The Moon (Barcrest) (MPU4) (OTU 0.1)" )
 GAME_CUSTOM( 199?, m4overmn__y,    m4overmn,   "otuad.p1", 0x0000, 0x010000, CRC(2576654b) SHA1(7fae2bd057d96af4c50fd84a5261ae750ba34033), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 26)" )
 GAME_CUSTOM( 199?, m4overmn__z,    m4overmn,   "otub.p1",  0x0000, 0x010000, CRC(1463877d) SHA1(ea41e048aead52aabc1b8a2a224ef87b9011c163), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 27)" )
 GAME_CUSTOM( 199?, m4overmn__0,    m4overmn,   "otubd.p1", 0x0000, 0x010000, CRC(8ac2d17b) SHA1(09f21f1233d82fd02830b6ece6a773402393a447), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 28)" )
@@ -2752,7 +2974,6 @@ GAME_CUSTOM( 199?, m4overmn__3,    m4overmn,   "otudr.p1", 0x0000, 0x010000, CRC
 GAME_CUSTOM( 199?, m4overmn__4,    m4overmn,   "otudy.p1", 0x0000, 0x010000, CRC(562da6fd) SHA1(899f971124969c52a018634b2b2f2dd7cb634195), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 32)" )
 GAME_CUSTOM( 199?, m4overmn__5,    m4overmn,   "otuk.p1",  0x0000, 0x010000, CRC(cbb66497) SHA1(ade033fb3d226bfcb3cdf3e3612fb65cfc22b030), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 33)" )
 GAME_CUSTOM( 199?, m4overmn__6,    m4overmn,   "otur.p1",  0x0000, 0x010000, CRC(d05a8c2f) SHA1(754e2351431aa7bf6dea3a1498581da0c4283c1e), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 34)" )
-GAME_CUSTOM( 199?, m4overmn__7,    m4overmn,   "otus.p1",  0x0000, 0x010000, CRC(5f2b8d0b) SHA1(1e3ac59fa0b108549c265eeba027591bce5122f3), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 35)" )
 GAME_CUSTOM( 199?, m4overmn__8,    m4overmn,   "otuy.p1",  0x0000, 0x010000, CRC(fc65136d) SHA1(048f81de92a1db4e4e4e9aa7a87228805d57b263), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 36)" )
 
 
@@ -2778,33 +2999,39 @@ GAME_CUSTOM( 199?, m4overmn__8,    m4overmn,   "otuy.p1",  0x0000, 0x010000, CRC
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 
-GAME_CUSTOM( 199?, m4luxor,     0,          "luxor.rom",        0x0000, 0x010000, CRC(55277510) SHA1(9a866c36a398df52c54b554cd8085078c1f1954b), "Barcrest","Luxor (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4luxor__a,  m4luxor,    "lux05_101",        0x0000, 0x010000, CRC(8f4dc4f4) SHA1(c9743a1b79b377313504296a060dff3f413a7a9d), "Barcrest","Luxor (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4luxor__b,  m4luxor,    "lux10_101",        0x0000, 0x010000, CRC(8965c7be) SHA1(ca05803bc7d7a96e25dc0b025c2683b4679789fb), "Barcrest","Luxor (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4luxor__c,  m4luxor,    "lux208c",          0x0000, 0x010000, CRC(f57bae67) SHA1(3a2523a2121948480381f49e26e870b10d541304), "Barcrest","Luxor (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4luxor__d,  m4luxor,    "lux55",            0x0000, 0x010000, CRC(997419ab) SHA1(c616a5d6cb347963e7e5c5b88912c248bae184ca), "Barcrest","Luxor (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4luxor__e,  m4luxor,    "lux58c",           0x0000, 0x010000, CRC(da408721) SHA1(971413620d1f304a026d3adc68f6ac5c1d104e20), "Barcrest","Luxor (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4luxor__f,  m4luxor,    "luxc.p1",          0x0000, 0x010000, CRC(47d1c4dc) SHA1(0856fac4a7ec14dc1df24446e1355ed05bb5f1c1), "Barcrest","Luxor (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4luxor__g,  m4luxor,    "luxd.p1",          0x0000, 0x010000, CRC(8f949379) SHA1(4f0a94d06b8e7036acaae5c0c42c91481837d3a1), "Barcrest","Luxor (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4luxor__h,  m4luxor,    "luxk.p1",          0x0000, 0x010000, CRC(bd5eaf2d) SHA1(f9a3f3139d6b7ff4fcec805e0ca6e8ab1c3c10dd), "Barcrest","Luxor (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4luxor__i,  m4luxor,    "luxor_std.bin",    0x0000, 0x010000, CRC(2c565bf7) SHA1(61612abbda037b63e2cda7746be8cf64b4563d43), "Barcrest","Luxor (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4luxor__j,  m4luxor,    "luxs.p1",          0x0000, 0x010000, CRC(78d6f05a) SHA1(53de98b9248c67c83f255d33d5963bebb757d0af), "Barcrest","Luxor (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4luxor__k,  m4luxor,    "lux_05_4",         0x0000, 0x010000, CRC(335503ec) SHA1(dd03096aa98e4cac9fade6e77f9f8a8ad9a64287), "Barcrest","Luxor (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4luxor__l,  m4luxor,    "lux_05_8",         0x0000, 0x010000, CRC(43a15814) SHA1(694c8c6ee695bb746391f5269f540c995fc18002), "Barcrest","Luxor (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4luxor__m,  m4luxor,    "lux_10_4",         0x0000, 0x010000, CRC(122461d9) SHA1(a347c834b27a00abc1864a1e00316a491d04d84b), "Barcrest","Luxor (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4luxor__n,  m4luxor,    "lux_10_8",         0x0000, 0x010000, CRC(544208e7) SHA1(85e2ff663b7500ee6bb0a900ee5ef48f7bf1934a), "Barcrest","Luxor (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4luxor__o,  m4luxor,    "lux_20.4",         0x0000, 0x010000, CRC(50b3e5cc) SHA1(ff08095c01d8eeff320b5a04fe9f7e1888690cf8), "Barcrest","Luxor (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4luxor__p,  m4luxor,    "lux_20_8",         0x0000, 0x010000, CRC(6c9a7152) SHA1(e38e8452e0d3f5b0e8ac51da272ab9f2e57e1d89), "Barcrest","Luxor (Barcrest) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4luxor__q,  m4luxor,    "lx_05a__.1o1",     0x0000, 0x010000, CRC(7b81f1b9) SHA1(412a8961571f279d70c05ef26c565b4b2a588060), "Barcrest","Luxor (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4luxor__r,  m4luxor,    "lx_05s__.1o1",     0x0000, 0x010000, CRC(2bf86940) SHA1(cf96a7a12db84fc028766da55ca06d2350f9d08f), "Barcrest","Luxor (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4luxor__s,  m4luxor,    "lx_05sb_.1o1",     0x0000, 0x010000, CRC(e210c1b6) SHA1(023b1e0b36c4d146af5e958be72575590588b3fd), "Barcrest","Luxor (Barcrest) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4luxor__t,  m4luxor,    "lx_05sd_.1o1",     0x0000, 0x010000, CRC(8727963a) SHA1(4585c0e3fb14f54684ff199be9010ed7b5cb97c3), "Barcrest","Luxor (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4luxor__u,  m4luxor,    "lx_10a__.1o1",     0x0000, 0x010000, CRC(ce8e6c05) SHA1(b48bc01d1a069881e9b9db1a4959c7b57e80f28a), "Barcrest","Luxor (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4luxor__v,  m4luxor,    "lx_10s__.1o1",     0x0000, 0x010000, CRC(9f0f5b6b) SHA1(9f67500d62921dd680bd864856206306adc3f2f6), "Barcrest","Luxor (Barcrest) (MPU4) (set 23)" )
-GAME_CUSTOM( 199?, m4luxor__w,  m4luxor,    "lx_10sb_.1o1",     0x0000, 0x010000, CRC(bd020920) SHA1(a6b5c11c82344afc1cdd350b9f31d1257be72615), "Barcrest","Luxor (Barcrest) (MPU4) (set 24)" )
-GAME_CUSTOM( 199?, m4luxor__x,  m4luxor,    "lx_10sd_.1o1",     0x0000, 0x010000, CRC(cc59d370) SHA1(a428d93c005b629e86810c85ea91630a354e170b), "Barcrest","Luxor (Barcrest) (MPU4) (set 25)" )
-GAME_CUSTOM( 199?, m4luxor__y,  m4luxor,    "lxi05a__.1o1",     0x0000, 0x010000, CRC(7a5fe065) SHA1(c44b41d01175c10051ae4cd1453be3411842825e), "Barcrest","Luxor (Barcrest) (MPU4) (set 26)" )
-GAME_CUSTOM( 199?, m4luxor__z,  m4luxor,    "lxi10a__.1o1",     0x0000, 0x010000, CRC(17989464) SHA1(67aa9cc01d89ed4caeb33885f53dcaee762ccb6d), "Barcrest","Luxor (Barcrest) (MPU4) (set 27)" )
+// "(C)1993 BARCREST" and "LUX 0.6"
+GAME_CUSTOM( 199?, m4luxor,     0,          "luxs.p1",          0x0000, 0x010000, CRC(78d6f05a) SHA1(53de98b9248c67c83f255d33d5963bebb757d0af), "Barcrest","Luxor (Barcrest) (MPU4) (LUX 0.6)" )
+GAME_CUSTOM( 199?, m4luxor__f,  m4luxor,    "luxc.p1",          0x0000, 0x010000, CRC(47d1c4dc) SHA1(0856fac4a7ec14dc1df24446e1355ed05bb5f1c1), "Barcrest","Luxor (Barcrest) (MPU4) (LUX 0.6C)" )
+GAME_CUSTOM( 199?, m4luxor__g,  m4luxor,    "luxd.p1",          0x0000, 0x010000, CRC(8f949379) SHA1(4f0a94d06b8e7036acaae5c0c42c91481837d3a1), "Barcrest","Luxor (Barcrest) (MPU4) (LUX 0.6D)" )
+GAME_CUSTOM( 199?, m4luxor__h,  m4luxor,    "luxk.p1",          0x0000, 0x010000, CRC(bd5eaf2d) SHA1(f9a3f3139d6b7ff4fcec805e0ca6e8ab1c3c10dd), "Barcrest","Luxor (Barcrest) (MPU4) (LUX 0.6K)" )
+GAME_CUSTOM( 199?, m4luxor__i,  m4luxor,    "luxor_std.bin",    0x0000, 0x010000, CRC(2c565bf7) SHA1(61612abbda037b63e2cda7746be8cf64b4563d43), "Barcrest","Luxor (Barcrest) (MPU4) (LUX 0.6Y)" )
+// "(C)1995  B.W.B." and "LX5 1.0"
+GAME_CUSTOM( 199?, m4luxor__q,  m4luxor,    "lx_05a__.1o1",     0x0000, 0x010000, CRC(7b81f1b9) SHA1(412a8961571f279d70c05ef26c565b4b2a588060), "Bwb","Luxor (Barcrest) (MPU4) (LX5 1.0K)" )
+GAME_CUSTOM( 199?, m4luxor__r,  m4luxor,    "lx_05s__.1o1",     0x0000, 0x010000, CRC(2bf86940) SHA1(cf96a7a12db84fc028766da55ca06d2350f9d08f), "Bwb","Luxor (Barcrest) (MPU4) (LX5 1.0)" )
+GAME_CUSTOM( 199?, m4luxor__s,  m4luxor,    "lx_05sb_.1o1",     0x0000, 0x010000, CRC(e210c1b6) SHA1(023b1e0b36c4d146af5e958be72575590588b3fd), "Bwb","Luxor (Barcrest) (MPU4) (LX5 1.0YD)" )
+GAME_CUSTOM( 199?, m4luxor__t,  m4luxor,    "lx_05sd_.1o1",     0x0000, 0x010000, CRC(8727963a) SHA1(4585c0e3fb14f54684ff199be9010ed7b5cb97c3), "Bwb","Luxor (Barcrest) (MPU4) (LX5 1.0D)" )
+GAME_CUSTOM( 199?, m4luxor__y,  m4luxor,    "lxi05a__.1o1",     0x0000, 0x010000, CRC(7a5fe065) SHA1(c44b41d01175c10051ae4cd1453be3411842825e), "Bwb","Luxor (Barcrest) (MPU4) (LX5 1.0CK)" )
+// "(C)1994  B.W.B." and "LX101.0"
+GAME_CUSTOM( 199?, m4luxor__u,  m4luxor,    "lx_10a__.1o1",     0x0000, 0x010000, CRC(ce8e6c05) SHA1(b48bc01d1a069881e9b9db1a4959c7b57e80f28a), "Bwb","Luxor (Barcrest) (MPU4) (LX101.0K)" )
+GAME_CUSTOM( 199?, m4luxor__v,  m4luxor,    "lx_10s__.1o1",     0x0000, 0x010000, CRC(9f0f5b6b) SHA1(9f67500d62921dd680bd864856206306adc3f2f6), "Bwb","Luxor (Barcrest) (MPU4) (LX101.0)" )
+GAME_CUSTOM( 199?, m4luxor__w,  m4luxor,    "lx_10sb_.1o1",     0x0000, 0x010000, CRC(bd020920) SHA1(a6b5c11c82344afc1cdd350b9f31d1257be72615), "Bwb","Luxor (Barcrest) (MPU4) (LX101.0YD)" )
+GAME_CUSTOM( 199?, m4luxor__x,  m4luxor,    "lx_10sd_.1o1",     0x0000, 0x010000, CRC(cc59d370) SHA1(a428d93c005b629e86810c85ea91630a354e170b), "Bwb","Luxor (Barcrest) (MPU4) (LX101.0D)" )
+GAME_CUSTOM( 199?, m4luxor__z,  m4luxor,    "lxi10a__.1o1",     0x0000, 0x010000, CRC(17989464) SHA1(67aa9cc01d89ed4caeb33885f53dcaee762ccb6d), "Bwb","Luxor (Barcrest) (MPU4) (LX101.0CK)" )
+// these ones give bad char alarm
+GAME_CUSTOM( 199?, m4luxor__b,  m4luxor,    "lux10_101",        0x0000, 0x010000, CRC(8965c7be) SHA1(ca05803bc7d7a96e25dc0b025c2683b4679789fb), "Bwb / hack?","Luxor (Barcrest) (MPU4) (LX101.0, hack?, set 1)" )
+GAME_CUSTOM( 199?, m4luxor__m,  m4luxor,    "lux_10_4",         0x0000, 0x010000, CRC(122461d9) SHA1(a347c834b27a00abc1864a1e00316a491d04d84b), "Bwb / hack?","Luxor (Barcrest) (MPU4) (LX101.0, hack?, set 2)" )
+GAME_CUSTOM( 199?, m4luxor__n,  m4luxor,    "lux_10_8",         0x0000, 0x010000, CRC(544208e7) SHA1(85e2ff663b7500ee6bb0a900ee5ef48f7bf1934a), "Bwb / hack?","Luxor (Barcrest) (MPU4) (LX101.0, hack?, set 3)" )
+// no copyright string and "V1  0.6"
+GAME_CUSTOM( 199?, m4luxor__j,  m4luxor,    "luxor.rom",        0x0000, 0x010000, CRC(55277510) SHA1(9a866c36a398df52c54b554cd8085078c1f1954b), "hack","Luxor (Barcrest) (MPU4) (V1  0.6, hack, set 1)" )
+GAME_CUSTOM( 199?, m4luxor__c,  m4luxor,    "lux208c",          0x0000, 0x010000, CRC(f57bae67) SHA1(3a2523a2121948480381f49e26e870b10d541304), "hack","Luxor (Barcrest) (MPU4) (V1  0.6, hack, set 2)" )
+GAME_CUSTOM( 199?, m4luxor__o,  m4luxor,    "lux_20.4",         0x0000, 0x010000, CRC(50b3e5cc) SHA1(ff08095c01d8eeff320b5a04fe9f7e1888690cf8), "hack","Luxor (Barcrest) (MPU4) (V1  0.6, hack, set 3)" )
+GAME_CUSTOM( 199?, m4luxor__p,  m4luxor,    "lux_20_8",         0x0000, 0x010000, CRC(6c9a7152) SHA1(e38e8452e0d3f5b0e8ac51da272ab9f2e57e1d89), "hack","Luxor (Barcrest) (MPU4) (V1  0.6, hack, set 4)" )
+// "ROBIN  HOOD" and "LX5 1.0"
+GAME_CUSTOM( 199?, m4luxor__a,  m4luxor,    "lux05_101",        0x0000, 0x010000, CRC(8f4dc4f4) SHA1(c9743a1b79b377313504296a060dff3f413a7a9d), "hack","Luxor (Barcrest) (MPU4) (LX5 1.0, hack, set 1)" )
+GAME_CUSTOM( 199?, m4luxor__d,  m4luxor,    "lux55",            0x0000, 0x010000, CRC(997419ab) SHA1(c616a5d6cb347963e7e5c5b88912c248bae184ca), "hack","Luxor (Barcrest) (MPU4) (LX5 1.0, hack, set 2)" )
+GAME_CUSTOM( 199?, m4luxor__e,  m4luxor,    "lux58c",           0x0000, 0x010000, CRC(da408721) SHA1(971413620d1f304a026d3adc68f6ac5c1d104e20), "hack","Luxor (Barcrest) (MPU4) (LX5 1.0, hack, set 3)" )
+GAME_CUSTOM( 199?, m4luxor__k,  m4luxor,    "lux_05_4",         0x0000, 0x010000, CRC(335503ec) SHA1(dd03096aa98e4cac9fade6e77f9f8a8ad9a64287), "hack","Luxor (Barcrest) (MPU4) (LX5 1.0, hack, set 4)" )
+GAME_CUSTOM( 199?, m4luxor__l,  m4luxor,    "lux_05_8",         0x0000, 0x010000, CRC(43a15814) SHA1(694c8c6ee695bb746391f5269f540c995fc18002), "hack","Luxor (Barcrest) (MPU4) (LX5 1.0, hack, set 5)" )
 
 
 #define M4HIJINX_EXTRA_ROMS \
@@ -2822,9 +3049,15 @@ GAME_CUSTOM( 199?, m4luxor__z,  m4luxor,    "lxi10a__.1o1",     0x0000, 0x010000
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4hijinx,       0,          "jnx10y.p1",    0x0000, 0x020000, CRC(792b3bae) SHA1(d30aecce42953f1ec49753cc2d1df00ad9bd088f), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4hijinx__a,    m4hijinx,   "hij15g",       0x0000, 0x020000, CRC(73271cca) SHA1(8177e10e30386464a7e5a33dc3c02adbf4c93101), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4hijinx__b,    m4hijinx,   "hij15t",       0x0000, 0x020000, CRC(c7d54c64) SHA1(d3537c8412b583f2812f87ab68ac8855e9cdbd2f), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 3)" )
+// "(C)1993 BARCREST" and "JNX 1.0"
+GAME_CUSTOM( 199?, m4hijinx,       0,          "jnx10s.p1",    0x0000, 0x020000, CRC(a291147e) SHA1(818172bab2fad210a937d91e0be4ddf165f1cf99), "Barcrest","Hi Jinx (Barcrest) (MPU4) (JNX 1.0)" )
+GAME_CUSTOM( 199?, m4hijinx__ab,   m4hijinx,   "jnx10y.p1",    0x0000, 0x020000, CRC(792b3bae) SHA1(d30aecce42953f1ec49753cc2d1df00ad9bd088f), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 1)" )
+GAME_CUSTOM( 199?, m4hijinx__7,    m4hijinx,   "jnx10d.p1",    0x0000, 0x020000, CRC(31b243d1) SHA1(029dd8ecbe83b63ca799b6507262193ef56d4b36), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 35)" )
+GAME_CUSTOM( 199?, m4hijinx__8,    m4hijinx,   "jnx10dh.p1",   0x0000, 0x020000, CRC(ffc421b0) SHA1(28439c5d2ec371edae5e7b84e1da96d468bb8556), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 36)" )
+GAME_CUSTOM( 199?, m4hijinx__9,    m4hijinx,   "jnx10dy.p1",   0x0000, 0x020000, CRC(dc57d3fb) SHA1(e622485f37f638a69e0c5dbb06faa519b10eafc9), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 37)" )
+GAME_CUSTOM( 199?, m4hijinx__aa,   m4hijinx,   "jnx10h.p1",    0x0000, 0x020000, CRC(5ab8c9e5) SHA1(f12094bd95369288a76dac9d1e62810fa478cfd6), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 38)" )
+// "(C)1993 BARCREST" and "JNS 0.2"
+GAME_CUSTOM( 199?, m4hijinx__n,    m4hijinx,   "jns02s.p1",    0x0000, 0x020000, CRC(42df2639) SHA1(8ed6addfc85cfeab4c5f03c24a692a9c392a8bc2), "Barcrest","Hi Jinx (Barcrest) (MPU4) (JNS 0.2)" )
 GAME_CUSTOM( 199?, m4hijinx__c,    m4hijinx,   "jns02ad.p1",   0x0000, 0x020000, CRC(436a6632) SHA1(25ab01b8785cf6f9d2316b15d2d2887e898358de), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 4)" )
 GAME_CUSTOM( 199?, m4hijinx__d,    m4hijinx,   "jns02b.p1",    0x0000, 0x020000, CRC(171b8941) SHA1(8383f0ce3c21b187f031302b4d930e13c131f862), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 5)" )
 GAME_CUSTOM( 199?, m4hijinx__e,    m4hijinx,   "jns02bd.p1",   0x0000, 0x020000, CRC(6a8b03ba) SHA1(ecc6826474a96a7d2e5cee851d672b954906bfbe), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 6)" )
@@ -2836,8 +3069,9 @@ GAME_CUSTOM( 199?, m4hijinx__j,    m4hijinx,   "jns02dy.p1",   0x0000, 0x020000,
 GAME_CUSTOM( 199?, m4hijinx__k,    m4hijinx,   "jns02h.p1",    0x0000, 0x020000, CRC(f927ea5a) SHA1(c1af9f2b20421c66d2141b85a61cd51e8cb6a67b), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 12)" )
 GAME_CUSTOM( 199?, m4hijinx__l,    m4hijinx,   "jns02k.p1",    0x0000, 0x020000, CRC(4377f98d) SHA1(0e7b4e655acec07fea221697179045f06d4f3c48), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 13)" )
 GAME_CUSTOM( 199?, m4hijinx__m,    m4hijinx,   "jns02r.p1",    0x0000, 0x020000, CRC(8df557f8) SHA1(899e73b265065f09eac785e45e06fd755a618c21), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4hijinx__n,    m4hijinx,   "jns02s.p1",    0x0000, 0x020000, CRC(42df2639) SHA1(8ed6addfc85cfeab4c5f03c24a692a9c392a8bc2), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 15)" )
 GAME_CUSTOM( 199?, m4hijinx__o,    m4hijinx,   "jns02y.p1",    0x0000, 0x020000, CRC(743d449f) SHA1(739e41b28ee53465b40138cdccf0fcd1782c8b45), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 16)" )
+// "(C)1993 BARCREST" and "JNS 0.3"
+GAME_CUSTOM( 199?, m4hijinx__0,    m4hijinx,   "jns03s.p1",    0x0000, 0x020000, CRC(ef9f3d18) SHA1(cc2239a4dca1c092025216a16bb39fe9126bd6f8), "Barcrest","Hi Jinx (Barcrest) (MPU4) (JNS 0.3)" )
 GAME_CUSTOM( 199?, m4hijinx__p,    m4hijinx,   "jns03ad.p1",   0x0000, 0x020000, CRC(9d3e4a13) SHA1(5780eaeb148d64f7d2769207f7973c02a5e5a3de), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 17)" )
 GAME_CUSTOM( 199?, m4hijinx__q,    m4hijinx,   "jns03b.p1",    0x0000, 0x020000, CRC(07eddb71) SHA1(05f5bbcf6c7e69407163c9dc76c6c587f0cdf10e), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 18)" )
 GAME_CUSTOM( 199?, m4hijinx__r,    m4hijinx,   "jns03bd.p1",   0x0000, 0x020000, CRC(b4df2f9b) SHA1(1d6025bfb119007c7b17214577cf69f978fa2830), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 19)" )
@@ -2849,19 +3083,17 @@ GAME_CUSTOM( 199?, m4hijinx__w,    m4hijinx,   "jns03dy.p1",   0x0000, 0x020000,
 GAME_CUSTOM( 199?, m4hijinx__x,    m4hijinx,   "jns03h.p1",    0x0000, 0x020000, CRC(e9d1b86a) SHA1(4a982370bfb788ef53ae9479a72dbca6c7f9ec00), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 25)" )
 GAME_CUSTOM( 199?, m4hijinx__y,    m4hijinx,   "jns03k.p1",    0x0000, 0x020000, CRC(5381abbd) SHA1(8967579f31ef9a0ec868af1cb64d9fa049314f94), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 26)" )
 GAME_CUSTOM( 199?, m4hijinx__z,    m4hijinx,   "jns03r.p1",    0x0000, 0x020000, CRC(9d0305c8) SHA1(525b36b43a09c27f807dcbdc8bff89af82bdffc0), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 27)" )
-GAME_CUSTOM( 199?, m4hijinx__0,    m4hijinx,   "jns03s.p1",    0x0000, 0x020000, CRC(ef9f3d18) SHA1(cc2239a4dca1c092025216a16bb39fe9126bd6f8), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 28)" )
 GAME_CUSTOM( 199?, m4hijinx__1,    m4hijinx,   "jns03y.p1",    0x0000, 0x020000, CRC(64cb16af) SHA1(f4bc3557f84cd0054c475e0354f0562f63df3146), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 29)" )
+// "(C)1993 BARCREST" and "JNX 0.5"
+GAME_CUSTOM( 199?, m4hijinx__6,    m4hijinx,   "jnx05y.p1",    0x0000, 0x020000, CRC(6f40a357) SHA1(7d019f925d7920df23782b1e6e742bc467e7767b), "Barcrest","Hi Jinx (Barcrest) (MPU4) (JNX 0.5Y)" )
 GAME_CUSTOM( 199?, m4hijinx__2,    m4hijinx,   "jnx05d.p1",    0x0000, 0x020000, CRC(27d9db28) SHA1(df333d884735a94d3c4d460deb05e50fcfce8896), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 30)" )
 GAME_CUSTOM( 199?, m4hijinx__3,    m4hijinx,   "jnx05dh.p1",   0x0000, 0x020000, CRC(d7dc5d8b) SHA1(6b94ae9169b522a80455cbe42378427d2f1019f3), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 31)" )
 GAME_CUSTOM( 199?, m4hijinx__4,    m4hijinx,   "jnx05dy.p1",   0x0000, 0x020000, CRC(f44fafc0) SHA1(996411b41071cc3c5c84f00106f9685b27e95352), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 32)" )
 GAME_CUSTOM( 199?, m4hijinx__5,    m4hijinx,   "jnx05h.p1",    0x0000, 0x020000, CRC(4cd3511c) SHA1(2f283f50d2313eb9da49e4efbdb9a098f90c0afb), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 33)" )
-GAME_CUSTOM( 199?, m4hijinx__6,    m4hijinx,   "jnx05y.p1",    0x0000, 0x020000, CRC(6f40a357) SHA1(7d019f925d7920df23782b1e6e742bc467e7767b), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 34)" )
-GAME_CUSTOM( 199?, m4hijinx__7,    m4hijinx,   "jnx10d.p1",    0x0000, 0x020000, CRC(31b243d1) SHA1(029dd8ecbe83b63ca799b6507262193ef56d4b36), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 35)" )
-GAME_CUSTOM( 199?, m4hijinx__8,    m4hijinx,   "jnx10dh.p1",   0x0000, 0x020000, CRC(ffc421b0) SHA1(28439c5d2ec371edae5e7b84e1da96d468bb8556), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 36)" )
-GAME_CUSTOM( 199?, m4hijinx__9,    m4hijinx,   "jnx10dy.p1",   0x0000, 0x020000, CRC(dc57d3fb) SHA1(e622485f37f638a69e0c5dbb06faa519b10eafc9), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 37)" )
-GAME_CUSTOM( 199?, m4hijinx__aa,   m4hijinx,   "jnx10h.p1",    0x0000, 0x020000, CRC(5ab8c9e5) SHA1(f12094bd95369288a76dac9d1e62810fa478cfd6), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 38)" )
-GAME_CUSTOM( 199?, m4hijinx__ab,   m4hijinx,   "jnx10s.p1",    0x0000, 0x020000, CRC(a291147e) SHA1(818172bab2fad210a937d91e0be4ddf165f1cf99), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 39)" )
-
+// no copyright string and "JNX 0.5"
+GAME_CUSTOM( 199?, m4hijinx__a,    m4hijinx,   "hij15g",       0x0000, 0x020000, CRC(73271cca) SHA1(8177e10e30386464a7e5a33dc3c02adbf4c93101), "hack","Hi Jinx (Barcrest) (MPU4) (JNX 0.5, hack)" )
+// no copyright string and "JNS 0.2"
+GAME_CUSTOM( 199?, m4hijinx__b,    m4hijinx,   "hij15t",       0x0000, 0x020000, CRC(c7d54c64) SHA1(d3537c8412b583f2812f87ab68ac8855e9cdbd2f), "hack","Hi Jinx (Barcrest) (MPU4) (JNS 0.2, hack)" )
 
 
 
@@ -2882,50 +3114,8 @@ GAME_CUSTOM( 199?, m4hijinx__ab,   m4hijinx,   "jnx10s.p1",    0x0000, 0x020000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4cashln,       0,          "cls04s.p1",    0x0000, 0x020000, CRC(c8b7f355) SHA1(437324bf499ba49ecbb3854f5f787da5f575f7f5), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4cashln__a,    m4cashln,   "cl15g",        0x0000, 0x020000, CRC(fdd5765d) SHA1(fee8ddc9b93934a5582d6730cfa26246191c22ff), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4cashln__b,    m4cashln,   "cl15t",        0x0000, 0x020000, CRC(56bb9f21) SHA1(2876ac79283ea5cbee45e9ac6d5d140ea7db8e95), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4cashln__c,    m4cashln,   "cli10s",       0x0000, 0x020000, CRC(9aca737d) SHA1(6669c8b7a192b1c67caad62aad528b08737f7e73), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4cashln__d,    m4cashln,   "cli11ad.p1",   0x0000, 0x020000, CRC(ab47d9b3) SHA1(e501bb61de76ffe6618be03a59614b36e71e031b), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4cashln__e,    m4cashln,   "cli11b.p1",    0x0000, 0x020000, CRC(4adcaa58) SHA1(027dda275f32e49e6c0f9ff4e7d42472bdd3174e), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4cashln__f,    m4cashln,   "cli11bd.p1",   0x0000, 0x020000, CRC(e18071e5) SHA1(e219be249b5992808745a4c668686dfad77e2837), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4cashln__g,    m4cashln,   "cli11d.p1",    0x0000, 0x020000, CRC(c7c6049d) SHA1(6ad1caed1272ff4e6902843bf2420020ca2d0cb4), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4cashln__h,    m4cashln,   "cli11dh.p1",   0x0000, 0x020000, CRC(c21383ae) SHA1(01a840f160aacbb2b253ab6ba0a915f7055cc381), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4cashln__i,    m4cashln,   "cli11dk.p1",   0x0000, 0x020000, CRC(18486282) SHA1(5910a68539f5343661f8e55105c767067633ef1c), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4cashln__j,    m4cashln,   "cli11dr.p1",   0x0000, 0x020000, CRC(82a6bc3b) SHA1(c12b46234bebe408374a7fc3e18bf79942434d95), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4cashln__k,    m4cashln,   "cli11dy.p1",   0x0000, 0x020000, CRC(2ca4f94d) SHA1(4d0345e3c819d8dd48c559f01c118430d5ccdea2), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4cashln__l,    m4cashln,   "cli11h.p1",    0x0000, 0x020000, CRC(694f5813) SHA1(3acf84d6e5060e7054097aa2601c9c2833a2d524), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4cashln__m,    m4cashln,   "cli11k.p1",    0x0000, 0x020000, CRC(b314b93f) SHA1(e94472e1d1e345be84b277088dc852ed75117344), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4cashln__n,    m4cashln,   "cli11r.p1",    0x0000, 0x020000, CRC(29fa6786) SHA1(8bd7a7b0cf84615a126ebed494954ed2b7bc0ec4), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4cashln__o,    m4cashln,   "cli11s.p1",    0x0000, 0x020000, CRC(e5ad1734) SHA1(69fb5c81ae04c98920d84f829be14983168196e5), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4cashln__p,    m4cashln,   "cli11y.p1",    0x0000, 0x020000, CRC(87f822f0) SHA1(701a8c88be972b8363490e92e98f37acd493ef07), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4cashln__q,    m4cashln,   "cli12ad.p1",   0x0000, 0x020000, CRC(d6c03a42) SHA1(203ea61def95c2ea0a9ea1f808056122d87993ff), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4cashln__r,    m4cashln,   "cli12b.p1",    0x0000, 0x020000, CRC(9d4245da) SHA1(604b1e68d271784b982cde81e3675298662df1bc), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4cashln__s,    m4cashln,   "cli12bd.p1",   0x0000, 0x020000, CRC(9c079214) SHA1(1ee6362d876dd5aaa1699186ee905b48755a80de), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4cashln__t,    m4cashln,   "cli12d.p1",    0x0000, 0x020000, CRC(1058eb1f) SHA1(2c4305679c829cbf6c34d2627a1e8e366c5be5c1), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4cashln__u,    m4cashln,   "cli12dh.p1",   0x0000, 0x020000, CRC(bf94605f) SHA1(e2ae87041791ba92d8db69c7a3b40b62c97cf941), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4cashln__v,    m4cashln,   "cli12dk.p1",   0x0000, 0x020000, CRC(65cf8173) SHA1(f7ed6227b3e57d50e327f3ff72b9aafafa51da63), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 23)" )
-GAME_CUSTOM( 199?, m4cashln__w,    m4cashln,   "cli12dr.p1",   0x0000, 0x020000, CRC(ff215fca) SHA1(40cab82f6a7f5229b365236b4758e73b2a3dce1e), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 24)" )
-GAME_CUSTOM( 199?, m4cashln__x,    m4cashln,   "cli12dy.p1",   0x0000, 0x020000, CRC(51231abc) SHA1(ae80491fb1496f6fccbd46f424fe1d45640da8e2), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 25)" )
-GAME_CUSTOM( 199?, m4cashln__y,    m4cashln,   "cli12h.p1",    0x0000, 0x020000, CRC(bed1b791) SHA1(d017f62a099475786fa15c7a185574301b80dbdd), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 26)" )
-GAME_CUSTOM( 199?, m4cashln__z,    m4cashln,   "cli12k.p1",    0x0000, 0x020000, CRC(648a56bd) SHA1(25ad92789b12512b8c65cc912080f62abfe101a6), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 27)" )
-GAME_CUSTOM( 199?, m4cashln__0,    m4cashln,   "cli12r.p1",    0x0000, 0x020000, CRC(fe648804) SHA1(27e74aea209b90dc3d8cf46474e271d68d9af7e2), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 28)" )
-GAME_CUSTOM( 199?, m4cashln__1,    m4cashln,   "cli12s.p1",    0x0000, 0x020000, CRC(ef5aa578) SHA1(c4c288a297f5f6cd0712c396237aa3bf1363e188), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 29)" )
-GAME_CUSTOM( 199?, m4cashln__2,    m4cashln,   "cli12y.p1",    0x0000, 0x020000, CRC(5066cd72) SHA1(03cef55b4fff8fb6edd804fdbc4076db6b234614), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 30)" )
-GAME_CUSTOM( 199?, m4cashln__3,    m4cashln,   "cls03ad.p1",   0x0000, 0x020000, CRC(c68249cf) SHA1(d2d16ce76a5b144827a11f7fa471c7ea558c1ce0), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 31)" )
-GAME_CUSTOM( 199?, m4cashln__4,    m4cashln,   "cls03b.p1",    0x0000, 0x020000, CRC(db667c56) SHA1(8a8f2374d0d02307206071718376400d5a52dc6c), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 32)" )
-GAME_CUSTOM( 199?, m4cashln__5,    m4cashln,   "cls03bd.p1",   0x0000, 0x020000, CRC(4b98e70a) SHA1(04e0732dd8c0283dd928da9caafd78f509a4d479), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 33)" )
-GAME_CUSTOM( 199?, m4cashln__6,    m4cashln,   "cls03c.p1",    0x0000, 0x020000, CRC(ec2cc144) SHA1(bc2879e4487ad5638e2818f4c8c5b23ab660cecc), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 34)" )
-GAME_CUSTOM( 199?, m4cashln__7,    m4cashln,   "cls03d.p1",    0x0000, 0x020000, CRC(a67d7720) SHA1(556128a8c464a5d1de0ebb0de8ce87a7ea0813d3), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 35)" )
-GAME_CUSTOM( 199?, m4cashln__8,    m4cashln,   "cls03dh.p1",   0x0000, 0x020000, CRC(22587ac6) SHA1(04cacccfebdc01046e048b2c98a05f3f97fcd6f3), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 36)" )
-GAME_CUSTOM( 199?, m4cashln__9,    m4cashln,   "cls03dk.p1",   0x0000, 0x020000, CRC(015f4f5c) SHA1(fd0e622217d42f52cfba78989e8cf843cb08a17d), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 37)" )
-GAME_CUSTOM( 199?, m4cashln__aa,   m4cashln,   "cls03dr.p1",   0x0000, 0x020000, CRC(b250f46d) SHA1(02f04778ce6fb674ba9760b0fa9828b76a58239a), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 38)" )
-GAME_CUSTOM( 199?, m4cashln__ab,   m4cashln,   "cls03dy.p1",   0x0000, 0x020000, CRC(86bc6fa2) SHA1(40a2bb1148989b5895b0f58417f404f7b035b472), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 39)" )
-GAME_CUSTOM( 199?, m4cashln__ac,   m4cashln,   "cls03h.p1",    0x0000, 0x020000, CRC(b2a6e19a) SHA1(668527a7939ab70deb03b1db8a4a2629fb332815), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 40)" )
-GAME_CUSTOM( 199?, m4cashln__ad,   m4cashln,   "cls03k.p1",    0x0000, 0x020000, CRC(91a1d400) SHA1(9e4ccd4f4119471d66a22b14a22312149faf28c0), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 41)" )
-GAME_CUSTOM( 199?, m4cashln__ae,   m4cashln,   "cls03r.p1",    0x0000, 0x020000, CRC(22ae6f31) SHA1(b08ec5eb5bae377b829a14065b54ec1dbbc55677), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 42)" )
-GAME_CUSTOM( 199?, m4cashln__af,   m4cashln,   "cls03s.p1",    0x0000, 0x020000, CRC(cb9a86b2) SHA1(2b4aee61c0070d295ba81ffa5739ceb8e05dc0e8), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 43)" )
-GAME_CUSTOM( 199?, m4cashln__ag,   m4cashln,   "cls03y.p1",    0x0000, 0x020000, CRC(1642f4fe) SHA1(b4e3fa360fdc1908cafe61d833c5097cee965404), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 44)" )
+// "(C)1993 BARCREST" and "CLS 0.4"
+GAME_CUSTOM( 199?, m4cashln,       0,          "cls04s.p1",    0x0000, 0x020000, CRC(c8b7f355) SHA1(437324bf499ba49ecbb3854f5f787da5f575f7f5), "Barcrest","Cash Lines (Barcrest) (MPU4) (CLS 0.4)" )
 GAME_CUSTOM( 199?, m4cashln__ah,   m4cashln,   "cls04ad.p1",   0x0000, 0x020000, CRC(6eb174ed) SHA1(dcf4e91ca16e3d5644429289470329102bc96f83), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 45)" )
 GAME_CUSTOM( 199?, m4cashln__ai,   m4cashln,   "cls04b.p1",    0x0000, 0x020000, CRC(73554174) SHA1(f74ba0a6212c58306d3e4f2e467e860bd4b2b294), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 46)" )
 GAME_CUSTOM( 199?, m4cashln__aj,   m4cashln,   "cls04bd.p1",   0x0000, 0x020000, CRC(e3abda28) SHA1(65b7883b52a8105f3df12659f4d9467f503ac1c6), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 47)" )
@@ -2939,19 +3129,53 @@ GAME_CUSTOM( 199?, m4cashln__aq,   m4cashln,   "cls04h.p1",    0x0000, 0x020000,
 GAME_CUSTOM( 199?, m4cashln__ar,   m4cashln,   "cls04k.p1",    0x0000, 0x020000, CRC(3992e922) SHA1(9c39d2740ef51004ea59f859ec3e008c6586c00d), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 55)" )
 GAME_CUSTOM( 199?, m4cashln__as,   m4cashln,   "cls04r.p1",    0x0000, 0x020000, CRC(8a9d5213) SHA1(dce36cdf790415bb37735a09226d73e322f7510a), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 56)" )
 GAME_CUSTOM( 199?, m4cashln__at,   m4cashln,   "cls04y.p1",    0x0000, 0x020000, CRC(be71c9dc) SHA1(d2c2374685e953a028726ba48329196aa0a9f098), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 57)" )
-GAME_CUSTOM( 199?, m4cashln__au,   m4cashln,   "ncc10ad.p1",   0x0000, 0x020000, CRC(d4be9280) SHA1(cbae1aad2dc8d88df9869755063a7a1097995417), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 58)" )
-GAME_CUSTOM( 199?, m4cashln__av,   m4cashln,   "ncc10b.p1",    0x0000, 0x020000, CRC(42abdedf) SHA1(4c428288ba9bb426ae011127896634f5995f8a6c), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 59)" )
-GAME_CUSTOM( 199?, m4cashln__aw,   m4cashln,   "ncc10bd.p1",   0x0000, 0x020000, CRC(9e793ad6) SHA1(7c26c6cf2b23e2b73887c2eea1e5f7566127ca95), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 60)" )
-GAME_CUSTOM( 199?, m4cashln__ax,   m4cashln,   "ncc10d.p1",    0x0000, 0x020000, CRC(cfb1701a) SHA1(20c47f0d30c4e4da37ce38fc097e841fb3ee89ed), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 61)" )
-GAME_CUSTOM( 199?, m4cashln__ay,   m4cashln,   "ncc10dh.p1",   0x0000, 0x020000, CRC(bdeac89d) SHA1(5ddde5cee5c95714e66e10a061e76603a993f446), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 62)" )
-GAME_CUSTOM( 199?, m4cashln__az,   m4cashln,   "ncc10dk.p1",   0x0000, 0x020000, CRC(67b129b1) SHA1(d7c0a107295ae3d11abe4138a1c76fd779777bec), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 63)" )
-GAME_CUSTOM( 199?, m4cashln__a0,   m4cashln,   "ncc10dr.p1",   0x0000, 0x020000, CRC(fd5ff708) SHA1(1bc5b96a46130370fc16b43804721eb392ec585f), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 64)" )
-GAME_CUSTOM( 199?, m4cashln__a1,   m4cashln,   "ncc10dy.p1",   0x0000, 0x020000, CRC(535db27e) SHA1(16b8d87fc22e040952988823d2c677130c17e137), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 65)" )
-GAME_CUSTOM( 199?, m4cashln__a2,   m4cashln,   "ncc10h.p1",    0x0000, 0x020000, CRC(61382c94) SHA1(98e4fcfedbe16773be0abbd6691ccd9f19a33684), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 66)" )
-GAME_CUSTOM( 199?, m4cashln__a3,   m4cashln,   "ncc10k.p1",    0x0000, 0x020000, CRC(bb63cdb8) SHA1(d4737ab4492bcdc0ffa3eb1cb0456f4f32e4482a), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 67)" )
-GAME_CUSTOM( 199?, m4cashln__a4,   m4cashln,   "ncc10r.p1",    0x0000, 0x020000, CRC(218d1301) SHA1(4bbdb69c2ac6ee13b50b1de8a17b019ce46004ba), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 68)" )
-GAME_CUSTOM( 199?, m4cashln__a5,   m4cashln,   "ncc10s.p1",    0x0000, 0x020000, CRC(2a18dc72) SHA1(f2434805212719db22ce163f2b338b25ca275c94), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 69)" )
-GAME_CUSTOM( 199?, m4cashln__a6,   m4cashln,   "ncc10y.p1",    0x0000, 0x020000, CRC(8f8f5677) SHA1(188d5d9c274147367bde644e33e162d0541cdca2), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 70)" )
+// "(C)1993 BARCREST" and "CLS 0.3"
+GAME_CUSTOM( 199?, m4cashln__af,   m4cashln,   "cls03s.p1",    0x0000, 0x020000, CRC(cb9a86b2) SHA1(2b4aee61c0070d295ba81ffa5739ceb8e05dc0e8), "Barcrest","Cash Lines (Barcrest) (MPU4) (CLS 0.3)" )
+GAME_CUSTOM( 199?, m4cashln__3,    m4cashln,   "cls03ad.p1",   0x0000, 0x020000, CRC(c68249cf) SHA1(d2d16ce76a5b144827a11f7fa471c7ea558c1ce0), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 31)" )
+GAME_CUSTOM( 199?, m4cashln__4,    m4cashln,   "cls03b.p1",    0x0000, 0x020000, CRC(db667c56) SHA1(8a8f2374d0d02307206071718376400d5a52dc6c), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 32)" )
+GAME_CUSTOM( 199?, m4cashln__5,    m4cashln,   "cls03bd.p1",   0x0000, 0x020000, CRC(4b98e70a) SHA1(04e0732dd8c0283dd928da9caafd78f509a4d479), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 33)" )
+GAME_CUSTOM( 199?, m4cashln__6,    m4cashln,   "cls03c.p1",    0x0000, 0x020000, CRC(ec2cc144) SHA1(bc2879e4487ad5638e2818f4c8c5b23ab660cecc), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 34)" )
+GAME_CUSTOM( 199?, m4cashln__7,    m4cashln,   "cls03d.p1",    0x0000, 0x020000, CRC(a67d7720) SHA1(556128a8c464a5d1de0ebb0de8ce87a7ea0813d3), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 35)" )
+GAME_CUSTOM( 199?, m4cashln__8,    m4cashln,   "cls03dh.p1",   0x0000, 0x020000, CRC(22587ac6) SHA1(04cacccfebdc01046e048b2c98a05f3f97fcd6f3), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 36)" )
+GAME_CUSTOM( 199?, m4cashln__9,    m4cashln,   "cls03dk.p1",   0x0000, 0x020000, CRC(015f4f5c) SHA1(fd0e622217d42f52cfba78989e8cf843cb08a17d), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 37)" )
+GAME_CUSTOM( 199?, m4cashln__aa,   m4cashln,   "cls03dr.p1",   0x0000, 0x020000, CRC(b250f46d) SHA1(02f04778ce6fb674ba9760b0fa9828b76a58239a), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 38)" )
+GAME_CUSTOM( 199?, m4cashln__ab,   m4cashln,   "cls03dy.p1",   0x0000, 0x020000, CRC(86bc6fa2) SHA1(40a2bb1148989b5895b0f58417f404f7b035b472), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 39)" )
+GAME_CUSTOM( 199?, m4cashln__ac,   m4cashln,   "cls03h.p1",    0x0000, 0x020000, CRC(b2a6e19a) SHA1(668527a7939ab70deb03b1db8a4a2629fb332815), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 40)" )
+GAME_CUSTOM( 199?, m4cashln__ad,   m4cashln,   "cls03k.p1",    0x0000, 0x020000, CRC(91a1d400) SHA1(9e4ccd4f4119471d66a22b14a22312149faf28c0), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 41)" )
+GAME_CUSTOM( 199?, m4cashln__ae,   m4cashln,   "cls03r.p1",    0x0000, 0x020000, CRC(22ae6f31) SHA1(b08ec5eb5bae377b829a14065b54ec1dbbc55677), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 42)" )
+GAME_CUSTOM( 199?, m4cashln__ag,   m4cashln,   "cls03y.p1",    0x0000, 0x020000, CRC(1642f4fe) SHA1(b4e3fa360fdc1908cafe61d833c5097cee965404), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 44)" )
+// "(C)1993 BARCREST" and "CLI 1.2"
+GAME_CUSTOM( 199?, m4cashln__1,    m4cashln,   "cli12s.p1",    0x0000, 0x020000, CRC(ef5aa578) SHA1(c4c288a297f5f6cd0712c396237aa3bf1363e188), "Barcrest","Cash Lines (Barcrest) (MPU4) (CLI 1.2)" )
+GAME_CUSTOM( 199?, m4cashln__q,    m4cashln,   "cli12ad.p1",   0x0000, 0x020000, CRC(d6c03a42) SHA1(203ea61def95c2ea0a9ea1f808056122d87993ff), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 18)" )
+GAME_CUSTOM( 199?, m4cashln__r,    m4cashln,   "cli12b.p1",    0x0000, 0x020000, CRC(9d4245da) SHA1(604b1e68d271784b982cde81e3675298662df1bc), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 19)" )
+GAME_CUSTOM( 199?, m4cashln__s,    m4cashln,   "cli12bd.p1",   0x0000, 0x020000, CRC(9c079214) SHA1(1ee6362d876dd5aaa1699186ee905b48755a80de), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 20)" )
+GAME_CUSTOM( 199?, m4cashln__t,    m4cashln,   "cli12d.p1",    0x0000, 0x020000, CRC(1058eb1f) SHA1(2c4305679c829cbf6c34d2627a1e8e366c5be5c1), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 21)" )
+GAME_CUSTOM( 199?, m4cashln__u,    m4cashln,   "cli12dh.p1",   0x0000, 0x020000, CRC(bf94605f) SHA1(e2ae87041791ba92d8db69c7a3b40b62c97cf941), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 22)" )
+GAME_CUSTOM( 199?, m4cashln__v,    m4cashln,   "cli12dk.p1",   0x0000, 0x020000, CRC(65cf8173) SHA1(f7ed6227b3e57d50e327f3ff72b9aafafa51da63), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 23)" )
+GAME_CUSTOM( 199?, m4cashln__w,    m4cashln,   "cli12dr.p1",   0x0000, 0x020000, CRC(ff215fca) SHA1(40cab82f6a7f5229b365236b4758e73b2a3dce1e), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 24)" )
+GAME_CUSTOM( 199?, m4cashln__x,    m4cashln,   "cli12dy.p1",   0x0000, 0x020000, CRC(51231abc) SHA1(ae80491fb1496f6fccbd46f424fe1d45640da8e2), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 25)" )
+GAME_CUSTOM( 199?, m4cashln__y,    m4cashln,   "cli12h.p1",    0x0000, 0x020000, CRC(bed1b791) SHA1(d017f62a099475786fa15c7a185574301b80dbdd), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 26)" )
+GAME_CUSTOM( 199?, m4cashln__z,    m4cashln,   "cli12k.p1",    0x0000, 0x020000, CRC(648a56bd) SHA1(25ad92789b12512b8c65cc912080f62abfe101a6), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 27)" )
+GAME_CUSTOM( 199?, m4cashln__0,    m4cashln,   "cli12r.p1",    0x0000, 0x020000, CRC(fe648804) SHA1(27e74aea209b90dc3d8cf46474e271d68d9af7e2), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 28)" )
+GAME_CUSTOM( 199?, m4cashln__2,    m4cashln,   "cli12y.p1",    0x0000, 0x020000, CRC(5066cd72) SHA1(03cef55b4fff8fb6edd804fdbc4076db6b234614), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 30)" )
+// "(C)1993 BARCREST" and "CLI 1.1"
+GAME_CUSTOM( 199?, m4cashln__o,    m4cashln,   "cli11s.p1",    0x0000, 0x020000, CRC(e5ad1734) SHA1(69fb5c81ae04c98920d84f829be14983168196e5), "Barcrest","Cash Lines (Barcrest) (MPU4) (CLI 1.1)" )
+GAME_CUSTOM( 199?, m4cashln__d,    m4cashln,   "cli11ad.p1",   0x0000, 0x020000, CRC(ab47d9b3) SHA1(e501bb61de76ffe6618be03a59614b36e71e031b), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4cashln__e,    m4cashln,   "cli11b.p1",    0x0000, 0x020000, CRC(4adcaa58) SHA1(027dda275f32e49e6c0f9ff4e7d42472bdd3174e), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4cashln__f,    m4cashln,   "cli11bd.p1",   0x0000, 0x020000, CRC(e18071e5) SHA1(e219be249b5992808745a4c668686dfad77e2837), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4cashln__g,    m4cashln,   "cli11d.p1",    0x0000, 0x020000, CRC(c7c6049d) SHA1(6ad1caed1272ff4e6902843bf2420020ca2d0cb4), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 8)" )
+GAME_CUSTOM( 199?, m4cashln__h,    m4cashln,   "cli11dh.p1",   0x0000, 0x020000, CRC(c21383ae) SHA1(01a840f160aacbb2b253ab6ba0a915f7055cc381), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 9)" )
+GAME_CUSTOM( 199?, m4cashln__i,    m4cashln,   "cli11dk.p1",   0x0000, 0x020000, CRC(18486282) SHA1(5910a68539f5343661f8e55105c767067633ef1c), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 10)" )
+GAME_CUSTOM( 199?, m4cashln__j,    m4cashln,   "cli11dr.p1",   0x0000, 0x020000, CRC(82a6bc3b) SHA1(c12b46234bebe408374a7fc3e18bf79942434d95), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 11)" )
+GAME_CUSTOM( 199?, m4cashln__k,    m4cashln,   "cli11dy.p1",   0x0000, 0x020000, CRC(2ca4f94d) SHA1(4d0345e3c819d8dd48c559f01c118430d5ccdea2), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 12)" )
+GAME_CUSTOM( 199?, m4cashln__l,    m4cashln,   "cli11h.p1",    0x0000, 0x020000, CRC(694f5813) SHA1(3acf84d6e5060e7054097aa2601c9c2833a2d524), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 13)" )
+GAME_CUSTOM( 199?, m4cashln__m,    m4cashln,   "cli11k.p1",    0x0000, 0x020000, CRC(b314b93f) SHA1(e94472e1d1e345be84b277088dc852ed75117344), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 14)" )
+GAME_CUSTOM( 199?, m4cashln__n,    m4cashln,   "cli11r.p1",    0x0000, 0x020000, CRC(29fa6786) SHA1(8bd7a7b0cf84615a126ebed494954ed2b7bc0ec4), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 15)" )
+GAME_CUSTOM( 199?, m4cashln__p,    m4cashln,   "cli11y.p1",    0x0000, 0x020000, CRC(87f822f0) SHA1(701a8c88be972b8363490e92e98f37acd493ef07), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 17)" )
+// "(C)1993 BARCREST" and "CLI 1.0"
+GAME_CUSTOM( 199?, m4cashln__c,    m4cashln,   "cli10s",       0x0000, 0x020000, CRC(9aca737d) SHA1(6669c8b7a192b1c67caad62aad528b08737f7e73), "Barcrest","Cash Lines (Barcrest) (MPU4) (CLI 1.0)" )
+// "(C)1993 BARCREST" and "NCL 1.1"
+GAME_CUSTOM( 199?, m4cashln__bi,   m4cashln,   "ncl11s.p1",    0x0000, 0x020000, CRC(06ae30c0) SHA1(eb7fde45e0a0aa08f3c788f581b48adc8ee86a79), "Barcrest","Cash Lines (Barcrest) (MPU4) (NCL 1.1)" )
 GAME_CUSTOM( 199?, m4cashln__a7,   m4cashln,   "ncl11ad.p1",   0x0000, 0x020000, CRC(73ba0558) SHA1(d86b2469d7cbe5f9271f8e8f3c6ee1659d72b3c6), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 71)" )
 GAME_CUSTOM( 199?, m4cashln__a8,   m4cashln,   "ncl11b.p1",    0x0000, 0x020000, CRC(f6e8ee46) SHA1(6d0da96b6cba4482c254fef6ba44a4e80fc0fda4), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 72)" )
 GAME_CUSTOM( 199?, m4cashln__a9,   m4cashln,   "ncl11bd.p1",   0x0000, 0x020000, CRC(397dad0e) SHA1(ad764f376b34f01578fc2ce78351f89642601252), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 73)" )
@@ -2963,10 +3187,25 @@ GAME_CUSTOM( 199?, m4cashln__be,   m4cashln,   "ncl11dy.p1",   0x0000, 0x020000,
 GAME_CUSTOM( 199?, m4cashln__bf,   m4cashln,   "ncl11h.p1",    0x0000, 0x020000, CRC(d57b1c0d) SHA1(cfb0e78ecba28a5ebe6e272190c473023544452b), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 79)" )
 GAME_CUSTOM( 199?, m4cashln__bg,   m4cashln,   "ncl11k.p1",    0x0000, 0x020000, CRC(0f20fd21) SHA1(25c3a7fe77819613de7bf4218759b096a05e5605), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 80)" )
 GAME_CUSTOM( 199?, m4cashln__bh,   m4cashln,   "ncl11r.p1",    0x0000, 0x020000, CRC(95ce2398) SHA1(72aa7ec767a81c568b442f63c3cf916925b22a4a), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 81)" )
-GAME_CUSTOM( 199?, m4cashln__bi,   m4cashln,   "ncl11s.p1",    0x0000, 0x020000, CRC(06ae30c0) SHA1(eb7fde45e0a0aa08f3c788f581b48adc8ee86a79), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 82)" )
 GAME_CUSTOM( 199?, m4cashln__bj,   m4cashln,   "ncl11y.p1",    0x0000, 0x020000, CRC(3bcc66ee) SHA1(795ecf1e34ae44d7aea70512124b66b0bed3e875), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 83)" )
-
-
+// "(C)1993 BARCREST" and "NCC 1.0"
+GAME_CUSTOM( 199?, m4cashln__a5,   m4cashln,   "ncc10s.p1",    0x0000, 0x020000, CRC(2a18dc72) SHA1(f2434805212719db22ce163f2b338b25ca275c94), "Barcrest","Cash Lines (Barcrest) (MPU4) (NCC 1.0)" )
+GAME_CUSTOM( 199?, m4cashln__au,   m4cashln,   "ncc10ad.p1",   0x0000, 0x020000, CRC(d4be9280) SHA1(cbae1aad2dc8d88df9869755063a7a1097995417), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 58)" )
+GAME_CUSTOM( 199?, m4cashln__av,   m4cashln,   "ncc10b.p1",    0x0000, 0x020000, CRC(42abdedf) SHA1(4c428288ba9bb426ae011127896634f5995f8a6c), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 59)" )
+GAME_CUSTOM( 199?, m4cashln__aw,   m4cashln,   "ncc10bd.p1",   0x0000, 0x020000, CRC(9e793ad6) SHA1(7c26c6cf2b23e2b73887c2eea1e5f7566127ca95), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 60)" )
+GAME_CUSTOM( 199?, m4cashln__ax,   m4cashln,   "ncc10d.p1",    0x0000, 0x020000, CRC(cfb1701a) SHA1(20c47f0d30c4e4da37ce38fc097e841fb3ee89ed), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 61)" )
+GAME_CUSTOM( 199?, m4cashln__ay,   m4cashln,   "ncc10dh.p1",   0x0000, 0x020000, CRC(bdeac89d) SHA1(5ddde5cee5c95714e66e10a061e76603a993f446), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 62)" )
+GAME_CUSTOM( 199?, m4cashln__az,   m4cashln,   "ncc10dk.p1",   0x0000, 0x020000, CRC(67b129b1) SHA1(d7c0a107295ae3d11abe4138a1c76fd779777bec), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 63)" )
+GAME_CUSTOM( 199?, m4cashln__a0,   m4cashln,   "ncc10dr.p1",   0x0000, 0x020000, CRC(fd5ff708) SHA1(1bc5b96a46130370fc16b43804721eb392ec585f), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 64)" )
+GAME_CUSTOM( 199?, m4cashln__a1,   m4cashln,   "ncc10dy.p1",   0x0000, 0x020000, CRC(535db27e) SHA1(16b8d87fc22e040952988823d2c677130c17e137), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 65)" )
+GAME_CUSTOM( 199?, m4cashln__a2,   m4cashln,   "ncc10h.p1",    0x0000, 0x020000, CRC(61382c94) SHA1(98e4fcfedbe16773be0abbd6691ccd9f19a33684), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 66)" )
+GAME_CUSTOM( 199?, m4cashln__a3,   m4cashln,   "ncc10k.p1",    0x0000, 0x020000, CRC(bb63cdb8) SHA1(d4737ab4492bcdc0ffa3eb1cb0456f4f32e4482a), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 67)" )
+GAME_CUSTOM( 199?, m4cashln__a4,   m4cashln,   "ncc10r.p1",    0x0000, 0x020000, CRC(218d1301) SHA1(4bbdb69c2ac6ee13b50b1de8a17b019ce46004ba), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 68)" )
+GAME_CUSTOM( 199?, m4cashln__a6,   m4cashln,   "ncc10y.p1",    0x0000, 0x020000, CRC(8f8f5677) SHA1(188d5d9c274147367bde644e33e162d0541cdca2), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 70)" )
+// no copyright string and "CLI 1.1"
+GAME_CUSTOM( 199?, m4cashln__a,    m4cashln,   "cl15g",        0x0000, 0x020000, CRC(fdd5765d) SHA1(fee8ddc9b93934a5582d6730cfa26246191c22ff), "hack","Cash Lines (Barcrest) (MPU4) (CLI 1.1, hack)" )
+// no copyright string and "CLS 0.3"
+GAME_CUSTOM( 199?, m4cashln__b,    m4cashln,   "cl15t",        0x0000, 0x020000, CRC(56bb9f21) SHA1(2876ac79283ea5cbee45e9ac6d5d140ea7db8e95), "hack","Cash Lines (Barcrest) (MPU4) (CLS 0.3, hack)" )
 
 #define M4LUCKLV_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
@@ -2981,7 +3220,14 @@ GAME_CUSTOM( 199?, m4cashln__bj,   m4cashln,   "ncl11y.p1",    0x0000, 0x020000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4lucklv,       0,          "llvs.p1",  0x0000, 0x010000, CRC(30727bc9) SHA1(c32112d0181f629540b31ce9959834111dbf7e0e), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 1)" )
+// "(C)1991 BARCREST" and "LLV 0.2"
+GAME_CUSTOM( 199?, m4lucklv,       0,          "llvs.p1",  0x0000, 0x010000, CRC(30727bc9) SHA1(c32112d0181f629540b31ce9959834111dbf7e0e), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (LLV 0.2)" )
+GAME_CUSTOM( 199?, m4lucklv__af,   m4lucklv,   "llvb.p1",  0x0000, 0x010000, CRC(72e27d9b) SHA1(2355c48c4ac8bc94dcea74b04e68be8a461f09a3), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 43)" )
+GAME_CUSTOM( 199?, m4lucklv__ag,   m4lucklv,   "llvc.p1",  0x0000, 0x010000, CRC(00ac2db0) SHA1(a8ec3a2862abf4eb56734d15cd9b7db0333c98f2), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 44)" )
+GAME_CUSTOM( 199?, m4lucklv__ah,   m4lucklv,   "llvd.p1",  0x0000, 0x010000, CRC(fdb4dcc5) SHA1(77fa51dcf1895b83182e7ee4137ed68c06d2593b), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 45)" )
+GAME_CUSTOM( 199?, m4lucklv__ai,   m4lucklv,   "llvr.p1",  0x0000, 0x010000, CRC(a806c43f) SHA1(8c36d50c911f956a0458f942cc8e313104f00005), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 46)" )
+// "(C)1991 BARCREST" and "LL3 0.1"
+GAME_CUSTOM( 199?, m4lucklv__h,    m4lucklv,   "ll3s.p1",  0x0000, 0x010000, CRC(fdda2e78) SHA1(f68b274b6af7b44347b8f684f6e8a9342d222590), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (LL3 0.1)" )
 GAME_CUSTOM( 199?, m4lucklv__a,    m4lucklv,   "ll3ad.p1", 0x0000, 0x010000, CRC(e79e7f98) SHA1(7b3a22978f2f5a0b6062f0330fef15ce0e91c010), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4lucklv__b,    m4lucklv,   "ll3b.p1",  0x0000, 0x010000, CRC(bcbbe728) SHA1(4930419e0e524a91687386e8a2fce2150cd8a172), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4lucklv__c,    m4lucklv,   "ll3bd.p1", 0x0000, 0x010000, CRC(aa4e9e1e) SHA1(ebacd42049916a32d1738813d544e34507dd650a), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 4)" )
@@ -2989,8 +3235,9 @@ GAME_CUSTOM( 199?, m4lucklv__d,    m4lucklv,   "ll3d.p1",  0x0000, 0x010000, CRC
 GAME_CUSTOM( 199?, m4lucklv__e,    m4lucklv,   "ll3dk.p1", 0x0000, 0x010000, CRC(c03baaef) SHA1(f3c4394d0c9929d439551aa61784a51f67e2dc3a), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 6)" )
 GAME_CUSTOM( 199?, m4lucklv__f,    m4lucklv,   "ll3dy.p1", 0x0000, 0x010000, CRC(e73fa943) SHA1(3b2a372028ffa5200510e976cd4e8eba8e6c0612), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 7)" )
 GAME_CUSTOM( 199?, m4lucklv__g,    m4lucklv,   "ll3k.p1",  0x0000, 0x010000, CRC(2519ede2) SHA1(d9e4b57824cddc04d1166cee16c309a77ff510d6), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4lucklv__h,    m4lucklv,   "ll3s.p1",  0x0000, 0x010000, CRC(fdda2e78) SHA1(f68b274b6af7b44347b8f684f6e8a9342d222590), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 9)" )
 GAME_CUSTOM( 199?, m4lucklv__i,    m4lucklv,   "ll3y.p1",  0x0000, 0x010000, CRC(195023d4) SHA1(a4fabaa44fa76c4e77fb40bb89c65dadeab5927c), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 10)" )
+// "(C)1991 BARCREST" and "LL8 0.1"
+GAME_CUSTOM( 199?, m4lucklv__r,    m4lucklv,   "ll8s.p1",  0x0000, 0x010000, CRC(1448c6fe) SHA1(211627a0f397658a8241c5e4e138a1a609beaabe), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (LL8 0.1)" )
 GAME_CUSTOM( 199?, m4lucklv__j,    m4lucklv,   "ll8ad.p1", 0x0000, 0x010000, CRC(08f307ef) SHA1(1a613d8d2cbadffe1a97a7e2c3eafc709e6895c7), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 11)" )
 GAME_CUSTOM( 199?, m4lucklv__k,    m4lucklv,   "ll8b.p1",  0x0000, 0x010000, CRC(7dd12d38) SHA1(4466bca407500741e74dfec07361d030c1736c18), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 12)" )
 GAME_CUSTOM( 199?, m4lucklv__l,    m4lucklv,   "ll8bd.p1", 0x0000, 0x010000, CRC(3eef6aa5) SHA1(e01b95ca085a326207ef2ada1d5f31745b9c15c9), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 13)" )
@@ -2999,8 +3246,9 @@ GAME_CUSTOM( 199?, m4lucklv__n,    m4lucklv,   "ll8d.p1",  0x0000, 0x010000, CRC
 GAME_CUSTOM( 199?, m4lucklv__o,    m4lucklv,   "ll8dk.p1", 0x0000, 0x010000, CRC(f325c2af) SHA1(25a0818776c0cf4edcd2678fe457e21bf10dfe61), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 16)" )
 GAME_CUSTOM( 199?, m4lucklv__p,    m4lucklv,   "ll8dy.p1", 0x0000, 0x010000, CRC(10b33cc3) SHA1(fe0a41b98b1f3dde82365c30236586737c5fdb9d), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 17)" )
 GAME_CUSTOM( 199?, m4lucklv__q,    m4lucklv,   "ll8k.p1",  0x0000, 0x010000, CRC(d7c284be) SHA1(c33dbfa15ead02a581b4a874a6981e6094537fb4), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4lucklv__r,    m4lucklv,   "ll8s.p1",  0x0000, 0x010000, CRC(1448c6fe) SHA1(211627a0f397658a8241c5e4e138a1a609beaabe), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 19)" )
 GAME_CUSTOM( 199?, m4lucklv__s,    m4lucklv,   "ll8y.p1",  0x0000, 0x010000, CRC(eb8b4a88) SHA1(f0de0d50de848e7fea35ebe754f20eaa1c02f295), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 20)" )
+// "(C)1991 BARCREST" and "LLT 0.3"
+GAME_CUSTOM( 199?, m4lucklv__2,    m4lucklv,   "llts.p1",  0x0000, 0x010000, CRC(3ccc9e2f) SHA1(15c90bbc135ddaa05768bde6970bda15f1b69d44), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (LLT 0.3)" )
 GAME_CUSTOM( 199?, m4lucklv__t,    m4lucklv,   "lltad.p1", 0x0000, 0x010000, CRC(35e43f52) SHA1(4ca2c43c59f5c5c3f53527bbf8128f0e92a3ca5c), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 21)" )
 GAME_CUSTOM( 199?, m4lucklv__u,    m4lucklv,   "lltb.p1",  0x0000, 0x010000, CRC(ddc19b4e) SHA1(b44a56e5d543d895e37986d19649d7afa8d3d238), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 22)" )
 GAME_CUSTOM( 199?, m4lucklv__v,    m4lucklv,   "lltbd.p1", 0x0000, 0x010000, CRC(fe25aa83) SHA1(68ccae76938af64e0c5df0e56333fd6814734779), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 23)" )
@@ -3010,8 +3258,9 @@ GAME_CUSTOM( 199?, m4lucklv__y,    m4lucklv,   "lltdr.p1", 0x0000, 0x010000, CRC
 GAME_CUSTOM( 199?, m4lucklv__z,    m4lucklv,   "lltdy.p1", 0x0000, 0x010000, CRC(55c4a8df) SHA1(a7cc7fa2aa893a3f134d6d1c04a16ecbcad99a40), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 27)" )
 GAME_CUSTOM( 199?, m4lucklv__0,    m4lucklv,   "lltk.p1",  0x0000, 0x010000, CRC(88c7f5e5) SHA1(c30651c6daa6c82157879e72a74ee5e03f9ea64f), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 28)" )
 GAME_CUSTOM( 199?, m4lucklv__1,    m4lucklv,   "lltr.p1",  0x0000, 0x010000, CRC(189c8fc7) SHA1(c06bedd4477ead2c071374d17fc0ef617ef6e924), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 29)" )
-GAME_CUSTOM( 199?, m4lucklv__2,    m4lucklv,   "llts.p1",  0x0000, 0x010000, CRC(3ccc9e2f) SHA1(15c90bbc135ddaa05768bde6970bda15f1b69d44), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 30)" )
 GAME_CUSTOM( 199?, m4lucklv__3,    m4lucklv,   "llty.p1",  0x0000, 0x010000, CRC(85f7a729) SHA1(b3a58071bb6dae36354280a8f0de1faaa190899f), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 31)" )
+// "(C)1991 BARCREST" and "LLU 0.1"
+GAME_CUSTOM( 199?, m4lucklv__ad,   m4lucklv,   "llus.p1",  0x0000, 0x010000, CRC(07745135) SHA1(ec602d01910ac52d20ff9c54914a5261f538233b), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (LLU 0.1)" )
 GAME_CUSTOM( 199?, m4lucklv__4,    m4lucklv,   "lluad.p1", 0x0000, 0x010000, CRC(7a2acea9) SHA1(dfb5763664143dec4927e2a8f4088f04ca85c458), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 32)" )
 GAME_CUSTOM( 199?, m4lucklv__5,    m4lucklv,   "llub.p1",  0x0000, 0x010000, CRC(d3683b6b) SHA1(e67e996f5f2ed55fbc47b7f1a0e225125baf2a99), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 33)" )
 GAME_CUSTOM( 199?, m4lucklv__6,    m4lucklv,   "llubd.p1", 0x0000, 0x010000, CRC(4c36a3e3) SHA1(afbe3c4d60dd92e7bc34915f3d15cadd46da6738), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 34)" )
@@ -3021,12 +3270,7 @@ GAME_CUSTOM( 199?, m4lucklv__9,    m4lucklv,   "lludr.p1", 0x0000, 0x010000, CRC
 GAME_CUSTOM( 199?, m4lucklv__aa,   m4lucklv,   "lludy.p1", 0x0000, 0x010000, CRC(6d042cfe) SHA1(3812f99d45cff5f147a7965f3cb8c96eda9a2e8d), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 38)" )
 GAME_CUSTOM( 199?, m4lucklv__ab,   m4lucklv,   "lluk.p1",  0x0000, 0x010000, CRC(476cd76c) SHA1(1a122bfbe3d95b2ce9ecf18bc6d4f85d1ea09bc7), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 39)" )
 GAME_CUSTOM( 199?, m4lucklv__ac,   m4lucklv,   "llur.p1",  0x0000, 0x010000, CRC(89a1a999) SHA1(e21007e2db0f69f0753becbf499c54cb29f46a39), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 40)" )
-GAME_CUSTOM( 199?, m4lucklv__ad,   m4lucklv,   "llus.p1",  0x0000, 0x010000, CRC(07745135) SHA1(ec602d01910ac52d20ff9c54914a5261f538233b), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 41)" )
 GAME_CUSTOM( 199?, m4lucklv__ae,   m4lucklv,   "lluy.p1",  0x0000, 0x010000, CRC(1cfc18d6) SHA1(eb34e5a43cee1d4b64443f1fe2b1d12ccf35b847), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 42)" )
-GAME_CUSTOM( 199?, m4lucklv__af,   m4lucklv,   "llvb.p1",  0x0000, 0x010000, CRC(72e27d9b) SHA1(2355c48c4ac8bc94dcea74b04e68be8a461f09a3), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 43)" )
-GAME_CUSTOM( 199?, m4lucklv__ag,   m4lucklv,   "llvc.p1",  0x0000, 0x010000, CRC(00ac2db0) SHA1(a8ec3a2862abf4eb56734d15cd9b7db0333c98f2), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 44)" )
-GAME_CUSTOM( 199?, m4lucklv__ah,   m4lucklv,   "llvd.p1",  0x0000, 0x010000, CRC(fdb4dcc5) SHA1(77fa51dcf1895b83182e7ee4137ed68c06d2593b), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 45)" )
-GAME_CUSTOM( 199?, m4lucklv__ai,   m4lucklv,   "llvr.p1",  0x0000, 0x010000, CRC(a806c43f) SHA1(8c36d50c911f956a0458f942cc8e313104f00005), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 46)" )
 
 
 
@@ -3044,9 +3288,8 @@ GAME_CUSTOM( 199?, m4lucklv__ai,   m4lucklv,   "llvr.p1",  0x0000, 0x010000, CRC
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4luckst,       0,          "lss06s.p1",            0x0000, 0x020000, CRC(b6a69478) SHA1(6b05b7f9af94a83adfdff328d4132f72a1dfb19f), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4luckst__a,    m4luckst,   "ls15g",                0x0000, 0x020000, CRC(b942ac91) SHA1(e77b2acd07cac9b747731f9e0637112fc6bf94c7), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4luckst__b,    m4luckst,   "ls15t",                0x0000, 0x020000, CRC(20447a20) SHA1(ca2ba566317ca87afcc2501e551c1326b9712526), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 3)" )
+// "(C)1993 BARCREST" and "LSS 0.6"
+GAME_CUSTOM( 199?, m4luckst,       0,          "lss06s.p1",            0x0000, 0x020000, CRC(b6a69478) SHA1(6b05b7f9af94a83adfdff328d4132f72a1dfb19f), "Barcrest","Lucky Strike (Barcrest) (MPU4) (LSS 0.6)" )
 GAME_CUSTOM( 199?, m4luckst__c,    m4luckst,   "lss06ad.p1",           0x0000, 0x020000, CRC(9a512ec1) SHA1(c1eb4d0f5c915f392411d0ff2c931eb22a41b3a8), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 4)" )
 GAME_CUSTOM( 199?, m4luckst__d,    m4luckst,   "lss06b.p1",            0x0000, 0x020000, CRC(f2e1cb20) SHA1(7867085e0d1166419360bf1b6f39e3ec31bf2c7f), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 5)" )
 GAME_CUSTOM( 199?, m4luckst__e,    m4luckst,   "lss06bd.p1",           0x0000, 0x020000, CRC(174b8004) SHA1(9cce3124797b80886ab744885444f7a69711f6f1), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 6)" )
@@ -3060,6 +3303,8 @@ GAME_CUSTOM( 199?, m4luckst__l,    m4luckst,   "lss06h.p1",            0x0000, 0
 GAME_CUSTOM( 199?, m4luckst__m,    m4luckst,   "lss06k.p1",            0x0000, 0x020000, CRC(b8266376) SHA1(7d84dce05224c8882ed103796a054b50e2390234), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 14)" )
 GAME_CUSTOM( 199?, m4luckst__n,    m4luckst,   "lss06r.p1",            0x0000, 0x020000, CRC(0b29d847) SHA1(3412bff6f38ab12b9d5e30f1ed3e327ad58dc470), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 15)" )
 GAME_CUSTOM( 199?, m4luckst__p,    m4luckst,   "lss06y.p1",            0x0000, 0x020000, CRC(3fc54388) SHA1(f57667cc0263efe05d0f0538fae2f4f8adc0c405), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 17)" )
+// "(C)1993 BARCREST" and "LSS 0.7"
+GAME_CUSTOM( 199?, m4luckst__2,    m4luckst,   "lss07s.p1",            0x0000, 0x020000, CRC(f4546d1a) SHA1(fed65704693e11087825b1dfda4df28ee6d2d3be), "Barcrest","Lucky Strike (Barcrest) (MPU4) (LSS 0.7)" )
 GAME_CUSTOM( 199?, m4luckst__q,    m4luckst,   "lss07ad.p1",           0x0000, 0x020000, CRC(c4e113c0) SHA1(e5e81c08c2487ee8802ff4374b3affdff3e70003), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 18)" )
 GAME_CUSTOM( 199?, m4luckst__r,    m4luckst,   "lss07b.p1",            0x0000, 0x020000, CRC(eec5db67) SHA1(c7b76b50524b256ec42adc33c99f933790d9d578), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 19)" )
 GAME_CUSTOM( 199?, m4luckst__s,    m4luckst,   "lss07bd.p1",           0x0000, 0x020000, CRC(49fbbd05) SHA1(4edebdf607ae996e0f4a2df02f181e75b784e1ac), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 20)" )
@@ -3072,8 +3317,9 @@ GAME_CUSTOM( 199?, m4luckst__y,    m4luckst,   "lss07dy.p1",           0x0000, 0
 GAME_CUSTOM( 199?, m4luckst__z,    m4luckst,   "lss07h.p1",            0x0000, 0x020000, CRC(20298b24) SHA1(004d6d04d9e8223e7b97dbd39abc66e80d6ea0eb), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 27)" )
 GAME_CUSTOM( 199?, m4luckst__0,    m4luckst,   "lss07k.p1",            0x0000, 0x020000, CRC(a4027331) SHA1(64320519f22ebac3fbb7d93e2e70e999e8e7cd29), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 28)" )
 GAME_CUSTOM( 199?, m4luckst__1,    m4luckst,   "lss07r.p1",            0x0000, 0x020000, CRC(170dc800) SHA1(bebd8b41b756c7ca5ddc60647e6031ac4cf874db), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 29)" )
-GAME_CUSTOM( 199?, m4luckst__2,    m4luckst,   "lss07s.p1",            0x0000, 0x020000, CRC(f4546d1a) SHA1(fed65704693e11087825b1dfda4df28ee6d2d3be), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 30)" )
 GAME_CUSTOM( 199?, m4luckst__3,    m4luckst,   "lss07y.p1",            0x0000, 0x020000, CRC(23e153cf) SHA1(75c5c13ad735aba1bf62d26eb37f9aaa5804fdd2), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 31)" )
+// "(C)1993 BARCREST" and "LST 0.9"
+GAME_CUSTOM( 199?, m4luckst__af,   m4luckst,   "lst09s.p1",            0x0000, 0x020000, CRC(285d0255) SHA1(89f74ad19525b636d6e1ea36308b659389f68245), "Barcrest","Lucky Strike (Barcrest) (MPU4) (LST 0.9)" )
 GAME_CUSTOM( 199?, m4luckst__4,    m4luckst,   "lst09ad.p1",           0x0000, 0x020000, CRC(2fc94fb9) SHA1(cda6ce0a9d9e124326e29b57bc553b517408f1c6), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 32)" )
 GAME_CUSTOM( 199?, m4luckst__5,    m4luckst,   "lst09b.p1",            0x0000, 0x020000, CRC(c5b8927f) SHA1(15d227be23404b9393cb3d3625fd054eaf0da3a4), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 33)" )
 GAME_CUSTOM( 199?, m4luckst__6,    m4luckst,   "lst09bd.p1",           0x0000, 0x020000, CRC(650ee7ef) SHA1(2422e4f9857376a029f6b4df46b5b81c73b2640a), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 34)" )
@@ -3085,8 +3331,9 @@ GAME_CUSTOM( 199?, m4luckst__ab,   m4luckst,   "lst09dy.p1",           0x0000, 0
 GAME_CUSTOM( 199?, m4luckst__ac,   m4luckst,   "lst09h.p1",            0x0000, 0x020000, CRC(e62b6034) SHA1(37ae4b6250795087475ea8e51b49e225572118b4), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 40)" )
 GAME_CUSTOM( 199?, m4luckst__ad,   m4luckst,   "lst09k.p1",            0x0000, 0x020000, CRC(3c708118) SHA1(61ab1751dec08f7407fd3360cf129736d7d5ec16), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 41)" )
 GAME_CUSTOM( 199?, m4luckst__ae,   m4luckst,   "lst09r.p1",            0x0000, 0x020000, CRC(a69e5fa1) SHA1(10ca0a2135c4d6832693bf97812f4eb5f1380efd), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 42)" )
-GAME_CUSTOM( 199?, m4luckst__af,   m4luckst,   "lst09s.p1",            0x0000, 0x020000, CRC(285d0255) SHA1(89f74ad19525b636d6e1ea36308b659389f68245), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 43)" )
 GAME_CUSTOM( 199?, m4luckst__ag,   m4luckst,   "lst09y.p1",            0x0000, 0x020000, CRC(089c1ad7) SHA1(bcfacbeaf1845d91f18c6f57bf166c82469cb460), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 44)" )
+// "(C)1993 BARCREST" and "LST 1.0"
+GAME_CUSTOM( 199?, m4luckst__as,   m4luckst,   "lst10s.p1",            0x0000, 0x020000, CRC(0e1ad810) SHA1(bd439f2857ebbde2b7941c411ac7edf7c66af7eb), "Barcrest","Lucky Strike (Barcrest) (MPU4) (LST 1.0)" )
 GAME_CUSTOM( 199?, m4luckst__ah,   m4luckst,   "lst10ad.p1",           0x0000, 0x020000, CRC(41e8dd7d) SHA1(2b794554f57dfb5b6fe9f64b9d3e6b73ec306056), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 45)" )
 GAME_CUSTOM( 199?, m4luckst__ai,   m4luckst,   "lst10b.p1",            0x0000, 0x020000, CRC(afd0d023) SHA1(7ee5c004d9d0cacf2d55457f9846fd638b584482), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 46)" )
 GAME_CUSTOM( 199?, m4luckst__aj,   m4luckst,   "lst10bd.p1",           0x0000, 0x020000, CRC(0b2f752b) SHA1(655f50bbe163fca4386b356e7db0b019eba5d94f), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 47)" )
@@ -3098,11 +3345,15 @@ GAME_CUSTOM( 199?, m4luckst__ao,   m4luckst,   "lst10dy.p1",           0x0000, 0
 GAME_CUSTOM( 199?, m4luckst__ap,   m4luckst,   "lst10h.p1",            0x0000, 0x020000, CRC(8c432268) SHA1(c8707c587ab2cc1450bd47069206767d2d930b29), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 53)" )
 GAME_CUSTOM( 199?, m4luckst__aq,   m4luckst,   "lst10k.p1",            0x0000, 0x020000, CRC(5618c344) SHA1(61565a9814fd1b4e77944e73d8f18f8545685928), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 54)" )
 GAME_CUSTOM( 199?, m4luckst__ar,   m4luckst,   "lst10r.p1",            0x0000, 0x020000, CRC(ccf61dfd) SHA1(01772dd0b252b41b5cba024a717d5898e74971f8), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 55)" )
-GAME_CUSTOM( 199?, m4luckst__as,   m4luckst,   "lst10s.p1",            0x0000, 0x020000, CRC(0e1ad810) SHA1(bd439f2857ebbde2b7941c411ac7edf7c66af7eb), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 56)" )
 GAME_CUSTOM( 199?, m4luckst__at,   m4luckst,   "lst10y.p1",            0x0000, 0x020000, CRC(62f4588b) SHA1(ee7c06e2cc79f7d18d45b0a1793e5279a46ffcc0), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 57)" )
-GAME_CUSTOM( 199?, m4luckst__au,   m4luckst,   "lstrikegame10-8t.bin", 0x0000, 0x020000, CRC(709c2dbf) SHA1(bba8d7af9502911ffa1c086b993484ab78ad38ac), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 58)" )
-GAME_CUSTOM( 199?, m4luckst__av,   m4luckst,   "ls55",                 0x0000, 0x020000, CRC(823e805b) SHA1(17f09fd53188950a8d98ac04cd94785947b52b01), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 59)" )
-GAME_CUSTOM( 199?, m4luckst__aw,   m4luckst,   "ls__xa_x.1_1",         0x0000, 0x020000, CRC(a9642503) SHA1(2765c4d8943678446c516918035d7a888a812aae), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 60)" )
+// "(C)1998    BWB" and "LSS 1.0" (one of these is probably a hack)
+GAME_CUSTOM( 199?, m4luckst__av,   m4luckst,   "ls55",                 0x0000, 0x020000, CRC(823e805b) SHA1(17f09fd53188950a8d98ac04cd94785947b52b01), "Bwb","Lucky Strike (Barcrest) (MPU4) (LSS 1.0, set 1)" ) // bad chr alarm
+GAME_CUSTOM( 199?, m4luckst__aw,   m4luckst,   "ls__xa_x.1_1",         0x0000, 0x020000, CRC(a9642503) SHA1(2765c4d8943678446c516918035d7a888a812aae), "Bwb","Lucky Strike (Barcrest) (MPU4) (LSS 1.0, set 2)" )
+// no copyright string and "LST 0.9"
+GAME_CUSTOM( 199?, m4luckst__a,    m4luckst,   "ls15g",                0x0000, 0x020000, CRC(b942ac91) SHA1(e77b2acd07cac9b747731f9e0637112fc6bf94c7), "hack","Lucky Strike (Barcrest) (MPU4) (LST 0.9, hack)" )
+// no copyright string and "LSS 0.6"
+GAME_CUSTOM( 199?, m4luckst__au,   m4luckst,   "lstrikegame10-8t.bin", 0x0000, 0x020000, CRC(709c2dbf) SHA1(bba8d7af9502911ffa1c086b993484ab78ad38ac), "hack","Lucky Strike (Barcrest) (MPU4) (LSS 0.6, hack, set 1)" )
+GAME_CUSTOM( 199?, m4luckst__b,    m4luckst,   "ls15t",                0x0000, 0x020000, CRC(20447a20) SHA1(ca2ba566317ca87afcc2501e551c1326b9712526), "hack","Lucky Strike (Barcrest) (MPU4) (LSS 0.6, hack, set 2)" )
 
 
 #define M4TENTEN_EXTRA_ROMS \
@@ -3117,18 +3368,8 @@ GAME_CUSTOM( 199?, m4luckst__aw,   m4luckst,   "ls__xa_x.1_1",         0x0000, 0
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4tenten,       0,          "t2002s.p1",    0x0000, 0x010000, CRC(6cd9fa10) SHA1(8efe36e3fc5b709fa4363194634686d62b5d6609), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4tenten__a,    m4tenten,   "n2503ad.p1",   0x0000, 0x010000, CRC(c84150e6) SHA1(8f143c26c6026a413bdd65ca148d78dead1d2474), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4tenten__b,    m4tenten,   "n2503b.p1",    0x0000, 0x010000, CRC(dd74fb57) SHA1(402f632f48cf1153cb8c22879a7482c82c8fecfe), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4tenten__c,    m4tenten,   "n2503bd.p1",   0x0000, 0x010000, CRC(62542d80) SHA1(90ebfb92891a7aaa4814b733c0e0df06bb292a4f), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4tenten__d,    m4tenten,   "n2503d.p1",    0x0000, 0x010000, CRC(b8c64fa4) SHA1(f53d9bdf97cc021399c8598a051ad5bcb7a611b5), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4tenten__e,    m4tenten,   "n2503dk.p1",   0x0000, 0x010000, CRC(28715d57) SHA1(1ab648a7f5dde5575e5ab5653823e4b88580677f), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4tenten__f,    m4tenten,   "n2503dr.p1",   0x0000, 0x010000, CRC(59932d11) SHA1(9895392ce48569e23816646124933192b6f720e3), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4tenten__g,    m4tenten,   "n2503dy.p1",   0x0000, 0x010000, CRC(287b8ee7) SHA1(10e428c73911e01ba53dd4321eb2c5a58e35441e), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4tenten__h,    m4tenten,   "n2503k.p1",    0x0000, 0x010000, CRC(f240b5ba) SHA1(fca353213447e50e29f1cd2c0d3895c437ae9336), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4tenten__i,    m4tenten,   "n2503r.p1",    0x0000, 0x010000, CRC(afaacb9d) SHA1(1bf3d648b82a8160ff1a38d92d2bb3ce1b41125e), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4tenten__j,    m4tenten,   "n2503s.p1",    0x0000, 0x010000, CRC(0d9e912c) SHA1(67d888fde242e81a1808f36e1e81c0c5724e99a7), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4tenten__k,    m4tenten,   "n2503y.p1",    0x0000, 0x010000, CRC(b365cff0) SHA1(65ab9d624bec1efc0590cec739541887ca20fc6f), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 12)" )
+// "(C)1991 BARCREST" and "T20 0.2"
+GAME_CUSTOM( 199?, m4tenten,       0,          "t2002s.p1",    0x0000, 0x010000, CRC(6cd9fa10) SHA1(8efe36e3fc5b709fa4363194634686d62b5d6609), "Barcrest","10 X 10 (Barcrest) (MPU4) (T20 0.2)" )
 GAME_CUSTOM( 199?, m4tenten__l,    m4tenten,   "t2002ad.p1",   0x0000, 0x010000, CRC(f7903f0d) SHA1(8a10ff31ddaad817a31d39ea9a66d4453d8767bb), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 13)" )
 GAME_CUSTOM( 199?, m4tenten__m,    m4tenten,   "t2002b.p1",    0x0000, 0x010000, CRC(90e150ea) SHA1(abc8456de42cef605e1f0e80a97b25cd51d90707), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 14)" )
 GAME_CUSTOM( 199?, m4tenten__n,    m4tenten,   "t2002bd.p1",   0x0000, 0x010000, CRC(110c0d5c) SHA1(a263c678ebd58c95f33b198be544b726ac506449), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 15)" )
@@ -3139,6 +3380,20 @@ GAME_CUSTOM( 199?, m4tenten__r,    m4tenten,   "t2002dy.p1",   0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4tenten__s,    m4tenten,   "t2002k.p1",    0x0000, 0x010000, CRC(34628c9d) SHA1(3547dac8fd73abcba0f088c3f2db02ef8a40cf4e), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 20)" )
 GAME_CUSTOM( 199?, m4tenten__t,    m4tenten,   "t2002r.p1",    0x0000, 0x010000, CRC(9c639380) SHA1(c044b7fc53daa01d93c701a3d3c786ab6a883e76), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 21)" )
 GAME_CUSTOM( 199?, m4tenten__u,    m4tenten,   "t2002y.p1",    0x0000, 0x010000, CRC(dcf2ac8c) SHA1(e745534f45148ff33e6b1e503108a39e27d8bdae), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 22)" )
+// "(C)1991 BARCREST" and "N25 0.3"
+GAME_CUSTOM( 199?, m4tenten__j,    m4tenten,   "n2503s.p1",    0x0000, 0x010000, CRC(0d9e912c) SHA1(67d888fde242e81a1808f36e1e81c0c5724e99a7), "Barcrest","10 X 10 (Barcrest) (MPU4) (N25 0.3)" )
+GAME_CUSTOM( 199?, m4tenten__a,    m4tenten,   "n2503ad.p1",   0x0000, 0x010000, CRC(c84150e6) SHA1(8f143c26c6026a413bdd65ca148d78dead1d2474), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4tenten__b,    m4tenten,   "n2503b.p1",    0x0000, 0x010000, CRC(dd74fb57) SHA1(402f632f48cf1153cb8c22879a7482c82c8fecfe), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4tenten__c,    m4tenten,   "n2503bd.p1",   0x0000, 0x010000, CRC(62542d80) SHA1(90ebfb92891a7aaa4814b733c0e0df06bb292a4f), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4tenten__d,    m4tenten,   "n2503d.p1",    0x0000, 0x010000, CRC(b8c64fa4) SHA1(f53d9bdf97cc021399c8598a051ad5bcb7a611b5), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4tenten__e,    m4tenten,   "n2503dk.p1",   0x0000, 0x010000, CRC(28715d57) SHA1(1ab648a7f5dde5575e5ab5653823e4b88580677f), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4tenten__f,    m4tenten,   "n2503dr.p1",   0x0000, 0x010000, CRC(59932d11) SHA1(9895392ce48569e23816646124933192b6f720e3), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4tenten__g,    m4tenten,   "n2503dy.p1",   0x0000, 0x010000, CRC(287b8ee7) SHA1(10e428c73911e01ba53dd4321eb2c5a58e35441e), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 8)" )
+GAME_CUSTOM( 199?, m4tenten__h,    m4tenten,   "n2503k.p1",    0x0000, 0x010000, CRC(f240b5ba) SHA1(fca353213447e50e29f1cd2c0d3895c437ae9336), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 9)" )
+GAME_CUSTOM( 199?, m4tenten__i,    m4tenten,   "n2503r.p1",    0x0000, 0x010000, CRC(afaacb9d) SHA1(1bf3d648b82a8160ff1a38d92d2bb3ce1b41125e), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 10)" )
+GAME_CUSTOM( 199?, m4tenten__k,    m4tenten,   "n2503y.p1",    0x0000, 0x010000, CRC(b365cff0) SHA1(65ab9d624bec1efc0590cec739541887ca20fc6f), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 12)" )
+// "(C)1991 BARCREST" and "T25 0.4"
+GAME_CUSTOM( 199?, m4tenten__4,    m4tenten,   "t2504s.p1",    0x0000, 0x010000, CRC(a7618248) SHA1(e28d34a7a4b2eb3f6192a04cc8849475f021d392), "Barcrest","10 X 10 (Barcrest) (MPU4) (T25 0.4)" )
 GAME_CUSTOM( 199?, m4tenten__v,    m4tenten,   "t2504ad.p1",   0x0000, 0x010000, CRC(f964cf74) SHA1(a72bd32f3785506e8f57107f2b8e42d64cbe267b), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 23)" )
 GAME_CUSTOM( 199?, m4tenten__w,    m4tenten,   "t2504b.p1",    0x0000, 0x010000, CRC(f6cc485b) SHA1(6a95bf4c0cf35ccb79cb2a9e6bef208d6b61f4c7), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 24)" )
 GAME_CUSTOM( 199?, m4tenten__x,    m4tenten,   "t2504bd.p1",   0x0000, 0x010000, CRC(f4ce2ee9) SHA1(8d0dc72f288810118702d00dc08f4e748c4da9e6), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 25)" )
@@ -3148,8 +3403,9 @@ GAME_CUSTOM( 199?, m4tenten__0,    m4tenten,   "t2504dr.p1",   0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4tenten__1,    m4tenten,   "t2504dy.p1",   0x0000, 0x010000, CRC(af52e603) SHA1(8c234f0964018eb21efff7a9e820c355d4465401), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 29)" )
 GAME_CUSTOM( 199?, m4tenten__2,    m4tenten,   "t2504k.p1",    0x0000, 0x010000, CRC(c489942d) SHA1(047509ede2cb5a155274698423a1caa32ac0baeb), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 30)" )
 GAME_CUSTOM( 199?, m4tenten__3,    m4tenten,   "t2504r.p1",    0x0000, 0x010000, CRC(da847c46) SHA1(b5897fe0266ee3eb5f364570f29ffca3de8c4c7f), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 31)" )
-GAME_CUSTOM( 199?, m4tenten__4,    m4tenten,   "t2504s.p1",    0x0000, 0x010000, CRC(a7618248) SHA1(e28d34a7a4b2eb3f6192a04cc8849475f021d392), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 32)" )
 GAME_CUSTOM( 199?, m4tenten__5,    m4tenten,   "t2504y.p1",    0x0000, 0x010000, CRC(e311f030) SHA1(ce21932013f1fdab1b9bbe8eb61d4fe067ccc62f), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 33)" )
+// "(C)1991 BARCREST" and "T2T 0.1"
+GAME_CUSTOM( 199?, m4tenten__af,   m4tenten,   "t2t01s.p1",    0x0000, 0x010000, CRC(75b421e3) SHA1(d5de7485180baf9d8458a895edbfd65310fed2cc), "Barcrest","10 X 10 (Barcrest) (MPU4) (T2T 0.1)" )
 GAME_CUSTOM( 199?, m4tenten__6,    m4tenten,   "t2t01ad.p1",   0x0000, 0x010000, CRC(debb50d9) SHA1(18b099111d81cf847155b81faba8be06cdfb3d54), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 34)" )
 GAME_CUSTOM( 199?, m4tenten__7,    m4tenten,   "t2t01b.p1",    0x0000, 0x010000, CRC(4d8b3369) SHA1(e2221c712e8b031f39531fed61895af2214c23bc), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 35)" )
 GAME_CUSTOM( 199?, m4tenten__8,    m4tenten,   "t2t01bd.p1",   0x0000, 0x010000, CRC(e7f852d2) SHA1(7aff9dc05e8a5db91abea61860f85793a73ad8db), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 36)" )
@@ -3159,8 +3415,9 @@ GAME_CUSTOM( 199?, m4tenten__ab,   m4tenten,   "t2t01dr.p1",   0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4tenten__ac,   m4tenten,   "t2t01dy.p1",   0x0000, 0x010000, CRC(205c3c2e) SHA1(53d6829ac650fc7637f8743ac6cdb3b02dd0cc86), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 40)" )
 GAME_CUSTOM( 199?, m4tenten__ad,   m4tenten,   "t2t01k.p1",    0x0000, 0x010000, CRC(488b2ce4) SHA1(3b47ea15f318b49744e869d0485e00fbd2cd74b2), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 41)" )
 GAME_CUSTOM( 199?, m4tenten__ae,   m4tenten,   "t2t01r.p1",    0x0000, 0x010000, CRC(a8f71c79) SHA1(0b9d468819bfd2f7e2ec7b5f11f052531a13d703), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 42)" )
-GAME_CUSTOM( 199?, m4tenten__af,   m4tenten,   "t2t01s.p1",    0x0000, 0x010000, CRC(75b421e3) SHA1(d5de7485180baf9d8458a895edbfd65310fed2cc), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 43)" )
 GAME_CUSTOM( 199?, m4tenten__ag,   m4tenten,   "t2t01y.p1",    0x0000, 0x010000, CRC(0c3e29c2) SHA1(a0163587193145a0a173d1571ad9076c9f03d3ad), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 44)" )
+// "(C)1991 BARCREST" and "T3T 0.1"
+GAME_CUSTOM( 199?, m4tenten__aq,   m4tenten,   "t3t01s.p1",    0x0000, 0x010000, CRC(eae20667) SHA1(3ea054516e36ac5ca521a68bba16e299a1926c90), "Barcrest","10 X 10 (Barcrest) (MPU4) (T3T 0.1)" )
 GAME_CUSTOM( 199?, m4tenten__ah,   m4tenten,   "t3t01ad.p1",   0x0000, 0x010000, CRC(7075b69b) SHA1(3ac28d0542c287de9c2cabfed2da0ac0cc4a24cb), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 45)" )
 GAME_CUSTOM( 199?, m4tenten__ai,   m4tenten,   "t3t01b.p1",    0x0000, 0x010000, CRC(7f7d4170) SHA1(3925a0e1f620777356ed6d6c67d6d432daeb9ade), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 46)" )
 GAME_CUSTOM( 199?, m4tenten__aj,   m4tenten,   "t3t01bd.p1",   0x0000, 0x010000, CRC(90d5dbcb) SHA1(2c348f81fe070d0825c1824f05bc4c640da9ce24), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 47)" )
@@ -3170,8 +3427,9 @@ GAME_CUSTOM( 199?, m4tenten__am,   m4tenten,   "t3t01dr.p1",   0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4tenten__an,   m4tenten,   "t3t01dy.p1",   0x0000, 0x010000, CRC(94bb082d) SHA1(236b81d7e10afd4dc3facfad30d9ab0a72ea21e3), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 51)" )
 GAME_CUSTOM( 199?, m4tenten__ao,   m4tenten,   "t3t01k.p1",    0x0000, 0x010000, CRC(b7bd2547) SHA1(6154b30a587d52dadd1fa137e805762e096f02cb), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 52)" )
 GAME_CUSTOM( 199?, m4tenten__ap,   m4tenten,   "t3t01r.p1",    0x0000, 0x010000, CRC(d4401ee1) SHA1(c270a0f191870136278ff8e47d529458bbc049d0), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 53)" )
-GAME_CUSTOM( 199?, m4tenten__aq,   m4tenten,   "t3t01s.p1",    0x0000, 0x010000, CRC(eae20667) SHA1(3ea054516e36ac5ca521a68bba16e299a1926c90), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 54)" )
 GAME_CUSTOM( 199?, m4tenten__ar,   m4tenten,   "t3t01y.p1",    0x0000, 0x010000, CRC(d2a6c8cd) SHA1(b30064145cebc2a39ae63009529cd8422dc98373), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 55)" )
+// "(C)1991 BARCREST" and "TST 0.1"
+GAME_CUSTOM( 199?, m4tenten__a1,   m4tenten,   "tst01s.p1",    0x0000, 0x010000, CRC(c4bb2a12) SHA1(1d8c134facfa72d8438676c96e530f93c41f1266), "Barcrest","10 X 10 (Barcrest) (MPU4) (TST 0.1)" )
 GAME_CUSTOM( 199?, m4tenten__as,   m4tenten,   "tst01ad.p1",   0x0000, 0x010000, CRC(ca4be612) SHA1(70673e29a99ea0c70ff386c6c5fed49eabeea0e4), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 56)" )
 GAME_CUSTOM( 199?, m4tenten__at,   m4tenten,   "tst01b.p1",    0x0000, 0x010000, CRC(7dd06165) SHA1(6853436a1b0c60283707932961bbf5cce7e185c0), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 57)" )
 GAME_CUSTOM( 199?, m4tenten__au,   m4tenten,   "tst01bd.p1",   0x0000, 0x010000, CRC(38f4c0a2) SHA1(2cc62837c37618198dae7195e848c06ad1b96b06), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 58)" )
@@ -3181,7 +3439,6 @@ GAME_CUSTOM( 199?, m4tenten__ax,   m4tenten,   "tst01dr.p1",   0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4tenten__ay,   m4tenten,   "tst01dy.p1",   0x0000, 0x010000, CRC(ef87da08) SHA1(9358e4a02def10c98fddbb21d81b62f83500aa69), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 62)" )
 GAME_CUSTOM( 199?, m4tenten__az,   m4tenten,   "tst01k.p1",    0x0000, 0x010000, CRC(1f097f64) SHA1(d752b688b4e0520393bc4bef0c618a7c68c2e323), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 63)" )
 GAME_CUSTOM( 199?, m4tenten__a0,   m4tenten,   "tst01r.p1",    0x0000, 0x010000, CRC(ccc4ecb5) SHA1(0629c7951b56f44b8cb48d9aa66fb7c71ae275ec), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 64)" )
-GAME_CUSTOM( 199?, m4tenten__a1,   m4tenten,   "tst01s.p1",    0x0000, 0x010000, CRC(c4bb2a12) SHA1(1d8c134facfa72d8438676c96e530f93c41f1266), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 65)" )
 GAME_CUSTOM( 199?, m4tenten__a2,   m4tenten,   "tst01y.p1",    0x0000, 0x010000, CRC(e3ba4b94) SHA1(a7b13c172e5177711ddb81ef1ea77e27e14bf470), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 66)" )
 
 
@@ -3199,8 +3456,14 @@ GAME_CUSTOM( 199?, m4tenten__a2,   m4tenten,   "tst01y.p1",    0x0000, 0x010000,
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 
-
-GAME_CUSTOM( 199?, m4andyfh,       0,          "afhs.p1",      0x0000, 0x010000, CRC(722660ef) SHA1(e1700f4dc6d14da8e8d8402466057cfd126e067b), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 1)" )
+// "(C)1991 BARCREST" and "AFH 0.1"
+GAME_CUSTOM( 199?, m4andyfh,       0,          "afhs.p1",      0x0000, 0x010000, CRC(722660ef) SHA1(e1700f4dc6d14da8e8d8402466057cfd126e067b), "Barcrest","Andy's Full House (Barcrest) (MPU4) (AFH 0.1)" )
+GAME_CUSTOM( 199?, m4andyfh__o,    m4andyfh,   "afhb.p1",      0x0000, 0x010000, CRC(899945a4) SHA1(ed4a8c9b35e3aa08ea762740a713352560490443), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 16)" )
+GAME_CUSTOM( 199?, m4andyfh__p,    m4andyfh,   "afhc.p1",      0x0000, 0x010000, CRC(eff4016e) SHA1(4497ae5033aa4c3b3af8e2f6821dadb3f0683c82), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 17)" )
+GAME_CUSTOM( 199?, m4andyfh__q,    m4andyfh,   "afhd.p1",      0x0000, 0x010000, CRC(9f673d80) SHA1(ae2658d817d4d07f2d9f7948f0660f51626d07ac), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 18)" )
+GAME_CUSTOM( 199?, m4andyfh__r,    m4andyfh,   "afhr.p1",      0x0000, 0x010000, CRC(232bc900) SHA1(831368184be51b13db30468d519e395a9af7570e), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 19)" )
+// "(C)1991 BARCREST" and "AF3 0.1"
+GAME_CUSTOM( 199?, m4andyfh__h,    m4andyfh,   "af3s.p1",      0x0000, 0x010000, CRC(e9860d9a) SHA1(f1d1323e2329613748602559b6458a19963c091a), "Barcrest","Andy's Full House (Barcrest) (MPU4) (AF3 0.1)" )
 GAME_CUSTOM( 199?, m4andyfh__a,    m4andyfh,   "af3ad.p1",     0x0000, 0x010000, CRC(ef141eca) SHA1(1ba03db9c05f5d60c5e1e0729eb124f6c5c3acf5), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4andyfh__b,    m4andyfh,   "af3b.p1",      0x0000, 0x010000, CRC(78889d06) SHA1(5ea4c8010b7fd3e2e41d378b69a7cfda27aba99f), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4andyfh__c,    m4andyfh,   "af3bd.p1",     0x0000, 0x010000, CRC(d9087380) SHA1(1a7f203b722583927eb6f99a493e564100321fe6), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 4)" )
@@ -3208,17 +3471,15 @@ GAME_CUSTOM( 199?, m4andyfh__d,    m4andyfh,   "af3d.p1",      0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4andyfh__e,    m4andyfh,   "af3dk.p1",     0x0000, 0x010000, CRC(4fc4a031) SHA1(c5c68027231988a88610931f395ae08d8e60f962), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 6)" )
 GAME_CUSTOM( 199?, m4andyfh__f,    m4andyfh,   "af3dy.p1",     0x0000, 0x010000, CRC(f59c1a50) SHA1(55054a49b7bbf4a27ec808727cfbf3ce9bdfce40), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 7)" )
 GAME_CUSTOM( 199?, m4andyfh__g,    m4andyfh,   "af3k.p1",      0x0000, 0x010000, CRC(ddf5edfb) SHA1(ce69c70b1cdcebfa29e1613cb619617a961a649b), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4andyfh__h,    m4andyfh,   "af3s.p1",      0x0000, 0x010000, CRC(e9860d9a) SHA1(f1d1323e2329613748602559b6458a19963c091a), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 9)" )
 GAME_CUSTOM( 199?, m4andyfh__i,    m4andyfh,   "af3y.p1",      0x0000, 0x010000, CRC(1895bbe1) SHA1(c084f77004c9086bd75add665b25b0b3e114a91f), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 10)" )
+// "(C)1991 BARCREST" and "AF8 0.1"
+GAME_CUSTOM( 199?, m4andyfh__n,    m4andyfh,   "af8s.p1",      0x0000, 0x010000, CRC(1b06be8e) SHA1(c1b67b23c6e2abca68fb242e24b61333bde688fa), "Barcrest","Andy's Full House (Barcrest) (MPU4) (AF8 0.1)" )
 GAME_CUSTOM( 199?, m4andyfh__j,    m4andyfh,   "af8b.p1",      0x0000, 0x010000, CRC(fa8d002e) SHA1(cad754268706a1c942ce3751aa5a51720a104899), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 11)" )
 GAME_CUSTOM( 199?, m4andyfh__k,    m4andyfh,   "af8bd.p1",     0x0000, 0x010000, CRC(f64ce609) SHA1(d36a868647a954fd7974613510aabc6fc18035ee), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 12)" )
 GAME_CUSTOM( 199?, m4andyfh__l,    m4andyfh,   "af8c.p1",      0x0000, 0x010000, CRC(6dff4569) SHA1(10809f81924a72b21129158043c023ad6809cced), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 13)" )
 GAME_CUSTOM( 199?, m4andyfh__m,    m4andyfh,   "af8k.p1",      0x0000, 0x010000, CRC(0f6cb2a4) SHA1(320954e216e48ef2882f6d4feb7e29c106d49b79), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4andyfh__n,    m4andyfh,   "af8s.p1",      0x0000, 0x010000, CRC(1b06be8e) SHA1(c1b67b23c6e2abca68fb242e24b61333bde688fa), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4andyfh__o,    m4andyfh,   "afhb.p1",      0x0000, 0x010000, CRC(899945a4) SHA1(ed4a8c9b35e3aa08ea762740a713352560490443), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4andyfh__p,    m4andyfh,   "afhc.p1",      0x0000, 0x010000, CRC(eff4016e) SHA1(4497ae5033aa4c3b3af8e2f6821dadb3f0683c82), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4andyfh__q,    m4andyfh,   "afhd.p1",      0x0000, 0x010000, CRC(9f673d80) SHA1(ae2658d817d4d07f2d9f7948f0660f51626d07ac), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4andyfh__r,    m4andyfh,   "afhr.p1",      0x0000, 0x010000, CRC(232bc900) SHA1(831368184be51b13db30468d519e395a9af7570e), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 19)" )
+// "(C)1991 BARCREST" and "AFT 0.3"
+GAME_CUSTOM( 199?, m4andyfh__1,    m4andyfh,   "afts.p1",      0x0000, 0x010000, CRC(7f059eec) SHA1(06de497bbae7391bbb09241204dfdd59ecc36569), "Barcrest","Andy's Full House (Barcrest) (MPU4) (AFT 0.3)" )
 GAME_CUSTOM( 199?, m4andyfh__s,    m4andyfh,   "aftad.p1",     0x0000, 0x010000, CRC(72b75e4a) SHA1(fb25a4a455589c51ec7bf1e77faee7f9809eea2c), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 20)" )
 GAME_CUSTOM( 199?, m4andyfh__t,    m4andyfh,   "aftb.p1",      0x0000, 0x010000, CRC(be3cd9ec) SHA1(135f5b575ff1921d08985251b6cd326db4de4f3e), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 21)" )
 GAME_CUSTOM( 199?, m4andyfh__u,    m4andyfh,   "aftbd.p1",     0x0000, 0x010000, CRC(d7fd4c6d) SHA1(3eea5f025f25194fd1d4b4cf0643445b11694c7b), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 22)" )
@@ -3228,8 +3489,9 @@ GAME_CUSTOM( 199?, m4andyfh__x,    m4andyfh,   "aftdr.p1",     0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4andyfh__y,    m4andyfh,   "aftdy.p1",     0x0000, 0x010000, CRC(3e9fc7a6) SHA1(65d181398b3e574b26b060001e9477d5ee40bcc0), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 26)" )
 GAME_CUSTOM( 199?, m4andyfh__z,    m4andyfh,   "aftk.p1",      0x0000, 0x010000, CRC(8d87a910) SHA1(a315210a5c9d880621937412ff6d8d42ac658db2), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 27)" )
 GAME_CUSTOM( 199?, m4andyfh__0,    m4andyfh,   "aftr.p1",      0x0000, 0x010000, CRC(1be08c33) SHA1(21cd201cae159a1a3ee17f9661bc6db5e5a0ad48), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 28)" )
-GAME_CUSTOM( 199?, m4andyfh__1,    m4andyfh,   "afts.p1",      0x0000, 0x010000, CRC(7f059eec) SHA1(06de497bbae7391bbb09241204dfdd59ecc36569), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 29)" )
 GAME_CUSTOM( 199?, m4andyfh__2,    m4andyfh,   "afty.p1",      0x0000, 0x010000, CRC(d14f2670) SHA1(a6d21e855fbb90e80c8b8c4af02280343edcb3e8), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 30)" )
+// "(C)1991 BARCREST" and "AFU 0.2"
+GAME_CUSTOM( 199?, m4andyfh__ac,   m4andyfh,   "afus.p1",      0x0000, 0x010000, CRC(efbde76c) SHA1(abad98f2affb46e449a50f5a43729160b275294b), "Barcrest","Andy's Full House (Barcrest) (MPU4) (AFU 0.2)" )
 GAME_CUSTOM( 199?, m4andyfh__3,    m4andyfh,   "afuad.p1",     0x0000, 0x010000, CRC(0f14e261) SHA1(080a5667127e14b6959ff1508f028fd849c27c24), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 31)" )
 GAME_CUSTOM( 199?, m4andyfh__4,    m4andyfh,   "afub.p1",      0x0000, 0x010000, CRC(99c6a4cc) SHA1(36fe83a32aeab413c19bc253edeadf4bc0f73615), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 32)" )
 GAME_CUSTOM( 199?, m4andyfh__5,    m4andyfh,   "afubd.p1",     0x0000, 0x010000, CRC(c38d376a) SHA1(843d0dcc0909ea7cd93f6ba707e784b160cb4984), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 33)" )
@@ -3239,8 +3501,9 @@ GAME_CUSTOM( 199?, m4andyfh__8,    m4andyfh,   "afudr.p1",     0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4andyfh__9,    m4andyfh,   "afudy.p1",     0x0000, 0x010000, CRC(c2754f00) SHA1(4012231cb4a2eb0e0010f90d173295aa3c1fd6a5), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 37)" )
 GAME_CUSTOM( 199?, m4andyfh__aa,   m4andyfh,   "afuk.p1",      0x0000, 0x010000, CRC(f58fcf3c) SHA1(3731eab62e447a833b7decde842eda6a36cfadef), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 38)" )
 GAME_CUSTOM( 199?, m4andyfh__ab,   m4andyfh,   "afur.p1",      0x0000, 0x010000, CRC(0369ab49) SHA1(53acb382fada789c976b1dd124014778cfe518bc), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 39)" )
-GAME_CUSTOM( 199?, m4andyfh__ac,   m4andyfh,   "afus.p1",      0x0000, 0x010000, CRC(efbde76c) SHA1(abad98f2affb46e449a50f5a43729160b275294b), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 40)" )
 GAME_CUSTOM( 199?, m4andyfh__ad,   m4andyfh,   "afuy.p1",      0x0000, 0x010000, CRC(9e0283a7) SHA1(63c0e3f26132a6bd6d8d3a8a3d0ab46e52fb2c09), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 41)" )
+// "(C)1991 BARCREST" and "CA4 0.8"
+GAME_CUSTOM( 199?, m4andyfh__al,   m4andyfh,   "ca4s.p1",      0x0000, 0x010000, CRC(ece1bca7) SHA1(84a168e0d36f7c4f56fc3a7579fe335cc1e5a5ba), "Barcrest","Andy's Full House (Barcrest) (MPU4) (CA4 0.8)" )
 GAME_CUSTOM( 199?, m4andyfh__ae,   m4andyfh,   "ca4ad.p1",     0x0000, 0x010000, CRC(bb311861) SHA1(9606b536c2775997935049caddb79170a98211b4), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 42)" )
 GAME_CUSTOM( 199?, m4andyfh__af,   m4andyfh,   "ca4b.p1",      0x0000, 0x010000, CRC(71e8f0f9) SHA1(663f536f4b3de20c2dcae52d22f3be9be19b0a4d), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 43)" )
 GAME_CUSTOM( 199?, m4andyfh__ag,   m4andyfh,   "ca4bd.p1",     0x0000, 0x010000, CRC(808b93e6) SHA1(08667db3f43f8550d7b96b53b92a53029a8d5d29), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 44)" )
@@ -3248,8 +3511,9 @@ GAME_CUSTOM( 199?, m4andyfh__ah,   m4andyfh,   "ca4d.p1",      0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4andyfh__ai,   m4andyfh,   "ca4dk.p1",     0x0000, 0x010000, CRC(23cabc1a) SHA1(a72e14d7616da0b7cc394e466fe6df4c85eea986), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 46)" )
 GAME_CUSTOM( 199?, m4andyfh__aj,   m4andyfh,   "ca4dy.p1",     0x0000, 0x010000, CRC(caa2e461) SHA1(5dd3c609d1cc4bc43a6d00e98a71e927287c41fd), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 47)" )
 GAME_CUSTOM( 199?, m4andyfh__ak,   m4andyfh,   "ca4k.p1",      0x0000, 0x010000, CRC(78b0a533) SHA1(fa0fc59562be59d0aadba923281086a9de8e8934), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 48)" )
-GAME_CUSTOM( 199?, m4andyfh__al,   m4andyfh,   "ca4s.p1",      0x0000, 0x010000, CRC(ece1bca7) SHA1(84a168e0d36f7c4f56fc3a7579fe335cc1e5a5ba), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 49)" )
 GAME_CUSTOM( 199?, m4andyfh__am,   m4andyfh,   "ca4y.p1",      0x0000, 0x010000, CRC(5c1886f2) SHA1(4d6131989a04db993b7ade74d1950077d52cbc23), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 50)" )
+// "(C)1991 BARCREST" and "CAT 0.2"
+GAME_CUSTOM( 199?, m4andyfh__au,   m4andyfh,   "cats.p1",      0x0000, 0x010000, CRC(e4cb7300) SHA1(fe9daaa587f1796227ad9ccb49869f2288b6d708), "Barcrest","Andy's Full House (Barcrest) (MPU4) (CAT 0.2)" )
 GAME_CUSTOM( 199?, m4andyfh__an,   m4andyfh,   "catad.p1",     0x0000, 0x010000, CRC(b2c5a227) SHA1(0c4253dddef07476778adf10b7afc8415ac2b170), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 51)" )
 GAME_CUSTOM( 199?, m4andyfh__ao,   m4andyfh,   "catb.p1",      0x0000, 0x010000, CRC(34007275) SHA1(102a30e4a83eec9ed144158cc4896c91f4eadd1b), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 52)" )
 GAME_CUSTOM( 199?, m4andyfh__ap,   m4andyfh,   "catbd.p1",     0x0000, 0x010000, CRC(9c38229a) SHA1(1c24eff59e22d354e07f9a0655b35029a89a60ef), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 53)" )
@@ -3257,8 +3521,9 @@ GAME_CUSTOM( 199?, m4andyfh__aq,   m4andyfh,   "catd.p1",      0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4andyfh__ar,   m4andyfh,   "catdk.p1",     0x0000, 0x010000, CRC(c85a53ea) SHA1(1b7245b08bc0ad7ddd7ed4498ba4ac910f1df1d1), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 55)" )
 GAME_CUSTOM( 199?, m4andyfh__as,   m4andyfh,   "catdy.p1",     0x0000, 0x010000, CRC(08aa7a9c) SHA1(b8552ad4d9f1ea3c536ba7313ded56f9d47930d3), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 56)" )
 GAME_CUSTOM( 199?, m4andyfh__at,   m4andyfh,   "catk.p1",      0x0000, 0x010000, CRC(843a09b2) SHA1(56e845bcf940d80277b53df8fe847e5e862a05c9), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 57)" )
-GAME_CUSTOM( 199?, m4andyfh__au,   m4andyfh,   "cats.p1",      0x0000, 0x010000, CRC(e4cb7300) SHA1(fe9daaa587f1796227ad9ccb49869f2288b6d708), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 58)" )
 GAME_CUSTOM( 199?, m4andyfh__av,   m4andyfh,   "caty.p1",      0x0000, 0x010000, CRC(1a5c2413) SHA1(096695d99cc5dcf9d677b7821af5018751e21a89), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 59)" )
+// "(C)1991 BARCREST" and "CA4 0.1" (CAU 0.1 on startup)
+GAME_CUSTOM( 199?, m4andyfh__a3,   m4andyfh,   "caus.p1",      0x0000, 0x010000, CRC(88e263a4) SHA1(2b8bc3d9aab344ca756b4829c4593db74200779e), "Barcrest","Andy's Full House (Barcrest) (MPU4) (CAU 0.1 / CA4 0.1)" )
 GAME_CUSTOM( 199?, m4andyfh__aw,   m4andyfh,   "cauad.p1",     0x0000, 0x010000, CRC(a530d8ce) SHA1(9c919dfe85d947545e35c52b070dcb19ad3660ea), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 60)" )
 GAME_CUSTOM( 199?, m4andyfh__ax,   m4andyfh,   "caub.p1",      0x0000, 0x010000, CRC(4c6f35b7) SHA1(3300d3a8cdeda7183d066ff8fec2bdfbcd816f9b), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 61)" )
 GAME_CUSTOM( 199?, m4andyfh__ay,   m4andyfh,   "caubd.p1",     0x0000, 0x010000, CRC(932cb584) SHA1(28dc617a242f01030d3bfdd855b2237b99dfb080), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 62)" )
@@ -3266,7 +3531,6 @@ GAME_CUSTOM( 199?, m4andyfh__az,   m4andyfh,   "caud.p1",      0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4andyfh__a0,   m4andyfh,   "caudk.p1",     0x0000, 0x010000, CRC(9d2ca094) SHA1(343304a09ae0aa36039b4b90f90ac7206f6b020b), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 64)" )
 GAME_CUSTOM( 199?, m4andyfh__a1,   m4andyfh,   "caudy.p1",     0x0000, 0x010000, CRC(b8e09c8e) SHA1(b9fc39f754dadfaf359f7df6e51a18e948eda574), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 65)" )
 GAME_CUSTOM( 199?, m4andyfh__a2,   m4andyfh,   "cauk.p1",      0x0000, 0x010000, CRC(38c7b3b0) SHA1(d5ee172e37e65911a4010abe7baae3e32131208d), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 66)" )
-GAME_CUSTOM( 199?, m4andyfh__a3,   m4andyfh,   "caus.p1",      0x0000, 0x010000, CRC(88e263a4) SHA1(2b8bc3d9aab344ca756b4829c4593db74200779e), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 67)" )
 GAME_CUSTOM( 199?, m4andyfh__a4,   m4andyfh,   "cauy.p1",      0x0000, 0x010000, CRC(b04ab546) SHA1(5f9d3a24fb0091406e45cdad7f22fad4bda27bff), "Barcrest","Andy's Full House (Barcrest) (MPU4) (set 68)" )
 
 
@@ -3285,38 +3549,8 @@ GAME_CUSTOM( 199?, m4andyfh__a4,   m4andyfh,   "cauy.p1",      0x0000, 0x010000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
-
-GAME_CUSTOM( 199?, m4bdash,     0,          "bls01s.p1",    0x0000, 0x020000, CRC(4e4f403b) SHA1(f040568af530cf0ff060199f98b00e476191da22), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4bdash__a,  m4bdash,    "bdvarg.bin",   0x0000, 0x020000, CRC(99d579e7) SHA1(afc47144e0a8d464d8547b1ad14b0a3a1c15c027), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4bdash__b,  m4bdash,    "bld06s",       0x0000, 0x020000, CRC(0bc580b8) SHA1(432ac5aec08bd9d36cc4a0b257c17d6e22015bae), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4bdash__c,  m4bdash,    "bld07ad.p1",   0x0000, 0x020000, CRC(56438185) SHA1(f78789042a1ac61b7dd333120b9fef76a2805cc7), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4bdash__d,  m4bdash,    "bld07b.p1",    0x0000, 0x020000, CRC(4b24ec01) SHA1(80763e2832d9ef9c49f8729fbc93843865422d47), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4bdash__e,  m4bdash,    "bld07bd.p1",   0x0000, 0x020000, CRC(db592f40) SHA1(bca6b78ea13ccab1f49d6b6078071739cb418778), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4bdash__f,  m4bdash,    "bld07c.p1",    0x0000, 0x020000, CRC(7c6e5113) SHA1(814fb61aa64eecfa8b6d8e9c39a7b3b3287247dd), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4bdash__g,  m4bdash,    "bld07d.p1",    0x0000, 0x020000, CRC(363fe777) SHA1(181b10e828b1308725cbe185c655c7deb7899cbe), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4bdash__h,  m4bdash,    "bld07dh.p1",   0x0000, 0x020000, CRC(b299b28c) SHA1(3784cc7e33cd31c6ef5fd7fbc336b1b024a13993), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4bdash__i,  m4bdash,    "bld07dk.p1",   0x0000, 0x020000, CRC(919e8716) SHA1(4be8b30a3db436fab8dfc9a131f2ca2b16ba6f7d), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4bdash__j,  m4bdash,    "bld07dr.p1",   0x0000, 0x020000, CRC(22913c27) SHA1(33ed5a70b30d16fd607ec56a5ab085b55778c483), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4bdash__k,  m4bdash,    "bld07dy.p1",   0x0000, 0x020000, CRC(167da7e8) SHA1(1cb81ad595ad5c7b70aed4f48ce9f6ae34d92089), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4bdash__l,  m4bdash,    "bld07h.p1",    0x0000, 0x020000, CRC(22e471cd) SHA1(3e6e0a052761e1ed108475687dead185eef10119), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4bdash__m,  m4bdash,    "bld07k.p1",    0x0000, 0x020000, CRC(01e34457) SHA1(5e9d8cb558222340df42904365ad90288ca5cdf2), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4bdash__n,  m4bdash,    "bld07r.p1",    0x0000, 0x020000, CRC(b2ecff66) SHA1(9d8bca3e137a654d786b9257ce1206c7118ac6e0), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4bdash__o,  m4bdash,    "bld07s.p1",    0x0000, 0x020000, CRC(b9c61540) SHA1(d6752d90a431cde17c7915746f645ef3157eeffe), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4bdash__p,  m4bdash,    "bld07y.p1",    0x0000, 0x020000, CRC(860064a9) SHA1(8e13df769bde73bc5af3fa8010b39502e269f63f), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4bdash__q,  m4bdash,    "bld10ad.p1",   0x0000, 0x020000, CRC(04b2781e) SHA1(828426d6191974050e3ccbfbc826d5474dc18312), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4bdash__r,  m4bdash,    "bld10b.p1",    0x0000, 0x020000, CRC(160a6c83) SHA1(e2421fbc166b9e64a2b10afbfd12ebc724077248), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4bdash__s,  m4bdash,    "bld10bd.p1",   0x0000, 0x020000, CRC(89a8d6db) SHA1(c93b8d7c57a970649204078f3428fc766ada32f7), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4bdash__t,  m4bdash,    "bld10c.p1",    0x0000, 0x020000, CRC(2140d191) SHA1(151aba51cf0909f8bc3d252ef49a2ae2e96adf32), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4bdash__u,  m4bdash,    "bld10d.p1",    0x0000, 0x020000, CRC(6b1167f5) SHA1(2aeb0fa0964867d90412bfd895da664d9be8a339), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4bdash__v,  m4bdash,    "bld10dh.p1",   0x0000, 0x020000, CRC(e0684b17) SHA1(eb2832a3344aa9dfdc10c845faf3ae67171c40e9), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 23)" )
-GAME_CUSTOM( 199?, m4bdash__w,  m4bdash,    "bld10dk.p1",   0x0000, 0x020000, CRC(c36f7e8d) SHA1(1ee7bcca0cfdd27cd23328f60aa5230325db6366), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 24)" )
-GAME_CUSTOM( 199?, m4bdash__x,  m4bdash,    "bld10dr.p1",   0x0000, 0x020000, CRC(7060c5bc) SHA1(e409684b5f2494c1e580e4c9db001e89ef63ea1a), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 25)" )
-GAME_CUSTOM( 199?, m4bdash__y,  m4bdash,    "bld10dy.p1",   0x0000, 0x020000, CRC(448c5e73) SHA1(38193dbe23266d29344439d75e020b8236d34037), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 26)" )
-GAME_CUSTOM( 199?, m4bdash__z,  m4bdash,    "bld10h.p1",    0x0000, 0x020000, CRC(7fcaf14f) SHA1(e093bbaea83f7b2683b968b70d821ec42addab92), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 27)" )
-GAME_CUSTOM( 199?, m4bdash__0,  m4bdash,    "bld10k.p1",    0x0000, 0x020000, CRC(5ccdc4d5) SHA1(b7be6f027092106ef5e33ff988a153050f48943b), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 28)" )
-GAME_CUSTOM( 199?, m4bdash__1,  m4bdash,    "bld10r.p1",    0x0000, 0x020000, CRC(efc27fe4) SHA1(1ed3c5c92505b7fdf4993a9c8b119eff5e9a6f94), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 29)" )
-GAME_CUSTOM( 199?, m4bdash__2,  m4bdash,    "bld10s.p1",    0x0000, 0x020000, CRC(c59c186b) SHA1(83f16e15a215fe1cf3c07fac7268b00c55e0ff5b), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 30)" )
-GAME_CUSTOM( 199?, m4bdash__3,  m4bdash,    "bld10y.p1",    0x0000, 0x020000, CRC(db2ee42b) SHA1(b6a4bb4f78c14428a7bd2286b8fda51acb0c9e10), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 31)" )
+// "(C)1993 BARCREST" and "BLS 0.1"
+GAME_CUSTOM( 199?, m4bdash,     0,          "bls01s.p1",    0x0000, 0x020000, CRC(4e4f403b) SHA1(f040568af530cf0ff060199f98b00e476191da22), "Barcrest","Boulder Dash (Barcrest) (MPU4) (BLS 0.1)" )
 GAME_CUSTOM( 199?, m4bdash__4,  m4bdash,    "bls01ad.p1",   0x0000, 0x020000, CRC(2425cab4) SHA1(9df08f9dffc0ac5fe5994ad086e6b8eb8d03baa9), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 32)" )
 GAME_CUSTOM( 199?, m4bdash__5,  m4bdash,    "bls01b.p1",    0x0000, 0x020000, CRC(64d1e31d) SHA1(e30d199bd1d60ceabef27cfa81605eb3b307f68e), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 33)" )
 GAME_CUSTOM( 199?, m4bdash__6,  m4bdash,    "bls01bd.p1",   0x0000, 0x020000, CRC(a93f6471) SHA1(d895c7825c713626be57dd9eef2dbfc5f591825b), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 34)" )
@@ -3330,6 +3564,40 @@ GAME_CUSTOM( 199?, m4bdash__ad, m4bdash,    "bls01h.p1",    0x0000, 0x020000, CR
 GAME_CUSTOM( 199?, m4bdash__ae, m4bdash,    "bls01k.p1",    0x0000, 0x020000, CRC(2e164b4b) SHA1(37d1c45db0002c7e8f16ede87cfe62cfbdbf39e8), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 42)" )
 GAME_CUSTOM( 199?, m4bdash__af, m4bdash,    "bls01r.p1",    0x0000, 0x020000, CRC(9d19f07a) SHA1(bb1e2d8f6e1fd75d6c9a15448fc29b21d8f14bf7), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 43)" )
 GAME_CUSTOM( 199?, m4bdash__ag, m4bdash,    "bls01y.p1",    0x0000, 0x020000, CRC(a9f56bb5) SHA1(771ea854bdc71af0ce09952be53671629babfa9b), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 44)" )
+// "(C)1993 BARCREST" and "BLD 0.6"
+GAME_CUSTOM( 199?, m4bdash__b,  m4bdash,    "bld06s",       0x0000, 0x020000, CRC(0bc580b8) SHA1(432ac5aec08bd9d36cc4a0b257c17d6e22015bae), "Barcrest","Boulder Dash (Barcrest) (MPU4) (BLD 0.6)" )
+// "(C)1993 BARCREST" and "BLD 0.7"
+GAME_CUSTOM( 199?, m4bdash__o,  m4bdash,    "bld07s.p1",    0x0000, 0x020000, CRC(b9c61540) SHA1(d6752d90a431cde17c7915746f645ef3157eeffe), "Barcrest","Boulder Dash (Barcrest) (MPU4) (BLD 0.7)" )
+GAME_CUSTOM( 199?, m4bdash__c,  m4bdash,    "bld07ad.p1",   0x0000, 0x020000, CRC(56438185) SHA1(f78789042a1ac61b7dd333120b9fef76a2805cc7), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4bdash__d,  m4bdash,    "bld07b.p1",    0x0000, 0x020000, CRC(4b24ec01) SHA1(80763e2832d9ef9c49f8729fbc93843865422d47), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4bdash__e,  m4bdash,    "bld07bd.p1",   0x0000, 0x020000, CRC(db592f40) SHA1(bca6b78ea13ccab1f49d6b6078071739cb418778), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4bdash__f,  m4bdash,    "bld07c.p1",    0x0000, 0x020000, CRC(7c6e5113) SHA1(814fb61aa64eecfa8b6d8e9c39a7b3b3287247dd), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4bdash__g,  m4bdash,    "bld07d.p1",    0x0000, 0x020000, CRC(363fe777) SHA1(181b10e828b1308725cbe185c655c7deb7899cbe), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 8)" )
+GAME_CUSTOM( 199?, m4bdash__h,  m4bdash,    "bld07dh.p1",   0x0000, 0x020000, CRC(b299b28c) SHA1(3784cc7e33cd31c6ef5fd7fbc336b1b024a13993), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 9)" )
+GAME_CUSTOM( 199?, m4bdash__i,  m4bdash,    "bld07dk.p1",   0x0000, 0x020000, CRC(919e8716) SHA1(4be8b30a3db436fab8dfc9a131f2ca2b16ba6f7d), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 10)" )
+GAME_CUSTOM( 199?, m4bdash__j,  m4bdash,    "bld07dr.p1",   0x0000, 0x020000, CRC(22913c27) SHA1(33ed5a70b30d16fd607ec56a5ab085b55778c483), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 11)" )
+GAME_CUSTOM( 199?, m4bdash__k,  m4bdash,    "bld07dy.p1",   0x0000, 0x020000, CRC(167da7e8) SHA1(1cb81ad595ad5c7b70aed4f48ce9f6ae34d92089), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 12)" )
+GAME_CUSTOM( 199?, m4bdash__l,  m4bdash,    "bld07h.p1",    0x0000, 0x020000, CRC(22e471cd) SHA1(3e6e0a052761e1ed108475687dead185eef10119), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 13)" )
+GAME_CUSTOM( 199?, m4bdash__m,  m4bdash,    "bld07k.p1",    0x0000, 0x020000, CRC(01e34457) SHA1(5e9d8cb558222340df42904365ad90288ca5cdf2), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 14)" )
+GAME_CUSTOM( 199?, m4bdash__n,  m4bdash,    "bld07r.p1",    0x0000, 0x020000, CRC(b2ecff66) SHA1(9d8bca3e137a654d786b9257ce1206c7118ac6e0), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 15)" )
+GAME_CUSTOM( 199?, m4bdash__p,  m4bdash,    "bld07y.p1",    0x0000, 0x020000, CRC(860064a9) SHA1(8e13df769bde73bc5af3fa8010b39502e269f63f), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 17)" )
+// "(C)1993 BARCREST" and "BLD 1.0"
+GAME_CUSTOM( 199?, m4bdash__2,  m4bdash,    "bld10s.p1",    0x0000, 0x020000, CRC(c59c186b) SHA1(83f16e15a215fe1cf3c07fac7268b00c55e0ff5b), "Barcrest","Boulder Dash (Barcrest) (MPU4) (BLD 1.0)" )
+GAME_CUSTOM( 199?, m4bdash__q,  m4bdash,    "bld10ad.p1",   0x0000, 0x020000, CRC(04b2781e) SHA1(828426d6191974050e3ccbfbc826d5474dc18312), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 18)" )
+GAME_CUSTOM( 199?, m4bdash__r,  m4bdash,    "bld10b.p1",    0x0000, 0x020000, CRC(160a6c83) SHA1(e2421fbc166b9e64a2b10afbfd12ebc724077248), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 19)" )
+GAME_CUSTOM( 199?, m4bdash__s,  m4bdash,    "bld10bd.p1",   0x0000, 0x020000, CRC(89a8d6db) SHA1(c93b8d7c57a970649204078f3428fc766ada32f7), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 20)" )
+GAME_CUSTOM( 199?, m4bdash__t,  m4bdash,    "bld10c.p1",    0x0000, 0x020000, CRC(2140d191) SHA1(151aba51cf0909f8bc3d252ef49a2ae2e96adf32), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 21)" )
+GAME_CUSTOM( 199?, m4bdash__u,  m4bdash,    "bld10d.p1",    0x0000, 0x020000, CRC(6b1167f5) SHA1(2aeb0fa0964867d90412bfd895da664d9be8a339), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 22)" )
+GAME_CUSTOM( 199?, m4bdash__v,  m4bdash,    "bld10dh.p1",   0x0000, 0x020000, CRC(e0684b17) SHA1(eb2832a3344aa9dfdc10c845faf3ae67171c40e9), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 23)" )
+GAME_CUSTOM( 199?, m4bdash__w,  m4bdash,    "bld10dk.p1",   0x0000, 0x020000, CRC(c36f7e8d) SHA1(1ee7bcca0cfdd27cd23328f60aa5230325db6366), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 24)" )
+GAME_CUSTOM( 199?, m4bdash__x,  m4bdash,    "bld10dr.p1",   0x0000, 0x020000, CRC(7060c5bc) SHA1(e409684b5f2494c1e580e4c9db001e89ef63ea1a), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 25)" )
+GAME_CUSTOM( 199?, m4bdash__y,  m4bdash,    "bld10dy.p1",   0x0000, 0x020000, CRC(448c5e73) SHA1(38193dbe23266d29344439d75e020b8236d34037), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 26)" )
+GAME_CUSTOM( 199?, m4bdash__z,  m4bdash,    "bld10h.p1",    0x0000, 0x020000, CRC(7fcaf14f) SHA1(e093bbaea83f7b2683b968b70d821ec42addab92), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 27)" )
+GAME_CUSTOM( 199?, m4bdash__0,  m4bdash,    "bld10k.p1",    0x0000, 0x020000, CRC(5ccdc4d5) SHA1(b7be6f027092106ef5e33ff988a153050f48943b), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 28)" )
+GAME_CUSTOM( 199?, m4bdash__1,  m4bdash,    "bld10r.p1",    0x0000, 0x020000, CRC(efc27fe4) SHA1(1ed3c5c92505b7fdf4993a9c8b119eff5e9a6f94), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 29)" )
+GAME_CUSTOM( 199?, m4bdash__3,  m4bdash,    "bld10y.p1",    0x0000, 0x020000, CRC(db2ee42b) SHA1(b6a4bb4f78c14428a7bd2286b8fda51acb0c9e10), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 31)" )
+// "(C)1993 BARCREST" and "BLS 0.2"
+GAME_CUSTOM( 199?, m4bdash__at, m4bdash,    "bls02s.p1",    0x0000, 0x020000, CRC(b8e435d5) SHA1(500c30d687d3e029f22de2bf132c12349c1575b4), "Barcrest","Boulder Dash (Barcrest) (MPU4) (BLS 0.2)" )
 GAME_CUSTOM( 199?, m4bdash__ah, m4bdash,    "bls02ad.p1",   0x0000, 0x020000, CRC(f4b6828b) SHA1(8ca39a9dc29b40a097489e34ababaf70eb58c326), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 45)" )
 GAME_CUSTOM( 199?, m4bdash__ai, m4bdash,    "bls02b.p1",    0x0000, 0x020000, CRC(d75f9bdb) SHA1(2018e1ebe4f00782be649544bc8d56d923d6c198), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 46)" )
 GAME_CUSTOM( 199?, m4bdash__aj, m4bdash,    "bls02bd.p1",   0x0000, 0x020000, CRC(79ac2c4e) SHA1(83d6828272438ae0d687b40368701cbccac32d9f), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 47)" )
@@ -3342,19 +3610,23 @@ GAME_CUSTOM( 199?, m4bdash__ap, m4bdash,    "bls02dy.p1",   0x0000, 0x020000, CR
 GAME_CUSTOM( 199?, m4bdash__aq, m4bdash,    "bls02h.p1",    0x0000, 0x020000, CRC(be9f0617) SHA1(fcc491ae5cb5312f47726c4b9ffda99317171bab), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 54)" )
 GAME_CUSTOM( 199?, m4bdash__ar, m4bdash,    "bls02k.p1",    0x0000, 0x020000, CRC(9d98338d) SHA1(0e43896ae8361894c9060ec7a74dd23c6e2bed56), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 55)" )
 GAME_CUSTOM( 199?, m4bdash__as, m4bdash,    "bls02r.p1",    0x0000, 0x020000, CRC(2e9788bc) SHA1(586a30b3485e0ceb8b9b389e103fdbab78115446), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 56)" )
-GAME_CUSTOM( 199?, m4bdash__at, m4bdash,    "bls02s.p1",    0x0000, 0x020000, CRC(b8e435d5) SHA1(500c30d687d3e029f22de2bf132c12349c1575b4), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 57)" )
 GAME_CUSTOM( 199?, m4bdash__au, m4bdash,    "bls02y.p1",    0x0000, 0x020000, CRC(1a7b1373) SHA1(dde4754d92f0fde495ab826294a650ac81fd586e), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 58)" )
-GAME_CUSTOM( 199?, m4bdash__av, m4bdash,    "bold15g",      0x0000, 0x020000, CRC(fa400d34) SHA1(2faeb9b880fb4980aa0d96b4b962c879498445f2), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 59)" )
-GAME_CUSTOM( 199?, m4bdash__aw, m4bdash,    "bold15t",      0x0000, 0x020000, CRC(f3f331ae) SHA1(d999c8571549d8d26b7b861299d77c7282aef700), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 60)" )
-GAME_CUSTOM( 199?, m4bdash__ax, m4bdash,    "bo__x__x.2_0", 0x0000, 0x020000, CRC(7e54982f) SHA1(c5187d2f6a5b202af5fd6326d52451d3b3f48f33), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 61)" )
-GAME_CUSTOM( 199?, m4bdash__ay, m4bdash,    "bo__x__x.2_1", 0x0000, 0x020000, CRC(3e48d8ad) SHA1(73d69712993819d012c2ab2a8a36b7ebad419144), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 62)" )
-GAME_CUSTOM( 199?, m4bdash__az, m4bdash,    "bo__x_dx.2_0", 0x0000, 0x020000, CRC(d0d9e7b1) SHA1(31e858991fc1dfe9c1a8bd7955096617ebe0a4ce), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 63)" )
-GAME_CUSTOM( 199?, m4bdash__a0, m4bdash,    "bo__x_dx.2_1", 0x0000, 0x020000, CRC(b6e146c4) SHA1(8bda363f16bd258d5c6ba1b20cecc0a76e0965f7), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 64)" )
-GAME_CUSTOM( 199?, m4bdash__a1, m4bdash,    "bo__xa_x.2_0", 0x0000, 0x020000, CRC(e7054491) SHA1(7d102b1071d90ff29ea4a9418478b17b93c08059), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 65)" )
-GAME_CUSTOM( 199?, m4bdash__a2, m4bdash,    "bo__xa_x.2_1", 0x0000, 0x020000, CRC(813de5e4) SHA1(498923261e49b20666a930593fcf25ccfc9a9d79), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 66)" )
-GAME_CUSTOM( 199?, m4bdash__a3, m4bdash,    "bo__xb_x.2_0", 0x0000, 0x020000, CRC(adc2ecc7) SHA1(75e4216ff022c1ae0642913c9aaa7e241b806fcd), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 67)" )
-GAME_CUSTOM( 199?, m4bdash__a4, m4bdash,    "bo__xb_x.2_1", 0x0000, 0x020000, CRC(cbfa4db2) SHA1(d1ed60f876b4f056f478cfc23b08a7789379e143), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 68)" )
-
+// "(C)1999    BWB" and "BO_ 2.0"
+GAME_CUSTOM( 199?, m4bdash__ax, m4bdash,    "bo__x__x.2_0", 0x0000, 0x020000, CRC(7e54982f) SHA1(c5187d2f6a5b202af5fd6326d52451d3b3f48f33), "Bwb","Boulder Dash (Barcrest) (MPU4) (BO_ 2.0, set 1)" )
+GAME_CUSTOM( 199?, m4bdash__az, m4bdash,    "bo__x_dx.2_0", 0x0000, 0x020000, CRC(d0d9e7b1) SHA1(31e858991fc1dfe9c1a8bd7955096617ebe0a4ce), "Bwb","Boulder Dash (Barcrest) (MPU4) (BO_ 2.0, set 2)" )
+GAME_CUSTOM( 199?, m4bdash__a1, m4bdash,    "bo__xa_x.2_0", 0x0000, 0x020000, CRC(e7054491) SHA1(7d102b1071d90ff29ea4a9418478b17b93c08059), "Bwb","Boulder Dash (Barcrest) (MPU4) (BO_ 2.0, set 3)" )
+GAME_CUSTOM( 199?, m4bdash__a3, m4bdash,    "bo__xb_x.2_0", 0x0000, 0x020000, CRC(adc2ecc7) SHA1(75e4216ff022c1ae0642913c9aaa7e241b806fcd), "Bwb","Boulder Dash (Barcrest) (MPU4) (BO_ 2.0, set 4)" )
+// "(C)1999    BWB" and "BO_ 2.1"
+GAME_CUSTOM( 199?, m4bdash__ay, m4bdash,    "bo__x__x.2_1", 0x0000, 0x020000, CRC(3e48d8ad) SHA1(73d69712993819d012c2ab2a8a36b7ebad419144), "Bwb","Boulder Dash (Barcrest) (MPU4) (BO_ 2.1, set 1)" )
+GAME_CUSTOM( 199?, m4bdash__a0, m4bdash,    "bo__x_dx.2_1", 0x0000, 0x020000, CRC(b6e146c4) SHA1(8bda363f16bd258d5c6ba1b20cecc0a76e0965f7), "Bwb","Boulder Dash (Barcrest) (MPU4) (BO_ 2.1, set 2)" )
+GAME_CUSTOM( 199?, m4bdash__a2, m4bdash,    "bo__xa_x.2_1", 0x0000, 0x020000, CRC(813de5e4) SHA1(498923261e49b20666a930593fcf25ccfc9a9d79), "Bwb","Boulder Dash (Barcrest) (MPU4) (BO_ 2.1, set 3)" )
+GAME_CUSTOM( 199?, m4bdash__a4, m4bdash,    "bo__xb_x.2_1", 0x0000, 0x020000, CRC(cbfa4db2) SHA1(d1ed60f876b4f056f478cfc23b08a7789379e143), "Bwb","Boulder Dash (Barcrest) (MPU4) (BO_ 2.1, set 4)" )
+// no copyright string and "BLD 1.0"
+GAME_CUSTOM( 199?, m4bdash__a,  m4bdash,    "bdvarg.bin",   0x0000, 0x020000, CRC(99d579e7) SHA1(afc47144e0a8d464d8547b1ad14b0a3a1c15c027), "hack","Boulder Dash (Barcrest) (MPU4) (BLD 1.0, hack)" )
+// no copyright string and "BLD 0.7"
+GAME_CUSTOM( 199?, m4bdash__av, m4bdash,    "bold15g",      0x0000, 0x020000, CRC(fa400d34) SHA1(2faeb9b880fb4980aa0d96b4b962c879498445f2), "hack","Boulder Dash (Barcrest) (MPU4) (BLD 0.7, hack)" )
+// no copyright string and "BLS 0.1"
+GAME_CUSTOM( 199?, m4bdash__aw, m4bdash,    "bold15t",      0x0000, 0x020000, CRC(f3f331ae) SHA1(d999c8571549d8d26b7b861299d77c7282aef700), "hack","Boulder Dash (Barcrest) (MPU4) (BLS 0.1, hack)" )
 
 
 #define M4PRZDTY_EXTRA_ROMS \
@@ -3370,7 +3642,15 @@ GAME_CUSTOM( 199?, m4bdash__a4, m4bdash,    "bo__xb_x.2_1", 0x0000, 0x020000, CR
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4przdty,       0,          "pdus.p1",  0x0000, 0x010000, CRC(eaa2ae08) SHA1(a4cef3ee8c005fb717625699260d24ef6a368824), "Barcrest","Prize Duty Free (Barcrest) (MPU4) (set 1)" )
+// "(C)1993 BARCREST" and "PDU 0.2"
+GAME_CUSTOM( 199?, m4przdty,       0,          "pdus.p1",  0x0000, 0x010000, CRC(eaa2ae08) SHA1(a4cef3ee8c005fb717625699260d24ef6a368824), "Barcrest","Prize Duty Free (Barcrest) (MPU4) (PDU 0.2)" )
+GAME_CUSTOM( 199?, m4przdty__l,    m4przdty,   "pdub.p1",  0x0000, 0x010000, CRC(e50a571b) SHA1(b8412ae7211bfbf8098ae3ae70dfc2a99cd8558d), "Barcrest","Prize Duty Free (Barcrest) (MPU4) (set 13)" )
+GAME_CUSTOM( 199?, m4przdty__m,    m4przdty,   "pdud.p1",  0x0000, 0x010000, CRC(24cddc59) SHA1(c4fa0530387c5cd172d51b766315d3874cc61618), "Barcrest","Prize Duty Free (Barcrest) (MPU4) (set 14)" )
+GAME_CUSTOM( 199?, m4przdty__n,    m4przdty,   "pdudy.p1", 0x0000, 0x010000, CRC(b852ea1f) SHA1(375f0baaf64b1ea1e118f6d93417877174e094bb), "Barcrest","Prize Duty Free (Barcrest) (MPU4) (set 15)" )
+GAME_CUSTOM( 199?, m4przdty__o,    m4przdty,   "pduk.p1",  0x0000, 0x010000, CRC(7d1c1897) SHA1(aa7753bef9b580f0a134960d74115cb43b91494f), "Barcrest","Prize Duty Free (Barcrest) (MPU4) (set 16)" )
+GAME_CUSTOM( 199?, m4przdty__p,    m4przdty,   "pduy.p1",  0x0000, 0x010000, CRC(460d967b) SHA1(ea55c87674d62ee6f525ae1ff08267e8b4b126aa), "Barcrest","Prize Duty Free (Barcrest) (MPU4) (set 17)" )
+// "(C)1993 BARCREST" and "PD8 0.2"
+GAME_CUSTOM( 199?, m4przdty__j,    m4przdty,   "pd8s.p1",  0x0000, 0x010000, CRC(65816bdb) SHA1(52717f789676ad66e4b8c5c023e23262408ef0b3), "Barcrest","Prize Duty Free (Barcrest) (MPU4) (PD8 0.2)" )
 GAME_CUSTOM( 199?, m4przdty__a,    m4przdty,   "pd8ad.p1", 0x0000, 0x010000, CRC(ff2bde9d) SHA1(6f75d1c4f8b136ad9dbfd6c0182dbe0f54f856a9), "Barcrest","Prize Duty Free (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4przdty__b,    m4przdty,   "pd8b.p1",  0x0000, 0x010000, CRC(123f8081) SHA1(1619e23f563f9c70e64dccf36743c60ee597cad4), "Barcrest","Prize Duty Free (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4przdty__c,    m4przdty,   "pd8bd.p1", 0x0000, 0x010000, CRC(6136acca) SHA1(616cfc419beef50b642714df9b257ef0322bdfd4), "Barcrest","Prize Duty Free (Barcrest) (MPU4) (set 4)" )
@@ -3380,13 +3660,7 @@ GAME_CUSTOM( 199?, m4przdty__f,    m4przdty,   "pd8dk.p1", 0x0000, 0x010000, CRC
 GAME_CUSTOM( 199?, m4przdty__g,    m4przdty,   "pd8dy.p1", 0x0000, 0x010000, CRC(8446848a) SHA1(23840190a3543c7fee0334bd1e9c0000eb2b7908), "Barcrest","Prize Duty Free (Barcrest) (MPU4) (set 8)" )
 GAME_CUSTOM( 199?, m4przdty__h,    m4przdty,   "pd8j.p1",  0x0000, 0x010000, CRC(8d74c338) SHA1(482fc028a04bd257a36b46ba3e6949f95cacd271), "Barcrest","Prize Duty Free (Barcrest) (MPU4) (set 9)" )
 GAME_CUSTOM( 199?, m4przdty__i,    m4przdty,   "pd8k.p1",  0x0000, 0x010000, CRC(f4753cad) SHA1(4d41a2c40f56267ea31375046058ab2b22700414), "Barcrest","Prize Duty Free (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4przdty__j,    m4przdty,   "pd8s.p1",  0x0000, 0x010000, CRC(65816bdb) SHA1(52717f789676ad66e4b8c5c023e23262408ef0b3), "Barcrest","Prize Duty Free (Barcrest) (MPU4) (set 11)" )
 GAME_CUSTOM( 199?, m4przdty__k,    m4przdty,   "pd8y.p1",  0x0000, 0x010000, CRC(c958ed40) SHA1(35c1905656d12c788e8766424dd400669189e2c7), "Barcrest","Prize Duty Free (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4przdty__l,    m4przdty,   "pdub.p1",  0x0000, 0x010000, CRC(e50a571b) SHA1(b8412ae7211bfbf8098ae3ae70dfc2a99cd8558d), "Barcrest","Prize Duty Free (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4przdty__m,    m4przdty,   "pdud.p1",  0x0000, 0x010000, CRC(24cddc59) SHA1(c4fa0530387c5cd172d51b766315d3874cc61618), "Barcrest","Prize Duty Free (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4przdty__n,    m4przdty,   "pdudy.p1", 0x0000, 0x010000, CRC(b852ea1f) SHA1(375f0baaf64b1ea1e118f6d93417877174e094bb), "Barcrest","Prize Duty Free (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4przdty__o,    m4przdty,   "pduk.p1",  0x0000, 0x010000, CRC(7d1c1897) SHA1(aa7753bef9b580f0a134960d74115cb43b91494f), "Barcrest","Prize Duty Free (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4przdty__p,    m4przdty,   "pduy.p1",  0x0000, 0x010000, CRC(460d967b) SHA1(ea55c87674d62ee6f525ae1ff08267e8b4b126aa), "Barcrest","Prize Duty Free (Barcrest) (MPU4) (set 17)" )
 
 
 #define M4PRZMON_EXTRA_ROMS \
@@ -3401,8 +3675,9 @@ GAME_CUSTOM( 199?, m4przdty__p,    m4przdty,   "pduy.p1",  0x0000, 0x010000, CRC
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-
-GAME_CUSTOM( 199?, m4przmon,       0,          "fp8ad.p1",     0x0000, 0x010000, CRC(9c1c443a) SHA1(58e45501c33d0fd8ecca7e7bc40fef60ebb519e9), "Barcrest","Prize Money (Barcrest) (MPU4) (set 1)" )
+// "(C)1991 BARCREST" and "FP8 0.1"
+GAME_CUSTOM( 199?, m4przmon,       0,          "fp8s.p1",      0x0000, 0x010000, CRC(b43eef89) SHA1(15991ad9223ddce77277f5451b5557ff59e2647c), "Barcrest","Prize Money (Barcrest) (MPU4) (FP8 0.1)" )
+GAME_CUSTOM( 199?, m4przmon__i,    m4przmon,   "fp8ad.p1",     0x0000, 0x010000, CRC(9c1c443a) SHA1(58e45501c33d0fd8ecca7e7bc40fef60ebb519e9), "Barcrest","Prize Money (Barcrest) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4przmon__a,    m4przmon,   "fp8b.p1",      0x0000, 0x010000, CRC(2a8cd9da) SHA1(2364853f3c78ca4f47aac8609649f06bf3a98ba1), "Barcrest","Prize Money (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4przmon__b,    m4przmon,   "fp8bd.p1",     0x0000, 0x010000, CRC(bbb342fd) SHA1(5117304284a25ce43798a0a1c8c1c45d25f707ab), "Barcrest","Prize Money (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4przmon__c,    m4przmon,   "fp8d.p1",      0x0000, 0x010000, CRC(2e6dea1e) SHA1(8b0877277c414693b0d6c9d22ef86cbb487b4d2e), "Barcrest","Prize Money (Barcrest) (MPU4) (set 4)" )
@@ -3411,26 +3686,30 @@ GAME_CUSTOM( 199?, m4przmon__e,    m4przmon,   "fp8dk.p1",     0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4przmon__f,    m4przmon,   "fp8dy.p1",     0x0000, 0x010000, CRC(2c8d3a96) SHA1(413e619c76209f948885ea0ff2388a2fcb0134d6), "Barcrest","Prize Money (Barcrest) (MPU4) (set 7)" )
 GAME_CUSTOM( 199?, m4przmon__g,    m4przmon,   "fp8j.p1",      0x0000, 0x010000, CRC(2a834685) SHA1(184a5e157dc2994823f4a1077b3bc0e3b69fda34), "Barcrest","Prize Money (Barcrest) (MPU4) (set 8)" )
 GAME_CUSTOM( 199?, m4przmon__h,    m4przmon,   "fp8k.p1",      0x0000, 0x010000, CRC(48cf748a) SHA1(2116f6cc00822ac9d4d3b090443d0f84fe3b5194), "Barcrest","Prize Money (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4przmon__i,    m4przmon,   "fp8s.p1",      0x0000, 0x010000, CRC(b43eef89) SHA1(15991ad9223ddce77277f5451b5557ff59e2647c), "Barcrest","Prize Money (Barcrest) (MPU4) (set 10)" )
 GAME_CUSTOM( 199?, m4przmon__j,    m4przmon,   "fp8y.p1",      0x0000, 0x010000, CRC(c3ee5211) SHA1(02c51f28bdeb7b7fdc7bb95cdc79117eb733789c), "Barcrest","Prize Money (Barcrest) (MPU4) (set 11)" )
+// "(C)1991 BARCREST" and "FPM 0.3"
+GAME_CUSTOM( 199?, m4przmon__o,    m4przmon,   "fpms.p1",      0x0000, 0x010000, CRC(2d71e7f5) SHA1(16040a042cb0824b44869e618f38edcabd9d47d6), "Barcrest","Prize Money (Barcrest) (MPU4) (FPM 0.3)" )
 GAME_CUSTOM( 199?, m4przmon__k,    m4przmon,   "fpmb.p1",      0x0000, 0x010000, CRC(e3265d54) SHA1(e283d1675e529c600454f12f87fce370d517e11c), "Barcrest","Prize Money (Barcrest) (MPU4) (set 12)" )
 GAME_CUSTOM( 199?, m4przmon__l,    m4przmon,   "fpmd.p1",      0x0000, 0x010000, CRC(60b2051c) SHA1(9543997fe8fa168bcc66edc3aef6f7e69b4fb326), "Barcrest","Prize Money (Barcrest) (MPU4) (set 13)" )
 GAME_CUSTOM( 199?, m4przmon__m,    m4przmon,   "fpmdy.p1",     0x0000, 0x010000, CRC(422b8f68) SHA1(d18926c7228dbd8f5228b6bd03d265318b5296fe), "Barcrest","Prize Money (Barcrest) (MPU4) (set 14)" )
 GAME_CUSTOM( 199?, m4przmon__n,    m4przmon,   "fpmk.p1",      0x0000, 0x010000, CRC(84f58f68) SHA1(e2297d53c8a7ee3c5058fc734b1f4ec533e93734), "Barcrest","Prize Money (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4przmon__o,    m4przmon,   "fpms.p1",      0x0000, 0x010000, CRC(2d71e7f5) SHA1(16040a042cb0824b44869e618f38edcabd9d47d6), "Barcrest","Prize Money (Barcrest) (MPU4) (set 16)" )
 GAME_CUSTOM( 199?, m4przmon__p,    m4przmon,   "fpmy.p1",      0x0000, 0x010000, CRC(2728c725) SHA1(d36f8129731f9479ed526f9abfab8647cf43fdce), "Barcrest","Prize Money (Barcrest) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4przmon__q,    m4przmon,   "mt_05a__.3o3", 0x0000, 0x010000, CRC(4175f4a9) SHA1(b0e172e4862aa3b7be7accefc90e98d07d449b65), "Barcrest","Prize Money (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4przmon__r,    m4przmon,   "mt_05a__.4o1", 0x0000, 0x010000, CRC(637fecee) SHA1(8c970bdf703177c71dde5c774c75929ac42b6eb0), "Barcrest","Prize Money (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4przmon__s,    m4przmon,   "mt_05s__.3o3", 0x0000, 0x010000, CRC(92d674b7) SHA1(a828a9b0d870122bc09d865de90b8efa428f3fd0), "Barcrest","Prize Money (Barcrest) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4przmon__t,    m4przmon,   "mt_05sb_.3o3", 0x0000, 0x010000, CRC(1158e506) SHA1(8c91bfe29545bbbc0d136a8c9abef785cadc3c64), "Barcrest","Prize Money (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4przmon__u,    m4przmon,   "mt_05sd_.3o3", 0x0000, 0x010000, CRC(5ed3d947) SHA1(4b9bc9be6e79014ad6ca95293eb464af39e40dc1), "Barcrest","Prize Money (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4przmon__v,    m4przmon,   "mt_10a__.3o3", 0x0000, 0x010000, CRC(6a8172a4) SHA1(92c081535258677e90d9f9748a168926c7a0cbed), "Barcrest","Prize Money (Barcrest) (MPU4) (set 23)" )
-GAME_CUSTOM( 199?, m4przmon__w,    m4przmon,   "mt_10a__.4o1", 0x0000, 0x010000, CRC(36eeac30) SHA1(daa662392874806d18d4a161d39caed7e0abca73), "Barcrest","Prize Money (Barcrest) (MPU4) (set 24)" )
-GAME_CUSTOM( 199?, m4przmon__x,    m4przmon,   "mt_10s__.3o3", 0x0000, 0x010000, CRC(1b66f0f8) SHA1(308227b0144f0568df8190810e0de627b413a742), "Barcrest","Prize Money (Barcrest) (MPU4) (set 25)" )
-GAME_CUSTOM( 199?, m4przmon__y,    m4przmon,   "mt_10sb_.3o3", 0x0000, 0x010000, CRC(06a33d34) SHA1(5fa1269a7cf42ef14e2a19143a07bf28b38ad920), "Barcrest","Prize Money (Barcrest) (MPU4) (set 26)" )
-GAME_CUSTOM( 199?, m4przmon__z,    m4przmon,   "mt_10sd_.3o3", 0x0000, 0x010000, CRC(42629cb1) SHA1(12f695e1f70bf93100c1af8052dcee9131711510), "Barcrest","Prize Money (Barcrest) (MPU4) (set 27)" )
-GAME_CUSTOM( 199?, m4przmon__0,    m4przmon,   "mti05___.4o1", 0x0000, 0x010000, CRC(0e82c258) SHA1(c4aa7d32bcd9418e2919be8be8a2f9e60d46f316), "Barcrest","Prize Money (Barcrest) (MPU4) (set 28)" )
-GAME_CUSTOM( 199?, m4przmon__1,    m4przmon,   "mti10___.4o1", 0x0000, 0x010000, CRC(a35e0571) SHA1(9a22946047e76392f0c4534f892ee9ae9e700503), "Barcrest","Prize Money (Barcrest) (MPU4) (set 29)" )
+// "(C)1995  B.W.B." and "MC 53.0"
+GAME_CUSTOM( 199?, m4przmon__q,    m4przmon,   "mt_05a__.3o3", 0x0000, 0x010000, CRC(4175f4a9) SHA1(b0e172e4862aa3b7be7accefc90e98d07d449b65), "Bwb","Prize Money (Barcrest) (MPU4) (MC 53.0 K)" )
+GAME_CUSTOM( 199?, m4przmon__s,    m4przmon,   "mt_05s__.3o3", 0x0000, 0x010000, CRC(92d674b7) SHA1(a828a9b0d870122bc09d865de90b8efa428f3fd0), "Bwb","Prize Money (Barcrest) (MPU4) (MC 53.0 )" )
+GAME_CUSTOM( 199?, m4przmon__t,    m4przmon,   "mt_05sb_.3o3", 0x0000, 0x010000, CRC(1158e506) SHA1(8c91bfe29545bbbc0d136a8c9abef785cadc3c64), "Bwb","Prize Money (Barcrest) (MPU4) (MC 53.0 YD)" )
+GAME_CUSTOM( 199?, m4przmon__u,    m4przmon,   "mt_05sd_.3o3", 0x0000, 0x010000, CRC(5ed3d947) SHA1(4b9bc9be6e79014ad6ca95293eb464af39e40dc1), "Bwb","Prize Money (Barcrest) (MPU4) (MC 53.0 D)" )
+// "(C)1995  B.W.B." and "MT054.0"
+GAME_CUSTOM( 199?, m4przmon__r,    m4przmon,   "mt_05a__.4o1", 0x0000, 0x010000, CRC(637fecee) SHA1(8c970bdf703177c71dde5c774c75929ac42b6eb0), "Bwb","Prize Money (Barcrest) (MPU4) (MT054.0 K)" )
+GAME_CUSTOM( 199?, m4przmon__0,    m4przmon,   "mti05___.4o1", 0x0000, 0x010000, CRC(0e82c258) SHA1(c4aa7d32bcd9418e2919be8be8a2f9e60d46f316), "Bwb","Prize Money (Barcrest) (MPU4) (MT054.0 C)" )
+// "(C)1995  B.W.B." and "MC103.0"
+GAME_CUSTOM( 199?, m4przmon__v,    m4przmon,   "mt_10a__.3o3", 0x0000, 0x010000, CRC(6a8172a4) SHA1(92c081535258677e90d9f9748a168926c7a0cbed), "Bwb","Prize Money (Barcrest) (MPU4) (MC103.0 K)" )
+GAME_CUSTOM( 199?, m4przmon__x,    m4przmon,   "mt_10s__.3o3", 0x0000, 0x010000, CRC(1b66f0f8) SHA1(308227b0144f0568df8190810e0de627b413a742), "Bwb","Prize Money (Barcrest) (MPU4) (MC103.0)" )
+GAME_CUSTOM( 199?, m4przmon__y,    m4przmon,   "mt_10sb_.3o3", 0x0000, 0x010000, CRC(06a33d34) SHA1(5fa1269a7cf42ef14e2a19143a07bf28b38ad920), "Bwb","Prize Money (Barcrest) (MPU4) (MC103.0 YD)" )
+GAME_CUSTOM( 199?, m4przmon__z,    m4przmon,   "mt_10sd_.3o3", 0x0000, 0x010000, CRC(42629cb1) SHA1(12f695e1f70bf93100c1af8052dcee9131711510), "Bwb","Prize Money (Barcrest) (MPU4) (MC103.0D)" )
+// "(C)1995  B.W.B." and "MT104.0"
+GAME_CUSTOM( 199?, m4przmon__w,    m4przmon,   "mt_10a__.4o1", 0x0000, 0x010000, CRC(36eeac30) SHA1(daa662392874806d18d4a161d39caed7e0abca73), "Bwb","Prize Money (Barcrest) (MPU4) (MT104.0 K)" )
+GAME_CUSTOM( 199?, m4przmon__1,    m4przmon,   "mti10___.4o1", 0x0000, 0x010000, CRC(a35e0571) SHA1(9a22946047e76392f0c4534f892ee9ae9e700503), "Bwb","Prize Money (Barcrest) (MPU4) (MT104.0 C)" )
 
 #define M4PRZHR_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
@@ -3445,7 +3724,17 @@ GAME_CUSTOM( 199?, m4przmon__1,    m4przmon,   "mti10___.4o1", 0x0000, 0x010000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4przhr,     0,          "prly.p1",  0x0000, 0x010000, CRC(feeac121) SHA1(e01f32fb4cdfbe61fdcd89749a33185ac0410720), "Barcrest","Prize High Roller (Barcrest) (MPU4) (set 1)" )
+// "(C)1991 BARCREST" and "PRL 0.3"
+GAME_CUSTOM( 199?, m4przhr,     0,          "prls.p1",  0x0000, 0x010000, CRC(8cc08272) SHA1(8b25b99291a288f198573272d705c3592c7c60e6), "Barcrest","Prize High Roller (Barcrest) (MPU4) (PRL 0.3)" )
+GAME_CUSTOM( 199?, m4przhr__p,  m4przhr,    "prly.p1",  0x0000, 0x010000, CRC(feeac121) SHA1(e01f32fb4cdfbe61fdcd89749a33185ac0410720), "Barcrest","Prize High Roller (Barcrest) (MPU4) (set 1)" )
+GAME_CUSTOM( 199?, m4przhr__j,  m4przhr,    "prlb.p1",  0x0000, 0x010000, CRC(b76f96cb) SHA1(2b0196542a99e60215ced488c7f5b2ae47b66ada), "Barcrest","Prize High Roller (Barcrest) (MPU4) (set 11)" )
+GAME_CUSTOM( 199?, m4przhr__k,  m4przhr,    "prlbd.p1", 0x0000, 0x010000, CRC(efad3703) SHA1(2a2dd6e913936a3232aa51972bfd1d2f6f4e9857), "Barcrest","Prize High Roller (Barcrest) (MPU4) (set 12)" )
+GAME_CUSTOM( 199?, m4przhr__l,  m4przhr,    "prld.p1",  0x0000, 0x010000, CRC(aeff3794) SHA1(84bdd743ec49ff8f1d4f34a2c9e14f427bc38b83), "Barcrest","Prize High Roller (Barcrest) (MPU4) (set 13)" )
+GAME_CUSTOM( 199?, m4przhr__m,  m4przhr,    "prldk.p1", 0x0000, 0x010000, CRC(c003cabf) SHA1(1f031d362591d675d2cffec041a0762e431e64f5), "Barcrest","Prize High Roller (Barcrest) (MPU4) (set 14)" )
+GAME_CUSTOM( 199?, m4przhr__n,  m4przhr,    "prldy.p1", 0x0000, 0x010000, CRC(15b4e8f3) SHA1(92c3be901f038a18906db674129e153ea61d70f4), "Barcrest","Prize High Roller (Barcrest) (MPU4) (set 15)" )
+GAME_CUSTOM( 199?, m4przhr__o,  m4przhr,    "prlk.p1",  0x0000, 0x010000, CRC(f2be8c36) SHA1(411a5e1614a4f7963ebbb87e1a3a63209801f6da), "Barcrest","Prize High Roller (Barcrest) (MPU4) (set 16)" )
+// "(C)1991 BARCREST" and "PR3 0.1"
+GAME_CUSTOM( 199?, m4przhr__h,  m4przhr,    "pr3s.p1",  0x0000, 0x010000, CRC(e4968894) SHA1(92b4b930f3bf370b213a72ad8328f19d5ebbd471), "Barcrest","Prize High Roller (Barcrest) (MPU4) (PR3 0.1)" )
 GAME_CUSTOM( 199?, m4przhr__a,  m4przhr,    "pr3ad.p1", 0x0000, 0x010000, CRC(8b047599) SHA1(fd2f21c2ed3e5cb4e4ace7ffa620131a1897cf92), "Barcrest","Prize High Roller (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4przhr__b,  m4przhr,    "pr3b.p1",  0x0000, 0x010000, CRC(11d42c71) SHA1(ede99d2bbe597e4057a28c843b4b1b089e3427d2), "Barcrest","Prize High Roller (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4przhr__c,  m4przhr,    "pr3bd.p1", 0x0000, 0x010000, CRC(b682a11f) SHA1(a5cb9d016e0ff877f506c890aa6733551aef5507), "Barcrest","Prize High Roller (Barcrest) (MPU4) (set 4)" )
@@ -3453,15 +3742,7 @@ GAME_CUSTOM( 199?, m4przhr__d,  m4przhr,    "pr3d.p1",  0x0000, 0x010000, CRC(7d
 GAME_CUSTOM( 199?, m4przhr__e,  m4przhr,    "pr3dk.p1", 0x0000, 0x010000, CRC(6f6b1df4) SHA1(c4db1a793e79a47d614154fb0091be2253012489), "Barcrest","Prize High Roller (Barcrest) (MPU4) (set 6)" )
 GAME_CUSTOM( 199?, m4przhr__f,  m4przhr,    "pr3dy.p1", 0x0000, 0x010000, CRC(1ecf832e) SHA1(6b72bc6b25e8019b1867f17cfd74913e2850eacb), "Barcrest","Prize High Roller (Barcrest) (MPU4) (set 7)" )
 GAME_CUSTOM( 199?, m4przhr__g,  m4przhr,    "pr3k.p1",  0x0000, 0x010000, CRC(41423db6) SHA1(928b7c91fe12b4cef2c6b9828f0dd0f51e223d75), "Barcrest","Prize High Roller (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4przhr__h,  m4przhr,    "pr3s.p1",  0x0000, 0x010000, CRC(e4968894) SHA1(92b4b930f3bf370b213a72ad8328f19d5ebbd471), "Barcrest","Prize High Roller (Barcrest) (MPU4) (set 9)" )
 GAME_CUSTOM( 199?, m4przhr__i,  m4przhr,    "pr3y.p1",  0x0000, 0x010000, CRC(81b214c0) SHA1(792db44df880ac58e0da8ed47fe25881a24891b0), "Barcrest","Prize High Roller (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4przhr__j,  m4przhr,    "prlb.p1",  0x0000, 0x010000, CRC(b76f96cb) SHA1(2b0196542a99e60215ced488c7f5b2ae47b66ada), "Barcrest","Prize High Roller (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4przhr__k,  m4przhr,    "prlbd.p1", 0x0000, 0x010000, CRC(efad3703) SHA1(2a2dd6e913936a3232aa51972bfd1d2f6f4e9857), "Barcrest","Prize High Roller (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4przhr__l,  m4przhr,    "prld.p1",  0x0000, 0x010000, CRC(aeff3794) SHA1(84bdd743ec49ff8f1d4f34a2c9e14f427bc38b83), "Barcrest","Prize High Roller (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4przhr__m,  m4przhr,    "prldk.p1", 0x0000, 0x010000, CRC(c003cabf) SHA1(1f031d362591d675d2cffec041a0762e431e64f5), "Barcrest","Prize High Roller (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4przhr__n,  m4przhr,    "prldy.p1", 0x0000, 0x010000, CRC(15b4e8f3) SHA1(92c3be901f038a18906db674129e153ea61d70f4), "Barcrest","Prize High Roller (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4przhr__o,  m4przhr,    "prlk.p1",  0x0000, 0x010000, CRC(f2be8c36) SHA1(411a5e1614a4f7963ebbb87e1a3a63209801f6da), "Barcrest","Prize High Roller (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4przhr__p,  m4przhr,    "prls.p1",  0x0000, 0x010000, CRC(8cc08272) SHA1(8b25b99291a288f198573272d705c3592c7c60e6), "Barcrest","Prize High Roller (Barcrest) (MPU4) (set 17)" )
 
 
 #define M4GCLUE_EXTRA_ROMS \
@@ -3479,7 +3760,9 @@ GAME_CUSTOM( 199?, m4przhr__p,  m4przhr,    "prls.p1",  0x0000, 0x010000, CRC(8c
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4gclue,     0,          "c2002ad.p1",   0x0000, 0x010000, CRC(39507216) SHA1(dc49d9cea63cd5e88e4076bfca3aae88521056be), "Barcrest","Give Us A Clue (Barcrest) (MPU4) (set 1)" )
+// "(C)1991 BARCREST" and "C20 0.2"
+GAME_CUSTOM( 199?, m4gclue,     0,          "c2002s.p1",    0x0000, 0x010000, CRC(fe640d18) SHA1(598e5a92bd26457cbd0cbd1f73cddb56054ff826), "Barcrest","Give Us A Clue (Barcrest) (MPU4) (C20 0.2)" )
+GAME_CUSTOM( 199?, m4gclue__j,  m4gclue,    "c2002ad.p1",   0x0000, 0x010000, CRC(39507216) SHA1(dc49d9cea63cd5e88e4076bfca3aae88521056be), "Barcrest","Give Us A Clue (Barcrest) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4gclue__a,  m4gclue,    "c2002b.p1",    0x0000, 0x010000, CRC(1a552423) SHA1(3025c7a8f98817a8b0233c7682452d5d6df081c5), "Barcrest","Give Us A Clue (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4gclue__b,  m4gclue,    "c2002bd.p1",   0x0000, 0x010000, CRC(1eff74d1) SHA1(7cfba92237b3de1ea54c0d8b8619dd09a68c3b51), "Barcrest","Give Us A Clue (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4gclue__c,  m4gclue,    "c2002c.p1",    0x0000, 0x010000, CRC(3c73d6c8) SHA1(63bb5df7063bf33e2b9f88db53ad64666967ecca), "Barcrest","Give Us A Clue (Barcrest) (MPU4) (set 4)" )
@@ -3489,8 +3772,9 @@ GAME_CUSTOM( 199?, m4gclue__f,  m4gclue,    "c2002dr.p1",   0x0000, 0x010000, CR
 GAME_CUSTOM( 199?, m4gclue__g,  m4gclue,    "c2002dy.p1",   0x0000, 0x010000, CRC(1bf36c0c) SHA1(584fa498821129cfe9fb5c64cbf29c10abef0c57), "Barcrest","Give Us A Clue (Barcrest) (MPU4) (set 8)" )
 GAME_CUSTOM( 199?, m4gclue__h,  m4gclue,    "c2002k.p1",    0x0000, 0x010000, CRC(05e65abe) SHA1(560c2a7ac5af90ce5d0f1b34ec097bf5f733ec90), "Barcrest","Give Us A Clue (Barcrest) (MPU4) (set 9)" )
 GAME_CUSTOM( 199?, m4gclue__i,  m4gclue,    "c2002r.p1",    0x0000, 0x010000, CRC(49ce30ab) SHA1(501f509aae61059349107657516b559106d06f49), "Barcrest","Give Us A Clue (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4gclue__j,  m4gclue,    "c2002s.p1",    0x0000, 0x010000, CRC(fe640d18) SHA1(598e5a92bd26457cbd0cbd1f73cddb56054ff826), "Barcrest","Give Us A Clue (Barcrest) (MPU4) (set 11)" )
 GAME_CUSTOM( 199?, m4gclue__k,  m4gclue,    "c2002y.p1",    0x0000, 0x010000, CRC(d4a51845) SHA1(7808ff2d62eeadbb894379857266770fe9954384), "Barcrest","Give Us A Clue (Barcrest) (MPU4) (set 12)" )
+// "(C)1991 BARCREST" and "C25 0.4"
+GAME_CUSTOM( 199?, m4gclue__v,  m4gclue,    "c2504s.p1",    0x0000, 0x010000, CRC(47d6791f) SHA1(e232586605b096849480002ddb7b77a8b113a388), "Barcrest","Give Us A Clue (Barcrest) (MPU4) (C25 0.4)" )
 GAME_CUSTOM( 199?, m4gclue__l,  m4gclue,    "c2504ad.p1",   0x0000, 0x010000, CRC(f721de72) SHA1(8e64360f5b0de9d9b2afda6361e2b6d4ec3b1baf), "Barcrest","Give Us A Clue (Barcrest) (MPU4) (set 13)" )
 GAME_CUSTOM( 199?, m4gclue__m,  m4gclue,    "c2504b.p1",    0x0000, 0x010000, CRC(4cd01058) SHA1(705b3979c8728e98810cb3cd4d4b4e926e52d78b), "Barcrest","Give Us A Clue (Barcrest) (MPU4) (set 14)" )
 GAME_CUSTOM( 199?, m4gclue__n,  m4gclue,    "c2504bd.p1",   0x0000, 0x010000, CRC(34d6d202) SHA1(1c596abdbcce801f5363871f9959d07ba9568083), "Barcrest","Give Us A Clue (Barcrest) (MPU4) (set 15)" )
@@ -3501,7 +3785,6 @@ GAME_CUSTOM( 199?, m4gclue__r,  m4gclue,    "c2504dr.p1",   0x0000, 0x010000, CR
 GAME_CUSTOM( 199?, m4gclue__s,  m4gclue,    "c2504dy.p1",   0x0000, 0x010000, CRC(a71ccade) SHA1(65cd823aa4136fcf8d93058e4ef708e4b01caa3a), "Barcrest","Give Us A Clue (Barcrest) (MPU4) (set 20)" )
 GAME_CUSTOM( 199?, m4gclue__t,  m4gclue,    "c2504k.p1",    0x0000, 0x010000, CRC(aa4af6e9) SHA1(18654cf751e157d11010e991e74127aa15cb3cfc), "Barcrest","Give Us A Clue (Barcrest) (MPU4) (set 21)" )
 GAME_CUSTOM( 199?, m4gclue__u,  m4gclue,    "c2504r.p1",    0x0000, 0x010000, CRC(62bbd71d) SHA1(0b7f97a213a8f5b457aa54f760e19ebd00b1d334), "Barcrest","Give Us A Clue (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4gclue__v,  m4gclue,    "c2504s.p1",    0x0000, 0x010000, CRC(47d6791f) SHA1(e232586605b096849480002ddb7b77a8b113a388), "Barcrest","Give Us A Clue (Barcrest) (MPU4) (set 23)" )
 GAME_CUSTOM( 199?, m4gclue__w,  m4gclue,    "c2504y.p1",    0x0000, 0x010000, CRC(ffd0fff3) SHA1(5f30353e73331315be99281c7ed435d05a9bfc5b), "Barcrest","Give Us A Clue (Barcrest) (MPU4) (set 24)" )
 
 #define M4VEGAST_EXTRA_ROMS \
@@ -3519,7 +3802,9 @@ GAME_CUSTOM( 199?, m4gclue__w,  m4gclue,    "c2504y.p1",    0x0000, 0x010000, CR
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4vegast,       0,          "uvsad.p1",     0x0000, 0x020000, CRC(f26d7fa8) SHA1(bb37be4a189bd38bd71afd836e94a55f9ef84ad4), "Barcrest","Vegas Strip (Barcrest) (MPU4) (set 1)" )
+// "(C)1993 BARCREST" and "UVS 0.3"
+GAME_CUSTOM( 199?, m4vegast,       0,          "uvss.p1",      0x0000, 0x020000, CRC(8b5b120f) SHA1(90749c4f986a248252661b8e4157871330673ecd), "Barcrest","Vegas Strip (Barcrest) (MPU4) (UVS 0.3)" )
+GAME_CUSTOM( 199?, m4vegast__h,    m4vegast,   "uvsad.p1",     0x0000, 0x020000, CRC(f26d7fa8) SHA1(bb37be4a189bd38bd71afd836e94a55f9ef84ad4), "Barcrest","Vegas Strip (Barcrest) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4vegast__a,    m4vegast,   "uvsb.p1",      0x0000, 0x020000, CRC(32e017ff) SHA1(3e8aa863b85164ee9d535244bafb82b14ee19528), "Barcrest","Vegas Strip (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4vegast__b,    m4vegast,   "uvsbd.p1",     0x0000, 0x020000, CRC(7f77d16d) SHA1(7f34a687877ca1d9257ee1c39ca5b3c44a42782e), "Barcrest","Vegas Strip (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4vegast__c,    m4vegast,   "uvsc.p1",      0x0000, 0x020000, CRC(05aaaaed) SHA1(7eee93204467b9ecdff4b742a6e16306b83778ba), "Barcrest","Vegas Strip (Barcrest) (MPU4) (set 4)" )
@@ -3527,8 +3812,9 @@ GAME_CUSTOM( 199?, m4vegast__d,    m4vegast,   "uvsd.p1",      0x0000, 0x020000,
 GAME_CUSTOM( 199?, m4vegast__e,    m4vegast,   "uvsdk.p1",     0x0000, 0x020000, CRC(35b0793b) SHA1(90ef897fcd9cfb48007e5788a4df02053e38430c), "Barcrest","Vegas Strip (Barcrest) (MPU4) (set 6)" )
 GAME_CUSTOM( 199?, m4vegast__f,    m4vegast,   "uvsdy.p1",     0x0000, 0x020000, CRC(b25359c5) SHA1(da4aa9b5069db222e22f24cd78f641c70a015166), "Barcrest","Vegas Strip (Barcrest) (MPU4) (set 7)" )
 GAME_CUSTOM( 199?, m4vegast__g,    m4vegast,   "uvsk.p1",      0x0000, 0x020000, CRC(7827bfa9) SHA1(720d9793e97f2e11c1c9b18e3b4fa6ec7e29250a), "Barcrest","Vegas Strip (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4vegast__h,    m4vegast,   "uvss.p1",      0x0000, 0x020000, CRC(8b5b120f) SHA1(90749c4f986a248252661b8e4157871330673ecd), "Barcrest","Vegas Strip (Barcrest) (MPU4) (set 9)" )
 GAME_CUSTOM( 199?, m4vegast__i,    m4vegast,   "uvsy.p1",      0x0000, 0x020000, CRC(ffc49f57) SHA1(fb64afa2fefb3ff1c0f9b71aa3d00e1a17903e84), "Barcrest","Vegas Strip (Barcrest) (MPU4) (set 10)" )
+// "(C)1993 BARCREST" and "VSG 0.4"
+GAME_CUSTOM( 199?, m4vegast__t,    m4vegast,   "vsg04s.p1",    0x0000, 0x020000, CRC(aff47295) SHA1(d249f280b721c96b7c36329e2c2bb955fa91aa59), "Barcrest","Vegas Strip (Barcrest) (MPU4) (VSG 0.4)" )
 GAME_CUSTOM( 199?, m4vegast__j,    m4vegast,   "vsg04ad.p1",   0x0000, 0x020000, CRC(d63f8f24) SHA1(f3dcd908bceb5a508927a83d23e82577e8684240), "Barcrest","Vegas Strip (Barcrest) (MPU4) (set 11)" )
 GAME_CUSTOM( 199?, m4vegast__k,    m4vegast,   "vsg04b.p1",    0x0000, 0x020000, CRC(4211e2bf) SHA1(5f634d074d0f95673f734c5600ac990fb7510bdc), "Barcrest","Vegas Strip (Barcrest) (MPU4) (set 12)" )
 GAME_CUSTOM( 199?, m4vegast__l,    m4vegast,   "vsg04bd.p1",   0x0000, 0x020000, CRC(5b2521e1) SHA1(67d2496e7a52f9aa984d57a5b76f995506051a8c), "Barcrest","Vegas Strip (Barcrest) (MPU4) (set 13)" )
@@ -3539,11 +3825,11 @@ GAME_CUSTOM( 199?, m4vegast__p,    m4vegast,   "vsg04dr.p1",   0x0000, 0x020000,
 GAME_CUSTOM( 199?, m4vegast__q,    m4vegast,   "vsg04dy.p1",   0x0000, 0x020000, CRC(9601a949) SHA1(39a06f671b8f817039b9861887dd9521e7f3acdd), "Barcrest","Vegas Strip (Barcrest) (MPU4) (set 18)" )
 GAME_CUSTOM( 199?, m4vegast__r,    m4vegast,   "vsg04k.p1",    0x0000, 0x020000, CRC(08d64ae9) SHA1(5cfe1b2fe0933d06618a2c88e1a63224686e972f), "Barcrest","Vegas Strip (Barcrest) (MPU4) (set 19)" )
 GAME_CUSTOM( 199?, m4vegast__s,    m4vegast,   "vsg04r.p1",    0x0000, 0x020000, CRC(bbd9f1d8) SHA1(22312ff72d5b2fbe6416a7e84435e1df456a3547), "Barcrest","Vegas Strip (Barcrest) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4vegast__t,    m4vegast,   "vsg04s.p1",    0x0000, 0x020000, CRC(aff47295) SHA1(d249f280b721c96b7c36329e2c2bb955fa91aa59), "Barcrest","Vegas Strip (Barcrest) (MPU4) (set 21)" )
 GAME_CUSTOM( 199?, m4vegast__u,    m4vegast,   "vsg04y.p1",    0x0000, 0x020000, CRC(8f356a17) SHA1(33ac5e8a455175471466f7c7f35c66f795067bf2), "Barcrest","Vegas Strip (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4vegast__v,    m4vegast,   "lvs",          0x0000, 0x020000, CRC(dcb0dc80) SHA1(6045b332eb4af09f6e0a669ea0b78ef4ac389ac2), "Barcrest","Vegas Strip (Barcrest) (MPU4) (set 23)" )
-GAME_CUSTOM( 199?, m4vegast__w,    m4vegast,   "vspa20st",     0x0000, 0x010000, CRC(267388eb) SHA1(2621724ebdd5031fc513692ff90989bf3b6115d1), "Barcrest","Vegas Strip (Barcrest) (MPU4) (set 24)" )
-GAME_CUSTOM( 199?, m4vegast__x,    m4vegast,   "vstr2010",     0x0000, 0x020000, CRC(126365e3) SHA1(1e648b7a8cb1ff49e43e2fdc30f482b2b73ed6d7), "Barcrest","Vegas Strip (Barcrest) (MPU4) (set 25)" )
+// "(C)1993 BARCREST" and "VSG 0.3" (most of the sets with 2010 in the filenames are hacks tho)
+GAME_CUSTOM( 199?, m4vegast__x,    m4vegast,   "vstr2010",     0x0000, 0x020000, CRC(126365e3) SHA1(1e648b7a8cb1ff49e43e2fdc30f482b2b73ed6d7), "Barcrest","Vegas Strip (Barcrest) (MPU4) (VSG 0.3)" )
+// "(C)1993 BARCREST" and "VSG 0.3" (but doesn't boot?)
+GAME_CUSTOM( 199?, m4vegast__v,    m4vegast,   "lvs",          0x0000, 0x020000, CRC(dcb0dc80) SHA1(6045b332eb4af09f6e0a669ea0b78ef4ac389ac2), "hack?","Vegas Strip (Barcrest) (MPU4) (VSG 0.3, hack?)" )
 
 
 #define M4HOTROD_EXTRA_ROMS \
@@ -3561,29 +3847,36 @@ GAME_CUSTOM( 199?, m4vegast__x,    m4vegast,   "vstr2010",     0x0000, 0x020000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4hotrod,       0,          "rodk.p1",                  0x0000, 0x010000, CRC(298d85ff) SHA1(3c9374be1f6b5e58a1b9004f74f3a33d0fff4214), "Barcrest","Hot Rod (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4hotrod__a,    m4hotrod,   "hot rod 5p 4 p1 (27512)",  0x0000, 0x010000, CRC(b6212af8) SHA1(9453c4424244895b3ad15d5fba45fe8822e7ff2b), "Barcrest","Hot Rod (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4hotrod__b,    m4hotrod,   "hr056c",                   0x0000, 0x010000, CRC(c062f285) SHA1(917e82cadf242aa815c525ff435cd4b04ea87e39), "Barcrest","Hot Rod (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4hotrod__c,    m4hotrod,   "hrod05_11",                0x0000, 0x010000, CRC(61f35723) SHA1(743b71ecde4923c359a1202eaad7e4d74b0d1611), "Barcrest","Hot Rod (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4hotrod__d,    m4hotrod,   "hrod10_11",                0x0000, 0x010000, CRC(5b924a86) SHA1(6b86dce6ba3789750de05dca996202c000ecfbae), "Barcrest","Hot Rod (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4hotrod__e,    m4hotrod,   "hrod20_11",                0x0000, 0x010000, CRC(b81a57b6) SHA1(442c119b9ed70d4da2f9082ec01e410cfee76102), "Barcrest","Hot Rod (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4hotrod__f,    m4hotrod,   "hrod55",                   0x0000, 0x010000, CRC(dd6d3153) SHA1(27f3324b43c026abf2ae4c584afeb6971a3fe57a), "Barcrest","Hot Rod (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4hotrod__g,    m4hotrod,   "hrod58c",                  0x0000, 0x010000, CRC(079474db) SHA1(257b1086277cd0b8398b80a4b95cf1212c10c4c3), "Barcrest","Hot Rod (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4hotrod__h,    m4hotrod,   "rodc.p1",                  0x0000, 0x010000, CRC(2f6b53d3) SHA1(fa4df1e6a2f6158cbc099d7e2d5ec96355079f36), "Barcrest","Hot Rod (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4hotrod__i,    m4hotrod,   "roddy.p1",                 0x0000, 0x010000, CRC(53e508ac) SHA1(24df8b949211e7bc5c7b8d704562b36e52cb8d5c), "Barcrest","Hot Rod (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4hotrod__j,    m4hotrod,   "rods.p1",                  0x0000, 0x010000, CRC(93d73857) SHA1(dcfd1dbf368f68ba3e7aa163eedd89c68aaccec8), "Barcrest","Hot Rod (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4hotrod__k,    m4hotrod,   "hr_05___.1o1",             0x0000, 0x010000, CRC(abdb0a16) SHA1(5db2721326a22b9d8653773ec8de8a845d147eee), "Barcrest","Hot Rod (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4hotrod__l,    m4hotrod,   "hr_05_d_.1o1",             0x0000, 0x010000, CRC(8a14fa8d) SHA1(8d64a75514d0a58fcdc2d5a81c0b85a49ab8322b), "Barcrest","Hot Rod (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4hotrod__m,    m4hotrod,   "hr_10___.1o1",             0x0000, 0x010000, CRC(5e09202f) SHA1(06991f5fd451fff77ef7ab0b866543613c3dcc02), "Barcrest","Hot Rod (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4hotrod__n,    m4hotrod,   "hr_10_d_.1o1",             0x0000, 0x010000, CRC(329409c5) SHA1(e9ba0f36048f46a381c8a408b9c1e10acea0bde3), "Barcrest","Hot Rod (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4hotrod__o,    m4hotrod,   "hri05___.101",             0x0000, 0x010000, CRC(43e5e86e) SHA1(8bf00b1af1f86f1a361537a1117d857fa8fa7af4), "Barcrest","Hot Rod (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4hotrod__p,    m4hotrod,   "hri10___.1o1",             0x0000, 0x010000, CRC(a855f93c) SHA1(2b63aa7c632f14457c2ae0312cef7b22bbf1df22), "Barcrest","Hot Rod (Barcrest) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4hotrod__q,    m4hotrod,   "hrod_05_.4",               0x0000, 0x010000, CRC(c58aa0e8) SHA1(8a2b5a9bd4e93a7a12cae4e92e0faf35e2ebbe4c), "Barcrest","Hot Rod (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4hotrod__r,    m4hotrod,   "hrod_05_.8",               0x0000, 0x010000, CRC(b3c9e0c9) SHA1(4a549876121dd7fc5c11d3b03322d1e5f90eaa86), "Barcrest","Hot Rod (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4hotrod__s,    m4hotrod,   "hrod_10_.4",               0x0000, 0x010000, CRC(b9e84451) SHA1(7566aef1604992376010758cb079fe9da67ad454), "Barcrest","Hot Rod (Barcrest) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4hotrod__t,    m4hotrod,   "hrod_10_.8",               0x0000, 0x010000, CRC(62ac8057) SHA1(d2085ec0f29ff85251ef2c576e828f502420839d), "Barcrest","Hot Rod (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4hotrod__u,    m4hotrod,   "hrod_20_.4",               0x0000, 0x010000, CRC(c58bb470) SHA1(7bb831d7b647d17eff896ccce0ab7c8cfa8179b8), "Barcrest","Hot Rod (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4hotrod__v,    m4hotrod,   "hrod_20_.8",               0x0000, 0x010000, CRC(a2d20781) SHA1(3f1b33374ae0a61815b38ad0e57856ae16047adc), "Barcrest","Hot Rod (Barcrest) (MPU4) (set 23)" )
+
+// "(C)1991 BARCREST" and "ROD 0.4"
+GAME_CUSTOM( 199?, m4hotrod,       0,          "rodk.p1",                  0x0000, 0x010000, CRC(298d85ff) SHA1(3c9374be1f6b5e58a1b9004f74f3a33d0fff4214), "Barcrest","Hot Rod (Barcrest) (MPU4) (ROD 0.4K)" )
+GAME_CUSTOM( 199?, m4hotrod__h,    m4hotrod,   "rodc.p1",                  0x0000, 0x010000, CRC(2f6b53d3) SHA1(fa4df1e6a2f6158cbc099d7e2d5ec96355079f36), "Barcrest","Hot Rod (Barcrest) (MPU4) (ROD 0.4C)" )
+GAME_CUSTOM( 199?, m4hotrod__i,    m4hotrod,   "roddy.p1",                 0x0000, 0x010000, CRC(53e508ac) SHA1(24df8b949211e7bc5c7b8d704562b36e52cb8d5c), "Barcrest","Hot Rod (Barcrest) (MPU4) (ROD 0.4YD)" )
+GAME_CUSTOM( 199?, m4hotrod__j,    m4hotrod,   "rods.p1",                  0x0000, 0x010000, CRC(93d73857) SHA1(dcfd1dbf368f68ba3e7aa163eedd89c68aaccec8), "Barcrest","Hot Rod (Barcrest) (MPU4) (ROD 0.4)" )
+GAME_CUSTOM( 199?, m4hotrod__e,    m4hotrod,   "hrod20_11",                0x0000, 0x010000, CRC(b81a57b6) SHA1(442c119b9ed70d4da2f9082ec01e410cfee76102), "hack",    "Hot Rod (Barcrest) (MPU4) (ROD 0.4, hack?, set 1)" ) // bad chr
+GAME_CUSTOM( 199?, m4hotrod__u,    m4hotrod,   "hrod_20_.4",               0x0000, 0x010000, CRC(c58bb470) SHA1(7bb831d7b647d17eff896ccce0ab7c8cfa8179b8), "hack",    "Hot Rod (Barcrest) (MPU4) (ROD 0.4, hack?, set 2)" ) // ^
+GAME_CUSTOM( 199?, m4hotrod__v,    m4hotrod,   "hrod_20_.8",               0x0000, 0x010000, CRC(a2d20781) SHA1(3f1b33374ae0a61815b38ad0e57856ae16047adc), "hack",    "Hot Rod (Barcrest) (MPU4) (ROD 0.4, hack?, set 3)" ) /// ^
+// "(C)1994  B.W.B." and "HR__1.0"
+GAME_CUSTOM( 199?, m4hotrod__k,    m4hotrod,   "hr_05___.1o1",             0x0000, 0x010000, CRC(abdb0a16) SHA1(5db2721326a22b9d8653773ec8de8a845d147eee), "Bwb","Hot Rod (Barcrest) (MPU4) (HR__1.0, set 1)" )
+GAME_CUSTOM( 199?, m4hotrod__l,    m4hotrod,   "hr_05_d_.1o1",             0x0000, 0x010000, CRC(8a14fa8d) SHA1(8d64a75514d0a58fcdc2d5a81c0b85a49ab8322b), "Bwb","Hot Rod (Barcrest) (MPU4) (HR__1.0D, set 1)" )
+GAME_CUSTOM( 199?, m4hotrod__o,    m4hotrod,   "hri05___.101",             0x0000, 0x010000, CRC(43e5e86e) SHA1(8bf00b1af1f86f1a361537a1117d857fa8fa7af4), "Bwb","Hot Rod (Barcrest) (MPU4) (HR__1.0C, set 1)" )
+GAME_CUSTOM( 199?, m4hotrod__m,    m4hotrod,   "hr_10___.1o1",             0x0000, 0x010000, CRC(5e09202f) SHA1(06991f5fd451fff77ef7ab0b866543613c3dcc02), "Bwb","Hot Rod (Barcrest) (MPU4) (HR__1.0, set 2)" )
+GAME_CUSTOM( 199?, m4hotrod__n,    m4hotrod,   "hr_10_d_.1o1",             0x0000, 0x010000, CRC(329409c5) SHA1(e9ba0f36048f46a381c8a408b9c1e10acea0bde3), "Bwb","Hot Rod (Barcrest) (MPU4) (HR__1.0D, set 2)" )
+GAME_CUSTOM( 199?, m4hotrod__p,    m4hotrod,   "hri10___.1o1",             0x0000, 0x010000, CRC(a855f93c) SHA1(2b63aa7c632f14457c2ae0312cef7b22bbf1df22), "Bwb","Hot Rod (Barcrest) (MPU4) (HR__1.0C, set 2)" )
+// "(C)1995  B.W.B." and "HRC_1.0"
+GAME_CUSTOM( 199?, m4hotrod__a,    m4hotrod,   "hot rod 5p 4 p1 (27512)",  0x0000, 0x010000, CRC(b6212af8) SHA1(9453c4424244895b3ad15d5fba45fe8822e7ff2b), "Bwb","Hot Rod (Barcrest) (MPU4) (HRC_1.0C)" )
+// no copyright string and "HR__1.0"
+GAME_CUSTOM( 199?, m4hotrod__b,    m4hotrod,   "hr056c",                   0x0000, 0x010000, CRC(c062f285) SHA1(917e82cadf242aa815c525ff435cd4b04ea87e39), "hack","Hot Rod (Barcrest) (MPU4) (HR__1.0, hack, set 1)" )
+GAME_CUSTOM( 199?, m4hotrod__c,    m4hotrod,   "hrod05_11",                0x0000, 0x010000, CRC(61f35723) SHA1(743b71ecde4923c359a1202eaad7e4d74b0d1611), "hack","Hot Rod (Barcrest) (MPU4) (HR__1.0, hack, set 2)" )
+GAME_CUSTOM( 199?, m4hotrod__d,    m4hotrod,   "hrod10_11",                0x0000, 0x010000, CRC(5b924a86) SHA1(6b86dce6ba3789750de05dca996202c000ecfbae), "hack","Hot Rod (Barcrest) (MPU4) (HR__1.0, hack, set 3)" )
+GAME_CUSTOM( 199?, m4hotrod__f,    m4hotrod,   "hrod55",                   0x0000, 0x010000, CRC(dd6d3153) SHA1(27f3324b43c026abf2ae4c584afeb6971a3fe57a), "hack","Hot Rod (Barcrest) (MPU4) (HR__1.0, hack, set 4)" )
+GAME_CUSTOM( 199?, m4hotrod__g,    m4hotrod,   "hrod58c",                  0x0000, 0x010000, CRC(079474db) SHA1(257b1086277cd0b8398b80a4b95cf1212c10c4c3), "hack","Hot Rod (Barcrest) (MPU4) (HR__1.0, hack, set 5)" )
+GAME_CUSTOM( 199?, m4hotrod__q,    m4hotrod,   "hrod_05_.4",               0x0000, 0x010000, CRC(c58aa0e8) SHA1(8a2b5a9bd4e93a7a12cae4e92e0faf35e2ebbe4c), "hack","Hot Rod (Barcrest) (MPU4) (HR__1.0, hack, set 6)" )
+GAME_CUSTOM( 199?, m4hotrod__r,    m4hotrod,   "hrod_05_.8",               0x0000, 0x010000, CRC(b3c9e0c9) SHA1(4a549876121dd7fc5c11d3b03322d1e5f90eaa86), "hack","Hot Rod (Barcrest) (MPU4) (HR__1.0, hack, set 7)" )
+GAME_CUSTOM( 199?, m4hotrod__s,    m4hotrod,   "hrod_10_.4",               0x0000, 0x010000, CRC(b9e84451) SHA1(7566aef1604992376010758cb079fe9da67ad454), "hack","Hot Rod (Barcrest) (MPU4) (HR__1.0, hack, set 8)" )
+GAME_CUSTOM( 199?, m4hotrod__t,    m4hotrod,   "hrod_10_.8",               0x0000, 0x010000, CRC(62ac8057) SHA1(d2085ec0f29ff85251ef2c576e828f502420839d), "hack","Hot Rod (Barcrest) (MPU4) (HR__1.0, hack, set 9)" )
+
+
 
 
 #define M4BUC_EXTRA_ROMS \
@@ -3599,10 +3892,8 @@ GAME_CUSTOM( 199?, m4hotrod__v,    m4hotrod,   "hrod_20_.8",               0x000
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
-
-GAME_CUSTOM( 199?, m4buc,     0,      "buccaneer5-15sw.bin",  0x000000, 0x020000, CRC(9b92d1f6) SHA1(d374fe966a1b039c971f278ab1113640e7629233), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4buc__a,  m4buc,  "bucc15g",              0x000000, 0x020000, CRC(63dd1180) SHA1(a557af6927744b4ce2773c70db5ce1a7708ceb2c), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4buc__b,  m4buc,  "bucc15t",              0x000000, 0x020000, CRC(66104749) SHA1(4b5a9a3f1409e207cad42ea29a205a18facf57ab), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 3)" )
+// "(C)1993 BARCREST" and "BUG 0.4"
+GAME_CUSTOM( 199?, m4buc,     0,      "bug04s.p1",            0x000000, 0x020000, CRC(0f76cf1d) SHA1(e0081f88e23958564a87346082629c4fdc0cc147), "Barcrest","Buccaneer (Barcrest) (MPU4) (BUG 0.4)" )
 GAME_CUSTOM( 199?, m4buc__c,  m4buc,  "bug04ad.p1",           0x000000, 0x020000, CRC(c6171b29) SHA1(a66aa4b05f974aa9cea9e05e95d14a0e746374be), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 4)" )
 GAME_CUSTOM( 199?, m4buc__d,  m4buc,  "bug04b.p1",            0x000000, 0x020000, CRC(4358fe51) SHA1(6e61397f71018d3f9d369a0ac8fefacafbada2d5), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 5)" )
 GAME_CUSTOM( 199?, m4buc__e,  m4buc,  "bug04bd.p1",           0x000000, 0x020000, CRC(282b7832) SHA1(1ae3e45606bb875dd178beab231bdaa472687d46), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 6)" )
@@ -3614,8 +3905,9 @@ GAME_CUSTOM( 199?, m4buc__j,  m4buc,  "bug04dy.p1",           0x000000, 0x020000
 GAME_CUSTOM( 199?, m4buc__k,  m4buc,  "bug04h.p1",            0x000000, 0x020000, CRC(03edc1c4) SHA1(52a3040ec602008dc9143900d149251235282dca), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 12)" )
 GAME_CUSTOM( 199?, m4buc__l,  m4buc,  "bug04k.p1",            0x000000, 0x020000, CRC(6ab99bd9) SHA1(d199e88dd22f6c2d31c23413c4c3f262834f5751), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 13)" )
 GAME_CUSTOM( 199?, m4buc__m,  m4buc,  "bug04r.p1",            0x000000, 0x020000, CRC(d9b620e8) SHA1(01e7232f62dc33d3a9a26ee5456c2bb47dd4fce4), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4buc__n,  m4buc,  "bug04s.p1",            0x000000, 0x020000, CRC(0f76cf1d) SHA1(e0081f88e23958564a87346082629c4fdc0cc147), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 15)" )
 GAME_CUSTOM( 199?, m4buc__o,  m4buc,  "bug04y.p1",            0x000000, 0x020000, CRC(207e338f) SHA1(3a95d0029e3e3a8f839f335ed1a981e8d6124dcc), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 16)" )
+// "(C)1993 BARCREST" and "BUG 0.5"
+GAME_CUSTOM( 199?, m4buc__0,  m4buc,  "bug05s.p1",            0x000000, 0x020000, CRC(99ce7ada) SHA1(6cdb17d8dfd759ceb2d7acd5f6b15952106f3178), "Barcrest","Buccaneer (Barcrest) (MPU4) (BUG 0.5)" )
 GAME_CUSTOM( 199?, m4buc__p,  m4buc,  "bug05ad.p1",           0x000000, 0x020000, CRC(515539dd) SHA1(6f8eb199f4738edb6f405f3d5df1ba0256dfa0bf), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 17)" )
 GAME_CUSTOM( 199?, m4buc__q,  m4buc,  "bug05b.p1",            0x000000, 0x020000, CRC(a4e57b87) SHA1(64a76762b028349da9fb14141d27423785bdb9c8), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 18)" )
 GAME_CUSTOM( 199?, m4buc__r,  m4buc,  "bug05bd.p1",           0x000000, 0x020000, CRC(bf695ac6) SHA1(24f5c4f46ed5d269426357ef578774ac456be1d0), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 19)" )
@@ -3627,8 +3919,9 @@ GAME_CUSTOM( 199?, m4buc__w,  m4buc,  "bug05dy.p1",           0x000000, 0x020000
 GAME_CUSTOM( 199?, m4buc__x,  m4buc,  "bug05h.p1",            0x000000, 0x020000, CRC(e4504412) SHA1(84596d14c1474f7965956ed707261dbe272d9c14), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 25)" )
 GAME_CUSTOM( 199?, m4buc__y,  m4buc,  "bug05k.p1",            0x000000, 0x020000, CRC(8d041e0f) SHA1(94c4fa84f6c978c725593c6086c61521cd791c74), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 26)" )
 GAME_CUSTOM( 199?, m4buc__z,  m4buc,  "bug05r.p1",            0x000000, 0x020000, CRC(3e0ba53e) SHA1(041dbf7f086dce0182f855249d832b68942e2c33), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 27)" )
-GAME_CUSTOM( 199?, m4buc__0,  m4buc,  "bug05s.p1",            0x000000, 0x020000, CRC(99ce7ada) SHA1(6cdb17d8dfd759ceb2d7acd5f6b15952106f3178), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 28)" )
 GAME_CUSTOM( 199?, m4buc__1,  m4buc,  "bug05y.p1",            0x000000, 0x020000, CRC(c7c3b659) SHA1(66aa9481b69ee282ecfa8f7614b7d476919e35b3), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 29)" )
+// "(C)1993 BARCREST" and "BUS 0.1"
+GAME_CUSTOM( 199?, m4buc__ad, m4buc,  "bus01s.p1",            0x000000, 0x020000, CRC(d5a35734) SHA1(7b905ac16eb50d462e9edc5bb50fe660b6f7c81b), "Barcrest","Buccaneer (Barcrest) (MPU4) (BUS 0.1)" )
 GAME_CUSTOM( 199?, m4buc__2,  m4buc,  "bus01ad.p1",           0x000000, 0x020000, CRC(0f5920ee) SHA1(5152c24fd3e3642a5324e68465403a6ce199db5a), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 30)" )
 GAME_CUSTOM( 199?, m4buc__3,  m4buc,  "bus01b.p1",            0x000000, 0x020000, CRC(656d2609) SHA1(525fc8e2dc1d6bfe17c24e28ccde0f0a580e4330), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 31)" )
 GAME_CUSTOM( 199?, m4buc__4,  m4buc,  "bus01bd.p1",           0x000000, 0x020000, CRC(e16543f5) SHA1(98dc6a098ad13c1f7c3e0e1079eed92931ce279c), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 32)" )
@@ -3640,8 +3933,9 @@ GAME_CUSTOM( 199?, m4buc__9,  m4buc,  "bus01dy.p1",           0x000000, 0x020000
 GAME_CUSTOM( 199?, m4buc__aa, m4buc,  "bus01h.p1",            0x000000, 0x020000, CRC(25d8199c) SHA1(84be66148fe14d85bd69fb4c9b5263b7c208e690), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 38)" )
 GAME_CUSTOM( 199?, m4buc__ab, m4buc,  "bus01k.p1",            0x000000, 0x020000, CRC(4c8c4381) SHA1(0e6204e6f937ca8b9dc31927d31ec11db18068c0), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 39)" )
 GAME_CUSTOM( 199?, m4buc__ac, m4buc,  "bus01r.p1",            0x000000, 0x020000, CRC(ff83f8b0) SHA1(bbd56730eccb4df1815b98921522beec5c74a9bd), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 40)" )
-GAME_CUSTOM( 199?, m4buc__ad, m4buc,  "bus01s.p1",            0x000000, 0x020000, CRC(d5a35734) SHA1(7b905ac16eb50d462e9edc5bb50fe660b6f7c81b), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 41)" )
 GAME_CUSTOM( 199?, m4buc__ae, m4buc,  "bus01y.p1",            0x000000, 0x020000, CRC(064bebd7) SHA1(8b19edae49c919ddf20d2ebff43ffec79809d90c), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 42)" )
+// "(C)1993 BARCREST" and "BUS 0.2"
+GAME_CUSTOM( 199?, m4buc__aq, m4buc,  "bus02s.p1",            0x000000, 0x020000, CRC(c43f9f09) SHA1(83501473bf8fc17748fa42ab446d4bc54eeb2a80), "Barcrest","Buccaneer (Barcrest) (MPU4) (BUS 0.2)" )
 GAME_CUSTOM( 199?, m4buc__af, m4buc,  "bus02ad.p1",           0x000000, 0x020000, CRC(a1ad9f3d) SHA1(bfb61b1f2a449293d23d6c385a0aab67ccdcc8fe), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 43)" )
 GAME_CUSTOM( 199?, m4buc__ag, m4buc,  "bus02b.p1",            0x000000, 0x020000, CRC(f6d1181b) SHA1(f4606b4f9522293ad73936f9dd80e54b9ee58f33), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 44)" )
 GAME_CUSTOM( 199?, m4buc__ah, m4buc,  "bus02bd.p1",           0x000000, 0x020000, CRC(4f91fc26) SHA1(66e2aec28ec474a8d9c11dd7375de0c2050db963), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 45)" )
@@ -3653,17 +3947,25 @@ GAME_CUSTOM( 199?, m4buc__am, m4buc,  "bus02dy.p1",           0x000000, 0x020000
 GAME_CUSTOM( 199?, m4buc__an, m4buc,  "bus02h.p1",            0x000000, 0x020000, CRC(b664278e) SHA1(ab009d09f1e3a8aa3c425db689553c3ac63f17ce), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 51)" )
 GAME_CUSTOM( 199?, m4buc__ao, m4buc,  "bus02k.p1",            0x000000, 0x020000, CRC(df307d93) SHA1(1dda940868273f81c501dcee27c9d6bc91f411e1), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 52)" )
 GAME_CUSTOM( 199?, m4buc__ap, m4buc,  "bus02r.p1",            0x000000, 0x020000, CRC(6c3fc6a2) SHA1(f65cab3fcc5a7176dded8ebf3de8ff90479686c6), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 53)" )
-GAME_CUSTOM( 199?, m4buc__aq, m4buc,  "bus02s.p1",            0x000000, 0x020000, CRC(c43f9f09) SHA1(83501473bf8fc17748fa42ab446d4bc54eeb2a80), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 54)" )
 GAME_CUSTOM( 199?, m4buc__ar, m4buc,  "bus02y.p1",            0x000000, 0x020000, CRC(95f7d5c5) SHA1(301949ad27963041a3cef000ed9ffd16c119b18d), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 55)" )
-GAME_CUSTOM( 199?, m4buc__as, m4buc,  "br_sj___.1_1",         0x000000, 0x020000, CRC(02c30d48) SHA1(8e5d09d721bf6e1876d672b6c84f46666cf42b90), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 56)" )
-GAME_CUSTOM( 199?, m4buc__at, m4buc,  "br_sj_b_.1_1",         0x000000, 0x020000, CRC(490ec8a7) SHA1(faf9f450d48382aeb7b8e01750fc226c30e761d3), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 57)" )
-GAME_CUSTOM( 199?, m4buc__au, m4buc,  "br_sj_d_.1_1",         0x000000, 0x020000, CRC(ac4e72d6) SHA1(303f77e536b8da79a926dc5b30441ae9071f683b), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 58)" )
-GAME_CUSTOM( 199?, m4buc__av, m4buc,  "br_sj_k_.1_1",         0x000000, 0x020000, CRC(1c71f108) SHA1(10f4e99b0af4a102ed23098123d82da2a8f1c5be), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 59)" )
-GAME_CUSTOM( 199?, m4buc__aw, m4buc,  "br_sjb__.1_1",         0x000000, 0x020000, CRC(d15579a0) SHA1(577c7cd11da15083327dba385a6769b346be2b71), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 60)" )
-GAME_CUSTOM( 199?, m4buc__ax, m4buc,  "br_sjbg_.1_1",         0x000000, 0x020000, CRC(5f8ec0ae) SHA1(8eacfd43e3f875af862b77f044b7a9f1487af4a1), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 61)" )
-GAME_CUSTOM( 199?, m4buc__ay, m4buc,  "br_sjbt_.1_1",         0x000000, 0x020000, CRC(00f9581e) SHA1(1461539f501250a08bf66e4a94e4b84113dc0dc5), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 62)" )
-GAME_CUSTOM( 199?, m4buc__az, m4buc,  "br_sjwb_.1_1",         0x000000, 0x020000, CRC(d15cb680) SHA1(4ab485eb2d1d57c690926e430e0c8b2af045381d), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 63)" )
 
+// "(C)1999    BWB" and "BR_ 1.0"
+GAME_CUSTOM( 199?, m4buc__as, m4buc,  "br_sj___.1_1",         0x000000, 0x020000, CRC(02c30d48) SHA1(8e5d09d721bf6e1876d672b6c84f46666cf42b90), "Bwb","Buccaneer (Barcrest) (MPU4) (BR_ 1.0, set 1)" )
+GAME_CUSTOM( 199?, m4buc__at, m4buc,  "br_sj_b_.1_1",         0x000000, 0x020000, CRC(490ec8a7) SHA1(faf9f450d48382aeb7b8e01750fc226c30e761d3), "Bwb","Buccaneer (Barcrest) (MPU4) (BR_ 1.0, set 2)" )
+GAME_CUSTOM( 199?, m4buc__au, m4buc,  "br_sj_d_.1_1",         0x000000, 0x020000, CRC(ac4e72d6) SHA1(303f77e536b8da79a926dc5b30441ae9071f683b), "Bwb","Buccaneer (Barcrest) (MPU4) (BR_ 1.0, set 3)" )
+GAME_CUSTOM( 199?, m4buc__av, m4buc,  "br_sj_k_.1_1",         0x000000, 0x020000, CRC(1c71f108) SHA1(10f4e99b0af4a102ed23098123d82da2a8f1c5be), "Bwb","Buccaneer (Barcrest) (MPU4) (BR_ 1.0, set 4)" )
+GAME_CUSTOM( 199?, m4buc__aw, m4buc,  "br_sjb__.1_1",         0x000000, 0x020000, CRC(d15579a0) SHA1(577c7cd11da15083327dba385a6769b346be2b71), "Bwb","Buccaneer (Barcrest) (MPU4) (BR_ 1.0, set 5)" )
+GAME_CUSTOM( 199?, m4buc__ax, m4buc,  "br_sjbg_.1_1",         0x000000, 0x020000, CRC(5f8ec0ae) SHA1(8eacfd43e3f875af862b77f044b7a9f1487af4a1), "Bwb","Buccaneer (Barcrest) (MPU4) (BR_ 1.0, set 6)" )
+GAME_CUSTOM( 199?, m4buc__ay, m4buc,  "br_sjbt_.1_1",         0x000000, 0x020000, CRC(00f9581e) SHA1(1461539f501250a08bf66e4a94e4b84113dc0dc5), "Bwb","Buccaneer (Barcrest) (MPU4) (BR_ 1.0, set 7)" )
+GAME_CUSTOM( 199?, m4buc__az, m4buc,  "br_sjwb_.1_1",         0x000000, 0x020000, CRC(d15cb680) SHA1(4ab485eb2d1d57c690926e430e0c8b2af045381d), "Bwb","Buccaneer (Barcrest) (MPU4) (BR_ 1.0, set 8)" )
+GAME_CUSTOM( 199?, m4buc__n,  m4buc,  "buccaneer5-15sw.bin",  0x000000, 0x020000, CRC(9b92d1f6) SHA1(d374fe966a1b039c971f278ab1113640e7629233), "Bwb","Buccaneer (Barcrest) (MPU4) (BR_ 1.0, set 9)" )
+// no copyright string and "BUG 0.4"
+GAME_CUSTOM( 199?, m4buc__a,  m4buc,  "bucc15g",              0x000000, 0x020000, CRC(63dd1180) SHA1(a557af6927744b4ce2773c70db5ce1a7708ceb2c), "hack","Buccaneer (Barcrest) (MPU4) (BUG 0.4, hack)" )
+// no copyright string and "BUS 0.1"
+GAME_CUSTOM( 199?, m4buc__b,  m4buc,  "bucc15t",              0x000000, 0x020000, CRC(66104749) SHA1(4b5a9a3f1409e207cad42ea29a205a18facf57ab), "hack","Buccaneer (Barcrest) (MPU4) (BUS 0.1, hack)" )
+
+
+// These were mixed in Hyper Viper and Super Hyper Viper sets, not sure if the software is actually different, maybe the Bwb rebuilds were 'Super' ?
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -3673,29 +3975,58 @@ GAME_CUSTOM( 199?, m4buc__az, m4buc,  "br_sjwb_.1_1",         0x000000, 0x020000
 	ROM_END \
 	GAME(year, setname, parent ,mod2    ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4hypvip,       0,          "5p4hypervyper.bin",    0x0000, 0x010000, CRC(51ac9288) SHA1(1580079b6e710506ab03e1d8a89af65cd06cedd2), "Barcrest","Hyper Viper (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4hypvip__a,    m4hypvip,   "h.viper10p610m.bin",   0x0000, 0x010000, CRC(104b0c48) SHA1(ab4cdb596a0cfb877ed1b6bf801e4a759b53971f), "Barcrest","Hyper Viper (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4hypvip__b,    m4hypvip,   "h6yc.p1",              0x0000, 0x010000, CRC(8faca3bc) SHA1(9d666371f1118ccb1a94bfc4e6c79b540a84842b), "Barcrest","Hyper Viper (Barcrest) (MPU4) (set 3)" )
+// "(C)1991 BARCREST" and "H6Y 0.3"
+GAME_CUSTOM( 199?, m4hypvip,       0,          "h6ys.p1",              0x0000, 0x010000, CRC(4af914ff) SHA1(3d9b7c65ec1129ee64e3f4e14e43e4c39c76166b), "Barcrest","Hyper Viper (Barcrest) (MPU4) (H6Y 0.3, set 1)" )
+GAME_CUSTOM( 199?, m4hypvip__e,    m4hypvip,   "h6yc.p1",              0x0000, 0x010000, CRC(8faca3bc) SHA1(9d666371f1118ccb1a94bfc4e6c79b540a84842b), "Barcrest","Hyper Viper (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4hypvip__c,    m4hypvip,   "h6yd.p1",              0x0000, 0x010000, CRC(862e7f5b) SHA1(2f5bbc31978fb9fd0ba17f0de220152da87cf06f), "Barcrest","Hyper Viper (Barcrest) (MPU4) (set 4)" )
 GAME_CUSTOM( 199?, m4hypvip__d,    m4hypvip,   "h6yk.p1",              0x0000, 0x010000, CRC(51f43c88) SHA1(d6ee4f537d09b33e9b13c972e1bda01a28f54f8e), "Barcrest","Hyper Viper (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4hypvip__e,    m4hypvip,   "h6ys.p1",              0x0000, 0x010000, CRC(4af914ff) SHA1(3d9b7c65ec1129ee64e3f4e14e43e4c39c76166b), "Barcrest","Hyper Viper (Barcrest) (MPU4) (set 6)" )
 GAME_CUSTOM( 199?, m4hypvip__f,    m4hypvip,   "h6yy.p1",              0x0000, 0x010000, CRC(bed4b3bb) SHA1(7c592fbc6541c03777ff0498db90c575b3193222), "Barcrest","Hyper Viper (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4hypvip__g,    m4hypvip,   "hv056c",               0x0000, 0x010000, CRC(91dcef99) SHA1(8fb6245fa8731b58799c0d2edc0e6c6942984a6f), "Barcrest","Hyper Viper (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4hypvip__h,    m4hypvip,   "hv05_101",             0x0000, 0x010000, CRC(e1fa633d) SHA1(3f446c3396142631141cf85db507f3ae288847e3), "Barcrest","Hyper Viper (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4hypvip__i,    m4hypvip,   "hv108c",               0x0000, 0x010000, CRC(4d40ebfe) SHA1(0e355fe5b185ba595c5040335956037b8ed21599), "Barcrest","Hyper Viper (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4hypvip__j,    m4hypvip,   "hv10_101",             0x0000, 0x010000, CRC(57714454) SHA1(de99f5a66081191a7280c54e875fd17cc94e111b), "Barcrest","Hyper Viper (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4hypvip__k,    m4hypvip,   "hv20_101",             0x0000, 0x010000, CRC(b2ab79c9) SHA1(fd097b5b062d725fa0607117d6b52be6cbf7e597), "Barcrest","Hyper Viper (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4hypvip__l,    m4hypvip,   "hvyp10p",              0x0000, 0x010000, CRC(b4af635a) SHA1(420cdf3a6899e432d74e3b10a57414cbedc0913e), "Barcrest","Hyper Viper (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4hypvip__m,    m4hypvip,   "hvyp56c",              0x0000, 0x010000, CRC(297d3cf8) SHA1(78f4de2ed69fb38b944a54d4d5927ff791e7876c), "Barcrest","Hyper Viper (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4hypvip__n,    m4hypvip,   "hvypr206",             0x0000, 0x010000, CRC(e1d96b8c) SHA1(e21b1bdbca1bae41f0e7274e3521f99eb984759e), "Barcrest","Hyper Viper (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4hypvip__o,    m4hypvip,   "hyp55",                0x0000, 0x010000, CRC(07bd7455) SHA1(0d0a017c90e8d28500594f55c9a60dfc08aff5c3), "Barcrest","Hyper Viper (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4hypvip__p,    m4hypvip,   "hypr58c",              0x0000, 0x010000, CRC(d6028f8f) SHA1(54a3188ddb5196808a1161a0e1e6a8c1fe8bfde3), "Barcrest","Hyper Viper (Barcrest) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4hypvip__q,    m4hypvip,   "hvip_05_.8",           0x0000, 0x010000, CRC(625f1b9d) SHA1(f8dc0cde774f3fc4fb3d66d014ad47e9576c0f44), "Barcrest","Hyper Viper (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4hypvip__r,    m4hypvip,   "hvip_10_.8",           0x0000, 0x010000, CRC(f91d7fec) SHA1(4c8130f9ce0ee3b14744e2b3cab79d4a65767e78), "Barcrest","Hyper Viper (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4hypvip__s,    m4hypvip,   "hvip_20_.8",           0x0000, 0x010000, CRC(61a608c7) SHA1(1ed98c8bd90a3a789ba00b6b39f49e3aa0fcb1ca), "Barcrest","Hyper Viper (Barcrest) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4hypvip__t,    m4hypvip,   "hypv_05_.4",           0x0000, 0x010000, CRC(246f171c) SHA1(7bbefb0cae57cf8097aa6d033df1a428e8bfe744), "Barcrest","Hyper Viper (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4hypvip__u,    m4hypvip,   "hypv_10_.4",           0x0000, 0x010000, CRC(f85d21a1) SHA1(55ed92147335a1471b7b443f68dd700f579d21f3), "Barcrest","Hyper Viper (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4hypvip__v,    m4hypvip,   "hypv_20_.4",           0x0000, 0x010000, CRC(27a0162b) SHA1(2d1342edbfa29c4f2ee1f1a825f3eeb0489fbaf5), "Barcrest","Hyper Viper (Barcrest) (MPU4) (set 23)" )
+GAME_CUSTOM( 199?, m4suphv,        m4hypvip,   "hyperviper.bin",       0x0000, 0x010000, CRC(8373f6a3) SHA1(79bff20ab80ffe11447595c6fe8e5ab90d432e17), "Barcrest","Hyper Viper (Barcrest) (MPU4) (H6Y 0.3, set 2)" ) // hack?
+// "(C)1991 BARCREST" and "H6Y 0.3" (but hack, doesn't want usual characterizer)
+GAME_CUSTOM( 199?, m4hypvip__k,    m4hypvip,   "hv20_101",             0x0000, 0x010000, CRC(b2ab79c9) SHA1(fd097b5b062d725fa0607117d6b52be6cbf7e597), "hack","Hyper Viper (Barcrest) (MPU4) (H6Y 0.3, hack, set 1)" )
+GAME_CUSTOM( 199?, m4hypvip__s,    m4hypvip,   "hvip_20_.8",           0x0000, 0x010000, CRC(61a608c7) SHA1(1ed98c8bd90a3a789ba00b6b39f49e3aa0fcb1ca), "hack","Hyper Viper (Barcrest) (MPU4) (H6Y 0.3, hack, set 2)" )
+GAME_CUSTOM( 199?, m4hypvip__v,    m4hypvip,   "hypv_20_.4",           0x0000, 0x010000, CRC(27a0162b) SHA1(2d1342edbfa29c4f2ee1f1a825f3eeb0489fbaf5), "hack","Hyper Viper (Barcrest) (MPU4) (H6Y 0.3, hack, set 3)" )
+// "(C)1991 BARCREST" and "H6Y 0.2"
+GAME_CUSTOM( 199?, m4hypvip__n,    m4hypvip,   "hvypr206",             0x0000, 0x010000, CRC(e1d96b8c) SHA1(e21b1bdbca1bae41f0e7274e3521f99eb984759e), "Barcrest","Hyper Viper (Barcrest) (MPU4) (H6Y 0.2 Y)" )
+// "(C)1993  B.W.B." and "HVP 3.0"
+GAME_CUSTOM( 199?, m4hypvip__l,    m4hypvip,   "hvyp10p",              0x0000, 0x010000, CRC(b4af635a) SHA1(420cdf3a6899e432d74e3b10a57414cbedc0913e), "Bwb","Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 1)" )
+GAME_CUSTOM( 199?, m4suphv__a,     m4hypvip,   "hv_05___.3h3",         0x0000, 0x010000, CRC(13bfa891) SHA1(ffddd14a019d52029bf8d4f680d8d05413a9f0b7), "Bwb","Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 2)" )
+GAME_CUSTOM( 199?, m4suphv__d,     m4hypvip,   "hv_05_d_.3h3",         0x0000, 0x010000, CRC(50c66ce8) SHA1(ef12525fc3ac82caf80326edaac81bb9fbc3245c), "Bwb","Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 3)" )
+GAME_CUSTOM( 199?, m4suphv__g,     m4hypvip,   "hv_10___.3h3",         0x0000, 0x010000, CRC(627caac7) SHA1(4851ce2441850743ea68ecbf89bde3f4cd6c2b4c), "Bwb","Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 4)" )
+GAME_CUSTOM( 199?, m4suphv__i,     m4hypvip,   "hv_10_d_.3h3",         0x0000, 0x010000, CRC(15cfa26e) SHA1(6bc3feaba65d1797b9945f23a89e983f56b13f79), "Bwb","Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 5)" )
+GAME_CUSTOM( 199?, m4suphv__j,     m4hypvip,   "hv_10_d_.3n3",         0x0000, 0x010000, CRC(b81f1d0a) SHA1(5fd293be2b75393069c9f5e099b4700ff930f081), "Bwb","Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 6)" )
+GAME_CUSTOM( 199?, m4suphv__l,     m4hypvip,   "hvi05___.3h3",         0x0000, 0x010000, CRC(6959332e) SHA1(edaa5f86ad4389b0a3bc2e6679fe8f62520be3ae), "Bwb","Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 7)" )
+GAME_CUSTOM( 199?, m4suphv__o,     m4hypvip,   "hvi10___.3h3",         0x0000, 0x010000, CRC(6c1b4b89) SHA1(e8eb4e689d43c5b9e8354aa7375ca3ba12ed1160), "Bwb","Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 8)" )
+GAME_CUSTOM( 199?, m4suphv__p,     m4hypvip,   "hvi10___.3n3",         0x0000, 0x010000, CRC(9d95cf8c) SHA1(26daf3975e1e3a605bc4392700c5470b52450d6e), "Bwb","Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 9)" )
+// "(C)1993  B.W.B." and "HVP 4.0"
+GAME_CUSTOM( 199?, m4suphv__c,     m4hypvip,   "hv_05___.4n3",         0x0000, 0x010000, CRC(f607f351) SHA1(d7b779b80fa964a27b106bd9d5ca3be16a11d5e9), "Bwb","Hyper Viper (Barcrest) (MPU4) (HVP 4.0, set 1)" )
+GAME_CUSTOM( 199?, m4suphv__f,     m4hypvip,   "hv_05_d_.4n3",         0x0000, 0x010000, CRC(f4d702d7) SHA1(268c7f6443c7ae587caf5b227fcd438530a06bcc), "Bwb","Hyper Viper (Barcrest) (MPU4) (HVP 4.0, set 2)" )
+GAME_CUSTOM( 199?, m4suphv__n,     m4hypvip,   "hvi05___.4n3",         0x0000, 0x010000, CRC(38a33c2b) SHA1(21004092b81e08146291fd3a025652f0edbe47dc), "Bwb","Hyper Viper (Barcrest) (MPU4) (HVP 4.0, set 3)" )
+// "(C)1994  B.W.B." and "HVP 3.0"
+GAME_CUSTOM( 199?, m4hypvip__a,    m4hypvip,   "h.viper10p610m.bin",   0x0000, 0x010000, CRC(104b0c48) SHA1(ab4cdb596a0cfb877ed1b6bf801e4a759b53971f), "Bwb","Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, C)" )
+GAME_CUSTOM( 199?, m4hypvip__m,    m4hypvip,   "hvyp56c",              0x0000, 0x010000, CRC(297d3cf8) SHA1(78f4de2ed69fb38b944a54d4d5927ff791e7876c), "Bwb","Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, C, bad?)" ) // bad rom? checksum alarm
+GAME_CUSTOM( 199?, m4suphv__b,     m4hypvip,   "hv_05___.3o3",         0x0000, 0x010000, CRC(9ae86366) SHA1(614ae0ab184645c9f568796783f29a177eda3208), "Bwb","Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 1)" )
+GAME_CUSTOM( 199?, m4suphv__e,     m4hypvip,   "hv_05_d_.3o3",         0x0000, 0x010000, CRC(87dfca0e) SHA1(3ab4105680acc46d3633a722f40ff1af0a520a7f), "Bwb","Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 2)" )
+GAME_CUSTOM( 199?, m4suphv__h,     m4hypvip,   "hv_10___.3o3",         0x0000, 0x010000, CRC(02e4d86a) SHA1(47aa83e8bcd85e8ba7fb972cdd1ead7fe21e0418), "Bwb","Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 3)" )
+GAME_CUSTOM( 199?, m4suphv__k,     m4hypvip,   "hv_10_d_.3o3",         0x0000, 0x010000, CRC(85f176b9) SHA1(30380d58bf2834829764cbdbdc7d950632e61e6d), "Bwb","Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 4)" )
+GAME_CUSTOM( 199?, m4suphv__m,     m4hypvip,   "hvi05___.3o3",         0x0000, 0x010000, CRC(cdba80a5) SHA1(6c9fac7e5ee324b18922cc7a053495f1977bcb6d), "Bwb","Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 5)" )
+ // "(C)1995  B.W.B." and "HVC 1.0"
+GAME_CUSTOM( 199?, m4hypvip__b,    m4hypvip,   "5p4hypervyper.bin",    0x0000, 0x010000, CRC(51ac9288) SHA1(1580079b6e710506ab03e1d8a89af65cd06cedd2), "Bwb","Hyper Viper (Barcrest) (MPU4) (HVC 1.0 C)" )
+// no copyright string and "HVP 3.0"
+GAME_CUSTOM( 199?, m4hypvip__g,    m4hypvip,   "hv056c",               0x0000, 0x010000, CRC(91dcef99) SHA1(8fb6245fa8731b58799c0d2edc0e6c6942984a6f), "hack","Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 1)" )
+GAME_CUSTOM( 199?, m4hypvip__h,    m4hypvip,   "hv05_101",             0x0000, 0x010000, CRC(e1fa633d) SHA1(3f446c3396142631141cf85db507f3ae288847e3), "hack","Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 2)" )
+GAME_CUSTOM( 199?, m4hypvip__o,    m4hypvip,   "hyp55",                0x0000, 0x010000, CRC(07bd7455) SHA1(0d0a017c90e8d28500594f55c9a60dfc08aff5c3), "hack","Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 3)" )
+GAME_CUSTOM( 199?, m4hypvip__p,    m4hypvip,   "hypr58c",              0x0000, 0x010000, CRC(d6028f8f) SHA1(54a3188ddb5196808a1161a0e1e6a8c1fe8bfde3), "hack","Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 4)" )
+GAME_CUSTOM( 199?, m4hypvip__t,    m4hypvip,   "hypv_05_.4",           0x0000, 0x010000, CRC(246f171c) SHA1(7bbefb0cae57cf8097aa6d033df1a428e8bfe744), "hack","Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 5)" )
+GAME_CUSTOM( 199?, m4hypvip__q,    m4hypvip,   "hvip_05_.8",           0x0000, 0x010000, CRC(625f1b9d) SHA1(f8dc0cde774f3fc4fb3d66d014ad47e9576c0f44), "hack","Hyper Viper (Barcrest) (MPU4) (HVP 3.0, hack, set 1)" )
+// "DICK WAS ERE" and "HVP 3.0"
+GAME_CUSTOM( 199?, m4hypvip__i,    m4hypvip,   "hv108c",               0x0000, 0x010000, CRC(4d40ebfe) SHA1(0e355fe5b185ba595c5040335956037b8ed21599), "hack","Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 6)" )
+GAME_CUSTOM( 199?, m4hypvip__j,    m4hypvip,   "hv10_101",             0x0000, 0x010000, CRC(57714454) SHA1(de99f5a66081191a7280c54e875fd17cc94e111b), "hack","Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 7)" )
+GAME_CUSTOM( 199?, m4hypvip__u,    m4hypvip,   "hypv_10_.4",           0x0000, 0x010000, CRC(f85d21a1) SHA1(55ed92147335a1471b7b443f68dd700f579d21f3), "hack","Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 8)" )
+GAME_CUSTOM( 199?, m4hypvip__r,    m4hypvip,   "hvip_10_.8",           0x0000, 0x010000, CRC(f91d7fec) SHA1(4c8130f9ce0ee3b14744e2b3cab79d4a65767e78), "hack","Hyper Viper (Barcrest) (MPU4) (HVP 3.0, hack, set 2)" )
+
+
+
 
 
 #define M4JWLCWN_EXTRA_ROMS \
@@ -3715,7 +4046,8 @@ GAME_CUSTOM( 199?, m4hypvip__v,    m4hypvip,   "hypv_20_.4",           0x0000, 0
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 
-GAME_CUSTOM( 199?, m4jwlcwn,       0,          "cje0.8",       0x0000, 0x020000, CRC(2074bf61) SHA1(d84201fb7d2590b16816e0369e89789d02088a6d), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 1)" )
+// "(C)1993 BARCREST" and "CJE 1.0"
+GAME_CUSTOM( 199?, m4jwlcwn,       0,          "cje10s.p1",    0x0000, 0x020000, CRC(5f3b72b7) SHA1(8faf0de0282a67c88170c13856b8816c38396e19), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (CJE 1.0)" )
 GAME_CUSTOM( 199?, m4jwlcwn__a,    m4jwlcwn,   "cje10ad.p1",   0x0000, 0x020000, CRC(b245d706) SHA1(704cc3bcae099c71dcc2bd96095cb4b48857a23a), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4jwlcwn__b,    m4jwlcwn,   "cje10b.p1",    0x0000, 0x020000, CRC(0ef3387b) SHA1(852bdac93fb448089633133a546bdb8da4d6887b), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4jwlcwn__c,    m4jwlcwn,   "cje10bd.p1",   0x0000, 0x020000, CRC(3f5f79c3) SHA1(a89502dae9843fddd471fd5eb1d39e84d7124c7e), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 4)" )
@@ -3726,8 +4058,11 @@ GAME_CUSTOM( 199?, m4jwlcwn__g,    m4jwlcwn,   "cje10dr.p1",   0x0000, 0x020000,
 GAME_CUSTOM( 199?, m4jwlcwn__h,    m4jwlcwn,   "cje10dy.p1",   0x0000, 0x020000, CRC(f27bf16b) SHA1(f6c6986ed96c9fca90f94921fb984e58425179b9), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 9)" )
 GAME_CUSTOM( 199?, m4jwlcwn__i,    m4jwlcwn,   "cje10k.p1",    0x0000, 0x020000, CRC(4434902d) SHA1(31c7be1235cdfd00099d1e09644a0f76fc7a26f7), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 10)" )
 GAME_CUSTOM( 199?, m4jwlcwn__j,    m4jwlcwn,   "cje10r.p1",    0x0000, 0x020000, CRC(f73b2b1c) SHA1(bd9ee8047b4b0cc30b92d5460d34fa2628a72dde), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4jwlcwn__k,    m4jwlcwn,   "cje10s.p1",    0x0000, 0x020000, CRC(5f3b72b7) SHA1(8faf0de0282a67c88170c13856b8816c38396e19), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 12)" )
 GAME_CUSTOM( 199?, m4jwlcwn__l,    m4jwlcwn,   "cje10y.p1",    0x0000, 0x020000, CRC(c3d7b0d3) SHA1(5c314fcaab08e7a551e6ad7a2e0fa08a03d4c80d), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 13)" )
+// "(C)1993 BARCREST" and "CJE 0.8"
+GAME_CUSTOM( 199?, m4jwlcwn__k,    m4jwlcwn,   "cje0.8",       0x0000, 0x020000, CRC(2074bf61) SHA1(d84201fb7d2590b16816e0369e89789d02088a6d), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (CJE 0.8 Y)" )
+// "(C)1993 BARCREST" and "CJH 1.0"
+GAME_CUSTOM( 199?, m4jwlcwn__w,    m4jwlcwn,   "cjh10s.p1",    0x0000, 0x020000, CRC(eb22d1bb) SHA1(4a8c19a8c71ef018f1fae146ba60632a94d895fc), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (CJH 1.0)" )
 GAME_CUSTOM( 199?, m4jwlcwn__m,    m4jwlcwn,   "cjh10ad.p1",   0x0000, 0x020000, CRC(db6a3f77) SHA1(9986150dd84839ea726405dec1b731b0477d1d29), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 14)" )
 GAME_CUSTOM( 199?, m4jwlcwn__n,    m4jwlcwn,   "cjh10b.p1",    0x0000, 0x020000, CRC(67009ea4) SHA1(84e97bcb23ba876e33976a6081f24561e0b3faac), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 15)" )
 GAME_CUSTOM( 199?, m4jwlcwn__o,    m4jwlcwn,   "cjh10bd.p1",   0x0000, 0x020000, CRC(567091b2) SHA1(8b7f33802e03d7e4ede06d345afedf8631f69412), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 16)" )
@@ -3738,17 +4073,25 @@ GAME_CUSTOM( 199?, m4jwlcwn__s,    m4jwlcwn,   "cjh10dr.p1",   0x0000, 0x020000,
 GAME_CUSTOM( 199?, m4jwlcwn__t,    m4jwlcwn,   "cjh10dy.p1",   0x0000, 0x020000, CRC(9b54191a) SHA1(ae01b3842ab83572abc4966e94956623103b2bda), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 21)" )
 GAME_CUSTOM( 199?, m4jwlcwn__u,    m4jwlcwn,   "cjh10k.p1",    0x0000, 0x020000, CRC(2dc736f2) SHA1(eae27aad3faca98c3dc0873cd00f3babe4d67302), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 22)" )
 GAME_CUSTOM( 199?, m4jwlcwn__v,    m4jwlcwn,   "cjh10r.p1",    0x0000, 0x020000, CRC(9ec88dc3) SHA1(01016ca0785a11e800fbddb7a7cc7e4be6ffdb09), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 23)" )
-GAME_CUSTOM( 199?, m4jwlcwn__w,    m4jwlcwn,   "cjh10s.p1",    0x0000, 0x020000, CRC(eb22d1bb) SHA1(4a8c19a8c71ef018f1fae146ba60632a94d895fc), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 24)" )
 GAME_CUSTOM( 199?, m4jwlcwn__x,    m4jwlcwn,   "cjh10y.p1",    0x0000, 0x020000, CRC(aa24160c) SHA1(2014420ce92297dbe1ef286d801c25aa67976b2e), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 25)" )
-GAME_CUSTOM( 199?, m4jwlcwn__y,    m4jwlcwn,   "jewel15g",     0x0000, 0x020000, CRC(bf3b8b63) SHA1(1ee91745438b9458ffbd43380bf9c6fd784fd054), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 26)" )
-GAME_CUSTOM( 199?, m4jwlcwn__z,    m4jwlcwn,   "jewel15t",     0x0000, 0x020000, CRC(5828fd3b) SHA1(be95d5c3c9729547dcb0815c868e8d654826e34e), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 27)" )
-GAME_CUSTOM( 199?, m4jwlcwn__0,    m4jwlcwn,   "jitc2010",     0x0000, 0x020000, CRC(1c946895) SHA1(43215c4099197a67bf0a6100e3dc3b81759cfc76), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 28)" )
-GAME_CUSTOM( 199?, m4jwlcwn__1,    m4jwlcwn,   "jc__x___.4_1", 0x0000, 0x020000, CRC(5bf060ca) SHA1(a13795b145ff230437764f5414ec443e8fe4d783), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 29)" )
-GAME_CUSTOM( 199?, m4jwlcwn__2,    m4jwlcwn,   "jc__x__c.3_1", 0x0000, 0x020000, CRC(b5e11e92) SHA1(87d7febf350ff7e4175bb6b8544181de66415e12), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 30)" )
-GAME_CUSTOM( 199?, m4jwlcwn__3,    m4jwlcwn,   "jc__xa_4.3_1", 0x0000, 0x020000, CRC(e6abb23e) SHA1(05b9286c4c1ec6364fd57d412336192ca61325a9), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 31)" )
-GAME_CUSTOM( 199?, m4jwlcwn__4,    m4jwlcwn,   "jc__xa_5.1_1", 0x0000, 0x020000, CRC(09f897c7) SHA1(5f6ad23f92b9fa4fdde57dd80317e1e998de9d54), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 32)" )
-GAME_CUSTOM( 199?, m4jwlcwn__5,    m4jwlcwn,   "jc__xa_8.4_1", 0x0000, 0x020000, CRC(27346ae8) SHA1(0fa13205e45e8dab0e1a25e6492ff2987633eb0f), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 33)" )
-GAME_CUSTOM( 199?, m4jwlcwn__6,    m4jwlcwn,   "jc_xx__c.3_1", 0x0000, 0x020000, CRC(0787fd51) SHA1(90fc71e0ea9b79d3296611c1e6f720150e17d51b), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 34)" )
+// "(C)1993 BARCREST" and "CJH 0.8"
+GAME_CUSTOM( 199?, m4jwlcwn__0,    m4jwlcwn,   "jitc2010",     0x0000, 0x020000, CRC(1c946895) SHA1(43215c4099197a67bf0a6100e3dc3b81759cfc76), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (CJH 0.8)" )
+// "(C)1997  B.W.B." and "JC8 4.4"
+GAME_CUSTOM( 199?, m4jwlcwn__1,    m4jwlcwn,   "jc__x___.4_1", 0x0000, 0x020000, CRC(5bf060ca) SHA1(a13795b145ff230437764f5414ec443e8fe4d783), "Bwb","Jewel In the Crown (Barcrest) (MPU4) (JC8 4.4)" )
+// "(C)1997  B.W.B." and "JCC 3.3"
+GAME_CUSTOM( 199?, m4jwlcwn__2,    m4jwlcwn,   "jc__x__c.3_1", 0x0000, 0x020000, CRC(b5e11e92) SHA1(87d7febf350ff7e4175bb6b8544181de66415e12), "Bwb","Jewel In the Crown (Barcrest) (MPU4) (JCC 3.3)" )
+// "(C)1997  B.W.B." and "JC4 3.1"
+GAME_CUSTOM( 199?, m4jwlcwn__3,    m4jwlcwn,   "jc__xa_4.3_1", 0x0000, 0x020000, CRC(e6abb23e) SHA1(05b9286c4c1ec6364fd57d412336192ca61325a9), "Bwb","Jewel In the Crown (Barcrest) (MPU4) (JC4 3.1)" )
+// "(C)1997  B.W.B." and "JC5 1.9"
+GAME_CUSTOM( 199?, m4jwlcwn__4,    m4jwlcwn,   "jc__xa_5.1_1", 0x0000, 0x020000, CRC(09f897c7) SHA1(5f6ad23f92b9fa4fdde57dd80317e1e998de9d54), "Bwb","Jewel In the Crown (Barcrest) (MPU4) (JC5 1.9)" )
+// "(C)1997  B.W.B." and "JC8 4.2"
+GAME_CUSTOM( 199?, m4jwlcwn__5,    m4jwlcwn,   "jc__xa_8.4_1", 0x0000, 0x020000, CRC(27346ae8) SHA1(0fa13205e45e8dab0e1a25e6492ff2987633eb0f), "Bwb","Jewel In the Crown (Barcrest) (MPU4) (JC8 4.2)" )
+// "(C)1997  B.W.B." and "JCC 3.7"
+GAME_CUSTOM( 199?, m4jwlcwn__6,    m4jwlcwn,   "jc_xx__c.3_1", 0x0000, 0x020000, CRC(0787fd51) SHA1(90fc71e0ea9b79d3296611c1e6f720150e17d51b), "Bwb","Jewel In the Crown (Barcrest) (MPU4) (JCC 3.7)" )
+// no copyright string and "CJH 1.0"
+GAME_CUSTOM( 199?, m4jwlcwn__y,    m4jwlcwn,   "jewel15g",     0x0000, 0x020000, CRC(bf3b8b63) SHA1(1ee91745438b9458ffbd43380bf9c6fd784fd054), "hack","Jewel In the Crown (Barcrest) (MPU4) (CJH 1.0, hack)" )
+// no copyright string and "CJE 1.0"
+GAME_CUSTOM( 199?, m4jwlcwn__z,    m4jwlcwn,   "jewel15t",     0x0000, 0x020000, CRC(5828fd3b) SHA1(be95d5c3c9729547dcb0815c868e8d654826e34e), "hack","Jewel In the Crown (Barcrest) (MPU4) (CJE 1.0, hack)" )
 
 
 #define M4BAGTEL_EXTRA_ROMS \
@@ -3764,14 +4107,18 @@ GAME_CUSTOM( 199?, m4jwlcwn__6,    m4jwlcwn,   "jc_xx__c.3_1", 0x0000, 0x020000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4bagtel,       0,          "bgt05s.p1",    0x0000, 0x010000, CRC(ddf1c7dc) SHA1(a786e5e04538ce498493795fc4054bb5de57ffd2), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4bagtel__a,    m4bagtel,   "bg201c.p1",    0x0000, 0x010000, CRC(ee9bf501) SHA1(5c6ee55cfac5bb92695b412fe56f4c843dcae424), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4bagtel__b,    m4bagtel,   "bg201dy.p1",   0x0000, 0x010000, CRC(c4916bc0) SHA1(7600a5be6ff235d19f7c99b44b86054555b43638), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4bagtel__c,    m4bagtel,   "bg201s.p1",    0x0000, 0x010000, CRC(639b078b) SHA1(0c5d270457b2ae88c3885838f96ce29824996e77), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 4)" )
+// "(C)1991 BARCREST" and "BGT 0.5"
+GAME_CUSTOM( 199?, m4bagtel,       0,          "bgt05s.p1",    0x0000, 0x010000, CRC(ddf1c7dc) SHA1(a786e5e04538ce498493795fc4054bb5de57ffd2), "Barcrest","Bagatelle (Barcrest) (MPU4) (BGT 0.5)" )
 GAME_CUSTOM( 199?, m4bagtel__d,    m4bagtel,   "bgt05dk.p1",   0x0000, 0x010000, CRC(4acaf68d) SHA1(fb7e04c8201829c252add05599218fb2b32c8533), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 5)" )
 GAME_CUSTOM( 199?, m4bagtel__e,    m4bagtel,   "bgt05k.p1",    0x0000, 0x010000, CRC(72eb14ad) SHA1(18f9dbc5fd85e14d507b4c69d03d01f24aabb325), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 6)" )
 GAME_CUSTOM( 199?, m4bagtel__f,    m4bagtel,   "bgt05r.p1",    0x0000, 0x010000, CRC(e92ad743) SHA1(649496429572a339dea50e262b7eb2ef22273bea), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 7)" )
 GAME_CUSTOM( 199?, m4bagtel__g,    m4bagtel,   "bgt05y.p1",    0x0000, 0x010000, CRC(f2508bfa) SHA1(936fb79d5d953d1e2138a55754cbd364d3c307ed), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 8)" )
+// "(C)1991 BARCREST" and "BG2 0.1"
+GAME_CUSTOM( 199?, m4bagtel__c,    m4bagtel,   "bg201s.p1",    0x0000, 0x010000, CRC(639b078b) SHA1(0c5d270457b2ae88c3885838f96ce29824996e77), "Barcrest","Bagatelle (Barcrest) (MPU4) (BG2 0.1)" )
+GAME_CUSTOM( 199?, m4bagtel__a,    m4bagtel,   "bg201c.p1",    0x0000, 0x010000, CRC(ee9bf501) SHA1(5c6ee55cfac5bb92695b412fe56f4c843dcae424), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4bagtel__b,    m4bagtel,   "bg201dy.p1",   0x0000, 0x010000, CRC(c4916bc0) SHA1(7600a5be6ff235d19f7c99b44b86054555b43638), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 3)" )
+// "(C)1991 BARCREST" and "EL1 0.1"
+GAME_CUSTOM( 199?, m4bagtel__r,    m4bagtel,   "el101s.p1",    0x0000, 0x010000, CRC(2035faf2) SHA1(1b640fee2f0ace25dfaa702ab2602cdec5ab6018), "Barcrest","Bagatelle (Barcrest) (MPU4) (EL1 0.1)" )
 GAME_CUSTOM( 199?, m4bagtel__h,    m4bagtel,   "el101ad.p1",   0x0000, 0x010000, CRC(fcb39192) SHA1(a604122e40c313ed240f722a48f56d1478754ed3), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 9)" )
 GAME_CUSTOM( 199?, m4bagtel__i,    m4bagtel,   "el101b.p1",    0x0000, 0x010000, CRC(947548b4) SHA1(dc74fa15843ec4c34f5bd7269b041ed4406832c2), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 10)" )
 GAME_CUSTOM( 199?, m4bagtel__j,    m4bagtel,   "el101bd.p1",   0x0000, 0x010000, CRC(338664f4) SHA1(074261acbf0611d7d54f2718eed04ef6eda81b50), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 11)" )
@@ -3782,8 +4129,9 @@ GAME_CUSTOM( 199?, m4bagtel__n,    m4bagtel,   "el101dr.p1",   0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4bagtel__o,    m4bagtel,   "el101dy.p1",   0x0000, 0x010000, CRC(81e29484) SHA1(3ac48cef176df5d4ab3b00dc9366f7c9192c8c77), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 16)" )
 GAME_CUSTOM( 199?, m4bagtel__p,    m4bagtel,   "el101k.p1",    0x0000, 0x010000, CRC(0dd7427e) SHA1(83373dca6ec50a03506bda2c220949b2d2f0a7db), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 17)" )
 GAME_CUSTOM( 199?, m4bagtel__q,    m4bagtel,   "el101r.p1",    0x0000, 0x010000, CRC(6299ff71) SHA1(137842a886fb4790571b94d94199b362cd86bc3c), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4bagtel__r,    m4bagtel,   "el101s.p1",    0x0000, 0x010000, CRC(2035faf2) SHA1(1b640fee2f0ace25dfaa702ab2602cdec5ab6018), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 19)" )
 GAME_CUSTOM( 199?, m4bagtel__s,    m4bagtel,   "el101y.p1",    0x0000, 0x010000, CRC(fff2d79f) SHA1(5d1142d8d96803c8b4ddba43283e21bab3a0b598), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 20)" )
+// "(C)1991 BARCREST" and "EL2 0.1"
+GAME_CUSTOM( 199?, m4bagtel__3,    m4bagtel,   "el201s.p1",    0x0000, 0x010000, CRC(87280546) SHA1(f7af53fc1c5e98897c36eaec013f13b1da283c53), "Barcrest","Bagatelle (Barcrest) (MPU4) (EL2 0.1)" )
 GAME_CUSTOM( 199?, m4bagtel__t,    m4bagtel,   "el201ad.p1",   0x0000, 0x010000, CRC(7ebf37ba) SHA1(d6d09d707458aa8a17507e3a1a396569b1eaef4d), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 21)" )
 GAME_CUSTOM( 199?, m4bagtel__u,    m4bagtel,   "el201b.p1",    0x0000, 0x010000, CRC(ed9c0546) SHA1(8884420caa7bd9347d882f79f05288c2581026b1), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 22)" )
 GAME_CUSTOM( 199?, m4bagtel__v,    m4bagtel,   "el201bd.p1",   0x0000, 0x010000, CRC(48a35af0) SHA1(17a8f4c178a744dd4b7ab16388a9622f335e3a79), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 23)" )
@@ -3794,8 +4142,9 @@ GAME_CUSTOM( 199?, m4bagtel__z,    m4bagtel,   "el201dr.p1",   0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4bagtel__0,    m4bagtel,   "el201dy.p1",   0x0000, 0x010000, CRC(16a93996) SHA1(b151e4f16d0d78cd6651976d7108d3e8e8a17696), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 28)" )
 GAME_CUSTOM( 199?, m4bagtel__1,    m4bagtel,   "el201k.p1",    0x0000, 0x010000, CRC(4fb93561) SHA1(ec4575ff6243a6402db7286826197262821d52e4), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 29)" )
 GAME_CUSTOM( 199?, m4bagtel__2,    m4bagtel,   "el201r.p1",    0x0000, 0x010000, CRC(118e1494) SHA1(dc5d4a06d99c2855fd737178e0df19a5b6eb422b), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 30)" )
-GAME_CUSTOM( 199?, m4bagtel__3,    m4bagtel,   "el201s.p1",    0x0000, 0x010000, CRC(87280546) SHA1(f7af53fc1c5e98897c36eaec013f13b1da283c53), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 31)" )
 GAME_CUSTOM( 199?, m4bagtel__4,    m4bagtel,   "el201y.p1",    0x0000, 0x010000, CRC(8ce53c7a) SHA1(cf6f863be222eec894da34a414c0a6dd0c8601d7), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 32)" )
+// "(C)1991 BARCREST" and "EL3 1.0"
+GAME_CUSTOM( 199?, m4bagtel__af,   m4bagtel,   "el310s.p1",    0x0000, 0x010000, CRC(5e1cace4) SHA1(b78d8021ef91127f8a60cdcb458723de8925fba5), "Barcrest","Bagatelle (Barcrest) (MPU4) (EL3 1.0)" )
 GAME_CUSTOM( 199?, m4bagtel__5,    m4bagtel,   "el310ad.p1",   0x0000, 0x010000, CRC(7029e664) SHA1(a4e0996710dc6c5cd2b6a79f83e08406a153a01d), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 33)" )
 GAME_CUSTOM( 199?, m4bagtel__6,    m4bagtel,   "el310b.p1",    0x0000, 0x010000, CRC(aa10ed40) SHA1(0722be3c2c582b1179f3dafd4ed6c38f503ee17a), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 34)" )
 GAME_CUSTOM( 199?, m4bagtel__7,    m4bagtel,   "el310bd.p1",   0x0000, 0x010000, CRC(b9204c03) SHA1(ecd3fcc301f5a7ce63b06dc4153b18602c405289), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 35)" )
@@ -3806,7 +4155,6 @@ GAME_CUSTOM( 199?, m4bagtel__ab,   m4bagtel,   "el310dr.p1",   0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4bagtel__ac,   m4bagtel,   "el310dy.p1",   0x0000, 0x010000, CRC(41f1ac45) SHA1(b3fe09704de422ecc0f7632ec8b8bad646498cd3), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 40)" )
 GAME_CUSTOM( 199?, m4bagtel__ad,   m4bagtel,   "el310k.p1",    0x0000, 0x010000, CRC(8bb4d65c) SHA1(f05b448e7ba9808fb3a1c1f25f4e50fc27549031), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 41)" )
 GAME_CUSTOM( 199?, m4bagtel__ae,   m4bagtel,   "el310r.p1",    0x0000, 0x010000, CRC(0ea8a744) SHA1(2839dd86b54ed073765d97a82b056e20eb05f32f), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 42)" )
-GAME_CUSTOM( 199?, m4bagtel__af,   m4bagtel,   "el310s.p1",    0x0000, 0x010000, CRC(5e1cace4) SHA1(b78d8021ef91127f8a60cdcb458723de8925fba5), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 43)" )
 GAME_CUSTOM( 199?, m4bagtel__ag,   m4bagtel,   "el310y.p1",    0x0000, 0x010000, CRC(9653f0c6) SHA1(188056b8b704f9b06f93144ce358ec47cc026902), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 45)" )
 
 
@@ -3825,7 +4173,15 @@ GAME_CUSTOM( 199?, m4bagtel__ag,   m4bagtel,   "el310y.p1",    0x0000, 0x010000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4przwta,       0,          "pwnr.p1",  0x0000, 0x020000, CRC(cf619ad2) SHA1(3eeccccb304afd5faf2563e0e65f8123e463d363), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 1)" )
+// "(C)1993 BARCREST" and "PWN 0.4"
+GAME_CUSTOM( 199?, m4przwta,       0,          "pwns.p1",  0x0000, 0x020000, CRC(b3b87954) SHA1(f998ebf8047930f006213040ed5e6a9f90844143), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (PWN 0.4)" )
+GAME_CUSTOM( 199?, m4przwta__p,    m4przwta,   "pwnr.p1",  0x0000, 0x020000, CRC(cf619ad2) SHA1(3eeccccb304afd5faf2563e0e65f8123e463d363), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 1)" )
+GAME_CUSTOM( 199?, m4przwta__l,    m4przwta,   "pwna.p1",  0x0000, 0x020000, CRC(bbb32770) SHA1(36815dca6550a1a417b3e809b041a7b4670f5b75), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 13)" )
+GAME_CUSTOM( 199?, m4przwta__m,    m4przwta,   "pwnb.p1",  0x0000, 0x020000, CRC(36a989b5) SHA1(631399c65b697417ed9a95961463b8349a97b142), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 14)" )
+GAME_CUSTOM( 199?, m4przwta__n,    m4przwta,   "pwndy.p1", 0x0000, 0x020000, CRC(6b739a41) SHA1(64f4b380c725f6159c6201147ab4062d6375d98b), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 15)" )
+GAME_CUSTOM( 199?, m4przwta__o,    m4przwta,   "pwnk.p1",  0x0000, 0x020000, CRC(7c6e21e3) SHA1(d6aeb5948e0800050193575a3b5c06c11f46eed8), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 16)" )
+// "(C)1993 BARCREST" and "PW8 0.2"
+GAME_CUSTOM( 199?, m4przwta__j,    m4przwta,   "pw8s.p1",  0x0000, 0x020000, CRC(3d77c91d) SHA1(3ab79073f5d9c13f751892aa33c2668521887bf8), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (PW8 0.2)" )
 GAME_CUSTOM( 199?, m4przwta__a,    m4przwta,   "pw8ad.p1", 0x0000, 0x020000, CRC(71257e43) SHA1(1db17aa1fc684873511a46e5e7421b459040d0cc), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4przwta__b,    m4przwta,   "pw8b.p1",  0x0000, 0x020000, CRC(52b2af18) SHA1(1ce00b94a2d16b5140a110e604b97af6860fd577), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4przwta__c,    m4przwta,   "pw8bd.p1", 0x0000, 0x020000, CRC(fc3fd086) SHA1(8fa8b75faf2196e87acbafc3a48a2ba628f6cc66), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 4)" )
@@ -3835,13 +4191,7 @@ GAME_CUSTOM( 199?, m4przwta__f,    m4przwta,   "pw8dk.p1", 0x0000, 0x020000, CRC
 GAME_CUSTOM( 199?, m4przwta__g,    m4przwta,   "pw8dy.p1", 0x0000, 0x020000, CRC(311b582e) SHA1(f53254b8c6f65087f67d60f0d0441228e1024cc8), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 8)" )
 GAME_CUSTOM( 199?, m4przwta__h,    m4przwta,   "pw8j.p1",  0x0000, 0x020000, CRC(766739cb) SHA1(8b7cd7f02fb25f5e50febdb90c8f39f3a6840a35), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 9)" )
 GAME_CUSTOM( 199?, m4przwta__i,    m4przwta,   "pw8k.p1",  0x0000, 0x020000, CRC(1875074e) SHA1(fb25c4ed4ba9d6aa5fb45a8ba9c73b18062173f0), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4przwta__j,    m4przwta,   "pw8s.p1",  0x0000, 0x020000, CRC(3d77c91d) SHA1(3ab79073f5d9c13f751892aa33c2668521887bf8), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 11)" )
 GAME_CUSTOM( 199?, m4przwta__k,    m4przwta,   "pw8y.p1",  0x0000, 0x020000, CRC(9f9627b0) SHA1(19c9dc7033b1e85676222a8b3a866392a4afdd1e), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4przwta__l,    m4przwta,   "pwna.p1",  0x0000, 0x020000, CRC(bbb32770) SHA1(36815dca6550a1a417b3e809b041a7b4670f5b75), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4przwta__m,    m4przwta,   "pwnb.p1",  0x0000, 0x020000, CRC(36a989b5) SHA1(631399c65b697417ed9a95961463b8349a97b142), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4przwta__n,    m4przwta,   "pwndy.p1", 0x0000, 0x020000, CRC(6b739a41) SHA1(64f4b380c725f6159c6201147ab4062d6375d98b), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4przwta__o,    m4przwta,   "pwnk.p1",  0x0000, 0x020000, CRC(7c6e21e3) SHA1(d6aeb5948e0800050193575a3b5c06c11f46eed8), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4przwta__p,    m4przwta,   "pwns.p1",  0x0000, 0x020000, CRC(b3b87954) SHA1(f998ebf8047930f006213040ed5e6a9f90844143), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 17)" )
 
 
 #define M4BERSER_EXTRA_ROMS \
@@ -3856,8 +4206,17 @@ GAME_CUSTOM( 199?, m4przwta__p,    m4przwta,   "pwns.p1",  0x0000, 0x020000, CRC
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-
-GAME_CUSTOM( 199?, m4berser,       0,          "bess.p1",      0x0000, 0x010000, CRC(b95bafbe) SHA1(034c80ef5fd0a12fad918c9b01bafb9a99c2e991), "Barcrest","Berserk (Barcrest) (MPU4) (set 1)" )
+// "(C)1991 BARCREST" and "BES 0.6"
+GAME_CUSTOM( 199?, m4berser,       0,          "bess.p1",      0x0000, 0x010000, CRC(b95bafbe) SHA1(034c80ef5fd0a12fad918c9b01bafb9a99c2e991), "Barcrest","Berserk (Barcrest) (MPU4) (BES 0.6)" )
+GAME_CUSTOM( 199?, m4berser__u,    m4berser,   "besb.p1",      0x0000, 0x010000, CRC(a0aa05f9) SHA1(3831c07e9e33c83b2f7148a34037023433b49cd0), "Barcrest","Berserk (Barcrest) (MPU4) (set 22)" )
+GAME_CUSTOM( 199?, m4berser__v,    m4berser,   "besc.p1",      0x0000, 0x010000, CRC(3a7ea673) SHA1(469e104ca1008c274f2a58c3ec6e96b40e1b4fb6), "Barcrest","Berserk (Barcrest) (MPU4) (set 23)" )
+GAME_CUSTOM( 199?, m4berser__w,    m4berser,   "besd.p1",      0x0000, 0x010000, CRC(ac7daf9c) SHA1(9951cf3194bc5acc17044dfb4b854edb0cc2c090), "Barcrest","Berserk (Barcrest) (MPU4) (set 24)" )
+GAME_CUSTOM( 199?, m4berser__x,    m4berser,   "besdk.p1",     0x0000, 0x010000, CRC(f9d20012) SHA1(d3942406af0573a58e49a24f98b4e3c0a9ff508e), "Barcrest","Berserk (Barcrest) (MPU4) (set 25)" )
+GAME_CUSTOM( 199?, m4berser__y,    m4berser,   "besdy.p1",     0x0000, 0x010000, CRC(461ac51f) SHA1(217f169bd2bc4108145231e9b974d2f890a4f25e), "Barcrest","Berserk (Barcrest) (MPU4) (set 26)" )
+GAME_CUSTOM( 199?, m4berser__z,    m4berser,   "besk.p1",      0x0000, 0x010000, CRC(03eb2a05) SHA1(375f47bd1d0f21fde5ea0fcf7b79c02db9f8c9c6), "Barcrest","Berserk (Barcrest) (MPU4) (set 27)" )
+GAME_CUSTOM( 199?, m4berser__0,    m4berser,   "besy.p1",      0x0000, 0x010000, CRC(64a49f88) SHA1(6bd1275e9172e311ead36566432729530c1b6c21), "Barcrest","Berserk (Barcrest) (MPU4) (set 28)" )
+// "(C)1991 BARCREST" and "BE3 0.1"
+GAME_CUSTOM( 199?, m4berser__h,    m4berser,   "be3s.p1",      0x0000, 0x010000, CRC(1a66772e) SHA1(e604315cea3db5f3859f1756e84b37b805f1f995), "Barcrest","Berserk (Barcrest) (MPU4) (BE3 0.1)" )
 GAME_CUSTOM( 199?, m4berser__a,    m4berser,   "be3ad.p1",     0x0000, 0x010000, CRC(db4d77e9) SHA1(80e9ecf0a5d213e23fe8d328fbe8af52d49e2897), "Barcrest","Berserk (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4berser__b,    m4berser,   "be3b.p1",      0x0000, 0x010000, CRC(b25e9adb) SHA1(cc72c7a02868d56371f6d1bbaf78a017147b1a5a), "Barcrest","Berserk (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4berser__c,    m4berser,   "be3bd.p1",     0x0000, 0x010000, CRC(ed511aa3) SHA1(e6efe14490fa62ec9e5565e92216e371ab98b78a), "Barcrest","Berserk (Barcrest) (MPU4) (set 4)" )
@@ -3865,8 +4224,9 @@ GAME_CUSTOM( 199?, m4berser__d,    m4berser,   "be3d.p1",      0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4berser__e,    m4berser,   "be3dk.p1",     0x0000, 0x010000, CRC(82b4513e) SHA1(a36eebef35dbc2fbc25d39fde811e180a3682b67), "Barcrest","Berserk (Barcrest) (MPU4) (set 6)" )
 GAME_CUSTOM( 199?, m4berser__f,    m4berser,   "be3dy.p1",     0x0000, 0x010000, CRC(6f2869f2) SHA1(b006f467463038b5987764f9eedec1d7357ade65), "Barcrest","Berserk (Barcrest) (MPU4) (set 7)" )
 GAME_CUSTOM( 199?, m4berser__g,    m4berser,   "be3k.p1",      0x0000, 0x010000, CRC(12b3954a) SHA1(cce68a720a0bb1ce64cbf6ab2902a712403516cd), "Barcrest","Berserk (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4berser__h,    m4berser,   "be3s.p1",      0x0000, 0x010000, CRC(1a66772e) SHA1(e604315cea3db5f3859f1756e84b37b805f1f995), "Barcrest","Berserk (Barcrest) (MPU4) (set 9)" )
 GAME_CUSTOM( 199?, m4berser__i,    m4berser,   "be3y.p1",      0x0000, 0x010000, CRC(5c6451ca) SHA1(b63b9289fdef3be6add1e1ee22f9e316f296cc97), "Barcrest","Berserk (Barcrest) (MPU4) (set 10)" )
+// "(C)1991 BARCREST" and "BE8 0.1"
+GAME_CUSTOM( 199?, m4berser__s,    m4berser,   "be8s.p1",      0x0000, 0x010000, CRC(12d0fb4f) SHA1(103a468a0712dfc44b140cad01cd49b6f159b621), "Barcrest","Berserk (Barcrest) (MPU4) (BE8 0.1)" )
 GAME_CUSTOM( 199?, m4berser__j,    m4berser,   "be8ad.p1",     0x0000, 0x010000, CRC(0c196fd2) SHA1(830917f4c9bb7df35ac7d1e4fdcbb3eaac65ec5f), "Barcrest","Berserk (Barcrest) (MPU4) (set 11)" )
 GAME_CUSTOM( 199?, m4berser__k,    m4berser,   "be8b.p1",      0x0000, 0x010000, CRC(8f25875d) SHA1(e53ca0322838891274e0c5c61882a6690df3f1a0), "Barcrest","Berserk (Barcrest) (MPU4) (set 12)" )
 GAME_CUSTOM( 199?, m4berser__l,    m4berser,   "be8bcd.p1",    0x0000, 0x010000, CRC(40d40ecd) SHA1(a728a2ea63dc7d520e2f189e18b4884fb5f292bc), "Barcrest","Berserk (Barcrest) (MPU4) (set 13)" )
@@ -3876,16 +4236,9 @@ GAME_CUSTOM( 199?, m4berser__o,    m4berser,   "be8d.p1",      0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4berser__p,    m4berser,   "be8dk.p1",     0x0000, 0x010000, CRC(39a3f145) SHA1(00242636e7519e37ed4f5e65ecf41c315c2607ad), "Barcrest","Berserk (Barcrest) (MPU4) (set 17)" )
 GAME_CUSTOM( 199?, m4berser__q,    m4berser,   "be8dy.p1",     0x0000, 0x010000, CRC(5f885b13) SHA1(c398bb40fbac39530ba7b96bf4a4fde575c9fa87), "Barcrest","Berserk (Barcrest) (MPU4) (set 18)" )
 GAME_CUSTOM( 199?, m4berser__r,    m4berser,   "be8k.p1",      0x0000, 0x010000, CRC(b66051b6) SHA1(910bd0a4112a81df0160efd86bed1a8a59b2acb8), "Barcrest","Berserk (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4berser__s,    m4berser,   "be8s.p1",      0x0000, 0x010000, CRC(12d0fb4f) SHA1(103a468a0712dfc44b140cad01cd49b6f159b621), "Barcrest","Berserk (Barcrest) (MPU4) (set 20)" )
 GAME_CUSTOM( 199?, m4berser__t,    m4berser,   "be8y.p1",      0x0000, 0x010000, CRC(80d73997) SHA1(99e76616e9a73f111bdd560f2691b99905e4e454), "Barcrest","Berserk (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4berser__u,    m4berser,   "besb.p1",      0x0000, 0x010000, CRC(a0aa05f9) SHA1(3831c07e9e33c83b2f7148a34037023433b49cd0), "Barcrest","Berserk (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4berser__v,    m4berser,   "besc.p1",      0x0000, 0x010000, CRC(3a7ea673) SHA1(469e104ca1008c274f2a58c3ec6e96b40e1b4fb6), "Barcrest","Berserk (Barcrest) (MPU4) (set 23)" )
-GAME_CUSTOM( 199?, m4berser__w,    m4berser,   "besd.p1",      0x0000, 0x010000, CRC(ac7daf9c) SHA1(9951cf3194bc5acc17044dfb4b854edb0cc2c090), "Barcrest","Berserk (Barcrest) (MPU4) (set 24)" )
-GAME_CUSTOM( 199?, m4berser__x,    m4berser,   "besdk.p1",     0x0000, 0x010000, CRC(f9d20012) SHA1(d3942406af0573a58e49a24f98b4e3c0a9ff508e), "Barcrest","Berserk (Barcrest) (MPU4) (set 25)" )
-GAME_CUSTOM( 199?, m4berser__y,    m4berser,   "besdy.p1",     0x0000, 0x010000, CRC(461ac51f) SHA1(217f169bd2bc4108145231e9b974d2f890a4f25e), "Barcrest","Berserk (Barcrest) (MPU4) (set 26)" )
-GAME_CUSTOM( 199?, m4berser__z,    m4berser,   "besk.p1",      0x0000, 0x010000, CRC(03eb2a05) SHA1(375f47bd1d0f21fde5ea0fcf7b79c02db9f8c9c6), "Barcrest","Berserk (Barcrest) (MPU4) (set 27)" )
-GAME_CUSTOM( 199?, m4berser__0,    m4berser,   "besy.p1",      0x0000, 0x010000, CRC(64a49f88) SHA1(6bd1275e9172e311ead36566432729530c1b6c21), "Barcrest","Berserk (Barcrest) (MPU4) (set 28)" )
-GAME_CUSTOM( 199?, m4berser__1,    m4berser,   "be_05a_4.1_1", 0x0000, 0x010000, CRC(e4ec1624) SHA1(e6241edb729796dd248abca6bf67281379c39af2), "Barcrest","Berserk (Barcrest) (MPU4) (set 29)" )
+// "(C)1996  B.W.B." and "BE4 1.1"
+GAME_CUSTOM( 199?, m4berser__1,    m4berser,   "be_05a_4.1_1", 0x0000, 0x010000, CRC(e4ec1624) SHA1(e6241edb729796dd248abca6bf67281379c39af2), "Bwb","Berserk (Barcrest) (MPU4) (BE4 1.1 KS)" )
 
 
 
@@ -3901,7 +4254,8 @@ GAME_CUSTOM( 199?, m4berser__1,    m4berser,   "be_05a_4.1_1", 0x0000, 0x010000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4vivess,       0,          "se8s.p1",  0x0000, 0x010000, CRC(d5c261de) SHA1(5f70944ffe03109ad16f162370fd3653d131034d), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 1)" )
+// "(C)1993 BARCREST" and "SE8 0.1"
+GAME_CUSTOM( 199?, m4vivess,       0,          "se8s.p1",  0x0000, 0x010000, CRC(d5c261de) SHA1(5f70944ffe03109ad16f162370fd3653d131034d), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (SE8 0.1)" )
 GAME_CUSTOM( 199?, m4vivess__a,    m4vivess,   "se8ad.p1", 0x0000, 0x010000, CRC(4f799dfe) SHA1(e85108ab0aad92a64eabf5c7562068caf22f8d5b), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4vivess__b,    m4vivess,   "se8b.p1",  0x0000, 0x010000, CRC(876efabb) SHA1(6ca1d37416b5401ba10977dad6a5881bdc7246ed), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4vivess__c,    m4vivess,   "se8bd.p1", 0x0000, 0x010000, CRC(39fe1c08) SHA1(99a04561555c819fc2954897e7831cf2c38db702), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 4)" )
@@ -3910,11 +4264,12 @@ GAME_CUSTOM( 199?, m4vivess__f,    m4vivess,   "se8dk.p1", 0x0000, 0x010000, CRC
 GAME_CUSTOM( 199?, m4vivess__g,    m4vivess,   "se8dy.p1", 0x0000, 0x010000, CRC(36dcf85f) SHA1(e635501e6ba7dc4e56f1e00b472b32c030aa6592), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 7)" )
 GAME_CUSTOM( 199?, m4vivess__i,    m4vivess,   "se8k.p1",  0x0000, 0x010000, CRC(befb76cd) SHA1(f60e17538acd6f5b20e786f8a51a0471ee3246c8), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 8)" )
 GAME_CUSTOM( 199?, m4vivess__j,    m4vivess,   "se8y.p1",  0x0000, 0x010000, CRC(8be03e81) SHA1(f51024036f56b2009905e9c08bb292f2a280c0f6), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 9)" )
+// "(C)1993 BARCREST" and "SES 0.2"
+GAME_CUSTOM( 199?, m4vivess__o,    m4vivess,   "sess.p1",  0x0000, 0x010000, CRC(0e8d5c05) SHA1(bf05e4e83d6d4fb7c471e8ca22df21b357d8ed9b), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (SES 0.2)" )
 GAME_CUSTOM( 199?, m4vivess__k,    m4vivess,   "sesb.p1",  0x0000, 0x010000, CRC(0e3dc285) SHA1(53cf28228192b6e83d0ff95c8de2fb978720d363), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 10)" )
 GAME_CUSTOM( 199?, m4vivess__l,    m4vivess,   "sesd.p1",  0x0000, 0x010000, CRC(549aaf0b) SHA1(084aca4429e27ce2642991aae8738d85c0157e54), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 11)" )
 GAME_CUSTOM( 199?, m4vivess__m,    m4vivess,   "sesdy.p1", 0x0000, 0x010000, CRC(1869edd8) SHA1(b76dfa439eef641817a9bdf9c737cb06ac54efea), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 12)" )
 GAME_CUSTOM( 199?, m4vivess__n,    m4vivess,   "sesk.p1",  0x0000, 0x010000, CRC(ebdb5ec4) SHA1(f7ec6e8c0142a0885fda066f379e7bd22f5844e5), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4vivess__o,    m4vivess,   "sess.p1",  0x0000, 0x010000, CRC(0e8d5c05) SHA1(bf05e4e83d6d4fb7c471e8ca22df21b357d8ed9b), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 14)" )
 GAME_CUSTOM( 199?, m4vivess__p,    m4vivess,   "sesy.p1",  0x0000, 0x010000, CRC(126472e9) SHA1(3bebd273debbc9b71fce83cdc1031927698f7775), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 15)" )
 
 
@@ -3931,8 +4286,8 @@ GAME_CUSTOM( 199?, m4vivess__p,    m4vivess,   "sesy.p1",  0x0000, 0x010000, CRC
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
-
-GAME_CUSTOM( 199?, m4ttdia,     0,          "tda04s.p1",    0x0000, 0x020000, CRC(1240642e) SHA1(7eaf02d5c00707a0a6d98d247c293cad1ca87108), "Barcrest","Ten Ten Do It Again (Barcrest) (MPU4) (set 1)" )
+// "(C)1993 BARCREST" and "TDA 0.4"
+GAME_CUSTOM( 199?, m4ttdia,     0,          "tda04s.p1",    0x0000, 0x020000, CRC(1240642e) SHA1(7eaf02d5c00707a0a6d98d247c293cad1ca87108), "Barcrest","Ten Ten Do It Again (Barcrest) (MPU4) (TDA 0.4)" )
 GAME_CUSTOM( 199?, m4ttdia__a,  m4ttdia,    "tda04ad.p1",   0x0000, 0x020000, CRC(79d804ba) SHA1(0616a2718aea85692ce5c5086f18e54a531efb19), "Barcrest","Ten Ten Do It Again (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4ttdia__b,  m4ttdia,    "tda04b.p1",    0x0000, 0x020000, CRC(dc755e6a) SHA1(386a1baf7d86d73dff1d6034f60094a55255d6bc), "Barcrest","Ten Ten Do It Again (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4ttdia__c,  m4ttdia,    "tda04bd.p1",   0x0000, 0x020000, CRC(f4c2aa7f) SHA1(aae114e9ab813809a8f8e2e12773a9f6379f535d), "Barcrest","Ten Ten Do It Again (Barcrest) (MPU4) (set 4)" )
@@ -3962,7 +4317,15 @@ GAME_CUSTOM( 199?, m4ttdia__m,  m4ttdia,    "tda04y.p1",    0x0000, 0x020000, CR
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4przve,     0,          "pess.p1",  0x0000, 0x010000, CRC(d8e79833) SHA1(f68fd1bd057a353832c7de3e2818906ab2b844b7), "Barcrest","Prize Viva Esapana (Barcrest) (MPU4) (set 1)" )
+// "(C)1993 BARCREST" and "PES 0.4"
+GAME_CUSTOM( 199?, m4przve,     0,          "pess.p1",  0x0000, 0x010000, CRC(d8e79833) SHA1(f68fd1bd057a353832c7de3e2818906ab2b844b7), "Barcrest","Prize Viva Esapana (Barcrest) (MPU4) (PES 0.4)" )
+GAME_CUSTOM( 199?, m4przve__l,  m4przve,    "pesb.p1",  0x0000, 0x010000, CRC(bf0ffed9) SHA1(ab8cd98ae7dfb3582aad7ae8c669a6d97f144f88), "Barcrest","Prize Viva Esapana (Barcrest) (MPU4) (set 13)" )
+GAME_CUSTOM( 199?, m4przve__m,  m4przve,    "pesd.p1",  0x0000, 0x010000, CRC(6f7b1e16) SHA1(412a22ebb61b77541da067ba74621c8e54364471), "Barcrest","Prize Viva Esapana (Barcrest) (MPU4) (set 14)" )
+GAME_CUSTOM( 199?, m4przve__n,  m4przve,    "pesdy.p1", 0x0000, 0x010000, CRC(94db27b4) SHA1(fe745a991a5e78fc9054480d3ce5bf6b7f5f9fe4), "Barcrest","Prize Viva Esapana (Barcrest) (MPU4) (set 15)" )
+GAME_CUSTOM( 199?, m4przve__o,  m4przve,    "pesk.p1",  0x0000, 0x010000, CRC(9e7b9f58) SHA1(86c2a83964f925448dda189546d9909b10e52673), "Barcrest","Prize Viva Esapana (Barcrest) (MPU4) (set 16)" )
+GAME_CUSTOM( 199?, m4przve__p,  m4przve,    "pesy.p1",  0x0000, 0x010000, CRC(fbfc1563) SHA1(870239cab39eff33303fe06dfd1dd3db708f0f2d), "Barcrest","Prize Viva Esapana (Barcrest) (MPU4) (set 17)" )
+// "(C)1993 BARCREST" and "PE8 0.1"
+GAME_CUSTOM( 199?, m4przve__j,  m4przve,    "pe8s.p1",  0x0000, 0x010000, CRC(e8463e69) SHA1(923d6c79470a65cf66b089ef09898acea928aa9b), "Barcrest","Prize Viva Esapana (Barcrest) (MPU4) (PE8 0.1)" )
 GAME_CUSTOM( 199?, m4przve__a,  m4przve,    "pe8ad.p1", 0x0000, 0x010000, CRC(3a81422e) SHA1(bb77365ed7bc7c2cd9e1cfe6e266c6edfd3562a3), "Barcrest","Prize Viva Esapana (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4przve__b,  m4przve,    "pe8b.p1",  0x0000, 0x010000, CRC(9f36b112) SHA1(265451557afcfdc1aa8e77616f4b871698b20c5f), "Barcrest","Prize Viva Esapana (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4przve__c,  m4przve,    "pe8bd.p1", 0x0000, 0x010000, CRC(af0689b5) SHA1(0e3cf464c855b0dcfeac403bda80818287707abe), "Barcrest","Prize Viva Esapana (Barcrest) (MPU4) (set 4)" )
@@ -3972,13 +4335,7 @@ GAME_CUSTOM( 199?, m4przve__f,  m4przve,    "pe8dk.p1", 0x0000, 0x010000, CRC(fc
 GAME_CUSTOM( 199?, m4przve__g,  m4przve,    "pe8dy.p1", 0x0000, 0x010000, CRC(6abc5682) SHA1(ae8754f0e214738adae4bc856cd72b0920aaa67a), "Barcrest","Prize Viva Esapana (Barcrest) (MPU4) (set 8)" )
 GAME_CUSTOM( 199?, m4przve__h,  m4przve,    "pe8j.p1",  0x0000, 0x010000, CRC(d3bf07f1) SHA1(3e539f24ef25c8d6fbfbdcd469fa8a2908dd2ec2), "Barcrest","Prize Viva Esapana (Barcrest) (MPU4) (set 9)" )
 GAME_CUSTOM( 199?, m4przve__i,  m4przve,    "pe8k.p1",  0x0000, 0x010000, CRC(efba0d3f) SHA1(2205b94f5a6ed23e834cfeb0d3ebe5ed66d942a1), "Barcrest","Prize Viva Esapana (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4przve__j,  m4przve,    "pe8s.p1",  0x0000, 0x010000, CRC(e8463e69) SHA1(923d6c79470a65cf66b089ef09898acea928aa9b), "Barcrest","Prize Viva Esapana (Barcrest) (MPU4) (set 11)" )
 GAME_CUSTOM( 199?, m4przve__k,  m4przve,    "pe8y.p1",  0x0000, 0x010000, CRC(c324b75f) SHA1(bf3409a193539e1e032c856a5316bec674043d57), "Barcrest","Prize Viva Esapana (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4przve__l,  m4przve,    "pesb.p1",  0x0000, 0x010000, CRC(bf0ffed9) SHA1(ab8cd98ae7dfb3582aad7ae8c669a6d97f144f88), "Barcrest","Prize Viva Esapana (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4przve__m,  m4przve,    "pesd.p1",  0x0000, 0x010000, CRC(6f7b1e16) SHA1(412a22ebb61b77541da067ba74621c8e54364471), "Barcrest","Prize Viva Esapana (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4przve__n,  m4przve,    "pesdy.p1", 0x0000, 0x010000, CRC(94db27b4) SHA1(fe745a991a5e78fc9054480d3ce5bf6b7f5f9fe4), "Barcrest","Prize Viva Esapana (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4przve__o,  m4przve,    "pesk.p1",  0x0000, 0x010000, CRC(9e7b9f58) SHA1(86c2a83964f925448dda189546d9909b10e52673), "Barcrest","Prize Viva Esapana (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4przve__p,  m4przve,    "pesy.p1",  0x0000, 0x010000, CRC(fbfc1563) SHA1(870239cab39eff33303fe06dfd1dd3db708f0f2d), "Barcrest","Prize Viva Esapana (Barcrest) (MPU4) (set 17)" )
 
 
 #define M4SHOCM_EXTRA_ROMS \
@@ -3993,7 +4350,8 @@ GAME_CUSTOM( 199?, m4przve__p,  m4przve,    "pesy.p1",  0x0000, 0x010000, CRC(fb
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4shocm,     0,          "scms.p1",  0x0000, 0x020000, CRC(8cb17f49) SHA1(6c67d5d65567ba3677f51f9c636e1f8e253111de), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (set 1)" )
+// "(C)1993 BARCREST" and "SCM 0.1"
+GAME_CUSTOM( 199?, m4shocm,     0,          "scms.p1",  0x0000, 0x020000, CRC(8cb17f49) SHA1(6c67d5d65567ba3677f51f9c636e1f8e253111de), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (SCM 0.1)" )
 GAME_CUSTOM( 199?, m4shocm__a,  m4shocm,    "scmad.p1", 0x0000, 0x020000, CRC(0960b887) SHA1(02b029760d141664a7c5860a29b158d8c2dec4e7), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4shocm__b,  m4shocm,    "scmb.p1",  0x0000, 0x020000, CRC(c96e88cd) SHA1(61abff544c979efabf5e53d2c53d7cbe90c1f265), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4shocm__c,  m4shocm,    "scmbd.p1", 0x0000, 0x020000, CRC(847a1642) SHA1(0bb6d2494888c5e45bf4bfd0f6ba123283346361), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (set 4)" )
@@ -4019,7 +4377,9 @@ GAME_CUSTOM( 199?, m4shocm__j,  m4shocm,    "scmk.p1",  0x0000, 0x020000, CRC(83
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4actbnk,       0,          "acts.p1",  0x0000, 0x010000, CRC(49a9007c) SHA1(b205270e53264c3d8cb009a5780cacba1ce2e2a8), "Barcrest","Action Bank (Barcrest) (MPU4) (set 1)" )
+// these require a jackpot key to be inserted
+// "(C)1993 BARCREST" and "ACT 0.7"
+GAME_CUSTOM( 199?, m4actbnk,       0,          "acts.p1",  0x0000, 0x010000, CRC(49a9007c) SHA1(b205270e53264c3d8cb009a5780cacba1ce2e2a8), "Barcrest","Action Bank (Barcrest) (MPU4) (ACT 0.7)" )
 GAME_CUSTOM( 199?, m4actbnk__a,    m4actbnk,   "actb.p1",  0x0000, 0x010000, CRC(1429708e) SHA1(8b3ecb443e5920ccec80695a142cb1eb9596b1c1), "Barcrest","Action Bank (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4actbnk__b,    m4actbnk,   "actbd.p1", 0x0000, 0x010000, CRC(727d7bb6) SHA1(765a9944ee27b175ba1f45bf82dcf7ef0defd076), "Barcrest","Action Bank (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4actbnk__c,    m4actbnk,   "actc.p1",  0x0000, 0x010000, CRC(0a2498e5) SHA1(97f1e35426156c8eece6f76f3ecffa85714ade5b), "Barcrest","Action Bank (Barcrest) (MPU4) (set 4)" )
@@ -4029,49 +4389,6 @@ GAME_CUSTOM( 199?, m4actbnk__f,    m4actbnk,   "actdy.p1", 0x0000, 0x010000, CRC
 GAME_CUSTOM( 199?, m4actbnk__g,    m4actbnk,   "actk.p1",  0x0000, 0x010000, CRC(fa555503) SHA1(8bf2b0b28453eedf6541f3471e8c6ffaba04de9d), "Barcrest","Action Bank (Barcrest) (MPU4) (set 8)" )
 GAME_CUSTOM( 199?, m4actbnk__h,    m4actbnk,   "acty.p1",  0x0000, 0x010000, CRC(0ab8ff54) SHA1(7dc16ef1bbed2a5b2da3bf9eb4bbaf87b176954f), "Barcrest","Action Bank (Barcrest) (MPU4) (set 9)" )
 GAME_CUSTOM( 199?, m4actbnk__i,    m4actbnk,   "actad.p1", 0x0000, 0x010000, CRC(a8dfdf77) SHA1(92e9f0f3837e466c0c6d98b890234d80318ef236), "Barcrest","Action Bank (Barcrest) (MPU4) (set 10)" )
-
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-	ROM_END \
-	GAME(year, setname, parent ,mod2    ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
-
-GAME_CUSTOM( 199?, m4addrc,     0,          "add05_101",                        0x0000, 0x010000, CRC(4b3fb104) SHA1(9dba619019a476ce317122a3553965b279c684ba), "Barcrest","Adders & Ladders Classic (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4addrc__a,  m4addrc,    "add10_101",                        0x0000, 0x010000, CRC(af8f8b4e) SHA1(712c33ed0f425dc10b79780b0cfce0ac5768e2d5), "Barcrest","Adders & Ladders Classic (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4addrc__b,  m4addrc,    "add20_101",                        0x0000, 0x010000, CRC(361b7173) SHA1(dea2b1b0f5910e2fd3f45d220554f0e712dedada), "Barcrest","Adders & Ladders Classic (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4addrc__c,  m4addrc,    "add55",                            0x0000, 0x010000, CRC(48c5bc73) SHA1(18c9f70bad6141cca95b6bbcb4fc621e71f87700), "Barcrest","Adders & Ladders Classic (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4addrc__d,  m4addrc,    "alddr20",                          0x0000, 0x010000, CRC(19cf4437) SHA1(b528823c476bebd1a9a6c720a4144294743693d2), "Barcrest","Adders & Ladders Classic (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4addrc__e,  m4addrc,    "classic adders & ladders_alt",     0x0000, 0x010000, CRC(ac948903) SHA1(e07023efd7722a661a2bbf93c0a168af70ad6c20), "Barcrest","Adders & Ladders Classic (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4addrc__f,  m4addrc,    "classic adders & ladders_alt2",    0x0000, 0x010000, CRC(843ed53d) SHA1(b1dff249df37800744e3fc9c32be20a62bd130a1), "Barcrest","Adders & Ladders Classic (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4addrc__h,  m4addrc,    "adders classic.bin",               0x0000, 0x010000, CRC(6bc1d2aa) SHA1(cf17e697ff0cfba999f6511f24051dbc3d0384ef), "Barcrest","Adders & Ladders Classic (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4addrc__i,  m4addrc,    "addl_10_.4",                       0x0000, 0x010000, CRC(c2d11126) SHA1(0eafe9dc30013ed5817ac303a4eea5ea82d62715), "Barcrest","Adders & Ladders Classic (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4addrc__j,  m4addrc,    "addl_10_.8",                       0x0000, 0x010000, CRC(9fc82c47) SHA1(0f56afc33f09fe22afc5ec74aeb496c32f9e623c), "Barcrest","Adders & Ladders Classic (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4addrc__k,  m4addrc,    "addl_20_.8",                       0x0000, 0x010000, CRC(43c98f46) SHA1(0ca4a093b38fc04639e3f4bb742a8923b90d2ed1), "Barcrest","Adders & Ladders Classic (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4addrc__l,  m4addrc,    "al10",                             0x0000, 0x010000, CRC(3c3c82b6) SHA1(cc5ffdd0837c9af31d5737a70430a01d1989cdcc), "Barcrest","Adders & Ladders Classic (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4addrc__m,  m4addrc,    "alad58c",                          0x0000, 0x010000, CRC(df9c46b8) SHA1(439ea1ce17aa89e19cedb78465b4388b72c8c5ed), "Barcrest","Adders & Ladders Classic (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4addrc__n,  m4addrc,    "nik56c",                           0x0000, 0x010000, CRC(05fa11d1) SHA1(01d3d0c504489f1513a0c3aa26e910c9604f5366), "Barcrest","Adders & Ladders Classic (Barcrest) (MPU4) (set 14)" )
-
-#define M4ADDRCC_EXTRA_ROMS \
-	ROM_REGION( 0x48, "fakechr", 0 ) \
-	ROM_LOAD( "aal.chr", 0x0000, 0x000048, CRC(bb48409f) SHA1(adefde520104b8c3815260ee136460ddf3e9e4b2) )
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4ADDRCC_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent ,mod2    ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
-
-
-GAME_CUSTOM( 199?, m4addrcc,       0,          "adcd.p1", 0x0000, 0x010000, CRC(47e41c9a) SHA1(546aaaa5765b3bc91eeb9bf5a979ed68a2e72da8), "Barcrest","Adders & Ladders Classic Club (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4addrcc__a,    m4addrcc,   "adcf.p1", 0x0000, 0x010000, CRC(1dbbc990) SHA1(fb9439b43089e3135a719ab94b24dd65561d17cf), "Barcrest","Adders & Ladders Classic Club (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4addrcc__b,    m4addrcc,   "adcl.p1", 0x0000, 0x010000, CRC(89299196) SHA1(9a92b250b47b11536f8708429d69c95111ecdb98), "Barcrest","Adders & Ladders Classic Club (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4addrcc__c,    m4addrcc,   "adcs.p1", 0x0000, 0x010000, CRC(7247de78) SHA1(e390b4e912d7bc8c1ca5e42bf2e2753d4c2b4d17), "Barcrest","Adders & Ladders Classic Club (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4addrcc__d,    m4addrcc,   "adrscfm", 0x0000, 0x010000, CRC(6c95881a) SHA1(db658bd722c54fc84734105f1a9b0028b23179fb), "Barcrest","Adders & Ladders Classic Club (Barcrest) (MPU4) (set 5)" )
 
 
 #define M4CRDOME_EXTRA_ROMS \
@@ -4089,7 +4406,9 @@ GAME_CUSTOM( 199?, m4addrcc__d,    m4addrcc,   "adrscfm", 0x0000, 0x010000, CRC(
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4crdome,       0,          "cd212k.p1",    0x0000, 0x020000, CRC(673b10a1) SHA1(996ade8193f448970beea2c5b81d9f27c05f162f), "Barcrest","Crystal Dome (Barcrest) (MPU4) (set 1)" )
+// "(C)1993 BARCREST" and "CD2 1.2"
+GAME_CUSTOM( 199?, m4crdome,       0,          "cd212s.p1",    0x0000, 0x020000, CRC(f7d9d5e3) SHA1(1378e28c0a2c59a42a440502f20cc011625f43b5), "Barcrest","Crystal Dome (Barcrest) (MPU4) (CD2 1.2)" )
+GAME_CUSTOM( 199?, m4crdome__j,    m4crdome,   "cd212k.p1",    0x0000, 0x020000, CRC(673b10a1) SHA1(996ade8193f448970beea2c5b81d9f27c05f162f), "Barcrest","Crystal Dome (Barcrest) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4crdome__a,    m4crdome,   "cd212c.p1",    0x0000, 0x020000, CRC(1ab605e5) SHA1(03327b2fac9d3d2891dc5950aa89ac4947c7b444), "Barcrest","Crystal Dome (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4crdome__b,    m4crdome,   "cd212ad.p1",   0x0000, 0x020000, CRC(c76cab39) SHA1(abbe5d629929ff89b499cd4d0e15e9fa13fc33de), "Barcrest","Crystal Dome (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4crdome__c,    m4crdome,   "cd212b.p1",    0x0000, 0x020000, CRC(2dfcb8f7) SHA1(ba711fb20556c447f4bb3a11fc1cc6a3599bfd6d), "Barcrest","Crystal Dome (Barcrest) (MPU4) (set 4)" )
@@ -4099,11 +4418,13 @@ GAME_CUSTOM( 199?, m4crdome__f,    m4crdome,   "cd212dk.p1",   0x0000, 0x020000,
 GAME_CUSTOM( 199?, m4crdome__g,    m4crdome,   "cd212dr.p1",   0x0000, 0x020000, CRC(b3be169b) SHA1(eb4699fdce371d94feec410c640bd49bfdccba98), "Barcrest","Crystal Dome (Barcrest) (MPU4) (set 8)" )
 GAME_CUSTOM( 199?, m4crdome__h,    m4crdome,   "cd212dy.p1",   0x0000, 0x020000, CRC(87528d54) SHA1(974fa2c29af43c903add28dca0ea3b04f612d2f7), "Barcrest","Crystal Dome (Barcrest) (MPU4) (set 9)" )
 GAME_CUSTOM( 199?, m4crdome__i,    m4crdome,   "cd212r.p1",    0x0000, 0x020000, CRC(d434ab90) SHA1(d42258bd965e8a028a418681a1307234c9b1c450), "Barcrest","Crystal Dome (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4crdome__j,    m4crdome,   "cd212s.p1",    0x0000, 0x020000, CRC(f7d9d5e3) SHA1(1378e28c0a2c59a42a440502f20cc011625f43b5), "Barcrest","Crystal Dome (Barcrest) (MPU4) (set 11)" )
 GAME_CUSTOM( 199?, m4crdome__k,    m4crdome,   "cd212y.p1",    0x0000, 0x020000, CRC(e0d8305f) SHA1(ddf1125eba0e470f6ae811fe050d4000300cfd0c), "Barcrest","Crystal Dome (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4crdome__l,    m4crdome,   "cdom15r",      0x0000, 0x020000, CRC(28f9ee8e) SHA1(e3484933dd0b8ddc2eeefc4dc95ce5379565e750), "Barcrest","Crystal Dome (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4crdome__m,    m4crdome,   "cdome10",      0x0000, 0x020000, CRC(945c9277) SHA1(6afee54b332152f6767781a040799d865999b292), "Barcrest","Crystal Dome (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4crdome__n,    m4crdome,   "cdome8ac",     0x0000, 0x020000, CRC(0553bfe6) SHA1(77abfa556f04dca1be52fbed357807e6ada10458), "Barcrest","Crystal Dome (Barcrest) (MPU4) (set 15)" )
+// "(C)1993 BARCREST" and "CD2 1.0"
+GAME_CUSTOM( 199?, m4crdome__m,    m4crdome,   "cdome10",      0x0000, 0x020000, CRC(945c9277) SHA1(6afee54b332152f6767781a040799d865999b292), "Barcrest","Crystal Dome (Barcrest) (MPU4) (CD2 1.0 C)" )
+// "(C)1993 BARCREST" and "CD2 0.2"
+GAME_CUSTOM( 199?, m4crdome__n,    m4crdome,   "cdome8ac",     0x0000, 0x020000, CRC(0553bfe6) SHA1(77abfa556f04dca1be52fbed357807e6ada10458), "Barcrest","Crystal Dome (Barcrest) (MPU4) (CD2 0.2 C)" )
+// no copyright string and "CD2 1.2"
+GAME_CUSTOM( 199?, m4crdome__l,    m4crdome,   "cdom15r",      0x0000, 0x020000, CRC(28f9ee8e) SHA1(e3484933dd0b8ddc2eeefc4dc95ce5379565e750), "hack","Crystal Dome (Barcrest) (MPU4) (CD2 1.2, hack)" )
 
 
 #define M4ROCKMN_EXTRA_ROMS \
@@ -4123,8 +4444,9 @@ GAME_CUSTOM( 199?, m4crdome__n,    m4crdome,   "cdome8ac",     0x0000, 0x020000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
-
-GAME_CUSTOM( 199?, m4rockmn,       0,          "rok06c.p1",    0x0000, 0x020000, CRC(8e3a628f) SHA1(3bedb095af710f0b6376a5d99c072f7b3d3de0af), "Barcrest","Rocket Money (Barcrest) (MPU4) (set 1)" )
+// "(C)1993 BARCREST" and "ROK 0.6"
+GAME_CUSTOM( 199?, m4rockmn,       0,          "rok06s.p1",    0x0000, 0x020000, CRC(e8b89551) SHA1(753828fd8631588c7725ee4f013f3c78d23f7038), "Barcrest","Rocket Money (Barcrest) (MPU4) (ROK 0.6)" )
+GAME_CUSTOM( 199?, m4rockmn__j,    m4rockmn,   "rok06c.p1",    0x0000, 0x020000, CRC(8e3a628f) SHA1(3bedb095af710f0b6376a5d99c072f7b3d3de0af), "Barcrest","Rocket Money (Barcrest) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4rockmn__a,    m4rockmn,   "rok06ad.p1",   0x0000, 0x020000, CRC(9daa1e35) SHA1(11e7a503c289813cc2ea4507bf5255957e92bc12), "Barcrest","Rocket Money (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4rockmn__b,    m4rockmn,   "rok06b.p1",    0x0000, 0x020000, CRC(b970df9d) SHA1(4230c3130a52502fb0a8aabf60fd33e90a7fa266), "Barcrest","Rocket Money (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4rockmn__c,    m4rockmn,   "rok06bd.p1",   0x0000, 0x020000, CRC(10b0b0f0) SHA1(a2f485e7578648aadb8ddb04ea885f4315b9ab82), "Barcrest","Rocket Money (Barcrest) (MPU4) (set 4)" )
@@ -4134,7 +4456,6 @@ GAME_CUSTOM( 199?, m4rockmn__f,    m4rockmn,   "rok06dr.p1",   0x0000, 0x020000,
 GAME_CUSTOM( 199?, m4rockmn__g,    m4rockmn,   "rok06dy.p1",   0x0000, 0x020000, CRC(dd943858) SHA1(ac8e53f72f98b217f190a9d3a9822a41b3028adb), "Barcrest","Rocket Money (Barcrest) (MPU4) (set 8)" )
 GAME_CUSTOM( 199?, m4rockmn__h,    m4rockmn,   "rok06k.p1",    0x0000, 0x020000, CRC(f3b777cb) SHA1(2d5b67c69458712c370801702a813f81640ce184), "Barcrest","Rocket Money (Barcrest) (MPU4) (set 9)" )
 GAME_CUSTOM( 199?, m4rockmn__i,    m4rockmn,   "rok06r.p1",    0x0000, 0x020000, CRC(40b8ccfa) SHA1(8868a0ca622e5331204b2431bf64e723a1a79222), "Barcrest","Rocket Money (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4rockmn__j,    m4rockmn,   "rok06s.p1",    0x0000, 0x020000, CRC(e8b89551) SHA1(753828fd8631588c7725ee4f013f3c78d23f7038), "Barcrest","Rocket Money (Barcrest) (MPU4) (set 11)" )
 GAME_CUSTOM( 199?, m4rockmn__k,    m4rockmn,   "rok06y.p1",    0x0000, 0x020000, CRC(74545735) SHA1(79ee259656fb71c24382c6670150e49a5b8bc62f), "Barcrest","Rocket Money (Barcrest) (MPU4) (set 12)" )
 
 
@@ -4153,17 +4474,9 @@ GAME_CUSTOM( 199?, m4rockmn__k,    m4rockmn,   "rok06y.p1",    0x0000, 0x020000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-
-GAME_CUSTOM( 199?, m4madhse,       0,          "mh502y.p1",    0x0000, 0x010000, CRC(3ec1955a) SHA1(6939e6f5d749249825c41df8e05957450eaf1007), "Barcrest","Mad House (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4madhse__a,    m4madhse,   "madc.p1",      0x0000, 0x010000, CRC(96da2d58) SHA1(23686a4dc5adaac81ba173f8fa0ea5ff8ac26260), "Barcrest","Mad House (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4madhse__b,    m4madhse,   "mhty.p1",      0x0000, 0x010000, CRC(e86e4542) SHA1(fb1b1d319c443daa1184eac4f6b0668ff3c6a1c5), "Barcrest","Mad House (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4madhse__c,    m4madhse,   "mads.p1",      0x0000, 0x010000, CRC(d4ea7f14) SHA1(808c64b65542c6bfd8336feec025e947c8c904ee), "Barcrest","Mad House (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4madhse__d,    m4madhse,   "md8c.p1",      0x0000, 0x010000, CRC(3d9c9cf7) SHA1(3f663fe9bd61d163d58bb4c51bea59121678aa76), "Barcrest","Mad House (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4madhse__e,    m4madhse,   "md8d.p1",      0x0000, 0x010000, CRC(6d150df3) SHA1(e93fda497696b06ad854b3b06e2b61737cef3fc1), "Barcrest","Mad House (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4madhse__f,    m4madhse,   "md8dy.p1",     0x0000, 0x010000, CRC(af01407f) SHA1(46359220e34dede4cc5e8c11699d01460dd9a469), "Barcrest","Mad House (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4madhse__g,    m4madhse,   "md8k.p1",      0x0000, 0x010000, CRC(c713f706) SHA1(65480171d3d69a670b9ce2c566425998134ad502), "Barcrest","Mad House (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4madhse__h,    m4madhse,   "md8s.p1",      0x0000, 0x010000, CRC(0d8a1a3e) SHA1(4df8b1c1834bbffb4798d9ed5135b6cb29b08e73), "Barcrest","Mad House (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4madhse__i,    m4madhse,   "md8y.p1",      0x0000, 0x010000, CRC(15fc9590) SHA1(a01bd5cea5873c8175262f668e330b2975a03eb1), "Barcrest","Mad House (Barcrest) (MPU4) (set 10)" )
+// "(C)1993 BARCREST" and "MH5 0.2"
+GAME_CUSTOM( 199?, m4madhse,       0,          "mh502s.p1",    0x0000, 0x010000, CRC(063cc07b) SHA1(0b43a5cf6094bd8c99e4395f31ff073389dd56ce), "Barcrest","Mad House (Barcrest) (MPU4) (MH5 0.2)" )
+GAME_CUSTOM( 199?, m4madhse__s,    m4madhse,   "mh502y.p1",    0x0000, 0x010000, CRC(3ec1955a) SHA1(6939e6f5d749249825c41df8e05957450eaf1007), "Barcrest","Mad House (Barcrest) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4madhse__j,    m4madhse,   "mh502ad.p1",   0x0000, 0x010000, CRC(55714741) SHA1(287ed4c0b070537e3cf9bf3a47bdf205e34b7ea8), "Barcrest","Mad House (Barcrest) (MPU4) (set 11)" )
 GAME_CUSTOM( 199?, m4madhse__k,    m4madhse,   "mh502b.p1",    0x0000, 0x010000, CRC(7d6a3e3a) SHA1(5ac43616bde8079d430c7a8f78884770396cc9e9), "Barcrest","Mad House (Barcrest) (MPU4) (set 12)" )
 GAME_CUSTOM( 199?, m4madhse__l,    m4madhse,   "mh502bd.p1",   0x0000, 0x010000, CRC(63bd7096) SHA1(ded53d603f7d1ed65914d9483923c74424964b59), "Barcrest","Mad House (Barcrest) (MPU4) (set 13)" )
@@ -4173,7 +4486,18 @@ GAME_CUSTOM( 199?, m4madhse__o,    m4madhse,   "mh502dr.p1",   0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4madhse__p,    m4madhse,   "mh502dy.p1",   0x0000, 0x010000, CRC(de670300) SHA1(32e17baed9c971e879974489ee9da375a0dbf735), "Barcrest","Mad House (Barcrest) (MPU4) (set 17)" )
 GAME_CUSTOM( 199?, m4madhse__q,    m4madhse,   "mh502k.p1",    0x0000, 0x010000, CRC(3aa341ec) SHA1(8012ee1d3f67fbdd5682ee07ac77dbb482b027ca), "Barcrest","Mad House (Barcrest) (MPU4) (set 18)" )
 GAME_CUSTOM( 199?, m4madhse__r,    m4madhse,   "mh502r.p1",    0x0000, 0x010000, CRC(a3aabdb4) SHA1(74e53a315b10264c23b8b00d6a4d5f99d3f204a3), "Barcrest","Mad House (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4madhse__s,    m4madhse,   "mh502s.p1",    0x0000, 0x010000, CRC(063cc07b) SHA1(0b43a5cf6094bd8c99e4395f31ff073389dd56ce), "Barcrest","Mad House (Barcrest) (MPU4) (set 20)" )
+// "(C)1993 BARCREST" and "MD8 0.1"
+GAME_CUSTOM( 199?, m4madhse__h,    m4madhse,   "md8s.p1",      0x0000, 0x010000, CRC(0d8a1a3e) SHA1(4df8b1c1834bbffb4798d9ed5135b6cb29b08e73), "Barcrest","Mad House (Barcrest) (MPU4) (MD8 0.1)" )
+GAME_CUSTOM( 199?, m4madhse__d,    m4madhse,   "md8c.p1",      0x0000, 0x010000, CRC(3d9c9cf7) SHA1(3f663fe9bd61d163d58bb4c51bea59121678aa76), "Barcrest","Mad House (Barcrest) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4madhse__e,    m4madhse,   "md8d.p1",      0x0000, 0x010000, CRC(6d150df3) SHA1(e93fda497696b06ad854b3b06e2b61737cef3fc1), "Barcrest","Mad House (Barcrest) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4madhse__f,    m4madhse,   "md8dy.p1",     0x0000, 0x010000, CRC(af01407f) SHA1(46359220e34dede4cc5e8c11699d01460dd9a469), "Barcrest","Mad House (Barcrest) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4madhse__g,    m4madhse,   "md8k.p1",      0x0000, 0x010000, CRC(c713f706) SHA1(65480171d3d69a670b9ce2c566425998134ad502), "Barcrest","Mad House (Barcrest) (MPU4) (set 8)" )
+GAME_CUSTOM( 199?, m4madhse__i,    m4madhse,   "md8y.p1",      0x0000, 0x010000, CRC(15fc9590) SHA1(a01bd5cea5873c8175262f668e330b2975a03eb1), "Barcrest","Mad House (Barcrest) (MPU4) (set 10)" )
+// "(C)1993 BARCREST" and "MAD 0.5"
+GAME_CUSTOM( 199?, m4madhse__c,    m4madhse,   "mads.p1",      0x0000, 0x010000, CRC(d4ea7f14) SHA1(808c64b65542c6bfd8336feec025e947c8c904ee), "Barcrest","Mad House (Barcrest) (MPU4) (MAD 0.5)" )
+GAME_CUSTOM( 199?, m4madhse__a,    m4madhse,   "madc.p1",      0x0000, 0x010000, CRC(96da2d58) SHA1(23686a4dc5adaac81ba173f8fa0ea5ff8ac26260), "Barcrest","Mad House (Barcrest) (MPU4) (set 2)" )
+// "(C)1993 BARCREST" and "MHT 0.2"
+GAME_CUSTOM( 199?, m4madhse__0,    m4madhse,   "mhts.p1",      0x0000, 0x010000, CRC(751b4574) SHA1(a04820f48e0df936813ca984c77da08d703e6474), "Barcrest","Mad House (Barcrest) (MPU4) (MHT 0.2)" )
 GAME_CUSTOM( 199?, m4madhse__t,    m4madhse,   "mhtad.p1",     0x0000, 0x010000, CRC(edfe01be) SHA1(5d738acc0a39906f085c1bc55caf683d6b6a4f6c), "Barcrest","Mad House (Barcrest) (MPU4) (set 21)" )
 GAME_CUSTOM( 199?, m4madhse__u,    m4madhse,   "mhtb.p1",      0x0000, 0x010000, CRC(272a3c62) SHA1(c6d71295d11350a0b778382a276b8bdf88faede9), "Barcrest","Mad House (Barcrest) (MPU4) (set 22)" )
 GAME_CUSTOM( 199?, m4madhse__v,    m4madhse,   "mhtbd.p1",     0x0000, 0x010000, CRC(f73a3808) SHA1(5f74eb64a9b12b9c2c1141b30e64325b8a5beece), "Barcrest","Mad House (Barcrest) (MPU4) (set 23)" )
@@ -4181,7 +4505,7 @@ GAME_CUSTOM( 199?, m4madhse__w,    m4madhse,   "mhtd.p1",      0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4madhse__x,    m4madhse,   "mhtdk.p1",     0x0000, 0x010000, CRC(ceafb47e) SHA1(32b7e23229524cc79ca24ee00368a9b4c76a35c7), "Barcrest","Mad House (Barcrest) (MPU4) (set 25)" )
 GAME_CUSTOM( 199?, m4madhse__y,    m4madhse,   "mhtdy.p1",     0x0000, 0x010000, CRC(36748788) SHA1(04a541f1a6b94dca2bff16d50674f968e896bea7), "Barcrest","Mad House (Barcrest) (MPU4) (set 26)" )
 GAME_CUSTOM( 199?, m4madhse__z,    m4madhse,   "mhtk.p1",      0x0000, 0x010000, CRC(1ebfb014) SHA1(493bf3ca37f2e49c5f00d7b8f6122e42f7b71f73), "Barcrest","Mad House (Barcrest) (MPU4) (set 27)" )
-GAME_CUSTOM( 199?, m4madhse__0,    m4madhse,   "mhts.p1",      0x0000, 0x010000, CRC(751b4574) SHA1(a04820f48e0df936813ca984c77da08d703e6474), "Barcrest","Mad House (Barcrest) (MPU4) (set 28)" )
+GAME_CUSTOM( 199?, m4madhse__b,    m4madhse,   "mhty.p1",      0x0000, 0x010000, CRC(e86e4542) SHA1(fb1b1d319c443daa1184eac4f6b0668ff3c6a1c5), "Barcrest","Mad House (Barcrest) (MPU4) (set 3)" )
 
 #define M4NHTT_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
@@ -4195,7 +4519,9 @@ GAME_CUSTOM( 199?, m4madhse__0,    m4madhse,   "mhts.p1",      0x0000, 0x010000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4nhtt,       0,      "nht01b.p1",    0x0000, 0x010000, CRC(8201a051) SHA1(a87550c0cdc0b14a30e8814bfef939eb5cf414f8), "Barcrest","New Hit the Top (Barcrest) (MPU4) (set 1)" )
+// "(C)1991 BARCREST" and "NHT 0.1"
+GAME_CUSTOM( 199?, m4nhtt,       0,      "nht01s.p1",    0x0000, 0x010000, CRC(a4a44ddf) SHA1(e64953f3cd2559a8ebdacb2b0c12c84fd5c4b836), "Barcrest","New Hit the Top (Barcrest) (MPU4) (NHT 0.1)" )
+GAME_CUSTOM( 199?, m4nhtt__i,    m4nhtt, "nht01b.p1",    0x0000, 0x010000, CRC(8201a051) SHA1(a87550c0cdc0b14a30e8814bfef939eb5cf414f8), "Barcrest","New Hit the Top (Barcrest) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4nhtt__a,    m4nhtt, "nht01ad.p1",   0x0000, 0x010000, CRC(a5c6ce9a) SHA1(f21dcc1a70fa45637f236aede9c6fa2e962af8f5), "Barcrest","New Hit the Top (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4nhtt__b,    m4nhtt, "nht01bd.p1",   0x0000, 0x010000, CRC(21c50c56) SHA1(66c7dfa15447a2519cad58daebe0832c4c2f6f5e), "Barcrest","New Hit the Top (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4nhtt__c,    m4nhtt, "nht01d.p1",    0x0000, 0x010000, CRC(4d0868a0) SHA1(1f70273928582b87693f046e10e22c19d6bcf87e), "Barcrest","New Hit the Top (Barcrest) (MPU4) (set 4)" )
@@ -4204,7 +4530,6 @@ GAME_CUSTOM( 199?, m4nhtt__e,    m4nhtt, "nht01dr.p1",   0x0000, 0x010000, CRC(7
 GAME_CUSTOM( 199?, m4nhtt__f,    m4nhtt, "nht01dy.p1",   0x0000, 0x010000, CRC(954df9ba) SHA1(61cfb2c68921576549d40ba6776877322e4dd338), "Barcrest","New Hit the Top (Barcrest) (MPU4) (set 7)" )
 GAME_CUSTOM( 199?, m4nhtt__g,    m4nhtt, "nht01k.p1",    0x0000, 0x010000, CRC(c9ab03b3) SHA1(acc26a54bfe6e26fc2c8ac58268ee9347bc4ddb9), "Barcrest","New Hit the Top (Barcrest) (MPU4) (set 8)" )
 GAME_CUSTOM( 199?, m4nhtt__h,    m4nhtt, "nht01r.p1",    0x0000, 0x010000, CRC(f5ec653e) SHA1(aed9320ab164dd0f2b3dfaee3aacde5ba62e31ef), "Barcrest","New Hit the Top (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4nhtt__i,    m4nhtt, "nht01s.p1",    0x0000, 0x010000, CRC(a4a44ddf) SHA1(e64953f3cd2559a8ebdacb2b0c12c84fd5c4b836), "Barcrest","New Hit the Top (Barcrest) (MPU4) (set 10)" )
 GAME_CUSTOM( 199?, m4nhtt__j,    m4nhtt, "nht01y.p1",    0x0000, 0x010000, CRC(54c02b5d) SHA1(75b3056d714ee232325f8a1058bef46d902d0b64), "Barcrest","New Hit the Top (Barcrest) (MPU4) (set 11)" )
 
 
@@ -4221,8 +4546,8 @@ GAME_CUSTOM( 199?, m4nhtt__j,    m4nhtt, "nht01y.p1",    0x0000, 0x010000, CRC(5
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 
-
-GAME_CUSTOM( 199?, m4przfrt,       0,          "pfr03s.p1",    0x0000, 0x010000, CRC(0ea80adb) SHA1(948a23fe8ccf6f423957a478a57bb875cc7b2cc2), "Barcrest","Prize Fruit & Loot (Barcrest) (MPU4) (set 1)" )
+// "(C)1991 BARCREST" and "PFR 0.3"
+GAME_CUSTOM( 199?, m4przfrt,       0,          "pfr03s.p1",    0x0000, 0x010000, CRC(0ea80adb) SHA1(948a23fe8ccf6f423957a478a57bb875cc7b2cc2), "Barcrest","Prize Fruit & Loot (Barcrest) (MPU4) (PFR 0.3)" )
 GAME_CUSTOM( 199?, m4przfrt__a,    m4przfrt,   "pfr03ad.p1",   0x0000, 0x010000, CRC(860cbd1b) SHA1(a3a3c0c3c5aff9b469ae82cf514937973b752421), "Barcrest","Prize Fruit & Loot (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4przfrt__b,    m4przfrt,   "pfr03b.p1",    0x0000, 0x010000, CRC(2a7ba02c) SHA1(178fbf0301d263b32f9a8ac00e79731d074576d9), "Barcrest","Prize Fruit & Loot (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4przfrt__c,    m4przfrt,   "pfr03bd.p1",   0x0000, 0x010000, CRC(dfff487c) SHA1(bf4bbb17241595ceb2c373c2bbd72fcecddedfd2), "Barcrest","Prize Fruit & Loot (Barcrest) (MPU4) (set 4)" )
@@ -4249,7 +4574,9 @@ GAME_CUSTOM( 199?, m4przfrt__l,    m4przfrt,   "pfr03o.p1",    0x0000, 0x010000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4tutcl,     0,          "f2u01ad.p1",   0x0000, 0x010000, CRC(65537552) SHA1(b0a761dcc6e0a9f01cfb934b570356ca67fdd099), "Barcrest","Tutti Fruity Classic (Barcrest) (MPU4) (set 1)" )
+// "(C)1991 BARCREST" and "F2U 0.1"
+GAME_CUSTOM( 199?, m4tutcl,     0,          "f2u01s.p1",    0x0000, 0x010000, CRC(25b68f22) SHA1(7f484dbc841e1e87d9f5e322cf497b6b68e4a096), "Barcrest","Tutti Fruity Classic (Barcrest) (MPU4) (F2U 0.1)" )
+GAME_CUSTOM( 199?, m4tutcl__j,  m4tutcl,    "f2u01ad.p1",   0x0000, 0x010000, CRC(65537552) SHA1(b0a761dcc6e0a9f01cfb934b570356ca67fdd099), "Barcrest","Tutti Fruity Classic (Barcrest) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4tutcl__a,  m4tutcl,    "f2u01b.p1",    0x0000, 0x010000, CRC(2cae37df) SHA1(5aed985476b7b747a99a4046b846ee4a359776af), "Barcrest","Tutti Fruity Classic (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4tutcl__b,  m4tutcl,    "f2u01bd.p1",   0x0000, 0x010000, CRC(0dd91ccf) SHA1(bcdfc39025d02e7a51f69757238dfa44fe9d3655), "Barcrest","Tutti Fruity Classic (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4tutcl__c,  m4tutcl,    "f2u01c.p1",    0x0000, 0x010000, CRC(6b6d9bb9) SHA1(140e9cbb8b484116e5fb9a7670d41fb0bcb37ec0), "Barcrest","Tutti Fruity Classic (Barcrest) (MPU4) (set 4)" )
@@ -4259,7 +4586,6 @@ GAME_CUSTOM( 199?, m4tutcl__f,  m4tutcl,    "f2u01dr.p1",   0x0000, 0x010000, CR
 GAME_CUSTOM( 199?, m4tutcl__g,  m4tutcl,    "f2u01dy.p1",   0x0000, 0x010000, CRC(24dd0a73) SHA1(a75129e414dd8cbe5f6f44e39b1d3dc3d7dfafb2), "Barcrest","Tutti Fruity Classic (Barcrest) (MPU4) (set 8)" )
 GAME_CUSTOM( 199?, m4tutcl__h,  m4tutcl,    "f2u01k.p1",    0x0000, 0x010000, CRC(b9cec403) SHA1(90a1f49202ea9b79e2ab097cf95cf94088c52926), "Barcrest","Tutti Fruity Classic (Barcrest) (MPU4) (set 9)" )
 GAME_CUSTOM( 199?, m4tutcl__i,  m4tutcl,    "f2u01r.p1",    0x0000, 0x010000, CRC(471e39d7) SHA1(874db6f2d04ed0b2c6756efba5fa1140d2fbfc58), "Barcrest","Tutti Fruity Classic (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4tutcl__j,  m4tutcl,    "f2u01s.p1",    0x0000, 0x010000, CRC(25b68f22) SHA1(7f484dbc841e1e87d9f5e322cf497b6b68e4a096), "Barcrest","Tutti Fruity Classic (Barcrest) (MPU4) (set 11)" )
 GAME_CUSTOM( 199?, m4tutcl__k,  m4tutcl,    "f2u01y.p1",    0x0000, 0x010000, CRC(5a583a6f) SHA1(0421d079de12a7379c13832108e8608c9a01f41d), "Barcrest","Tutti Fruity Classic (Barcrest) (MPU4) (set 12)" )
 
 
@@ -4276,8 +4602,15 @@ GAME_CUSTOM( 199?, m4tutcl__k,  m4tutcl,    "f2u01y.p1",    0x0000, 0x010000, CR
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-
-GAME_CUSTOM( 199?, m4przmns,       0,          "spmy.p1",  0x0000, 0x010000, CRC(2b27b2a0) SHA1(07950616da39e39d19452859390d3eaad89ea377), "Barcrest","Prize Money Showcase (Barcrest) (MPU4) (set 1)" )
+// "(C)1991 BARCREST" and "SPM 0.2"
+GAME_CUSTOM( 199?, m4przmns,       0,          "spms.p1",  0x0000, 0x010000, CRC(7d684358) SHA1(b07b13d6827e5ea4127eb763f4233a3d35ea99e6), "Barcrest","Prize Money Showcase (Barcrest) (MPU4) (SPM 0.2)" )
+GAME_CUSTOM( 199?, m4przmns__n,    m4przmns,   "spmy.p1",  0x0000, 0x010000, CRC(2b27b2a0) SHA1(07950616da39e39d19452859390d3eaad89ea377), "Barcrest","Prize Money Showcase (Barcrest) (MPU4) (set 1)" )
+GAME_CUSTOM( 199?, m4przmns__j,    m4przmns,   "spmb.p1",  0x0000, 0x010000, CRC(752dd1c6) SHA1(e180c959bc3fb8bce9da22ed6e74fa03e4562a74), "Barcrest","Prize Money Showcase (Barcrest) (MPU4) (set 11)" )
+GAME_CUSTOM( 199?, m4przmns__k,    m4przmns,   "spmd.p1",  0x0000, 0x010000, CRC(34172b4f) SHA1(8594d3863e3de3e6300cd5f4588545bf82c89e00), "Barcrest","Prize Money Showcase (Barcrest) (MPU4) (set 12)" )
+GAME_CUSTOM( 199?, m4przmns__l,    m4przmns,   "spmdy.p1", 0x0000, 0x010000, CRC(1abed85e) SHA1(0b2d7e0127c30f6704a7f64a2955ecf3e8010206), "Barcrest","Prize Money Showcase (Barcrest) (MPU4) (set 13)" )
+GAME_CUSTOM( 199?, m4przmns__m,    m4przmns,   "spmk.p1",  0x0000, 0x010000, CRC(ba2f467a) SHA1(327ebad946b028f387e04e9db9f882320995d175), "Barcrest","Prize Money Showcase (Barcrest) (MPU4) (set 14)" )
+// "(C)1991 BARCREST" and "SM8 0.1"
+GAME_CUSTOM( 199?, m4przmns__h,    m4przmns,   "sm8s.p1",  0x0000, 0x010000, CRC(be159855) SHA1(277884b5417857fa661b09d3e41bef2b22b89f6c), "Barcrest","Prize Money Showcase (Barcrest) (MPU4) (SM8 0.1)" )
 GAME_CUSTOM( 199?, m4przmns__a,    m4przmns,   "sm8ad.p1", 0x0000, 0x010000, CRC(6272ae09) SHA1(96130f62646424dd9f2f34f2858a2635ec615f03), "Barcrest","Prize Money Showcase (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4przmns__b,    m4przmns,   "sm8b.p1",  0x0000, 0x010000, CRC(25d95c1b) SHA1(7aa448d1fb383d1b89e71bbc63a554eaa5e06141), "Barcrest","Prize Money Showcase (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4przmns__c,    m4przmns,   "sm8bd.p1", 0x0000, 0x010000, CRC(bf58108f) SHA1(a0dfc2447a014f4a9b1abad3f954ee9c58251289), "Barcrest","Prize Money Showcase (Barcrest) (MPU4) (set 4)" )
@@ -4285,13 +4618,7 @@ GAME_CUSTOM( 199?, m4przmns__d,    m4przmns,   "sm8d.p1",  0x0000, 0x010000, CRC
 GAME_CUSTOM( 199?, m4przmns__e,    m4przmns,   "sm8dk.p1", 0x0000, 0x010000, CRC(f077ac65) SHA1(9baa5d2fd9833838d48c202a57aaa98783130dbc), "Barcrest","Prize Money Showcase (Barcrest) (MPU4) (set 6)" )
 GAME_CUSTOM( 199?, m4przmns__f,    m4przmns,   "sm8dy.p1", 0x0000, 0x010000, CRC(2df61788) SHA1(003d6e172cee41cf9704dc285c2a0b39ee247ea8), "Barcrest","Prize Money Showcase (Barcrest) (MPU4) (set 7)" )
 GAME_CUSTOM( 199?, m4przmns__g,    m4przmns,   "sm8k.p1",  0x0000, 0x010000, CRC(8d02ca2b) SHA1(b5defdc50fee9e9f1379571b638702c0779fd450), "Barcrest","Prize Money Showcase (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4przmns__h,    m4przmns,   "sm8s.p1",  0x0000, 0x010000, CRC(be159855) SHA1(277884b5417857fa661b09d3e41bef2b22b89f6c), "Barcrest","Prize Money Showcase (Barcrest) (MPU4) (set 9)" )
 GAME_CUSTOM( 199?, m4przmns__i,    m4przmns,   "sm8y.p1",  0x0000, 0x010000, CRC(51e76e1d) SHA1(3045ab447871c7369c5ed53da75326e64d6e57d9), "Barcrest","Prize Money Showcase (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4przmns__j,    m4przmns,   "spmb.p1",  0x0000, 0x010000, CRC(752dd1c6) SHA1(e180c959bc3fb8bce9da22ed6e74fa03e4562a74), "Barcrest","Prize Money Showcase (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4przmns__k,    m4przmns,   "spmd.p1",  0x0000, 0x010000, CRC(34172b4f) SHA1(8594d3863e3de3e6300cd5f4588545bf82c89e00), "Barcrest","Prize Money Showcase (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4przmns__l,    m4przmns,   "spmdy.p1", 0x0000, 0x010000, CRC(1abed85e) SHA1(0b2d7e0127c30f6704a7f64a2955ecf3e8010206), "Barcrest","Prize Money Showcase (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4przmns__m,    m4przmns,   "spmk.p1",  0x0000, 0x010000, CRC(ba2f467a) SHA1(327ebad946b028f387e04e9db9f882320995d175), "Barcrest","Prize Money Showcase (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4przmns__n,    m4przmns,   "spms.p1",  0x0000, 0x010000, CRC(7d684358) SHA1(b07b13d6827e5ea4127eb763f4233a3d35ea99e6), "Barcrest","Prize Money Showcase (Barcrest) (MPU4) (set 15)" )
 
 #define M4PRZRF_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
@@ -4305,7 +4632,9 @@ GAME_CUSTOM( 199?, m4przmns__n,    m4przmns,   "spms.p1",  0x0000, 0x010000, CRC
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4przrf,     0,          "pr8ad.p1", 0x0000, 0x020000, CRC(ebada7c9) SHA1(4a1e2f746116c23f87b53d25bd8b11322962306f), "Barcrest","Prize Rich And Famous (Barcrest) (MPU4) (set 1)" )
+// "(C)1993 BARCREST" and "PR8 0.1"
+GAME_CUSTOM( 199?, m4przrf,     0,          "pr8s.p1",  0x0000, 0x020000, CRC(bbbdd4f4) SHA1(72c2a8b3404384b524f49fc2d6507e2d8dab85cb), "Barcrest","Prize Rich And Famous (Barcrest) (MPU4) (PR8 0.1)" )
+GAME_CUSTOM( 199?, m4przrf__i,  m4przrf,    "pr8ad.p1", 0x0000, 0x020000, CRC(ebada7c9) SHA1(4a1e2f746116c23f87b53d25bd8b11322962306f), "Barcrest","Prize Rich And Famous (Barcrest) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4przrf__a,  m4przrf,    "pr8b.p1",  0x0000, 0x020000, CRC(4a6448b6) SHA1(061dbc1603fff0cb60e02acdf21881047b2b7d43), "Barcrest","Prize Rich And Famous (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4przrf__b,  m4przrf,    "pr8bd.p1", 0x0000, 0x020000, CRC(66b7090c) SHA1(774f5b1403109ccc7ac1bc188f30e8b3a5025aad), "Barcrest","Prize Rich And Famous (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4przrf__c,  m4przrf,    "pr8d.p1",  0x0000, 0x020000, CRC(377f43c0) SHA1(14e29f1832afc47f06752d7da11cc2cb40fcb368), "Barcrest","Prize Rich And Famous (Barcrest) (MPU4) (set 4)" )
@@ -4314,7 +4643,6 @@ GAME_CUSTOM( 199?, m4przrf__e,  m4przrf,    "pr8dk.p1", 0x0000, 0x020000, CRC(2c
 GAME_CUSTOM( 199?, m4przrf__f,  m4przrf,    "pr8dy.p1", 0x0000, 0x020000, CRC(ab9381a4) SHA1(90c3a048ad5c1e19007b6e089750a9e4b299d2a3), "Barcrest","Prize Rich And Famous (Barcrest) (MPU4) (set 7)" )
 GAME_CUSTOM( 199?, m4przrf__g,  m4przrf,    "pr8j.p1",  0x0000, 0x020000, CRC(6eb1de65) SHA1(b9e13173191e9a45fab29936b303a914e372918f), "Barcrest","Prize Rich And Famous (Barcrest) (MPU4) (set 8)" )
 GAME_CUSTOM( 199?, m4przrf__h,  m4przrf,    "pr8k.p1",  0x0000, 0x020000, CRC(00a3e0e0) SHA1(c0671052de5cdd7f169ca50590b9c4f0f10cb678), "Barcrest","Prize Rich And Famous (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4przrf__i,  m4przrf,    "pr8s.p1",  0x0000, 0x020000, CRC(bbbdd4f4) SHA1(72c2a8b3404384b524f49fc2d6507e2d8dab85cb), "Barcrest","Prize Rich And Famous (Barcrest) (MPU4) (set 10)" )
 GAME_CUSTOM( 199?, m4przrf__j,  m4przrf,    "pr8y.p1",  0x0000, 0x020000, CRC(8740c01e) SHA1(c75f4ad724e735a2ffabc9f7cce96dcb341eaf4a), "Barcrest","Prize Rich And Famous (Barcrest) (MPU4) (set 11)" )
 
 #define M4PRZRFM_EXTRA_ROMS \
@@ -4329,13 +4657,15 @@ GAME_CUSTOM( 199?, m4przrf__j,  m4przrf,    "pr8y.p1",  0x0000, 0x020000, CRC(87
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-
-GAME_CUSTOM( 199?, m4przrfm,       0,          "prub.p1",      0x0000, 0x010000, CRC(748f220f) SHA1(5d729057d521fa656375610e424cfd4088f6ea02), "Barcrest","Prize Run For Your Money (Barcrest) (MPU4) (set 1)" )
+// "(C)1993 BARCREST" and "PRU 0.2"
+GAME_CUSTOM( 199?, m4przrfm,       0,          "prus.p1",      0x0000, 0x010000, CRC(d6c22253) SHA1(f9a25dd1c6f16849a6eb1febdc2da16080cc6838), "Barcrest","Prize Run For Your Money (Barcrest) (MPU4) (PRU 0.2)" )
+GAME_CUSTOM( 199?, m4przrfm__d,    m4przrfm,   "prub.p1",      0x0000, 0x010000, CRC(748f220f) SHA1(5d729057d521fa656375610e424cfd4088f6ea02), "Barcrest","Prize Run For Your Money (Barcrest) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4przrfm__a,    m4przrfm,   "prud.p1",      0x0000, 0x010000, CRC(426bf7c1) SHA1(998b7968d4ed2fb0d1fcaf13929c76670100d9df), "Barcrest","Prize Run For Your Money (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4przrfm__b,    m4przrfm,   "prudy.p1",     0x0000, 0x010000, CRC(e9f76ebd) SHA1(8f1151e123e73ac40fdb6f071960d1ed3e72692a), "Barcrest","Prize Run For Your Money (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4przrfm__c,    m4przrfm,   "pruk.p1",      0x0000, 0x010000, CRC(b995d098) SHA1(22107fbbc8c4e026fc34159114cdbfcd130f814e), "Barcrest","Prize Run For Your Money (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4przrfm__d,    m4przrfm,   "prus.p1",      0x0000, 0x010000, CRC(d6c22253) SHA1(f9a25dd1c6f16849a6eb1febdc2da16080cc6838), "Barcrest","Prize Run For Your Money (Barcrest) (MPU4) (set 5)" )
 GAME_CUSTOM( 199?, m4przrfm__e,    m4przrfm,   "pruy.p1",      0x0000, 0x010000, CRC(fcd8add4) SHA1(14e922daf24d981a3a65463bf64213722d8ba758), "Barcrest","Prize Run For Your Money (Barcrest) (MPU4) (set 6)" )
+// "(C)1993 BARCREST" and "RM8 0.1"
+GAME_CUSTOM( 199?, m4przrfm__n,    m4przrfm,   "rm8s.p1",      0x0000, 0x010000, CRC(9ab83f24) SHA1(bdc72a9d6f22244a2be86b035fac84433705ce78), "Barcrest","Prize Run For Your Money (Barcrest) (MPU4) (RM8 0.1)" )
 GAME_CUSTOM( 199?, m4przrfm__f,    m4przrfm,   "rm8b.p1",      0x0000, 0x010000, CRC(181da11e) SHA1(c06a9626a541a56d707f9b80806714020cefa7b2), "Barcrest","Prize Run For Your Money (Barcrest) (MPU4) (set 7)" )
 GAME_CUSTOM( 199?, m4przrfm__g,    m4przrfm,   "rm8bd.p1",     0x0000, 0x010000, CRC(b3d983b5) SHA1(7881c31617855983981f93190afddb0aa880ce0a), "Barcrest","Prize Run For Your Money (Barcrest) (MPU4) (set 8)" )
 GAME_CUSTOM( 199?, m4przrfm__h,    m4przrfm,   "rm8d.p1",      0x0000, 0x010000, CRC(94377ab0) SHA1(2c43dfd11eeca53faae661d7af4a986fdbb6d7e9), "Barcrest","Prize Run For Your Money (Barcrest) (MPU4) (set 9)" )
@@ -4344,7 +4674,6 @@ GAME_CUSTOM( 199?, m4przrfm__j,    m4przrfm,   "rm8dk.p1",     0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4przrfm__k,    m4przrfm,   "rm8dy.p1",     0x0000, 0x010000, CRC(bac738e3) SHA1(21bd359cfeaf1e33268cecef08d8c7d23d89360c), "Barcrest","Prize Run For Your Money (Barcrest) (MPU4) (set 12)" )
 GAME_CUSTOM( 199?, m4przrfm__l,    m4przrfm,   "rm8j.p1",      0x0000, 0x010000, CRC(b825b8fd) SHA1(6fa58784018fd7be6528e60d8642803cca55c15d), "Barcrest","Prize Run For Your Money (Barcrest) (MPU4) (set 13)" )
 GAME_CUSTOM( 199?, m4przrfm__m,    m4przrfm,   "rm8k.p1",      0x0000, 0x010000, CRC(3f559f9e) SHA1(f70c127490859a3b4c405fd0efd18168dd3b0728), "Barcrest","Prize Run For Your Money (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4przrfm__n,    m4przrfm,   "rm8s.p1",      0x0000, 0x010000, CRC(9ab83f24) SHA1(bdc72a9d6f22244a2be86b035fac84433705ce78), "Barcrest","Prize Run For Your Money (Barcrest) (MPU4) (set 15)" )
 GAME_CUSTOM( 199?, m4przrfm__o,    m4przrfm,   "rm8y.p1",      0x0000, 0x010000, CRC(47a3873e) SHA1(51baf82a7a4dee10b1a2f7862030f960912d8d7c), "Barcrest","Prize Run For Your Money (Barcrest) (MPU4) (set 16)" )
 
 
@@ -4364,12 +4693,13 @@ GAME_CUSTOM( 199?, m4przrfm__o,    m4przrfm,   "rm8y.p1",      0x0000, 0x010000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4przwo,     0,          "pwo206ac",     0x0000, 0x010000, CRC(b9dd88e7) SHA1(4c60e7a28b538ff2483839fc66600037ccd99440), "Barcrest","Prize What's On (Barcrest) (MPU4) (set 1)" )
+// "(C)1991 BARCREST" and "PWO 0.5"
+GAME_CUSTOM( 199?, m4przwo,     0,          "pwos.p1",      0x0000, 0x010000, CRC(6a87aa68) SHA1(3dc8c006de3adcada43c3581be0ff921081ecff0), "Barcrest","Prize What's On (Barcrest) (MPU4) (PWO 0.5)" )
+GAME_CUSTOM( 199?, m4przwo__e,  m4przwo,    "pwo206ac",     0x0000, 0x010000, CRC(b9dd88e7) SHA1(4c60e7a28b538ff2483839fc66600037ccd99440), "Barcrest","Prize What's On (Barcrest) (MPU4) (PWO 0.5 C)" )
 GAME_CUSTOM( 199?, m4przwo__a,  m4przwo,    "pwob.p1",      0x0000, 0x010000, CRC(9e9f65d7) SHA1(69d28a1e08d2bde1a9c4d55555478808546ad4f0), "Barcrest","Prize What's On (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4przwo__b,  m4przwo,    "pwod.p1",      0x0000, 0x010000, CRC(ae97b585) SHA1(d6b90d8b696a21f9fa6b06c63a329b1370edd224), "Barcrest","Prize What's On (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4przwo__c,  m4przwo,    "pwody.p1",     0x0000, 0x010000, CRC(3abfd1c9) SHA1(131811807396103641d73cd7cef1797a6cecb35b), "Barcrest","Prize What's On (Barcrest) (MPU4) (set 4)" )
 GAME_CUSTOM( 199?, m4przwo__d,  m4przwo,    "pwok.p1",      0x0000, 0x010000, CRC(b8631e11) SHA1(c01aff60dad14945c2b45992f0112c6fc0ae7c5a), "Barcrest","Prize What's On (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4przwo__e,  m4przwo,    "pwos.p1",      0x0000, 0x010000, CRC(6a87aa68) SHA1(3dc8c006de3adcada43c3581be0ff921081ecff0), "Barcrest","Prize What's On (Barcrest) (MPU4) (set 6)" )
 GAME_CUSTOM( 199?, m4przwo__f,  m4przwo,    "pwoy.p1",      0x0000, 0x010000, CRC(1ada4987) SHA1(05a0480f5a92faaedc8183d948c7e2d657bda2a4), "Barcrest","Prize What's On (Barcrest) (MPU4) (set 7)" )
 
 
@@ -4389,8 +4719,9 @@ GAME_CUSTOM( 199?, m4przwo__f,  m4przwo,    "pwoy.p1",      0x0000, 0x010000, CR
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
-
-GAME_CUSTOM( 199?, m4rhog2,     0,          "2rh06c.p1",    0x0000, 0x020000, CRC(62c312bc) SHA1(6b02345c97b130deabad58a238ba9045161b5a80), "Barcrest","Road Hog 2 - I'm Back (Barcrest) (MPU4) (set 1)" )
+// "(C)1993 BARCREST" and "2RH 0.6"
+GAME_CUSTOM( 199?, m4rhog2,     0,          "2rh06s.p1",    0x0000, 0x020000, CRC(2ea10eed) SHA1(825bd6a53100b389f7d67ec49e4535c1de0ece74), "Barcrest","Road Hog 2 - I'm Back (Barcrest) (MPU4) (2RH 0.6)" )
+GAME_CUSTOM( 199?, m4rhog2__l,  m4rhog2,    "2rh06c.p1",    0x0000, 0x020000, CRC(62c312bc) SHA1(6b02345c97b130deabad58a238ba9045161b5a80), "Barcrest","Road Hog 2 - I'm Back (Barcrest) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4rhog2__a,  m4rhog2,    "2rh06ad.p1",   0x0000, 0x020000, CRC(f44040d1) SHA1(685bbfe5f975c7e5b3efee17e1833f6f51b223af), "Barcrest","Road Hog 2 - I'm Back (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4rhog2__b,  m4rhog2,    "2rh06b.p1",    0x0000, 0x020000, CRC(5589afae) SHA1(15c9c65089cc2754d644dabfd6f5a32a2a788219), "Barcrest","Road Hog 2 - I'm Back (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4rhog2__c,  m4rhog2,    "2rh06bd.p1",   0x0000, 0x020000, CRC(795aee14) SHA1(7703c8456aaa2e27f71a7edbfa74fb2d7434a762), "Barcrest","Road Hog 2 - I'm Back (Barcrest) (MPU4) (set 4)" )
@@ -4402,38 +4733,8 @@ GAME_CUSTOM( 199?, m4rhog2__h,  m4rhog2,    "2rh06dy.p1",   0x0000, 0x020000, CR
 GAME_CUSTOM( 199?, m4rhog2__i,  m4rhog2,    "2rh06h.p1",    0x0000, 0x020000, CRC(9b65ffed) SHA1(65ab62fe772bd54793c45cc1105a189f21bb5d25), "Barcrest","Road Hog 2 - I'm Back (Barcrest) (MPU4) (set 10)" )
 GAME_CUSTOM( 199?, m4rhog2__j,  m4rhog2,    "2rh06k.p1",    0x0000, 0x020000, CRC(1f4e07f8) SHA1(35459640bc215c465b84df073505e8fd6077a332), "Barcrest","Road Hog 2 - I'm Back (Barcrest) (MPU4) (set 11)" )
 GAME_CUSTOM( 199?, m4rhog2__k,  m4rhog2,    "2rh06r.p1",    0x0000, 0x020000, CRC(ac41bcc9) SHA1(0de0c0976ef5c58084f02310495b246dc7c23e60), "Barcrest","Road Hog 2 - I'm Back (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4rhog2__l,  m4rhog2,    "2rh06s.p1",    0x0000, 0x020000, CRC(2ea10eed) SHA1(825bd6a53100b389f7d67ec49e4535c1de0ece74), "Barcrest","Road Hog 2 - I'm Back (Barcrest) (MPU4) (set 13)" )
 GAME_CUSTOM( 199?, m4rhog2__m,  m4rhog2,    "2rh06y.p1",    0x0000, 0x020000, CRC(98ad2706) SHA1(862a725bad97d28580dad102a71750465c7b0f5d), "Barcrest","Road Hog 2 - I'm Back (Barcrest) (MPU4) (set 14)" )
 
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-	ROM_END \
-	GAME(year, setname, parent ,mod2    ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
-
-
-
-
-GAME_CUSTOM( 199?, m4suphv,     0,          "hyperviper.bin",   0x0000, 0x010000, CRC(8373f6a3) SHA1(79bff20ab80ffe11447595c6fe8e5ab90d432e17), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4suphv__a,  m4suphv,    "hv_05___.3h3",     0x0000, 0x010000, CRC(13bfa891) SHA1(ffddd14a019d52029bf8d4f680d8d05413a9f0b7), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4suphv__b,  m4suphv,    "hv_05___.3o3",     0x0000, 0x010000, CRC(9ae86366) SHA1(614ae0ab184645c9f568796783f29a177eda3208), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4suphv__c,  m4suphv,    "hv_05___.4n3",     0x0000, 0x010000, CRC(f607f351) SHA1(d7b779b80fa964a27b106bd9d5ca3be16a11d5e9), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4suphv__d,  m4suphv,    "hv_05_d_.3h3",     0x0000, 0x010000, CRC(50c66ce8) SHA1(ef12525fc3ac82caf80326edaac81bb9fbc3245c), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4suphv__e,  m4suphv,    "hv_05_d_.3o3",     0x0000, 0x010000, CRC(87dfca0e) SHA1(3ab4105680acc46d3633a722f40ff1af0a520a7f), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4suphv__f,  m4suphv,    "hv_05_d_.4n3",     0x0000, 0x010000, CRC(f4d702d7) SHA1(268c7f6443c7ae587caf5b227fcd438530a06bcc), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4suphv__g,  m4suphv,    "hv_10___.3h3",     0x0000, 0x010000, CRC(627caac7) SHA1(4851ce2441850743ea68ecbf89bde3f4cd6c2b4c), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4suphv__h,  m4suphv,    "hv_10___.3o3",     0x0000, 0x010000, CRC(02e4d86a) SHA1(47aa83e8bcd85e8ba7fb972cdd1ead7fe21e0418), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4suphv__i,  m4suphv,    "hv_10_d_.3h3",     0x0000, 0x010000, CRC(15cfa26e) SHA1(6bc3feaba65d1797b9945f23a89e983f56b13f79), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4suphv__j,  m4suphv,    "hv_10_d_.3n3",     0x0000, 0x010000, CRC(b81f1d0a) SHA1(5fd293be2b75393069c9f5e099b4700ff930f081), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4suphv__k,  m4suphv,    "hv_10_d_.3o3",     0x0000, 0x010000, CRC(85f176b9) SHA1(30380d58bf2834829764cbdbdc7d950632e61e6d), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4suphv__l,  m4suphv,    "hvi05___.3h3",     0x0000, 0x010000, CRC(6959332e) SHA1(edaa5f86ad4389b0a3bc2e6679fe8f62520be3ae), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4suphv__m,  m4suphv,    "hvi05___.3o3",     0x0000, 0x010000, CRC(cdba80a5) SHA1(6c9fac7e5ee324b18922cc7a053495f1977bcb6d), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4suphv__n,  m4suphv,    "hvi05___.4n3",     0x0000, 0x010000, CRC(38a33c2b) SHA1(21004092b81e08146291fd3a025652f0edbe47dc), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4suphv__o,  m4suphv,    "hvi10___.3h3",     0x0000, 0x010000, CRC(6c1b4b89) SHA1(e8eb4e689d43c5b9e8354aa7375ca3ba12ed1160), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4suphv__p,  m4suphv,    "hvi10___.3n3",     0x0000, 0x010000, CRC(9d95cf8c) SHA1(26daf3975e1e3a605bc4392700c5470b52450d6e), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (set 17)" )
 
 
 #define M4SHODF_EXTRA_ROMS \
@@ -4451,20 +4752,21 @@ GAME_CUSTOM( 199?, m4suphv__p,  m4suphv,    "hvi10___.3n3",     0x0000, 0x010000
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 
-
-GAME_CUSTOM( 199?, m4shodf,     0,          "sdfs.p1",  0x0000, 0x010000, CRC(5df9abdb) SHA1(0dce3a7ff4d2f11c370a3a2578c592910a9e7371), "Barcrest","Showcase Duty Free (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4shodf__a,  m4shodf,    "sd8b.p1",  0x0000, 0x010000, CRC(79f7fea2) SHA1(5bfa695aef54c9621a91beac2e6c8a09d3b2974b), "Barcrest","Showcase Duty Free (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4shodf__b,  m4shodf,    "sd8d.p1",  0x0000, 0x010000, CRC(060a1b37) SHA1(fb4fbc1164f97f13eb10edbd4e8a37502d716340), "Barcrest","Showcase Duty Free (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4shodf__c,  m4shodf,    "sd8dk.p1", 0x0000, 0x010000, CRC(20982264) SHA1(178ce24ce21e865608133fe2ae281ba2adbdf1d4), "Barcrest","Showcase Duty Free (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4shodf__d,  m4shodf,    "sd8dy.p1", 0x0000, 0x010000, CRC(3fb73b48) SHA1(328f827a92e6fb8ccfb3a82c52401b2d31e974bf), "Barcrest","Showcase Duty Free (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4shodf__e,  m4shodf,    "sd8k.p1",  0x0000, 0x010000, CRC(0d8f2238) SHA1(55643a1f9fe136fb724b05efc0362b6295c9caf9), "Barcrest","Showcase Duty Free (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4shodf__f,  m4shodf,    "sd8s.p1",  0x0000, 0x010000, CRC(59d696e4) SHA1(e51a9a0bc1348b44e77f85343463154ad680ef89), "Barcrest","Showcase Duty Free (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4shodf__g,  m4shodf,    "sd8y.p1",  0x0000, 0x010000, CRC(f79c2e78) SHA1(f6c298b77a9c32378e3f219063daab17e551d083), "Barcrest","Showcase Duty Free (Barcrest) (MPU4) (set 8)" )
+// "(C)1993 BARCREST" and "SDF 0.2"
+GAME_CUSTOM( 199?, m4shodf,     0,          "sdfs.p1",  0x0000, 0x010000, CRC(5df9abdb) SHA1(0dce3a7ff4d2f11c370a3a2578c592910a9e7371), "Barcrest","Showcase Duty Free (Barcrest) (MPU4) (SDF 0.2)" )
 GAME_CUSTOM( 199?, m4shodf__h,  m4shodf,    "sdfb.p1",  0x0000, 0x010000, CRC(a15204bb) SHA1(c862822615e82e5f2f9f2f3cb7e31f804fd859be), "Barcrest","Showcase Duty Free (Barcrest) (MPU4) (set 9)" )
 GAME_CUSTOM( 199?, m4shodf__i,  m4shodf,    "sdfd.p1",  0x0000, 0x010000, CRC(19913c83) SHA1(894da549e790b9062f36fdce90b8e8d284d513e6), "Barcrest","Showcase Duty Free (Barcrest) (MPU4) (set 10)" )
 GAME_CUSTOM( 199?, m4shodf__j,  m4shodf,    "sdfdy.p1", 0x0000, 0x010000, CRC(df1325b1) SHA1(002780fcecf895d20a2a3c0c57fbe4dd675a1e42), "Barcrest","Showcase Duty Free (Barcrest) (MPU4) (set 11)" )
 GAME_CUSTOM( 199?, m4shodf__k,  m4shodf,    "sdfk.p1",  0x0000, 0x010000, CRC(32def2fb) SHA1(45064f319cb5268745e8d5210ceed3a84a8e7f20), "Barcrest","Showcase Duty Free (Barcrest) (MPU4) (set 12)" )
 GAME_CUSTOM( 199?, m4shodf__l,  m4shodf,    "sdfy.p1",  0x0000, 0x010000, CRC(dbb6aa80) SHA1(976f5811a0a578c7f2497ac654f7c416b6018a34), "Barcrest","Showcase Duty Free (Barcrest) (MPU4) (set 13)" )
+// "(C)1993 BARCREST" and "SD8 0.1"
+GAME_CUSTOM( 199?, m4shodf__f,  m4shodf,    "sd8s.p1",  0x0000, 0x010000, CRC(59d696e4) SHA1(e51a9a0bc1348b44e77f85343463154ad680ef89), "Barcrest","Showcase Duty Free (Barcrest) (MPU4) (SD8 0.1)" )
+GAME_CUSTOM( 199?, m4shodf__a,  m4shodf,    "sd8b.p1",  0x0000, 0x010000, CRC(79f7fea2) SHA1(5bfa695aef54c9621a91beac2e6c8a09d3b2974b), "Barcrest","Showcase Duty Free (Barcrest) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4shodf__b,  m4shodf,    "sd8d.p1",  0x0000, 0x010000, CRC(060a1b37) SHA1(fb4fbc1164f97f13eb10edbd4e8a37502d716340), "Barcrest","Showcase Duty Free (Barcrest) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4shodf__c,  m4shodf,    "sd8dk.p1", 0x0000, 0x010000, CRC(20982264) SHA1(178ce24ce21e865608133fe2ae281ba2adbdf1d4), "Barcrest","Showcase Duty Free (Barcrest) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4shodf__d,  m4shodf,    "sd8dy.p1", 0x0000, 0x010000, CRC(3fb73b48) SHA1(328f827a92e6fb8ccfb3a82c52401b2d31e974bf), "Barcrest","Showcase Duty Free (Barcrest) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4shodf__e,  m4shodf,    "sd8k.p1",  0x0000, 0x010000, CRC(0d8f2238) SHA1(55643a1f9fe136fb724b05efc0362b6295c9caf9), "Barcrest","Showcase Duty Free (Barcrest) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4shodf__g,  m4shodf,    "sd8y.p1",  0x0000, 0x010000, CRC(f79c2e78) SHA1(f6c298b77a9c32378e3f219063daab17e551d083), "Barcrest","Showcase Duty Free (Barcrest) (MPU4) (set 8)" )
 
 
 #define M4LUCKSC_EXTRA_ROMS \
@@ -4483,19 +4785,24 @@ GAME_CUSTOM( 199?, m4shodf__l,  m4shodf,    "sdfy.p1",  0x0000, 0x010000, CRC(db
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4lucksc,       0,          "clu14d.p1",    0x0000, 0x020000, CRC(7a64199f) SHA1(62c7c8a4475a8005a1f969550d0717c9cc44bada), "Barcrest","Lucky Strike Club (Barcrest) (MPU4) (set 1)" )
+// "(C)1996 BARCREST" and "CLU 1.4"
+GAME_CUSTOM( 199?, m4lucksc,       0,          "clu14s.p1",    0x0000, 0x020000, CRC(5f66d7cc) SHA1(bd8a832739d7aef4d04b89a94dd2886e89a6e0c2), "Barcrest","Lucky Strike Club (Barcrest) (MPU4) (CLU 1.4)" )
+GAME_CUSTOM( 199?, m4lucksc__b,    m4lucksc,   "clu14d.p1",    0x0000, 0x020000, CRC(7a64199f) SHA1(62c7c8a4475a8005a1f969550d0717c9cc44bada), "Barcrest","Lucky Strike Club (Barcrest) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4lucksc__a,    m4lucksc,   "clu14f.p1",    0x0000, 0x020000, CRC(07e90cdb) SHA1(5d4bf7f6f84f2890a0119de898f01e3e99bfbb7f), "Barcrest","Lucky Strike Club (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4lucksc__b,    m4lucksc,   "clu14s.p1",    0x0000, 0x020000, CRC(5f66d7cc) SHA1(bd8a832739d7aef4d04b89a94dd2886e89a6e0c2), "Barcrest","Lucky Strike Club (Barcrest) (MPU4) (set 3)" )
+// "(C)1996 BARCREST" and "GLS 0.6"
+GAME_CUSTOM( 199?, m4lucksc__e,    m4lucksc,   "gls06s.p1",    0x0000, 0x020000, CRC(975adb8d) SHA1(b92d1ad93e51f55111921060939359471c2e5384), "Barcrest","Lucky Strike Club (Barcrest) (MPU4) (GLS 0.6)" )
 GAME_CUSTOM( 199?, m4lucksc__c,    m4lucksc,   "gls06d.p1",    0x0000, 0x020000, CRC(2f7f8a9a) SHA1(04243f190597e3d3bdd258b8146b71e9c7cd90c7), "Barcrest","Lucky Strike Club (Barcrest) (MPU4) (set 4)" )
 GAME_CUSTOM( 199?, m4lucksc__d,    m4lucksc,   "gls06f.p1",    0x0000, 0x020000, CRC(52f29fde) SHA1(97df15c89540d8bbb15abb86f6a2e9d0e022c9df), "Barcrest","Lucky Strike Club (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4lucksc__e,    m4lucksc,   "gls06s.p1",    0x0000, 0x020000, CRC(975adb8d) SHA1(b92d1ad93e51f55111921060939359471c2e5384), "Barcrest","Lucky Strike Club (Barcrest) (MPU4) (set 6)" )
+// "(C)1996 BARCREST" and "GS3 0.1"
+GAME_CUSTOM( 199?, m4lucksc__h,    m4lucksc,   "gs301s.p1",    0x0000, 0x020000, CRC(53314dc6) SHA1(28b5d2a03b8f6221b80f10c46985fa906cc9be32), "Barcrest","Lucky Strike Club (Barcrest) (MPU4) (GS3 0.1)" )
 GAME_CUSTOM( 199?, m4lucksc__f,    m4lucksc,   "gs301d.p1",    0x0000, 0x020000, CRC(e0807af7) SHA1(1740d4d56ad71407a4d2bb13b43c9d5f31caf638), "Barcrest","Lucky Strike Club (Barcrest) (MPU4) (set 7)" )
 GAME_CUSTOM( 199?, m4lucksc__g,    m4lucksc,   "gs301f.p1",    0x0000, 0x020000, CRC(9d0d6fb3) SHA1(9206299604190deace09136ca2eebb9ad2792815), "Barcrest","Lucky Strike Club (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4lucksc__h,    m4lucksc,   "gs301s.p1",    0x0000, 0x020000, CRC(53314dc6) SHA1(28b5d2a03b8f6221b80f10c46985fa906cc9be32), "Barcrest","Lucky Strike Club (Barcrest) (MPU4) (set 9)" )
+// "(C)1996 BARCREST" and "LS3 0.1"
+GAME_CUSTOM( 199?, m4lucksc__k,    m4lucksc,   "ls301s.p1",    0x0000, 0x020000, CRC(7e9e97f1) SHA1(43760792b529db8acb497d38ad3951abdebcf76b), "Barcrest","Lucky Strike Club (Barcrest) (MPU4) (LS3 0.1)" )
 GAME_CUSTOM( 199?, m4lucksc__i,    m4lucksc,   "ls301d.p1",    0x0000, 0x020000, CRC(39fb0ddf) SHA1(3a6934892585bde6a99f1d2e2fd95677cf37fcfe), "Barcrest","Lucky Strike Club (Barcrest) (MPU4) (set 10)" )
 GAME_CUSTOM( 199?, m4lucksc__j,    m4lucksc,   "ls301f.p1",    0x0000, 0x020000, CRC(4476189b) SHA1(b94c6abbbf37ae28869b1f9c882de8fa56b2c676), "Barcrest","Lucky Strike Club (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4lucksc__k,    m4lucksc,   "ls301s.p1",    0x0000, 0x020000, CRC(7e9e97f1) SHA1(43760792b529db8acb497d38ad3951abdebcf76b), "Barcrest","Lucky Strike Club (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4lucksc__l,    m4lucksc,   "lsc_.1_1",     0x0000, 0x020000, CRC(79ce3db0) SHA1(409e9d3b08284dee3af696fb7c839c0ca35eddee), "Barcrest","Lucky Strike Club (Barcrest) (MPU4) (set 13)" )
+// "(C)1998   BWB" and "LSC 1.0"
+GAME_CUSTOM( 199?, m4lucksc__l,    m4lucksc,   "lsc_.1_1",     0x0000, 0x020000, CRC(79ce3db0) SHA1(409e9d3b08284dee3af696fb7c839c0ca35eddee), "Bwb","Lucky Strike Club (Barcrest) (MPU4) (LSC 1.0)" )
 
 
 #define M4PRZLUX_EXTRA_ROMS \
@@ -4512,7 +4819,8 @@ GAME_CUSTOM( 199?, m4lucksc__l,    m4lucksc,   "lsc_.1_1",     0x0000, 0x020000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4przlux,       0,          "plxs.p1",  0x0000, 0x010000, CRC(0aea0339) SHA1(28da52924fe2bf00799ef466143103e08399f5f5), "Barcrest","Prize Luxor (Barcrest) (MPU4) (set 1)" )
+// "(C)1993 BARCREST" and "PLX 0.2"
+GAME_CUSTOM( 199?, m4przlux,       0,          "plxs.p1",  0x0000, 0x010000, CRC(0aea0339) SHA1(28da52924fe2bf00799ef466143103e08399f5f5), "Barcrest","Prize Luxor (Barcrest) (MPU4) (PLX 0.2)" )
 GAME_CUSTOM( 199?, m4przlux__a,    m4przlux,   "plxad.p1", 0x0000, 0x010000, CRC(e52ddf4f) SHA1(ec3f198fb6658cadd45046ef7586f9178f95d814), "Barcrest","Prize Luxor (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4przlux__b,    m4przlux,   "plxb.p1",  0x0000, 0x010000, CRC(03b0f7bd) SHA1(0ce1cec1afa0a2efee3bc55a2b9cdf8fec7d3ebc), "Barcrest","Prize Luxor (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4przlux__c,    m4przlux,   "plxd.p1",  0x0000, 0x010000, CRC(46ae371e) SHA1(a164d0336ed6bf7d25f406e28a01bbec86f4b723), "Barcrest","Prize Luxor (Barcrest) (MPU4) (set 4)" )
@@ -4534,33 +4842,33 @@ GAME_CUSTOM( 199?, m4przlux__f,    m4przlux,   "plxy.p1",  0x0000, 0x010000, CRC
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4topdog,       0,          "td_20_b4.7_1", 0x0000, 0x010000, CRC(fe864f25) SHA1(b9f97aaf0425b4987b5bfa0b793e9226fdffe58f), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4topdog__a,    m4topdog,   "td_20_bc.7_1", 0x0000, 0x010000, CRC(3af18a9f) SHA1(0db7427d934363d021265fcac811505867f20d47), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4topdog__b,    m4topdog,   "td_20_d4.7_1", 0x0000, 0x010000, CRC(35da9e2d) SHA1(a2d1efd7c9cbe4bb5ce7574c6bea2edf55f3e08f), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4topdog__c,    m4topdog,   "td_20_dc.7_1", 0x0000, 0x010000, CRC(b90dfbce) SHA1(b9eb9393fbd33725d372b3b6648c261cf0ae486f), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4topdog__d,    m4topdog,   "td_20_k4.7_1", 0x0000, 0x010000, CRC(44618034) SHA1(0fce08e279a16d94422155c695b9b5f124b657ea), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4topdog__e,    m4topdog,   "td_20_kc.7_1", 0x0000, 0x010000, CRC(8ec10cf7) SHA1(cdc479f7f41f2205285a9db6539dce83feef6af4), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4topdog__f,    m4topdog,   "td_20a_4.7_1", 0x0000, 0x010000, CRC(e7bcc879) SHA1(6c963d059867bdd506af1826fe038daa560a3623), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4topdog__g,    m4topdog,   "td_20a_c.7_1", 0x0000, 0x010000, CRC(ea229917) SHA1(3e42c1eca1a89b2d536498156beddddcba9899b2), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4topdog__h,    m4topdog,   "td_20b_4.7_1", 0x0000, 0x010000, CRC(79468269) SHA1(709f34a0ebea816cb268b5dc36c3d02939cd6224), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4topdog__i,    m4topdog,   "td_20b_c.7_1", 0x0000, 0x010000, CRC(1301d28b) SHA1(b0fc0c73dedd89bbdb5845ec9f91530959fabeb6), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4topdog__j,    m4topdog,   "td_20bg4.7_1", 0x0000, 0x010000, CRC(4cb61b04) SHA1(6bb56cd06240c1bbb73406fe132e302822dec0df), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4topdog__k,    m4topdog,   "td_20bgc.7_1", 0x0000, 0x010000, CRC(8ce831d0) SHA1(e58ca3b38e8dc7196c27cf00123a6e7122bd7f58), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4topdog__l,    m4topdog,   "td_20bt4.7_1", 0x0000, 0x010000, CRC(2cdd5be2) SHA1(bc1afe70268eb7e3cb8fe1a43d262201faec0613), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4topdog__m,    m4topdog,   "td_20btc.7_1", 0x0000, 0x010000, CRC(67e96c75) SHA1(da9dd06f5d4773fa8e3945cf89cfdde4c465acb9), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4topdog__n,    m4topdog,   "td_25_bc.8_1", 0x0000, 0x010000, CRC(ac324184) SHA1(d6743c8cbbe719b12f47792a07ec2e898630591b), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4topdog__o,    m4topdog,   "td_25_dc.8_1", 0x0000, 0x010000, CRC(6ea8077c) SHA1(672976af1fad0257be7a15b839ec261653704be8), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4topdog__p,    m4topdog,   "td_25_kc.8_1", 0x0000, 0x010000, CRC(e006de48) SHA1(2c09e04d2dc3ec369c4c01eb1ff1af57156d05c1), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4topdog__q,    m4topdog,   "td_25a_c.8_1", 0x0000, 0x010000, CRC(84e54ba8) SHA1(dd09094854463f4b7033773be77d4a2d7f06b650), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4topdog__r,    m4topdog,   "td_25b_c.8_1", 0x0000, 0x010000, CRC(314f4f03) SHA1(a7c399ddf453305d0dbe2a63e57427b261c48c2c), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4topdog__s,    m4topdog,   "td_25bgc.8_1", 0x0000, 0x010000, CRC(efc0899c) SHA1(0d0e5a006d260a1bfcde7966c06360386c949f29), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4topdog__t,    m4topdog,   "td_25bgp.2_1", 0x0000, 0x010000, CRC(f0894f48) SHA1(63056dd434d18bb9a052db25cc6ce29d0c3f9f82), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4topdog__u,    m4topdog,   "td_25btc.8_1", 0x0000, 0x010000, CRC(f5dec7d9) SHA1(ffb361745aebb3c7d6bf4925d95904e8ced13a35), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4topdog__v,    m4topdog,   "td_30a_c.1_1", 0x0000, 0x010000, CRC(f0986895) SHA1(65c24de42a3009959c9bb7f5b42536aa6fd70c2b), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 23)" )
-GAME_CUSTOM( 199?, m4topdog__w,    m4topdog,   "td_30b_c.1_1", 0x0000, 0x010000, CRC(7683cf72) SHA1(4319954b833ef6b0d88b8d22c5e700a9df96dc65), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 24)" )
-GAME_CUSTOM( 199?, m4topdog__x,    m4topdog,   "td_30bdc.1_1", 0x0000, 0x010000, CRC(f5a4481b) SHA1(75b32b0996315b8ce833fd695377716dbeb0b7e4), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 25)" )
-GAME_CUSTOM( 199?, m4topdog__y,    m4topdog,   "td_30bgc.1_1", 0x0000, 0x010000, CRC(1ffe440f) SHA1(adc1909fbbfe7e63bb89b29878bda5a6df776a6a), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 26)" )
-GAME_CUSTOM( 199?, m4topdog__z,    m4topdog,   "td_30btc.1_1", 0x0000, 0x010000, CRC(5109516c) SHA1(a4919465286be9e1f0e7970a91a89738f8fcad4e), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 27)" )
+GAME_CUSTOM( 199?, m4topdog,       0,          "td_20_b4.7_1", 0x0000, 0x010000, CRC(fe864f25) SHA1(b9f97aaf0425b4987b5bfa0b793e9226fdffe58f), "Bwb","Top Dog (Barcrest) (MPU4) (set 1)" )
+GAME_CUSTOM( 199?, m4topdog__a,    m4topdog,   "td_20_bc.7_1", 0x0000, 0x010000, CRC(3af18a9f) SHA1(0db7427d934363d021265fcac811505867f20d47), "Bwb","Top Dog (Barcrest) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4topdog__b,    m4topdog,   "td_20_d4.7_1", 0x0000, 0x010000, CRC(35da9e2d) SHA1(a2d1efd7c9cbe4bb5ce7574c6bea2edf55f3e08f), "Bwb","Top Dog (Barcrest) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4topdog__c,    m4topdog,   "td_20_dc.7_1", 0x0000, 0x010000, CRC(b90dfbce) SHA1(b9eb9393fbd33725d372b3b6648c261cf0ae486f), "Bwb","Top Dog (Barcrest) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4topdog__d,    m4topdog,   "td_20_k4.7_1", 0x0000, 0x010000, CRC(44618034) SHA1(0fce08e279a16d94422155c695b9b5f124b657ea), "Bwb","Top Dog (Barcrest) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4topdog__e,    m4topdog,   "td_20_kc.7_1", 0x0000, 0x010000, CRC(8ec10cf7) SHA1(cdc479f7f41f2205285a9db6539dce83feef6af4), "Bwb","Top Dog (Barcrest) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4topdog__f,    m4topdog,   "td_20a_4.7_1", 0x0000, 0x010000, CRC(e7bcc879) SHA1(6c963d059867bdd506af1826fe038daa560a3623), "Bwb","Top Dog (Barcrest) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4topdog__g,    m4topdog,   "td_20a_c.7_1", 0x0000, 0x010000, CRC(ea229917) SHA1(3e42c1eca1a89b2d536498156beddddcba9899b2), "Bwb","Top Dog (Barcrest) (MPU4) (set 8)" )
+GAME_CUSTOM( 199?, m4topdog__h,    m4topdog,   "td_20b_4.7_1", 0x0000, 0x010000, CRC(79468269) SHA1(709f34a0ebea816cb268b5dc36c3d02939cd6224), "Bwb","Top Dog (Barcrest) (MPU4) (set 9)" )
+GAME_CUSTOM( 199?, m4topdog__i,    m4topdog,   "td_20b_c.7_1", 0x0000, 0x010000, CRC(1301d28b) SHA1(b0fc0c73dedd89bbdb5845ec9f91530959fabeb6), "Bwb","Top Dog (Barcrest) (MPU4) (set 10)" )
+GAME_CUSTOM( 199?, m4topdog__j,    m4topdog,   "td_20bg4.7_1", 0x0000, 0x010000, CRC(4cb61b04) SHA1(6bb56cd06240c1bbb73406fe132e302822dec0df), "Bwb","Top Dog (Barcrest) (MPU4) (set 11)" )
+GAME_CUSTOM( 199?, m4topdog__k,    m4topdog,   "td_20bgc.7_1", 0x0000, 0x010000, CRC(8ce831d0) SHA1(e58ca3b38e8dc7196c27cf00123a6e7122bd7f58), "Bwb","Top Dog (Barcrest) (MPU4) (set 12)" )
+GAME_CUSTOM( 199?, m4topdog__l,    m4topdog,   "td_20bt4.7_1", 0x0000, 0x010000, CRC(2cdd5be2) SHA1(bc1afe70268eb7e3cb8fe1a43d262201faec0613), "Bwb","Top Dog (Barcrest) (MPU4) (set 13)" )
+GAME_CUSTOM( 199?, m4topdog__m,    m4topdog,   "td_20btc.7_1", 0x0000, 0x010000, CRC(67e96c75) SHA1(da9dd06f5d4773fa8e3945cf89cfdde4c465acb9), "Bwb","Top Dog (Barcrest) (MPU4) (set 14)" )
+GAME_CUSTOM( 199?, m4topdog__n,    m4topdog,   "td_25_bc.8_1", 0x0000, 0x010000, CRC(ac324184) SHA1(d6743c8cbbe719b12f47792a07ec2e898630591b), "Bwb","Top Dog (Barcrest) (MPU4) (set 15)" )
+GAME_CUSTOM( 199?, m4topdog__o,    m4topdog,   "td_25_dc.8_1", 0x0000, 0x010000, CRC(6ea8077c) SHA1(672976af1fad0257be7a15b839ec261653704be8), "Bwb","Top Dog (Barcrest) (MPU4) (set 16)" )
+GAME_CUSTOM( 199?, m4topdog__p,    m4topdog,   "td_25_kc.8_1", 0x0000, 0x010000, CRC(e006de48) SHA1(2c09e04d2dc3ec369c4c01eb1ff1af57156d05c1), "Bwb","Top Dog (Barcrest) (MPU4) (set 17)" )
+GAME_CUSTOM( 199?, m4topdog__q,    m4topdog,   "td_25a_c.8_1", 0x0000, 0x010000, CRC(84e54ba8) SHA1(dd09094854463f4b7033773be77d4a2d7f06b650), "Bwb","Top Dog (Barcrest) (MPU4) (set 18)" )
+GAME_CUSTOM( 199?, m4topdog__r,    m4topdog,   "td_25b_c.8_1", 0x0000, 0x010000, CRC(314f4f03) SHA1(a7c399ddf453305d0dbe2a63e57427b261c48c2c), "Bwb","Top Dog (Barcrest) (MPU4) (set 19)" )
+GAME_CUSTOM( 199?, m4topdog__s,    m4topdog,   "td_25bgc.8_1", 0x0000, 0x010000, CRC(efc0899c) SHA1(0d0e5a006d260a1bfcde7966c06360386c949f29), "Bwb","Top Dog (Barcrest) (MPU4) (set 20)" )
+GAME_CUSTOM( 199?, m4topdog__t,    m4topdog,   "td_25bgp.2_1", 0x0000, 0x010000, CRC(f0894f48) SHA1(63056dd434d18bb9a052db25cc6ce29d0c3f9f82), "Bwb","Top Dog (Barcrest) (MPU4) (set 21)" )
+GAME_CUSTOM( 199?, m4topdog__u,    m4topdog,   "td_25btc.8_1", 0x0000, 0x010000, CRC(f5dec7d9) SHA1(ffb361745aebb3c7d6bf4925d95904e8ced13a35), "Bwb","Top Dog (Barcrest) (MPU4) (set 22)" )
+GAME_CUSTOM( 199?, m4topdog__v,    m4topdog,   "td_30a_c.1_1", 0x0000, 0x010000, CRC(f0986895) SHA1(65c24de42a3009959c9bb7f5b42536aa6fd70c2b), "Bwb","Top Dog (Barcrest) (MPU4) (set 23)" )
+GAME_CUSTOM( 199?, m4topdog__w,    m4topdog,   "td_30b_c.1_1", 0x0000, 0x010000, CRC(7683cf72) SHA1(4319954b833ef6b0d88b8d22c5e700a9df96dc65), "Bwb","Top Dog (Barcrest) (MPU4) (set 24)" )
+GAME_CUSTOM( 199?, m4topdog__x,    m4topdog,   "td_30bdc.1_1", 0x0000, 0x010000, CRC(f5a4481b) SHA1(75b32b0996315b8ce833fd695377716dbeb0b7e4), "Bwb","Top Dog (Barcrest) (MPU4) (set 25)" )
+GAME_CUSTOM( 199?, m4topdog__y,    m4topdog,   "td_30bgc.1_1", 0x0000, 0x010000, CRC(1ffe440f) SHA1(adc1909fbbfe7e63bb89b29878bda5a6df776a6a), "Bwb","Top Dog (Barcrest) (MPU4) (set 26)" )
+GAME_CUSTOM( 199?, m4topdog__z,    m4topdog,   "td_30btc.1_1", 0x0000, 0x010000, CRC(5109516c) SHA1(a4919465286be9e1f0e7970a91a89738f8fcad4e), "Bwb","Top Dog (Barcrest) (MPU4) (set 27)" )
 
 #define M4KINGQ_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
@@ -4576,26 +4884,26 @@ GAME_CUSTOM( 199?, m4topdog__z,    m4topdog,   "td_30btc.1_1", 0x0000, 0x010000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4kingq,     0,          "ee_05a_4.2_1", 0x0000, 0x010000, CRC(8dd842b6) SHA1(1c1bcaae355ceee4d7b1572b0fa1a8b23a8afdbf), "Barcrest / Bwb","Kings & Queens (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4kingq__a,  m4kingq,    "ee_05a__.2_1", 0x0000, 0x010000, CRC(36aa5fb9) SHA1(b4aaf647713e33e79be7927e5eeef240d3beedf7), "Barcrest / Bwb","Kings & Queens (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4kingq__b,  m4kingq,    "ee_20a__.2_1", 0x0000, 0x010000, CRC(2c61341f) SHA1(76d68ae2a44087414be8be12b3824c62311721dd), "Barcrest / Bwb","Kings & Queens (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4kingq__c,  m4kingq,    "ee_20a_c.1_1", 0x0000, 0x010000, CRC(948140ac) SHA1(d43f1f2903ecd809dee191087fa075c638728a5b), "Barcrest / Bwb","Kings & Queens (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4kingq__d,  m4kingq,    "ee_20b__.2_1", 0x0000, 0x010000, CRC(2fc7c7c2) SHA1(3b8736a582009d7b1455769374342ff72026d2fa), "Barcrest / Bwb","Kings & Queens (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4kingq__e,  m4kingq,    "ee_20b_c.1_1", 0x0000, 0x010000, CRC(70d399ab) SHA1(ca2c593151f4f852c7cb66859a12e832e53cd31f), "Barcrest / Bwb","Kings & Queens (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4kingq__f,  m4kingq,    "ee_20bd_.2_1", 0x0000, 0x010000, CRC(239de2dd) SHA1(c8021ba5bfdc10f59fec27c364035225093328d8), "Barcrest / Bwb","Kings & Queens (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4kingq__g,  m4kingq,    "ee_20bdc.1_1", 0x0000, 0x010000, CRC(cbb8c57b) SHA1(ea165199213f95128aec95ae40799faa8c457dd3), "Barcrest / Bwb","Kings & Queens (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4kingq__h,  m4kingq,    "ee_20bg_.2_1", 0x0000, 0x010000, CRC(ddc4d832) SHA1(031f987e9fced1df4acc57eb4b60911d52e1dbf6), "Barcrest / Bwb","Kings & Queens (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4kingq__i,  m4kingq,    "ee_20bt_.2_1", 0x0000, 0x010000, CRC(6f278771) SHA1(4459c9490be14bcbc139eebe6542325c80937ff3), "Barcrest / Bwb","Kings & Queens (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4kingq__j,  m4kingq,    "ee_20s_c.1_1", 0x0000, 0x010000, CRC(a0c1e313) SHA1(8a088a33e51a31ff0abdb554aa4d8ce61eaf4b7d), "Barcrest / Bwb","Kings & Queens (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4kingq__k,  m4kingq,    "ee_20sb_.2_1", 0x0000, 0x010000, CRC(307ad157) SHA1(32b6187e907bfbdb87a9ad2d9ca5870b09de5e4a), "Barcrest / Bwb","Kings & Queens (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4kingq__l,  m4kingq,    "ee_25a_c.3_1", 0x0000, 0x010000, CRC(4dc25083) SHA1(b754b4003f73bd74d1670a36a70985ce5e48794d), "Barcrest / Bwb","Kings & Queens (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4kingq__m,  m4kingq,    "ee_25b_c.3_1", 0x0000, 0x010000, CRC(a6fe50ff) SHA1(011602d9624f232ba8484e57f5f33ff06091809f), "Barcrest / Bwb","Kings & Queens (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4kingq__n,  m4kingq,    "ee_25bdc.3_1", 0x0000, 0x010000, CRC(d0088a97) SHA1(aacc1a86bd4b321d0ee21d14147e1d135b3a5bae), "Barcrest / Bwb","Kings & Queens (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4kingq__o,  m4kingq,    "ee_25bgc.3_1", 0x0000, 0x010000, CRC(e4dcd86b) SHA1(b8f8ec317bf9f18e3d0ae9a9fd59349fee24530d), "Barcrest / Bwb","Kings & Queens (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4kingq__p,  m4kingq,    "ee_25btc.3_1", 0x0000, 0x010000, CRC(8f44347a) SHA1(09815a6e1d3a91cd2e69578bbcfef3203ddb33d6), "Barcrest / Bwb","Kings & Queens (Barcrest) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4kingq__r,  m4kingq,    "ee_25sbc.3_1", 0x0000, 0x010000, CRC(0f4bdd7c) SHA1(5c5cb3a9d6a96afc6e29149d2a8adf19aae0bc41), "Barcrest / Bwb","Kings & Queens (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4kingq__s,  m4kingq,    "eei20___.2_1", 0x0000, 0x010000, CRC(15f4b869) SHA1(5be6f660321cb47900dda986ef44eb5c1c324013), "Barcrest / Bwb","Kings & Queens (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4kingq__t,  m4kingq,    "knq2pprg.bin", 0x0000, 0x010000, CRC(23b22f79) SHA1(3d8b9cbffb9b427897548981ddacf724215336a4), "Barcrest / Bwb","Kings & Queens (Barcrest) (MPU4) (set 20)" )
+GAME_CUSTOM( 199?, m4kingq,     0,          "ee_05a_4.2_1", 0x0000, 0x010000, CRC(8dd842b6) SHA1(1c1bcaae355ceee4d7b1572b0fa1a8b23a8afdbf), "Bwb","Kings & Queens (Barcrest) (MPU4) (set 1)" )
+GAME_CUSTOM( 199?, m4kingq__a,  m4kingq,    "ee_05a__.2_1", 0x0000, 0x010000, CRC(36aa5fb9) SHA1(b4aaf647713e33e79be7927e5eeef240d3beedf7), "Bwb","Kings & Queens (Barcrest) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4kingq__b,  m4kingq,    "ee_20a__.2_1", 0x0000, 0x010000, CRC(2c61341f) SHA1(76d68ae2a44087414be8be12b3824c62311721dd), "Bwb","Kings & Queens (Barcrest) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4kingq__c,  m4kingq,    "ee_20a_c.1_1", 0x0000, 0x010000, CRC(948140ac) SHA1(d43f1f2903ecd809dee191087fa075c638728a5b), "Bwb","Kings & Queens (Barcrest) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4kingq__d,  m4kingq,    "ee_20b__.2_1", 0x0000, 0x010000, CRC(2fc7c7c2) SHA1(3b8736a582009d7b1455769374342ff72026d2fa), "Bwb","Kings & Queens (Barcrest) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4kingq__e,  m4kingq,    "ee_20b_c.1_1", 0x0000, 0x010000, CRC(70d399ab) SHA1(ca2c593151f4f852c7cb66859a12e832e53cd31f), "Bwb","Kings & Queens (Barcrest) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4kingq__f,  m4kingq,    "ee_20bd_.2_1", 0x0000, 0x010000, CRC(239de2dd) SHA1(c8021ba5bfdc10f59fec27c364035225093328d8), "Bwb","Kings & Queens (Barcrest) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4kingq__g,  m4kingq,    "ee_20bdc.1_1", 0x0000, 0x010000, CRC(cbb8c57b) SHA1(ea165199213f95128aec95ae40799faa8c457dd3), "Bwb","Kings & Queens (Barcrest) (MPU4) (set 8)" )
+GAME_CUSTOM( 199?, m4kingq__h,  m4kingq,    "ee_20bg_.2_1", 0x0000, 0x010000, CRC(ddc4d832) SHA1(031f987e9fced1df4acc57eb4b60911d52e1dbf6), "Bwb","Kings & Queens (Barcrest) (MPU4) (set 9)" )
+GAME_CUSTOM( 199?, m4kingq__i,  m4kingq,    "ee_20bt_.2_1", 0x0000, 0x010000, CRC(6f278771) SHA1(4459c9490be14bcbc139eebe6542325c80937ff3), "Bwb","Kings & Queens (Barcrest) (MPU4) (set 10)" )
+GAME_CUSTOM( 199?, m4kingq__j,  m4kingq,    "ee_20s_c.1_1", 0x0000, 0x010000, CRC(a0c1e313) SHA1(8a088a33e51a31ff0abdb554aa4d8ce61eaf4b7d), "Bwb","Kings & Queens (Barcrest) (MPU4) (set 11)" )
+GAME_CUSTOM( 199?, m4kingq__k,  m4kingq,    "ee_20sb_.2_1", 0x0000, 0x010000, CRC(307ad157) SHA1(32b6187e907bfbdb87a9ad2d9ca5870b09de5e4a), "Bwb","Kings & Queens (Barcrest) (MPU4) (set 12)" )
+GAME_CUSTOM( 199?, m4kingq__l,  m4kingq,    "ee_25a_c.3_1", 0x0000, 0x010000, CRC(4dc25083) SHA1(b754b4003f73bd74d1670a36a70985ce5e48794d), "Bwb","Kings & Queens (Barcrest) (MPU4) (set 13)" )
+GAME_CUSTOM( 199?, m4kingq__m,  m4kingq,    "ee_25b_c.3_1", 0x0000, 0x010000, CRC(a6fe50ff) SHA1(011602d9624f232ba8484e57f5f33ff06091809f), "Bwb","Kings & Queens (Barcrest) (MPU4) (set 14)" )
+GAME_CUSTOM( 199?, m4kingq__n,  m4kingq,    "ee_25bdc.3_1", 0x0000, 0x010000, CRC(d0088a97) SHA1(aacc1a86bd4b321d0ee21d14147e1d135b3a5bae), "Bwb","Kings & Queens (Barcrest) (MPU4) (set 15)" )
+GAME_CUSTOM( 199?, m4kingq__o,  m4kingq,    "ee_25bgc.3_1", 0x0000, 0x010000, CRC(e4dcd86b) SHA1(b8f8ec317bf9f18e3d0ae9a9fd59349fee24530d), "Bwb","Kings & Queens (Barcrest) (MPU4) (set 16)" )
+GAME_CUSTOM( 199?, m4kingq__p,  m4kingq,    "ee_25btc.3_1", 0x0000, 0x010000, CRC(8f44347a) SHA1(09815a6e1d3a91cd2e69578bbcfef3203ddb33d6), "Bwb","Kings & Queens (Barcrest) (MPU4) (set 17)" )
+GAME_CUSTOM( 199?, m4kingq__r,  m4kingq,    "ee_25sbc.3_1", 0x0000, 0x010000, CRC(0f4bdd7c) SHA1(5c5cb3a9d6a96afc6e29149d2a8adf19aae0bc41), "Bwb","Kings & Queens (Barcrest) (MPU4) (set 18)" )
+GAME_CUSTOM( 199?, m4kingq__s,  m4kingq,    "eei20___.2_1", 0x0000, 0x010000, CRC(15f4b869) SHA1(5be6f660321cb47900dda986ef44eb5c1c324013), "Bwb","Kings & Queens (Barcrest) (MPU4) (set 19)" )
+GAME_CUSTOM( 199?, m4kingq__t,  m4kingq,    "knq2pprg.bin", 0x0000, 0x010000, CRC(23b22f79) SHA1(3d8b9cbffb9b427897548981ddacf724215336a4), "Bwb","Kings & Queens (Barcrest) (MPU4) (set 20)" )
 
 #define M4KINGQC_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
@@ -4611,37 +4919,37 @@ GAME_CUSTOM( 199?, m4kingq__t,  m4kingq,    "knq2pprg.bin", 0x0000, 0x010000, CR
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4kingqc,       0,          "cn_20_b4.6_1", 0x0000, 0x010000, CRC(22d0b20c) SHA1(a7a4f60017cf62247339c9b23420d29845657895), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4kingqc__a,    m4kingqc,   "cn_20_bc.3_1", 0x0000, 0x010000, CRC(dfb0eb80) SHA1(ad973125681db0aae8ef1cf57b1c280e7f0e5803), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4kingqc__b,    m4kingqc,   "cn_20_dc.3_1", 0x0000, 0x010000, CRC(56e919ad) SHA1(c3c6f522574b287f7ed4dc4d1d8a32f68369dd5c), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4kingqc__c,    m4kingqc,   "cn_20a_c.2_1", 0x0000, 0x010000, CRC(0df15fd9) SHA1(e7c5e2277aac1c71d27710ea71d09d1005c5b8f9), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4kingqc__d,    m4kingqc,   "cn_20a_c.3_1", 0x0000, 0x010000, CRC(68e1dcef) SHA1(a0b15344b900226052633703e935c0ec0f718936), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4kingqc__e,    m4kingqc,   "cn_20a_c.5_1", 0x0000, 0x010000, CRC(4975d39e) SHA1(243b8af1a12c3538e826bfd5f6feb6927c1467b0), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4kingqc__f,    m4kingqc,   "cn_20b_c.2_1", 0x0000, 0x010000, CRC(66e074f3) SHA1(1f5381a41dd1402ee344e228635b35521e9377c8), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4kingqc__g,    m4kingqc,   "cn_20b_c.3_1", 0x0000, 0x010000, CRC(bcae86c9) SHA1(f03b136d82fe7b93350f0ca5dc36e78e98aecfa9), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4kingqc__h,    m4kingqc,   "cn_20b_c.5_1", 0x0000, 0x010000, CRC(6a19d734) SHA1(e0d5f5020e7997d3927b42336ab18757bd9f1ed0), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4kingqc__i,    m4kingqc,   "cn_20bg4.6_1", 0x0000, 0x010000, CRC(6d4158fe) SHA1(9c12264a415601d6f28f23c1e1f6a3d97fadddba), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4kingqc__j,    m4kingqc,   "cn_20bgc.3_1", 0x0000, 0x010000, CRC(3ecc1bf3) SHA1(fb191749f920aa4ac0d9809c6c59b695afdf6594), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4kingqc__k,    m4kingqc,   "cn_20bgc.5_1", 0x0000, 0x010000, CRC(24743f7e) SHA1(c90d95df2357bc00aba2bb21c0c77082b8c32463), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4kingqc__l,    m4kingqc,   "cn_20btc.2_1", 0x0000, 0x010000, CRC(b8f0ade0) SHA1(5b5344f799b27833f6456ae852eb5085afb3dbe5), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4kingqc__m,    m4kingqc,   "cn_20btc.3_1", 0x0000, 0x010000, CRC(b92f3787) SHA1(7efd815cf1a9a738ffae2c3ce19149f47d465c72), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4kingqc__n,    m4kingqc,   "cn_20btc.5_1", 0x0000, 0x010000, CRC(e2b8baf0) SHA1(23e966a6cc94c26903bfe943160a327529d7e21b), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4kingqc__q,    m4kingqc,   "cn_20sbc.5_1", 0x0000, 0x010000, CRC(8b49bf8c) SHA1(2c6835e343e7cdcc197c0105e13cc4f6ddd3f0d3), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4kingqc__r,    m4kingqc,   "cn_25_bc.2_1", 0x0000, 0x010000, CRC(3e2b2d7b) SHA1(9a68cf4902ca210e8fb52a35b4c507708c7f6d2a), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4kingqc__s,    m4kingqc,   "cn_25_dc.2_1", 0x0000, 0x010000, CRC(eb384ef6) SHA1(489c59d8e1e6296ec2b05fb0aa307c48f3486aa2), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4kingqc__t,    m4kingqc,   "cn_25_kc.2_1", 0x0000, 0x010000, CRC(bd11e742) SHA1(0c3b290e3010bc3f904f9087ee89efe63072b8c3), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4kingqc__u,    m4kingqc,   "cn_25a_c.2_1", 0x0000, 0x010000, CRC(1994efd5) SHA1(d7c3d692737138b30244d2d51eb535b88c87e401), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4kingqc__v,    m4kingqc,   "cn_25b_c.2_1", 0x0000, 0x010000, CRC(24255989) SHA1(017d0dc811b5c82d5b8785022169929c94f3f18a), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4kingqc__w,    m4kingqc,   "cn_25bdc.2_1", 0x0000, 0x010000, CRC(503ccd3c) SHA1(936b77b33373624e6bd80d168bcd48dc2ebcb2fe), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4kingqc__x,    m4kingqc,   "cn_25bgc.2a1", 0x0000, 0x010000, CRC(89e2130d) SHA1(22f97030e6f4cb94f62215a0c653d170ba3e0efd), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 23)" )
-GAME_CUSTOM( 199?, m4kingqc__y,    m4kingqc,   "cn_25btc.2_1", 0x0000, 0x010000, CRC(876bc126) SHA1(debe36a082493cdeba26a0808f205a19e9e897d5), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 24)" )
-GAME_CUSTOM( 199?, m4kingqc__z,    m4kingqc,   "cn_25s_c.1_1", 0x0000, 0x010000, CRC(84d1a32b) SHA1(f6e76a2bf1bd7b31eb360dea8b453d235c365e64), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 25)" )
-GAME_CUSTOM( 199?, m4kingqc__0,    m4kingqc,   "cn_25sbc.1_1", 0x0000, 0x010000, CRC(e53b672c) SHA1(2aea2a243817857df31b6f7b767e380bd003fafa), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 26)" )
-GAME_CUSTOM( 199?, m4kingqc__1,    m4kingqc,   "cn_30_dc.1_1", 0x0000, 0x010000, CRC(aeb21904) SHA1(32bd505e738b8826c6ab138f30831b7a53b700cf), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 27)" )
-GAME_CUSTOM( 199?, m4kingqc__2,    m4kingqc,   "cn_30a_c.1_1", 0x0000, 0x010000, CRC(be7aed91) SHA1(7dac1281bbc9da8924657b13ec4aa86aa6ff9de4), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 28)" )
-GAME_CUSTOM( 199?, m4kingqc__3,    m4kingqc,   "cn_30b_c.1_1", 0x0000, 0x010000, CRC(232c87ec) SHA1(2c2bf1c273ab88c0ab27a672d53cd6184a24a8d1), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 29)" )
-GAME_CUSTOM( 199?, m4kingqc__4,    m4kingqc,   "cn_30bgc.1_1", 0x0000, 0x010000, CRC(40afaa86) SHA1(edb8f55abf66e3e1cc7e353c520a93fc42073585), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 30)" )
-GAME_CUSTOM( 199?, m4kingqc__5,    m4kingqc,   "cn_30btc.1_1", 0x0000, 0x010000, CRC(1920cc67) SHA1(55a3ad78d68d635faff98390e2feeea29dd10664), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 31)" )
+GAME_CUSTOM( 199?, m4kingqc,       0,          "cn_20_b4.6_1", 0x0000, 0x010000, CRC(22d0b20c) SHA1(a7a4f60017cf62247339c9b23420d29845657895), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 1)" )
+GAME_CUSTOM( 199?, m4kingqc__a,    m4kingqc,   "cn_20_bc.3_1", 0x0000, 0x010000, CRC(dfb0eb80) SHA1(ad973125681db0aae8ef1cf57b1c280e7f0e5803), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4kingqc__b,    m4kingqc,   "cn_20_dc.3_1", 0x0000, 0x010000, CRC(56e919ad) SHA1(c3c6f522574b287f7ed4dc4d1d8a32f68369dd5c), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4kingqc__c,    m4kingqc,   "cn_20a_c.2_1", 0x0000, 0x010000, CRC(0df15fd9) SHA1(e7c5e2277aac1c71d27710ea71d09d1005c5b8f9), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4kingqc__d,    m4kingqc,   "cn_20a_c.3_1", 0x0000, 0x010000, CRC(68e1dcef) SHA1(a0b15344b900226052633703e935c0ec0f718936), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4kingqc__e,    m4kingqc,   "cn_20a_c.5_1", 0x0000, 0x010000, CRC(4975d39e) SHA1(243b8af1a12c3538e826bfd5f6feb6927c1467b0), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4kingqc__f,    m4kingqc,   "cn_20b_c.2_1", 0x0000, 0x010000, CRC(66e074f3) SHA1(1f5381a41dd1402ee344e228635b35521e9377c8), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4kingqc__g,    m4kingqc,   "cn_20b_c.3_1", 0x0000, 0x010000, CRC(bcae86c9) SHA1(f03b136d82fe7b93350f0ca5dc36e78e98aecfa9), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 8)" )
+GAME_CUSTOM( 199?, m4kingqc__h,    m4kingqc,   "cn_20b_c.5_1", 0x0000, 0x010000, CRC(6a19d734) SHA1(e0d5f5020e7997d3927b42336ab18757bd9f1ed0), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 9)" )
+GAME_CUSTOM( 199?, m4kingqc__i,    m4kingqc,   "cn_20bg4.6_1", 0x0000, 0x010000, CRC(6d4158fe) SHA1(9c12264a415601d6f28f23c1e1f6a3d97fadddba), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 10)" )
+GAME_CUSTOM( 199?, m4kingqc__j,    m4kingqc,   "cn_20bgc.3_1", 0x0000, 0x010000, CRC(3ecc1bf3) SHA1(fb191749f920aa4ac0d9809c6c59b695afdf6594), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 11)" )
+GAME_CUSTOM( 199?, m4kingqc__k,    m4kingqc,   "cn_20bgc.5_1", 0x0000, 0x010000, CRC(24743f7e) SHA1(c90d95df2357bc00aba2bb21c0c77082b8c32463), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 12)" )
+GAME_CUSTOM( 199?, m4kingqc__l,    m4kingqc,   "cn_20btc.2_1", 0x0000, 0x010000, CRC(b8f0ade0) SHA1(5b5344f799b27833f6456ae852eb5085afb3dbe5), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 13)" )
+GAME_CUSTOM( 199?, m4kingqc__m,    m4kingqc,   "cn_20btc.3_1", 0x0000, 0x010000, CRC(b92f3787) SHA1(7efd815cf1a9a738ffae2c3ce19149f47d465c72), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 14)" )
+GAME_CUSTOM( 199?, m4kingqc__n,    m4kingqc,   "cn_20btc.5_1", 0x0000, 0x010000, CRC(e2b8baf0) SHA1(23e966a6cc94c26903bfe943160a327529d7e21b), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 15)" )
+GAME_CUSTOM( 199?, m4kingqc__q,    m4kingqc,   "cn_20sbc.5_1", 0x0000, 0x010000, CRC(8b49bf8c) SHA1(2c6835e343e7cdcc197c0105e13cc4f6ddd3f0d3), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 16)" )
+GAME_CUSTOM( 199?, m4kingqc__r,    m4kingqc,   "cn_25_bc.2_1", 0x0000, 0x010000, CRC(3e2b2d7b) SHA1(9a68cf4902ca210e8fb52a35b4c507708c7f6d2a), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 17)" )
+GAME_CUSTOM( 199?, m4kingqc__s,    m4kingqc,   "cn_25_dc.2_1", 0x0000, 0x010000, CRC(eb384ef6) SHA1(489c59d8e1e6296ec2b05fb0aa307c48f3486aa2), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 18)" )
+GAME_CUSTOM( 199?, m4kingqc__t,    m4kingqc,   "cn_25_kc.2_1", 0x0000, 0x010000, CRC(bd11e742) SHA1(0c3b290e3010bc3f904f9087ee89efe63072b8c3), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 19)" )
+GAME_CUSTOM( 199?, m4kingqc__u,    m4kingqc,   "cn_25a_c.2_1", 0x0000, 0x010000, CRC(1994efd5) SHA1(d7c3d692737138b30244d2d51eb535b88c87e401), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 20)" )
+GAME_CUSTOM( 199?, m4kingqc__v,    m4kingqc,   "cn_25b_c.2_1", 0x0000, 0x010000, CRC(24255989) SHA1(017d0dc811b5c82d5b8785022169929c94f3f18a), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 21)" )
+GAME_CUSTOM( 199?, m4kingqc__w,    m4kingqc,   "cn_25bdc.2_1", 0x0000, 0x010000, CRC(503ccd3c) SHA1(936b77b33373624e6bd80d168bcd48dc2ebcb2fe), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 22)" )
+GAME_CUSTOM( 199?, m4kingqc__x,    m4kingqc,   "cn_25bgc.2a1", 0x0000, 0x010000, CRC(89e2130d) SHA1(22f97030e6f4cb94f62215a0c653d170ba3e0efd), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 23)" )
+GAME_CUSTOM( 199?, m4kingqc__y,    m4kingqc,   "cn_25btc.2_1", 0x0000, 0x010000, CRC(876bc126) SHA1(debe36a082493cdeba26a0808f205a19e9e897d5), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 24)" )
+GAME_CUSTOM( 199?, m4kingqc__z,    m4kingqc,   "cn_25s_c.1_1", 0x0000, 0x010000, CRC(84d1a32b) SHA1(f6e76a2bf1bd7b31eb360dea8b453d235c365e64), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 25)" )
+GAME_CUSTOM( 199?, m4kingqc__0,    m4kingqc,   "cn_25sbc.1_1", 0x0000, 0x010000, CRC(e53b672c) SHA1(2aea2a243817857df31b6f7b767e380bd003fafa), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 26)" )
+GAME_CUSTOM( 199?, m4kingqc__1,    m4kingqc,   "cn_30_dc.1_1", 0x0000, 0x010000, CRC(aeb21904) SHA1(32bd505e738b8826c6ab138f30831b7a53b700cf), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 27)" )
+GAME_CUSTOM( 199?, m4kingqc__2,    m4kingqc,   "cn_30a_c.1_1", 0x0000, 0x010000, CRC(be7aed91) SHA1(7dac1281bbc9da8924657b13ec4aa86aa6ff9de4), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 28)" )
+GAME_CUSTOM( 199?, m4kingqc__3,    m4kingqc,   "cn_30b_c.1_1", 0x0000, 0x010000, CRC(232c87ec) SHA1(2c2bf1c273ab88c0ab27a672d53cd6184a24a8d1), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 29)" )
+GAME_CUSTOM( 199?, m4kingqc__4,    m4kingqc,   "cn_30bgc.1_1", 0x0000, 0x010000, CRC(40afaa86) SHA1(edb8f55abf66e3e1cc7e353c520a93fc42073585), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 30)" )
+GAME_CUSTOM( 199?, m4kingqc__5,    m4kingqc,   "cn_30btc.1_1", 0x0000, 0x010000, CRC(1920cc67) SHA1(55a3ad78d68d635faff98390e2feeea29dd10664), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 31)" )
 
 #define M4TYPCL_EXTRA_ROMS \
 	ROM_REGION( 0x48, "fakechr", 0 ) \
@@ -4659,11 +4967,13 @@ GAME_CUSTOM( 199?, m4kingqc__5,    m4kingqc,   "cn_30btc.1_1", 0x0000, 0x010000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4typcl,     0,          "ctp12s.p1",    0x0000, 0x020000, CRC(5f0bbd2a) SHA1(ba1fa09ea7b4713a99b2033bdbbf6b15f973dcca), "Barcrest","Take Your Pick Club (Barcrest) (MPU4) (set 1)" )
+// "(C)1996 BARCREST" and "CTP 1.2"
+GAME_CUSTOM( 199?, m4typcl,     0,          "ctp12s.p1",    0x0000, 0x020000, CRC(5f0bbd2a) SHA1(ba1fa09ea7b4713a99b2033bdbbf6b15f973dcca), "Barcrest","Take Your Pick Club (Barcrest) (MPU4) (CTP 1.2)" )
 GAME_CUSTOM( 199?, m4typcl__a,  m4typcl,    "ctp13d.p1",    0x0000, 0x020000, CRC(a0f081b9) SHA1(794bba6ed86c3f332165c4b3224315256c939926), "Barcrest","Take Your Pick Club (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4typcl__b,  m4typcl,    "ctp13f.p1",    0x0000, 0x020000, CRC(dd7d94fd) SHA1(127ef8159facf647dff37109bcbb94311a8343f1), "Barcrest","Take Your Pick Club (Barcrest) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4typcl__c,  m4typcl,    "ctp13s.p1",    0x0000, 0x020000, CRC(f0a69f92) SHA1(cd34fb26ecbe6a6e8602a8549c5f331a525567df), "Barcrest","Take Your Pick Club (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4typcl__d,  m4typcl,    "ntp02.p1",     0x0000, 0x020000, CRC(6063e27d) SHA1(c99599fbc7146d8fcf62432994098dd51250b17b), "Barcrest","Take Your Pick Club (Barcrest) (MPU4) (set 5)" )
+// "(C)1996 BARCREST" and "NTP 0.2"
+GAME_CUSTOM( 199?, m4typcl__d,  m4typcl,    "ntp02.p1",     0x0000, 0x020000, CRC(6063e27d) SHA1(c99599fbc7146d8fcf62432994098dd51250b17b), "Barcrest","Take Your Pick Club (Barcrest) (MPU4) (NTP 0.2)" )
 
 
 #define M4ANDYBT_EXTRA_ROMS \
@@ -4681,10 +4991,12 @@ GAME_CUSTOM( 199?, m4typcl__d,  m4typcl,    "ntp02.p1",     0x0000, 0x020000, CR
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4andybt,       0,          "abt18d.p1",    0x0000, 0x020000, CRC(77874578) SHA1(455964614b67af14f5baa5883e1076e986de9e9c), "Barcrest","Andy's Big Time Club (Barcrest) (MPU4) (set 1)" )
+// "(C)1991 BARCREST" and "ABT 1.8"
+GAME_CUSTOM( 199?, m4andybt,       0,          "abt18s.p1",    0x0000, 0x020000, CRC(625263e4) SHA1(23fa0547164cc1f9b7c6cd26e06b0d779bf0329d), "Barcrest","Andy's Big Time Club (Barcrest) (MPU4) (ABT 1.8)" )
+GAME_CUSTOM( 199?, m4andybt__b,    m4andybt,   "abt18d.p1",    0x0000, 0x020000, CRC(77874578) SHA1(455964614b67af14f5baa5883e1076e986de9e9c), "Barcrest","Andy's Big Time Club (Barcrest) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4andybt__a,    m4andybt,   "abt18f.p1",    0x0000, 0x020000, CRC(cdd756af) SHA1(b1bb851ad2a2ba631e13509a476fe60cb8a24e69), "Barcrest","Andy's Big Time Club (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4andybt__b,    m4andybt,   "abt18s.p1",    0x0000, 0x020000, CRC(625263e4) SHA1(23fa0547164cc1f9b7c6cd26e06b0d779bf0329d), "Barcrest","Andy's Big Time Club (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4andybt__c,    m4andybt,   "abt1.5",       0x0000, 0x020000, CRC(05303209) SHA1(6a9eba19e7138ede122ec04c062556763b80f6c0), "Barcrest","Andy's Big Time Club (Barcrest) (MPU4) (set 4)" )
+// "(C)1991 BARCREST" and "ABT 1.5"
+GAME_CUSTOM( 199?, m4andybt__c,    m4andybt,   "abt1.5",       0x0000, 0x020000, CRC(05303209) SHA1(6a9eba19e7138ede122ec04c062556763b80f6c0), "Barcrest","Andy's Big Time Club (Barcrest) (MPU4) (ABT 1.5)" )
 
 
 #define M4THESTR_EXTRA_ROMS \
@@ -4700,32 +5012,32 @@ GAME_CUSTOM( 199?, m4andybt__c,    m4andybt,   "abt1.5",       0x0000, 0x020000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4thestr,       0,          "thestreakbin", 0x0000, 0x010000, CRC(cb79f9e5) SHA1(6cbdc5327e81b51f1060fd91efa3d061b9748b49), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4thestr__a,    m4thestr,   "ts_20_b4.3_1", 0x0000, 0x010000, CRC(17726c7c) SHA1(193b572b9f859f1018f1be398b35a5103622faf8), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4thestr__b,    m4thestr,   "ts_20_bc.3_1", 0x0000, 0x010000, CRC(b03b3f11) SHA1(9116ac608ab5574d5912550b988fc319d0a38444), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4thestr__c,    m4thestr,   "ts_20_d4.3_1", 0x0000, 0x010000, CRC(7bfae07a) SHA1(9414ad510ca9a183181a30d98858278c375c185d), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4thestr__d,    m4thestr,   "ts_20_dc.3_1", 0x0000, 0x010000, CRC(7196b317) SHA1(c124ed3d030b77870b7851b3da104f8fc5393a31), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4thestr__e,    m4thestr,   "ts_20a_4.3_1", 0x0000, 0x010000, CRC(921b8cc3) SHA1(74143888de21aba4374d016cb4c08ae59dfa59ef), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4thestr__f,    m4thestr,   "ts_20a_c.3_1", 0x0000, 0x010000, CRC(c8eb1dd9) SHA1(7b7520467cd32295e6324d350d1f2bed829555e0), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4thestr__g,    m4thestr,   "ts_20b_4.3_1", 0x0000, 0x010000, CRC(2221f704) SHA1(8459b658d3ad84bb86250518d0403970f881323d), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4thestr__h,    m4thestr,   "ts_20b_c.3_1", 0x0000, 0x010000, CRC(ecdf59a9) SHA1(7c2141e336ba3f1865bbf422aaa0b78cb1a27a4c), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4thestr__i,    m4thestr,   "ts_20bg4.3_1", 0x0000, 0x010000, CRC(b2a419ea) SHA1(bbc565ce8e79d39e1b1a7cd1685fa8c7ce00d7b9), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4thestr__j,    m4thestr,   "ts_20bgc.3_1", 0x0000, 0x010000, CRC(3b2d7b50) SHA1(a8560b0894783a398aaf0510493583b8cb826947), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4thestr__k,    m4thestr,   "ts_20bt4.3_1", 0x0000, 0x010000, CRC(d10a6c5a) SHA1(07fdf3797c87e35468ef859bb67753f11c5fbded), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4thestr__l,    m4thestr,   "ts_20btc.3_1", 0x0000, 0x010000, CRC(58830ee0) SHA1(b2798e0f8e03870c77892a32654263575e9aaafa), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4thestr__m,    m4thestr,   "ts_25_bc.3_1", 0x0000, 0x010000, CRC(43877de6) SHA1(b006ae97139c9bd66a32884b92fdbdf4f10db58a), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4thestr__n,    m4thestr,   "ts_25_dc.3_1", 0x0000, 0x010000, CRC(60ab675c) SHA1(763b66d7731489abdec84d2f8e3c186ad95c7349), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4thestr__o,    m4thestr,   "ts_25_kc.3_1", 0x0000, 0x010000, CRC(418cbb32) SHA1(e19a0c7fd88a82983ec33b99f3819a2a238c68a5), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4thestr__p,    m4thestr,   "ts_25a_c.3_1", 0x0000, 0x010000, CRC(448a705f) SHA1(35a7cc480c376eaef7439d5c96cec490aec9fc4b), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4thestr__q,    m4thestr,   "ts_25b_c.3_1", 0x0000, 0x010000, CRC(5b390ec2) SHA1(db7719ab8021e0b75e9419d2a05f3139fbab8e61), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4thestr__r,    m4thestr,   "ts_25bgc.3_1", 0x0000, 0x010000, CRC(612463fc) SHA1(085d8faf91c8ef6520ca971d249322f336464856), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4thestr__s,    m4thestr,   "ts_25btc.3_1", 0x0000, 0x010000, CRC(6d658e61) SHA1(619dbacad424e5db82c6ee19d1e3358c18cfe783), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4thestr__t,    m4thestr,   "ts_30a_c.1_1", 0x0000, 0x010000, CRC(8636e700) SHA1(f11c20da6c3bfe1842ea8f9eac8c831d49f42c32), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4thestr__u,    m4thestr,   "ts_30b_c.1_1", 0x0000, 0x010000, CRC(2577c8fc) SHA1(6d22bd1a93f423862f5466f99690eeced9090420), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4thestr__v,    m4thestr,   "ts_30bgc.1_1", 0x0000, 0x010000, CRC(2c582ba6) SHA1(dbcae0ef90105a7f6c720156711f73bb3c237b8a), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 23)" )
-GAME_CUSTOM( 199?, m4thestr__w,    m4thestr,   "ts_39_dc.1_1", 0x0000, 0x010000, CRC(84d338b8) SHA1(847e6b7808b6d5d361414a4aaa5d5cf6a5863a70), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 24)" )
-GAME_CUSTOM( 199?, m4thestr__x,    m4thestr,   "ts_39a_c.1_1", 0x0000, 0x010000, CRC(9ee56a3a) SHA1(365ec4c90abbe4b352bdd2d6aed5eec4cdaf35ff), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 25)" )
-GAME_CUSTOM( 199?, m4thestr__y,    m4thestr,   "ts_39b_c.1_1", 0x0000, 0x010000, CRC(470cd6d1) SHA1(c9c3c9c23c596e79f1b6495d4706b1da6cbd1b2e), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 26)" )
+GAME_CUSTOM( 199?, m4thestr,       0,          "thestreakbin", 0x0000, 0x010000, CRC(cb79f9e5) SHA1(6cbdc5327e81b51f1060fd91efa3d061b9748b49), "Bwb","The Streak (Barcrest) (MPU4) (set 1)" )
+GAME_CUSTOM( 199?, m4thestr__a,    m4thestr,   "ts_20_b4.3_1", 0x0000, 0x010000, CRC(17726c7c) SHA1(193b572b9f859f1018f1be398b35a5103622faf8), "Bwb","The Streak (Barcrest) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4thestr__b,    m4thestr,   "ts_20_bc.3_1", 0x0000, 0x010000, CRC(b03b3f11) SHA1(9116ac608ab5574d5912550b988fc319d0a38444), "Bwb","The Streak (Barcrest) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4thestr__c,    m4thestr,   "ts_20_d4.3_1", 0x0000, 0x010000, CRC(7bfae07a) SHA1(9414ad510ca9a183181a30d98858278c375c185d), "Bwb","The Streak (Barcrest) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4thestr__d,    m4thestr,   "ts_20_dc.3_1", 0x0000, 0x010000, CRC(7196b317) SHA1(c124ed3d030b77870b7851b3da104f8fc5393a31), "Bwb","The Streak (Barcrest) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4thestr__e,    m4thestr,   "ts_20a_4.3_1", 0x0000, 0x010000, CRC(921b8cc3) SHA1(74143888de21aba4374d016cb4c08ae59dfa59ef), "Bwb","The Streak (Barcrest) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4thestr__f,    m4thestr,   "ts_20a_c.3_1", 0x0000, 0x010000, CRC(c8eb1dd9) SHA1(7b7520467cd32295e6324d350d1f2bed829555e0), "Bwb","The Streak (Barcrest) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4thestr__g,    m4thestr,   "ts_20b_4.3_1", 0x0000, 0x010000, CRC(2221f704) SHA1(8459b658d3ad84bb86250518d0403970f881323d), "Bwb","The Streak (Barcrest) (MPU4) (set 8)" )
+GAME_CUSTOM( 199?, m4thestr__h,    m4thestr,   "ts_20b_c.3_1", 0x0000, 0x010000, CRC(ecdf59a9) SHA1(7c2141e336ba3f1865bbf422aaa0b78cb1a27a4c), "Bwb","The Streak (Barcrest) (MPU4) (set 9)" )
+GAME_CUSTOM( 199?, m4thestr__i,    m4thestr,   "ts_20bg4.3_1", 0x0000, 0x010000, CRC(b2a419ea) SHA1(bbc565ce8e79d39e1b1a7cd1685fa8c7ce00d7b9), "Bwb","The Streak (Barcrest) (MPU4) (set 10)" )
+GAME_CUSTOM( 199?, m4thestr__j,    m4thestr,   "ts_20bgc.3_1", 0x0000, 0x010000, CRC(3b2d7b50) SHA1(a8560b0894783a398aaf0510493583b8cb826947), "Bwb","The Streak (Barcrest) (MPU4) (set 11)" )
+GAME_CUSTOM( 199?, m4thestr__k,    m4thestr,   "ts_20bt4.3_1", 0x0000, 0x010000, CRC(d10a6c5a) SHA1(07fdf3797c87e35468ef859bb67753f11c5fbded), "Bwb","The Streak (Barcrest) (MPU4) (set 12)" )
+GAME_CUSTOM( 199?, m4thestr__l,    m4thestr,   "ts_20btc.3_1", 0x0000, 0x010000, CRC(58830ee0) SHA1(b2798e0f8e03870c77892a32654263575e9aaafa), "Bwb","The Streak (Barcrest) (MPU4) (set 13)" )
+GAME_CUSTOM( 199?, m4thestr__m,    m4thestr,   "ts_25_bc.3_1", 0x0000, 0x010000, CRC(43877de6) SHA1(b006ae97139c9bd66a32884b92fdbdf4f10db58a), "Bwb","The Streak (Barcrest) (MPU4) (set 14)" )
+GAME_CUSTOM( 199?, m4thestr__n,    m4thestr,   "ts_25_dc.3_1", 0x0000, 0x010000, CRC(60ab675c) SHA1(763b66d7731489abdec84d2f8e3c186ad95c7349), "Bwb","The Streak (Barcrest) (MPU4) (set 15)" )
+GAME_CUSTOM( 199?, m4thestr__o,    m4thestr,   "ts_25_kc.3_1", 0x0000, 0x010000, CRC(418cbb32) SHA1(e19a0c7fd88a82983ec33b99f3819a2a238c68a5), "Bwb","The Streak (Barcrest) (MPU4) (set 16)" )
+GAME_CUSTOM( 199?, m4thestr__p,    m4thestr,   "ts_25a_c.3_1", 0x0000, 0x010000, CRC(448a705f) SHA1(35a7cc480c376eaef7439d5c96cec490aec9fc4b), "Bwb","The Streak (Barcrest) (MPU4) (set 17)" )
+GAME_CUSTOM( 199?, m4thestr__q,    m4thestr,   "ts_25b_c.3_1", 0x0000, 0x010000, CRC(5b390ec2) SHA1(db7719ab8021e0b75e9419d2a05f3139fbab8e61), "Bwb","The Streak (Barcrest) (MPU4) (set 18)" )
+GAME_CUSTOM( 199?, m4thestr__r,    m4thestr,   "ts_25bgc.3_1", 0x0000, 0x010000, CRC(612463fc) SHA1(085d8faf91c8ef6520ca971d249322f336464856), "Bwb","The Streak (Barcrest) (MPU4) (set 19)" )
+GAME_CUSTOM( 199?, m4thestr__s,    m4thestr,   "ts_25btc.3_1", 0x0000, 0x010000, CRC(6d658e61) SHA1(619dbacad424e5db82c6ee19d1e3358c18cfe783), "Bwb","The Streak (Barcrest) (MPU4) (set 20)" )
+GAME_CUSTOM( 199?, m4thestr__t,    m4thestr,   "ts_30a_c.1_1", 0x0000, 0x010000, CRC(8636e700) SHA1(f11c20da6c3bfe1842ea8f9eac8c831d49f42c32), "Bwb","The Streak (Barcrest) (MPU4) (set 21)" )
+GAME_CUSTOM( 199?, m4thestr__u,    m4thestr,   "ts_30b_c.1_1", 0x0000, 0x010000, CRC(2577c8fc) SHA1(6d22bd1a93f423862f5466f99690eeced9090420), "Bwb","The Streak (Barcrest) (MPU4) (set 22)" )
+GAME_CUSTOM( 199?, m4thestr__v,    m4thestr,   "ts_30bgc.1_1", 0x0000, 0x010000, CRC(2c582ba6) SHA1(dbcae0ef90105a7f6c720156711f73bb3c237b8a), "Bwb","The Streak (Barcrest) (MPU4) (set 23)" )
+GAME_CUSTOM( 199?, m4thestr__w,    m4thestr,   "ts_39_dc.1_1", 0x0000, 0x010000, CRC(84d338b8) SHA1(847e6b7808b6d5d361414a4aaa5d5cf6a5863a70), "Bwb","The Streak (Barcrest) (MPU4) (set 24)" )
+GAME_CUSTOM( 199?, m4thestr__x,    m4thestr,   "ts_39a_c.1_1", 0x0000, 0x010000, CRC(9ee56a3a) SHA1(365ec4c90abbe4b352bdd2d6aed5eec4cdaf35ff), "Bwb","The Streak (Barcrest) (MPU4) (set 25)" )
+GAME_CUSTOM( 199?, m4thestr__y,    m4thestr,   "ts_39b_c.1_1", 0x0000, 0x010000, CRC(470cd6d1) SHA1(c9c3c9c23c596e79f1b6495d4706b1da6cbd1b2e), "Bwb","The Streak (Barcrest) (MPU4) (set 26)" )
 
 
 #define M4CPYCAT_EXTRA_ROMS \
@@ -4741,42 +5053,42 @@ GAME_CUSTOM( 199?, m4thestr__y,    m4thestr,   "ts_39b_c.1_1", 0x0000, 0x010000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4cpycat,       0,          "co_20_bc.1_1", 0x0000, 0x010000, CRC(c9d3cdc1) SHA1(28265b0f95a8829efc4e346269a7af17a6abe345), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4cpycat__a,    m4cpycat,   "co_20_dc.1_1", 0x0000, 0x010000, CRC(c6552f9a) SHA1(ae7ad183d2cd89bc9748dcbb3ea26832bed30009), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4cpycat__b,    m4cpycat,   "co_20_kc.1_1", 0x0000, 0x010000, CRC(b5260e35) SHA1(6cbf4ca426fd47b0db49e188a7a7fe72f6c99aef), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4cpycat__c,    m4cpycat,   "co_20a_c.1_1", 0x0000, 0x010000, CRC(486d42af) SHA1(327fca9604845ec37c2212413105f48a7b0e2836), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4cpycat__d,    m4cpycat,   "co_20b_c.1_1", 0x0000, 0x010000, CRC(90e0e19f) SHA1(c7e73faa4c3e853dbaa6b14303ab454a09eb36d7), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4cpycat__e,    m4cpycat,   "co_20bgc.1_1", 0x0000, 0x010000, CRC(f99d6ae2) SHA1(2106412caa7d3dfc262dc2b1d3e258bb33605912), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4cpycat__f,    m4cpycat,   "co_20bgp.4_1", 0x0000, 0x010000, CRC(fdc6753a) SHA1(4dd39fa995ee9fa7d153d64dd163d5482aa490d2), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4cpycat__g,    m4cpycat,   "co_20btc.1_1", 0x0000, 0x010000, CRC(3780d767) SHA1(4fb4354b02eed754ca1caef2b56eccc76524ae1e), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4cpycat__h,    m4cpycat,   "co_25_bc.1_1", 0x0000, 0x010000, CRC(13c82730) SHA1(992a6d04ed357548bb6cea6505316013048a2e57), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4cpycat__i,    m4cpycat,   "co_25_bp.2_1", 0x0000, 0x010000, CRC(a5983412) SHA1(7daa3028355fb0e85dce1629477a8efae625f86d), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4cpycat__j,    m4cpycat,   "co_25_bp.3_1", 0x0000, 0x010000, CRC(4060da30) SHA1(34a93e0550992e7510d1eaf2d5109da3c3fa2f75), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4cpycat__k,    m4cpycat,   "co_25_dc.1_1", 0x0000, 0x010000, CRC(a3f34f3f) SHA1(4c4842cc668b4c3abd9d2896cc50bbc3d9643b75), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4cpycat__l,    m4cpycat,   "co_25_dp.2_1", 0x0000, 0x010000, CRC(1f192638) SHA1(16a86242281281ca7b994dee06910d7f107c4743), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4cpycat__m,    m4cpycat,   "co_25_kc.1_1", 0x0000, 0x010000, CRC(6b2a7f2b) SHA1(5d558431a6b83214cc0dc33d999eeb72f3c53e85), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4cpycat__n,    m4cpycat,   "co_25_kp.2_1", 0x0000, 0x010000, CRC(73d3aaba) SHA1(5ef9118462bfdf93182ec539d3b80a72c09fa032), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4cpycat__o,    m4cpycat,   "co_25_kp.3_1", 0x0000, 0x010000, CRC(2e8fa3ee) SHA1(18f4e4eae7d7ac14486ed731bb67cab22d0b287d), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4cpycat__p,    m4cpycat,   "co_25a_c.1_1", 0x0000, 0x010000, CRC(e753196a) SHA1(79fc9b567dc946f81d40c3b215035cf2adcf94af), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4cpycat__q,    m4cpycat,   "co_25a_p.2_1", 0x0000, 0x010000, CRC(a058d7f7) SHA1(6e9116ce757503ef5b1822473a310513dd2973e3), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4cpycat__r,    m4cpycat,   "co_25a_p.3_1", 0x0000, 0x010000, CRC(ba172858) SHA1(d0a025c339f886802b7491448b6b2a4e1f5a3451), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4cpycat__s,    m4cpycat,   "co_25b_c.1_1", 0x0000, 0x010000, CRC(d82a9080) SHA1(9b9091f867f0b5d75f2bd5f9d62a4419073da357), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4cpycat__t,    m4cpycat,   "co_25b_p.2_1", 0x0000, 0x010000, CRC(48c8f7e6) SHA1(ff651e4c88b81bb816ab92e7f1d1fbd2c2920db1), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4cpycat__u,    m4cpycat,   "co_25bgc.1_1", 0x0000, 0x010000, CRC(947a5465) SHA1(c99c0e8ca515fbad8801e07e5936256cca8e7af1), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4cpycat__v,    m4cpycat,   "co_25bgp.2_1", 0x0000, 0x010000, CRC(84ab9c9d) SHA1(4c1043fb7ff6cd4e681f18e2dd0ddd29d5ce6d09), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 23)" )
-GAME_CUSTOM( 199?, m4cpycat__w,    m4cpycat,   "co_25bgp.3_1", 0x0000, 0x010000, CRC(7fa4089e) SHA1(f73aff58c7a627f993e65527bb551c23640b22ed), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 24)" )
-GAME_CUSTOM( 199?, m4cpycat__x,    m4cpycat,   "co_25btc.1_1", 0x0000, 0x010000, CRC(dbbae1b6) SHA1(2ee1d53872774d4b80f8c1a4e8a6ceb9e79ed6f5), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 25)" )
-GAME_CUSTOM( 199?, m4cpycat__y,    m4cpycat,   "co_25btp.2_1", 0x0000, 0x010000, CRC(cea10ed8) SHA1(2b10193824afb50d561b2307a3189d14e2f5d47a), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 26)" )
-GAME_CUSTOM( 199?, m4cpycat__z,    m4cpycat,   "co_30_bc.2_1", 0x0000, 0x010000, CRC(2d39f5fa) SHA1(20075621085765150a57233eccd61f16dbbae9b1), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 27)" )
-GAME_CUSTOM( 199?, m4cpycat__0,    m4cpycat,   "co_30_bp.4_1", 0x0000, 0x010000, CRC(0826ffa7) SHA1(05a12d68acf69d8a582fc7fee91a282280380420), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 28)" )
-GAME_CUSTOM( 199?, m4cpycat__1,    m4cpycat,   "co_30_dc.2_1", 0x0000, 0x010000, CRC(b028d639) SHA1(9393b82d41e7f8a7e2dba33545477ae13a8d6804), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 29)" )
-GAME_CUSTOM( 199?, m4cpycat__2,    m4cpycat,   "co_30_dp.4_1", 0x0000, 0x010000, CRC(f40f09ca) SHA1(11f7af5bf78768759c3eba50ab1a906e81ce1100), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 30)" )
-GAME_CUSTOM( 199?, m4cpycat__3,    m4cpycat,   "co_30_kp.4_1", 0x0000, 0x010000, CRC(97ab5c33) SHA1(dc6b9705de4731a5cbc35557ca26c80b20cc6518), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 31)" )
-GAME_CUSTOM( 199?, m4cpycat__4,    m4cpycat,   "co_30a_c.2_1", 0x0000, 0x010000, CRC(eea1522d) SHA1(fdfe797b8cf2fa10f24e89c3047290ac63acebc7), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 32)" )
-GAME_CUSTOM( 199?, m4cpycat__5,    m4cpycat,   "co_30b_c.2_1", 0x0000, 0x010000, CRC(61e873b0) SHA1(00037fde263fe9e9cb227ef2945e8b90feee0d6e), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 33)" )
-GAME_CUSTOM( 199?, m4cpycat__6,    m4cpycat,   "co_30bdc.2_1", 0x0000, 0x010000, CRC(6f261bdc) SHA1(df7ab51c984b20665fdb327d17ca6ec32109ec2d), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 34)" )
-GAME_CUSTOM( 199?, m4cpycat__7,    m4cpycat,   "co_30bgc.2_1", 0x0000, 0x010000, CRC(85cd1c27) SHA1(e0c250bf2848b6991cf33c07b43c2704ae906e47), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 35)" )
-GAME_CUSTOM( 199?, m4cpycat__8,    m4cpycat,   "co_30btc.2_1", 0x0000, 0x010000, CRC(3a940326) SHA1(f1a0eca5ceccbf979ac7a2c51bfdc1de6f0aa40e), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 36)" )
+GAME_CUSTOM( 199?, m4cpycat,       0,          "co_20_bc.1_1", 0x0000, 0x010000, CRC(c9d3cdc1) SHA1(28265b0f95a8829efc4e346269a7af17a6abe345), "Bwb","Copy Cat (Barcrest) (MPU4) (set 1)" )
+GAME_CUSTOM( 199?, m4cpycat__a,    m4cpycat,   "co_20_dc.1_1", 0x0000, 0x010000, CRC(c6552f9a) SHA1(ae7ad183d2cd89bc9748dcbb3ea26832bed30009), "Bwb","Copy Cat (Barcrest) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4cpycat__b,    m4cpycat,   "co_20_kc.1_1", 0x0000, 0x010000, CRC(b5260e35) SHA1(6cbf4ca426fd47b0db49e188a7a7fe72f6c99aef), "Bwb","Copy Cat (Barcrest) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4cpycat__c,    m4cpycat,   "co_20a_c.1_1", 0x0000, 0x010000, CRC(486d42af) SHA1(327fca9604845ec37c2212413105f48a7b0e2836), "Bwb","Copy Cat (Barcrest) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4cpycat__d,    m4cpycat,   "co_20b_c.1_1", 0x0000, 0x010000, CRC(90e0e19f) SHA1(c7e73faa4c3e853dbaa6b14303ab454a09eb36d7), "Bwb","Copy Cat (Barcrest) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4cpycat__e,    m4cpycat,   "co_20bgc.1_1", 0x0000, 0x010000, CRC(f99d6ae2) SHA1(2106412caa7d3dfc262dc2b1d3e258bb33605912), "Bwb","Copy Cat (Barcrest) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4cpycat__f,    m4cpycat,   "co_20bgp.4_1", 0x0000, 0x010000, CRC(fdc6753a) SHA1(4dd39fa995ee9fa7d153d64dd163d5482aa490d2), "Bwb","Copy Cat (Barcrest) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4cpycat__g,    m4cpycat,   "co_20btc.1_1", 0x0000, 0x010000, CRC(3780d767) SHA1(4fb4354b02eed754ca1caef2b56eccc76524ae1e), "Bwb","Copy Cat (Barcrest) (MPU4) (set 8)" )
+GAME_CUSTOM( 199?, m4cpycat__h,    m4cpycat,   "co_25_bc.1_1", 0x0000, 0x010000, CRC(13c82730) SHA1(992a6d04ed357548bb6cea6505316013048a2e57), "Bwb","Copy Cat (Barcrest) (MPU4) (set 9)" )
+GAME_CUSTOM( 199?, m4cpycat__i,    m4cpycat,   "co_25_bp.2_1", 0x0000, 0x010000, CRC(a5983412) SHA1(7daa3028355fb0e85dce1629477a8efae625f86d), "Bwb","Copy Cat (Barcrest) (MPU4) (set 10)" )
+GAME_CUSTOM( 199?, m4cpycat__j,    m4cpycat,   "co_25_bp.3_1", 0x0000, 0x010000, CRC(4060da30) SHA1(34a93e0550992e7510d1eaf2d5109da3c3fa2f75), "Bwb","Copy Cat (Barcrest) (MPU4) (set 11)" )
+GAME_CUSTOM( 199?, m4cpycat__k,    m4cpycat,   "co_25_dc.1_1", 0x0000, 0x010000, CRC(a3f34f3f) SHA1(4c4842cc668b4c3abd9d2896cc50bbc3d9643b75), "Bwb","Copy Cat (Barcrest) (MPU4) (set 12)" )
+GAME_CUSTOM( 199?, m4cpycat__l,    m4cpycat,   "co_25_dp.2_1", 0x0000, 0x010000, CRC(1f192638) SHA1(16a86242281281ca7b994dee06910d7f107c4743), "Bwb","Copy Cat (Barcrest) (MPU4) (set 13)" )
+GAME_CUSTOM( 199?, m4cpycat__m,    m4cpycat,   "co_25_kc.1_1", 0x0000, 0x010000, CRC(6b2a7f2b) SHA1(5d558431a6b83214cc0dc33d999eeb72f3c53e85), "Bwb","Copy Cat (Barcrest) (MPU4) (set 14)" )
+GAME_CUSTOM( 199?, m4cpycat__n,    m4cpycat,   "co_25_kp.2_1", 0x0000, 0x010000, CRC(73d3aaba) SHA1(5ef9118462bfdf93182ec539d3b80a72c09fa032), "Bwb","Copy Cat (Barcrest) (MPU4) (set 15)" )
+GAME_CUSTOM( 199?, m4cpycat__o,    m4cpycat,   "co_25_kp.3_1", 0x0000, 0x010000, CRC(2e8fa3ee) SHA1(18f4e4eae7d7ac14486ed731bb67cab22d0b287d), "Bwb","Copy Cat (Barcrest) (MPU4) (set 16)" )
+GAME_CUSTOM( 199?, m4cpycat__p,    m4cpycat,   "co_25a_c.1_1", 0x0000, 0x010000, CRC(e753196a) SHA1(79fc9b567dc946f81d40c3b215035cf2adcf94af), "Bwb","Copy Cat (Barcrest) (MPU4) (set 17)" )
+GAME_CUSTOM( 199?, m4cpycat__q,    m4cpycat,   "co_25a_p.2_1", 0x0000, 0x010000, CRC(a058d7f7) SHA1(6e9116ce757503ef5b1822473a310513dd2973e3), "Bwb","Copy Cat (Barcrest) (MPU4) (set 18)" )
+GAME_CUSTOM( 199?, m4cpycat__r,    m4cpycat,   "co_25a_p.3_1", 0x0000, 0x010000, CRC(ba172858) SHA1(d0a025c339f886802b7491448b6b2a4e1f5a3451), "Bwb","Copy Cat (Barcrest) (MPU4) (set 19)" )
+GAME_CUSTOM( 199?, m4cpycat__s,    m4cpycat,   "co_25b_c.1_1", 0x0000, 0x010000, CRC(d82a9080) SHA1(9b9091f867f0b5d75f2bd5f9d62a4419073da357), "Bwb","Copy Cat (Barcrest) (MPU4) (set 20)" )
+GAME_CUSTOM( 199?, m4cpycat__t,    m4cpycat,   "co_25b_p.2_1", 0x0000, 0x010000, CRC(48c8f7e6) SHA1(ff651e4c88b81bb816ab92e7f1d1fbd2c2920db1), "Bwb","Copy Cat (Barcrest) (MPU4) (set 21)" )
+GAME_CUSTOM( 199?, m4cpycat__u,    m4cpycat,   "co_25bgc.1_1", 0x0000, 0x010000, CRC(947a5465) SHA1(c99c0e8ca515fbad8801e07e5936256cca8e7af1), "Bwb","Copy Cat (Barcrest) (MPU4) (set 22)" )
+GAME_CUSTOM( 199?, m4cpycat__v,    m4cpycat,   "co_25bgp.2_1", 0x0000, 0x010000, CRC(84ab9c9d) SHA1(4c1043fb7ff6cd4e681f18e2dd0ddd29d5ce6d09), "Bwb","Copy Cat (Barcrest) (MPU4) (set 23)" )
+GAME_CUSTOM( 199?, m4cpycat__w,    m4cpycat,   "co_25bgp.3_1", 0x0000, 0x010000, CRC(7fa4089e) SHA1(f73aff58c7a627f993e65527bb551c23640b22ed), "Bwb","Copy Cat (Barcrest) (MPU4) (set 24)" )
+GAME_CUSTOM( 199?, m4cpycat__x,    m4cpycat,   "co_25btc.1_1", 0x0000, 0x010000, CRC(dbbae1b6) SHA1(2ee1d53872774d4b80f8c1a4e8a6ceb9e79ed6f5), "Bwb","Copy Cat (Barcrest) (MPU4) (set 25)" )
+GAME_CUSTOM( 199?, m4cpycat__y,    m4cpycat,   "co_25btp.2_1", 0x0000, 0x010000, CRC(cea10ed8) SHA1(2b10193824afb50d561b2307a3189d14e2f5d47a), "Bwb","Copy Cat (Barcrest) (MPU4) (set 26)" )
+GAME_CUSTOM( 199?, m4cpycat__z,    m4cpycat,   "co_30_bc.2_1", 0x0000, 0x010000, CRC(2d39f5fa) SHA1(20075621085765150a57233eccd61f16dbbae9b1), "Bwb","Copy Cat (Barcrest) (MPU4) (set 27)" )
+GAME_CUSTOM( 199?, m4cpycat__0,    m4cpycat,   "co_30_bp.4_1", 0x0000, 0x010000, CRC(0826ffa7) SHA1(05a12d68acf69d8a582fc7fee91a282280380420), "Bwb","Copy Cat (Barcrest) (MPU4) (set 28)" )
+GAME_CUSTOM( 199?, m4cpycat__1,    m4cpycat,   "co_30_dc.2_1", 0x0000, 0x010000, CRC(b028d639) SHA1(9393b82d41e7f8a7e2dba33545477ae13a8d6804), "Bwb","Copy Cat (Barcrest) (MPU4) (set 29)" )
+GAME_CUSTOM( 199?, m4cpycat__2,    m4cpycat,   "co_30_dp.4_1", 0x0000, 0x010000, CRC(f40f09ca) SHA1(11f7af5bf78768759c3eba50ab1a906e81ce1100), "Bwb","Copy Cat (Barcrest) (MPU4) (set 30)" )
+GAME_CUSTOM( 199?, m4cpycat__3,    m4cpycat,   "co_30_kp.4_1", 0x0000, 0x010000, CRC(97ab5c33) SHA1(dc6b9705de4731a5cbc35557ca26c80b20cc6518), "Bwb","Copy Cat (Barcrest) (MPU4) (set 31)" )
+GAME_CUSTOM( 199?, m4cpycat__4,    m4cpycat,   "co_30a_c.2_1", 0x0000, 0x010000, CRC(eea1522d) SHA1(fdfe797b8cf2fa10f24e89c3047290ac63acebc7), "Bwb","Copy Cat (Barcrest) (MPU4) (set 32)" )
+GAME_CUSTOM( 199?, m4cpycat__5,    m4cpycat,   "co_30b_c.2_1", 0x0000, 0x010000, CRC(61e873b0) SHA1(00037fde263fe9e9cb227ef2945e8b90feee0d6e), "Bwb","Copy Cat (Barcrest) (MPU4) (set 33)" )
+GAME_CUSTOM( 199?, m4cpycat__6,    m4cpycat,   "co_30bdc.2_1", 0x0000, 0x010000, CRC(6f261bdc) SHA1(df7ab51c984b20665fdb327d17ca6ec32109ec2d), "Bwb","Copy Cat (Barcrest) (MPU4) (set 34)" )
+GAME_CUSTOM( 199?, m4cpycat__7,    m4cpycat,   "co_30bgc.2_1", 0x0000, 0x010000, CRC(85cd1c27) SHA1(e0c250bf2848b6991cf33c07b43c2704ae906e47), "Bwb","Copy Cat (Barcrest) (MPU4) (set 35)" )
+GAME_CUSTOM( 199?, m4cpycat__8,    m4cpycat,   "co_30btc.2_1", 0x0000, 0x010000, CRC(3a940326) SHA1(f1a0eca5ceccbf979ac7a2c51bfdc1de6f0aa40e), "Bwb","Copy Cat (Barcrest) (MPU4) (set 36)" )
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -4786,10 +5098,11 @@ GAME_CUSTOM( 199?, m4cpycat__8,    m4cpycat,   "co_30btc.2_1", 0x0000, 0x010000,
 	ROM_END \
 	GAME(year, setname, parent ,mod2    ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4hypclb,       0,          "hpcd.p1",  0x0000, 0x010000, CRC(7fac8944) SHA1(32f0f16ef6c4b99fe70464341a1ce226f6221122), "Barcrest","Hyper Viper Club (Barcrest) (MPU4) (set 1)" )
+// "(C)1991 BARCREST" and "HPC 0.5"
+GAME_CUSTOM( 199?, m4hypclb,       0,          "hpcs.p1",  0x0000, 0x010000, CRC(55601e10) SHA1(78c3f13cd122e86ff8b7750b375c26e56c6b27c6), "Barcrest","Hyper Viper Club (Barcrest) (MPU4) (HPC 0.5)" )
+GAME_CUSTOM( 199?, m4hypclb__c,    m4hypclb,   "hpcd.p1",  0x0000, 0x010000, CRC(7fac8944) SHA1(32f0f16ef6c4b99fe70464341a1ce226f6221122), "Barcrest","Hyper Viper Club (Barcrest) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4hypclb__a,    m4hypclb,   "hpcf.p1",  0x0000, 0x010000, CRC(2931a558) SHA1(2f7fe541edc502738dd6603435deaef1cb26a1e2), "Barcrest","Hyper Viper Club (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4hypclb__b,    m4hypclb,   "hpcfd.p1", 0x0000, 0x010000, CRC(b127e577) SHA1(da034086bb92934f73d1a2be776f91462274479d), "Barcrest","Hyper Viper Club (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4hypclb__c,    m4hypclb,   "hpcs.p1",  0x0000, 0x010000, CRC(55601e10) SHA1(78c3f13cd122e86ff8b7750b375c26e56c6b27c6), "Barcrest","Hyper Viper Club (Barcrest) (MPU4) (set 4)" )
 
 
 #define M4BNKROL_EXTRA_ROMS \
@@ -4805,13 +5118,14 @@ GAME_CUSTOM( 199?, m4hypclb__c,    m4hypclb,   "hpcs.p1",  0x0000, 0x010000, CRC
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
-
-GAME_CUSTOM( 199?, m4bnkrol,       0,          "cbr05s.p1", 0x0000, 0x020000, CRC(a8b53a0d) SHA1(661ab61aa8f427b92fdee02539f19e5dd2243da7), "Barcrest","Bank Roller Club (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4bnkrol__a,    m4bnkrol,   "br301d.p1", 0x0000, 0x020000, CRC(b9334e2d) SHA1(263808eb5ea3f9987eb7579b43329cb27e109921), "Barcrest","Bank Roller Club (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4bnkrol__b,    m4bnkrol,   "br301f.p1", 0x0000, 0x020000, CRC(c4be5b69) SHA1(9b08d5c0c5aebeef9f0767f5bd456cc6b05ea317), "Barcrest","Bank Roller Club (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4bnkrol__c,    m4bnkrol,   "br301s.p1", 0x0000, 0x020000, CRC(1e117651) SHA1(c06d3f14e55be83c89c8132cf219d46acc42991c), "Barcrest","Bank Roller Club (Barcrest) (MPU4) (set 4)" )
+// "(C)1996 BARCREST" and "CBR 0.5"
+GAME_CUSTOM( 199?, m4bnkrol,       0,          "cbr05s.p1", 0x0000, 0x020000, CRC(a8b53a0d) SHA1(661ab61aa8f427b92fdee02539f19e5dd2243da7), "Barcrest","Bank Roller Club (Barcrest) (MPU4) (CBR 0.5)" )
 GAME_CUSTOM( 199?, m4bnkrol__d,    m4bnkrol,   "cbr05d.p1", 0x0000, 0x020000, CRC(44cefec0) SHA1(7034c5acd44ccd3cd985ba4945c004c070a599a4), "Barcrest","Bank Roller Club (Barcrest) (MPU4) (set 5)" )
 GAME_CUSTOM( 199?, m4bnkrol__e,    m4bnkrol,   "cbr05f.p1", 0x0000, 0x020000, CRC(3943eb84) SHA1(76a00db6a0c6655c3a7942550c788822bacd73e5), "Barcrest","Bank Roller Club (Barcrest) (MPU4) (set 6)" )
+// "(C)1996 BARCREST" and "BR3 0.1"
+GAME_CUSTOM( 199?, m4bnkrol__c,    m4bnkrol,   "br301s.p1", 0x0000, 0x020000, CRC(1e117651) SHA1(c06d3f14e55be83c89c8132cf219d46acc42991c), "Barcrest","Bank Roller Club (Barcrest) (MPU4) (BR3 0.1)" )
+GAME_CUSTOM( 199?, m4bnkrol__a,    m4bnkrol,   "br301d.p1", 0x0000, 0x020000, CRC(b9334e2d) SHA1(263808eb5ea3f9987eb7579b43329cb27e109921), "Barcrest","Bank Roller Club (Barcrest) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4bnkrol__b,    m4bnkrol,   "br301f.p1", 0x0000, 0x020000, CRC(c4be5b69) SHA1(9b08d5c0c5aebeef9f0767f5bd456cc6b05ea317), "Barcrest","Bank Roller Club (Barcrest) (MPU4) (set 3)" )
 
 
 #define M4TIC_EXTRA_ROMS \
@@ -4825,25 +5139,27 @@ GAME_CUSTOM( 199?, m4bnkrol__e,    m4bnkrol,   "cbr05f.p1", 0x0000, 0x020000, CR
 		M4TIC_EXTRA_ROMS \
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
-GAME_CUSTOM( 199?, m4tic,     0,      "tt_20a__.2_1", 0x0000, 0x010000, CRC(b923ac0d) SHA1(1237962af43c2c3f4ed0ad5bed21f24decfeae02), "Barcrest / Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4tic__a,  m4tic,  "tt_20a_c.1_1", 0x0000, 0x010000, CRC(18a68ea0) SHA1(37783121ff5540e264d89069101d991acb66b982), "Barcrest / Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4tic__b,  m4tic,  "tt_20b__.2_1", 0x0000, 0x010000, CRC(b5eb86ab) SHA1(99ddb80941c67bd271e22af17405457d32676484), "Barcrest / Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4tic__c,  m4tic,  "tt_20b_c.1_1", 0x0000, 0x010000, CRC(d35079ab) SHA1(d109af8ef6f4d26b505f63df10d5850ddc0c0b65), "Barcrest / Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4tic__d,  m4tic,  "tt_20bd_.2_1", 0x0000, 0x010000, CRC(0889a699) SHA1(c96d135b9248e9bab78af438b97e6cb854b2c771), "Barcrest / Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4tic__e,  m4tic,  "tt_20bdc.1_1", 0x0000, 0x010000, CRC(2a43efd4) SHA1(9f6e568ca95a5f4e1a4e82eda2d15dfa225e65ea), "Barcrest / Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4tic__f,  m4tic,  "tt_20bg_.2_1", 0x0000, 0x010000, CRC(128896c1) SHA1(af37645b88116cde57fcc42ed58d69bf9c11ff8a), "Barcrest / Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4tic__g,  m4tic,  "tt_20bt_.2_1", 0x0000, 0x010000, CRC(362046f9) SHA1(6cb5a986517158d63e7403891bb749eaccb63acb), "Barcrest / Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4tic__h,  m4tic,  "tt_20s__.2_1", 0x0000, 0x010000, CRC(53dfefe9) SHA1(0f9fc1d65ebd7e370de6001f594616b79b2aa57e), "Barcrest / Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4tic__i,  m4tic,  "tt_20s_c.1_1", 0x0000, 0x010000, CRC(65a38960) SHA1(48ffdda1c5c98742124418429c510de9f5b90270), "Barcrest / Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4tic__j,  m4tic,  "tt_20sb_.2_1", 0x0000, 0x010000, CRC(c9174384) SHA1(f694a6a7f78b8a062fd26371fa6758ec4252352a), "Barcrest / Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4tic__k,  m4tic,  "tt_20sk_.2_1", 0x0000, 0x010000, CRC(dca42636) SHA1(c6e9aaf402c2fc7eec6e9b07aa4c33312bc0af0e), "Barcrest / Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4tic__l,  m4tic,  "tt_25a_c.3_1", 0x0000, 0x010000, CRC(2e44c6db) SHA1(ffc96dafbcfae719c3971882e066971540fafe78), "Barcrest / Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4tic__m,  m4tic,  "tt_25b_c.3_1", 0x0000, 0x010000, CRC(d393edf0) SHA1(66f17a88018fee71f3e0c7996371c9b6832ef23a), "Barcrest / Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4tic__n,  m4tic,  "tt_25bdc.3_1", 0x0000, 0x010000, CRC(2ce71772) SHA1(a2f36d0d11826a7be7f8cc04f21a77facb4ce188), "Barcrest / Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4tic__o,  m4tic,  "tt_25bgc.3_1", 0x0000, 0x010000, CRC(2dbeb9c3) SHA1(8288a9d17932582c7536563e34e2150a85c7a822), "Barcrest / Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4tic__p,  m4tic,  "tt_25btc.3_1", 0x0000, 0x010000, CRC(d5702abf) SHA1(6115f39d70dfdf1a00bcfc5f0fe257dd1e0ff968), "Barcrest / Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4tic__r,  m4tic,  "tt_25sbc.3_1", 0x0000, 0x010000, CRC(11c0152f) SHA1(d46b0a6774da35cf9d3a352b9fe7cb574880b210), "Barcrest / Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4tic__s,  m4tic,  "tti20___.2_1", 0x0000, 0x010000, CRC(91054bf6) SHA1(68cc6c9b47849149a574e3af97bd0e8255fc5c43), "Barcrest / Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 19)" )
+
+
+GAME_CUSTOM( 199?, m4tic,     0,      "tt_20a__.2_1", 0x0000, 0x010000, CRC(b923ac0d) SHA1(1237962af43c2c3f4ed0ad5bed21f24decfeae02), "Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 1)" )
+GAME_CUSTOM( 199?, m4tic__a,  m4tic,  "tt_20a_c.1_1", 0x0000, 0x010000, CRC(18a68ea0) SHA1(37783121ff5540e264d89069101d991acb66b982), "Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4tic__b,  m4tic,  "tt_20b__.2_1", 0x0000, 0x010000, CRC(b5eb86ab) SHA1(99ddb80941c67bd271e22af17405457d32676484), "Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4tic__c,  m4tic,  "tt_20b_c.1_1", 0x0000, 0x010000, CRC(d35079ab) SHA1(d109af8ef6f4d26b505f63df10d5850ddc0c0b65), "Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4tic__d,  m4tic,  "tt_20bd_.2_1", 0x0000, 0x010000, CRC(0889a699) SHA1(c96d135b9248e9bab78af438b97e6cb854b2c771), "Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4tic__e,  m4tic,  "tt_20bdc.1_1", 0x0000, 0x010000, CRC(2a43efd4) SHA1(9f6e568ca95a5f4e1a4e82eda2d15dfa225e65ea), "Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4tic__f,  m4tic,  "tt_20bg_.2_1", 0x0000, 0x010000, CRC(128896c1) SHA1(af37645b88116cde57fcc42ed58d69bf9c11ff8a), "Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4tic__g,  m4tic,  "tt_20bt_.2_1", 0x0000, 0x010000, CRC(362046f9) SHA1(6cb5a986517158d63e7403891bb749eaccb63acb), "Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 8)" )
+GAME_CUSTOM( 199?, m4tic__h,  m4tic,  "tt_20s__.2_1", 0x0000, 0x010000, CRC(53dfefe9) SHA1(0f9fc1d65ebd7e370de6001f594616b79b2aa57e), "Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 9)" )
+GAME_CUSTOM( 199?, m4tic__i,  m4tic,  "tt_20s_c.1_1", 0x0000, 0x010000, CRC(65a38960) SHA1(48ffdda1c5c98742124418429c510de9f5b90270), "Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 10)" )
+GAME_CUSTOM( 199?, m4tic__j,  m4tic,  "tt_20sb_.2_1", 0x0000, 0x010000, CRC(c9174384) SHA1(f694a6a7f78b8a062fd26371fa6758ec4252352a), "Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 11)" )
+GAME_CUSTOM( 199?, m4tic__k,  m4tic,  "tt_20sk_.2_1", 0x0000, 0x010000, CRC(dca42636) SHA1(c6e9aaf402c2fc7eec6e9b07aa4c33312bc0af0e), "Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 12)" )
+GAME_CUSTOM( 199?, m4tic__l,  m4tic,  "tt_25a_c.3_1", 0x0000, 0x010000, CRC(2e44c6db) SHA1(ffc96dafbcfae719c3971882e066971540fafe78), "Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 13)" )
+GAME_CUSTOM( 199?, m4tic__m,  m4tic,  "tt_25b_c.3_1", 0x0000, 0x010000, CRC(d393edf0) SHA1(66f17a88018fee71f3e0c7996371c9b6832ef23a), "Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 14)" )
+GAME_CUSTOM( 199?, m4tic__n,  m4tic,  "tt_25bdc.3_1", 0x0000, 0x010000, CRC(2ce71772) SHA1(a2f36d0d11826a7be7f8cc04f21a77facb4ce188), "Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 15)" )
+GAME_CUSTOM( 199?, m4tic__o,  m4tic,  "tt_25bgc.3_1", 0x0000, 0x010000, CRC(2dbeb9c3) SHA1(8288a9d17932582c7536563e34e2150a85c7a822), "Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 16)" )
+GAME_CUSTOM( 199?, m4tic__p,  m4tic,  "tt_25btc.3_1", 0x0000, 0x010000, CRC(d5702abf) SHA1(6115f39d70dfdf1a00bcfc5f0fe257dd1e0ff968), "Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 17)" )
+GAME_CUSTOM( 199?, m4tic__r,  m4tic,  "tt_25sbc.3_1", 0x0000, 0x010000, CRC(11c0152f) SHA1(d46b0a6774da35cf9d3a352b9fe7cb574880b210), "Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 18)" )
+GAME_CUSTOM( 199?, m4tic__s,  m4tic,  "tti20___.2_1", 0x0000, 0x010000, CRC(91054bf6) SHA1(68cc6c9b47849149a574e3af97bd0e8255fc5c43), "Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 19)" )
 
 #define M4RHRCL_EXTRA_ROMS \
 	ROM_REGION( 0x48, "fakechr", 0 ) \
@@ -4860,10 +5176,12 @@ GAME_CUSTOM( 199?, m4tic__s,  m4tic,  "tti20___.2_1", 0x0000, 0x010000, CRC(9105
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4rhrcl,     0,          "rhrc.hex", 0x0000, 0x010000, CRC(e4b89d53) SHA1(fc222d56cdba2891048726d6e6ecd8a4028ba8ba), "Barcrest","Red Hot Roll Club (Barcrest) (MPU4) (set 1)" )
+// "(C)1991 BARCREST" and "RH2 1.1"
+GAME_CUSTOM( 199?, m4rhrcl,     0,          "rh2s.p1",  0x0000, 0x010000, CRC(aa15e8a8) SHA1(243e7562a4cf938527afebbd99581acea1ab4134), "Barcrest","Red Hot Roll Club (Barcrest) (MPU4) (RH2 1.1)" )
 GAME_CUSTOM( 199?, m4rhrcl__a,  m4rhrcl,    "rh2d.p1",  0x0000, 0x010000, CRC(b55a01c3) SHA1(8c94c2ca509ac7631528df78e82fb39b5f579c45), "Barcrest","Red Hot Roll Club (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4rhrcl__b,  m4rhrcl,    "rh2f.p1",  0x0000, 0x010000, CRC(83466c89) SHA1(790d626e361bfec1265edc6f6ce51f098eb774ba), "Barcrest","Red Hot Roll Club (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4rhrcl__c,  m4rhrcl,    "rh2s.p1",  0x0000, 0x010000, CRC(aa15e8a8) SHA1(243e7562a4cf938527afebbd99581acea1ab4134), "Barcrest","Red Hot Roll Club (Barcrest) (MPU4) (set 4)" )
+// "(C)1991 BARCREST" and "RH2 1.0"
+GAME_CUSTOM( 199?, m4rhrcl__c,  m4rhrcl,    "rhrc.hex", 0x0000, 0x010000, CRC(e4b89d53) SHA1(fc222d56cdba2891048726d6e6ecd8a4028ba8ba), "Barcrest","Red Hot Roll Club (Barcrest) (MPU4) (RH2 1.0)" )
 
 #define M4RHOGC_EXTRA_ROMS \
 	ROM_REGION( 0x48, "fakechr", 0 ) \
@@ -4880,9 +5198,9 @@ GAME_CUSTOM( 199?, m4rhrcl__c,  m4rhrcl,    "rh2s.p1",  0x0000, 0x010000, CRC(aa
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-
-GAME_CUSTOM( 199?, m4rhogc,     0,          "rhcf.p1", 0x0000, 0x010000, CRC(0b726e87) SHA1(12c334e7dd712b9e19e8241b1a8e278ff84110d4), "Barcrest","Road Hog Club (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4rhogc__a,  m4rhogc,    "rhcs.p1", 0x0000, 0x010000, CRC(d1541050) SHA1(ef1ee3b9319e2a357540cf0de902de439267c3e2), "Barcrest","Road Hog Club (Barcrest) (MPU4) (set 2)" )
+// "(C)1991 BARCREST" and "RHC 0.5"
+GAME_CUSTOM( 199?, m4rhogc,     0,          "rhcs.p1", 0x0000, 0x010000, CRC(d1541050) SHA1(ef1ee3b9319e2a357540cf0de902de439267c3e2), "Barcrest","Road Hog Club (Barcrest) (MPU4) (RHC 0.5)" )
+GAME_CUSTOM( 199?, m4rhogc__a,  m4rhogc,    "rhcf.p1", 0x0000, 0x010000, CRC(0b726e87) SHA1(12c334e7dd712b9e19e8241b1a8e278ff84110d4), "Barcrest","Road Hog Club (Barcrest) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4rhogc__b,  m4rhogc,    "rhcd.p1", 0x0000, 0x010000, CRC(7a7df536) SHA1(9c53e5c6a5f3a32de05a574e1c8dedc3e5be66eb), "Barcrest","Road Hog Club (Barcrest) (MPU4) (set 3)" )
 
 #define M4GB006_EXTRA_ROMS \
@@ -4901,11 +5219,11 @@ GAME_CUSTOM( 199?, m4rhogc__b,  m4rhogc,    "rhcd.p1", 0x0000, 0x010000, CRC(7a7
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 
-
-GAME_CUSTOM( 199?, m4gb006,     0,          "006s.p1",      0x0000, 0x010000, CRC(6e750ab9) SHA1(2e1f08df7991efe450633e0bcec201e6fa7fdbaa), "Barcrest","Games Bond 006 (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4gb006__a,  m4gb006,    "006d.p1",      0x0000, 0x010000, CRC(7e0a4282) SHA1(8fd0cbdd9cf3ac74b7b202ce7615392c1a746906), "Barcrest","Games Bond 006 (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4gb006__b,  m4gb006,    "006y.p1",      0x0000, 0x010000, CRC(2947f4ed) SHA1(7d212bcef36e2bd792ded3e1e1638218e76da119), "Barcrest","Games Bond 006 (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4gb006__c,  m4gb006,    "bond20_11",    0x0000, 0x010000, CRC(8d810cb1) SHA1(065d8df33472a3476dd6cf21a684db9d7c8ba829), "Barcrest","Games Bond 006 (Barcrest) (MPU4) (set 4)" )
+// "(C)1993 BARCREST" and "006 0.6"
+GAME_CUSTOM( 199?, m4gb006,     0,          "006s.p1",      0x0000, 0x010000, CRC(6e750ab9) SHA1(2e1f08df7991efe450633e0bcec201e6fa7fdbaa), "Barcrest","Games Bond 006 (Barcrest) (MPU4) (006 0.6)" )
+GAME_CUSTOM( 199?, m4gb006__a,  m4gb006,    "006d.p1",      0x0000, 0x010000, CRC(7e0a4282) SHA1(8fd0cbdd9cf3ac74b7b202ce7615392c1a746906), "Barcrest","Games Bond 006 (Barcrest) (MPU4) (006 0.6D)" )
+GAME_CUSTOM( 199?, m4gb006__b,  m4gb006,    "006y.p1",      0x0000, 0x010000, CRC(2947f4ed) SHA1(7d212bcef36e2bd792ded3e1e1638218e76da119), "Barcrest","Games Bond 006 (Barcrest) (MPU4) (006 0.6Y)" )
+GAME_CUSTOM( 199?, m4gb006__c,  m4gb006,    "bond20_11",    0x0000, 0x010000, CRC(8d810cb1) SHA1(065d8df33472a3476dd6cf21a684db9d7c8ba829), "Barcrest","Games Bond 006 (Barcrest) (MPU4) (006 0.6C)" )
 
 
 #define M4GBUST_EXTRA_ROMS \
@@ -4920,32 +5238,38 @@ GAME_CUSTOM( 199?, m4gb006__c,  m4gb006,    "bond20_11",    0x0000, 0x010000, CR
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
+// some of these ROMs (the non-D ones?) contain a 'Barcrest Video' string, and the game seems to do nothing, could require other (undumped?) parts as there really aren't many strings in here
 
-
-GAME_CUSTOM( 199?, m4gbust,     0,          "gb_02___.2n3",         0x0000, 0x010000, CRC(973b3538) SHA1(31df04d9f35cbde4d5e395256927f146d1613178), "Bwb / Barcrest","Ghost Buster (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4gbust__a,  m4gbust,    "gb_02___.3a3",         0x0000, 0x010000, CRC(2b9d94b6) SHA1(ca433240f9e926cdf5240209589951e6018a496a), "Bwb / Barcrest","Ghost Buster (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4gbust__b,  m4gbust,    "gb_02___.3n3",         0x0000, 0x010000, CRC(99514ddd) SHA1(432d484525867c6ad68cd93a4bfded4dba36cf56), "Bwb / Barcrest","Ghost Buster (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4gbust__c,  m4gbust,    "gb_02___.3s3",         0x0000, 0x010000, CRC(2634aa5f) SHA1(58ab973940138bdfd2690867e2ac3eb52bffb633), "Bwb / Barcrest","Ghost Buster (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4gbust__d,  m4gbust,    "gb_05___.4a3",         0x0000, 0x010000, CRC(8be6949e) SHA1(9731a1cb0d17c3cec2bec263cd6348f05662d917), "Bwb / Barcrest","Ghost Buster (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4gbust__e,  m4gbust,    "gb_05___.4n3",         0x0000, 0x010000, CRC(621b25f0) SHA1(bf699068284def8bad9143c5841f667f2cb6f20f), "Bwb / Barcrest","Ghost Buster (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4gbust__f,  m4gbust,    "gb_05___.4s3",         0x0000, 0x010000, CRC(e2227701) SHA1(271682c7bf6e0f6f49f6d6b138aa19b6ef6bc626), "Bwb / Barcrest","Ghost Buster (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4gbust__g,  m4gbust,    "gb_05_d_.4a3",         0x0000, 0x010000, CRC(a1b2b32f) SHA1(c1504b3768920f90dbd441b9d50db9676528ca97), "Bwb / Barcrest","Ghost Buster (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4gbust__h,  m4gbust,    "gb_10___.2a3",         0x0000, 0x010000, CRC(a5c692f3) SHA1(8305c88ab8b80b407f4723df25135c25a4c0794f), "Bwb / Barcrest","Ghost Buster (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4gbust__i,  m4gbust,    "gb_10___.2n3",         0x0000, 0x010000, CRC(de18c441) SHA1(5a7055fcd755c1ac58e1b94af243801f169f29f5), "Bwb / Barcrest","Ghost Buster (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4gbust__j,  m4gbust,    "gb_10___.3s3",         0x0000, 0x010000, CRC(427e043b) SHA1(2f64c11a04306692ac5eb9919892f7226156dce0), "Bwb / Barcrest","Ghost Buster (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4gbust__k,  m4gbust,    "gb_10_b_.3s3",         0x0000, 0x010000, CRC(091afb66) SHA1(ac32d7be1e1f4f1453e37017966990a481506024), "Bwb / Barcrest","Ghost Buster (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4gbust__l,  m4gbust,    "gb_10_d_.2a3",         0x0000, 0x010000, CRC(f1446bf5) SHA1(4011d60e13045476741c5a02c64dabbe6a1ae2d6), "Bwb / Barcrest","Ghost Buster (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4gbust__m,  m4gbust,    "gb_10_d_.2n3",         0x0000, 0x010000, CRC(cac5057d) SHA1(afcc21dbd07515ed134675b7dbfb53c048a465b0), "Bwb / Barcrest","Ghost Buster (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4gbust__n,  m4gbust,    "gb_10_d_.3s3",         0x0000, 0x010000, CRC(776736de) SHA1(4f80d9ffdf4468801cf830e9774b6028f7684864), "Bwb / Barcrest","Ghost Buster (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4gbust__o,  m4gbust,    "gb_20___.2n3",         0x0000, 0x010000, CRC(27fc2ee1) SHA1(2e6a042f7117b4594b2601ae166ee0db72c70ed5), "Bwb / Barcrest","Ghost Buster (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4gbust__p,  m4gbust,    "gb_20___.3s3",         0x0000, 0x010000, CRC(4a86d879) SHA1(72e92b6482fdeb4dca36d9426a712ac24d60f7f7), "Bwb / Barcrest","Ghost Buster (Barcrest) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4gbust__q,  m4gbust,    "gb_20_b_.2a3",         0x0000, 0x010000, CRC(4dd7d38f) SHA1(8a71c27189ec3089c016a8292db68f7cdc91b083), "Bwb / Barcrest","Ghost Buster (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4gbust__r,  m4gbust,    "gb_20_b_.2n3",         0x0000, 0x010000, CRC(28cbb217) SHA1(a74978ff5e1511a33f543006b3f8ad30a77ea462), "Bwb / Barcrest","Ghost Buster (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4gbust__s,  m4gbust,    "gb_20_b_.3s3",         0x0000, 0x010000, CRC(1a7cc3cf) SHA1(0d5764d35489bde284965c197b217a06f26a3e3b), "Bwb / Barcrest","Ghost Buster (Barcrest) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4gbust__t,  m4gbust,    "gb_20_d_.2a3",         0x0000, 0x010000, CRC(70f40688) SHA1(ed14f8f460825ffa087394ef5984ae064e02f7b6), "Bwb / Barcrest","Ghost Buster (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4gbust__u,  m4gbust,    "gb_20_d_.2n3",         0x0000, 0x010000, CRC(431c2965) SHA1(eb24e560d5c4bf419465fc760621a4fa853fff95), "Bwb / Barcrest","Ghost Buster (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4gbust__v,  m4gbust,    "gb_20_d_.3s3",         0x0000, 0x010000, CRC(4fc69155) SHA1(09a0f2122893d9fd90204a74c8862e01386503a4), "Bwb / Barcrest","Ghost Buster (Barcrest) (MPU4) (set 23)" )
-GAME_CUSTOM( 199?, m4gbust__w,  m4gbust,    "ghostbusters 2p.bin",  0x0000, 0x010000, CRC(abb288c4) SHA1(2012e027711996a552ab59674ae3bce1bf14f44b), "Bwb / Barcrest","Ghost Buster (Barcrest) (MPU4) (set 24)" )
+// "(C)1994  B.W.B." and "GB  5.0"
+GAME_CUSTOM( 199?, m4gbust,     0,          "gb_05___.4s3",         0x0000, 0x010000, CRC(e2227701) SHA1(271682c7bf6e0f6f49f6d6b138aa19b6ef6bc626), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 5.0)" )
+// "(C)1994  B.W.B." and "GB  4.0"
+GAME_CUSTOM( 199?, m4gbust__d,  m4gbust,    "gb_05___.4a3",         0x0000, 0x010000, CRC(8be6949e) SHA1(9731a1cb0d17c3cec2bec263cd6348f05662d917), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 4.0, set 1)" )
+GAME_CUSTOM( 199?, m4gbust__e,  m4gbust,    "gb_05___.4n3",         0x0000, 0x010000, CRC(621b25f0) SHA1(bf699068284def8bad9143c5841f667f2cb6f20f), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 4.0, set 2)" )
+GAME_CUSTOM( 199?, m4gbust__g,  m4gbust,    "gb_05_d_.4a3",         0x0000, 0x010000, CRC(a1b2b32f) SHA1(c1504b3768920f90dbd441b9d50db9676528ca97), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 4.0D)" )
+// "(C)1994  B.W.B." and "GB  3.0"
+GAME_CUSTOM( 199?, m4gbust__b,  m4gbust,    "gb_02___.3n3",         0x0000, 0x010000, CRC(99514ddd) SHA1(432d484525867c6ad68cd93a4bfded4dba36cf56), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 3.0, 1994, set 1)" )
+GAME_CUSTOM( 199?, m4gbust__a,  m4gbust,    "gb_02___.3a3",         0x0000, 0x010000, CRC(2b9d94b6) SHA1(ca433240f9e926cdf5240209589951e6018a496a), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 3.0, 1994, set 2)" )
+// "(C)1994  B.W.B." and "GB  2.0"
+GAME_CUSTOM( 199?, m4gbust__c,  m4gbust,    "gb_02___.3s3",         0x0000, 0x010000, CRC(2634aa5f) SHA1(58ab973940138bdfd2690867e2ac3eb52bffb633), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 2.0, 1994)" )
+// "(C)1993  B.W.B." and "GB  3.0"
+GAME_CUSTOM( 199?, m4gbust__j,  m4gbust,    "gb_10___.3s3",         0x0000, 0x010000, CRC(427e043b) SHA1(2f64c11a04306692ac5eb9919892f7226156dce0), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 3.0, set 1)" )
+GAME_CUSTOM( 199?, m4gbust__p,  m4gbust,    "gb_20___.3s3",         0x0000, 0x010000, CRC(4a86d879) SHA1(72e92b6482fdeb4dca36d9426a712ac24d60f7f7), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 3.0, set 2)" )
+GAME_CUSTOM( 199?, m4gbust__n,  m4gbust,    "gb_10_d_.3s3",         0x0000, 0x010000, CRC(776736de) SHA1(4f80d9ffdf4468801cf830e9774b6028f7684864), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 3.0D, set 1)" )
+GAME_CUSTOM( 199?, m4gbust__v,  m4gbust,    "gb_20_d_.3s3",         0x0000, 0x010000, CRC(4fc69155) SHA1(09a0f2122893d9fd90204a74c8862e01386503a4), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 3.0D, set 2)" )
+GAME_CUSTOM( 199?, m4gbust__k,  m4gbust,    "gb_10_b_.3s3",         0x0000, 0x010000, CRC(091afb66) SHA1(ac32d7be1e1f4f1453e37017966990a481506024), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 3.0YD, set 1)" )
+GAME_CUSTOM( 199?, m4gbust__s,  m4gbust,    "gb_20_b_.3s3",         0x0000, 0x010000, CRC(1a7cc3cf) SHA1(0d5764d35489bde284965c197b217a06f26a3e3b), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 3.0YD, set 2)" )
+// "(C)1993  B.W.B." and "GB  2.0"
+GAME_CUSTOM( 199?, m4gbust__f,  m4gbust,    "gb_02___.2n3",         0x0000, 0x010000, CRC(973b3538) SHA1(31df04d9f35cbde4d5e395256927f146d1613178), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 2.0, set 1)" )
+GAME_CUSTOM( 199?, m4gbust__i,  m4gbust,    "gb_10___.2n3",         0x0000, 0x010000, CRC(de18c441) SHA1(5a7055fcd755c1ac58e1b94af243801f169f29f5), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 2.0, set 2)" )
+GAME_CUSTOM( 199?, m4gbust__o,  m4gbust,    "gb_20___.2n3",         0x0000, 0x010000, CRC(27fc2ee1) SHA1(2e6a042f7117b4594b2601ae166ee0db72c70ed5), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 2.0, set 3)" )
+GAME_CUSTOM( 199?, m4gbust__h,  m4gbust,    "gb_10___.2a3",         0x0000, 0x010000, CRC(a5c692f3) SHA1(8305c88ab8b80b407f4723df25135c25a4c0794f), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 2.0, set 4)" )
+GAME_CUSTOM( 199?, m4gbust__w,  m4gbust,    "ghostbusters 2p.bin",  0x0000, 0x010000, CRC(abb288c4) SHA1(2012e027711996a552ab59674ae3bce1bf14f44b), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 2.0, set 5)" )
+GAME_CUSTOM( 199?, m4gbust__m,  m4gbust,    "gb_10_d_.2n3",         0x0000, 0x010000, CRC(cac5057d) SHA1(afcc21dbd07515ed134675b7dbfb53c048a465b0), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 2.0D, set 1)" )
+GAME_CUSTOM( 199?, m4gbust__u,  m4gbust,    "gb_20_d_.2n3",         0x0000, 0x010000, CRC(431c2965) SHA1(eb24e560d5c4bf419465fc760621a4fa853fff95), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 2.0D, set 2)" )
+GAME_CUSTOM( 199?, m4gbust__l,  m4gbust,    "gb_10_d_.2a3",         0x0000, 0x010000, CRC(f1446bf5) SHA1(4011d60e13045476741c5a02c64dabbe6a1ae2d6), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 2.0D, set 3)" )
+GAME_CUSTOM( 199?, m4gbust__t,  m4gbust,    "gb_20_d_.2a3",         0x0000, 0x010000, CRC(70f40688) SHA1(ed14f8f460825ffa087394ef5984ae064e02f7b6), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 2.0D, set 4)" )
+GAME_CUSTOM( 199?, m4gbust__r,  m4gbust,    "gb_20_b_.2n3",         0x0000, 0x010000, CRC(28cbb217) SHA1(a74978ff5e1511a33f543006b3f8ad30a77ea462), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 2.0YD, set 1)" )
+GAME_CUSTOM( 199?, m4gbust__q,  m4gbust,    "gb_20_b_.2a3",         0x0000, 0x010000, CRC(4dd7d38f) SHA1(8a71c27189ec3089c016a8292db68f7cdc91b083), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 2.0YD, set 2)" )
 
 
 
@@ -4962,11 +5286,12 @@ GAME_CUSTOM( 199?, m4gbust__w,  m4gbust,    "ghostbusters 2p.bin",  0x0000, 0x01
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4cshenc,       0,          "ca_sj__c.5_1", 0x0000, 0x020000, CRC(d9131b39) SHA1(4af89a7bc10de1406f401bede41e1bc452dbb159), "Bwb / Barcrest","Cash Encounters (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4cshenc__a,    m4cshenc,   "ca_sj_bc.5_1", 0x0000, 0x020000, CRC(30d1fb6d) SHA1(f845bef4ad7f2f48077eed74840916e87abb24b2), "Bwb / Barcrest","Cash Encounters (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4cshenc__b,    m4cshenc,   "ca_sj_dc.5_1", 0x0000, 0x020000, CRC(ac3ec716) SHA1(4ff8c26c46ec6e1321249b4d6d0c5194ed917f33), "Bwb / Barcrest","Cash Encounters (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4cshenc__c,    m4cshenc,   "ca_sja_c.5_1", 0x0000, 0x020000, CRC(c56a9d0b) SHA1(b0298c2e03097ab8ba5f99892e732ff1ab784c9b), "Bwb / Barcrest","Cash Encounters (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4cshenc__d,    m4cshenc,   "ca_sjb_c.5_1", 0x0000, 0x020000, CRC(8fad355d) SHA1(2ac16ad85ab8239a3e961abb06f9f71d17e5832a), "Bwb / Barcrest","Cash Encounters (Barcrest) (MPU4) (set 5)" )
+// "(C)1997    BWB" and "CA_ 5.0"
+GAME_CUSTOM( 199?, m4cshenc,       0,          "ca_sj__c.5_1", 0x0000, 0x020000, CRC(d9131b39) SHA1(4af89a7bc10de1406f401bede41e1bc452dbb159), "Bwb","Cash Encounters (Barcrest) (MPU4) (CA_ 5.0)" )
+GAME_CUSTOM( 199?, m4cshenc__a,    m4cshenc,   "ca_sj_bc.5_1", 0x0000, 0x020000, CRC(30d1fb6d) SHA1(f845bef4ad7f2f48077eed74840916e87abb24b2), "Bwb","Cash Encounters (Barcrest) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4cshenc__b,    m4cshenc,   "ca_sj_dc.5_1", 0x0000, 0x020000, CRC(ac3ec716) SHA1(4ff8c26c46ec6e1321249b4d6d0c5194ed917f33), "Bwb","Cash Encounters (Barcrest) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4cshenc__c,    m4cshenc,   "ca_sja_c.5_1", 0x0000, 0x020000, CRC(c56a9d0b) SHA1(b0298c2e03097ab8ba5f99892e732ff1ab784c9b), "Bwb","Cash Encounters (Barcrest) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4cshenc__d,    m4cshenc,   "ca_sjb_c.5_1", 0x0000, 0x020000, CRC(8fad355d) SHA1(2ac16ad85ab8239a3e961abb06f9f71d17e5832a), "Bwb","Cash Encounters (Barcrest) (MPU4) (set 5)" )
 
 
 
@@ -4983,14 +5308,15 @@ GAME_CUSTOM( 199?, m4cshenc__d,    m4cshenc,   "ca_sjb_c.5_1", 0x0000, 0x020000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-
-GAME_CUSTOM( 199?, m4lvlcl,     0,          "ll__x__x.1_1", 0x0000, 0x010000, CRC(1ef1c5b4) SHA1(455c147f158f8a36a9add9b984abc22af78258cf), "Bwb / Barcrest","Lucky Las Vegas Classic (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4lvlcl__a,  m4lvlcl,    "ll__x__x.3_1", 0x0000, 0x010000, CRC(42b85ebc) SHA1(a352d8389674fcfd90dc4e8155e6f4a78c9ec70d), "Bwb / Barcrest","Lucky Las Vegas Classic (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4lvlcl__b,  m4lvlcl,    "ll__x_dx.3_1", 0x0000, 0x010000, CRC(7753c8f0) SHA1(9600fee08529f29716697c4630730f15ef8a457b), "Bwb / Barcrest","Lucky Las Vegas Classic (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4lvlcl__c,  m4lvlcl,    "ll__xa_x.3_1", 0x0000, 0x010000, CRC(79468e93) SHA1(4beaa6fe2ad095b4674473ab99a7216513923077), "Bwb / Barcrest","Lucky Las Vegas Classic (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4lvlcl__d,  m4lvlcl,    "ll__xb_x.3_1", 0x0000, 0x010000, CRC(73b2fb34) SHA1(c127bc0954f8d01e9d8365a4506dde6f17da33fd), "Bwb / Barcrest","Lucky Las Vegas Classic (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4lvlcl__e,  m4lvlcl,    "ll__xgdx.1_1", 0x0000, 0x010000, CRC(65824c4f) SHA1(a514e48ac0f9d4a8d7506bf6932aeee88ca17104), "Bwb / Barcrest","Lucky Las Vegas Classic (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4lvlcl__f,  m4lvlcl,    "ll__xgdx.3_1", 0x0000, 0x010000, CRC(ba5b951a) SHA1(9ee36d3d42ce68f5797208633be87ddbbe605cf1), "Bwb / Barcrest","Lucky Las Vegas Classic (Barcrest) (MPU4) (set 7)" )
+// "(C)1998    BWB" and "LLU 0.1"
+GAME_CUSTOM( 199?, m4lvlcl,     0,          "ll__x__x.1_1", 0x0000, 0x010000, CRC(1ef1c5b4) SHA1(455c147f158f8a36a9add9b984abc22af78258cf), "Bwb","Lucky Las Vegas Classic (Barcrest) (MPU4) (LLU 0.1)" )
+GAME_CUSTOM( 199?, m4lvlcl__e,  m4lvlcl,    "ll__xgdx.1_1", 0x0000, 0x010000, CRC(65824c4f) SHA1(a514e48ac0f9d4a8d7506bf6932aeee88ca17104), "Bwb","Lucky Las Vegas Classic (Barcrest) (MPU4) (set 6)" )
+// "(C)1998    BWB" and "LLU 3.0"
+GAME_CUSTOM( 199?, m4lvlcl__a,  m4lvlcl,    "ll__x__x.3_1", 0x0000, 0x010000, CRC(42b85ebc) SHA1(a352d8389674fcfd90dc4e8155e6f4a78c9ec70d), "Bwb","Lucky Las Vegas Classic (Barcrest) (MPU4) (LLU 3.0)" )
+GAME_CUSTOM( 199?, m4lvlcl__b,  m4lvlcl,    "ll__x_dx.3_1", 0x0000, 0x010000, CRC(7753c8f0) SHA1(9600fee08529f29716697c4630730f15ef8a457b), "Bwb","Lucky Las Vegas Classic (Barcrest) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4lvlcl__c,  m4lvlcl,    "ll__xa_x.3_1", 0x0000, 0x010000, CRC(79468e93) SHA1(4beaa6fe2ad095b4674473ab99a7216513923077), "Bwb","Lucky Las Vegas Classic (Barcrest) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4lvlcl__d,  m4lvlcl,    "ll__xb_x.3_1", 0x0000, 0x010000, CRC(73b2fb34) SHA1(c127bc0954f8d01e9d8365a4506dde6f17da33fd), "Bwb","Lucky Las Vegas Classic (Barcrest) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4lvlcl__f,  m4lvlcl,    "ll__xgdx.3_1", 0x0000, 0x010000, CRC(ba5b951a) SHA1(9ee36d3d42ce68f5797208633be87ddbbe605cf1), "Bwb","Lucky Las Vegas Classic (Barcrest) (MPU4) (set 7)" )
 
 
 #define M4RHS_EXTRA_ROMS \
@@ -5011,20 +5337,23 @@ GAME_CUSTOM( 199?, m4lvlcl__f,  m4lvlcl,    "ll__xgdx.3_1", 0x0000, 0x010000, CR
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
-
-GAME_CUSTOM( 199?, m4rhs,     0,      "rh_sj___.4s1", 0x0000, 0x020000, CRC(be6179cd) SHA1(8aefffdffb25bc4dd7d083c7027be746181c2ff9), "Bwb / Barcrest","Rocky Horror Show (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4rhs__a,  m4rhs,  "rh_sj__c.6_1", 0x0000, 0x020000, CRC(476f3cf2) SHA1(18ce990e28ca8565ade5eec9a62f0b243121af73), "Bwb / Barcrest","Rocky Horror Show (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4rhs__b,  m4rhs,  "rh_sj_b_.4s1", 0x0000, 0x020000, CRC(58a4480e) SHA1(f4ecfa1debbfa9dba75263bce2c9f66741c3466f), "Bwb / Barcrest","Rocky Horror Show (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4rhs__c,  m4rhs,  "rh_sj_bc.6_1", 0x0000, 0x020000, CRC(2e37a58c) SHA1(a48c96384aa81f98bfa980c93e93523ecef3d43c), "Bwb / Barcrest","Rocky Horror Show (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4rhs__d,  m4rhs,  "rh_sj_d_.4s1", 0x0000, 0x020000, CRC(8f1176db) SHA1(283ef0b9515eac342a02489118bd30016ba85399), "Bwb / Barcrest","Rocky Horror Show (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4rhs__e,  m4rhs,  "rh_sj_k_.4s1", 0x0000, 0x020000, CRC(3f2ef505) SHA1(28c3806bc48af21a2b7ea27d42ea9f6b4346f3b8), "Bwb / Barcrest","Rocky Horror Show (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4rhs__f,  m4rhs,  "rh_sja__.4s1", 0x0000, 0x020000, CRC(b8cdd5fb) SHA1(4e336dd3d61f4fdba731951c56e440766ea8efeb), "Bwb / Barcrest","Rocky Horror Show (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4rhs__g,  m4rhs,  "rh_sja_c.6_1", 0x0000, 0x020000, CRC(b7b790e5) SHA1(e2b34dc2f6ede4f4c22b11123dfaed46f2c5c45e), "Bwb / Barcrest","Rocky Horror Show (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4rhs__h,  m4rhs,  "rh_sjab_.4s1", 0x0000, 0x020000, CRC(c8468d4c) SHA1(6a9f8fe10949712ecacca3bfcd7d5ab4860682e2), "Bwb / Barcrest","Rocky Horror Show (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4rhs__i,  m4rhs,  "rh_sjad_.4s1", 0x0000, 0x020000, CRC(df4768f0) SHA1(74894b232b27e65058d59acf174172da86def95a), "Bwb / Barcrest","Rocky Horror Show (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4rhs__j,  m4rhs,  "rh_sjak_.4s1", 0x0000, 0x020000, CRC(6f78eb2e) SHA1(a9fec7a7ad9334c3d8760e1982ac00651858cee8), "Bwb / Barcrest","Rocky Horror Show (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4rhs__k,  m4rhs,  "rocky15g",     0x0000, 0x020000, CRC(05f4f333) SHA1(a1b917f6c91d751fb2433e46c4c60840b47eed9e), "Bwb / Barcrest","Rocky Horror Show (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4rhs__l,  m4rhs,  "rocky15t",     0x0000, 0x020000, CRC(3fbad6de) SHA1(e8d76b3878794c769187d92d2834018a84e764ac), "Bwb / Barcrest","Rocky Horror Show (Barcrest) (MPU4) (set 13)" )
+// "(C)1998  B.W.B." and "RH__4.0"
+GAME_CUSTOM( 199?, m4rhs,     0,      "rh_sj___.4s1", 0x0000, 0x020000, CRC(be6179cd) SHA1(8aefffdffb25bc4dd7d083c7027be746181c2ff9), "Bwb","Rocky Horror Show (Barcrest) (MPU4) (RH__4.0)" )
+GAME_CUSTOM( 199?, m4rhs__b,  m4rhs,  "rh_sj_b_.4s1", 0x0000, 0x020000, CRC(58a4480e) SHA1(f4ecfa1debbfa9dba75263bce2c9f66741c3466f), "Bwb","Rocky Horror Show (Barcrest) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4rhs__d,  m4rhs,  "rh_sj_d_.4s1", 0x0000, 0x020000, CRC(8f1176db) SHA1(283ef0b9515eac342a02489118bd30016ba85399), "Bwb","Rocky Horror Show (Barcrest) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4rhs__e,  m4rhs,  "rh_sj_k_.4s1", 0x0000, 0x020000, CRC(3f2ef505) SHA1(28c3806bc48af21a2b7ea27d42ea9f6b4346f3b8), "Bwb","Rocky Horror Show (Barcrest) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4rhs__f,  m4rhs,  "rh_sja__.4s1", 0x0000, 0x020000, CRC(b8cdd5fb) SHA1(4e336dd3d61f4fdba731951c56e440766ea8efeb), "Bwb","Rocky Horror Show (Barcrest) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4rhs__h,  m4rhs,  "rh_sjab_.4s1", 0x0000, 0x020000, CRC(c8468d4c) SHA1(6a9f8fe10949712ecacca3bfcd7d5ab4860682e2), "Bwb","Rocky Horror Show (Barcrest) (MPU4) (set 9)" )
+GAME_CUSTOM( 199?, m4rhs__i,  m4rhs,  "rh_sjad_.4s1", 0x0000, 0x020000, CRC(df4768f0) SHA1(74894b232b27e65058d59acf174172da86def95a), "Bwb","Rocky Horror Show (Barcrest) (MPU4) (set 10)" )
+GAME_CUSTOM( 199?, m4rhs__j,  m4rhs,  "rh_sjak_.4s1", 0x0000, 0x020000, CRC(6f78eb2e) SHA1(a9fec7a7ad9334c3d8760e1982ac00651858cee8), "Bwb","Rocky Horror Show (Barcrest) (MPU4) (set 11)" )
+// "(C)1998  B.W.B." and "RH__6.0"
+GAME_CUSTOM( 199?, m4rhs__a,  m4rhs,  "rh_sj__c.6_1", 0x0000, 0x020000, CRC(476f3cf2) SHA1(18ce990e28ca8565ade5eec9a62f0b243121af73), "Bwb","Rocky Horror Show (Barcrest) (MPU4) (RH__6.0)" )
+GAME_CUSTOM( 199?, m4rhs__c,  m4rhs,  "rh_sj_bc.6_1", 0x0000, 0x020000, CRC(2e37a58c) SHA1(a48c96384aa81f98bfa980c93e93523ecef3d43c), "Bwb","Rocky Horror Show (Barcrest) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4rhs__g,  m4rhs,  "rh_sja_c.6_1", 0x0000, 0x020000, CRC(b7b790e5) SHA1(e2b34dc2f6ede4f4c22b11123dfaed46f2c5c45e), "Bwb","Rocky Horror Show (Barcrest) (MPU4) (set 8)" )
+// no copyright string and "RH__2.0"
+GAME_CUSTOM( 199?, m4rhs__k,  m4rhs,  "rocky15g",     0x0000, 0x020000, CRC(05f4f333) SHA1(a1b917f6c91d751fb2433e46c4c60840b47eed9e), "hack","Rocky Horror Show (Barcrest) (MPU4) (RH__2.0, hack)" )
+// no copyright string and "RH__3.0"
+GAME_CUSTOM( 199?, m4rhs__l,  m4rhs,  "rocky15t",     0x0000, 0x020000, CRC(3fbad6de) SHA1(e8d76b3878794c769187d92d2834018a84e764ac), "hack","Rocky Horror Show (Barcrest) (MPU4) (RH__3.0, hack)" )
 
 
 #define M4OADRAC_EXTRA_ROMS \
@@ -5042,16 +5371,17 @@ GAME_CUSTOM( 199?, m4rhs__l,  m4rhs,  "rocky15t",     0x0000, 0x020000, CRC(3fba
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
-
-GAME_CUSTOM( 199?, m4oadrac,       0,          "dr__x__x.2_0", 0x0000, 0x020000, CRC(4ca65bd9) SHA1(deb0a7d3596647210061b69a10fc6cdfc066538e), "Bwb / Barcrest","Ooh Aah Dracula (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4oadrac__a,    m4oadrac,   "dr__x__x.2_1", 0x0000, 0x020000, CRC(d91773af) SHA1(3d8dda0f409f55bce9c4d4e2a8377e43fe2f1f7d), "Bwb / Barcrest","Ooh Aah Dracula (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4oadrac__b,    m4oadrac,   "dr__x_dx.2_0", 0x0000, 0x020000, CRC(47f3ac5a) SHA1(e0413c55b897e96e32c3332dac041bc94da6dea3), "Bwb / Barcrest","Ooh Aah Dracula (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4oadrac__c,    m4oadrac,   "dr__x_dx.2_1", 0x0000, 0x020000, CRC(f8c36b67) SHA1(c765d7a5eb4d7cd74295da26a7c6f5341a1ca257), "Bwb / Barcrest","Ooh Aah Dracula (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4oadrac__d,    m4oadrac,   "dr__xa_x.2_0", 0x0000, 0x020000, CRC(702f0f7a) SHA1(8529c3eaa33cb972cc38067d176c7c8af0674147), "Bwb / Barcrest","Ooh Aah Dracula (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4oadrac__e,    m4oadrac,   "dr__xa_x.2_1", 0x0000, 0x020000, CRC(cf1fc847) SHA1(6b09c0de15a380da1783a387569d83328f5b29a0), "Bwb / Barcrest","Ooh Aah Dracula (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4oadrac__f,    m4oadrac,   "dr__xb_x.2_0", 0x0000, 0x020000, CRC(3ae8a72c) SHA1(a27faba69430b1d16abf62e0ef37182ab302bbbd), "Bwb / Barcrest","Ooh Aah Dracula (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4oadrac__g,    m4oadrac,   "dr__xb_x.2_1", 0x0000, 0x020000, CRC(85d86011) SHA1(81f8624908299aa37e75fc5d12059b3600212d35), "Bwb / Barcrest","Ooh Aah Dracula (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4oadrac__h,    m4oadrac,   "dri_xa_x.2_0", 0x0000, 0x020000, CRC(849d2a80) SHA1(c9ff0a5a543b62ca5b885f93a35b5f40e88db8c3), "Bwb / Barcrest","Ooh Aah Dracula (Barcrest) (MPU4) (set 9)" )
+// "(C)1999    BWB" and "DR_ 2.0"
+GAME_CUSTOM( 199?, m4oadrac,       0,          "dr__x__x.2_0", 0x0000, 0x020000, CRC(4ca65bd9) SHA1(deb0a7d3596647210061b69a10fc6cdfc066538e), "Bwb","Ooh Aah Dracula (Barcrest) (MPU4) (DR_ 2.0)" )
+GAME_CUSTOM( 199?, m4oadrac__b,    m4oadrac,   "dr__x_dx.2_0", 0x0000, 0x020000, CRC(47f3ac5a) SHA1(e0413c55b897e96e32c3332dac041bc94da6dea3), "Bwb","Ooh Aah Dracula (Barcrest) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4oadrac__d,    m4oadrac,   "dr__xa_x.2_0", 0x0000, 0x020000, CRC(702f0f7a) SHA1(8529c3eaa33cb972cc38067d176c7c8af0674147), "Bwb","Ooh Aah Dracula (Barcrest) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4oadrac__f,    m4oadrac,   "dr__xb_x.2_0", 0x0000, 0x020000, CRC(3ae8a72c) SHA1(a27faba69430b1d16abf62e0ef37182ab302bbbd), "Bwb","Ooh Aah Dracula (Barcrest) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4oadrac__h,    m4oadrac,   "dri_xa_x.2_0", 0x0000, 0x020000, CRC(849d2a80) SHA1(c9ff0a5a543b62ca5b885f93a35b5f40e88db8c3), "Bwb","Ooh Aah Dracula (Barcrest) (MPU4) (set 9)" )
+// "(C)1999    BWB" and "DR_ 2.1"
+GAME_CUSTOM( 199?, m4oadrac__a,    m4oadrac,   "dr__x__x.2_1", 0x0000, 0x020000, CRC(d91773af) SHA1(3d8dda0f409f55bce9c4d4e2a8377e43fe2f1f7d), "Bwb","Ooh Aah Dracula (Barcrest) (MPU4) (DR_ 2.1)" )
+GAME_CUSTOM( 199?, m4oadrac__c,    m4oadrac,   "dr__x_dx.2_1", 0x0000, 0x020000, CRC(f8c36b67) SHA1(c765d7a5eb4d7cd74295da26a7c6f5341a1ca257), "Bwb","Ooh Aah Dracula (Barcrest) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4oadrac__e,    m4oadrac,   "dr__xa_x.2_1", 0x0000, 0x020000, CRC(cf1fc847) SHA1(6b09c0de15a380da1783a387569d83328f5b29a0), "Bwb","Ooh Aah Dracula (Barcrest) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4oadrac__g,    m4oadrac,   "dr__xb_x.2_1", 0x0000, 0x020000, CRC(85d86011) SHA1(81f8624908299aa37e75fc5d12059b3600212d35), "Bwb","Ooh Aah Dracula (Barcrest) (MPU4) (set 8)" )
 
 
 
@@ -5068,35 +5398,42 @@ GAME_CUSTOM( 199?, m4oadrac__h,    m4oadrac,   "dri_xa_x.2_0", 0x0000, 0x020000,
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 
+// "(C)1996  B.W.B." and "CT4 7.0"
+GAME_CUSTOM( 199?, m4ticcla,       0,          "ct_20_b4.7_1", 0x0000, 0x010000, CRC(48b9a162) SHA1(2d19a5d6379dc93a56c920b3cd61a0d1a8c6b303), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 1)" )
 
-GAME_CUSTOM( 199?, m4ticcla,       0,          "ct_20_b4.7_1", 0x0000, 0x010000, CRC(48b9a162) SHA1(2d19a5d6379dc93a56c920b3cd61a0d1a8c6b303), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4ticcla__a,    m4ticcla,   "ct_20_bc.4_1", 0x0000, 0x010000, CRC(fb40b5ff) SHA1(723a07a2b6b08483aa75ecdd4fd9720a66201fc3), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4ticcla__b,    m4ticcla,   "ct_20_d4.7_1", 0x0000, 0x010000, CRC(3c7c862c) SHA1(a3577f29950e845a14ca68750d2ab6c56a395dba), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4ticcla__c,    m4ticcla,   "ct_20_dc.4_1", 0x0000, 0x010000, CRC(0f20a790) SHA1(02876178f0af64154d490cc048a7bc1c9a6f521b), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4ticcla__d,    m4ticcla,   "ct_20a_4.7_1", 0x0000, 0x010000, CRC(35318095) SHA1(888105a674c9ea8ccad33e24c05ef42936f5f4cf), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4ticcla__e,    m4ticcla,   "ct_20a_c.4_1", 0x0000, 0x010000, CRC(e409f49f) SHA1(8774015ec20ed9fe54e812013dfc12d408276c31), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4ticcla__f,    m4ticcla,   "ct_20b_c.4_1", 0x0000, 0x010000, CRC(864a59cf) SHA1(abd9b7a47c791ce4f91abbd3bf97bdcd9d8296ee), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4ticcla__g,    m4ticcla,   "ct_20bg4.7_1", 0x0000, 0x010000, CRC(7f200f42) SHA1(0ea6aa0de88982737d818c9dac9f2605cea7bc11), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4ticcla__h,    m4ticcla,   "ct_20bgc.4_1", 0x0000, 0x010000, CRC(215b8965) SHA1(883735066a1425b502e89d1234575294ac83746c), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4ticcla__i,    m4ticcla,   "ct_20bt4.7_1", 0x0000, 0x010000, CRC(7c7280a4) SHA1(3dbdc53a3474f4147427ed4fa8a161a3b364d43b), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4ticcla__j,    m4ticcla,   "ct_25_bc.3_1", 0x0000, 0x010000, CRC(9d6fb3b0) SHA1(a6278579d217b5544d9f0b942a7a344596153950), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4ticcla__k,    m4ticcla,   "ct_25_dc.2_1", 0x0000, 0x010000, CRC(b49af435) SHA1(e5f92f114931e554eb8eb5fe89f50298783d541c), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4ticcla__l,    m4ticcla,   "ct_25_dc.3_1", 0x0000, 0x010000, CRC(eb359c82) SHA1(c137768461b859d5277b08c8783b0c8625f9b1be), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4ticcla__m,    m4ticcla,   "ct_25_kc.2_1", 0x0000, 0x010000, CRC(43309e7b) SHA1(d8f6ecbea618da7f54309f2a6e93210c51b68b81), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4ticcla__n,    m4ticcla,   "ct_25a_c.2_1", 0x0000, 0x010000, CRC(717396ed) SHA1(6cdb0f99b40096178f6e85a0966182e704d1b99a), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4ticcla__o,    m4ticcla,   "ct_25a_c.3_1", 0x0000, 0x010000, CRC(28e0a15b) SHA1(b3678ba3d1f392665cc6ec9c24c2c506a41cd4fa), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4ticcla__p,    m4ticcla,   "ct_25b_c.2_1", 0x0000, 0x010000, CRC(b3d7e79c) SHA1(86c0b419c3ca054f8a2ed785cffeb03e6c5b69f2), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4ticcla__q,    m4ticcla,   "ct_25b_c.3_1", 0x0000, 0x010000, CRC(e0ba763d) SHA1(453d8a0dbe616c5a8c4313b918fcfe21fed473e0), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4ticcla__r,    m4ticcla,   "ct_25bgc.2_1", 0x0000, 0x010000, CRC(0869d04c) SHA1(0f0fd3982ac376c66d139655a50639f48bf740b4), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4ticcla__s,    m4ticcla,   "ct_25bgc.3_1", 0x0000, 0x010000, CRC(1e0ca1d1) SHA1(0b1023cdd5cd3db657cea53c85e31ed83c2e5524), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4ticcla__t,    m4ticcla,   "ct_25btc.2_1", 0x0000, 0x010000, CRC(032ec96d) SHA1(c5cef956bc0e3eb45cf128c8d0b4e1d6e5b01afe), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4ticcla__u,    m4ticcla,   "ct_25btc.3_1", 0x0000, 0x010000, CRC(f656897a) SHA1(92ad5c6ce2a696298bbfc8c1750825db4e3bc80b), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4ticcla__v,    m4ticcla,   "ct_30_dc.2_1", 0x0000, 0x010000, CRC(57fabdfb) SHA1(ad86621e4bc8141508c691e148a66e74fc070a88), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 23)" )
-GAME_CUSTOM( 199?, m4ticcla__w,    m4ticcla,   "ct_30a_c.2_1", 0x0000, 0x010000, CRC(800c94c3) SHA1(c78497899ea9cf27e66f6e8526b95d51215053b2), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 24)" )
-GAME_CUSTOM( 199?, m4ticcla__x,    m4ticcla,   "ct_30b_c.2_1", 0x0000, 0x010000, CRC(3036ef04) SHA1(de514a85d45d11a880ed147aebe211ffb5bee146), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 25)" )
-GAME_CUSTOM( 199?, m4ticcla__y,    m4ticcla,   "ct_30bdc.2_1", 0x0000, 0x010000, CRC(9852c9d4) SHA1(37bb20d63fa70ea99e18a16a8f11c461a377a07a), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 26)" )
-GAME_CUSTOM( 199?, m4ticcla__z,    m4ticcla,   "ct_30bgc.2_1", 0x0000, 0x010000, CRC(a1bc89b4) SHA1(4c82ce8fe78768443823e868f7cc49a06e7cc441), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 27)" )
-GAME_CUSTOM( 199?, m4ticcla__0,    m4ticcla,   "ct_30btc.2_1", 0x0000, 0x010000, CRC(cde0d12e) SHA1(5427ad700311c30cc86eccc7f1ff36cf0da3b980), "Bwb / Barcrest","Tic Tac Toe Classic (Barcrest) (MPU4) (set 28)" )
+GAME_CUSTOM( 199?, m4ticcla__b,    m4ticcla,   "ct_20_d4.7_1", 0x0000, 0x010000, CRC(3c7c862c) SHA1(a3577f29950e845a14ca68750d2ab6c56a395dba), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4ticcla__d,    m4ticcla,   "ct_20a_4.7_1", 0x0000, 0x010000, CRC(35318095) SHA1(888105a674c9ea8ccad33e24c05ef42936f5f4cf), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4ticcla__g,    m4ticcla,   "ct_20bg4.7_1", 0x0000, 0x010000, CRC(7f200f42) SHA1(0ea6aa0de88982737d818c9dac9f2605cea7bc11), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 8)" )
+GAME_CUSTOM( 199?, m4ticcla__i,    m4ticcla,   "ct_20bt4.7_1", 0x0000, 0x010000, CRC(7c7280a4) SHA1(3dbdc53a3474f4147427ed4fa8a161a3b364d43b), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 10)" )
+
+// "(C)1996  B.W.B." and "CT  4.0"
+GAME_CUSTOM( 199?, m4ticcla__a,    m4ticcla,   "ct_20_bc.4_1", 0x0000, 0x010000, CRC(fb40b5ff) SHA1(723a07a2b6b08483aa75ecdd4fd9720a66201fc3), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4ticcla__c,    m4ticcla,   "ct_20_dc.4_1", 0x0000, 0x010000, CRC(0f20a790) SHA1(02876178f0af64154d490cc048a7bc1c9a6f521b), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4ticcla__e,    m4ticcla,   "ct_20a_c.4_1", 0x0000, 0x010000, CRC(e409f49f) SHA1(8774015ec20ed9fe54e812013dfc12d408276c31), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4ticcla__f,    m4ticcla,   "ct_20b_c.4_1", 0x0000, 0x010000, CRC(864a59cf) SHA1(abd9b7a47c791ce4f91abbd3bf97bdcd9d8296ee), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4ticcla__h,    m4ticcla,   "ct_20bgc.4_1", 0x0000, 0x010000, CRC(215b8965) SHA1(883735066a1425b502e89d1234575294ac83746c), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 9)" )
+
+// "(C)1996  B.W.B." and "CT4 3.0" (CTT on startup)
+GAME_CUSTOM( 199?, m4ticcla__j,    m4ticcla,   "ct_25_bc.3_1", 0x0000, 0x010000, CRC(9d6fb3b0) SHA1(a6278579d217b5544d9f0b942a7a344596153950), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 11)" )
+GAME_CUSTOM( 199?, m4ticcla__l,    m4ticcla,   "ct_25_dc.3_1", 0x0000, 0x010000, CRC(eb359c82) SHA1(c137768461b859d5277b08c8783b0c8625f9b1be), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 13)" )
+GAME_CUSTOM( 199?, m4ticcla__o,    m4ticcla,   "ct_25a_c.3_1", 0x0000, 0x010000, CRC(28e0a15b) SHA1(b3678ba3d1f392665cc6ec9c24c2c506a41cd4fa), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 16)" )
+GAME_CUSTOM( 199?, m4ticcla__q,    m4ticcla,   "ct_25b_c.3_1", 0x0000, 0x010000, CRC(e0ba763d) SHA1(453d8a0dbe616c5a8c4313b918fcfe21fed473e0), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 18)" )
+GAME_CUSTOM( 199?, m4ticcla__s,    m4ticcla,   "ct_25bgc.3_1", 0x0000, 0x010000, CRC(1e0ca1d1) SHA1(0b1023cdd5cd3db657cea53c85e31ed83c2e5524), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 20)" )
+GAME_CUSTOM( 199?, m4ticcla__u,    m4ticcla,   "ct_25btc.3_1", 0x0000, 0x010000, CRC(f656897a) SHA1(92ad5c6ce2a696298bbfc8c1750825db4e3bc80b), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 22)" )
+
+// "(C)1998  B.W.B." and "CT  2.3"
+GAME_CUSTOM( 199?, m4ticcla__k,    m4ticcla,   "ct_25_dc.2_1", 0x0000, 0x010000, CRC(b49af435) SHA1(e5f92f114931e554eb8eb5fe89f50298783d541c), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 12)" )
+GAME_CUSTOM( 199?, m4ticcla__m,    m4ticcla,   "ct_25_kc.2_1", 0x0000, 0x010000, CRC(43309e7b) SHA1(d8f6ecbea618da7f54309f2a6e93210c51b68b81), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 14)" )
+GAME_CUSTOM( 199?, m4ticcla__n,    m4ticcla,   "ct_25a_c.2_1", 0x0000, 0x010000, CRC(717396ed) SHA1(6cdb0f99b40096178f6e85a0966182e704d1b99a), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 15)" )
+GAME_CUSTOM( 199?, m4ticcla__p,    m4ticcla,   "ct_25b_c.2_1", 0x0000, 0x010000, CRC(b3d7e79c) SHA1(86c0b419c3ca054f8a2ed785cffeb03e6c5b69f2), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 17)" )
+GAME_CUSTOM( 199?, m4ticcla__r,    m4ticcla,   "ct_25bgc.2_1", 0x0000, 0x010000, CRC(0869d04c) SHA1(0f0fd3982ac376c66d139655a50639f48bf740b4), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 19)" )
+GAME_CUSTOM( 199?, m4ticcla__t,    m4ticcla,   "ct_25btc.2_1", 0x0000, 0x010000, CRC(032ec96d) SHA1(c5cef956bc0e3eb45cf128c8d0b4e1d6e5b01afe), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 21)" )
+GAME_CUSTOM( 199?, m4ticcla__v,    m4ticcla,   "ct_30_dc.2_1", 0x0000, 0x010000, CRC(57fabdfb) SHA1(ad86621e4bc8141508c691e148a66e74fc070a88), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 23)" )
+GAME_CUSTOM( 199?, m4ticcla__w,    m4ticcla,   "ct_30a_c.2_1", 0x0000, 0x010000, CRC(800c94c3) SHA1(c78497899ea9cf27e66f6e8526b95d51215053b2), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 24)" )
+GAME_CUSTOM( 199?, m4ticcla__x,    m4ticcla,   "ct_30b_c.2_1", 0x0000, 0x010000, CRC(3036ef04) SHA1(de514a85d45d11a880ed147aebe211ffb5bee146), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 25)" )
+GAME_CUSTOM( 199?, m4ticcla__y,    m4ticcla,   "ct_30bdc.2_1", 0x0000, 0x010000, CRC(9852c9d4) SHA1(37bb20d63fa70ea99e18a16a8f11c461a377a07a), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 26)" )
+GAME_CUSTOM( 199?, m4ticcla__z,    m4ticcla,   "ct_30bgc.2_1", 0x0000, 0x010000, CRC(a1bc89b4) SHA1(4c82ce8fe78768443823e868f7cc49a06e7cc441), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 27)" )
+GAME_CUSTOM( 199?, m4ticcla__0,    m4ticcla,   "ct_30btc.2_1", 0x0000, 0x010000, CRC(cde0d12e) SHA1(5427ad700311c30cc86eccc7f1ff36cf0da3b980), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (set 28)" )
 
 #define M4TICGLC_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
@@ -5110,11 +5447,13 @@ GAME_CUSTOM( 199?, m4ticcla__0,    m4ticcla,   "ct_30btc.2_1", 0x0000, 0x010000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4ticglc,       0,          "tg_25a_c.3_1", 0x0000, 0x010000, CRC(44b2b6b0) SHA1(c2caadd68659bd474df534101e3bc13b15a43694), "Bwb / Barcrest","Tic Tac Toe Gold (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4ticglc__a,    m4ticglc,   "tg_30_dc.4_1", 0x0000, 0x010000, CRC(19c0fb1e) SHA1(955da095df56f28ace6839c9b6df5669f576730c), "Bwb / Barcrest","Tic Tac Toe Gold (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4ticglc__b,    m4ticglc,   "tg_30a_c.4_1", 0x0000, 0x010000, CRC(3e4dcc70) SHA1(c4ad3a8633e19015d4d2b08a653119e9e4c5dcbb), "Bwb / Barcrest","Tic Tac Toe Gold (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4ticglc__c,    m4ticglc,   "tg_30b_c.4_1", 0x0000, 0x010000, CRC(83d1517a) SHA1(38a9269dac53ca701e4b621d5e77696142f429cd), "Bwb / Barcrest","Tic Tac Toe Gold (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4ticglc__d,    m4ticglc,   "tg_30bgc.4_1", 0x0000, 0x010000, CRC(a366c32d) SHA1(8d86778411ef07e06d99c12147a211d7620af9bf), "Bwb / Barcrest","Tic Tac Toe Gold (Barcrest) (MPU4) (set 5)" )
+// "(C)1998  B.W.B." and "TG  3.3"
+GAME_CUSTOM( 199?, m4ticglc,       0,          "tg_25a_c.3_1", 0x0000, 0x010000, CRC(44b2b6b0) SHA1(c2caadd68659bd474df534101e3bc13b15a43694), "Bwb","Tic Tac Toe Gold (Barcrest) (MPU4) (TG  3.3)" )
+// "(C)1998  B.W.B." and "TG  4.4"
+GAME_CUSTOM( 199?, m4ticglc__a,    m4ticglc,   "tg_30_dc.4_1", 0x0000, 0x010000, CRC(19c0fb1e) SHA1(955da095df56f28ace6839c9b6df5669f576730c), "Bwb","Tic Tac Toe Gold (Barcrest) (MPU4) (TG  4.4)" )
+GAME_CUSTOM( 199?, m4ticglc__b,    m4ticglc,   "tg_30a_c.4_1", 0x0000, 0x010000, CRC(3e4dcc70) SHA1(c4ad3a8633e19015d4d2b08a653119e9e4c5dcbb), "Bwb","Tic Tac Toe Gold (Barcrest) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4ticglc__c,    m4ticglc,   "tg_30b_c.4_1", 0x0000, 0x010000, CRC(83d1517a) SHA1(38a9269dac53ca701e4b621d5e77696142f429cd), "Bwb","Tic Tac Toe Gold (Barcrest) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4ticglc__d,    m4ticglc,   "tg_30bgc.4_1", 0x0000, 0x010000, CRC(a366c32d) SHA1(8d86778411ef07e06d99c12147a211d7620af9bf), "Bwb","Tic Tac Toe Gold (Barcrest) (MPU4) (set 5)" )
 
 #define M4SSCLAS_EXTRA_ROMS \
 	ROM_REGION( 0x48, "fakechr", 0 ) \
@@ -5130,13 +5469,15 @@ GAME_CUSTOM( 199?, m4ticglc__d,    m4ticglc,   "tg_30bgc.4_1", 0x0000, 0x010000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
-
-GAME_CUSTOM( 199?, m4ssclas,       0,          "cs__x__x.6_0", 0x0000, 0x010000, CRC(3230284d) SHA1(bca3b4c43859ed424956c4119fa6a91a2e7d6eec), "Bwb / Barcrest","Super Streak Classic (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4ssclas__a,    m4ssclas,   "cs__x_dx.2_0", 0x0000, 0x010000, CRC(ea004a13) SHA1(db9a187b0672c69a6a149ec6d1025bd6da9beccd), "Bwb / Barcrest","Super Streak Classic (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4ssclas__b,    m4ssclas,   "cs__x_dx.6_0", 0x0000, 0x010000, CRC(6dd2d11f) SHA1(8c7e60d3e5a0d4fccb024b5c0aa21fd2b9a5ada9), "Bwb / Barcrest","Super Streak Classic (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4ssclas__c,    m4ssclas,   "cs__xa_x.6_0", 0x0000, 0x010000, CRC(6657e810) SHA1(0860076cf01c732f419483876991fb42a838622a), "Bwb / Barcrest","Super Streak Classic (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4ssclas__d,    m4ssclas,   "cs__xb_x.5_0", 0x0000, 0x010000, CRC(a5f46ff5) SHA1(a068029f774bc6ed2e76acc2eb509bc6e2490945), "Bwb / Barcrest","Super Streak Classic (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4ssclas__e,    m4ssclas,   "cs__xb_x.6_0", 0x0000, 0x010000, CRC(801d543c) SHA1(f0905947312fb2a526765d17cde01af5095ef923), "Bwb / Barcrest","Super Streak Classic (Barcrest) (MPU4) (set 6)" )
+// "(C)2000    BWB" and "CSS 6.0"
+GAME_CUSTOM( 199?, m4ssclas,       0,          "cs__x__x.6_0", 0x0000, 0x010000, CRC(3230284d) SHA1(bca3b4c43859ed424956c4119fa6a91a2e7d6eec), "Bwb","Super Streak Classic (Barcrest) (MPU4) (CSS 6.0)" )
+GAME_CUSTOM( 199?, m4ssclas__b,    m4ssclas,   "cs__x_dx.6_0", 0x0000, 0x010000, CRC(6dd2d11f) SHA1(8c7e60d3e5a0d4fccb024b5c0aa21fd2b9a5ada9), "Bwb","Super Streak Classic (Barcrest) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4ssclas__c,    m4ssclas,   "cs__xa_x.6_0", 0x0000, 0x010000, CRC(6657e810) SHA1(0860076cf01c732f419483876991fb42a838622a), "Bwb","Super Streak Classic (Barcrest) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4ssclas__e,    m4ssclas,   "cs__xb_x.6_0", 0x0000, 0x010000, CRC(801d543c) SHA1(f0905947312fb2a526765d17cde01af5095ef923), "Bwb","Super Streak Classic (Barcrest) (MPU4) (set 6)" )
+// "(C)1998    BWB" and "CSS 5.0"
+GAME_CUSTOM( 199?, m4ssclas__d,    m4ssclas,   "cs__xb_x.5_0", 0x0000, 0x010000, CRC(a5f46ff5) SHA1(a068029f774bc6ed2e76acc2eb509bc6e2490945), "Bwb","Super Streak Classic (Barcrest) (MPU4) (CSS 5.0)" )
+// "(C)1998    BWB" and "CSS 2.0"
+GAME_CUSTOM( 199?, m4ssclas__a,    m4ssclas,   "cs__x_dx.2_0", 0x0000, 0x010000, CRC(ea004a13) SHA1(db9a187b0672c69a6a149ec6d1025bd6da9beccd), "Bwb","Super Streak Classic (Barcrest) (MPU4) (CSS 2.0)" )
 // was in SC2 Super Star set, but seems to fit here, ident hacked to "BILL    BIXBY" and "V1   0.1"
 GAME_CUSTOM( 199?, m4ssclas__f,    m4ssclas,   "supst20.15",   0x0000, 0x010000, CRC(c3446ec4) SHA1(3c1ad27385547a33993a839b53873d8b92214ade), "hack","Super Streak Classic (Barcrest) (MPU4) (hack)" )
 
@@ -5157,10 +5498,11 @@ GAME_CUSTOM( 199?, m4ssclas__f,    m4ssclas,   "supst20.15",   0x0000, 0x010000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4squid,     0,          "squidsin.bin", 0x0000, 0x020000, CRC(be369b43) SHA1(e5c7b7a858b264db2f8f726396ddeb42004d7cb9), "Bwb / Barcrest","Squids In (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4squid__a,  m4squid,    "sq__x_dx.2_0", 0x0000, 0x020000, CRC(2eb6c814) SHA1(070ad5cb36220daf98043f175cf67d4d584c3d01), "Bwb / Barcrest","Squids In (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4squid__b,  m4squid,    "sq__xa_x.2_0", 0x0000, 0x020000, CRC(196a6b34) SHA1(a044ba73b4cf04657ddfcf787dedcb151507ef15), "Bwb / Barcrest","Squids In (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4squid__c,  m4squid,    "sq__xb_x.2_0", 0x0000, 0x020000, CRC(53adc362) SHA1(3920f08299bf284ee9f102ce1505d9e9cdc1d1f0), "Bwb / Barcrest","Squids In (Barcrest) (MPU4) (set 4)" )
+// "(C)1999    BWB" and "SQ_ 2.0"
+GAME_CUSTOM( 199?, m4squid,     0,          "squidsin.bin", 0x0000, 0x020000, CRC(be369b43) SHA1(e5c7b7a858b264db2f8f726396ddeb42004d7cb9), "Bwb","Squids In (Barcrest) (MPU4) (SQ_ 2.0, set 1)" )
+GAME_CUSTOM( 199?, m4squid__a,  m4squid,    "sq__x_dx.2_0", 0x0000, 0x020000, CRC(2eb6c814) SHA1(070ad5cb36220daf98043f175cf67d4d584c3d01), "Bwb","Squids In (Barcrest) (MPU4) (SQ_ 2.0, set 2)" )
+GAME_CUSTOM( 199?, m4squid__b,  m4squid,    "sq__xa_x.2_0", 0x0000, 0x020000, CRC(196a6b34) SHA1(a044ba73b4cf04657ddfcf787dedcb151507ef15), "Bwb","Squids In (Barcrest) (MPU4) (SQ_ 2.0, set 3)" )
+GAME_CUSTOM( 199?, m4squid__c,  m4squid,    "sq__xb_x.2_0", 0x0000, 0x020000, CRC(53adc362) SHA1(3920f08299bf284ee9f102ce1505d9e9cdc1d1f0), "Bwb","Squids In (Barcrest) (MPU4) (SQ_ 2.0, set 4)" )
 
 #define M4CALAMA_EXTRA_ROMS \
 	ROM_REGION( 0x48, "fakechr", 0 ) \
@@ -5177,17 +5519,22 @@ GAME_CUSTOM( 199?, m4squid__c,  m4squid,    "sq__xb_x.2_0", 0x0000, 0x020000, CR
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4calama,       0,          "cac03s.p1",    0x0000, 0x020000, CRC(edc97795) SHA1(58fb91809c7f475fbceacfc1c3bda41b86dff54b), "Bwb / Barcrest","Calamari Club (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4calama__a,    m4calama,   "ca301d.p1",    0x0000, 0x020000, CRC(9a220126) SHA1(d5b12955bb336f8233ed3f892e23a14ba755a511), "Bwb / Barcrest","Calamari Club (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4calama__b,    m4calama,   "ca301f.p1",    0x0000, 0x020000, CRC(e7af1462) SHA1(72659ef85c3b7916e10b4dbc09ad62638e7ab7e1), "Bwb / Barcrest","Calamari Club (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4calama__c,    m4calama,   "ca301s.p1",    0x0000, 0x020000, CRC(95beecf1) SHA1(70f72abc0d4280618033b61f9dbe5b90b455c2b1), "Bwb / Barcrest","Calamari Club (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4calama__d,    m4calama,   "cac03d.p1",    0x0000, 0x020000, CRC(14436ec7) SHA1(eb654ef5cef94e24296512acb6134440a5f8d17e), "Bwb / Barcrest","Calamari Club (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4calama__e,    m4calama,   "cac03f.p1",    0x0000, 0x020000, CRC(69ce7b83) SHA1(c1f2dea6fe7983f5cefbf58ad63bce5ae8d7f7a5), "Bwb / Barcrest","Calamari Club (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4calama__f,    m4calama,   "bc302f.p1",    0x0000, 0x020000, CRC(4b356aca) SHA1(81ce1585f529f1717ec56ace0a4902ae901593ae), "Bwb / Barcrest","Calamari Club (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4calama__g,    m4calama,   "bc302s.p1",    0x0000, 0x020000, CRC(b349bd2d) SHA1(9b026bece40584c4f53c30f3dacc91942c871a9f), "Bwb / Barcrest","Calamari Club (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4calama__h,    m4calama,   "calamari.cl",  0x0000, 0x020000, CRC(bb5e81ac) SHA1(b27f71321978712d2950d58715d18fd5523d6b06), "Bwb / Barcrest","Calamari Club (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4calama__i,    m4calama,   "bc302d.p1",    0x0000, 0x020000, CRC(36b87f8e) SHA1(6e3cbfa52d9ec52fe009d3331dda3781f7f7783a), "Bwb / Barcrest","Calamari Club (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4calama__j,    m4calama,   "bca04.p1",     0x0000, 0x020000, CRC(3f97fe65) SHA1(6bc2c7e60658f39701974426ab652e8dd96b1913), "Bwb / Barcrest","Calamari Club (Barcrest) (MPU4) (set 11)" )
+// "(C)1996 BARCREST" and "CAC 0.3"
+GAME_CUSTOM( 199?, m4calama,       0,          "cac03s.p1",    0x0000, 0x020000, CRC(edc97795) SHA1(58fb91809c7f475fbceacfc1c3bda41b86dff54b), "Barcrest","Calamari Club (Barcrest) (MPU4) (CAC 0.3)" )
+GAME_CUSTOM( 199?, m4calama__d,    m4calama,   "cac03d.p1",    0x0000, 0x020000, CRC(14436ec7) SHA1(eb654ef5cef94e24296512acb6134440a5f8d17e), "Barcrest","Calamari Club (Barcrest) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4calama__e,    m4calama,   "cac03f.p1",    0x0000, 0x020000, CRC(69ce7b83) SHA1(c1f2dea6fe7983f5cefbf58ad63bce5ae8d7f7a5), "Barcrest","Calamari Club (Barcrest) (MPU4) (set 6)" )
+// "(C)1996 BARCREST" and "CA3 0.1"
+GAME_CUSTOM( 199?, m4calama__c,    m4calama,   "ca301s.p1",    0x0000, 0x020000, CRC(95beecf1) SHA1(70f72abc0d4280618033b61f9dbe5b90b455c2b1), "Barcrest","Calamari Club (Barcrest) (MPU4) (CA3 0.1)" )
+GAME_CUSTOM( 199?, m4calama__a,    m4calama,   "ca301d.p1",    0x0000, 0x020000, CRC(9a220126) SHA1(d5b12955bb336f8233ed3f892e23a14ba755a511), "Barcrest","Calamari Club (Barcrest) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4calama__b,    m4calama,   "ca301f.p1",    0x0000, 0x020000, CRC(e7af1462) SHA1(72659ef85c3b7916e10b4dbc09ad62638e7ab7e1), "Barcrest","Calamari Club (Barcrest) (MPU4) (set 3)" )
+// "(C)1996 BARCREST" and "BC3 0.2"
+GAME_CUSTOM( 199?, m4calama__g,    m4calama,   "bc302s.p1",    0x0000, 0x020000, CRC(b349bd2d) SHA1(9b026bece40584c4f53c30f3dacc91942c871a9f), "Barcrest","Calamari Club (Barcrest) (MPU4) (BC3 0.2)" )
+GAME_CUSTOM( 199?, m4calama__f,    m4calama,   "bc302f.p1",    0x0000, 0x020000, CRC(4b356aca) SHA1(81ce1585f529f1717ec56ace0a4902ae901593ae), "Barcrest","Calamari Club (Barcrest) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4calama__i,    m4calama,   "bc302d.p1",    0x0000, 0x020000, CRC(36b87f8e) SHA1(6e3cbfa52d9ec52fe009d3331dda3781f7f7783a), "Barcrest","Calamari Club (Barcrest) (MPU4) (set 10)" )
+// "(C)1996 BARCREST" and "BCA 0.4"
+GAME_CUSTOM( 199?, m4calama__j,    m4calama,   "bca04.p1",     0x0000, 0x020000, CRC(3f97fe65) SHA1(6bc2c7e60658f39701974426ab652e8dd96b1913), "Barcrest","Calamari Club (Barcrest) (MPU4) (BCA 0.4)" )
+// "(C)1996 BARCREST" and "BCA 0.2"
+GAME_CUSTOM( 199?, m4calama__h,    m4calama,   "calamari.cl",  0x0000, 0x020000, CRC(bb5e81ac) SHA1(b27f71321978712d2950d58715d18fd5523d6b06), "Barcrest","Calamari Club (Barcrest) (MPU4) (BCA 0.2)" )
 
 
 #define M4COSCAS_EXTRA_ROMS \
@@ -5203,29 +5550,33 @@ GAME_CUSTOM( 199?, m4calama__j,    m4calama,   "bca04.p1",     0x0000, 0x020000,
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4coscas,       0,          "cc_sj__c.3r1",         0x0000, 0x020000, CRC(44b940a6) SHA1(7e621873fcf6460f654e35cc74552e86b6253ddb), "Bwb / Barcrest","Cosmic Casino (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4coscas__a,    m4coscas,   "cosm15g",              0x0000, 0x020000, CRC(edd01d55) SHA1(49246fa1e12ceb3297f35616cdc1cf62472a379f), "Bwb / Barcrest","Cosmic Casino (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4coscas__b,    m4coscas,   "cosmiccasinos15.bin",  0x0000, 0x020000, CRC(ddba1241) SHA1(7ca2928ae2ab4e323b60bb661b60681f89cc5663), "Bwb / Barcrest","Cosmic Casino (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4coscas__c,    m4coscas,   "cc30s.p1",             0x0000, 0x020000, CRC(e308100a) SHA1(14cb07895d17237768877dd62ba7c3fc8e5b2630), "Bwb / Barcrest","Cosmic Casino (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4coscas__d,    m4coscas,   "cc_sj___.3s1",         0x0000, 0x020000, CRC(52c312b0) SHA1(bd5381d58b1acb7adf6857c142eae4a253081fbd), "Bwb / Barcrest","Cosmic Casino (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4coscas__e,    m4coscas,   "cc_sj__c.7_1",         0x0000, 0x020000, CRC(ee9e6126) SHA1(fab6fd04004acebf291544720ba06cea79d5a054), "Bwb / Barcrest","Cosmic Casino (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4coscas__f,    m4coscas,   "cc_sj_b_.3s1",         0x0000, 0x020000, CRC(019f0a71) SHA1(7a97f4e89c16e25f8e7502bba37f49c8496fbb47), "Bwb / Barcrest","Cosmic Casino (Barcrest) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4coscas__g,    m4coscas,   "cc_sj_bc.3r1",         0x0000, 0x020000, CRC(de9bb8e1) SHA1(7974b03974531eb4b5ed865b8eeb9649c1346df4), "Bwb / Barcrest","Cosmic Casino (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4coscas__h,    m4coscas,   "cc_sj_bc.7_1",         0x0000, 0x020000, CRC(afe1aac6) SHA1(fc9c69e45db6a85c45ef8d32d048e5726d7da655), "Bwb / Barcrest","Cosmic Casino (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4coscas__i,    m4coscas,   "cc_sj_d_.3s1",         0x0000, 0x020000, CRC(215e12f3) SHA1(68ed9923c6fd51e9305afac9d271c7b3ce38b12f), "Bwb / Barcrest","Cosmic Casino (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4coscas__j,    m4coscas,   "cc_sj_dc.3r1",         0x0000, 0x020000, CRC(00e357c3) SHA1(02bf7427899d2e536442b87d41c140ebd787a580), "Bwb / Barcrest","Cosmic Casino (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4coscas__k,    m4coscas,   "cc_sj_dc.7_1",         0x0000, 0x020000, CRC(330d68a2) SHA1(12410af5f37b26f29f5cd23606ab0e128675095a), "Bwb / Barcrest","Cosmic Casino (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4coscas__l,    m4coscas,   "cc_sj_k_.3s1",         0x0000, 0x020000, CRC(9161912d) SHA1(d11109f4bdc1c60f4cf477e1f26556800a83abdb), "Bwb / Barcrest","Cosmic Casino (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4coscas__m,    m4coscas,   "cc_sj_kc.3r1",         0x0000, 0x020000, CRC(b0dcd41d) SHA1(6b50a5e401bf854186331673dcc0c3fc5de2991b), "Bwb / Barcrest","Cosmic Casino (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4coscas__n,    m4coscas,   "cc_sja__.3s1",         0x0000, 0x020000, CRC(1682b1d3) SHA1(24baaf789eca150f0f6fd9c510e245aa7b88cc4c), "Bwb / Barcrest","Cosmic Casino (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4coscas__o,    m4coscas,   "cc_sja_c.3r1",         0x0000, 0x020000, CRC(373ff4e3) SHA1(55b7ab247863eb3c025e84782c8cab7734343077), "Bwb / Barcrest","Cosmic Casino (Barcrest) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4coscas__p,    m4coscas,   "cc_sja_c.7_1",         0x0000, 0x020000, CRC(e956898e) SHA1(f51682651520551d481360bf86eba510cd758441), "Bwb / Barcrest","Cosmic Casino (Barcrest) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4coscas__q,    m4coscas,   "cc_sjb__.3s1",         0x0000, 0x020000, CRC(5c451985) SHA1(517f634d31f7190ca6685c1037fb66a8b87effba), "Bwb / Barcrest","Cosmic Casino (Barcrest) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4coscas__r,    m4coscas,   "cc_sjb_c.7_1",         0x0000, 0x020000, CRC(109e9ae9) SHA1(00f381beb33cae58fc3429d3501efa4a9d9f0035), "Bwb / Barcrest","Cosmic Casino (Barcrest) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4coscas__s,    m4coscas,   "cc_sjbgc.3r1",         0x0000, 0x020000, CRC(2de82f88) SHA1(5c8029d43282a014e82b4f975616ed2bbc0e5641), "Bwb / Barcrest","Cosmic Casino (Barcrest) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4coscas__t,    m4coscas,   "cc_sjbtc.3r1",         0x0000, 0x020000, CRC(976c2858) SHA1(a70a8fe51d1b9d903d099e89a40481ea6af13683), "Bwb / Barcrest","Cosmic Casino (Barcrest) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4coscas__u,    m4coscas,   "cc_sjwb_.3s1",         0x0000, 0x020000, CRC(e2df8167) SHA1(c312b30402dd93c6d4a32932677430c9c996fd36), "Bwb / Barcrest","Cosmic Casino (Barcrest) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4coscas__v,    m4coscas,   "cc_sjwbc.3r1",         0x0000, 0x020000, CRC(a33a59a6) SHA1(a74ffd647e8390d89df475cc3f5205462c9d93d7), "Bwb / Barcrest","Cosmic Casino (Barcrest) (MPU4) (set 23)" )
+// "(C)1998  B.W.B." and "CC__3.0"
+GAME_CUSTOM( 199?, m4coscas,       0,          "cc_sj___.3s1",         0x0000, 0x020000, CRC(52c312b0) SHA1(bd5381d58b1acb7adf6857c142eae4a253081fbd), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0)" )
+GAME_CUSTOM( 199?, m4coscas__d,    m4coscas,   "cc_sj__c.3r1",         0x0000, 0x020000, CRC(44b940a6) SHA1(7e621873fcf6460f654e35cc74552e86b6253ddb), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 C)" )
+GAME_CUSTOM( 199?, m4coscas__f,    m4coscas,   "cc_sj_b_.3s1",         0x0000, 0x020000, CRC(019f0a71) SHA1(7a97f4e89c16e25f8e7502bba37f49c8496fbb47), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 YD)" )
+GAME_CUSTOM( 199?, m4coscas__g,    m4coscas,   "cc_sj_bc.3r1",         0x0000, 0x020000, CRC(de9bb8e1) SHA1(7974b03974531eb4b5ed865b8eeb9649c1346df4), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 YCD)" )
+GAME_CUSTOM( 199?, m4coscas__i,    m4coscas,   "cc_sj_d_.3s1",         0x0000, 0x020000, CRC(215e12f3) SHA1(68ed9923c6fd51e9305afac9d271c7b3ce38b12f), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 D)" )
+GAME_CUSTOM( 199?, m4coscas__j,    m4coscas,   "cc_sj_dc.3r1",         0x0000, 0x020000, CRC(00e357c3) SHA1(02bf7427899d2e536442b87d41c140ebd787a580), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 CD)" )
+GAME_CUSTOM( 199?, m4coscas__l,    m4coscas,   "cc_sj_k_.3s1",         0x0000, 0x020000, CRC(9161912d) SHA1(d11109f4bdc1c60f4cf477e1f26556800a83abdb), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 Y)" )
+GAME_CUSTOM( 199?, m4coscas__m,    m4coscas,   "cc_sj_kc.3r1",         0x0000, 0x020000, CRC(b0dcd41d) SHA1(6b50a5e401bf854186331673dcc0c3fc5de2991b), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 YC)" )
+GAME_CUSTOM( 199?, m4coscas__n,    m4coscas,   "cc_sja__.3s1",         0x0000, 0x020000, CRC(1682b1d3) SHA1(24baaf789eca150f0f6fd9c510e245aa7b88cc4c), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 K)" )
+GAME_CUSTOM( 199?, m4coscas__o,    m4coscas,   "cc_sja_c.3r1",         0x0000, 0x020000, CRC(373ff4e3) SHA1(55b7ab247863eb3c025e84782c8cab7734343077), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 CK)" )
+GAME_CUSTOM( 199?, m4coscas__q,    m4coscas,   "cc_sjb__.3s1",         0x0000, 0x020000, CRC(5c451985) SHA1(517f634d31f7190ca6685c1037fb66a8b87effba), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 B)" )
+GAME_CUSTOM( 199?, m4coscas__s,    m4coscas,   "cc_sjbgc.3r1",         0x0000, 0x020000, CRC(2de82f88) SHA1(5c8029d43282a014e82b4f975616ed2bbc0e5641), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 BCAD)" )
+GAME_CUSTOM( 199?, m4coscas__t,    m4coscas,   "cc_sjbtc.3r1",         0x0000, 0x020000, CRC(976c2858) SHA1(a70a8fe51d1b9d903d099e89a40481ea6af13683), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 BCR)" )
+GAME_CUSTOM( 199?, m4coscas__u,    m4coscas,   "cc_sjwb_.3s1",         0x0000, 0x020000, CRC(e2df8167) SHA1(c312b30402dd93c6d4a32932677430c9c996fd36), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 YDH)" )
+GAME_CUSTOM( 199?, m4coscas__v,    m4coscas,   "cc_sjwbc.3r1",         0x0000, 0x020000, CRC(a33a59a6) SHA1(a74ffd647e8390d89df475cc3f5205462c9d93d7), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 YCDH)" )
+// "(C)1998  B.W.B." and "CC__7.0"
+GAME_CUSTOM( 199?, m4coscas__e,    m4coscas,   "cc_sj__c.7_1",         0x0000, 0x020000, CRC(ee9e6126) SHA1(fab6fd04004acebf291544720ba06cea79d5a054), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__7.0)" )
+GAME_CUSTOM( 199?, m4coscas__h,    m4coscas,   "cc_sj_bc.7_1",         0x0000, 0x020000, CRC(afe1aac6) SHA1(fc9c69e45db6a85c45ef8d32d048e5726d7da655), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__7.0 YD)" )
+GAME_CUSTOM( 199?, m4coscas__k,    m4coscas,   "cc_sj_dc.7_1",         0x0000, 0x020000, CRC(330d68a2) SHA1(12410af5f37b26f29f5cd23606ab0e128675095a), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__7.0 D)" )
+GAME_CUSTOM( 199?, m4coscas__p,    m4coscas,   "cc_sja_c.7_1",         0x0000, 0x020000, CRC(e956898e) SHA1(f51682651520551d481360bf86eba510cd758441), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__7.0 K)" )
+GAME_CUSTOM( 199?, m4coscas__r,    m4coscas,   "cc_sjb_c.7_1",         0x0000, 0x020000, CRC(109e9ae9) SHA1(00f381beb33cae58fc3429d3501efa4a9d9f0035), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__7.0 B)" )
+GAME_CUSTOM( 199?, m4coscas__b,    m4coscas,   "cosmiccasinos15.bin",  0x0000, 0x020000, CRC(ddba1241) SHA1(7ca2928ae2ab4e323b60bb661b60681f89cc5663), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__7.0 Y)" )
+// no copyright string and "CC__3.0"
+GAME_CUSTOM( 199?, m4coscas__c,    m4coscas,   "cc30s.p1",             0x0000, 0x020000, CRC(e308100a) SHA1(14cb07895d17237768877dd62ba7c3fc8e5b2630), "hack","Cosmic Casino (Barcrest) (MPU4) (CC__3.0, hack)" )
+// no copyright string and "CC__6.0"
+GAME_CUSTOM( 199?, m4coscas__a,    m4coscas,   "cosm15g",              0x0000, 0x020000, CRC(edd01d55) SHA1(49246fa1e12ceb3297f35616cdc1cf62472a379f), "hack","Cosmic Casino (Barcrest) (MPU4) (CC__6.0, hack)" )
 
 
 #define M4DBLDM_EXTRA_ROMS \
@@ -5241,7 +5592,9 @@ GAME_CUSTOM( 199?, m4coscas__v,    m4coscas,   "cc_sjwbc.3r1",         0x0000, 0
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4dbldm,     0,          "cdd05s.p1",    0x0000, 0x020000, CRC(fc14771f) SHA1(f418af9fed331560195a694f20ef2fea27ed04b0), "Barcrest","Double Diamond Club (Barcrest) (MPU4) (set 1)" )
+// "(C)1996 BARCREST" and "CDD 0.5"
+GAME_CUSTOM( 199?, m4dbldm,     0,          "cdd05s.p1",    0x0000, 0x020000, CRC(fc14771f) SHA1(f418af9fed331560195a694f20ef2fea27ed04b0), "Barcrest","Double Diamond Club (Barcrest) (MPU4) (CDD 0.5)" )
 GAME_CUSTOM( 199?, m4dbldm__a,  m4dbldm,    "cdd05d.p1",    0x0000, 0x020000, CRC(fc1c5e90) SHA1(c756d2ac725168af5396c8ef7550db9087a50937), "Barcrest","Double Diamond Club (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4dbldm__b,  m4dbldm,    "cdd05f.p1",    0x0000, 0x020000, CRC(81914bd4) SHA1(cf286810ad6732ca1d706e70f4c2958d28cc979c), "Barcrest","Double Diamond Club (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4dbldm__c,  m4dbldm,    "cdd01.p1",     0x0000, 0x020000, CRC(e35dffde) SHA1(0bfc977f25f25785f20b510c44d2d3d79e23af8b), "Barcrest","Double Diamond Club (Barcrest) (MPU4) (set 4)" )
+// "(C)1996 BARCREST" and "CDD 0.1"
+GAME_CUSTOM( 199?, m4dbldm__c,  m4dbldm,    "cdd01.p1",     0x0000, 0x020000, CRC(e35dffde) SHA1(0bfc977f25f25785f20b510c44d2d3d79e23af8b), "Barcrest","Double Diamond Club (Barcrest) (MPU4) (CDD 0.1)" )

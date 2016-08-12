@@ -285,10 +285,6 @@ image_init_result cassette_image_device::internal_load(bool is_create)
 			cassette_flags = is_writable ? (CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT) : CASSETTE_FLAG_READONLY;
 			std::string fname;
 			err = cassette_open_choices((void *)image, &image_ioprocs, filetype().c_str(), m_formats, cassette_flags, &m_cassette);
-
-			/* this is kind of a hack */
-			if (err && is_writable)
-				make_readonly();
 		}
 		while(err && is_writable);
 

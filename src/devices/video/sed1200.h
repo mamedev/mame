@@ -57,7 +57,7 @@ public:
 	sed1200d0a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 class sed1200f0a_device : public sed1200_device {
@@ -65,7 +65,7 @@ public:
 	sed1200f0a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 class sed1200d0b_device : public sed1200_device {
@@ -73,7 +73,7 @@ public:
 	sed1200d0b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 class sed1200f0b_device : public sed1200_device {
@@ -81,7 +81,7 @@ public:
 	sed1200f0b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 extern const device_type SED1200D0A;

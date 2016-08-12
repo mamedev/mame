@@ -155,9 +155,7 @@ public:
 		m_io_mode4_dsw(*this, "MODE4_DSW"),
 		m_io_p1(*this, "P1"),
 		m_io_p2(*this, "P2"),
-		m_io_key1(*this, "key1"),
-		m_io_key2(*this, "key2"),
-		m_io_key3(*this, "key3"),
+		m_io_keys(*this, {"key1", "key2", "key3"}),
 		m_io_key_modifiers(*this, "key_modifiers"),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
@@ -278,9 +276,7 @@ protected:
 	required_ioport m_io_mode4_dsw;
 	required_ioport m_io_p1;
 	required_ioport m_io_p2;
-	required_ioport m_io_key1;
-	required_ioport m_io_key2;
-	required_ioport m_io_key3;
+	required_ioport_array<3> m_io_keys;
 	required_ioport m_io_key_modifiers;
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank2;
@@ -1903,7 +1899,6 @@ READ8_MEMBER(pc6001_state::pc6001_8255_portc_r)
 
 UINT8 pc6001_state::check_keyboard_press()
 {
-	ioport_port *ports[3] = { m_io_key1, m_io_key2, m_io_key3 };
 	int i,port_i,scancode;
 	UINT8 shift_pressed,caps_lock;
 	scancode = 0;
@@ -1915,7 +1910,7 @@ UINT8 pc6001_state::check_keyboard_press()
 	{
 		for(i=0;i<32;i++)
 		{
-			if((ports[port_i]->read()>>i) & 1)
+			if((m_io_keys[port_i]->read()>>i) & 1)
 			{
 				if((shift_pressed != caps_lock) && scancode >= 0x41 && scancode <= 0x5f)
 					scancode+=0x20;
@@ -1948,7 +1943,7 @@ UINT8 pc6001_state::check_joy_press()
 {
 	UINT8 p1_key = m_io_p1->read() ^ 0xff;
 	UINT8 shift_key = m_io_key_modifiers->read() & 0x02;
-	UINT8 space_key = m_io_key2->read() & 0x01;
+	UINT8 space_key = m_io_keys[1]->read() & 0x01;
 	UINT8 joy_press;
 
 		/*
@@ -2027,9 +2022,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::cassette_callback)
 
 TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::keyboard_callback)
 {
-	UINT32 key1 = m_io_key1->read();
-	UINT32 key2 = m_io_key2->read();
-	UINT32 key3 = m_io_key3->read();
+	UINT32 key1 = m_io_keys[0]->read();
+	UINT32 key2 = m_io_keys[1]->read();
+	UINT32 key3 = m_io_keys[2]->read();
 //  UINT8 p1_key = m_io_p1->read();
 
 	if(m_cas_switch == 0)

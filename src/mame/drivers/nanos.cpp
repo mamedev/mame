@@ -39,13 +39,7 @@ public:
 	m_bank1(*this, "bank1"),
 	m_bank2(*this, "bank2"),
 	m_bank3(*this, "bank3"),
-	m_line0(*this, "LINE0"),
-	m_line1(*this, "LINE1"),
-	m_line2(*this, "LINE2"),
-	m_line3(*this, "LINE3"),
-	m_line4(*this, "LINE4"),
-	m_line5(*this, "LINE5"),
-	m_line6(*this, "LINE6"),
+	m_lines(*this, {"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6"}),
 	m_linec(*this, "LINEC")
 	{ }
 
@@ -84,13 +78,7 @@ protected:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
-	required_ioport m_line0;
-	required_ioport m_line1;
-	required_ioport m_line2;
-	required_ioport m_line3;
-	required_ioport m_line4;
-	required_ioport m_line5;
-	required_ioport m_line6;
+	required_ioport_array<7> m_lines;
 	required_ioport m_linec;
 	UINT8 row_number(UINT8 code);
 };
@@ -343,8 +331,6 @@ UINT8 nanos_state::row_number(UINT8 code)
 
 TIMER_DEVICE_CALLBACK_MEMBER(nanos_state::keyboard_callback)
 {
-	ioport_port *io_ports[] = { m_line0, m_line1, m_line2, m_line3, m_line4, m_line5, m_line6 };
-
 	int i;
 	UINT8 code;
 	UINT8 key_code = 0;
@@ -353,7 +339,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(nanos_state::keyboard_callback)
 	m_key_pressed = 0xff;
 	for(i = 0; i < 7; i++)
 	{
-		code = io_ports[i]->read();
+		code = m_lines[i]->read();
 		if (code != 0)
 		{
 			if (i==0 && shift==0) {

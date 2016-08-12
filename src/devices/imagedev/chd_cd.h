@@ -12,6 +12,7 @@
 #define CHD_CD_H
 
 #include "cdrom.h"
+#include "softlist_dev.h"
 
 /***************************************************************************
     TYPE DEFINITIONS

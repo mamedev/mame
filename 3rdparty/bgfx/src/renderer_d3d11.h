@@ -242,6 +242,7 @@ namespace bgfx { namespace d3d11
 
 		TextureD3D11()
 			: m_ptr(NULL)
+			, m_rt(NULL)
 			, m_srv(NULL)
 			, m_uav(NULL)
 			, m_numMips(0)
@@ -253,7 +254,7 @@ namespace bgfx { namespace d3d11
 		void overrideInternal(uintptr_t _ptr);
 		void update(uint8_t _side, uint8_t _mip, const Rect& _rect, uint16_t _z, uint16_t _depth, uint16_t _pitch, const Memory* _mem);
 		void commit(uint8_t _stage, uint32_t _flags, const float _palette[][4]);
-		void resolve();
+		void resolve() const;
 		TextureHandle getHandle() const;
 
 		union
@@ -261,6 +262,12 @@ namespace bgfx { namespace d3d11
 			ID3D11Resource*  m_ptr;
 			ID3D11Texture2D* m_texture2d;
 			ID3D11Texture3D* m_texture3d;
+		};
+
+		union
+		{
+			ID3D11Resource* m_rt;
+			ID3D11Texture2D* m_rt2d;
 		};
 
 		ID3D11ShaderResourceView*  m_srv;

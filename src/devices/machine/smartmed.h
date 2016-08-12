@@ -8,6 +8,7 @@
 #define __SMARTMEDIA_H__
 
 #include "formats/imageutl.h"
+#include "softlist_dev.h"
 
 //#define SMARTMEDIA_IMAGE_SAVE
 

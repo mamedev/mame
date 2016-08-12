@@ -170,10 +170,10 @@ WRITE32_MEMBER(astrafr_state::astrafr_mem_w)
 		case 3:
 			address &= 0xfffff;
 
-			if (mem_mask&0xff000000) astra_fgpa_w(space, address+0, data >> 24);
-			if (mem_mask&0x00ff0000) astra_fgpa_w(space, address+1, data >> 16);
-			if (mem_mask&0x0000ff00) astra_fgpa_w(space, address+2, data >> 8);
-			if (mem_mask&0x000000ff) astra_fgpa_w(space, address+3, data >> 0);
+			if (ACCESSING_BITS_24_31) astra_fgpa_w(space, address+0, data >> 24);
+			if (ACCESSING_BITS_16_23) astra_fgpa_w(space, address+1, data >> 16);
+			if (ACCESSING_BITS_8_15) astra_fgpa_w(space, address+2, data >> 8);
+			if (ACCESSING_BITS_0_7) astra_fgpa_w(space, address+3, data >> 0);
 			break;
 
 		case 2:
@@ -225,10 +225,10 @@ WRITE32_MEMBER(astrafr_state::astrafr_slave_mem_w)
 		case 3:
 			address &= 0xfffff;
 
-			if (mem_mask&0xff000000) astra_fgpa_slave_w(space, address+0, data >> 24);
-			if (mem_mask&0x00ff0000) astra_fgpa_slave_w(space, address+1, data >> 16);
-			if (mem_mask&0x0000ff00) astra_fgpa_slave_w(space, address+2, data >> 8);
-			if (mem_mask&0x000000ff) astra_fgpa_slave_w(space, address+3, data >> 0);
+			if (ACCESSING_BITS_24_31) astra_fgpa_slave_w(space, address+0, data >> 24);
+			if (ACCESSING_BITS_16_23) astra_fgpa_slave_w(space, address+1, data >> 16);
+			if (ACCESSING_BITS_8_15) astra_fgpa_slave_w(space, address+2, data >> 8);
+			if (ACCESSING_BITS_0_7) astra_fgpa_slave_w(space, address+3, data >> 0);
 			break;
 
 		case 2:

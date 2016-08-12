@@ -26,7 +26,7 @@ ROM_START( wordpro )
 	ROM_LOAD("wordpro.u5", 0x2000, 0x1000, CRC(2a336802) SHA1(b4de50f943243f18a2bfabef354b76d77178c189))
 ROM_END
 
-const rom_entry *wordpro_device::device_rom_region() const
+const tiny_rom_entry *wordpro_device::device_rom_region() const
 {
 	return ROM_NAME( wordpro );
 }

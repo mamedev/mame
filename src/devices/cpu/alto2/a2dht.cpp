@@ -7,6 +7,52 @@
  *****************************************************************************/
 #include "alto2cpu.h"
 
+/*
+ * Copied from ALTOCODE24.MU
+ *	;Display Horizontal Task.
+ *	;11 cycles if no block change, 17 if new control block.
+ *
+ *	DHT:	MAR← CBA-1;
+ *		L← SLC -1, BUS=0;
+ *		SLC← L, :DHT0;
+ *
+ *	DHT0:	T← 37400;		MORE TO DO IN THIS BLOCK
+ *		SINK← MD;
+ *		L← T← MD AND T, SETMODE;
+ *		HTAB← L LCY 8, :NORMODE;
+ *
+ *	NORMODE:L← T← 377 . T;
+ *		AECL← L, :REST;
+ *
+ *	HALFMODE: L← T←  377 . T;
+ *		AECL← L, :REST, T← 0;
+ *
+ *	REST:	L← DWA + T,TASK;	INCREMENT DWA BY 0 OR NWRDS
+ *	NDNX:	DWA← L, :DHT;
+ *
+ *	DHT1:	L← T← MD+1, BUS=0;
+ *		CBA← L, MAR← T, :MOREB;
+ *
+ *	NOMORE:	BLOCK, :DNX;
+ *	MOREB:	T← 37400;
+ *		L← T← MD AND T, SETMODE;
+ *		MAR← CBA+1, :NORMX, EVENFIELD;
+ *
+ *	NORMX:	HTAB← L LCY 8, :NODD;
+ *	HALFX:	HTAB← L LCY 8, :NEVEN;
+ *
+ *	NODD:	L←T← 377 . T;
+ *		AECL← L, :XREST;	ODD FIELD, FULL RESOLUTION
+ *
+ *	NEVEN:	L← 377 AND T;		EVEN FIELD OR HALF RESOLUTION
+ *		AECL←L, T←0;
+ *
+ *	XREST:	L← MD+T;
+ *		T←MD-1;
+ *	DNX:	DWA←L, L←T, TASK;
+ *		SLC←L, :DHT;
+ */
+
 /**
  * @brief f1_dht_block early: disable the display word task
  */
@@ -49,10 +95,6 @@ void alto2_cpu_device::activate_dht()
  */
 void alto2_cpu_device::init_dht(int task)
 {
-	set_f1(task, f1_block,          &alto2_cpu_device::f1_early_dht_block, nullptr);
-	set_f2(task, f2_dht_evenfield,  nullptr, &alto2_cpu_device::f2_late_evenfield);
-	set_f2(task, f2_dht_setmode,    nullptr, &alto2_cpu_device::f2_late_dht_setmode);
-	m_active_callback[task] = &alto2_cpu_device::activate_dht;
 }
 
 void alto2_cpu_device::exit_dht()

@@ -324,12 +324,12 @@ READ8_MEMBER(cosmic_state::cosmica_pixel_clock_r)
 READ8_MEMBER(cosmic_state::cosmicg_port_0_r)
 {
 	/* The top four address lines from the CRTC are bits 0-3 */
-	return (ioport("IN0")->read() & 0xf0) | ((m_screen->vpos() & 0xf0) >> 4);
+	return (m_in_ports[0]->read() & 0xf0) | ((m_screen->vpos() & 0xf0) >> 4);
 }
 
 READ8_MEMBER(cosmic_state::magspot_coinage_dip_r)
 {
-	return (read_safe(ioport("DSW"), 0) & (1 << (7 - offset))) ? 0 : 1;
+	return (m_dsw.read_safe(0) & (1 << (7 - offset))) ? 0 : 1;
 }
 
 
@@ -337,8 +337,8 @@ READ8_MEMBER(cosmic_state::magspot_coinage_dip_r)
 
 READ8_MEMBER(cosmic_state::nomnlnd_port_0_1_r)
 {
-	int control = ioport(offset ? "IN1" : "IN0")->read();
-	int fire = ioport("IN3")->read();
+	int control = m_in_ports[offset]->read();
+	int fire = m_in_ports[3]->read();
 
 	/* If firing - stop tank */
 	if ((fire & 0xc0) == 0) return 0xff;

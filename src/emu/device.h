@@ -203,7 +203,8 @@ public:
 	UINT32 configured_clock() const { return m_configured_clock; }
 	const machine_config &mconfig() const { return m_machine_config; }
 	const input_device_default *input_ports_defaults() const { return m_input_defaults; }
-	const rom_entry *rom_region() const { return device_rom_region(); }
+	const std::vector<rom_entry> &rom_region_vector() const;
+	const rom_entry *rom_region() const { return rom_region_vector().data(); }
 	machine_config_constructor machine_config_additions() const { return device_mconfig_additions(); }
 	ioport_constructor input_ports() const { return device_input_ports(); }
 	UINT8 default_bios() const { return m_default_bios; }
@@ -304,7 +305,7 @@ protected:
 	//------------------- begin derived class overrides
 
 	// device-level overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const tiny_rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
 	virtual void device_config_complete();
@@ -361,6 +362,7 @@ private:
 	bool                    m_config_complete;      // have we completed our configuration?
 	bool                    m_started;              // true if the start function has succeeded
 	finder_base *           m_auto_finder_list;     // list of objects to auto-find
+	mutable std::vector<rom_entry>	m_rom_entries;
 
 	// string formatting buffer for logerror
 	mutable util::ovectorstream m_string_buffer;

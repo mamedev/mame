@@ -56,7 +56,7 @@ public:
 	DECLARE_WRITE16_MEMBER(vreg_127_w);
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:
 	// device-level overrides

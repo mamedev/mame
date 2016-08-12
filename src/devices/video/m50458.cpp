@@ -126,7 +126,7 @@ WRITE16_MEMBER( m50458_device::vreg_127_w)
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *m50458_device::device_rom_region() const
+const tiny_rom_entry *m50458_device::device_rom_region() const
 {
 	return ROM_NAME( m50458 );
 }

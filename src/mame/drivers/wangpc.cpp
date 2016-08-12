@@ -1109,8 +1109,8 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_PIT8253_CLK2(500000)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(wangpc_state, pit2_w))
 
-	MCFG_IM6402_ADD(IM6402_TAG, 0, 62500*16) // HACK for wangpckb in IM6402 derives clocks from data line
-	MCFG_IM6402_TRO_CALLBACK(DEVWRITELINE(WANGPC_KEYBOARD_TAG, wangpc_keyboard_device, write_rxd))
+	MCFG_IM6402_ADD(IM6402_TAG, 62500*16, 62500*16)
+	MCFG_IM6402_TRO_CALLBACK(DEVWRITELINE(WANGPC_KEYBOARD_TAG, wangpc_keyboard_t, write_rxd))
 	MCFG_IM6402_DR_CALLBACK(WRITELINE(wangpc_state, uart_dr_w))
 	MCFG_IM6402_TBRE_CALLBACK(WRITELINE(wangpc_state, uart_tbre_w))
 

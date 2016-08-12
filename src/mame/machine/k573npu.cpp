@@ -85,7 +85,7 @@ ROM_START( k573npu )
 	ROM_LOAD( "29f400.24e",   0x000000, 0x080000, CRC(8dcf294b) SHA1(efac79e18db22c30886463ec1bc448187da7a95a) )
 ROM_END
 
-const rom_entry *k573npu_device::device_rom_region() const
+const tiny_rom_entry *k573npu_device::device_rom_region() const
 {
 	return ROM_NAME( k573npu );
 }

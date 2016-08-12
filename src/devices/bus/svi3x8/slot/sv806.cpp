@@ -27,7 +27,7 @@ ROM_START( sv806 )
 	ROMX_LOAD("sv806se.ic27", 0x0000, 0x1000, CRC(daea8956) SHA1(3f16d5513ad35692488ae7d864f660e76c6e8ed3), ROM_BIOS(2))
 ROM_END
 
-const rom_entry *sv806_device::device_rom_region() const
+const tiny_rom_entry *sv806_device::device_rom_region() const
 {
 	return ROM_NAME( sv806 );
 }

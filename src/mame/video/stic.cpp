@@ -130,7 +130,7 @@ ROM_START( stic_grom )
 	ROM_LOAD( "ro-3-9503-003.u21", 0, 0x0800, CRC(683a4158) SHA1(f9608bb4ad1cfe3640d02844c7ad8e0bcd974917))
 ROM_END
 
-const rom_entry *stic_device::device_rom_region() const
+const tiny_rom_entry *stic_device::device_rom_region() const
 {
 	return ROM_NAME( stic_grom );
 }

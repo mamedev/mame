@@ -53,7 +53,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *sandy_superqboard_t::device_rom_region() const
+const tiny_rom_entry *sandy_superqboard_t::device_rom_region() const
 {
 	return ROM_NAME( sandy_superqboard );
 }

@@ -37,11 +37,7 @@ struct {
 	UINT8 strobe;                   //!< strobe (still) active
 	emu_timer* strobon_timer;       //!< set strobe on timer
 	UINT8 bitclk;                   //!< current bitclk state (either crystal clock, or rdclk from the drive)
-#if USE_BITCLK_TIMER
-	emu_timer* bitclk_timer;        //!< bit clock timer
-#else
 	int bitclk_time[2];             //!< per drive time in clocks per bit
-#endif
 	UINT8 datin;                    //!< current datin from the drive
 	UINT8 bitcount;                 //!< bit counter
 	UINT8 carry;                    //!< carry output of the bitcounter
@@ -78,11 +74,7 @@ TIMER_CALLBACK_MEMBER( disk_seclate );          //!< timer callback to take away
 TIMER_CALLBACK_MEMBER( disk_ok_to_run );        //!< timer callback to take away the OK TO RUN pulse (reset)
 TIMER_CALLBACK_MEMBER( disk_strobon );          //!< timer callback to pulse the STROBE' signal to the drive
 TIMER_CALLBACK_MEMBER( disk_ready_mf31a );      //!< timer callback to change the READY monoflop 31a
-#if USE_BITCLK_TIMER
-TIMER_CALLBACK_MEMBER( disk_bitclk );           //!< callback to update the disk controller with a new bitclk
-#else
 void disk_bitclk(void *ptr, int arg);           //!< function to update the disk controller with a new bitclk
-#endif
 void disk_block(int task);                      //!< called if one of the disk tasks (task_kwd or task_ksec) blocks
 void bs_early_read_kstat();                     //!< bus source: bus driven by disk status register KSTAT
 void bs_early_read_kdata();                     //!< bus source: bus driven by disk data register KDATA input

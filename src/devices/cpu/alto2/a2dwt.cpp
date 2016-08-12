@@ -7,6 +7,37 @@
  *****************************************************************************/
 #include "alto2cpu.h"
 
+/*
+ * Copied from ALTOCODE24.MU
+ *
+ *	;Display Word Task
+ *	
+ *	DWT:	T← DWA;
+ *		T←-3+T+1;
+ *		L← AECL+T,BUS=0,TASK;	AECL CONTAINS NWRDS AT THIS TIME
+ *		AECL←L, :DWTZ;
+ *	
+ *	DWTY:	BLOCK;
+ *		TASK, :DWTF;
+ *	
+ *	DWTZ:	L←HTAB-1, BUS=0,TASK;
+ *		HTAB←L, :DOTAB;
+ *
+ *	DOTAB:	DDR←0, :DWTZ;
+ *	NOTAB:	MAR←T←DWA;
+ *		L←AECL-T-1;
+ *		ALUCY, L←2+T;
+ *		DWA←L, :XNOMORE;
+ *
+ *	DOMORE:	DDR←MD, TASK;
+ *		DDR←MD, :NOTAB;
+ *
+ *	XNOMORE:DDR← MD, BLOCK;
+ *		DDR← MD, TASK;
+ *
+ *	DWTF:	:DWT;
+ */
+
 //! PROM a38 bit O1 is STOPWAKE' (stop DWT if bit is zero)
 #define FIFO_STOPWAKE(a38) (0 == (a38 & disp_a38_STOPWAKE) ? true : false)
 
@@ -44,8 +75,6 @@ void alto2_cpu_device::f2_late_dwt_load_ddr()
 
 void alto2_cpu_device::init_dwt(int task)
 {
-	set_f1(task, f1_block,          &alto2_cpu_device::f1_early_dwt_block, nullptr);
-	set_f2(task, f2_dwt_load_ddr,   nullptr, &alto2_cpu_device::f2_late_dwt_load_ddr);
 }
 
 void alto2_cpu_device::exit_dwt()

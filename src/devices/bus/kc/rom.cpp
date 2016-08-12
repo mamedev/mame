@@ -80,7 +80,7 @@ void kc_8k_device::device_reset()
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *kc_8k_device::device_rom_region() const
+const tiny_rom_entry *kc_8k_device::device_rom_region() const
 {
 	return ROM_NAME( kc_rom );
 }

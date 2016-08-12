@@ -131,7 +131,7 @@ ROM_START( k573dio )
 	ROM_LOAD( "digital-id.bin",   0x000000, 0x000008, CRC(2b977f4d) SHA1(2b108a56653f91cb3351718c45dfcf979bc35ef1) )
 ROM_END
 
-const rom_entry *k573dio_device::device_rom_region() const
+const tiny_rom_entry *k573dio_device::device_rom_region() const
 {
 	return ROM_NAME(k573dio);
 }

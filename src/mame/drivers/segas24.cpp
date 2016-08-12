@@ -518,19 +518,19 @@ UINT8 segas24_state::hotrod_io_r(UINT8 port)
 	switch(port)
 	{
 	case 0:
-		return ioport("P1")->read();
+		return m_p1->read();
 	case 1:
-		return ioport("P2")->read();
+		return m_p2->read();
 	case 2:
-		return read_safe(ioport("P3"), 0xff);
+		return m_p3.read_safe(0xff);
 	case 3:
 		return 0xff;
 	case 4:
-		return ioport("SERVICE")->read();
+		return m_service->read();
 	case 5: // Dip switches
-		return ioport("COINAGE")->read();
+		return m_coinage->read();
 	case 6:
-		return ioport("DSW")->read();
+		return m_dsw->read();
 	case 7: // DAC
 		return 0xff;
 	}
@@ -544,20 +544,20 @@ UINT8 segas24_state::dcclub_io_r(UINT8 port)
 	case 0:
 	{
 		static const UINT8 pos[16] = { 0, 1, 3, 2, 6, 4, 12, 8, 9 };
-		return (ioport("P1")->read() & 0xf) | ((~pos[ioport("PADDLE")->read()>>4]<<4) & 0xf0);
+		return (m_p1->read() & 0xf) | ((~pos[m_paddle->read()>>4]<<4) & 0xf0);
 	}
 	case 1:
-		return ioport("P2")->read();
+		return m_p2->read();
 	case 2:
 		return 0xff;
 	case 3:
 		return 0xff;
 	case 4:
-		return ioport("SERVICE")->read();
+		return m_service->read();
 	case 5: // Dip switches
-		return ioport("COINAGE")->read();
+		return m_coinage->read();
 	case 6:
-		return ioport("DSW")->read();
+		return m_dsw->read();
 	case 7: // DAC
 		return 0xff;
 	}
@@ -567,8 +567,6 @@ UINT8 segas24_state::dcclub_io_r(UINT8 port)
 
 UINT8 segas24_state::mahmajn_io_r(UINT8 port)
 {
-	static const char *const keynames[] = { "MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5", "P1", "P2" };
-
 	switch(port)
 	{
 	case 0:
@@ -576,15 +574,15 @@ UINT8 segas24_state::mahmajn_io_r(UINT8 port)
 	case 1:
 		return 0xff;
 	case 2:
-		return ioport(keynames[cur_input_line])->read();
+		return m_mj_inputs[cur_input_line].read_safe(0xff);
 	case 3:
 		return 0xff;
 	case 4:
-		return ioport("SERVICE")->read();
+		return m_service->read();
 	case 5: // Dip switches
-		return ioport("COINAGE")->read();
+		return m_coinage->read();
 	case 6:
-		return ioport("DSW")->read();
+		return m_dsw->read();
 	case 7: // DAC
 		return 0xff;
 	}
@@ -624,12 +622,10 @@ void segas24_state::hotrod_io_w(UINT8 port, UINT8 data)
 
 WRITE16_MEMBER( segas24_state::hotrod3_ctrl_w )
 {
-	static const char *const portnames[] = { "PEDAL1", "PEDAL2", "PEDAL3", "PEDAL4" };
-
 	if(ACCESSING_BITS_0_7)
 	{
 		data &= 3;
-		hotrod_ctrl_cur = read_safe(ioport(portnames[data]), 0);
+		hotrod_ctrl_cur = m_pedals[data].read_safe(0);
 	}
 }
 
@@ -641,21 +637,21 @@ READ16_MEMBER( segas24_state::hotrod3_ctrl_r )
 		{
 			// Steering dials
 			case 0:
-				return read_safe(ioport("DIAL1"), 0) & 0xff;
+				return m_dials[0].read_safe(0) & 0xff;
 			case 1:
-				return read_safe(ioport("DIAL1"), 0) >> 8;
+				return m_dials[0].read_safe(0) >> 8;
 			case 2:
-				return read_safe(ioport("DIAL2"), 0) & 0xff;
+				return m_dials[1].read_safe(0) & 0xff;
 			case 3:
-				return read_safe(ioport("DIAL2"), 0) >> 8;
+				return m_dials[1].read_safe(0) >> 8;
 			case 4:
-				return read_safe(ioport("DIAL3"), 0) & 0xff;
+				return m_dials[2].read_safe(0) & 0xff;
 			case 5:
-				return read_safe(ioport("DIAL3"), 0) >> 8;
+				return m_dials[2].read_safe(0) >> 8;
 			case 6:
-				return read_safe(ioport("DIAL4"), 0) & 0xff;
+				return m_dials[3].read_safe(0) & 0xff;
 			case 7:
-				return read_safe(ioport("DIAL4"), 0) >> 8;
+				return m_dials[3].read_safe(0) >> 8;
 
 			case 8:
 			{

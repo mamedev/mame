@@ -385,7 +385,7 @@ void pioneer_pr8210_device::device_timer(emu_timer &timer, device_timer_id id, i
 //  ROM region definitions
 //-------------------------------------------------
 
-const rom_entry *pioneer_pr8210_device::device_rom_region() const
+const tiny_rom_entry *pioneer_pr8210_device::device_rom_region() const
 {
 	return ROM_NAME(pr8210);
 }
@@ -1018,7 +1018,7 @@ void simutrek_special_device::device_timer(emu_timer &timer, device_timer_id id,
 //  ROM region definitions
 //-------------------------------------------------
 
-const rom_entry *simutrek_special_device::device_rom_region() const
+const tiny_rom_entry *simutrek_special_device::device_rom_region() const
 {
 	return ROM_NAME(simutrek);
 }

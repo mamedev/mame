@@ -282,16 +282,16 @@ READ8_MEMBER(namcofl_state::port7_r)
 	switch (m_mcu_port6 & 0xf0)
 	{
 		case 0x00:
-			return ioport("IN0")->read();
+			return m_in0->read();
 
 		case 0x20:
-			return ioport("MISC")->read();
+			return m_misc->read();
 
 		case 0x40:
-			return ioport("IN1")->read();
+			return m_in1->read();
 
 		case 0x60:
-			return ioport("IN2")->read();
+			return m_in2->read();
 
 		default:
 			break;
@@ -302,17 +302,17 @@ READ8_MEMBER(namcofl_state::port7_r)
 
 READ8_MEMBER(namcofl_state::dac7_r)
 {
-	return read_safe(ioport("ACCEL"), 0xff);
+	return m_accel.read_safe(0xff);
 }
 
 READ8_MEMBER(namcofl_state::dac6_r)
 {
-	return read_safe(ioport("BRAKE"), 0xff);
+	return m_brake.read_safe(0xff);
 }
 
 READ8_MEMBER(namcofl_state::dac5_r)
 {
-	return read_safe(ioport("WHEEL"), 0xff);
+	return m_wheel.read_safe(0xff);
 }
 
 READ8_MEMBER(namcofl_state::dac4_r){ return 0xff; }

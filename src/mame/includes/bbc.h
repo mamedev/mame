@@ -102,7 +102,8 @@ public:
 		m_via_system_irq(CLEAR_LINE),
 		m_via_user_irq(CLEAR_LINE),
 		m_acia_irq(CLEAR_LINE),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_bbcconfig(*this, "BBCCONFIG")
 	{ }
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats_bbc);
@@ -445,6 +446,7 @@ public: // HACK FOR MC6845
 	void bbc_update_nmi();
 	unsigned int calculate_video_address(int ma,int ra);
 	required_device<palette_device> m_palette;
+	optional_ioport m_bbcconfig;
 };
 
 #endif /* BBC_H_ */

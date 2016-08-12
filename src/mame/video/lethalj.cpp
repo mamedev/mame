@@ -30,13 +30,13 @@ inline void lethalj_state::get_crosshair_xy(int player, int *x, int *y)
 
 	if (player)
 	{
-		*x = (((m_light1_x ? m_light1_x->read() : 0) & 0xff) * width) / 255;
-		*y = (((m_light1_y ? m_light1_y->read() : 0) & 0xff) * height) / 255;
+		*x = ((m_light1_x.read_safe(0) & 0xff) * width) / 255;
+		*y = ((m_light1_y.read_safe(0) & 0xff) * height) / 255;
 	}
 	else
 	{
-		*x = (((m_light0_x ? m_light0_x->read() : 0) & 0xff) * width) / 255;
-		*y = (((m_light0_y ? m_light0_y->read() : 0) & 0xff) * height) / 255;
+		*x = ((m_light0_x.read_safe(0) & 0xff) * width) / 255;
+		*y = ((m_light0_y.read_safe(0) & 0xff) * height) / 255;
 	}
 }
 

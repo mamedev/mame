@@ -4,6 +4,8 @@
 #define __NEOGEO_SLOT_H
 
 #include "emu.h"
+#include "softlist_dev.h"
+
 
 /* PCB */
 enum

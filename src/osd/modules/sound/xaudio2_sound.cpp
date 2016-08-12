@@ -45,6 +45,7 @@
 
 #define INITIAL_BUFFER_COUNT 4
 #define SUBMIT_FREQUENCY_TARGET_MS 20
+#define RESAMPLE_TOLERANCE 1.20f
 
 //============================================================
 //  Macros
@@ -494,7 +495,7 @@ void sound_xaudio2::create_buffers(const WAVEFORMATEX &format)
 	// buffer size is equal to the bytes we need to hold in memory per X tenths of a second where X is audio_latency
 	float audio_latency_in_seconds = m_audio_latency / 10.0f;
 	UINT32 format_bytes_per_second = format.nSamplesPerSec * format.nBlockAlign;
-	UINT32 total_buffer_size = format_bytes_per_second * audio_latency_in_seconds;
+	UINT32 total_buffer_size = format_bytes_per_second * audio_latency_in_seconds * RESAMPLE_TOLERANCE;
 
 	// We want to be able to submit buffers every X milliseconds
 	// I want to divide these up into "packets" so figure out how many buffers we need
@@ -594,10 +595,6 @@ void sound_xaudio2::submit_needed()
 {
 	XAUDIO2_VOICE_STATE state;
 	m_sourceVoice->GetState(&state, XAUDIO2_VOICE_NOSAMPLESPLAYED);
-
-	// If we have a buffer on the queue, no reason to submit
-	if (state.BuffersQueued >= 1)
-		return;
 
 	std::lock_guard<std::mutex> lock(m_buffer_lock);
 

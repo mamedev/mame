@@ -282,7 +282,7 @@ void pioneer_ldv1000_device::device_timer(emu_timer &timer, device_timer_id id, 
 //  ROM region definitions
 //-------------------------------------------------
 
-const rom_entry *pioneer_ldv1000_device::device_rom_region() const
+const tiny_rom_entry *pioneer_ldv1000_device::device_rom_region() const
 {
 	return ROM_NAME(ldv1000);
 }

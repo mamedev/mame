@@ -114,7 +114,7 @@ void bsmt2000_device::static_set_ready_callback(device_t &device, ready_callback
 //  internal ROM region
 //-------------------------------------------------
 
-const rom_entry *bsmt2000_device::device_rom_region() const
+const tiny_rom_entry *bsmt2000_device::device_rom_region() const
 {
 	return ROM_NAME( bsmt2000 );
 }

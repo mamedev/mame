@@ -1747,9 +1747,9 @@ MACHINE_START_MEMBER(bbc_state, bbca)
 
 MACHINE_RESET_MEMBER(bbc_state, bbca)
 {
-	m_monitortype = read_safe(ioport("BBCCONFIG"), 0) & 0x03;
-	m_Speech      = read_safe(ioport("BBCCONFIG"), 0) & 0x04;
-	m_SWRAMtype   = read_safe(ioport("BBCCONFIG"), 0) & 0x18;
+	m_monitortype = m_bbcconfig.read_safe(0) & 0x03;
+	m_Speech      = m_bbcconfig.read_safe(0) & 0x04;
+	m_SWRAMtype   = m_bbcconfig.read_safe(0) & 0x18;
 
 	UINT8 *RAM = m_region_maincpu->base();
 
@@ -1782,9 +1782,9 @@ MACHINE_START_MEMBER(bbc_state, bbcb)
 
 MACHINE_RESET_MEMBER(bbc_state, bbcb)
 {
-	m_monitortype = read_safe(ioport("BBCCONFIG"), 0) & 0x03;
-	m_Speech      = read_safe(ioport("BBCCONFIG"), 1) & 0x04;
-	m_SWRAMtype   = read_safe(ioport("BBCCONFIG"), 0) & 0x18;
+	m_monitortype = m_bbcconfig.read_safe(0) & 0x03;
+	m_Speech      = m_bbcconfig.read_safe(1) & 0x04;
+	m_SWRAMtype   = m_bbcconfig.read_safe(0) & 0x18;
 
 	UINT8 *RAM = m_region_maincpu->base();
 
@@ -1823,8 +1823,8 @@ MACHINE_START_MEMBER(bbc_state, bbcbp)
 
 MACHINE_RESET_MEMBER(bbc_state, bbcbp)
 {
-	m_monitortype = read_safe(ioport("BBCCONFIG"), 0) & 0x03;
-	m_Speech      = read_safe(ioport("BBCCONFIG"), 1) & 0x04;
+	m_monitortype = m_bbcconfig.read_safe(0) & 0x03;
+	m_Speech      = m_bbcconfig.read_safe(1) & 0x04;
 	m_SWRAMtype   = 0;
 
 	m_bank1->set_base(m_region_maincpu->base());
@@ -1855,7 +1855,7 @@ MACHINE_START_MEMBER(bbc_state, bbcm)
 
 MACHINE_RESET_MEMBER(bbc_state, bbcm)
 {
-	m_monitortype = read_safe(ioport("BBCCONFIG"), 0) & 0x03;
+	m_monitortype = m_bbcconfig.read_safe(0) & 0x03;
 	m_Speech      = 0;
 	m_SWRAMtype   = 0;
 

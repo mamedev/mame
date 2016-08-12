@@ -266,12 +266,12 @@ machine_config_constructor omti8621_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( omti_disk );
 }
 
-const rom_entry *omti8621_device::device_rom_region() const
+const tiny_rom_entry *omti8621_device::device_rom_region() const
 {
 	return ROM_NAME( omti8621 );
 }
 
-const rom_entry *omti8621_apollo_device::device_rom_region() const
+const tiny_rom_entry *omti8621_apollo_device::device_rom_region() const
 {
 	// OMTI 8621 boards for Apollo workstations never use a BIOS ROM
 	// They don't even have a socket for the BIOS ROM

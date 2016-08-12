@@ -205,7 +205,7 @@ qs1000_device::qs1000_device(const machine_config &mconfig, const char *tag, dev
 //  rom_region - return a pointer to the device's
 //  internal ROM region
 //-------------------------------------------------
-const rom_entry *qs1000_device::device_rom_region() const
+const tiny_rom_entry *qs1000_device::device_rom_region() const
 {
 	return m_external_rom ? nullptr : ROM_NAME( qs1000 );
 }

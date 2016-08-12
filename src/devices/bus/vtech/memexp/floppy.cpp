@@ -34,7 +34,7 @@ ROM_START( floppy )
 	ROM_LOAD("vzdos.rom", 0x0000, 0x2000, CRC(b6ed6084) SHA1(59d1cbcfa6c5e1906a32704fbf0d9670f0d1fd8b))
 ROM_END
 
-const rom_entry *floppy_controller_device::device_rom_region() const
+const tiny_rom_entry *floppy_controller_device::device_rom_region() const
 {
 	return ROM_NAME( floppy );
 }

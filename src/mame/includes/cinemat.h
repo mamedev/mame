@@ -20,7 +20,9 @@ public:
 		m_samples(*this, "samples"),
 		m_vector(*this, "vector"),
 		m_screen(*this, "screen"),
-		m_rambase(*this, "rambase") { }
+		m_rambase(*this, "rambase"),
+		m_analog_x(*this, "ANALOGX"),
+		m_analog_y(*this, "ANALOGY") { }
 
 	required_device<ccpu_cpu_device> m_maincpu;
 	optional_device<ay8910_device> m_ay1;
@@ -28,6 +30,9 @@ public:
 	required_device<vector_device> m_vector;
 	required_device<screen_device> m_screen;
 	optional_shared_ptr<UINT16> m_rambase;
+
+	optional_ioport m_analog_x;
+	optional_ioport m_analog_y;
 
 	typedef void (cinemat_state::*sound_func)(UINT8 sound_val, UINT8 bits_changed);
 

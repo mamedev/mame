@@ -431,6 +431,7 @@ MACHINES["LDPR8210"] = true
 MACHINES["LDSTUB"] = true
 MACHINES["LDV1000"] = true
 MACHINES["LDP1000"] = true
+MACHINES["LDP1450"] = true
 MACHINES["LDVP931"] = true
 --MACHINES["LH5810"] = true
 MACHINES["LINFLASH"] = true
@@ -3240,7 +3241,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/cabal.cpp",
 	MAME_DIR .. "src/mame/includes/cabal.h",
 	MAME_DIR .. "src/mame/video/cabal.cpp",
-	MAME_DIR .. "src/mame/drivers/cshooter.cpp",
+	MAME_DIR .. "src/mame/drivers/airraid.cpp",
 	MAME_DIR .. "src/mame/drivers/dcon.cpp",
 	MAME_DIR .. "src/mame/includes/dcon.h",
 	MAME_DIR .. "src/mame/video/dcon.cpp",
@@ -3284,9 +3285,12 @@ files {
 	MAME_DIR .. "src/mame/video/seibuspi.cpp",
 	MAME_DIR .. "src/mame/drivers/sengokmj.cpp",
 	MAME_DIR .. "src/mame/drivers/stfight.cpp",
+	MAME_DIR .. "src/mame/video/stfight_dev.cpp",
+	MAME_DIR .. "src/mame/video/stfight_dev.h",
+	MAME_DIR .. "src/mame/video/airraid_dev.cpp",
+	MAME_DIR .. "src/mame/video/airraid_dev.h",
 	MAME_DIR .. "src/mame/includes/stfight.h",
 	MAME_DIR .. "src/mame/machine/stfight.cpp",
-	MAME_DIR .. "src/mame/video/stfight.cpp",
 	MAME_DIR .. "src/mame/drivers/toki.cpp",
 	MAME_DIR .. "src/mame/includes/toki.h",
 	MAME_DIR .. "src/mame/video/toki.cpp",

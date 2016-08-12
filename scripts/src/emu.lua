@@ -158,6 +158,8 @@ files {
 	MAME_DIR .. "src/emu/screen.h",
 	MAME_DIR .. "src/emu/softlist.cpp",
 	MAME_DIR .. "src/emu/softlist.h",
+	MAME_DIR .. "src/emu/softlist_dev.cpp",
+	MAME_DIR .. "src/emu/softlist_dev.h",
 	MAME_DIR .. "src/emu/sound.cpp",
 	MAME_DIR .. "src/emu/sound.h",
 	MAME_DIR .. "src/emu/speaker.cpp",

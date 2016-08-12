@@ -808,7 +808,7 @@ READ32_MEMBER( deco32_state::fghthist_protection_region_0_146_r )
 {
 	UINT32 retdata = 0x0000ffff;
 
-	if (mem_mask & 0xffff0000)
+	if (ACCESSING_BITS_16_31)
 	{
 		mem_mask >>=16;
 
@@ -826,7 +826,7 @@ READ32_MEMBER( deco32_state::fghthist_protection_region_0_146_r )
 
 WRITE32_MEMBER( deco32_state::fghthist_protection_region_0_146_w )
 {
-	if (mem_mask & 0xffff0000)
+	if (ACCESSING_BITS_16_31)
 	{
 		data >>=16;
 		mem_mask >>=16;

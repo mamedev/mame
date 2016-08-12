@@ -53,7 +53,6 @@ menu::global_state_ptr menu::get_global_state(running_machine &machine)
 	std::lock_guard<std::mutex> guard(s_global_state_guard);
 	auto const it(s_global_states.find(&machine));
 	return (it != s_global_states.end()) ? it->second : global_state_ptr();
-
 }
 
 //-------------------------------------------------

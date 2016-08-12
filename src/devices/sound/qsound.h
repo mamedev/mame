@@ -40,7 +40,7 @@ public:
 
 protected:
 	// device-level overrides
-	const rom_entry *device_rom_region() const override;
+	const tiny_rom_entry *device_rom_region() const override;
 	machine_config_constructor device_mconfig_additions() const override;
 	virtual void device_start() override;
 

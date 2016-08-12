@@ -63,7 +63,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c1570_t::device_rom_region() const
+const tiny_rom_entry *c1570_t::device_rom_region() const
 {
 	return ROM_NAME( c1570 );
 }
@@ -89,7 +89,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c1571_t::device_rom_region() const
+const tiny_rom_entry *c1571_t::device_rom_region() const
 {
 	return ROM_NAME( c1571 );
 }
@@ -113,7 +113,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c1571cr_t::device_rom_region() const
+const tiny_rom_entry *c1571cr_t::device_rom_region() const
 {
 	return ROM_NAME( c1571cr );
 }
@@ -133,7 +133,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *mini_chief_t::device_rom_region() const
+const tiny_rom_entry *mini_chief_t::device_rom_region() const
 {
 	return ROM_NAME( minichief );
 }

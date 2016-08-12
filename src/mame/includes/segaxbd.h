@@ -138,6 +138,8 @@ protected:
 	UINT8       m_palette_hilight[32];      // RGB translations for hilighted pixels
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_ioport_array<8> m_adc_ports;
+	optional_ioport_array<4> m_mux_ports;
 
 protected:
 	virtual void device_start() override;

@@ -3,6 +3,8 @@
 #ifndef __VCS_SLOT_H
 #define __VCS_SLOT_H
 
+#include "softlist_dev.h"
+
 
 /***************************************************************************
  TYPE DEFINITIONS

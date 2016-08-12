@@ -48,7 +48,7 @@ ROM_START( pf10 )
 	ROM_LOAD("k3pf1.bin", 0x0000, 0x2000, CRC(eef4593a) SHA1(bb176e4baf938fe58c2d32f7c46d7bb7b0627755))
 ROM_END
 
-const rom_entry *epson_pf10_device::device_rom_region() const
+const tiny_rom_entry *epson_pf10_device::device_rom_region() const
 {
 	return ROM_NAME( pf10 );
 }

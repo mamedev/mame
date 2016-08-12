@@ -55,7 +55,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *ec_1841_keyboard_device::device_rom_region() const
+const tiny_rom_entry *ec_1841_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME( ec_1841_keyboard );
 }

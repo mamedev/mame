@@ -173,7 +173,7 @@ void driver_device::video_reset()
 //  game's ROMs
 //-------------------------------------------------
 
-const rom_entry *driver_device::device_rom_region() const
+const tiny_rom_entry *driver_device::device_rom_region() const
 {
 	return m_system->rom;
 }

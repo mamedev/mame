@@ -62,11 +62,11 @@ struct ImGuiSizeConstraintCallbackData;// Structure used to constraint window si
 struct ImGuiListClipper;            // Helper to manually clip large list of items
 struct ImGuiContext;                // ImGui context (opaque)
 
-// Enumerations (declared as int for compatibility and to not pollute the top of this file)
-typedef unsigned int ImU32;
+// Typedefs and Enumerations (declared as int for compatibility and to not pollute the top of this file)
+typedef unsigned int ImU32;         // 32-bit unsigned integer (typically used to store packed colors)
+typedef unsigned int ImGuiID;       // unique ID used by widgets (typically hashed from a stack of string)
 typedef unsigned short ImWchar;     // character for keyboard input/display
 typedef void* ImTextureID;          // user data to identify a texture (this is whatever to you want it to be! read the FAQ about ImTextureID in imgui.cpp)
-typedef ImU32 ImGuiID;              // unique ID used by widgets (typically hashed from a stack of string)
 typedef int ImGuiCol;               // a color identifier for styling       // enum ImGuiCol_
 typedef int ImGuiStyleVar;          // a variable identifier for styling    // enum ImGuiStyleVar_
 typedef int ImGuiKey;               // a key identifier (ImGui-side enum)   // enum ImGuiKey_
@@ -352,7 +352,7 @@ namespace ImGui
     IMGUI_API void          Value(const char* prefix, unsigned int v);
     IMGUI_API void          Value(const char* prefix, float v, const char* float_format = NULL);
     IMGUI_API void          ValueColor(const char* prefix, const ImVec4& v);
-    IMGUI_API void          ValueColor(const char* prefix, unsigned int v);
+    IMGUI_API void          ValueColor(const char* prefix, ImU32 v);
 
     // Tooltips
     IMGUI_API void          SetTooltip(const char* fmt, ...) IM_PRINTFARGS(1);                  // set tooltip under mouse-cursor, typically use with ImGui::IsHovered(). last call wins
@@ -409,7 +409,8 @@ namespace ImGui
     IMGUI_API bool          IsRootWindowFocused();                                              // is current root window focused (root = top-most parent of a child, otherwise self)
     IMGUI_API bool          IsRootWindowOrAnyChildFocused();                                    // is current root window or any of its child (including current window) focused
     IMGUI_API bool          IsRootWindowOrAnyChildHovered();                                    // is current root window or any of its child (including current window) hovered and hoverable (not blocked by a popup)
-    IMGUI_API bool          IsRectVisible(const ImVec2& size);                                  // test if rectangle of given size starting from cursor pos is visible (not clipped). to perform coarse clipping on user's side (as an optimization)
+    IMGUI_API bool          IsRectVisible(const ImVec2& size);                                  // test if rectangle (of given size, starting from cursor position) is visible / not clipped.
+    IMGUI_API bool          IsRectVisible(const ImVec2& rect_min, const ImVec2& rect_max);      // test if rectangle (in screen space) is visible / not clipped. to perform coarse clipping on user's side.
     IMGUI_API bool          IsPosHoveringAnyWindow(const ImVec2& pos);                          // is given position hovering any active imgui window
     IMGUI_API float         GetTime();
     IMGUI_API int           GetFrameCount();
@@ -467,15 +468,9 @@ namespace ImGui
     static inline bool      CollapsingHeader(const char* label, const char* str_id, bool framed = true, bool default_open = false) { (void)str_id; (void)framed; ImGuiTreeNodeFlags default_open_flags = 1<<5; return CollapsingHeader(label, (default_open ? default_open_flags : 0)); } // OBSOLETE 1.49+
     static inline ImFont*   GetWindowFont() { return GetFont(); }                              // OBSOLETE 1.48+
     static inline float     GetWindowFontSize() { return GetFontSize(); }                      // OBSOLETE 1.48+
-    static inline void      OpenNextNode(bool open) { ImGui::SetNextTreeNodeOpen(open, 0); }   // OBSOLETE 1.34+
-    static inline bool      GetWindowIsFocused() { return ImGui::IsWindowFocused(); }          // OBSOLETE 1.36+
-    static inline bool      GetWindowCollapsed() { return ImGui::IsWindowCollapsed(); }        // OBSOLETE 1.39+
-    static inline ImVec2    GetItemBoxMin() { return GetItemRectMin(); }                       // OBSOLETE 1.36+
-    static inline ImVec2    GetItemBoxMax() { return GetItemRectMax(); }                       // OBSOLETE 1.36+
-    static inline bool      IsClipped(const ImVec2& size) { return !IsRectVisible(size); }     // OBSOLETE 1.38+
-    static inline bool      IsRectClipped(const ImVec2& size) { return !IsRectVisible(size); } // OBSOLETE 1.39+
-    static inline bool      IsMouseHoveringBox(const ImVec2& rect_min, const ImVec2& rect_max) { return IsMouseHoveringRect(rect_min, rect_max); }  // OBSOLETE 1.36+
     static inline void      SetScrollPosHere() { SetScrollHere(); }                            // OBSOLETE 1.42+
+    static inline bool      GetWindowCollapsed() { return ImGui::IsWindowCollapsed(); }        // OBSOLETE 1.39+
+    static inline bool      IsRectClipped(const ImVec2& size) { return !IsRectVisible(size); } // OBSOLETE 1.39+
 #endif
 
 } // namespace ImGui
@@ -694,9 +689,9 @@ enum ImGuiMouseCursor_
 enum ImGuiSetCond_
 {
     ImGuiSetCond_Always        = 1 << 0, // Set the variable
-    ImGuiSetCond_Once          = 1 << 1, // Only set the variable on the first call per runtime session
-    ImGuiSetCond_FirstUseEver  = 1 << 2, // Only set the variable if the window doesn't exist in the .ini file
-    ImGuiSetCond_Appearing     = 1 << 3  // Only set the variable if the window is appearing after being inactive (or the first time)
+    ImGuiSetCond_Once          = 1 << 1, // Set the variable once per runtime session (only the first call with succeed)
+    ImGuiSetCond_FirstUseEver  = 1 << 2, // Set the variable if the window has no saved data (if doesn't exist in the .ini file)
+    ImGuiSetCond_Appearing     = 1 << 3  // Set the variable if the window is appearing after being hidden/inactive (or the first time)
 };
 
 struct ImGuiStyle
@@ -758,10 +753,7 @@ struct ImGuiIO
     ImVec2        DisplayVisibleMax;        // <unset> (0.0f,0.0f)  // If the values are the same, we defaults to Min=(0.0f) and Max=DisplaySize
 
     // Advanced/subtle behaviors
-    bool          WordMovementUsesAltKey;   // = defined(__APPLE__) // OS X style: Text editing cursor movement using Alt instead of Ctrl
-    bool          ShortcutsUseSuperKey;     // = defined(__APPLE__) // OS X style: Shortcuts using Cmd/Super instead of Ctrl
-    bool          DoubleClickSelectsWord;   // = defined(__APPLE__) // OS X style: Double click selects by word instead of selecting whole text
-    bool          MultiSelectUsesSuperKey;  // = defined(__APPLE__) // OS X style: Multi-selection in lists uses Cmd/Super instead of Ctrl [unused yet]
+    bool          OSXBehaviors;             // = defined(__APPLE__) // OS X style: Text editing cursor movement using Alt instead of Ctrl, Shortcuts using Cmd/Super instead of Ctrl, Line/Text Start and End using Cmd+Arrows instead of Home/End, Double click selects by word instead of selecting whole text, Multi-selection in lists uses Cmd/Super instead of Ctrl
 
     //------------------------------------------------------------------
     // User Functions
@@ -888,7 +880,8 @@ public:
         if (new_capacity <= Capacity) return;
         T* new_data = (value_type*)ImGui::MemAlloc((size_t)new_capacity * sizeof(value_type));
         memset(&new_data[Size], 0, (size_t)(new_capacity - Size) * sizeof(value_type)); // BK - clear garbage so that 0 initialized ImString works properly.
-        memcpy(new_data, Data, (size_t)Size * sizeof(value_type));
+        if (Data)
+            memcpy(new_data, Data, (size_t)Size * sizeof(value_type));
         ImGui::MemFree(Data);
         Data = new_data;
         Capacity = new_capacity;
@@ -1272,7 +1265,7 @@ struct ImFontConfig
     int             FontNo;                     // 0        // Index of font within TTF file
     float           SizePixels;                 //          // Size in pixels for rasterizer
     int             OversampleH, OversampleV;   // 3, 1     // Rasterize at higher quality for sub-pixel positioning. We don't use sub-pixel positions on the Y axis.
-    bool            PixelSnapH;                 // false    // Align every character to pixel boundary (if enabled, set OversampleH/V to 1)
+    bool            PixelSnapH;                 // false    // Align every glyph to pixel boundary. Useful e.g. if you are merging a non-pixel aligned font with the default font. If enabled, you can set OversampleH/V to 1.
     ImVec2          GlyphExtraSpacing;          // 0, 0     // Extra spacing (in pixels) between glyphs
     const ImWchar*  GlyphRanges;                //          // Pointer to a user-provided list of Unicode range (2 value per range, values are inclusive, zero-terminated list). THE ARRAY DATA NEEDS TO PERSIST AS LONG AS THE FONT IS ALIVE.
     bool            MergeMode;                  // false    // Merge into previous ImFont, so you can combine multiple inputs font into one ImFont (e.g. ASCII font + icons + Japanese glyphs).
@@ -1325,6 +1318,7 @@ struct ImFontAtlas
     IMGUI_API const ImWchar*    GetGlyphRangesJapanese();   // Default + Hiragana, Katakana, Half-Width, Selection of 1946 Ideographs
     IMGUI_API const ImWchar*    GetGlyphRangesChinese();    // Japanese + full set of about 21000 CJK Unified Ideographs
     IMGUI_API const ImWchar*    GetGlyphRangesCyrillic();   // Default + about 400 Cyrillic characters
+    IMGUI_API const ImWchar*    GetGlyphRangesThai();       // Default + Thai characters
 
     // Members
     // (Access texture data via GetTexData*() calls which will setup a default font for you.)

@@ -768,7 +768,11 @@ void cleaner_base::handle_codepoint(unicode_char cp)
 class text_cleaner : public cleaner_base
 {
 public:
-	using cleaner_base::cleaner_base;
+	template <typename OutputIt>
+	text_cleaner(OutputIt &&output, newline newline_mode, unsigned tab_width)
+		: cleaner_base(std::forward<OutputIt>(output), newline_mode, tab_width)
+	{
+	}
 
 private:
 	virtual void process_characters(unicode_char const *begin, unicode_char const *end) override
@@ -1464,24 +1468,6 @@ bool is_xml_extension(char const *ext)
 
 int main(int argc, char *argv[])
 {
-#if 0
-	int removed_tabs = 0;
-	int added_tabs = 0;
-	int removed_spaces = 0;
-	int removed_continuations = 0;
-	int removed_newlines = 0;
-	int dst = 0;
-	bool in_multiline_comment = false;
-	bool in_singleline_comment = false;
-	int indent_multiline_comment = 0;
-	int in_c_string = FALSE;
-	int hichars = 0;
-	int bytes;
-	int col = 0;
-	int escape = 0;
-	const int tab_size = 4;
-#endif
-
 	bool                    keep_backup(false);
 	bool                    dry_run(false);
 #if defined(WIN32)

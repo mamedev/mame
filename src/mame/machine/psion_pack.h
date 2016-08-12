@@ -9,6 +9,8 @@
 #ifndef __PSION_PACK_H__
 #define __PSION_PACK_H__
 
+#include "softlist_dev.h"
+
 
 /***************************************************************************
     TYPE DEFINITIONS

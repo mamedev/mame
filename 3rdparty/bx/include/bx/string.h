@@ -30,7 +30,7 @@ namespace bx
 	/// Case insensitive string compare.
 	inline int32_t stricmp(const char* _a, const char* _b)
 	{
-#if BX_COMPILER_MSVC_COMPATIBLE
+#if BX_CRT_MSVC
 		return ::_stricmp(_a, _b);
 #else
 		return ::strcasecmp(_a, _b);

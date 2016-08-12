@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "mameopts.h"
 #include "drivenum.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 #include <ctype.h>
 

@@ -183,10 +183,7 @@ WRITE_LINE_MEMBER(vectrex_state::vectrex_via_irq)
 
 READ8_MEMBER(vectrex_state::vectrex_via_pb_r)
 {
-	int pot;
-	ioport_port *io_port[4] = { m_io_contr1x, m_io_contr1y, m_io_contr2x, m_io_contr2y };
-
-	pot = io_port[(m_via_out[PORTB] & 0x6) >> 1]->read() - 0x80;
+	int pot = m_io_contr[(m_via_out[PORTB] & 0x6) >> 1]->read() - 0x80;
 
 	if (pot > (signed char)m_via_out[PORTA])
 		m_via_out[PORTB] |= 0x20;

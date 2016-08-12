@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria,Paul Priest,Aaron Giles
 /*********************************************************************
 
-    romload.c
+    romload.cpp
 
     ROM loading functions.
 *********************************************************************/
@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "drivenum.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "ui/uimain.h"
 
 
@@ -268,23 +268,22 @@ int rom_load_manager::set_disk_handle(const char *region, const char *fullpath)
 void rom_load_manager::determine_bios_rom(device_t &device, const char *specbios)
 {
 	const char *defaultname = nullptr;
-	const rom_entry *rom;
 	int default_no = 1;
 	int bios_count = 0;
 
 	device.set_system_bios(0);
 
 	/* first determine the default BIOS name */
-	for (rom = device.rom_region(); !ROMENTRY_ISEND(rom); rom++)
-		if (ROMENTRY_ISDEFAULT_BIOS(rom))
-			defaultname = ROM_GETNAME(rom);
+	for (const rom_entry &rom : device.rom_region_vector())
+		if (ROMENTRY_ISDEFAULT_BIOS(&rom))
+			defaultname = ROM_GETNAME(&rom);
 
 	/* look for a BIOS with a matching name */
-	for (rom = device.rom_region(); !ROMENTRY_ISEND(rom); rom++)
-		if (ROMENTRY_ISSYSTEM_BIOS(rom))
+	for (const rom_entry &rom : device.rom_region_vector())
+		if (ROMENTRY_ISSYSTEM_BIOS(&rom))
 		{
-			const char *biosname = ROM_GETNAME(rom);
-			int bios_flags = ROM_GETBIOSFLAGS(rom);
+			const char *biosname = ROM_GETNAME(&rom);
+			int bios_flags = ROM_GETBIOSFLAGS(&rom);
 			char bios_number[20];
 
 			/* Allow '-bios n' to still be used */
@@ -813,7 +812,7 @@ void rom_load_manager::fill_rom_data(const rom_entry *romp)
 		fatalerror("Error in RomModule definition: FILL has an invalid length\n");
 
 	// for fill bytes, the byte that gets filled is the first byte of the hashdata string
-	UINT8 fill_byte = (UINT8)atoi(ROM_GETHASHDATA(romp));
+	UINT8 fill_byte = (UINT8)strtol(ROM_GETHASHDATA(romp), nullptr, 0);
 
 	// fill the data (filling value is stored in place of the hashdata)
 	if(skip != 0)
@@ -1488,3 +1487,30 @@ rom_load_manager::rom_load_manager(running_machine &machine)
 	/* display the results and exit */
 	display_rom_load_results(false);
 }
+
+
+// -------------------------------------------------
+// rom_build_entries - builds a rom_entry vector
+// from a tiny_rom_entry array
+// -------------------------------------------------
+
+std::vector<rom_entry> rom_build_entries(const tiny_rom_entry *tinyentries)
+{
+	std::vector<rom_entry> result;
+
+	if (tinyentries != nullptr)
+	{
+		int i = 0;
+		do
+		{
+			result.emplace_back(tinyentries[i]);
+		} while ((tinyentries[i++].flags & ROMENTRY_TYPEMASK) != ROMENTRYTYPE_END);
+	}
+	else
+	{
+		const tiny_rom_entry end_entry = { nullptr, nullptr, 0, 0, ROMENTRYTYPE_END };
+		result.emplace_back(end_entry);
+	}
+	return result;
+}
+

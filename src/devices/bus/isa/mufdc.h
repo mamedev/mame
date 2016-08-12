@@ -69,7 +69,7 @@ public:
 	// construction/destruction
 	fdc344_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:
 	virtual void device_config_complete() override { m_shortname = "fdc344"; }
@@ -81,7 +81,7 @@ public:
 	// construction/destruction
 	fdcmag_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:
 	virtual void device_config_complete() override { m_shortname = "fdcmag"; }

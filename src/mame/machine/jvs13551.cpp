@@ -35,7 +35,7 @@ ROM_START( jvs13551 )
 	ROM_LOAD( "315-6215.bin", 0x0000, 0x8000, CRC(d7c97e40) SHA1(b1ae8db332f869c4fdbbae15967baeca0bc7f57d))
 ROM_END
 
-const rom_entry *sega_837_13551::device_rom_region() const
+const tiny_rom_entry *sega_837_13551::device_rom_region() const
 {
 	return ROM_NAME(jvs13551);
 }

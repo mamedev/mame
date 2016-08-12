@@ -151,6 +151,11 @@ WRITE8_MEMBER(p1_state::p1_trap_w)
 
 READ8_MEMBER(p1_state::p1_cga_r)
 {
+	UINT16 port = offset + 0x3d0;
+
+	DBG_LOG(1,"cga",("R %.4x\n", port));
+	m_video.trap[1] = 0x40 | ((port >> 8) & 0x3f);
+	m_video.trap[0] = port & 255;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	return 0;
 }
@@ -189,15 +194,18 @@ WRITE8_MEMBER(p1_state::p1_vram_w)
 
 WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
 {
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+
 	DBG_LOG(1,"color_select_68",("W $%02x\n", data));
 
 	// NMI DISABLE
 	if (BIT((data ^ m_video.color_select_68), 3)) {
+		program.unmap_readwrite( 0xb8000, 0xbbfff, 0 );
 		if (BIT(data, 3)) {
-			space.install_readwrite_bank( 0xb8000, 0xbbfff, "bank11" );
+			program.install_readwrite_bank( 0xb8000, 0xbbfff, "bank11" );
 		} else {
-			space.install_read_bank( 0xb8000, 0xbbfff, "bank11" );
-			space.install_write_handler( 0xb8000, 0xbbfff, WRITE8_DELEGATE(p1_state, p1_vram_w) );
+			program.install_read_bank( 0xb8000, 0xbbfff, "bank11" );
+			program.install_write_handler( 0xb8000, 0xbbfff, WRITE8_DELEGATE(p1_state, p1_vram_w) );
 		}
 	}
 	// DISPLAY BANK
@@ -386,8 +394,10 @@ void p1_state::video_start()
 	m_video.videoram = m_video.videoram_base.get();
 	m_video.stride = 80;
 
-	space.install_readwrite_bank(0xb8000, 0xbffff, "bank11" );
+	space.install_readwrite_bank(0xb8000, 0xbbfff, "bank11" );
 	machine().root_device().membank("bank11")->set_base(m_video.videoram);
+	space.install_readwrite_bank(0xbc000, 0xbffff, "bank12" );
+	machine().root_device().membank("bank12")->set_base(m_video.videoram + 0x4000);
 }
 
 UINT32 p1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -641,7 +651,7 @@ static MACHINE_CONFIG_START( poisk1, p1_state )
 	MCFG_ISA8_SLOT_ADD("isa", "isa4", p1_isa8_cards, nullptr, false)
 
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","poisk1_flop")
 //  MCFG_SOFTWARE_LIST_ADD("cass_list","poisk1_cass")

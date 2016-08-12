@@ -31,7 +31,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c64_nl10_interface_device::device_rom_region() const
+const tiny_rom_entry *c64_nl10_interface_device::device_rom_region() const
 {
 	return ROM_NAME( c64_nl10_interface );
 }

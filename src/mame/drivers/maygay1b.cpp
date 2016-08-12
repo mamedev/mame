@@ -559,8 +559,7 @@ WRITE8_MEMBER( maygay1b_state::lamp_data_w )
 
 READ8_MEMBER( maygay1b_state::kbd_r )
 {
-	ioport_port * portnames[] = { m_sw1_port, m_s2_port, m_s3_port, m_s4_port, m_s5_port, m_s6_port, m_s7_port, m_sw2_port};
-	return (portnames[m_lamp_strobe&0x07])->read();
+	return (m_kbd_ports[m_lamp_strobe&0x07])->read();
 }
 
 WRITE8_MEMBER( maygay1b_state::lamp_data_2_w )

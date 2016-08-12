@@ -57,7 +57,7 @@ ROM_START( cpc_brunword4 )
 	ROM_LOAD( "brunw-fb.rom",  0x7c000, 0x4000, CRC(88383953) SHA1(50c6417b26134b68a80912bdb91c8578eb00c8a2) )
 ROM_END
 
-const rom_entry *cpc_brunword4_device::device_rom_region() const
+const tiny_rom_entry *cpc_brunword4_device::device_rom_region() const
 {
 	return ROM_NAME( cpc_brunword4 );
 }

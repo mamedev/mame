@@ -258,16 +258,6 @@ WRITE8_MEMBER( tmc2000e_state::dma_w )
 
 void tmc2000e_state::machine_start()
 {
-	// find keyboard rows
-	m_key_row[0] = m_y0;
-	m_key_row[1] = m_y1;
-	m_key_row[2] = m_y2;
-	m_key_row[3] = m_y3;
-	m_key_row[4] = m_y4;
-	m_key_row[5] = m_y5;
-	m_key_row[6] = m_y6;
-	m_key_row[7] = m_y7;
-
 	/* register for state saving */
 	save_item(NAME(m_cdp1864_efx));
 	save_item(NAME(m_keylatch));

@@ -157,9 +157,6 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 
 						if (net_proxy_output == nullptr)
 						{
-							//net_proxy_output = palloc(analog_output_t(*this,
-							//      this->name() + "." + plib::pfmt("m{1}")(m_inps.size())));
-
 							auto net_proxy_output_u = plib::make_unique<proxied_analog_output_t>(*this, this->name() + "." + plib::pfmt("m{1}")(m_inps.size()));
 							net_proxy_output = net_proxy_output_u.get();
 							m_inps.push_back(std::move(net_proxy_output_u));
@@ -385,7 +382,7 @@ void matrix_solver_t::reset()
 	m_last_step = netlist_time::zero();
 }
 
-void matrix_solver_t::update() NOEXCEPT
+void matrix_solver_t::update() NL_NOEXCEPT
 {
 	const netlist_time new_timestep = solve();
 
@@ -691,9 +688,61 @@ std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(unsigned siz
 	}
 }
 
+struct net_splitter
+{
+
+	bool already_processed(analog_net_t *n)
+	{
+		if (n->isRailNet())
+			return true;
+		for (auto & grp : groups)
+			if (plib::container::contains(grp, n))
+				return true;
+		return false;
+	}
+
+	void process_net(analog_net_t *n)
+	{
+		if (n->num_cons() == 0)
+			return;
+		/* add the net */
+		groups.back().push_back(n);
+		for (auto &p : n->m_core_terms)
+		{
+			if (p->is_type(terminal_t::TERMINAL))
+			{
+				terminal_t *pt = static_cast<terminal_t *>(p);
+				analog_net_t *other_net = &pt->m_otherterm->net();
+				if (!already_processed(other_net))
+					process_net(other_net);
+			}
+		}
+	}
+
+	void run(netlist_t &netlist)
+	{
+		for (auto & net : netlist.m_nets)
+		{
+			netlist.log().debug("processing {1}\n", net->name());
+			if (!net->isRailNet() && net->num_cons() > 0)
+			{
+				netlist.log().debug("   ==> not a rail net\n");
+				/* Must be an analog net */
+				analog_net_t *n = static_cast<analog_net_t *>(net.get());
+				if (!already_processed(n))
+				{
+					groups.push_back(analog_net_t::list_t());
+					process_net(n);
+				}
+			}
+		}
+	}
+
+	std::vector<analog_net_t::list_t> groups;
+};
+
 void NETLIB_NAME(solver)::post_start()
 {
-	std::vector<analog_net_t::list_t> groups;
 	const bool use_specific = true;
 
 	m_params.m_pivot = m_pivot();
@@ -729,25 +778,14 @@ void NETLIB_NAME(solver)::post_start()
 
 	netlist().log().verbose("Scanning net groups ...");
 	// determine net groups
-	for (auto & net : netlist().m_nets)
-	{
-		netlist().log().debug("processing {1}\n", net->name());
-		if (!net->isRailNet())
-		{
-			netlist().log().debug("   ==> not a rail net\n");
-			/* Must be an analog net */
-			analog_net_t *n = static_cast<analog_net_t *>(net.get());
-			if (!n->already_processed(groups))
-			{
-				groups.push_back(analog_net_t::list_t());
-				n->process_net(groups);
-			}
-		}
-	}
+
+	net_splitter splitter;
+
+	splitter.run(netlist());
 
 	// setup the solvers
-	netlist().log().verbose("Found {1} net groups in {2} nets\n", groups.size(), netlist().m_nets.size());
-	for (auto & grp : groups)
+	netlist().log().verbose("Found {1} net groups in {2} nets\n", splitter.groups.size(), netlist().m_nets.size());
+	for (auto & grp : splitter.groups)
 	{
 		std::unique_ptr<matrix_solver_t> ms;
 		unsigned net_count = static_cast<unsigned>(grp.size());

@@ -69,7 +69,9 @@ public:
 		m_serial(*this, "serial"),
 		m_screen(*this, "screen"),
 		m_paletteram16(*this, "paletteram"),
-		m_paletteram32(*this, "paletteram") { }
+		m_paletteram32(*this, "paletteram"),
+		m_analog(*this, {"ANALOG0", "ANALOG1", "ANALOG2", "ANALOG3"})
+		{ }
 
 	required_shared_ptr<UINT32> m_adsp_ram_base;
 	required_shared_ptr<UINT16> m_m68k_ram_base;
@@ -84,6 +86,7 @@ public:
 	required_device<screen_device> m_screen;
 	optional_shared_ptr<UINT16> m_paletteram16;
 	optional_shared_ptr<UINT32> m_paletteram32;
+	optional_ioport_array<4> m_analog;
 
 	UINT16 m_sound_data;
 	UINT8 m_sound_status;

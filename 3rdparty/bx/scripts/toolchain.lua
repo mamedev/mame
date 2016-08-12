@@ -717,7 +717,7 @@ function toolchain(_buildDir, _libDir)
 			"NoImportLib",
 		}
 		includedirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/include",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.9/include",
 			"$(ANDROID_NDK_ROOT)/sources/android/native_app_glue",
 		}
 		linkoptions {
@@ -811,10 +811,10 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "android-mips/obj"))
 		libdirs {
 			path.join(_libDir, "lib/android-mips"),
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/mips",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.9/libs/mips",
 		}
 		includedirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/mips/include",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.9/libs/mips/include",
 		}
 		buildoptions {
 			"--sysroot=" .. path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-mips"),
@@ -832,10 +832,10 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "android-x86/obj"))
 		libdirs {
 			path.join(_libDir, "lib/android-x86"),
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/x86",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.9/libs/x86",
 		}
 		includedirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/x86/include",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.9/libs/x86/include",
 		}
 		buildoptions {
 			"--sysroot=" .. path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-x86"),

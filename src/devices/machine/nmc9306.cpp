@@ -15,7 +15,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 1
+#define LOG 0
 
 #define RAM_SIZE 32
 

@@ -66,7 +66,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *adam_fdc_device::device_rom_region() const
+const tiny_rom_entry *adam_fdc_device::device_rom_region() const
 {
 	return ROM_NAME( adam_fdc );
 }

@@ -504,12 +504,16 @@ protected:
 
 private:
 	int m_coin_counter[2];
+	optional_ioport m_test_port;
+	optional_ioport_array<2> m_player_ports;
 };
 
 const device_type COBRA_JVS = &device_creator<cobra_jvs>;
 
 cobra_jvs::cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: jvs_device(mconfig, COBRA_JVS, "JVS (COBRA)", tag, owner, clock, "cobra_jvs", __FILE__)
+	: jvs_device(mconfig, COBRA_JVS, "JVS (COBRA)", tag, owner, clock, "cobra_jvs", __FILE__),
+		m_test_port(*this, ":TEST"),
+		m_player_ports(*this, {":P1", ":P2"})
 {
 	m_coin_counter[0] = 0;
 	m_coin_counter[1] = 0;
@@ -551,13 +555,11 @@ bool cobra_jvs::switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_switc
 	if (count_players > 2 || bytes_per_switch > 2)
 		return false;
 
-	static const char* player_ports[2] = { ":P1", ":P2" };
-
-	*buf++ = read_safe(ioport(":TEST"), 0);
+	*buf++ = m_test_port.read_safe(0);
 
 	for (int i=0; i < count_players; i++)
 	{
-		UINT32 pval = read_safe(ioport(player_ports[i]), 0);
+		UINT32 pval = m_player_ports[i].read_safe(0);
 		for (int j=0; j < bytes_per_switch; j++)
 		{
 			*buf++ = (UINT8)(pval >> ((1-j) * 8));
@@ -1728,7 +1730,7 @@ READ32_MEMBER(cobra_state::sub_unk1_r)
 WRITE32_MEMBER(cobra_state::sub_unk1_w)
 {
 	/*
-	if (!(mem_mask & 0xff000000))
+	if (!ACCESSING_BITS_24_31)
 	{
 	    printf("%02X", data >> 24);
 	    ucount++;
