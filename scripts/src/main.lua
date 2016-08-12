@@ -197,8 +197,12 @@ if (STANDALONE~=true) then
 		"frontend",
 	}
 end
+if (MACHINES["NETLIST"]~=null) then
 	links {
 		"netlist",
+	}
+end
+	links {
 		"optional",
 		"emu",
 		"formats",
@@ -214,10 +218,13 @@ end
 		"softfloat",
 		ext_lib("jpeg"),
 		"7z",
+	}
+if (STANDALONE~=true) then		
+	links {
 		ext_lib("lua"),
 		"lualibs",
 	}
-
+end
 	if _OPTIONS["USE_LIBUV"]=="1" then
 		links {
 			ext_lib("uv"),
