@@ -205,5 +205,10 @@ private:
 };
 
 
+// ----- Helpers -----
+
+// parses a software name (e.g. - 'apple2e:agentusa:flop1') into its consituent parts (returns false if cannot parse)
+bool software_name_parse(const std::string &text, std::string *swlist_name = nullptr, std::string *swname = nullptr, std::string *swpart = nullptr);
+
 #endif // __SOFTLIST_H_
 
