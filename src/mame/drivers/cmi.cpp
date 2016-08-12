@@ -209,14 +209,26 @@ MACHINE_CONFIG_END
 
 ROM_START( cmi2x )
 	ROM_REGION( 0x800, "commonrom", 0 )
-	ROM_LOAD( "f8lmrk5.bin", 0x00000, 0x0800, CRC(12345678) SHA1(1234567812345678123456781234567812345678) )
+	ROM_LOAD( "f8lmrk5.bin",  0x000, 0x800, CRC(cfc7967f) SHA1(0695cc757cf6fab35414dc068dd2a3e50084685c) )
 
 	ROM_REGION( 0x800, "percpurom", 0 )
-	ROM_LOAD( "q9fomrk1.bin", 0x00000, 0x0800, CRC(12345678) SHA1(1234567812345678123456781234567812345678) )
+	ROM_LOAD( "q9fomrk1.bin", 0x000, 0x800, CRC(16f195cc) SHA1(fcc4be370ba60ae5a4145c36cdbdc97a7be91f8f) )
+
+	ROM_REGION( 0x420, "proms", 0 )
+	ROM_LOAD( "brom.bin",   0x000, 0x100, CRC(3f730d15) SHA1(095df6eee95b9ad6418b910fb5d2ae46913750f9) ) // Unknown use, lightgun/graphics card
+	ROM_LOAD( "srom.bin",   0x100, 0x100, CRC(a1b4b71b) SHA1(6ea96480af2f1e43967f209218a74fc17972ce0e) ) // Used to generate signal timing for lightpen
+	ROM_LOAD( "mrom.bin",   0x200, 0x100, CRC(dc26642c) SHA1(49b207ff80d1b055c3b855dc954129846c49bfe3) ) // Unknown use, master card
+	ROM_LOAD( "timrom.bin", 0x300, 0x100, CRC(a426e4a2) SHA1(6b7ea128c730f5afd1042820ccd55bbda683afd8) ) // Unknown use, master card
+	ROM_LOAD( "wrom.bin",   0x400, 0x020, CRC(68a9e17f) SHA1(c3364a37a8d19a1882d7910add1c1df9b63ee32c) ) // Unknown use, lightgun/graphics card
+
+	// Should be odd/even bytes of a 68k region
+	ROM_REGION( 0x4000, "midiroms", 0 )
+	ROM_LOAD( "mon1110e.bin", 0x0000, 0x2000, CRC(476f7d5f) SHA1(9af21e0072eaa58cae42947c20dca05d35dfadd0) ) // General input (MIDI/SMPTE) card (optional), even bytes
+	ROM_LOAD( "mon1110o.bin", 0x2000, 0x2000, CRC(150c8ebe) SHA1(bbd371bebac29628f60537832d0587e83323ad01) ) // General input (MIDI/SMPTE) card (optional), odd bytes
 ROM_END
 
 DRIVER_INIT_MEMBER( cmi_state, cmi2x )
 {
 }
 
-CONS( 1983, cmi2x, 0, 0, cmi2x, cmi2x, cmi_state, cmi2x, "Fairlight", "CMI IIx", MACHINE_NOT_WORKING )
+CONS( 1983, cmi2x, 0, 0, cmi2x, cmi2x, cmi_state, cmi2x, "Fairlight", "CMI IIx", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
