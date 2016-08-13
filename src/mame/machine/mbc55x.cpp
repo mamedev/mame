@@ -12,7 +12,7 @@
 #include <functional>
 
 #include "includes/mbc55x.h"
-#include "debug/debugcpu.h"
+#include "debug/devdebug.h"
 
 
 /*-------------------------------------------------------------------------*/

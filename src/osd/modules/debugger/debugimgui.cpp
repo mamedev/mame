@@ -14,6 +14,7 @@
 #include "debug/dvwpoints.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
+#include "debug/devdebug.h"
 
 #include "config.h"
 #include "debugger.h"

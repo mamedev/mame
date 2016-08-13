@@ -11,6 +11,7 @@
 #include "deviceswindow.h"
 
 #include "debug/debugcpu.h"
+#include "debug/devdebug.h"
 
 bool WindowQt::s_refreshAll = false;
 bool WindowQt::s_hideAll = false;

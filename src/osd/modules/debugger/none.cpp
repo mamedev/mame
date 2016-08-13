@@ -10,6 +10,7 @@
 #include "modules/osdmodule.h"
 
 #include "debug/debugcpu.h"
+#include "debug/devdebug.h"
 #include "debugger.h"
 
 class debug_none : public osd_module, public debug_module

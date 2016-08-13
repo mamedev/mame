@@ -123,6 +123,7 @@ void fd1094_init_debugging(running_machine &machine, const char *cpureg, const c
 #include "debug/debugcmd.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
+#include "debug/devdebug.h"
 #include "debug/debugvw.h"
 #include "machine/fddebug.h"
 

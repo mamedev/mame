@@ -78,6 +78,8 @@ public:
 	CMDERR          execute_command(const char *command, bool echo);
 	CMDERR          validate_command(const char *command);
 	void            register_command(const char *command, UINT32 flags, int ref, int minparams, int maxparams, std::function<void(int, int, const char **)> handler);
+	void            source_script(const char *file);
+	void            process_source_file();
 
 	/* console management */
 	void            vprintf(util::format_argument_pack<std::ostream> const &args);
@@ -130,6 +132,8 @@ private:
 	text_buffer     *m_errorlog_textbuf;
 
 	debug_command   *m_commandlist;
+
+	FILE            *m_source_file;          // script source file
 };
 
 #endif

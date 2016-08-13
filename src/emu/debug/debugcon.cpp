@@ -37,6 +37,7 @@ debugger_console::debugger_console(running_machine &machine)
 	, m_console_textbuf(nullptr)
 	, m_errorlog_textbuf(nullptr)
 	, m_commandlist(nullptr)
+	, m_source_file(nullptr)
 {
 	/* allocate text buffers */
 	m_console_textbuf = text_buffer_alloc(CONSOLE_BUF_SIZE, CONSOLE_MAX_LINES);
@@ -385,6 +386,75 @@ void debugger_console::register_command(const char *command, UINT32 flags, int r
 	/* link it */
 	cmd->next = m_commandlist;
 	m_commandlist = cmd;
+}
+
+
+//-------------------------------------------------
+//  source_script - specifies a debug command
+//  script to execute
+//-------------------------------------------------
+
+void debugger_console::source_script(const char *file)
+{
+	// close any existing source file
+	if (m_source_file != nullptr)
+	{
+		fclose(m_source_file);
+		m_source_file = nullptr;
+	}
+
+	// open a new one if requested
+	if (file != nullptr)
+	{
+		m_source_file = fopen(file, "r");
+		if (!m_source_file)
+		{
+			if (m_machine.phase() == MACHINE_PHASE_RUNNING)
+				printf("Cannot open command file '%s'\n", file);
+			else
+				fatalerror("Cannot open command file '%s'\n", file);
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  process_source_file - executes commands from
+//  a source file
+//-------------------------------------------------
+
+void debugger_console::process_source_file()
+{
+	// loop until the file is exhausted or until we are executing again
+	while (m_source_file != nullptr && m_machine.debugger().cpu().is_stopped())
+	{
+		// stop at the end of file
+		if (feof(m_source_file))
+		{
+			fclose(m_source_file);
+			m_source_file = nullptr;
+			return;
+		}
+
+		// fetch the next line
+		char buf[512];
+		memset(buf, 0, sizeof(buf));
+		fgets(buf, sizeof(buf), m_source_file);
+
+		// strip out comments (text after '//')
+		char *s = strstr(buf, "//");
+		if (s)
+			*s = '\0';
+
+		// strip whitespace
+		int i = (int)strlen(buf);
+		while((i > 0) && (isspace((UINT8)buf[i-1])))
+			buf[--i] = '\0';
+
+		// execute the command
+		if (buf[0])
+			execute_command(buf, true);
+	}
 }
 
 

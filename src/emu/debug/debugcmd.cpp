@@ -14,6 +14,7 @@
 #include "debugcmd.h"
 #include "debugcon.h"
 #include "debugcpu.h"
+#include "devdebug.h"
 #include "express.h"
 #include "debughlp.h"
 #include "debugvw.h"
@@ -271,7 +272,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	/* set up the initial debugscript if specified */
 	const char* name = m_machine.options().debug_script();
 	if (name[0] != 0)
-		m_cpu.source_script(name);
+		m_console.source_script(name);
 
 	m_cheat.cpu[0] = m_cheat.cpu[1] = 0;
 }
@@ -2765,7 +2766,7 @@ void debugger_commands::execute_snap(int ref, int params, const char *param[])
 
 void debugger_commands::execute_source(int ref, int params, const char *param[])
 {
-	m_cpu.source_script(param[0]);
+	m_console.source_script(param[0]);
 }
 
 

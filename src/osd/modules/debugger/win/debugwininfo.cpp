@@ -12,6 +12,7 @@
 
 #include "debugger.h"
 #include "debug/debugcpu.h"
+#include "debug/devdebug.h"
 #include "window.h"
 #include "winutf8.h"
 

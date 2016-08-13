@@ -64,7 +64,7 @@ chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
 #include "includes/rmnimbus.h"
 #include "debugger.h"
 #include "debug/debugcon.h"
-#include "debug/debugcpu.h"
+#include "debug/devdebug.h"
 #include "imagedev/flopdrv.h"
 
 

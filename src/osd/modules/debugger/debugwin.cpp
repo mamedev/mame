@@ -26,6 +26,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "debug/debugcpu.h"
+#include "debug/devdebug.h"
 
 #include "window.h"
 #include "../input/input_common.h"

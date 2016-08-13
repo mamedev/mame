@@ -16,6 +16,7 @@
 #include "debug/dvmemory.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
+#include "debug/devdebug.h"
 
 
 MemoryWindow::MemoryWindow(running_machine* machine, QWidget* parent) :

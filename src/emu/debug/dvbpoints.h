@@ -12,7 +12,7 @@
 #define __DVBPOINTS_H__
 
 #include "debugvw.h"
-#include "debugcpu.h"
+#include "devdebug.h"
 
 
 //**************************************************************************
