@@ -273,14 +273,11 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 	Output.Color = Input.Color;
 
-	float2 TexCoord = Input.TexCoord;
-	TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
+	Output.TexCoord = Input.TexCoord;
+	Output.TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 
-	Output.TexCoord = TexCoord.xy;
-
-	TexCoord += 0.5f / SourceDims;
-
-	Output.BloomCoord = TexCoord.xy;
+	Output.BloomCoord = Output.TexCoord;
+	Output.BloomCoord += 0.5f / SourceDims;
 
 	return Output;
 }

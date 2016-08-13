@@ -253,9 +253,13 @@ float4 ps_main(PS_INPUT Input) : COLOR
 			float ColorBrightness = 0.299f * BaseColor.r + 0.587f * BaseColor.g + 0.114 * BaseColor.b;
 
 			float ScanlineCoord = SourceCoord.y;
-			ScanlineCoord += QuadDims.y <= SourceDims.y * 2.0f
-				? 0.5f / QuadDims.y // uncenter scanlines if the quad is less than twice the size of the source
-				: 0.0f;
+			ScanlineCoord += SwapXY
+				? QuadDims.x <= SourceDims.x * 2.0f
+					? 0.5f / QuadDims.x // uncenter scanlines if the quad is less than twice the size of the source
+					: 0.0f
+				: QuadDims.y <= SourceDims.y * 2.0f
+					? 0.5f / QuadDims.y // uncenter scanlines if the quad is less than twice the size of the source
+					: 0.0f;
 
 			ScanlineCoord *= SourceDims.y * ScanlineScale * PI;
 
