@@ -10,15 +10,15 @@
 
     TODO:
 
+    - contrast
+    - MC6852
+    - codec sound
     - expansion bus
         - Z80 card
         - Winchester DMA card (Xebec S1410 + Tandon TM502/TM603SE)
         - RAM cards
         - clock cards
     - floppy 8048
-    - brightness/contrast
-    - MC6852
-    - codec sound
 
 */
 
@@ -95,7 +95,6 @@ MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 	int hires = BIT(ma, 13);
 	int dot_addr = BIT(ma, 12);
 	int width = hires ? 16 : 10;
-	if (hires) x_count = 0x32;
 
 	if (m_hires != hires)
 	{
@@ -146,8 +145,14 @@ MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 				break;
 			}
 
-			int color = palette[pixel && de];
-			if (!lowint && color) color = 2;
+			int color = 0;
+
+			if (pixel && de)
+			{
+				int pen = 1 + m_brt;
+				if (!lowint) pen = 9;
+				color = palette[pen];
+			}
 
 			bitmap.pix32(vbp + y, x++) = color;
 		}
@@ -201,6 +206,14 @@ WRITE_LINE_MEMBER( victor9k_state::ssda_irq_w )
 	m_ssda_irq = state;
 
 	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via3_irq || m_fdc_irq);
+}
+
+
+WRITE_LINE_MEMBER( victor9k_state::ssda_sm_dtr_w )
+{
+	m_ssda->cts_w(state);
+	m_ssda->dcd_w(!state);
+	//m_cvsd->enc_dec_w(!state);
 }
 
 
@@ -340,6 +353,8 @@ WRITE8_MEMBER( victor9k_state::via2_pb_w )
 
 	// contrast
 	m_cont = data >> 5;
+
+	if (LOG) logerror("BRT %u CONT %u\n", m_brt, m_cont);
 }
 
 WRITE_LINE_MEMBER( victor9k_state::via2_irq_w )
@@ -393,8 +408,9 @@ WRITE_LINE_MEMBER( victor9k_state::write_rib )
 WRITE8_MEMBER( victor9k_state::via3_pb_w )
 {
 	// codec clock output
-	m_ssda->rx_clk_w(BIT(data, 7));
-	m_ssda->tx_clk_w(BIT(data, 7));
+	m_ssda->rx_clk_w(!BIT(data, 7));
+	m_ssda->tx_clk_w(!BIT(data, 7));
+	m_cvsd->clock_w(!BIT(data, 7));
 }
 
 WRITE_LINE_MEMBER( victor9k_state::via3_irq_w )
@@ -439,6 +455,30 @@ WRITE_LINE_MEMBER( victor9k_state::fdc_irq_w )
 //**************************************************************************
 //  MACHINE INITIALIZATION
 //**************************************************************************
+
+PALETTE_INIT_MEMBER(victor9k_state, victor9k)
+{
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));
+
+	// BRT0 82K
+	// BRT1 39K
+	// BRT2 20K
+	// 12V 220K pullup
+	palette.set_pen_color(1, rgb_t(0x00, 0x10, 0x00));
+	palette.set_pen_color(2, rgb_t(0x00, 0x20, 0x00));
+	palette.set_pen_color(3, rgb_t(0x00, 0x40, 0x00));
+	palette.set_pen_color(4, rgb_t(0x00, 0x60, 0x00));
+	palette.set_pen_color(5, rgb_t(0x00, 0x80, 0x00));
+	palette.set_pen_color(6, rgb_t(0x00, 0xa0, 0x00));
+	palette.set_pen_color(7, rgb_t(0x00, 0xc0, 0x00));
+	palette.set_pen_color(8, rgb_t(0x00, 0xff, 0x00));
+
+	// CONT0 620R
+	// CONT1 332R
+	// CONT2 162R
+	// 12V 110R pullup
+	palette.set_pen_color(9, rgb_t(0xff, 0x00, 0x00));
+}
 
 void victor9k_state::machine_start()
 {
@@ -498,8 +538,8 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_SCREEN_UPDATE_DEVICE(HD46505S_TAG, hd6845_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(victor9k_state, victor9k)
 
 	MCFG_MC6845_ADD(HD46505S_TAG, HD6845, SCREEN_TAG, XTAL_30MHz/10) // HD6845 == HD46505S
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
@@ -509,7 +549,8 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(HC55516_TAG, HC55516, 100000)
+	MCFG_SOUND_ADD(HC55516_TAG, HC55516, 0)
+	//MCFG_HC55516_DIG_OUT_CB(DEVWRITELINE(MC6852_TAG, mc6852_device, rx_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
@@ -544,6 +585,7 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 
 	MCFG_DEVICE_ADD(MC6852_TAG, MC6852, XTAL_30MHz/30)
 	MCFG_MC6852_TX_DATA_CALLBACK(DEVWRITELINE(HC55516_TAG, hc55516_device, digit_w))
+	MCFG_MC6852_SM_DTR_CALLBACK(WRITELINE(victor9k_state, ssda_sm_dtr_w))
 	MCFG_MC6852_IRQ_CALLBACK(WRITELINE(victor9k_state, ssda_irq_w))
 
 	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, XTAL_30MHz/30)

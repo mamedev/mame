@@ -125,6 +125,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
 
 	DECLARE_WRITE_LINE_MEMBER( ssda_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( ssda_sm_dtr_w );
 
 	DECLARE_WRITE_LINE_MEMBER( kbrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( kbdata_w );
@@ -134,6 +135,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( mux_serial_b_w );
 	DECLARE_WRITE_LINE_MEMBER( mux_serial_a_w );
+
+	DECLARE_PALETTE_INIT( victor9k );
 
 	// video state
 	int m_brt;
