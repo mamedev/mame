@@ -214,17 +214,39 @@ ROM_START( cmi2x )
 	ROM_REGION( 0x800, "percpurom", 0 )
 	ROM_LOAD( "q9fomrk1.bin", 0x000, 0x800, CRC(16f195cc) SHA1(fcc4be370ba60ae5a4145c36cdbdc97a7be91f8f) )
 
+	/* QFC9 Floppy disk controller driver */
+	ROM_REGION( 0x800, "qfc9", 0 )
+	ROM_LOAD( "dqfc911.bin", 0x00, 0x800, CRC(5bc38db2) SHA1(bd840e19e51a336e669c40b9e18cdaf6b3c62a8a) )
+
+	/* Musical keyboard CPU */
+	// Both of these dumps have been trimmed to size from within a roughly 2x-bigger file.
+	// The actual size is known based on the format apparently used by the dumping device, shared with the prom
+	// dumps and cmikeys4.bin dump.
+	ROM_REGION( 0x10000, "muskeys", 0 )
+	ROM_LOAD( "velkeysd.bin", 0xb000, 0x0400, CRC(9b636781) SHA1(be29a72a1d6d313dafe0b63951b5e3e18ddb9a21) )
+	ROM_LOAD( "kbdioa.bin",   0xfc00, 0x0400, CRC(a5cbe218) SHA1(bc6784aaa5697c28eab126e20500139b8d0c1f50) )
+
+	/* Alphanumeric keyboard CPU */
+	// This dump has been trimmed to size from within a roughly 2x-bigger file. The actual size is known based
+	// on the format apparently used by the dumping device, shared with the prom dumps and music keys dump.
+	ROM_REGION( 0x10000, "alphakeys", 0 )
+	ROM_LOAD( "cmikeys4.bin", 0xc000, 0x400, CRC(b214fbe9) SHA1(8c404f58ba3e5a50aa42f761e966c74374e96cc9) )
+
+	/* General Interface (SMPTE/MIDI) CPU */
+	ROM_REGION( 0x4000, "smptemidi", 0 )
+	ROM_LOAD16_BYTE( "mon1110e.bin", 0x0000, 0x2000, CRC(476f7d5f) SHA1(9af21e0072eaa58cae42947c20dca05d35dfadd0) )
+	ROM_LOAD16_BYTE( "mon1110o.bin", 0x0001, 0x2000, CRC(150c8ebe) SHA1(bbd371bebac29628f60537832d0587e83323ad01) )
+
+	// All of these PROM dumps have been trimmed to size from within a roughly 2x-bigger file.
+	// The actual sizes are known from the schematics and the starting address of the actual PROM data was obvious
+	// based on repeated data in some of the 256x4 PROMs, but it would be nice to get redumps, in the extremely
+	// unlikely event that someone finds a CMI IIx for sale.
 	ROM_REGION( 0x420, "proms", 0 )
 	ROM_LOAD( "brom.bin",   0x000, 0x100, CRC(3f730d15) SHA1(095df6eee95b9ad6418b910fb5d2ae46913750f9) ) // Unknown use, lightgun/graphics card
 	ROM_LOAD( "srom.bin",   0x100, 0x100, CRC(a1b4b71b) SHA1(6ea96480af2f1e43967f209218a74fc17972ce0e) ) // Used to generate signal timing for lightpen
 	ROM_LOAD( "mrom.bin",   0x200, 0x100, CRC(dc26642c) SHA1(49b207ff80d1b055c3b855dc954129846c49bfe3) ) // Unknown use, master card
 	ROM_LOAD( "timrom.bin", 0x300, 0x100, CRC(a426e4a2) SHA1(6b7ea128c730f5afd1042820ccd55bbda683afd8) ) // Unknown use, master card
 	ROM_LOAD( "wrom.bin",   0x400, 0x020, CRC(68a9e17f) SHA1(c3364a37a8d19a1882d7910add1c1df9b63ee32c) ) // Unknown use, lightgun/graphics card
-
-	// Should be odd/even bytes of a 68k region
-	ROM_REGION( 0x4000, "midiroms", 0 )
-	ROM_LOAD( "mon1110e.bin", 0x0000, 0x2000, CRC(476f7d5f) SHA1(9af21e0072eaa58cae42947c20dca05d35dfadd0) ) // General input (MIDI/SMPTE) card (optional), even bytes
-	ROM_LOAD( "mon1110o.bin", 0x2000, 0x2000, CRC(150c8ebe) SHA1(bbd371bebac29628f60537832d0587e83323ad01) ) // General input (MIDI/SMPTE) card (optional), odd bytes
 ROM_END
 
 DRIVER_INIT_MEMBER( cmi_state, cmi2x )

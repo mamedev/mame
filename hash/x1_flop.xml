@@ -7,7 +7,6 @@ but the website only covers post 1985 titles...
 
 Games I haven't managed to start (possibly due to my mistakes):
 * zeliard: at the end of the intro it prints "read EMM address [00]" while waiting for something
-* ys2: after the Falcom screen it prints a message on-screen and waits for something to happen
 * suikoden, sangoku2, sangoku2a, nobuseng: sits to a jpn message waiting for who knows what
 * revolty2: waits for something to happen
 * reviver: waits for something to happen
@@ -38,6 +37,7 @@ Games with possible issues (either in emulation or in dump):
 * aokiooka: glitches (chars cut in half)
 * alpha: is the title screen correct or is it glitched (I'd bet the latter)?
 * advfant: glitches
+* ys: character sprite is glitched until you enter a new area
 
 Games which start loading but never reach the program:
 * vipc
@@ -52,9 +52,9 @@ Games which start loading but never reach the program:
 * jesusd
 * hydlide3, hydlide3a (invalid disks 2?)
 * aztec
+* ys3
 
 Games which are completely not recognized (maybe not for x1?)
-* ys3
 * unk_fl1
 * srdemo
 * robowres
@@ -4175,19 +4175,20 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Wanderers from Ys</description>
 		<year>1989?</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<!-- Turbo only -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
-				<rom name="ys3_d1.d88" size="415840" crc="7ce0c5f0" sha1="a9db94fd74038d1cba8a338a1319830e9b3f4aaa" offset="0" />
+				<rom name="ys3_prg.d88" size="415840" crc="6698bb78" sha1="cbdd1c7c2df31b7b7e0ca86a647ed499e347d4fc" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
-				<rom name="ys3_d2.d88" size="415840" crc="d632dc9d" sha1="8927ee49cff3bb95b68e4de5a338f661614f6369" offset="0" />
+				<rom name="ys3_d1.d88" size="415840" crc="7ce0c5f0" sha1="a9db94fd74038d1cba8a338a1319830e9b3f4aaa" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
-				<rom name="ys3_prg.d88" size="415840" crc="6698bb78" sha1="cbdd1c7c2df31b7b7e0ca86a647ed499e347d4fc" offset="0" />
+				<rom name="ys3_d2.d88" size="415840" crc="d632dc9d" sha1="8927ee49cff3bb95b68e4de5a338f661614f6369" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">

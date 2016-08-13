@@ -162,6 +162,11 @@ static INPUT_PORTS_START( alto2 )
 	PORT_CONFNAME( 0x01, 0x01, "Memory switch")
 	PORT_CONFSETTING( 0x00, "on")
 	PORT_CONFSETTING( 0x01, "off")
+	PORT_CONFNAME( 0x06, 0x02, "CROM/CRAM configuration")
+	PORT_CONFSETTING( 0x00, "Invalid (no CROM/CRAM)")
+	PORT_CONFSETTING( 0x02, "1K CROM, 1K CRAM")
+	PORT_CONFSETTING( 0x04, "2K CROM, 1K CRAM")
+	PORT_CONFSETTING( 0x06, "1K CROM, 3K CRAM")
 	PORT_CONFNAME( 0x70, 0x00, "Ethernet breath-of-life")
 	PORT_CONFSETTING( 0x00, "off")
 	PORT_CONFSETTING( 0x10, "5 seconds")
@@ -252,7 +257,7 @@ ROM_END
 //**************************************************************************
 
 ADDRESS_MAP_START( alto2_ucode_map, AS_0, 32, alto2_state )
-	AM_RANGE(0, ALTO2_UCODE_SIZE-1) AM_DEVICE32( "maincpu", alto2_cpu_device, ucode_map, 0xffffffffUL )
+	AM_RANGE(0, 4*ALTO2_UCODE_PAGE_SIZE-1) AM_DEVICE32( "maincpu", alto2_cpu_device, ucode_map, 0xffffffffUL )
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START( alto2_const_map, AS_1, 16, alto2_state )
@@ -275,12 +280,14 @@ static MACHINE_CONFIG_START( alto2, alto2_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::white)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_20_16MHz,
-							ALTO2_DISPLAY_TOTAL_WIDTH,   0, ALTO2_DISPLAY_WIDTH,
-							ALTO2_DISPLAY_TOTAL_HEIGHT,  0, ALTO2_DISPLAY_HEIGHT)
-	MCFG_SCREEN_REFRESH_RATE(30)    // two interlaced fields
-	MCFG_SCREEN_VBLANK_TIME(ALTO2_DISPLAY_VBLANK_TIME)
+             ALTO2_DISPLAY_TOTAL_WIDTH,
+                 0,
+                 ALTO2_DISPLAY_WIDTH,
+             ALTO2_DISPLAY_TOTAL_HEIGHT,
+                 16,                          // some scalines of vblank period before
+                 16+ALTO2_DISPLAY_HEIGHT+8)   // and after the usual range
+	MCFG_SCREEN_REFRESH_RATE(30)          // two interlaced fields at 60Hz
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", alto2_cpu_device, screen_update)
-	MCFG_SCREEN_VBLANK_DEVICE("maincpu", alto2_cpu_device, screen_eof)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEFAULT_LAYOUT( layout_vertical )
