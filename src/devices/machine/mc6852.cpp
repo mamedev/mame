@@ -197,8 +197,8 @@ WRITE8_MEMBER( mc6852_device::write )
 			if (LOG) logerror("MC6852 '%s' Control 2 %02x\n", tag(), data);
 			m_cr[1] = data;
 			
-			int data_bit_count;
-			parity_t parity;
+			int data_bit_count = 0;
+			parity_t parity = PARITY_NONE;
 			stop_bits_t stop_bits = STOP_BITS_1;
 
 			switch (data & C2_WS_MASK)
