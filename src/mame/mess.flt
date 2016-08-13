@@ -112,6 +112,7 @@ chessmst.cpp
 chesstrv.cpp
 clcd.cpp
 cm1800.cpp
+cmi.cpp
 coco12.cpp
 coco3.cpp
 codata.cpp
