@@ -7,9 +7,9 @@
  *****************************************************************************/
 #include "alto2cpu.h"
 
-#define DEBUG_WRTRAM        1       //!< define to 1 to print CRAM writes
-#define DEBUG_RDRAM         1       //!< define to 1 to print CRAM reads
-#define DEBUG_BRANCH        1       //!< define to 1 to print branching to ROM/RAM
+#define DEBUG_WRTRAM        0       //!< define to 1 to print CRAM writes
+#define DEBUG_RDRAM         0       //!< define to 1 to print CRAM reads
+#define DEBUG_BRANCH        0       //!< define to 1 to print branching to ROM/RAM
 
 //! direct read access to the microcode CRAM
 #define RD_CRAM(addr) (*reinterpret_cast<UINT32 *>(m_ucode_cram.get() + addr * 4))
