@@ -73,12 +73,6 @@ public:
 	symbol_table *get_visible_symtable();
 
 
-	/* ----- misc debugger functions ----- */
-
-	/* specifies a debug command script to execute */
-	void source_script(const char *file);
-
-
 	/* ----- debugger comment helpers ----- */
 
 	// save all comments for a given machine
@@ -149,7 +143,6 @@ public:
 	void halt_on_next_instruction(device_t *device, util::format_argument_pack<std::ostream> &&args);
 	void ensure_comments_loaded();
 	void reset_transient_flags();
-	void process_source_file();
 
 private:
 	static const size_t NUM_TEMP_VARIABLES;
@@ -178,8 +171,6 @@ private:
 	device_t *  m_livecpu;
 	device_t *  m_visiblecpu;
 	device_t *  m_breakcpu;
-
-	FILE *      m_source_file;          // script source file
 
 	std::unique_ptr<symbol_table> m_symtable;           // global symbol table
 

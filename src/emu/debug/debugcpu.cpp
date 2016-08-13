@@ -32,7 +32,6 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	, m_livecpu(nullptr)
 	, m_visiblecpu(nullptr)
 	, m_breakcpu(nullptr)
-	, m_source_file(nullptr)
 	, m_symtable(nullptr)
 	, m_execution_state(EXECUTION_STATE_STOPPED)
 	, m_bpindex(1)
@@ -161,35 +160,6 @@ symbol_table* debugger_cpu::get_global_symtable()
 symbol_table* debugger_cpu::get_visible_symtable()
 {
 	return &m_visiblecpu->debug()->symtable();
-}
-
-
-/*-------------------------------------------------
-    source_script - specifies a debug command
-    script to execute
--------------------------------------------------*/
-
-void debugger_cpu::source_script(const char *file)
-{
-	/* close any existing source file */
-	if (m_source_file != nullptr)
-	{
-		fclose(m_source_file);
-		m_source_file = nullptr;
-	}
-
-	/* open a new one if requested */
-	if (file != nullptr)
-	{
-		m_source_file = fopen(file, "r");
-		if (!m_source_file)
-		{
-			if (m_machine.phase() == MACHINE_PHASE_RUNNING)
-				m_machine.debugger().console().printf("Cannot open command file '%s'\n", file);
-			else
-				fatalerror("Cannot open command file '%s'\n", file);
-		}
-	}
 }
 
 
@@ -960,46 +930,6 @@ void debugger_cpu::reset_transient_flags()
 	for (device_t &device : device_iterator(m_machine.root_device()))
 		device.debug()->reset_transient_flag();
 	m_stop_when_not_device = nullptr;
-}
-
-
-/*-------------------------------------------------
-    process_source_file - executes commands from
-    a source file
--------------------------------------------------*/
-
-void debugger_cpu::process_source_file()
-{
-	/* loop until the file is exhausted or until we are executing again */
-	while (m_source_file != nullptr && m_execution_state == EXECUTION_STATE_STOPPED)
-	{
-		/* stop at the end of file */
-		if (feof(m_source_file))
-		{
-			fclose(m_source_file);
-			m_source_file = nullptr;
-			return;
-		}
-
-		/* fetch the next line */
-		char buf[512];
-		memset(buf, 0, sizeof(buf));
-		fgets(buf, sizeof(buf), m_source_file);
-
-		/* strip out comments (text after '//') */
-		char *s = strstr(buf, "//");
-		if (s)
-			*s = '\0';
-
-		/* strip whitespace */
-		int i = (int)strlen(buf);
-		while((i > 0) && (isspace((UINT8)buf[i-1])))
-			buf[--i] = '\0';
-
-		/* execute the command */
-		if (buf[0])
-			m_machine.debugger().console().execute_command(buf, true);
-	}
 }
 
 
