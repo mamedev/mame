@@ -547,11 +547,20 @@ WRITE8_MEMBER( maygay1b_state::lamp_data_w )
 		// Because of the nature of the lamping circuit, there is an element of persistance
 		// As a consequence, the lamp column data can change before the input strobe without
 		// causing the relevant lamps to black out.
-
+		int bit_offset;
 		for (int i = 0; i < 8; i++)
 		{
-			output().set_lamp_value((8*m_lamp_strobe)+i, ((data  & (1 << i)) !=0));
+			if(i < 4)
+			{
+				bit_offset = i + 4;
+			}
+			else
+			{
+				bit_offset = i - 4;
+			}
+			output().set_lamp_value((8*m_lamp_strobe)+i, ((data  & (1 << bit_offset)) !=0));
 		}
+
 		m_old_lamp_strobe = m_lamp_strobe;
 	}
 
@@ -565,6 +574,8 @@ READ8_MEMBER( maygay1b_state::kbd_r )
 
 WRITE8_MEMBER( maygay1b_state::lamp_data_2_w )
 {
+	// TODO: THIS FUNCTION IS NEVER CALLED!  So we are missing the second half of the lamp matrix
+
 	//The two A/B ports are merged back into one, to make one row of 8 lamps.
 
 	if (m_old_lamp_strobe2 != m_lamp_strobe2)
@@ -575,8 +586,9 @@ WRITE8_MEMBER( maygay1b_state::lamp_data_2_w )
 
 		for (int i = 0; i < 8; i++)
 		{
-			output().set_lamp_value((8*m_lamp_strobe)+i+128, ((data  & (1 << i)) !=0));
+			output().set_lamp_value((8*m_lamp_strobe2)+i+128, ((data  & (1 << i)) !=0));
 		}
+
 		m_old_lamp_strobe2 = m_lamp_strobe2;
 	}
 
