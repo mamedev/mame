@@ -111,15 +111,6 @@ using unicode_char = std::uint32_t;
     FUNDAMENTAL MACROS
 ***************************************************************************/
 
-/* Standard MIN/MAX macros */
-#ifndef MIN
-#define MIN(x,y)            ((x) < (y) ? (x) : (y))
-#endif
-#ifndef MAX
-#define MAX(x,y)            ((x) > (y) ? (x) : (y))
-#endif
-
-
 /* U64 and S64 are used to wrap long integer constants. */
 #if defined(__GNUC__) || defined(_MSC_VER)
 #define U64(val) val##ULL
@@ -131,12 +122,12 @@ using unicode_char = std::uint32_t;
 
 
 /* Concatenate/extract 32-bit halves of 64-bit values */
-#define CONCAT_64(hi,lo)    (((UINT64)(hi) << 32) | (UINT32)(lo))
-#define EXTRACT_64HI(val)   ((UINT32)((val) >> 32))
-#define EXTRACT_64LO(val)   ((UINT32)(val))
+constexpr UINT64 concat_64(UINT32 hi, UINT32 lo) { return (UINT64(hi) << 32) | UINT32(lo); }
+constexpr UINT32 extract_64hi(UINT64 val) { return UINT32(val >> 32); }
+constexpr UINT32 extract_64lo(UINT64 val) { return UINT32(val); }
 
 // Highly useful template for compile-time knowledge of an array size
-template <typename T, size_t N> constexpr inline size_t ARRAY_LENGTH(T (&)[N]) { return N;}
+template <typename T, size_t N> constexpr size_t ARRAY_LENGTH(T (&)[N]) { return N;}
 
 // For declaring an array of the same dimensions as another array (including multi-dimensional arrays)
 template <typename T, typename U> struct equivalent_array_or_type { typedef T type; };
@@ -147,42 +138,35 @@ template <typename T, typename U, std::size_t N> struct equivalent_array<T, U[N]
 template <typename T, typename U> using equivalent_array_t = typename equivalent_array<T, U>::type;
 #define EQUIVALENT_ARRAY(a, T) equivalent_array_t<T, std::remove_reference_t<decltype(a)> >
 
-
 /* Macros for normalizing data into big or little endian formats */
-#define FLIPENDIAN_INT16(x) (((((UINT16) (x)) >> 8) | ((x) << 8)) & 0xffff)
-#define FLIPENDIAN_INT32(x) ((((UINT32) (x)) << 24) | (((UINT32) (x)) >> 24) | \
-	(( ((UINT32) (x)) & 0x0000ff00) << 8) | (( ((UINT32) (x)) & 0x00ff0000) >> 8))
-#define FLIPENDIAN_INT64(x) \
-	(                                               \
-		(((((UINT64) (x)) >> 56) & ((UINT64) 0xFF)) <<  0)  |   \
-		(((((UINT64) (x)) >> 48) & ((UINT64) 0xFF)) <<  8)  |   \
-		(((((UINT64) (x)) >> 40) & ((UINT64) 0xFF)) << 16)  |   \
-		(((((UINT64) (x)) >> 32) & ((UINT64) 0xFF)) << 24)  |   \
-		(((((UINT64) (x)) >> 24) & ((UINT64) 0xFF)) << 32)  |   \
-		(((((UINT64) (x)) >> 16) & ((UINT64) 0xFF)) << 40)  |   \
-		(((((UINT64) (x)) >>  8) & ((UINT64) 0xFF)) << 48)  |   \
-		(((((UINT64) (x)) >>  0) & ((UINT64) 0xFF)) << 56)      \
-	)
+constexpr UINT16 flipendian_int16(UINT16 val) { return (val << 8) | (val >> 8); }
+
+constexpr UINT32 flipendian_int32_partial16(UINT32 val) { return ((val << 8) & 0xFF00FF00U) | ((val >> 8) & 0x00FF00FFU); }
+constexpr UINT32 flipendian_int32(UINT32 val) { return (flipendian_int32_partial16(val) << 16) | (flipendian_int32_partial16(val) >> 16); }
+
+constexpr UINT64 flipendian_int64_partial16(UINT64 val) { return ((val << 8) & U64(0xFF00FF00FF00FF00)) | ((val >> 8) & U64(0x00FF00FF00FF00FF)); }
+constexpr UINT64 flipendian_int64_partial32(UINT64 val) { return ((flipendian_int64_partial16(val) << 16) & U64(0xFFFF0000FFFF0000)) | ((flipendian_int64_partial16(val) >> 16) & U64(0x0000FFFF0000FFFF)); }
+constexpr UINT64 flipendian_int64(UINT64 val) { return (flipendian_int64_partial32(val) << 32) | (flipendian_int64_partial32(val) >> 32); }
 
 #ifdef LSB_FIRST
-#define BIG_ENDIANIZE_INT16(x)      (FLIPENDIAN_INT16(x))
-#define BIG_ENDIANIZE_INT32(x)      (FLIPENDIAN_INT32(x))
-#define BIG_ENDIANIZE_INT64(x)      (FLIPENDIAN_INT64(x))
-#define LITTLE_ENDIANIZE_INT16(x)   (x)
-#define LITTLE_ENDIANIZE_INT32(x)   (x)
-#define LITTLE_ENDIANIZE_INT64(x)   (x)
+constexpr UINT16 big_endianize_int16(UINT16 x) { return flipendian_int16(x); }
+constexpr UINT32 big_endianize_int32(UINT32 x) { return flipendian_int32(x); }
+constexpr UINT64 big_endianize_int64(UINT64 x) { return flipendian_int64(x); }
+constexpr UINT16 little_endianize_int16(UINT16 x) { return x; }
+constexpr UINT32 little_endianize_int32(UINT32 x) { return x; }
+constexpr UINT64 little_endianize_int64(UINT64 x) { return x; }
 #else
-#define BIG_ENDIANIZE_INT16(x)      (x)
-#define BIG_ENDIANIZE_INT32(x)      (x)
-#define BIG_ENDIANIZE_INT64(x)      (x)
-#define LITTLE_ENDIANIZE_INT16(x)   (FLIPENDIAN_INT16(x))
-#define LITTLE_ENDIANIZE_INT32(x)   (FLIPENDIAN_INT32(x))
-#define LITTLE_ENDIANIZE_INT64(x)   (FLIPENDIAN_INT64(x))
+constexpr UINT16 big_endianize_int16(UINT16 x) { return x; }
+constexpr UINT32 big_endianize_int32(UINT32 x) { return x; }
+constexpr UINT64 big_endianize_int64(UINT64 x) { return x; }
+constexpr UINT16 little_endianize_int16(UINT16 x) { return flipendian_int16(x); }
+constexpr UINT32 little_endianize_int32(UINT32 x) { return flipendian_int32(x); }
+constexpr UINT64 little_endianize_int64(UINT64 x) { return flipendian_int64(x); }
 #endif /* LSB_FIRST */
 
 #ifdef _MSC_VER
 #include <malloc.h>
-typedef ptrdiff_t ssize_t;
+using ssize_t = std::make_signed_t<size_t>;
 #if _MSC_VER == 1900 // VS2015
 #define __LINE__Var 0
 #endif // VS2015

@@ -42,7 +42,7 @@ public:
 	DECLARE_WRITE8_MEMBER(p2_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(mouse_timer);
 
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
@@ -93,7 +93,7 @@ public:
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_WRITE8_MEMBER(p1_w);
 
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
 protected:

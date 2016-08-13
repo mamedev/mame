@@ -32,7 +32,7 @@ public:
 protected:
 	void device_start(void) override;
 	void device_reset(void) override;
-	const rom_entry *device_rom_region(void) const override;
+	const tiny_rom_entry *device_rom_region(void) const override;
 	ioport_constructor device_input_ports() const override;
 	machine_config_constructor device_mconfig_additions() const override;
 

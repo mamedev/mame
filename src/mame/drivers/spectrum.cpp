@@ -329,11 +329,11 @@ READ8_MEMBER(spectrum_state::spectrum_port_fe_r)
 	int lines = offset >> 8;
 	int data = 0xff;
 
-	int cs_extra1 = m_io_plus0 ? m_io_plus0->read() & 0x1f : 0x1f;
-	int cs_extra2 = m_io_plus1 ? m_io_plus1->read() & 0x1f : 0x1f;
-	int cs_extra3 = m_io_plus2 ? m_io_plus2->read() & 0x1f : 0x1f;
-	int ss_extra1 = m_io_plus3 ? m_io_plus3->read() & 0x1f : 0x1f;
-	int ss_extra2 = m_io_plus4 ? m_io_plus4->read() & 0x1f : 0x1f;
+	int cs_extra1 = m_io_plus0.read_safe(0x1f) & 0x1f;
+	int cs_extra2 = m_io_plus1.read_safe(0x1f) & 0x1f;
+	int cs_extra3 = m_io_plus2.read_safe(0x1f) & 0x1f;
+	int ss_extra1 = m_io_plus3.read_safe(0x1f) & 0x1f;
+	int ss_extra2 = m_io_plus4.read_safe(0x1f) & 0x1f;
 
 	/* Caps - V */
 	if ((lines & 1) == 0)
@@ -665,13 +665,13 @@ DEVICE_IMAGE_LOAD_MEMBER(spectrum_state, spectrum_cart)
 	if (size != 0x4000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 MACHINE_CONFIG_START( spectrum_common, spectrum_state )

@@ -224,7 +224,7 @@ private:
 	// internal array types
 	typedef poly_array<polygon_info, _MaxPolys> polygon_array;
 	typedef poly_array<_ObjectData, _MaxPolys + 1> objectdata_array;
-	typedef poly_array<work_unit, MIN(_MaxPolys * UNITS_PER_POLY, 65535)> unit_array;
+	typedef poly_array<work_unit, std::min(_MaxPolys * UNITS_PER_POLY, 65535)> unit_array;
 
 	// round in a cross-platform consistent manner
 	inline INT32 round_coordinate(_BaseType value)
@@ -525,8 +525,8 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_tile(
 	// clip coordinates
 	INT32 v1yclip = v1y;
 	INT32 v2yclip = v2y + ((m_flags & POLYFLAG_INCLUDE_BOTTOM_EDGE) ? 1 : 0);
-	v1yclip = MAX(v1yclip, cliprect.min_y);
-	v2yclip = MIN(v2yclip, cliprect.max_y + 1);
+	v1yclip = std::max(v1yclip, cliprect.min_y);
+	v2yclip = std::min(v2yclip, cliprect.max_y + 1);
 	if (v2yclip - v1yclip <= 0)
 		return 0;
 
@@ -592,7 +592,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_tile(
 
 		// fill in the work unit basics
 		unit.polygon = &polygon;
-		unit.count_next = MIN(v2yclip - curscan, scaninc);
+		unit.count_next = std::min(v2yclip - curscan, scaninc);
 		unit.scanline = curscan;
 		unit.previtem = m_unit_bucket[bucketnum];
 		m_unit_bucket[bucketnum] = unit_index;
@@ -670,8 +670,8 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_trian
 	// clip coordinates
 	INT32 v1yclip = v1y;
 	INT32 v3yclip = v3y + ((m_flags & POLYFLAG_INCLUDE_BOTTOM_EDGE) ? 1 : 0);
-	v1yclip = MAX(v1yclip, cliprect.min_y);
-	v3yclip = MIN(v3yclip, cliprect.max_y + 1);
+	v1yclip = std::max(v1yclip, cliprect.min_y);
+	v3yclip = std::min(v3yclip, cliprect.max_y + 1);
 	if (v3yclip - v1yclip <= 0)
 		return 0;
 
@@ -750,7 +750,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_trian
 
 		// fill in the work unit basics
 		unit.polygon = &polygon;
-		unit.count_next = MIN(v3yclip - curscan, scaninc);
+		unit.count_next = std::min(v3yclip - curscan, scaninc);
 		unit.scanline = curscan;
 		unit.previtem = m_unit_bucket[bucketnum];
 		m_unit_bucket[bucketnum] = unit_index;
@@ -860,8 +860,8 @@ template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
 UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_triangle_custom(const rectangle &cliprect, render_delegate callback, int startscanline, int numscanlines, const extent_t *extents)
 {
 	// clip coordinates
-	INT32 v1yclip = MAX(startscanline, cliprect.min_y);
-	INT32 v3yclip = MIN(startscanline + numscanlines, cliprect.max_y + 1);
+	INT32 v1yclip = std::max(startscanline, cliprect.min_y);
+	INT32 v3yclip = std::min(startscanline + numscanlines, cliprect.max_y + 1);
 	if (v3yclip - v1yclip <= 0)
 		return 0;
 
@@ -883,7 +883,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_trian
 
 		// fill in the work unit basics
 		unit.polygon = &polygon;
-		unit.count_next = MIN(v3yclip - curscan, scaninc);
+		unit.count_next = std::min(v3yclip - curscan, scaninc);
 		unit.scanline = curscan;
 		unit.previtem = m_unit_bucket[bucketnum];
 		m_unit_bucket[bucketnum] = unit_index;
@@ -968,8 +968,8 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_polyg
 	// clip coordinates
 	INT32 minyclip = miny;
 	INT32 maxyclip = maxy + ((m_flags & POLYFLAG_INCLUDE_BOTTOM_EDGE) ? 1 : 0);
-	minyclip = MAX(minyclip, cliprect.min_y);
-	maxyclip = MIN(maxyclip, cliprect.max_y + 1);
+	minyclip = std::max(minyclip, cliprect.min_y);
+	maxyclip = std::min(maxyclip, cliprect.max_y + 1);
 	if (maxyclip - minyclip <= 0)
 		return 0;
 
@@ -1058,7 +1058,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_polyg
 
 		// fill in the work unit basics
 		unit.polygon = &polygon;
-		unit.count_next = MIN(maxyclip - curscan, scaninc);
+		unit.count_next = std::min(maxyclip - curscan, scaninc);
 		unit.scanline = curscan;
 		unit.previtem = m_unit_bucket[bucketnum];
 		m_unit_bucket[bucketnum] = unit_index;

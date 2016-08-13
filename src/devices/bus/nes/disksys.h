@@ -19,7 +19,7 @@ public:
 	virtual void device_start() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	virtual DECLARE_READ8_MEMBER(read_ex) override;
 	virtual DECLARE_READ8_MEMBER(read_m) override;
@@ -33,7 +33,7 @@ public:
 	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
 	virtual void pcb_reset() override;
 
-	static void load_proc(device_image_interface &image);
+	static void load_proc(device_image_interface &image, bool is_created);
 	static void unload_proc(device_image_interface &image);
 
 private:

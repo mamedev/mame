@@ -5,12 +5,13 @@
 //  strconv.cpp - Win32 string conversion
 //
 //============================================================
-
 #if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
-
+#undef min
+#undef max
+#include <algorithm>
 // MAMEOS headers
 #include "strconv.h"
 
@@ -140,7 +141,7 @@ int osd_uchar_from_osdchar(UINT32 *uchar, const char *osdchar, size_t count)
 		goto error;
 
 	// The multibyte char can't be bigger than the max character size
-	count = MIN(count, cp.MaxCharSize);
+	count = std::min(count, size_t(cp.MaxCharSize));
 
 	if (MultiByteToWideChar(CP_ACP, 0, osdchar, static_cast<DWORD>(count), &wch, 1) == 0)
 		goto error;

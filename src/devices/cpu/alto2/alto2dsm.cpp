@@ -214,14 +214,14 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 			(static_cast<UINT32>(oprom[1]) << 16) |
 			(static_cast<UINT32>(oprom[2]) << 8) |
 			(static_cast<UINT32>(oprom[3]) << 0);
-	UINT8 rsel = static_cast<UINT8>((mir >> 27) & 31);
-	UINT8 aluf = static_cast<UINT8>((mir >> 23) & 15);
-	UINT8 bs = static_cast<UINT8>((mir >> 20) & 7);
-	UINT8 f1 = static_cast<UINT8>((mir >> 16) & 15);
-	UINT8 f2 = static_cast<UINT8>((mir >> 12) & 15);
-	UINT8 t = static_cast<UINT8>((mir >> 11) & 1);
-	UINT8 l = static_cast<UINT8>((mir >> 10) & 1);
-	offs_t next = static_cast<offs_t>(mir & 1023);
+	int rsel = (mir >> 27) & 31;
+	int aluf = (mir >> 23) & 15;
+	int bs = (mir >> 20) & 7;
+	int f1 = (mir >> 16) & 15;
+	int f2 = (mir >> 12) & 15;
+	int t = (mir >> 11) & 1;
+	int l = (mir >> 10) & 1;
+	offs_t next = mir & 1023;
 	const UINT8* src = oprom - 4 * pc + 4 * next;
 	UINT32 next2 =  (static_cast<UINT32>(src[0]) << 24) |
 			(static_cast<UINT32>(src[1]) << 16) |
@@ -244,52 +244,52 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 	switch (aluf) {
 	case  0: // T?: BUS
 		// this is somehow redundant and just wasting space
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS) ");
+		// dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS) ");
 		break;
 	case  1: //   : T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(T) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "T ");
 		break;
 	case  2: // T?: BUS OR T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS|T) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS|T ");
 		break;
 	case  3: //   : BUS AND T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS&T) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS&T ");
 		break;
 	case  4: //   : BUS XOR T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS^T) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS^T ");
 		break;
 	case  5: // T?: BUS + 1
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS+1) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS+1 ");
 		break;
 	case  6: // T?: BUS - 1
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS-1) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS-1 ");
 		break;
 	case  7: //   : BUS + T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS+T) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS+T ");
 		break;
 	case  8: //   : BUS - T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS-T) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS-T ");
 		break;
 	case  9: //   : BUS - T - 1
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS-T-1) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS-T-1 ");
 		break;
 	case 10: // T?: BUS + T + 1
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS+T+1) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS+T+1 ");
 		break;
 	case 11: // T?: BUS + SKIP
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS+SKIP) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS+SKIP ");
 		break;
 	case 12: // T?: BUS, T (AND)
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS,T) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS,T ");
 		break;
 	case 13: //   : BUS AND NOT T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS&~T) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS&~T ");
 		break;
 	case 14: //   : undefined
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "*ALUF(BUS) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "*BUS ");
 		break;
 	case 15: //   : undefined
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "*ALUF(BUS) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "*BUS ");
 		break;
 	}
 
@@ -344,7 +344,7 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 		break;
 	case 7: // put the constant from PROM (RSELECT,BS) on the bus
 		pa = (rsel << 3) | bs;
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-%05o CONST[%03o]", const_prom[pa], pa);
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-%05o ", const_prom[pa]);
 		break;
 	default:
 		dst += snprintf(dst, len - (size_t)(dst - buffer), "F1_%02o ", f1);
@@ -373,18 +373,21 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 		dst += snprintf(dst, len - (size_t)(dst - buffer), "[ALUC0 ? %s:%s] ",
 			addrname((prefetch | 1) & MCODE_MASK), addrname(prefetch & MCODE_MASK));
 		break;
-	case 6: // deliver BUS data to memory
+	case 6: // write BUS data to memory
 		dst += snprintf(dst, len - (size_t)(dst - buffer), "MD<-BUS ");
 		break;
-	case 7: // put on the bus the constant from PROM (RSELECT,BS)
+	case 7: // put the constant from PROM (RSELECT,BS) on the bus
 		if (f1 != 7) {
 			pa = 8 * rsel + bs;
-			dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-%05o CONST[%03o]", const_prom[pa], pa);
+			dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-%05o", const_prom[pa]);
 		}
 		break;
 	default:
 		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-F2_%02o ", f2);
 		break;
 	}
+	if (dst > buffer && dst[-1] == ' ')
+		*--dst = '\0';
+
 	return result;
 }

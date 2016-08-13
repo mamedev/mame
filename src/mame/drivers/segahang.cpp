@@ -177,10 +177,7 @@ READ16_MEMBER( segahang_state::hangon_io_r )
 			return m_i8255_2->read(space, offset & 3);
 
 		case 0x3020/2: // ADC0804 data output
-		{
-			static const char *const adcports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
-			return read_safe(ioport(adcports[m_adc_select]), 0);
-		}
+			return m_adc_ports[m_adc_select].read_safe(0);
 	}
 
 	//logerror("%06X:hangon_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
@@ -238,10 +235,7 @@ READ16_MEMBER( segahang_state::sharrier_io_r )
 			return m_i8255_2->read(space, offset & 3);
 
 		case 0x0030/2: // ADC0804 data output
-		{
-			static const char *const adcports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
-			return read_safe(ioport(adcports[m_adc_select]), 0);
-		}
+			return m_adc_ports[m_adc_select].read_safe(0);
 	}
 
 	//logerror("%06X:sharrier_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
@@ -391,7 +385,7 @@ void segahang_state::sharrier_i8751_sim()
 	m_workram[0x0f0/2] = 0;
 
 	// read I/O ports
-	m_workram[0x492/2] = (ioport("ADC0")->read() << 8) | ioport("ADC1")->read();
+	m_workram[0x492/2] = (m_adc_ports[0]->read() << 8) | m_adc_ports[1]->read();
 }
 
 

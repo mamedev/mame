@@ -120,7 +120,7 @@ void menu_directory::custom_render(void *selectedref, float top, float bottom, f
 	ui().draw_text_full(container(), _("Folders Setup"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 		mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
-	float maxwidth = MAX(width, origx2 - origx1);
+	float maxwidth = std::max(width, origx2 - origx1);
 
 	// compute our bounds
 	float x1 = 0.5f - 0.5f * maxwidth;
@@ -218,13 +218,13 @@ void menu_display_actual::custom_render(void *selectedref, float top, float bott
 	{
 		ui().draw_text_full(container(), elem.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::LEFT, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 		width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
-		maxwidth = MAX(maxwidth, width);
+		maxwidth = std::max(maxwidth, width);
 	}
 
 	// get the size of the text
 	ui().draw_text_full(container(), m_tempbuf.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
-	maxwidth = MAX(width, maxwidth);
+	maxwidth = std::max(width, maxwidth);
 
 	// compute our bounds
 	float x1 = 0.5f - 0.5f * maxwidth;
@@ -508,7 +508,7 @@ void menu_add_change_folder::custom_render(void *selectedref, float top, float b
 		ui().draw_text_full(container(), elem.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
 			mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 		width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
-		maxwidth = MAX(width, maxwidth);
+		maxwidth = std::max(width, maxwidth);
 	}
 
 	// compute our bounds
@@ -539,7 +539,7 @@ void menu_add_change_folder::custom_render(void *selectedref, float top, float b
 	ui().draw_text_full(container(), tempbuf[0].c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 		mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
-	maxwidth = MAX(maxwidth, width);
+	maxwidth = std::max(maxwidth, width);
 
 	// compute our bounds
 	x1 = 0.5f - 0.5f * maxwidth;
@@ -644,7 +644,7 @@ void menu_remove_folder::custom_render(void *selectedref, float top, float botto
 	// get the size of the text
 	ui().draw_text_full(container(), tempbuf.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER, mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
-	float maxwidth = MAX(width, origx2 - origx1);
+	float maxwidth = std::max(width, origx2 - origx1);
 
 	// compute our bounds
 	float x1 = 0.5f - 0.5f * maxwidth;

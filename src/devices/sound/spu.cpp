@@ -140,13 +140,13 @@ static const unsigned int /*sound_buffer_size=65536*4,*/
 
 													output_buffer_size=65536/8/*,
 
-                                                    sample_loop_cache_pool_size=64,
-                                                    sample_loop_cache_extend_size=64,
-                                                    sample_cache_pool_size=64,
-                                                    sample_cache_extend_size=64,
+													sample_loop_cache_pool_size=64,
+													sample_loop_cache_extend_size=64,
+													sample_cache_pool_size=64,
+													sample_cache_extend_size=64,
 
-                                                    stream_marker_pool_size=64,
-                                                    stream_marker_extend_size=64*/;
+													stream_marker_pool_size=64,
+													stream_marker_extend_size=64*/;
 
 //
 //

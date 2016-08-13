@@ -67,7 +67,7 @@ public:
 	{
 		assert(m_spriteram != nullptr);
 		if (m_spriteram != nullptr)
-			memcpy(&m_buffered[0], m_spriteram + srcoffset, MIN(srclength, m_spriteram.bytes() / sizeof(_Type) - srcoffset) * sizeof(_Type));
+			memcpy(&m_buffered[0], m_spriteram + srcoffset, (std::min<size_t>)(srclength, m_spriteram.bytes() / sizeof(_Type) - srcoffset) * sizeof(_Type));
 		return &m_buffered[0];
 	}
 

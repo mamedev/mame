@@ -351,7 +351,7 @@ const address_space_config *hd63484_device::memory_space_config(address_spacenum
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *hd63484_device::device_rom_region() const
+const tiny_rom_entry *hd63484_device::device_rom_region() const
 {
 	return ROM_NAME( hd63484 );
 }
@@ -812,7 +812,7 @@ void hd63484_device::draw_line(INT16 sx, INT16 sy, INT16 ex, INT16 ey)
 
 void hd63484_device::draw_ellipse(INT16 cx, INT16 cy, double dx, double dy, double s_angol, double e_angol, bool c)
 {
-	double inc = 1.0 / (MAX(dx, dy) * 100);
+	double inc = 1.0 / (std::max(dx, dy) * 100);
 	for (double angol = s_angol; fabs(angol - e_angol) >= inc*2; angol += inc * (c ? -1 : +1))
 	{
 		if (angol > DEGREE_TO_RADIAN(360))    angol -= DEGREE_TO_RADIAN(360);

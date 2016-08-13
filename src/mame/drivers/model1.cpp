@@ -638,11 +638,8 @@ Notes:
 
 READ16_MEMBER(model1_state::io_r)
 {
-	static const char *const analognames[] = { "AN.0", "AN.1", "AN.2", "AN.3", "AN.4", "AN.5", "AN.6", "AN.7" };
-	static const char *const inputnames[] = { "IN.0", "IN.1", "IN.2" };
-
 	if(offset < 0x8)
-		return read_safe(ioport(analognames[offset]), 0x00);
+		return m_analog_ports[offset].read_safe(0x00);
 
 	if(offset == 0x0f)
 		return m_lamp_state;
@@ -651,7 +648,7 @@ READ16_MEMBER(model1_state::io_r)
 	{
 		offset -= 0x8;
 		if(offset < 3)
-			return ioport(inputnames[offset])->read();
+			return m_digital_ports[offset]->read();
 		return 0xff;
 	}
 

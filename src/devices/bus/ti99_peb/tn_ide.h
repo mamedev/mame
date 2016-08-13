@@ -17,6 +17,7 @@
 #include "emu.h"
 #include "machine/ataintf.h"
 #include "machine/rtc65271.h"
+#include "machine/ram.h"
 
 extern const device_type TI99_IDE;
 
@@ -40,7 +41,6 @@ public:
 protected:
 	virtual void device_start(void) override;
 	virtual void device_reset(void) override;
-	virtual const rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -58,7 +58,7 @@ private:
 	UINT16  m_input_latch;
 	UINT16  m_output_latch;
 
-	UINT8   *m_ram;
+	required_device<ram_device> m_ram;
 };
 
 #endif

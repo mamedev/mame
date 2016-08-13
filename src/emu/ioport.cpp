@@ -439,6 +439,11 @@ const char_info charinfo[] =
 	{ UCHAR_MAMEKEY(F13),       "F13",          nullptr },     // F13 function key
 	{ UCHAR_MAMEKEY(F14),       "F14",          nullptr },     // F14 function key
 	{ UCHAR_MAMEKEY(F15),       "F15",          nullptr },     // F15 function key
+	{ UCHAR_MAMEKEY(F16),       "F16",          nullptr },     // F16 function key
+	{ UCHAR_MAMEKEY(F17),       "F17",          nullptr },     // F17 function key
+	{ UCHAR_MAMEKEY(F18),       "F18",          nullptr },     // F18 function key
+	{ UCHAR_MAMEKEY(F19),       "F19",          nullptr },     // F19 function key
+	{ UCHAR_MAMEKEY(F20),       "F20",          nullptr },     // F20 function key
 	{ UCHAR_MAMEKEY(ESC),       "Esc",          "\033" },   // Esc key
 	{ UCHAR_MAMEKEY(INSERT),    "Insert",       nullptr },     // Insert key
 	{ UCHAR_MAMEKEY(DEL),       "Delete",       "\010" },   // Delete key
@@ -2148,7 +2153,7 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 			unicode_char ch = field.keyboard_code(which);
 			if (ch == 0)
 				break;
-			name.append(string_format("%-*s ", MAX(SPACE_COUNT - 1, 0), field.manager().natkeyboard().key_name(ch)));
+			name.append(string_format("%-*s ", std::max(SPACE_COUNT - 1, 0), field.manager().natkeyboard().key_name(ch)));
 		}
 
 		// trim extra spaces
@@ -2445,10 +2450,6 @@ ioport_manager::ioport_manager(running_machine &machine)
 		m_timecode_file(machine.options().input_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS),
 		m_timecode_count(0),
 		m_timecode_last_time(attotime::zero),
-		m_has_configs(false),
-		m_has_analog(false),
-		m_has_dips(false),
-		m_has_bioses(false),
 		m_autofire_toggle(false),
 		m_autofire_delay(3)                 // 1 seems too fast for a bunch of games
 {
@@ -2528,30 +2529,6 @@ time_t ioport_manager::initialize()
 	m_natkeyboard.initialize();
 	// register callbacks for when we load configurations
 	machine().configuration().config_register("input", config_saveload_delegate(FUNC(ioport_manager::load_config), this), config_saveload_delegate(FUNC(ioport_manager::save_config), this));
-
-	// calculate "has..." values
-	{
-		m_has_configs = false;
-		m_has_analog = false;
-		m_has_dips = false;
-		m_has_bioses = false;
-
-		// scan the input port array to see what options we need to enable
-		for (auto &port : m_portlist)
-			for (ioport_field &field : port.second->fields())
-			{
-				if (field.type() == IPT_DIPSWITCH)
-					m_has_dips = true;
-				if (field.type() == IPT_CONFIG)
-					m_has_configs = true;
-				if (field.is_analog())
-					m_has_analog = true;
-			}
-		for (device_t &device : device_iterator(machine().root_device()))
-			if (device.rom_region())
-				for (const rom_entry *rom = device.rom_region(); !ROMENTRY_ISEND(rom); rom++)
-					if (ROMENTRY_ISSYSTEM_BIOS(rom)) { m_has_bioses= true; break; }
-	}
 
 	// open playback and record files if specified
 	time_t basetime = playback_init();
@@ -3302,11 +3279,11 @@ _Type ioport_manager::playback_read(_Type &result)
 
 	// return the appropriate value
 	else if (sizeof(result) == 8)
-		result = LITTLE_ENDIANIZE_INT64(result);
+		result = little_endianize_int64(result);
 	else if (sizeof(result) == 4)
-		result = LITTLE_ENDIANIZE_INT32(result);
+		result = little_endianize_int32(result);
 	else if (sizeof(result) == 2)
-		result = LITTLE_ENDIANIZE_INT16(result);
+		result = little_endianize_int16(result);
 	return result;
 }
 
@@ -4330,7 +4307,7 @@ void analog_field::frame_update(running_machine &machine)
 				rawvalue = apply_scale(rawvalue - INPUT_ABSOLUTE_MIN, m_positionalscale) * INPUT_RELATIVE_PER_PIXEL + m_minimum;
 
 				// clamp the high value so it does not roll over
-				rawvalue = MIN(rawvalue, m_maximum);
+				rawvalue = std::min(rawvalue, m_maximum);
 				m_accum = apply_inverse_sensitivity(rawvalue);
 			}
 			else

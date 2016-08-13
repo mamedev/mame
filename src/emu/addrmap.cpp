@@ -32,8 +32,8 @@ address_map_entry::address_map_entry(device_t &device, address_map &map, offs_t 
 	: m_next(nullptr),
 		m_map(map),
 		m_devbase(device),
-		m_addrstart((map.m_globalmask == 0) ? start : start & map.m_globalmask),
-		m_addrend((map.m_globalmask == 0) ? end : end & map.m_globalmask),
+		m_addrstart(start),
+		m_addrend(end),
 		m_addrmirror(0),
 		m_addrmask(0),
 		m_addrselect(0),
@@ -47,6 +47,17 @@ address_map_entry::address_map_entry(device_t &device, address_map &map, offs_t 
 		m_bytemirror(0),
 		m_bytemask(0)
 {
+	if (map.m_globalmask != 0 && (start & ~map.m_globalmask) != 0)
+	{
+		osd_printf_warning("AS_%d map entry start %08X lies outside global address mask %08X\n", map.m_spacenum, start, map.m_globalmask);
+		m_addrstart &= map.m_globalmask;
+	}
+
+	if (map.m_globalmask != 0 && (end & ~map.m_globalmask) != 0)
+	{
+		osd_printf_warning("AS_%d map entry end %08X lies outside global address mask %08X\n", map.m_spacenum, end, map.m_globalmask);
+		m_addrend &= map.m_globalmask;
+	}
 }
 
 

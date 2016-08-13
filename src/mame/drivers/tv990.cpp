@@ -3,10 +3,10 @@
 /***************************************************************************
 
   TeleVideo 990/995 terminal
-  
+
   Driver by Carl and R. Belmont
   Thanks to Al Kossow.
-  
+
   H/W:
   68000-P16 CPU (clock unknown, above 10 MHz it outruns the AT keyboard controller)
   16C452 dual 16450 (PC/AT standard) UART + PC-compatible Centronics (integrated into
@@ -14,7 +14,7 @@
   AMI MEGA-KBD-H-Q PS/2 keyboard interface on 990, PS/2 8042 on 995
   Televideo ASIC marked "134446-00 TVI1111-0 427"
   3x AS7C256 (32K x 8 SRAM)
-  
+
   IRQs:
   2 = PS/2 keyboard
   3 = Centronics
@@ -24,7 +24,7 @@
 
   Video modes include 80 or 132 wide by 24, 25, 42, 43, 48, or 49 lines high plus an
                       optional status bar
-  Modes include TeleVideo 990, 950, and 955, Wyse WY-60, WY-150/120/50+/50, ANSI, 
+  Modes include TeleVideo 990, 950, and 955, Wyse WY-60, WY-150/120/50+/50, ANSI,
                       DEC VT320/220, VT100/52, SCO Console, and PC TERM.
 
 ****************************************************************************/
@@ -38,11 +38,11 @@
 #include "machine/nvram.h"
 #include "sound/beep.h"
 
-#define UART0_TAG		"ns16450_0"
-#define UART1_TAG		"ns16450_1"
+#define UART0_TAG       "ns16450_0"
+#define UART1_TAG       "ns16450_1"
 #define RS232A_TAG      "rs232a"
 #define RS232B_TAG      "rs232b"
-#define LPT_TAG			"lpt"
+#define LPT_TAG         "lpt"
 
 class tv990_state : public driver_device
 {
@@ -74,14 +74,14 @@ public:
 	virtual void machine_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void device_post_load() override;
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	
+
 	DECLARE_READ16_MEMBER(tvi1111_r);
 	DECLARE_WRITE16_MEMBER(tvi1111_w);
 	DECLARE_READ8_MEMBER(kbdc_r);
 	DECLARE_WRITE8_MEMBER(kbdc_w);
-	
+
 	DECLARE_WRITE_LINE_MEMBER(uart0_irq);
 	DECLARE_WRITE_LINE_MEMBER(uart1_irq);
 	DECLARE_WRITE_LINE_MEMBER(lpt_irq);
@@ -104,7 +104,7 @@ INTERRUPT_GEN_MEMBER(tv990_state::vblank)
 void tv990_state::machine_start()
 {
 	m_rowtimer = timer_alloc();
-	
+
 	save_item(NAME(tvi1111_regs));
 	save_item(NAME(m_rowh));
 	save_item(NAME(m_width));
@@ -137,7 +137,7 @@ READ16_MEMBER(tv990_state::tvi1111_r)
 {
 	if (offset == (0x32/2))
 	{
-		tvi1111_regs[offset] |= 8;	// loop at 109ca wants this set
+		tvi1111_regs[offset] |= 8;  // loop at 109ca wants this set
 	}
 	else if(offset == 0x1d)
 	{
@@ -239,7 +239,7 @@ UINT32 tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 						attr ^= attrchg;
 				}
 
-				if (attr & 0x4)	// inverse video?
+				if (attr & 0x4) // inverse video?
 				{
 					palette[1] = m_palette->pen(0);
 					palette[0] = (attr & 0x10) ? m_palette->pen(1) : m_palette->pen(2);
@@ -304,14 +304,14 @@ WRITE8_MEMBER(tv990_state::kbdc_w)
 
 static ADDRESS_MAP_START(tv990_mem, AS_PROGRAM, 16, tv990_state)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x060000, 0x06ffff) AM_RAM	AM_SHARE("vram") // character/attribute RAM
-	AM_RANGE(0X080000, 0X087fff) AM_RAM	AM_SHARE("fontram") // font RAM
+	AM_RANGE(0x060000, 0x06ffff) AM_RAM AM_SHARE("vram") // character/attribute RAM
+	AM_RANGE(0x080000, 0x087fff) AM_RAM AM_SHARE("fontram") // font RAM
 	AM_RANGE(0x090000, 0x0900ff) AM_READWRITE(tvi1111_r, tvi1111_w)
 	AM_RANGE(0x0a0000, 0x0a000f) AM_DEVREADWRITE8(UART0_TAG, ns16450_device, ins8250_r, ins8250_w, 0x00ff)
 	AM_RANGE(0x0a0010, 0x0a001f) AM_DEVREADWRITE8(UART1_TAG, ns16450_device, ins8250_r, ins8250_w, 0x00ff)
 	AM_RANGE(0x0a0028, 0x0a002d) AM_DEVREADWRITE8(LPT_TAG, pc_lpt_device, read, write, 0x00ff)
 	AM_RANGE(0x0b0000, 0x0b0003) AM_READWRITE8(kbdc_r, kbdc_w, 0x00ff)
-	AM_RANGE(0x0c0000, 0x0c7fff) AM_RAM	AM_SHARE("nvram")// work RAM
+	AM_RANGE(0x0c0000, 0x0c7fff) AM_RAM AM_SHARE("nvram")// work RAM
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -349,7 +349,7 @@ INPUT_CHANGED_MEMBER(tv990_state::color)
 void tv990_state::machine_reset()
 {
 	m_rowtimer->adjust(m_screen->time_until_pos(0));
-	
+
 	memset(tvi1111_regs, 0, sizeof(tvi1111_regs));
 	m_rowh = 16;
 	m_width = 80;
@@ -363,10 +363,10 @@ void tv990_state::device_post_load()
 
 static MACHINE_CONFIG_START( tv990, tv990_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 14967500)	// verified (59.86992/4)
+	MCFG_CPU_ADD("maincpu", M68000, 14967500)   // verified (59.86992/4)
 	MCFG_CPU_PROGRAM_MAP(tv990_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tv990_state, vblank)
-	
+
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
 	MCFG_SCREEN_UPDATE_DRIVER(tv990_state, screen_update)
 	MCFG_SCREEN_SIZE(132*16, 50*16)
@@ -385,7 +385,7 @@ static MACHINE_CONFIG_START( tv990, tv990_state )
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_rts))
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_INT_CB(WRITELINE(tv990_state, uart1_irq))
-	
+
 	MCFG_DEVICE_ADD(LPT_TAG, PC_LPT, 0)
 	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(tv990_state, lpt_irq))
 
@@ -398,7 +398,7 @@ static MACHINE_CONFIG_START( tv990, tv990_state )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(UART1_TAG, ns16450_device, rx_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(UART1_TAG, ns16450_device, dcd_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(UART1_TAG, ns16450_device, cts_w))
-	
+
 	MCFG_DEVICE_ADD("pc_kbdc", KBDC8042, 0)
 	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_AT386)
 	MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(INPUTLINE("maincpu", M68K_IRQ_2))
@@ -413,14 +413,14 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( tv990 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "180003-89_u3.bin", 0x000000, 0x010000, CRC(0465fc55) SHA1(b8874ce54bf2bf4f77664194d2f23c0e4e6ccbe9) ) 
-	ROM_LOAD16_BYTE( "180003-90_u4.bin", 0x000001, 0x010000, CRC(fad7d77d) SHA1(f1114a4a07c8b4ffa0323a2e7ce03d82a386f7d3) ) 
+	ROM_LOAD16_BYTE( "180003-89_u3.bin", 0x000000, 0x010000, CRC(0465fc55) SHA1(b8874ce54bf2bf4f77664194d2f23c0e4e6ccbe9) )
+	ROM_LOAD16_BYTE( "180003-90_u4.bin", 0x000001, 0x010000, CRC(fad7d77d) SHA1(f1114a4a07c8b4ffa0323a2e7ce03d82a386f7d3) )
 ROM_END
 
 ROM_START( tv995 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "995-65_u3.bin", 0x000000, 0x020000, CRC(2d71b6fe) SHA1(a2a3406c19308eb9232db319ea8f151949b2ac74) ) 
-	ROM_LOAD16_BYTE( "995-65_u4.bin", 0x000001, 0x020000, CRC(dc002af2) SHA1(9608e7a729c5ac0fc58f673eaf441d2f4f591ec6) ) 
+	ROM_LOAD16_BYTE( "995-65_u3.bin", 0x000000, 0x020000, CRC(2d71b6fe) SHA1(a2a3406c19308eb9232db319ea8f151949b2ac74) )
+	ROM_LOAD16_BYTE( "995-65_u4.bin", 0x000001, 0x020000, CRC(dc002af2) SHA1(9608e7a729c5ac0fc58f673eaf441d2f4f591ec6) )
 ROM_END
 
 /* Driver */

@@ -161,7 +161,7 @@ machine_config_constructor ti_speech_synthesizer_device::device_mconfig_addition
 	return MACHINE_CONFIG_NAME( ti99_speech );
 }
 
-const rom_entry *ti_speech_synthesizer_device::device_rom_region() const
+const tiny_rom_entry *ti_speech_synthesizer_device::device_rom_region() const
 {
 	return ROM_NAME( ti99_speech );
 }

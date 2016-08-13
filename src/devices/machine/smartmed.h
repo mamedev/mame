@@ -8,6 +8,7 @@
 #define __SMARTMEDIA_H__
 
 #include "formats/imageutl.h"
+#include "softlist_dev.h"
 
 //#define SMARTMEDIA_IMAGE_SAVE
 
@@ -214,7 +215,7 @@ public:
 	virtual const char *image_interface() const override { return "sm_memc"; }
 	virtual const char *file_extensions() const override { return "smc"; }
 
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
@@ -222,8 +223,8 @@ protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
 
-	bool smartmedia_format_1();
-	bool smartmedia_format_2();
+	image_init_result smartmedia_format_1();
+	image_init_result smartmedia_format_2();
 	int detect_geometry( UINT8 id1, UINT8 id2);
 };
 

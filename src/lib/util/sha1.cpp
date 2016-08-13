@@ -373,7 +373,7 @@ sha1_final(struct sha1_ctx *ctx)
 
 	if (words > (SHA1_DATA_LENGTH-2))
 	{ /* No room for length in this block. Process it and
-       * pad with another one */
+	   * pad with another one */
 		for (i = words ; i < SHA1_DATA_LENGTH; i++)
 	data[i] = 0;
 		sha1_transform(ctx->digest, data);

@@ -140,7 +140,7 @@ submenu::submenu(mame_ui_manager &mui, render_container &container, std::vector<
 	else
 		opts = dynamic_cast<core_options*>(options);
 
-	for (auto & sm_option : m_options)
+	for (option & sm_option : m_options)
 	{
 		switch (sm_option.type)
 		{
@@ -176,6 +176,12 @@ submenu::submenu(mame_ui_manager &mui, render_container &container, std::vector<
 				sm_option.value.clear();
 				std::string descr(sm_option.entry->description()), delim(", ");
 				descr.erase(0, descr.find(":") + 2);
+
+				std::string default_value(sm_option.entry->default_value());
+				std::string auto_value(OSDOPTVAL_AUTO);
+				if (default_value == auto_value)
+					descr = auto_value + delim + descr;
+
 				size_t p1, p2 = 0;
 				while ((p1 = descr.find_first_not_of(delim, p2)) != std::string::npos)
 				{
@@ -423,7 +429,7 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 	ui().draw_text_full(container(), _(m_options[0].description), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 			mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
-	float maxwidth = MAX(origx2 - origx1, width);
+	float maxwidth = std::max(origx2 - origx1, width);
 
 	// compute our bounds
 	float x1 = 0.5f - 0.5f * maxwidth;
@@ -452,7 +458,7 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 					mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 
 			width += 2 * UI_BOX_LR_BORDER;
-			maxwidth = MAX(origx2 - origx1, width);
+			maxwidth = std::max(origx2 - origx1, width);
 
 			// compute our bounds
 			x1 = 0.5f - 0.5f * maxwidth;

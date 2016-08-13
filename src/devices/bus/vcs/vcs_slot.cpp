@@ -182,7 +182,7 @@ static const char *vcs_get_slot(int type)
 	return "a26_4k";
 }
 
-bool vcs_cart_slot_device::call_load()
+image_init_result vcs_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -213,7 +213,7 @@ bool vcs_cart_slot_device::call_load()
 
 			default:
 				seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid rom file size" );
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 		}
 
 		m_cart->rom_alloc(len, tag());
@@ -310,10 +310,10 @@ bool vcs_cart_slot_device::call_load()
 		if (m_type == A26_DPC)
 			m_cart->setup_addon_ptr((UINT8 *)m_cart->get_rom_base() + 0x2000);
 
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

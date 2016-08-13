@@ -101,7 +101,7 @@
 
 #include "coretmpl.h"
 #include "huffman.h"
-
+#include <algorithm>
 
 
 //**************************************************************************
@@ -375,7 +375,7 @@ huffman_error huffman_context_base::export_tree_huffman(bitstream_out &bitbuf)
 		}
 
 	// clamp first non-zero to be 8 at a maximum
-	first_non_zero = MIN(first_non_zero, 8);
+	first_non_zero = std::min(first_non_zero, 8);
 
 	// output the lengths of the each small tree node, starting with the RLE
 	// token (0), followed by the first_non_zero value, followed by the data
@@ -488,7 +488,7 @@ void huffman_context_base::write_rle_tree_bits(bitstream_out &bitbuf, int value,
 		// otherwise, write a triple using 1 as the escape code
 		else
 		{
-			int cur_reps = MIN(repcount - 3, (1 << numbits) - 1);
+			int cur_reps = std::min(repcount - 3, (1 << numbits) - 1);
 			bitbuf.write(1, numbits);
 			bitbuf.write(value, numbits);
 			bitbuf.write(cur_reps, numbits);
@@ -597,7 +597,7 @@ int huffman_context_base::build_tree(UINT32 totaldata, UINT32 totalweight)
 				node.m_numbits = 1;
 
 			// keep track of the max
-			maxbits = MAX(maxbits, node.m_numbits);
+			maxbits = std::max(maxbits, int(node.m_numbits));
 		}
 	}
 	return maxbits;

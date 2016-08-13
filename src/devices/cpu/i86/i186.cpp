@@ -28,7 +28,7 @@
 #define DEST_INCREMENT          0x2000
 #define DEST_NO_CHANGE          (DEST_DECREMENT | DEST_INCREMENT)
 #define DEST_INCDEC_MASK        (DEST_DECREMENT | DEST_INCREMENT)
-#define SRC_MIO                 0X1000
+#define SRC_MIO                 0x1000
 #define SRC_DECREMENT           0x0800
 #define SRC_INCREMENT           0x0400
 #define SRC_NO_CHANGE           (SRC_DECREMENT | SRC_INCREMENT)

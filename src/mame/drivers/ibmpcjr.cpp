@@ -66,7 +66,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pcjx_port_1ff_w);
 	void pcjx_set_bank(int unk1, int unk2, int unk3);
 
-	int load_cart(device_image_interface &image, generic_slot_device *slot);
+	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pcjr_cart1) { return load_cart(image, m_cart1); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pcjr_cart2) { return load_cart(image, m_cart2); }
 	void pc_speaker_set_spkrdata(UINT8 data);
@@ -436,7 +436,7 @@ READ8_MEMBER(pcjr_state::pcjx_port_1ff_r)
 	return 0x60; // expansion?
 }
 
-int pcjr_state::load_cart(device_image_interface &image, generic_slot_device *slot)
+image_init_result pcjr_state::load_cart(device_image_interface &image, generic_slot_device *slot)
 {
 	UINT32 size = slot->common_get_size("rom");
 	bool imagic_hack = false;
@@ -456,7 +456,7 @@ int pcjr_state::load_cart(device_image_interface &image, generic_slot_device *sl
 				break;
 			default:
 				image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid header size" );
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 		}
 		if (size - header_size == 0xa000)
 		{
@@ -487,7 +487,7 @@ int pcjr_state::load_cart(device_image_interface &image, generic_slot_device *sl
 		memcpy(ROM + 0x4000, ROM, 0x2000);
 		memcpy(ROM + 0x2000, ROM, 0x2000);
 	}
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

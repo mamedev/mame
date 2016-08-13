@@ -2366,7 +2366,7 @@ void nv2a_renderer::convert_vertices_poly(vertex_nv *source, nv2avertex_t *desti
 	// should use either the vertex program or transformation matrices
 	if (vertex_pipeline == 4) {
 		// transformation matrices
-		// it is not implemented, so we pretend its always using screen coordinates
+		// this part needs more testing
 		for (m = 0; m < count; m++) {
 			for (int i = 0; i < 4; i++) {
 				t[i] = 0;
@@ -2378,7 +2378,8 @@ void nv2a_renderer::convert_vertices_poly(vertex_nv *source, nv2avertex_t *desti
 				for (int j = 0; j < 4; j++)
 					v[i] += matrix.projection[i][j] * t[j];
 			};
-			/*for (int i = 0; i < 3; i++) {
+			/* it seems these are not needed ?
+			for (int i = 0; i < 3; i++) {
 			    v[i] *= matrix.scale[i];
 			}
 			for (int i = 0; i < 3; i++) {
@@ -2400,6 +2401,7 @@ void nv2a_renderer::convert_vertices_poly(vertex_nv *source, nv2avertex_t *desti
 		// vertex program
 		// run vertex program
 		vertexprogram.exec.process(vertexprogram.start_instruction, source, vert, count);
+		// the output of the vertex program has the perspective divide, viewport scale and offset already applied
 		// copy data for poly.c
 		for (m = 0; m < count; m++) {
 			destination[m].w = vert[m].attribute[0].fv[3];
@@ -2680,6 +2682,15 @@ UINT32 nv2a_renderer::render_triangle_clipping(const rectangle &cliprect, render
 	vi[2] = &_v3;
 	for (int n=0;n < 3;n++)
 	{
+		// remove translate
+		vi[n]->x = vi[n]->x - translatex;
+		vi[n]->y = vi[n]->y - translatey;
+		vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] = vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] - translatez;
+		// remove scale
+		vi[n]->x = vi[n]->x / scalex;
+		vi[n]->y = vi[n]->y / scaley;
+		vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] = vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] / scalez;
+		// remove perspective divide
 		vi[n]->x = vi[n]->x * vi[n]->w;
 		vi[n]->y = vi[n]->y * vi[n]->w;
 		vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] = vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] * vi[n]->w;
@@ -2715,16 +2726,26 @@ UINT32 nv2a_renderer::render_triangle_clipping(const rectangle &cliprect, render
 	}
 	for (int n = 0; n < idx; n++)
 	{
+		// apply perspective divide
 		vo[n].x = vo[n].x / vo[n].w;
 		vo[n].y = vo[n].y / vo[n].w;
 		vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] = vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] / vo[n].w;
+		// apply scale
+		vo[n].x = vo[n].x * scalex;
+		vo[n].y = vo[n].y * scaley;
+		vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] = vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] * scalez;
+		// apply translate
+		vo[n].x = vo[n].x + translatex;
+		vo[n].y = vo[n].y + translatey;
+		vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] = vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] + translatez;
 	}
-	if (idx > 2)
-		render_triangle_culling(cliprect, callback, paramcount, vo[0], vo[1], vo[2]);
-	if (idx > 3)
-		render_triangle_culling(cliprect, callback, paramcount, vo[0], vo[2], vo[3]);
-	if (idx > 4)
-		exit(0);
+	for (int n = 0; n < (idx-2); n++)
+	{
+		if ((n & 1) == 0)
+			render_triangle_culling(cliprect, callback, paramcount, vo[n], vo[n + 1], vo[n + 2]);
+		else
+			render_triangle_culling(cliprect, callback, paramcount, vo[n], vo[n + 2], vo[n + 1]);
+	}
 #endif
 	return 0;
 }
@@ -2869,7 +2890,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 	data = space.read_dword(address);
 	channel[chanel][subchannel].object.method[method] = data;
 #ifdef LOG_NV2A
-	printf("A:%08X MTHD:%08X D:%08X\n\r",address,maddress,data);
+	//printf("A:%08X MTHD:%08X D:%08X\n\r",address,maddress,data);
 #endif
 	if (maddress == 0x17fc) {
 #if 0 // useful while debugging to see what coordinates have been used
@@ -3489,6 +3510,10 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		*(UINT32 *)(&matrix.translate[maddress]) = data;
 		// set corresponding vertex shader constant too
 		vertexprogram.exec.c_constant[59].iv[maddress] = data; // constant -37
+#ifdef LOG_NV2A
+		if (maddress == 3)
+			machine().logerror("viewport translate = {%f %f %f %f}\n", matrix.translate[0], matrix.translate[1], matrix.translate[2], matrix.translate[3]);
+#endif
 		countlen--;
 	}
 	// viewport scale
@@ -3497,6 +3522,10 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		*(UINT32 *)(&matrix.scale[maddress]) = data;
 		// set corresponding vertex shader constant too
 		vertexprogram.exec.c_constant[58].iv[maddress] = data; // constant -38
+#ifdef LOG_NV2A
+		if (maddress == 3)
+			machine().logerror("viewport scale = {%f %f %f %f}\n", matrix.scale[0], matrix.scale[1], matrix.scale[2], matrix.scale[3]);
+#endif
 		countlen--;
 	}
 	// Vertex program (shader)
@@ -3557,6 +3586,15 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 			machine().logerror("Need to increase size of vertexprogram.parameter to %d\n\r", vertexprogram.upload_parameter_index);
 		vertexprogram.upload_parameter_component++;
 		if (vertexprogram.upload_parameter_component >= 4) {
+#ifdef LOG_NV2A
+			if ((vertexprogram.upload_parameter_index == 58) || (vertexprogram.upload_parameter_index == 59))
+				machine().logerror("vp constant %d (%s) = {%f %f %f %f}\n", vertexprogram.upload_parameter_index,
+					vertexprogram.upload_parameter_index == 58 ? "viewport scale" : "viewport translate",
+					vertexprogram.exec.c_constant[vertexprogram.upload_parameter_index].fv[0],
+					vertexprogram.exec.c_constant[vertexprogram.upload_parameter_index].fv[1],
+					vertexprogram.exec.c_constant[vertexprogram.upload_parameter_index].fv[2],
+					vertexprogram.exec.c_constant[vertexprogram.upload_parameter_index].fv[3]);
+#endif
 			vertexprogram.upload_parameter_component = 0;
 			vertexprogram.upload_parameter_index++;
 		}
@@ -3851,18 +3889,18 @@ float nv2a_renderer::combiner_map_input_function(int code, float value)
 
 	switch (code) {
 	case 0:
-		return MAX(0.0f, value);
+		return std::max(0.0f, value);
 	case 1:
-		t = MAX(value, 0.0f);
-		return 1.0f - MIN(t, 1.0f);
+		t = std::max(value, 0.0f);
+		return 1.0f - std::min(t, 1.0f);
 	case 2:
-		return 2.0f * MAX(0.0f, value) - 1.0f;
+		return 2.0f * std::max(0.0f, value) - 1.0f;
 	case 3:
-		return -2.0f * MAX(0.0f, value) + 1.0f;
+		return -2.0f * std::max(0.0f, value) + 1.0f;
 	case 4:
-		return MAX(0.0f, value) - 0.5f;
+		return std::max(0.0f, value) - 0.5f;
 	case 5:
-		return -MAX(0.0f, value) + 0.5f;
+		return -std::max(0.0f, value) + 0.5f;
 	case 6:
 		return value;
 	case 7:
@@ -3880,37 +3918,37 @@ void nv2a_renderer::combiner_map_input_function3(int code, float *data)
 
 	switch (code) {
 	case 0:
-		data[0] = MAX(0.0f, data[0]);
-		data[1] = MAX(0.0f, data[1]);
-		data[2] = MAX(0.0f, data[2]);
+		data[0] = std::max(0.0f, data[0]);
+		data[1] = std::max(0.0f, data[1]);
+		data[2] = std::max(0.0f, data[2]);
 		break;
 	case 1:
-		t = MAX(data[0], 0.0f);
-		data[0] = 1.0f - MIN(t, 1.0f);
-		t = MAX(data[1], 0.0f);
-		data[1] = 1.0f - MIN(t, 1.0f);
-		t = MAX(data[2], 0.0f);
-		data[2] = 1.0f - MIN(t, 1.0f);
+		t = std::max(data[0], 0.0f);
+		data[0] = 1.0f - std::min(t, 1.0f);
+		t = std::max(data[1], 0.0f);
+		data[1] = 1.0f - std::min(t, 1.0f);
+		t = std::max(data[2], 0.0f);
+		data[2] = 1.0f - std::min(t, 1.0f);
 		break;
 	case 2:
-		data[0] = 2.0f * MAX(0.0f, data[0]) - 1.0f;
-		data[1] = 2.0f * MAX(0.0f, data[1]) - 1.0f;
-		data[2] = 2.0f * MAX(0.0f, data[2]) - 1.0f;
+		data[0] = 2.0f * std::max(0.0f, data[0]) - 1.0f;
+		data[1] = 2.0f * std::max(0.0f, data[1]) - 1.0f;
+		data[2] = 2.0f * std::max(0.0f, data[2]) - 1.0f;
 		break;
 	case 3:
-		data[0] = -2.0f * MAX(0.0f, data[0]) + 1.0f;
-		data[1] = -2.0f * MAX(0.0f, data[1]) + 1.0f;
-		data[2] = -2.0f * MAX(0.0f, data[2]) + 1.0f;
+		data[0] = -2.0f * std::max(0.0f, data[0]) + 1.0f;
+		data[1] = -2.0f * std::max(0.0f, data[1]) + 1.0f;
+		data[2] = -2.0f * std::max(0.0f, data[2]) + 1.0f;
 		break;
 	case 4:
-		data[0] = MAX(0.0f, data[0]) - 0.5f;
-		data[1] = MAX(0.0f, data[1]) - 0.5f;
-		data[2] = MAX(0.0f, data[2]) - 0.5f;
+		data[0] = std::max(0.0f, data[0]) - 0.5f;
+		data[1] = std::max(0.0f, data[1]) - 0.5f;
+		data[2] = std::max(0.0f, data[2]) - 0.5f;
 		break;
 	case 5:
-		data[0] = -MAX(0.0f, data[0]) + 0.5f;
-		data[1] = -MAX(0.0f, data[1]) + 0.5f;
-		data[2] = -MAX(0.0f, data[2]) + 0.5f;
+		data[0] = -std::max(0.0f, data[0]) + 0.5f;
+		data[1] = -std::max(0.0f, data[1]) + 0.5f;
+		data[2] = -std::max(0.0f, data[2]) + 0.5f;
 		break;
 	case 6:
 		return;
@@ -4088,13 +4126,13 @@ void nv2a_renderer::combiner_map_final_input()
 	combiner.variable_EF[1] = combiner.variable_E[1] * combiner.variable_F[1];
 	combiner.variable_EF[2] = combiner.variable_E[2] * combiner.variable_F[2];
 	// sumclamp
-	combiner.variable_sumclamp[0] = MAX(0, combiner.register_spare0[0]) + MAX(0, combiner.register_secondarycolor[0]);
-	combiner.variable_sumclamp[1] = MAX(0, combiner.register_spare0[1]) + MAX(0, combiner.register_secondarycolor[1]);
-	combiner.variable_sumclamp[2] = MAX(0, combiner.register_spare0[2]) + MAX(0, combiner.register_secondarycolor[2]);
+	combiner.variable_sumclamp[0] = std::max(0.0f, combiner.register_spare0[0]) + std::max(0.0f, combiner.register_secondarycolor[0]);
+	combiner.variable_sumclamp[1] = std::max(0.0f, combiner.register_spare0[1]) + std::max(0.0f, combiner.register_secondarycolor[1]);
+	combiner.variable_sumclamp[2] = std::max(0.0f, combiner.register_spare0[2]) + std::max(0.0f, combiner.register_secondarycolor[2]);
 	if (combiner.final.color_sum_clamp != 0) {
-		combiner.variable_sumclamp[0] = MIN(combiner.variable_sumclamp[0], 1.0f);
-		combiner.variable_sumclamp[1] = MIN(combiner.variable_sumclamp[1], 1.0f);
-		combiner.variable_sumclamp[2] = MIN(combiner.variable_sumclamp[2], 1.0f);
+		combiner.variable_sumclamp[0] = std::min(combiner.variable_sumclamp[0], 1.0f);
+		combiner.variable_sumclamp[1] = std::min(combiner.variable_sumclamp[1], 1.0f);
+		combiner.variable_sumclamp[2] = std::min(combiner.variable_sumclamp[2], 1.0f);
 	}
 	// A
 	pv = combiner_map_input_select3(combiner.final.mapin_rgbA_input);
@@ -4142,9 +4180,9 @@ void nv2a_renderer::combiner_final_output()
 	combiner.output[0] = combiner.variable_A[0] * combiner.variable_B[0] + (1.0f - combiner.variable_A[0])*combiner.variable_C[0] + combiner.variable_D[0];
 	combiner.output[1] = combiner.variable_A[1] * combiner.variable_B[1] + (1.0f - combiner.variable_A[1])*combiner.variable_C[1] + combiner.variable_D[1];
 	combiner.output[2] = combiner.variable_A[2] * combiner.variable_B[2] + (1.0f - combiner.variable_A[2])*combiner.variable_C[2] + combiner.variable_D[2];
-	combiner.output[0] = MIN(combiner.output[0], 1.0f);
-	combiner.output[1] = MIN(combiner.output[1], 1.0f);
-	combiner.output[2] = MIN(combiner.output[2], 1.0f);
+	combiner.output[0] = std::min(combiner.output[0], 1.0f);
+	combiner.output[1] = std::min(combiner.output[1], 1.0f);
+	combiner.output[2] = std::min(combiner.output[2], 1.0f);
 	// a
 	combiner.output[3] = combiner_map_input_function(combiner.final.mapin_aG_mapping, combiner.variable_G);
 }
@@ -4225,26 +4263,26 @@ void nv2a_renderer::combiner_compute_rgb_outputs(int stage_number)
 		m = 0;
 		combiner_function_AB(combiner.function_RGBop1);
 	}
-	combiner.function_RGBop1[0] = MAX(MIN((combiner.function_RGBop1[0] + biasrgb) * scalergb, 1.0f), -1.0f);
-	combiner.function_RGBop1[1] = MAX(MIN((combiner.function_RGBop1[1] + biasrgb) * scalergb, 1.0f), -1.0f);
-	combiner.function_RGBop1[2] = MAX(MIN((combiner.function_RGBop1[2] + biasrgb) * scalergb, 1.0f), -1.0f);
+	combiner.function_RGBop1[0] = std::max(std::min((combiner.function_RGBop1[0] + biasrgb) * scalergb, 1.0f), -1.0f);
+	combiner.function_RGBop1[1] = std::max(std::min((combiner.function_RGBop1[1] + biasrgb) * scalergb, 1.0f), -1.0f);
+	combiner.function_RGBop1[2] = std::max(std::min((combiner.function_RGBop1[2] + biasrgb) * scalergb, 1.0f), -1.0f);
 	if (combiner.stage[n].mapout_rgbCD_dotproduct) {
 		m = m | 1;
 		combiner_function_CdotD(combiner.function_RGBop2);
 	}
 	else
 		combiner_function_CD(combiner.function_RGBop2);
-	combiner.function_RGBop2[0] = MAX(MIN((combiner.function_RGBop2[0] + biasrgb) * scalergb, 1.0f), -1.0f);
-	combiner.function_RGBop2[1] = MAX(MIN((combiner.function_RGBop2[1] + biasrgb) * scalergb, 1.0f), -1.0f);
-	combiner.function_RGBop2[2] = MAX(MIN((combiner.function_RGBop2[2] + biasrgb) * scalergb, 1.0f), -1.0f);
+	combiner.function_RGBop2[0] = std::max(std::min((combiner.function_RGBop2[0] + biasrgb) * scalergb, 1.0f), -1.0f);
+	combiner.function_RGBop2[1] = std::max(std::min((combiner.function_RGBop2[1] + biasrgb) * scalergb, 1.0f), -1.0f);
+	combiner.function_RGBop2[2] = std::max(std::min((combiner.function_RGBop2[2] + biasrgb) * scalergb, 1.0f), -1.0f);
 	if (m == 0) {
 		if (combiner.stage[n].mapout_rgb_muxsum)
 			combiner_function_ABmuxCD(combiner.function_RGBop3);
 		else
 			combiner_function_ABsumCD(combiner.function_RGBop3);
-		combiner.function_RGBop3[0] = MAX(MIN((combiner.function_RGBop3[0] + biasrgb) * scalergb, 1.0f), -1.0f);
-		combiner.function_RGBop3[1] = MAX(MIN((combiner.function_RGBop3[1] + biasrgb) * scalergb, 1.0f), -1.0f);
-		combiner.function_RGBop3[2] = MAX(MIN((combiner.function_RGBop3[2] + biasrgb) * scalergb, 1.0f), -1.0f);
+		combiner.function_RGBop3[0] = std::max(std::min((combiner.function_RGBop3[0] + biasrgb) * scalergb, 1.0f), -1.0f);
+		combiner.function_RGBop3[1] = std::max(std::min((combiner.function_RGBop3[1] + biasrgb) * scalergb, 1.0f), -1.0f);
+		combiner.function_RGBop3[2] = std::max(std::min((combiner.function_RGBop3[2] + biasrgb) * scalergb, 1.0f), -1.0f);
 	}
 }
 
@@ -4273,9 +4311,9 @@ void nv2a_renderer::combiner_compute_a_outputs(int stage_number)
 		break;
 	}
 	combiner.function_Aop1 = combiner.variable_A[3] * combiner.variable_B[3];
-	combiner.function_Aop1 = MAX(MIN((combiner.function_Aop1 + biasa) * scalea, 1.0f), -1.0f);
+	combiner.function_Aop1 = std::max(std::min((combiner.function_Aop1 + biasa) * scalea, 1.0f), -1.0f);
 	combiner.function_Aop2 = combiner.variable_C[3] * combiner.variable_D[3];
-	combiner.function_Aop2 = MAX(MIN((combiner.function_Aop2 + biasa) * scalea, 1.0f), -1.0f);
+	combiner.function_Aop2 = std::max(std::min((combiner.function_Aop2 + biasa) * scalea, 1.0f), -1.0f);
 	if (combiner.stage[n].mapout_a_muxsum) {
 		if (combiner.register_spare0[3] >= 0.5f)
 			combiner.function_Aop3 = combiner.variable_A[3] * combiner.variable_B[3];
@@ -4284,7 +4322,7 @@ void nv2a_renderer::combiner_compute_a_outputs(int stage_number)
 	}
 	else
 		combiner.function_Aop3 = combiner.variable_A[3] * combiner.variable_B[3] + combiner.variable_C[3] * combiner.variable_D[3];
-	combiner.function_Aop3 = MAX(MIN((combiner.function_Aop3 + biasa) * scalea, 1.0f), -1.0f);
+	combiner.function_Aop3 = std::max(std::min((combiner.function_Aop3 + biasa) * scalea, 1.0f), -1.0f);
 }
 
 void nv2a_renderer::vblank_callback(screen_device &screen, bool state)
@@ -4616,6 +4654,12 @@ WRITE32_MEMBER(nv2a_renderer::geforce_w)
 			dmaget = &channel[chanel][0].regs[0x44 / 4];
 			//printf("dmaget %08X dmaput %08X\n\r",*dmaget,*dmaput);
 			if (((*dmaput == 0x048cf000) && (*dmaget == 0x07f4d000)) || // only for outr2
+				((*dmaput == 0x045cd000) && (*dmaget == 0x07f4d000)) || // only for scg06nt
+				((*dmaput == 0x0494c000) && (*dmaget == 0x07f4d000)) || // only for wangmid
+				((*dmaput == 0x05acd000) && (*dmaget == 0x07f4d000)) || // only for ghostsqu
+				((*dmaput == 0x0574d000) && (*dmaget == 0x07f4d000)) || // only for mj2c
+				((*dmaput == 0x07ca3000) && (*dmaget == 0x07f4d000)) || // only for hotd3
+				((*dmaput == 0x063cd000) && (*dmaget == 0x07f4d000)) || // only for vcop3
 				((*dmaput == 0x07dca000) && (*dmaget == 0x07f4d000))) // only for crtaxihr
 			{
 				*dmaget = *dmaput;

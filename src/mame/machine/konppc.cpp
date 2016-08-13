@@ -20,7 +20,7 @@ konppc_device::konppc_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, KONPPC, "Konami PowerPC Common Functions", tag, owner, clock, "konppc", __FILE__),
 	cgboard_type(0),
 	num_cgboards(0)/*,
-    cgboard_id(MAX_CG_BOARDS)*/
+	cgboard_id(MAX_CG_BOARDS)*/
 {
 }
 

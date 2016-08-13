@@ -191,7 +191,7 @@ CUSTOM_INPUT_MEMBER(vicdual_state::get_timer_value)
 
 int vicdual_state::is_cabinet_color()
 {
-	return ((m_color_bw ? m_color_bw->read() : 0) & 1) ? 0 : 1;
+	return (m_color_bw.read_safe(0) & 1) ? 0 : 1;
 }
 
 
@@ -1303,7 +1303,7 @@ CUSTOM_INPUT_MEMBER(vicdual_state::fake_lives_r)
 
 	/* and use d8 for the port */
 	int port = ((FPTR)param) >> 8 & 1;
-	return ((m_fake_lives[port] ? m_fake_lives[port]->read() : 0) & bit_mask) ? 0 : 1;
+	return (m_fake_lives[port].read_safe(0) & bit_mask) ? 0 : 1;
 }
 
 

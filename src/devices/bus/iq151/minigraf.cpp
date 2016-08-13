@@ -94,7 +94,7 @@ void iq151_minigraf_device::device_stop()
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *iq151_minigraf_device::device_rom_region() const
+const tiny_rom_entry *iq151_minigraf_device::device_rom_region() const
 {
 	return ROM_NAME( iq151_minigraf );
 }
@@ -154,10 +154,10 @@ void iq151_minigraf_device::plotter_update(UINT8 control)
 	m_pen = BIT(control, 7);
 
 	// clamp within range
-	m_posx = MAX(m_posx, 0);
-	m_posx = MIN(m_posx, PAPER_MAX_X);
-	m_posy = MAX(m_posy, 0);
-	m_posy = MIN(m_posy, PAPER_MAX_Y);
+	m_posx = std::max<INT16>(m_posx, 0);
+	m_posx = std::min<INT16>(m_posx, PAPER_MAX_X);
+	m_posy = std::max<INT16>(m_posy, 0);
+	m_posy = std::min<INT16>(m_posy, PAPER_MAX_Y);
 
 	// if pen is down draws a point
 	if (m_pen)

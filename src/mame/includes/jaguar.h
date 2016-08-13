@@ -243,7 +243,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( dsp_cpu_int );
 	DECLARE_WRITE_LINE_MEMBER( external_int );
 
-	int quickload(device_image_interface &image, const char *file_type, int quickload_size);
+	image_init_result quickload(device_image_interface &image, const char *file_type, int quickload_size);
 	void cart_start();
 	IRQ_CALLBACK_MEMBER(jaguar_irq_callback);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( jaguar_cart );

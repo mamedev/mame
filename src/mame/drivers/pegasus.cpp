@@ -78,7 +78,7 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(pegasus);
 	TIMER_DEVICE_CALLBACK_MEMBER(pegasus_firq);
-	int load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag);
+	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp00_load) { return load_cart(image, m_exp_00, "0000"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp01_load) { return load_cart(image, m_exp_01, "1000"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp02_load) { return load_cart(image, m_exp_02, "2000"); }
@@ -413,7 +413,7 @@ void pegasus_state::pegasus_decrypt_rom(UINT8 *ROM)
 	}
 }
 
-int pegasus_state::load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag)
+image_init_result pegasus_state::load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag)
 {
 	UINT32 size = slot->common_get_size(reg_tag);
 	bool any_socket = false;
@@ -421,7 +421,7 @@ int pegasus_state::load_cart(device_image_interface &image, generic_slot_device 
 	if (size > 0x1000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	if (image.software_entry() != nullptr && size == 0)
@@ -437,7 +437,7 @@ int pegasus_state::load_cart(device_image_interface &image, generic_slot_device 
 					"Attempted to load a file that does not work in this socket.\n"
 					"Please check \"Usage\" field in the software list for the correct socket(s) to use.");
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, errmsg.c_str());
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 	}
 
@@ -447,7 +447,7 @@ int pegasus_state::load_cart(device_image_interface &image, generic_slot_device 
 	// raw images have to be decrypted (in particular the ones from softlist)
 	pegasus_decrypt_rom(slot->get_rom_base());
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void pegasus_state::machine_start()

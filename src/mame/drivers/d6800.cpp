@@ -346,7 +346,7 @@ QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
 	int quick_length;
 	dynamic_buffer quick_data;
 	int read_;
-	int result = IMAGE_INIT_FAIL;
+	image_init_result result = image_init_result::FAIL;
 
 	quick_length = image.length();
 	quick_data.resize(quick_length);
@@ -366,12 +366,12 @@ QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
 		image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length,quick_addr,quick_addr+quick_length,exec_addr);
 
 		// Start the quickload
-		if (strcmp(image.filetype(), "bin") == 0)
+		if (image.is_filetype("bin"))
 			m_maincpu->set_pc(quick_addr);
 		else
 			m_maincpu->set_pc(exec_addr);
 
-		result = IMAGE_INIT_PASS;
+		result = image_init_result::PASS;
 	}
 
 	return result;

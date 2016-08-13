@@ -260,6 +260,8 @@ SOUNDS["ESQPUMP"] = true
 SOUNDS["VRC6"] = true
 SOUNDS["UPD1771"] = true
 SOUNDS["GB_SOUND"] = true
+SOUNDS["PCD3311"] = true
+
 --------------------------------------------------
 -- specify available video cores
 --------------------------------------------------
@@ -704,6 +706,148 @@ BUSES["Z88"] = true
 BUSES["ZORRO"] = true
 
 --------------------------------------------------
+-- specify used file formats
+--------------------------------------------------
+
+FORMATS["2D_DSK"] = true
+FORMATS["A26_CAS"] = true
+FORMATS["A5105_DSK"] = true
+FORMATS["ABC800_DSK"] = true
+FORMATS["ABCFD2_DSK"] = true
+FORMATS["ACE_TAP"] = true
+FORMATS["ACORN_DSK"] = true
+FORMATS["ADAM_CAS"] = true
+FORMATS["ADAM_DSK"] = true
+FORMATS["AFS_DSK"] = true
+FORMATS["AMI_DSK"] = true
+FORMATS["AP2_DSK"] = true
+FORMATS["APF_APT"] = true
+FORMATS["APOLLO_DSK"] = true
+FORMATS["APPLIX_DSK"] = true
+FORMATS["APRIDISK"] = true
+FORMATS["AP_DSK35"] = true
+FORMATS["ASST128_DSK"] = true
+FORMATS["ATARI_DSK"] = true
+FORMATS["ATOM_DSK"] = true
+FORMATS["ATOM_TAP"] = true
+FORMATS["BASICDSK"] = true
+FORMATS["BW12_DSK"] = true
+FORMATS["BW2_DSK"] = true
+FORMATS["C3040_DSK"] = true
+FORMATS["C4040_DSK"] = true
+FORMATS["C8280_DSK"] = true
+FORMATS["CAMPLYNX_CAS"] = true
+FORMATS["CAMPLYNX_DSK"] = true
+FORMATS["CBM_CRT"] = true
+FORMATS["CBM_TAP"] = true
+FORMATS["CCVF_DSK"] = true
+FORMATS["CD90_640_DSK"] = true
+FORMATS["CGENIE_DSK"] = true
+FORMATS["CGEN_CAS"] = true
+FORMATS["COCO_CAS"] = true
+FORMATS["COMX35_DSK"] = true
+FORMATS["CONCEPT_DSK"] = true
+FORMATS["COUPEDSK"] = true
+FORMATS["CPIS_DSK"] = true
+FORMATS["CSW_CAS"] = true
+FORMATS["D64_DSK"] = true
+FORMATS["D71_DSK"] = true
+FORMATS["D80_DSK"] = true
+FORMATS["D81_DSK"] = true
+FORMATS["D82_DSK"] = true
+FORMATS["DCP_DSK"] = true
+FORMATS["DIM_DSK"] = true
+FORMATS["DIP_DSK"] = true
+FORMATS["DMK_DSK"] = true
+FORMATS["EP64_DSK"] = true
+FORMATS["DMV_DSK"] = true
+FORMATS["ESQ16_DSK"] = true
+FORMATS["ESQ8_DSK"] = true
+FORMATS["EXCALI64_DSK"] = true
+FORMATS["FC100_CAS"] = true
+FORMATS["FDD_DSK"] = true
+FORMATS["FLEX_DSK"] = true
+FORMATS["FM7_CAS"] = true
+FORMATS["FMSX_CAS"] = true
+FORMATS["FMTOWNS_DSK"] = true
+FORMATS["FSD_DSK"] = true
+FORMATS["G64_DSK"] = true
+FORMATS["GTP_CAS"] = true
+FORMATS["HECTOR_MINIDISC"] = true
+FORMATS["HECT_DSK"] = true
+FORMATS["HECT_TAP"] = true
+FORMATS["IQ151_DSK"] = true
+FORMATS["ITT3030_DSK"] = true
+FORMATS["JVC_DSK"] = true
+FORMATS["KAYPRO_DSK"] = true
+FORMATS["KC85_DSK"] = true
+FORMATS["KC_CAS"] = true
+FORMATS["KIM1_CAS"] = true
+FORMATS["LVIV_LVT"] = true
+FORMATS["M20_DSK"] = true
+FORMATS["M5_DSK"] = true
+FORMATS["MBEE_CAS"] = true
+FORMATS["MFM_HD"] = true
+FORMATS["MM_DSK"] = true
+FORMATS["MSX_DSK"] = true
+FORMATS["MZ_CAS"] = true
+FORMATS["NANOS_DSK"] = true
+FORMATS["NASCOM_DSK"] = true
+FORMATS["NASLITE_DSK"] = true
+FORMATS["NES_DSK"] = true
+FORMATS["NFD_DSK"] = true
+FORMATS["ORAO_CAS"] = true
+FORMATS["ORIC_DSK"] = true
+FORMATS["ORIC_TAP"] = true
+FORMATS["P6001_CAS"] = true
+FORMATS["PASTI_DSK"] = true
+FORMATS["PC98FDI_DSK"] = true
+FORMATS["PC98_DSK"] = true
+FORMATS["PC_DSK"] = true
+FORMATS["PHC25_CAS"] = true
+FORMATS["PK8020_DSK"] = true
+FORMATS["PMD_CAS"] = true
+FORMATS["PRIMOPTP"] = true
+FORMATS["PYLDIN_DSK"] = true
+FORMATS["QL_DSK"] = true
+FORMATS["RK_CAS"] = true
+FORMATS["RX50_DSK"] = true
+FORMATS["SC3000_BIT"] = true
+FORMATS["SF7000_DSK"] = true
+FORMATS["SMX_DSK"] = true
+FORMATS["SOL_CAS"] = true
+FORMATS["SORC_CAS"] = true
+FORMATS["SORC_DSK"] = true
+FORMATS["SORD_CAS"] = true
+FORMATS["SPC1000_CAS"] = true
+FORMATS["ST_DSK"] = true
+FORMATS["SVI_CAS"] = true
+FORMATS["SVI_DSK"] = true
+FORMATS["TANDY2K_DSK"] = true
+FORMATS["THOM_CAS"] = true
+FORMATS["THOM_DSK"] = true
+FORMATS["TI99_DSK"] = true
+FORMATS["TIKI100_DSK"] = true
+FORMATS["TRD_DSK"] = true
+FORMATS["TRS80_DSK"] = true
+FORMATS["TRS_CAS"] = true
+FORMATS["TVC_CAS"] = true
+FORMATS["TVC_DSK"] = true
+FORMATS["TZX_CAS"] = true
+FORMATS["UEF_CAS"] = true
+FORMATS["UPD765_DSK"] = true
+FORMATS["VDK_DSK"] = true
+FORMATS["VECTOR06_DSK"] = true
+FORMATS["VG5K_CAS"] = true
+FORMATS["VICTOR9K_DSK"] = true
+FORMATS["VT_CAS"] = true
+FORMATS["WD177X_DSK"] = true
+FORMATS["X07_CAS"] = true
+FORMATS["X1_TAP"] = true
+FORMATS["XDF_DSK"] = true
+FORMATS["ZX81_P"] = true
+
+--------------------------------------------------
 -- this is the list of driver libraries that
 -- comprise MESS plus messdriv.*", which contains
 -- the list of drivers
@@ -766,6 +910,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"epson",
 		"exidy",
 		"fairch",
+		"fairlight",
 		"fidelity",
 		"force",
 		"fujitsu",
@@ -1727,6 +1872,11 @@ files {
 	MAME_DIR .. "src/mame/audio/channelf.cpp",
 	MAME_DIR .. "src/mame/audio/channelf.h",
 	MAME_DIR .. "src/mame/video/channelf.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "fairlight")
+files {
+	MAME_DIR .. "src/mame/drivers/cmi.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "fidelity")

@@ -96,20 +96,20 @@ private:
 	int                 m_height;           // height of the font, from ascent to descent
 	int                 m_yoffs;            // y offset from baseline to descent
 	float               m_scale;            // 1 / height precomputed
-	glyph               *m_glyphs[256];     // array of glyph subtables
+	glyph               *m_glyphs[17*256];  // array of glyph subtables
 	std::vector<char>   m_rawdata;          // pointer to the raw data for the font
 	UINT64              m_rawsize;          // size of the raw font data
 	std::unique_ptr<osd_font> m_osdfont;    // handle to the OSD font
 
 	int                 m_height_cmd;       // height of the font, from ascent to descent
 	int                 m_yoffs_cmd;        // y offset from baseline to descent
-	glyph               *m_glyphs_cmd[256]; // array of glyph subtables
+	EQUIVALENT_ARRAY(m_glyphs, glyph *) m_glyphs_cmd; // array of glyph subtables
 	std::vector<char>   m_rawdata_cmd;      // pointer to the raw data for the font
 
 	// constants
 	static const int CACHED_CHAR_SIZE       = 12;
 	static const int CACHED_HEADER_SIZE     = 16;
-	static const int CACHED_BDF_HASH_SIZE   = 1024;
+	static const UINT64 CACHED_BDF_HASH_SIZE   = 1024;
 };
 
 void convert_command_glyph(std::string &s);

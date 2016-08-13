@@ -158,7 +158,7 @@ static const char *vboy_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-bool vboy_cart_slot_device::call_load()
+image_init_result vboy_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -169,7 +169,7 @@ bool vboy_cart_slot_device::call_load()
 		if (len > 0x200000)
 		{
 			seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		// always alloc 0x200000 so to be able to directly map the region
@@ -200,10 +200,10 @@ bool vboy_cart_slot_device::call_load()
 
 		//printf("Type: %s\n", vboy_get_slot(m_type));
 
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

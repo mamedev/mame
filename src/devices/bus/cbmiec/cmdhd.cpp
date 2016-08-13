@@ -49,7 +49,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *cmd_hd_device::device_rom_region() const
+const tiny_rom_entry *cmd_hd_device::device_rom_region() const
 {
 	return ROM_NAME( cmd_hd );
 }

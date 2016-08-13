@@ -13,6 +13,7 @@
 #ifndef __MICRODRV__
 #define __MICRODRV__
 
+#include "softlist_dev.h"
 
 
 //**************************************************************************
@@ -48,7 +49,7 @@ public:
 	template<class _Object> static devcb_base &set_comms_out_wr_callback(device_t &device, _Object object) { return downcast<microdrive_image_device &>(device).m_write_comms_out.set_callback(object); }
 
 	// image-level overrides
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 

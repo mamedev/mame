@@ -174,7 +174,7 @@ ROM_START( msx_nms1205 )
 ROM_END
 
 
-const rom_entry *msx_cart_msx_audio_nms1205::device_rom_region() const
+const tiny_rom_entry *msx_cart_msx_audio_nms1205::device_rom_region() const
 {
 	return ROM_NAME( msx_nms1205 );
 }
@@ -287,7 +287,7 @@ ROM_START( msx_fsca1 )
 ROM_END
 
 
-const rom_entry *msx_cart_msx_audio_fsca1::device_rom_region() const
+const tiny_rom_entry *msx_cart_msx_audio_fsca1::device_rom_region() const
 {
 	return ROM_NAME( msx_fsca1 );
 }

@@ -18,6 +18,9 @@
 #include <mutex>
 #include <queue>
 #include <string>
+#undef min
+#undef max
+#include <utility>
 
 
 //============================================================
@@ -461,10 +464,10 @@ class input_module_base : public input_module
 public:
 	input_module_base(const char *type, const char* name)
 		: input_module(type, name),
-		m_input_enabled(FALSE),
-		m_mouse_enabled(FALSE),
-		m_lightgun_enabled(FALSE),
-		m_input_paused(FALSE),
+		m_input_enabled(false),
+		m_mouse_enabled(false),
+		m_lightgun_enabled(false),
+		m_input_paused(false),
 		m_options(nullptr)
 	{
 	}
@@ -614,14 +617,14 @@ inline static INT32 normalize_absolute_axis(INT32 raw, INT32 rawmin, INT32 rawma
 	if (raw >= center)
 	{
 		INT32 result = (INT64)(raw - center) * (INT64)INPUT_ABSOLUTE_MAX / (INT64)(rawmax - center);
-		return MIN(result, INPUT_ABSOLUTE_MAX);
+		return std::min(result, INPUT_ABSOLUTE_MAX);
 	}
 
 	// below center
 	else
 	{
 		INT32 result = -((INT64)(center - raw) * (INT64)-INPUT_ABSOLUTE_MIN / (INT64)(center - rawmin));
-		return MAX(result, INPUT_ABSOLUTE_MIN);
+		return std::max(result, INPUT_ABSOLUTE_MIN);
 	}
 }
 

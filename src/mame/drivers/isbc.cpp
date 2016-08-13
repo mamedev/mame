@@ -55,7 +55,18 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(isbc_uart8274_irq);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE8_MEMBER(ppi_c_w);
+protected:
+	void machine_reset() override;
 };
+
+void isbc_state::machine_reset()
+{
+	if(m_centronics)
+	{
+		m_centronics->write_busy(0);  // centronics_device sets busy to 1 at reset causing spurious irqs
+		m_pic_1->ir7_w(0);
+	}
+}
 
 static ADDRESS_MAP_START(rpc86_mem, AS_PROGRAM, 16, isbc_state)
 	ADDRESS_MAP_UNMAP_HIGH

@@ -24,7 +24,7 @@
 #include "mame.h"
 #include "rendfont.h"
 #include "rendutil.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "uiinput.h"
 
 
@@ -96,18 +96,20 @@ bool has_multiple_bios(const game_driver *driver, s_bios &biosname)
 	if (driver->rom == nullptr)
 		return false;
 
-	std::string default_name;
-	for (const rom_entry *rom = driver->rom; !ROMENTRY_ISEND(rom); ++rom)
-		if (ROMENTRY_ISDEFAULT_BIOS(rom))
-			default_name = ROM_GETNAME(rom);
+	auto entries = rom_build_entries(driver->rom);
 
-	for (const rom_entry *rom = driver->rom; !ROMENTRY_ISEND(rom); ++rom)
+	std::string default_name;
+	for (const rom_entry &rom : entries)
+		if (ROMENTRY_ISDEFAULT_BIOS(&rom))
+			default_name = ROM_GETNAME(&rom);
+
+	for (const rom_entry &rom : entries)
 	{
-		if (ROMENTRY_ISSYSTEM_BIOS(rom))
+		if (ROMENTRY_ISSYSTEM_BIOS(&rom))
 		{
-			std::string name(ROM_GETHASHDATA(rom));
-			std::string bname(ROM_GETNAME(rom));
-			int bios_flags = ROM_GETBIOSFLAGS(rom);
+			std::string name(ROM_GETHASHDATA(&rom));
+			std::string bname(ROM_GETNAME(&rom));
+			int bios_flags = ROM_GETBIOSFLAGS(&rom);
 
 			if (bname == default_name)
 			{
@@ -528,7 +530,7 @@ void menu_select_software::build_software_list()
 		for (const software_info &swinfo : swlist.get_info())
 		{
 			const software_part &part = swinfo.parts().front();
-			if (part.is_compatible(swlist) == SOFTWARE_IS_COMPATIBLE)
+			if (swlist.is_compatible(part) == SOFTWARE_IS_COMPATIBLE)
 			{
 				const char *instance_name = nullptr;
 				const char *type_name = nullptr;
@@ -560,7 +562,7 @@ void menu_select_software::build_software_list()
 				tmpmatches.supported = swinfo.supported();
 				tmpmatches.part = part.name();
 				tmpmatches.driver = m_driver;
-				tmpmatches.listname = strensure(swlist.list_name());
+				tmpmatches.listname = swlist.list_name();
 				tmpmatches.interface = part.interface();
 				tmpmatches.startempty = 0;
 				tmpmatches.parentlongname.clear();
@@ -1033,7 +1035,7 @@ void menu_select_software::find_matches(const char *str, int count)
 		// pick the best match between driver name and description
 		int curpenalty = fuzzy_substring(str, m_displaylist[index]->longname);
 		int tmp = fuzzy_substring(str, m_displaylist[index]->shortname);
-		curpenalty = MIN(curpenalty, tmp);
+		curpenalty = std::min(curpenalty, tmp);
 
 		// insert into the sorted table of matches
 		for (int matchnum = count - 1; matchnum >= 0; --matchnum)
@@ -1315,7 +1317,7 @@ void menu_select_software::infos_render(float origx1, float origy1, float origx2
 			ui().draw_text_full(container(), elem.c_str(), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER, ui::text_layout::NEVER,
 					mame_ui_manager::NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, nullptr);
 			txt_lenght += 0.01f;
-			title_size = MAX(txt_lenght, title_size);
+			title_size = std::max(txt_lenght, title_size);
 		}
 
 		rgb_t fgcolor = UI_TEXT_COLOR;
@@ -1476,7 +1478,7 @@ void software_parts::custom_render(void *selectedref, float top, float bottom, f
 	ui().draw_text_full(container(), _("Software part selection:"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 									mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
-	float maxwidth = MAX(origx2 - origx1, width);
+	float maxwidth = std::max(origx2 - origx1, width);
 
 	// compute our bounds
 	float x1 = 0.5f - 0.5f * maxwidth;
@@ -1617,7 +1619,7 @@ void bios_selection::custom_render(void *selectedref, float top, float bottom, f
 	ui().draw_text_full(container(), _("Bios selection:"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 									mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
-	float maxwidth = MAX(origx2 - origx1, width);
+	float maxwidth = std::max(origx2 - origx1, width);
 
 	// compute our bounds
 	float x1 = 0.5f - 0.5f * maxwidth;

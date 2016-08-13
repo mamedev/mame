@@ -31,13 +31,13 @@ WRITE8_MEMBER( xxx_state::kbd_put )
 namespace {
 UINT8 const TRANSLATION_TABLE[][2][4][16] = {
 	{
-		{	// ANSI
+		{   // ANSI
 			{ '`',   '1',   '2',   '3',   '4',   '5',   '6',   '7',   '8',   '9',   '0',   '-',   '=',   0x08U, 0x7fU, 0x1bU },
 			{ 0x09U, 'q',   'w',   'e',   'r',   't',   'y',   'u',   'i',   'o',   'p',   '[',   ']',   '\\',  0xffU, 0xffU },
 			{ 0xffU, 'a',   's',   'd',   'f',   'g',   'h',   'j',   'k',   'l',   ';',   '\'',  0x0dU, 0xffU, 0xffU, 0x0aU },
 			{ 0xffU, '\\',  'z',   'x',   'c',   'v',   'b',   'n',   'm',   ',',   '.',   '/',   0xffU, 0xffU, 0xffU, ' '   }
 		},
-		{	// JIS
+		{   // JIS
 			{ '\\',  '1',   '2',   '3',   '4',   '5',   '6',   '7',   '8',   '9',   '0',   '-',   '^',   0x08U, 0x7fU, 0x1bU },
 			{ 0x09U, 'q',   'w',   'e',   'r',   't',   'y',   'u',   'i',   'o',   'p',   '@',   '[',   ']',   0xffU, 0xffU },
 			{ 0xffU, 'a',   's',   'd',   'f',   'g',   'h',   'j',   'k',   'l',   ';',   ':',   0x0dU, 0xffU, 0xffU, 0x0aU },
@@ -45,13 +45,13 @@ UINT8 const TRANSLATION_TABLE[][2][4][16] = {
 		}
 	},
 	{
-		{	// ANSI shift
+		{   // ANSI shift
 			{ '~',   '!',   '@',   '#',   '$',   '%',   '^',   '&',   '*',   '(',   ')',   '_',   '+',   0x08U, 0x7fU, 0x1bU },
 			{ 0x09U, 'Q',   'W',   'E',   'R',   'T',   'Y',   'U',   'I',   'O',   'P',   '{',   '}',   '|',   0xffU, 0xffU },
 			{ 0xffU, 'A',   'S',   'D',   'F',   'G',   'H',   'J',   'K',   'L',   ':',   '"',   0x0dU, 0xffU, 0xffU, 0x0aU },
 			{ 0xffU, '_',   'Z',   'X',   'C',   'V',   'B',   'N',   'M',   '<',   '>',   '?',   0xffU, 0xffU, 0xffU, ' '   }
 		},
-		{	// JIS shift
+		{   // JIS shift
 			{ '|',   '!',   '"',   '#',   '$',   '%',   '&',   '\'',  '(',   ')',   0xffU, '=',   '~',   0x08U, 0x7fU, 0x1bU },
 			{ 0x09U, 'Q',   'W',   'E',   'R',   'T',   'Y',   'U',   'I',   'O',   'P',   '`',   '{',   '}',   0xffU, 0xffU },
 			{ 0xffU, 'A',   'S',   'D',   'F',   'G',   'H',   'J',   'K',   'L',   '+',   '*',   0x0dU, 0xffU, 0xffU, 0x0aU },
@@ -59,13 +59,13 @@ UINT8 const TRANSLATION_TABLE[][2][4][16] = {
 		}
 	},
 	{
-		{	// ANSI ctrl
+		{   // ANSI ctrl
 			{ 0x00U, '1',   '2',   '3',   '4',   '5',   '6',   '7',   '8',   '9',   '0',   0x1fU, 0x1eU, 0x08U, 0x7fU, 0x1bU },
 			{ 0x09U, 0x11U, 0x17U, 0x05U, 0x12U, 0x14U, 0x19U, 0x15U, 0x09U, 0x0fU, 0x10U, 0x1bU, 0x1dU, 0x1cU, 0xffU, 0xffU },
 			{ 0xffU, 0x01U, 0x13U, 0x04U, 0x06U, 0x07U, 0x08U, 0x0aU, 0x0bU, 0x0cU, ';',   '\'',  0x0dU, 0xffU, 0xffU, 0x0aU },
 			{ 0xffU, 0x1cU, 0x1aU, 0x18U, 0x03U, 0x16U, 0x02U, 0x0eU, 0x0dU, ',',   '.',   0x1fU, 0xffU, 0xffU, 0xffU, 0x00U }
 		},
-		{	// JIS ctrl
+		{   // JIS ctrl
 			{ 0x1cU, '1',   '2',   '3',   '4',   '5',   '6',   '7',   '8',   '9',   '0',   0x1fU, 0x1eU, 0x08U, 0x7fU, 0x1bU },
 			{ 0x09U, 0x11U, 0x17U, 0x05U, 0x12U, 0x14U, 0x19U, 0x15U, 0x09U, 0x0fU, 0x10U, 0x00U, 0x1bU, 0x1dU, 0xffU, 0xffU },
 			{ 0xffU, 0x01U, 0x13U, 0x04U, 0x06U, 0x07U, 0x08U, 0x0aU, 0x0bU, 0x0cU, ';',   ':',   0x0dU, 0xffU, 0xffU, 0x0aU },
@@ -180,7 +180,7 @@ INPUT_PORTS_START( generic_keyboard )
 	PORT_BIT( 0x0200U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O)                                                                                   PORT_CHAR('o')   PORT_CHAR('O')
 	PORT_BIT( 0x0400U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P)                                                                                   PORT_CHAR('p')   PORT_CHAR('P')
 	PORT_BIT( 0x0800U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x00)                         PORT_CHAR('[')   PORT_CHAR('{')
-	PORT_BIT( 0x0800U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x01)                         PORT_CHAR('@')   PORT_CHAR('`')  
+	PORT_BIT( 0x0800U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x01)                         PORT_CHAR('@')   PORT_CHAR('`')
 	PORT_BIT( 0x1000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x00)                         PORT_CHAR(']')   PORT_CHAR('}')
 	PORT_BIT( 0x1000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x01)                         PORT_CHAR('[')   PORT_CHAR('{')
 	PORT_BIT( 0x2000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH)  PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x00)                         PORT_CHAR('\\')  PORT_CHAR('|')
@@ -190,19 +190,19 @@ INPUT_PORTS_START( generic_keyboard )
 
 	PORT_START("GENKBD_ROW2")
 	PORT_BIT( 0x0001U, IP_ACTIVE_HIGH, IPT_UNUSED   )
-	PORT_BIT( 0x0002U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A)                                                                                   PORT_CHAR('a')   PORT_CHAR('Q')
-	PORT_BIT( 0x0004U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S)                                                                                   PORT_CHAR('s')   PORT_CHAR('W')
-	PORT_BIT( 0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D)                                                                                   PORT_CHAR('d')   PORT_CHAR('E')
-	PORT_BIT( 0x0010U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F)                                                                                   PORT_CHAR('f')   PORT_CHAR('R')
-	PORT_BIT( 0x0020U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G)                                                                                   PORT_CHAR('g')   PORT_CHAR('T')
-	PORT_BIT( 0x0040U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H)                                                                                   PORT_CHAR('h')   PORT_CHAR('Y')
-	PORT_BIT( 0x0080U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J)                                                                                   PORT_CHAR('j')   PORT_CHAR('U')
-	PORT_BIT( 0x0100U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)                                                                                   PORT_CHAR('k')   PORT_CHAR('I')
-	PORT_BIT( 0x0200U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)                                                                                   PORT_CHAR('l')   PORT_CHAR('O')
+	PORT_BIT( 0x0002U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A)                                                                                   PORT_CHAR('a')   PORT_CHAR('A')
+	PORT_BIT( 0x0004U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S)                                                                                   PORT_CHAR('s')   PORT_CHAR('S')
+	PORT_BIT( 0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D)                                                                                   PORT_CHAR('d')   PORT_CHAR('D')
+	PORT_BIT( 0x0010U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F)                                                                                   PORT_CHAR('f')   PORT_CHAR('F')
+	PORT_BIT( 0x0020U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G)                                                                                   PORT_CHAR('g')   PORT_CHAR('G')
+	PORT_BIT( 0x0040U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H)                                                                                   PORT_CHAR('h')   PORT_CHAR('H')
+	PORT_BIT( 0x0080U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J)                                                                                   PORT_CHAR('j')   PORT_CHAR('J')
+	PORT_BIT( 0x0100U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)                                                                                   PORT_CHAR('k')   PORT_CHAR('K')
+	PORT_BIT( 0x0200U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)                                                                                   PORT_CHAR('l')   PORT_CHAR('L')
 	PORT_BIT( 0x0400U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)      PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x00)                         PORT_CHAR(';')   PORT_CHAR(':')
 	PORT_BIT( 0x0400U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)      PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x01)                         PORT_CHAR(';')   PORT_CHAR('+')
 	PORT_BIT( 0x0800U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)      PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x00)                         PORT_CHAR('\'')  PORT_CHAR('"')
-	PORT_BIT( 0x0800U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)      PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x01)                         PORT_CHAR(':')   PORT_CHAR('*')  
+	PORT_BIT( 0x0800U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)      PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x01)                         PORT_CHAR(':')   PORT_CHAR('*')
 	PORT_BIT( 0x1000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER)                                                        PORT_NAME("Return")    PORT_CHAR(0x0dU)
 	PORT_BIT( 0x2000U, IP_ACTIVE_HIGH, IPT_UNUSED   )
 	PORT_BIT( 0x4000U, IP_ACTIVE_HIGH, IPT_UNUSED   )

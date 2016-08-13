@@ -203,14 +203,25 @@
 #define TRACE_CLOCK 0
 #define TRACE_LINES 0
 #define TRACE_SETTING 1
+#define TRACE_VIDEOWS 0
 #define TRACE_PFM 0
 
+#define SRAM_PAR_TAG  ":sram"
+#define DRAM_PAR_TAG  ":dram"
+
 geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, GENEVE_MAPPER, "Geneve Gate Array", tag, owner, clock, "geneve_mapper", __FILE__), m_gromwaddr_LSB(false), m_gromraddr_LSB(false), m_grom_address(0), m_video_waitstates(false), m_extra_waitstates(false), m_ready_asserted(false), m_read_mode(false), m_debug_no_ws(false), m_geneve_mode(false), m_direct_mode(false), m_cartridge_size(0), m_cartridge_secondpage(false), m_cartridge6_writable(false), m_cartridge7_writable(false), m_turbo(false), m_genmod(false), m_timode(false), m_pfm_mode(0), m_pfm_bank(0), m_pfm_output_enable(false), m_sram_mask(0), m_sram_val(0),
+: device_t(mconfig, GENEVE_MAPPER, "Geneve Gate Array", tag, owner, clock, "geneve_mapper", __FILE__), m_gromwaddr_LSB(false),
+	m_gromraddr_LSB(false), m_grom_address(0), m_video_waitstates(false),
+	m_extra_waitstates(false), m_ready_asserted(false), m_read_mode(false),
+	m_debug_no_ws(false), m_geneve_mode(false), m_direct_mode(false),
+	m_cartridge_size(0), m_cartridge_secondpage(false),
+	m_cartridge6_writable(false), m_cartridge7_writable(false),
+	m_turbo(false), m_genmod(false), m_timode(false), m_pfm_mode(0),
+	m_pfm_bank(0), m_pfm_output_enable(false), m_sram_mask(0), m_sram_val(0),
 	m_ready(*this), m_waitcount(0), m_ext_waitcount(0),
 	m_clock(nullptr), m_cpu(nullptr), m_pfm512(nullptr),
 	m_pfm512a(nullptr), m_sound(nullptr), m_keyboard(nullptr),
-	m_video(nullptr), m_peribox(nullptr), m_sram(nullptr), m_dram(nullptr)
+	m_video(nullptr), m_peribox(nullptr), m_sram(*this, SRAM_PAR_TAG), m_dram(*this, DRAM_PAR_TAG)
 {
 	m_eprom = nullptr;
 }
@@ -224,12 +235,12 @@ INPUT_CHANGED_MEMBER( geneve_mapper_device::settings_changed )
 	{
 	case 1:
 		// Turbo switch. May be changed at any time.
-		if (TRACE_SETTING) logerror("%s: Setting turbo flag to %d\n", tag(), value);
+		if (TRACE_SETTING) logerror("Setting turbo flag to %d\n", value);
 		m_turbo = (value!=0);
 		break;
 	case 2:
 		// TIMode switch. Causes reset when changed.
-		if (TRACE_SETTING) logerror("%s: Setting timode flag to %d\n", tag(), value);
+		if (TRACE_SETTING) logerror("Setting timode flag to %d\n", value);
 		m_timode = (value!=0);
 		machine().schedule_hard_reset();
 		break;
@@ -238,7 +249,7 @@ INPUT_CHANGED_MEMBER( geneve_mapper_device::settings_changed )
 		set_boot_rom(value);
 		break;
 	default:
-		logerror("%s: Unknown setting %d ignored\n", tag(), number);
+		logerror("Unknown setting %d ignored\n", number);
 	}
 }
 
@@ -276,7 +287,7 @@ READ8_MEMBER( geneve_mapper_device::read_grom )
 		// GROM data handling
 		// GROMs are stored in pages 38..3f
 		int page = 0x38;
-		reply = m_dram[(page<<13) + m_grom_address];
+		reply = m_dram->pointer()[(page<<13) + m_grom_address];
 		m_grom_address = (m_grom_address + 1) & 0xffff;
 		m_gromraddr_LSB = m_gromwaddr_LSB = false;
 	}
@@ -309,7 +320,7 @@ WRITE8_MEMBER( geneve_mapper_device::write_grom )
 	{   // write GPL data
 		// The Geneve GROM simulator allows for GROM writing (verified with a real system)
 		int page = 0x38;
-		m_dram[(page<<13) + m_grom_address] = data;
+		m_dram->pointer()[(page<<13) + m_grom_address] = data;
 
 		m_grom_address = (m_grom_address + 1) & 0xffff;
 		m_gromraddr_LSB = m_gromwaddr_LSB = false;
@@ -329,7 +340,7 @@ void geneve_mapper_device::set_wait(int min)
 	m_waitcount = min + 1;
 	if (m_waitcount > 1)
 	{
-		if (TRACE_LINES) logerror("%s: Pulling down READY line for %d cycles\n", tag(), min);
+		if (TRACE_LINES) logerror("Pulling down READY line for %d cycles\n", min);
 		m_ready(CLEAR_LINE);
 		m_ready_asserted = false;
 	}
@@ -346,62 +357,62 @@ void geneve_mapper_device::set_boot_rom(int selection)
 	switch (selection)
 	{
 	case GENEVE_098:
-		logerror("%s: Using 0.98 boot eprom\n", tag());
+		logerror("Using 0.98 boot eprom\n");
 		m_eprom = machine().root_device().memregion("maincpu")->base() + 0x4000;
 		m_pfm_mode = 0;
 		break;
 	case GENEVE_100:
-		logerror("%s: Using 1.00 boot eprom\n", tag());
+		logerror("Using 1.00 boot eprom\n");
 		m_eprom = machine().root_device().memregion("maincpu")->base();
 		m_pfm_mode = 0;
 		break;
 	case GENEVE_PFM512:
-		logerror("%s: Using PFM512 (AT29C040)\n", tag());
+		logerror("Using PFM512 (AT29C040)\n");
 		m_pfm_mode = 1;
 		break;
 	case GENEVE_PFM512A:
-		logerror("%s: Using PFM512A (AT29C040A)\n", tag());
+		logerror("Using PFM512A (AT29C040A)\n");
 		m_pfm_mode = 2;
 		break;
 	default:
-		logerror("%s: Unknown boot ROM selection\n", tag());
+		logerror("Unknown boot ROM selection\n");
 	}
 }
 
 void geneve_mapper_device::set_geneve_mode(bool geneve)
 {
-	if (TRACE_SETTING) logerror("%s: Setting Geneve mode = %d\n", tag(), geneve);
+	if (TRACE_SETTING) logerror("Setting Geneve mode = %d\n", geneve);
 	m_geneve_mode = geneve;
 }
 
 void geneve_mapper_device::set_direct_mode(bool direct)
 {
-	if (TRACE_SETTING) logerror("%s: Setting direct mode = %d\n", tag(), direct);
+	if (TRACE_SETTING) logerror("Setting direct mode = %d\n", direct);
 	m_direct_mode = direct;
 }
 
 void geneve_mapper_device::set_cartridge_size(int size)
 {
-	if (TRACE_SETTING) logerror("%s: Setting cartridge size to %d\n", tag(), size);
+	if (TRACE_SETTING) logerror("Setting cartridge size to %d\n", size);
 	m_cartridge_size = size;
 }
 
 void geneve_mapper_device::set_cartridge_writable(int base, bool write)
 {
-	if (TRACE_SETTING) logerror("%s: Cartridge %04x space writable = %d\n", tag(), base, write);
+	if (TRACE_SETTING) logerror("Cartridge %04x space writable = %d\n", base, write);
 	if (base==0x6000) m_cartridge6_writable = write;
 	else m_cartridge7_writable = write;
 }
 
 void geneve_mapper_device::set_video_waitstates(bool wait)
 {
-	if (TRACE_SETTING) logerror("%s: Setting video waitstates = %d\n", tag(), wait);
+	if (TRACE_VIDEOWS) logerror("Setting video waitstates = %d\n", wait);
 	m_video_waitstates = wait;
 }
 
 void geneve_mapper_device::set_extra_waitstates(bool wait)
 {
-	if (TRACE_SETTING) logerror("%s: Setting extra waitstates = %d\n", tag(), wait);
+	if (TRACE_SETTING) logerror("Setting extra waitstates = %d\n", wait);
 	m_extra_waitstates = wait;
 }
 
@@ -472,7 +483,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		if (!space.debugger_access())
 		{
 			value = m_video->read(space, dec->offset>>1);
-			if (TRACE_READ) logerror("%s: Read video %04x -> %02x\n", tag(), dec->offset, value);
+			if (TRACE_READ) logerror("Read video %04x -> %02x\n", dec->offset, value);
 			// Video wait states are created *after* the access
 			// Accordingly, they have no effect when execution is in onchip RAM
 			if (m_video_waitstates) set_ext_wait(15);
@@ -482,13 +493,13 @@ READ8_MEMBER( geneve_mapper_device::readm )
 	case MLGMAPPER:
 		// mapper
 		value = m_map[dec->offset];
-		if (TRACE_READ) logerror("%s: read mapper %04x -> %02x\n", tag(), dec->offset, value);
+		if (TRACE_READ) logerror("read mapper %04x -> %02x\n", dec->offset, value);
 		break;
 
 	case MLGKEY:
 		// key
 		if (!space.debugger_access()) value = m_keyboard->get_recent_key();
-		if (TRACE_READ) logerror("%s: Read keyboard -> %02x\n", tag(), value);
+		if (TRACE_READ) logerror("Read keyboard -> %02x\n", value);
 		break;
 
 	case MLGCLOCK:
@@ -496,19 +507,19 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		// tests on the real machine showed that
 		// upper nibble is 0xf (probably because of the location at 0xf130?)
 		value = m_clock->read(space, dec->offset) | 0xf0;
-		if (TRACE_READ) logerror("%s: Read clock %04x -> %02x\n", tag(), dec->offset, value);
+		if (TRACE_READ) logerror("Read clock %04x -> %02x\n", dec->offset, value);
 		break;
 
 	case MLTMAPPER:
 		// mapper
 		value = m_map[dec->offset];
-		if (TRACE_READ) logerror("%s: Read mapper %04x -> %02x\n", tag(), dec->offset, value);
+		if (TRACE_READ) logerror("Read mapper %04x -> %02x\n", dec->offset, value);
 		break;
 
 	case MLTKEY:
 		// key
 		if (!space.debugger_access()) value = m_keyboard->get_recent_key();
-		if (TRACE_READ) logerror("%s: Read keyboard -> %02x\n", tag(), value);
+		if (TRACE_READ) logerror("Read keyboard -> %02x\n", value);
 		break;
 
 	case MLTCLOCK:
@@ -522,7 +533,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		// value floating around.
 		value = m_clock->read(space, dec->offset);
 		value |= (dec->offset==0x000f)? 0x20 : 0x10;
-		if (TRACE_READ) logerror("%s: Read clock %04x -> %02x\n", tag(), dec->offset, value);
+		if (TRACE_READ) logerror("Read clock %04x -> %02x\n", dec->offset, value);
 		break;
 
 	case MLTVIDEO:
@@ -532,7 +543,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		if (!space.debugger_access())
 		{
 			value = m_video->read(space, dec->offset>>1);
-			if (TRACE_READ) logerror("%s: Read video %04x -> %02x\n", tag(), dec->offset, value);
+			if (TRACE_READ) logerror("Read video %04x -> %02x\n", dec->offset, value);
 			// See above
 			if (m_video_waitstates) set_ext_wait(15);
 		}
@@ -545,7 +556,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		// We need to add the address prefix bits
 		m_peribox->readz(space, dec->offset, &value, 0xff);
 		m_peribox->memen_in(CLEAR_LINE);
-		if (TRACE_READ) logerror("%s: Read speech -> %02x\n", tag(), value);
+		if (TRACE_READ) logerror("Read speech -> %02x\n", value);
 		break;
 
 	case MLTGROM:
@@ -553,7 +564,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		// ++++ ++-- ---- ---+
 		// 1001 1000 0000 00x0
 		if (!space.debugger_access()) value = read_grom(space, dec->offset, 0xff);
-		if (TRACE_READ) logerror("%s: Read GROM %04x -> %02x\n", tag(), dec->offset, value);
+		if (TRACE_READ) logerror("Read GROM %04x -> %02x\n", dec->offset, value);
 		break;
 
 	case MLGSOUND:
@@ -564,14 +575,14 @@ READ8_MEMBER( geneve_mapper_device::readm )
 
 	case MPGDRAM:
 		// DRAM.
-		value = m_dram[dec->physaddr];
+		value = m_dram->pointer()[dec->physaddr];
 //          LOG("dram read physaddr = %06x logaddr = %04x value = %02x\n", dec->physaddr, dec->offset, value);
-		if (TRACE_READ) logerror("%s: Read DRAM %04x (%06x) -> %02x\n", tag(), dec->offset, dec->physaddr, value);
+		if (TRACE_READ) logerror("Read DRAM %04x (%06x) -> %02x\n", dec->offset, dec->physaddr, value);
 		break;
 
 	case MPGEXP:
 		// On-board memory expansion for standard Geneve (never used)
-		if (TRACE_READ) logerror("%s: Read unmapped area %06x\n", tag(), dec->physaddr);
+		if (TRACE_READ) logerror("Read unmapped area %06x\n", dec->physaddr);
 		value = 0;
 		break;
 
@@ -581,7 +592,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		if (m_pfm_mode == 0)
 		{
 			value = m_eprom[dec->physaddr & 0x003fff];
-			if (TRACE_READ) logerror("%s: Read EPROM %04x (%06x) -> %02x\n", tag(), dec->offset, dec->physaddr, value);
+			if (TRACE_READ) logerror("Read EPROM %04x (%06x) -> %02x\n", dec->offset, dec->physaddr, value);
 		}
 		else value = read_from_pfm(space, dec->physaddr, 0xff);
 
@@ -590,12 +601,12 @@ READ8_MEMBER( geneve_mapper_device::readm )
 	case MPGSRAM:
 		if ((dec->physaddr & m_sram_mask)==m_sram_val)
 		{
-			value = m_sram[dec->physaddr & ~m_sram_mask];
+			value = m_sram->pointer()[dec->physaddr & ~m_sram_mask];
 		}
 		else value = 0;
 		// Return in any case
 //          LOG("sram read physaddr = %06x logaddr = %04x value = %02x\n", dec->physaddr, dec->offset, value);
-		if (TRACE_READ) logerror("%s: Read SRAM %04x (%06x) -> %02x\n", tag(), dec->offset, dec->physaddr, value);
+		if (TRACE_READ) logerror("Read SRAM %04x (%06x) -> %02x\n", dec->offset, dec->physaddr, value);
 		break;
 
 	case MPGBOX:
@@ -605,12 +616,12 @@ READ8_MEMBER( geneve_mapper_device::readm )
 
 		m_peribox->readz(space, dec->physaddr, &value, 0xff);
 		m_peribox->memen_in(CLEAR_LINE);
-		if (TRACE_READ) logerror("%s: Read P-Box %04x (%06x) -> %02x\n", tag(), dec->offset, dec->physaddr, value);
+		if (TRACE_READ) logerror("Read P-Box %04x (%06x) -> %02x\n", dec->offset, dec->physaddr, value);
 		break;
 
 	case MPGMDRAM:
 		// DRAM. One wait state.
-		value = m_dram[dec->physaddr];
+		value = m_dram->pointer()[dec->physaddr];
 		break;
 
 	case MPGMEPROM:
@@ -619,7 +630,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		if (m_pfm_mode == 0)
 		{
 			value = m_eprom[dec->physaddr & 0x003fff];
-			if (TRACE_READ) logerror("%s: Read EPROM %04x (%06x) -> %02x\n", tag(), dec->offset, dec->physaddr, value);
+			if (TRACE_READ) logerror("Read EPROM %04x (%06x) -> %02x\n", dec->offset, dec->physaddr, value);
 		}
 		else value = read_from_pfm(space, dec->physaddr, 0xff);
 		break;
@@ -662,7 +673,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 		if (!space.debugger_access())
 		{
 			m_video->write(space, dec->offset>>1, data);
-			if (TRACE_WRITE) logerror("%s: Write video %04x <- %02x\n", tag(), offset, data);
+			if (TRACE_WRITE) logerror("Write video %04x <- %02x\n", offset, data);
 			// See above
 			if (m_video_waitstates) set_ext_wait(15);
 		}
@@ -671,33 +682,33 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 	case MLGMAPPER:
 		// mapper
 		m_map[dec->offset] = data;
-		if (TRACE_WRITE) logerror("%s: Write mapper %04x <- %02x\n", tag(), offset, data);
+		if (TRACE_WRITE) logerror("Write mapper %04x <- %02x\n", offset, data);
 		break;
 
 	case MLGCLOCK:
 		// clock
 		// ++++ ++++ ++++ ----
 		m_clock->write(space, dec->offset, data);
-		if (TRACE_WRITE) logerror("%s: Write clock %04x <- %02x\n", tag(), offset, data);
+		if (TRACE_WRITE) logerror("Write clock %04x <- %02x\n", offset, data);
 		break;
 
 	case MLGSOUND:
 		// sound
 		// ++++ ++++ ++++ ---+
 		m_sound->write(space, 0, data, 0xff);
-		if (TRACE_WRITE) logerror("%s: Write sound <- %02x\n", tag(), data);
+		if (TRACE_WRITE) logerror("Write sound <- %02x\n", data);
 		break;
 
 	case MLTMAPPER:
 		// mapper
 		m_map[dec->offset] = data;
-		if (TRACE_WRITE) logerror("%s: Write mapper %04x <- %02x\n", tag(), offset, data);
+		if (TRACE_WRITE) logerror("Write mapper %04x <- %02x\n", offset, data);
 		break;
 
 	case MLTCLOCK:
 		// clock
 		m_clock->write(space, dec->offset, data);
-		if (TRACE_WRITE) logerror("%s: Write clock %04x <- %02x\n", tag(), offset, data);
+		if (TRACE_WRITE) logerror("Write clock %04x <- %02x\n", offset, data);
 		break;
 
 	case MLTVIDEO:
@@ -708,7 +719,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 		if (!space.debugger_access())
 		{
 			m_video->write(space, dec->offset>>1, data);
-			if (TRACE_WRITE) logerror("%s: Write video %04x <- %02x\n", tag(), offset, data);
+			if (TRACE_WRITE) logerror("Write video %04x <- %02x\n", offset, data);
 			// See above
 			if (m_video_waitstates) set_ext_wait(15);
 		}
@@ -721,7 +732,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 		// We need to add the address prefix bits
 		m_peribox->write(space, dec->offset, data, 0xff);
 		m_peribox->memen_in(CLEAR_LINE);
-		if (TRACE_WRITE) logerror("%s: Write speech <- %02x\n", tag(), data);
+		if (TRACE_WRITE) logerror("Write speech <- %02x\n", data);
 		break;
 
 	case MLTGROM:
@@ -729,7 +740,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 		// ++++ ++-- ---- ---+
 		// 1001 1100 0000 00c0
 		write_grom(space, dec->offset, data, 0xff);
-		if (TRACE_WRITE) logerror("%s: Write GROM %04x <- %02x\n", tag(), offset, data);
+		if (TRACE_WRITE) logerror("Write GROM %04x <- %02x\n", offset, data);
 		break;
 
 	case MLTSOUND:
@@ -737,7 +748,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 		// ++++ ++-- ---- ---+
 		// 1000 0100 0000 0000
 		m_sound->write(space, 0, data, 0xff);
-		if (TRACE_WRITE) logerror("%s: Write sound <- %02x\n", tag(), data);
+		if (TRACE_WRITE) logerror("Write sound <- %02x\n", data);
 		break;
 
 	case MLTKEY:
@@ -746,13 +757,13 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 
 	case MPGDRAM:
 		// DRAM write. One wait state. (only for normal Geneve)
-		m_dram[dec->physaddr] = data;
-		if (TRACE_WRITE) logerror("%s: Write DRAM %04x (%06x) <- %02x\n", tag(), offset, dec->physaddr, data);
+		m_dram->pointer()[dec->physaddr] = data;
+		if (TRACE_WRITE) logerror("Write DRAM %04x (%06x) <- %02x\n", offset, dec->physaddr, data);
 		break;
 
 	case MPGEXP:
 		// On-board memory expansion for standard Geneve (never used)
-		if (TRACE_WRITE) logerror("%s: Write unmapped area %06x\n", tag(), dec->physaddr);
+		if (TRACE_WRITE) logerror("Write unmapped area %06x\n", dec->physaddr);
 		break;
 
 	case MPGEPROM:
@@ -761,27 +772,27 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 		// Ignore EPROM write (unless PFM)
 		if (m_pfm_mode != 0) write_to_pfm(space, dec->physaddr, data, 0xff);
 		else
-			logerror("%s: Write EPROM %04x (%06x) <- %02x, ignored\n", tag(), offset, dec->physaddr, data);
+			logerror("Write EPROM %04x (%06x) <- %02x, ignored\n", offset, dec->physaddr, data);
 		break;
 
 	case MPGSRAM:
 		if ((dec->physaddr & m_sram_mask)==m_sram_val)
 		{
-			m_sram[dec->physaddr & ~m_sram_mask] = data;
+			m_sram->pointer()[dec->physaddr & ~m_sram_mask] = data;
 		}
-		if (TRACE_WRITE) logerror("%s: Write SRAM %04x (%06x) <- %02x\n", tag(), offset, dec->physaddr, data);
+		if (TRACE_WRITE) logerror("Write SRAM %04x (%06x) <- %02x\n", offset, dec->physaddr, data);
 		break;
 
 	case MPGBOX:
 		dec->physaddr = (dec->physaddr & 0x0007ffff);  // 19 bit address
-		if (TRACE_WRITE) logerror("%s: Write P-Box %04x (%06x) <- %02x\n", tag(), offset, dec->physaddr, data);
+		if (TRACE_WRITE) logerror("Write P-Box %04x (%06x) <- %02x\n", offset, dec->physaddr, data);
 		m_peribox->write(space, dec->physaddr, data, 0xff);
 		m_peribox->memen_in(CLEAR_LINE);
 		break;
 
 	case MPGMDRAM:
 		// DRAM. One wait state.
-		m_dram[dec->physaddr] = data;
+		m_dram->pointer()[dec->physaddr] = data;
 		break;
 
 	case MPGMEPROM:
@@ -790,7 +801,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 		// Ignore EPROM write
 		if (m_pfm_mode != 0) write_to_pfm(space, dec->physaddr, data, 0xff);
 		else
-			logerror("%s: Write EPROM %04x (%06x) <- %02x, ignored\n", tag(), offset, dec->physaddr, data);
+			logerror("Write EPROM %04x (%06x) <- %02x, ignored\n", offset, dec->physaddr, data);
 		break;
 
 	case MPGMBOX:
@@ -1118,7 +1129,7 @@ void geneve_mapper_device::decode(address_space& space, offs_t offset, bool read
 				if (m_cartridge_size==0x4000)
 				{
 					m_cartridge_secondpage = ((dec->offset & 0x0002)!=0);
-					if (TRACE_WRITE) logerror("%s: Set cartridge page %02x\n", tag(), m_cartridge_secondpage);
+					if (TRACE_WRITE) logerror("Set cartridge page %02x\n", m_cartridge_secondpage);
 					set_wait(1);
 					return;
 				}
@@ -1128,7 +1139,7 @@ void geneve_mapper_device::decode(address_space& space, offs_t offset, bool read
 					if ((((dec->offset & 0x1000)==0x0000) && !m_cartridge6_writable)
 						|| (((dec->offset & 0x1000)==0x1000) && !m_cartridge7_writable))
 					{
-						logerror("%s: Writing to protected cartridge space %04x ignored\n", tag(), dec->offset);
+						logerror("Writing to protected cartridge space %04x ignored\n", dec->offset);
 						return;
 					}
 					else
@@ -1228,11 +1239,11 @@ READ8_MEMBER( geneve_mapper_device::read_from_pfm )
 		value = m_pfm512a->read(space, address, mem_mask);
 		break;
 	default:
-		logerror("%s: Illegal mode for reading PFM: %d\n", tag(), m_pfm_mode);
+		logerror("Illegal mode for reading PFM: %d\n", m_pfm_mode);
 		return 0;
 	}
 
-	if (TRACE_PFM) logerror("%s: Reading from PFM at address %05x -> %02x\n", tag(), address, value);
+	if (TRACE_PFM) logerror("Reading from PFM at address %05x -> %02x\n", address, value);
 	return value;
 }
 
@@ -1241,7 +1252,7 @@ WRITE8_MEMBER( geneve_mapper_device::write_to_pfm )
 	// Nota bene: The PFM must be write protected on startup, or the RESET
 	// of the 9995 will attempt to write the return vector into the flash EEPROM
 	int address = (offset & 0x01ffff) | (m_pfm_bank<<17);
-	if (TRACE_PFM) logerror("%s: Writing to PFM at address %05x <- %02x\n", tag(), address, data);
+	if (TRACE_PFM) logerror("Writing to PFM at address %05x <- %02x\n", address, data);
 
 	switch (m_pfm_mode)
 	{
@@ -1252,7 +1263,7 @@ WRITE8_MEMBER( geneve_mapper_device::write_to_pfm )
 		m_pfm512a->write(space, address, data, mem_mask);
 		break;
 	default:
-		logerror("%s: Illegal mode for writing to PFM: %d\n", tag(), m_pfm_mode);
+		logerror("Illegal mode for writing to PFM: %d\n", m_pfm_mode);
 	}
 }
 
@@ -1264,7 +1275,7 @@ WRITE8_MEMBER( geneve_mapper_device::write_to_pfm )
 */
 SETOFFSET_MEMBER( geneve_mapper_device::setoffset )
 {
-	if (TRACE_DETAIL) logerror("%s: setoffset = %04x\n", tag(), offset);
+	if (TRACE_DETAIL) logerror("setoffset = %04x\n", offset);
 	m_debug_no_ws = false;
 	decode(space, offset, m_read_mode, &m_decoded);
 }
@@ -1293,13 +1304,13 @@ WRITE_LINE_MEMBER( geneve_mapper_device::clock_in )
 				m_waitcount--;
 				if (m_waitcount == 0)
 				{
-					if (TRACE_CLOCK) logerror("%s: clock, READY asserted\n", tag());
+					if (TRACE_CLOCK) logerror("clock, READY asserted\n");
 					m_ready(ASSERT_LINE);
 					m_ready_asserted = true;
 				}
 				else
 				{
-					if (TRACE_CLOCK) logerror("%s: clock\n", tag());
+					if (TRACE_CLOCK) logerror("clock\n");
 				}
 			}
 			else
@@ -1309,13 +1320,13 @@ WRITE_LINE_MEMBER( geneve_mapper_device::clock_in )
 					m_ext_waitcount--;
 					if (m_ext_waitcount == 0)
 					{
-						if (TRACE_CLOCK) logerror("%s: clock, READY asserted after video\n", tag());
+						if (TRACE_CLOCK) logerror("clock, READY asserted after video\n");
 						m_ready(ASSERT_LINE);
 						m_ready_asserted = true;
 					}
 					else
 					{
-						if (TRACE_CLOCK) logerror("%s: vclock, ew=%d\n", tag(), m_ext_waitcount);
+						if (TRACE_CLOCK) logerror("vclock, ew=%d\n", m_ext_waitcount);
 					}
 				}
 			}
@@ -1327,7 +1338,7 @@ WRITE_LINE_MEMBER( geneve_mapper_device::clock_in )
 		// Do we have video wait states? In that case, clear the line again
 		if ((m_waitcount == 0) && (m_ext_waitcount > 0) && m_ready_asserted)
 		{
-			if (TRACE_CLOCK) logerror("%s: clock, READY cleared for video\n", tag());
+			if (TRACE_CLOCK) logerror("clock, READY cleared for video\n");
 			m_ready(CLEAR_LINE);
 			m_ready_asserted = false;
 		}
@@ -1340,7 +1351,7 @@ WRITE_LINE_MEMBER( geneve_mapper_device::clock_in )
 WRITE_LINE_MEMBER( geneve_mapper_device::dbin_in )
 {
 	m_read_mode = (state==ASSERT_LINE);
-	if (TRACE_DETAIL) logerror("%s: dbin = %02x\n", tag(), m_read_mode? 1:0);
+	if (TRACE_DETAIL) logerror("dbin = %02x\n", m_read_mode? 1:0);
 }
 
 /*
@@ -1350,21 +1361,21 @@ WRITE_LINE_MEMBER( geneve_mapper_device::pfm_select_lsb )
 {
 	if (state==ASSERT_LINE) m_pfm_bank |= 1;
 	else m_pfm_bank &= 0xfe;
-	if (TRACE_PFM) logerror("%s: Setting bank (l) = %d\n", tag(), m_pfm_bank);
+	if (TRACE_PFM) logerror("Setting bank (l) = %d\n", m_pfm_bank);
 }
 
 WRITE_LINE_MEMBER( geneve_mapper_device::pfm_select_msb )
 {
 	if (state==ASSERT_LINE) m_pfm_bank |= 2;
 	else m_pfm_bank &= 0xfd;
-	if (TRACE_PFM) logerror("%s: Setting bank (u) = %d\n", tag(), m_pfm_bank);
+	if (TRACE_PFM) logerror("Setting bank (u) = %d\n", m_pfm_bank);
 }
 
 WRITE_LINE_MEMBER( geneve_mapper_device::pfm_output_enable )
 {
 	// Negative logic
 	m_pfm_output_enable = (state==CLEAR_LINE);
-	if (TRACE_PFM) logerror("%s: PFM output %s\n", tag(), m_pfm_output_enable? "enable" : "disable");
+	if (TRACE_PFM) logerror("PFM output %s\n", m_pfm_output_enable? "enable" : "disable");
 }
 
 //====================================================================
@@ -1385,9 +1396,6 @@ void geneve_mapper_device::device_start()
 	m_pfm512a = machine().device<at29c040a_device>(PFM512A_TAG);
 
 	m_ready.resolve();
-
-	m_sram = machine().root_device().memregion(SRAM_TAG)->base();
-	m_dram = machine().root_device().memregion(DRAM_TAG)->base();
 	m_cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
 
 	m_geneve_mode = false;
@@ -1424,7 +1432,7 @@ void geneve_mapper_device::device_reset()
 	// Check for GenMod. We assume that GenMod can be combined with PFM.
 	if (machine().root_device().ioport("MODE")->read()!=0)
 	{
-		logerror("%s: Using GenMod modification\n", tag());
+		logerror("Using GenMod modification\n");
 		m_eprom = machine().root_device().memregion("maincpu")->base() + 0x8000;
 		if (m_eprom[0] != 0xf0)
 		{
@@ -1507,7 +1515,7 @@ void geneve_keyboard_device::post_in_key_queue(int keycode)
 	m_key_queue[(m_key_queue_head + m_key_queue_length) % KEYQUEUESIZE] = keycode;
 	m_key_queue_length++;
 
-	if (TRACE_KEYBOARD) logerror("%s: Posting keycode %02x\n", tag(), keycode);
+	if (TRACE_KEYBOARD) logerror("Posting keycode %02x\n", keycode);
 }
 
 void geneve_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -1522,7 +1530,7 @@ void geneve_keyboard_device::poll()
 	int i, j;
 	int keycode;
 	int pressed;
-	if (TRACE_KEYBOARD) logerror("%s: Poll keyboard\n", tag());
+	if (TRACE_KEYBOARD) logerror("Poll keyboard\n");
 	if (m_key_reset) return;
 
 	/* Poll keyboard */
@@ -1728,7 +1736,7 @@ void geneve_keyboard_device::signal_when_key_available()
 	// buffer clear is disabled, and key queue is not empty. */
 	if ((!m_key_reset) && (m_keyboard_clock) && (m_keep_keybuf) && (m_key_queue_length != 0))
 	{
-		if (TRACE_KEYBOARD) logerror("%s: Signalling key available\n", tag());
+		if (TRACE_KEYBOARD) logerror("Signalling key available\n");
 		m_interrupt(ASSERT_LINE);
 		m_key_in_buffer = true;
 	}
@@ -1738,7 +1746,7 @@ WRITE_LINE_MEMBER( geneve_keyboard_device::clock_control )
 {
 	bool rising_edge = (!m_keyboard_clock && (state==ASSERT_LINE));
 	m_keyboard_clock = (state==ASSERT_LINE);
-	if (TRACE_KEYBOARD) logerror("%s: Keyboard clock_control state=%d\n", tag(), m_keyboard_clock);
+	if (TRACE_KEYBOARD) logerror("Keyboard clock_control state=%d\n", m_keyboard_clock);
 	if (rising_edge)
 		signal_when_key_available();
 }

@@ -74,7 +74,7 @@ void colecovision_cartridge_slot_device::device_start()
 //  call_load -
 //-------------------------------------------------
 
-bool colecovision_cartridge_slot_device::call_load()
+image_init_result colecovision_cartridge_slot_device::call_load()
 {
 	if (m_card)
 	{
@@ -92,7 +92,7 @@ bool colecovision_cartridge_slot_device::call_load()
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

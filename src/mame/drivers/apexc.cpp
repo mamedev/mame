@@ -23,8 +23,8 @@ public:
 		m_screen(*this, "screen")  { }
 
 	UINT32 m_panel_data_reg;    /* value of a data register on the control panel which can
-                                be edited - the existence of this register is a personnal
-                                guess */
+	                            be edited - the existence of this register is a personnal
+	                            guess */
 
 	std::unique_ptr<bitmap_ind16> m_bitmap;
 
@@ -86,7 +86,7 @@ public:
 	virtual bool is_reset_on_load() const override { return 1; }
 	virtual const char *file_extensions() const override { return "apc"; }
 
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
@@ -107,7 +107,7 @@ apexc_cylinder_image_device::apexc_cylinder_image_device(const machine_config &m
 /*
     Open cylinder image and read RAM
 */
-bool apexc_cylinder_image_device::call_load()
+image_init_result apexc_cylinder_image_device::call_load()
 {
 	/* load RAM contents */
 	m_writable = !is_readonly();
@@ -118,11 +118,11 @@ bool apexc_cylinder_image_device::call_load()
 		UINT32 *RAM = (UINT32 *)(machine().root_device().memregion("maincpu")->base());
 
 		for (int i=0; i < 0x0400; i++)
-			RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
+			RAM[i] = big_endianize_int32(RAM[i]);
 	}
 #endif
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /*
@@ -139,7 +139,7 @@ void apexc_cylinder_image_device::call_unload()
 			UINT32 *RAM = (UINT32 *)(machine().root_device().memregion("maincpu")->base());
 
 			for (int i=0; i < /*0x2000*/0x0400; i++)
-				RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
+				RAM[i] = big_endianize_int32(RAM[i]);
 		}
 #endif
 		/* write */

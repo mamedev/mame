@@ -75,13 +75,13 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *nes_disksys_device::device_rom_region() const
+const tiny_rom_entry *nes_disksys_device::device_rom_region() const
 {
 	return ROM_NAME( disksys );
 }
 
 
-void nes_disksys_device::load_proc(device_image_interface &image)
+void nes_disksys_device::load_proc(device_image_interface &image, bool is_created)
 {
 	nes_disksys_device *disk_sys = static_cast<nes_disksys_device *>(image.device().owner());
 	disk_sys->load_disk(image);

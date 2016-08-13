@@ -375,7 +375,7 @@ void legacy_floppy_image_device::floppy_drive_write_sector_data(int side, int in
 	}
 }
 
-void legacy_floppy_image_device::floppy_install_load_proc(void (*proc)(device_image_interface &image))
+void legacy_floppy_image_device::floppy_install_load_proc(void (*proc)(device_image_interface &image, bool is_created))
 {
 	m_load_proc = proc;
 }
@@ -417,18 +417,17 @@ void legacy_floppy_image_device::floppy_drive_set_controller(device_t *controlle
 	m_controller = controller;
 }
 
-int legacy_floppy_image_device::internal_floppy_device_load(int create_format, util::option_resolution *create_args)
+image_init_result legacy_floppy_image_device::internal_floppy_device_load(bool is_create, int create_format, util::option_resolution *create_args)
 {
 	floperr_t err;
 	const struct FloppyFormat *floppy_options;
 	int floppy_flags, i;
-	const char *extension;
 
 	device_image_interface *image = nullptr;
 	interface(image);   /* figure out the floppy options */
 	floppy_options = m_config->formats;
 
-	if (has_been_created())
+	if (is_create)
 	{
 		/* creating an image */
 		assert(create_format >= 0);
@@ -440,8 +439,7 @@ int legacy_floppy_image_device::internal_floppy_device_load(int create_format, u
 	{
 		/* opening an image */
 		floppy_flags = !is_readonly() ? FLOPPY_FLAGS_READWRITE : FLOPPY_FLAGS_READONLY;
-		extension = filetype();
-		err = floppy_open_choices((void *) image, &image_ioprocs, extension, floppy_options, floppy_flags, &m_floppy);
+		err = floppy_open_choices((void *) image, &image_ioprocs, filetype().c_str(), floppy_options, floppy_flags, &m_floppy);
 		if (err)
 			goto error;
 	}
@@ -452,7 +450,11 @@ int legacy_floppy_image_device::internal_floppy_device_load(int create_format, u
 	/* disk changed */
 	m_dskchg = CLEAR_LINE;
 
-	return IMAGE_INIT_PASS;
+	// If we have one of our hacky load procs, call it
+	if (m_load_proc)
+		m_load_proc(*this, is_create);
+
+	return image_init_result::PASS;
 
 error:
 	for (i = 0; i < ARRAY_LENGTH(errmap); i++)
@@ -460,7 +462,7 @@ error:
 		if (err == errmap[i].ferr)
 			seterror(errmap[i].ierr, errmap[i].message);
 	}
-	return IMAGE_INIT_FAIL;
+	return image_init_result::FAIL;
 }
 
 TIMER_CALLBACK_MEMBER( legacy_floppy_image_device::set_wpt )
@@ -821,7 +823,7 @@ void legacy_floppy_image_device::device_config_complete()
 		// only add if creatable
 		if (floppy_options[i].param_guidelines) {
 			// allocate a new format and append it to the list
-			m_formatlist.push_back(std::make_unique<image_device_format>(floppy_options[i].name, floppy_options[i].description, floppy_options[i].extensions, floppy_options[i].param_guidelines));
+			add_format(floppy_options[i].name, floppy_options[i].description, floppy_options[i].extensions, floppy_options[i].param_guidelines);
 		}
 		image_specify_extension( m_extension_list, 256, floppy_options[i].extensions );
 	}
@@ -830,19 +832,14 @@ void legacy_floppy_image_device::device_config_complete()
 	update_names();
 }
 
-bool legacy_floppy_image_device::call_create(int format_type, util::option_resolution *format_options)
+image_init_result legacy_floppy_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
-	return internal_floppy_device_load(format_type, format_options);
+	return internal_floppy_device_load(true, format_type, format_options);
 }
 
-bool legacy_floppy_image_device::call_load()
+image_init_result legacy_floppy_image_device::call_load()
 {
-	int retVal = internal_floppy_device_load(-1, nullptr);
-	if (retVal==IMAGE_INIT_PASS) {
-		/* if we have one of our hacky unload procs, call it */
-		if (m_load_proc)
-			m_load_proc(*this);
-	}
+	image_init_result retVal = internal_floppy_device_load(false, -1, nullptr);
 
 	/* push disk halfway into drive */
 	m_wpt = CLEAR_LINE;

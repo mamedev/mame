@@ -269,7 +269,7 @@ QUICKLOAD_LOAD_MEMBER( ravens_state, ravens )
 	int quick_length;
 	dynamic_buffer quick_data;
 	int read_;
-	int result = IMAGE_INIT_FAIL;
+	image_init_result result = image_init_result::FAIL;
 
 	quick_length = image.length();
 	if (quick_length < 0x0900)
@@ -316,7 +316,7 @@ QUICKLOAD_LOAD_MEMBER( ravens_state, ravens )
 				// Start the quickload
 				m_maincpu->set_state_int(S2650_PC, exec_addr);
 
-				result = IMAGE_INIT_PASS;
+				result = image_init_result::PASS;
 			}
 		}
 	}

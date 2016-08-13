@@ -447,7 +447,7 @@ UINT32 cb2001_state::screen_update_cb2001(screen_device &screen, bitmap_rgb32 &b
    is being executed incorrectly */
 WRITE16_MEMBER(cb2001_state::cb2001_vidctrl_w)
 {
-	if (mem_mask&0xff00) // video control?
+	if (ACCESSING_BITS_8_15) // video control?
 	{
 		printf("cb2001_vidctrl_w %04x %04x\n", data, mem_mask);
 		m_videobank = (data & 0x0800)>>11;
@@ -458,7 +458,7 @@ WRITE16_MEMBER(cb2001_state::cb2001_vidctrl_w)
 
 WRITE16_MEMBER(cb2001_state::cb2001_vidctrl2_w)
 {
-	if (mem_mask&0xff00) // video control?
+	if (ACCESSING_BITS_8_15) // video control?
 	{
 		printf("cb2001_vidctrl2_w %04x %04x\n", data, mem_mask); // i think this switches to 'reels' mode
 		m_videomode = (data>>8) & 0x03; // which bit??

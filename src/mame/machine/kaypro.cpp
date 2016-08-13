@@ -278,7 +278,7 @@ QUICKLOAD_LOAD_MEMBER( kaypro_state, kaypro )
 	/* Load image to the TPA (Transient Program Area) */
 	for (i = 0; i < quickload_size; i++)
 	{
-		if (image.fread( &data, 1) != 1) return IMAGE_INIT_FAIL;
+		if (image.fread( &data, 1) != 1) return image_init_result::FAIL;
 
 		RAM[i+0x100] = data;
 	}
@@ -288,5 +288,5 @@ QUICKLOAD_LOAD_MEMBER( kaypro_state, kaypro )
 	RAM[0x80]=0;                            // clear out command tail
 	RAM[0x81]=0;
 	m_maincpu->set_pc(0x100);                // start program
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }

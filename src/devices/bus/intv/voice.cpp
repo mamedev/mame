@@ -96,7 +96,7 @@ ROM_START( intellivoice )
 	ROM_LOAD( "sp0256-012.bin",   0x1000, 0x0800, CRC(0de7579d) SHA1(618563e512ff5665183664f52270fa9606c9d289) )
 ROM_END
 
-const rom_entry *intv_voice_device::device_rom_region() const
+const tiny_rom_entry *intv_voice_device::device_rom_region() const
 {
 	return ROM_NAME( intellivoice );
 }

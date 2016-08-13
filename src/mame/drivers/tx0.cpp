@@ -369,7 +369,7 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *file_extensions() const override { return "tap,rim"; }
 
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
@@ -402,7 +402,7 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *file_extensions() const override { return "tap,rim"; }
 
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
@@ -436,7 +436,7 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *file_extensions() const override { return "typ"; }
 
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
@@ -469,7 +469,7 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *file_extensions() const override { return "tap"; }
 
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
@@ -490,7 +490,7 @@ tx0_magtape_image_device::tx0_magtape_image_device(const machine_config &mconfig
 
     unit 0 is reader (read-only), unit 1 is puncher (write-only)
 */
-bool tx0_readtape_image_device::call_load()
+image_init_result tx0_readtape_image_device::call_load()
 {
 	tx0_state *state = machine().driver_data<tx0_state>();
 
@@ -518,7 +518,7 @@ bool tx0_readtape_image_device::call_load()
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void tx0_readtape_image_device::call_unload()
@@ -626,14 +626,14 @@ TIMER_CALLBACK_MEMBER(tx0_state::reader_callback)
 /*
     timer callback to generate punch completion pulse
 */
-bool tx0_punchtape_image_device::call_load()
+image_init_result tx0_punchtape_image_device::call_load()
 {
 	tx0_state *state = machine().driver_data<tx0_state>();
 
 	/* punch unit */
 	state->m_tape_puncher.fd = this;
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void tx0_punchtape_image_device::call_unload()
@@ -706,13 +706,13 @@ WRITE_LINE_MEMBER( tx0_state::tx0_io_p7h )
 /*
     Open a file for typewriter output
 */
-bool tx0_printer_image_device::call_load()
+image_init_result tx0_printer_image_device::call_load()
 {
 	tx0_state *state = machine().driver_data<tx0_state>();
 	/* open file */
 	state->m_typewriter.fd = this;
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void tx0_printer_image_device::call_unload()
@@ -846,7 +846,7 @@ void tx0_magtape_image_device::device_start()
 /*
     Open a magnetic tape image
 */
-bool tx0_magtape_image_device::call_load()
+image_init_result tx0_magtape_image_device::call_load()
 {
 	tx0_state *state = machine().driver_data<tx0_state>();
 	state->m_magtape.img = this;
@@ -863,7 +863,7 @@ bool tx0_magtape_image_device::call_load()
 			state->schedule_select();
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void tx0_magtape_image_device::call_unload()
@@ -904,7 +904,7 @@ void tx0_state::magtape_callback()
 
 			if ((mar & 03) != 1)
 			{   /* unimplemented device: remain in unselected state and set rwc
-                flag? */
+			    flag? */
 				m_maincpu->set_state_int(TX0_PF, m_maincpu->state_int(TX0_PF) | PF_RWC);
 			}
 			else

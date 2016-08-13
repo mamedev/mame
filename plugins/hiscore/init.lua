@@ -5,7 +5,6 @@
 -- high-score saving with hiscore.dat infom just as older
 -- builds did in the past.
 -- 
-require('lfs')
 local exports = {}
 exports.name = "hiscore"
 exports.version = "1.0.0"
@@ -24,16 +23,37 @@ function hiscore.startplugin()
 
 	local hiscoredata_path = "hiscore.dat";
 	local hiscore_path = "hi";
-
+	local config_path = lfs.env_replace(manager:options().entries.inipath:value():match("[^;]+") .. "/hiscore.ini");
+	
 	local current_checksum = 0;
 	local default_checksum = 0;
 
+	local config_read = false;
 	local scores_have_been_read = false;
 	local mem_check_passed = false;
 	local found_hiscore_entry = false;
 
 	local positions = {};
-
+	-- Configuration file will be searched in the first path defined
+	-- in mame inipath option.
+    	local function read_config()
+	  if config_read then return true end;
+	  local file = io.open( config_path, "r" );
+	  if file then
+		file:close()
+		emu.print_verbose( "hiscore: config found" );
+		local _conf = {}
+		for line in io.lines(config_path) do
+		  token, value = string.match(line, '([^ ]+) ([^ ]+)');
+		  _conf[token] = lfs.env_replace(value);
+		end
+		hiscore_path = _conf["hi_path"];
+		-- hiscoredata_path = _conf["dat_path"]; -- don't know if I should do it, but wathever
+		return true
+	  end
+	  return false
+	end
+	
 	local function parse_table ( dsting )
 	  local _table = {};
 	  for line in string.gmatch(dsting, '([^\n]+)') do
@@ -247,6 +267,7 @@ function hiscore.startplugin()
 	   	scores_have_been_read = false;
 		last_write_time = -10
 	  	emu.print_verbose("Starting " .. emu.gamename())
+	  	config_read = read_config();
 		local dat = read_hiscore_dat()
 		if dat and dat ~= "" then
 			emu.print_verbose( "hiscore: found hiscore.dat entry for " .. emu.romname() );

@@ -75,7 +75,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *vic20_final_expansion_3_t::device_rom_region() const
+const tiny_rom_entry *vic20_final_expansion_3_t::device_rom_region() const
 {
 	return ROM_NAME( vic20_fe3 );
 }

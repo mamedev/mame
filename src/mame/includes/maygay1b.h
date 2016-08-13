@@ -40,12 +40,7 @@ public:
 		m_duart68681(*this, "duart68681"),
 		m_sw1_port(*this, "SW1"),
 		m_sw2_port(*this, "SW2"),
-		m_s2_port(*this, "STROBE2"),
-		m_s3_port(*this, "STROBE3"),
-		m_s4_port(*this, "STROBE4"),
-		m_s5_port(*this, "STROBE5"),
-		m_s6_port(*this, "STROBE6"),
-		m_s7_port(*this, "STROBE7"),
+		m_kbd_ports(*this, {"SW1", "STROBE2", "STROBE3", "STROBE4", "STROBE5", "STROBE6", "STROBE7", "SW2"}),
 		m_bank1(*this, "bank1"),
 		m_reel0(*this, "reel0"),
 		m_reel1(*this, "reel1"),
@@ -66,12 +61,7 @@ public:
 	required_device<mc68681_device> m_duart68681;
 	required_ioport m_sw1_port;
 	required_ioport m_sw2_port;
-	required_ioport m_s2_port;
-	required_ioport m_s3_port;
-	required_ioport m_s4_port;
-	required_ioport m_s5_port;
-	required_ioport m_s6_port;
-	required_ioport m_s7_port;
+	required_ioport_array<8> m_kbd_ports;
 	required_memory_bank m_bank1;
 	required_device<stepper_device> m_reel0;
 	required_device<stepper_device> m_reel1;

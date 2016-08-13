@@ -23,11 +23,9 @@ public:
 
 	laserbat_state_base(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_row0(*this, "ROW0")
+		, m_mux_ports(*this, {"ROW0", "ROW1", "SW1", "SW2"})
 		, m_row1(*this, "ROW1")
 		, m_row2(*this, "ROW2")
-		, m_sw1(*this, "SW1")
-		, m_sw2(*this, "SW2")
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
@@ -93,11 +91,9 @@ protected:
 	TIMER_CALLBACK_MEMBER(video_line);
 
 	// input lines
-	required_ioport m_row0;
+	required_ioport_array<4> m_mux_ports;
 	required_ioport m_row1;
 	required_ioport m_row2;
-	required_ioport m_sw1;
-	required_ioport m_sw2;
 
 	// main CPU device
 	required_device<cpu_device> m_maincpu;

@@ -129,7 +129,7 @@ bool nfd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	UINT8 mfm[164 * 26];
 	UINT8 sec_sizes[164 * 26];
 
-	UINT32 hsize = LITTLE_ENDIANIZE_INT32(*(UINT32 *)(h+0x110));
+	UINT32 hsize = little_endianize_int32(*(UINT32 *)(h+0x110));
 
 	int pos = 0x120;
 
@@ -142,7 +142,7 @@ bool nfd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			// read sector map absolute location
 			io_generic_read(io, hsec, pos, 4);
 			pos += 4;
-			UINT32 secmap_addr = LITTLE_ENDIANIZE_INT32(*(UINT32 *)(hsec));
+			UINT32 secmap_addr = little_endianize_int32(*(UINT32 *)(hsec));
 
 			if (secmap_addr)
 			{
@@ -151,8 +151,8 @@ bool nfd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				// first WORD is # of sectors, second WORD is # of special data sectors
 				io_generic_read(io, hsec, secmap_addr, 0x10);
 				secmap_addr += 0x10;
-				num_secs[track] = LITTLE_ENDIANIZE_INT16(*(UINT16 *)(hsec));
-				num_specials[track] = LITTLE_ENDIANIZE_INT16(*(UINT16 *)(hsec + 0x2));
+				num_secs[track] = little_endianize_int16(*(UINT16 *)(hsec));
+				num_specials[track] = little_endianize_int16(*(UINT16 *)(hsec + 0x2));
 
 				for (int sect = 0; sect < num_secs[track]; sect++)
 				{
@@ -177,7 +177,7 @@ bool nfd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 					{
 						io_generic_read(io, hsec, secmap_addr, 0x10);
 						secmap_addr += 0x10;
-						curr_track_size += (hsec[9] + 1) * LITTLE_ENDIANIZE_INT32(*(UINT32 *)(hsec + 0x0a));
+						curr_track_size += (hsec[9] + 1) * little_endianize_int32(*(UINT32 *)(hsec + 0x0a));
 					}
 				}
 			}

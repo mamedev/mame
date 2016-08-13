@@ -17,7 +17,7 @@ ROM_START( omti5100 )
 	ROM_LOAD("100240-N.7a", 0x0000, 0x1000, CRC(d227d6cb) SHA1(3d6140764d3d043428c941826370ebf1597c63bd))
 ROM_END
 
-const rom_entry *omti5100_device::device_rom_region() const
+const tiny_rom_entry *omti5100_device::device_rom_region() const
 {
 	return ROM_NAME( omti5100 );
 }

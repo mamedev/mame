@@ -20,6 +20,7 @@
 #include "formats/cqm_dsk.h"
 #include "formats/dsk_dsk.h"
 #include "sound/samples.h"
+#include "softlist_dev.h"
 
 #define MCFG_FLOPPY_DRIVE_ADD(_tag, _slot_intf, _def_slot, _formats)  \
 	MCFG_DEVICE_ADD(_tag, FLOPPY_CONNECTOR, 0) \
@@ -61,7 +62,7 @@ class floppy_image_device : public device_t,
 							public device_slot_card_interface
 {
 public:
-	typedef delegate<int (floppy_image_device *)> load_cb;
+	typedef delegate<image_init_result (floppy_image_device *)> load_cb;
 	typedef delegate<void (floppy_image_device *)> unload_cb;
 	typedef delegate<void (floppy_image_device *, int)> index_pulse_cb;
 	typedef delegate<void (floppy_image_device *, int)> ready_cb;
@@ -80,9 +81,9 @@ public:
 	void set_rpm(float rpm);
 
 	// image-level overrides
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual bool call_create(int format_type, util::option_resolution *format_options) override;
+	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 	virtual const char *image_interface() const override = 0;
 	virtual iodevice_t image_type() const override { return IO_FLOPPY; }

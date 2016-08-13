@@ -22,10 +22,7 @@ public:
 		m_gdfs_tmapscroll(*this, "gdfs_tmapscroll"),
 		m_gdfs_st0020(*this, "st0020_spr"),
 		m_input_sel(*this, "input_sel"),
-		m_io_gunx1(*this, "GUNX1"),
-		m_io_guny1(*this, "GUNY1"),
-		m_io_gunx2(*this, "GUNX2"),
-		m_io_guny2(*this, "GUNY2"),
+		m_io_gun(*this, {"GUNX1", "GUNY1", "GUNX2", "GUNY2"}),
 		m_io_key0(*this, "KEY0"),
 		m_io_key1(*this, "KEY1"),
 		m_io_key2(*this, "KEY2"),
@@ -153,10 +150,7 @@ public:
 	void init_st010();
 
 protected:
-	optional_ioport m_io_gunx1;
-	optional_ioport m_io_guny1;
-	optional_ioport m_io_gunx2;
-	optional_ioport m_io_guny2;
+	optional_ioport_array<4> m_io_gun;
 	optional_ioport m_io_key0;
 	optional_ioport m_io_key1;
 	optional_ioport m_io_key2;

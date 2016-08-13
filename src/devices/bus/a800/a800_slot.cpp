@@ -236,7 +236,7 @@ static const char *a800_get_slot(int type)
 	return "a800_8k";
 }
 
-bool a800_cart_slot_device::call_load()
+image_init_result a800_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -291,7 +291,7 @@ bool a800_cart_slot_device::call_load()
 
 		logerror("%s loaded cartridge '%s' size %dK\n", machine().system().name, filename(), len/1024);
 	}
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

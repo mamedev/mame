@@ -968,9 +968,9 @@ offs_t mips3_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *op
 	extern unsigned dasmmips3(char *, unsigned, UINT32);
 	UINT32 op = *(UINT32 *)oprom;
 	if (m_bigendian)
-		op = BIG_ENDIANIZE_INT32(op);
+		op = big_endianize_int32(op);
 	else
-		op = LITTLE_ENDIANIZE_INT32(op);
+		op = little_endianize_int32(op);
 	return dasmmips3(buffer, pc, op);
 }
 

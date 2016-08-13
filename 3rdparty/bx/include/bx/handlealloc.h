@@ -151,8 +151,6 @@ namespace bx
 		static const uint16_t invalid = UINT16_MAX;
 
 		HandleListT()
-			: m_front(invalid)
-			, m_back(invalid)
 		{
 			reset();
 		}
@@ -250,6 +248,8 @@ namespace bx
 		void reset()
 		{
 			memset(m_links, 0xff, sizeof(m_links) );
+			m_front = invalid;
+			m_back  = invalid;
 		}
 
 	private:

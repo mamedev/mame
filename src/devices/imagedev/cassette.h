@@ -12,6 +12,7 @@
 #define CASSETTE_H
 
 #include "formats/cassimg.h"
+#include "softlist_dev.h"
 
 
 enum cassette_state
@@ -55,8 +56,8 @@ public:
 	static void static_set_interface(device_t &device, const char *_interface) { downcast<cassette_image_device &>(device).m_interface = _interface; }
 
 	// image-level overrides
-	virtual bool call_load() override;
-	virtual bool call_create(int format_type, util::option_resolution *format_options) override;
+	virtual image_init_result call_load() override;
+	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 	virtual std::string call_display() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
@@ -95,6 +96,7 @@ protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
+
 private:
 	cassette_image  *m_cassette;
 	cassette_state  m_state;
@@ -109,6 +111,8 @@ private:
 	const struct CassetteOptions    *m_create_opts;
 	cassette_state                  m_default_state;
 	const char *                    m_interface;
+
+	image_init_result internal_load(bool is_create);
 };
 
 // device type definition

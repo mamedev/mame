@@ -16,7 +16,6 @@
         - RAM cards
         - clock cards
     - floppy 8048
-    - hires graphics
     - brightness/contrast
     - MC6852
     - codec sound
@@ -86,46 +85,75 @@ INPUT_PORTS_END
 //  MC6845
 //-------------------------------------------------
 
-#define CODE_NON_DISPLAY    0x1000
-#define CODE_UNDERLINE      0x2000
-#define CODE_LOW_INTENSITY  0x4000
-#define CODE_REVERSE_VIDEO  0x8000
+#define DC_SECRET   0x1000
+#define DC_UNDLN    0x2000
+#define DC_LOWINT  	0x4000
+#define DC_RVS  	0x8000
 
 MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 {
+	int hires = BIT(ma, 13);
+	int dot_addr = BIT(ma, 12);
+	int width = hires ? 16 : 10;
+	if (hires) x_count = 0x32;
+
+	if (m_hires != hires)
+	{
+		m_hires = hires;
+		m_crtc->set_clock(XTAL_30MHz / width);
+		m_crtc->set_hpixels_per_column(width);
+	}
+
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	
+	int x = hbp;
 
-	if (BIT(ma, 13))
-	{
-		fatalerror("Graphics mode not supported!\n");
-	}
-	else
-	{
-		UINT16 video_ram_addr = (ma & 0xfff) << 1;
+	offs_t aa = (ma & 0x7ff) << 1;
 
-		for (int sx = 0; sx < x_count; sx++)
+	for (int sx = 0; sx < x_count; sx++)
+	{
+		UINT16 dc = (m_video_ram[aa + 1] << 8) | m_video_ram[aa];
+		offs_t ab = (dot_addr << 15) | ((dc & 0x7ff) << 4) | (ra & 0x0f);
+		UINT16 dd = program.read_word(ab << 1);
+
+		int cursor = (sx == cursor_x) ? 1 : 0;
+		int undln = !((dc & DC_UNDLN) && BIT(dd, 15)) ? 2 : 0;
+		int rvs = (dc & DC_RVS) ? 4 : 0;
+		int secret = (dc & DC_SECRET) ? 1 : 0;
+		int lowint = (dc & DC_LOWINT) ? 1 : 0;
+
+		for (int bit = 0; bit < width; bit++)
 		{
-			UINT16 code = (m_video_ram[video_ram_addr + 1] << 8) | m_video_ram[video_ram_addr];
-			UINT32 char_ram_addr = (BIT(ma, 12) << 16) | ((code & 0xff) << 5) | (ra << 1);
-			UINT16 data = program.read_word(char_ram_addr);
+			int pixel;
 
-			if (code & CODE_REVERSE_VIDEO) data ^= 0xffff;
-			if (code & CODE_NON_DISPLAY) data = 0;
-			if (sx == cursor_x) data = 0xffff;
-
-			for (int x = 0; x <= 10; x++)
+			switch (rvs | undln | cursor)
 			{
-				int pixel = BIT(data, x);
-				int color = palette[pixel && de];
-				if (!(code & CODE_LOW_INTENSITY) && color) color = 2;
+			case 0:	case 5:
+				pixel = 1;
+				break;
 
-				bitmap.pix32(vbp + y, hbp + x + sx*10) = color;
+			case 1: case 4:
+				pixel = 0;
+				break;
+
+			case 2: case 7:
+				pixel = !(!(BIT(dd, bit) && !secret));
+				break;
+
+			case 3: case 6:
+				pixel = !(BIT(dd, bit) && !secret);
+				break;
 			}
 
-			video_ram_addr += 2;
-			video_ram_addr &= 0xfff;
+			int color = palette[pixel && de];
+			if (!lowint && color) color = 2;
+
+			bitmap.pix32(vbp + y, x++) = color;
 		}
+
+		aa += 2;
+		aa &= 0xfff;
 	}
 }
 
@@ -473,7 +501,7 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	MCFG_MC6845_ADD(HD46505S_TAG, HD6845, SCREEN_TAG, XTAL_30MHz/11) // HD6845 == HD46505S
+	MCFG_MC6845_ADD(HD46505S_TAG, HD6845, SCREEN_TAG, XTAL_30MHz/10) // HD6845 == HD46505S
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(10)
 	MCFG_MC6845_UPDATE_ROW_CB(victor9k_state, crtc_update_row)

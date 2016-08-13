@@ -116,7 +116,7 @@ public:
 	DECLARE_DRIVER_INIT(nascom2c);
 	UINT32 screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	int load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id);
+	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket1_load) { return load_cart(image, m_socket1, 1); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket2_load) { return load_cart(image, m_socket2, 2); }
 
@@ -211,10 +211,10 @@ DEVICE_IMAGE_LOAD_MEMBER( nascom_state, nascom1_cassette )
 	m_tape_image = (UINT8*)image.ptr();
 
 	if (!m_tape_image)
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 
 	m_tape_index = 0;
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 DEVICE_IMAGE_UNLOAD_MEMBER( nascom_state, nascom1_cassette )
@@ -250,7 +250,7 @@ SNAPSHOT_LOAD_MEMBER( nascom_state, nascom1 )
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -258,7 +258,7 @@ SNAPSHOT_LOAD_MEMBER( nascom_state, nascom1 )
 //  SOCKETS
 //**************************************************************************
 
-int nascom2_state::load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id)
+image_init_result nascom2_state::load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id)
 {
 	// loading directly from file
 	if (image.software_entry() == nullptr)
@@ -266,7 +266,7 @@ int nascom2_state::load_cart(device_image_interface &image, generic_slot_device 
 		if (slot->length() > 0x1000)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported file size");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		slot->rom_alloc(slot->length(), GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
@@ -310,7 +310,7 @@ int nascom2_state::load_cart(device_image_interface &image, generic_slot_device 
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

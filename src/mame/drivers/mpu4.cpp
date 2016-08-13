@@ -531,7 +531,7 @@ WRITE8_MEMBER(mpu4_state::bankset_w)
 WRITE8_MEMBER(mpu4_state::ic2_o1_callback)
 {
 	m_6840ptm->set_c2(data);    /* copy output value to IC2 c2
-    this output is the clock for timer2 */
+	this output is the clock for timer2 */
 	/* 1200Hz System interrupt timer */
 }
 
@@ -1022,14 +1022,14 @@ READ8_MEMBER(mpu4_state::pia_ic5_portb_r)
 {
 	if (m_hopper == HOPPER_NONDUART_B)
 	{/*
-        if (hopper1_active)
-        {
-            m_aux2_input |= 0x08;
-        }
-        else
-        {
-            m_aux2_input &= ~0x08;
-        }*/
+	    if (hopper1_active)
+	    {
+	        m_aux2_input |= 0x08;
+	    }
+	    else
+	    {
+	        m_aux2_input &= ~0x08;
+	    }*/
 	}
 
 	LOG(("%s: IC5 PIA Read of Port B (coin input AUX2)\n",machine().describe_context()));
@@ -1255,14 +1255,12 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic7_cb2_w)
 /* IC8, Inputs, TRIACS, alpha clock */
 READ8_MEMBER(mpu4_state::pia_ic8_porta_r)
 {
-	ioport_port * portnames[] = { m_orange1_port, m_orange2_port, m_black1_port, m_black2_port, m_orange1_port, m_orange2_port, m_dil1_port, m_dil2_port };
-
 	LOG_IC8(("%s: IC8 PIA Read of Port A (MUX input data)\n", machine().describe_context()));
 /* The orange inputs are polled twice as often as the black ones, for reasons of efficiency.
    This is achieved via connecting every input line to an AND gate, thus allowing two strobes
    to represent each orange input bank (strobes are active low). */
 	m_pia5->cb1_w(m_aux2_port->read() & 0x80);
-	return (portnames[m_input_strobe])->read();
+	return (m_port_mux[m_input_strobe])->read();
 }
 
 

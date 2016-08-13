@@ -72,7 +72,7 @@ enum
 static const UINT16 w_mask[8] =
 {
 	0x000f,     /* Controllers should prevent overwriting of w0 status bits, and I know
-                that some controllers do so. */
+	            that some controllers do so. */
 	0xffff,
 	0xffff,
 	0xffff,
@@ -904,7 +904,7 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *file_extensions() const override { return "tap"; }
 
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
@@ -946,12 +946,12 @@ int ti990_tape_image_device::tape_get_id()
 /*
     Open a tape image
 */
-bool ti990_tape_image_device::call_load()
+image_init_result ti990_tape_image_device::call_load()
 {
 	tap_990_device* tpc = downcast<tap_990_device*>(owner());
 	tpc->set_tape(tape_get_id(), this, true, false, is_readonly());
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /*

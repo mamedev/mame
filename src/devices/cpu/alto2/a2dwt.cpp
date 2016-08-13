@@ -7,29 +7,62 @@
  *****************************************************************************/
 #include "alto2cpu.h"
 
+/*
+ * Copied from ALTOCODE24.MU
+ *
+ *	;Display Word Task
+ *	
+ *	DWT:	T← DWA;
+ *		T←-3+T+1;
+ *		L← AECL+T,BUS=0,TASK;	AECL CONTAINS NWRDS AT THIS TIME
+ *		AECL←L, :DWTZ;
+ *	
+ *	DWTY:	BLOCK;
+ *		TASK, :DWTF;
+ *	
+ *	DWTZ:	L←HTAB-1, BUS=0,TASK;
+ *		HTAB←L, :DOTAB;
+ *
+ *	DOTAB:	DDR←0, :DWTZ;
+ *	NOTAB:	MAR←T←DWA;
+ *		L←AECL-T-1;
+ *		ALUCY, L←2+T;
+ *		DWA←L, :XNOMORE;
+ *
+ *	DOMORE:	DDR←MD, TASK;
+ *		DDR←MD, :NOTAB;
+ *
+ *	XNOMORE:DDR← MD, BLOCK;
+ *		DDR← MD, TASK;
+ *
+ *	DWTF:	:DWT;
+ */
+
 //! PROM a38 bit O1 is STOPWAKE' (stop DWT if bit is zero)
 #define FIFO_STOPWAKE(a38) (0 == (a38 & disp_a38_STOPWAKE) ? true : false)
 
 /**
- * @brief block the display word task
+ * @brief Block the display word task.
  */
 void alto2_cpu_device::f1_early_dwt_block()
 {
 	m_dsp.dwt_blocks = true;
 
-	/* clear the wakeup for the display word task */
+	// Clear the wakeup for the display word task
 	m_task_wakeup &= ~(1 << m_task);
 	LOG((this,LOG_DWT,2,"    BLOCK %s\n", task_name(m_task)));
 
-	/* wakeup the display horizontal task, if it didn't block itself */
+	// Wakeup the display horizontal task, if it didn't block itself
 	if (!m_dsp.dht_blocks)
 		m_task_wakeup |= 1 << task_dht;
 }
 
 /**
- * @brief load the display data register
+ * @brief Load the display data register
+ * Pushes the word on the bus to the display FIFO.
+ * If the FIFO becomes full, the wakeup flag for task_dwt is reset.
  */
-void alto2_cpu_device::f2_late_dwt_load_ddr()
+void alto2_cpu_device::f2_late_load_ddr()
 {
 	LOG((this,LOG_DWT,2,"    DDR<- BUS (%#o)\n", m_bus));
 	m_dsp.fifo[m_dsp.wa] = m_bus;
@@ -44,8 +77,6 @@ void alto2_cpu_device::f2_late_dwt_load_ddr()
 
 void alto2_cpu_device::init_dwt(int task)
 {
-	set_f1(task, f1_block,          &alto2_cpu_device::f1_early_dwt_block, nullptr);
-	set_f2(task, f2_dwt_load_ddr,   nullptr, &alto2_cpu_device::f2_late_dwt_load_ddr);
 }
 
 void alto2_cpu_device::exit_dwt()

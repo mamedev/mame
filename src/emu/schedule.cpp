@@ -732,7 +732,7 @@ void device_scheduler::compute_perfect_interleave()
 			// adjust all the actuals; this doesn't affect the current
 			m_quantum_minimum = perfect;
 			for (quantum_slot &quant : m_quantum_list)
-				quant.m_actual = MAX(quant.m_requested, m_quantum_minimum);
+				quant.m_actual = std::max(quant.m_requested, m_quantum_minimum);
 		}
 	}
 }
@@ -967,7 +967,7 @@ void device_scheduler::add_scheduling_quantum(const attotime &quantum, const att
 	{
 		quantum_slot &quant = *m_quantum_allocator.alloc();
 		quant.m_requested = quantum_attos;
-		quant.m_actual = MAX(quantum_attos, m_quantum_minimum);
+		quant.m_actual = std::max(quantum_attos, m_quantum_minimum);
 		quant.m_expire = expire;
 		m_quantum_list.insert_after(quant, insert_after);
 	}

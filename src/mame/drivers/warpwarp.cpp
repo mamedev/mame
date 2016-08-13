@@ -158,7 +158,7 @@ READ8_MEMBER(warpwarp_state::geebee_in_r)
 	int res;
 
 	offset &= 3;
-	res = m_ports[offset] ? m_ports[offset]->read() : 0;
+	res = m_ports[offset].read_safe(0);
 	if (offset == 3)
 	{
 		res = (flip_screen() & 1) ? m_in2->read() : m_in1->read();  // read player 2 input in cocktail mode

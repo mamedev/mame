@@ -125,7 +125,7 @@ public:
 	DECLARE_DRIVER_INIT(mt_slot);
 	DECLARE_MACHINE_RESET(megatech);
 
-	int load_cart(device_image_interface &image, generic_slot_device *slot, int gameno);
+	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, int gameno);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart1 ) { return load_cart(image, m_cart1, 0); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart2 ) { return load_cart(image, m_cart2, 1); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart3 ) { return load_cart(image, m_cart3, 2); }
@@ -718,21 +718,21 @@ static MACHINE_CONFIG_START( megatech, mtech_state )
 MACHINE_CONFIG_END
 
 
-int mtech_state::load_cart(device_image_interface &image, generic_slot_device *slot, int gameno)
+image_init_result mtech_state::load_cart(device_image_interface &image, generic_slot_device *slot, int gameno)
 {
 	UINT8 *ROM;
 	const char  *pcb_name;
 	UINT32 size = slot->common_get_size("rom");
 
 	if (image.software_entry() == nullptr)
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 
 	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	ROM = slot->get_rom_base();
 	memcpy(ROM, image.get_software_region("rom"), size);
 
 	if ((pcb_name = image.get_feature("pcb_type")) == nullptr)
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	else
 	{
 		if (!core_stricmp("genesis", pcb_name))
@@ -749,7 +749,7 @@ int mtech_state::load_cart(device_image_interface &image, generic_slot_device *s
 			osd_printf_debug("cart%d is invalid\n", gameno + 1);
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 #define MCFG_MEGATECH_CARTSLOT_ADD(_tag, _load) \

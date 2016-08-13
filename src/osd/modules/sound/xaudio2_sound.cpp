@@ -20,13 +20,16 @@
 // XAudio2 include
 #include <xaudio2.h>
 
+#undef interface
+#undef min
+#undef max
+
 // stdlib includes
 #include <mutex>
 #include <thread>
 #include <queue>
 #include <chrono>
-
-#undef interface
+#include <utility>
 
 // MAME headers
 #include "emu.h"
@@ -42,6 +45,7 @@
 
 #define INITIAL_BUFFER_COUNT 4
 #define SUBMIT_FREQUENCY_TARGET_MS 20
+#define RESAMPLE_TOLERANCE 1.20f
 
 //============================================================
 //  Macros
@@ -397,7 +401,7 @@ void sound_xaudio2::update_audio_stream(
 
 	while (bytes_left > 0)
 	{
-		UINT32 chunk = MIN(m_buffer_size, bytes_left);
+		UINT32 chunk = std::min(UINT32(m_buffer_size), bytes_left);
 
 		// Roll the buffer if needed
 		if (m_writepos + chunk >= m_buffer_size)
@@ -429,7 +433,7 @@ void sound_xaudio2::set_mastervolume(int attenuation)
 	HRESULT result;
 
 	// clamp the attenuation to 0-32 range
-	attenuation = MAX(MIN(attenuation, 0), -32);
+	attenuation = std::max(std::min(attenuation, 0), -32);
 
 	// Ranges from 1.0 to XAUDIO2_MAX_VOLUME_LEVEL indicate additional gain
 	// Ranges from 0 to 1.0 indicate a reduced volume level
@@ -491,14 +495,14 @@ void sound_xaudio2::create_buffers(const WAVEFORMATEX &format)
 	// buffer size is equal to the bytes we need to hold in memory per X tenths of a second where X is audio_latency
 	float audio_latency_in_seconds = m_audio_latency / 10.0f;
 	UINT32 format_bytes_per_second = format.nSamplesPerSec * format.nBlockAlign;
-	UINT32 total_buffer_size = format_bytes_per_second * audio_latency_in_seconds;
+	UINT32 total_buffer_size = format_bytes_per_second * audio_latency_in_seconds * RESAMPLE_TOLERANCE;
 
 	// We want to be able to submit buffers every X milliseconds
 	// I want to divide these up into "packets" so figure out how many buffers we need
 	m_buffer_count = (audio_latency_in_seconds * 1000.0f) / SUBMIT_FREQUENCY_TARGET_MS;
 
 	// Now record the size of the individual buffers
-	m_buffer_size = MAX(1024, total_buffer_size / m_buffer_count);
+	m_buffer_size = std::max(DWORD(1024), total_buffer_size / m_buffer_count);
 
 	// Make the buffer a multiple of the format size bytes (rounding up)
 	UINT32 remainder = m_buffer_size % format.nBlockAlign;
@@ -591,10 +595,6 @@ void sound_xaudio2::submit_needed()
 {
 	XAUDIO2_VOICE_STATE state;
 	m_sourceVoice->GetState(&state, XAUDIO2_VOICE_NOSAMPLESPLAYED);
-
-	// If we have a buffer on the queue, no reason to submit
-	if (state.BuffersQueued >= 1)
-		return;
 
 	std::lock_guard<std::mutex> lock(m_buffer_lock);
 

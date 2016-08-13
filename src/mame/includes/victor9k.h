@@ -138,6 +138,7 @@ public:
 	// video state
 	int m_brt;
 	int m_cont;
+	int m_hires;
 
 	// interrupts
 	int m_via1_irq;

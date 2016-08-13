@@ -355,6 +355,28 @@ Donkey Kong Notes
 
     Not only did the eprom fix the ladder bug, but it also changed
     the copyright screen to read "(C)1981 Nintendo of America".
+    
+    --------------------------------------------------------------
+    
+    Nintendo Service Department Bulletin # TKG-06         10-04-82
+    GAME: Donkey Kong
+    SUBJECT: Speed-up Kit #2
+    
+    In an attempt to increase revenue of Donkey Kong we are making
+    available and updated speed-up kit, part number TKG-23-70.
+    
+    The speed-up kit consists of two (2) EPROM's that are mounted
+    on the CPU P.C. Board.  The replacement locations vary depend-
+    ing on the P.C. Board style.
+    
+    P.C Board Style     Eprom Location
+    ---------------     --------------
+    TKG2 and TKG3       5F, 5K
+    TKG4                5A, 5E 
+    
+    These kits are available through all Nintendo distributors. If
+    your distributor is out, they can get immediate shipment from
+    our factory.
 
 
     D2K Jumpman returns Notes
@@ -378,6 +400,9 @@ Donkey Kong Notes
 
     Hopefully confirmation and information will come along later which confirms
     this is a legitimate Nintendo Kit.
+    
+    This is probably "Speed-up Kit #2" mentioned above, but this still needs to be
+    confirmed.
 
 ***************************************************************************/
 

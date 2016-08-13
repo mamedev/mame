@@ -75,7 +75,7 @@ void ql_rom_cartridge_slot_t::device_start()
 //  call_load -
 //-------------------------------------------------
 
-bool ql_rom_cartridge_slot_t::call_load()
+image_init_result ql_rom_cartridge_slot_t::call_load()
 {
 	if (m_card)
 	{
@@ -94,7 +94,7 @@ bool ql_rom_cartridge_slot_t::call_load()
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

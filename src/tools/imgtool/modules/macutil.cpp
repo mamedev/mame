@@ -80,7 +80,7 @@ void pascal_from_c_string(unsigned char *pstring, size_t pstring_len, const char
 	size_t cstring_len, i;
 
 	cstring_len = strlen(cstring);
-	pstring[0] = MIN(cstring_len, pstring_len - 1);
+	pstring[0] = std::min(cstring_len, pstring_len - 1);
 
 	for (i = 0; i < pstring[0]; i++)
 		pstring[1 + i] = cstring[i];

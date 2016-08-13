@@ -8,6 +8,7 @@
 #include <cstdarg>
 
 #include "pparser.h"
+#include "plib/palloc.h"
 
 namespace plib {
 // ----------------------------------------------------------------------------------------
@@ -105,7 +106,7 @@ pstring ptokenizer::get_identifier_or_number()
 	token_t tok = get_token();
 	if (!(tok.is_type(IDENTIFIER) || tok.is_type(NUMBER)))
 	{
-		error(pfmt("Expected an identifier, got <{1}>")(tok.str()) );
+		error(pfmt("Expected an identifier or number, got <{1}>")(tok.str()) );
 	}
 	return tok.str();
 }
@@ -202,7 +203,8 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 	{
 		/* read identifier till non identifier char */
 		pstring tokstr = "";
-		while (m_identifier_chars.find(c) != m_identifier_chars.end()) {
+		while (m_identifier_chars.find(c) != m_identifier_chars.end())
+		{
 			tokstr += c;
 			c = getc();
 		}
@@ -228,7 +230,8 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 	{
 		/* read identifier till first identifier char or ws */
 		pstring tokstr = "";
-		while ((m_identifier_chars.find(c)) == m_identifier_chars.end() && (m_whitespace.find(c) == m_whitespace.end())) {
+		while ((m_identifier_chars.find(c) == m_identifier_chars.end()) && (m_whitespace.find(c) == m_whitespace.end()))
+		{
 			tokstr += c;
 			/* expensive, check for single char tokens */
 			if (tokstr.len() == 1)

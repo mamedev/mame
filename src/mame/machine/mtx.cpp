@@ -348,7 +348,7 @@ SNAPSHOT_LOAD_MEMBER( mtx_state, mtx )
 	if (header[0] != 0xff)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, nullptr);
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	// get tape name
@@ -385,7 +385,7 @@ SNAPSHOT_LOAD_MEMBER( mtx_state, mtx )
 
 	logerror("snapshot name = '%s', system_size = 0x%04x, data_size = 0x%04x\n", tape_name, system_variables_size, data_size);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /***************************************************************************

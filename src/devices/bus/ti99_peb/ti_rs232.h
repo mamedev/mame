@@ -50,7 +50,7 @@ protected:
 	virtual void device_start(void) override;
 	virtual void device_reset(void) override;
 	virtual void device_stop(void) override;
-	virtual const rom_entry *device_rom_region(void) const override;
+	virtual const tiny_rom_entry *device_rom_region(void) const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -130,7 +130,7 @@ public:
 
 protected:
 	virtual void    device_start(void) override;
-	bool    call_load() override;
+	image_init_result    call_load() override;
 	void    call_unload() override;
 	virtual void    device_config_complete() override;
 
@@ -157,7 +157,7 @@ public:
 
 protected:
 	virtual void    device_start(void) override;
-	bool    call_load() override;
+	image_init_result    call_load() override;
 	void    call_unload() override;
 	virtual void    device_config_complete() override;
 };

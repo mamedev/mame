@@ -12,6 +12,8 @@
 #include "emu.h"
 #include "ti99defs.h"
 #include "machine/tmc0430.h"
+#include "softlist_dev.h"
+
 
 extern const device_type GROMPORT;
 
@@ -103,10 +105,10 @@ protected:
 	virtual void device_start() override { };
 	virtual void device_config_complete() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry* device_rom_region() const override;
+	virtual const tiny_rom_entry* device_rom_region() const override;
 
 	// Image handling: implementation of methods which are abstract in the parent
-	bool call_load() override;
+	image_init_result call_load() override;
 	void call_unload() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
@@ -261,7 +263,7 @@ protected:
 	virtual void device_reset() override;
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry* device_rom_region() const override;
+	virtual const tiny_rom_entry* device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
 	// device_nvram_interface

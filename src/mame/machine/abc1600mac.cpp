@@ -6,16 +6,6 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - segment/page RAM addresses are not correctly decoded, "sas/format/format" can't find the SASI interface because of this
-        forcetask0 1 t0 0 t1 0 t2 0 t3 0
-        sega19 0 task 0
-        sega 000 segd 00 pga 008 pgd 4058 virtual 02c730 (should be 004730)
-*/
-
 #include "abc1600mac.h"
 
 
@@ -25,6 +15,8 @@
 //**************************************************************************
 
 #define LOG 0
+#define LOG_MAC 0
+#define LOG_DMA 0
 
 
 #define A0          BIT(offset, 0)
@@ -101,7 +93,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *abc1600_mac_device::device_rom_region() const
+const tiny_rom_entry *abc1600_mac_device::device_rom_region() const
 {
 	return ROM_NAME( abc1600_mac );
 }
@@ -116,15 +108,15 @@ const rom_entry *abc1600_mac_device::device_rom_region() const
 //  abc1600_mac_device - constructor
 //-------------------------------------------------
 
-abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ABC1600_MAC, "ABC 1600 MAC", tag, owner, clock, "abc1600mac", __FILE__),
-		device_memory_interface(mconfig, *this),
-		m_space_config("program", ENDIANNESS_LITTLE, 8, 22, 0, *ADDRESS_MAP_NAME(program_map)),
-		m_rom(*this, "boot"),
-		m_segment_ram(*this, "segment_ram"),
-		m_page_ram(*this, "page_ram"),
-		m_watchdog(*this, "watchdog"),
-		m_task(0)
+abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, ABC1600_MAC, "ABC 1600 MAC", tag, owner, clock, "abc1600mac", __FILE__),
+	device_memory_interface(mconfig, *this),
+	m_space_config("program", ENDIANNESS_LITTLE, 8, 22, 0, *ADDRESS_MAP_NAME(program_map)),
+	m_rom(*this, "boot"),
+	m_segment_ram(*this, "segment_ram"),
+	m_page_ram(*this, "page_ram"),
+	m_watchdog(*this, "watchdog"),
+	m_task(0)
 {
 }
 
@@ -145,6 +137,7 @@ void abc1600_mac_device::device_start()
 
 	// HACK fill segment RAM or abcenix won't boot
 	memset(m_segment_ram, 0xcd, 0x400);
+	memset(m_page_ram, 0xcd, 0x400);
 
 	// state saving
 	save_item(NAME(m_ifc2));
@@ -240,6 +233,8 @@ offs_t abc1600_mac_device::translate_address(offs_t offset, int *nonx, int *wp)
 
 	*nonx = PAGE_NONX;
 	*wp = PAGE_WP;
+
+	if (LOG_MAC) logerror("%s MAC %05x:%06x (SEGA %03x SEGD %02x PGA %03x PGD %04x NONX %u WP %u)\n", machine().describe_context(), offset, virtual_offset, sega, segd, pga, m_page_ram[pga], *nonx, *wp);
 
 	return virtual_offset;
 }
@@ -441,7 +436,7 @@ WRITE8_MEMBER( abc1600_mac_device::task_w )
 
 	m_task = data ^ 0xff;
 
-	if (LOG) logerror("%s: %06x Task %u BOOTE %u MAGIC %u\n", machine().describe_context(), offset, get_current_task(offset), BOOTE, MAGIC);
+	if (LOG) logerror("%s TASK %05x:%02x (TASK %u BOOTE %u MAGIC %u)\n", machine().describe_context(), offset, data, get_current_task(offset), BOOTE, MAGIC);
 }
 
 
@@ -498,7 +493,7 @@ WRITE8_MEMBER( abc1600_mac_device::segment_w )
 
 	m_segment_ram[sega] = data & 0x7f;
 
-	if (LOG) logerror("%s: %06x Task %u Segment %03x : %02x\n", machine().describe_context(), offset, get_current_task(offset), sega, data);
+	if (LOG) logerror("%s SEGMENT %05x:%02x (SEGA %03x SEGD %02x)\n", machine().describe_context(), offset, data, sega, m_segment_ram[sega]);
 }
 
 
@@ -603,7 +598,7 @@ WRITE8_MEMBER( abc1600_mac_device::page_w )
 		m_page_ram[pga] = ((data & 0xc3) << 8) | (m_page_ram[pga] & 0xff);
 	}
 
-	if (LOG) logerror("%s: %06x Task %u Segment %03x Page %03x : %02x -> %04x\n", machine().describe_context(), offset, get_current_task(offset), sega, pga, data, m_page_ram[pga]);
+	if (LOG) logerror("%s PAGE %05x:%02x (SEGA %03x SEGD %02x PGA %03x PGD %04x)\n", machine().describe_context(), offset, data, sega, segd, pga, m_page_ram[pga]);
 }
 
 
@@ -631,6 +626,8 @@ UINT8 abc1600_mac_device::dma_mreq_r(int index, UINT16 offset)
 {
 	offs_t virtual_offset = get_dma_address(index, offset);
 
+	if (LOG_DMA)logerror("%s DMA R %04x:%06x\n", machine().describe_context(), offset, virtual_offset);
+
 	return space().read_byte(virtual_offset);
 }
 
@@ -642,6 +639,8 @@ UINT8 abc1600_mac_device::dma_mreq_r(int index, UINT16 offset)
 void abc1600_mac_device::dma_mreq_w(int index, UINT16 offset, UINT8 data)
 {
 	offs_t virtual_offset = get_dma_address(index, offset);
+
+	if (LOG_DMA)logerror("%s DMA W %04x:%06x\n", machine().describe_context(), offset, virtual_offset);
 
 	space().write_byte(virtual_offset, data);
 }
@@ -655,6 +654,8 @@ UINT8 abc1600_mac_device::dma_iorq_r(int index, UINT16 offset)
 {
 	offs_t virtual_offset = 0x1fe000 | get_dma_address(index, offset);
 
+	if (LOG_DMA)logerror("%s DMA R %04x:%06x\n", machine().describe_context(), offset, virtual_offset);
+
 	return space().read_byte(virtual_offset);
 }
 
@@ -666,6 +667,8 @@ UINT8 abc1600_mac_device::dma_iorq_r(int index, UINT16 offset)
 void abc1600_mac_device::dma_iorq_w(int index, UINT16 offset, UINT8 data)
 {
 	offs_t virtual_offset = 0x1fe000 | get_dma_address(index, offset);
+
+	if (LOG_DMA)logerror("%s DMA W %04x:%06x\n", machine().describe_context(), offset, virtual_offset);
 
 	space().write_byte(virtual_offset, data);
 }
@@ -692,7 +695,7 @@ WRITE8_MEMBER( abc1600_mac_device::dmamap_w )
 
 	*/
 
-	if (LOG) logerror("DMAMAP %u %02x\n", offset & 7, data);
+	if (LOG_DMA) logerror("%s DMAMAP %u:%02x\n", machine().describe_context(), offset & 7, data);
 
 	m_dmamap[offset & 7] = data;
 }

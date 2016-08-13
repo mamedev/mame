@@ -101,7 +101,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *victor_9000_fdc_t::device_rom_region() const
+const tiny_rom_entry *victor_9000_fdc_t::device_rom_region() const
 {
 	return ROM_NAME( victor_9000_fdc );
 }
@@ -124,12 +124,12 @@ ADDRESS_MAP_END
 //  SLOT_INTERFACE( victor9k_floppies )
 //-------------------------------------------------
 
-int victor_9000_fdc_t::load0_cb(floppy_image_device *device)
+image_init_result victor_9000_fdc_t::load0_cb(floppy_image_device *device)
 {
 	// DOOR OPEN 0
 	m_via4->write_ca1(0);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void victor_9000_fdc_t::unload0_cb(floppy_image_device *device)
@@ -138,12 +138,12 @@ void victor_9000_fdc_t::unload0_cb(floppy_image_device *device)
 	m_via4->write_ca1(1);
 }
 
-int victor_9000_fdc_t::load1_cb(floppy_image_device *device)
+image_init_result victor_9000_fdc_t::load1_cb(floppy_image_device *device)
 {
 	// DOOR OPEN 1
 	m_via4->write_cb1(0);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void victor_9000_fdc_t::unload1_cb(floppy_image_device *device)
@@ -565,6 +565,8 @@ void victor_9000_fdc_t::update_stepper_motor(floppy_image_device *floppy, int st
 		floppy->stp_w(1);
 		floppy->stp_w(0);
 	}
+
+	floppy->set_rpm(victor9k_format::get_rpm(m_side, floppy->get_cyl()));
 }
 
 void victor_9000_fdc_t::update_spindle_motor(floppy_image_device *floppy, emu_timer *t_tach, bool start, bool stop, bool sel, UINT8 &da)

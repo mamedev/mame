@@ -347,8 +347,7 @@ public:
 	m_potgo_port(*this, "potgo"),
 	m_pot0dat_port(*this, "POT0DAT"),
 	m_pot1dat_port(*this, "POT1DAT"),
-	m_p1joy_port(*this, "p1_joy"),
-	m_p2joy_port(*this, "p2_joy"),
+	m_joy_ports(*this, {"p1_joy", "p2_joy"}),
 	m_p1_mouse_x(*this, "p1_mouse_x"),
 	m_p1_mouse_y(*this, "p1_mouse_y"),
 	m_p2_mouse_x(*this, "p2_mouse_x"),
@@ -576,8 +575,7 @@ protected:
 	optional_ioport m_potgo_port;
 	optional_ioport m_pot0dat_port;
 	optional_ioport m_pot1dat_port;
-	optional_ioport m_p1joy_port;
-	optional_ioport m_p2joy_port;
+	optional_ioport_array<2> m_joy_ports;
 	optional_ioport m_p1_mouse_x;
 	optional_ioport m_p1_mouse_y;
 	optional_ioport m_p2_mouse_x;

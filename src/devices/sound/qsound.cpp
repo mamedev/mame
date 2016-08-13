@@ -83,7 +83,7 @@ qsound_device::qsound_device(const machine_config &mconfig, const char *tag, dev
 //  internal ROM region
 //-------------------------------------------------
 
-const rom_entry *qsound_device::device_rom_region() const
+const tiny_rom_entry *qsound_device::device_rom_region() const
 {
 	return ROM_NAME( qsound );
 }

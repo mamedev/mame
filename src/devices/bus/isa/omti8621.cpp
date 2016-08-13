@@ -63,7 +63,7 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *file_extensions() const override { return "awd"; }
 
-	virtual bool call_create(int format_type, util::option_resolution *format_options) override;
+	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
@@ -266,12 +266,12 @@ machine_config_constructor omti8621_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( omti_disk );
 }
 
-const rom_entry *omti8621_device::device_rom_region() const
+const tiny_rom_entry *omti8621_device::device_rom_region() const
 {
 	return ROM_NAME( omti8621 );
 }
 
-const rom_entry *omti8621_apollo_device::device_rom_region() const
+const tiny_rom_entry *omti8621_apollo_device::device_rom_region() const
 {
 	// OMTI 8621 boards for Apollo workstations never use a BIOS ROM
 	// They don't even have a socket for the BIOS ROM
@@ -1404,7 +1404,7 @@ void omti_disk_image_device::device_reset()
    disk image create callback
 -------------------------------------------------*/
 
-bool omti_disk_image_device::call_create(int format_type, util::option_resolution *format_options)
+image_init_result omti_disk_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	LOG(("device_create_omti_disk: creating OMTI Disk with %d blocks", m_sector_count));
 
@@ -1418,8 +1418,8 @@ bool omti_disk_image_device::call_create(int format_type, util::option_resolutio
 		if (fwrite(sectordata, OMTI_DISK_SECTOR_SIZE)
 				< OMTI_DISK_SECTOR_SIZE)
 		{
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 	}
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }

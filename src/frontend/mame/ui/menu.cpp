@@ -53,7 +53,6 @@ menu::global_state_ptr menu::get_global_state(running_machine &machine)
 	std::lock_guard<std::mutex> guard(s_global_state_guard);
 	auto const it(s_global_states.find(&machine));
 	return (it != s_global_states.end()) ? it->second : global_state_ptr();
-
 }
 
 //-------------------------------------------------
@@ -809,7 +808,7 @@ void menu::draw_text_box()
 
 	// maximum against "return to prior menu" text
 	prior_width = ui().get_string_width(backtext) + 2.0f * gutter_width;
-	target_width = MAX(target_width, prior_width);
+	target_width = std::max(target_width, prior_width);
 
 	// determine the target location
 	target_x = 0.5f - 0.5f * target_width;
@@ -1240,7 +1239,7 @@ void menu::extra_text_position(float origx1, float origx2, float origy, float ys
 	int direction, float &x1, float &y1, float &x2, float &y2)
 {
 	float width = layout.actual_width() + (2 * UI_BOX_LR_BORDER);
-	float maxwidth = MAX(width, origx2 - origx1);
+	float maxwidth = std::max(width, origx2 - origx1);
 
 	// compute our bounds
 	x1 = 0.5f - 0.5f * maxwidth;

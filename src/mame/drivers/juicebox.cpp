@@ -223,10 +223,10 @@ WRITE32_MEMBER(juicebox_state::s3c44b0_gpio_port_w)
 READ32_MEMBER(juicebox_state::juicebox_nand_r)
 {
 	UINT32 data = 0;
-	if (mem_mask & 0x000000FF) data = data | (smc_read() <<  0);
-	if (mem_mask & 0x0000FF00) data = data | (smc_read() <<  8);
-	if (mem_mask & 0x00FF0000) data = data | (smc_read() << 16);
-	if (mem_mask & 0xFF000000) data = data | (smc_read() << 24);
+	if (ACCESSING_BITS_0_7) data = data | (smc_read() <<  0);
+	if (ACCESSING_BITS_8_15) data = data | (smc_read() <<  8);
+	if (ACCESSING_BITS_16_23) data = data | (smc_read() << 16);
+	if (ACCESSING_BITS_24_31) data = data | (smc_read() << 24);
 	verboselog( 5, "juicebox_nand_r %08X %08X %08X\n", offset, mem_mask, data);
 	return data;
 }
@@ -234,10 +234,10 @@ READ32_MEMBER(juicebox_state::juicebox_nand_r)
 WRITE32_MEMBER(juicebox_state::juicebox_nand_w)
 {
 	verboselog( 5, "juicebox_nand_w %08X %08X %08X\n", offset, mem_mask, data);
-	if (mem_mask & 0x000000FF) smc_write((data >>  0) & 0xFF);
-	if (mem_mask & 0x0000FF00) smc_write((data >>  8) & 0xFF);
-	if (mem_mask & 0x00FF0000) smc_write((data >> 16) & 0xFF);
-	if (mem_mask & 0xFF000000) smc_write((data >> 24) & 0xFF);
+	if (ACCESSING_BITS_0_7) smc_write((data >>  0) & 0xFF);
+	if (ACCESSING_BITS_8_15) smc_write((data >>  8) & 0xFF);
+	if (ACCESSING_BITS_16_23) smc_write((data >> 16) & 0xFF);
+	if (ACCESSING_BITS_24_31) smc_write((data >> 24) & 0xFF);
 }
 
 // I2S

@@ -44,14 +44,7 @@ public:
 			m_reel1(*this, "reel1"),
 			m_reel2(*this, "reel2"),
 			m_reel3(*this, "reel3"),
-			m_io1_port(*this, "IO1"),
-			m_io2_port(*this, "IO2"),
-			m_io3_port(*this, "IO3"),
-			m_io4_port(*this, "IO4"),
-			m_io5_port(*this, "IO5"),
-			m_io6_port(*this, "IO6"),
-			m_io7_port(*this, "IO7"),
-			m_io8_port(*this, "IO8")
+			m_io_ports(*this, {"IO1", "IO2", "IO3", "IO4", "IO5", "IO6", "IO7", "IO8"})
 	{ }
 	int m_input_strobe;
 	int m_lamp_strobe;
@@ -197,9 +190,7 @@ public:
 
 	DECLARE_READ8_MEMBER( ic37_read_b )
 	{
-		ioport_port * portnames[] = { m_io1_port, m_io2_port, m_io3_port, m_io4_port, m_io5_port, m_io6_port, m_io7_port, m_io8_port,m_io1_port, m_io2_port, m_io3_port, m_io4_port, m_io5_port, m_io6_port, m_io7_port, m_io8_port };
-
-		return (portnames[m_input_strobe])->read();
+		return (m_io_ports[m_input_strobe & 7])->read();
 	}
 
 	DECLARE_READ8_MEMBER( ic37_read_c )
@@ -219,14 +210,7 @@ public:
 	required_device<stepper_device> m_reel1;
 	required_device<stepper_device> m_reel2;
 	required_device<stepper_device> m_reel3;
-	required_ioport m_io1_port;
-	required_ioport m_io2_port;
-	required_ioport m_io3_port;
-	required_ioport m_io4_port;
-	required_ioport m_io5_port;
-	required_ioport m_io6_port;
-	required_ioport m_io7_port;
-	required_ioport m_io8_port;
+	required_ioport_array<8> m_io_ports;
 
 	DECLARE_DRIVER_INIT(aces1);
 	virtual void machine_start() override;

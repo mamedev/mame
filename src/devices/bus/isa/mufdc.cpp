@@ -105,7 +105,7 @@ ROM_START( fdc344 )
 	ROM_LOAD("fdc344_42.u2", 0x0000, 0x4000, CRC(3e02567c) SHA1(b639d92435ecf2a6d4aefd3576a6955028f6bde7))
 ROM_END
 
-const rom_entry *fdc344_device::device_rom_region() const
+const tiny_rom_entry *fdc344_device::device_rom_region() const
 {
 	return ROM_NAME( fdc344 );
 }
@@ -115,7 +115,7 @@ ROM_START( fdcmag )
 	ROM_LOAD("magitronic_40.u2", 0x0000, 0x2000, CRC(41a5371b) SHA1(9c4443169a0b104395404274470e62b8b65efcf4))
 ROM_END
 
-const rom_entry *fdcmag_device::device_rom_region() const
+const tiny_rom_entry *fdcmag_device::device_rom_region() const
 {
 	return ROM_NAME( fdcmag );
 }

@@ -92,7 +92,7 @@ READ8_MEMBER(nes_aladdin_slot_device::read)
 }
 
 // 128K for Dizzy The Adventurer, 256K for the others
-bool nes_aladdin_slot_device::call_load()
+image_init_result nes_aladdin_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -100,12 +100,12 @@ bool nes_aladdin_slot_device::call_load()
 		UINT32 size;
 
 		if (!ROM)
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 
 		if (software_entry() == nullptr)
 		{
 			if (length() != 0x20010 && length() != 0x40010)
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 
 			UINT8 temp[0x40010];
 			size = length() - 0x10;
@@ -117,13 +117,13 @@ bool nes_aladdin_slot_device::call_load()
 				UINT8 mapper = (temp[6] & 0xf0) >> 4;
 				mapper |= temp[7] & 0xf0;
 				if (mapper != 71 && mapper != 232)
-					return IMAGE_INIT_FAIL;
+					return image_init_result::FAIL;
 			}
 		}
 		else
 		{
 			if (get_software_region_length("rom") != 0x20000 && get_software_region_length("rom") != 0x40000)
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 
 			size = get_software_region_length("rom");
 			memcpy(ROM, get_software_region("rom"), size);
@@ -132,7 +132,7 @@ bool nes_aladdin_slot_device::call_load()
 		m_cart->set_cart_size(size);
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -221,7 +221,7 @@ void nes_algq_rom_device::device_reset()
 	m_bank_base = 0;
 }
 
-const rom_entry *nes_algn_rom_device::device_rom_region() const
+const tiny_rom_entry *nes_algn_rom_device::device_rom_region() const
 {
 	return ROM_NAME( ade_rom );
 }

@@ -1368,13 +1368,13 @@ WRITE16_MEMBER( supracan_state::_68k_soundram_w )
 
 	if(offset*2 < 0x500 && offset*2 >= 0x300)
 	{
-		if(mem_mask & 0xff00)
+		if(ACCESSING_BITS_8_15)
 		{
 			m_hack_68k_to_6502_access = true;
 			_6502_soundmem_w(mem, offset*2, data >> 8);
 			m_hack_68k_to_6502_access = false;
 		}
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 		{
 			m_hack_68k_to_6502_access = true;
 			_6502_soundmem_w(mem, offset*2 + 1, data & 0xff);
@@ -1392,13 +1392,13 @@ READ16_MEMBER( supracan_state::_68k_soundram_r )
 	if(offset*2 >= 0x300 && offset*2 < 0x500)
 	{
 		val = 0;
-		if(mem_mask & 0xff00)
+		if(ACCESSING_BITS_8_15)
 		{
 			m_hack_68k_to_6502_access = true;
 			val |= _6502_soundmem_r(mem, offset*2) << 8;
 			m_hack_68k_to_6502_access = false;
 		}
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 		{
 			m_hack_68k_to_6502_access = true;
 			val |= _6502_soundmem_r(mem, offset*2 + 1);
@@ -1748,13 +1748,13 @@ DEVICE_IMAGE_LOAD_MEMBER( supracan_state, supracan_cart )
 	if (size > 0x400000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

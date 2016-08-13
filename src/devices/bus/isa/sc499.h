@@ -15,6 +15,8 @@
 
 #include "emu.h"
 #include "bus/isa/isa.h"
+#include "softlist_dev.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -29,7 +31,7 @@ public:
 	sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 	virtual void call_unload() override;
 	virtual iodevice_t image_type() const override { return IO_MAGTAPE; }

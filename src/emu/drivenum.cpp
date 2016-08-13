@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    drivenum.c
+    drivenum.cpp
 
     Driver enumeration helpers.
 
@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "drivenum.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include <ctype.h>
 
 
@@ -365,7 +365,7 @@ void driver_enumerator::find_approximate_matches(const char *string, int count, 
 			// pick the best match between driver name and description
 			int curpenalty = penalty_compare(string, s_drivers_sorted[index]->description);
 			int tmp = penalty_compare(string, s_drivers_sorted[index]->name);
-			curpenalty = MIN(curpenalty, tmp);
+			curpenalty = std::min(curpenalty, tmp);
 
 			// insert into the sorted table of matches
 			for (int matchnum = count - 1; matchnum >= 0; matchnum--)

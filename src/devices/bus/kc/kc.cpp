@@ -328,7 +328,7 @@ void kccart_slot_device::device_config_complete()
     call load
 -------------------------------------------------*/
 
-bool kccart_slot_device::call_load()
+image_init_result kccart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -349,10 +349,10 @@ bool kccart_slot_device::call_load()
 			}
 		}
 		else
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /*-------------------------------------------------

@@ -172,7 +172,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *luxor_55_10828_device::device_rom_region() const
+const tiny_rom_entry *luxor_55_10828_device::device_rom_region() const
 {
 	return ROM_NAME( luxor_55_10828 );
 }

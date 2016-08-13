@@ -133,18 +133,7 @@ public:
 			m_reel4(*this, "reel4"),
 			m_reel5(*this, "reel5"),
 			m_reel6(*this, "reel6"),
-			m_io1(*this, "IN-0"),
-			m_io2(*this, "IN-1"),
-			m_io3(*this, "IN-2"),
-			m_io4(*this, "IN-3"),
-			m_io5(*this, "IN-4"),
-			m_io6(*this, "IN-5"),
-			m_io7(*this, "IN-6"),
-			m_io8(*this, "IN-7"),
-			m_io9(*this, "IN-8"),
-			m_io10(*this, "IN-9"),
-			m_io11(*this, "IN-10"),
-			m_io12(*this, "IN-11")
+			m_io_ports(*this, {"IN-0", "IN-1", "IN-2", "IN-3", "IN-4", "IN-5", "IN-6", "IN-7", "IN-8", "IN-9", "IN-10", "IN-11"})
 	{
 		m_chk41addr = -1;
 		m_dochk41 = false;
@@ -630,18 +619,7 @@ public:
 
 
 protected:
-	required_ioport m_io1;
-	required_ioport m_io2;
-	required_ioport m_io3;
-	required_ioport m_io4;
-	required_ioport m_io5;
-	required_ioport m_io6;
-	required_ioport m_io7;
-	required_ioport m_io8;
-	required_ioport m_io9;
-	required_ioport m_io10;
-	required_ioport m_io11;
-	required_ioport m_io12;
+	optional_ioport_array<16> m_io_ports;
 };
 
 class sc4_adder4_state : public sc4_state

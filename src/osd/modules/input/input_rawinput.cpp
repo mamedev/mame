@@ -16,6 +16,8 @@
 #include <windows.h>
 #include <tchar.h>
 #undef interface
+#undef min
+#undef max
 
 #include <mutex>
 #include <functional>
@@ -364,28 +366,88 @@ public:
 
 	void process_event(RAWINPUT &rawinput) override
 	{
-		// If this data was intended for a rawinput lightgun, ignore it.
+
+		// If this data was intended for a rawinput mouse
+		if (rawinput.data.mouse.usFlags == MOUSE_MOVE_RELATIVE)
+		{
+
+			mouse.lX += rawinput.data.mouse.lLastX * INPUT_RELATIVE_PER_PIXEL;
+			mouse.lY += rawinput.data.mouse.lLastY * INPUT_RELATIVE_PER_PIXEL;
+
+			// update zaxis
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_WHEEL)
+				mouse.lZ += static_cast<INT16>(rawinput.data.mouse.usButtonData) * INPUT_RELATIVE_PER_PIXEL;
+
+			// update the button states; always update the corresponding mouse buttons
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) mouse.rgbButtons[0] = 0x80;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_UP)   mouse.rgbButtons[0] = 0x00;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_DOWN) mouse.rgbButtons[1] = 0x80;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_UP)   mouse.rgbButtons[1] = 0x00;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_DOWN) mouse.rgbButtons[2] = 0x80;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_UP)   mouse.rgbButtons[2] = 0x00;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_DOWN) mouse.rgbButtons[3] = 0x80;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_UP)   mouse.rgbButtons[3] = 0x00;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_DOWN) mouse.rgbButtons[4] = 0x80;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_UP)   mouse.rgbButtons[4] = 0x00;
+		}
+	}
+};
+
+//============================================================
+//  rawinput_lightgun_device
+//============================================================
+
+class rawinput_lightgun_device : public rawinput_device
+{
+private:
+	std::mutex  m_device_lock;
+public:
+	mouse_state          lightgun;
+
+	rawinput_lightgun_device(running_machine& machine, const char* name, input_module& module)
+		: rawinput_device(machine, name, DEVICE_CLASS_LIGHTGUN, module),
+		lightgun({0})
+	{
+	}
+
+	void poll() override
+	{
+		lightgun.lZ = 0;
+
+		rawinput_device::poll();
+	}
+
+	void reset() override
+	{
+		memset(&lightgun, 0, sizeof(lightgun));
+	}
+
+	void process_event(RAWINPUT &rawinput) override
+	{
+		// If this data was intended for a rawinput lightgun
 		if (rawinput.data.mouse.usFlags & MOUSE_MOVE_ABSOLUTE)
-			return;
+		{
 
-		mouse.lX += rawinput.data.mouse.lLastX * INPUT_RELATIVE_PER_PIXEL;
-		mouse.lY += rawinput.data.mouse.lLastY * INPUT_RELATIVE_PER_PIXEL;
+			// update the X/Y positions
+			lightgun.lX = normalize_absolute_axis(rawinput.data.mouse.lLastX, 0, INPUT_ABSOLUTE_MAX);
+			lightgun.lY = normalize_absolute_axis(rawinput.data.mouse.lLastY, 0, INPUT_ABSOLUTE_MAX);
 
-		// update zaxis
-		if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_WHEEL)
-			mouse.lZ += static_cast<INT16>(rawinput.data.mouse.usButtonData) * INPUT_RELATIVE_PER_PIXEL;
+			// update zaxis
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_WHEEL)
+				lightgun.lZ += static_cast<INT16>(rawinput.data.mouse.usButtonData) * INPUT_RELATIVE_PER_PIXEL;
 
-		// update the button states; always update the corresponding mouse buttons
-		if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) mouse.rgbButtons[0] = 0x80;
-		if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_UP)   mouse.rgbButtons[0] = 0x00;
-		if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_DOWN) mouse.rgbButtons[1] = 0x80;
-		if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_UP)   mouse.rgbButtons[1] = 0x00;
-		if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_DOWN) mouse.rgbButtons[2] = 0x80;
-		if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_UP)   mouse.rgbButtons[2] = 0x00;
-		if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_DOWN) mouse.rgbButtons[3] = 0x80;
-		if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_UP)   mouse.rgbButtons[3] = 0x00;
-		if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_DOWN) mouse.rgbButtons[4] = 0x80;
-		if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_UP)   mouse.rgbButtons[4] = 0x00;
+			// update the button states; always update the corresponding mouse buttons
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) lightgun.rgbButtons[0] = 0x80;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_UP)   lightgun.rgbButtons[0] = 0x00;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_DOWN) lightgun.rgbButtons[1] = 0x80;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_UP)   lightgun.rgbButtons[1] = 0x00;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_DOWN) lightgun.rgbButtons[2] = 0x80;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_UP)   lightgun.rgbButtons[2] = 0x00;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_DOWN) lightgun.rgbButtons[3] = 0x80;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_UP)   lightgun.rgbButtons[3] = 0x00;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_DOWN) lightgun.rgbButtons[4] = 0x80;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_UP)   lightgun.rgbButtons[4] = 0x00;
+		}
 	}
 };
 
@@ -521,23 +583,22 @@ protected:
 	{
 		// Only handle raw input data
 		if (!input_enabled() || eventid != INPUT_EVENT_RAWINPUT)
-			return FALSE;
+			return false;
 
 		HRAWINPUT rawinputdevice = *static_cast<HRAWINPUT*>(eventdata);
 
 		BYTE small_buffer[4096];
 		std::unique_ptr<BYTE[]> larger_buffer;
 		LPBYTE data = small_buffer;
-		BOOL result;
 		UINT size;
 
 		// ignore if not enabled
 		if (!input_enabled())
-			return FALSE;
+			return false;
 
 		// determine the size of databuffer we need
 		if ((*get_rawinput_data)(rawinputdevice, RID_INPUT, nullptr, &size, sizeof(RAWINPUTHEADER)) != 0)
-			return FALSE;
+			return false;
 
 		// if necessary, allocate a temporary buffer and fetch the data
 		if (size > sizeof(small_buffer))
@@ -545,11 +606,11 @@ protected:
 			larger_buffer = std::make_unique<BYTE[]>(size);
 			data = larger_buffer.get();
 			if (data == nullptr)
-				return FALSE;
+				return false;
 		}
 
 		// fetch the data and process the appropriate message types
-		result = (*get_rawinput_data)(static_cast<HRAWINPUT>(rawinputdevice), RID_INPUT, data, &size, sizeof(RAWINPUTHEADER));
+		bool result = (*get_rawinput_data)(static_cast<HRAWINPUT>(rawinputdevice), RID_INPUT, data, &size, sizeof(RAWINPUTHEADER));
 		if (result)
 		{
 			std::lock_guard<std::mutex> scope_lock(m_module_lock);
@@ -565,7 +626,7 @@ protected:
 					if (input->header.hDevice == devinfo->device_handle())
 					{
 						devinfo->queue_events(input, 1);
-						result = TRUE;
+						result = true;
 					}
 				}
 			}
@@ -668,12 +729,61 @@ protected:
 	}
 };
 
+//============================================================
+//  lightgun_input_rawinput - rawinput lightgun module
+//============================================================
+
+class lightgun_input_rawinput : public rawinput_module
+{
+public:
+	lightgun_input_rawinput()
+		: rawinput_module(OSD_LIGHTGUNINPUT_PROVIDER, "rawinput")
+	{
+	}
+
+protected:
+	USHORT usagepage() override { return 1; }
+	USHORT usage() override { return 2; }
+	void add_rawinput_device(running_machine& machine, RAWINPUTDEVICELIST * device) override
+	{
+
+		// make sure this is a mouse
+		if (device->dwType != RIM_TYPEMOUSE)
+			return;
+
+		// allocate and link in a new device
+		rawinput_lightgun_device *devinfo = create_rawinput_device<rawinput_lightgun_device>(machine, device);
+		if (devinfo == nullptr)
+			return;
+
+		// populate the axes
+		for (int axisnum = 0; axisnum < 3; axisnum++)
+		{
+			devinfo->device()->add_item(
+				default_axis_name[axisnum],
+				static_cast<input_item_id>(ITEM_ID_XAXIS + axisnum),
+				generic_axis_get_state<LONG>,
+				&devinfo->lightgun.lX + axisnum);
+		}
+
+		// populate the buttons
+		for (int butnum = 0; butnum < 5; butnum++)
+		{
+			devinfo->device()->add_item(
+				default_button_name(butnum),
+				static_cast<input_item_id>(ITEM_ID_BUTTON1 + butnum),
+				generic_button_get_state<BYTE>,
+				&devinfo->lightgun.rgbButtons[butnum]);
+		}
+	}
+};
+
 #else
 MODULE_NOT_SUPPORTED(keyboard_input_rawinput, OSD_KEYBOARDINPUT_PROVIDER, "rawinput")
 MODULE_NOT_SUPPORTED(mouse_input_rawinput, OSD_MOUSEINPUT_PROVIDER, "rawinput")
-//MODULE_NOT_SUPPORTED(lightgun_input_rawinput, OSD_LIGHTGUNINPUT_PROVIDER, "rawinput")
+MODULE_NOT_SUPPORTED(lightgun_input_rawinput, OSD_LIGHTGUNINPUT_PROVIDER, "rawinput")
 #endif
 
 MODULE_DEFINITION(KEYBOARDINPUT_RAWINPUT, keyboard_input_rawinput)
 MODULE_DEFINITION(MOUSEINPUT_RAWINPUT, mouse_input_rawinput)
-//MODULE_DEFINITION(LIGHTGUNINPUT_RAWINPUT, lightgun_input_rawinput)
+MODULE_DEFINITION(LIGHTGUNINPUT_RAWINPUT, lightgun_input_rawinput)

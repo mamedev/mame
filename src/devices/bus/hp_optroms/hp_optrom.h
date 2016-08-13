@@ -14,6 +14,8 @@
 #define _HP_OPTROM_H_
 
 #include "emu.h"
+#include "softlist_dev.h"
+
 
 class hp_optrom_cart_device : public device_t,
 								public device_slot_card_interface
@@ -41,7 +43,7 @@ public:
 		virtual void device_config_complete() override;
 
 		// image-level overrides
-		virtual bool call_load() override;
+		virtual image_init_result call_load() override;
 		virtual void call_unload() override;
 		virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 

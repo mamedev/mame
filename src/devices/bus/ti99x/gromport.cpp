@@ -1071,7 +1071,7 @@ ROM_START( gkracker_rom )
 	ROM_LOAD("gkracker.bin", 0x0000, 0x2000, CRC(86eaaf9f) SHA1(a3bd5257c63e190800921b52dbe3ffa91ad91113))
 ROM_END
 
-const rom_entry *gkracker_device::device_rom_region() const
+const tiny_rom_entry *gkracker_device::device_rom_region() const
 {
 	return ROM_NAME( gkracker_rom );
 }
@@ -1293,7 +1293,7 @@ int ti99_cartridge_device::get_index_from_tagname()
 	return atoi(mytag+i+1)-1;
 }
 
-bool ti99_cartridge_device::call_load()
+image_init_result ti99_cartridge_device::call_load()
 {
 	// File name is in m_basename
 	// return true = error
@@ -1329,7 +1329,7 @@ bool ti99_cartridge_device::call_load()
 			logerror("Failed to load cartridge '%s': %s\n", basename(), err.to_string());
 			m_rpk = nullptr;
 			m_err = IMAGE_ERROR_INVALIDIMAGE;
-			return true;
+			return image_init_result::FAIL;
 		}
 	}
 
@@ -1386,7 +1386,7 @@ bool ti99_cartridge_device::call_load()
 	m_pcb->set_tag(tag());
 	m_slot = get_index_from_tagname();
 	m_connector->insert(m_slot, this);
-	return false;
+	return image_init_result::PASS;
 }
 
 void ti99_cartridge_device::call_unload()
@@ -1498,7 +1498,7 @@ ROM_START( cartridge_memory )
 	ROM_REGION(0x200000, CARTROM_TAG, ROMREGION_ERASE00)
 ROM_END
 
-const rom_entry *ti99_cartridge_device::device_rom_region() const
+const tiny_rom_entry *ti99_cartridge_device::device_rom_region() const
 {
 	return ROM_NAME( cartridge_memory );
 }

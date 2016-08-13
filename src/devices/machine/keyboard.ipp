@@ -5,6 +5,11 @@
 
 #pragma once
 
+// Work around for MSVC warning that identifies some of these as unused
+#ifdef _MSC_VER
+#pragma warning ( disable : 4505 )
+#endif
+
 #include "keyboard.h"
 
 #include <numeric>

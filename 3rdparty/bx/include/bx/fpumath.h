@@ -341,7 +341,7 @@ namespace bx
 		_result[2] = 1.0f / _a[2];
 	}
 
-	inline void vec3TangentFrame(const float* _n, float* _t, float* _b)
+	inline void vec3TangentFrame(const float* __restrict _n, float* __restrict _t, float* __restrict _b)
 	{
 		const float nx = _n[0];
 		const float ny = _n[1];
@@ -547,6 +547,30 @@ namespace bx
 		_result[0]  = _sx;
 		_result[5]  = _sy;
 		_result[10] = _sz;
+		_result[15] = 1.0f;
+	}
+
+	inline void mtxScale(float* _result, float _scale)
+	{
+		mtxScale(_result, _scale, _scale, _scale);
+	}
+
+	inline void mtxFromNormal(float* __restrict _result, const float* __restrict _normal, float _scale, const float* __restrict _pos)
+	{
+		float tangent[3];
+		float bitangent[3];
+		vec3TangentFrame(_normal, tangent, bitangent);
+
+		vec3Mul(&_result[ 0], bitangent, _scale);
+		vec3Mul(&_result[ 4], _normal,   _scale);
+		vec3Mul(&_result[ 8], tangent,   _scale);
+
+		_result[ 3] = 0.0f;
+		_result[ 7] = 0.0f;
+		_result[11] = 0.0f;
+		_result[12] = _pos[0];
+		_result[13] = _pos[1];
+		_result[14] = _pos[2];
 		_result[15] = 1.0f;
 	}
 

@@ -146,7 +146,7 @@ static const char *astrocade_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-bool astrocade_cart_slot_device::call_load()
+image_init_result astrocade_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -176,10 +176,10 @@ bool astrocade_cart_slot_device::call_load()
 
 		//printf("Type: %s\n", astrocade_get_slot(m_type));
 
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

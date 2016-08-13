@@ -19,7 +19,7 @@ function dummy.startplugin()
 	end)
 
 	local function menu_populate()
-		return {{ "This is a", "test", 32 }, { "Also a", "test", 0 }} -- 32 is MENU_FLAG_DISABLE
+		return {{ "This is a", "test", "off" }, { "Also a", "test", 0 }}
 	end
 
 	local function menu_callback(index, event)

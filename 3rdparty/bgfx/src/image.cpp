@@ -387,68 +387,68 @@ namespace bgfx
 		const uint8_t* src = (const uint8_t*)_src;
 
 		using namespace bx;
-		const float4_t unpack = float4_ld(1.0f, 1.0f/256.0f, 1.0f/65536.0f, 1.0f/16777216.0f);
-		const float4_t pack   = float4_ld(1.0f, 256.0f*0.5f, 65536.0f, 16777216.0f*0.5f);
-		const float4_t umask  = float4_ild(0xff, 0xff00, 0xff0000, 0xff000000);
-		const float4_t pmask  = float4_ild(0xff, 0x7f80, 0xff0000, 0x7f800000);
-		const float4_t wflip  = float4_ild(0, 0, 0, 0x80000000);
-		const float4_t wadd   = float4_ld(0.0f, 0.0f, 0.0f, 32768.0f*65536.0f);
-		const float4_t gamma  = float4_ld(1.0f/2.2f, 1.0f/2.2f, 1.0f/2.2f, 1.0f);
-		const float4_t linear = float4_ld(2.2f, 2.2f, 2.2f, 1.0f);
-		const float4_t quater = float4_splat(0.25f);
+		const simd128_t unpack = simd_ld(1.0f, 1.0f/256.0f, 1.0f/65536.0f, 1.0f/16777216.0f);
+		const simd128_t pack   = simd_ld(1.0f, 256.0f*0.5f, 65536.0f, 16777216.0f*0.5f);
+		const simd128_t umask  = simd_ild(0xff, 0xff00, 0xff0000, 0xff000000);
+		const simd128_t pmask  = simd_ild(0xff, 0x7f80, 0xff0000, 0x7f800000);
+		const simd128_t wflip  = simd_ild(0, 0, 0, 0x80000000);
+		const simd128_t wadd   = simd_ld(0.0f, 0.0f, 0.0f, 32768.0f*65536.0f);
+		const simd128_t gamma  = simd_ld(1.0f/2.2f, 1.0f/2.2f, 1.0f/2.2f, 1.0f);
+		const simd128_t linear = simd_ld(2.2f, 2.2f, 2.2f, 1.0f);
+		const simd128_t quater = simd_splat(0.25f);
 
 		for (uint32_t yy = 0, ystep = _pitch*2; yy < dstheight; ++yy, src += ystep)
 		{
 			const uint8_t* rgba = src;
 			for (uint32_t xx = 0; xx < dstwidth; ++xx, rgba += 8, dst += 4)
 			{
-				const float4_t abgr0  = float4_splat(rgba);
-				const float4_t abgr1  = float4_splat(rgba+4);
-				const float4_t abgr2  = float4_splat(rgba+_pitch);
-				const float4_t abgr3  = float4_splat(rgba+_pitch+4);
+				const simd128_t abgr0  = simd_splat(rgba);
+				const simd128_t abgr1  = simd_splat(rgba+4);
+				const simd128_t abgr2  = simd_splat(rgba+_pitch);
+				const simd128_t abgr3  = simd_splat(rgba+_pitch+4);
 
-				const float4_t abgr0m = float4_and(abgr0, umask);
-				const float4_t abgr1m = float4_and(abgr1, umask);
-				const float4_t abgr2m = float4_and(abgr2, umask);
-				const float4_t abgr3m = float4_and(abgr3, umask);
-				const float4_t abgr0x = float4_xor(abgr0m, wflip);
-				const float4_t abgr1x = float4_xor(abgr1m, wflip);
-				const float4_t abgr2x = float4_xor(abgr2m, wflip);
-				const float4_t abgr3x = float4_xor(abgr3m, wflip);
-				const float4_t abgr0f = float4_itof(abgr0x);
-				const float4_t abgr1f = float4_itof(abgr1x);
-				const float4_t abgr2f = float4_itof(abgr2x);
-				const float4_t abgr3f = float4_itof(abgr3x);
-				const float4_t abgr0c = float4_add(abgr0f, wadd);
-				const float4_t abgr1c = float4_add(abgr1f, wadd);
-				const float4_t abgr2c = float4_add(abgr2f, wadd);
-				const float4_t abgr3c = float4_add(abgr3f, wadd);
-				const float4_t abgr0n = float4_mul(abgr0c, unpack);
-				const float4_t abgr1n = float4_mul(abgr1c, unpack);
-				const float4_t abgr2n = float4_mul(abgr2c, unpack);
-				const float4_t abgr3n = float4_mul(abgr3c, unpack);
+				const simd128_t abgr0m = simd_and(abgr0, umask);
+				const simd128_t abgr1m = simd_and(abgr1, umask);
+				const simd128_t abgr2m = simd_and(abgr2, umask);
+				const simd128_t abgr3m = simd_and(abgr3, umask);
+				const simd128_t abgr0x = simd_xor(abgr0m, wflip);
+				const simd128_t abgr1x = simd_xor(abgr1m, wflip);
+				const simd128_t abgr2x = simd_xor(abgr2m, wflip);
+				const simd128_t abgr3x = simd_xor(abgr3m, wflip);
+				const simd128_t abgr0f = simd_itof(abgr0x);
+				const simd128_t abgr1f = simd_itof(abgr1x);
+				const simd128_t abgr2f = simd_itof(abgr2x);
+				const simd128_t abgr3f = simd_itof(abgr3x);
+				const simd128_t abgr0c = simd_add(abgr0f, wadd);
+				const simd128_t abgr1c = simd_add(abgr1f, wadd);
+				const simd128_t abgr2c = simd_add(abgr2f, wadd);
+				const simd128_t abgr3c = simd_add(abgr3f, wadd);
+				const simd128_t abgr0n = simd_mul(abgr0c, unpack);
+				const simd128_t abgr1n = simd_mul(abgr1c, unpack);
+				const simd128_t abgr2n = simd_mul(abgr2c, unpack);
+				const simd128_t abgr3n = simd_mul(abgr3c, unpack);
 
-				const float4_t abgr0l = float4_pow(abgr0n, linear);
-				const float4_t abgr1l = float4_pow(abgr1n, linear);
-				const float4_t abgr2l = float4_pow(abgr2n, linear);
-				const float4_t abgr3l = float4_pow(abgr3n, linear);
+				const simd128_t abgr0l = simd_pow(abgr0n, linear);
+				const simd128_t abgr1l = simd_pow(abgr1n, linear);
+				const simd128_t abgr2l = simd_pow(abgr2n, linear);
+				const simd128_t abgr3l = simd_pow(abgr3n, linear);
 
-				const float4_t sum0   = float4_add(abgr0l, abgr1l);
-				const float4_t sum1   = float4_add(abgr2l, abgr3l);
-				const float4_t sum2   = float4_add(sum0, sum1);
-				const float4_t avg0   = float4_mul(sum2, quater);
-				const float4_t avg1   = float4_pow(avg0, gamma);
+				const simd128_t sum0   = simd_add(abgr0l, abgr1l);
+				const simd128_t sum1   = simd_add(abgr2l, abgr3l);
+				const simd128_t sum2   = simd_add(sum0, sum1);
+				const simd128_t avg0   = simd_mul(sum2, quater);
+				const simd128_t avg1   = simd_pow(avg0, gamma);
 
-				const float4_t avg2   = float4_mul(avg1, pack);
-				const float4_t ftoi0  = float4_ftoi(avg2);
-				const float4_t ftoi1  = float4_and(ftoi0, pmask);
-				const float4_t zwxy   = float4_swiz_zwxy(ftoi1);
-				const float4_t tmp0   = float4_or(ftoi1, zwxy);
-				const float4_t yyyy   = float4_swiz_yyyy(tmp0);
-				const float4_t tmp1   = float4_iadd(yyyy, yyyy);
-				const float4_t result = float4_or(tmp0, tmp1);
+				const simd128_t avg2   = simd_mul(avg1, pack);
+				const simd128_t ftoi0  = simd_ftoi(avg2);
+				const simd128_t ftoi1  = simd_and(ftoi0, pmask);
+				const simd128_t zwxy   = simd_swiz_zwxy(ftoi1);
+				const simd128_t tmp0   = simd_or(ftoi1, zwxy);
+				const simd128_t yyyy   = simd_swiz_yyyy(tmp0);
+				const simd128_t tmp1   = simd_iadd(yyyy, yyyy);
+				const simd128_t result = simd_or(tmp0, tmp1);
 
-				float4_stx(dst, result);
+				simd_stx(dst, result);
 			}
 		}
 	}
@@ -630,8 +630,8 @@ namespace bgfx
 
 		using namespace bx;
 
-		const float4_t mf0f0 = float4_isplat(0xff00ff00);
-		const float4_t m0f0f = float4_isplat(0x00ff00ff);
+		const simd128_t mf0f0 = simd_isplat(0xff00ff00);
+		const simd128_t m0f0f = simd_isplat(0x00ff00ff);
 		const uint8_t* src = (uint8_t*) _src;
 		const uint8_t* next = src + _pitch;
 		uint8_t* dst = (uint8_t*)_dst;
@@ -642,14 +642,14 @@ namespace bgfx
 		{
 			for (uint32_t xx = 0; xx < width; ++xx, src += 16, dst += 16)
 			{
-				const float4_t tabgr = float4_ld(src);
-				const float4_t t00ab = float4_srl(tabgr, 16);
-				const float4_t tgr00 = float4_sll(tabgr, 16);
-				const float4_t tgrab = float4_or(t00ab, tgr00);
-				const float4_t ta0g0 = float4_and(tabgr, mf0f0);
-				const float4_t t0r0b = float4_and(tgrab, m0f0f);
-				const float4_t targb = float4_or(ta0g0, t0r0b);
-				float4_st(dst, targb);
+				const simd128_t tabgr = simd_ld(src);
+				const simd128_t t00ab = simd_srl(tabgr, 16);
+				const simd128_t tgr00 = simd_sll(tabgr, 16);
+				const simd128_t tgrab = simd_or(t00ab, tgr00);
+				const simd128_t ta0g0 = simd_and(tabgr, mf0f0);
+				const simd128_t t0r0b = simd_and(tgrab, m0f0f);
+				const simd128_t targb = simd_or(ta0g0, t0r0b);
+				simd_st(dst, targb);
 			}
 		}
 	}
@@ -707,6 +707,9 @@ namespace bgfx
 	{
 		const uint8_t* src = (const uint8_t*)_src;
 		_dst[0] = fromUnorm(src[0], 255.0f);
+		_dst[1] = 0.0f;
+		_dst[2] = 0.0f;
+		_dst[3] = 1.0f;
 	}
 
 	// R8S
@@ -720,6 +723,9 @@ namespace bgfx
 	{
 		const int8_t* src = (const int8_t*)_src;
 		_dst[0] = fromSnorm(src[0], 127.0f);
+		_dst[1] = 0.0f;
+		_dst[2] = 0.0f;
+		_dst[3] = 1.0f;
 	}
 
 	// R8I
@@ -733,6 +739,9 @@ namespace bgfx
 	{
 		const int8_t* src = (const int8_t*)_src;
 		_dst[0] = float(src[0]);
+		_dst[1] = 0.0f;
+		_dst[2] = 0.0f;
+		_dst[3] = 1.0f;
 	}
 
 	// R8U
@@ -746,6 +755,9 @@ namespace bgfx
 	{
 		const uint8_t* src = (const uint8_t*)_src;
 		_dst[0] = float(src[0]);
+		_dst[1] = 0.0f;
+		_dst[2] = 0.0f;
+		_dst[3] = 1.0f;
 	}
 
 	// RG8
@@ -761,6 +773,8 @@ namespace bgfx
 		const uint8_t* src = (const uint8_t*)_src;
 		_dst[0] = fromUnorm(src[0], 255.0f);
 		_dst[1] = fromUnorm(src[1], 255.0f);
+		_dst[2] = 0.0f;
+		_dst[3] = 1.0f;
 	}
 
 	// RG8S
@@ -776,6 +790,8 @@ namespace bgfx
 		const int8_t* src = (const int8_t*)_src;
 		_dst[0] = fromSnorm(src[0], 127.0f);
 		_dst[1] = fromSnorm(src[1], 127.0f);
+		_dst[2] = 0.0f;
+		_dst[3] = 1.0f;
 	}
 
 	// RG8I
@@ -791,6 +807,8 @@ namespace bgfx
 		const int8_t* src = (const int8_t*)_src;
 		_dst[0] = float(src[0]);
 		_dst[1] = float(src[1]);
+		_dst[2] = 0.0f;
+		_dst[3] = 1.0f;
 	}
 
 	// RG8U
@@ -806,6 +824,8 @@ namespace bgfx
 		const uint8_t* src = (const uint8_t*)_src;
 		_dst[0] = float(src[0]);
 		_dst[1] = float(src[1]);
+		_dst[2] = 0.0f;
+		_dst[3] = 1.0f;
 	}
 
 	// RGB8
@@ -823,6 +843,7 @@ namespace bgfx
 		_dst[0] = fromUnorm(src[0], 255.0f);
 		_dst[1] = fromUnorm(src[1], 255.0f);
 		_dst[2] = fromUnorm(src[2], 255.0f);
+		_dst[3] = 1.0f;
 	}
 
 	// RGB8S
@@ -840,6 +861,7 @@ namespace bgfx
 		_dst[0] = fromSnorm(src[0], 127.0f);
 		_dst[1] = fromSnorm(src[1], 127.0f);
 		_dst[2] = fromSnorm(src[2], 127.0f);
+		_dst[3] = 1.0f;
 	}
 
 	// RGB8I
@@ -857,6 +879,7 @@ namespace bgfx
 		_dst[0] = float(src[0]);
 		_dst[1] = float(src[1]);
 		_dst[2] = float(src[2]);
+		_dst[3] = 1.0f;
 	}
 
 	// RGB8U
@@ -874,6 +897,7 @@ namespace bgfx
 		_dst[0] = float(src[0]);
 		_dst[1] = float(src[1]);
 		_dst[2] = float(src[2]);
+		_dst[3] = 1.0f;
 	}
 
 	// BGRA8
@@ -982,6 +1006,9 @@ namespace bgfx
 	{
 		const uint16_t* src = (const uint16_t*)_src;
 		_dst[0] = fromUnorm(src[0], 65535.0f);
+		_dst[1] = 0.0f;
+		_dst[2] = 0.0f;
+		_dst[3] = 1.0f;
 	}
 
 	// R16S
@@ -995,6 +1022,9 @@ namespace bgfx
 	{
 		const int16_t* src = (const int16_t*)_src;
 		_dst[0] = fromSnorm(src[0], 32767.0f);
+		_dst[1] = 0.0f;
+		_dst[2] = 0.0f;
+		_dst[3] = 1.0f;
 	}
 
 	// R16I
@@ -1008,6 +1038,9 @@ namespace bgfx
 	{
 		const int16_t* src = (const int16_t*)_src;
 		_dst[0] = float(src[0]);
+		_dst[1] = 0.0f;
+		_dst[2] = 0.0f;
+		_dst[3] = 1.0f;
 	}
 
 	// R16U
@@ -1034,6 +1067,9 @@ namespace bgfx
 	{
 		const uint16_t* src = (const uint16_t*)_src;
 		_dst[0] = bx::halfToFloat(src[0]);
+		_dst[1] = 0.0f;
+		_dst[2] = 0.0f;
+		_dst[3] = 1.0f;
 	}
 
 	// RG16
@@ -1049,6 +1085,8 @@ namespace bgfx
 		const uint16_t* src = (const uint16_t*)_src;
 		_dst[0] = fromUnorm(src[0], 65535.0f);
 		_dst[1] = fromUnorm(src[1], 65535.0f);
+		_dst[2] = 0.0f;
+		_dst[3] = 1.0f;
 	}
 
 	// RG16S
@@ -1064,6 +1102,8 @@ namespace bgfx
 		const int16_t* src = (const int16_t*)_src;
 		_dst[0] = fromSnorm(src[0], 32767.0f);
 		_dst[1] = fromSnorm(src[1], 32767.0f);
+		_dst[2] = 0.0f;
+		_dst[3] = 1.0f;
 	}
 
 	// RG16I
@@ -1079,6 +1119,8 @@ namespace bgfx
 		const int16_t* src = (const int16_t*)_src;
 		_dst[0] = float(src[0]);
 		_dst[1] = float(src[1]);
+		_dst[2] = 0.0f;
+		_dst[3] = 1.0f;
 	}
 
 	// RG16U
@@ -1094,6 +1136,8 @@ namespace bgfx
 		const uint16_t* src = (const uint16_t*)_src;
 		_dst[0] = float(src[0]);
 		_dst[1] = float(src[1]);
+		_dst[2] = 0.0f;
+		_dst[3] = 1.0f;
 	}
 
 	// RG16F
@@ -1109,6 +1153,8 @@ namespace bgfx
 		const uint16_t* src = (const uint16_t*)_src;
 		_dst[0] = bx::halfToFloat(src[0]);
 		_dst[1] = bx::halfToFloat(src[1]);
+		_dst[2] = 0.0f;
+		_dst[3] = 1.0f;
 	}
 
 	// RGBA16
@@ -1389,6 +1435,7 @@ namespace bgfx
 		_dst[0] = float( ( (packed>>11) & 0x1f) ) / 31.0f;
 		_dst[1] = float( ( (packed>> 5) & 0x3f) ) / 63.0f;
 		_dst[2] = float( ( (packed    ) & 0x1f) ) / 31.0f;
+		_dst[3] = 1.0f;
 	}
 
 	// RGBA4
@@ -1507,6 +1554,7 @@ namespace bgfx
 		_dst[0] = bx::halfToFloat( (packed<< 4) & 0x7ff0);
 		_dst[1] = bx::halfToFloat( (packed>> 7) & 0x7ff0);
 		_dst[2] = bx::halfToFloat( (packed>>17) & 0x7fe0);
+		_dst[3] = 1.0f;
 	}
 
 	struct PackUnpack
@@ -3581,7 +3629,7 @@ namespace bgfx
 
 		default:
 			imageDecodeToBgra8(_dst, _src, _width, _height, _pitch, _format);
-			imageSwizzleBgra8(_width, _height, _pitch, _dst, _dst);
+			imageSwizzleBgra8(_width, _height, _width*4, _dst, _dst);
 			break;
 		}
 	}
@@ -3628,24 +3676,24 @@ namespace bgfx
 		const uint8_t* src = (const uint8_t*)_src;
 
 		using namespace bx;
-		const float4_t unpack = float4_ld(1.0f, 1.0f/256.0f, 1.0f/65536.0f, 1.0f/16777216.0f);
-		const float4_t umask  = float4_ild(0xff, 0xff00, 0xff0000, 0xff000000);
-		const float4_t wflip  = float4_ild(0, 0, 0, 0x80000000);
-		const float4_t wadd   = float4_ld(0.0f, 0.0f, 0.0f, 32768.0f*65536.0f);
+		const simd128_t unpack = simd_ld(1.0f, 1.0f/256.0f, 1.0f/65536.0f, 1.0f/16777216.0f);
+		const simd128_t umask  = simd_ild(0xff, 0xff00, 0xff0000, 0xff000000);
+		const simd128_t wflip  = simd_ild(0, 0, 0, 0x80000000);
+		const simd128_t wadd   = simd_ld(0.0f, 0.0f, 0.0f, 32768.0f*65536.0f);
 
 		for (uint32_t yy = 0, ystep = _pitch; yy < dstheight; ++yy, src += ystep)
 		{
 			const uint8_t* rgba = src;
 			for (uint32_t xx = 0; xx < dstwidth; ++xx, rgba += 4, dst += 4)
 			{
-				const float4_t abgr0  = float4_splat(rgba);
-				const float4_t abgr0m = float4_and(abgr0, umask);
-				const float4_t abgr0x = float4_xor(abgr0m, wflip);
-				const float4_t abgr0f = float4_itof(abgr0x);
-				const float4_t abgr0c = float4_add(abgr0f, wadd);
-				const float4_t abgr0n = float4_mul(abgr0c, unpack);
+				const simd128_t abgr0  = simd_splat(rgba);
+				const simd128_t abgr0m = simd_and(abgr0, umask);
+				const simd128_t abgr0x = simd_xor(abgr0m, wflip);
+				const simd128_t abgr0f = simd_itof(abgr0x);
+				const simd128_t abgr0c = simd_add(abgr0f, wadd);
+				const simd128_t abgr0n = simd_mul(abgr0c, unpack);
 
-				float4_st(dst, abgr0n);
+				simd_st(dst, abgr0n);
 			}
 		}
 	}

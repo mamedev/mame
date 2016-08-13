@@ -19,12 +19,12 @@
  */
 static UINT32 ones_u32(UINT32 val)
 {
-		val -= ((val >> 1) & 0x55555555);
-		val = (((val >> 2) & 0x33333333) + (val & 0x33333333));
-		val = (((val >> 4) + val) & 0x0f0f0f0f);
-		val += (val >> 8);
-		val += (val >> 16);
-		return (val & 0x0000003f);
+	val -= ((val >> 1) & 0x55555555);
+	val = (((val >> 2) & 0x33333333) + (val & 0x33333333));
+	val = (((val >> 4) + val) & 0x0f0f0f0f);
+	val += (val >> 8);
+	val += (val >> 16);
+	return val & 0x3f;
 }
 
 /**

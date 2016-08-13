@@ -1489,7 +1489,7 @@ static DISCRETE_SOUND_START(dplay)
 
 	/************************************************ * Cheer
 	************************************************/ /* Noise clock was
-    breadboarded and measured at 7700Hz */ DISCRETE_LFSR_NOISE(DPLAY_NOISE, 1,
+	breadboarded and measured at 7700Hz */ DISCRETE_LFSR_NOISE(DPLAY_NOISE, 1,
 	1, 7700, 12.0, 0, 12.0/2, &dplay_lfsr)
 
 	DISCRETE_INTEGRATE(NODE_50, DPLAY_CHEER_EN, 0, &dplay_cheer_integrate_info)

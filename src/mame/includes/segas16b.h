@@ -49,8 +49,12 @@ public:
 			m_atomicp_sound_divisor(0),
 			m_atomicp_sound_count(0),
 			m_hwc_input_value(0),
+			m_hwc_monitor(*this, "MONITOR"),
+			m_hwc_left(*this, "LEFT"),
+			m_hwc_right(*this, "RIGHT"),
 			m_mj_input_num(0),
 			m_mj_last_val(0),
+			m_mj_inputs(*this, {"MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5"}),
 			m_spritepalbase(0x400),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_sound_decrypted_opcodes(*this, "sound_decrypted_opcodes"),
@@ -216,8 +220,12 @@ protected:
 	// game-specific state
 	UINT8               m_atomicp_sound_count;
 	UINT8               m_hwc_input_value;
+	optional_ioport     m_hwc_monitor;
+	optional_ioport     m_hwc_left;
+	optional_ioport     m_hwc_right;
 	UINT8               m_mj_input_num;
 	UINT8               m_mj_last_val;
+	optional_ioport_array<6> m_mj_inputs;
 	int                 m_spritepalbase;
 
 	required_device<gfxdecode_device> m_gfxdecode;

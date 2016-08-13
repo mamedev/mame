@@ -86,14 +86,7 @@ public:
 			m_palette(*this, "palette"),
 			m_floppy0(*this, "fdc:0:525dd"),
 			m_floppy1(*this, "fdc:1:525dd"),
-			m_kb_row0(*this, "row0"),
-			m_kb_row1(*this, "row1"),
-			m_kb_row2(*this, "row2"),
-			m_kb_row3(*this, "row3"),
-			m_kb_row4(*this, "row4"),
-			m_kb_row5(*this, "row5"),
-			m_kb_row6(*this, "row6"),
-			m_kb_row7(*this, "row7"),
+			m_kb_rows(*this, {"row0", "row1", "row2", "row3", "row4", "row5", "row6", "row7"}),
 			m_kb_mod(*this, "modifiers"),
 			m_membank1(*this, "bank1"),
 			m_membank2(*this, "bank2"),
@@ -183,14 +176,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
-	required_ioport m_kb_row0;
-	required_ioport m_kb_row1;
-	required_ioport m_kb_row2;
-	required_ioport m_kb_row3;
-	required_ioport m_kb_row4;
-	required_ioport m_kb_row5;
-	required_ioport m_kb_row6;
-	required_ioport m_kb_row7;
+	required_ioport_array<8> m_kb_rows;
 	required_ioport m_kb_mod;
 	required_memory_bank m_membank1;
 	required_memory_bank m_membank2;
@@ -370,13 +356,12 @@ WRITE8_MEMBER(attache_state::rom_w)
 UINT16 attache_state::get_key()
 {
 	UINT8 row,bits,data;
-	ioport_port* keys[8] = { m_kb_row0, m_kb_row1, m_kb_row2, m_kb_row3, m_kb_row4, m_kb_row5, m_kb_row6, m_kb_row7 };
 	UINT8 res = 0;
 
 	// scan input ports
 	for(row=0;row<8;row++)
 	{
-		data = keys[row]->read();
+		data = m_kb_rows[row]->read();
 		for(bits=0;bits<8;bits++)
 		{
 			if(BIT(data,bits))

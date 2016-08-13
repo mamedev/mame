@@ -220,7 +220,7 @@ READ16_MEMBER( harddriv_state::hd68k_port0_r )
 	*/
 	screen_device &scr = m_gsp->screen();
 
-	int temp = ((m_sw1 ? m_sw1->read() : 0xff) << 8) | m_in0->read();
+	int temp = (m_sw1.read_safe(0xff) << 8) | m_in0->read();
 	if (get_hblank(scr)) temp ^= 0x0002;
 	temp ^= 0x0018;     /* both EOCs always high for now */
 	return temp;
@@ -270,7 +270,7 @@ READ16_MEMBER( harddriv_state::hda68k_port1_r )
 READ16_MEMBER( harddriv_state::hdc68k_wheel_r )
 {
 	/* grab the new wheel value and upconvert to 12 bits */
-	UINT16 new_wheel = (m_12badc[0] ? m_12badc[0]->read() : 0xffff) << 4;
+	UINT16 new_wheel = m_12badc[0].read_safe(0xffff) << 4;
 
 	/* hack to display the wheel position */
 	if (space.machine().input().code_pressed(KEYCODE_LSHIFT))
@@ -321,14 +321,14 @@ WRITE16_MEMBER( harddriv_state::hd68k_adc_control_w )
 	if (m_adc_control & 0x08)
 	{
 		m_adc8_select = m_adc_control & 0x07;
-		m_adc8_data = m_8badc[m_adc8_select] ? m_8badc[m_adc8_select]->read() : 0xffff;
+		m_adc8_data = m_8badc[m_adc8_select].read_safe(0xffff);
 	}
 
 	/* handle a write to the 12-bit ADC address select */
 	if (m_adc_control & 0x40)
 	{
 		m_adc12_select = (m_adc_control >> 4) & 0x03;
-		m_adc12_data = (m_12badc[m_adc12_select] ? m_12badc[m_adc12_select]->read() : 0xffff) << 4;
+		m_adc12_data = m_12badc[m_adc12_select].read_safe(0xffff) << 4;
 	}
 
 	/* bit 7 selects which byte of the 12 bit data to read */

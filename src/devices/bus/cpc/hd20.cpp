@@ -39,7 +39,7 @@ ROM_START( cpc_hd20 )
 	ROMX_LOAD( "x-ddos20.rom",   0x0000, 0x4000, CRC(c2d9cc03) SHA1(8a20788be5f957e84e849c226aa97b55b2a3aab9), ROM_BIOS(2) )
 ROM_END
 
-const rom_entry *cpc_hd20_device::device_rom_region() const
+const tiny_rom_entry *cpc_hd20_device::device_rom_region() const
 {
 	return ROM_NAME( cpc_hd20 );
 }

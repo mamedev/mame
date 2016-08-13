@@ -245,7 +245,7 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 		printf("ERROR: unexpected size offset %lu (%s)\n", offset, filename);
 		return 0;
 	}
-	filesize = LITTLE_ENDIANIZE_INT32(filesize);
+	filesize = little_endianize_int32(filesize);
 
 	/* read the RIFF file type and make sure it's a WAVE file */
 	file->read(buf, offset, 4, actual);
@@ -268,7 +268,7 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 		offset += actual;
 		file->read(&length, offset, 4, actual);
 		offset += actual;
-		length = LITTLE_ENDIANIZE_INT32(length);
+		length = little_endianize_int32(length);
 		if (memcmp(&buf[0], "fmt ", 4) == 0)
 			break;
 
@@ -284,7 +284,7 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 	/* read the format -- make sure it is PCM */
 	file->read(&temp16, offset, 2, actual);
 	offset += actual;
-	temp16 = LITTLE_ENDIANIZE_INT16(temp16);
+	temp16 = little_endianize_int16(temp16);
 	if (temp16 != 1)
 	{
 		printf("ERROR: unsupported format %u - only PCM is supported (%s)\n", temp16, filename);
@@ -294,7 +294,7 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 	/* number of channels -- only stereo is supported */
 	file->read(&temp16, offset, 2, actual);
 	offset += actual;
-	temp16 = LITTLE_ENDIANIZE_INT16(temp16);
+	temp16 = little_endianize_int16(temp16);
 	if (temp16 != 2)
 	{
 		printf("ERROR: unsupported number of channels %u - only stereo is supported (%s)\n", temp16, filename);
@@ -304,7 +304,7 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 	/* sample rate */
 	file->read(&rate, offset, 4, actual);
 	offset += actual;
-	rate = LITTLE_ENDIANIZE_INT32(rate);
+	rate = little_endianize_int32(rate);
 	if (rate != 44100)
 	{
 		printf("ERROR: unsupported samplerate %u - only 44100 is supported (%s)\n", rate, filename);
@@ -318,7 +318,7 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 	/* bits/sample */
 	file->read(&bits, offset, 2, actual);
 	offset += actual;
-	bits = LITTLE_ENDIANIZE_INT16(bits);
+	bits = little_endianize_int16(bits);
 	if (bits != 16)
 	{
 		printf("ERROR: unsupported bits/sample %u - only 16 is supported (%s)\n", bits, filename);
@@ -335,7 +335,7 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 		offset += actual;
 		file->read(&length, offset, 4, actual);
 		offset += actual;
-		length = LITTLE_ENDIANIZE_INT32(length);
+		length = little_endianize_int32(length);
 		if (memcmp(&buf[0], "data", 4) == 0)
 			break;
 

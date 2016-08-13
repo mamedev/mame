@@ -241,12 +241,12 @@ READ32_MEMBER( deco_mlc_state::mlc_spriteram_r )
 {
 	UINT32 retdata = 0;
 
-	if (mem_mask & 0xffff0000)
+	if (ACCESSING_BITS_16_31)
 	{
 		retdata |= 0xffff0000;
 	}
 
-	if (mem_mask & 0x0000ffff)
+	if (ACCESSING_BITS_0_15)
 	{
 		retdata |= m_mlc_spriteram[offset];
 	}
@@ -257,11 +257,11 @@ READ32_MEMBER( deco_mlc_state::mlc_spriteram_r )
 
 WRITE32_MEMBER( deco_mlc_state::mlc_spriteram_w )
 {
-	if (mem_mask & 0xffff0000)
+	if (ACCESSING_BITS_16_31)
 	{
 	}
 
-	if (mem_mask & 0x0000ffff)
+	if (ACCESSING_BITS_0_15)
 	{
 		data &=0x0000ffff;
 		COMBINE_DATA(&m_mlc_spriteram[offset]);

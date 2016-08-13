@@ -77,7 +77,7 @@ void atarig1_state::scanline_update(screen_device &screen, int scanline)
 	int offset = (scanline / 8) * 64 + 48;
 	if (offset >= 0x800)
 		return;
-	screen.update_partial(MAX(scanline - 1, 0));
+	screen.update_partial(std::max(scanline - 1, 0));
 
 	/* update the playfield scrolls */
 	for (i = 0; i < 8; i++)
@@ -91,7 +91,7 @@ void atarig1_state::scanline_update(screen_device &screen, int scanline)
 			int newscroll = ((word >> 6) + m_pfscroll_xoffset) & 0x1ff;
 			if (newscroll != m_playfield_xscroll)
 			{
-				screen.update_partial(MAX(scanline + i - 1, 0));
+				screen.update_partial(std::max(scanline + i - 1, 0));
 				m_playfield_tilemap->set_scrollx(0, newscroll);
 				m_playfield_xscroll = newscroll;
 			}
@@ -105,13 +105,13 @@ void atarig1_state::scanline_update(screen_device &screen, int scanline)
 			int newbank = word & 7;
 			if (newscroll != m_playfield_yscroll)
 			{
-				screen.update_partial(MAX(scanline + i - 1, 0));
+				screen.update_partial(std::max(scanline + i - 1, 0));
 				m_playfield_tilemap->set_scrolly(0, newscroll);
 				m_playfield_yscroll = newscroll;
 			}
 			if (newbank != m_playfield_tile_bank)
 			{
-				screen.update_partial(MAX(scanline + i - 1, 0));
+				screen.update_partial(std::max(scanline + i - 1, 0));
 				m_playfield_tilemap->mark_all_dirty();
 				m_playfield_tile_bank = newbank;
 			}

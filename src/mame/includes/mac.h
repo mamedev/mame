@@ -208,13 +208,7 @@ public:
 		m_mouse0(*this, "MOUSE0"),
 		m_mouse1(*this, "MOUSE1"),
 		m_mouse2(*this, "MOUSE2"),
-		m_key0(*this, "KEY0"),
-		m_key1(*this, "KEY1"),
-		m_key2(*this, "KEY2"),
-		m_key3(*this, "KEY3"),
-		m_key4(*this, "KEY4"),
-		m_key5(*this, "KEY5"),
-		m_key6(*this, "KEY6"),
+		m_keys(*this, {"KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6"}),
 		m_montype(*this, "MONTYPE"),
 		m_vram(*this,"vram"),
 		m_vram16(*this,"vram16"),
@@ -239,8 +233,8 @@ public:
 	optional_device<rtc3430042_device> m_rtc;
 
 	required_ioport m_mouse0, m_mouse1, m_mouse2;
-	required_ioport m_key0, m_key1, m_key2, m_key3, m_key4, m_key5;
-	optional_ioport m_key6, m_montype;
+	optional_ioport_array<7> m_keys;
+	optional_ioport m_montype;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

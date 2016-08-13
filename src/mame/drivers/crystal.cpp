@@ -318,7 +318,7 @@ READ32_MEMBER(crystal_state::FlipCount_r)
 
 WRITE32_MEMBER(crystal_state::FlipCount_w)
 {
-	if (mem_mask & 0x00ff0000)
+	if (ACCESSING_BITS_16_23)
 	{
 		int fc = (data >> 16) & 0xff;
 		if (fc == 1)
@@ -351,14 +351,14 @@ WRITE32_MEMBER(crystal_state::IntAck_w)
 {
 	UINT32 IntPend = space.read_dword(0x01800c0c);
 
-	if (mem_mask & 0xff)
+	if (ACCESSING_BITS_0_7)
 	{
 		IntPend &= ~(1 << (data & 0x1f));
 		space.write_dword(0x01800c0c, IntPend);
 		if (!IntPend)
 			m_maincpu->set_input_line(SE3208_INT, CLEAR_LINE);
 	}
-	if (mem_mask & 0xff00)
+	if (ACCESSING_BITS_8_15)
 		m_IntHigh = (data >> 8) & 7;
 }
 

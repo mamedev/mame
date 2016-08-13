@@ -878,7 +878,7 @@ READ8_MEMBER(arkanoid_state::hexaa_sub_90_r)
 }
 
 static ADDRESS_MAP_START( hexaa_sub_iomap, AS_IO, 8, arkanoid_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
+	ADDRESS_MAP_GLOBAL_MASK(0x9f)
 	AM_RANGE(0x00, 0x0f) AM_RAM // ?? could be communication with the other chip (protection?)
 	AM_RANGE(0x80, 0x80) AM_WRITE(hexaa_sub_80_w)
 	AM_RANGE(0x90, 0x90) AM_READ(hexaa_sub_90_r)

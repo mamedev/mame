@@ -245,6 +245,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, MOUSE_NONE);
 
 	REGISTER_MODULE(m_mod_man, LIGHTGUN_X11);
+	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_RAWINPUT);
 	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_WIN32);
 	REGISTER_MODULE(m_mod_man, LIGHTGUN_NONE);
 

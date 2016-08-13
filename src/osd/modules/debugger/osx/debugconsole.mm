@@ -156,19 +156,19 @@
 	consoleSize.height += consoleCurrent.height - [consoleScroll frame].size.height;
 	adjustment.width = regSize.width - regCurrent.width;
 	adjustment.height = regSize.height - regCurrent.height;
-	adjustment.width += MAX(dasmSize.width - dasmCurrent.width, consoleSize.width - consoleCurrent.width);
+	adjustment.width += std::max(dasmSize.width - dasmCurrent.width, consoleSize.width - consoleCurrent.width);
 
 	windowFrame.size.width += adjustment.width;
 	windowFrame.size.height += adjustment.height; // not used - better to go for fixed height
-	windowFrame.size.height = MIN(512.0, available.size.height);
-	windowFrame.size.width = MIN(windowFrame.size.width, available.size.width);
+	windowFrame.size.height = std::min(512.0, available.size.height);
+	windowFrame.size.width = std::min(windowFrame.size.width, available.size.width);
 	windowFrame.origin.x = available.origin.x + available.size.width - windowFrame.size.width;
 	windowFrame.origin.y = available.origin.y;
 	[window setFrame:windowFrame display:YES];
 
 	NSRect lhsFrame = [regScroll frame];
 	NSRect rhsFrame = [dasmSplit frame];
-	adjustment.width = MIN(regSize.width, ([regSplit frame].size.width - [regSplit dividerThickness]) / 2);
+	adjustment.width = std::min(regSize.width, ([regSplit frame].size.width - [regSplit dividerThickness]) / 2);
 	rhsFrame.origin.x -= lhsFrame.size.width - adjustment.width;
 	rhsFrame.size.width += lhsFrame.size.width - adjustment.width;
 	lhsFrame.size.width = adjustment.width;

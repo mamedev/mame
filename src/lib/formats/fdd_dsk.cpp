@@ -97,7 +97,7 @@ bool fdd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			secs[(track * 26) + sect] = hsec[2];
 			sec_sizes[(track * 26) + sect] = hsec[3];
 			fill_vals[(track * 26) + sect] = hsec[4];
-			sec_offs[(track * 26) + sect] = LITTLE_ENDIANIZE_INT32(*(UINT32 *)(hsec + 0x08));
+			sec_offs[(track * 26) + sect] = little_endianize_int32(*(UINT32 *)(hsec + 0x08));
 
 			curr_track_size += (128 << hsec[3]);
 			curr_num_sec++;

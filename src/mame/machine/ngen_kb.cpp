@@ -2,10 +2,10 @@
 // copyright-holders:Barry Rodewald
 // Convergent NGEN keyboard device
 /*
-	TODO: represent the real layout/scancodes for this keyboard.  The
-	current HLE just sends ASCII and hopes, with an additional 0xc0
-	"last key up" code.  We're also inheriting typematic behaviour from
-	the serial keyboard which may not be desirable.
+    TODO: represent the real layout/scancodes for this keyboard.  The
+    current HLE just sends ASCII and hopes, with an additional 0xc0
+    "last key up" code.  We're also inheriting typematic behaviour from
+    the serial keyboard which may not be desirable.
 */
 
 #include "ngen_kb.h"

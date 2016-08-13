@@ -60,13 +60,13 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 		set_minwidth(bounds.right - bounds.left);
 
 		bounds.top = bounds.left = 0;
-		bounds.right = bounds.bottom = EDGE_WIDTH + m_views[1]->maxwidth() + (2 * EDGE_WIDTH) + MAX(m_views[0]->maxwidth(), m_views[2]->maxwidth()) + EDGE_WIDTH;
+		bounds.right = bounds.bottom = EDGE_WIDTH + m_views[1]->maxwidth() + (2 * EDGE_WIDTH) + std::max(m_views[0]->maxwidth(), m_views[2]->maxwidth()) + EDGE_WIDTH;
 		AdjustWindowRectEx(&bounds, DEBUG_WINDOW_STYLE, FALSE, DEBUG_WINDOW_STYLE_EX);
 		set_maxwidth(bounds.right - bounds.left);
 
 		// position the window at the bottom-right
-		int const bestwidth = MIN(maxwidth(), work_bounds.right - work_bounds.left);
-		int const bestheight = MIN(500, work_bounds.bottom - work_bounds.top);
+		int const bestwidth = (std::min<UINT32>)(maxwidth(), work_bounds.right - work_bounds.left);
+		int const bestheight = (std::min<UINT32>)(500, work_bounds.bottom - work_bounds.top);
 		SetWindowPos(window(), HWND_TOP,
 					work_bounds.right - bestwidth, work_bounds.bottom - bestheight,
 					bestwidth, bestheight,

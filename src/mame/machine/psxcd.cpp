@@ -192,11 +192,11 @@ void psxcd_device::device_reset()
 	curpos.w = 0;
 }
 
-bool psxcd_device::call_load()
+image_init_result psxcd_device::call_load()
 {
-	bool ret = cdrom_image_device::call_load();
+	image_init_result ret = cdrom_image_device::call_load();
 	open = true;
-	if(ret == IMAGE_INIT_PASS)
+	if(ret == image_init_result::PASS)
 		add_system_event(event_change_disk, m_sysclock, nullptr); // 1 sec to spin up the disk
 	return ret;
 }
@@ -1322,7 +1322,7 @@ ROM_START( psxcd )
 	ROMX_LOAD( "sc430920.s19", 0x0000, 0xb195, CRC(8380a5a2) SHA1(6fe45fd6fb96b12a25a45f39b5efd0be5e3f3e86), ROM_BIOS(16) )
 ROM_END
 
-const rom_entry *psxcd_device::device_rom_region() const
+const tiny_rom_entry *psxcd_device::device_rom_region() const
 {
 	return ROM_NAME( psxcd );
 }

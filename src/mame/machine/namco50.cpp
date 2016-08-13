@@ -275,7 +275,7 @@ machine_config_constructor namco_50xx_device::device_mconfig_additions() const
 //  the device's ROM definitions
 //-------------------------------------------------
 
-const rom_entry *namco_50xx_device::device_rom_region() const
+const tiny_rom_entry *namco_50xx_device::device_rom_region() const
 {
 	return ROM_NAME(namco_50xx );
 }

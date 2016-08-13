@@ -16,8 +16,8 @@ enum
 	APEXC_STATE,    /* whether CPU is running */
 
 	APEXC_ML_FULL,  /* read-only pseudo-register for exclusive use by the control panel code
-                    in the apexc driver : enables it to get the complete address computed
-                    from the contents of ML and WS */
+	                in the apexc driver : enables it to get the complete address computed
+	                from the contents of ML and WS */
 	APEXC_PC    /* doesn't actually exist; is there for the disassembler */
 };
 

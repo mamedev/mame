@@ -190,7 +190,7 @@ public:
 	UINT8 m_bg3_priority_bit;
 	UINT8 m_direct_color;
 	UINT8 m_ppu_last_scroll;      /* as per Anomie's doc and Theme Park, all scroll regs shares (but mode 7 ones) the same
-                                   'previous' scroll value */
+	                               'previous' scroll value */
 	UINT8 m_mode7_last_scroll;    /* as per Anomie's doc mode 7 scroll regs use a different value, shared with mode 7 matrix! */
 
 	UINT8 m_ppu1_open_bus, m_ppu2_open_bus;
@@ -278,6 +278,11 @@ protected:
 
 private:
 	devcb_read16  m_openbus_cb;
+	optional_ioport m_options;
+	optional_ioport m_debug1;
+	optional_ioport m_debug2;
+	optional_ioport m_debug3;
+	optional_ioport m_debug4;
 };
 
 

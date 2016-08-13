@@ -56,22 +56,22 @@ sed1200f0b_device::sed1200f0b_device(const machine_config &mconfig, const char *
 {
 }
 
-const rom_entry *sed1200d0a_device::device_rom_region() const
+const tiny_rom_entry *sed1200d0a_device::device_rom_region() const
 {
 	return ROM_NAME(sed1200x0a);
 }
 
-const rom_entry *sed1200f0a_device::device_rom_region() const
+const tiny_rom_entry *sed1200f0a_device::device_rom_region() const
 {
 	return ROM_NAME(sed1200x0a);
 }
 
-const rom_entry *sed1200d0b_device::device_rom_region() const
+const tiny_rom_entry *sed1200d0b_device::device_rom_region() const
 {
 	return ROM_NAME(sed1200x0b);
 }
 
-const rom_entry *sed1200f0b_device::device_rom_region() const
+const tiny_rom_entry *sed1200f0b_device::device_rom_region() const
 {
 	return ROM_NAME(sed1200x0b);
 }

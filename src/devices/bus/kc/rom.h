@@ -29,7 +29,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// kcexp_interface overrides
 	virtual UINT8 module_id_r() override { return 0xfb; }

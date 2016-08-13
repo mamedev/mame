@@ -29,7 +29,7 @@ ROM_START( x68k_cz6bs1 )
 	ROM_LOAD16_WORD_SWAP( "scsiexrom.bin",   0x0000, 0x2000, CRC(7be488de) SHA1(49616c09a8986ffe6a12ad600febe512f7ba8ae4) )
 ROM_END
 
-const rom_entry *x68k_scsiext_device::device_rom_region() const
+const tiny_rom_entry *x68k_scsiext_device::device_rom_region() const
 {
 	return ROM_NAME( x68k_cz6bs1 );
 }

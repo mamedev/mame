@@ -9,20 +9,26 @@
     http://www.best-electronics-ca.com/portfoli.htm
     http://www.atari-portfolio.co.uk/pfnews/pf9.txt
 
+	Command line for dual RAM expansion with A: File Manager ROM card and B: RAM card
+    ./mess64 pofo -exp ram -exp:ram:exp ram2 -cart1 fileman -exp:ram:ccmb ram
+
 */
 
 /*
 
     TODO:
 
-    - clock is running too fast
-    - create chargen ROM from tech manual
-    - memory error interrupt vector
+	- cursor is missing
+	- where do CDET and NMD1 connect to ??
     - i/o port 8051
     - screen contrast
     - system tick frequency selection (1 or 128 Hz)
-    - speaker
-    - credit card memory (A:/B:)
+    - soft power off
+    - LCD board
+    	- HD61830A00
+    	- 5816 2Kx8 RAM
+    	- 27C256 32Kx8 EPROM
+    	- PCD3311T DTMF generator @ 3.578640MHz
 
 */
 
@@ -30,18 +36,34 @@
 #include "rendlay.h"
 #include "softlist.h"
 #include "cpu/i86/i86.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+#include "bus/pofo/ccm.h"
 #include "bus/pofo/exp.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
-#include "sound/speaker.h"
+#include "sound/pcd3311.h"
 #include "video/hd61830.h"
+
+
+
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+#define LOG 0
 
 #define M80C88A_TAG     "u1"
 #define HD61830_TAG     "hd61830"
+#define PCD3311T_TAG	"pcd3311t"
 #define TIMER_TICK_TAG  "tick"
 #define SCREEN_TAG      "screen"
+
+static const UINT8 INTERRUPT_VECTOR[] = { 0x08, 0x09, 0x00 };
+
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
 class portfolio_state : public driver_device
 {
@@ -50,9 +72,12 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, M80C88A_TAG),
 		m_lcdc(*this, HD61830_TAG),
-		m_speaker(*this, "speaker"),
+		m_dtmf(*this, PCD3311T_TAG),
+		m_ccm(*this, PORTFOLIO_MEMORY_CARD_SLOT_A_TAG),
 		m_exp(*this, PORTFOLIO_EXPANSION_SLOT_TAG),
 		m_timer_tick(*this, TIMER_TICK_TAG),
+		m_nvram(*this, "nvram"),
+		m_ram(*this, "ram"),
 		m_rom(*this, M80C88A_TAG),
 		m_char_rom(*this, HD61830_TAG),
 		m_y0(*this, "Y0"),
@@ -64,15 +89,17 @@ public:
 		m_y6(*this, "Y6"),
 		m_y7(*this, "Y7"),
 		m_battery(*this, "BATTERY"),
-		m_contrast(*this, "contrast"),
-		m_ram(*this, RAM_TAG)
+		m_keylatch(0xff)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<hd61830_device> m_lcdc;
-	required_device<speaker_sound_device> m_speaker;
+	required_device<pcd3311_t> m_dtmf;
+	required_device<portfolio_memory_card_slot_t> m_ccm;
 	required_device<portfolio_expansion_slot_t> m_exp;
 	required_device<timer_device> m_timer_tick;
+	required_device<nvram_device> m_nvram;
+	required_device<ram_device> m_ram;
 	required_region_ptr<UINT8> m_rom;
 	required_region_ptr<UINT8> m_char_rom;
 	required_ioport m_y0;
@@ -100,51 +127,48 @@ public:
 		INT_EXTERNAL
 	};
 
+	enum
+	{
+		ROM_APP,
+		CCM_A,
+		CCM_B,
+		ROM_EXT
+	};
+
+	DECLARE_READ8_MEMBER( mem_r );
+	DECLARE_WRITE8_MEMBER( mem_w );
+
+	DECLARE_READ8_MEMBER( io_r );
+	DECLARE_WRITE8_MEMBER( io_w );
+
 	DECLARE_READ8_MEMBER( irq_status_r );
 	DECLARE_READ8_MEMBER( keyboard_r );
 	DECLARE_READ8_MEMBER( battery_r );
 	DECLARE_READ8_MEMBER( counter_r );
 
 	DECLARE_WRITE8_MEMBER( irq_mask_w );
-	DECLARE_WRITE8_MEMBER( speaker_w );
+	DECLARE_WRITE8_MEMBER( dtmf_w );
 	DECLARE_WRITE8_MEMBER( power_w );
-	DECLARE_WRITE8_MEMBER( unknown_w );
+	DECLARE_WRITE8_MEMBER( select_w );
 	DECLARE_WRITE8_MEMBER( counter_w );
+	DECLARE_WRITE8_MEMBER( contrast_w );
 
 	DECLARE_WRITE_LINE_MEMBER( iint_w );
 	DECLARE_WRITE_LINE_MEMBER( eint_w );
 
-	/* interrupt state */
-	UINT8 m_ip;                         /* interrupt pending */
-	UINT8 m_ie;                         /* interrupt enable */
-
-	/* counter state */
+	UINT8 m_ip;
+	UINT8 m_ie;
 	UINT16 m_counter;
-
-	/* keyboard state */
 	UINT8 m_keylatch;
+	int m_rom_b;
 
-	/* video state */
-	required_shared_ptr<UINT8> m_contrast;
-
-	/* peripheral state */
 	DECLARE_PALETTE_INIT(portfolio);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(system_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(counter_tick);
 	DECLARE_READ8_MEMBER(hd61830_rd_r);
 	IRQ_CALLBACK_MEMBER(portfolio_int_ack);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( portfolio_cart );
-	required_device<ram_device> m_ram;
 };
-
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-static const UINT8 INTERRUPT_VECTOR[] = { 0x08, 0x09, 0x00 };
 
 
 
@@ -178,6 +202,29 @@ void portfolio_state::trigger_interrupt(int level)
 
 
 //-------------------------------------------------
+//  iint_w - internal interrupt
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( portfolio_state::iint_w )
+{
+	// TODO
+}
+
+
+//-------------------------------------------------
+//  eint_w - external interrupt
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( portfolio_state::eint_w )
+{
+	if (state)
+	{
+		trigger_interrupt(INT_EXTERNAL);
+	}
+}
+
+
+//-------------------------------------------------
 //  irq_status_r - interrupt status read
 //-------------------------------------------------
 
@@ -194,7 +241,8 @@ READ8_MEMBER( portfolio_state::irq_status_r )
 WRITE8_MEMBER( portfolio_state::irq_mask_w )
 {
 	m_ie = data;
-	//logerror("IE %02x\n", data);
+
+	if (LOG) logerror("%s %s IE %01x\n", machine().time().as_string(), machine().describe_context(), data);
 
 	check_interrupt();
 }
@@ -214,6 +262,8 @@ IRQ_CALLBACK_MEMBER(portfolio_state::portfolio_int_ack)
 		{
 			// clear interrupt pending bit
 			m_ip &= ~(1 << i);
+
+			if (LOG) logerror("%s %s IP %01x\n", machine().time().as_string(), machine().describe_context(), m_ip);
 
 			if (i == 3)
 				vector = m_exp->eack_r();
@@ -275,7 +325,7 @@ void portfolio_state::scan_keyboard()
 	else
 	{
 		// key released
-		if (m_keylatch != 0xff)
+		if (!(m_keylatch & 0x80))
 		{
 			m_keylatch |= 0x80;
 
@@ -307,33 +357,36 @@ READ8_MEMBER( portfolio_state::keyboard_r )
 
 
 //**************************************************************************
-//  INTERNAL SPEAKER
+//  SOUND
 //**************************************************************************
 
 //-------------------------------------------------
-//  speaker_w - internal speaker output
+//  dtmf_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( portfolio_state::speaker_w )
+WRITE8_MEMBER( portfolio_state::dtmf_w )
 {
 	/*
 
 	    bit     description
 
-	    0
-	    1
-	    2
-	    3
-	    4
-	    5
-	    6
-	    7       speaker level
+	    0		PCD3311T D0
+	    1		PCD3311T D1
+	    2		PCD3311T D2
+	    3		PCD3311T D3
+	    4		PCD3311T D4
+	    5		PCD3311T D5
+	    6		PCD3311T STROBE
+	    7       PCD3311T VDD,MODE,A0
 
 	*/
 
-	m_speaker->level_w(!BIT(data, 7));
+	if (LOG) logerror("%s %s DTMF %02x\n", machine().time().as_string(), machine().describe_context(), data);
 
-	//logerror("SPEAKER %02x\n", data);
+	m_dtmf->mode_w(!BIT(data, 7));
+	m_dtmf->a0_w(!BIT(data, 7));
+	m_dtmf->write(space, 0, data & 0x3f);
+	m_dtmf->strobe_w(BIT(data, 6));
 }
 
 
@@ -363,7 +416,12 @@ WRITE8_MEMBER( portfolio_state::power_w )
 
 	*/
 
-	//logerror("POWER %02x\n", data);
+	if (LOG) logerror("%s %s POWER %02x\n", machine().time().as_string(), machine().describe_context(), data);
+
+	if (BIT(data, 1))
+	{
+		// TODO power off
+	}
 }
 
 
@@ -377,36 +435,59 @@ READ8_MEMBER( portfolio_state::battery_r )
 
 	    bit     signal      description
 
-	    0
-	    1
-	    2
-	    3
-	    4
+	    0		?			1=boots from B:
+	    1		?			1=boots from external ROM
+	    2		?			1=boots from B:
+	    3		?			1=boots from ???
+	    4		?
 	    5       PDET        1=peripheral connected
 	    6       BATD?       0=battery low
-	    7                   1=cold boot
+	    7       ?           1=cold boot
 
 	*/
 
 	UINT8 data = 0;
 
-	/* peripheral detect */
+	// peripheral detect
 	data |= m_exp->pdet_r() << 5;
 
-	/* battery status */
-	data |= BIT(m_battery->read(), 0) << 6;
+	// battery status
+	data |= (m_battery->read() & 0x03) << 6;
 
 	return data;
 }
 
 
 //-------------------------------------------------
-//  unknown_w - ?
+//  select_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( portfolio_state::unknown_w )
+WRITE8_MEMBER( portfolio_state::select_w )
 {
-	//logerror("UNKNOWN %02x\n", data);
+	/*
+
+	    bit     description
+
+	    0		?
+	    1		?
+	    2		?
+	    3		?
+	    4
+	    5       
+	    6       ?
+	    7       ?
+
+	*/
+
+	if (LOG) logerror("%s %s SELECT %02x\n", machine().time().as_string(), machine().describe_context(), data);
+
+	switch (data & 0x0f)
+	{
+	case 3: m_rom_b = CCM_A; break;
+	case 7: m_rom_b = CCM_B; break;
+	case 0: m_rom_b = ROM_APP; break;
+	case 2: m_rom_b = ROM_EXT; break;
+	}
 }
 
 
@@ -421,7 +502,7 @@ WRITE8_MEMBER( portfolio_state::unknown_w )
 
 TIMER_DEVICE_CALLBACK_MEMBER(portfolio_state::system_tick)
 {
-	trigger_interrupt(INT_TICK);
+	//trigger_interrupt(INT_TICK);
 }
 
 
@@ -450,7 +531,7 @@ READ8_MEMBER( portfolio_state::counter_r )
 		break;
 
 	case 1:
-		data = m_counter >> 1;
+		data = m_counter >> 8;
 		break;
 	}
 
@@ -479,6 +560,223 @@ WRITE8_MEMBER( portfolio_state::counter_w )
 
 
 //**************************************************************************
+//  MEMORY MAPPING
+//**************************************************************************
+
+//-------------------------------------------------
+//  mem_r -
+//-------------------------------------------------
+
+READ8_MEMBER( portfolio_state::mem_r )
+{
+	UINT8 data = 0;
+
+	int iom = 0;
+	int bcom = 1;
+	int ncc1 = 1;
+	
+	if (offset < 0x1f000)
+	{
+		data = m_ram->read(offset);
+	}
+	else if (offset >= 0xb0000 && offset < 0xc0000)
+	{
+		data = m_ram->read(0x1f000 + (offset & 0xfff));
+	}
+	else if (offset >= 0xc0000 && offset < 0xe0000)
+	{
+		switch (m_rom_b)
+		{
+		case ROM_APP:
+			data = m_rom[offset & 0x3ffff];
+			break;
+
+		case CCM_A:
+			if (LOG) logerror("%s %s CCM0 read %05x\n", machine().time().as_string(), machine().describe_context(), offset & 0x1ffff);
+
+			data = m_ccm->nrdi_r(space, offset & 0x1ffff);
+			break;
+
+		case CCM_B:
+			ncc1 = 0;
+			break;
+
+		case ROM_EXT:
+			// TODO
+			break;
+		}
+	}
+	else if (offset >= 0xe0000)
+	{
+		data = m_rom[offset & 0x3ffff];
+	}
+
+	data = m_exp->nrdi_r(space, offset, data, iom, bcom, ncc1);
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  mem_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( portfolio_state::mem_w )
+{
+	int iom = 0;
+	int bcom = 1;
+	int ncc1 = 1;
+	
+	if (offset < 0x1f000)
+	{
+		m_ram->write(offset, data);
+	}
+	else if (offset >= 0xb0000 && offset < 0xc0000)
+	{
+		m_ram->write(0x1f000 + (offset & 0xfff), data);
+	}
+	else if (offset >= 0xc0000 && offset < 0xe0000)
+	{
+		switch (m_rom_b)
+		{
+		case CCM_A:
+			if (LOG) logerror("%s %s CCM0 write %05x:%02x\n", machine().time().as_string(), machine().describe_context(), offset & 0x1ffff, data);
+
+			m_ccm->nwri_w(space, offset & 0x1ffff, data);
+			break;
+
+		case CCM_B:
+			ncc1 = 0;
+			break;
+		}
+	}
+
+	m_exp->nwri_w(space, offset, data, iom, bcom, ncc1);
+}
+
+
+//-------------------------------------------------
+//  io_r -
+//-------------------------------------------------
+
+READ8_MEMBER( portfolio_state::io_r )
+{
+	UINT8 data = 0;
+
+	int iom = 1;
+	int bcom = 1;
+	int ncc1 = 0;
+
+	if ((offset & 0xff00) == 0x8000)
+	{
+		switch ((offset >> 4) & 0x0f)
+		{
+		case 0:
+			data = keyboard_r(space, 0);
+			break;
+		
+		case 1:
+			if (offset & 0x01)
+			{
+				data = m_lcdc->status_r(space, 0);
+			}
+			else
+			{
+				data = m_lcdc->data_r(space, 0);
+			}
+			break;
+
+		case 4:
+			data = counter_r(space, offset & 0x01);
+			break;
+		
+		case 5:
+			if (offset & 0x01)
+			{
+				data = battery_r(space, 0);
+			}
+			else
+			{
+				data = irq_status_r(space, 0);
+			}
+			break;
+		
+		case 7:
+			bcom = 0;
+			break;
+		}
+	}
+
+	data = m_exp->nrdi_r(space, offset, data, iom, bcom, ncc1);
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  io_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( portfolio_state::io_w )
+{
+	int iom = 1;
+	int bcom = 1;
+	int ncc1 = 0;
+
+	if ((offset & 0xff00) == 0x8000)
+	{
+		switch ((offset >> 4) & 0x0f)
+		{
+		case 1:
+			if (offset & 0x01)
+			{
+				m_lcdc->control_w(space, 0, data);
+			}
+			else
+			{
+				m_lcdc->data_w(space, 0, data);
+			}
+			break;
+		
+		case 2:
+			dtmf_w(space, 0, data);
+			break;
+		
+		case 3:
+			power_w(space, 0, data);
+			break;
+		
+		case 4:
+			counter_w(space, offset & 0x01, data);
+			break;
+		
+		case 5:
+			if (offset & 0x01)
+			{
+				select_w(space, 0, data);
+			}
+			else
+			{
+				irq_mask_w(space, 0, data);
+			}
+			break;
+		
+		case 6:
+			contrast_w(space, 0, data);
+			break;
+		
+		case 7:
+			bcom = 0;
+			break;
+		}
+	}
+
+	m_exp->nwri_w(space, offset, data, iom, bcom, ncc1);
+}
+
+
+
+//**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
 
@@ -487,11 +785,7 @@ WRITE8_MEMBER( portfolio_state::counter_w )
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( portfolio_mem, AS_PROGRAM, 8, portfolio_state )
-	AM_RANGE(0x00000, 0x1efff) AM_RAM AM_SHARE("nvram1")
-	AM_RANGE(0x1f000, 0x9efff) AM_RAM // expansion
-	AM_RANGE(0xb0000, 0xb0fff) AM_MIRROR(0xf000) AM_RAM AM_SHARE("nvram2") // video RAM
-	AM_RANGE(0xc0000, 0xdffff) AM_ROM AM_REGION(M80C88A_TAG, 0) // or credit card memory
-	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION(M80C88A_TAG, 0x20000)
+	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(mem_r, mem_w)
 ADDRESS_MAP_END
 
 
@@ -500,15 +794,17 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( portfolio_io, AS_IO, 8, portfolio_state )
-	AM_RANGE(0x8000, 0x8000) AM_READ(keyboard_r)
-	AM_RANGE(0x8010, 0x8010) AM_DEVREADWRITE(HD61830_TAG, hd61830_device, data_r, data_w)
-	AM_RANGE(0x8011, 0x8011) AM_DEVREADWRITE(HD61830_TAG, hd61830_device, status_r, control_w)
-	AM_RANGE(0x8020, 0x8020) AM_WRITE(speaker_w)
-	AM_RANGE(0x8030, 0x8030) AM_WRITE(power_w)
-	AM_RANGE(0x8040, 0x8041) AM_READWRITE(counter_r, counter_w)
-	AM_RANGE(0x8050, 0x8050) AM_READWRITE(irq_status_r, irq_mask_w)
-	AM_RANGE(0x8051, 0x8051) AM_READWRITE(battery_r, unknown_w)
-	AM_RANGE(0x8060, 0x8060) AM_RAM AM_SHARE("contrast")
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_r, io_w)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( portfolio_lcdc )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( portfolio_lcdc, AS_0, 8, portfolio_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -606,6 +902,9 @@ static INPUT_PORTS_START( portfolio )
 	PORT_CONFNAME( 0x01, 0x01, "Battery Status" )
 	PORT_CONFSETTING( 0x01, DEF_STR( Normal ) )
 	PORT_CONFSETTING( 0x00, "Low Battery" )
+	PORT_CONFNAME( 0x02, 0x00, "Boot" )
+	PORT_CONFSETTING( 0x02, "Cold" )
+	PORT_CONFSETTING( 0x00, "Warm" )
 INPUT_PORTS_END
 
 
@@ -614,10 +913,24 @@ INPUT_PORTS_END
 //  VIDEO
 //**************************************************************************
 
+//-------------------------------------------------
+//  contrast_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( portfolio_state::contrast_w )
+{
+	if (LOG) logerror("%s %s CONTRAST %02x\n", machine().time().as_string(), machine().describe_context(), data);
+}
+
+
+//-------------------------------------------------
+//  PALETTE_INIT( portfolio )
+//-------------------------------------------------
+
 PALETTE_INIT_MEMBER(portfolio_state, portfolio)
 {
-	palette.set_pen_color(0, rgb_t(138, 146, 148));
-	palette.set_pen_color(1, rgb_t(92, 83, 88));
+	palette.set_pen_color(0, rgb_t(142, 193, 172));
+	palette.set_pen_color(1, rgb_t(67, 71, 151));
 }
 
 
@@ -627,6 +940,7 @@ PALETTE_INIT_MEMBER(portfolio_state, portfolio)
 
 READ8_MEMBER( portfolio_state::hd61830_rd_r )
 {
+	// TODO with real ROM: offs_t address = ((offset & 0xff) << 4) | ((offset >> 12) & 0x0f);
 	UINT16 address = ((offset & 0xff) << 3) | ((offset >> 12) & 0x07);
 	UINT8 data = m_char_rom[address];
 
@@ -661,35 +975,6 @@ GFXDECODE_END
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-WRITE_LINE_MEMBER( portfolio_state::iint_w )
-{
-}
-
-WRITE_LINE_MEMBER( portfolio_state::eint_w )
-{
-	if (state)
-		trigger_interrupt(INT_EXTERNAL);
-}
-
-//**************************************************************************
-//  IMAGE LOADING
-//**************************************************************************
-
-//-------------------------------------------------
-//  DEVICE_IMAGE_LOAD( portfolio_cart )
-//-------------------------------------------------
-
-DEVICE_IMAGE_LOAD_MEMBER( portfolio_state, portfolio_cart )
-{
-	return IMAGE_INIT_FAIL;
-}
-
-
-
-//**************************************************************************
 //  MACHINE INITIALIZATION
 //**************************************************************************
 
@@ -699,29 +984,14 @@ DEVICE_IMAGE_LOAD_MEMBER( portfolio_state, portfolio_cart )
 
 void portfolio_state::machine_start()
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
+	m_nvram->set_base(m_ram->pointer(), m_ram->size());
 
-	/* memory expansions */
-	switch (m_ram->size())
-	{
-	case 128 * 1024:
-		program.unmap_readwrite(0x1f000, 0x9efff);
-		break;
-
-	case 384 * 1024:
-		program.unmap_readwrite(0x5f000, 0x9efff);
-		break;
-	}
-
-	/* set initial values */
-	m_keylatch = 0xff;
-
-	/* register for state saving */
+	// state saving
 	save_item(NAME(m_ip));
 	save_item(NAME(m_ie));
 	save_item(NAME(m_counter));
 	save_item(NAME(m_keylatch));
-	save_pointer(NAME(m_contrast.target()), m_contrast.bytes());
+	save_item(NAME(m_rom_b));
 }
 
 
@@ -731,6 +1001,9 @@ void portfolio_state::machine_start()
 
 void portfolio_state::machine_reset()
 {
+	m_lcdc->reset();
+
+	m_exp->reset();
 }
 
 
@@ -744,13 +1017,13 @@ void portfolio_state::machine_reset()
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( portfolio, portfolio_state )
-	/* basic machine hardware */
+	// basic machine hardware
 	MCFG_CPU_ADD(M80C88A_TAG, I8088, XTAL_4_9152MHz)
 	MCFG_CPU_PROGRAM_MAP(portfolio_mem)
 	MCFG_CPU_IO_MAP(portfolio_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(portfolio_state,portfolio_int_ack)
 
-	/* video hardware */
+	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
 	MCFG_SCREEN_REFRESH_RATE(72)
 	MCFG_SCREEN_UPDATE_DEVICE(HD61830_TAG, hd61830_device, screen_update)
@@ -766,15 +1039,18 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", portfolio)
 
 	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, XTAL_4_9152MHz/2/2)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, portfolio_lcdc)
 	MCFG_HD61830_RD_CALLBACK(READ8(portfolio_state, hd61830_rd_r))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
-	/* sound hardware */
+	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD(PCD3311T_TAG, PCD3311, XTAL_3_57864MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
+	MCFG_PORTFOLIO_MEMORY_CARD_SLOT_ADD(PORTFOLIO_MEMORY_CARD_SLOT_A_TAG, portfolio_memory_cards, nullptr)
+
 	MCFG_PORTFOLIO_EXPANSION_SLOT_ADD(PORTFOLIO_EXPANSION_SLOT_TAG, XTAL_4_9152MHz, portfolio_expansion_cards, nullptr)
 	MCFG_PORTFOLIO_EXPANSION_SLOT_IINT_CALLBACK(WRITELINE(portfolio_state, iint_w))
 	MCFG_PORTFOLIO_EXPANSION_SLOT_EINT_CALLBACK(WRITELINE(portfolio_state, eint_w))
@@ -784,23 +1060,17 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("counter", portfolio_state, counter_tick, attotime::from_hz(XTAL_32_768kHz/16384))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_TICK_TAG, portfolio_state, system_tick, attotime::from_hz(XTAL_32_768kHz/32768))
 
-	/* fake keyboard */
+	// fake keyboard
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", portfolio_state, keyboard_tick, attotime::from_usec(2500))
 
-	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "portfolio_cart")
-	MCFG_GENERIC_LOAD(portfolio_state, portfolio_cart)
-
-	/* software lists */
+	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "pofo")
 
-	/* internal ram */
+	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("384K,640K")
 
-	MCFG_NVRAM_ADD_RANDOM_FILL("nvram1")
-	MCFG_NVRAM_ADD_RANDOM_FILL("nvram2")
+	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 MACHINE_CONFIG_END
 
 
@@ -819,7 +1089,7 @@ ROM_START( pofo )
 	ROMX_LOAD( "rom b.u4", 0x00000, 0x20000, BAD_DUMP CRC(c9852766) SHA1(c74430281bc717bd36fd9b5baec1cc0f4489fe82), ROM_BIOS(1) ) // dumped with debug.com
 	ROMX_LOAD( "rom a.u3", 0x20000, 0x20000, BAD_DUMP CRC(b8fb730d) SHA1(1b9d82b824cab830256d34912a643a7d048cd401), ROM_BIOS(1) ) // dumped with debug.com
 
-	ROM_REGION( 0x800, HD61830_TAG, 0 )
+	ROM_REGION( 0x8000, HD61830_TAG, 0 )
 	ROM_LOAD( "hd61830 external character generator", 0x000, 0x800, BAD_DUMP CRC(747a1db3) SHA1(a4b29678fdb43791a8ce4c1ec778f3231bb422c5) ) // typed in from manual
 ROM_END
 
@@ -829,5 +1099,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME        FLAGS */
-COMP( 1989, pofo,   0,      0,      portfolio,  portfolio, driver_device,   0,      "Atari",    "Portfolio",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME        FLAGS
+COMP( 1989, pofo,   0,      0,      portfolio,  portfolio, driver_device,   0,  "Atari",    "Portfolio",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -16,6 +16,56 @@
 
     Michael Zapf, August 2015
 
+    ==================================
+    Specifics of both controller types
+
+    ** 9224 **
+    - Defines a special "ST506" type for hard disks with a fixed 512 byte sector length
+    - No specific IDENT; uses HEAD field for cylinder MSBs (both ST and user-defined types);
+    - Different buffered step rate for SEEK and RESTORE
+    - POLL_DRIVES
+      - must be preceded by DESELECT
+    - DRIVE_SELECT
+      - 00 = ST506
+    - READ_SECTORS_LOGICAL
+      - Bit 1 = Bad sector bypass/terminate
+      - Multi-sector read requires ECC correction disable
+    - WRITE_SECTOR_*
+      - Bit 6 = Bad sector bypass/terminate
+    - FORMAT_TRACK
+      - 3-byte header for ST506, 4-byte otherwise
+      - No IDENT byte in the format parameters; the IDENT field (after the IDAM) is locked to FE
+
+    ** 9234 **
+    - Defines a special "PC-AT" type for hard disks with a selectable sector length (128, 256, 512, 1024)
+    - IDENT field in the sector header encodes cylinder MSBs (HD and MFM floppy)
+    - Defines R6 as CURRENT IDENT byte register
+    - Uses HEAD field for cylinder MSBs (only user-defined type)
+    - Faster step rates, no different rates for SEEK/RESTORE
+    - PC-AT mode:
+      - R/W reg A contains specs for sector length and zone
+      - HEAD register contains sector size code provided by system (W4)
+        or read from disk (R4)
+    - POLL_DRIVES
+      - must be preceded by SEEK or DESELECT
+    - DRIVE_SELECT
+      - 00 = PC-AT
+    - READ_SECTORS_PHYSICAL
+      - PC-AT: Requires W10 to be set appropriately
+    - READ_SECTORS_LOGICAL
+      - Bit 1 = Implied seek enabled/disabled
+      - PC-AT: Requires W10 to be set appropriately
+    - WRITE_SECTOR_*
+      - Bit 6 = Implied seek enable/disable
+      - PC-AT: Requires W10 to be set appropriately
+    - WRITE LONG mode for extended ECC code
+       - MODE register (8) allows for setting WRITE LONG mode
+    - FORMAT_TRACK
+      - 4-byte header for PC-AT, 5-byte otherwise
+      - IDENT byte must be set for MFM floppy and MFM/PC-AT HD
+      - No Bad Sector Flag for PC-AT
+      - HEAD field contains sector size for PC-AT
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -67,7 +117,6 @@
    ECC
    Write long (see MODE register; only useful with ECC)
    Tape operations
-   AT mode (HD)
    FM-encoded HD
 
    === Implemented but untested ===
@@ -75,6 +124,7 @@
    Poll drives
    Seek/Read ID
    Read track
+   AT mode (HD)
 
    === TODO ===
    Create a common state machine for HD and floppy
@@ -232,7 +282,8 @@ enum
 	TYPE_AT = 0x00,
 	TYPE_HD = 0x01,
 	TYPE_FLOPPY8 = 0x02,
-	TYPE_FLOPPY5 = 0x03
+	TYPE_FLOPPY5 = 0x03,
+	TYPE_ST = 0x04
 };
 
 /*
@@ -241,8 +292,7 @@ enum
 enum
 {
 	GEN_TIMER = 1,
-	COM_TIMER /*,
-    LIVE_TIMER */
+	COM_TIMER
 };
 
 /*
@@ -257,24 +307,11 @@ enum {
 };
 
 /*
-    Step rates in microseconds for MFM. This is set in the mode register,
-    bits 0-2. FM mode doubles all values.
-*/
-static const int step_hd[]      = { 22, 50, 100, 200, 400, 800, 1600, 3200 };
-static const int step_flop8[]   = { 218, 500, 1000, 2000, 4000, 8000, 16000, 32000 };
-static const int step_flop5[]   = { 436, 1000, 2000, 4000, 8000, 16000, 32000, 64000 };
-
-/*
     Head load timer increments in usec. Delay value is calculated from this value
     multiplied by the factor in the DATA/DELAY register. For FM mode all
     values are doubled. The values depend on the drive type.
 */
 static const int head_load_timer_increment[] = { 200, 200, 2000, 4000 };
-
-/*
-    ID fields association to registers
-*/
-static const int id_field[] = { CURRENT_CYLINDER, CURRENT_HEAD, CURRENT_SECTOR, CURRENT_SIZE, CURRENT_CRC1, CURRENT_CRC2 };
 
 /*
     Pulse widths for stepping in usec
@@ -518,19 +555,32 @@ bool hdc92x4_device::reading_track()
 */
 
 /*
-    In SMC mode, the cylinder number is stored in bit positions 4,5,6 of the
-    head register and in the 8 bits of the cylinder register.
-    This is true for the desired cyl/head, current cyl/head, and the header
-    fields on the track.
+    The desired head is specified by the last 4 bits of the desired head
+    register in all modes.
 */
 int hdc92x4_device::desired_head()
 {
 	return m_register_w[DESIRED_HEAD] & 0x0f;
 }
 
+/*
+    PC-AT mode: Cylinder number is specified by the least significant two
+    bits of the R/W register A (DATA) and the 8 bits of the desired cylinder
+    register.
+
+    SMC mode: Cylinder number is stored in bit positions 4,5,6 of the
+    head register and in the 8 bits of the desired cylinder register.
+*/
 int hdc92x4_device::desired_cylinder()
 {
-	return (m_register_w[DESIRED_CYLINDER] & 0xff) | ((m_register_w[DESIRED_HEAD] & 0x70) << 4);
+	if (m_selected_drive_type == TYPE_AT)
+	{
+		return (m_register_w[DESIRED_CYLINDER] & 0xff) | ((m_register_w[DATA] & 0x03) << 8);
+	}
+	else
+	{
+		return (m_register_w[DESIRED_CYLINDER] & 0xff) | ((m_register_w[DESIRED_HEAD] & 0x70) << 4);
+	}
 }
 
 int hdc92x4_device::desired_sector()
@@ -538,14 +588,34 @@ int hdc92x4_device::desired_sector()
 	return m_register_w[DESIRED_SECTOR] & 0xff;
 }
 
+/*
+    The current head is specified by the last 4 bits of the current head
+    register in all modes.
+*/
 int hdc92x4_device::current_head()
 {
 	return m_register_r[CURRENT_HEAD] & 0x0f;
 }
 
+/*
+    PC-AT mode: The current cylinder number is specified by the IDENT   field
+    as read from the sector header and the 8 bits of the desired cylinder
+    register.
+    IDENT: FE->0, FF->1, FC->2, FD->3
+
+    SMC mode: The current cylinder number is stored in bit positions 4,5,6 of
+    the head register and in the 8 bits of the desired cylinder register.
+*/
 int hdc92x4_device::current_cylinder()
 {
-	return (m_register_r[CURRENT_CYLINDER] & 0xff) | ((m_register_r[CURRENT_HEAD] & 0x70) << 4);
+	if (m_selected_drive_type == TYPE_AT)
+	{
+		return (m_register_r[CURRENT_CYLINDER] & 0xff) | (((m_register_r[CURRENT_IDENT] + 2) & 0x03) << 8);
+	}
+	else
+	{
+		return (m_register_r[CURRENT_CYLINDER] & 0xff) | ((m_register_r[CURRENT_HEAD] & 0x70) << 4);
+	}
 }
 
 int hdc92x4_device::current_sector()
@@ -563,12 +633,77 @@ bool hdc92x4_device::using_floppy()
 	return (m_selected_drive_type == TYPE_FLOPPY5 || m_selected_drive_type == TYPE_FLOPPY8);
 }
 
+int hdc92x4_device::header_length()
+{
+	return (m_selected_drive_type == TYPE_AT)? 4 : 5;
+}
+
 /*
-    Delivers the step time (in microseconds) minus the pulse width
+    Returns the index of the register where the sector header field shall be stored
 */
-int hdc92x4_device::step_time()
+int hdc92x4_device::register_number(int slot)
+{
+	// The id_field is an array of indexes into the chip registers.
+	// Thus we get the values properly assigned to the registers.
+	// The PC-AT mode does not use a size field.
+	const int id_field[] = { CURRENT_CYLINDER, CURRENT_HEAD, CURRENT_SECTOR, CURRENT_SIZE, CURRENT_CRC1, CURRENT_CRC2 };
+	int index = slot;
+
+	// Skip size for PC-AT
+	if (m_selected_drive_type == TYPE_AT && slot > 2) index++;
+	if (index > 5)
+	{
+		logerror("BUG: Invalid index for header field: %d", index);
+		index = 5;
+	}
+	return id_field[index];
+}
+
+/*
+    Delivers the step time (in microseconds) minus the pulse width (9224).
+    The first two values in the list apply for index==0 (buffered step),
+    but the first one is used for the RESTORE command, the second one is used
+    for SEEK. [2]
+*/
+int hdc9224_device::step_time()
 {
 	int time;
+	// Step rates in microseconds for MFM. This is set in the mode register,
+	// bits 0-2. FM mode doubles all values.
+	const int step_hd[]      = { 22, 18, 200, 400, 800, 1600, 3200, 6400, 12800 };
+	const int step_flop8[]   = { 218, 176, 2000, 4000, 8000, 16000, 32000, 64000, 128000 };
+	const int step_flop5[]   = { 436, 352, 4000, 8000, 16000, 32000, 64000, 128000, 256000 };
+
+	int index = m_register_w[MODE] & MO_STEPRATE;
+	// First value is used only for RESTORE (02, 03)
+	if ((index > 0) || ((current_command() & 0xfe)!=0x02)) index++;
+
+	// Get seek time.
+	if (m_selected_drive_type == TYPE_FLOPPY8)
+		time = step_flop8[index] - pulse_flop8;
+
+	else if (m_selected_drive_type == TYPE_FLOPPY5)
+		time = step_flop5[index] - pulse_flop5;
+	else
+		time = step_hd[index] - pulse_hd;
+
+	if (fm_mode()) time = time * 2;
+	return time;
+}
+
+/*
+    Delivers the step time (in microseconds) minus the pulse width (9234).
+    The 9234 does not use different values for buffered steps.
+*/
+int hdc9234_device::step_time()
+{
+	int time;
+	// Step rates in microseconds for MFM. This is set in the mode register,
+	// bits 0-2. FM mode doubles all values.
+	const int step_hd[]      = { 22, 50, 100, 200, 400, 800, 1600, 3200 };
+	const int step_flop8[]   = { 218, 500, 1000, 2000, 4000, 8000, 16000, 32000 };
+	const int step_flop5[]   = { 436, 1000, 2000, 4000, 8000, 16000, 32000, 64000 };
+
 	int index = m_register_w[MODE] & MO_STEPRATE;
 	// Get seek time.
 	if (m_selected_drive_type == TYPE_FLOPPY8)
@@ -603,11 +738,24 @@ int hdc92x4_device::pulse_width()
 }
 
 /*
-    Delivers the sector size
+    Delivers the sector size. The register has been either loaded from the
+    sector header (floppy / generic HD) or from register A (PC-AT mode). For
+    the 9224, 512 bytes is returned when TYPE_ST was selected.
 */
-int hdc92x4_device::calc_sector_size()
+int hdc92x4_device::sector_size()
 {
-	return 128 << (m_register_r[CURRENT_SIZE] & 3);
+	// TYPE_AT:
+	// CURRENT_HEAD
+	// x S S x x x x x, where SS =0 (256), =1 (512), =2(1024), =3 (128)
+	if (m_selected_drive_type==TYPE_AT)
+		return 128 << (((m_register_r[CURRENT_HEAD] >> 5) + 1) & 0x03);
+	else
+	{
+		if (m_selected_drive_type==TYPE_ST)
+			return 512;
+		else
+			return 128 << (m_register_r[CURRENT_SIZE] & 7);
+	}
 }
 
 // ===========================================================================
@@ -1006,7 +1154,7 @@ void hdc92x4_device::data_transfer(int& cont)
 						(m_register_w[DMA15_8] & 0xff) << 8 |
 						(m_register_w[DMA7_0] & 0xff);
 
-					dma_address = (dma_address + calc_sector_size()) & 0xffffff;
+					dma_address = (dma_address + sector_size()) & 0xffffff;
 
 					m_register_w[DMA23_16] = m_register_r[DMA23_16] = (dma_address & 0xff0000) >> 16;
 					m_register_w[DMA15_8] = m_register_r[DMA15_8] = (dma_address & 0x00ff00) >> 8;
@@ -1049,7 +1197,7 @@ void hdc92x4_device::data_transfer(int& cont)
 				(m_register_w[DMA15_8] & 0xff) << 8 |
 				(m_register_w[DMA7_0] & 0xff);
 
-				dma_address = (dma_address + calc_sector_size()) & 0xffffff;
+				dma_address = (dma_address + sector_size()) & 0xffffff;
 
 				m_register_w[DMA23_16] = m_register_r[DMA23_16] = (dma_address & 0xff0000) >> 16;
 				m_register_w[DMA15_8] = m_register_r[DMA15_8] = (dma_address & 0x00ff00) >> 8;
@@ -1086,6 +1234,56 @@ void hdc92x4_device::data_transfer(int& cont)
 		set_command_done(TC_DATAERR);
 	}
 }
+
+/*
+    Presets the CRC register, depending on the flag in the Interrupt/Command
+    Termination Register.
+    If this flag is set to 0, the CRC calculation is preset with 0, which
+    means that only media with the same setting will be readable (all others
+    will yield CRC errors).
+    This method simply provides preset values for some particular situations.
+    When value=0, the CRC is preset to 0 or FFFF. Other defined values are:
+    a1 = data value of MFM IDAM
+    a1a1a1 = all three a1s
+    fe = data value of FM IDAM
+    f56a = cell pattern of f8 (DAM, FM)
+    f56b = cell pattern of f9 (DAM, FM)
+    f56e = cell pattern of fa (DAM, FM)
+    f56f = cell pattern of fb (DAM, FM)
+*/
+void hdc92x4_device::preset_crc(live_info& live, int value)
+{
+	if ((m_register_w[INT_COMM_TERM] & 0x80)!=0)
+	{
+		// Preset -1
+		switch (value)
+		{
+		case 0xa1: live.crc = 0x443b; break;
+		case 0xfe: live.crc = 0xef21; break;
+		case 0xf56a: live.crc = 0x8fe7; break;  // F8
+		case 0xf56b: live.crc = 0x9fc6; break;  // F9
+		case 0xf56e: live.crc = 0xafa5; break;  // FA
+		case 0xf56f: live.crc = 0xbf84; break;  // FB
+		case 0xa1a1a1: live.crc = 0xcdb4; break; // A1A1A1
+		default: live.crc = 0xffff; break;
+		}
+	}
+	else
+	{
+		// Preset 0
+		switch (value)
+		{
+		case 0xa1: live.crc = 0xc1a9; break;
+		case 0xfe: live.crc = 0x736d; break;
+		case 0xf56a: live.crc = 0x6e17; break;  // F8
+		case 0xf56b: live.crc = 0x7e36; break;  // F9
+		case 0xf56e: live.crc = 0x4e55; break;  // FA
+		case 0xf56f: live.crc = 0x5e74; break;  // FB
+		case 0xa1a1a1: live.crc = 0x0128; break; // A1A1A1
+		default: live.crc = 0x0000; break;
+		}
+	}
+};
 
 // ===========================================================================
 //     Commands
@@ -1954,7 +2152,7 @@ void hdc92x4_device::live_start(int state)
 	m_live_state.next_state = -1;
 
 	m_live_state.shift_reg = 0;
-	m_live_state.crc = 0xffff;
+	preset_crc(m_live_state, 0);
 	m_live_state.bit_counter = 0;
 	m_live_state.byte_counter = 0;
 	m_live_state.data_separator_phase = false;
@@ -2063,7 +2261,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 				if (m_live_state.shift_reg == 0x4489)
 				{
 					if (TRACE_LIVE) logerror("%s: [%s live] Found an A1 mark\n", tag(),tts(m_live_state.time).c_str());
-					m_live_state.crc = 0x443b;
+					preset_crc(m_live_state, 0xa1);
 					m_live_state.data_separator_phase = false;
 					m_live_state.bit_counter = 0;
 					// Next task: find the next two A1 marks
@@ -2076,7 +2274,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 				if (m_live_state.shift_reg == 0xf57e)
 				{
 					if (TRACE_LIVE) logerror("%s: SEARCH_IDAM: IDAM found\n", tag());
-					m_live_state.crc = 0xef21;
+					preset_crc(m_live_state, 0xfe);
 					m_live_state.data_separator_phase = false;
 					m_live_state.bit_counter = 0;
 					m_live_state.state = READ_ID_FIELDS_INTO_REGS;
@@ -2174,11 +2372,9 @@ void hdc92x4_device::live_run_until(attotime limit)
 
 			if (TRACE_LIVE) logerror("%s: slot %d = %02x, crc=%04x\n", tag(), slot, m_live_state.data_reg, m_live_state.crc);
 
-			// The id_field is an array of indexes into the chip registers.
-			// Thus we get the values properly assigned to the registers.
-			m_register_r[id_field[slot]] = m_live_state.data_reg;
+			m_register_r[register_number(slot)] = m_live_state.data_reg;
 
-			if(slot > 4)
+			if (slot > 4) // this includes both CRC bytes. There are no different lengths for the floppy headers (excluding the ident byte)
 			{
 				// We successfully read the ID fields; let's wait for the machine time to catch up.
 				if (reading_track())
@@ -2222,7 +2418,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 				if (m_live_state.bit_counter >= 28*16 && m_live_state.shift_reg == 0x4489)
 				{
 					if (TRACE_LIVE) logerror("%s: [%s live] Found an A1 mark\n", tag(),tts(m_live_state.time).c_str());
-					m_live_state.crc = 0x443b;
+					preset_crc(m_live_state, 0xa1);
 					m_live_state.data_separator_phase = false;
 					m_live_state.bit_counter = 0;
 					m_live_state.state = READ_TWO_MORE_A1_DAM;
@@ -2240,11 +2436,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 				if (m_live_state.bit_counter >= 11*16 && (m_live_state.shift_reg == 0xf56a || m_live_state.shift_reg == 0xf56b ||
 														m_live_state.shift_reg == 0xf56e || m_live_state.shift_reg == 0xf56f)) {
 					if (TRACE_LIVE) logerror("%s: SEARCH_DAM: found DAM = %04x\n", tag(), m_live_state.shift_reg);
-					m_live_state.crc =
-						m_live_state.shift_reg == 0xf56a ? 0x8fe7 :
-						m_live_state.shift_reg == 0xf56b ? 0x9fc6 :
-						m_live_state.shift_reg == 0xf56e ? 0xafa5 :
-						0xbf84;
+					preset_crc(m_live_state, m_live_state.shift_reg);
 					m_live_state.data_separator_phase = false;
 					m_live_state.bit_counter = 0;
 					m_live_state.state = READ_SECTOR_DATA;
@@ -2342,16 +2534,16 @@ void hdc92x4_device::live_run_until(attotime limit)
 			if (TRACE_LIVE) logerror("%s: [%s live] Found data value %02X, CRC=%04x\n", tag(),tts(m_live_state.time).c_str(), m_live_state.data_reg, m_live_state.crc);
 			int slot = (m_live_state.bit_counter >> 4)-1;
 
-			if (slot < calc_sector_size())
+			if (slot < sector_size())
 			{
 				// Sector data
 				wait_for_realtime(READ_SECTOR_DATA_CONT);
 				return;
 			}
-			else if (slot < calc_sector_size()+2)
+			else if (slot < sector_size()+2)
 			{
 				// CRC
-				if (slot == calc_sector_size()+1)
+				if (slot == sector_size()+1)
 				{
 					if (reading_track())
 					{
@@ -2395,7 +2587,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 				m_out_dma(0, m_register_r[DATA], 0xff);
 
 				// And again, for floppies, clear line after writing each byte, for hard disk, only after the last byte
-				if (using_floppy() || (m_live_state.bit_counter >> 4)==calc_sector_size()-1)
+				if (using_floppy() || (m_live_state.bit_counter >> 4)==sector_size()-1)
 				{
 					m_out_dip(CLEAR_LINE);
 					m_out_dmarq(CLEAR_LINE);
@@ -2441,7 +2633,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 			if (fm_mode())
 			{
 				// Init the CRC for the DAM and sector
-				m_live_state.crc = 0xffff;
+				preset_crc(m_live_state, 0);
 
 				// 1111 0101 0110 1010 = F8 deleted
 				// 1111 0101 0110 1111 = FB normal
@@ -2450,10 +2642,10 @@ void hdc92x4_device::live_run_until(attotime limit)
 			else
 			{
 				// Init the CRC for the ident byte and sector
-				m_live_state.crc = 0xcdb4; // value for 3*A1
+				preset_crc(m_live_state, 0xa1a1a1);
 				write_on_track(encode(m_deleted? 0xf8 : 0xfb), 1, WRITE_SECDATA);
 			}
-			m_live_state.byte_counter = calc_sector_size();
+			m_live_state.byte_counter = sector_size();
 
 			// Set the over/underrun flag and hope that it will be cleared before we start writing
 			// (only for sector writing)
@@ -2476,7 +2668,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 				else
 				{
 					// For floppies, set this for each byte; for hard disk, set it only at the beginning
-					if (using_floppy() || m_live_state.byte_counter == calc_sector_size())
+					if (using_floppy() || m_live_state.byte_counter == sector_size())
 						m_out_dip(ASSERT_LINE);
 
 					m_register_r[DATA] = m_register_w[DATA] = m_in_dma(0, 0xff);
@@ -2624,7 +2816,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 				write_on_track(0x4489, 3, WRITE_HEADER);
 				m_live_state.byte_counter = 5;
 			}
-			m_live_state.crc = 0xffff;
+			preset_crc(m_live_state, 0);
 			break;
 
 		case WRITE_HEADER:
@@ -2721,8 +2913,8 @@ void hdc92x4_device::live_run_until(attotime limit)
 			m_out_dip(ASSERT_LINE);
 
 			// Write the header via DMA
-			for (auto & elem : id_field)
-				m_out_dma(0, m_register_r[elem], 0xff);
+			for (int i=0; i < header_length(); i++)
+				m_out_dma(0, m_register_r[register_number(i)], 0xff);
 
 			m_out_dip(CLEAR_LINE);
 			m_out_dmarq(CLEAR_LINE);
@@ -2877,7 +3069,7 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 			if (found_mark(SEARCH_IDAM))
 			{
 				if (TRACE_LIVE) logerror("%s: [%s live] Found an A1 mark\n", tag(), tts(m_live_state.time).c_str());
-				m_live_state.crc = 0x443b;
+				preset_crc(m_live_state, 0xa1);
 				m_live_state.data_separator_phase = false;
 				m_live_state.bit_counter = 0;
 
@@ -2934,7 +3126,7 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 			if (m_live_state.bit_counter & 15) break;
 
 			if (TRACE_LIVE) logerror("%s: slot %d = %02x, crc=%04x\n", tag(), slot, m_live_state.data_reg, m_live_state.crc);
-			m_register_r[id_field[slot++]] = m_live_state.data_reg;
+			m_register_r[register_number(slot++)] = m_live_state.data_reg;
 
 			if(slot > 5)
 			{
@@ -2972,7 +3164,7 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 			if (found_mark(SEARCH_DAM))
 			{
 				if (TRACE_LIVE) logerror("%s: [%s live] Found an A1 mark\n", tag(),tts(m_live_state.time).c_str());
-				m_live_state.crc = 0x443b;
+				preset_crc(m_live_state, 0xa1);
 				m_live_state.data_separator_phase = false;
 				m_live_state.bit_counter = 0;
 				m_live_state.state = READ_DATADEL_FLAG;
@@ -3030,9 +3222,9 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 			if (m_live_state.bit_counter & 15) break;
 
 			slot = (m_live_state.bit_counter >> 4)-1;
-			if (TRACE_LIVE) logerror("%s: [%s live] Found data value [%d/%d] = %02X, CRC=%04x\n", tag(),tts(m_live_state.time).c_str(), slot, calc_sector_size(), m_live_state.data_reg, m_live_state.crc);
+			if (TRACE_LIVE) logerror("%s: [%s live] Found data value [%d/%d] = %02X, CRC=%04x\n", tag(),tts(m_live_state.time).c_str(), slot, sector_size(), m_live_state.data_reg, m_live_state.crc);
 
-			if (slot < calc_sector_size())
+			if (slot < sector_size())
 			{
 				// For the first byte, allow for the DMA acknowledge to be set.
 				if (slot == 0)
@@ -3042,10 +3234,10 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 				}
 				else m_live_state.state = READ_SECTOR_DATA_CONT;
 			}
-			else if (slot < calc_sector_size()+2)
+			else if (slot < sector_size()+2)
 			{
 				// CRC
-				if (slot == calc_sector_size()+1)
+				if (slot == sector_size()+1)
 				{
 					m_out_dip(CLEAR_LINE);
 					m_out_dmarq(CLEAR_LINE);
@@ -3176,11 +3368,11 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 			if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Write data mark\n", tag());
 
 			// Init the CRC for the ident byte and sector
-			m_live_state.crc = 0x443b; // value for 1*A1
+			preset_crc(m_live_state, 0xa1); // only one A1
 
 			write_on_track(encode_hd(m_deleted? 0xf8 : 0xfb), 1, WRITE_SECDATA);
 
-			m_live_state.byte_counter = calc_sector_size();
+			m_live_state.byte_counter = sector_size();
 
 			// Set the over/underrun flag and hope that it will be cleared before we start writing
 			// (only for sector writing)
@@ -3204,8 +3396,8 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 				{
 					if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Write sector byte, %d to go\n", tag(), m_live_state.byte_counter);
 
-					// For floppies, set this for each byte; for hard disk, set it only at the beginning
-					if (m_live_state.byte_counter == calc_sector_size())
+					// This is hard disk, so set DIP only at the beginning
+					if (m_live_state.byte_counter == sector_size())
 						m_out_dip(ASSERT_LINE);
 
 					m_register_r[DATA] = m_register_w[DATA] = m_in_dma(0, 0xff);
@@ -3296,8 +3488,8 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 			m_out_dip(ASSERT_LINE);
 
 			// Write the header via DMA
-			for (auto & elem : id_field)
-				m_out_dma(0, m_register_r[elem], 0xff);
+			for (int i=0; i < header_length(); i++)
+				m_out_dma(0, m_register_r[register_number(i)], 0xff);
 
 			// Continue with reading the sector data
 			m_live_state.state = SEARCH_DAM;
@@ -3341,7 +3533,7 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 			if (TRACE_HEADER) logerror("%s: Writing IDAM and header: ", tag());
 			write_on_track(encode_a1_hd(), 1, WRITE_HEADER);
 			m_live_state.byte_counter = 5;          // TODO: Check this for AT mode
-			m_live_state.crc = 0xffff;
+			preset_crc(m_live_state, 0);
 			break;
 
 		case WRITE_HEADER:
@@ -3996,6 +4188,12 @@ void hdc92x4_device::process_command()
 		// The DMA registers and the sector register for read and
 		// write are identical, so in that case we copy the contents
 		if (m_register_pointer < DESIRED_HEAD) m_register_r[m_register_pointer] = m_regvalue;
+
+		// Note for the PC-AT mode: The DATA register contains two bits (5,4)
+		// that are defined as "Actual sector size" ([1] p. 7). The
+		// specification does not say anything about the meaning of these
+		// bits. The desired sector size is already specified by bits 6 and 5
+		// of the DESIRED_HEAD register, so we ignore these bits for now.
 
 		// Autoincrement until DATA is reached.
 		if (m_register_pointer < DATA)  m_register_pointer++;

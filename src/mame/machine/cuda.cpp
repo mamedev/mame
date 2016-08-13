@@ -99,7 +99,7 @@ machine_config_constructor cuda_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( cuda );
 }
 
-const rom_entry *cuda_device::device_rom_region() const
+const tiny_rom_entry *cuda_device::device_rom_region() const
 {
 	return ROM_NAME( cuda );
 }

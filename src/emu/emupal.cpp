@@ -159,7 +159,7 @@ UINT32 palette_device::transpen_mask(gfx_element &gfx, int color, int transcolor
 	assert(gfx.depth() <= 32);
 
 	// either gfx->color_depth entries or as many as we can get up until the end
-	int count = MIN(gfx.depth(), m_indirect_pens.size() - entry);
+	int count = std::min(size_t(gfx.depth()), m_indirect_pens.size() - entry);
 
 	// set a bit anywhere the transcolor matches
 	UINT32 mask = 0;

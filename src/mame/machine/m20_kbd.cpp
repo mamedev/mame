@@ -8,51 +8,51 @@
 
 namespace {
 /*
-	TODO: dump 8048 mcu
+    TODO: dump 8048 mcu
 
-	There seem to be a lot of guesses in this code - actual scan rate,
-	FIFO length, command processing, etc. don't seem to be evidence-
-	based.  The modifier handling seems very odd as it has aliasing and
-	overflow all over the place.
+    There seem to be a lot of guesses in this code - actual scan rate,
+    FIFO length, command processing, etc. don't seem to be evidence-
+    based.  The modifier handling seems very odd as it has aliasing and
+    overflow all over the place.
 
-	Layout is selected with a set of four jumpers on the keyboard MCU.
-	We need to bring these out to DIP switches, work out which command
-	is the layout request, and respond appropriately.
+    Layout is selected with a set of four jumpers on the keyboard MCU.
+    We need to bring these out to DIP switches, work out which command
+    is the layout request, and respond appropriately.
 
-	Available layouts:
-	Italian
-	German
-	French
-	British
-	USA ASCII
-	Spanish
-	Portuguese
-	Swedish - Finnish
-	Danish
-	Katakana
-	Yugoslavian
-	Norwegian
-	Greek
-	Swiss - French
-	Swiss - German
+    Available layouts:
+    Italian
+    German
+    French
+    British
+    USA ASCII
+    Spanish
+    Portuguese
+    Swedish - Finnish
+    Danish
+    Katakana
+    Yugoslavian
+    Norwegian
+    Greek
+    Swiss - French
+    Swiss - German
 
-	The keyboard MCU drives a buzzer.  We should work out what the bell
-	on/off commands are and emulate it.
+    The keyboard MCU drives a buzzer.  We should work out what the bell
+    on/off commands are and emulate it.
 
-	There are apparently no break codes.
-	The scancodes are arranged to read in alphabetical order with the QWERTY layout.
-	Modifiers apparently modify the make codes.
-	We are using a matrix here that corresponds to the logical scan codes - the physical matrix apparently doesn't match this.
+    There are apparently no break codes.
+    The scancodes are arranged to read in alphabetical order with the QWERTY layout.
+    Modifiers apparently modify the make codes.
+    We are using a matrix here that corresponds to the logical scan codes - the physical matrix apparently doesn't match this.
 
-	00  1c  1d  1e  1f  20  21  22  23  24  25  26  27   c3     cd  ce  cf  d0
-	 ??   12  18  06  13  15  1a  16  0a  10  11  28  29  c2    ca  cb  cc  d1
-	   ??  02  14  05  07  08  09  0b  0c  0d  2a  2b  2c  c1   c7  c8  c9  d2
-	??   01  1b  19  04  17  03  0f  0e  2d  2e  2f   ??        c4  c5  c6  d3
-		                       c0
+    00  1c  1d  1e  1f  20  21  22  23  24  25  26  27   c3     cd  ce  cf  d0
+     ??   12  18  06  13  15  1a  16  0a  10  11  28  29  c2    ca  cb  cc  d1
+       ??  02  14  05  07  08  09  0b  0c  0d  2a  2b  2c  c1   c7  c8  c9  d2
+    ??   01  1b  19  04  17  03  0f  0e  2d  2e  2f   ??        c4  c5  c6  d3
+                               c0
 
-	Ths is the 72-key version of the keyboard.
-	The katakana kayout has 75 keys, but we don't have a diagram for it.
-	?? are modifiers, which are read directly, not through the 8x9 scan matrix.
+    Ths is the 72-key version of the keyboard.
+    The katakana kayout has 75 keys, but we don't have a diagram for it.
+    ?? are modifiers, which are read directly, not through the 8x9 scan matrix.
 */
 // Italian layout (QZERTY typewriter)
 static INPUT_PORTS_START( m20_keyboard )

@@ -34,7 +34,7 @@ public:
 	midiout_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 
 	// image device
@@ -45,7 +45,7 @@ public:
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *file_extensions() const override { return "mid"; }
-	virtual bool core_opens_image_file() const override { return FALSE; }
+	virtual bool core_opens_image_file() const override { return false; }
 
 	virtual void tx(UINT8 state) { rx_w(state); }
 

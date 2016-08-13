@@ -2,12 +2,13 @@
 // copyright-holders:Nathan Woods, Miodrag Milanovic
 /***************************************************************************
 
-    image.c
+    image.cpp
 
     Core image functions and definitions.
 
 
 ***************************************************************************/
+
 #include <ctype.h>
 
 #include "emu.h"
@@ -15,6 +16,8 @@
 #include "image.h"
 #include "config.h"
 #include "xmlfile.h"
+#include "softlist.h"
+
 
 //**************************************************************************
 //  IMAGE MANAGER
@@ -27,35 +30,43 @@
 image_manager::image_manager(running_machine &machine)
 	: m_machine(machine)
 {
-	/* make sure that any required devices have been allocated */
+	// make sure that any required devices have been allocated
 	for (device_image_interface &image : image_interface_iterator(machine.root_device()))
 	{
-		/* is an image specified for this image */
-		const char *image_name = machine.options().value(image.instance_name());
+		// ignore things not user loadable
 		if (!image.user_loadable())
 			continue;
 
-		if ((image_name != nullptr) && (image_name[0] != '\0'))
+		// is an image specified for this image
+		const char *image_name_ptr = machine.options().value(image.instance_name());
+		if ((image_name_ptr != nullptr) && (image_name_ptr[0] != '\0'))
 		{
-			/* mark init state */
+			image_init_result result = image_init_result::FAIL;
+			std::string image_name(image_name_ptr);
+
+			// mark init state
 			image.set_init_phase();
 
-			/* try to load this image */
-			bool result = image.load(image_name);
+			// try as a softlist
+			if (software_name_parse(image_name))
+				result = image.load_software(image_name);
 
-			/* did the image load fail? */
-			if (result)
+			// failing that, try as an image
+			if (result != image_init_result::PASS)
+				result = image.load(image_name);
+
+			// did the image load fail?
+			if (result != image_init_result::PASS)
 			{
-				/* retrieve image error message */
+				// retrieve image error message
 				std::string image_err = std::string(image.error());
-				std::string image_basename(image_name);
 
-				/* unload all images */
+				// unload all images
 				unload_all();
 
 				fatalerror_exitcode(machine, EMU_ERR_DEVICE, "Device %s load (%s) failed: %s",
 					image.device().name(),
-					image_basename.c_str(),
+					image_name.c_str(),
 					image_err.c_str());
 			}
 		}
@@ -128,7 +139,7 @@ void image_manager::config_save(config_type cfg_type, xml_data_node *parentnode)
 			if (node != nullptr)
 			{
 				xml_set_attribute(node, "instance", dev_instance);
-				xml_set_attribute(node, "directory", image.working_directory());
+				xml_set_attribute(node, "directory", image.working_directory().c_str());
 			}
 		}
 	}
@@ -192,23 +203,6 @@ void image_manager::options_extract()
 
 
 /*-------------------------------------------------
- image_mandatory_scan - search for devices which
- need an image to be loaded
- -------------------------------------------------*/
-
-std::string &image_manager::mandatory_scan(std::string &mandatory)
-{
-	mandatory.clear();
-	// make sure that any required image has a mounted file
-	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
-	{
-		if (image.filename() == nullptr && image.must_be_loaded())
-			mandatory.append("\"").append(image.instance_name()).append("\", ");
-	}
-	return mandatory;
-}
-
-/*-------------------------------------------------
     postdevice_init - initialize devices for a specific
     running_machine
 -------------------------------------------------*/
@@ -218,10 +212,10 @@ void image_manager::postdevice_init()
 	/* make sure that any required devices have been allocated */
 	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 	{
-		int result = image.finish_load();
+		image_init_result result = image.finish_load();
 
 		/* did the image load fail? */
-		if (result)
+		if (result != image_init_result::PASS)
 		{
 			/* retrieve image error message */
 			std::string image_err = std::string(image.error());

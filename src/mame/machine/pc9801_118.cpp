@@ -104,7 +104,7 @@ ROM_START( pc9801_118 )
 	ROM_REGION( 0x100000, "opn3", ROMREGION_ERASE00 )
 ROM_END
 
-const rom_entry *pc9801_118_device::device_rom_region() const
+const tiny_rom_entry *pc9801_118_device::device_rom_region() const
 {
 	return ROM_NAME( pc9801_118 );
 }

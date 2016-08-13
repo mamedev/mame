@@ -78,14 +78,13 @@ static const char *const adb_statenames[4] = { "NEW", "EVEN", "ODD", "IDLE" };
 int mac_state::adb_pollkbd(int update)
 {
 	int i, j, keybuf, report, codes[2], result;
-	ioport_port *ports[6] = { m_key0, m_key1,   m_key2, m_key3, m_key4, m_key5 };
 
 	codes[0] = codes[1] = 0xff; // key up
 	report = result = 0;
 
 	for (i = 0; i < 6; i++)
 	{
-		keybuf = ports[i]->read();
+		keybuf = m_keys[i]->read();
 
 		// any changes in this row?
 		if ((keybuf != m_key_matrix[i]) && (report < 2))

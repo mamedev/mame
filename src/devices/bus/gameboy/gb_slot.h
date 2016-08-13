@@ -3,6 +3,9 @@
 #ifndef __GB_SLOT_H
 #define __GB_SLOT_H
 
+#include "softlist_dev.h"
+
+
 /***************************************************************************
  TYPE DEFINITIONS
  ***************************************************************************/
@@ -116,7 +119,7 @@ public:
 	virtual void device_config_complete() override;
 
 	// image-level overrides
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
@@ -176,7 +179,7 @@ public:
 	megaduck_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual const char *image_interface() const override { return "megaduck_cart"; }
 	virtual const char *file_extensions() const override { return "bin"; }
 

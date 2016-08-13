@@ -94,10 +94,10 @@ READ16_MEMBER( huc6202_device::next_pixel )
 					break;
 
 				case 2:     /* Back - BG0 + SP1 => BG0 - Front
-                                      BG0 + BG1 => BG0
-                                      BG1 + SP0 => BG1
-                                      SP0 + SP1 => SP0
-                            */
+				                      BG0 + BG1 => BG0
+				                      BG1 + SP0 => BG1
+				                      SP0 + SP1 => SP0
+				            */
 					if ( data_1 > huc6270_device::HUC6270_SPRITE )
 					{
 						if ( data_0 > huc6270_device::HUC6270_SPRITE )
@@ -155,7 +155,7 @@ READ16_MEMBER( huc6202_device::time_until_next_event )
 	UINT16 next_event_clocks_0 = m_time_til_next_event_0_cb( 0, 0xffff  );
 	UINT16 next_event_clocks_1 = m_time_til_next_event_1_cb( 0, 0xffff );
 
-	return MIN( next_event_clocks_0, next_event_clocks_1 );
+	return std::min( next_event_clocks_0, next_event_clocks_1 );
 }
 
 

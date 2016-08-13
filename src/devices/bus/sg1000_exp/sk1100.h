@@ -54,23 +54,10 @@ protected:
 	virtual bool is_readable(UINT8 offset) override;
 
 private:
-	ioport_port* m_key_row[16];
 	required_device<cassette_image_device> m_cassette;
 	required_device<i8255_device> m_ppi;
-	required_ioport m_pa0;
-	required_ioport m_pa1;
-	required_ioport m_pa2;
-	required_ioport m_pa3;
-	required_ioport m_pa4;
-	required_ioport m_pa5;
-	required_ioport m_pa6;
-	required_ioport m_pb0;
-	required_ioport m_pb1;
-	required_ioport m_pb2;
-	required_ioport m_pb3;
-	required_ioport m_pb4;
-	required_ioport m_pb5;
-	required_ioport m_pb6;
+	required_ioport_array<8> m_pa;
+	required_ioport_array<8> m_pb;
 
 	/* keyboard state */
 	UINT8 m_keylatch;

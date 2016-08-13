@@ -533,7 +533,7 @@ void superfx_device::superfx_add_clocks_internal(UINT32 clocks)
 {
 	if(m_romcl)
 	{
-		m_romcl -= MIN(clocks, m_romcl);
+		m_romcl -= std::min(clocks, m_romcl);
 		if(m_romcl == 0)
 		{
 			m_sfr &= ~SUPERFX_SFR_R;
@@ -543,7 +543,7 @@ void superfx_device::superfx_add_clocks_internal(UINT32 clocks)
 
 	if(m_ramcl)
 	{
-		m_ramcl -= MIN(clocks, m_ramcl);
+		m_ramcl -= std::min(clocks, m_ramcl);
 		if(m_ramcl == 0)
 		{
 			superfx_bus_write(0x700000 + (m_rambr << 16) + m_ramar, m_ramdr);
@@ -765,7 +765,7 @@ void superfx_device::execute_run()
 	if(!(m_sfr & SUPERFX_SFR_G))
 	{
 		superfx_add_clocks_internal(6);
-		m_icount = MIN(m_icount, 0);
+		m_icount = std::min(m_icount, 0);
 	}
 
 	while (m_icount > 0 && (m_sfr & SUPERFX_SFR_G))
@@ -773,7 +773,7 @@ void superfx_device::execute_run()
 		if(!(m_sfr & SUPERFX_SFR_G))
 		{
 			superfx_add_clocks_internal(6);
-			m_icount = MIN(m_icount, 0);
+			m_icount = std::min(m_icount, 0);
 			break;
 		}
 

@@ -119,8 +119,8 @@
 												hasHorizontalScroller:YES
 												  hasVerticalScroller:YES
 														   borderType:[watchScroll borderType]];
-	NSSize const desired = NSMakeSize(MAX(breakDesired.width, watchDesired.width),
-									  MAX(breakDesired.height, watchDesired.height));
+	NSSize const desired = NSMakeSize(std::max(breakDesired.width, watchDesired.width),
+									  std::max(breakDesired.height, watchDesired.height));
 	[self cascadeWindowWithDesiredSize:desired forView:tabs];
 
 	// don't forget the result

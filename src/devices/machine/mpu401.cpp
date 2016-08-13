@@ -106,7 +106,7 @@ machine_config_constructor mpu401_device::device_mconfig_additions() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *mpu401_device::device_rom_region() const
+const tiny_rom_entry *mpu401_device::device_rom_region() const
 {
 	return ROM_NAME( mpu401 );
 }

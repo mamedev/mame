@@ -536,8 +536,9 @@ void core_device_t::set_delegate_pointer()
 
 void core_device_t::stop_dev()
 {
-#if (NL_KEEP_STATISTICS)
-#endif
+	//NOTE: stop_dev is not removed. It remains so it can be reactivated in case
+	//      we run into a situation were RAII and noexcept dtors force us to
+	//      to have a device stop() routine which may throw.
 	//stop();
 }
 
@@ -640,7 +641,7 @@ detail::net_t::~net_t()
 	netlist().state().remove_save_items(this);
 }
 
-void detail::net_t::inc_active(core_terminal_t &term)
+void detail::net_t::inc_active(core_terminal_t &term) NL_NOEXCEPT
 {
 	m_active++;
 	m_list_active.push_front(&term);
@@ -664,7 +665,7 @@ void detail::net_t::inc_active(core_terminal_t &term)
 	}
 }
 
-void detail::net_t::dec_active(core_terminal_t &term)
+void detail::net_t::dec_active(core_terminal_t &term) NL_NOEXCEPT
 {
 	--m_active;
 	nl_assert(m_active >= 0);
@@ -688,9 +689,8 @@ void detail::net_t::rebuild_list()
 	m_active = cnt;
 }
 
-void detail::net_t::update_devs()
+void detail::net_t::update_devs() NL_NOEXCEPT
 {
-	//assert(m_num_cons != 0);
 	nl_assert(this->isRailNet());
 
 	static const unsigned masks[4] =
@@ -748,40 +748,13 @@ void detail::net_t::register_con(detail::core_terminal_t &terminal)
 		m_active++;
 }
 
-void detail::net_t::move_connections(detail::net_t *dest_net)
+void detail::net_t::move_connections(detail::net_t &dest_net)
 {
 	for (auto &ct : m_core_terms)
-		dest_net->register_con(*ct);
+		dest_net.register_con(*ct);
 	m_core_terms.clear();
 	m_active = 0;
 }
-
-void detail::net_t::merge_net(detail::net_t *othernet)
-{
-	netlist().log().debug("merging nets ...\n");
-	if (othernet == nullptr)
-		return; // Nothing to do
-
-	if (othernet == this)
-	{
-		netlist().log().warning("Connecting {1} to itself. This may be right, though\n", this->name());
-		return; // Nothing to do
-	}
-
-	if (this->isRailNet() && othernet->isRailNet())
-		netlist().log().fatal("Trying to merge two rail nets: {1} and {2}\n", this->name(), othernet->name());
-
-	if (othernet->isRailNet())
-	{
-		netlist().log().debug("othernet is railnet\n");
-		othernet->merge_net(this);
-	}
-	else
-	{
-		othernet->move_connections(this);
-	}
-}
-
 
 // ----------------------------------------------------------------------------------------
 // logic_net_t
@@ -803,46 +776,16 @@ analog_net_t::analog_net_t(netlist_t &nl, const pstring &aname, detail::core_ter
 {
 }
 
-bool analog_net_t::already_processed(std::vector<list_t> &groups)
-{
-	if (isRailNet())
-		return true;
-	for (auto & grp : groups)
-	{
-		if (plib::container::contains(grp, this))
-			return true;
-	}
-	return false;
-}
-
-void analog_net_t::process_net(std::vector<list_t> &groups)
-{
-	if (num_cons() == 0)
-		return;
-	/* add the net */
-	groups.back().push_back(this);
-	for (auto &p : m_core_terms)
-	{
-		if (p->is_type(terminal_t::TERMINAL))
-		{
-			terminal_t *pt = static_cast<terminal_t *>(p);
-			analog_net_t *other_net = &pt->m_otherterm->net();
-			if (!other_net->already_processed(groups))
-				other_net->process_net(groups);
-		}
-	}
-}
-
-
 // ----------------------------------------------------------------------------------------
 // core_terminal_t
 // ----------------------------------------------------------------------------------------
 
-detail::core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &aname, const type_t atype)
-: device_object_t(dev, dev.name() + "." + aname, atype)
+detail::core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &aname,
+		const type_t type, const state_e state)
+: device_object_t(dev, dev.name() + "." + aname, type)
 , plib::linkedlist_t<core_terminal_t>::element_t()
 , m_net(nullptr)
-, m_state(*this, "m_state", STATE_NONEX)
+, m_state(*this, "m_state", state)
 {
 }
 
@@ -870,7 +813,7 @@ void detail::core_terminal_t::set_net(net_t *anet)
 // ----------------------------------------------------------------------------------------
 
 terminal_t::terminal_t(core_device_t &dev, const pstring &aname)
-: analog_t(dev, aname, TERMINAL)
+: analog_t(dev, aname, TERMINAL, STATE_BIDIR)
 , m_otherterm(nullptr)
 , m_Idr1(*this, "m_Idr1", nullptr)
 , m_go1(*this, "m_go1", nullptr)
@@ -907,10 +850,9 @@ void terminal_t::schedule_after(const netlist_time &after)
 // ----------------------------------------------------------------------------------------
 
 logic_output_t::logic_output_t(core_device_t &dev, const pstring &aname)
-	: logic_t(dev, aname, OUTPUT)
+	: logic_t(dev, aname, OUTPUT, STATE_OUT)
 	, m_my_net(dev.netlist(), name() + ".net", this)
 {
-	set_state(STATE_OUT);
 	this->set_net(&m_my_net);
 	set_logic_family(dev.logic_family());
 	netlist().setup().register_term(*this);
@@ -926,9 +868,8 @@ void logic_output_t::initial(const netlist_sig_t val)
 // ----------------------------------------------------------------------------------------
 
 analog_input_t::analog_input_t(core_device_t &dev, const pstring &aname)
-: analog_t(dev, aname, INPUT)
+: analog_t(dev, aname, INPUT, STATE_INP_ACTIVE)
 {
-	set_state(STATE_INP_ACTIVE);
 	netlist().setup().register_term(*this);
 }
 
@@ -937,11 +878,10 @@ analog_input_t::analog_input_t(core_device_t &dev, const pstring &aname)
 // ----------------------------------------------------------------------------------------
 
 analog_output_t::analog_output_t(core_device_t &dev, const pstring &aname)
-	: analog_t(dev, aname, OUTPUT)
+	: analog_t(dev, aname, OUTPUT, STATE_OUT)
 	, m_my_net(dev.netlist(), name() + ".net", this)
 {
 	this->set_net(&m_my_net);
-	set_state(STATE_OUT);
 
 	net().m_cur_Analog = NL_FCONST(0.0);
 	netlist().setup().register_term(*this);
@@ -957,9 +897,8 @@ void analog_output_t::initial(const nl_double val)
 // -----------------------------------------------------------------------------
 
 logic_input_t::logic_input_t(core_device_t &dev, const pstring &aname)
-		: logic_t(dev, aname, INPUT)
+		: logic_t(dev, aname, INPUT, STATE_INP_ACTIVE)
 {
-	set_state(STATE_INP_ACTIVE);
 	set_logic_family(dev.logic_family());
 	netlist().setup().register_term(*this);
 }

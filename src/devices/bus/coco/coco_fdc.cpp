@@ -116,7 +116,7 @@ SLOT_INTERFACE_END
 
 coco_rtc_type_t coco_fdc_device::real_time_clock()
 {
-	coco_rtc_type_t result = coco_rtc_type_t(read_safe(machine().root_device().ioport("real_time_clock"), RTC_NONE));
+	coco_rtc_type_t result = coco_rtc_type_t(m_rtc.read_safe(RTC_NONE));
 
 	/* check to make sure we don't have any invalid values */
 	if (((result == RTC_DISTO) && (m_disto_msm6242 == nullptr))
@@ -183,7 +183,8 @@ coco_fdc_device::coco_fdc_device(const machine_config &mconfig, device_type type
 		m_wd17xx(*this, WD_TAG),
 		m_wd2797(*this, WD2797_TAG),
 		m_ds1315(*this, CLOUD9_TAG),
-		m_disto_msm6242(*this, DISTO_TAG), m_msm6242_rtc_address(0)
+		m_disto_msm6242(*this, DISTO_TAG), m_msm6242_rtc_address(0),
+		m_rtc(*this, ":real_time_clock")
 {
 }
 
@@ -193,8 +194,9 @@ coco_fdc_device::coco_fdc_device(const machine_config &mconfig, const char *tag,
 		m_wd17xx(*this, WD_TAG),
 		m_wd2797(*this, WD2797_TAG),
 		m_ds1315(*this, CLOUD9_TAG),
-		m_disto_msm6242(*this, DISTO_TAG), m_msm6242_rtc_address(0)
-	{
+		m_disto_msm6242(*this, DISTO_TAG), m_msm6242_rtc_address(0),
+		m_rtc(*this, ":real_time_clock")
+{
 }
 
 //-------------------------------------------------
@@ -224,7 +226,7 @@ machine_config_constructor coco_fdc_device::device_mconfig_additions() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *coco_fdc_device::device_rom_region() const
+const tiny_rom_entry *coco_fdc_device::device_rom_region() const
 {
 	return ROM_NAME( coco_fdc );
 }
@@ -480,7 +482,7 @@ machine_config_constructor dragon_fdc_device::device_mconfig_additions() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *dragon_fdc_device::device_rom_region() const
+const tiny_rom_entry *dragon_fdc_device::device_rom_region() const
 {
 	return ROM_NAME( dragon_fdc );
 }
@@ -622,7 +624,7 @@ sdtandy_fdc_device::sdtandy_fdc_device(const machine_config &mconfig, const char
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *sdtandy_fdc_device::device_rom_region() const
+const tiny_rom_entry *sdtandy_fdc_device::device_rom_region() const
 {
 	return ROM_NAME( sdtandy_fdc );
 }
@@ -654,7 +656,7 @@ coco_fdc_v11_device::coco_fdc_v11_device(const machine_config &mconfig, const ch
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *coco_fdc_v11_device::device_rom_region() const
+const tiny_rom_entry *coco_fdc_v11_device::device_rom_region() const
 {
 	return ROM_NAME( coco_fdc_v11 );
 }
@@ -678,7 +680,7 @@ coco3_hdb1_device::coco3_hdb1_device(const machine_config &mconfig, const char *
 {
 }
 
-const rom_entry *coco3_hdb1_device::device_rom_region() const
+const tiny_rom_entry *coco3_hdb1_device::device_rom_region() const
 {
 	return ROM_NAME( coco3_hdb1 );
 }
@@ -707,7 +709,7 @@ cp400_fdc_device::cp400_fdc_device(const machine_config &mconfig, const char *ta
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *cp400_fdc_device::device_rom_region() const
+const tiny_rom_entry *cp400_fdc_device::device_rom_region() const
 {
 	return ROM_NAME( cp400_fdc );
 }

@@ -94,7 +94,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
@@ -168,10 +168,10 @@ private:
 	void set_rdy0(int state);
 	void set_rdy1(int state);
 
-	int load0_cb(floppy_image_device *device);
+	image_init_result load0_cb(floppy_image_device *device);
 	void unload0_cb(floppy_image_device *device);
 
-	int load1_cb(floppy_image_device *device);
+	image_init_result load1_cb(floppy_image_device *device);
 	void unload1_cb(floppy_image_device *device);
 
 	UINT8 m_p2;

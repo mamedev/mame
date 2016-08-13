@@ -7,15 +7,12 @@
  *****************************************************************************/
 #include "alto2cpu.h"
 
-#define DEBUG_WRTRAM        0       //!< define to 1 to printf disassembled CRAM writes
+#define DEBUG_WRTRAM        0       //!< define to 1 to print CRAM writes
+#define DEBUG_RDRAM         0       //!< define to 1 to print CRAM reads
+#define DEBUG_BRANCH        0       //!< define to 1 to print branching to ROM/RAM
 
 //! direct read access to the microcode CRAM
 #define RD_CRAM(addr) (*reinterpret_cast<UINT32 *>(m_ucode_cram.get() + addr * 4))
-
-//! direct write access to the microcode CRAM
-#define WR_CRAM(addr,data) do { \
-	*reinterpret_cast<UINT32 *>(m_ucode_cram.get() + addr * 4) = data; \
-} while (0)
 
 /**
  * @brief read the microcode ROM/RAM halfword
@@ -88,17 +85,30 @@ void alto2_cpu_device::rdram()
 	}
 
 	m_rdram_flag = false;
-	if (ALTO2_UCODE_RAM_BASE + addr >= ALTO2_UCODE_SIZE) {
+	if (m_ucode_ram_base + addr >= m_ucode_size) {
 		value = 0177777;    /* ??? */
 		LOG((this,LOG_CPU,0,"invalid address (%06o)\n", addr));
+#if DEBUG_RDRAM
+		printf("RD CRAM_BANKSEL=%d RAM%d [%04o] invalid address!\n",
+			GET_CRAM_BANKSEL(m_cram_addr), bank, wordaddr);
+#endif
 		return;
 	}
-	value = RD_CRAM(addr) ^ ALTO2_UCODE_INVERTED;
+	value = *reinterpret_cast<UINT32 *>(m_ucode_cram.get() + addr * 4) ^ ALTO2_UCODE_INVERTED;
+#if DEBUG_RDRAM
+	char buffer[256];
+	UINT8* oprom = m_ucode_cram.get() + 4 * wordaddr;
+	disasm_disassemble(buffer, wordaddr, oprom, oprom, 0);
+	printf("RD CRAM_BANKSEL=%d RAM%d [%04o] upper:%06o lower:%06o value:%011o '%s'\n",
+			GET_CRAM_BANKSEL(m_cram_addr), bank, wordaddr, m_myl, m_alu,
+			value, buffer);
+#endif
 	if (GET_CRAM_HALFSEL(m_cram_addr)) {
-		value = value >> 16;
-		LOG((this,LOG_CPU,0,"upper:%06o\n", value & 0177777));
+		value >>= 16;
+		LOG((this,LOG_CPU,0,"upper:%06o\n", value));
 	} else {
-		LOG((this,LOG_CPU,0,"lower:%06o\n", value & 0177777));
+		value &= 0177777;
+		LOG((this,LOG_CPU,0,"lower:%06o\n", value));
 	}
 	m_bus &= value;
 }
@@ -115,32 +125,29 @@ void alto2_cpu_device::rdram()
  */
 void alto2_cpu_device::wrtram()
 {
-	UINT32 bank = GET_CRAM_BANKSEL(m_cram_addr);
-	UINT32 wordaddr = GET_CRAM_WORDADDR(m_cram_addr);
-	UINT32 value = ((m_m << 16) | m_alu) ^ ALTO2_UCODE_INVERTED;
+	const UINT32 bank = GET_CRAM_BANKSEL(m_cram_addr);
+	const UINT32 wordaddr = GET_CRAM_WORDADDR(m_cram_addr);
+	const UINT32 addr = bank * ALTO2_UCODE_PAGE_SIZE + wordaddr;  // write RAM 0,1,2
+	const UINT32 value = (m_myl << 16) | m_alu;
 
-	UINT32 addr = bank * ALTO2_UCODE_PAGE_SIZE + wordaddr;  // write RAM 0,1,2
-	LOG((this,LOG_CPU,0,"    wrtram: RAM%d [%04o] upper:%06o lower:%06o", bank, wordaddr, m_m, m_alu));
-
-#if DEBUG_WRTRAM
-	char buff[128];
-	UINT8 oprom[4];
-	oprom[0] = m_m / 256;
-	oprom[1] = m_m % 256;
-	oprom[2] = m_m / 256;
-	oprom[3] = m_m % 256;
-	disasm_disassemble(buff, addr, oprom, oprom, 0);
-	printf("WR CRAM_BANKSEL=%d RAM%d [%04o] upper:%06o lower:%06o *** %s\n",
-			GET_CRAM_BANKSEL(m_cram_addr), bank, wordaddr, m_m, m_alu, buff);
-#endif
+	LOG((this,LOG_CPU,0,"    wrtram: RAM%d [%04o] upper:%06o lower:%06o", bank, wordaddr, m_myl, m_alu));
 
 	m_wrtram_flag = false;
-	if (ALTO2_UCODE_RAM_BASE + addr >= ALTO2_UCODE_SIZE) {
+	if (m_ucode_ram_base + addr >= m_ucode_size) {
 		LOG((this,LOG_CPU,0," invalid address %06o\n", addr));
 		return;
 	}
 	LOG((this,LOG_CPU,0,"\n"));
-	WR_CRAM(addr, value);
+	*reinterpret_cast<UINT32 *>(m_ucode_cram.get() + addr * 4) = value ^ ALTO2_UCODE_INVERTED;
+
+#if DEBUG_WRTRAM
+	char buffer[256];
+	UINT8* oprom = m_ucode_cram.get() + 4 * wordaddr;
+	disasm_disassemble(buffer, wordaddr, oprom, oprom, 0);
+	printf("WR CRAM_BANKSEL=%d RAM%d [%04o] upper:%06o lower:%06o value:%011o '%s'\n",
+			GET_CRAM_BANKSEL(m_cram_addr), bank, wordaddr, m_myl, m_alu,
+			value, buffer);
+#endif
 }
 
 /**
@@ -153,13 +160,13 @@ void alto2_cpu_device::bs_early_read_sreg()
 {
 	UINT16 r;
 
-	if (m_d_rsel) {
+	if (rsel()) {
 		UINT8 bank = m_s_reg_bank[m_task];
-		r = m_s[bank][m_d_rsel];
-		LOG((this,LOG_RAM,2,"    <-S%02o; bus &= S[%o][%02o] (%#o)\n", m_d_rsel, bank, m_d_rsel, r));
+		r = m_s[bank][rsel()];
+		LOG((this,LOG_RAM,2,"    <-S%02o; bus &= S[%o][%02o] (%#o)\n", rsel(), bank, rsel(), r));
 	} else {
-		r = m_m;
-		LOG((this,LOG_RAM,2,"    <-S%02o; bus &= M (%#o)\n", m_d_rsel, r));
+		r = m_myl;
+		LOG((this,LOG_RAM,2,"    <-S%02o; bus &= M (%#o)\n", rsel(), r));
 	}
 	m_bus &= r;
 }
@@ -170,7 +177,7 @@ void alto2_cpu_device::bs_early_read_sreg()
 void alto2_cpu_device::bs_early_load_sreg()
 {
 	int r = 0;  /* ??? */
-	LOG((this,LOG_RAM,2,"    S%02o<- BUS &= garbage (%#o)\n", m_d_rsel, r));
+	LOG((this,LOG_RAM,2,"    S%02o<- BUS &= garbage (%#o)\n", rsel(), r));
 	m_bus &= r;
 }
 
@@ -180,8 +187,8 @@ void alto2_cpu_device::bs_early_load_sreg()
 void alto2_cpu_device::bs_late_load_sreg()
 {
 	UINT8 bank = m_s_reg_bank[m_task];
-	m_s[bank][m_d_rsel] = m_m;
-	LOG((this,LOG_RAM,2,"    S%02o<- S[%o][%02o] := %#o\n", m_d_rsel, bank, m_d_rsel, m_m));
+	m_s[bank][rsel()] = m_myl;
+	LOG((this,LOG_RAM,2,"    S%02o<- S[%o][%02o] := %#o\n", rsel(), bank, rsel(), m_myl));
 }
 
 /**
@@ -190,6 +197,9 @@ void alto2_cpu_device::bs_late_load_sreg()
 void alto2_cpu_device::branch_ROM(const char *from, int page)
 {
 	(void)from;
+#if DEBUG_BRANCH
+	printf("SWMODE: branch from %s to ROM%d (%#o)\n", from, page, m_next2);
+#endif
 	m_next2 = (m_next2 & ALTO2_UCODE_PAGE_MASK) + page * ALTO2_UCODE_PAGE_SIZE;
 	LOG((this,LOG_RAM,2,"    SWMODE: branch from %s to ROM%d (%#o)\n", from, page, m_next2));
 }
@@ -200,7 +210,10 @@ void alto2_cpu_device::branch_ROM(const char *from, int page)
 void alto2_cpu_device::branch_RAM(const char *from, int page)
 {
 	(void)from;
-	m_next2 = (m_next2 & ALTO2_UCODE_PAGE_MASK) + ALTO2_UCODE_RAM_BASE + page * ALTO2_UCODE_PAGE_SIZE;
+#if DEBUG_BRANCH
+	printf("SWMODE: branch from %s to RAM%d (%#o)\n", from, page, m_next2);
+#endif
+	m_next2 = (m_next2 & ALTO2_UCODE_PAGE_MASK) + m_ucode_ram_base + page * ALTO2_UCODE_PAGE_SIZE;
 	LOG((this,LOG_RAM,2,"    SWMODE: branch from %s to RAM%d\n", from, page, m_next2));
 }
 
@@ -218,147 +231,152 @@ void alto2_cpu_device::branch_RAM(const char *from, int page)
  */
 void alto2_cpu_device::f1_late_swmode()
 {
-	/* currently executing in what page? */
-	UINT16 current = m_mpc / ALTO2_UCODE_PAGE_SIZE;
+	// Currently executing in what CROM/CRAM page?
+	UINT16 page = m_mpc / ALTO2_UCODE_PAGE_SIZE;
+	UINT16 next;
 
-#if (ALTO2_UCODE_ROM_PAGES == 1 && ALTO2_UCODE_RAM_PAGES == 1)
-	switch (current) {
-	case 0:
-		branch_RAM("ROM0", 0);
-		break;
-	case 1:
-		branch_ROM("RAM0", 0);
-		break;
-	default:
-		fatal(1, "Impossible current mpc %d\n", current);
-	}
-#endif
-#if (ALTO2_UCODE_ROM_PAGES == 2 && ALTO2_UCODE_RAM_PAGES == 1)
-	UINT16 next = X_RDBITS(m_next2,10,1,1);
-
-	switch (current) {
-	case 0: /* ROM0 to RAM0 or ROM1 */
-		switch (next) {
+	switch (m_cram_config) {
+	case 1:	// 1K CROM, 1K CRAM
+		switch (page) {
 		case 0:
 			branch_RAM("ROM0", 0);
 			break;
 		case 1:
-			branch_ROM("ROM0", 1);
-			break;
-		default:
-			fatal(1, "Impossible next %d\n", next);
-		}
-		break;
-	case 1: /* ROM1 to ROM0 or RAM0 */
-		switch (next) {
-		case 0:
-			branch_ROM("ROM1", 0);
-			break;
-		case 1:
-			branch_RAM("ROM1", 0);
-			break;
-		default:
-			fatal(1, "Impossible next %d\n", next);
-		}
-		break;
-	case 2: /* RAM0 to ROM0 or ROM1 */
-		switch (next) {
-		case 0:
 			branch_ROM("RAM0", 0);
 			break;
-		case 1:
-			branch_ROM("RAM0", 1);
-			break;
 		default:
-			fatal(1, "Impossible next %d\n", next);
+			fatal(1, "Impossible current mpc %u\n", page);
 		}
 		break;
-	default:
-		fatal(1, "Impossible current mpc %d\n", current);
-	}
-#endif
-#if (ALTO2_UCODE_ROM_PAGES == 1 && ALTO2_UCODE_RAM_PAGES == 3)
-	UINT16 next = X_RDBITS(m_next2,10,1,2);
 
-	switch (current) {
-	case 0: /* ROM0 to RAM0, RAM2, RAM1, RAM0 */
-		switch (next) {
-		case 0:
-			branch_RAM("ROM0", 0);
+	case 2:	// 2K CROM, 1K CRAM
+		next = X_RDBITS(m_next2,10,1,1);
+		switch (page) {
+		case 0: /* ROM0 to RAM0 or ROM1 */
+			switch (next) {
+			case 0:
+				branch_RAM("ROM0", 0);
+				break;
+			case 1:
+				branch_ROM("ROM0", 1);
+				break;
+			default:
+				fatal(1, "Impossible next %u\n", next);
+			}
 			break;
-		case 1:
-			branch_RAM("ROM0", 2);
+		case 1: /* ROM1 to ROM0 or RAM0 */
+			switch (next) {
+			case 0:
+				branch_ROM("ROM1", 0);
+				break;
+			case 1:
+				branch_RAM("ROM1", 0);
+				break;
+			default:
+				fatal(1, "Impossible next %u\n", next);
+			}
 			break;
-		case 2:
-			branch_RAM("ROM0", 1);
-			break;
-		case 3:
-			branch_RAM("ROM0", 0);
+		case 2: /* RAM0 to ROM0 or ROM1 */
+			switch (next) {
+			case 0:
+				branch_ROM("RAM0", 0);
+				break;
+			case 1:
+				branch_ROM("RAM0", 1);
+				break;
+			default:
+				fatal(1, "Impossible next %u\n", next);
+			}
 			break;
 		default:
-			fatal(1, "Impossible next %d\n", next);
+			fatal(1, "Impossible current mpc %u\n", page);
 		}
 		break;
-	case 1: /* RAM0 to ROM0, RAM2, RAM1, RAM1 */
-		switch (next) {
-		case 0:
-			branch_ROM("RAM0", 0);
+
+	case 3:	// 1K CROM, 3K CRAM
+		next = X_RDBITS(m_next2,10,1,2);
+
+		switch (page) {
+		case 0: /* ROM0 to RAM0, RAM2, RAM1, RAM0 */
+			switch (next) {
+			case 0:
+				branch_RAM("ROM0", 0);
+				break;
+			case 1:
+				branch_RAM("ROM0", 2);
+				break;
+			case 2:
+				branch_RAM("ROM0", 1);
+				break;
+			case 3:
+				branch_RAM("ROM0", 0);
+				break;
+			default:
+				fatal(1, "Impossible next %u\n", next);
+			}
 			break;
-		case 1:
-			branch_RAM("RAM0", 2);
+		case 1: /* RAM0 to ROM0, RAM2, RAM1, RAM1 */
+			switch (next) {
+			case 0:
+				branch_ROM("RAM0", 0);
+				break;
+			case 1:
+				branch_RAM("RAM0", 2);
+				break;
+			case 2:
+				branch_RAM("RAM0", 1);
+				break;
+			case 3:
+				branch_RAM("RAM0", 1);
+				break;
+			default:
+				fatal(1, "Impossible next %u\n", next);
+			}
 			break;
-		case 2:
-			branch_RAM("RAM0", 1);
+		case 2: /* RAM1 to ROM0, RAM2, RAM0, RAM0 */
+			switch (next) {
+			case 0:
+				branch_ROM("RAM1", 0);
+				break;
+			case 1:
+				branch_RAM("RAM1", 2);
+				break;
+			case 2:
+				branch_RAM("RAM1", 0);
+				break;
+			case 3:
+				branch_RAM("RAM1", 0);
+				break;
+			default:
+				fatal(1, "Impossible next %u\n", next);
+			}
 			break;
-		case 3:
-			branch_RAM("RAM0", 1);
+		case 3: /* RAM2 to ROM0, RAM1, RAM0, RAM0 */
+			switch (next) {
+			case 0:
+				branch_ROM("RAM2", 0);
+				break;
+			case 1:
+				branch_RAM("RAM2", 1);
+				break;
+			case 2:
+				branch_RAM("RAM2", 0);
+				break;
+			case 3:
+				branch_RAM("RAM2", 0);
+				break;
+			default:
+				fatal(1, "Impossible next %u\n", next);
+			}
 			break;
 		default:
-			fatal(1, "Impossible next %d\n", next);
-		}
-		break;
-	case 2: /* RAM1 to ROM0, RAM2, RAM0, RAM0 */
-		switch (next) {
-		case 0:
-			branch_ROM("RAM1", 0);
-			break;
-		case 1:
-			branch_RAM("RAM1", 2);
-			break;
-		case 2:
-			branch_RAM("RAM1", 0);
-			break;
-		case 3:
-			branch_RAM("RAM1", 0);
-			break;
-		default:
-			fatal(1, "Impossible next %d\n", next);
-		}
-		break;
-	case 3: /* RAM2 to ROM0, RAM1, RAM0, RAM0 */
-		switch (next) {
-		case 0:
-			branch_ROM("RAM2", 0);
-			break;
-		case 1:
-			branch_RAM("RAM2", 1);
-			break;
-		case 2:
-			branch_RAM("RAM2", 0);
-			break;
-		case 3:
-			branch_RAM("RAM2", 0);
-			break;
-		default:
-			fatal(1, "Impossible next %d\n", next);
+			fatal(1, "Impossible current mpc %u\n", page);
 		}
 		break;
 	default:
-		fatal(1, "Impossible current mpc %d\n", current);
+		fatal(1, "Impossible control ROM/RAM config %u (%u CROM pages, %u CRAM pages)\n",
+			m_cram_config, m_ucode_rom_pages, m_ucode_ram_pages);
 	}
-#else
-	fatal(1, "Impossible control ROM/RAM combination %d/%d\n", ALTO2_UCODE_ROM_PAGES, ALTO2_UCODE_RAM_PAGES);
-#endif
 }
 
 /**
@@ -379,8 +397,6 @@ void alto2_cpu_device::f1_late_rdram()
 	LOG((this,LOG_RAM,2,"    RDRAM\n"));
 }
 
-#if (ALTO2_UCODE_RAM_PAGES == 3)
-
 /**
  * @brief f1_load_rmr late: load the reset mode register
  *
@@ -393,16 +409,17 @@ void alto2_cpu_device::f1_late_load_rmr()
 	LOG((this,LOG_RAM,2,"    RMR<-; BUS (%#o)\n", m_bus));
 	m_reset_mode = m_bus;
 }
-#else   // ALTO2_UCODE_RAM_PAGES != 3
+
 /**
  * @brief f1_load_srb late: load the S register bank from BUS[12-14]
+ * F1=013 corresponds to SRB<- in the emulator, if the RAM size is
+ * just 1K. It sets the S register bank for the current task.
  */
 void alto2_cpu_device::f1_late_load_srb()
 {
-	m_s_reg_bank[m_task] = X_RDBITS(m_bus,16,12,14) % ALTO2_SREG_BANKS;
+	m_s_reg_bank[m_task] = X_RDBITS(m_bus,16,12,14) % m_sreg_banks;
 	LOG((this,LOG_RAM,2,"    SRB<-; srb[%d] := %#o\n", m_task, m_s_reg_bank[m_task]));
 }
-#endif
 
 /**
  * @brief RAM related task slots initialization
@@ -410,18 +427,6 @@ void alto2_cpu_device::f1_late_load_srb()
 void alto2_cpu_device::init_ram(int task)
 {
 	m_ram_related[task] = true;
-
-	set_bs(task, bs_ram_read_slocation, &alto2_cpu_device::bs_early_read_sreg, nullptr);
-	set_bs(task, bs_ram_load_slocation, &alto2_cpu_device::bs_early_load_sreg, &alto2_cpu_device::bs_late_load_sreg);
-
-	set_f1(task, f1_ram_swmode,         nullptr, &alto2_cpu_device::f1_late_swmode);
-	set_f1(task, f1_ram_wrtram,         nullptr, &alto2_cpu_device::f1_late_wrtram);
-	set_f1(task, f1_ram_rdram,          nullptr, &alto2_cpu_device::f1_late_rdram);
-#if (ALTO2_UCODE_RAM_PAGES == 3)
-	set_f1(task, f1_ram_load_rmr,       0, &alto2_cpu_device::f1_late_load_rmr);
-#else   // ALTO2_UCODE_RAM_PAGES != 3
-	set_f1(task, f1_ram_load_srb,       nullptr, &alto2_cpu_device::f1_late_load_srb);
-#endif
 }
 
 void alto2_cpu_device::exit_ram()
@@ -433,6 +438,6 @@ void alto2_cpu_device::reset_ram()
 {
 	m_rdram_flag = false;
 	m_wrtram_flag = false;
-	m_m = 0;
+	m_myl = 0;
 	memset(m_s, 0, sizeof(m_s));
 }

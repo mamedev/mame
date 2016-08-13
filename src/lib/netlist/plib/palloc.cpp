@@ -64,7 +64,9 @@ mempool::~mempool()
 	for (auto & b : m_blocks)
 	{
 		if (b.m_num_alloc != 0)
-			fprintf(stderr, "Found block with dangling allocations\n");
+		{
+			fprintf(stderr, "Found block with %d dangling allocations\n", static_cast<int>(b.m_num_alloc));
+		}
 		delete b.data;
 	}
 	m_blocks.clear();
@@ -122,8 +124,8 @@ void mempool::free(void *ptr)
 		fprintf(stderr, "Argh .. double free\n");
 	else
 	{
-		b->m_free = m_min_alloc;
-		b->cur_ptr = b->data;
+		//b->m_free = m_min_alloc;
+		//b->cur_ptr = b->data;
 	}
 	b->m_num_alloc--;
 }

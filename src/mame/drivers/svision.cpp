@@ -29,7 +29,7 @@ TIMER_CALLBACK_MEMBER(svision_state::svision_pet_timer)
 	switch (m_pet.state)
 	{
 		case 0:
-			if ( m_joy2 )
+			if (m_joy2.found())
 			{
 				m_pet.input = m_joy2->read();
 			}
@@ -459,13 +459,13 @@ DEVICE_IMAGE_LOAD_MEMBER( svision_state, svision_cart )
 	if (size > 0x20000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void svision_state::machine_start()

@@ -130,7 +130,7 @@ ROM_START( stic_grom )
 	ROM_LOAD( "ro-3-9503-003.u21", 0, 0x0800, CRC(683a4158) SHA1(f9608bb4ad1cfe3640d02844c7ad8e0bcd974917))
 ROM_END
 
-const rom_entry *stic_device::device_rom_region() const
+const tiny_rom_entry *stic_device::device_rom_region() const
 {
 	return ROM_NAME( stic_grom );
 }
@@ -191,10 +191,10 @@ int stic_device::sprites_collide(int spriteNum1, int spriteNum2)
 		return FALSE;
 
 	// iterate over the intersecting bits to see if any touch
-	x0 = MAX(x1, x2);
-	y0 = MAX(y1, y2);
-	w0 = MIN(x1 + w1, x2 + w2) - x0;
-	h0 = MIN(y1 + h1, y2 + h2) - y0;
+	x0 = std::max(x1, x2);
+	y0 = std::max(y1, y2);
+	w0 = std::min(x1 + w1, x2 + w2) - x0;
+	h0 = std::min(y1 + h1, y2 + h2) - y0;
 	x1 = x0 - x1;
 	y1 = y0 - y1;
 	x2 = x0 - x2;

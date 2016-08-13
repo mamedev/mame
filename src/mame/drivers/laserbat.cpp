@@ -136,8 +136,7 @@ WRITE8_MEMBER(laserbat_state_base::ct_io_w)
 
 READ8_MEMBER(laserbat_state_base::rrowx_r)
 {
-	ioport_port *const mux_ports[] = { m_row0, m_row1, m_sw1, m_sw2 };
-	return (m_mpx_p_1_2 ? m_row2 : mux_ports[m_input_mux])->read();
+	return (m_mpx_p_1_2 ? m_row2 : m_mux_ports[m_input_mux])->read();
 }
 
 /*

@@ -294,7 +294,7 @@ ioport_constructor isa8_cga_device::device_input_ports() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa8_cga_device::device_rom_region() const
+const tiny_rom_entry *isa8_cga_device::device_rom_region() const
 {
 	return ROM_NAME( cga );
 }
@@ -349,7 +349,7 @@ void isa8_cga_device::device_start()
 	set_isa_device();
 	m_vram.resize(m_vram_size);
 	m_isa->install_device(0x3d0, 0x3df, read8_delegate( FUNC(isa8_cga_device::io_read), this ), write8_delegate( FUNC(isa8_cga_device::io_write), this ) );
-	m_isa->install_bank(0xb8000, 0xb8000 + MIN(0x8000,m_vram_size) - 1, "bank_cga", &m_vram[0]);
+	m_isa->install_bank(0xb8000, 0xb8000 + (std::min<size_t>)(0x8000, m_vram_size) - 1, "bank_cga", &m_vram[0]);
 	if(m_vram_size == 0x4000)
 		m_isa->install_bank(0xbc000, 0xbffff, "bank_cga", &m_vram[0]);
 
@@ -461,7 +461,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa8_cga_poisk2_device::device_rom_region() const
+const tiny_rom_entry *isa8_cga_poisk2_device::device_rom_region() const
 {
 	return ROM_NAME( cga_poisk2 );
 }
@@ -1561,7 +1561,7 @@ isa8_cga_pc1512_device::isa8_cga_pc1512_device(const machine_config &mconfig, co
 }
 
 
-const rom_entry *isa8_cga_pc1512_device::device_rom_region() const
+const tiny_rom_entry *isa8_cga_pc1512_device::device_rom_region() const
 {
 	return nullptr;
 }
@@ -1706,7 +1706,7 @@ ROM_START( wyse700 )
 	ROM_LOAD( "250212-03.f5", 0x2000, 0x2000, CRC(6930d741) SHA1(1beeb133c5e39eee9914bdc5924039d70b5edcad))
 ROM_END
 
-const rom_entry *isa8_wyse700_device::device_rom_region() const
+const tiny_rom_entry *isa8_wyse700_device::device_rom_region() const
 {
 	return ROM_NAME( wyse700 );
 }
@@ -1821,7 +1821,7 @@ WRITE8_MEMBER( isa8_ec1841_0002_device::io_write )
 										read8_delegate( FUNC(isa8_ec1841_0002_device::char_ram_read), this),
 										write8_delegate(FUNC(isa8_ec1841_0002_device::char_ram_write), this) );
 		} else {
-			m_isa->install_bank(0xb8000, 0xb8000 + MIN(0x8000,m_vram_size) - 1, "bank_cga", &m_vram[0]);
+			m_isa->install_bank(0xb8000, 0xb8000 + (std::min<size_t>)(0x8000, m_vram_size) - 1, "bank_cga", &m_vram[0]);
 			if(m_vram_size == 0x4000)
 				m_isa->install_bank(0xbc000, 0xbffff, "bank_cga", &m_vram[0]);
 		}
@@ -1872,7 +1872,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa8_cga_iskr1031_device::device_rom_region() const
+const tiny_rom_entry *isa8_cga_iskr1031_device::device_rom_region() const
 {
 	return ROM_NAME( cga_iskr1031 );
 }
@@ -1897,7 +1897,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa8_cga_iskr1030m_device::device_rom_region() const
+const tiny_rom_entry *isa8_cga_iskr1030m_device::device_rom_region() const
 {
 	return ROM_NAME( cga_iskr1030m );
 }
@@ -1921,7 +1921,7 @@ ROM_START( mc1502 )
 	ROM_LOAD( "symgen.rom", 0x0000, 0x2000, CRC(b2747a52) SHA1(6766d275467672436e91ac2997ac6b77700eba1e))
 ROM_END
 
-const rom_entry *isa8_cga_mc1502_device::device_rom_region() const
+const tiny_rom_entry *isa8_cga_mc1502_device::device_rom_region() const
 {
 	return ROM_NAME( mc1502 );
 }

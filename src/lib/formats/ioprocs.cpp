@@ -196,11 +196,11 @@ void io_generic_write_filler(struct io_generic *genio, UINT8 filler, UINT64 offs
 	UINT8 buffer[512];
 	size_t this_length;
 
-	memset(buffer, filler, MIN(length, sizeof(buffer)));
+	memset(buffer, filler, std::min(length, sizeof(buffer)));
 
 	while(length > 0)
 	{
-		this_length = MIN(length, sizeof(buffer));
+		this_length = std::min(length, sizeof(buffer));
 		io_generic_write(genio, buffer, offset, this_length);
 		offset += this_length;
 		length -= this_length;

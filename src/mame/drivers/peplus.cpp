@@ -227,6 +227,14 @@ public:
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_in0(*this, "IN0"),
+		m_door(*this, "DOOR"),
+		m_sensor(*this, "SENSOR"),
+		m_dbv(*this, "DBV"),
+		m_bc(*this, "BC"),
+		m_bp(*this, "BP"),
+		m_touch_x(*this, "TOUCH_X"),
+		m_touch_y(*this, "TOUCH_Y"),
 		m_cmos_ram(*this, "cmos"),
 		m_program_ram(*this, "prograram"),
 		m_s3000_ram(*this, "s3000_ram"),
@@ -246,6 +254,15 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	optional_ioport m_in0;
+	optional_ioport m_door;
+	optional_ioport m_sensor;
+	optional_ioport m_dbv;
+	optional_ioport m_bc;
+	optional_ioport m_bp;
+	optional_ioport m_touch_x;
+	optional_ioport m_touch_y;
 
 	required_shared_ptr<UINT8> m_cmos_ram;
 	required_shared_ptr<UINT8> m_program_ram;
@@ -406,8 +423,8 @@ void peplus_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 void peplus_state::handle_lightpen()
 {
-	int x_val = read_safe(ioport("TOUCH_X"), 0x00);
-	int y_val = read_safe(ioport("TOUCH_Y"), 0x00);
+	int x_val = m_touch_x.read_safe(0x00);
+	int y_val = m_touch_y.read_safe(0x00);
 	const rectangle &vis_area = m_screen->visible_area();
 	int xt, yt;
 
@@ -581,14 +598,14 @@ READ8_MEMBER(peplus_state::peplus_input0_r)
 	UINT64 curr_cycles = m_maincpu->total_cycles();
 
 	// Allow Bill Insert if DBV Enabled
-	if (m_bv_enable_state == 0x01 && ((read_safe(ioport("DBV"), 0xff) & 0x01) == 0x00)) {
+	if (m_bv_enable_state == 0x01 && ((m_dbv.read_safe(0xff) & 0x01) == 0x00)) {
 		// If not busy
 		if (m_bv_busy == 0) {
 			m_bv_busy = 1;
 
 			// Fetch Current Denomination and Protocol
-			m_bv_denomination = ioport("BC")->read();
-			m_bv_protocol = ioport("BP")->read();
+			m_bv_denomination = m_bc->read();
+			m_bv_protocol = m_bp->read();
 
 			if (m_bv_protocol == 0) {
 				// ID-022
@@ -775,9 +792,9 @@ READ8_MEMBER(peplus_state::peplus_input0_r)
 	}
 
 	if (m_bv_pulse == 1) {
-		return (0x70 || ioport("IN0")->read()); // Add Bill Validator Credit Pulse
+		return (0x70 || m_in0->read()); // Add Bill Validator Credit Pulse
 	} else {
-		return ioport("IN0")->read();
+		return m_in0->read();
 	}
 }
 
@@ -804,7 +821,7 @@ READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
 		sda = m_i2cmem->read_sda();
 	}
 
-	if ((read_safe(ioport("SENSOR"), 0x00) & 0x01) == 0x01 && m_coin_state == 0) {
+	if ((m_sensor.read_safe(0x00) & 0x01) == 0x01 && m_coin_state == 0) {
 		m_coin_state = 1; // Start Coin Cycle
 		m_last_cycles = m_maincpu->total_cycles();
 	} else {
@@ -840,7 +857,7 @@ READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
 	}
 
 	if (curr_cycles - m_last_door > door_wait) {
-		if ((read_safe(ioport("DOOR"), 0xff) & 0x01) == 0x01) {
+		if ((m_door.read_safe(0xff) & 0x01) == 0x01) {
 			if (m_doorcycle) {
 				m_door_open = (m_door_open ^ 0x01) & 0x01;
 			} else {

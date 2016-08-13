@@ -5,8 +5,8 @@
 
 #include "naomibd.h"
 
-#define MCFG_NAOMI_M4_BOARD_ADD(_tag, _key_tag, _eeprom_tag, _actel_tag, _irq_cb) \
-	MCFG_NAOMI_BOARD_ADD(_tag, NAOMI_M4_BOARD, _eeprom_tag, _actel_tag, _irq_cb) \
+#define MCFG_NAOMI_M4_BOARD_ADD(_tag, _key_tag, _eeprom_tag, _irq_cb) \
+	MCFG_NAOMI_BOARD_ADD(_tag, NAOMI_M4_BOARD, _eeprom_tag, _irq_cb) \
 	naomi_m4_board::static_set_tags(*device, "^" _key_tag);
 
 class naomi_m4_board : public naomi_board
@@ -33,6 +33,7 @@ private:
 
 	static const UINT8 k_sboxes[4][16];
 
+	UINT16 m4id;
 	required_memory_region m_region;
 	required_region_ptr<UINT8> m_key_data;
 	UINT16 subkey1, subkey2;
