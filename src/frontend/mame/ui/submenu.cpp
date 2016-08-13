@@ -174,7 +174,6 @@ submenu::submenu(mame_ui_manager &mui, render_container &container, std::vector<
 			if (sm_option.entry->type() == OPTION_STRING)
 			{
 				sm_option.value.clear();
-				printf("%s\n", sm_option.entry->description());
 				std::string descr(sm_option.entry->description()), delim(", ");
 				descr.erase(0, descr.find(":") + 2);
 
