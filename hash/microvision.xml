@@ -216,4 +216,48 @@ The "rc" feature is used to indicate the source of the clock signal
 		</part>
 	</software>
 
+<!-- Homebrew -->
+
+	<software name="bomber">
+		<description>Bomber</description>
+		<year>2014</year>
+		<publisher>Paul Robson</publisher>
+		<part name="cart" interface="microvision_cart">
+			<feature name="pcb" value="4952 REV-A" />
+			<feature name="paddle" value="no" />
+			<feature name="rc" value="100pf/23.2K" />
+			<dataarea name="rom" size="2048">
+				<rom name="bomber.bin" size="2048" crc="badbd0f8" sha1="3c31c24b58b1d6ac1c7313b690ec796cc5010cb7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demo">
+		<description>Demo</description>
+		<year>2013</year>
+		<publisher>Paul Robson</publisher>
+		<part name="cart" interface="microvision_cart">
+			<feature name="pcb" value="4952 REV-A" />
+			<feature name="paddle" value="no" />
+			<feature name="rc" value="100pf/23.2K" />
+			<dataarea name="rom" size="2048">
+				<rom name="demo.bin" size="2048" crc="54f1b288" sha1="9fcd930dff5f09979d3ed1278a928330b7000068" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="invaders">
+		<description>Invaders</description>
+		<year>2014</year>
+		<publisher>Paul Robson</publisher>
+		<part name="cart" interface="microvision_cart">
+			<feature name="pcb" value="4952 REV-A" />
+			<feature name="paddle" value="no" />
+			<feature name="rc" value="100pf/23.2K" />
+			<dataarea name="rom" size="2048">
+				<rom name="invaders.bin" size="2048" crc="d520ff6e" sha1="c979d7004fc205ee050045f13e2d6f2c31e2083e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
