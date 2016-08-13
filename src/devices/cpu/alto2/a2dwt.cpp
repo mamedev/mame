@@ -42,25 +42,27 @@
 #define FIFO_STOPWAKE(a38) (0 == (a38 & disp_a38_STOPWAKE) ? true : false)
 
 /**
- * @brief block the display word task
+ * @brief Block the display word task.
  */
 void alto2_cpu_device::f1_early_dwt_block()
 {
 	m_dsp.dwt_blocks = true;
 
-	/* clear the wakeup for the display word task */
+	// Clear the wakeup for the display word task
 	m_task_wakeup &= ~(1 << m_task);
 	LOG((this,LOG_DWT,2,"    BLOCK %s\n", task_name(m_task)));
 
-	/* wakeup the display horizontal task, if it didn't block itself */
+	// Wakeup the display horizontal task, if it didn't block itself
 	if (!m_dsp.dht_blocks)
 		m_task_wakeup |= 1 << task_dht;
 }
 
 /**
- * @brief load the display data register
+ * @brief Load the display data register
+ * Pushes the word on the bus to the display FIFO.
+ * If the FIFO becomes full, the wakeup flag for task_dwt is reset.
  */
-void alto2_cpu_device::f2_late_dwt_load_ddr()
+void alto2_cpu_device::f2_late_load_ddr()
 {
 	LOG((this,LOG_DWT,2,"    DDR<- BUS (%#o)\n", m_bus));
 	m_dsp.fifo[m_dsp.wa] = m_bus;

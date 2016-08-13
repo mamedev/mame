@@ -37,31 +37,11 @@ void alto2_cpu_device::f2_late_load_csr()
 
 /**
  * @brief curt_activate: called by the CPU when the cursor task becomes active
- *
- * Shift CSR to xpreg % 16 position to make it easier to
- * to handle the word xor in unload_word().
- * <PRE>
- * xpreg % 16   cursor bits
- *              [ first word   ][  second word ]
- * ----------------------------------------------
- *     0        xxxxxxxxxxxxxxxx0000000000000000
- *     1        0xxxxxxxxxxxxxxxx000000000000000
- *     2        00xxxxxxxxxxxxxxxx00000000000000
- * ...
- *    14        00000000000000xxxxxxxxxxxxxxxx00
- *    15        000000000000000xxxxxxxxxxxxxxxx0
- * </PRE>
  */
 void alto2_cpu_device::activate_curt()
 {
 	m_task_wakeup &= ~(1 << m_task);
 	m_dsp.curt_wakeup = false;
-
-	int x = 01777 - m_dsp.xpreg;
-	UINT32 bits = m_dsp.csr << (16 - (x & 15));
-	m_dsp.cursor0 = static_cast<UINT16>(bits >> 16);
-	m_dsp.cursor1 = static_cast<UINT16>(bits);
-	m_dsp.curxpos = x / 16;
 }
 
 /** @brief initialize the cursor task F1 and F2 functions */
@@ -79,6 +59,4 @@ void alto2_cpu_device::reset_curt()
 	m_dsp.curt_blocks = false;
 	m_dsp.xpreg = 0;
 	m_dsp.csr = 0;
-	m_dsp.curxpos = 0;
-	m_dsp.cursor0 = m_dsp.cursor1 = 0;
 }

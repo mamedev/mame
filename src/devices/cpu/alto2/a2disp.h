@@ -39,7 +39,7 @@
  * scanlines to the monitor. The frame rate is 60Hz, which is actually the rate
  * of the half-frames. The rate for full frames is thus 30Hz.
  */
-#define ALTO2_DISPLAY_TOTAL_HEIGHT ((ALTO2_DISPLAY_HLC_END - ALTO2_DISPLAY_HLC_START) / 2)
+#define ALTO2_DISPLAY_TOTAL_HEIGHT ((ALTO2_DISPLAY_HLC_END + 1 - ALTO2_DISPLAY_HLC_START) / 2)
 
 /**
  * @brief display total width, including horizontal blanking
@@ -80,7 +80,8 @@
 #define ALTO2_DISPLAY_HEIGHT 808
 
 //! Visible width of the display; 38 x 16 bit words - 2 pixels.
-#define ALTO2_DISPLAY_WIDTH 606
+//#define ALTO2_DISPLAY_WIDTH 606
+#define ALTO2_DISPLAY_WIDTH 608
 
 //! Visible words per scanline.
 #define ALTO2_DISPLAY_VISIBLE_WORDS ((ALTO2_DISPLAY_WIDTH+15)/16)
@@ -197,7 +198,10 @@ struct {
 	UINT32 hlc;                             //!< horizontal line counter
 	UINT32 setmode;                         //!< value written by last SETMODE<-
 	UINT32 inverse;                         //!< set to 0xffff if line is inverse, 0x0000 otherwise
+	UINT32 scanline;                        //!< current scanline
 	bool halfclock;                         //!< false for normal pixel clock, true for half pixel clock
+	bool vsync;                             //!< true after vsync, false when end_of_frame was called
+	bool odd;                               //!< true if odd field
 	UINT16 fifo[ALTO2_DISPLAY_FIFO];        //!< display word fifo
 	UINT32 wa;                              //!< fifo input pointer (write address; 4-bit)
 	UINT32 ra;                              //!< fifo output pointer (read address; 4-bit)
@@ -207,12 +211,8 @@ struct {
 	bool dwt_blocks;                        //!< set true, if the DWT executed BLOCK
 	bool curt_blocks;                       //!< set true, if the CURT executed BLOCK
 	bool curt_wakeup;                       //!< set true, if CURT wakeups are generated
-	UINT32 vblank;                          //!< most recent HLC with VBLANK still high (11-bit)
 	UINT32 xpreg;                           //!< cursor cursor x position register (10-bit)
 	UINT32 csr;                             //!< cursor shift register (16-bit)
-	UINT32 curxpos;                         //!< helper: first cursor word in scanline
-	UINT32 cursor0;                         //!< helper: shifted cursor data for left word
-	UINT32 cursor1;                         //!< helper: shifted cursor data for right word
 	std::unique_ptr<UINT16[]> framebuf;     //!< array of words of the raw bitmap that is displayed
 	UINT8 *patterns;                        //!< array of 65536 patterns (16 bytes) with 1 byte per pixel
 	std::unique_ptr<bitmap_ind16> bitmap;   //!< MAME bitmap with 16 bit indices
