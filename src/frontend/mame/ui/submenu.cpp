@@ -140,7 +140,7 @@ submenu::submenu(mame_ui_manager &mui, render_container &container, std::vector<
 	else
 		opts = dynamic_cast<core_options*>(options);
 
-	for (auto & sm_option : m_options)
+	for (option & sm_option : m_options)
 	{
 		switch (sm_option.type)
 		{
@@ -174,8 +174,15 @@ submenu::submenu(mame_ui_manager &mui, render_container &container, std::vector<
 			if (sm_option.entry->type() == OPTION_STRING)
 			{
 				sm_option.value.clear();
+				printf("%s\n", sm_option.entry->description());
 				std::string descr(sm_option.entry->description()), delim(", ");
 				descr.erase(0, descr.find(":") + 2);
+
+				std::string default_value(sm_option.entry->default_value());
+				std::string auto_value(OSDOPTVAL_AUTO);
+				if (default_value == auto_value)
+					descr = auto_value + delim + descr;
+
 				size_t p1, p2 = 0;
 				while ((p1 = descr.find_first_not_of(delim, p2)) != std::string::npos)
 				{
