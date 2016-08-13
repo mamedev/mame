@@ -36213,6 +36213,9 @@ wcombatk                        // 2002
 wcombatu                        // 2002
 xtrial                          // 2002
 
+@source:vis.cpp
+vis
+
 @source:vixen.cpp
 vixen                           //
 

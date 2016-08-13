@@ -3035,6 +3035,7 @@ files {
 	MAME_DIR .. "src/mame/includes/tandy2k.h",
 	MAME_DIR .. "src/mame/machine/tandy2kb.cpp",
 	MAME_DIR .. "src/mame/machine/tandy2kb.h",
+	MAME_DIR .. "src/mame/drivers/vis.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "ultimachine")
