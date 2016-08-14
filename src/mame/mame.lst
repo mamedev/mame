@@ -10146,9 +10146,10 @@ ssf2tu                          // 23/03/1994 (c) 1994 (USA)
 ssf2tur1                        // 23/02/1994 (c) 1994 (USA)
 ssf2u                           // 11/09/1993 (c) 1993 (USA)
 ssf2ud                          //
-ssf2xj                          // 23/02/1994 (c) 1994 (Japan)
-ssf2xjd                         //
-ssf2xjr                         // 23/02/1994 (c) 1994 (Japan)
+ssf2xj                          // 11/03/1994 (c) 1994 (Japan)
+ssf2xjr1                        // 23/02/1994 (c) 1994 (Japan)
+ssf2xjr1d                       //
+ssf2xjr1r                       // 23/02/1994 (c) 1994 (Japan)
 uecology                        // 03/12/1993 (c) 1994 (Japan)
 vampj                           // 05/07/1994 (c) 1994 (Japan)
 vampja                          // 05/07/1994 (c) 1994 (Japan)
@@ -11852,6 +11853,7 @@ poizone                         // (c) 1990 Sisteme
 deluxe5                         // (c) 2000 ESD
 deluxe5a                        // (c) 2000 ESD
 deluxe5b                        // (c) 2000 ESD
+deluxe4u						// (c) 2000 ESD
 hedpanic                        // (c) 2000 ESD
 hedpanicf                       // (c) 2000 ESD + Fuuki, Co. Ltd.
 hedpanico                       // (c) 1999 ESD

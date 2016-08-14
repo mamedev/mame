@@ -1267,6 +1267,32 @@ ROM_START( deluxe5b ) /* Deluxe 5 */
 	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(23f2b7d9) SHA1(328c951d14674760df68486841c933bad0d59fe3) ) /* AT27C010 mask rom */
 ROM_END
 
+
+ROM_START( deluxe4u ) /* Deluxe 4 U */
+	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "2.cu02", 0x000000, 0x040000,  CRC(db213e1f) SHA1(bf9c49635f79b92a761715138528200106aa86ae) )
+	ROM_LOAD16_BYTE( "1.cu03", 0x000001, 0x040000,  CRC(fbf14d74) SHA1(5ff5bf4ff55609452d5b8a49d8658f878541ce60) )
+
+	ROM_REGION( 0x40000, "audiocpu", 0 )        /* Z80 Code */
+	ROM_LOAD( "3.su06", 0x00000, 0x40000, CRC(31de379a) SHA1(a0c9a9cec7207cc4ba33abb68bef62d7eb8e75e9) )
+
+	ROM_REGION( 0x180000, "spr", 0 )    /* Sprites, 16x16x5 */
+	ROM_LOAD16_BYTE( "ju06", 0x000000, 0x040000, CRC(8b853bce) SHA1(fa6e654fc965d88bb426b76cdce3417f357b25f3) )
+	ROM_LOAD16_BYTE( "ju05", 0x000001, 0x040000, CRC(bbe81779) SHA1(750387fb4aaa04b7f4f1d3985896f5e11219e3ea) )
+	ROM_LOAD16_BYTE( "ju04", 0x080000, 0x040000, CRC(40fa2c2f) SHA1(b9d9bfdc9343f00bad9749c76472f064c509cfce) )
+	ROM_LOAD16_BYTE( "ju03", 0x080001, 0x040000, CRC(aa130fd3) SHA1(46a55d8ca59a52e610600fdba76d9729528d2871) )
+	ROM_LOAD16_BYTE( "ju07", 0x100000, 0x040000, CRC(d414c3af) SHA1(9299b07a8c7a3e30a1bb6028204a049a7cb510f7) )
+
+	ROM_REGION( 0x400000, "bgs", 0 )    /* Layers, 16x16x8 */
+	// could not get good reads of these, not the same as deluxe5
+	ROM_LOAD16_BYTE( "fu35", 0x000000, 0x200000, BAD_DUMP CRC(6dc3b387) SHA1(9be25eb71db2387c83825e05c9129e7a911a1b5e) )
+	ROM_LOAD16_BYTE( "fu34", 0x000001, 0x200000, BAD_DUMP CRC(e99b6668) SHA1(9c38c542153ccb8b97b7efd9a28390af2fe2dd7e) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "su10", 0x00000, 0x20000, CRC(23f2b7d9) SHA1(328c951d14674760df68486841c933bad0d59fe3) )
+ROM_END
+
+
 /* Tang Tang
 
 Tang Tang (ESD)
@@ -1581,6 +1607,7 @@ GAME( 2000, hedpanicf,hedpanic, hedpanic, hedpanic, driver_device, 0, ROT0, "ESD
 GAME( 2000, deluxe5,  0,        tangtang, hedpanic, driver_device, 0, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 1)", MACHINE_SUPPORTS_SAVE ) // all 3 sets report the same version number?
 GAME( 2000, deluxe5a, deluxe5,  tangtang, hedpanic, driver_device, 0, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, deluxe5b, deluxe5,  tangtang, hedpanic, driver_device, 0, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, deluxe4u, deluxe5,  tangtang, hedpanic, driver_device, 0, ROT0, "ESD",         "Deluxe 4 U (ver. 0107, 07/01/2000)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump of flash roms
 
 GAME( 2000, tangtang, 0,        tangtang, hedpanic, driver_device, 0, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)", MACHINE_SUPPORTS_SAVE )
 GAME( 2001, swatpolc, 0,        hedpanic, swatpolc, driver_device, 0, ROT0, "ESD",         "SWAT Police", MACHINE_SUPPORTS_SAVE )
