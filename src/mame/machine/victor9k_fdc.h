@@ -190,6 +190,8 @@ private:
 	int m_tach1;
 	int m_rdy0;
 	int m_rdy1;
+	int m_via_rdy0;
+	int m_via_rdy1;
 	UINT8 m_l0ms;
 	UINT8 m_l1ms;
 	int m_st0;

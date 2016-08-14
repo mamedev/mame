@@ -29,6 +29,7 @@
 
     TODO:
 
+	- audiokit tries to communicate with SCP using RDY0/1
     - write protect
     - separate read/write methods
     - communication error with SCP after loading boot sector
@@ -291,6 +292,8 @@ void victor_9000_fdc_t::device_start()
 	save_item(NAME(m_tach1));
 	save_item(NAME(m_rdy0));
 	save_item(NAME(m_rdy1));
+	save_item(NAME(m_via_rdy0));
+	save_item(NAME(m_via_rdy1));
 	save_item(NAME(m_l0ms));
 	save_item(NAME(m_l1ms));
 	save_item(NAME(m_st0));
@@ -435,8 +438,8 @@ READ8_MEMBER( victor_9000_fdc_t::floppy_p2_r )
 
 	UINT8 data = m_p2 & 0x3f;
 
-	data |= m_rdy0 << 6;
-	data |= m_rdy1 << 7;
+	data |= m_via_rdy0 << 6;
+	data |= m_via_rdy1 << 7;
 
 	return data;
 }
@@ -810,6 +813,8 @@ WRITE8_MEMBER( victor_9000_fdc_t::via5_pb_w )
 
 	if (LOG_VIA) logerror("%s %s WD %02x\n", machine().time().as_string(), machine().describe_context(), data);
 
+	m_via5->write_cb1(BIT(data, 7));
+
 	if (m_wd != data)
 	{
 		live_sync();
@@ -969,8 +974,8 @@ WRITE8_MEMBER( victor_9000_fdc_t::via6_pb_w )
 
 	*/
 
-	set_rdy0(BIT(data, 0));
-	set_rdy1(BIT(data, 1));
+	m_via_rdy0 = BIT(data, 0);
+	m_via_rdy1 = BIT(data, 1);
 
 	// motor speed controller reset
 	if (!BIT(data, 2))
@@ -985,6 +990,7 @@ WRITE8_MEMBER( victor_9000_fdc_t::via6_pb_w )
 	// stepper enable B
 	int stp1 = BIT(data, 7);
 	if (m_stp1 != stp1) sync = true;
+	m_via6->write_cb1(stp1);
 
 	if (sync)
 	{
