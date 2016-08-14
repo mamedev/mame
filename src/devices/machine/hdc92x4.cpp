@@ -8,8 +8,8 @@
     This controller handles MFM and FM encoded floppy disks and hard disks.
 
     References:
-    [1] SMC HDC9234 preliminary data book (1988)
-    [2] SMC HDC9224 data book
+    [1] SMC HDC9224 data book
+    [2] SMC HDC9234 preliminary data book (1988)
 
     The HDC 9224 / 9234 controller is also referred to as the "Universal Disk Controller" (UDC)
     by the data book
@@ -192,7 +192,7 @@ enum
 };
 
 /*
-    Definition of bits in the status register [1] p.7
+    Definition of bits in the status register [2] p.7
 */
 enum
 {
@@ -623,6 +623,11 @@ int hdc92x4_device::current_sector()
 	return m_register_r[CURRENT_SECTOR] & 0xff;
 }
 
+bool hdc92x4_device::bad_sector()
+{
+	return (m_selected_drive_type != TYPE_AT) && ((m_register_r[CURRENT_HEAD] & 0x80)!=0);
+}
+
 UINT8 hdc92x4_device::current_command()
 {
 	return m_register_w[COMMAND];
@@ -633,7 +638,18 @@ bool hdc92x4_device::using_floppy()
 	return (m_selected_drive_type == TYPE_FLOPPY5 || m_selected_drive_type == TYPE_FLOPPY8);
 }
 
-int hdc92x4_device::header_length()
+/*
+    Delivers the header length (including ident, excluding CRC)
+*/
+int hdc9224_device::header_length()
+{
+	return (m_selected_drive_type == TYPE_ST)? 4 : 5;
+}
+
+/*
+    Delivers the header length (including ident, excluding CRC)
+*/
+int hdc9234_device::header_length()
 {
 	return (m_selected_drive_type == TYPE_AT)? 4 : 5;
 }
@@ -645,12 +661,13 @@ int hdc92x4_device::register_number(int slot)
 {
 	// The id_field is an array of indexes into the chip registers.
 	// Thus we get the values properly assigned to the registers.
-	// The PC-AT mode does not use a size field.
+	// The PC-AT (9234) and ST-506 (9224) modes do not use a size field.
 	const int id_field[] = { CURRENT_CYLINDER, CURRENT_HEAD, CURRENT_SECTOR, CURRENT_SIZE, CURRENT_CRC1, CURRENT_CRC2 };
 	int index = slot;
 
-	// Skip size for PC-AT
-	if (m_selected_drive_type == TYPE_AT && slot > 2) index++;
+	// Skip size for PC-AT and ST-506
+	if ((header_length() == 4) && (slot > 2)) index++;
+
 	if (index > 5)
 	{
 		logerror("BUG: Invalid index for header field: %d", index);
@@ -663,7 +680,7 @@ int hdc92x4_device::register_number(int slot)
     Delivers the step time (in microseconds) minus the pulse width (9224).
     The first two values in the list apply for index==0 (buffered step),
     but the first one is used for the RESTORE command, the second one is used
-    for SEEK. [2]
+    for SEEK. [1]
 */
 int hdc9224_device::step_time()
 {
@@ -770,7 +787,7 @@ void hdc92x4_device::wait_time(emu_timer *tm, int microsec, int next_substate)
 
 void hdc92x4_device::wait_time(emu_timer *tm, const attotime &delay, int param)
 {
-	if (TRACE_DELAY) logerror("%s: [%s] Delaying by %4.2f microsecs\n", tag(), ttsn().c_str(), delay.as_double()*1000000);
+	if (TRACE_DELAY) logerror("[%s] Delaying by %4.2f microsecs\n", ttsn().c_str(), delay.as_double()*1000000);
 	tm->adjust(delay);
 	m_substate = param;
 	m_state_after_line = UNDEF;
@@ -787,19 +804,19 @@ void hdc92x4_device::wait_line(int line, line_state level, int substate, bool st
 
 	if (line == SEEKCOMP_LINE && (seek_complete() == (level==ASSERT_LINE)))
 	{
-		if (TRACE_LINES) logerror("%s: SEEK_COMPLETE line is already %d\n", tag(), level);
+		if (TRACE_LINES) logerror("SEEK_COMPLETE line is already %d\n", level);
 	}
 	else
 	{
 		if (line == INDEX_LINE && (index_hole() == (level==ASSERT_LINE)))
 		{
-			if (TRACE_LINES) logerror("%s: INDEX line is already %d\n", tag(), level);
+			if (TRACE_LINES) logerror("INDEX line is already %d\n", level);
 		}
 		else
 		{
 			if (line == READY_LINE && (drive_ready() == (level==ASSERT_LINE)))
 			{
-				if (TRACE_LINES) logerror("%s: READY line is already %d\n", tag(), level);
+				if (TRACE_LINES) logerror("READY line is already %d\n", level);
 			}
 			else
 			{
@@ -827,7 +844,7 @@ void hdc92x4_device::wait_line(int line, line_state level, int substate, bool st
 //     called by all sector access commands
 // ==================================================================
 /*
-    READ ID FIELD ([1] p. 9)
+    READ ID FIELD ([2] p. 9)
     The controller
     - scans for the next IDAM
     - reads the ID field values into the CURRENT_HEAD/CYLINDER/SECTOR registers
@@ -846,14 +863,15 @@ void hdc92x4_device::read_id(int& cont, bool implied_seek, bool wait_seek_comple
 		{
 		case READ_ID:
 			// Implied seek: Enter the READ_ID subprogram.
-			if (TRACE_READID && TRACE_SUBSTATES) logerror("%s: substate READ_ID\n", tag());
+			if (TRACE_READID && TRACE_SUBSTATES) logerror("substate READ_ID\n");
 
 			// First step: Search the next IDAM, and if found, read the
 			// ID values into the registers
 
 			// Depending on the implied seek flag, continue with read_id,
 			// else switch to verify.
-			m_substate = implied_seek? READ_ID1 : VERIFY;
+			// The 9224 always assumes implied seek
+			m_substate = (implied_seek || !m_is_hdc9234)? READ_ID1 : VERIFY;
 
 			m_live_state.bit_count_total = 0;
 			live_start(SEARCH_IDAM);
@@ -864,22 +882,22 @@ void hdc92x4_device::read_id(int& cont, bool implied_seek, bool wait_seek_comple
 			// If an error occurred (no IDAM found), terminate the command
 			if ((m_register_r[CHIP_STATUS] & CS_SYNCERR) != 0)
 			{
-				if (TRACE_FAIL) logerror("%s: READ_ID failed to find any IDAM\n", tag());
+				if (TRACE_FAIL) logerror("READ_ID failed to find any IDAM\n");
 				cont = ERROR;
 				break;
 			}
 
 			if (TRACE_READID)
 			{
-				if (TRACE_SUBSTATES) logerror("%s: substate READ_ID1\n", tag());
-				logerror("%s: DESIRED_CYL = %d; CURRENT_CYL = %d\n", tag(), desired_cylinder(), current_cylinder());
+				if (TRACE_SUBSTATES) logerror("substate READ_ID1\n");
+				logerror("DESIRED_CYL = %d; CURRENT_CYL = %d\n", desired_cylinder(), current_cylinder());
 			}
 
 			// The CRC has been updated automatically with each read_one_bit during the live_run.
 			// We just need to check whether it ended in 0000
 			if (m_live_state.crc != 0)
 			{
-				if (TRACE_FAIL) logerror("%s: CRC error in sector header\n", tag());
+				if (TRACE_FAIL) logerror("CRC error in sector header\n");
 				set_bits(m_register_r[CHIP_STATUS], CS_CRCERR, true);
 				cont = ERROR;
 				break;
@@ -900,7 +918,7 @@ void hdc92x4_device::read_id(int& cont, bool implied_seek, bool wait_seek_comple
 				if (wait_seek_complete)
 				{
 					// We have to wait for SEEK COMPLETE
-					if (TRACE_READID && TRACE_SUBSTATES) logerror("%s: Waiting for SEEK COMPLETE\n", tag());
+					if (TRACE_READID && TRACE_SUBSTATES) logerror("Waiting for SEEK COMPLETE\n");
 					wait_line(SEEKCOMP_LINE, ASSERT_LINE, READ_ID_SEEK_COMPLETE, false);
 					cont = WAIT;
 				}
@@ -913,7 +931,7 @@ void hdc92x4_device::read_id(int& cont, bool implied_seek, bool wait_seek_comple
 				break;
 			}
 
-			if (TRACE_READID && TRACE_SUBSTATES) logerror("%s: substate STEP_ON\n", tag());
+			if (TRACE_READID && TRACE_SUBSTATES) logerror("substate STEP_ON\n");
 			// STEPDIR = 0 -> towards TRK00
 			set_bits(m_output2, OUT2_STEPDIR, (m_track_delta>0));
 			set_bits(m_output2, OUT2_STEPPULSE, true);
@@ -922,7 +940,7 @@ void hdc92x4_device::read_id(int& cont, bool implied_seek, bool wait_seek_comple
 			break;
 
 		case READ_ID_STEPOFF:
-			if (TRACE_READID && TRACE_SUBSTATES) logerror("%s: substate STEP_OFF\n", tag());
+			if (TRACE_READID && TRACE_SUBSTATES) logerror("substate STEP_OFF\n");
 			set_bits(m_output2, OUT2_STEPPULSE, false);
 			m_track_delta += (m_track_delta<0)? 1 : -1;
 			// Return to STEP_ON, check whether there are more steps
@@ -936,7 +954,7 @@ void hdc92x4_device::read_id(int& cont, bool implied_seek, bool wait_seek_comple
 			break;
 
 		default:
-			logerror("%s: BUG: Unknown substate %02x in read_id, aborting command\n", tag(), m_substate);
+			logerror("BUG: Unknown substate %02x in read_id, aborting command\n", m_substate);
 			cont = ERROR;
 		}
 	}
@@ -950,7 +968,7 @@ void hdc92x4_device::read_id(int& cont, bool implied_seek, bool wait_seek_comple
 }
 
 /*
-    VERIFY ([1] p. 10)
+    VERIFY ([2] p. 10)
     The controller
     - continues to read the next ID field until the current values match the
     contents of the DESIRED_HEAD/CYLINDER/SECTOR registers
@@ -968,8 +986,8 @@ void hdc92x4_device::verify(int& cont)
 			// After seeking (or immediately when implied seek has been disabled),
 			// find the desired sector.
 
-			if (TRACE_VERIFY && TRACE_SUBSTATES) logerror("%s: substate VERIFY\n", tag());
-			if (TRACE_VERIFY) logerror("%s: VERIFY: Find sector CHS=(%d,%d,%d)\n", tag(),
+			if (TRACE_VERIFY && TRACE_SUBSTATES) logerror("substate VERIFY\n");
+			if (TRACE_VERIFY) logerror("VERIFY: Find sector CHS=(%d,%d,%d)\n",
 					desired_cylinder(),
 					desired_head(),
 					desired_sector());
@@ -978,7 +996,7 @@ void hdc92x4_device::verify(int& cont)
 			// (This test is only relevant when we did not have a seek phase before)
 			if ((m_register_r[CHIP_STATUS] & CS_SYNCERR) != 0)
 			{
-				if (TRACE_FAIL) logerror("%s: VERIFY failed to find any IDAM\n", tag());
+				if (TRACE_FAIL) logerror("VERIFY failed to find any IDAM\n");
 				cont = ERROR;
 				break;
 			}
@@ -994,17 +1012,31 @@ void hdc92x4_device::verify(int& cont)
 				&& desired_head() == current_head()
 				&& desired_sector() == current_sector())
 			{
-				if (TRACE_VERIFY) logerror("%s: Found the desired sector CHS=(%d,%d,%d)\n", tag(),
-					desired_cylinder(),
-					desired_head(),
-					desired_sector());
-				m_substate = DATA_TRANSFER;
-				cont = NEXT;
-				m_first_sector_found = true;
+				if (bad_sector())
+				{
+					if (m_bypass)   // only for 9224
+					{
+						if (TRACE_FAIL) logerror("Desired sector CHS=(%d,%d,%d) found, marked as bad. Bypassing by request.\n", current_cylinder(), current_head(), current_sector());
+						m_substate = VERIFY2;
+					}
+					else
+					{
+						if (TRACE_FAIL) logerror("Desired sector CHS=(%d,%d,%d) found, marked as bad.\n", current_cylinder(), current_head(), current_sector());
+						set_bits(m_register_r[INT_STATUS], ST_BADSECT, true);
+						cont = ERROR;
+					}
+				}
+				else
+				{
+					if (TRACE_VERIFY) logerror("Found the desired sector CHS=(%d,%d,%d)\n", desired_cylinder(), desired_head(), desired_sector());
+					m_substate = DATA_TRANSFER;
+					cont = NEXT;
+					m_first_sector_found = true;
+				}
 			}
 			else
 			{
-				if (TRACE_VERIFY && TRACE_DETAIL) logerror("%s: Current CHS=(%d,%d,%d), desired CHS=(%d,%d,%d).\n", tag(),
+				if (TRACE_VERIFY && TRACE_DETAIL) logerror("Current CHS=(%d,%d,%d), desired CHS=(%d,%d,%d).\n",
 					current_cylinder(),
 					current_head(),
 					current_sector(),
@@ -1023,10 +1055,10 @@ void hdc92x4_device::verify(int& cont)
 			break;
 
 		case VERIFY3:
-			if (TRACE_VERIFY) logerror("%s: Next IDAM found; total bytes read: %d\n", tag(), m_live_state.bit_count_total / 16);
+			if (TRACE_VERIFY) logerror("Next IDAM found; total bytes read: %d\n", m_live_state.bit_count_total / 16);
 			if ((m_register_r[CHIP_STATUS] & CS_COMPERR) != 0)
 			{
-				if (TRACE_FAIL) logerror("%s: VERIFY failed to find sector CHS=(%d,%d,%d)\n", tag(), desired_cylinder(), desired_head(), desired_sector());
+				if (TRACE_FAIL) logerror("VERIFY failed to find sector CHS=(%d,%d,%d)\n", desired_cylinder(), desired_head(), desired_sector());
 				cont = ERROR;
 				break;
 			}
@@ -1041,14 +1073,23 @@ void hdc92x4_device::verify(int& cont)
 			{
 				// this is for the physical sector reading/writing
 				// do not verify the next ID field
-				m_substate = DATA_TRANSFER;
-				m_wait_for_index = true;
-				cont = NEXT;
+				if (bad_sector())
+				{
+					if (TRACE_FAIL) logerror("Next physical sector CHS=(%d,%d,%d) found, but marked as bad.\n", current_cylinder(), current_head(), current_sector());
+					set_bits(m_register_r[INT_STATUS], ST_BADSECT, true);
+					cont = ERROR;
+				}
+				else
+				{
+					m_substate = DATA_TRANSFER;
+					m_wait_for_index = true;
+					cont = NEXT;
+				}
 			}
 			break;
 
 		default:
-			logerror("%s: BUG: Unknown substate %02x in verify, aborting command\n", tag(), m_substate);
+			logerror("BUG: Unknown substate %02x in verify, aborting command\n", m_substate);
 			cont = ERROR;
 		}
 	}
@@ -1062,7 +1103,7 @@ void hdc92x4_device::verify(int& cont)
 }
 
 /*
-    DATA TRANSFER ([1], p. 10)
+    DATA TRANSFER ([2], p. 10)
     only during READ/WRITE PHYSICAL/LOGICAL
     The controller
     - scans for the next DAM
@@ -1079,7 +1120,7 @@ void hdc92x4_device::data_transfer(int& cont)
 		switch (m_substate)
 		{
 		case DATA_TRANSFER:
-			if (TRACE_TRANSFER && TRACE_SUBSTATES) logerror("%s: substate DATA_TRANSFER (%s)\n", tag(), m_write? "write" : "read");
+			if (TRACE_TRANSFER && TRACE_SUBSTATES) logerror("substate DATA_TRANSFER (%s)\n", m_write? "write" : "read");
 
 			// Count from 0 again
 			m_live_state.bit_count_total = 0;
@@ -1089,12 +1130,12 @@ void hdc92x4_device::data_transfer(int& cont)
 			if (TRACE_TRANSFER && TRACE_DETAIL)
 			{
 				if (m_logical)
-					logerror("%s: %s sector CHS=(%d,%d,%d)\n", tag(), m_write? "Write" : "Read",
+					logerror("%s sector CHS=(%d,%d,%d)\n", m_write? "Write" : "Read",
 						desired_cylinder(),
 						desired_head(),
 						desired_sector());
 				else
-					logerror("%s: %s next sector on track\n", tag(), m_write? "Write" : "Read");
+					logerror("%s next sector on track\n", m_write? "Write" : "Read");
 			}
 
 			if (m_write)
@@ -1122,12 +1163,12 @@ void hdc92x4_device::data_transfer(int& cont)
 				// Decrement the retry register (one's complemented value; 0000 = 15)
 				int retry = 15-((m_register_w[RETRY_COUNT] >> 4)&0x0f);
 
-				if (TRACE_FAIL) logerror("%s: DATA TRANSFER got CRC error in sector data, retries = %d\n", tag(), retry);
+				if (TRACE_FAIL) logerror("DATA TRANSFER got CRC error in sector data, retries = %d\n", retry);
 				m_register_w[RETRY_COUNT] = (m_register_w[RETRY_COUNT] & 0x0f) | ((15-(retry-1))<<4);
 
 				if (retry == 0)
 				{
-					if (TRACE_FAIL) logerror("%s: CRC error; no retries left\n", tag());
+					if (TRACE_FAIL) logerror("CRC error; no retries left\n");
 					set_bits(m_register_r[CHIP_STATUS], CS_CRCERR, true);
 					cont = ERROR;
 				}
@@ -1145,7 +1186,7 @@ void hdc92x4_device::data_transfer(int& cont)
 			}
 			else
 			{
-				if (TRACE_TRANSFER) logerror("%s: Sector successfully read (count=%d)\n", tag(), m_register_w[SECTOR_COUNT]-1);
+				if (TRACE_TRANSFER) logerror("Sector successfully read (count=%d)\n", m_register_w[SECTOR_COUNT]-1);
 
 				// Update the DMA registers for multi-sector operations
 				if (m_multi_sector)
@@ -1159,7 +1200,7 @@ void hdc92x4_device::data_transfer(int& cont)
 					m_register_w[DMA23_16] = m_register_r[DMA23_16] = (dma_address & 0xff0000) >> 16;
 					m_register_w[DMA15_8] = m_register_r[DMA15_8] = (dma_address & 0x00ff00) >> 8;
 					m_register_w[DMA7_0] = m_register_r[DMA7_0] = (dma_address & 0x0000ff);
-					if (TRACE_TRANSFER) logerror("%s: New DMA address = %06x\n", tag(), dma_address);
+					if (TRACE_TRANSFER) logerror("New DMA address = %06x\n", dma_address);
 				}
 
 				// Decrement the count
@@ -1188,7 +1229,7 @@ void hdc92x4_device::data_transfer(int& cont)
 			break;
 
 		case DATA_TRANSFER_WRITE:
-			if (TRACE_TRANSFER) logerror("%s: Sector successfully written (count=%d)\n", tag(), m_register_w[SECTOR_COUNT]-1);
+			if (TRACE_TRANSFER) logerror("Sector successfully written (count=%d)\n", m_register_w[SECTOR_COUNT]-1);
 
 			// Update the DMA registers for multi-sector operations
 			if (m_multi_sector)
@@ -1202,7 +1243,7 @@ void hdc92x4_device::data_transfer(int& cont)
 				m_register_w[DMA23_16] = m_register_r[DMA23_16] = (dma_address & 0xff0000) >> 16;
 				m_register_w[DMA15_8] = m_register_r[DMA15_8] = (dma_address & 0x00ff00) >> 8;
 				m_register_w[DMA7_0] = m_register_r[DMA7_0] = (dma_address & 0x0000ff);
-				if (TRACE_TRANSFER) logerror("%s: New DMA address = %06x\n", tag(), dma_address);
+				if (TRACE_TRANSFER) logerror("New DMA address = %06x\n", dma_address);
 			}
 
 			// Decrement the count
@@ -1220,7 +1261,7 @@ void hdc92x4_device::data_transfer(int& cont)
 			break;
 
 		default:
-			logerror("%s: BUG: Unknown substate %02x in data_transfer, aborting command\n", tag(), m_substate);
+			logerror("BUG: Unknown substate %02x in data_transfer, aborting command\n", m_substate);
 			cont = ERROR;
 		}
 	}
@@ -1253,7 +1294,7 @@ void hdc92x4_device::data_transfer(int& cont)
 */
 void hdc92x4_device::preset_crc(live_info& live, int value)
 {
-	if ((m_register_w[INT_COMM_TERM] & 0x80)!=0)
+	if ((m_register_w[INT_COMM_TERM] & TC_CRCPRE)!=0)
 	{
 		// Preset -1
 		switch (value)
@@ -1303,7 +1344,7 @@ void hdc92x4_device::preset_crc(live_info& live, int value)
 */
 void hdc92x4_device::reset_controller()
 {
-	logerror("%s: RESET command\n", tag());
+	logerror("RESET command\n");
 	device_reset();
 }
 
@@ -1320,7 +1361,7 @@ void hdc92x4_device::reset_controller()
 */
 void hdc92x4_device::drive_deselect()
 {
-	if (TRACE_SELECT) logerror("%s: DESELECT command\n", tag());
+	if (TRACE_SELECT) logerror("DESELECT command\n");
 	m_selected_drive_number = NODRIVE;
 	m_output1 = 0x00;
 	set_command_done(TC_SUCCESS);
@@ -1349,7 +1390,7 @@ void hdc92x4_device::restore_drive()
 
 	if (m_substate == UNDEF)
 	{
-		if (TRACE_RESTORE) logerror("%s: RESTORE command %02x\n", tag(), current_command());
+		if (TRACE_RESTORE) logerror("RESTORE command %02x\n", current_command());
 		m_seek_count = 0;
 		m_substate = RESTORE_CHECK;
 	}
@@ -1362,7 +1403,7 @@ void hdc92x4_device::restore_drive()
 			// Track 0 has not been reached yet
 			if (!drive_ready())
 			{
-				if (TRACE_RESTORE) logerror("%s: restore command: Drive not ready\n", tag());
+				if (TRACE_RESTORE) logerror("restore command: Drive not ready\n");
 				// Does not look like a success, but this takes into account
 				// that if a drive is not connected we do not want an error message
 				cont = SUCCESS;
@@ -1377,7 +1418,7 @@ void hdc92x4_device::restore_drive()
 					// When we have buffered steps, the seek limit will be reached
 					// before TRK00 is asserted. In that case we have to wait for
 					// SEEK_COMPLETE. We also wait as soon as TRK00 is asserted.
-					if (TRACE_RESTORE) logerror("%s: restore using buffered steps\n", tag());
+					if (TRACE_RESTORE) logerror("restore using buffered steps\n");
 					wait_line(SEEKCOMP_LINE, ASSERT_LINE, SEEK_COMPLETE, false);
 					cont = WAIT;
 				}
@@ -1392,7 +1433,7 @@ void hdc92x4_device::restore_drive()
 			break;
 
 		case STEP_ON:
-			if (TRACE_RESTORE && TRACE_SUBSTATES) logerror("%s: [%s] substate STEP_ON\n", tag(), ttsn().c_str());
+			if (TRACE_RESTORE && TRACE_SUBSTATES) logerror("[%s] substate STEP_ON\n", ttsn().c_str());
 
 			// Increase step count
 			m_seek_count++;
@@ -1407,7 +1448,7 @@ void hdc92x4_device::restore_drive()
 			break;
 
 		case STEP_OFF:
-			if (TRACE_RESTORE && TRACE_SUBSTATES) logerror("%s: [%s] substate STEP_OFF\n", tag(), ttsn().c_str());
+			if (TRACE_RESTORE && TRACE_SUBSTATES) logerror("[%s] substate STEP_OFF\n", ttsn().c_str());
 			set_bits(m_output2, OUT2_STEPPULSE, false);
 			wait_time(m_timer, step_time(), RESTORE_CHECK);
 			cont = WAIT;
@@ -1417,7 +1458,7 @@ void hdc92x4_device::restore_drive()
 			// If TRK00 is not set, the drive failed to reach it.
 			if (!on_track00())
 			{
-				if (TRACE_FAIL) logerror("%s: restore command: failed to reach track 00\n", tag());
+				if (TRACE_FAIL) logerror("restore command: failed to reach track 00\n");
 				set_command_done(TC_VRFYERR);
 				cont = ERROR;
 			}
@@ -1448,7 +1489,7 @@ void hdc92x4_device::step_drive()
 
 	if (m_substate == UNDEF)
 	{
-		if (TRACE_STEP) logerror("%s: STEP IN/OUT command %02x\n", tag(), current_command());
+		if (TRACE_STEP) logerror("STEP IN/OUT command %02x\n", current_command());
 		m_substate = STEP_ON;
 	}
 
@@ -1457,7 +1498,7 @@ void hdc92x4_device::step_drive()
 		switch (m_substate)
 		{
 		case STEP_ON:
-			if (TRACE_STEP && TRACE_SUBSTATES) logerror("%s: substate STEP_ON\n", tag());
+			if (TRACE_STEP && TRACE_SUBSTATES) logerror("substate STEP_ON\n");
 
 			// STEPDIR = 0 -> towards TRK00
 			set_bits(m_output2, OUT2_STEPDIR, (current_command() & 0x02)==0);
@@ -1469,7 +1510,7 @@ void hdc92x4_device::step_drive()
 			break;
 
 		case STEP_OFF:
-			if (TRACE_STEP && TRACE_SUBSTATES) logerror("%s: substate STEP_OFF\n", tag());
+			if (TRACE_STEP && TRACE_SUBSTATES) logerror("substate STEP_OFF\n");
 			set_bits(m_output2, OUT2_STEPPULSE, false);
 			wait_time(m_timer, step_time(), ((current_command() & 0x01)!=0)? WAIT_SEEK_COMPLETE : DONE);
 			cont = WAIT;
@@ -1494,7 +1535,7 @@ void hdc92x4_device::step_drive()
 */
 void hdc92x4_device::tape_backup()
 {
-	logerror("%s: TAPE BACKUP command %02x not implemented\n", tag(), current_command());
+	logerror("TAPE BACKUP command %02x not implemented\n", current_command());
 	set_command_done(TC_SUCCESS);
 }
 
@@ -1514,13 +1555,20 @@ void hdc92x4_device::tape_backup()
 
     This command only sets the select lines but does not process parameters
     like head load times or drive types.
+
+    According to [1], this command must be preceded by a DESELECT.
+    The specification to the successor 9234 [2] says that typically a SEEK
+    may be issued before POLL_DRIVES.
+
+    It is unclear what happens when this is not ensured. This implementation
+    automatically deselects the drives.
 */
 void hdc92x4_device::poll_drives()
 {
 	UINT8 drivebit;
 	if (m_substate == UNDEF)
 	{
-		logerror("%s: POLL DRIVES command %02x\n", tag(), current_command());
+		logerror("POLL DRIVES command %02x\n", current_command());
 		m_substate = POLL1;
 		m_selected_drive_number = 0;
 		// If there is no selection, do not enter the loop
@@ -1542,7 +1590,7 @@ void hdc92x4_device::poll_drives()
 				m_register_r[CHIP_STATUS] = (m_register_r[CHIP_STATUS] & 0xfc) | m_selected_drive_number;
 
 				m_output1 = (drivebit << 4) | (m_register_w[RETRY_COUNT]&0x0f);
-				if (TRACE_AUXBUS) logerror("%s: Setting OUTPUT1 to %02x\n", tag(), m_output1);
+				if (TRACE_AUXBUS) logerror("Setting OUTPUT1 to %02x\n", m_output1);
 				wait_time(m_timer, 1, POLL2);   // Wait for 1 usec
 				cont = WAIT;
 			}
@@ -1584,7 +1632,7 @@ void hdc92x4_device::poll_drives()
     On the next OUTPUT1 time, the number of the drive (one of four lines)
     is set on the higher four bits of the auxiliary bus. Also, the lower
     4 bits of the RETRY COUNT register are put on the lower 4 bits of the bus
-    (user-programmable output, [1] p. 5).
+    (user-programmable output, [2] p. 5).
 
     The HFDC controller board uses the user-programmable output to
     select one of four floppy disk drives with Drive set to 00.
@@ -1608,7 +1656,7 @@ void hdc92x4_device::drive_select()
 		int driveparm = current_command() & 0x1f;
 		bool head_load_delay_enable = (driveparm & 0x10)!=0;
 
-		// The drive type is used to configure DMA burst mode ([1], p.12)
+		// The drive type is used to configure DMA burst mode ([2], p.12)
 		// and to select the timing parameters
 		m_selected_drive_type = (driveparm>>2) & 0x03;
 		m_selected_drive_number = driveparm & 0x03;
@@ -1617,10 +1665,10 @@ void hdc92x4_device::drive_select()
 		head_load_delay = head_load_delay_enable? m_register_w[DATA] * head_load_timer_increment[m_selected_drive_type] : 0;
 		if (fm_mode()) head_load_delay <<= 1;
 
-		if (TRACE_SELECT) logerror("%s: DRIVE SELECT command (%02x): head load delay=%d, type=%d, drive=%d, pout=%02x, step_rate=%d\n", tag(), current_command(), head_load_delay, m_selected_drive_type, driveparm&3, m_register_w[RETRY_COUNT]&0x0f, pulse_width() + step_time());
+		if (TRACE_SELECT) logerror("DRIVE SELECT command (%02x): head load delay=%d, type=%d, drive=%d, pout=%02x, step_rate=%d\n", current_command(), head_load_delay, m_selected_drive_type, driveparm&3, m_register_w[RETRY_COUNT]&0x0f, pulse_width() + step_time());
 
 		// Copy the DMA registers to registers CURRENT_HEAD, CURRENT_CYLINDER,
-		// and CURRENT_IDENT. This is required during formatting ([1], p. 14)
+		// and CURRENT_IDENT. This is required during formatting [1,2]
 		// as the format command reuses the registers for formatting parameters.
 		m_register_r[CURRENT_HEAD] = m_register_r[DMA7_0];
 		m_register_r[CURRENT_CYLINDER] = m_register_r[DMA15_8];
@@ -1631,7 +1679,7 @@ void hdc92x4_device::drive_select()
 
 		m_output1 = (m_selected_drive_number != NODRIVE)? (0x10 << m_selected_drive_number) : 0;
 		m_output1 |= (m_register_w[RETRY_COUNT]&0x0f);
-		if (TRACE_AUXBUS) logerror("%s: Setting OUTPUT1 to %02x\n", tag(), m_output1);
+		if (TRACE_AUXBUS) logerror("Setting OUTPUT1 to %02x\n", m_output1);
 		m_substate = (head_load_delay>0)? HEAD_DELAY : DONE;
 	}
 
@@ -1662,12 +1710,12 @@ void hdc92x4_device::drive_select()
 void hdc92x4_device::set_register_pointer()
 {
 	m_register_pointer = current_command() & 0xf;
-	if (TRACE_SETPTR) logerror("%s: SET REGISTER POINTER command; start reg=%d\n", tag(), m_register_pointer);
+	if (TRACE_SETPTR) logerror("SET REGISTER POINTER command; start reg=%d\n", m_register_pointer);
 	// The specification does not say anything about the effect of setting an
 	// invalid value (only "care should be taken")
 	if (m_register_pointer > 10)
 	{
-		logerror("%s: set register pointer: Invalid register number: %d. Setting to 10.\n", tag(), m_register_pointer);
+		logerror("set register pointer: Invalid register number: %d. Setting to 10.\n", m_register_pointer);
 		m_register_pointer = 10;
 	}
 	set_command_done(TC_SUCCESS);
@@ -1686,14 +1734,14 @@ void hdc92x4_device::set_register_pointer()
          |  0  |  1  |  0  |  1  |  0  | Step| Seek| Verf|
          +-----+-----+-----+-----+-----+-----+-----+-----+
 
-    All combinations of flags are legal ([1], p.12).
+    All combinations of flags are legal ([2], p.12).
 */
 void hdc92x4_device::seek_read_id()
 {
 	if (m_substate == UNDEF)
 	{
 		// Command init
-		if (TRACE_READ) logerror("%s: SEEK / READ ID command %02x, CHS=(%d,%d,%d)\n", tag(), current_command(), desired_cylinder(), desired_head(), desired_sector());
+		if (TRACE_READ) logerror("SEEK / READ ID command %02x, CHS=(%d,%d,%d)\n", current_command(), desired_cylinder(), desired_head(), desired_sector());
 		m_substate = READ_ID;
 	}
 
@@ -1721,7 +1769,7 @@ void hdc92x4_device::seek_read_id()
 			cont = SUCCESS;
 			break;
 		default:
-			logerror("%s: BUG: Unknown substate %02x in seek_read_id, aborting command\n", tag(), m_substate);
+			logerror("BUG: Unknown substate %02x in seek_read_id, aborting command\n", m_substate);
 			set_command_done(TC_DATAERR);
 			cont = ERROR;
 		}
@@ -1745,30 +1793,38 @@ void hdc92x4_device::seek_read_id()
 
     Command word
 
-       7     6     5     4     3      2       1       0
-    +-----+-----+-----+-----+-----+--------+------+------+
-    |  0  |  1  |  0  |  1  |  1  | Logical|NoSeek| Trans|
-    +-----+-----+-----+-----+-----+--------+------+------+
+    Physical:
+    +-----+-----+-----+-----+-----+-----+------+------+
+    |  0  |  1  |  0  |  1  |  1  |  0  |  0   |XferEn|
+    +-----+-----+-----+-----+-----+-----+------+------+
 
+    Logical:
+    +-----+-----+-----+-----+-----+-----+------+------+
+    |  0  |  1  |  0  |  1  |  1  |  1  |Bypass|XferEn|     9224
+    +-----+-----+-----+-----+-----+-----+------+------+
+    +-----+-----+-----+-----+-----+-----+------+------+
+    |  0  |  1  |  0  |  1  |  1  |  1  |NoSeek|XferEn|     9234
+    +-----+-----+-----+-----+-----+-----+------+------+
 */
 void hdc92x4_device::read_sectors()
 {
-	m_logical = (current_command() & 0x04)!=0;
+	int cont = NEXT;
+	bool implied_seek = (current_command() & 0x02)==0;
 
 	if (m_substate == UNDEF)
 	{
 		// Command init
-		if (TRACE_READ) logerror("%s: READ SECTORS %s command %02x, CHS=(%d,%d,%d)\n", tag(), m_logical? "LOGICAL": "PHYSICAL", current_command(), desired_cylinder(), desired_head(), desired_sector());
+		m_logical = (current_command() & 0x04)!=0;  // used in VERIFY and DATA TRANSFER substate
+		if (TRACE_READ) logerror("READ SECTORS %s command %02x, CHS=(%d,%d,%d)\n", m_logical? "LOGICAL": "PHYSICAL", current_command(), desired_cylinder(), desired_head(), desired_sector());
+
+		m_bypass = !m_is_hdc9234 && (current_command() & 0x02)!=0;
+		m_transfer_enabled = (current_command() & 0x01)!=0;
 		m_retry_save = m_register_w[RETRY_COUNT];
 		m_multi_sector = (m_register_w[SECTOR_COUNT] != 1);
 		m_write = false;
 		m_substate = READ_ID;
 		m_first_sector_found = false;
 	}
-
-	int cont = NEXT;
-	bool implied_seek = (current_command() & 0x02)==0;
-	m_transfer_enabled = (current_command() & 0x01)!=0;
 
 	while (cont == NEXT)
 	{
@@ -1784,7 +1840,7 @@ void hdc92x4_device::read_sectors()
 			data_transfer(cont);
 			break;
 		default:
-			logerror("%s: BUG: Unknown substate %02x in read_sectors, aborting command\n", tag(), m_substate);
+			logerror("BUG: Unknown substate %02x in read_sectors, aborting command\n", m_substate);
 			set_command_done(TC_DATAERR);
 			cont = ERROR;
 		}
@@ -1794,9 +1850,10 @@ void hdc92x4_device::read_sectors()
 /*
     READ TRACK
     Read all ID and data fields as they appear on the track. Command 5A only
-    transmits the ID fields via DMA, which 5B transmits all ID and data fields.
-    Note that the specifications do not mention any gaps to be transmitted as
-    well.
+    transmits the ID fields via DMA, while 5B transmits all ID and data fields.
+    Apart from the ID fields and the data fields, the specs [1] and [2] do not
+    mention any further transmitted data, so this is not a verbatim copy of
+    the track.
 
     Command word
 
@@ -1810,7 +1867,7 @@ void hdc92x4_device::read_track()
 {
 	if (m_substate == UNDEF)
 	{
-		if (TRACE_READTRACK) logerror("%s: READ TRACK command %02x, head = %d\n", tag(), current_command(), desired_head());
+		if (TRACE_READTRACK) logerror("READ TRACK command %02x, head = %d\n", current_command(), desired_head());
 		dma_address_out(m_register_w[DMA23_16], m_register_w[DMA15_8], m_register_w[DMA7_0]);
 		m_transfer_enabled = (current_command() & 1)!=0;
 	}
@@ -1821,7 +1878,7 @@ void hdc92x4_device::read_track()
 		switch (m_substate)
 		{
 		case WAITINDEX0:
-			if (TRACE_READTRACK && TRACE_DETAIL) logerror("%s: Read track - waiting for index hole\n", tag());
+			if (TRACE_READTRACK && TRACE_DETAIL) logerror("Read track - waiting for index hole\n");
 			if (!index_hole())
 			{
 				m_substate = WAITINDEX1;
@@ -1830,7 +1887,7 @@ void hdc92x4_device::read_track()
 			else
 			{
 				// We're above the index hole; wait for the index line going down
-				if (TRACE_READTRACK && TRACE_DETAIL) logerror("%s: Index hole just passing by ... waiting for next\n", tag());
+				if (TRACE_READTRACK && TRACE_DETAIL) logerror("Index hole just passing by ... waiting for next\n");
 				wait_line(INDEX_LINE, ASSERT_LINE, WAITINDEX1, false);
 				cont = WAIT;
 			}
@@ -1841,12 +1898,12 @@ void hdc92x4_device::read_track()
 			cont = WAIT;
 			break;
 		case TRACKSTART:
-			if (TRACE_READTRACK && TRACE_DETAIL) logerror("%s: Read track - index hole arrived\n", tag());
+			if (TRACE_READTRACK && TRACE_DETAIL) logerror("Read track - index hole arrived\n");
 			live_start(READ_TRACK);
 			cont = WAIT;
 			break;
 		case TRACKDONE:
-			if (TRACE_READTRACK && TRACE_SUBSTATES) logerror("%s: Track reading done\n", tag());
+			if (TRACE_READTRACK && TRACE_SUBSTATES) logerror("Track reading done\n");
 			cont = SUCCESS;
 			m_out_dmarq(CLEAR_LINE);
 			m_out_dip(CLEAR_LINE);
@@ -1868,12 +1925,28 @@ void hdc92x4_device::read_track()
 
     1. Before starting the command, the user program must have set up a
     sector sequence table in the controller RAM (located on the PCB):
+
+    9224: Floppy or generic HD
+    (cylinder, head, sector1, size)  (4 bytes)
+    (cylinder, head, sector2, size)  ...
+
+    9224: ST-506 HD
+    (cylinder, head, sector1)        (3 bytes)
+    (cylinder, head, sector2) ...
+
+    ---------------------------
+
+    9234: FM Floppy
+    (cylinder, head, sector1, size)  (4 bytes)
+    (cylinder, head, sector2, size) ...
+
+    9234: PC-AT
+    (ident, cylinder, head, sector1)  (4 bytes)
+    (ident, cylinder, head, sector2) ...
+
+    9234: MFM Floppy or generic HD
     (ident, cylinder, head, sector1, size)  (5 bytes)
-    (ident, cylinder, head, sector2, size)
-    (ident, cylinder, head, sector3, size)
-    ...
-    ident is not required for floppy FM operation. size is not required
-    for IBM AT-compatible hard disks.
+    (ident, cylinder, head, sector2, size) ...
 
     2. The DMA registers must point to the beginning of the table
 
@@ -1918,7 +1991,7 @@ void hdc92x4_device::format_track()
 {
 	if (m_substate == UNDEF)
 	{
-		if (TRACE_FORMAT) logerror("%s: FORMAT TRACK command %02x, head = %d\n", tag(), current_command(), desired_head());
+		if (TRACE_FORMAT) logerror("FORMAT TRACK command %02x, head = %d\n", current_command(), desired_head());
 		m_substate = WAITINDEX0;
 		m_deleted = (current_command() & 0x10)!=0;
 		m_reduced_write_current = (current_command() & 0x08)!=0;
@@ -1935,13 +2008,27 @@ void hdc92x4_device::format_track()
 
 		if (TRACE_FORMAT && TRACE_DETAIL)
 		{
-			logerror("%s: GAP0 length  = %d\n", tag(), m_gap0_size);
-			logerror("%s: GAP1 length  = %d\n", tag(), m_gap1_size);
-			logerror("%s: GAP2 length  = %d\n", tag(), m_gap2_size);
-			logerror("%s: GAP3 length  = %d\n", tag(), m_gap3_size);
-			logerror("%s: Sync size    = %d\n", tag(), m_sync_size);
-			logerror("%s: Sector count = %d\n", tag(), m_sector_count);
-			logerror("%s: Sector size  = %d\n", tag(), m_sector_size);
+			logerror("GAP0 length  = %d\n", m_gap0_size);
+			logerror("GAP1 length  = %d\n", m_gap1_size);
+			logerror("GAP2 length  = %d\n", m_gap2_size);
+			logerror("GAP3 length  = %d\n", m_gap3_size);
+			logerror("Sync size    = %d\n", m_sync_size);
+			logerror("Sector count = %d\n", m_sector_count);
+			logerror("Sector size  = %d\n", m_sector_size);
+		}
+
+		if (TRACE_FORMAT)
+		{
+			if (!m_is_hdc9234 && (m_selected_drive_type==TYPE_ST))
+			{
+				// For ST-506 mode (9224), GAP0 and GAP1 should be equal [1]
+				if (m_gap0_size != m_gap1_size)
+					logerror("Warning: GAP0 (%d) and GAP1 (%d) must be equal in ST-506 mode.\n", m_gap0_size, m_gap1_size);
+
+				// For ST-506 mode (9224), sector size is 512 [1]
+				if (m_sector_size != 512)
+					logerror("Warning: Sector size (%d) must be 512 in ST-506 mode.\n", m_sector_size);
+			}
 		}
 
 		dma_address_out(m_register_r[CURRENT_IDENT], m_register_r[CURRENT_CYLINDER], m_register_r[CURRENT_HEAD]);
@@ -1953,7 +2040,7 @@ void hdc92x4_device::format_track()
 		switch (m_substate)
 		{
 		case WAITINDEX0:
-			if (TRACE_FORMAT && TRACE_DETAIL) logerror("%s: Format track; looking for track start\n", tag());
+			if (TRACE_FORMAT && TRACE_DETAIL) logerror("Format track; looking for track start\n");
 			if (!index_hole())
 			{
 				m_substate = WAITINDEX1;
@@ -1962,24 +2049,24 @@ void hdc92x4_device::format_track()
 			else
 			{
 				// We're above the index hole right now, so wait for the line going down
-				if (TRACE_FORMAT && TRACE_DETAIL) logerror("%s: Index hole just passing by ... \n", tag());
+				if (TRACE_FORMAT && TRACE_DETAIL) logerror("Index hole just passing by ... \n");
 				wait_line(INDEX_LINE, CLEAR_LINE, WAITINDEX1, false);
 				cont = WAIT;
 			}
 			break;
 		case WAITINDEX1:
 			// Waiting for the next rising edge
-			if (TRACE_FORMAT && TRACE_DETAIL) logerror("%s: Waiting for next index hole\n", tag());
+			if (TRACE_FORMAT && TRACE_DETAIL) logerror("Waiting for next index hole\n");
 			wait_line(INDEX_LINE, ASSERT_LINE, TRACKSTART, false);
 			cont = WAIT;
 			break;
 		case TRACKSTART:
-			if (TRACE_FORMAT && TRACE_DETAIL) logerror("%s: Format track - index hole arrived\n", tag());
+			if (TRACE_FORMAT && TRACE_DETAIL) logerror("Format track - index hole arrived\n");
 			live_start(FORMAT_TRACK);
 			cont = WAIT;
 			break;
 		case TRACKDONE:
-			if (FORMAT_TRACK && TRACE_SUBSTATES) logerror("%s: Track writing done\n", tag());
+			if (FORMAT_TRACK && TRACE_SUBSTATES) logerror("Track writing done\n");
 			cont = SUCCESS;
 			break;
 		}
@@ -2004,34 +2091,44 @@ void hdc92x4_device::format_track()
 
     Command word
 
-       7      6      5      4      3     2     1      0
+    Physical:
     +-----+------+-------+------+-----+-----+-----+------+
-    |  1  |NoSeek|Logical|DelMrk|RedWC|  Precompensation |
+    |  1  |NoSeek|   0   |DelMrk|RedWC|  Precompensation |
+    +-----+------+-------+------+-----+-----+-----+------+
+
+    Logical:
+    +-----+------+-------+------+-----+-----+-----+------+
+    |  1  |Bypass|   1   |DelMrk|RedWC|  Precompensation |   9224
+    +-----+------+-------+------+-----+-----+-----+------+
+    +-----+------+-------+------+-----+-----+-----+------+
+    |  1  |NoSeek|   1   |DelMrk|RedWC|  Precompensation |   9234
     +-----+------+-------+------+-----+-----+-----+------+
 */
 void hdc92x4_device::write_sectors()
 {
-	m_logical = (current_command() & 0x20)!=0;
+	int cont = NEXT;
+	bool implied_seek = (current_command() & 0x40)==0;
 
 	if (m_substate == UNDEF)
 	{
-		if (TRACE_WRITE) logerror("%s: WRITE SECTORS %s command %02x, CHS=(%d,%d,%d)\n", tag(), m_logical? "LOGICAL" : "PHYSICAL", current_command(), desired_cylinder(), desired_head(), desired_sector());
+		// Command init
+		m_logical = (current_command() & 0x20)!=0;
+		if (TRACE_WRITE) logerror("WRITE SECTORS %s command %02x, CHS=(%d,%d,%d)\n", m_logical? "LOGICAL" : "PHYSICAL", current_command(), desired_cylinder(), desired_head(), desired_sector());
+
 		m_multi_sector = (m_register_w[SECTOR_COUNT] != 1);
 		m_substate = READ_ID;
-
+		m_bypass = !m_is_hdc9234 && (current_command() & 0x40)!=0;
 		m_deleted = (current_command() & 0x10)!=0;
 		m_reduced_write_current = (current_command() & 0x08)!=0;
 		m_precompensation = (current_command() & 0x07);
 		// Important for DATA TRANSFER
 		m_transfer_enabled = true;
 
-		// Something interesting here:
-		//
-		// The values for sync and gap2 are passed to the formatting routing
-		// but how do we know their values right now, when we are writing sectors?
-		// Since this is not clearly stated in the specification, we have to
-		// use the default values here
-		// Actually, why can we choose that value for formatting in the first place?
+		// For formatting, the values for GAP2 and SYNC can be set as parameters.
+		// However, these areas must be rewritten during sector writing, and
+		// there is no way to specify these values for that operation. It seems
+		// to be a design feature of the 92x4 that does not make sense at all.
+		// We just assume the standard values here.
 
 		if (using_floppy())
 		{
@@ -2047,9 +2144,6 @@ void hdc92x4_device::write_sectors()
 		m_write = false; // until we're writing
 		m_first_sector_found = false;
 	}
-
-	int cont = NEXT;
-	bool implied_seek = (current_command() & 0x40)==0;
 
 	while (cont == NEXT)
 	{
@@ -2067,7 +2161,7 @@ void hdc92x4_device::write_sectors()
 			data_transfer(cont);
 			break;
 		default:
-			logerror("%s: BUG: Unknown substate %02x in write_sectors, aborting command\n", tag(), m_substate);
+			logerror("BUG: Unknown substate %02x in write_sectors, aborting command\n", m_substate);
 			set_command_done(TC_DATAERR);
 			cont = ERROR;
 		}
@@ -2146,7 +2240,7 @@ bool hdc92x4_device::found_mark(int state)
 */
 void hdc92x4_device::live_start(int state)
 {
-	if (TRACE_LIVE) logerror("%s: [%s] Live start substate=%02x\n", tag(), ttsn().c_str(), state);
+	if (TRACE_LIVE) logerror("[%s] Live start substate=%02x\n", ttsn().c_str(), state);
 	m_live_state.time = machine().time();
 	m_live_state.state = state;
 	m_live_state.next_state = -1;
@@ -2167,7 +2261,7 @@ void hdc92x4_device::live_start(int state)
 
 	live_run();
 	m_last_live_state = UNDEF;
-	if (TRACE_LIVE) logerror("%s: [%s] Live start end\n", tag(), ttsn().c_str());  // delete
+	if (TRACE_LIVE) logerror("[%s] Live start end\n", ttsn().c_str());  // delete
 }
 
 void hdc92x4_device::live_run()
@@ -2194,9 +2288,9 @@ void hdc92x4_device::live_run_until(attotime limit)
 	if (TRACE_LIVE)
 	{
 		if (limit == attotime::never)
-			logerror("%s: [%s live] live_run, live_state=%02x, mode=%s\n", tag(), tts(m_live_state.time).c_str(), m_live_state.state, fm_mode()? "FM":"MFM");
+			logerror("[%s live] live_run, live_state=%02x, mode=%s\n", tts(m_live_state.time).c_str(), m_live_state.state, fm_mode()? "FM":"MFM");
 		else
-			logerror("%s: [%s live] live_run until %s, live_state=%02x, mode=%s\n", tag(), tts(m_live_state.time).c_str(), tts(limit).c_str(), m_live_state.state, fm_mode()? "FM":"MFM");
+			logerror("[%s live] live_run until %s, live_state=%02x, mode=%s\n", tts(m_live_state.time).c_str(), tts(limit).c_str(), m_live_state.state, fm_mode()? "FM":"MFM");
 	}
 
 	if (limit == attotime::never)
@@ -2228,7 +2322,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 
 			if (TRACE_LIVE && m_last_live_state != SEARCH_IDAM)
 			{
-				logerror("%s: [%s live] SEARCH_IDAM [limit %s]\n", tag(),tts(m_live_state.time).c_str(), tts(limit).c_str());
+				logerror("[%s live] SEARCH_IDAM [limit %s]\n",tts(m_live_state.time).c_str(), tts(limit).c_str());
 				m_last_live_state = m_live_state.state;
 			}
 
@@ -2237,14 +2331,14 @@ void hdc92x4_device::live_run_until(attotime limit)
 
 			if (read_one_bit(limit))
 			{
-				if (TRACE_LIVE) logerror("%s: [%s live] SEARCH_IDAM limit reached\n", tag(), tts(m_live_state.time).c_str());
+				if (TRACE_LIVE) logerror("[%s live] SEARCH_IDAM limit reached\n", tts(m_live_state.time).c_str());
 				return;
 			}
-			// logerror("%s: SEARCH_IDAM\n", tts(m_live_state.time).c_str());
-			if (TRACE_SHIFT) logerror("%s: [%s live] shift = %04x data=%02x c=%d\n", tag(), tts(m_live_state.time).c_str(), m_live_state.shift_reg,
+			// logerror("SEARCH_IDAM\n", tts(m_live_state.time).c_str());
+			if (TRACE_SHIFT) logerror("[%s live] shift = %04x data=%02x c=%d\n", tts(m_live_state.time).c_str(), m_live_state.shift_reg,
 				get_data_from_encoding(m_live_state.shift_reg), m_live_state.bit_counter);
 
-			// [1] p. 9: The ID field sync mark must be found within 33,792 byte times
+			// [1,2]: The ID field sync mark must be found within 33,792 byte times
 			if (m_live_state.bit_count_total > 33792*16)
 			{
 				// Desired sector not found within time
@@ -2260,7 +2354,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 				// MFM case
 				if (m_live_state.shift_reg == 0x4489)
 				{
-					if (TRACE_LIVE) logerror("%s: [%s live] Found an A1 mark\n", tag(),tts(m_live_state.time).c_str());
+					if (TRACE_LIVE) logerror("[%s live] Found an A1 mark\n",tts(m_live_state.time).c_str());
 					preset_crc(m_live_state, 0xa1);
 					m_live_state.data_separator_phase = false;
 					m_live_state.bit_counter = 0;
@@ -2273,7 +2367,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 				// FM case
 				if (m_live_state.shift_reg == 0xf57e)
 				{
-					if (TRACE_LIVE) logerror("%s: SEARCH_IDAM: IDAM found\n", tag());
+					if (TRACE_LIVE) logerror("SEARCH_IDAM: IDAM found\n");
 					preset_crc(m_live_state, 0xfe);
 					m_live_state.data_separator_phase = false;
 					m_live_state.bit_counter = 0;
@@ -2296,14 +2390,14 @@ void hdc92x4_device::live_run_until(attotime limit)
 
 			if (TRACE_LIVE && m_last_live_state != READ_TWO_MORE_A1_IDAM)
 			{
-				logerror("%s: [%s live] READ_TWO_MORE_A1\n", tag(),tts(m_live_state.time).c_str());
+				logerror("[%s live] READ_TWO_MORE_A1\n",tts(m_live_state.time).c_str());
 				m_last_live_state = m_live_state.state;
 			}
 
 			// Beyond time limit?
 			if (read_one_bit(limit)) return;
 
-			if (TRACE_SHIFT) logerror("%s: [%s live] shift = %04x data=%02x c=%d\n", tag(), tts(m_live_state.time).c_str(), m_live_state.shift_reg,
+			if (TRACE_SHIFT) logerror("[%s live] shift = %04x data=%02x c=%d\n", tts(m_live_state.time).c_str(), m_live_state.shift_reg,
 					get_data_from_encoding(m_live_state.shift_reg), m_live_state.bit_counter);
 
 			if (m_live_state.bit_count_total > 33792*16)
@@ -2325,12 +2419,12 @@ void hdc92x4_device::live_run_until(attotime limit)
 					m_live_state.state = SEARCH_IDAM;
 				}
 				else
-					if (TRACE_LIVE) logerror("%s: [%s live] Found an A1 mark\n", tag(),tts(m_live_state.time).c_str());
+					if (TRACE_LIVE) logerror("[%s live] Found an A1 mark\n",tts(m_live_state.time).c_str());
 				// Continue
 				break;
 			}
 
-			if (TRACE_LIVE) logerror("%s: [%s live] Found data value %02X\n", tag(),tts(m_live_state.time).c_str(), m_live_state.data_reg);
+			if (TRACE_LIVE) logerror("[%s live] Found data value %02X\n",tts(m_live_state.time).c_str(), m_live_state.data_reg);
 
 			// Check for ident field (fe, ff, fd, fc)
 			if ((m_live_state.data_reg & 0xfc) != 0xfc)
@@ -2339,9 +2433,9 @@ void hdc92x4_device::live_run_until(attotime limit)
 				if (TRACE_LIVE)
 				{
 					if (m_live_state.data_reg == 0xf8 || m_live_state.data_reg == 0xfb)
-						logerror("%s: [%s live] Looks like a DAM; continue to next mark\n", tag(), tts(m_live_state.time).c_str());
+						logerror("[%s live] Looks like a DAM; continue to next mark\n", tts(m_live_state.time).c_str());
 					else
-						logerror("%s: [%s live] Missing ident data after A1A1A1, and it was not DAM; format corrupt?\n", tag(), tts(m_live_state.time).c_str());
+						logerror("[%s live] Missing ident data after A1A1A1, and it was not DAM; format corrupt?\n", tts(m_live_state.time).c_str());
 				}
 				m_live_state.state = SEARCH_IDAM;
 				break;
@@ -2357,7 +2451,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 		case READ_ID_FIELDS_INTO_REGS:
 			if (TRACE_LIVE && m_last_live_state != READ_ID_FIELDS_INTO_REGS)
 			{
-				logerror("%s: [%s live] READ_ID_FIELDS_INTO_REGS\n", tag(),tts(m_live_state.time).c_str());
+				logerror("[%s live] READ_ID_FIELDS_INTO_REGS\n",tts(m_live_state.time).c_str());
 				m_last_live_state = m_live_state.state;
 			}
 
@@ -2370,7 +2464,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 
 			slot = (m_live_state.bit_counter >> 4)-1;
 
-			if (TRACE_LIVE) logerror("%s: slot %d = %02x, crc=%04x\n", tag(), slot, m_live_state.data_reg, m_live_state.crc);
+			if (TRACE_LIVE) logerror("slot %d = %02x, crc=%04x\n", slot, m_live_state.data_reg, m_live_state.crc);
 
 			m_register_r[register_number(slot)] = m_live_state.data_reg;
 
@@ -2394,7 +2488,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 		case SEARCH_DAM:
 			if (TRACE_LIVE && m_last_live_state != SEARCH_DAM)
 			{
-				logerror("%s: [%s live] SEARCH_DAM\n", tag(),tts(m_live_state.time).c_str());
+				logerror("[%s live] SEARCH_DAM\n",tts(m_live_state.time).c_str());
 				m_last_live_state = m_live_state.state;
 			}
 
@@ -2403,21 +2497,21 @@ void hdc92x4_device::live_run_until(attotime limit)
 			if(read_one_bit(limit))
 				return;
 
-			if (TRACE_SHIFT) logerror("%s: [%s live] shift = %04x data=%02x c=%d\n", tag(), tts(m_live_state.time).c_str(), m_live_state.shift_reg,
+			if (TRACE_SHIFT) logerror("[%s live] shift = %04x data=%02x c=%d\n", tts(m_live_state.time).c_str(), m_live_state.shift_reg,
 					get_data_from_encoding(m_live_state.shift_reg), m_live_state.bit_counter);
 
 			if (!fm_mode())
 			{   // MFM
 				if(m_live_state.bit_counter > 43*16)
 				{
-					if (TRACE_FAIL) logerror("%s: SEARCH_DAM failed\n", tag());
+					if (TRACE_FAIL) logerror("SEARCH_DAM failed\n");
 					wait_for_realtime(SEARCH_DAM_FAILED);
 					return;
 				}
 
 				if (m_live_state.bit_counter >= 28*16 && m_live_state.shift_reg == 0x4489)
 				{
-					if (TRACE_LIVE) logerror("%s: [%s live] Found an A1 mark\n", tag(),tts(m_live_state.time).c_str());
+					if (TRACE_LIVE) logerror("[%s live] Found an A1 mark\n",tts(m_live_state.time).c_str());
 					preset_crc(m_live_state, 0xa1);
 					m_live_state.data_separator_phase = false;
 					m_live_state.bit_counter = 0;
@@ -2428,18 +2522,30 @@ void hdc92x4_device::live_run_until(attotime limit)
 			{   // FM
 				if (m_live_state.bit_counter > 23*16)
 				{
-					if (TRACE_FAIL) logerror("%s: SEARCH_DAM failed\n", tag());
+					if (TRACE_FAIL) logerror("SEARCH_DAM failed\n");
 					wait_for_realtime(SEARCH_DAM_FAILED);
 					return;
 				}
 
-				if (m_live_state.bit_counter >= 11*16 && (m_live_state.shift_reg == 0xf56a || m_live_state.shift_reg == 0xf56b ||
-														m_live_state.shift_reg == 0xf56e || m_live_state.shift_reg == 0xf56f)) {
-					if (TRACE_LIVE) logerror("%s: SEARCH_DAM: found DAM = %04x\n", tag(), m_live_state.shift_reg);
-					preset_crc(m_live_state, m_live_state.shift_reg);
-					m_live_state.data_separator_phase = false;
-					m_live_state.bit_counter = 0;
-					m_live_state.state = READ_SECTOR_DATA;
+				if (m_live_state.bit_counter >= 11*16)
+				{
+					if ((m_live_state.shift_reg & 0xfffe) == 0xf56a) {
+						if (TRACE_LIVE) logerror("SEARCH_DAM: found DEL DAM = %04x\n", m_live_state.shift_reg);
+						preset_crc(m_live_state, m_live_state.shift_reg);
+						m_live_state.data_separator_phase = false;
+						m_live_state.bit_counter = 0;
+						m_live_state.state = READ_SECTOR_DATA;
+						set_bits(m_register_r[CHIP_STATUS], CS_DELDATA, true);
+					}
+					else {
+						if ((m_live_state.shift_reg & 0xfffe) == 0xf56e) {
+							if (TRACE_LIVE) logerror("SEARCH_DAM: found DAM = %04x\n", m_live_state.shift_reg);
+							preset_crc(m_live_state, m_live_state.shift_reg);
+							m_live_state.data_separator_phase = false;
+							m_live_state.bit_counter = 0;
+							m_live_state.state = READ_SECTOR_DATA;
+						}
+					}
 				}
 			}
 			break;
@@ -2447,14 +2553,14 @@ void hdc92x4_device::live_run_until(attotime limit)
 		case READ_TWO_MORE_A1_DAM: {
 			if (TRACE_LIVE && m_last_live_state != READ_TWO_MORE_A1_DAM)
 			{
-				logerror("%s: [%s live] READ_TWO_MORE_A1_DAM\n", tag(),tts(m_live_state.time).c_str());
+				logerror("[%s live] READ_TWO_MORE_A1_DAM\n",tts(m_live_state.time).c_str());
 				m_last_live_state = m_live_state.state;
 			}
 
 			if(read_one_bit(limit))
 				return;
 
-			if (TRACE_SHIFT) logerror("%s: [%s live] shift = %04x data=%02x c=%d\n", tag(), tts(m_live_state.time).c_str(), m_live_state.shift_reg,
+			if (TRACE_SHIFT) logerror("[%s live] shift = %04x data=%02x c=%d\n", tts(m_live_state.time).c_str(), m_live_state.shift_reg,
 				get_data_from_encoding(m_live_state.shift_reg), m_live_state.bit_counter);
 
 			// Repeat until we have collected 16 bits
@@ -2471,23 +2577,23 @@ void hdc92x4_device::live_run_until(attotime limit)
 					return;
 				}
 				else
-					if (TRACE_LIVE) logerror("%s: [%s live] Found an A1 mark\n", tag(),tts(m_live_state.time).c_str());
+					if (TRACE_LIVE) logerror("[%s live] Found an A1 mark\n",tts(m_live_state.time).c_str());
 				// Continue
 				break;
 			}
 
-			if (TRACE_LIVE) logerror("%s: [%s live] Found data value %02X\n", tag(),tts(m_live_state.time).c_str(), m_live_state.data_reg);
+			if (TRACE_LIVE) logerror("[%s live] Found data value %02X\n",tts(m_live_state.time).c_str(), m_live_state.data_reg);
 
 			if ((m_live_state.data_reg & 0xff) == 0xf8)
 			{
-				if (TRACE_LIVE) logerror("%s: Found deleted data mark F8 after DAM sync\n", tag());
+				if (TRACE_LIVE) logerror("Found deleted data mark F8 after DAM sync\n");
 				set_bits(m_register_r[CHIP_STATUS], CS_DELDATA, true);
 			}
 			else
 			{
 				if ((m_live_state.data_reg & 0xff) != 0xfb)
 				{
-					if (TRACE_FAIL) logerror("%s: Missing FB/F8 data mark after DAM sync\n", tag());
+					if (TRACE_FAIL) logerror("Missing FB/F8 data mark after DAM sync\n");
 					wait_for_realtime(SEARCH_DAM_FAILED);
 					return;
 				}
@@ -2498,7 +2604,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 			break;
 		}
 		case SEARCH_DAM_FAILED:
-			if (TRACE_FAIL) logerror("%s: SEARCH_DAM failed\n", tag());
+			if (TRACE_FAIL) logerror("SEARCH_DAM failed\n");
 			m_live_state.state = IDLE;
 			return;
 
@@ -2506,14 +2612,14 @@ void hdc92x4_device::live_run_until(attotime limit)
 		{
 			if (TRACE_LIVE && m_last_live_state != READ_SECTOR_DATA)
 			{
-				logerror("%s: [%s live] READ_SECTOR_DATA\n", tag(),tts(m_live_state.time).c_str());
+				logerror("[%s live] READ_SECTOR_DATA\n",tts(m_live_state.time).c_str());
 				m_last_live_state = m_live_state.state;
 			}
 
 			if(read_one_bit(limit))
 				return;
 
-			// Request bus release at the first bit of each byte (floppy; [1], fig 5 and 6)
+			// Request bus release at the first bit of each byte (floppy; [2], fig 5 and 6)
 			if (m_transfer_enabled)
 			{
 				if ((m_live_state.bit_counter & 15)== 1)
@@ -2531,7 +2637,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 			// Repeat until we have collected 16 bits
 			if (m_live_state.bit_counter & 15) break;
 
-			if (TRACE_LIVE) logerror("%s: [%s live] Found data value %02X, CRC=%04x\n", tag(),tts(m_live_state.time).c_str(), m_live_state.data_reg, m_live_state.crc);
+			if (TRACE_LIVE) logerror("[%s live] Found data value %02X, CRC=%04x\n",tts(m_live_state.time).c_str(), m_live_state.data_reg, m_live_state.crc);
 			int slot = (m_live_state.bit_counter >> 4)-1;
 
 			if (slot < sector_size())
@@ -2552,7 +2658,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 					}
 					else
 					{
-						if (TRACE_LIVE) logerror("%s: [%s live] Sector read completed\n", tag(),tts(m_live_state.time).c_str());
+						if (TRACE_LIVE) logerror("[%s live] Sector read completed\n",tts(m_live_state.time).c_str());
 						wait_for_realtime(IDLE);
 					}
 					return;
@@ -2564,14 +2670,14 @@ void hdc92x4_device::live_run_until(attotime limit)
 		case READ_SECTOR_DATA_CONT:
 			if (TRACE_LIVE && m_last_live_state != READ_SECTOR_DATA_CONT)
 			{
-				logerror("%s: [%s live] READ_SECTOR_DATA_CONT\n", tag(),tts(m_live_state.time).c_str());
+				logerror("[%s live] READ_SECTOR_DATA_CONT\n",tts(m_live_state.time).c_str());
 				m_last_live_state = m_live_state.state;
 			}
 
 			// Did the system CPU send the DMA ACK in the meantime?
 			if ((m_register_r[INT_STATUS] & ST_OVRUN)!=0)
 			{
-				if (TRACE_FAIL) logerror("%s: No DMA ACK - buffer overrun\n", tag());
+				if (TRACE_FAIL) logerror("No DMA ACK - buffer overrun\n");
 				set_bits(m_register_r[INT_STATUS], TC_DATAERR, true);
 				m_live_state.state = IDLE;
 				return;
@@ -2610,13 +2716,13 @@ void hdc92x4_device::live_run_until(attotime limit)
 			// 5. Write the CRC bytes
 
 			if (TRACE_LIVE)
-				logerror("%s: [%s live] WRITE_DAM_AND_SECTOR\n", tag(), tts(m_live_state.time).c_str());
+				logerror("[%s live] WRITE_DAM_AND_SECTOR\n", tts(m_live_state.time).c_str());
 
 			skip_on_track(m_gap2_size, WRITE_DAM_SYNC);
 			break;
 
 		case WRITE_DAM_SYNC:
-			if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Write sync zeros\n", tag());
+			if (TRACE_WRITE && TRACE_DETAIL) logerror("Write sync zeros\n");
 
 			// Clear the overrun/underrun flag
 			set_bits(m_register_r[INT_STATUS], ST_OVRUN, false);
@@ -2624,12 +2730,12 @@ void hdc92x4_device::live_run_until(attotime limit)
 			break;
 
 		case WRITE_A1:
-			if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Write three A1\n", tag());
+			if (TRACE_WRITE && TRACE_DETAIL) logerror("Write three A1\n");
 			write_on_track(0x4489, 3, WRITE_DATAMARK);
 			break;
 
 		case WRITE_DATAMARK:
-			if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Write data mark and sector contents\n", tag());
+			if (TRACE_WRITE && TRACE_DETAIL) logerror("Write data mark and sector contents\n");
 			if (fm_mode())
 			{
 				// Init the CRC for the DAM and sector
@@ -2707,7 +2813,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 			// byte in two iterations to get both
 			if (m_live_state.byte_counter > 0)
 			{
-				if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Write CRC\n", tag());
+				if (TRACE_WRITE && TRACE_DETAIL) logerror("Write CRC\n");
 				m_live_state.byte_counter--;
 				write_on_track(encode((m_live_state.crc >> 8) & 0xff), 1, WRITE_DATA_CRC);
 			}
@@ -2721,7 +2827,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 		case WRITE_DONE:
 			if (m_substate == DATA_TRANSFER_WRITE)
 			{
-				if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Write sector complete\n", tag());
+				if (TRACE_WRITE && TRACE_DETAIL) logerror("Write sector complete\n");
 				m_pll.stop_writing(m_floppy, m_live_state.time);
 				m_live_state.state = IDLE;
 				return;
@@ -2752,19 +2858,19 @@ void hdc92x4_device::live_run_until(attotime limit)
 		// ==================================================
 
 		case FORMAT_TRACK:
-			if (TRACE_LIVE) logerror("%s: FORMAT_TRACK\n", tag());
+			if (TRACE_LIVE) logerror("FORMAT_TRACK\n");
 			m_live_state.state = WRITE_GAP0;
 			m_pll.start_writing(m_live_state.time);
 			break;
 
 		case WRITE_GAP0:
 			// GAP0 length is in DMA7_0 (negated, 2s comp)
-			if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Writing GAP0\n", tag());
+			if (TRACE_WRITE && TRACE_DETAIL) logerror("Writing GAP0\n");
 			write_on_track(encode(fm_mode()? 0xff : 0x4e), m_gap0_size, WRITE_IXAM_SYNC);
 			break;
 
 		case WRITE_IXAM_SYNC:
-			if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Writing IXAM sync\n", tag());
+			if (TRACE_WRITE && TRACE_DETAIL) logerror("Writing IXAM sync\n");
 			write_on_track(encode(0x00), m_sync_size, WRITE_IXAM);
 			break;
 
@@ -2772,7 +2878,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 			// FM: FC with clock D7 = 1111 -111 -111 1010
 			// MFM: C2 = 11000010
 			// 0101 0010 -010 0100
-			if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Writing IXAM\n", tag());
+			if (TRACE_WRITE && TRACE_DETAIL) logerror("Writing IXAM\n");
 			if (fm_mode())
 				write_on_track(0xf77a, 1, WRITE_GAP1);
 			else
@@ -2787,7 +2893,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 
 		case WRITE_GAP1:
 			// GAP1 length is in DMA15_8
-			if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Writing GAP1\n", tag());
+			if (TRACE_WRITE && TRACE_DETAIL) logerror("Writing GAP1\n");
 			write_on_track(encode(fm_mode()? 0xff : 0x4e), m_gap1_size, WRITE_IDAM_SYNC);
 			break;
 
@@ -2796,7 +2902,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 			// We assume it reads the bytes and writes them directly on the disk
 
 		case WRITE_IDAM_SYNC:
-			if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Writing IDAM sync\n", tag());
+			if (TRACE_WRITE && TRACE_DETAIL) logerror("Writing IDAM sync\n");
 			write_on_track(encode(0x00), m_sync_size, WRITE_IDAM);
 			break;
 
@@ -2804,22 +2910,36 @@ void hdc92x4_device::live_run_until(attotime limit)
 			// Set the over/underrun flag and hope that it will be cleared before we enter the next state (after writing)
 			set_bits(m_register_r[INT_STATUS], ST_OVRUN, true);
 			m_out_dmarq(ASSERT_LINE);
+			// CRC covers the header starting at the FE (FM) or the first A1 (MFM)
+			preset_crc(m_live_state, 0);
 
-			if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Writing IDAM and header\n", tag());
+			if (TRACE_WRITE && TRACE_DETAIL) logerror("Writing IDAM and header\n");
 			if (fm_mode())
 			{
-				write_on_track(0xf57e, 1, WRITE_HEADER);
+				write_on_track(0xf57e, 1, WRITE_HEADER);   // Write FE (IDAM+Ident)
 				m_live_state.byte_counter = 4;
 			}
 			else
 			{
-				write_on_track(0x4489, 3, WRITE_HEADER);
+				write_on_track(0x4489, 3, (m_is_hdc9234)? WRITE_HEADER : WRITE_IDENT);   // Write A1A1A1; ident follows in track layout data
 				m_live_state.byte_counter = 5;
 			}
-			preset_crc(m_live_state, 0);
+			// note that the actual writing happens after the break
+			break;
+
+		case WRITE_IDENT:
+			// Only for 9224, MFM (there is no ident byte in the track layout)
+			write_on_track(encode(0xfe), 1, WRITE_HEADER);   // Write FE
+			m_live_state.byte_counter--;
 			break;
 
 		case WRITE_HEADER:
+			// 9224: FM Floppy   = track side sector size
+			// 9224: MFM Floppy  = track side sector size
+
+			// 9234: FM floppy   = track side sector size  (FE already written)
+			// 9234: MFM floppy  = ident track side sector size
+
 			if ((m_register_r[INT_STATUS] & ST_OVRUN)!=0)
 				// No DMA (we do not get access to the ID table); exit
 				m_live_state.state= NO_DMA_ACK;
@@ -2849,7 +2969,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 			if (m_live_state.byte_counter > 0)
 			{
 				UINT8 crct = (m_live_state.crc >> 8) & 0xff;
-				if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Write CRC byte %02x\n", tag(), crct);
+				if (TRACE_WRITE && TRACE_DETAIL) logerror("Write CRC byte %02x\n", crct);
 				m_live_state.byte_counter--;
 				write_on_track(encode(crct), 1, WRITE_HEADER_CRC);
 			}
@@ -2859,13 +2979,13 @@ void hdc92x4_device::live_run_until(attotime limit)
 			break;
 
 		case WRITE_GAP2:
-			if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Writing GAP2\n", tag());
+			if (TRACE_WRITE && TRACE_DETAIL) logerror("Writing GAP2\n");
 			write_on_track(encode(fm_mode()? 0xff : 0x4e), m_gap2_size, WRITE_DAM_SYNC);
 			break;
 
 		case WRITE_GAP3:
 			m_sector_count--;
-			if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Writing GAP3\n", tag());
+			if (TRACE_WRITE && TRACE_DETAIL) logerror("Writing GAP3\n");
 			write_on_track(encode(fm_mode()? 0xff : 0x4e), m_gap3_size, (m_sector_count>0)? WRITE_IDAM_SYNC : WRITE_GAP4);
 			break;
 
@@ -2874,7 +2994,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 			wait_line(INDEX_LINE, ASSERT_LINE, TRACKDONE, true);
 			if (TRACE_WRITE && TRACE_DETAIL && m_last_live_state != WRITE_GAP4)
 			{
-				logerror("%s: Writing GAP4\n", tag());
+				logerror("Writing GAP4\n");
 				m_last_live_state = WRITE_GAP4;
 			}
 			// Write a single byte; when the index hole shows up, the live run will be aborted
@@ -2889,7 +3009,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 		// Quite simple. Read the next ID fields, then the sector contents.
 		// Continue until the next index hole shows up (live_abort).
 		case READ_TRACK:
-			if (TRACE_LIVE) logerror("%s: READ_TRACK\n", tag());
+			if (TRACE_LIVE) logerror("READ_TRACK\n");
 			m_live_state.state = READ_TRACK_ID;
 			break;
 
@@ -2903,17 +3023,24 @@ void hdc92x4_device::live_run_until(attotime limit)
 		case READ_TRACK_ID_DONE:
 			if ((m_register_r[INT_STATUS] & ST_OVRUN)!=0)
 			{
-				if (TRACE_FAIL) logerror("%s: No DMA ACK - buffer overrun\n", tag());
+				if (TRACE_FAIL) logerror("No DMA ACK - buffer overrun\n");
 				set_bits(m_register_r[INT_STATUS], TC_DATAERR, true);
 				m_live_state.state = IDLE;
 				return;
 			}
-			if (TRACE_LIVE) logerror("%s: READ_TRACK1\n", tag());
+			if (TRACE_LIVE) logerror("READ_TRACK1\n");
 
 			m_out_dip(ASSERT_LINE);
 
 			// Write the header via DMA
-			for (int i=0; i < header_length(); i++)
+			// TODO: Does the FE byte belong to the ID fields? What about the
+			//       CRC field? Specs do not clarify. Check with real controller.
+			// For now we return the same ID format as used for Format Track
+			// (with ident expect in FM mode, no CRC)
+			if (!fm_mode() && m_is_hdc9234)
+				m_out_dma(0, m_register_r[CURRENT_IDENT], 0xff);
+
+			for (int i=0; i <= header_length()-2; i++)
 				m_out_dma(0, m_register_r[register_number(i)], 0xff);
 
 			m_out_dip(CLEAR_LINE);
@@ -2929,14 +3056,14 @@ void hdc92x4_device::live_run_until(attotime limit)
 			// The pause is implemented by doing dummy reads on the floppy
 			if (read_one_bit(limit))
 			{
-				if (TRACE_LIVE) logerror("%s: [%s live] return; limit=%s\n", tag(), tts(m_live_state.time).c_str(), tts(limit).c_str());
+				if (TRACE_LIVE) logerror("[%s live] return; limit=%s\n", tts(m_live_state.time).c_str(), tts(limit).c_str());
 				return;
 			}
 
 			// Repeat until we have collected 16 bits
 			if ((m_live_state.bit_counter & 15)==0)
 			{
-				if (TRACE_READ && TRACE_DETAIL) logerror("%s: [%s live] Read byte %02x, repeat = %d\n", tag(), tts(m_live_state.time).c_str(), m_live_state.data_reg, m_live_state.repeat);
+				if (TRACE_READ && TRACE_DETAIL) logerror("[%s live] Read byte %02x, repeat = %d\n", tts(m_live_state.time).c_str(), m_live_state.data_reg, m_live_state.repeat);
 				wait_for_realtime(READ_TRACK_NEXT_BYTE);
 				return;
 			}
@@ -2982,14 +3109,14 @@ void hdc92x4_device::live_run_until(attotime limit)
 			break;
 
 		case NO_DMA_ACK:
-			if (TRACE_FAIL) logerror("%s: No DMA ACK - buffer underrun\n", tag());
+			if (TRACE_FAIL) logerror("No DMA ACK - buffer underrun\n");
 			set_bits(m_register_r[INT_STATUS], TC_DATAERR, true);
 			m_pll.stop_writing(m_floppy, m_live_state.time);
 			m_live_state.state = IDLE;
 			return;
 
 		default:
-			logerror("%s: Unknown live state: %02x\n", tag(), m_live_state.state);
+			logerror("Unknown live state: %02x\n", m_live_state.state);
 			m_last_live_state = m_live_state.state;
 			return;
 		}
@@ -3006,13 +3133,13 @@ void hdc92x4_device::live_run_until(attotime limit)
     THIS IS THE HARDDISK-ONLY LIVE_RUN
 
     NB: Although unlikely, hard disks may be recorded in FM format with this controller
-    [1], section "Drive select", table
+    [2], section "Drive select", table
     This is currently unsupported; hard disks are forced to MFM
 */
 void hdc92x4_device::live_run_hd_until(attotime limit)
 {
 	int slot = 0;
-	if (TRACE_LIVE) logerror("%s: live_run_hd\n", tag());
+	if (TRACE_LIVE) logerror("live_run_hd\n");
 
 	if (m_live_state.state == IDLE || m_live_state.next_state != -1)
 		return;
@@ -3020,16 +3147,16 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 	if (TRACE_LIVE)
 	{
 		if (limit == attotime::never)
-			logerror("%s: [%s live] live_run_hd, live_state=%02x, mode=%s\n", tag(), tts(m_live_state.time).c_str(), m_live_state.state, fm_mode()? "FM":"MFM");
+			logerror("[%s live] live_run_hd, live_state=%02x, mode=%s\n", tts(m_live_state.time).c_str(), m_live_state.state, fm_mode()? "FM":"MFM");
 		else
-			logerror("%s: [%s live] live_run_hd until %s, live_state=%02x, mode=%s\n", tag(), tts(m_live_state.time).c_str(), tts(limit).c_str(), m_live_state.state, fm_mode()? "FM":"MFM");
+			logerror("[%s live] live_run_hd until %s, live_state=%02x, mode=%s\n", tts(m_live_state.time).c_str(), tts(limit).c_str(), m_live_state.state, fm_mode()? "FM":"MFM");
 	}
 
 	// We did not specify an upper time bound, so we take the next index pulse
 	if (limit == attotime::never && m_harddisk != nullptr)
 	{
 		limit = m_harddisk->track_end_time();
-		if (TRACE_LIVE) logerror("%s: [%s live] live_run_hd new limit %s\n", tag(), tts(m_live_state.time).c_str(), tts(limit).c_str());
+		if (TRACE_LIVE) logerror("[%s live] live_run_hd new limit %s\n", tts(m_live_state.time).c_str(), tts(limit).c_str());
 	}
 
 	while (true)
@@ -3039,7 +3166,7 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 		case SEARCH_IDAM:
 			if (TRACE_LIVE && m_last_live_state != SEARCH_IDAM)
 			{
-				logerror("%s: [%s live] SEARCH_IDAM [limit %s]\n", tag(),tts(m_live_state.time).c_str(), tts(limit).c_str());
+				logerror("[%s live] SEARCH_IDAM [limit %s]\n",tts(m_live_state.time).c_str(), tts(limit).c_str());
 				m_last_live_state = m_live_state.state;
 			}
 
@@ -3048,14 +3175,14 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 
 			if (read_from_mfmhd(limit))
 			{
-				if (TRACE_LIVE) logerror("%s: [%s live] SEARCH_IDAM limit reached\n", tag(), tts(m_live_state.time).c_str());
+				if (TRACE_LIVE) logerror("[%s live] SEARCH_IDAM limit reached\n", tts(m_live_state.time).c_str());
 				return;
 			}
 
 			if (TRACE_LIVE)
-				if ((m_live_state.bit_counter & 0x000f)==0) logerror("%s: [%s live] Read %04x\n", tag(), tts(m_live_state.time).c_str(), m_live_state.shift_reg);
+				if ((m_live_state.bit_counter & 0x000f)==0) logerror("[%s live] Read %04x\n", tts(m_live_state.time).c_str(), m_live_state.shift_reg);
 
-			// [1] p. 9: The ID field sync mark must be found within 33,792 byte times
+			// [1,2]: The ID field sync mark must be found within 33,792 byte times
 			if (m_live_state.bit_count_total > 33792*16)
 			{
 				// Desired sector not found within time
@@ -3068,7 +3195,7 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 
 			if (found_mark(SEARCH_IDAM))
 			{
-				if (TRACE_LIVE) logerror("%s: [%s live] Found an A1 mark\n", tag(), tts(m_live_state.time).c_str());
+				if (TRACE_LIVE) logerror("[%s live] Found an A1 mark\n", tts(m_live_state.time).c_str());
 				preset_crc(m_live_state, 0xa1);
 				m_live_state.data_separator_phase = false;
 				m_live_state.bit_counter = 0;
@@ -3099,9 +3226,9 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 				if (TRACE_LIVE)
 				{
 					if (m_live_state.data_reg == 0xf8 || m_live_state.data_reg == 0xfb)
-						logerror("%s: [%s live] Looks like a DAM; continue to next mark\n", tag(), tts(m_live_state.time).c_str());
+						logerror("[%s live] Looks like a DAM; continue to next mark\n", tts(m_live_state.time).c_str());
 					else
-						logerror("%s: [%s live] Missing ident data after A1, and it was not DAM; format corrupt?\n", tag(), tts(m_live_state.time).c_str());
+						logerror("[%s live] Missing ident data after A1, and it was not DAM; format corrupt?\n", tts(m_live_state.time).c_str());
 				}
 				m_live_state.state = SEARCH_IDAM;
 			}
@@ -3116,7 +3243,7 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 		case READ_ID_FIELDS_INTO_REGS:
 			if (TRACE_LIVE && m_last_live_state != READ_ID_FIELDS_INTO_REGS)
 			{
-				logerror("%s: [%s live] READ_ID_FIELDS_INTO_REGS\n", tag(),tts(m_live_state.time).c_str());
+				logerror("[%s live] READ_ID_FIELDS_INTO_REGS\n",tts(m_live_state.time).c_str());
 				m_last_live_state = m_live_state.state;
 			}
 
@@ -3125,10 +3252,10 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 			// Repeat until we have collected 16 bits
 			if (m_live_state.bit_counter & 15) break;
 
-			if (TRACE_LIVE) logerror("%s: slot %d = %02x, crc=%04x\n", tag(), slot, m_live_state.data_reg, m_live_state.crc);
+			if (TRACE_LIVE) logerror("slot %d = %02x, crc=%04x\n", slot, m_live_state.data_reg, m_live_state.crc);
 			m_register_r[register_number(slot++)] = m_live_state.data_reg;
 
-			if(slot > 5)
+			if (slot > header_length())
 			{
 				// We successfully read the ID fields; let's wait for the machine time to catch up.
 				if (reading_track())
@@ -3144,7 +3271,7 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 		case SEARCH_DAM:
 			if (TRACE_LIVE && m_last_live_state != SEARCH_DAM)
 			{
-				logerror("%s: [%s live] SEARCH_DAM\n", tag(),tts(m_live_state.time).c_str());
+				logerror("[%s live] SEARCH_DAM\n",tts(m_live_state.time).c_str());
 				m_last_live_state = m_live_state.state;
 			}
 			set_bits(m_register_r[CHIP_STATUS], CS_DELDATA, false);
@@ -3152,18 +3279,18 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 			if (read_from_mfmhd(limit)) return;
 
 			if (TRACE_LIVE)
-				if ((m_live_state.bit_counter & 15)==0) logerror("%s: [%s live] Read %04x\n", tag(), tts(m_live_state.time).c_str(), m_live_state.shift_reg);
+				if ((m_live_state.bit_counter & 15)==0) logerror("[%s live] Read %04x\n", tts(m_live_state.time).c_str(), m_live_state.shift_reg);
 
 			if (m_live_state.bit_counter > 30*16)
 			{
-				if (TRACE_FAIL) logerror("%s: SEARCH_DAM failed\n", tag());
+				if (TRACE_FAIL) logerror("SEARCH_DAM failed\n");
 				wait_for_realtime(SEARCH_DAM_FAILED);
 				return;
 			}
 
 			if (found_mark(SEARCH_DAM))
 			{
-				if (TRACE_LIVE) logerror("%s: [%s live] Found an A1 mark\n", tag(),tts(m_live_state.time).c_str());
+				if (TRACE_LIVE) logerror("[%s live] Found an A1 mark\n",tts(m_live_state.time).c_str());
 				preset_crc(m_live_state, 0xa1);
 				m_live_state.data_separator_phase = false;
 				m_live_state.bit_counter = 0;
@@ -3178,14 +3305,14 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 
 			if ((m_live_state.data_reg & 0xff) == 0xf8)
 			{
-				if (TRACE_LIVE) logerror("%s: [%s live] Found deleted data mark F8 after DAM sync\n", tag(), tts(m_live_state.time).c_str());
+				if (TRACE_LIVE) logerror("[%s live] Found deleted data mark F8 after DAM sync\n", tts(m_live_state.time).c_str());
 				set_bits(m_register_r[CHIP_STATUS], CS_DELDATA, true);
 			}
 			else
 			{
 				if ((m_live_state.data_reg & 0xff) != 0xfb)
 				{
-					if (TRACE_FAIL) logerror("%s: [%s live] Missing FB/F8 data mark after DAM sync; found %04x\n", tag(), tts(m_live_state.time).c_str(), m_live_state.shift_reg);
+					if (TRACE_FAIL) logerror("[%s live] Missing FB/F8 data mark after DAM sync; found %04x\n", tts(m_live_state.time).c_str(), m_live_state.shift_reg);
 					wait_for_realtime(SEARCH_DAM_FAILED);
 					return;
 				}
@@ -3195,14 +3322,14 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 			break;
 
 		case SEARCH_DAM_FAILED:
-			if (TRACE_FAIL) logerror("%s: SEARCH_DAM failed\n", tag());
+			if (TRACE_FAIL) logerror("SEARCH_DAM failed\n");
 			m_live_state.state = IDLE;
 			return;
 
 		case READ_SECTOR_DATA:
 			if (TRACE_LIVE && m_last_live_state != READ_SECTOR_DATA)
 			{
-				logerror("%s: [%s live] READ_SECTOR_DATA\n", tag(),tts(m_live_state.time).c_str());
+				logerror("[%s live] READ_SECTOR_DATA\n",tts(m_live_state.time).c_str());
 				m_last_live_state = m_live_state.state;
 			}
 
@@ -3222,7 +3349,7 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 			if (m_live_state.bit_counter & 15) break;
 
 			slot = (m_live_state.bit_counter >> 4)-1;
-			if (TRACE_LIVE) logerror("%s: [%s live] Found data value [%d/%d] = %02X, CRC=%04x\n", tag(),tts(m_live_state.time).c_str(), slot, sector_size(), m_live_state.data_reg, m_live_state.crc);
+			if (TRACE_LIVE) logerror("[%s live] Found data value [%d/%d] = %02X, CRC=%04x\n",tts(m_live_state.time).c_str(), slot, sector_size(), m_live_state.data_reg, m_live_state.crc);
 
 			if (slot < sector_size())
 			{
@@ -3250,7 +3377,7 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 					}
 					else
 					{
-						if (TRACE_LIVE) logerror("%s: [%s live] Sector read completed\n", tag(),tts(m_live_state.time).c_str());
+						if (TRACE_LIVE) logerror("[%s live] Sector read completed\n",tts(m_live_state.time).c_str());
 						wait_for_realtime(IDLE);
 					}
 					return;
@@ -3263,7 +3390,7 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 			// Did the system CPU send the DMA ACK in the meantime?
 			if ((m_register_r[INT_STATUS] & ST_OVRUN)!=0)
 			{
-				if (TRACE_FAIL) logerror("%s: No DMA ACK - buffer overrun\n", tag());
+				if (TRACE_FAIL) logerror("No DMA ACK - buffer overrun\n");
 				set_bits(m_register_r[INT_STATUS], TC_DATAERR, true);
 				m_live_state.state = IDLE;
 				return;
@@ -3277,7 +3404,7 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 					m_out_dip(ASSERT_LINE);
 
 				m_out_dma(0, m_register_r[DATA], 0xff);
-				if (TRACE_LIVE) logerror("%s: [%s live] Byte %02x sent via DMA\n", tag(),tts(m_live_state.time).c_str(), m_register_r[DATA] & 0xff);
+				if (TRACE_LIVE) logerror("[%s live] Byte %02x sent via DMA\n",tts(m_live_state.time).c_str(), m_register_r[DATA] & 0xff);
 			}
 			m_live_state.state = READ_SECTOR_DATA;
 			break;
@@ -3288,14 +3415,14 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 			// The pause is implemented by doing dummy reads on the hard disk
 			if (read_from_mfmhd(limit))
 			{
-				if (TRACE_LIVE) logerror("%s: [%s live] return; limit=%s\n", tag(), tts(m_live_state.time).c_str(), tts(limit).c_str());
+				if (TRACE_LIVE) logerror("[%s live] return; limit=%s\n", tts(m_live_state.time).c_str(), tts(limit).c_str());
 				return;
 			}
 
 			// Repeat until we have collected 16 bits
 			if ((m_live_state.bit_counter & 15)==0)
 			{
-				if (TRACE_READ && TRACE_DETAIL) logerror("%s: [%s live] Read byte %02x, repeat = %d\n", tag(), tts(m_live_state.time).c_str(), m_live_state.data_reg, m_live_state.repeat);
+				if (TRACE_READ && TRACE_DETAIL) logerror("[%s live] Read byte %02x, repeat = %d\n", tts(m_live_state.time).c_str(), m_live_state.data_reg, m_live_state.repeat);
 				wait_for_realtime(READ_TRACK_NEXT_BYTE);
 				return;
 			}
@@ -3315,7 +3442,7 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 		case WRITE_TRACK_BYTE:
 			if (write_to_mfmhd(limit))
 			{
-				if (TRACE_LIVE) logerror("%s: [%s live] write limit reached\n", tag(), tts(m_live_state.time).c_str());
+				if (TRACE_LIVE) logerror("[%s live] write limit reached\n", tts(m_live_state.time).c_str());
 				return;
 			}
 
@@ -3346,13 +3473,13 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 			// ======= HD sector write =====================================
 
 		case WRITE_DAM_AND_SECTOR:
-			if (TRACE_LIVE) logerror("%s: [%s live] Skipping GAP2\n", tag(), tts(m_live_state.time).c_str());
+			if (TRACE_LIVE) logerror("[%s live] Skipping GAP2\n", tts(m_live_state.time).c_str());
 			skip_on_track(m_gap2_size, WRITE_DAM_SYNC);
 
 			break;
 
 		case WRITE_DAM_SYNC:
-			if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Write sync zeros\n", tag());
+			if (TRACE_WRITE && TRACE_DETAIL) logerror("Write sync zeros\n");
 
 			// Clear the overrun/underrun flag
 			set_bits(m_register_r[INT_STATUS], ST_OVRUN, false);
@@ -3360,12 +3487,12 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 			break;
 
 		case WRITE_A1:
-			if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Write one A1\n", tag());
+			if (TRACE_WRITE && TRACE_DETAIL) logerror("Write one A1\n");
 			write_on_track(encode_a1_hd(), 1, WRITE_DATAMARK);
 			break;
 
 		case WRITE_DATAMARK:
-			if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Write data mark\n", tag());
+			if (TRACE_WRITE && TRACE_DETAIL) logerror("Write data mark\n");
 
 			// Init the CRC for the ident byte and sector
 			preset_crc(m_live_state, 0xa1); // only one A1
@@ -3394,7 +3521,7 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 				}
 				else
 				{
-					if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Write sector byte, %d to go\n", tag(), m_live_state.byte_counter);
+					if (TRACE_WRITE && TRACE_DETAIL) logerror("Write sector byte, %d to go\n", m_live_state.byte_counter);
 
 					// This is hard disk, so set DIP only at the beginning
 					if (m_live_state.byte_counter == sector_size())
@@ -3433,7 +3560,7 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 		case WRITE_DATA_CRC:
 			if (m_live_state.byte_counter > 0)
 			{
-				if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Write CRC\n", tag());
+				if (TRACE_WRITE && TRACE_DETAIL) logerror("Write CRC\n");
 				m_live_state.byte_counter--;
 				write_on_track(encode_hd((m_live_state.crc >> 8) & 0xff), 1, WRITE_DATA_CRC);
 			}
@@ -3446,7 +3573,7 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 		case WRITE_DONE:
 			if (m_substate == DATA_TRANSFER_WRITE)
 			{
-				if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Write sector complete\n", tag());
+				if (TRACE_WRITE && TRACE_DETAIL) logerror("Write sector complete\n");
 				m_live_state.state = IDLE;
 				return;
 			}
@@ -3464,7 +3591,7 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 		// Read the next ID fields, then the sector contents.
 		// Continue until the next index hole shows up (live_abort).
 		case READ_TRACK:
-			if (TRACE_LIVE) logerror("%s: READ_TRACK\n", tag());
+			if (TRACE_LIVE) logerror("READ_TRACK\n");
 			m_live_state.state = READ_TRACK_ID;
 			break;
 
@@ -3479,16 +3606,23 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 			if ((m_register_r[INT_STATUS] & ST_OVRUN)!=0)
 			{
 				// We need an ACK right now, or the header bytes will be lost
-				if (TRACE_FAIL) logerror("%s: No DMA ACK - buffer overrun\n", tag());
+				if (TRACE_FAIL) logerror("No DMA ACK - buffer overrun\n");
 				set_bits(m_register_r[INT_STATUS], TC_DATAERR, true);
 				m_live_state.state = IDLE;
 				return;
 			}
-			if (TRACE_LIVE) logerror("%s: READ_TRACK_ID_DONE\n", tag());
+			if (TRACE_LIVE) logerror("READ_TRACK_ID_DONE\n");
 			m_out_dip(ASSERT_LINE);
 
 			// Write the header via DMA
-			for (int i=0; i < header_length(); i++)
+			// TODO: Does the FE byte belong to the ID fields? What about the
+			//       CRC field? Specs do not clarify. Check with real controller.
+			// For now we return the same ID format as used for Format Track
+			// (with ident expect in FM mode, no CRC)
+			if (m_is_hdc9234)
+				m_out_dma(0, m_register_r[CURRENT_IDENT], 0xff);
+
+			for (int i=0; i <= header_length()-2; i++)
 				m_out_dma(0, m_register_r[register_number(i)], 0xff);
 
 			// Continue with reading the sector data
@@ -3511,18 +3645,18 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 			// Write GAP4 until the next pulse
 		// ==================================================
 		case FORMAT_TRACK:
-			if (TRACE_LIVE) logerror("%s: FORMAT_TRACK\n", tag());
+			if (TRACE_LIVE) logerror("FORMAT_TRACK\n");
 			m_live_state.state = WRITE_GAP1;
 			break;
 
 		case WRITE_GAP1:
 			// GAP1 length is in DMA15_8
-			if (TRACE_GAPS) logerror("%s: Writing GAP1; size=%d\n", tag(), m_gap1_size);
+			if (TRACE_GAPS) logerror("Writing GAP1; size=%d\n", m_gap1_size);
 			write_on_track(encode_hd(0x4e), m_gap1_size, WRITE_IDAM_SYNC);
 			break;
 
 		case WRITE_IDAM_SYNC:
-			if (TRACE_GAPS) logerror("%s: Writing IDAM sync, size=%d\n", tag(), m_sync_size);
+			if (TRACE_GAPS) logerror("Writing IDAM sync, size=%d\n", m_sync_size);
 			write_on_track(encode_hd(0x00), m_sync_size, WRITE_IDAM);
 			break;
 
@@ -3530,13 +3664,29 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 			// Set the over/underrun flag and hope that it will be cleared before we enter the next state (after writing)
 			set_bits(m_register_r[INT_STATUS], ST_OVRUN, true);
 			m_out_dmarq(ASSERT_LINE);
-			if (TRACE_HEADER) logerror("%s: Writing IDAM and header: ", tag());
-			write_on_track(encode_a1_hd(), 1, WRITE_HEADER);
-			m_live_state.byte_counter = 5;          // TODO: Check this for AT mode
 			preset_crc(m_live_state, 0);
+			if (TRACE_HEADER) logerror("Writing IDAM and header\n");
+			write_on_track(encode_a1_hd(), 1, (m_is_hdc9234)? WRITE_HEADER : WRITE_IDENT);
+			// AT mode does not use a size field; the sector size must
+			// be specified by call parameters
+			m_live_state.byte_counter = 5;
+			if (m_selected_drive_type==TYPE_AT) m_live_state.byte_counter--;
+			break;
+
+		case WRITE_IDENT:
+			// 9224 does not allow for a user-defined ident field
+			write_on_track(encode_hd(0xfe), 1, WRITE_HEADER);
+			// ST type does not use a size field
+			if (m_selected_drive_type==TYPE_ST) m_live_state.byte_counter--;
 			break;
 
 		case WRITE_HEADER:
+			// 9224: Generic HD  = track side sector size
+			// 9224: ST-506 HD   = track side sector
+
+			// 9234: Generic HD  = ident track side sector size
+			// 9234: PC-AT HD    = ident track side sector
+
 			if ((m_register_r[INT_STATUS] & ST_OVRUN)!=0)
 				// No DMA (we do not get access to the ID table); exit
 				m_live_state.state= NO_DMA_ACK;
@@ -3545,7 +3695,7 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 				m_out_dip(ASSERT_LINE);
 				m_live_state.byte_counter--;
 				UINT8 headbyte = m_in_dma(0, 0xff);
-				if (TRACE_HEADER) logerror("%02x ", headbyte);
+				if (TRACE_HEADER) logerror("%02x\n", headbyte);
 				write_on_track(encode_hd(headbyte), 1, (m_live_state.byte_counter>0)? WRITE_HEADER : WRITE_HEADER_CRC);
 
 				if (m_live_state.byte_counter==0)
@@ -3562,7 +3712,7 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 			if (m_live_state.byte_counter > 0)
 			{
 				UINT8 crct = (m_live_state.crc >> 8) & 0xff;
-				if (TRACE_HEADER) logerror("%02x ", crct);
+				if (TRACE_HEADER) logerror("%02x\n", crct);
 				m_live_state.byte_counter--;
 				write_on_track(encode_hd(crct), 1, WRITE_HEADER_CRC);
 			}
@@ -3574,13 +3724,13 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 			break;
 
 		case WRITE_GAP2:
-			if (TRACE_GAPS) logerror("%s: Writing GAP2, size=%d\n", tag(), m_gap2_size);
+			if (TRACE_GAPS) logerror("Writing GAP2, size=%d\n", m_gap2_size);
 			write_on_track(encode_hd(0x4e), m_gap2_size, WRITE_DAM_SYNC);
 			break;
 
 		case WRITE_GAP3:
 			m_sector_count--;
-			if (TRACE_GAPS) logerror("%s: Writing GAP3, size=%d\n", tag(), m_gap3_size);
+			if (TRACE_GAPS) logerror("Writing GAP3, size=%d\n", m_gap3_size);
 			write_on_track(encode_hd(0x4e), m_gap3_size, (m_sector_count>0)? WRITE_IDAM_SYNC : WRITE_GAP4);
 			break;
 
@@ -3589,7 +3739,7 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 			wait_line(INDEX_LINE, ASSERT_LINE, TRACKDONE, true);
 			if (TRACE_GAPS && m_last_live_state != WRITE_GAP4)
 			{
-				logerror("%s: Writing GAP4\n", tag());
+				logerror("Writing GAP4\n");
 				m_last_live_state = WRITE_GAP4;
 			}
 			// Write a single byte; when the index hole shows up, the live run will be aborted
@@ -3598,7 +3748,7 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 // --------------------------------------------------------
 
 		default:
-			if (TRACE_LIVE) logerror("%s: Unknown state: %02x\n", tag(), m_live_state.state);
+			if (TRACE_LIVE) logerror("Unknown state: %02x\n", m_live_state.state);
 			break;
 		}
 	}
@@ -3619,7 +3769,7 @@ void hdc92x4_device::live_sync()
 		if(m_live_state.time > machine().time())
 		{
 			// If so, we must roll back to the last checkpoint
-			if (TRACE_SYNC) logerror("%s: [%s] Rolling back and replaying [%s live]\n", tag(), ttsn().c_str(), tts(m_live_state.time).c_str());
+			if (TRACE_SYNC) logerror("[%s] Rolling back and replaying [%s live]\n", ttsn().c_str(), tts(m_live_state.time).c_str());
 			rollback();
 
 			// and replay until we reach the machine time
@@ -3639,7 +3789,7 @@ void hdc92x4_device::live_sync()
 		{
 			// We are behind machine time, so we will never get back to that
 			// time, thus we can commit that position
-			if (TRACE_SYNC) logerror("%s: [%s] Committing [%s live]\n", tag(), ttsn().c_str(), tts(m_live_state.time).c_str());
+			if (TRACE_SYNC) logerror("[%s] Committing [%s live]\n", ttsn().c_str(), tts(m_live_state.time).c_str());
 
 			// Commit bits from pll buffer to disk until live time (if there is something to write)
 			if (using_floppy())
@@ -3666,7 +3816,7 @@ void hdc92x4_device::live_abort()
 {
 	if (!m_live_state.time.is_never() && m_live_state.time > machine().time())
 	{
-		if (TRACE_LIVE) logerror("%s: [%s] Abort; rolling back and replaying [%s live]\n", tag(), ttsn().c_str(), tts(m_live_state.time).c_str());
+		if (TRACE_LIVE) logerror("[%s] Abort; rolling back and replaying [%s live]\n", ttsn().c_str(), tts(m_live_state.time).c_str());
 		rollback();
 		live_run_until(machine().time());
 	}
@@ -3733,7 +3883,7 @@ void hdc92x4_device::wait_for_realtime(int state)
 {
 	m_live_state.next_state = state;
 	m_timer->adjust(m_live_state.time - machine().time());
-	if (TRACE_LIVE) logerror("%s: [%s live] Waiting for real time [%s] to catch up; next state = %02x\n", tag(), tts(m_live_state.time).c_str(), ttsn().c_str(), state);
+	if (TRACE_LIVE) logerror("[%s live] Waiting for real time [%s] to catch up; next state = %02x\n", tts(m_live_state.time).c_str(), ttsn().c_str(), state);
 }
 
 /*
@@ -3858,7 +4008,7 @@ void hdc92x4_device::encode_raw(UINT16 raw)
 	m_live_state.bit_counter = 16;
 	m_live_state.shift_reg = m_live_state.shift_reg_save = raw;
 	m_live_state.last_data_bit = raw & 1;
-	if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: [%s live] Write %02x (%04x)\n", tag(), tts(m_live_state.time).c_str(), get_data_from_encoding(raw), raw);
+	if (TRACE_WRITE && TRACE_DETAIL) logerror("[%s live] Write %02x (%04x)\n", tts(m_live_state.time).c_str(), get_data_from_encoding(raw), raw);
 	checkpoint();
 }
 
@@ -4115,7 +4265,7 @@ READ8_MEMBER( hdc92x4_device::read )
 	{
 		// Data register
 		reply = m_register_r[m_register_pointer];
-		if (TRACE_READREG) logerror("%s: Read register[%d] -> %02x\n", tag(), m_register_pointer, reply);
+		if (TRACE_READREG) logerror("Read register[%d] -> %02x\n", m_register_pointer, reply);
 
 		// Autoincrement until DATA is reached.
 		if (m_register_pointer < DATA)  m_register_pointer++;
@@ -4126,8 +4276,8 @@ READ8_MEMBER( hdc92x4_device::read )
 		reply = m_register_r[INT_STATUS];
 
 		// "The interrupt pin is reset to its inactive state
-		// when the UDC interrupt status register is read." [1] (p.3)
-		if (TRACE_READREG) logerror("%s: Read interrupt status register -> %02x\n", tag(), reply);
+		// when the UDC interrupt status register is read." [1,2]
+		if (TRACE_READREG) logerror("Read interrupt status register -> %02x\n", reply);
 		set_interrupt(CLEAR_LINE);
 
 		// Clear the bits due to interrupt status register read.
@@ -4147,8 +4297,8 @@ WRITE8_MEMBER( hdc92x4_device::write )
 {
 	if ((offset & 1) == 0)
 	{
-		if (TRACE_COMMAND) logerror("%s: New register write access %02x\n", tag(), data & 0xff);
-		if (m_executing) logerror("%s: Error - previous command %02x not completed; register access ignored\n", tag(), current_command());
+		if (TRACE_COMMAND) logerror("New register write access %02x\n", data & 0xff);
+		if (m_executing) logerror("Error - previous command %02x not completed; register access ignored\n", current_command());
 		else
 		{
 			m_regvalue = data & 0xff;
@@ -4157,8 +4307,8 @@ WRITE8_MEMBER( hdc92x4_device::write )
 	}
 	else
 	{
-		if (TRACE_COMMAND) logerror("%s: New incoming command %02x\n", tag(), data);
-		if (m_executing) logerror("%s: Error - previous command %02x not completed; new command %02x ignored\n", tag(), current_command(), data);
+		if (TRACE_COMMAND) logerror("New incoming command %02x\n", data);
+		if (m_executing) logerror("Error - previous command %02x not completed; new command %02x ignored\n", current_command(), data);
 		else
 		{
 			m_register_w[COMMAND] = data;
@@ -4179,9 +4329,9 @@ void hdc92x4_device::process_command()
 		if (TRACE_SETREG)
 		{
 			if (m_register_pointer == INT_COMM_TERM)
-				logerror("%s: Setting interrupt trigger DONE=%d READY=%d\n", tag(), (m_regvalue & TC_INTDONE)? 1:0, (m_regvalue & TC_INTRDCH)? 1:0);
+				logerror("Setting interrupt trigger DONE=%d READY=%d\n", (m_regvalue & TC_INTDONE)? 1:0, (m_regvalue & TC_INTRDCH)? 1:0);
 			else
-				logerror("%s: register[%d] <- %02x\n", tag(), m_register_pointer, m_regvalue);
+				logerror("register[%d] <- %02x\n", m_register_pointer, m_regvalue);
 		}
 		m_register_w[m_register_pointer] = m_regvalue;
 
@@ -4190,7 +4340,7 @@ void hdc92x4_device::process_command()
 		if (m_register_pointer < DESIRED_HEAD) m_register_r[m_register_pointer] = m_regvalue;
 
 		// Note for the PC-AT mode: The DATA register contains two bits (5,4)
-		// that are defined as "Actual sector size" ([1] p. 7). The
+		// that are defined as "Actual sector size" ([2] p. 7). The
 		// specification does not say anything about the meaning of these
 		// bits. The desired sector size is already specified by bits 6 and 5
 		// of the DESIRED_HEAD register, so we ignore these bits for now.
@@ -4200,7 +4350,10 @@ void hdc92x4_device::process_command()
 	}
 	else
 	{
-		// Reset DONE and BAD_SECTOR [1], p.7
+		// Reset DONE and BAD_SECTOR [2], p.7
+		// BAD_SECTOR is set by writing the sector header field HEAD with bit
+		// 7 set to one. When reading the header, the flag, together with all
+		// other bits, is copied into the CURRENT_HEAD register.
 		set_bits(m_register_r[INT_STATUS], ST_DONE | ST_BADSECT, false);
 
 		// Reset interrupt line (not explicitly mentioned in spec, but seems reasonable
@@ -4230,7 +4383,7 @@ void hdc92x4_device::process_command()
 		}
 		if (!found)
 		{
-			logerror("%s: Command %02x not defined\n", tag(), m_register_w[COMMAND]);
+			logerror("Command %02x not defined\n", m_register_w[COMMAND]);
 		}
 	}
 	auxbus_out();
@@ -4238,7 +4391,7 @@ void hdc92x4_device::process_command()
 
 void hdc92x4_device::reenter_command_processing()
 {
-	if (TRACE_DELAY) logerror("%s: Re-enter command processing; live state = %02x\n", tag(), m_live_state.state);
+	if (TRACE_DELAY) logerror("Re-enter command processing; live state = %02x\n", m_live_state.state);
 	// Do we have a live run on the track?
 	if (m_live_state.state != IDLE)
 	{
@@ -4250,7 +4403,7 @@ void hdc92x4_device::reenter_command_processing()
 	// We're here when there is no live_run anymore
 	// Where were we last time?
 	// Take care not to restart commands because of the index callback
-	if (TRACE_DELAY) logerror("%s: Continue with substate %02x\n", tag(), m_substate);
+	if (TRACE_DELAY) logerror("Continue with substate %02x\n", m_substate);
 	if (m_executing && m_substate != UNDEF) (this->*m_command)();
 	auxbus_out();
 }
@@ -4269,15 +4422,15 @@ void hdc92x4_device::set_command_done(int flags)
 	{
 		set_bits(m_register_r[INT_STATUS], ST_TERMCOD, false); // clear the previously set flags
 		m_register_r[INT_STATUS] |= flags;
-		if (TRACE_DONE) logerror("%s: command %02x done, flags=%02x\n", tag(), current_command(), flags);
+		if (TRACE_DONE) logerror("command %02x done, flags=%02x\n", current_command(), flags);
 	}
 	else
 	{
-		if (TRACE_DONE) logerror("%s: command %02x done\n", tag(), current_command());
+		if (TRACE_DONE) logerror("command %02x done\n", current_command());
 	}
 
-	// [1], p. 6
-	if (TRACE_INT) logerror("%s: Raise interrupt DONE\n", tag());
+	// [1]; [2] p. 6
+	if (TRACE_INT) logerror("Raise interrupt DONE\n");
 	set_interrupt(ASSERT_LINE);
 
 	m_substate = UNDEF;
@@ -4302,14 +4455,14 @@ void hdc92x4_device::set_command_done()
     The specification is not really precise on the times when this bus is
     used, but at least we can rely on this information:
 
-    - Whenever there is no output of data, the bus is sampled. ([1], p.8,
+    - Whenever there is no output of data, the bus is sampled. ([2], p.8,
       Drive status register). Data is sampled at the rising edge of STB*.
       As the minimum STB* pulse is 800ns with min 100ns S0/S1 settling time
       and min 100ns hold time we can say that the bus is polled at a maximum
       rate of 1 MHz.
 
     - Data for the DMA address is output only when the address is initially
-      set; also when the address must be set again on error ([1], p.5,
+      set; also when the address must be set again on error ([2], p.5,
       DMA registers). The external memory system has to take care of the
       addressing for subsequent bytes. The address will be increased by the
       length of a sector during multiple sector read/write operations.
@@ -4344,7 +4497,7 @@ void hdc92x4_device::auxbus_in(UINT8 data)
 	if (!m_initialized)
 		return;
 
-	if (TRACE_AUXBUS) logerror("%s: Got value %02x via auxbus: ecc=%d index=%d seek_comp=%d tr00=%d user=%d writeprot=%d ready=%d fault=%d\n",
+	if (TRACE_AUXBUS) logerror("Got value %02x via auxbus: ecc=%d index=%d seek_comp=%d tr00=%d user=%d writeprot=%d ready=%d fault=%d\n",
 				tag(), data,
 				(data&HDC_DS_ECCERR)? 1:0, (data&HDC_DS_INDEX)? 1:0,
 				(data&HDC_DS_SKCOM)? 1:0, (data&HDC_DS_TRK00)? 1:0,
@@ -4379,20 +4532,20 @@ bool hdc92x4_device::waiting_for_other_line(int line)
 void hdc92x4_device::index_handler()
 {
 	int level = index_hole()? ASSERT_LINE : CLEAR_LINE;
-	if (TRACE_LINES) logerror("%s: [%s] Index handler; level=%d\n", tag(), ttsn().c_str(), level);
+	if (TRACE_LINES) logerror("[%s] Index handler; level=%d\n", ttsn().c_str(), level);
 
 	// Synchronize our position on the track
 	live_sync();
 
 	if (level==ASSERT_LINE)
 	{
-		if (TRACE_INDEX) logerror("%s: Index pulse\n", tag());
+		if (TRACE_INDEX) logerror("Index pulse\n");
 		if (m_wait_for_index) m_stop_after_index = true;
 	}
 
 	if (waiting_for_line(INDEX_LINE, level))
 	{
-		if (TRACE_LINES) logerror("%s: [%s] Index pulse level=%d triggers event\n", tag(), ttsn().c_str(), level);
+		if (TRACE_LINES) logerror("[%s] Index pulse level=%d triggers event\n", ttsn().c_str(), level);
 		m_substate = m_state_after_line;
 		m_state_after_line = UNDEF;
 		if (m_stopwrite)
@@ -4414,7 +4567,7 @@ void hdc92x4_device::index_handler()
 void hdc92x4_device::ready_handler()
 {
 	int level = drive_ready()? ASSERT_LINE : CLEAR_LINE;
-	if (TRACE_LINES) logerror("%s: [%s] Ready handler; level=%d\n", tag(), ttsn().c_str(), level);
+	if (TRACE_LINES) logerror("[%s] Ready handler; level=%d\n", ttsn().c_str(), level);
 
 	// Set the interrupt status flag
 	set_bits(m_register_r[INT_STATUS], ST_RDYCHNG, true);
@@ -4425,7 +4578,7 @@ void hdc92x4_device::ready_handler()
 	// Raise an interrupt if desired
 	if (m_register_w[INT_COMM_TERM] & TC_INTRDCH)
 	{
-		if (TRACE_INT) logerror("%s: Raise interrupt READY change\n", tag());
+		if (TRACE_INT) logerror("Raise interrupt READY change\n");
 		set_interrupt(ASSERT_LINE);
 	}
 
@@ -4441,7 +4594,7 @@ void hdc92x4_device::ready_handler()
 void hdc92x4_device::seek_complete_handler()
 {
 	int level = seek_complete()? ASSERT_LINE : CLEAR_LINE;
-	if (TRACE_LINES) logerror("%s: [%s] Seek complete handler; level=%d\n", tag(), ttsn().c_str(), level);
+	if (TRACE_LINES) logerror("[%s] Seek complete handler; level=%d\n", ttsn().c_str(), level);
 
 	// Synchronize our position on the track
 	live_sync();
@@ -4488,7 +4641,7 @@ void hdc92x4_device::auxbus_out()
 	m_output2 = (m_output2 & 0xb0) | desired_head();
 	if (m_reduced_write_current) m_output2 |= OUT2_REDWRT;
 
-	if (TRACE_AUXBUS) logerror("%s: [%s] Setting OUTPUT1=%02x, OUTPUT2=%02x\n", tag(), ttsn().c_str(), m_output1, m_output2);
+	if (TRACE_AUXBUS) logerror("[%s] Setting OUTPUT1=%02x, OUTPUT2=%02x\n", ttsn().c_str(), m_output1, m_output2);
 
 	if (m_output1 != m_output1_old || m_output2 != m_output2_old)
 	{
@@ -4502,7 +4655,7 @@ void hdc92x4_device::auxbus_out()
 
 void hdc92x4_device::dma_address_out(UINT8 addrub, UINT8 addrhb, UINT8 addrlb)
 {
-	if (TRACE_DMA) logerror("%s: Setting DMA address %06x\n", tag(), (addrub<<16 | addrhb<<8 | addrlb)&0xffffff);
+	if (TRACE_DMA) logerror("Setting DMA address %06x\n", (addrub<<16 | addrhb<<8 | addrlb)&0xffffff);
 	m_out_auxbus((offs_t)HDC_OUTPUT_DMA_ADDR, addrub);
 	m_out_auxbus((offs_t)HDC_OUTPUT_DMA_ADDR, addrhb);
 	m_out_auxbus((offs_t)HDC_OUTPUT_DMA_ADDR, addrlb);
@@ -4542,7 +4695,7 @@ WRITE_LINE_MEMBER( hdc92x4_device::dmaack )
 {
 	if (state==ASSERT_LINE)
 	{
-		if (TRACE_DMA) logerror("%s: [%s] DMA acknowledged\n", tag(), ttsn().c_str());
+		if (TRACE_DMA) logerror("[%s] DMA acknowledged\n", ttsn().c_str());
 		set_bits(m_register_r[INT_STATUS], ST_OVRUN, false);
 	}
 }
@@ -4563,7 +4716,7 @@ void hdc92x4_device::connect_hard_drive(mfm_harddisk_device* harddisk)
 {
 	m_harddisk = harddisk;
 	m_hd_encoding = m_harddisk->get_encoding();
-	if (TRACE_SELECT && TRACE_DETAIL) logerror("%s: HD encoding = %d\n", tag(), m_hd_encoding);
+	if (TRACE_SELECT && TRACE_DETAIL) logerror("HD encoding = %d\n", m_hd_encoding);
 }
 
 /*
@@ -4603,7 +4756,7 @@ WRITE_LINE_MEMBER( hdc92x4_device::reset )
 {
 	if (state == ASSERT_LINE)
 	{
-		if (TRACE_LINES) logerror("%s: Reset via RST line\n", tag());
+		if (TRACE_LINES) logerror("Reset via RST line\n");
 		device_reset();
 	}
 }
@@ -4639,6 +4792,7 @@ void hdc92x4_device::device_reset()
 	m_live_state.state = IDLE;
 	m_live_state.time = attotime::never;
 	m_logical = true;
+	m_bypass = false;
 	m_multi_sector = false;
 	m_output1 = 0;
 	m_output2 = 0x80;
