@@ -237,8 +237,9 @@ UINT16 ti99_datamux_device::debugger_read(address_space& space, UINT16 addr)
 				UINT8 lval = 0;
 				UINT8 hval = 0;
 
-				if ((addr & 0xe000)==0x6000)
+				if ((addrb & 0xe000)==0x6000)
 				{
+					m_gromport->romgq_line(ASSERT_LINE);
 					m_gromport->readz(space, addrb+1, &lval);
 					m_gromport->readz(space, addrb, &hval);
 				}
@@ -272,8 +273,9 @@ void ti99_datamux_device::debugger_write(address_space& space, UINT16 addr, UINT
 		if (base32k != 0) m_ram16b[(addrb-base32k)>>1] = data;
 		else
 		{
-			if ((addr & 0xe000)==0x6000)
+			if ((addrb & 0xe000)==0x6000)
 			{
+				m_gromport->romgq_line(ASSERT_LINE);
 				m_gromport->write(space, addr+1, data & 0xff);
 				m_gromport->write(space, addr, (data>>8) & 0xff);
 			}
