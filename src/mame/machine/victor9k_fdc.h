@@ -166,8 +166,7 @@ private:
 	void update_stepper_motor(floppy_image_device *floppy, int stp, int old_st, int st);
 	void update_spindle_motor(floppy_image_device *floppy, emu_timer *t_tach, bool start, bool stop, bool sel, UINT8 &da);
 	void update_rpm(floppy_image_device *floppy, emu_timer *t_tach, bool sel, UINT8 &da);
-	void set_rdy0(int state);
-	void set_rdy1(int state);
+	void update_rdy();
 
 	image_init_result load0_cb(floppy_image_device *device);
 	void unload0_cb(floppy_image_device *device);
@@ -191,10 +190,14 @@ private:
 	int m_tach1;
 	int m_rdy0;
 	int m_rdy1;
+	int m_scp_rdy0;
+	int m_scp_rdy1;
 	int m_via_rdy0;
 	int m_via_rdy1;
-	UINT8 m_l0ms;
-	UINT8 m_l1ms;
+	UINT8 m_scp_l0ms;
+	UINT8 m_scp_l1ms;
+	UINT8 m_via_l0ms;
+	UINT8 m_via_l1ms;
 	int m_st0;
 	int m_st1;
 	int m_stp0;

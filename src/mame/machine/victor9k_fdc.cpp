@@ -29,7 +29,6 @@
 
     TODO:
 
-	- audiokit tries to communicate with SCP using RDY0/1
     - write protect
     - separate read/write methods
     - communication error with SCP after loading boot sector
@@ -247,8 +246,14 @@ victor_9000_fdc_t::victor_9000_fdc_t(const machine_config &mconfig, const char *
 	m_tach1(0),
 	m_rdy0(0),
 	m_rdy1(0),
-	m_l0ms(0),
-	m_l1ms(0),
+	m_scp_rdy0(0),
+	m_scp_rdy1(0),
+	m_via_rdy0(1),
+	m_via_rdy1(1),
+	m_scp_l0ms(0),
+	m_scp_l1ms(0),
+	m_via_l0ms(0),
+	m_via_l1ms(0),
 	m_st0(0),
 	m_st1(0),
 	m_stp0(0),
@@ -296,10 +301,14 @@ void victor_9000_fdc_t::device_start()
 	save_item(NAME(m_tach1));
 	save_item(NAME(m_rdy0));
 	save_item(NAME(m_rdy1));
+	save_item(NAME(m_scp_rdy0));
+	save_item(NAME(m_scp_rdy1));
 	save_item(NAME(m_via_rdy0));
 	save_item(NAME(m_via_rdy1));
-	save_item(NAME(m_l0ms));
-	save_item(NAME(m_l1ms));
+	save_item(NAME(m_scp_l0ms));
+	save_item(NAME(m_scp_l1ms));
+	save_item(NAME(m_via_l0ms));
+	save_item(NAME(m_via_l1ms));
 	save_item(NAME(m_st0));
 	save_item(NAME(m_st1));
 	save_item(NAME(m_stp0));
@@ -389,7 +398,7 @@ READ8_MEMBER( victor_9000_fdc_t::floppy_p1_r )
 
 	*/
 
-	return (m_l1ms << 4) | m_l0ms;
+	return (m_via_l1ms << 4) | m_via_l0ms;
 }
 
 
@@ -414,8 +423,8 @@ WRITE8_MEMBER( victor_9000_fdc_t::floppy_p1_w )
 
 	*/
 
-	m_l0ms = data & 0x0f;
-	m_l1ms = data >> 4;
+	m_scp_l0ms = data & 0x0f;
+	m_scp_l1ms = data >> 4;
 }
 
 
@@ -492,8 +501,9 @@ WRITE8_MEMBER( victor_9000_fdc_t::floppy_p2_w )
 	int sel1 = BIT(data, 4);
 	if (m_sel1 != sel1) sync = true;
 
-	set_rdy0(BIT(data, 6));
-	set_rdy1(BIT(data, 7));
+	m_scp_rdy0 = BIT(data, 6);
+	m_scp_rdy1 = BIT(data, 7);
+	update_rdy();
 
 	if (LOG_SCP) logerror("%s %s START0/STOP0/SEL0/RDY0 %u/%u/%u/%u START1/STOP1/SEL1/RDY1 %u/%u/%u/%u\n", machine().time().as_string(), machine().describe_context(), start0, stop0, sel0, m_rdy0, start1, stop1, sel1, m_rdy1);
 
@@ -614,20 +624,10 @@ void victor_9000_fdc_t::update_rpm(floppy_image_device *floppy, emu_timer *t_tac
 #endif
 }
 
-void victor_9000_fdc_t::set_rdy0(int state)
+void victor_9000_fdc_t::update_rdy()
 {
-#ifdef USE_SCP
-	m_rdy0 = state;
-	m_via5->write_ca2(m_rdy0);
-#endif
-}
-
-void victor_9000_fdc_t::set_rdy1(int state)
-{
-#ifdef USE_SCP
-	m_rdy1 = state;
-	m_via5->write_cb2(m_rdy1);
-#endif
+	m_via5->write_ca2((m_via_rdy0 && m_via_rdy1) ? m_rdy0 : m_scp_rdy0);
+	m_via5->write_cb2((m_via_rdy0 && m_via_rdy1) ? m_rdy1 : m_scp_rdy1);
 }
 
 
@@ -664,7 +664,7 @@ READ8_MEMBER( victor_9000_fdc_t::via4_pa_r )
 
 	*/
 
-	return m_l0ms;
+	return m_scp_l0ms;
 }
 
 WRITE8_MEMBER( victor_9000_fdc_t::via4_pa_w )
@@ -684,23 +684,23 @@ WRITE8_MEMBER( victor_9000_fdc_t::via4_pa_w )
 
 	*/
 
-	m_l0ms = data & 0x0f;
+	m_via_l0ms = data & 0x0f;
 
 #ifndef USE_SCP
 	{ // HACK to bypass SCP
 		if (m_floppy0->get_device())
 		{
-			m_floppy0->get_device()->mon_w((m_l0ms == 0xf) ? 1 : 0);
+			m_floppy0->get_device()->mon_w((m_via_l0ms == 0xf) ? 1 : 0);
 			m_floppy0->get_device()->set_rpm(victor9k_format::get_rpm(m_side, m_floppy0->get_device()->get_cyl()));
 		}
-		m_rdy0 = (m_l0ms == 0xf) ? 0 : 1;
-		m_via5->write_ca2(m_rdy0);
+		m_rdy0 = (m_via_l0ms == 0xf) ? 0 : 1;
+		update_rdy();
 	}
 #endif
 
 	UINT8 st0 = data >> 4;
 
-	if (LOG_VIA) logerror("%s %s L0MS %01x ST0 %01x\n", machine().time().as_string(), machine().describe_context(), m_l0ms, st0);
+	if (LOG_VIA) logerror("%s %s L0MS %01x ST0 %01x\n", machine().time().as_string(), machine().describe_context(), m_via_l0ms, st0);
 
 	if (m_st0 != st0)
 	{
@@ -729,7 +729,7 @@ READ8_MEMBER( victor_9000_fdc_t::via4_pb_r )
 
 	*/
 
-	return m_l1ms;
+	return m_scp_l1ms;
 }
 
 WRITE8_MEMBER( victor_9000_fdc_t::via4_pb_w )
@@ -749,23 +749,23 @@ WRITE8_MEMBER( victor_9000_fdc_t::via4_pb_w )
 
 	*/
 
-	m_l1ms = data & 0x0f;
+	m_via_l1ms = data & 0x0f;
 
 #ifndef USE_SCP
 	{ // HACK to bypass SCP
 		if (m_floppy1->get_device())
 		{
-			m_floppy1->get_device()->mon_w((m_l1ms == 0xf) ? 1 : 0);
+			m_floppy1->get_device()->mon_w((m_via_l1ms == 0xf) ? 1 : 0);
 			m_floppy1->get_device()->set_rpm(victor9k_format::get_rpm(m_side, m_floppy1->get_device()->get_cyl()));
 		}
-		m_rdy1 = (m_l1ms == 0xf) ? 0 : 1;
-		m_via5->write_cb2(m_rdy1);
+		m_rdy1 = (m_via_l1ms == 0xf) ? 0 : 1;
+		update_rdy();
 	}
 #endif
 
 	UINT8 st1 = data >> 4;
 
-	if (LOG_VIA) logerror("%s %s L1MS %01x ST1 %01x\n", machine().time().as_string(), machine().describe_context(), m_l1ms, st1);
+	if (LOG_VIA) logerror("%s %s L1MS %01x ST1 %01x\n", machine().time().as_string(), machine().describe_context(), m_via_l1ms, st1);
 
 	if (m_st1 != st1)
 	{
@@ -949,8 +949,8 @@ READ8_MEMBER( victor_9000_fdc_t::via6_pb_r )
 
 	    bit     description
 
-	    PB0     RDY0
-	    PB1     RDY1
+	    PB0     RDY0 from SCP
+	    PB1     RDY1 from SCP
 	    PB2
 	    PB3     _DS1
 	    PB4     _DS0
@@ -963,10 +963,10 @@ READ8_MEMBER( victor_9000_fdc_t::via6_pb_r )
 	UINT8 data = 0;
 
 	// motor speed status, drive A
-	data |= m_rdy0;
+	data |= (m_via_rdy0 && m_via_rdy1) ? m_rdy0 : m_scp_rdy0;
 
 	// motor speed status, drive B
-	data |= m_rdy1 << 1;
+	data |= ((m_via_rdy0 && m_via_rdy1) ? m_rdy1 : m_scp_rdy1) << 1;
 
 	// door B sense
 	data |= ((m_floppy1->get_device() && m_floppy1->get_device()->exists()) ? 0 : 1) << 3;
@@ -986,8 +986,8 @@ WRITE8_MEMBER( victor_9000_fdc_t::via6_pb_w )
 
 	    bit     description
 
-	    PB0     RDY0
-	    PB1     RDY1
+	    PB0     RDY0 to SCP
+	    PB1     RDY1 to SCP
 	    PB2     _SCRESET
 	    PB3
 	    PB4
@@ -999,6 +999,7 @@ WRITE8_MEMBER( victor_9000_fdc_t::via6_pb_w )
 
 	m_via_rdy0 = BIT(data, 0);
 	m_via_rdy1 = BIT(data, 1);
+	update_rdy();
 
 	// motor speed controller reset
 	if (!BIT(data, 2))
