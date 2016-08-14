@@ -75,7 +75,7 @@
 // TACH = RPM / 60 * SPINDLE RATIO * MOTOR POLES
 // 256 = 300 / 60 * 6.4 * 8
 #define SPINDLE_RATIO   6.4
-#define MOTOR_POLES     8
+#define MOTOR_POLES     8.0
 
 // TODO wrong values here! motor speed is controlled by an LM2917, with help from the spindle TACH and a DAC0808 whose value is set by the SCP 8048
 const int victor_9000_fdc_t::rpm[] = { 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 254, 255, 257, 259, 260, 262, 264, 266, 267, 269, 271, 273, 275, 276, 278, 280, 282, 284, 286, 288, 290, 291, 293, 295, 297, 299, 301, 303, 305, 307, 309, 311, 313, 315, 318, 320, 322, 324, 326, 328, 330, 333, 335, 337, 339, 342, 344, 346, 348, 351, 353, 355, 358, 360, 362, 365, 367, 370, 372, 375, 377, 380, 382, 385, 387, 390, 392, 395, 398, 400, 403, 406, 408, 411, 414, 416, 419, 422, 425, 428, 430, 433, 436, 439, 442, 445, 448, 451, 454, 457, 460, 463, 466, 469, 472, 475, 478, 482, 485, 488, 491, 494, 498, 501, 504, 508, 511, 514, 518, 521, 525, 528, 532, 535, 539, 542, 546, 550, 553, 557, 561, 564, 568, 572, 576, 579, 583, 587, 591, 595, 599, 603, 607, 611, 615, 619, 623, 627, 631, 636, 640, 644, 648, 653, 657, 661, 666, 670, 674, 679, 683, 688, 693, 697, 702, 706, 711, 716, 721, 725, 730, 735, 740, 745, 750, 755, 760, 765, 770, 775, 780, 785, 790, 796, 801, 806, 812, 817, 822, 828, 833, 839, 844, 850, 856, 861, 867, 873, 878, 884 };
@@ -505,11 +505,13 @@ WRITE8_MEMBER( victor_9000_fdc_t::floppy_p2_w )
 		m_stop0 = stop0;
 		m_sel0 = sel0;
 		update_spindle_motor(m_floppy0->get_device(), t_tach0, m_start0, m_stop0, m_sel0, m_da0);
+		update_rpm(m_floppy0->get_device(), t_tach0, m_sel0, m_da0);
 
 		m_start1 = start1;
 		m_stop1 = stop1;
 		m_sel1 = sel1;
 		update_spindle_motor(m_floppy1->get_device(), t_tach1, m_start1, m_stop1, m_sel1, m_da1);
+		update_rpm(m_floppy1->get_device(), t_tach1, m_sel1, m_da1);
 
 		checkpoint();
 
@@ -532,6 +534,7 @@ WRITE8_MEMBER( victor_9000_fdc_t::floppy_p2_w )
 
 READ8_MEMBER( victor_9000_fdc_t::tach0_r )
 {
+	if (LOG_SCP) logerror("%s %s Read TACH0 %u\n", machine().time().as_string(), machine().describe_context(), m_tach0);
 	return m_tach0;
 }
 
@@ -542,6 +545,7 @@ READ8_MEMBER( victor_9000_fdc_t::tach0_r )
 
 READ8_MEMBER( victor_9000_fdc_t::tach1_r )
 {
+	if (LOG_SCP) logerror("%s %s Read TACH1 %u\n", machine().time().as_string(), machine().describe_context(), m_tach1);
 	return m_tach1;
 }
 
@@ -582,22 +586,30 @@ void victor_9000_fdc_t::update_spindle_motor(floppy_image_device *floppy, emu_ti
 	if (start && !stop && floppy->mon_r()) {
 		if (LOG_SCP) logerror("%s: motor start\n", floppy->tag());
 		floppy->mon_w(0);
+		t_tach->enable(true);
 	} else if (stop && !floppy->mon_r()) {
 		if (LOG_SCP) logerror("%s: motor stop\n", floppy->tag());
 		floppy->mon_w(1);
-		t_tach->reset();
+		t_tach->enable(false);
 	}
+#endif
+}
 
+void victor_9000_fdc_t::update_rpm(floppy_image_device *floppy, emu_timer *t_tach, bool sel, UINT8 &da)
+{
+#ifdef USE_SCP
 	if (sel) {
 		da = m_da;
-		if (!floppy->mon_r()) {
-			float tach = rpm[da] / 60 * SPINDLE_RATIO * MOTOR_POLES;
 
-			if (LOG_SCP) logerror("%s: motor speed %u rpm / tach %0.1f hz (DA %02x)\n", floppy->tag(), rpm[da], (double) tach, da);
+		float tach = rpm[da] / 60.0 * SPINDLE_RATIO * MOTOR_POLES;
 
-			t_tach->adjust(attotime::from_hz(tach*2), 0, attotime::from_hz(tach*2));
-			floppy->set_rpm(rpm[da]);
-		}
+		if (LOG_SCP) logerror("%s: motor speed %u rpm / tach %0.1f hz %0.9f s (DA %02x)\n", floppy->tag(), rpm[da], (double) tach, 1.0/(double)tach, da);
+
+		floppy->set_rpm(rpm[da]);
+
+		bool enabled = t_tach->enabled();
+		t_tach->adjust(attotime::from_hz(tach*2), 0, attotime::from_hz(tach*2));
+		t_tach->enable(enabled);
 	}
 #endif
 }
@@ -625,17 +637,14 @@ void victor_9000_fdc_t::set_rdy1(int state)
 
 WRITE8_MEMBER( victor_9000_fdc_t::da_w )
 {
-	if (LOG_SCP) logerror("%s %s DA %02x\n", machine().time().as_string(), machine().describe_context(), data);
+	if (LOG_SCP) logerror("%s %s DA %02x SEL0 %u SEL1 %u\n", machine().time().as_string(), machine().describe_context(), data, m_sel0, m_sel1);
 
-	if (m_da != data)
-	{
-		live_sync();
-		m_da = data;
-		if (m_floppy0->get_device()) update_spindle_motor(m_floppy0->get_device(), t_tach0, m_start0, m_stop0, m_sel0, m_da0);
-		if (m_floppy1->get_device()) update_spindle_motor(m_floppy1->get_device(), t_tach1, m_start1, m_stop1, m_sel1, m_da1);
-		checkpoint();
-		live_run();
-	}
+	live_sync();
+	m_da = data;
+	if (m_floppy0->get_device()) update_rpm(m_floppy0->get_device(), t_tach0, m_sel0, m_da0);
+	if (m_floppy1->get_device()) update_rpm(m_floppy1->get_device(), t_tach1, m_sel1, m_da1);
+	checkpoint();
+	live_run();
 }
 
 READ8_MEMBER( victor_9000_fdc_t::via4_pa_r )

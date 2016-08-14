@@ -165,6 +165,7 @@ private:
 
 	void update_stepper_motor(floppy_image_device *floppy, int stp, int old_st, int st);
 	void update_spindle_motor(floppy_image_device *floppy, emu_timer *t_tach, bool start, bool stop, bool sel, UINT8 &da);
+	void update_rpm(floppy_image_device *floppy, emu_timer *t_tach, bool sel, UINT8 &da);
 	void set_rdy0(int state);
 	void set_rdy1(int state);
 
