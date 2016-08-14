@@ -493,6 +493,7 @@ void victor9k_state::machine_start()
 	save_item(NAME(m_kbrdy));
 	save_item(NAME(m_kbackctl));
 
+#ifndef USE_SCP
 	// patch out SCP self test
 	m_rom->base()[0x11ab] = 0xc3;
 
@@ -501,6 +502,7 @@ void victor9k_state::machine_start()
 	m_rom->base()[0x1d52] = 0x90;
 	m_rom->base()[0x1d53] = 0x90;
 	m_rom->base()[0x1d54] = 0x90;
+#endif
 }
 
 void victor9k_state::machine_reset()

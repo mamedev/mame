@@ -51,7 +51,11 @@
 
 #define LOG 0
 #define LOG_VIA 0
+#ifdef USE_SCP
+#define LOG_SCP 1
+#else
 #define LOG_SCP 0
+#endif
 #define LOG_BITS 0
 
 #define I8048_TAG       "5d"
@@ -353,12 +357,12 @@ void victor_9000_fdc_t::device_timer(emu_timer &timer, device_timer_id id, int p
 
 	case TM_TACH0:
 		m_tach0 = !m_tach0;
-		if (LOG_SCP) logerror("TACH0 %u\n", m_tach0);
+		if (LOG_SCP) logerror("%s TACH0 %u\n", machine().time().as_string(), m_tach0);
 		break;
 
 	case TM_TACH1:
 		m_tach1 = !m_tach1;
-		if (LOG_SCP) logerror("TACH1 %u\n", m_tach1);
+		if (LOG_SCP) logerror("%s TACH1 %u\n", machine().time().as_string(), m_tach1);
 		break;
 	}
 }
@@ -500,12 +504,12 @@ WRITE8_MEMBER( victor_9000_fdc_t::floppy_p2_w )
 		m_start0 = start0;
 		m_stop0 = stop0;
 		m_sel0 = sel0;
-		//update_spindle_motor(m_floppy0->get_device(), t_tach0, m_start0, m_stop0, m_sel0, m_da0);
+		update_spindle_motor(m_floppy0->get_device(), t_tach0, m_start0, m_stop0, m_sel0, m_da0);
 
 		m_start1 = start1;
 		m_stop1 = stop1;
 		m_sel1 = sel1;
-		//update_spindle_motor(m_floppy1->get_device(), t_tach1, m_start1, m_stop1, m_sel1, m_da1);
+		update_spindle_motor(m_floppy1->get_device(), t_tach1, m_start1, m_stop1, m_sel1, m_da1);
 
 		checkpoint();
 
@@ -574,6 +578,7 @@ void victor_9000_fdc_t::update_stepper_motor(floppy_image_device *floppy, int st
 
 void victor_9000_fdc_t::update_spindle_motor(floppy_image_device *floppy, emu_timer *t_tach, bool start, bool stop, bool sel, UINT8 &da)
 {
+#ifdef USE_SCP
 	if (start && !stop && floppy->mon_r()) {
 		if (LOG_SCP) logerror("%s: motor start\n", floppy->tag());
 		floppy->mon_w(0);
@@ -594,18 +599,23 @@ void victor_9000_fdc_t::update_spindle_motor(floppy_image_device *floppy, emu_ti
 			floppy->set_rpm(rpm[da]);
 		}
 	}
+#endif
 }
 
 void victor_9000_fdc_t::set_rdy0(int state)
 {
-	//m_rdy0 = state;
-	//m_via5->write_ca2(m_rdy0);
+#ifdef USE_SCP
+	m_rdy0 = state;
+	m_via5->write_ca2(m_rdy0);
+#endif
 }
 
 void victor_9000_fdc_t::set_rdy1(int state)
 {
-	//m_rdy1 = state;
-	//m_via5->write_cb2(m_rdy1);
+#ifdef USE_SCP
+	m_rdy1 = state;
+	m_via5->write_cb2(m_rdy1);
+#endif
 }
 
 
@@ -667,6 +677,7 @@ WRITE8_MEMBER( victor_9000_fdc_t::via4_pa_w )
 
 	m_l0ms = data & 0x0f;
 
+#ifndef USE_SCP
 	{ // HACK to bypass SCP
 		if (m_floppy0->get_device())
 		{
@@ -676,6 +687,7 @@ WRITE8_MEMBER( victor_9000_fdc_t::via4_pa_w )
 		m_rdy0 = (m_l0ms == 0xf) ? 0 : 1;
 		m_via5->write_ca2(m_rdy0);
 	}
+#endif
 
 	UINT8 st0 = data >> 4;
 
@@ -730,6 +742,7 @@ WRITE8_MEMBER( victor_9000_fdc_t::via4_pb_w )
 
 	m_l1ms = data & 0x0f;
 
+#ifndef USE_SCP
 	{ // HACK to bypass SCP
 		if (m_floppy1->get_device())
 		{
@@ -739,6 +752,7 @@ WRITE8_MEMBER( victor_9000_fdc_t::via4_pb_w )
 		m_rdy1 = (m_l1ms == 0xf) ? 0 : 1;
 		m_via5->write_cb2(m_rdy1);
 	}
+#endif
 
 	UINT8 st1 = data >> 4;
 

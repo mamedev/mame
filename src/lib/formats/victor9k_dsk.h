@@ -13,6 +13,8 @@
 
 #include "flopimg.h"
 
+//#define USE_SCP 1
+
 class victor9k_format : public floppy_image_format_t {
 public:
 	struct format {
