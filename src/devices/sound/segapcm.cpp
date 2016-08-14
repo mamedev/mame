@@ -19,7 +19,7 @@ const device_type SEGAPCM = &device_creator<segapcm_device>;
 segapcm_device::segapcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGAPCM, "Sega PCM", tag, owner, clock, "segapcm", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_rom(*this, DEVICE_SELF),
+		device_rom_interface(mconfig, *this, 21),
 		m_ram(nullptr),
 		m_bank(0),
 		m_bankshift(0),
@@ -35,7 +35,7 @@ segapcm_device::segapcm_device(const machine_config &mconfig, const char *tag, d
 
 void segapcm_device::device_start()
 {
-	int mask, rom_mask;
+	int mask;
 
 	m_ram = std::make_unique<UINT8[]>(0x800);
 
@@ -46,10 +46,7 @@ void segapcm_device::device_start()
 	if (!mask)
 		mask = BANK_MASK7 >> 16;
 
-	for(rom_mask = 1; rom_mask < m_rom.length(); rom_mask *= 2) { };
-	rom_mask--;
-
-	m_bankmask = mask & (rom_mask >> m_bankshift);
+	m_bankmask = mask & (0x1fffff >> m_bankshift);
 
 	m_stream = stream_alloc(0, 2, clock() / 128);
 
@@ -97,7 +94,7 @@ void segapcm_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		/* only process active channels */
 		if (!(regs[0x86]&1))
 		{
-			const UINT8 *rom = m_rom + ((regs[0x86] & m_bankmask) << m_bankshift);
+			int offset = (regs[0x86] & m_bankmask) << m_bankshift;
 			UINT32 addr = (regs[0x85] << 16) | (regs[0x84] << 8) | m_low[ch];
 			UINT32 loop = (regs[0x05] << 16) | (regs[0x04] << 8);
 			UINT8 end = regs[6] + 1;
@@ -120,7 +117,7 @@ void segapcm_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 				}
 
 				/* fetch the sample */
-				v = rom[(addr >> 8) & m_rom.mask()] - 0x80;
+				v = read_byte(offset + (addr >> 8)) - 0x80;
 
 				/* apply panning and advance */
 				outputs[0][i] += v * (regs[2] & 0x7f);
