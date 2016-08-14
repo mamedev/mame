@@ -1152,10 +1152,6 @@ const render_screen_list &render_target::view_screens(int viewindex)
 
 void render_target::compute_visible_area(INT32 target_width, INT32 target_height, float target_pixel_aspect, int target_orientation, INT32 &visible_width, INT32 &visible_height)
 {
-	bool system_swap_xy = (m_manager.machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
-	bool target_swap_xy = (target_orientation & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
-	bool swap_xy = system_swap_xy ^ target_swap_xy;
-
 	switch (m_scale_mode)
 	{
 		case SCALE_FRACTIONAL:
@@ -1217,19 +1213,11 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 			bool x_is_integer = !(target_aspect >= 1.0f && m_scale_mode == SCALE_FRACTIONAL_X);
 			bool y_is_integer = !(target_aspect < 1.0f && m_scale_mode == SCALE_FRACTIONAL_X);
 
-			// apply swap to scale mode
-			if (swap_xy)
-				std::swap(x_is_integer, y_is_integer);
-
 			// first compute scale factors to fit the screen
 			float xscale = (float)target_width / src_width;
 			float yscale = (float)target_height / src_height;
 			float maxxscale = std::max(1.0f, float(m_int_overscan ? render_round_nearest(xscale) : floor(xscale)));
 			float maxyscale = std::max(1.0f, float(m_int_overscan ? render_round_nearest(yscale) : floor(yscale)));
-
-			// apply swap to maximum scale factors
-			if (swap_xy)
-				std::swap(maxxscale, maxyscale);
 
 			// now apply desired scale mode and aspect correction
 			if (m_keepaspect && target_aspect > src_aspect) xscale *= src_aspect / target_aspect * (maxyscale / yscale);
@@ -1237,15 +1225,9 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 			if (x_is_integer) xscale = std::min(maxxscale, std::max(1.0f, render_round_nearest(xscale)));
 			if (y_is_integer) yscale = std::min(maxyscale, std::max(1.0f, render_round_nearest(yscale)));
 
-			// apply swap to user defined scale factors
-			int int_scale_x = m_int_scale_x;
-			int int_scale_y = m_int_scale_y;
-			if (swap_xy)
-				std::swap(int_scale_x, int_scale_y);
-
 			// check if we have user defined scale factors, if so use them instead
-			xscale = int_scale_x > 0 ? int_scale_x : xscale;
-			yscale = int_scale_y > 0 ? int_scale_y : yscale;
+			xscale = m_int_scale_x > 0 ? m_int_scale_x : xscale;
+			yscale = m_int_scale_y > 0 ? m_int_scale_y : yscale;
 
 			// set the final width/height
 			visible_width = render_round_nearest(src_width * xscale);
