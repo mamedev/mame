@@ -38,34 +38,190 @@
 - Added a nasty hack to get a display on compis2 (wait 20 seconds)
 
 
- ******************************************************************************/
+******************************************************************************/
 
-#include "includes/compis.h"
-#include "bus/rs232/rs232.h"
+#include "emu.h"
 #include "softlist.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/compis/graphics.h"
+#include "bus/isbx/isbx.h"
+#include "bus/rs232/rs232.h"
+#include "cpu/i86/i186.h"
+#include "cpu/mcs48/mcs48.h"
+#include "imagedev/cassette.h"
+#include "machine/compiskb.h"
+#include "machine/i8251.h"
+#include "machine/i8255.h"
+#include "machine/i80130.h"
+#include "machine/mm58274c.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/ram.h"
+#include "machine/z80dart.h"
+
+#define I80186_TAG      "ic1"
+#define I80130_TAG      "ic15"
+#define I8251A_TAG      "ic59"
+#define I8253_TAG       "ic60"
+#define I8274_TAG       "ic65"
+#define MM58174A_TAG    "ic66"
+#define I8255_TAG       "ic69"
+#define RS232_A_TAG     "rs232a"
+#define RS232_B_TAG     "rs232b"
+#define CASSETTE_TAG    "cassette"
+#define CENTRONICS_TAG  "centronics"
+#define ISBX_0_TAG      "isbx0"
+#define ISBX_1_TAG      "isbx1"
+#define GRAPHICS_TAG	"gfx"
+#define COMPIS_KEYBOARD_TAG "compiskb"
+
+class compis_state : public driver_device
+{
+public:
+	compis_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, I80186_TAG),
+		m_osp(*this, I80130_TAG),
+		m_pit(*this, I8253_TAG),
+		m_ppi(*this, I8255_TAG),
+		m_mpsc(*this, I8274_TAG),
+		m_centronics(*this, CENTRONICS_TAG),
+		m_uart(*this, I8251A_TAG),
+		m_rtc(*this, MM58174A_TAG),
+		m_cassette(*this, CASSETTE_TAG),
+		m_graphics(*this, GRAPHICS_TAG),
+		m_isbx0(*this, ISBX_0_TAG),
+		m_isbx1(*this, ISBX_1_TAG),
+		m_ram(*this, RAM_TAG),
+		m_s8(*this, "S8")
+	{ }
+
+	required_device<i80186_cpu_device> m_maincpu;
+	required_device<i80130_device> m_osp;
+	required_device<pit8253_device> m_pit;
+	required_device<i8255_device> m_ppi;
+	required_device<i8274_device> m_mpsc;
+	required_device<centronics_device> m_centronics;
+	required_device<i8251_device> m_uart;
+	required_device<mm58274c_device> m_rtc;
+	required_device<cassette_image_device> m_cassette;
+	required_device<compis_graphics_slot_t> m_graphics;
+	required_device<isbx_slot_device> m_isbx0;
+	required_device<isbx_slot_device> m_isbx1;
+	required_device<ram_device> m_ram;
+	required_ioport m_s8;
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	DECLARE_READ16_MEMBER( pcs6_0_1_r );
+	DECLARE_WRITE16_MEMBER( pcs6_0_1_w );
+	DECLARE_READ16_MEMBER( pcs6_2_3_r );
+	DECLARE_WRITE16_MEMBER( pcs6_2_3_w );
+	DECLARE_READ16_MEMBER( pcs6_4_5_r );
+	DECLARE_WRITE16_MEMBER( pcs6_4_5_w );
+	DECLARE_READ16_MEMBER( pcs6_6_7_r );
+	DECLARE_WRITE16_MEMBER( pcs6_6_7_w );
+	DECLARE_READ16_MEMBER( pcs6_8_9_r );
+	DECLARE_WRITE16_MEMBER( pcs6_8_9_w );
+	DECLARE_READ16_MEMBER( pcs6_10_11_r );
+	DECLARE_WRITE16_MEMBER( pcs6_10_11_w );
+	DECLARE_READ16_MEMBER( pcs6_12_13_r );
+	DECLARE_WRITE16_MEMBER( pcs6_12_13_w );
+	DECLARE_READ16_MEMBER( pcs6_14_15_r );
+	DECLARE_WRITE16_MEMBER( pcs6_14_15_w );
+
+	DECLARE_READ8_MEMBER( compis_irq_callback );
+
+	DECLARE_READ8_MEMBER( ppi_pb_r );
+	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+
+	DECLARE_WRITE_LINE_MEMBER( tmr0_w );
+	DECLARE_WRITE_LINE_MEMBER( tmr1_w );
+	DECLARE_WRITE_LINE_MEMBER( tmr2_w );
+	DECLARE_WRITE_LINE_MEMBER( tmr5_w );
+
+	TIMER_DEVICE_CALLBACK_MEMBER( tape_tick );
+
+	int m_centronics_busy;
+	int m_centronics_select;
+
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
+
+	int m_tmr0;
+};
+
 
 
 //**************************************************************************
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-//-------------------------------------------------
-//  tape_mon_w -
-//-------------------------------------------------
-
-WRITE8_MEMBER( compis_state::tape_mon_w )
+READ16_MEMBER( compis_state::pcs6_0_1_r )
 {
-	cassette_state state = BIT(data, 0) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED;
-
-	m_cassette->change_state(state, CASSETTE_MASK_MOTOR);
+	if (ACCESSING_BITS_0_7)
+	{
+		return 0xff;
+	}
+	else
+	{
+		return m_graphics->dma_ack_r(space, offset);
+	}
 }
 
+WRITE16_MEMBER( compis_state::pcs6_0_1_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		cassette_state state = BIT(data, 0) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED;
 
-//-------------------------------------------------
-//  isbx
-//-------------------------------------------------
+		m_cassette->change_state(state, CASSETTE_MASK_MOTOR);
+	}
+	else
+	{
+		m_graphics->dma_ack_w(space, offset, data);
+	}
+}
 
-READ16_MEMBER( compis_state::isbx0_tdma_r )
+READ16_MEMBER( compis_state::pcs6_2_3_r )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		return m_mpsc->inta_r(space, 0);
+	}
+	else
+	{
+		if (BIT(offset, 0))
+		{
+			return m_uart->status_r(space, 0) << 8;
+		}	
+		else
+		{
+			return m_uart->data_r(space, 0) << 8;
+		}
+	}
+}
+
+WRITE16_MEMBER( compis_state::pcs6_2_3_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+	}
+	else
+	{
+		if (BIT(offset, 0))
+		{
+			m_uart->control_w(space, 0, data >> 8);
+		}	
+		else
+		{
+			m_uart->data_w(space, 0, data >> 8);
+		}
+	}
+}
+
+READ16_MEMBER( compis_state::pcs6_4_5_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -80,7 +236,7 @@ READ16_MEMBER( compis_state::isbx0_tdma_r )
 	}
 }
 
-WRITE16_MEMBER( compis_state::isbx0_tdma_w )
+WRITE16_MEMBER( compis_state::pcs6_4_5_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -93,32 +249,11 @@ WRITE16_MEMBER( compis_state::isbx0_tdma_w )
 	}
 }
 
-READ16_MEMBER( compis_state::isbx1_tdma_r )
+READ16_MEMBER( compis_state::pcs6_6_7_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		if (offset < 2)
-			return m_crtc->read(space, offset & 0x01);
-		else
-			// monochrome only, hblank? vblank?
-			if(offset == 2)
-			{
-				switch(m_unk_video)
-				{
-					case 0x04:
-						m_unk_video = 0x44;
-						break;
-					case 0x44:
-						m_unk_video = 0x64;
-						break;
-					default:
-						m_unk_video = 0x04;
-						break;
-				}
-				return m_unk_video;
-			}
-		else
-			return 0;
+		return m_graphics->pcs6_6_r(space, offset);
 	}
 	else
 	{
@@ -129,13 +264,11 @@ READ16_MEMBER( compis_state::isbx1_tdma_r )
 	}
 }
 
-WRITE16_MEMBER( compis_state::isbx1_tdma_w )
+WRITE16_MEMBER( compis_state::pcs6_6_7_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		// 0x336 is likely the color plane register
-		if (offset < 2) m_crtc->write(space, offset & 0x01, data);
-
+		m_graphics->pcs6_6_w(space, offset, data);
 	}
 	else
 	{
@@ -144,7 +277,7 @@ WRITE16_MEMBER( compis_state::isbx1_tdma_w )
 	}
 }
 
-READ16_MEMBER( compis_state::isbx0_cs_r )
+READ16_MEMBER( compis_state::pcs6_8_9_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -156,7 +289,7 @@ READ16_MEMBER( compis_state::isbx0_cs_r )
 	}
 }
 
-WRITE16_MEMBER( compis_state::isbx0_cs_w )
+WRITE16_MEMBER( compis_state::pcs6_8_9_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -168,7 +301,7 @@ WRITE16_MEMBER( compis_state::isbx0_cs_w )
 	}
 }
 
-READ16_MEMBER( compis_state::isbx0_dack_r )
+READ16_MEMBER( compis_state::pcs6_10_11_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -180,7 +313,7 @@ READ16_MEMBER( compis_state::isbx0_dack_r )
 	}
 }
 
-WRITE16_MEMBER( compis_state::isbx0_dack_w )
+WRITE16_MEMBER( compis_state::pcs6_10_11_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -192,7 +325,7 @@ WRITE16_MEMBER( compis_state::isbx0_dack_w )
 	}
 }
 
-READ16_MEMBER( compis_state::isbx1_cs_r )
+READ16_MEMBER( compis_state::pcs6_12_13_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -204,7 +337,7 @@ READ16_MEMBER( compis_state::isbx1_cs_r )
 	}
 }
 
-WRITE16_MEMBER( compis_state::isbx1_cs_w )
+WRITE16_MEMBER( compis_state::pcs6_12_13_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -216,7 +349,7 @@ WRITE16_MEMBER( compis_state::isbx1_cs_w )
 	}
 }
 
-READ16_MEMBER( compis_state::isbx1_dack_r )
+READ16_MEMBER( compis_state::pcs6_14_15_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -228,7 +361,7 @@ READ16_MEMBER( compis_state::isbx1_dack_r )
 	}
 }
 
-WRITE16_MEMBER( compis_state::isbx1_dack_w )
+WRITE16_MEMBER( compis_state::pcs6_14_15_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -280,41 +413,17 @@ static ADDRESS_MAP_START( compis_io, AS_IO, 16, compis_state )
 	//AM_RANGE(0x0180, 0x0181) /* PCS3 */ AM_MIRROR(0x7e)
 	//AM_RANGE(0x0200, 0x0201) /* PCS4 */ AM_MIRROR(0x7e)
 	AM_RANGE(0x0280, 0x028f) /* PCS5 */ AM_MIRROR(0x70) AM_DEVICE(I80130_TAG, i80130_device, io_map)
-	AM_RANGE(0x0300, 0x0301) /* PCS6:0 */ AM_MIRROR(0xe) AM_WRITE8(tape_mon_w, 0x00ff)
-	AM_RANGE(0x0310, 0x0311) /* PCS6:3 */ AM_MIRROR(0xc) AM_DEVREADWRITE8(I8251A_TAG, i8251_device, data_r, data_w, 0xff00)
-	AM_RANGE(0x0312, 0x0313) /* PCS6:3 */ AM_MIRROR(0xc) AM_DEVREADWRITE8(I8251A_TAG, i8251_device, status_r, control_w, 0xff00)
-	AM_RANGE(0x0320, 0x032f) AM_READWRITE(isbx0_tdma_r, isbx0_tdma_w)
-	AM_RANGE(0x0330, 0x033f) AM_READWRITE(isbx1_tdma_r, isbx1_tdma_w)
-	AM_RANGE(0x0340, 0x034f) AM_READWRITE(isbx0_cs_r, isbx0_cs_w)
-	AM_RANGE(0x0350, 0x035f) AM_READWRITE(isbx0_dack_r, isbx0_dack_w)
-	AM_RANGE(0x0360, 0x036f) AM_READWRITE(isbx1_cs_r, isbx1_cs_w)
-	AM_RANGE(0x0370, 0x037f) AM_READWRITE(isbx1_dack_r, isbx1_dack_w)
-#ifdef NOT_SUPPORTED_BY_MAME_CORE
-	AM_RANGE(0x0300, 0x0301) /* PCS6:1 */ AM_MIRROR(0xe) AM_DEVREADWRITE8("upd7220", upd7220_device, dack_r, dack_w, 0xff00) // DMA-ACK graphics
-	AM_RANGE(0x0310, 0x0311) /* PCS6:2 */ AM_MIRROR(0xe) AM_DEVREAD8(I8274_TAG, i8274_device, inta_r, 0x00ff) // 8274 INTERRUPT ACKNOWLEDGE
-	AM_RANGE(0x0320, 0x0323) /* PCS6:4 */ AM_MIRROR(0xc) AM_DEVREADWRITE8(I8274_TAG, i8274_device, cd_ba_r, cd_ba_w, 0x00ff)
-	AM_RANGE(0x0320, 0x0321) /* PCS6:5 */ AM_MIRROR(0xe) AM_READWRITE8(isbx0_tdma_r, isbx0_tdma_w, 0xff00) // DMA-TERMINATE J8 (iSBX0)
-	AM_RANGE(0x0330, 0x0333) /* PCS6:6 */ AM_DEVREADWRITE8("upd7220", upd7220_device, read, write, 0x00ff)
-	AM_RANGE(0x0330, 0x0331) /* PCS6:7 */ AM_MIRROR(0xe) AM_READWRITE8(isbx1_tdma_r, isbx1_tdma_w, 0xff00) // DMA-TERMINATE J9 (iSBX1)
-	AM_RANGE(0x0340, 0x034f) /* PCS6:8 */ AM_DEVREADWRITE8(ISBX_0_TAG, isbx_slot_device, mcs0_r, mcs0_w, 0x00ff) // 8272 CS0 (8/16-bit) J8 (iSBX0)
-	AM_RANGE(0x0340, 0x034f) /* PCS6:9 */ AM_DEVREADWRITE8(ISBX_0_TAG, isbx_slot_device, mcs1_r, mcs1_w, 0xff00) // CS1 (16-bit) J8 (iSBX0)
-	AM_RANGE(0x0350, 0x035f) /* PCS6:10 */ AM_DEVREADWRITE8(ISBX_0_TAG, isbx_slot_device, mcs1_r, mcs1_w, 0x00ff) // CS1 (8-bit) J8 (iSBX0)
-	AM_RANGE(0x0350, 0x035f) /* PCS6:11 */ AM_DEVREADWRITE8(ISBX_0_TAG, isbx_slot_device, mdack_r, mdack_w, 0xff00) // DMA-ACK J8 (iSBX0)
-	AM_RANGE(0x0360, 0x036f) /* PCS6:13 */ AM_DEVREADWRITE8(ISBX_1_TAG, isbx_slot_device, mcs0_r, mcs0_w, 0x00ff) // CS0 (8/16-bit) J9 (iSBX1)
-	AM_RANGE(0x0360, 0x036f) /* PCS6:13 */ AM_DEVREADWRITE8(ISBX_1_TAG, isbx_slot_device, mcs1_r, mcs1_w, 0xff00) // CS1 (16-bit) J9 (iSBX1)
-	AM_RANGE(0x0370, 0x037f) /* PCS6:14 */ AM_DEVREADWRITE8(ISBX_1_TAG, isbx_slot_device, mcs1_r, mcs1_w, 0x00ff) // CS1 (8-bit) J9 (iSBX1)
-	AM_RANGE(0x0370, 0x037f) /* PCS6:15 */ AM_DEVREADWRITE8(ISBX_1_TAG, isbx_slot_device, mdack_r, mdack_w, 0xff00) // DMA-ACK J9 (iSBX1)
-#endif
-ADDRESS_MAP_END
-
-
-//-------------------------------------------------
-//  ADDRESS_MAP( upd7220_map )
-//-------------------------------------------------
-
-static ADDRESS_MAP_START( upd7220_map, AS_0, 16, compis_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x00000, 0x7fff) AM_RAM AM_SHARE("video_ram")
+//	AM_RANGE(0x0300, 0x0301) /* PCS6:0 */ AM_MIRROR(0xe) AM_WRITE8(tape_mon_w, 0x00ff)
+//	AM_RANGE(0x0310, 0x0311) /* PCS6:3 */ AM_MIRROR(0xc) AM_DEVREADWRITE8(I8251A_TAG, i8251_device, data_r, data_w, 0xff00)
+//	AM_RANGE(0x0312, 0x0313) /* PCS6:3 */ AM_MIRROR(0xc) AM_DEVREADWRITE8(I8251A_TAG, i8251_device, status_r, control_w, 0xff00)
+	AM_RANGE(0x0300, 0x030f) AM_READWRITE(pcs6_0_1_r, pcs6_0_1_w)
+	AM_RANGE(0x0310, 0x031f) AM_READWRITE(pcs6_2_3_r, pcs6_2_3_w)
+	AM_RANGE(0x0320, 0x032f) AM_READWRITE(pcs6_4_5_r, pcs6_4_5_w)
+	AM_RANGE(0x0330, 0x033f) AM_READWRITE(pcs6_6_7_r, pcs6_6_7_w)
+	AM_RANGE(0x0340, 0x034f) AM_READWRITE(pcs6_8_9_r, pcs6_8_9_w)
+	AM_RANGE(0x0350, 0x035f) AM_READWRITE(pcs6_10_11_r, pcs6_10_11_w)
+	AM_RANGE(0x0360, 0x036f) AM_READWRITE(pcs6_12_13_r, pcs6_12_13_w)
+	AM_RANGE(0x0370, 0x037f) AM_READWRITE(pcs6_14_15_r, pcs6_14_15_w)
 ADDRESS_MAP_END
 
 
@@ -444,20 +553,6 @@ INPUT_PORTS_END
 //**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
-
-//-------------------------------------------------
-//  UPD7220_INTERFACE( hgdc_intf )
-//-------------------------------------------------
-
-UPD7220_DISPLAY_PIXELS_MEMBER( compis_state::hgdc_display_pixels )
-{
-	UINT16 i,gfx = m_video_ram[(address & 0x7fff) >> 1];
-	const pen_t *pen = m_palette->pens();
-
-	for(i=0; i<16; i++)
-		bitmap.pix32(y, x + i) = pen[BIT(gfx, i)];
-}
-
 
 //-------------------------------------------------
 //  I80186_INTERFACE( cpu_intf )
@@ -612,6 +707,7 @@ void compis_state::machine_reset()
 	m_uart->reset();
 	m_mpsc->reset();
 	m_ppi->reset();
+	m_graphics->reset();
 	m_isbx0->reset();
 	m_isbx1->reset();
 }
@@ -635,26 +731,10 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_80186_TMROUT0_HANDLER(DEVWRITELINE(DEVICE_SELF, compis_state, tmr0_w))
 	MCFG_80186_TMROUT1_HANDLER(DEVWRITELINE(DEVICE_SELF, compis_state, tmr1_w))
 
-	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-	MCFG_SCREEN_SIZE(640, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
-	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
-
-	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL_4_433619MHz/2) // unknown clock
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(compis_state, hgdc_display_pixels)
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
-
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-
 	// devices
 	MCFG_DEVICE_ADD(I80130_TAG, I80130, XTAL_16MHz/2)
 	MCFG_I80130_IRQ_CALLBACK(DEVWRITELINE(I80186_TAG, i80186_cpu_device, int0_w))
-	//MCFG_I80130_SYSTICK_CALLBACK(DEVWRITELINE(I80130_TAG, i80130_device, ir3_w))
+	MCFG_I80130_SYSTICK_CALLBACK(DEVWRITELINE(I80130_TAG, i80130_device, ir3_w))
 	MCFG_I80130_DELAY_CALLBACK(DEVWRITELINE(I80130_TAG, i80130_device, ir7_w))
 	MCFG_I80130_BAUD_CALLBACK(WRITELINE(compis_state, tmr2_w))
 
@@ -673,7 +753,7 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_DEVICE_ADD(I8251A_TAG, I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(COMPIS_KEYBOARD_TAG, compis_keyboard_device, si_w))
 	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE(I80130_TAG, i80130_device, ir2_w))
-	//MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE(I80186_TAG, i80186_cpu_device, int1_w))
+	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE(I80186_TAG, i80186_cpu_device, int1_w))
 
 	MCFG_DEVICE_ADD(COMPIS_KEYBOARD_TAG, COMPIS_KEYBOARD, 0)
 	MCFG_COMPIS_KEYBOARD_OUT_TX_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_rxd))
@@ -710,6 +790,8 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(compis_state, write_centronics_busy))
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(compis_state, write_centronics_select))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+
+	MCFG_COMPIS_GRAPHICS_SLOT_ADD(GRAPHICS_TAG, XTAL_16MHz, compis_graphics_cards, "hrg")
 
 	MCFG_ISBX_SLOT_ADD(ISBX_0_TAG, 0, isbx_cards, "fdc")
 	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE(I80130_TAG, i80130_device, ir1_w))

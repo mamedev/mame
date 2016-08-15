@@ -623,6 +623,7 @@ BUSES["CGENIE_PARALLEL"] = true
 BUSES["CHANNELF"] = true
 BUSES["COCO"] = true
 BUSES["COLECO"] = true
+BUSES["COMPIS_GRAPHICS"] = true
 BUSES["COMPUCOLOR"] = true
 BUSES["COMX35"] = true
 BUSES["CPC"] = true
@@ -2854,7 +2855,6 @@ files {
 createMESSProjects(_target, _subtarget, "telenova")
 files {
 	MAME_DIR .. "src/mame/drivers/compis.cpp",
-	MAME_DIR .. "src/mame/includes/compis.h",
 	MAME_DIR .. "src/mame/machine/compiskb.cpp",
 	MAME_DIR .. "src/mame/machine/compiskb.h",
 }
