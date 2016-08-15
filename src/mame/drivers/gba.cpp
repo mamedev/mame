@@ -17,8 +17,89 @@
 #include "sound/gb.h"
 #include "includes/gba.h"
 #include "bus/gba/rom.h"
-#include "rendlay.h"
 #include "softlist.h"
+
+#define REG_BASE    0x060
+
+/* Sound Registers */
+#define SOUNDCNT_L  HWLO(0x080)  /* 0x4000080  2  R/W   Control Stereo/Volume/Enable */
+#define SOUNDCNT_H  HWHI(0x080)  /* 0x4000082  2  R/W   Control Mixing/DMA Control */
+#define SOUNDCNT_X  HWLO(0x084)  /* 0x4000084  2  R/W   Control Sound on/off */
+                                 /* 0x4000086  2  -     Unused */
+#define SOUNDBIAS   HWLO(0x088)  /* 0x4000088  2  BIOS  Sound PWM Control */
+                                 /* 0x400008A  2  -     Unused */
+
+/* DMA Registers (4 Transfer Channels) */
+#define DMASAD(c)   WORD(0x0B0 + c * 0xC) /* 0x40000B0  4  W     DMA 0 Source Address */
+#define DMADAD(c)   WORD(0x0B4 + c * 0xC) /* 0x40000B4  4  W     DMA 0 Destination Address */
+#define DMACNT_L(c) HWLO(0x0B8 + c * 0xC) /* 0x40000B8  2  W     DMA 0 Word Count */
+#define DMACNT_H(c) HWHI(0x0B8 + c * 0xC) /* 0x40000BA  2  R/W   DMA 0 Control */
+
+/* Serial Communication (1) Registers */
+#define SIODATA32   WORD(0x120)  /* 0x4000120  4  R/W   SIO Data (Normal-32bit Mode; shared with below) */
+#define SIOMULTI0   HWLO(0x120)  /* 0x4000120  2  R/W   SIO Data 0 (Parent)    (Multi-Player Mode) */
+#define SIOMULTI1   HWHI(0x120)  /* 0x4000122  2  R/W   SIO Data 1 (1st Child) (Multi-Player Mode) */
+#define SIOMULTI2   HWLO(0x124)  /* 0x4000124  2  R/W   SIO Data 2 (2nd Child) (Multi-Player Mode) */
+#define SIOMULTI3   HWHI(0x124)  /* 0x4000126  2  R/W   SIO Data 3 (3rd Child) (Multi-Player Mode) */
+#define SIOCNT      HWLO(0x128)  /* 0x4000128  2  R/W   SIO Control Register */
+#define SIOMLT_SEND HWHI(0x128)  /* 0x400012A  2  R/W   SIO Data (Local of MultiPlayer; shared below) */
+#define SIODATA8    HWHI(0x128)  /* 0x400012A  2  R/W   SIO Data (Normal-8bit and UART Mode) */
+                                 /* 0x400012C  2  -     Unused */
+
+/* Keypad Input Registers */
+#define KEYINPUT    HWLO(0x130)  /* 0x4000130  2  R     Key Status */
+#define KEYCNT      HWHI(0x130)  /* 0x4000132  2  R/W   Key Interrupt Control */
+
+/* Serial Communication (2) Registers */
+#define RCNT        HWLO(0x134)  /* 0x4000134  2  R/W   SIO Mode Select/General Purpose Data */
+#define IR          HWHI(0x134)  /* 0x4000136  2  R/W   Ancient - Infrared Register (Prototypes only) */
+                                 /* 0x4000138  8  -     Unused */
+#define JOYCNT      HWLO(0x140)  /* 0x4000140  2  R/W   SIO JOY Bus Control */
+                                 /* 0x4000142  2  -     Unused */
+#define JOY_RECV    WORD(0x150)  /* 0x4000150  4  R/W   SIO JOY Bus Receive Data */
+#define JOY_TRANS   WORD(0x154)  /* 0x4000154  4  R/W   SIO JOY Bus Transmit Data */
+#define JOYSTAT     HWLO(0x158)  /* 0x4000158  2  R/?   SIO JOY Bus Receive Status */
+                                 /* 0x400015A  2  -     Unused */
+
+/* Interrupt, Waitstate, and Power-Down Control Registers */
+#define IE          HWLO(0x200)  /* 0x4000200  2  R/W   Interrupt Enable Register */
+#define IF          HWHI(0x200)  /* 0x4000202  2  R/W   Interrupt Request Flags / IRQ Acknowledge */
+#define WAITCNT     HWLO(0x204)  /* 0x4000204  2  R/W   Game Pak Waitstate Control */
+                                 /* 0x4000206     -     Unused */
+#define IME         HWLO(0x208)  /* 0x4000208  2  R/W   Interrupt Master Enable Register */
+                                 /* 0x400020A     -     Unused */
+                                 /* 0x4000300  1  R/W   Undocumented - Post Boot Flag */
+                                 /* 0x4000301  1  W     Undocumented - Power Down Control */
+                                 /* 0x4000302     -     Unused */
+                                 /* 0x4000410  ?  ?     Undocumented - Purpose Unknown / Bug ??? 0FFh */
+                                 /* 0x4000411     -     Unused */
+                                 /* 0x4000800  4  R/W   Undocumented - Internal Memory Control (R/W) */
+                                 /* 0x4000804     -     Unused */
+                                 /* 0x4xx0800  4  R/W   Mirrors of 4000800h (repeated each 64K) */
+
+#define SOUNDBIAS_SET(val)      HWLO_SET(0x088, val)
+
+#define DMASAD_SET(c, val)      WORD_SET(0x0B0 + (c * 0xC), val)
+#define DMADAD_SET(c, val)      WORD_SET(0x0B4 + (c * 0xC), val)
+#define DMACNT_L_SET(c, val)    HWLO_SET(0x0B8 + (c * 0xC), val)
+#define DMACNT_H_SET(c, val)    HWHI_SET(0x0B8 + (c * 0xC), val)
+#define DMACNT_H_RESET(c, val)  HWHI_RESET(0x0B8 + (c * 0xC), val)
+
+#define SIOMULTI0_SET(val)      HWLO_SET(0x120, val)
+#define SIOMULTI1_SET(val)      HWHI_SET(0x120, val)
+#define SIOMULTI2_SET(val)      HWLO_SET(0x124, val)
+#define SIOMULTI3_SET(val)      HWHI_SET(0x124, val)
+
+#define SIOCNT_RESET(val)       HWLO_RESET(0x128, val)
+
+#define KEYCNT_SET(val)         HWHI_SET(0x130, val)
+
+#define RCNT_SET(val)           HWLO_SET(0x134, val)
+
+#define JOYSTAT_SET(val)        HWLO_SET(0x158, val)
+
+#define IF_SET(val)             HWHI_SET(0x200, val)
+#define IF_RESET(val)           HWHI_RESET(0x200, val)
 
 #define VERBOSE_LEVEL   (0)
 
@@ -38,21 +119,6 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, co
 static const UINT32 timer_clks[4] = { XTAL_16_777216MHz, XTAL_16_777216MHz / 64, XTAL_16_777216MHz / 256, XTAL_16_777216MHz / 1024 };
 
 
-PALETTE_INIT_MEMBER(gba_state, gba)
-{
-	UINT8 r, g, b;
-	for( b = 0; b < 32; b++ )
-	{
-		for( g = 0; g < 32; g++ )
-		{
-			for( r = 0; r < 32; r++ )
-			{
-				palette.set_pen_color( ( b << 10 ) | ( g << 5 ) | r, pal5bit(r), pal5bit(g), pal5bit(b) );
-			}
-		}
-	}
-}
-
 void gba_state::request_irq(UINT32 int_type)
 {
 	// set flag for later recovery
@@ -68,6 +134,34 @@ void gba_state::request_irq(UINT32 int_type)
 			m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
 			m_maincpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
 		}
+	}
+}
+
+void gba_state::request_dma(dma_start_timing start)
+{
+	UINT16 mask = 0x0000;
+	switch (start)
+	{
+		case immediately:
+			mask = 0x0000;
+			break;
+		case vblank:
+			mask = 0x1000;
+			break;
+		case hblank:
+			mask = 0x2000;
+			break;
+		case special:
+			mask = 0x3000;
+			break;
+	}
+
+	for (int ch = 0; ch < 4; ch++)
+	{
+		int ctrl = DMACNT_H(ch);
+
+		if ((ctrl & 0x8000) && ((ctrl & 0x3000) == mask))
+			dma_exec(ch);
 	}
 }
 
@@ -450,20 +544,6 @@ TIMER_CALLBACK_MEMBER(gba_state::handle_irq)
 }
 
 static const char *reg_names[] = {
-	/* LCD I/O Registers */
-	"DISPCNT", "GRNSWAP",  "DISPSTAT", "VCOUNT",
-	"BG0CNT",  "BG1CNT",   "BG2CNT",   "BG3CNT",
-	"BG0HOFS", "BG0VOFS",  "BG1HOFS",  "BG1VOFS",
-	"BG2HOFS", "BG2VOFS",  "BG3HOFS",  "BG3VOFS",
-	"BG2PA",   "BG2PB",    "BG2PC",    "BG2PD",
-	"BG2X_L",  "BG2X_H",   "BG2Y_L",   "BG2Y_H",
-	"BG3PA",   "BG3PB",    "BG3PC",    "BG3PD",
-	"BG3X_L",  "BG3X_H",   "BG3Y_L",   "BG3Y_H",
-	"WIN0H",   "WIN1H",    "WIN0V",    "WIN1V",
-	"WININ",   "WINOUT",   "MOSAIC",   "Unused",
-	"BLDCNT",  "BLDALPHA", "BLDY",     "Unused",
-	"Unused",  "Unused",   "Unused",   "Unused",
-
 	/* Sound Registers */
 	"SOUND1CNT_L", "SOUND1CNT_H", "SOUND1CNT_X", "Unused",
 	"SOUND2CNT_L", "Unused",      "SOUND2CNT_H", "Unused",
@@ -482,11 +562,8 @@ READ32_MEMBER(gba_state::gba_io_r)
 {
 	UINT32 retval = 0;
 
-	switch( offset )
+	switch( offset + 0x60/4 )
 	{
-		case 0x0004/4:
-			retval = (DISPSTAT & 0xffff) | (machine().first_screen()->vpos()<<16);
-			break;
 		case 0x0060/4:
 			retval = m_gbsound->sound_r(space, 0) | m_gbsound->sound_r(space, 1)<<16 | m_gbsound->sound_r(space, 2)<<24;
 			break;
@@ -602,7 +679,7 @@ READ32_MEMBER(gba_state::gba_io_r)
 			{
 				UINT32 elapsed;
 				double time, ticks;
-				int timer = offset-(0x100/4);
+				int timer = offset + 0x60/4 - 0x100/4;
 
 //              printf("Read timer reg %x (PC=%x)\n", timer, space.device().safe_pc());
 
@@ -654,25 +731,24 @@ READ32_MEMBER(gba_state::gba_io_r)
 		default:
 			if( ACCESSING_BITS_0_15 )
 			{
-				retval |= m_io_regs[offset] & 0x0000ffff;
+				retval |= m_regs[offset] & 0x0000ffff;
 			}
 			if( ACCESSING_BITS_16_31 )
 			{
-				retval |= m_io_regs[offset] & 0xffff0000;
+				retval |= m_regs[offset] & 0xffff0000;
 			}
 			break;
 	}
 
-	if (offset < ARRAY_LENGTH(reg_names) / 2)
+//	assert_always(offset < ARRAY_LENGTH(reg_names) / 2, "Not enough register names in gba_state");
+
+	if (ACCESSING_BITS_0_15)
 	{
-		if (ACCESSING_BITS_0_15)
-		{
-			verboselog(*this, 2, "GBA I/O Read: %s (%08x) = %04x (%08x)\n", reg_names[offset * 2], 0x04000000 + ( offset << 2 ), retval & 0x0000ffff, ~mem_mask);
-		}
-		if (ACCESSING_BITS_16_31)
-		{
-			verboselog(*this, 2, "GBA I/O Read: %s (%08x) = %04x (%08x)\n", reg_names[offset * 2 + 1], 0x04000000 + ( offset << 2 ) + 2, (retval & 0xffff0000) >> 16, ~mem_mask);
-		}
+		verboselog(*this, 2, "GBA I/O Read: %s = %04x\n", reg_names[offset * 2], retval & 0x0000ffff);
+	}
+	if (ACCESSING_BITS_16_31)
+	{
+		verboselog(*this, 2, "GBA I/O Read: %s = %04x\n", reg_names[offset * 2 + 1], (retval & 0xffff0000) >> 16);
 	}
 
 	return retval;
@@ -684,7 +760,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 	UINT16 siocnt = SIOCNT;
 	UINT16 dmachcnt[4] = { DMACNT_H(0), DMACNT_H(1), DMACNT_H(2), DMACNT_H(3) };
 
-	COMBINE_DATA(&m_io_regs[offset]);
+	COMBINE_DATA(&m_regs[offset]);
 
 //	assert_always(offset < ARRAY_LENGTH(reg_names) / 2, "Not enough register names in gba_state");
 
@@ -697,46 +773,8 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 		verboselog(*this, 2, "GBA I/O Write: %s = %04x\n", reg_names[offset * 2 + 1], (data & 0xffff0000) >> 16);
 	}
 
-	switch( offset )
+	switch( offset + 0x60/4 )
 	{
-		case 0x0000/4:
-			if( ACCESSING_BITS_0_15 )
-			{
-				if(DISPCNT & (DISPCNT_WIN0_EN | DISPCNT_WIN1_EN))
-				{
-					m_windowOn = 1;
-				}
-				else
-				{
-					m_windowOn = 0;
-				}
-			}
-			break;
-		case 0x0028/4:
-			m_gfxBG2Changed |= 1;
-			break;
-		case 0x002c/4:
-			m_gfxBG2Changed |= 2;
-			break;
-		case 0x0038/4:
-			m_gfxBG3Changed |= 1;
-			break;
-		case 0x003c/4:
-			m_gfxBG3Changed |= 2;
-			break;
-		case 0x0050/4:
-			if( ACCESSING_BITS_0_15 )
-			{
-				if(BLDCNT & BLDCNT_SFX)
-				{
-					m_fxOn = 1;
-				}
-				else
-				{
-					m_fxOn = 0;
-				}
-			}
-			break;
 		case 0x0060/4:
 			if( ACCESSING_BITS_0_7 )   // SOUNDCNTL
 			{
@@ -969,7 +1007,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 		case 0x00dc/4:
 			if( ACCESSING_BITS_16_31 )
 			{
-				int ch = (offset - (0xb0/4)) / 3;
+				int ch = (offset + 0x60/4 - 0xb0/4) / 3;
 
 				int ctrl = data>>16;
 
@@ -1003,7 +1041,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 				double rate, clocksel;
 				UINT32 old_timer_regs;
 
-				int timer = offset - 0x100/4;
+				int timer = offset + 0x60/4 - 0x100/4;
 
 				old_timer_regs = m_timer_regs[timer];
 
@@ -1104,52 +1142,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 				m_maincpu->spin_until_interrupt();
 			}
 			break;
-		default:
-//          verboselog(machine, 0, "Unknown GBA I/O register write: %08x = %08x (%08x)\n", 0x04000000 + ( offset << 2 ), data, ~mem_mask );
-			break;
 	}
-}
-
-static inline UINT32 COMBINE_DATA32_16(UINT32 prev, UINT32 data, UINT32 mem_mask)
-{
-	COMBINE_DATA(&prev);
-	switch(mem_mask)
-	{
-		case 0x000000ff:
-			prev &= 0xffff00ff;
-			prev |= data << 8;
-			break;
-		case 0x0000ff00:
-			prev &= 0xffffff00;
-			prev |= data >> 8;
-			break;
-		case 0x00ff0000:
-			prev &= 0x00ffffff;
-			prev |= data << 8;
-			break;
-		case 0xff000000:
-			prev &= 0xff00ffff;
-			prev |= data >> 8;
-			break;
-		default:
-			break;
-	}
-	return prev;
-}
-
-WRITE32_MEMBER(gba_state::gba_pram_w)
-{
-	m_gba_pram[offset] = COMBINE_DATA32_16(m_gba_pram[offset], data, mem_mask);
-}
-
-WRITE32_MEMBER(gba_state::gba_vram_w)
-{
-	m_gba_vram[offset] = COMBINE_DATA32_16(m_gba_vram[offset], data, mem_mask);
-}
-
-WRITE32_MEMBER(gba_state::gba_oam_w)
-{
-	m_gba_oam[offset] = COMBINE_DATA32_16(m_gba_oam[offset], data, mem_mask);
 }
 
 READ32_MEMBER(gba_state::gba_bios_r)
@@ -1192,11 +1185,12 @@ static ADDRESS_MAP_START( gba_map, AS_PROGRAM, 32, gba_state )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM AM_READ(gba_bios_r)
 	AM_RANGE(0x02000000, 0x0203ffff) AM_RAM AM_MIRROR(0xfc0000)
 	AM_RANGE(0x03000000, 0x03007fff) AM_RAM AM_MIRROR(0xff8000)
-	AM_RANGE(0x04000000, 0x040003ff) AM_READWRITE(gba_io_r, gba_io_w)
+	AM_RANGE(0x04000000, 0x0400005f) AM_DEVREADWRITE("lcd", gba_lcd_device, video_r, video_w)
+	AM_RANGE(0x04000060, 0x040003ff) AM_READWRITE(gba_io_r, gba_io_w)
 	AM_RANGE(0x04000400, 0x04ffffff) AM_NOP                                         // Not used
-	AM_RANGE(0x05000000, 0x050003ff) AM_RAM_WRITE(gba_pram_w) AM_SHARE("gba_pram")  // Palette RAM
-	AM_RANGE(0x06000000, 0x06017fff) AM_RAM_WRITE(gba_vram_w) AM_SHARE("gba_vram")  // VRAM
-	AM_RANGE(0x07000000, 0x070003ff) AM_RAM_WRITE(gba_oam_w) AM_SHARE("gba_oam")    // OAM
+	AM_RANGE(0x05000000, 0x050003ff) AM_DEVREADWRITE("lcd", gba_lcd_device, gba_pram_r, gba_pram_w)  // Palette RAM
+	AM_RANGE(0x06000000, 0x06017fff) AM_DEVREADWRITE("lcd", gba_lcd_device, gba_vram_r, gba_vram_w)  // VRAM
+	AM_RANGE(0x07000000, 0x070003ff) AM_DEVREADWRITE("lcd", gba_lcd_device, gba_oam_r, gba_oam_w)    // OAM
 	AM_RANGE(0x07000400, 0x07ffffff) AM_NOP                                         // Not used
 	//AM_RANGE(0x08000000, 0x0cffffff)  // cart ROM + mirrors, mapped here at machine_start if a cart is present
 	AM_RANGE(0x10000000, 0xffffffff) AM_READ(gba_10000000_r) // for "Justice League Chronicles" (game bug)
@@ -1223,97 +1217,10 @@ static INPUT_PORTS_START( gbadv )
 INPUT_PORTS_END
 
 
-TIMER_CALLBACK_MEMBER(gba_state::perform_hbl)
-{
-	int ch, ctrl;
-	int scanline = machine().first_screen()->vpos();
-
-	// draw only visible scanlines
-	if (scanline < 160)
-	{
-		draw_scanline(scanline);
-
-		for (ch = 0; ch < 4; ch++)
-		{
-			ctrl = DMACNT_H(ch);
-
-			// HBL-triggered DMA?
-			if ((ctrl & 0x8000) && ((ctrl & 0x3000) == 0x2000))
-			{
-				dma_exec(ch);
-			}
-		}
-	}
-
-	if ((DISPSTAT & DISPSTAT_HBL_IRQ_EN ) != 0)
-	{
-		request_irq(INT_HBL);
-	}
-
-	DISPSTAT_SET(DISPSTAT_HBL);
-
-	m_hbl_timer->adjust(attotime::never);
-}
-
-TIMER_CALLBACK_MEMBER(gba_state::perform_scan)
-{
-	int scanline;
-
-	// clear hblank and raster IRQ flags
-	DISPSTAT_RESET(DISPSTAT_HBL|DISPSTAT_VCNT);
-
-	scanline = machine().first_screen()->vpos();
-
-	// VBL is set for scanlines 160 through 226 (but not 227, which is the last line)
-	if (scanline >= 160 && scanline < 227)
-	{
-		DISPSTAT_SET(DISPSTAT_VBL);
-
-		// VBL IRQ and DMA on line 160
-		if (scanline == 160)
-		{
-			int ch, ctrl;
-
-			if (DISPSTAT & DISPSTAT_VBL_IRQ_EN)
-			{
-				request_irq(INT_VBL);
-			}
-
-			for (ch = 0; ch < 4; ch++)
-			{
-				ctrl = DMACNT_H(ch);
-
-				// VBL-triggered DMA?
-				if ((ctrl & 0x8000) && ((ctrl & 0x3000) == 0x1000))
-				{
-					dma_exec(ch);
-				}
-			}
-		}
-	}
-	else
-	{
-		DISPSTAT_RESET(DISPSTAT_VBL);
-	}
-
-	// handle VCNT match interrupt/flag
-	if (scanline == ((DISPSTAT >> 8) & 0xff))
-	{
-		DISPSTAT_SET(DISPSTAT_VCNT);
-
-		if (DISPSTAT & DISPSTAT_VCNT_IRQ_EN)
-		{
-			request_irq(INT_VCNT);
-		}
-	}
-
-	m_hbl_timer->adjust(machine().first_screen()->time_until_pos(scanline, 240));
-	m_scan_timer->adjust(machine().first_screen()->time_until_pos(( scanline + 1 ) % 228, 0));
-}
-
 void gba_state::machine_reset()
 {
-	memset(m_io_regs, 0, sizeof(m_io_regs));
+	memset(m_regs, 0, sizeof(m_regs));
+
 	SOUNDBIAS_SET(0x0200);
 	SIOMULTI0_SET(0xffff);
 	SIOMULTI1_SET(0xffff);
@@ -1322,20 +1229,9 @@ void gba_state::machine_reset()
 	KEYCNT_SET(0x03ff);
 	RCNT_SET(0x8000);
 	JOYSTAT_SET(0x0002);
-	m_gfxBG2Changed = 0;
-	m_gfxBG3Changed = 0;
-	m_gfxBG2X = 0;
-	m_gfxBG2Y = 0;
-	m_gfxBG3X = 0;
-	m_gfxBG3Y = 0;
-
-	m_windowOn = 0;
-	m_fxOn = 0;
 
 	m_bios_protected = 0;
 
-	m_scan_timer->adjust(machine().first_screen()->time_until_pos(0, 0));
-	m_hbl_timer->adjust(attotime::never);
 	m_dma_timer[0]->adjust(attotime::never);
 	m_dma_timer[1]->adjust(attotime::never, 1);
 	m_dma_timer[2]->adjust(attotime::never, 2);
@@ -1353,11 +1249,6 @@ void gba_state::machine_reset()
 
 void gba_state::machine_start()
 {
-	/* create a timer to fire scanline functions */
-	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::perform_scan),this));
-	m_hbl_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::perform_hbl),this));
-	m_scan_timer->adjust(machine().first_screen()->time_until_pos(0, 0));
-
 	/* and one for each DMA channel */
 	m_dma_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::dma_complete),this));
 	m_dma_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::dma_complete),this));
@@ -1444,15 +1335,7 @@ void gba_state::machine_start()
 
 	}
 
-	save_pointer(NAME(m_io_regs), sizeof(m_io_regs));
-	save_item(NAME(m_windowOn));
-	save_item(NAME(m_fxOn));
-	save_item(NAME(m_gfxBG2Changed));
-	save_item(NAME(m_gfxBG3Changed));
-	save_item(NAME(m_gfxBG2X));
-	save_item(NAME(m_gfxBG2Y));
-	save_item(NAME(m_gfxBG3X));
-	save_item(NAME(m_gfxBG3Y));
+	save_pointer(NAME(m_regs), sizeof(m_regs));
 	save_item(NAME(m_dma_src));
 	save_item(NAME(m_dma_dst));
 	save_item(NAME(m_dma_cnt));
@@ -1466,7 +1349,6 @@ void gba_state::machine_start()
 	save_item(NAME(m_fifo_b_in));
 	save_item(NAME(m_fifo_a));
 	save_item(NAME(m_fifo_b));
-	save_item(NAME(m_xferscan));
 	save_item(NAME(m_bios_last_address));
 	save_item(NAME(m_bios_protected));
 }
@@ -1496,14 +1378,7 @@ static MACHINE_CONFIG_START( gbadv, gba_state )
 	MCFG_CPU_ADD("maincpu", ARM7, XTAL_16_777216MHz)
 	MCFG_CPU_PROGRAM_MAP(gba_map)
 
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_16_777216MHz/4, 308, 0, 240, 228, 0, 160)
-	MCFG_SCREEN_UPDATE_DRIVER(gba_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_PALETTE_ADD("palette", 32768)
-	MCFG_PALETTE_INIT_OWNER(gba_state, gba)
+	MCFG_GBA_LCD_ADD("lcd")
 
 	MCFG_SPEAKER_STANDARD_STEREO("spkleft", "spkright")
 	MCFG_SOUND_ADD("custom", GAMEBOY, 0)

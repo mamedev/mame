@@ -333,6 +333,7 @@ VIDEOS["VIC4567"] = true
 --VIDEOS+= VOODOO"] = true
 VIDEOS["SCN2674"] = true
 VIDEOS["GB_LCD"] = true
+VIDEOS["GBA_LCD"] = true
 
 --------------------------------------------------
 -- specify available machine cores
@@ -2313,7 +2314,6 @@ files {
 	MAME_DIR .. "src/mame/machine/gb.cpp",
 	MAME_DIR .. "src/mame/drivers/gba.cpp",
 	MAME_DIR .. "src/mame/includes/gba.h",
-	MAME_DIR .. "src/mame/video/gba.cpp",
 	MAME_DIR .. "src/mame/drivers/n64.cpp",
 	MAME_DIR .. "src/mame/includes/n64.h",
 	MAME_DIR .. "src/mame/drivers/nes.cpp",
