@@ -23,7 +23,7 @@
 #include "sound/okim6376.h"
 #include "machine/nvram.h"
 #include "sound/upd7759.h"
-
+#include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
 
 class maygay1b_state : public driver_device
@@ -32,6 +32,7 @@ public:
 	maygay1b_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_mcu(*this, "mcu"),
 		m_vfd(*this, "vfd"),
 		m_ay(*this, "aysnd"),
 		m_msm6376(*this, "msm6376"),
@@ -53,6 +54,7 @@ public:
 	{}
 
 	required_device<cpu_device> m_maincpu;
+	required_device<i80c51_device> m_mcu;
 	optional_device<s16lf01_t> m_vfd;
 	required_device<ay8910_device> m_ay;
 	optional_device<okim6376_device> m_msm6376;
@@ -118,6 +120,12 @@ public:
 	DECLARE_WRITE8_MEMBER(nec_bank1_w);
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_READ8_MEMBER(m1_duart_r);
+	DECLARE_WRITE8_MEMBER(mcu_port0_w);
+	DECLARE_WRITE8_MEMBER(mcu_port1_w);
+	DECLARE_WRITE8_MEMBER(mcu_port2_w);
+	DECLARE_WRITE8_MEMBER(mcu_port3_w);
+	DECLARE_READ8_MEMBER(mcu_port0_r);
+	DECLARE_READ8_MEMBER(mcu_port1_r);
 	DECLARE_DRIVER_INIT(m1);
 	DECLARE_DRIVER_INIT(m1common);
 	DECLARE_DRIVER_INIT(m1nec);

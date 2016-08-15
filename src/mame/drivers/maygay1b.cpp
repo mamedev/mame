@@ -447,6 +447,53 @@ static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
 
 ADDRESS_MAP_END
 
+
+
+WRITE8_MEMBER(maygay1b_state::mcu_port0_w)
+{
+	logerror("%s: mcu_port0_w %02x\n",machine().describe_context(),data);
+}
+	
+WRITE8_MEMBER(maygay1b_state::mcu_port1_w)
+{
+	logerror("%s: mcu_port1_w %02x\n",machine().describe_context(),data);
+}
+	
+WRITE8_MEMBER(maygay1b_state::mcu_port2_w)
+{
+	logerror("%s: mcu_port2_w %02x\n",machine().describe_context(),data);
+}
+	
+WRITE8_MEMBER(maygay1b_state::mcu_port3_w)
+{
+	logerror("%s: mcu_port3_w %02x\n",machine().describe_context(),data);
+}
+	
+
+READ8_MEMBER(maygay1b_state::mcu_port0_r)
+{
+	logerror("%s: mcu_port0_r\n", machine().describe_context());
+	return rand();
+}
+	
+READ8_MEMBER(maygay1b_state::mcu_port1_r)
+{
+	logerror("%s: mcu_port1_r\n", machine().describe_context());
+	return rand();
+}
+
+static ADDRESS_MAP_START( maygay_mcu_map, AS_PROGRAM, 8, maygay1b_state )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( maygay_mcu_io, AS_IO, 8, maygay1b_state )
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE( mcu_port0_r, mcu_port0_w )
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE( mcu_port1_r, mcu_port1_w )
+	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE( mcu_port2_w )
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_WRITE( mcu_port3_w )
+ADDRESS_MAP_END
+
+
 /*************************************************
  *
  *  NEC uPD7759 handling (used as OKI replacement)
@@ -600,6 +647,12 @@ MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 	MCFG_CPU_ADD("maincpu", M6809, M1_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(m1_memmap)
 
+	MCFG_CPU_ADD("mcu", I80C51, 2000000) //  EP840034.A-P-80C51AVW
+	MCFG_CPU_PROGRAM_MAP(maygay_mcu_map)
+	MCFG_CPU_IO_MAP(maygay_mcu_io)
+//	MCFG_MCS51_SERIAL_TX_CB(WRITE8(maygay1b_state, mcs51_tx_callback))
+
+
 	MCFG_MC68681_ADD("duart68681", M1_DUART_CLOCK)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(maygay1b_state, duart_irq_handler))
 	MCFG_MC68681_INPORT_CALLBACK(READ8(maygay1b_state, m1_duart_r))
@@ -625,10 +678,13 @@ MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmitimer", maygay1b_state, maygay1b_nmitimer_callback, attotime::from_hz(75)) // freq?
+	
 	MCFG_DEVICE_ADD("i8279", I8279, M1_MASTER_CLOCK/4)    // unknown clock
 	MCFG_I8279_OUT_SL_CB(WRITE8(maygay1b_state, scanlines_w))   // scan SL lines
 	MCFG_I8279_OUT_DISP_CB(WRITE8(maygay1b_state, lamp_data_w))     // display A&B
 	MCFG_I8279_IN_RL_CB(READ8(maygay1b_state, kbd_r))           // kbd RL lines
+	
+	// there is no 2nd u8279!
 	MCFG_DEVICE_ADD("i8279_2", I8279, M1_MASTER_CLOCK/4)        // unknown clock
 	MCFG_I8279_OUT_DISP_CB(WRITE8(maygay1b_state, lamp_data_2_w))       // display A&B
 
