@@ -124,7 +124,7 @@ MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 
 		for (int bit = 0; bit < width; bit++)
 		{
-			int pixel;
+			int pixel = 0;
 
 			switch (rvs | undln | cursor)
 			{
