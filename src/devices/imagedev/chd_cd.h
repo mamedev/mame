@@ -45,7 +45,6 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *image_interface() const override { return m_interface; }
 	virtual const char *file_extensions() const override { return m_extension_list; }
-	virtual const option_guide *create_option_guide() const override;
 
 	// specific implementation
 	cdrom_file *get_cdrom_file() { return m_cdrom_handle; }
