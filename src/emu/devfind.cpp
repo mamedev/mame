@@ -156,10 +156,11 @@ bool finder_base::report_missing(bool found, const char *objname, bool required)
 		return true;
 
 	// otherwise, report
+	std::string region_fulltag = m_base.subtag(m_tag);
 	if (required)
-		osd_printf_error("Required %s '%s' not found\n", objname, m_tag);
+		osd_printf_error("Required %s '%s' not found\n", objname, region_fulltag.c_str());
 	else
-		osd_printf_verbose("Optional %s '%s' not found\n", objname, m_tag);
+		osd_printf_verbose("Optional %s '%s' not found\n", objname, region_fulltag.c_str());
 	return !required;
 }
 
