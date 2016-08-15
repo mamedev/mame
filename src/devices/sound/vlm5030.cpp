@@ -159,16 +159,10 @@ static const int vlm5030_speed_table[8] =
 
 const device_type VLM5030 = &device_creator<vlm5030_device>;
 
-// default address map
-static ADDRESS_MAP_START( vlm5030, AS_0, 8, vlm5030_device )
-	AM_RANGE(0x0000, 0xffff) AM_ROM
-ADDRESS_MAP_END
-
 vlm5030_device::vlm5030_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VLM5030, "VLM5030", tag, owner, clock, "vlm5030", __FILE__),
 		device_sound_interface(mconfig, *this),
-		device_memory_interface(mconfig, *this),
-		m_space_config("samples", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(vlm5030)),
+		device_rom_interface(mconfig, *this, 16),
 		m_channel(nullptr),
 		m_coeff(nullptr),
 		m_address(0),
@@ -200,16 +194,6 @@ vlm5030_device::vlm5030_device(const machine_config &mconfig, const char *tag, d
 		memset(m_current_k, 0, sizeof(m_current_k));
 		memset(m_target_k, 0, sizeof(m_target_k));
 		memset(m_x, 0, sizeof(m_x));
-}
-
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-const address_space_config *vlm5030_device::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 //-------------------------------------------------
@@ -284,8 +268,7 @@ int vlm5030_device::get_bits(int sbit,int bits)
 	int offset = m_address + (sbit>>3);
 	int data;
 
-	data = space(AS_0).read_byte(offset) |
-			space(AS_0).read_byte(offset+1)<<8;
+	data = read_byte(offset) | (read_byte(offset+1)<<8);
 	data >>= (sbit&7);
 	data &= (0xff>>(8-bits));
 
@@ -305,7 +288,7 @@ int vlm5030_device::parse_frame()
 		m_old_k[i] = m_new_k[i];
 
 	/* command byte check */
-	cmd = space(AS_0).read_byte(m_address);
+	cmd = read_byte(m_address);
 	if( cmd & 0x01 )
 	{   /* extend frame */
 		m_new_energy = m_new_pitch = 0;
@@ -469,8 +452,7 @@ WRITE_LINE_MEMBER( vlm5030_device::st )
 				else
 				{   /* indirect accedd mode */
 					table = (m_latch_data&0xfe) + (((int)m_latch_data&1)<<8);
-					m_address = (space(AS_0).read_byte(table)<<8)
-									|        space(AS_0).read_byte(table+1);
+					m_address = (read_byte(table)<<8) | read_byte(table+1);
 #if 0
 /* show unsupported parameter message */
 if( m_interp_step != 1)

@@ -44,11 +44,6 @@ static const UINT32 wavemasks[8] = { 0x1ff00, 0x1fe00, 0x1fc00, 0x1f800, 0x1f000
 static const UINT32 accmasks[8]  = { 0xff, 0x1ff, 0x3ff, 0x7ff, 0xfff, 0x1fff, 0x3fff, 0x7fff };
 static const int    resshifts[8] = { 9, 10, 11, 12, 13, 14, 15, 16 };
 
-// default address map
-static ADDRESS_MAP_START( es5503, AS_0, 8, es5503_device )
-	AM_RANGE(0x000000, 0x1ffff) AM_ROM
-ADDRESS_MAP_END
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -60,22 +55,12 @@ ADDRESS_MAP_END
 es5503_device::es5503_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ES5503, "Ensoniq ES5503", tag, owner, clock, "es5503", __FILE__),
 		device_sound_interface(mconfig, *this),
-		device_memory_interface(mconfig, *this),
-		m_space_config("es5503_samples", ENDIANNESS_LITTLE, 8, 17, 0, nullptr, *ADDRESS_MAP_NAME(es5503)),
+		device_rom_interface(mconfig, *this, 17),
 		m_irq_func(*this),
 		m_adc_func(*this)
 {
 }
 
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-const address_space_config *es5503_device::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == 0) ? &m_space_config : nullptr;
-}
 
 //-------------------------------------------------
 //  static_set_type - configuration helper to set
@@ -184,9 +169,9 @@ void es5503_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 					// channel strobe is always valid when reading; this allows potentially banking per voice
 					m_channel_strobe = (ctrl>>4) & 0xf;
-					data = (INT32)m_direct->read_byte(ramptr + wtptr) ^ 0x80;
+					data = (INT32)read_byte(ramptr + wtptr) ^ 0x80;
 
-					if (m_direct->read_byte(ramptr + wtptr) == 0x00)
+					if (read_byte(ramptr + wtptr) == 0x00)
 					{
 						halt_osc(osc, 1, &acc, resshift);
 					}
@@ -226,9 +211,6 @@ void es5503_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 void es5503_device::device_start()
 {
 	int osc;
-
-	// find our direct access
-	m_direct = &space().direct();
 
 	m_irq_func.resolve_safe();
 	m_adc_func.resolve_safe(0);

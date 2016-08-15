@@ -62,11 +62,6 @@ const UINT32 okim9810_device::s_sampling_freq_table[16] =
 	0
 };
 
-// default address map
-static ADDRESS_MAP_START( okim9810, AS_0, 8, okim9810_device )
-	AM_RANGE(0x000000, 0xffffff) AM_ROM
-ADDRESS_MAP_END
-
 
 
 //**************************************************************************
@@ -80,8 +75,7 @@ ADDRESS_MAP_END
 okim9810_device::okim9810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, OKIM9810, "OKI9810", tag, owner, clock, "okim9810", __FILE__),
 		device_sound_interface(mconfig, *this),
-		device_memory_interface(mconfig, *this),
-		m_space_config("samples", ENDIANNESS_BIG, 8, 24, 0, nullptr, *ADDRESS_MAP_NAME(okim9810)),
+		device_rom_interface(mconfig, *this, 24),
 		m_stream(nullptr),
 		m_TMP_register(0x00),
 		m_global_volume(0x00),
@@ -97,9 +91,6 @@ okim9810_device::okim9810_device(const machine_config &mconfig, const char *tag,
 
 void okim9810_device::device_start()
 {
-	// find our direct access
-	m_direct = &space().direct();
-
 	// create the stream
 	//int divisor = m_pin7 ? 132 : 165;
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock());
@@ -168,16 +159,6 @@ void okim9810_device::device_clock_changed()
 }
 
 
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-const address_space_config *okim9810_device::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == 0) ? &m_space_config : nullptr;
-}
-
 
 //-------------------------------------------------
 //  stream_generate - handle update requests for
@@ -192,7 +173,7 @@ void okim9810_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 
 	// iterate over voices and accumulate sample data
 	for (auto & elem : m_voice)
-		elem.generate_audio(*m_direct, outputs, samples, m_global_volume, clock(), m_filter_type);
+		elem.generate_audio(*this, outputs, samples, m_global_volume, clock(), m_filter_type);
 }
 
 
@@ -313,31 +294,31 @@ void okim9810_device::write_command(UINT8 data)
 			const offs_t base = m_TMP_register * 8;
 
 			offs_t startAddr;
-			UINT8 startFlags = m_direct->read_byte(base + 0);
-			startAddr  = m_direct->read_byte(base + 1) << 16;
-			startAddr |= m_direct->read_byte(base + 2) << 8;
-			startAddr |= m_direct->read_byte(base + 3) << 0;
+			UINT8 startFlags = read_byte(base + 0);
+			startAddr  = read_byte(base + 1) << 16;
+			startAddr |= read_byte(base + 2) << 8;
+			startAddr |= read_byte(base + 3) << 0;
 
 			offs_t endAddr;
-			UINT8 endFlags = m_direct->read_byte(base + 4);
-			endAddr  = m_direct->read_byte(base + 5) << 16;
-			endAddr |= m_direct->read_byte(base + 6) << 8;
-			endAddr |= m_direct->read_byte(base + 7) << 0;
+			UINT8 endFlags = read_byte(base + 4);
+			endAddr  = read_byte(base + 5) << 16;
+			endAddr |= read_byte(base + 6) << 8;
+			endAddr |= read_byte(base + 7) << 0;
 
 			// Sub-table
 			if (startFlags & 0x80)
 			{
 				offs_t subTable = startAddr;
 				// TODO: New startFlags &= 0x80.  Are there further subtables?
-				startFlags = m_direct->read_byte(subTable + 0);
-				startAddr  = m_direct->read_byte(subTable + 1) << 16;
-				startAddr |= m_direct->read_byte(subTable + 2) << 8;
-				startAddr |= m_direct->read_byte(subTable + 3) << 0;
+				startFlags = read_byte(subTable + 0);
+				startAddr  = read_byte(subTable + 1) << 16;
+				startAddr |= read_byte(subTable + 2) << 8;
+				startAddr |= read_byte(subTable + 3) << 0;
 
 				// TODO: What does byte (subTable + 4) refer to?
-				endAddr  = m_direct->read_byte(subTable + 5) << 16;
-				endAddr |= m_direct->read_byte(subTable + 6) << 8;
-				endAddr |= m_direct->read_byte(subTable + 7) << 0;
+				endAddr  = read_byte(subTable + 5) << 16;
+				endAddr |= read_byte(subTable + 6) << 8;
+				endAddr |= read_byte(subTable + 7) << 0;
 			}
 
 			m_voice[channel].m_sample = 0;
@@ -446,7 +427,7 @@ okim9810_device::okim_voice::okim_voice()
 //  add them to an output stream
 //-------------------------------------------------
 
-void okim9810_device::okim_voice::generate_audio(direct_read_data &direct,
+void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 													stream_sample_t **buffers,
 													int samples,
 													const UINT8 global_volume,
@@ -478,7 +459,7 @@ void okim9810_device::okim_voice::generate_audio(direct_read_data &direct,
 			if (m_sample == 0)
 			{
 				// fetch the first sample nibble
-				int nibble0 = direct.read_byte(m_base_offset + m_sample / 2) >> (((m_sample & 1) << 2) ^ 4);
+				int nibble0 = rom.read_byte(m_base_offset + m_sample / 2) >> (((m_sample & 1) << 2) ^ 4);
 				switch (m_playbackAlgo)
 				{
 					case OKIM9810_ADPCM_PLAYBACK:
@@ -504,7 +485,7 @@ void okim9810_device::okim_voice::generate_audio(direct_read_data &direct,
 			}
 
 			// And fetch the second sample nibble
-			int nibble1 = direct.read_byte(m_base_offset + (m_sample+1) / 2) >> ((((m_sample+1) & 1) << 2) ^ 4);
+			int nibble1 = rom.read_byte(m_base_offset + (m_sample+1) / 2) >> ((((m_sample+1) & 1) << 2) ^ 4);
 			switch (m_playbackAlgo)
 			{
 				case OKIM9810_ADPCM_PLAYBACK:

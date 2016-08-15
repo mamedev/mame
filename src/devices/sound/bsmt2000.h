@@ -37,7 +37,7 @@
 
 class bsmt2000_device : public device_t,
 						public device_sound_interface,
-						public device_memory_interface
+						public device_rom_interface
 {
 	typedef void (*ready_callback)(bsmt2000_device &device);
 
@@ -60,9 +60,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -88,12 +85,10 @@ private:
 	};
 
 	// configuration state
-	const address_space_config  m_space_config;
 	ready_callback              m_ready_callback;
 
 	// internal state
 	sound_stream *              m_stream;
-	direct_read_data *          m_direct;
 	tms32015_device *           m_cpu;
 	UINT16                      m_register_select;
 	UINT16                      m_write_data;

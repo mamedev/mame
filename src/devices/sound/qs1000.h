@@ -55,7 +55,7 @@
 
 class qs1000_device :   public device_t,
 						public device_sound_interface,
-						public device_memory_interface
+						public device_rom_interface
 {
 public:
 	// construction/destruction
@@ -81,9 +81,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -128,9 +125,7 @@ public:
 	//devcb_write8            m_serial_w_cb;
 
 	// Internal state
-	const address_space_config      m_space_config;
 	sound_stream *                  m_stream;
-	direct_read_data *              m_direct;
 	required_device<i8052_device>   m_cpu;
 
 	// Wavetable engine
