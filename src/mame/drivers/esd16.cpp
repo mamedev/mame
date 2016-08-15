@@ -28,7 +28,8 @@ Year + Game            PCB             Notes
 00  Deluxe 5           ESD            (no date is marked on PCB)
 00  Tang Tang          ESD            (no date is marked on PCB)
 01  SWAT Police        ESD            (no date is marked on PCB)
-01  Jumping Pop        ESD 11-09-98   (also original version by Emag Soft)
+01  Jumping Pop        ESD 11-09-98   (version by Emag Soft)
+01  Jumping Pop        ESD 12-04-00   (ESD branded version)
 ---------------------------------------------------------------------------
 
 Other ESD games:
@@ -1451,6 +1452,7 @@ ESD, 2001
 PCB Layout
 ----------
 
+ESD 12-04-00
 |------------------------------------------------------|
 | TDA1519A                62256         PAL            |
 | SAMPLES.BIN YM3014      62256         BG0.BIN        |
