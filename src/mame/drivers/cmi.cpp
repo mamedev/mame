@@ -932,6 +932,7 @@ void cmi_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 			m_cmi10_pia_u20->ca1_w(m_scnd);
 			m_scnd ^= 1;
 			m_cmi10_pia_u21->ca1_w(m_scnd);
+			m_map_switch_timer->adjust(attotime::never);
 			break;
 	}
 }
@@ -2068,7 +2069,8 @@ WRITE8_MEMBER( cmi_state::cmi02_w )
 
 			case 0x30:
 				m_maincpu1->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-				m_i8214_2->b_w(data & 0xf);
+				m_i8214_2->b_w(data & 0x7);
+				m_i8214_2->sgs_w((data >> 3) & 1);
 				break;
 
 			case 0x31: case 0x32:
@@ -2099,14 +2101,16 @@ void cmi_state::install_video_ram(int cpunum)
 WRITE8_MEMBER( cmi_state::i8214_cpu1_w )
 {
 	m_maincpu1->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-	m_i8214_0->b_w(data & 0xf);
+	m_i8214_0->b_w(data & 0x7);
+	m_i8214_0->sgs_w((data >> 3) & 1);
 }
 
 
 WRITE8_MEMBER( cmi_state::i8214_cpu2_w )
 {
 	m_maincpu2->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-	m_i8214_1->b_w(data & 0xf);
+	m_i8214_1->b_w(data & 0x7);
+	m_i8214_1->sgs_w((data >> 3) & 1);
 }
 
 // TODO: replace with AM_SHARE
@@ -2663,6 +2667,9 @@ void cmi_state::machine_reset()
 	/* CMI-07 */
 	m_cmi07_ctrl = 0;
 	m_cmi07cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+
+	m_cmi10_scnd_timer->adjust(attotime::from_hz(4000000 / 4 / 2048 / 2), 0, attotime::from_hz(4000000 / 4 / 2048 / 2));
+	m_scnd = 0;
 }
 
 void cmi_state::machine_start()
