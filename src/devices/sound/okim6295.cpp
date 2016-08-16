@@ -89,8 +89,7 @@ okim6295_device::okim6295_device(const machine_config &mconfig, const char *tag,
 		m_bank_installed(false),
 		m_bank_offs(0),
 		m_stream(nullptr),
-		m_pin7_state(0),
-		m_direct(nullptr)
+		m_pin7_state(0)
 {
 }
 
@@ -181,7 +180,7 @@ void okim6295_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 
 	// iterate over voices and accumulate sample data
 	for (auto & elem : m_voice)
-		elem.generate_adpcm(*m_direct, outputs[0], samples);
+		elem.generate_adpcm(*this, outputs[0], samples);
 }
 
 
@@ -375,7 +374,7 @@ okim6295_device::okim_voice::okim_voice()
 //  add them to an output stream
 //-------------------------------------------------
 
-void okim6295_device::okim_voice::generate_adpcm(direct_read_data &direct, stream_sample_t *buffer, int samples)
+void okim6295_device::okim_voice::generate_adpcm(device_rom_interface &rom, stream_sample_t *buffer, int samples)
 {
 	// skip if not active
 	if (!m_playing)
@@ -385,7 +384,7 @@ void okim6295_device::okim_voice::generate_adpcm(direct_read_data &direct, strea
 	while (samples-- != 0)
 	{
 		// fetch the next sample byte
-		int nibble = direct.read_byte(m_base_offset + m_sample / 2) >> (((m_sample & 1) << 2) ^ 4);
+		int nibble = rom.read_byte(m_base_offset + m_sample / 2) >> (((m_sample & 1) << 2) ^ 4);
 
 		// output to the buffer, scaling by the volume
 		// signal in range -2048..2047, volume in range 2..32 => signal * volume / 2 in range -32768..32767

@@ -88,7 +88,7 @@ protected:
 	{
 	public:
 		okim_voice();
-		void generate_adpcm(direct_read_data &direct, stream_sample_t *buffer, int samples);
+		void generate_adpcm(device_rom_interface &rom, stream_sample_t *buffer, int samples);
 
 		oki_adpcm_state m_adpcm;        // current ADPCM state
 		bool            m_playing;
@@ -110,7 +110,6 @@ protected:
 	offs_t              m_bank_offs;
 	sound_stream *      m_stream;
 	UINT8               m_pin7_state;
-	direct_read_data *  m_direct;
 
 	static const UINT8 s_volume_table[16];
 };
