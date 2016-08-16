@@ -71,6 +71,11 @@ private:
 	std::list<rom_block> m_rom_blocks[0x40];
 	UINT32 m_rom_masks[0x40];
 
+	std::vector<UINT8> m_data_streams[0x40];
+	std::vector<UINT32> m_data_stream_starts[0x40];
+
+	UINT32 m_ym2612_stream_offset;
+
 	UINT8 rom_r(UINT8 type, offs_t offset);
 	UINT32 handle_data_block(UINT32 address);
 	void blocks_clear();
@@ -122,6 +127,8 @@ void vgmplay_device::device_reset()
 {
 	m_pc = 0;
 	m_state = RESET;
+
+	m_ym2612_stream_offset = 0;
 	blocks_clear();
 }
 
@@ -145,6 +152,8 @@ void vgmplay_device::blocks_clear()
 	for(int i = 0; i < 0x40; i++) {
 		m_rom_blocks[i].clear();
 		m_rom_masks[i] = 0;
+		m_data_streams[i].clear();
+		m_data_stream_starts[i].clear();
 	}
 }
 
@@ -152,7 +161,20 @@ UINT32 vgmplay_device::handle_data_block(UINT32 address)
 {
 	UINT32 size = m_file->read_dword(m_pc+3);
 	UINT8 type = m_file->read_byte(m_pc+2);
-	if(type >= 0x80 && type < 0xc0) {
+	if(type < 0x40) {
+		UINT32 start = m_data_streams[type].size();
+		m_data_stream_starts[type].push_back(start);
+		m_data_streams[type].resize(start + size);
+		for(UINT32 i=0; i<size; i++)
+			m_data_streams[type][start+i] = m_file->read_byte(m_pc+7+i);
+
+	} else if(type < 0x7f)
+		logerror("ignored compressed stream size %x type %02x\n", size, type);
+
+	else if(type < 0x80)
+		logerror("ignored compression table size %x\n", size);
+
+	else if(type < 0xc0) {
 		UINT32 rs = m_file->read_dword(m_pc+7);
 		UINT32 start = m_file->read_dword(m_pc+11);
 		std::unique_ptr<UINT8[]> block = std::make_unique<UINT8[]>(size - 8);
@@ -168,7 +190,7 @@ UINT32 vgmplay_device::handle_data_block(UINT32 address)
 		mask |= mask >> 16;
 		m_rom_masks[type - 0x80] = mask;
 	} else
-		logerror("ignored block size %x type %02x\n", size, type);
+		logerror("ignored ram block size %x type %02x\n", size, type);
 	return 7+size;
 }
 
@@ -260,7 +282,13 @@ void vgmplay_device::execute_run()
 
 			case 0x80: case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x86: case 0x87:
 			case 0x88: case 0x89: case 0x8a: case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f:
-				logerror("ignored ym2612 dac from databank\n");
+				if(!m_data_streams[0].empty()) {
+					if(m_ym2612_stream_offset >= int(m_data_streams[0].size()))
+						m_ym2612_stream_offset = 0;
+
+					m_io->write_byte(A_YM2612+0, 0x2a);
+					m_io->write_byte(A_YM2612+1, m_data_streams[0][m_ym2612_stream_offset]);
+				}
 				m_pc += 1;
 				m_icount -= code & 0xf;
 				break;
@@ -271,7 +299,7 @@ void vgmplay_device::execute_run()
 				break;
 
 			case 0xe0:
-				logerror("ignored ym2612 offset\n");
+				m_ym2612_stream_offset = m_file->read_dword(m_pc+1);
 				m_pc += 5;
 				break;
 
