@@ -382,7 +382,7 @@ WRITE_LINE_MEMBER( allied_state::ic2_cb2_w )
 	if ((m_display) && (!state))
 	{
 		m_bit_counter++;
-		if BIT(m_bit_counter, 0)
+		if (BIT(m_bit_counter, 0))
 			m_player_score[m_display-1] = (m_player_score[m_display-1] << 1) | m_disp_data;
 		if (m_bit_counter == 15)
 			m_bit_counter = 0;

@@ -55,7 +55,7 @@ READ8_MEMBER( special_state::specialist_8255_portb_r )
 	if ((m_specialist_8255_portc & 0x08)==0) dat &= m_io_line11->read();
 
 	// shift key
-	if BIT(~m_io_line12->read(), 0)
+	if (BIT(~m_io_line12->read(), 0))
 		dat &= 0xfd;
 
 	// cassette
@@ -86,7 +86,7 @@ READ8_MEMBER( special_state::specimx_8255_portb_r )
 	if ((m_specialist_8255_portc & 0x08)==0) dat &= m_io_line11->read();
 
 	// shift key
-	if BIT(~m_io_line12->read(), 0)
+	if (BIT(~m_io_line12->read(), 0))
 		dat &= 0xfd;
 
 	// cassette

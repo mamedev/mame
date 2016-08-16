@@ -229,7 +229,7 @@ MC6845_UPDATE_ROW( zrt80_state::crtc_update_row )
 		mem = (ma + x) & 0x1fff;
 		chr = m_p_videoram[mem];
 
-		if BIT(chr, 7)
+		if (BIT(chr, 7))
 		{
 			inv ^= 0xff;
 			chr &= 0x7f;

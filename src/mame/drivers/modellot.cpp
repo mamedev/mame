@@ -121,7 +121,7 @@ UINT32 modellot_state::screen_update_modellot(screen_device &screen, bitmap_ind1
 
 				chr = m_p_videoram[x+ma];
 
-				if BIT(chr, 7) inv = 0xff;
+				if (BIT(chr, 7)) inv = 0xff;
 
 				chr &= 0x7f; // cursor
 

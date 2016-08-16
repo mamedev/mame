@@ -338,10 +338,10 @@ WRITE8_MEMBER( bigbord2_state::portcc_w )
 
 	/* drive select */
 	m_floppy = nullptr;
-	if BIT(data, 7) m_floppy = m_floppy0->get_device();
-	if BIT(data, 6) m_floppy = m_floppy1->get_device();
-	//if BIT(data, 5) m_floppy = m_floppy2->get_device();
-	//if BIT(data, 4) m_floppy = m_floppy3->get_device();
+	if (BIT(data, 7)) m_floppy = m_floppy0->get_device();
+	if (BIT(data, 6)) m_floppy = m_floppy1->get_device();
+	//if (BIT(data, 5)) m_floppy = m_floppy2->get_device();
+	//if (BIT(data, 4)) m_floppy = m_floppy3->get_device();
 
 	m_fdc->set_floppy(m_floppy);
 
@@ -546,11 +546,11 @@ UINT8 bigbord2_state::crt8002(UINT8 ac_ra, UINT8 ac_chr, UINT8 ac_attr, UINT16 a
 		gfx = 0xff;
 	if (BIT(ac_attr, 6) & BIT(ac_cnt, 13)) // flash
 		gfx = 0;
-	if BIT(ac_attr, 5) // blank
+	if (BIT(ac_attr, 5)) // blank
 		gfx = 0;
 	if (ac_curs && BIT(ac_cnt, 14)) // cursor
 		gfx ^= 0xff;
-	if BIT(ac_attr, 4) // reverse video
+	if (BIT(ac_attr, 4)) // reverse video
 		gfx ^= 0xff;
 	return gfx;
 }

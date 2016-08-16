@@ -302,9 +302,9 @@ WRITE8_MEMBER( gts80b_state::port1b_w )
 WRITE8_MEMBER( gts80b_state::port2a_w )
 {
 	m_port2a = data;
-	if BIT(data, 4)
+	if (BIT(data, 4))
 		m_dispcmd = (m_dispcmd & 0xf0) | m_port2b;
-	if BIT(data, 5)
+	if (BIT(data, 5))
 		m_dispcmd = (m_dispcmd & 0x0f) | (m_port2b << 4);
 }
 

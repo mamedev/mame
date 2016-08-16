@@ -202,7 +202,7 @@ UINT8 c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, i
 			break;
 
 		case 2: // CS8563
-			if BIT(offset, 0)
+			if (BIT(offset, 0))
 			{
 				data = m_vdc->register_r(space, 0);
 			}
@@ -286,7 +286,7 @@ void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, U
 			break;
 
 		case 2: // CS8563
-			if BIT(offset, 0)
+			if (BIT(offset, 0))
 			{
 				m_vdc->register_w(space, 0, data);
 			}

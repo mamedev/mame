@@ -192,7 +192,7 @@ WRITE8_MEMBER( jp_state::disp_w )
 		m_disp_data = (m_disp_data << 1) | BIT(data, 0);
 	}
 
-	if BIT(data, 2)
+	if (BIT(data, 2))
 	{
 		UINT8 segment, t = (m_disp_data >> 24) & 15;
 		if (t == 8)
@@ -209,7 +209,7 @@ WRITE8_MEMBER( jp_state::disp_w )
 				segment = 1 << (6-t);
 
 			for (i = 0; i < 32; i++)
-				if BIT(m_disp_data, i)
+				if (BIT(m_disp_data, i))
 					output().set_digit_value(i, (output().get_digit_value(i) & ~segment));
 				else
 					output().set_digit_value(i, (output().get_digit_value(i) | segment));

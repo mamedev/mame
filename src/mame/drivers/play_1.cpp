@@ -203,12 +203,12 @@ WRITE8_MEMBER( play_1_state::port01_w )
 	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
 	// d0-1 via 4013 to match-game board
 	// d4-7 via 4511 to match-game board
-	if BIT(data, 0)
+	if (BIT(data, 0))
 		output().set_digit_value(40, patterns[1]);
 	else
 		output().set_digit_value(40, 0);
 
-	if BIT(data, 1)
+	if (BIT(data, 1))
 		output().set_digit_value(45, patterns[0]);
 	else
 		output().set_digit_value(45, 0);
@@ -232,16 +232,13 @@ WRITE8_MEMBER( play_1_state::port03_w )
 	{
 		case 1:
 			// a combination of bits could set higher frequencies, but that isn't documented
-			if BIT(m_segment, 0)
+			if (BIT(m_segment, 0))
 				m_monotone->set_unscaled_clock(523);
-			else
-			if BIT(m_segment, 1)
+			else if (BIT(m_segment, 1))
 				m_monotone->set_unscaled_clock(659);
-			else
-			if BIT(m_segment, 2)
+			else if (BIT(m_segment, 2))
 				m_monotone->set_unscaled_clock(784);
-			else
-			if BIT(m_segment, 3)
+			else if (BIT(m_segment, 3))
 				m_monotone->set_unscaled_clock(988);
 			else
 				m_monotone->set_unscaled_clock(0);

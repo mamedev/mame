@@ -3007,7 +3007,7 @@ UINT32 cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap
 
 	if (m_cps_version == 1)
 	{
-		if BIT(m_game_config->bootleg_kludge, 7)
+		if (BIT(m_game_config->bootleg_kludge, 7))
 			cps1_build_palette(cps1_base(CPS1_PALETTE_BASE, m_palette_align));
 
 		cps1_render_layer(screen, bitmap, cliprect, l0, 0);

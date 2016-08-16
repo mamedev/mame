@@ -175,7 +175,7 @@ MC6845_UPDATE_ROW( alphatro_state::crtc_update_row )
 		bg = (palette) ? 8 : attr & 7; // amber or RGB
 		fg = (palette) ? 0 : (attr & 0x38) >> 3;
 
-		if BIT(attr, 7) // reverse video
+		if (BIT(attr, 7)) // reverse video
 		{
 			inv ^= 1;
 			chr &= 0x7f;

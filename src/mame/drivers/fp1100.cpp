@@ -141,7 +141,7 @@ MC6845_UPDATE_ROW( fp1100_state::fp1100_update_row )
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
 
-	if BIT(m_upd7801.porta, 4)
+	if (BIT(m_upd7801.porta, 4))
 	{ // green screen
 		for (x = 0; x < x_count; x++)
 		{
@@ -263,7 +263,7 @@ WRITE8_MEMBER( fp1100_state::colour_control_w )
 
 	m_col_border = data & 7;
 
-	if BIT(data, 7)
+	if (BIT(data, 7))
 		m_col_display = (data >> 4) & 7;
 	else
 		m_col_cursor = data >> 4;
@@ -310,7 +310,7 @@ WRITE8_MEMBER( fp1100_state::porta_w )
 {
 	m_upd7801.porta = data;
 
-	if BIT(data, 5)
+	if (BIT(data, 5))
 		memset(m_p_videoram, 0, 0xc000);
 }
 
@@ -340,7 +340,7 @@ d6 - Centronics strobe
 */
 WRITE8_MEMBER( fp1100_state::portc_w )
 {
-	if BIT(m_irq_mask, 4)
+	if (BIT(m_irq_mask, 4))
 		m_maincpu->set_input_line_and_vector(0, BIT(data, 3) ? CLEAR_LINE : HOLD_LINE, 0xf0);
 	if (LOG) printf("%s: PortC:%X\n",machine().describe_context(),data);
 	m_upd7801.portc = data;
@@ -596,7 +596,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( fp1100_state::timer_c )
 
 INTERRUPT_GEN_MEMBER(fp1100_state::fp1100_vblank_irq)
 {
-//  if BIT(m_irq_mask, 4)
+//  if (BIT(m_irq_mask, 4))
 //      m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xf8);
 }
 

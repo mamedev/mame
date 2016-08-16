@@ -228,7 +228,7 @@ WRITE8_MEMBER( play_5_state::port01_w )
 	{
 		m_disp_sw = 0;
 		for (UINT8 j = 0; j < 6; j++)
-			if BIT(m_kbdrow, j)
+			if (BIT(m_kbdrow, j))
 				for (UINT8 i = 0; i < 5; i++)
 				{
 					output().set_digit_value(j*10 + i, m_segment[i] & 0x7f);
@@ -246,7 +246,7 @@ WRITE8_MEMBER( play_5_state::port02_w )
 
 WRITE8_MEMBER( play_5_state::port03_w )
 {
-	if BIT(data, 6)
+	if (BIT(data, 6))
 		m_audiocpu->ef1_w(1); // inverted
 }
 
@@ -254,7 +254,7 @@ READ8_MEMBER( play_5_state::port04_r )
 {
 	if (m_kbdrow & 0x3f)
 		for (UINT8 i = 0; i < 6; i++)
-			if BIT(m_kbdrow, i)
+			if (BIT(m_kbdrow, i))
 				return m_keyboard[i]->read();
 
 	return 0;
@@ -263,9 +263,9 @@ READ8_MEMBER( play_5_state::port04_r )
 READ8_MEMBER( play_5_state::port05_r )
 {
 	UINT8 data = 0, key8 = m_keyboard[8]->read() & 0x0f;
-	if BIT(m_kbdrow, 0)
+	if (BIT(m_kbdrow, 0))
 		data |= m_keyboard[6]->read();
-	if BIT(m_kbdrow, 1)
+	if (BIT(m_kbdrow, 1))
 		data |= m_keyboard[7]->read();
 	return (data & 0xf0) | key8;
 }

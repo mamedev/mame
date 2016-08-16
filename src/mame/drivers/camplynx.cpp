@@ -315,7 +315,7 @@ d0 = read from bank 4 */
 	m_wbyte = BITSWAP8(data, 0, 0, 0, 0, 4, 5, 6, 7) & 0x0f; // rearrange to 1,2,3,4
 	// do reads
 	UINT8 rbyte = BITSWAP8(data, 0, 0, 0, 0, 0, 1, 2, 3) & 0x0f; // rearrange to 0,1,2,4
-	if BIT(rbyte, 1)
+	if (BIT(rbyte, 1))
 		rbyte &= 0x07; // remove 4 if 1 selected (AND gate in IC82)
 //printf("%s:%X:%X:%X\n", machine().describe_context(), data, rbyte, m_wbyte);
 	switch (rbyte)
@@ -569,7 +569,7 @@ INPUT_CHANGED_MEMBER( camplynx_state::brk_key )
 
 WRITE8_MEMBER( camplynx_state::bank1_w )
 {
-	if BIT(m_wbyte, 0)
+	if (BIT(m_wbyte, 0))
 		m_p_ram[offset+0x10000] = data;
 	if ((m_wbyte & 0x22) == 0x02)
 		m_p_ram[offset+0x20000] = data;
@@ -581,7 +581,7 @@ WRITE8_MEMBER( camplynx_state::bank1_w )
 
 WRITE8_MEMBER( camplynx_state::bank6_w )
 {
-	if BIT(m_wbyte, 0)
+	if (BIT(m_wbyte, 0))
 		m_p_ram[offset+0x10000] = data;
 
 	offset &= 0x5fff;
@@ -607,7 +607,7 @@ READ8_MEMBER( camplynx_state::port80_r )
 {
 	UINT8 data = ioport("LINE0")->read();
 	// when reading tape, bit 0 becomes cass-in signal
-	if BIT(m_port80, 1)
+	if (BIT(m_port80, 1))
 	{
 		data &= 0xfe;
 		data |= (m_cass->input() > +0.02) ? 0 : 1;
@@ -640,7 +640,7 @@ WRITE8_MEMBER( camplynx_state::port80_w )
 
 WRITE8_MEMBER( camplynx_state::port84_w )
 {
-	if BIT(m_port80, (m_is_128k) ? 3 : 1) // for 128k, bit 2 might be ok too
+	if (BIT(m_port80, (m_is_128k) ? 3 : 1)) // for 128k, bit 2 might be ok too
 	{
 		// Sine wave output
 		//float t = (float)(unsigned)data - 32.0f;
@@ -690,7 +690,7 @@ MC6845_UPDATE_ROW( camplynx_state::lynx48k_update_row )
 	UINT16 mem = ((ma << 2) + (ra << 5)) & 0x1fff;
 
 	// determine green bank
-	if BIT(m_port80, 4)
+	if (BIT(m_port80, 4))
 		green_bank = 0x38000+mem; // alt green
 	else
 		green_bank = 0x3c000+mem; // normal green
@@ -718,7 +718,7 @@ MC6845_UPDATE_ROW( camplynx_state::lynx128k_update_row )
 	UINT32 green_bank, *p = &bitmap.pix32(y);
 	UINT16 mem = ((ma << 2) + (ra << 6)) & 0x3fff;
 	// determine green bank
-	if BIT(m_port80, 4)
+	if (BIT(m_port80, 4))
 		green_bank = 0x2c000+mem; // alt green
 	else
 		green_bank = 0x28000+mem; // normal green

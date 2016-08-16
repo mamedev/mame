@@ -112,7 +112,7 @@ UINT32 c10_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 				//  if ((chr < 0x80) && (framecnt & 0x08))
 				//      chr |= 0x80;
 
-					if BIT(chr, 7)  // ignore attribute bytes
+					if (BIT(chr, 7)) // ignore attribute bytes
 						x--;
 					else
 						gfx = m_p_chargen[(chr<<4) | ra ];

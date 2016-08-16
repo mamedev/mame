@@ -187,7 +187,7 @@ WRITE8_MEMBER(pp01_state::pp01_8255_portb_w)
 
 WRITE8_MEMBER(pp01_state::pp01_8255_portc_w)
 {
-	if BIT(data, 4)
+	if (BIT(data, 4))
 		m_key_line = data & 0x0f;
 	else
 		m_speaker->level_w(BIT(data, 0));
