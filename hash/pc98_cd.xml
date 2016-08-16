@@ -1865,7 +1865,7 @@
 		<info name="alt_title" value="ランス4.1/4.2 ひんとDISK" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="ran4hint" sha1="9ffe2e1e6969413771fdcc102e87b7e21c327d0d" />
+				<disk name="ran4hint" sha1="6a166d1468e8790f23e361fd3750f7a03f6366fc" />
 			</diskarea>
 		</part>
 	</software>
