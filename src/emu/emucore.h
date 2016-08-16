@@ -254,7 +254,7 @@ template <typename T, typename U, typename... V> constexpr T bitswap(T val, U b,
 	return (BIT(val, b) << sizeof...(c)) | bitswap(val, c...);
 }
 
-// legacy names for backwards compatibility
+// explicit versions that check number of bit position arguments
 template <typename T, typename... U> constexpr T BITSWAP8(T val, U... b) { static_assert(sizeof...(b) == 8U, "wrong number of bits"); return bitswap(val, b...); }
 template <typename T, typename... U> constexpr T BITSWAP16(T val, U... b) { static_assert(sizeof...(b) == 16U, "wrong number of bits"); return bitswap(val, b...); }
 template <typename T, typename... U> constexpr T BITSWAP24(T val, U... b) { static_assert(sizeof...(b) == 24U, "wrong number of bits"); return bitswap(val, b...); }
