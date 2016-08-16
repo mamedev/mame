@@ -27,6 +27,7 @@
 #endif
 
 // standard C++ includes
+#include <cassert>
 #include <exception>
 #include <type_traits>
 #include <typeinfo>
@@ -254,10 +255,14 @@ template <typename T, typename U, typename... V> constexpr T bitswap(T val, U b,
 }
 
 // legacy names for backwards compatibility
-template <typename T, typename... U> constexpr T BITSWAP8(T val, U... b) { return bitswap(val, b...); }
-template <typename T, typename... U> constexpr T BITSWAP16(T val, U... b) { return bitswap(val, b...); }
-template <typename T, typename... U> constexpr T BITSWAP24(T val, U... b) { return bitswap(val, b...); }
-template <typename T, typename... U> constexpr T BITSWAP32(T val, U... b) { return bitswap(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP8(T val, U... b) { static_assert(sizeof...(b) == 8U, "wrong number of bits"); return bitswap(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP16(T val, U... b) { static_assert(sizeof...(b) == 16U, "wrong number of bits"); return bitswap(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP24(T val, U... b) { static_assert(sizeof...(b) == 24U, "wrong number of bits"); return bitswap(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP32(T val, U... b) { static_assert(sizeof...(b) == 32U, "wrong number of bits"); return bitswap(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP40(T val, U... b) { static_assert(sizeof...(b) == 40U, "wrong number of bits"); return bitswap(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP48(T val, U... b) { static_assert(sizeof...(b) == 48U, "wrong number of bits"); return bitswap(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP56(T val, U... b) { static_assert(sizeof...(b) == 56U, "wrong number of bits"); return bitswap(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP64(T val, U... b) { static_assert(sizeof...(b) == 64U, "wrong number of bits"); return bitswap(val, b...); }
 
 
 
