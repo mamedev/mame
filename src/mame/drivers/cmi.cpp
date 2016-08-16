@@ -2436,7 +2436,7 @@ WRITE16_MEMBER( cmi_state::cmi_iix_update_dp3 )
 WRITE_LINE_MEMBER( cmi_state::cmi10_u21_cb2_w )
 {
 	// if 0
-	state = state;
+//	state = state;
 }
 
 
