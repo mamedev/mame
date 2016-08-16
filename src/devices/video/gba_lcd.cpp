@@ -15,9 +15,7 @@
 
 #include "gba_lcd.h"
 
-#include "includes/gba.h"
-
-#define REG_BASE    0x000
+#include "includes/gba.h" // this is a dependency from src/devices to src/mame which is very bad and should be fixed
 
 /* LCD I/O Registers */
 #define DISPCNT     HWLO(0x000)  /* 0x4000000  2  R/W   LCD Control */

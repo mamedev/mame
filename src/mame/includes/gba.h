@@ -9,18 +9,6 @@
 #include "sound/dac.h"
 #include "video/gba_lcd.h"
 
-#define WORD(x)              (m_regs[(x - REG_BASE) / 4])              /* 32-bit Register */   
-#define HWHI(x)              (m_regs[(x - REG_BASE) / 4] >> 16)        /* 16-bit Register, Upper Half-Word */
-#define HWLO(x)              (m_regs[(x - REG_BASE) / 4] & 0x0000ffff) /* 16-bit Register, Lower Half-Word */
-
-#define WORD_SET(x, y)       (m_regs[(x - REG_BASE) / 4] |= (y))
-#define HWHI_SET(x, y)      ((m_regs[(x - REG_BASE) / 4] |= (y << 16)))
-#define HWLO_SET(x, y)       (m_regs[(x - REG_BASE) / 4] |= (y))
-
-#define WORD_RESET(x, y)     (m_regs[(x - REG_BASE) / 4] &= ~(y))
-#define HWHI_RESET(x, y)    ((m_regs[(x - REG_BASE) / 4] &= ~(y << 16)))
-#define HWLO_RESET(x, y)     (m_regs[(x - REG_BASE) / 4] &= ~(y))
-
 #define INT_VBL                 0x0001
 #define INT_HBL                 0x0002
 #define INT_VCNT                0x0004
@@ -37,7 +25,7 @@
 #define INT_GAMEPAK             0x2000
 
 /* driver state */
-class gba_state : public driver_device
+class gba_state : public driver_device, protected gba_registers<(0x400 - 0x060) / 4, 0x060>
 {
 public:
 	gba_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -74,8 +62,6 @@ public:
 	void request_dma(dma_start_timing start);
 	void dma_exec(int ch);
 	void audio_tick(int ref);
-
-	UINT32 m_regs[(0x400 - 0x60) / 4];
 
 	// DMA
 	emu_timer *m_dma_timer[4];

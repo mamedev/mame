@@ -18,6 +18,7 @@
 #include "emu.h"
 
 
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -38,8 +39,33 @@ extern const device_type GBA_LCD;
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class gba_lcd_device :  public device_t,
-						public device_video_interface
+template <unsigned COUNT, unsigned BASE>
+class gba_registers
+{
+protected:
+	static constexpr unsigned REG_BASE = BASE;
+
+	UINT32 &WORD(unsigned x) { return m_regs[(x - REG_BASE) / 4]; }             // 32-bit Register
+	const UINT32 &WORD(unsigned x) const { return m_regs[(x - REG_BASE) / 4]; } // 32-bit Register
+	UINT16 HWHI(unsigned x) const { return UINT16(WORD(x) >> 16); }             // 16-bit Register, Upper Half-Word
+	UINT16 HWLO(unsigned x) const { return UINT16(WORD(x)); }                   // 16-bit Register, Lower Half-Word
+
+	UINT32 &WORD_SET(unsigned x, UINT32 y) { return WORD(x) |= y; }
+	UINT32 &HWHI_SET(unsigned x, UINT16 y) { return WORD(x) |= UINT32(y) << 16; }
+	UINT32 &HWLO_SET(unsigned x, UINT16 y) { return WORD(x) |= UINT32(y); }
+
+	UINT32 &WORD_RESET(unsigned x, UINT32 y) { return WORD(x) &= ~y; }
+	UINT32 &HWHI_RESET(unsigned x, UINT16 y) { return WORD(x) &= ~(UINT32(y) << 16); }
+	UINT32 &HWLO_RESET(unsigned x, UINT16 y) { return WORD(x) &= ~UINT32(y); }
+
+	UINT32 m_regs[COUNT];
+};
+
+
+class gba_lcd_device
+		: public device_t
+		, public device_video_interface
+		, protected gba_registers<0x060 / 4, 0x000>
 {
 public:
 	gba_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -82,8 +108,6 @@ private:
 	emu_timer *m_scan_timer, *m_hbl_timer;
 
 	bitmap_ind16 m_bitmap;
-
-	UINT32 m_regs[0x60 / 4];
 
 	UINT8  m_windowOn;
 	UINT8  m_fxOn;

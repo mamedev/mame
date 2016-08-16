@@ -19,8 +19,6 @@
 #include "bus/gba/rom.h"
 #include "softlist.h"
 
-#define REG_BASE    0x060
-
 /* Sound Registers */
 #define SOUNDCNT_L  HWLO(0x080)  /* 0x4000080  2  R/W   Control Stereo/Volume/Enable */
 #define SOUNDCNT_H  HWHI(0x080)  /* 0x4000082  2  R/W   Control Mixing/DMA Control */
