@@ -20,6 +20,7 @@
 #include "modules/lib/osdobj_common.h"
 #include "debug_module.h"
 #include "modules/osdmodule.h"
+#include "zippath.h"
 
 class debug_area
 {
@@ -102,7 +103,11 @@ public:
 		m_key_char(0),
 		m_hide(false),
 		m_win_count(0),
-		m_initialised(false)
+		m_has_images(false),
+		m_initialised(false),
+		m_filelist_refresh(false),
+		m_mount_open(false),
+		m_selected_file(nullptr)
 	{
 	}
 
@@ -116,12 +121,27 @@ public:
 	virtual void debugger_update() override;
 
 private:
+	enum file_entry_type
+	{
+		DRIVE,
+		DIRECTORY,
+		FILE
+	};
+
+	struct file_entry
+	{
+		file_entry_type type;
+		std::string basename;
+		std::string fullpath;
+	};
+
 	void handle_mouse();
 	void handle_mouse_views();
 	void handle_keys();
 	void handle_keys_views();
 	void handle_console(running_machine* machine);
 	void update();
+	void draw_images_menu();
 	void draw_console();
 	void add_disasm(int id);
 	void add_memory(int id);
@@ -133,6 +153,8 @@ private:
 	void draw_bpoints(debug_area* view_ptr, bool* opened);
 	void draw_log(debug_area* view_ptr, bool* opened);
 	void draw_view(debug_area* view_ptr, bool exp_change);
+	void draw_mount_dialog(const char* label);
+	void mount_image();
 	void update_cpu_view(device_t* device);
 	static bool get_view_source(void* data, int idx, const char** out_text);
 	static int history_set(ImGuiTextEditCallbackData* data);
@@ -150,7 +172,14 @@ private:
 	UINT8            m_key_char;
 	bool             m_hide;
 	int              m_win_count;  // number of active windows, does not decrease, used to ID individual windows
+	bool             m_has_images; // true if current system has any image devices
 	bool             m_initialised;  // true after initial views are created
+	device_image_interface* m_dialog_image;
+	bool             m_filelist_refresh;  // set to true to refresh mount/create dialog file lists
+	bool             m_mount_open;  // true when opening a mount dialog
+	std::vector<file_entry> m_filelist;
+	file_entry*      m_selected_file;
+	char             m_path[1024];  // path text field buffer
 };
 
 // globals
@@ -902,6 +931,163 @@ void debug_imgui::add_memory(int id)
 	view_list_add(new_view);
 }
 
+void debug_imgui::mount_image()
+{
+	if(m_selected_file != nullptr)
+	{
+		osd_file::error err;
+		switch(m_selected_file->type)
+		{
+			case file_entry_type::DRIVE:
+			case file_entry_type::DIRECTORY:
+				err = util::zippath_opendir(m_selected_file->fullpath.c_str(), nullptr);
+				if(err == osd_file::error::NONE)
+				{
+					m_filelist_refresh = true;
+					strcpy(m_path,m_selected_file->fullpath.c_str());
+				}
+				break;
+			case file_entry_type::FILE:
+				m_dialog_image->load(m_selected_file->fullpath.c_str());
+				ImGui::CloseCurrentPopup();
+				break;
+		}
+	}
+}
+
+void debug_imgui::draw_images_menu()
+{
+	if(ImGui::BeginMenu("Images"))
+	{
+		for (device_image_interface &img : image_interface_iterator(m_machine->root_device()))
+		{
+			std::string str = string_format("%s : %s",img.device().name(),img.exists() ? img.filename() : "[Empty slot]");
+			if(ImGui::BeginMenu(str.c_str())) 
+			{
+				if(ImGui::MenuItem("Mount...")) 
+				{
+					m_dialog_image = &img;
+					m_filelist_refresh = true;
+					m_mount_open = true;
+					m_selected_file = nullptr;  // start with no file selected
+					if (img.exists())  // use image path if one is already mounted
+						strcpy(m_path,util::zippath_parent(m_dialog_image->filename()).c_str());
+					else
+						strcpy(m_path,img.working_directory().c_str());
+				}
+				if(ImGui::MenuItem("Unmount"))
+					img.unload();
+				ImGui::Separator();
+				if(img.is_creatable())
+					if(ImGui::MenuItem("Create...",NULL,false,false)) {}
+				// TODO: Cassette controls
+				ImGui::EndMenu();
+			}
+		}
+		ImGui::EndMenu();
+	}
+}
+
+void debug_imgui::draw_mount_dialog(const char* label)
+{
+	int x;
+	
+	// render dialog
+	ImGui::SetNextWindowContentWidth(200.0f);
+	if(ImGui::BeginPopupModal(label,NULL,ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		if(m_filelist_refresh)
+		{
+			osd_file::error err;
+			util::zippath_directory* dir = nullptr;
+			const char *volume_name;
+			const osd::directory::entry *dirent;
+			
+			// todo
+			m_filelist.clear();
+			m_filelist_refresh = false;
+
+			err = util::zippath_opendir(m_path,&dir);
+			if(err == osd_file::error::NONE)
+			{
+				x = 0;
+				// add drives
+				while((volume_name = osd_get_volume_name(x))!=nullptr)
+				{
+					file_entry temp;
+					temp.type = file_entry_type::DRIVE;
+					temp.basename = std::string(volume_name);
+					temp.fullpath = std::string(volume_name);
+					m_filelist.emplace_back(std::move(temp));
+					x++;
+				}
+				while((dirent = util::zippath_readdir(dir)) != nullptr)
+				{
+					file_entry temp;
+					switch(dirent->type)
+					{
+						case osd::directory::entry::entry_type::FILE:
+							temp.type = file_entry_type::FILE;
+							break;
+						case osd::directory::entry::entry_type::DIR:
+							temp.type = file_entry_type::DIRECTORY;
+							break;
+						default:
+							break;
+					}
+					temp.basename = std::string(dirent->name);
+					temp.fullpath = util::zippath_combine(m_path,dirent->name);
+					m_filelist.emplace_back(std::move(temp));
+				}
+			}
+			if (dir != nullptr)
+				util::zippath_closedir(dir);
+		}
+		if(ImGui::InputText("##mountpath",m_path,1024,ImGuiInputTextFlags_EnterReturnsTrue))
+		{
+			m_filelist_refresh = true;
+		}
+		ImGui::Separator();
+		{
+			ImGui::ListBoxHeader("##filelist",m_filelist.size(),15);
+			for(std::vector<file_entry>::iterator f = m_filelist.begin();f != m_filelist.end();++f)
+			{
+				std::string txt_name;
+				bool sel = false;
+				switch((*f).type)
+				{
+					case file_entry_type::DRIVE:
+						txt_name.assign("[DRIVE] ");
+						break;
+					case file_entry_type::DIRECTORY:
+						txt_name.assign("[DIR]   ");
+						break;
+					case file_entry_type::FILE:
+						txt_name.assign("[FILE]  ");
+						break;
+				}
+				txt_name.append((*f).basename);
+				if(m_selected_file == &(*f))
+					sel = true;
+				if(ImGui::Selectable(txt_name.c_str(),sel,ImGuiSelectableFlags_AllowDoubleClick))
+				{
+					m_selected_file = &(*f);
+					if(ImGui::IsMouseDoubleClicked(0))
+						mount_image();
+				}
+			}
+			ImGui::ListBoxFooter();
+		}
+		ImGui::Separator();
+		if(ImGui::Button("Cancel##mount"))
+			ImGui::CloseCurrentPopup();
+		ImGui::SameLine();
+		if(ImGui::Button("OK##mount"))
+			mount_image();
+		ImGui::EndPopup();
+	}
+}
+
 void debug_imgui::draw_console()
 {
 	rgb_t bg, fg;
@@ -979,6 +1165,8 @@ void debug_imgui::draw_console()
 				}
 				ImGui::EndMenu();
 			}
+			if(m_has_images)
+				draw_images_menu();
 			ImGui::EndMenuBar();
 		}
 
@@ -1011,6 +1199,12 @@ void debug_imgui::draw_console()
 			view_main_console->exec_cmd = true;
 		if ((ImGui::IsRootWindowOrAnyChildFocused() && !ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked(0)))
 			ImGui::SetKeyboardFocusHere(-1); // Auto focus previous widget
+		if(m_mount_open)
+		{
+			ImGui::OpenPopup("Mount Image");
+			m_mount_open = false;
+		}
+		draw_mount_dialog("Mount Image");  // draw mount image dialog if open
 		ImGui::PopItemWidth();
 		ImGui::EndChild();
 		ImGui::End();
@@ -1077,16 +1271,22 @@ void debug_imgui::update()
 		view_list_remove(to_delete);
 		global_free(to_delete);
 	}
+	
 	ImGui::PopStyleColor(12);
 }
 
 void debug_imgui::init_debugger(running_machine &machine)
 {
-		ImGuiIO& io = ImGui::GetIO();
+	ImGuiIO& io = ImGui::GetIO();
 	m_machine = &machine;
 	m_mouse_button = false;
 	if(strcmp(downcast<osd_options &>(m_machine->options()).video(),"bgfx") != 0)
 		fatalerror("Error: ImGui debugger requires the BGFX renderer.\n");
+
+	// check for any image devices (cassette, floppy, etc...)
+	image_interface_iterator iter(m_machine->root_device());
+	if (iter.first() != nullptr)
+		m_has_images = true;
 
 	// map keys to ImGui inputs
 	io.KeyMap[ImGuiKey_A] = ITEM_ID_A;
