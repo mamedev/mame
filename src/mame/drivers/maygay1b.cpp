@@ -76,6 +76,9 @@
 
 #include "maygay1b.lh"
 
+// not yet working
+//#define USE_MCU
+
 ///////////////////////////////////////////////////////////////////////////
 // called if board is reset ///////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -417,10 +420,17 @@ static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
 	AM_RANGE(0x2030, 0x2030) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w )
 	AM_RANGE(0x2031, 0x2031) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
 
+
+#ifdef USE_MCU
+	//8051
+	AM_RANGE(0x2040, 0x2040) AM_WRITE( main_to_mcu_0_w )
+	AM_RANGE(0x2041, 0x2041) AM_WRITE( main_to_mcu_1_w )
+#else
 	//8051
 	AM_RANGE(0x2040, 0x2040) AM_DEVREADWRITE("i8279_2", i8279_device, data_r, data_w )
 	AM_RANGE(0x2041, 0x2041) AM_DEVREADWRITE("i8279_2", i8279_device, status_r, cmd_w)
 //  AM_RANGE(0x2050, 0x2050)// SCAN on M1B
+#endif
 
 	AM_RANGE(0x2070, 0x207f) AM_DEVREADWRITE("duart68681", mc68681_device, read, write )
 
@@ -447,51 +457,6 @@ static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
 
 ADDRESS_MAP_END
 
-
-
-WRITE8_MEMBER(maygay1b_state::mcu_port0_w)
-{
-	logerror("%s: mcu_port0_w %02x\n",machine().describe_context(),data);
-}
-	
-WRITE8_MEMBER(maygay1b_state::mcu_port1_w)
-{
-	logerror("%s: mcu_port1_w %02x\n",machine().describe_context(),data);
-}
-	
-WRITE8_MEMBER(maygay1b_state::mcu_port2_w)
-{
-	logerror("%s: mcu_port2_w %02x\n",machine().describe_context(),data);
-}
-	
-WRITE8_MEMBER(maygay1b_state::mcu_port3_w)
-{
-	logerror("%s: mcu_port3_w %02x\n",machine().describe_context(),data);
-}
-	
-
-READ8_MEMBER(maygay1b_state::mcu_port0_r)
-{
-	logerror("%s: mcu_port0_r\n", machine().describe_context());
-	return rand();
-}
-	
-READ8_MEMBER(maygay1b_state::mcu_port1_r)
-{
-	logerror("%s: mcu_port1_r\n", machine().describe_context());
-	return rand();
-}
-
-static ADDRESS_MAP_START( maygay_mcu_map, AS_PROGRAM, 8, maygay1b_state )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( maygay_mcu_io, AS_IO, 8, maygay1b_state )
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE( mcu_port0_r, mcu_port0_w )
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE( mcu_port1_r, mcu_port1_w )
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE( mcu_port2_w )
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_WRITE( mcu_port3_w )
-ADDRESS_MAP_END
 
 
 /*************************************************
@@ -543,10 +508,16 @@ static ADDRESS_MAP_START( m1_nec_memmap, AS_PROGRAM, 8, maygay1b_state )
 	AM_RANGE(0x2030, 0x2030) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w )
 	AM_RANGE(0x2031, 0x2031) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
 
+#ifdef USE_MCU
+	//8051
+	AM_RANGE(0x2040, 0x2040) AM_WRITE( main_to_mcu_0_w )
+	AM_RANGE(0x2041, 0x2041) AM_WRITE( main_to_mcu_1_w )
+#else
 	//8051
 	AM_RANGE(0x2040, 0x2040) AM_DEVREADWRITE("i8279_2", i8279_device, data_r, data_w )
 	AM_RANGE(0x2041, 0x2041) AM_DEVREADWRITE("i8279_2", i8279_device, status_r, cmd_w)
 //  AM_RANGE(0x2050, 0x2050)// SCAN on M1B
+#endif
 
 	AM_RANGE(0x2070, 0x207f) AM_DEVREADWRITE("duart68681", mc68681_device, read, write )
 
@@ -618,6 +589,11 @@ READ8_MEMBER( maygay1b_state::kbd_r )
 	return (m_kbd_ports[m_lamp_strobe&0x07])->read();
 }
 
+WRITE8_MEMBER( maygay1b_state::scanlines_2_w )
+{
+	m_lamp_strobe2 = data;
+}
+
 WRITE8_MEMBER( maygay1b_state::lamp_data_2_w )
 {
 	// TODO: THIS FUNCTION IS NEVER CALLED!  So we are missing the second half of the lamp matrix
@@ -640,6 +616,113 @@ WRITE8_MEMBER( maygay1b_state::lamp_data_2_w )
 
 }
 
+// MCU hookup not yet working
+
+WRITE8_MEMBER(maygay1b_state::main_to_mcu_0_w)
+{
+	// we trigger the 2nd, more complex interrupt on writes here
+
+	m_main_to_mcu = data;
+	m_mcu->set_input_line(1, HOLD_LINE);
+}
+
+
+WRITE8_MEMBER(maygay1b_state::main_to_mcu_1_w)
+{
+	// we trigger the 1st interrupt on writes here
+	// the 1st interrupt (03h) is a very simple one
+	// it stores the value written as long at bit 0x40
+	// isn't set.
+	//
+	// this is used as an index, so is probably the
+	// row data written with
+	// [:maincpu] ':maincpu' (F2CF): unmapped program memory write to 2041 = 8x & FF   ( m1glad )
+	m_main_to_mcu = data;
+	m_mcu->set_input_line(0, HOLD_LINE);
+}
+
+
+WRITE8_MEMBER(maygay1b_state::mcu_port0_w)
+{
+#ifdef USE_MCU
+// only during startup
+//	logerror("%s: mcu_port0_w %02x\n",machine().describe_context(),data);
+#endif
+}
+	
+WRITE8_MEMBER(maygay1b_state::mcu_port1_w)
+{
+#ifdef USE_MCU
+	int bit_offset;
+	for (int i = 0; i < 8; i++)
+	{
+		if (i < 4)
+		{
+			bit_offset = i + 4;
+		}
+		else
+		{
+			bit_offset = i - 4;
+		}
+		output().set_lamp_value((8 * m_lamp_strobe) + i + 128, ((data  & (1 << bit_offset)) != 0));
+	}
+#endif
+}
+	
+WRITE8_MEMBER(maygay1b_state::mcu_port2_w)
+{
+#ifdef USE_MCU
+// only during startup
+	logerror("%s: mcu_port2_w %02x\n",machine().describe_context(),data);
+#endif
+}
+	
+WRITE8_MEMBER(maygay1b_state::mcu_port3_w)
+{
+#ifdef USE_MCU
+// only during startup
+	logerror("%s: mcu_port3_w %02x\n",machine().describe_context(),data);
+#endif
+}
+
+READ8_MEMBER(maygay1b_state::mcu_port0_r)
+{
+	UINT8 ret = m_lamp_strobe;
+#ifdef USE_MCU
+	// the MCU code checks to see if the input from this port is stable in
+	// the main loop
+	// it looks like it needs to read the strobe
+//	logerror("%s: mcu_port0_r returning %02x\n", machine().describe_context(), ret);
+#endif
+	return ret;
+
+}
+	
+
+READ8_MEMBER(maygay1b_state::mcu_port2_r)
+{
+	// this is read in BOTH the external interrupts
+	// it seems that both the writes from the main cpu go here
+	// and the MCU knows which is is based on the interrupt level
+	UINT8 ret = m_main_to_mcu;
+#ifdef USE_MCU
+	logerror("%s: mcu_port2_r returning %02x\n", machine().describe_context(), ret);
+#endif
+	return ret;
+}
+
+static ADDRESS_MAP_START( maygay_mcu_map, AS_PROGRAM, 8, maygay1b_state )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( maygay_mcu_io, AS_IO, 8, maygay1b_state )
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE( mcu_port0_r, mcu_port0_w )
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE( mcu_port1_w )
+	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE( mcu_port2_r, mcu_port2_w )
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_WRITE( mcu_port3_w )
+ADDRESS_MAP_END
+
+
 // machine driver for maygay m1 board /////////////////////////////////
 
 MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
@@ -650,7 +733,6 @@ MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 	MCFG_CPU_ADD("mcu", I80C51, 2000000) //  EP840034.A-P-80C51AVW
 	MCFG_CPU_PROGRAM_MAP(maygay_mcu_map)
 	MCFG_CPU_IO_MAP(maygay_mcu_io)
-//	MCFG_MCS51_SERIAL_TX_CB(WRITE8(maygay1b_state, mcs51_tx_callback))
 
 
 	MCFG_MC68681_ADD("duart68681", M1_DUART_CLOCK)
@@ -684,9 +766,12 @@ MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 	MCFG_I8279_OUT_DISP_CB(WRITE8(maygay1b_state, lamp_data_w))     // display A&B
 	MCFG_I8279_IN_RL_CB(READ8(maygay1b_state, kbd_r))           // kbd RL lines
 	
-	// there is no 2nd u8279!
+#ifndef USE_MCU
+	// there is no 2nd i8279, the 8051 handles this task!
 	MCFG_DEVICE_ADD("i8279_2", I8279, M1_MASTER_CLOCK/4)        // unknown clock
+	MCFG_I8279_OUT_SL_CB(WRITE8(maygay1b_state, scanlines_2_w))   // scan SL lines
 	MCFG_I8279_OUT_DISP_CB(WRITE8(maygay1b_state, lamp_data_2_w))       // display A&B
+#endif
 
 	MCFG_STARPOINT_48STEP_ADD("reel0")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel0_optic_cb))
