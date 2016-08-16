@@ -97,7 +97,7 @@ private:
 };
 
 vgmplay_device::vgmplay_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	cpu_device(mconfig, VGMPLAY, "VGM Player engine", tag, owner, clock, "vgmplay", __FILE__),
+	cpu_device(mconfig, VGMPLAY, "VGM Player engine", tag, owner, clock, "vgmplay_core", __FILE__),
 	m_file_config("file", ENDIANNESS_LITTLE, 8, 32),
 	m_io_config("io", ENDIANNESS_LITTLE, 8, 32)
 {
