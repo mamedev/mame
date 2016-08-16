@@ -54,11 +54,7 @@ private:
 		std::unique_ptr<UINT8[]> data;
 
 		rom_block(rom_block &&) = default;
-		rom_block(offs_t start, offs_t end, UINT8 d[]) {
-			start_address = start;
-			end_address = end;
-			data = d;
-		}
+		rom_block(offs_t start, offs_t end, std::unique_ptr<UINT8[]> &&d) : start_address(start), end_address(end), data(std::move(d)) {}
 	};
 
 	enum { RESET, RUN, DONE };
@@ -70,8 +66,8 @@ private:
 
 	UINT32 m_pc;	
 
-	std::list<rom_block> m_rom_blocks[0x80];
-	UINT32 m_rom_masks[0x80];
+	std::list<rom_block> m_rom_blocks[0x40];
+	UINT32 m_rom_masks[0x40];
 
 	UINT8 rom_r(UINT8 type, offs_t offset);
 	UINT32 handle_data_block(UINT32 address);
@@ -143,7 +139,7 @@ UINT32 vgmplay_device::execute_input_lines() const
 
 void vgmplay_device::blocks_clear()
 {
-	for(int i = 0; i < 128; i++) {
+	for(int i = 0; i < 0x40; i++) {
 		m_rom_blocks[i].clear();
 		m_rom_masks[i] = 0;
 	}
@@ -153,13 +149,13 @@ UINT32 vgmplay_device::handle_data_block(UINT32 address)
 {
 	UINT32 size = m_file->read_dword(m_pc+3);
 	UINT8 type = m_file->read_byte(m_pc+2);
-	if(type >= 0x80) {
+	if(type >= 0x80 && type < 0xc0) {
 		UINT32 rs = m_file->read_dword(m_pc+7);
 		UINT32 start = m_file->read_dword(m_pc+11);
-		UINT8 *block = new UINT8[size - 8];
+		std::unique_ptr<UINT8[]> block = std::make_unique<UINT8[]>(size - 8);
 		for(UINT32 i=0; i<size-8; i++)
 			block[i] = m_file->read_byte(m_pc+15+i);
-		m_rom_blocks[type - 0x80].emplace_front(start, start+size-9, block);
+		m_rom_blocks[type - 0x80].emplace_front(start, start+size-9, std::move(block));
 
 		UINT32 mask = rs-1;
 		mask |= mask >> 1;
@@ -610,7 +606,10 @@ offs_t vgmplay_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *
 
 UINT8 vgmplay_device::rom_r(UINT8 type, offs_t offset)
 {
-	logerror("rom_r %02x, %08x\n", type, offset);
+	for(const auto &b : m_rom_blocks[type - 0x80])
+		if(offset >= b.start_address && offset <= b.end_address)
+			return b.data[offset - b.start_address];
+	logerror("Unmapped rom read, type %02x, offset %x\n", type, offset);
 	return 0;
 }
 
