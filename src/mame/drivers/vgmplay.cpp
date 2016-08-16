@@ -12,6 +12,7 @@
 
 #include "sound/2612intf.h"
 #include "sound/ym2151.h"
+#include "sound/ym2413.h"
 #include "sound/segapcm.h"
 
 class vgmplay_device : public cpu_device
@@ -21,6 +22,7 @@ public:
 		REG_SIZE     = 0x00000000,
 		A_YM2612     = 0x00000010,
 		A_YM2151     = 0x00000020,
+		A_YM2413     = 0x00000030,
 		A_SEGAPCM    = 0x00001000,
 	};
 
@@ -91,6 +93,7 @@ private:
 	required_device<bitbanger_device> m_file;
 	required_device<ym2612_device> m_ym2612;
 	required_device<ym2151_device> m_ym2151;
+	required_device<ym2413_device> m_ym2413;
 	required_device<segapcm_device> m_segapcm;
 
 	UINT32 r32(int offset) const;
@@ -198,6 +201,12 @@ void vgmplay_device::execute_run()
 			case 0x50:
 				logerror("ignored psg\n");
 				m_pc += 2;
+				break;
+
+			case 0x51:
+				m_io->write_byte(A_YM2413+0, m_file->read_byte(m_pc+1));
+				m_io->write_byte(A_YM2413+1, m_file->read_byte(m_pc+2));
+				m_pc += 3;
 				break;
 
 			case 0x52:
@@ -623,6 +632,7 @@ vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, co
 	m_file(*this, "file"),
 	m_ym2612(*this, "ym2612"),
 	m_ym2151(*this, "ym2151"),
+	m_ym2413(*this, "ym2413"),
 	m_segapcm(*this, "segapcm")
 {
 }
@@ -689,7 +699,7 @@ void vgmplay_state::machine_start()
 		if(r32(0x0c))
 			logerror("Warning: file requests an unsupported SN76489\n");
 		if(r32(0x10))
-			logerror("Warning: file requests an unsupported YM2413\n");
+			m_ym2413->set_unscaled_clock(r32(0x10));
 		if(version <= 0x101 && r32(0x0c)) {
 			m_ym2612->set_unscaled_clock(r32(0x0c));
 			m_ym2151->set_unscaled_clock(r32(0x0c));
@@ -753,8 +763,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( soundchips_map, AS_IO, 8, vgmplay_state )
 	AM_RANGE(vgmplay_device::REG_SIZE,  vgmplay_device::REG_SIZE+3)      AM_READ(file_size_r)
-	AM_RANGE(vgmplay_device::A_YM2612,  vgmplay_device::A_YM2612+3)      AM_DEVREADWRITE("ym2612",  ym2612_device, read, write)
-	AM_RANGE(vgmplay_device::A_YM2151,  vgmplay_device::A_YM2151+3)      AM_DEVREADWRITE("ym2151",  ym2151_device, read, write)
+	AM_RANGE(vgmplay_device::A_YM2612,  vgmplay_device::A_YM2612+3)      AM_DEVREADWRITE("ym2612",  ym2612_device,  read, write)
+	AM_RANGE(vgmplay_device::A_YM2151,  vgmplay_device::A_YM2151+1)      AM_DEVREADWRITE("ym2151",  ym2151_device,  read, write)
+	AM_RANGE(vgmplay_device::A_YM2413,  vgmplay_device::A_YM2413+1)      AM_DEVWRITE    ("ym2413",  ym2413_device,  write)
 	AM_RANGE(vgmplay_device::A_SEGAPCM, vgmplay_device::A_SEGAPCM+0x7ff) AM_DEVREADWRITE("segapcm", segapcm_device, sega_pcm_r, sega_pcm_w)
 ADDRESS_MAP_END
 
@@ -778,6 +789,10 @@ static MACHINE_CONFIG_START( vgmplay, vgmplay_state )
 	MCFG_SOUND_ADD("ym2151", YM2151, 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
+
+	MCFG_SOUND_ADD("ym2413", YM2413, 3579545)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1)
 
 	MCFG_SOUND_ADD("segapcm", SEGAPCM, 4000000)
 	MCFG_SEGAPCM_BANK(BANK_512) // Should be configurable for yboard...
