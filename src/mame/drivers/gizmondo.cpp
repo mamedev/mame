@@ -39,7 +39,6 @@ SYSINTR_GPS      = INT_EINT3, INT_EINT8_23 (EINT18)
 #define VERBOSE_LEVEL ( 0 )
 
 
-#define BIT(x,n) (((x)>>(n))&1)
 #define BITS(x,m,n) (((x)>>(n))&(((UINT32)1<<((m)-(n)+1))-1))
 
 class gizmondo_state : public driver_device

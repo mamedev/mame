@@ -26,7 +26,6 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, c
 	}
 }
 
-#define BIT(x,n) (((x)>>(n))&1)
 #define BITS(x,m,n) (((x)>>(n))&(((UINT32)1<<((m)-(n)+1))-1))
 
 #define GF4500_FRAMEBUF_OFFSET 0x20000
