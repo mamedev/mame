@@ -96,6 +96,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(reel4_optic_cb) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
 	DECLARE_WRITE_LINE_MEMBER(reel5_optic_cb) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
 	DECLARE_WRITE8_MEMBER(scanlines_w);
+	DECLARE_WRITE8_MEMBER(scanlines_2_w);
 	DECLARE_WRITE8_MEMBER(lamp_data_w);
 	DECLARE_WRITE8_MEMBER(lamp_data_2_w);
 	DECLARE_READ8_MEMBER(kbd_r);
@@ -125,7 +126,13 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_port2_w);
 	DECLARE_WRITE8_MEMBER(mcu_port3_w);
 	DECLARE_READ8_MEMBER(mcu_port0_r);
-	DECLARE_READ8_MEMBER(mcu_port1_r);
+	DECLARE_READ8_MEMBER(mcu_port2_r);
+
+	DECLARE_WRITE8_MEMBER(main_to_mcu_0_w);
+	DECLARE_WRITE8_MEMBER(main_to_mcu_1_w);
+
+	UINT8 m_main_to_mcu;
+
 	DECLARE_DRIVER_INIT(m1);
 	DECLARE_DRIVER_INIT(m1common);
 	DECLARE_DRIVER_INIT(m1nec);
