@@ -1044,10 +1044,13 @@ dinoeggs                        //
 mystcast                        //
 mystcasta                       //
 pstlpkr                         //
+pstlpkr1                        //
 punchy                          //
+punchy3                         //
 usafootb                        //
 wrldtour                        //
 wrldtour2                       //
+wrldtour3                       //
 
 @source:amaticmg.cpp
 am_mg24                         // (c) 2000 Amatic
@@ -16501,6 +16504,7 @@ kinstp                          // (c) 1994 Rare
 
 @source:kissproto.cpp
 kissp                           //
+kissp2                          //
 
 @source:klax.cpp
 klax                            // 136075           (c) 1989
@@ -30063,6 +30067,7 @@ superpet                        //
 
 @source:peyper.cpp
 gamatros                        //
+hangonp                         //
 nemesisp                        //
 odin                            //
 odin_dlx                        //
@@ -33294,7 +33299,10 @@ slapshot                        // D71 (c) 1994 Taito Corporation (Japan)
 slc1                            //
 
 @source:sleic.cpp
+bikerace                        //
+bikerace2                       //
 sleicpin                        //
+iomoon                          //
 
 @source:slicer.cpp
 slicer                          // 1983 Slicer Computers
@@ -34935,6 +34943,7 @@ tecjmon                         // Talking Electronics Computer
 
 @source:techno.cpp
 xforce                          //
+spcteam                         //
 
 @source:tecmo.cpp
 backfirt                        // bootleg [(c) 1988 Tecmo]

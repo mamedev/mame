@@ -14,9 +14,9 @@
   Wolf Man (Peyper)
   Nemesis (Peyper)
   Odisea Paris-Dakar (Peyper)
+  Hang-On (Sonic)
 
   Others not emulated (need roms):
-  Hang-On (Sonic)
   Night Fever (Sonic)
   Storm (Sonic)
 
@@ -795,8 +795,12 @@ ROM_END
 /*-------------------------------------------------------------------
 / Hang-On (1988)
 /-------------------------------------------------------------------*/
-
-
+ROM_START(hangonp)
+	ROM_REGION(0x6000, "maincpu", 0)
+	ROM_LOAD("hangon1.bin", 0x0000, 0x2000, CRC(b0672137) SHA1(e0bd0808a3a8c6df200b0edc7b5e8cf293a659b7))
+	ROM_LOAD("hangon2.bin", 0x2000, 0x2000, CRC(6e1e55c0) SHA1(473c882a0eb68807969894b82be2b86d7c463c93))
+	ROM_LOAD("hangon3.bin", 0x4000, 0x2000, CRC(26949f2f) SHA1(e3e1a436ce59c7f1c2904cd8f50f2ba4a4e37638))
+ROM_END
 /*-------------------------------------------------------------------
 / Odisea Paris-Dakar (1987)
 /-------------------------------------------------------------------*/
@@ -838,3 +842,4 @@ GAME( 1987, sonstwr2, sonstwar, peyper,   sonstwar, peyper_state, peyper,   ROT0
 GAME( 1987, wolfman,  0,        peyper,   wolfman,  peyper_state, wolfman,  ROT0, "Peyper", "Wolf Man", MACHINE_MECHANICAL)
 GAME( 1986, nemesisp, 0,        peyper,   wolfman,  peyper_state, wolfman,  ROT0, "Peyper", "Nemesis", MACHINE_MECHANICAL)
 GAME( 1987, odisea,   0,        peyper,   odisea,   peyper_state, wolfman,  ROT0, "Peyper", "Odisea Paris-Dakar", MACHINE_MECHANICAL)
+GAME( 1988, hangonp,  0,        peyper,   sonstwar, peyper_state, peyper,  ROT0, "Sonic",  "Hang-On (Sonic)", MACHINE_MECHANICAL) // inputs to be checked
