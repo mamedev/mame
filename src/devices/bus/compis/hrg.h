@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    TeleNova Compis High Resolution Graphics adapter emulation
+    TeleNova Compis (Ultra) High Resolution Graphics adapter emulation
 
 **********************************************************************/
 
@@ -21,13 +21,14 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> compis_fdc_device
+// ======================> compis_hrg_t
 
 class compis_hrg_t : public device_t,
 					 public device_compis_graphics_card_interface
 {
 public:
 	// construction/destruction
+	compis_hrg_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	compis_hrg_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
@@ -53,8 +54,23 @@ private:
 };
 
 
+// ======================> compis_uhrg_t
+
+class compis_uhrg_t : public compis_hrg_t
+{
+public:
+	// construction/destruction
+	compis_uhrg_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const override;
+};
+
+
 // device type definition
 extern const device_type COMPIS_HRG;
+extern const device_type COMPIS_UHRG;
+
 
 
 #endif

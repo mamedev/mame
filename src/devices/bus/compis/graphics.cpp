@@ -68,4 +68,5 @@ void compis_graphics_slot_t::device_start()
 
 SLOT_INTERFACE_START( compis_graphics_cards )
 	SLOT_INTERFACE("hrg", COMPIS_HRG)
+	SLOT_INTERFACE("uhrg", COMPIS_UHRG)
 SLOT_INTERFACE_END
