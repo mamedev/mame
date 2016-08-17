@@ -12,8 +12,7 @@ Status:
 - Most games work
 -- Spain82: not working
 -- Nautilus: sound is broken (runs into the weeds)
--- Skill Flight: not working, no sound roms
--- Flash Dragon: no sound roms
+-- Skill Flight: not working
 -- Meg Aaton: not working (No Ball)
 
 Note: The input lines INT, EF1-4 are inverted (not true voltage).
@@ -507,8 +506,18 @@ ROM_START(fldragon)
 	ROM_LOAD("fldraudiocpu.rom", 0x2000, 0x2000, CRC(6ff2b276) SHA1(040b614f0b0587521ef5550b5587b94a7f3f178b))
 
 	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("fdsndu3.rom", 0x0000, 0x2000, NO_DUMP)
-	ROM_LOAD("fdsndu4.rom", 0x2000, 0x0800, NO_DUMP)
+	ROM_LOAD("fdsndu3.rom", 0x0000, 0x2000, CRC(aa9c52a8) SHA1(97d5d63b14d10c70a5eb80c08ccf5a1f3df7596d))
+	ROM_LOAD("fdsndu4.rom", 0x2000, 0x0800, CRC(0a7dc1d2) SHA1(32c7be5e9fbe4fa9ca661af7b7b5ea13ef250ce6))
+ROM_END
+
+ROM_START(fldragona)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("fldr_1a.cpu", 0x0000, 0x2000, CRC(21fda8e8) SHA1(feea608c2605cea1cdf9f7ed884297a95993f754))
+	ROM_LOAD("fldr_2a.cpu", 0x2000, 0x2000, CRC(3592a0b7) SHA1(4c4ed7930dcbbf81ce2e5296c0b36bb615bd2270))
+
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("fdsndu3.rom", 0x0000, 0x2000, CRC(aa9c52a8) SHA1(97d5d63b14d10c70a5eb80c08ccf5a1f3df7596d))
+	ROM_LOAD("fdsndu4.rom", 0x2000, 0x0800, CRC(0a7dc1d2) SHA1(32c7be5e9fbe4fa9ca661af7b7b5ea13ef250ce6))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -523,14 +532,24 @@ ROM_START(sklflite)
 	ROM_LOAD("skflcpu1.rom", 0x0000, 0x2000, CRC(8f833b55) SHA1(1729203582c22b51d1cc401aa8f270aa5cdadabe))
 	ROM_LOAD("skflaudiocpu.rom", 0x2000, 0x2000, CRC(ffc497aa) SHA1(3e88539ae1688322b9268f502d8ca41cffb28df3))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
-	ROM_LOAD("sfsndu3.rom", 0x0000, 0x2000, NO_DUMP)
-	ROM_LOAD("sfsndu4.rom", 0x2000, 0x0800, NO_DUMP)
+	ROM_REGION(0x8000, "audiocpu", 0)
+	ROM_LOAD("skflsnd.rom", 0x0000, 0x8000, CRC(926a1da9) SHA1(16c762fbfe6a55597f26ff55d380192bb8647ee0))
 ROM_END
 
 /*-------------------------------------------------------------------
 / ??/87 Phantom Ship
 /-------------------------------------------------------------------*/
+ROM_START(phntmshp)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("video1.bin", 0x0000, 0x2000, CRC(2b61a8d2) SHA1(1b5cabbab252b2ffb6ed12fb7e4181de7695ed9a))
+	ROM_LOAD("video2.bin", 0x2000, 0x2000, CRC(50126db1) SHA1(58d89e44131554cb087c4cad62869f90366704ad))
+
+	ROM_REGION(0x20000, "audiocpu", 0)
+	ROM_LOAD("sonido1.bin", 0x00000, 0x8000, CRC(3294611d) SHA1(5f790b41bcb6d87418c80e61ac8ae69c57864b1d))
+	ROM_LOAD("sonido2.bin", 0x08000, 0x8000, CRC(c2efc826) SHA1(44ee144b902627745853011968e0d654b35b3b08))
+	ROM_LOAD("sonido3.bin", 0x10000, 0x8000, CRC(13d50f39) SHA1(70624de2dd8412c83866183a83f16cc5b8bdccb8))
+	ROM_LOAD("sonido4.bin", 0x18000, 0x8000, CRC(b53f73ed) SHA1(bb928cfee418e8d9698d7bee78a32426f793c6e9))
+ROM_END
 
 /*-------------------------------------------------------------------
 / Trailer (1985)
@@ -566,6 +585,27 @@ ROM_START(megaatona)
 	ROM_LOAD("smegat.bin", 0x2000, 0x1000, CRC(910ab7fe) SHA1(0ddfd15c9c25f43b8fcfc4e11bc8ea180f6bd761))
 ROM_END
 
+/*-------------------------------------------------------------------
+/ ??/87 Iron Balls (Stargame)
+/-------------------------------------------------------------------*/
+ROM_START(ironball)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("video.bin", 0x0000, 0x2000, CRC(1867ebff) SHA1(485e46c742d914febcbdd58cb5a886f1d773282a))
+
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("sound.bin", 0x0000, 0x2000, CRC(83165483) SHA1(5076e5e836105d69c4ba606d8b995ecb16f88504))
+ROM_END
+
+/*-------------------------------------------------------------------
+/ ??/83 Miss Disco (Bingo machine)
+/-------------------------------------------------------------------*/
+ROM_START(msdisco)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("1.bin", 0x0000, 0x1000, CRC(06fb7da9) SHA1(36c6fda166b2a07a5ed9ad5d2b6fdfe8fd707b0f))
+
+	ROM_REGION(0x10000, "audiocpu", ROMREGION_ERASEFF)
+ROM_END
+
 GAME(1982,  spain82,   0,        play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Spain '82",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME(1983,  megaaton,  0,        play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Meg-Aaton",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 GAME(1983,  megaatona, megaaton, play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Meg-Aaton (alternate set)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
@@ -578,4 +618,10 @@ GAME(1985,  starfirp,  0,        play_5, play_5, driver_device, 0, ROT0, "Playma
 GAME(1985,  starfirpa, starfirp, play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Star Fire (alternate set)", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
 GAME(1985,  trailer,   0,        play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Trailer",                   MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
 GAME(1986,  fldragon,  0,        play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Flash Dragon",              MACHINE_MECHANICAL | MACHINE_NO_SOUND)
+GAME(1986,  fldragona, fldragon, play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Flash Dragon (alternate set)", MACHINE_MECHANICAL | MACHINE_NO_SOUND)
+GAME(1987,  phntmshp,  0,        play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Phantom Ship",              MACHINE_MECHANICAL | MACHINE_NO_SOUND)
 GAME(1987,  sklflite,  0,        play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Skill Flight (Playmatic)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+// not by Playmatic, but same hardware
+GAME(1987,  ironball,  0,        play_5, play_5, driver_device, 0, ROT0, "Stargame",  "Iron Balls",                MACHINE_MECHANICAL | MACHINE_NO_SOUND)
+// bingo hardware, to be split (?)
+GAME(1983,  msdisco,   0,        play_5, play_5, driver_device, 0, ROT0, "Playmatic", "Miss Disco (Bingo)",        MACHINE_IS_SKELETON_MECHANICAL)

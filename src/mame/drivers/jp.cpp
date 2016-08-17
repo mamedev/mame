@@ -12,7 +12,6 @@ ToDo:
 - Mechanical sounds
 - Extra sound board for some games - no schematic available
 - Even though nvram is fitted, all credits and scores are lost at reboot
-- Lortium: a rom is missing
 - Pimbal: outhole not working
 - Petaco: different hardware - manual is very poor copy
 
@@ -403,7 +402,7 @@ ROM_END
 /-------------------------------------------------------------------*/
 ROM_START(lortium)
 	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_LOAD("cpulort1.dat", 0x0000, 0x2000, NO_DUMP)
+	ROM_LOAD("cpulort1.dat", 0x0000, 0x2000, CRC(4943e31f) SHA1(2cbc0a1feb711b5540e9288b9b59527cc85361fc))
 	ROM_LOAD("cpulort2.dat", 0x2000, 0x2000, CRC(71eebb26) SHA1(9d49c1012555bda24ac7287499bcb93828cbb57f))
 ROM_END
 
@@ -428,7 +427,7 @@ ROM_START(olympus)
 
 	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("c1.256", 0x0000, 0x8000, CRC(93ceefbf) SHA1(be50b3d4485d4e8291047a52ca60656b55729555))
-	ROM_LOAD("c2.256", 0x8000, 0x8000, NO_DUMP)
+	ROM_LOAD("c2.256", 0x8000, 0x8000, CRC(8d404cf7) SHA1(e521ff1cf999496bada5348b7f845c468f053f0f))
 	ROM_LOAD("c3.256", 0x10000, 0x8000, CRC(266eb5dd) SHA1(0eb7c098ddb7f257daf625e5209a54c306d365bf))
 	ROM_LOAD("c4.256", 0x18000, 0x8000, CRC(082a052d) SHA1(f316fbe6ff63433861a8856e297c953ce29a8901))
 	ROM_LOAD("c5.256", 0x20000, 0x8000, CRC(402a3fb2) SHA1(1c078ca519271bf2bcbe0bc10e33078861085fcf))
@@ -446,7 +445,20 @@ ROM_START(petaco)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Petaco 2
+/ Petaco (using the new hardware, probably #1102)
+/-------------------------------------------------------------------*/
+ROM_START(petacon)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("petaco-n.dat", 0x0000, 0x2000, CRC(9e4d6944) SHA1(54b39e28152d481bd485433b4a7bf46174a78dbb))
+ROM_END
+
+ROM_START(petacona)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("petacona.bin", 0x0000, 0x2000, CRC(81502083) SHA1(c67a095fb5e868467577e7a86de5d51c59b3a68e))
+ROM_END
+
+/*-------------------------------------------------------------------
+/ Petaco 2 #1106?
 /-------------------------------------------------------------------*/
 ROM_START(petaco2)
 	ROM_REGION(0x4000, "maincpu", 0)
@@ -469,6 +481,8 @@ ROM_END
 GAME(1984,  petaco,     0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Petaco",       MACHINE_IS_SKELETON_MECHANICAL)
 
 // mostly ok
+GAME(1985,  petacon,    0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Petaco (new hardware)",      MACHINE_MECHANICAL)
+GAME(1985,  petacona,   0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Petaco (new hardware, alternate set)",       MACHINE_MECHANICAL)
 GAME(1985,  petaco2,    0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Petaco 2",     MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
 GAME(1985,  faeton,     0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Faeton",       MACHINE_MECHANICAL)
 GAME(1986,  halley,     0,      jp, jp, jp_state,   jp, ROT0, "Juegos Populares", "Halley Comet", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )

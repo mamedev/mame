@@ -9031,6 +9031,7 @@ bsb105                          //
 bsv100r                         //
 bsv102r                         //
 bsv103                          //
+bsv102                          //
 ffv101                          //
 ffv104                          //
 ghv101                          //
@@ -14920,6 +14921,8 @@ halleya                         //
 lortium                         //
 olympus                         //
 petaco                          //
+petacon                         //
+petacona                        //
 petaco2                         //
 pimbal                          //
 
@@ -30370,8 +30373,12 @@ megaatona                       //
 
 @source:play_5.cpp
 fldragon                        //
+fldragona                       //
+ironball                        //
 kz26                            //
+msdisco                         //
 nautilus                        //
+phntmshp                        //
 rock2500                        //
 sklflite                        //
 spain82                         //

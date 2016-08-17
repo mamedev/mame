@@ -442,7 +442,7 @@ ROM_START(blkfever)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Zira (??/80)
+/ Zira (??/81)
 /-------------------------------------------------------------------*/
 ROM_START(zira)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -450,7 +450,7 @@ ROM_START(zira)
 	ROM_LOAD("zira_u9.bin",  0x0800, 0x0800, CRC(d50a2419) SHA1(81b157f579a433389506817b1b6e02afaa2cf0d5))
 
 	ROM_REGION(0x10000, "audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("zira.snd",     0x0000, 0x0400, NO_DUMP)
+	ROM_LOAD("zira.snd",     0x0000, 0x0400, CRC(c8a54854) SHA1(6c0367dcb2a11f0478c44b4e2115c1cb1e8052f3))
 ROM_END
 
 /*-------------------------------------------------------------------
