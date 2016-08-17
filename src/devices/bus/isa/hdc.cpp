@@ -366,6 +366,32 @@ int xt_hdc_device::dack_r()
 	return result;
 }
 
+int xt_hdc_device::dack_rs()
+{
+	UINT8 result;
+
+	logerror("%s dack_rs(%d %d)\n", machine().describe_context(), hdcdma_read, hdcdma_size);
+
+	if (hdcdma_read == 0)
+	{
+		hdcdma_read = 512;
+		hdcdma_size -= 512;
+		hdcdma_src = hdcdma_data;
+	}
+
+	result = *(hdcdma_src++);
+
+	hdcdma_read--;
+
+	if (!no_dma())
+	{
+		m_drq_handler((hdcdma_read) ? 1 : 0);
+		if(!(hdcdma_read)) pc_hdc_result(0);
+	}
+
+	return result;
+}
+
 
 
 void xt_hdc_device::dack_w(int data)
@@ -441,13 +467,30 @@ void xt_hdc_device::execute_read()
 	if (!disk)
 		return;
 
-	status |= STA_READY;  // ready to recieve data
+	status |= STA_READY;  // ready to receive data
 	status &= ~STA_INPUT;
 	status &= ~STA_COMMAND;
 
 	hdcdma_src = hdcdma_data;
 	hdcdma_read = read_;
 	hdcdma_size = size;
+
+	if(!no_dma())
+	{
+		m_drq_handler(1);
+		if(!hdcdma_size) pc_hdc_result(0);
+	}
+}
+
+void xt_hdc_device::execute_readsbuff()
+{
+	status |= STA_READY;  // ready to receive data
+	status &= ~STA_INPUT;
+	status &= ~STA_COMMAND;
+
+	hdcdma_src = hdcdma_data;
+	hdcdma_read = 512;
+	hdcdma_size = 512;
 
 	if(!no_dma())
 	{
@@ -471,7 +514,7 @@ void xt_hdc_device::execute_write()
 	if (!disk)
 		return;
 
-	status |= STA_READY;  // ready to recieve data
+	status |= STA_READY;  // ready to receive data
 	status |= STA_INPUT;
 	status &= ~STA_COMMAND;
 
@@ -493,7 +536,7 @@ void xt_hdc_device::execute_writesbuff()
 	hdcdma_write = 512;
 	hdcdma_size = 512;
 
-	status |= STA_READY;  // ready to recieve data
+	status |= STA_READY;  // ready to receive data
 	status |= STA_INPUT;
 	status &= ~STA_COMMAND;
 
@@ -606,6 +649,15 @@ void xt_hdc_device::command()
 			set_error_info = 0;
 			break;
 
+		case CMD_READSBUFF:
+			if (LOG_HDC_STATUS)
+			{
+				logerror("%s hdc read sector buffer\n", machine().describe_context());
+			}
+
+			execute_readsbuff();
+			break;
+
 		case CMD_WRITE:
 		case CMD_WRITELONG:
 			get_chsn();
@@ -644,7 +696,6 @@ void xt_hdc_device::command()
 			if(no_dma()) pc_hdc_result(set_error_info);
 			break;
 
-		case CMD_READSBUFF:
 		case CMD_RAMDIAG:
 		case CMD_INTERNDIAG:
 			if(no_dma()) pc_hdc_result(set_error_info);
@@ -826,7 +877,10 @@ UINT8 xt_hdc_device::data_r()
 		{
 			do
 			{
-				buffer[data_cnt++] = dack_r();
+				if (m_current_cmd == CMD_READSBUFF)
+					buffer[data_cnt++] = dack_rs();
+				else
+					buffer[data_cnt++] = dack_r();
 			} while (hdcdma_read);
 			data_cnt = 0;
 		}
@@ -957,7 +1011,7 @@ void isa8_hdc_device::device_reset()
 {
 	dip = ioport("HDD")->read();
 
-	if (ioport("ROM")->read() == 1)
+	if (ioport("ROM")->read() == 1 && m_hdc->install_rom())
 		m_isa->install_rom(this, 0xc8000, 0xc9fff, "hdc", "hdc");
 }
 
@@ -1002,7 +1056,10 @@ WRITE8_MEMBER( isa8_hdc_device::pc_hdc_w )
 
 UINT8 isa8_hdc_device::dack_r(int line)
 {
-	return m_hdc->dack_r();
+	if (m_hdc->get_command() == CMD_READSBUFF)
+		return m_hdc->dack_rs();
+	else
+		return m_hdc->dack_r();
 }
 
 void isa8_hdc_device::dack_w(int line,UINT8 data)
