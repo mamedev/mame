@@ -1484,12 +1484,12 @@ ROM_START( pitboss ) /* Program roms on a CTR-202 daughter card - Internal desig
 	ROM_LOAD( "2214-04_u7-0.u7",   0x6000, 0x4000, CRC(c5cf7060) SHA1(4a3209ad24ae649348b0e0470fc446d37b667975) ) /* 27128 eprom */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "chr7.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) ) /* Shows: */
-	ROM_LOAD( "chr7.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) ) /* (c) 1983 Merit industries */
-	ROM_LOAD( "chr7.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) )
+	ROM_LOAD( "chr7_u39.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) ) /* Shows: */
+	ROM_LOAD( "chr7_u38.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) ) /* (c) 1983 Merit industries */
+	ROM_LOAD( "chr7_u37.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "chr7.rom.u40",  0x0000, 0x2000, CRC(db62c5ec) SHA1(a9967eb51436f342902fa3ce9c43d4d1ec5e0f3c) )
+	ROM_LOAD( "chr7_u40a.u40",  0x0000, 0x2000, CRC(db62c5ec) SHA1(a9967eb51436f342902fa3ce9c43d4d1ec5e0f3c) )
 ROM_END
 
 ROM_START( pitbossa ) /* Roms also found labeled simply as "PBHD" U5 through U7 */
@@ -1499,12 +1499,12 @@ ROM_START( pitbossa ) /* Roms also found labeled simply as "PBHD" U5 through U7 
 	ROM_LOAD( "2214-03_u7-0.u7",  0x4000, 0x2000, CRC(023e8cb8) SHA1(cdb180a94d801137466c13ddfaf65918cb608c5a) ) /* Joker Poker, Blackjack, Foto Finish & The Dice Game */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "chr7.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) ) /* Shows: */
-	ROM_LOAD( "chr7.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) ) /* (c) 1983 Merit industries */
-	ROM_LOAD( "chr7.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) ) /* Cheltenham PA. 19012      */
+	ROM_LOAD( "chr7_u39.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) ) /* Shows: */
+	ROM_LOAD( "chr7_u38.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) ) /* (c) 1983 Merit industries */
+	ROM_LOAD( "chr7_u37.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) ) /* Cheltenham PA. 19012      */
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "chr7.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
+	ROM_LOAD( "chr7_u40.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
 ROM_END
 
 ROM_START( pitbossa1 ) /* Specific build for localized region with no Free Hand Bonus */
@@ -1514,27 +1514,27 @@ ROM_START( pitbossa1 ) /* Specific build for localized region with no Free Hand 
 	ROM_LOAD( "2214-03_u7-0.u7",  0x4000, 0x2000, CRC(023e8cb8) SHA1(cdb180a94d801137466c13ddfaf65918cb608c5a) ) /* Joker Poker, Blackjack, Foto Finish & The Dice Game */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "chr7.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) ) /* Shows: */
-	ROM_LOAD( "chr7.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) ) /* (c) 1983 Merit industries */
-	ROM_LOAD( "chr7.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) ) /* Cheltenham PA. 19012      */
+	ROM_LOAD( "chr7_u39.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) ) /* Shows: */
+	ROM_LOAD( "chr7_u38.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) ) /* (c) 1983 Merit industries */
+	ROM_LOAD( "chr7_u37.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) ) /* Cheltenham PA. 19012      */
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "chr7.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
+	ROM_LOAD( "chr7_u40.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
 ROM_END
 
-ROM_START( pitbossb ) /* Roms also found labeled simply as "PSB1" U5 through U7 */
+ROM_START( pitbossb ) /* Roms also found labeled as U5-0C, U6-0 & U7-0 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "u5-0c.u5", 0x0000, 0x2000, CRC(d8902656) SHA1(06da829201f6141a6b23afa0e277a3c7a122c26e) ) /* Internal designation: PSB1REV0 */
-	ROM_LOAD( "u6-0.u6",  0x2000, 0x2000, CRC(bf903b01) SHA1(1f5f69cfd3eb105bd9bad071016931a79defa16b) ) /* Games included in this set are: */
-	ROM_LOAD( "u7-0.u7",  0x4000, 0x2000, CRC(306351b9) SHA1(32cd243aa65571ee7fc72971b6a16beeb4ed9d85) ) /* Joker Poker, Blackjack, Super Slots & The Dice Game */
+	ROM_LOAD( "psb1_u5.u5", 0x0000, 0x2000, CRC(d8902656) SHA1(06da829201f6141a6b23afa0e277a3c7a122c26e) ) /* Internal designation: PSB1REV0 */
+	ROM_LOAD( "psb1_u6.u6", 0x2000, 0x2000, CRC(bf903b01) SHA1(1f5f69cfd3eb105bd9bad071016931a79defa16b) ) /* Games included in this set are: */
+	ROM_LOAD( "psb1_u7.u7", 0x4000, 0x2000, CRC(306351b9) SHA1(32cd243aa65571ee7fc72971b6a16beeb4ed9d85) ) /* Joker Poker, Blackjack, Super Slots & The Dice Game */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "chr7.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) ) /* Shows: */
-	ROM_LOAD( "chr7.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) ) /* (c) 1983 Merit industries */
-	ROM_LOAD( "chr7.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) ) /* Cheltenham PA. 19012      */
+	ROM_LOAD( "chr7_u39.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) ) /* Shows: */
+	ROM_LOAD( "chr7_u38.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) ) /* (c) 1983 Merit industries */
+	ROM_LOAD( "chr7_u37.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) ) /* Cheltenham PA. 19012      */
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "chr7.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
+	ROM_LOAD( "chr7_u40.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
 ROM_END
 
 /* Known to exist is Pit Boss version M4A2 (confirmed via manual) and likely a M4A3 as well (not confirmed, but M4A4 is dumped) */
@@ -1546,12 +1546,12 @@ ROM_START( pitbossc )
 	ROM_LOAD( "m4a1_u7.u7",   0x4000, 0x2000, CRC(5fa5d436) SHA1(9f3fd81eae7f378268f3b4af8fd299ffb97d7fb6) ) /* Draw Poker, Blackjack, Acey Deucey & The Dice Game */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "chr2.u39",  0x0000, 0x2000, CRC(f9613e7b) SHA1(1e8cafe142a235d65b43c7e46a79ed4f6272b61c) ) /* Shows: */
-	ROM_LOAD( "chr2.u38",  0x2000, 0x2000, CRC(7af28902) SHA1(04f685389958d581aaf2c86940d1b8b8cec05d7a) ) /* (c) 1983 Merit industries   Phila. PA. */
-	ROM_LOAD( "chr2.u37",  0x4000, 0x2000, CRC(ea6f0c59) SHA1(f2c0ff99518c2cec3eb1b4042fa3754a702c0e34) ) /* All Rights Reserverd                   */
+	ROM_LOAD( "chr2_u39.u39",  0x0000, 0x2000, CRC(f9613e7b) SHA1(1e8cafe142a235d65b43c7e46a79ed4f6272b61c) ) /* Shows: */
+	ROM_LOAD( "chr2_u38.u38",  0x2000, 0x2000, CRC(7af28902) SHA1(04f685389958d581aaf2c86940d1b8b8cec05d7a) ) /* (c) 1983 Merit industries   Phila. PA. */
+	ROM_LOAD( "chr2_u37.u37",  0x4000, 0x2000, CRC(ea6f0c59) SHA1(f2c0ff99518c2cec3eb1b4042fa3754a702c0e34) ) /* All Rights Reserverd                   */
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "chr2.u40",  0x0000, 0x2000, CRC(40c94dce) SHA1(86611e3a1048b2a3fffcc0110811656a2d0fc4a5) )
+	ROM_LOAD( "chr2_u40.u40",  0x0000, 0x2000, CRC(40c94dce) SHA1(86611e3a1048b2a3fffcc0110811656a2d0fc4a5) )
 ROM_END
 
 ROM_START( mdchoice )
@@ -1561,12 +1561,12 @@ ROM_START( mdchoice )
 	ROM_LOAD( "e4a1_u7.u7",   0x4000, 0x2000, CRC(9451d8db) SHA1(c2431b25543218fd8bc5a4eb79e8a77690e26c5e) ) /* Draw Poker, Blackjack, Acey Deucey & The Dice Game */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "chr2.u39",  0x0000, 0x2000, CRC(f9613e7b) SHA1(1e8cafe142a235d65b43c7e46a79ed4f6272b61c) ) /* Shows: */
-	ROM_LOAD( "chr2.u38",  0x2000, 0x2000, CRC(7af28902) SHA1(04f685389958d581aaf2c86940d1b8b8cec05d7a) ) /* (MFG FOR:             */
-	ROM_LOAD( "chr2.u37",  0x4000, 0x2000, CRC(ea6f0c59) SHA1(f2c0ff99518c2cec3eb1b4042fa3754a702c0e34) ) /* EEI-CVS International */
+	ROM_LOAD( "chr2_u39.u39",  0x0000, 0x2000, CRC(f9613e7b) SHA1(1e8cafe142a235d65b43c7e46a79ed4f6272b61c) ) /* Shows: */
+	ROM_LOAD( "chr2_u38.u38",  0x2000, 0x2000, CRC(7af28902) SHA1(04f685389958d581aaf2c86940d1b8b8cec05d7a) ) /* MFG FOR:              */
+	ROM_LOAD( "chr2_u37.u37",  0x4000, 0x2000, CRC(ea6f0c59) SHA1(f2c0ff99518c2cec3eb1b4042fa3754a702c0e34) ) /* EEI-CVS International */
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "chr2.u40",  0x0000, 0x2000, CRC(40c94dce) SHA1(86611e3a1048b2a3fffcc0110811656a2d0fc4a5) )
+	ROM_LOAD( "chr2_u40.u40",  0x0000, 0x2000, CRC(40c94dce) SHA1(86611e3a1048b2a3fffcc0110811656a2d0fc4a5) )
 ROM_END
 
 ROM_START( mpchoice ) /* Same games as pitbossc but different dips & can control the payout percentage (like The Round Up below) */
@@ -1576,12 +1576,12 @@ ROM_START( mpchoice ) /* Same games as pitbossc but different dips & can control
 	ROM_LOAD( "m4c1_u7.u7",   0x4000, 0x2000, CRC(f2b6aff8) SHA1(c5c1a4ba808d9830604bc2399e66b60c56bd6f05) ) /* Draw Poker, Blackjack, Acey Deucey & The Dice Game */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "chr2.u39",  0x0000, 0x2000, CRC(f9613e7b) SHA1(1e8cafe142a235d65b43c7e46a79ed4f6272b61c) ) /* Shows: */
-	ROM_LOAD( "chr2.u38",  0x2000, 0x2000, CRC(7af28902) SHA1(04f685389958d581aaf2c86940d1b8b8cec05d7a) ) /* (c) 1983 Merit industries   Philadelphia PA. */
-	ROM_LOAD( "chr2.u37",  0x4000, 0x2000, CRC(ea6f0c59) SHA1(f2c0ff99518c2cec3eb1b4042fa3754a702c0e34) ) /* All Rights Reserverd                         */
+	ROM_LOAD( "chr2_u39.u39",  0x0000, 0x2000, CRC(f9613e7b) SHA1(1e8cafe142a235d65b43c7e46a79ed4f6272b61c) ) /* Shows: */
+	ROM_LOAD( "chr2_u38.u38",  0x2000, 0x2000, CRC(7af28902) SHA1(04f685389958d581aaf2c86940d1b8b8cec05d7a) ) /* (c) 1983 Merit industries   Philadelphia PA. */
+	ROM_LOAD( "chr2_u37.u37",  0x4000, 0x2000, CRC(ea6f0c59) SHA1(f2c0ff99518c2cec3eb1b4042fa3754a702c0e34) ) /* All Rights Reserverd                         */
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "chr2.u40",  0x0000, 0x2000, CRC(40c94dce) SHA1(86611e3a1048b2a3fffcc0110811656a2d0fc4a5) )
+	ROM_LOAD( "chr2_u40.u40",  0x0000, 0x2000, CRC(40c94dce) SHA1(86611e3a1048b2a3fffcc0110811656a2d0fc4a5) )
 ROM_END
 
 ROM_START( casino5 ) /* Standard version, the rom set with 3315-02 U5-1 is the "Minnesota" version and is undumped */
@@ -1591,12 +1591,12 @@ ROM_START( casino5 ) /* Standard version, the rom set with 3315-02 U5-1 is the "
 	ROM_LOAD( "3315-02_u7-0.u7", 0x6000, 0x4000, CRC(d3bc510d) SHA1(6222badabf629dd6334591867596f811883aed52) ) /* There is known to be a 3315-02 U7-0-A version (not dumped) */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "chr7.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) )
-	ROM_LOAD( "chr7.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) )
-	ROM_LOAD( "chr7.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) )
+	ROM_LOAD( "chr7_u39.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) )
+	ROM_LOAD( "chr7_u38.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) )
+	ROM_LOAD( "chr7_u37.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "u40", 0x0000, 0x2000, CRC(b13a3fb1) SHA1(25760aa27c88b8be248a87df724bf8797d179e7a) )
+	ROM_LOAD( "chr8_u40a.u40", 0x0000, 0x2000, CRC(b13a3fb1) SHA1(25760aa27c88b8be248a87df724bf8797d179e7a) )
 ROM_END
 
 ROM_START( mroundup )
@@ -1606,12 +1606,12 @@ ROM_START( mroundup )
 	ROM_LOAD( "kru1cd_u7.u7",  0x4000, 0x2000, CRC(72131230) SHA1(e7c08b537848a7c6e6e987c6d0644a031bb238d4) ) /* Draw Poker, Blackjack, Foto Finish */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "chr7.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) )
-	ROM_LOAD( "chr7.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) )
-	ROM_LOAD( "chr7.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) )
+	ROM_LOAD( "chr7_u39.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) )
+	ROM_LOAD( "chr7_u38.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) )
+	ROM_LOAD( "chr7_u37.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "chr7.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
+	ROM_LOAD( "chr7_u40.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
 ROM_END
 
 ROM_START( chkndraw )

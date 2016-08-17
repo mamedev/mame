@@ -1278,11 +1278,11 @@ ROM_START( deluxe4u ) /* Deluxe 4 U */
 	ROM_LOAD( "3.su06", 0x00000, 0x40000, CRC(31de379a) SHA1(a0c9a9cec7207cc4ba33abb68bef62d7eb8e75e9) )
 
 	ROM_REGION( 0x180000, "spr", 0 )    /* Sprites, 16x16x5 */
-	ROM_LOAD16_BYTE( "ju06", 0x000000, 0x040000, CRC(8b853bce) SHA1(fa6e654fc965d88bb426b76cdce3417f357b25f3) )
-	ROM_LOAD16_BYTE( "ju05", 0x000001, 0x040000, CRC(bbe81779) SHA1(750387fb4aaa04b7f4f1d3985896f5e11219e3ea) )
-	ROM_LOAD16_BYTE( "ju04", 0x080000, 0x040000, CRC(40fa2c2f) SHA1(b9d9bfdc9343f00bad9749c76472f064c509cfce) )
-	ROM_LOAD16_BYTE( "ju03", 0x080001, 0x040000, CRC(aa130fd3) SHA1(46a55d8ca59a52e610600fdba76d9729528d2871) )
-	ROM_LOAD16_BYTE( "ju07", 0x100000, 0x040000, CRC(d414c3af) SHA1(9299b07a8c7a3e30a1bb6028204a049a7cb510f7) )
+	ROM_LOAD16_BYTE( "am27c020.ju06", 0x000000, 0x040000, CRC(8b853bce) SHA1(fa6e654fc965d88bb426b76cdce3417f357b25f3) ) /* AM27C020 mask roms with no label */
+	ROM_LOAD16_BYTE( "am27c020.ju05", 0x000001, 0x040000, CRC(bbe81779) SHA1(750387fb4aaa04b7f4f1d3985896f5e11219e3ea) )
+	ROM_LOAD16_BYTE( "am27c020.ju04", 0x080000, 0x040000, CRC(40fa2c2f) SHA1(b9d9bfdc9343f00bad9749c76472f064c509cfce) )
+	ROM_LOAD16_BYTE( "am27c020.ju03", 0x080001, 0x040000, CRC(aa130fd3) SHA1(46a55d8ca59a52e610600fdba76d9729528d2871) )
+	ROM_LOAD16_BYTE( "am27c020.ju07", 0x100000, 0x040000, CRC(d414c3af) SHA1(9299b07a8c7a3e30a1bb6028204a049a7cb510f7) )
 
 	ROM_REGION( 0x400000, "bgs", 0 )    /* Layers, 16x16x8 */
 	// could not get good reads of these, not the same as deluxe5
@@ -1592,7 +1592,7 @@ GAME( 1999, multchmp, 0,        esd16,    multchmp, driver_device, 0, ROT0, "ESD
 GAME( 1998, multchmpk,multchmp, esd16,    multchmp, driver_device, 0, ROT0, "ESD",         "Multi Champ (Korea, older)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, multchmpa,multchmp, esd16,    multchmp, driver_device, 0, ROT0, "ESD",         "Multi Champ (World, older)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2001, jumppop,  0,        jumppop,  jumppop, driver_device,  0, ROT0, "ESD",         "Jumping Pop (set 1)", MACHINE_SUPPORTS_SAVE ) /* Redesigned(?) ESD 11-09-98 with no ID# */
+GAME( 2001, jumppop,  0,        jumppop,  jumppop, driver_device,  0, ROT0, "ESD",         "Jumping Pop (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 2001, jumppope, jumppop,  jumppop,  jumppop, driver_device,  0, ROT0, "Emag Soft",   "Jumping Pop (set 2)", MACHINE_SUPPORTS_SAVE )
 
 /* ESD 05-28-99 */
