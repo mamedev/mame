@@ -2874,7 +2874,7 @@ ROM_START( term2la1 )
 ROM_END
 
 
-ROM_START( term2lg1 ) /* All reported German versions use stadard English sound roms */
+ROM_START( term2lg1 ) /* All reported German versions use standard English sound roms */
 	ROM_REGION( 0x50000, "adpcm:cpu", 0 )   /* sound CPU */
 	ROM_LOAD (  "sl1_terminator_2_u3_sound_rom.u3",   0x10000, 0x20000, CRC(73c3f5c4) SHA1(978dd974590e77294dbe9a647aebd3d24af6397f) )
 	ROM_RELOAD ( 0x30000, 0x20000 )
