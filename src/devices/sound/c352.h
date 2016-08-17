@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont
+// copyright-holders:R. Belmont, superctr
 #pragma once
 
 #ifndef __C352_H__
@@ -66,44 +66,38 @@ private:
 		C352_FLG_LOOP       = 0x0002,   // loop forward
 		C352_FLG_REVERSE    = 0x0001    // play sample backwards
 	};
+	
+	struct c352_voice_t {
 
-	struct c352_ch_t
-	{
-		UINT8   vol_l;
-		UINT8   vol_r;
-		UINT8   vol_l2;
-		UINT8   vol_r2;
-		UINT8   bank;
-		INT16   noise;
-		INT16   noisebuf;
-		UINT16  noisecnt;
-		UINT16  pitch;
-		UINT16  start_addr;
-		UINT16  end_addr;
-		UINT16  repeat_addr;
-		UINT32  flag;
+		unsigned int pos;
+		unsigned int counter;
 
-		UINT16  start;
-		UINT16  repeat;
-		UINT32  current_addr;
-		UINT32  pos;
+		short sample;
+		short last_sample;
+
+		unsigned short vol_f;
+		unsigned short vol_r;
+		unsigned short freq;
+		unsigned short flags;
+
+		unsigned short wave_bank;
+		unsigned short wave_start;
+		unsigned short wave_end;
+		unsigned short wave_loop;
+
 	};
-
-	c352_ch_t m_c352_ch[32];
+	
 	int m_sample_rate_base;
 	int m_divider;
-
-	long m_channel_l[2048*2];
-	long m_channel_r[2048*2];
-	long m_channel_l2[2048*2];
-	long m_channel_r2[2048*2];
-
+	
+	c352_voice_t m_c352_v[32];
 	short m_mulaw_table[256];
-	unsigned int m_mseq_reg;
+	
+    unsigned short m_random;
+    unsigned short m_control; // control flags, purpose unknown.
+	
+	void fetch_sample(c352_voice_t* v);
 
-	// private functions
-	int get_mseq_bit(void);
-	void mix_one_channel(unsigned long ch, long sample_count);
 	unsigned short read_reg16(unsigned long address);
 	void write_reg16(unsigned long address, unsigned short val);
 };
